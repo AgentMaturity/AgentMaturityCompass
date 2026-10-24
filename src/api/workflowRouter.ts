@@ -175,11 +175,12 @@ export async function handleWorkflowRoute(
         ttlMs: parseTtlToMs(body.ttl ?? '15m'),
         toolName: body.tool,
       };
-      const issued = revalidateAuthority ? await tickets.issueExecTicketAsync(input) : tickets.issueExecTicket(input);
+      const issued = revalidateAuthority ? await tickets.issueExecTicketAsync(input, { beforePublish }) : tickets.issueExecTicket(input);
       // A trusted direct caller rereads its credential/current roles after the provider wait.
       if (revalidateAuthority && !revalidateAuthority()) return true;
       apiSuccess(res, { ticket: issued.ticket, payload: issued.payload }, 201);
     } catch (err) {
+      if (res.headersSent) return true;
       if (err instanceof KeyProviderError) apiError(res, err.status, err.message);
       else if (err instanceof KeyRevokedError) apiError(res, 409, 'A4_KEY_REVOKED: the execution-ticket key was revoked');
       else if (err instanceof Error && /vault locked/i.test(err.message)) apiError(res, 423, 'A4_VAULT_LOCKED: unlock the vault to issue an execution ticket');

@@ -151,14 +151,21 @@ export function createWorkOrder(params: WorkOrderInput): {
 
 async function publishWorkOrderFile(workspace: string, agentId: string, filePath: string, bytes: Buffer,
   assertCurrent: () => void, options: WorkOrderPublicationOptions, ownerCommand: "workorder create" | "workorder expire"): Promise<string> {
+  const beforePublish = options.beforePublish;
+  beforePublish?.(); assertCurrent(); assertOwnerMode(workspace, ownerCommand);
   const rel = relative(workspace, filePath).replace(/\\/g, "/"), sigRel = rel + ".sig", captured = capturePurposePublication(workspace, "config-signature");
   const readPair = () => ({ body: readContainedOrNull(workspace, rel, Number.MAX_SAFE_INTEGER), signature: readContainedOrNull(workspace, sigRel, Number.MAX_SAFE_INTEGER) });
   const predecessor = withWorkOrderLock(workspace, agentId, () => { assertCurrent(); return readPair(); });
   if (predecessor.body !== null || predecessor.signature !== null) throw new Error("work-order publication destination already exists");
-  const digestSha256 = sha256Hex(bytes), signed = await signWithPurposeKey(workspace, "config-signature", Buffer.from(digestSha256, "hex"));
+  const beforeSign = () => {
+    beforePublish?.(); assertCurrent(); assertOwnerMode(workspace, ownerCommand);
+    const current = readPair();
+    if (current.body !== null || current.signature !== null) throw new Error("work-order publication destination changed while signing was prepared; retry");
+  };
+  const digestSha256 = sha256Hex(bytes), signed = await signWithPurposeKey(workspace, "config-signature", Buffer.from(digestSha256, "hex"), { beforeSign });
   const payload: SignatureFile = { digestSha256, signature: signed.signature.toString("base64"), signedTs: Date.now(), signer: "auditor" };
   withWorkOrderLock(workspace, agentId, () => {
-    options.beforePublish?.(); assertCurrent(); assertOwnerMode(workspace, ownerCommand);
+    beforePublish?.(); assertCurrent(); assertOwnerMode(workspace, ownerCommand);
     assertPurposePublicationCurrent(workspace, captured, signed);
     const current = readPair();
     if (current.body !== null || current.signature !== null) throw new Error("work-order publication destination changed while signing was prepared; retry");

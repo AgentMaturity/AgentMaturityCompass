@@ -2,6 +2,7 @@ import { sign, randomUUID } from "node:crypto";
 import { getSigningKey } from "../crypto/keys.js";
 import { verifyCurrentPurposeCredentialSignature } from "../keys/purposeCredentialSignature.js";
 import { signWithPurposeKey } from "../keys/purposeProviders.js";
+import { capturePurposePublication, assertPurposePublicationCurrent } from "../keys/purposePublication.js";
 import { assertOwnerMode } from "../mode/mode.js";
 import { canonicalize } from "../utils/json.js";
 import { execTicketPayloadSchema, type ExecTicketPayload } from "./execTicketSchema.js";
@@ -62,15 +63,22 @@ export function issueExecTicket(params: ExecTicketInput): { ticket: string; payl
   };
 }
 
-/** Additive runtime issuer. No token escapes until both committed key and the actual work order are checked again. */
-export async function issueExecTicketAsync(params: ExecTicketInput): Promise<{ ticket: string; payload: ExecTicketPayload }> {
-  assertOwnerMode(params.workspace, "ticket issue");
-  const input = { ...params }, { payload, payloadBytes } = prepareExecTicket(input);
-  const signed = await signWithPurposeKey(input.workspace, "config-signature", payloadBytes);
-  const current = loadWorkOrder({ workspace: input.workspace, agentId: input.agentId, workOrderId: input.workOrderId, requireValidSignature: true });
-  if (workOrderDigest(current) !== payload.workOrderSha256) throw new Error("the work order changed while the execution ticket was signed");
-  if (Date.now() > payload.expiresTs) throw new Error("the execution ticket expired while it was signed");
-  assertOwnerMode(input.workspace, "ticket issue");
+/** Additive runtime issuer. Caller/work-order refusal repeats through Sign and before the unchanged token returns. */
+export async function issueExecTicketAsync(params: ExecTicketInput, options: { beforePublish?: () => void } = {}): Promise<{ ticket: string; payload: ExecTicketPayload }> {
+  const input = { ...params }, beforePublish = options.beforePublish;
+  beforePublish?.(); assertOwnerMode(input.workspace, "ticket issue");
+  const { payload, payloadBytes } = prepareExecTicket(input);
+  const authority = capturePurposePublication(input.workspace, "config-signature");
+  const beforeSign = () => {
+    beforePublish?.();
+    const current = loadWorkOrder({ workspace: input.workspace, agentId: input.agentId, workOrderId: input.workOrderId, requireValidSignature: true });
+    if (workOrderDigest(current) !== payload.workOrderSha256) throw new Error("the work order changed while the execution ticket was signed");
+    if (Date.now() > payload.expiresTs) throw new Error("the execution ticket expired while it was signed");
+    assertOwnerMode(input.workspace, "ticket issue");
+  };
+  const signed = await signWithPurposeKey(input.workspace, "config-signature", payloadBytes, { beforeSign });
+  beforeSign();
+  assertPurposePublicationCurrent(input.workspace, authority, signed);
   return { ticket: `${toBase64Url(payloadBytes)}.${toBase64Url(signed.signature)}`, payload };
 }
 

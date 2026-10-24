@@ -357,17 +357,21 @@ async function mutateUsersConfigAsync<T>(workspace: string, change: (current: Us
     const bytes = Buffer.from(YAML.stringify(usersFileSchema.parse(changed.config)), "utf8");
     return { predecessor, bytes, result: changed.result };
   });
+  const assertPredecessorCurrent = () => {
+    const current = usersPublicationSnapshot(workspace);
+    if (!sameUsersBytes(prepared.predecessor.bytes, current.bytes) || !sameUsersBytes(prepared.predecessor.signature, current.signature)) {
+      throw new Error("users config changed while signing; retry");
+    }
+  };
+  const beforeSign = () => { assertAuthorized?.(); assertPredecessorCurrent(); };
   const digest = sha256Hex(prepared.bytes);
-  const signed = await signWithPurposeKey(workspace, "config-signature", Buffer.from(digest, "hex"));
+  const signed = await signWithPurposeKey(workspace, "config-signature", Buffer.from(digest, "hex"), { beforeSign });
   const signature = Buffer.from(JSON.stringify({ digestSha256: digest, signature: signed.signature.toString("base64"),
     signedTs: Date.now(), signer: "auditor" } satisfies UsersSignature, null, 2), "utf8");
   return withUsersConfigLock(workspace, () => {
     assertAuthorized?.();
     assertPurposePublicationCurrent(workspace, authority, signed);
-    const current = usersPublicationSnapshot(workspace);
-    if (!sameUsersBytes(prepared.predecessor.bytes, current.bytes) || !sameUsersBytes(prepared.predecessor.signature, current.signature)) {
-      throw new Error("users config changed while signing; retry");
-    }
+    assertPredecessorCurrent();
     // Same YAML, digest and sidecar shape as the synchronous APIs; a partial pair still fails closed.
     writeFileAtomic(usersPath(workspace), prepared.bytes, 0o644);
     writeFileAtomic(usersSigPath(workspace), signature, 0o644);
