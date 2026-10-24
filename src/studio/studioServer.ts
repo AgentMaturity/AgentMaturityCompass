@@ -259,7 +259,7 @@ import {
 } from "../transformation/transformApi.js";
 import { renderTransformReportMarkdown } from "../transformation/transformReports.js";
 import { loadOpsPolicy, verifyOpsPolicySignature } from "../ops/policy.js";
-import { retentionStatusCli, retentionRunCli } from "../ops/retention/retentionCli.js";
+import { retentionStatusCli, retentionRunStudioAsync } from "../ops/retention/retentionCli.js";
 import {
   maintenancePruneCacheCli,
   maintenanceStatsCli,
@@ -2509,7 +2509,12 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
         const parsed = body ? (JSON.parse(body) as { dryRun?: boolean }) : {};
-        const result = retentionRunCli(options.workspace, parsed.dryRun === true);
+        const currentActor = signingAuthority(["OWNER", "OPERATOR"]), beforePublish = () => {
+          currentActor(); if (requiresReadOnlyMode(options.workspace)) { if (!res.headersSent) json(res, 403, { error: "users signature invalid; write operations blocked" }); throw new Error("retention caller is read-only"); }
+        };
+        let result: Awaited<ReturnType<typeof retentionRunStudioAsync>>;
+        try { result = await retentionRunStudioAsync(options.workspace, parsed.dryRun === true, beforePublish); beforePublish(); }
+        catch (error) { if (res.headersSent) return; throw error; }
         const stats = maintenanceStatsCli(options.workspace);
         setRetentionSegmentsMetric(retentionStatusCli(options.workspace).segmentCount);
         setBlobMetrics(stats.blobs.count, stats.blobs.bytes);

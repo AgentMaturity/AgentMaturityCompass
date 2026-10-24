@@ -1,11 +1,16 @@
-import { gzipSync, gunzipSync } from "node:zlib";
-import { readFileSync, readdirSync } from "node:fs";
+import { gunzipSync } from "node:zlib";
+import { readdirSync } from "node:fs";
 import { join } from "node:path";
 import type { EvidenceEvent } from "../../types.js";
-import { getSigningKey, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../../crypto/keys.js";
-import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../../utils/fs.js";
+import { getSigningKey, getPublicKeyPem, signHexDigest, verifyHexDigestAny } from "../../crypto/keys.js";
+import { assertKeysetComplete, boundProviderKey, keysetDeclared } from "../../keys/keyset.js";
+import { getPurposeKeyHistory, readHistory } from "../../keys/signingKeys.js";
+import { pathExists, readUtf8 } from "../../utils/fs.js";
 import { sha256Hex } from "../../utils/hash.js";
 import { canonicalize } from "../../utils/json.js";
+import { captureRetentionFile, prunedFiles, preparePrunedPrefix, prepareRetentionSegment, publishPrunedPrefix,
+  publishRetentionSegment, withRetentionPublication, type RetentionFile } from "./retentionPublication.js";
+import { captureRetentionAuthority, assertRetentionAuthorityCurrent } from "./retentionAuthority.js";
 import {
   blobPrunedRowSchema,
   blobPrunedSealSchema,
@@ -34,10 +39,6 @@ function archiveLedgerDir(workspace: string): string {
   return join(workspace, ".amc", "archive", "ledger");
 }
 
-function segmentFilePath(workspace: string, segmentId: string, startTs: number, endTs: number): string {
-  return join(archiveLedgerDir(workspace), `segment_${startTs}_${endTs}_${segmentId}.jsonl.gz`);
-}
-
 function segmentManifestPath(segmentPath: string): string {
   return `${segmentPath}.manifest.json`;
 }
@@ -50,48 +51,38 @@ function prunedLogPath(workspace: string): string {
   return join(workspace, ".amc", "blobs", "pruned.jsonl");
 }
 
-function prunedSealPath(workspace: string): string {
-  return join(workspace, ".amc", "blobs", "pruned.jsonl.sig");
+export function readPrunedRows(workspace: string): BlobPrunedRow[] {
+  return parsePrunedRows(captureRetentionFile(prunedLogPath(workspace)).bytes);
 }
 
-export function readPrunedRows(workspace: string): BlobPrunedRow[] {
-  const file = prunedLogPath(workspace);
-  if (!pathExists(file)) return [];
-  return readUtf8(file)
+function parsePrunedRows(bytes: Buffer | null): BlobPrunedRow[] {
+  return (bytes?.toString("utf8") ?? "")
     .split(/\r?\n/)
     .map((line) => line.trim())
     .filter((line) => line.length > 0)
     .map((line) => blobPrunedRowSchema.parse(JSON.parse(line) as unknown));
 }
 
-function signPrunedRows(workspace: string, lastHash: string): void {
-  const digest = sha256Hex(pathExists(prunedLogPath(workspace)) ? readFileSync(prunedLogPath(workspace)) : Buffer.alloc(0));
-  const seal = blobPrunedSealSchema.parse({
-    v: 1,
-    ts: Date.now(),
-    lastHash,
-    digestSha256: digest,
-    signature: signHexDigest(digest, getSigningKey(workspace, "artifact-seal")),
-    signer: "auditor"
-  });
-  writeFileAtomic(prunedSealPath(workspace), JSON.stringify(seal, null, 2), 0o644);
+export function appendPrunedRow(workspace: string, blobId: string, sha256: string): void {
+  const authority = captureRetentionAuthority(workspace, false);
+  const plan = preparePrunedPrefix(workspace, blobId, sha256, prunedFiles(workspace));
+  // Retained sync/no-sign contract; all key lookup and crypto finish before the common lock.
+  const signature = signHexDigest(plan.digest, getSigningKey(workspace, "artifact-seal"));
+  const seal = JSON.stringify(blobPrunedSealSchema.parse({ v: 1, ts: plan.sealTs, lastHash: plan.row.hash,
+    digestSha256: plan.digest, signature, signer: "auditor" }), null, 2);
+  withRetentionPublication(workspace, () => { assertRetentionAuthorityCurrent(workspace, authority); publishPrunedPrefix(plan, seal, []); });
 }
 
-export function appendPrunedRow(workspace: string, blobId: string, sha256: string): void {
-  const rows = readPrunedRows(workspace);
-  const prev = rows.length > 0 ? rows[rows.length - 1]!.hash : "";
-  const ts = Date.now();
-  const row = blobPrunedRowSchema.parse({
-    v: 1,
-    ts,
-    blobId,
-    sha256,
-    prev,
-    hash: sha256Hex(canonicalize({ v: 1, ts, blobId, sha256, prev }))
-  });
-  const current = pathExists(prunedLogPath(workspace)) ? readUtf8(prunedLogPath(workspace)) : "";
-  writeFileAtomic(prunedLogPath(workspace), `${current}${JSON.stringify(row)}\n`, 0o644);
-  signPrunedRows(workspace, row.hash);
+function verifyRetentionDigest(workspace: string, digest: string, signature: string): boolean {
+  try {
+    assertKeysetComplete(workspace);
+    const keys = getPurposeKeyHistory(workspace, "artifact-seal");
+    if (keysetDeclared(workspace) && boundProviderKey(workspace, "artifact-seal") === null) {
+      const history = readHistory(workspace, "auditor", getPublicKeyPem(workspace, "auditor"));
+      keys.push(...(history?.entries.filter(entry => entry.source === "imported").map(entry => entry.publicKeyPem) ?? []));
+    }
+    return verifyHexDigestAny(digest, signature, keys);
+  } catch { return false; }
 }
 
 export function verifyPrunedRows(workspace: string): {
@@ -99,10 +90,18 @@ export function verifyPrunedRows(workspace: string): {
   errors: string[];
   rows: BlobPrunedRow[];
 } {
+  try { return verifyPrunedSnapshot(workspace, prunedFiles(workspace)); }
+  catch { return { ok: false, errors: ["invalid blob pruned log or seal: unreadable state"], rows: [] }; }
+}
+
+/** Internal same-buffer verifier, also used before preparing the next cumulative seal. */
+export function verifyPrunedSnapshot(workspace: string, files: readonly RetentionFile[]): {
+  ok: boolean; errors: string[]; rows: BlobPrunedRow[];
+} {
   const errors: string[] = [];
   let rows: BlobPrunedRow[] = [];
   try {
-    rows = readPrunedRows(workspace);
+    rows = parsePrunedRows(files[0]!.bytes);
   } catch (error) {
     errors.push(`invalid blob pruned log: ${String(error)}`);
     return { ok: false, errors, rows };
@@ -122,15 +121,15 @@ export function verifyPrunedRows(workspace: string): {
     prev = row.hash;
   }
 
-  if (rows.length > 0 && !pathExists(prunedSealPath(workspace))) {
+  if (rows.length > 0 && files[1]!.bytes === null) {
     errors.push("blob pruned seal missing");
-  } else if (pathExists(prunedSealPath(workspace))) {
+  } else if (files[1]!.bytes !== null) {
     try {
-      const seal = blobPrunedSealSchema.parse(JSON.parse(readUtf8(prunedSealPath(workspace))) as unknown);
-      const digest = sha256Hex(pathExists(prunedLogPath(workspace)) ? readFileSync(prunedLogPath(workspace)) : Buffer.alloc(0));
+      const seal = blobPrunedSealSchema.parse(JSON.parse(files[1]!.bytes!.toString("utf8")) as unknown);
+      const digest = sha256Hex(files[0]!.bytes ?? Buffer.alloc(0));
       if (seal.digestSha256 !== digest) {
         errors.push("blob pruned seal digest mismatch");
-      } else if (!verifyHexDigestAny(digest, seal.signature, getPublicKeyHistory(workspace, "auditor"))) {
+      } else if (!verifyRetentionDigest(workspace, digest, seal.signature)) {
         errors.push("blob pruned seal signature invalid");
       }
       if (seal.lastHash !== (rows.length > 0 ? rows[rows.length - 1]!.hash : "")) {
@@ -163,46 +162,26 @@ export function writeRetentionSegment(params: {
   sigPath: string;
   manifest: RetentionSegmentManifest;
 } {
-  ensureDir(archiveLedgerDir(params.workspace));
-  const segmentPath = segmentFilePath(params.workspace, params.segmentId, params.startTs, params.endTs);
-  const raw = `${params.eventLines.join("\n")}${params.eventLines.length > 0 ? "\n" : ""}`;
-  const compressed = gzipSync(Buffer.from(raw, "utf8"));
-  writeFileAtomic(segmentPath, compressed, 0o644);
-  const segmentFileSha256 = sha256Hex(compressed);
-  const manifest = retentionSegmentManifestSchema.parse({
-    v: 1,
-    segmentId: params.segmentId,
-    createdTs: Date.now(),
-    startTs: params.startTs,
-    endTs: params.endTs,
-    eventCount: params.eventLines.length,
-    firstEventHash: params.firstEventHash,
-    lastEventHash: params.lastEventHash,
-    prevSegmentLastEventHash: params.prevSegmentLastEventHash,
-    segmentFileSha256,
-    prunePolicy: params.prunePolicy
-  });
-  const manifestPath = segmentManifestPath(segmentPath);
-  writeFileAtomic(manifestPath, JSON.stringify(manifest, null, 2), 0o644);
-  const digest = sha256Hex(readFileSync(manifestPath));
+  const authority = captureRetentionAuthority(params.workspace, false);
+  const plan = prepareRetentionSegment({ ...params, eventLines: [...params.eventLines], prunePolicy: { ...params.prunePolicy } });
+  const signature = signHexDigest(plan.digest, getSigningKey(params.workspace, "artifact-seal"));
   const sig = retentionSegmentSignatureSchema.parse({
-    digestSha256: digest,
-    signature: signHexDigest(digest, getSigningKey(params.workspace, "artifact-seal")),
+    digestSha256: plan.digest,
+    signature,
     signedTs: Date.now(),
     signer: "auditor"
   });
-  const sigPath = segmentManifestSigPath(segmentPath);
-  writeFileAtomic(sigPath, JSON.stringify(sig, null, 2), 0o644);
+  const signatureBytes = JSON.stringify(sig, null, 2);
+  withRetentionPublication(params.workspace, () => { assertRetentionAuthorityCurrent(params.workspace, authority); publishRetentionSegment(plan, signatureBytes, []); });
   return {
-    segmentPath,
-    manifestPath,
-    sigPath,
-    manifest
+    segmentPath: plan.segmentPath,
+    manifestPath: plan.manifestPath,
+    sigPath: plan.sigPath,
+    manifest: plan.manifest
   };
 }
 
-function readRetentionSegmentLines(segmentPath: string): string[] {
-  const bytes = readFileSync(segmentPath);
+function readRetentionSegmentLines(bytes: Buffer): string[] {
   const text = gunzipSync(bytes, {
     maxOutputLength: MAX_RETENTION_SEGMENT_DECOMPRESSED_BYTES
   }).toString("utf8");
@@ -256,37 +235,46 @@ export function verifyRetentionSegment(params: {
   errors: string[];
   manifest: RetentionSegmentManifest | null;
 } {
+  const result = verifiedSegment(params);
+  return { ok: result.ok, errors: result.errors, manifest: result.manifest };
+}
+
+function verifiedSegment(params: { workspace: string; segmentPath: string; manifestPath: string; sigPath: string }) {
   const errors: string[] = [];
-  if (!pathExists(params.segmentPath)) {
+  let files: RetentionFile[] = [];
+  const failed = (manifest: RetentionSegmentManifest | null = null) => ({ ok: false, errors, manifest, lines: [] as string[], files, manifestSha256: "" });
+  try { files = [params.segmentPath, params.manifestPath, params.sigPath].map(captureRetentionFile); }
+  catch { errors.push("segment read failure: unreadable or changed state"); return failed(); }
+  if (files[0]!.bytes === null) {
     errors.push(`segment missing: ${params.segmentPath}`);
-    return { ok: false, errors, manifest: null };
+    return failed();
   }
-  if (!pathExists(params.manifestPath)) {
+  if (files[1]!.bytes === null) {
     errors.push(`segment manifest missing: ${params.manifestPath}`);
-    return { ok: false, errors, manifest: null };
+    return failed();
   }
-  if (!pathExists(params.sigPath)) {
+  if (files[2]!.bytes === null) {
     errors.push(`segment manifest signature missing: ${params.sigPath}`);
-    return { ok: false, errors, manifest: null };
+    return failed();
   }
   let manifest: RetentionSegmentManifest | null = null;
   try {
-    manifest = retentionSegmentManifestSchema.parse(JSON.parse(readUtf8(params.manifestPath)) as unknown);
+    manifest = retentionSegmentManifestSchema.parse(JSON.parse(files[1]!.bytes!.toString("utf8")) as unknown);
   } catch (error) {
     errors.push(`invalid segment manifest: ${String(error)}`);
-    return { ok: false, errors, manifest: null };
+    return failed();
   }
-  const segmentSha = sha256Hex(readFileSync(params.segmentPath));
+  const segmentSha = sha256Hex(files[0]!.bytes!);
   if (manifest.segmentFileSha256 !== segmentSha) {
     errors.push(`segment sha mismatch for ${params.segmentPath}`);
   }
   try {
-    const sig = retentionSegmentSignatureSchema.parse(JSON.parse(readUtf8(params.sigPath)) as unknown);
-    const digest = sha256Hex(readFileSync(params.manifestPath));
+    const sig = retentionSegmentSignatureSchema.parse(JSON.parse(files[2]!.bytes!.toString("utf8")) as unknown);
+    const digest = sha256Hex(files[1]!.bytes!);
     if (sig.digestSha256 !== digest) {
       errors.push(`manifest digest mismatch for ${params.manifestPath}`);
     } else {
-      const valid = verifyHexDigestAny(digest, sig.signature, getPublicKeyHistory(params.workspace, "auditor"));
+      const valid = verifyRetentionDigest(params.workspace, digest, sig.signature);
       if (!valid) {
         errors.push(`manifest signature invalid for ${params.manifestPath}`);
       }
@@ -296,15 +284,15 @@ export function verifyRetentionSegment(params: {
   }
 
   if (errors.length > 0) {
-    return { ok: false, errors, manifest };
+    return failed(manifest);
   }
 
   let lines: string[] = [];
   try {
-    lines = readRetentionSegmentLines(params.segmentPath);
+    lines = readRetentionSegmentLines(files[0]!.bytes!);
   } catch (error) {
     errors.push(`segment read failure for ${params.segmentPath}: ${String(error)}`);
-    return { ok: false, errors, manifest };
+    return failed(manifest);
   }
   if (lines.length !== manifest.eventCount) {
     errors.push(`segment event count mismatch for ${params.segmentPath}`);
@@ -325,7 +313,10 @@ export function verifyRetentionSegment(params: {
   return {
     ok: errors.length === 0,
     errors,
-    manifest
+    manifest,
+    lines,
+    files,
+    manifestSha256: sha256Hex(files[1]!.bytes!)
   };
 }
 
@@ -357,19 +348,26 @@ function parseArchivedEvent(line: string, segmentId: string, errors: string[]): 
 }
 
 export function buildRetentionProofIndex(workspace: string): RetentionProofIndex {
+  return captureRetentionProofs(workspace).index;
+}
+
+/** Same-read proof bytes retained for a destructive caller's final synchronous CAS. */
+export function captureRetentionProofs(workspace: string): { index: RetentionProofIndex; files: readonly RetentionFile[] } {
   const errors: string[] = [];
+  const files: RetentionFile[] = [];
   const archivedEvents = new Map<string, ArchivedEventProof>();
   const prunedBlobs = new Map<string, BlobPrunedRow>();
   const segments = listRetentionSegments(workspace);
   let previousLastEventHash: string | null = null;
 
   for (const item of segments) {
-    const verified = verifyRetentionSegment({
+    const verified = verifiedSegment({
       workspace,
       segmentPath: item.segmentPath,
       manifestPath: item.manifestPath,
       sigPath: item.sigPath
     });
+    files.push(...verified.files);
     errors.push(...verified.errors);
     if (!verified.manifest) continue;
 
@@ -381,20 +379,14 @@ export function buildRetentionProofIndex(workspace: string): RetentionProofIndex
     previousLastEventHash = verified.manifest.lastEventHash;
     if (!segmentTrusted) continue;
 
-    let lines: string[] = [];
-    try {
-      lines = readRetentionSegmentLines(item.segmentPath);
-    } catch (error) {
-      errors.push(`segment read failure for ${verified.manifest.segmentId}: ${String(error)}`);
-      segmentTrusted = false;
-    }
+    const lines = verified.lines;
     const parsed = lines
       .map((line) => parseArchivedEvent(line, verified.manifest!.segmentId, errors))
       .filter((event): event is EvidenceEvent => event !== null);
     if (parsed.length !== lines.length) segmentTrusted = false;
     if (!segmentTrusted) continue;
 
-    const manifestSha256 = sha256Hex(readFileSync(item.manifestPath));
+    const manifestSha256 = verified.manifestSha256;
     for (const event of parsed) {
       if (archivedEvents.has(event.id)) {
         errors.push(`duplicate archived event proof for ${event.id}`);
@@ -409,7 +401,11 @@ export function buildRetentionProofIndex(workspace: string): RetentionProofIndex
     }
   }
 
-  const pruned = verifyPrunedRows(workspace);
+  let pruned: ReturnType<typeof verifyPrunedRows>;
+  try {
+    const pruneFiles = prunedFiles(workspace); files.push(...pruneFiles);
+    pruned = verifyPrunedSnapshot(workspace, pruneFiles);
+  } catch { pruned = { ok: false, errors: ["invalid blob pruned log or seal: unreadable state"], rows: [] }; }
   errors.push(...pruned.errors);
   if (pruned.ok) {
     for (const row of pruned.rows) {
@@ -422,10 +418,10 @@ export function buildRetentionProofIndex(workspace: string): RetentionProofIndex
     }
   }
 
-  return {
+  return { files, index: {
     ok: errors.length === 0,
     errors,
     archivedEvents,
     prunedBlobs
-  };
+  } };
 }

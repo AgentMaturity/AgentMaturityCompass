@@ -47,3 +47,5 @@ Admit committed receipt authority in ActionJournal reads and writes, separate re
 Add checked asynchronous DAG and governance-lineage SDK producers, preserving raw digest signatures and synchronous compatibility while checking original authority, selected predecessors, and atomic intent links before publication.
 
 Prepare the human-action aggregate signature before file publication and await maintained Studio secondary audits. Preserve compact seal signing and pretty stored bytes, verify captured exact-purpose signatures, refuse partial predecessors, and retain primary effects with truthful secondary publication failures.
+
+Prepare retention archive signatures before destructive phases, await maintained CLI and Studio publication, preserve original authority and exact selected state, contain managed blob reads/removal, and report actual archive, pruning and log partial progress.

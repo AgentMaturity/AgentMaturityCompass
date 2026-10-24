@@ -382,7 +382,7 @@ import {
   benchVerifyPolicyCli
 } from "./bench/benchCli.js";
 import { initOpsPolicyAsync, loadOpsPolicy, signOpsPolicyAsync, verifyOpsPolicySignature } from "./ops/policy.js";
-import { retentionRunCli, retentionStatusCli, retentionVerifyCli } from "./ops/retention/retentionCli.js";
+import { retentionRunCliAsync, retentionStatusCli, retentionVerifyCli } from "./ops/retention/retentionCli.js";
 import { backupCreateCliAsync, backupPrintCli, backupRestoreCli, backupVerifyCli } from "./ops/backup/backupCli.js";
 import {
   maintenancePruneCacheCli,
@@ -9256,8 +9256,8 @@ retention
   .command("run")
   .description("Run archival + payload prune lifecycle")
   .option("--dry-run", "simulate without modifying data", false)
-  .action((opts: { dryRun: boolean }) => {
-    const result = retentionRunCli(process.cwd(), opts.dryRun);
+  .action(async (opts: { dryRun: boolean }) => {
+    const result = await retentionRunCliAsync(process.cwd(), opts.dryRun);
     console.log(JSON.stringify(result, null, 2));
   });
 
