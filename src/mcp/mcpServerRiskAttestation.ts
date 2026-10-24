@@ -1,5 +1,7 @@
 import { randomUUID } from "node:crypto";
-import { getSigningKey, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { getSigningKey, signHexDigest } from "../crypto/keys.js";
+import { prepareRunHashSignature } from "../ledger/runHashSignature.js";
+import { verifyCurrentPurposeCredentialSignature } from "../keys/purposeCredentialSignature.js";
 import type { RiskTier } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
@@ -235,7 +237,7 @@ function verifyAttestationSignature(workspace: string, attestation: SignedMcpSer
   if (digest !== attestation.attestationDigestSha256) {
     return false;
   }
-  return verifyHexDigestAny(digest, attestation.attestationSignature, getPublicKeyHistory(workspace, "auditor"));
+  return verifyCurrentPurposeCredentialSignature(workspace, "artifact-seal", Buffer.from(digest, "hex"), Buffer.from(attestation.attestationSignature, "base64"));
 }
 
 function networkPolicyRank(policy: McpServerAttestationNetworkPolicy): number {
@@ -317,6 +319,22 @@ export function createSignedMcpServerRiskAttestation(input: {
     signedTs: Date.now(),
     metadataOnlyAccepted: false
   };
+}
+
+/** Existing direct-module producer; the callback can only refuse, never select a key or grant authority. */
+export async function createSignedMcpServerRiskAttestationAsync(input: Parameters<typeof createSignedMcpServerRiskAttestation>[0],
+  options: { beforePublish?: () => void } = {}): Promise<SignedMcpServerRiskAttestation> {
+  const selected = structuredClone(input), beforePublish = options.beforePublish;
+  beforePublish?.();
+  const payload = unsignedAttestationPayload({ schemaVersion: "2026-06-25", attestationId: selected.attestationId,
+    serverManifest: selected.serverManifest, signerIdentity: selected.signerIdentity,
+    sandboxPolicy: selected.sandboxPolicy, lastScan: selected.lastScan });
+  const digest = sha256Hex(canonicalize(payload));
+  // Reuse the existing fixed artifact-purpose raw32 preparation; no ledger-row delegate participates.
+  const prepared = await prepareRunHashSignature(selected.workspace, digest, false, beforePublish);
+  beforePublish?.(); prepared.assertCurrent();
+  return { ...payload, attestationDigestSha256: digest, attestationSignature: prepared.signature,
+    signer: "auditor", signedTs: Date.now(), metadataOnlyAccepted: false };
 }
 
 export function evaluateMcpServerRiskAttestation(input: {
