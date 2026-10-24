@@ -5,7 +5,7 @@ import { passportPolicyPath } from "./passportStore.js";
 import { capturePassportShareRead } from "./passportLazyReads.js";
 import { PassportPublicationError, passportPublicationFailure, type PassportPublicationOptions } from "./passportPublication.js";
 import { passportBadgeAttemptForApiAsync } from "./passportApi.js";
-import { passportPolicyForApiAsync, passportPolicyApplyForApiAsync, passportCreateForApiAsync } from "./passportApi.js";
+import { passportPolicyForApiAsync, passportPolicyApplyForApiAsync, passportCreateForApiAsync, passportExportLatestAttemptForApiAsync } from "./passportApi.js";
 import { dirname, join, resolve } from "node:path";
 import YAML from "yaml";
 import { ensureDir, readUtf8, writeFileAtomic } from "../utils/fs.js";
@@ -278,6 +278,11 @@ export function passportCompareCli(params: {
 }) {
   const first = loadOrCreateAgentPassport(params.workspace, params.agentA);
   const second = loadOrCreateAgentPassport(params.workspace, params.agentB);
+  return presentPassportComparison(params, first, second);
+}
+
+function presentPassportComparison(params: { agentA: string; agentB: string },
+  first: ReturnType<typeof inspectPassportArtifact>["passport"], second: typeof first) {
   const rows = [
     { dimension: "overall", a: first.maturity.overall, b: second.maturity.overall },
     { dimension: "strategicOps", a: first.maturity.byFiveLayers.strategicOps, b: second.maturity.byFiveLayers.strategicOps },
@@ -306,6 +311,46 @@ export function passportCompareCli(params: {
     },
     dimensions
   };
+}
+
+/** Fixed maintained export leaf; its real mode path adds no new owner rule. */
+export async function passportExportLatestCliAsync(params: Parameters<typeof passportExportLatestCli>[0]) {
+  const input = { ...params }, workspace = resolve(input.workspace);
+  return passportExportLatestAttemptForApiAsync({ workspace, scopeType: input.scope.toUpperCase(), scopeId: input.id, outFile: resolve(workspace, input.outFile) },
+    { beforePublish: () => assertOwnerMode(workspace, "passport export-latest") });
+}
+
+/** Sequential ordinary reads; each miss owns its genuine create, never an atomic two-agent snapshot. */
+export async function passportCompareCliAsync(params: Parameters<typeof passportCompareCli>[0]) {
+  const input = { ...params }; input.workspace = resolve(input.workspace);
+  type Read = Readonly<{ side: "A" | "B"; agentId: string; source: "cache" | "created"; currentChecked: boolean;
+    publishedPaths: readonly string[]; createdDirectories: readonly string[]; createdHash: string | null; exportedHash: string | null }>;
+  const completedReads: Read[] = [], passports: ReturnType<typeof inspectPassportArtifact>["passport"][] = [];
+  let creationAttempted = false;
+  try {
+    for (const [side, agentId] of [["A", input.agentA], ["B", input.agentB]] as const) {
+      const cached = passportCacheLatestForApi({ workspace: input.workspace, scopeType: "AGENT", scopeId: agentId }).passport;
+      if (cached) {
+        passports.push(cached); completedReads.push(Object.freeze({ side, agentId, source: "cache", currentChecked: false,
+          publishedPaths: Object.freeze([]), createdDirectories: Object.freeze([]), createdHash: null, exportedHash: null }));
+        continue;
+      }
+      creationAttempted = true;
+      const actual = await passportExportLatestAttemptForApiAsync({ workspace: input.workspace, scopeType: "AGENT", scopeId: agentId });
+      const observed = Object.freeze({ side, agentId, source: "created" as const, currentChecked: false,
+        publishedPaths: Object.freeze([...actual.publishedPaths]), createdDirectories: Object.freeze([...actual.createdDirectories]),
+        createdHash: actual.result.transparencyCreatedHash, exportedHash: actual.result.transparencyExportedHash });
+      completedReads.push(observed); actual.assertCurrent();
+      completedReads[completedReads.length - 1] = Object.freeze({ ...observed, currentChecked: true });
+      passports.push(actual.result.passport);
+    }
+    return presentPassportComparison(input, passports[0]!, passports[1]!);
+  } catch (cause) {
+    const failure = passportPublicationFailure(input.workspace, "comparison", completedReads.flatMap(row => row.publishedPaths),
+      completedReads.flatMap(row => row.createdDirectories), null, cause, null, null,
+      creationAttempted || (cause instanceof PassportPublicationError && cause.sharedProgressUnknown));
+    throw Object.assign(failure, { completedReads: Object.freeze([...completedReads]) });
+  }
 }
 
 /** Fixed registered owner gate for these maintained leaves; it adds no mode key or caller-selected policy. */

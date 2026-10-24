@@ -1,4 +1,6 @@
-import { captureOrgPairs, assertOrgPairsCurrent, captureOrgPairsAuthority, orgPairBytes } from "../org/preparedOrgPairs.js";
+import { captureOrgFiles, captureOrgPairs, assertOrgPairsCurrent, captureOrgPairsAuthority, orgPairBytes } from "../org/preparedOrgPairs.js";
+import { verifyAuditorSignatureBytes } from "../org/orgSignatureBytes.js";
+import { getAuthenticatedKeyHistory } from "../crypto/keys.js";
 import { captureTransparencyState, assertTransparencyStateCurrent } from "../transparency/workspacePublication.js";
 import { appendTransparencyEntryAttemptAsync, captureWorkspaceLogAuthority } from "../transparency/asyncWorkspaceAppend.js";
 import { TransparencyMerkleLagError } from "../transparency/merkleIndexState.js";
@@ -23,6 +25,7 @@ import {
   listExportedPassportArtifacts
 } from "./passportArtifact.js";
 import {
+  passportPolicyPath,
   loadPassportCache,
   loadPassportPolicy,
   savePassportPolicy,
@@ -731,4 +734,42 @@ export async function passportCreateAttemptForApiAsync(params: Parameters<typeof
 }
 export async function passportCreateForApiAsync(params: Parameters<typeof passportCreateForApi>[0], options: PassportPublicationOptions = {}) {
   return (await passportCreateAttemptForApiAsync(params, options)).result;
+}
+
+/** Fixed direct export: legacy refusal, explicit BUNDLE admission and the genuine ordinary constructor. */
+export async function passportExportLatestAttemptForApiAsync(params: Parameters<typeof passportExportLatestForApi>[0], options: PassportPublicationOptions = {}) {
+  const input = structuredClone(params), caller = { ...options }, workspace = resolve(input.workspace); input.workspace = workspace;
+  const actor = caller.beforePublish, inputs = caller.assertInputsCurrent, legacy = verifyPassportPolicySignature(workspace);
+  const refused = (cause?: unknown) => new Error(`passport policy signature invalid: ${legacy.reason ?? "unknown"}`, { cause });
+  const exception = !legacy.valid && legacy.reason === "signature verify failed";
+  if (!legacy.valid && !exception) throw refused();
+  const path = passportPolicyPath(workspace), historyPath = join(workspace, ".amc", "keys", "auditor_history.json");
+  const captured = (() => { try {
+    const pair = captureOrgPairs([path]), body = orgPairBytes(pair, path), signature = orgPairBytes(pair, `${path}.sig`);
+    if (body === null || signature === null) throw new Error("passport policy signature invalid: missing or untrusted pair");
+    const history = exception ? captureOrgFiles([historyPath]) : null, historyBytes = history === null ? null : orgPairBytes(history, historyPath);
+    const historyCanonical = historyBytes === null ? null : canonicalize(JSON.parse(historyBytes.toString("utf8")));
+    return { pair, body, signature, history, historyCanonical };
+  } catch (cause) { throw exception ? refused(cause) : cause; } })();
+  let failed = false, failure: unknown;
+  const intrinsic = () => { if (failed) throw failure; try {
+    assertOrgPairsCurrent(captured.pair); if (captured.history !== null) assertOrgPairsCurrent(captured.history);
+    if (captured.historyCanonical !== null) {
+      const admitted = getAuthenticatedKeyHistory(workspace, "auditor");
+      if (admitted === null || canonicalize(admitted) !== captured.historyCanonical) throw new Error("original auditor history is not currently authenticated");
+    }
+    const admitted = verifyAuditorSignatureBytes(workspace, "BUNDLE", captured.body, captured.signature);
+    if (!admitted.valid) throw new Error(`passport policy signature invalid: ${admitted.reason ?? "missing or untrusted pair"}`);
+    assertOrgPairsCurrent(captured.pair); if (captured.history !== null) assertOrgPairsCurrent(captured.history);
+  } catch (cause) { failed = true; failure = exception ? refused(cause) : cause; throw failure; } };
+  // Internal currentness exists even when neither external actor was supplied.
+  const beforePublish = () => { intrinsic(); actor?.(); intrinsic(); };
+  const assertInputsCurrent = inputs === undefined ? undefined : () => { intrinsic(); inputs(); intrinsic(); };
+  intrinsic();
+  const actual = await passportCreateAttemptForApiAsync(input, { beforePublish, assertInputsCurrent });
+  const createdHash = actual.result.transparencyCreatedHash, exportedHash = actual.result.transparencyExportedHash;
+  const assertCurrent = () => { try { intrinsic(); actual.assertCurrent(); intrinsic(); }
+    catch (cause) { throw passportPublicationFailure(workspace, "export-currentness", actual.publishedPaths, actual.createdDirectories, null,
+      cause, createdHash, exportedHash, true); } };
+  assertCurrent(); return Object.freeze({ ...actual, assertCurrent });
 }

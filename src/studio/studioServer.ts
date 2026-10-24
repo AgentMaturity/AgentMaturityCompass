@@ -387,7 +387,7 @@ import {
   passportCacheLatestForApi,
   passportCreateAttemptForApiAsync,
   passportExportExecuteForApi,
-  passportExportLatestForApi,
+  passportExportLatestAttemptForApiAsync,
   passportExportRequestForApi,
   passportExportsForApi,
   capturePassportInitialization,
@@ -5180,26 +5180,40 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 202, requested);
           return;
         }
-        const out = passportExportLatestForApi({
-          workspace: options.workspace,
+        const exportSourceWorkspace = options.workspace, exportWorkspace = resolve(exportSourceWorkspace), exportToken = options.token;
+        const exportActor = currentSigningAuthority(req, res, exportWorkspace, exportToken, auth, ["OWNER"]);
+        const exportFixed = () => {
+          if (shuttingDown || options.workspace !== exportSourceWorkspace || resolve(exportSourceWorkspace) !== exportWorkspace || options.token !== exportToken)
+            throw new Error("original passport export workspace, token or server state changed");
+        };
+        const beforePublish = () => { exportFixed(); exportActor(); exportFixed(); if (!requireUnlockedVaultForSigning()) throw new Error("vault locked; unlock required for signing"); exportFixed(); };
+        const passportAttempt = await passportExportLatestAttemptForApiAsync({
+          workspace: exportWorkspace,
           scopeType: typeof parsed.scopeType === "string" ? parsed.scopeType : undefined,
           scopeId: typeof parsed.scopeId === "string" ? parsed.scopeId : undefined,
           outFile: typeof parsed.outFile === "string" ? parsed.outFile : undefined
-        });
-        writeStudioAuditEvent({
-          workspace: options.workspace,
-          auditType: "PASSPORT_EXPORTED",
-          severity: "LOW",
-          payload: {
-            passportId: out.passport.passportId,
-            sha256: out.sha256
-          }
-        });
-        emitPassportSse({
-          hub: orgSse,
-          type: "PASSPORT_UPDATED"
-        });
-        json(res, 200, out);
+        }, { beforePublish });
+        const out = passportAttempt.result, current = () => { beforePublish(); passportAttempt.assertCurrent(); };
+        try {
+          current();
+          writeStudioAuditEvent({
+            workspace: exportWorkspace,
+            auditType: "PASSPORT_EXPORTED",
+            severity: "LOW",
+            payload: {
+              passportId: out.passport.passportId,
+              sha256: out.sha256
+            }
+          });
+          current(); emitPassportSse({
+            hub: orgSse,
+            type: "PASSPORT_UPDATED"
+          });
+          current(); json(res, 200, out);
+        } catch (cause) {
+          throw passportPublicationFailure(exportWorkspace, "studio-followup", passportAttempt.publishedPaths, passportAttempt.createdDirectories, null,
+            cause, out.transparencyCreatedHash, out.transparencyExportedHash, true);
+        }
         return;
       }
 

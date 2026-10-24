@@ -777,9 +777,9 @@ import {
 } from "./prompt/promptPackCli.js";
 import {
   passportBadgeCliAsync as passportBadgeCli,
-  passportCompareCli,
+  passportCompareCliAsync as passportCompareCli,
   passportCreateCliAsync as passportCreateCli,
-  passportExportLatestCli,
+  passportExportLatestCliAsync as passportExportLatestCli,
   passportInitCliAsync as passportInitCli,
   passportPolicyApplyCliAsync as passportPolicyApplyCli,
   passportPolicyPrintCli,
@@ -8898,18 +8898,19 @@ passport
   .requiredOption("--scope <scope>", "workspace|node|agent")
   .requiredOption("--out <file.amcpass>", "output passport path")
   .option("--id <id>", "scope id for node/agent")
-  .action((opts: { scope: string; out: string; id?: string }) => {
+  .action(async (opts: { scope: string; out: string; id?: string }) => {
     assertOwnerMode(process.cwd(), "passport export-latest");
     const scope = opts.scope.toLowerCase();
     if (scope !== "workspace" && scope !== "node" && scope !== "agent") {
       throw new Error("scope must be workspace|node|agent");
     }
-    const out = passportExportLatestCli({
+    const passportAttempt = await passportExportLatestCli({
       workspace: process.cwd(),
       scope: scope as "workspace" | "node" | "agent",
       id: opts.id,
       outFile: opts.out
     });
+    const out = passportAttempt.result; passportAttempt.assertCurrent();
     console.log(chalk.green("Passport exported"));
     printClaimResult(artifactClaim("passport"), {});
     console.log(`File: ${out.outFile}`);
@@ -8964,10 +8965,10 @@ passport
   .description("Compare two agents by passport maturity dimensions")
   .argument("<agentIdA>")
   .argument("<agentIdB>")
-  .action((agentIdA: string, agentIdB: string) => {
+  .action(async (agentIdA: string, agentIdB: string) => {
     const first = resolveAgentId(process.cwd(), agentIdA);
     const second = resolveAgentId(process.cwd(), agentIdB);
-    const out = passportCompareCli({
+    const out = await passportCompareCli({
       workspace: process.cwd(),
       agentA: first,
       agentB: second
