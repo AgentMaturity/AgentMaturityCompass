@@ -12,6 +12,7 @@ import { verifyAuditorSignatureBytes } from "../org/orgSignatureBytes.js";
 import { writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
+import { captureRunHashAuthority } from "../ledger/runHashSignature.js";
 
 export interface HumanLogEntry {
   v: 1;
@@ -162,7 +163,8 @@ function sealFor(pem: string, entry: HumanLogEntry | null, count: number): Human
 }
 function prepared(
   state: HumanState, entry: HumanLogEntry | null, seal: HumanSeal, signed: PurposeSignature,
-  authority: ReturnType<typeof capturePurposePublication>, log: Buffer
+  authority: ReturnType<typeof capturePurposePublication>, log: Buffer,
+  continuation?: { beforeSign?: () => void; original: () => void }
 ): { publish: (assertActorCurrent?: () => void) => HumanLogEntry | null } {
   if (signed.publicKeyPem !== selectedPublicKey(state.workspace)
     || sha256Hex(Buffer.from(signed.publicKeyPem, "utf8")) !== seal.signerFingerprint) {
@@ -176,11 +178,14 @@ function prepared(
   };
   return { publish(assertActorCurrent) {
     return withControlFileLock({ root: join(state.workspace, ".amc"), name: "human-action-log", operation: () => {
-      // Only the actual internal Studio caller supplies this throw-only local recheck. It cannot replace the gates below.
-      assertActorCurrent?.();
-      assertCurrent(state);
+      // Retain the preparation caller; a publish-only callback can only add refusal, never replace it.
+      continuation?.beforeSign?.();
+      if (assertActorCurrent !== continuation?.beforeSign) assertActorCurrent?.();
+      if (continuation === undefined) assertCurrent(state); // Preserve the retained synchronous gate order.
+      continuation?.original();
       assertPurposePublicationCurrent(state.workspace, authority, signed);
       if (signed.publicKeyPem !== selectedPublicKey(state.workspace)) throw new Error("human audit signer changed before publication");
+      if (continuation !== undefined) assertCurrent(state); // Async exact triplet CAS follows the final authority gate.
       const completed: MemberName[] = [];
       let phase: MemberName = "log";
       try {
@@ -195,12 +200,17 @@ function prepared(
   } };
 }
 /** Internal actual Studio seam; no root SDK facade or public key/kind/auth option. */
-export async function prepareHumanActionEvent(params: HumanEventInput): Promise<{ publish: (assertActorCurrent?: () => void) => HumanLogEntry }> {
-  const input = copyInput(params), state = capture(input.workspace), entries = predecessor(state);
+export async function prepareHumanActionEvent(params: HumanEventInput, beforeSign?: () => void): Promise<{ publish: (assertActorCurrent?: () => void) => HumanLogEntry }> {
+  const input = copyInput(params), caller = beforeSign;
+  caller?.(); const original = captureRunHashAuthority(input.workspace, false);
+  const state = capture(input.workspace), entries = predecessor(state);
   const authority = capturePurposePublication(input.workspace, "artifact-seal"), pem = selectedPublicKey(input.workspace);
   const entry = nextEntry(input, entries), seal = sealFor(pem, entry, entries.length + 1), log = logFor(state, entry, entries.length + 1);
-  const signed = await signWithPurposeKey(input.workspace, "artifact-seal", Buffer.from(sha256Hex(Buffer.from(JSON.stringify(seal))), "hex"));
-  const plan = prepared(state, entry, seal, signed, authority, log);
+  const assertPreparationCurrent = () => { caller?.(); original(); assertCurrent(state); };
+  assertPreparationCurrent();
+  const signed = await signWithPurposeKey(input.workspace, "artifact-seal", Buffer.from(sha256Hex(Buffer.from(JSON.stringify(seal))), "hex"), { beforeSign: assertPreparationCurrent });
+  assertPreparationCurrent();
+  const plan = prepared(state, entry, seal, signed, authority, log, { beforeSign: caller, original });
   return { publish: assertActorCurrent => plan.publish(assertActorCurrent)! };
 }
 export async function appendHumanActionEventAsync(params: HumanEventInput): Promise<HumanLogEntry> {

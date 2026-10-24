@@ -105,7 +105,7 @@ export async function writeStudioAuditEventAsync(params: StudioAuditInput, asser
   if (type) {
     try {
       assertActorCurrent?.();
-      const plan = await prepareHumanActionEvent(humanInput(input, type));
+      const plan = await prepareHumanActionEvent(humanInput(input, type), assertActorCurrent);
       plan.publish(assertActorCurrent);
     } catch { /* Secondary refusal/partial publication does not undo a completed primary action or emit HTTP denial. */ }
   }
