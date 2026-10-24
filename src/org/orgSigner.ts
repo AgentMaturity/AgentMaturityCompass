@@ -8,6 +8,7 @@ import { signingPurposeForKind } from "../crypto/signing/signerTypes.js";
 import { capturePurposePublication, assertPurposePublicationCurrent } from "../keys/purposePublication.js";
 import { boundProviderKey } from "../keys/keyset.js";
 import { loadTrustConfig } from "../trust/trustConfig.js";
+import { vaultStatus } from "../vault/vault.js";
 import type { SignKind, SignedDigest } from "../crypto/signing/signerTypes.js";
 
 function signKindForPath(path: string): SignKind {
@@ -154,7 +155,12 @@ export async function prepareFileSignatureWithAuditor(workspace: string, path: s
   const purpose = signingPurposeForKind(kind), policy = JSON.stringify(loadTrustConfig(workspace));
   const authority = descriptor.mode === "VAULT" ? capturePurposePublication(workspace, purpose) : null;
   const provider = authority === null ? "file" : boundProviderKey(workspace, purpose)?.binding.provider ?? "file";
+  const assertVaultCurrent = () => {
+    if (authority !== null && provider === "file" && !vaultStatus(workspace).unlocked)
+      throw new Error("prepared file signing vault is locked; unlock before publication");
+  };
   const signed = await signDigestWithPolicyAsync({ workspace, kind, digestHex: digestSha256, expectedSigner: descriptor });
+  assertVaultCurrent();
   // Keep the historical five-field order and the complete checked envelope/basis.
   const signatureBytes = JSON.stringify({ digestSha256, signature: signed.signature, signedTs: signed.signedTs,
     signer: "auditor", envelope: signed.envelope }, null, 2);
@@ -162,6 +168,7 @@ export async function prepareFileSignatureWithAuditor(workspace: string, path: s
     assertPolicySignerCurrent(workspace, descriptor);
     if (JSON.stringify(loadTrustConfig(workspace)) !== policy) throw new Error("file signing policy changed while signing");
     if (authority !== null) {
+      assertVaultCurrent();
       if (signed.envelope === undefined) throw new Error("prepared file signature has no envelope");
       assertPurposePublicationCurrent(workspace, authority, { provider, algorithm: signed.envelope.alg, keyId: descriptor.fingerprint,
         publicKeyPem: descriptor.publicKeyPem, signature: Buffer.from(signed.signature, "base64") });
