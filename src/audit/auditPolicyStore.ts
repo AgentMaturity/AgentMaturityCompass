@@ -1,3 +1,5 @@
+import { verifyAuditBundlePair } from "./binderFileVerification.js";
+import { saveAuditSchedulerStateSync } from "./binderStatePublication.js";
 import { join } from "node:path";
 import YAML from "yaml";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
@@ -51,7 +53,7 @@ export function auditRequestsClosedDir(workspace: string): string {
   return join(auditRequestsDir(workspace), "closed");
 }
 
-function auditSchedulerPath(workspace: string): string {
+export function auditSchedulerPath(workspace: string): string {
   return join(auditRoot(workspace), "scheduler.json");
 }
 
@@ -123,14 +125,7 @@ export function saveAuditSchedulerState(workspace: string, state: AuditScheduler
   path: string;
   sigPath: string;
 } {
-  ensureAuditDirs(workspace);
-  const path = auditSchedulerPath(workspace);
-  writeFileAtomic(path, JSON.stringify(auditSchedulerStateSchema.parse(state), null, 2), 0o644);
-  const sigPath = signFileWithAuditor(workspace, path);
-  return {
-    path,
-    sigPath
-  };
+  return saveAuditSchedulerStateSync(workspace, state);
 }
 
 export function verifyAuditSchedulerSignature(workspace: string) {
@@ -144,5 +139,5 @@ export function verifyAuditSchedulerSignature(workspace: string) {
       sigPath: `${path}.sig`
     };
   }
-  return verifySignedFileWithAuditor(workspace, path);
+  return verifyAuditBundlePair(workspace, path);
 }

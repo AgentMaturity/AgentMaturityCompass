@@ -1,3 +1,5 @@
+import { byDimensionFromRun, byDimensionFromOrgNode } from "./binderDimensions.js";
+import { readAuditAssurancePolicy, readAuditMechanicTuning, readAuditRetentionCount, readAuditWorkspaceRecord } from "./binderReadOnlyInputs.js";
 import { readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { loadApprovalPolicy, verifyApprovalPolicySignature } from "../approvals/approvalPolicyEngine.js";
@@ -184,66 +186,6 @@ function mapRunTrustLabel(input: string): "LOW" | "MEDIUM" | "HIGH" {
     return "LOW";
   }
   return "MEDIUM";
-}
-
-function byDimensionFromRun(run: ReturnType<typeof loadRunReport>): {
-  DIM1: number | null;
-  DIM2: number | null;
-  DIM3: number | null;
-  DIM4: number | null;
-  DIM5: number | null;
-} {
-  const out = {
-    DIM1: null as number | null,
-    DIM2: null as number | null,
-    DIM3: null as number | null,
-    DIM4: null as number | null,
-    DIM5: null as number | null
-  };
-  for (const layer of run.layerScores) {
-    if (layer.layerName === "Strategic Agent Operations") {
-      out.DIM1 = Number(layer.avgFinalLevel.toFixed(6));
-    } else if (layer.layerName === "Leadership & Autonomy") {
-      out.DIM2 = Number(layer.avgFinalLevel.toFixed(6));
-    } else if (layer.layerName === "Culture & Alignment") {
-      out.DIM3 = Number(layer.avgFinalLevel.toFixed(6));
-    } else if (layer.layerName === "Resilience") {
-      out.DIM4 = Number(layer.avgFinalLevel.toFixed(6));
-    } else if (layer.layerName === "Skills") {
-      out.DIM5 = Number(layer.avgFinalLevel.toFixed(6));
-    }
-  }
-  return out;
-}
-
-function byDimensionFromOrgNode(node: NonNullable<ReturnType<typeof loadLatestOrgScorecard>>["nodes"][number]): {
-  DIM1: number | null;
-  DIM2: number | null;
-  DIM3: number | null;
-  DIM4: number | null;
-  DIM5: number | null;
-} {
-  const out = {
-    DIM1: null as number | null,
-    DIM2: null as number | null,
-    DIM3: null as number | null,
-    DIM4: null as number | null,
-    DIM5: null as number | null
-  };
-  for (const layer of node.layerScores) {
-    if (layer.layerName === "Strategic Agent Operations") {
-      out.DIM1 = Number(layer.median.toFixed(6));
-    } else if (layer.layerName === "Leadership & Autonomy") {
-      out.DIM2 = Number(layer.median.toFixed(6));
-    } else if (layer.layerName === "Culture & Alignment") {
-      out.DIM3 = Number(layer.median.toFixed(6));
-    } else if (layer.layerName === "Resilience") {
-      out.DIM4 = Number(layer.median.toFixed(6));
-    } else if (layer.layerName === "Skills") {
-      out.DIM5 = Number(layer.median.toFixed(6));
-    }
-  }
-  return out;
 }
 
 function inferHostDir(workspace: string): string | null {
@@ -463,7 +405,7 @@ function scopeFromInput(workspace: string, scope: ScopeInput): ScopeInput {
   };
 }
 
-export async function collectAuditBinderData(params: {
+export type AuditBinderCollectionInput = {
   workspace: string;
   scope: ScopeInput;
   policy: AuditPolicy;
@@ -471,7 +413,10 @@ export async function collectAuditBinderData(params: {
   nowTs?: number;
   request?: EvidenceRequest | null;
   trust?: import("../trust/trustContext.js").TrustContext;
-}): Promise<BinderCollectResult> {
+};
+
+/** Local observation only; the maintained publisher selects readonly, non-initializing readers. */
+export function collectAuditBinderLocalData(params: AuditBinderCollectionInput, readOnly = false) {
   const nowTs = Number.isFinite(Number(params.nowTs)) ? Number(params.nowTs) : Date.now();
   const scope = scopeFromInput(params.workspace, params.scope);
   const windowStartTs = nowTs - parseWindowToMs("30d");
@@ -480,13 +425,14 @@ export async function collectAuditBinderData(params: {
     .sort((a, b) => a.ts - b.ts);
   const eventsByType = eventRefsByType(transparencyEntries.map((entry) => ({ type: entry.type, hash: entry.hash })));
 
-  const ledger = openLedger(params.workspace);
+  const ledger = openLedger(params.workspace, readOnly ? { readonly: true } : {});
+  let selectedWindowEvents: ReturnType<typeof ledger.getEventsBetween> = [];
   const auditTypeRefs = new Map<string, string[]>();
   let truthguardCount = 0;
   let toolDeniedCount = 0;
   let providerAllowlistEvents = 0;
   try {
-    const events = ledger.getEventsBetween(windowStartTs, nowTs);
+    const events = ledger.getEventsBetween(windowStartTs, nowTs); selectedWindowEvents = events;
     for (const event of events) {
       if (event.event_type === "output_validated") {
         truthguardCount += 1;
@@ -519,7 +465,7 @@ export async function collectAuditBinderData(params: {
       return null;
     }
     try {
-      return getWorkspaceRecord(hostDir, workspaceIdFromDirectory(params.workspace));
+      return readOnly ? readAuditWorkspaceRecord(hostDir, workspaceIdFromDirectory(params.workspace)) : getWorkspaceRecord(hostDir, workspaceIdFromDirectory(params.workspace));
     } catch {
       return null;
     }
@@ -535,19 +481,18 @@ export async function collectAuditBinderData(params: {
   const bridgeSig = verifyBridgeConfigSignature(params.workspace);
   const adaptersSig = verifyAdaptersConfigSignature(params.workspace);
   const benchRegistrySig = verifyBenchRegistriesSignature(params.workspace);
-  const pluginVerify = verifyPluginWorkspace({ workspace: params.workspace });
+  const pluginVerify = verifyPluginWorkspace({ workspace: params.workspace, readonly: readOnly });
   const tlogVerify = verifyTransparencyLog(params.workspace);
   const merkleVerify = verifyTransparencyMerkle(params.workspace);
-  const ledgerVerify = await verifyLedgerIntegrity(params.workspace);
+  const ledgerVerify = verifyLedgerIntegrity(params.workspace);
 
-  const retention = retentionStatusCli(params.workspace);
+  const retention = readOnly ? { segmentCount: readAuditRetentionCount(params.workspace) } : retentionStatusCli(params.workspace);
   const assuranceRun = latestAssuranceRun(params.workspace);
   const assuranceCert = latestAssuranceCertificateSummary(params.workspace);
-  const assurancePolicy = loadAssurancePolicy(params.workspace);
+  const assurancePolicy = readOnly ? readAuditAssurancePolicy(params.workspace) : loadAssurancePolicy(params.workspace);
 
   const trust = loadTrustConfig(params.workspace);
   const conformance = binderConformanceRun(params.workspace, scope.type === "AGENT" ? scope.id : null, params.policy.auditPolicy.privacy.hashTruncBytes, params.trust);
-  const notary = await checkNotaryTrust(params.workspace).catch(() => null);
 
   const opsPolicy = loadOpsPolicy(params.workspace);
 
@@ -880,7 +825,7 @@ export async function collectAuditBinderData(params: {
 
   const tuning = (() => {
     try {
-      return loadMechanicTuning(params.workspace).mechanicTuning.knobs;
+      return (readOnly ? readAuditMechanicTuning(params.workspace) : loadMechanicTuning(params.workspace)).mechanicTuning.knobs;
     } catch {
       return null;
     }
@@ -1007,11 +952,8 @@ export async function collectAuditBinderData(params: {
       },
       notary: {
         enabled: trust.trust.mode === "NOTARY",
-        fingerprint: trust.trust.mode === "NOTARY" ? notary?.currentFingerprint ?? trust.trust.notary.pinnedPubkeyFingerprint : null,
-        attestationAgeMinutes:
-          trust.trust.mode === "NOTARY" && Number.isFinite(Number(notary?.lastAttestationTs ?? NaN))
-            ? Number((((nowTs - Number(notary?.lastAttestationTs ?? nowTs)) / 60_000).toFixed(3)))
-            : null
+        fingerprint: trust.trust.mode === "NOTARY" ? trust.trust.notary.pinnedPubkeyFingerprint : null,
+        attestationAgeMinutes: null
       }
     },
     bindings: {
@@ -1150,5 +1092,22 @@ export async function collectAuditBinderData(params: {
     }
   });
 
-  return { binder, includedEventKinds, calculationManifest, sourceEventHashes, conformanceFiles: conformance.files };
+  return { binder, includedEventKinds, calculationManifest, sourceEventHashes, conformanceFiles: conformance.files, selectedWindowEvents };
+}
+
+/** One actual remote health observation; it is never repeated by a final negative callback. */
+export async function completeAuditBinderCollection(local: ReturnType<typeof collectAuditBinderLocalData>, workspace: string): Promise<BinderCollectResult> {
+  const notary = await checkNotaryTrust(workspace).catch(() => null);
+  const collected: BinderCollectResult = { binder: local.binder, includedEventKinds: local.includedEventKinds, calculationManifest: local.calculationManifest,
+    sourceEventHashes: local.sourceEventHashes, conformanceFiles: local.conformanceFiles };
+  if (collected.binder.trust.notary.enabled) collected.binder.trust.notary = {
+    enabled: true, fingerprint: notary?.currentFingerprint ?? collected.binder.trust.notary.fingerprint,
+    attestationAgeMinutes: Number.isFinite(Number(notary?.lastAttestationTs ?? NaN))
+      ? Number(((collected.binder.generatedTs - Number(notary?.lastAttestationTs ?? collected.binder.generatedTs)) / 60_000).toFixed(3)) : null
+  };
+  return collected;
+}
+
+export async function collectAuditBinderData(params: AuditBinderCollectionInput): Promise<BinderCollectResult> {
+  return completeAuditBinderCollection(collectAuditBinderLocalData(params), params.workspace);
 }

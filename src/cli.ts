@@ -267,7 +267,7 @@ import {
   auditRequestFulfillCli,
   auditRequestListCli,
   auditRequestRejectCli,
-  auditSchedulerEnableCli,
+  auditSchedulerEnableCliAsync,
   auditSchedulerRunNowCli,
   auditSchedulerStatusCli,
   auditVerifyPolicyCli,
@@ -17158,7 +17158,7 @@ auditBinder
       id: opts.id,
       outFile: opts.out,
       requestId: opts.requestId
-    });
+    }, { beforePublish: () => assertOwnerMode(process.cwd(), "audit binder create") });
     if (!("outFile" in out) || !("sha256" in out)) {
       throw new Error("audit binder create did not produce an export artifact");
     }
@@ -17228,7 +17228,7 @@ auditBinder
     const out = await auditBinderExportExecuteCli({
       workspace: process.cwd(),
       approvalRequestId: opts.approval
-    });
+    }, { beforePublish: () => assertOwnerMode(process.cwd(), "audit binder export-execute") });
     console.log(chalk.green("Audit binder export executed"));
     console.log(`File: ${out.outFile}`);
     console.log(`sha256: ${out.sha256}`);
@@ -17307,7 +17307,7 @@ auditRequest
       workspace: process.cwd(),
       requestId,
       outFile: opts.out
-    });
+    }, { beforePublish: () => assertOwnerMode(process.cwd(), "audit request fulfill") });
     console.log(chalk.green("Evidence request fulfilled"));
     console.log(`requestId: ${out.request.requestId}`);
     console.log(`binder sha256: ${out.export.sha256}`);
@@ -17336,7 +17336,7 @@ auditScheduler
       workspace: process.cwd(),
       scope: scope as "workspace" | "node" | "agent",
       id: opts.id
-    });
+    }, { beforePublish: () => assertOwnerMode(process.cwd(), "audit scheduler run-now") });
     console.log(chalk.green("Audit scheduler refresh completed"));
     console.log(`binderId: ${out.binder.binderId}`);
     console.log(`cache: ${out.cache.path}`);
@@ -17345,23 +17345,23 @@ auditScheduler
 auditScheduler
   .command("enable")
   .description("Enable audit scheduler")
-  .action(() => {
+  .action(async () => {
     assertOwnerMode(process.cwd(), "audit scheduler enable");
-    console.log(JSON.stringify(auditSchedulerEnableCli({
+    console.log(JSON.stringify(await auditSchedulerEnableCliAsync({
       workspace: process.cwd(),
       enabled: true
-    }), null, 2));
+    }, { beforePublish: () => assertOwnerMode(process.cwd(), "audit scheduler enable") }), null, 2));
   });
 
 auditScheduler
   .command("disable")
   .description("Disable audit scheduler")
-  .action(() => {
+  .action(async () => {
     assertOwnerMode(process.cwd(), "audit scheduler disable");
-    console.log(JSON.stringify(auditSchedulerEnableCli({
+    console.log(JSON.stringify(await auditSchedulerEnableCliAsync({
       workspace: process.cwd(),
       enabled: false
-    }), null, 2));
+    }, { beforePublish: () => assertOwnerMode(process.cwd(), "audit scheduler disable") }), null, 2));
   });
 
 audit

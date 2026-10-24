@@ -1,3 +1,4 @@
+import type { AuditPublicationOptions } from "./binderPublication.js";
 import { cliInitiator } from "../approvals/approvalEngine.js";
 import { resolve } from "node:path";
 import YAML from "yaml";
@@ -23,7 +24,7 @@ import {
   auditRequestFulfillForApi,
   auditRequestListForApi,
   auditRequestRejectForApi,
-  auditSchedulerEnableForApi,
+  auditSchedulerEnableForApi, auditSchedulerEnableForApiAsync,
   auditSchedulerRunNowForApi,
   auditSchedulerStatusForApi
 } from "./auditApi.js";
@@ -97,7 +98,7 @@ export function auditBinderCreateCli(params: {
   id?: string;
   outFile?: string;
   requestId?: string;
-}) {
+}, options: AuditPublicationOptions = {}) {
   if (params.outFile) {
     return auditBinderExportForApi({
       workspace: params.workspace,
@@ -105,14 +106,14 @@ export function auditBinderCreateCli(params: {
       scopeId: params.id,
       outFile: params.outFile,
       requestId: params.requestId
-    });
+    }, options);
   }
   return auditBinderCreateForApi({
     workspace: params.workspace,
     scopeType: params.scope.toUpperCase(),
     scopeId: params.id,
     requestId: params.requestId
-  });
+  }, options);
 }
 
 export function auditBinderExportRequestCli(params: {
@@ -137,8 +138,8 @@ export function auditBinderExportRequestCli(params: {
 export function auditBinderExportExecuteCli(params: {
   workspace: string;
   approvalRequestId: string;
-}) {
-  return auditBinderExportExecuteForApi(params);
+}, options: AuditPublicationOptions = {}) {
+  return auditBinderExportExecuteForApi(params, options);
 }
 
 export function auditBinderVerifyCli(params: {
@@ -207,8 +208,8 @@ export function auditRequestFulfillCli(params: {
   workspace: string;
   requestId: string;
   outFile?: string;
-}) {
-  return auditRequestFulfillForApi(params);
+}, options: AuditPublicationOptions = {}) {
+  return auditRequestFulfillForApi(params, options);
 }
 
 export function auditSchedulerStatusCli(workspace: string) {
@@ -219,12 +220,12 @@ export function auditSchedulerRunNowCli(params: {
   workspace: string;
   scope?: "workspace" | "node" | "agent";
   id?: string;
-}) {
+}, options: AuditPublicationOptions = {}) {
   return auditSchedulerRunNowForApi({
     workspace: params.workspace,
     scopeType: params.scope?.toUpperCase(),
     scopeId: params.id
-  });
+  }, options);
 }
 
 export function auditSchedulerEnableCli(params: {
@@ -247,4 +248,8 @@ export function auditEnterpriseExportCli(params: {
   limit?: number;
 }) {
   return exportEnterpriseAudit(params);
+}
+
+export async function auditSchedulerEnableCliAsync(params: Parameters<typeof auditSchedulerEnableCli>[0], options: AuditPublicationOptions = {}) {
+  return auditSchedulerEnableForApiAsync(params, options);
 }

@@ -37,7 +37,7 @@ import {
   auditRequestFulfillForApi,
   auditRequestListForApi,
   auditRequestRejectForApi,
-  auditSchedulerEnableForApi,
+  auditSchedulerEnableForApiAsync,
   auditSchedulerRunNowForApi,
   auditSchedulerStatusForApi
 } from "../audit/auditApi.js";
@@ -1516,7 +1516,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         const auditTick = await auditSchedulerTick({
           workspace: options.workspace,
           workspaceReady: state.ok
-        });
+        }, { beforePublish: () => { if (shuttingDown) throw new Error("audit scheduler stopped"); } });
         const valueTick = await valueSchedulerTick({
           workspace: options.workspace,
           workspaceReady: state.ok
@@ -2171,6 +2171,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       const requireRouteRoles = (roles: UserRole[]): boolean =>
         requireRoles({ auth, res, workspace: options.workspace, roles });
       const signingAuthority = (roles: UserRole[]) => currentSigningAuthority(req, res, options.workspace, options.token, auth, roles);
+      const auditPublication = (roles: UserRole[], vault = true) => { const actor = signingAuthority(roles); return { beforePublish() { actor(); if (requiresReadOnlyMode(options.workspace)) { if (!res.headersSent) json(res, 403, { error: "users signature invalid; write operations blocked" }); throw new Error("users signature invalid; write operations blocked"); } if (vault && !requireUnlockedVaultForSigning()) throw new Error("vault locked; unlock required for signing"); } }; };
       const refreshConsole = async () => {
         const recheck = signingAuthority(["OWNER"]);
         try { await writeConsoleSnapshot(options.workspace, recheck); return {}; }
@@ -4414,7 +4415,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           scopeType: typeof parsed.scopeType === "string" ? parsed.scopeType : undefined,
           scopeId: typeof parsed.scopeId === "string" ? parsed.scopeId : undefined,
           requestId: typeof parsed.requestId === "string" ? parsed.requestId : undefined
-        });
+        }, auditPublication(["OWNER", "OPERATOR"])).catch(error => { if (res.headersSent || respondReportSigningError(error, (status, body) => json(res, status, body))) return null; throw error; }); if (out === null) return;
         emitAuditSse({
           hub: orgSse,
           type: "AUDIT_BINDER_UPDATED"
@@ -4449,7 +4450,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           const out = await auditBinderExportExecuteForApi({
             workspace: options.workspace,
             approvalRequestId: parsed.approvalRequestId.trim()
-          });
+          }, auditPublication(["OWNER"])).catch(error => { if (res.headersSent || respondReportSigningError(error, (status, body) => json(res, status, body))) return null; throw error; }); if (out === null) return;
           emitAuditSse({
             hub: orgSse,
             type: "AUDIT_BINDER_UPDATED"
@@ -4475,7 +4476,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           scopeId: typeof parsed.scopeId === "string" ? parsed.scopeId : undefined,
           outFile: typeof parsed.outFile === "string" ? parsed.outFile : undefined,
           requestId: typeof parsed.requestId === "string" ? parsed.requestId : undefined
-        });
+        }, auditPublication(["OWNER"])).catch(error => { if (res.headersSent || respondReportSigningError(error, (status, body) => json(res, status, body))) return null; throw error; }); if (out === null) return;
         emitAuditSse({
           hub: orgSse,
           type: "AUDIT_BINDER_UPDATED"
@@ -4640,7 +4641,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           workspace: options.workspace,
           requestId,
           outFile: typeof parsed.outFile === "string" ? parsed.outFile : undefined
-        });
+        }, auditPublication(["OWNER", "OPERATOR"])).catch(error => { if (res.headersSent || respondReportSigningError(error, (status, body) => json(res, status, body))) return null; throw error; }); if (out === null) return;
         emitAuditSse({
           hub: orgSse,
           type: "AUDIT_EVIDENCE_REQUEST_UPDATED"
@@ -4680,7 +4681,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           workspace: options.workspace,
           scopeType: typeof parsed.scopeType === "string" ? parsed.scopeType : undefined,
           scopeId: typeof parsed.scopeId === "string" ? parsed.scopeId : undefined
-        });
+        }, auditPublication(["OWNER", "OPERATOR"])).catch(error => { if (res.headersSent || respondReportSigningError(error, (status, body) => json(res, status, body))) return null; throw error; }); if (out === null) return;
         emitAuditSse({
           hub: orgSse,
           type: "AUDIT_BINDER_UPDATED"
@@ -4696,10 +4697,8 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
-        json(res, 200, auditSchedulerEnableForApi({
-          workspace: options.workspace,
-          enabled: true
-        }));
+        const out = await auditSchedulerEnableForApiAsync({ workspace: options.workspace, enabled: true }, auditPublication(["OWNER", "OPERATOR"], false)).catch(error => { if (res.headersSent || respondReportSigningError(error, (status, body) => json(res, status, body))) return null; throw error; }); if (out === null) return;
+        json(res, 200, out);
         return;
       }
 
@@ -4710,10 +4709,8 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
-        json(res, 200, auditSchedulerEnableForApi({
-          workspace: options.workspace,
-          enabled: false
-        }));
+        const out = await auditSchedulerEnableForApiAsync({ workspace: options.workspace, enabled: false }, auditPublication(["OWNER", "OPERATOR"], false)).catch(error => { if (res.headersSent || respondReportSigningError(error, (status, body) => json(res, status, body))) return null; throw error; }); if (out === null) return;
+        json(res, 200, out);
         return;
       }
 
