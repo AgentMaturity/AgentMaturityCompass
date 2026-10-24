@@ -310,98 +310,99 @@ function activeAgentFilterClause(agentId: string | undefined): { sql: string; pa
   };
 }
 
-export function collectVerifierEvidence(params: CollectVerifierEvidenceParams): VerifierEvidenceDataset {
+/** Internal same recipe for the actual readonly audit-packet connection; no signing authority is accepted. */
+export function collectVerifierEvidenceFromDatabase(params: CollectVerifierEvidenceParams, db: Database.Database, fixedGeneratedTs?: number): VerifierEvidenceDataset {
   const includeChain = params.includeChain ?? false;
   const includeRationale = params.includeRationale ?? false;
-  const ledger = openLedger(params.workspace);
-  try {
-    const db = ledger.db;
-    const allRows = db.prepare("SELECT rowid, * FROM evidence_events ORDER BY rowid ASC").all() as EvidenceRow[];
-    const filter = activeAgentFilterClause(params.agentId);
-    const selectedRows = db
-      .prepare(`SELECT rowid, * FROM evidence_events${filter.sql} ORDER BY rowid ASC`)
-      .all(...filter.params) as EvidenceRow[];
-    const chainStatus = hashChainStatus(allRows);
-    const incidentByEvent = incidentLinksByEvent(db);
-    const correctionByEvent = correctionStatusByEvent(db);
+  const allRows = db.prepare("SELECT rowid, * FROM evidence_events ORDER BY rowid ASC").all() as EvidenceRow[];
+  const filter = activeAgentFilterClause(params.agentId);
+  const selectedRows = db
+    .prepare(`SELECT rowid, * FROM evidence_events${filter.sql} ORDER BY rowid ASC`)
+    .all(...filter.params) as EvidenceRow[];
+  const chainStatus = hashChainStatus(allRows);
+  const incidentByEvent = incidentLinksByEvent(db);
+  const correctionByEvent = correctionStatusByEvent(db);
 
-    const records: EvidenceExportRecord[] = selectedRows.map((row) => {
-      const meta = parseMeta(row.meta_json);
-      const chain = chainStatus.get(row.id) ?? {
-        index: 0,
-        valid: true,
-        expectedPrevHash: row.prev_event_hash
-      };
-      const rationale = extractRationale(meta);
-      const incidents = [...(incidentByEvent.get(row.id) ?? new Set<string>())].sort((a, b) => a.localeCompare(b));
-      const correction = correctionByEvent.get(row.id) ?? {
-        correctionIds: [],
-        correctionStatuses: [],
-        corrected: false,
-        correctedTs: null
-      };
-
-      const tier = effectiveTrustTier(row, { trustList: null });
-      const record: EvidenceExportRecord = {
-        eventId: row.id,
-        ts: row.ts,
-        isoTs: new Date(row.ts).toISOString(),
-        sessionId: row.session_id,
-        runtime: row.runtime,
-        eventType: row.event_type,
-        actorId: extractActorId(meta, row.session_id),
-        claimKind: tier === null ? "synthetic_example" : claimKindFromTrustTier(tier).claimKind,
-        payloadSha256: row.payload_sha256,
-        prevEventHash: row.prev_event_hash,
-        eventHash: row.event_hash,
-        writerSignature: row.writer_sig,
-        chainIndex: includeChain ? chain.index : -1,
-        chainValid: includeChain ? chain.valid : true,
-        chainExpectedPrevHash: includeChain ? chain.expectedPrevHash : "",
-        incidentIds: incidents,
-        correctionIds: correction.correctionIds,
-        correctionStatuses: correction.correctionStatuses,
-        corrected: correction.corrected,
-        correctedTs: correction.correctedTs,
-        rationale: includeRationale ? rationale.rationale : null,
-        rationaleChain: includeRationale ? rationale.chain : [],
-        meta
-      };
-      // The published contract is the export's own check: a row it does not describe is refused, never written.
-      try {
-        assertContract("evidence-event", record);
-      } catch (error) {
-        throw new Error(`export refused: row ${row.id} ${error instanceof Error ? error.message : String(error)}`);
-      }
-      return record;
-    });
-
-    const agentId = params.agentId?.trim();
-    const agentFilter: VerifierEvidenceAgentFilter | null = agentId
-      ? {
-          agentId,
-          mode: "row-meta-or-owned-session",
-          sessionsIncluded: [...new Set(db.prepare(`${OWNED_SESSIONS_SQL} ORDER BY rowid ASC`).pluck().all(agentId) as string[])],
-          rowsExcluded: allRows.length - selectedRows.length,
-          systemSession: "excluded",
-          insufficientFor: ["requires_no_audit"]
-        }
-      : null;
-
-    return {
-      schemaVersion: 2,
-      generatedTs: Date.now(),
-      workspace: params.workspace,
-      agentFilter,
-      includeChain,
-      includeRationale,
-      eventCount: records.length,
-      chainInvalidCount: includeChain ? records.filter((row) => !row.chainValid).length : 0,
-      records
+  const records: EvidenceExportRecord[] = selectedRows.map((row) => {
+    const meta = parseMeta(row.meta_json);
+    const chain = chainStatus.get(row.id) ?? {
+      index: 0,
+      valid: true,
+      expectedPrevHash: row.prev_event_hash
     };
-  } finally {
-    ledger.close();
-  }
+    const rationale = extractRationale(meta);
+    const incidents = [...(incidentByEvent.get(row.id) ?? new Set<string>())].sort((a, b) => a.localeCompare(b));
+    const correction = correctionByEvent.get(row.id) ?? {
+      correctionIds: [],
+      correctionStatuses: [],
+      corrected: false,
+      correctedTs: null
+    };
+
+    const tier = effectiveTrustTier(row, { trustList: null });
+    const record: EvidenceExportRecord = {
+      eventId: row.id,
+      ts: row.ts,
+      isoTs: new Date(row.ts).toISOString(),
+      sessionId: row.session_id,
+      runtime: row.runtime,
+      eventType: row.event_type,
+      actorId: extractActorId(meta, row.session_id),
+      claimKind: tier === null ? "synthetic_example" : claimKindFromTrustTier(tier).claimKind,
+      payloadSha256: row.payload_sha256,
+      prevEventHash: row.prev_event_hash,
+      eventHash: row.event_hash,
+      writerSignature: row.writer_sig,
+      chainIndex: includeChain ? chain.index : -1,
+      chainValid: includeChain ? chain.valid : true,
+      chainExpectedPrevHash: includeChain ? chain.expectedPrevHash : "",
+      incidentIds: incidents,
+      correctionIds: correction.correctionIds,
+      correctionStatuses: correction.correctionStatuses,
+      corrected: correction.corrected,
+      correctedTs: correction.correctedTs,
+      rationale: includeRationale ? rationale.rationale : null,
+      rationaleChain: includeRationale ? rationale.chain : [],
+      meta
+    };
+    // The published contract is the export's own check: a row it does not describe is refused, never written.
+    try {
+      assertContract("evidence-event", record);
+    } catch (error) {
+      throw new Error(`export refused: row ${row.id} ${error instanceof Error ? error.message : String(error)}`);
+    }
+    return record;
+  });
+
+  const agentId = params.agentId?.trim();
+  const agentFilter: VerifierEvidenceAgentFilter | null = agentId
+    ? {
+        agentId,
+        mode: "row-meta-or-owned-session",
+        sessionsIncluded: [...new Set(db.prepare(`${OWNED_SESSIONS_SQL} ORDER BY rowid ASC`).pluck().all(agentId) as string[])],
+        rowsExcluded: allRows.length - selectedRows.length,
+        systemSession: "excluded",
+        insufficientFor: ["requires_no_audit"]
+      }
+    : null;
+
+  return {
+    schemaVersion: 2,
+    generatedTs: fixedGeneratedTs ?? Date.now(),
+    workspace: params.workspace,
+    agentFilter,
+    includeChain,
+    includeRationale,
+    eventCount: records.length,
+    chainInvalidCount: includeChain ? records.filter((row) => !row.chainValid).length : 0,
+    records
+  };
+}
+
+/** Existing writable export/default clock/close behavior stays on its compatibility path. */
+export function collectVerifierEvidence(params: CollectVerifierEvidenceParams): VerifierEvidenceDataset {
+  const ledger = openLedger(params.workspace);
+  try { return collectVerifierEvidenceFromDatabase(params, ledger.db); } finally { ledger.close(); }
 }
 
 export function renderVerifierEvidenceCsv(dataset: VerifierEvidenceDataset): string {
