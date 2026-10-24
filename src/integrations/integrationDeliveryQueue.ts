@@ -1,11 +1,10 @@
-import { dirname, resolve } from "node:path";
-import { writeFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { withWorkspaceScope } from "../enforce/evidenceEmitter.js";
 import { EgressBlocked } from "../residency/checkEgress.js";
 import {
   verifyHexDigestAny
 } from "../crypto/keys.js";
-import { ensureDir } from "../utils/fs.js";
+import { writeIntegrationQueueExport } from "./integrationJournalProtocol.js";
 import { sha256Hex } from "../utils/hash.js";
 import {
   computeBackoffDelayMs,
@@ -486,19 +485,22 @@ export function markIntegrationDeliveriesFinalized(params: {
   }
 }
 
-/** Internal terminal publication. The row preimage is checked last under the short SQLite writer transaction. */
+/** Journal effects precede the final short SQL CAS. No file lock spans this SQLite writer transaction. */
 export function finalizeIntegrationDeliveryWithAuthority(workspace: string, status: IntegrationQueueDeliveryStatus,
   beforeCommit: () => void, publishJournals: (assertRow: () => void) => void): void {
   beforeCommit(); const db = openIntegrationQueueDb(workspace);
-  try { db.transaction(() => {
+  try {
     const assertRow = () => {
       const current = db.prepare("SELECT * FROM integration_delivery_queue WHERE queue_id = ?").get(status.queueId) as IntegrationQueueRow | undefined;
       if (!current || canonicalize(mapDeliveryStatus(current)) !== canonicalize(status)) throw new Error("selected terminal integration row changed");
     };
     beforeCommit(); assertRow(); publishJournals(assertRow);
-    const finalizedTs = Date.now(); beforeCommit(); assertRow();
-    db.prepare("UPDATE integration_delivery_queue SET finalized_ts = ?, updated_ts = ? WHERE queue_id = ?").run(finalizedTs, finalizedTs, status.queueId);
-  }).immediate(); } finally { db.close(); }
+    // If this CAS refuses, acknowledged journal records remain real and replay uses their existing delivery/queue ids.
+    db.transaction(() => {
+      const finalizedTs = Date.now(); beforeCommit(); assertRow();
+      db.prepare("UPDATE integration_delivery_queue SET finalized_ts = ?, updated_ts = ? WHERE queue_id = ?").run(finalizedTs, finalizedTs, status.queueId);
+    }).immediate();
+  } finally { db.close(); }
 }
 
 export function listIntegrationDeadLetters(
@@ -1003,8 +1005,9 @@ export function exportIntegrationDeliverySnapshot(params: {
     };
 
     const outFile = resolve(params.workspace, params.outFile);
-    ensureDir(dirname(outFile));
-    writeFileSync(outFile, JSON.stringify(payload, null, 2), "utf8");
+    const body = JSON.stringify(payload, null, 2);
+    // Existing arbitrary export destinations can alias a journal; every export cooperates with the same file lock.
+    writeIntegrationQueueExport(params.workspace, outFile, body);
 
     return {
       outFile,

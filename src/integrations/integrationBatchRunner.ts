@@ -1,41 +1,12 @@
-import { lstatSync, readFileSync } from "node:fs";
-import { join } from "node:path";
 import { canonicalize } from "../utils/json.js";
 import { getVaultSecretReadOnly } from "../vault/vault.js";
-import { integrationDeliveryJournalPath } from "./integrationDeliveryStore.js";
+import { captureIntegrationJournalPublication } from "./integrationJournalProtocol.js";
+export { captureIntegrationJournalPublication } from "./integrationJournalProtocol.js";
 import { resolveSecretRef } from "./integrationStore.js";
 import { captureIntegrationConfiguration, captureIntegrationQueueAuthority, captureIntegrationQueueReader } from "./integrationQueueEnqueue.js";
 import { captureIntegrationPendingRows, listIntegrationDeliveriesNeedingFinalization,
   type IntegrationQueueRow, type IntegrationQueueDeliveryStatus } from "./integrationDeliveryQueue.js";
 import type { IntegrationEventInput } from "./integrationDispatcher.js";
-
-/** Fixed integration journal targets; existing writers do not all share a lock, so no cross-process atomicity is claimed. */
-export function captureIntegrationJournalPublication(workspace: string, beforeCommit: () => void) {
-  const paths = [integrationDeliveryJournalPath(workspace), join(workspace, ".amc", "integrations", "dead-letters.jsonl")];
-  const read = (path: string) => {
-    let stat: ReturnType<typeof lstatSync>;
-    try { stat = lstatSync(path); } catch (cause) {
-      if ((cause as NodeJS.ErrnoException).code === "ENOENT") return null;
-      throw cause;
-    }
-    if (!stat.isFile() || stat.isSymbolicLink()) throw new Error("integration journal target is not a regular file");
-    return { bytes: readFileSync(path), mode: stat.mode & 0o7777 };
-  };
-  let targets = paths.map(read);
-  const progress: Array<{ stage: string; returned: boolean }> = [];
-  const assertCurrent = () => {
-    for (let index = 0; index < paths.length; index += 1) {
-      const current = read(paths[index]!), original = targets[index]!;
-      if ((current === null) !== (original === null) || (current !== null && original !== null &&
-        (current.mode !== original.mode || !current.bytes.equals(original.bytes)))) throw new Error("integration journal target changed");
-    }
-  };
-  return { progress, assertCurrent, publish: <T>(stage: string, operation: () => T, assertRow?: () => void): T => {
-    beforeCommit(); assertRow?.(); assertCurrent();
-    const effect = { stage, returned: false }; progress.push(effect);
-    const result = operation(); effect.returned = true; targets = paths.map(read); return result;
-  } };
-}
 
 export type IntegrationBatchEvent = Omit<IntegrationEventInput, "workspace">;
 export interface IntegrationBatchInput { workspace: string; events: IntegrationBatchEvent[] }
@@ -73,7 +44,7 @@ export function captureIntegrationBatchRun(params: IntegrationBatchInput, before
   const terminal = new Map(initialTerminals.map(row => [row.queueId, row]));
   const copyStatus = (row: IntegrationQueueDeliveryStatus) => JSON.parse(canonicalize(row)) as IntegrationQueueDeliveryStatus;
   return { workspace, events, config, journals, secretValues,
-    assertCurrent: () => { assertAuthority(); journals.assertCurrent(); },
+    assertCurrent: assertAuthority,
     pendingRows: () => [...pending.values()].map(row => ({ ...row })),
     terminalRows: (channelIds: readonly string[]) => [...terminal.values()].filter(row => channelIds.includes(row.channelId)).map(copyStatus),
     // These facts come only from the maintained enqueue/queue transaction after it returned successfully.

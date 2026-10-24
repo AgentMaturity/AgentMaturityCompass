@@ -1,3 +1,4 @@
+import { withIntegrationJournalProtocol, type IntegrationJournalIo } from "./integrationJournalProtocol.js";
 import { captureIntegrationBatchRun, captureIntegrationJournalPublication as captureJournalPublication,
   type IntegrationBatchRun, type IntegrationBatchInput } from "./integrationBatchRunner.js";
 import { randomUUID } from "node:crypto";
@@ -24,11 +25,11 @@ import {
   type IntegrationQueueItemInput,
   type ProcessedIntegrationDelivery
 } from "./integrationDeliveryQueue.js";
-import { appendIntegrationDeadLetter } from "./integrationDeadLetters.js";
+import { appendIntegrationDeadLetterInJournal } from "./integrationDeadLetters.js";
 import {
-  addIntegrationDeadLetter,
+  addIntegrationDeadLetterInJournal,
   nextIntegrationChannelSequence,
-  recordIntegrationDelivery
+  recordIntegrationDeliveryInJournal, nextIntegrationChannelSequenceInJournal
 } from "./integrationDeliveryStore.js";
 
 export interface IntegrationDispatchPayload {
@@ -381,10 +382,11 @@ function finalizeTerminalDelivery(params: {
 }): void {
   const status = params.status;
   const journals = (assertRow?: () => void) => {
-  const publish = <T>(stage: string, operation: () => T): T => params.journals ? params.journals.publish(stage, operation, assertRow) : operation();
+  const publish = <T>(stage: string, operation: (journal: IntegrationJournalIo) => T): T => params.journals
+    ? params.journals.publish(stage, operation, assertRow) : withIntegrationJournalProtocol(params.workspace, operation);
   if (status.deliveryReceipt) {
     const sequence = status.orderedSequence ?? status.seq;
-    publish("record-delivery", () => recordIntegrationDelivery({
+    publish("record-delivery", journal => recordIntegrationDeliveryInJournal(journal, {
       workspace: params.workspace,
       channelId: status.channelId,
       eventName: status.eventName,
@@ -394,7 +396,7 @@ function finalizeTerminalDelivery(params: {
       receipt: status.deliveryReceipt!
     }));
     if (status.state === "DEAD_LETTER" && params.recordDeadLetters) {
-      publish("record-dead-letter", () => addIntegrationDeadLetter({
+      publish("record-dead-letter", journal => addIntegrationDeadLetterInJournal(journal, {
         workspace: params.workspace,
         channelId: status.channelId,
         eventName: status.eventName,
@@ -403,7 +405,7 @@ function finalizeTerminalDelivery(params: {
         payloadSha256: status.payloadSha256,
         receipt: status.deliveryReceipt!
       }));
-      publish("append-dead-letter", () => appendIntegrationDeadLetter(params.workspace, {
+      publish("append-dead-letter", journal => appendIntegrationDeadLetterInJournal(journal, params.workspace, {
         v: 1,
         deadLetterId: `idl_${status.queueId}`,
         ts: status.deadLetterTs ?? Date.now(),
@@ -505,8 +507,8 @@ async function dispatchIntegrationEventAttempt(params: IntegrationEventInput, be
     standardPayloadBody,
     channels,
     skipped, secretValues: batch?.secretValues,
-    publishSequence: journals ? channelId => journals.publish("reserve-sequence", () => {
-      const sequence = nextIntegrationChannelSequence(params.workspace, channelId); reservedSequences.push({ channelId, sequence }); return sequence;
+    publishSequence: journals ? channelId => journals.publish("reserve-sequence", journal => {
+      const sequence = nextIntegrationChannelSequenceInJournal(journal, params.workspace, channelId); reservedSequences.push({ channelId, sequence }); return sequence;
     }) : undefined
   });
   const deliveries = prepared.deliveries;
