@@ -379,7 +379,7 @@ export const API_ROUTE_REGISTRY: readonly ApiRouteDefinition[] = [
     methods: ['GET', 'POST'],
     auth: 'protected',
     validationPolicy: 'router-local',
-    handler: workspaceRoute(handleAdaptersRoute)
+    handler: (pathname, method, req, res, context) => handleAdaptersRoute(pathname, method, req, res, context.workspace, context.revalidateAuthority)
   },
   {
     id: 'tools',
@@ -433,7 +433,7 @@ export const API_ROUTE_REGISTRY: readonly ApiRouteDefinition[] = [
     methods: ['GET', 'POST'],
     auth: 'protected',
     validationPolicy: 'router-local',
-    handler: workspaceRoute(handleBomRoute)
+    handler: (pathname, method, req, res, context) => handleBomRoute(pathname, method, req, res, context.workspace, context.revalidateAuthority)
   },
   {
     id: 'compliance',

@@ -286,3 +286,6 @@ Diagnostic self-run now retains silent original lease/signing authority before i
 
 
 Restore the retained original self-run signer parameter at the private initialization call. The conditional initial seal body and expected signer both consume it; the reviewed output-continuity correction did not make it unused. No primary route or protocol change.
+
+
+Forward the existing trusted Studio revalidation callback through the two adapters/BOM API registry entries. Existing signed adapter init/configure/capability and BOM sign handlers now select their maintained awaited signing branches. Existing roles, routes, request fields and callback-absent compatibility remain. This applies only the two additional exact lines authorized by Sid; other reserved source remains held.
