@@ -1,3 +1,5 @@
+import { assertOwnerMode } from "../mode/mode.js";
+import { captureRunHashAuthority } from "../ledger/runHashSignature.js";
 import { relative } from "node:path";
 import YAML from "yaml";
 import { readContainedOrNull } from "../utils/containedFs.js";
@@ -23,6 +25,15 @@ import {
   verifyOutcomeContractSignature
 } from "./outcomeContractEngine.js";
 import { diffOutcomeReports, fleetOutcomeReport, loadOutcomeReport, runOutcomeReport, runOutcomeReportAsync } from "./outcomeReport.js";
+
+/** Reuse the registered manual-control signing owner gate; the outcome label is error context only. */
+export function assertOutcomesAttestOwnerMode(workspace: string): void {
+  try { assertOwnerMode(workspace, "control results sign"); }
+  catch (cause) {
+    if (!(cause instanceof Error) || cause.message !== "Command 'control results sign' is blocked in agent mode. Switch to owner mode with: amc mode owner") throw cause;
+    throw new Error("Command 'outcomes attest' is blocked in agent mode. Switch to owner mode with: amc mode owner", { cause });
+  }
+}
 
 function parseValue(value: string): number | string | boolean {
   const lower = value.trim().toLowerCase();
@@ -227,21 +238,26 @@ export async function outcomesAttestCliAsync(params: Parameters<typeof outcomesA
   if (Object.values(input).some(value => value !== undefined && typeof value !== "string")) throw new Error("Manual outcome attestation inputs must be strings");
   beforePublish?.();
   const agentId = resolveAgentId(input.workspace, input.agentId), authority = capturePurposePublication(input.workspace, "artifact-seal");
+  const originalAuthority = captureRunHashAuthority(input.workspace, false);
   const contract = manualAttestationContract(input.workspace, agentId);
   const metric = contract.contract.outcomeContract.metrics.find(row => row.metricId === input.metricId);
   if (!metric) throw new Error("metricId not found in contract: " + input.metricId);
   const value = parseValue(input.value);
   const attestationDigest = sha256Hex(JSON.stringify({ agentId, metricId: input.metricId, value: input.value, reason: input.reason, ts: Date.now() }));
-  const signed = await signWithPurposeKey(input.workspace, "artifact-seal", Buffer.from(attestationDigest, "hex"));
+  const beforeSign = () => {
+    beforePublish?.(); originalAuthority();
+    const current = manualAttestationContract(input.workspace, agentId);
+    if (!current.bytes.equals(contract.bytes) || !current.signature.equals(contract.signature)) throw new Error("Manual outcome contract changed while signing was prepared");
+    originalAuthority();
+  };
+  const signed = await signWithPurposeKey(input.workspace, "artifact-seal", Buffer.from(attestationDigest, "hex"), { beforeSign });
   const original = () => { if (signed.provider === "file" && !vaultStatus(input.workspace).unlocked) throw new Error("vault locked; unlock required for manual outcome attestation"); assertPurposePublicationCurrent(input.workspace, authority, signed); };
   original();
-  beforePublish?.(); original();
+  beforeSign(); original();
   const ledger = openLedger(input.workspace);
   try {
     return ledger.db.transaction(() => {
-      const current = manualAttestationContract(input.workspace, agentId);
-      if (!current.bytes.equals(contract.bytes) || !current.signature.equals(contract.signature)) throw new Error("Manual outcome contract changed while signing was prepared");
-      original();
+      beforeSign(); original();
       // The attestation binds no prior row; appendOutcomeEvent takes the current predecessor under this transaction.
       const written = ledger.appendOutcomeEvent({
         agentId, workOrderId: input.workOrderId ?? null, category: metric.category, metricId: input.metricId,

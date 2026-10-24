@@ -498,7 +498,7 @@ import {
   integrationsVerifyCli
 } from "./integrations/integrationsCli.js";
 import {
-  outcomesAttestCliAsync,
+  outcomesAttestCliAsync, assertOutcomesAttestOwnerMode,
   outcomesDiffCli,
   outcomesFleetReportCli,
   outcomesInitCliAsync,
@@ -13134,7 +13134,7 @@ outcomes
   .option("--unit <unit>", "unit label")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
   .action(async (opts: { metric: string; value: string; reason: string; workorder?: string; unit?: string; agent?: string }) => {
-    assertOwnerMode(process.cwd(), commandPath(outcomes.commands.find((c) => c.name() === "attest") ?? outcomes));
+    assertOutcomesAttestOwnerMode(process.cwd());
     const out = await outcomesAttestCliAsync({
       workspace: process.cwd(),
       agentId: opts.agent ?? activeAgent(program),
@@ -13143,7 +13143,7 @@ outcomes
       reason: opts.reason,
       workOrderId: opts.workorder,
       unit: opts.unit
-    });
+    }, { beforePublish: () => assertOutcomesAttestOwnerMode(process.cwd()) });
     console.log(chalk.green(`Outcome signal recorded (${out.trustTier}): ${out.outcomeEventId}`));
     printClaimResult(unverifiedClaim("outcomes:attest", 1), {});
     console.log(`eventHash=${out.eventHash}`);
