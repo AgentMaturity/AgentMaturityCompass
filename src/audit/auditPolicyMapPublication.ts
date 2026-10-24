@@ -81,7 +81,7 @@ function directory(path: string): Directory {
   catch (cause) { if ((cause as NodeJS.ErrnoException).code === "ENOENT") return { path, identity: null, mode: null }; throw cause; }
 }
 /** Preserve exactly ensureAuditDirs' existing finite set and native default mkdir mode, after signing. */
-function captureDirectories(workspace: string) {
+export function captureDirectories(workspace: string) {
   const paths = [join(workspace, ".amc", "audit"), auditMapsDir(workspace), join(workspace, ".amc", "audit", "binders"),
     auditBindersExportsDir(workspace), auditBindersCacheDir(workspace), auditRequestsOpenDir(workspace), auditRequestsClosedDir(workspace)];
   const expected = new Map<string, Directory>(), mode = 0o777 & ~process.umask(), created: string[] = []; let attempted: string | null = null;

@@ -2,7 +2,7 @@ import type { AuditPublicationOptions } from "./binderPublication.js";
 import { captureOrgFiles, orgPairBytes, assertOrgPairsCurrent } from "../org/preparedOrgPairs.js";
 import { auditPolicyPath } from "./auditPolicyStore.js";
 import { auditMapActivePath } from "./auditMapStore.js";
-import { physicalPathWithMissingSuffix } from "../utils/pathSafety.js";
+import { physicalPathWithMissingSuffix, safeIdSchema } from "../utils/pathSafety.js";
 import { cliInitiator } from "../approvals/approvalEngine.js";
 import { assertOwnerMode } from "../mode/mode.js";
 import { resolve } from "node:path";
@@ -25,10 +25,10 @@ import {
   auditPolicyApplyForApi, auditPolicyApplyForApiAsync,
   auditPolicyForApi, auditPolicyForApiAsync,
   auditRequestApproveForApi,
-  auditRequestCreateForApi,
+  auditRequestCreateForApi, auditRequestCreateForApiAsync,
   auditRequestFulfillForApi,
   auditRequestListForApi,
-  auditRequestRejectForApi,
+  auditRequestRejectForApi, auditRequestRejectForApiAsync,
   auditSchedulerEnableForApi, auditSchedulerEnableForApiAsync,
   auditSchedulerRunNowForApi,
   auditSchedulerStatusForApi
@@ -289,4 +289,16 @@ export async function auditMapApplyCliAsync(params: Parameters<typeof auditMapAp
   if (bytes === null) throw new Error("audit map input file is missing");
   const map = parseJsonOrYaml(bytes.toString("utf8")), beforePublish = () => { assertAuditCliOwnerMode(input.workspace, "audit map apply"); if (!sameTarget) assertOrgPairsCurrent(before); };
   beforePublish(); return auditMapApplyForApiAsync({ workspace: input.workspace, map }, { beforePublish, assertPreparationInputsCurrent() { assertOrgPairsCurrent(before); } });
+}
+
+export function auditRequestCreateCliAsync(params: Parameters<typeof auditRequestCreateCli>[0], options: AuditPublicationOptions = {}) {
+  const input = { ...params, workspace: resolve(params.workspace) };
+  return auditRequestCreateForApiAsync({ workspace: input.workspace, scopeType: input.scope.toUpperCase(), scopeId: input.id,
+    requestedItems: parseRequestedItems(input.items), requesterUserId: input.requesterUserId }, { ...options });
+}
+export function auditRequestRejectCliAsync(params: Parameters<typeof auditRequestRejectCli>[0], options: AuditPublicationOptions = {}) {
+  const requestId = safeIdSchema.parse(params.requestId), input = { ...params, requestId, workspace: resolve(params.workspace) }, caller = options.beforePublish;
+  if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize policy signing");
+  const beforePublish = () => { if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize policy signing"); caller?.(); if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize policy signing"); assertAuditCliOwnerMode(input.workspace, "audit request reject"); };
+  beforePublish(); return auditRequestRejectForApiAsync(input, { ...options, beforePublish });
 }

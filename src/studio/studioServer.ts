@@ -33,10 +33,10 @@ import {
   auditPolicyForApiAsync,
   auditReadinessGate,
   auditRequestApproveForApi,
-  auditRequestCreateForApi,
+  auditRequestCreateForApiAsync as auditRequestCreateForApi,
   auditRequestFulfillForApi,
   auditRequestListForApi,
-  auditRequestRejectForApi,
+  auditRequestRejectForApiAsync as auditRequestRejectForApi,
   auditSchedulerEnableForApiAsync,
   auditSchedulerRunNowForApi,
   auditSchedulerStatusForApi
@@ -4550,13 +4550,13 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           : Array.isArray(parsed.items)
             ? parsed.items
             : [];
-        const out = auditRequestCreateForApi({
+        const out = await auditRequestCreateForApi({
           workspace: options.workspace,
           scopeType: typeof parsed.scopeType === "string" ? parsed.scopeType : undefined,
           scopeId: typeof parsed.scopeId === "string" ? parsed.scopeId : undefined,
           requestedItems: requestedItems as Array<string | { kind: "ARTIFACT_HASH"; id: string; sha256: string } | { kind: "PROOF"; id: string } | { kind: "CONTROL"; controlId: string }>,
           requesterUserId: auth.username ?? auth.agentId ?? "auditor"
-        });
+        }, auditPublication(["AUDITOR"], false)).catch(error => { if (res.headersSent || respondReportSigningError(error, (status, body) => json(res, status, body))) return null; throw error; }); if (out === null) return;
         emitAuditSse({
           hub: orgSse,
           type: "AUDIT_EVIDENCE_REQUEST_UPDATED"
@@ -4615,10 +4615,10 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           return;
         }
         const requestId = decodeURIComponent(auditRequestRejectMatch[1] ?? "");
-        const out = auditRequestRejectForApi({
+        const out = await auditRequestRejectForApi({
           workspace: options.workspace,
           requestId
-        });
+        }, auditPublication(["OWNER"], false)).catch(error => { if (res.headersSent || respondReportSigningError(error, (status, body) => json(res, status, body))) return null; throw error; }); if (out === null) return;
         emitAuditSse({
           hub: orgSse,
           type: "AUDIT_EVIDENCE_REQUEST_UPDATED"

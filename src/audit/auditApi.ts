@@ -41,13 +41,13 @@ import {
 } from "./binderArtifact.js";
 import { verifyAuditBinderFile, verifyAuditWorkspace } from "./binderVerifier.js";
 import { unreadableAuditResult, verifyIndustryPackAuditFile } from "../domains/industryPackAudit.js";
-import { isWithin } from "../utils/pathSafety.js";
+import { isWithin, safeIdSchema } from "../utils/pathSafety.js";
 import { loadBinderCache } from "./binderStore.js";
 import {
-  createAuditEvidenceRequest,
+  createAuditEvidenceRequest, createAuditEvidenceRequestAsync,
   listAuditEvidenceRequests,
   markAuditEvidenceRequestFulfilled,
-  rejectAuditEvidenceRequest,
+  rejectAuditEvidenceRequest, rejectAuditEvidenceRequestAsync,
   requestAuditEvidenceApproval
 } from "./evidenceRequests.js";
 import { evidenceRequestItemSchema } from "./evidenceRequestSchema.js";
@@ -662,4 +662,13 @@ export async function auditMapApplyForApiAsync(params: Parameters<typeof auditMa
     if (cause instanceof TransparencyMerkleLagError) hash = cause.entryHash;
     throw new AuditPolicyMapPublicationError("map-log", prepared.paths, hash === null ? [] : [hash], cause, prepared.createdDirectories, null, true);
   }
+}
+
+export function auditRequestCreateForApiAsync(params: Parameters<typeof auditRequestCreateForApi>[0], options: AuditPublicationOptions = {}) {
+  const input = structuredClone(params), scope = parseScope(input);
+  return createAuditEvidenceRequestAsync({ workspace: resolve(input.workspace), scopeType: scope.scopeType, scopeId: scope.scopeId,
+    requestedItems: input.requestedItems, requesterUserId: input.requesterUserId }, { ...options });
+}
+export function auditRequestRejectForApiAsync(params: Parameters<typeof auditRequestRejectForApi>[0], options: AuditPublicationOptions = {}) {
+  const requestId = safeIdSchema.parse(params.requestId); return rejectAuditEvidenceRequestAsync({ ...params, requestId, workspace: resolve(params.workspace) }, { ...options });
 }

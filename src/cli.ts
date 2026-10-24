@@ -263,10 +263,10 @@ import {
   auditMapVerifyCli,
   auditPrintPolicyCliAsync,
   auditRequestApproveCli,
-  auditRequestCreateCli,
+  auditRequestCreateCliAsync as auditRequestCreateCli,
   auditRequestFulfillCli,
   auditRequestListCli,
-  auditRequestRejectCli,
+  auditRequestRejectCliAsync as auditRequestRejectCli,
   auditSchedulerEnableCliAsync,
   auditSchedulerRunNowCli,
   auditSchedulerStatusCli,
@@ -17238,12 +17238,12 @@ auditRequest
   .requiredOption("--items <csv>", "e.g. control:ACCESS_CONTROL.SSO_SCIM,proof:inc_abc")
   .option("--id <id>", "scope id for node/agent")
   .option("--requester <id>", "requester user id", "auditor")
-  .action((opts: { scope: string; items: string; id?: string; requester: string }) => {
+  .action(async (opts: { scope: string; items: string; id?: string; requester: string }) => {
     const scope = opts.scope.toLowerCase();
     if (!["workspace", "node", "agent"].includes(scope)) {
       throw new Error(`invalid scope: ${opts.scope}`);
     }
-    const out = auditRequestCreateCli({
+    const out = await auditRequestCreateCli({
       workspace: process.cwd(),
       scope: scope as "workspace" | "node" | "agent",
       id: opts.id,
@@ -17284,9 +17284,9 @@ auditRequest
   .command("reject")
   .description("Reject evidence request")
   .argument("<requestId>")
-  .action((requestId: string) => {
-    assertOwnerMode(process.cwd(), "audit request reject");
-    const out = auditRequestRejectCli({
+  .action(async (requestId: string) => {
+    assertAuditCliOwnerMode(process.cwd(), "audit request reject");
+    const out = await auditRequestRejectCli({
       workspace: process.cwd(),
       requestId
     });
