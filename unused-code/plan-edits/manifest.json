@@ -430,6 +430,13 @@
       "sha256": "d11408dc51ac383c7d23e0972e7f4de28010f3365306ca29c4badd30f4a8d291"
     },
     {
+      "path": "src/integrations/noCodeGovernanceStore.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/integrations/noCodeGovernanceStore.ts.landed",
+      "sha256": "01b2d8f3aacfa89548c5bc00e789e2075134d7c3dca232051622dc18287fb7ab"
+    },
+    {
       "path": "src/leases/leaseCli.ts",
       "issue": "P0-30",
       "baseCommit": "ee0afc9bc6099ffbd57e4929b67dc81acdff1741",
