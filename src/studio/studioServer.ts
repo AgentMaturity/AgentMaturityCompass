@@ -1,7 +1,7 @@
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
 import type { Socket } from "node:net";
 import { URL } from "node:url";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { readdirSync } from "node:fs";
 import { CLI_BRIDGE_ROLES,
   execCliCommand as cliBridgeExec,
@@ -242,7 +242,8 @@ import {
   verifyOrgConfigSignature
 } from "../org/orgStore.js";
 import { compareNodeScorecards, loadLatestOrgScorecard } from "../org/orgScorecard.js";
-import { computeOrgScorecard, nodeHierarchy, recomputeAndPersistOrgScorecard } from "../org/orgEngine.js";
+import { computeOrgScorecard, nodeHierarchy } from "../org/orgEngine.js";
+import { captureStudioOrgSecondary, recomputeStudioOrgLegacy } from "./studioOrgSecondary.js";
 import { renderOrgCompareMarkdown, renderOrgNodeReportMarkdown, renderOrgSystemicMarkdown } from "../org/orgReports.js";
 import { generateOrgEocAsync, recomputeOrgScorecardsApiAsync } from "../org/orgApi.js";
 import { prepareOrgConfigUpdateLog } from "../org/orgPublication.js";
@@ -1339,6 +1340,20 @@ function currentSigningAuthority(req: IncomingMessage, res: ServerResponse, work
   };
 }
 
+function currentOrgRunActor(req: IncomingMessage, workspace: string, token: string, initial: NonNullable<ReturnType<typeof authenticate>>) {
+  workspace = resolve(workspace);
+  const expected = { isAdmin: initial.isAdmin, userId: initial.userId, agentId: initial.agentId };
+  return () => {
+    const current = authenticate(req, workspace, token);
+    if (!current || current.isAdmin !== expected.isAdmin || current.userId !== expected.userId || current.agentId !== expected.agentId)
+      throw new Error("authenticated authority changed while preparing optional org recompute");
+    const usersSig = verifyUsersConfigSignature(workspace);
+    const check = enforceRoleOrAdmin({ access: accessContext(current), requiredAny: ["OPERATOR", "OWNER"],
+      usersConfigValid: usersSig.valid || current.sessionAuthSource === "WORKSPACE_ROUTER" });
+    if (!check.ok) throw new Error(check.error ?? "optional org recompute authority refused");
+  };
+}
+
 async function writeConsoleSnapshot(workspace: string, beforePublish: () => void) {
   const state = readStudioState(workspace);
   const agents = listAgents(workspace).map((agent) => agent.id);
@@ -1445,23 +1460,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
     }
   };
 
-  const recomputeOrgAndEmit = (
-    type: Parameters<OrgSseHub["emit"]>[0]["type"],
-    nodeIds?: string[]
-  ): void => {
-    try {
-      recomputeAndPersistOrgScorecard({
-        workspace: options.workspace,
-        window: "14d"
-      });
-    } catch {
-      // Do not fail primary workflow if org scorecard recompute fails.
-    }
-    emitOrgEvent(type, nodeIds);
-    if (type !== "ORG_SCORECARD_UPDATED") {
-      emitOrgEvent("ORG_SCORECARD_UPDATED", nodeIds);
-    }
-  };
+  const recomputeOrgAndEmit = (type: Parameters<OrgSseHub["emit"]>[0]["type"], nodeIds?: string[]): void => recomputeStudioOrgLegacy(options.workspace, type, nodeIds, emitOrgEvent);
 
   const recomputeOwnedOrgAndEmit = async (nodeIds: string[], beforePublish: () => void): Promise<void> => {
     try { await recomputeOrgScorecardsApiAsync({ workspace: options.workspace, window: "14d" }, { beforePublish }); }
@@ -5884,7 +5883,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           return;
         }
         const agentId = resolveAgentId(options.workspace, decodeURIComponent(runMatch[1] ?? ""));
-        const reportAuthority = captureReportSigningAuthority(options.workspace, signingAuthority(["OPERATOR", "OWNER"]));
+        const reportAuthority = captureReportSigningAuthority(options.workspace, signingAuthority(["OPERATOR", "OWNER"])); const orgSecondary = captureStudioOrgSecondary(options.workspace, currentOrgRunActor(req, options.workspace, options.token, auth), emitOrgEvent);
         const run = await runDiagnostic({
           workspace: options.workspace,
           agentId,
@@ -5908,7 +5907,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           })),
           status: refreshedAgentForecast.forecast.status
         });
-        recomputeOrgAndEmit("AGENT_RUN_COMPLETED", orgNodeIdsForAgent(agentId));
+        await orgSecondary.run("AGENT_RUN_COMPLETED", orgNodeIdsForAgent(agentId));
         json(res, 200, { runId: run.runId, status: run.status });
         return;
       }
@@ -5934,7 +5933,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           return;
         }
         const agentId = resolveAgentId(options.workspace, url.searchParams.get("agentId") ?? undefined);
-        const reportAuthority = captureReportSigningAuthority(options.workspace, signingAuthority(["OPERATOR", "OWNER"]));
+        const reportAuthority = captureReportSigningAuthority(options.workspace, signingAuthority(["OPERATOR", "OWNER"])); const orgSecondary = captureStudioOrgSecondary(options.workspace, currentOrgRunActor(req, options.workspace, options.token, auth), emitOrgEvent);
         const out = await runAutoAnswer({
           workspace: options.workspace,
           agentId,
@@ -5956,7 +5955,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           })),
           status: refreshedAgentForecast.forecast.status
         });
-        recomputeOrgAndEmit("AGENT_RUN_COMPLETED", orgNodeIdsForAgent(agentId));
+        await orgSecondary.run("AGENT_RUN_COMPLETED", orgNodeIdsForAgent(agentId));
         json(res, 200, out);
         return;
       }
@@ -6150,7 +6149,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           return;
         }
         const agentId = resolveAgentId(options.workspace, decodeURIComponent(assuranceMatch[1] ?? ""));
-        const reportAuthority = captureReportSigningAuthority(options.workspace, signingAuthority(["OPERATOR", "OWNER"]));
+        const reportAuthority = captureReportSigningAuthority(options.workspace, signingAuthority(["OPERATOR", "OWNER"])); const orgSecondary = captureStudioOrgSecondary(options.workspace, currentOrgRunActor(req, options.workspace, options.token, auth), emitOrgEvent);
         const assurance = await runAssurance({
           workspace: options.workspace,
           agentId,
@@ -6173,7 +6172,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           })),
           status: refreshed.forecast.status
         });
-        recomputeOrgAndEmit("ASSURANCE_RUN_COMPLETED", orgNodeIdsForAgent(agentId));
+        await orgSecondary.run("ASSURANCE_RUN_COMPLETED", orgNodeIdsForAgent(agentId));
         json(res, 200, { assuranceRunId: assurance.assuranceRunId });
         return;
       }
