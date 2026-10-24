@@ -12,11 +12,14 @@ import { clearMerklePendingMarker, TransparencyMerkleLagError, writeMerklePendin
 import { captureTransparencyState, publishTransparencyState, stateBytes, workspaceLogPath } from "./workspacePublication.js";
 export { appendTransparencyEntryAsync } from "./asyncWorkspaceAppend.js";
 import type { MerkleAlgorithm } from "./merkle.js";
-import { signDigestWithPolicy } from "../crypto/signing/signer.js";
+import { signDigestWithPolicy, signDigestWithPolicyAsync } from "../crypto/signing/signer.js";
 import { verifyWorkspaceLogSignature } from "./workspaceSignature.js";
 import { extractValidatedTarGzipArchive, type TarArchiveLimits } from "../security/safeTarArchive.js";
 import { buildVerifierReport, checkDigestSignature, envelopePublicKey, type IssuerAdmission, type TrustContext, type VerifierReportV1 } from "../trust/index.js";
 import { fileSha256 } from "../trust/signatureCheck.js";
+import type { SignedDigest } from "../crypto/signing/signerTypes.js";
+import { captureWorkspaceLogAuthority } from "./asyncWorkspaceAppend.js";
+import { captureTransparencyAppendPublication, withTransparencyPublicationLock } from "./workspacePublication.js";
 
 /**
  * Extraction limits for AMC archives.
@@ -96,10 +99,8 @@ function readEntries(workspace: string): TransparencyEntry[] {
     .map((line) => transparencyEntrySchema.parse(JSON.parse(line) as unknown));
 }
 
-/** `merkleAlgorithm` makes the Merkle tree choice part of the signed, chain-bound seal (P1-26). */
-function prepareSeal(workspace: string, lastHash: string, merkleAlgorithm: MerkleAlgorithm): { bytes: Buffer; signature: Buffer } {
-  const auditorPub = getPublicKeyHistory(workspace, "auditor")[0] ?? "";
-  const signerFingerprint = sha256Hex(Buffer.from(auditorPub, "utf8"));
+/** Shared pure wire recipe; the synchronous caller retains its historical role-first fingerprint. */
+function sealBytes(lastHash: string, signerFingerprint: string, merkleAlgorithm: MerkleAlgorithm): Buffer {
   const seal = transparencySealSchema.parse({
     v: 1,
     ts: Date.now(),
@@ -107,12 +108,9 @@ function prepareSeal(workspace: string, lastHash: string, merkleAlgorithm: Merkl
     signerFingerprint,
     merkleAlgorithm
   });
-  const bytes = Buffer.from(JSON.stringify(seal, null, 2)), digest = sha256Hex(bytes);
-  const signed = signDigestWithPolicy({
-    workspace,
-    kind: "TRANSPARENCY_ROOT",
-    digestHex: digest
-  });
+  return Buffer.from(JSON.stringify(seal, null, 2));
+}
+function sealSignatureBytes(digest: string, signed: SignedDigest): Buffer {
   const sig = transparencySealSignatureSchema.parse({
     digestSha256: digest,
     signature: signed.signature,
@@ -120,7 +118,19 @@ function prepareSeal(workspace: string, lastHash: string, merkleAlgorithm: Merkl
     signer: "auditor",
     envelope: signed.envelope
   });
-  return { bytes, signature: Buffer.from(JSON.stringify(sig, null, 2)) };
+  return Buffer.from(JSON.stringify(sig, null, 2));
+}
+/** `merkleAlgorithm` makes the Merkle tree choice part of the signed, chain-bound seal (P1-26). */
+function prepareSeal(workspace: string, lastHash: string, merkleAlgorithm: MerkleAlgorithm): { bytes: Buffer; signature: Buffer } {
+  const auditorPub = getPublicKeyHistory(workspace, "auditor")[0] ?? "";
+  const signerFingerprint = sha256Hex(Buffer.from(auditorPub, "utf8"));
+  const bytes = sealBytes(lastHash, signerFingerprint, merkleAlgorithm), digest = sha256Hex(bytes);
+  const signed = signDigestWithPolicy({
+    workspace,
+    kind: "TRANSPARENCY_ROOT",
+    digestHex: digest
+  });
+  return { bytes, signature: sealSignatureBytes(digest, signed) };
 }
 
 export function initTransparencyLog(workspace: string): {
@@ -143,6 +153,92 @@ export function initTransparencyLog(workspace: string): {
     sealPath: transparencySealPath(workspace),
     sealSigPath: transparencySealSigPath(workspace)
   };
+}
+
+interface TransparencyInitializationProgress {
+  readonly phase: string;
+  readonly signingCallAttempted: boolean;
+  readonly signingCallReturned: boolean;
+  readonly lockSetupAttempted: boolean;
+  readonly lockEntered: boolean;
+  readonly lockReturned: boolean;
+  readonly attemptedPath: string | null;
+  readonly returnedMembers: readonly string[];
+  readonly acknowledgedMembers: readonly string[];
+  readonly completed: boolean;
+}
+/** Native calls may leave setup/temp effects even without a returned or acknowledged member. */
+export class TransparencyInitializationError extends Error {
+  readonly code = "TRANSPARENCY_INITIALIZATION_INCOMPLETE";
+  constructor(readonly progress: TransparencyInitializationProgress, readonly firstRefusalObserved: boolean,
+    readonly firstRefusal: unknown, cause: unknown) {
+    super("transparency initialization did not complete; earlier native effects may remain", { cause });
+    this.name = "TransparencyInitializationError";
+  }
+}
+/** Fixed internal async sibling; no Sign or await runs inside the short native publication lock. */
+export async function initTransparencyLogAttemptAsync(workspace: string, beforePublish?: () => void) {
+  let phase = "authority-capture", signingCallAttempted = false, signingCallReturned = false;
+  let lockSetupAttempted = false, lockEntered = false, lockReturned = false, completed = false;
+  let attemptedPath: string | null = null, firstRefusalObserved = false, firstRefusal: unknown;
+  const returnedMembers: string[] = [], acknowledgedMembers: string[] = [];
+  const progress = (): TransparencyInitializationProgress => Object.freeze({ phase, signingCallAttempted, signingCallReturned,
+    lockSetupAttempted, lockEntered, lockReturned, attemptedPath, completed,
+    returnedMembers: Object.freeze([...returnedMembers]), acknowledgedMembers: Object.freeze([...acknowledgedMembers]) });
+  const negative = (check: () => void) => {
+    if (firstRefusalObserved) throw firstRefusal;
+    try { check(); } catch (cause) { firstRefusalObserved = true; firstRefusal = cause; throw cause; }
+  };
+  const caller = () => negative(() => {
+    if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize policy signing");
+    beforePublish?.();
+    if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize policy signing");
+  });
+  try {
+    caller();
+    const original = captureWorkspaceLogAuthority(workspace, caller), publication = captureTransparencyAppendPublication(workspace);
+    const logPath = transparencyLogPath(workspace), bodyPath = transparencySealPath(workspace), sigPath = transparencySealSigPath(workspace);
+    const log = stateBytes(publication.state, logPath), needsSeal = !publication.present(bodyPath) || !publication.present(sigPath);
+    let signed: SignedDigest | undefined, seal: { bytes: Buffer; signature: Buffer } | null = null;
+    const stable = () => negative(() => { caller(); original.assertIntrinsicCurrent(signed); publication.assertCurrent(); });
+    stable();
+    if (needsSeal) {
+      phase = "seal-preparation";
+      const algorithm = currentTreeAlgorithm(workspace);
+      const preparing = () => { stable(); negative(() => {
+        if (currentTreeAlgorithm(workspace) !== algorithm) throw new Error("original initialization tree algorithm changed");
+      }); };
+      preparing();
+      const bytes = sealBytes("", original.sealSigner.descriptor.fingerprint, algorithm), digest = sha256Hex(bytes);
+      phase = "seal-sign"; signingCallAttempted = true;
+      signed = await signDigestWithPolicyAsync({ workspace, kind: "TRANSPARENCY_ROOT", digestHex: digest,
+        expectedSigner: original.sealSigner.descriptor, beforeSign: preparing });
+      signingCallReturned = true; preparing();
+      seal = { bytes, signature: sealSignatureBytes(digest, signed) };
+    }
+    const member = (path: string, bytes: Buffer) => {
+      attemptedPath = null; phase = `before:${path}`; stable();
+      phase = `write:${path}`; attemptedPath = path;
+      writeFileAtomic(path, bytes, 0o644); returnedMembers.push(path);
+      phase = `acknowledge:${path}`;
+      publication.acknowledge(path, bytes, 0o644, "replace"); acknowledgedMembers.push(path);
+      attemptedPath = null;
+    };
+    phase = "lock-setup"; lockSetupAttempted = true;
+    withTransparencyPublicationLock(workspace, () => {
+      lockEntered = true; phase = "first-native-gate"; stable();
+      if (log === null) member(logPath, Buffer.alloc(0));
+      if (seal !== null) { member(bodyPath, seal.bytes); member(sigPath, seal.signature); }
+      phase = "final-native-gate"; stable();
+    });
+    lockReturned = true; phase = "after-lock"; stable();
+    completed = true; phase = "complete";
+    return Object.freeze({ paths: Object.freeze({ logPath, sealPath: bodyPath, sealSigPath: sigPath }), progress: progress(),
+      assertCurrent() {
+        try { stable(); }
+        catch (cause) { throw new TransparencyInitializationError(progress(), firstRefusalObserved, firstRefusal, cause); }
+      } });
+  } catch (cause) { throw new TransparencyInitializationError(progress(), firstRefusalObserved, firstRefusal, cause); }
 }
 
 export function appendTransparencyEntry(params: {

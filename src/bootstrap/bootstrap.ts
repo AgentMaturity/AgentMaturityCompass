@@ -36,6 +36,7 @@ import { signFileWithAuditor } from "../org/orgSigner.js";
 import { enableLanMode } from "../pairing/lanMode.js";
 import { enableNotaryTrust } from "../trust/trustConfig.js";
 import { checkScopedEgress } from "../residency/checkEgress.js";
+import { captureBootstrapSuffixInputs, publishBootstrapProviderSuffix } from "./bootstrapProviderSuffix.js";
 
 export interface BootstrapOptions {
   workspace: string;
@@ -251,11 +252,13 @@ export class BootstrapColdPrerequisitesIncompleteError extends Error {
 }
 export async function runBootstrap(options: BootstrapOptions): Promise<BootstrapResult> {
   options = { ...options, allowedCidrs: [...options.allowedCidrs] };
+  const noSignAtEntry = process.env.AMC_NO_SIGN === "1";
   const previousVaultEnv = process.env.AMC_VAULT_PASSPHRASE;
   let cold: WorkspaceColdOrgPrerequisites | null = null, assurance: ReturnType<typeof captureAssurancePolicyInitialization> | null = null;
   if (options.vaultPassphrase && options.vaultPassphrase.length > 0) {
     process.env.AMC_VAULT_PASSPHRASE = options.vaultPassphrase;
   }
+  const activeVaultEnv = process.env.AMC_VAULT_PASSPHRASE;
 
   try {
     const workspace = resolve(options.workspace);
@@ -305,6 +308,14 @@ export async function runBootstrap(options: BootstrapOptions): Promise<Bootstrap
         requiredAttestationLevel
       });
       createdConfigs["trust.yaml"] = true;
+    }
+    if (!noSignAtEntry) {
+      const assertInputsCurrent = captureBootstrapSuffixInputs(workspace, activeVaultEnv);
+      const completed = await publishBootstrapProviderSuffix(workspace, {
+        vaultCreated: vault.created, ownerCreated: owner.created, createdConfigs, notaryEnabled: options.enableNotary
+      }, assertInputsCurrent);
+      completed.assertCurrent();
+      return completed.result;
     }
     initTransparencyLog(workspace);
     rebuildTransparencyMerkle(workspace);
