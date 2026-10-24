@@ -1,3 +1,14 @@
+import { assertOwnerMode } from "../mode/mode.js";
+
+/** Reuse the fixed registered tuning owner gate; the prompt command label supplies error context only. */
+export function assertPromptCliOwnerMode(workspace: string, label: "prompt pack build" | "prompt scheduler run-now"): void {
+  try { assertOwnerMode(workspace, "tune"); }
+  catch (cause) {
+    if (!(cause instanceof Error) || cause.message !== "Command 'tune' is blocked in agent mode. Switch to owner mode with: amc mode owner") throw cause;
+    throw new Error(`Command '${label}' is blocked in agent mode. Switch to owner mode with: amc mode owner`, { cause });
+  }
+}
+
 import type { OrgPairsOptions } from "../org/preparedOrgPairs.js";
 import { buildPromptPackForApiAsync } from "./promptPackAsync.js";
 import { promptSchedulerRunNowForApiAsync } from "./promptSchedulerAsync.js";

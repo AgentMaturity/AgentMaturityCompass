@@ -341,7 +341,7 @@ import { initApprovalPolicy, verifyApprovalPolicySignature } from "./approvals/a
 import { simulateTargetWhatIf } from "./simulator/targetWhatIf.js";
 import { parseSetPairs, parseTargetMappingFile } from "./simulator/whatIfCli.js";
 import { exportBenchmarkArtifactAsync } from "./benchmarks/benchExport.js";
-import { assertBenchmarkExportOwnerMode } from "./benchmarks/benchCli.js";
+import { assertBenchmarkExportOwnerMode, assertBenchCreateOwnerMode } from "./benchmarks/benchCli.js";
 import { verifyBenchmarkArtifact } from "./benchmarks/benchVerify.js";
 import { ingestBenchmarks } from "./benchmarks/benchImport.js";
 import { listImportedBenchmarks } from "./benchmarks/benchStore.js";
@@ -760,7 +760,7 @@ import { registerScopeTemplateCommands } from "./enforce/scopeTemplateCli.js";
 import { registerActionEvidenceLogicCommands } from "./enforce/actionEvidenceLogicCli.js";
 import {
   promptInitCliAsync as promptInitCli,
-  promptPackBuildCliAsync as promptPackBuildCli,
+  promptPackBuildCliAsync as promptPackBuildCli, assertPromptCliOwnerMode,
   promptPackDiffCli,
   promptPackShowCli,
   promptPackVerifyCli,
@@ -8670,12 +8670,12 @@ promptPack
   .option("--agent <agentId>", "agent id", "default")
   .option("--out <file>", "output .amcprompt file")
   .action(async (opts: { agent: string; out?: string }) => {
-    assertOwnerMode(process.cwd(), "prompt pack build");
+    assertPromptCliOwnerMode(process.cwd(), "prompt pack build");
     const out = await promptPackBuildCli({
       workspace: process.cwd(),
       agentId: opts.agent,
       outFile: opts.out
-    }, { beforePublish: () => assertOwnerMode(process.cwd(), "prompt pack build") });
+    }, { beforePublish: () => assertPromptCliOwnerMode(process.cwd(), "prompt pack build") });
     console.log(chalk.green("Prompt pack created"));
     console.log(`agent=${out.agentId}`);
     console.log(`packId=${out.pack.packId}`);
@@ -8745,11 +8745,11 @@ promptScheduler
   .description("Run prompt scheduler now for one agent or all")
   .option("--agent <agentId>", "agent id or all", "all")
   .action(async (opts: { agent: string }) => {
-    assertOwnerMode(process.cwd(), "prompt scheduler run-now");
+    assertPromptCliOwnerMode(process.cwd(), "prompt scheduler run-now");
     const out = await promptSchedulerRunNowCli({
       workspace: process.cwd(),
       agent: opts.agent === "all" ? "all" : opts.agent
-    }, { beforePublish: () => assertOwnerMode(process.cwd(), "prompt scheduler run-now") });
+    }, { beforePublish: () => assertPromptCliOwnerMode(process.cwd(), "prompt scheduler run-now") });
     console.log(JSON.stringify(out, null, 2));
   });
 
@@ -17444,7 +17444,7 @@ bench
     agentType?: "code-agent" | "support-agent" | "ops-agent" | "research-agent" | "sales-agent" | "other";
     deployment?: "single" | "host" | "k8s" | "compose";
   }) => {
-    assertOwnerMode(process.cwd(), "bench create");
+    assertBenchCreateOwnerMode(process.cwd());
     const scope = opts.scope.toLowerCase();
     if (!["workspace", "node", "agent"].includes(scope)) {
       throw new Error(`Invalid scope: ${opts.scope}`);
@@ -17461,7 +17461,7 @@ bench
         agentType: opts.agentType,
         deployment: opts.deployment
       }
-    }, { beforePublish: () => assertOwnerMode(process.cwd(), "bench create") });
+    }, { beforePublish: () => assertBenchCreateOwnerMode(process.cwd()) });
     console.log(chalk.green("Bench artifact created"));
     console.log(`File: ${out.outFile}`);
     console.log(`sha256: ${out.sha256}`);
