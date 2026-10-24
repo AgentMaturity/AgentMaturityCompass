@@ -17,20 +17,22 @@ import { publicKeyFromPrivate } from "../crypto/keyHistoryEnvelope.js";
 
 /** Fixed BUNDLE operation gate. Capture before the caller's FIRST await, not after a prerequisite. */
 export function captureOrgPairsAuthority(workspace: string, beforePublish?: () => void): () => void {
-  const actor = beforePublish; actor?.();
+  const enabled = () => { if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize policy signing"); };
+  enabled(); const actor = beforePublish; actor?.(); enabled();
   const descriptor = Object.freeze({ ...describePolicySigner(workspace, "BUNDLE") });
   // The existing purpose seam performs only its normal local unlock/migration gate, before the full snapshot.
   const purpose = descriptor.mode === "VAULT" ? capturePurposePublication(workspace, "artifact-seal") : null;
   const keyset = canonicalize(assertKeysetComplete(workspace)), trust = canonicalize(loadTrustConfig(workspace));
   const holder = descriptor.mode === "VAULT" ? boundProviderKey(workspace, "artifact-seal")?.binding.provider ?? "file" : null;
+  const selectedPolicy = purpose === null ? null : canonicalize(keyPolicy(loadKeysConfig(workspace)));
   const assertCurrent = () => {
-    actor?.();
+    enabled(); actor?.(); enabled();
     assertPolicySignerCurrent(workspace, descriptor);
     if (canonicalize(assertKeysetComplete(workspace)) !== keyset || canonicalize(loadTrustConfig(workspace)) !== trust)
       throw new Error("original BUNDLE operation authority changed before publication");
     if (purpose !== null && holder !== null) {
       const current = assertKeysetComplete(workspace), policy = keyPolicy(loadKeysConfig(workspace));
-      if (current === null || canonicalize(current) !== purpose.keyset || !policy.allowed.includes(descriptor.algorithm)
+      if (current === null || canonicalize(current) !== purpose.keyset || canonicalize(policy) !== selectedPolicy || !policy.allowed.includes(descriptor.algorithm)
         || (holder === "file" && policy.requireNonExportable)) throw new Error("original BUNDLE purpose authority is refused");
       assertSigningKeyUsable(workspace, "artifact-seal", descriptor.publicKeyPem, holder);
       if (holder === "file") {
