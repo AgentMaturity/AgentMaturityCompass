@@ -930,7 +930,7 @@ export type {
   IntegrationDeliveryRecord
 } from "./integrations/integrationDeliveryStore.js";
 export {
-  enqueueIntegrationDeliveries,
+  enqueueIntegrationDeliveries, enqueueIntegrationDeliveriesAsync,
   exportIntegrationDeliverySnapshot,
   getIntegrationDeliveryStatusByQueueId,
   getIntegrationDeliveryStatusByQueueIds,

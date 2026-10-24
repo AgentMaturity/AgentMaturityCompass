@@ -1,27 +1,32 @@
 import { randomUUID } from "node:crypto";
+import { lstatSync, readFileSync } from "node:fs";
+import { join } from "node:path";
+import { getVaultSecretReadOnly } from "../vault/vault.js";
+import { captureIntegrationConfiguration, prepareIntegrationEnqueue, captureIntegrationQueueReader, IntegrationDispatchPartialError } from "./integrationQueueEnqueue.js";
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
 import { openLedger } from "../ledger/ledger.js";
 import { EgressBlocked } from "../residency/checkEgress.js";
 import {
   loadIntegrationsConfig,
-  resolveSecretRef,
-  verifyIntegrationsConfigSignature
+  resolveSecretRef
 } from "./integrationStore.js";
 import {
-  enqueueIntegrationDeliveries,
+  enqueueIntegrationDeliveriesAsync,
   getIntegrationDeliveryStatusByQueueIds,
   listDueIntegrationChannelIds,
   listIntegrationDeliveriesNeedingFinalization,
   markIntegrationDeliveriesFinalized,
   processIntegrationChannelQueue,
+  processIntegrationChannelQueueWithAuthority, captureIntegrationPendingRows, finalizeIntegrationDeliveryWithAuthority,
+  type IntegrationQueueRow,
   type IntegrationQueueDeliveryStatus,
   type IntegrationQueueItemInput,
   type ProcessedIntegrationDelivery
 } from "./integrationDeliveryQueue.js";
 import { appendIntegrationDeadLetter } from "./integrationDeadLetters.js";
 import {
-  addIntegrationDeadLetter,
+  addIntegrationDeadLetter, integrationDeliveryJournalPath,
   nextIntegrationChannelSequence,
   recordIntegrationDelivery
 } from "./integrationDeliveryStore.js";
@@ -108,20 +113,25 @@ function writeIntegrationEvidence(params: {
   orderedSequence: number | null;
   attempts: number;
   httpStatus: number;
-}): {
+}, beforeCommit?: () => void): {
   eventId: string;
   receiptId: string;
   receipt: string;
 } {
+  beforeCommit?.();
   const ledger = openLedger(params.workspace);
   const sessionId = `integration-dispatch-${Date.now()}-${randomUUID().replace(/-/g, "")}`;
+  let sessionStarted = false, sessionSealed = false, returnedEvidence: { id: string; receiptId: string; receipt: string } | null = null;
   try {
+    beforeCommit?.();
     ledger.startSession({
       sessionId,
       runtime: "unknown",
       binaryPath: "amc-integrations",
       binarySha256: sha256Hex("amc-integrations")
     });
+    sessionStarted = true;
+    beforeCommit?.();
     const written = ledger.appendEvidenceWithReceipt({
       sessionId,
       runtime: "unknown",
@@ -148,12 +158,18 @@ function writeIntegrationEvidence(params: {
         bodySha256: params.payloadSha256
       }
     });
+    returnedEvidence = written;
+    beforeCommit?.();
     ledger.sealSession(sessionId);
+    sessionSealed = true;
     return {
       eventId: written.id,
       receiptId: written.receiptId,
       receipt: written.receipt
     };
+  } catch (cause) {
+    if (!beforeCommit) throw cause;
+    throw new IntegrationDispatchPartialError(cause, Object.freeze({ stage: "integration-evidence", sessionId, sessionStarted, returnedEvidence, sessionSealed }));
   } finally {
     ledger.close();
   }
@@ -228,6 +244,7 @@ function buildQueueDeliveries(params: {
   standardPayloadBody: string;
   channels: ReturnType<typeof loadIntegrationsConfig>["integrations"]["channels"];
   skipped: string[];
+  publishSequence?: (channelId: string) => number;
 }): {
   deliveries: IntegrationQueueItemInput[];
   policiesByChannelId: Map<string, ChannelDeliveryPolicy>;
@@ -246,7 +263,7 @@ function buildQueueDeliveries(params: {
     });
     policiesByChannelId.set(channel.id, deliveryPolicy);
     const orderedSequence = deliveryPolicy.ordered
-      ? nextIntegrationChannelSequence(params.workspace, channel.id)
+      ? (params.publishSequence ? params.publishSequence(channel.id) : nextIntegrationChannelSequence(params.workspace, channel.id))
       : null;
 
     if (channel.type === "webhook") {
@@ -303,15 +320,20 @@ async function processChannelQueue(params: {
   channelId: string;
   policy?: ChannelDeliveryPolicy;
   now?: () => number;
+  beforeCommit?: () => void;
+  selectedRows?: readonly IntegrationQueueRow[];
+  terminalWrites?: IntegrationQueueDeliveryStatus[];
 }): Promise<ProcessedIntegrationDelivery[]> {
   return withChannelProcessingLock(params.workspace, params.channelId, async () => {
     try {
-      const result = await processIntegrationChannelQueue({
+      const run = params.beforeCommit ? (input: Parameters<typeof processIntegrationChannelQueue>[0]) =>
+        processIntegrationChannelQueueWithAuthority(input, params.beforeCommit!, params.selectedRows ?? [], params.terminalWrites) : processIntegrationChannelQueue;
+      const result = await run({
         workspace: params.workspace,
         channelId: params.channelId,
         deliveryPolicy: params.policy?.retry ?? {},
         now: params.now,
-        onDelivered: async (input) => writeIntegrationEvidence({
+        onDelivered: async (input, beforeEvidenceCommit) => writeIntegrationEvidence({
           workspace: params.workspace,
           channelId: input.channelId,
           eventName: input.eventName,
@@ -321,7 +343,7 @@ async function processChannelQueue(params: {
           orderedSequence: input.orderedSequence,
           attempts: input.receipt.attempts.length,
           httpStatus: input.httpStatus
-        })
+        }, beforeEvidenceCommit ?? params.beforeCommit)
       });
       return result.processed;
     } catch (error) {
@@ -331,93 +353,162 @@ async function processChannelQueue(params: {
   });
 }
 
+/** Fixed integration journal targets; existing writers do not all share a lock, so no cross-process atomicity is claimed. */
+function captureJournalPublication(workspace: string, beforeCommit: () => void) {
+  const paths = [integrationDeliveryJournalPath(workspace), join(workspace, ".amc", "integrations", "dead-letters.jsonl")];
+  const read = (path: string) => {
+    let stat: ReturnType<typeof lstatSync>;
+    try { stat = lstatSync(path); } catch (cause) {
+      if ((cause as NodeJS.ErrnoException).code === "ENOENT") return null;
+      throw cause;
+    }
+    if (!stat.isFile() || stat.isSymbolicLink()) throw new Error("integration journal target is not a regular file");
+    return { bytes: readFileSync(path), mode: stat.mode & 0o7777 };
+  };
+  let targets = paths.map(read);
+  const progress: Array<{ stage: string; returned: boolean }> = [];
+  return { progress, publish: <T>(stage: string, operation: () => T, assertRow?: () => void): T => {
+    beforeCommit(); assertRow?.();
+    for (let index = 0; index < paths.length; index += 1) {
+      const current = read(paths[index]!), original = targets[index]!;
+      if ((current === null) !== (original === null) || (current !== null && original !== null &&
+        (current.mode !== original.mode || !current.bytes.equals(original.bytes)))) throw new Error("integration journal target changed");
+    }
+    const effect = { stage, returned: false }; progress.push(effect);
+    const result = operation(); effect.returned = true; targets = paths.map(read); return result;
+  } };
+}
+
+/** Original config/selected secrets are captured before the first async turn. No callback comes from event JSON. */
+function captureDispatchInputs(workspace: string, channels: ReturnType<typeof loadIntegrationsConfig>["integrations"]["channels"],
+  beforeCommit: () => void, assertConfigurationCurrent: () => void) {
+  beforeCommit();
+  const refs = [...new Set(channels.filter(channel => channel.enabled).map(channel =>
+    channel.type === "webhook" ? channel.secretRef : channel.webhookUrlRef))];
+  const values = refs.map(ref => resolveSecretRef(workspace, ref));
+  return () => {
+    beforeCommit();
+    for (let index = 0; index < refs.length; index += 1) {
+      const ref = refs[index]!, current = ref.startsWith("vault:") ? getVaultSecretReadOnly(workspace, ref.slice(6)) : null;
+      if (current !== values[index]) throw new Error("selected integration secret or destination changed");
+    }
+    assertConfigurationCurrent();
+  };
+}
+
 function finalizeTerminalDelivery(params: {
   workspace: string;
   status: IntegrationQueueDeliveryStatus;
   recordDeadLetters: boolean;
+  beforeCommit?: () => void;
+  journals?: ReturnType<typeof captureJournalPublication>;
 }): void {
   const status = params.status;
+  const journals = (assertRow?: () => void) => {
+  const publish = <T>(stage: string, operation: () => T): T => params.journals ? params.journals.publish(stage, operation, assertRow) : operation();
   if (status.deliveryReceipt) {
     const sequence = status.orderedSequence ?? status.seq;
-    recordIntegrationDelivery({
+    publish("record-delivery", () => recordIntegrationDelivery({
       workspace: params.workspace,
       channelId: status.channelId,
       eventName: status.eventName,
       agentId: status.agentId,
       sequence,
       payloadSha256: status.payloadSha256,
-      receipt: status.deliveryReceipt
-    });
+      receipt: status.deliveryReceipt!
+    }));
     if (status.state === "DEAD_LETTER" && params.recordDeadLetters) {
-      addIntegrationDeadLetter({
+      publish("record-dead-letter", () => addIntegrationDeadLetter({
         workspace: params.workspace,
         channelId: status.channelId,
         eventName: status.eventName,
         agentId: status.agentId,
         sequence,
         payloadSha256: status.payloadSha256,
-        receipt: status.deliveryReceipt
-      });
-      appendIntegrationDeadLetter(params.workspace, {
+        receipt: status.deliveryReceipt!
+      }));
+      publish("append-dead-letter", () => appendIntegrationDeadLetter(params.workspace, {
         v: 1,
         deadLetterId: `idl_${status.queueId}`,
         ts: status.deadLetterTs ?? Date.now(),
         channelId: status.channelId,
         eventName: status.eventName,
         agentId: status.agentId,
-        url: status.deliveryReceipt.url,
+        url: status.deliveryReceipt!.url,
         orderedSequence: sequence,
         payloadSha256: status.payloadSha256,
-        attemptCount: status.deliveryReceipt.attempts.length,
+        attemptCount: status.deliveryReceipt!.attempts.length,
         lastHttpStatus: status.lastHttpStatus,
         reason: status.lastError ?? "dead-letter"
-      });
+      }));
     }
   }
-  markIntegrationDeliveriesFinalized({
-    workspace: params.workspace,
-    queueIds: [status.queueId]
-  });
+  };
+  if (params.beforeCommit) finalizeIntegrationDeliveryWithAuthority(params.workspace, status, params.beforeCommit, journals);
+  else { journals(); markIntegrationDeliveriesFinalized({ workspace: params.workspace, queueIds: [status.queueId] }); }
 }
 
 function finalizePendingTerminals(params: {
   workspace: string;
   policiesByChannelId: Map<string, ChannelDeliveryPolicy>;
+  beforeCommit?: () => void;
+  journals?: ReturnType<typeof captureJournalPublication>;
+  statuses?: readonly IntegrationQueueDeliveryStatus[];
 }): string[] {
   const failures: string[] = [];
-  for (const status of listIntegrationDeliveriesNeedingFinalization(params.workspace)) {
+  params.beforeCommit?.();
+  for (const status of params.statuses ?? listIntegrationDeliveriesNeedingFinalization(params.workspace)) {
     try {
       finalizeTerminalDelivery({
         workspace: params.workspace,
         status,
-        recordDeadLetters: params.policiesByChannelId.get(status.channelId)?.recordDeadLetters ?? true
+        recordDeadLetters: params.policiesByChannelId.get(status.channelId)?.recordDeadLetters ?? true,
+        beforeCommit: params.beforeCommit, journals: params.journals
       });
-    } catch {
+    } catch (cause) {
+      if (params.beforeCommit) throw new IntegrationDispatchPartialError(cause, { stage: "terminal-finalization", queueId: status.queueId, journals: params.journals?.progress.map(item => ({ ...item })) });
       failures.push(`${status.channelId}:delivery-finalization-failed`);
     }
   }
   return failures;
 }
 
-export async function dispatchIntegrationEvent(params: {
+type IntegrationEventInput = {
   workspace: string;
   eventName: string;
   agentId: string;
   summary: string;
   details?: Record<string, unknown>;
   forceChannelId?: string;
-}): Promise<IntegrationDispatchOutcome> {
-  const verify = verifyIntegrationsConfigSignature(params.workspace);
-  if (!verify.valid) {
-    throw new Error(`integrations config signature invalid: ${verify.reason ?? "unknown"}`);
-  }
-  const config = loadIntegrationsConfig(params.workspace);
+};
+
+export async function dispatchIntegrationEvent(params: IntegrationEventInput): Promise<IntegrationDispatchOutcome> {
+  return dispatchIntegrationEventAttempt(params);
+}
+
+/** Internal maintained-caller API, deliberately absent from the root SDK. Negative callback is never read from JSON. */
+export async function dispatchIntegrationEventWithAuthority(params: IntegrationEventInput, beforeCommit: () => void): Promise<IntegrationDispatchOutcome> {
+  return dispatchIntegrationEventAttempt(params, beforeCommit);
+}
+
+async function dispatchIntegrationEventAttempt(params: IntegrationEventInput, beforeCommit?: () => void): Promise<IntegrationDispatchOutcome> {
+  params = { ...params, details: JSON.parse(canonicalize(params.details ?? {})) as Record<string, unknown> };
+  const reservedSequences: Array<{ channelId: string; sequence: number }> = [];
+  let queued: Awaited<ReturnType<typeof enqueueIntegrationDeliveriesAsync>> = [];
+  let journals: ReturnType<typeof captureJournalPublication> | undefined;
+  try {
+  beforeCommit?.();
+  const capturedConfig = captureIntegrationConfiguration(params.workspace), config = capturedConfig.config;
+  const assertConfigurationCurrent = capturedConfig.assertCurrent;
   const routed = params.forceChannelId
     ? [params.forceChannelId]
     : config.integrations.routing[params.eventName] ?? [];
   const routedSet = new Set(routed);
   const channels = config.integrations.channels.filter((channel) => routedSet.has(channel.id));
 
+  const assertInputs = beforeCommit ? captureDispatchInputs(params.workspace, channels, beforeCommit, assertConfigurationCurrent) : assertConfigurationCurrent;
+  let assertOriginalQueue = () => {};
+  journals = beforeCommit ? captureJournalPublication(params.workspace, () => { assertInputs(); assertOriginalQueue(); }) : undefined;
   const payload: IntegrationDispatchPayload = {
     type: "AMC_OPS_EVENT",
     eventName: params.eventName,
@@ -435,7 +526,10 @@ export async function dispatchIntegrationEvent(params: {
     payload,
     standardPayloadBody,
     channels,
-    skipped
+    skipped,
+    publishSequence: journals ? channelId => journals.publish("reserve-sequence", () => {
+      const sequence = nextIntegrationChannelSequence(params.workspace, channelId); reservedSequences.push({ channelId, sequence }); return sequence;
+    }) : undefined
   });
   const deliveries = prepared.deliveries;
   const policiesByChannelId = prepared.policiesByChannelId;
@@ -448,11 +542,19 @@ export async function dispatchIntegrationEvent(params: {
     };
   }
 
-  const queued = enqueueIntegrationDeliveries({
-    workspace: params.workspace,
-    deliveries
-  });
-
+  let assertOriginalReader = () => {};
+  const enqueue = prepareIntegrationEnqueue({ workspace: params.workspace, deliveries }, { beforePublish: () => { assertInputs(); assertOriginalReader(); } });
+  if (beforeCommit) assertOriginalReader = captureIntegrationQueueReader(params.workspace);
+  assertOriginalQueue = enqueue.assertCurrent;
+  const gate = beforeCommit ? enqueue.assertCurrent : undefined;
+  const selectedRows = beforeCommit ? captureIntegrationPendingRows(params.workspace, deliveries.map(row => row.channelId), enqueue.assertCurrent) : undefined;
+  gate?.();
+  const selectedTerminals = beforeCommit ? listIntegrationDeliveriesNeedingFinalization(params.workspace)
+    .filter(status => deliveries.some(row => row.channelId === status.channelId)) : undefined;
+  const terminalWrites: IntegrationQueueDeliveryStatus[] = [];
+  // Empty channel ids are forbidden by the config schema. This Promise schedule spans no SQL/file lock or Sign lock.
+  queued = await withChannelProcessingLock(params.workspace, "", enqueue.publish);
+  const processingRows = selectedRows ? [...selectedRows, ...enqueue.publishedRows()] : undefined;
   const channelOrder: string[] = [];
   for (const delivery of queued) {
     if (!channelOrder.includes(delivery.channelId)) {
@@ -465,15 +567,16 @@ export async function dispatchIntegrationEvent(params: {
     await processChannelQueue({
       workspace: params.workspace,
       channelId,
-      policy: channelPolicy
+      policy: channelPolicy, beforeCommit: gate, selectedRows: processingRows, terminalWrites
     });
   }
 
   skipped.push(...finalizePendingTerminals({
     workspace: params.workspace,
-    policiesByChannelId
+    policiesByChannelId, beforeCommit: gate, journals, statuses: selectedTerminals ? [...selectedTerminals, ...terminalWrites] : undefined
   }));
 
+  gate?.();
   const statuses = getIntegrationDeliveryStatusByQueueIds(
     params.workspace,
     queued.map((row) => row.queueId)
@@ -531,52 +634,56 @@ export async function dispatchIntegrationEvent(params: {
     queued: stillQueued,
     skipped
   };
+  } catch (cause) {
+    if (!beforeCommit) throw cause;
+    throw new IntegrationDispatchPartialError(cause, Object.freeze({ reservedSequences: reservedSequences.map(item => ({ ...item })),
+      queued: queued.map(item => ({ ...item })), journals: journals?.progress.map(item => ({ ...item })) }));
+  }
 }
 
-export async function drainDueIntegrationDeliveries(params: {
-  workspace: string;
-  nowTs?: number;
-  maxChannels?: number;
-}): Promise<{
-  channelIds: string[];
-  processed: ProcessedIntegrationDelivery[];
-  finalizationFailures: string[];
-}> {
-  const verified = verifyIntegrationsConfigSignature(params.workspace);
-  if (!verified.valid) {
-    throw new Error(`integrations config signature invalid: ${verified.reason ?? "unknown"}`);
-  }
-  const config = loadIntegrationsConfig(params.workspace);
+type IntegrationDrainInput = { workspace: string; nowTs?: number; maxChannels?: number };
+type IntegrationDrainOutcome = { channelIds: string[]; processed: ProcessedIntegrationDelivery[]; finalizationFailures: string[] };
+
+export async function drainDueIntegrationDeliveries(params: IntegrationDrainInput): Promise<IntegrationDrainOutcome> {
+  return drainDueIntegrationDeliveriesAttempt(params);
+}
+
+/** Internal maintained scheduler counterpart. Existing queue verification needs no new signing or BUNDLE authority. */
+export async function drainDueIntegrationDeliveriesWithAuthority(params: IntegrationDrainInput, beforeCommit: () => void): Promise<IntegrationDrainOutcome> {
+  return drainDueIntegrationDeliveriesAttempt(params, beforeCommit);
+}
+
+async function drainDueIntegrationDeliveriesAttempt(params: IntegrationDrainInput, beforeCommit?: () => void): Promise<IntegrationDrainOutcome> {
+  params = { ...params }; beforeCommit?.();
+  const captured = captureIntegrationConfiguration(params.workspace), config = captured.config;
+  const assertInputs = beforeCommit ? captureDispatchInputs(params.workspace, config.integrations.channels, beforeCommit, captured.assertCurrent) : captured.assertCurrent;
+  const assertReader = beforeCommit ? captureIntegrationQueueReader(params.workspace) : () => {};
+  const gate = beforeCommit ? () => { assertInputs(); assertReader(); } : undefined;
+  const journals = gate ? captureJournalPublication(params.workspace, gate) : undefined;
   const policiesByChannelId = new Map<string, ChannelDeliveryPolicy>();
-  for (const channel of config.integrations.channels) {
-    policiesByChannelId.set(channel.id, mergeChannelDeliveryPolicy({
-      defaults: config.integrations.defaults.delivery,
-      channel
+  for (const channel of config.integrations.channels) policiesByChannelId.set(channel.id, mergeChannelDeliveryPolicy({
+    defaults: config.integrations.defaults.delivery, channel
+  }));
+  gate?.();
+  const channelIds = listDueIntegrationChannelIds({ workspace: params.workspace, nowTs: params.nowTs, limit: params.maxChannels });
+  const selectedRows = gate ? captureIntegrationPendingRows(params.workspace, channelIds, gate) : undefined;
+  gate?.();
+  const selectedTerminals = gate ? listIntegrationDeliveriesNeedingFinalization(params.workspace) : undefined;
+  const terminalWrites: IntegrationQueueDeliveryStatus[] = [], processed: ProcessedIntegrationDelivery[] = [];
+  try {
+    for (const channelId of channelIds) processed.push(...await processChannelQueue({
+      workspace: params.workspace, channelId, policy: policiesByChannelId.get(channelId),
+      now: typeof params.nowTs === "number" ? () => params.nowTs! : undefined,
+      beforeCommit: gate, selectedRows, terminalWrites
     }));
+    const finalizationFailures = finalizePendingTerminals({ workspace: params.workspace, policiesByChannelId,
+      beforeCommit: gate, journals, statuses: selectedTerminals ? [...selectedTerminals, ...terminalWrites] : undefined });
+    gate?.(); return { channelIds, processed, finalizationFailures };
+  } catch (cause) {
+    if (!gate) throw cause;
+    throw new IntegrationDispatchPartialError(cause, Object.freeze({ stage: "integration-drain", processed: processed.map(item => ({ ...item })),
+      journals: journals?.progress.map(item => ({ ...item })) }));
   }
-  const channelIds = listDueIntegrationChannelIds({
-    workspace: params.workspace,
-    nowTs: params.nowTs,
-    limit: params.maxChannels
-  });
-  const processed: ProcessedIntegrationDelivery[] = [];
-  for (const channelId of channelIds) {
-    processed.push(...await processChannelQueue({
-      workspace: params.workspace,
-      channelId,
-      policy: policiesByChannelId.get(channelId),
-      now: typeof params.nowTs === "number" ? () => params.nowTs! : undefined
-    }));
-  }
-  const finalizationFailures = finalizePendingTerminals({
-    workspace: params.workspace,
-    policiesByChannelId
-  });
-  return {
-    channelIds,
-    processed,
-    finalizationFailures
-  };
 }
 
 export async function dispatchIntegrationEventsBatch(params: {
@@ -642,4 +749,10 @@ export async function dispatchIntegrationTest(params: {
     },
     forceChannelId: params.channelId
   });
+}
+
+/** Internal current-session counterpart for the maintained integration test route. */
+export async function dispatchIntegrationTestWithAuthority(params: { workspace: string; channelId?: string }, beforeCommit: () => void): Promise<IntegrationDispatchOutcome> {
+  return dispatchIntegrationEventWithAuthority({ workspace: params.workspace, eventName: "INTEGRATION_TEST", agentId: "system",
+    summary: "AMC integration test dispatch", details: { source: "amc integrations test" }, forceChannelId: params.channelId }, beforeCommit);
 }

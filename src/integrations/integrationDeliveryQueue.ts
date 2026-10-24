@@ -1,27 +1,27 @@
-import Database from "better-sqlite3";
-import { randomUUID } from "node:crypto";
-import { dirname, join, resolve } from "node:path";
+import { dirname, resolve } from "node:path";
 import { writeFileSync } from "node:fs";
 import { withWorkspaceScope } from "../enforce/evidenceEmitter.js";
 import { EgressBlocked } from "../residency/checkEgress.js";
 import {
-  getSigningKey,
-  getPublicKeyHistory,
-  signHexDigest,
   verifyHexDigestAny
 } from "../crypto/keys.js";
 import { ensureDir } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
-import { canonicalize } from "../utils/json.js";
 import {
   computeBackoffDelayMs,
   deliverWebhookWithRetry,
+  defaultWebhookHttpClient,
   normalizeWebhookDeliveryError,
   redactWebhookDeliveryReceipt,
   type WebhookDeliveryPolicy,
   type WebhookDeliveryReceipt
 } from "./webhookDelivery.js";
-import { ensureSchema } from "./integrationQueueSchema.js";
+import { openIntegrationQueueDb } from "./integrationQueueDb.js";
+import { canonicalize } from "../utils/json.js";
+import { getVaultSecretReadOnly } from "../vault/vault.js";
+import { getPurposeKeyHistory } from "../keys/signingKeys.js";
+import { IntegrationAuthorityRefused, IntegrationDispatchPartialError, captureIntegrationQueueReader, queueBindingDigest } from "./integrationQueueEnqueue.js";
+export { enqueueIntegrationDeliveries, enqueueIntegrationDeliveriesAsync } from "./integrationQueueEnqueue.js";
 import {
   loadIntegrationsConfig,
   resolveSecretRef,
@@ -136,7 +136,6 @@ export interface IntegrationDeliveryArtifacts {
   receipt: string;
 }
 
-const DEFAULT_MAX_ROUNDS = 3;
 const DEFAULT_ROUND_BACKOFF_MS = 5_000;
 const MAX_ROUND_BACKOFF_MS = 60_000;
 const DEFAULT_MAX_PROCESS_ROWS = 100;
@@ -148,11 +147,6 @@ const DEFAULT_WEBHOOK_POLICY: Required<WebhookDeliveryPolicy> = {
   jitterFactor: 0,
   timeoutMs: 10_000
 };
-
-function integrationQueuePath(workspace: string): string {
-  return join(workspace, ".amc", "integration-delivery.sqlite");
-}
-
 
 /**
  * Deletes delivered rows older than `beforeTs`, returning the count removed.
@@ -172,26 +166,6 @@ export function pruneDeliveredIntegrationQueue(workspace: string, beforeTs: numb
   } finally {
     db.close();
   }
-}
-
-function openIntegrationQueueDb(workspace: string): Database.Database {
-  ensureDir(join(workspace, ".amc"));
-  const db = new Database(integrationQueuePath(workspace));
-  db.pragma("journal_mode = WAL");
-  db.pragma("synchronous = NORMAL");
-  db.pragma("secure_delete = ON");
-  const scrubbed = ensureSchema(db);
-  if (scrubbed) {
-    db.pragma("wal_checkpoint(TRUNCATE)");
-  }
-  return db;
-}
-
-function clampMaxRounds(input: number | undefined): number {
-  if (!Number.isFinite(input)) {
-    return DEFAULT_MAX_ROUNDS;
-  }
-  return Math.max(1, Math.min(20, Math.floor(input ?? DEFAULT_MAX_ROUNDS)));
 }
 
 function parseHeaders(raw: string): Record<string, string> {
@@ -298,31 +272,6 @@ function roundBackoffMs(attemptRound: number): number {
   });
 }
 
-function queueBindingDigest(params: {
-  queueId: string;
-  channelId: string;
-  channelType: IntegrationChannelType;
-  eventName: string;
-  agentId: string;
-  payloadSha256: string;
-  orderedSequence: number | null;
-  maxRounds: number;
-  createdTs: number;
-}): string {
-  return sha256Hex(canonicalize({
-    v: 1,
-    queueId: params.queueId,
-    channelId: params.channelId,
-    channelType: params.channelType,
-    eventName: params.eventName,
-    agentId: params.agentId,
-    payloadSha256: params.payloadSha256,
-    orderedSequence: params.orderedSequence,
-    maxRounds: params.maxRounds,
-    createdTs: params.createdTs
-  }));
-}
-
 function verifyQueueBinding(workspace: string, row: IntegrationQueueRow): boolean {
   const payloadSha256 = sha256Hex(Buffer.from(row.payload_body, "utf8"));
   if (payloadSha256 !== row.payload_sha256) {
@@ -345,7 +294,7 @@ function verifyQueueBinding(workspace: string, row: IntegrationQueueRow): boolea
   return row.binding_digest === expectedDigest && verifyHexDigestAny(
     expectedDigest,
     row.binding_signature,
-    getPublicKeyHistory(workspace, "auditor")
+    getPurposeKeyHistory(workspace, "artifact-seal")
   );
 }
 
@@ -396,106 +345,6 @@ function buildDeliveryRequest(params: {
     secret: sha256Hex(`${params.row.channel_id}:${params.row.event_name}`),
     headers
   };
-}
-
-export function enqueueIntegrationDeliveries(params: {
-  workspace: string;
-  deliveries: IntegrationQueueItemInput[];
-  nowTs?: number;
-}): QueuedIntegrationDelivery[] {
-  const nowTs = typeof params.nowTs === "number" ? params.nowTs : Date.now();
-  const db = openIntegrationQueueDb(params.workspace);
-  try {
-    const insert = db.prepare(`
-      INSERT INTO integration_delivery_queue (
-        queue_id,
-        channel_id,
-        channel_type,
-        event_name,
-        agent_id,
-        payload_body,
-        payload_sha256,
-        ordered_sequence,
-        binding_digest,
-        binding_signature,
-        destination_url,
-        destination_ref,
-        secret_ref,
-        extra_headers_json,
-        state,
-        attempt_round,
-        max_rounds,
-        next_attempt_ts,
-        created_ts,
-        updated_ts
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'PENDING', 0, ?, ?, ?, ?)
-    `);
-
-    const queued: QueuedIntegrationDelivery[] = [];
-    const tx = db.transaction(() => {
-      for (const item of params.deliveries) {
-        const queueId = `iq_${randomUUID().replace(/-/g, "")}`;
-        const payloadSha256 = sha256Hex(Buffer.from(item.payloadBody, "utf8"));
-        const maxRounds = clampMaxRounds(item.maxRounds);
-        const extraHeaders = "{}";
-        const bindingDigest = queueBindingDigest({
-          queueId,
-          channelId: item.channelId,
-          channelType: item.channelType,
-          eventName: item.eventName,
-          agentId: item.agentId,
-          payloadSha256,
-          orderedSequence: typeof item.orderedSequence === "number" ? item.orderedSequence : null,
-          maxRounds,
-          createdTs: nowTs
-        });
-        const bindingSignature = signHexDigest(
-          bindingDigest,
-          getSigningKey(params.workspace, "artifact-seal")
-        );
-        const result = insert.run(
-          queueId,
-          item.channelId,
-          item.channelType,
-          item.eventName,
-          item.agentId,
-          item.payloadBody,
-          payloadSha256,
-          typeof item.orderedSequence === "number" ? item.orderedSequence : null,
-          bindingDigest,
-          bindingSignature,
-          null,
-          null,
-          null,
-          extraHeaders,
-          maxRounds,
-          nowTs,
-          nowTs,
-          nowTs
-        );
-        queued.push({
-          queueId,
-          channelId: item.channelId,
-          channelType: item.channelType,
-          eventName: item.eventName,
-          agentId: item.agentId,
-          payloadSha256,
-          orderedSequence: typeof item.orderedSequence === "number" ? item.orderedSequence : null,
-          seq: Number(result.lastInsertRowid),
-          state: "PENDING",
-          attemptRound: 0,
-          maxRounds,
-          createdTs: nowTs,
-          nextAttemptTs: nowTs
-        });
-      }
-    });
-    tx();
-
-    return queued;
-  } finally {
-    db.close();
-  }
 }
 
 export function getIntegrationDeliveryStatusByQueueId(
@@ -637,6 +486,21 @@ export function markIntegrationDeliveriesFinalized(params: {
   }
 }
 
+/** Internal terminal publication. The row preimage is checked last under the short SQLite writer transaction. */
+export function finalizeIntegrationDeliveryWithAuthority(workspace: string, status: IntegrationQueueDeliveryStatus,
+  beforeCommit: () => void, publishJournals: (assertRow: () => void) => void): void {
+  beforeCommit(); const db = openIntegrationQueueDb(workspace);
+  try { db.transaction(() => {
+    const assertRow = () => {
+      const current = db.prepare("SELECT * FROM integration_delivery_queue WHERE queue_id = ?").get(status.queueId) as IntegrationQueueRow | undefined;
+      if (!current || canonicalize(mapDeliveryStatus(current)) !== canonicalize(status)) throw new Error("selected terminal integration row changed");
+    };
+    beforeCommit(); assertRow(); publishJournals(assertRow);
+    const finalizedTs = Date.now(); beforeCommit(); assertRow();
+    db.prepare("UPDATE integration_delivery_queue SET finalized_ts = ?, updated_ts = ? WHERE queue_id = ?").run(finalizedTs, finalizedTs, status.queueId);
+  }).immediate(); } finally { db.close(); }
+}
+
 export function listIntegrationDeadLetters(
   workspace: string,
   options?: { channelId?: string; limit?: number }
@@ -725,7 +589,16 @@ export function requeueIntegrationDeadLetters(params: {
   }
 }
 
-export async function processIntegrationChannelQueue(params: {
+/** Internal immutable pending selection, captured before the outer dispatch schedule awaits. */
+export function captureIntegrationPendingRows(workspace: string, channelIds: readonly string[], beforeCommit: () => void): IntegrationQueueRow[] {
+  beforeCommit();
+  const db = openIntegrationQueueDb(workspace);
+  try { return db.prepare("SELECT * FROM integration_delivery_queue WHERE state = 'PENDING' ORDER BY seq ASC").all()
+    .filter((row: unknown) => channelIds.includes((row as IntegrationQueueRow).channel_id)) as IntegrationQueueRow[]; }
+  finally { db.close(); }
+}
+
+type ChannelQueueInput = {
   workspace: string;
   channelId: string;
   deliveryPolicy?: WebhookDeliveryPolicy;
@@ -741,8 +614,22 @@ export async function processIntegrationChannelQueue(params: {
     orderedSequence: number | null;
     httpStatus: number;
     receipt: WebhookDeliveryReceipt;
-  }) => Promise<IntegrationDeliveryArtifacts | null>;
-}): Promise<ProcessIntegrationQueueResult> {
+  }, beforeCommit?: () => void) => Promise<IntegrationDeliveryArtifacts | null>;
+};
+
+/** Public compatibility entry; no caller authority is inferred from the event or queue body. */
+export async function processIntegrationChannelQueue(params: ChannelQueueInput): Promise<ProcessIntegrationQueueResult> {
+  return processChannelQueueAttempt(params);
+}
+
+/** Internal maintained-caller counterpart. The callback can only refuse; selected rows are immutable snapshots. */
+export async function processIntegrationChannelQueueWithAuthority(params: ChannelQueueInput, beforeCommit: () => void,
+  selectedRows: readonly IntegrationQueueRow[], terminalWrites: IntegrationQueueDeliveryStatus[] = []): Promise<ProcessIntegrationQueueResult> {
+  return processChannelQueueAttempt(params, beforeCommit, selectedRows, terminalWrites);
+}
+
+async function processChannelQueueAttempt(params: ChannelQueueInput, beforeCommit?: () => void,
+  selectedRows?: readonly IntegrationQueueRow[], terminalWrites?: IntegrationQueueDeliveryStatus[]): Promise<ProcessIntegrationQueueResult> {
   const input = { ...params };
   const workspace = input.workspace.trim() ? resolve(input.workspace) : input.workspace;
   const maxRows = Math.max(1, Math.min(500, Math.floor(input.maxRows ?? DEFAULT_MAX_PROCESS_ROWS)));
@@ -751,7 +638,11 @@ export async function processIntegrationChannelQueue(params: {
     ...DEFAULT_WEBHOOK_POLICY,
     ...(input.deliveryPolicy ?? {})
   };
+  beforeCommit?.();
+  const assertReader = beforeCommit ? captureIntegrationQueueReader(workspace) : undefined;
   const db = openIntegrationQueueDb(workspace);
+  const selected = selectedRows ? new Map(selectedRows.map(row => [row.queue_id, canonicalize(row)])) : null;
+  const nativePost = defaultWebhookHttpClient.post.bind(defaultWebhookHttpClient);
   const processed: ProcessedIntegrationDelivery[] = [];
   let blockedByOrdering = false;
   try {
@@ -809,7 +700,37 @@ export async function processIntegrationChannelQueue(params: {
         break;
       }
 
-      const nowTs = now();
+      if (selected !== null && !selected.has(row.queue_id)) { blockedByOrdering = true; break; }
+      const nativePosts: Array<{ entered: number; httpStatus: number | null; error: string | null }> = [];
+      let nativePostCallsEntered = 0, returnedReceipt: WebhookDeliveryReceipt | null = null;
+      let returnedArtifacts: IntegrationDeliveryArtifacts | null = null, refusal: IntegrationAuthorityRefused | null = null;
+      const guard = () => {
+        if (!beforeCommit) return;
+        try {
+          beforeCommit(); assertReader?.();
+          const current = loadNext.get(input.channelId) as IntegrationQueueRow | undefined;
+          if (current?.queue_id !== row.queue_id || canonicalize(current) !== selected!.get(row.queue_id)) throw new Error("selected integration queue row changed");
+        } catch (cause) {
+          refusal = new IntegrationAuthorityRefused(cause, Object.freeze({ queueId: row.queue_id, nativePostCallsEntered, nativePosts: nativePosts.map(item => ({ ...item })),
+            returnedReceipt: returnedReceipt ? redactWebhookDeliveryReceipt(returnedReceipt) : null,
+            returnedArtifacts, processed: processed.map(item => ({ ...item })) }));
+          throw refusal;
+        }
+      };
+      const commit = (operation: () => void) => {
+        if (!beforeCommit) { operation(); return; }
+        const written = db.transaction(() => {
+          guard(); operation();
+          return db.prepare("SELECT * FROM integration_delivery_queue WHERE queue_id = ?").get(row.queue_id) as IntegrationQueueRow;
+        }).immediate();
+        if (written.state === "DELIVERED" || written.state === "DEAD_LETTER") terminalWrites?.push(mapDeliveryStatus(written));
+      };
+      const readNow = () => { try { return now(); } catch (cause) {
+        if (!beforeCommit) throw cause;
+        throw new IntegrationDispatchPartialError(cause, { queueId: row.queue_id, nativePostCallsEntered,
+          nativePosts: nativePosts.map(item => ({ ...item })), returnedReceipt, returnedArtifacts, processed: processed.map(item => ({ ...item })) });
+      } };
+      const nowTs = readNow(); guard();
       if (row.next_attempt_ts > nowTs) {
         blockedByOrdering = true;
         break;
@@ -825,6 +746,22 @@ export async function processIntegrationChannelQueue(params: {
           workspace,
           row
         });
+        const requestSnapshot = canonicalize(deliveryRequest);
+        const checkRequest = () => {
+          if (!beforeCommit) return;
+          // Read-only final secret lookup never implicitly unlocks or changes the selected destination.
+          const config = loadIntegrationsConfig(workspace), channel = config.integrations.channels.find(item => item.id === row.channel_id);
+          let currentRequest: typeof deliveryRequest | null = null;
+          if (channel?.enabled && channel.type === row.channel_type) {
+            const ref = channel.type === "webhook" ? channel.secretRef : channel.webhookUrlRef;
+            const value = ref.startsWith("vault:") ? getVaultSecretReadOnly(workspace, ref.slice(6)) : null;
+            if (value) currentRequest = { url: channel.type === "webhook" ? channel.url : value.trim(),
+              secret: channel.type === "webhook" ? value.trim() : sha256Hex(`${row.channel_id}:${row.event_name}`), headers: deliveryRequest.headers };
+          }
+          if (currentRequest === null || canonicalize(currentRequest) !== requestSnapshot)
+            throw new Error("selected integration destination or secret changed");
+        };
+        guard();
         const receipt = await withWorkspaceScope(workspace, () => deliverWebhookWithRetry({
           request: {
             url: deliveryRequest.url,
@@ -834,25 +771,45 @@ export async function processIntegrationChannelQueue(params: {
             headers: deliveryRequest.headers
           },
           policy,
-          deliveryId: `int_${row.queue_id}`
+          deliveryId: `int_${row.queue_id}`,
+          dependencies: beforeCommit ? {
+            client: { post: async request => {
+              try { checkRequest(); guard(); }
+              catch (cause) {
+                if (cause instanceof IntegrationAuthorityRefused) throw cause;
+                refusal = new IntegrationAuthorityRefused(cause, Object.freeze({ queueId: row.queue_id, nativePostCallsEntered, nativePosts: nativePosts.map(item => ({ ...item })),
+                  returnedReceipt, returnedArtifacts, processed: processed.map(item => ({ ...item })) }));
+                throw refusal;
+              }
+              nativePostCallsEntered += 1;
+              try {
+                const response = await nativePost(request);
+                nativePosts.push({ entered: nativePostCallsEntered, httpStatus: response.status, error: null }); return response;
+              } catch (cause) {
+                nativePosts.push({ entered: nativePostCallsEntered, httpStatus: null, error: normalizeWebhookDeliveryError(cause) }); throw cause;
+              }
+            } },
+            // The legacy retry catches transport errors. A saved authority refusal is never retried as a native request.
+            sleep: async ms => { if (refusal) throw refusal; await new Promise<void>(done => setTimeout(done, ms)); }
+          } : undefined
         }));
+        if (refusal) throw refusal;
+        returnedReceipt = beforeCommit ? JSON.parse(canonicalize(receipt)) as WebhookDeliveryReceipt : receipt; guard();
         const lastHttpStatus = receipt.attempts[receipt.attempts.length - 1]?.httpStatus ?? null;
 
         if (receipt.delivered) {
-          const artifacts =
-            (await input.onDelivered?.call(params, {
-              queueId: row.queue_id,
-              channelId: row.channel_id,
-              eventName: row.event_name,
-              agentId: row.agent_id,
-              payloadBody: row.payload_body,
-              payloadSha256: row.payload_sha256,
-              orderedSequence: typeof row.ordered_sequence === "number" ? row.ordered_sequence : null,
-              httpStatus: lastHttpStatus ?? 200,
-              receipt
-            })) ?? null;
-          const updatedTs = now();
-          markDelivered.run(
+          const deliveryInput = { queueId: row.queue_id, channelId: row.channel_id, eventName: row.event_name,
+            agentId: row.agent_id, payloadBody: row.payload_body, payloadSha256: row.payload_sha256,
+            orderedSequence: typeof row.ordered_sequence === "number" ? row.ordered_sequence : null,
+            httpStatus: lastHttpStatus ?? 200,
+            receipt: beforeCommit ? JSON.parse(canonicalize(receipt)) as WebhookDeliveryReceipt : receipt };
+          const callbackArtifacts = (await (beforeCommit ? input.onDelivered?.call(params, deliveryInput, guard)
+            : input.onDelivered?.call(params, deliveryInput))) ?? null;
+          const artifacts = beforeCommit && callbackArtifacts ? { eventId: callbackArtifacts.eventId, receiptId: callbackArtifacts.receiptId,
+            receipt: callbackArtifacts.receipt } : callbackArtifacts;
+          returnedArtifacts = artifacts;
+          const updatedTs = readNow();
+          commit(() => markDelivered.run(
             attemptRound,
             lastHttpStatus,
             JSON.stringify(redactWebhookDeliveryReceipt(receipt)),
@@ -862,7 +819,7 @@ export async function processIntegrationChannelQueue(params: {
             artifacts?.receiptId ?? null,
             artifacts?.receipt ?? null,
             row.queue_id
-          );
+          ));
           processed.push({
             queueId: row.queue_id,
             channelId: row.channel_id,
@@ -876,10 +833,10 @@ export async function processIntegrationChannelQueue(params: {
         }
 
         const failure = summarizeDeliveryFailure(receipt);
-        const updatedTs = now();
+        const updatedTs = readNow();
         const receiptJson = JSON.stringify(redactWebhookDeliveryReceipt(receipt));
         if (attemptRound >= row.max_rounds) {
-          markDeadLetter.run(
+          commit(() => markDeadLetter.run(
             attemptRound,
             failure.message,
             failure.httpStatus,
@@ -887,7 +844,7 @@ export async function processIntegrationChannelQueue(params: {
             updatedTs,
             updatedTs,
             row.queue_id
-          );
+          ));
           processed.push({
             queueId: row.queue_id,
             channelId: row.channel_id,
@@ -901,7 +858,7 @@ export async function processIntegrationChannelQueue(params: {
         }
 
         const nextAttemptTs = updatedTs + roundBackoffMs(attemptRound);
-        markPending.run(
+        commit(() => markPending.run(
           attemptRound,
           nextAttemptTs,
           failure.message,
@@ -909,7 +866,7 @@ export async function processIntegrationChannelQueue(params: {
           receiptJson,
           updatedTs,
           row.queue_id
-        );
+        ));
         processed.push({
           queueId: row.queue_id,
           channelId: row.channel_id,
@@ -922,11 +879,15 @@ export async function processIntegrationChannelQueue(params: {
         blockedByOrdering = true;
         break;
       } catch (error) {
-        if (error instanceof EgressBlocked) throw error;
+        if (refusal) throw refusal;
+        if (error instanceof IntegrationDispatchPartialError || error instanceof EgressBlocked) throw error;
+        if (beforeCommit && returnedReceipt?.delivered) throw new IntegrationDispatchPartialError(error, Object.freeze({
+          queueId: row.queue_id, nativePostCallsEntered, returnedReceipt: redactWebhookDeliveryReceipt(returnedReceipt),
+          returnedArtifacts, processed: processed.map(item => ({ ...item })) }));
         const message = normalizeWebhookDeliveryError(error);
-        const updatedTs = now();
+        const updatedTs = readNow(); guard();
         if (message === "DELIVERY_QUEUE_BINDING_INVALID" || attemptRound >= row.max_rounds) {
-          markDeadLetter.run(attemptRound, message, null, null, updatedTs, updatedTs, row.queue_id);
+          commit(() => markDeadLetter.run(attemptRound, message, null, null, updatedTs, updatedTs, row.queue_id));
           processed.push({
             queueId: row.queue_id,
             channelId: row.channel_id,
@@ -940,7 +901,7 @@ export async function processIntegrationChannelQueue(params: {
         }
 
         const nextAttemptTs = updatedTs + roundBackoffMs(attemptRound);
-        markPending.run(
+        commit(() => markPending.run(
           attemptRound,
           nextAttemptTs,
           message,
@@ -948,7 +909,7 @@ export async function processIntegrationChannelQueue(params: {
           null,
           updatedTs,
           row.queue_id
-        );
+        ));
         processed.push({
           queueId: row.queue_id,
           channelId: row.channel_id,
