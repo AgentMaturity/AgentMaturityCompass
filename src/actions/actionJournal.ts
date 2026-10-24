@@ -8,13 +8,16 @@
  * rewrite the index row. Times are AMC's clock, taken inside the transition. Each row gets its own ledger session,
  * sealed in the same transaction (the native budget journal's pattern), so the ledger never holds an unsealed one.
  *
- * Signatures are checked against the workspace's own monitor keys: a local audit trail, not a portable verdict.
+ * Row and token signatures use their exact workspace purposes: a local audit trail, not a portable verdict.
  */
 import { randomUUID } from "node:crypto";
 import { hostname } from "node:os";
 import type Database from "better-sqlite3";
 import type { ReceiptV2 } from "../contracts/v1/receipt.js";
-import { getPublicKeyHistory, verifyHexDigestAny } from "../crypto/keys.js";
+import { verifyHexDigestAny } from "../crypto/keys.js";
+import { canonicalMetadataForHash } from "../ledger/eventHash.js";
+import { getPurposeKeyHistory } from "../keys/signingKeys.js";
+import { receiptLedgerProblems } from "../keys/receiptSqlAuthority.js";
 import { openLedger, type Ledger } from "../ledger/ledger.js";
 import { ledgerSynchronousMode } from "../ledger/ledgerDurability.js";
 import { runImmediateTransaction } from "../ledger/ledgerSessionTransactions.js";
@@ -22,7 +25,7 @@ import { noteTelemetryDropped, takeDroppedTelemetry } from "../observability/tel
 import { verifyReceipt, type ActionReceiptMembers } from "../receipts/receipt.js";
 import type { ActionClass } from "../types.js";
 import type { EvidenceEvent } from "../types.js";
-import { operationalEvidenceProblems, type OperationalEvidenceOptions } from "../keys/operationalLedgerReader.js";
+import { legacyLedgerRowKeys, operationalEvidenceProblems, type OperationalEvidenceOptions } from "../keys/operationalLedgerReader.js";
 import { workspaceSelfTrust } from "../trust/trustContext.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
@@ -167,17 +170,23 @@ function parseJson(text: string): unknown {
  * receipt the signed ACTION_STATE evidence row and its `v: 2` receipt binding the same bytes and state.
  */
 export function verifyChainIn(ledger: { readonly workspace: string; readonly db: Database.Database }, executionId: string, options: OperationalEvidenceOptions = {}): ChainVerification {
+  const read = () => verifyChainSnapshotIn(ledger, executionId, options);
+  return ledger.db.inTransaction ? read() : ledger.db.transaction(read)();
+}
+
+/** Prefix, action rows and selected evidence are read in one actual SQL snapshot. */
+function verifyChainSnapshotIn(ledger: { readonly workspace: string; readonly db: Database.Database }, executionId: string, options: OperationalEvidenceOptions): ChainVerification {
   const { db, workspace } = ledger;
   const rows = db.prepare("SELECT seq, receipt_json, receipt_digest, evidence_event_id FROM action_transitions WHERE execution_id = ? ORDER BY seq")
     .all(executionId) as TransitionRow[];
   const index = db.prepare("SELECT last_receipt_digest FROM action_executions WHERE execution_id = ?").get(executionId) as
     { last_receipt_digest: string } | undefined;
-  const errors: string[] = [];
+  const errors = receiptLedgerProblems(ledger, options.trust).map(problem => `receipt authority invalid: ${problem}`);
   const receipts: ActionReceiptV1[] = [];
   const receiptIds = new Map<number, string>();
   const workspaceId = workspaceIdFromDirectory(workspace);
   const events = new Set<string>();
-  let keys: string[] | null = null;
+  let rowKeys: string[] | null = null, receiptKeys: string[] | null = null;
   rows.forEach((row, position) => {
     const fail = (problem: string): void => { errors.push(`seq ${row.seq}: ${problem}`); };
     if (row.seq !== position) fail(`expected seq ${position}: a receipt is missing or out of order`);
@@ -197,8 +206,9 @@ export function verifyChainIn(ledger: { readonly workspace: string; readonly db:
     }
     if (events.has(row.evidence_event_id)) fail("evidence row already used by another receipt");
     events.add(row.evidence_event_id);
-    keys ??= getPublicKeyHistory(workspace, "monitor");
-    const evidence = checkEvidence(ledger, row, receipt, keys, options);
+    rowKeys ??= legacyLedgerRowKeys(workspace);
+    receiptKeys ??= getPurposeKeyHistory(workspace, "receipt");
+    const evidence = checkEvidence(ledger, row, receipt, rowKeys, receiptKeys, options);
     if ("problem" in evidence) fail(evidence.problem);
     else {
       receiptIds.set(row.seq, evidence.payload.receipt_id);
@@ -214,7 +224,7 @@ export function verifyChainIn(ledger: { readonly workspace: string; readonly db:
 
 type EvidenceCheck = { readonly problem: string } | { readonly payload: ReceiptV2 };
 
-function checkEvidence(ledger: { readonly workspace: string; readonly db: Database.Database }, row: TransitionRow, receipt: ActionReceiptV1, keys: string[], options: OperationalEvidenceOptions): EvidenceCheck {
+function checkEvidence(ledger: { readonly workspace: string; readonly db: Database.Database }, row: TransitionRow, receipt: ActionReceiptV1, rowKeys: string[], receiptKeys: string[], options: OperationalEvidenceOptions): EvidenceCheck {
   const { db, workspace } = ledger;
   const problem = (text: string): EvidenceCheck => ({ problem: text });
   const event = db.prepare("SELECT * FROM evidence_events WHERE id = ?").get(row.evidence_event_id) as EvidenceEvent | undefined;
@@ -226,8 +236,16 @@ function checkEvidence(ledger: { readonly workspace: string; readonly db: Databa
     || (event.payload_inline !== null && event.payload_inline !== row.receipt_json)) return problem("evidence row does not carry this receipt");
   const meta = (parseJson(event.meta_json) ?? {}) as Record<string, unknown>;
   if (meta.auditType !== "ACTION_STATE" || meta.executionId !== receipt.executionId || meta.seq !== receipt.seq) return problem("evidence row is for another receipt");
-  if (!verifyHexDigestAny(event.event_hash, event.writer_sig, keys)) return problem("evidence row signature does not verify");
-  const signed = typeof meta.receipt === "string" ? verifyReceipt(meta.receipt, keys) : null;
+  // ACTION_STATE is inline canonical receipt_json; retention clears only its live payload columns.
+  // A legacy missing canonical inline can use these known checked bytes only if the original signed hash agrees.
+  const payloadPath = event.canonical_payload_path ?? event.payload_path ?? null;
+  const payloadInline = event.canonical_payload_inline ?? event.payload_inline ?? row.receipt_json;
+  if (payloadPath !== null || payloadInline !== row.receipt_json) return problem("evidence canonical payload does not carry this receipt");
+  const metadata = canonicalMetadataForHash({ id: event.id, ts: event.ts, sessionId: event.session_id, runtime: event.runtime,
+    eventType: event.event_type, payloadPath, payloadInline, metaJson: event.meta_json });
+  if (sha256Hex(`${event.prev_event_hash}${metadata}${event.payload_sha256}`) !== event.event_hash) return problem("evidence row hash does not verify");
+  if (!verifyHexDigestAny(event.event_hash, event.writer_sig, rowKeys)) return problem("evidence row signature does not verify");
+  const signed = typeof meta.receipt === "string" ? verifyReceipt(meta.receipt, receiptKeys) : null;
   const payload = signed?.ok ? signed.payload : null;
   if (payload?.v !== 2) return problem(`signed receipt does not verify${signed?.error ? `: ${signed.error}` : ""}`);
   const reconciled = "reconciliation" in payload && payload.reconciliation !== undefined;
@@ -338,6 +356,7 @@ function createJournal(workspace: string, ledger: Ledger, staleAfterMs: number):
 
   const transition = (executionId: string, change: Change): ActionReceiptV1 => {
     try {
+      if (process.env.AMC_NO_SIGN === "1") throw new JournalUnavailable("AMC_NO_SIGN=1: an unsigned receipt attests to nothing");
       const receipt = runImmediateTransaction(db, () => append(executionId, change, verified(executionId)));
       writeTelemetryDrops(ledger);
       return receipt;

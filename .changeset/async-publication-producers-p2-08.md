@@ -41,3 +41,5 @@ Prepare workspace records before shared publication locks and await actual false
 Add awaited canary postmortem SDK filing with same-read target capture and checked outer record publication, preserving the existing inner signature, reader admission and expiry behavior.
 
 Await both rollback-pack signatures in the maintained CLI and SDK, retaining original first authority through outer preparation and caching only after durable publication.
+
+Admit committed receipt authority in ActionJournal reads and writes, separate receipt-purpose tokens from ledger-row signatures, verify selected signed event preimages, and recheck live signing refusal on each transition while retaining the existing synchronous API and legacy pruning compatibility.

@@ -301,7 +301,7 @@ describe("P1-03 signed chain tamper controls on owned cold copies", () => {
       expect(verified.ok).toBe(false); expect(verified.errors.length).toBeGreaterThan(0);
       const expected = { deleted: /expected seq|broken link/, duplicated: /another execution or position|evidence row already used/,
         reordered: /another execution or position/, "broken-link": /broken link/, "foreign-workspace": /receipt names workspace/,
-        "second-terminal": /completed -> denied is not an allowed transition/, "evidence-session": /signed receipt does not bind/ };
+        "second-terminal": /completed -> denied is not an allowed transition/, "evidence-session": /evidence row hash does not verify/ };
       expect(verified.errors.join("; ")).toMatch(expected[attack]);
     } finally { db.close(); }
     const coverage = actionEvidenceCoverage(copy, f.sessionId);
