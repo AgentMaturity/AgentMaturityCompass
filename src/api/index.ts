@@ -135,7 +135,7 @@ export const API_ROUTE_REGISTRY: readonly ApiRouteDefinition[] = [
     methods: ['GET', 'POST'],
     auth: 'protected',
     validationPolicy: 'schema-validated',
-    handler: workspaceRoute(handleScoreRoute)
+    handler: (pathname, method, req, res, context) => handleScoreRoute(pathname, method, req, res, context.workspace, context.revalidateAuthority)
   },
   {
     id: 'fleet',
@@ -144,7 +144,7 @@ export const API_ROUTE_REGISTRY: readonly ApiRouteDefinition[] = [
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     auth: 'protected',
     validationPolicy: 'router-local',
-    handler: workspaceRoute(handleFleetRoute)
+    handler: (pathname, method, req, res, context) => handleFleetRoute(pathname, method, req, res, context.workspace, context.revalidateAuthority)
   },
   {
     id: 'org',
@@ -162,7 +162,7 @@ export const API_ROUTE_REGISTRY: readonly ApiRouteDefinition[] = [
     methods: ['GET', 'POST'],
     auth: 'protected',
     validationPolicy: 'router-local',
-    handler: workspaceRoute(handleEvidenceRoute)
+    handler: (pathname, method, req, res, context) => handleEvidenceRoute(pathname, method, req, res, context.workspace, context.revalidateAuthority)
   },
   {
     id: 'fixer',
@@ -189,7 +189,7 @@ export const API_ROUTE_REGISTRY: readonly ApiRouteDefinition[] = [
     methods: ['GET', 'POST'],
     auth: 'protected',
     validationPolicy: 'router-local',
-    handler: workspaceRoute(handleWatchRoute)
+    handler: (pathname, method, req, res, context) => handleWatchRoute(pathname, method, req, res, context.workspace, context.revalidateAuthority)
   },
   {
     id: 'observe',
@@ -216,7 +216,7 @@ export const API_ROUTE_REGISTRY: readonly ApiRouteDefinition[] = [
     methods: ['GET', 'POST'],
     auth: 'protected',
     validationPolicy: 'router-local',
-    handler: workspaceRoute(handleFirewallRoute)
+    handler: (pathname, method, req, res, context) => handleFirewallRoute(pathname, method, req, res, context.workspace, context.revalidateAuthority)
   },
   {
     id: 'runtime',
@@ -261,7 +261,7 @@ export const API_ROUTE_REGISTRY: readonly ApiRouteDefinition[] = [
     methods: ['GET', 'POST'],
     auth: 'protected',
     validationPolicy: 'router-local',
-    handler: workspaceRoute(handleDriftRoute)
+    handler: (pathname, method, req, res, context) => handleDriftRoute(pathname, method, req, res, context.workspace, context.revalidateAuthority)
   },
   {
     id: 'sandbox',
@@ -280,7 +280,7 @@ export const API_ROUTE_REGISTRY: readonly ApiRouteDefinition[] = [
     auth: 'protected',
     validationPolicy: 'router-local',
     // The oversight route signs a record naming its reviewer: it needs the authenticated principal (P1-17).
-    handler: (pathname, method, req, res, context) => handleIncidentRoute(pathname, method, req, res, context.workspace, context.principal)
+    handler: (pathname, method, req, res, context) => handleIncidentRoute(pathname, method, req, res, context.workspace, context.principal, context.revalidateAuthority)
   },
   {
     id: 'assurance',
@@ -352,7 +352,7 @@ export const API_ROUTE_REGISTRY: readonly ApiRouteDefinition[] = [
     methods: ['GET', 'POST'],
     auth: 'protected',
     validationPolicy: 'router-local',
-    handler: workspaceRoute(handleBenchmarkRoute)
+    handler: (pathname, method, req, res, context) => handleBenchmarkRoute(pathname, method, req, res, context.workspace, context.revalidateAuthority)
   },
   {
     id: 'workflow',
@@ -388,7 +388,7 @@ export const API_ROUTE_REGISTRY: readonly ApiRouteDefinition[] = [
     methods: ['GET', 'POST'],
     auth: 'protected',
     validationPolicy: 'router-local',
-    handler: workspaceRoute(handleToolsRoute)
+    handler: (pathname, method, req, res, context) => handleToolsRoute(pathname, method, req, res, context.workspace, context.revalidateAuthority)
   },
   {
     id: 'identity',
@@ -442,7 +442,7 @@ export const API_ROUTE_REGISTRY: readonly ApiRouteDefinition[] = [
     methods: ['GET', 'POST'],
     auth: 'protected',
     validationPolicy: 'router-local',
-    handler: workspaceRoute(handleComplianceRoute)
+    handler: (pathname, method, req, res, context) => handleComplianceRoute(pathname, method, req, res, context.workspace, context.revalidateAuthority)
   },
   {
     id: 'proof',
@@ -478,7 +478,7 @@ export const API_ROUTE_REGISTRY: readonly ApiRouteDefinition[] = [
     methods: ['GET', 'POST'],
     auth: 'protected',
     validationPolicy: 'router-local',
-    handler: workspaceRoute(handleExportRoute)
+    handler: (pathname, method, req, res, context) => handleExportRoute(pathname, method, req, res, context.workspace, context.revalidateAuthority)
   },
   {
     id: 'marketplace',
