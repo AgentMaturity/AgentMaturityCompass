@@ -3,6 +3,8 @@ import { OrgPairsPublicationError, captureOrgPairsAuthority } from "../org/prepa
 import { appendTransparencyEntryAsync, type TransparencyAppendInput } from "../transparency/asyncWorkspaceAppend.js";
 import { TransparencyMerkleLagError } from "../transparency/merkleIndexState.js";
 export function captureMechanicRun(workspace: string, beforePublish: () => void) {
+  const actor = beforePublish, enabled = () => { if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize policy signing"); };
+  beforePublish = () => { enabled(); actor(); enabled(); };
   beforePublish(); const fixed = captureOrgPairsAuthority(workspace);
   return { beforePublish, fixed, assertCurrent() { beforePublish(); fixed(); } };
 }

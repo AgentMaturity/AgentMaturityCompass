@@ -19,6 +19,7 @@ interface Pair { body: FileState | null; sidecar: FileState | null }
 type Command = "adapters init" | "adapters configure";
 type Result = { configPath: string; sigPath: string };
 const BODY = ".amc/adapters.yaml", SIGNATURE = BODY + ".sig";
+function assertSigningEnabled(): void { if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize policy signing"); }
 const equal = (a: FileState | null, b: FileState | null) => a === null ? b === null : b !== null && a.mode === b.mode && a.identity === b.identity && a.bytes.equals(b.bytes);
 function read(workspace: string, path: string): FileState | null {
   const bytes = readContainedOrNull(workspace, path, Number.MAX_SAFE_INTEGER);
@@ -68,11 +69,11 @@ function signSync(input: ReturnType<typeof plan>): Result {
   return publish(input, signatureBytes, () => {});
 }
 async function prepareAsync(input: ReturnType<typeof plan>, beforeSign?: () => void) {
-  const caller = beforeSign;
+  const actor = beforeSign, caller = () => { assertSigningEnabled(); actor?.(); assertSigningEnabled(); };
   const beforeCheckedSign = () => { caller?.(); assertOwnerMode(input.workspace, input.command); assertPairCurrent(input.workspace, input.previous); };
   const prepared = await prepareFileSignatureWithAuditor(input.workspace, adaptersConfigPath(input.workspace), input.bytes, "BUNDLE", beforeCheckedSign);
   return Object.freeze({ signatureBytes: prepared.signatureBytes,
-    publish: (recheckInputs?: () => void) => publish(input, prepared.signatureBytes, prepared.assertCurrent, () => { recheckInputs?.(); caller?.(); }) });
+    publish: (recheckInputs?: () => void) => publish(input, prepared.signatureBytes, prepared.assertCurrent, () => { assertSigningEnabled(); recheckInputs?.(); assertSigningEnabled(); caller?.(); }) });
 }
 export function loadAdaptersConfig(workspace: string): AdapterConfig { return parse(read(workspace, BODY)?.bytes ?? null); }
 
@@ -117,7 +118,7 @@ export async function initAdaptersConfigAsync(workspace: string, beforeSign?: ()
   return (await prepareAdaptersConfigInitializationAsync(workspace, beforeSign)).publish();
 }
 function initializationPlan(workspace: string, beforeSign?: () => void) {
-  beforeSign?.(); assertOwnerMode(workspace, "adapters init");
+  assertSigningEnabled(); beforeSign?.(); assertSigningEnabled(); assertOwnerMode(workspace, "adapters init");
   const previous = pair(workspace), bytes = Buffer.from(YAML.stringify(defaultAdapterConfig()));
   return plan(workspace, "adapters init", previous, bytes, true);
 }
@@ -127,13 +128,14 @@ export function prepareAdaptersConfigInitializationAsync(workspace: string, befo
 }
 /** Internal cold initialize-if-absent attempt, captured before another producer may await. Explicit reset APIs above remain distinct. */
 export function captureAdaptersConfigInitialization(workspace: string, beforeSign?: () => void) {
-  const caller = beforeSign; caller?.();
+  const noSignAtEntry = process.env.AMC_NO_SIGN === "1", caller = beforeSign; caller?.();
   const previous = pair(workspace), result = { configPath: adaptersConfigPath(workspace), sigPath: adaptersConfigSigPath(workspace) };
   if (previous.body !== null) {
     const assertCurrent = () => { caller?.(); assertPairCurrent(workspace, previous); };
     return Object.freeze({ assertCurrent, publishedPaths: (): readonly string[] => Object.freeze([]),
       async initialize(): Promise<Result> { assertCurrent(); return { ...result }; } });
   }
+  if (noSignAtEntry) throw new Error("no-sign mode does not authorize policy signing");
   const original = captureOrgPairsAuthority(workspace, () => { caller?.(); assertOwnerMode(workspace, "adapters init"); });
   const input = plan(workspace, "adapters init", previous, Buffer.from(YAML.stringify(defaultAdapterConfig())), true);
   let acknowledged: Pair | null = null, completed = false, published: readonly string[] = Object.freeze([]);
@@ -175,6 +177,6 @@ export async function setAgentAdapterProfileAsync(workspace: string, agentId: st
 }
 /** Internal actual CLI input boundary; not exported from the SDK or accepted from an HTTP request. */
 export function prepareAgentAdapterProfileAsync(workspace: string, agentId: string, profile: AdapterAgentProfile, beforeSign?: () => void) {
-  beforeSign?.();
+  assertSigningEnabled(); beforeSign?.(); assertSigningEnabled();
   return prepareAsync(profilePlan(workspace, agentId, profile, true), beforeSign);
 }

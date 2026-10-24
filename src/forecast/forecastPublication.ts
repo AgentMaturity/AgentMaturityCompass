@@ -29,6 +29,8 @@ function failed(progress: Progress, error: unknown): never {
 function progress(): Progress { return { completed: [], phase: "prepare", entryHash: null, pendingRecorded: null }; }
 /** Run-level authority is distinct from an individual pair's expected postimage: later own scope/state writes may replace a prior latest. */
 function captureRun(workspace: string, beforePublish: () => void) {
+  const actor = beforePublish, enabled = () => { if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize policy signing"); };
+  beforePublish = () => { enabled(); actor(); enabled(); };
   beforePublish(); const fixed = captureOrgPairsAuthority(workspace);
   return { beforePublish, fixed, assertCurrent() { beforePublish(); fixed(); } };
 }

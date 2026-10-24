@@ -260,6 +260,7 @@ export async function adaptersConfigureCliAsync(params: ConfigureInput, beforeSi
 /** Internal fixed prepared publishers, consumed by the owned route; absent from the root SDK exports. */
 export function prepareAdaptersInitForHttp(workspace: string, beforeSign?: () => void) { return prepareAdaptersConfigInitializationAsync(workspace, beforeSign); }
 export async function prepareAdaptersConfigureForHttp(params: ConfigureInput, beforeSign?: () => void) {
+  if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize policy signing");
   const caller = beforeSign; caller?.();
   if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize policy signing");
   const input = prepareConfiguration(params), originalInputs = () => { caller?.(); input.recheck(); };
