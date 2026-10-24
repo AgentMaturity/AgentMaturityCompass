@@ -48,16 +48,19 @@ export function readNativeExecutableFile(root: string, file: string, limit: numb
   }
 }
 
-/** Installed-lock callers explicitly select its exact-purpose/current-notary verifier; other existing policy callers retain their protocol. */
-export function readNativeExecutableSignedJson(workspace: string, path: string, limit: number, kind?: "INSTALLED_LOCK"): { value: unknown; digest: string } {
+/** Fixed BUNDLE keeps the old fatal UTF-8/BOM parser; INSTALLED_LOCK and unspecified compatibility retain their protocols. */
+export function readNativeExecutableSignedJson(workspace: string, path: string, limit: number, kind?: "INSTALLED_LOCK" | "BUNDLE"): { value: unknown; digest: string } {
   const bytes = readNativeExecutableFile(workspace, path, limit);
   const signatureBytes = readNativeExecutableFile(workspace, `${path}.sig`, 65_536);
   const digest = sha256Hex(bytes);
   try {
-    const signature = orgSignatureSchema.parse(JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(signatureBytes)));
+    const signatureText = new TextDecoder("utf-8", { fatal: true }).decode(signatureBytes);
+    const signature = orgSignatureSchema.parse(JSON.parse(signatureText));
     const valid = kind === "INSTALLED_LOCK"
       ? verifyPluginSignedBytes(workspace, relative(workspace, path), "INSTALLED_LOCK", bytes, signatureBytes).valid
-      : verifySignedDigest({ workspace, digestHex: digest, signed: { signature: signature.signature, envelope: signature.envelope } });
+      : kind === "BUNDLE"
+        ? verifyPluginSignedBytes(workspace, relative(workspace, path), "BUNDLE", bytes, Buffer.from(signatureText, "utf8")).valid
+        : verifySignedDigest({ workspace, digestHex: digest, signed: { signature: signature.signature, envelope: signature.envelope } });
     if (signature.digestSha256 !== digest || !valid) throw new Error("untrusted signature");
     return { value: JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes)) as unknown, digest };
   } catch {

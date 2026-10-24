@@ -34,7 +34,7 @@ export function nativeExecutablePolicyPath(workspace: string): string {
 
 export function readNativeExecutablePolicy(workspace: string): { policy: NativeExecutablePolicy; digest: string } {
   try {
-    const signed = readNativeExecutableSignedJson(resolve(workspace), nativeExecutablePolicyPath(workspace), NATIVE_EXECUTABLE_LIMITS.policyBytes);
+    const signed = readNativeExecutableSignedJson(resolve(workspace), nativeExecutablePolicyPath(workspace), NATIVE_EXECUTABLE_LIMITS.policyBytes, "BUNDLE");
     return { policy: nativeExecutablePolicySchema.parse(signed.value), digest: signed.digest };
   } catch {
     throw new NativeExecutableError("EXECUTABLE_APPROVAL_REQUIRED", "Executable extensions require a separate valid workspace-signed .amc/plugins/execution-policy.json. A code signature or installation approval alone is not execution approval.");

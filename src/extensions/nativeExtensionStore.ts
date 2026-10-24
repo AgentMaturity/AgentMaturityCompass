@@ -1,11 +1,10 @@
 import { constants, closeSync, fstatSync, lstatSync, mkdirSync, mkdtempSync, openSync, readSync, realpathSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { basename, dirname, isAbsolute, join, relative, resolve } from "node:path";
-import { verifySignedDigest } from "../crypto/signing/signer.js";
+import { verifyPluginSignedBytes } from "../plugins/pluginPublication.js";
 import { prepareFileSignatureWithAuditor, signSerializedPayloadWithAuditor } from "../org/orgSigner.js";
 import { captureOrgCommitmentAuthority } from "../org/orgPublication.js";
 import { verifyAuditorSignatureBytes } from "../org/orgSignatureBytes.js";
 import { withControlFileLock } from "../lifecycle/controlFileLock.js";
-import { orgSignatureSchema } from "../org/orgSchema.js";
 import { sha256Hex } from "../utils/hash.js";
 import { NATIVE_EXTENSION_LIMITS, NativeExtensionError, parseNativeExtensionManifest, type NativeExtensionManifest } from "./nativeExtensionManifest.js";
 
@@ -71,11 +70,11 @@ function readBounded(root: string, file: string, limit: number): Buffer {
   } finally { closeSync(fd); }
 }
 
-function verifySignature(workspace: string, bytes: Buffer, digest: string): boolean {
+/** Fixed BUNDLE over raw body bytes; sidecar parsing keeps original fatal UTF-8 and optional leading BOM semantics. */
+function verifySignature(workspace: string, path: string, body: Buffer, sidecar: Buffer): boolean {
   try {
-    const signed = orgSignatureSchema.parse(JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes)));
-    if (signed.digestSha256 !== digest) return false;
-    return verifySignedDigest({ workspace, digestHex: digest, signed: { signature: signed.signature, envelope: signed.envelope } });
+    const signatureText = new TextDecoder("utf-8", { fatal: true }).decode(sidecar);
+    return verifyPluginSignedBytes(workspace, relative(workspace, path), "BUNDLE", body, Buffer.from(signatureText, "utf8")).valid;
   } catch { return false; }
 }
 
@@ -120,7 +119,7 @@ export function readNativeExtension(options: {
     catch (error) {
       if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
     }
-    const signatureValid = signatureBytes !== null && verifySignature(workspace, signatureBytes, manifestDigest);
+    const signatureValid = signatureBytes !== null && verifySignature(workspace, manifestPath, manifestBytes, signatureBytes);
     if (options.requireSignature !== false && !signatureValid) refused("SIGNATURE_INVALID", "The extension has no valid signature from this AMC workspace's admitted signing authority. Inspect and explicitly sign it before loading.");
     return { workspace, root, manifestPath, manifestDigest, manifest, signatureValid, totalContentBytes, contents, manifestBytes, signatureBytes };
   } catch (error) {
