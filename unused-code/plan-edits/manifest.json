@@ -416,6 +416,13 @@
       "sha256": "fd2f2d0e55dc53e0470beecd438d5fac9f944beb60f590eb4713e88bee04ca9f"
     },
     {
+      "path": "src/mechanic/simulator.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/mechanic/simulator.ts.landed",
+      "sha256": "2c6ba7d0eff5f0d1b3fa18c573dfaf4f6cfa71796364840ff39f699654d138cb"
+    },
+    {
       "path": "src/mechanic/targetsStore.ts",
       "issue": "P0-28",
       "baseCommit": "d6184fee3320635c8ca606aa2454b8dc27596111",
