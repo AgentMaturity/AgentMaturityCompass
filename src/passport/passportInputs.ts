@@ -20,7 +20,9 @@ import { valueSnapshotLatestPath } from "../value/valueStore.js";
 import { physicalPathWithMissingSuffix } from "../utils/pathSafety.js";
 import { canonicalize } from "../utils/json.js";
 import { collectPassportDataForPublication } from "./passportCollector.js";
-import type { PassportPolicy } from "./passportPolicySchema.js";
+import { defaultPassportPolicy, type PassportPolicy } from "./passportPolicySchema.js";
+import { questionBank } from "../diagnostic/questionBank.js";
+import { passportLatestCachePath, passportPolicyPath } from "./passportStore.js";
 
 function benchCandidates(root: string): string[] {
   try { return readdirSync(root, { withFileTypes: true }).flatMap(entry => entry.isDirectory() ? benchCandidates(join(root, entry.name))
@@ -54,13 +56,11 @@ export function capturePassportCollection(params: { workspace: string; scopeType
   const local = collectPassportDataForPublication(input, generatedTs), original = canonicalize(local);
   const knownInputPaths = [...selected, promptPolicyPath(input.workspace), `${promptPolicyPath(input.workspace)}.sig`, ...proofState.keys()];
   // Actual caller authority remains in its negative callback. Protect these source paths against outputs without a raw authority/session inventory CAS.
-  const authorityPaths = ["mode.json", "users.yaml", "users.yaml.sig", "keys/session.pub", "keys/session_ed25519.pub", "keys/session_history.json", "keys/config-signature.pub", "keys/config-signature_history.json"]
-    .map(path => join(input.workspace, ".amc", path));
+  const authorityPaths = callerAuthorityPaths(input.workspace);
   const sessionsRoot = join(input.workspace, ".amc", "studio", "sessions"), defaultAgentRoot = join(input.workspace, ".amc", "agents", "default");
-  const roots = [benchExportsDir(input.workspace), agentPaths.runsDir, defaultAgentRoot, sessionsRoot];
-  const physicalInputs = new Map([...new Set([...knownInputPaths, ...authorityPaths, ...roots])].map(path => [path, physicalPathWithMissingSuffix(path)]));
-  const assertPhysicalInputs = () => { for (const [path, expected] of physicalInputs) if (physicalPathWithMissingSuffix(path) !== expected)
-    throw new Error("passport protected input or namespace physical selection changed while signing"); };
+  const roots = inputNamespaceRoots(input.workspace, agentPaths);
+  const physicalSelection = capturePhysicalInputs([...knownInputPaths, ...authorityPaths, ...roots]);
+  const physicalInputs = physicalSelection.paths, assertPhysicalInputs = physicalSelection.assertCurrent;
   let physicalOutputs: ReadonlyMap<string, string> | null = null;
   const assertCurrent = () => {
     assertPhysicalInputs();
@@ -101,4 +101,54 @@ export function capturePassportCollection(params: { workspace: string; scopeType
     for (let i = 0; i < targets.members.length; i += 1) for (let j = i + 1; j < targets.members.length; j += 1)
       if (targets.members[i]!.identity !== null && targets.members[i]!.identity === targets.members[j]!.identity) throw new Error("passport destinations share an existing identity");
   } };
+}
+
+function callerAuthorityPaths(workspace: string) {
+  return ["mode.json", "users.yaml", "users.yaml.sig", "keys/session.pub", "keys/session_ed25519.pub", "keys/session_history.json", "keys/config-signature.pub", "keys/config-signature_history.json"]
+    .map(path => join(workspace, ".amc", path));
+}
+function inputNamespaceRoots(workspace: string, agentPaths: ReturnType<typeof getAgentPaths>) {
+  return [benchExportsDir(workspace), agentPaths.runsDir, join(workspace, ".amc", "agents", "default"), join(workspace, ".amc", "studio", "sessions")];
+}
+function capturePhysicalInputs(paths: readonly string[]) {
+  const selected = new Map([...new Set(paths)].map(path => [path, physicalPathWithMissingSuffix(path)]));
+  return { paths: selected, assertCurrent() { for (const [path, expected] of selected) if (physicalPathWithMissingSuffix(path) !== expected)
+    throw new Error("passport protected input or namespace physical selection changed while signing"); } };
+}
+/** Preparation-only AGENT negative: the actual default loader owns exactly its policy pair transition. */
+export function capturePassportBadgeBeforeDefault(workspace: string, agentId: string): () => void {
+  const scopeId = agentId.trim() || "default", policy = defaultPassportPolicy(), policyPath = passportPolicyPath(workspace);
+  const selectedPaths = () => usedPaths(workspace, "AGENT", scopeId, policy).filter(path => path !== policyPath && path !== `${policyPath}.sig`);
+  const selected = selectedPaths(), raw = captureOrgFiles(selected), originalAgentPaths = getAgentPaths(workspace, scopeId), agentPaths = canonicalize(originalAgentPaths);
+  const proof = captureTransparencyState(workspace, true), questionCount = questionBank.length;
+  const physical = capturePhysicalInputs([...selected, promptPolicyPath(workspace), `${promptPolicyPath(workspace)}.sig`, ...proof.keys(), ...callerAuthorityPaths(workspace), ...inputNamespaceRoots(workspace, originalAgentPaths)]);
+  const assertCurrent = () => {
+    physical.assertCurrent();
+    if (questionBank.length !== questionCount) throw new Error("passport original question-count fallback changed before creation transfer");
+    if (JSON.stringify(selectedPaths()) !== JSON.stringify(selected) || canonicalize(getAgentPaths(workspace, scopeId)) !== agentPaths)
+      throw new Error("passport original non-policy input selection changed before creation transfer");
+    assertOrgPairsCurrent(raw); assertTransparencyStateCurrent(proof); assertOrgPairsCurrent(raw);
+  };
+  assertCurrent(); return assertCurrent;
+}
+/** Fixed share-PDF aliases only; cached reads gain no collection, valid-policy or signer requirement. */
+export function capturePassportSharePdfAliases(workspace: string, agentId: string, outFile: string): () => void {
+  const cache = passportLatestCachePath(workspace, "AGENT", agentId.trim() || "default"), policy = passportPolicyPath(workspace);
+  const inputs = [cache, policy, `${policy}.sig`], authorities = callerAuthorityPaths(workspace), sessions = join(workspace, ".amc", "studio", "sessions");
+  const physical = capturePhysicalInputs([...inputs, ...authorities, sessions]), destination = physicalPathWithMissingSuffix(outFile);
+  const assertCurrent = () => {
+    physical.assertCurrent();
+    if (physicalPathWithMissingSuffix(outFile) !== destination) throw new Error("passport share PDF physical destination changed");
+    const relativeSession = relative(physical.paths.get(sessions)!, destination);
+    if (relativeSession === "" || (!isAbsolute(relativeSession) && relativeSession !== ".." && !relativeSession.startsWith(`..${sep}`)))
+      throw new Error("passport share PDF enters the actual Studio session authority namespace");
+    if ([...inputs, ...authorities].some(path => resolve(path) === resolve(outFile) || physical.paths.get(path) === destination))
+      throw new Error("passport share PDF aliases a consumed or caller authority input");
+    const target = captureOrgFiles([outFile]).members[0]!;
+    const identities = [...inputs, ...authorities].flatMap(path => { try { const row = statSync(path); return [`${row.dev}:${row.ino}`]; }
+      catch (cause) { if ((cause as NodeJS.ErrnoException).code === "ENOENT") return []; throw cause; } });
+    if (target.identity !== null && identities.includes(target.identity)) throw new Error("passport share PDF hardlinks a consumed or caller authority input");
+    physical.assertCurrent();
+  };
+  assertCurrent(); return assertCurrent;
 }

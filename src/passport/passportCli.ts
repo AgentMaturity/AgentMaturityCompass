@@ -2,6 +2,9 @@ import { escapePdfText as escapeSharedPdfText, renderPdfFromLines as renderShare
 import { assertOwnerMode } from "../mode/mode.js";
 import { captureOrgFiles, assertOrgPairsCurrent, orgPairBytes } from "../org/preparedOrgPairs.js";
 import { passportPolicyPath } from "./passportStore.js";
+import { capturePassportShareRead } from "./passportLazyReads.js";
+import { PassportPublicationError, passportPublicationFailure, type PassportPublicationOptions } from "./passportPublication.js";
+import { passportBadgeAttemptForApiAsync } from "./passportApi.js";
 import { passportPolicyForApiAsync, passportPolicyApplyForApiAsync, passportCreateForApiAsync } from "./passportApi.js";
 import { dirname, join, resolve } from "node:path";
 import YAML from "yaml";
@@ -165,14 +168,15 @@ export function passportExportLatestCli(params: {
   });
 }
 
-export function passportShareCli(params: {
-  workspace: string;
-  agentId: string;
-  format: "url" | "qr" | "json" | "pdf";
-  baseUrl?: string;
-  outFile?: string;
-}) {
-  const passport = loadOrCreateAgentPassport(params.workspace, params.agentId);
+type PassportShareRequest = {
+  workspace: string; agentId: string; format: "url" | "qr" | "json" | "pdf"; baseUrl?: string; outFile?: string;
+};
+export function passportShareCli(params: PassportShareRequest) {
+  return presentPassportShare(params, loadOrCreateAgentPassport(params.workspace, params.agentId));
+}
+
+function presentPassportShare(params: PassportShareRequest, passport: ReturnType<typeof inspectPassportArtifact>["passport"],
+  pending?: { state: SharePdfState; assertCurrent(): void }) {
   const publicUrl = passportPublicUrlForApi({
     passportId: passport.passportId,
     baseUrl: params.baseUrl
@@ -229,7 +233,10 @@ export function passportShareCli(params: {
     params.workspace,
     params.outFile ?? join(".amc", "passport", "share", params.agentId, `${passport.passportId}.pdf`)
   );
+  if (pending) { if (outFile !== pending.state.file) throw new Error("passport share PDF destination changed");
+    pending.assertCurrent(); assertSharePdfCurrent(pending.state); pending.state.directoryAttempted = true; }
   ensureDir(dirname(outFile));
+  if (pending) pending.state.directoryReturned = true;
   const lines = [
     "AMC Passport Share Certificate",
     `Generated: ${new Date().toISOString()}`,
@@ -246,7 +253,12 @@ export function passportShareCli(params: {
     `Verify URL: ${verificationUrl}`,
     `QR URL: ${qr.qrCodeUrl}`
   ];
-  writeFileAtomic(outFile, renderPdfFromLines(lines), 0o644);
+  const bytes = renderPdfFromLines(lines);
+  if (pending) { pending.assertCurrent(); assertSharePdfCurrent(pending.state); pending.state.writeAttempted = true; }
+  writeFileAtomic(outFile, bytes, 0o644);
+  if (pending) { pending.state.writeReturned = true; const own = captureOrgFiles([outFile]), member = own.members[0]!;
+    if (member.mode !== 0o644 || member.bytes === null || !member.bytes.equals(bytes)) throw new Error("passport share PDF differs from exact returned-write bytes or mode");
+    pending.state.expected = own; pending.assertCurrent(); assertSharePdfCurrent(pending.state); }
   return {
     format: "pdf" as const,
     agentId: params.agentId,
@@ -321,4 +333,36 @@ export async function passportPolicyApplyCliAsync(params: Parameters<typeof pass
 export async function passportCreateCliAsync(params: Parameters<typeof passportCreateCli>[0]) {
   const input = { ...params }, beforePublish = () => assertPassportCliOwner(input.workspace, "passport create"); beforePublish();
   return passportCreateForApiAsync({ workspace: input.workspace, scopeType: input.scope.toUpperCase(), scopeId: input.id, outFile: resolve(input.workspace, input.outFile) }, { beforePublish });
+}
+
+interface SharePdfState {
+  file: string; aliases(): void; expected: ReturnType<typeof captureOrgFiles>;
+  directoryAttempted: boolean; directoryReturned: boolean; writeAttempted: boolean; writeReturned: boolean;
+}
+function captureSharePdfState(file: string, aliases: () => void): SharePdfState {
+  aliases(); return { file, aliases, expected: captureOrgFiles([file]), directoryAttempted: false, directoryReturned: false, writeAttempted: false, writeReturned: false };
+}
+function assertSharePdfCurrent(state: SharePdfState) { state.aliases(); assertOrgPairsCurrent(state.expected); }
+export async function passportBadgeCliAsync(params: Parameters<typeof passportBadgeCli>[0]) {
+  return passportBadgeAttemptForApiAsync({ ...params });
+}
+/** Fixed maintained share attempt; compare and direct export retain their synchronous recipes. */
+export async function passportShareCliAsync(params: Parameters<typeof passportShareCli>[0], options: PassportPublicationOptions = {}) {
+  const input = { ...params }, pending = capturePassportShareRead(input, { ...options });
+  const pdf = pending.pdfPath === null ? null : captureSharePdfState(pending.pdfPath, pending.pdfAliases!);
+  let actual: Awaited<ReturnType<typeof pending.read>> | null = null;
+  const failed = (cause: unknown) => {
+    const nested = cause instanceof PassportPublicationError ? cause : null;
+    const failure = passportPublicationFailure(input.workspace, "share-presentation", [...(actual?.publishedPaths ?? []), ...(pdf?.writeReturned ? [pdf.file] : [])], actual?.createdDirectories ?? [],
+      pdf?.writeAttempted ? pdf.file : null, cause, actual?.createdHash ?? nested?.createdHash ?? null, actual?.exportedHash ?? nested?.exportedHash ?? null,
+      actual === null || (actual?.sharedProgressUnknown ?? false) || (pdf?.directoryAttempted ?? false) || (nested?.sharedProgressUnknown ?? false));
+    return Object.assign(failure, { policyAttempted: actual?.policyAttempted ?? false, policyReturned: actual?.policyReturned ?? false, pdfDirectoryAttempted: pdf?.directoryAttempted ?? false, pdfDirectoryReturned: pdf?.directoryReturned ?? false,
+      pdfWriteAttempted: pdf?.writeAttempted ?? false, pdfWriteReturned: pdf?.writeReturned ?? false });
+  };
+  try {
+    actual = await pending.read(); actual.assertCurrent();
+    const result = presentPassportShare(input, actual.passport, pdf === null ? undefined : { state: pdf, assertCurrent: actual.assertCurrent });
+    const current = () => { actual!.assertCurrent(); if (pdf !== null) assertSharePdfCurrent(pdf); }; current();
+    return Object.freeze({ result, assertCurrent() { try { current(); } catch (cause) { throw failed(cause); } } });
+  } catch (cause) { throw failed(cause); }
 }

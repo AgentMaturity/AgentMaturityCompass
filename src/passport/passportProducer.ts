@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import YAML from "yaml";
 import { benchProofFileBytes } from "../bench/benchProofs.js";
-import { assertOrgPairsCurrent, captureOrgPairs, orgPairBytes, captureOrgPairsAuthority } from "../org/preparedOrgPairs.js";
+import { assertOrgPairsCurrent, captureOrgFiles, captureOrgPairs, orgPairBytes, captureOrgPairsAuthority } from "../org/preparedOrgPairs.js";
 import { verifyAuditorSignatureBytes } from "../org/orgSignatureBytes.js";
 import { loadPromptPolicyAttemptAsync, promptPolicyPath } from "../prompt/promptPolicyStore.js";
 import { appendTransparencyEntryAttemptAsync, captureWorkspaceLogAuthority } from "../transparency/asyncWorkspaceAppend.js";
@@ -12,7 +12,7 @@ import { cleanupDir } from "../utils/archiveFiles.js";
 import { ensureDir, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
-import { passportArchiveMemberBytes, tarCreateDeterministic, type PassportCreateResult } from "./passportArtifact.js";
+import { defaultPassportExportPath, passportArchiveMemberBytes, tarCreateDeterministic, type PassportCreateResult } from "./passportArtifact.js";
 import { capturePassportCollection } from "./passportInputs.js";
 import { passportPolicySchema } from "./passportPolicySchema.js";
 import { buildPassportProofs } from "./passportProofs.js";
@@ -23,9 +23,9 @@ import { passportLatestCachePath, passportPolicyPath, preparePassportCacheAsync 
 import { capturePassportDirectories, capturePassportFiles, passportRequiredDirectories, passportPublicationFailure, type PassportPublicationOptions } from "./passportPublication.js";
 
 /** Actual ordinary artifact constructor; approval-gated sharing/export consumers stay on their existing held path. */
-export async function createPassportArtifactAttemptAsync(input: {
+function captureArtifactCreation(input: {
   workspace: string; scopeType: "WORKSPACE" | "NODE" | "AGENT"; scopeId?: string; outFile: string;
-}, options: PassportPublicationOptions = {}) {
+}, options: PassportPublicationOptions, sharePdf?: { agentId: string; outFile?: string }) {
   const params = structuredClone(input), caller = { ...options }, workspace = params.workspace;
   caller.beforePublish?.(); caller.assertInputsCurrent?.();
   const original = captureOrgPairsAuthority(workspace), logAuthority = captureWorkspaceLogAuthority(workspace);
@@ -41,11 +41,14 @@ export async function createPassportArtifactAttemptAsync(input: {
   const collection = capturePassportCollection({ workspace, scopeType: params.scopeType, scopeId, policy }, Date.now());
   const promptBefore = captureOrgPairs([promptPolicyPath(workspace)]), promptWasMissing = orgPairBytes(promptBefore, promptPolicyPath(workspace)) === null;
   const proofRecipe = benchProofFileBytes(buildPassportProofs({ workspace, includeEventKinds: collection.local.includedEventKinds }));
-  collection.assertCurrent(); collection.assertProofCurrent(); collection.assertNoOutputAliases(destinations);
+  collection.assertCurrent(); collection.assertProofCurrent(); if (sharePdf === undefined) collection.assertNoOutputAliases(destinations);
   const passport = passportJsonSchema.parse({ ...collection.local.passport, proofBindings: {
     ...collection.local.passport.proofBindings, calculationManifestSha256: sha256Hex(canonicalize(collection.local.calculationManifest)),
     transparencyRootSha256: proofRecipe.transparencyRootSha256, merkleRootSha256: proofRecipe.merkleRootSha256, includedEventProofIds: proofRecipe.proofIds
   } });
+  const pdfPath = sharePdf === undefined ? null : resolve(workspace, sharePdf.outFile ?? join(".amc", "passport", "share", sharePdf.agentId, `${passport.passportId}.pdf`));
+  const pdfBefore = pdfPath === null ? null : captureOrgFiles([pdfPath]);
+  if (pdfPath !== null) { destinations.push(pdfPath); collection.assertNoOutputAliases(destinations); }
   const piiScan = passportPiiScanSchema.parse(scanPassportForPii(passport));
   if (piiScan.status !== "PASS") throw new Error("passport pii scan failed after proof binding");
   let promptCurrent: (() => void) | null = null, signatureCurrent: (() => void) | null = null, proofSelected = true;
@@ -58,58 +61,75 @@ export async function createPassportArtifactAttemptAsync(input: {
     files.assertCurrent(); directories.assertCurrent();
   };
   const stable = () => { base(); promptCurrent?.(); signatureCurrent?.(); collection.assertCurrent(); files.assertCurrent(); directories.assertCurrent(); };
-  stable();
-  const knownPaths: string[] = []; let phase = "preparation", createdHash: string | null = null, exportedHash: string | null = null;
-  try {
-    // Preserve the genuine default initializer, not a substitute policy or a fresh winner after an earlier wait.
-    if (promptWasMissing) {
-      phase = "prompt-initialization";
-      const prompt = await loadPromptPolicyAttemptAsync(workspace, { beforePublish: base }, promptBefore);
-      knownPaths.push(promptPolicyPath(workspace), `${promptPolicyPath(workspace)}.sig`); promptCurrent = prompt.assertCurrent;
-    } else promptCurrent = () => assertOrgPairsCurrent(promptBefore);
+  let used = false;
+  return Object.freeze({ pdfPath, assertCurrent() { stable(); if (pdfBefore !== null) assertOrgPairsCurrent(pdfBefore); }, async create() {
+    if (used) throw new Error("passport creation attempt was already consumed"); used = true;
+    if (pdfBefore !== null) assertOrgPairsCurrent(pdfBefore);
     stable();
-    phase = "preparation";
-    const signed = await preparePassportJsonSignatureAsync(workspace, passport, stable);
-    signatureCurrent = signed.assertCurrent;
-    const cache = await preparePassportCacheAsync({ workspace, scopeType: params.scopeType, scopeId, passport }, { beforePublish: stable }, cacheBefore);
-    const beforeMember = () => { cache.assertCurrent(); collection.assertCurrent(); files.assertCurrent(); directories.assertCurrent(); };
-    beforeMember(); assertOrgPairsCurrent(cacheBefore);
-    const signerPub = signed.signature.envelope ? Buffer.from(signed.signature.envelope.pubkeyB64, "base64").toString("utf8") : "";
-    if (!signerPub) throw new Error("prepared passport signature has no actual signer public key");
-    const archiveBytes = privatePassportArchiveBytes([...proofRecipe.files,
-      ...passportArchiveMemberBytes({ passport, signature: signed.signature, piiScan, signerPub, collected: collection.local })]);
-    beforeMember(); assertOrgPairsCurrent(cacheBefore);
-    const sha256 = sha256Hex(archiveBytes);
-    phase = "directories"; directories.create(() => { beforeMember(); assertOrgPairsCurrent(cacheBefore); });
-    phase = "artifact-members";
-    files.publish([{ path: outFile, bytes: archiveBytes }, { path: `${outFile}.sha256`, bytes: Buffer.from(`${sha256}\n`) }], () => { beforeMember(); assertOrgPairsCurrent(cacheBefore); });
-    knownPaths.push(...files.published);
-    phase = "cache-pair"; const saved = cache.publish()[0]!; knownPaths.push(saved.path, saved.sigPath);
-    const finalOutputs = () => { beforeMember(); };
-    finalOutputs();
-    const artifact = { kind: "amcpass" as const, sha256, id: passport.passportId }, agentId = params.scopeType === "AGENT" ? scopeId : "workspace";
-    // Old proof/predecessor CAS belongs only to preparation, never to this append's own member progression.
-    proofSelected = false;
-    phase = "created-log";
-    const created = await appendTransparencyEntryAttemptAsync({ workspace, type: "PASSPORT_CREATED", agentId, artifact }, {
-      beforeCommit() { finalOutputs(); collection.assertProofCurrent(); }, beforeMember: finalOutputs
-    });
-    createdHash = created.entry.hash;
-    phase = "exported-log";
-    const exported = await appendTransparencyEntryAttemptAsync({ workspace, type: "PASSPORT_EXPORTED", agentId, artifact }, {
-      beforeCommit() { finalOutputs(); created.assertCurrent(); }, beforeMember: finalOutputs
-    });
-    exportedHash = exported.entry.hash; finalOutputs(); exported.assertCurrent();
-    const result: PassportCreateResult = { outFile, sha256, passport, signature: signed.signature, piiScan, cachePath: saved.path, cacheSigPath: saved.sigPath,
-      transparencyCreatedHash: createdHash, transparencyExportedHash: exportedHash };
-    return Object.freeze({ result, assertCurrent() { finalOutputs(); exported.assertCurrent(); },
-      publishedPaths: Object.freeze([...knownPaths]), createdDirectories: Object.freeze([...directories.created]) });
-  } catch (cause) {
-    if (cause instanceof TransparencyMerkleLagError) { if (phase === "created-log") createdHash = cause.entryHash; if (phase === "exported-log") exportedHash = cause.entryHash; }
-    if (knownPaths.length === 0 && directories.created.length === 0 && files.published.length === 0 && phase === "preparation") throw cause;
-    throw passportPublicationFailure(workspace, phase, [...knownPaths, ...files.published], directories.created, null, cause, createdHash, exportedHash,
-      phase === "prompt-initialization");
-  }
+    const knownPaths: string[] = []; let phase = "preparation", createdHash: string | null = null, exportedHash: string | null = null;
+    try {
+      // Preserve the genuine default initializer, not a substitute policy or a fresh winner after an earlier wait.
+      if (promptWasMissing) {
+        phase = "prompt-initialization";
+        const prompt = await loadPromptPolicyAttemptAsync(workspace, { beforePublish: base }, promptBefore);
+        knownPaths.push(promptPolicyPath(workspace), `${promptPolicyPath(workspace)}.sig`); promptCurrent = prompt.assertCurrent;
+      } else promptCurrent = () => assertOrgPairsCurrent(promptBefore);
+      stable();
+      phase = "preparation";
+      const signed = await preparePassportJsonSignatureAsync(workspace, passport, stable);
+      signatureCurrent = signed.assertCurrent;
+      const cache = await preparePassportCacheAsync({ workspace, scopeType: params.scopeType, scopeId, passport }, { beforePublish: stable }, cacheBefore);
+      const beforeMember = () => { cache.assertCurrent(); collection.assertCurrent(); files.assertCurrent(); directories.assertCurrent(); };
+      beforeMember(); assertOrgPairsCurrent(cacheBefore);
+      const signerPub = signed.signature.envelope ? Buffer.from(signed.signature.envelope.pubkeyB64, "base64").toString("utf8") : "";
+      if (!signerPub) throw new Error("prepared passport signature has no actual signer public key");
+      const archiveBytes = privatePassportArchiveBytes([...proofRecipe.files,
+        ...passportArchiveMemberBytes({ passport, signature: signed.signature, piiScan, signerPub, collected: collection.local })]);
+      beforeMember(); assertOrgPairsCurrent(cacheBefore);
+      const sha256 = sha256Hex(archiveBytes);
+      phase = "directories"; directories.create(() => { beforeMember(); assertOrgPairsCurrent(cacheBefore); });
+      phase = "artifact-members";
+      files.publish([{ path: outFile, bytes: archiveBytes }, { path: `${outFile}.sha256`, bytes: Buffer.from(`${sha256}\n`) }], () => { beforeMember(); assertOrgPairsCurrent(cacheBefore); });
+      knownPaths.push(...files.published);
+      phase = "cache-pair"; const saved = cache.publish()[0]!; knownPaths.push(saved.path, saved.sigPath);
+      const finalOutputs = () => { beforeMember(); };
+      finalOutputs();
+      const artifact = { kind: "amcpass" as const, sha256, id: passport.passportId }, agentId = params.scopeType === "AGENT" ? scopeId : "workspace";
+      // Old proof/predecessor CAS belongs only to preparation, never to this append's own member progression.
+      proofSelected = false;
+      phase = "created-log";
+      const created = await appendTransparencyEntryAttemptAsync({ workspace, type: "PASSPORT_CREATED", agentId, artifact }, {
+        beforeCommit() { finalOutputs(); collection.assertProofCurrent(); }, beforeMember: finalOutputs
+      });
+      createdHash = created.entry.hash;
+      phase = "exported-log";
+      const exported = await appendTransparencyEntryAttemptAsync({ workspace, type: "PASSPORT_EXPORTED", agentId, artifact }, {
+        beforeCommit() { finalOutputs(); created.assertCurrent(); }, beforeMember: finalOutputs
+      });
+      exportedHash = exported.entry.hash; finalOutputs(); exported.assertCurrent();
+      const result: PassportCreateResult = { outFile, sha256, passport, signature: signed.signature, piiScan, cachePath: saved.path, cacheSigPath: saved.sigPath,
+        transparencyCreatedHash: createdHash, transparencyExportedHash: exportedHash };
+      return Object.freeze({ result, assertCurrent() { finalOutputs(); exported.assertCurrent(); },
+        publishedPaths: Object.freeze([...knownPaths]), createdDirectories: Object.freeze([...directories.created]) });
+    } catch (cause) {
+      if (cause instanceof TransparencyMerkleLagError) { if (phase === "created-log") createdHash = cause.entryHash; if (phase === "exported-log") exportedHash = cause.entryHash; }
+      if (knownPaths.length === 0 && directories.created.length === 0 && files.published.length === 0 && phase === "preparation") throw cause;
+      throw passportPublicationFailure(workspace, phase, [...knownPaths, ...files.published], directories.created, null, cause, createdHash, exportedHash,
+        phase === "prompt-initialization");
+    }
+  } });
+}
+/** Genuine fixed ordinary capture; no parsed collection or supplied signer can replace its closed state. */
+export function capturePassportArtifactCreation(input: Parameters<typeof captureArtifactCreation>[0], options: PassportPublicationOptions = {}) {
+  return captureArtifactCreation(input, options);
+}
+/** Fixed AGENT share-PDF capture; the real private passport ID selects its one additional presentation output. */
+export function capturePassportSharePdfCreation(workspace: string, agentId: string, outFile: string | undefined, options: PassportPublicationOptions = {}) {
+  const scopeId = agentId.trim() || "default", archive = defaultPassportExportPath({ workspace, scopeType: "AGENT", scopeId });
+  return captureArtifactCreation({ workspace, scopeType: "AGENT", scopeId, outFile: resolve(workspace, archive) }, options, { agentId, outFile });
+}
+export async function createPassportArtifactAttemptAsync(input: Parameters<typeof captureArtifactCreation>[0], options: PassportPublicationOptions = {}) {
+  return capturePassportArtifactCreation(input, options).create();
 }
 
 export async function createPassportArtifactAsync(input: Parameters<typeof createPassportArtifactAttemptAsync>[0], options: PassportPublicationOptions = {}): Promise<PassportCreateResult> {

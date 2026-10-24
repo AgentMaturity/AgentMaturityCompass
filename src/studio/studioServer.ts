@@ -384,7 +384,6 @@ import {
 import { promptPolicySchema } from "../prompt/promptPolicySchema.js";
 import { emitPromptPackSse } from "../prompt/promptPackSse.js";
 import {
-  passportBadgeForApi,
   passportCacheLatestForApi,
   passportCreateAttemptForApiAsync,
   passportExportExecuteForApi,
@@ -400,6 +399,7 @@ import {
 import { verifyPassportPolicySignature } from "../passport/passportStore.js";
 import { passportPublicationFailure } from "../passport/passportPublication.js";
 import { emitPassportSse } from "../passport/passportSse.js";
+import { handleStudioPassportBadge } from "./passportBadgeRead.js";
 import {
   standardGenerateForApiAsync as standardGenerateForApi,
   standardSchemaReadForApi,
@@ -5251,27 +5251,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/passport/badge" && req.method === "GET") {
-        if (auth.agentId) {
-          const badge = passportBadgeForApi({
-            workspace: options.workspace,
-            agentId: auth.agentId
-          });
-          json(res, 200, {
-            badge: badge.badge
-          });
-          return;
-        }
-        if (!requireRouteRoles(["VIEWER", "OPERATOR", "AUDITOR", "OWNER"])) {
-          return;
-        }
-        const agentId = resolveAgentId(options.workspace, url.searchParams.get("agentId") ?? "default");
-        const badge = passportBadgeForApi({
-          workspace: options.workspace,
-          agentId
-        });
-        json(res, 200, {
-          badge: badge.badge
-        });
+        await handleStudioPassportBadge({ req, res, url, options, auth, authenticate, requireRoles, json });
         return;
       }
 

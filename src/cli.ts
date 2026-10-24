@@ -776,14 +776,14 @@ import {
   promptVerifyCli
 } from "./prompt/promptPackCli.js";
 import {
-  passportBadgeCli,
+  passportBadgeCliAsync as passportBadgeCli,
   passportCompareCli,
   passportCreateCliAsync as passportCreateCli,
   passportExportLatestCli,
   passportInitCliAsync as passportInitCli,
   passportPolicyApplyCliAsync as passportPolicyApplyCli,
   passportPolicyPrintCli,
-  passportShareCli,
+  passportShareCliAsync as passportShareCli,
   passportShowCli,
   passportVerifyCli,
   passportVerifyPolicyCli
@@ -8879,14 +8879,15 @@ passport
   .description("Print deterministic single-line badge from latest cache")
   .requiredOption("--scope <scope>", "agent")
   .requiredOption("--id <agentId>", "agent id")
-  .action((opts: { scope: string; id: string }) => {
+  .action(async (opts: { scope: string; id: string }) => {
     if (opts.scope.toLowerCase() !== "agent") {
       throw new Error("badge currently supports --scope agent only");
     }
-    const out = passportBadgeCli({
+    const attempt = await passportBadgeCli({
       workspace: process.cwd(),
       agentId: resolveAgentId(process.cwd(), opts.id)
     });
+    attempt.assertCurrent(); const out = attempt.result;
     console.log(out.badge);
     printClaimResult(unverifiedClaim("passport:badge", 1), { stderr: true });
   });
@@ -8923,18 +8924,19 @@ passport
   .requiredOption("--format <format>", "url|qr|json|pdf")
   .option("--base-url <url>", "public base URL", "http://localhost:8787")
   .option("--out <path>", "output file path for pdf format")
-  .action((opts: { agent: string; format: string; baseUrl: string; out?: string }) => {
+  .action(async (opts: { agent: string; format: string; baseUrl: string; out?: string }) => {
     const format = opts.format.toLowerCase();
     if (format !== "url" && format !== "qr" && format !== "json" && format !== "pdf") {
       throw new Error("format must be url|qr|json|pdf");
     }
-    const out = passportShareCli({
+    const attempt = await passportShareCli({
       workspace: process.cwd(),
       agentId: resolveAgentId(process.cwd(), opts.agent),
       format: format as "url" | "qr" | "json" | "pdf",
       baseUrl: opts.baseUrl,
       outFile: opts.out
     });
+    attempt.assertCurrent(); const out = attempt.result;
     const claim = artifactClaim("passport");
     if (format !== "json") printClaimResult(claim, {});
     if (format === "url") {

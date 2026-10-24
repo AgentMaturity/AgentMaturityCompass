@@ -3,6 +3,7 @@ import { captureTransparencyState, assertTransparencyStateCurrent } from "../tra
 import { appendTransparencyEntryAttemptAsync, captureWorkspaceLogAuthority } from "../transparency/asyncWorkspaceAppend.js";
 import { TransparencyMerkleLagError } from "../transparency/merkleIndexState.js";
 import { createPassportArtifactAttemptAsync } from "./passportProducer.js";
+import { capturePassportBadgeRead } from "./passportLazyReads.js";
 import { loadPassportPolicyAttemptAsync, preparePassportPolicyAsync } from "./passportPairPublication.js";
 import { passportPublicationFailure, type PassportPublicationOptions } from "./passportPublication.js";
 import { randomUUID } from "node:crypto";
@@ -347,6 +348,10 @@ export function passportBadgeForApi(params: {
       scopeId: params.agentId
     }).passport;
   }
+  return renderPassportBadge(passport);
+}
+
+function renderPassportBadge(passport: ReturnType<typeof inspectPassportArtifact>["passport"]) {
   const maturity = typeof passport.maturity.overall === "number" ? passport.maturity.overall.toFixed(1) : "UNKNOWN";
   const assurance = typeof passport.checkpoints.lastAssuranceCert.riskAssuranceScore === "number"
     ? String(Math.round(passport.checkpoints.lastAssuranceCert.riskAssuranceScore))
@@ -366,6 +371,18 @@ export function passportBadgeForApi(params: {
     badge,
     passport
   };
+}
+
+/** Internal maintained lazy attempt; presentation never substitutes for its closed actual currentness. */
+export async function passportBadgeAttemptForApiAsync(params: Parameters<typeof passportBadgeForApi>[0], options: PassportPublicationOptions = {}) {
+  const input = { ...params }, pending = capturePassportBadgeRead(input, { ...options }), actual = await pending.read();
+  try {
+    actual.assertCurrent();
+    return Object.freeze({ result: renderPassportBadge(actual.passport), assertCurrent: actual.assertCurrent,
+      publishedPaths: actual.publishedPaths, createdDirectories: actual.createdDirectories, createdHash: actual.createdHash, exportedHash: actual.exportedHash,
+      sharedProgressUnknown: actual.sharedProgressUnknown, policyAttempted: actual.policyAttempted, policyReturned: actual.policyReturned });
+  } catch (cause) { throw Object.assign(passportPublicationFailure(input.workspace, "badge-presentation", actual.publishedPaths, actual.createdDirectories, null,
+    cause, actual.createdHash, actual.exportedHash, actual.sharedProgressUnknown), { policyAttempted: actual.policyAttempted, policyReturned: actual.policyReturned }); }
 }
 
 export function passportExportsForApi(workspace: string) {
