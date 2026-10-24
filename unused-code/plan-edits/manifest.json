@@ -220,6 +220,13 @@
       "sha256": "7d1770ee582af5fa127fcc9831c204c9ad779abc185c8051d5bde208357f2d3c"
     },
     {
+      "path": "src/canon/canonLoader.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/canon/canonLoader.ts.landed",
+      "sha256": "780ddc5faad962980c10ee64a652d5c9e82d1faf8ddea9cee4f6e181b0f42a18"
+    },
+    {
       "path": "src/casebooks/casebookStore.ts",
       "issue": "P1-08",
       "baseCommit": "42dfa8375817abd903bb4357c2ffcc0ce3b7ac74",
@@ -260,6 +267,13 @@
       "baseCommit": "b396249ad8d9ffc9b0b47db2c56464ca86183a4b",
       "archivePath": "unused-code/plan-edits/P0-15/src/demo/prospectDemo.ts.landed",
       "sha256": "af482db8700e0d6067c4084248cd97b11e3c82359da2be4d3a9d49c8cc064e63"
+    },
+    {
+      "path": "src/diagnostic/bank/bankLoader.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/diagnostic/bank/bankLoader.ts.landed",
+      "sha256": "4ce153049c4f1de1cee6a240c03596dc97c2e60574afaca8fec076e99c042703"
     },
     {
       "path": "src/diagnostic/l5DeltaReport.ts",
