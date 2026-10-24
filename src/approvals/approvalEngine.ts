@@ -34,6 +34,7 @@ import {
 } from "./approvalChainStore.js";
 import { evaluateApprovalQuorum, isApprovalInitiator } from "./approvalQuorum.js";
 import { AUTHZ_INTENT_SCHEMA } from "../actions/authorizationRecord.js";
+import { captureApprovalConsumptionEntry, type ApprovalConsumptionOptions } from "./approvalConsumptionPublication.js";
 import { parseUserRoles, type UserRole } from "../auth/roles.js";
 
 export interface ApprovalRequestInput {
@@ -520,6 +521,21 @@ export function consumeApprovedExecution(params: {
     reason: consumed.replay ? "approval already consumed" : "ok",
     consumedTs: consumed.consumed.consumedTs
   };
+}
+
+/** Genuine publisher-owned public capture precedes the audit caller and its normal private warming. */
+export function captureApprovedExecutionConsumptionEntry(workspace: string) {
+  const entry = captureApprovalConsumptionEntry(workspace);
+  return Object.freeze({ assertPublicCurrent: entry.assertPublicCurrent,
+    selectGrant(input: Parameters<typeof verifyApprovalForExecution>[0] & { executionId?: string | null }, options: ApprovalConsumptionOptions = {}) {
+      const selection = Object.freeze(structuredClone(input));
+      const originalExecution = Object.freeze({ ...selection, workspace: entry.workspace });
+      const verifyOriginalExecution = () => {
+        const verified = verifyApprovalForExecution(originalExecution);
+        if (!verified.ok || verified.approval === null) throw new Error("audit fulfillment approval is not executable");
+      };
+      return entry.selectGrant(selection, verifyOriginalExecution, options);
+    } });
 }
 
 export function approvalStatusPayload(params: {
