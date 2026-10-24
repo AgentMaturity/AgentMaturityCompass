@@ -7445,12 +7445,15 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "registryId and benchRef required" });
           return;
         }
+        const initialAuthority = signingAuthority(["OWNER", "OPERATOR"]); let authorityRefused = false;
+        const beforePublish = () => { try { initialAuthority(); } catch (cause) { authorityRefused = true; throw cause; } };
         try {
           const imported = await benchImportForApi({
             workspace: options.workspace,
             registryId: parsed.registryId,
             benchRef: parsed.benchRef
-          });
+          }, { beforePublish });
+          beforePublish();
           writeStudioAuditEvent({
             workspace: options.workspace,
             auditType: "BENCH_IMPORTED",
@@ -7466,6 +7469,9 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           });
           json(res, 200, imported);
         } catch (error) {
+          if (res.headersSent) return;
+          if (authorityRefused) throw error;
+          beforePublish();
           writeStudioAuditEvent({
             workspace: options.workspace,
             auditType: "BENCH_IMPORT_FAILED",
@@ -7477,7 +7483,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             }
           });
           try {
-            await dispatchIntegrationEvent({
+            await dispatchIntegrationEventWithAuthority({
               workspace: options.workspace,
               eventName: "BENCH_IMPORT_FAILED",
               agentId: "workspace",
@@ -7487,11 +7493,13 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
                 benchRef: parsed.benchRef,
                 reason: String(error)
               }
-            });
-          } catch {
-            // best effort integration dispatch
+            }, beforePublish);
+          } catch (deliveryError) {
+            if (res.headersSent) return;
+            if (authorityRefused) throw new Error("bench import failure delivery authority refused", { cause: new AggregateError([error, deliveryError]) });
           }
-          json(res, 400, { error: String(error) });
+          if (res.headersSent) return;
+          beforePublish(); json(res, 400, { error: String(error) });
         }
         return;
       }

@@ -1,3 +1,4 @@
+import { withBenchImportLock } from "./benchImportLock.js";
 import { copyFileSync, readFileSync, readdirSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
 import { z } from "zod";
@@ -5,7 +6,7 @@ import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { containedPath } from "../utils/pathSafety.js";
-import { benchArtifactSchema } from "./benchSchema.js";
+import { benchArtifactSchema, type BenchArtifact } from "./benchSchema.js";
 import {
   benchImportsBenchesDir,
   benchImportsCacheDir
@@ -29,12 +30,12 @@ const importedBenchMetaSchema = z.object({
 
 export type ImportedBenchMeta = z.infer<typeof importedBenchMetaSchema>;
 
-function benchRegistryCachePath(workspace: string, registryId: string): {
+export function benchRegistryCachePath(workspace: string, registryId: string): {
   indexPath: string;
   sigPath: string;
   pubPath: string;
 } {
-  const root = join(benchImportsCacheDir(workspace), registryId);
+  const root = containedPath(benchImportsCacheDir(workspace), "the bench registry cache directory", registryId);
   return {
     indexPath: join(root, "index.json"),
     sigPath: join(root, "index.sig"),
@@ -54,11 +55,13 @@ export function cacheRegistryIndex(params: {
   pubPath: string;
 } {
   const paths = benchRegistryCachePath(params.workspace, params.registryId);
-  ensureDir(dirname(paths.indexPath));
-  writeFileAtomic(paths.indexPath, params.indexRaw, 0o644);
-  writeFileAtomic(paths.sigPath, params.sigRaw, 0o644);
-  writeFileAtomic(paths.pubPath, params.pubRaw, 0o644);
-  return paths;
+  return withBenchImportLock(params.workspace, () => {
+    ensureDir(dirname(paths.indexPath));
+    writeFileAtomic(paths.indexPath, params.indexRaw, 0o644);
+    writeFileAtomic(paths.sigPath, params.sigRaw, 0o644);
+    writeFileAtomic(paths.pubPath, params.pubRaw, 0o644);
+    return paths;
+  });
 }
 
 export function importedBenchPath(workspace: string, benchId: string, version: string): {
@@ -99,12 +102,26 @@ export function storeImportedBench(params: {
   }
   const bench = benchArtifactSchema.parse(verified.bench);
   const target = importedBenchPath(params.workspace, bench.benchId, params.version);
-  ensureDir(target.dir);
-  copyFileSync(resolve(params.file), target.artifactPath);
-  const digest = sha256Hex(readFileSync(target.artifactPath));
-  writeFileAtomic(target.shaPath, `${digest}\n`, 0o644);
-  writeFileAtomic(target.benchJsonPath, JSON.stringify(bench, null, 2), 0o644);
-  const meta = importedBenchMetaSchema.parse({
+  return withBenchImportLock(params.workspace, () => {
+    ensureDir(target.dir);
+    copyFileSync(resolve(params.file), target.artifactPath);
+    const digest = sha256Hex(readFileSync(target.artifactPath));
+    writeFileAtomic(target.shaPath, `${digest}\n`, 0o644);
+    writeFileAtomic(target.benchJsonPath, JSON.stringify(bench, null, 2), 0o644);
+    const meta = buildImportedBenchMeta(params, bench, digest);
+    writeFileAtomic(target.metaPath, `${canonicalize(meta)}\n`, 0o644);
+    return {
+      meta,
+      artifactPath: target.artifactPath,
+      metaPath: target.metaPath
+    };
+  });
+}
+
+/** Existing metadata recipe shared by the actual cache importer; it does not admit or sign keys. */
+export function buildImportedBenchMeta(params: { registryId: string; registryFingerprint: string; signerFingerprint: string; sourceUrl: string; version: string },
+  bench: BenchArtifact, digest: string): ImportedBenchMeta {
+  return importedBenchMetaSchema.parse({
     v: 1,
     benchId: bench.benchId,
     version: params.version,
@@ -117,12 +134,6 @@ export function storeImportedBench(params: {
     sha256: digest,
     sourceUrl: params.sourceUrl
   });
-  writeFileAtomic(target.metaPath, `${canonicalize(meta)}\n`, 0o644);
-  return {
-    meta,
-    artifactPath: target.artifactPath,
-    metaPath: target.metaPath
-  };
 }
 
 export function listImportedBenches(workspace: string): ImportedBenchMeta[] {

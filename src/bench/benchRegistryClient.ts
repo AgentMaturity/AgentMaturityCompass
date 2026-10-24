@@ -1,5 +1,13 @@
+import { captureOrgPairs, orgPairBytes, assertOrgPairsCurrent, type OrgPairsOptions } from "../org/preparedOrgPairs.js";
+import { verifyAuditorSignatureBytes } from "../org/orgSignatureBytes.js";
+import { assertKeysetComplete } from "../keys/keyset.js";
+import { loadTrustConfig } from "../trust/trustConfig.js";
+import { distrustAt, listsAt } from "../trust/admissionRule.js";
+import { captureBenchImportFiles, publishVerifiedBenchImport, BenchImportPublicationError } from "./benchImportPublication.js";
 import { verifyWithKey } from "../keys/algorithmPolicy.js";
-import { readFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import YAML from "yaml";
 import { join, resolve } from "node:path";
 import { getWorkspaceScope } from "../enforce/evidenceEmitter.js";
 import { checkScopedEgress } from "../residency/checkEgress.js";
@@ -9,8 +17,8 @@ import { sha256Hex } from "../utils/hash.js";
 import { pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { verifyBenchArtifactFile } from "./benchVerifier.js";
 import { admitKey, loadTrustContext, untrustedReasons, withPins, type TrustContext } from "../trust/index.js";
-import { cacheRegistryIndex, listImportedBenches, storeImportedBench, type ImportedBenchMeta } from "./benchRegistryStore.js";
-import { benchImportsCacheDir, loadBenchRegistriesConfig, verifyBenchRegistriesSignature } from "./benchPolicyStore.js";
+import { benchRegistryCachePath, importedBenchPath, listImportedBenches, type ImportedBenchMeta } from "./benchRegistryStore.js";
+import { benchImportsCacheDir, benchImportsRegistriesPath, loadBenchRegistriesConfig, loadBenchRegistriesConfigAsync, verifyBenchRegistriesSignature } from "./benchPolicyStore.js";
 
 function isHttp(base: string): boolean {
   return /^https?:\/\//i.test(base);
@@ -189,86 +197,78 @@ export async function importedBenchSigner(workspace: string, meta: ImportedBench
   return signer;
 }
 
-export async function importBenchFromRegistry(params: {
-  workspace: string;
-  registryId: string;
-  benchRef: string;
-}): Promise<{
-  benchId: string;
-  version: string;
-  filePath: string;
-  registryFingerprint: string;
-}> {
-  const { workspace: rawWorkspace, registryId, benchRef } = params;
-  const workspace = typeof rawWorkspace === "string" && rawWorkspace.trim() ? resolve(rawWorkspace) : rawWorkspace;
-  const registry = signedBenchRegistry(workspace, registryId);
-  const base = isHttp(registry.base) ? registry.base : resolve(workspace, registry.base);
-  const fetched = await fetchBenchRegistryIndex(base, workspace);
-  cacheRegistryIndex({
-    workspace,
-    registryId: registry.id,
-    indexRaw: fetched.indexRaw,
-    sigRaw: fetched.sigRaw,
-    pubRaw: fetched.pubRaw
-  });
-  if (registry.pinnedRegistryFingerprint !== fetched.registryFingerprint) {
-    throw new Error("registry fingerprint does not match pinned fingerprint");
-  }
-  const operator = loadTrustContext();
-  admitRegistryKey(fetched.pubRaw, registry.pinnedRegistryFingerprint, operator);
+export async function importBenchFromRegistry(params: { workspace: string; registryId: string; benchRef: string }, options: OrgPairsOptions = {}) {
+  return (await importBenchFromRegistryAttempt(params, options)).result;
+}
 
-  const at = benchRef.lastIndexOf("@");
-  const benchId = at > 0 ? benchRef.slice(0, at) : benchRef;
-  const requestedVersion = at > 0 ? benchRef.slice(at + 1) : "latest";
-  const item = fetched.index.benches.find((row) => row.benchId === benchId);
-  if (!item) {
-    throw new Error(`bench not found in registry: ${benchId}`);
+/** Internal actual API caller retains this attempt through its later workspace-log await; absent from root SDK. */
+export async function importBenchFromRegistryAttempt(params: { workspace: string; registryId: string; benchRef: string }, options: OrgPairsOptions = {}) {
+  const { workspace: rawWorkspace, registryId, benchRef } = params, actor = options.beforePublish, inputs = options.assertInputsCurrent;
+  const workspace = typeof rawWorkspace === "string" && rawWorkspace.trim() ? resolve(rawWorkspace) : rawWorkspace;
+  actor?.(); inputs?.(); const configPath = benchImportsRegistriesPath(workspace);
+  if (!pathExists(configPath)) {
+    await loadBenchRegistriesConfigAsync(workspace, { beforePublish: actor, assertInputsCurrent: inputs }); actor?.(); inputs?.();
+    // Genuine missing initialization creates only the old empty defaults; never adopt a concurrent configured winner.
+    throw new Error(`bench registry not configured: ${registryId}`);
   }
-  if (!registry.allowTrustLabels.includes(item.evidence.trustLabel)) {
-    throw new Error(`bench trust label not allowed by registry policy: ${item.evidence.trustLabel}`);
-  }
-  const selected =
-    requestedVersion === "latest"
-      ? item.versions.slice().sort((a, b) => compareVersions(a.version, b.version)).at(-1)
-      : item.versions.find((row) => row.version === requestedVersion);
-  if (!selected) {
-    throw new Error(`bench version not found: ${benchId}@${requestedVersion}`);
-  }
-  if (registry.allowSignerFingerprints.length > 0 && !registry.allowSignerFingerprints.includes(selected.signerFingerprint)) {
-    throw new Error(`bench signer not allowlisted: ${selected.signerFingerprint}`);
-  }
-  const bytes = await readBytes(fetched.base, selected.url, workspace);
-  const digest = sha256Hex(bytes);
-  if (digest !== selected.sha256) {
-    throw new Error(`bench sha mismatch for ${benchId}@${selected.version}`);
-  }
-  const tmpPath = join(resolve(workspace), ".amc", "bench", "imports", "tmp-import.amcbench");
-  writeFileAtomic(tmpPath, bytes, 0o644);
-  // The signer counts because the pinned registry's signed index names it for this version (P0-09).
-  const trust = withPins(operator, [{ keyId: selected.signerFingerprint, purposes: ["artifact-seal"], origin: `bench registry ${registry.id} index` }]);
-  const verified = verifyBenchArtifactFile({ file: tmpPath, trust });
-  if (!verified.ok) {
-    throw new Error(`bench artifact verify failed: ${untrustedReasons(verified.report).join("; ")}`);
-  }
-  if (registry.requireBenchProofs && verified.bench && verified.bench.proofBindings.includedEventProofIds.length === 0) {
-    throw new Error("bench proofs required by registry policy but artifact has no inclusion proofs");
-  }
-  const stored = storeImportedBench({
-    workspace,
-    registryId: registry.id,
-    registryFingerprint: fetched.registryFingerprint,
-    signerFingerprint: selected.signerFingerprint,
-    sourceUrl: selected.url,
-    version: selected.version,
-    file: tmpPath,
-    trust
-  });
-  return {
-    benchId: stored.meta.benchId,
-    version: stored.meta.version,
-    filePath: stored.artifactPath,
-    registryFingerprint: stored.meta.registryFingerprint
+  const pair = captureOrgPairs([configPath]), body = orgPairBytes(pair, configPath), sidecar = orgPairBytes(pair, `${configPath}.sig`);
+  if (body === null || sidecar === null || !verifyAuditorSignatureBytes(workspace, "BUNDLE", body, sidecar).valid) throw new Error("bench registries config signature invalid");
+  const registry = resolveRegistryFromConfig(benchRegistryConfigSchema.parse(YAML.parse(body.toString("utf8")) as unknown), registryId);
+  const keyset = canonicalize(assertKeysetComplete(workspace)), policy = canonicalize(loadTrustConfig(workspace));
+  const operator = loadTrustContext(), trustState = (value: TrustContext) => canonicalize({ ...value, asOf: null }), originalTrust = trustState(operator);
+  const current = () => { actor?.(); inputs?.();
+    if (canonicalize(assertKeysetComplete(workspace)) !== keyset || canonicalize(loadTrustConfig(workspace)) !== policy) throw new Error("original registry configuration authority changed during import");
+    const now = loadTrustContext(); if (trustState(now) !== originalTrust || now.asOf.getTime() < operator.asOf.getTime()) throw new Error("original registry trust policy or clock changed during import");
+    if (!verifyAuditorSignatureBytes(workspace, "BUNDLE", body, sidecar).valid) throw new Error("captured registry configuration is no longer admitted");
+    assertOrgPairsCurrent(pair); return now;
   };
+  current(); const cachePaths = benchRegistryCachePath(workspace, registry.id), cacheBefore = captureBenchImportFiles(workspace, Object.values(cachePaths));
+  let stage: string | null = null, failure: unknown, completedPaths: readonly string[] = [];
+  try {
+    const base = isHttp(registry.base) ? registry.base : resolve(workspace, registry.base), fetched = await fetchBenchRegistryIndex(base, workspace); current();
+    if (registry.pinnedRegistryFingerprint !== fetched.registryFingerprint) throw new Error("registry fingerprint does not match pinned fingerprint");
+    admitRegistryKey(fetched.pubRaw, registry.pinnedRegistryFingerprint, operator);
+    const at = benchRef.lastIndexOf("@"), benchId = at > 0 ? benchRef.slice(0, at) : benchRef, requestedVersion = at > 0 ? benchRef.slice(at + 1) : "latest";
+    const item = fetched.index.benches.find(row => row.benchId === benchId);
+    if (!item) throw new Error(`bench not found in registry: ${benchId}`);
+    if (!registry.allowTrustLabels.includes(item.evidence.trustLabel)) throw new Error(`bench trust label not allowed by registry policy: ${item.evidence.trustLabel}`);
+    const selected = requestedVersion === "latest" ? item.versions.slice().sort((a, b) => compareVersions(a.version, b.version)).at(-1) : item.versions.find(row => row.version === requestedVersion);
+    if (!selected) throw new Error(`bench version not found: ${benchId}@${requestedVersion}`);
+    if (registry.allowSignerFingerprints.length > 0 && !registry.allowSignerFingerprints.includes(selected.signerFingerprint)) throw new Error(`bench signer not allowlisted: ${selected.signerFingerprint}`);
+    // Derived targets are captured immediately after authenticated selection, before fetching that artifact.
+    const target = importedBenchPath(workspace, benchId, selected.version), targetBefore = captureBenchImportFiles(workspace, [target.artifactPath, target.shaPath, target.benchJsonPath, target.metaPath]);
+    const bytes = await readBytes(fetched.base, selected.url, workspace); current();
+    if (sha256Hex(bytes) !== selected.sha256) throw new Error(`bench sha mismatch for ${benchId}@${selected.version}`);
+    stage = mkdtempSync(join(tmpdir(), "amc-bench-import-")); const file = join(stage, "candidate.amcbench"); writeFileAtomic(file, bytes, 0o600);
+    const trust = withPins(operator, [{ keyId: selected.signerFingerprint, purposes: ["artifact-seal"], origin: `bench registry ${registry.id} index` }]);
+    const verified = verifyBenchArtifactFile({ file, trust });
+    if (!verified.ok || !verified.bench) throw new Error(`bench artifact verify failed: ${untrustedReasons(verified.report).join("; ")}`);
+    if (verified.fileSha256 !== selected.sha256 || verified.bench.benchId !== benchId) throw new Error("verified bench does not match the selected signed registry item");
+    if (registry.requireBenchProofs && verified.bench.proofBindings.includedEventProofIds.length === 0) throw new Error("bench proofs required by registry policy but artifact has no inclusion proofs");
+    const admitted = verified.report.issuerAdmission.signatures.map(row => ({ ...row }));
+    const publicationCurrent = () => { const now = current(); admitRegistryKey(fetched.pubRaw, registry.pinnedRegistryFingerprint, now);
+      const pinned = withPins(now, [{ keyId: selected.signerFingerprint, purposes: ["artifact-seal"], origin: `bench registry ${registry.id} index` }]);
+      // Negative-only refresh for already cryptographically verified exact identities. It never supplies a new candidate key.
+      for (const row of admitted) {
+        if (row.status !== "admitted" || row.keyId === null || distrustAt(pinned.distrust, row.keyId, pinned.asOf.getTime())) throw new Error("verified bench issuer is currently refused");
+        if (!pinned.explicitPins.some(pin => pin.keyId === row.keyId && pin.purposes.includes(row.purpose))
+          && listsAt(pinned.lists, row.keyId, row.purpose, pinned.asOf.getTime())?.status !== "admitted") throw new Error("verified bench issuer is no longer admitted");
+      }
+    };
+    const stored = publishVerifiedBenchImport({ workspace, registryId: registry.id, registryFingerprint: fetched.registryFingerprint,
+      signerFingerprint: selected.signerFingerprint, sourceUrl: selected.url, version: selected.version, bytes, bench: verified.bench, cacheBefore, targetBefore,
+      cache: [{ path: cachePaths.indexPath, bytes: Buffer.from(fetched.indexRaw) }, { path: cachePaths.sigPath, bytes: Buffer.from(fetched.sigRaw) }, { path: cachePaths.pubPath, bytes: Buffer.from(fetched.pubRaw) }], current: publicationCurrent });
+    completedPaths = stored.completedPaths;
+    return { result: { benchId: stored.meta.benchId, version: stored.meta.version, filePath: stored.artifactPath, registryFingerprint: stored.meta.registryFingerprint },
+      assertPublished: stored.assertPublished, completedPaths };
+  } catch (cause) {
+    if (cause instanceof BenchImportPublicationError) completedPaths = cause.completedPaths;
+    failure = cause;
+    try { actor?.(); } catch (refusal) { failure = new BenchImportPublicationError("authority", completedPaths, null, new AggregateError([cause, refusal])); throw failure; }
+    throw cause;
+  } finally { if (stage !== null) try { rmSync(stage, { recursive: true, force: true }); } catch (cleanup) {
+    throw new BenchImportPublicationError("staging-cleanup", completedPaths, null, failure === undefined ? cleanup : new AggregateError([failure, cleanup]));
+  } }
 }
 
 export function listImportedBenchArtifacts(workspace: string) {

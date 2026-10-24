@@ -1,3 +1,6 @@
+import { captureBenchImportLogAuthority } from "./benchImportLogAuthority.js";
+import { BenchImportPublicationError } from "./benchImportPublication.js";
+import { appendTransparencyEntryAsync } from "../transparency/asyncWorkspaceAppend.js";
 import YAML from "yaml";
 import { benchRegistryConfigSchema } from "./benchRegistrySchema.js";
 import type { OrgPairsOptions } from "../org/preparedOrgPairs.js";
@@ -14,7 +17,7 @@ import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js
 import { sha256Hex } from "../utils/hash.js";
 import { createBenchArtifact, inspectBenchArtifact, listExportedBenchArtifacts } from "./benchArtifact.js";
 import { createBenchComparison } from "./benchComparer.js";
-import { browseBenchRegistry, importBenchFromRegistry } from "./benchRegistryClient.js";
+import { browseBenchRegistry, importBenchFromRegistryAttempt } from "./benchRegistryClient.js";
 import { publishBenchToRegistry } from "./benchRegistryServer.js";
 import {
   benchImportsRegistriesPath, loadBenchRegistriesConfigAsync,
@@ -219,25 +222,16 @@ export async function benchRegistryBrowseForApi(params: {
   current(); return result;
 }
 
-export async function benchImportForApi(params: {
-  workspace: string;
-  registryId: string;
-  benchRef: string;
-}) {
-  const { workspace: explicitWorkspace, registryId, benchRef } = params;
-  const workspace = explicitWorkspace.trim() ? resolve(explicitWorkspace) : explicitWorkspace;
-  const imported = await importBenchFromRegistry({ workspace, registryId, benchRef });
-  appendTransparencyEntry({
-    workspace,
-    type: "BENCH_IMPORTED",
-    agentId: "workspace",
-    artifact: {
-      kind: "amcbench",
-      sha256: sha256Hex(readFileSync(imported.filePath)),
-      id: `${imported.benchId}@${imported.version}`
-    }
-  });
-  return imported;
+export async function benchImportForApi(params: { workspace: string; registryId: string; benchRef: string }, options: OrgPairsOptions = {}) {
+  const { workspace: explicitWorkspace, registryId, benchRef } = params, workspace = explicitWorkspace.trim() ? resolve(explicitWorkspace) : explicitWorkspace;
+  const original = captureBenchImportLogAuthority(workspace, options);
+  const imported = await importBenchFromRegistryAttempt({ workspace, registryId, benchRef }, { beforePublish: original });
+  const current = () => { original(); imported.assertPublished(); }, completedLogs: string[] = [];
+  try {
+    current(); const logged = await appendTransparencyEntryAsync({ workspace, type: "BENCH_IMPORTED", agentId: "workspace",
+      artifact: { kind: "amcbench", sha256: sha256Hex(readFileSync(imported.result.filePath)), id: `${imported.result.benchId}@${imported.result.version}` } }, { beforeCommit: current });
+    completedLogs.push(logged.hash); current(); return imported.result;
+  } catch (cause) { throw new BenchImportPublicationError("workspace-log", imported.completedPaths, null, cause, Object.freeze([...completedLogs])); }
 }
 
 export function benchCompareForApi(params: {

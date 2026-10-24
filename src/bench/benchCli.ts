@@ -132,8 +132,8 @@ export async function benchImportCli(params: {
   workspace: string;
   registryId: string;
   benchRef: string;
-}) {
-  return importBenchFromRegistry(params);
+}, options: OrgPairsOptions = {}) {
+  return importBenchFromRegistry({ ...params }, options);
 }
 
 export function benchListImportsCli(workspace: string) {

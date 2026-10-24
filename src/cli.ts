@@ -17581,7 +17581,7 @@ bench
       workspace: process.cwd(),
       registryId: opts.registryId,
       benchRef: opts.bench
-    });
+    }, { beforePublish: () => assertOwnerMode(process.cwd(), "bench import") });
     console.log(chalk.green("Bench imported"));
     console.log(`Bench: ${out.benchId}@${out.version}`);
     console.log(`File: ${out.filePath}`);
