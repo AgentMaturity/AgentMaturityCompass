@@ -345,14 +345,13 @@ import {
   mechanicLatestPlanForApi,
   mechanicLatestSimulationForApi,
   mechanicPlanDiffForApi,
-  mechanicPlanExecuteForApi,
-  mechanicPlanRequestApprovalForApi,
   mechanicProfilesForApi,
   mechanicSimulateForApi,
   mechanicTargetsForApi,
   mechanicTuningForApi,
   verifyMechanicWorkspace
 } from "../mechanic/mechanicApi.js";
+import { mechanicPlanRequestApprovalForAuthority as mechanicPlanRequestApprovalForApi, mechanicPlanExecuteForAuthority as mechanicPlanExecuteForApi } from "../mechanic/mechanicExecutionPublication.js";
 import { verifyMechanicTargetsSignature } from "../mechanic/targetsStore.js";
 import { verifyMechanicProfilesSignature } from "../mechanic/profiles.js";
 import { verifyMechanicTuningSignature } from "../mechanic/tuningStore.js";
@@ -7022,13 +7021,15 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "planId is required" });
           return;
         }
-        const out = mechanicPlanRequestApprovalForApi({
+        const authority = signingAuthority(["OWNER"]);
+        const out = await mechanicPlanRequestApprovalForApi({
           workspace: options.workspace,
           planId: parsed.planId,
           actor: auth.username ?? "owner",
           reason: typeof parsed.reason === "string" && parsed.reason.trim().length > 0 ? parsed.reason.trim() : "mechanic plan execution approval"
-        });
-        writeStudioAuditEvent({
+        }, authority).catch(error => { if (res.headersSent) return null; throw error; });
+        if (out === null) return;
+        await writeStudioAuditEventAsync({
           workspace: options.workspace,
           auditType: "MECHANIC_PLAN_APPROVAL_REQUESTED",
           severity: "LOW",
@@ -7036,7 +7037,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             planId: out.plan.planId,
             approvals: out.approvalRequests.length
           }
-        });
+        }, humanAuditAuthority(["OWNER"]));
         emitMechanicSse({
           hub: orgSse,
           type: "MECHANIC_PLAN_UPDATED"
@@ -7065,12 +7066,13 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           hub: orgSse,
           type: "MECHANIC_EXECUTION_STARTED"
         });
+        const authority = signingAuthority(["OWNER"]);
         try {
           const out = await mechanicPlanExecuteForApi({
             workspace: options.workspace,
             planId: parsed.planId
-          });
-          writeStudioAuditEvent({
+          }, () => { authority(); if (!requireUnlockedVaultForSigning()) throw new Error("vault locked; unlock required for signing"); });
+          await writeStudioAuditEventAsync({
             workspace: options.workspace,
             auditType: "MECHANIC_PLAN_EXECUTED",
             severity: "LOW",
@@ -7078,14 +7080,15 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
               planId: out.plan.planId,
               executed: out.executed.length
             }
-          });
+          }, humanAuditAuthority(["OWNER"], true));
           emitMechanicSse({
             hub: orgSse,
             type: "MECHANIC_EXECUTION_COMPLETED"
           });
           json(res, 200, out);
         } catch (error) {
-          writeStudioAuditEvent({
+          if (res.headersSent) return;
+          await writeStudioAuditEventAsync({
             workspace: options.workspace,
             auditType: "MECHANIC_PLAN_EXECUTION_FAILED",
             severity: "HIGH",
@@ -7093,7 +7096,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
               planId: parsed.planId,
               reason: String(error)
             }
-          });
+          }, humanAuditAuthority(["OWNER"], true));
           emitMechanicSse({
             hub: orgSse,
             type: "MECHANIC_EXECUTION_FAILED"

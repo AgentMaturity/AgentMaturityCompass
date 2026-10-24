@@ -1,3 +1,4 @@
+import { mechanicPlanRequestApprovalForApiAsync, mechanicPlanRequestApprovalForAuthority, mechanicPlanExecuteForAuthority } from "./mechanicExecutionPublication.js";
 import { captureMechanicRun, mechanicProgress, mechanicFailed } from "./mechanicPublication.js";
 import { captureMechanicPair } from "./mechanicPairs.js";
 import { mechanicTargetsPath, captureMechanicTargets, prepareMechanicTargets, prepareInitialMechanicTargets, initMechanicTargetsAsync } from "./targetsStore.js";
@@ -320,11 +321,23 @@ export function mechanicPlanRequestApprovalCli(params: {
   return mechanicPlanRequestApprovalForApi(params);
 }
 
+export async function mechanicPlanRequestApprovalCliAsync(params: Parameters<typeof mechanicPlanRequestApprovalCli>[0]) {
+  return mechanicPlanRequestApprovalForApiAsync({ ...params });
+}
+
 export async function mechanicPlanExecuteCli(params: {
   workspace: string;
   planId: string;
 }) {
   return mechanicPlanExecuteForApi(params);
+}
+
+/** Internal maintained CLI handoffs. The caller supplies only its exact existing current-mode refusal. */
+export async function mechanicPlanRequestApprovalCliForAuthority(params: Parameters<typeof mechanicPlanRequestApprovalCli>[0], beforePublish: () => void) {
+  return mechanicPlanRequestApprovalForAuthority({ ...params }, beforePublish);
+}
+export async function mechanicPlanExecuteCliForAuthority(params: Parameters<typeof mechanicPlanExecuteCli>[0], beforePublish: () => void) {
+  return mechanicPlanExecuteForAuthority({ ...params }, beforePublish);
 }
 
 export async function mechanicSimulateCli(params: {

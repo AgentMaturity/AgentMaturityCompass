@@ -1,244 +1,44 @@
 import { randomUUID } from "node:crypto";
-import YAML from "yaml";
+import { relative } from "node:path";
 import { appendTransparencyEntry } from "../transparency/logChain.js";
-import { loadBudgetsConfig, budgetsPath, signBudgetsConfig } from "../budgets/budgets.js";
-import { loadToolsConfig, signToolsConfig, toolsConfigPath } from "../toolhub/toolhubValidators.js";
-import { loadApprovalPolicy, approvalPolicyPath, signApprovalPolicy } from "../approvals/approvalPolicyEngine.js";
-import { cliInitiator, createApprovalForIntent, consumeApprovedExecution, verifyApprovalForExecution } from "../approvals/approvalEngine.js";
-import { policyPackApplyCli, policyPackListCli } from "../policyPacks/packCli.js";
-import { runAssurance } from "../assurance/assuranceRunner.js";
-import { createAgentTransformPlanForApi } from "../transformation/transformApi.js";
-import { createFreezeIncident } from "../drift/freezeEngine.js";
-import { benchCreateForApi } from "../bench/benchApi.js";
-import { refreshForecastForApi } from "../forecast/forecastApi.js";
-import { executePluginRequest, requestPluginInstall } from "../plugins/pluginApi.js";
-import { bridgeConfigPath, loadBridgeConfig, signBridgeConfig } from "../bridge/bridgeConfigStore.js";
-import { ensureDir, writeFileAtomic } from "../utils/fs.js";
-import { latestRunId } from "../diagnostic/runReportResolution.js";
+import { createApprovalForIntent, consumeApprovedExecution } from "../approvals/approvalEngine.js";
+import { assertVaultMaySign } from "../keys/signingKeys.js";
 import { sha256Hex } from "../utils/hash.js";
+import { captureMechanicPlanById, loadMechanicPlanById, prepareMechanicPlan, saveMechanicPlan } from "./planStore.js";
+import { executeAction, selectAgentId } from "./mechanicExecutionActions.js";
+import { captureMechanicApprovals } from "./mechanicExecutionApprovals.js";
+import { captureMechanicRun, mechanicProgress, mechanicFailed, appendMechanicEntry, MechanicPublicationError } from "./mechanicPublication.js";
 import type { MechanicUpgradePlan } from "./upgradePlanSchema.js";
-import { loadMechanicTuning } from "./tuningStore.js";
-import { loadMechanicPlanById, saveMechanicPlan } from "./planStore.js";
 
-function selectAgentId(plan: MechanicUpgradePlan): string {
-  return plan.scope.type === "AGENT" ? plan.scope.id : "default";
+type RequestParams = { workspace: string; planId: string; actor: string; reason: string };
+type ExecuteParams = { workspace: string; planId: string };
+type Executed = { actionId: string; status: "EXECUTED" | "SKIPPED"; note: string };
+type Consumption = ReturnType<typeof consumeApprovedExecution> & { actionId: string; approvalRequestId: string; attemptedExecutionId: string };
+export class MechanicExecutionError extends Error {
+  readonly code = "MECHANIC_EXECUTION_PARTIAL";
+  constructor(readonly executed: readonly Executed[], readonly consumptions: readonly Consumption[], readonly attemptedActionId: string | null,
+    readonly completed: readonly string[], readonly phase: string, readonly entryHash: string | null, readonly pendingRecorded: boolean | null,
+    readonly recordingErrors: readonly unknown[], readonly publicationError: unknown | null, cause: unknown) {
+    super("mechanic execution did not complete; inspect earlier effects and recording failures before retrying", { cause }); this.name = "MechanicExecutionError";
+  }
 }
-
-function updateBudgetsFromTuning(workspace: string, agentId: string): string {
-  const tuning = loadMechanicTuning(workspace).mechanicTuning.knobs;
-  const budgets = loadBudgetsConfig(workspace);
-  const existing = budgets.budgets.perAgent[agentId] ?? budgets.budgets.perAgent.default;
-  if (!existing) {
-    throw new Error(`budgets profile missing for agent ${agentId}`);
-  }
-  budgets.budgets.perAgent[agentId] = {
-    ...existing,
-    daily: {
-      ...existing.daily,
-      maxLlmRequests: Math.max(1, tuning.maxToolCallsPerRun),
-      maxLlmTokens: Math.max(1000, tuning.maxTokensPerRun),
-      maxCostUsd: Math.max(0.01, tuning.maxCostPerDayUsd),
-      maxToolExecutes: Object.fromEntries(
-        Object.entries(existing.daily.maxToolExecutes).map(([actionClass]) => [
-          actionClass,
-          Math.max(0, tuning.maxToolCallsPerRun)
-        ])
-      ) as typeof existing.daily.maxToolExecutes
-    },
-    perMinute: {
-      maxLlmRequests: Math.max(1, Math.ceil(tuning.maxToolCallsPerRun / 2)),
-      maxLlmTokens: Math.max(1000, Math.ceil(tuning.maxTokensPerRun / 12))
-    }
-  };
-  writeFileAtomic(budgetsPath(workspace), YAML.stringify(budgets), 0o644);
-  signBudgetsConfig(workspace);
-  return budgetsPath(workspace);
-}
-
-function updateToolsFromTuning(workspace: string): string {
-  const tuning = loadMechanicTuning(workspace).mechanicTuning.knobs;
-  const tools = loadToolsConfig(workspace);
-  const denied = new Set(tuning.deniedTools.map((item) => item.trim()).filter((item) => item.length > 0));
-  const allowed = new Set(tuning.allowedTools.map((item) => item.trim()).filter((item) => item.length > 0));
-
-  const kept = tools.tools.allowedTools.filter((tool) => !denied.has(tool.name));
-  const knownNames = new Set(kept.map((tool) => tool.name));
-  for (const name of allowed) {
-    if (!knownNames.has(name)) {
-      kept.push({
-        name,
-        actionClass: "READ_ONLY"
-      });
-    }
-  }
-  tools.tools.allowedTools = kept.sort((a, b) => a.name.localeCompare(b.name));
-  tools.tools.denyByDefault = true;
-
-  writeFileAtomic(toolsConfigPath(workspace), YAML.stringify(tools), 0o644);
-  signToolsConfig(workspace);
-
-  const bridge = loadBridgeConfig(workspace);
-  const providers = new Set(tuning.allowedProviders);
-  for (const [provider, config] of Object.entries(bridge.bridge.providers)) {
-    config.enabled = providers.has(provider as typeof tuning.allowedProviders[number]);
-    config.modelAllowlist = [...tuning.allowedModelPatterns];
-  }
-  writeFileAtomic(bridgeConfigPath(workspace), YAML.stringify(bridge), 0o644);
-  signBridgeConfig(workspace);
-
-  return toolsConfigPath(workspace);
-}
-
-function updateApprovalPolicyFromTuning(workspace: string): string {
-  const tuning = loadMechanicTuning(workspace).mechanicTuning.knobs;
-  const policy = loadApprovalPolicy(workspace);
-  const required = Math.max(0, tuning.approvalQuorum.owners + tuning.approvalQuorum.auditors);
-  for (const key of Object.keys(policy.approvalPolicy.actionClasses)) {
-    const row = policy.approvalPolicy.actionClasses[key as keyof typeof policy.approvalPolicy.actionClasses];
-    if (!row) {
-      continue;
-    }
-    row.requiredApprovals = key === "READ_ONLY" ? Math.min(row.requiredApprovals, 1) : Math.max(row.requiredApprovals, required);
-    row.requireDistinctUsers = row.requiredApprovals > 1;
-    if (key === "SECURITY" || key === "DATA_EXPORT" || key === "IDENTITY") {
-      row.rolesAllowed = ["OWNER", "AUDITOR"];
-    }
-  }
-  writeFileAtomic(approvalPolicyPath(workspace), YAML.stringify(policy), 0o644);
-  signApprovalPolicy(workspace);
-  return approvalPolicyPath(workspace);
-}
-
-async function executeAction(params: {
-  workspace: string;
-  plan: MechanicUpgradePlan;
-  action: MechanicUpgradePlan["phases"][number]["actions"][number];
-}): Promise<{ status: "EXECUTED" | "SKIPPED"; note: string }> {
-  const agentId = selectAgentId(params.plan);
-
-  switch (params.action.kind) {
-    case "POLICY_PACK_APPLY": {
-      const packId = typeof params.action.params.packId === "string"
-        ? params.action.params.packId
-        : (policyPackListCli().find((pack) => pack.id === "code-agent.high")?.id ?? policyPackListCli()[0]?.id);
-      if (!packId) {
-        return {
-          status: "SKIPPED",
-          note: "no policy pack available"
-        };
-      }
-      policyPackApplyCli({
-        workspace: params.workspace,
-        agentId,
-        packId
-      });
-      return {
-        status: "EXECUTED",
-        note: `policy pack applied (${packId})`
-      };
-    }
-    case "BUDGETS_APPLY": {
-      const path = updateBudgetsFromTuning(params.workspace, agentId);
-      return { status: "EXECUTED", note: `budgets updated (${path})` };
-    }
-    case "TOOLS_APPLY": {
-      const path = updateToolsFromTuning(params.workspace);
-      return { status: "EXECUTED", note: `tools/bridge updated (${path})` };
-    }
-    case "APPROVAL_POLICY_APPLY": {
-      const path = updateApprovalPolicyFromTuning(params.workspace);
-      return { status: "EXECUTED", note: `approval policy updated (${path})` };
-    }
-    case "PLUGIN_INSTALL": {
-      const registryId = typeof params.action.params.registryId === "string" ? params.action.params.registryId : null;
-      const pluginRef = typeof params.action.params.pluginRef === "string" ? params.action.params.pluginRef : null;
-      if (!registryId || !pluginRef) {
-        return { status: "SKIPPED", note: "plugin action missing registryId/pluginRef" };
-      }
-      const request = await requestPluginInstall({
-        workspace: params.workspace,
-        initiator: cliInitiator(),
-        agentId,
-        registryId,
-        pluginRef
-      });
-      executePluginRequest({
-        workspace: params.workspace,
-        approvalRequestId: request.approvalRequestId
-      });
-      return { status: "EXECUTED", note: `plugin installed via ${request.approvalRequestId}` };
-    }
-    case "ASSURANCE_RUN": {
-      // Previously fire-and-forget: the promise was never awaited, so this
-      // reported "assurance run completed" before the run had resolved and a
-      // failure surfaced as an unhandled rejection after the caller returned.
-      try {
-        const report = await runAssurance({
-          workspace: params.workspace,
-          agentId,
-          mode: "supervise",
-          window: "14d",
-          packId: "governance_bypass"
-        });
-        return {
-          status: "EXECUTED",
-          note: `assurance run ${report.assuranceRunId} completed (score ${report.overallScore0to100})`
-        };
-      } catch (error) {
-        // A scan that could not run is not an executed action.
-        return {
-          status: "SKIPPED",
-          note: `assurance run did not execute: ${error instanceof Error ? error.message : String(error)}`
-        };
-      }
-    }
-    case "TRANSFORM_PLAN_CREATE": {
-      const created = createAgentTransformPlanForApi({
-        workspace: params.workspace,
-        agentId,
-        to: "targets"
-      });
-      return { status: "EXECUTED", note: `transform plan created (${created.plan.planId})` };
-    }
-    case "FREEZE_SET": {
-      const currentRun = latestRunId(params.workspace, agentId) ?? "unknown";
-      const previousRun = currentRun;
-      const incident = createFreezeIncident({
-        workspace: params.workspace,
-        agentId,
-        ruleId: "mechanic-plan-freeze",
-        previousRunId: previousRun,
-        currentRunId: currentRun,
-        deltas: {
-          overallDrop: 0,
-          integrityDrop: 0,
-          correlationDrop: 0,
-          maxLayerDrop: 0
-        },
-        actionClasses: ["DEPLOY", "WRITE_HIGH", "SECURITY"],
-        reason: "Mechanic workbench protective freeze"
-      });
-      return { status: "EXECUTED", note: `freeze incident created (${incident.incidentId})` };
-    }
-    case "BENCH_CREATE": {
-      const scope = params.plan.scope.type === "AGENT" ? "agent" : params.plan.scope.type === "NODE" ? "node" : "workspace";
-      const result = benchCreateForApi({
-        workspace: params.workspace,
-        scope,
-        id: params.plan.scope.id
-      });
-      return { status: "EXECUTED", note: `bench created (${result.bench.benchId})` };
-    }
-    case "FORECAST_REFRESH": {
-      const scope = params.plan.scope.type === "AGENT" ? "agent" : params.plan.scope.type === "NODE" ? "node" : "workspace";
-      const result = refreshForecastForApi({
-        workspace: params.workspace,
-        scope,
-        targetId: params.plan.scope.id
-      });
-      return { status: "EXECUTED", note: `forecast refreshed (${result.forecast.generatedTs})` };
-    }
-  }
+function context(workspace: string, planId: string, beforePublish: () => void) {
+  const run = captureMechanicRun(workspace, beforePublish), captured = captureMechanicPlanById(workspace, planId), state = mechanicProgress();
+  let published: (() => void) | null = null;
+  const assertPlan = () => { if (published === null) captured.assertCurrent(); else published(); };
+  const assertCurrent = () => { run.beforePublish(); assertPlan(); run.fixed(); };
+  return { run, captured, state, assertPlan, assertInputs: assertPlan, assertCurrent, failed(cause: unknown): never { return mechanicFailed(state, cause); }, async save(plan: MechanicUpgradePlan, assertInputs: () => void = () => {}) {
+    state.phase = "plan-prepare"; state.entryHash = null; state.pendingRecorded = null;
+    run.beforePublish(); assertPlan(); assertInputs(); run.fixed();
+    const prepared = await prepareMechanicPlan(workspace, plan, { beforePublish() { run.beforePublish(); run.fixed(); },
+      assertInputsCurrent() { assertPlan(); assertInputs(); run.fixed(); } }, captured.destinations);
+    state.phase = "plan-publish"; const saved = prepared.publish(); published = prepared.assertCurrent;
+    state.completed.push(...[saved.latestPath, saved.latestSigPath, saved.snapshotPath, saved.snapshotSigPath].map(path => relative(workspace, path)));
+    return saved;
+  }, async log(type: "MECHANIC_PLAN_APPROVAL_REQUESTED" | "MECHANIC_PLAN_EXECUTED" | "MECHANIC_PLAN_EXECUTION_FAILED",
+    kind: "approval" | "policy", digest: string, id: string, assertInputs: () => void = () => {}) {
+    return appendMechanicEntry(workspace, { type, agentId: selectAgentId(captured.plan), artifact: { kind, sha256: digest, id } }, run, () => { assertPlan(); assertInputs(); }, state);
+  } };
 }
 
 export function requestPlanApprovals(params: {
@@ -259,6 +59,7 @@ export function requestPlanApprovals(params: {
       if (!action.requiresApproval || action.approvalRequestId) {
         continue;
       }
+      assertVaultMaySign(params.workspace, "artifact-seal");
       const intentId = `mechanic-${plan.planId}-${action.id}`;
       const approval = createApprovalForIntent({
         workspace: params.workspace,
@@ -310,99 +111,83 @@ export function requestPlanApprovals(params: {
   };
 }
 
-export async function executeMechanicPlan(params: {
-  workspace: string;
-  planId: string;
-}): Promise<{
-  plan: MechanicUpgradePlan;
-  executed: Array<{ actionId: string; status: "EXECUTED" | "SKIPPED"; note: string }>;
-}> {
-  const plan = loadMechanicPlanById(params.workspace, params.planId);
-  const executed: Array<{ actionId: string; status: "EXECUTED" | "SKIPPED"; note: string }> = [];
-
-  // Pre-validate approvals before any mutating action executes so bound hash checks
-  // are evaluated against the same signed config snapshot used during approval.
-  for (const phase of plan.phases) {
-    for (const action of phase.actions) {
-      if (!action.requiresApproval) {
-        continue;
-      }
-      if (!action.approvalRequestId) {
-        throw new Error(`action ${action.id} requires approval request before execution`);
-      }
-      const approval = verifyApprovalForExecution({
-        workspace: params.workspace,
-        approvalId: action.approvalRequestId,
-        expectedAgentId: selectAgentId(plan),
-        expectedIntentId: String(action.params.approvalIntentId ?? ""),
-        expectedToolName: "mechanic.plan.execute",
-        expectedActionClass: "SECURITY"
-      });
-      if (!approval.ok) {
-        throw new Error(`approval not executable for ${action.id}: ${approval.error ?? approval.status ?? "unknown"}`);
-      }
+/** Internal maintained request path. The approval producer remains its existing held synchronous boundary. */
+export async function requestPlanApprovalsForAuthority(params: RequestParams, beforePublish: () => void) {
+  const input = { ...params }, current = context(input.workspace, input.planId, beforePublish), plan = current.captured.plan;
+  const approvals: Array<{ actionId: string; approvalRequestId: string; intentId: string }> = [];
+  const planSha = sha256Hex(Buffer.from(JSON.stringify(plan), "utf8"));
+  try {
+    for (const phase of plan.phases) for (const action of phase.actions) {
+      if (!action.requiresApproval || action.approvalRequestId) continue;
+      current.state.phase = "approval-request"; current.assertCurrent(); assertVaultMaySign(input.workspace, "artifact-seal");
+      const intentId = `mechanic-${plan.planId}-${action.id}`;
+      const approval = createApprovalForIntent({ workspace: input.workspace, initiator: input.actor, agentId: selectAgentId(plan), intentId,
+        toolName: "mechanic.plan.execute", actionClass: "SECURITY", requestedMode: "EXECUTE", effectiveMode: "EXECUTE", riskTier: "high",
+        intentPayload: { planId: plan.planId, actionId: action.id, planSha256: planSha, reason: input.reason },
+        leaseConstraints: { scopes: [], routeAllowlist: [], modelAllowlist: [] } });
+      action.approvalRequestId = approval.approval.approvalRequestId; action.params.approvalIntentId = intentId;
+      approvals.push({ actionId: action.id, approvalRequestId: approval.approval.approvalRequestId, intentId });
+      current.state.completed.push(`approval-request:${approval.approval.approvalRequestId}`); current.assertCurrent();
     }
-  }
+    await current.save(plan);
+    await current.log("MECHANIC_PLAN_APPROVAL_REQUESTED", "approval", sha256Hex(Buffer.from(JSON.stringify(approvals), "utf8")), plan.planId);
+    current.assertCurrent();
+    return { result: { plan, approvalRequests: approvals }, current };
+  } catch (cause) { mechanicFailed(current.state, cause); }
+}
 
-  for (const phase of plan.phases) {
-    for (const action of phase.actions) {
-      try {
-        const out = await executeAction({
-          workspace: params.workspace,
-          plan,
-          action
-        });
-        action.executionStatus = out.status === "EXECUTED" ? "EXECUTED" : "SKIPPED";
-        action.executionNote = out.note;
-        action.executedTs = Date.now();
-        executed.push({
-          actionId: action.id,
-          status: out.status,
-          note: out.note
-        });
-
-        if (action.approvalRequestId) {
-          consumeApprovedExecution({
-            workspace: params.workspace,
-            approvalId: action.approvalRequestId,
-            expectedAgentId: selectAgentId(plan),
-            executionId: `${plan.planId}:${action.id}:${randomUUID()}`
-          });
-        }
-      } catch (error) {
-        action.executionStatus = "FAILED";
-        action.executionNote = String(error);
-        action.executedTs = Date.now();
-        appendTransparencyEntry({
-          workspace: params.workspace,
-          type: "MECHANIC_PLAN_EXECUTION_FAILED",
-          agentId: selectAgentId(plan),
-          artifact: {
-            kind: "policy",
-            sha256: sha256Hex(Buffer.from(`${plan.planId}:${action.id}:${String(error)}`, "utf8")),
-            id: action.id
-          }
-        });
-        saveMechanicPlan(params.workspace, plan);
-        throw error;
-      }
-    }
-  }
-
-  saveMechanicPlan(params.workspace, plan);
-  appendTransparencyEntry({
-    workspace: params.workspace,
-    type: "MECHANIC_PLAN_EXECUTED",
-    agentId: selectAgentId(plan),
-    artifact: {
-      kind: "policy",
-      sha256: sha256Hex(Buffer.from(JSON.stringify(executed), "utf8")),
-      id: plan.planId
-    }
-  });
-
-  return {
-    plan,
-    executed
+export async function executeMechanicPlan(params: ExecuteParams): Promise<{ plan: MechanicUpgradePlan; executed: Executed[] }> {
+  return (await executeMechanicPlanForAuthority(params, () => {})).result;
+}
+/** Internal trusted caller boundary; the callback adds only refusal to original authority and actual grant checks. */
+export async function executeMechanicPlanForAuthority(params: ExecuteParams, beforePublish: () => void) {
+  const input = { ...params }, current = context(input.workspace, input.planId, beforePublish), plan = current.captured.plan;
+  const grants = captureMechanicApprovals(input.workspace, plan), executed: Executed[] = [], consumptions: Consumption[] = [];
+  let attemptedActionId: string | null = null;
+  const assertCurrent = () => { current.run.beforePublish(); current.assertPlan(); grants.assertCurrent(); current.run.fixed(); };
+  const fail = (cause: unknown, recordingErrors: readonly unknown[] = []): never => {
+    let publicationError: unknown | null = null;
+    try { mechanicFailed(current.state, recordingErrors.at(-1) ?? cause); }
+    catch (projected) { if (projected !== (recordingErrors.at(-1) ?? cause)) publicationError = projected; }
+    const progress = publicationError instanceof MechanicPublicationError ? publicationError : current.state;
+    throw new MechanicExecutionError(Object.freeze([...executed]), Object.freeze([...consumptions]), attemptedActionId,
+      Object.freeze([...progress.completed]), progress.phase, progress.entryHash, progress.pendingRecorded,
+      Object.freeze([...recordingErrors]), publicationError, cause);
   };
+  for (const phase of plan.phases) for (const action of phase.actions) {
+    attemptedActionId = action.id;
+    try {
+      const beforeEffect = () => { current.run.beforePublish(); current.assertPlan(); grants.assertCurrent(); current.run.fixed(); };
+      current.state.phase = `action:${action.id}`; current.state.entryHash = null; current.state.pendingRecorded = null; beforeEffect();
+      if (action.approvalRequestId) assertVaultMaySign(input.workspace, "artifact-seal");
+      const out = await executeAction({ workspace: input.workspace, plan, action, beforeEffect,
+        recordEffect(effect) { current.state.completed.push(effect); } });
+      // A returned action effect exists even if authority or consumption is refused immediately afterward.
+      executed.push({ actionId: action.id, ...out }); current.state.completed.push(`action:${action.id}:${out.status}`);
+      action.executionStatus = out.status; action.executionNote = out.note; action.executedTs = Date.now(); beforeEffect();
+      if (action.approvalRequestId) {
+        current.state.phase = `approval-consume:${action.id}`;
+        const executionId = `${plan.planId}:${action.id}:${randomUUID()}`;
+        const consumed = consumeApprovedExecution({ workspace: input.workspace, approvalId: action.approvalRequestId,
+          expectedAgentId: selectAgentId(plan), executionId });
+        consumptions.push({ ...consumed, actionId: action.id, approvalRequestId: action.approvalRequestId, attemptedExecutionId: executionId });
+        if (!consumed.consumed) throw new Error("mechanic approval consumption was a replay; this action may already have taken effect");
+        current.state.completed.push(`approval-consumed:${action.approvalRequestId}`); grants.consumed(action, executionId);
+      }
+      assertCurrent();
+    } catch (cause) {
+      action.executionStatus = "FAILED"; action.executionNote = String(cause); action.executedTs = Date.now();
+      const recordingErrors: unknown[] = [];
+      // Preserve the original failed-log then failed-plan order. Neither recording failure replaces the action cause.
+      try { await current.log("MECHANIC_PLAN_EXECUTION_FAILED", "policy", sha256Hex(Buffer.from(`${plan.planId}:${action.id}:${String(cause)}`, "utf8")), action.id); }
+      catch (recording) { recordingErrors.push(recording); }
+      try { await current.save(plan); } catch (recording) { recordingErrors.push(recording); }
+      fail(cause, recordingErrors);
+    }
+  }
+  try {
+    assertCurrent(); await current.save(plan, grants.assertCurrent);
+    await current.log("MECHANIC_PLAN_EXECUTED", "policy", sha256Hex(Buffer.from(JSON.stringify(executed), "utf8")), plan.planId, grants.assertCurrent);
+    assertCurrent(); return { result: { plan, executed }, current: { ...current, assertCurrent, failed: fail, assertInputs() { current.assertPlan(); grants.assertCurrent(); } } };
+  } catch (cause) { fail(cause); }
 }

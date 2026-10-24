@@ -28,7 +28,8 @@ import {
 import { buildGapAnalysis } from "./gapAnalysis.js";
 import { createMechanicUpgradePlan } from "./upgradePlanner.js";
 import { diffMechanicPlanAgainstCurrent } from "./planDiff.js";
-import { executeMechanicPlan, requestPlanApprovals } from "./executionEngine.js";
+import { requestPlanApprovals } from "./executionEngine.js";
+import { mechanicPlanExecuteForAuthority } from "./mechanicExecutionPublication.js";
 import { loadLatestMechanicSimulation, simulateMechanicPlan, verifyMechanicSimulationSignature } from "./simulator.js";
 import { mechanicGapReportSchema } from "./mechanicSchema.js";
 import type { MechanicScope, MechanicTargets } from "./targetSchema.js";
@@ -338,22 +339,7 @@ export async function mechanicPlanExecuteForApi(params: {
   workspace: string;
   planId: string;
 }) {
-  const executed = await executeMechanicPlan({
-    workspace: params.workspace,
-    planId: params.planId
-  });
-  const digest = sha256Hex(Buffer.from(JSON.stringify(executed.executed), "utf8"));
-  const transparencyHash = appendMechanicTransparency({
-    workspace: params.workspace,
-    type: "MECHANIC_PLAN_EXECUTED",
-    scopeId: executed.plan.scope.id,
-    sha256: digest,
-    artifactId: executed.plan.planId
-  });
-  return {
-    ...executed,
-    transparencyHash
-  };
+  return mechanicPlanExecuteForAuthority(params, () => {});
 }
 
 export async function mechanicSimulateForApi(params: {

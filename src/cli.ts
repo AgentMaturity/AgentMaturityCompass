@@ -543,8 +543,8 @@ import {
   mechanicInitCliAsync as mechanicInitCli,
   mechanicPlanCreateCli,
   mechanicPlanDiffCli,
-  mechanicPlanExecuteCli,
-  mechanicPlanRequestApprovalCli,
+  mechanicPlanExecuteCliForAuthority as mechanicPlanExecuteCli,
+  mechanicPlanRequestApprovalCliForAuthority as mechanicPlanRequestApprovalCli,
   mechanicPlanShowCli,
   mechanicProfileApplyCliAsync as mechanicProfileApplyCli,
   mechanicProfileListCli,
@@ -18249,14 +18249,14 @@ mechanicPlan
   .command("request-approval")
   .argument("<planId>")
   .requiredOption("--reason <text>", "reason for request")
-  .action((planId: string, opts: { reason: string }) => {
+  .action(async (planId: string, opts: { reason: string }) => {
     assertOwnerMode(process.cwd(), "mechanic plan request-approval");
-    const out = mechanicPlanRequestApprovalCli({
+    const out = await mechanicPlanRequestApprovalCli({
       workspace: process.cwd(),
       planId,
       actor: "owner",
       reason: opts.reason
-    });
+    }, () => assertOwnerMode(process.cwd(), "mechanic plan request-approval"));
     console.log(chalk.green(`Approval requests created: ${out.approvalRequests.length}`));
     console.log(JSON.stringify(out.approvalRequests, null, 2));
   });
@@ -18269,7 +18269,7 @@ mechanicPlan
     const out = await mechanicPlanExecuteCli({
       workspace: process.cwd(),
       planId
-    });
+    }, () => assertOwnerMode(process.cwd(), "mechanic plan execute"));
     console.log(chalk.green(`Plan executed: ${out.plan.planId}`));
     console.log(JSON.stringify(out.executed, null, 2));
   });
