@@ -1,8 +1,11 @@
 import { randomUUID } from "node:crypto";
 import { readdirSync, readFileSync } from "node:fs";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import YAML from "yaml";
-import { getSigningKey, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { getSigningKey, signHexDigest } from "../crypto/keys.js";
+import { verifyRawConfigSignature } from "../config/configSignaturePair.js";
+import { captureOrgPairs, orgPairBytes } from "../org/preparedOrgPairs.js";
+import { publishCasebookInitializationAsync, publishCasebookAdditionAsync, type CasebookPublicationOptions } from "./casebookPublication.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -65,24 +68,14 @@ function verifyFile(workspace: string, file: string): { valid: boolean; reason: 
     if (digest !== parsed.digestSha256) {
       return { valid: false, reason: "digest mismatch" };
     }
-    const valid = verifyHexDigestAny(digest, parsed.signature, getPublicKeyHistory(workspace, "auditor"));
+    const valid = verifyRawConfigSignature(workspace, digest, parsed.signature);
     return { valid, reason: valid ? null : "signature verification failed" };
   } catch (error) {
     return { valid: false, reason: String(error) };
   }
 }
 
-export function initCasebook(workspace: string, agentId?: string, casebookId = "default"): {
-  casebookId: string;
-  path: string;
-  sigPath: string;
-} {
-  const resolvedAgentId = resolveAgentId(workspace, agentId);
-  const root = casebookFolder(workspace, casebookId, resolvedAgentId);
-  const casesDir = casebookCasesDir(workspace, casebookId, resolvedAgentId);
-  ensureDir(root);
-  ensureDir(casesDir);
-
+function initialCasebookDocuments(resolvedAgentId: string, casebookId: string) {
   const base: CasebookFile = casebookSchema.parse({
     casebook: {
       version: 1,
@@ -116,6 +109,22 @@ export function initCasebook(workspace: string, agentId?: string, casebookId = "
       valuePoints: 100
     }
   });
+
+  return { base, case1 };
+}
+
+export function initCasebook(workspace: string, agentId?: string, casebookId = "default"): {
+  casebookId: string;
+  path: string;
+  sigPath: string;
+} {
+  const resolvedAgentId = resolveAgentId(workspace, agentId);
+  const root = casebookFolder(workspace, casebookId, resolvedAgentId);
+  const casesDir = casebookCasesDir(workspace, casebookId, resolvedAgentId);
+  ensureDir(root);
+  ensureDir(casesDir);
+
+  const { base, case1 } = initialCasebookDocuments(resolvedAgentId, casebookId);
 
   const file = casebookYamlPath(workspace, casebookId, resolvedAgentId);
   writeFileAtomic(file, YAML.stringify(base), 0o644);
@@ -182,20 +191,7 @@ export function listCasebooks(workspace: string, agentId?: string): Array<{
     .sort((a, b) => a.casebookId.localeCompare(b.casebookId));
 }
 
-export function addCaseToCasebook(params: {
-  workspace: string;
-  agentId?: string;
-  casebookId: string;
-  title: string;
-  description: string;
-  riskTier: "low" | "medium" | "high" | "critical";
-  requestedMode?: "SIMULATE" | "EXECUTE";
-  allowedActionClasses: ActionClass[];
-  prompt: string;
-  forbiddenAudits?: string[];
-}): { caseId: string; casePath: string; caseSigPath: string; casebookSigPath: string } {
-  const resolvedAgentId = resolveAgentId(params.workspace, params.agentId);
-  const base = loadCasebook(params.workspace, params.casebookId, resolvedAgentId);
+function prepareCasebookCase(params: Parameters<typeof addCaseToCasebook>[0]) {
   const caseId = `case_${randomUUID().replace(/-/g, "").slice(0, 12)}`;
   const created: CasebookCase = casebookCaseSchema.parse({
     v: 1,
@@ -219,6 +215,24 @@ export function addCaseToCasebook(params: {
       valuePoints: 100
     }
   });
+  return { caseId, created };
+}
+
+export function addCaseToCasebook(params: {
+  workspace: string;
+  agentId?: string;
+  casebookId: string;
+  title: string;
+  description: string;
+  riskTier: "low" | "medium" | "high" | "critical";
+  requestedMode?: "SIMULATE" | "EXECUTE";
+  allowedActionClasses: ActionClass[];
+  prompt: string;
+  forbiddenAudits?: string[];
+}): { caseId: string; casePath: string; caseSigPath: string; casebookSigPath: string } {
+  const resolvedAgentId = resolveAgentId(params.workspace, params.agentId);
+  const base = loadCasebook(params.workspace, params.casebookId, resolvedAgentId);
+  const { caseId, created } = prepareCasebookCase(params);
   const casePath = caseFilePath(params.workspace, params.casebookId, caseId, resolvedAgentId);
   ensureDir(casebookCasesDir(params.workspace, params.casebookId, resolvedAgentId));
   writeFileAtomic(casePath, JSON.stringify(created, null, 2), 0o644);
@@ -235,6 +249,52 @@ export function addCaseToCasebook(params: {
     caseSigPath,
     casebookSigPath
   };
+}
+
+/** Stable original agent/folder decision; it adds no owner policy to these existing operations. */
+function casebookSelection(workspace: string, agentId: string | undefined, casebookId: string, caller?: () => void) {
+  const selected = resolveAgentId(workspace, agentId), folder = casebookFolder(workspace, casebookId, selected);
+  const assertCurrent = () => {
+    caller?.();
+    if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize casebook signing");
+    if (resolveAgentId(workspace, agentId) !== selected || casebookFolder(workspace, casebookId, selected) !== folder)
+      throw new Error("casebook agent or folder selection changed while signing");
+  };
+  assertCurrent(); return { selected, assertCurrent };
+}
+
+export async function initCasebookAsync(workspaceInput: string, agentId?: string, casebookId = "default", options: CasebookPublicationOptions = {}) {
+  const workspace = resolve(workspaceInput), caller = options.beforePublish, protectedInputs = [...(options.protectedInputs ?? [])];
+  const selection = casebookSelection(workspace, agentId, casebookId, caller);
+  const { base, case1 } = initialCasebookDocuments(selection.selected, casebookId);
+  const file = casebookYamlPath(workspace, casebookId, selection.selected), casePath = caseFilePath(workspace, casebookId, case1.caseId, selection.selected);
+  const published = await publishCasebookInitializationAsync({ workspace, index: { path: file, bytes: Buffer.from(YAML.stringify(base)) },
+    selectedCase: { path: casePath, bytes: Buffer.from(JSON.stringify(case1, null, 2)) }, beforePublish: selection.assertCurrent, protectedInputs });
+  published.assertCurrent(); return { casebookId, path: published.path, sigPath: published.sigPath };
+}
+
+export async function addCaseToCasebookAsync(supplied: Parameters<typeof addCaseToCasebook>[0], options: CasebookPublicationOptions = {}) {
+  const params = { ...supplied, workspace: resolve(supplied.workspace), allowedActionClasses: [...supplied.allowedActionClasses],
+    forbiddenAudits: supplied.forbiddenAudits === undefined ? undefined : [...supplied.forbiddenAudits] };
+  const caller = options.beforePublish, protectedInputs = [...(options.protectedInputs ?? [])];
+  const selection = casebookSelection(params.workspace, params.agentId, params.casebookId, caller);
+  const file = casebookYamlPath(params.workspace, params.casebookId, selection.selected), previousIndex = captureOrgPairs([file]);
+  const body = orgPairBytes(previousIndex, file), sidecar = orgPairBytes(previousIndex, `${file}.sig`);
+  if (body === null || sidecar === null) throw new Error("casebook addition requires an existing signed index");
+  const signed = JSON.parse(sidecar.toString("utf8")) as SignedDigest, digest = sha256Hex(body);
+  const assertSourceAdmission = () => {
+    selection.assertCurrent();
+    if (signed.digestSha256 !== digest || typeof signed.signature !== "string" || !verifyRawConfigSignature(params.workspace, digest, signed.signature))
+      throw new Error("the captured casebook index is not currently admitted by config-purpose authority");
+  };
+  assertSourceAdmission();
+  const base = casebookSchema.parse(YAML.parse(body.toString("utf8")) as unknown), { caseId, created } = prepareCasebookCase(params);
+  base.casebook.caseIds = [...new Set([...base.casebook.caseIds, caseId])];
+  const casePath = caseFilePath(params.workspace, params.casebookId, caseId, selection.selected);
+  const published = await publishCasebookAdditionAsync({ workspace: params.workspace, index: { path: file, bytes: Buffer.from(YAML.stringify(base)) },
+    selectedCase: { path: casePath, bytes: Buffer.from(JSON.stringify(created, null, 2)) }, beforePublish: assertSourceAdmission, protectedInputs }, previousIndex);
+  published.assertCurrent();
+  return { caseId, casePath: published.casePath, caseSigPath: published.caseSigPath, casebookSigPath: published.sigPath };
 }
 
 export function verifyCasebook(workspace: string, casebookId: string, agentId?: string): {

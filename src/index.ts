@@ -686,8 +686,8 @@ export {
 } from "./outcomes/outcomeApi.js";
 export { latestOutcomeReport, outcomeTrend, topValueGaps } from "./outcomes/outcomeDashboard.js";
 export {
-  initCasebook,
-  addCaseToCasebook,
+  initCasebook, initCasebookAsync,
+  addCaseToCasebook, addCaseToCasebookAsync,
   listCasebooks,
   verifyCasebook,
   loadCasebook

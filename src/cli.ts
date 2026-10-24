@@ -568,8 +568,8 @@ import {
   mechanicVerifyCli
 } from "./mechanic/mechanicCli.js";
 import {
-  casebookAddFromWorkOrderCli,
-  casebookInitCli,
+  casebookAddFromWorkOrderCliAsync as casebookAddFromWorkOrderCli,
+  casebookInitCliAsync as casebookInitCli,
   casebookListCli,
   casebookVerifyCli
 } from "./casebooks/casebookCli.js";
@@ -13644,8 +13644,8 @@ casebook
   .description("Create a signed casebook")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
   .option("--casebook <id>", "casebook ID", "default")
-  .action((opts: { agent?: string; casebook: string }) => {
-    const out = casebookInitCli({
+  .action(async (opts: { agent?: string; casebook: string }) => {
+    const out = await casebookInitCli({
       workspace: process.cwd(),
       agentId: opts.agent ?? activeAgent(program),
       casebookId: opts.casebook
@@ -13661,8 +13661,8 @@ casebook
   .requiredOption("--casebook <id>", "casebook ID")
   .requiredOption("--from-workorder <id>", "source workorder ID")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
-  .action((opts: { casebook: string; fromWorkorder: string; agent?: string }) => {
-    const out = casebookAddFromWorkOrderCli({
+  .action(async (opts: { casebook: string; fromWorkorder: string; agent?: string }) => {
+    const out = await casebookAddFromWorkOrderCli({
       workspace: process.cwd(),
       agentId: opts.agent ?? activeAgent(program),
       casebookId: opts.casebook,
