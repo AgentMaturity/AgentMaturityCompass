@@ -30,18 +30,22 @@ Defined in `src/keys/algorithmPolicy.ts`.
 
 ### Provider matrix
 
-From the provider facts recorded in the P2-08 issue, checked on 5 October 2026. **Historical source facts; not independently re-verified as a complete matrix during this implementation.** Re-check before relying on a row; capabilities change, and AMC tests capabilities (key spec, mechanism list), not provider names.
+The algorithm/mechanism rows below were rechecked against the linked official documentation on **24 October 2026**. This is a public-documentation check, not a successful provider operation, SDK qualification, hardware attestation or proof of availability in a particular account, region or token. The protection column describes the current AMC source mapping; provider metadata and operator configuration remain claims, not independent attestation.
 
-| Provider | Algorithm | Key type and mechanism | Protection AMC reports | Source |
+| Provider | Algorithm | Documented input/mechanism | Protection AMC reports | Official source checked 24 Oct 2026 |
 |---|---|---|---|---|
-| AWS KMS | `ed25519` | key spec `ECC_NIST_EDWARDS25519`, `ED25519_SHA_512` with MessageType `RAW` (pure Ed25519); announced 7 Nov 2025 | `hsm` (origin `AWS_KMS` or `AWS_CLOUDHSM`), `external` (`EXTERNAL_KEY_STORE`), else `unknown` | https://docs.aws.amazon.com/kms/latest/developerguide/symm-asymm-choose-key-spec.html (5 Oct 2026) |
-| AWS KMS | `ecdsa-p256-sha256` | key spec `ECC_NIST_P256`, `ECDSA_SHA_256`, DER answer | as above | same |
-| Google Cloud KMS | `ed25519` | `EC_SIGN_ED25519` (PureEdDSA over the data); SOFTWARE protection level only | `software` | https://cloud.google.com/kms/docs/algorithms (5 Oct 2026) |
-| Google Cloud KMS | `ecdsa-p256-sha256` | `EC_SIGN_P256_SHA256` over a SHA-256 digest, DER answer | the key version's protection level: `hsm`, `software` or `external` | same |
-| Azure Key Vault / Managed HSM | `ecdsa-p256-sha256` | key type `EC` or `EC-HSM`, curve P-256, `ES256` over a SHA-256 digest; no Ed25519 | `hsm` for `EC-HSM`, `software` for `EC` | https://learn.microsoft.com/azure/key-vault/keys/about-keys-details (5 Oct 2026) |
-| PKCS#11 | `ecdsa-p256-sha256` | `CKM_ECDSA` over a SHA-256 digest | what `AMC_PKCS11_PROTECTION` states, basis `configured`; `unknown` when unset | PKCS#11 v3.0 |
-| PKCS#11 | `ed25519` | `CKM_EDDSA` (PKCS#11 v3.0), only when the token lists the mechanism; SoftHSM2 needs `--enable-eddsa` | as above | PKCS#11 v3.0; https://github.com/softhsm/SoftHSMv2 |
-| file (vault) | `ed25519` | vault key, development only | `software`, basis `configured`, exportable | — |
+| AWS KMS | `ed25519` | `ECC_NIST_EDWARDS25519`, `ED25519_SHA_512`, `MessageType: RAW`; distinct from the prehashed variant | `hsm` for origin `AWS_KMS`/`AWS_CLOUDHSM`, `external` for `EXTERNAL_KEY_STORE`, otherwise `unknown`; basis `provider-metadata` | [Key specifications](https://docs.aws.amazon.com/kms/latest/developerguide/symm-asymm-choose-key-spec.html), [Sign](https://docs.aws.amazon.com/kms/latest/APIReference/API_Sign.html) |
+| AWS KMS | `ecdsa-p256-sha256` | `ECC_NIST_P256`, `ECDSA_SHA_256`; DER response converted by AMC to canonical P1363 | Same source mapping | [Key specifications](https://docs.aws.amazon.com/kms/latest/developerguide/symm-asymm-choose-key-spec.html), [Sign](https://docs.aws.amazon.com/kms/latest/APIReference/API_Sign.html) |
+| Google Cloud KMS | `ed25519` | `EC_SIGN_ED25519`, PureEdDSA over raw data; listed for `SOFTWARE`, absent from the documented HSM tables | `software`; basis `provider-metadata` | [Algorithms by protection level](https://docs.cloud.google.com/kms/docs/algorithms#elliptic_curve_signing_algorithms) |
+| Google Cloud KMS | `ecdsa-p256-sha256` | `EC_SIGN_P256_SHA256`, SHA-256 digest | `hsm`, `software` or `external` from recognized protection metadata; otherwise `unknown` | [Algorithms by protection level](https://docs.cloud.google.com/kms/docs/algorithms#elliptic_curve_signing_algorithms) |
+| Azure Key Vault / Managed HSM | `ecdsa-p256-sha256` | P-256 and `ES256` over a SHA-256 digest; Ed25519 is not listed in these supported-key tables | `hsm` for `EC-HSM`, `software` for `EC`; basis `provider-metadata` | [Key Vault](https://learn.microsoft.com/en-us/azure/key-vault/keys/about-keys-details), [Managed HSM](https://learn.microsoft.com/en-us/azure/key-vault/managed-hsm/about-keys-details) |
+| PKCS#11 | `ecdsa-p256-sha256` | `CKM_ECDSA` over a SHA-256 digest; actual token mechanism/attribute checks remain required | Configured `hsm`/`software`, otherwise `unknown`; basis `configured` | [OASIS PKCS#11 specification, ECDSA](https://docs.oasis-open.org/pkcs11/pkcs11-spec/v3.1/os/pkcs11-spec-v3.1-os.html) |
+| PKCS#11 | `ed25519` | `CKM_EDDSA` with the pure scheme; support depends on the actual token/build | Same configured mapping; SoftHSM is software | [OASIS PKCS#11, section6.3.14](https://docs.oasis-open.org/pkcs11/pkcs11-spec/v3.1/os/pkcs11-spec-v3.1-os.html), [SoftHSM build options](https://github.com/softhsm/SoftHSMv2#configure) |
+| file (vault) | `ed25519` | Existing development vault key | `software`, basis `configured`, exportable | Current AMC file-provider source; no hardware claim |
+
+Google also lists `HSM_SINGLE_TENANT`; the current adapter does not map that metadata value and reports `unknown`. This table does not imply that AMC has qualified that protection level. SoftHSM's current build option is `--enable-eddsa` with automatic detection by default; the installed backend and runtime mechanism list determine actual support. A software token is not physical-HSM evidence.
+
+Public page bodies, retrieval times and SHA-256 values are recorded in the local P2-08 evidence packet `root-provider-matrix-reverification-20261024-v1`. SDK versions, least-privilege policy suggestions and provider/network behavior were not requalified by this documentation-only check. Live KMS, physical-HSM and hosted-CI evidence remain pending.
 
 ## Configuration
 
