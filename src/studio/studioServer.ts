@@ -47,8 +47,8 @@ import { containedPath } from "../utils/pathSafety.js";
 import { auditSchedulerTick } from "../audit/auditScheduler.js";
 import { emitAuditSse } from "../audit/auditSse.js";
 import {
-  importValueCsvForApi,
-  ingestValueWebhookForApi,
+  importValueCsvForApiAsync as importValueCsvForApi,
+  ingestValueWebhookForApiAsync as ingestValueWebhookForApi,
   valueContractApplyForApiAsync as valueContractApplyForApi,
   valueContractForApi,
   valueContractInitForApiAsync as valueContractInitForApi,
@@ -60,7 +60,7 @@ import {
   valueSchedulerSetEnabledForApiAsync as valueSchedulerSetEnabledForApi,
   valueSchedulerStatusForApi,
   valueSnapshotLatestForApi,
-  verifyValueWebhookToken
+  verifyValueWebhookToken, assertValueWebhookTokenCurrent
 } from "../value/valueApi.js";
 import { loadValuePolicyReadOnly as loadValuePolicy, verifyValuePolicySignature } from "../value/valueStore.js";
 import { valueSchedulerTick } from "../value/valueScheduler.js";
@@ -2131,11 +2131,24 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 401, { error: "value ingest requires OWNER/OPERATOR session or vault-backed webhook token" });
           return;
         }
-        // An operator session or a webhook token authenticates the sender; the events stay SELF_REPORTED (P0-18).
-        const out = ingestValueWebhookForApi({
-          workspace: options.workspace,
-          payload: parsed
-        });
+        // Choose the original session or token basis once; a revoked session never falls back to the token after Sign.
+        const expected = sessionAuth ? { isAdmin: sessionAuth.isAdmin, userId: sessionAuth.userId, agentId: sessionAuth.agentId } : null;
+        const originalToken = typeof providedToken === "string" ? providedToken : "";
+        const beforePublish = () => {
+          if (canIngestAsOperator) {
+            const current = authenticate(req, options.workspace, options.token);
+            if (!current || !expected || current.isAdmin !== expected.isAdmin || current.userId !== expected.userId || current.agentId !== expected.agentId) {
+              if (!res.headersSent) json(res, 401, { error: "value ingest session changed while signing" }); throw new Error("value ingest session changed while signing");
+            }
+            if (!requireRoles({ auth: current, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) throw new Error("value ingest role changed while signing");
+          } else {
+            try { assertValueWebhookTokenCurrent(options.workspace, originalToken); }
+            catch (error) { if (!res.headersSent) json(res, 401, { error: "value webhook authority changed while signing" }); throw error; }
+          }
+        };
+        // Sender authentication never upgrades the SELF_REPORTED event trust tier.
+        const out = await ingestValueWebhookForApi({ workspace: options.workspace, payload: parsed }, { beforePublish })
+          .catch(error => { if (res.headersSent) return null; throw error; }); if (out === null) return;
         emitValueSse({
           hub: orgSse,
           type: "VALUE_UPDATED"
@@ -4825,7 +4838,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "attest was removed in 2.0.0: imported value events are SELF_REPORTED (see docs/EVIDENCE_TRUST.md)" });
           return;
         }
-        const out = importValueCsvForApi({
+        const out = await importValueCsvForApi({
           workspace: options.workspace,
           scopeType:
             typeof parsed.scopeType === "string"
@@ -4834,7 +4847,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           scopeId: typeof parsed.scopeId === "string" ? parsed.scopeId : "workspace",
           kpiId: parsed.kpiId,
           csvText: parsed.csv
-        });
+        }, { beforePublish: signingAuthority(["OWNER", "OPERATOR"]) }).catch(error => { if (res.headersSent) return null; throw error; }); if (out === null) return;
         emitValueSse({
           hub: orgSse,
           type: "VALUE_UPDATED"

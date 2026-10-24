@@ -508,8 +508,8 @@ import {
   valueContractPrintCli,
   valueContractVerifyCli,
   VALUE_ATTESTED_REMOVED,
-  valueImportCsvCli,
-  valueIngestWebhookCli,
+  valueImportCsvCliAsync as valueImportCsvCli,
+  valueIngestWebhookCliAsync as valueIngestWebhookCli,
   valueInitCliAsync as valueInitCli,
   valuePolicyApplyCliAsync as valuePolicyApplyCli,
   valuePolicyDefaultCli,
@@ -13309,13 +13309,13 @@ value
   .requiredOption("--file <path>", "payload JSON/YAML file")
   // Removed in 2.0.0 (P0-18 follow-up): kept hidden only to refuse with a pointer instead of commander's unknown-option error.
   .addOption(new Option("--attested").hideHelp())
-  .action((opts: { file: string; attested?: boolean }) => {
+  .action(async (opts: { file: string; attested?: boolean }) => {
     if (opts.attested !== undefined) {
       console.error(VALUE_ATTESTED_REMOVED);
       process.exit(2);
     }
     assertOwnerMode(process.cwd(), "value ingest");
-    const out = valueIngestWebhookCli({
+    const out = await valueIngestWebhookCli({
       workspace: process.cwd(),
       file: opts.file
     });
@@ -13333,7 +13333,7 @@ value
   .option("--id <id>", "scope id", "workspace")
   .requiredOption("--kpi <kpiId>", "kpi id")
   .addOption(new Option("--attested").hideHelp())
-  .action((opts: { csv: string; scope: string; id: string; kpi: string; attested?: boolean }) => {
+  .action(async (opts: { csv: string; scope: string; id: string; kpi: string; attested?: boolean }) => {
     if (opts.attested !== undefined) {
       console.error(VALUE_ATTESTED_REMOVED);
       process.exit(2);
@@ -13343,7 +13343,7 @@ value
     if (!(scope === "workspace" || scope === "node" || scope === "agent")) {
       throw new Error("scope must be workspace|node|agent");
     }
-    const out = valueImportCsvCli({
+    const out = await valueImportCsvCli({
       workspace: process.cwd(),
       file: opts.csv,
       scope: scope as "workspace" | "node" | "agent",

@@ -18,7 +18,7 @@ import {
   valueSchedulerStatusForApi,
   valueSnapshotLatestForApi
 } from "./valueApi.js";
-import { valueInitForApiAsync, valuePolicyForApiAsync, valuePolicyApplyForApiAsync, valueContractInitForApiAsync, valueContractApplyForApiAsync, valueSchedulerSetEnabledForApiAsync } from "./valueApi.js";
+import { ingestValueWebhookForApiAsync, importValueCsvForApiAsync, valueInitForApiAsync, valuePolicyForApiAsync, valuePolicyApplyForApiAsync, valueContractInitForApiAsync, valueContractApplyForApiAsync, valueSchedulerSetEnabledForApiAsync } from "./valueApi.js";
 import { verifyValueWorkspace } from "./valueVerifier.js";
 
 function parseJsonOrYaml(raw: string): unknown {
@@ -213,4 +213,13 @@ export async function valueContractApplyCliAsync(params: Parameters<typeof value
 }
 export async function valueSchedulerEnableCliAsync(params: { workspace: string; enabled: boolean }) {
   const own = { ...params }; return valueSchedulerSetEnabledForApiAsync(own, { beforePublish: () => assertOwnerMode(own.workspace, own.enabled ? "value scheduler enable" : "value scheduler disable") });
+}
+
+export async function valueIngestWebhookCliAsync(params: Parameters<typeof valueIngestWebhookCli>[0]) {
+  const own = { ...params }, payload = parseJsonOrYaml(readUtf8(resolve(own.file)));
+  return ingestValueWebhookForApiAsync({ workspace: own.workspace, payload }, { beforePublish: () => assertOwnerMode(own.workspace, "value ingest") });
+}
+export async function valueImportCsvCliAsync(params: Parameters<typeof valueImportCsvCli>[0]) {
+  const own = { ...params }, csvText = readUtf8(resolve(own.file));
+  return importValueCsvForApiAsync({ workspace: own.workspace, scopeType: own.scope.toUpperCase() as "WORKSPACE" | "NODE" | "AGENT", scopeId: own.scope === "workspace" ? "workspace" : own.id, kpiId: own.kpiId, csvText }, { beforePublish: () => assertOwnerMode(own.workspace, "value import") });
 }

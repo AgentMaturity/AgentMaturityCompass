@@ -1,10 +1,10 @@
-import { ingestValueWebhookForApi } from "../valueApi.js";
+import { ingestValueWebhookForApiAsync } from "../valueApi.js";
 
 export async function ingestValueWebhook(params: {
   workspace: string;
   payload: unknown;
 }) {
-  return ingestValueWebhookForApi({
+  return ingestValueWebhookForApiAsync({
     workspace: params.workspace,
     payload: params.payload
   });
