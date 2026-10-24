@@ -241,7 +241,7 @@ export function captureHandoffFiles(paths: string[]): HandoffFile[] {
   try { return paths.map(path => ({ path, state: readHandoffFile(path) })); }
   catch (cause) { throw Object.assign(new Error("Cannot read .amc/handoffs publication preimage", { cause }), { code: "HANDOFF_PREPARATION_FAILED" }); }
 }
-function assertHandoffFilesCurrent(files: readonly HandoffFile[]): void {
+export function assertHandoffFilesCurrent(files: readonly HandoffFile[]): void {
   for (const file of files) {
     const current = captureHandoffFiles([file.path])[0]!.state;
     if (current === null ? file.state !== null : file.state === null || current.mode !== file.state.mode || !current.bytes.equals(file.state.bytes)) {
