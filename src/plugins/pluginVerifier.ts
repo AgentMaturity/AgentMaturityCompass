@@ -22,9 +22,9 @@ function installedLockPath(workspace: string): string {
   return join(pluginsRoot(workspace), "installed.lock.json");
 }
 
-export function verifyInstalledPluginsIntegrity(workspace: string): InstalledPluginIntegrityResult {
+export function verifyInstalledPluginsIntegrity(workspace: string, options: { readonly?: boolean } = {}): InstalledPluginIntegrityResult {
   const root = pluginsRoot(workspace);
-  ensureDir(root);
+  if (!options.readonly) ensureDir(root);
   const lockPath = installedLockPath(workspace);
   const lockSig = verifyInstalledPluginsLock(workspace);
   const errors: string[] = [];

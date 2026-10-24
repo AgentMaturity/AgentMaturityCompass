@@ -95,6 +95,7 @@ export async function initPluginWorkspaceAsync(params: Parameters<typeof initPlu
 
 export function verifyPluginWorkspace(params: {
   workspace: string;
+  readonly?: boolean;
 }): {
   ok: boolean;
   errors: string[];
@@ -137,7 +138,7 @@ export function verifyPluginWorkspace(params: {
   const registries = verifyPluginRegistriesConfig(params.workspace);
   const overrides = verifyPluginOverrides(params.workspace);
   const lock = verifyInstalledPluginsLock(params.workspace);
-  const integrity = verifyInstalledPluginsIntegrity(params.workspace);
+  const integrity = verifyInstalledPluginsIntegrity(params.workspace, { readonly: params.readonly === true });
   const errors: string[] = [];
   if (!registries.valid) {
     errors.push(`registries signature invalid: ${registries.reason ?? "unknown"}`);

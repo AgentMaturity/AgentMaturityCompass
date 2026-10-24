@@ -1,3 +1,4 @@
+import { countBenchAuditRows, countReadonlyBenchAuditEvents, latestReadonlyBenchAssuranceByPack } from "./benchReadOnlyInputs.js";
 import { readdirSync } from "node:fs";
 import { join } from "node:path";
 import type { LayerName, OutcomeReport } from "../types.js";
@@ -167,18 +168,6 @@ function valueDimensionsFromOutcome(report: OutcomeReport | null): {
   };
 }
 
-function parseMeta(metaJson: string): Record<string, unknown> {
-  try {
-    const parsed = JSON.parse(metaJson) as unknown;
-    if (parsed && typeof parsed === "object") {
-      return parsed as Record<string, unknown>;
-    }
-    return {};
-  } catch {
-    return {};
-  }
-}
-
 function countAuditEvents(params: {
   workspace: string;
   startTs: number;
@@ -187,16 +176,7 @@ function countAuditEvents(params: {
 }): number {
   const ledger = openLedger(params.workspace);
   try {
-    const events = ledger.getEventsBetween(params.startTs, params.endTs);
-    const auditSet = new Set(params.auditTypes);
-    return events
-      .filter((event) => event.event_type === "audit")
-      .filter((event) => {
-        const meta = parseMeta(event.meta_json);
-        const auditType = typeof meta.auditType === "string" ? meta.auditType : null;
-        return Boolean(auditType && auditSet.has(auditType));
-      })
-      .length;
+    return countBenchAuditRows(ledger.getEventsBetween(params.startTs, params.endTs), params.auditTypes);
   } finally {
     ledger.close();
   }
@@ -309,15 +289,15 @@ export function collectBenchData(params: BenchCollectionInput): CollectedBenchDa
 /** Internal selected-value capture: original window and actual forecast selector are retained, not refreshed after signing. */
 export function captureBenchData(input: BenchCollectionInput) {
   const params = structuredClone(input);
-  const closed = () => {const ledger=openLedger(params.workspace);try{if(ledger.db.inTransaction)throw new Error("async bench collection cannot borrow an open SQL transaction");}finally{ledger.close();}};
-  closed(); const window = resolveWindow(params.windowDays), identity = collectionIdentity(params);
+  const window = resolveWindow(params.windowDays), identity = collectionIdentity(params);
   const signals = captureForecastSignals({workspace:params.workspace,scope:{type:params.scopeType,id:params.scopeId},lookbackDays:Math.max(90,params.windowDays)});
-  const collected = collectBenchDataWithInputs(params,window,signals.signals,identity), selected = canonicalize(collected);
-  return {collected,assertCurrent(){closed();signals.assertCurrent();if(canonicalize(collectBenchDataWithInputs(params,window,signals.signals,identity))!==selected)throw new Error("selected bench inputs changed while signing");}};
+  const collected = collectBenchDataWithInputs(params,window,signals.signals,identity,true), selected = canonicalize(collected);
+  return {collected,assertCurrent(){signals.assertCurrent();if(canonicalize(collectBenchDataWithInputs(params,window,signals.signals,identity,true))!==selected)throw new Error("selected bench inputs changed while signing");}};
 }
 function collectionIdentity(params:BenchCollectionInput){return {scopeIdHash:hashId(params.scopeId,params.policy.benchPolicy.privacy.hashTruncBytes),workspaceHash:hashId(params.workspace,params.policy.benchPolicy.privacy.hashTruncBytes)};}
-function collectBenchDataWithInputs(params: BenchCollectionInput, window: ReturnType<typeof resolveWindow>, signals: ForecastSignalBundle, identity:ReturnType<typeof collectionIdentity>): CollectedBenchData {
+function collectBenchDataWithInputs(params: BenchCollectionInput, window: ReturnType<typeof resolveWindow>, signals: ForecastSignalBundle, identity:ReturnType<typeof collectionIdentity>, readOnly = false): CollectedBenchData {
   const {scopeIdHash,workspaceHash} = identity;
+  const countSelectedAudit = readOnly ? countReadonlyBenchAuditEvents : countAuditEvents, selectedAssurance = readOnly ? latestReadonlyBenchAssuranceByPack : latestAssuranceByPack;
   const scope = { type: params.scopeType, id: params.scopeId };
   const latestForecast = loadLatestForecastArtifact(params.workspace, scope);
 
@@ -433,18 +413,18 @@ function collectBenchDataWithInputs(params: BenchCollectionInput, window: Return
     }
   }
 
-  const pluginState = verifyPluginWorkspace({ workspace: params.workspace });
+  const pluginState = verifyPluginWorkspace({ workspace: params.workspace, readonly: readOnly });
   const operating = {
     approvalsBacklogCount: Math.max(0, Math.round(latestSeriesValue(signals.points.operating.approval_backlog_size))),
     approvalsMedianAgeHours: Number(latestSeriesValue(signals.points.operating.approval_backlog_age_hours).toFixed(6)),
-    budgetExceedEvents: countAuditEvents({
+    budgetExceedEvents: countSelectedAudit({
       workspace: params.workspace,
       startTs: window.startTs,
       endTs: window.endTs,
       auditTypes: ["BUDGET_EXCEEDED", "LEASE_RATE_LIMITED"]
     }),
     toolhubDenialRate: Number(latestSeriesValue(signals.points.operating.toolhub_denial_rate).toFixed(6)),
-    freezeEvents: countAuditEvents({
+    freezeEvents: countSelectedAudit({
       workspace: params.workspace,
       startTs: window.startTs,
       endTs: window.endTs,
@@ -468,7 +448,7 @@ function collectBenchDataWithInputs(params: BenchCollectionInput, window: Return
 
   if (params.scopeType === "AGENT") {
     const agentId = resolveAgentId(params.workspace, params.scopeId);
-    const assurance = latestAssuranceByPack({
+    const assurance = selectedAssurance({
       workspace: params.workspace,
       agentId,
       windowStartTs: window.startTs,
