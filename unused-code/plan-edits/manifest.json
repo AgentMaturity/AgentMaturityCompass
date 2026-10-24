@@ -395,11 +395,25 @@
       "sha256": "4eef636358fb607e4ada186a19aee5e187b9c8e9022c5d04b77467c5b46bbe17"
     },
     {
+      "path": "src/mechanic/profiles.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/mechanic/profiles.ts.landed",
+      "sha256": "fd2f2d0e55dc53e0470beecd438d5fac9f944beb60f590eb4713e88bee04ca9f"
+    },
+    {
       "path": "src/mechanic/targetsStore.ts",
       "issue": "P0-28",
       "baseCommit": "d6184fee3320635c8ca606aa2454b8dc27596111",
       "archivePath": "unused-code/plan-edits/P0-28/src/mechanic/targetsStore.ts.landed",
       "sha256": "abd2a0dce4dab30daec3c37ea969ea053e8a3ecd0a140e6e39ce9a8ea6166326"
+    },
+    {
+      "path": "src/mechanic/tuningStore.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/mechanic/tuningStore.ts.landed",
+      "sha256": "b7a481e7383c6b1a725867ec39bf8a1b264e3582753ad86b4e52de4f749e9eac"
     },
     {
       "path": "src/notary/notaryAttestation.ts",
