@@ -12,6 +12,9 @@ import { getVaultSecret, setVaultSecret } from "../vault/vault.js";
 import { checkScopedEgress } from "../residency/checkEgress.js";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
+import { captureRawConfigPair } from "../config/configSignaturePair.js";
+import { captureOrgPairs } from "../org/preparedOrgPairs.js";
+import { vaultStatus } from "../vault/vault.js";
 
 const alertsSchema = z.object({
   alerts: z.object({
@@ -185,6 +188,59 @@ export function initAlertsConfig(workspace: string): { configPath: string; sigPa
     configPath: path,
     sigPath
   };
+}
+
+/** Actual existing-file raw config-purpose signer; no body is rewritten. */
+export async function signAlertsConfigAsync(workspaceInput: string, beforePublish?: () => void): Promise<string> {
+  const workspace = resolve(workspaceInput), caller = beforePublish;
+  const assertCurrent = () => {
+    caller?.();
+    if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize alerts configuration signing");
+  };
+  assertCurrent();
+  const pair = captureRawConfigPair(workspace, alertsPath(workspace), undefined, { beforePublish: assertCurrent });
+  const prepared = await pair.prepare(), result = prepared.publish(); prepared.assertCurrent(); return result.sigPath;
+}
+
+/** Secret writes precede provider signing; attempted and returned persistence are distinct facts. */
+export class AlertsInitializationError extends Error {
+  readonly code = "ALERTS_INITIALIZATION_INCOMPLETE";
+  constructor(readonly attemptedSecretKeys: readonly string[], readonly returnedSecretKeys: readonly string[], cause: unknown) {
+    super("alerts initialization did not complete; inspect secret persistence and nested publication before retrying", { cause });
+    this.name = "AlertsInitializationError";
+  }
+}
+
+export async function initAlertsConfigAsync(workspaceInput: string, beforePublish?: () => void): Promise<{ configPath: string; sigPath: string }> {
+  const workspace = resolve(workspaceInput), caller = beforePublish;
+  const maySign = () => {
+    caller?.();
+    if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize alerts configuration signing");
+  };
+  maySign();
+  const path = alertsPath(workspace), previous = captureOrgPairs([path]), config = defaultAlertsConfig();
+  const bytes = Buffer.from(YAML.stringify(config)), selected = new Map<string, string>();
+  const attempted: string[] = [], returned: string[] = [];
+  try {
+    ensureDir(join(workspace, ".amc"));
+    for (const channel of config.alerts.channels) {
+      maySign();
+      const key = secretKeyFromRef(channel.secretRef), secret = randomBytes(16).toString("hex");
+      attempted.push(key); setVaultSecret(workspace, key, secret); returned.push(key); selected.set(key, secret);
+    }
+    const assertInputsCurrent = () => {
+      maySign();
+      if (!vaultStatus(workspace).unlocked) throw new Error("alerts secret vault is locked while signing");
+      for (const [key, secret] of selected) if (getVaultSecret(workspace, key) !== secret)
+        throw new Error("the selected alerts secret changed while configuration signing was prepared");
+    };
+    const pair = captureRawConfigPair(workspace, path, bytes, { previous, beforePublish: assertInputsCurrent });
+    const prepared = await pair.prepare(), result = prepared.publish(); prepared.assertCurrent();
+    return { configPath: result.path, sigPath: result.sigPath };
+  } catch (cause) {
+    if (attempted.length === 0) throw cause;
+    throw new AlertsInitializationError(Object.freeze([...attempted]), Object.freeze([...returned]), cause);
+  }
 }
 
 export interface AlertPayload {

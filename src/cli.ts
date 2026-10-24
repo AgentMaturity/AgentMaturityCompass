@@ -330,7 +330,7 @@ import { issueExecTicketAsync, verifyExecTicket } from "./tickets/execTicketVeri
 import { normalizeActionClass, parseTtlToMs } from "./tickets/execTicketCli.js";
 import { registerBudgetCommands } from "./cli-budget-commands.js";
 import { driftCheckCliAsync as driftCheckCli, driftReportCliAsync as driftReportCli, freezeLiftCliAsync as freezeLiftCli, freezeStatusCli } from "./drift/driftCli.js";
-import { initAlertsConfig, sendTestAlert, verifyAlertsConfigSignature } from "./drift/alerts.js";
+import { initAlertsConfigAsync as initAlertsConfig, sendTestAlert, verifyAlertsConfigSignature } from "./drift/alerts.js";
 import { startTrustDriftMonitor } from "./monitor/trustDriftMonitor.js";
 import { generateBom } from "./bom/bomGenerator.js";
 import { signBomFileAsync, verifyBomSignature } from "./bom/bomVerifier.js";
@@ -16373,8 +16373,8 @@ const alerts = program.command("alerts").description("Signed drift alert configu
 
 alerts
   .command("init")
-  .action(() => {
-    const out = initAlertsConfig(process.cwd());
+  .action(async () => {
+    const out = await initAlertsConfig(process.cwd());
     console.log(chalk.green(`Alerts initialized: ${out.configPath}`));
     console.log(`Signature: ${out.sigPath}`);
   });

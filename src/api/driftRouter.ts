@@ -5,6 +5,7 @@
 
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { KeyProviderError } from '../keys/provider.js';
+import { initAlertsConfigAsync } from '../drift/alerts.js';
 import { bodyJson, apiSuccess, apiError, queryParam } from './apiHelpers.js';
 
 export async function handleDriftRoute(
@@ -103,11 +104,12 @@ export async function handleDriftRoute(
   // POST /api/v1/drift/alerts/init — initialize alerts config
   if (pathname === '/api/v1/drift/alerts/init' && method === 'POST') {
     try {
-      const { initAlertsConfig } = await import('../drift/alerts.js');
-      const result = initAlertsConfig(workspace);
+      const guard = () => { if (!revalidateAuthority?.()) { if (!res.headersSent) apiError(res, 403, 'Current authority no longer permits this operation'); throw new Error('Current authority no longer permits this operation'); } };
+      const result = await initAlertsConfigAsync(workspace, revalidateAuthority === undefined ? undefined : guard);
       apiSuccess(res, { initialized: true, ...result });
     } catch (err) {
-      apiError(res, 500, err instanceof Error ? err.message : 'Alerts init failed');
+      if (!res.headersSent) apiError(res, revalidateAuthority !== undefined && err instanceof KeyProviderError ? err.status : 500,
+        revalidateAuthority !== undefined ? err instanceof KeyProviderError ? err.code : 'Alerts init failed' : err instanceof Error ? err.message : 'Alerts init failed');
     }
     return true;
   }
