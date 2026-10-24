@@ -8240,7 +8240,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         const listed = listInstalledPlugins(options.workspace);
         const loaded = loadInstalledPluginAssets(options.workspace);
         if (!loaded.integrity.ok) {
-          recomputeOrgAndEmit("PLUGIN_INTEGRITY_BROKEN");
+          const orgWorkspace = resolve(options.workspace), orgToken = options.token, orgIdentity = { isAdmin: auth.isAdmin, userId: auth.userId, agentId: auth.agentId }; await captureStudioOrgSecondary(orgWorkspace, () => { if (resolve(options.workspace) !== orgWorkspace || options.token !== orgToken) throw new Error("original Studio workspace or token changed while preparing optional org recompute"); const current = authenticate(req, orgWorkspace, orgToken); if (!current || current.isAdmin !== orgIdentity.isAdmin || current.userId !== orgIdentity.userId || current.agentId !== orgIdentity.agentId) throw new Error("authenticated authority changed while preparing optional org recompute"); const usersSig = verifyUsersConfigSignature(orgWorkspace); const check = enforceRoleOrAdmin({ access: accessContext(current), requiredAny: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"], usersConfigValid: usersSig.valid || current.sessionAuthSource === "WORKSPACE_ROUTER" }); if (!check.ok) throw new Error(check.error ?? "optional org recompute authority refused"); }, emitOrgEvent).run("PLUGIN_INTEGRITY_BROKEN");
         }
         json(res, 200, {
           ...listed,
@@ -8469,7 +8469,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 409, { error: "vault is locked" });
           return;
         }
-        const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
+        const orgWorkspace = resolve(options.workspace), orgToken = options.token, orgActor = humanAuditAuthority(["OWNER"], true); const orgSecondary = captureStudioOrgSecondary(orgWorkspace, () => { if (resolve(options.workspace) !== orgWorkspace || options.token !== orgToken) throw new Error("original Studio workspace or token changed while preparing optional org recompute"); orgActor(); }, emitOrgEvent); const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
         const parsed = body ? (JSON.parse(body) as { approvalRequestId?: string }) : {};
         if (!parsed.approvalRequestId) {
           json(res, 400, { error: "approvalRequestId is required" });
@@ -8496,7 +8496,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           }
         });
         const currentAgent = resolveAgentId(options.workspace);
-        recomputeOrgAndEmit(eventType, orgNodeIdsForAgent(currentAgent));
+        await orgSecondary.run(eventType, orgNodeIdsForAgent(currentAgent));
         const snapshotStatus = await refreshConsole(); if (snapshotStatus === null) return;
         json(res, 200, { ...executed, ...snapshotStatus });
         return;
@@ -8691,7 +8691,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           return;
         }
         const packId = decodeURIComponent(policyPackApplyMatch[1] ?? "");
-        const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
+        const orgWorkspace = resolve(options.workspace), orgToken = options.token, orgActor = humanAuditAuthority(["OWNER"]); const orgSecondary = captureStudioOrgSecondary(orgWorkspace, () => { if (resolve(options.workspace) !== orgWorkspace || options.token !== orgToken) throw new Error("original Studio workspace or token changed while preparing optional org recompute"); orgActor(); }, emitOrgEvent); const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
         const parsed = body ? (JSON.parse(body) as { agentId?: string }) : {};
         const owner = signingAuthority(["OWNER"]);
         const applied = await policyPackApplyCliAsync({
@@ -8713,7 +8713,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             transparencyHash: applied.transparencyHash
           }
         }, humanAuditAuthority(["OWNER"]));
-        recomputeOrgAndEmit("POLICY_PACK_APPLIED", orgNodeIdsForAgent(applied.agentId));
+        await orgSecondary.run("POLICY_PACK_APPLIED", orgNodeIdsForAgent(applied.agentId));
         const snapshotStatus = await refreshConsole(); if (snapshotStatus === null) return;
         json(res, 200, { applied, ...snapshotStatus });
         return;
