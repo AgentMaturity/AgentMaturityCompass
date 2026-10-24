@@ -1,11 +1,14 @@
 import { readdirSync } from "node:fs";
-import { join } from "node:path";
+import { join, relative, resolve } from "node:path";
 import { listAgents, verifyAgentConfigSignature, verifyFleetConfigSignature } from "../fleet/registry.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import { parseWindowToMs } from "../utils/time.js";
 import type { DiagnosticReport, TrustTier } from "../types.js";
 import { pathExists, readUtf8 } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
+import { canonicalize } from "../utils/json.js";
+import { keyPolicy, loadKeysConfig } from "../keys/keysConfig.js";
+import { assertPolicySignerCurrent, describePolicySigner } from "../crypto/signing/signer.js";
 import { questionBank } from "../diagnostic/questionBank.js";
 import { activeFreezeStatus } from "../drift/freezeEngine.js";
 import { latestAssuranceByPack } from "../assurance/assuranceRunner.js";
@@ -17,8 +20,8 @@ import { robustScore, weightedDistribution, weightedMedian, weightedMean, type W
 import type { OrgConfig, OrgNode, OrgNodeScorecard, OrgScorecard, OrgNodeType, NodeLayerScore, NodeQuestionScore, WeightedDistribution } from "./orgSchema.js";
 import { loadOrgConfig, nodeAgentIds, memberWeightForNode } from "./orgStore.js";
 import { verifyOrgConfigSignature } from "./orgStore.js";
-import { writeOrgScorecard, prepareOrgScorecardAsync } from "./orgScorecard.js";
-import { appendTransparencyEntryAsync } from "../transparency/logChain.js";
+import { writeOrgScorecard, prepareOrgScorecardAsync, orgScorecardPathsForResult } from "./orgScorecard.js";
+import { appendTransparencyEntryAttemptAsync, captureWorkspaceLogAuthority } from "../transparency/asyncWorkspaceAppend.js";
 import { withControlFileLock } from "../lifecycle/controlFileLock.js";
 import { captureOrgComputationInputs, captureOrgScorecardAuthority, OrgFollowupError, type OrgEffectOptions } from "./orgPublication.js";
 
@@ -601,25 +604,39 @@ export function recomputeAndPersistOrgScorecard(params: {
 /** Computed values are historical at computedAt; only the exact consumed org pair remains a current input gate. */
 export async function recomputeAndPersistOrgScorecardAsync(params: { workspace: string; window: string },
   options: OrgEffectOptions = {}): Promise<ReturnType<typeof recomputeAndPersistOrgScorecard>> {
-  const input = { workspace: params.workspace, window: params.window };
-  const assertOriginal = captureOrgScorecardAuthority(input.workspace, options.beforePublish);
+  const assertSigningEnabled = () => { if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize policy signing"); };
+  assertSigningEnabled();
+  const actor = options.beforePublish, beforeAuthority = () => { assertSigningEnabled(); actor?.(); assertSigningEnabled(); };
+  const resultWorkspace = params.workspace, input = { workspace: resolve(resultWorkspace), window: params.window };
+  const assertOriginal = captureOrgScorecardAuthority(input.workspace, beforeAuthority);
+  const logDescriptors = (["TRANSPARENCY_ROOT", "MERKLE_ROOT"] as const).map(kind => describePolicySigner(input.workspace, kind));
+  const logPolicy = logDescriptors.some(row => row.mode === "VAULT") ? canonicalize(keyPolicy(loadKeysConfig(input.workspace))) : null;
+  const beforeLog = () => { beforeAuthority();
+    for (const descriptor of logDescriptors) assertPolicySignerCurrent(input.workspace, descriptor);
+    if (logPolicy !== null && canonicalize(keyPolicy(loadKeysConfig(input.workspace))) !== logPolicy)
+      throw new Error("original org log signing policy changed while preparing the operation");
+  };
+  const originalLog = captureWorkspaceLogAuthority(input.workspace, beforeLog);
   const inputs = captureOrgComputationInputs(input.workspace), computed = computeOrgScorecard({ ...input, config: inputs.config });
-  inputs.assertCurrent();
-  const prepared = await prepareOrgScorecardAsync(input.workspace, computed, { beforePublish: () => {
-    assertOriginal(); inputs.assertCurrent();
-  } });
+  const beforePublish = () => { assertOriginal(); originalLog.assertCurrent(); inputs.assertCurrent(); };
+  beforePublish();
+  const prepared = await prepareOrgScorecardAsync(input.workspace, computed, { beforePublish });
   const written = prepared.publish(), scorecard = prepared.scorecard;
+  const publishedPaths = Object.freeze([written.latestPath, written.historyPath, written.latestSigPath, written.historySigPath]
+    .map(path => relative(input.workspace, path)));
+  let completedEntryHash: string | null = null;
   try {
-    await appendTransparencyEntryAsync({ workspace: input.workspace, type: "ORG_SCORECARD_RECORDED", agentId: "org",
-      artifact: { kind: "policy", sha256: sha256Hex(Buffer.from(JSON.stringify(scorecard), "utf8")), id: String(scorecard.computedAt) } },
-    { beforeCommit: () => {
-      withControlFileLock({ root: join(input.workspace, ".amc"), name: "org-scorecard-pairs", operation: prepared.assertCurrent });
+    const stable = () => withControlFileLock({ root: join(input.workspace, ".amc"), name: "org-scorecard-pairs", operation: () => {
+      beforePublish(); prepared.assertCurrent();
     } });
+    const attempt = await appendTransparencyEntryAttemptAsync({ workspace: input.workspace, type: "ORG_SCORECARD_RECORDED", agentId: "org",
+      artifact: { kind: "policy", sha256: sha256Hex(Buffer.from(JSON.stringify(scorecard), "utf8")), id: String(scorecard.computedAt) } },
+      { beforeCommit: stable, beforeMember: stable });
+    completedEntryHash = attempt.entry.hash; stable(); attempt.assertCurrent();
   } catch (error) {
-    throw new OrgFollowupError("log", Object.freeze([".amc/org/scorecards/latest.json", ".amc/org/scorecards/latest.json.sig",
-      `.amc/org/scorecards/history/${scorecard.computedAt}.json`, `.amc/org/scorecards/history/${scorecard.computedAt}.json.sig`]), null, error);
+    throw new OrgFollowupError("log", publishedPaths, null, error, completedEntryHash);
   }
-  return { scorecard, ...written };
+  return { scorecard, ...orgScorecardPathsForResult(resultWorkspace, scorecard.computedAt) };
 }
 
 export function nodeHierarchy(config: OrgConfig): Array<{

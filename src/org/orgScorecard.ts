@@ -1,12 +1,13 @@
-import { join, relative } from "node:path";
+import { join, relative, resolve } from "node:path";
 import type { OrgNodeScorecard, OrgScorecard } from "./orgSchema.js";
 import { orgScorecardHistoryDir, orgScorecardsDir } from "./orgStore.js";
-import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
+import { pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { prepareFileSignatureWithAuditor, type SignedFileVerification } from "./orgSigner.js";
 import { signDigestWithPolicy } from "../crypto/signing/signer.js";
 import { sha256Hex } from "../utils/hash.js";
 import { withControlFileLock } from "../lifecycle/controlFileLock.js";
-import { captureOrgPairs, assertOrgPairsCurrent, orgPairBytes } from "./preparedOrgPairs.js";
+import { captureOrgFiles, captureOrgPairs, assertOrgPairsCurrent, orgPairBytes, type OrgPairsSnapshot } from "./preparedOrgPairs.js";
+import { capturePassportDirectories, PassportPublicationError } from "../passport/passportPublication.js";
 import { verifyAuditorSignatureBytes } from "./orgSignatureBytes.js";
 import { captureOrgScorecardAuthority, type OrgEffectOptions } from "./orgPublication.js";
 
@@ -19,35 +20,69 @@ function orgScorecardHistoryPath(workspace: string, ts: number): string {
 }
 
 type WrittenScorecard = { latestPath: string; latestSigPath: string; historyPath: string; historySigPath: string };
-function scorecardPlan(workspace: string, input: OrgScorecard) {
+/** Result spelling only; native publication retains its separately captured absolute workspace. */
+export function orgScorecardPathsForResult(workspace: string, computedAt: number): WrittenScorecard {
+  const latestPath = latestOrgScorecardPath(workspace), historyPath = orgScorecardHistoryPath(workspace, computedAt);
+  return { latestPath, latestSigPath: `${latestPath}.sig`, historyPath, historySigPath: `${historyPath}.sig` };
+}
+function scorecardPlan(workspace: string, input: OrgScorecard, resultWorkspace = workspace) {
   const payload = JSON.stringify(input, null, 2), scorecard = JSON.parse(payload) as OrgScorecard;
+  workspace = resolve(workspace);
   const latestPath = latestOrgScorecardPath(workspace), historyPath = orgScorecardHistoryPath(workspace, scorecard.computedAt);
   return { workspace, scorecard, payload: Buffer.from(payload), latestPath, historyPath,
-    previous: captureOrgPairs([latestPath, historyPath]) };
+    written: orgScorecardPathsForResult(resultWorkspace, scorecard.computedAt), previous: captureOrgPairs([latestPath, historyPath]),
+    directories: capturePassportDirectories([orgScorecardsDir(workspace), orgScorecardHistoryDir(workspace)]) };
+}
+interface OrgScorecardPublicationProgress {
+  readonly phase: string; readonly lockSetupAttempted: boolean; readonly lockEntered: boolean;
+  readonly directorySetupAttempted: boolean; readonly returnedDirectories: readonly string[]; readonly acknowledgedPaths: readonly string[];
 }
 export class OrgScorecardPublicationError extends Error {
   readonly code = "ORG_SCORECARD_PARTIAL";
-  constructor(readonly publishedPaths: readonly string[], readonly attemptedPath: string, cause: unknown) {
-    super("org scorecard publication is incomplete; inspect acknowledged and attempted members before retrying", { cause });
-    this.name = "OrgScorecardPublicationError";
+  constructor(readonly publishedPaths: readonly string[], readonly attemptedPath: string, cause: unknown,
+    readonly progress: OrgScorecardPublicationProgress | null = null) {
+    super("org scorecard publication is incomplete; inspect returned, acknowledged and attempted members before retrying", { cause });
+    this.publishedPaths = Object.freeze([...publishedPaths]); this.name = "OrgScorecardPublicationError";
   }
 }
 function publishScorecard(plan: ReturnType<typeof scorecardPlan>, latestSignature: string, historySignature: string,
-  assertCurrent: () => void): WrittenScorecard {
-  return withControlFileLock({ root: join(plan.workspace, ".amc"), name: "org-scorecard-pairs", operation: () => {
-    assertCurrent(); assertOrgPairsCurrent(plan.previous);
-    const published: string[] = []; let attempted = "";
-    try {
-      ensureDir(orgScorecardsDir(plan.workspace)); ensureDir(orgScorecardHistoryDir(plan.workspace));
+  assertCurrent: () => void) {
+  const expected: { members: OrgPairsSnapshot["members"][number][] } = {
+    members: plan.previous.members.map(row => ({ ...row, bytes: row.bytes === null ? null : Buffer.from(row.bytes) }))
+  };
+  const published: string[] = [], acknowledged: string[] = []; let attempted = "", phase = "lock-setup";
+  let lockSetupAttempted = false, lockEntered = false, directorySetupAttempted = false;
+  const progress = (): OrgScorecardPublicationProgress => Object.freeze({ phase, lockSetupAttempted, lockEntered, directorySetupAttempted,
+    returnedDirectories: Object.freeze([...plan.directories.created]), acknowledgedPaths: Object.freeze([...acknowledged]) });
+  const assertOwnedCurrent = () => { plan.directories.assertCurrent(); assertOrgPairsCurrent(expected); };
+  // External/current signature negatives precede the last original-remaining/acknowledged-own target CAS.
+  const beforeMember = () => { assertCurrent(); assertOwnedCurrent(); };
+  lockSetupAttempted = true;
+  try {
+    return withControlFileLock({ root: join(plan.workspace, ".amc"), name: "org-scorecard-pairs", operation: () => {
+      lockEntered = true; phase = "directory-setup"; beforeMember(); directorySetupAttempted = true;
+      plan.directories.create(beforeMember);
       // Retain the existing two-body, then two-sidecar publication order.
       for (const [path, bytes] of [[plan.latestPath, plan.payload], [plan.historyPath, plan.payload],
-        [`${plan.latestPath}.sig`, latestSignature], [`${plan.historyPath}.sig`, historySignature]] as const) {
-        attempted = relative(plan.workspace, path); writeFileAtomic(path, bytes, 0o644); published.push(attempted);
+        [`${plan.latestPath}.sig`, Buffer.from(latestSignature)], [`${plan.historyPath}.sig`, Buffer.from(historySignature)]] as const) {
+        attempted = ""; phase = "member"; beforeMember();
+        attempted = relative(plan.workspace, path);
+        writeFileAtomic(path, bytes, 0o644); published.push(attempted);
+        phase = "member-acknowledgment";
+        const own = captureOrgFiles([path]).members[0];
+        if (own === undefined || own.mode !== 0o644 || own.bytes === null || !own.bytes.equals(bytes))
+          throw new Error("published org scorecard member differs from its exact prepared bytes or mode");
+        const index = expected.members.findIndex(row => row.path === path);
+        if (index < 0) throw new Error("published org scorecard destination was not captured");
+        expected.members[index] = { ...own, bytes: Buffer.from(own.bytes) }; acknowledged.push(attempted); attempted = "";
       }
-    } catch (error) { throw new OrgScorecardPublicationError(Object.freeze([...published]), attempted, error); }
-    return { latestPath: plan.latestPath, latestSigPath: `${plan.latestPath}.sig`,
-      historyPath: plan.historyPath, historySigPath: `${plan.historyPath}.sig` };
-  } });
+      phase = "final-continuation"; beforeMember();
+      return Object.freeze({ written: plan.written, publishedPaths: Object.freeze([...published]), progress: progress(), assertCurrent: assertOwnedCurrent });
+    } });
+  } catch (cause) {
+    const directoryAttempt = cause instanceof PassportPublicationError ? cause.attemptedPath : null;
+    throw new OrgScorecardPublicationError(Object.freeze([...published]), attempted || (directoryAttempt === null ? "" : relative(plan.workspace, directoryAttempt)), cause, progress());
+  }
 }
 /** Existing sync API, with both fixed ORG_SCORECARD signatures prepared before the first file replacement. */
 export function writeOrgScorecard(workspace: string, scorecard: OrgScorecard): WrittenScorecard {
@@ -61,42 +96,30 @@ export function writeOrgScorecard(workspace: string, scorecard: OrgScorecard): W
   return publishScorecard(plan, latest, history, () => {
     for (const signature of [latest, history]) if (!verifyAuditorSignatureBytes(workspace, "ORG_SCORECARD", plan.payload, Buffer.from(signature)).valid)
       throw new Error("prepared scorecard signature is not admitted by current ORG_SCORECARD authority");
-  });
+  }).written;
 }
 /** Internal used preparation retains first-signature authority through the second Sign and later workspace-log waits. */
 export async function prepareOrgScorecardAsync(workspace: string, scorecard: OrgScorecard, options: OrgEffectOptions = {}) {
-  const copied = structuredClone(scorecard), beforePublish = options.beforePublish;
-  const assertAuthority = captureOrgScorecardAuthority(workspace, beforePublish), plan = scorecardPlan(workspace, copied);
-  const beforeSign = () => { assertAuthority(); assertOrgPairsCurrent(plan.previous); };
+  const resultWorkspace = workspace, copied = structuredClone(scorecard), beforePublish = options.beforePublish;
+  workspace = resolve(workspace);
+  const assertAuthority = captureOrgScorecardAuthority(workspace, beforePublish), plan = scorecardPlan(workspace, copied, resultWorkspace);
+  const beforeSign = () => { assertAuthority(); plan.directories.assertCurrent(); assertOrgPairsCurrent(plan.previous); };
   const latest = await prepareFileSignatureWithAuditor(workspace, plan.latestPath, plan.payload, "ORG_SCORECARD", beforeSign);
   const beforeHistorySign = () => { beforeSign(); latest.assertCurrent(); };
   beforeHistorySign();
   const history = await prepareFileSignatureWithAuditor(workspace, plan.historyPath, plan.payload, "ORG_SCORECARD", beforeHistorySign);
-  let published: ReturnType<typeof captureOrgPairs> | null = null;
+  let published: ReturnType<typeof publishScorecard> | null = null;
   const assertCurrent = () => {
-    assertAuthority(); latest.assertCurrent(); history.assertCurrent();
-    if (published !== null) assertOrgPairsCurrent(published);
+    assertAuthority(); latest.assertCurrent(); history.assertCurrent(); plan.directories.assertCurrent(); published?.assertCurrent();
   };
+  assertCurrent();
   return { scorecard: plan.scorecard, assertCurrent, publish() {
-    const written = publishScorecard(plan, latest.signatureBytes, history.signatureBytes, assertCurrent);
-    try {
-    published = captureOrgPairs([plan.latestPath, plan.historyPath]);
-    if (published.members.some(member => member.mode !== 0o644)) throw new OrgScorecardPublicationError(
-      Object.freeze([written.latestPath, written.historyPath, written.latestSigPath, written.historySigPath].map(path => relative(workspace, path))),
-      "published scorecard modes", new Error("published scorecard mode changed"));
-    for (const [path, expected] of [[plan.latestPath, plan.payload], [plan.historyPath, plan.payload],
-      [`${plan.latestPath}.sig`, Buffer.from(latest.signatureBytes)], [`${plan.historyPath}.sig`, Buffer.from(history.signatureBytes)]] as const) {
-      const actual = orgPairBytes(published, path);
-      if (actual === null || !actual.equals(expected)) throw new OrgScorecardPublicationError(
-        Object.freeze([written.latestPath, written.historyPath, written.latestSigPath, written.historySigPath].map(path => relative(workspace, path))),
-        relative(workspace, path), new Error("published scorecard changed before its continuation was captured"));
-    }
-    } catch (error) {
-      if (error instanceof OrgScorecardPublicationError) throw error;
-      throw new OrgScorecardPublicationError(Object.freeze([written.latestPath, written.historyPath, written.latestSigPath, written.historySigPath]
-        .map(path => relative(workspace, path))), "published scorecard snapshot", error);
-    }
-    return written;
+    if (published !== null) throw new Error("prepared org scorecard has already been published");
+    published = publishScorecard(plan, latest.signatureBytes, history.signatureBytes, assertCurrent);
+    try { assertCurrent(); }
+    catch (cause) { throw new OrgScorecardPublicationError(published.publishedPaths, "", cause,
+      Object.freeze({ ...published.progress, phase: "post-lock-continuation" })); }
+    return published.written;
   } };
 }
 export async function writeOrgScorecardAsync(workspace: string, scorecard: OrgScorecard,

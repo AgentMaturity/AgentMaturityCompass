@@ -2,6 +2,7 @@ import { dirname, join, relative, resolve } from "node:path";
 import YAML from "yaml";
 import { assertPolicySignerCurrent, describePolicySigner } from "../crypto/signing/signer.js";
 import { capturePurposePublication } from "../keys/purposePublication.js";
+import { keyPolicy, loadKeysConfig } from "../keys/keysConfig.js";
 import { assertKeysetComplete, boundProviderKey } from "../keys/keyset.js";
 import { vaultStatus } from "../vault/vault.js";
 import { loadTrustConfig } from "../trust/trustConfig.js";
@@ -21,19 +22,22 @@ import { assertValidOrgGraph } from "./orgValidator.js";
 export interface OrgEffectOptions { beforePublish?: () => void }
 // Only the two existing org recipes can reach this private capture. No caller-selected kind/key/provider API.
 function captureAuthority(workspace: string, kind: "BUNDLE" | "ORG_SCORECARD", beforePublish?: () => void) {
-  beforePublish?.();
-  if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize policy signing");
+  workspace = resolve(workspace);
+  const assertSigningEnabled = () => { if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize policy signing"); };
+  assertSigningEnabled(); beforePublish?.(); assertSigningEnabled();
   const descriptor = describePolicySigner(workspace, kind), policy = JSON.stringify(loadTrustConfig(workspace));
   const purpose = descriptor.mode === "VAULT" ? capturePurposePublication(workspace, "artifact-seal") : null;
   const keyset = purpose?.keyset ?? canonicalize(assertKeysetComplete(workspace));
+  const selectedPolicy = descriptor.mode === "VAULT" ? canonicalize(keyPolicy(loadKeysConfig(workspace))) : null;
   const assertSigningCurrent = () => {
     assertPolicySignerCurrent(workspace, descriptor);
-    if (JSON.stringify(loadTrustConfig(workspace)) !== policy || canonicalize(assertKeysetComplete(workspace)) !== keyset)
+    if (JSON.stringify(loadTrustConfig(workspace)) !== policy || canonicalize(assertKeysetComplete(workspace)) !== keyset
+      || (selectedPolicy !== null && canonicalize(keyPolicy(loadKeysConfig(workspace))) !== selectedPolicy))
       throw new Error("original org publication authority changed while preparing the operation");
     if (descriptor.mode === "VAULT" && boundProviderKey(workspace, "artifact-seal") === null && !vaultStatus(workspace).unlocked)
       throw new Error("original org publication vault is locked; unlock before publication");
   };
-  const assertCurrent = () => { beforePublish?.(); assertSigningCurrent(); };
+  const assertCurrent = () => { assertSigningEnabled(); beforePublish?.(); assertSigningCurrent(); };
   return { descriptor, assertCurrent, assertSigningCurrent };
 }
 export const captureOrgScorecardAuthority = (workspace: string, beforePublish?: () => void) =>
