@@ -143,6 +143,13 @@
       "sha256": "4df07f2532ae2547cb195abd083e8e2fb6ba403b0b478af50298a0322d562293"
     },
     {
+      "path": "src/audit/auditMapStore.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/audit/auditMapStore.ts.landed",
+      "sha256": "42bbbf3cb009e82b43d15be3c76560abc98e3a835348d1a3afd3324f3cec1743"
+    },
+    {
       "path": "src/audit/auditPolicyStore.ts",
       "issue": "P2-08",
       "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
