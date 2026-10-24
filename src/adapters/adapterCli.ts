@@ -19,7 +19,7 @@ export function adaptersInitCli(workspace: string): { configPath: string; sigPat
   return initAdaptersConfig(workspace);
 }
 
-export function adaptersInitCliAsync(workspace: string): ReturnType<typeof initAdaptersConfigAsync> { return initAdaptersConfigAsync(workspace); }
+export function adaptersInitCliAsync(workspace: string, beforeSign?: () => void): ReturnType<typeof initAdaptersConfigAsync> { return initAdaptersConfigAsync(workspace, beforeSign); }
 
 export function adaptersVerifyCli(workspace: string): ReturnType<typeof verifyAdaptersConfigSignature> {
   return verifyAdaptersConfigSignature(workspace);
@@ -154,17 +154,18 @@ export function adaptersConfigureCli(params: ConfigureInput): { configPath: stri
   const prepared = prepareConfiguration(params);
   return { ...setAgentAdapterProfile(prepared.params.workspace, prepared.agentId, prepared.profile), agentId: prepared.agentId };
 }
-export async function adaptersConfigureCliAsync(params: ConfigureInput): Promise<{ configPath: string; sigPath: string; agentId: string }> {
-  return (await prepareAdaptersConfigureForHttp(params)).publish();
+export async function adaptersConfigureCliAsync(params: ConfigureInput, beforeSign?: () => void): Promise<{ configPath: string; sigPath: string; agentId: string }> {
+  return (await prepareAdaptersConfigureForHttp(params, beforeSign)).publish();
 }
 /** Internal fixed prepared publishers, consumed by the owned route; absent from the root SDK exports. */
-export function prepareAdaptersInitForHttp(workspace: string) { return prepareAdaptersConfigInitializationAsync(workspace); }
-export async function prepareAdaptersConfigureForHttp(params: ConfigureInput) {
+export function prepareAdaptersInitForHttp(workspace: string, beforeSign?: () => void) { return prepareAdaptersConfigInitializationAsync(workspace, beforeSign); }
+export async function prepareAdaptersConfigureForHttp(params: ConfigureInput, beforeSign?: () => void) {
+  const caller = beforeSign; caller?.();
   if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize policy signing");
-  const input = prepareConfiguration(params);
-  const prepared = await prepareAgentAdapterProfileAsync(input.params.workspace, input.agentId, input.profile);
+  const input = prepareConfiguration(params), originalInputs = () => { caller?.(); input.recheck(); };
+  const prepared = await prepareAgentAdapterProfileAsync(input.params.workspace, input.agentId, input.profile, originalInputs);
   return Object.freeze({ publish(assertActor: () => void = () => {}) {
-    return { ...prepared.publish(() => { input.recheck(); assertActor(); }), agentId: input.agentId };
+    return { ...prepared.publish(assertActor), agentId: input.agentId };
   } });
 }
 

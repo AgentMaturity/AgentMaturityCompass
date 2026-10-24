@@ -138,11 +138,14 @@ function prepare(workspace: string, initialize: boolean, options: OpsPolicyOptio
   if (validate) opsPolicySchema.parse(YAML.parse(bytes.toString("utf8")) as unknown);
   return { workspace, initialize, beforePublish, previous, bytes };
 }
+function assertPairCurrent(workspace: string, previous: ReturnType<typeof pair>): void {
+  const current = pair(workspace);
+  if (!equal(current.body, previous.body) || !equal(current.signature, previous.signature)) throw new Error("ops policy or signature changed while signing; retry");
+}
 function publish(plan: ReturnType<typeof prepare>, signed: SignedDigest, finalAuthority?: () => void): { configPath: string; sigPath: string } {
   return withControlFileLock({ root: join(plan.workspace, ".amc"), name: "ops-policy-pair", operation: () => {
     plan.beforePublish?.(); finalAuthority?.();
-    const current = pair(plan.workspace);
-    if (!equal(current.body, plan.previous.body) || !equal(current.signature, plan.previous.signature)) throw new Error("ops policy or signature changed while signing; retry");
+    assertPairCurrent(plan.workspace, plan.previous);
     const published: string[] = [];
     try {
       if (plan.initialize) { writeContained(plan.workspace, BODY, plan.bytes, 0o644); published.push(BODY); }
@@ -162,7 +165,8 @@ async function publishAsync(workspace: string, initialize: boolean, options: Ops
   const purpose = signingPurposeForKind("OPS_POLICY"), policy = JSON.stringify(loadTrustConfig(workspace));
   const captured = descriptor.mode === "VAULT" ? capturePurposePublication(workspace, purpose) : null;
   const provider = boundProviderKey(workspace, purpose)?.binding.provider ?? "file";
-  const signed = await signDigestWithPolicyAsync({ workspace, kind: "OPS_POLICY", digestHex: sha256Hex(plan.bytes), expectedSigner: descriptor });
+  const beforeSign = () => { plan.beforePublish?.(); if (initialize) assertOwnerMode(workspace, "ops init"); assertPairCurrent(workspace, plan.previous); };
+  const signed = await signDigestWithPolicyAsync({ workspace, kind: "OPS_POLICY", digestHex: sha256Hex(plan.bytes), expectedSigner: descriptor, beforeSign });
   return publish(plan, signed, () => {
     if (initialize) assertOwnerMode(workspace, "ops init");
     assertPolicySignerCurrent(workspace, descriptor);

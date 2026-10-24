@@ -464,7 +464,12 @@ async function autoConfigureDetectedFrameworkAdapters(params: {
 
   const route = preferredGatewayRoute(params.workspace);
   const baseAgentId = resolveAgentId(params.workspace, params.agentId);
-  recheckInputs(); // Bind the actual route/detection selection to its captured bytes before Sign.
+  const originalInputs = () => {
+    recheckInputs();
+    if (preferredGatewayRoute(params.workspace) !== route || resolveAgentId(params.workspace, params.agentId) !== baseAgentId)
+      throw new Error("setup adapter selection changed while signing; retry");
+  };
+  originalInputs(); // Retain the actual route/detection selection through Describe and Sign.
   const configured: ConfiguredAdapterProfile[] = [];
 
   try { for (const [index, detection] of params.detections.entries()) {
@@ -477,13 +482,8 @@ async function autoConfigureDetectedFrameworkAdapters(params: {
       leaseScopes: ["gateway:llm", "toolhub:intent", "toolhub:execute", "proxy:connect", "governor:check", "receipt:verify"],
       routeAllowlist: [route],
       modelAllowlist: ["*"]
-    });
-    prepared.publish(() => {
-      recheckInputs();
-      if (preferredGatewayRoute(params.workspace) !== route || resolveAgentId(params.workspace, params.agentId) !== baseAgentId) {
-        throw new Error("setup adapter selection changed while signing; retry");
-      }
-    });
+    }, originalInputs);
+    prepared.publish();
     configured.push({
       framework: detection.framework,
       adapterId: detection.adapterId,

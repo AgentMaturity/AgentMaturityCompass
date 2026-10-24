@@ -29,7 +29,7 @@ export async function handleAdaptersRoute(
       const adapters = await import('../adapters/adapterCli.js');
       assertActor(); // Recheck the actual caller after the dynamic-import wait, before preparing Sign.
       const out = revalidateAuthority === undefined ? adapters.adaptersInitCli(workspace)
-        : (await adapters.prepareAdaptersInitForHttp(workspace)).publish(assertActor);
+        : (await adapters.prepareAdaptersInitForHttp(workspace, assertActor)).publish(assertActor);
       apiSuccess(res, { initialized: true, ...out }, 201);
     } catch (err) {
       if (res.headersSent) return true;
@@ -141,7 +141,7 @@ export async function handleAdaptersRoute(
       assertActor(); // Recheck the actual caller after the dynamic-import wait, before preparing Sign.
       const input = { workspace, agentId: body.agentId, adapterId: body.adapterId, route: body.route, model: body.model, mode: body.mode };
       const out = revalidateAuthority === undefined ? adapters.adaptersConfigureCli(input)
-        : (await adapters.prepareAdaptersConfigureForHttp(input)).publish(assertActor);
+        : (await adapters.prepareAdaptersConfigureForHttp(input, assertActor)).publish(assertActor);
       apiSuccess(res, { configured: true, ...out });
     } catch (err) {
       if (res.headersSent) return true;
