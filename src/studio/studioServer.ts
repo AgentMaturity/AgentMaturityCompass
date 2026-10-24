@@ -8056,6 +8056,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
+        const orgSecondary = captureStudioOrgSecondary(options.workspace, currentOrgRunActor(req, options.workspace, options.token, auth), emitOrgEvent);
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
         const parsed = body ? (JSON.parse(body) as { path?: string }) : {};
         if (!parsed.path) {
@@ -8066,7 +8067,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           workspace: options.workspace,
           bundleFile: parsed.path
         });
-        recomputeOrgAndEmit("FEDERATION_IMPORTED");
+        await orgSecondary.run("FEDERATION_IMPORTED");
         json(res, 200, out);
         return;
       }

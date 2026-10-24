@@ -12,7 +12,7 @@ import { vaultStatus } from "../vault/vault.js";
 
 type EmitOrgEvent = (type: OrgSseEvent["type"], nodeIds?: string[]) => void;
 
-/** The fourteen unconverted callers retain their synchronous, best-effort recipe and event order. */
+/** The thirteen unconverted callers retain their synchronous, best-effort recipe and event order. */
 export function recomputeStudioOrgLegacy(workspace: string, type: OrgSseEvent["type"], nodeIds: string[] | undefined,
   emitOrgEvent: EmitOrgEvent): void {
   try {
@@ -31,7 +31,9 @@ export function recomputeStudioOrgLegacy(workspace: string, type: OrgSseEvent["t
 
 /** Public metadata only: no private-key warming, vault reopening, provider Describe or Sign here.
  * Existing authenticated readers may advance their high-water state; this is not a pure snapshot.
- * The later genuine org producer still supplies all signing authority and checked signatures. */
+ * The later genuine org producer still supplies all signing authority and checked signatures.
+ * Public metadata cannot attest original private-vault/session eligibility across an earlier primary wait;
+ * later genuine producer capture cannot establish that retrospectively. */
 function captureSecondaryAuthority(workspace: string, actor: () => void) {
   workspace = resolve(workspace);
   const enabled = () => { if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize policy signing"); };
@@ -63,13 +65,13 @@ function captureSecondaryAuthority(workspace: string, actor: () => void) {
   return { workspace, assertCurrent };
 }
 
-/** Only the three existing operator/owner run routes consume this optional secondary attempt.
+/** The four existing operator/owner callers consume this optional secondary attempt.
  * Capture refusal stays private and best-effort; it cannot send a response or authorize the primary operation. */
 export function captureStudioOrgSecondary(workspace: string, actor: () => void, emitOrgEvent: EmitOrgEvent) {
   let original: ReturnType<typeof captureSecondaryAuthority> | null = null, captureFailure: unknown;
   try { original = captureSecondaryAuthority(workspace, actor); }
   catch (error) { captureFailure = error; }
-  return { async run(type: "AGENT_RUN_COMPLETED" | "ASSURANCE_RUN_COMPLETED", nodeIds?: string[]): Promise<void> {
+  return { async run(type: "AGENT_RUN_COMPLETED" | "ASSURANCE_RUN_COMPLETED" | "FEDERATION_IMPORTED", nodeIds?: string[]): Promise<void> {
     const ids = nodeIds === undefined ? undefined : [...nodeIds];
     try {
       if (original === null) throw captureFailure;
