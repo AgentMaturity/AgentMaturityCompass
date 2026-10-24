@@ -577,6 +577,13 @@
       "sha256": "de1469cf447c9ccf8a22fef1ebcce716b3af7455b7127eb00ddc7cb5a7bc59e7"
     },
     {
+      "path": "src/setup/setupWizard.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/setup/setupWizard.ts.landed",
+      "sha256": "519a773d0a2b418ab62a063504fe6e640d45071f0ffc342e50782b3a85f2734a"
+    },
+    {
       "path": "src/standard/externalEvidenceProfile.ts",
       "issue": "P2-08",
       "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
