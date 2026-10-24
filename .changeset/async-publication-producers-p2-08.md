@@ -364,3 +364,6 @@ The maintained trust-init command now prepares its genuine direct artifact-seal 
 
 
 Direct notary enablement now prepares its actual artifact-seal trust signature before replacing the trust pair, then calls the unchanged local auditor-history admission helper and authenticates its returned poststate. Original pin, secret, signer and current authority negatives remain retained across the selected async continuation. Existing initial no-sign and genuine fresh recipes remain; bootstrap callers, declared-keyset missing-trust setup, normal binding and all executable qualification remain pending. Native partial effects and lower private-read and final CLI intervals remain explicit limits. Source implementation only; tests and PRs are deferred by the user.
+
+
+Compiled tool-policy approval guards now reuse the existing same-byte verified policy reader, accepting genuinely admitted config-purpose policy signatures before applying the unchanged monotonic strength checks. Invalid or missing shared-reader verdicts deny with the existing generic verification message. Source only; executable qualification and PR work remain deferred.
