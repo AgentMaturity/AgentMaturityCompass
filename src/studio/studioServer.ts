@@ -7690,7 +7690,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireRouteRoles(["OPERATOR", "OWNER", "AUDITOR"])) {
           return;
         }
-        const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
+        const orgWorkspace = resolve(options.workspace), orgToken = options.token, orgIdentity = { isAdmin: auth.isAdmin, userId: auth.userId, agentId: auth.agentId }; const orgSecondary = captureStudioOrgSecondary(orgWorkspace, () => { const current = authenticate(req, orgWorkspace, orgToken); if (!current || current.isAdmin !== orgIdentity.isAdmin || current.userId !== orgIdentity.userId || current.agentId !== orgIdentity.agentId) throw new Error("authenticated authority changed while preparing optional org recompute"); const usersSig = verifyUsersConfigSignature(orgWorkspace); const check = enforceRoleOrAdmin({ access: accessContext(current), requiredAny: ["OPERATOR", "OWNER", "AUDITOR"], usersConfigValid: usersSig.valid || current.sessionAuthSource === "WORKSPACE_ROUTER" }); if (!check.ok) throw new Error(check.error ?? "optional org recompute authority refused"); }, emitOrgEvent); const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
         const parsed = body ? (JSON.parse(body) as { path?: string }) : {};
         if (!parsed.path) {
           json(res, 400, { error: "path is required" });
@@ -7710,7 +7710,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             count: imported.imported.length
           }
         });
-        recomputeOrgAndEmit("BENCHMARK_INGESTED");
+        await orgSecondary.run("BENCHMARK_INGESTED");
         json(res, 200, imported);
         return;
       }

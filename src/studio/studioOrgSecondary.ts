@@ -12,7 +12,7 @@ import { vaultStatus } from "../vault/vault.js";
 
 type EmitOrgEvent = (type: OrgSseEvent["type"], nodeIds?: string[]) => void;
 
-/** The thirteen unconverted callers retain their synchronous, best-effort recipe and event order. */
+/** The twelve unconverted callers retain their synchronous, best-effort recipe and event order. */
 export function recomputeStudioOrgLegacy(workspace: string, type: OrgSseEvent["type"], nodeIds: string[] | undefined,
   emitOrgEvent: EmitOrgEvent): void {
   try {
@@ -65,13 +65,13 @@ function captureSecondaryAuthority(workspace: string, actor: () => void) {
   return { workspace, assertCurrent };
 }
 
-/** The four existing operator/owner callers consume this optional secondary attempt.
+/** The five converted routes consume this optional secondary attempt.
  * Capture refusal stays private and best-effort; it cannot send a response or authorize the primary operation. */
 export function captureStudioOrgSecondary(workspace: string, actor: () => void, emitOrgEvent: EmitOrgEvent) {
   let original: ReturnType<typeof captureSecondaryAuthority> | null = null, captureFailure: unknown;
   try { original = captureSecondaryAuthority(workspace, actor); }
   catch (error) { captureFailure = error; }
-  return { async run(type: "AGENT_RUN_COMPLETED" | "ASSURANCE_RUN_COMPLETED" | "FEDERATION_IMPORTED", nodeIds?: string[]): Promise<void> {
+  return { async run(type: "AGENT_RUN_COMPLETED" | "ASSURANCE_RUN_COMPLETED" | "FEDERATION_IMPORTED" | "BENCHMARK_INGESTED", nodeIds?: string[]): Promise<void> {
     const ids = nodeIds === undefined ? undefined : [...nodeIds];
     try {
       if (original === null) throw captureFailure;
