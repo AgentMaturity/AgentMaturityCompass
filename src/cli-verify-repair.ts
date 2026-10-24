@@ -6,10 +6,11 @@
  */
 import { createInterface } from "node:readline/promises";
 import chalk from "chalk";
-import { holdVerdict } from "./residency/legalHoldRegistry.js";
-import { signDigestWithPolicy } from "./crypto/signing/signer.js";
+import { holdVerdict, withLegalHoldLock } from "./residency/legalHoldRegistry.js";
+import { prepareFileSignatureWithAuditor } from "./org/orgSigner.js";
+import { KEY_PROVIDER_ERRORS, KeyProviderError } from "./keys/provider.js";
 import {
-  applyVerifyRepair, archivedStores, planVerifyRepair, QUARANTINE_DIR, RepairRefused, type HoldState, type RepairPlan
+  prepareVerifyRepairAsync, archivedStores, planVerifyRepair, QUARANTINE_DIR, RepairRefused, RepairPublicationError, type HoldState, type RepairPlan
 } from "./ledger/verifyRepair.js";
 
 /** All workspace data kinds and sessions; registry uncertainty remains unknown. */
@@ -74,17 +75,21 @@ async function applyPlan(workspace: string, plan: RepairPlan, yes: boolean): Pro
     return 2;
   }
   try {
-    const { receipt } = applyVerifyRepair(workspace, plan, {
+    const prepared = await prepareVerifyRepairAsync(workspace, plan, {
       legalHolds: () => workspaceLegalHolds(workspace),
-      sign: (digestHex) => signDigestWithPolicy({ workspace, kind: "REPAIR_RECEIPT", digestHex })
+      prepareSignature: (path, bytes) => prepareFileSignatureWithAuditor(workspace, path, bytes, "REPAIR_RECEIPT")
     });
+    const { receipt } = withLegalHoldLock(workspace, () => prepared.apply());
     console.log(chalk.green(`Archived ${receipt.moved.length} file(s) to ${QUARANTINE_DIR}/${receipt.id}/`));
     console.log(`Receipt: ${QUARANTINE_DIR}/${receipt.id}/repair-receipt.json (signed as REPAIR_RECEIPT)`);
     console.log(chalk.gray("To restore: move each file back to the path its receipt names, then run amc verify."));
     return 0;
   } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    console.log(chalk.red(error instanceof RepairRefused ? `Refused: ${message}. Nothing has been changed.` : `Repair aborted: ${message}`));
+    const message = error instanceof RepairPublicationError ? error.message
+      : error instanceof KeyProviderError && Object.hasOwn(KEY_PROVIDER_ERRORS, error.code) ? `${error.code}: repair signing refused before quarantine`
+      : error instanceof RepairRefused ? "repair preconditions refused; no evidence was moved"
+      : "repair preparation or publication refused; inspect the policy and retained repair plan";
+    console.log(chalk.red(error instanceof RepairPublicationError ? `Repair aborted: ${message}` : `Refused: ${message}`));
     return 2;
   }
 }
