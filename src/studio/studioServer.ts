@@ -71,7 +71,7 @@ import {
   assuranceCertLatestForApi,
   assurancePolicyApplyForApiAsync as assurancePolicyApplyForApi,
   assurancePolicyForApiAsync as assurancePolicyForApi,
-  assuranceReadinessGate,
+  assuranceReadinessGate, prepareAssuranceReadinessAsync,
   assuranceRunDetailForApi,
   assuranceRunForApi,
   assuranceRunsForApi,
@@ -581,7 +581,7 @@ function freeDiskMb(path: string): number | null {
   }
 }
 
-async function buildReadiness(options: StudioApiOptions): Promise<{
+async function buildReadiness(options: StudioApiOptions, assertOriginal: () => void): Promise<{
   ok: boolean;
   reasons: string[];
   checks: Record<string, unknown>;
@@ -709,20 +709,9 @@ async function buildReadiness(options: StudioApiOptions): Promise<{
   if (!pluginVerify.ok) {
     reasons.push("PLUGIN_INTEGRITY_BROKEN");
   }
-  const assuranceGate = (() => {
-    try {
-      return assuranceReadinessGate(options.workspace);
-    } catch (error) {
-      return {
-        ok: false,
-        reasons: [`ASSURANCE_READY_CHECK_FAILED:${String(error)}`],
-        warnings: [],
-        latestRunId: null,
-        latestStatus: null,
-        waiver: null
-      };
-    }
-  })();
+  const assurance = await prepareAssuranceReadinessAsync(options.workspace, assertOriginal);
+  let assuranceGate = assurance.current();
+  const assuranceReasonIndex = reasons.length;
   if (!assuranceGate.ok) {
     reasons.push(...assuranceGate.reasons);
   }
@@ -797,6 +786,10 @@ async function buildReadiness(options: StudioApiOptions): Promise<{
   if (blobEncryptionEnabled && !vault.unlocked) {
     reasons.push("VAULT_LOCKED_FOR_BLOB_ENCRYPTION");
   }
+  const finalAssuranceGate = assurance.current();
+  reasons.splice(assuranceReasonIndex, assuranceGate.ok ? 0 : assuranceGate.reasons.length,
+    ...(finalAssuranceGate.ok ? [] : finalAssuranceGate.reasons));
+  assuranceGate = finalAssuranceGate;
   return {
     ok: reasons.length === 0,
     reasons,
@@ -1499,7 +1492,11 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
   const schedulerTimer = setInterval(() => {
     try {
       drainIntegrationQueue();
-      const orgWorkspace = resolve(options.workspace), orgSecondary = captureStudioOrgSecondary(orgWorkspace, () => { if (shuttingDown) throw new Error("scheduler org recompute stopped"); if (resolve(options.workspace) !== orgWorkspace) throw new Error("original scheduler workspace changed while preparing optional org recompute"); }, emitOrgEvent); const readiness = buildReadiness(options);
+      const orgWorkspace = resolve(options.workspace), orgSecondary = captureStudioOrgSecondary(orgWorkspace, () => { if (shuttingDown) throw new Error("scheduler org recompute stopped"); if (resolve(options.workspace) !== orgWorkspace) throw new Error("original scheduler workspace changed while preparing optional org recompute"); }, emitOrgEvent); const readinessWorkspace = options.workspace;
+      const readiness = buildReadiness({ ...options, workspace: orgWorkspace }, () => {
+        if (shuttingDown) throw new Error("assurance readiness scheduler stopped");
+        if (options.workspace !== readinessWorkspace || resolve(readinessWorkspace) !== orgWorkspace) throw new Error("original scheduler readiness workspace changed");
+      });
       const forecastWork = readiness.then(async (state) => {
         const tick = await schedulerTickAsync({
           workspace: options.workspace,
@@ -1680,7 +1677,11 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 429, { error: "rate limited" });
           return;
         }
-        const readiness = await buildReadiness(options);
+        const readinessWorkspace = options.workspace, readinessRoot = resolve(readinessWorkspace);
+        const readiness = await buildReadiness({ ...options, workspace: readinessRoot }, () => {
+          if (shuttingDown) throw new Error("readiness check stopped");
+          if (options.workspace !== readinessWorkspace || resolve(readinessWorkspace) !== readinessRoot) throw new Error("original readiness workspace changed");
+        });
         json(res, readiness.ok ? 200 : 503, {
           status: readiness.ok ? "READY" : "NOT_READY",
           reasons: readiness.reasons,

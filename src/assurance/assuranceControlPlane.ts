@@ -28,7 +28,8 @@ import {
 import { assuranceWaiverSchema } from "./assuranceSchema.js";
 import { loadAssuranceReport, latestAssuranceReports, listAssuranceHistory, runAssurance } from "./assuranceRunner.js";
 import { listAssurancePacks } from "./packs/index.js";
-import { captureOrgPairs, assertOrgPairsCurrent, captureOrgPairsAuthority, type OrgPairsOptions } from "../org/preparedOrgPairs.js";
+import { captureOrgPairs, assertOrgPairsCurrent, captureOrgPairsAuthority, orgPairBytes, type OrgPairsOptions } from "../org/preparedOrgPairs.js";
+import { verifyAuditorSignatureBytes } from "../org/orgSignatureBytes.js";
 import { appendTransparencyEntryAttemptAsync, captureWorkspaceLogAuthority } from "../transparency/asyncWorkspaceAppend.js";
 import { captureTransparencyAppendPublication } from "../transparency/workspacePublication.js";
 import { pendingWaiverSchema, savePendingWaiver, listPendingWaivers, maybeActivatePendingWaivers, maybeActivatePendingWaiversAsync, revokeAssuranceWaiver, revokeAssuranceWaiverAsync } from "./assuranceWaiverPublication.js";
@@ -337,6 +338,12 @@ export function assuranceReadinessGate(workspace: string): {
   }
 
   const policy = loadAssurancePolicy(workspace);
+  return readinessProjection(workspace, policy, reasons, warnings);
+}
+
+type AssuranceReadiness = ReturnType<typeof assuranceReadinessGate>;
+
+function readinessProjection(workspace: string, policy: ReturnType<typeof loadAssurancePolicy>, reasons: string[] = [], warnings: string[] = []): AssuranceReadiness {
   const latest = latestAssuranceReports({
     workspace,
     windowStartTs: 0,
@@ -377,6 +384,47 @@ export function assuranceReadinessGate(workspace: string): {
     latestStatus,
     waiver
   };
+}
+
+function refusedReadiness(reason: string): AssuranceReadiness {
+  return { ok: false, reasons: [reason], warnings: [], latestRunId: null, latestStatus: null, waiver: null };
+}
+
+/** One actual waiver batch; policy baseline starts at the old post-activation read stage. */
+export async function prepareAssuranceReadinessAsync(workspace: string, beforePublish: () => void) {
+  let batch: Awaited<ReturnType<typeof maybeActivatePendingWaiversAsync>> | null = null;
+  let selected: ReturnType<typeof captureAssurancePolicy> | null = null, policy: ReturnType<typeof loadAssurancePolicy> | null = null;
+  let untrustedReason: string | null = null, failure: { cause: unknown; reason: string } | null = null;
+  const failed = (cause: unknown) => ({ cause, reason: `ASSURANCE_READY_CHECK_FAILED:${String(cause)}` });
+  try {
+    batch = await maybeActivatePendingWaiversAsync(workspace, { beforePublish });
+    // Negative classification only: missing body never strict-reads an orphan sidecar or initializes policy.
+    const legacy = verifyAssurancePolicySignature(workspace);
+    if (!legacy.valid) untrustedReason = `ASSURANCE_POLICY_UNTRUSTED:${legacy.reason ?? "unknown"}`;
+    else {
+      selected = captureAssurancePolicy(workspace);
+      if (!selected.signature.valid) throw new Error(`assurance policy signature invalid: ${selected.signature.reason ?? "unknown"}`);
+      policy = selected.parsePolicy();
+      if (policy === null) throw new Error("captured assurance policy is missing");
+    }
+  } catch (cause) { failure = failed(cause); }
+  return Object.freeze({ current(): AssuranceReadiness {
+    // Failures remain private and sticky; every returned ordinary result has fresh arrays and objects.
+    if (failure !== null) return refusedReadiness(failure.reason);
+    if (untrustedReason !== null) return refusedReadiness(untrustedReason);
+    try {
+      beforePublish();
+      const gate = readinessProjection(workspace, policy!);
+      batch!.assertCurrent(); // Its own pairs and latest genuine log, never the old preparation predecessor.
+      assertOrgPairsCurrent(selected!.snapshot);
+      const body = orgPairBytes(selected!.snapshot, selected!.path), sidecar = orgPairBytes(selected!.snapshot, `${selected!.path}.sig`);
+      if (body === null || sidecar === null) throw new Error("captured assurance policy pair is incomplete");
+      const admission = verifyAuditorSignatureBytes(workspace, "BUNDLE", body, sidecar);
+      if (!admission.valid) throw new Error(`assurance policy signature invalid: ${admission.reason ?? "unknown"}`);
+      assertOrgPairsCurrent(selected!.snapshot); // No external actor follows this final original-pair/admission boundary.
+      return gate;
+    } catch (cause) { failure = failed(cause); return refusedReadiness(failure.reason); }
+  } });
 }
 
 export function assuranceWaiverRequestForApi(params: {
