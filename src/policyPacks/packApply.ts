@@ -2,6 +2,10 @@ import { randomUUID } from "node:crypto";
 import { dirname, join } from "node:path";
 import YAML from "yaml";
 import { getPolicyPack } from "./builtInPacks.js";
+import type { PolicyPack } from "./packSchema.js";
+import { getSigningKey, assertSigningKeyUsable, assertVaultMaySign } from "../keys/signingKeys.js";
+import { publicKeyFromPrivate } from "../crypto/keyHistoryEnvelope.js";
+import { describePolicySigner } from "../crypto/signing/signer.js";
 import { resolveAgentId } from "../fleet/paths.js";
 import { ensureDir, writeFileAtomic } from "../utils/fs.js";
 import {
@@ -36,18 +40,20 @@ function hashFilePayload(text: string): string {
   return sha256Hex(Buffer.from(text, "utf8"));
 }
 
-function writeAudit(workspace: string, agentId: string, payload: Record<string, unknown>): string {
-  const ledger = openLedger(workspace);
+export function writePolicyPackAudit(workspace: string, agentId: string, payload: Record<string, unknown>, beforeEffect: () => void = () => {}, recorded: (effect: string) => void = () => {}): string {
+  beforeEffect(); const ledger = openLedger(workspace);
   const sessionId = `policy-pack-${randomUUID()}`;
   const body = JSON.stringify(payload);
   const bodySha = sha256Hex(Buffer.from(body, "utf8"));
+  let failed: unknown;
   try {
-    ledger.startSession({
+    beforeEffect(); ledger.startSession({
       sessionId,
       runtime: "unknown",
       binaryPath: "amc-policy-pack",
       binarySha256: "amc-policy-pack"
     });
+    recorded(`audit-session:${sessionId}`); beforeEffect();
     const out = ledger.appendEvidenceWithReceipt({
       sessionId,
       runtime: "unknown",
@@ -69,10 +75,13 @@ function writeAudit(workspace: string, agentId: string, payload: Record<string, 
         bodySha256: bodySha
       }
     });
-    ledger.sealSession(sessionId);
+    recorded(`audit-event:${out.id}`); beforeEffect(); ledger.sealSession(sessionId); recorded(`audit-seal:${sessionId}`);
     return out.id;
-  } finally {
-    ledger.close();
+  } catch (cause) { failed = cause; throw cause; } finally {
+    try { ledger.close(); } catch (close) {
+      if (failed !== undefined) throw new AggregateError([failed, close], "policy-pack audit and connection close failed", { cause: failed });
+      throw close;
+    }
   }
 }
 
@@ -88,34 +97,7 @@ function applyPolicyPackLocked(params: {
   }
   const agentId = resolveAgentId(params.workspace, params.agentId);
   const files: Array<{ path: string; sha256: string }> = [];
-  const writeAndTrack = (path: string, text: string): void => {
-    ensureDir(dirname(path));
-    writeFileAtomic(path, text, 0o644);
-    files.push({
-      path,
-      sha256: hashFilePayload(text)
-    });
-  };
-
-  const actionPolicyPath = join(params.workspace, ".amc", "action-policy.yaml");
-  writeAndTrack(actionPolicyPath, YAML.stringify(pack.actionPolicy));
-  signActionPolicyWithLockHeld(params.workspace);
-
-  const toolsPath = join(params.workspace, ".amc", "tools.yaml");
-  writeAndTrack(toolsPath, YAML.stringify(pack.tools));
-  signToolsConfig(params.workspace);
-
-  const budgetsPath = join(params.workspace, ".amc", "budgets.yaml");
-  writeAndTrack(budgetsPath, YAML.stringify(pack.budgets));
-  signBudgetsConfig(params.workspace);
-
-  const alertsPath = join(params.workspace, ".amc", "alerts.yaml");
-  writeAndTrack(alertsPath, YAML.stringify(pack.alerts));
-  signAlertsConfig(params.workspace);
-
-  const approvalPolicyPath = join(params.workspace, ".amc", "approval-policy.yaml");
-  writeAndTrack(approvalPolicyPath, YAML.stringify(pack.approvalPolicy));
-  signApprovalPolicy(params.workspace);
+  files.push(...publishPolicyPackCompatibility(params.workspace, pack));
 
   const gatePolicyPath = `.amc/agents/${agentId}/gatePolicy.json`;
   writeSignedGatePolicy({
@@ -164,7 +146,7 @@ function applyPolicyPackLocked(params: {
       id: pack.id
     }
   });
-  const auditEventId = writeAudit(params.workspace, agentId, {
+  const auditEventId = writePolicyPackAudit(params.workspace, agentId, {
     auditType: "POLICY_PACK_APPLIED",
     severity: "LOW",
     packId: pack.id,
@@ -196,6 +178,8 @@ export function applyPolicyPack(params: {
   agentId?: string;
   packId: string;
 }): PolicyPackApplyResult {
+  if (!getPolicyPack(params.packId)) throw new Error(`unknown policy pack: ${params.packId}`);
+  preflightPolicyPackCompatibility(params.workspace);
   const policyPath = canonicalActionPolicyPath(params.workspace);
   return withControlFileLock({
     root: dirname(policyPath),
@@ -203,4 +187,39 @@ export function applyPolicyPack(params: {
     timeoutMs: 500,
     operation: () => applyPolicyPackLocked(params),
   });
+}
+
+/** Actual held signer preflight. Required-notary approval logging has no held async handoff yet. */
+export function preflightPolicyPackCompatibility(workspace: string): void {
+  assertVaultMaySign(workspace, "config-signature"); assertVaultMaySign(workspace, "artifact-seal");
+  for (const purpose of ["config-signature", "artifact-seal"] as const) {
+    const key = getSigningKey(workspace, purpose);
+    assertSigningKeyUsable(workspace, purpose, publicKeyFromPrivate(key), "file");
+  }
+  if (describePolicySigner(workspace, "TRANSPARENCY_ROOT").mode !== "VAULT"
+    || describePolicySigner(workspace, "MERKLE_ROOT").mode !== "VAULT")
+    throw new Error("policy-pack approval logging requires the retained local signer; its held async handoff is unavailable");
+}
+
+/** Existing synchronous five-config phase; the caller must hold ACTION_POLICY_WRITER_LOCK. */
+export function publishPolicyPackCompatibility(workspace: string, pack: PolicyPack, options: {
+  beforeMember?: (path: string) => void; recorded?: (path: string) => void; approvalLogReturned?: () => void;
+} = {}): Array<{ path: string; sha256: string }> {
+  assertActionPolicyWriterReady(workspace);
+  const rows = [
+    { name: "action-policy.yaml", value: pack.actionPolicy, sign: signActionPolicyWithLockHeld },
+    { name: "tools.yaml", value: pack.tools, sign: signToolsConfig },
+    { name: "budgets.yaml", value: pack.budgets, sign: signBudgetsConfig },
+    { name: "alerts.yaml", value: pack.alerts, sign: signAlertsConfig },
+    { name: "approval-policy.yaml", value: pack.approvalPolicy, sign: signApprovalPolicy }
+  ];
+  const files: Array<{ path: string; sha256: string }> = [];
+  for (const row of rows) {
+    const path = join(workspace, ".amc", row.name), text = YAML.stringify(row.value);
+    options.beforeMember?.(path); ensureDir(dirname(path)); writeFileAtomic(path, text, 0o644); options.recorded?.(path);
+    files.push({ path, sha256: hashFilePayload(text) });
+    options.beforeMember?.(`${path}.sig`); const signaturePath = row.sign(workspace); options.recorded?.(signaturePath);
+    if (row.name === "approval-policy.yaml") options.approvalLogReturned?.();
+  }
+  return files;
 }

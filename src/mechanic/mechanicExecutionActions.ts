@@ -6,7 +6,7 @@ import { updateMechanicBudgets } from "./mechanicBudgetAction.js";
 import { loadToolsConfig, signToolsConfig, toolsConfigPath } from "../toolhub/toolhubValidators.js";
 import { loadApprovalPolicy, approvalPolicyPath, signApprovalPolicy } from "../approvals/approvalPolicyEngine.js";
 import { cliInitiator } from "../approvals/approvalEngine.js";
-import { policyPackApplyCli, policyPackListCli } from "../policyPacks/packCli.js";
+import { policyPackApplyCliAsync, policyPackListCli } from "../policyPacks/packCli.js";
 import { runAssurance } from "../assurance/assuranceRunner.js";
 import { createAgentTransformPlanForApiAsync } from "../transformation/transformApi.js";
 import { createFreezeIncidentForAuthority } from "../drift/freezeEngine.js";
@@ -98,13 +98,11 @@ export async function executeAction(params: {
           note: "no policy pack available"
         };
       }
-      // This compound producer is still synchronous, including its held approval suffix.
-      assertVaultMaySign(params.workspace, "config-signature"); assertVaultMaySign(params.workspace, "artifact-seal");
-      policyPackApplyCli({
+      await policyPackApplyCliAsync({
         workspace: params.workspace,
         agentId,
         packId
-      });
+      }, { beforePublish: params.beforeEffect, recordEffect: params.recordEffect });
       return {
         status: "EXECUTED",
         note: `policy pack applied (${packId})`

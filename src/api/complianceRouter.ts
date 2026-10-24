@@ -1,3 +1,4 @@
+import * as policyPacks from "../policyPacks/packCli.js";
 /**
  * complianceRouter.ts — Compliance, policy, waiver, and regulatory scoring API routes.
  * Full parity with: amc compliance *, amc policy *, amc waiver *,
@@ -455,15 +456,21 @@ export async function handleComplianceRoute(
       try {
         const body = await bodyJson<{ packId: string; agentId?: string }>(req);
         if (!body.packId) { apiError(res, 400, 'packId required'); return true; }
-        const { policyPackApplyCli } = await import('../policyPacks/packCli.js');
-        const applied = policyPackApplyCli({
-          workspace,
-          agentId: body.agentId,
-          packId: body.packId,
-        });
+        const beforePublish = () => {
+          if (revalidateAuthority?.() === false) {
+            if (!res.headersSent) apiError(res, 403, 'authenticated authority changed while policy-pack application was prepared');
+            throw new Error('policy-pack caller authority changed');
+          }
+        };
+        const input = { workspace, agentId: body.agentId, packId: body.packId }; beforePublish();
+        const applied = revalidateAuthority === undefined ? policyPacks.policyPackApplyCli(input)
+          : await policyPacks.policyPackApplyCliAsync(input, { beforePublish });
         apiSuccess(res, applied);
       } catch (err) {
-        apiError(res, 500, err instanceof Error ? err.message : 'Policy pack apply failed');
+        if (res.headersSent) return true;
+        if (err instanceof KeyProviderError && Object.hasOwn(KEY_PROVIDER_ERRORS, err.code)) { apiError(res, KEY_PROVIDER_ERRORS[err.code], err.code + ': policy-pack signing refused'); return true; }
+        if (err instanceof KeyRevokedError) { apiError(res, 409, 'KEY_REVOKED: policy-pack signing key was revoked'); return true; }
+        apiError(res, 500, 'Policy pack apply failed');
       }
       return true;
     }

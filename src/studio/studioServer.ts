@@ -192,7 +192,7 @@ import { loadLanMode, verifyLanModeSignature } from "../pairing/lanMode.js";
 import { createPairingCode } from "../pairing/pairingCodes.js";
 import { verifyApprovalPolicySignature } from "../approvals/approvalPolicyEngine.js";
 import { loadGatewayConfig } from "../gateway/config.js";
-import { policyPackApplyCli, policyPackDescribeCli, policyPackDiffCli, policyPackListCli } from "../policyPacks/packCli.js";
+import { policyPackApplyCliAsync, policyPackDescribeCli, policyPackDiffCli, policyPackListCli } from "../policyPacks/packCli.js";
 import { tailTransparencyEntries, verifyTransparencyLog } from "../transparency/logCli.js";
 import { appendTransparencyEntry } from "../transparency/logChain.js";
 import {
@@ -8669,11 +8669,16 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         const packId = decodeURIComponent(policyPackApplyMatch[1] ?? "");
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
         const parsed = body ? (JSON.parse(body) as { agentId?: string }) : {};
-        const applied = policyPackApplyCli({
+        const owner = signingAuthority(["OWNER"]);
+        const applied = await policyPackApplyCliAsync({
           workspace: options.workspace,
           agentId: resolveAgentId(options.workspace, parsed.agentId ?? "default"),
           packId
-        });
+        }, { beforePublish() { owner(); if (requiresReadOnlyMode(options.workspace)) {
+          if (!res.headersSent) json(res, 403, { error: "users config signature invalid: read-only mode active" });
+          throw new Error("policy-pack current caller is in read-only mode");
+        } } }).catch(error => { if (res.headersSent || respondReportSigningError(error, (status, body) => json(res, status, body))) return null; throw error; });
+        if (applied === null) return;
         await writeStudioAuditEventAsync({
           workspace: options.workspace,
           auditType: "HUMAN_POLICY_PACK_APPLY",

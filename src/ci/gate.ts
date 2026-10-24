@@ -15,12 +15,12 @@ import {
   beginAuditReceiptVerification,
   finalizeAuditEvidenceExport
 } from "../audit/auditEvidenceAccounting.js";
-import { signHexDigest, verifyHexDigestAny, getSigningKey, getPublicKeyHistory } from "../crypto/keys.js";
 import type { FleetEnvironment } from "../fleet/registry.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import { loadBundleRunAndTrustMap, verifyEvidenceBundle } from "../bundles/bundle.js";
 import { untrustedReasons, workspaceSelfTrust } from "../trust/index.js";
-import { appendTransparencyEntry } from "../transparency/logChain.js";
+import { writeSignedGatePolicy, verifyGatePolicySignature } from "./gatePolicyPublication.js";
+export { writeSignedGatePolicy, verifyGatePolicySignature, prepareSignedGatePolicy } from "./gatePolicyPublication.js";
 
 const layerNames: LayerName[] = [
   "Strategic Agent Operations",
@@ -55,13 +55,6 @@ const gatePolicySchema = z.object({
     })
     .optional()
 });
-
-interface SignaturePayload {
-  digestSha256: string;
-  signature: string;
-  signedTs: number;
-  signer: "auditor";
-}
 
 export type ReleaseGateOverrideStatus = "none" | "requested" | "approved" | "rejected" | "expired";
 export type ReleaseGateControlKind = "score" | "security" | "compliance" | "cost" | "observability";
@@ -173,97 +166,6 @@ export function defaultGatePolicy(): GatePolicy {
 
 export function parseGatePolicy(raw: unknown): GatePolicy {
   return gatePolicySchema.parse(raw);
-}
-
-function signPolicyContent(workspace: string, bytes: Buffer): SignaturePayload {
-  const digestSha256 = sha256Hex(bytes);
-  return {
-    digestSha256,
-    signature: signHexDigest(digestSha256, getSigningKey(workspace, "config-signature")),
-    signedTs: Date.now(),
-    signer: "auditor"
-  };
-}
-
-export function writeSignedGatePolicy(params: {
-  workspace: string;
-  policyPath: string;
-  policy: GatePolicy;
-}): { policyPath: string; sigPath: string } {
-  const resolved = resolve(params.workspace, params.policyPath);
-  ensureDir(dirname(resolved));
-  const bytes = Buffer.from(JSON.stringify(params.policy, null, 2), "utf8");
-  writeFileAtomic(resolved, bytes, 0o644);
-  const signature = signPolicyContent(params.workspace, bytes);
-  const sigPath = `${resolved}.sig`;
-  writeFileAtomic(sigPath, JSON.stringify(signature, null, 2), 0o644);
-  appendTransparencyEntry({
-    workspace: params.workspace,
-    type: "GATE_POLICY_SIGNED",
-    agentId: "system",
-    artifact: {
-      kind: "policy",
-      sha256: signature.digestSha256,
-      id: "gate-policy"
-    }
-  });
-  return {
-    policyPath: resolved,
-    sigPath
-  };
-}
-
-export function verifyGatePolicySignature(params: {
-  workspace: string;
-  policyPath: string;
-}): { valid: boolean; signatureExists: boolean; reason: string | null; sigPath: string } {
-  const resolved = resolve(params.workspace, params.policyPath);
-  const sigPath = `${resolved}.sig`;
-  if (!pathExists(resolved)) {
-    return {
-      valid: false,
-      signatureExists: false,
-      reason: "policy file missing",
-      sigPath
-    };
-  }
-  if (!pathExists(sigPath)) {
-    return {
-      valid: false,
-      signatureExists: false,
-      reason: "policy signature missing",
-      sigPath
-    };
-  }
-
-  try {
-    const payload = JSON.parse(readFileSync(sigPath, "utf8")) as SignaturePayload;
-    const bytes = readFileSync(resolved);
-    const digest = sha256Hex(bytes);
-    if (digest !== payload.digestSha256) {
-      return {
-        valid: false,
-        signatureExists: true,
-        reason: "policy digest mismatch",
-        sigPath
-      };
-    }
-    const keys = getPublicKeyHistory(params.workspace, "auditor");
-    const valid = verifyHexDigestAny(digest, payload.signature, keys);
-    return {
-      valid,
-      signatureExists: true,
-      reason: valid ? null : "signature verification failed",
-      sigPath
-    };
-  } catch (error) {
-    return {
-      valid: false,
-      signatureExists: true,
-      reason: `invalid signature payload: ${String(error)}`,
-      sigPath
-    };
-  }
 }
 
 function overallScore(report: DiagnosticReport): number {

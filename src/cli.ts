@@ -452,7 +452,7 @@ import {
   transparencyMerkleVerifyProofCli
 } from "./transparency/transparencyMerkleCli.js";
 import {
-  policyPackApplyCli,
+  policyPackApplyCliAsync,
   policyPackDescribeCli,
   policyPackDiffCli,
   policyPackListCli
@@ -7663,7 +7663,7 @@ policyPack
       console.log("Policy pack apply cancelled.");
       return;
     }
-    const applied = policyPackApplyCli({
+    const applied = await policyPackApplyCliAsync({
       workspace: process.cwd(),
       agentId: opts.agent ?? activeAgent(program),
       packId
