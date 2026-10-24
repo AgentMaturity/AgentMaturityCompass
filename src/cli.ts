@@ -201,7 +201,7 @@ import {
   verifyEvidenceBundle
 } from "./bundles/bundle.js";
 import { defaultEvidenceExportPath, exportVerifierEvidence, generateAuditPacket } from "./evidence/index.js";
-import { initCiForAgent, printCiSteps, runBundleGate } from "./ci/gate.js";
+import { initCiForAgent, initCiForAgentAttemptAsync, printCiSteps, runBundleGate } from "./ci/gate.js";
 import { describeArchetype, listArchetypes, previewArchetypeApply } from "./archetypes/index.js";
 import { captureArchetypeApply } from "./archetypes/archetypePublication.js";
 import { exportBadge, exportPolicyPack } from "./exports/policyExport.js";
@@ -10481,15 +10481,19 @@ ci
   .description("Generate GitHub workflow and gate policy")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
   .option("--no-sign", "Generate unsigned workflow and policy without requiring a vault")
-  .action((opts: { agent?: string; sign?: boolean }) => {
+  .action(async (opts: { agent?: string; sign?: boolean }) => {
     try {
-      const agentId = resolveAgentId(process.cwd(), opts.agent ?? activeAgent(program));
-      const signPolicy = opts.sign !== false;
-      const created = initCiForAgent({
-        workspace: process.cwd(),
-        agentId,
-        signPolicy
-      });
+      const workspace = process.cwd(), agentId = resolveAgentId(workspace, opts.agent ?? activeAgent(program));
+      const signPolicy = opts.sign !== false, selectedAsync = signPolicy && process.env.AMC_NO_SIGN !== "1";
+      const request = { workspace, agentId, signPolicy };
+      let created: ReturnType<typeof initCiForAgent>;
+      if (selectedAsync) {
+        const completed = await initCiForAgentAttemptAsync({ workspace, agentId }, () => {
+          if (process.cwd() !== workspace) throw new Error("original CI command workspace changed");
+          assertOwnerMode(workspace, "ci init");
+        });
+        completed.assertCurrent(); created = completed.result;
+      } else created = initCiForAgent(request);
       console.log(chalk.green(`CI workflow created: ${created.workflowPath}`));
       console.log(`Gate policy: ${created.policyPath}`);
       if (created.signed) {

@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { lstatSync, readFileSync, realpathSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { z } from "zod";
 import type { DiagnosticReport, GatePolicy, LayerName } from "../types.js";
@@ -19,8 +19,19 @@ import type { FleetEnvironment } from "../fleet/registry.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import { loadBundleRunAndTrustMap, verifyEvidenceBundle } from "../bundles/bundle.js";
 import { untrustedReasons, workspaceSelfTrust } from "../trust/index.js";
-import { writeSignedGatePolicy, verifyGatePolicySignature } from "./gatePolicyPublication.js";
+import { writeSignedGatePolicy, verifyGatePolicySignature, prepareSignedGatePolicy } from "./gatePolicyPublication.js";
 export { writeSignedGatePolicy, verifyGatePolicySignature, prepareSignedGatePolicy } from "./gatePolicyPublication.js";
+import { writeCiWorkflowSuffix, relativeAgentPathFromWorkspace, pinnedBundleVerify } from "./ciWorkflow.js";
+import { captureConfigSignatureAuthority } from "../config/configSignaturePair.js";
+import { captureVaultPurposeContinuity, vaultStatus } from "../vault/vault.js";
+import { boundProviderKey } from "../keys/keyset.js";
+import { loadTrustConfig, resolveNotaryAuthSecret } from "../trust/trustConfig.js";
+import { captureWorkspaceLogAuthority, appendTransparencyEntryAttemptAsync } from "../transparency/asyncWorkspaceAppend.js";
+import { initTransparencyLogAttemptAsync } from "../transparency/logChain.js";
+import { captureTransparencyAppendPublication } from "../transparency/workspacePublication.js";
+import { assertOrgPairsCurrent, captureOrgFiles } from "../org/preparedOrgPairs.js";
+import { physicalPathWithMissingSuffix } from "../utils/pathSafety.js";
+import { canonicalize } from "../utils/json.js";
 
 const layerNames: LayerName[] = [
   "Strategic Agent Operations",
@@ -234,10 +245,6 @@ export function evaluateGatePolicy(params: {
   };
 }
 
-function relativeAgentPathFromWorkspace(workspace: string, path: string): string {
-  const resolved = resolve(path);
-  return resolved.startsWith(resolve(workspace)) ? resolved.slice(resolve(workspace).length + 1).replace(/\\/g, "/") : path;
-}
 
 export function initCiForAgent(params: {
   workspace: string;
@@ -270,86 +277,120 @@ export function initCiForAgent(params: {
         };
       })();
 
-  const workflowPath = join(params.workspace, ".github", "workflows", "amc.yml");
-  ensureDir(dirname(workflowPath));
+  return writeCiWorkflowSuffix(params, agentId, agentPaths, signPolicy, savedPolicy).result;
+}
 
-  const suggestedBundlePath = join(agentPaths.bundlesDir, "latest.amcbundle");
-  const relBundle = relativeAgentPathFromWorkspace(params.workspace, suggestedBundlePath);
-  const relPolicy = relativeAgentPathFromWorkspace(params.workspace, savedPolicy.policyPath);
-  const relOutcomeReport = relativeAgentPathFromWorkspace(
-    params.workspace,
-    join(agentPaths.rootDir, "outcomes", "reports", "ci-latest.json")
-  );
-  const relExperimentPolicy = relativeAgentPathFromWorkspace(
-    params.workspace,
-    join(agentPaths.rootDir, "experimentGate.json")
-  );
-  const gateCommand = `amc gate --bundle ${relBundle} --policy ${relPolicy}${signPolicy ? "" : " --no-sign"}`;
-  const bomSteps = signPolicy
-    ? [
-        "      - name: Generate maturity BOM",
-        `        run: amc bom generate --agent ${agentId} --run latest --out amc-bom.json`,
-        "      - name: Sign maturity BOM",
-        "        run: amc bom sign --in amc-bom.json --out amc-bom.json.sig"
-      ]
-    : [
-        "      - name: Generate maturity BOM",
-        `        run: amc bom generate --agent ${agentId} --run latest --out amc-bom.json`,
-        "      - name: Unsigned CI boundary",
-        "        run: echo \"UNSIGNED CI mode: maturity BOM signing skipped; run amc ci init after vault setup for verifier-ready signatures.\""
-      ];
-
-  const workflow = [
-    "name: AMC Release Gate",
-    "",
-    "on:",
-    "  push:",
-    "  pull_request:",
-    "",
-    "jobs:",
-    "  amc-gate:",
-    "    runs-on: ubuntu-latest",
-    "    steps:",
-    "      - uses: actions/checkout@v4",
-    "      - uses: actions/setup-node@v4",
-    "        with:",
-    "          node-version: '20'",
-    "      - name: Install dependencies",
-    "        run: npm ci",
-    "      - name: Build",
-    "        run: npm run build",
-    // P0-09: bundle verify needs pinned keys. Pin ones recorded outside this repository (repository variables),
-    // never the .amc/keys files in the checkout, which would let the bundle vouch for itself.
-    "      - name: Verify evidence bundle",
-    "        env:",
-    "          AMC_AUDITOR_PUBKEY: ${{ vars.AMC_AUDITOR_PUBKEY }}",
-    "          AMC_MONITOR_FINGERPRINT: ${{ vars.AMC_MONITOR_FINGERPRINT }}",
-    `        run: printf '%s\\n' "$AMC_AUDITOR_PUBKEY" > "$RUNNER_TEMP/amc-auditor.pub" && ${pinnedBundleVerify(relBundle, "$RUNNER_TEMP/amc-auditor.pub")}`,
-    "      - name: Generate outcomes report",
-    `        run: amc outcomes report --agent ${agentId} --window 14d --out ${relOutcomeReport}`,
-    "      - name: Optional experiment gate",
-    `        run: if [ -n \"${"$"}AMC_EXPERIMENT_ID\" ] && [ -f \"${relExperimentPolicy}\" ]; then amc experiment gate --agent ${agentId} --experiment \"${"$"}AMC_EXPERIMENT_ID\" --policy ${relExperimentPolicy}; else echo \"Experiment gate skipped (set AMC_EXPERIMENT_ID and commit ${relExperimentPolicy})\"; fi`,
-    "      - name: Enforce AMC gate policy",
-    `        run: ${gateCommand}`,
-    ...bomSteps,
-    ""
-  ].join("\n");
-
-  writeFileAtomic(workflowPath, workflow, 0o644);
-
-  return {
-    workflowPath,
-    policyPath: savedPolicy.policyPath,
-    policySigPath: savedPolicy.sigPath,
-    suggestedBundlePath,
-    signed: signPolicy
+/** Partial native facts; a returned member is not a helper readback or an atomic multi-file commit. */
+export class CiInitializationError extends Error {
+  readonly code = "CI_INITIALIZATION_INCOMPLETE";
+  constructor(readonly progress: Readonly<{ phase: string; returnedPolicyMembers: readonly string[]; pairReturned: boolean;
+    initialization: Awaited<ReturnType<typeof initTransparencyLogAttemptAsync>>["progress"] | null;
+    initializationEntered: boolean; entryHash: string | null; workflowEntered: boolean; workflowWriteSelected: boolean;
+    workflowHelperReturned: boolean; workflowAcknowledged: boolean; firstRefusalObserved: boolean; firstRefusal: unknown }>, cause: unknown) {
+    super("CI initialization did not complete; earlier policy/log/workflow effects may remain", { cause });
+    this.name = "CiInitializationError";
+  }
+}
+/** Fixed signed attempt. Legacy sync/initial unsigned or global no-sign callers keep initCiForAgent. */
+export async function initCiForAgentAttemptAsync(params: { workspace: string; agentId?: string }, beforePublish?: () => void) {
+  const workspace = params.workspace, agentId = resolveAgentId(workspace, params.agentId);
+  const agentPaths = getAgentPaths(workspace, agentId), policy = defaultGatePolicy(), root = resolve(workspace);
+  let phase = "capture", pairEntered = false, pairReturned = false, initializationEntered = false;
+  let initialization: Awaited<ReturnType<typeof initTransparencyLogAttemptAsync>>["progress"] | null = null;
+  let entryHash: string | null = null, workflowEntered = false, workflowWriteSelected = false, workflowHelperReturned = false, workflowAcknowledged = false;
+  let firstRefusalObserved = false, firstRefusal: unknown;
+  const returnedPolicyMembers: string[] = [];
+  const checked = (negative: () => void) => {
+    if (firstRefusalObserved) throw firstRefusal;
+    try { negative(); } catch (cause) {
+      if (!firstRefusalObserved) { firstRefusalObserved = true; firstRefusal = cause; }
+      throw cause;
+    }
   };
+  const failure = (cause: unknown) => new CiInitializationError(Object.freeze({ phase,
+    returnedPolicyMembers: Object.freeze([...returnedPolicyMembers]), pairReturned, initialization, initializationEntered,
+    entryHash, workflowEntered, workflowWriteSelected, workflowHelperReturned, workflowAcknowledged, firstRefusalObserved, firstRefusal }), cause);
+  try {
+    const physicalRoot = realpathSync(root), originalRoot = lstatSync(physicalRoot);
+    if (!originalRoot.isDirectory()) throw new Error("CI initialization workspace must be a directory");
+    const selectedPaths = canonicalize(agentPaths), workflowPath = join(workspace, ".github", "workflows", "amc.yml");
+    const physicalWorkflow = physicalPathWithMissingSuffix(workflowPath);
+    let expectedWorkflow = captureOrgFiles([workflowPath]);
+    const enabled = () => { if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize policy signing"); };
+    const inputs = () => checked(() => {
+      enabled(); beforePublish?.(); enabled();
+      const now = lstatSync(physicalRoot);
+      if (resolve(workspace) !== root || realpathSync(root) !== physicalRoot || !now.isDirectory()
+        || now.dev !== originalRoot.dev || now.ino !== originalRoot.ino)
+        throw new Error("original CI workspace changed");
+      if (canonicalize(getAgentPaths(workspace, agentId)) !== selectedPaths)
+        throw new Error("original CI agent path selection changed");
+      if (physicalPathWithMissingSuffix(workflowPath) !== physicalWorkflow) throw new Error("original CI workflow destination changed");
+      assertOrgPairsCurrent(expectedWorkflow);
+    });
+    // This real constructor captures its public config negative BEFORE the first supplied actor. No duplicate public constructor.
+    const config = captureConfigSignatureAuthority(workspace, inputs), log = captureWorkspaceLogAuthority(workspace, inputs);
+    const usesNotary = [log.sealSigner.descriptor, log.rootSigner.descriptor].some(row => row.mode === "NOTARY");
+    const secretRef = usesNotary ? loadTrustConfig(workspace).trust.notary.auth.secretRef : null;
+    const originalSecret = secretRef === null ? null : resolveNotaryAuthSecret(workspace, secretRef);
+    // Stabilize actual secret authentication before retaining any selected managed local file material.
+    const configMaterial = (boundProviderKey(workspace, "config-signature")?.binding.provider ?? "file") === "file"
+      ? captureVaultPurposeContinuity(workspace, "config-signature") : null;
+    const artifactFile = [log.sealSigner.descriptor, log.rootSigner.descriptor].some(row => row.mode === "VAULT")
+      && (boundProviderKey(workspace, "artifact-seal")?.binding.provider ?? "file") === "file";
+    const artifactMaterial = artifactFile ? captureVaultPurposeContinuity(workspace, "artifact-seal") : null;
+    let policyCurrent: (() => void) | null = null;
+    const stable = () => checked(() => {
+      inputs(); configMaterial?.(); artifactMaterial?.();
+      if (secretRef !== null) {
+        if (!vaultStatus(workspace).unlocked) throw new Error("original CI notary credential vault is locked");
+        if (resolveNotaryAuthSecret(workspace, secretRef) !== originalSecret) throw new Error("original CI notary credential changed");
+      }
+      configMaterial?.(); artifactMaterial?.(); config.assertCurrent(); log.assertIntrinsicCurrent(); policyCurrent?.(); inputs();
+    });
+    stable();
+    const initialLog = captureTransparencyAppendPublication(workspace);
+    const preparingPair = () => checked(() => { stable(); initialLog.assertCurrent(); });
+    phase = "policy-sign";
+    const prepared = await prepareSignedGatePolicy({ workspace, policyPath: agentPaths.gatePolicy, policy },
+      { beforePublish: stable, assertInputsCurrent: preparingPair });
+    policyCurrent = prepared.assertCurrent; preparingPair();
+    phase = "policy-pair"; pairEntered = true;
+    // The real helper calls this after native return and BEFORE observe: record return only, never synthesize acknowledgment.
+    const savedPolicy = prepared.publish(path => returnedPolicyMembers.push(path));
+    pairReturned = true; preparingPair();
+    phase = "log-initialization"; preparingPair(); initializationEntered = true;
+    // Original full-family state retires at actual synchronous init capture. Stable members never replay that old CAS.
+    const initialized = await initTransparencyLogAttemptAsync(workspace, stable);
+    initialization = initialized.progress; stable();
+    phase = "gate-policy-log";
+    const appended = await appendTransparencyEntryAttemptAsync({ workspace, type: "GATE_POLICY_SIGNED", agentId: "system",
+      artifact: { kind: "policy", sha256: prepared.digestSha256, id: "gate-policy" } }, {
+      beforeCommit: () => checked(() => { stable(); initialized.assertCurrent(); }), beforeMember: stable
+    });
+    entryHash = appended.entry.hash;
+    const latest = () => checked(() => { stable(); appended.assertCurrent(); });
+    phase = "workflow-suffix"; latest(); workflowEntered = true;
+    const written = writeCiWorkflowSuffix({ workspace }, agentId, agentPaths, true, savedPolicy, () => {
+      latest(); phase = "workflow-write"; workflowWriteSelected = true;
+    });
+    workflowHelperReturned = true; phase = "workflow-readback";
+    const own = captureOrgFiles([workflowPath]), row = own.members[0];
+    if (row === undefined || row.mode !== 0o644 || row.bytes === null || !row.bytes.equals(Buffer.from(written.wire, "utf8")))
+      throw new Error("returned CI workflow differs from exact intended bytes or mode");
+    expectedWorkflow = own; workflowAcknowledged = true;
+    const completed = () => checked(() => { latest(); assertOrgPairsCurrent(expectedWorkflow); });
+    completed(); phase = "complete";
+    return Object.freeze({ result: written.result, assertCurrent() {
+      try { completed(); } catch (cause) { throw failure(cause); }
+    } });
+  } catch (cause) {
+    // Preserve genuine early provider/locked diagnostics; this says nothing about public-reader/warm/migration effects.
+    if (!pairEntered && !initializationEntered && !workflowEntered) throw cause;
+    throw failure(cause);
+  }
 }
 
-/** The pinned bundle verify a CI step runs: the auditor key and monitor fingerprint come from outside the checkout. */
-function pinnedBundleVerify(bundle: string, auditorPubFile: string): string {
-  return `amc bundle verify ${bundle} --pubkey "${auditorPubFile}" --expect-monitor "$AMC_MONITOR_FINGERPRINT"`;
-}
 
 export function printCiSteps(params: {
   workspace: string;
