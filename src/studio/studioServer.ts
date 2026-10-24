@@ -243,7 +243,7 @@ import {
 } from "../org/orgStore.js";
 import { compareNodeScorecards, loadLatestOrgScorecard } from "../org/orgScorecard.js";
 import { computeOrgScorecard, nodeHierarchy } from "../org/orgEngine.js";
-import { captureStudioOrgSecondary, createStudioOutcomeOrgWork, recomputeStudioOrgLegacy } from "./studioOrgSecondary.js";
+import { captureStudioOrgSecondary, createStudioOutcomeOrgWork } from "./studioOrgSecondary.js";
 import { renderOrgCompareMarkdown, renderOrgNodeReportMarkdown, renderOrgSystemicMarkdown } from "../org/orgReports.js";
 import { generateOrgEocAsync, recomputeOrgScorecardsApiAsync } from "../org/orgApi.js";
 import { prepareOrgConfigUpdateLog } from "../org/orgPublication.js";
@@ -1460,7 +1460,6 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
     }
   };
 
-  const recomputeOrgAndEmit = (type: Parameters<OrgSseHub["emit"]>[0]["type"], nodeIds?: string[]): void => recomputeStudioOrgLegacy(options.workspace, type, nodeIds, emitOrgEvent);
 
   const recomputeOwnedOrgAndEmit = async (nodeIds: string[], beforePublish: () => void): Promise<void> => {
     try { await recomputeOrgScorecardsApiAsync({ workspace: options.workspace, window: "14d" }, { beforePublish }); }
@@ -1500,7 +1499,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
   const schedulerTimer = setInterval(() => {
     try {
       drainIntegrationQueue();
-      const readiness = buildReadiness(options);
+      const orgWorkspace = resolve(options.workspace), orgSecondary = captureStudioOrgSecondary(orgWorkspace, () => { if (shuttingDown) throw new Error("scheduler org recompute stopped"); if (resolve(options.workspace) !== orgWorkspace) throw new Error("original scheduler workspace changed while preparing optional org recompute"); }, emitOrgEvent); const readiness = buildReadiness(options);
       const forecastWork = readiness.then(async (state) => {
         const tick = await schedulerTickAsync({
           workspace: options.workspace,
@@ -1523,7 +1522,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           workspaceReady: state.ok
         });
         if (tick.ran) {
-          recomputeOrgAndEmit("FORECAST_UPDATED");
+          await orgSecondary.run("FORECAST_UPDATED");
         }
         if (promptTick.ran) {
           emitPromptPackSse({
@@ -6183,11 +6182,11 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           return;
         }
         const agentId = resolveAgentId(options.workspace, decodeURIComponent(driftCheckMatch[1] ?? ""));
-        const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
+        const orgWorkspace = resolve(options.workspace), orgToken = options.token, orgActor = currentOrgRunActor(req, orgWorkspace, orgToken, auth); const orgSecondary = captureStudioOrgSecondary(orgWorkspace, () => { if (resolve(options.workspace) !== orgWorkspace || options.token !== orgToken) throw new Error("original Studio workspace or token changed while preparing optional org recompute"); orgActor(); }, emitOrgEvent); const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
         const parsed = body ? (JSON.parse(body) as { against?: "previous" }) : {};
         try {
           const result = await driftCheckForStudio({ workspace: options.workspace, agentId, against: parsed.against ?? "previous",
-            beforePublish: signingAuthority(["OPERATOR", "OWNER"]), recompute: type => recomputeOrgAndEmit(type, orgNodeIdsForAgent(agentId)),
+            beforePublish: signingAuthority(["OPERATOR", "OWNER"]), recompute: type => orgSecondary.run(type, orgNodeIdsForAgent(agentId)),
             forecast: refreshed => emitForecastEvents({ agentId,
               advisories: refreshed.advisories.map(advisory => ({ severity: advisory.severity, category: advisory.category })), status: refreshed.forecast.status }) });
           json(res, 200, result);

@@ -12,7 +12,7 @@ import { vaultStatus } from "../vault/vault.js";
 
 type EmitOrgEvent = (type: OrgSseEvent["type"], nodeIds?: string[]) => void;
 
-/** The two unconverted callers retain their synchronous, best-effort recipe and event order. */
+/** Retained synchronous compatibility recipe; no maintained Studio caller uses this legacy helper. */
 export function recomputeStudioOrgLegacy(workspace: string, type: OrgSseEvent["type"], nodeIds: string[] | undefined,
   emitOrgEvent: EmitOrgEvent): void {
   try {
@@ -65,13 +65,13 @@ function captureSecondaryAuthority(workspace: string, actor: () => void) {
   return { workspace, assertCurrent };
 }
 
-/** The fifteen converted callers consume this optional secondary attempt.
+/** The original broad Studio secondary callers consume this optional async attempt.
  * Capture refusal stays private and best-effort; it cannot send a response or authorize the primary operation. */
 export function captureStudioOrgSecondary(workspace: string, actor: () => void, emitOrgEvent: EmitOrgEvent) {
   let original: ReturnType<typeof captureSecondaryAuthority> | null = null, captureFailure: unknown;
   try { original = captureSecondaryAuthority(workspace, actor); }
   catch (error) { captureFailure = error; }
-  return { async run(type: "AGENT_RUN_COMPLETED" | "ASSURANCE_RUN_COMPLETED" | "FEDERATION_IMPORTED" | "BENCHMARK_INGESTED" | "PLUGIN_INSTALL_REQUESTED" | "PLUGIN_INTEGRITY_BROKEN" | "PLUGIN_INSTALLED" | "PLUGIN_UPGRADED" | "PLUGIN_REMOVED" | "POLICY_PACK_APPLIED" | "OUTCOMES_UPDATED", nodeIds?: string[]): Promise<void> {
+  return { async run(type: "AGENT_RUN_COMPLETED" | "ASSURANCE_RUN_COMPLETED" | "FEDERATION_IMPORTED" | "BENCHMARK_INGESTED" | "PLUGIN_INSTALL_REQUESTED" | "PLUGIN_INTEGRITY_BROKEN" | "PLUGIN_INSTALLED" | "PLUGIN_UPGRADED" | "PLUGIN_REMOVED" | "POLICY_PACK_APPLIED" | "OUTCOMES_UPDATED" | "FORECAST_UPDATED" | "INCIDENT_CREATED" | "FREEZE_APPLIED" | "FREEZE_LIFTED", nodeIds?: string[]): Promise<void> {
     const ids = nodeIds === undefined ? undefined : [...nodeIds];
     try {
       if (original === null) throw captureFailure;

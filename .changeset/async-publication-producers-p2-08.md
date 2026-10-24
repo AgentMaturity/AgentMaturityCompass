@@ -295,3 +295,6 @@ Add a fixed mature workspace initializer continuation for an already marked, adm
 
 
 Feedback/outcome routes retain their actual chosen session or HMAC authority for optional awaited org recompute after the original response. Webhook continuation rereads only the genuine selected ref/material without fallback or unlock; session rules stay admin or OWNER/OPERATOR. A per-server set tracks those four genuine promises and shutdown drains them before closing score stores. Earlier body/private eligibility and broader primary shutdown limits remain explicit. Primary ingestion, SELF_REPORTED status, JSON-before-org and notification order remain.
+
+
+Complete the finite scheduler and drift optional org continuations. Retain the original scheduler work set and drift incident/freeze observations, await genuine secondary work in its existing effect slots, and remove the now-unused Studio alias while retaining the compatibility helper. Optional public capture can advance authenticated high-water state before later scheduler no-op or refusal; it cannot attest original private-vault eligibility. Execution and all native qualification remain deferred by the user.
