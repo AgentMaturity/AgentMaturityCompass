@@ -549,6 +549,20 @@
       "sha256": "3f3d55b71ab48147ea436d7b9b165ac75cbe8e7f2a40b6f95af40d7f5dfeb176"
     },
     {
+      "path": "src/transformation/transformAttestations.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/transformation/transformAttestations.ts.landed",
+      "sha256": "33ed3987cba89b9f29e1fd664fb5da6d480ac50c365d447b1eb710fd4b021fe3"
+    },
+    {
+      "path": "src/transformation/transformTasks.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/transformation/transformTasks.ts.landed",
+      "sha256": "fe4094ba31e9b451e459e0516b3a174bef21d016945aa0eac5342c6ae6cbe2c4"
+    },
+    {
       "path": "src/trust/trustConfig.ts",
       "issue": "P0-45",
       "baseCommit": "2a5d632588f5c198785aedf229a801ad0178938d",
