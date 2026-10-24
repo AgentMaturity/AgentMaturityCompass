@@ -13,6 +13,7 @@ export function appendOpsAuditEvent(params: {
     auditType: params.auditType,
     ...(params.payload ?? {})
   });
+  let failed = false, primary: unknown;
   try {
     ledger.startSession({
       sessionId,
@@ -46,8 +47,10 @@ export function appendOpsAuditEvent(params: {
       eventId: event.id,
       eventHash: event.eventHash
     };
-  } finally {
-    ledger.close();
+  } catch (cause) { failed = true; primary = cause; throw cause; }
+  finally {
+    try { ledger.close(); }
+    catch (cleanup) { if (failed) throw new AggregateError([primary, cleanup], "ops audit and ledger close failed", { cause: primary }); throw cleanup; }
   }
 }
 
