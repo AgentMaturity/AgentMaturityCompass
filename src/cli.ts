@@ -182,12 +182,11 @@ import {
 } from "./fleet/trustInheritance.js";
 import type { TrustInheritancePolicyMode } from "./fleet/trustInheritance.js";
 import {
-  acceptHandoffPacket,
-  createHandoffPacket,
   verifyHandoffContract,
   verifyHandoffPacket,
   renderHandoffPacketMarkdown
 } from "./fleet/handoffPacket.js";
+import { acceptHandoffPacketAsync, createHandoffPacketAsync } from "./fleet/handoffPacketSigning.js";
 import {
   detectContradictions,
   renderContradictionReportMarkdown
@@ -15072,13 +15071,13 @@ fleet
   .option("--packet <packetId>", "packet ID for verify")
   .option("--receiver <id>", "receiver agent ID for accept")
   .option("--refuse <reason>", "record receiver refusal reason")
-  .action((action: string, opts: { from?: string; to?: string; goal?: string; mode?: string; packet?: string; receiver?: string; refuse?: string }) => {
+  .action(async (action: string, opts: { from?: string; to?: string; goal?: string; mode?: string; packet?: string; receiver?: string; refuse?: string }) => {
     const workspace = process.cwd();
     if (action === "create") {
       if (!opts.from || !opts.to || !opts.goal) {
         throw new Error("--from, --to, and --goal are required for create");
       }
-      const packet = createHandoffPacket(workspace, {
+      const packet = await createHandoffPacketAsync(workspace, {
         fromAgentId: opts.from,
         toAgentId: opts.to,
         goal: opts.goal,
@@ -15121,7 +15120,7 @@ fleet
       if (!packetId) {
         throw new Error("--packet <packetId> required for accept");
       }
-      const receipt = acceptHandoffPacket(workspace, packetId, {
+      const receipt = await acceptHandoffPacketAsync(workspace, packetId, {
         receiverAgentId: opts.receiver,
         accepted: !opts.refuse,
         refusalReason: opts.refuse

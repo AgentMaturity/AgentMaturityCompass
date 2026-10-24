@@ -125,6 +125,7 @@ export type {
 } from "./fleet/trustInheritance.js";
 
 // Handoff Packets
+export { acceptHandoffPacketAsync, createHandoffPacketAsync } from "./fleet/handoffPacketSigning.js";
 export {
   acceptHandoffPacket,
   createHandoffPacket,

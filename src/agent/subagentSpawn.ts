@@ -1,5 +1,5 @@
-import { mintDelegationPacket, UnsignablePacketError } from "../fleet/delegationPacket.js";
-import { removeHandoffPacket } from "../fleet/handoffPacket.js";
+import { mintDelegationPacketAsync, UnsignablePacketError } from "../fleet/delegationPacket.js";
+import { removeHandoffPacketIfCurrent, type HandoffPacket } from "../fleet/handoffPacket.js";
 import { parseDelegationScope } from "./delegationScope.js";
 import { parseSubagentStopConditions } from "./subagentStopConditions.js";
 import { writeDelegationEvidence } from "./delegationEvidenceWriter.js";
@@ -297,13 +297,18 @@ export async function spawnSubagent(init: SpawnSubagentInit): Promise<SubagentOu
     scopeClasses = parsed.classes;
   }
 
-  let packetId: string;
+  let packet: HandoffPacket;
   try {
-    packetId = mintDelegationPacket(workspace, { parent, child: identity, goal: request.goal,
-      delegationScope: request.delegationScope, stopConditions: stops.conditions }).packetId;
+    packet = await mintDelegationPacketAsync(workspace, { parent, child: identity, goal: request.goal,
+      delegationScope: request.delegationScope, stopConditions: stops.conditions }, { signal: parentSignal });
+    if (parentSignal?.aborted) {
+      removeHandoffPacketIfCurrent(workspace, packet);
+      return { ok: false, reason: "parent gave up before the delegation was authorised", packetId: null };
+    }
   } catch (error) {
     return { ok: false, reason: error instanceof UnsignablePacketError ? error.message : String(error), packetId: null };
   }
+  const packetId = packet.packetId;
   let childSessionId: string;
   try {
     childSessionId = mintSessionId();
@@ -321,7 +326,7 @@ export async function spawnSubagent(init: SpawnSubagentInit): Promise<SubagentOu
       } });
     }
   } catch (error) {
-    removeHandoffPacket(workspace, packetId);
+    removeHandoffPacketIfCurrent(workspace, packet);
     throw error;
   }
 

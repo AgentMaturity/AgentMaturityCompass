@@ -7,12 +7,15 @@
 
 import { randomUUID } from "node:crypto";
 import { join } from "node:path";
-import { readdirSync, rmSync, readFileSync } from "node:fs";
+import { constants, closeSync, fstatSync, lstatSync, openSync, readdirSync, rmSync, readFileSync } from "node:fs";
 import { z } from "zod";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
-import { getSigningKey, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { getSigningKey, getPublicKeyPem, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { assertKeysetComplete, boundProviderKey, keysetDeclared } from "../keys/keyset.js";
+import { getPurposeKeyHistory, readHistory } from "../keys/signingKeys.js";
+import { withControlFileLock } from "../lifecycle/controlFileLock.js";
 import { fleetRoot } from "./paths.js";
 
 // ---------------------------------------------------------------------------
@@ -143,7 +146,7 @@ function handoffDir(workspace: string): string {
   return join(fleetRoot(workspace), "handoffs");
 }
 
-function handoffFilePath(workspace: string, packetId: string): string {
+export function handoffFilePath(workspace: string, packetId: string): string {
   return join(handoffDir(workspace), `${packetId}.json`);
 }
 
@@ -151,11 +154,11 @@ function handoffReceiptDir(workspace: string): string {
   return join(handoffDir(workspace), "receipts");
 }
 
-function handoffReceiverReceiptPath(workspace: string, packetId: string): string {
+export function handoffReceiverReceiptPath(workspace: string, packetId: string): string {
   return join(handoffReceiptDir(workspace), `${packetId}.receiver.json`);
 }
 
-function handoffUnresolvedDependencyPath(workspace: string, packetId: string): string {
+export function handoffUnresolvedDependencyPath(workspace: string, packetId: string): string {
   return join(handoffReceiptDir(workspace), `${packetId}.unresolved.json`);
 }
 
@@ -172,7 +175,13 @@ function verifyCanonicalBodySignature(workspace: string, body: unknown, signatur
   if (signature === "unsigned") return false;
   const digest = sha256Hex(Buffer.from(canonicalize(body), "utf8"));
   try {
-    return verifyHexDigestAny(digest, signature, getPublicKeyHistory(workspace, "auditor"));
+    assertKeysetComplete(workspace);
+    const keys = getPurposeKeyHistory(workspace, "artifact-seal");
+    if (keysetDeclared(workspace) && boundProviderKey(workspace, "artifact-seal") === null) {
+      const history = readHistory(workspace, "auditor", getPublicKeyPem(workspace, "auditor"));
+      keys.push(...(history?.entries.filter(entry => entry.source === "imported").map(entry => entry.publicKeyPem) ?? []));
+    }
+    return verifyHexDigestAny(digest, signature, keys);
   } catch {
     return false;
   }
@@ -214,13 +223,75 @@ function unresolvedDependencies(dependencies: HandoffDependencyStatus[]): Handof
     .sort((a, b) => a.dependencyId.localeCompare(b.dependencyId));
 }
 
+/** Internal prepared-publication helpers; only the maintained producers use them. */
+export type HandoffFile = { path: string; state: { bytes: Buffer; mode: number } | null };
+function readHandoffFile(path: string): HandoffFile["state"] {
+  let fd: number;
+  try { fd = openSync(path, constants.O_RDONLY | constants.O_NOFOLLOW | constants.O_NONBLOCK); }
+  catch (error) { if ((error as NodeJS.ErrnoException).code === "ENOENT") return null; throw error; }
+  try {
+    const stat = fstatSync(fd);
+    if (!stat.isFile() || stat.nlink !== 1) throw new Error("handoff predecessor is not a regular single-link file");
+    const bytes = readFileSync(fd), openedAfter = fstatSync(fd), after = lstatSync(path);
+    if (openedAfter.ctimeMs !== stat.ctimeMs || openedAfter.size !== stat.size || after.dev !== stat.dev || after.ino !== stat.ino || after.mode !== stat.mode) throw new Error("handoff predecessor changed during read");
+    return { bytes, mode: stat.mode & 0o777 };
+  } finally { closeSync(fd); }
+}
+export function captureHandoffFiles(paths: string[]): HandoffFile[] {
+  try { return paths.map(path => ({ path, state: readHandoffFile(path) })); }
+  catch (cause) { throw Object.assign(new Error("Cannot read .amc/handoffs publication preimage", { cause }), { code: "HANDOFF_PREPARATION_FAILED" }); }
+}
+function assertHandoffFilesCurrent(files: readonly HandoffFile[]): void {
+  for (const file of files) {
+    const current = captureHandoffFiles([file.path])[0]!.state;
+    if (current === null ? file.state !== null : file.state === null || current.mode !== file.state.mode || !current.bytes.equals(file.state.bytes)) {
+      throw new Error("handoff packet or output changed while preparing publication");
+    }
+  }
+}
+function withHandoffPublicationLock<T>(workspace: string, operation: () => T): T {
+  return withControlFileLock({ root: fleetRoot(workspace), name: "handoff-publication", operation });
+}
+export class HandoffPublicationError extends Error {
+  readonly code = "HANDOFF_PUBLICATION_PARTIAL" as const;
+  readonly attemptedMemberMayExist = true;
+  constructor(readonly phase: "packet" | "packet-cleanup" | "receiver-receipt" | "unresolved-log", readonly published: readonly string[], cause: unknown) {
+    super(`Handoff publication failed during ${phase}; ${published.length} earlier member(s) completed; attempted member state may have changed`, { cause });
+    this.name = "HandoffPublicationError";
+  }
+}
+export function publishHandoffPacket(workspace: string, packet: HandoffPacket, files: readonly HandoffFile[], beforeWrite: () => void = () => {}): void {
+  withHandoffPublicationLock(workspace, () => {
+    beforeWrite(); assertHandoffFilesCurrent(files);
+    try { ensureDir(handoffDir(workspace)); writeFileAtomic(handoffFilePath(workspace, packet.packetId), JSON.stringify(packet, null, 2), 0o644); }
+    catch (cause) { throw new HandoffPublicationError("packet", [], cause); }
+  });
+}
+export function publishHandoffAcceptance(workspace: string, prepared: ReturnType<typeof prepareHandoffAcceptance>, receipt: HandoffReceiverReceipt, beforeWrite: () => void = () => {}): void {
+  withHandoffPublicationLock(workspace, () => {
+    beforeWrite();
+    if (Date.now() > prepared.packet.expiryTs) throw new Error("Cannot accept an expired handoff packet");
+    assertHandoffFilesCurrent(prepared.files);
+    try { ensureDir(handoffReceiptDir(workspace)); writeFileAtomic(handoffReceiverReceiptPath(workspace, receipt.packetId), JSON.stringify(receipt, null, 2), 0o644); }
+    catch (cause) { throw new HandoffPublicationError("receiver-receipt", [], cause); }
+    try { writeFileAtomic(handoffUnresolvedDependencyPath(workspace, receipt.packetId), JSON.stringify(prepared.unresolvedLog, null, 2), 0o644); }
+    catch (cause) { throw new HandoffPublicationError("unresolved-log", [`.amc/handoffs/receipts/${receipt.packetId}.receiver.json`], cause); }
+  });
+}
+export function removeHandoffPacketIfCurrent(workspace: string, packet: HandoffPacket): void {
+  try {
+    withHandoffPublicationLock(workspace, () => {
+      const state = captureHandoffFiles([handoffFilePath(workspace, packet.packetId)])[0]!.state;
+      if (state?.mode === 0o644 && state.bytes.equals(Buffer.from(JSON.stringify(packet, null, 2)))) rmSync(handoffFilePath(workspace, packet.packetId));
+    });
+  } catch (cause) { throw new HandoffPublicationError("packet-cleanup", [], cause); }
+}
+
 // ---------------------------------------------------------------------------
 // Create
 // ---------------------------------------------------------------------------
 
-export function createHandoffPacket(
-  workspace: string,
-  params: {
+export type HandoffCreateParams = {
     fromAgentId: string;
     toAgentId: string;
     goal: string;
@@ -238,43 +309,43 @@ export function createHandoffPacket(
     dependencyStatuses?: HandoffDependencyStatus[];
     refusalReasons?: Array<Omit<HandoffRefusalReason, "refusedAt"> & { refusedAt?: string }>;
     ttlMs?: number;
-  },
-): HandoffPacket {
-  ensureDir(handoffDir(workspace));
+  };
 
+export function prepareHandoffPacket(params: HandoffCreateParams) {
+  const captured = structuredClone(params);
   const packetId = `handoff_${randomUUID().slice(0, 12)}`;
   const now = Date.now();
-  const ttl = params.ttlMs ?? 3600_000; // 1 hour default
-  const delegationScope = params.delegationScope ?? [];
-  const dependencyStatuses = handoffPacketSchema.shape.dependencyStatuses.parse(params.dependencyStatuses ?? []);
-  const refusalReasons = handoffPacketSchema.shape.refusalReasons.parse((params.refusalReasons ?? []).map((reason) => ({
+  const ttl = captured.ttlMs ?? 3600_000; // 1 hour default
+  const delegationScope = captured.delegationScope ?? [];
+  const dependencyStatuses = handoffPacketSchema.shape.dependencyStatuses.parse(captured.dependencyStatuses ?? []);
+  const refusalReasons = handoffPacketSchema.shape.refusalReasons.parse((captured.refusalReasons ?? []).map((reason) => ({
     ...reason,
     refusedAt: reason.refusedAt ?? new Date(now).toISOString()
   })));
   const ownershipTransfer = handoffPacketSchema.shape.ownershipTransfer.parse({
-    fromOwnerAgentId: params.ownershipTransfer?.fromOwnerAgentId ?? params.fromAgentId,
-    toOwnerAgentId: params.ownershipTransfer?.toOwnerAgentId ?? params.toAgentId,
-    scope: params.ownershipTransfer?.scope ?? delegationScope,
-    status: params.ownershipTransfer?.status ?? "offered",
-    transferReceiptId: params.ownershipTransfer?.transferReceiptId ?? null,
-    refusalReason: params.ownershipTransfer?.refusalReason ?? null,
-    evidenceRefs: params.ownershipTransfer?.evidenceRefs ?? []
+    fromOwnerAgentId: captured.ownershipTransfer?.fromOwnerAgentId ?? captured.fromAgentId,
+    toOwnerAgentId: captured.ownershipTransfer?.toOwnerAgentId ?? captured.toAgentId,
+    scope: captured.ownershipTransfer?.scope ?? delegationScope,
+    status: captured.ownershipTransfer?.status ?? "offered",
+    transferReceiptId: captured.ownershipTransfer?.transferReceiptId ?? null,
+    refusalReason: captured.ownershipTransfer?.refusalReason ?? null,
+    evidenceRefs: captured.ownershipTransfer?.evidenceRefs ?? []
   });
 
   const baseBody = {
     packetId,
-    fromAgentId: params.fromAgentId,
-    toAgentId: params.toAgentId,
-    goal: params.goal,
-    currentState: params.currentState ?? "",
-    nextAction: params.nextAction ?? "",
-    constraints: params.constraints ?? [],
-    knownUnknowns: params.knownUnknowns ?? [],
-    artifactPaths: params.artifactPaths ?? [],
-    stopConditions: params.stopConditions ?? [],
-    contextHash: params.contextHash ?? sha256Hex(Buffer.from(params.goal, "utf8")),
-    evidenceSnapshot: params.evidenceSnapshot ?? [],
-    trustState: params.trustState ?? null,
+    fromAgentId: captured.fromAgentId,
+    toAgentId: captured.toAgentId,
+    goal: captured.goal,
+    currentState: captured.currentState ?? "",
+    nextAction: captured.nextAction ?? "",
+    constraints: captured.constraints ?? [],
+    knownUnknowns: captured.knownUnknowns ?? [],
+    artifactPaths: captured.artifactPaths ?? [],
+    stopConditions: captured.stopConditions ?? [],
+    contextHash: captured.contextHash ?? sha256Hex(Buffer.from(captured.goal, "utf8")),
+    evidenceSnapshot: captured.evidenceSnapshot ?? [],
+    trustState: captured.trustState ?? null,
     delegationScope,
     ownershipTransfer,
     dependencyStatuses,
@@ -287,24 +358,22 @@ export function createHandoffPacket(
     role: "sender",
     receiptId: `handoff_sender_${randomUUID().slice(0, 12)}`,
     packetId,
-    agentId: params.fromAgentId,
+    agentId: captured.fromAgentId,
     createdTs: now,
     payloadHash
   };
+  return { baseBody, senderReceiptWithoutSignature };
+}
+
+export function createHandoffPacket(workspace: string, params: HandoffCreateParams): HandoffPacket {
+  const { baseBody, senderReceiptWithoutSignature } = prepareHandoffPacket(params);
+  const files = captureHandoffFiles([handoffFilePath(workspace, baseBody.packetId)]);
   const senderReceipt = handoffPacketSchema.shape.senderReceipt.parse({
-    ...senderReceiptWithoutSignature,
-    signature: signCanonicalBody(workspace, senderReceiptWithoutSignature)
+    ...senderReceiptWithoutSignature, signature: signCanonicalBody(workspace, senderReceiptWithoutSignature)
   });
   const body = { ...baseBody, senderReceipt };
-
-  const digest = sha256Hex(Buffer.from(canonicalize(body), "utf8"));
-  let signature = "unsigned";
-  try {
-    signature = signHexDigest(digest, getSigningKey(workspace, "artifact-seal"));
-  } catch { /* unsigned */ }
-
-  const packet = handoffPacketSchema.parse({ ...body, signature });
-  writeFileAtomic(handoffFilePath(workspace, packetId), JSON.stringify(packet, null, 2), 0o644);
+  const packet = handoffPacketSchema.parse({ ...body, signature: signCanonicalBody(workspace, body) });
+  publishHandoffPacket(workspace, packet, files);
   return packet;
 }
 
@@ -329,7 +398,7 @@ export function loadHandoffPacket(workspace: string, packetId: string): HandoffP
  * exactly the orphan the caller is trying to prevent.
  */
 export function removeHandoffPacket(workspace: string, packetId: string): void {
-  rmSync(handoffFilePath(workspace, packetId), { force: true });
+  withHandoffPublicationLock(workspace, () => rmSync(handoffFilePath(workspace, packetId), { force: true }));
 }
 
 export function listHandoffPackets(workspace: string): string[] {
@@ -346,30 +415,26 @@ export function listHandoffPackets(workspace: string): string[] {
 // ---------------------------------------------------------------------------
 
 export function verifyHandoffPacket(workspace: string, packetId: string): HandoffVerificationResult {
+  try { return verifyHandoffPacketBody(workspace, loadHandoffPacket(workspace, packetId)); }
+  catch (e) { return { valid: false, expired: false, signatureValid: false, senderReceiptValid: false, errors: [String(e)], packet: null }; }
+}
+
+/** Same already-read packet for the public reader and both receiver producers. */
+function verifyHandoffPacketBody(workspace: string, packet: HandoffPacket): HandoffVerificationResult {
   const errors: string[] = [];
-
-  let packet: HandoffPacket;
-  try {
-    packet = loadHandoffPacket(workspace, packetId);
-  } catch (e) {
-    return { valid: false, expired: false, signatureValid: false, senderReceiptValid: false, errors: [String(e)], packet: null };
-  }
-
   const expired = Date.now() > packet.expiryTs;
   if (expired) {
     errors.push(`Packet expired at ${new Date(packet.expiryTs).toISOString()}`);
   }
 
   const { signature, ...body } = packet;
-  const digest = sha256Hex(Buffer.from(canonicalize(body), "utf8"));
   let signatureValid = false;
 
   if (signature === "unsigned") {
     errors.push("Packet is unsigned");
   } else {
     try {
-      const keys = getPublicKeyHistory(workspace, "auditor");
-      signatureValid = verifyHexDigestAny(digest, signature, keys);
+      signatureValid = verifyCanonicalBodySignature(workspace, body, signature);
       if (!signatureValid) {
         errors.push("Signature verification failed");
       }
@@ -414,44 +479,47 @@ export function loadHandoffUnresolvedDependencyLog(workspace: string, packetId: 
   return handoffUnresolvedDependencyLogSchema.parse(JSON.parse(readFileSync(file, "utf8")) as unknown);
 }
 
-export function acceptHandoffPacket(
-  workspace: string,
-  packetId: string,
-  params: {
+export type HandoffAcceptParams = {
     receiverAgentId?: string;
     accepted?: boolean;
     dependencyStatuses?: HandoffDependencyStatus[];
     refusalReason?: string;
     refusalReasons?: Array<Omit<HandoffRefusalReason, "refusedAt"> & { refusedAt?: string }>;
     evidenceRefs?: string[];
-  } = {}
-): HandoffReceiverReceipt {
-  const packetResult = verifyHandoffPacket(workspace, packetId);
+  };
+
+export function prepareHandoffAcceptance(workspace: string, packetId: string, params: HandoffAcceptParams) {
+  const captured = structuredClone(params);
+  const files = captureHandoffFiles([handoffFilePath(workspace, packetId),
+    handoffReceiverReceiptPath(workspace, packetId), handoffUnresolvedDependencyPath(workspace, packetId)]);
+  const bytes = files[0]!.state?.bytes;
+  if (bytes === undefined) throw new Error(`Handoff packet not found: ${packetId}`);
+  const packetResult = verifyHandoffPacketBody(workspace, handoffPacketSchema.parse(JSON.parse(bytes.toString("utf8"))));
   if (!packetResult.packet || !packetResult.valid) {
     throw new Error(`Cannot accept invalid handoff packet ${packetId}: ${packetResult.errors.join("; ")}`);
   }
   const packet = packetResult.packet;
-  const receiverAgentId = params.receiverAgentId ?? packet.toAgentId;
+  const receiverAgentId = captured.receiverAgentId ?? packet.toAgentId;
   const dependencyStatuses = mergeDependencyStatuses(
     packet.dependencyStatuses,
-    handoffPacketSchema.shape.dependencyStatuses.parse(params.dependencyStatuses ?? [])
+    handoffPacketSchema.shape.dependencyStatuses.parse(captured.dependencyStatuses ?? [])
   );
   const unresolved = unresolvedDependencies(dependencyStatuses);
   const receivedTs = Date.now();
   const refusalReasons = handoffPacketSchema.shape.refusalReasons.parse([
     ...packet.refusalReasons,
-    ...(params.refusalReasons ?? []).map((reason) => ({
+    ...(captured.refusalReasons ?? []).map((reason) => ({
       ...reason,
       refusedAt: reason.refusedAt ?? new Date(receivedTs).toISOString()
     })),
-    ...(params.refusalReason ? [{
+    ...(captured.refusalReason ? [{
       agentId: receiverAgentId,
-      reason: params.refusalReason,
+      reason: captured.refusalReason,
       refusedAt: new Date(receivedTs).toISOString(),
-      evidenceRefs: params.evidenceRefs ?? []
+      evidenceRefs: captured.evidenceRefs ?? []
     }] : [])
   ]);
-  const accepted = params.accepted ?? (unresolved.length === 0 && refusalReasons.length === 0);
+  const accepted = captured.accepted ?? (unresolved.length === 0 && refusalReasons.length === 0);
   const ownershipAccepted = Boolean(
     accepted &&
     unresolved.length === 0 &&
@@ -475,19 +543,16 @@ export function acceptHandoffPacket(
     ...receiptWithoutPayload,
     payloadHash
   };
-  const receipt = handoffReceiverReceiptSchema.parse({
-    ...receiptWithoutSignature,
-    signature: signCanonicalBody(workspace, receiptWithoutSignature)
-  });
-  ensureDir(handoffReceiptDir(workspace));
-  writeFileAtomic(handoffReceiverReceiptPath(workspace, packetId), JSON.stringify(receipt, null, 2), 0o644);
-  const unresolvedLog: HandoffUnresolvedDependencyLog = {
-    packetId,
-    loggedAt: new Date(receivedTs).toISOString(),
-    dependencies: unresolved,
-    refusalReasons
-  };
-  writeFileAtomic(handoffUnresolvedDependencyPath(workspace, packetId), JSON.stringify(unresolvedLog, null, 2), 0o644);
+  return { packet, files, receiptWithoutSignature, unresolvedLog: {
+    packetId, loggedAt: new Date(receivedTs).toISOString(), dependencies: unresolved, refusalReasons
+  } satisfies HandoffUnresolvedDependencyLog };
+}
+
+export function acceptHandoffPacket(workspace: string, packetId: string, params: HandoffAcceptParams = {}): HandoffReceiverReceipt {
+  const prepared = prepareHandoffAcceptance(workspace, packetId, params);
+  const receipt = handoffReceiverReceiptSchema.parse({ ...prepared.receiptWithoutSignature,
+    signature: signCanonicalBody(workspace, prepared.receiptWithoutSignature) });
+  publishHandoffAcceptance(workspace, prepared, receipt);
   return receipt;
 }
 
