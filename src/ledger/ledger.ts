@@ -17,6 +17,7 @@ import type {
 } from "../types.js";
 import { getSigningKey, getPublicKeyHistory, signHexDigest, signHexDigestWith, verifyHexDigestAny } from "../crypto/keys.js";
 import { cachedSigningKey } from "../keys/cachedSigningKey.js";
+import { prepareRunHashSignature } from "./runHashSignature.js";
 import { prepareReceiptWriter, withLedgerReceipt, type PreparedReceiptWriter } from "../keys/receiptWriter.js";
 import { operationalSqlMetadata } from "../keys/operationalLedgerWriter.js";
 import { verifyGatewayConfigSignature } from "../gateway/config.js";
@@ -1014,6 +1015,11 @@ export class Ledger {
 
   signRunHash(hashHex: string): string {
     return this.signAuditorDigest(hashHex);
+  }
+
+  async signRunHashAsync(hashHex: string, beforePublish?: () => void) {
+    if (this.db.inTransaction) throw new Error("Cannot await run signing while a SQL transaction is active");
+    return prepareRunHashSignature(this.workspace, hashHex, this.unsignedSignatures, beforePublish);
   }
 
   getEventsBetween(startTs: number, endTs: number): EvidenceEvent[] {

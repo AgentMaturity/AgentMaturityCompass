@@ -204,6 +204,7 @@ import {
 import { verifyWorkspaceProofBundle } from "../transparency/workspaceProofBundle.js";
 import { getSigningKey, signHexDigest } from "../crypto/keys.js";
 import { writeStudioAuditEvent, writeStudioAuditEventAsync } from "./studioAudit.js";
+import { captureReportSigningAuthority } from "./reportSigningAuthority.js";
 import { frameworkChoices, type ComplianceFramework } from "../compliance/frameworks.js";
 import { generateComplianceReport, verifyComplianceMapsSignature } from "../compliance/complianceEngine.js";
 import { complianceFleetReportCli } from "../compliance/complianceCli.js";
@@ -4032,13 +4033,15 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           });
           return;
         }
+        const authority = captureReportSigningAuthority(options.workspace, signingAuthority(["OWNER", "OPERATOR"]));
         const out = await assuranceRunForApi({
           workspace: options.workspace,
           scopeType: scopeRaw.toUpperCase() as "WORKSPACE" | "NODE" | "AGENT",
           scopeId: typeof parsed.id === "string" ? parsed.id : undefined,
           pack: packRaw,
           windowDays: Number.isFinite(Number(parsed.windowDays)) ? Number(parsed.windowDays) : undefined
-        });
+        }, { beforePublish() { authority(); if (requiresReadOnlyMode(options.workspace)) { if (!res.headersSent) json(res, 403, { error: "users signature invalid; write operations blocked" }); throw new Error("users signature invalid; write operations blocked"); } if (!requireUnlockedVaultForSigning()) throw new Error("vault locked; unlock required for signing"); } }).catch(error => { if (res.headersSent || respondReportSigningError(error, (status, body) => json(res, status, body))) return null; throw error; });
+        if (out === null) return;
         writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: "ASSURANCE_RUN_COMPLETED",
@@ -5862,16 +5865,18 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           return;
         }
         const agentId = resolveAgentId(options.workspace, decodeURIComponent(runMatch[1] ?? ""));
+        const reportAuthority = captureReportSigningAuthority(options.workspace, signingAuthority(["OPERATOR", "OWNER"]));
         const run = await runDiagnostic({
           workspace: options.workspace,
           agentId,
           window: "14d",
           targetName: "default",
           claimMode: "auto"
-        });
+        }, undefined, { beforePublish: reportAuthority }).catch(error => { if (res.headersSent || respondReportSigningError(error, (status, body) => json(res, status, body))) return null; throw error; });
+        if (run === null) return;
         const refreshedForecasts = await refreshForecastsAfterPrimary([
           { workspace: options.workspace, scope: "agent", targetId: agentId }, { workspace: options.workspace, scope: "workspace" }
-        ], signingAuthority(["OPERATOR", "OWNER"]), { kind: "diagnostic-run", id: run.runId, value: run })
+        ], reportAuthority, { kind: "diagnostic-run", id: run.runId, value: run })
           .catch(error => { if (res.headersSent) return null; throw error; });
         if (refreshedForecasts === null) return;
         const [refreshedAgentForecast] = refreshedForecasts;
@@ -5894,11 +5899,13 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           return;
         }
         const agentId = resolveAgentId(options.workspace, url.searchParams.get("agentId") ?? undefined);
+        const reportAuthority = captureReportSigningAuthority(options.workspace, signingAuthority(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"]));
         const out = await runAutoAnswer({
           workspace: options.workspace,
           agentId,
           createPlan: false
-        });
+        }, { beforePublish: reportAuthority }).catch(error => { if (res.headersSent || respondReportSigningError(error, (status, body) => json(res, status, body))) return null; throw error; });
+        if (out === null) return;
         json(res, 200, out);
         return;
       }
@@ -5908,14 +5915,16 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           return;
         }
         const agentId = resolveAgentId(options.workspace, url.searchParams.get("agentId") ?? undefined);
+        const reportAuthority = captureReportSigningAuthority(options.workspace, signingAuthority(["OPERATOR", "OWNER"]));
         const out = await runAutoAnswer({
           workspace: options.workspace,
           agentId,
           createPlan: true
-        });
+        }, { beforePublish: reportAuthority }).catch(error => { if (res.headersSent || respondReportSigningError(error, (status, body) => json(res, status, body))) return null; throw error; });
+        if (out === null) return;
         const refreshedForecasts = await refreshForecastsAfterPrimary([
           { workspace: options.workspace, scope: "agent", targetId: agentId }, { workspace: options.workspace, scope: "workspace" }
-        ], signingAuthority(["OPERATOR", "OWNER"]), { kind: "diagnostic-auto-answer", value: out })
+        ], reportAuthority, { kind: "diagnostic-auto-answer", value: out })
           .catch(error => { if (res.headersSent) return null; throw error; });
         if (refreshedForecasts === null) return;
         const [refreshedAgentForecast] = refreshedForecasts;
@@ -6025,12 +6034,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             }
           });
         }
-        const out = await runAutoAnswer({
-          workspace: options.workspace,
-          agentId: auth.agentId,
-          createPlan: true
-        });
-        const selfForecastAuthority = () => {
+        const selfActorAuthority = () => {
           const current = authenticate(req, options.workspace, options.token);
           if (!current || !current.roles.has("AGENT") || current.agentId !== auth.agentId || current.userId !== auth.userId || current.isAdmin !== auth.isAdmin) {
             if (!res.headersSent) json(res, 401, { error: "authenticated authority changed while signing" }); throw new Error("authenticated authority changed while signing");
@@ -6038,6 +6042,13 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           const live = verifyLeaseForScope({ workspace: options.workspace, req, expectedAgentId: auth.agentId!, scope: "diagnostic:self-run" });
           if (!live.ok) { if (!res.headersSent) json(res, live.status, { error: live.error }); throw new Error("diagnostic self-run lease changed while signing"); }
         };
+        const selfForecastAuthority = captureReportSigningAuthority(options.workspace, selfActorAuthority);
+        const out = await runAutoAnswer({
+          workspace: options.workspace,
+          agentId: auth.agentId,
+          createPlan: true
+        }, { beforePublish: selfForecastAuthority }).catch(error => { if (res.headersSent || respondReportSigningError(error, (status, body) => json(res, status, body))) return null; throw error; });
+        if (out === null) return;
         const refreshedForecasts = await refreshForecastsAfterPrimary([
           { workspace: options.workspace, scope: "agent", targetId: auth.agentId }, { workspace: options.workspace, scope: "workspace" }
         ], selfForecastAuthority, { kind: "diagnostic-self-run", value: out })
@@ -6115,16 +6126,18 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           return;
         }
         const agentId = resolveAgentId(options.workspace, decodeURIComponent(assuranceMatch[1] ?? ""));
+        const reportAuthority = captureReportSigningAuthority(options.workspace, signingAuthority(["OPERATOR", "OWNER"]));
         const assurance = await runAssurance({
           workspace: options.workspace,
           agentId,
           runAll: true,
           mode: "sandbox",
           window: "14d"
-        });
+        }, { beforePublish: reportAuthority }).catch(error => { if (res.headersSent || respondReportSigningError(error, (status, body) => json(res, status, body))) return null; throw error; });
+        if (assurance === null) return;
         const refreshedForecasts = await refreshForecastsAfterPrimary([
           { workspace: options.workspace, scope: "agent", targetId: agentId }
-        ], signingAuthority(["OPERATOR", "OWNER"]), { kind: "assurance-run", id: assurance.assuranceRunId, value: assurance })
+        ], reportAuthority, { kind: "assurance-run", id: assurance.assuranceRunId, value: assurance })
           .catch(error => { if (res.headersSent) return null; throw error; });
         if (refreshedForecasts === null) return;
         const [refreshed] = refreshedForecasts;

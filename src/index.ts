@@ -173,7 +173,7 @@ export type {
 } from "./fleet/trustComposition.js";
 export { listProviderTemplates, getProviderTemplateById } from "./providers/providerTemplates.js";
 export { runSandboxCommand, buildSandboxDockerArgs } from "./sandbox/sandbox.js";
-export { ingestEvidence, attestIngestSession } from "./ingest/ingest.js";
+export { ingestEvidence, attestIngestSession, attestIngestSessionAsync } from "./ingest/ingest.js";
 export {
   importEvalResults,
   evalImportCoverageStatus,

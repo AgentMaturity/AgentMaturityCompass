@@ -1,6 +1,5 @@
-import { getPublicKeyPem, verifyHexDigestAny } from "../crypto/keys.js";
-import { assertKeysetComplete, boundProviderKey, keysetDeclared } from "../keys/keyset.js";
-import { getPurposeKeyHistory, readHistory } from "../keys/signingKeys.js";
+import { verifyHexDigestAny } from "../crypto/keys.js";
+import { runHashVerificationKeys } from "../ledger/runHashSignature.js";
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
 
@@ -30,13 +29,7 @@ export function sealedRunReportVerifies(
   );
   if (recomputed !== claimedHash) return false;
   try {
-    assertKeysetComplete(workspace);
-    const keys = getPurposeKeyHistory(workspace, "artifact-seal");
-    // Preserve explicit owner enrollment for unbound legacy reports, not other auditor-purpose rotations.
-    if (keysetDeclared(workspace) && boundProviderKey(workspace, "artifact-seal") === null) {
-      const history = readHistory(workspace, "auditor", getPublicKeyPem(workspace, "auditor"));
-      keys.push(...(history?.entries.filter(entry => entry.source === "imported").map(entry => entry.publicKeyPem) ?? []));
-    }
+    const keys = runHashVerificationKeys(workspace);
     return verifyHexDigestAny(claimedHash, seal, keys);
   } catch {
     return false;

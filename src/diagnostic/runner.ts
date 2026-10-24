@@ -1,3 +1,5 @@
+import { captureRunHashAuthority, type RunHashPublicationOptions } from "../ledger/runHashSignature.js";
+import { publishDiagnosticReport } from "./runReportPublication.js";
 import { randomUUID } from "node:crypto";
 import { readdirSync } from "node:fs";
 import { join, resolve } from "node:path";
@@ -48,7 +50,7 @@ import { countAttestedOnce, evidenceProducer, readerTrustFor, type ReaderTrust }
 import { deriveDeterministicAudits, persistAuditFindings, type AuditFinding } from "./audits.js";
 import { loadTargetProfile, verifyTargetProfileSignature } from "../targets/targetProfile.js";
 import { loadAMCConfig } from "../workspace.js";
-import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
+import { pathExists, readUtf8 } from "../utils/fs.js";
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
 import { parseWindowToMs, dayKey } from "../utils/time.js";
@@ -499,10 +501,11 @@ export function enforceHighRiskSandboxRequirement(params: {
   };
 }
 
-export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPath?: string): Promise<DiagnosticReport> {
+export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPath?: string, options: RunHashPublicationOptions = {}): Promise<DiagnosticReport> {
+  const { beforePublish, synchronousSeal } = options; input = { ...input }; beforePublish?.();
   const unsignedStore = process.env.AMC_NO_SIGN === "1"; // P0-55, as runAssurance: unsigned whatever the caller passed
   if (unsignedStore) input = { ...input, noSign: true };
-  const workspace = input.workspace;
+  const workspace = input.workspace, assertOriginal = captureRunHashAuthority(workspace, Boolean(input.noSign || synchronousSeal));
   const agentId = resolveAgentId(workspace, input.agentId);
   const agentPaths = getAgentPaths(workspace, agentId);
   const config = loadAMCConfig(workspace);
@@ -1369,36 +1372,10 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
       ...baseReport,
       evidenceReadiness: evaluateDiagnosticEvidenceReadiness(baseReport)
     };
-    const reportJsonSha256 = sha256Hex(canonicalize(reportBody));
-    const runSealSig = input.noSign ? "unsigned" : ledger.signRunHash(reportJsonSha256);
-
-    const report: DiagnosticReport = {
-      ...reportBody,
-      runSealSig,
-      reportJsonSha256
-    };
-
-    ensureDir(agentPaths.runsDir);
-    const runJsonPath = join(agentPaths.runsDir, `${runId}.json`);
-    writeFileAtomic(runJsonPath, JSON.stringify(report, null, 2), 0o644);
-
-    if (!input.noSign || unsignedStore) ledger.insertRun({ // P0-27: an unsigned seal never enters the signed store
-      run_id: runId,
-      window_start_ts: windowStartTs,
-      window_end_ts: now,
-      target_profile_id: targetProfile?.id ?? null,
-      report_json_sha256: reportJsonSha256,
-      run_seal_sig: runSealSig,
-      status
-    });
-
-    const sealVerified = sealedRunReportVerifies(workspace, report as unknown as Record<string, unknown>);
-    const markdown = generateReport(report, "md", envelopeForStoredRun(report, { sealVerified, now })) as string;
-    const reportPath = outputMarkdownPath ?? join(agentPaths.reportsDir, `${runId}.md`);
-    ensureDir(agentPaths.reportsDir);
-    writeFileAtomic(reportPath, markdown, 0o644);
-
-    return report;
+    return await publishDiagnosticReport({ workspace, ledger, body: reportBody, noSign: Boolean(input.noSign), unsignedStore,
+      runsDir: agentPaths.runsDir, reportsDir: agentPaths.reportsDir, outputMarkdownPath, targetProfileId: targetProfile?.id ?? null,
+      options: { beforePublish, synchronousSeal }, priorEffects: correlationAuditIds.map(id => `evidence:${id}`), assertOriginal,
+      render: report => generateReport(report, "md", envelopeForStoredRun(report, { sealVerified: sealedRunReportVerifies(workspace, report as unknown as Record<string, unknown>), now })) as string });
   } finally {
     signedEvidence?.close();
     ledger.close();

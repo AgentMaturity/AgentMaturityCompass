@@ -1,3 +1,4 @@
+import { captureRunHashAuthority, type RunHashPublicationOptions } from "../ledger/runHashSignature.js";
 import { randomUUID } from "node:crypto";
 import { readdirSync, rmSync } from "node:fs";
 import { join } from "node:path";
@@ -321,7 +322,9 @@ export async function assuranceRunForApi(params: {
   scopeId?: string;
   pack?: "all" | string;
   windowDays?: number;
-}) {
+}, options: RunHashPublicationOptions = {}) {
+  params = { ...params }; options = { ...options }; const actor = options.beforePublish; actor?.();
+  const fixed = captureRunHashAuthority(params.workspace, Boolean(options.synchronousSeal || process.env.AMC_NO_SIGN === "1")), beforePublish = () => { actor?.(); fixed(); };
   const policy = loadAssurancePolicy(params.workspace);
   const selected = resolvePackId(params.pack ?? "all");
   const report = await runAssurance({
@@ -331,7 +334,8 @@ export async function assuranceRunForApi(params: {
     runAll: selected === "all",
     mode: "sandbox",
     window: `${Math.max(1, Math.trunc(params.windowDays ?? 30))}d`
-  });
+  }, { ...options, beforePublish });
+  beforePublish();
   return {
     run: legacyProjectionForReport({
       scopeType: params.scopeType,

@@ -1,3 +1,4 @@
+import { runHashHttpOptions } from "./runHashPublication.js";
 /**
  * scoreRouter.ts — Score/diagnostic API routes.
  * Full parity with: amc score *, amc diagnostic *
@@ -110,6 +111,7 @@ const safetyResearchBodySchema = z.object({
 });
 
 function scoreRouteError(res: ServerResponse, error: unknown, fallback: string, status = 500): void {
+  if (res.headersSent) return;
   if (isRequestBodyError(error)) {
     apiError(res, error.statusCode, error.message);
     return;
@@ -123,6 +125,7 @@ export async function handleScoreRoute(
   req: IncomingMessage,
   res: ServerResponse,
   workspace = process.cwd(),
+  revalidateAuthority?: () => boolean,
 ): Promise<boolean> {
 
   // GET /api/v1/score/status
@@ -328,7 +331,7 @@ export async function handleScoreRoute(
         runtimeForHarness: body.runtimeForHarness as import('../types.js').RuntimeName | undefined,
         questionSetVersion: body.questionSetVersion,
         applyIndustryPackWeights: body.applyIndustryPackWeights === true,
-      });
+      }, undefined, runHashHttpOptions(res, revalidateAuthority));
       queueScoreComputationMetric({
         agentId,
         runId: result.runId,
@@ -485,7 +488,7 @@ export async function handleScoreRoute(
       const body = await bodyJsonSchema(req, agentWindowBodySchema);
       const agentId = body.agentId ?? 'default';
       const { runDiagnostic } = await import('../diagnostic/runner.js');
-      const result = await runDiagnostic({ workspace, agentId, window: body.window ?? '30d' });
+      const result = await runDiagnostic({ workspace, agentId, window: body.window ?? '30d' }, undefined, runHashHttpOptions(res, revalidateAuthority));
       const score = result.layerScores?.reduce((s: number, l: { avgFinalLevel: number }) => s + l.avgFinalLevel, 0) ?? 0;
       const max = (result.layerScores?.length ?? 0) * 5;
       queueScoreComputationMetric({
@@ -513,7 +516,7 @@ export async function handleScoreRoute(
       const agentId = body.agentId ?? 'default';
       // Adversarial runs a special diagnostic pass — run diagnostic with adversarial window
       const { runDiagnostic } = await import('../diagnostic/runner.js');
-      const result = await runDiagnostic({ workspace, agentId, window: '7d', claimMode: 'auto' });
+      const result = await runDiagnostic({ workspace, agentId, window: '7d', claimMode: 'auto' }, undefined, runHashHttpOptions(res, revalidateAuthority));
       apiSuccess(res, { agentId, adversarialResult: result, inflationAttempts: result.inflationAttempts ?? [], unsupportedClaims: result.unsupportedClaimCount ?? 0 });
     } catch (err) {
       scoreRouteError(res, err, 'Adversarial test failed');

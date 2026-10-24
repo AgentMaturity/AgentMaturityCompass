@@ -1,3 +1,5 @@
+import { prepareOrgPairsAsync, captureOrgPairs, orgPairBytes, type OrgPairsOptions } from "../org/preparedOrgPairs.js";
+import { verifyAuditorSignatureBytes } from "../org/orgSignatureBytes.js";
 import { readdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import YAML from "yaml";
@@ -172,6 +174,17 @@ export function saveAssuranceRunArtifacts(params: {
   };
 }
 
+/** Actual v1 run/findings/trace publisher; all three checked signatures precede the short pair publication lock. */
+export async function saveAssuranceRunArtifactsAsync(input: Parameters<typeof saveAssuranceRunArtifacts>[0], options: OrgPairsOptions = {}) {
+  const params = structuredClone(input), runPath = assuranceRunJsonPath(params.workspace, params.run.runId),
+    findingsPath = assuranceFindingsPath(params.workspace, params.run.runId), traceRefsPath = assuranceTraceRefsPath(params.workspace, params.run.runId);
+  const writes = [{ path: runPath, bytes: Buffer.from(JSON.stringify(assuranceRunSchema.parse(params.run), null, 2)) },
+    { path: findingsPath, bytes: Buffer.from(JSON.stringify(assuranceFindingsDocSchema.parse(params.findings), null, 2)) },
+    { path: traceRefsPath, bytes: Buffer.from(JSON.stringify(assuranceTraceRefsSchema.parse(params.traceRefs), null, 2)) }];
+  const prepared = await prepareOrgPairsAsync(params.workspace, writes, options); prepared.publish();
+  return { runPath, runSigPath: `${runPath}.sig`, findingsPath, findingsSigPath: `${findingsPath}.sig`, traceRefsPath, traceRefsSigPath: `${traceRefsPath}.sig`, assertCurrent: prepared.assertCurrent };
+}
+
 export function loadAssuranceRun(workspace: string, runId: string): AssuranceRun | null {
   const path = assuranceRunJsonPath(workspace, runId);
   if (!pathExists(path)) {
@@ -290,10 +303,13 @@ export function verifyAssuranceRunArtifacts(workspace: string, runId: string): {
   ];
   const errors: string[] = [];
   for (const path of paths) {
-    const verify = verifySignedFileWithAuditor(workspace, path);
-    if (!verify.valid) {
-      errors.push(`${dirname(path)}:${verify.reason ?? "invalid signature"}`);
-    }
+    try {
+      const pair = captureOrgPairs([path]), bytes = orgPairBytes(pair, path), signature = orgPairBytes(pair, `${path}.sig`);
+      const verify = bytes === null ? { valid: false, reason: "file missing" } : signature === null ? { valid: false, reason: "signature missing" }
+        : verifyAuditorSignatureBytes(workspace, "BUNDLE", bytes, signature);
+      const reason = verify.reason === "signature verification failed" ? "signature verify failed" : verify.reason;
+      if (!verify.valid) errors.push(`${dirname(path)}:${reason ?? "invalid signature"}`);
+    } catch { errors.push(`${dirname(path)}:invalid signature`); }
   }
   return {
     ok: errors.length === 0,

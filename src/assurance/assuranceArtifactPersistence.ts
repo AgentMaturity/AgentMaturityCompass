@@ -1,6 +1,6 @@
 import type { AssuranceReport } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
-import { saveAssuranceRunArtifacts } from "./assurancePolicyStore.js";
+import { saveAssuranceRunArtifacts, saveAssuranceRunArtifactsAsync } from "./assurancePolicyStore.js";
 import type { AssuranceFindingCategory, AssuranceFindingSeverity } from "./assuranceSchema.js";
 
 /**
@@ -41,12 +41,9 @@ function severityForScore(score0to100: number): AssuranceFindingSeverity {
  * `amc assurance cert issue` failed on every workspace no matter how many scans
  * had run. Persisting them here closes that chain.
  */
-export function persistV1Artifacts(params: {
-  workspace: string;
-  agentId: string;
-  report: AssuranceReport;
-  policySha256: string;
-}): void {
+type V1ArtifactInput = { workspace: string; agentId: string; report: AssuranceReport; policySha256: string };
+
+function v1Artifacts(params: V1ArtifactInput) {
   const { workspace, agentId, report } = params;
   const generatedTs = Date.now();
   const runId = report.assuranceRunId;
@@ -147,20 +144,21 @@ export function persistV1Artifacts(params: {
     notes: []
   };
 
-  try {
-    saveAssuranceRunArtifacts({
-      workspace,
-      run: run as never,
-      findings: { v: 1, runId, generatedTs, findings } as never,
-      traceRefs: { v: 1, runId, generatedTs, refs } as never
-    });
-  } catch (error) {
-    // Artifact persistence must not fail a completed scan; surface it loudly.
-    console.error(
-      `[assurance] could not persist v1 artifacts for ${runId}: ${
-        error instanceof Error ? error.message : String(error)
-      }`
-    );
+  return { workspace, run: run as never, findings: { v: 1, runId, generatedTs, findings } as never,
+    traceRefs: { v: 1, runId, generatedTs, refs } as never };
+}
+
+export function persistV1Artifacts(params: V1ArtifactInput): void {
+  const documents = v1Artifacts(params), runId = params.report.assuranceRunId;
+  try { saveAssuranceRunArtifacts(documents); }
+  catch (error) {
+    // Preserve the retained synchronous compatibility caller's existing best-effort secondary persistence.
+    console.error(`[assurance] could not persist v1 artifacts for ${runId}: ${error instanceof Error ? error.message : String(error)}`);
   }
 }
 
+/** Checked normal async scan suffix; refusal propagates with actual earlier report effects rather than success. */
+export async function persistV1ArtifactsAsync(params: V1ArtifactInput, beforePublish: () => void) {
+  const saved = await saveAssuranceRunArtifactsAsync(v1Artifacts(params), { beforePublish });
+  return { paths: [saved.runPath, saved.runSigPath, saved.findingsPath, saved.findingsSigPath, saved.traceRefsPath, saved.traceRefsSigPath], assertCurrent: saved.assertCurrent };
+}

@@ -1,3 +1,4 @@
+import { runHashVerificationKeys } from "./runHashSignature.js";
 /**
  * Verification of the evidence ledger.
  *
@@ -493,7 +494,7 @@ function verifySessions(
 }
 
 function verifyRuns(ledger: Ledger, workspace: string, errors: string[]): void {
-  const auditorKeys = getPublicKeyHistory(workspace, "auditor");
+  const auditorKeys = runHashVerificationKeys(workspace);
   const runs = ledger.getAllRuns();
   for (const run of runs) {
     if (!verifyHexDigestAny(run.report_json_sha256, run.run_seal_sig, auditorKeys)) {

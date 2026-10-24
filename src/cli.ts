@@ -136,7 +136,7 @@ import { getAgentPaths, resolveAgentId } from "./fleet/paths.js";
 import { latestRunForAgent } from "./governor/actionPolicyEngine.js";
 import { getProviderTemplateById, listProviderTemplates, providerTemplateChoices } from "./providers/providerTemplates.js";
 import { runSandboxCommand } from "./sandbox/sandbox.js";
-import { attestIngestSession, ingestEvidence, type IngestType } from "./ingest/ingest.js";
+import { attestIngestSessionAsync, ingestEvidence, type IngestType } from "./ingest/ingest.js";
 import { generateFleetReport } from "./fleet/report.js";
 import { evaluateFleet, renderFleetScoringMarkdown, type FleetScoreProgressEvent } from "./fleet/fleetScoring.js";
 import { listFleetLifecycleRunArtifacts, loadFleetLifecycleRunArtifact } from "./fleet/fleetLifecycle.js";
@@ -15453,8 +15453,8 @@ program
   .requiredOption("--statement <text>", "what is being attested (e.g. provenance of the exported logs)")
   .option("--attester-signature <file>", "JSON { keyId, sigB64 }: a third party's Ed25519 signature over the bundle hash")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
-  .action((opts: { ingestSession: string; agent?: string; attestedBy: string; statement: string; attesterSignature?: string }) => {
-    const attested = attestIngestSession({
+  .action(async (opts: { ingestSession: string; agent?: string; attestedBy: string; statement: string; attesterSignature?: string }) => {
+    const attested = await attestIngestSessionAsync({
       workspace: process.cwd(),
       ingestSessionId: opts.ingestSession,
       agentId: opts.agent ?? activeAgent(program),
