@@ -116,7 +116,7 @@ export function captureMatureWorkspaceInitialization(workspace: string, supplied
     ensureSigningKeysReturned: false, ledgerOpenAttempted: false, ledgerOpenReturned: false, ledgerCloseAttempted: false, ledgerCloseReturned: false };
   const snapshot = () => Object.freeze(progress.map(row => Object.freeze({ ...row })));
   let config: ReturnType<typeof captureAmcConfigInitialization> | null = null;
-  let cold: ReturnType<typeof captureWorkspaceColdOrgPrerequisites> | null = null, targetCurrent: (() => void) | null = null, entered = false;
+  let cold: ReturnType<typeof captureWorkspaceColdOrgPrerequisites> | null = null, targetCurrent: (() => void) | null = null, entered = false, completed = false;
   const assertOriginal = () => {
     if (noSignAtEntry || process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize mature workspace signing");
     if (canonicalize(keysetCommittedMark(workspace)) !== originalMark || canonicalize(assertKeysetComplete(workspace)) !== originalKeyset)
@@ -195,7 +195,14 @@ export function captureMatureWorkspaceInitialization(workspace: string, supplied
     inherited.coldCaptureAttempted = true; cold = captureWorkspaceColdOrgPrerequisites(workspace, options.agentId); inherited.coldCaptureReturned = true;
     assertCurrent();
   } catch (cause) { throw partial(cause); }
-  return Object.freeze({ async initialize(): Promise<{ workspacePath: string; contextGraphHash: string }> {
+  const assertAttemptCurrent = () => { try { assertCurrent(); } catch (cause) { throw partial(cause); } };
+  return Object.freeze({
+    assertCurrent: assertAttemptCurrent,
+    assertCompleted() {
+      if (!completed) throw new Error("mature initializer has not completed its actual final gate");
+      assertAttemptCurrent();
+    },
+    async initialize(): Promise<{ workspacePath: string; contextGraphHash: string }> {
     if (entered) throw new Error("mature initializer attempt has already entered"); entered = true;
     try {
       assertCurrent(); await cold!.initializeAdapters(); assertCurrent();
@@ -229,7 +236,7 @@ export function captureMatureWorkspaceInitialization(workspace: string, supplied
       // Keep the old late best-effort signature contract; its real failure remains in the private attempt observation.
       try { await config!.signLate(assertCurrent); } catch { /* existing best-effort sidecar stage; no alternate signer or retry */ }
       // This independent original/owned gate is outside that catch: changed authority or destinations never grant completion.
-      assertCurrent(); return { workspacePath: workspace, contextGraphHash };
+      assertCurrent(); completed = true; return { workspacePath: workspace, contextGraphHash };
     } catch (cause) { throw partial(cause); }
   } });
 }

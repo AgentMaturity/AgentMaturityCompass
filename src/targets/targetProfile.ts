@@ -69,6 +69,11 @@ export function saveTargetProfile(workspace: string, profile: TargetProfile, age
   return file;
 }
 
+/** The actual target wire parser, shared with its fixed initialized diagnostic consumer. */
+export function parseTargetProfileBytes(bytes: Uint8Array): TargetProfile {
+  return targetProfileSchema.parse(JSON.parse(Buffer.from(bytes).toString("utf8")) as unknown);
+}
+
 export function loadTargetProfile(workspace: string, name: string, agentId?: string): TargetProfile {
   const primary = targetPath(workspace, name, agentId);
   const legacyRoot = join(workspace, ".amc", "targets", `${name}.target.json`);
@@ -76,13 +81,11 @@ export function loadTargetProfile(workspace: string, name: string, agentId?: str
   if (!pathExists(file)) {
     throw new Error(`Target profile not found: ${file}`);
   }
-  const raw = JSON.parse(readFileSync(file, "utf8")) as unknown;
-  return targetProfileSchema.parse(raw);
+  return parseTargetProfileBytes(readFileSync(file));
 }
 
 export function loadTargetProfileFromFile(file: string): TargetProfile {
-  const raw = JSON.parse(readFileSync(file, "utf8")) as unknown;
-  return targetProfileSchema.parse(raw);
+  return parseTargetProfileBytes(readFileSync(file));
 }
 
 export function verifyTargetProfileSignature(workspace: string, profile: TargetProfile): boolean {

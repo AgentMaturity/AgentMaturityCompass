@@ -37,6 +37,7 @@ import { runTuneWizard, runUpgradeWizard } from "./tuning/tuneWizard.js";
 import { loadContextGraph } from "./context/contextGraph.js";
 import { applyAMCConfigProfile, initWorkspace, loadAMCConfig, quickstartWizard, saveAMCConfigAsync, signAmcConfigAsync } from "./workspace.js";
 import { initWorkspaceAsync } from "./workspaceInitializationAsync.js";
+import { captureInstantWorkspaceDiagnostic } from "./cli/instantWorkspaceDiagnostic.js";
 import { runDoctorCli } from "./doctor/doctorCli.js";
 import { firstRunActions, firstRunFixCommands } from "./doctor/firstRunPlan.js";
 import {
@@ -1766,25 +1767,29 @@ function printEuAiActNotEvaluated(): void {
 }
 
 async function runInstantFullScoreForAgent(params: { workspace: string; agentId: string; json?: boolean }): Promise<void> {
+  params = { ...params };
   const started = Date.now();
   const releaseLock = await acquireInstantScoreLock(params.workspace);
   const previousNoSign = process.env.AMC_NO_SIGN;
   let state: InstantWorkspaceState | null = null;
   let onboarding: OnboardingState | null = null;
+  let initialized: Awaited<ReturnType<NonNullable<ReturnType<typeof captureInstantWorkspaceDiagnostic>>["initialize"]>> | null = null;
   try {
-    state = ensureInstantWorkspace(params.workspace, params.agentId);
+    const continuation = captureInstantWorkspaceDiagnostic(params.workspace, params.agentId);
+    initialized = continuation === null ? null : await continuation.initialize();
+    state = initialized === null ? ensureInstantWorkspace(params.workspace, params.agentId) : initialized.state;
     onboarding = startInstantOnboarding(params.workspace, params.agentId, state);
     if (state.vault.noSign) {
       process.env.AMC_NO_SIGN = "1";
     }
-    const report = await runDiagnostic({
+    const report = initialized === null ? await runDiagnostic({
       workspace: params.workspace,
       window: "30d",
       targetName: "default",
       agentId: params.agentId,
       claimMode: "auto",
       noSign: state.vault.noSign
-    });
+    }) : await initialized.diagnose();
     const elapsedMs = Date.now() - started;
     const resourceManifest = writeEnforceResourceManifest({
       workspace: params.workspace,
@@ -1869,7 +1874,7 @@ async function runInstantFullScoreForAgent(params: { workspace: string; agentId:
     });
   } catch (error: unknown) {
     const message = toErrorMessage(error);
-    if (state && !state.vault.noSign && /Vault unlock failed|Vault locked|passphrase/i.test(message)) {
+    if (initialized === null && state && !state.vault.noSign && /Vault unlock failed|Vault locked|passphrase/i.test(message)) {
       process.env.AMC_NO_SIGN = "1";
       const unsignedState: InstantWorkspaceState = {
         ...state,
