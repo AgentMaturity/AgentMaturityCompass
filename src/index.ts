@@ -851,6 +851,7 @@ export {
 export { exportFederationPackage, importFederationPackage, verifyFederationPackage } from "./federation/federationSync.js";
 export {
   integrationsInitCli,
+  integrationsInitCliAsync,
   integrationsVerifyCli,
   integrationsStatusCli,
   integrationsTestCli,

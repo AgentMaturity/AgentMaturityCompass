@@ -492,7 +492,7 @@ import {
 import {
   integrationsDispatchCli,
   integrationsExportJournalCli,
-  integrationsInitCli,
+  integrationsInitCliAsync as integrationsInitCli,
   integrationsStatusCli,
   integrationsTestCli,
   integrationsVerifyCli
@@ -12978,8 +12978,8 @@ withTrustFlags(federate
 integrations
   .command("init")
   .description("Create and sign integrations.yaml with vault-backed secret refs")
-  .action(() => {
-    const out = integrationsInitCli(process.cwd());
+  .action(async () => {
+    const out = await integrationsInitCli(process.cwd());
     console.log(chalk.green(`Integrations config created: ${out.path}`));
     console.log(`Signature: ${out.sigPath}`);
   });
