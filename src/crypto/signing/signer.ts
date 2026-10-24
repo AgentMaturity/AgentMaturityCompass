@@ -117,7 +117,7 @@ function notaryWithinDeadline<T>(work: Promise<T>, signal: AbortSignal): Promise
 }
 
 /** Native asynchronous transport; a fixed total deadline also bounds a slow/truncated body. */
-async function postNotaryAsync(workspace: string, params: NotaryRequest): Promise<{ status: number; body: string }> {
+async function postNotaryAsync(workspace: string, params: NotaryRequest, beforeRequest: () => void): Promise<{ status: number; body: string }> {
   const controller = new AbortController(), deadlineAt = performance.now() + 30_000;
   const timer = setTimeout(() => controller.abort(), 30_000);
   try {
@@ -139,6 +139,9 @@ async function postNotaryAsync(workspace: string, params: NotaryRequest): Promis
     // Recheck native policy immediately before creating the socket, after DNS may have yielded.
     checkScopedEgress(workspace, "bridge", url.href, { dataClasses: null, purpose: null });
   }
+  // The genuine original producer/policy negative runs after DNS and before entering native request creation.
+  // Keep it outside the transport catch so its actual refusal cause survives without opening a socket.
+  beforeRequest();
   // Unix-domain sockets are a local configured IPC transport: no DNS, TCP, URL destination, or redirect is followed.
   if (controller.signal.aborted || performance.now() >= deadlineAt) throw new Error("notary transport deadline exceeded");
   return await new Promise((resolvePromise, reject) => {
@@ -383,7 +386,7 @@ export async function signDigestWithPolicyAsync(input: PolicySignInput & { befor
   };
   const signed = selected.mode === "VAULT" ? await signDigestWithPurpose({ ...params, beforeSign: current }) : await (async () => {
     const prepared = prepareNotarySigning(params); current();
-    return acceptNotarySigning(params, prepared, await postNotaryAsync(params.workspace, prepared.request));
+    return acceptNotarySigning(params, prepared, await postNotaryAsync(params.workspace, prepared.request, current));
   })();
   // The original descriptor and complete enforcement policy remain authoritative after the remote wait.
   assertPolicySignerCurrent(params.workspace, selected);
