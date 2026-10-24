@@ -10,7 +10,14 @@ import { assertOwnerMode } from "../mode/mode.js";
 import { signWithPurposeKey } from "../keys/purposeProviders.js";
 import { capturePurposePublication, assertPurposePublicationCurrent } from "../keys/purposePublication.js";
 import { verifyCurrentPurposeCredentialSignature } from "../keys/purposeCredentialSignature.js";
-import { assertKeysetComplete } from "../keys/keyset.js";
+import { assertKeysetComplete, boundProviderKey } from "../keys/keyset.js";
+import { canonicalSigningKey, verifyWithKey } from "../keys/algorithmPolicy.js";
+import { keyPolicy, loadKeysConfig } from "../keys/keysConfig.js";
+import { KeyProviderError } from "../keys/provider.js";
+import { assertSigningKeyUsable, getSigningPublicKeyPem } from "../keys/signingKeys.js";
+import { vaultStatus } from "../vault/vault.js";
+import { canonicalize } from "../utils/json.js";
+import { captureOrgPairs, assertOrgPairsCurrent, orgPairBytes, type OrgPairsSnapshot } from "../org/preparedOrgPairs.js";
 
 export const ACTION_POLICY_WRITER_LOCK = "action-policy-writer" as const;
 
@@ -226,42 +233,15 @@ export function signActionPolicyWithLockHeld(workspace: string, explicitPath?: s
 }
 
 export function signActionPolicy(workspace: string, explicitPath?: string): string {
-  const file = explicitPath ? resolve(workspace, explicitPath) : actionPolicyPath(workspace);
-  return withControlFileLock({
-    root: dirname(file),
-    name: ACTION_POLICY_WRITER_LOCK,
-    timeoutMs: 500,
-    operation: () => {
-      assertActionPolicyWriterReady(workspace);
-      return signActionPolicyWithLockHeld(workspace, explicitPath);
-    },
-  });
+  const plan = captureActionPolicyPlan(workspace, undefined, { explicitPath }, false);
+  return completeActionPolicyPlan(plan, signActionPolicyDigest(workspace, plan.digest)).publish().signaturePath;
 }
 
-export function initActionPolicy(workspace: string, policy?: ActionPolicy): {
-  policyPath: string;
-  signaturePath: string;
-} {
-  assertOwnerMode(workspace, "policy action init");
-  ensureDir(join(workspace, ".amc"));
-  const targetPath = actionPolicyPath(workspace);
-  return withControlFileLock({
-    root: dirname(targetPath),
-    name: ACTION_POLICY_WRITER_LOCK,
-    timeoutMs: 500,
-    operation: () => {
-      assertActionPolicyWriterReady(workspace);
-      const parsed = actionPolicySchema.parse(policy ?? defaultActionPolicy());
-      getSigningKey(workspace, "config-signature"); // Refuse before the existing synchronous initializer replaces any body.
-      assertOwnerMode(workspace, "policy action init");
-      writeFileAtomic(targetPath, YAML.stringify(parsed), 0o644);
-      const signaturePath = signActionPolicyWithLockHeld(workspace);
-      return {
-        policyPath: targetPath,
-        signaturePath
-      };
-    },
-  });
+export function initActionPolicy(workspace: string, policy?: ActionPolicy): { policyPath: string; signaturePath: string } {
+  assertOwnerMode(workspace, "policy action init"); ensureDir(join(workspace, ".amc"));
+  const bytes = Buffer.from(YAML.stringify(actionPolicySchema.parse(policy ?? defaultActionPolicy())), "utf8");
+  const plan = captureActionPolicyPlan(workspace, bytes, { beforePublish() { assertOwnerMode(workspace, "policy action init"); } });
+  return completeActionPolicyPlan(plan, signActionPolicyDigest(workspace, plan.digest)).publish();
 }
 
 export function verifyActionPolicySignature(workspace: string, explicitPath?: string): {
@@ -306,37 +286,102 @@ export function verifyActionPolicySignature(workspace: string, explicitPath?: st
 }
 
 
-/** The actual init producer prepares remotely outside the existing shared writer/recovery lock. */
-export async function initActionPolicyAsync(workspace: string, policy?: ActionPolicy, opts: { onlyIfMissing?: boolean } = {}): Promise<{ policyPath: string; signaturePath: string }> {
+export interface ActionPolicyPairOptions {
+  explicitPath?: string; onlyIfMissing?: boolean;
+  beforePublish?: () => void; assertInputsCurrent?: () => void;
+}
+
+/** Original committed config holder; no private getter or invented checked signature in resumed gates. */
+function captureActionPolicyAuthority(workspace: string) {
+  const captured = capturePurposePublication(workspace, "config-signature"), bound = boundProviderKey(workspace, "config-signature");
+  const holder = bound?.binding.provider ?? "file", publicKeyPem = bound?.publicKeyPem ?? getSigningPublicKeyPem(workspace, "config-signature");
+  const algorithm = canonicalSigningKey(publicKeyPem)?.algorithm;
+  if (algorithm === undefined) throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", holder, "the original action-policy config signer is unsupported");
+  const assertCurrent = () => {
+    const policy = keyPolicy(loadKeysConfig(workspace));
+    if (canonicalize(assertKeysetComplete(workspace)) !== captured.keyset || !policy.allowed.includes(algorithm)
+      || (holder === "file" && policy.requireNonExportable))
+      throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", holder, "the original action-policy config authority changed or is refused");
+    assertSigningKeyUsable(workspace, "config-signature", publicKeyPem, holder);
+    if (holder === "file" && !vaultStatus(workspace).unlocked)
+      throw new Error("🔐 Vault locked. Run `amc vault unlock` first, or `amc setup` for first-time setup. Use --no-sign to skip signing where supported.");
+  };
+  assertCurrent(); return { captured, publicKeyPem, assertCurrent };
+}
+
+function withActionPolicyLock<T>(file: string, operation: () => T): T {
+  return withControlFileLock({ root: dirname(file), name: ACTION_POLICY_WRITER_LOCK, timeoutMs: 500, operation });
+}
+function captureActionPolicyPlan(workspace: string, replacement?: Uint8Array, options: ActionPolicyPairOptions = {}, validate = true) {
+  const file = options.explicitPath ? resolve(workspace, options.explicitPath) : actionPolicyPath(workspace);
+  const copy = replacement === undefined ? undefined : Buffer.from(replacement), onlyIfMissing = options.onlyIfMissing === true;
+  const beforePublish = options.beforePublish, assertInputsCurrent = options.assertInputsCurrent;
+  beforePublish?.(); assertActionPolicyWriterReady(workspace);
+  const before = withActionPolicyLock(file, () => { assertActionPolicyWriterReady(workspace); return captureOrgPairs([file]); });
+  const previous = orgPairBytes(before, file);
+  if (onlyIfMissing && previous !== null) throw new Error("action policy appeared while initializing; retry");
+  const bytes = copy ?? previous;
+  if (bytes === null) throw new Error(`Action policy not found: ${file}`);
+  // Async/prepared bodies are schema checked without reserializing their actual reviewed bytes.
+  // The retained sync sign-only API preserves its original raw-body signing contract.
+  if (validate) actionPolicySchema.parse(YAML.parse(bytes.toString("utf8")) as unknown);
+  const original = captureActionPolicyAuthority(workspace); // Ordinary entry warm/migration stays OUTSIDE the writer lock.
+  const digest = sha256Hex(bytes);
+  const beforeSign = () => { beforePublish?.(); assertInputsCurrent?.(); assertActionPolicyWriterReady(workspace); original.assertCurrent(); assertOrgPairsCurrent(before); };
+  beforeSign(); return { workspace, file, bytes, digest, replacement: copy !== undefined, before, original, beforePublish, assertInputsCurrent, beforeSign };
+}
+function completeActionPolicyPlan(plan: ReturnType<typeof captureActionPolicyPlan>, signature: string, checkedCurrent?: () => void) {
+  const { workspace, file, bytes, digest } = plan, signaturePath = `${file}.sig`;
+  let published: OrgPairsSnapshot | null = null;
+  const assertSignatureCurrent = () => {
+    plan.original.assertCurrent(); checkedCurrent?.();
+    if (!verifyWithKey(Buffer.from(digest, "hex"), plan.original.publicKeyPem, Buffer.from(signature, "base64")))
+      throw new Error("prepared action-policy signature does not match its original config authority");
+  };
+  assertSignatureCurrent();
+  const assertCurrent = () => { plan.beforePublish?.(); assertActionPolicyWriterReady(workspace); assertSignatureCurrent(); assertOrgPairsCurrent(published ?? plan.before); };
+  return { bytes: Buffer.from(bytes), digestSha256: digest, assertCurrent, publish() {
+    return withActionPolicyLock(file, () => {
+      plan.beforePublish?.(); plan.assertInputsCurrent?.(); assertActionPolicyWriterReady(workspace); assertSignatureCurrent();
+      const sidecar: ActionPolicySignature = { digestSha256: digest, signature, signedTs: Date.now(), signer: "auditor" };
+      const signatureBytes = Buffer.from(JSON.stringify(sidecar, null, 2));
+      assertOrgPairsCurrent(plan.before); // The exact destination check is last, after every caller/authority check.
+      const committed: string[] = []; let attemptedPath = plan.replacement ? file : signaturePath;
+      try {
+        if (plan.replacement) { writeFileAtomic(file, bytes, 0o644); committed.push(file); }
+        attemptedPath = signaturePath; writeFileAtomic(signaturePath, signatureBytes, 0o644); committed.push(signaturePath);
+        const observed = captureOrgPairs([file]);
+        const expectedBodyMode = plan.replacement ? 0o644 : plan.before.members.find(row => row.path === file)?.mode;
+        if (!orgPairBytes(observed, file)?.equals(bytes) || !orgPairBytes(observed, signaturePath)?.equals(signatureBytes)
+          || observed.members.find(row => row.path === file)?.mode !== expectedBodyMode
+          || observed.members.find(row => row.path === signaturePath)?.mode !== 0o644)
+          throw new Error("published action-policy pair differs from its acknowledged prepared bytes");
+        published = observed;
+      } catch (cause) { throw new ActionPolicyPublicationError(Object.freeze([...committed]), attemptedPath, cause); }
+      return { policyPath: file, signaturePath };
+    });
+  } };
+}
+export class ActionPolicyPublicationError extends Error {
+  readonly code = "ACTION_POLICY_PARTIAL";
+  constructor(readonly publishedPaths: readonly string[], readonly attemptedPath: string, cause: unknown) {
+    super("action-policy pair publication is incomplete; earlier members remain committed", { cause }); this.name = "ActionPolicyPublicationError";
+  }
+}
+
+/** Used checked raw config-purpose seam. Caller options can add refusal, never choose authority or replace gates. */
+export async function prepareActionPolicyPair(workspace: string, replacement?: Uint8Array, options: ActionPolicyPairOptions = {}) {
+  const plan = captureActionPolicyPlan(workspace, replacement, options);
+  const signed = await signWithPurposeKey(workspace, "config-signature", Buffer.from(plan.digest, "hex"), { beforeSign: plan.beforeSign });
+  plan.beforeSign();
+  return completeActionPolicyPlan(plan, signed.signature.toString("base64"), () => assertPurposePublicationCurrent(workspace, plan.original.captured, signed));
+}
+/** Maintained initializer: retain the actual existing mode key at entry, before Sign and final publication. */
+export async function initActionPolicyAsync(workspace: string, policy?: ActionPolicy, opts: Omit<ActionPolicyPairOptions, "explicitPath"> = {}): Promise<{ policyPath: string; signaturePath: string }> {
   assertOwnerMode(workspace, "policy action init");
-  const targetPath = actionPolicyPath(workspace), signaturePath = actionPolicySigPath(workspace);
   const bytes = Buffer.from(YAML.stringify(actionPolicySchema.parse(policy ?? defaultActionPolicy())), "utf8");
-  const pair = () => ({ body: pathExists(targetPath) ? readFileSync(targetPath) : null,
-    signature: pathExists(signaturePath) ? readFileSync(signaturePath) : null });
-  const prepared = withControlFileLock({
-    root: dirname(targetPath), name: ACTION_POLICY_WRITER_LOCK, timeoutMs: 500,
-    operation: () => {
-      assertActionPolicyWriterReady(workspace);
-      const previous = pair();
-      if (opts.onlyIfMissing === true && previous.body !== null) throw new Error("action policy appeared while initializing; retry");
-      return { previous, authority: capturePurposePublication(workspace, "config-signature") };
-    }
-  });
-  const digest = sha256Hex(bytes), signed = await signWithPurposeKey(workspace, "config-signature", Buffer.from(digest, "hex"));
-  return withControlFileLock({
-    root: dirname(targetPath), name: ACTION_POLICY_WRITER_LOCK, timeoutMs: 500,
-    operation: () => {
-      assertActionPolicyWriterReady(workspace);
-      const current = pair(), equal = (a: Buffer | null, b: Buffer | null) => a === null ? b === null : b !== null && a.equals(b);
-      if (!equal(prepared.previous.body, current.body) || !equal(prepared.previous.signature, current.signature)) {
-        throw new Error("action policy or signature changed while signing; retry");
-      }
-      assertPurposePublicationCurrent(workspace, prepared.authority, signed);
-      assertOwnerMode(workspace, "policy action init");
-      const sidecar: ActionPolicySignature = { digestSha256: digest, signature: signed.signature.toString("base64"), signedTs: Date.now(), signer: "auditor" };
-      writeFileAtomic(targetPath, bytes, 0o644);
-      writeFileAtomic(signaturePath, JSON.stringify(sidecar, null, 2), 0o644);
-      return { policyPath: targetPath, signaturePath };
-    }
-  });
+  const caller = opts.beforePublish, assertInputsCurrent = opts.assertInputsCurrent, onlyIfMissing = opts.onlyIfMissing;
+  const prepared = await prepareActionPolicyPair(workspace, bytes, { onlyIfMissing, assertInputsCurrent,
+    beforePublish() { caller?.(); assertOwnerMode(workspace, "policy action init"); } });
+  return prepared.publish();
 }

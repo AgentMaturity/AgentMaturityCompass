@@ -15,7 +15,7 @@ import { getAgentPaths } from "../fleet/paths.js";
 import { defaultActionPolicy } from "./actionPolicyStore.js";
 export { ACTION_POLICY_WRITER_LOCK, actionPolicyWriterPendingPath, assertActionPolicyWriterReady,
   actionPolicyPath, actionPolicySigPath, defaultActionPolicy, loadActionPolicy,
-  signActionPolicyWithLockHeld, signActionPolicy, initActionPolicy, initActionPolicyAsync, verifyActionPolicySignature } from "./actionPolicyStore.js";
+  signActionPolicyWithLockHeld, signActionPolicy, initActionPolicy, initActionPolicyAsync, prepareActionPolicyPair, verifyActionPolicySignature } from "./actionPolicyStore.js";
 import {
   evaluatePolicyEvidenceLogic,
   policyEvidenceGateId,
