@@ -1,4 +1,4 @@
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { createHash, randomUUID } from "node:crypto";
 import { closeSync, openSync, unlinkSync } from "node:fs";
 import YAML from "yaml";
@@ -7,6 +7,8 @@ import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js
 import { signFileWithAuditor, verifySignedFileWithAuditor } from "../org/orgSigner.js";
 import { parseDelegationScope } from "../agent/delegationScope.js";
 import { getMode } from "../mode/mode.js";
+import { assertOrgPairsCurrent, captureOrgPairs, orgPairBytes, prepareOrgPairsAsync, OrgPairsPublicationError } from "../org/preparedOrgPairs.js";
+import { verifyAuditorSignatureBytes } from "../org/orgSignatureBytes.js";
 
 /**
  * Durable schedules (plan P6.1d).
@@ -343,6 +345,19 @@ export type ScheduleChange =
   | { kind: "put"; schedule: unknown }
   | { kind: "enable" | "disable" | "remove" | "reset-failures"; id: string };
 
+function updatedScheduleConfiguration(schedules: Schedule[], change: ScheduleChange, incoming: Schedule | undefined, id: string): Schedule[] {
+    const index = schedules.findIndex(schedule => schedule.id === id);
+    if (change.kind === "put") {
+      if (index < 0) schedules.push(incoming!); else schedules[index] = incoming!;
+    } else {
+      if (index < 0) throw new Error(`No schedule ${JSON.stringify(id)}`);
+      if (change.kind === "reset-failures") return schedules;
+      if (change.kind === "remove") schedules.splice(index, 1);
+      else schedules[index] = { ...schedules[index]!, enabled: change.kind === "enable" };
+    }
+    return schedules;
+}
+
 /** Explicit owner operation. Neither a reader nor a running timer can sign policy. */
 export function manageSchedule(workspace: string, expectedDigest: string, change: ScheduleChange): void {
   assertScheduleOwner(workspace);
@@ -358,20 +373,13 @@ export function manageSchedule(workspace: string, expectedDigest: string, change
     const entry = entryFor(state, id);
     // Disable is a future-admission change only; it does not pretend to cancel a live owner.
     if (entry.inFlightSince !== null && change.kind !== "disable") throw new Error(`Schedule ${id} has an active or interrupted claim. No replacement, deletion, reset or enable was performed.`);
-    const index = schedules.findIndex(schedule => schedule.id === id);
-    if (change.kind === "put") {
-      if (index < 0) schedules.push(incoming!); else schedules[index] = incoming!;
-    } else {
-      if (index < 0) throw new Error(`No schedule ${JSON.stringify(id)}`);
-      if (change.kind === "reset-failures") {
-        state.schedules[id] = { ...entry, consecutiveFailures: 0 };
-        writeState(workspace, state); // Preserve cadence, claim history and last outcome.
-        return;
-      }
-      if (change.kind === "remove") schedules.splice(index, 1);
-      else schedules[index] = { ...schedules[index]!, enabled: change.kind === "enable" };
+    const updated = updatedScheduleConfiguration(schedules, change, incoming, id);
+    if (change.kind === "reset-failures") {
+      state.schedules[id] = { ...entry, consecutiveFailures: 0 };
+      writeState(workspace, state); // Preserve cadence, claim history and last outcome.
+      return;
     }
-    writeSchedules(workspace, schedules);
+    writeSchedules(workspace, updated);
   });
 }
 
@@ -395,4 +403,101 @@ export function scheduleStatus(workspace: string, now: number) {
     interrupted: interruptedClaims(workspace),
     boundary: "Operational state, not independent evidence verification. In-flight claims can be live or interrupted; no automatic retry or stale-owner takeover."
   };
+}
+
+export interface SchedulePublicationOptions { beforePublish?: () => void }
+export class SchedulePublicationError extends Error {
+  readonly code = "SCHEDULE_CONFIG_PUBLICATION_INCOMPLETE";
+  constructor(readonly phase: string, readonly nativeReturnedPaths: readonly string[], readonly publisherCompleted: boolean,
+    readonly attemptedPath: string | null, cause: unknown) {
+    super("schedule configuration did not finish; inspect returned members and nested publication/lock causes before retrying", { cause });
+    this.name = "SchedulePublicationError";
+  }
+}
+function assertScheduleSigningEnabled(): void {
+  if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize schedule configuration signing");
+}
+/** Same captured BUNDLE bytes and parser; historical admission is not a new execution permission. */
+function capturedSchedules(workspace: string) {
+  const path = schedulesPath(workspace), previous = captureOrgPairs([path]), body = orgPairBytes(previous, path), signature = orgPairBytes(previous, `${path}.sig`);
+  const assertAdmission = () => {
+    if (body !== null && (signature === null || !verifyAuditorSignatureBytes(workspace, "BUNDLE", body, signature).valid))
+      throw new Error("the captured schedule configuration is not admitted for BUNDLE");
+  };
+  assertAdmission();
+  const schedules = body === null ? [] : z.object({ schedules: schedulesSchema.default([]) }).strict().parse(YAML.parse(body.toString("utf8")) ?? {}).schedules;
+  return { previous, schedules, digest: body === null ? "absent" : createHash("sha256").update(body).digest("hex"), assertAdmission };
+}
+async function publishSchedulesAsync(workspace: string, selected: ReturnType<typeof capturedSchedules>, values: readonly unknown[],
+  assertClaimsCurrent: () => void, options: SchedulePublicationOptions) {
+  const caller = options.beforePublish, bytes = Buffer.from(YAML.stringify({ schedules: schedulesSchema.parse(values) }));
+  const stable = () => {
+    assertScheduleSigningEnabled(); caller?.(); assertScheduleOwner(workspace); assertScheduleSigningEnabled();
+    selected.assertAdmission(); assertClaimsCurrent();
+  };
+  stable();
+  const prepared = await prepareOrgPairsAsync(workspace, [{ path: schedulesPath(workspace), bytes }], {
+    beforePublish: stable, assertInputsCurrent() { stable(); assertOrgPairsCurrent(selected.previous); }
+  }, selected.previous);
+  let phase = "store-lock", completed = false, operationFailed = false, operationFailure: unknown;
+  const returned: string[] = [];
+  try {
+    withStoreLock(workspace, () => {
+      try {
+        phase = "publication"; stable(); assertOrgPairsCurrent(selected.previous);
+        const saved = prepared.publish(); returned.push(...saved.flatMap(row => [row.path, row.sigPath])); completed = true;
+        phase = "final-current"; prepared.assertCurrent(); phase = "store-lock-cleanup";
+      } catch (cause) { operationFailed = true; operationFailure = cause; throw cause; }
+    });
+    phase = "return"; prepared.assertCurrent();
+  } catch (cause) {
+    const nested = operationFailure instanceof OrgPairsPublicationError ? operationFailure : cause instanceof OrgPairsPublicationError ? cause : null;
+    const failure = operationFailed && cause !== operationFailure
+      ? new AggregateError([operationFailure, cause], "schedule publication and store-lock cleanup failed", { cause: operationFailure }) : cause;
+    throw new SchedulePublicationError(phase, Object.freeze([...returned, ...(nested?.publishedPaths ?? [])]), completed,
+      nested?.attemptedPath ?? null, failure);
+  }
+}
+/** Existing no-op init acquires no signer. Actual writes prepare Sign outside either native publication lock. */
+export async function initSchedulesAsync(workspaceInput: string, options: SchedulePublicationOptions = {}): Promise<void> {
+  const noSignAtEntry = process.env.AMC_NO_SIGN === "1";
+  const workspace = resolve(workspaceInput), caller = options.beforePublish; caller?.(); assertScheduleOwner(workspace);
+  const selected = withStoreLock(workspace, () => capturedSchedules(workspace));
+  if (selected.digest !== "absent") return;
+  if (noSignAtEntry) throw new Error("no-sign mode does not authorize schedule configuration signing");
+  assertScheduleSigningEnabled();
+  await publishSchedulesAsync(workspace, selected, [], () => {}, { beforePublish: caller });
+}
+export async function saveSchedulesAsync(workspaceInput: string, supplied: readonly unknown[], options: SchedulePublicationOptions = {}): Promise<void> {
+  assertScheduleSigningEnabled();
+  const workspace = resolve(workspaceInput), values = structuredClone(supplied), caller = options.beforePublish;
+  assertScheduleSigningEnabled(); caller?.(); assertScheduleOwner(workspace); assertScheduleSigningEnabled();
+  const selected = withStoreLock(workspace, () => { const selected = capturedSchedules(workspace); assertNoActiveClaims(workspace); return selected; });
+  await publishSchedulesAsync(workspace, selected, values, () => assertNoActiveClaims(workspace), { beforePublish: caller });
+}
+export async function manageScheduleAsync(workspaceInput: string, expectedDigest: string, supplied: ScheduleChange, options: SchedulePublicationOptions = {}): Promise<void> {
+  const noSignAtEntry = process.env.AMC_NO_SIGN === "1";
+  const workspace = resolve(workspaceInput), change = structuredClone(supplied), caller = options.beforePublish;
+  if (change.kind !== "reset-failures") {
+    if (noSignAtEntry) throw new Error("no-sign mode does not authorize schedule configuration signing");
+    assertScheduleSigningEnabled();
+  }
+  caller?.(); assertScheduleOwner(workspace);
+  // This existing operational-state-only branch needs no signing purpose or new await before its native write.
+  if (change.kind === "reset-failures") { manageSchedule(workspace, expectedDigest, change); return; }
+  assertScheduleSigningEnabled();
+  let assertClaimsCurrent: () => void = () => {};
+  const planned = withStoreLock(workspace, () => {
+    const selected = capturedSchedules(workspace);
+    if (selected.digest !== expectedDigest) throw new Error("Schedule configuration digest changed. Run native-schedule list and review before applying an update.");
+    const incoming = change.kind === "put" ? scheduleSchema.parse(change.schedule) : undefined, id = incoming?.id ?? (change as { id: string }).id;
+    scheduleIdSchema.parse(id);
+    assertClaimsCurrent = () => {
+      const entry = entryFor(readState(workspace), id);
+      if (entry.inFlightSince !== null && change.kind !== "disable") throw new Error(`Schedule ${id} has an active or interrupted claim. No replacement, deletion, reset or enable was performed.`);
+    };
+    assertClaimsCurrent();
+    return { selected, values: updatedScheduleConfiguration([...selected.schedules], change, incoming, id) };
+  });
+  await publishSchedulesAsync(workspace, planned.selected, planned.values, assertClaimsCurrent, { beforePublish: caller });
 }
