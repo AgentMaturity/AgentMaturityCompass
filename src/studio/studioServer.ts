@@ -297,18 +297,18 @@ import { loadTrustContext } from "../trust/trustContext.js";
 import { requestTrustOverride } from "../trust/requestTrust.js";
 import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
 import {
-  ackAdvisoryForApi,
-  applyForecastPolicyForApi,
-  forecastSchedulerRunNowForApi,
-  forecastSchedulerSetEnabledForApi,
+  ackAdvisoryForAuthority,
+  applyForecastPolicyForApiForAuthority,
+  forecastSchedulerRunNowForApiForAuthority,
+  forecastSchedulerSetEnabledForApiForAuthority,
   forecastSchedulerStatusForApi,
   getForecastLatestForApi,
   getForecastPolicyForApi,
   listAdvisoriesForApi,
-  refreshForecastForApi,
+  refreshForecastForAuthority, refreshForecastsAfterPrimary,
   refreshAllForecastsForApi
 } from "../forecast/forecastApi.js";
-import { schedulerTick } from "../forecast/forecastEngine.js";
+import { schedulerTickAsync } from "../forecast/forecastPublication.js";
 import { verifyForecastPolicySignature } from "../forecast/forecastStore.js";
 import { renderForecastMarkdown } from "../forecast/forecastReports.js";
 import { handleBridgeRequest } from "../bridge/bridgeServer.js";
@@ -1494,12 +1494,13 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
   };
   drainIntegrationQueue();
 
+  const forecastSchedulerWork = new Set<Promise<void>>();
   const schedulerTimer = setInterval(() => {
     try {
       drainIntegrationQueue();
       const readiness = buildReadiness(options);
-      void readiness.then(async (state) => {
-        const tick = schedulerTick({
+      const forecastWork = readiness.then(async (state) => {
+        const tick = await schedulerTickAsync({
           workspace: options.workspace,
           workspaceReady: state.ok
         });
@@ -1562,6 +1563,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }).catch(() => {
         // Scheduler loop is best effort; failures are surfaced via explicit endpoints and subsequent ticks.
       });
+      forecastSchedulerWork.add(forecastWork); void forecastWork.then(() => forecastSchedulerWork.delete(forecastWork), () => forecastSchedulerWork.delete(forecastWork));
     } catch {
       // Scheduler is best effort; readiness and explicit refresh endpoints remain authoritative.
     }
@@ -3778,10 +3780,12 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "policy object is required" });
           return;
         }
-        const out = applyForecastPolicyForApi({
+        const out = await applyForecastPolicyForApiForAuthority({
           workspace: options.workspace,
           policy: parsed.policy as ReturnType<typeof getForecastPolicyForApi>["policy"]
-        });
+        }, signingAuthority(["OWNER"]))
+          .catch(error => { if (res.headersSent) return null; throw error; });
+        if (out === null) return;
         const audit = writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: "FORECAST_POLICY_APPLIED",
@@ -3840,11 +3844,13 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           return;
         }
         const targetId = typeof parsed.targetId === "string" ? parsed.targetId : url.searchParams.get("targetId");
-        const out = refreshForecastForApi({
+        const out = await refreshForecastForAuthority({
           workspace: options.workspace,
           scope: scopeRaw as "workspace" | "agent" | "node",
           targetId
-        });
+        }, signingAuthority(["OWNER", "OPERATOR"]))
+          .catch(error => { if (res.headersSent) return null; throw error; });
+        if (out === null) return;
         const audit = writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: "FORECAST_CREATED",
@@ -3886,9 +3892,11 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireUnlockedVaultForSigning()) {
           return;
         }
-        const out = forecastSchedulerRunNowForApi({
+        const out = await forecastSchedulerRunNowForApiForAuthority({
           workspace: options.workspace
-        });
+        }, signingAuthority(["OWNER", "OPERATOR"]))
+          .catch(error => { if (res.headersSent) return null; throw error; });
+        if (out === null) return;
         emitOrgEvent("FORECAST_UPDATED");
         json(res, 200, out);
         return;
@@ -3898,10 +3906,12 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
-        const out = forecastSchedulerSetEnabledForApi({
+        const out = await forecastSchedulerSetEnabledForApiForAuthority({
           workspace: options.workspace,
           enabled: true
-        });
+        }, signingAuthority(["OWNER", "OPERATOR"]))
+          .catch(error => { if (res.headersSent) return null; throw error; });
+        if (out === null) return;
         json(res, 200, out);
         return;
       }
@@ -3910,10 +3920,12 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
-        const out = forecastSchedulerSetEnabledForApi({
+        const out = await forecastSchedulerSetEnabledForApiForAuthority({
           workspace: options.workspace,
           enabled: false
-        });
+        }, signingAuthority(["OWNER", "OPERATOR"]))
+          .catch(error => { if (res.headersSent) return null; throw error; });
+        if (out === null) return;
         json(res, 200, out);
         return;
       }
@@ -5331,12 +5343,14 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
         const parsed = body ? (JSON.parse(body) as { note?: string }) : {};
         const note = typeof parsed.note === "string" && parsed.note.trim().length > 0 ? parsed.note.trim() : "acknowledged";
-        const advisory = ackAdvisoryForApi({
+        const advisory = await ackAdvisoryForAuthority({
           workspace: options.workspace,
           advisoryId,
           by: auth.username ?? "operator",
           note
-        });
+        }, signingAuthority(["OWNER", "OPERATOR"]))
+          .catch(error => { if (res.headersSent) return null; throw error; });
+        if (advisory === null) return;
         const audit = writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: "ADVISORY_ACKNOWLEDGED",
@@ -5821,15 +5835,13 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           targetName: "default",
           claimMode: "auto"
         });
-        const refreshedAgentForecast = refreshForecastForApi({
-          workspace: options.workspace,
-          scope: "agent",
-          targetId: agentId
-        });
-        refreshForecastForApi({
-          workspace: options.workspace,
-          scope: "workspace"
-        });
+        const refreshedForecasts = await refreshForecastsAfterPrimary([
+          { workspace: options.workspace, scope: "agent", targetId: agentId }, { workspace: options.workspace, scope: "workspace" }
+        ], signingAuthority(["OPERATOR", "OWNER"]), { kind: "diagnostic-run", id: run.runId, value: run })
+          .catch(error => { if (res.headersSent) return null; throw error; });
+        if (refreshedForecasts === null) return;
+        const [refreshedAgentForecast] = refreshedForecasts;
+
         emitForecastEvents({
           agentId,
           advisories: refreshedAgentForecast.advisories.map((advisory) => ({
@@ -5867,15 +5879,13 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           agentId,
           createPlan: true
         });
-        const refreshedAgentForecast = refreshForecastForApi({
-          workspace: options.workspace,
-          scope: "agent",
-          targetId: agentId
-        });
-        refreshForecastForApi({
-          workspace: options.workspace,
-          scope: "workspace"
-        });
+        const refreshedForecasts = await refreshForecastsAfterPrimary([
+          { workspace: options.workspace, scope: "agent", targetId: agentId }, { workspace: options.workspace, scope: "workspace" }
+        ], signingAuthority(["OPERATOR", "OWNER"]), { kind: "diagnostic-auto-answer", value: out })
+          .catch(error => { if (res.headersSent) return null; throw error; });
+        if (refreshedForecasts === null) return;
+        const [refreshedAgentForecast] = refreshedForecasts;
+
         emitForecastEvents({
           agentId,
           advisories: refreshedAgentForecast.advisories.map((advisory) => ({
@@ -5986,15 +5996,21 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           agentId: auth.agentId,
           createPlan: true
         });
-        const refreshed = refreshForecastForApi({
-          workspace: options.workspace,
-          scope: "agent",
-          targetId: auth.agentId
-        });
-        refreshForecastForApi({
-          workspace: options.workspace,
-          scope: "workspace"
-        });
+        const selfForecastAuthority = () => {
+          const current = authenticate(req, options.workspace, options.token);
+          if (!current || !current.roles.has("AGENT") || current.agentId !== auth.agentId || current.userId !== auth.userId || current.isAdmin !== auth.isAdmin) {
+            if (!res.headersSent) json(res, 401, { error: "authenticated authority changed while signing" }); throw new Error("authenticated authority changed while signing");
+          }
+          const live = verifyLeaseForScope({ workspace: options.workspace, req, expectedAgentId: auth.agentId!, scope: "diagnostic:self-run" });
+          if (!live.ok) { if (!res.headersSent) json(res, live.status, { error: live.error }); throw new Error("diagnostic self-run lease changed while signing"); }
+        };
+        const refreshedForecasts = await refreshForecastsAfterPrimary([
+          { workspace: options.workspace, scope: "agent", targetId: auth.agentId }, { workspace: options.workspace, scope: "workspace" }
+        ], selfForecastAuthority, { kind: "diagnostic-self-run", value: out })
+          .catch(error => { if (res.headersSent) return null; throw error; });
+        if (refreshedForecasts === null) return;
+        const [refreshed] = refreshedForecasts;
+
         emitForecastEvents({
           agentId: auth.agentId,
           advisories: refreshed.advisories.map((advisory) => ({
@@ -6072,11 +6088,12 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           mode: "sandbox",
           window: "14d"
         });
-        const refreshed = refreshForecastForApi({
-          workspace: options.workspace,
-          scope: "agent",
-          targetId: agentId
-        });
+        const refreshedForecasts = await refreshForecastsAfterPrimary([
+          { workspace: options.workspace, scope: "agent", targetId: agentId }
+        ], signingAuthority(["OPERATOR", "OWNER"]), { kind: "assurance-run", id: assurance.assuranceRunId, value: assurance })
+          .catch(error => { if (res.headersSent) return null; throw error; });
+        if (refreshedForecasts === null) return;
+        const [refreshed] = refreshedForecasts;
         emitForecastEvents({
           agentId,
           advisories: refreshed.advisories.map((advisory) => ({
@@ -8716,7 +8733,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
     port,
     url: `http://${host}:${port}`,
     close: async () => {
-      shuttingDown = true;
+      shuttingDown = true; clearInterval(schedulerTimer); await Promise.allSettled([...forecastSchedulerWork]);
       let nativeCleanupError: unknown;
       try { await nativeTaskService.close(); } catch (error) { nativeCleanupError = error; }
       for (const socket of openSockets) {

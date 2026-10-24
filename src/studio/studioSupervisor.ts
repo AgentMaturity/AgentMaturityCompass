@@ -20,7 +20,7 @@ import { sha256Hex } from "../utils/hash.js";
 import { loadLanMode, verifyLanModeSignature } from "../pairing/lanMode.js";
 import { verifyUsersConfigSignature } from "../auth/authApi.js";
 import { initOpsPolicyAsync, opsPolicyPath, verifyOpsPolicySignature } from "../ops/policy.js";
-import { initForecastPolicy } from "../forecast/forecastEngine.js";
+import { initForecastPolicyAsync } from "../forecast/forecastPublication.js";
 import { forecastPolicyPath } from "../forecast/forecastStore.js";
 import { initPluginWorkspaceAsync, verifyPluginWorkspace } from "../plugins/pluginApi.js";
 import { checkNotaryTrust, verifyTrustConfigSignature } from "../trust/trustConfig.js";
@@ -110,7 +110,7 @@ async function ensureWorkspace(workspace: string): Promise<void> {
     await initOpsPolicyAsync(workspace, { onlyIfMissing: true });
   }
   if (!existsSync(forecastPolicyPath(workspace))) {
-    initForecastPolicy(workspace);
+    await initForecastPolicyAsync(workspace, { onlyIfMissing: true });
   }
   if (!existsSync(mechanicTargetsPath(workspace))) {
     initMechanicWorkspace({

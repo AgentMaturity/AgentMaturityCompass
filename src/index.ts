@@ -1104,29 +1104,30 @@ export {
   schedulerRunNow as forecastSchedulerRunNow,
   schedulerTick as forecastSchedulerTick
 } from "./forecast/forecastEngine.js";
+export { createForecastAsync, initForecastPolicyAsync, refreshForecastsForWorkspaceAsync, schedulerRunNowAsync as forecastSchedulerRunNowAsync, schedulerTickAsync as forecastSchedulerTickAsync } from "./forecast/forecastPublication.js";
 export {
-  forecastInitCli,
+  forecastInitCli, forecastInitCliAsync,
   forecastVerifyCli,
   forecastPrintPolicyCli,
-  forecastRefreshCli,
+  forecastRefreshCli, forecastRefreshCliAsync,
   forecastLatestCli,
   advisoryListCli,
   advisoryShowCli,
-  advisoryAckCli,
+  advisoryAckCli, advisoryAckCliAsync,
   forecastSchedulerStatusCli,
-  forecastSchedulerRunNowCli,
-  forecastSchedulerEnableCli,
-  forecastSchedulerDisableCli,
-  forecastPolicyApplyCli
+  forecastSchedulerRunNowCli, forecastSchedulerRunNowCliAsync,
+  forecastSchedulerEnableCli, forecastSchedulerEnableCliAsync,
+  forecastSchedulerDisableCli, forecastSchedulerDisableCliAsync,
+  forecastPolicyApplyCli, forecastPolicyApplyCliAsync
 } from "./forecast/forecastCli.js";
 export { renderForecastMarkdown } from "./forecast/forecastReports.js";
 export {
   getForecastLatestForApi,
-  refreshForecastForApi,
+  refreshForecastForApi, refreshForecastForApiAsync,
   listAdvisoriesForApi,
-  ackAdvisoryForApi,
+  ackAdvisoryForApi, ackAdvisoryForApiAsync,
   getForecastPolicyForApi,
-  applyForecastPolicyForApi
+  applyForecastPolicyForApi, applyForecastPolicyForApiAsync
 } from "./forecast/forecastApi.js";
 export { verifyForecastPolicy, verifyLatestForecast } from "./forecast/forecastVerifier.js";
 export { runTransformTracker, runTransformTrackerAsync } from "./transformation/transformTracker.js";

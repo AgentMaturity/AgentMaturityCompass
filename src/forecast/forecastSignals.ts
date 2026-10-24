@@ -8,6 +8,7 @@ import { listAgents } from "../fleet/registry.js";
 import { pathExists, readUtf8 } from "../utils/fs.js";
 import { computeFailureRiskIndices } from "../assurance/indices.js";
 import { loadTransformMap } from "../transformation/transformPlanner.js";
+import { canonicalize } from "../utils/json.js";
 import { FOUR_CS } from "../transformation/fourCs.js";
 import { listValueReports } from "../value/valueStore.js";
 import type { ValueReport } from "../value/valueSchema.js";
@@ -341,13 +342,13 @@ function computeTargetProgress(workspace: string, agentId: string, runs: Diagnos
   };
 }
 
-export function collectForecastSignals(params: {
+function collectForecastSignalsAt(params: {
   workspace: string;
   scope: ForecastScope;
   lookbackDays?: number;
-}): ForecastSignalBundle {
+}, selectionTs: number): ForecastSignalBundle {
   const lookbackDays = Math.max(14, params.lookbackDays ?? 90);
-  const earliestTs = Date.now() - lookbackDays * 86_400_000;
+  const earliestTs = selectionTs - lookbackDays * 86_400_000;
   const points = zeroSeriesInput();
   const runRefs: string[] = [];
   let observedAccumulator = 0;
@@ -581,4 +582,17 @@ export function collectForecastSignals(params: {
     runRefs: [...new Set(runRefs)],
     targetProgress
   };
+}
+
+/** Existing calculation clock stays private; a final reread uses the original selector boundary. */
+export function collectForecastSignals(params: { workspace: string; scope: ForecastScope; lookbackDays?: number }): ForecastSignalBundle {
+  return collectForecastSignalsAt(params, Date.now());
+}
+export function captureForecastSignals(input: { workspace: string; scope: ForecastScope; lookbackDays?: number }) {
+  const params = { ...input, scope: { ...input.scope } }, selectionTs = Date.now(), signals = collectForecastSignalsAt(params, selectionTs);
+  const project = (value: ForecastSignalBundle) => canonicalize({ ...value, generatedTs: 0 });
+  const original = project(signals);
+  return { signals, assertCurrent() {
+    if (project(collectForecastSignalsAt(params, selectionTs)) !== original) throw new Error("selected forecast signal inputs changed while signing");
+  } };
 }

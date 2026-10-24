@@ -523,18 +523,18 @@ import {
   valueVerifyWorkspaceCli
 } from "./value/valueCli.js";
 import {
-  advisoryAckCli,
+  advisoryAckCliAsync as advisoryAckCli,
   advisoryListCli,
   advisoryShowCli,
-  forecastInitCli,
+  forecastInitCliAsync as forecastInitCli,
   forecastLatestCli,
-  forecastPolicyApplyCli,
+  forecastPolicyApplyCliAsync as forecastPolicyApplyCli,
   forecastPolicyDefaultCli,
   forecastPrintPolicyCli,
-  forecastRefreshCli,
-  forecastSchedulerDisableCli,
-  forecastSchedulerEnableCli,
-  forecastSchedulerRunNowCli,
+  forecastRefreshCliAsync as forecastRefreshCli,
+  forecastSchedulerDisableCliAsync as forecastSchedulerDisableCli,
+  forecastSchedulerEnableCliAsync as forecastSchedulerEnableCli,
+  forecastSchedulerRunNowCliAsync as forecastSchedulerRunNowCli,
   forecastSchedulerStatusCli,
   forecastVerifyCli
 } from "./forecast/forecastCli.js";
@@ -13468,8 +13468,8 @@ value
 forecast
   .command("init")
   .description("Create and sign forecast policy")
-  .action(() => {
-    const out = forecastInitCli(process.cwd());
+  .action(async () => {
+    const out = await forecastInitCli(process.cwd());
     console.log(chalk.green(`Forecast policy created: ${out.path}`));
     console.log(`Signature: ${out.sigPath}`);
   });
@@ -13519,8 +13519,8 @@ forecast
   .requiredOption("--scope <scope>", "workspace|agent|node")
   .option("--id <targetId>", "agentId for scope=agent or nodeId for scope=node")
   .option("--out <path>", "optional output path (.json or .md)")
-  .action((opts: { scope: "workspace" | "agent" | "node"; id?: string; out?: string }) => {
-    const out = forecastRefreshCli({
+  .action(async (opts: { scope: "workspace" | "agent" | "node"; id?: string; out?: string }) => {
+    const out = await forecastRefreshCli({
       workspace: process.cwd(),
       scope: opts.scope,
       targetId: opts.id,
@@ -13553,8 +13553,8 @@ forecastScheduler
   .description("Run scheduler refresh immediately")
   .option("--scope <scope>", "workspace|agent|node")
   .option("--id <targetId>", "agentId for scope=agent or nodeId for scope=node")
-  .action((opts: { scope?: "workspace" | "agent" | "node"; id?: string }) => {
-    const out = forecastSchedulerRunNowCli({
+  .action(async (opts: { scope?: "workspace" | "agent" | "node"; id?: string }) => {
+    const out = await forecastSchedulerRunNowCli({
       workspace: process.cwd(),
       scope: opts.scope,
       targetId: opts.id
@@ -13565,15 +13565,15 @@ forecastScheduler
 forecastScheduler
   .command("enable")
   .description("Enable forecast scheduler")
-  .action(() => {
-    console.log(JSON.stringify(forecastSchedulerEnableCli(process.cwd()), null, 2));
+  .action(async () => {
+    console.log(JSON.stringify(await forecastSchedulerEnableCli(process.cwd()), null, 2));
   });
 
 forecastScheduler
   .command("disable")
   .description("Disable forecast scheduler")
-  .action(() => {
-    console.log(JSON.stringify(forecastSchedulerDisableCli(process.cwd()), null, 2));
+  .action(async () => {
+    console.log(JSON.stringify(await forecastSchedulerDisableCli(process.cwd()), null, 2));
   });
 
 const forecastPolicy = forecast.command("policy").description("Forecast policy operations");
@@ -13582,10 +13582,10 @@ forecastPolicy
   .command("apply")
   .requiredOption("--file <path>", "policy file (json or yaml)")
   .description("Apply and sign forecast policy from file")
-  .action((opts: { file: string }) => {
+  .action(async (opts: { file: string }) => {
     const raw = readUtf8(resolve(process.cwd(), opts.file));
     const parsed = (opts.file.endsWith(".json") ? JSON.parse(raw) : YAML.parse(raw)) as ReturnType<typeof forecastPolicyDefaultCli>;
-    const out = forecastPolicyApplyCli({
+    const out = await forecastPolicyApplyCli({
       workspace: process.cwd(),
       policy: parsed
     });
@@ -13637,8 +13637,8 @@ advisory
   .argument("<advisoryId>")
   .requiredOption("--note <text>", "ack note")
   .option("--by <name>", "actor name (defaults to current user or 'owner')")
-  .action((advisoryId: string, opts: { note: string; by?: string }) => {
-    const out = advisoryAckCli({
+  .action(async (advisoryId: string, opts: { note: string; by?: string }) => {
+    const out = await advisoryAckCli({
       workspace: process.cwd(),
       advisoryId,
       by: opts.by ?? "owner",
