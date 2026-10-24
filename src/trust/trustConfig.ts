@@ -5,7 +5,8 @@ import { z } from "zod";
 import YAML from "yaml";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
-import { verifySignedFileWithAuditor } from "../org/orgSigner.js";
+import { publishTrustConfig, verifyTrustConfigPublication } from "./trustConfigPublication.js";
+import { assertKeysetComplete, keysetDeclared } from "../keys/keyset.js";
 import { getVaultSecret, setVaultSecret } from "../vault/vault.js";
 import { verifyNotaryAttestResponse } from "../notary/notaryVerify.js";
 import { addPublicKeyToHistory } from "../crypto/keys.js";
@@ -163,6 +164,17 @@ export function initTrustConfig(workspace: string): {
   return { path, sigPath, config };
 }
 
+/** Direct-purpose initialization; true fresh/no-sign compatibility keeps the original synchronous recipe. */
+export async function initTrustConfigAsync(workspace: string, beforePublish?: () => void): Promise<ReturnType<typeof initTrustConfig>> {
+  if (process.env.AMC_NO_SIGN === "1") return initTrustConfig(workspace);
+  const keyset = assertKeysetComplete(workspace);
+  if (keyset === null && !keysetDeclared(workspace)) return initTrustConfig(workspace);
+  const config = defaultTrustConfig();
+  const completed = await publishTrustConfig(workspace, Buffer.from(YAML.stringify(config), "utf8"), beforePublish);
+  completed.assertCurrent();
+  return { path: completed.path, sigPath: completed.sigPath, config };
+}
+
 function saveTrustConfig(workspace: string, config: TrustConfig): {
   path: string;
   sigPath: string;
@@ -183,7 +195,7 @@ export function verifyTrustConfigSignature(workspace: string): {
   path: string;
   sigPath: string;
 } {
-  return verifySignedFileWithAuditor(workspace, trustConfigPath(workspace));
+  return verifyTrustConfigPublication(workspace);
 }
 
 async function httpJsonGet(params: {

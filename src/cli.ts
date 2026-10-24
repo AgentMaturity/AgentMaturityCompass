@@ -658,7 +658,7 @@ import { registerNotaryStartCommand } from "./cli-notary-commands.js";
 import {
   checkNotaryTrust,
   enableNotaryTrust,
-  initTrustConfig,
+  initTrustConfigAsync,
   loadTrustConfig,
   verifyTrustConfigSignature
 } from "./trust/trustConfig.js";
@@ -11755,9 +11755,15 @@ Example workflow:
   amc trust enable-notary --base-url <url> \\  # switch to NOTARY mode
     --pin ./notary-pubkey.pem
 `)
-  .action(() => {
-    assertOwnerMode(process.cwd(), "trust init");
-    const created = initTrustConfig(process.cwd());
+  .action(async () => {
+    const workspace = process.cwd();
+    assertOwnerMode(workspace, "trust init");
+    const assertCurrent = () => {
+      if (process.cwd() !== workspace) throw new Error("original trust initialization workspace changed");
+      assertOwnerMode(workspace, "trust init");
+    };
+    const created = await initTrustConfigAsync(workspace, assertCurrent);
+    assertCurrent();
     console.log(chalk.green(`Trust config created: ${created.path}`));
     console.log(`Signature: ${created.sigPath}`);
     console.log(`Mode: ${created.config.trust.mode}`);
