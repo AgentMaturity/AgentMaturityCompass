@@ -1,7 +1,7 @@
 import { join } from "node:path";
 import YAML from "yaml";
 import { ensureDir, pathExists, readUtf8 } from "../utils/fs.js";
-import { captureOrgPairs, orgPairBytes, publishOrgPairs, publishOrgPairsAsync, type OrgPairsOptions } from "../org/preparedOrgPairs.js";
+import { captureOrgPairs, assertOrgPairsCurrent, orgPairBytes, publishOrgPairs, publishOrgPairsAsync, prepareOrgPairsAsync, type OrgPairsOptions, type OrgPairsSnapshot } from "../org/preparedOrgPairs.js";
 import { verifyAuditorSignatureBytes } from "../org/orgSignatureBytes.js";
 import { readFileSync } from "node:fs";
 import {
@@ -162,14 +162,21 @@ export async function initPromptPolicyAsync(workspace: string, options: OrgPairs
 export async function loadPromptPolicyAsync(workspace: string, options: OrgPairsOptions = {}): Promise<PromptPolicy> {
   const path = promptPolicyPath(workspace);
   if (pathExists(path)) return promptPolicySchema.parse(YAML.parse(readUtf8(path)) as unknown);
-  const previous = captureOrgPairs([path]), bytes = orgPairBytes(previous, path);
-  if (bytes !== null) return promptPolicySchema.parse(YAML.parse(bytes.toString("utf8")) as unknown);
-  const policy = defaultPromptPolicy();
-  await publishOrgPairsAsync(workspace, [{ path, bytes: Buffer.from(YAML.stringify(policy)) }], options, previous);
-  return policy;
+  return (await loadPromptPolicyAttemptAsync(workspace, options)).policy;
 }
 export async function savePromptSchedulerStateAsync(workspace: string, state: PromptSchedulerState, options: OrgPairsOptions = {}) {
   ensurePromptDirs(workspace);
   const path = promptSchedulerPath(workspace), bytes = Buffer.from(JSON.stringify(promptSchedulerStateSchema.parse(state), null, 2));
   return (await publishOrgPairsAsync(workspace, [{ path, bytes }], options))[0]!;
+}
+
+/** Fixed internal cold-policy attempt; callers retain its actual checked publication through later waits. */
+export async function loadPromptPolicyAttemptAsync(workspace: string, options: OrgPairsOptions = {}, previous?: OrgPairsSnapshot) {
+  options = { ...options };
+  const path = promptPolicyPath(workspace), before = previous ?? captureOrgPairs([path]), bytes = orgPairBytes(before, path);
+  if (bytes !== null) return { policy: promptPolicySchema.parse(YAML.parse(bytes.toString("utf8")) as unknown),
+    assertCurrent() { options.beforePublish?.(); options.assertInputsCurrent?.(); assertOrgPairsCurrent(before); } };
+  const policy = defaultPromptPolicy(), prepared = await prepareOrgPairsAsync(workspace,
+    [{ path, bytes: Buffer.from(YAML.stringify(policy)) }], options, before);
+  prepared.publish(); return { policy, assertCurrent: prepared.assertCurrent };
 }

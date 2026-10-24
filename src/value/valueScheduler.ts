@@ -83,7 +83,8 @@ export async function valueSchedulerTick(params: {
     ...out.scheduler,
     nextSnapshotTs: nextTs(nowTs, policy.valuePolicy.cadence.snapshotEveryHours),
     nextReportTs: nextTs(nowTs, policy.valuePolicy.cadence.reportEveryHours)
-  }, { beforePublish: attempt.assertCurrent, assertInputsCurrent: () => assertOrgPairsCurrent(policyPair) }, afterRun);
+  }, { beforePublish: () => { original(); attempt.assertAuthorityCurrent(); assertOrgPairsCurrent(policyPair); },
+    assertInputsCurrent: () => { options.assertInputsCurrent?.(); attempt.assertCurrent(); assertOrgPairsCurrent(policyPair); } }, afterRun);
 
   return {
     ran: true,

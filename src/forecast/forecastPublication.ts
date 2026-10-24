@@ -158,15 +158,16 @@ export async function schedulerSetEnabledForAuthority(workspace: string, enabled
   return { state: next, sigPath: prepared.publish().sigPath };
 }
 export async function schedulerRunNowAsync(input: { workspace: string; scopes?: ForecastScope[] }) { return schedulerRunNowForAuthority(input, () => {}); }
-export async function schedulerRunNowForAuthority(input: { workspace: string; scopes?: ForecastScope[] }, beforePublish: () => void) {
+export async function schedulerRunNowForAuthority(input: { workspace: string; scopes?: ForecastScope[] }, beforePublish: () => void, assertPreparationInputsCurrent?: () => void) {
   const workspace = input.workspace, scopes = (input.scopes ?? listForecastScopesForWorkspace(workspace)).map(scope => ({ ...scope }));
   const policy = captureVerifiedForecastPolicy(workspace), selected = captureForecastSchedulerState(workspace);
-  const run = captureRun(workspace, () => { beforePublish(); policy.assertCurrent(); selected.assertCurrent(); });
+  const run = captureRun(workspace, () => { assertPreparationInputsCurrent?.(); beforePublish(); policy.assertCurrent(); selected.assertCurrent(); });
   const generated = await refreshScopes(workspace, scopes, run);
   const state = withSchedulerOutcome(selected.state, policy.policy, { status: "OK", reason: "", ts: computeNextRefreshTs(policy.policy, Date.now()) });
   try {
-    const prepared = await prepareForecastSchedulerState(workspace, state, { beforePublish,
-      assertInputsCurrent() { policy.assertCurrent(); selected.assertCurrent(); run.fixed(); } }, selected.before);
+    const prepared = await prepareForecastSchedulerState(workspace, state, {
+      beforePublish() { beforePublish(); policy.assertCurrent(); run.fixed(); },
+      assertInputsCurrent() { assertPreparationInputsCurrent?.(); policy.assertCurrent(); selected.assertCurrent(); run.fixed(); } }, selected.before);
     prepared.publish(); return { generated, state };
   } catch (cause) { throw new ForecastPublicationError(Object.freeze(generated.map(row => `scope:${row.scope.type}:${row.scope.id}`)), "scheduler-state", null, null, cause); }
 }
@@ -182,5 +183,5 @@ export async function schedulerTickAsync(input: { workspace: string; workspaceRe
     prepared.publish(); return { ran: false, reason: next.lastOutcome.reason, state: next };
   }
   if (state.nextRefreshTs !== null && state.nextRefreshTs > Date.now()) return { ran: false, reason: "not due", state };
-  const result = await schedulerRunNowForAuthority({ workspace: params.workspace }, selected.assertCurrent); return { ran: true, reason: "ok", state: result.state };
+  const result = await schedulerRunNowForAuthority({ workspace: params.workspace }, () => {}, selected.assertCurrent); return { ran: true, reason: "ok", state: result.state };
 }

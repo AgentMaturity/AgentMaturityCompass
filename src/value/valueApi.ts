@@ -457,12 +457,13 @@ export async function valueSchedulerRunNowRun(params: { workspace: string; scope
     assertOrgPairsCurrent(previous); assertOrgPairsCurrent(policyPair);
     const next = { ...current, lastSnapshotTs: nowTs, nextSnapshotTs: nowTs + policy.valuePolicy.cadence.snapshotEveryHours * 60 * 60 * 1000,
       lastReportTs: nowTs, nextReportTs: nowTs + policy.valuePolicy.cadence.reportEveryHours * 60 * 60 * 1000, lastOutcome: { status: "OK" as const, reason: "" } };
+    const assertAuthorityCurrent = () => { beforePublish?.(); reportAttempt.assertCurrent(); assertOrgPairsCurrent(policyPair); };
     const prepared = await prepareOrgPairsAsync(params.workspace, [{ path: valueSchedulerPath(params.workspace), bytes: Buffer.from(JSON.stringify(valueSchedulerStateSchema.parse(next), null, 2)) }], {
-      beforePublish: () => { beforePublish?.(); reportAttempt.assertCurrent(); },
+      beforePublish: assertAuthorityCurrent,
       assertInputsCurrent: () => { options.assertInputsCurrent?.(); assertOrgPairsCurrent(policyPair); }
     }, previous);
     prepared.publish();
-    return { result: { report, scheduler: next }, assertCurrent: prepared.assertCurrent };
+    return { result: { report, scheduler: next }, assertCurrent: prepared.assertCurrent, assertAuthorityCurrent };
   } catch (error) { throw new ValueOutputsPartialError([report.saved.path, report.saved.sigPath], "scheduler-after-report", error, [report.transparencyHash]); }
 }
 export async function valueSchedulerRunNowForApi(params: Parameters<typeof valueSchedulerRunNowRun>[0], options: OrgPairsOptions = {}) {

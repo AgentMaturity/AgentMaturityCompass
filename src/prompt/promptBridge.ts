@@ -8,7 +8,7 @@ import { captureOrgPairs, assertOrgPairsCurrent, orgPairBytes, captureOrgPairsAu
 import { verifyAuditorSignatureBytes } from "../org/orgSignatureBytes.js";
 import { checkNotaryTrust } from "../trust/trustConfig.js";
 import { loadLatestCgxContextPack, cgxLatestPackPath } from "../cgx/cgxStore.js";
-import { promptPolicyPath, promptLatestPackPath, promptLatestPackShaPath, promptLatestLintPath, loadPromptPolicyAsync } from "./promptPolicyStore.js";
+import { promptPolicyPath, promptLatestPackPath, promptLatestPackShaPath, promptLatestLintPath, loadPromptPolicyAttemptAsync } from "./promptPolicyStore.js";
 import { promptPolicySchema, type PromptPolicy } from "./promptPolicySchema.js";
 import { inspectPromptPackArtifact } from "./promptPackArtifact.js";
 import { verifyWorkspacePromptPack } from "./promptPackVerifier.js";
@@ -158,9 +158,13 @@ export async function preparePromptForBridgeRequest(params: {
   const path = promptPolicyPath(input.workspace), before = captureOrgPairs([path]), bytes = orgPairBytes(before,path), sidecar = orgPairBytes(before,`${path}.sig`);
   const policySig = bytes === null ? {valid:false,reason:"prompt policy missing"} : sidecar === null ? {valid:false,reason:"signature missing"} : verifyAuditorSignatureBytes(input.workspace,"BUNDLE",bytes,sidecar);
   const missingAuthority = bytes === null ? captureOrgPairsAuthority(input.workspace) : null;
-  const policy = bytes === null ? await loadPromptPolicyAsync(input.workspace,{beforePublish:()=>{missingAuthority!();assertOrgPairsCurrent(before);}}) : promptPolicySchema.parse(YAML.parse(bytes.toString("utf8")) as unknown);
+  const initializedPolicy = bytes === null ? await loadPromptPolicyAttemptAsync(input.workspace,
+    {beforePublish:missingAuthority!,assertInputsCurrent:()=>assertOrgPairsCurrent(before)}, before) : null;
+  const policy = initializedPolicy === null ? promptPolicySchema.parse(YAML.parse(bytes!.toString("utf8")) as unknown) : initializedPolicy.policy;
+  initializedPolicy?.assertCurrent();
   const policyPair = bytes === null ? captureOrgPairs([path]) : before;
-  assertOrgPairsCurrent(policyPair);
+  const assertPolicy = () => { initializedPolicy?.assertCurrent(); assertOrgPairsCurrent(policyPair); };
+  assertPolicy();
   if (policy.promptPolicy.enforcement.mode === "ENFORCE" && !policySig.valid) {
     return {
       ok: false as const,
@@ -174,8 +178,8 @@ export async function preparePromptForBridgeRequest(params: {
   const original = staleAtEntry ? capturePromptPackAuthority(input.workspace,undefined,true) : null;
   const cgxPath = cgxLatestPackPath(input.workspace,agentId), lintPath = promptLatestLintPath(input.workspace,agentId);
   const selected = capturePromptFiles([latestPath, cgxPath, `${cgxPath}.sig`, ...(staleAtEntry ? [promptLatestPackShaPath(input.workspace,agentId),lintPath,`${lintPath}.sig`] : [])]);
-  const assertRead = () => { assertOrgPairsCurrent(policyPair); assertPromptFilesCurrent(selected); };
-  const assertBuild = () => { original!.assertCurrent(); assertOrgPairsCurrent(policyPair); };
+  const assertRead = () => { assertPolicy(); assertPromptFilesCurrent(selected); };
+  const assertBuild = () => { original!.assertCurrent(); assertPolicy(); };
   if (policy.promptPolicy.enforcement.mode === "ENFORCE" && policy.promptPolicy.enforcement.requireNotarySigner) {
     const trust = await checkNotaryTrust(params.workspace);
     if (!trust.ok) {
@@ -197,7 +201,7 @@ export async function preparePromptForBridgeRequest(params: {
     if (isPackStale({workspace:input.workspace,agentId,packPath:latestPath,policy})) return {
       ok:false as const,status:503,code:"PROMPT_PACK_INVALID",reasons:["prompt pack became stale during readiness; retry"]};
   }
-  assertOrgPairsCurrent(policyPair);
+  assertPolicy();
   const returnedPack = capturePromptFiles([latestPath]);
   if (!pathExists(latestPath)) {
     return {
@@ -279,7 +283,7 @@ export async function preparePromptForBridgeRequest(params: {
         })
       : params.body;
 
-  assertOrgPairsCurrent(policyPair); assertPromptFilesCurrent(returnedPack);
+  assertPolicy(); assertPromptFilesCurrent(returnedPack);
   return {
     ok: true as const,
     policy,

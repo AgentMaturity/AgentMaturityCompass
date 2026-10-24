@@ -866,14 +866,14 @@ export {
   dispatchIntegrationTest
 } from "./integrations/integrationDispatcher.js";
 export { verifyOpsReceipt, verifyOpsReceiptForEvent } from "./integrations/opsReceipt.js";
-export { noCodeAdapterAddCli } from "./integrations/noCodeGovernanceCli.js";
+export { noCodeAdapterAddCli, noCodeAdapterAddCliAsync } from "./integrations/noCodeGovernanceCli.js";
 export {
-  addNoCodeAdapter,
-  initNoCodeGovernanceConfig,
+  addNoCodeAdapter, addNoCodeAdapterAsync,
+  initNoCodeGovernanceConfig, initNoCodeGovernanceConfigAsync,
   loadNoCodeGovernanceConfig,
   noCodeGovernanceConfigPath,
   noCodeGovernanceConfigSigPath,
-  signNoCodeGovernanceConfig,
+  signNoCodeGovernanceConfig, signNoCodeGovernanceConfigAsync,
   verifyNoCodeGovernanceConfigSignature
 } from "./integrations/noCodeGovernanceStore.js";
 export {

@@ -94,15 +94,29 @@ function publish(workspace: string, planned: ReturnType<typeof plan>, signatures
   // ponytail: one short common lock; preparation never waits for providers under this lock.
   return withControlFileLock({ root: join(workspace, ".amc"), name: "org-auditor-pairs", operation: () => {
     options.beforePublish?.(); options.assertInputsCurrent?.(); assertCurrent(); assertOrgPairsCurrent(planned.before);
+    const expected: { members: Member[] } = { members: planned.before.members.map(row => ({ ...row, bytes: row.bytes === null ? null : Buffer.from(row.bytes) })) };
     const published: string[] = []; let attempted = "";
+    const writeMember = (path: string, bytes: Uint8Array) => {
+      attempted = ""; // No native member write has been entered for this step.
+      // External continuations precede original checked authority and the last expected-own/original-remaining CAS.
+      options.beforePublish?.(); assertCurrent(); assertOrgPairsCurrent(expected);
+      attempted = relative(workspace, path); writeFileAtomic(path, bytes, 0o644); published.push(attempted);
+      const own = read(path);
+      if (own.mode !== 0o644 || own.bytes === null || !own.bytes.equals(Buffer.from(bytes)))
+        throw new Error("published signed pair member differs from the exact prepared bytes or mode");
+      const memberIndex = expected.members.findIndex(row => row.path === path);
+      if (memberIndex < 0) throw new Error("published signed pair member was not captured");
+      expected.members[memberIndex] = own; // Adopt own stable identity only after exact postimage validation.
+    };
     try {
       for (let index = 0; index < planned.own.length; index += 1) {
         const row = planned.own[index]!; ensureDir(dirname(row.path));
-        attempted = relative(workspace, row.path); writeFileAtomic(row.path, row.bytes, 0o644); published.push(attempted);
-        attempted = relative(workspace, `${row.path}.sig`); writeFileAtomic(`${row.path}.sig`, signatures[index]!, 0o644); published.push(attempted);
+        writeMember(row.path, row.bytes);
+        writeMember(`${row.path}.sig`, Buffer.from(signatures[index]!));
       }
-    } catch (error) { throw new OrgPairsPublicationError(Object.freeze([...published]), attempted, error); }
-    return planned.own.map(row => ({ path: row.path, sigPath: `${row.path}.sig` }));
+      attempted = ""; options.beforePublish?.(); assertCurrent(); assertOrgPairsCurrent(expected);
+    } catch (error) { if (published.length === 0 && attempted === "") throw error; throw new OrgPairsPublicationError(Object.freeze([...published]), attempted, error); }
+    return { paths: planned.own.map(row => ({ path: row.path, sigPath: `${row.path}.sig` })), assertCurrent: () => assertOrgPairsCurrent(expected) };
   } });
 }
 /** Fixed BUNDLE compatibility writer; prepare all signatures before replacing any body. */
@@ -115,26 +129,22 @@ export function publishOrgPairs(workspace: string, writes: readonly OrgPairWrite
   return publish(workspace, planned, signatures, () => {
     for (let index = 0; index < planned.own.length; index += 1) if (!verifyAuditorSignatureBytes(workspace, "BUNDLE", planned.own[index]!.bytes, Buffer.from(signatures[index]!)).valid)
       throw new Error("prepared synchronous signed pair is not admitted by current BUNDLE authority");
-  }, options);
+  }, options).paths;
 }
 /** Internal fixed BUNDLE preparation. Retain the original gate across a real later log/scheduler phase. */
 export async function prepareOrgPairsAsync(workspace: string, writes: readonly OrgPairWrite[], options: OrgPairsOptions = {}, previous?: OrgPairsSnapshot) {
   const beforePublish = captureOrgPairsAuthority(workspace, options.beforePublish), assertInputsCurrent = options.assertInputsCurrent;
   beforePublish(); const planned = plan(writes, previous), prepared = [];
-  const beforeSign = () => { beforePublish(); assertInputsCurrent?.(); beforePublish(); };
+  const beforeSign = () => { beforePublish(); assertInputsCurrent?.(); beforePublish(); assertOrgPairsCurrent(planned.before); };
   for (const row of planned.own) { beforeSign(); prepared.push(await prepareFileSignatureWithAuditor(workspace, row.path, row.bytes, "BUNDLE", beforeSign)); beforePublish(); }
-  let published = false;
+  let assertPublishedCurrent: (() => void) | null = null;
   const assertCurrent = () => { beforePublish?.(); for (const row of prepared) row.assertCurrent();
-    if (published) for (let index = 0; index < planned.own.length; index += 1) {
-      const row = planned.own[index]!, body = read(row.path), sidecar = read(`${row.path}.sig`);
-      if (body.mode !== 0o644 || sidecar.mode !== 0o644 || body.bytes === null || !body.bytes.equals(row.bytes)
-        || sidecar.bytes === null || !sidecar.bytes.equals(Buffer.from(prepared[index]!.signatureBytes)))
-        throw new Error("already-published signed pair changed before a later operation phase");
-    }
+    // Retain the exact own identities validated inside publication; never adopt a fresh byte-equivalent winner.
+    assertPublishedCurrent?.();
   };
   return Object.freeze({ assertCurrent, publish() {
     const result = publish(workspace, planned, prepared.map(row => row.signatureBytes), assertCurrent, { beforePublish, assertInputsCurrent });
-    published = true; return result;
+    assertPublishedCurrent = result.assertCurrent; return result.paths;
   } });
 }
 export async function publishOrgPairsAsync(workspace: string, writes: readonly OrgPairWrite[], options: OrgPairsOptions = {}, previous?: OrgPairsSnapshot) {
