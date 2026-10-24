@@ -1,3 +1,7 @@
+import type { OrgPairsOptions } from "../org/preparedOrgPairs.js";
+import { buildPromptPackForApiAsync } from "./promptPackAsync.js";
+import { promptSchedulerRunNowForApiAsync } from "./promptSchedulerAsync.js";
+import { promptStatusForApiAsync } from "./promptPackApi.js";
 import { resolve } from "node:path";
 import { promptInitForApiAsync, promptPolicyForApiAsync, promptPolicyApplyForApiAsync, promptSchedulerSetEnabledForApiAsync } from "./promptPolicyAsync.js";
 import YAML from "yaml";
@@ -121,3 +125,7 @@ export async function promptPolicyApplyCliAsync(params: Parameters<typeof prompt
 }
 export async function promptSchedulerEnableCliAsync(workspace: string) { return promptSchedulerSetEnabledForApiAsync({ workspace, enabled: true }); }
 export async function promptSchedulerDisableCliAsync(workspace: string) { return promptSchedulerSetEnabledForApiAsync({ workspace, enabled: false }); }
+
+export async function promptPackBuildCliAsync(params: Parameters<typeof promptPackBuildCli>[0], options: OrgPairsOptions = {}) { return buildPromptPackForApiAsync(params, options); }
+export async function promptSchedulerRunNowCliAsync(params: Parameters<typeof promptSchedulerRunNowCli>[0], options: OrgPairsOptions = {}) { return promptSchedulerRunNowForApiAsync(params, options); }
+export async function promptStatusCliAsync(workspace: string) { return promptStatusForApiAsync(workspace); }

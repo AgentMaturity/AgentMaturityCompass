@@ -5,11 +5,12 @@ import { loadAgentConfig } from "../fleet/registry.js";
 import { resolveAgentId } from "../fleet/paths.js";
 import { listToolhubTools } from "../toolhub/toolhubCli.js";
 import { loadBridgeConfig } from "../bridge/bridgeConfigStore.js";
+import type { CgxContextPack } from "../cgx/cgxSchema.js";
 import { loadLatestCgxContextPack, saveCgxContextPack } from "../cgx/cgxStore.js";
 import { buildCgxContextPack } from "../cgx/cgxContextPack.js";
 import { canonPath } from "../canon/canonLoader.js";
 import { diagnosticBankPath } from "../diagnostic/bank/bankLoader.js";
-import { loadMechanicTargets, mechanicTargetsPath } from "../mechanic/targetsStore.js";
+import { mechanicTargetsPath } from "../mechanic/targetsStore.js";
 import { listAdvisories } from "../forecast/forecastStore.js";
 import { loadTrustConfig } from "../trust/trustConfig.js";
 import { hashId } from "../bench/benchRedaction.js";
@@ -102,9 +103,9 @@ function resolveCgxPack(workspace: string, agentId: string) {
   return built;
 }
 
-function extractHighRiskTools(workspace: string): string[] {
+function extractHighRiskTools(tools: ReturnType<typeof listToolhubTools>): string[] {
   const high = new Set(["WRITE_HIGH", "DEPLOY", "SECURITY", "FINANCIAL", "DATA_EXPORT", "IDENTITY", "NETWORK_EXTERNAL"]);
-  return listToolhubTools(workspace)
+  return tools
     .filter((row) => high.has(row.actionClass))
     .map((row) => row.name)
     .sort((a, b) => a.localeCompare(b));
@@ -131,9 +132,21 @@ export function compilePromptPack(params: {
   const agentId = resolveAgentId(workspace, params.agentId ?? "default");
   const policy = loadPromptPolicy(workspace);
   const cgxPack = resolveCgxPack(workspace, agentId);
-  const bridge = loadBridgeConfig(workspace);
-  const trust = loadTrustConfig(workspace);
-  const agent = loadAgentConfig(workspace, agentId);
+  return compilePromptPackWithInputs(workspace, agentId, policy, cgxPack, capturePromptCompilerFacts(workspace, agentId), fileSha(promptPolicyPath(workspace)));
+}
+
+/** Internal fact capture shared with the actual async compiler; no signing or initialization is performed here. */
+export function capturePromptCompilerFacts(workspace: string, agentId: string) {
+  const advisories = listAdvisories(workspace).filter(row => row.scope.type === "WORKSPACE" || (row.scope.type === "AGENT" && row.scope.id === agentId))
+    .sort((x, y) => advisorySortWeight(x.severity) - advisorySortWeight(y.severity) || x.advisoryId.localeCompare(y.advisoryId)).slice(0, 5);
+  return structuredClone({ bridge: loadBridgeConfig(workspace), trust: loadTrustConfig(workspace), agent: loadAgentConfig(workspace, agentId),
+    tools: listToolhubTools(workspace), advisories, canonSha: fileSha(canonPath(workspace)), bankSha: fileSha(diagnosticBankPath(workspace)),
+    mechanicSha: pathExists(mechanicTargetsPath(workspace)) ? fileSha(mechanicTargetsPath(workspace)) : null });
+}
+/** Pure template construction; callers retain their own authenticated input/publication boundaries. */
+export function compilePromptPackWithInputs(workspace: string, agentId: string, policy: PromptPolicy, cgxPack: CgxContextPack,
+  facts: ReturnType<typeof capturePromptCompilerFacts>, policySha: string): CompiledPromptPack {
+  const { bridge, trust, agent } = facts;
 
   const agentType = detectAgentType(`${agent.role} ${agent.domain} ${agent.agentName}`);
   const selectedTemplate = policy.promptPolicy.templates.byAgentType[agentType];
@@ -146,7 +159,7 @@ export function compilePromptPack(params: {
     .flatMap((row) => row.modelAllowlist)
     .filter((row, index, arr) => arr.indexOf(row) === index)
     .sort((a, b) => a.localeCompare(b));
-  const tools = (policy.promptPolicy.privacy.allowIncludeToolNames ? listToolhubTools(workspace).map((row) => row.name) : [])
+  const tools = (policy.promptPolicy.privacy.allowIncludeToolNames ? facts.tools.map((row) => row.name) : [])
     .filter((row, index, arr) => arr.indexOf(row) === index)
     .sort((a, b) => a.localeCompare(b));
 
@@ -162,28 +175,11 @@ export function compilePromptPack(params: {
         .slice(0, 8)
     }));
 
-  const advisories = listAdvisories(workspace)
-    .filter((row) => row.scope.type === "WORKSPACE" || (row.scope.type === "AGENT" && row.scope.id === agentId))
-    .sort((a, b) => {
-      const weight = advisorySortWeight(a.severity) - advisorySortWeight(b.severity);
-      if (weight !== 0) {
-        return weight;
-      }
-      return a.advisoryId.localeCompare(b.advisoryId);
-    })
-    .slice(0, 5)
-    .map((row) => ({
-      advisoryId: row.advisoryId,
-      severity: row.severity,
-      category: row.category,
-      summary: redactPolicyText(row.summary, policy)
-    }));
+  const advisories = facts.advisories.map(row => ({ advisoryId: row.advisoryId, severity: row.severity, category: row.category,
+    summary: redactPolicyText(row.summary, policy) }));
 
-  const policySha = fileSha(promptPolicyPath(workspace));
   const cgxSha = sha256Hex(Buffer.from(canonicalize(cgxPack), "utf8"));
-  const canonSha = fileSha(canonPath(workspace));
-  const bankSha = fileSha(diagnosticBankPath(workspace));
-  const mechanicSha = pathExists(mechanicTargetsPath(workspace)) ? fileSha(mechanicTargetsPath(workspace)) : null;
+  const { canonSha, bankSha, mechanicSha } = facts;
 
   const pack = promptPackSchema.parse({
     v: 1,
@@ -241,7 +237,7 @@ export function compilePromptPack(params: {
       providers,
       models: policy.promptPolicy.privacy.allowIncludeModelNames ? models : [],
       tools,
-      highRiskTools: extractHighRiskTools(workspace)
+      highRiskTools: extractHighRiskTools(facts.tools)
     },
     checkpoints: {
       topTransformTasks: transformTasks,

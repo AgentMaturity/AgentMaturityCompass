@@ -759,7 +759,7 @@ import { registerScopeTemplateCommands } from "./enforce/scopeTemplateCli.js";
 import { registerActionEvidenceLogicCommands } from "./enforce/actionEvidenceLogicCli.js";
 import {
   promptInitCliAsync as promptInitCli,
-  promptPackBuildCli,
+  promptPackBuildCliAsync as promptPackBuildCli,
   promptPackDiffCli,
   promptPackShowCli,
   promptPackVerifyCli,
@@ -767,9 +767,9 @@ import {
   promptPolicyPrintCliAsync as promptPolicyPrintCli,
   promptSchedulerDisableCliAsync as promptSchedulerDisableCli,
   promptSchedulerEnableCliAsync as promptSchedulerEnableCli,
-  promptSchedulerRunNowCli,
+  promptSchedulerRunNowCliAsync as promptSchedulerRunNowCli,
   promptSchedulerStatusCli,
-  promptStatusCli,
+  promptStatusCliAsync as promptStatusCli,
   promptVerifyCli
 } from "./prompt/promptPackCli.js";
 import {
@@ -8656,8 +8656,8 @@ promptPolicy
 prompt
   .command("status")
   .description("List per-agent prompt pack status")
-  .action(() => {
-    const out = promptStatusCli(process.cwd());
+  .action(async () => {
+    const out = await promptStatusCli(process.cwd());
     console.log(JSON.stringify(out, null, 2));
   });
 
@@ -8668,13 +8668,13 @@ promptPack
   .description("Build and sign .amcprompt for an agent")
   .option("--agent <agentId>", "agent id", "default")
   .option("--out <file>", "output .amcprompt file")
-  .action((opts: { agent: string; out?: string }) => {
+  .action(async (opts: { agent: string; out?: string }) => {
     assertOwnerMode(process.cwd(), "prompt pack build");
-    const out = promptPackBuildCli({
+    const out = await promptPackBuildCli({
       workspace: process.cwd(),
       agentId: opts.agent,
       outFile: opts.out
-    });
+    }, { beforePublish: () => assertOwnerMode(process.cwd(), "prompt pack build") });
     console.log(chalk.green("Prompt pack created"));
     console.log(`agent=${out.agentId}`);
     console.log(`packId=${out.pack.packId}`);
@@ -8743,12 +8743,12 @@ promptScheduler
   .command("run-now")
   .description("Run prompt scheduler now for one agent or all")
   .option("--agent <agentId>", "agent id or all", "all")
-  .action((opts: { agent: string }) => {
+  .action(async (opts: { agent: string }) => {
     assertOwnerMode(process.cwd(), "prompt scheduler run-now");
-    const out = promptSchedulerRunNowCli({
+    const out = await promptSchedulerRunNowCli({
       workspace: process.cwd(),
       agent: opts.agent === "all" ? "all" : opts.agent
-    });
+    }, { beforePublish: () => assertOwnerMode(process.cwd(), "prompt scheduler run-now") });
     console.log(JSON.stringify(out, null, 2));
   });
 

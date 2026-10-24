@@ -1,8 +1,10 @@
-import { copyFileSync, readFileSync, readdirSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
-import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
+import { ensureDir, pathExists, readUtf8 } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
-import { signFileWithAuditor, verifySignedFileWithAuditor } from "../org/orgSigner.js";
+import { signSerializedPayloadWithAuditor } from "../org/orgSigner.js";
+import { verifyAuditorSignatureBytes } from "../org/orgSignatureBytes.js";
+import { capturePromptFiles, publishPromptFiles } from "./promptPublication.js";
 import { promptLintSchema, type PromptLintReport } from "./promptPackSchema.js";
 import {
   ensurePromptDirs,
@@ -30,8 +32,9 @@ export function savePromptLintReport(params: {
 } {
   ensurePromptAgentDirs(params.workspace, params.agentId);
   const path = promptLatestLintPath(params.workspace, params.agentId);
-  writeFileAtomic(path, JSON.stringify(promptLintSchema.parse(params.lint), null, 2), 0o644);
-  const sigPath = signFileWithAuditor(params.workspace, path);
+  const sigPath = `${path}.sig`, before = capturePromptFiles([path, sigPath]), bytes = Buffer.from(JSON.stringify(promptLintSchema.parse(params.lint), null, 2));
+  const signed = Buffer.from(JSON.stringify(signSerializedPayloadWithAuditor(params.workspace, bytes.toString("utf8")), null, 2));
+  publishPromptFiles(params.workspace, before, [{ path, bytes }, { path: sigPath, bytes: signed }]);
   return { path, sigPath };
 }
 
@@ -54,7 +57,10 @@ export function verifyPromptLintSignature(workspace: string, agentId: string) {
       sigPath: `${path}.sig`
     };
   }
-  return verifySignedFileWithAuditor(workspace, path);
+  const sigPath = `${path}.sig`, signatureExists = pathExists(sigPath);
+  if (!signatureExists) return { valid: false, signatureExists, reason: "signature missing", path, sigPath };
+  try { return { ...verifyAuditorSignatureBytes(workspace, "BUNDLE", readFileSync(path), readFileSync(sigPath)), signatureExists, path, sigPath }; }
+  catch { return { valid: false, signatureExists, reason: "invalid prompt lint signature", path, sigPath }; }
 }
 
 export function savePromptPackArtifact(params: {
@@ -74,11 +80,10 @@ export function savePromptPackArtifact(params: {
   const latestShaPath = promptLatestPackShaPath(params.workspace, params.agentId);
   const snapshotPath = join(promptSnapshotsDir(params.workspace, params.agentId), `${params.generatedTs}.amcprompt`);
   const snapshotShaPath = `${snapshotPath}.sha256`;
-  copyFileSync(resolve(params.artifactPath), latestPath);
-  copyFileSync(resolve(params.artifactPath), snapshotPath);
-  const digest = sha256Hex(readFileSync(latestPath));
-  writeFileAtomic(latestShaPath, `${digest}\n`, 0o644);
-  writeFileAtomic(snapshotShaPath, `${digest}\n`, 0o644);
+  const before = capturePromptFiles([latestPath, snapshotPath, latestShaPath, snapshotShaPath]), bytes = readFileSync(resolve(params.artifactPath));
+  const digest = sha256Hex(bytes), checksum = Buffer.from(`${digest}\n`);
+  publishPromptFiles(params.workspace, before, [{ path: latestPath, bytes }, { path: snapshotPath, bytes },
+    { path: latestShaPath, bytes: checksum }, { path: snapshotShaPath, bytes: checksum }]);
   return {
     latestPath,
     latestShaPath,

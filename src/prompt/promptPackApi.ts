@@ -7,7 +7,6 @@ import { pathExists, readUtf8 } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { appendTransparencyEntry } from "../transparency/logChain.js";
-import { checkNotaryTrust } from "../trust/trustConfig.js";
 import { verifyWorkspacePromptPack } from "./promptPackVerifier.js";
 import { buildPromptPackArtifact, inspectPromptPackArtifact } from "./promptPackArtifact.js";
 import { diffLatestPromptPack } from "./promptDiff.js";
@@ -26,27 +25,15 @@ import {
 } from "./promptPolicyStore.js";
 import { listPromptAgentsWithPacks, savePromptLintReport, savePromptPackArtifact, verifyPromptLintSignature } from "./promptPackStore.js";
 import { promptLintSchema, type PromptPackProvider } from "./promptPackSchema.js";
-import { loadLatestCgxContextPack } from "../cgx/cgxStore.js";
-import { compilePromptPack } from "./promptCompiler.js";
 import { validateTruthguardForWorkspace } from "../truthguard/truthguardApi.js";
 import { truthguardResultSchema } from "../truthguard/truthguardSchema.js";
 import type { PromptPolicy } from "./promptPolicySchema.js";
+import { promptPolicyForApiAsync } from "./promptPolicyAsync.js";
+import type { OrgPairsOptions } from "../org/preparedOrgPairs.js";
+export { preparePromptForBridgeRequest } from "./promptBridge.js";
+export { buildPromptPackForApiAsync } from "./promptPackAsync.js";
+export { promptSchedulerRunNowForApiAsync, promptSchedulerTickAsync } from "./promptSchedulerAsync.js";
 export { promptInitForApiAsync, promptPolicyForApiAsync, promptPolicyApplyForApiAsync, promptSchedulerSetEnabledForApiAsync, PromptPolicyPublicationError } from "./promptPolicyAsync.js";
-function currentPolicySha(workspace: string): string {
-  if (!pathExists(promptPolicyPath(workspace))) {
-    return "0".repeat(64);
-  }
-  return sha256Hex(readFileSync(promptPolicyPath(workspace)));
-}
-
-function currentCgxSha(workspace: string, agentId: string): string {
-  const pack = loadLatestCgxContextPack(workspace, agentId);
-  if (!pack) {
-    return "0".repeat(64);
-  }
-  return sha256Hex(Buffer.from(canonicalize(pack), "utf8"));
-}
-
 function listKnownAgents(workspace: string): string[] {
   try {
     const rows = listAgents(workspace).map((row) => row.id);
@@ -70,99 +57,6 @@ function nextRefreshTs(nowTs: number, cadenceHours: number): number {
 
 function fileExists(path: string): boolean {
   return pathExists(path);
-}
-
-function textFromUnknown(value: unknown): string[] {
-  if (typeof value === "string") {
-    return [value];
-  }
-  if (Array.isArray(value)) {
-    return value.flatMap((row) => textFromUnknown(row));
-  }
-  if (value && typeof value === "object") {
-    const row = value as Record<string, unknown>;
-    return Object.values(row).flatMap((item) => textFromUnknown(item));
-  }
-  return [];
-}
-
-function extractCandidatePromptTexts(params: {
-  provider: PromptPackProvider;
-  requestKind: string;
-  body: unknown;
-}): string[] {
-  const row = (typeof params.body === "object" && params.body !== null ? params.body : {}) as Record<string, unknown>;
-  if (params.provider === "anthropic") {
-    return [...textFromUnknown(row.system), ...textFromUnknown(row.messages)];
-  }
-  if (params.provider === "gemini") {
-    return [...textFromUnknown(row.systemInstruction), ...textFromUnknown(row.contents)];
-  }
-  if (params.requestKind === "responses") {
-    return [...textFromUnknown(row.instructions), ...textFromUnknown(row.input)];
-  }
-  return textFromUnknown(row.messages);
-}
-
-function detectOverrideMatches(params: {
-  policy: PromptPolicy;
-  texts: string[];
-}): string[] {
-  const hits = new Set<string>();
-  const patterns = params.policy.promptPolicy.enforcement.overridePatterns;
-  for (const text of params.texts) {
-    const normalized = text.toLowerCase();
-    for (const pattern of patterns) {
-      if (normalized.includes(pattern.toLowerCase())) {
-        hits.add(pattern);
-      }
-    }
-  }
-  return [...hits].sort((a, b) => a.localeCompare(b));
-}
-
-function injectPromptBody(params: {
-  provider: PromptPackProvider;
-  requestKind: string;
-  body: unknown;
-  systemPrompt: string;
-  stripUserSystemMessages: boolean;
-}): unknown {
-  const row = (typeof params.body === "object" && params.body !== null ? { ...(params.body as Record<string, unknown>) } : {}) as Record<string, unknown>;
-  if (params.provider === "anthropic") {
-    row.system = params.systemPrompt;
-    return row;
-  }
-  if (params.provider === "gemini") {
-    row.systemInstruction = {
-      parts: [{ text: params.systemPrompt }]
-    };
-    return row;
-  }
-  if (params.requestKind === "responses") {
-    if (params.stripUserSystemMessages && Array.isArray(row.input)) {
-      row.input = row.input.filter((item) => {
-        if (!item || typeof item !== "object") {
-          return true;
-        }
-        const role = (item as Record<string, unknown>).role;
-        return role !== "system";
-      });
-    }
-    row.instructions = params.systemPrompt;
-    return row;
-  }
-  const messages = Array.isArray(row.messages) ? [...row.messages] : [];
-  const filtered = params.stripUserSystemMessages
-    ? messages.filter((item) => {
-        if (!item || typeof item !== "object") {
-          return true;
-        }
-        return (item as Record<string, unknown>).role !== "system";
-      })
-    : messages;
-  row.messages = [{ role: "system", content: params.systemPrompt }, ...filtered];
-  return row;
 }
 
 function extractResponseText(provider: PromptPackProvider, responseBody: unknown): string {
@@ -434,7 +328,11 @@ export function buildPromptPackForApi(params: {
   };
 }
 
-export function promptStatusForApi(workspace: string): Array<{
+export function promptStatusForApi(workspace: string) { return renderPromptStatus(workspace, loadPromptPolicy(workspace)); }
+export async function promptStatusForApiAsync(workspace: string, options: OrgPairsOptions = {}) {
+  return renderPromptStatus(workspace, (await promptPolicyForApiAsync(workspace, options)).policy);
+}
+function renderPromptStatus(workspace: string, policy: PromptPolicy): Array<{
   agentId: string;
   hasPack: boolean;
   packSha256: string | null;
@@ -446,7 +344,6 @@ export function promptStatusForApi(workspace: string): Array<{
   lint: "PASS" | "FAIL" | "MISSING";
   findings: number;
 }> {
-  const policy = loadPromptPolicy(workspace);
   const rows = listKnownAgents(workspace);
   return rows.map((agentId) => {
     const latest = promptLatestPackPath(workspace, agentId);
@@ -626,159 +523,6 @@ export function promptSchedulerTick(params: {
   return {
     ran: true,
     built: out.built
-  };
-}
-
-function isPackStale(params: {
-  workspace: string;
-  agentId: string;
-  packPath: string;
-  policy: PromptPolicy;
-}) {
-  if (!pathExists(params.packPath)) {
-    return true;
-  }
-  const inspect = inspectPromptPackArtifact(params.packPath);
-  const ageMs = Date.now() - inspect.pack.generatedTs;
-  if (ageMs > params.policy.promptPolicy.recurrence.refreshCadenceHours * 60 * 60 * 1000) {
-    return true;
-  }
-  if (inspect.pack.bindings.promptPolicySha256 !== currentPolicySha(params.workspace)) {
-    return true;
-  }
-  if (inspect.pack.bindings.cgxPackSha256 !== currentCgxSha(params.workspace, params.agentId)) {
-    return true;
-  }
-  return false;
-}
-
-export async function preparePromptForBridgeRequest(params: {
-  workspace: string;
-  agentId: string;
-  provider: PromptPackProvider;
-  requestKind: string;
-  body: unknown;
-}) {
-  const policySig = verifyPromptPolicySignature(params.workspace);
-  const policy = loadPromptPolicy(params.workspace);
-  if (policy.promptPolicy.enforcement.mode === "ENFORCE" && !policySig.valid) {
-    return {
-      ok: false as const,
-      status: 503,
-      code: "PROMPT_POLICY_UNTRUSTED",
-      reasons: [policySig.reason ?? "invalid signature"]
-    };
-  }
-  if (policy.promptPolicy.enforcement.mode === "ENFORCE" && policy.promptPolicy.enforcement.requireNotarySigner) {
-    const trust = await checkNotaryTrust(params.workspace);
-    if (!trust.ok) {
-      return {
-        ok: false as const,
-        status: 503,
-        code: "PROMPT_NOTARY_UNAVAILABLE",
-        reasons: trust.reasons
-      };
-    }
-  }
-  const agentId = resolveAgentId(params.workspace, params.agentId);
-  const latestPath = promptLatestPackPath(params.workspace, agentId);
-  if (isPackStale({ workspace: params.workspace, agentId, packPath: latestPath, policy })) {
-    buildPromptPackForApi({
-      workspace: params.workspace,
-      agentId
-    });
-  }
-  if (!pathExists(latestPath)) {
-    return {
-      ok: false as const,
-      status: 503,
-      code: "PROMPT_PACK_MISSING",
-      reasons: ["no prompt pack available"]
-    };
-  }
-  const verify = verifyWorkspacePromptPack(params.workspace, latestPath);
-  if (policy.promptPolicy.enforcement.mode === "ENFORCE" && policy.promptPolicy.enforcement.requirePackSignatureValid && !verify.ok) {
-    return {
-      ok: false as const,
-      status: 503,
-      code: "PROMPT_PACK_INVALID",
-      reasons: verify.errors
-    };
-  }
-  const inspect = inspectPromptPackArtifact(latestPath);
-  const lint = inspect.lint;
-  if (
-    policy.promptPolicy.enforcement.mode === "ENFORCE" &&
-    policy.promptPolicy.enforcement.failClosedOnLintFail &&
-    lint &&
-    lint.status === "FAIL"
-  ) {
-    return {
-      ok: false as const,
-      status: 503,
-      code: "PROMPT_LINT_FAILED",
-      reasons: [`findings=${lint.findings.length}`]
-    };
-  }
-
-  const texts = extractCandidatePromptTexts({
-    provider: params.provider,
-    requestKind: params.requestKind,
-    body: params.body
-  });
-  const overrideMatches = detectOverrideMatches({
-    policy,
-    texts
-  });
-  if (
-    policy.promptPolicy.enforcement.mode === "ENFORCE" &&
-    policy.promptPolicy.enforcement.rejectIfUserTriesToOverride &&
-    overrideMatches.length > 0
-  ) {
-    return {
-      ok: false as const,
-      status: 400,
-      code: "PROMPT_OVERRIDE_REJECTED",
-      reasons: overrideMatches,
-      overrideMatches
-    };
-  }
-
-  const providerPrompt =
-    params.provider === "openai"
-      ? inspect.providerFiles.openai.systemMessage
-      : params.provider === "anthropic"
-        ? inspect.providerFiles.anthropic.system
-        : params.provider === "gemini"
-          ? inspect.providerFiles.gemini.systemInstruction
-          : params.provider === "xai"
-            ? inspect.providerFiles.xai.systemMessage
-            : params.provider === "openrouter"
-              ? inspect.providerFiles.openrouter.systemMessage
-              : inspect.providerFiles.generic.systemMessage;
-
-  const body =
-    policy.promptPolicy.enforcement.mode === "ENFORCE"
-      ? injectPromptBody({
-          provider: params.provider,
-          requestKind: params.requestKind,
-          body: params.body,
-          systemPrompt: providerPrompt,
-          stripUserSystemMessages: policy.promptPolicy.enforcement.stripUserSystemMessages
-        })
-      : params.body;
-
-  return {
-    ok: true as const,
-    policy,
-    body,
-    overrideMatches,
-    binding: {
-      packSha256: sha256Hex(readFileSync(latestPath)),
-      packId: inspect.pack.packId,
-      templateId: inspect.pack.templateId,
-      cgxPackSha256: inspect.pack.bindings.cgxPackSha256
-    }
   };
 }
 

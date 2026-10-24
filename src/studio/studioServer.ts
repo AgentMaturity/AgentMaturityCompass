@@ -357,17 +357,17 @@ import { verifyMechanicProfilesSignature } from "../mechanic/profiles.js";
 import { verifyMechanicTuningSignature } from "../mechanic/tuningStore.js";
 import { emitMechanicSse } from "../mechanic/mechanicSse.js";
 import {
-  buildPromptPackForApi,
+  buildPromptPackForApiAsync as buildPromptPackForApi,
   promptDiffForApi,
   promptInitForApiAsync as promptInitForApi,
   promptPolicyApplyForApiAsync as promptPolicyApplyForApi,
   promptPolicyForApiAsync as promptPolicyForApi,
-  promptSchedulerRunNowForApi,
+  promptSchedulerRunNowForApiAsync as promptSchedulerRunNowForApi,
   promptSchedulerSetEnabledForApiAsync as promptSchedulerSetEnabledForApi,
   promptSchedulerStatusForApi,
-  promptSchedulerTick,
+  promptSchedulerTickAsync as promptSchedulerTick,
   promptShowForApi,
-  promptStatusForApi,
+  promptStatusForApiAsync as promptStatusForApi,
   promptVerifyForApi
 } from "../prompt/promptPackApi.js";
 import { verifyWorkspacePromptPack } from "../prompt/promptPackVerifier.js";
@@ -1505,10 +1505,10 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           workspace: options.workspace,
           workspaceReady: state.ok
         });
-        const promptTick = promptSchedulerTick({
+        const promptTick = await promptSchedulerTick({
           workspace: options.workspace,
           workspaceReady: state.ok
-        });
+        }, { beforePublish: () => { if (shuttingDown) throw new Error("prompt scheduler stopped"); } });
         const assuranceTick = await assuranceSchedulerTick({
           workspace: options.workspace,
           workspaceReady: state.ok
@@ -3642,9 +3642,9 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireRouteRoles(["OWNER", "OPERATOR", "AUDITOR", "VIEWER"])) {
           return;
         }
-        json(res, 200, {
-          agents: promptStatusForApi(options.workspace)
-        });
+        const agents = await promptStatusForApi(options.workspace, { beforePublish: signingAuthority(["OWNER", "OPERATOR", "AUDITOR", "VIEWER"]) }).catch(error => { if (res.headersSent) return null; throw error; });
+        if (agents === null) return;
+        json(res, 200, { agents });
         return;
       }
 
@@ -3657,10 +3657,11 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
         const parsed = body ? (JSON.parse(body) as { agentId?: unknown }) : {};
-        const out = buildPromptPackForApi({
+        const out = await buildPromptPackForApi({
           workspace: options.workspace,
           agentId: typeof parsed.agentId === "string" ? parsed.agentId : undefined
-        });
+        }, { beforePublish: () => { signingAuthority(["OWNER", "OPERATOR"])(); if (!requireUnlockedVaultForSigning()) throw new Error("vault locked; unlock required for signing"); } }).catch(error => { if (res.headersSent) return null; throw error; });
+        if (out === null) return;
         emitPromptPackSse({
           hub: orgSse,
           type: "PROMPT_PACK_UPDATED"
@@ -3736,10 +3737,11 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
         const parsed = body ? (JSON.parse(body) as { agent?: unknown }) : {};
-        const out = promptSchedulerRunNowForApi({
+        const out = await promptSchedulerRunNowForApi({
           workspace: options.workspace,
           agent: typeof parsed.agent === "string" && parsed.agent.trim().length > 0 ? parsed.agent : "all"
-        });
+        }, { beforePublish: () => { signingAuthority(["OWNER", "OPERATOR"])(); if (!requireUnlockedVaultForSigning()) throw new Error("vault locked; unlock required for signing"); } }).catch(error => { if (res.headersSent) return null; throw error; });
+        if (out === null) return;
         emitPromptPackSse({
           hub: orgSse,
           type: "PROMPT_PACK_UPDATED"
