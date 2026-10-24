@@ -1,6 +1,6 @@
 /** Two explicit retention drivers; every preparation/final DB scope closes before any await. */
 import { randomUUID } from "node:crypto";
-import { unlinkSync } from "node:fs";
+import { lstatSync, unlinkSync } from "node:fs";
 import { join, resolve } from "node:path";
 import YAML from "yaml";
 import { openLedger } from "../../ledger/ledger.js";
@@ -10,7 +10,9 @@ import { getSigningKey } from "../../keys/signingKeys.js";
 import { signWithPurposeKey, type PurposeSignature } from "../../keys/purposeProviders.js";
 import { signHexDigest } from "../../crypto/keys.js";
 import { assertOwnerMode } from "../../mode/mode.js";
-import { appendTransparencyEntry, appendTransparencyEntryAsync } from "../../transparency/logChain.js";
+import { appendTransparencyEntry } from "../../transparency/logChain.js";
+import { appendTransparencyEntryAttemptAsync, captureWorkspaceLogAuthority } from "../../transparency/asyncWorkspaceAppend.js";
+import { TransparencyMerkleLagError } from "../../transparency/merkleIndexState.js";
 import { rebuildTransparencyMerkle } from "../../transparency/merkleIndexStore.js";
 import { canonicalize } from "../../utils/json.js";
 import { sha256Hex } from "../../utils/hash.js";
@@ -35,8 +37,14 @@ type Parameters = { workspace: string; dryRun: boolean };
 type Writer = ReturnType<typeof openLedger>;
 const DAY = 24 * 60 * 60 * 1000;
 const conflict = () => new Error("retention selected state changed while signing; retry");
-function withLedger<T>(workspace: string, operation: (ledger: Writer) => T): T {
-  const ledger = openLedger(workspace); try { return operation(ledger); } finally { ledger.close(); }
+function withLedger<T>(workspace: string, operation: (ledger: Writer) => T, readonly = false): T {
+  const ledger = openLedger(workspace, readonly ? { readonly: true } : undefined); let failed = false, primary: unknown;
+  try { return operation(ledger); }
+  catch (cause) { failed = true; primary = cause; throw cause; }
+  finally { try { ledger.close(); } catch (cleanup) {
+    if (failed) throw new AggregateError([primary, cleanup], "retention operation and ledger close failed", { cause: primary });
+    throw cleanup;
+  } }
 }
 function currentRows(ledger: Writer, ids: readonly string[]): EvidenceEvent[] {
   const query = ledger.db.prepare("SELECT * FROM evidence_events WHERE id = ?");
@@ -84,7 +92,8 @@ function prepareRun(input: Parameters, asynchronous: boolean, caller?: () => voi
     prunedGuardEventCount: 0, prunedBlobCount: 0, prunedSpillCount: 0, segmentId: archive.length ? `seg_${randomUUID()}` : null,
     segmentPath: null, manifestPath: null, manifestSha256: null, auditEventIds: progress.auditEventIds, transparencyHash: null };
   const run = { workspace, dryRun, asynchronous, caller, policyFiles, policy, archiveBeforeTs, pruneBeforeTs, guardBeforeTs, archive, prune,
-    progress, result, phase: "prepare", authority: null as ReturnType<typeof captureRetentionAuthority> | null, archiveFiles: [] as RetentionFile[] };
+    progress, result, phase: "prepare", authority: null as ReturnType<typeof captureRetentionAuthority> | null,
+    logAuthority: null as ReturnType<typeof captureWorkspaceLogAuthority> | null, archiveFiles: [] as RetentionFile[], prunedPrefix: [] as readonly RetentionFile[] };
   if (!dryRun && (archive.length > 0 || prune.length > 0 || withLedger(workspace, ledger => ledger.listBlobReferences()).length > 0))
     run.authority = captureRetentionAuthority(workspace, asynchronous);
   return run;
@@ -98,6 +107,8 @@ function gate(run: Run, signed?: PurposeSignature): void {
   if (!verifyOpsPolicyBytes(run.workspace, run.policyFiles[0]!.bytes, run.policyFiles[1]!.bytes).valid)
     throw new Error("the captured ops policy no longer verifies under current authority");
   if (run.authority !== null) assertRetentionAuthorityCurrent(run.workspace, run.authority, signed);
+  run.logAuthority?.assertCurrent();
+  assertRetentionFilesCurrent(run.prunedPrefix);
 }
 function guarded<T>(run: Run, phase: string, operation: () => T): T {
   run.phase = phase;
@@ -115,8 +126,9 @@ function segmentPlan(run: Run) {
     || row.archive_segment_id != null || row.archive_manifest_sha256 != null))
     throw new Error("retention archive requires the original pre-retention row state");
   const head = retentionHead(run.workspace);
+  let proof: ReturnType<typeof captureRetentionProofs> | null = null;
   if (run.asynchronous && head.name !== null) {
-    const proof = captureRetentionProofs(run.workspace);
+    proof = captureRetentionProofs(run.workspace);
     if (!proof.index.ok) throw new Error("retention predecessor proof is invalid");
     assertRetentionFilesCurrent(head.files);
   }
@@ -129,20 +141,26 @@ function segmentPlan(run: Run) {
     assertRetentionSuccessor(plan, head);
     if (plan.targets.some(file => file.bytes !== null)) throw conflict();
   }
-  return { head, plan };
+  return { head, plan, proof };
 }
 function commitSegment(run: Run, prepared: NonNullable<ReturnType<typeof segmentPlan>>, signature: string, signed?: PurposeSignature): void {
   run.phase = "archive-publish";
   const { plan, head } = prepared;
   const sidecar = JSON.stringify(retentionSegmentSignatureSchema.parse({ digestSha256: plan.digest, signature, signedTs: Date.now(), signer: "auditor" }), null, 2);
   gate(run, signed);
-  withLedger(run.workspace, ledger => withRetentionPublication(run.workspace, () => runImmediateTransaction(ledger.db, () => {
-    gate(run, signed); assertRows(ledger, run.archive); assertRetentionHeadCurrent(run.workspace, head); assertRetentionFilesCurrent(plan.targets);
-    run.progress.attemptedStages.push("archive-files-and-mark");
-    publishRetentionSegment(plan, sidecar, run.progress.publishedPaths, run.progress.attemptedPaths);
-    ledger.markEventsArchived(run.archive.map(row => row.id), run.result.segmentId!, plan.digest);
-  })));
-  run.progress.archiveMarked = true; run.progress.completedStages.push("archive-files-and-mark");
+  withLedger(run.workspace, ledger => withRetentionPublication(run.workspace, () => {
+    runImmediateTransaction(ledger.db, () => {
+      gate(run, signed); assertRows(ledger, run.archive);
+      if (run.asynchronous) segmentProofGate(run, prepared);
+      assertRetentionHeadCurrent(run.workspace, head); assertRetentionFilesCurrent(plan.targets);
+      run.progress.attemptedStages.push("archive-files-and-mark");
+      publishRetentionSegment(plan, sidecar, run.progress.publishedPaths, run.progress.attemptedPaths);
+      ledger.markEventsArchived(run.archive.map(row => row.id), run.result.segmentId!, plan.digest);
+    });
+    // Async progress acknowledges the returned COMMIT even if subsequent lock/ledger cleanup fails.
+    if (run.asynchronous) { run.progress.archiveMarked = true; run.progress.completedStages.push("archive-files-and-mark"); }
+  }));
+  if (!run.asynchronous) { run.progress.archiveMarked = true; run.progress.completedStages.push("archive-files-and-mark"); }
   run.result.segmentPath = plan.segmentPath; run.result.manifestPath = plan.manifestPath; run.result.manifestSha256 = plan.digest;
   run.archiveFiles = [plan.segmentPath, plan.manifestPath, plan.sigPath].map(captureRetentionFile);
   const expected = [plan.compressed, plan.manifestBytes, Buffer.from(sidecar)];
@@ -240,10 +258,21 @@ function commitBlob(run: Run, prepared: NonNullable<ReturnType<typeof blobPlan>>
       if (currentFile.bytes === null) return "file_missing" as const;
       if (file.identity !== currentFile.identity || !file.bytes!.equals(currentFile.bytes)) throw conflict();
       assertRetentionFilesCurrent(plan.previous);
+      if (run.asynchronous) {
+        if (!verifyPrunedSnapshot(run.workspace, plan.previous).ok) throw new Error("retention selected prune prefix is no longer admitted");
+        assertRetentionFilesCurrent(plan.previous);
+      }
       if (!containedExists(run.workspace, file.relativePath)) return "file_missing" as const;
       run.progress.attemptedStages.push("blob-unlink-and-prune-seal");
       unlinkSync(file.path); run.progress.removedBlobIds.push(plan.row.blobId); run.result.prunedBlobCount += 1;
       publishPrunedPrefix(plan, seal, run.progress.publishedPaths, run.progress.attemptedPaths);
+      if (run.asynchronous) {
+        // Retain only this returned prefix's exact prepared body/seal and native modes, inside the existing lock.
+        const own = prunedFiles(run.workspace), expected = [plan.bytes, Buffer.from(seal)];
+        if (own.some((row, index) => row.bytes === null || !row.bytes.equals(expected[index]!) || (lstatSync(row.path).mode & 0o777) !== 0o644))
+          throw new Error("published retention prune prefix differs from the prepared bytes or mode");
+        assertRetentionFilesCurrent(own); run.prunedPrefix = own;
+      }
       return "removed" as const;
     })))));
   } catch (error) { if (error instanceof DeletionDenied) return; throw error; }
@@ -281,6 +310,34 @@ function logInput(run: Run) {
     artifact: { kind: "policy" as const, id: run.result.segmentId!, sha256: run.result.manifestSha256! } };
 }
 function logGate(run: Run): void { gate(run); assertRetentionFilesCurrent(run.archiveFiles); }
+function segmentProofGate(run: Run, prepared: NonNullable<ReturnType<typeof segmentPlan>>): void {
+  if (prepared.proof !== null) {
+    assertRetentionFilesCurrent(prepared.proof.files);
+    const current = captureRetentionProofs(run.workspace);
+    if (!current.index.ok || canonicalize(current.files.map(file => file.path)) !== canonicalize(prepared.proof.files.map(file => file.path)))
+      throw new Error("retention selected predecessor proof is no longer admitted");
+    assertRetentionFilesCurrent(prepared.proof.files);
+  }
+}
+/** Old selected proof/row/target negatives apply only until this segment's own commit. */
+function segmentSigningGate(run: Run, prepared: NonNullable<ReturnType<typeof segmentPlan>>, signed?: PurposeSignature): void {
+  gate(run, signed); assertRetentionFilesCurrent(run.archiveFiles);
+  withLedger(run.workspace, ledger => assertRows(ledger, run.archive), true);
+  segmentProofGate(run, prepared);
+  assertRetentionHeadCurrent(run.workspace, prepared.head); assertRetentionFilesCurrent(prepared.plan.targets);
+}
+/** This blob's old references/bytes/prefix are preparation-only, never replayed after its own unlink or seal. */
+function blobSigningGate(run: Run, prepared: NonNullable<ReturnType<typeof blobPlan>>, signed?: PurposeSignature): void {
+  gate(run, signed); assertRetentionFilesCurrent(run.archiveFiles);
+  const { plan, file, references } = prepared;
+  const current = withLedger(run.workspace, ledger => ledger.db.prepare(referenceSql).all(plan.row.blobId) as Reference[], true);
+  if (canonicalize(current) !== canonicalize(references)) throw conflict();
+  const selected = captureRetentionBlob(run.workspace, plan.row.blobId);
+  if (file.identity !== selected.identity || selected.bytes === null || file.bytes === null || !file.bytes.equals(selected.bytes)) throw conflict();
+  assertRetentionFilesCurrent(plan.previous);
+  if (!verifyPrunedSnapshot(run.workspace, plan.previous).ok) throw new Error("retention selected prune prefix is no longer admitted");
+  assertRetentionFilesCurrent(plan.previous);
+}
 /** Retained synchronous SDK: all real signatures finish outside hold/publication/SQL locks. */
 export function runRetentionSync(input: Parameters): RetentionRunResult {
   const run = prepareRun({ ...input }, false);
@@ -311,8 +368,12 @@ async function runAsync(input: Parameters, caller?: () => void): Promise<Retenti
     if (run.dryRun) return dry(run);
     const segment = segmentPlan(run);
     if (segment) {
+      // Only this path later logs. Capture original TR/Merkle authority before its first await or retention effect.
+      run.logAuthority = captureWorkspaceLogAuthority(run.workspace);
       run.phase = "archive-sign";
-      const signed = await signWithPurposeKey(run.workspace, "artifact-seal", Buffer.from(segment.plan.digest, "hex"));
+      const beforeSign = () => segmentSigningGate(run, segment); beforeSign();
+      const signed = await signWithPurposeKey(run.workspace, "artifact-seal", Buffer.from(segment.plan.digest, "hex"), { beforeSign });
+      segmentSigningGate(run, segment, signed);
       run.phase = "archive-publish"; commitSegment(run, segment, signed.signature.toString("base64"), signed);
     }
     run.phase = "payload-prune"; prunePayloads(run); run.phase = "guard-prune"; guardRows(run);
@@ -320,17 +381,22 @@ async function runAsync(input: Parameters, caller?: () => void): Promise<Retenti
       run.phase = "blob-prepare"; const plan = blobPlan(run, blobId);
       if (plan === null) continue;
       run.phase = "blob-sign";
-      const signed = await signWithPurposeKey(run.workspace, "artifact-seal", Buffer.from(plan.plan.digest, "hex"));
+      const beforeSign = () => blobSigningGate(run, plan); beforeSign();
+      const signed = await signWithPurposeKey(run.workspace, "artifact-seal", Buffer.from(plan.plan.digest, "hex"), { beforeSign });
+      blobSigningGate(run, plan, signed);
       run.phase = "blob-publish"; commitBlob(run, plan, signed.signature.toString("base64"), signed);
     }
     finish(run);
     if (run.result.manifestSha256 && run.result.segmentId) {
       run.phase = "workspace-log"; logGate(run); run.progress.attemptedStages.push("workspace-log");
-      const entry = await appendTransparencyEntryAsync(logInput(run), { beforeCommit: () => logGate(run) });
-      run.result.transparencyHash = run.progress.transparencyHash = entry.hash; run.progress.completedStages.push("workspace-log");
-    }
+      const attempt = await appendTransparencyEntryAttemptAsync(logInput(run), { beforeCommit: () => logGate(run), beforeMember: () => logGate(run) });
+      run.result.transparencyHash = run.progress.transparencyHash = attempt.entry.hash; run.progress.completedStages.push("workspace-log");
+      logGate(run); attempt.assertCurrent();
+    } else logGate(run);
     return run.result;
   } catch (error) {
+    if (run.phase === "workspace-log" && error instanceof TransparencyMerkleLagError)
+      run.result.transparencyHash = run.progress.transparencyHash = error.entryHash;
     if (error instanceof RetentionPartialError) throw error;
     if (run.progress.attemptedStages.length > 0 || run.progress.publishedPaths.length > 0 || run.progress.removedBlobIds.length > 0)
       throw new RetentionPartialError(run.phase, run.progress, error);
