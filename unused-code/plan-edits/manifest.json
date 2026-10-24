@@ -199,6 +199,13 @@
       "sha256": "1a47a67926429b925b3b6e7233281a574f5c97c213685a40a884728ada8084e6"
     },
     {
+      "path": "src/cgx/cgxStore.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/cgx/cgxStore.ts.landed",
+      "sha256": "6e4272a79cfb920cac674d861d1af96ec7d7d75a818326e8bd288f4b5e5f216a"
+    },
+    {
       "path": "src/ci/gate.ts",
       "issue": "P0-09",
       "baseCommit": "9b9058705e9c67af9d82d87aeacb1e2cb78b8ac1",
@@ -582,6 +589,13 @@
       "baseCommit": "c64a87641297be160f5901ed4d9c0634b341fef8",
       "archivePath": "unused-code/plan-edits/P0-44/src/types.ts.landed",
       "sha256": "61ca2bd7d2394b3ef1d38666868c50f43698f642d84291e511baf9b603e11645"
+    },
+    {
+      "path": "src/value/valueStore.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/value/valueStore.ts.landed",
+      "sha256": "09811069c8c7f07f7011f9987ce6f777f37da28b2c3c0488d807d9b5beb0f40a"
     },
     {
       "path": "src/workorders/workorderEngine.ts",
