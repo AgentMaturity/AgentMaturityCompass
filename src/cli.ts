@@ -15956,7 +15956,7 @@ program
   .requiredOption("--expires <ts>", "expiry timestamp (epoch ms) or duration e.g. 7d")
   .option("--created-by <who>", "who created this waiver", "operator")
   .action(async (opts: { agent?: string; requirement: string; justification: string; expires: string; createdBy: string }) => {
-    const { registerPolicyDebt } = await import("./governor/policyCanary.js");
+    const { registerPolicyDebtAsync } = await import("./governor/policyCanary.js");
     const agentId = opts.agent ?? activeAgent(program) ?? "default";
     let expiresTs: number;
     if (/^\d+$/.test(opts.expires)) {
@@ -15972,7 +15972,7 @@ program
         expiresTs = Date.now() + 86400000; // default 1 day
       }
     }
-    const entry = registerPolicyDebt({
+    const entry = await registerPolicyDebtAsync({
       agentId,
       waivedRequirement: opts.requirement,
       justification: opts.justification,
@@ -19619,7 +19619,7 @@ program
   .option("--risk <risk>", "LOW|MEDIUM|HIGH|CRITICAL", "MEDIUM")
   .option("--created-by <who>", "who created this", "operator")
   .action(async (opts: { agent?: string; type: string; reason: string; expiry: string; policies: string; risk: string; createdBy: string }) => {
-    const { addDebtEntry } = await import("./governor/policyDebt.js");
+    const { addDebtEntryAsync } = await import("./governor/policyDebt.js");
     const agentId = opts.agent ?? activeAgent(program) ?? "default";
     let expiryTs: number;
     if (/^\d+$/.test(opts.expiry)) {
@@ -19627,7 +19627,7 @@ program
     } else {
       expiryTs = Date.now() + parseWindowToMs(opts.expiry);
     }
-    const entry = addDebtEntry(process.cwd(), {
+    const entry = await addDebtEntryAsync(process.cwd(), {
       type: opts.type as never,
       reason: opts.reason,
       expiryTs,

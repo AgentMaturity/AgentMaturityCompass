@@ -1381,7 +1381,7 @@ export {
   getActiveOverrides,
   filePostmortem, filePostmortemAsync,
   getOverridesMissingPostmortem,
-  registerPolicyDebt,
+  registerPolicyDebt, registerPolicyDebtAsync,
   getActivePolicyDebt,
   getExpiredPolicyDebt,
   expirePolicyDebt,

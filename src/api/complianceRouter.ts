@@ -10,6 +10,8 @@ import { verifyUsersConfigSignature } from '../auth/authApi.js';
 import { bodyJson, bodyJsonSchema, apiSuccess, apiError, isRequestBodyError, pathParam, queryParam } from './apiHelpers.js';
 import { verifyTrustConfigSignature } from '../trust/trustConfig.js';
 import { KEY_PROVIDER_ERRORS, KeyProviderError } from '../keys/provider.js';
+import { KeyRevokedError } from '../keys/keyRevocations.js';
+import { assertVaultMaySign } from '../keys/signingKeys.js';
 
 const SCOPE_TEMPLATE_ERROR_CODES = new Set([
   'TEMPLATE_NOT_FOUND',
@@ -476,7 +478,7 @@ export async function handleComplianceRoute(
         if (!body.requirement || !body.justification || !body.expires) {
           apiError(res, 400, 'requirement, justification, and expires required'); return true;
         }
-        const { registerPolicyDebt } = await import('../governor/policyCanary.js');
+        const debt = await import('../governor/policyCanary.js');
         const agentId = body.agentId ?? 'default';
         let expiresTs: number;
         if (/^\d+$/.test(body.expires)) {
@@ -492,16 +494,31 @@ export async function handleComplianceRoute(
             expiresTs = Date.now() + 86400000;
           }
         }
-        const entry = registerPolicyDebt({
+        const input = {
           agentId,
           waivedRequirement: body.requirement,
           justification: body.justification,
           expiresTs,
           createdBy: body.createdBy ?? 'operator',
-        }, workspace);
+        };
+        const beforePublish = () => {
+          if (revalidateAuthority?.() === false) {
+            if (!res.headersSent) apiError(res, 403, 'authenticated authority changed while the request was prepared');
+            throw new Error('policy debt authority changed while signing was prepared');
+          }
+        };
+        beforePublish();
+        if (revalidateAuthority === undefined) assertVaultMaySign(workspace, 'artifact-seal');
+        const entry = revalidateAuthority === undefined ? debt.registerPolicyDebt(input, workspace)
+          : await debt.registerPolicyDebtAsync(input, workspace, { beforePublish });
         apiSuccess(res, { debtId: entry.debtId }, 201);
       } catch (err) {
-        apiError(res, 500, err instanceof Error ? err.message : 'Policy debt registration failed');
+        if (res.headersSent) return true;
+        if (err instanceof KeyProviderError && Object.hasOwn(KEY_PROVIDER_ERRORS, err.code)) { apiError(res, KEY_PROVIDER_ERRORS[err.code], err.code + ': policy debt signing refused'); return true; }
+        if (err instanceof KeyRevokedError) { apiError(res, 409, 'KEY_REVOKED: policy debt signing key was revoked'); return true; }
+        if (err instanceof Error && (err.message === '🔐 Vault locked. Run `amc vault unlock` first, or `amc setup` for first-time setup. Use --no-sign to skip signing where supported.'
+          || err.message === '🔐 Vault locked. Run `amc vault unlock` first, or `amc setup` for first-time setup.')) { apiError(res, 423, 'VAULT_LOCKED: unlock the vault to sign policy debt'); return true; }
+        apiError(res, 500, 'Policy debt registration failed');
       }
       return true;
     }

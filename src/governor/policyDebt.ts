@@ -6,12 +6,16 @@
  */
 
 import { randomUUID } from "node:crypto";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { signHexDigest, getSigningKey } from "../crypto/keys.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
-import { readdirSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
+import { withControlFileLock } from "../lifecycle/controlFileLock.js";
+import { capturePurposePublication, assertPurposePublicationCurrent } from "../keys/purposePublication.js";
+import { signWithPurposeKey } from "../keys/purposeProviders.js";
+import { vaultStatus } from "../vault/vault.js";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -84,10 +88,33 @@ function getLastDebtHash(workspace: string): string {
   return sorted[sorted.length - 1]!.debt_hash;
 }
 
-function saveDebtEntry(workspace: string, entry: PolicyDebtEntry): void {
+function saveDebtEntry(workspace: string, entry: PolicyDebtEntry, bytes = JSON.stringify(entry, null, 2)): void {
   const dir = debtDir(workspace);
   ensureDir(dir);
-  writeFileAtomic(debtFilePath(workspace, entry.debtId), JSON.stringify(entry, null, 2), 0o644);
+  writeFileAtomic(debtFilePath(workspace, entry.debtId), bytes, 0o644);
+}
+
+/** Internal debt-family publication only: no Sign, initializer or await in the operation. */
+export function withDebtPublicationLock<T>(workspace: string, operation: () => T): T {
+  return withControlFileLock({ root: debtDir(workspace), name: "policy-debt", operation });
+}
+function captureDebtState(workspace: string, debtId: string) {
+  try {
+    const file = resolve(debtFilePath(workspace, debtId));
+    return { file, head: getLastDebtHash(workspace), target: pathExists(file) ? readFileSync(file) : null };
+  } catch { throw new Error("policy debt state is unreadable"); }
+}
+function assertDebtStateCurrent(workspace: string, debtId: string, before: ReturnType<typeof captureDebtState>): void {
+  const current = captureDebtState(workspace, debtId);
+  if (current.file !== before.file || current.head !== before.head || (before.target === null ? current.target !== null
+    : current.target === null || !current.target.equals(before.target))) {
+    throw new Error("policy debt predecessor or destination changed while signing was prepared; retry");
+  }
+}
+function debtBody(params: Parameters<typeof addDebtEntry>[1], debtId: string, createdTs: number, prev_debt_hash: string) {
+  return { debtId, type: params.type, reason: params.reason, expiryTs: params.expiryTs, affectedPolicies: params.affectedPolicies,
+    riskAssessment: params.riskAssessment, agentId: params.agentId, createdTs, createdBy: params.createdBy,
+    resolvedTs: null as number | null, resolved: false, prev_debt_hash };
 }
 
 // ---------------------------------------------------------------------------
@@ -108,22 +135,8 @@ export function addDebtEntry(
 ): PolicyDebtEntry {
   const debtId = `dbt_${randomUUID().slice(0, 12)}`;
   const now = Date.now();
-  const prevHash = getLastDebtHash(workspace);
-
-  const body = {
-    debtId,
-    type: params.type,
-    reason: params.reason,
-    expiryTs: params.expiryTs,
-    affectedPolicies: params.affectedPolicies,
-    riskAssessment: params.riskAssessment,
-    agentId: params.agentId,
-    createdTs: now,
-    createdBy: params.createdBy,
-    resolvedTs: null as number | null,
-    resolved: false,
-    prev_debt_hash: prevHash,
-  };
+  const before = captureDebtState(workspace, debtId);
+  const body = debtBody(params, debtId, now, before.head);
 
   const debtHash = sha256Hex(canonicalize(body));
   let signature = "unsigned";
@@ -132,17 +145,47 @@ export function addDebtEntry(
   } catch { /* no key */ }
 
   const entry: PolicyDebtEntry = { ...body, debt_hash: debtHash, signature };
-  saveDebtEntry(workspace, entry);
-  return entry;
+  const bytes = JSON.stringify(entry, null, 2);
+  return withDebtPublicationLock(workspace, () => {
+    assertDebtStateCurrent(workspace, debtId, before);
+    saveDebtEntry(workspace, entry, bytes);
+    return entry;
+  });
+}
+
+/** Internal preparation used by both actual add layers; the captured body is never exposed before publication. */
+export async function prepareDebtEntryAsync(workspace: string, params: Parameters<typeof addDebtEntry>[1]): Promise<{ publish(): PolicyDebtEntry }> {
+  const root = resolve(workspace), input = { ...params, affectedPolicies: [...params.affectedPolicies] };
+  const debtId = `dbt_${randomUUID().slice(0, 12)}`, now = Date.now(), before = captureDebtState(root, debtId);
+  const body = debtBody(input, debtId, now, before.head), captured = capturePurposePublication(root, "artifact-seal");
+  const hash = sha256Hex(canonicalize(body)), signed = await signWithPurposeKey(root, "artifact-seal", Buffer.from(hash, "hex"));
+  const assertVaultCurrent = () => { if (signed.provider === "file" && !vaultStatus(root).unlocked) throw new Error("🔐 Vault locked. Run `amc vault unlock` first, or `amc setup` for first-time setup."); };
+  assertVaultCurrent();
+  const entry: PolicyDebtEntry = { ...body, debt_hash: hash, signature: signed.signature.toString("base64") }, bytes = JSON.stringify(entry, null, 2);
+  return Object.freeze({ publish(): PolicyDebtEntry {
+    assertVaultCurrent();
+    assertPurposePublicationCurrent(root, captured, signed);
+    assertDebtStateCurrent(root, debtId, before);
+    saveDebtEntry(root, entry, bytes);
+    return entry;
+  } });
+}
+
+/** Maintained awaitable durable add; legacy unsigned behavior remains only in the synchronous API. */
+export async function addDebtEntryAsync(workspace: string, params: Parameters<typeof addDebtEntry>[1]): Promise<PolicyDebtEntry> {
+  const root = resolve(workspace), prepared = await prepareDebtEntryAsync(root, params);
+  return withDebtPublicationLock(root, () => prepared.publish());
 }
 
 export function resolveDebtEntry(workspace: string, debtId: string): boolean {
-  const entry = loadDebtEntry(workspace, debtId);
-  if (!entry) return false;
-  entry.resolved = true;
-  entry.resolvedTs = Date.now();
-  saveDebtEntry(workspace, entry);
-  return true;
+  return withDebtPublicationLock(workspace, () => {
+    const entry = loadDebtEntry(workspace, debtId);
+    if (!entry) return false;
+    entry.resolved = true;
+    entry.resolvedTs = Date.now();
+    saveDebtEntry(workspace, entry);
+    return true;
+  });
 }
 
 function loadDebtEntry(workspace: string, debtId: string): PolicyDebtEntry | null {
