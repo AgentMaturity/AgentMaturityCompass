@@ -1,3 +1,4 @@
+import { captureRunHashAuthority } from "../ledger/runHashSignature.js";
 import { randomUUID } from "node:crypto";
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
@@ -471,6 +472,7 @@ export async function runExperimentAsync(params: Parameters<typeof runExperiment
   beforePublish?.();
   // All original authorities precede the first await. Log policy does not choose or replace the raw report purpose.
   const captured = capturePurposePublication(input.workspace, "artifact-seal");
+  const originalArtifact = captureRunHashAuthority(input.workspace, false);
   const logSigners = [describePolicySigner(input.workspace, "TRANSPARENCY_ROOT"), describePolicySigner(input.workspace, "MERKLE_ROOT")];
   const logPolicy = JSON.stringify(loadTrustConfig(input.workspace)), prepared = prepareExperimentReport(input);
   const evidencePath = join(input.workspace, ".amc", "evidence.sqlite"), evidenceFile = statSync(evidencePath);
@@ -488,8 +490,23 @@ export async function runExperimentAsync(params: Parameters<typeof runExperiment
     const locked = <T>(operation: () => T): T => withControlFileLock({ root: prepared.runsDir, name: "experiment-report", operation });
     const destinations = locked(() => ({ json: experimentOutputState(prepared.jsonPath), markdown: experimentOutputState(prepared.mdPath) }));
     const reportJsonSha256 = sha256Hex(canonicalize(prepared.base));
+    const assertUsedInputsCurrent = () => {
+      beforePublish?.(); assertEvidenceFileCurrent();
+      if (experimentReportInputs(input.workspace, prepared, evidence) !== source) throw new Error("experiment report inputs changed while signing");
+      assertExperimentSourcesCurrent(input.workspace, prepared, evidence);
+    };
+    const assertOriginalPreparingAuthority = () => {
+      originalArtifact();
+      for (const descriptor of logSigners) assertPolicySignerCurrent(input.workspace, descriptor);
+      if (JSON.stringify(loadTrustConfig(input.workspace)) !== logPolicy) throw new Error("experiment log signing policy changed while signing");
+    };
+    const beforeSign = () => locked(() => {
+      assertUsedInputsCurrent(); assertOriginalPreparingAuthority();
+      if (!experimentOutputMatches(prepared.jsonPath, destinations.json) || !experimentOutputMatches(prepared.mdPath, destinations.markdown))
+        throw new Error("experiment report outputs changed while signing");
+    });
     phase = "sign";
-    const signed = await signWithPurposeKey(input.workspace, "artifact-seal", Buffer.from(reportJsonSha256, "hex"));
+    const signed = await signWithPurposeKey(input.workspace, "artifact-seal", Buffer.from(reportJsonSha256, "hex"), { beforeSign });
     // Do not let the inherited file getter reopen an explicitly locked vault through an environment passphrase.
     const assertFileVaultCurrent = () => {
       if (signed.provider === "file" && !vaultStatus(input.workspace).unlocked)
@@ -498,15 +515,8 @@ export async function runExperimentAsync(params: Parameters<typeof runExperiment
     assertFileVaultCurrent(); phase = "members";
     const report: ExperimentReport = { ...prepared.base, reportJsonSha256, reportSealSig: signed.signature.toString("base64") };
     const json = JSON.stringify(report, null, 2), markdown = toMarkdown(report);
-    const assertUsedInputsCurrent = () => {
-      beforePublish?.(); assertEvidenceFileCurrent();
-      if (experimentReportInputs(input.workspace, prepared, evidence) !== source) throw new Error("experiment report inputs changed while signing");
-      assertExperimentSourcesCurrent(input.workspace, prepared, evidence);
-    };
     const assertOriginalAuthority = () => {
-      assertFileVaultCurrent(); assertPurposePublicationCurrent(input.workspace, captured, signed);
-      for (const descriptor of logSigners) assertPolicySignerCurrent(input.workspace, descriptor);
-      if (JSON.stringify(loadTrustConfig(input.workspace)) !== logPolicy) throw new Error("experiment log signing policy changed while signing");
+      assertFileVaultCurrent(); assertOriginalPreparingAuthority(); assertPurposePublicationCurrent(input.workspace, captured, signed);
     };
     locked(() => {
       assertUsedInputsCurrent(); assertOriginalAuthority();
