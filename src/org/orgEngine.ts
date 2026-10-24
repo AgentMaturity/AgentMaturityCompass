@@ -17,7 +17,10 @@ import { robustScore, weightedDistribution, weightedMedian, weightedMean, type W
 import type { OrgConfig, OrgNode, OrgNodeScorecard, OrgScorecard, OrgNodeType, NodeLayerScore, NodeQuestionScore, WeightedDistribution } from "./orgSchema.js";
 import { loadOrgConfig, nodeAgentIds, memberWeightForNode } from "./orgStore.js";
 import { verifyOrgConfigSignature } from "./orgStore.js";
-import { writeOrgScorecard } from "./orgScorecard.js";
+import { writeOrgScorecard, prepareOrgScorecardAsync } from "./orgScorecard.js";
+import { appendTransparencyEntryAsync } from "../transparency/logChain.js";
+import { withControlFileLock } from "../lifecycle/controlFileLock.js";
+import { captureOrgComputationInputs, captureOrgScorecardAuthority, OrgFollowupError, type OrgEffectOptions } from "./orgPublication.js";
 
 const LAYER_NAMES = [
   "Strategic Agent Operations",
@@ -593,6 +596,30 @@ export function recomputeAndPersistOrgScorecard(params: {
     scorecard,
     ...written
   };
+}
+
+/** Computed values are historical at computedAt; only the exact consumed org pair remains a current input gate. */
+export async function recomputeAndPersistOrgScorecardAsync(params: { workspace: string; window: string },
+  options: OrgEffectOptions = {}): Promise<ReturnType<typeof recomputeAndPersistOrgScorecard>> {
+  const input = { workspace: params.workspace, window: params.window };
+  const assertOriginal = captureOrgScorecardAuthority(input.workspace, options.beforePublish);
+  const inputs = captureOrgComputationInputs(input.workspace), computed = computeOrgScorecard({ ...input, config: inputs.config });
+  inputs.assertCurrent();
+  const prepared = await prepareOrgScorecardAsync(input.workspace, computed, { beforePublish: () => {
+    assertOriginal(); inputs.assertCurrent();
+  } });
+  const written = prepared.publish(), scorecard = prepared.scorecard;
+  try {
+    await appendTransparencyEntryAsync({ workspace: input.workspace, type: "ORG_SCORECARD_RECORDED", agentId: "org",
+      artifact: { kind: "policy", sha256: sha256Hex(Buffer.from(JSON.stringify(scorecard), "utf8")), id: String(scorecard.computedAt) } },
+    { beforeCommit: () => {
+      withControlFileLock({ root: join(input.workspace, ".amc"), name: "org-scorecard-pairs", operation: prepared.assertCurrent });
+    } });
+  } catch (error) {
+    throw new OrgFollowupError("log", Object.freeze([".amc/org/scorecards/latest.json", ".amc/org/scorecards/latest.json.sig",
+      `.amc/org/scorecards/history/${scorecard.computedAt}.json`, `.amc/org/scorecards/history/${scorecard.computedAt}.json.sig`]), null, error);
+  }
+  return { scorecard, ...written };
 }
 
 export function nodeHierarchy(config: OrgConfig): Array<{

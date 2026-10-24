@@ -242,7 +242,8 @@ import {
 import { compareNodeScorecards, loadLatestOrgScorecard } from "../org/orgScorecard.js";
 import { computeOrgScorecard, nodeHierarchy, recomputeAndPersistOrgScorecard } from "../org/orgEngine.js";
 import { renderOrgCompareMarkdown, renderOrgNodeReportMarkdown, renderOrgSystemicMarkdown } from "../org/orgReports.js";
-import { generateOrgCommitmentPlan, generateOrgEducationBrief, generateOrgOwnershipPlan } from "../org/orgCommitments.js";
+import { generateOrgEocAsync, recomputeOrgScorecardsApiAsync } from "../org/orgApi.js";
+import { prepareOrgConfigUpdateLog } from "../org/orgPublication.js";
 import { listOrgRuns, loadOrgRun, orgRunRoleDefinitions, orgRunSummaryForUi, parseOrgRoleList, runOrg } from "../org/orgRun.js";
 import { OrgSseHub } from "../org/orgSse.js";
 import {
@@ -1460,6 +1461,12 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
     if (type !== "ORG_SCORECARD_UPDATED") {
       emitOrgEvent("ORG_SCORECARD_UPDATED", nodeIds);
     }
+  };
+
+  const recomputeOwnedOrgAndEmit = async (nodeIds: string[], beforePublish: () => void): Promise<void> => {
+    try { await recomputeOrgScorecardsApiAsync({ workspace: options.workspace, window: "14d" }, { beforePublish }); }
+    catch { /* Preserve the existing best-effort secondary recompute contract. */ }
+    emitOrgEvent("ORG_SCORECARD_UPDATED", nodeIds);
   };
 
   const emitForecastEvents = (params: {
@@ -2728,10 +2735,10 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
         const parsed = body ? (JSON.parse(body) as { window?: string }) : {};
-        const out = recomputeAndPersistOrgScorecard({
+        const out = await recomputeOrgScorecardsApiAsync({
           workspace: options.workspace,
           window: parsed.window ?? "14d"
-        });
+        }, { beforePublish: signingAuthority(["OWNER", "OPERATOR"]) });
         const audit = await writeStudioAuditEventAsync({
           workspace: options.workspace,
           auditType: "ORG_SCORECARD_UPDATED",
@@ -2774,13 +2781,15 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "invalid node type" });
           return;
         }
+        const orgUpdate = prepareOrgConfigUpdateLog(options.workspace, signingAuthority(["OWNER"]), humanAuditAuthority(["OWNER"], true));
         const saved = await addOrgNodeAsync({
           workspace: options.workspace,
           id: parsed.id,
           type: type as "ENTERPRISE" | "TEAM" | "FUNCTION" | "PROCESS" | "ECOSYSTEM",
           name: parsed.name,
           parentId: parsed.parentId ?? null
-        }, { beforePublish: signingAuthority(["OWNER"]) });
+        }, { beforePublish: orgUpdate.assertCurrent });
+        const orgLog = orgUpdate.published(saved.path, saved.config);
         const audit = await writeStudioAuditEventAsync({
           workspace: options.workspace,
           auditType: "ORG_NODE_ADDED",
@@ -2790,17 +2799,8 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             nodeType: type
           }
         }, humanAuditAuthority(["OWNER"], true));
-        appendTransparencyEntry({
-          workspace: options.workspace,
-          type: "ORG_CONFIG_UPDATED",
-          agentId: "org",
-          artifact: {
-            kind: "policy",
-            sha256: sha256Hex(readUtf8(saved.path)),
-            id: `node_${parsed.id}`
-          }
-        });
-        recomputeOrgAndEmit("ORG_SCORECARD_UPDATED", [parsed.id]);
+        await orgLog.append(`node_${parsed.id}`, audit.eventId);
+        await recomputeOwnedOrgAndEmit([parsed.id], orgLog.beforeRecompute);
         json(res, 200, {
           path: saved.path,
           sigPath: saved.sigPath,
@@ -2826,12 +2826,14 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "agentId and nodeId are required" });
           return;
         }
+        const orgUpdate = prepareOrgConfigUpdateLog(options.workspace, signingAuthority(["OWNER"]), humanAuditAuthority(["OWNER"], true));
         const saved = await assignAgentToNodeAsync({
           workspace: options.workspace,
           agentId: parsed.agentId,
           nodeId: parsed.nodeId,
           weight: parsed.weight ?? 1
-        }, { beforePublish: signingAuthority(["OWNER"]) });
+        }, { beforePublish: orgUpdate.assertCurrent });
+        const orgLog = orgUpdate.published(saved.path, saved.config);
         const audit = await writeStudioAuditEventAsync({
           workspace: options.workspace,
           auditType: "ORG_AGENT_ASSIGNED",
@@ -2842,17 +2844,8 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             weight: parsed.weight ?? 1
           }
         }, humanAuditAuthority(["OWNER"], true));
-        appendTransparencyEntry({
-          workspace: options.workspace,
-          type: "ORG_CONFIG_UPDATED",
-          agentId: "org",
-          artifact: {
-            kind: "policy",
-            sha256: sha256Hex(readUtf8(saved.path)),
-            id: `assign_${parsed.agentId}_${parsed.nodeId}`
-          }
-        });
-        recomputeOrgAndEmit("ORG_SCORECARD_UPDATED", [parsed.nodeId]);
+        await orgLog.append(`assign_${parsed.agentId}_${parsed.nodeId}`, audit.eventId);
+        await recomputeOwnedOrgAndEmit([parsed.nodeId], orgLog.beforeRecompute);
         json(res, 200, {
           path: saved.path,
           sigPath: saved.sigPath,
@@ -2878,11 +2871,13 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "agentId and nodeId are required" });
           return;
         }
+        const orgUpdate = prepareOrgConfigUpdateLog(options.workspace, signingAuthority(["OWNER"]), humanAuditAuthority(["OWNER"], true));
         const saved = await unassignAgentFromNodeAsync({
           workspace: options.workspace,
           agentId: parsed.agentId,
           nodeId: parsed.nodeId
-        }, { beforePublish: signingAuthority(["OWNER"]) });
+        }, { beforePublish: orgUpdate.assertCurrent });
+        const orgLog = orgUpdate.published(saved.path, saved.config);
         const audit = await writeStudioAuditEventAsync({
           workspace: options.workspace,
           auditType: "ORG_AGENT_UNASSIGNED",
@@ -2892,17 +2887,8 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             nodeId: parsed.nodeId
           }
         }, humanAuditAuthority(["OWNER"], true));
-        appendTransparencyEntry({
-          workspace: options.workspace,
-          type: "ORG_CONFIG_UPDATED",
-          agentId: "org",
-          artifact: {
-            kind: "policy",
-            sha256: sha256Hex(readUtf8(saved.path)),
-            id: `unassign_${parsed.agentId}_${parsed.nodeId}`
-          }
-        });
-        recomputeOrgAndEmit("ORG_SCORECARD_UPDATED", [parsed.nodeId]);
+        await orgLog.append(`unassign_${parsed.agentId}_${parsed.nodeId}`, audit.eventId);
+        await recomputeOwnedOrgAndEmit([parsed.nodeId], orgLog.beforeRecompute);
         json(res, 200, {
           path: saved.path,
           sigPath: saved.sigPath,
@@ -2982,21 +2968,11 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "nodeId is required" });
           return;
         }
-        const scorecard = computeOrgScorecard({
-          workspace: options.workspace,
-          window: "14d"
-        });
         const kind = (parsed.kind ?? "commit").toLowerCase();
-        const out = kind === "learn"
-          ? generateOrgEducationBrief({ workspace: options.workspace, scorecard, nodeId: parsed.nodeId })
-          : kind === "own"
-            ? generateOrgOwnershipPlan({ workspace: options.workspace, scorecard, nodeId: parsed.nodeId })
-            : generateOrgCommitmentPlan({
-              workspace: options.workspace,
-              scorecard,
-              nodeId: parsed.nodeId,
-              days: parsed.days === 14 || parsed.days === 30 || parsed.days === 90 ? parsed.days : 30
-            });
+        const out = await generateOrgEocAsync({ workspace: options.workspace, nodeId: parsed.nodeId,
+          type: kind === "learn" ? "learn" : kind === "own" ? "own" : "commit", window: "14d",
+          days: parsed.days === 14 || parsed.days === 30 || parsed.days === 90 ? parsed.days : 30 },
+        { beforePublish: signingAuthority(["OWNER", "OPERATOR"]) });
         const audit = await writeStudioAuditEventAsync({
           workspace: options.workspace,
           auditType: "ORG_COMMITMENT_GENERATED",

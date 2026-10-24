@@ -591,13 +591,13 @@ import { experimentGateSchema } from "./experiments/experimentSchema.js";
 import {
   orgAddNodeCliAsync,
   orgAssignCliAsync,
-  orgCommitCli,
+  orgCommitCliAsync,
   orgCompareCli,
   orgInitCliAsync,
-  orgLearnCli,
-  orgOwnCli,
+  orgLearnCliAsync,
+  orgOwnCliAsync,
   orgReportCli,
-  orgScoreCli,
+  orgScoreCliAsync,
   orgUnassignCliAsync,
   orgVerifyCli
 } from "./org/orgCli.js";
@@ -16906,8 +16906,8 @@ org
 org
   .command("score")
   .option("--window <window>", "e.g. 14d", "14d")
-  .action((opts: { window: string }) => {
-    const out = orgScoreCli({
+  .action(async (opts: { window: string }) => {
+    const out = await orgScoreCliAsync({
       workspace: process.cwd(),
       window: opts.window
     });
@@ -16957,8 +16957,8 @@ org
   .command("learn")
   .requiredOption("--node <id>", "node ID")
   .requiredOption("--out <file>", "output markdown path")
-  .action((opts: { node: string; out: string }) => {
-    const out = orgLearnCli({
+  .action(async (opts: { node: string; out: string }) => {
+    const out = await orgLearnCliAsync({
       workspace: process.cwd(),
       nodeId: opts.node,
       outFile: opts.out
@@ -16971,8 +16971,8 @@ org
   .command("own")
   .requiredOption("--node <id>", "node ID")
   .requiredOption("--out <file>", "output markdown path")
-  .action((opts: { node: string; out: string }) => {
-    const out = orgOwnCli({
+  .action(async (opts: { node: string; out: string }) => {
+    const out = await orgOwnCliAsync({
       workspace: process.cwd(),
       nodeId: opts.node,
       outFile: opts.out
@@ -16986,8 +16986,8 @@ org
   .requiredOption("--node <id>", "node ID")
   .option("--days <n>", "14|30|90", "30")
   .requiredOption("--out <file>", "output markdown path")
-  .action((opts: { node: string; days: string; out: string }) => {
-    const out = orgCommitCli({
+  .action(async (opts: { node: string; days: string; out: string }) => {
+    const out = await orgCommitCliAsync({
       workspace: process.cwd(),
       nodeId: opts.node,
       days: Number(opts.days),

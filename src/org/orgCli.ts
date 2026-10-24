@@ -2,7 +2,7 @@ import { dirname, resolve } from "node:path";
 import { ensureDir, writeFileAtomic } from "../utils/fs.js";
 import { parseWindowToMs } from "../utils/time.js";
 import { assertOwnerMode } from "../mode/mode.js";
-import { computeOrgScorecard, recomputeAndPersistOrgScorecard, scorecardNodeComparison } from "./orgEngine.js";
+import { computeOrgScorecard, recomputeAndPersistOrgScorecard, recomputeAndPersistOrgScorecardAsync, scorecardNodeComparison } from "./orgEngine.js";
 import { generateOrgCommitmentPlan, generateOrgEducationBrief, generateOrgOwnershipPlan } from "./orgCommitments.js";
 import { renderOrgCompareMarkdown, renderOrgNodeReportMarkdown } from "./orgReports.js";
 import {
@@ -13,6 +13,7 @@ import {
   verifyOrgConfigSignature
 } from "./orgStore.js";
 import type { OrgNodeType } from "./orgSchema.js";
+import { generateOrgEocAsync } from "./orgApi.js";
 
 export function orgInitCli(params: {
   workspace: string;
@@ -77,7 +78,7 @@ export function orgUnassignCli(params: {
 }
 
 // These maintained CLI adapters retain the existing command keys at entry and immediately before publication.
-function orgOwnerContinuation(workspace: string, command: "org init" | "org add node" | "org assign" | "org unassign") {
+function orgOwnerContinuation(workspace: string, command: "org init" | "org add node" | "org assign" | "org unassign" | "org score" | "org learn" | "org own" | "org commit") {
   const beforePublish = () => assertOwnerMode(workspace, command);
   beforePublish(); return { beforePublish };
 }
@@ -232,4 +233,22 @@ export function orgCommitCli(params: {
 export function orgWindowForDays(days: number): string {
   const ms = parseWindowToMs(`${days}d`);
   return `${Math.max(1, Math.round(ms / (24 * 60 * 60 * 1000)))}d`;
+}
+
+export async function orgScoreCliAsync(params: Parameters<typeof orgScoreCli>[0]): Promise<ReturnType<typeof orgScoreCli>> {
+  const input = { ...params };
+  return recomputeAndPersistOrgScorecardAsync(input, orgOwnerContinuation(input.workspace, "org score"));
+}
+export async function orgLearnCliAsync(params: Parameters<typeof orgLearnCli>[0]): Promise<ReturnType<typeof orgLearnCli>> {
+  const input = { ...params };
+  return generateOrgEocAsync({ ...input, type: "learn", window: "14d" }, orgOwnerContinuation(input.workspace, "org learn"));
+}
+export async function orgOwnCliAsync(params: Parameters<typeof orgOwnCli>[0]): Promise<ReturnType<typeof orgOwnCli>> {
+  const input = { ...params };
+  return generateOrgEocAsync({ ...input, type: "own", window: "14d" }, orgOwnerContinuation(input.workspace, "org own"));
+}
+export async function orgCommitCliAsync(params: Parameters<typeof orgCommitCli>[0]): Promise<ReturnType<typeof orgCommitCli>> {
+  const input = { ...params }, days = input.days <= 14 ? 14 : input.days <= 30 ? 30 : 90;
+  return generateOrgEocAsync({ ...input, type: "commit", days, window: `${Math.max(14, days)}d` },
+    orgOwnerContinuation(input.workspace, "org commit"));
 }

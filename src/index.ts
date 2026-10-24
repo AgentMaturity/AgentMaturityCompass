@@ -1057,13 +1057,13 @@ export {
 } from "./org/orgStore.js";
 export {
   computeOrgScorecard,
-  recomputeAndPersistOrgScorecard,
+  recomputeAndPersistOrgScorecard, recomputeAndPersistOrgScorecardAsync,
   nodeHierarchy,
   summarizeNodeForUi,
   scorecardNodeComparison
 } from "./org/orgEngine.js";
 export {
-  writeOrgScorecard,
+  writeOrgScorecard, writeOrgScorecardAsync,
   loadLatestOrgScorecard,
   verifyLatestOrgScorecardSignature,
   compareNodeScorecards
@@ -1075,12 +1075,12 @@ export {
   orgAddNodeCli, orgAddNodeCliAsync,
   orgAssignCli, orgAssignCliAsync,
   orgUnassignCli, orgUnassignCliAsync,
-  orgScoreCli,
+  orgScoreCli, orgScoreCliAsync,
   orgReportCli,
   orgCompareCli,
-  orgLearnCli,
-  orgOwnCli,
-  orgCommitCli
+  orgLearnCli, orgLearnCliAsync,
+  orgOwnCli, orgOwnCliAsync,
+  orgCommitCli, orgCommitCliAsync
 } from "./org/orgCli.js";
 export {
   initTransformMap, initTransformMapAsync,
