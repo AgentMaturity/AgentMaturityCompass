@@ -122,7 +122,7 @@ import {
 import { buildEvidencePacket, renderEvidencePacketMarkdown } from "./incidents/evidencePacket.js";
 import { oversightRecordPath, readOversightRecords, recordWorkspaceOversightAsync, workspaceOversightPublicKeys } from "./incidents/oversightRecord.js";
 import { startIncidentClocks } from "./incidents/clockRuntime.js";
-import { incidentNoticeDrafts } from "./incidents/noticeDraft.js";
+import { printIncidentClocks } from "./cli-incident-clocks.js";
 import {
   addAgentInteractive,
   buildAgentConfig,
@@ -665,7 +665,7 @@ import {
   loadTrustConfig,
   verifyTrustConfigSignature
 } from "./trust/trustConfig.js";
-import { describeTrustConfigResign, resignTrustConfig } from "./trust/trustConfigPublication.js";
+import { registerTrustResignCommand } from "./cli-trust-resign-command.js";
 import {
   computeTemporalDecayReport,
   decayConfigSchema,
@@ -7965,13 +7965,7 @@ incident
       }
       const transitions = store.getIncidentTransitions(id);
       const edges = store.getCausalEdges(id);
-      if (opts.clocks) {
-        const { runtime, drafts } = incidentNoticeDrafts({ workspace, db: ledger.db, incidentId: id, nowTs: Date.now() });
-        if (!opts.packet) return void console.log(JSON.stringify({ ...runtime, noticeDrafts: drafts.map((draft) => draft.json) }, null, 2));
-        mkdirSync(resolve(workspace, opts.packet), { recursive: true });
-        for (const draft of drafts) writeFileSync(join(resolve(workspace, opts.packet), `${id}.${draft.json.clockId}.notice.md`), draft.markdown, "utf8");
-        return void console.log(`${drafts.length} notice draft(s) in ${resolve(workspace, opts.packet)}; AMC does not file notices`);
-      }
+      if (opts.clocks) return printIncidentClocks(workspace, ledger.db, id, opts.packet);
       if (opts.packet) {
         if (!opts.station) throw new Error("--packet needs --station <station>");
         const station = parseStation(opts.station);
@@ -11795,40 +11789,7 @@ Example workflow:
     console.log(chalk.gray("Docs: amc trust init --help   — see concepts and workflow"));
   });
 
-trust
-  .command("resign")
-  .description("Re-sign the current .amc/trust.yaml in place with the current artifact-seal key, keeping NOTARY settings")
-  .option("--confirm <sha256>", "required: the trust.yaml sha256 you reviewed (run once without it to print the review)")
-  .option("--accept-compromised-signer", "also required when the recorded signer was revoked as key-compromise")
-  .addHelpText("after", `
-Use after a key rotation or revocation leaves trust.yaml signed by a retired or revoked artifact-seal key.
-Run it once without --confirm to print the content digest and the effective config; review them, then run it
-again with --confirm <that sha256>. Content that changed since the review is refused. The content must verify
-under its recorded signer from key history; tampered content, or a signer the operator trust context distrusts,
-is refused (recreate it with amc trust init, then amc trust enable-notary for NOTARY mode). Owner mode, unlocked vault.
-`)
-  .action(async (opts: { confirm?: string; acceptCompromisedSigner?: boolean }) => {
-    const workspace = process.cwd();
-    assertOwnerMode(workspace, "trust resign");
-    const review = describeTrustConfigResign(workspace);
-    console.log(`trust.yaml sha256: ${review.sha256}`);
-    console.log(`Signed by: ${review.signerKeyIds.join(", ")}`);
-    console.log(`Effective config:\n${JSON.stringify(review.config, null, 2)}`);
-    // The operator binds the digest they reviewed: a digest this run computed itself would bind nothing they saw.
-    if (typeof opts.confirm !== "string" || !/^[0-9a-f]{64}$/.test(opts.confirm))
-      throw new Error("amc trust resign re-signs content its previous signer vouched for; review the content above, then pass --confirm <its sha256>");
-    if (opts.confirm !== review.sha256) throw new Error("trust.yaml changed since the reviewed digest; review it again");
-    // resignTrustConfig refuses a distrusted signer, and a key-compromise one without --accept-compromised-signer.
-    const assertCurrent = () => {
-      if (process.cwd() !== workspace) throw new Error("original trust re-sign workspace changed");
-      assertOwnerMode(workspace, "trust resign");
-    };
-    const resigned = await resignTrustConfig(workspace, { acceptCompromisedSigner: opts.acceptCompromisedSigner === true, expectedSha256: opts.confirm, beforePublish: assertCurrent });
-    assertCurrent();
-    console.log(chalk.green(`Trust config re-signed: ${resigned.path}`));
-    console.log(`Signature: ${resigned.sigPath}`);
-    console.log(`Mode: ${resigned.mode}`);
-  });
+registerTrustResignCommand(trust);
 
 trust
   .command("enable-notary")
