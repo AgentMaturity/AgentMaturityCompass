@@ -13,7 +13,8 @@ import { randomUUID } from "node:crypto";
 import { loadActiveCompiledPolicy } from "../catalog/compiler/activate.js";
 import { loadGatewayConfig } from "../gateway/config.js";
 import { boundProviderKey } from "../keys/keyset.js";
-import { activeChangeEnvelope, evaluateChangeEnvelope, ledgerTestPassed, type AgentVersionManifest } from "./changeEnvelope.js";
+import { activeChangeEnvelope, evaluateChangeEnvelope, ledgerTestPassed } from "./changeEnvelope.js";
+import type { AgentVersionManifest } from "../lifecycle/versionManifest.js";
 import { activateKillSwitch, killSwitchDenial, releaseKillSwitch } from "./killSwitch.js";
 import { signDrillReceipt, type SignedDrillReceipt } from "./killSwitchDrill.js";
 
@@ -82,7 +83,7 @@ export async function runProviderExitDrill(p: {
         try { regulated = loadActiveCompiledPolicy(p.workspace) !== null; } catch { regulated = true; }
         // Judged as a regulated workspace would be, with the recorded test results: the drill shows what a switch would meet.
         const live: AgentVersionManifest | null = envelope === null ? null
-          : { ...envelope.baseline, model: { providerId: p.alternate.providerId, name: p.alternate.model, providerVersion: null } };
+          : { ...envelope.baseline, model: { providerId: p.alternate.providerId, model: p.alternate.model, providerReportedVersion: null } };
         const decision = live === null
           ? { outcome: "block" as const, envelopeId: null, reasons: [problem ?? "no envelope"] }
           : evaluateChangeEnvelope({ live, envelope, envelopeProblem: problem, regulated: true, nowTs: p.nowTs ?? Date.now(),

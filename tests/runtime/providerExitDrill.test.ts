@@ -1,15 +1,17 @@
 /** P2-26 slice D: disabling a provider fails closed; only an alternate the change envelope declares may take over. */
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
-import { activateChangeEnvelope, recordEnvelopeTestResult, requestChangeEnvelope, type AgentVersionManifest } from "../../src/runtime/changeEnvelope.js";
+import type { AgentVersionManifest } from "../../src/lifecycle/versionManifest.js";
+import { activateChangeEnvelope, recordEnvelopeTestResult, requestChangeEnvelope } from "../../src/runtime/changeEnvelope.js";
 import { killSwitchStatus } from "../../src/runtime/killSwitch.js";
 import { verifyDrillReceipt } from "../../src/runtime/killSwitchDrill.js";
 import { runProviderExitDrill } from "../../src/runtime/providerExit.js";
 import { AGENT, AUDITOR, OWNER, cleanupGovernanceFixtures, decideBound, governanceFixture, loginAs, type GovernanceFixture } from "../governor/governanceFixture.js";
 
 vi.setConfig({ testTimeout: 60_000 });
-const baseline: AgentVersionManifest = { model: { providerId: "anthropic", name: "claude-fixture", providerVersion: null },
-  promptDigest: "a".repeat(64), toolsDigest: "b".repeat(64), policyDigest: "c".repeat(64), corpusDigest: null };
-const onOpenAi = (name: string): AgentVersionManifest => ({ ...baseline, model: { providerId: "openai", name, providerVersion: null } });
+const baseline: AgentVersionManifest = { v: 1, agentId: AGENT, deploymentId: "not_bound", model: { providerId: "anthropic", model: "claude-fixture", providerReportedVersion: null },
+  systemPromptSha256: "a".repeat(64), toolsDigest: "b".repeat(64), policyDigest: "c".repeat(64), compiledPlanDigest: "none", harnessVersion: "fixture",
+  compositionDigest: "d".repeat(64), corpusDigests: [] };
+const onOpenAi = (model: string): AgentVersionManifest => ({ ...baseline, model: { providerId: "openai", model, providerReportedVersion: null } });
 let f: GovernanceFixture;
 
 async function declareAlternate(): Promise<string> {

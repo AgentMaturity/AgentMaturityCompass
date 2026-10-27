@@ -72,7 +72,8 @@ import type { ActionClass } from "../types.js";
 import { createDriverRunner } from "../agent/subagentRunner.js";
 import { LeasePrincipalRefused } from "../leases/leasePrincipal.js";
 import { planRequiresPrincipal } from "../tools/guards/compiledPolicyGuard.js";
-import { admitNativeSession, refuseRetired } from "../lifecycle/reassessment.js";
+import { refuseRetired } from "../lifecycle/reassessment.js";
+import { admitSessionAtOpen } from "../runtime/changeEnvelope.js";
 import { nativeSessionManifest } from "../lifecycle/versionManifest.js";
 import { runDueSchedules, type ScheduleRunResult } from "../autonomy/scheduleRunner.js";
 import { assertNativeScheduleAdmission } from "../autonomy/scheduleService.js";
@@ -553,8 +554,8 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
       approval === null || gate === undefined
         ? options.tools
         : gateToolCallsOnApproval(options.tools ?? EMPTY_TOOL_SEAM, approval, gate);
-    // P2-23: a governed agent's reassessment triggers run on the rendered prompt and composed tools, before the first request.
-    admitNativeSession({ workspace: options.workspace, agentId: options.agentId, manifest: () => nativeSessionManifest({ workspace: options.workspace,
+    // P2-23 reassessment triggers and P2-26 change envelopes run on the rendered prompt and composed tools, before the first request.
+    admitSessionAtOpen({ workspace: options.workspace, agentId: options.agentId, manifest: () => nativeSessionManifest({ workspace: options.workspace,
       agentId: options.agentId, providerId: options.route.providerId, model: options.route.model, systemPrompt: systemPromptText,
       harnessVersion: identity.harnessVersion, compositionDigest: identity.compositionDigest,
       tools: options.tools === undefined ? "none" : "workspace", surface: options.tools ?? EMPTY_TOOL_SEAM }) });

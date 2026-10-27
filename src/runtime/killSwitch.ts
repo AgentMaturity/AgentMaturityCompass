@@ -9,6 +9,12 @@
  * through activeFreezeStatus, and the gateway before model calls. A record that cannot be read or verified counts as
  * an active workspace stop_all and raises an alert: denial is the safe direction, and whoever can write the file can
  * already stop the pod. Lifting needs a signed OWNER release naming the incident. Break-glass never overrides a kill.
+ *
+ * P2-23 lifecycle (docs/AGENT_LIFECYCLE.md): an agent-scoped stop_all kill also suspends that agent with reason
+ * "incident", so returning it to service takes both the kill's signed release and an OWNER's lifecycle resume; neither
+ * lifts the other. Other kills suspend nothing: stop_new_effects keeps the agent's reads for reconciliation, which a
+ * suspension would refuse, and workspace, tool-class and provider kills name no agent. An ungoverned agent (no lifecycle
+ * row) is not enrolled by a kill. The suspension runs after the kill is published, and its failure never undoes the kill.
  */
 import { randomUUID } from "node:crypto";
 import { existsSync, mkdirSync, readdirSync, readFileSync } from "node:fs";
@@ -294,7 +300,23 @@ export async function activateKillSwitch(input: ActivateKillSwitchInput): Promis
   ledgerAudit(input.workspace, "KILL_SWITCH_ACTIVATED", record.issuedTs,
     { killId: record.killId, scope: record.scope, mode: record.mode, incidentId: record.incidentId, issuedBy: record.issuedBy,
       agentId: record.scope.kind === "agent" ? record.scope.id : "workspace" });
+  if (record.scope.kind === "agent" && record.mode === "stop_all") await suspendKilledAgent(input.workspace, record);
   return record;
+}
+
+/** The P2-23 suspension an agent-scoped stop_all kill carries (see the header); a failure is alerted, never thrown. */
+async function suspendKilledAgent(workspace: string, kill: KillSwitchRecord): Promise<void> {
+  try {
+    // Loaded here, not at the top: checkEgress imports this module from inside the plan reader's import graph
+    // (activate -> sign -> signer -> checkEgress), and a static lifecycle import would close a cycle back to the plan reader.
+    const { lifecycleView, suspendAgent } = await import("../lifecycle/governanceLifecycle.js");
+    const view = lifecycleView(workspace, kill.scope.id);
+    if (view.implicit || view.state !== "active") return;
+    suspendAgent(workspace, { agentId: kill.scope.id, reason: "incident", note: `kill switch ${kill.killId}${kill.incidentId ? ` (incident ${kill.incidentId})` : ""}` });
+  } catch (error) {
+    appendOpsAuditEvent({ workspace, auditType: "KILL_SWITCH_SUSPEND_FAILED", severity: "HIGH",
+      payload: { killId: kill.killId, agentId: kill.scope.id, error: String(error), stillDenied: "the kill itself" } });
+  }
 }
 
 /** An OWNER's signed release of one active kill, linked to an incident. The route checks the OWNER role. */

@@ -45,7 +45,10 @@ export interface PlanView {
   invalidatedBy(controlId: string): readonly InvalidationTrigger[];
 }
 
-/** P2-26 plugs its change envelopes in here; until then nothing pre-approves a change. */
+/**
+ * How a change envelope pre-approves a change. Native sessions open through P2-26's admitSessionAtOpen
+ * (src/runtime/changeEnvelope.ts), which passes its envelopes here; a direct caller without one gets no envelope.
+ */
 export type ChangeEnvelopeLookup = (change: { agentId: string; bound: AgentVersionManifest; current: AgentVersionManifest; changed: readonly ChangeKind[] }) =>
   { readonly envelopeId: string } | null;
 const NO_ENVELOPE: ChangeEnvelopeLookup = () => null;
@@ -137,6 +140,26 @@ function invalidationTriggerFor(workspace: string, view: LifecycleView, current:
     status: suspend ? "open" : "passed", manifestDigest: digest, unpinned: unpinnedComponents(current), envelopeId: covered?.envelopeId ?? null,
     approvalId: view.approvalId, note: suspend ? `mandatory controls invalidated: ${hit.mandatory.join(", ")}` : covered ? "covered by a change envelope" : "no mandatory control invalidated" });
   return suspend ? suspendAgent(workspace, { agentId: view.agentId, reason: "reassessment_required" }) : view;
+}
+
+/**
+ * P2-26's change-envelope gate as a P2-23 reassessment: a governed, active agent whose session manifest falls outside its
+ * envelope gets one open `invalidated_by` reassessment citing the envelope (once per manifest, envelope and approval), and
+ * a blocking decision suspends it (`reassessment_required`), so only an OWNER's resume, which closes the reassessment,
+ * lets it run again. An agent already held, or one P2-23 does not govern (no row), is left as it is.
+ */
+export function recordEnvelopeReassessment(workspace: string, input: { agentId: string; manifest: AgentVersionManifest; changed: readonly ChangeKind[];
+  envelopeId: string | null; reasons: readonly string[]; block: boolean }): LifecycleView {
+  const view = lifecycleView(workspace, input.agentId);
+  if (view.implicit || view.state !== "active") return view;
+  const digest = manifestDigest(input.manifest);
+  if (!alreadyRecorded(workspace, view.agentId, (row) => row.trigger === "invalidated_by" && row.manifestDigest === digest
+    && row.envelopeId === input.envelopeId && row.approvalId === view.approvalId)) {
+    recordReassessment(workspace, view.agentId, { trigger: "invalidated_by", changed: [...input.changed], invalidatedControls: [], requiredTests: [],
+      status: "open", manifestDigest: digest, unpinned: unpinnedComponents(input.manifest), envelopeId: input.envelopeId, approvalId: view.approvalId,
+      note: `outside the change envelope${input.block ? "" : " (advisory: the workspace has no active plan)"}: ${input.reasons.join("; ")}` });
+  }
+  return input.block ? suspendAgent(workspace, { agentId: view.agentId, reason: "reassessment_required" }) : view;
 }
 
 /** The scheduled trigger: an overdue mandatory review suspends; an overdue advisory one records one open warning per approval. */

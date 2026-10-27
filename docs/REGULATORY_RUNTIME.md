@@ -110,6 +110,15 @@ with slice D.
   own egress proxy) is not interrupted.
 - Lifting needs a signed release by an OWNER naming the kill's incident.
   Break-glass is weighed after the kill check and never overrides it.
+- An agent-scoped `stop_all` kill also suspends that agent in P2-23 lifecycle
+  (`suspendAgent`, reason `incident`), after the kill is published; a failure
+  there is alerted (`KILL_SWITCH_SUSPEND_FAILED`) and never undoes the kill.
+  The release does not resume the agent and a lifecycle resume does not lift
+  the kill: returning it to service takes both. Other kills suspend nothing:
+  `stop_new_effects` keeps reads for reconciliation, which a suspension would
+  refuse, and workspace, tool-class and provider kills name no agent. An
+  ungoverned agent is not enrolled. A call refused by both is refused once,
+  as `kill_switch_active`.
 - `GET /api/v1/runtime/kill-switch` serves the status; the Studio banner
   (pages with the unified banner) shows an active switch in red.
 - `scripts/drills/kill-switch-drill.mjs` writes the signed `amc.drill/1`
@@ -135,8 +144,11 @@ requester's own decision never counting. `approvalId` is that approval.
 | `digest_in_set` | A live value (prompt, tool, policy or corpus digest, or `provider/model@version`) in `values` |
 | `provider_version_in_set` | The same provider and model at a provider-reported version in `values` |
 
-At native session open (`composeAgentSession`), `checkChangeEnvelopeAtOpen`
-compares the live manifest with the agent's newest envelope:
+At native session open (`composeAgentSession` and the kernel runner),
+`admitSessionAtOpen` runs P2-23's `admitNativeSession` with the envelopes as
+its `ChangeEnvelopeLookup`, then `checkChangeEnvelopeAtOpen` compares the live
+manifest with the agent's newest envelope. The envelope is read and its test
+evidence weighed once per open, and both steps see the same manifest:
 
 - Identical to the baseline: allowed.
 - Every change admitted, with a passing result for each required test:
@@ -150,26 +162,38 @@ compares the live manifest with the agent's newest envelope:
 - Anything else (a change outside it, missing or failing test evidence, an
   expired envelope, an envelope file that fails verification): in a
   regulated workspace (an active compiled plan, or a plan that cannot be
-  read) the session is refused before any lease or session row; elsewhere
-  it is a warning. Both record `AGENT_REASSESSMENT_REQUIRED`, which opens an
-  incident.
+  read) the session is refused before its first turn (the manifest digests
+  the composed tool surface, so the session row is opened and then closed);
+  elsewhere it is a warning. Both record `AGENT_REASSESSMENT_REQUIRED`, which
+  opens an incident. For an agent P2-23 governs, the same decision is also a
+  lifecycle reassessment (`LIFECYCLE_REASSESSMENT`, `invalidated_by`, open,
+  citing the envelope), once per manifest, envelope and approval, and a block
+  suspends the agent (`reassessment_required`) so only an OWNER's resume lets
+  it run again. An ungoverned agent is not enrolled in lifecycle.
+- P2-23's own trigger (a change from the manifest the agent's approval bound
+  that invalidates a mandatory control) counts the change as covered when the
+  live manifest is the envelope's approved baseline or every change is inside
+  it with passing tests; the reassessment then passes and cites the envelope.
 - No envelope at all: nothing is compared.
 
-The live manifest is what the session resolves, never the caller's pins:
-the tool digest covers the tool mode, the verified signed `tools.yaml` and
-every additional capability (a tools config that does not verify gives no
-digest, which always counts as changed), and the policy digest is the
-active compiled plan's (one that cannot be read always counts as changed).
+The live manifest is P2-23's `AgentVersionManifest`, built once by
+`nativeSessionManifest` (`src/lifecycle/versionManifest.ts`) from what the
+session resolves, never the caller's pins: the tool digest covers the tool
+mode, the verified signed `tools.yaml`, the schemas the composed seam offers
+and every additional capability as declared (a tools config that does not
+verify, or a seam that cannot list its schemas, gives no digest, which always
+counts as changed), and the policy and plan digests are the active compiled
+plan's (a plan that cannot be read refuses the session). An envelope pins
+model, prompt, tool, policy (plan and policy digest together) and corpus; a
+deployment change (deployment id, harness version, composition) is P2-23's
+bound-manifest trigger, not an envelope's. A baseline must name the
+envelope's agent.
 
 A model with no provider-reported version is `unpinned`, a claim downgrade.
 No provider reports a version before the first response, so a native session
 is always unpinned at open (Not verified per provider: Gemini reports
 `modelVersion` mid-stream; the others were not checked).
 
-P2-23 owns the version manifest (`src/lifecycle/versionManifest.ts`) and
-reassessment as a lifecycle state, and is built in parallel. Until they are
-reconciled, `AgentVersionManifest` here is the minimal shape compared and the
-`AGENT_REASSESSMENT_REQUIRED` ledger row is the reassessment record.
 
 ## Slice D: retention per regime and provider exit
 

@@ -84,7 +84,11 @@ stage.
   `review_expired`. When only optional controls set a cadence, the review is advisory, and AMC records an open
   warning instead. Event-driven cadences ("on every release") set no date.
 - **manual and incident.** An OWNER suspends with `amc lifecycle transition --to suspended`. P2-26's kill switch
-  calls `suspendAgent(workspace, { agentId, reason: "incident" })`.
+  calls `suspendAgent(workspace, { agentId, reason: "incident" })` for an agent-scoped `stop_all` kill of a governed,
+  active agent. The kill's release does not resume the agent, and resuming it does not lift the kill.
+- **change envelope.** A session whose manifest falls outside the agent's P2-26 change envelope records an open
+  `invalidated_by` reassessment citing the envelope; in a regulated workspace the session is refused and the agent is
+  suspended with `reassessment_required` (see docs/REGULATORY_RUNTIME.md).
 
 A reassessment is a ledger row (`LIFECYCLE_REASSESSMENT`) shaped
 `{ reassessmentId, agentId, trigger, changed, invalidatedControls, requiredTests, status, createdTs, closedTs }`.

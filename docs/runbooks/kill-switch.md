@@ -42,7 +42,10 @@ curl -s -X POST "$AMC_URL/api/v1/runtime/kill-switch/release" \
 ```
 
 The release is signed and must name the kill's incident. Break-glass never
-overrides an active kill switch.
+overrides an active kill switch. An agent-scoped `stop_all` kill also suspended the agent
+(lifecycle reason `incident`); the release does not resume it. An OWNER
+resumes it with `amc lifecycle transition --to active` once the incident is
+closed.
 
 ## 3. Manual fallback (AMC down)
 

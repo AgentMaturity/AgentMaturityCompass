@@ -3,9 +3,9 @@ import { readdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { createIncidentStore } from "../../src/incidents/incidentStore.js";
+import { nativeSessionManifest, type AgentVersionManifest } from "../../src/lifecycle/versionManifest.js";
 import {
-  ChangeEnvelopeBlocked, activateChangeEnvelope, checkChangeEnvelopeAtOpen, manifestSha256, nativeSessionManifest, recordEnvelopeTestResult, requestChangeEnvelope,
-  type AgentVersionManifest
+  ChangeEnvelopeBlocked, activateChangeEnvelope, checkChangeEnvelopeAtOpen, manifestSha256, recordEnvelopeTestResult, requestChangeEnvelope
 } from "../../src/runtime/changeEnvelope.js";
 import { AGENT, AUDITOR, OWNER, cleanupGovernanceFixtures, decideBound, governanceFixture, loginAs, type GovernanceFixture } from "../governor/governanceFixture.js";
 
@@ -17,8 +17,9 @@ vi.mock("../../src/catalog/compiler/activate.js", async (importOriginal) => {
 vi.setConfig({ testTimeout: 60_000 });
 
 const baseline: AgentVersionManifest = {
-  model: { providerId: "anthropic", name: "claude-fixture", providerVersion: "2026-10-01" }, promptDigest: "a".repeat(64),
-  toolsDigest: "b".repeat(64), policyDigest: "c".repeat(64), corpusDigest: null
+  v: 1, agentId: AGENT, deploymentId: "not_bound", model: { providerId: "anthropic", model: "claude-fixture", providerReportedVersion: "2026-10-01" },
+  systemPromptSha256: "a".repeat(64), toolsDigest: "b".repeat(64), policyDigest: "c".repeat(64), compiledPlanDigest: "none", harnessVersion: "fixture",
+  compositionDigest: "e".repeat(64), corpusDigests: []
 };
 const NEW_PROMPT = "d".repeat(64);
 let f: GovernanceFixture;
@@ -38,7 +39,7 @@ async function envelope(over: { allowed?: Parameters<typeof requestChangeEnvelop
   return activateChangeEnvelope(f.workspace, draft.envelopeId, approval);
 }
 const open = (live: AgentVersionManifest, nowTs?: number) => checkChangeEnvelopeAtOpen({ workspace: f.workspace, agentId: AGENT, live, ...(nowTs ? { nowTs } : {}) });
-const withPrompt = (promptDigest: string): AgentVersionManifest => ({ ...baseline, promptDigest });
+const withPrompt = (systemPromptSha256: string): AgentVersionManifest => ({ ...baseline, systemPromptSha256 });
 const tester = () => login("fixture-envelope-tester", "AUDITOR");
 const pass = (envelopeId: string, manifest: AgentVersionManifest, passed = true, sessionTokenFile = tester()) =>
   recordEnvelopeTestResult(f.workspace, { sessionTokenFile, envelopeId, testId: "prompt-regression", passed, manifest });
@@ -82,11 +83,11 @@ describe("change envelopes at session open", () => {
 
   test("a model without a provider-reported version is unpinned", async () => {
     await envelope({ allowed: [{ component: "model", rule: "provider_version_in_set", values: ["2026-11-01"], requiredTests: [] }] });
-    const unversioned = { ...baseline, model: { ...baseline.model, providerVersion: null } };
+    const unversioned = { ...baseline, model: { ...baseline.model, providerReportedVersion: null } };
     expect(() => open(unversioned)).toThrow(ChangeEnvelopeBlocked);
     regulated.value = false;
     expect(open(unversioned)).toMatchObject({ outcome: "warn", unpinned: true });
-    expect(open({ ...baseline, model: { ...baseline.model, providerVersion: "2026-11-01" } })).toMatchObject({ outcome: "allow_in_envelope", unpinned: false });
+    expect(open({ ...baseline, model: { ...baseline.model, providerReportedVersion: "2026-11-01" } })).toMatchObject({ outcome: "allow_in_envelope", unpinned: false });
   });
 
   test("an expired envelope: blocked", async () => {
@@ -128,15 +129,26 @@ describe("change envelopes at session open", () => {
       .rejects.toThrow(/self_attested/);
   });
 
-  test("the session manifest comes from what the session resolves, not the caller's pins", () => {
-    const route = { providerId: "anthropic", model: "claude-fixture" };
-    const base = nativeSessionManifest(f.workspace, { route, systemPrompt: "p", tools: "workspace" });
+  test("the session manifest comes from what the session resolves, not the caller's pins (P2-23's one builder)", () => {
+    const surface = { schemas: () => [{ name: "fs.read" }] };
+    const manifest = (over: Partial<Parameters<typeof nativeSessionManifest>[0]> = {}) => nativeSessionManifest({ workspace: f.workspace, agentId: AGENT,
+      providerId: "anthropic", model: "claude-fixture", systemPrompt: "p", harnessVersion: "fixture", compositionDigest: "e".repeat(64),
+      tools: "workspace", surface, ...over });
+    const base = manifest();
     expect(base.toolsDigest).toMatch(/^[a-f0-9]{64}$/);
-    expect(nativeSessionManifest(f.workspace, { route, systemPrompt: "p", tools: "workspace",
-      additionalCapabilities: [{ name: "mounted.tool", actionClass: "WRITE_HIGH" }] }).toolsDigest).not.toBe(base.toolsDigest);
-    expect(nativeSessionManifest(f.workspace, { route, systemPrompt: "p", tools: "none" }).toolsDigest).not.toBe(base.toolsDigest);
+    // A capability counts by its declaration, so a changed action class moves the digest even with the same schemas.
+    const mounted = manifest({ additionalCapabilities: [{ name: "mounted.tool", actionClass: "READ_ONLY" }] }).toolsDigest;
+    expect(mounted).not.toBe(base.toolsDigest);
+    expect(manifest({ additionalCapabilities: [{ name: "mounted.tool", actionClass: "WRITE_HIGH" }] }).toolsDigest).not.toBe(mounted);
+    expect(manifest({ tools: "none" }).toolsDigest).not.toBe(base.toolsDigest);
+    expect(manifest({ surface: { schemas: () => { throw new Error("pinned digest mismatch"); } } }).toolsDigest).toBeNull();
     writeFileSync(join(f.workspace, ".amc", "tools.yaml"), "tampered: true\n");
-    expect(nativeSessionManifest(f.workspace, { route, systemPrompt: "p", tools: "workspace" }).toolsDigest).toBeNull();
+    expect(manifest().toolsDigest).toBeNull();
+  });
+
+  test("a baseline naming another agent is refused", async () => {
+    await expect(requestChangeEnvelope(f.workspace, { sessionTokenFile: login("fixture-envelope-requester", "OPERATOR"), agentId: AGENT,
+      baseline: { ...baseline, agentId: "someone-else" }, allowed: [], validUntil: Date.now() + 86_400_000 })).rejects.toThrow(/invalid_baseline/);
   });
 
   test("an unresolved tool set always counts as changed", async () => {

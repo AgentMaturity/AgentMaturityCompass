@@ -409,7 +409,9 @@ export class ToolPipeline {
     }
     if (!authorizes) {
       // P2-23: an unbound call (a read or low-impact write) still passes lifecycle admission; suspended and retired agents are held.
-      const lifecycle = lifecycleAdmission(draft.workspace, draft.agentId, { actionClass: draft.actionClass });
+      // A kill is left to the authorization stage, which checks it first, so a killed (and suspended) agent's denial names the kill.
+      const killed = killSwitchDenial(draft.workspace, { kind: "tool", agentId: draft.agentId, actionClass: draft.actionClass }) !== null;
+      const lifecycle = killed ? { ok: true as const } : lifecycleAdmission(draft.workspace, draft.agentId, { actionClass: draft.actionClass });
       return { refused: lifecycle.ok ? null : { stage: "authorization", reason: `agent_not_active: ${lifecycle.reason}`, guardLabel: null },
         context: null, bound: null, required: false };
     }

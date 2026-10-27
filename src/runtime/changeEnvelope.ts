@@ -5,13 +5,15 @@
  *
  * An envelope is a P2-24 bound record: requestChangeEnvelope writes the draft and raises its approval (kind
  * "change-envelope"), activateChangeEnvelope signs it once that approval's quorum is met. At native session open,
+ * admitSessionAtOpen runs P2-23's admitNativeSession with this module's envelopes as its ChangeEnvelopeLookup, then
  * checkChangeEnvelopeAtOpen compares the live manifest with the agent's newest envelope. Identical: allow. Every change
  * admitted by the envelope with passing evidence for its tests: allow, citing the envelope. Otherwise, in a regulated
- * workspace (an active compiled plan): block and record AGENT_REASSESSMENT_REQUIRED; elsewhere warn and record it.
+ * workspace (an active compiled plan): block and record AGENT_REASSESSMENT_REQUIRED (which opens an incident); elsewhere
+ * warn and record it. For an agent P2-23 governs, the same decision is a lifecycle reassessment, and a block suspends it.
  *
- * P2-23 owns the version manifest (src/lifecycle/versionManifest.ts) and reassessment as a lifecycle state; it is built
- * in parallel. AgentVersionManifest below is the minimal shape this module compares, and the AGENT_REASSESSMENT_REQUIRED
- * ledger row is the reassessment record until P2-23's state machine consumes it.
+ * The manifest is P2-23's AgentVersionManifest, built once by nativeSessionManifest (src/lifecycle/versionManifest.ts).
+ * An envelope pins the spec's five components (model, prompt, tool, policy, corpus); a deployment change (deployment id,
+ * harness version, composition) is P2-23's bound-manifest trigger, not an envelope's.
  */
 import { randomUUID } from "node:crypto";
 import { existsSync } from "node:fs";
@@ -26,34 +28,22 @@ import { openLedger } from "../ledger/ledger.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
-import type { NativeToolCapability } from "../agent/nativeToolCapabilities.js";
 import { verifyHexDigestAny } from "../crypto/keys.js";
 import { workspaceOversightPublicKeys } from "../incidents/oversightRecord.js";
 import { assertPurposePublicationCurrent, capturePurposePublication } from "../keys/purposePublication.js";
 import { signWithPurposeKey } from "../keys/purposeProviders.js";
-import { loadVerifiedToolsConfigSnapshot } from "../toolhub/toolhubValidators.js";
-
-/** The minimal manifest P2-26 compares (P2-23 owns the full one; reconcile at integration). */
-export interface AgentVersionManifest {
-  model: { providerId: string; name: string; providerVersion: string | null };
-  promptDigest: string;
-  /** null: the session's tool set could not be resolved, which always counts as changed (fail closed). */
-  toolsDigest: string | null;
-  /** null: the active compiled policy could not be read, which always counts as changed. */
-  policyDigest: string | null;
-  corpusDigest: string | null;
-}
+import { recordEnvelopeReassessment, admitNativeSession, type ChangeEnvelopeLookup } from "../lifecycle/reassessment.js";
+import type { LifecycleView } from "../lifecycle/governanceLifecycle.js";
+import {
+  agentVersionManifestSchema, diffManifests, manifestDigest, unpinnedComponents, type AgentVersionManifest, type ChangeKind
+} from "../lifecycle/versionManifest.js";
 
 const COMPONENTS = ["model", "prompt", "tool", "corpus", "policy"] as const;
 type Component = (typeof COMPONENTS)[number];
 const RULES = ["pinned", "digest_in_set", "provider_version_in_set"] as const;
 
-const manifestSchema = z.strictObject({
-  model: z.strictObject({ providerId: z.string().min(1), name: z.string().min(1), providerVersion: z.string().min(1).nullable() }),
-  promptDigest: z.string().min(1), toolsDigest: z.string().min(1).nullable(), policyDigest: z.string().min(1).nullable(), corpusDigest: z.string().min(1).nullable()
-});
 const draftSchema = z.strictObject({
-  v: z.literal(1), envelopeId: z.string().regex(/^env_[a-f0-9]{24}$/), agentId: z.string().min(1), baseline: manifestSchema,
+  v: z.literal(1), envelopeId: z.string().regex(/^env_[a-f0-9]{24}$/), agentId: z.string().min(1), baseline: agentVersionManifestSchema,
   allowed: z.array(z.strictObject({ component: z.enum(COMPONENTS), rule: z.enum(RULES), values: z.array(z.string().min(1)),
     requiredTests: z.array(z.string().min(1)) })),
   validUntil: z.number().int(), requestedBy: z.string().min(1), createdTs: z.number().int()
@@ -73,11 +63,11 @@ const UNRESOLVED = (): string => `unresolved:${randomUUID()}`;
 /** The value of one component as the envelope's rules compare it. */
 function valueOf(manifest: AgentVersionManifest, component: Component): string {
   switch (component) {
-    case "model": return `${manifest.model.providerId}/${manifest.model.name}@${manifest.model.providerVersion ?? "unpinned"}`;
-    case "prompt": return manifest.promptDigest;
+    case "model": return `${manifest.model.providerId}/${manifest.model.model}@${manifest.model.providerReportedVersion ?? "unpinned"}`;
+    case "prompt": return manifest.systemPromptSha256;
     case "tool": return manifest.toolsDigest ?? UNRESOLVED();
-    case "policy": return manifest.policyDigest ?? UNRESOLVED();
-    case "corpus": return manifest.corpusDigest ?? "none";
+    case "policy": return sha256Hex(canonicalize({ planDigest: manifest.compiledPlanDigest, policyDigest: manifest.policyDigest }));
+    case "corpus": return manifest.corpusDigests.length === 0 ? "none" : sha256Hex(canonicalize([...manifest.corpusDigests].sort()));
   }
 }
 
@@ -86,15 +76,15 @@ function admits(entry: ChangeEnvelope["allowed"][number], live: AgentVersionMani
     case "pinned": return false; // A pinned component admits no change at all.
     case "digest_in_set": return entry.values.includes(valueOf(live, entry.component));
     case "provider_version_in_set":
-      return entry.component === "model" && live.model.providerVersion !== null && entry.values.includes(live.model.providerVersion)
-        && live.model.providerId === baseline.model.providerId && live.model.name === baseline.model.name;
+      return entry.component === "model" && live.model.providerReportedVersion !== null && entry.values.includes(live.model.providerReportedVersion)
+        && live.model.providerId === baseline.model.providerId && live.model.model === baseline.model.model;
   }
 }
 
 export interface EnvelopeDecision {
   outcome: "allow" | "allow_in_envelope" | "block" | "warn";
   envelopeId: string | null;
-  changed: Component[];
+  changed: ChangeKind[];
   reasons: string[];
   /** A model with no provider-reported version: a claim downgrade, never a pass on its own. */
   unpinned: boolean;
@@ -106,13 +96,14 @@ export function evaluateChangeEnvelope(p: {
   /** Whether a verified result shows `testId` passing for this envelope against exactly this live manifest. */
   testPassed: (envelope: ChangeEnvelope, testId: string, live: AgentVersionManifest) => boolean;
 }): EnvelopeDecision {
-  const unpinned = p.live.model.providerVersion === null;
-  const fail = (envelopeId: string | null, changed: Component[], reasons: string[]): EnvelopeDecision =>
+  const unpinned = unpinnedComponents(p.live).length > 0;
+  const fail = (envelopeId: string | null, changed: ChangeKind[], reasons: string[]): EnvelopeDecision =>
     ({ outcome: p.regulated ? "block" : "warn", envelopeId, changed, reasons, unpinned });
   if (p.envelopeProblem !== null) return fail(null, [], [p.envelopeProblem]);
   if (p.envelope === null) return { outcome: "allow", envelopeId: null, changed: [], reasons: ["no change envelope: version pinning is not evaluated"], unpinned };
   const envelope = p.envelope;
-  const changed = COMPONENTS.filter((component) => valueOf(p.live, component) !== valueOf(envelope.baseline, component));
+  // P2-23's diff (a null or blank component counts as changed), limited to the components an envelope pins.
+  const changed = diffManifests(envelope.baseline, p.live).filter((kind): kind is Component => (COMPONENTS as readonly string[]).includes(kind));
   if (p.nowTs > envelope.validUntil) return fail(envelope.envelopeId, changed, [`envelope ${envelope.envelopeId} expired at ${new Date(envelope.validUntil).toISOString()}`]);
   if (changed.length === 0) return { outcome: "allow", envelopeId: envelope.envelopeId, changed, reasons: ["identical to the envelope baseline"], unpinned };
   const reasons: string[] = [];
@@ -176,8 +167,8 @@ const testResultSchema = z.strictObject({
 });
 type EnvelopeTestResult = z.infer<typeof testResultSchema>;
 const resultDigest = (result: EnvelopeTestResult) => sha256Hex(canonicalize(result));
-/** The digest a test result binds: the exact manifest the test ran against. */
-export const manifestSha256 = (manifest: AgentVersionManifest): string => sha256Hex(canonicalize(manifest));
+/** The digest a test result binds: the exact manifest the test ran against (P2-23's manifestDigest, unprefixed). */
+export const manifestSha256 = (manifest: AgentVersionManifest): string => manifestDigest(manifest).slice("sha256:".length);
 
 /**
  * Records one required test's outcome for an envelope: bound to the envelope id, its approval's request digest and the
@@ -243,53 +234,55 @@ export class ChangeEnvelopeBlocked extends Error {
 }
 
 /**
- * The session-open check. With no envelope directory there is nothing to compare and nothing is read. A blocked
- * session throws before any session row exists; a warning or an in-envelope change is recorded in the ledger.
+ * The envelope check at session open. With no envelope directory there is nothing to compare and nothing is read. A
+ * blocked session throws before its first turn; a warning or an in-envelope change is recorded in the ledger, and an
+ * agent P2-23 governs gets the matching reassessment (suspended on a block). `decision` is the one admitSessionAtOpen
+ * already made for the same manifest, so the envelope is read and its evidence weighed once per session open.
  */
-export function checkChangeEnvelopeAtOpen(p: { workspace: string; agentId: string; live: AgentVersionManifest; nowTs?: number }): EnvelopeDecision {
-  if (!existsSync(envelopeDir(p.workspace))) return evaluateChangeEnvelope({ ...p, envelope: null, envelopeProblem: null, regulated: false, nowTs: p.nowTs ?? Date.now(), testPassed: () => false });
-  const { envelope, problem } = activeChangeEnvelope(p.workspace, p.agentId);
-  let regulated: boolean;
-  try { regulated = loadActiveCompiledPolicy(p.workspace) !== null; } catch { regulated = true; } // An unreadable plan cannot prove the workspace unregulated.
-  const decision = evaluateChangeEnvelope({ live: p.live, envelope, envelopeProblem: problem, regulated, nowTs: p.nowTs ?? Date.now(),
-    testPassed: ledgerTestPassed(p.workspace) });
+export function checkChangeEnvelopeAtOpen(p: { workspace: string; agentId: string; live: AgentVersionManifest; nowTs?: number; decision?: EnvelopeDecision }): EnvelopeDecision {
+  const decision = p.decision ?? decideChangeEnvelope(p.workspace, p.agentId, p.live, p.nowTs ?? Date.now());
   const meta = { agentId: p.agentId, envelopeId: decision.envelopeId, changed: decision.changed, reasons: decision.reasons, unpinned: decision.unpinned,
     liveManifestSha256: manifestSha256(p.live) };
-  if (decision.outcome === "block" || decision.outcome === "warn") audit(p.workspace, "AGENT_REASSESSMENT_REQUIRED", { ...meta, outcome: decision.outcome });
+  if (decision.outcome === "block" || decision.outcome === "warn") {
+    audit(p.workspace, "AGENT_REASSESSMENT_REQUIRED", { ...meta, outcome: decision.outcome });
+    recordEnvelopeReassessment(p.workspace, { agentId: p.agentId, manifest: p.live, changed: decision.changed, envelopeId: decision.envelopeId,
+      reasons: decision.reasons, block: decision.outcome === "block" });
+  }
   if (decision.outcome === "allow_in_envelope") audit(p.workspace, "CHANGE_ENVELOPE_APPLIED", meta);
   if (decision.outcome === "block") throw new ChangeEnvelopeBlocked(decision);
   return decision;
 }
 
-/** The digest of a session that exposes no tools; the same rule as P2-23's nativeSessionManifest. */
-const NO_TOOLS_DIGEST = sha256Hex("amc.native-tools/none");
+function decideChangeEnvelope(workspace: string, agentId: string, live: AgentVersionManifest, nowTs: number): EnvelopeDecision {
+  if (!existsSync(envelopeDir(workspace))) return evaluateChangeEnvelope({ live, envelope: null, envelopeProblem: null, regulated: false, nowTs, testPassed: () => false });
+  const { envelope, problem } = activeChangeEnvelope(workspace, agentId);
+  let regulated: boolean;
+  try { regulated = loadActiveCompiledPolicy(workspace) !== null; } catch { regulated = true; } // An unreadable plan cannot prove the workspace unregulated.
+  return evaluateChangeEnvelope({ live, envelope, envelopeProblem: problem, regulated, nowTs, testPassed: ledgerTestPassed(workspace) });
+}
 
 /**
- * The live manifest of a native session at open, from what the session resolves, never from the caller's pins: the
- * route, the system prompt, the tool set (mode, the verified signed tools.yaml and every additional capability), and
- * the active compiled policy. A tool set or policy that cannot be resolved is null, which counts as changed. No
- * provider reports a version before the first response, so the model is unpinned.
+ * Native session open (src/agent/agentSession.ts, src/kernel/agentLoopRunner.ts): P2-23's admission, whose invalidated_by
+ * trigger asks this module whether an envelope covers the change, then the envelope check itself. The manifest is built
+ * once, and only when one of them needs it: never for a retired agent, nor for an ungoverned one in a workspace without
+ * envelopes. An envelope covers a change when the live manifest is its approved baseline or every change is inside it
+ * with passing tests.
  */
-export function nativeSessionManifest(workspace: string, init: { route: { providerId: string; model: string }; systemPrompt: string;
-  tools?: "none" | "workspace"; additionalCapabilities?: readonly NativeToolCapability[] }): AgentVersionManifest {
-  let toolsDigest: string | null;
-  if ((init.tools ?? "workspace") === "none") {
-    toolsDigest = NO_TOOLS_DIGEST;
-  } else {
-    try {
-      const snapshot = loadVerifiedToolsConfigSnapshot(workspace);
-      const capabilities = [...(init.additionalCapabilities ?? [])].map((c) => canonicalize(c)).sort();
-      toolsDigest = snapshot.signatureValid && snapshot.digestSha256
-        ? sha256Hex(canonicalize({ mode: "workspace", toolsConfig: snapshot.digestSha256, additionalCapabilities: capabilities })) : null;
-    } catch { toolsDigest = null; }
-  }
-  let policyDigest: string | null;
-  try {
-    const active = loadActiveCompiledPolicy(workspace);
-    policyDigest = active === null ? "none" : sha256Hex(canonicalize({ planDigest: active.planDigest, policyDigest: active.runtimePolicy.policyDigest }));
-  } catch { policyDigest = null; }
-  return { model: { providerId: init.route.providerId, name: init.route.model, providerVersion: null }, promptDigest: sha256Hex(init.systemPrompt),
-    toolsDigest, policyDigest, corpusDigest: null };
+export function admitSessionAtOpen(p: { workspace: string; agentId: string; manifest: () => AgentVersionManifest; now?: number }): LifecycleView {
+  const nowTs = p.now ?? Date.now();
+  let live: AgentVersionManifest | undefined;
+  const manifest = (): AgentVersionManifest => (live ??= p.manifest());
+  let decision: EnvelopeDecision | undefined;
+  const decide = (): EnvelopeDecision => (decision ??= decideChangeEnvelope(p.workspace, p.agentId, manifest(), nowTs));
+  const hasEnvelopes = existsSync(envelopeDir(p.workspace));
+  const covers: ChangeEnvelopeLookup = () => {
+    if (!hasEnvelopes) return null;
+    const d = decide();
+    return (d.outcome === "allow" || d.outcome === "allow_in_envelope") && d.envelopeId !== null ? { envelopeId: d.envelopeId } : null;
+  };
+  const view = admitNativeSession({ workspace: p.workspace, agentId: p.agentId, manifest, now: nowTs, envelope: covers });
+  if (hasEnvelopes) checkChangeEnvelopeAtOpen({ workspace: p.workspace, agentId: p.agentId, live: manifest(), nowTs, decision: decide() });
+  return view;
 }
 
 export interface ChangeEnvelopeRequest {
@@ -304,6 +297,7 @@ export interface ChangeEnvelopeRequest {
 /** Step 1: write the draft and raise its P2-24 approval (the requester's own decision never counts). */
 export async function requestChangeEnvelope(workspace: string, input: ChangeEnvelopeRequest): Promise<{ draft: EnvelopeDraft; approval: BoundApproval }> {
   const requester = sessionPrincipal(workspace, input.sessionTokenFile);
+  if (input.baseline.agentId !== input.agentId) throw new BoundRecordError("invalid_baseline", `the baseline manifest names agent ${input.baseline.agentId}, not ${input.agentId}`);
   const draft = draftSchema.parse({ v: 1, envelopeId: `env_${randomUUID().replace(/-/g, "").slice(0, 24)}`, agentId: input.agentId,
     baseline: input.baseline, allowed: input.allowed, validUntil: input.validUntil, requestedBy: requester.userId, createdTs: Date.now() });
   if (draft.validUntil <= draft.createdTs) throw new BoundRecordError("invalid_window", "an envelope must be valid after it is requested");

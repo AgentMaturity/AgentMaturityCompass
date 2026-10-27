@@ -20,9 +20,10 @@ import { SessionService } from "../session/sessionService.js";
 import { redactingSessionFor } from "../dataflow/redactingSession.js";
 import { resumeSession } from "../session/sessionResume.js";
 import { runLease } from "../leases/runLease.js";
-import { admitNativeSession, refuseRetired } from "../lifecycle/reassessment.js";
+import { refuseRetired } from "../lifecycle/reassessment.js";
 import { nativeSessionManifest } from "../lifecycle/versionManifest.js";
 import type { RecoveryClaimant } from "../session/sessionRecovery.js";
+import { admitSessionAtOpen } from "../runtime/changeEnvelope.js";
 
 /**
  * One AMC session, many prompts (plan P7.1a).
@@ -226,10 +227,12 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
       toolset = init.tools === "none" ? undefined : makeToolset();
       const tools = init.bindTools?.({ session, toolset: toolset ?? null }) ?? toolset?.seam ?? EMPTY_TOOL_SEAM;
       const systemPromptEventId = session.recordSystemPrompt(init.systemPrompt).eventId;
-      // P2-23: the reassessment triggers run on the composed tool surface, before the first turn.
-      admitNativeSession({ workspace, agentId: init.agentId, manifest: () => nativeSessionManifest({ workspace, agentId: init.agentId,
+      // P2-23 reassessment triggers and P2-26 change envelopes run on the composed tool surface, before the first turn;
+      // an out-of-envelope change throws here and the session is closed below.
+      admitSessionAtOpen({ workspace, agentId: init.agentId, manifest: () => nativeSessionManifest({ workspace, agentId: init.agentId,
         providerId: init.route.providerId, model: init.route.model, systemPrompt: init.systemPrompt, harnessVersion: init.harnessVersion,
-        compositionDigest: init.compositionDigest, tools: init.tools ?? "workspace", surface: tools }) });
+        compositionDigest: init.compositionDigest, tools: init.tools ?? "workspace", surface: tools,
+        ...(init.additionalCapabilities === undefined ? {} : { additionalCapabilities: init.additionalCapabilities }) }) });
       driver = new AgentDriver({
         session,
         llm: init.makeLlm(session),
