@@ -1,0 +1,26 @@
+# P2-09 qualification receipts (2026-10-27)
+
+Branches: `rtd/p2-09a-ledger-encryption` → `rtd/p2-09b-worm-export` → `rtd/p2-09c-guard-events-cutover` → `rtd/p2-09d-postgres` (stacked). Machine: macOS 26.6.2 arm64, Node v22.23.3, shared with other agents (vitest `--maxWorkers=2`). ADR: `docs/adr/018-encrypted-ledger-worm-postgres.md` (proposed; **Sid approval pending**).
+
+## 09a: ledger encryption, downgrade guard, WAL-safe backup
+
+New tests (all pass): `tests/ledgerEncryption.test.ts` (6), `tests/ledgerEncryptionMigration.test.ts` (4), `tests/ledgerDowngradeGuard.test.ts` (2), `tests/backupWalSafety.test.ts` (2).
+
+Existing tests: 362 files that import `src/ledger`, `src/storage`, backup, retention, guard events, the payload read path or the key bridge (list in `a-related-files.txt`). Under load 49 files had failures; the same 49 files were rerun on the base (`7bdb1627a`, stashed tree, rebuilt `dist`): every failure that remained on this branch also fails on the base (113 failing tests on the base, among them `asyncBackupCreate`, `embeddedKeyForgery`, many `tests/keys/async*`). Two regressions found that way were fixed before commit: CLI tests replace `dist/keys/providerBridge.js` with a stub, so the sync unwrap moved to `src/ledger/encryption/syncUnwrap.ts`; and `tests/actions/receiptStates.test.ts` encoded "current schema is v13" and the unchanged `protect_evidence_immutable` trigger, updated for migration 14.
+
+Red/green:
+- Downgrade guard: with the `assertSchemaNotNewer` call removed, `ledgerDowngradeGuard` "refuses a ledger holding a migration one above…" fails; restored, passes.
+- WAL-safe backup: on the base `backupEngine.ts`, `backupWalSafety` fails deterministically on the sidecar assertion (the manifest carries `.amc/evidence.sqlite-wal`/`-shm`). Without that assertion the byte copy failed 1 of 3 runs (`SqliteError: database is locked` on the restored copy), so the torn-copy failure is real but not deterministic on this machine.
+- Encryption features are new behaviour (no prior code path to fail).
+
+Mutation checks (each made one named test fail, then restored):
+- AAD dropped (`aadBytes` → empty buffer): "refuses a ciphertext moved to another row (AAD binds the row id)" fails.
+- Appends allowed without a key (`sealInline` falls back to plaintext on error): "denies the append with the provider's reason when the KeyProvider is down" fails.
+- Downgrade guard call removed: see above.
+
+Checks on the 09a tree: build, typecheck, typecheck:tests, lint, check:gates, check:dead-code (0 new), check:counts (after `gen-counts --write`), check:docs-drift, check:architecture-boundaries, check:api-ref pass. check:duplicates reports 3 `transformation/transformApi.ts` findings that the base reports identically (not touched here); two re-fingerprinted pre-existing clones were accepted with reasons. check:freeze fails on the base already (P3-14, P2-30 not in the base baseline) and P2-09 must be added to `allowedExceptionKeys` by the integrator: a PR cannot authorize itself.
+
+## Pending Sid
+
+- Approve or reject ADR 018 (the code follows its proposal).
+- Add `P2-09` to `scripts/freeze-baseline.json` `allowedExceptionKeys` on the base (new CLI paths: `amc evidence-stores encrypt`, and in later branches the WORM and cutover commands).

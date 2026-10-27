@@ -94,6 +94,38 @@ export function registerEvidenceStoreCommands(program: Command): void {
     });
 
   stores
+    .command("encrypt")
+    .description("Encrypt existing inline evidence payloads under the ledger data key (P2-09)")
+    .option("--key-provider <id>", "provider of the wrapping key for a new data key (default: file)")
+    .option("--key-ref <id>", "wrapping key id: KMS ARN or name, Key Vault URL, PKCS#11 URI, or a vault wrap-key name")
+    .option("--rotate-key", "add a new data key version first; old rows keep theirs")
+    .option("--rewrap", "re-wrap every data key version (under --key-ref when given) and stop; no ciphertext changes")
+    .option("--json", "Output as JSON")
+    .action(async (opts: { keyProvider?: string; keyRef?: string; rotateKey?: boolean; rewrap?: boolean; json?: boolean }) => {
+      const { encryptExistingLedger } = await import("./ledger/encryption/encryptMigration.js");
+      const { rewrapDataKeys, rotateDataKey } = await import("./ledger/encryption/dataKeys.js");
+      const { KEY_PROVIDER_IDS } = await import("./keys/provider.js");
+      const workspace = process.cwd();
+      const provider = KEY_PROVIDER_IDS.find((id) => id === (opts.keyProvider ?? "file"));
+      if (!provider) throw new Error(`--key-provider must be one of ${KEY_PROVIDER_IDS.join(", ")}`);
+      const ref = opts.keyRef ? { provider, id: opts.keyRef } : undefined;
+      if (opts.rewrap) {
+        const keys = await rewrapDataKeys(workspace, { ref });
+        console.log(opts.json ? JSON.stringify({ rewrapped: keys.map((key) => key.keyVersion) }) : chalk.green(`Re-wrapped ${keys.length} ledger data key version(s).`));
+        return;
+      }
+      if (opts.rotateKey) await rotateDataKey(workspace, { ref });
+      const result = await encryptExistingLedger(workspace, { ref });
+      if (opts.json) {
+        console.log(JSON.stringify(result, null, 2));
+        return;
+      }
+      console.log(chalk.green(`Encrypted ${result.receipt.rowsEncrypted} row(s) under data key version ${result.receipt.keyVersion}; ${result.receipt.rowsSkipped} already encrypted.`));
+      console.log(chalk.gray(`Chain head unchanged: ${result.receipt.chainHeadAfter}`));
+      console.log(chalk.gray(`Signed receipt: ${result.receiptPath}`));
+    });
+
+  stores
     .command("backfill")
     .description("Copy guard events written before dual-write into evidence.sqlite")
     .action(async () => {

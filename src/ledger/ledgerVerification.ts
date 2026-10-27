@@ -31,7 +31,8 @@ import { verifyActionPolicySignature } from "../governor/actionPolicyEngine.js";
 import { verifyToolsConfigSignature } from "../toolhub/toolhubValidators.js";
 import { verifyReceipt } from "../receipts/receipt.js";
 import { verifyEvidencePayload } from "./retentionVerification.js";
-import { openLedger, targetsDir, canonicalMetadataForHash, type Ledger, type EvidenceLedgerReader } from "./ledger.js";
+import { recomputeEventHash } from "./encryption/ledgerCipher.js";
+import { openLedger, targetsDir, type Ledger, type EvidenceLedgerReader } from "./ledger.js";
 import { extractEnvelope } from "../session/sessionTypes.js";
 import { readSessionWriter } from "../session/sessionOwnership.js";
 import { verifySessionChains } from "./sessionVerification.js";
@@ -180,17 +181,7 @@ export function verifyEvidenceEventIntegrity(input: {
     if (prefixEvent.prev_event_hash !== previousHash) {
       errors.push(`Event ${prefixEvent.id} previous hash mismatch`);
     }
-    const canonicalMetadata = canonicalMetadataForHash({
-      id: prefixEvent.id,
-      ts: prefixEvent.ts,
-      sessionId: prefixEvent.session_id,
-      runtime: prefixEvent.runtime,
-      eventType: prefixEvent.event_type,
-      payloadPath: prefixEvent.canonical_payload_path ?? prefixEvent.payload_path,
-      payloadInline: prefixEvent.canonical_payload_inline ?? prefixEvent.payload_inline,
-      metaJson: prefixEvent.meta_json
-    });
-    const recalculated = sha256Hex(`${prefixEvent.prev_event_hash}${canonicalMetadata}${prefixEvent.payload_sha256}`);
+    const recalculated = recomputeEventHash(input.ledger.workspace, prefixEvent, errors);
     if (recalculated !== prefixEvent.event_hash) errors.push(`Event ${prefixEvent.id} event_hash mismatch`);
     if (!verifyHexDigestAny(prefixEvent.event_hash, prefixEvent.writer_sig, monitorKeys)) {
       errors.push(`Event ${prefixEvent.id} writer signature invalid`);
@@ -293,18 +284,7 @@ function verifyEvents(
       errors.push(`Event ${event.id} previous hash mismatch`);
     }
 
-    const canonicalMetadata = canonicalMetadataForHash({
-      id: event.id,
-      ts: event.ts,
-      sessionId: event.session_id,
-      runtime: event.runtime,
-      eventType: event.event_type,
-      payloadPath: event.canonical_payload_path ?? event.payload_path,
-      payloadInline: event.canonical_payload_inline ?? event.payload_inline,
-      metaJson: event.meta_json
-    });
-
-    const recalculated = sha256Hex(`${event.prev_event_hash}${canonicalMetadata}${event.payload_sha256}`);
+    const recalculated = recomputeEventHash(workspace, event, errors);
     if (recalculated !== event.event_hash) {
       errors.push(`Event ${event.id} event_hash mismatch`);
     }

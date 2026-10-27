@@ -14,6 +14,7 @@ import { sha256Hex } from "../utils/hash.js";
 import { loadBlobPlaintext } from "../storage/blobs/blobStore.js";
 import type { RetentionProofIndex } from "../ops/retention/retentionArchive.js";
 import type { EvidenceEvent } from "../types.js";
+import { inlinePlaintextOrNull } from "./encryption/ledgerCipher.js";
 
 export function verifyEvidencePayload(
   event: EvidenceEvent,
@@ -24,7 +25,17 @@ export function verifyEvidencePayload(
 ): void {
   verifyEventRetentionState(event, workspace, errors, retentionProofs);
   if (event.payload_inline !== null) {
-    const payloadSha = sha256Hex(Buffer.from(event.payload_inline, "utf8"));
+    // P2-09: an encrypted inline payload is checked only where its key is available; without the key the chain
+    // (which covers the ciphertext) still verifies and this content check is not evaluated.
+    let plain: string | null;
+    try {
+      plain = inlinePlaintextOrNull(workspace, event.id, event.payload_inline);
+    } catch {
+      errors.push(`Event ${event.id} payload authentication failed`);
+      return;
+    }
+    if (plain === null) return;
+    const payloadSha = sha256Hex(Buffer.from(plain, "utf8"));
     if (payloadSha !== event.payload_sha256) errors.push(`Event ${event.id} payload hash mismatch`);
     return;
   }

@@ -388,7 +388,7 @@ describe("P1-03 evidence coverage and durability", () => {
   });
 });
 
-test("a real historical v11 file migrates to current v13 including action tables, preserves data and is logically idempotent", () => {
+test("a real historical v11 file migrates to current v14 including action tables, preserves data and is logically idempotent", () => {
   const root = mkdtempSync(join(tmpdir(), "amc-p103-migration-")); roots.push(root);
   const bytes = readFileSync(fileURLToPath(new URL("../fixtures/actions/ledgerSchemaV11.ts", import.meta.url)));
   expect(bytes.length).toBe(20_118);
@@ -406,14 +406,15 @@ test("a real historical v11 file migrates to current v13 including action tables
     db.prepare("INSERT INTO amc_guard_events(id,agent_id,module_code,decision,reason,severity,created_at) VALUES ('synthetic-migration-guard','default','TEST','deny','synthetic migration sentinel','low','1970-01-01T00:00:00.001Z')").run();
     const before = logical(db);
     runMigrations(db);
-    expect(db.prepare("SELECT version FROM schema_migrations ORDER BY version").all()).toEqual(Array.from({ length: 13 }, (_, i) => ({ version: i + 1 })));
+    expect(db.prepare("SELECT version FROM schema_migrations ORDER BY version").all()).toEqual(Array.from({ length: 14 }, (_, i) => ({ version: i + 1 })));
     for (const name of ["action_executions", "action_transitions", "a4_projects"]) expect(db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name=?").get(name)).toEqual({ name });
     const after = logical(db);
     for (const [name, rows] of Object.entries(before.rows)) {
       if (name === "schema_migrations") expect(after.rows[name]!.slice(0, 11)).toEqual(rows);
       else expect(after.rows[name], name).toEqual(rows);
     }
-    for (const entry of before.schema) expect(after.schema).toContainEqual(entry);
+    // P2-09 migration 14 replaces protect_evidence_immutable (one-way plaintext-to-ciphertext change); every other entry stays.
+    for (const entry of before.schema) if (!JSON.stringify(entry).includes("protect_evidence_immutable")) expect(after.schema).toContainEqual(entry);
     runMigrations(db);
     expect(logical(db)).toEqual(after);
     expect(db.pragma("integrity_check")).toEqual([{ integrity_check: "ok" }]);
