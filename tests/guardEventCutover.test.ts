@@ -75,4 +75,23 @@ describe("guard-events cutover (P2-09c)", () => {
     expect(result.prunedGuardEventCount).toBe(1);
     expect(compareGuardEventStores({ workspace, legacyDbPath })).toMatchObject({ identical: true, legacyRows: 1, consolidatedRows: 1 });
   });
+
+  it("prunes the evidence store, now primary, and the frozen legacy file under CUTOVER", () => {
+    const old = new Date(Date.now() - 10 * 86_400_000).toISOString();
+    emit("old");
+    expect(cutOverGuardEvents({ workspace, legacyDbPath }).cutOver).toBe(true);
+    closeGuardDb();
+    emit("old-after-cutover");
+    emit("new");
+    for (const db of [new Database(legacyDbPath), openLedger(workspace).db]) {
+      db.prepare("UPDATE amc_guard_events SET created_at = ? WHERE reason LIKE 'old%'").run(old);
+    }
+    const policy = loadOpsPolicy(workspace);
+    policy.opsPolicy.retention.pruneGuardEventsAfterDays = 5;
+    writeFileSync(opsPolicyPath(workspace), YAML.stringify(policy));
+    signOpsPolicy(workspace);
+    const result = withWorkspaceScope(workspace, () => runRetention({ workspace, dryRun: false }));
+    expect(result.prunedGuardEventCount).toBe(2);
+    expect(compareGuardEventStores({ workspace, legacyDbPath })).toMatchObject({ legacyRows: 0, consolidatedRows: 1 });
+  });
 });

@@ -23,7 +23,7 @@ import { withDeletionGate, DeletionDenied } from "../../residency/deletionGate.j
 import { opsPolicyPath, opsPolicySigPath, opsPolicySchema, verifyOpsPolicyBytes } from "../policy.js";
 import { appendOpsAuditEvent } from "../audit.js";
 import { pruneGuardEvents } from "../../enforce/evidenceEmitter.js";
-import { currentStage, pruneConsolidatedGuardEvents } from "../../storage/consolidation/guardEventConsolidation.js";
+import { currentStage, pruneConsolidatedGuardEvents, pruneLegacyGuardEvents } from "../../storage/consolidation/guardEventConsolidation.js";
 import { captureRetentionProofs, verifyPrunedSnapshot } from "./retentionArchive.js";
 import { retentionSegmentSignatureSchema, blobPrunedSealSchema } from "./retentionSchema.js";
 import { captureRetentionFile, captureRetentionBlob, assertRetentionFilesCurrent, retentionHead, assertRetentionHeadCurrent, prepareRetentionSegment,
@@ -301,8 +301,10 @@ function guardRows(run: Run): void {
   gate(run); run.progress.attemptedStages.push("guard-prune");
   const before = new Date(run.guardBeforeTs).toISOString();
   run.result.prunedGuardEventCount = pruneGuardEvents(run.workspace, before);
-  // P2-09c: under DUAL_WRITE the evidence store's copy is pruned too, so the stores stay in parity.
+  // P2-09c: pruneGuardEvents prunes the stage's primary store; the other copy is pruned with the same cutoff, so
+  // retention reaches the evidence store under DUAL_WRITE and the frozen legacy file after cutover.
   if (currentStage(run.workspace) === "DUAL_WRITE") pruneConsolidatedGuardEvents(run.workspace, before);
+  else pruneLegacyGuardEvents(run.workspace, before);
   run.progress.guardResult = run.result.prunedGuardEventCount;
 }
 function finish(run: Run): void {

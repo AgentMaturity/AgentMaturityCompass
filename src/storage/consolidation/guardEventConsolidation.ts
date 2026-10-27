@@ -87,6 +87,23 @@ export function cutOverGuardEvents(params: { workspace: string; legacyDbPath: st
 }
 
 /**
+ * Under CUTOVER, prunes the frozen legacy file with the same cutoff as the evidence store, through the hold-aware
+ * deletion gate, so retention reaches every copy. Reverting to DUAL_WRITE still works for rows inside the window.
+ */
+export function pruneLegacyGuardEvents(workspace: string, beforeIso: string): number {
+  const legacyDbPath = join(workspace, ".amc", "guard_events.sqlite");
+  if (!Number.isFinite(Date.parse(beforeIso)) || !existsSync(legacyDbPath)) return 0;
+  const db = new Database(legacyDbPath);
+  try {
+    const result = withDeletionGate({ workspace, executor: "guard-events.prune-legacy", target: { kind: "guard-events", before: new Date(beforeIso).toISOString() } },
+      () => db.prepare("DELETE FROM amc_guard_events WHERE created_at < ?").run(beforeIso));
+    return Number(result.changes ?? 0);
+  } finally {
+    db.close();
+  }
+}
+
+/**
  * Under DUAL_WRITE, prunes the evidence store's copy as `pruneGuardEvents` prunes the legacy file, through the same
  * hold-aware deletion gate (P2-01), so both stores stay in parity and the copy is no longer something nothing prunes.
  */
