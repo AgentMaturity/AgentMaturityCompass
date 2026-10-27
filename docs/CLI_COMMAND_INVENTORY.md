@@ -617,7 +617,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc indices` | Compute deterministic failure-risk indices | `--run <runId>`<br>`--agent <agentId>`<br>`--out <path>` | - |
 | `amc indices fleet` | Compute failure-risk indices across fleet | `--window <window>`<br>`--out <path>` | - |
 | `amc ingest` | Ingest external logs/transcripts as SELF_REPORTED evidence | `--type <kind>`<br>`--agent <agentId>` | - |
-| `amc init` | Initialize .amc workspace | `--trust-boundary <mode>`<br>`--profile <name>`<br>`--force`<br>`--skip-vault`<br>`--minimal`<br>`--coding`<br>`--regulated` | - |
+| `amc init` | Initialize .amc workspace | `--trust-boundary <mode>`<br>`--profile <name>`<br>`--force`<br>`--skip-vault`<br>`--minimal`<br>`--coding`<br>`--regulated`<br>`--web-allow-host <host>` | - |
 | `amc insider-alerts` | Show insider risk alerts | `--actor <id>`<br>`--ack <alertId>` | - |
 | `amc insider-risk-report` | Generate insider risk analytics report | `--window <days>` | - |
 | `amc insider-risk-scores` | Show insider risk scores by actor | - | - |

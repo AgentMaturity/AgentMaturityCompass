@@ -22,7 +22,7 @@ const view: NativeTaskView = { taskId, sessionId: "route-unit-session", agentId:
   maxSteps: 2, maxTokens: 64, state: "idle", archived: false, createdAt: 1, updatedAt: 2, turnEndReason: null, error: null,
   validationSelection: null, validationOutputs: [], validation: { status: "not-requested", turn: null, configSha256: null, checks: [] },
   verification: "not-verified", verificationScope: null, approvals: [], approvalError: null, nextCursor: 0, firstCursor: 1, droppedEvents: 0, canResume: false,
-  resumeBlockedReason: null, history: { status: "not-started", backend: null, headEventHash: null, eventCount: 0, message: "Synthetic routing fixture" } };
+  resumeBlockedReason: null, history: { status: "not-started", backend: null, headEventHash: null, eventCount: 0, message: "Synthetic routing fixture" }, execution: null };
 const configuration: NativeTaskConfiguration = { schemaVersion: "2026-09-08", agentId: "default", demo: false,
   providers: [{ id: "gemini-audio", local: false, model: "required", credential: { ref: "GEMINI_API_KEY", configured: false, source: null }, input: nativeTaskInputCapabilities("gemini-audio") }],
   validation: { ready: false, configSha256: null, checks: [], message: "No operator checks configured." },
@@ -38,7 +38,8 @@ function fakeService() {
     poll: vi.fn<NativeTaskService["poll"]>(() => ({ task: view, events: [], truncated: false })),
     cancel: vi.fn<NativeTaskService["cancel"]>(() => view), release: vi.fn<NativeTaskService["release"]>(async () => view),
     resume: vi.fn<NativeTaskService["resume"]>(async () => view), verify: vi.fn<NativeTaskService["verify"]>(async () => view),
-    archive: vi.fn<NativeTaskService["archive"]>(() => view), close: vi.fn<NativeTaskService["close"]>(async () => {})
+    archive: vi.fn<NativeTaskService["archive"]>(() => view), fork: vi.fn<NativeTaskService["fork"]>(async () => view),
+    close: vi.fn<NativeTaskService["close"]>(async () => {})
   } satisfies NativeTaskService;
 }
 async function fixture(auth: StudioApiAuthContext | null = human) {
@@ -130,6 +131,22 @@ describe("P10 native media HTTP admission", () => {
       expect(flagged.status).toBe(400);
       expect(f.service.verify).not.toHaveBeenCalled();
     }
+  });
+
+  test("P2-13: fork is a CSRF-guarded mutation with a strict body, refused read-only, and reaches the service with the authenticated owner", async () => {
+    const f = await fixture(), path = `/api/v1/native-tasks/${taskId}/fork?agentId=default`, fork = { clientRequestId: requestId, expectedRevision: 1 };
+    for (const headers of [{ [NATIVE_INTENT_HEADER]: undefined }, { [NATIVE_CSRF_HEADER]: undefined }, { origin: "https://attacker.invalid" }]) {
+      expect((await f.post(path, fork, headers)).status).toBe(403);
+    }
+    for (const body of [{ ...fork, sessionId: "another-parent" }, { ...fork, principalId: "forged" }, { expectedRevision: 1 }, { ...fork, clientRequestId: "not-a-uuid" }]) {
+      expect((await f.post(path, body)).status).toBe(400);
+    }
+    expect(f.service.fork).not.toHaveBeenCalled();
+    expect((await f.post(path, fork)).status).toBe(202);
+    expect(f.service.fork).toHaveBeenCalledWith({ principalId: "session:LOCAL_USER:p10-stable-user", agentId: "default", demo: false }, taskId, fork);
+    f.readOnly();
+    expect((await f.post(path, { ...fork, clientRequestId: "0ebd57dd-e8c0-48d0-99af-b888d5141002" })).status).toBe(403);
+    expect(f.service.fork).toHaveBeenCalledTimes(1);
   });
 
   test("follow-ups cannot mutate validation, model or authority, and require an exact revision", async () => {

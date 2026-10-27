@@ -10,7 +10,8 @@ and `src/agent/agentToolset.ts`.
 > them, so in a default workspace the model is not offered any of them and every
 > call is denied by the signed tool allowlist. An operator who wants one must
 > list it in a signed `tools.yaml` (with origins for the web tools), as shown
-> below. Plan item P2-13 adds profiles that enable them.
+> below. Since P2-13, `amc init --coding --web-allow-host <host>` lists `web_fetch`
+> and `web_search` with exactly those origins (see docs/sdk/EXECUTION_API.md).
 
 Each tool refuses unless a signed policy or a composed dependency explicitly
 permits the call. Registering a tool does not grant it. A call has to pass the
@@ -203,9 +204,12 @@ own keys are a local audit trail only.
 
 ## Not covered here
 
-- **Enabling:** no default template, starter profile or shipped `.amc/tools.yaml`
-  lists these tools. Profiles that enable them, an `ask_user` answerer surface and
-  a shared workspace egress allowlist are P2-13.
+- **Enabling:** no default template or shipped `.amc/tools.yaml` lists these
+  tools. The only starter profile that lists any is `amc init --coding
+  --web-allow-host <host>`, which grants `web_fetch` and `web_search` the named
+  origins; `--regulated` lists none. `ask_user`, `todo` and `plan` stay off in
+  both profiles, and there is no `ask_user` answerer surface or shared workspace
+  egress allowlist yet.
 - **Ledger tail:** the read-time check verifies every row up to the newest one it
   finds. Deleting the newest rows of an open session together with restoring an
   older record file is not caught by that read. A native session writer's head

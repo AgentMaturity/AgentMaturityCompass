@@ -2218,11 +2218,12 @@ program
   .option("--minimal", "Startup-friendly setup without vault prompt or immediate full score", false)
   .option("--coding", "Starter profile: signed coding tools, a contained shell without network, firewall warn (P1-40)")
   .option("--regulated", "Starter profile: deny-by-default egress, firewall block, approvals on, a signed Layer 0 plan (P1-40)")
-  .action(async (opts: { trustBoundary?: "isolated" | "shared"; profile: "dev" | "ci" | "prod"; force: boolean; skipVault: boolean; minimal: boolean; coding?: boolean; regulated?: boolean }) => {
+  .option("--web-allow-host <host>", "--coding only: also grant web_fetch and web_search this exact host or origin in the signed tools policy; repeatable (P2-13)", (v: string, p: string[] = []) => [...p, v])
+  .action(async (opts: { trustBoundary?: "isolated" | "shared"; profile: "dev" | "ci" | "prod"; force: boolean; skipVault: boolean; minimal: boolean; coding?: boolean; regulated?: boolean; webAllowHost?: string[] }) => {
     const { starterProfileFlag, runStarterInit } = await import("./setup/starterProfiles.js");
     try {
       const starter = starterProfileFlag(opts);
-      if (starter) { await runStarterInit(process.cwd(), starter, opts.force); return; }
+      if (starter) { await runStarterInit(process.cwd(), starter, opts.force, opts.webAllowHost); return; }
     } catch (error) { console.error(chalk.red(toErrorMessage(error))); process.exit(1); }
     // Force mode: delete existing .amc directory before re-init
     if (opts.force) {
