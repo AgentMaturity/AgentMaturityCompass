@@ -170,3 +170,37 @@ P2-23 owns the version manifest (`src/lifecycle/versionManifest.ts`) and
 reassessment as a lifecycle state, and is built in parallel. Until they are
 reconciled, `AgentVersionManifest` here is the minimal shape compared and the
 `AGENT_REASSESSMENT_REQUIRED` ledger row is the reassessment record.
+
+## Slice D: retention per regime and provider exit
+
+### Retention floors
+
+`src/ops/retention/regimeRetention.ts` builds `RegimeRetentionRule`s
+(`regimeId`, `registerRef`, `minimumDays`, `maximumDays`, `appliesTo`,
+`wormRequired`, `residency`, `verified: false`) from the active compiled
+plan's applicable requirements:
+
+| Rule | When | Floor |
+|---|---|---|
+| `eu-ai-act-art-26-6-deployer-logs` | L0-LOG-03 (logging and retention) with citation `eu-ai-act-art-26-6` in scope | logs, 183 days |
+| `in-cert-in-logs-180d` | a requirement pulled in by `jurisdiction:IN` | logs, 180 days, residency IN (no register row yet) |
+| `us-sec-17a-4-records` | a citation key starting `sec-17a-4` in scope (none in the catalog yet) | receipts, 2,190 days, WORM |
+
+The effective minimum per record class is the largest applicable one.
+Signing an ops policy (`amc ops` sign paths) and running retention (not a
+dry run) are refused with `REGIME_RETENTION_REFUSED`, naming each knob and
+regime, when `prunePayloadsAfterDays`, `pruneGuardEventsAfterDays` or
+`keepArchiveSegmentsDays` would delete a class sooner than its floor. A plan
+that cannot be read refuses too. Conflicting maximums are listed for a
+reviewer. A rule that needs WORM leaves its control `not_evaluated` until a
+WORM export target is configured (P2-09 has no configured-target registry
+yet). Initialising the default ops policy is not refused; running or
+re-signing it under a plan with floors is. Residency is named, and enforced
+by P2-01's residency registry, not here.
+
+### Provider exit
+
+See [the provider-exit runbook](runbooks/provider-exit.md). The drill writes a
+signed `amc.drill/1` receipt. The provider-outage detector (bursts in
+`amc_gateway_failures_total`) is not built: nothing records that metric yet,
+and the gateway has no line budget left for the call.

@@ -24,7 +24,7 @@ export interface SignedDrillReceipt<T extends object> {
 }
 
 /** Signs a drill receipt with the workspace's artifact-seal key; verifyDrillReceipt checks it against that key history. */
-async function signDrillReceipt<T extends object>(workspace: string, body: T & { schema: "amc.drill/1"; drillId: string }): Promise<SignedDrillReceipt<T>> {
+export async function signDrillReceipt<T extends object>(workspace: string, body: T & { schema: "amc.drill/1"; drillId: string }): Promise<SignedDrillReceipt<T>> {
   const digestSha256 = sha256Hex(canonicalize(body));
   const signed = await signWithPurposeKey(workspace, "artifact-seal", Buffer.from(digestSha256, "hex"));
   return { body, digestSha256, signature: signed.signature.toString("base64"), signerPublicKeyPem: signed.publicKeyPem };

@@ -101,7 +101,7 @@ export interface EnvelopeDecision {
 }
 
 /** Pure: the decision for one live manifest against one envelope (or none, or one that could not be verified). */
-function evaluateChangeEnvelope(p: {
+export function evaluateChangeEnvelope(p: {
   live: AgentVersionManifest; envelope: ChangeEnvelope | null; envelopeProblem: string | null; regulated: boolean; nowTs: number;
   /** Whether a verified result shows `testId` passing for this envelope against exactly this live manifest. */
   testPassed: (envelope: ChangeEnvelope, testId: string, live: AgentVersionManifest) => boolean;
@@ -130,7 +130,7 @@ function evaluateChangeEnvelope(p: {
 }
 
 /** The agent's newest verified envelope, or a problem when any envelope file fails verification (never silently skipped). */
-function activeChangeEnvelope(workspace: string, agentId: string): { envelope: ChangeEnvelope | null; problem: string | null } {
+export function activeChangeEnvelope(workspace: string, agentId: string): { envelope: ChangeEnvelope | null; problem: string | null } {
   const read = readSignedRecords(workspace, envelopeDir(workspace), "change-envelope", (raw) => envelopeSchema.parse(raw));
   const invalid = [...read.invalid];
   const mine: ChangeEnvelope[] = [];
@@ -208,7 +208,7 @@ export async function recordEnvelopeTestResult(workspace: string, p: {
  * signature verifies against the workspace's artifact-seal key history. The newest such result per (envelope, approval,
  * manifest, test) decides; a result by the envelope's requester or its agent never counts; anything else is no evidence.
  */
-function ledgerTestPassed(workspace: string): (envelope: ChangeEnvelope, testId: string, live: AgentVersionManifest) => boolean {
+export function ledgerTestPassed(workspace: string): (envelope: ChangeEnvelope, testId: string, live: AgentVersionManifest) => boolean {
   const ledger = openLedger(workspace, { readonly: true });
   let rows: Array<{ meta_json: string }>;
   try {
