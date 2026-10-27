@@ -114,6 +114,7 @@ The signature (revocation-list purpose) covers `AMC_REVOCATION_LIST_V1`, 0x00 an
 
 - Lease revocations: `.amc/studio/leases/revocations.signed.json` ([LEASES.md](LEASES.md)).
 - Key revocations: `.amc/keys/revocations.signed.json` (`keys:<workspaceId>`). Every key set starts one, empty. `amc keys revoke --purpose <p> --key-id <id> --reason key-compromise|superseded|unspecified` adds a retired key; a key still in use is refused (rotate first). Every key use checks the list: a revoked current key is refused, and a missing, unverifiable, rolled-back or forked list refuses every key. The workspace self-check distrusts revoked keys; portable verifiers learn of a revocation when the trust-list owner publishes it.
+- Revoking the key that signs `.amc/trust.yaml` (P0-37). trust.yaml refuses a revoked signer, so before the list is staged the revocation checks trust.yaml under the pre-revocation state: when it verifies and the key being revoked signs it, its bytes are re-signed unchanged (NOTARY settings included) by the current artifact-seal key, and policy signing keeps working. When it does not verify (tampered, or its signer was already retired or revoked), it is left as it is and stays refused; the revocation still completes, and its output's `trustConfig` names the reason and the recovery command (`amc trust resign --confirm`, or `amc trust init` for content that verifies under no history key). No trust.yaml state blocks a revocation: trust.yaml is writable by anyone who can write the workspace, so the revocation's own transparency append seals with the vault's artifact-seal key when the trust config is refused (under a NOTARY config that one seal is vault-signed; the next append after recovery re-seals through the notary).
 
 ## Anti-rollback
 
@@ -190,6 +191,7 @@ amc keys rotate --restore   # owner mode: put back the key set this machine comm
 amc keys rotate --accept <generation> --digest <sha256> [--allow-gap <reason>]   # owner mode, on a machine that adopted the key set
 amc keys rotate --quarantine-unbound-pub                  # owner mode, with no keyset.json: move unbound purpose files aside
 amc keys revoke --purpose <p> --key-id <id> --reason key-compromise|superseded|unspecified
+amc trust resign --confirm   # owner mode: re-sign trust.yaml in place after its signer was retired or revoked
 amc keys export-public --purpose <p>
 ```
 
