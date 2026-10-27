@@ -51,3 +51,12 @@ Pending:
 - **Checks.** All 11 checks passed (architecture after fitting ToolHub's line budget).
 - **Related tests.** 181 files, 2,575 tests: 3 failed, all from the entry-point test's mock import order, which was
   then fixed. The `tests/lifecycle` and `lifecycleRouter` files were re-run afterwards: 15 files, 56 tests passed.
+
+## Suspension holds in every workspace (commit `0981eff04`)
+
+- **Rule.** A suspended or retired agent is now denied whether or not the plan enforces `L0-CHG-01`. The advisory
+  warning-only mode now applies only to agents not yet active.
+- **Red before the fix.** `red-before-advisory-hold.txt` shows 2 tests failing on the previous sources.
+- **Mutations.** `mutations-advisory-hold.json` records M22 and M23; both were killed.
+- **Checks.** All 11 checks passed.
+- **Related tests.** The full set of 181 files (2,576 tests) passed.

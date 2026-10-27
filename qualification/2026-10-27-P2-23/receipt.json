@@ -199,5 +199,61 @@
   },
   "mutations": "mutations-held-agents.json",
   "red": "red-before-held-agents.txt"
+ },
+ "advisoryHold": {
+  "commit": "0981eff04",
+  "checks": [
+   {
+    "cmd": "npm run -s build",
+    "exit": 0
+   },
+   {
+    "cmd": "npm run -s typecheck",
+    "exit": 0
+   },
+   {
+    "cmd": "npm run -s typecheck:tests",
+    "exit": 0
+   },
+   {
+    "cmd": "npm run -s lint",
+    "exit": 0
+   },
+   {
+    "cmd": "npm run -s check:gates",
+    "exit": 0
+   },
+   {
+    "cmd": "npm run -s check:dead-code",
+    "exit": 0
+   },
+   {
+    "cmd": "npm run -s check:duplicates",
+    "exit": 0
+   },
+   {
+    "cmd": "npm run -s check:counts",
+    "exit": 0
+   },
+   {
+    "cmd": "npm run -s check:api-ref",
+    "exit": 0
+   },
+   {
+    "cmd": "npm run -s check:docs-drift",
+    "exit": 0
+   },
+   {
+    "cmd": "npm run -s check:architecture-boundaries",
+    "exit": 0
+   }
+  ],
+  "relatedTests": {
+   "testFiles": 181,
+   "tests": 2576,
+   "failed": 0
+  },
+  "mutations": "mutations-advisory-hold.json",
+  "red": "red-before-advisory-hold.txt"
  }
 }
