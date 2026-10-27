@@ -4,7 +4,7 @@
  * keys. It is anchored when the exported ledger row it names (evidence-event, `eventHash` = `event_hash`) carries a
  * writerSignature by a key admitted for `ledger-row`.
  */
-import { base64UrlDecode, isCanonicalSignatureBase64, parseJson, same, verifyEd25519 } from "../bytes.js";
+import { base64UrlDecode, isCanonicalSignatureBase64, parseJson, same, verifySignature } from "../bytes.js";
 import type { Finding } from "../codes.js";
 import { notRecomputable, result, scopeResult, type Env, type Evaluation } from "../evaluation.js";
 import { actionReceipt, evidenceEvent, receiptPayload, type ActionReceipt, type ReceiptPayload } from "../records/evidence.js";
@@ -13,7 +13,7 @@ import { admit, listedKeys, type Admission, type TrustContext } from "../trust.j
 import { refused } from "./common.js";
 
 function signerOf(message: Uint8Array, signature: Uint8Array, ctx: TrustContext): string | null {
-  return listedKeys(ctx).find(key => verifyEd25519(message, key.publicKeyPem, signature))?.keyId ?? null;
+  return listedKeys(ctx).find(key => verifySignature(message, key.publicKeyPem, signature))?.keyId ?? null;
 }
 
 interface Anchor {

@@ -1,3 +1,4 @@
+import type { SignatureEnvelope } from "../crypto/signing/signerTypes.js";
 import { readFileSync } from "node:fs";
 import { signSerializedPayloadWithAuditor } from "../org/orgSigner.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -8,19 +9,7 @@ export function signBenchJson(workspace: string, bench: BenchArtifact): {
   signature: string;
   signedTs: number;
   signer: "auditor";
-  envelope?: {
-    v: 1;
-    alg: "ed25519";
-    pubkeyB64: string;
-    fingerprint: string;
-    sigB64: string;
-    signedTs: number;
-    signer: {
-      type: "VAULT" | "NOTARY";
-      attestationLevel: "SOFTWARE" | "HARDWARE";
-      notaryFingerprint?: string;
-    };
-  };
+  envelope?: SignatureEnvelope;
 } {
   return benchSignatureSchema.parse(signSerializedPayloadWithAuditor(workspace, JSON.stringify(bench)));
 }

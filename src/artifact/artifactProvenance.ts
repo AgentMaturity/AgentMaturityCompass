@@ -1,19 +1,30 @@
 import { randomUUID } from "node:crypto";
 import { readFileSync } from "node:fs";
-import { basename, extname, relative, resolve } from "node:path";
+import { basename, resolve } from "node:path";
 import { z } from "zod";
 import {
   getSigningKey,
-  getPublicKeyHistory,
   getPublicKeyPem,
-  signHexDigest,
-  verifyHexDigestAny
+  signHexDigest
 } from "../crypto/keys.js";
 import { openLedger } from "../ledger/ledger.js";
 import { pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { amcVersion } from "../version.js";
+import { SIGNING_ALGORITHMS, canonicalSigningKey, signingKeyId, verifyWithKey } from "../keys/algorithmPolicy.js";
+import { capturePurposePublication, assertPurposePublicationCurrent } from "../keys/purposePublication.js";
+import { signWithPurposeKey } from "../keys/purposeProviders.js";
+import { assertKeysetComplete, keysetDeclared } from "../keys/keyset.js";
+import { getPurposeKeyHistory, getSigningPublicKeyPem, readHistory } from "../keys/signingKeys.js";
+import { assertKeyNotRevoked } from "../keys/keyRevocations.js";
+import { builtInDistrust } from "../trust/builtInDistrust.js";
+import { vaultStatus } from "../vault/vault.js";
+import { distrustAt } from "../trust/admissionRule.js";
+import { normalizePathForManifest, mediaTypeFromFile, defaultManifestPath, defaultSignaturePath, computePromptDigest, normalizeEvidenceRefs,
+  buildChain, validateChain, buildC2paSection, recordArtifactEvidence, captureProvenanceFile, assertProvenanceFile, assertDistinctProvenanceFiles,
+  withProvenanceFiles, assertSelectedProvenanceEvidence, ArtifactProvenancePublicationError } from "./artifactProvenanceSupport.js";
+export { ArtifactProvenancePublicationError } from "./artifactProvenanceSupport.js";
 
 const hexDigestSchema = z.string().regex(/^[a-f0-9]{64}$/);
 const provenanceNodeSchema = z.enum(["artifact", "agent", "model", "prompt", "evidence"]);
@@ -84,7 +95,7 @@ export const artifactProvenanceManifestSchema = z.object({
   })
 });
 
-export const artifactProvenanceSignatureSchema = z.object({
+const artifactProvenanceLegacySignatureSchema = z.object({
   schemaVersion: z.literal(1),
   signer: z.literal("monitor"),
   signedTs: z.number().int().nonnegative(),
@@ -93,15 +104,14 @@ export const artifactProvenanceSignatureSchema = z.object({
   signature: z.string().min(1)
 });
 
+const artifactProvenanceReceiptSignatureSchema = z.strictObject({
+  schemaVersion: z.literal(2), signer: z.literal("receipt"), signedTs: z.number().int().nonnegative(), manifestSha256: hexDigestSchema,
+  keyFingerprint: hexDigestSchema, algorithm: z.enum(SIGNING_ALGORITHMS), publicKeyPem: z.string().min(1).max(4096), signature: z.string().min(1)
+});
+export const artifactProvenanceSignatureSchema = z.union([artifactProvenanceLegacySignatureSchema, artifactProvenanceReceiptSignatureSchema]);
+
 export type ArtifactProvenanceManifest = z.infer<typeof artifactProvenanceManifestSchema>;
 export type ArtifactProvenanceSignature = z.infer<typeof artifactProvenanceSignatureSchema>;
-
-const REQUIRED_CHAIN_EDGES = [
-  { from: "artifact", to: "agent", relation: "generated-by" },
-  { from: "agent", to: "model", relation: "executed-with" },
-  { from: "model", to: "prompt", relation: "prompted-by" },
-  { from: "prompt", to: "evidence", relation: "supported-by" }
-] as const;
 
 const TAMPER_CODES = new Set([
   "MISSING_ARTIFACT",
@@ -181,246 +191,13 @@ export interface VerifyArtifactProvenanceResult {
   issues: ArtifactProvenanceIssue[];
 }
 
-function normalizePathForManifest(workspace: string, file: string): string {
-  const rel = relative(resolve(workspace), file).replace(/\\/g, "/");
-  if (!rel || rel.startsWith("..")) {
-    return file;
-  }
-  return rel;
-}
-
-function mediaTypeFromFile(file: string): string {
-  const ext = extname(file).toLowerCase();
-  if (ext === ".txt" || ext === ".md" || ext === ".log" || ext === ".csv") {
-    return "text/plain";
-  }
-  if (ext === ".json" || ext === ".amcprov.json") {
-    return "application/json";
-  }
-  if (ext === ".html" || ext === ".htm") {
-    return "text/html";
-  }
-  if (ext === ".pdf") {
-    return "application/pdf";
-  }
-  if (ext === ".png") {
-    return "image/png";
-  }
-  if (ext === ".jpg" || ext === ".jpeg") {
-    return "image/jpeg";
-  }
-  if (ext === ".yaml" || ext === ".yml") {
-    return "application/yaml";
-  }
-  return "application/octet-stream";
-}
-
-function defaultManifestPath(file: string): string {
-  return `${file}.amcprov.json`;
-}
-
-function defaultSignaturePath(file: string): string {
-  return `${file}.amcprov.sig.json`;
-}
-
-function computePromptDigest(input: SignArtifactProvenanceInput): string | null {
-  if (input.promptTextSha256) {
-    return input.promptTextSha256;
-  }
-  if (input.promptText) {
-    return sha256Hex(Buffer.from(input.promptText, "utf8"));
-  }
-  return null;
-}
-
-function normalizeEvidenceRefs(input: SignArtifactProvenanceInput): {
-  eventIds: string[];
-  refs: Array<{ eventId: string; eventHash: string | null; note: string | null }>;
-} {
-  const eventIds = new Set<string>();
-  const map = new Map<string, { eventId: string; eventHash: string | null; note: string | null }>();
-
-  for (const rawId of input.evidenceEventIds ?? []) {
-    const id = rawId.trim();
-    if (!id) {
-      continue;
-    }
-    eventIds.add(id);
-    if (!map.has(id)) {
-      map.set(id, { eventId: id, eventHash: null, note: null });
-    }
-  }
-
-  for (const ref of input.evidenceRefs ?? []) {
-    const eventId = ref.eventId.trim();
-    if (!eventId) {
-      continue;
-    }
-    const eventHash = ref.eventHash?.trim() ? ref.eventHash.trim() : null;
-    const note = ref.note?.trim() ? ref.note.trim() : null;
-    eventIds.add(eventId);
-    const existing = map.get(eventId);
-    if (!existing) {
-      map.set(eventId, { eventId, eventHash, note });
-      continue;
-    }
-    existing.eventHash = existing.eventHash ?? eventHash;
-    existing.note = existing.note ?? note;
-  }
-
-  if (pathExists(resolve(input.workspace, ".amc", "evidence.sqlite"))) {
-    const ledger = openLedger(input.workspace);
-    try {
-      for (const id of eventIds) {
-        const existing = map.get(id);
-        if (!existing || existing.eventHash) {
-          continue;
-        }
-        const event = ledger.getEventById(id);
-        if (event) {
-          existing.eventHash = event.event_hash;
-        }
-      }
-    } finally {
-      ledger.close();
-    }
-  }
-
-  return {
-    eventIds: [...eventIds].sort((a, b) => a.localeCompare(b)),
-    refs: [...map.values()].sort((a, b) => a.eventId.localeCompare(b.eventId))
-  };
-}
-
-function buildChain(): ArtifactProvenanceManifest["chain"] {
-  return REQUIRED_CHAIN_EDGES.map((edge) => ({
-    from: edge.from,
-    to: edge.to,
-    relation: edge.relation
-  }));
-}
-
-function validateChain(
-  chain: ArtifactProvenanceManifest["chain"]
-): Array<{ from: string; to: string; relation: string }> {
-  const missing: Array<{ from: string; to: string; relation: string }> = [];
-  for (const required of REQUIRED_CHAIN_EDGES) {
-    const found = chain.some(
-      (edge) =>
-        edge.from === required.from &&
-        edge.to === required.to &&
-        edge.relation === required.relation
-    );
-    if (!found) {
-      missing.push(required);
-    }
-  }
-  return missing;
-}
-
-function buildC2paSection(params: {
-  filePath: string;
-  promptSha: string | null;
-  promptRef: string | null;
-  evidenceRefs: Array<{ eventId: string; eventHash: string | null }>;
-  evidenceDatasetSha256: string | null;
-}): ArtifactProvenanceManifest["c2pa"] {
-  const ingredients: ArtifactProvenanceManifest["c2pa"]["ingredients"] = [];
-  if (params.promptSha) {
-    ingredients.push({
-      title: params.promptRef ?? "prompt",
-      relationship: "prompt",
-      sha256: params.promptSha
-    });
-  }
-  for (const ref of params.evidenceRefs) {
-    if (!ref.eventHash) {
-      continue;
-    }
-    ingredients.push({
-      title: `evidence:${ref.eventId}`,
-      relationship: "input",
-      sha256: ref.eventHash
-    });
-  }
-  if (params.evidenceDatasetSha256) {
-    ingredients.push({
-      title: "evidence-dataset",
-      relationship: "input",
-      sha256: params.evidenceDatasetSha256
-    });
-  }
-  return {
-    format: "application/vnd.c2pa.manifest+json",
-    title: basename(params.filePath),
-    claimGenerator: `amc/${amcVersion}`,
-    assertions: ["amc.agent", "amc.model", "amc.prompt", "amc.evidence"],
-    ingredients
-  };
-}
-
-function recordArtifactEvidence(params: {
-  workspace: string;
-  subjectPath: string;
-  subjectSha256: string;
-  manifestPath: string;
-  signaturePath: string;
-  manifestSha256: string;
-  agentId: string;
-  modelId: string;
-  promptSha256: string | null;
-}): void {
-  const ledger = openLedger(params.workspace);
-  const sessionId = `artifact-provenance-${randomUUID().replace(/-/g, "")}`;
-  const payload = canonicalize({
-    file: params.subjectPath,
-    sha256: params.subjectSha256,
-    manifestSha256: params.manifestSha256,
-    manifestPath: normalizePathForManifest(params.workspace, params.manifestPath),
-    signaturePath: normalizePathForManifest(params.workspace, params.signaturePath)
-  });
-  try {
-    ledger.startSession({
-      sessionId,
-      runtime: "unknown",
-      binaryPath: "amc artifact sign",
-      binarySha256: sha256Hex("amc artifact sign")
-    });
-    ledger.appendEvidence({
-      sessionId,
-      runtime: "unknown",
-      eventType: "artifact",
-      payload,
-      payloadExt: "json",
-      inline: true,
-      meta: {
-        agentId: params.agentId,
-        modelId: params.modelId,
-        promptSha256: params.promptSha256,
-        questionId: "AMC-PROV-1",
-        provenance: {
-          profile: "AMC-C2PA-INSPIRED/1",
-          manifestPath: normalizePathForManifest(params.workspace, params.manifestPath),
-          signaturePath: normalizePathForManifest(params.workspace, params.signaturePath)
-        },
-        trustTier: "OBSERVED"
-      }
-    });
-    ledger.sealSession(sessionId);
-  } finally {
-    ledger.close();
-  }
-}
-
-export function signArtifactProvenance(
-  input: SignArtifactProvenanceInput
-): SignArtifactProvenanceResult {
+function prepareArtifactProvenance(input: SignArtifactProvenanceInput, output?: Buffer, readonlyLookup = false) {
   const workspace = resolve(input.workspace);
   const file = resolve(workspace, input.file);
-  if (!pathExists(file)) {
+  if (output === undefined && !pathExists(file)) {
     throw new Error(`artifact file not found: ${file}`);
   }
-  const bytes = readFileSync(file);
+  const bytes = output ?? readFileSync(file);
   const fileSha256 = sha256Hex(bytes);
   const promptSha256 = computePromptDigest(input);
   if (!promptSha256 && !input.promptRef && !input.promptId) {
@@ -429,7 +206,7 @@ export function signArtifactProvenance(
   const evidence = normalizeEvidenceRefs({
     ...input,
     workspace
-  });
+  }, readonlyLookup);
   if (evidence.eventIds.length === 0 && evidence.refs.length === 0) {
     throw new Error("at least one evidence reference is required for provenance chain");
   }
@@ -491,6 +268,13 @@ export function signArtifactProvenance(
   });
 
   const manifestSha256 = sha256Hex(Buffer.from(canonicalize(manifest), "utf8"));
+  return { workspace, file, fileSha256, promptSha256, manifestPath, signaturePath, manifest, manifestSha256, evidence };
+}
+
+export function signArtifactProvenance(
+  input: SignArtifactProvenanceInput
+): SignArtifactProvenanceResult {
+  const { workspace, file, fileSha256, promptSha256, manifestPath, signaturePath, manifest, manifestSha256 } = prepareArtifactProvenance(input);
   const monitorPublicKey = getPublicKeyPem(workspace, "monitor");
   const signature = artifactProvenanceSignatureSchema.parse({
     schemaVersion: 1,
@@ -543,6 +327,63 @@ export function signArtifactOutput(
     workspace,
     file
   });
+}
+
+
+function provenanceInput(input: SignArtifactProvenanceInput): SignArtifactProvenanceInput {
+  return { ...input, evidenceEventIds: input.evidenceEventIds?.slice(), evidenceRefs: input.evidenceRefs?.map(row => ({ ...row })) };
+}
+function provenanceMaySign(): void { if (process.env.AMC_NO_SIGN === "1") throw new Error("artifact provenance signing is unavailable in no-sign mode"); }
+async function signPreparedArtifactProvenance(input: SignArtifactProvenanceInput, output?: Buffer): Promise<SignArtifactProvenanceResult> {
+  provenanceMaySign(); const workspace = resolve(input.workspace), captured = capturePurposePublication(workspace, "receipt");
+  const file = resolve(workspace, input.file), manifestPath = resolve(workspace, input.manifestFile ?? defaultManifestPath(file)), signaturePath = resolve(workspace, input.signatureFile ?? defaultSignaturePath(file));
+  if (output === undefined && !pathExists(file)) throw new Error("artifact file not found");
+  const paths = [file, manifestPath, signaturePath], original = withProvenanceFiles(paths, () => {
+    const files = paths.map(captureProvenanceFile); assertDistinctProvenanceFiles(paths, files); return files;
+  });
+  const prepared = prepareArtifactProvenance({ ...input, workspace, file }, output ?? original[0]!.bytes!, true);
+  const monitor = getPublicKeyPem(workspace, "monitor"), signedTs = Date.now();
+  const beforeSign = () => withProvenanceFiles(paths, () => {
+    provenanceMaySign();
+    assertSelectedProvenanceEvidence(workspace, prepared.evidence.usedLedgerRefs);
+    paths.forEach((path, index) => assertProvenanceFile(path, original[index]!)); assertDistinctProvenanceFiles(paths, original);
+  });
+  const signed = await signWithPurposeKey(workspace, "receipt", Buffer.from(prepared.manifestSha256, "hex"), { beforeSign });
+  const assertVaultCurrent = () => { if (signed.provider === "file" && !vaultStatus(workspace).unlocked) throw new Error("vault locked; unlock required for artifact provenance publication"); };
+  assertVaultCurrent();
+  const legacy = signed.provider === "file" && signed.algorithm === "ed25519" && canonicalSigningKey(monitor)?.pem === monitor && signed.publicKeyPem === monitor;
+  const signature = artifactProvenanceSignatureSchema.parse({ schemaVersion: legacy ? 1 : 2, signer: legacy ? "monitor" : "receipt", signedTs,
+    manifestSha256: prepared.manifestSha256, keyFingerprint: signed.keyId, signature: signed.signature.toString("base64"),
+    ...(legacy ? {} : { algorithm: signed.algorithm, publicKeyPem: signed.publicKeyPem }) });
+  const manifestBytes = `${canonicalize(prepared.manifest)}\n`, signatureBytes = `${canonicalize(signature)}\n`, published: string[] = [];
+  let phase = "files", attemptedPath: string | null = null, evidenceState: "not-started" | "attempted" = "not-started";
+  try {
+    withProvenanceFiles(paths, () => {
+      provenanceMaySign(); assertVaultCurrent(); assertPurposePublicationCurrent(workspace, captured, signed);
+      paths.forEach((path, index) => assertProvenanceFile(path, original[index]!)); assertDistinctProvenanceFiles(paths, original);
+      assertSelectedProvenanceEvidence(workspace, prepared.evidence.usedLedgerRefs);
+      if (output !== undefined) { phase = "artifact"; attemptedPath = file; writeFileAtomic(file, output, 0o644); published.push(file); }
+      phase = "manifest"; attemptedPath = manifestPath; writeFileAtomic(manifestPath, manifestBytes, 0o644); published.push(manifestPath);
+      phase = "signature"; attemptedPath = signaturePath; writeFileAtomic(signaturePath, signatureBytes, 0o644); published.push(signaturePath);
+    });
+    attemptedPath = null;
+    if (input.recordEvidence ?? true) {
+      phase = "record-evidence"; evidenceState = "attempted";
+      recordArtifactEvidence({ workspace, subjectPath: prepared.manifest.subject.path, subjectSha256: prepared.manifest.subject.sha256,
+        manifestPath, signaturePath, manifestSha256: prepared.manifestSha256, agentId: prepared.manifest.assertions.agent.agentId,
+        modelId: prepared.manifest.assertions.model.modelId, promptSha256: prepared.promptSha256 });
+    }
+  } catch (cause) { if (published.length || attemptedPath !== null) throw new ArtifactProvenancePublicationError([...published], phase, evidenceState, cause, attemptedPath); throw cause; }
+  return { file, fileSha256: prepared.fileSha256, manifestPath, signaturePath, manifestSha256: prepared.manifestSha256, manifest: prepared.manifest, signature };
+}
+/** Used SDK successor: the literal receipt issuer signs the original raw32 manifest digest. */
+export async function signArtifactProvenanceAsync(input: SignArtifactProvenanceInput): Promise<SignArtifactProvenanceResult> {
+  return signPreparedArtifactProvenance(provenanceInput(input));
+}
+/** New async output publishes no artifact until its signature/authority/input checks have completed. */
+export async function signArtifactOutputAsync(input: SignArtifactOutputInput): Promise<SignArtifactProvenanceResult> {
+  const copied = provenanceInput(input), bytes = Buffer.isBuffer(input.output) ? Buffer.from(input.output) : Buffer.from(input.output, "utf8");
+  return signPreparedArtifactProvenance(copied, bytes);
 }
 
 export function verifyArtifactProvenance(
@@ -636,28 +477,25 @@ export function verifyArtifactProvenance(
       });
     }
 
-    const monitorKeys = getPublicKeyHistory(workspace, "monitor");
-    if (
-      !verifyHexDigestAny(
-        signature.manifestSha256,
-        signature.signature,
-        monitorKeys
-      )
-    ) {
-      issues.push({
-        code: "SIGNATURE_INVALID",
-        message: "manifest signature verification failed"
-      });
-    }
-    const knownFingerprints = new Set(
-      monitorKeys.map((pem) => sha256Hex(Buffer.from(pem, "utf8")))
-    );
-    if (!knownFingerprints.has(signature.keyFingerprint)) {
-      issues.push({
-        code: "SIGNER_FINGERPRINT_MISMATCH",
-        message: "signature key fingerprint does not match monitor key history"
-      });
-    }
+    const record = signature;
+    assertKeysetComplete(workspace);
+    const receiptKeys = getPurposeKeyHistory(workspace, "receipt"), bytes = Buffer.from(record.manifestSha256, "hex"), raw = Buffer.from(record.signature, "base64");
+    const matching = receiptKeys.filter(pem => verifyWithKey(bytes, pem, raw));
+    const distrust = builtInDistrust(), now = Date.now();
+    const usable = matching.length > 0 && matching.every(pem => {
+      const keyId = signingKeyId(pem); if (keyId === null) return false;
+      try { assertKeyNotRevoked(workspace, keysetDeclared(workspace), keyId, "receipt"); return distrustAt(distrust, keyId, now) === undefined; }
+      catch { return false; }
+    });
+    if (!usable || raw.toString("base64") !== record.signature) issues.push({ code: "SIGNATURE_INVALID", message: "manifest receipt-purpose signature verification failed" });
+    const localReceipt = record.schemaVersion === 1 && keysetDeclared(workspace)
+      ? new Set(readHistory(workspace, "receipt", getSigningPublicKeyPem(workspace, "receipt"))?.entries.filter(entry => entry.source === "local").map(entry => entry.publicKeyPem) ?? []) : null;
+    const localMonitor = record.schemaVersion === 1 && keysetDeclared(workspace)
+      ? new Set(readHistory(workspace, "ledger-row", getSigningPublicKeyPem(workspace, "ledger-row"))?.entries.filter(entry => entry.source === "local").map(entry => entry.publicKeyPem) ?? []) : null;
+    const identity = matching.some(pem => signingKeyId(pem) === record.keyFingerprint && (record.schemaVersion === 1
+      ? canonicalSigningKey(pem)?.algorithm === "ed25519" && canonicalSigningKey(pem)?.pem === pem && (localMonitor === null || localMonitor.has(pem)) && (localReceipt === null || localReceipt.has(pem))
+      : canonicalSigningKey(pem)?.pem === record.publicKeyPem && canonicalSigningKey(pem)?.algorithm === record.algorithm));
+    if (!identity) issues.push({ code: "SIGNER_FINGERPRINT_MISMATCH", message: "signature key identity does not match its verifying receipt-purpose key" });
 
     const missingEdges = validateChain(manifest.chain);
     for (const edge of missingEdges) {
@@ -717,7 +555,7 @@ export function verifyArtifactProvenance(
           message: "ledger not found; cannot verify evidence references"
         });
       } else {
-        const ledger = openLedger(workspace);
+        const ledger = openLedger(workspace, { readonly: true });
         try {
           const refById = new Map<string, { eventHash: string | null }>();
           for (const id of manifest.assertions.evidence.eventIds) {

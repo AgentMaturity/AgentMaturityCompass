@@ -4,6 +4,7 @@ import { verifySignedDigest } from "../crypto/signing/signer.js";
 import { orgSignatureSchema } from "../org/orgSchema.js";
 import { sha256Hex } from "../utils/hash.js";
 import { NativeExecutableError } from "./nativeExecutableSchema.js";
+import { verifyPluginSignedBytes } from "./pluginPublication.js";
 
 function assertPath(root: string, file: string): void {
   if (realpathSync(root) !== root || !lstatSync(root).isDirectory()) throw new Error("invalid root");
@@ -47,15 +48,20 @@ export function readNativeExecutableFile(root: string, file: string, limit: numb
   }
 }
 
-/** Uses the existing AMC signing-policy verifier, never a signature-valid caller flag. */
-export function readNativeExecutableSignedJson(workspace: string, path: string, limit: number): { value: unknown; digest: string } {
+/** Fixed BUNDLE keeps the old fatal UTF-8/BOM parser; INSTALLED_LOCK and unspecified compatibility retain their protocols. */
+export function readNativeExecutableSignedJson(workspace: string, path: string, limit: number, kind?: "INSTALLED_LOCK" | "BUNDLE"): { value: unknown; digest: string } {
   const bytes = readNativeExecutableFile(workspace, path, limit);
   const signatureBytes = readNativeExecutableFile(workspace, `${path}.sig`, 65_536);
   const digest = sha256Hex(bytes);
   try {
-    const signature = orgSignatureSchema.parse(JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(signatureBytes)));
-    if (signature.digestSha256 !== digest || !verifySignedDigest({ workspace, digestHex: digest,
-      signed: { signature: signature.signature, envelope: signature.envelope } })) throw new Error("untrusted signature");
+    const signatureText = new TextDecoder("utf-8", { fatal: true }).decode(signatureBytes);
+    const signature = orgSignatureSchema.parse(JSON.parse(signatureText));
+    const valid = kind === "INSTALLED_LOCK"
+      ? verifyPluginSignedBytes(workspace, relative(workspace, path), "INSTALLED_LOCK", bytes, signatureBytes).valid
+      : kind === "BUNDLE"
+        ? verifyPluginSignedBytes(workspace, relative(workspace, path), "BUNDLE", bytes, Buffer.from(signatureText, "utf8")).valid
+        : verifySignedDigest({ workspace, digestHex: digest, signed: { signature: signature.signature, envelope: signature.envelope } });
+    if (signature.digestSha256 !== digest || !valid) throw new Error("untrusted signature");
     return { value: JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes)) as unknown, digest };
   } catch {
     throw new NativeExecutableError("EXECUTABLE_AUTHORITY_INVALID", "Executable extension authority requires an unchanged valid signature from this AMC workspace.");

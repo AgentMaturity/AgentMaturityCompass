@@ -1,3 +1,6 @@
+import { captureRunHashAuthority, type RunHashPublicationOptions } from "../ledger/runHashSignature.js";
+import { publishDiagnosticReport } from "./runReportPublication.js";
+import { captureInstantDiagnosticSnapshot, type InstantDiagnosticSnapshot } from "./instantDiagnosticSnapshot.js";
 import { randomUUID } from "node:crypto";
 import { readdirSync } from "node:fs";
 import { join, resolve } from "node:path";
@@ -48,7 +51,7 @@ import { countAttestedOnce, evidenceProducer, readerTrustFor, type ReaderTrust }
 import { deriveDeterministicAudits, persistAuditFindings, type AuditFinding } from "./audits.js";
 import { loadTargetProfile, verifyTargetProfileSignature } from "../targets/targetProfile.js";
 import { loadAMCConfig } from "../workspace.js";
-import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
+import { pathExists, readUtf8 } from "../utils/fs.js";
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
 import { parseWindowToMs, dayKey } from "../utils/time.js";
@@ -499,19 +502,34 @@ export function enforceHighRiskSandboxRequirement(params: {
   };
 }
 
-export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPath?: string): Promise<DiagnosticReport> {
+export function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPath?: string, options: RunHashPublicationOptions = {}): Promise<DiagnosticReport> {
+  return runDiagnosticCore(input, outputMarkdownPath, options);
+}
+/** Internal fixed instant consumer: no caller datasets, filenames, options or signer selection. */
+export function captureInitializedInstantDiagnostic(workspace: string, agentId: string, assertOriginal: () => void, assertCompleted: () => void) {
+  const prepared = captureInstantDiagnosticSnapshot(workspace, agentId, assertOriginal, assertCompleted);
+  let entered = false;
+  return Object.freeze({ assertCurrent: prepared.assertOriginalCurrent, diagnose() {
+    if (entered) throw new Error("initialized instant diagnostic has already entered"); entered = true;
+    const snapshot = prepared.complete();
+    return runDiagnosticCore({ workspace, agentId, window: "30d", targetName: "default", claimMode: "auto", noSign: false }, undefined, { beforePublish: snapshot.assertCurrent }, snapshot);
+  } });
+}
+async function runDiagnosticCore(input: RunDiagnosticInput, outputMarkdownPath?: string, options: RunHashPublicationOptions = {}, instant?: InstantDiagnosticSnapshot): Promise<DiagnosticReport> {
+  const { beforePublish, synchronousSeal } = options; input = { ...input }; beforePublish?.();
   const unsignedStore = process.env.AMC_NO_SIGN === "1"; // P0-55, as runAssurance: unsigned whatever the caller passed
   if (unsignedStore) input = { ...input, noSign: true };
-  const workspace = input.workspace;
+  const workspace = input.workspace, assertOriginal = captureRunHashAuthority(workspace, Boolean(input.noSign || synchronousSeal));
   const agentId = resolveAgentId(workspace, input.agentId);
   const agentPaths = getAgentPaths(workspace, agentId);
-  const config = loadAMCConfig(workspace);
-  const selectedQuestionSet = getQuestionSet({
+  const config = instant?.config ?? loadAMCConfig(workspace);
+  const selectedQuestionSet = instant?.questionSet ?? getQuestionSet({
     version: input.questionSetVersion,
     workspace,
     applyIndustryPackWeights: input.applyIndustryPackWeights
   });
   const activeQuestions = selectedQuestionSet.questions;
+  instant?.assertCurrent();
   const ledger = openLedger(workspace, unsignedStore ? { store: "unsigned" } : {});
   const runId = randomUUID();
   let signedEvidence: ReturnType<typeof openLedger> | null = null; // an unsigned run still reads signed evidence, read-only
@@ -520,6 +538,7 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
     if (unsignedStore && pathExists(join(workspace, ".amc", "evidence.sqlite"))) signedEvidence = openLedger(workspace, { readonly: true });
     // P0-55: verify the signed rows an unsigned run reads; its own unverified rows read UNSIGNED, never a ledger failure.
     const verification = unsignedStore && !signedEvidence ? { ok: true } : await verifyLedgerIntegrity(workspace);
+    instant?.assertCurrent();
     const now = Date.now();
     const windowMs = parseWindowToMs(input.window || "14d");
     const windowStartTs = now - windowMs;
@@ -535,7 +554,7 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
     }
 
     const trustBoundary = detectTrustBoundaryViolation(workspace, config);
-    const contextGraph = loadContextGraph(workspace, agentId);
+    const contextGraph = instant?.contextGraph ?? loadContextGraph(workspace, agentId);
     configuredRiskTier = contextGraph.riskTier;
     const contextSummary = summarizeContextGraphForPrompt(contextGraph);
     const gatewayConfigPresent = pathExists(join(workspace, ".amc", "gateway.yaml"));
@@ -568,6 +587,7 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
       riskTier: configuredRiskTier
     });
     if (!input.noSign || unsignedStore) { // P0-55: an unsigned run's audits land in its own store, so the caps still apply
+      instant?.assertCurrent();
       persistAuditFindings(ledger, derivedAudits, runId);
       _cachedAllEvents = null;
     }
@@ -579,6 +599,7 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
       monitorPublicKeys: monitorKeys,
       expectedAgentId: agentId
     });
+    instant?.assertCurrent();
     const correlationAuditIds = input.noSign && !unsignedStore
       ? []
       : persistCorrelationAudits({
@@ -629,9 +650,9 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
         countAuditFromMap(eventsAuditMap, "CONFIG_UNSIGNED") >
       0;
 
-    let targetProfile: TargetProfile | null = null;
-    let targetSignatureValid = true;
-    if (input.targetName) {
+    let targetProfile: TargetProfile | null = instant?.targetProfile ?? null;
+    let targetSignatureValid: boolean = instant?.targetSignatureValid ?? true;
+    if (input.targetName && instant === undefined) {
       targetProfile = loadTargetProfile(workspace, input.targetName, agentId);
       targetSignatureValid = verifyTargetProfileSignature(workspace, targetProfile);
     }
@@ -644,6 +665,7 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
       contextSummary,
       questions: activeQuestions
     });
+    instant?.assertCurrent();
 
     const questionScores: QuestionScore[] = [];
     const questionExplainabilityInputs: QuestionExplainabilityInputRow[] = [];
@@ -1020,6 +1042,7 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
 
     const allFindings = [...assuranceProvenanceFindings, ...unsupportedClaimFindings];
     if (allFindings.length > 0) {
+      instant?.assertCurrent();
       persistAuditFindings(ledger, allFindings, runId);
       _cachedAllEvents = null;
       events = filterEventsForAgent(
@@ -1029,6 +1052,7 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
     }
     if (assuranceMissingQuestions.size > 0) {
       for (const questionId of assuranceMissingQuestions) {
+        instant?.assertCurrent();
         ledger.appendEvidence({
           sessionId: runId,
           runtime: "unknown",
@@ -1369,36 +1393,10 @@ export async function runDiagnostic(input: RunDiagnosticInput, outputMarkdownPat
       ...baseReport,
       evidenceReadiness: evaluateDiagnosticEvidenceReadiness(baseReport)
     };
-    const reportJsonSha256 = sha256Hex(canonicalize(reportBody));
-    const runSealSig = input.noSign ? "unsigned" : ledger.signRunHash(reportJsonSha256);
-
-    const report: DiagnosticReport = {
-      ...reportBody,
-      runSealSig,
-      reportJsonSha256
-    };
-
-    ensureDir(agentPaths.runsDir);
-    const runJsonPath = join(agentPaths.runsDir, `${runId}.json`);
-    writeFileAtomic(runJsonPath, JSON.stringify(report, null, 2), 0o644);
-
-    if (!input.noSign || unsignedStore) ledger.insertRun({ // P0-27: an unsigned seal never enters the signed store
-      run_id: runId,
-      window_start_ts: windowStartTs,
-      window_end_ts: now,
-      target_profile_id: targetProfile?.id ?? null,
-      report_json_sha256: reportJsonSha256,
-      run_seal_sig: runSealSig,
-      status
-    });
-
-    const sealVerified = sealedRunReportVerifies(workspace, report as unknown as Record<string, unknown>);
-    const markdown = generateReport(report, "md", envelopeForStoredRun(report, { sealVerified, now })) as string;
-    const reportPath = outputMarkdownPath ?? join(agentPaths.reportsDir, `${runId}.md`);
-    ensureDir(agentPaths.reportsDir);
-    writeFileAtomic(reportPath, markdown, 0o644);
-
-    return report;
+    return await publishDiagnosticReport({ workspace, ledger, body: reportBody, noSign: Boolean(input.noSign), unsignedStore,
+      runsDir: agentPaths.runsDir, reportsDir: agentPaths.reportsDir, outputMarkdownPath, targetProfileId: targetProfile?.id ?? null,
+      options: { beforePublish, synchronousSeal }, priorEffects: correlationAuditIds.map(id => `evidence:${id}`), assertOriginal,
+      render: report => generateReport(report, "md", envelopeForStoredRun(report, { sealVerified: sealedRunReportVerifies(workspace, report as unknown as Record<string, unknown>), now })) as string });
   } finally {
     signedEvidence?.close();
     ledger.close();

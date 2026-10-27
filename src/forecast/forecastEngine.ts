@@ -9,11 +9,11 @@ import {
   type ForecastSeries
 } from "./forecastSchema.js";
 import { detectSuspiciousMaturityJump } from "./anomalyDetector.js";
-import { generateAdvisories } from "./advisoryGenerator.js";
+import { generateAdvisories, captureAdvisoryRecommendations } from "./advisoryGenerator.js";
 import { detectCusumChangePoints } from "./changePoint.js";
 import { detectDrift } from "./driftDetector.js";
 import { FORECAST_MODEL_VERSION, fitSeriesForecast } from "./forecastModels.js";
-import { collectForecastSignals, type ForecastSignalBundle } from "./forecastSignals.js";
+import { captureForecastSignals, type ForecastSignalBundle } from "./forecastSignals.js";
 import {
   defaultForecastSchedulerState,
   loadAdvisory,
@@ -24,12 +24,13 @@ import {
   saveForecastArtifact,
   saveForecastPolicy,
   saveForecastSchedulerState,
-  verifyForecastPolicySignature
+  verifyForecastPolicySignature,
+  captureVerifiedForecastPolicy
 } from "./forecastStore.js";
 import { appendTransparencyEntry } from "../transparency/logChain.js";
 import { dispatchIntegrationEvent } from "../integrations/integrationDispatcher.js";
 import { quantile } from "./robustStats.js";
-import { computeLeadingIndicators } from "./leadingIndicators.js";
+import { captureLeadingIndicators } from "./leadingIndicators.js";
 import { computeNextRefreshTs, withSchedulerOutcome } from "./renewalCadence.js";
 import { parseWindowToMs } from "../utils/time.js";
 import { listAgents } from "../fleet/registry.js";
@@ -231,7 +232,8 @@ function computeValueDrop(series: ForecastArtifact["series"]): number {
   return ensureNumber(Math.max(0, (latest - forecasted) / Math.max(1e-9, latest)));
 }
 
-function maybeDispatchAdvisories(params: {
+/** Internal existing best-effort delivery boundary, reused after durable async publication. */
+export function maybeDispatchAdvisories(params: {
   workspace: string;
   advisories: AdvisoryRecord[];
   policy: ForecastPolicy;
@@ -332,8 +334,8 @@ export function initForecastPolicy(workspace: string): {
   };
 }
 
-function policySha256(workspace: string): string {
-  return sha256Hex(canonicalize(loadForecastPolicy(workspace)));
+function policySha256(policy: ForecastPolicy): string {
+  return sha256Hex(canonicalize(policy));
 }
 
 export function parseForecastScope(params: {
@@ -356,29 +358,18 @@ export function parseForecastScope(params: {
   };
 }
 
-export function createForecast(params: {
-  workspace: string;
-  scope: ForecastScope;
-  lookbackDays?: number;
-  persist?: boolean;
-}): {
-  forecast: ForecastArtifact;
-  advisories: AdvisoryRecord[];
-  snapshotPath: string | null;
-  latestPath: string | null;
-  snapshotSha256: string | null;
-} {
-  const policySig = verifyForecastPolicySignature(params.workspace);
-  if (!policySig.valid) {
-    throw new Error(`forecast policy signature invalid: ${policySig.reason ?? "unknown"}`);
-  }
-  const policy = loadForecastPolicy(params.workspace);
-  const signals = collectForecastSignals({
+export interface ForecastCreationParams { workspace: string; scope: ForecastScope; lookbackDays?: number; persist?: boolean }
+/** Internal shared calculation; historical bodies and actual input projections are fixed before any provider wait. */
+export function calculateForecast(input: ForecastCreationParams) {
+  const params = { ...input, scope: { ...input.scope } };
+  const policySnapshot = captureVerifiedForecastPolicy(params.workspace), policy = policySnapshot.policy;
+  const signalSnapshot = captureForecastSignals({
     workspace: params.workspace,
     scope: params.scope,
     lookbackDays: params.lookbackDays ?? Math.max(90, policy.forecastPolicy.horizons.longDays)
   });
 
+  const signals = signalSnapshot.signals;
   const gateReasons = evidenceGateFailures(policy, signals);
   const status: ForecastArtifact["status"] = gateReasons.length === 0 ? "OK" : "INSUFFICIENT_EVIDENCE";
   const series = forecastScopeSeries(signals, policy.forecastPolicy.horizons, status === "OK");
@@ -394,17 +385,21 @@ export function createForecast(params: {
         })
       : null;
   const anomalies = anomaly ? [anomaly] : [];
-  const leadingIndicators = computeLeadingIndicators({
+  const leadingSnapshot = captureLeadingIndicators({
     workspace: params.workspace,
     agentId: params.scope.type === "AGENT" ? params.scope.id : undefined,
     windowStartTs: now() - parseWindowToMs("30d"),
     windowEndTs: now()
   });
+  const leadingIndicators = leadingSnapshot.indicators;
+  let recommendations: ReturnType<typeof captureAdvisoryRecommendations> | undefined;
+  const transformSteps = () => (recommendations ??= captureAdvisoryRecommendations(params.workspace, params.scope)).steps;
   const riskScore = computeRiskScore(series);
   const valueDrop = computeValueDrop(series);
   const advisories = policy.forecastPolicy.advisories.enable
     ? generateAdvisories({
         workspace: params.workspace,
+        transformSteps,
         scope: params.scope,
         drift,
         anomalies,
@@ -419,7 +414,7 @@ export function createForecast(params: {
     v: 1,
     scope: params.scope,
     generatedTs: now(),
-    policySha256: policySha256(params.workspace),
+    policySha256: policySha256(policy),
     modelVersion: FORECAST_MODEL_VERSION,
     status,
     reasons: gateReasons,
@@ -440,6 +435,20 @@ export function createForecast(params: {
     advisories
   };
 
+  return { forecast, advisories, policy,
+    /** Internal mechanic read: preserve this calculation's selector clock without pinning unused advisory/leading inputs. */
+    readMechanicCurrent() {
+      policySnapshot.assertCurrent(); const current = signalSnapshot.readCurrent();
+      return { series: forecastScopeSeries(current, policy.forecastPolicy.horizons, evidenceGateFailures(policy, current).length === 0), etaToTarget: computeEta(current) };
+    }, assertInputsCurrent() {
+      policySnapshot.assertCurrent(); signalSnapshot.assertCurrent(); leadingSnapshot.assertCurrent(); recommendations?.assertCurrent();
+    } };
+}
+
+export function createForecast(input: ForecastCreationParams): {
+  forecast: ForecastArtifact; advisories: AdvisoryRecord[]; snapshotPath: string | null; latestPath: string | null; snapshotSha256: string | null;
+} {
+  const params = { ...input, scope: { ...input.scope } }, { forecast, advisories, policy } = calculateForecast(params);
   let latestPath: string | null = null;
   let snapshotPath: string | null = null;
   let snapshotSha256: string | null = null;

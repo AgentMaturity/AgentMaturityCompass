@@ -1,9 +1,12 @@
+import { captureOrgPairs, captureOrgPairsAuthority, assertOrgPairsCurrent, type OrgPairsSnapshot } from "../org/preparedOrgPairs.js";
+import { prepareFileSignatureWithAuditor, signSerializedPayloadWithAuditor } from "../org/orgSigner.js";
+import { publishAuditFiles, type AuditPublicationOptions } from "./binderPublication.js";
 import { readdirSync } from "node:fs";
 import { join } from "node:path";
-import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
-import { signFileWithAuditor, verifySignedFileWithAuditor } from "../org/orgSigner.js";
+import { pathExists, readUtf8 } from "../utils/fs.js";
+import { verifyAuditBundlePair } from "./binderFileVerification.js";
 import { binderJsonSchema, type AuditBinderJson } from "./binderSchema.js";
-import { auditBindersCacheDir, auditBindersExportsDir, ensureAuditDirs } from "./auditPolicyStore.js";
+import { auditBindersCacheDir, auditBindersExportsDir } from "./auditPolicyStore.js";
 
 function scopeSegment(scopeType: "WORKSPACE" | "NODE" | "AGENT"): string {
   if (scopeType === "WORKSPACE") return "workspace";
@@ -11,7 +14,7 @@ function scopeSegment(scopeType: "WORKSPACE" | "NODE" | "AGENT"): string {
   return "agent";
 }
 
-function binderCachePath(workspace: string, scopeType: "WORKSPACE" | "NODE" | "AGENT", scopeId: string): string {
+export function binderCachePath(workspace: string, scopeType: "WORKSPACE" | "NODE" | "AGENT", scopeId: string): string {
   return join(auditBindersCacheDir(workspace), `latest_${scopeSegment(scopeType)}_${scopeId}.json`);
 }
 
@@ -32,12 +35,10 @@ export function saveBinderCache(params: {
   path: string;
   sigPath: string;
 } {
-  ensureAuditDirs(params.workspace);
-  const path = binderCachePath(params.workspace, params.scopeType, params.scopeId);
-  ensureDir(auditBindersCacheDir(params.workspace));
-  writeFileAtomic(path, JSON.stringify(binderJsonSchema.parse(params.binder), null, 2), 0o644);
-  const sigPath = signFileWithAuditor(params.workspace, path);
-  return { path, sigPath };
+  const path = binderCachePath(params.workspace, params.scopeType, params.scopeId), body = JSON.stringify(binderJsonSchema.parse(params.binder), null, 2);
+  const original = captureOrgPairsAuthority(params.workspace), before = captureOrgPairs([path]), signature = JSON.stringify(signSerializedPayloadWithAuditor(params.workspace, body), null, 2);
+  publishAuditFiles(params.workspace, [{ path, bytes: Buffer.from(body) }, { path: `${path}.sig`, bytes: Buffer.from(signature) }], before, original);
+  return { path, sigPath: `${path}.sig` };
 }
 
 export function loadBinderCache(params: {
@@ -67,7 +68,7 @@ export function verifyBinderCacheSignature(params: {
       sigPath: `${path}.sig`
     };
   }
-  return verifySignedFileWithAuditor(params.workspace, path);
+  return verifyAuditBundlePair(params.workspace, path);
 }
 
 export function listBinderExports(workspace: string): Array<{
@@ -116,4 +117,18 @@ function hostAuditPortfolioCachePath(hostDir: string): string {
 
 export function hostAuditPortfolioCacheSigPath(hostDir: string): string {
   return `${hostAuditPortfolioCachePath(hostDir)}.sig`;
+}
+
+export async function prepareBinderCacheAsync(params: Parameters<typeof saveBinderCache>[0], options: AuditPublicationOptions = {}, previous?: OrgPairsSnapshot) {
+  options = { ...options };
+  const copied = structuredClone(params), path = binderCachePath(copied.workspace, copied.scopeType, copied.scopeId);
+  const actor = options.beforePublish; actor?.();
+  const original = captureOrgPairsAuthority(copied.workspace), before = previous ?? captureOrgPairs([path]);
+  const body = Buffer.from(JSON.stringify(binderJsonSchema.parse(copied.binder), null, 2));
+  const publicationInputs = () => { actor?.(); options.assertInputsCurrent?.(); options.assertOutputsSafe?.(Object.freeze([path, `${path}.sig`])); original(); };
+  const gate = () => { options.assertPreparationInputsCurrent?.(); publicationInputs(); assertOrgPairsCurrent(before); };
+  const signature = await prepareFileSignatureWithAuditor(copied.workspace, path, body, "BUNDLE", gate);
+  const writes = [{ path, bytes: body }, { path: `${path}.sig`, bytes: Buffer.from(signature.signatureBytes) }];
+  const assertCurrent = () => { original(); signature.assertCurrent(); };
+  return { path, sigPath: `${path}.sig`, writes, assertCurrent, publish() { publishAuditFiles(copied.workspace, writes, before, () => { publicationInputs(); assertCurrent(); }, gate); return { path, sigPath: `${path}.sig` }; } };
 }

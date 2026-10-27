@@ -4,7 +4,7 @@
  * admitted for artifact-seal (independent-attestation when the statement claims independently_reviewed). Every subject
  * and every evidence digest must be among the supplied evidence bytes, so a changed AIBOM or bundle matches nothing.
  */
-import { isCanonicalSignatureBase64, parseJson, same, verifyEd25519 } from "../bytes.js";
+import { isCanonicalSignatureBase64, parseJson, same, verifySignature } from "../bytes.js";
 import type { Finding } from "../codes.js";
 import { notRecomputable, result, scopeResult, type Env, type Evaluation } from "../evaluation.js";
 import { dsseEnvelope, INTOTO_PAYLOAD_TYPE, intotoStatement, sigstoreDsseBundle, type IntotoStatement } from "../records/intoto.js";
@@ -67,7 +67,7 @@ export function evaluateDsseIntoto(value: Record<string, unknown>, env: Env): Ev
   // The keyid only selects among keys the verifier's own trust lists hold; it never supplies a key.
   const pem = listedPem(env.ctx, signature.keyid);
   if (!isCanonicalSignatureBase64(signature.sig)) integrity.push({ code: "MALFORMED", detail: "the signature is not canonical base64 of 64 bytes" });
-  else if (pem !== null && !verifyEd25519(pae(envelope.payloadType, payload), pem, Buffer.from(signature.sig, "base64"))) {
+  else if (pem !== null && !verifySignature(pae(envelope.payloadType, payload), pem, Buffer.from(signature.sig, "base64"))) {
     integrity.push({ code: "SIGNATURE_INVALID", detail: "the signature does not verify over the DSSE PAE" });
   }
   const purpose = predicate.claimKind === "independently_reviewed" ? "independent-attestation" : "artifact-seal";

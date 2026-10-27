@@ -2,6 +2,14 @@ import { z } from "zod";
 
 export const notaryAttestationLevelSchema = z.enum(["SOFTWARE", "HARDWARE"]);
 export type NotaryAttestationLevel = z.infer<typeof notaryAttestationLevelSchema>;
+/**
+ * P2-08: where the level comes from. "configured" (a sealed key file, or a PKCS#11 token the operator declared),
+ * "provider-metadata" (the KMS or HSM's own key metadata) or "provider-reported" (an external signer's own claim).
+ * Never "attested": nothing here verifies a hardware attestation.
+ */
+export const notaryAttestationBasisSchema = z.enum(["configured", "provider-metadata", "provider-reported"]);
+export type NotaryAttestationBasis = z.infer<typeof notaryAttestationBasisSchema>;
+const notaryBackendTypeSchema = z.enum(["FILE_SEALED", "EXTERNAL_SIGNER", "KEY_PROVIDER"]);
 
 export const notarySignRequestSchema = z.object({
   kind: z.string().min(1),
@@ -18,8 +26,9 @@ export const notarySignResponseSchema = z.object({
   pubkeyPem: z.string().min(1),
   pubkeyFingerprint: z.string().length(64),
   signedTs: z.number().int(),
-  backend: z.enum(["FILE_SEALED", "EXTERNAL_SIGNER"]),
+  backend: notaryBackendTypeSchema,
   attestationLevel: notaryAttestationLevelSchema,
+  attestationBasis: notaryAttestationBasisSchema.optional(),
   claims: z.record(z.string(), z.unknown()).default({})
 });
 export type NotarySignResponse = z.infer<typeof notarySignResponseSchema>;
@@ -30,8 +39,9 @@ export const notaryAttestPayloadSchema = z.object({
   ts: z.number().int(),
   notary: z.object({
     pubkeyFingerprint: z.string().length(64),
-    backend: z.enum(["FILE_SEALED", "EXTERNAL_SIGNER"]),
+    backend: notaryBackendTypeSchema,
     attestationLevel: notaryAttestationLevelSchema,
+    attestationBasis: notaryAttestationBasisSchema.optional(),
     claims: z.record(z.string(), z.unknown()).default({})
   }),
   runtime: z.object({
@@ -67,6 +77,7 @@ export const notaryTailEntrySchema = z.object({
   signerFingerprint: z.string().length(64),
   attestationLevel: notaryAttestationLevelSchema,
   prevHash: z.string(),
+  attestationBasis: notaryAttestationBasisSchema.optional(),
   entryHash: z.string().length(64)
 });
 export type NotaryTailEntry = z.infer<typeof notaryTailEntrySchema>;

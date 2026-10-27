@@ -1,7 +1,7 @@
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
 import type { Socket } from "node:net";
 import { URL } from "node:url";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { readdirSync } from "node:fs";
 import { CLI_BRIDGE_ROLES,
   execCliCommand as cliBridgeExec,
@@ -26,61 +26,61 @@ import {
   auditBinderExportRequestForApi,
   auditBinderVerifyForApi,
   auditBindersForApi,
-  auditMapApplyForApi,
-  auditMapShowForApi,
+  auditMapApplyForApiAsync,
+  auditMapShowForApiAsync,
   auditMapVerifyForApi,
-  auditPolicyApplyForApi,
-  auditPolicyForApi,
+  auditPolicyApplyForApiAsync,
+  auditPolicyForApiAsync,
   auditReadinessGate,
   auditRequestApproveForApi,
-  auditRequestCreateForApi,
+  auditRequestCreateForApiAsync as auditRequestCreateForApi,
   auditRequestFulfillForApi,
   auditRequestListForApi,
-  auditRequestRejectForApi,
-  auditSchedulerEnableForApi,
+  auditRequestRejectForApiAsync as auditRequestRejectForApi,
+  auditSchedulerEnableForApiAsync,
   auditSchedulerRunNowForApi,
   auditSchedulerStatusForApi
-} from "../audit/auditApi.js";
+} from "../audit/auditApi.js"; import { captureAuditPolicyMapReadiness } from "../audit/auditPolicyMapPublication.js";
 import { verifyAuditMapActiveSignature } from "../audit/auditMapStore.js";
 import { auditBindersExportsDir, verifyAuditPolicySignature } from "../audit/auditPolicyStore.js";
 import { containedPath } from "../utils/pathSafety.js";
 import { auditSchedulerTick } from "../audit/auditScheduler.js";
 import { emitAuditSse } from "../audit/auditSse.js";
 import {
-  importValueCsvForApi,
-  ingestValueWebhookForApi,
-  valueContractApplyForApi,
+  importValueCsvForApiAsync as importValueCsvForApi,
+  ingestValueWebhookForApiAsync as ingestValueWebhookForApi,
+  valueContractApplyForApiAsync as valueContractApplyForApi,
   valueContractForApi,
-  valueContractInitForApi,
-  valuePolicyApplyForApi,
-  valuePolicyForApi,
+  valueContractInitForApiAsync as valueContractInitForApi,
+  valuePolicyApplyForApiAsync as valuePolicyApplyForApi,
+  valuePolicyForApiAsync as valuePolicyForApi,
   valueReadinessGate,
   valueReportForApi,
   valueSchedulerRunNowForApi,
-  valueSchedulerSetEnabledForApi,
+  valueSchedulerSetEnabledForApiAsync as valueSchedulerSetEnabledForApi,
   valueSchedulerStatusForApi,
   valueSnapshotLatestForApi,
-  verifyValueWebhookToken
+  verifyValueWebhookToken, assertValueWebhookTokenCurrent
 } from "../value/valueApi.js";
-import { loadValuePolicy, verifyValuePolicySignature } from "../value/valueStore.js";
+import { loadValuePolicyReadOnly as loadValuePolicy, verifyValuePolicySignature } from "../value/valueStore.js";
 import { valueSchedulerTick } from "../value/valueScheduler.js";
 import { timeCheckpointTick } from "../time/checkpoint.js";
 import { emitValueSse } from "../value/valueSse.js";
 import {
   assuranceCertIssueForApi,
   assuranceCertLatestForApi,
-  assurancePolicyApplyForApi,
-  assurancePolicyForApi,
-  assuranceReadinessGate,
+  assurancePolicyApplyForApiAsync as assurancePolicyApplyForApi,
+  assurancePolicyForApiAsync as assurancePolicyForApi,
+  assuranceReadinessGate, prepareAssuranceReadinessAsync,
   assuranceRunDetailForApi,
   assuranceRunForApi,
   assuranceRunsForApi,
-  assuranceSchedulerEnableForApi,
+  assuranceSchedulerEnableForApiAsync as assuranceSchedulerEnableForApi,
   assuranceSchedulerRunNowForApi,
   assuranceSchedulerStatusForApi,
   assuranceWaiverRequestForApi,
-  assuranceWaiverRevokeForApi,
-  assuranceWaiverStatusForApi
+  assuranceWaiverRevokeForApiAsync as assuranceWaiverRevokeForApi,
+  assuranceWaiverStatusForApiAsync as assuranceWaiverStatusForApi
 } from "../assurance/assuranceControlPlane.js";
 import { verifyAssurancePolicySignature } from "../assurance/assurancePolicyStore.js";
 import { assuranceSchedulerTick } from "../assurance/assuranceScheduler.js";
@@ -100,8 +100,10 @@ import {
 } from "./studioState.js";
 import { agentExecuteClassCheck, scopeRefusal } from "./agentTokenScopeGuard.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
-import { vaultStatus } from "../vault/vault.js";
+import { getVaultSecret, vaultStatus } from "../vault/vault.js";
 import { ToolHubService } from "../toolhub/toolhubServer.js";
+import { ApprovalRequestContinuationError } from "../approvals/approvalRequestPublication.js";
+import { authenticate, hasScope, verifyLeaseForScope, captureStudioToolhubIntentAuthority, StudioToolhubIntentAuthorityError, type AuthContext } from "./toolhubIntentAuthority.js";
 import { normalizeActionClass } from "../tickets/execTicketCli.js";
 import type { ActionClass } from "../types.js";
 import { runGovernorCheck } from "../governor/governorCli.js";
@@ -111,8 +113,9 @@ import { verifyLeaseToken } from "../leases/leaseVerifier.js";
 import { extractLeaseCarrier } from "../leases/leaseCarriers.js";
 import { serveConsolePath } from "../console/consoleServer.js";
 import { handleStudioApiDelegation } from "./apiDelegation.js";
+import { publishConsoleSnapshotAsync, consoleSnapshotErrorStatus, CONSOLE_SNAPSHOT_UNAVAILABLE } from "./consoleSnapshot.js";
 import { bindStudioResultRoute, ENTITLEMENT_NOTE, studioStoredRunReport, withClaimBody } from "./studioClaimOutput.js";
-import { authenticateStudioAgent } from "./agentCredentialAuth.js";
+import { respondReportSigningError } from "./reportSigningError.js";
 import { allowStudioCors as allowCors } from "./studioCors.js";
 import { createNativeTaskService } from "./nativeTaskService.js";
 import { isNativeApprovalMutationPath, isNativeStudioPath, nativeAllowedBrowserOrigins, nativeCsrfTokenForSession } from "./nativeAdmission.js";
@@ -141,83 +144,82 @@ import {
   studioApprovalDenyInputSchema
 } from "../approvals/approvalStudioService.js";
 import { questionBank } from "../diagnostic/questionBank.js";
-import { loadTargetProfile, saveTargetProfile } from "../targets/targetProfile.js";
+import { loadTargetProfile } from "../targets/targetProfile.js";
 import { simulateTargetWhatIf } from "../simulator/targetWhatIf.js";
-import { createSignedTargetProfile } from "../targets/targetProfile.js";
+import { captureStudioTargetPublication } from "../targets/targetProfilePublication.js";
 import { loadContextGraph } from "../context/contextGraph.js";
 import { exportBenchmarkArtifact } from "../benchmarks/benchExport.js";
 import { ingestBenchmarks } from "../benchmarks/benchImport.js";
 import { listImportedBenchmarks } from "../benchmarks/benchStore.js";
 import { benchmarkStats } from "../benchmarks/benchStats.js";
 import {
-  benchCompareForApi,
+  benchCompareForApiAsync as benchCompareForApi,
   benchComparisonLatestForApi,
-  benchCreateForApi,
+  benchCreateForApiAsync as benchCreateForApi,
   benchExportsForApi,
   benchImportForApi,
   benchImportsForApi,
-  benchPolicyApplyForApi,
+  benchPolicyApplyForApiAsync as benchPolicyApplyForApi,
   benchPolicyForApi,
-  benchPublishExecuteForApi,
+  benchPublishExecuteForApiAsync as benchPublishExecuteForApi,
   benchPublishRequestForApi,
-  benchRegistriesForApi,
-  benchRegistryApplyForApi,
+  benchRegistriesForApiAsync as benchRegistriesForApi,
+  benchRegistryApplyForApiAsync as benchRegistryApplyForApi, benchRegistryAddForApiAsync,
   benchRegistryBrowseForApi
 } from "../bench/benchApi.js";
 import { loadBenchPolicy, verifyBenchPolicySignature } from "../bench/benchPolicyStore.js";
 import { emitBenchSse } from "../bench/benchSse.js";
-import { loadBudgetsConfig, signBudgetsConfig } from "../budgets/budgets.js";
-import { driftCheckCli } from "../drift/driftCli.js";
+import { loadBudgetsConfig, captureBudgetsPublication, BudgetsPublicationError } from "../budgets/budgets.js";
+import { driftCheckForStudio } from "../drift/studioDriftCheck.js";
 import { activeFreezeStatus } from "../drift/freezeEngine.js";
 import YAML from "yaml";
 import {
-  addUser,
+  addUserAsync, revokeUserAsync, setUserRolesAsync, createUsersMutationGuard, publicUsersMutationRecord, respondUsersMutationError,
   authenticateUser,
   clearSessionCookie,
-  createSession,
+  createSessionAsync,
   listUsers as listHumanUsers,
-  revokeUser,
   revokeSessionByToken,
   sessionFromRequest,
-  setUserRoles,
   setSessionCookie,
-  verifyUsersConfigSignature
+  verifyUsersConfigSignature, verifyTrackedSessionToken
 } from "../auth/authApi.js";
 import { parseCookieHeader } from "../auth/sessionTokens.js";
 import { enforceRoleOrAdmin, hasAnyRole, type AccessContext } from "../auth/rbac.js";
 import type { UserRole } from "../auth/roles.js";
 import { parseUserRoles } from "../auth/roles.js";
-import { claimPairingForResponse, clearPairingCookie, pairingCookieValid } from "../pairing/pairingApi.js";
+import { claimPairingForResponseAsync, clearPairingCookie, pairingCookieValid } from "../pairing/pairingApi.js";
 import { loadLanMode, verifyLanModeSignature } from "../pairing/lanMode.js";
 import { createPairingCode } from "../pairing/pairingCodes.js";
 import { verifyApprovalPolicySignature } from "../approvals/approvalPolicyEngine.js";
 import { loadGatewayConfig } from "../gateway/config.js";
-import { policyPackApplyCli, policyPackDescribeCli, policyPackDiffCli, policyPackListCli } from "../policyPacks/packCli.js";
+import { policyPackApplyCliAsync, policyPackDescribeCli, policyPackDiffCli, policyPackListCli } from "../policyPacks/packCli.js";
 import { tailTransparencyEntries, verifyTransparencyLog } from "../transparency/logCli.js";
-import { appendTransparencyEntry } from "../transparency/logChain.js";
+import { captureStudioSelfRunTransparency } from "./studioSelfRunTransparency.js";
 import {
   currentTransparencyMerkleRoot,
-  exportTransparencyProofBundle,
   listTransparencyMerkleRoots,
   verifyTransparencyMerkle
 } from "../transparency/merkleIndexStore.js";
+import { exportTransparencyProofBundleAsync } from "../transparency/merkleProofPublication.js";
 import { verifyWorkspaceProofBundle } from "../transparency/workspaceProofBundle.js";
 import { getSigningKey, signHexDigest } from "../crypto/keys.js";
-import { appendHumanActionEvent } from "../auth/humanLog.js";
+import { writeStudioAuditEvent, writeStudioAuditEventAsync } from "./studioAudit.js";
+import { captureReportSigningAuthority } from "./reportSigningAuthority.js";
 import { frameworkChoices, type ComplianceFramework } from "../compliance/frameworks.js";
 import { generateComplianceReport, verifyComplianceMapsSignature } from "../compliance/complianceEngine.js";
 import { complianceFleetReportCli } from "../compliance/complianceCli.js";
 import { federateExportCli, federateImportCli, federatePeerListCli, federateVerifyCli } from "../federation/federationCli.js";
-import { integrationsDispatchCli, integrationsStatusCli, integrationsTestCli, integrationsVerifyCli } from "../integrations/integrationsCli.js";
+import { integrationsStatusCli, integrationsVerifyCli } from "../integrations/integrationsCli.js";
 import { verifyOpsReceiptForEvent } from "../integrations/opsReceipt.js";
 import {
-  dispatchIntegrationEvent,
-  drainDueIntegrationDeliveries
+  dispatchIntegrationEventWithAuthority, dispatchIntegrationTestWithAuthority,
+  drainDueIntegrationDeliveriesWithAuthority
 } from "../integrations/integrationDispatcher.js";
 import { resolveSecretRef } from "../integrations/integrationStore.js";
 import {
   outcomesFleetReportCli,
-  outcomesReportCli,
+  outcomesReportCliAsync,
   outcomesVerifyCli
 } from "../outcomes/outcomeCli.js";
 import { ingestFeedbackOutcome, ingestOutcomeWebhook, verifyHmacSignature } from "../outcomes/outcomeApi.js";
@@ -229,39 +231,41 @@ import {
   experimentOptimizeCli,
   experimentOptimizerListCli,
   experimentOptimizerShowCli,
-  experimentRunCli,
+  experimentRunCliAsync,
   experimentSetBaselineCli,
   experimentSetCandidateCli
 } from "../experiments/experimentCli.js";
 import {
-  addOrgNode,
-  assignAgentToNode,
+  addOrgNodeAsync,
+  assignAgentToNodeAsync,
   loadOrgConfig,
-  saveOrgConfig,
-  unassignAgentFromNode,
+  unassignAgentFromNodeAsync,
   verifyOrgConfigSignature
 } from "../org/orgStore.js";
 import { compareNodeScorecards, loadLatestOrgScorecard } from "../org/orgScorecard.js";
-import { computeOrgScorecard, nodeHierarchy, recomputeAndPersistOrgScorecard } from "../org/orgEngine.js";
+import { computeOrgScorecard, nodeHierarchy } from "../org/orgEngine.js";
+import { captureStudioOrgSecondary, createStudioOutcomeOrgWork } from "./studioOrgSecondary.js";
 import { renderOrgCompareMarkdown, renderOrgNodeReportMarkdown, renderOrgSystemicMarkdown } from "../org/orgReports.js";
-import { generateOrgCommitmentPlan, generateOrgEducationBrief, generateOrgOwnershipPlan } from "../org/orgCommitments.js";
+import { generateOrgEocAsync, recomputeOrgScorecardsApiAsync } from "../org/orgApi.js";
+import { prepareOrgConfigUpdateLog } from "../org/orgPublication.js";
 import { listOrgRuns, loadOrgRun, orgRunRoleDefinitions, orgRunSummaryForUi, parseOrgRoleList, runOrg } from "../org/orgRun.js";
 import { OrgSseHub } from "../org/orgSse.js";
 import {
-  applyTransformMapForApi,
-  attestAgentTransformTaskForApi,
-  attestNodeTransformTaskForApi,
-  createAgentTransformPlanForApi,
-  createNodeTransformPlanForApi,
+  applyTransformMapForApiAsync,
+  attestAgentTransformTaskForApiAsync,
+  attestNodeTransformTaskForApiAsync,
+  createAgentTransformPlanForApiAsync,
+  createNodeTransformPlanForApiAsync,
   getLatestAgentTransformPlanForApi,
   getLatestNodeTransformPlanForApi,
   getTransformMapForApi,
-  trackAgentTransformPlanForApi,
-  trackNodeTransformPlanForApi
+  trackAgentTransformPlanForApiAsync,
+  trackNodeTransformPlanForApiAsync
 } from "../transformation/transformApi.js";
 import { renderTransformReportMarkdown } from "../transformation/transformReports.js";
+import { TransformPublicationError } from "../transformation/transformPublication.js";
 import { loadOpsPolicy, verifyOpsPolicySignature } from "../ops/policy.js";
-import { retentionStatusCli, retentionRunCli } from "../ops/retention/retentionCli.js";
+import { retentionStatusCli, retentionRunStudioAsync } from "../ops/retention/retentionCli.js";
 import {
   maintenancePruneCacheCli,
   maintenanceStatsCli,
@@ -297,18 +301,18 @@ import { loadTrustContext } from "../trust/trustContext.js";
 import { requestTrustOverride } from "../trust/requestTrust.js";
 import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
 import {
-  ackAdvisoryForApi,
-  applyForecastPolicyForApi,
-  forecastSchedulerRunNowForApi,
-  forecastSchedulerSetEnabledForApi,
+  ackAdvisoryForAuthority,
+  applyForecastPolicyForApiForAuthority,
+  forecastSchedulerRunNowForApiForAuthority,
+  forecastSchedulerSetEnabledForApiForAuthority,
   forecastSchedulerStatusForApi,
   getForecastLatestForApi,
   getForecastPolicyForApi,
   listAdvisoriesForApi,
-  refreshForecastForApi,
+  refreshForecastForAuthority, refreshForecastsAfterPrimary,
   refreshAllForecastsForApi
 } from "../forecast/forecastApi.js";
-import { schedulerTick } from "../forecast/forecastEngine.js";
+import { schedulerTickAsync } from "../forecast/forecastPublication.js";
 import { verifyForecastPolicySignature } from "../forecast/forecastStore.js";
 import { renderForecastMarkdown } from "../forecast/forecastReports.js";
 import { handleBridgeRequest } from "../bridge/bridgeServer.js";
@@ -316,60 +320,56 @@ import { createBridgePairingCode, redeemBridgePairingCode } from "../bridge/brid
 import { buildHealthPayload } from "../api/health.js";
 import { closeScoreSessionStores } from "../api/scoreStore.js";
 import { bindRequestContext, resolveRequestId } from "../api/requestContext.js";
-import { canonApplyForApi, canonGetForApi, canonVerifyForApi } from "../canon/canonApi.js";
+import { canonApplyForPublicationAsync, CanonAuditIncompleteError, canonGetForApi, canonVerifyForApi } from "../canon/canonApi.js";
+import { loadDiagnosticBankAttemptAsync, DiagnosticBankFollowupError } from "../diagnostic/bank/bankLoader.js";
 import { verifyCanonSignature } from "../canon/canonLoader.js";
 import {
-  diagnosticBankApplyForApi,
-  diagnosticBankGetForApi,
+  diagnosticBankApplyForApiAsync as diagnosticBankApplyForApi,
+  diagnosticBankGetForApiAsync as diagnosticBankGetForApi,
   diagnosticBankVerifyForApi
 } from "../diagnostic/bank/bankApi.js";
 import { verifyDiagnosticBankSignature } from "../diagnostic/bank/bankLoader.js";
 import {
-  cgxBuildForApi,
+  cgxBuildForApiAsync as cgxBuildForApi,
   cgxLatestGraphForApi,
   cgxLatestPackForApi,
-  cgxPolicyApplyForApi,
-  cgxPolicyForApi,
+  cgxPolicyApplyForApiAsync as cgxPolicyApplyForApi,
+  cgxPolicyForApiAsync as cgxPolicyForApi,
   cgxVerifyForApi
 } from "../cgx/cgxApi.js";
 import { verifyCgxPolicySignature } from "../cgx/cgxStore.js";
 import { renderContextualizedDiagnostic } from "../diagnostic/contextualizer/contextualizer.js";
 import { emitCgxSse } from "../cgx/cgxSse.js";
 import { validateTruthguardForWorkspace } from "../truthguard/truthguardApi.js";
+import { mechanicTargetsApplyForAuthority as mechanicTargetsApplyForApi, mechanicProfileApplyForAuthority as mechanicProfileApplyForApi, mechanicTuningApplyForAuthority as mechanicTuningApplyForApi } from "../mechanic/mechanicSettingsPublication.js";
+import { mechanicGapForAuthority as mechanicGapForApi, mechanicCreatePlanForAuthority as mechanicCreatePlanForApi, mechanicSimulateForAuthority as mechanicSimulateForApi } from "../mechanic/mechanicAnalysisPublication.js";
 import {
   initMechanicWorkspace,
-  mechanicCreatePlanForApi,
-  mechanicGapForApi,
   mechanicLatestPlanForApi,
   mechanicLatestSimulationForApi,
   mechanicPlanDiffForApi,
-  mechanicPlanExecuteForApi,
-  mechanicPlanRequestApprovalForApi,
-  mechanicProfileApplyForApi,
   mechanicProfilesForApi,
-  mechanicSimulateForApi,
-  mechanicTargetsApplyForApi,
   mechanicTargetsForApi,
-  mechanicTuningApplyForApi,
   mechanicTuningForApi,
   verifyMechanicWorkspace
 } from "../mechanic/mechanicApi.js";
+import { mechanicPlanRequestApprovalForAuthority as mechanicPlanRequestApprovalForApi, mechanicPlanExecuteForAuthority as mechanicPlanExecuteForApi } from "../mechanic/mechanicExecutionPublication.js";
 import { verifyMechanicTargetsSignature } from "../mechanic/targetsStore.js";
 import { verifyMechanicProfilesSignature } from "../mechanic/profiles.js";
 import { verifyMechanicTuningSignature } from "../mechanic/tuningStore.js";
 import { emitMechanicSse } from "../mechanic/mechanicSse.js";
 import {
-  buildPromptPackForApi,
+  buildPromptPackForApiAsync as buildPromptPackForApi,
   promptDiffForApi,
-  promptInitForApi,
-  promptPolicyApplyForApi,
-  promptPolicyForApi,
-  promptSchedulerRunNowForApi,
-  promptSchedulerSetEnabledForApi,
+  promptInitForApiAsync as promptInitForApi,
+  promptPolicyApplyForApiAsync as promptPolicyApplyForApi,
+  promptPolicyForApiAsync as promptPolicyForApi,
+  promptSchedulerRunNowForApiAsync as promptSchedulerRunNowForApi,
+  promptSchedulerSetEnabledForApiAsync as promptSchedulerSetEnabledForApi,
   promptSchedulerStatusForApi,
-  promptSchedulerTick,
+  promptSchedulerTickAsync as promptSchedulerTick,
   promptShowForApi,
-  promptStatusForApi,
+  promptStatusForApiAsync as promptStatusForApi,
   promptVerifyForApi
 } from "../prompt/promptPackApi.js";
 import { verifyWorkspacePromptPack } from "../prompt/promptPackVerifier.js";
@@ -385,27 +385,28 @@ import {
 import { promptPolicySchema } from "../prompt/promptPolicySchema.js";
 import { emitPromptPackSse } from "../prompt/promptPackSse.js";
 import {
-  passportBadgeForApi,
   passportCacheLatestForApi,
-  passportCreateForApi,
+  passportCreateAttemptForApiAsync,
   passportExportExecuteForApi,
-  passportExportLatestForApi,
+  passportExportLatestAttemptForApiAsync,
   passportExportRequestForApi,
   passportExportsForApi,
-  passportInitForApi,
-  passportPolicyApplyForApi,
+  capturePassportInitialization,
+  passportPolicyApplyAttemptForApiAsync,
   passportPolicyForApi,
   passportReadinessGate,
   passportVerifyForApi
 } from "../passport/passportApi.js";
-import { verifyPassportPolicySignature } from "../passport/passportStore.js";
+import { verifyPassportPolicySignatureForApi as verifyPassportPolicySignature } from "../passport/passportReadAdmission.js";
+import { passportPublicationFailure } from "../passport/passportPublication.js";
 import { emitPassportSse } from "../passport/passportSse.js";
+import { handleStudioPassportBadge } from "./passportBadgeRead.js";
 import {
-  standardGenerateForApi,
+  standardGenerateForApiAsync as standardGenerateForApi,
   standardSchemaReadForApi,
   standardSchemasForApi,
   standardValidateForApi,
-  standardVerifyForApi
+  standardVerifyForApiAsync as standardVerifyForApi
 } from "../standard/standardApi.js";
 
 interface StudioApiOptions {
@@ -420,17 +421,6 @@ interface StudioApiOptions {
   nativeAllowedOrigins?: readonly string[];
   minFreeDiskMb?: number;
   publicConsoleBasePath?: string;
-}
-
-interface AuthContext {
-  isAdmin: boolean;
-  agentId: string | null;
-  scopes: Set<string>;
-  roles: Set<UserRole>;
-  username: string | null;
-  userId: string | null;
-  nativeCsrfToken: string | null;
-  sessionAuthSource?: "LOCAL_USER" | "WORKSPACE_ROUTER";
 }
 
 async function readBody(req: IncomingMessage, maxBytes = 1_048_576): Promise<string> {
@@ -581,7 +571,7 @@ function freeDiskMb(path: string): number | null {
   }
 }
 
-async function buildReadiness(options: StudioApiOptions): Promise<{
+async function buildReadiness(options: StudioApiOptions, assertOriginal: () => void): Promise<{
   ok: boolean;
   reasons: string[];
   checks: Record<string, unknown>;
@@ -651,7 +641,7 @@ async function buildReadiness(options: StudioApiOptions): Promise<{
   let promptPolicyEnforced = true;
   let promptPolicyLoaded: ReturnType<typeof loadPromptPolicy> | null = null;
   try {
-    promptPolicyLoaded = loadPromptPolicy(options.workspace);
+    promptPolicyLoaded = promptPolicySchema.parse(YAML.parse(readUtf8(join(options.workspace, ".amc", "prompt", "policy.yaml"))) as unknown);
     promptPolicyEnforced = promptPolicyLoaded.promptPolicy.enforcement.mode === "ENFORCE";
   } catch {
     promptPolicyEnforced = true;
@@ -709,20 +699,9 @@ async function buildReadiness(options: StudioApiOptions): Promise<{
   if (!pluginVerify.ok) {
     reasons.push("PLUGIN_INTEGRITY_BROKEN");
   }
-  const assuranceGate = (() => {
-    try {
-      return assuranceReadinessGate(options.workspace);
-    } catch (error) {
-      return {
-        ok: false,
-        reasons: [`ASSURANCE_READY_CHECK_FAILED:${String(error)}`],
-        warnings: [],
-        latestRunId: null,
-        latestStatus: null,
-        waiver: null
-      };
-    }
-  })();
+  const assurance = await prepareAssuranceReadinessAsync(options.workspace, assertOriginal);
+  let assuranceGate = assurance.current();
+  const assuranceReasonIndex = reasons.length;
   if (!assuranceGate.ok) {
     reasons.push(...assuranceGate.reasons);
   }
@@ -797,6 +776,10 @@ async function buildReadiness(options: StudioApiOptions): Promise<{
   if (blobEncryptionEnabled && !vault.unlocked) {
     reasons.push("VAULT_LOCKED_FOR_BLOB_ENCRYPTION");
   }
+  const finalAssuranceGate = assurance.current();
+  reasons.splice(assuranceReasonIndex, assuranceGate.ok ? 0 : assuranceGate.reasons.length,
+    ...(finalAssuranceGate.ok ? [] : finalAssuranceGate.reasons));
+  assuranceGate = finalAssuranceGate;
   return {
     ok: reasons.length === 0,
     reasons,
@@ -991,14 +974,6 @@ function setRateLimitHeaders(res: ServerResponse, decision: RateLimitDecision): 
   }
 }
 
-function leaseQueryCarrierEnabled(workspace: string): boolean {
-  try {
-    return loadGatewayConfig(workspace).lease.allowQueryCarrier === true;
-  } catch {
-    return false;
-  }
-}
-
 function requestUsesHttps(req: IncomingMessage): boolean {
   const forwarded = req.headers["x-forwarded-proto"];
   const first = (Array.isArray(forwarded) ? forwarded[0] : forwarded)?.split(",", 1)[0]?.trim().toLowerCase();
@@ -1006,53 +981,6 @@ function requestUsesHttps(req: IncomingMessage): boolean {
     return true;
   }
   return (req.socket as Socket & { encrypted?: boolean }).encrypted === true;
-}
-
-function authenticate(req: IncomingMessage, workspace: string, adminToken: string): AuthContext | null {
-  const suppliedAdmin = req.headers["x-amc-admin-token"];
-  if (typeof suppliedAdmin === "string" && suppliedAdmin === adminToken) {
-    return {
-      isAdmin: true,
-      agentId: null,
-      scopes: new Set(["*"]),
-      roles: new Set(["OWNER", "AUDITOR", "APPROVER", "OPERATOR", "VIEWER", "AGENT"]),
-      username: "bootstrap-admin",
-      userId: "bootstrap-admin",
-      nativeCsrfToken: null
-    };
-  }
-
-  const session = sessionFromRequest({
-    workspace,
-    req
-  });
-  if (session.ok && session.payload) {
-    return {
-      isAdmin: false,
-      agentId: null,
-      scopes: new Set(["console:session"]),
-      roles: new Set<UserRole>(session.payload.userId === "local-demo" ? ["VIEWER"] : session.payload.roles),
-      username: session.payload.username,
-      userId: session.payload.userId,
-      nativeCsrfToken: nativeCsrfTokenForSession(session.payload),
-      sessionAuthSource: session.authSource
-    };
-  }
-
-  const agent = authenticateStudioAgent({
-    workspace, headers: req.headers, rawHeaders: req.rawHeaders,
-    url: new URL(req.url ?? "/", `http://${req.headers.host ?? "127.0.0.1"}`),
-    allowQueryCarrier: leaseQueryCarrierEnabled(workspace)
-  });
-  return agent === null ? null : {
-    isAdmin: false, agentId: agent.agentId, scopes: agent.scopes,
-    roles: new Set(["AGENT"]), username: agent.username,
-    userId: null, nativeCsrfToken: null
-  };
-}
-
-function hasScope(auth: AuthContext, scope: string): boolean {
-  return auth.isAdmin || auth.scopes.has("*") || auth.scopes.has(scope);
 }
 
 function accessContext(auth: AuthContext): AccessContext {
@@ -1115,7 +1043,7 @@ function hmacHeaderValue(req: IncomingMessage): string | null {
   return null;
 }
 
-function resolveWebhookSecret(workspace: string, kind: "feedback" | "outcomes"): string | null {
+function resolveWebhookSecret(workspace: string, kind: "feedback" | "outcomes"): { ref: string; secret: string } | null {
   const refs =
     kind === "feedback"
       ? ["vault:integrations/feedback-webhook", "vault:integrations/ops-webhook"]
@@ -1124,75 +1052,13 @@ function resolveWebhookSecret(workspace: string, kind: "feedback" | "outcomes"):
     try {
       const secret = resolveSecretRef(workspace, ref);
       if (secret && secret.length > 0) {
-        return secret;
+        return { ref, secret };
       }
     } catch {
       // ignore and try fallback ref
     }
   }
   return null;
-}
-
-function verifyLeaseForScope(params: {
-  workspace: string;
-  req: IncomingMessage;
-  expectedAgentId: string;
-  scope: "toolhub:intent" | "toolhub:execute" | "governor:check" | "receipt:verify" | "diagnostic:self-run";
-  routePath?: string;
-  model?: string | null;
-  actionClass?: ActionClass;
-}): { ok: true } | { ok: false; status: number; error: string } {
-  const parsedUrl = new URL(params.req.url ?? "/", `http://${params.req.headers.host ?? "127.0.0.1"}`);
-  const carrier = extractLeaseCarrier({
-    headers: params.req.headers,
-    url: parsedUrl,
-    allowQueryCarrier: leaseQueryCarrierEnabled(params.workspace)
-  });
-  const leaseToken = carrier.leaseToken ?? undefined;
-  if (!leaseToken) {
-    return {
-      ok: false,
-      status: 401,
-      error: "missing lease token"
-    };
-  }
-  const revocations = readRevokedLeaseIds(params.workspace);
-  if (!revocations.ok) {
-    return {
-      ok: false,
-      status: 401,
-      error: `lease revocation signature invalid: ${revocations.reason}`
-    };
-  }
-  const revoked = revocations.ids;
-  const expectedWorkspaceId = workspaceIdFromDirectory(params.workspace);
-  const verification = verifyLeaseToken({
-    workspace: params.workspace,
-    token: leaseToken,
-    expectedWorkspaceId,
-    expectedAgentId: params.expectedAgentId,
-    requiredScope: params.scope,
-    routePath: params.routePath,
-    model: params.model,
-    revokedLeaseIds: revoked,
-    ...(params.actionClass === undefined ? {} : { actionClass: params.actionClass })
-  });
-  if (!verification.ok) {
-    const message = verification.error ?? "lease verification failed";
-    const status = message.includes("scope denied") ||
-      message.includes("route denied") ||
-      message.includes("model denied") ||
-      message.includes("agent mismatch") ||
-      message.includes("workspace mismatch")
-      ? 403
-      : 401;
-    return {
-      ok: false,
-      status,
-      error: message
-    };
-  }
-  return { ok: true };
 }
 
 interface AgentLatestRunSummary {
@@ -1326,108 +1192,35 @@ function agentLastStatus(workspace: string, agentId: string): AgentStatusRespons
   };
 }
 
-function writeStudioAuditEvent(params: {
-  workspace: string;
-  auditType: string;
-  severity?: "LOW" | "MEDIUM" | "HIGH";
-  agentId?: string;
-  payload: Record<string, unknown>;
-}): {
-  eventId: string;
-  receiptId: string;
-} {
-  const humanType = (() => {
-    if (params.auditType === "HUMAN_LOGIN_SUCCESS") return "HUMAN_LOGIN_SUCCESS";
-    if (params.auditType === "HUMAN_LOGIN_FAILED") return "HUMAN_LOGIN_FAILED";
-    if (params.auditType === "APPROVAL_DECIDED" || params.auditType === "CONSOLE_APPROVAL_DECIDED") return "HUMAN_APPROVAL_DECISION";
-    if (params.auditType === "CONSOLE_TARGET_DRAFT_APPLIED") return "HUMAN_TARGET_APPLY";
-    if (params.auditType === "POLICY_PACK_APPLIED" || params.auditType === "HUMAN_POLICY_PACK_APPLY") return "HUMAN_POLICY_PACK_APPLY";
-    if (params.auditType === "HUMAN_FREEZE_LIFT") return "HUMAN_FREEZE_LIFT";
-    if (params.auditType.startsWith("OPS_")) return "HUMAN_OPS_ACTION";
-    if (params.auditType.startsWith("ORG_")) return "HUMAN_ORG_ACTION";
-    return null;
-  })();
-  if (humanType) {
-    try {
-      appendHumanActionEvent({
-        workspace: params.workspace,
-        type: humanType,
-        agentId: params.agentId ?? null,
-        username: typeof params.payload.username === "string" ? params.payload.username : null,
-        payload: params.payload
-      });
-    } catch {
-      // Do not fail primary audit path if human log append fails.
+
+function currentSigningAuthority(req: IncomingMessage, res: ServerResponse, workspace: string, token: string,
+  initial: NonNullable<ReturnType<typeof authenticate>>, requested: UserRole[]) {
+  const roles = [...requested], expected = { isAdmin: initial.isAdmin, userId: initial.userId, agentId: initial.agentId };
+  return () => {
+    const current = authenticate(req, workspace, token);
+    if (!current || current.isAdmin !== expected.isAdmin || current.userId !== expected.userId || current.agentId !== expected.agentId) {
+      if (!res.headersSent) json(res, 401, { error: "authenticated authority changed while signing" });
+      throw new Error("authenticated authority changed while signing");
     }
-  }
-  const ledger = openLedger(params.workspace);
-  const sessionId = `studio-audit-${Date.now()}`;
-  const body = JSON.stringify({
-    auditType: params.auditType,
-    severity: params.severity ?? "MEDIUM",
-    ...params.payload
-  });
-  const bodySha = sha256Hex(Buffer.from(body, "utf8"));
-  try {
-    ledger.startSession({
-      sessionId,
-      runtime: "unknown",
-      binaryPath: "amc-studio",
-      binarySha256: "amc-studio"
-    });
-    const out = ledger.appendEvidenceWithReceipt({
-      sessionId,
-      runtime: "unknown",
-      eventType: "audit",
-      payload: body,
-      payloadExt: "json",
-      inline: true,
-      meta: {
-        auditType: params.auditType,
-        severity: params.severity ?? "MEDIUM",
-        trustTier: "OBSERVED",
-        bodySha256: bodySha,
-        ...(params.agentId ? { agentId: params.agentId } : {}),
-        ...params.payload
-      },
-      receipt: {
-        kind: "guard_check",
-        agentId: params.agentId ?? "unknown",
-        providerId: "unknown",
-        model: null,
-        bodySha256: bodySha
-      }
-    });
-    ledger.sealSession(sessionId);
-    // Fire-and-forget integration routing for deterministic ops hooks.
-    if (params.auditType !== "INTEGRATION_DISPATCHED") {
-      void dispatchIntegrationEvent({
-        workspace: params.workspace,
-        eventName: params.auditType,
-        agentId: params.agentId ?? "system",
-        summary: `AMC audit event ${params.auditType}`,
-        details: {
-          source: "studio-audit",
-          auditEventId: out.id
-        }
-      }).catch(() => {
-        // Integration channel failures must not block core audit persistence.
-      });
-    }
-    return {
-      eventId: out.id,
-      receiptId: out.receiptId
-    };
-  } finally {
-    ledger.close();
-  }
+    if (!requireRoles({ auth: current, res, workspace, roles })) throw new Error("authenticated authority changed while signing");
+  };
 }
 
-function writeConsoleSnapshot(workspace: string): {
-  path: string;
-  sigPath: string | null;
-  payload: Record<string, unknown>;
-} {
+function currentOrgRunActor(req: IncomingMessage, workspace: string, token: string, initial: NonNullable<ReturnType<typeof authenticate>>) {
+  workspace = resolve(workspace);
+  const expected = { isAdmin: initial.isAdmin, userId: initial.userId, agentId: initial.agentId };
+  return () => {
+    const current = authenticate(req, workspace, token);
+    if (!current || current.isAdmin !== expected.isAdmin || current.userId !== expected.userId || current.agentId !== expected.agentId)
+      throw new Error("authenticated authority changed while preparing optional org recompute");
+    const usersSig = verifyUsersConfigSignature(workspace);
+    const check = enforceRoleOrAdmin({ access: accessContext(current), requiredAny: ["OPERATOR", "OWNER"],
+      usersConfigValid: usersSig.valid || current.sessionAuthSource === "WORKSPACE_ROUTER" });
+    if (!check.ok) throw new Error(check.error ?? "optional org recompute authority refused");
+  };
+}
+
+async function writeConsoleSnapshot(workspace: string, beforePublish: () => void) {
   const state = readStudioState(workspace);
   const agents = listAgents(workspace).map((agent) => agent.id);
   if (!agents.includes("default")) {
@@ -1450,32 +1243,7 @@ function writeConsoleSnapshot(workspace: string): {
       : { running: false },
     agents: agentSummaries
   };
-  const studioDir = join(workspace, ".amc", "studio");
-  const path = join(studioDir, "console-snapshot.json");
-  const sigPath = `${path}.sig`;
-  ensureDir(studioDir);
-  writeFileAtomic(path, JSON.stringify(payload, null, 2), 0o644);
-  try {
-    const digest = sha256Hex(Buffer.from(JSON.stringify(payload), "utf8"));
-    const sig = {
-      digestSha256: digest,
-      signature: signHexDigest(digest, getSigningKey(workspace, "artifact-seal")),
-      signedTs: Date.now(),
-      signer: "auditor"
-    };
-    writeFileAtomic(sigPath, JSON.stringify(sig, null, 2), 0o644);
-    return {
-      path,
-      sigPath,
-      payload
-    };
-  } catch {
-    return {
-      path,
-      sigPath: null,
-      payload
-    };
-  }
+  return publishConsoleSnapshotAsync(workspace, payload, beforePublish);
 }
 
 function pickAgentApproval(workspace: string, approvalId: string): { agentId: string; approval: ReturnType<typeof loadApprovalRequestRecord> } | null {
@@ -1507,8 +1275,9 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
   url: string;
   close: () => Promise<void>;
 }> {
-  promptInitForApi(options.workspace);
-  passportInitForApi(options.workspace);
+  const passportStartup = capturePassportInitialization(options.workspace);
+  await promptInitForApi(options.workspace);
+  await passportStartup.initialize();
   const toolhub = new ToolHubService(options.workspace);
   const nativeTaskService = createNativeTaskService({ workspace: options.workspace });
   const orgSse = new OrgSseHub();
@@ -1557,22 +1326,11 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
     }
   };
 
-  const recomputeOrgAndEmit = (
-    type: Parameters<OrgSseHub["emit"]>[0]["type"],
-    nodeIds?: string[]
-  ): void => {
-    try {
-      recomputeAndPersistOrgScorecard({
-        workspace: options.workspace,
-        window: "14d"
-      });
-    } catch {
-      // Do not fail primary workflow if org scorecard recompute fails.
-    }
-    emitOrgEvent(type, nodeIds);
-    if (type !== "ORG_SCORECARD_UPDATED") {
-      emitOrgEvent("ORG_SCORECARD_UPDATED", nodeIds);
-    }
+
+  const recomputeOwnedOrgAndEmit = async (nodeIds: string[], beforePublish: () => void): Promise<void> => {
+    try { await recomputeOrgScorecardsApiAsync({ workspace: options.workspace, window: "14d" }, { beforePublish }); }
+    catch { /* Preserve the existing best-effort secondary recompute contract. */ }
+    emitOrgEvent("ORG_SCORECARD_UPDATED", nodeIds);
   };
 
   const emitForecastEvents = (params: {
@@ -1593,40 +1351,48 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
     }
   };
 
+  let shuttingDown = false; const outcomeOrgWork = createStudioOutcomeOrgWork();
+  const integrationQueueWork = new Set<Promise<void>>();
   const drainIntegrationQueue = (): void => {
-    void drainDueIntegrationDeliveries({ workspace: options.workspace }).catch(() => {
-      // Delivery state remains durable in SQLite and will be retried on a later tick.
-    });
+    const work = drainDueIntegrationDeliveriesWithAuthority({ workspace: options.workspace }, () => {
+      if (shuttingDown) throw new Error("integration queue worker stopped");
+    }).then(() => undefined, () => undefined); // Durable queue state remains available for a later tick.
+    integrationQueueWork.add(work); void work.then(() => integrationQueueWork.delete(work));
   };
   drainIntegrationQueue();
 
+  const forecastSchedulerWork = new Set<Promise<void>>();
   const schedulerTimer = setInterval(() => {
     try {
       drainIntegrationQueue();
-      const readiness = buildReadiness(options);
-      void readiness.then(async (state) => {
-        const tick = schedulerTick({
+      const orgWorkspace = resolve(options.workspace), orgSecondary = captureStudioOrgSecondary(orgWorkspace, () => { if (shuttingDown) throw new Error("scheduler org recompute stopped"); if (resolve(options.workspace) !== orgWorkspace) throw new Error("original scheduler workspace changed while preparing optional org recompute"); }, emitOrgEvent); const readinessWorkspace = options.workspace;
+      const readiness = buildReadiness({ ...options, workspace: orgWorkspace }, () => {
+        if (shuttingDown) throw new Error("assurance readiness scheduler stopped");
+        if (options.workspace !== readinessWorkspace || resolve(readinessWorkspace) !== orgWorkspace) throw new Error("original scheduler readiness workspace changed");
+      });
+      const forecastWork = readiness.then(async (state) => {
+        const tick = await schedulerTickAsync({
           workspace: options.workspace,
           workspaceReady: state.ok
         });
-        const promptTick = promptSchedulerTick({
+        const promptTick = await promptSchedulerTick({
           workspace: options.workspace,
           workspaceReady: state.ok
-        });
+        }, { beforePublish: () => { if (shuttingDown) throw new Error("prompt scheduler stopped"); } });
         const assuranceTick = await assuranceSchedulerTick({
           workspace: options.workspace,
           workspaceReady: state.ok
-        });
+        }, { beforePublish: () => { if (shuttingDown) throw new Error("assurance scheduler stopped"); } });
         const auditTick = await auditSchedulerTick({
           workspace: options.workspace,
           workspaceReady: state.ok
-        });
+        }, { beforePublish: () => { if (shuttingDown) throw new Error("audit scheduler stopped"); } });
         const valueTick = await valueSchedulerTick({
           workspace: options.workspace,
           workspaceReady: state.ok
         });
         if (tick.ran) {
-          recomputeOrgAndEmit("FORECAST_UPDATED");
+          await orgSecondary.run("FORECAST_UPDATED");
         }
         if (promptTick.ran) {
           emitPromptPackSse({
@@ -1668,12 +1434,12 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }).catch(() => {
         // Scheduler loop is best effort; failures are surfaced via explicit endpoints and subsequent ticks.
       });
+      forecastSchedulerWork.add(forecastWork); void forecastWork.then(() => forecastSchedulerWork.delete(forecastWork), () => forecastSchedulerWork.delete(forecastWork));
     } catch {
       // Scheduler is best effort; readiness and explicit refresh endpoints remain authoritative.
     }
   }, 60_000);
 
-  let shuttingDown = false;
   let inFlightRequests = 0;
   const openSockets = new Set<Socket>();
 
@@ -1784,7 +1550,11 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 429, { error: "rate limited" });
           return;
         }
-        const readiness = await buildReadiness(options);
+        const readinessWorkspace = options.workspace, readinessRoot = resolve(readinessWorkspace);
+        const readiness = await buildReadiness({ ...options, workspace: readinessRoot }, () => {
+          if (shuttingDown) throw new Error("readiness check stopped");
+          if (options.workspace !== readinessWorkspace || resolve(readinessWorkspace) !== readinessRoot) throw new Error("original readiness workspace changed");
+        });
         json(res, readiness.ok ? 200 : 503, {
           status: readiness.ok ? "READY" : "NOT_READY",
           reasons: readiness.reasons,
@@ -1816,12 +1586,13 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
           return;
         }
-        const snapshot = writeConsoleSnapshot(options.workspace);
-        json(res, 200, {
-          ...snapshot.payload,
-          snapshotPath: snapshot.path,
-          signaturePath: snapshot.sigPath
-        });
+        try {
+          const snapshot = await writeConsoleSnapshot(options.workspace, currentSigningAuthority(req, res, options.workspace, options.token, auth,
+            ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"]));
+          json(res, 200, { ...snapshot.payload, snapshotPath: snapshot.path, signaturePath: snapshot.sigPath });
+        } catch (error) {
+          if (!res.headersSent) json(res, consoleSnapshotErrorStatus(error), { error: "Console snapshot unavailable", code: CONSOLE_SNAPSHOT_UNAVAILABLE });
+        }
         return;
       }
 
@@ -1987,7 +1758,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "pairing code is required" });
           return;
         }
-        const claimed = claimPairingForResponse({
+        const claimed = await claimPairingForResponseAsync({
           workspace: options.workspace,
           code: parsed.code.trim(),
           res,
@@ -2043,7 +1814,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           password: parsed.password
         });
         if (!authUser.ok || !authUser.user) {
-          writeStudioAuditEvent({
+          await writeStudioAuditEventAsync({
             workspace: options.workspace,
             auditType: "HUMAN_LOGIN_FAILED",
             severity: "MEDIUM",
@@ -2054,13 +1825,13 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 401, { error: authUser.error ?? "invalid credentials" });
           return;
         }
-        const session = createSession({
+        const session = await createSessionAsync({
           workspace: options.workspace,
           user: authUser.user
         });
         const maxAgeSec = Math.max(60, Math.floor((session.payload.expiresTs - Date.now()) / 1000));
         setSessionCookie(res, session.token, maxAgeSec, "/", requestUsesHttps(req));
-        writeStudioAuditEvent({
+        await writeStudioAuditEventAsync({
           workspace: options.workspace,
           auditType: "HUMAN_LOGIN_SUCCESS",
           severity: "LOW",
@@ -2069,7 +1840,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             username: authUser.user.username,
             roles: authUser.user.roles
           }
-        });
+        }, () => { if (!verifyTrackedSessionToken({ workspace: options.workspace, token: session.token }).ok) throw new Error("issued login session is no longer current"); });
         json(res, 200, {
           ok: true,
           user: {
@@ -2140,7 +1911,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         const canIngestAsOperator =
           sessionAuth && (sessionAuth.isAdmin || hasAnyRole([...sessionAuth.roles], ["OWNER", "OPERATOR"]));
         if (canIngestAsOperator) {
-          const ingested = ingestFeedbackOutcome({
+          const orgSourceWorkspace = options.workspace, orgWorkspace = resolve(orgSourceWorkspace), orgToken = options.token, orgIdentity = { isAdmin: sessionAuth.isAdmin, userId: sessionAuth.userId, agentId: sessionAuth.agentId }; const orgSecondary = captureStudioOrgSecondary(orgWorkspace, () => { if (shuttingDown) throw new Error("outcome org recompute stopped"); if (options.workspace !== orgSourceWorkspace || resolve(orgSourceWorkspace) !== orgWorkspace || options.token !== orgToken) throw new Error("original outcome workspace or token changed while preparing optional org recompute"); const current = authenticate(req, orgSourceWorkspace, orgToken); if (!current || current.isAdmin !== orgIdentity.isAdmin || current.userId !== orgIdentity.userId || current.agentId !== orgIdentity.agentId || !(current.isAdmin || hasAnyRole([...current.roles], ["OWNER", "OPERATOR"]))) throw new Error("original outcome session authority changed while preparing optional org recompute"); }, emitOrgEvent); const ingested = ingestFeedbackOutcome({
             workspace: options.workspace,
             payload,
             attestationKind: "self_attested"
@@ -2150,16 +1921,16 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             trustTier: "SELF_REPORTED",
             auth: "session"
           });
-          recomputeOrgAndEmit("OUTCOMES_UPDATED", payloadAgentId ? orgNodeIdsForAgent(payloadAgentId) : undefined);
+          await outcomeOrgWork.track(orgSecondary.run("OUTCOMES_UPDATED", payloadAgentId ? orgNodeIdsForAgent(payloadAgentId) : undefined));
           return;
         }
         const provided = hmacHeaderValue(req);
-        const secret = resolveWebhookSecret(options.workspace, "feedback");
+        const orgSourceWorkspace = options.workspace, selectedSecret = resolveWebhookSecret(orgSourceWorkspace, "feedback"), secret = selectedSecret?.secret ?? null;
         if (!provided || !secret || !verifyHmacSignature(body, secret, provided)) {
           json(res, 401, { error: "invalid feedback webhook authentication" });
           return;
         }
-        const ingested = ingestFeedbackOutcome({
+        const orgWorkspace = resolve(orgSourceWorkspace), orgSecret = secret, orgSecretKey = selectedSecret!.ref.slice("vault:".length); const orgSecondary = captureStudioOrgSecondary(orgWorkspace, () => { if (shuttingDown) throw new Error("outcome org recompute stopped"); if (options.workspace !== orgSourceWorkspace || resolve(orgSourceWorkspace) !== orgWorkspace) throw new Error("original outcome workspace changed while preparing optional org recompute"); if (!vaultStatus(orgSourceWorkspace).unlocked || getVaultSecret(orgSourceWorkspace, orgSecretKey) !== orgSecret) throw new Error("original outcome webhook credential is unavailable or changed"); const carrier = hmacHeaderValue(req); if (!carrier || !verifyHmacSignature(body, orgSecret, carrier)) throw new Error("original outcome webhook authentication changed while preparing optional org recompute"); }, emitOrgEvent); const ingested = ingestFeedbackOutcome({
           workspace: options.workspace,
           payload,
           attestationKind: "external_report"
@@ -2169,7 +1940,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           trustTier: "SELF_REPORTED",
           auth: "webhook"
         });
-        recomputeOrgAndEmit("OUTCOMES_UPDATED", payloadAgentId ? orgNodeIdsForAgent(payloadAgentId) : undefined);
+        await outcomeOrgWork.track(orgSecondary.run("OUTCOMES_UPDATED", payloadAgentId ? orgNodeIdsForAgent(payloadAgentId) : undefined));
         return;
       }
 
@@ -2186,7 +1957,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         const canIngestAsOperator =
           sessionAuth && (sessionAuth.isAdmin || hasAnyRole([...sessionAuth.roles], ["OWNER", "OPERATOR"]));
         if (canIngestAsOperator) {
-          const ingested = ingestOutcomeWebhook({
+          const orgSourceWorkspace = options.workspace, orgWorkspace = resolve(orgSourceWorkspace), orgToken = options.token, orgIdentity = { isAdmin: sessionAuth.isAdmin, userId: sessionAuth.userId, agentId: sessionAuth.agentId }; const orgSecondary = captureStudioOrgSecondary(orgWorkspace, () => { if (shuttingDown) throw new Error("outcome org recompute stopped"); if (options.workspace !== orgSourceWorkspace || resolve(orgSourceWorkspace) !== orgWorkspace || options.token !== orgToken) throw new Error("original outcome workspace or token changed while preparing optional org recompute"); const current = authenticate(req, orgSourceWorkspace, orgToken); if (!current || current.isAdmin !== orgIdentity.isAdmin || current.userId !== orgIdentity.userId || current.agentId !== orgIdentity.agentId || !(current.isAdmin || hasAnyRole([...current.roles], ["OWNER", "OPERATOR"]))) throw new Error("original outcome session authority changed while preparing optional org recompute"); }, emitOrgEvent); const ingested = ingestOutcomeWebhook({
             workspace: options.workspace,
             payload,
             attestationKind: "self_attested",
@@ -2197,16 +1968,16 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             trustTier: "SELF_REPORTED",
             auth: "session"
           });
-          recomputeOrgAndEmit("OUTCOMES_UPDATED", payloadAgentId ? orgNodeIdsForAgent(payloadAgentId) : undefined);
+          await outcomeOrgWork.track(orgSecondary.run("OUTCOMES_UPDATED", payloadAgentId ? orgNodeIdsForAgent(payloadAgentId) : undefined));
           return;
         }
         const provided = hmacHeaderValue(req);
-        const secret = resolveWebhookSecret(options.workspace, "outcomes");
+        const orgSourceWorkspace = options.workspace, selectedSecret = resolveWebhookSecret(orgSourceWorkspace, "outcomes"), secret = selectedSecret?.secret ?? null;
         if (!provided || !secret || !verifyHmacSignature(body, secret, provided)) {
           json(res, 401, { error: "invalid outcomes webhook authentication" });
           return;
         }
-        const ingested = ingestOutcomeWebhook({
+        const orgWorkspace = resolve(orgSourceWorkspace), orgSecret = secret, orgSecretKey = selectedSecret!.ref.slice("vault:".length); const orgSecondary = captureStudioOrgSecondary(orgWorkspace, () => { if (shuttingDown) throw new Error("outcome org recompute stopped"); if (options.workspace !== orgSourceWorkspace || resolve(orgSourceWorkspace) !== orgWorkspace) throw new Error("original outcome workspace changed while preparing optional org recompute"); if (!vaultStatus(orgSourceWorkspace).unlocked || getVaultSecret(orgSourceWorkspace, orgSecretKey) !== orgSecret) throw new Error("original outcome webhook credential is unavailable or changed"); const carrier = hmacHeaderValue(req); if (!carrier || !verifyHmacSignature(body, orgSecret, carrier)) throw new Error("original outcome webhook authentication changed while preparing optional org recompute"); }, emitOrgEvent); const ingested = ingestOutcomeWebhook({
           workspace: options.workspace,
           payload,
           attestationKind: "external_report",
@@ -2217,7 +1988,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           trustTier: "SELF_REPORTED",
           auth: "webhook"
         });
-        recomputeOrgAndEmit("OUTCOMES_UPDATED", payloadAgentId ? orgNodeIdsForAgent(payloadAgentId) : undefined);
+        await outcomeOrgWork.track(orgSecondary.run("OUTCOMES_UPDATED", payloadAgentId ? orgNodeIdsForAgent(payloadAgentId) : undefined));
         return;
       }
 
@@ -2234,11 +2005,24 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 401, { error: "value ingest requires OWNER/OPERATOR session or vault-backed webhook token" });
           return;
         }
-        // An operator session or a webhook token authenticates the sender; the events stay SELF_REPORTED (P0-18).
-        const out = ingestValueWebhookForApi({
-          workspace: options.workspace,
-          payload: parsed
-        });
+        // Choose the original session or token basis once; a revoked session never falls back to the token after Sign.
+        const expected = sessionAuth ? { isAdmin: sessionAuth.isAdmin, userId: sessionAuth.userId, agentId: sessionAuth.agentId } : null;
+        const originalToken = typeof providedToken === "string" ? providedToken : "";
+        const beforePublish = () => {
+          if (canIngestAsOperator) {
+            const current = authenticate(req, options.workspace, options.token);
+            if (!current || !expected || current.isAdmin !== expected.isAdmin || current.userId !== expected.userId || current.agentId !== expected.agentId) {
+              if (!res.headersSent) json(res, 401, { error: "value ingest session changed while signing" }); throw new Error("value ingest session changed while signing");
+            }
+            if (!requireRoles({ auth: current, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) throw new Error("value ingest role changed while signing");
+          } else {
+            try { assertValueWebhookTokenCurrent(options.workspace, originalToken); }
+            catch (error) { if (!res.headersSent) json(res, 401, { error: "value webhook authority changed while signing" }); throw error; }
+          }
+        };
+        // Sender authentication never upgrades the SELF_REPORTED event trust tier.
+        const out = await ingestValueWebhookForApi({ workspace: options.workspace, payload: parsed }, { beforePublish })
+          .catch(error => { if (res.headersSent) return null; throw error; }); if (out === null) return;
         emitValueSse({
           hub: orgSse,
           type: "VALUE_UPDATED"
@@ -2260,7 +2044,30 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       const initiator = auth.userId ?? (auth.agentId ? `agent:${auth.agentId}` : "unknown");
       const requireRouteRoles = (roles: UserRole[]): boolean =>
         requireRoles({ auth, res, workspace: options.workspace, roles });
-
+      const signingAuthority = (roles: UserRole[]) => currentSigningAuthority(req, res, options.workspace, options.token, auth, roles);
+      const assurancePublication = (roles: UserRole[], readOnly = false, vault = false) => { const actor = signingAuthority(roles); return { beforePublish() { actor(); if (readOnly && requiresReadOnlyMode(options.workspace)) { if (!res.headersSent) json(res, 403, { error: "users signature invalid; write operations blocked" }); throw new Error("users signature invalid; write operations blocked"); } if (vault && !requireUnlockedVaultForSigning()) throw new Error("vault locked; unlock required for signing"); } }; };
+      const auditPublication = (roles: UserRole[], vault = true) => { const actor = signingAuthority(roles); return { beforePublish() { actor(); if (requiresReadOnlyMode(options.workspace)) { if (!res.headersSent) json(res, 403, { error: "users signature invalid; write operations blocked" }); throw new Error("users signature invalid; write operations blocked"); } if (vault && !requireUnlockedVaultForSigning()) throw new Error("vault locked; unlock required for signing"); } }; }; let policyMapReadiness: ReturnType<typeof captureAuditPolicyMapReadiness> | null = null;
+      const refreshConsole = async () => {
+        const recheck = signingAuthority(["OWNER"]);
+        try { await writeConsoleSnapshot(options.workspace, recheck); return {}; }
+        catch {
+          if (res.headersSent) return null;
+          try { recheck(); } catch (error) { if (res.headersSent) return null; throw error; }
+          return { warning: { code: CONSOLE_SNAPSHOT_UNAVAILABLE } };
+        }
+      };
+      const assertUsersMutationAuthorized = createUsersMutationGuard({ workspace: options.workspace, expected: auth,
+        authenticate: () => authenticate(req, options.workspace, options.token), access: accessContext, readOnly: () => requiresReadOnlyMode(options.workspace) });
+      const humanAuditAuthority = (requested: UserRole[], needsVault = false) => {
+        const roles = [...requested], expected = { isAdmin: auth.isAdmin, userId: auth.userId, agentId: auth.agentId };
+        return () => {
+          const current = authenticate(req, options.workspace, options.token);
+          if (!current || current.isAdmin !== expected.isAdmin || current.userId !== expected.userId || current.agentId !== expected.agentId) throw new Error("human audit actor changed");
+          const check = enforceRoleOrAdmin({ access: accessContext(current), requiredAny: roles,
+            usersConfigValid: verifyUsersConfigSignature(options.workspace).valid || current.sessionAuthSource === "WORKSPACE_ROUTER" });
+          if (!check.ok || requiresReadOnlyMode(options.workspace) || (needsVault && !vaultStatus(options.workspace).unlocked)) throw new Error("human audit actor is no longer authorized");
+        };
+      };
       const requireUnlockedVaultForSigning = (): boolean => {
         if (vaultStatus(options.workspace).unlocked) return true;
         json(res, 423, { error: "vault locked; unlock required for signing" });
@@ -2421,6 +2228,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           pinnedFingerprint: null,
           currentFingerprint: null,
           attestationLevel: null,
+          attestationBasis: null,
           requiredAttestationLevel: null,
           lastAttestationTs: null
         }));
@@ -2519,6 +2327,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             pinnedFingerprint: trust.pinnedFingerprint,
             currentFingerprint: trust.currentFingerprint,
             attestationLevel: trust.attestationLevel,
+            attestationBasis: trust.attestationBasis,
             requiredAttestationLevel: trust.requiredAttestationLevel,
             lastAttestationTs: trust.lastAttestationTs
           }
@@ -2540,6 +2349,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           pinnedFingerprint: null,
           currentFingerprint: null,
           attestationLevel: null,
+          attestationBasis: null,
           requiredAttestationLevel: null,
           lastAttestationTs: null
         }));
@@ -2585,12 +2395,17 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
         const parsed = body ? (JSON.parse(body) as { dryRun?: boolean }) : {};
-        const result = retentionRunCli(options.workspace, parsed.dryRun === true);
+        const currentActor = signingAuthority(["OWNER", "OPERATOR"]), beforePublish = () => {
+          currentActor(); if (requiresReadOnlyMode(options.workspace)) { if (!res.headersSent) json(res, 403, { error: "users signature invalid; write operations blocked" }); throw new Error("retention caller is read-only"); }
+        };
+        let result: Awaited<ReturnType<typeof retentionRunStudioAsync>>;
+        try { result = await retentionRunStudioAsync(options.workspace, parsed.dryRun === true, beforePublish); beforePublish(); }
+        catch (error) { if (res.headersSent) return; throw error; }
         const stats = maintenanceStatsCli(options.workspace);
         setRetentionSegmentsMetric(retentionStatusCli(options.workspace).segmentCount);
         setBlobMetrics(stats.blobs.count, stats.blobs.bytes);
         setDbSizeMetric(stats.dbSizeBytes);
-        const audit = writeStudioAuditEvent({
+        const audit = await writeStudioAuditEventAsync({
           workspace: options.workspace,
           auditType: "OPS_RETENTION_RUN",
           severity: "MEDIUM",
@@ -2602,7 +2417,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             prunedBlobCount: result.prunedBlobCount,
             username: auth.username ?? null
           }
-        });
+        }, humanAuditAuthority(["OWNER", "OPERATOR"]));
         json(res, 200, {
           ...result,
           studioAuditEventId: audit.eventId,
@@ -2636,7 +2451,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         setRetentionSegmentsMetric(stats.archive.segmentCount);
         setBlobMetrics(stats.blobs.count, stats.blobs.bytes);
         setDbSizeMetric(stats.dbSizeBytes);
-        const audit = writeStudioAuditEvent({
+        const audit = await writeStudioAuditEventAsync({
           workspace: options.workspace,
           auditType: "OPS_MAINTENANCE_VACUUM",
           severity: "LOW",
@@ -2644,7 +2459,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             lastVacuumTs: result.lastVacuumTs,
             username: auth.username ?? null
           }
-        });
+        }, humanAuditAuthority(["OWNER", "OPERATOR"]));
         json(res, 200, {
           ...result,
           studioAuditEventId: audit.eventId,
@@ -2662,7 +2477,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           return;
         }
         const result = maintenancePruneCacheCli(options.workspace);
-        const audit = writeStudioAuditEvent({
+        const audit = await writeStudioAuditEventAsync({
           workspace: options.workspace,
           auditType: "OPS_MAINTENANCE_PRUNE",
           severity: "LOW",
@@ -2672,7 +2487,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             removedGenericCacheFiles: result.removedGenericCacheFiles.length,
             username: auth.username ?? null
           }
-        });
+        }, humanAuditAuthority(["OWNER", "OPERATOR"]));
         json(res, 200, {
           ...result,
           studioAuditEventId: audit.eventId,
@@ -2752,7 +2567,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           source: "studio",
           command: "Studio org run"
         });
-        const audit = writeStudioAuditEvent({
+        const audit = await writeStudioAuditEventAsync({
           workspace: options.workspace,
           auditType: "ORG_RUN_CREATED",
           severity: result.artifact.status === "completed" ? "LOW" : "MEDIUM",
@@ -2761,7 +2576,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             roleCount: result.artifact.summary.roleCount,
             status: result.artifact.status
           }
-        });
+        }, humanAuditAuthority(["OWNER", "OPERATOR"]));
         emitOrgEvent("ORG_RUN_CREATED");
         json(res, 201, {
           ...result,
@@ -2811,11 +2626,11 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
         const parsed = body ? (JSON.parse(body) as { window?: string }) : {};
-        const out = recomputeAndPersistOrgScorecard({
+        const out = await recomputeOrgScorecardsApiAsync({
           workspace: options.workspace,
           window: parsed.window ?? "14d"
-        });
-        const audit = writeStudioAuditEvent({
+        }, { beforePublish: signingAuthority(["OWNER", "OPERATOR"]) });
+        const audit = await writeStudioAuditEventAsync({
           workspace: options.workspace,
           auditType: "ORG_SCORECARD_UPDATED",
           severity: "LOW",
@@ -2824,7 +2639,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             latestPath: out.latestPath,
             latestSigPath: out.latestSigPath
           }
-        });
+        }, humanAuditAuthority(["OWNER", "OPERATOR"], true));
         emitOrgEvent("ORG_SCORECARD_UPDATED");
         json(res, 200, {
           ...out,
@@ -2857,14 +2672,16 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "invalid node type" });
           return;
         }
-        const saved = addOrgNode({
+        const orgUpdate = prepareOrgConfigUpdateLog(options.workspace, signingAuthority(["OWNER"]), humanAuditAuthority(["OWNER"], true));
+        const saved = await addOrgNodeAsync({
           workspace: options.workspace,
           id: parsed.id,
           type: type as "ENTERPRISE" | "TEAM" | "FUNCTION" | "PROCESS" | "ECOSYSTEM",
           name: parsed.name,
           parentId: parsed.parentId ?? null
-        });
-        const audit = writeStudioAuditEvent({
+        }, { beforePublish: orgUpdate.assertCurrent });
+        const orgLog = orgUpdate.published(saved.path, saved.config);
+        const audit = await writeStudioAuditEventAsync({
           workspace: options.workspace,
           auditType: "ORG_NODE_ADDED",
           severity: "LOW",
@@ -2872,18 +2689,9 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             nodeId: parsed.id,
             nodeType: type
           }
-        });
-        appendTransparencyEntry({
-          workspace: options.workspace,
-          type: "ORG_CONFIG_UPDATED",
-          agentId: "org",
-          artifact: {
-            kind: "policy",
-            sha256: sha256Hex(readUtf8(saved.path)),
-            id: `node_${parsed.id}`
-          }
-        });
-        recomputeOrgAndEmit("ORG_SCORECARD_UPDATED", [parsed.id]);
+        }, humanAuditAuthority(["OWNER"], true));
+        await orgLog.append(`node_${parsed.id}`, audit.eventId);
+        await recomputeOwnedOrgAndEmit([parsed.id], orgLog.beforeRecompute);
         json(res, 200, {
           path: saved.path,
           sigPath: saved.sigPath,
@@ -2909,13 +2717,15 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "agentId and nodeId are required" });
           return;
         }
-        const saved = assignAgentToNode({
+        const orgUpdate = prepareOrgConfigUpdateLog(options.workspace, signingAuthority(["OWNER"]), humanAuditAuthority(["OWNER"], true));
+        const saved = await assignAgentToNodeAsync({
           workspace: options.workspace,
           agentId: parsed.agentId,
           nodeId: parsed.nodeId,
           weight: parsed.weight ?? 1
-        });
-        const audit = writeStudioAuditEvent({
+        }, { beforePublish: orgUpdate.assertCurrent });
+        const orgLog = orgUpdate.published(saved.path, saved.config);
+        const audit = await writeStudioAuditEventAsync({
           workspace: options.workspace,
           auditType: "ORG_AGENT_ASSIGNED",
           severity: "LOW",
@@ -2924,18 +2734,9 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             nodeId: parsed.nodeId,
             weight: parsed.weight ?? 1
           }
-        });
-        appendTransparencyEntry({
-          workspace: options.workspace,
-          type: "ORG_CONFIG_UPDATED",
-          agentId: "org",
-          artifact: {
-            kind: "policy",
-            sha256: sha256Hex(readUtf8(saved.path)),
-            id: `assign_${parsed.agentId}_${parsed.nodeId}`
-          }
-        });
-        recomputeOrgAndEmit("ORG_SCORECARD_UPDATED", [parsed.nodeId]);
+        }, humanAuditAuthority(["OWNER"], true));
+        await orgLog.append(`assign_${parsed.agentId}_${parsed.nodeId}`, audit.eventId);
+        await recomputeOwnedOrgAndEmit([parsed.nodeId], orgLog.beforeRecompute);
         json(res, 200, {
           path: saved.path,
           sigPath: saved.sigPath,
@@ -2961,12 +2762,14 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "agentId and nodeId are required" });
           return;
         }
-        const saved = unassignAgentFromNode({
+        const orgUpdate = prepareOrgConfigUpdateLog(options.workspace, signingAuthority(["OWNER"]), humanAuditAuthority(["OWNER"], true));
+        const saved = await unassignAgentFromNodeAsync({
           workspace: options.workspace,
           agentId: parsed.agentId,
           nodeId: parsed.nodeId
-        });
-        const audit = writeStudioAuditEvent({
+        }, { beforePublish: orgUpdate.assertCurrent });
+        const orgLog = orgUpdate.published(saved.path, saved.config);
+        const audit = await writeStudioAuditEventAsync({
           workspace: options.workspace,
           auditType: "ORG_AGENT_UNASSIGNED",
           severity: "LOW",
@@ -2974,18 +2777,9 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             agentId: parsed.agentId,
             nodeId: parsed.nodeId
           }
-        });
-        appendTransparencyEntry({
-          workspace: options.workspace,
-          type: "ORG_CONFIG_UPDATED",
-          agentId: "org",
-          artifact: {
-            kind: "policy",
-            sha256: sha256Hex(readUtf8(saved.path)),
-            id: `unassign_${parsed.agentId}_${parsed.nodeId}`
-          }
-        });
-        recomputeOrgAndEmit("ORG_SCORECARD_UPDATED", [parsed.nodeId]);
+        }, humanAuditAuthority(["OWNER"], true));
+        await orgLog.append(`unassign_${parsed.agentId}_${parsed.nodeId}`, audit.eventId);
+        await recomputeOwnedOrgAndEmit([parsed.nodeId], orgLog.beforeRecompute);
         json(res, 200, {
           path: saved.path,
           sigPath: saved.sigPath,
@@ -3065,22 +2859,12 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "nodeId is required" });
           return;
         }
-        const scorecard = computeOrgScorecard({
-          workspace: options.workspace,
-          window: "14d"
-        });
         const kind = (parsed.kind ?? "commit").toLowerCase();
-        const out = kind === "learn"
-          ? generateOrgEducationBrief({ workspace: options.workspace, scorecard, nodeId: parsed.nodeId })
-          : kind === "own"
-            ? generateOrgOwnershipPlan({ workspace: options.workspace, scorecard, nodeId: parsed.nodeId })
-            : generateOrgCommitmentPlan({
-              workspace: options.workspace,
-              scorecard,
-              nodeId: parsed.nodeId,
-              days: parsed.days === 14 || parsed.days === 30 || parsed.days === 90 ? parsed.days : 30
-            });
-        const audit = writeStudioAuditEvent({
+        const out = await generateOrgEocAsync({ workspace: options.workspace, nodeId: parsed.nodeId,
+          type: kind === "learn" ? "learn" : kind === "own" ? "own" : "commit", window: "14d",
+          days: parsed.days === 14 || parsed.days === 30 || parsed.days === 90 ? parsed.days : 30 },
+        { beforePublish: signingAuthority(["OWNER", "OPERATOR"]) });
+        const audit = await writeStudioAuditEventAsync({
           workspace: options.workspace,
           auditType: "ORG_COMMITMENT_GENERATED",
           severity: "LOW",
@@ -3089,7 +2873,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             kind,
             outPath: out.outPath
           }
-        });
+        }, humanAuditAuthority(["OWNER", "OPERATOR"], true));
         emitOrgEvent("ORG_SCORECARD_UPDATED", [parsed.nodeId]);
         json(res, 200, {
           ...out,
@@ -3144,10 +2928,15 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "map payload is required" });
           return;
         }
-        const applied = applyTransformMapForApi({
+        const applied = await applyTransformMapForApiAsync({
           workspace: options.workspace,
           map: parsed.map as ReturnType<typeof getTransformMapForApi>["map"]
-        });
+        }, { beforePublish: () => {
+          signingAuthority(["OWNER"])();
+          if (requiresReadOnlyMode(options.workspace)) { if (!res.headersSent) json(res, 403, { error: "users signature invalid; write operations blocked" }); throw new Error("users signature invalid; write operations blocked"); }
+          if (!requireUnlockedVaultForSigning()) throw new Error("vault locked; unlock required for signing");
+        } });
+        if (res.headersSent) return;
         const audit = writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: "TRANSFORM_MAP_UPDATED",
@@ -3196,14 +2985,19 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         const parsed = body
           ? (JSON.parse(body) as { to?: "targets" | "excellence" | "custom"; window?: string; preview?: boolean; targetOverride?: Record<string, number> })
           : {};
-        const out = createAgentTransformPlanForApi({
+        const out = await createAgentTransformPlanForApiAsync({
           workspace: options.workspace,
           agentId,
           to: parsed.to ?? "targets",
           window: parsed.window ?? "14d",
           preview: parsed.preview === true,
           targetOverride: parsed.targetOverride
-        });
+        }, { beforePublish: () => {
+          signingAuthority(["OWNER", "OPERATOR"])();
+          if (requiresReadOnlyMode(options.workspace)) { if (!res.headersSent) json(res, 403, { error: "users signature invalid; write operations blocked" }); throw new Error("users signature invalid; write operations blocked"); }
+          if (!requireUnlockedVaultForSigning()) throw new Error("vault locked; unlock required for signing");
+        } });
+        if (res.headersSent) return;
         const audit = writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: "TRANSFORM_PLAN_CREATED",
@@ -3238,11 +3032,16 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         const agentId = resolveAgentId(options.workspace, decodeURIComponent(agentTransformTrackMatch[1] ?? "default"));
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
         const parsed = body ? (JSON.parse(body) as { window?: string }) : {};
-        const out = trackAgentTransformPlanForApi({
+        const out = await trackAgentTransformPlanForApiAsync({
           workspace: options.workspace,
           agentId,
           window: parsed.window
-        });
+        }, { beforePublish: () => {
+          signingAuthority(["OWNER", "OPERATOR"])();
+          if (requiresReadOnlyMode(options.workspace)) { if (!res.headersSent) json(res, 403, { error: "users signature invalid; write operations blocked" }); throw new Error("users signature invalid; write operations blocked"); }
+          if (!requireUnlockedVaultForSigning()) throw new Error("vault locked; unlock required for signing");
+        } });
+        if (res.headersSent) return;
         const audit = writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: "TRANSFORM_PLAN_UPDATED",
@@ -3281,7 +3080,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           return;
         }
         const role: "OWNER" | "AUDITOR" = auth.roles.has("AUDITOR") ? "AUDITOR" : "OWNER";
-        const out = attestAgentTransformTaskForApi({
+        const out = await attestAgentTransformTaskForApiAsync({
           workspace: options.workspace,
           agentId,
           taskId: parsed.taskId,
@@ -3290,7 +3089,12 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           evidenceLinks: Array.isArray(parsed.evidenceLinks) ? parsed.evidenceLinks : [],
           createdByUser: auth.username ?? "owner",
           role
-        });
+        }, { beforePublish: () => {
+          signingAuthority([role])();
+          if (requiresReadOnlyMode(options.workspace)) { if (!res.headersSent) json(res, 403, { error: "users signature invalid; write operations blocked" }); throw new Error("users signature invalid; write operations blocked"); }
+          if (!requireUnlockedVaultForSigning()) throw new Error("vault locked; unlock required for signing");
+        } });
+        if (res.headersSent) return;
         const audit = writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: "TRANSFORM_TASK_ATTESTED",
@@ -3341,14 +3145,19 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         const parsed = body
           ? (JSON.parse(body) as { to?: "targets" | "excellence" | "custom"; window?: string; preview?: boolean; targetOverride?: Record<string, number> })
           : {};
-        const out = createNodeTransformPlanForApi({
+        const out = await createNodeTransformPlanForApiAsync({
           workspace: options.workspace,
           nodeId,
           to: parsed.to ?? "targets",
           window: parsed.window ?? "14d",
           preview: parsed.preview === true,
           targetOverride: parsed.targetOverride
-        });
+        }, { beforePublish: () => {
+          signingAuthority(["OWNER", "OPERATOR"])();
+          if (requiresReadOnlyMode(options.workspace)) { if (!res.headersSent) json(res, 403, { error: "users signature invalid; write operations blocked" }); throw new Error("users signature invalid; write operations blocked"); }
+          if (!requireUnlockedVaultForSigning()) throw new Error("vault locked; unlock required for signing");
+        } });
+        if (res.headersSent) return;
         const audit = writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: "TRANSFORM_PLAN_CREATED",
@@ -3383,11 +3192,16 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         const nodeId = decodeURIComponent(nodeTransformTrackMatch[1] ?? "");
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
         const parsed = body ? (JSON.parse(body) as { window?: string }) : {};
-        const out = trackNodeTransformPlanForApi({
+        const out = await trackNodeTransformPlanForApiAsync({
           workspace: options.workspace,
           nodeId,
           window: parsed.window
-        });
+        }, { beforePublish: () => {
+          signingAuthority(["OWNER", "OPERATOR"])();
+          if (requiresReadOnlyMode(options.workspace)) { if (!res.headersSent) json(res, 403, { error: "users signature invalid; write operations blocked" }); throw new Error("users signature invalid; write operations blocked"); }
+          if (!requireUnlockedVaultForSigning()) throw new Error("vault locked; unlock required for signing");
+        } });
+        if (res.headersSent) return;
         const audit = writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: "TRANSFORM_PLAN_UPDATED",
@@ -3426,7 +3240,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           return;
         }
         const role: "OWNER" | "AUDITOR" = auth.roles.has("AUDITOR") ? "AUDITOR" : "OWNER";
-        const out = attestNodeTransformTaskForApi({
+        const out = await attestNodeTransformTaskForApiAsync({
           workspace: options.workspace,
           nodeId,
           taskId: parsed.taskId,
@@ -3435,7 +3249,12 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           evidenceLinks: Array.isArray(parsed.evidenceLinks) ? parsed.evidenceLinks : [],
           createdByUser: auth.username ?? "owner",
           role
-        });
+        }, { beforePublish: () => {
+          signingAuthority([role])();
+          if (requiresReadOnlyMode(options.workspace)) { if (!res.headersSent) json(res, 403, { error: "users signature invalid; write operations blocked" }); throw new Error("users signature invalid; write operations blocked"); }
+          if (!requireUnlockedVaultForSigning()) throw new Error("vault locked; unlock required for signing");
+        } });
+        if (res.headersSent) return;
         const audit = writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: "TRANSFORM_TASK_ATTESTED",
@@ -3488,11 +3307,14 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "canon object is required" });
           return;
         }
-        const out = canonApplyForApi({
+        const actorCurrent = signingAuthority(["OWNER"]), beforePublish = () => { actorCurrent(); if (requiresReadOnlyMode(options.workspace)) { if (!res.headersSent) json(res, 403, { error: "users signature invalid; write operations blocked" }); throw new Error("users signature invalid; write operations blocked"); } if (!requireUnlockedVaultForSigning()) throw new Error("vault locked; unlock required for signing"); };
+        const applied = await canonApplyForPublicationAsync({
           workspace: options.workspace,
           canon: parsed.canon as ReturnType<typeof canonGetForApi>["canon"]
-        });
-        const audit = writeStudioAuditEvent({
+        }, { beforePublish }).catch(error => { if (res.headersSent) return null; throw error; }); if (applied === null) return;
+        const out = applied.result;
+        let audit: ReturnType<typeof writeStudioAuditEvent>;
+        try { applied.assertCurrent(); audit = writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: "CANON_APPLIED",
           severity: "LOW",
@@ -3500,7 +3322,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             path: out.path,
             sigPath: out.sigPath
           }
-        });
+        }); } catch (cause) { throw new CanonAuditIncompleteError(Object.freeze([out.path, out.sigPath]), cause); }
         json(res, 200, {
           ...out,
           auditEventId: audit.eventId
@@ -3512,7 +3334,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
-        json(res, 200, cgxPolicyForApi(options.workspace));
+        const out = await cgxPolicyForApi(options.workspace, { beforePublish: signingAuthority(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"]) }).catch(error => { if (res.headersSent) return null; throw error; }); if (out !== null) json(res, 200, out);
         return;
       }
 
@@ -3533,10 +3355,10 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "policy object is required" });
           return;
         }
-        const out = cgxPolicyApplyForApi({
+        const out = await cgxPolicyApplyForApi({
           workspace: options.workspace,
-          policy: parsed.policy as ReturnType<typeof cgxPolicyForApi>["policy"]
-        });
+          policy: parsed.policy as Awaited<ReturnType<typeof cgxPolicyForApi>>["policy"]
+        }, { beforePublish: () => { signingAuthority(["OWNER"])(); if (requiresReadOnlyMode(options.workspace)) { if (!res.headersSent) json(res, 403, { error: "users signature invalid; write operations blocked" }); throw new Error("users signature invalid; write operations blocked"); } } }).catch(error => { if (res.headersSent) return null; throw error; }); if (out === null) return;
         const audit = writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: "CGX_POLICY_APPLIED",
@@ -3568,11 +3390,11 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           return;
         }
         const targetId = typeof parsed.targetId === "string" ? parsed.targetId : url.searchParams.get("targetId");
-        const built = cgxBuildForApi({
+        const built = await cgxBuildForApi({
           workspace: options.workspace,
           scope: scopeRaw as "workspace" | "agent",
           targetId
-        });
+        }, { beforePublish: signingAuthority(["OWNER", "OPERATOR"]) }).catch(error => { if (res.headersSent) return null; throw error; }); if (built === null) return;
         emitCgxSse({
           hub: orgSse,
           type: "CGX_GRAPH_UPDATED"
@@ -3637,7 +3459,8 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireRouteRoles(["OWNER", "OPERATOR", "AUDITOR", "VIEWER"])) {
           return;
         }
-        json(res, 200, promptPolicyForApi(options.workspace));
+        const out = await promptPolicyForApi(options.workspace, { beforePublish: signingAuthority(["OWNER", "OPERATOR", "AUDITOR", "VIEWER"]) }).catch(error => { if (res.headersSent) return null; throw error; });
+        if (out !== null) json(res, 200, out);
         return;
       }
 
@@ -3666,12 +3489,13 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "policy object is required" });
           return;
         }
-        const out = promptPolicyApplyForApi({
+        const out = await promptPolicyApplyForApi({
           workspace: options.workspace,
           policy: promptPolicySchema.parse(parsed.policy),
           reason: typeof parsed.reason === "string" && parsed.reason.trim().length > 0 ? parsed.reason : "prompt policy update",
           actor: auth.username ?? "owner"
-        });
+        }, { beforePublish: () => { signingAuthority(["OWNER"])(); if (requiresReadOnlyMode(options.workspace)) { if (!res.headersSent) json(res, 403, { error: "users signature invalid; write operations blocked" }); throw new Error("prompt signing is read-only"); } if (!requireUnlockedVaultForSigning()) throw new Error("vault locked; unlock required for signing"); } }).catch(error => { if (res.headersSent) return null; throw error; });
+        if (out === null) return;
         emitPromptPackSse({
           hub: orgSse,
           type: "PROMPT_POLICY_UPDATED"
@@ -3697,9 +3521,9 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireRouteRoles(["OWNER", "OPERATOR", "AUDITOR", "VIEWER"])) {
           return;
         }
-        json(res, 200, {
-          agents: promptStatusForApi(options.workspace)
-        });
+        const agents = await promptStatusForApi(options.workspace, { beforePublish: signingAuthority(["OWNER", "OPERATOR", "AUDITOR", "VIEWER"]) }).catch(error => { if (res.headersSent) return null; throw error; });
+        if (agents === null) return;
+        json(res, 200, { agents });
         return;
       }
 
@@ -3712,10 +3536,11 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
         const parsed = body ? (JSON.parse(body) as { agentId?: unknown }) : {};
-        const out = buildPromptPackForApi({
+        const out = await buildPromptPackForApi({
           workspace: options.workspace,
           agentId: typeof parsed.agentId === "string" ? parsed.agentId : undefined
-        });
+        }, { beforePublish: () => { signingAuthority(["OWNER", "OPERATOR"])(); if (!requireUnlockedVaultForSigning()) throw new Error("vault locked; unlock required for signing"); } }).catch(error => { if (res.headersSent) return null; throw error; });
+        if (out === null) return;
         emitPromptPackSse({
           hub: orgSse,
           type: "PROMPT_PACK_UPDATED"
@@ -3791,10 +3616,11 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
         const parsed = body ? (JSON.parse(body) as { agent?: unknown }) : {};
-        const out = promptSchedulerRunNowForApi({
+        const out = await promptSchedulerRunNowForApi({
           workspace: options.workspace,
           agent: typeof parsed.agent === "string" && parsed.agent.trim().length > 0 ? parsed.agent : "all"
-        });
+        }, { beforePublish: () => { signingAuthority(["OWNER", "OPERATOR"])(); if (!requireUnlockedVaultForSigning()) throw new Error("vault locked; unlock required for signing"); } }).catch(error => { if (res.headersSent) return null; throw error; });
+        if (out === null) return;
         emitPromptPackSse({
           hub: orgSse,
           type: "PROMPT_PACK_UPDATED"
@@ -3807,10 +3633,8 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
-        json(res, 200, promptSchedulerSetEnabledForApi({
-          workspace: options.workspace,
-          enabled: true
-        }));
+        const out = await promptSchedulerSetEnabledForApi({ workspace: options.workspace, enabled: true }, { beforePublish: signingAuthority(["OWNER", "OPERATOR"]) }).catch(error => { if (res.headersSent) return null; throw error; });
+        if (out !== null) json(res, 200, out);
         return;
       }
 
@@ -3818,10 +3642,8 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
-        json(res, 200, promptSchedulerSetEnabledForApi({
-          workspace: options.workspace,
-          enabled: false
-        }));
+        const out = await promptSchedulerSetEnabledForApi({ workspace: options.workspace, enabled: false }, { beforePublish: signingAuthority(["OWNER", "OPERATOR"]) }).catch(error => { if (res.headersSent) return null; throw error; });
+        if (out !== null) json(res, 200, out);
         return;
       }
 
@@ -3850,10 +3672,18 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "policy object is required" });
           return;
         }
-        const out = applyForecastPolicyForApi({
+        const authority = signingAuthority(["OWNER"]);
+        const beforePublish = () => {
+          authority();
+          if (requiresReadOnlyMode(options.workspace)) { if (!res.headersSent) json(res, 403, { error: "users signature invalid; write operations blocked" }); throw new Error("forecast read-only gate changed while signing"); }
+          if (!requireUnlockedVaultForSigning()) throw new Error("forecast vault entry gate changed while signing");
+        };
+        const out = await applyForecastPolicyForApiForAuthority({
           workspace: options.workspace,
           policy: parsed.policy as ReturnType<typeof getForecastPolicyForApi>["policy"]
-        });
+        }, beforePublish)
+          .catch(error => { if (res.headersSent) return null; throw error; });
+        if (out === null) return;
         const audit = writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: "FORECAST_POLICY_APPLIED",
@@ -3912,11 +3742,18 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           return;
         }
         const targetId = typeof parsed.targetId === "string" ? parsed.targetId : url.searchParams.get("targetId");
-        const out = refreshForecastForApi({
+        const authority = signingAuthority(["OWNER", "OPERATOR"]);
+        const beforePublish = () => {
+          authority();
+          if (!requireUnlockedVaultForSigning()) throw new Error("forecast vault entry gate changed while signing");
+        };
+        const out = await refreshForecastForAuthority({
           workspace: options.workspace,
           scope: scopeRaw as "workspace" | "agent" | "node",
           targetId
-        });
+        }, beforePublish)
+          .catch(error => { if (res.headersSent) return null; throw error; });
+        if (out === null) return;
         const audit = writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: "FORECAST_CREATED",
@@ -3958,9 +3795,16 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireUnlockedVaultForSigning()) {
           return;
         }
-        const out = forecastSchedulerRunNowForApi({
+        const authority = signingAuthority(["OWNER", "OPERATOR"]);
+        const beforePublish = () => {
+          authority();
+          if (!requireUnlockedVaultForSigning()) throw new Error("forecast vault entry gate changed while signing");
+        };
+        const out = await forecastSchedulerRunNowForApiForAuthority({
           workspace: options.workspace
-        });
+        }, beforePublish)
+          .catch(error => { if (res.headersSent) return null; throw error; });
+        if (out === null) return;
         emitOrgEvent("FORECAST_UPDATED");
         json(res, 200, out);
         return;
@@ -3970,10 +3814,12 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
-        const out = forecastSchedulerSetEnabledForApi({
+        const out = await forecastSchedulerSetEnabledForApiForAuthority({
           workspace: options.workspace,
           enabled: true
-        });
+        }, signingAuthority(["OWNER", "OPERATOR"]))
+          .catch(error => { if (res.headersSent) return null; throw error; });
+        if (out === null) return;
         json(res, 200, out);
         return;
       }
@@ -3982,10 +3828,12 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
-        const out = forecastSchedulerSetEnabledForApi({
+        const out = await forecastSchedulerSetEnabledForApiForAuthority({
           workspace: options.workspace,
           enabled: false
-        });
+        }, signingAuthority(["OWNER", "OPERATOR"]))
+          .catch(error => { if (res.headersSent) return null; throw error; });
+        if (out === null) return;
         json(res, 200, out);
         return;
       }
@@ -3994,7 +3842,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
-        json(res, 200, assurancePolicyForApi(options.workspace));
+        const out = await assurancePolicyForApi(options.workspace, assurancePublication(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])).catch(error => { if (res.headersSent || respondReportSigningError(error, (status, body) => json(res, status, body))) return null; throw error; }); if (out === null) return; json(res, 200, out);
         return;
       }
 
@@ -4015,10 +3863,10 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "policy object is required" });
           return;
         }
-        const out = assurancePolicyApplyForApi({
+        const out = await assurancePolicyApplyForApi({
           workspace: options.workspace,
           policy: parsed.policy
-        });
+        }, assurancePublication(["OWNER"], true, true)).catch(error => { if (res.headersSent || respondReportSigningError(error, (status, body) => json(res, status, body))) return null; throw error; }); if (out === null) return;
         writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: "ASSURANCE_POLICY_APPLIED",
@@ -4065,13 +3913,15 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           });
           return;
         }
+        const authority = captureReportSigningAuthority(options.workspace, signingAuthority(["OWNER", "OPERATOR"]));
         const out = await assuranceRunForApi({
           workspace: options.workspace,
           scopeType: scopeRaw.toUpperCase() as "WORKSPACE" | "NODE" | "AGENT",
           scopeId: typeof parsed.id === "string" ? parsed.id : undefined,
           pack: packRaw,
           windowDays: Number.isFinite(Number(parsed.windowDays)) ? Number(parsed.windowDays) : undefined
-        });
+        }, { beforePublish() { authority(); if (requiresReadOnlyMode(options.workspace)) { if (!res.headersSent) json(res, 403, { error: "users signature invalid; write operations blocked" }); throw new Error("users signature invalid; write operations blocked"); } if (!requireUnlockedVaultForSigning()) throw new Error("vault locked; unlock required for signing"); } }).catch(error => { if (res.headersSent || respondReportSigningError(error, (status, body) => json(res, status, body))) return null; throw error; });
+        if (out === null) return;
         writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: "ASSURANCE_RUN_COMPLETED",
@@ -4148,7 +3998,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           workspace: options.workspace,
           runId: parsed.runId,
           outFile: typeof parsed.outFile === "string" ? parsed.outFile : undefined
-        });
+        }, assurancePublication(["OWNER", "OPERATOR"], true, true)).catch(error => { if (res.headersSent || respondReportSigningError(error, (status, body) => json(res, status, body))) return null; throw error; }); if (out === null) return;
         writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: "ASSURANCE_CERT_ISSUED",
@@ -4220,7 +4070,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
-        json(res, 200, assuranceWaiverStatusForApi(options.workspace));
+        const out = await assuranceWaiverStatusForApi(options.workspace, assurancePublication(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])).catch(error => { if (res.headersSent || respondReportSigningError(error, (status, body) => json(res, status, body))) return null; throw error; }); if (out === null) return; json(res, 200, out);
         return;
       }
 
@@ -4234,10 +4084,10 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
         const parsed = body ? (JSON.parse(body) as { waiverId?: unknown }) : {};
-        const out = assuranceWaiverRevokeForApi({
+        const out = await assuranceWaiverRevokeForApi({
           workspace: options.workspace,
           waiverId: typeof parsed.waiverId === "string" ? parsed.waiverId : undefined
-        });
+        }, assurancePublication(["OWNER"], true)).catch(error => { if (res.headersSent || respondReportSigningError(error, (status, body) => json(res, status, body))) return null; throw error; }); if (out === null) return;
         if (out.revoked) {
           writeStudioAuditEvent({
             workspace: options.workspace,
@@ -4273,7 +4123,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         }
         const out = await assuranceSchedulerRunNowForApi({
           workspace: options.workspace
-        });
+        }, assurancePublication(["OWNER", "OPERATOR"], true, true)).catch(error => { if (res.headersSent || respondReportSigningError(error, (status, body) => json(res, status, body))) return null; throw error; }); if (out === null) return;
         emitAssuranceSse({
           hub: orgSse,
           type: "ASSURANCE_RUN_UPDATED"
@@ -4299,10 +4149,10 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
-        json(res, 200, assuranceSchedulerEnableForApi({
+        const out = await assuranceSchedulerEnableForApi({
           workspace: options.workspace,
           enabled: true
-        }));
+        }, assurancePublication(["OWNER", "OPERATOR"])).catch(error => { if (res.headersSent || respondReportSigningError(error, (status, body) => json(res, status, body))) return null; throw error; }); if (out === null) return; json(res, 200, out);
         return;
       }
 
@@ -4310,10 +4160,10 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
-        json(res, 200, assuranceSchedulerEnableForApi({
+        const out = await assuranceSchedulerEnableForApi({
           workspace: options.workspace,
           enabled: false
-        }));
+        }, assurancePublication(["OWNER", "OPERATOR"])).catch(error => { if (res.headersSent || respondReportSigningError(error, (status, body) => json(res, status, body))) return null; throw error; }); if (out === null) return; json(res, 200, out);
         return;
       }
 
@@ -4327,6 +4177,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           });
           return;
         }
+        if ((req.method === "GET" && (pathname === "/audit/policy" || pathname === "/audit/map/active")) || (req.method === "POST" && (pathname === "/audit/policy/apply" || pathname === "/audit/map/apply"))) policyMapReadiness = captureAuditPolicyMapReadiness(options.workspace, req.method === "POST" ? pathname === "/audit/policy/apply" ? "policy" : "active" : null);
       }
 
       if (pathname === "/audit/policy" && req.method === "GET") {
@@ -4336,7 +4187,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
-        json(res, 200, auditPolicyForApi(options.workspace));
+        const out = await auditPolicyForApiAsync(options.workspace, policyMapReadiness!.withOptions({ beforePublish: signingAuthority(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"]) })).catch(error => { if (res.headersSent) return null; throw error; }); if (out !== null) json(res, 200, out);
         return;
       }
 
@@ -4357,10 +4208,10 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "policy is required" });
           return;
         }
-        const out = auditPolicyApplyForApi({
+        const out = await auditPolicyApplyForApiAsync({
           workspace: options.workspace,
           policy: parsed.policy
-        });
+        }, policyMapReadiness!.withOptions(auditPublication(["OWNER"], false))).catch(error => { if (res.headersSent) return null; throw error; }); if (out === null) return;
         emitAuditSse({
           hub: orgSse,
           type: "AUDIT_BINDER_UPDATED"
@@ -4376,10 +4227,10 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
-        json(res, 200, auditMapShowForApi({
+        const out = await auditMapShowForApiAsync({
           workspace: options.workspace,
           id: "active"
-        }));
+        }, policyMapReadiness!.withOptions({ beforePublish: signingAuthority(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"]) })).catch(error => { if (res.headersSent) return null; throw error; }); if (out !== null) json(res, 200, out);
         return;
       }
 
@@ -4400,10 +4251,10 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "map is required" });
           return;
         }
-        const out = auditMapApplyForApi({
+        const out = await auditMapApplyForApiAsync({
           workspace: options.workspace,
           map: parsed.map
-        });
+        }, policyMapReadiness!.withOptions(auditPublication(["OWNER"], false))).catch(error => { if (res.headersSent) return null; throw error; }); if (out === null) return;
         emitAuditSse({
           hub: orgSse,
           type: "AUDIT_BINDER_UPDATED"
@@ -4440,7 +4291,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           scopeType: typeof parsed.scopeType === "string" ? parsed.scopeType : undefined,
           scopeId: typeof parsed.scopeId === "string" ? parsed.scopeId : undefined,
           requestId: typeof parsed.requestId === "string" ? parsed.requestId : undefined
-        });
+        }, auditPublication(["OWNER", "OPERATOR"])).catch(error => { if (res.headersSent || respondReportSigningError(error, (status, body) => json(res, status, body))) return null; throw error; }); if (out === null) return;
         emitAuditSse({
           hub: orgSse,
           type: "AUDIT_BINDER_UPDATED"
@@ -4475,7 +4326,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           const out = await auditBinderExportExecuteForApi({
             workspace: options.workspace,
             approvalRequestId: parsed.approvalRequestId.trim()
-          });
+          }, auditPublication(["OWNER"])).catch(error => { if (res.headersSent || respondReportSigningError(error, (status, body) => json(res, status, body))) return null; throw error; }); if (out === null) return;
           emitAuditSse({
             hub: orgSse,
             type: "AUDIT_BINDER_UPDATED"
@@ -4501,7 +4352,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           scopeId: typeof parsed.scopeId === "string" ? parsed.scopeId : undefined,
           outFile: typeof parsed.outFile === "string" ? parsed.outFile : undefined,
           requestId: typeof parsed.requestId === "string" ? parsed.requestId : undefined
-        });
+        }, auditPublication(["OWNER"])).catch(error => { if (res.headersSent || respondReportSigningError(error, (status, body) => json(res, status, body))) return null; throw error; }); if (out === null) return;
         emitAuditSse({
           hub: orgSse,
           type: "AUDIT_BINDER_UPDATED"
@@ -4571,13 +4422,13 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           : Array.isArray(parsed.items)
             ? parsed.items
             : [];
-        const out = auditRequestCreateForApi({
+        const out = await auditRequestCreateForApi({
           workspace: options.workspace,
           scopeType: typeof parsed.scopeType === "string" ? parsed.scopeType : undefined,
           scopeId: typeof parsed.scopeId === "string" ? parsed.scopeId : undefined,
           requestedItems: requestedItems as Array<string | { kind: "ARTIFACT_HASH"; id: string; sha256: string } | { kind: "PROOF"; id: string } | { kind: "CONTROL"; controlId: string }>,
           requesterUserId: auth.username ?? auth.agentId ?? "auditor"
-        });
+        }, auditPublication(["AUDITOR"], false)).catch(error => { if (res.headersSent || respondReportSigningError(error, (status, body) => json(res, status, body))) return null; throw error; }); if (out === null) return;
         emitAuditSse({
           hub: orgSse,
           type: "AUDIT_EVIDENCE_REQUEST_UPDATED"
@@ -4636,10 +4487,10 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           return;
         }
         const requestId = decodeURIComponent(auditRequestRejectMatch[1] ?? "");
-        const out = auditRequestRejectForApi({
+        const out = await auditRequestRejectForApi({
           workspace: options.workspace,
           requestId
-        });
+        }, auditPublication(["OWNER"], false)).catch(error => { if (res.headersSent || respondReportSigningError(error, (status, body) => json(res, status, body))) return null; throw error; }); if (out === null) return;
         emitAuditSse({
           hub: orgSse,
           type: "AUDIT_EVIDENCE_REQUEST_UPDATED"
@@ -4666,7 +4517,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           workspace: options.workspace,
           requestId,
           outFile: typeof parsed.outFile === "string" ? parsed.outFile : undefined
-        });
+        }, auditPublication(["OWNER", "OPERATOR"])).catch(error => { if (res.headersSent || respondReportSigningError(error, (status, body) => json(res, status, body))) return null; throw error; }); if (out === null) return;
         emitAuditSse({
           hub: orgSse,
           type: "AUDIT_EVIDENCE_REQUEST_UPDATED"
@@ -4706,7 +4557,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           workspace: options.workspace,
           scopeType: typeof parsed.scopeType === "string" ? parsed.scopeType : undefined,
           scopeId: typeof parsed.scopeId === "string" ? parsed.scopeId : undefined
-        });
+        }, auditPublication(["OWNER", "OPERATOR"])).catch(error => { if (res.headersSent || respondReportSigningError(error, (status, body) => json(res, status, body))) return null; throw error; }); if (out === null) return;
         emitAuditSse({
           hub: orgSse,
           type: "AUDIT_BINDER_UPDATED"
@@ -4722,10 +4573,8 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
-        json(res, 200, auditSchedulerEnableForApi({
-          workspace: options.workspace,
-          enabled: true
-        }));
+        const out = await auditSchedulerEnableForApiAsync({ workspace: options.workspace, enabled: true }, auditPublication(["OWNER", "OPERATOR"], false)).catch(error => { if (res.headersSent || respondReportSigningError(error, (status, body) => json(res, status, body))) return null; throw error; }); if (out === null) return;
+        json(res, 200, out);
         return;
       }
 
@@ -4736,10 +4585,8 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
-        json(res, 200, auditSchedulerEnableForApi({
-          workspace: options.workspace,
-          enabled: false
-        }));
+        const out = await auditSchedulerEnableForApiAsync({ workspace: options.workspace, enabled: false }, auditPublication(["OWNER", "OPERATOR"], false)).catch(error => { if (res.headersSent || respondReportSigningError(error, (status, body) => json(res, status, body))) return null; throw error; }); if (out === null) return;
+        json(res, 200, out);
         return;
       }
 
@@ -4762,7 +4609,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireRouteRoles(["VIEWER", "OPERATOR", "AUDITOR", "OWNER"])) {
           return;
         }
-        json(res, 200, valuePolicyForApi(options.workspace));
+        const out = await valuePolicyForApi(options.workspace, { beforePublish: signingAuthority(["VIEWER", "OPERATOR", "AUDITOR", "OWNER"]) }).catch(error => { if (res.headersSent) return null; throw error; }); if (out !== null) json(res, 200, out);
         return;
       }
 
@@ -4783,10 +4630,10 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "policy is required" });
           return;
         }
-        const out = valuePolicyApplyForApi({
+        const out = await valuePolicyApplyForApi({
           workspace: options.workspace,
           policy: parsed.policy
-        });
+        }, { beforePublish: () => { signingAuthority(["OWNER"])(); if (requiresReadOnlyMode(options.workspace)) { if (!res.headersSent) json(res, 403, { error: "users signature invalid; write operations blocked" }); throw new Error("users signature invalid; write operations blocked"); } } }).catch(error => { if (res.headersSent) return null; throw error; }); if (out === null) return;
         emitValueSse({
           hub: orgSse,
           type: "VALUE_UPDATED"
@@ -4833,7 +4680,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           ? (JSON.parse(body) as { contract?: unknown; scopeType?: unknown; scopeId?: unknown; type?: unknown; deployment?: unknown })
           : {};
         if (!parsed.contract && typeof parsed.type === "string") {
-          const out = valueContractInitForApi({
+          const out = await valueContractInitForApi({
             workspace: options.workspace,
             scopeType:
               typeof parsed.scopeType === "string"
@@ -4842,7 +4689,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             scopeId: typeof parsed.scopeId === "string" ? parsed.scopeId : "workspace",
             type: parsed.type as "code-agent" | "support-agent" | "ops-agent" | "research-agent" | "sales-agent" | "other",
             deployment: typeof parsed.deployment === "string" ? (parsed.deployment as "single" | "host" | "k8s" | "compose") : undefined
-          });
+          }, { beforePublish: () => { signingAuthority(["OWNER", "OPERATOR"])(); if (requiresReadOnlyMode(options.workspace)) { if (!res.headersSent) json(res, 403, { error: "users signature invalid; write operations blocked" }); throw new Error("users signature invalid; write operations blocked"); } } }).catch(error => { if (res.headersSent) return null; throw error; }); if (out === null) return;
           emitValueSse({
             hub: orgSse,
             type: "VALUE_UPDATED"
@@ -4854,12 +4701,12 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "contract or type is required" });
           return;
         }
-        const out = valueContractApplyForApi({
+        const out = await valueContractApplyForApi({
           workspace: options.workspace,
           contract: parsed.contract,
           scopeType: typeof parsed.scopeType === "string" ? parsed.scopeType : undefined,
           scopeId: typeof parsed.scopeId === "string" ? parsed.scopeId : undefined
-        });
+        }, { beforePublish: () => { signingAuthority(["OWNER", "OPERATOR"])(); if (requiresReadOnlyMode(options.workspace)) { if (!res.headersSent) json(res, 403, { error: "users signature invalid; write operations blocked" }); throw new Error("users signature invalid; write operations blocked"); } } }).catch(error => { if (res.headersSent) return null; throw error; }); if (out === null) return;
         emitValueSse({
           hub: orgSse,
           type: "VALUE_UPDATED"
@@ -4885,7 +4732,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "attest was removed in 2.0.0: imported value events are SELF_REPORTED (see docs/EVIDENCE_TRUST.md)" });
           return;
         }
-        const out = importValueCsvForApi({
+        const out = await importValueCsvForApi({
           workspace: options.workspace,
           scopeType:
             typeof parsed.scopeType === "string"
@@ -4894,7 +4741,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           scopeId: typeof parsed.scopeId === "string" ? parsed.scopeId : "workspace",
           kpiId: parsed.kpiId,
           csvText: parsed.csv
-        });
+        }, { beforePublish: signingAuthority(["OWNER", "OPERATOR"]) }).catch(error => { if (res.headersSent) return null; throw error; }); if (out === null) return;
         emitValueSse({
           hub: orgSse,
           type: "VALUE_UPDATED"
@@ -4919,7 +4766,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           scopeType: scope.toUpperCase(),
           scopeId: scope === "workspace" ? "workspace" : scopeId,
           windowDays: Number.isFinite(windowDays) && windowDays > 0 ? Math.trunc(windowDays) : undefined
-        });
+        }, { beforePublish: signingAuthority(["VIEWER", "OPERATOR", "AUDITOR", "OWNER"]) }).catch(error => { if (res.headersSent) return null; throw error; }); if (out === null) return;
         if (out.status === "INSUFFICIENT_EVIDENCE") {
           emitValueSse({
             hub: orgSse,
@@ -4946,7 +4793,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           scopeType: scope.toUpperCase(),
           scopeId: scope === "workspace" ? "workspace" : scopeId,
           windowDays: Number.isFinite(windowDays) && windowDays > 0 ? Math.trunc(windowDays) : undefined
-        });
+        }, { beforePublish: signingAuthority(["VIEWER", "OPERATOR", "AUDITOR", "OWNER"]) }).catch(error => { if (res.headersSent) return null; throw error; }); if (out === null) return;
         emitValueSse({
           hub: orgSse,
           type: "VALUE_UPDATED"
@@ -4986,7 +4833,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           scopeType: typeof parsed.scopeType === "string" ? parsed.scopeType : undefined,
           scopeId: typeof parsed.scopeId === "string" ? parsed.scopeId : undefined,
           windowDays: typeof parsed.windowDays === "number" ? parsed.windowDays : undefined
-        });
+        }, { beforePublish: signingAuthority(["OWNER", "OPERATOR"]) }).catch(error => { if (res.headersSent) return null; throw error; }); if (out === null) return;
         emitValueSse({
           hub: orgSse,
           type: "VALUE_UPDATED"
@@ -5008,10 +4855,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
-        json(res, 200, valueSchedulerSetEnabledForApi({
-          workspace: options.workspace,
-          enabled: true
-        }));
+        const out = await valueSchedulerSetEnabledForApi({ workspace: options.workspace, enabled: true }, { beforePublish: signingAuthority(["OWNER", "OPERATOR"]) }).catch(error => { if (res.headersSent) return null; throw error; }); if (out !== null) json(res, 200, out);
         return;
       }
 
@@ -5022,10 +4866,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
-        json(res, 200, valueSchedulerSetEnabledForApi({
-          workspace: options.workspace,
-          enabled: false
-        }));
+        const out = await valueSchedulerSetEnabledForApi({ workspace: options.workspace, enabled: false }, { beforePublish: signingAuthority(["OWNER", "OPERATOR"]) }).catch(error => { if (res.headersSent) return null; throw error; }); if (out !== null) json(res, 200, out);
         return;
       }
 
@@ -5072,10 +4913,13 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "policy object is required" });
           return;
         }
-        const out = passportPolicyApplyForApi({
+        const passportActor = auditPublication(["OWNER"]).beforePublish;
+        const passportAttempt = await passportPolicyApplyAttemptForApiAsync({
           workspace: options.workspace,
           policy: parsed.policy
-        });
+        }, { beforePublish: passportActor });
+        const out = passportAttempt.result;
+        try { passportAttempt.assertCurrent(); passportActor();
         writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: "PASSPORT_POLICY_APPLIED",
@@ -5085,11 +4929,16 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             sigPath: out.sigPath
           }
         });
+        passportAttempt.assertCurrent(); passportActor();
         emitPassportSse({
           hub: orgSse,
           type: "PASSPORT_UPDATED"
         });
+        passportAttempt.assertCurrent(); passportActor();
         json(res, 200, out);
+        } catch (cause) {
+          throw passportPublicationFailure(options.workspace, "studio-followup", passportAttempt.publishedPaths, passportAttempt.createdDirectories, null, cause, out.transparencyHash, null, true);
+        }
         return;
       }
 
@@ -5105,12 +4954,15 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
         const parsed = body ? (JSON.parse(body) as { scopeType?: unknown; scopeId?: unknown; outFile?: unknown }) : {};
-        const out = passportCreateForApi({
+        const passportActor = auditPublication(["OWNER", "OPERATOR"]).beforePublish;
+        const passportAttempt = await passportCreateAttemptForApiAsync({
           workspace: options.workspace,
           scopeType: typeof parsed.scopeType === "string" ? parsed.scopeType : undefined,
           scopeId: typeof parsed.scopeId === "string" ? parsed.scopeId : undefined,
           outFile: typeof parsed.outFile === "string" ? parsed.outFile : undefined
-        });
+        }, { beforePublish: passportActor });
+        const out = passportAttempt.result;
+        try { passportAttempt.assertCurrent(); passportActor();
         writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: "PASSPORT_CREATED",
@@ -5121,11 +4973,16 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             sha256: out.sha256
           }
         });
+        passportAttempt.assertCurrent(); passportActor();
         emitPassportSse({
           hub: orgSse,
           type: "PASSPORT_UPDATED"
         });
+        passportAttempt.assertCurrent(); passportActor();
         json(res, 200, out);
+        } catch (cause) {
+          throw passportPublicationFailure(options.workspace, "studio-followup", passportAttempt.publishedPaths, passportAttempt.createdDirectories, null, cause, out.transparencyCreatedHash, out.transparencyExportedHash, true);
+        }
         return;
       }
 
@@ -5196,26 +5053,40 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 202, requested);
           return;
         }
-        const out = passportExportLatestForApi({
-          workspace: options.workspace,
+        const exportSourceWorkspace = options.workspace, exportWorkspace = resolve(exportSourceWorkspace), exportToken = options.token;
+        const exportActor = currentSigningAuthority(req, res, exportWorkspace, exportToken, auth, ["OWNER"]);
+        const exportFixed = () => {
+          if (shuttingDown || options.workspace !== exportSourceWorkspace || resolve(exportSourceWorkspace) !== exportWorkspace || options.token !== exportToken)
+            throw new Error("original passport export workspace, token or server state changed");
+        };
+        const beforePublish = () => { exportFixed(); exportActor(); exportFixed(); if (!requireUnlockedVaultForSigning()) throw new Error("vault locked; unlock required for signing"); exportFixed(); };
+        const passportAttempt = await passportExportLatestAttemptForApiAsync({
+          workspace: exportWorkspace,
           scopeType: typeof parsed.scopeType === "string" ? parsed.scopeType : undefined,
           scopeId: typeof parsed.scopeId === "string" ? parsed.scopeId : undefined,
           outFile: typeof parsed.outFile === "string" ? parsed.outFile : undefined
-        });
-        writeStudioAuditEvent({
-          workspace: options.workspace,
-          auditType: "PASSPORT_EXPORTED",
-          severity: "LOW",
-          payload: {
-            passportId: out.passport.passportId,
-            sha256: out.sha256
-          }
-        });
-        emitPassportSse({
-          hub: orgSse,
-          type: "PASSPORT_UPDATED"
-        });
-        json(res, 200, out);
+        }, { beforePublish });
+        const out = passportAttempt.result, current = () => { beforePublish(); passportAttempt.assertCurrent(); };
+        try {
+          current();
+          writeStudioAuditEvent({
+            workspace: exportWorkspace,
+            auditType: "PASSPORT_EXPORTED",
+            severity: "LOW",
+            payload: {
+              passportId: out.passport.passportId,
+              sha256: out.sha256
+            }
+          });
+          current(); emitPassportSse({
+            hub: orgSse,
+            type: "PASSPORT_UPDATED"
+          });
+          current(); json(res, 200, out);
+        } catch (cause) {
+          throw passportPublicationFailure(exportWorkspace, "studio-followup", passportAttempt.publishedPaths, passportAttempt.createdDirectories, null,
+            cause, out.transparencyCreatedHash, out.transparencyExportedHash, true);
+        }
         return;
       }
 
@@ -5267,27 +5138,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/passport/badge" && req.method === "GET") {
-        if (auth.agentId) {
-          const badge = passportBadgeForApi({
-            workspace: options.workspace,
-            agentId: auth.agentId
-          });
-          json(res, 200, {
-            badge: badge.badge
-          });
-          return;
-        }
-        if (!requireRouteRoles(["VIEWER", "OPERATOR", "AUDITOR", "OWNER"])) {
-          return;
-        }
-        const agentId = resolveAgentId(options.workspace, url.searchParams.get("agentId") ?? "default");
-        const badge = passportBadgeForApi({
-          workspace: options.workspace,
-          agentId
-        });
-        json(res, 200, {
-          badge: badge.badge
-        });
+        await handleStudioPassportBadge({ req, res, url, options, auth, authenticate, requireRoles, json });
         return;
       }
 
@@ -5301,7 +5152,8 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireUnlockedVaultForSigning()) {
           return;
         }
-        const out = standardGenerateForApi(options.workspace);
+        const beforePublish = signingAuthority(["OWNER"]), out = await standardGenerateForApi(options.workspace, { beforePublish }).catch(error => { if (res.headersSent) return null; throw error; });
+        if (out === null) return; beforePublish();
         writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: "STANDARD_SCHEMAS_GENERATED",
@@ -5326,7 +5178,8 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireRouteRoles(["VIEWER", "OPERATOR", "AUDITOR", "OWNER"])) {
           return;
         }
-        json(res, 200, standardVerifyForApi(options.workspace));
+        const beforePublish = signingAuthority(["VIEWER", "OPERATOR", "AUDITOR", "OWNER"]), out = await standardVerifyForApi(options.workspace, { beforePublish }).catch(error => { if (res.headersSent) return null; throw error; });
+        if (out === null) return; beforePublish(); json(res, 200, out);
         return;
       }
 
@@ -5409,12 +5262,19 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
         const parsed = body ? (JSON.parse(body) as { note?: string }) : {};
         const note = typeof parsed.note === "string" && parsed.note.trim().length > 0 ? parsed.note.trim() : "acknowledged";
-        const advisory = ackAdvisoryForApi({
+        const authority = signingAuthority(["OWNER", "OPERATOR"]);
+        const beforePublish = () => {
+          authority();
+          if (!requireUnlockedVaultForSigning()) throw new Error("forecast vault entry gate changed while signing");
+        };
+        const advisory = await ackAdvisoryForAuthority({
           workspace: options.workspace,
           advisoryId,
           by: auth.username ?? "operator",
           note
-        });
+        }, beforePublish)
+          .catch(error => { if (res.headersSent) return null; throw error; });
+        if (advisory === null) return;
         const audit = writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: "ADVISORY_ACKNOWLEDGED",
@@ -5490,12 +5350,12 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "username, password, roles are required" });
           return;
         }
-        const user = addUser({
+        const user = await addUserAsync({
           workspace: options.workspace,
           username: parsed.username,
           password: parsed.password,
           roles: parseUserRoles(parsed.roles)
-        });
+        }, { assertAuthorized: assertUsersMutationAuthorized });
         json(res, 200, {
           user: {
             userId: user.userId,
@@ -5521,11 +5381,11 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "username is required" });
           return;
         }
-        const user = revokeUser({
+        const user = await revokeUserAsync({
           workspace: options.workspace,
           username: parsed.username
-        });
-        json(res, 200, { user });
+        }, { assertAuthorized: assertUsersMutationAuthorized });
+        json(res, 200, { user: publicUsersMutationRecord(user) });
         return;
       }
 
@@ -5543,12 +5403,12 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "username and roles are required" });
           return;
         }
-        const user = setUserRoles({
+        const user = await setUserRolesAsync({
           workspace: options.workspace,
           username: parsed.username,
           roles: parseUserRoles(parsed.roles)
-        });
-        json(res, 200, { user });
+        }, { assertAuthorized: assertUsersMutationAuthorized });
+        json(res, 200, { user: publicUsersMutationRecord(user) });
         return;
       }
 
@@ -5588,17 +5448,14 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 403, { error: "users signature invalid; write operations blocked" });
           return;
         }
+        const actor = signingAuthority(["OWNER"]), beforePublish = () => { actor(); if (requiresReadOnlyMode(options.workspace)) { if (!res.headersSent) json(res, 403, { error: "users signature invalid; write operations blocked" }); throw new Error("users signature invalid; write operations blocked"); } };
+        const writer = captureBudgetsPublication(options.workspace, beforePublish);
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
         const parsed = body ? (JSON.parse(body) as { config?: unknown }) : {};
-        if (!parsed.config || typeof parsed.config !== "object") {
-          json(res, 400, { error: "config object is required" });
-          return;
-        }
-        const yaml = YAML.stringify(parsed.config as Record<string, unknown>);
-        const path = join(options.workspace, ".amc", "budgets.yaml");
-        writeFileAtomic(path, yaml, 0o644);
-        signBudgetsConfig(options.workspace);
-        writeStudioAuditEvent({
+        if (!parsed.config || typeof parsed.config !== "object") { json(res, 400, { error: "config object is required" }); return; }
+        const prepared = await writer.prepareAsync(Buffer.from(YAML.stringify(parsed.config as Record<string, unknown>)));
+        const saved = prepared.publish(), path = saved.configPath;
+        try { prepared.assertCurrent(); writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: "CONSOLE_BUDGETS_UPDATED",
           severity: "LOW",
@@ -5606,6 +5463,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             path
           }
         });
+        prepared.assertCurrent(); } catch (cause) { throw new BudgetsPublicationError([path, saved.sigPath], "studio-budget-audit", cause); }
         json(res, 200, { path });
         return;
       }
@@ -5769,25 +5627,23 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           return;
         }
         const agentId = resolveAgentId(options.workspace, decodeURIComponent(agentTargetsApplyMatch[1] ?? ""));
+        const targetWorkspace = options.workspace, targetToken = options.token;
+        const humanTarget = humanAuditAuthority(["OWNER"]);
+        const target = captureStudioTargetPublication(targetWorkspace, agentId, () => {
+          if (shuttingDown || options.workspace !== targetWorkspace || resolve(targetWorkspace) !== targetRoot || options.token !== targetToken)
+            throw new Error("original target actor inputs changed");
+          humanTarget();
+          if (shuttingDown || options.workspace !== targetWorkspace || resolve(targetWorkspace) !== targetRoot || options.token !== targetToken)
+            throw new Error("original target actor inputs changed");
+        });
+        const targetRoot = target.workspace; target.observe();
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
         const parsed = body ? (JSON.parse(body) as { mapping?: Record<string, number>; name?: string }) : {};
-        const graph = loadContextGraph(options.workspace, agentId);
+        const graph = loadContextGraph(targetRoot, agentId);
         const contextGraphHash = sha256Hex(JSON.stringify(graph));
         const name = parsed.name ?? "default";
-        const oldTarget = (() => {
-          try {
-            return loadTargetProfile(options.workspace, name, agentId);
-          } catch {
-            return null;
-          }
-        })();
-        const profile = createSignedTargetProfile({
-          workspace: options.workspace,
-          name,
-          contextGraphHash,
-          mapping: parsed.mapping ?? oldTarget?.mapping ?? {}
-        });
-        const targetPath = saveTargetProfile(options.workspace, profile, agentId);
+        const { oldTarget, profile, targetPath } = await target.publish({ name, contextGraphHash, mapping: parsed.mapping });
+        target.assertCurrent();
         const diffHash = sha256Hex(
           JSON.stringify({
             before: oldTarget?.mapping ?? {},
@@ -5795,7 +5651,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           })
         );
         const auditA = writeStudioAuditEvent({
-          workspace: options.workspace,
+          workspace: targetRoot,
           auditType: "TARGET_PROFILE_UPDATED",
           severity: "MEDIUM",
           agentId,
@@ -5805,8 +5661,8 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             diffHash
           }
         });
-        const auditB = writeStudioAuditEvent({
-          workspace: options.workspace,
+        const auditB = await writeStudioAuditEventAsync({
+          workspace: targetRoot,
           auditType: "CONSOLE_TARGET_DRAFT_APPLIED",
           severity: "LOW",
           agentId,
@@ -5815,16 +5671,18 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             targetPath,
             diffHash
           }
-        });
+        }, target.assertCurrent);
+        target.assertCurrent();
         try {
           buildDashboard({
-            workspace: options.workspace,
+            workspace: targetRoot,
             agentId,
             outDir: `.amc/agents/${agentId}/dashboard`
           });
         } catch {
           // ignore if no runs yet
         }
+        target.assertCurrent();
         json(res, 200, {
           agentId,
           targetPath,
@@ -5892,22 +5750,22 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           return;
         }
         const agentId = resolveAgentId(options.workspace, decodeURIComponent(runMatch[1] ?? ""));
+        const reportAuthority = captureReportSigningAuthority(options.workspace, signingAuthority(["OPERATOR", "OWNER"])); const orgSecondary = captureStudioOrgSecondary(options.workspace, currentOrgRunActor(req, options.workspace, options.token, auth), emitOrgEvent);
         const run = await runDiagnostic({
           workspace: options.workspace,
           agentId,
           window: "14d",
           targetName: "default",
           claimMode: "auto"
-        });
-        const refreshedAgentForecast = refreshForecastForApi({
-          workspace: options.workspace,
-          scope: "agent",
-          targetId: agentId
-        });
-        refreshForecastForApi({
-          workspace: options.workspace,
-          scope: "workspace"
-        });
+        }, undefined, { beforePublish: reportAuthority }).catch(error => { if (res.headersSent || respondReportSigningError(error, (status, body) => json(res, status, body))) return null; throw error; });
+        if (run === null) return;
+        const refreshedForecasts = await refreshForecastsAfterPrimary([
+          { workspace: options.workspace, scope: "agent", targetId: agentId }, { workspace: options.workspace, scope: "workspace" }
+        ], reportAuthority, { kind: "diagnostic-run", id: run.runId, value: run })
+          .catch(error => { if (res.headersSent) return null; throw error; });
+        if (refreshedForecasts === null) return;
+        const [refreshedAgentForecast] = refreshedForecasts;
+
         emitForecastEvents({
           agentId,
           advisories: refreshedAgentForecast.advisories.map((advisory) => ({
@@ -5916,7 +5774,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           })),
           status: refreshedAgentForecast.forecast.status
         });
-        recomputeOrgAndEmit("AGENT_RUN_COMPLETED", orgNodeIdsForAgent(agentId));
+        await orgSecondary.run("AGENT_RUN_COMPLETED", orgNodeIdsForAgent(agentId));
         json(res, 200, { runId: run.runId, status: run.status });
         return;
       }
@@ -5926,11 +5784,13 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           return;
         }
         const agentId = resolveAgentId(options.workspace, url.searchParams.get("agentId") ?? undefined);
+        const reportAuthority = captureReportSigningAuthority(options.workspace, signingAuthority(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"]));
         const out = await runAutoAnswer({
           workspace: options.workspace,
           agentId,
           createPlan: false
-        });
+        }, { beforePublish: reportAuthority }).catch(error => { if (res.headersSent || respondReportSigningError(error, (status, body) => json(res, status, body))) return null; throw error; });
+        if (out === null) return;
         json(res, 200, out);
         return;
       }
@@ -5940,20 +5800,20 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           return;
         }
         const agentId = resolveAgentId(options.workspace, url.searchParams.get("agentId") ?? undefined);
+        const reportAuthority = captureReportSigningAuthority(options.workspace, signingAuthority(["OPERATOR", "OWNER"])); const orgSecondary = captureStudioOrgSecondary(options.workspace, currentOrgRunActor(req, options.workspace, options.token, auth), emitOrgEvent);
         const out = await runAutoAnswer({
           workspace: options.workspace,
           agentId,
           createPlan: true
-        });
-        const refreshedAgentForecast = refreshForecastForApi({
-          workspace: options.workspace,
-          scope: "agent",
-          targetId: agentId
-        });
-        refreshForecastForApi({
-          workspace: options.workspace,
-          scope: "workspace"
-        });
+        }, { beforePublish: reportAuthority }).catch(error => { if (res.headersSent || respondReportSigningError(error, (status, body) => json(res, status, body))) return null; throw error; });
+        if (out === null) return;
+        const refreshedForecasts = await refreshForecastsAfterPrimary([
+          { workspace: options.workspace, scope: "agent", targetId: agentId }, { workspace: options.workspace, scope: "workspace" }
+        ], reportAuthority, { kind: "diagnostic-auto-answer", value: out })
+          .catch(error => { if (res.headersSent) return null; throw error; });
+        if (refreshedForecasts === null) return;
+        const [refreshedAgentForecast] = refreshedForecasts;
+
         emitForecastEvents({
           agentId,
           advisories: refreshedAgentForecast.advisories.map((advisory) => ({
@@ -5962,7 +5822,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           })),
           status: refreshedAgentForecast.forecast.status
         });
-        recomputeOrgAndEmit("AGENT_RUN_COMPLETED", orgNodeIdsForAgent(agentId));
+        await orgSecondary.run("AGENT_RUN_COMPLETED", orgNodeIdsForAgent(agentId));
         json(res, 200, out);
         return;
       }
@@ -5971,7 +5831,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
-        json(res, 200, diagnosticBankGetForApi(options.workspace));
+        const out = await diagnosticBankGetForApi(options.workspace, { beforePublish: signingAuthority(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"]) }).catch(error => { if (res.headersSent) return null; throw error; }); if (out !== null) json(res, 200, out);
         return;
       }
 
@@ -6000,10 +5860,11 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "bank object is required" });
           return;
         }
-        const out = diagnosticBankApplyForApi({
+        const actorCurrent = signingAuthority(["OWNER"]), beforePublish = () => { actorCurrent(); if (requiresReadOnlyMode(options.workspace)) { if (!res.headersSent) json(res, 403, { error: "users signature invalid; write operations blocked" }); throw new Error("users signature invalid; write operations blocked"); } if (!requireUnlockedVaultForSigning()) throw new Error("vault locked; unlock required for signing"); };
+        const out = await diagnosticBankApplyForApi({
           workspace: options.workspace,
-          bank: parsed.bank as ReturnType<typeof diagnosticBankGetForApi>["bank"]
-        });
+          bank: parsed.bank as Awaited<ReturnType<typeof diagnosticBankGetForApi>>["bank"]
+        }, { beforePublish }).catch(error => { if (res.headersSent) return null; throw error; }); if (out === null) return;
         json(res, 200, out);
         return;
       }
@@ -6013,11 +5874,14 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           return;
         }
         const agentId = resolveAgentId(options.workspace, url.searchParams.get("agentId") ?? undefined);
+        const selected = await loadDiagnosticBankAttemptAsync(options.workspace, { beforePublish: signingAuthority(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"]) }).catch(error => { if (res.headersSent) return null; throw error; }); if (selected === null) return;
+        try {
+        selected.assertCurrent();
         const render = renderContextualizedDiagnostic({
           workspace: options.workspace,
-          agentId
+          agentId, bank: selected.bank
         });
-        writeStudioAuditEvent({
+        selected.assertCurrent(); writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: "DIAGNOSTIC_RENDERED",
           severity: "LOW",
@@ -6028,6 +5892,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           }
         });
         json(res, 200, render);
+        } catch (cause) { if (res.headersSent) return; if (selected.completedPaths.length > 0) throw new DiagnosticBankFollowupError(selected.completedPaths, cause); throw cause; }
         return;
       }
 
@@ -6046,6 +5911,15 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, leaseCheck.status, { error: leaseCheck.error });
           return;
         }
+        const selfWorkspace = resolve(options.workspace), selfToken = options.token, selfIdentity = { isAdmin: auth.isAdmin, userId: auth.userId, agentId: auth.agentId };
+        const selfTransparency = captureStudioSelfRunTransparency(selfWorkspace, selfIdentity.agentId, () => {
+          if (resolve(options.workspace) !== selfWorkspace || options.token !== selfToken) throw new Error("original self-run workspace or token changed");
+          const current = authenticate(req, selfWorkspace, selfToken);
+          if (!current || !current.roles.has("AGENT") || current.agentId !== selfIdentity.agentId || current.userId !== selfIdentity.userId
+            || current.isAdmin !== selfIdentity.isAdmin) throw new Error("original self-run actor changed while preparing transparency");
+          const live = verifyLeaseForScope({ workspace: selfWorkspace, req, expectedAgentId: selfIdentity.agentId, scope: "diagnostic:self-run" });
+          if (!live.ok) throw new Error(live.error);
+        });
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
         const parsed = body ? (JSON.parse(body) as { answers?: unknown }) : {};
         if (typeof parsed.answers !== "undefined") {
@@ -6059,20 +5933,28 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             }
           });
         }
+        const selfActorAuthority = () => {
+          const current = authenticate(req, options.workspace, options.token);
+          if (!current || !current.roles.has("AGENT") || current.agentId !== auth.agentId || current.userId !== auth.userId || current.isAdmin !== auth.isAdmin) {
+            if (!res.headersSent) json(res, 401, { error: "authenticated authority changed while signing" }); throw new Error("authenticated authority changed while signing");
+          }
+          const live = verifyLeaseForScope({ workspace: options.workspace, req, expectedAgentId: auth.agentId!, scope: "diagnostic:self-run" });
+          if (!live.ok) { if (!res.headersSent) json(res, live.status, { error: live.error }); throw new Error("diagnostic self-run lease changed while signing"); }
+        };
+        const selfForecastAuthority = captureReportSigningAuthority(options.workspace, selfActorAuthority);
         const out = await runAutoAnswer({
           workspace: options.workspace,
           agentId: auth.agentId,
           createPlan: true
-        });
-        const refreshed = refreshForecastForApi({
-          workspace: options.workspace,
-          scope: "agent",
-          targetId: auth.agentId
-        });
-        refreshForecastForApi({
-          workspace: options.workspace,
-          scope: "workspace"
-        });
+        }, { beforePublish: selfForecastAuthority }).catch(error => { if (res.headersSent || respondReportSigningError(error, (status, body) => json(res, status, body))) return null; throw error; });
+        if (out === null) return;
+        const refreshedForecasts = await refreshForecastsAfterPrimary([
+          { workspace: options.workspace, scope: "agent", targetId: auth.agentId }, { workspace: options.workspace, scope: "workspace" }
+        ], selfForecastAuthority, { kind: "diagnostic-self-run", value: out })
+          .catch(error => { if (res.headersSent) return null; throw error; });
+        if (refreshedForecasts === null) return;
+        const [refreshed] = refreshedForecasts;
+
         emitForecastEvents({
           agentId: auth.agentId,
           advisories: refreshed.advisories.map((advisory) => ({
@@ -6081,16 +5963,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           })),
           status: refreshed.forecast.status
         });
-        const transparency = appendTransparencyEntry({
-          workspace: options.workspace,
-          type: "DIAGNOSTIC_SELF_RUN",
-          agentId: auth.agentId,
-          artifact: {
-            kind: "policy",
-            id: `diagnostic-self-run-${out.runId}`,
-            sha256: sha256Hex(Buffer.from(JSON.stringify(out), "utf8"))
-          }
-        });
+        const transparency = await selfTransparency.append(out); selfTransparency.assertCurrent();
         json(res, 200, {
           ...out,
           transparencyHash: transparency.hash
@@ -6143,18 +6016,21 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           return;
         }
         const agentId = resolveAgentId(options.workspace, decodeURIComponent(assuranceMatch[1] ?? ""));
+        const reportAuthority = captureReportSigningAuthority(options.workspace, signingAuthority(["OPERATOR", "OWNER"])); const orgSecondary = captureStudioOrgSecondary(options.workspace, currentOrgRunActor(req, options.workspace, options.token, auth), emitOrgEvent);
         const assurance = await runAssurance({
           workspace: options.workspace,
           agentId,
           runAll: true,
           mode: "sandbox",
           window: "14d"
-        });
-        const refreshed = refreshForecastForApi({
-          workspace: options.workspace,
-          scope: "agent",
-          targetId: agentId
-        });
+        }, { beforePublish: reportAuthority }).catch(error => { if (res.headersSent || respondReportSigningError(error, (status, body) => json(res, status, body))) return null; throw error; });
+        if (assurance === null) return;
+        const refreshedForecasts = await refreshForecastsAfterPrimary([
+          { workspace: options.workspace, scope: "agent", targetId: agentId }
+        ], reportAuthority, { kind: "assurance-run", id: assurance.assuranceRunId, value: assurance })
+          .catch(error => { if (res.headersSent) return null; throw error; });
+        if (refreshedForecasts === null) return;
+        const [refreshed] = refreshedForecasts;
         emitForecastEvents({
           agentId,
           advisories: refreshed.advisories.map((advisory) => ({
@@ -6163,7 +6039,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           })),
           status: refreshed.forecast.status
         });
-        recomputeOrgAndEmit("ASSURANCE_RUN_COMPLETED", orgNodeIdsForAgent(agentId));
+        await orgSecondary.run("ASSURANCE_RUN_COMPLETED", orgNodeIdsForAgent(agentId));
         json(res, 200, { assuranceRunId: assurance.assuranceRunId });
         return;
       }
@@ -6174,37 +6050,15 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           return;
         }
         const agentId = resolveAgentId(options.workspace, decodeURIComponent(driftCheckMatch[1] ?? ""));
-        const freezeBefore = activeFreezeStatus(options.workspace, agentId).active;
-        const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
+        const orgWorkspace = resolve(options.workspace), orgToken = options.token, orgActor = currentOrgRunActor(req, orgWorkspace, orgToken, auth); const orgSecondary = captureStudioOrgSecondary(orgWorkspace, () => { if (resolve(options.workspace) !== orgWorkspace || options.token !== orgToken) throw new Error("original Studio workspace or token changed while preparing optional org recompute"); orgActor(); }, emitOrgEvent); const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
         const parsed = body ? (JSON.parse(body) as { against?: "previous" }) : {};
-        const result = await driftCheckCli({
-          workspace: options.workspace,
-          agentId,
-          against: parsed.against ?? "previous"
-        });
-        const freezeAfter = activeFreezeStatus(options.workspace, agentId).active;
-        if (result.triggered) {
-          recomputeOrgAndEmit("INCIDENT_CREATED", orgNodeIdsForAgent(agentId));
-        }
-        if (!freezeBefore && freezeAfter) {
-          recomputeOrgAndEmit("FREEZE_APPLIED", orgNodeIdsForAgent(agentId));
-        } else if (freezeBefore && !freezeAfter) {
-          recomputeOrgAndEmit("FREEZE_LIFTED", orgNodeIdsForAgent(agentId));
-        }
-        const refreshed = refreshForecastForApi({
-          workspace: options.workspace,
-          scope: "agent",
-          targetId: agentId
-        });
-        emitForecastEvents({
-          agentId,
-          advisories: refreshed.advisories.map((advisory) => ({
-            severity: advisory.severity,
-            category: advisory.category
-          })),
-          status: refreshed.forecast.status
-        });
-        json(res, 200, result);
+        try {
+          const result = await driftCheckForStudio({ workspace: options.workspace, agentId, against: parsed.against ?? "previous",
+            beforePublish: signingAuthority(["OPERATOR", "OWNER"]), recompute: type => orgSecondary.run(type, orgNodeIdsForAgent(agentId)),
+            forecast: refreshed => emitForecastEvents({ agentId,
+              advisories: refreshed.advisories.map(advisory => ({ severity: advisory.severity, category: advisory.category })), status: refreshed.forecast.status }) });
+          json(res, 200, result);
+        } catch (error) { if (res.headersSent) return; throw error; }
         return;
       }
 
@@ -6351,13 +6205,17 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, leaseCheck.status, { error: leaseCheck.error });
           return;
         }
-        const response = toolhub.createIntent({
+        const actor = captureStudioToolhubIntentAuthority(req, options, agentId,
+          { isAdmin: auth.isAdmin, userId: auth.userId, agentId: auth.agentId });
+        const created = await toolhub.createIntentAsync({
           agentId, initiator,
           workOrderId: parsed.workOrderId,
           toolName: parsed.toolName,
           args: parsed.args ?? {},
           requestedMode: parsed.requestedMode ?? "SIMULATE"
-        });
+        }, { beforePublish: actor });
+        const { response } = created;
+        created.assertCurrent();
         const intentRecord = toolhub.intent(response.intentId);
         const actionClass = intentRecord?.actionClass ?? "READ_ONLY";
         recordToolhubIntentMetric(agentId, actionClass, parsed.requestedMode ?? "SIMULATE");
@@ -6371,11 +6229,13 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
               approvalRequestId: response.approvalRequestId,
               trigger: "REQUEST_CREATED",
               reviewBasePath: options.publicConsoleBasePath
-            })
+            }, { beforePublish: created.assertCurrent })
           : undefined;
+        created.assertCurrent();
         if (response.approvalRequired && response.approvalRequestId) {
           emitOrgEvent("APPROVAL_REQUEST_CREATED", orgNodeIdsForAgent(agentId));
         }
+        created.assertCurrent();
         json(res, 200, {
           ...response,
           ...(approvalDelivery ? { approvalDelivery } : {})
@@ -6813,12 +6673,14 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           return;
         }
         const reason = typeof parsed.reason === "string" && parsed.reason.trim().length > 0 ? parsed.reason.trim() : "";
-        const out = mechanicTargetsApplyForApi({
+        const out = await mechanicTargetsApplyForApi({
           workspace: options.workspace,
           targets: parsed.targets as Parameters<typeof mechanicTargetsApplyForApi>[0]["targets"],
           reason,
           actor: auth.username ?? "owner"
-        });
+        }, () => { signingAuthority(["OWNER"])(); if (requiresReadOnlyMode(options.workspace)) { if (!res.headersSent) json(res, 403, { error: "users signature invalid; write operations blocked" }); throw new Error("mechanic signing is read-only"); } if (!requireUnlockedVaultForSigning()) throw new Error("vault locked; unlock required for signing"); })
+          .catch(error => { if (res.headersSent) return null; throw error; });
+        if (out === null) return;
         writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: "MECHANIC_TARGETS_APPLIED",
@@ -6876,7 +6738,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "profileId is required" });
           return;
         }
-        const out = mechanicProfileApplyForApi({
+        const out = await mechanicProfileApplyForApi({
           workspace: options.workspace,
           profileId: parsed.profileId,
           mode: parsed.mode === "EXCELLENCE" ? "EXCELLENCE" : "DESIRED",
@@ -6884,7 +6746,9 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           scopeId: (parsed.scopeId ?? (parsed.scopeType === "WORKSPACE" ? "workspace" : "default")).trim(),
           reason: typeof parsed.reason === "string" ? parsed.reason : "apply mechanic profile",
           actor: auth.username ?? "owner"
-        });
+        }, () => { signingAuthority(["OWNER"])(); if (requiresReadOnlyMode(options.workspace)) { if (!res.headersSent) json(res, 403, { error: "users signature invalid; write operations blocked" }); throw new Error("mechanic signing is read-only"); } if (!requireUnlockedVaultForSigning()) throw new Error("vault locked; unlock required for signing"); })
+          .catch(error => { if (res.headersSent) return null; throw error; });
+        if (out === null) return;
         writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: "MECHANIC_PROFILE_APPLIED",
@@ -6935,12 +6799,14 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           return;
         }
         const reason = typeof parsed.reason === "string" && parsed.reason.trim().length > 0 ? parsed.reason.trim() : "apply mechanic tuning";
-        const out = mechanicTuningApplyForApi({
+        const out = await mechanicTuningApplyForApi({
           workspace: options.workspace,
           tuning: parsed.tuning as Parameters<typeof mechanicTuningApplyForApi>[0]["tuning"],
           reason,
           actor: auth.username ?? "owner"
-        });
+        }, () => { signingAuthority(["OWNER"])(); if (requiresReadOnlyMode(options.workspace)) { if (!res.headersSent) json(res, 403, { error: "users signature invalid; write operations blocked" }); throw new Error("mechanic signing is read-only"); } if (!requireUnlockedVaultForSigning()) throw new Error("vault locked; unlock required for signing"); })
+          .catch(error => { if (res.headersSent) return null; throw error; });
+        if (out === null) return;
         writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: "MECHANIC_TARGETS_APPLIED",
@@ -6976,7 +6842,8 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           workspace: options.workspace,
           scopeType: scopeRaw.toUpperCase() as "WORKSPACE" | "NODE" | "AGENT",
           scopeId: targetId
-        });
+        }, signingAuthority(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])).catch(error => { if (res.headersSent) return null; throw error; });
+        if (out === null) return;
         json(res, 200, out);
         return;
       }
@@ -6993,12 +6860,14 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
         const parsed = body ? (JSON.parse(body) as { scopeType?: "WORKSPACE" | "NODE" | "AGENT"; scopeId?: string }) : {};
+        const authority = signingAuthority(["OWNER", "OPERATOR"]);
         const out = await mechanicCreatePlanForApi({
           workspace: options.workspace,
           scopeType: parsed.scopeType ?? "WORKSPACE",
           scopeId: parsed.scopeId ?? (parsed.scopeType === "WORKSPACE" ? "workspace" : "default")
-        });
-        writeStudioAuditEvent({
+        }, () => { authority(); if (!requireUnlockedVaultForSigning()) throw new Error("vault locked; unlock required for signing"); }).catch(error => { if (res.headersSent) return null; throw error; });
+        if (out === null) return;
+        await writeStudioAuditEventAsync({
           workspace: options.workspace,
           auditType: "MECHANIC_PLAN_CREATED",
           severity: "LOW",
@@ -7007,7 +6876,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             scopeType: out.plan.scope.type,
             scopeId: out.plan.scope.id
           }
-        });
+        }, humanAuditAuthority(["OWNER", "OPERATOR"], true));
         emitMechanicSse({
           hub: orgSse,
           type: "MECHANIC_PLAN_UPDATED"
@@ -7064,13 +6933,15 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "planId is required" });
           return;
         }
-        const out = mechanicPlanRequestApprovalForApi({
+        const authority = signingAuthority(["OWNER"]);
+        const out = await mechanicPlanRequestApprovalForApi({
           workspace: options.workspace,
           planId: parsed.planId,
           actor: auth.username ?? "owner",
           reason: typeof parsed.reason === "string" && parsed.reason.trim().length > 0 ? parsed.reason.trim() : "mechanic plan execution approval"
-        });
-        writeStudioAuditEvent({
+        }, authority).catch(error => { if (res.headersSent) return null; throw error; });
+        if (out === null) return;
+        await writeStudioAuditEventAsync({
           workspace: options.workspace,
           auditType: "MECHANIC_PLAN_APPROVAL_REQUESTED",
           severity: "LOW",
@@ -7078,7 +6949,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             planId: out.plan.planId,
             approvals: out.approvalRequests.length
           }
-        });
+        }, humanAuditAuthority(["OWNER"]));
         emitMechanicSse({
           hub: orgSse,
           type: "MECHANIC_PLAN_UPDATED"
@@ -7107,12 +6978,13 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           hub: orgSse,
           type: "MECHANIC_EXECUTION_STARTED"
         });
+        const authority = signingAuthority(["OWNER"]);
         try {
           const out = await mechanicPlanExecuteForApi({
             workspace: options.workspace,
             planId: parsed.planId
-          });
-          writeStudioAuditEvent({
+          }, () => { authority(); if (!requireUnlockedVaultForSigning()) throw new Error("vault locked; unlock required for signing"); });
+          await writeStudioAuditEventAsync({
             workspace: options.workspace,
             auditType: "MECHANIC_PLAN_EXECUTED",
             severity: "LOW",
@@ -7120,14 +6992,15 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
               planId: out.plan.planId,
               executed: out.executed.length
             }
-          });
+          }, humanAuditAuthority(["OWNER"], true));
           emitMechanicSse({
             hub: orgSse,
             type: "MECHANIC_EXECUTION_COMPLETED"
           });
           json(res, 200, out);
         } catch (error) {
-          writeStudioAuditEvent({
+          if (res.headersSent) return;
+          await writeStudioAuditEventAsync({
             workspace: options.workspace,
             auditType: "MECHANIC_PLAN_EXECUTION_FAILED",
             severity: "HIGH",
@@ -7135,7 +7008,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
               planId: parsed.planId,
               reason: String(error)
             }
-          });
+          }, humanAuditAuthority(["OWNER"], true));
           emitMechanicSse({
             hub: orgSse,
             type: "MECHANIC_EXECUTION_FAILED"
@@ -7162,8 +7035,9 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         const out = await mechanicSimulateForApi({
           workspace: options.workspace,
           planId
-        });
-        writeStudioAuditEvent({
+        }, signingAuthority(["OWNER", "OPERATOR"])).catch(error => { if (res.headersSent) return null; throw error; });
+        if (out === null) return;
+        await writeStudioAuditEventAsync({
           workspace: options.workspace,
           auditType: "MECHANIC_SIMULATION_CREATED",
           severity: "LOW",
@@ -7172,7 +7046,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             simulationId: out.simulation.simulationId,
             status: out.simulation.status
           }
-        });
+        }, humanAuditAuthority(["OWNER", "OPERATOR"]));
         emitMechanicSse({
           hub: orgSse,
           type: "MECHANIC_SIMULATION_UPDATED"
@@ -7226,10 +7100,11 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "policy object required" });
           return;
         }
-        const applied = benchPolicyApplyForApi({
+        const applied = await benchPolicyApplyForApi({
           workspace: options.workspace,
           policy: parsed.policy as ReturnType<typeof loadBenchPolicy>
-        });
+        }, { beforePublish: signingAuthority(["OWNER"]) }).catch(error => { if (res.headersSent) return null; throw error; });
+        if (applied === null) return;
         writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: "BENCH_POLICY_UPDATED",
@@ -7270,7 +7145,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
               };
             })
           : {};
-        const created = benchCreateForApi({
+        const created = await benchCreateForApi({
           workspace: options.workspace,
           scope: parsed.scope ?? "workspace",
           id: parsed.id ?? (parsed.scope === "agent" ? resolveAgentId(options.workspace, "default") : "workspace"),
@@ -7278,7 +7153,8 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           windowDays: parsed.windowDays,
           named: parsed.named,
           labels: parsed.labels
-        });
+        }, { beforePublish: signingAuthority(["OWNER", "OPERATOR"]) }).catch(error => { if (res.headersSent) return null; throw error; });
+        if (created === null) return;
         writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: "BENCH_CREATED",
@@ -7335,7 +7211,8 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 403, { error: "lease-auth cannot access bench APIs" });
           return;
         }
-        json(res, 200, benchRegistriesForApi(options.workspace));
+        const out = await benchRegistriesForApi(options.workspace, { beforePublish: signingAuthority(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"]) }).catch(error => { if (res.headersSent) return null; throw error; });
+        if (out !== null) json(res, 200, out);
         return;
       }
 
@@ -7377,7 +7254,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             })
           : {};
         if (parsed.replaceAll && parsed.config?.benchRegistries?.registries) {
-          const saved = benchRegistryApplyForApi({
+          const saved = await benchRegistryApplyForApi({
             workspace: options.workspace,
             config: {
               benchRegistries: {
@@ -7396,7 +7273,8 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
                   .sort((a, b) => a.id.localeCompare(b.id))
               }
             }
-          });
+          }, { beforePublish: signingAuthority(["OWNER"]) }).catch(error => { if (res.headersSent) return null; throw error; });
+          if (saved === null) return;
           writeStudioAuditEvent({
             workspace: options.workspace,
             auditType: "BENCH_REGISTRY_UPDATED",
@@ -7417,27 +7295,12 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "id,type,base,pinnedRegistryFingerprint required" });
           return;
         }
-        const existing = benchRegistriesForApi(options.workspace).registries;
-        const filtered = existing.benchRegistries.registries.filter((row) => row.id !== parsed.id);
-        filtered.push({
-          id: parsed.id,
-          type: parsed.type,
-          base: parsed.base,
-          pinnedRegistryFingerprint: parsed.pinnedRegistryFingerprint,
-          allowSignerFingerprints: parsed.allowSignerFingerprints ?? [],
-          allowTrustLabels: parsed.allowTrustLabels ?? ["HIGH", "MEDIUM", "LOW"],
-          requireBenchProofs: parsed.requireBenchProofs ?? true,
-          autoUpdate: parsed.autoUpdate ?? false
-        });
-        const saved = benchRegistryApplyForApi({
-          workspace: options.workspace,
-          config: {
-            benchRegistries: {
-              version: 1,
-              registries: filtered.sort((a, b) => a.id.localeCompare(b.id))
-            }
-          }
-        });
+        const saved = await benchRegistryAddForApiAsync({ workspace: options.workspace, registry: {
+          id: parsed.id, type: parsed.type, base: parsed.base, pinnedRegistryFingerprint: parsed.pinnedRegistryFingerprint,
+          allowSignerFingerprints: parsed.allowSignerFingerprints ?? [], allowTrustLabels: parsed.allowTrustLabels ?? ["HIGH", "MEDIUM", "LOW"],
+          requireBenchProofs: parsed.requireBenchProofs ?? true, autoUpdate: parsed.autoUpdate ?? false
+        } }, { beforePublish: signingAuthority(["OWNER"]) }).catch(error => { if (res.headersSent) return null; throw error; });
+        if (saved === null) return;
         writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: "BENCH_REGISTRY_UPDATED",
@@ -7473,7 +7336,8 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           workspace: options.workspace,
           registryId,
           query
-        });
+        }, { beforePublish: signingAuthority(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"]) }).catch(error => { if (res.headersSent) return null; throw error; });
+        if (browsed === null) return;
         json(res, 200, browsed);
         return;
       }
@@ -7492,12 +7356,15 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "registryId and benchRef required" });
           return;
         }
+        const initialAuthority = signingAuthority(["OWNER", "OPERATOR"]); let authorityRefused = false;
+        const beforePublish = () => { try { initialAuthority(); } catch (cause) { authorityRefused = true; throw cause; } };
         try {
           const imported = await benchImportForApi({
             workspace: options.workspace,
             registryId: parsed.registryId,
             benchRef: parsed.benchRef
-          });
+          }, { beforePublish });
+          beforePublish();
           writeStudioAuditEvent({
             workspace: options.workspace,
             auditType: "BENCH_IMPORTED",
@@ -7513,6 +7380,9 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           });
           json(res, 200, imported);
         } catch (error) {
+          if (res.headersSent) return;
+          if (authorityRefused) throw error;
+          beforePublish();
           writeStudioAuditEvent({
             workspace: options.workspace,
             auditType: "BENCH_IMPORT_FAILED",
@@ -7524,7 +7394,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             }
           });
           try {
-            await dispatchIntegrationEvent({
+            await dispatchIntegrationEventWithAuthority({
               workspace: options.workspace,
               eventName: "BENCH_IMPORT_FAILED",
               agentId: "workspace",
@@ -7534,11 +7404,13 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
                 benchRef: parsed.benchRef,
                 reason: String(error)
               }
-            });
-          } catch {
-            // best effort integration dispatch
+            }, beforePublish);
+          } catch (deliveryError) {
+            if (res.headersSent) return;
+            if (authorityRefused) throw new Error("bench import failure delivery authority refused", { cause: new AggregateError([error, deliveryError]) });
           }
-          json(res, 400, { error: String(error) });
+          if (res.headersSent) return;
+          beforePublish(); json(res, 400, { error: String(error) });
         }
         return;
       }
@@ -7559,12 +7431,13 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
               against?: "imported" | `registry:${string}`;
             })
           : {};
-        const compared = benchCompareForApi({
+        const compared = await benchCompareForApi({
           workspace: options.workspace,
           scope: parsed.scope ?? "workspace",
           id: parsed.id ?? (parsed.scope === "agent" ? resolveAgentId(options.workspace, "default") : "workspace"),
           against: parsed.against
-        });
+        }, { beforePublish: signingAuthority(["OWNER", "OPERATOR"]) }).catch(error => { if (res.headersSent) return null; throw error; });
+        if (compared === null) return;
         writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: "BENCH_COMPARISON_CREATED",
@@ -7620,11 +7493,14 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             json(res, 400, { error: "approvalRequestId required when execute=true" });
             return;
           }
-          const executed = benchPublishExecuteForApi({
+          const initialAuthority = signingAuthority(["OWNER"]); let authorityRefused = false;
+          const beforePublish = () => { try { initialAuthority(); } catch (cause) { authorityRefused = true; throw cause; } };
+          const executed = await benchPublishExecuteForApi({
             workspace: options.workspace,
             approvalRequestId: parsed.approvalRequestId
-          });
-          writeStudioAuditEvent({
+          }, { beforePublish }).catch(error => { if (res.headersSent) return null; throw error; });
+          if (executed === null) return;
+          beforePublish(); writeStudioAuditEvent({
             workspace: options.workspace,
             auditType: "BENCH_PUBLISHED",
             severity: "MEDIUM",
@@ -7639,7 +7515,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             type: "BENCH_PUBLISHED"
           });
           try {
-            await dispatchIntegrationEvent({
+            await dispatchIntegrationEventWithAuthority({
               workspace: options.workspace,
               eventName: "BENCH_PUBLISHED",
               agentId: "workspace",
@@ -7649,11 +7525,13 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
                 version: executed.version,
                 targetPath: executed.targetPath
               }
-            });
-          } catch {
-            // best effort
+            }, beforePublish);
+          } catch (deliveryError) {
+            if (res.headersSent) return;
+            if (authorityRefused) throw new Error("benchmark published delivery authority refused", { cause: deliveryError });
           }
-          json(res, 200, executed);
+          if (res.headersSent) return;
+          beforePublish(); json(res, 200, executed);
           return;
         }
         if (!parsed.file || !parsed.registryDir || !parsed.registryKeyPath) {
@@ -7685,7 +7563,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireRouteRoles(["OPERATOR", "OWNER", "AUDITOR"])) {
           return;
         }
-        const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
+        const orgWorkspace = resolve(options.workspace), orgToken = options.token, orgIdentity = { isAdmin: auth.isAdmin, userId: auth.userId, agentId: auth.agentId }; const orgSecondary = captureStudioOrgSecondary(orgWorkspace, () => { const current = authenticate(req, orgWorkspace, orgToken); if (!current || current.isAdmin !== orgIdentity.isAdmin || current.userId !== orgIdentity.userId || current.agentId !== orgIdentity.agentId) throw new Error("authenticated authority changed while preparing optional org recompute"); const usersSig = verifyUsersConfigSignature(orgWorkspace); const check = enforceRoleOrAdmin({ access: accessContext(current), requiredAny: ["OPERATOR", "OWNER", "AUDITOR"], usersConfigValid: usersSig.valid || current.sessionAuthSource === "WORKSPACE_ROUTER" }); if (!check.ok) throw new Error(check.error ?? "optional org recompute authority refused"); }, emitOrgEvent); const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
         const parsed = body ? (JSON.parse(body) as { path?: string }) : {};
         if (!parsed.path) {
           json(res, 400, { error: "path is required" });
@@ -7705,7 +7583,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             count: imported.imported.length
           }
         });
-        recomputeOrgAndEmit("BENCHMARK_INGESTED");
+        await orgSecondary.run("BENCHMARK_INGESTED");
         json(res, 200, imported);
         return;
       }
@@ -7747,20 +7625,13 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/outcomes/report" && req.method === "GET") {
-        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
-          return;
-        }
-        const agentId = resolveAgentId(options.workspace, url.searchParams.get("agentId") ?? "default");
-        const window = url.searchParams.get("window") ?? "14d";
-        const result = outcomesReportCli({
-          workspace: options.workspace,
-          agentId,
-          window
-        });
-        json(res, 200, {
-          ...result,
-          report: JSON.parse(readUtf8(result.jsonPath))
-        });
+        const roles: UserRole[] = ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"];
+        if (!requireRouteRoles(roles)) return;
+        const beforePublish = signingAuthority(roles);
+        const agentId = resolveAgentId(options.workspace, url.searchParams.get("agentId") ?? "default"), window = url.searchParams.get("window") ?? "14d";
+        const result = await outcomesReportCliAsync({ workspace: options.workspace, agentId, window }, { beforePublish })
+          .catch(error => { if (res.headersSent) return null; throw error; });
+        if (result) json(res, 200, { ...result, report: JSON.parse(readUtf8(result.jsonPath)) });
         return;
       }
 
@@ -7936,19 +7807,18 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
 
       const experimentRunMatch = pathname.match(/^\/experiments\/([^/]+)\/run$/);
       if (experimentRunMatch && req.method === "POST") {
-        if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
-          return;
-        }
+        if (!requireRouteRoles(["OWNER", "OPERATOR"])) return;
         const experimentId = decodeURIComponent(experimentRunMatch[1] ?? "");
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
-        const parsed = body ? (JSON.parse(body) as { agentId?: string; mode?: "supervise" | "sandbox" }) : {};
-        const out = experimentRunCli({
-          workspace: options.workspace,
-          agentId: resolveAgentId(options.workspace, parsed.agentId ?? "default"),
-          experimentId,
-          mode: parsed.mode ?? "sandbox"
+        const parsed = body ? (JSON.parse(body) as { agentId?: string; mode?: "supervise" | "sandbox"; candidateWindow?: string; candidateAgentId?: string }) : {};
+        if (typeof parsed.candidateWindow !== "string" || !parsed.candidateWindow.trim()) { json(res, 400, { error: "candidateWindow is required" }); return; }
+        if (parsed.candidateAgentId !== undefined && (typeof parsed.candidateAgentId !== "string" || !parsed.candidateAgentId.trim())) { json(res, 400, { error: "candidateAgentId must be a non-empty string" }); return; }
+        const out = await experimentRunCliAsync({ workspace: options.workspace, agentId: resolveAgentId(options.workspace, parsed.agentId ?? "default"),
+          experimentId, mode: parsed.mode ?? "sandbox", candidateWindow: parsed.candidateWindow, candidateAgentId: parsed.candidateAgentId
+        }, { beforePublish: signingAuthority(["OWNER", "OPERATOR"]) }).catch(error => {
+          if (res.headersSent || respondReportSigningError(error, (status, result) => json(res, status, result))) return null; throw error;
         });
-        json(res, 200, out);
+        if (out) json(res, 200, out);
         return;
       }
 
@@ -8059,6 +7929,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
+        const orgSecondary = captureStudioOrgSecondary(options.workspace, currentOrgRunActor(req, options.workspace, options.token, auth), emitOrgEvent);
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
         const parsed = body ? (JSON.parse(body) as { path?: string }) : {};
         if (!parsed.path) {
@@ -8069,7 +7940,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           workspace: options.workspace,
           bundleFile: parsed.path
         });
-        recomputeOrgAndEmit("FEDERATION_IMPORTED");
+        await orgSecondary.run("FEDERATION_IMPORTED");
         json(res, 200, out);
         return;
       }
@@ -8091,11 +7962,11 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
         const parsed = body ? (JSON.parse(body) as { channelId?: string }) : {};
-        const out = await integrationsTestCli({
+        const out = await dispatchIntegrationTestWithAuthority({
           workspace: options.workspace,
           channelId: parsed.channelId
-        });
-        json(res, 200, out);
+        }, signingAuthority(["OWNER", "OPERATOR"])).catch(error => { if (res.headersSent) return null; throw error; });
+        if (out !== null) json(res, 200, out);
         return;
       }
 
@@ -8111,14 +7982,14 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "eventName and agentId are required" });
           return;
         }
-        const out = await integrationsDispatchCli({
+        const out = await dispatchIntegrationEventWithAuthority({
           workspace: options.workspace,
           eventName: parsed.eventName,
           agentId: parsed.agentId,
-          summary: parsed.summary,
+          summary: parsed.summary ?? `AMC integration dispatch for ${parsed.eventName}`,
           details: parsed.details
-        });
-        json(res, 200, out);
+        }, signingAuthority(["OWNER", "OPERATOR"])).catch(error => { if (res.headersSent) return null; throw error; });
+        if (out !== null) json(res, 200, out);
         return;
       }
 
@@ -8187,11 +8058,11 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 400, { error: "entryHash is required" });
           return;
         }
-        const out = exportTransparencyProofBundle({
+        const out = await exportTransparencyProofBundleAsync({
           workspace: options.workspace,
           entryHash: parsed.entryHash,
           outFile: `.amc/transparency/proofs/${parsed.entryHash}.amcproof`
-        });
+        }, { beforePublish: signingAuthority(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"]) });
         json(res, 200, out);
         return;
       }
@@ -8242,7 +8113,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         const listed = listInstalledPlugins(options.workspace);
         const loaded = loadInstalledPluginAssets(options.workspace);
         if (!loaded.integrity.ok) {
-          recomputeOrgAndEmit("PLUGIN_INTEGRITY_BROKEN");
+          const orgWorkspace = resolve(options.workspace), orgToken = options.token, orgIdentity = { isAdmin: auth.isAdmin, userId: auth.userId, agentId: auth.agentId }; await captureStudioOrgSecondary(orgWorkspace, () => { if (resolve(options.workspace) !== orgWorkspace || options.token !== orgToken) throw new Error("original Studio workspace or token changed while preparing optional org recompute"); const current = authenticate(req, orgWorkspace, orgToken); if (!current || current.isAdmin !== orgIdentity.isAdmin || current.userId !== orgIdentity.userId || current.agentId !== orgIdentity.agentId) throw new Error("authenticated authority changed while preparing optional org recompute"); const usersSig = verifyUsersConfigSignature(orgWorkspace); const check = enforceRoleOrAdmin({ access: accessContext(current), requiredAny: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"], usersConfigValid: usersSig.valid || current.sessionAuthSource === "WORKSPACE_ROUTER" }); if (!check.ok) throw new Error(check.error ?? "optional org recompute authority refused"); }, emitOrgEvent).run("PLUGIN_INTEGRITY_BROKEN");
         }
         json(res, 200, {
           ...listed,
@@ -8328,7 +8199,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 403, { error: "users config signature invalid: read-only mode active" });
           return;
         }
-        const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
+        const orgWorkspace = resolve(options.workspace), orgToken = options.token, orgActor = humanAuditAuthority(["OWNER"]); const orgSecondary = captureStudioOrgSecondary(orgWorkspace, () => { if (resolve(options.workspace) !== orgWorkspace || options.token !== orgToken) throw new Error("original Studio workspace or token changed while preparing optional org recompute"); orgActor(); }, emitOrgEvent); const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
         const parsed = body ? (JSON.parse(body) as { agentId?: string; registryId?: string; pluginRef?: string }) : {};
         if (!parsed.registryId || !parsed.pluginRef) {
           json(res, 400, { error: "registryId and pluginRef are required" });
@@ -8353,7 +8224,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             approvalRequestId: requested.approvalRequestId
           }
         });
-        recomputeOrgAndEmit("PLUGIN_INSTALL_REQUESTED", orgNodeIdsForAgent(agentId));
+        await orgSecondary.run("PLUGIN_INSTALL_REQUESTED", orgNodeIdsForAgent(agentId));
         json(res, 200, requested);
         return;
       }
@@ -8366,7 +8237,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 403, { error: "users config signature invalid: read-only mode active" });
           return;
         }
-        const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
+        const orgWorkspace = resolve(options.workspace), orgToken = options.token, orgActor = humanAuditAuthority(["OWNER"]); const orgSecondary = captureStudioOrgSecondary(orgWorkspace, () => { if (resolve(options.workspace) !== orgWorkspace || options.token !== orgToken) throw new Error("original Studio workspace or token changed while preparing optional org recompute"); orgActor(); }, emitOrgEvent); const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
         const parsed = body
           ? (JSON.parse(body) as { agentId?: string; registryId?: string; pluginId?: string; to?: string })
           : {};
@@ -8394,7 +8265,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             approvalRequestId: requested.approvalRequestId
           }
         });
-        recomputeOrgAndEmit("PLUGIN_INSTALL_REQUESTED", orgNodeIdsForAgent(agentId));
+        await orgSecondary.run("PLUGIN_INSTALL_REQUESTED", orgNodeIdsForAgent(agentId));
         json(res, 200, requested);
         return;
       }
@@ -8407,7 +8278,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 403, { error: "users config signature invalid: read-only mode active" });
           return;
         }
-        const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
+        const orgWorkspace = resolve(options.workspace), orgToken = options.token, orgActor = humanAuditAuthority(["OWNER"]); const orgSecondary = captureStudioOrgSecondary(orgWorkspace, () => { if (resolve(options.workspace) !== orgWorkspace || options.token !== orgToken) throw new Error("original Studio workspace or token changed while preparing optional org recompute"); orgActor(); }, emitOrgEvent); const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
         const parsed = body ? (JSON.parse(body) as { agentId?: string; pluginId?: string }) : {};
         if (!parsed.pluginId) {
           json(res, 400, { error: "pluginId is required" });
@@ -8431,7 +8302,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             approvalRequestId: requested.approvalRequestId
           }
         });
-        recomputeOrgAndEmit("PLUGIN_INSTALL_REQUESTED", orgNodeIdsForAgent(agentId));
+        await orgSecondary.run("PLUGIN_INSTALL_REQUESTED", orgNodeIdsForAgent(agentId));
         json(res, 200, requested);
         return;
       }
@@ -8471,7 +8342,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 409, { error: "vault is locked" });
           return;
         }
-        const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
+        const orgWorkspace = resolve(options.workspace), orgToken = options.token, orgActor = humanAuditAuthority(["OWNER"], true); const orgSecondary = captureStudioOrgSecondary(orgWorkspace, () => { if (resolve(options.workspace) !== orgWorkspace || options.token !== orgToken) throw new Error("original Studio workspace or token changed while preparing optional org recompute"); orgActor(); }, emitOrgEvent); const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
         const parsed = body ? (JSON.parse(body) as { approvalRequestId?: string }) : {};
         if (!parsed.approvalRequestId) {
           json(res, 400, { error: "approvalRequestId is required" });
@@ -8498,9 +8369,9 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           }
         });
         const currentAgent = resolveAgentId(options.workspace);
-        recomputeOrgAndEmit(eventType, orgNodeIdsForAgent(currentAgent));
-        writeConsoleSnapshot(options.workspace);
-        json(res, 200, executed);
+        await orgSecondary.run(eventType, orgNodeIdsForAgent(currentAgent));
+        const snapshotStatus = await refreshConsole(); if (snapshotStatus === null) return;
+        json(res, 200, { ...executed, ...snapshotStatus });
         return;
       }
 
@@ -8693,14 +8564,19 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           return;
         }
         const packId = decodeURIComponent(policyPackApplyMatch[1] ?? "");
-        const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
+        const orgWorkspace = resolve(options.workspace), orgToken = options.token, orgActor = humanAuditAuthority(["OWNER"]); const orgSecondary = captureStudioOrgSecondary(orgWorkspace, () => { if (resolve(options.workspace) !== orgWorkspace || options.token !== orgToken) throw new Error("original Studio workspace or token changed while preparing optional org recompute"); orgActor(); }, emitOrgEvent); const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
         const parsed = body ? (JSON.parse(body) as { agentId?: string }) : {};
-        const applied = policyPackApplyCli({
+        const owner = signingAuthority(["OWNER"]);
+        const applied = await policyPackApplyCliAsync({
           workspace: options.workspace,
           agentId: resolveAgentId(options.workspace, parsed.agentId ?? "default"),
           packId
-        });
-        writeStudioAuditEvent({
+        }, { beforePublish() { owner(); if (requiresReadOnlyMode(options.workspace)) {
+          if (!res.headersSent) json(res, 403, { error: "users config signature invalid: read-only mode active" });
+          throw new Error("policy-pack current caller is in read-only mode");
+        } } }).catch(error => { if (res.headersSent || respondReportSigningError(error, (status, body) => json(res, status, body))) return null; throw error; });
+        if (applied === null) return;
+        await writeStudioAuditEventAsync({
           workspace: options.workspace,
           auditType: "HUMAN_POLICY_PACK_APPLY",
           severity: "LOW",
@@ -8709,12 +8585,10 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             packId: applied.packId,
             transparencyHash: applied.transparencyHash
           }
-        });
-        recomputeOrgAndEmit("POLICY_PACK_APPLIED", orgNodeIdsForAgent(applied.agentId));
-        writeConsoleSnapshot(options.workspace);
-        json(res, 200, {
-          applied
-        });
+        }, humanAuditAuthority(["OWNER"]));
+        await orgSecondary.run("POLICY_PACK_APPLIED", orgNodeIdsForAgent(applied.agentId));
+        const snapshotStatus = await refreshConsole(); if (snapshotStatus === null) return;
+        json(res, 200, { applied, ...snapshotStatus });
         return;
       }
 
@@ -8785,6 +8659,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
 
       json(res, 404, { error: "not found" });
     } catch (error) {
+      if (res.headersSent) return;
       const message = error instanceof Error ? error.message : String(error);
       if (message.includes("PAYLOAD_TOO_LARGE")) {
         json(res, 413, { error: "payload too large" });
@@ -8794,6 +8669,10 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         json(res, 400, { error: "invalid JSON body" });
         return;
       }
+      const intentRefusal = error instanceof ApprovalRequestContinuationError ? error.primaryCause : error;
+      if (intentRefusal instanceof StudioToolhubIntentAuthorityError) { json(res, intentRefusal.status, { error: intentRefusal.message }); return; }
+      if (respondUsersMutationError(req, error, (status, body) => json(res, status, body))) return;
+      if (error instanceof TransformPublicationError) { if (!res.headersSent) json(res, 409, { error: error.message, code: error.code, publishedPaths: error.publishedPaths, attemptedPhase: error.attemptedPhase, knownTransparencyHash: error.knownTransparencyHash }); return; }
       json(res, 500, { error: "internal server error" });
     }
   });
@@ -8822,7 +8701,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
     port,
     url: `http://${host}:${port}`,
     close: async () => {
-      shuttingDown = true;
+      shuttingDown = true; clearInterval(schedulerTimer); await Promise.allSettled([...forecastSchedulerWork, ...integrationQueueWork, ...outcomeOrgWork.snapshot()]);
       let nativeCleanupError: unknown;
       try { await nativeTaskService.close(); } catch (error) { nativeCleanupError = error; }
       for (const socket of openSockets) {
@@ -8846,7 +8725,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       while (inFlightRequests > 0 && Date.now() < waitUntil) {
         await new Promise((resolvePromise) => setTimeout(resolvePromise, 50));
       }
-      closeScoreSessionStores(options.workspace);
+      while (outcomeOrgWork.hasPending()) await outcomeOrgWork.waitCurrent(); closeScoreSessionStores(options.workspace);
       if (nativeCleanupError) throw nativeCleanupError;
     }
   };

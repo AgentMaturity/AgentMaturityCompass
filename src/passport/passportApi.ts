@@ -1,3 +1,12 @@
+import { captureOrgPairs, assertOrgPairsCurrent, captureOrgPairsAuthority, orgPairBytes } from "../org/preparedOrgPairs.js";
+import { capturePassportPolicyReadAdmission, verifyPassportPolicySignatureForApi as verifyPassportPolicySignature } from "./passportReadAdmission.js";
+import { captureTransparencyState, assertTransparencyStateCurrent } from "../transparency/workspacePublication.js";
+import { appendTransparencyEntryAttemptAsync, captureWorkspaceLogAuthority } from "../transparency/asyncWorkspaceAppend.js";
+import { TransparencyMerkleLagError } from "../transparency/merkleIndexState.js";
+import { createPassportArtifactAttemptAsync } from "./passportProducer.js";
+import { capturePassportBadgeRead } from "./passportLazyReads.js";
+import { loadPassportPolicyAttemptAsync, preparePassportPolicyAsync } from "./passportPairPublication.js";
+import { passportPublicationFailure, type PassportPublicationOptions } from "./passportPublication.js";
 import { randomUUID } from "node:crypto";
 import { join, resolve } from "node:path";
 import { rmSync } from "node:fs";
@@ -18,7 +27,6 @@ import {
   loadPassportCache,
   loadPassportPolicy,
   savePassportPolicy,
-  verifyPassportPolicySignature,
   getPassportRevocation,
   revokePassport
 } from "./passportStore.js";
@@ -340,6 +348,10 @@ export function passportBadgeForApi(params: {
       scopeId: params.agentId
     }).passport;
   }
+  return renderPassportBadge(passport);
+}
+
+function renderPassportBadge(passport: ReturnType<typeof inspectPassportArtifact>["passport"]) {
   const maturity = typeof passport.maturity.overall === "number" ? passport.maturity.overall.toFixed(1) : "UNKNOWN";
   const assurance = typeof passport.checkpoints.lastAssuranceCert.riskAssuranceScore === "number"
     ? String(Math.round(passport.checkpoints.lastAssuranceCert.riskAssuranceScore))
@@ -359,6 +371,18 @@ export function passportBadgeForApi(params: {
     badge,
     passport
   };
+}
+
+/** Internal maintained lazy attempt; presentation never substitutes for its closed actual currentness. */
+export async function passportBadgeAttemptForApiAsync(params: Parameters<typeof passportBadgeForApi>[0], options: PassportPublicationOptions = {}) {
+  const input = { ...params }, pending = capturePassportBadgeRead(input, { ...options }), actual = await pending.read();
+  try {
+    actual.assertCurrent();
+    return Object.freeze({ result: renderPassportBadge(actual.passport), assertCurrent: actual.assertCurrent,
+      publishedPaths: actual.publishedPaths, createdDirectories: actual.createdDirectories, createdHash: actual.createdHash, exportedHash: actual.exportedHash,
+      sharedProgressUnknown: actual.sharedProgressUnknown, policyAttempted: actual.policyAttempted, policyReturned: actual.policyReturned });
+  } catch (cause) { throw Object.assign(passportPublicationFailure(input.workspace, "badge-presentation", actual.publishedPaths, actual.createdDirectories, null,
+    cause, actual.createdHash, actual.exportedHash, actual.sharedProgressUnknown), { policyAttempted: actual.policyAttempted, policyReturned: actual.policyReturned }); }
 }
 
 export function passportExportsForApi(workspace: string) {
@@ -647,4 +671,81 @@ export function passportRegistryForApi(params: {
     totalPages,
     items
   };
+}
+
+/** Internal startup capture before another initializer can yield. Existing bodies need no fresh Sign authority. */
+export function capturePassportInitialization(workspace: string, options: PassportPublicationOptions = {}) {
+  const caller = { ...options }; caller.beforePublish?.(); caller.assertInputsCurrent?.();
+  const path = join(workspace, ".amc", "passport", "policy.yaml"), before = captureOrgPairs([path]);
+  const original = orgPairBytes(before, path) === null ? captureOrgPairsAuthority(workspace) : () => {};
+  const beforePublish = () => { caller.beforePublish?.(); original(); };
+  const assertInputsCurrent = () => { caller.assertInputsCurrent?.(); assertOrgPairsCurrent(before); };
+  beforePublish(); assertInputsCurrent();
+  return Object.freeze({ async initialize() {
+    beforePublish(); assertInputsCurrent();
+    const loaded = await loadPassportPolicyAttemptAsync(workspace, { beforePublish, assertInputsCurrent });
+    loaded.assertCurrent(); return { path, sigPath: `${path}.sig`, policy: loaded.policy };
+  } });
+}
+export async function passportInitForApiAsync(workspace: string, options: PassportPublicationOptions = {}) {
+  return capturePassportInitialization(workspace, options).initialize();
+}
+export async function passportPolicyForApiAsync(workspace: string, options: PassportPublicationOptions = {}) {
+  const loaded = await loadPassportPolicyAttemptAsync(workspace, { ...options });
+  loaded.assertCurrent(); const signature = verifyPassportPolicySignature(workspace); loaded.assertCurrent();
+  return { policy: loaded.policy, signature };
+}
+/** Internal actual maintained suffix retains the genuine pair; SDK result shape stays unchanged. */
+export async function passportPolicyApplyAttemptForApiAsync(params: Parameters<typeof passportPolicyApplyForApi>[0], options: PassportPublicationOptions = {}) {
+  const workspace = params.workspace, policy = passportPolicySchema.parse(structuredClone(params.policy)), caller = { ...options };
+  caller.beforePublish?.(); caller.assertInputsCurrent?.();
+  const logAuthority = captureWorkspaceLogAuthority(workspace), logBefore = captureTransparencyState(workspace, true);
+  const beforePublish = () => { caller.beforePublish?.(); logAuthority.assertCurrent(); };
+  const originalInputs = () => { caller.assertInputsCurrent?.(); assertTransparencyStateCurrent(logBefore); };
+  originalInputs();
+  const prepared = await preparePassportPolicyAsync(workspace, policy, { beforePublish, assertInputsCurrent: originalInputs });
+  const saved = prepared.publish(), paths = Object.freeze([saved.path, saved.sigPath]);
+  let transparencyHash: string | null = null;
+  const assertCurrent = () => { prepared.assertCurrent(); logAuthority.assertCurrent(); };
+  try {
+    const appended = await appendTransparencyEntryAttemptAsync({ workspace, type: "PASSPORT_POLICY_APPLIED", agentId: "workspace",
+      artifact: { kind: "policy", sha256: sha256Hex(canonicalize(policy)), id: "passport-policy" } }, {
+      beforeCommit() { assertCurrent(); assertTransparencyStateCurrent(logBefore); }, beforeMember: assertCurrent
+    });
+    transparencyHash = appended.entry.hash;
+    const assertPublishedCurrent = () => { assertCurrent(); appended.assertCurrent(); };
+    assertPublishedCurrent();
+    return Object.freeze({ result: { ...saved, transparencyHash }, assertCurrent: assertPublishedCurrent, publishedPaths: paths, createdDirectories: prepared.createdDirectories });
+  } catch (cause) {
+    if (cause instanceof TransparencyMerkleLagError) transparencyHash = cause.entryHash;
+    throw passportPublicationFailure(workspace, "policy-log", paths, prepared.createdDirectories, null, cause, transparencyHash);
+  }
+}
+export async function passportPolicyApplyForApiAsync(params: Parameters<typeof passportPolicyApplyForApi>[0], options: PassportPublicationOptions = {}) {
+  return (await passportPolicyApplyAttemptForApiAsync(params, options)).result;
+}
+export async function passportCreateAttemptForApiAsync(params: Parameters<typeof passportCreateForApi>[0], options: PassportPublicationOptions = {}) {
+  const input = structuredClone(params), scope = parseScope(input);
+  const outFile = input.outFile?.trim() || defaultPassportExportPath({ workspace: input.workspace, scopeType: scope.scopeType, scopeId: scope.scopeId });
+  return createPassportArtifactAttemptAsync({ workspace: input.workspace, scopeType: scope.scopeType, scopeId: scope.scopeId, outFile: resolve(input.workspace, outFile) }, { ...options });
+}
+export async function passportCreateForApiAsync(params: Parameters<typeof passportCreateForApi>[0], options: PassportPublicationOptions = {}) {
+  return (await passportCreateAttemptForApiAsync(params, options)).result;
+}
+
+/** Fixed direct export: legacy refusal, explicit BUNDLE admission and the genuine ordinary constructor. */
+export async function passportExportLatestAttemptForApiAsync(params: Parameters<typeof passportExportLatestForApi>[0], options: PassportPublicationOptions = {}) {
+  const input = structuredClone(params), caller = { ...options }, workspace = resolve(input.workspace); input.workspace = workspace;
+  const actor = caller.beforePublish, inputs = caller.assertInputsCurrent;
+  const { intrinsic } = capturePassportPolicyReadAdmission(workspace);
+  // Internal currentness exists even when neither external actor was supplied.
+  const beforePublish = () => { intrinsic(); actor?.(); intrinsic(); };
+  const assertInputsCurrent = inputs === undefined ? undefined : () => { intrinsic(); inputs(); intrinsic(); };
+  intrinsic();
+  const actual = await passportCreateAttemptForApiAsync(input, { beforePublish, assertInputsCurrent });
+  const createdHash = actual.result.transparencyCreatedHash, exportedHash = actual.result.transparencyExportedHash;
+  const assertCurrent = () => { try { intrinsic(); actual.assertCurrent(); intrinsic(); }
+    catch (cause) { throw passportPublicationFailure(workspace, "export-currentness", actual.publishedPaths, actual.createdDirectories, null,
+      cause, createdHash, exportedHash, true); } };
+  assertCurrent(); return Object.freeze({ ...actual, assertCurrent });
 }

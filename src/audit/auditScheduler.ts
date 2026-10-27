@@ -1,8 +1,12 @@
-import { readFileSync } from "node:fs";
-import { appendTransparencyEntry } from "../transparency/logChain.js";
-import { sha256Hex } from "../utils/hash.js";
+import { captureOrgPairs, assertOrgPairsCurrent } from "../org/preparedOrgPairs.js";
+import { auditSchedulerPath, auditPolicyPath } from "./auditPolicyStore.js";
+import { auditMapActivePath } from "./auditMapStore.js";
+import { saveAuditSchedulerStateAsync } from "./binderStatePublication.js";
+import { captureAuditBinderPolicies } from "./binderCollectionPlan.js";
+import { publishAuditSchedulerRun } from "./binderSchedulerPublication.js";
+import type { AuditPublicationOptions } from "./binderPublication.js";
+export { auditSchedulerSetEnabledAsync } from "./binderSchedulerPublication.js";
 import {
-  loadAuditMapActive,
   verifyAuditMapActiveSignature
 } from "./auditMapStore.js";
 import {
@@ -10,18 +14,11 @@ import {
   type AuditSchedulerState
 } from "./auditPolicySchema.js";
 import {
-  loadAuditPolicy,
   loadAuditSchedulerState,
   saveAuditSchedulerState,
   verifyAuditPolicySignature
 } from "./auditPolicyStore.js";
-import { collectAuditBinderData } from "./binderCollector.js";
-import { saveBinderCache } from "./binderStore.js";
 import { includes } from "../utils/typeGuards.js";
-
-function nextRefreshTs(nowTs: number, cadenceHours: number): number {
-  return nowTs + Math.max(1, cadenceHours) * 60 * 60 * 1000;
-}
 
 function safeState(workspace: string): AuditSchedulerState {
   try {
@@ -58,75 +55,24 @@ export async function auditSchedulerRunNow(params: {
   scopeType?: "WORKSPACE" | "NODE" | "AGENT";
   scopeId?: string;
   request?: import("./evidenceRequestSchema.js").EvidenceRequest | null;
-}) {
-  const policySig = verifyAuditPolicySignature(params.workspace);
-  if (!policySig.valid) {
-    throw new Error(`audit policy signature invalid: ${policySig.reason ?? "unknown"}`);
-  }
-  const mapSig = verifyAuditMapActiveSignature(params.workspace);
-  if (!mapSig.valid) {
-    throw new Error(`audit map signature invalid: ${mapSig.reason ?? "unknown"}`);
-  }
-  const current = safeState(params.workspace);
-  const policy = loadAuditPolicy(params.workspace);
-  const map = loadAuditMapActive(params.workspace);
-  const scopeType = params.scopeType ?? "WORKSPACE";
-  const scopeId = scopeType === "WORKSPACE" ? "workspace" : (params.scopeId?.trim() || "default");
-  const collected = await collectAuditBinderData({
-    workspace: params.workspace,
-    scope: {
-      type: scopeType,
-      id: scopeId
-    },
-    policy,
-    map,
-    request: params.request ?? null
-  });
-  const cache = saveBinderCache({
-    workspace: params.workspace,
-    scopeType,
-    scopeId,
-    binder: collected.binder
-  });
-  const nowTs = Date.now();
-  const next: AuditSchedulerState = {
-    enabled: current.enabled,
-    lastRefreshTs: nowTs,
-    nextRefreshTs: nextRefreshTs(nowTs, policy.auditPolicy.recurrence.refreshCadenceHours),
-    lastOutcome: {
-      status: "OK",
-      reason: ""
-    }
-  };
-  saveAuditSchedulerState(params.workspace, next);
-  const hash = sha256Hex(readFileSync(cache.path));
-  const entry = appendTransparencyEntry({
-    workspace: params.workspace,
-    type: "AUDIT_BINDER_CREATED",
-    agentId: scopeType === "AGENT" ? scopeId : "workspace",
-    artifact: {
-      kind: "policy",
-      sha256: hash,
-      id: collected.binder.binderId
-    }
-  });
-  return {
-    binder: collected.binder,
-    cache,
-    scheduler: next,
-    transparencyHash: entry.hash
-  };
+}, options: AuditPublicationOptions = {}) {
+  return publishAuditSchedulerRun(params, options);
 }
 
 export async function auditSchedulerTick(params: {
   workspace: string;
   workspaceReady: boolean;
   eventType?: string;
-}):
+}, options: AuditPublicationOptions = {}):
   Promise<
     | { ran: false; reason: "disabled" | "workspace_not_ready" | "policy_untrusted" | "map_untrusted" | "not_due" }
     | { ran: true; binderId: string }
   > {
+  options = { ...options };
+  const decision = captureOrgPairs([auditSchedulerPath(params.workspace), auditPolicyPath(params.workspace), auditMapActivePath(params.workspace)]);
+  const stableDecision = { members: decision.members.filter(row => row.path !== auditSchedulerPath(params.workspace) && row.path !== `${auditSchedulerPath(params.workspace)}.sig`) };
+  const inputs = () => { options.assertInputsCurrent?.(); assertOrgPairsCurrent(stableDecision); };
+  const preparation = () => { options.assertPreparationInputsCurrent?.(); assertOrgPairsCurrent(decision); };
   const state = safeState(params.workspace);
   if (!state.enabled) {
     return { ran: false, reason: "disabled" };
@@ -139,7 +85,7 @@ export async function auditSchedulerTick(params: {
         reason: "workspace not ready"
       }
     };
-    saveAuditSchedulerState(params.workspace, next);
+    await saveAuditSchedulerStateAsync(params.workspace, next, { beforePublish: options.beforePublish, assertInputsCurrent: inputs, assertPreparationInputsCurrent: preparation, assertOutputsSafe: options.assertOutputsSafe });
     return { ran: false, reason: "workspace_not_ready" };
   }
 
@@ -149,10 +95,10 @@ export async function auditSchedulerTick(params: {
       ...state,
       lastOutcome: {
         status: "ERROR",
-        reason: `audit policy invalid: ${policySig.reason ?? "unknown"}`
+        reason: "audit policy invalid"
       }
     };
-    saveAuditSchedulerState(params.workspace, next);
+    await saveAuditSchedulerStateAsync(params.workspace, next, { beforePublish: options.beforePublish, assertInputsCurrent: inputs, assertPreparationInputsCurrent: preparation, assertOutputsSafe: options.assertOutputsSafe });
     return { ran: false, reason: "policy_untrusted" };
   }
   const mapSig = verifyAuditMapActiveSignature(params.workspace);
@@ -161,14 +107,14 @@ export async function auditSchedulerTick(params: {
       ...state,
       lastOutcome: {
         status: "ERROR",
-        reason: `audit map invalid: ${mapSig.reason ?? "unknown"}`
+        reason: "audit map invalid"
       }
     };
-    saveAuditSchedulerState(params.workspace, next);
+    await saveAuditSchedulerStateAsync(params.workspace, next, { beforePublish: options.beforePublish, assertInputsCurrent: inputs, assertPreparationInputsCurrent: preparation, assertOutputsSafe: options.assertOutputsSafe });
     return { ran: false, reason: "map_untrusted" };
   }
 
-  const policy = loadAuditPolicy(params.workspace);
+  const policy = captureAuditBinderPolicies(params.workspace, false).policy;
   const nowTs = Date.now();
   const eventTriggered = Boolean(
     params.eventType &&
@@ -183,7 +129,7 @@ export async function auditSchedulerTick(params: {
     workspace: params.workspace,
     scopeType: "WORKSPACE",
     scopeId: "workspace"
-  });
+  }, { beforePublish: options.beforePublish, assertInputsCurrent: inputs, assertPreparationInputsCurrent: preparation, assertOutputsSafe: options.assertOutputsSafe });
   return {
     ran: true,
     binderId: out.binder.binderId

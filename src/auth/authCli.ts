@@ -1,4 +1,5 @@
 import { initUsersConfig, addUser, listUsers, revokeUser, setUserRoles, verifyUsersConfigSignature } from "./authApi.js";
+import { initUsersConfigAsync, addUserAsync, revokeUserAsync, setUserRolesAsync } from "./authApi.js";
 import { parseUserRoles, type UserRole } from "./roles.js";
 
 export function parseRolesCsv(raw: string): UserRole[] {
@@ -79,4 +80,20 @@ export function userRoleSetCli(params: {
 
 export function userVerifyCli(workspace: string): ReturnType<typeof verifyUsersConfigSignature> {
   return verifyUsersConfigSignature(workspace);
+}
+
+/** Maintained CLI authoring paths; synchronous wrapper exports above retain their original contracts. */
+export async function userInitCliAsync(params: Parameters<typeof userInitCli>[0]): Promise<ReturnType<typeof userInitCli>> {
+  const out = await initUsersConfigAsync({ ...params });
+  return { username: out.owner.username, roles: out.owner.roles, path: out.path, sigPath: out.sigPath };
+}
+export async function userAddCliAsync(params: Parameters<typeof userAddCli>[0]): Promise<ReturnType<typeof userAddCli>> {
+  const user = await addUserAsync({ ...params, roles: [...params.roles] });
+  return { username: user.username, roles: user.roles };
+}
+export async function userRevokeCliAsync(params: Parameters<typeof userRevokeCli>[0]): Promise<ReturnType<typeof userRevokeCli>> {
+  const user = await revokeUserAsync({ ...params }); return { username: user.username, status: user.status };
+}
+export async function userRoleSetCliAsync(params: Parameters<typeof userRoleSetCli>[0]): Promise<ReturnType<typeof userRoleSetCli>> {
+  const user = await setUserRolesAsync({ ...params, roles: [...params.roles] }); return { username: user.username, roles: user.roles };
 }

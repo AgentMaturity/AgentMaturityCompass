@@ -9,6 +9,8 @@ import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import type { ActionClass, ExecutionMode } from "../types.js";
 import { USER_ROLES, type UserRole } from "../auth/roles.js";
+import { signatureEnvelopeSchema } from "../crypto/signing/signatureEnvelope.js";
+import { verifyAuditorSignatureBytes } from "../org/orgSignatureBytes.js";
 
 const riskTierSchema = z.enum(["low", "medium", "high", "critical"]);
 const modeSchema = z.enum(["SIMULATE", "EXECUTE"]);
@@ -32,7 +34,8 @@ const signatureSchema = z.object({
   digestSha256: z.string().length(64),
   signature: z.string().min(1),
   signedTs: z.number().int(),
-  signer: z.literal("auditor")
+  signer: z.literal("auditor"),
+  envelope: signatureEnvelopeSchema.optional()
 });
 
 export const approvalRequestSchema = z.object({
@@ -159,6 +162,14 @@ function sigPathFor(path: string): string {
   return `${path}.sig`;
 }
 
+/** Fixed consumption paths; this projection supplies names, never positive authority or acknowledgment. */
+export function approvalConsumptionPaths(params: { workspace: string; agentId: string; approvalRequestId: string }) {
+  const agentId = resolveAgentId(params.workspace, params.agentId), root = approvalsRoot(params.workspace, agentId);
+  return Object.freeze({ agentId, root, requests: requestsDir(params.workspace, agentId), decisions: decisionsDir(params.workspace, agentId),
+    consumed: consumedDir(params.workspace, agentId), request: requestPath(params.workspace, agentId, params.approvalRequestId),
+    consumption: consumedPath(params.workspace, agentId, params.approvalRequestId) });
+}
+
 function signArtifact(workspace: string, path: string): string {
   const digest = sha256Hex(readFileSync(path));
   const sig = signatureSchema.parse({
@@ -182,12 +193,16 @@ function verifyArtifact(workspace: string, path: string, bytes?: Buffer): { vali
     return { valid: false, reason: "signature missing" };
   }
   try {
-    const sig = signatureSchema.parse(JSON.parse(readUtf8(sigPath)) as unknown);
-    const digest = sha256Hex(bytes ?? readFileSync(path));
+    const sidecar = readFileSync(sigPath);
+    const sig = signatureSchema.parse(JSON.parse(sidecar.toString("utf8")) as unknown);
+    const body = bytes ?? readFileSync(path), digest = sha256Hex(body);
     if (digest !== sig.digestSha256) {
       return { valid: false, reason: "digest mismatch" };
     }
-    const valid = verifyHexDigestAny(digest, sig.signature, getPublicKeyHistory(workspace, "auditor"));
+    const valid = sig.envelope === undefined
+      ? verifyHexDigestAny(digest, sig.signature, getPublicKeyHistory(workspace, "auditor"))
+      : sig.envelope.signer.type === "VAULT" && sig.signature === sig.envelope.sigB64
+        && verifyAuditorSignatureBytes(workspace, "BUNDLE", body, sidecar).valid;
     return valid ? { valid: true } : { valid: false, reason: "signature verification failed" };
   } catch (error) {
     return { valid: false, reason: String(error) };
@@ -244,8 +259,24 @@ export function createApprovalRequestRecord(input: {
   authorizationIntent?: Record<string, unknown>;
   initiator?: string;
 }): { request: ApprovalRequestRecord; path: string; sigPath: string } {
+  const { request, path } = prepareApprovalRequestRecord(input);
+  writeFileAtomic(path, JSON.stringify(request, null, 2), 0o644);
+  const sigPath = signArtifact(input.workspace, path);
+  return {
+    request,
+    path,
+    sigPath
+  };
+}
+
+export type ApprovalRequestRecordInput = Parameters<typeof createApprovalRequestRecord>[0];
+
+/** Shared native directory prefix and actual UUID/two-clock payload recipe; no signing or member write. */
+export function prepareApprovalRequestRecord(input: ApprovalRequestRecordInput, directories?: (phase: "attempted" | "returned") => void) {
   const agentId = resolveAgentId(input.workspace, input.agentId);
+  directories?.("attempted");
   ensureDirs(input.workspace, agentId);
+  directories?.("returned");
   const request = approvalRequestSchema.parse({
     v: 1,
     approvalRequestId: `apprreq_${randomUUID().replace(/-/g, "")}`,
@@ -276,13 +307,7 @@ export function createApprovalRequestRecord(input: {
     ...(input.initiator === undefined ? {} : { initiator: input.initiator })
   });
   const path = requestPath(input.workspace, agentId, request.approvalRequestId);
-  writeFileAtomic(path, JSON.stringify(request, null, 2), 0o644);
-  const sigPath = signArtifact(input.workspace, path);
-  return {
-    request,
-    path,
-    sigPath
-  };
+  return { request, path };
 }
 
 export function loadApprovalRequestRecord(params: {

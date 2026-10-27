@@ -24,10 +24,11 @@ import { envelopeForAggregate } from "../claims/eligibility/adapters/results.js"
 import { formatClaimLabel, renderClaimLabel, renderClaimLegend } from "../claims/eligibility/render.js";
 import type { ClaimEnvelope, ClaimKind } from "../claims/eligibility/types.js";
 import { binderSignatureSchema } from "../audit/binderSchema.js";
+import { signingKeyId } from "../keys/algorithmPolicy.js";
 import { signIndustryPackAuditJson } from "../audit/binderSigner.js";
 import { assertNotExample } from "../claims/eligibility/exampleMode.js";
 import {
-  buildVerifierReport, checkDigestSignature, ed25519KeyId, envelopePublicKey,
+  buildVerifierReport, checkDigestSignature, envelopePublicKey,
   type IssuerAdmission, type TrustContext, type VerifierReportV1
 } from "../trust/index.js";
 import type { IndustryPack, IndustryPackQuestion } from "./industryPacks.js";
@@ -466,8 +467,8 @@ export function signIndustryPackAudit(workspace: string, audit: IndustryPackAudi
   if (!verifyIndustryPackAuditChecksum(audit)) throw new Error("the audit checksum does not match its body");
   const { signature: _previous, ...unsigned } = audit;
   const signed = signIndustryPackAuditJson(workspace, unsigned);
-  const keyId = ed25519KeyId(envelopePublicKey(signed.envelope) ?? "");
-  if (keyId === null) throw new Error("the signer returned no Ed25519 public key");
+  const keyId = signingKeyId(envelopePublicKey(signed.envelope) ?? "");
+  if (keyId === null) throw new Error("the signer returned no supported public key");
   return { ...unsigned, signature: { ...signed, keyFingerprint: `sha256:${keyId}` } };
 }
 
@@ -516,7 +517,7 @@ export function verifyIndustryPackAuditSignature(audit: IndustryPackAudit, opts:
     const digest = sha256Hex(canonicalize(unsigned));
     if (digest !== signature.digestSha256) fail("DIGEST_MISMATCH", "the audit does not match the signed digest");
     const check = checkDigestSignature({ signature: "industry-pack audit signature", purpose: "artifact-seal", digestHex: digest,
-      signatureB64: signature.signature, candidates: [opts.publicKeyPem, envelopePublicKey(signature.envelope)],
+      signatureB64: signature.signature, envelope: signature.envelope, candidates: [opts.publicKeyPem, envelopePublicKey(signature.envelope)],
       context: opts.trust, claimedSignedAt: signature.signedTs });
     admission = check.admission;
     keyFingerprint = check.verified ? `sha256:${check.admission.keyId}` : null;

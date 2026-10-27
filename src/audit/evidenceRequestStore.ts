@@ -152,3 +152,5 @@ export function updateEvidenceRequest(params: {
     sigPath
   };
 }
+
+export { createEvidenceRequestAsync, rejectEvidenceRequestAsync } from "./evidenceRequestPublication.js";

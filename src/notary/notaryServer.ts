@@ -5,12 +5,13 @@ import { URL } from "node:url";
 import { randomUUID } from "node:crypto";
 import { isIP, type Socket } from "node:net";
 import { loadNotaryConfig, resolveNotaryDir } from "./notaryConfigStore.js";
-import { loadNotarySigner } from "./notarySigner.js";
+import { loadNotarySignerAsync, notarySignResponse, type AsyncNotarySigner } from "./notarySigner.js";
+import type { NotaryAttestationBasis } from "./notaryApiTypes.js";
 import { createNotaryReplayGuard, verifyNotaryRequestAuth } from "./notaryAuth.js";
 import { notarySignRequestSchema } from "./notaryApiTypes.js";
 import { sha256Hex } from "../utils/hash.js";
-import { appendNotaryLogEntry, initNotaryLog, tailNotaryLog } from "./notaryLog.js";
-import { signNotaryAttestation } from "./notaryAttestation.js";
+import { appendNotaryLogEntryAsync, initNotaryLogAsync, tailNotaryLog } from "./notaryLog.js";
+import { signNotaryAttestationAsync } from "./notaryAttestation.js";
 import { verifyNotarySignResponse } from "./notaryVerify.js";
 
 interface NotaryStartOptions {
@@ -35,6 +36,7 @@ interface NotaryRuntimeState {
   notaryDir: string;
   fingerprint: string | null;
   attestationLevel: "SOFTWARE" | "HARDWARE" | null;
+  attestationBasis: NotaryAttestationBasis | null;
 }
 
 function json(res: ServerResponse, status: number, payload: unknown): void {
@@ -102,10 +104,10 @@ export async function startNotaryServer(options: NotaryStartOptions = {}): Promi
   const config = loadNotaryConfig(notaryDir);
   // Refuse invalid/conflicting transport arguments before signer or log writes.
   const bindHost = resolveNotaryBindHost(options.bindHost, config.notary.bindHost, config.notary.unixSocketPath);
-  let signer: ReturnType<typeof loadNotarySigner> | null = null;
+  let signer: AsyncNotarySigner | null = null;
   const reasons: string[] = [];
   try {
-    signer = loadNotarySigner({
+    signer = await loadNotarySignerAsync({
       notaryDir,
       backend: config.notary.backend
     });
@@ -114,7 +116,7 @@ export async function startNotaryServer(options: NotaryStartOptions = {}): Promi
   }
   if (signer) {
     try {
-      initNotaryLog(notaryDir, signer);
+      await initNotaryLogAsync(notaryDir, signer);
     } catch (error) {
       reasons.push(`NOTARY_LOG_INIT_FAILED: ${String(error)}`);
     }
@@ -128,7 +130,8 @@ export async function startNotaryServer(options: NotaryStartOptions = {}): Promi
     reasons: [...reasons],
     notaryDir,
     fingerprint: signer ? signer.pubkeyFingerprint() : null,
-    attestationLevel: signer ? signer.attestationLevel() : null
+    attestationLevel: signer ? signer.attestationLevel() : null,
+    attestationBasis: signer ? signer.attestationBasis() : null
   };
   const limiter = rateLimiter(config.notary.rateLimitPerMinute);
   const markAuthReplay = createNotaryReplayGuard();
@@ -152,7 +155,8 @@ export async function startNotaryServer(options: NotaryStartOptions = {}): Promi
           reasons: state.reasons,
           backend: config.notary.backend.type,
           fingerprint: state.fingerprint,
-          attestationLevel: state.attestationLevel
+          attestationLevel: state.attestationLevel,
+          attestationBasis: state.attestationBasis
         });
         return;
       }
@@ -167,6 +171,7 @@ export async function startNotaryServer(options: NotaryStartOptions = {}): Promi
           fingerprint: signer.pubkeyFingerprint(),
           backend: signer.backendType(),
           attestationLevel: signer.attestationLevel(),
+          attestationBasis: signer.attestationBasis(),
           claims: signer.claims()
         });
         return;
@@ -177,7 +182,7 @@ export async function startNotaryServer(options: NotaryStartOptions = {}): Promi
           json(res, 503, { error: "notary signer unavailable" });
           return;
         }
-        const attestation = signNotaryAttestation({
+        const attestation = await signNotaryAttestationAsync({
           signer,
           workspace: options.workspace
         });
@@ -214,7 +219,7 @@ export async function startNotaryServer(options: NotaryStartOptions = {}): Promi
             path: pathname
           });
           if (!auth.ok) {
-            appendNotaryLogEntry({
+            await appendNotaryLogEntryAsync({
               notaryDir,
               signer,
               requestId,
@@ -226,7 +231,7 @@ export async function startNotaryServer(options: NotaryStartOptions = {}): Promi
           }
           const replay = markAuthReplay(auth);
           if (!replay.ok) {
-            appendNotaryLogEntry({
+            await appendNotaryLogEntryAsync({
               notaryDir,
               signer,
               requestId,
@@ -248,25 +253,14 @@ export async function startNotaryServer(options: NotaryStartOptions = {}): Promi
           json(res, 400, { error: "payloadSha256 mismatch" });
           return;
         }
-        const signed = signer.sign(parsed.kind, payloadBytes);
-        const out = {
-          v: 1 as const,
-          kind: parsed.kind,
-          payloadSha256: payloadSha,
-          signatureB64: signed.signatureB64,
-          pubkeyPem: signed.pubkeyPem,
-          pubkeyFingerprint: signed.pubkeyFingerprint,
-          signedTs: signed.signedTs,
-          backend: signed.backend,
-          attestationLevel: signed.attestationLevel,
-          claims: signed.claims
-        };
+        const signed = await signer.sign(parsed.kind, payloadBytes);
+        const out = notarySignResponse(parsed.kind, payloadSha, signed);
         const verified = verifyNotarySignResponse(out, payloadBytes);
         if (!verified.ok) {
           json(res, 500, { error: verified.error ?? "sign verification failed" });
           return;
         }
-        appendNotaryLogEntry({
+        await appendNotaryLogEntryAsync({
           notaryDir,
           signer,
           requestId,
@@ -297,7 +291,7 @@ export async function startNotaryServer(options: NotaryStartOptions = {}): Promi
             path: pathname
           });
           if (!auth.ok) {
-            appendNotaryLogEntry({
+            await appendNotaryLogEntryAsync({
               notaryDir,
               signer,
               requestId,
@@ -309,7 +303,7 @@ export async function startNotaryServer(options: NotaryStartOptions = {}): Promi
           }
           const replay = markAuthReplay(auth);
           if (!replay.ok) {
-            appendNotaryLogEntry({
+            await appendNotaryLogEntryAsync({
               notaryDir,
               signer,
               requestId,

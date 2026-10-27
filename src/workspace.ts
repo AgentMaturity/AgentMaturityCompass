@@ -50,6 +50,9 @@ import { auditPolicyPath, initAuditPolicy } from "./audit/auditPolicyStore.js";
 import { auditMapActivePath, auditMapBuiltinPath, initAuditMaps } from "./audit/auditMapStore.js";
 import { readFileSync } from "node:fs";
 import { signAmcConfig } from "./config/amcConfigSignature.js";
+import { saveSignedAmcConfig } from "./config/amcConfigSigning.js";
+import { withAmcConfigPublicationLock } from "./config/configPublicationLock.js";
+import { assertNoPendingKeyset } from "./keys/keyset.js";
 
 export interface WorkspacePaths {
   agentId: string;
@@ -151,10 +154,13 @@ export function applyAMCConfigProfile(profile: AMCConfigProfileName, baseConfig?
 
 export function loadAMCConfig(workspace = process.cwd()): AMCConfig {
   const paths = getWorkspacePaths(workspace);
-  if (!pathExists(paths.config)) {
-    return defaultAMCConfig();
-  }
-  const raw = YAML.parse(readUtf8(paths.config)) as Partial<AMCConfig> | null;
+  return parseAMCConfigBytes(pathExists(paths.config) ? Buffer.from(readUtf8(paths.config), "utf8") : null);
+}
+
+/** The existing normalizer, shared so initialization consumes its captured original body. */
+export function parseAMCConfigBytes(bytes: Buffer | null): AMCConfig {
+  if (bytes === null) return defaultAMCConfig();
+  const raw = YAML.parse(bytes.toString("utf8")) as Partial<AMCConfig> | null;
   const base = defaultAMCConfig();
   return {
     profile: raw?.profile === "ci" || raw?.profile === "prod" || raw?.profile === "dev" ? raw.profile : base.profile,
@@ -174,16 +180,25 @@ export function loadAMCConfig(workspace = process.cwd()): AMCConfig {
       includeProxyEnv: raw?.supervise?.includeProxyEnv ?? base.supervise.includeProxyEnv,
       customBaseUrlEnvKeys: raw?.supervise?.customBaseUrlEnvKeys ?? base.supervise.customBaseUrlEnvKeys
     },
-    // Carried through so saveAMCConfig never drops them; loadTimeConfig and loadTransparencyConfig validate them.
+    // Carried through so saveAMCConfig never drops them; loadTimeConfig, loadTransparencyConfig and loadKeysConfig validate them.
     ...(raw?.time === undefined ? {} : { time: raw.time }),
-    ...(raw?.transparency === undefined ? {} : { transparency: raw.transparency })
+    ...(raw?.transparency === undefined ? {} : { transparency: raw.transparency }),
+    ...(raw?.keys === undefined ? {} : { keys: raw.keys })
   };
 }
 
 export function saveAMCConfig(workspace: string, config: AMCConfig): void {
   const paths = getWorkspacePaths(workspace);
   ensureDir(paths.amcDir);
-  writeFileAtomic(paths.config, YAML.stringify(config), 0o644);
+  withAmcConfigPublicationLock(workspace, () => {
+    assertNoPendingKeyset(workspace);
+    writeFileAtomic(paths.config, YAML.stringify(config), 0o644);
+  });
+}
+
+/** Owner runtime update: sign the serialized snapshot, then publish config and sidecar in one recoverable generation. */
+export async function saveAMCConfigAsync(workspace: string, config: AMCConfig): Promise<void> {
+  await saveSignedAmcConfig(workspace, Buffer.from(YAML.stringify(config), "utf8"));
 }
 
 export interface InitWorkspaceOptions {
@@ -200,7 +215,7 @@ export interface InitWorkspaceOptions {
   trustBoundaryMode?: "isolated" | "shared";
 }
 
-function defaultContextGraph(opts: InitWorkspaceOptions): Record<string, unknown> {
+export function defaultContextGraph(opts: InitWorkspaceOptions): Record<string, unknown> {
   const riskTier = opts.riskTier ?? "med";
   const agentName = opts.agentName ?? "Agent";
   const primaryTasks = opts.primaryTasks ?? ["general assistance"];
@@ -246,6 +261,27 @@ function defaultContextGraph(opts: InitWorkspaceOptions): Record<string, unknown
   };
 }
 
+/** Literal initializer artifacts; fleet scaffold text is a different recipe. */
+export function defaultWorkspaceArtifactBodies(paths: Pick<WorkspacePaths, "guardrails" | "promptAddendum" | "evalHarness">) {
+  return [
+    { path: paths.guardrails, bytes: Buffer.from(YAML.stringify({
+      honesty: { requireKnownUnknownAssumptions: true, requireEvidenceRefs: true },
+      compliance: { requireConsentForSensitive: true, requireAuditEvents: true },
+      verification: { requireTestsForHighRisk: true }, thresholds: { minIntegrityIndex: 0.6 }
+    })) },
+    { path: paths.promptAddendum, bytes: Buffer.from([
+      "# AMC Prompt Addendum", "", "Always structure high-impact outputs as:",
+      "1) Known facts (with evidence refs)", "2) Unknowns", "3) Assumptions",
+      "4) Verification plan", "5) Escalation/consent checkpoints"
+    ].join("\n")) },
+    { path: paths.evalHarness, bytes: Buffer.from(YAML.stringify({ suites: [
+      { name: "truthfulness", checks: ["evidence-link", "uncertainty-label"] },
+      { name: "compliance", checks: ["consent-required", "policy-refusal"] },
+      { name: "verification", checks: ["test-evidence", "reproducibility"] }
+    ] })) }
+  ];
+}
+
 export function initWorkspace(opts: InitWorkspaceOptions = {}): { workspacePath: string; contextGraphHash: string } {
   const workspace = opts.workspacePath ?? process.cwd();
   const paths = getWorkspacePaths(workspace, opts.agentId);
@@ -278,48 +314,8 @@ export function initWorkspace(opts: InitWorkspaceOptions = {}): { workspacePath:
   }
   saveAMCConfig(workspace, config);
 
-  if (!pathExists(paths.guardrails)) {
-    writeFileAtomic(
-      paths.guardrails,
-      YAML.stringify({
-        honesty: { requireKnownUnknownAssumptions: true, requireEvidenceRefs: true },
-        compliance: { requireConsentForSensitive: true, requireAuditEvents: true },
-        verification: { requireTestsForHighRisk: true },
-        thresholds: { minIntegrityIndex: 0.6 }
-      }),
-      0o644
-    );
-  }
-
-  if (!pathExists(paths.promptAddendum)) {
-    writeFileAtomic(
-      paths.promptAddendum,
-      [
-        "# AMC Prompt Addendum",
-        "",
-        "Always structure high-impact outputs as:",
-        "1) Known facts (with evidence refs)",
-        "2) Unknowns",
-        "3) Assumptions",
-        "4) Verification plan",
-        "5) Escalation/consent checkpoints"
-      ].join("\n"),
-      0o644
-    );
-  }
-
-  if (!pathExists(paths.evalHarness)) {
-    writeFileAtomic(
-      paths.evalHarness,
-      YAML.stringify({
-        suites: [
-          { name: "truthfulness", checks: ["evidence-link", "uncertainty-label"] },
-          { name: "compliance", checks: ["consent-required", "policy-refusal"] },
-          { name: "verification", checks: ["test-evidence", "reproducibility"] }
-        ]
-      }),
-      0o644
-    );
+  for (const artifact of defaultWorkspaceArtifactBodies(paths)) {
+    if (!pathExists(artifact.path)) writeFileAtomic(artifact.path, artifact.bytes, 0o644);
   }
 
   const targetFile = join(paths.targetsDir, "default.target.json");
@@ -648,7 +644,8 @@ export async function quickstartWizard(workspace = process.cwd()): Promise<{
       .map((item) => item.trim())
       .filter(Boolean);
 
-  initWorkspace({
+  const { initWorkspaceAsync } = await import("./workspaceInitializationAsync.js");
+  await initWorkspaceAsync({
     workspacePath: workspace,
     agentName: answers.agentName,
     role: answers.role,
@@ -782,3 +779,4 @@ export async function quickstartWizard(workspace = process.cwd()): Promise<{
 }
 
 export { signAmcConfig, verifyAmcConfigSignature } from "./config/amcConfigSignature.js";
+export { signAmcConfigAsync } from "./config/amcConfigSigning.js";

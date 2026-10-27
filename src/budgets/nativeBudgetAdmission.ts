@@ -5,6 +5,7 @@ import type { ToolExecution } from "../tools/toolTypes.js";
 import { sha256Hex } from "../utils/hash.js";
 import { budgetForAgent, loadVerifiedBudgetsConfig } from "./budgets.js";
 import { budgetSessionAgent, NATIVE_BUDGET_RESERVATION, projectBudgetUsage, readBudgetEvents } from "./nativeBudgetUsage.js";
+import { workspaceSelfTrust } from "../trust/trustContext.js";
 
 export class NativeBudgetRefusal extends Error {
   readonly code = "AMC_NATIVE_BUDGET_REFUSED";
@@ -25,7 +26,7 @@ function reserve(workspace: string, spend: Spend, agentId?: string): void {
   try {
     ledger.db.transaction(() => {
       const config = loadVerifiedBudgetsConfig(workspace);
-      const rows = readBudgetEvents(workspace, ledger);
+      const rows = readBudgetEvents(workspace, ledger, { trust: workspaceSelfTrust(workspace) });
       const owner = spend.kind === "llm" ? budgetSessionAgent(rows, spend.nativeSessionId) : agentId;
       if (!owner) throw new NativeBudgetRefusal("native budget identity is missing");
       // Toolset identity is inherited from the root. When a native session

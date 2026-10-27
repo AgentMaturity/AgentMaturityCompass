@@ -1,3 +1,4 @@
+import { runHashHttpOptions } from "./runHashPublication.js";
 /**
  * evidenceRouter.ts — Evidence lifecycle API routes.
  * Full parity with: amc evidence *, amc bundle *, amc ingest *
@@ -16,6 +17,7 @@ export async function handleEvidenceRoute(
   req: IncomingMessage,
   res: ServerResponse,
   workspace = process.cwd(),
+  revalidateAuthority?: () => boolean,
 ): Promise<boolean> {
   if (!pathname.startsWith('/api/v1/evidence')) return false;
 
@@ -397,9 +399,9 @@ export async function handleEvidenceRoute(
       if (!body.ingestSessionId) { apiError(res, 400, 'ingestSessionId required'); return true; }
       // An attestation names who vouches for the content; ATTESTED also needs a pinned third-party signature.
       if (!body.attestedBy || !body.statement) { apiError(res, 400, 'attestedBy and statement are required to attest'); return true; }
-      const { attestIngestSession } = await import('../ingest/ingest.js');
+      const ingest = await import('../ingest/ingest.js');
       const { loadTrustContext } = await import('../trust/index.js');
-      const result = attestIngestSession({
+      const input = {
         workspace,
         agentId: body.agentId ?? 'default',
         ingestSessionId: body.ingestSessionId,
@@ -408,9 +410,11 @@ export async function handleEvidenceRoute(
         attesterSignature: body.attesterSignature,
         // The operator's trust lists from the AMC home, never from the request.
         trust: loadTrustContext(),
-      });
+      };
+      const result = revalidateAuthority ? await ingest.attestIngestSessionAsync(input, runHashHttpOptions(res, revalidateAuthority)) : ingest.attestIngestSession(input);
       apiSuccess(res, { attested: result.trustTier === 'ATTESTED', ...result });
     } catch (err) {
+      if (res.headersSent) return true;
       apiError(res, 500, err instanceof Error ? err.message : 'Attestation failed');
     }
     return true;

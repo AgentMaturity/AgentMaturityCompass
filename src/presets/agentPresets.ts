@@ -1,9 +1,12 @@
 import { readFileSync } from "node:fs";
-import { join } from "node:path";
+import { join, relative } from "node:path";
 import YAML from "yaml";
 import { z } from "zod";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
-import { signFileWithAuditor, verifySignedFileWithAuditor } from "../org/orgSigner.js";
+import { signSerializedPayloadWithAuditor } from "../org/orgSigner.js";
+import { withControlFileLock } from "../lifecycle/controlFileLock.js";
+import { verifyAuditorSignatureBytes } from "../org/orgSignatureBytes.js";
+import { captureOrgPairs, assertOrgPairsCurrent, OrgPairsPublicationError, prepareOrgPairsAsync, type OrgPairsOptions } from "../org/preparedOrgPairs.js";
 import { DELEGATION_SCOPE_TOKENS } from "../agent/delegationScope.js";
 import { parseSubagentStopConditions } from "../agent/subagentStopConditions.js";
 
@@ -125,9 +128,23 @@ export function savePresets(workspace: string, presets: readonly unknown[]): voi
   ensureDir(join(workspace, ".amc"));
   const parsed = presets.map((one) => parsePreset(one));
   const bytes = Buffer.from(YAML.stringify({ presets: parsed }), "utf8");
-  writeFileAtomic(presetsPath(workspace), bytes, 0o644);
-  // The bytes written are the bytes signed: a file swapped in between fails verification instead of being signed.
-  signFileWithAuditor(workspace, presetsPath(workspace), bytes);
+  const path = presetsPath(workspace), previous = captureOrgPairs([path]);
+  const signature = JSON.stringify(signSerializedPayloadWithAuditor(workspace, bytes.toString("utf8")), null, 2);
+  withControlFileLock({ root: join(workspace, ".amc"), name: "org-auditor-pairs", operation() {
+    assertOrgPairsCurrent(previous); const published: string[] = []; let attempted = relative(workspace, path);
+    try { writeFileAtomic(path, bytes, 0o644); published.push(attempted); attempted = relative(workspace, `${path}.sig`); writeFileAtomic(`${path}.sig`, signature, 0o644); }
+    catch (cause) { throw new OrgPairsPublicationError(Object.freeze(published), attempted, cause); }
+  } });
+}
+
+/** Fixed BUNDLE preparation for the maintained starter; no member changes before provider success. */
+export function preparePresetsAsync(workspace: string, presets: readonly unknown[], options: OrgPairsOptions = {}) {
+  const parsed = presets.map((one) => parsePreset(one)), path = presetsPath(workspace);
+  const bytes = Buffer.from(YAML.stringify({ presets: parsed }), "utf8"), previous = captureOrgPairs([path]);
+  return prepareOrgPairsAsync(workspace, [{ path, bytes }], options, previous);
+}
+export async function savePresetsAsync(workspace: string, presets: readonly unknown[], options: OrgPairsOptions = {}): Promise<void> {
+  (await preparePresetsAsync(workspace, presets, options)).publish();
 }
 
 export type ReadPresets =
@@ -145,7 +162,10 @@ export function readPresets(workspace: string): ReadPresets {
   } catch (error) {
     return { ok: false, reason: `${path} could not be read: ${String(error)}` };
   }
-  const signature = verifySignedFileWithAuditor(workspace, path, bytes);
+  let signature: { valid: boolean; reason: string | null };
+  try { signature = pathExists(`${path}.sig`) ? verifyAuditorSignatureBytes(workspace, "BUNDLE", bytes, readFileSync(`${path}.sig`))
+    : { valid: false, reason: "signature missing" }; }
+  catch (error) { signature = { valid: false, reason: String(error) }; }
   if (!signature.valid) {
     return {
       ok: false,

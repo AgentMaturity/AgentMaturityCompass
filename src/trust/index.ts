@@ -1,7 +1,7 @@
 /** Pinned issuers for AMC verifiers (P0-09): trust lists, issuer admission, built-in distrust and VerifierReportV1. */
 export { KEY_PURPOSES, ROLE_PURPOSES, type KeyPurpose } from "./keyPurposes.js";
 export {
-  TRUST_LIST_MAX_BYTES, TrustListError, canonicalEd25519Pem, distrustEntrySchema, ed25519KeyId, readSignedTrustListFile, signTrustList,
+  TRUST_LIST_MAX_BYTES, TrustListError, canonicalEd25519Pem, distrustEntrySchema, ed25519KeyId, readSignedTrustListFile, signTrustList, signTrustListWithProvider, trustListSigningBytes,
   signedTrustListSchema, timestampAuthoritySchema, transparencyLogSchema, trustListEntrySchema, trustListSchema, verifySignedTrustList,
   type DistrustEntry, type SignedTrustList, type TimestampAuthority, type TransparencyLog, type TrustList, type TrustListEntry, type TrustListErrorCode
 } from "./trustList.js";
@@ -13,4 +13,4 @@ export {
 } from "./verifierReport.js";
 export { checkDigestSignature, checkSignature, envelopePublicKey, type SignatureCheck, type SignatureCheckInput } from "./signatureCheck.js";
 export { requestTrustOverride } from "./requestTrust.js";
-export { addRootRotationSignature, applyTrustRootRotation, signRootRotation, type RootRotationStatement } from "./rootRotation.js";
+export { addRootRotationSignature, addRootRotationSignatureWithProvider, applyTrustRootRotation, rootRotationSigningBytes, signRootRotation, signedRootRotationSchema, type RootRotationStatement } from "./rootRotation.js";

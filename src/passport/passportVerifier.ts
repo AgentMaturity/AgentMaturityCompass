@@ -14,12 +14,11 @@ import { passportJsonSchema, passportPiiScanSchema, passportSignatureSchema, typ
 import { digestFile } from "./passportSigner.js";
 import { verifyProofsAgainstSignedRoot } from "../bench/benchProofs.js";
 import { buildVerifierReport, checkDigestSignature, envelopePublicKey, workspaceSelfTrust, type IssuerAdmission, type TrustContext, type VerifierReportV1 } from "../trust/index.js";
+import { listPassportExportFiles, getPassportRevocation } from "./passportStore.js";
 import {
-  verifyPassportPolicySignature,
-  listPassportExportFiles,
-  verifyPassportCacheSignature,
-  getPassportRevocation
-} from "./passportStore.js";
+  verifyPassportPolicySignatureForApi as verifyPassportPolicySignature,
+  verifyPassportCacheSignatureForApi as verifyPassportCacheSignature
+} from "./passportReadAdmission.js";
 import { computePassportExpiresTs } from "./passportConstants.js";
 import {
   extractValidatedTarGzipArchive,
@@ -125,7 +124,7 @@ export function verifyPassportArtifactFile(params: {
       envelopePublicKey(signature.envelope)
     ];
     const check = checkDigestSignature({ signature: "passport.sig", purpose: "artifact-seal", digestHex: digest,
-      signatureB64: signature.signature, candidates, context: params.trust, claimedSignedAt: signature.signedTs });
+      signatureB64: signature.signature, envelope: signature.envelope, candidates, context: params.trust, claimedSignedAt: signature.signedTs });
     signatures.push(check.admission);
     if (!check.verified || (signature.envelope !== undefined && signature.signature !== signature.envelope.sigB64)) {
       errors.push({ code: "SIGNATURE_INVALID", message: "passport signature verification failed" });

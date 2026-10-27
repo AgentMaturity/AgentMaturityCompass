@@ -642,7 +642,10 @@
         "envelope": {
           "properties": {
             "alg": {
-              "const": "ed25519",
+              "enum": [
+                "ed25519",
+                "ecdsa-p256-sha256"
+              ],
               "type": "string"
             },
             "fingerprint": {
@@ -665,6 +668,14 @@
             },
             "signer": {
               "properties": {
+                "attestationBasis": {
+                  "enum": [
+                    "configured",
+                    "provider-metadata",
+                    "provider-reported"
+                  ],
+                  "type": "string"
+                },
                 "attestationLevel": {
                   "enum": [
                     "SOFTWARE",

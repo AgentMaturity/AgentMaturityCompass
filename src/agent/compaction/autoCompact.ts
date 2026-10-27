@@ -14,6 +14,7 @@ import { isLlmError } from "../../llm/llmFailure.js";
 import { RequestEncodingError } from "../../llm/request/requestSpec.js";
 import { extractEnvelope, type TokenUsage } from "../../session/sessionTypes.js";
 import { describeLiveEntries, describeMeasuredLiveEntries, type LiveSurfaceEntry } from "../../session/surfaceCompaction.js";
+import { workspaceSelfTrust } from "../../trust/trustContext.js";
 import { fenceModelSummary, MODEL_SUMMARY_ROLE, PROMPT_TOKENS_FORMULA, SUMMARY_CLAIM_KIND, selectCompactionEntries,
   type AutomaticCompaction } from "../../session/surfaceCompactionValidation.js";
 import { foldSurfaceEntries } from "../../session/surfaceProjection.js";
@@ -138,7 +139,7 @@ export class AutoCompactor {
   private prune(trigger: Trigger): readonly string[] {
     const { session } = this.init, events = session.readEvents();
     // Authenticates the whole session and replays earlier compactions before anything is selected.
-    const live = describeMeasuredLiveEntries(session.workspace, events);
+    const live = describeMeasuredLiveEntries(session.workspace, events, { trust: workspaceSelfTrust(session.workspace) });
     const at = positions(events), recent = recentSteps(events, this.config.keepRecentSteps);
     const uses = new Set(live.filter(entry => entry.kind === "tool_use").map(entry => entry.slot));
     const candidates = live.flatMap(entry => {
@@ -155,7 +156,7 @@ export class AutoCompactor {
 
   private async summarize(turn: number, trigger: Trigger, signal: AbortSignal, notify: Notify): Promise<Outcome> {
     const { session } = this.init, events = session.readEvents();
-    const live = describeMeasuredLiveEntries(session.workspace, events), at = positions(events);
+    const live = describeMeasuredLiveEntries(session.workspace, events, { trust: workspaceSelfTrust(session.workspace) }), at = positions(events);
     const cutoff = Math.min(turn, ...recentSteps(events, this.config.keepRecentSteps).map(kept => kept.turn ?? turn));
     const range = oldestCompletedTurns(live, at, cutoff), runs = summarizableRuns(range);
     const ids = (run: readonly LiveSurfaceEntry[]): readonly string[] => run.map(entry => entry.originEventId);

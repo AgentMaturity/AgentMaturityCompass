@@ -4,6 +4,7 @@ import { KEY_PURPOSES, type KeyPurpose } from "../trust/keyPurposes.js";
 import { canonicalize, isCanonicalSignatureBase64 } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
 import { verifyKeyHistoryEntries, type KeyHistoryEntry } from "./keyHistoryChain.js";
+import { canonicalSigningKey } from "../keys/algorithmPolicy.js";
 
 export type KeyHistoryRole = "monitor" | "auditor" | "lease" | "session";
 /** v1 histories name a vault role; v2 (P1-08) name a signing purpose. "lease" and "session" are both, and stay v1. */
@@ -64,7 +65,7 @@ export function validHistoryEntry(entry: unknown): entry is KeyHistoryEntry {
   const parsed = entrySchema.safeParse(entry);
   if (!parsed.success) return false;
   try {
-    return createPublicKey(parsed.data.publicKeyPem).asymmetricKeyType === "ed25519"
+    return canonicalSigningKey(parsed.data.publicKeyPem) !== null
       && sha256Hex(Buffer.from(parsed.data.publicKeyPem, "utf8")) === parsed.data.fingerprint;
   } catch {
     return false;

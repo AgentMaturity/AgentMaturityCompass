@@ -45,6 +45,7 @@ export function buildGapAnalysis(params: {
   scope: MechanicTargets["mechanicTargets"]["scope"];
   targets: MechanicTargets;
   measured: AutoAnswerOutput;
+  readForecast?: () => Pick<ReturnType<typeof getForecastLatestForApi>, "series">;
 }): MechanicGapReport {
   const unknownMap = new Map(params.measured.unknownReasons.map((row) => [row.questionId, row.reasons]));
   const byQuestion = [...questionBank]
@@ -100,10 +101,10 @@ export function buildGapAnalysis(params: {
     };
   });
 
-  const latestForecast = getForecastLatestForApi({
+  const latestForecast = params.readForecast === undefined ? getForecastLatestForApi({
     workspace: params.workspace,
     scope: "workspace"
-  });
+  }) : params.readForecast();
 
   const riskKeys = [
     "EcosystemFocusRisk",

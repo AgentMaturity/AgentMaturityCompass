@@ -460,7 +460,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc experiment optimize` | Create governed optimizer candidates from a Fixer RCA report | `--rca <selector>`<br>`--agent <agentId>`<br>`--json` | - |
 | `amc experiment optimizer-list` | List governed optimizer runs | `--agent <agentId>`<br>`--limit <n>`<br>`--json` | - |
 | `amc experiment optimizer-show` | Show a governed optimizer run | `--agent <agentId>`<br>`--json` | - |
-| `amc experiment run` | Run deterministic experiment against signed casebook | `--experiment <id>`<br>`--mode <mode>`<br>`--agent <agentId>` | - |
+| `amc experiment run` | Run deterministic experiment against signed casebook | `--experiment <id>`<br>`--mode <mode>`<br>`--candidate-window <window>`<br>`--candidate-agent <agentId>`<br>`--agent <agentId>` | - |
 | `amc experiment set-baseline` | Set experiment baseline config | `--experiment <id>`<br>`--config <current|path>`<br>`--agent <agentId>` | - |
 | `amc experiment set-candidate` | Set experiment candidate signed config overlay | `--experiment <id>`<br>`--candidate-file <path>`<br>`--agent <agentId>` | - |
 | `amc experiment-architecture` | Run a controlled architecture comparison experiment | `--name <name>`<br>`--model <modelId>`<br>`--baseline-file <path>`<br>`--candidate-file <path>`<br>`--baseline-kind <kind>`<br>`--candidate-kind <kind>` | - |
@@ -638,9 +638,9 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc key-custody-modes` | List available key custody modes and their configurations | - | - |
 | `amc keys` | Purpose signing keys: list, rotate, revoke and export public keys | - | - |
 | `amc keys export-public` | Print a purpose's public key, key id and proof of possession, for an organisation's trust list | `--purpose <purpose>` | - |
-| `amc keys list` | List each signing purpose's key id, shared keys, history size and rotations (public files only) | `--json` | - |
+| `amc keys list` | List each signing purpose's key id, shared keys, history size, rotations, provider, algorithm and protection (public files only) | `--json` | - |
 | `amc keys revoke` | Record a retired key's revocation in the workspace's signed, anchored key revocation list | `--purpose <purpose>`<br>`--key-id <id>`<br>`--reason <reason>` | - |
-| `amc keys rotate` | Rotate one purpose's key with a signed, chained statement; --resume completes or rolls back an interrupted change | `--purpose <purpose>`<br>`--reason <reason>`<br>`--overlap-days <n>`<br>`--root-key <file...>`<br>`--resume`<br>`--restore`<br>`--accept <generation>`<br>`--digest <sha256>`<br>`--allow-gap <reason>`<br>`--quarantine-unbound-pub` | - |
+| `amc keys rotate` | Rotate one purpose's key with a signed, chained statement (or bind the provider key keys.refs names); --resume completes or rolls back an interrupted change | `--purpose <purpose>`<br>`--config-candidate <file>`<br>`--reason <reason>`<br>`--overlap-days <n>`<br>`--root-key <file...>`<br>`--resume`<br>`--restore`<br>`--accept <generation>`<br>`--digest <sha256>`<br>`--allow-gap <reason>`<br>`--quarantine-unbound-pub` | - |
 | `amc lab-compare` | Compare two lab experiments | `--baseline <id>`<br>`--candidate <id>` | - |
 | `amc lab-create` | Create a new lab experiment | `--kind <kind>`<br>`--name <name>`<br>`--model <modelId>`<br>`--description <desc>` | - |
 | `amc lab-list` | List all lab experiments | `--kind <kind>` | - |

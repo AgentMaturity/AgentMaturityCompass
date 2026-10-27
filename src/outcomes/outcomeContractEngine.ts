@@ -2,7 +2,15 @@ import { readFileSync } from "node:fs";
 import { join, relative } from "node:path";
 import YAML from "yaml";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
-import { getSigningKey, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { getSigningKey, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { publicKeyFromPrivate } from "../crypto/keyHistoryEnvelope.js";
+import { getPurposeKeyHistory } from "../keys/signingKeys.js";
+import { assertKeysetComplete } from "../keys/keyset.js";
+import { signingKeyId } from "../keys/algorithmPolicy.js";
+import { signWithPurposeKey } from "../keys/purposeProviders.js";
+import { assertPurposePublicationCurrent, capturePurposePublication } from "../keys/purposePublication.js";
+import { withControlFileLock } from "../lifecycle/controlFileLock.js";
+import { readContainedOrNull, writeContained } from "../utils/containedFs.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
@@ -135,35 +143,32 @@ export function loadOutcomeContract(workspace: string, agentId?: string): Outcom
   return outcomeContractSchema.parse(YAML.parse(readUtf8(path)) as unknown);
 }
 
-function signContractBytes(workspace: string, bytes: Buffer): SignaturePayload {
+function signContractBytes(workspace: string, bytes: Buffer): { payload: SignaturePayload; signerFpr: string } {
   const digestSha256 = sha256Hex(bytes);
-  return {
-    digestSha256,
-    signature: signHexDigest(digestSha256, getSigningKey(workspace, "config-signature")),
-    signedTs: Date.now(),
-    signer: "auditor"
-  };
+  const privateKey = getSigningKey(workspace, "config-signature");
+  return { payload: { digestSha256, signature: signHexDigest(digestSha256, privateKey), signedTs: Date.now(), signer: "auditor" },
+    signerFpr: signingKeyId(publicKeyFromPrivate(privateKey))!.slice(0, 16) };
 }
 
-export function signOutcomeContract(workspace: string, agentId?: string): string {
-  const resolvedAgentId = resolveAgentId(workspace, agentId);
-  const contractFile = outcomeContractPath(workspace, resolvedAgentId);
-  if (!pathExists(contractFile)) {
-    throw new Error(`Outcome contract missing: ${contractFile}`);
-  }
-  const bytes = readFileSync(contractFile);
-  const sigPayload = signContractBytes(workspace, bytes);
-  const sigPath = outcomeContractSigPath(workspace, resolvedAgentId);
-  writeFileAtomic(sigPath, JSON.stringify(sigPayload, null, 2), 0o644);
+function withContractPublicationLock<T>(workspace: string, agentId: string, operation: () => T): T {
+  return withControlFileLock({ root: outcomesDir(workspace, agentId), name: "outcome-contract", operation });
+}
 
-  const publicKey = getPublicKeyHistory(workspace, "auditor")[0] ?? "";
-  const signerFpr = sha256Hex(Buffer.from(publicKey, "utf8")).slice(0, 16);
+function recordContract(workspace: string, agentId: string, bytes: Buffer, sigPayload: SignaturePayload, signerFpr: string): void {
+  const contractFile = outcomeContractPath(workspace, agentId);
   const contractId = sha256Hex(bytes).slice(0, 24);
   const ledger = openLedger(workspace);
   try {
+    const existing = ledger.listOutcomeContracts().find(row => row.contract_id === contractId);
+    if (existing) {
+      // Content IDs are immutable. A re-sign must not overwrite the first publication's signer record.
+      if (existing.sig_valid !== 1 || existing.sha256 !== sigPayload.digestSha256 || existing.agent_id !== agentId
+        || existing.file_path !== relative(workspace, contractFile).replace(/\\/g, "/")) throw new Error("outcome contract content-id collision");
+      return;
+    }
     ledger.insertOutcomeContract({
       contract_id: contractId,
-      agent_id: resolvedAgentId,
+      agent_id: agentId,
       file_path: relative(workspace, contractFile).replace(/\\/g, "/"),
       sha256: sigPayload.digestSha256,
       sig_valid: 1,
@@ -172,19 +177,79 @@ export function signOutcomeContract(workspace: string, agentId?: string): string
   } finally {
     ledger.close();
   }
+}
 
+function logContract(workspace: string, agentId: string, digestSha256: string): void {
   appendTransparencyEntry({
     workspace,
     type: "OUTCOME_CONTRACT_SIGNED",
-    agentId: resolvedAgentId,
+    agentId,
     artifact: {
       kind: "policy",
-      sha256: sigPayload.digestSha256,
-      id: `outcome-contract-${resolvedAgentId}`
+      sha256: digestSha256,
+      id: `outcome-contract-${agentId}`
     }
   });
 
-  return sigPath;
+}
+
+function signContractUnlocked(workspace: string, agentId: string): { sigPath: string; digestSha256: string } {
+  const contractFile = outcomeContractPath(workspace, agentId);
+  if (!pathExists(contractFile)) throw new Error(`Outcome contract missing: ${contractFile}`);
+  const bytes = readFileSync(contractFile), signed = signContractBytes(workspace, bytes), sigPath = outcomeContractSigPath(workspace, agentId);
+  writeFileAtomic(sigPath, JSON.stringify(signed.payload, null, 2), 0o644);
+  recordContract(workspace, agentId, bytes, signed.payload, signed.signerFpr);
+  return { sigPath, digestSha256: signed.payload.digestSha256 };
+}
+
+export function signOutcomeContract(workspace: string, agentId?: string): string {
+  const resolved = resolveAgentId(workspace, agentId), signed = withContractPublicationLock(workspace, resolved, () => signContractUnlocked(workspace, resolved));
+  logContract(workspace, resolved, signed.digestSha256);
+  return signed.sigPath;
+}
+
+export class OutcomeContractPublicationError extends Error {
+  readonly code = "OUTCOME_CONTRACT_PUBLICATION_INCOMPLETE";
+  constructor(readonly published: { path: string; sigPath: string }, readonly stage: "ledger" | "transparency") {
+    super(`Outcome contract files are published; ${stage} recording did not complete. Inspect the published files before retrying.`);
+    this.name = "OutcomeContractPublicationError";
+  }
+}
+
+/** No provider is awaited under the file lock; only a current prepared signature may publish the unchanged predecessor. */
+async function publishContractAsync(workspace: string, agentId: string, candidate: Buffer | null, reports = false): Promise<{ path: string; sigPath: string }> {
+  const path = outcomeContractPath(workspace, agentId), sigPath = outcomeContractSigPath(workspace, agentId);
+  const rel = relative(workspace, path).replace(/\\/g, "/"), sigRel = relative(workspace, sigPath).replace(/\\/g, "/");
+  const captured = capturePurposePublication(workspace, "config-signature");
+  const readPair = () => ({ body: readContainedOrNull(workspace, rel, Number.MAX_SAFE_INTEGER), signature: readContainedOrNull(workspace, sigRel, Number.MAX_SAFE_INTEGER) });
+  const predecessor = withContractPublicationLock(workspace, agentId, () => {
+    if (outcomeContractPath(workspace, agentId) !== path) throw new Error("outcome contract location changed while signing was prepared; retry");
+    return readPair();
+  });
+  const bytes = candidate === null ? predecessor.body : Buffer.from(candidate);
+  if (bytes === null) throw new Error("outcome contract missing");
+  const digestSha256 = sha256Hex(bytes), signed = await signWithPurposeKey(workspace, "config-signature", Buffer.from(digestSha256, "hex"));
+  const payload: SignaturePayload = { digestSha256, signature: signed.signature.toString("base64"), signedTs: Date.now(), signer: "auditor" };
+  const result = { path, sigPath };
+  withContractPublicationLock(workspace, agentId, () => {
+    if (outcomeContractPath(workspace, agentId) !== path) throw new Error("outcome contract location changed while signing was prepared; retry");
+    assertPurposePublicationCurrent(workspace, captured, signed);
+    const current = readPair(), same = (a: Buffer | null, b: Buffer | null) => a === null ? b === null : b !== null && a.equals(b);
+    if (!same(predecessor.body, current.body) || !same(predecessor.signature, current.signature)) throw new Error("outcome contract or signature changed while signing was prepared; retry");
+    if (reports) ensureDir(join(outcomesDir(workspace, agentId), "reports"));
+    if (candidate !== null) writeContained(workspace, rel, bytes, 0o644);
+    writeContained(workspace, sigRel, JSON.stringify(payload, null, 2), 0o644);
+    try { recordContract(workspace, agentId, bytes, payload, signed.keyId.slice(0, 16)); }
+    catch { throw new OutcomeContractPublicationError(result, "ledger"); }
+  });
+  // Existing workspace transparency is synchronous, including its notary route, and always runs after this lock is released.
+  try { logContract(workspace, agentId, digestSha256); }
+  catch { throw new OutcomeContractPublicationError(result, "transparency"); }
+  return result;
+}
+
+export async function signOutcomeContractAsync(workspace: string, agentId?: string): Promise<string> {
+  return (await publishContractAsync(workspace, resolveAgentId(workspace, agentId), null)).sigPath;
 }
 
 export function verifyOutcomeContractSignature(workspace: string, agentId?: string): {
@@ -226,7 +291,8 @@ export function verifyOutcomeContractSignature(workspace: string, agentId?: stri
         sigPath
       };
     }
-    const valid = verifyHexDigestAny(digest, sig.signature, getPublicKeyHistory(workspace, "auditor"));
+    assertKeysetComplete(workspace);
+    const valid = verifyHexDigestAny(digest, sig.signature, getPurposeKeyHistory(workspace, "config-signature"));
     return {
       valid,
       signatureExists: true,
@@ -250,17 +316,20 @@ export function initOutcomeContract(workspace: string, agentId?: string, _archet
   sigPath: string;
 } {
   const resolvedAgentId = resolveAgentId(workspace, agentId);
-  const dir = outcomesDir(workspace, resolvedAgentId);
-  ensureDir(dir);
-  ensureDir(join(dir, "reports"));
-  const contract = defaultOutcomeContract(resolvedAgentId);
   const path = outcomeContractPath(workspace, resolvedAgentId);
-  writeFileAtomic(path, YAML.stringify(contract), 0o644);
-  const sigPath = signOutcomeContract(workspace, resolvedAgentId);
-  return {
-    path,
-    sigPath
-  };
+  const signed = withContractPublicationLock(workspace, resolvedAgentId, () => {
+    getSigningKey(workspace, "config-signature"); // compatibility API refuses before changing the signed pair
+    ensureDir(join(outcomesDir(workspace, resolvedAgentId), "reports"));
+    writeFileAtomic(path, YAML.stringify(defaultOutcomeContract(resolvedAgentId)), 0o644);
+    return signContractUnlocked(workspace, resolvedAgentId);
+  });
+  logContract(workspace, resolvedAgentId, signed.digestSha256);
+  return { path, sigPath: signed.sigPath };
+}
+
+export async function initOutcomeContractAsync(workspace: string, agentId?: string, _archetype?: string): Promise<{ path: string; sigPath: string }> {
+  const resolved = resolveAgentId(workspace, agentId);
+  return publishContractAsync(workspace, resolved, Buffer.from(YAML.stringify(defaultOutcomeContract(resolved))), true);
 }
 
 export function upsertOutcomeContract(workspace: string, contract: OutcomeContract, agentId?: string): {
@@ -273,12 +342,19 @@ export function upsertOutcomeContract(workspace: string, contract: OutcomeContra
     parsed.outcomeContract.agentId = resolvedAgentId;
   }
   const path = outcomeContractPath(workspace, resolvedAgentId);
-  ensureDir(outcomesDir(workspace, resolvedAgentId));
-  writeFileAtomic(path, YAML.stringify(parsed), 0o644);
-  return {
-    path,
-    sigPath: signOutcomeContract(workspace, resolvedAgentId)
-  };
+  const signed = withContractPublicationLock(workspace, resolvedAgentId, () => {
+    getSigningKey(workspace, "config-signature"); // provider-held/locked keys cannot leave a changed unsigned body
+    writeFileAtomic(path, YAML.stringify(parsed), 0o644);
+    return signContractUnlocked(workspace, resolvedAgentId);
+  });
+  logContract(workspace, resolvedAgentId, signed.digestSha256);
+  return { path, sigPath: signed.sigPath };
+}
+
+export async function upsertOutcomeContractAsync(workspace: string, contract: OutcomeContract, agentId?: string): Promise<{ path: string; sigPath: string }> {
+  const resolved = resolveAgentId(workspace, agentId), parsed = outcomeContractSchema.parse(contract);
+  parsed.outcomeContract.agentId = resolved;
+  return publishContractAsync(workspace, resolved, Buffer.from(YAML.stringify(parsed)));
 }
 
 export function outcomeContractDigest(workspace: string, agentId?: string): string {

@@ -1,10 +1,14 @@
 import { readFileSync } from "node:fs";
 import { dirname } from "node:path";
-import { getPublicKeyHistory, verifyHexDigestAny } from "../crypto/keys.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { orgSignatureSchema } from "./orgSchema.js";
-import { signDigestWithPolicy, verifySignedDigest } from "../crypto/signing/signer.js";
+import { assertPolicySignerCurrent, describePolicySigner, signDigestWithPolicy, signDigestWithPolicyAsync, verifySignedDigest } from "../crypto/signing/signer.js";
+import { signingPurposeForKind } from "../crypto/signing/signerTypes.js";
+import { capturePurposePublication, assertPurposePublicationCurrent } from "../keys/purposePublication.js";
+import { boundProviderKey } from "../keys/keyset.js";
+import { loadTrustConfig } from "../trust/trustConfig.js";
+import { vaultStatus } from "../vault/vault.js";
 import type { SignKind, SignedDigest } from "../crypto/signing/signerTypes.js";
 
 function signKindForPath(path: string): SignKind {
@@ -102,7 +106,7 @@ export function verifySignedFileWithAuditor(workspace: string, path: string, byt
         signature: sig.signature,
         envelope: sig.envelope
       }
-    }) || verifyHexDigestAny(digest, sig.signature, getPublicKeyHistory(workspace, "auditor"));
+    });
     return {
       valid,
       signatureExists: true,
@@ -141,4 +145,34 @@ export function signSerializedPayloadWithAuditor(workspace: string, serialized: 
     signer: "auditor",
     envelope: signed.envelope
   };
+}
+
+/** Prepare bytes for a real publisher; no body or sidecar is written before the checked provider returns. */
+export async function prepareFileSignatureWithAuditor(workspace: string, path: string, input: Uint8Array,
+  kind: SignKind = signKindForPath(path), beforeSign?: () => void): Promise<{ readonly digestSha256: string; readonly signatureBytes: string; assertCurrent(): void }> {
+  if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize policy signing");
+  const bytes = Buffer.from(input), digestSha256 = sha256Hex(bytes); beforeSign?.();
+  const descriptor = describePolicySigner(workspace, kind);
+  const purpose = signingPurposeForKind(kind), policy = JSON.stringify(loadTrustConfig(workspace));
+  const authority = descriptor.mode === "VAULT" ? capturePurposePublication(workspace, purpose) : null;
+  const provider = authority === null ? "file" : boundProviderKey(workspace, purpose)?.binding.provider ?? "file";
+  const assertVaultCurrent = () => {
+    if (authority !== null && provider === "file" && !vaultStatus(workspace).unlocked)
+      throw new Error("prepared file signing vault is locked; unlock before publication");
+  };
+  const signed = await signDigestWithPolicyAsync({ workspace, kind, digestHex: digestSha256, expectedSigner: descriptor, beforeSign });
+  beforeSign?.(); assertVaultCurrent();
+  // Keep the historical five-field order and the complete checked envelope/basis.
+  const signatureBytes = JSON.stringify({ digestSha256, signature: signed.signature, signedTs: signed.signedTs,
+    signer: "auditor", envelope: signed.envelope }, null, 2);
+  return Object.freeze({ digestSha256, signatureBytes, assertCurrent() {
+    assertPolicySignerCurrent(workspace, descriptor);
+    if (JSON.stringify(loadTrustConfig(workspace)) !== policy) throw new Error("file signing policy changed while signing");
+    if (authority !== null) {
+      assertVaultCurrent();
+      if (signed.envelope === undefined) throw new Error("prepared file signature has no envelope");
+      assertPurposePublicationCurrent(workspace, authority, { provider, algorithm: signed.envelope.alg, keyId: descriptor.fingerprint,
+        publicKeyPem: descriptor.publicKeyPem, signature: Buffer.from(signed.signature, "base64") });
+    }
+  } });
 }

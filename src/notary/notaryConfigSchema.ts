@@ -10,6 +10,15 @@ export const notaryBackendSchema = z.discriminatedUnion("type", [
     type: z.literal("EXTERNAL_SIGNER"),
     command: z.string().min(1),
     args: z.array(z.string()).default([])
+  }),
+  // P2-08: a key held by a key provider (src/keys/provider.ts); credentials, PINs and module paths come from the environment.
+  z.object({
+    type: z.literal("KEY_PROVIDER"),
+    ref: z.strictObject({
+      provider: z.enum(["aws-kms", "gcp-kms", "azure-kv", "pkcs11"]),
+      id: z.string().min(1).max(2048),
+      version: z.string().min(1).max(256).optional()
+    })
   })
 ]);
 

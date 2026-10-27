@@ -4,12 +4,14 @@ import { join } from "node:path";
 import inquirer from "inquirer";
 import { z } from "zod";
 import type { DiagnosticReport, TargetProfile } from "../types.js";
-import { getSigningKey, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { getSigningKey, signHexDigest } from "../crypto/keys.js";
+import { verifyRawConfigSignature } from "../config/configSignaturePair.js";
 import { questionBank } from "../diagnostic/questionBank.js";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { getAgentPaths } from "../fleet/paths.js";
+import { captureTargetWizardPublication } from "./targetProfilePublication.js";
 
 const targetProfileSchema = z.object({
   id: z.string(),
@@ -42,25 +44,33 @@ export function defaultTargetMapping(level = 3): Record<string, number> {
   return out;
 }
 
+/** Shared v1 payload recipe. Signed field order, UUID, timestamp and mapping semantics stay unchanged. */
+export function targetProfilePayload(params: { name: string; contextGraphHash: string; mapping: Record<string, number> }): Omit<TargetProfile, "signature"> {
+  return { id: randomUUID(), name: params.name, createdTs: Date.now(), contextGraphHash: params.contextGraphHash, mapping: params.mapping };
+}
+
 export function createSignedTargetProfile(params: {
   workspace: string;
   name: string;
   contextGraphHash: string;
   mapping: Record<string, number>;
 }): TargetProfile {
-  const payload = {
-    id: randomUUID(),
-    name: params.name,
-    createdTs: Date.now(),
-    contextGraphHash: params.contextGraphHash,
-    mapping: params.mapping
-  };
-
+  const payload = targetProfilePayload(params);
   const signature = signTargetPayload(params.workspace, payload);
   return {
     ...payload,
     signature
   };
+}
+
+/** Internal maintained compatibility recipe; the original public synchronous APIs remain unchanged. */
+export function createMaintainedCompatibleTargetProfile(params: {
+  workspace: string; name: string; contextGraphHash: string; mapping: Record<string, number>;
+}, beforeSign: () => void): TargetProfile {
+  const payload = targetProfilePayload(params);
+  beforeSign();
+  const signature = signTargetPayload(params.workspace, payload);
+  return { ...payload, signature };
 }
 
 export function saveTargetProfile(workspace: string, profile: TargetProfile, agentId?: string): string {
@@ -70,6 +80,11 @@ export function saveTargetProfile(workspace: string, profile: TargetProfile, age
   return file;
 }
 
+/** The actual target wire parser, shared with its fixed initialized diagnostic consumer. */
+export function parseTargetProfileBytes(bytes: Uint8Array): TargetProfile {
+  return targetProfileSchema.parse(JSON.parse(Buffer.from(bytes).toString("utf8")) as unknown);
+}
+
 export function loadTargetProfile(workspace: string, name: string, agentId?: string): TargetProfile {
   const primary = targetPath(workspace, name, agentId);
   const legacyRoot = join(workspace, ".amc", "targets", `${name}.target.json`);
@@ -77,13 +92,11 @@ export function loadTargetProfile(workspace: string, name: string, agentId?: str
   if (!pathExists(file)) {
     throw new Error(`Target profile not found: ${file}`);
   }
-  const raw = JSON.parse(readFileSync(file, "utf8")) as unknown;
-  return targetProfileSchema.parse(raw);
+  return parseTargetProfileBytes(readFileSync(file));
 }
 
 export function loadTargetProfileFromFile(file: string): TargetProfile {
-  const raw = JSON.parse(readFileSync(file, "utf8")) as unknown;
-  return targetProfileSchema.parse(raw);
+  return parseTargetProfileBytes(readFileSync(file));
 }
 
 export function verifyTargetProfileSignature(workspace: string, profile: TargetProfile): boolean {
@@ -95,8 +108,7 @@ export function verifyTargetProfileSignature(workspace: string, profile: TargetP
     mapping: profile.mapping
   };
   const digest = sha256Hex(canonicalize(payload));
-  const auditorPubs = getPublicKeyHistory(workspace, "auditor");
-  return verifyHexDigestAny(digest, profile.signature, auditorPubs);
+  return verifyRawConfigSignature(workspace, digest, profile.signature);
 }
 
 export async function setTargetProfileInteractive(params: {
@@ -105,9 +117,12 @@ export async function setTargetProfileInteractive(params: {
   contextGraphHash: string;
   agentId?: string;
 }): Promise<TargetProfile> {
+  const input = { ...params };
+  const target = captureTargetWizardPublication(input.workspace, input.agentId);
   const mapping: Record<string, number> = {};
 
   for (const question of questionBank) {
+    target.observe();
     const response = await inquirer.prompt<{ level: number }>([
       {
         type: "list",
@@ -118,17 +133,12 @@ export async function setTargetProfileInteractive(params: {
       }
     ]);
     mapping[question.id] = response.level;
+    target.observe();
   }
 
-  const profile = createSignedTargetProfile({
-    workspace: params.workspace,
-    name: params.name,
-    contextGraphHash: params.contextGraphHash,
-    mapping
-  });
-
-  saveTargetProfile(params.workspace, profile, params.agentId);
-  return profile;
+  const result = await target.publish({ name: input.name, contextGraphHash: input.contextGraphHash, mapping });
+  target.assertCurrent();
+  return result.profile;
 }
 
 export function diffRunToTarget(report: DiagnosticReport, profile: TargetProfile): Array<{

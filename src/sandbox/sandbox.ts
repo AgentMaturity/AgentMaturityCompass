@@ -160,12 +160,13 @@ function recordSandboxAttestation(params: {
   }
 }
 
-export async function runSandboxCommand(opts: SandboxRunOptions): Promise<{
+export async function runSandboxCommand(opts: SandboxRunOptions, beforeLaunch?: () => void): Promise<{
   sessionId: string;
   dockerArgs: string[];
   image: string;
   networkName: string;
 }> {
+  beforeLaunch?.();
   const docker = dockerAvailable();
   if (!docker.ok) {
     throw new Error("Docker is required for sandbox mode. Install Docker Desktop or Docker Engine and retry.");
@@ -174,6 +175,7 @@ export async function runSandboxCommand(opts: SandboxRunOptions): Promise<{
   const image = opts.image ?? "node:20-alpine";
   const agentId = resolveAgentId(opts.workspace, opts.agentId);
   const networkName = opts.networkName ?? `amc-sandbox-${randomUUID().slice(0, 12)}`;
+  beforeLaunch?.();
   const networkCreate = spawnSync("docker", ["network", "create", "--driver", "bridge", "--internal", networkName], {
     encoding: "utf8"
   });
@@ -184,6 +186,7 @@ export async function runSandboxCommand(opts: SandboxRunOptions): Promise<{
 
   let sessionId = "";
   try {
+  beforeLaunch?.();
   const dockerArgs = buildSandboxDockerArgs({
     ...opts,
     agentId,
@@ -203,11 +206,13 @@ export async function runSandboxCommand(opts: SandboxRunOptions): Promise<{
     ...(opts.scrubValues ? { scrubValues: opts.scrubValues } : {})
   });
 
+    beforeLaunch?.();
     sessionId = await wrapAny("docker", dockerArgs, {
       workspace: opts.workspace,
       agentId,
       ...(opts.env ? { envExtras: { ...opts.env } } : {}),
-      ...(opts.scrubValues ? { scrubValues: opts.scrubValues } : {})
+      ...(opts.scrubValues ? { scrubValues: opts.scrubValues } : {}),
+      ...(beforeLaunch ? { beforeLaunch } : {})
     });
     return {
       sessionId,

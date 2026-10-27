@@ -1,12 +1,13 @@
 import { join } from "node:path";
 import YAML from "yaml";
-import { signFileWithAuditor, verifySignedFileWithAuditor } from "../org/orgSigner.js";
-import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
+import { publishOrgPairs, prepareOrgPairsAsync, type OrgPairsOptions, type OrgPairsSnapshot } from "../org/preparedOrgPairs.js";
+import { captureMechanicPair, requireMechanicPair, verifyMechanicPair } from "./mechanicPairs.js";
+import { pathExists, readUtf8 } from "../utils/fs.js";
 import type { MechanicScope } from "./targetSchema.js";
 import { mechanicTuningSchema, type MechanicTuning } from "./tuningSchema.js";
 import { mechanicRoot } from "./targetsStore.js";
 
-function mechanicTuningPath(workspace: string): string {
+export function mechanicTuningPath(workspace: string): string {
   return join(mechanicRoot(workspace), "tuning.yaml");
 }
 
@@ -76,13 +77,12 @@ export function loadMechanicTuning(workspace: string): MechanicTuning {
   return mechanicTuningSchema.parse(YAML.parse(readUtf8(path)) as unknown);
 }
 
-export function saveMechanicTuning(params: {
+function planMechanicTuning(params: {
   workspace: string;
   tuning: MechanicTuning;
   reason?: string;
-}): { path: string; sigPath: string } {
+}) {
   const path = mechanicTuningPath(params.workspace);
-  ensureDir(mechanicRoot(params.workspace));
   const normalized = mechanicTuningSchema.parse({
     mechanicTuning: {
       ...params.tuning.mechanicTuning,
@@ -92,24 +92,30 @@ export function saveMechanicTuning(params: {
   if (!params.reason || params.reason.trim().length === 0) {
     throw new Error("tuning apply requires reason");
   }
-  writeFileAtomic(path, YAML.stringify(normalized), 0o644);
-  const sigPath = signFileWithAuditor(params.workspace, path);
-  return {
-    path,
-    sigPath
-  };
+  return { path, bytes: Buffer.from(YAML.stringify(normalized)) };
 }
 
+export function saveMechanicTuning(params: {
+  workspace: string;
+  tuning: MechanicTuning;
+  reason?: string;
+}): { path: string; sigPath: string } {
+  const plan = planMechanicTuning(params); return publishOrgPairs(params.workspace, [plan])[0]!;
+}
+export async function prepareMechanicTuning(params: Parameters<typeof saveMechanicTuning>[0], options: OrgPairsOptions = {}, before?: OrgPairsSnapshot) {
+  const plan = planMechanicTuning(params), prepared = await prepareOrgPairsAsync(params.workspace, [plan], options, before);
+  return { bytes: Buffer.from(plan.bytes), assertCurrent: prepared.assertCurrent, publish() { return prepared.publish()[0]!; } };
+}
+export function captureMechanicTuning(workspace: string) {
+  const captured = captureMechanicPair(workspace, mechanicTuningPath(workspace), "mechanic tuning missing");
+  return { ...captured, tuning: mechanicTuningSchema.parse(YAML.parse(requireMechanicPair(captured).toString("utf8")) as unknown) };
+}
+export async function prepareInitialMechanicTuning(params: Parameters<typeof initMechanicTuning>[0], options: OrgPairsOptions = {}, previous?: OrgPairsSnapshot) {
+  const tuning = defaultMechanicTuning({ ...params.scope }), prepared = await prepareMechanicTuning({ workspace: params.workspace, tuning, reason: "initial mechanic tuning" }, options, previous);
+  return { bytes: Buffer.from(prepared.bytes), assertCurrent: prepared.assertCurrent, publish() { return { ...prepared.publish(), tuning }; } };
+}
+export async function initMechanicTuningAsync(params: Parameters<typeof initMechanicTuning>[0]) { return (await prepareInitialMechanicTuning(params)).publish(); }
+
 export function verifyMechanicTuningSignature(workspace: string) {
-  const path = mechanicTuningPath(workspace);
-  if (!pathExists(path)) {
-    return {
-      valid: false,
-      signatureExists: false,
-      reason: "mechanic tuning missing",
-      path,
-      sigPath: `${path}.sig`
-    };
-  }
-  return verifySignedFileWithAuditor(workspace, path);
+  return verifyMechanicPair(workspace, mechanicTuningPath(workspace), "mechanic tuning missing");
 }

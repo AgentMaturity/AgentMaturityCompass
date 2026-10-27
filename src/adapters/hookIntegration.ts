@@ -20,6 +20,7 @@ import { approvalPolicyPath, approvalPolicySigPath, initApprovalPolicy } from ".
 import { signFileWithAuditor, verifySignedFileWithAuditor } from "../org/orgSigner.js";
 import { revokeLeaseForCli } from "../leases/leaseCli.js";
 import { verifyManagedLease } from "./managedHookLease.js";
+import { readOnlyCapabilityGovernance, readOnlyCapabilityLeaseStatus } from "./hookCapabilityInspection.js";
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
 import { writeFileAtomic } from "../utils/fs.js";
@@ -39,7 +40,6 @@ export {
 } from "./hookProviders/installFiles.js";
 
 export { CLAUDE_CODE_HOOK_SOURCE } from "./hookProviders/claudeCode.js";
-
 export const GEMINI_CLI_HOOK_SOURCE = {
   provider: "gemini-cli",
   contract: "Gemini CLI project tool lifecycle command hooks",
@@ -552,7 +552,7 @@ function loadSignedManifest(workspace: string, paths: ManagedPaths): HookManifes
   if (!hasManifest || !hasSignature) {
     throw new HookIntegrationError("HOOK_MANIFEST_INVALID", "hook installation manifest or signature is missing");
   }
-  const verification = verifySignedFileWithAuditor(workspace, paths.manifest);
+  const bytes = readFileSync(paths.manifest), verification = verifySignedFileWithAuditor(workspace, paths.manifest, bytes);
   if (!verification.valid) {
     throw new HookIntegrationError(
       "HOOK_MANIFEST_INVALID",
@@ -560,7 +560,7 @@ function loadSignedManifest(workspace: string, paths: ManagedPaths): HookManifes
     );
   }
   try {
-    return manifestSchema.parse(JSON.parse(readFileSync(paths.manifest, "utf8")) as unknown);
+    return manifestSchema.parse(JSON.parse(bytes.toString("utf8")) as unknown);
   } catch {
     throw new HookIntegrationError("HOOK_MANIFEST_INVALID", "hook installation manifest does not match schema");
   }
@@ -676,7 +676,7 @@ function claudeCodeBinding(options: InstallHookIntegrationOptions, forwarderPath
 }
 
 /** Claude Code control: drift of the bound forwarder and Claude Code (an issue each), and the sessions' governance. */
-function claudeControlStatus(workspace: string, manifest: HookManifest, issues: string[]): { drifted: boolean; governance: ClaudeCodeGovernance } {
+function claudeControlStatus(workspace: string, manifest: HookManifest, issues: string[], readonly = false): { drifted: boolean; governance: ClaudeCodeGovernance } {
   const binding = manifest.v === 2 ? manifest.claudeCode : undefined;
   const drift = [
     !binding ? "the control installation binds no AMC hook forwarder; reinstall" : null,
@@ -688,7 +688,7 @@ function claudeControlStatus(workspace: string, manifest: HookManifest, issues: 
   issues.push(...drift);
   let governance: ClaudeCodeGovernance;
   try {
-    governance = claudeCodeGovernance(workspace, manifest.agentId);
+    governance = readonly ? readOnlyCapabilityGovernance(workspace, manifest.agentId) : claudeCodeGovernance(workspace, manifest.agentId);
   } catch {
     governance = { claim: "not_evaluated", registeredSessions: 0, qualifiedSessions: 0, invalidRegistrations: 0, latestRegistrationAt: null, note: CLAUDE_NOT_GOVERNED_NOTE };
   }
@@ -930,7 +930,7 @@ export function installHookIntegration(options: InstallHookIntegrationOptions): 
   return options.dryRun ? execute() : withInstallLock(workspace, paths.lock, execute);
 }
 
-export function getHookIntegrationStatus(input: { workspace: string; provider: HookProvider }): HookIntegrationStatus {
+export function getHookIntegrationStatus(input: { workspace: string; provider: HookProvider; readonly?: boolean }): HookIntegrationStatus {
   if (input.provider === "pi") return piHookStatus(input.workspace);
   const provider = parseProvider(input.provider);
   const workspace = resolve(input.workspace);
@@ -1016,8 +1016,8 @@ export function getHookIntegrationStatus(input: { workspace: string; provider: H
   const ignoreProtected = hasManagedIgnoreBlock(ignoreRaw);
   if (manifest && !ignoreProtected) issues.push(".amc/hooks/ is not protected by .gitignore");
 
-  const lease = managedLeaseStatus(workspace, paths.token, manifest, issues);
-  const claude = provider === "claude-code" && manifest?.mode === "control" ? claudeControlStatus(workspace, manifest, issues) : null;
+  const lease = input.readonly ? readOnlyCapabilityLeaseStatus(workspace, paths.token, manifest, issues) : managedLeaseStatus(workspace, paths.token, manifest, issues);
+  const claude = provider === "claude-code" && manifest?.mode === "control" ? claudeControlStatus(workspace, manifest, issues, input.readonly) : null;
 
   let state: HookIntegrationStatus["state"] = "installed";
   if (!manifestValid || !lease.valid && !lease.expired || !ignoreProtected

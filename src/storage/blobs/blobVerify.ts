@@ -3,7 +3,10 @@ import { pathExists } from "../../utils/fs.js";
 import { openLedger } from "../../ledger/ledger.js";
 import { loadBlobMetadata, loadBlobPlaintext, verifyBlobIndexChain } from "./blobStore.js";
 
+import type { TrustContext } from "../../trust/trustContext.js";
+
 export interface BlobVerifyOptions {
+  trust?: TrustContext;
   decrypt?: boolean;
   verifyLedgerReferences?: boolean;
 }
@@ -22,7 +25,7 @@ export function verifyBlobStore(
   const decrypt = options.decrypt ?? true;
   const verifyLedgerRefs = options.verifyLedgerReferences ?? true;
   const errors: string[] = [];
-  const chain = verifyBlobIndexChain(workspace);
+  const chain = verifyBlobIndexChain(workspace, options.trust);
   errors.push(...chain.errors);
 
   let checkedBlobRefs = 0;

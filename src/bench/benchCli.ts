@@ -1,3 +1,8 @@
+import type { BenchRegistryOptions } from "./benchRegistryPublication.js";
+import type { OrgPairsOptions } from "../org/preparedOrgPairs.js";
+import { createBenchArtifactAsync } from "./benchArtifactAsync.js";
+import { benchCompareForApiAsync } from "./benchApi.js";
+import { benchInitForApiAsync, benchRegistriesForApiAsync, benchRegistryApplyForApiAsync } from "./benchPolicyAsync.js";
 import { cliInitiator } from "../approvals/approvalEngine.js";
 import { resolve } from "node:path";
 import { benchArtifactSchema } from "./benchSchema.js";
@@ -12,7 +17,7 @@ import {
   benchInitForApi,
   benchCompareForApi,
   benchComparisonLatestForApi,
-  benchPublishExecuteForApi,
+  benchPublishExecuteForApi, benchPublishExecuteForApiAsync,
   benchPublishRequestForApi,
   benchRegistriesForApi,
   benchRegistryApplyForApi
@@ -76,12 +81,12 @@ export function benchRegistryInitCli(params: {
   dir: string;
   registryId?: string;
   registryName?: string;
-}) {
+}, options: BenchRegistryOptions = {}) {
   return initBenchRegistry({
     dir: resolve(params.dir),
     registryId: params.registryId,
     registryName: params.registryName
-  });
+  }, options);
 }
 
 export function benchRegistryPublishCli(params: {
@@ -89,13 +94,13 @@ export function benchRegistryPublishCli(params: {
   benchFile: string;
   registryKeyPath: string;
   version?: string;
-}) {
+}, options: BenchRegistryOptions = {}) {
   return publishBenchToRegistry({
     dir: resolve(params.dir),
     benchFile: resolve(params.benchFile),
     registryKeyPath: resolve(params.registryKeyPath),
     version: params.version
-  });
+  }, options);
 }
 
 export function benchRegistryVerifyCli(dir: string, trust: TrustContext, pubkeyPath?: string) {
@@ -128,8 +133,8 @@ export async function benchImportCli(params: {
   workspace: string;
   registryId: string;
   benchRef: string;
-}) {
-  return importBenchFromRegistry(params);
+}, options: OrgPairsOptions = {}) {
+  return importBenchFromRegistry({ ...params }, options);
 }
 
 export function benchListImportsCli(workspace: string) {
@@ -199,4 +204,41 @@ export function parseBenchPolicy(input: string): BenchPolicy {
 
 export function parseBenchArtifact(input: string) {
   return benchArtifactSchema.parse(JSON.parse(input) as unknown);
+}
+
+export async function benchInitCliAsync(workspace: string) { return benchInitForApiAsync(workspace); }
+export async function benchRegistriesCliAsync(workspace: string) { return benchRegistriesForApiAsync(workspace); }
+export async function benchRegistriesApplyCliAsync(params: Parameters<typeof benchRegistriesApplyCli>[0]) {
+  const workspace = params.workspace, config = params.config; return benchRegistryApplyForApiAsync({ workspace, config });
+}
+
+export async function benchCreateCliAsync(params: {
+  workspace: string;
+  scope: "workspace" | "node" | "agent";
+  id?: string;
+  outFile: string;
+  windowDays?: number;
+  named?: boolean;
+  labels?: {
+    industry?: "software" | "fintech" | "health" | "manufacturing" | "other";
+    agentType?: "code-agent" | "support-agent" | "ops-agent" | "research-agent" | "sales-agent" | "other";
+    deployment?: "single" | "host" | "k8s" | "compose";
+  };
+}, options: OrgPairsOptions = {}) {
+  params = structuredClone(params);
+  return createBenchArtifactAsync({
+    workspace: params.workspace,
+    scope: params.scope,
+    id: params.id,
+    outFile: resolve(params.workspace, params.outFile),
+    windowDays: params.windowDays,
+    named: params.named,
+    labels: params.labels
+  }, options);
+}
+
+export async function benchCompareCliAsync(params: Parameters<typeof benchCompareCli>[0], options: OrgPairsOptions = {}) { return benchCompareForApiAsync({...params},options); }
+
+export async function benchPublishExecuteCliAsync(params: Parameters<typeof benchPublishExecuteCli>[0], options: OrgPairsOptions = {}) {
+  return benchPublishExecuteForApiAsync({ ...params }, options);
 }

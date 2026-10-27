@@ -6,6 +6,7 @@
 
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { bodyJson, apiSuccess, apiError, queryParam } from './apiHelpers.js';
+import { KEY_PROVIDER_ERRORS, KeyProviderError } from '../keys/provider.js';
 
 function parseBadgeLevel(value: string): number | null {
   const level = Number(value);
@@ -17,7 +18,8 @@ export async function handleExportRoute(
   method: string,
   req: IncomingMessage,
   res: ServerResponse,
-  workspace = process.cwd()
+  workspace = process.cwd(),
+  revalidateAuthority?: () => boolean
 ): Promise<boolean> {
   if (
     !pathname.startsWith('/api/v1/export') &&
@@ -123,8 +125,8 @@ export async function handleExportRoute(
       if (!body.outFile) {
         apiError(res, 400, 'outFile required'); return true;
       }
-      const { notaryAttestCli } = await import('../notary/notaryCli.js');
-      const result = notaryAttestCli({
+      const { notaryAttestCliAsync } = await import('../notary/notaryCli.js');
+      const result = await notaryAttestCliAsync({
         notaryDir: body.notaryDir,
         workspace,
         outFile: body.outFile,
@@ -159,6 +161,13 @@ export async function handleExportRoute(
   // POST /api/v1/attest/outcome — record manual attested outcome signal
   if (pathname === '/api/v1/attest/outcome' && method === 'POST') {
     try {
+      const beforePublish = () => {
+        if (revalidateAuthority?.() === false) {
+          if (!res.headersSent) apiError(res, 403, 'authenticated authority changed before outcome attestation');
+          throw new Error('authenticated authority changed before outcome attestation');
+        }
+      };
+      beforePublish();
       const body = await bodyJson<{
         metricId: string; value: string; reason: string;
         workOrderId?: string; unit?: string; agentId?: string;
@@ -166,8 +175,8 @@ export async function handleExportRoute(
       if (!body.metricId || !body.value || !body.reason) {
         apiError(res, 400, 'metricId, value, and reason required'); return true;
       }
-      const { outcomesAttestCli } = await import('../outcomes/outcomeCli.js');
-      const result = outcomesAttestCli({
+      const outcomes = await import('../outcomes/outcomeCli.js');
+      const input = {
         workspace,
         agentId: body.agentId,
         metricId: body.metricId,
@@ -175,9 +184,15 @@ export async function handleExportRoute(
         reason: body.reason,
         workOrderId: body.workOrderId,
         unit: body.unit,
-      });
+      };
+      // Registry callers retain the synchronous path until their trusted dispatcher explicitly forwards authority.
+      const result = revalidateAuthority === undefined ? outcomes.outcomesAttestCli(input) : await outcomes.outcomesAttestCliAsync(input, { beforePublish });
       apiSuccess(res, result);
     } catch (err) {
+      if (res.headersSent) return true;
+      if (err instanceof KeyProviderError && Object.hasOwn(KEY_PROVIDER_ERRORS, err.code)) {
+        apiError(res, KEY_PROVIDER_ERRORS[err.code], err.code + ': manual outcome signing refused'); return true;
+      }
       apiError(res, 500, err instanceof Error ? err.message : 'Outcome attestation failed');
     }
     return true;

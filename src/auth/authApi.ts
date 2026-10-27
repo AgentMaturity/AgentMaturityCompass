@@ -3,13 +3,22 @@ import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import YAML from "yaml";
-import { getSigningKey, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { getSigningKey, signHexDigest } from "../crypto/keys.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
-import { parseCookieHeader, issueSessionToken, verifySessionToken, type SessionPayload } from "./sessionTokens.js";
+import { parseCookieHeader, issueSessionToken, issueSessionTokenAsync, verifySessionToken, type SessionPayload } from "./sessionTokens.js";
 import { hashPassword, verifyPassword } from "./passwordHash.js";
 import { createUserRecord, usersFileSchema, type UserRecord, type UsersFile } from "./userSchema.js";
 import type { UserRole } from "./roles.js";
+import { enforceRoleOrAdmin, type AccessContext } from "./rbac.js";
+import { getPurposeKeyHistory } from "../keys/signingKeys.js";
+import { assertKeysetComplete } from "../keys/keyset.js";
+import { verifyWithKey } from "../keys/algorithmPolicy.js";
+import { signWithPurposeKey } from "../keys/purposeProviders.js";
+import { capturePurposePublication, assertPurposePublicationCurrent } from "../keys/purposePublication.js";
+import { withControlFileLock } from "../lifecycle/controlFileLock.js";
+import { KeyProviderError, KEY_PROVIDER_ERRORS } from "../keys/provider.js";
+import { KeyRevokedError } from "../keys/keyRevocations.js";
 
 interface UsersSignature {
   digestSha256: string;
@@ -69,7 +78,7 @@ export function verifyUsersConfigSignature(workspace: string): {
  * One read of users.yaml and its .sig: the verdict over exactly these bytes, the bytes themselves (null when the file
  * is missing) and the auditor key that verified them. Callers parse these bytes, never a second read of the file.
  */
-function readSignedUsersConfig(workspace: string): {
+function readSignedUsersConfig(workspace: string, captured?: UsersPublicationSnapshot): {
   verdict: ReturnType<typeof verifyUsersConfigSignature>;
   bytes: Buffer | null;
   signerPem: string | null;
@@ -77,24 +86,26 @@ function readSignedUsersConfig(workspace: string): {
   const path = usersPath(workspace);
   const sigPath = usersSigPath(workspace);
   const verdict = (valid: boolean, signatureExists: boolean, reason: string | null) => ({ valid, signatureExists, reason, path, sigPath });
-  if (!pathExists(path)) {
+  if (captured === undefined ? !pathExists(path) : captured.bytes === null) {
     return { verdict: verdict(false, false, "users config missing"), bytes: null, signerPem: null };
   }
   let bytes: Buffer | null = null;
   try {
-    bytes = readFileSync(path);
-    if (!pathExists(sigPath)) {
+    bytes = captured === undefined ? readFileSync(path) : Buffer.from(captured.bytes!);
+    if (captured === undefined ? !pathExists(sigPath) : captured.signature === null) {
       return { verdict: verdict(false, false, "users signature missing"), bytes, signerPem: null };
     }
-    const sig = JSON.parse(readUtf8(sigPath)) as UsersSignature;
+    const sig = JSON.parse(captured === undefined ? readUtf8(sigPath) : captured.signature!.toString("utf8")) as UsersSignature;
     const digest = sha256Hex(bytes);
     if (digest !== sig.digestSha256) {
       return { verdict: verdict(false, true, "digest mismatch"), bytes, signerPem: null };
     }
-    const signerPem = getPublicKeyHistory(workspace, "auditor").find((pem) => verifyHexDigestAny(digest, sig.signature, [pem])) ?? null;
+    assertKeysetComplete(workspace);
+    const signerPem = getPurposeKeyHistory(workspace, "config-signature")
+      .find(pem => typeof sig.signature === "string" && verifyWithKey(Buffer.from(digest, "hex"), pem, Buffer.from(sig.signature, "base64"))) ?? null;
     return { verdict: verdict(signerPem !== null, true, signerPem !== null ? null : "signature verification failed"), bytes, signerPem };
-  } catch (error) {
-    return { verdict: verdict(false, true, String(error)), bytes, signerPem: null };
+  } catch {
+    return { verdict: verdict(false, true, "users config or signature unreadable"), bytes, signerPem: null };
   }
 }
 
@@ -121,8 +132,8 @@ function loadUsersConfig(workspace: string, options?: { requireValidSignature?: 
 }
 
 /** users.yaml parsed from the bytes its signature was verified over, in the same read, and the verifying auditor key. */
-function loadSignedUsersConfig(workspace: string, options?: { requireValidSignature?: boolean }): { config: UsersFile; signerPem: string | null } {
-  const { verdict, bytes, signerPem } = readSignedUsersConfig(workspace);
+function loadSignedUsersConfig(workspace: string, options?: { requireValidSignature?: boolean }, captured?: UsersPublicationSnapshot): { config: UsersFile; signerPem: string | null } {
+  const { verdict, bytes, signerPem } = readSignedUsersConfig(workspace, captured);
   if (verdict.reason === "users config missing") {
     throw new Error("users config missing");
   }
@@ -133,6 +144,8 @@ function loadSignedUsersConfig(workspace: string, options?: { requireValidSignat
 }
 
 function saveUsersConfig(workspace: string, users: UsersFile): void {
+  // Compatibility writers must refuse a held/locked key before replacing the authenticated body.
+  getSigningKey(workspace, "config-signature");
   ensureDir(join(workspace, ".amc"));
   writeFileAtomic(usersPath(workspace), YAML.stringify(usersFileSchema.parse(users)), 0o644);
 }
@@ -142,6 +155,7 @@ export function initUsersConfig(params: {
   username: string;
   password: string;
 }): { path: string; sigPath: string; owner: UserRecord } {
+  return withUsersConfigLock(params.workspace, () => {
   const owner = createUserRecord({
     username: params.username,
     roles: ["OWNER"],
@@ -159,6 +173,7 @@ export function initUsersConfig(params: {
     sigPath,
     owner
   };
+  });
 }
 
 export function listUsers(workspace: string): UserRecord[] {
@@ -189,6 +204,7 @@ export function addUser(params: {
   roles: UserRole[];
   password: string;
 }): UserRecord {
+  return withUsersConfigLock(params.workspace, () => {
   const config = loadUsersConfig(params.workspace);
   if (config.users.some((user) => user.username.toLowerCase() === params.username.toLowerCase())) {
     throw new Error(`user already exists: ${params.username}`);
@@ -206,12 +222,14 @@ export function addUser(params: {
   saveUsersConfig(params.workspace, next);
   signUsersConfig(params.workspace);
   return record;
+  });
 }
 
 export function revokeUser(params: {
   workspace: string;
   username: string;
 }): UserRecord {
+  return withUsersConfigLock(params.workspace, () => {
   const config = loadUsersConfig(params.workspace);
   const index = config.users.findIndex((user) => user.username.toLowerCase() === params.username.toLowerCase());
   if (index < 0) {
@@ -230,6 +248,7 @@ export function revokeUser(params: {
   });
   signUsersConfig(params.workspace);
   return updated;
+  });
 }
 
 export function setUserRoles(params: {
@@ -237,6 +256,7 @@ export function setUserRoles(params: {
   username: string;
   roles: UserRole[];
 }): UserRecord {
+  return withUsersConfigLock(params.workspace, () => {
   const config = loadUsersConfig(params.workspace);
   const index = config.users.findIndex((user) => user.username.toLowerCase() === params.username.toLowerCase());
   if (index < 0) {
@@ -255,6 +275,147 @@ export function setUserRoles(params: {
   });
   signUsersConfig(params.workspace);
   return updated;
+  });
+}
+
+interface UsersPublicationSnapshot { bytes: Buffer | null; signature: Buffer | null }
+function usersPublicationSnapshot(workspace: string): UsersPublicationSnapshot {
+  try {
+    return { bytes: pathExists(usersPath(workspace)) ? readFileSync(usersPath(workspace)) : null,
+      signature: pathExists(usersSigPath(workspace)) ? readFileSync(usersSigPath(workspace)) : null };
+  } catch { throw new Error("users config or signature unreadable"); }
+}
+function withUsersConfigLock<T>(workspace: string, operation: () => T): T {
+  return withControlFileLock({ root: join(workspace, ".amc"), name: "users-config", operation });
+}
+const sameUsersBytes = (left: Buffer | null, right: Buffer | null) => left === null ? right === null : right !== null && left.equals(right);
+
+/** A maintained caller rechecks its existing authorization after the provider wait, before any users-file write. */
+export interface UsersMutationOptions { assertAuthorized?: () => void }
+class UsersAuthorizationChangedError extends Error {
+  constructor() { super("user mutation authority changed while signing"); this.name = "UsersAuthorizationChangedError"; }
+}
+
+const usersVaultLockedMessages = new Set([
+  "🔐 Vault locked. Run `amc vault unlock` first, or `amc setup` for first-time setup.",
+  "🔐 Vault locked. Run `amc vault unlock` first, or `amc setup` for first-time setup. Use --no-sign to skip signing where supported."
+]);
+/** Only the three existing users-mutation POST routes receive this response mapping. */
+export function respondUsersMutationError(request: Pick<IncomingMessage, "method" | "url">, error: unknown, send: (status: number, body: { error: string; code?: string }) => void): boolean {
+  if (request.method !== "POST") return false;
+  let path: string;
+  try { path = new URL(request.url ?? "/", "http://local.invalid").pathname; } catch { return false; }
+  if (!["/users/add", "/users/revoke", "/users/roles"].includes(path)) return false;
+  if (error instanceof UsersAuthorizationChangedError) {
+    send(403, { error: "user mutation authority changed while signing" }); return true;
+  }
+  if (error instanceof KeyProviderError && Object.hasOwn(KEY_PROVIDER_ERRORS, error.code)) {
+    send(KEY_PROVIDER_ERRORS[error.code], { error: `${error.code}: user mutation signing refused`, code: error.code }); return true;
+  }
+  if (error instanceof KeyRevokedError) {
+    send(409, { error: "KEY_REVOKED: the config-signature key was revoked", code: "KEY_REVOKED" }); return true;
+  }
+  // The vault compatibility API currently throws Error, not a distinct lock class. Match only its two fixed messages.
+  if (error instanceof Error && usersVaultLockedMessages.has(error.message)) {
+    send(423, { error: "VAULT_LOCKED: unlock the vault to change users", code: "VAULT_LOCKED" }); return true;
+  }
+  return false;
+}
+
+interface UsersMutationActor { isAdmin: boolean; userId: string | null; sessionAuthSource?: string }
+/** Current request authentication and the caller's established access conversion remain authoritative. */
+export function createUsersMutationGuard<Actor extends UsersMutationActor>(input: {
+  workspace: string; expected: Actor; authenticate: () => Actor | null; access: (actor: Actor) => AccessContext; readOnly: () => boolean;
+}): () => void {
+  const { workspace, authenticate, access, readOnly } = input;
+  const expected = { isAdmin: input.expected.isAdmin, userId: input.expected.userId };
+  return () => {
+    const current = authenticate();
+    if (current === null || current.isAdmin !== expected.isAdmin || current.userId !== expected.userId
+      || !enforceRoleOrAdmin({ access: access(current), requiredAny: ["OWNER"],
+        usersConfigValid: verifyUsersConfigSignature(workspace).valid || current.sessionAuthSource === "WORKSPACE_ROUTER" }).ok
+      || readOnly()) throw new UsersAuthorizationChangedError();
+  };
+}
+
+/** HTTP user mutations expose record metadata, never its password verifier. */
+export function publicUsersMutationRecord({ passwordHash: _passwordHash, ...user }: UserRecord): Omit<UserRecord, "passwordHash"> {
+  return user;
+}
+
+async function mutateUsersConfigAsync<T>(workspace: string, change: (current: UsersFile | null) => { config: UsersFile; result: T },
+  opts: UsersMutationOptions = {}, replace = false): Promise<T> {
+  const assertAuthorized = opts.assertAuthorized;
+  assertAuthorized?.();
+  // Existing file-provider migration/gates occur before the users lock. No provider await holds that lock.
+  const authority = capturePurposePublication(workspace, "config-signature");
+  const prepared = withUsersConfigLock(workspace, () => {
+    assertAuthorized?.();
+    const predecessor = usersPublicationSnapshot(workspace);
+    const current = replace ? null : loadSignedUsersConfig(workspace, undefined, predecessor).config;
+    const changed = change(current);
+    const bytes = Buffer.from(YAML.stringify(usersFileSchema.parse(changed.config)), "utf8");
+    return { predecessor, bytes, result: changed.result };
+  });
+  const assertPredecessorCurrent = () => {
+    const current = usersPublicationSnapshot(workspace);
+    if (!sameUsersBytes(prepared.predecessor.bytes, current.bytes) || !sameUsersBytes(prepared.predecessor.signature, current.signature)) {
+      throw new Error("users config changed while signing; retry");
+    }
+  };
+  const beforeSign = () => { assertAuthorized?.(); assertPredecessorCurrent(); };
+  const digest = sha256Hex(prepared.bytes);
+  const signed = await signWithPurposeKey(workspace, "config-signature", Buffer.from(digest, "hex"), { beforeSign });
+  const signature = Buffer.from(JSON.stringify({ digestSha256: digest, signature: signed.signature.toString("base64"),
+    signedTs: Date.now(), signer: "auditor" } satisfies UsersSignature, null, 2), "utf8");
+  return withUsersConfigLock(workspace, () => {
+    assertAuthorized?.();
+    assertPurposePublicationCurrent(workspace, authority, signed);
+    assertPredecessorCurrent();
+    // Same YAML, digest and sidecar shape as the synchronous APIs; a partial pair still fails closed.
+    writeFileAtomic(usersPath(workspace), prepared.bytes, 0o644);
+    writeFileAtomic(usersSigPath(workspace), signature, 0o644);
+    return prepared.result;
+  });
+}
+
+export async function initUsersConfigAsync(input: Parameters<typeof initUsersConfig>[0], opts: UsersMutationOptions = {}): Promise<ReturnType<typeof initUsersConfig>> {
+  const params = { ...input };
+  return mutateUsersConfigAsync(params.workspace, () => {
+    const owner = createUserRecord({ username: params.username, roles: ["OWNER"], passwordHash: hashPassword(params.password) });
+    return { config: { v: 1, updatedTs: Date.now(), users: [owner] },
+      result: { path: usersPath(params.workspace), sigPath: usersSigPath(params.workspace), owner } };
+  }, opts, true);
+}
+
+export async function addUserAsync(input: Parameters<typeof addUser>[0], opts: UsersMutationOptions = {}): Promise<UserRecord> {
+  const params = { ...input, roles: [...input.roles] };
+  return mutateUsersConfigAsync(params.workspace, current => {
+    const config = current!;
+    if (config.users.some(user => user.username.toLowerCase() === params.username.toLowerCase())) throw new Error(`user already exists: ${params.username}`);
+    const record = createUserRecord({ username: params.username, roles: params.roles, passwordHash: hashPassword(params.password) });
+    return { config: { ...config, updatedTs: Date.now(), users: [...config.users, record] }, result: record };
+  }, opts);
+}
+
+export async function revokeUserAsync(input: Parameters<typeof revokeUser>[0], opts: UsersMutationOptions = {}): Promise<UserRecord> {
+  const params = { ...input };
+  return mutateUsersConfigAsync(params.workspace, current => {
+    const config = current!, index = config.users.findIndex(user => user.username.toLowerCase() === params.username.toLowerCase());
+    if (index < 0) throw new Error(`user not found: ${params.username}`);
+    const updated = { ...config.users[index]!, status: "REVOKED" as const }, users = config.users.slice(); users[index] = updated;
+    return { config: { ...config, updatedTs: Date.now(), users }, result: updated };
+  }, opts);
+}
+
+export async function setUserRolesAsync(input: Parameters<typeof setUserRoles>[0], opts: UsersMutationOptions = {}): Promise<UserRecord> {
+  const params = { ...input, roles: [...input.roles] };
+  return mutateUsersConfigAsync(params.workspace, current => {
+    const config = current!, index = config.users.findIndex(user => user.username.toLowerCase() === params.username.toLowerCase());
+    if (index < 0) throw new Error(`user not found: ${params.username}`);
+    const updated = { ...config.users[index]!, roles: params.roles }, users = config.users.slice(); users[index] = updated;
+    return { config: { ...config, updatedTs: Date.now(), users }, result: updated };
+  }, opts);
 }
 
 export function authenticateUser(params: {
@@ -308,13 +469,10 @@ export function createTrackedSession(params: {
   ttlMs?: number;
   authSource: "LOCAL_USER" | "WORKSPACE_ROUTER";
 }): { token: string; payload: SessionPayload } {
-  const issued = issueSessionToken({
-    workspace: params.workspace,
-    userId: params.userId,
-    username: params.username,
-    roles: params.roles,
-    ttlMs: params.ttlMs
-  });
+  return storeTrackedSession(params, issueSessionToken(params));
+}
+
+function storeTrackedSession(params: Parameters<typeof createTrackedSession>[0], issued: ReturnType<typeof issueSessionToken>): ReturnType<typeof issueSessionToken> {
   const sessionId = `sess_${sha256Hex(issued.token).slice(0, 24)}_${randomUUID().replace(/-/g, "").slice(0, 8)}`;
   const store: SessionStoreRecord = {
     sessionId,
@@ -332,6 +490,21 @@ export function createTrackedSession(params: {
   return issued;
 }
 
+/** Persist no tracked session until the committed purpose signer has successfully returned a verified signature. */
+export async function createTrackedSessionAsync(params: Parameters<typeof createTrackedSession>[0]): Promise<ReturnType<typeof createTrackedSession>> {
+  const requested = { ...params, roles: [...params.roles] };
+  const issued = await issueSessionTokenAsync(requested);
+  // A provider await must not publish the authority of a user revoked or changed while signing was pending.
+  if (requested.authSource === "LOCAL_USER") {
+    const current = activeUserRecord(requested.workspace, requested.userId);
+    if (current === null || current.username !== requested.username
+      || [...current.roles].sort().join("\n") !== [...issued.payload.roles].sort().join("\n")) {
+      throw new Error("local session authority changed while signing");
+    }
+  }
+  return storeTrackedSession(requested, issued);
+}
+
 export function createSession(params: {
   workspace: string;
   user: UserRecord;
@@ -345,6 +518,12 @@ export function createSession(params: {
     ttlMs: params.ttlMs,
     authSource: "LOCAL_USER"
   });
+}
+
+/** Runtime local-login counterpart of the synchronous compatibility API. */
+export async function createSessionAsync(params: Parameters<typeof createSession>[0]): Promise<ReturnType<typeof createSession>> {
+  return createTrackedSessionAsync({ workspace: params.workspace, userId: params.user.userId, username: params.user.username,
+    roles: params.user.roles, ttlMs: params.ttlMs, authSource: "LOCAL_USER" });
 }
 
 export function revokeSessionByToken(params: {

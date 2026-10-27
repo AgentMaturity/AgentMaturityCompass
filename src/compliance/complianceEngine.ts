@@ -1,17 +1,16 @@
 import { randomUUID } from "node:crypto";
 import { readFileSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { resolve } from "node:path";
 import YAML from "yaml";
-import { z } from "zod";
-import { getPublicKeyHistory, verifyHexDigestAny } from "../crypto/keys.js";
+import { getPublicKeyHistory } from "../crypto/keys.js";
 import { parseWindowToMs } from "../utils/time.js";
-import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
-import { sha256Hex } from "../utils/hash.js";
+import { pathExists, readUtf8 } from "../utils/fs.js";
 import { openLedger } from "../ledger/ledger.js";
 import { resolveAgentId } from "../fleet/paths.js";
 import { descopedReason, familyReview, type ComplianceFramework } from "./frameworks.js";
 import { defaultComplianceMapsFile } from "./builtInMappings.js";
-import { signDigestWithPolicy, verifySignedDigest } from "../crypto/signing/signer.js";
+import { verifyAuditorSignatureBytes } from "../org/orgSignatureBytes.js";
+import { complianceMapsPath, publishComplianceMaps, publishComplianceMapsAsync, readComplianceMapsPair, type ComplianceMapsPublicationOptions } from "./complianceMapPublication.js";
 import {
   complianceMapsSchema,
   type ComplianceCategoryResult,
@@ -34,72 +33,13 @@ import { subjectRole, verifiedAssuranceByPack } from "./evidenceBinding.js";
 import { stationsForMapping } from "./stationTags.js";
 import type { Station } from "../domains/stations.js";
 
-interface SignedDigest {
-  digestSha256: string;
-  signature: string;
-  signedTs: number;
-  signer: "auditor";
-  envelope?: {
-    v: 1;
-    alg: "ed25519";
-    pubkeyB64: string;
-    fingerprint: string;
-    sigB64: string;
-    signedTs: number;
-    signer: {
-      type: "VAULT" | "NOTARY";
-      attestationLevel: "SOFTWARE" | "HARDWARE";
-      notaryFingerprint?: string;
-    };
-  };
+/** Retained sync SDK API. Its checked signature is prepared before the first body replacement. */
+export function initComplianceMaps(workspace: string, file?: ComplianceMapsFile): { path: string; sigPath: string } {
+  return publishComplianceMaps(workspace, file);
 }
-
-function complianceMapsPath(workspace: string): string {
-  return join(workspace, ".amc", "compliance-maps.yaml");
-}
-
-function complianceMapsSigPath(workspace: string): string {
-  return `${complianceMapsPath(workspace)}.sig`;
-}
-
-function signComplianceMapsDigest(workspace: string, digest: string): SignedDigest {
-  const signed = signDigestWithPolicy({
-    workspace,
-    kind: "COMPLIANCE_MAPS",
-    digestHex: digest
-  });
-  return {
-    digestSha256: digest,
-    signature: signed.signature,
-    signedTs: signed.signedTs,
-    signer: "auditor",
-    envelope: signed.envelope
-  };
-}
-
-function signComplianceMaps(workspace: string): string {
-  const path = complianceMapsPath(workspace);
-  if (!pathExists(path)) {
-    throw new Error(`Compliance maps not found: ${path}`);
-  }
-  const digest = sha256Hex(readFileSync(path));
-  const sigPath = complianceMapsSigPath(workspace);
-  writeFileAtomic(sigPath, JSON.stringify(signComplianceMapsDigest(workspace, digest), null, 2), 0o644);
-  return sigPath;
-}
-
-export function initComplianceMaps(workspace: string, file?: ComplianceMapsFile): {
-  path: string;
-  sigPath: string;
-} {
-  ensureDir(join(workspace, ".amc"));
-  const path = complianceMapsPath(workspace);
-  const payload = complianceMapsSchema.parse(file ?? defaultComplianceMapsFile());
-  writeFileAtomic(path, YAML.stringify(payload), 0o644);
-  return {
-    path,
-    sigPath: signComplianceMaps(workspace)
-  };
+/** Maintained initialized-workspace path; no provider work occurs under the short publication lock. */
+export function initComplianceMapsAsync(workspace: string, file?: ComplianceMapsFile, options: ComplianceMapsPublicationOptions = {}): Promise<{ path: string; sigPath: string }> {
+  return publishComplianceMapsAsync(workspace, file, options);
 }
 
 export function loadComplianceMaps(workspace: string, explicitPath?: string): ComplianceMapsFile {
@@ -113,74 +53,21 @@ export function loadComplianceMaps(workspace: string, explicitPath?: string): Co
   return complianceMapsSchema.parse(YAML.parse(readUtf8(path)) as unknown);
 }
 
-export function verifyComplianceMapsSignature(workspace: string, explicitPath?: string): {
-  valid: boolean;
-  signatureExists: boolean;
-  reason: string | null;
-  path: string;
-  sigPath: string;
+function verifyComplianceMapsBytes(workspace: string, path: string, body: Buffer | null, sidecar: Buffer | null): {
+  valid: boolean; signatureExists: boolean; reason: string | null; path: string; sigPath: string;
 } {
-  const path = explicitPath ? resolve(workspace, explicitPath) : complianceMapsPath(workspace);
   const sigPath = `${path}.sig`;
-  if (!pathExists(path)) {
-    return { valid: false, signatureExists: false, reason: "compliance maps missing", path, sigPath };
-  }
-  if (!pathExists(sigPath)) {
-    return { valid: false, signatureExists: false, reason: "compliance maps signature missing", path, sigPath };
-  }
-  try {
-    const sig = z
-      .object({
-        digestSha256: z.string().length(64),
-        signature: z.string().min(1),
-        signedTs: z.number().int(),
-        signer: z.literal("auditor"),
-        envelope: z
-          .object({
-            v: z.literal(1),
-            alg: z.literal("ed25519"),
-            pubkeyB64: z.string().min(1),
-            fingerprint: z.string().length(64),
-            sigB64: z.string().min(1),
-            signedTs: z.number().int(),
-            signer: z.object({
-              type: z.enum(["VAULT", "NOTARY"]),
-              attestationLevel: z.enum(["SOFTWARE", "HARDWARE"]),
-              notaryFingerprint: z.string().length(64).optional()
-            })
-          })
-          .optional()
-      })
-      .parse(JSON.parse(readUtf8(sigPath)) as unknown);
-    const digest = sha256Hex(readFileSync(path));
-    if (digest !== sig.digestSha256) {
-      return { valid: false, signatureExists: true, reason: "digest mismatch", path, sigPath };
-    }
-    const valid = verifySignedDigest({
-      workspace,
-      digestHex: digest,
-      signed: {
-        signature: sig.signature,
-        envelope: sig.envelope
-      }
-    }) || verifyHexDigestAny(digest, sig.signature, getPublicKeyHistory(workspace, "auditor"));
-    return {
-      valid,
-      signatureExists: true,
-      reason: valid ? null : "signature verification failed",
-      path,
-      sigPath
-    };
-  } catch (error) {
-    return {
-      valid: false,
-      signatureExists: true,
-      reason: String(error),
-      path,
-      sigPath
-    };
-  }
+  if (body === null) return { valid: false, signatureExists: false, reason: "compliance maps missing", path, sigPath };
+  if (sidecar === null) return { valid: false, signatureExists: false, reason: "compliance maps signature missing", path, sigPath };
+  return { ...verifyAuditorSignatureBytes(workspace, "COMPLIANCE_MAPS", body, sidecar), signatureExists: true, path, sigPath };
 }
+export function verifyComplianceMapsSignature(workspace: string, explicitPath?: string): ReturnType<typeof verifyComplianceMapsBytes> {
+  const path = explicitPath ? resolve(workspace, explicitPath) : complianceMapsPath(workspace);
+  try { const pair = readComplianceMapsPair(path); return verifyComplianceMapsBytes(workspace, path, pair.body?.bytes ?? null, pair.sidecar?.bytes ?? null); }
+  catch { return { valid: false, signatureExists: pathExists(`${path}.sig`), reason: "invalid compliance maps signature", path, sigPath: `${path}.sig` }; }
+}
+
+export { ComplianceMapsPublicationError } from "./complianceMapPublication.js";
 
 const STATUS_BY_RESULT: Readonly<Record<ResultState, ComplianceCategoryStatus>> = {
   pass: "SATISFIED", fail: "MISSING", not_evaluated: "NOT_EVALUATED"
@@ -276,6 +163,7 @@ function monitorKeysOf(workspace: string): string[] | null {
 
 export function generateComplianceReport(params: {
   workspace: string;
+  trust?: import("../trust/trustContext.js").TrustContext;
   agentId?: string;
   window: string;
   framework: ComplianceFramework;
@@ -289,8 +177,13 @@ export function generateComplianceReport(params: {
   const windowMs = parseWindowToMs(params.window);
   const windowStartTs = now - windowMs;
   const windowEndTs = now;
-  const maps = loadComplianceMaps(workspace, params.mapsPath);
-  const verify = verifyComplianceMapsSignature(workspace, params.mapsPath);
+  const path = params.mapsPath ? resolve(workspace, params.mapsPath) : complianceMapsPath(workspace);
+  const body = pathExists(path) ? readFileSync(path) : null;
+  if (body === null && params.mapsPath) throw new Error(`Compliance maps not found: ${path}`);
+  const maps = body === null ? defaultComplianceMapsFile() : complianceMapsSchema.parse(YAML.parse(body.toString("utf8")) as unknown);
+  let sidecar: Buffer | null = null, invalidSidecar = false;
+  try { if (pathExists(`${path}.sig`)) sidecar = readFileSync(`${path}.sig`); } catch { invalidSidecar = true; }
+  const verify = invalidSidecar ? { valid: false, reason: "invalid compliance maps signature" } : verifyComplianceMapsBytes(workspace, path, body, sidecar);
   const { station } = params;
   const mappings = maps.complianceMaps.mappings.filter((row) => row.framework === params.framework
     && (station === undefined || stationsForMapping(row).includes(station)));
@@ -306,7 +199,7 @@ export function generateComplianceReport(params: {
       // Events that could matter to this subject at any scope; the evidence contracts decide how each counts.
       rows: chain.filter((event) => event.ts >= windowStartTs && event.ts <= windowEndTs
         && subjectRole(event, agentId, "workspace") !== "none"),
-      chainError: monitorKeys === null ? "this workspace has no monitor key to verify its ledger" : ledgerChainError(chain, monitorKeys),
+      chainError: monitorKeys === null ? "this workspace has no monitor key to verify its ledger" : ledgerChainError(chain, monitorKeys, { workspace, ledger, trust: params.trust }),
       monitorKeys: monitorKeys ?? [],
       reader,
       assurance: verifiedAssuranceByPack({ workspace, agentId, windowStartTs, windowEndTs })

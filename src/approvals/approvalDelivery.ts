@@ -1,11 +1,12 @@
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
-import { dispatchIntegrationEvent } from "../integrations/integrationDispatcher.js";
+import { dispatchIntegrationEvent, dispatchIntegrationEventWithAuthority } from "../integrations/integrationDispatcher.js";
 import { verifyIntegrationsConfigSignature } from "../integrations/integrationStore.js";
 import { openLedger } from "../ledger/ledger.js";
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
 import { getApprovalInboxItem } from "./approvalInbox.js";
+import { ApprovalRequestContinuationError } from "./approvalRequestPublication.js";
 
 export const approvalDeliveryTriggerSchema = z.enum([
   "REQUEST_CREATED",
@@ -275,14 +276,32 @@ export async function deliverApprovalLifecycle(params: {
   approvalRequestId: string;
   trigger: ApprovalDeliveryTrigger;
   reviewBasePath?: string;
-}): Promise<ApprovalDeliverySummary> {
+}, options: { beforePublish?: () => void } = {}): Promise<ApprovalDeliverySummary> {
+  const caller = options.beforePublish;
+  let failure: { cause: unknown } | null = null;
+  const current = () => {
+    if (failure !== null) throw failure.cause;
+    try { caller?.(); } catch (cause) { failure = { cause }; throw cause; }
+  };
+  const afterFailure = (cause: unknown) => {
+    try { current(); }
+    catch (primary) {
+      if (primary === cause) throw primary;
+      throw new ApprovalRequestContinuationError(primary, cause);
+    }
+  };
+  const evidence = (input: Parameters<typeof withEvidence>[0]) => {
+    current(); const summary = withEvidence(input); current(); return summary;
+  };
+  current();
   const agentId = params.agentId ?? "default";
   let envelope: ApprovalDeliveryEnvelope;
   try {
     envelope = buildApprovalDeliveryEnvelope(params);
   } catch (error) {
+    afterFailure(error);
     const reasonCode = error instanceof ApprovalDeliveryError ? error.reasonCode : "REQUEST_INTEGRITY_INVALID";
-    return withEvidence({
+    return evidence({
       workspace: params.workspace,
       agentId,
       summary: {
@@ -302,10 +321,11 @@ export async function deliverApprovalLifecycle(params: {
     });
   }
 
+  current();
   const eventName = eventNameForLifecycle(envelope.lifecycle);
   const integrations = verifyIntegrationsConfigSignature(params.workspace);
   if (!integrations.valid) {
-    return withEvidence({
+    return evidence({
       workspace: params.workspace,
       agentId,
       summary: {
@@ -326,13 +346,16 @@ export async function deliverApprovalLifecycle(params: {
   }
 
   try {
-    const dispatched = await dispatchIntegrationEvent({
+    current();
+    const event = {
       workspace: params.workspace,
       eventName,
       agentId: "approval",
       summary: summaryForLifecycle(envelope.lifecycle),
       details: envelope
-    });
+    };
+    const dispatched = await (caller === undefined ? dispatchIntegrationEvent(event) : dispatchIntegrationEventWithAuthority(event, current));
+    current();
     const channels = dispatched.dispatched.map((row) => ({
       channelId: row.channelId,
       deliveryId: row.deliveryId,
@@ -359,7 +382,7 @@ export async function deliverApprovalLifecycle(params: {
         : failed
           ? "FAILED"
           : "SKIPPED";
-    return withEvidence({
+    return evidence({
       workspace: params.workspace,
       agentId,
       summary: {
@@ -383,8 +406,9 @@ export async function deliverApprovalLifecycle(params: {
         proofEligible: false
       }
     });
-  } catch {
-    return withEvidence({
+  } catch (cause) {
+    afterFailure(cause);
+    return evidence({
       workspace: params.workspace,
       agentId,
       summary: {

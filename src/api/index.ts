@@ -66,6 +66,8 @@ export interface ApiRouteContext {
    * person must read it from here rather than trusting a body field.
    */
   principal?: string;
+  /** Trusted authentication layer only: rereads the same credential/current roles before an awaited write returns. */
+  revalidateAuthority?: () => boolean;
   /** Present only after Studio has checked native-task browser admission. */
   nativeTasks?: NativeTaskApiContext;
 }
@@ -133,7 +135,7 @@ export const API_ROUTE_REGISTRY: readonly ApiRouteDefinition[] = [
     methods: ['GET', 'POST'],
     auth: 'protected',
     validationPolicy: 'schema-validated',
-    handler: workspaceRoute(handleScoreRoute)
+    handler: (pathname, method, req, res, context) => handleScoreRoute(pathname, method, req, res, context.workspace, context.revalidateAuthority)
   },
   {
     id: 'fleet',
@@ -142,7 +144,7 @@ export const API_ROUTE_REGISTRY: readonly ApiRouteDefinition[] = [
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     auth: 'protected',
     validationPolicy: 'router-local',
-    handler: workspaceRoute(handleFleetRoute)
+    handler: (pathname, method, req, res, context) => handleFleetRoute(pathname, method, req, res, context.workspace, context.revalidateAuthority)
   },
   {
     id: 'org',
@@ -160,7 +162,7 @@ export const API_ROUTE_REGISTRY: readonly ApiRouteDefinition[] = [
     methods: ['GET', 'POST'],
     auth: 'protected',
     validationPolicy: 'router-local',
-    handler: workspaceRoute(handleEvidenceRoute)
+    handler: (pathname, method, req, res, context) => handleEvidenceRoute(pathname, method, req, res, context.workspace, context.revalidateAuthority)
   },
   {
     id: 'fixer',
@@ -187,7 +189,7 @@ export const API_ROUTE_REGISTRY: readonly ApiRouteDefinition[] = [
     methods: ['GET', 'POST'],
     auth: 'protected',
     validationPolicy: 'router-local',
-    handler: workspaceRoute(handleWatchRoute)
+    handler: (pathname, method, req, res, context) => handleWatchRoute(pathname, method, req, res, context.workspace, context.revalidateAuthority)
   },
   {
     id: 'observe',
@@ -205,7 +207,7 @@ export const API_ROUTE_REGISTRY: readonly ApiRouteDefinition[] = [
     methods: ['GET', 'POST'],
     auth: 'protected',
     validationPolicy: 'router-local',
-    handler: workspaceRoute(handleGatewayRoute)
+    handler: (pathname, method, req, res, context) => handleGatewayRoute(pathname, method, req, res, context.workspace, context.revalidateAuthority)
   },
   {
     id: 'firewall',
@@ -214,7 +216,7 @@ export const API_ROUTE_REGISTRY: readonly ApiRouteDefinition[] = [
     methods: ['GET', 'POST'],
     auth: 'protected',
     validationPolicy: 'router-local',
-    handler: workspaceRoute(handleFirewallRoute)
+    handler: (pathname, method, req, res, context) => handleFirewallRoute(pathname, method, req, res, context.workspace, context.revalidateAuthority)
   },
   {
     id: 'runtime',
@@ -259,7 +261,7 @@ export const API_ROUTE_REGISTRY: readonly ApiRouteDefinition[] = [
     methods: ['GET', 'POST'],
     auth: 'protected',
     validationPolicy: 'router-local',
-    handler: workspaceRoute(handleDriftRoute)
+    handler: (pathname, method, req, res, context) => handleDriftRoute(pathname, method, req, res, context.workspace, context.revalidateAuthority)
   },
   {
     id: 'sandbox',
@@ -278,7 +280,7 @@ export const API_ROUTE_REGISTRY: readonly ApiRouteDefinition[] = [
     auth: 'protected',
     validationPolicy: 'router-local',
     // The oversight route signs a record naming its reviewer: it needs the authenticated principal (P1-17).
-    handler: (pathname, method, req, res, context) => handleIncidentRoute(pathname, method, req, res, context.workspace, context.principal)
+    handler: (pathname, method, req, res, context) => handleIncidentRoute(pathname, method, req, res, context.workspace, context.principal, context.revalidateAuthority)
   },
   {
     id: 'assurance',
@@ -350,7 +352,7 @@ export const API_ROUTE_REGISTRY: readonly ApiRouteDefinition[] = [
     methods: ['GET', 'POST'],
     auth: 'protected',
     validationPolicy: 'router-local',
-    handler: workspaceRoute(handleBenchmarkRoute)
+    handler: (pathname, method, req, res, context) => handleBenchmarkRoute(pathname, method, req, res, context.workspace, context.revalidateAuthority)
   },
   {
     id: 'workflow',
@@ -359,7 +361,7 @@ export const API_ROUTE_REGISTRY: readonly ApiRouteDefinition[] = [
     methods: ['GET', 'POST'],
     auth: 'protected',
     validationPolicy: 'router-local',
-    handler: workspaceRoute(handleWorkflowRoute)
+    handler: (pathname, method, req, res, context) => handleWorkflowRoute(pathname, method, req, res, context.workspace, context.revalidateAuthority)
   },
   {
     id: 'governor',
@@ -377,7 +379,7 @@ export const API_ROUTE_REGISTRY: readonly ApiRouteDefinition[] = [
     methods: ['GET', 'POST'],
     auth: 'protected',
     validationPolicy: 'router-local',
-    handler: workspaceRoute(handleAdaptersRoute)
+    handler: (pathname, method, req, res, context) => handleAdaptersRoute(pathname, method, req, res, context.workspace, context.revalidateAuthority)
   },
   {
     id: 'tools',
@@ -386,7 +388,7 @@ export const API_ROUTE_REGISTRY: readonly ApiRouteDefinition[] = [
     methods: ['GET', 'POST'],
     auth: 'protected',
     validationPolicy: 'router-local',
-    handler: workspaceRoute(handleToolsRoute)
+    handler: (pathname, method, req, res, context) => handleToolsRoute(pathname, method, req, res, context.workspace, context.revalidateAuthority)
   },
   {
     id: 'identity',
@@ -431,7 +433,7 @@ export const API_ROUTE_REGISTRY: readonly ApiRouteDefinition[] = [
     methods: ['GET', 'POST'],
     auth: 'protected',
     validationPolicy: 'router-local',
-    handler: workspaceRoute(handleBomRoute)
+    handler: (pathname, method, req, res, context) => handleBomRoute(pathname, method, req, res, context.workspace, context.revalidateAuthority)
   },
   {
     id: 'compliance',
@@ -440,7 +442,7 @@ export const API_ROUTE_REGISTRY: readonly ApiRouteDefinition[] = [
     methods: ['GET', 'POST'],
     auth: 'protected',
     validationPolicy: 'router-local',
-    handler: workspaceRoute(handleComplianceRoute)
+    handler: (pathname, method, req, res, context) => handleComplianceRoute(pathname, method, req, res, context.workspace, context.revalidateAuthority)
   },
   {
     id: 'proof',
@@ -476,7 +478,7 @@ export const API_ROUTE_REGISTRY: readonly ApiRouteDefinition[] = [
     methods: ['GET', 'POST'],
     auth: 'protected',
     validationPolicy: 'router-local',
-    handler: workspaceRoute(handleExportRoute)
+    handler: (pathname, method, req, res, context) => handleExportRoute(pathname, method, req, res, context.workspace, context.revalidateAuthority)
   },
   {
     id: 'marketplace',
@@ -525,7 +527,8 @@ export async function handleApiRoute(
   workspace = process.cwd(),
   apiToken?: string,
   principal?: string,
-  nativeTasks?: NativeTaskApiContext
+  nativeTasks?: NativeTaskApiContext,
+  revalidateAuthority?: () => boolean
 ): Promise<boolean> {
   if (!pathname.startsWith('/api/v1/')) return false;
   // Studio binds first (it may trust a forwarder's id); every other caller gets a server-generated one.
@@ -540,7 +543,7 @@ export async function handleApiRoute(
     if (resultRoute) labelResultsOn(res, (data) => labelResult(resultRoute, data, workspace));
     if (route) {
       const handled = await route.handler(pathname, method, req, res, {
-        workspace, apiToken, principal, ...(nativeTasks ? { nativeTasks } : {})
+        workspace, apiToken, principal, ...(nativeTasks ? { nativeTasks } : {}), ...(revalidateAuthority ? { revalidateAuthority } : {})
       });
       if (handled) {
         return true;

@@ -1,12 +1,18 @@
 import { readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import YAML from "yaml";
-import { getSigningKey, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { getSigningKey, getPublicKeyHistory, getAuthenticatedKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import type { ActionClass } from "../types.js";
 import { approvalA4FloorSchema, approvalPolicySchema, type ApprovalA4Floor, type ApprovalClassPolicy, type ApprovalPolicy } from "./approvalPolicySchema.js";
 import { appendTransparencyEntry } from "../transparency/logChain.js";
+
+import { captureRawConfigPairForAsync, type ConfigSignaturePairOptions } from "../config/configSignaturePair.js";
+import { verifyCurrentPurposeCredentialSignature } from "../keys/purposeCredentialSignature.js";
+import { captureOrgFiles, assertOrgPairsCurrent, orgPairBytes } from "../org/preparedOrgPairs.js";
+import { canonicalize } from "../utils/json.js";
+import { appendTransparencyEntryAttemptAsync } from "../transparency/asyncWorkspaceAppend.js";
 
 interface SignaturePayload {
   digestSha256: string;
@@ -186,7 +192,8 @@ export function verifyApprovalPolicySignature(workspace: string, explicitPath?: 
     if (digest !== sig.digestSha256) {
       return { valid: false, signatureExists: true, reason: "digest mismatch", path, sigPath };
     }
-    const valid = verifyHexDigestAny(digest, sig.signature, getPublicKeyHistory(workspace, "auditor"));
+    const legacy = verifyHexDigestAny(digest, sig.signature, getPublicKeyHistory(workspace, "auditor"));
+    const valid = legacy || approvalConfigPurposeCandidate(workspace, digest, sig.signature);
     return {
       valid,
       signatureExists: true,
@@ -225,7 +232,8 @@ export function loadVerifiedApprovalPolicy(workspace: string): { policy: Approva
     const sig = JSON.parse(readUtf8(`${path}.sig`)) as SignaturePayload;
     const digest = sha256Hex(bytes);
     if (digest !== sig.digestSha256) return unverified("digest mismatch");
-    if (!verifyHexDigestAny(digest, sig.signature, getPublicKeyHistory(workspace, "auditor"))) return unverified("signature verification failed");
+    const legacy = verifyHexDigestAny(digest, sig.signature, getPublicKeyHistory(workspace, "auditor"));
+    if (!legacy && !approvalConfigPurposeCandidate(workspace, digest, sig.signature)) return unverified("signature verification failed");
   } catch (error) {
     return unverified(String(error));
   }
@@ -346,4 +354,50 @@ export function approvalRuleForAction(policy: ApprovalPolicy, actionClass: Actio
 /** The signed policy's `a4` floor with its defaults filled in; a policy without the section reads as the defaults. */
 export function a4FloorFor(policy: ApprovalPolicy): ApprovalA4Floor {
   return approvalA4FloorSchema.parse(policy.approvalPolicy.a4 ?? {});
+}
+
+/** Exception-only extension after the ACTUAL legacy verifier returned false; no malformed/native error rescue. */
+function approvalConfigPurposeCandidate(workspace: string, digest: string, signature: string): boolean {
+  try {
+    const path = join(workspace, ".amc", "keys", "auditor_history.json"), before = captureOrgFiles([path]);
+    const bytes = orgPairBytes(before, path);
+    if (bytes !== null) {
+      const value: unknown = JSON.parse(bytes.toString("utf8"));
+      assertOrgPairsCurrent(before);
+      const actual = getAuthenticatedKeyHistory(workspace, "auditor");
+      assertOrgPairsCurrent(before);
+      if (actual === null || canonicalize(actual) !== canonicalize(value)) return false;
+    }
+    assertOrgPairsCurrent(before);
+    const valid = verifyCurrentPurposeCredentialSignature(workspace, "config-signature", Buffer.from(digest, "hex"), Buffer.from(signature, "base64"));
+    assertOrgPairsCurrent(before); return valid;
+  } catch { return false; }
+}
+
+/** Fixed held policy recipe. Only the actual raw CONFIG pair and fixed APPROVAL_POLICY_SIGNED log can complete it. */
+export function captureApprovalPolicyPublication(workspace: string, replacement: Uint8Array, options: ConfigSignaturePairOptions = {}) {
+  const caller = options.beforePublish, path = approvalPolicyPath(workspace), bytes = Buffer.from(replacement);
+  caller?.(); approvalPolicySchema.parse(YAML.parse(bytes.toString("utf8")) as unknown);
+  const actual = captureRawConfigPairForAsync(workspace, path, bytes, { previous: options.previous, beforePublish: caller });
+  let started = false;
+  return Object.freeze({ async prepare() {
+    if (started) throw new Error("approval policy publication already prepared; inspect the original attempt");
+    started = true;
+    const pair = await actual.prepare(); let returned = false, appendStarted = false;
+    const assertCurrent = () => { caller?.(); pair.assertCurrent(); };
+    return Object.freeze({ digestSha256: pair.digestSha256, assertCurrent,
+      publish(recorded?: (path: string) => void) {
+        if (returned) throw new Error("approval policy pair has already returned; inspect the original attempt");
+        const result = pair.publish(recorded); pair.assertCurrent(); returned = true; return result;
+      },
+      async appendSigned() {
+        if (!returned) throw new Error("approval policy pair has not returned from its genuine publisher");
+        if (appendStarted) throw new Error("approval policy signed log already attempted; inspect the original attempt");
+        appendStarted = true; assertCurrent();
+        return appendTransparencyEntryAttemptAsync({ workspace, type: "APPROVAL_POLICY_SIGNED", agentId: "system",
+          artifact: { kind: "policy", sha256: pair.digestSha256, id: "approval-policy" } },
+        { beforeCommit: assertCurrent, beforeMember: assertCurrent });
+      }
+    });
+  } });
 }

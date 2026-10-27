@@ -1,4 +1,5 @@
-import { sign, verify, type KeyObject } from "node:crypto";
+import { sign, type KeyObject } from "node:crypto";
+import { verifyWithKey } from "../keys/algorithmPolicy.js";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { AntiRollbackError, checkHighWater, keyHistoryMarkKey, nextKeyHistoryRevision, recordHighWater } from "../keys/highWater.js";
@@ -7,7 +8,8 @@ import { assertBoundPublicKey, assertNoPendingKeyset } from "../keys/keyset.js";
 import { getSigningKey } from "../keys/signingKeys.js";
 import { isLocalPurpose, ROLE_PRIMARY_PURPOSE, type LocalPurpose } from "../vault/vaultPayload.js";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
-import { sha256Hex } from "../utils/hash.js";
+import { isSha256HexDigest, sha256Hex } from "../utils/hash.js";
+export { isSha256HexDigest } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { ensureVaultAndPublicKeys, getVaultPrivateKeyPem, vaultPaths } from "../vault/vault.js";
 
@@ -173,10 +175,6 @@ export function getPublicKeyHistory(workspace: string, kind: KeyHistoryRole): st
   return [...new Set([...(history?.entries.map((entry) => entry.publicKeyPem) ?? []), current])];
 }
 
-export function isSha256HexDigest(value: string): boolean {
-  return /^[a-f0-9]{64}$/.test(value);
-}
-
 export function assertSha256HexDigest(value: string): void {
   if (!isSha256HexDigest(value)) throw new Error("Signing requires exactly 64 lowercase hexadecimal SHA-256 characters");
 }
@@ -202,13 +200,10 @@ export function signHexDigestWith(privateKey: KeyObject, digestHex: string): str
   return signature.toString("base64");
 }
 
+/** Ed25519, or ECDSA P-256 in IEEE P1363 (P2-08 algorithm policy); a DER-encoded ECDSA signature never verifies. */
 export function verifyHexDigest(digestHex: string, signatureB64: string, publicKeyPem: string): boolean {
   if (!isSha256HexDigest(digestHex)) return false;
-  try {
-    return verify(null, Buffer.from(digestHex, "hex"), publicKeyPem, Buffer.from(signatureB64, "base64"));
-  } catch {
-    return false;
-  }
+  return verifyWithKey(Buffer.from(digestHex, "hex"), publicKeyPem, Buffer.from(signatureB64, "base64"));
 }
 
 export function verifyHexDigestAny(digestHex: string, signatureB64: string, publicKeys: string[]): boolean {

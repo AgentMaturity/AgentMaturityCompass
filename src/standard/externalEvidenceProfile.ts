@@ -22,7 +22,7 @@ export interface ExternalEvidenceProfile {
   normalization: { normalizer: string; normalizedSha256: string; ingestedAt: string; losses: string[] };
   policyRefs: string[];
   events: ExternalEvidenceEvent[];
-  signature: { algorithm: "ed25519"; authorityId: string; value: string } | null;
+  signature: { algorithm: "ed25519" | "ecdsa-p256-sha256"; authorityId: string; value: string } | null;
 }
 
 const text = { type: "string", minLength: 1, maxLength: 4096 };
@@ -59,10 +59,25 @@ export const externalEvidenceProfileSchema: Record<string, unknown> = {
         { type: "boolean" }, { type: "null" }
       ] } }
     }) },
-    signature: { anyOf: [obj({ algorithm: { const: "ed25519" }, authorityId: text,
+    signature: { anyOf: [obj({ algorithm: { enum: ["ed25519", "ecdsa-p256-sha256"] }, authorityId: text,
       value: { type: "string", pattern: "^[A-Za-z0-9+/]{86}==$" } }), { type: "null" }] }
   })
 };
+
+/** P2-08: the declared algorithm is the admitted key's own, with one canonical 64-byte signature encoding. */
+function verifyAuthoritySignature(algorithm: NonNullable<ExternalEvidenceProfile["signature"]>["algorithm"], message: Buffer, publicKeyPem: string, signature: Buffer): boolean {
+  try {
+    if (signature.length !== 64) return false;
+    const key = createPublicKey(publicKeyPem);
+    if (algorithm === "ed25519") return key.asymmetricKeyType === "ed25519" && verify(null, message, key, signature);
+    if (key.asymmetricKeyType !== "ec" || key.asymmetricKeyDetails?.namedCurve !== "prime256v1") return false;
+    const order = BigInt("0xffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632551");
+    const r = BigInt(`0x${signature.subarray(0, 32).toString("hex")}`);
+    const s = BigInt(`0x${signature.subarray(32).toString("hex")}`);
+    return r > 0n && r < order && s > 0n && s <= order / 2n
+      && verify("sha256", message, { key, dsaEncoding: "ieee-p1363" }, signature);
+  } catch { return false; }
+}
 
 function record(value: unknown): value is Record<string, unknown> { return value !== null && typeof value === "object" && !Array.isArray(value); }
 function wellFormed(value: string): boolean { return !/[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/u.test(value); }
@@ -145,7 +160,7 @@ export function validateExternalEvidenceProfile(value: unknown): string[] {
     }
   }
   if (value.signature !== null && (!keys(value.signature, ["algorithm", "authorityId", "value"])
-    || value.signature.algorithm !== "ed25519" || !validText(value.signature.authorityId)
+    || (value.signature.algorithm !== "ed25519" && value.signature.algorithm !== "ecdsa-p256-sha256") || !validText(value.signature.authorityId)
     || typeof value.signature.value !== "string" || !/^[A-Za-z0-9+/]{86}==$/.test(value.signature.value))) bad("signature: invalid envelope");
   if (!errors.length) {
     const profile = value as unknown as ExternalEvidenceProfile;
@@ -212,10 +227,9 @@ export function verifyExternalEvidence(value: unknown, options: {
       errors.push("signature: authority not independently admitted for this producer");
     } else {
       try {
-        const key = createPublicKey(authority.publicKeyPem);
         const signature = Buffer.from(profile.signature.value, "base64");
-        signatureVerified = key.asymmetricKeyType === "ed25519" && signature.length === 64
-          && signature.toString("base64") === profile.signature.value && verify(null, externalEvidenceSigningBytes(profile), key, signature);
+        signatureVerified = signature.toString("base64") === profile.signature.value
+          && verifyAuthoritySignature(profile.signature.algorithm, externalEvidenceSigningBytes(profile), authority.publicKeyPem, signature);
       } catch { signatureVerified = false; }
       if (!signatureVerified) errors.push("signature: verification failed");
       if (signatureVerified && profile.provenance.captureMethod !== "import"

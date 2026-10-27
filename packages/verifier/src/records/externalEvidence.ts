@@ -67,7 +67,7 @@ const shape = obj({
   normalization: obj({ normalizer: text, normalizedSha256: digest, ingestedAt: time, losses: textList }),
   policyRefs: refine(textList, refs => new Set(refs).size === refs.length, "policyRefs must be unique"),
   events: refine(arr(event, { max: 10000 }), references, "event references are invalid"),
-  signature: nullable(obj({ algorithm: lit("ed25519"), authorityId: text, value: str({ regex: /^[A-Za-z0-9+/]{86}==$/ }) }))
+  signature: nullable(obj({ algorithm: oneOf(["ed25519", "ecdsa-p256-sha256"] as const), authorityId: text, value: str({ regex: /^[A-Za-z0-9+/]{86}==$/ }) }))
 });
 export type ExternalEvidence = ReturnType<typeof shape>;
 

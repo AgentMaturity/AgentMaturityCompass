@@ -3,8 +3,9 @@
  * type and the payload bytes, never the payload alone, so a signature for one payload type cannot be replayed as
  * another. AMC signs with Ed25519; a signature's `keyid` is the AMC key id, sha256 of the canonical SPKI PEM.
  */
-import { createPrivateKey, createPublicKey, sign, verify } from "node:crypto";
+import { createPrivateKey, createPublicKey, sign } from "node:crypto";
 import { sha256Hex } from "../utils/hash.js";
+import { verifyWithKey } from "../keys/algorithmPolicy.js";
 
 export const INTOTO_PAYLOAD_TYPE = "application/vnd.in-toto+json";
 
@@ -69,6 +70,6 @@ export function verifyDsse(envelope: unknown, expectedPayloadType: string, trust
   const publicKeyPem = trustedKeys.get(keyid);
   if (publicKeyPem === undefined) return { ok: false, error: `keyid ${keyid} is not a key the verifier trusts` };
   let valid = false;
-  try { valid = sig !== null && verify(null, pae(envelope.payloadType, payload), publicKeyPem, sig); } catch { valid = false; }
+  try { valid = sig !== null && verifyWithKey(pae(envelope.payloadType, payload), publicKeyPem, sig); } catch { valid = false; }
   return valid ? { ok: true, payload, keyid } : { ok: false, error: "the signature does not verify over the DSSE PAE" };
 }

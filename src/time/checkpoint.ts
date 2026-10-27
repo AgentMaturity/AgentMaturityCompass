@@ -1,9 +1,18 @@
 import { randomUUID } from "node:crypto";
-import { readdirSync, writeFileSync } from "node:fs";
+import { vaultStatus } from "../vault/vault.js";
+import { lstatSync, readdirSync, writeFileSync, type Stats } from "node:fs";
 import { join } from "node:path";
 import { z } from "zod";
-import { getSigningKey, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
-import { signingRoute } from "../crypto/signing/signer.js";
+import { getSigningKey, getPublicKeyHistory } from "../crypto/keys.js";
+import { publicKeyFromPrivate } from "../crypto/keyHistoryEnvelope.js";
+import { assertOwnerMode } from "../mode/mode.js";
+import { readContainedOrNull } from "../utils/containedFs.js";
+import { parseDelegation, verifyDelegation } from "../keys/delegation.js";
+import { DELEGATION_REL, getPurposeKeyHistory, getSigningPublicKeyPem, keyFile, readHistory } from "../keys/signingKeys.js";
+import { assertPolicySignerCurrent, describePolicySigner } from "../crypto/signing/signer.js";
+import { loadTrustConfig } from "../trust/trustConfig.js";
+import { assertPurposePublicationCurrent, capturePurposePublication } from "../keys/purposePublication.js";
+import { withControlFileLock } from "../lifecycle/controlFileLock.js";
 import { hashBinaryOrPath, openLedger, verifyEvidenceEventIntegrity } from "../ledger/ledger.js";
 import { EgressBlocked } from "../residency/checkEgress.js";
 import { boundedFile } from "../standard/externalEvidenceFiles.js";
@@ -12,11 +21,24 @@ import {
   type AnchorReceiptV1, type TransparencyConfig
 } from "../transparency/anchors/anchor.js";
 import { submitRekorV2Entry } from "../transparency/anchors/rekorV2.js";
-import { NOTE_MAX_BYTES, signNote, verifySignedNote } from "../transparency/checkpointNote.js";
+import { NOTE_MAX_BYTES, formatSignedNote, verifyCanonicalSignedNote } from "../transparency/checkpointNote.js";
 import { verifyTransparencyMerkle } from "../transparency/merkleIndexStore.js";
 import { merkleCurrentRootPath } from "../transparency/merklePaths.js";
 import type { PublicAnchoring } from "../trust/verifierReport.js";
-import { loadTrustContext, type TrustContext } from "../trust/trustContext.js";
+import { loadTrustContext, workspaceSelfTrust, type TrustContext } from "../trust/trustContext.js";
+import { localLedgerRowKeys } from "../keys/operationalLedgerReader.js";
+import { readOperationalDelegationState } from "../keys/operationalDelegationState.js";
+import { verifyOperationalCheckpoints, type DelegationCheckpoint } from "../keys/operationalDelegation.js";
+import { signWithPurposeKey } from "../keys/purposeProviders.js";
+import { assertBoundPublicKey, assertNoPendingKeyset, boundProviderKey, keysetDeclared } from "../keys/keyset.js";
+import { assertSigningKeyUsable } from "../keys/signingKeys.js";
+import { keyPolicy, loadKeysConfig } from "../keys/keysConfig.js";
+import { KeyProviderError } from "../keys/provider.js";
+import { signingKeyId } from "../keys/algorithmPolicy.js";
+import { assertKeyNotRevoked } from "../keys/keyRevocations.js";
+import { builtInDistrust } from "../trust/builtInDistrust.js";
+import { distrustAt } from "../trust/admissionRule.js";
+import { withDelegationUseLock } from "../keys/delegationUsage.js";
 import type { TimestampAuthority } from "../trust/trustList.js";
 import type { EvidenceEvent } from "../types.js";
 import { ensureDir, pathExists } from "../utils/fs.js";
@@ -39,13 +61,13 @@ const checkpointSchema = z.strictObject({
   type: z.literal("amc.ledger-checkpoint"),
   version: z.literal(1),
   workspaceId: z.string(),
-  sequence: z.number().int().positive(),
+  sequence: z.number().int().positive().safe(),
   claimedAt: z.iso.datetime(),
-  ledger: z.strictObject({ headEventHash: sha256, eventCount: z.number().int().positive() }),
+  ledger: z.strictObject({ headEventHash: sha256, eventCount: z.number().int().positive().safe() }),
   transparency: z.strictObject({ root: sha256, leafCount: z.number().int().nonnegative(), algorithm: z.enum(["amc-legacy-v1", "rfc9162-sha256"]) }).nullable(),
   previousCheckpointSha256: sha256.nullable()
 });
-const checkpointFileSchema = z.strictObject({ checkpoint: checkpointSchema, sha256, signature: z.string().min(1) });
+const checkpointFileSchema = z.strictObject({ checkpoint: checkpointSchema, sha256, signature: z.string().min(1), providerKeyId: sha256.optional() });
 export type LedgerCheckpointV1 = z.infer<typeof checkpointSchema>;
 
 export const checkpointsDir = (workspace: string): string => join(workspace, ".amc", "time", "checkpoints");
@@ -57,21 +79,57 @@ interface VerifiedCheckpoint { checkpoint: LedgerCheckpointV1; sha256: string }
  * Every checkpoint, verified whole: contiguous sequences, digests, monitor signatures and previous links. Throws when
  * broken. ponytail: O(checkpoints) signature checks per call; cache the verified prefix if years of checkpoints pile up.
  */
-export function readCheckpointChain(workspace: string): VerifiedCheckpoint[] {
+function readCheckpointFiles(workspace: string): { chain: VerifiedCheckpoint[]; authority: DelegationCheckpoint[] } {
   const dir = checkpointsDir(workspace);
-  if (!pathExists(dir)) return [];
-  const sequences = readdirSync(dir).flatMap(name => /^([1-9][0-9]*)\.json$/.exec(name)?.[1] ?? []).map(Number).sort((a, b) => a - b);
-  const monitorKeys = getPublicKeyHistory(workspace, "monitor");
+  const sequences = (pathExists(dir) ? readdirSync(dir) : []).flatMap(name => /^([1-9][0-9]*)\.json$/.exec(name)?.[1] ?? []).map(Number).sort((a, b) => a - b);
+  const authority: DelegationCheckpoint[] = [];
   const chain: VerifiedCheckpoint[] = [];
   for (const [index, sequence] of sequences.entries()) {
     const file = checkpointFileSchema.parse(JSON.parse(boundedFile(join(dir, `${sequence}.json`), 64 * 1024).toString("utf8")) as unknown);
     const digest = sha256Hex(canonicalize(file.checkpoint));
     const broken = sequence !== index + 1 || file.checkpoint.sequence !== sequence ? "sequence gap or mismatch"
-      : digest !== file.sha256 || !verifyHexDigestAny(digest, file.signature, monitorKeys) ? "digest or monitor signature invalid"
+      : file.checkpoint.workspaceId !== workspaceIdFromDirectory(workspace) ? "workspace mismatch"
+        : digest !== file.sha256 ? "digest invalid"
         : file.checkpoint.previousCheckpointSha256 !== (chain[index - 1]?.sha256 ?? null) ? "previous checkpoint link broken" : null;
     if (broken) throw new Error(`ledger checkpoint ${sequence}: ${broken}`);
     chain.push({ checkpoint: file.checkpoint, sha256: digest });
+    authority.push({ sequence, sha256: digest, signature: file.signature, claimedAt: file.checkpoint.claimedAt,
+      ...(file.providerKeyId === undefined ? {} : { providerKeyId: file.providerKeyId }) });
   }
+  return { chain, authority };
+}
+
+export function readCheckpointChain(workspace: string, trust?: TrustContext): VerifiedCheckpoint[] {
+  const state = readOperationalDelegationState(workspace);
+  const { chain, authority } = readCheckpointFiles(workspace);
+  if (chain.length === 0 && state === null) return [];
+  const errors = verifyOperationalCheckpoints(state?.chain ?? [], authority,
+    localLedgerRowKeys(workspace), trust ?? loadTrustContext({}));
+  if (errors.length) throw new Error(`ledger checkpoint authority invalid: ${errors.slice(0, 3).join("; ")}`);
+  return chain;
+}
+
+/**
+ * Internal key-owner migration only, never a public verifier mode. The binder has already opened the matching vault
+ * with its passphrase; its captured delegate must equal this generation's local purpose key. An expired canonical v1
+ * certificate may be renewed, but it never authorizes a current-clock writer. The new provider-signed v2 cutoff is the
+ * final prefix endorsement. Do not export this helper from the package/public verifier entry points.
+ */
+export function readLegacyCheckpointPrefixForKeyMigration(workspace: string, capturedVaultDelegate: string): VerifiedCheckpoint[] {
+  assertOwnerMode(workspace, "keys rotate");
+  const bound = boundProviderKey(workspace, "ledger-row");
+  const fail = (): never => { throw new KeyProviderError("KEY_DELEGATION_INVALID", bound?.binding.provider ?? "file", "the owner checkpoint migration needs a canonical v1 certificate for the exact bound issuer and captured vault ledger key"); };
+  if (bound === null || bound.binding.delegationSha256 !== undefined || capturedVaultDelegate !== getSigningPublicKeyPem(workspace, "ledger-row")) return fail();
+  const bytes = readContainedOrNull(workspace, DELEGATION_REL, 64 * 1024);
+  if (bytes === null) return fail();
+  let signed: ReturnType<typeof parseDelegation>;
+  try { signed = parseDelegation(bytes); } catch { return fail(); }
+  if (signed.delegation.version !== 1 || signed.delegation.delegatePublicKeyPem !== capturedVaultDelegate) return fail();
+  const verdict = verifyDelegation(bytes, { issuerPublicKeyPems: [bound.publicKeyPem], at: new Date(signed.delegation.notBefore) });
+  if (!verdict.valid) return fail();
+  const { chain, authority } = readCheckpointFiles(workspace);
+  const errors = verifyOperationalCheckpoints([], authority, localLedgerRowKeys(workspace), workspaceSelfTrust(workspace));
+  if (errors.length) return fail();
   return chain;
 }
 
@@ -92,14 +150,14 @@ function appendCheckpointEvent(workspace: string, meta: { checkpointSequence: nu
  * ponytail: re-verifies from genesis each checkpoint (O(events)); start from the previous checkpoint's head if large
  * ledgers make the scheduler tick slow.
  */
-function verifiedLedgerHead(workspace: string): { count: number; hash: string } {
+function verifiedLedgerHead(workspace: string, trust: TrustContext): { count: number; hash: string } {
   const ledger = openLedger(workspace);
   try {
     const head = ledger.db.prepare(`SELECT (SELECT COUNT(*) FROM evidence_events) AS count,
       (SELECT id FROM evidence_events ORDER BY rowid DESC LIMIT 1) AS id,
       (SELECT event_hash FROM evidence_events ORDER BY rowid DESC LIMIT 1) AS hash`).get() as { count: number; id: string | null; hash: string | null };
     if (head.id === null || head.hash === null) throw new Error("the ledger is empty; there is nothing to checkpoint");
-    const verified = verifyEvidenceEventIntegrity({ ledger, eventId: head.id });
+    const verified = verifyEvidenceEventIntegrity({ ledger, eventId: head.id, trust });
     if (!verified.ok) throw new Error(`the ledger does not verify up to its head: ${verified.errors.slice(0, 3).join("; ")}`);
     return { count: head.count, hash: head.hash };
   } finally {
@@ -128,8 +186,11 @@ async function stampCheckpoint(workspace: string, entry: VerifiedCheckpoint, tru
 export async function checkpointLedger(workspace: string, trust?: TrustContext): Promise<CheckpointResult> {
   const config = loadTimeConfig(workspace);
   if (!config.tsa.length) throw new Error("ledger checkpoints need at least one time.tsa entry in .amc/amc.config.yaml");
-  const chain = readCheckpointChain(workspace);
-  const head = verifiedLedgerHead(workspace);
+  // Producer-internal input checks may trust the current workspace state; public readers use operator trust.
+  const sourceTrust = workspaceSelfTrust(workspace);
+  const chain = readCheckpointChain(workspace, sourceTrust);
+  const head = verifiedLedgerHead(workspace, sourceTrust);
+  const prepared = boundProviderKey(workspace, "ledger-row");
   let transparency: LedgerCheckpointV1["transparency"] = null;
   if (pathExists(merkleCurrentRootPath(workspace))) {
     const merkle = verifyTransparencyMerkle(workspace);
@@ -143,11 +204,33 @@ export async function checkpointLedger(workspace: string, trust?: TrustContext):
     previousCheckpointSha256: previous?.sha256 ?? null
   };
   const digest = sha256Hex(canonicalize(checkpoint));
-  ensureDir(checkpointsDir(workspace));
-  // "wx": a concurrent writer of the same sequence fails here instead of forking the chain.
-  writeFileSync(join(checkpointsDir(workspace), `${checkpoint.sequence}.json`),
-    `${JSON.stringify({ checkpoint, sha256: digest, signature: signHexDigest(digest, getSigningKey(workspace, "ledger-row")) }, null, 2)}\n`,
-    { flag: "wx", mode: 0o644 });
+  // Provider work is outside the shared synchronous publication lock and before file/TSA side effects.
+  const signed = await signWithPurposeKey(workspace, "ledger-row", Buffer.from(digest, "hex"));
+  withDelegationUseLock(workspace, () => {
+    const current = boundProviderKey(workspace, "ledger-row");
+    if (canonicalize(current?.binding ?? null) !== canonicalize(prepared?.binding ?? null)) {
+      throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", signed.provider, "the ledger issuer or delegation changed while the checkpoint was signed");
+    }
+    const policy = keyPolicy(loadKeysConfig(workspace));
+    if (!policy.allowed.includes(signed.algorithm) || (signed.provider === "file" && policy.requireNonExportable)) {
+      throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", signed.provider, "the current key policy refuses the checkpoint signer");
+    }
+    assertSigningKeyUsable(workspace, "ledger-row", signed.publicKeyPem, signed.provider);
+    if (signed.provider === "file" && !vaultStatus(workspace).unlocked) throw new Error("🔐 Vault locked. Run `amc vault unlock` first, or `amc setup` for first-time setup. Use --no-sign to skip signing where supported.");
+    if (signed.provider === "file" && publicKeyFromPrivate(getSigningKey(workspace, "ledger-row")) !== signed.publicKeyPem) {
+      throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", "file", "the vault ledger key changed while the checkpoint was signed");
+    }
+    const latest = readCheckpointChain(workspace, workspaceSelfTrust(workspace)).at(-1);
+    if ((latest?.sha256 ?? null) !== checkpoint.previousCheckpointSha256 || (latest?.checkpoint.sequence ?? 0) + 1 !== checkpoint.sequence) {
+      throw new Error("the checkpoint head changed while the next checkpoint was signed; retry");
+    }
+    ensureDir(checkpointsDir(workspace));
+    // Omit the optional member for the file provider, preserving existing unbound JSON bytes/order.
+    writeFileSync(join(checkpointsDir(workspace), `${checkpoint.sequence}.json`),
+      `${JSON.stringify({ checkpoint, sha256: digest, signature: signed.signature.toString("base64"),
+        ...(signed.provider === "file" ? {} : { providerKeyId: signed.keyId }) }, null, 2)}\n`,
+      { flag: "wx", mode: 0o644 });
+  });
   const result = await stampCheckpoint(workspace, { checkpoint, sha256: digest }, trust);
   if (result.status === "pending" && config.required) {
     throw new Error(`time.required: checkpoint ${checkpoint.sequence} has no verified token (${result.failures.join("; ") || "no TSA answered"})`);
@@ -158,7 +241,7 @@ export async function checkpointLedger(workspace: string, trust?: TrustContext):
 /** Fetches tokens for checkpoints still pending, oldest first. */
 export async function completePendingCheckpoints(workspace: string, trust?: TrustContext): Promise<CheckpointResult[]> {
   const results: CheckpointResult[] = [];
-  for (const entry of readCheckpointChain(workspace)) {
+  for (const entry of readCheckpointChain(workspace, workspaceSelfTrust(workspace))) {
     if (!pathExists(tokenPath(workspace, entry.checkpoint.sequence))) results.push(await stampCheckpoint(workspace, entry, trust));
   }
   return results;
@@ -180,9 +263,9 @@ export interface AnchorResult { anchor: string; sequence: number; status: Public
 
 /**
  * P1-26: the signed C2SP note for a checkpoint whose transparency tree is RFC 9162, written once to
- * `.amc/transparency/anchors/<sequence>.note`; an existing note must be that text signed by an auditor key.
+ * `.amc/transparency/anchors/<sequence>.note`; retry admission also requires a currently admitted artifact-purpose key.
  */
-function checkpointNote(workspace: string, entry: VerifiedCheckpoint): Buffer {
+async function checkpointNote(workspace: string, entry: VerifiedCheckpoint): Promise<Buffer> {
   const { sequence, transparency } = entry.checkpoint;
   if (transparency?.algorithm !== "rfc9162-sha256") {
     throw new Error(`checkpoint ${sequence} covers no RFC 9162 transparency tree; run \`amc transparency merkle rebuild --algorithm rfc9162-sha256\``);
@@ -191,21 +274,100 @@ function checkpointNote(workspace: string, entry: VerifiedCheckpoint): Buffer {
     treeSize: transparency.leafCount, rootHash: transparency.root });
   const origin = text.slice(0, text.indexOf("\n"));
   const path = checkpointNotePath(workspace, sequence);
-  if (pathExists(path)) {
-    const existing = boundedFile(path, NOTE_MAX_BYTES);
-    if (!getPublicKeyHistory(workspace, "auditor").some(pem => verifySignedNote(existing, { name: origin, publicKeyPem: pem }) === text)) {
-      throw new Error(`${path} is not checkpoint ${sequence}'s note signed by an auditor key`);
-    }
-    return existing;
+  const readExisting = (): Buffer | null => {
+    if (!pathExists(path)) return null;
+    try {
+      const existing = boundedFile(path, NOTE_MAX_BYTES);
+      const legacy = getPublicKeyHistory(workspace, "auditor").some(pem => verifyCanonicalSignedNote(existing, { name: origin, publicKeyPem: pem }) === text);
+      // Point identities only: boundedFile does not return the identity of its opened descriptor.
+      const identity = (stat: Stats): string => canonicalize(
+        [stat.dev, stat.ino, stat.mode, stat.nlink, stat.size, stat.mtimeMs, stat.ctimeMs]);
+      const noteState = (): string => {
+        const before = lstatSync(path), stamp = identity(before);
+        if (!before.isFile() || before.nlink !== 1) throw new Error("stored checkpoint note is not a single-link regular file");
+        if (!boundedFile(path, NOTE_MAX_BYTES).equals(existing) || identity(lstatSync(path)) !== stamp) {
+          throw new Error("stored checkpoint note changed during admission");
+        }
+        return stamp;
+      };
+      const selected = noteState();
+      const historyRel = ".amc/keys/auditor_history.json";
+      const historyState = () => {
+        const bytes = readContainedOrNull(workspace, historyRel, 1024 * 1024);
+        return { bytes, stamp: bytes === null ? null : identity(lstatSync(join(workspace, historyRel))) };
+      };
+      const history = legacy ? null : historyState();
+      const assertHistoryCurrent = (): void => {
+        if (history === null) return;
+        const current = historyState();
+        const sameBytes = history.bytes === null ? current.bytes === null : current.bytes?.equals(history.bytes) === true;
+        if (current.stamp !== history.stamp || !sameBytes) {
+          throw new Error("original auditor history changed during checkpoint note admission");
+        }
+      };
+      let rolePem: string | null = null;
+      if (history !== null && history.bytes !== null) {
+        assertHistoryCurrent();
+        assertNoPendingKeyset(workspace);
+        rolePem = keyFile(workspace, "auditor_ed25519.pub");
+        if (rolePem === null) throw new Error("auditor public key is missing");
+        assertBoundPublicKey(workspace, "artifact-seal", rolePem);
+        const admitted = readHistory(workspace, "auditor", rolePem);
+        if (admitted === null || canonicalize(admitted) !== canonicalize(JSON.parse(history.bytes.toString("utf8")))) {
+          throw new Error("original auditor history is not currently authenticated");
+        }
+      }
+      const required = keysetDeclared(workspace), now = Date.now(), distrust = builtInDistrust();
+      const matching = getPurposeKeyHistory(workspace, "artifact-seal")
+        .filter(pem => verifyCanonicalSignedNote(existing, { name: origin, publicKeyPem: pem }) === text);
+      if (matching.length === 0) throw new Error("signature refused");
+      for (const pem of matching) {
+        const keyId = signingKeyId(pem);
+        if (keyId === null) throw new Error("checkpoint note key is not canonical");
+        assertKeyNotRevoked(workspace, required, keyId, "artifact-seal");
+        if (distrustAt(distrust, keyId, now) !== undefined) throw new Error("checkpoint note key is distrusted");
+      }
+      if (rolePem !== null) {
+        assertNoPendingKeyset(workspace);
+        if (keyFile(workspace, "auditor_ed25519.pub") !== rolePem) throw new Error("original auditor public key changed during admission");
+        assertBoundPublicKey(workspace, "artifact-seal", rolePem);
+      }
+      assertHistoryCurrent();
+      if (noteState() !== selected) throw new Error("stored checkpoint note identity changed during admission");
+      return existing;
+    } catch (error) { throw new Error(`stored checkpoint ${sequence} note is not its canonical auditor signature`, { cause: error }); }
+  };
+  const existing = readExisting();
+  if (existing !== null) return existing; // Reading an already signed note does not mint a new signature.
+  if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize checkpoint note signing");
+  const signer = describePolicySigner(workspace, "MERKLE_ROOT");
+  if (signer.mode === "NOTARY") {
+    throw new Error("the trust config requires the notary for MERKLE_ROOT, and the notary does not provide raw-message C2SP note signing");
   }
-  // Mirrors signDigestWithPolicy: where the notary must sign Merkle roots, the vault key does not sign their checkpoints.
-  if (signingRoute(workspace, "MERKLE_ROOT") === "notary") {
-    throw new Error("the trust config requires the notary for MERKLE_ROOT, and a C2SP note needs a raw Ed25519 signature the notary does not make");
-  }
-  const note = Buffer.from(signNote(text, origin, getSigningKey(workspace, "artifact-seal")), "utf8");
-  ensureDir(anchorsDir(workspace));
-  writeFileSync(path, note, { flag: "wx", mode: 0o644 });
-  return note;
+  const policy = JSON.stringify(loadTrustConfig(workspace));
+  const captured = capturePurposePublication(workspace, "artifact-seal");
+  const sourcePath = join(checkpointsDir(workspace), `${sequence}.json`);
+  const readSource = (): Buffer => {
+    try { return boundedFile(sourcePath, 64 * 1024); }
+    catch (error) { throw new Error("the selected checkpoint note input is unreadable", { cause: error }); }
+  };
+  const source = readSource();
+  const signed = await signWithPurposeKey(workspace, "artifact-seal", Buffer.from(text, "utf8"));
+  const note = Buffer.from(formatSignedNote(text, origin, signed.publicKeyPem, signed.signature), "utf8");
+  return withControlFileLock({ root: anchorsDir(workspace), name: `checkpoint-note-${sequence}`, operation: () => {
+    assertPurposePublicationCurrent(workspace, captured, signed);
+    assertPolicySignerCurrent(workspace, signer);
+    if (JSON.stringify(loadTrustConfig(workspace)) !== policy) throw new Error("checkpoint note signing policy changed while signing");
+    let current: VerifiedCheckpoint | undefined;
+    try { current = readCheckpointChain(workspace, workspaceSelfTrust(workspace)).find(row => row.checkpoint.sequence === sequence); }
+    catch (error) { throw new Error("the selected checkpoint note input no longer verifies", { cause: error }); }
+    if (current?.sha256 !== entry.sha256 || canonicalize(current.checkpoint) !== canonicalize(entry.checkpoint)
+      || !readSource().equals(source)) throw new Error("the selected checkpoint changed while its note was signed");
+    const concurrent = readExisting();
+    if (concurrent !== null) return concurrent;
+    writeFileSync(path, note, { flag: "wx", mode: 0o644 });
+    return note;
+  } });
 }
 
 async function anchorCheckpoint(workspace: string, entry: VerifiedCheckpoint, anchor: TransparencyConfig["anchors"][number], trust: TrustContext): Promise<AnchorResult> {
@@ -215,7 +377,7 @@ async function anchorCheckpoint(workspace: string, entry: VerifiedCheckpoint, an
   const logs = pinnedTransparencyLogs(trust).filter(log => selected.logIds.includes(log.logId));
   if (!logs.length) return result("failed", `none of its logIds (${selected.logIds.join(", ")}) is in a verified trust list`);
   try {
-    const note = checkpointNote(workspace, entry);
+    const note = await checkpointNote(workspace, entry);
     const digest = sha256Hex(note);
     // The token first: a public log entry is permanent, so nothing is submitted that the anchor could not complete.
     const { grant, failures } = await timestampDigest(workspace, digest, trust);
@@ -241,10 +403,10 @@ async function anchorCheckpoint(workspace: string, entry: VerifiedCheckpoint, an
  */
 export async function anchorCheckpoints(workspace: string, trust?: TrustContext, now = Date.now()): Promise<AnchorResult[]> {
   const config = loadTransparencyConfig(workspace);
-  const chain = readCheckpointChain(workspace);
+  const context = trust ?? loadTrustContext();
+  const chain = readCheckpointChain(workspace, context);
   const latest = chain.at(-1);
   if (!config.anchors.length || !latest) return [];
-  const context = trust ?? loadTrustContext();
   const results: AnchorResult[] = [];
   let selected = 0;
   let denied = 0;
@@ -280,7 +442,7 @@ export async function timeCheckpointTick(workspace: string, now = Date.now()): P
   inFlight.add(workspace);
   try {
     await completePendingCheckpoints(workspace);
-    const due = checkpointDue(workspace, config, readCheckpointChain(workspace).at(-1)?.checkpoint, now);
+    const due = checkpointDue(workspace, config, readCheckpointChain(workspace, workspaceSelfTrust(workspace)).at(-1)?.checkpoint, now);
     if (due) await checkpointLedger(workspace);
     return { ran: due, anchors: await anchorCheckpoints(workspace, undefined, now) };
   } catch (error) {
@@ -304,11 +466,11 @@ export interface LedgerTimeline {
  * earliest-genTime checkpoint covering it and below by the latest `time/checkpoint` row before it whose token verified.
  */
 export function ledgerTimeline(workspace: string, events: ReadonlyArray<Pick<EvidenceEvent, "event_hash" | "event_type" | "meta_json">>,
-  opts: { anchors: readonly TimestampAuthority[]; toleranceMinutes?: number }): LedgerTimeline {
+  opts: { anchors: readonly TimestampAuthority[]; toleranceMinutes?: number; trust?: TrustContext }): LedgerTimeline {
   const checkpoints: LedgerTimeline["checkpoints"] = [];
   const upper: Array<{ eventCount: number; attested: AttestedTime }> = [];
   const byTokenSha = new Map<string, AttestedTime>();
-  for (const { checkpoint, sha256: digest } of readCheckpointChain(workspace)) {
+  for (const { checkpoint, sha256: digest } of readCheckpointChain(workspace, opts.trust)) {
     const row = { sequence: checkpoint.sequence, genTime: null as string | null, detail: null as string | null };
     if (!pathExists(tokenPath(workspace, checkpoint.sequence))) { checkpoints.push({ ...row, status: "pending" }); continue; }
     const token = boundedFile(tokenPath(workspace, checkpoint.sequence), TIMESTAMP_TOKEN_MAX_BYTES);

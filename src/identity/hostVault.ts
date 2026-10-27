@@ -280,13 +280,12 @@ export function hostVaultPublicKeyPem(hostDir: string, kind: "auditor" | "sessio
 }
 
 function toBase64Url(value: Buffer): string {
-  return value.toString("base64").replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+  return value.toString("base64url");
 }
 
 function fromBase64Url(value: string): Buffer {
-  const normalized = value.replace(/-/g, "+").replace(/_/g, "/");
-  const pad = normalized.length % 4 === 0 ? "" : "=".repeat(4 - (normalized.length % 4));
-  return Buffer.from(`${normalized}${pad}`, "base64");
+  if (typeof value !== "string") throw new TypeError("base64url input must be a string");
+  return Buffer.from(value, "base64url");
 }
 
 export function signHostPayload(hostDir: string, kind: "auditor" | "session", payloadBytes: Buffer): string {

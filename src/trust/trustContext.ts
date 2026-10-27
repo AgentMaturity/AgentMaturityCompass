@@ -1,6 +1,6 @@
-import { existsSync, lstatSync, readFileSync } from "node:fs";
+import { signingKeyId } from "../keys/algorithmPolicy.js";
+import { existsSync, lstatSync } from "node:fs";
 import { join } from "node:path";
-import { z } from "zod";
 import { resolveAmcHome } from "../credentials/credentialsPaths.js";
 import { getPublicKeyHistory } from "../crypto/keys.js";
 import { AntiRollbackError, highWaterKey, readHighWater, recordHighWater } from "../keys/highWater.js";
@@ -12,9 +12,10 @@ import { LOCAL_PURPOSES } from "../vault/vaultPayload.js";
 import { boundedFile } from "../standard/externalEvidenceFiles.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
+import { builtInDistrust } from "./builtInDistrust.js";
 import { ROLE_PURPOSES, type KeyPurpose } from "./keyPurposes.js";
 import {
-  distrustEntrySchema, ed25519KeyId, parseTrustValue, readSignedTrustListFile, signedTrustListSchema, TrustListError, verifySignedTrustList,
+  ed25519KeyId, parseTrustValue, readSignedTrustListFile, signedTrustListSchema, TrustListError, verifySignedTrustList,
   type DistrustEntry, type TrustList
 } from "./trustList.js";
 
@@ -47,14 +48,6 @@ export interface LoadTrustContextOptions {
   now?: Date;
 }
 
-const builtInDistrustSchema = z.strictObject({ distrust: z.array(distrustEntrySchema) });
-
-/** Shipped with the package; no flag or environment variable disables it, and it beats any pin. */
-function builtInDistrust(): DistrustEntry[] {
-  const text = readFileSync(new URL("./amc-distrust.json", import.meta.url), "utf8");
-  return parseTrustValue(builtInDistrustSchema, JSON.parse(text) as unknown, "built-in amc-distrust.json").distrust;
-}
-
 function fingerprint(value: string, origin: string): string {
   const normalized = value.trim().toLowerCase();
   if (!/^[0-9a-f]{64}$/.test(normalized)) throw new Error(`${origin} must be a 64 hex sha256 fingerprint`);
@@ -67,8 +60,8 @@ export function loadTrustContext(opts: LoadTrustContextOptions = {}): TrustConte
   const explicitPins: TrustPin[] = [];
   if (opts.pubkey) {
     const pem = boundedFile(opts.pubkey.path, 64 * 1024).toString("utf8");
-    const keyId = ed25519KeyId(pem);
-    if (keyId === null) throw new Error(`--pubkey ${opts.pubkey.path} is not an Ed25519 SPKI public key`);
+    const keyId = signingKeyId(pem);
+    if (keyId === null) throw new Error(`--pubkey ${opts.pubkey.path} is not an Ed25519 or ECDSA P-256 SPKI public key`);
     explicitPins.push({ keyId, purposes: [...opts.pubkey.purposes], origin: `--pubkey ${opts.pubkey.path}` });
   }
   const monitor = opts.expectMonitor !== undefined
@@ -157,7 +150,8 @@ export function workspaceSelfTrust(workspace: string, now: Date = new Date()): T
   const migrated = keysetDeclared(workspace);
   const explicitPins = migrated
     ? LOCAL_PURPOSES.flatMap(purpose => getPurposeKeyHistory(workspace, purpose).flatMap(pem => {
-      const keyId = ed25519KeyId(pem);
+      // A provider key the key set binds (P2-08) may be ECDSA P-256.
+      const keyId = signingKeyId(pem);
       return keyId ? [{ keyId, purposes: [purpose], origin: `workspace-self:${purpose}` }] : [];
     }))
     : (Object.keys(ROLE_PURPOSES) as Array<keyof typeof ROLE_PURPOSES>).flatMap(role => {

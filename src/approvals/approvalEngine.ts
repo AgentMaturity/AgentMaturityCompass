@@ -1,4 +1,7 @@
 import { readFileSync } from "node:fs";
+import YAML from "yaml";
+import { captureApprovalBoundInputs, captureApprovalRequestPublication, ApprovalRequestContinuationError } from "./approvalRequestPublication.js";
+import { captureOrgFiles, captureOrgPairs, assertOrgPairsCurrent } from "../org/preparedOrgPairs.js";
 import { userInfo } from "node:os";
 import { join } from "node:path";
 import type { ActionClass, ExecutionMode } from "../types.js";
@@ -13,6 +16,9 @@ import {
   approvalRuleForAction,
   evaluateApprovalRequestPolicy,
   initApprovalPolicy,
+  approvalPolicyPath,
+  defaultApprovalPolicy,
+  captureApprovalPolicyPublication,
   loadApprovalPolicy,
   verifyApprovalPolicySignature,
 } from "./approvalPolicyEngine.js";
@@ -34,6 +40,7 @@ import {
 } from "./approvalChainStore.js";
 import { evaluateApprovalQuorum, isApprovalInitiator } from "./approvalQuorum.js";
 import { AUTHZ_INTENT_SCHEMA } from "../actions/authorizationRecord.js";
+import { captureApprovalConsumptionEntry, type ApprovalConsumptionOptions } from "./approvalConsumptionPublication.js";
 import { parseUserRoles, type UserRole } from "../auth/roles.js";
 
 export interface ApprovalRequestInput {
@@ -219,6 +226,12 @@ export function createApprovalForIntent(input: ApprovalRequestInput): {
       policySig = verifyApprovalPolicySignature(input.workspace);
     }
   }
+  const rule = approvalCreationRule(input, policySig);
+  const created = createApprovalRequestRecord(approvalCreationInput(input, rule, () => requestBoundHashes(input)));
+  return approvalCreationResult(created);
+}
+
+function approvalCreationRule(input: ApprovalRequestInput, policySig: ReturnType<typeof verifyApprovalPolicySignature>) {
   if (!policySig.valid) {
     throw new Error(
       `approval policy signature invalid: ${policySig.reason ?? "unknown"}. ` +
@@ -245,7 +258,11 @@ export function createApprovalForIntent(input: ApprovalRequestInput): {
     ttlMinutes: Math.max(evaluation.rule.ttlMinutes, Math.min(floor.ttlMinutes ?? 0, ttlCap))
   };
   if (floor?.rolesAllowed && rule.requiredApprovals > 0 && rule.rolesAllowed.length === 0) throw new Error("quorumFloor.rolesAllowed leaves no role that may approve");
-  const created = createApprovalRequestRecord({
+  return rule;
+}
+
+function approvalCreationInput(input: ApprovalRequestInput, rule: ReturnType<typeof approvalCreationRule>, hashes: () => ReturnType<typeof requestBoundHashes>) {
+  return {
     workspace: input.workspace,
     agentId: input.agentId,
     intentId: input.intentId,
@@ -260,11 +277,14 @@ export function createApprovalForIntent(input: ApprovalRequestInput): {
     rolesAllowed: parseUserRoles(rule.rolesAllowed),
     ttlMinutes: rule.ttlMinutes,
     requiredAssurancePacks: rule.requireAssurancePacks,
-    boundHashes: requestBoundHashes(input),
+    boundHashes: hashes(),
     // Kept with the signed request so an approver sees the protected facts and a recheck can name what changed.
     ...(input.intentPayload.schema === AUTHZ_INTENT_SCHEMA ? { authorizationIntent: input.intentPayload } : {}),
     ...(input.initiator === undefined ? {} : { initiator: input.initiator })
-  });
+  };
+}
+
+function approvalCreationResult(created: ReturnType<typeof createApprovalRequestRecord>): ReturnType<typeof createApprovalForIntent> {
   return {
     approval: {
       approvalId: created.request.approvalRequestId,
@@ -277,6 +297,76 @@ export function createApprovalForIntent(input: ApprovalRequestInput): {
     filePath: created.path,
     sigPath: created.sigPath
   };
+}
+
+/** Internal maintained async creation. Hashes, policy ownership and publication handles are never supplied as authority. */
+export async function createApprovalForIntentAsync(input: ApprovalRequestInput, options: { beforePublish?: () => void; beforePolicyCapture?: () => void } = {}) {
+  const selected = structuredClone(input), shape = canonicalize(selected), workspace = selected.workspace;
+  const caller = options.beforePublish, raw = captureApprovalBoundInputs(workspace, selected.agentId, selected.workOrderId);
+  options.beforePolicyCapture?.();
+  let expected = captureOrgPairs([approvalPolicyPath(workspace)]), failure = null as { cause: unknown } | null;
+  options.beforePolicyCapture?.();
+  let artifactCurrent: (() => void) | null = null;
+  let policyCurrent: (() => void) | null = null, requestCurrent: (() => void) | null = null;
+  const intrinsic = () => {
+    if (canonicalize(input) !== shape) throw new Error("original approval request input changed");
+    artifactCurrent?.(); raw.assertCurrent(); assertOrgPairsCurrent(expected);
+  };
+  const baseCurrent = () => {
+    if (failure !== null) throw failure.cause;
+    try { intrinsic(); caller?.(); intrinsic(); }
+    catch (cause) { failure = { cause }; throw cause; }
+  };
+  baseCurrent();
+  let hashes: ReturnType<typeof requestBoundHashes> | null = null, hashCaptureStarted = false;
+  let publication: ReturnType<typeof captureApprovalRequestPublication> | null = null;
+  const captureHashes = () => {
+    if (hashCaptureStarted) throw new Error("approval bound-hash recipe already entered");
+    hashCaptureStarted = true; baseCurrent();
+    const actual = requestBoundHashes(selected);
+    raw.assertBoundHashes(actual); baseCurrent(); return actual;
+  };
+  const capturePublication = () => {
+    publication = captureApprovalRequestPublication(workspace, baseCurrent);
+    artifactCurrent = publication.assertPublicCurrent; baseCurrent();
+  };
+  const fullCurrent = () => {
+    if (failure !== null) throw failure.cause;
+    try { baseCurrent(); policyCurrent?.(); requestCurrent?.(); baseCurrent(); }
+    catch (cause) { if (failure === null) failure = { cause }; throw failure.cause; }
+  };
+  try {
+    let policySig = verifyApprovalPolicySignature(workspace);
+    baseCurrent();
+    if (!policySig.valid && !policySig.signatureExists && policySig.reason === "approval policy missing") {
+      // Missing bootstrap moves this actual two-read/fallback/throw recipe before its first await, never after it.
+      hashes = captureHashes(); capturePublication();
+      const bootstrap = captureApprovalPolicyPublication(workspace, Buffer.from(YAML.stringify(defaultApprovalPolicy())),
+        { previous: expected, beforePublish: baseCurrent });
+      const prepared = await bootstrap.prepare(); baseCurrent();
+      prepared.publish(path => {
+        const own = captureOrgFiles([path]).members[0]!;
+        expected = { members: expected.members.map(row => row.path === path ? own : row) };
+      });
+      baseCurrent();
+      const logged = await prepared.appendSigned(); baseCurrent();
+      policyCurrent = () => { prepared.assertCurrent(); logged.assertCurrent(); };
+      policySig = verifyApprovalPolicySignature(workspace);
+    }
+    fullCurrent();
+    const rule = approvalCreationRule(selected, policySig);
+    if (hashes === null) hashes = captureHashes();
+    if (publication === null) capturePublication();
+    raw.assertBoundHashes(hashes); fullCurrent();
+    const created = await publication!.publish(approvalCreationInput(selected, rule, () => hashes!));
+    requestCurrent = created.assertCurrent; fullCurrent();
+    const result = approvalCreationResult(created);
+    fullCurrent(); return Object.freeze({ result, assertCurrent: fullCurrent });
+  } catch (cause) {
+    // The first observed intrinsic/caller refusal survives nested publisher/dispatcher partial wrappers.
+    if (failure !== null && failure.cause !== cause) throw new ApprovalRequestContinuationError(failure.cause, cause);
+    throw cause;
+  }
 }
 
 export function decideApprovalForIntent(params: {
@@ -520,6 +610,21 @@ export function consumeApprovedExecution(params: {
     reason: consumed.replay ? "approval already consumed" : "ok",
     consumedTs: consumed.consumed.consumedTs
   };
+}
+
+/** Genuine publisher-owned public capture precedes the audit caller and its normal private warming. */
+export function captureApprovedExecutionConsumptionEntry(workspace: string) {
+  const entry = captureApprovalConsumptionEntry(workspace);
+  return Object.freeze({ assertPublicCurrent: entry.assertPublicCurrent,
+    selectGrant(input: Parameters<typeof verifyApprovalForExecution>[0] & { executionId?: string | null }, options: ApprovalConsumptionOptions = {}) {
+      const selection = Object.freeze(structuredClone(input));
+      const originalExecution = Object.freeze({ ...selection, workspace: entry.workspace });
+      const verifyOriginalExecution = () => {
+        const verified = verifyApprovalForExecution(originalExecution);
+        if (!verified.ok || verified.approval === null) throw new Error("audit fulfillment approval is not executable");
+      };
+      return entry.selectGrant(selection, verifyOriginalExecution, options);
+    } });
 }
 
 export function approvalStatusPayload(params: {

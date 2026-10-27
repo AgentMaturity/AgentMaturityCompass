@@ -1,3 +1,4 @@
+import { workspaceSelfTrust } from "../trust/trustContext.js";
 import { randomUUID } from "node:crypto";
 import {
   createServer,
@@ -1389,7 +1390,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
         return;
       }
 
-      const budgetStatus = evaluateBudgetStatus(options.workspace, attributedAgentId);
+      const budgetStatus = evaluateBudgetStatus(options.workspace, attributedAgentId, Date.now(), { trust: workspaceSelfTrust(options.workspace) });
       if (!budgetStatus.ok && budgetStatus.reasons.some((reason) => reason.includes("llm "))) {
         appendEvidence({
           eventType: "audit",

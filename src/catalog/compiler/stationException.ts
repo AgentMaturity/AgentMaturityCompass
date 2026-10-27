@@ -2,6 +2,8 @@
 import { z } from "zod";
 import { signatureEnvelopeSchema, verifySignatureEnvelope } from "../../crypto/signing/signatureEnvelope.js";
 import { signDigestWithPolicy } from "../../crypto/signing/signer.js";
+import { prepareFileSignatureWithAuditor } from "../../org/orgSigner.js";
+import { canonicalize } from "../../utils/json.js";
 import { assertOwnerMode } from "../../mode/mode.js";
 import { admitKey } from "../../trust/admission.js";
 import type { TrustContext } from "../../trust/trustContext.js";
@@ -42,10 +44,23 @@ export function stationExceptionDigest(exception: StationMergeException): string
 
 /** Uses the existing plan-signing route; the operator must separately admit its key for config-signature. */
 export function signStationMergeException(workspace: string, exception: Omit<StationMergeException, "signature">): StationMergeException {
-  assertOwnerMode(workspace, "catalog reviewer exception");
+  assertOwnerMode(workspace, "catalog compile");
   const body = stationMergeExceptionSchema.parse(exception);
   const digestHex = stationExceptionDigest(body).slice("sha256:".length);
   return { ...body, signature: signDigestWithPolicy({ workspace, kind: "CONTROL_PLAN", digestHex }) };
+}
+
+/** Awaitable existing direct reviewer API; independent config-purpose admission remains required by the verifier. */
+export async function signStationMergeExceptionAsync(workspace: string, exception: Omit<StationMergeException, "signature">,
+  options: { beforePublish?: () => void } = {}): Promise<StationMergeException> {
+  const beforePublish = options.beforePublish;
+  const beforeSign = () => { beforePublish?.(); assertOwnerMode(workspace, "catalog compile"); };
+  beforeSign();
+  const { signature: _signature, ...body } = stationMergeExceptionSchema.parse(structuredClone(exception));
+  const prepared = await prepareFileSignatureWithAuditor(workspace, "station-merge-exception.json",
+    Buffer.from(canonicalize(body), "utf8"), "CONTROL_PLAN", beforeSign);
+  beforeSign(); prepared.assertCurrent();
+  return stationMergeExceptionSchema.parse({ ...body, signature: JSON.parse(prepared.signatureBytes) as unknown });
 }
 
 /** No key is trusted because the exception names it; no workspace-self or unpinned admission authorizes a waiver. */

@@ -20,12 +20,15 @@ import { z } from "zod";
 import { resolveAmcHome } from "../credentials/credentialsPaths.js";
 import { assertOwnerMode } from "../mode/mode.js";
 import { withControlFileLock } from "../lifecycle/controlFileLock.js";
+import { withAmcConfigPublicationLock } from "../config/configPublicationLock.js";
 import {
   containedExists, ensureContainedDir, readContained, readContainedOrNull, removeContained, renameContained, statStamp, writeContained
 } from "../utils/containedFs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize, parseCanonicalJson } from "../utils/json.js";
 import { ed25519KeyId } from "../trust/trustList.js";
+import { SIGNING_ALGORITHMS, signingKeyId } from "./algorithmPolicy.js";
+import { KEY_PROVIDER_IDS } from "./provider.js";
 import { LOCAL_PURPOSES, type LocalPurpose } from "../vault/vaultPayload.js";
 import { AntiRollbackError, compareHighWater, highWaterKey, highWaterPath, readHighWater, recordHighWater, workspaceScope } from "./highWater.js";
 
@@ -34,16 +37,39 @@ import { AntiRollbackError, compareHighWater, highWaterKey, highWaterPath, readH
  * revocation list and rotation statements. Anything else (`..`, an absolute path, a separator or NUL inside a name, a
  * look-alike Unicode slash) never reaches a filesystem call; the rest is contained by src/utils/containedFs.ts.
  */
-const KEYSET_FILE = /^(?:vault\.amcvault|vault\.amcvault\.meta\.json|previous-vault\.amcvault|keys\/(?:[a-z][a-z-]{0,31}(?:_ed25519)?\.pub|[a-z][a-z-]{0,31}_history\.json(?:\.previous-[0-9a-f]{64})?|revocations\.signed\.json|statements\/[a-z][a-z-]{0,31}\/[1-9][0-9]{0,15}\.json))$/;
+const KEYSET_FILE = /^(?:amc\.config\.yaml(?:\.sig)?|vault\.amcvault|vault\.amcvault\.meta\.json|previous-vault\.amcvault|keys\/(?:[a-z][a-z-]{0,31}(?:_ed25519)?\.pub|[a-z][a-z-]{0,31}_history\.json(?:\.previous-[0-9a-f]{64})?|revocations\.signed\.json|statements\/[a-z][a-z-]{0,31}\/[1-9][0-9]{0,15}\.json|delegations\/(?:ledger-row|[0-9a-f]{64})\.json|delegation-issuers\/[0-9a-f]{64}\.pub|blob-index-authorities\/(?:current|[0-9a-f]{64})\.json|blob-index-issuers\/[0-9a-f]{64}\.pub|blob-index-child\.amcvault|receipt-authorities\/(?:current|[0-9a-f]{64})\.json|receipt-issuers\/[0-9a-f]{64}\.pub|receipt-child\.amcvault))$/;
 const relSchema = z.string().regex(KEYSET_FILE, "not a key-set file");
 const hex = z.string().regex(/^[0-9a-f]{64}$/);
+/** P2-08: a provider-held key bound to a purpose; its public key is `keys/<purpose>-provider.pub`, pinned in `files`. */
+const providerBindingSchema = z.strictObject({
+  provider: z.enum(KEY_PROVIDER_IDS).exclude(["file"]),
+  /** How to reach the key (the ref it was bound from): signing routes by this, never by the editable config. */
+  id: z.string().min(1).max(2048),
+  version: z.string().min(1).max(256).optional(),
+  keyId: hex,
+  algorithm: z.enum(SIGNING_ALGORITHMS),
+  protection: z.enum(["software", "hsm", "external", "unknown"]),
+  protectionBasis: z.enum(["provider-metadata", "configured"]),
+  delegationSha256: hex.optional(),
+  blobIndexAuthoritySha256: hex.optional(),
+  receiptAuthoritySha256: hex.optional()
+});
+export type ProviderBinding = z.infer<typeof providerBindingSchema>;
 const keysetSchema = z.strictObject({
   type: z.literal("amc.keyset"),
   version: z.literal(1),
   generation: z.number().int().positive().safe(),
   keys: z.partialRecord(z.enum(LOCAL_PURPOSES), hex),
   files: z.record(relSchema, hex),
-  statements: z.array(hex)
+  statements: z.array(hex),
+  providers: z.partialRecord(z.enum(LOCAL_PURPOSES), providerBindingSchema).optional()
+}).superRefine((value, ctx) => {
+  for (const [purpose, binding] of Object.entries(value.providers ?? {})) if (purpose !== "receipt" && binding?.receiptAuthoritySha256 !== undefined) {
+    ctx.addIssue({ code: "custom", path: ["providers", purpose, "receiptAuthoritySha256"], message: "receipt authority belongs only to receipt" });
+  }
+  for (const [purpose, binding] of Object.entries(value.providers ?? {})) if (purpose !== "artifact-seal" && binding?.blobIndexAuthoritySha256 !== undefined) {
+    ctx.addIssue({ code: "custom", path: ["providers", purpose, "blobIndexAuthoritySha256"], message: "blob-index authority belongs only to artifact-seal" });
+  }
 });
 const manifestSchema = z.strictObject({
   generation: z.number().int().positive().safe(),
@@ -351,13 +377,30 @@ export function assertBoundPublicKey(workspace: string, purpose: LocalPurpose, p
 }
 
 /**
+ * The provider key the committed key set binds to `purpose` (P2-08) and its pinned public key, or null when the purpose
+ * signs with the vault. Throws when the key set is incomplete or the public key is not the bound one.
+ */
+export function boundProviderKey(workspace: string, purpose: LocalPurpose): { binding: ProviderBinding; publicKeyPem: string } | null {
+  // Presence from the mark-bound key set; the digest checks only once a binding exists, so vault-only readers see no change.
+  // Purpose files without a key set (a 1.x workspace mid-migration) bind no provider key; the vault's own reads refuse them.
+  const binding = boundKeyset(workspace, { allowUnboundFiles: true })?.providers?.[purpose];
+  if (binding === undefined) return null;
+  const keyset = assertKeysetComplete(workspace)!;
+  const publicKeyPem = readContainedOrNull(workspace, keysetFileRel(`keys/${purpose}-provider.pub`), 64 * 1024)?.toString("utf8") ?? null;
+  if (publicKeyPem === null || signingKeyId(publicKeyPem) !== binding.keyId) {
+    throw new KeysetIncompleteError(keyset.generation, `keys/${purpose}-provider.pub is missing or is not the ${binding.provider} key generation ${keyset.generation} binds`);
+  }
+  return { binding, publicKeyPem };
+}
+
+/**
  * Signers: the bound key set (above), after checking that every public key and statement it pins still has its digest.
  * Null for a workspace that has none yet.
  */
 export function assertKeysetComplete(workspace: string, opts: { allowUnboundFiles?: boolean } = {}): Keyset | null {
   const keyset = boundKeyset(workspace, opts);
   if (keyset === null) return null;
-  const listed = Object.keys(keyset.files).filter(pinned);
+  const listed = Object.keys(keyset.files).filter(rel => pinned(rel, keyset.providers));
   const now = statStamp([keysetPaths(workspace).keyset, highWaterPath(), ...listed.map(rel => join(amcDir(workspace), rel))]);
   const memo = checked.get(workspace);
   if (memo && memo.stamp === now) return memo.keyset;
@@ -369,8 +412,14 @@ export function assertKeysetComplete(workspace: string, opts: { allowUnboundFile
 }
 
 /** What readers re-check after the commit: published public keys and rotation statements. */
-function pinned(rel: string): boolean {
-  return rel.endsWith(".pub") || rel.startsWith("keys/statements/");
+function pinned(rel: string, providers?: Keyset["providers"]): boolean {
+  return rel.endsWith(".pub") || rel.startsWith("keys/statements/") || rel.startsWith("keys/delegations/")
+    || rel.startsWith("keys/blob-index-authorities/") || rel === "keys/blob-index-child.amcvault"
+    || rel.startsWith("keys/receipt-authorities/") || rel === "keys/receipt-child.amcvault"
+    || (providers?.receipt !== undefined && rel === "keys/receipt_history.json")
+    || (providers?.["artifact-seal"] !== undefined && rel === "keys/artifact-seal_history.json")
+    || (providers?.session !== undefined && rel === "keys/session_history.json")
+    || (providers?.["config-signature"] !== undefined && rel === "keys/config-signature_history.json");
 }
 
 function recoveryName(rel: string): string {
@@ -381,7 +430,8 @@ function recoveryName(rel: string): string {
  * Commits one generation: recovery copies, staged files, the pending intent, renames, then the commit rename. Any
  * failure before the commit rename leaves a pending generation that every signer and verifier refuses until resume.
  */
-export function commitKeyset(workspace: string, change: { keys: Keyset["keys"]; writes: readonly KeysetWrite[]; statements?: readonly string[] }): Keyset {
+export function commitKeyset(workspace: string, change: { keys: Keyset["keys"]; writes: readonly KeysetWrite[]; statements?: readonly string[]; providers?: Keyset["providers"];
+  expectedGeneration?: number }): Keyset {
   assertOwnerMode(workspace, "keys commit");
   ensureContainedDir(workspace, ".amc/keys");
   return withControlFileLock({ root: amcDir(workspace), name: "keyset", operation: () => {
@@ -389,13 +439,19 @@ export function commitKeyset(workspace: string, change: { keys: Keyset["keys"]; 
     // exactly that generation: a lost key set is restored by `amc keys rotate --restore`, never re-created.
     // The first generation binds purpose files that already match what it writes (publicKeyWrites refuses any other).
     const current = assertKeysetComplete(workspace, { allowUnboundFiles: true });
+    if (change.expectedGeneration !== undefined && current?.generation !== change.expectedGeneration) {
+      throw new Error("the committed key set changed while this generation was prepared; retry the operation");
+    }
     const generation = Math.max(current?.generation ?? 0, readHighWater(markKey(workspace))?.sequence ?? 0) + 1;
     const rows = change.writes.map(write => ({ rel: relOf(workspace, write.path), write }));
     const written = Object.fromEntries(rows.map(({ rel, write }) => [rel, sha256Hex(Buffer.from(write.bytes))]));
     // Every public key and statement in force stays pinned, not only the ones this generation rewrote.
-    const carried = Object.entries(current?.files ?? {}).filter(([rel]) => pinned(rel) && !Object.hasOwn(written, rel));
+    const carried = Object.entries(current?.files ?? {}).filter(([rel]) => pinned(rel, current?.providers) && !Object.hasOwn(written, rel));
     const files = { ...Object.fromEntries(carried), ...written };
-    const next = keysetSchema.parse({ type: "amc.keyset", version: 1, generation, keys: change.keys, files, statements: [...(change.statements ?? [])] });
+    // Provider bindings (P2-08) carry forward unless this generation sets them; none at all keeps the 1.x-era bytes.
+    const providers = change.providers ?? current?.providers;
+    const next = keysetSchema.parse({ type: "amc.keyset", version: 1, generation, keys: change.keys, files, statements: [...(change.statements ?? [])],
+      ...(providers && Object.keys(providers).length > 0 ? { providers } : {}) });
     const manifest = rows.map(({ rel, write }) => {
       const existed = containedExists(workspace, keysetFileRel(rel));
       return { rel, existed, mode: existed ? statSync(join(amcDir(workspace), rel)).mode & 0o777 : write.mode };
@@ -431,6 +487,11 @@ export function commitKeyset(workspace: string, change: { keys: Keyset["keys"]; 
  * otherwise restores the previous bytes saved in `.amc/keys/rotations/gen-<N>/` and drops the pending generation.
  */
 export function resumeKeyset(workspace: string, opts: { vaultKeyIds: VaultKeyIds }): { action: "nothing-pending" | "completed" | "rolled-back"; generation: number | null } {
+  assertOwnerMode(workspace, "keys resume");
+  return withAmcConfigPublicationLock(workspace, () => resumeKeysetLocked(workspace, opts));
+}
+
+function resumeKeysetLocked(workspace: string, opts: { vaultKeyIds: VaultKeyIds }): { action: "nothing-pending" | "completed" | "rolled-back"; generation: number | null } {
   assertOwnerMode(workspace, "keys resume");
   ensureContainedDir(workspace, ".amc/keys");
   return withControlFileLock({ root: amcDir(workspace), name: "keyset", operation: () => {
@@ -513,7 +574,8 @@ function keepCommittedCopies(workspace: string, generation: number, files: Reado
   writeContained(home, `${dir}/keyset.json`, keysetBytes, 0o600);
 }
 
-const restoredMode = (rel: string) => rel.endsWith(".pub") || rel.endsWith(".meta.json") || rel.startsWith("keys/statements/") || rel === "keys/revocations.signed.json" ? 0o644 : 0o600;
+const restoredMode = (rel: string) => rel.endsWith(".pub") || rel.endsWith(".meta.json") || rel.startsWith("keys/statements/")
+  || rel === "keys/revocations.signed.json" || /^amc\.config\.yaml(?:\.sig)?$/.test(rel) ? 0o644 : 0o600;
 
 /**
  * `amc keys rotate --restore` (owner mode): puts back the key set this machine committed, from the copies kept in AMC
@@ -522,6 +584,13 @@ const restoredMode = (rel: string) => rel.endsWith(".pub") || rel.endsWith(".met
  * restored automatically, and nothing this machine did not commit.
  */
 export function restoreCommittedKeyset(workspace: string, opts: { vaultKeyIds: VaultKeyIds }): {
+  generation: number; restored: string[]; missing: string[]; vault: "matches" | "restored";
+} {
+  assertOwnerMode(workspace, "keys restore");
+  return withAmcConfigPublicationLock(workspace, () => restoreCommittedKeysetLocked(workspace, opts));
+}
+
+function restoreCommittedKeysetLocked(workspace: string, opts: { vaultKeyIds: VaultKeyIds }): {
   generation: number; restored: string[]; missing: string[]; vault: "matches" | "restored";
 } {
   assertOwnerMode(workspace, "keys restore");
@@ -541,7 +610,7 @@ export function restoreCommittedKeyset(workspace: string, opts: { vaultKeyIds: V
     for (const [rel, digest] of Object.entries(keyset.files)) {
       const target = keysetFileRel(rel);
       const present = fileSha(workspace, target);
-      if (present === digest || (present !== null && !pinned(rel))) continue; // a vault, list or history that changed since stays
+      if (present === digest || (present !== null && !pinned(rel, keyset.providers))) continue; // mutable vault/list/unbound histories stay
       let bytes: Buffer | null = null;
       for (let generation = mark.sequence; generation >= 1 && bytes === null; generation -= 1) {
         const copy = copyOf(generation, recoveryName(rel));

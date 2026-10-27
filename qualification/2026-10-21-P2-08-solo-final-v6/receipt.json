@@ -1,0 +1,176 @@
+{
+  "schemaVersion": 1,
+  "key": "P2-08",
+  "date": "2026-10-21",
+  "commit": "e2a1b6b0e47d96d4a1fd8a350817aef0b15c318b",
+  "branch": "codex/p2-08-publication-final",
+  "node": "v22.23.3",
+  "pnpm": "10.33.0",
+  "os": "macOS",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "npm run -s build",
+      "exit": 0,
+      "durationMs": 31843
+    },
+    {
+      "cmd": "npm run -s typecheck",
+      "exit": 0,
+      "durationMs": 27268
+    },
+    {
+      "cmd": "npm run -s typecheck:tests",
+      "exit": 0,
+      "durationMs": 41803
+    },
+    {
+      "cmd": "npm run -s lint",
+      "exit": 0,
+      "durationMs": 2931
+    },
+    {
+      "cmd": "npm run -s check:counts",
+      "exit": 0,
+      "durationMs": 784
+    },
+    {
+      "cmd": "npm run -s check:docs-drift",
+      "exit": 0,
+      "durationMs": 366
+    },
+    {
+      "cmd": "npm run -s check:freeze -- --base-ref int",
+      "exit": 0,
+      "durationMs": 1642
+    },
+    {
+      "cmd": "npm run -s check:citations",
+      "exit": 0,
+      "durationMs": 464
+    },
+    {
+      "cmd": "npm run -s check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 1673
+    },
+    {
+      "cmd": "npm run -s check:threat-model",
+      "exit": 0,
+      "durationMs": 201
+    },
+    {
+      "cmd": "npm run -s check:api-ref",
+      "exit": 0,
+      "durationMs": 171
+    },
+    {
+      "cmd": "npm run -s check:schemas",
+      "exit": 0,
+      "durationMs": 568
+    },
+    {
+      "cmd": "npm run -s check:gates",
+      "exit": 0,
+      "durationMs": 288
+    },
+    {
+      "cmd": "npm run -s check:qualification",
+      "exit": 0,
+      "durationMs": 1081
+    },
+    {
+      "cmd": "npm run -s check:catalog-currency",
+      "exit": 0,
+      "durationMs": 398
+    },
+    {
+      "cmd": "npm run -s check:catalog-changelog -- --base-ref int",
+      "exit": 0,
+      "durationMs": 851
+    },
+    {
+      "cmd": "npm run -s check:catalog-admission",
+      "exit": 0,
+      "durationMs": 2481
+    },
+    {
+      "cmd": "npm run -s check:industry-guides",
+      "exit": 0,
+      "durationMs": 357
+    },
+    {
+      "cmd": "npm run -s check:regulatory-calendar",
+      "exit": 0,
+      "durationMs": 201
+    },
+    {
+      "cmd": "npm run -s check:clean-source",
+      "exit": 0,
+      "durationMs": 56693
+    },
+    {
+      "cmd": "npm run -s check:duplicates",
+      "exit": 0,
+      "durationMs": 619
+    },
+    {
+      "cmd": "npm run -s check:dead-code",
+      "exit": 0,
+      "durationMs": 3193
+    },
+    {
+      "cmd": "npm run -s release:notes -- --check",
+      "exit": 0,
+      "durationMs": 183
+    },
+    {
+      "cmd": "npm run -s audit:runtime",
+      "exit": 0,
+      "durationMs": 599
+    },
+    {
+      "cmd": "npm run -s check:third-party-notices",
+      "exit": 0,
+      "durationMs": 173
+    },
+    {
+      "cmd": "npm run -s check:packed-install",
+      "exit": 0,
+      "durationMs": 60285
+    },
+    {
+      "cmd": "pnpm exec vitest run tests/keys/pkcs11Softhsm.test.ts --maxWorkers=1 --reporter=verbose --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-fixture-final-softhsm-v6/vitest.json",
+      "exit": 0,
+      "durationMs": 671
+    }
+  ],
+  "tests": null,
+  "artifacts": [
+    {
+      "path": "BLOCKERS.md",
+      "sha256": "5e3ca0ab4df5da75cf11c19f1e464b4cfbef976966e59798a764d003120720d0"
+    },
+    {
+      "path": "README.md",
+      "sha256": "ab689c2e2b091d8bc9a01079fe789552130c1bfda00386700dadaec38a6d4196"
+    },
+    {
+      "path": "acceptance-matrix.json",
+      "sha256": "01ce7f01bf38974e8a28e01af0f5047daef5530ca0adcb12dd226ec4d6e8348b"
+    },
+    {
+      "path": "checks.json",
+      "sha256": "d198e79a0c5d7731901b16d493cdd3bca50e32983e50e72fa5e1ccdb72eb1816"
+    },
+    {
+      "path": "input-pins.json",
+      "sha256": "01ab34bf231d46a51cb7c0895440f91f2cb3cbdc7f214816bc6e741684e43444"
+    },
+    {
+      "path": "mutation-results.json",
+      "sha256": "e13438aec8a8dd42211eed832819f7867185d5dbd70b8e69d3cf85a6585901ee"
+    }
+  ],
+  "notes": "Actual clean product-H 27 command measurements only. Final metadata-Q unfiltered full and eligibility/classification pending; no formal or all-purpose acceptance claim. Prior Q60 failed full and developmental repair evidence are pinned separately. Local software token is not hardware/CI/live-cloud evidence."
+}

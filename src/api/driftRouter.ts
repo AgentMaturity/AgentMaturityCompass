@@ -4,6 +4,8 @@
  */
 
 import type { IncomingMessage, ServerResponse } from 'node:http';
+import { KeyProviderError } from '../keys/provider.js';
+import { initAlertsConfigAsync } from '../drift/alerts.js';
 import { bodyJson, apiSuccess, apiError, queryParam } from './apiHelpers.js';
 
 export async function handleDriftRoute(
@@ -11,7 +13,8 @@ export async function handleDriftRoute(
   method: string,
   req: IncomingMessage,
   res: ServerResponse,
-  workspace = process.cwd()
+  workspace = process.cwd(),
+  revalidateAuthority?: () => boolean
 ): Promise<boolean> {
   if (!pathname.startsWith('/api/v1/drift')) return false;
 
@@ -19,15 +22,15 @@ export async function handleDriftRoute(
   if (pathname === '/api/v1/drift/check' && method === 'POST') {
     try {
       const body = await bodyJson<{ agentId?: string; against?: 'previous' }>(req);
-      const { driftCheckCli } = await import('../drift/driftCli.js');
-      const result = await driftCheckCli({
-        workspace,
-        agentId: body.agentId,
-        against: body.against ?? 'previous'
-      });
+      const drift = await import('../drift/driftCli.js');
+      const input = { workspace, agentId: body.agentId, against: body.against ?? 'previous' as const };
+      const guard = () => { if (!revalidateAuthority?.()) { if (!res.headersSent) apiError(res, 403, 'Current authority no longer permits this operation'); throw new Error('Current authority no longer permits this operation'); } };
+      if (revalidateAuthority !== undefined) guard();
+      const result = revalidateAuthority === undefined ? await drift.driftCheckCli(input) : await drift.driftCheckCliForAuthority(input, guard);
       apiSuccess(res, result);
     } catch (err) {
-      apiError(res, 500, err instanceof Error ? err.message : 'Drift check failed');
+      if (!res.headersSent) apiError(res, revalidateAuthority !== undefined && err instanceof KeyProviderError ? err.status : 500,
+        revalidateAuthority !== undefined ? err instanceof KeyProviderError ? err.code : 'Drift check failed' : err instanceof Error ? err.message : 'Drift check failed');
     }
     return true;
   }
@@ -85,16 +88,15 @@ export async function handleDriftRoute(
         apiError(res, 400, 'Required: agentId, incidentId, reason');
         return true;
       }
-      const { freezeLiftCli } = await import('../drift/driftCli.js');
-      const result = freezeLiftCli({
-        workspace,
-        agentId: body.agentId,
-        incidentId: body.incidentId,
-        reason: body.reason
-      });
+      const drift = await import('../drift/driftCli.js');
+      const input = { workspace, agentId: body.agentId, incidentId: body.incidentId, reason: body.reason };
+      const guard = () => { if (!revalidateAuthority?.()) { if (!res.headersSent) apiError(res, 403, 'Current authority no longer permits this operation'); throw new Error('Current authority no longer permits this operation'); } };
+      if (revalidateAuthority !== undefined) guard();
+      const result = revalidateAuthority === undefined ? drift.freezeLiftCli(input) : await drift.freezeLiftCliForAuthority(input, guard);
       apiSuccess(res, { lifted: true, ...result });
     } catch (err) {
-      apiError(res, 500, err instanceof Error ? err.message : 'Freeze lift failed');
+      if (!res.headersSent) apiError(res, revalidateAuthority !== undefined && err instanceof KeyProviderError ? err.status : 500,
+        revalidateAuthority !== undefined ? err instanceof KeyProviderError ? err.code : 'Freeze lift failed' : err instanceof Error ? err.message : 'Freeze lift failed');
     }
     return true;
   }
@@ -102,11 +104,12 @@ export async function handleDriftRoute(
   // POST /api/v1/drift/alerts/init — initialize alerts config
   if (pathname === '/api/v1/drift/alerts/init' && method === 'POST') {
     try {
-      const { initAlertsConfig } = await import('../drift/alerts.js');
-      const result = initAlertsConfig(workspace);
+      const guard = () => { if (!revalidateAuthority?.()) { if (!res.headersSent) apiError(res, 403, 'Current authority no longer permits this operation'); throw new Error('Current authority no longer permits this operation'); } };
+      const result = await initAlertsConfigAsync(workspace, revalidateAuthority === undefined ? undefined : guard);
       apiSuccess(res, { initialized: true, ...result });
     } catch (err) {
-      apiError(res, 500, err instanceof Error ? err.message : 'Alerts init failed');
+      if (!res.headersSent) apiError(res, revalidateAuthority !== undefined && err instanceof KeyProviderError ? err.status : 500,
+        revalidateAuthority !== undefined ? err instanceof KeyProviderError ? err.code : 'Alerts init failed' : err instanceof Error ? err.message : 'Alerts init failed');
     }
     return true;
   }

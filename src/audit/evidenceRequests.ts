@@ -1,5 +1,9 @@
 import { randomUUID } from "node:crypto";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
+import { assertOrgPairsCurrent, captureOrgFiles, orgPairBytes } from "../org/preparedOrgPairs.js";
+import { safeIdSchema } from "../utils/pathSafety.js";
+import { captureAuditOutputAliases } from "./binderOutputAliases.js";
+import type { AuditPublicationOptions } from "./binderPublication.js";
 import { readdirSync, rmSync } from "node:fs";
 import { z } from "zod";
 import {
@@ -13,10 +17,10 @@ import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js
 import { sha256Hex } from "../utils/hash.js";
 import { type UserRole } from "../auth/roles.js";
 import {
-  createEvidenceRequest,
+  createEvidenceRequest, createEvidenceRequestAsync,
   listEvidenceRequests,
   loadEvidenceRequest,
-  updateEvidenceRequest
+  updateEvidenceRequest, rejectEvidenceRequestAsync
 } from "./evidenceRequestStore.js";
 import { evidenceRequestItemSchema, type EvidenceRequest } from "./evidenceRequestSchema.js";
 
@@ -313,4 +317,42 @@ export function markAuditEvidenceRequestFulfilled(params: {
     approvalRequestId: pending.approvalRequestId,
     approvals
   };
+}
+
+/** A completed request mutation can precede a refused or partial pending-file removal. */
+export class AuditEvidenceRequestExecutionError extends Error {
+  readonly code = "AUDIT_REQUEST_EXECUTION_INCOMPLETE";
+  constructor(readonly requestId: string, readonly completedRequest: Awaited<ReturnType<typeof rejectEvidenceRequestAsync>>["progress"],
+    readonly pendingRemoveAttempted: boolean, readonly pendingRemoveReturned: boolean, readonly pendingRemoveAcknowledged: boolean, cause: unknown) {
+    super("audit evidence request mutation completed but its pending-file continuation did not finish", { cause }); this.name = "AuditEvidenceRequestExecutionError";
+  }
+}
+export async function createAuditEvidenceRequestAsync(params: Parameters<typeof createAuditEvidenceRequest>[0], options: AuditPublicationOptions = {}) {
+  const input = structuredClone(params), workspace = resolve(input.workspace), caller = { ...options };
+  const attempt = await createEvidenceRequestAsync({ workspace, scopeType: input.scopeType,
+    scopeId: input.scopeType === "WORKSPACE" ? "workspace" : input.scopeId, requestedItems: toRequestedItems(input.requestedItems),
+    requesterUserIdHash: sha256Hex(input.requesterUserId).slice(0, 16) }, caller);
+  attempt.assertCurrent(); return { request: attempt.request, path: attempt.path, sigPath: attempt.sigPath };
+}
+export async function rejectAuditEvidenceRequestAsync(params: Parameters<typeof rejectAuditEvidenceRequest>[0], options: AuditPublicationOptions = {}) {
+  const requestId = safeIdSchema.parse(params.requestId), workspace = resolve(params.workspace), caller = { ...options };
+  const path = pendingPath(workspace, requestId), original = captureOrgFiles([path]); let expected = original;
+  const beforePublish = () => { caller.beforePublish?.(); assertOrgPairsCurrent(expected); };
+  const originalOutputs = caller.assertOutputsSafe; let aliases: (() => void) | null = null, selectedPaths: string | null = null;
+  const attempt = await rejectEvidenceRequestAsync({ workspace, requestId }, { ...caller, beforePublish,
+    assertOutputsSafe(paths) { originalOutputs?.(paths); const key = JSON.stringify(paths);
+      if (selectedPaths !== null && selectedPaths !== key) throw new Error("audit request output selection changed");
+      if (aliases === null) { selectedPaths = key; aliases = captureAuditOutputAliases(paths, [path]); }
+      aliases(); assertOrgPairsCurrent(expected); } });
+  let pendingRemoveAttempted = false, pendingRemoveReturned = false, pendingRemoveAcknowledged = false;
+  try {
+    attempt.assertCurrent();
+    if (orgPairBytes(original, path) !== null) {
+      pendingRemoveAttempted = true; rmSync(path, { force: true }); pendingRemoveReturned = true;
+      const absent = captureOrgFiles([path]);
+      if (orgPairBytes(absent, path) !== null) throw new Error("removed audit request pending file is not absent");
+      expected = absent; pendingRemoveAcknowledged = true;
+    }
+    attempt.assertCurrent(); return attempt.request;
+  } catch (cause) { throw new AuditEvidenceRequestExecutionError(requestId, attempt.progress, pendingRemoveAttempted, pendingRemoveReturned, pendingRemoveAcknowledged, cause); }
 }

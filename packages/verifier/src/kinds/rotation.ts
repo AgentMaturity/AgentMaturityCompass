@@ -4,7 +4,7 @@
  * signature only proves possession. A root-set rotation is authorized by the pinned root set it replaces. Neither ever
  * changes a pin: the trust-list owner publishes a new list.
  */
-import { canonicalize, ed25519KeyId, same, tagged, verifyEd25519 } from "../bytes.js";
+import { canonicalize, signingKeyId, same, statementMessage, verifySignature } from "../bytes.js";
 import type { Finding } from "../codes.js";
 import type { Env, Evaluation } from "../evaluation.js";
 import { signedKeyRotation, signedRootRotation } from "../records/statements.js";
@@ -23,12 +23,12 @@ export function evaluateKeyRotation(value: unknown, bytes: Uint8Array, env: Env)
   const { statement, signatures } = parsed.value;
   const integrity: Finding<"integrity">[] = chainHead(statement.sequence, statement.previousStatementSha256);
   const unverifiable: string[] = [];
-  if (!same(ed25519KeyId(statement.nextPublicKeyPem) ?? "", statement.nextKeyId)) integrity.push({ code: "DIGEST_MISMATCH", detail: "nextKeyId is not the key id of nextPublicKeyPem" });
+  if (!same(signingKeyId(statement.nextPublicKeyPem) ?? "", statement.nextKeyId)) integrity.push({ code: "DIGEST_MISMATCH", detail: "nextKeyId is not the key id of nextPublicKeyPem" });
   const span = statement.overlap === null ? null : Date.parse(statement.overlap.notAfter) - Date.parse(statement.overlap.notBefore);
   if (statement.reason === "key-compromise" ? span !== null : span !== null && (span <= 0 || span > MAX_OVERLAP_DAYS * DAY_MS)) {
     integrity.push({ code: "MALFORMED", detail: `overlap must be null for key-compromise, otherwise positive and at most ${MAX_OVERLAP_DAYS} days` });
   }
-  const message = tagged("AMC_KEY_ROTATION_V1", canonicalize(statement));
+  const message = statementMessage("AMC_KEY_ROTATION_V1", "AMC_KEY_ROTATION_V2_DIGEST", canonicalize(statement), parsed.value.signatureVersion);
   const admissions: Admission[] = [];
   const admissionFindings: Finding<"issuerAdmission">[] = [];
   const isRotated = (keyId: string) => same(keyId, statement.nextKeyId) || (statement.previousKeyId !== null && same(keyId, statement.previousKeyId));
@@ -47,7 +47,7 @@ export function evaluateKeyRotation(value: unknown, bytes: Uint8Array, env: Env)
     }
     const pem = row.by === "next" ? statement.nextPublicKeyPem : row.by === "previous" ? listedPem(env.ctx, row.keyId) : env.ctx.rootPems.get(row.keyId) ?? null;
     if (pem === null) unverifiable.push(`${row.by} signature by ${row.keyId}: its key is not in the supplied trust lists`);
-    else if (!verifyEd25519(message, pem, Buffer.from(row.signature, "base64"))) {
+    else if (!verifySignature(message, pem, Buffer.from(row.signature, "base64"))) {
       integrity.push({ code: "SIGNATURE_INVALID", detail: `the ${row.by} signature by ${row.keyId} does not verify` });
     } else if (row.by === "root") {
       const admission = rootAdmission(`root signature ${row.keyId}`, row.keyId, env.ctx);
@@ -89,7 +89,7 @@ export function evaluateRootRotation(value: unknown, bytes: Uint8Array, env: Env
   if ((statement.newThreshold < currentThreshold || statement.newRoots.length < statement.previousRoots.length) && !statement.allowDecrease) {
     integrity.push({ code: "MALFORMED", detail: "it lowers the threshold or the set size without allowDecrease" });
   }
-  const message = tagged("amc.root-rotation/v1", canonicalize(statement));
+  const message = statementMessage("amc.root-rotation/v1", "amc.root-rotation/v2-digest", canonicalize(statement), parsed.value.signatureVersion);
   const admissions: Admission[] = [];
   let newSigned = 0;
   let currentSigned = 0;
@@ -100,7 +100,7 @@ export function evaluateRootRotation(value: unknown, bytes: Uint8Array, env: Env
       integrity.push({ code: "MALFORMED", detail: `the ${row.by} signature by ${row.keyId} is not by a key of the ${row.by} root set` });
     } else if (pem === null) {
       unverifiable.push(`current signature by ${row.keyId}: no supplied trust list carries this pinned root's key`);
-    } else if (!verifyEd25519(message, pem, Buffer.from(row.signature, "base64"))) {
+    } else if (!verifySignature(message, pem, Buffer.from(row.signature, "base64"))) {
       integrity.push({ code: "SIGNATURE_INVALID", detail: `the ${row.by} signature by ${row.keyId} does not verify` });
     } else if (row.by === "new") newSigned += 1;
     else {

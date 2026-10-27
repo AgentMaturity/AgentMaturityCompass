@@ -4,7 +4,7 @@ import { sha256Hex } from "../utils/hash.js";
 import { KEY_PURPOSES, ROLE_PURPOSES, type KeyPurpose } from "./keyPurposes.js";
 import type { TrustContext } from "./trustContext.js";
 import { distrustAt, listsAt } from "./admissionRule.js";
-import { ed25519KeyId } from "./trustList.js";
+import { signingKeyId } from "../keys/algorithmPolicy.js";
 
 export const issuerAdmissionSchema = z.strictObject({
   signature: z.string(),
@@ -95,12 +95,12 @@ function admitFromHistory(keyId: string, purpose: KeyPurpose, history: unknown, 
 export function admitKey(input: AdmitKeyInput): IssuerAdmission {
   const { purpose, context } = input;
   // The id of the key, not of the PEM text, so a CRLF or otherwise re-encoded copy matches the same pins and distrust.
-  const canonicalId = input.publicKeyPem === null ? null : ed25519KeyId(input.publicKeyPem);
+  const canonicalId = input.publicKeyPem === null ? null : signingKeyId(input.publicKeyPem);
   const keyId = input.publicKeyPem === null ? null : canonicalId ?? sha256Hex(Buffer.from(input.publicKeyPem, "utf8"));
   const result = (verdict: Verdict): IssuerAdmission => ({ signature: input.signature, purpose, keyId, ...verdict });
   const refuse = (status: IssuerAdmission["status"], detail: string) => result({ status, source: null, listId: null, timeBasis: null, detail });
   if (keyId === null) return refuse("not-pinned", "the artifact names no public key for this signature");
-  if (canonicalId === null) return refuse("not-pinned", `key ${keyId} is not an Ed25519 SPKI public key, so no pin can admit it`);
+  if (canonicalId === null) return refuse("not-pinned", `key ${keyId} is not an Ed25519 or ECDSA P-256 SPKI public key, so no pin can admit it`);
   const claimed = time(input.claimedSignedAt);
 
   // 1. Distrust beats every pin and every allow flag. It is judged at the verification time, never a claimed one.

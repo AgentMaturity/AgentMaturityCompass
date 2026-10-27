@@ -21,7 +21,8 @@ export async function handleBenchmarkRoute(
   method: string,
   req: IncomingMessage,
   res: ServerResponse,
-  workspace = process.cwd()
+  workspace = process.cwd(),
+  revalidateAuthority?: () => boolean
 ): Promise<boolean> {
   if (!pathname.startsWith('/api/v1/benchmarks')) return false;
 
@@ -53,6 +54,16 @@ export async function handleBenchmarkRoute(
   // POST /api/v1/benchmarks/export — export a benchmark artifact
   if (pathname === '/api/v1/benchmarks/export' && method === 'POST') {
     try {
+      const beforePublish = () => {
+        if (revalidateAuthority?.() === false) {
+          if (!res.headersSent) apiError(res, 403, 'Authenticated authority changed before benchmark publication');
+          throw new Error('authenticated authority changed before benchmark publication');
+        }
+      };
+      if (revalidateAuthority?.() === false) {
+        if (!res.headersSent) apiError(res, 403, 'Authenticated authority changed before benchmark publication');
+        return true;
+      }
       const body = await bodyJson<{
         agentId?: string;
         runId: string;
@@ -66,8 +77,8 @@ export async function handleBenchmarkRoute(
         apiError(res, 400, 'Required: runId, outFile');
         return true;
       }
-      const { exportBenchmarkArtifact } = await import('../benchmarks/benchExport.js');
-      const result = exportBenchmarkArtifact({
+      const benchmarkExport = await import('../benchmarks/benchExport.js');
+      const input = {
         workspace,
         agentId: body.agentId,
         runId: body.runId,
@@ -76,9 +87,11 @@ export async function handleBenchmarkRoute(
         publisherContact: body.publisherContact,
         publicAgentId: body.publicAgentId,
         notes: body.notes,
-      });
+      };
+      const result = revalidateAuthority === undefined ? benchmarkExport.exportBenchmarkArtifact(input) : await benchmarkExport.exportBenchmarkArtifactAsync(input, { beforePublish });
       apiSuccess(res, { exported: true, outFile: result.outFile, benchId: result.bench.benchId });
     } catch (err) {
+      if (res.headersSent) return true;
       apiError(res, 500, err instanceof Error ? err.message : 'Benchmark export failed');
     }
     return true;

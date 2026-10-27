@@ -30,13 +30,13 @@ import {
   pluginsInstalledLockPath,
   pluginsRegistriesPath,
   saveInstalledPluginsLock,
-  savePluginRegistriesConfig,
   verifyInstalledPluginsLock,
   verifyPluginOverrides,
   verifyPluginRegistriesConfig
 } from "./pluginStore.js";
 import { pluginRiskCategorySchema } from "./pluginTypes.js";
 import { verifyInstalledPluginsIntegrity } from "./pluginVerifier.js";
+import { initializePluginFiles, initializePluginFilesAsync } from "./pluginPublication.js";
 
 const pendingPluginActionSchema = z.object({
   v: z.literal(1),
@@ -71,7 +71,6 @@ export function initPluginWorkspace(params: {
   lockPath: string;
   lockSigPath: string;
 } {
-  ensurePluginsStore(params.workspace);
   const registries = defaultPluginRegistriesConfig();
   if (params.includeDefaultRegistry) {
     registries.pluginRegistries.registries = [
@@ -83,18 +82,20 @@ export function initPluginWorkspace(params: {
       }
     ];
   }
-  const registriesSaved = savePluginRegistriesConfig(params.workspace, registries);
-  const lockSaved = saveInstalledPluginsLock(params.workspace, defaultInstalledPluginsLock(params.workspace));
-  return {
-    registriesPath: registriesSaved.path,
-    registriesSigPath: registriesSaved.sigPath,
-    lockPath: lockSaved.path,
-    lockSigPath: lockSaved.sigPath
-  };
+  return initializePluginFiles(params.workspace, registries, defaultInstalledPluginsLock(params.workspace));
+}
+
+/** Actual async initializer preserves authenticated existing files and fills only missing complete pairs. */
+export async function initPluginWorkspaceAsync(params: Parameters<typeof initPluginWorkspace>[0]): Promise<ReturnType<typeof initPluginWorkspace>> {
+  const registries = defaultPluginRegistriesConfig();
+  if (params.includeDefaultRegistry) registries.pluginRegistries.registries = [{ ...params.includeDefaultRegistry,
+    allowPluginPublishers: [], allowRiskCategories: ["LOW", "MEDIUM", "HIGH", "CRITICAL"], autoUpdate: false }];
+  return initializePluginFilesAsync(params.workspace, registries, defaultInstalledPluginsLock(params.workspace));
 }
 
 export function verifyPluginWorkspace(params: {
   workspace: string;
+  readonly?: boolean;
 }): {
   ok: boolean;
   errors: string[];
@@ -137,7 +138,7 @@ export function verifyPluginWorkspace(params: {
   const registries = verifyPluginRegistriesConfig(params.workspace);
   const overrides = verifyPluginOverrides(params.workspace);
   const lock = verifyInstalledPluginsLock(params.workspace);
-  const integrity = verifyInstalledPluginsIntegrity(params.workspace);
+  const integrity = verifyInstalledPluginsIntegrity(params.workspace, { readonly: params.readonly === true });
   const errors: string[] = [];
   if (!registries.valid) {
     errors.push(`registries signature invalid: ${registries.reason ?? "unknown"}`);

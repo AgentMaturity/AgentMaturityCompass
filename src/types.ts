@@ -3394,6 +3394,8 @@ export interface AMCConfig {
   time?: unknown;
   /** P1-26 public anchoring, kept as written; src/transparency/anchors/anchor.ts parses it strictly. */
   transparency?: unknown;
+  /** P2-08 key providers, kept as written; src/keys/keysConfig.ts parses it strictly. */
+  keys?: unknown;
 }
 
 export interface GatePolicy {

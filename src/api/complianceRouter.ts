@@ -1,3 +1,4 @@
+import * as policyPacks from "../policyPacks/packCli.js";
 /**
  * complianceRouter.ts — Compliance, policy, waiver, and regulatory scoring API routes.
  * Full parity with: amc compliance *, amc policy *, amc waiver *,
@@ -9,6 +10,9 @@ import type { ComplianceFramework } from '../compliance/frameworks.js';
 import { verifyUsersConfigSignature } from '../auth/authApi.js';
 import { bodyJson, bodyJsonSchema, apiSuccess, apiError, isRequestBodyError, pathParam, queryParam } from './apiHelpers.js';
 import { verifyTrustConfigSignature } from '../trust/trustConfig.js';
+import { KEY_PROVIDER_ERRORS, KeyProviderError } from '../keys/provider.js';
+import { KeyRevokedError } from '../keys/keyRevocations.js';
+import { assertVaultMaySign } from '../keys/signingKeys.js';
 
 const SCOPE_TEMPLATE_ERROR_CODES = new Set([
   'TEMPLATE_NOT_FOUND',
@@ -99,7 +103,8 @@ export async function handleComplianceRoute(
   method: string,
   req: IncomingMessage,
   res: ServerResponse,
-  workspace = process.cwd()
+  workspace = process.cwd(),
+  revalidateAuthority?: () => boolean
 ): Promise<boolean> {
   // ── Compliance routes (/api/v1/compliance/*) ───────────────────
   if (pathname.startsWith('/api/v1/compliance')) {
@@ -451,15 +456,21 @@ export async function handleComplianceRoute(
       try {
         const body = await bodyJson<{ packId: string; agentId?: string }>(req);
         if (!body.packId) { apiError(res, 400, 'packId required'); return true; }
-        const { policyPackApplyCli } = await import('../policyPacks/packCli.js');
-        const applied = policyPackApplyCli({
-          workspace,
-          agentId: body.agentId,
-          packId: body.packId,
-        });
+        const beforePublish = () => {
+          if (revalidateAuthority?.() === false) {
+            if (!res.headersSent) apiError(res, 403, 'authenticated authority changed while policy-pack application was prepared');
+            throw new Error('policy-pack caller authority changed');
+          }
+        };
+        const input = { workspace, agentId: body.agentId, packId: body.packId }; beforePublish();
+        const applied = revalidateAuthority === undefined ? policyPacks.policyPackApplyCli(input)
+          : await policyPacks.policyPackApplyCliAsync(input, { beforePublish });
         apiSuccess(res, applied);
       } catch (err) {
-        apiError(res, 500, err instanceof Error ? err.message : 'Policy pack apply failed');
+        if (res.headersSent) return true;
+        if (err instanceof KeyProviderError && Object.hasOwn(KEY_PROVIDER_ERRORS, err.code)) { apiError(res, KEY_PROVIDER_ERRORS[err.code], err.code + ': policy-pack signing refused'); return true; }
+        if (err instanceof KeyRevokedError) { apiError(res, 409, 'KEY_REVOKED: policy-pack signing key was revoked'); return true; }
+        apiError(res, 500, 'Policy pack apply failed');
       }
       return true;
     }
@@ -474,7 +485,7 @@ export async function handleComplianceRoute(
         if (!body.requirement || !body.justification || !body.expires) {
           apiError(res, 400, 'requirement, justification, and expires required'); return true;
         }
-        const { registerPolicyDebt } = await import('../governor/policyCanary.js');
+        const debt = await import('../governor/policyCanary.js');
         const agentId = body.agentId ?? 'default';
         let expiresTs: number;
         if (/^\d+$/.test(body.expires)) {
@@ -490,16 +501,31 @@ export async function handleComplianceRoute(
             expiresTs = Date.now() + 86400000;
           }
         }
-        const entry = registerPolicyDebt({
+        const input = {
           agentId,
           waivedRequirement: body.requirement,
           justification: body.justification,
           expiresTs,
           createdBy: body.createdBy ?? 'operator',
-        }, workspace);
+        };
+        const beforePublish = () => {
+          if (revalidateAuthority?.() === false) {
+            if (!res.headersSent) apiError(res, 403, 'authenticated authority changed while the request was prepared');
+            throw new Error('policy debt authority changed while signing was prepared');
+          }
+        };
+        beforePublish();
+        if (revalidateAuthority === undefined) assertVaultMaySign(workspace, 'artifact-seal');
+        const entry = revalidateAuthority === undefined ? debt.registerPolicyDebt(input, workspace)
+          : await debt.registerPolicyDebtAsync(input, workspace, { beforePublish });
         apiSuccess(res, { debtId: entry.debtId }, 201);
       } catch (err) {
-        apiError(res, 500, err instanceof Error ? err.message : 'Policy debt registration failed');
+        if (res.headersSent) return true;
+        if (err instanceof KeyProviderError && Object.hasOwn(KEY_PROVIDER_ERRORS, err.code)) { apiError(res, KEY_PROVIDER_ERRORS[err.code], err.code + ': policy debt signing refused'); return true; }
+        if (err instanceof KeyRevokedError) { apiError(res, 409, 'KEY_REVOKED: policy debt signing key was revoked'); return true; }
+        if (err instanceof Error && (err.message === '🔐 Vault locked. Run `amc vault unlock` first, or `amc setup` for first-time setup. Use --no-sign to skip signing where supported.'
+          || err.message === '🔐 Vault locked. Run `amc vault unlock` first, or `amc setup` for first-time setup.')) { apiError(res, 423, 'VAULT_LOCKED: unlock the vault to sign policy debt'); return true; }
+        apiError(res, 500, 'Policy debt registration failed');
       }
       return true;
     }
@@ -522,11 +548,23 @@ export async function handleComplianceRoute(
     // POST /api/v1/policy/ops/init — create and sign ops policy
     if (pathname === '/api/v1/policy/ops/init' && method === 'POST') {
       try {
-        const { initOpsPolicy } = await import('../ops/policy.js');
-        const created = initOpsPolicy(workspace);
+        const beforePublish = () => {
+          if (revalidateAuthority?.() === false) {
+            if (!res.headersSent) apiError(res, 403, 'authenticated authority changed before ops policy publication');
+            throw new Error('authenticated authority changed before ops policy publication');
+          }
+        };
+        beforePublish();
+        const opsPolicy = await import('../ops/policy.js');
+        // No registry async upgrade until the trusted dispatcher explicitly supplies its current-authority callback.
+        const created = revalidateAuthority === undefined ? opsPolicy.initOpsPolicy(workspace) : await opsPolicy.initOpsPolicyAsync(workspace, { beforePublish });
         apiSuccess(res, { configPath: created.configPath, sigPath: created.sigPath }, 201);
       } catch (err) {
-        apiError(res, 500, err instanceof Error ? err.message : 'Ops policy init failed');
+        if (res.headersSent) return true;
+        if (err instanceof KeyProviderError && Object.hasOwn(KEY_PROVIDER_ERRORS, err.code)) {
+          apiError(res, KEY_PROVIDER_ERRORS[err.code], err.code + ': ops policy signing refused'); return true;
+        }
+        apiError(res, 500, 'Ops policy init failed; inspect the policy pair before retrying');
       }
       return true;
     }

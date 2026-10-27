@@ -17,11 +17,25 @@
       "sha256": "f1aaf94001038ab59a7e8713c8fbd7e7076a8bcbb9a8f5b44138b35411138043"
     },
     {
+      "path": "dist/runtime/firewall.d.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/dist/runtime/firewall.d.ts.landed",
+      "sha256": "b9d0d6ea421896588b78b7b7dc5c6afe3529209d06b0a7031642f7875e162527"
+    },
+    {
       "path": "dist/sdk/nativeAgentClient.d.ts",
       "issue": "P0-06",
       "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
       "archivePath": "unused-code/plan-edits/P0-06/dist/sdk/nativeAgentClient.d.ts.landed",
       "sha256": "8652b7c9ffded332a5e277ce4511f3a8a0e06f0599d49677d73298a4e2b1bc8a"
+    },
+    {
+      "path": "dist/standard/externalEvidenceProfile.d.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/dist/standard/externalEvidenceProfile.d.ts.landed",
+      "sha256": "b14d55d260d9c5b5c84b97fce4fd4db27bec942d24feccb15477fb15c37c9d69"
     },
     {
       "path": "knip.json",
@@ -43,6 +57,13 @@
       "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
       "archivePath": "unused-code/plan-edits/P0-49/pnpm-lock.yaml.landed",
       "sha256": "6ee56db74a48240aca2a66072fd62ada30a468a73bd2fc839b98fe5ab325466b"
+    },
+    {
+      "path": "pnpm-workspace.yaml",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/pnpm-workspace.yaml.landed",
+      "sha256": "fb6b23c507e6d97ecd5dac0a103f009ece6c0fcb35ff32373de92a81c8e2cf23"
     },
     {
       "path": "scripts/source-quality.mjs",
@@ -87,6 +108,13 @@
       "sha256": "7773a77fc1ceeb9916ab09d62a99324d33cd33c5517b5a2d4fdbe003a2b61951"
     },
     {
+      "path": "src/api/watchRouter.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/api/watchRouter.ts.landed",
+      "sha256": "2350b8454ea2a361bd635823a644507e8b2bbd81ad3e0f99181988d7c3e457cd"
+    },
+    {
       "path": "src/assurance/assuranceCertificates.ts",
       "issue": "P0-15",
       "baseCommit": "c64a87641297be160f5901ed4d9c0634b341fef8",
@@ -115,11 +143,39 @@
       "sha256": "4df07f2532ae2547cb195abd083e8e2fb6ba403b0b478af50298a0322d562293"
     },
     {
+      "path": "src/audit/auditMapStore.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/audit/auditMapStore.ts.landed",
+      "sha256": "42bbbf3cb009e82b43d15be3c76560abc98e3a835348d1a3afd3324f3cec1743"
+    },
+    {
+      "path": "src/audit/auditPolicyStore.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/audit/auditPolicyStore.ts.landed",
+      "sha256": "fa36b73619fedde92914778acc6d3bfb24276d5a14ab38b3540acecbc2eaa8bf"
+    },
+    {
       "path": "src/audit/binderArtifact.ts",
       "issue": "P1-16",
       "baseCommit": "1c1ff4b1ff3d94960aee7e130e5dba6988126d4c",
       "archivePath": "unused-code/plan-edits/P1-16/src/audit/binderArtifact.ts.landed",
       "sha256": "9b40bd627e04b45b395fba58e4318808b71c34ab40048d344088a22d635c7e46"
+    },
+    {
+      "path": "src/audit/binderStore.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/audit/binderStore.ts.landed",
+      "sha256": "25fc1e815c526d8cb1d4627acc81b6c5fca72b06dae19e12ac0c4e8decfe05a0"
+    },
+    {
+      "path": "src/audit/binderVerifier.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/audit/binderVerifier.ts.landed",
+      "sha256": "b7efcef92effb50588606e9a95d1bcc28b2e0de34a1a59b556194cca7fee7e7a"
     },
     {
       "path": "src/auth/authApi.ts",
@@ -134,6 +190,20 @@
       "baseCommit": "42dfa8375817abd903bb4357c2ffcc0ce3b7ac74",
       "archivePath": "unused-code/plan-edits/P1-08/src/auth/humanLog.ts.landed",
       "sha256": "f89101f4d6afcecc1ed7631a6decdfd036657786b55f6bee2ba9b19c5e3199b5"
+    },
+    {
+      "path": "src/bench/benchArtifact.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/bench/benchArtifact.ts.landed",
+      "sha256": "1b3467ee2b3b6662bea9893f843c75d663a43d23f226be9be4f8ab9617852964"
+    },
+    {
+      "path": "src/bench/benchPolicyStore.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/bench/benchPolicyStore.ts.landed",
+      "sha256": "83d47eb7e0216f15ba8cb04ee932f24c52b3cada9a80913ade52fd1c6350d1f1"
     },
     {
       "path": "src/bench/benchRegistryClient.ts",
@@ -171,11 +241,25 @@
       "sha256": "7d1770ee582af5fa127fcc9831c204c9ad779abc185c8051d5bde208357f2d3c"
     },
     {
+      "path": "src/canon/canonLoader.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/canon/canonLoader.ts.landed",
+      "sha256": "780ddc5faad962980c10ee64a652d5c9e82d1faf8ddea9cee4f6e181b0f42a18"
+    },
+    {
       "path": "src/casebooks/casebookStore.ts",
       "issue": "P1-08",
       "baseCommit": "42dfa8375817abd903bb4357c2ffcc0ce3b7ac74",
       "archivePath": "unused-code/plan-edits/P1-08/src/casebooks/casebookStore.ts.landed",
       "sha256": "1a47a67926429b925b3b6e7233281a574f5c97c213685a40a884728ada8084e6"
+    },
+    {
+      "path": "src/cgx/cgxStore.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/cgx/cgxStore.ts.landed",
+      "sha256": "6e4272a79cfb920cac674d861d1af96ec7d7d75a818326e8bd288f4b5e5f216a"
     },
     {
       "path": "src/ci/gate.ts",
@@ -204,6 +288,13 @@
       "baseCommit": "b396249ad8d9ffc9b0b47db2c56464ca86183a4b",
       "archivePath": "unused-code/plan-edits/P0-15/src/demo/prospectDemo.ts.landed",
       "sha256": "af482db8700e0d6067c4084248cd97b11e3c82359da2be4d3a9d49c8cc064e63"
+    },
+    {
+      "path": "src/diagnostic/bank/bankLoader.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/diagnostic/bank/bankLoader.ts.landed",
+      "sha256": "4ce153049c4f1de1cee6a240c03596dc97c2e60574afaca8fec076e99c042703"
     },
     {
       "path": "src/diagnostic/l5DeltaReport.ts",
@@ -248,6 +339,13 @@
       "sha256": "de42434762596133deac32622fe725aaf6d7a30bc986d9782c71e7ab2430991a"
     },
     {
+      "path": "src/enforce/guardrailControlState.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/enforce/guardrailControlState.ts.landed",
+      "sha256": "fae71491ec4db25ba4c5969e84bb81249f6a8b3dbc23eb9f2be5854858647486"
+    },
+    {
       "path": "src/enforce/resourceManifest.ts",
       "issue": "P1-59",
       "baseCommit": "ebfa106dc45a853fc15f36e8d5312b499fc01806",
@@ -281,6 +379,13 @@
       "baseCommit": "201c76b659d8afe2c556e951764d401cec60e6a5",
       "archivePath": "unused-code/plan-edits/P0-52/src/federation/federationStore.ts.landed",
       "sha256": "7f8cd201e6850e2d14c9b176f1a258dd5c4fb0c4c2f4992f1a68287faca004b7"
+    },
+    {
+      "path": "src/forecast/forecastStore.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/forecast/forecastStore.ts.landed",
+      "sha256": "2cac2b32bc50f665bc05033d52754fcb45b1ceb1a65eb6ff59dfa386d2fd07da"
     },
     {
       "path": "src/gateway/config.ts",
@@ -325,6 +430,20 @@
       "sha256": "9c33ae512e09e0526550c34a94c49001d997901a17136307650403f9c9414242"
     },
     {
+      "path": "src/integrations/integrationDeadLetters.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/integrations/integrationDeadLetters.ts.landed",
+      "sha256": "d11408dc51ac383c7d23e0972e7f4de28010f3365306ca29c4badd30f4a8d291"
+    },
+    {
+      "path": "src/integrations/noCodeGovernanceStore.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/integrations/noCodeGovernanceStore.ts.landed",
+      "sha256": "01b2d8f3aacfa89548c5bc00e789e2075134d7c3dca232051622dc18287fb7ab"
+    },
+    {
       "path": "src/leases/leaseCli.ts",
       "issue": "P0-30",
       "baseCommit": "ee0afc9bc6099ffbd57e4929b67dc81acdff1741",
@@ -353,11 +472,39 @@
       "sha256": "4eef636358fb607e4ada186a19aee5e187b9c8e9022c5d04b77467c5b46bbe17"
     },
     {
+      "path": "src/mechanic/planStore.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/mechanic/planStore.ts.landed",
+      "sha256": "9a09f6df9655b6ed9fdb7ee2850d80b0d8fd14d0ec2e65a1d0a368478748b60e"
+    },
+    {
+      "path": "src/mechanic/profiles.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/mechanic/profiles.ts.landed",
+      "sha256": "fd2f2d0e55dc53e0470beecd438d5fac9f944beb60f590eb4713e88bee04ca9f"
+    },
+    {
+      "path": "src/mechanic/simulator.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/mechanic/simulator.ts.landed",
+      "sha256": "2c6ba7d0eff5f0d1b3fa18c573dfaf4f6cfa71796364840ff39f699654d138cb"
+    },
+    {
       "path": "src/mechanic/targetsStore.ts",
       "issue": "P0-28",
       "baseCommit": "d6184fee3320635c8ca606aa2454b8dc27596111",
       "archivePath": "unused-code/plan-edits/P0-28/src/mechanic/targetsStore.ts.landed",
       "sha256": "abd2a0dce4dab30daec3c37ea969ea053e8a3ecd0a140e6e39ce9a8ea6166326"
+    },
+    {
+      "path": "src/mechanic/tuningStore.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/mechanic/tuningStore.ts.landed",
+      "sha256": "b7a481e7383c6b1a725867ec39bf8a1b264e3582753ad86b4e52de4f749e9eac"
     },
     {
       "path": "src/notary/notaryAttestation.ts",
@@ -388,6 +535,20 @@
       "sha256": "de6f8d70b8b3410b4476f1daa6169818bffbcf8e4fe131149df8a6c86cd2fcee"
     },
     {
+      "path": "src/org/orgSchema.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/org/orgSchema.ts.landed",
+      "sha256": "f7015e224378afe91406f387f52380ffaf474da9a23ee4b7d082298b35886b99"
+    },
+    {
+      "path": "src/org/orgScorecard.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/org/orgScorecard.ts.landed",
+      "sha256": "c8e87d768c30921a9032d5174335d46e4a0c7f5d9a9e8980bdf6fb64e1573c67"
+    },
+    {
       "path": "src/outcomes/outcomeContractEngine.ts",
       "issue": "P1-08",
       "baseCommit": "42dfa8375817abd903bb4357c2ffcc0ce3b7ac74",
@@ -400,6 +561,20 @@
       "baseCommit": "42dfa8375817abd903bb4357c2ffcc0ce3b7ac74",
       "archivePath": "unused-code/plan-edits/P1-08/src/pairing/lanMode.ts.landed",
       "sha256": "fb677b55c759e9cf36a6fe5552245c3b2d3cad2efdcf38ebbe4bae1da43670a3"
+    },
+    {
+      "path": "src/pairing/pairingApi.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/pairing/pairingApi.ts.landed",
+      "sha256": "9fabef38494baa090d30775430a2260ed9830ff3920c27b3dac65306e92ef3d8"
+    },
+    {
+      "path": "src/passport/passportArtifact.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/passport/passportArtifact.ts.landed",
+      "sha256": "c9b5586946209565a8a0714a41161401868bb0b0078629b5eb7924af67c91533"
     },
     {
       "path": "src/passport/passportCli.ts",
@@ -416,6 +591,20 @@
       "sha256": "ddfbd29e5a0a69aa06be7648a4fcc44e3a474c6f6be8d5f7fd3f7756709d39bd"
     },
     {
+      "path": "src/passport/passportStore.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/passport/passportStore.ts.landed",
+      "sha256": "d4782f22d568b62f10d62d4eac7bd2fa73d4ab2ec67a9813c28c0cc6c961cab1"
+    },
+    {
+      "path": "src/passport/passportVerifier.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/passport/passportVerifier.ts.landed",
+      "sha256": "4c703c6d49ee7f17a2ca0ba8e0a2ce31b24412cbac066f6afdb8f5b6cce682a5"
+    },
+    {
       "path": "src/plugins/pluginPackage.ts",
       "issue": "P0-09",
       "baseCommit": "0b818f4f866dbd25226d5690cdf3f2e8f6837101",
@@ -430,11 +619,46 @@
       "sha256": "44236debfef1053173c2f5427e185141b566395b75608804fa8a08eb43c6724f"
     },
     {
+      "path": "src/plugins/pluginStore.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/plugins/pluginStore.ts.landed",
+      "sha256": "d8fcf3b4e4e7c79fa2841951a01adc7e6ca75feef40e38aba88784462aa1afd1"
+    },
+    {
+      "path": "src/prompt/promptPackArtifact.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/prompt/promptPackArtifact.ts.landed",
+      "sha256": "0cb3589919172da55dacb3eb2b1a02c4716230091ef4d5b7d28904b635dde674"
+    },
+    {
+      "path": "src/prompt/promptPackStore.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/prompt/promptPackStore.ts.landed",
+      "sha256": "85b638eaecab121b53687cfdd83b3d5faf16e3cb31567b0a3ab00e07ae13f1a3"
+    },
+    {
       "path": "src/prompt/promptPackVerifier.ts",
       "issue": "P0-09",
       "baseCommit": "0b818f4f866dbd25226d5690cdf3f2e8f6837101",
       "archivePath": "unused-code/plan-edits/P0-09/src/prompt/promptPackVerifier.ts.landed",
       "sha256": "0956285bdaf07793ecd40b5c70d9a47c3b2b9aa4762c65dfeeeb4df2abe254ad"
+    },
+    {
+      "path": "src/prompt/promptPolicyStore.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/prompt/promptPolicyStore.ts.landed",
+      "sha256": "535a626d6e1802003214e31dc98f61fedfa94f0e448205f43b446e3c011a0c7a"
+    },
+    {
+      "path": "src/runtime/firewall.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/runtime/firewall.ts.landed",
+      "sha256": "922b0b6891478e7e234bc65eab67acf50d806f76d10ace5c560dbbd3cbd9fe05"
     },
     {
       "path": "src/sdk/nativeAgentClient.ts",
@@ -451,11 +675,32 @@
       "sha256": "de1469cf447c9ccf8a22fef1ebcce716b3af7455b7127eb00ddc7cb5a7bc59e7"
     },
     {
+      "path": "src/setup/setupWizard.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/setup/setupWizard.ts.landed",
+      "sha256": "519a773d0a2b418ab62a063504fe6e640d45071f0ffc342e50782b3a85f2734a"
+    },
+    {
+      "path": "src/standard/externalEvidenceProfile.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/standard/externalEvidenceProfile.ts.landed",
+      "sha256": "788099197b820732d8e19693e95dec5b8070494ec208bd55a963dc47362058d5"
+    },
+    {
       "path": "src/storage/blobs/blobStore.ts",
       "issue": "P1-08",
       "baseCommit": "42dfa8375817abd903bb4357c2ffcc0ce3b7ac74",
       "archivePath": "unused-code/plan-edits/P1-08/src/storage/blobs/blobStore.ts.landed",
       "sha256": "3be0ed5f62c63f9e0c98afa0dc3275fc7a495de8ee8276ad283b18b818fed277"
+    },
+    {
+      "path": "src/studio/apiDelegation.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/studio/apiDelegation.ts.landed",
+      "sha256": "fcf33617981088c66f3b6c8620948dc016eea953ca65fb942af294dbcfa0c38a"
     },
     {
       "path": "src/studio/studioServer.ts",
@@ -486,6 +731,20 @@
       "sha256": "3f3d55b71ab48147ea436d7b9b165ac75cbe8e7f2a40b6f95af40d7f5dfeb176"
     },
     {
+      "path": "src/transformation/transformAttestations.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/transformation/transformAttestations.ts.landed",
+      "sha256": "33ed3987cba89b9f29e1fd664fb5da6d480ac50c365d447b1eb710fd4b021fe3"
+    },
+    {
+      "path": "src/transformation/transformTasks.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/transformation/transformTasks.ts.landed",
+      "sha256": "fe4094ba31e9b451e459e0516b3a174bef21d016945aa0eac5342c6ae6cbe2c4"
+    },
+    {
       "path": "src/trust/trustConfig.ts",
       "issue": "P0-45",
       "baseCommit": "2a5d632588f5c198785aedf229a801ad0178938d",
@@ -498,6 +757,13 @@
       "baseCommit": "c64a87641297be160f5901ed4d9c0634b341fef8",
       "archivePath": "unused-code/plan-edits/P0-44/src/types.ts.landed",
       "sha256": "61ca2bd7d2394b3ef1d38666868c50f43698f642d84291e511baf9b603e11645"
+    },
+    {
+      "path": "src/value/valueStore.ts",
+      "issue": "P2-08",
+      "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+      "archivePath": "unused-code/plan-edits/P2-08/src/value/valueStore.ts.landed",
+      "sha256": "09811069c8c7f07f7011f9987ce6f777f37da28b2c3c0488d807d9b5beb0f40a"
     },
     {
       "path": "src/workorders/workorderEngine.ts",

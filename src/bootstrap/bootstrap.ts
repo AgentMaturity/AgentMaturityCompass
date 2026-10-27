@@ -1,31 +1,33 @@
 import { generateKeyPairSync } from "node:crypto";
 import { request as httpRequest, type RequestOptions } from "node:http";
 import { dirname, join, resolve } from "node:path";
-import { initWorkspace } from "../workspace.js";
-import { createVault, setVaultSecret, unlockVault, vaultExists, vaultStatus } from "../vault/vault.js";
+import { initWorkspaceAsync } from "../workspaceInitializationAsync.js";
+import { captureWorkspaceColdOrgPrerequisites, type WorkspaceColdOrgPrerequisites } from "../workspaceColdOrgPrerequisites.js";
+import { createVault, getVaultSecret, setVaultSecret, unlockVault, vaultExists, vaultStatus } from "../vault/vault.js";
 import { initUsersConfig, usersConfigPath, verifyUsersConfigSignature } from "../auth/authApi.js";
 import { actionPolicyPath, initActionPolicy } from "../governor/actionPolicyEngine.js";
 import { initToolsConfig, toolsConfigPath } from "../toolhub/toolhubValidators.js";
-import { budgetsPath, initBudgets } from "../budgets/budgets.js";
+import { budgetsPath } from "../budgets/budgets.js";
 import { approvalPolicyPath, initApprovalPolicy } from "../approvals/approvalPolicyEngine.js";
-import { adaptersConfigPath, initAdaptersConfig } from "../adapters/adapterConfigStore.js";
+import { adaptersConfigPath } from "../adapters/adapterConfigStore.js";
 import { bridgeConfigPath, initBridgeConfig } from "../bridge/bridgeConfigStore.js";
 import { initModelTaxonomy, modelTaxonomyPath } from "../bridge/modelTaxonomy.js";
 import { initOrgConfig, orgConfigPath } from "../org/orgStore.js";
 import { initGatewayConfig } from "../gateway/config.js";
-import { initOpsPolicy, opsPolicyPath } from "../ops/policy.js";
+import { initOpsPolicyAsync, opsPolicyPath } from "../ops/policy.js";
+import { keysetDeclared } from "../keys/keyset.js";
 import { initForecastPolicy } from "../forecast/forecastEngine.js";
 import { forecastPolicyPath } from "../forecast/forecastStore.js";
 import { initBenchPolicy, benchPolicyPath } from "../bench/benchPolicyStore.js";
-import { initCanon, canonPath } from "../canon/canonLoader.js";
-import { initDiagnosticBank, diagnosticBankPath } from "../diagnostic/bank/bankLoader.js";
+import { canonPath } from "../canon/canonLoader.js";
+import { diagnosticBankPath } from "../diagnostic/bank/bankLoader.js";
 import { initCgxPolicy, cgxPolicyPath } from "../cgx/cgxStore.js";
 import { initPluginWorkspace } from "../plugins/pluginApi.js";
 import { pluginsInstalledLockPath, pluginsRegistriesPath } from "../plugins/pluginStore.js";
 import { initMechanicWorkspace } from "../mechanic/mechanicApi.js";
 import { mechanicTargetsPath } from "../mechanic/targetsStore.js";
 import { initPromptPolicy, promptPolicyPath } from "../prompt/promptPolicyStore.js";
-import { assurancePolicyPath, initAssurancePolicy } from "../assurance/assurancePolicyStore.js";
+import { assurancePolicyPath, captureAssurancePolicyInitialization } from "../assurance/assurancePolicyStore.js";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
 import { appendTransparencyEntry, initTransparencyLog } from "../transparency/logChain.js";
 import { rebuildTransparencyMerkle } from "../transparency/merkleIndexStore.js";
@@ -34,6 +36,10 @@ import { signFileWithAuditor } from "../org/orgSigner.js";
 import { enableLanMode } from "../pairing/lanMode.js";
 import { enableNotaryTrust } from "../trust/trustConfig.js";
 import { checkScopedEgress } from "../residency/checkEgress.js";
+import { captureBootstrapSuffixInputs, publishBootstrapProviderSuffix } from "./bootstrapProviderSuffix.js";
+import { captureBootstrapNotaryEnablement } from "../trust/notaryEnablementPublication.js";
+import { assertOrgPairsCurrent, captureOrgFiles } from "../org/preparedOrgPairs.js";
+import { physicalPathWithMissingSuffix } from "../utils/pathSafety.js";
 
 export interface BootstrapOptions {
   workspace: string;
@@ -114,8 +120,9 @@ function ensureOwnerUser(params: BootstrapOptions): { created: boolean } {
   return { created: true };
 }
 
-function ensureSignedConfigs(workspace: string): Record<string, boolean> {
-  const created: Record<string, boolean> = {};
+async function ensureSignedConfigs(workspace: string, originalCold: WorkspaceColdOrgPrerequisites | null, originalAssurance: ReturnType<typeof captureAssurancePolicyInitialization> | null): Promise<{ created: Record<string, boolean>; assurance: ReturnType<typeof captureAssurancePolicyInitialization> }> {
+  const created: Record<string, boolean> = {}, cold = originalCold ?? captureWorkspaceColdOrgPrerequisites(workspace), assurance = originalAssurance ?? captureAssurancePolicyInitialization(workspace, { beforePublish: cold.assertCurrent });
+  cold.assertCurrent(); assurance.assertCurrent();
   if (!pathExists(actionPolicyPath(workspace))) {
     initActionPolicy(workspace);
     created["action-policy.yaml"] = true;
@@ -129,7 +136,7 @@ function ensureSignedConfigs(workspace: string): Record<string, boolean> {
     created["tools.yaml"] = true;
   }
   if (!pathExists(budgetsPath(workspace))) {
-    initBudgets(workspace, "default");
+    await cold.initializeBudgets();
     created["budgets.yaml"] = true;
   }
   if (!pathExists(approvalPolicyPath(workspace))) {
@@ -137,7 +144,7 @@ function ensureSignedConfigs(workspace: string): Record<string, boolean> {
     created["approval-policy.yaml"] = true;
   }
   if (!pathExists(adaptersConfigPath(workspace))) {
-    initAdaptersConfig(workspace);
+    await cold.initializeAdapters();
     created["adapters.yaml"] = true;
   }
   if (!pathExists(bridgeConfigPath(workspace))) {
@@ -153,7 +160,7 @@ function ensureSignedConfigs(workspace: string): Record<string, boolean> {
     created["org.yaml"] = true;
   }
   if (!pathExists(opsPolicyPath(workspace))) {
-    initOpsPolicy(workspace);
+    await initOpsPolicyAsync(workspace, { onlyIfMissing: true, beforePublish: cold.assertCurrent });
     created["ops-policy.yaml"] = true;
   }
   if (!pathExists(forecastPolicyPath(workspace))) {
@@ -161,11 +168,11 @@ function ensureSignedConfigs(workspace: string): Record<string, boolean> {
     created["forecast/policy.yaml"] = true;
   }
   if (!pathExists(canonPath(workspace))) {
-    initCanon(workspace);
+    await cold.initializeCanon();
     created["canon/canon.yaml"] = true;
   }
   if (!pathExists(diagnosticBankPath(workspace))) {
-    initDiagnosticBank(workspace);
+    await cold.initializeBank();
     created["diagnostic/bank/bank.yaml"] = true;
   }
   if (!pathExists(cgxPolicyPath(workspace))) {
@@ -197,16 +204,16 @@ function ensureSignedConfigs(workspace: string): Record<string, boolean> {
     initPromptPolicy(workspace);
     created["prompt/policy.yaml"] = true;
   }
-  if (!pathExists(assurancePolicyPath(workspace))) {
-    initAssurancePolicy(workspace);
-    created["assurance/policy.yaml"] = true;
-  }
-  return created;
+  try {
+    if ((await assurance.initialize()).created) created["assurance/policy.yaml"] = true;
+    cold.assertCurrent(); assurance.assertCurrent(); return { created, assurance };
+  } catch (cause) { throw Object.assign(new Error("bootstrap assurance stage incomplete; earlier cold effects remain", { cause }), { completedAssurancePaths: assurance.publishedPaths() }); }
 }
 
-async function fetchNotaryPubkey(endpoint: string, workspace: string, requestOptions: RequestOptions): Promise<{ pubkeyPem: string; fingerprint: string }> {
+async function fetchNotaryPubkey(endpoint: string, workspace: string, requestOptions: RequestOptions, beforeRequest?: () => void): Promise<{ pubkeyPem: string; fingerprint: string }> {
   return new Promise((resolvePromise, rejectPromise) => {
     checkScopedEgress(workspace, "network-tool", endpoint, { dataClasses: null, purpose: null, agentId: "system" });
+    beforeRequest?.();
     const req = httpRequest(endpoint, requestOptions, (res) => {
       const chunks: Buffer[] = [];
       res.on("data", (chunk) => chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk)));
@@ -240,22 +247,100 @@ async function fetchNotaryPubkey(endpoint: string, workspace: string, requestOpt
   });
 }
 
+interface BootstrapNotaryInputs {
+  workspace: string; baseUrl: string; requiredAttestationLevel: "SOFTWARE" | "HARDWARE";
+  endpoint: string; requestOptions: RequestOptions; secret: string; vaultEnvironment: string | undefined;
+}
+class BootstrapNotaryPrefetchError extends Error {
+  readonly code = "BOOTSTRAP_NOTARY_PREFETCH_INCOMPLETE";
+  constructor(readonly progress: Readonly<{ phase: string; directoryAttempted: boolean; directoryReturned: boolean;
+    writeAttempted: boolean; writeReturned: boolean; acknowledged: boolean; enablementReturned: boolean }>,
+    readonly firstRefusalObserved: boolean, readonly firstRefusal: unknown, cause: unknown) {
+    super("bootstrap notary continuation did not complete; earlier native effects may remain", { cause });
+    this.name = "BootstrapNotaryPrefetchError";
+  }
+}
+async function publishBootstrapNotaryPrefetch(input: BootstrapNotaryInputs) {
+  const params = { ...input, requestOptions: { ...input.requestOptions } }, workspace = params.workspace;
+  let refused = false, first: unknown;
+  const negative = (check: () => void) => {
+    if (refused) throw first;
+    try { check(); } catch (cause) { refused = true; first = cause; throw cause; }
+  };
+  const progress = { phase: "capture", directoryAttempted: false, directoryReturned: false,
+    writeAttempted: false, writeReturned: false, acknowledged: false, enablementReturned: false };
+  const fail = (cause: unknown): never => {
+    if (!progress.directoryAttempted) throw cause;
+    throw new BootstrapNotaryPrefetchError(Object.freeze({ ...progress }), refused, first, cause);
+  };
+  try {
+    if (getVaultSecret(workspace, "notary/auth") !== params.secret) throw new Error("required bootstrap notary auth secret did not read back");
+    const inputs = captureBootstrapSuffixInputs(workspace, params.vaultEnvironment);
+    const path = join(workspace, ".amc", "bootstrap", "notary.pub");
+    const physicalPin = physicalPathWithMissingSuffix(path);
+    let expected = captureOrgFiles([path]);
+    // This fixed lower input callback never calls the staged or completed notary operation.
+    const stable = () => negative(() => {
+      inputs();
+      if (getVaultSecret(workspace, "notary/auth") !== params.secret) throw new Error("original bootstrap notary auth secret changed");
+      if (physicalPathWithMissingSuffix(path) !== physicalPin) throw new Error("original bootstrap notary pin route changed");
+      assertOrgPairsCurrent(expected); inputs();
+    });
+    const stage = captureBootstrapNotaryEnablement({ workspace, baseUrl: params.baseUrl,
+      requiredAttestationLevel: params.requiredAttestationLevel, requiredSecret: params.secret }, stable);
+    const preparing = () => negative(() => { stable(); stage.assertCurrent(); stable(); });
+    preparing(); progress.phase = "pubkey-request";
+    const notary = await fetchNotaryPubkey(params.endpoint, workspace, params.requestOptions, preparing);
+    preparing(); progress.phase = "pin-directory"; progress.directoryAttempted = true;
+    ensureDir(dirname(path)); progress.directoryReturned = true;
+    preparing(); progress.phase = "pin-write"; progress.writeAttempted = true;
+    writeFileAtomic(path, notary.pubkeyPem, 0o644); progress.writeReturned = true;
+    progress.phase = "pin-readback";
+    const own = captureOrgFiles([path]), member = own.members[0];
+    if (member === undefined || member.mode !== 0o644 || member.bytes === null || !member.bytes.equals(Buffer.from(notary.pubkeyPem, "utf8")))
+      throw new Error("returned bootstrap notary pin differs from its exact bytes or mode");
+    expected = own; progress.acknowledged = true;
+    preparing(); progress.phase = "enablement";
+    const completed = await stage.publishPin(path); progress.enablementReturned = true;
+    const current = () => negative(() => { stable(); completed.assertCurrent(); stable(); });
+    current(); progress.phase = "complete";
+    return Object.freeze({ assertCurrent() { try { current(); } catch (cause) { fail(cause); } } });
+  } catch (cause) { return fail(cause); }
+}
+
+export class BootstrapColdPrerequisitesIncompleteError extends Error {
+  readonly code = "BOOTSTRAP_COLD_PREREQUISITES_INCOMPLETE";
+  constructor(readonly completedColdPaths: readonly string[], cause: unknown) {
+    super("bootstrap did not complete; published cold prerequisites and any earlier bootstrap effects remain", { cause });
+    this.name = "BootstrapColdPrerequisitesIncompleteError";
+  }
+}
 export async function runBootstrap(options: BootstrapOptions): Promise<BootstrapResult> {
+  options = { ...options, allowedCidrs: [...options.allowedCidrs] };
+  const noSignAtEntry = process.env.AMC_NO_SIGN === "1";
   const previousVaultEnv = process.env.AMC_VAULT_PASSPHRASE;
+  let cold: WorkspaceColdOrgPrerequisites | null = null, assurance: ReturnType<typeof captureAssurancePolicyInitialization> | null = null;
   if (options.vaultPassphrase && options.vaultPassphrase.length > 0) {
     process.env.AMC_VAULT_PASSPHRASE = options.vaultPassphrase;
   }
+  const activeVaultEnv = process.env.AMC_VAULT_PASSPHRASE;
 
   try {
     const workspace = resolve(options.workspace);
-    initWorkspace({
-      workspacePath: workspace,
-      trustBoundaryMode: "isolated"
-    });
+    const mature = keysetDeclared(workspace);
+    if (mature && (!pathExists(opsPolicyPath(workspace)) || !pathExists(adaptersConfigPath(workspace)) || !pathExists(canonPath(workspace)) || !pathExists(diagnosticBankPath(workspace)) || !pathExists(assurancePolicyPath(workspace))))
+      ensureVault({ ...options, workspace }); // Preserve the selected passphrase gate before any new cold provider request.
+    cold = mature ? captureWorkspaceColdOrgPrerequisites(workspace) : null;
+    assurance = mature ? captureAssurancePolicyInitialization(workspace, { beforePublish: cold!.assertCurrent }) : null;
+    if (mature && !pathExists(opsPolicyPath(workspace))) await initOpsPolicyAsync(workspace, { onlyIfMissing: true, beforePublish: cold!.assertCurrent });
+    cold?.assertCurrent();
+    if (cold !== null) await cold.initializeWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
+    else await initWorkspaceAsync({ workspacePath: workspace, trustBoundaryMode: "isolated" });
 
     const vault = ensureVault({ ...options, workspace });
     const owner = ensureOwnerUser({ ...options, workspace });
-    const createdConfigs = ensureSignedConfigs(workspace);
+    const signedConfigs = await ensureSignedConfigs(workspace, cold, assurance); assurance = signedConfigs.assurance;
+    const createdConfigs = signedConfigs.created;
     if (options.lanMode) {
       enableLanMode({
         workspace,
@@ -266,6 +351,7 @@ export async function runBootstrap(options: BootstrapOptions): Promise<Bootstrap
       });
       createdConfigs["studio/lan.yaml"] = true;
     }
+    let notaryCurrent: (() => void) | null = null;
     if (options.enableNotary) {
       if (!options.notaryAuthSecret || options.notaryAuthSecret.trim().length === 0) {
         throw new Error("AMC_ENABLE_NOTARY requires AMC_NOTARY_AUTH_SECRET_FILE (or AMC_NOTARY_AUTH_SECRET).");
@@ -277,17 +363,34 @@ export async function runBootstrap(options: BootstrapOptions): Promise<Bootstrap
       const requestOptions: RequestOptions = { method: "GET" };
       checkScopedEgress(workspace, "network-tool", endpoint, { dataClasses: null, purpose: null, agentId: "system" });
       setVaultSecret(workspace, "notary/auth", notarySecret);
-      const notary = await fetchNotaryPubkey(endpoint, workspace, requestOptions);
-      const pubPath = join(workspace, ".amc", "bootstrap", "notary.pub");
-      ensureDir(dirname(pubPath));
-      writeFileAtomic(pubPath, notary.pubkeyPem, 0o644);
-      await enableNotaryTrust({
-        workspace,
-        baseUrl: notaryBaseUrl,
-        pinPubkeyPath: pubPath,
-        requiredAttestationLevel
-      });
+      if (noSignAtEntry) {
+        const notary = await fetchNotaryPubkey(endpoint, workspace, requestOptions);
+        const pubPath = join(workspace, ".amc", "bootstrap", "notary.pub");
+        ensureDir(dirname(pubPath));
+        writeFileAtomic(pubPath, notary.pubkeyPem, 0o644);
+        await enableNotaryTrust({
+          workspace,
+          baseUrl: notaryBaseUrl,
+          pinPubkeyPath: pubPath,
+          requiredAttestationLevel
+        });
+      } else {
+        const completed = await publishBootstrapNotaryPrefetch({ workspace, baseUrl: notaryBaseUrl, requiredAttestationLevel,
+          endpoint, requestOptions, secret: notarySecret, vaultEnvironment: activeVaultEnv });
+        completed.assertCurrent(); notaryCurrent = completed.assertCurrent;
+      }
       createdConfigs["trust.yaml"] = true;
+    }
+    if (!noSignAtEntry) {
+      const notaryCompleted = notaryCurrent;
+      notaryCompleted?.();
+      const inputs = captureBootstrapSuffixInputs(workspace, activeVaultEnv);
+      const assertInputsCurrent = () => { inputs(); notaryCompleted?.(); inputs(); };
+      const completed = await publishBootstrapProviderSuffix(workspace, {
+        vaultCreated: vault.created, ownerCreated: owner.created, createdConfigs, notaryEnabled: options.enableNotary
+      }, assertInputsCurrent);
+      completed.assertCurrent();
+      return completed.result;
     }
     initTransparencyLog(workspace);
     rebuildTransparencyMerkle(workspace);
@@ -332,6 +435,10 @@ export async function runBootstrap(options: BootstrapOptions): Promise<Bootstrap
       reportSigPath,
       transparencyHash: entry.hash
     };
+  } catch (cause) {
+    const stagePaths = cause instanceof Error ? (cause as Error & { completedAssurancePaths?: readonly string[] }).completedAssurancePaths ?? [] : [];
+    const completed = [...(cold?.completedPaths ?? []), ...(assurance?.publishedPaths() ?? stagePaths)];
+    if (completed.length > 0) throw new BootstrapColdPrerequisitesIncompleteError(completed, cause); throw cause;
   } finally {
     if (typeof previousVaultEnv === "string") {
       process.env.AMC_VAULT_PASSPHRASE = previousVaultEnv;

@@ -47,7 +47,8 @@ function responseDouble() {
   return { res: res as unknown as ServerResponse, state };
 }
 
-async function call(method: string, url: string, body?: string, route = handleApiRoute) {
+async function call(method: string, url: string, body?: string,
+  route: (pathname: string, method: string, req: IncomingMessage, res: ServerResponse, workspace: string) => Promise<boolean> = handleApiRoute) {
   const pathname = url.split("?")[0]!;
   const { res, state } = responseDouble();
   expect(await route(pathname, method, requestDouble(method, url, body), res, workspace)).toBe(true);

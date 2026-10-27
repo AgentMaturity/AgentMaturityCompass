@@ -1,4 +1,20 @@
+import { assertOwnerMode } from "../mode/mode.js";
+
+/** Reuse the fixed registered tuning owner gate; the prompt command label supplies error context only. */
+export function assertPromptCliOwnerMode(workspace: string, label: "prompt pack build" | "prompt scheduler run-now"): void {
+  try { assertOwnerMode(workspace, "tune"); }
+  catch (cause) {
+    if (!(cause instanceof Error) || cause.message !== "Command 'tune' is blocked in agent mode. Switch to owner mode with: amc mode owner") throw cause;
+    throw new Error(`Command '${label}' is blocked in agent mode. Switch to owner mode with: amc mode owner`, { cause });
+  }
+}
+
+import type { OrgPairsOptions } from "../org/preparedOrgPairs.js";
+import { buildPromptPackForApiAsync } from "./promptPackAsync.js";
+import { promptSchedulerRunNowForApiAsync } from "./promptSchedulerAsync.js";
+import { promptStatusForApiAsync } from "./promptPackApi.js";
 import { resolve } from "node:path";
+import { promptInitForApiAsync, promptPolicyForApiAsync, promptPolicyApplyForApiAsync, promptSchedulerSetEnabledForApiAsync } from "./promptPolicyAsync.js";
 import YAML from "yaml";
 import { readUtf8 } from "../utils/fs.js";
 import {
@@ -111,3 +127,16 @@ export function promptSchedulerDisableCli(workspace: string) {
   });
 }
 
+
+export async function promptInitCliAsync(workspace: string) { return promptInitForApiAsync(workspace); }
+export async function promptPolicyPrintCliAsync(workspace: string) { return (await promptPolicyForApiAsync(workspace)).policy; }
+export async function promptPolicyApplyCliAsync(params: Parameters<typeof promptPolicyApplyCli>[0]) {
+  const input = { ...params }, policy = promptPolicySchema.parse(YAML.parse(readUtf8(resolve(input.file))) as unknown);
+  return promptPolicyApplyForApiAsync({ workspace: input.workspace, policy, reason: input.reason, actor: input.actor });
+}
+export async function promptSchedulerEnableCliAsync(workspace: string) { return promptSchedulerSetEnabledForApiAsync({ workspace, enabled: true }); }
+export async function promptSchedulerDisableCliAsync(workspace: string) { return promptSchedulerSetEnabledForApiAsync({ workspace, enabled: false }); }
+
+export async function promptPackBuildCliAsync(params: Parameters<typeof promptPackBuildCli>[0], options: OrgPairsOptions = {}) { return buildPromptPackForApiAsync(params, options); }
+export async function promptSchedulerRunNowCliAsync(params: Parameters<typeof promptSchedulerRunNowCli>[0], options: OrgPairsOptions = {}) { return promptSchedulerRunNowForApiAsync(params, options); }
+export async function promptStatusCliAsync(workspace: string) { return promptStatusForApiAsync(workspace); }

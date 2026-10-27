@@ -1,14 +1,15 @@
 import { randomUUID } from "node:crypto";
 import { join } from "node:path";
-import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
-import { signFileWithAuditor, verifySignedFileWithAuditor } from "../org/orgSigner.js";
+import { pathExists, readUtf8 } from "../utils/fs.js";
+import { publishOrgPairs, prepareOrgPairsAsync, type OrgPairsOptions, type OrgPairsSnapshot } from "../org/preparedOrgPairs.js";
+import { verifyMechanicPair } from "./mechanicPairs.js";
 import { mechanicSimulationSchema, type MechanicSimulation } from "./mechanicSchema.js";
 import { aggregateProjectedEffects } from "./simulatorModels.js";
 import { mechanicSimulatorGate } from "./simulatorEvidenceGates.js";
 import type { MechanicUpgradePlan } from "./upgradePlanSchema.js";
 import { mechanicRoot } from "./targetsStore.js";
 
-function mechanicSimulationPath(workspace: string): string {
+export function mechanicSimulationPath(workspace: string): string {
   return join(mechanicRoot(workspace), "simulations", "latest.json");
 }
 
@@ -25,10 +26,7 @@ function saveMechanicSimulation(workspace: string, simulation: MechanicSimulatio
   sigPath: string;
 } {
   const path = mechanicSimulationPath(workspace);
-  ensureDir(join(mechanicRoot(workspace), "simulations"));
-  writeFileAtomic(path, `${JSON.stringify(mechanicSimulationSchema.parse(simulation), null, 2)}\n`, 0o644);
-  const sigPath = signFileWithAuditor(workspace, path);
-  return { path, sigPath };
+  return publishOrgPairs(workspace, [{ path, bytes: simulationBytes(simulation) }])[0]!;
 }
 
 export function verifyMechanicSimulationSignature(workspace: string) {
@@ -42,7 +40,7 @@ export function verifyMechanicSimulationSignature(workspace: string) {
       sigPath: `${path}.sig`
     };
   }
-  return verifySignedFileWithAuditor(workspace, path);
+  return verifyMechanicPair(workspace, path, "mechanic simulation missing");
 }
 
 export function simulateMechanicPlan(params: {
@@ -55,6 +53,11 @@ export function simulateMechanicPlan(params: {
   path: string;
   sigPath: string;
 } {
+  const simulation = calculateMechanicSimulation(params);
+  return { simulation, ...saveMechanicSimulation(params.workspace, simulation) };
+}
+
+export function calculateMechanicSimulation(params: Parameters<typeof simulateMechanicPlan>[0]): MechanicSimulation {
   const gate = mechanicSimulatorGate({
     integrityIndex: params.integrityIndex,
     correlationRatio: params.correlationRatio
@@ -85,11 +88,7 @@ export function simulateMechanicPlan(params: {
         }
       ]
     });
-    const saved = saveMechanicSimulation(params.workspace, simulation);
-    return {
-      simulation,
-      ...saved
-    };
+    return simulation;
   }
 
   const effect = aggregateProjectedEffects(kinds);
@@ -130,9 +129,13 @@ export function simulateMechanicPlan(params: {
       }
     ]
   });
-  const saved = saveMechanicSimulation(params.workspace, simulation);
-  return {
-    simulation,
-    ...saved
-  };
+  return simulation;
+}
+
+function simulationBytes(simulation: MechanicSimulation): Buffer {
+  return Buffer.from(`${JSON.stringify(mechanicSimulationSchema.parse(simulation), null, 2)}\n`, "utf8");
+}
+export async function prepareMechanicSimulation(workspace: string, simulation: MechanicSimulation, options: OrgPairsOptions = {}, previous?: OrgPairsSnapshot) {
+  const path = mechanicSimulationPath(workspace), bytes = simulationBytes(simulation), prepared = await prepareOrgPairsAsync(workspace, [{ path, bytes }], options, previous);
+  return { bytes: Buffer.from(bytes), assertCurrent: prepared.assertCurrent, publish() { return prepared.publish()[0]!; } };
 }

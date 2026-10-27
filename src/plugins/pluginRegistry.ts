@@ -1,4 +1,5 @@
-import { createPrivateKey, createPublicKey, generateKeyPairSync, sign, verify } from "node:crypto";
+import { createPrivateKey, generateKeyPairSync, sign } from "node:crypto";
+import { verifyWithKey } from "../keys/algorithmPolicy.js";
 import { copyFileSync, mkdirSync, readFileSync, statSync } from "node:fs";
 import { createServer, type Server } from "node:http";
 import { dirname, join, normalize, relative, resolve } from "node:path";
@@ -45,10 +46,9 @@ function signIndex(index: PluginRegistryIndex, privatePem: string) {
 
 function verifyIndex(index: PluginRegistryIndex, sigB64: string, pubPem: string): boolean {
   try {
-    return verify(
-      null,
+    return verifyWithKey(
       Buffer.from(canonicalize(index), "utf8"),
-      createPublicKey(pubPem),
+      pubPem,
       Buffer.from(sigB64, "base64")
     );
   } catch {

@@ -1,3 +1,11 @@
+import YAML from "yaml";
+import { signAmcConfig } from "../../src/workspace.js";
+import { signingKeyId } from "../../src/keys/algorithmPolicy.js";
+import { awsKmsProvider } from "../../src/keys/providers/awsKms.js";
+import { bindPurposeProviderKey } from "../../src/keys/purposeProviders.js";
+import { withPins } from "../../src/trust/trustContext.js";
+import { workspaceKeyTrust } from "../helpers/trustContext.js";
+import { AWS_ARN, awsFake, fakeKey } from "../keys/providerFakes.js";
 import { openSessionEventStore } from "../../src/persistence/openSessionEventStore.js";
 import { SessionService } from "../../src/session/sessionService.js";
 import { ToolPipeline } from "../../src/tools/toolPipeline.js";
@@ -7,7 +15,7 @@ import { DELETION_TOOL, faultTools } from "../helpers/actionFaults.js";
 import { FakeSystemOfRecord } from "../fixtures/actions/fakeSystemOfRecord.js";
 import Database from "better-sqlite3";
 import { randomUUID } from "node:crypto";
-import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -293,7 +301,7 @@ describe("P1-03 signed chain tamper controls on owned cold copies", () => {
       expect(verified.ok).toBe(false); expect(verified.errors.length).toBeGreaterThan(0);
       const expected = { deleted: /expected seq|broken link/, duplicated: /another execution or position|evidence row already used/,
         reordered: /another execution or position/, "broken-link": /broken link/, "foreign-workspace": /receipt names workspace/,
-        "second-terminal": /completed -> denied is not an allowed transition/, "evidence-session": /signed receipt does not bind/ };
+        "second-terminal": /completed -> denied is not an allowed transition/, "evidence-session": /evidence row hash does not verify/ };
       expect(verified.errors.join("; ")).toMatch(expected[attack]);
     } finally { db.close(); }
     const coverage = actionEvidenceCoverage(copy, f.sessionId);
@@ -303,7 +311,47 @@ describe("P1-03 signed chain tamper controls on owned cold copies", () => {
   });
 });
 
+
+async function bindOwnedReaderProvider(workspace: string) {
+  const key = fakeKey("p256"), id = AWS_ARN(`outer-reader-${randomUUID()}`), fake = awsFake({ [id]: key });
+  const publicKeyPem = key.publicKey.export({ format: "pem", type: "spki" }).toString();
+  // Operator choices are fixed before the binding and new provider-authorized artifacts exist.
+  const operatorPins = withPins(workspaceKeyTrust(workspace), [{ keyId: signingKeyId(publicKeyPem)!, purposes: ["ledger-row"], origin: "owned independent outer-reader operator" }]);
+  const path = join(workspace, ".amc", "amc.config.yaml"), config = YAML.parse(readFileSync(path, "utf8"));
+  config.keys = { ...(config.keys ?? {}), refs: { ...(config.keys?.refs ?? {}), "ledger-row": { provider: "aws-kms", id } } };
+  writeFileSync(path, YAML.stringify(config)); signAmcConfig(workspace);
+  const binding = await bindPurposeProviderKey(workspace, "ledger-row", { passphrase: process.env.AMC_VAULT_PASSPHRASE!,
+    provider: awsKmsProvider(fake.call), delegation: { maxEvents: 10_000 } });
+  expect(binding.keyId).toBe(signingKeyId(publicKeyPem));
+  vi.stubEnv("AMC_EXPECTED_MONITOR_FINGERPRINT", "");
+  return { binding, operatorPins, fake };
+}
+
 describe("P1-03 evidence coverage and durability", () => {
+  test("provider-bound public action coverage propagates independent trust through ledger, row loading and every receipt chain", async () => {
+    const f = fixture();
+    const { operatorPins, binding } = await bindOwnedReaderProvider(f.workspace);
+    const a = action(f); toState(f, a, "completed");
+    const pinned = { ...operatorPins, asOf: new Date() }, absent = { ...pinned, explicitPins: [] };
+    const rows = f.ledger.getAllEvents().filter(row => JSON.parse(row.meta_json).auditType === "ACTION_STATE");
+    expect(rows).toHaveLength(4);
+    expect(rows.every(row => JSON.parse(row.meta_json).amcKeyDelegation?.sha256 === binding.delegationSha256)).toBe(true);
+    expect(verifyChainIn(f.ledger, a.id, { trust: pinned }).ok).toBe(true);
+    expect(actionEvidenceCoverage(f.workspace, f.sessionId, { trust: pinned })).toMatchObject({
+      status: "evaluated", calls: 1, linked: 1, operatorResolved: 0, unknown: 0, unlinked: 0, integrityFailures: 0, duplicateExecutions: 0
+    });
+    for (const trust of [absent, undefined]) {
+      const coverage = actionEvidenceCoverage(f.workspace, f.sessionId, trust === undefined ? {} : { trust });
+      expect(coverage.status).toBe("not_evaluated");
+      if (coverage.status !== "not_evaluated") throw new Error("unadmitted provider action evidence was counted");
+      expect(coverage.reason).toContain("ledger_integrity_failed");
+      expect(coverage.integrityErrors?.join("; ")).toMatch(/issuer.*not-pinned/);
+    }
+    expect(actionEvidenceCoverage(f.workspace, f.sessionId, { trust: { ...operatorPins, asOf: new Date() } })).toMatchObject({
+      status: "evaluated", calls: 1, linked: 1, integrityFailures: 0
+    });
+  });
+
   test("zero calls are not evaluated and a real completed chain is linked", () => {
     const f = fixture();
     expect(actionEvidenceCoverage(f.workspace, f.sessionId)).toEqual({ status: "not_evaluated", reason: "no consequential call in this session" });

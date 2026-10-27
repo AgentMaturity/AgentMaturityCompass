@@ -1,3 +1,4 @@
+import { runHashVerificationKeys } from "./runHashSignature.js";
 /**
  * Verification of the evidence ledger.
  *
@@ -39,6 +40,10 @@ import { readSessionStoreMarker } from "../persistence/openSessionEventStore.js"
 import type { EvidenceEvent } from "../types.js";
 import { admitKey, type IssuerAdmission } from "../trust/admission.js";
 import type { TrustContext } from "../trust/trustContext.js";
+import { legacyLedgerRowKeys, operationalLedgerProblems } from "../keys/operationalLedgerReader.js";
+import { boundProviderKey } from "../keys/keyset.js";
+import { getPurposeKeyHistory } from "../keys/signingKeys.js";
+import { receiptLedgerProblems } from "../keys/receiptSqlAuthority.js";
 
 /**
  * Default heartbeat window for the OPEN vs INTERRUPTED verdict on an unsealed,
@@ -149,6 +154,7 @@ export function verifyEvidenceEventIntegrity(input: {
   eventId: string;
   requireReceipt?: boolean;
   requireSealedSession?: boolean;
+  trust?: TrustContext;
 }): VerifyResult {
   const errors: string[] = [];
   const event = input.ledger.db.prepare(
@@ -158,7 +164,9 @@ export function verifyEvidenceEventIntegrity(input: {
     return chainOnlyResult([`Missing evidence event ${input.eventId}`]);
   }
 
-  const monitorKeys = getPublicKeyHistory(input.ledger.workspace, "monitor");
+  const monitorKeys = legacyLedgerRowKeys(input.ledger.workspace);
+  errors.push(...operationalLedgerProblems(input.ledger.workspace, input.ledger, input.trust));
+  errors.push(...receiptLedgerProblems(input.ledger, input.trust));
   const retentionProofs = event.archived === 1 || event.payload_pruned === 1
     ? buildRetentionProofIndex(input.ledger.workspace)
     : undefined;
@@ -200,7 +208,7 @@ export function verifyEvidenceEventIntegrity(input: {
   if (!receipt) {
     if (input.requireReceipt) errors.push(`Event ${event.id} receipt missing`);
   } else {
-    const verified = verifyReceipt(receipt, monitorKeys);
+    const verified = verifyReceipt(receipt, getPurposeKeyHistory(input.ledger.workspace, "receipt"));
     if (!verified.ok || !verified.payload) {
       errors.push(`Event ${event.id} receipt verification failed`);
     } else {
@@ -271,7 +279,7 @@ function verifyEvents(
     ? buildRetentionProofIndex(workspace)
     : undefined;
   if (retentionProofs && !retentionProofs.ok) errors.push(...retentionProofs.errors);
-  const monitorKeys = getPublicKeyHistory(workspace, "monitor");
+  const monitorKeys = legacyLedgerRowKeys(workspace);
   const eventByHash = new Map<string, EvidenceEvent>();
   for (const event of events) {
     eventByHash.set(event.event_hash, event);
@@ -308,7 +316,7 @@ function verifyEvents(
     try {
       const meta = JSON.parse(event.meta_json) as Record<string, unknown>;
       if (typeof meta.receipt === "string" && meta.receipt.length > 0) {
-        const verifyReceiptResult = verifyReceipt(meta.receipt, monitorKeys);
+        const verifyReceiptResult = verifyReceipt(meta.receipt, getPurposeKeyHistory(workspace, "receipt"));
         if (!verifyReceiptResult.ok || !verifyReceiptResult.payload) {
           errors.push(`Event ${event.id} receipt verification failed: ${verifyReceiptResult.error ?? "unknown"}`);
         } else {
@@ -373,7 +381,7 @@ function verifySessions(
   staleAfterMs: number,
   continuation?: NativeContinuationScope
 ): SessionLifecycle {
-  const monitorKeys = getPublicKeyHistory(workspace, "monitor");
+  const monitorKeys = legacyLedgerRowKeys(workspace);
   const sessions = ledger.getAllSessions();
   const events = ledger.getAllEvents();
 
@@ -486,7 +494,7 @@ function verifySessions(
 }
 
 function verifyRuns(ledger: Ledger, workspace: string, errors: string[]): void {
-  const auditorKeys = getPublicKeyHistory(workspace, "auditor");
+  const auditorKeys = runHashVerificationKeys(workspace);
   const runs = ledger.getAllRuns();
   for (const run of runs) {
     if (!verifyHexDigestAny(run.report_json_sha256, run.run_seal_sig, auditorKeys)) {
@@ -503,7 +511,7 @@ function verifyRuns(ledger: Ledger, workspace: string, errors: string[]): void {
 }
 
 function verifyOutcomeEvents(ledger: Ledger, workspace: string, errors: string[]): void {
-  const monitorKeys = getPublicKeyHistory(workspace, "monitor");
+  const monitorKeys = legacyLedgerRowKeys(workspace);
   const rows = ledger.getAllOutcomeEvents();
   let previous = "GENESIS_OUTCOME";
   for (const row of rows) {
@@ -539,7 +547,7 @@ function verifyOutcomeEvents(ledger: Ledger, workspace: string, errors: string[]
     if (!verifyHexDigestAny(row.event_hash, row.signature, monitorKeys)) {
       errors.push(`Outcome event ${row.outcome_event_id} signature invalid`);
     }
-    const verifiedReceipt = verifyReceipt(row.receipt, monitorKeys);
+    const verifiedReceipt = verifyReceipt(row.receipt, getPurposeKeyHistory(workspace, "receipt"));
     if (!verifiedReceipt.ok || !verifiedReceipt.payload) {
       errors.push(`Outcome event ${row.outcome_event_id} receipt invalid`);
     } else {
@@ -670,7 +678,7 @@ function verifyLedger(workspacePath: string, options: LedgerVerifyOptions, conti
   let monitorFingerprint: string | null = null;
   let monitorPem: string | null = null;
   try {
-    monitorPem = getPublicKeyPem(workspacePath, "monitor");
+    monitorPem = boundProviderKey(workspacePath, "ledger-row")?.publicKeyPem ?? getPublicKeyPem(workspacePath, "monitor");
     monitorFingerprint = sha256Hex(Buffer.from(monitorPem, "utf8"));
   } catch {
     // No monitor key at all. verifyEvents reports the consequences per event;
@@ -704,10 +712,12 @@ function verifyLedger(workspacePath: string, options: LedgerVerifyOptions, conti
       chainErrors.push("Evidence ledger is missing; verification does not initialize a workspace");
     }
     if (continuation && (!ledger || jsonlBackend)) chainErrors.push("Native continuation requires the SQLite native session store");
-    chainErrors.push(...verifyAlternateBackendEvidence(workspacePath, expectedFingerprint));
+    chainErrors.push(...verifyAlternateBackendEvidence(workspacePath, expectedFingerprint, options.trust));
     if (ledger) {
+      chainErrors.push(...operationalLedgerProblems(workspacePath, ledger, options.trust));
+      chainErrors.push(...receiptLedgerProblems(ledger, options.trust));
       verifyEvents(ledger, workspacePath, chainErrors, options.externallyAuthenticatedPayloads);
-      verifySessionChains(ledger, chainErrors);
+      verifySessionChains(ledger, chainErrors, { trust: options.trust });
       sessionLifecycle = verifySessions(ledger, workspacePath, chainErrors, staleAfterMs, continuation);
       verifyRuns(ledger, workspacePath, chainErrors);
       verifyOutcomeEvents(ledger, workspacePath, chainErrors);
@@ -724,8 +734,8 @@ function verifyLedger(workspacePath: string, options: LedgerVerifyOptions, conti
         governanceErrors.push(`Governance verification could not complete: ${error instanceof Error ? error.message : String(error)}`);
       }
     }
-  } catch (error) {
-    chainErrors.push(`Evidence verification could not complete: ${error instanceof Error ? error.message : String(error)}`);
+  } catch {
+    chainErrors.push("Evidence verification could not complete: unreadable or unauthenticated evidence");
   } finally {
     ledger?.close();
   }
@@ -740,7 +750,9 @@ function verifyLedger(workspacePath: string, options: LedgerVerifyOptions, conti
     chain: { ok: chainErrors.length === 0, errors: chainErrors },
     governance: { ok: governanceErrors.length === 0, errors: governanceErrors },
     trustRoot: {
-      anchored: monitorAdmission ? monitorAdmission.status === "admitted" : Boolean(expectedFingerprint) && monitorFingerprint === expectedFingerprint,
+      anchored: monitorAdmission
+        ? monitorAdmission.status === "admitted" && monitorAdmission.source !== "workspace-self"
+        : Boolean(expectedFingerprint) && monitorFingerprint === expectedFingerprint,
       monitorFingerprint,
       expectedFingerprint,
       ...(monitorAdmission ? { monitorAdmission } : {})

@@ -1,7 +1,8 @@
 import { ledgerChainError } from "../../catalog/evidence/mappingAdapter.js";
 import { eventMeta } from "../../claims/evidenceProvenance.js";
 import { verifyHexDigestAny } from "../../crypto/keys.js";
-import { getPurposeKeyHistory } from "../../keys/signingKeys.js";
+import { legacyLedgerRowKeys } from "../../keys/operationalLedgerReader.js";
+import type { TrustContext } from "../../trust/trustContext.js";
 /** Replay authenticated seeded captures before any native inconclusive-row skip. */
 import { z } from "zod";
 import type { Ledger } from "../../ledger/ledger.js";
@@ -33,15 +34,16 @@ export function isExecutedReportPack(packId: string): boolean {
 /** Historical prompt/reply references prove only that the native session recorded an ungraded exchange. */
 function authenticHistoricalReferences(input: {
   ledger: Ledger; sessionId: string; agentId: string | undefined; packId: string; row: AssuranceScenarioResult;
+  trust?: TrustContext;
 }): boolean {
   const ids = input.row.evidenceEventIds;
   if (!input.sessionId || !input.agentId || ids.length < 1 || ids.length > 2 ||
       ids.some(id => typeof id !== "string") || new Set(ids).size !== ids.length) return false;
   try {
-    const keys = getPurposeKeyHistory(input.ledger.workspace, "ledger-row");
+    const keys = legacyLedgerRowKeys(input.ledger.workspace);
     const snapshot = input.ledger.db.transaction(() => ({ events: input.ledger.getAllEvents(),
       session: input.ledger.getSessionById(input.sessionId) }))();
-    if (ledgerChainError(snapshot.events, keys)) return false;
+    if (ledgerChainError(snapshot.events, keys, { workspace: input.ledger.workspace, ledger: input.ledger, trust: input.trust })) return false;
     const session = snapshot.session, last = snapshot.events.filter(event => event.session_id === input.sessionId).at(-1);
     if (!session || session.binary_path !== "amc-assurance-runner" || session.ended_ts === null ||
         !session.session_final_event_hash || session.session_final_event_hash !== last?.event_hash ||
@@ -60,6 +62,7 @@ function authenticHistoricalReferences(input: {
 /** Outer native verification owns the report hash/seal and ledger-run binding before trusting its scope. */
 export function validateExecutedReportRow(input: {
   ledger: Ledger; sessionId: string; scope: ExecutedRunScope | undefined; agentId?: string;
+  trust?: TrustContext;
   row: AssuranceScenarioResult; packId: string; catalog: LoadedCatalog;
 }): { ok: boolean; errors: string[] } {
   const errors: string[] = [];
@@ -77,7 +80,7 @@ export function validateExecutedReportRow(input: {
     // Unsupported/missing-scope/invocation-unavailable rows carry no authenticated execution packet or evidence.
     if (row.executed === undefined) {
       if (row.evidenceEventIds.length === 0) return { ok: true, errors };
-      return authenticHistoricalReferences({ ledger: input.ledger, sessionId: input.sessionId,
+      return authenticHistoricalReferences({ ledger: input.ledger, sessionId: input.sessionId, trust: input.trust,
         agentId: input.scope?.agentId ?? input.agentId, packId, row }) ? { ok: true, errors } :
         fail("executed_report_unbacked_evidence_references");
     }
@@ -92,7 +95,7 @@ export function validateExecutedReportRow(input: {
     if (!scopeResult.success || !input.sessionId) return fail("executed_report_trusted_scope_or_session_missing");
     const scope = scopeResult.data;
     const bindingScope = { ...executedBindingScope(scope), controlId: compiled.controlId, controlVersion: compiled.controlVersion };
-    const replay = replaySeededRunCaptures(input.ledger, input.sessionId, compiled, bindingScope, packet.references);
+    const replay = replaySeededRunCaptures(input.ledger, input.sessionId, compiled, bindingScope, packet.references, undefined, { trust: input.trust });
     if (!replay.ok) return fail(`executed_report_capture_replay_refused:${replay.reason}`);
     // Auth failures are hard verification errors, even when stored rows/diagnostics say NE or inconclusive.
     if (replay.authenticationErrors.length > 0) return fail("executed_report_capture_authentication_failed");
@@ -105,7 +108,7 @@ export function validateExecutedReportRow(input: {
     const evaluation = executedEvaluationSnapshotSchema.parse({ v: 1, planDigest: scope.planDigest,
       profileSha256: scope.profileSha256, policyDigest: scope.policyDigest,
       applicability: scope.controlApplicability[compiled.controlId] ?? "unresolved" });
-    const projection = evaluateExecutedControl({ ledger: input.ledger, sessionId: input.sessionId,
+    const projection = evaluateExecutedControl({ ledger: input.ledger, sessionId: input.sessionId, trust: input.trust,
       compiled, catalog, scope: bindingScope, evaluation, references: packet.references });
     if (!projection.ok) {
       // A truly empty authenticated reference set cannot supply a native insertion-time window or result.

@@ -1,9 +1,17 @@
+import YAML from "yaml";
+import { signAmcConfig } from "../../../src/workspace.js";
+import { signingKeyId } from "../../../src/keys/algorithmPolicy.js";
+import { awsKmsProvider } from "../../../src/keys/providers/awsKms.js";
+import { bindPurposeProviderKey } from "../../../src/keys/purposeProviders.js";
+import { withPins, workspaceSelfTrust } from "../../../src/trust/trustContext.js";
+import { workspaceKeyTrust } from "../../helpers/trustContext.js";
+import { AWS_ARN, awsFake, fakeKey } from "../../keys/providerFakes.js";
 import { envelopeForAssurancePack, envelopeForAssuranceReport } from "../../../src/claims/eligibility/adapters/results.js";
 import { renderAssuranceMarkdown } from "../../../src/assurance/report.js";
 /** Synthetic local HTTP/native-signature integration tests; never human calibration or production ASR. */
 import { randomUUID } from "node:crypto";
 import { createServer, type Server } from "node:http";
-import { mkdirSync, mkdtempSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { afterAll, afterEach, beforeAll, describe, expect, test, vi } from "vitest";
@@ -22,7 +30,7 @@ import { initDestinationRegistry } from "../../../src/residency/destinationRegis
 import { initGatewayConfig, type GatewayConfig } from "../../../src/gateway/config.js";
 import { startGateway, type GatewayHandle } from "../../../src/gateway/server.js";
 import { workspaceIdFromDirectory } from "../../../src/workspaces/workspaceId.js";
-import { openLedger, type Ledger } from "../../../src/ledger/ledger.js";
+import { openLedger, verifyLedgerIntegrity, type Ledger } from "../../../src/ledger/ledger.js";
 import { startAssuranceSession, writeScenarioPrompt, writeScenarioResponse } from "../../../src/assurance/evidenceWriters.js";
 import { runAssurance, verifyAssuranceRun } from "../../../src/assurance/assuranceRunner.js";
 import * as responders from "../../../src/assurance/agentResponder.js";
@@ -42,6 +50,15 @@ import { evaluateControl } from "../../../src/catalog/evidence/evaluate.js";
 import type { EvaluableControl, EvaluationContext } from "../../../src/catalog/evidence/types.js";
 import { canonicalize } from "../../../src/utils/json.js";
 import type { AssuranceReport } from "../../../src/types.js";
+
+const providerBoundary = vi.hoisted(() => ({ call: undefined as import("../../../src/keys/providers/awsKms.js").KmsCall | undefined }));
+vi.mock("../../../src/keys/providers/awsKms.js", async importOriginal => {
+  const actual = await importOriginal<typeof import("../../../src/keys/providers/awsKms.js")>();
+  return { ...actual, awsKmsProvider: (call?: import("../../../src/keys/providers/awsKms.js").KmsCall) => actual.awsKmsProvider(call ?? (async (...args) => {
+    if (providerBoundary.call === undefined) throw new Error("owned provider transport is unset");
+    return providerBoundary.call(...args);
+  })) };
+});
 
 const PASS = "p227-native-owned-fixture-passphrase";
 const MODEL = "p227-native-fixture-model";
@@ -409,6 +426,74 @@ describe.sequential("P2-27 native runner and stored replay", () => {
     expect(markdown).toContain("1-attempt smoke");
     expect(markdown).toContain("Wilson 95%: not measured");
     expect(markdown).not.toContain("**Result:** pass");
+  });
+
+  test("actual provider-bound public report verification replays compiled captures with the independent operator pin", async () => {
+    const isolated = workspaceAt(root, "provider-outer-report"), key = fakeKey("p256"), id = AWS_ARN(`outer-assurance-${randomUUID()}`);
+    const fake = awsFake({ [id]: key }), publicKeyPem = key.publicKey.export({ format: "pem", type: "spki" }).toString();
+    const operatorPins = withPins(workspaceKeyTrust(isolated), [{ keyId: signingKeyId(publicKeyPem)!, purposes: ["ledger-row"], origin: "owned independent assurance operator" }]);
+    activateFixture(isolated);
+    const configPath = join(isolated, ".amc", "amc.config.yaml"), config = YAML.parse(readFileSync(configPath, "utf8"));
+    config.keys = { refs: { "ledger-row": { provider: "aws-kms", id } } };
+    writeFileSync(configPath, YAML.stringify(config)); signAmcConfig(isolated);
+    providerBoundary.call = fake.call;
+    const previousExpected = process.env.AMC_EXPECTED_MONITOR_FINGERPRINT;
+    let owned: OwnedUpstream | undefined, localGateway: GatewayHandle | undefined, stopped = false;
+    try {
+      const binding = await bindPurposeProviderKey(isolated, "ledger-row", { passphrase: PASS, provider: awsKmsProvider(fake.call), delegation: { maxEvents: 10_000 } });
+      vi.stubEnv("AMC_EXPECTED_MONITOR_FINGERPRINT", "");
+      owned = await startOwnedUpstream();
+      initGatewayConfig(isolated, gatewayConfig(owned.origin));
+      localGateway = await startGateway({ workspace: isolated, logger: { log() {}, error() {} } });
+      initGatewayConfig(isolated, gatewayConfig(owned.origin, localGateway.port));
+      const report = await runAssurance({ workspace: isolated, agentId: "default", packId: PACK,
+        mode: "sandbox", window: "1d", model: MODEL, executedAttempts: 1 });
+      expect(owned.bodies, JSON.stringify(report)).toHaveLength(4);
+      const diagnostic = openLedger(isolated, { readonly: true });
+      let sessions;
+      try { sessions = diagnostic.db.prepare("SELECT session_id, binary_path, ended_ts, session_final_event_hash FROM sessions WHERE ended_ts IS NULL OR session_final_event_hash IS NULL").all(); }
+      finally { diagnostic.close(); }
+      // A live legacy gateway session is deliberately unsealed. Do not promote this signed report to VALID.
+      expect(sessions).toHaveLength(1);
+      expect(sessions).toEqual([expect.objectContaining({ binary_path: join(isolated, "dist", "cli.js"), ended_ts: null, session_final_event_hash: null })]);
+      expect(verifyLedgerIntegrity(isolated, { trust: workspaceSelfTrust(isolated) }).chain.errors).toEqual([
+        `Session ${(sessions as Array<{ session_id: string }>)[0]!.session_id} missing seal`
+      ]);
+      expect(report).toMatchObject({ status: "INVALID", verificationPassed: false, overallScore0to100: 0, evidenceStatus: "INSUFFICIENT_EVIDENCE" });
+      const executed = report.packResults[0]!.scenarioResults.filter(row => row.executed !== undefined);
+      expect(executed.map(row => row.scenarioId).sort()).toEqual(["edu-record-isolation", SCENARIO]);
+      for (const row of executed) {
+        expect(row).toMatchObject({ inconclusive: true, pass: false, score0to5: 0, score0to100: 0, gradingMethod: "executed" });
+        expect(row.executed!.references.attack).toHaveLength(1); expect(row.executed!.references.benign).toHaveLength(1);
+        expect(row.executed!.controlResults).toHaveLength(1);
+      }
+      const native = openLedger(isolated);
+      try {
+        const captureRows = native.getAllEvents().filter(row => JSON.parse(row.meta_json).testType === "ASSURANCE_EXECUTED_CAPTURE");
+        expect(captureRows).toHaveLength(4);
+        expect(captureRows.every(row => JSON.parse(row.meta_json).amcKeyDelegation?.sha256 === binding.delegationSha256)).toBe(true);
+        expect(native.getAssuranceRun(report.assuranceRunId)).toMatchObject({ report_json_sha256: report.reportJsonSha256, run_seal_sig: report.runSealSig, status: "INVALID" });
+      } finally { native.close(); }
+      await localGateway.close(); stopped = true; // Verification consumes stored signed captures, without reaching a responder.
+      const grade = vi.spyOn(grading, "gradeScenarioReply"), resolve = vi.spyOn(responders, "resolveAgentResponder");
+      const pinned = { ...operatorPins, asOf: new Date() }, absent = { ...pinned, explicitPins: [] };
+      const input = { workspace: isolated, agentId: "default", assuranceRunId: report.assuranceRunId };
+      expect(await verifyAssuranceRun({ ...input, trust: pinned })).toEqual({ ok: true, errors: [] });
+      for (const trust of [absent, undefined]) {
+        const refused = await verifyAssuranceRun({ ...input, ...(trust === undefined ? {} : { trust }) });
+        expect(refused.ok).toBe(false); expect(refused.errors.join("; ")).toMatch(/issuer.*not-pinned/);
+      }
+      expect(await verifyAssuranceRun({ ...input, trust: { ...operatorPins, asOf: new Date() } })).toEqual({ ok: true, errors: [] });
+      expect(grade).not.toHaveBeenCalled(); expect(resolve).not.toHaveBeenCalled(); expect(owned.bodies).toHaveLength(4);
+    } finally {
+      try {
+        if (localGateway && !stopped) await localGateway.close();
+        const server = owned?.server;
+        if (server) await new Promise<void>((resolve, reject) => server.close(error => error ? reject(error) : resolve()));
+      } finally {
+        providerBoundary.call = undefined; vi.stubEnv("AMC_EXPECTED_MONITOR_FINGERPRINT", previousExpected);
+      }
+    }
   });
 
   test("stored public reports verify native regulated captures without reply regrading", async () => {

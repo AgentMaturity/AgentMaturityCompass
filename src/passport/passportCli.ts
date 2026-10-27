@@ -1,4 +1,11 @@
 import { escapePdfText as escapeSharedPdfText, renderPdfFromLines as renderSharedPdfLines } from "../utils/textPdf.js";
+import { assertOwnerMode } from "../mode/mode.js";
+import { captureOrgFiles, assertOrgPairsCurrent, orgPairBytes } from "../org/preparedOrgPairs.js";
+import { passportPolicyPath } from "./passportStore.js";
+import { capturePassportShareRead } from "./passportLazyReads.js";
+import { PassportPublicationError, passportPublicationFailure, type PassportPublicationOptions } from "./passportPublication.js";
+import { passportBadgeAttemptForApiAsync } from "./passportApi.js";
+import { passportPolicyForApiAsync, passportPolicyApplyForApiAsync, passportCreateForApiAsync, passportExportLatestAttemptForApiAsync } from "./passportApi.js";
 import { dirname, join, resolve } from "node:path";
 import YAML from "yaml";
 import { ensureDir, readUtf8, writeFileAtomic } from "../utils/fs.js";
@@ -161,14 +168,15 @@ export function passportExportLatestCli(params: {
   });
 }
 
-export function passportShareCli(params: {
-  workspace: string;
-  agentId: string;
-  format: "url" | "qr" | "json" | "pdf";
-  baseUrl?: string;
-  outFile?: string;
-}) {
-  const passport = loadOrCreateAgentPassport(params.workspace, params.agentId);
+type PassportShareRequest = {
+  workspace: string; agentId: string; format: "url" | "qr" | "json" | "pdf"; baseUrl?: string; outFile?: string;
+};
+export function passportShareCli(params: PassportShareRequest) {
+  return presentPassportShare(params, loadOrCreateAgentPassport(params.workspace, params.agentId));
+}
+
+function presentPassportShare(params: PassportShareRequest, passport: ReturnType<typeof inspectPassportArtifact>["passport"],
+  pending?: { state: SharePdfState; assertCurrent(): void }) {
   const publicUrl = passportPublicUrlForApi({
     passportId: passport.passportId,
     baseUrl: params.baseUrl
@@ -225,7 +233,10 @@ export function passportShareCli(params: {
     params.workspace,
     params.outFile ?? join(".amc", "passport", "share", params.agentId, `${passport.passportId}.pdf`)
   );
+  if (pending) { if (outFile !== pending.state.file) throw new Error("passport share PDF destination changed");
+    pending.assertCurrent(); assertSharePdfCurrent(pending.state); pending.state.directoryAttempted = true; }
   ensureDir(dirname(outFile));
+  if (pending) pending.state.directoryReturned = true;
   const lines = [
     "AMC Passport Share Certificate",
     `Generated: ${new Date().toISOString()}`,
@@ -242,7 +253,12 @@ export function passportShareCli(params: {
     `Verify URL: ${verificationUrl}`,
     `QR URL: ${qr.qrCodeUrl}`
   ];
-  writeFileAtomic(outFile, renderPdfFromLines(lines), 0o644);
+  const bytes = renderPdfFromLines(lines);
+  if (pending) { pending.assertCurrent(); assertSharePdfCurrent(pending.state); pending.state.writeAttempted = true; }
+  writeFileAtomic(outFile, bytes, 0o644);
+  if (pending) { pending.state.writeReturned = true; const own = captureOrgFiles([outFile]), member = own.members[0]!;
+    if (member.mode !== 0o644 || member.bytes === null || !member.bytes.equals(bytes)) throw new Error("passport share PDF differs from exact returned-write bytes or mode");
+    pending.state.expected = own; pending.assertCurrent(); assertSharePdfCurrent(pending.state); }
   return {
     format: "pdf" as const,
     agentId: params.agentId,
@@ -262,6 +278,11 @@ export function passportCompareCli(params: {
 }) {
   const first = loadOrCreateAgentPassport(params.workspace, params.agentA);
   const second = loadOrCreateAgentPassport(params.workspace, params.agentB);
+  return presentPassportComparison(params, first, second);
+}
+
+function presentPassportComparison(params: { agentA: string; agentB: string },
+  first: ReturnType<typeof inspectPassportArtifact>["passport"], second: typeof first) {
   const rows = [
     { dimension: "overall", a: first.maturity.overall, b: second.maturity.overall },
     { dimension: "strategicOps", a: first.maturity.byFiveLayers.strategicOps, b: second.maturity.byFiveLayers.strategicOps },
@@ -290,4 +311,103 @@ export function passportCompareCli(params: {
     },
     dimensions
   };
+}
+
+/** Fixed maintained export leaf; its real mode path adds no new owner rule. */
+export async function passportExportLatestCliAsync(params: Parameters<typeof passportExportLatestCli>[0]) {
+  const input = { ...params }, workspace = resolve(input.workspace);
+  return passportExportLatestAttemptForApiAsync({ workspace, scopeType: input.scope.toUpperCase(), scopeId: input.id, outFile: resolve(workspace, input.outFile) },
+    { beforePublish: () => assertOwnerMode(workspace, "passport export-latest") });
+}
+
+/** Sequential ordinary reads; each miss owns its genuine create, never an atomic two-agent snapshot. */
+export async function passportCompareCliAsync(params: Parameters<typeof passportCompareCli>[0]) {
+  const input = { ...params }; input.workspace = resolve(input.workspace);
+  type Read = Readonly<{ side: "A" | "B"; agentId: string; source: "cache" | "created"; currentChecked: boolean;
+    publishedPaths: readonly string[]; createdDirectories: readonly string[]; createdHash: string | null; exportedHash: string | null }>;
+  const completedReads: Read[] = [], passports: ReturnType<typeof inspectPassportArtifact>["passport"][] = [];
+  let creationAttempted = false;
+  try {
+    for (const [side, agentId] of [["A", input.agentA], ["B", input.agentB]] as const) {
+      const cached = passportCacheLatestForApi({ workspace: input.workspace, scopeType: "AGENT", scopeId: agentId }).passport;
+      if (cached) {
+        passports.push(cached); completedReads.push(Object.freeze({ side, agentId, source: "cache", currentChecked: false,
+          publishedPaths: Object.freeze([]), createdDirectories: Object.freeze([]), createdHash: null, exportedHash: null }));
+        continue;
+      }
+      creationAttempted = true;
+      const actual = await passportExportLatestAttemptForApiAsync({ workspace: input.workspace, scopeType: "AGENT", scopeId: agentId });
+      const observed = Object.freeze({ side, agentId, source: "created" as const, currentChecked: false,
+        publishedPaths: Object.freeze([...actual.publishedPaths]), createdDirectories: Object.freeze([...actual.createdDirectories]),
+        createdHash: actual.result.transparencyCreatedHash, exportedHash: actual.result.transparencyExportedHash });
+      completedReads.push(observed); actual.assertCurrent();
+      completedReads[completedReads.length - 1] = Object.freeze({ ...observed, currentChecked: true });
+      passports.push(actual.result.passport);
+    }
+    return presentPassportComparison(input, passports[0]!, passports[1]!);
+  } catch (cause) {
+    const failure = passportPublicationFailure(input.workspace, "comparison", completedReads.flatMap(row => row.publishedPaths),
+      completedReads.flatMap(row => row.createdDirectories), null, cause, null, null,
+      creationAttempted || (cause instanceof PassportPublicationError && cause.sharedProgressUnknown));
+    throw Object.assign(failure, { completedReads: Object.freeze([...completedReads]) });
+  }
+}
+
+/** Fixed registered owner gate for these maintained leaves; it adds no mode key or caller-selected policy. */
+function assertPassportCliOwner(workspace: string, command: "passport init" | "passport policy apply" | "passport create"): void {
+  try { assertOwnerMode(workspace, "control results sign"); }
+  catch (cause) {
+    if (cause instanceof Error && cause.message === "Command 'control results sign' is blocked in agent mode. Switch to owner mode with: amc mode owner")
+      throw new Error(`Command '${command}' is blocked in agent mode. Switch to owner mode with: amc mode owner`, { cause });
+    throw cause;
+  }
+}
+export async function passportInitCliAsync(workspace: string) {
+  const beforePublish = () => assertPassportCliOwner(workspace, "passport init"); beforePublish();
+  return passportPolicyForApiAsync(workspace, { beforePublish });
+}
+export async function passportPolicyApplyCliAsync(params: Parameters<typeof passportPolicyApplyCli>[0]) {
+  assertPassportCliOwner(params.workspace, "passport policy apply");
+  const input = { ...params }, file = resolve(input.file), before = captureOrgFiles([file]), bytes = orgPairBytes(before, file);
+  if (bytes === null) throw new Error("passport policy input file is missing");
+  const policy = parseJsonOrYaml(bytes.toString("utf8")), sameTarget = file === resolve(passportPolicyPath(input.workspace));
+  const beforePublish = () => { assertPassportCliOwner(input.workspace, "passport policy apply"); if (!sameTarget) assertOrgPairsCurrent(before); };
+  beforePublish(); assertOrgPairsCurrent(before);
+  return passportPolicyApplyForApiAsync({ workspace: input.workspace, policy }, { beforePublish, assertInputsCurrent() { assertOrgPairsCurrent(before); } });
+}
+export async function passportCreateCliAsync(params: Parameters<typeof passportCreateCli>[0]) {
+  const input = { ...params }, beforePublish = () => assertPassportCliOwner(input.workspace, "passport create"); beforePublish();
+  return passportCreateForApiAsync({ workspace: input.workspace, scopeType: input.scope.toUpperCase(), scopeId: input.id, outFile: resolve(input.workspace, input.outFile) }, { beforePublish });
+}
+
+interface SharePdfState {
+  file: string; aliases(): void; expected: ReturnType<typeof captureOrgFiles>;
+  directoryAttempted: boolean; directoryReturned: boolean; writeAttempted: boolean; writeReturned: boolean;
+}
+function captureSharePdfState(file: string, aliases: () => void): SharePdfState {
+  aliases(); return { file, aliases, expected: captureOrgFiles([file]), directoryAttempted: false, directoryReturned: false, writeAttempted: false, writeReturned: false };
+}
+function assertSharePdfCurrent(state: SharePdfState) { state.aliases(); assertOrgPairsCurrent(state.expected); }
+export async function passportBadgeCliAsync(params: Parameters<typeof passportBadgeCli>[0]) {
+  return passportBadgeAttemptForApiAsync({ ...params });
+}
+/** Fixed maintained share attempt; compare and direct export retain their synchronous recipes. */
+export async function passportShareCliAsync(params: Parameters<typeof passportShareCli>[0], options: PassportPublicationOptions = {}) {
+  const input = { ...params }, pending = capturePassportShareRead(input, { ...options });
+  const pdf = pending.pdfPath === null ? null : captureSharePdfState(pending.pdfPath, pending.pdfAliases!);
+  let actual: Awaited<ReturnType<typeof pending.read>> | null = null;
+  const failed = (cause: unknown) => {
+    const nested = cause instanceof PassportPublicationError ? cause : null;
+    const failure = passportPublicationFailure(input.workspace, "share-presentation", [...(actual?.publishedPaths ?? []), ...(pdf?.writeReturned ? [pdf.file] : [])], actual?.createdDirectories ?? [],
+      pdf?.writeAttempted ? pdf.file : null, cause, actual?.createdHash ?? nested?.createdHash ?? null, actual?.exportedHash ?? nested?.exportedHash ?? null,
+      actual === null || (actual?.sharedProgressUnknown ?? false) || (pdf?.directoryAttempted ?? false) || (nested?.sharedProgressUnknown ?? false));
+    return Object.assign(failure, { policyAttempted: actual?.policyAttempted ?? false, policyReturned: actual?.policyReturned ?? false, pdfDirectoryAttempted: pdf?.directoryAttempted ?? false, pdfDirectoryReturned: pdf?.directoryReturned ?? false,
+      pdfWriteAttempted: pdf?.writeAttempted ?? false, pdfWriteReturned: pdf?.writeReturned ?? false });
+  };
+  try {
+    actual = await pending.read(); actual.assertCurrent();
+    const result = presentPassportShare(input, actual.passport, pdf === null ? undefined : { state: pdf, assertCurrent: actual.assertCurrent });
+    const current = () => { actual!.assertCurrent(); if (pdf !== null) assertSharePdfCurrent(pdf); }; current();
+    return Object.freeze({ result, assertCurrent() { try { current(); } catch (cause) { throw failed(cause); } } });
+  } catch (cause) { throw failed(cause); }
 }

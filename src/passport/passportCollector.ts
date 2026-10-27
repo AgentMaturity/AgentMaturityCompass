@@ -1,4 +1,7 @@
 import { join } from "node:path";
+import YAML from "yaml";
+import { defaultPromptPolicy, promptPolicySchema } from "../prompt/promptPolicySchema.js";
+import { promptPolicyPath } from "../prompt/promptPolicyStore.js";
 import type { DiagnosticReport, LayerScore } from "../types.js";
 import { readUtf8, pathExists } from "../utils/fs.js";
 import { agentRunFiles } from "../diagnostic/runReportResolution.js";
@@ -162,12 +165,12 @@ function trustRank(label: "LOW" | "MEDIUM" | "HIGH"): number {
   return 1;
 }
 
-export function collectPassportData(params: {
+function collectPassportLocalData(params: {
   workspace: string;
   scopeType: "WORKSPACE" | "NODE" | "AGENT";
   scopeId?: string | null;
   policy: PassportPolicy;
-}): {
+}, fixedGeneratedTs?: number, readOnly = false): {
   passport: PassportJson;
   includedEventKinds: string[];
   calculationManifest: Record<string, unknown>;
@@ -267,6 +270,10 @@ export function collectPassportData(params: {
 
   const promptPolicy = (() => {
     try {
+      if (readOnly) {
+        const path = promptPolicyPath(params.workspace);
+        return pathExists(path) ? promptPolicySchema.parse(YAML.parse(readUtf8(path))) : defaultPromptPolicy();
+      }
       return loadPromptPolicy(params.workspace);
     } catch {
       return null;
@@ -305,7 +312,7 @@ export function collectPassportData(params: {
 
   const approvalsSummary = verifyApprovalPolicySignature(params.workspace).valid ? "PASS" : "FAIL";
   const leasesSummary = verifyLeaseRevocationsSignature(params.workspace).valid ? "PASS" : "FAIL";
-  const pluginSummary = verifyPluginWorkspace({ workspace: params.workspace }).ok ? "PASS" : "FAIL";
+  const pluginSummary = verifyPluginWorkspace({ workspace: params.workspace, readonly: readOnly }).ok ? "PASS" : "FAIL";
 
   const reasons = new Set<string>();
   const gates = params.policy.passportPolicy.integrityGates;
@@ -387,7 +394,7 @@ export function collectPassportData(params: {
     ? fileSha(mechanicTargetsPath(params.workspace))
     : null;
 
-  const generatedTs = Date.now();
+  const generatedTs = fixedGeneratedTs ?? Date.now();
   const passport = passportJsonSchema.parse({
     v: 1,
     passportId: `pass_${hashPassportId(`${scope.type}:${scope.id}:${generatedTs}`, 16)}`,
@@ -546,4 +553,13 @@ export function collectPassportData(params: {
     calculationManifest,
     sourceHashes: calculationManifest.sourceHashes
   };
+}
+
+/** Existing synchronous collection/default behavior. */
+export function collectPassportData(params: Parameters<typeof collectPassportLocalData>[0]) {
+  return collectPassportLocalData(params);
+}
+/** Internal actual producer projection: fixed clock; no workspace policy/plugin initialization during rechecks. */
+export function collectPassportDataForPublication(params: Parameters<typeof collectPassportLocalData>[0], generatedTs: number) {
+  return collectPassportLocalData(params, generatedTs, true);
 }

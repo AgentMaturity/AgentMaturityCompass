@@ -1,3 +1,5 @@
+import { rebuildTransparencyMerkleWithMigrationAsync, ensureTransparencyMerkleInitializedAsync } from "./merkleProducerPublication.js";
+import { exportInitializedTransparencyProofBundleAsync } from "./merkleProofPublication.js";
 import type { TrustContext } from "../trust/trustContext.js";
 import type { MerkleAlgorithm } from "./merkle.js";
 import { appendTransparencyEntry } from "./logChain.js";
@@ -60,4 +62,16 @@ export function transparencyMerkleProofCli(params: {
 
 export function transparencyMerkleVerifyProofCli(bundleFile: string, trust: TrustContext, pubkeyPem?: string | null): ReturnType<typeof verifyTransparencyProofBundle> {
   return verifyTransparencyProofBundle(bundleFile, trust, pubkeyPem);
+}
+
+/** Maintained awaitable CLI producers; the synchronous SDK compatibility functions above remain unchanged. */
+export async function transparencyMerkleRebuildCliAsync(workspace: string, opts: { algorithm?: MerkleAlgorithm } = {}) {
+  return rebuildTransparencyMerkleWithMigrationAsync(workspace, opts);
+}
+export async function transparencyMerkleRootCliAsync(workspace: string) {
+  await ensureTransparencyMerkleInitializedAsync(workspace);
+  return { current: currentTransparencyMerkleRoot(workspace), history: listTransparencyMerkleRoots(workspace, 20), verify: verifyTransparencyMerkle(workspace) };
+}
+export async function transparencyMerkleProofCliAsync(params: { workspace: string; entryHash: string; outFile: string }) {
+  return exportInitializedTransparencyProofBundleAsync(params);
 }

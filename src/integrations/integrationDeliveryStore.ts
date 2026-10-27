@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
-import { dirname, join, resolve } from "node:path";
+import { join, resolve } from "node:path";
 import { z } from "zod";
-import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
+import { withIntegrationJournalProtocol, writeIntegrationJournalExport, type IntegrationJournalIo, type IntegrationJournalWrite } from "./integrationJournalProtocol.js";
 import {
   normalizeWebhookDeliveryError,
   redactWebhookDeliveryReceipt,
@@ -74,11 +74,14 @@ export function integrationDeliveryJournalPath(workspace: string): string {
 }
 
 export function loadIntegrationDeliveryJournal(workspace: string): IntegrationDeliveryJournal {
-  const path = integrationDeliveryJournalPath(workspace);
-  if (!pathExists(path)) {
+  return withIntegrationJournalProtocol(workspace, journal => loadJournal(journal));
+}
+function loadJournal(io: IntegrationJournalIo): IntegrationDeliveryJournal {
+  const text = io.deliveryText();
+  if (text === null) {
     return defaultJournal();
   }
-  const parsed = integrationDeliveryJournalSchema.parse(JSON.parse(readUtf8(path)) as unknown);
+  const parsed = integrationDeliveryJournalSchema.parse(JSON.parse(text) as unknown);
   const sanitizeReceipt = (value: unknown): unknown => {
     if (
       value &&
@@ -107,24 +110,27 @@ export function loadIntegrationDeliveryJournal(workspace: string): IntegrationDe
     }))
   });
   if (JSON.stringify(parsed) !== JSON.stringify(sanitized)) {
-    writeFileAtomic(path, JSON.stringify(sanitized, null, 2), 0o600);
+    io.saveDelivery(JSON.stringify(sanitized, null, 2));
   }
   return sanitized;
 }
 
-function saveIntegrationDeliveryJournal(workspace: string, journal: IntegrationDeliveryJournal): string {
-  ensureDir(join(workspace, ".amc"));
-  const path = integrationDeliveryJournalPath(workspace);
-  writeFileAtomic(path, JSON.stringify(integrationDeliveryJournalSchema.parse(journal), null, 2), 0o600);
-  return path;
+function saveIntegrationDeliveryJournal(io: IntegrationJournalIo, journal: IntegrationDeliveryJournal): void {
+  io.saveDelivery(JSON.stringify(integrationDeliveryJournalSchema.parse(journal), null, 2));
 }
 
 export function nextIntegrationChannelSequence(workspace: string, channelId: string): number {
-  const journal = loadIntegrationDeliveryJournal(workspace);
+  return withIntegrationJournalProtocol(workspace, io => nextIntegrationChannelSequenceInJournal(io, workspace, channelId));
+}
+
+/** Internal active-scope implementation; no recursive public lock acquisition. */
+export function nextIntegrationChannelSequenceInJournal(io: IntegrationJournalIo, workspace: string, channelId: string): number {
+  if (io.workspace !== workspace) throw new Error("integration journal scope belongs to another workspace");
+  const journal = loadJournal(io);
   const next = (journal.sequenceByChannel[channelId] ?? 0) + 1;
   journal.sequenceByChannel[channelId] = next;
   journal.updatedTs = Date.now();
-  saveIntegrationDeliveryJournal(workspace, journal);
+  saveIntegrationDeliveryJournal(io, journal);
   return next;
 }
 
@@ -155,11 +161,17 @@ export function recordIntegrationDelivery(params: {
   receipt: WebhookDeliveryReceipt;
   maxReceipts?: number;
 }): IntegrationDeliveryRecord {
+  return withIntegrationJournalProtocol(params.workspace, io => recordIntegrationDeliveryInJournal(io, params));
+}
+
+/** Internal active-scope implementation; no recursive public lock acquisition. */
+export function recordIntegrationDeliveryInJournal(io: IntegrationJournalIo, params: Parameters<typeof recordIntegrationDelivery>[0]): IntegrationDeliveryRecord {
+  if (io.workspace !== params.workspace) throw new Error("integration journal scope belongs to another workspace");
   const maxReceipts = Number.isFinite(params.maxReceipts)
     ? Math.max(1, Math.floor(params.maxReceipts!))
     : DEFAULT_MAX_RECEIPTS;
   const receipt = redactWebhookDeliveryReceipt(params.receipt);
-  const journal = loadIntegrationDeliveryJournal(params.workspace);
+  const journal = loadJournal(io);
   const existing = journal.receipts.find((row) => row.deliveryId === receipt.deliveryId);
   if (existing) {
     return existing;
@@ -187,7 +199,7 @@ export function recordIntegrationDelivery(params: {
     journal.receipts = journal.receipts.slice(journal.receipts.length - maxReceipts);
   }
   journal.updatedTs = Date.now();
-  saveIntegrationDeliveryJournal(params.workspace, journal);
+  saveIntegrationDeliveryJournal(io, journal);
   return record;
 }
 
@@ -201,11 +213,17 @@ export function addIntegrationDeadLetter(params: {
   receipt: WebhookDeliveryReceipt;
   maxDeadLetters?: number;
 }): IntegrationDeadLetter {
+  return withIntegrationJournalProtocol(params.workspace, io => addIntegrationDeadLetterInJournal(io, params));
+}
+
+/** Internal active-scope implementation; no recursive public lock acquisition. */
+export function addIntegrationDeadLetterInJournal(io: IntegrationJournalIo, params: Parameters<typeof addIntegrationDeadLetter>[0]): IntegrationDeadLetter {
+  if (io.workspace !== params.workspace) throw new Error("integration journal scope belongs to another workspace");
   const maxDeadLetters = Number.isFinite(params.maxDeadLetters)
     ? Math.max(1, Math.floor(params.maxDeadLetters!))
     : DEFAULT_MAX_DEAD_LETTERS;
   const receipt = redactWebhookDeliveryReceipt(params.receipt);
-  const journal = loadIntegrationDeliveryJournal(params.workspace);
+  const journal = loadJournal(io);
   const existing = journal.deadLetters.find((row) => row.deliveryId === receipt.deliveryId);
   if (existing) {
     return existing;
@@ -234,7 +252,7 @@ export function addIntegrationDeadLetter(params: {
     journal.deadLetters = journal.deadLetters.slice(journal.deadLetters.length - maxDeadLetters);
   }
   journal.updatedTs = Date.now();
-  saveIntegrationDeliveryJournal(params.workspace, journal);
+  saveIntegrationDeliveryJournal(io, journal);
   return entry;
 }
 
@@ -242,7 +260,13 @@ export function resolveIntegrationDeadLetter(params: {
   workspace: string;
   deadLetterId: string;
 }): IntegrationDeadLetter | null {
-  const journal = loadIntegrationDeliveryJournal(params.workspace);
+  return withIntegrationJournalProtocol(params.workspace, io => resolveIntegrationDeadLetterInJournal(io, params));
+}
+
+/** Internal active-scope implementation; no recursive public lock acquisition. */
+export function resolveIntegrationDeadLetterInJournal(io: IntegrationJournalIo, params: Parameters<typeof resolveIntegrationDeadLetter>[0]): IntegrationDeadLetter | null {
+  if (io.workspace !== params.workspace) throw new Error("integration journal scope belongs to another workspace");
+  const journal = loadJournal(io);
   const entry = journal.deadLetters.find((row) => row.deadLetterId === params.deadLetterId);
   if (!entry) {
     return null;
@@ -250,7 +274,7 @@ export function resolveIntegrationDeadLetter(params: {
   entry.resolved = true;
   entry.resolvedTs = Date.now();
   journal.updatedTs = Date.now();
-  saveIntegrationDeliveryJournal(params.workspace, journal);
+  saveIntegrationDeliveryJournal(io, journal);
   return entry;
 }
 
@@ -287,13 +311,15 @@ export function exportIntegrationDeliveryJournal(params: {
   receiptCount: number;
   deadLetterCount: number;
 } {
-  const journal = loadIntegrationDeliveryJournal(params.workspace);
-  const outFile = resolve(params.workspace, params.outFile);
-  ensureDir(dirname(outFile));
-  writeFileAtomic(outFile, JSON.stringify(journal, null, 2), 0o644);
-  return {
-    outFile,
-    receiptCount: journal.receipts.length,
-    deadLetterCount: journal.deadLetters.length
-  };
+  const workspace = params.workspace, outFile = resolve(workspace, params.outFile);
+  const writes: IntegrationJournalWrite[] = [];
+  const prepared = withIntegrationJournalProtocol(workspace, io => {
+    const journal = loadJournal(io), body = JSON.stringify(journal, null, 2);
+    const local = io.sharesExportLock(outFile);
+    if (local) io.exportJournal(outFile, body);
+    return { local, body, result: { outFile, receiptCount: journal.receipts.length, deadLetterCount: journal.deadLetters.length } };
+  }, undefined, writes);
+  // A different workspace's explicit journal destination is written only after releasing this source lock.
+  if (!prepared.local) writeIntegrationJournalExport(workspace, outFile, prepared.body, writes);
+  return prepared.result;
 }

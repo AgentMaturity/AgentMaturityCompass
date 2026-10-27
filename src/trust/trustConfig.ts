@@ -5,12 +5,15 @@ import { z } from "zod";
 import YAML from "yaml";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
-import { verifySignedFileWithAuditor } from "../org/orgSigner.js";
+import { publishTrustConfig, verifyTrustConfigPublication } from "./trustConfigPublication.js";
+import { publishNotaryEnablement } from "./notaryEnablementPublication.js";
+import { assertKeysetComplete, keysetDeclared } from "../keys/keyset.js";
 import { getVaultSecret, setVaultSecret } from "../vault/vault.js";
 import { verifyNotaryAttestResponse } from "../notary/notaryVerify.js";
 import { addPublicKeyToHistory } from "../crypto/keys.js";
 import { buildNotaryAuthSignature } from "../notary/notaryAuth.js";
 import { signDigestWithVault } from "../crypto/signing/signerVault.js";
+import type { NotaryAttestationBasis } from "../notary/notaryApiTypes.js";
 
 function signTrustConfigWithVault(workspace: string, path: string): string {
   const digest = sha256Hex(Buffer.from(readUtf8(path), "utf8"));
@@ -107,7 +110,7 @@ export function trustConfigSigPath(workspace: string): string {
   return `${trustConfigPath(workspace)}.sig`;
 }
 
-function defaultTrustConfig(): TrustConfig {
+export function defaultTrustConfig(): TrustConfig {
   return trustConfigSchema.parse({
     trust: {
       version: 1,
@@ -162,6 +165,17 @@ export function initTrustConfig(workspace: string): {
   return { path, sigPath, config };
 }
 
+/** Direct-purpose initialization; true fresh/no-sign compatibility keeps the original synchronous recipe. */
+export async function initTrustConfigAsync(workspace: string, beforePublish?: () => void): Promise<ReturnType<typeof initTrustConfig>> {
+  if (process.env.AMC_NO_SIGN === "1") return initTrustConfig(workspace);
+  const keyset = assertKeysetComplete(workspace);
+  if (keyset === null && !keysetDeclared(workspace)) return initTrustConfig(workspace);
+  const config = defaultTrustConfig();
+  const completed = await publishTrustConfig(workspace, Buffer.from(YAML.stringify(config), "utf8"), beforePublish);
+  completed.assertCurrent();
+  return { path: completed.path, sigPath: completed.sigPath, config };
+}
+
 function saveTrustConfig(workspace: string, config: TrustConfig): {
   path: string;
   sigPath: string;
@@ -182,7 +196,7 @@ export function verifyTrustConfigSignature(workspace: string): {
   path: string;
   sigPath: string;
 } {
-  return verifySignedFileWithAuditor(workspace, trustConfigPath(workspace));
+  return verifyTrustConfigPublication(workspace);
 }
 
 async function httpJsonGet(params: {
@@ -233,6 +247,7 @@ export async function checkNotaryTrust(workspace: string): Promise<{
   pinnedFingerprint: string | null;
   currentFingerprint: string | null;
   attestationLevel: "SOFTWARE" | "HARDWARE" | null;
+  attestationBasis: NotaryAttestationBasis | null;
   requiredAttestationLevel: "SOFTWARE" | "HARDWARE" | null;
   lastAttestationTs: number | null;
 }> {
@@ -247,6 +262,7 @@ export async function checkNotaryTrust(workspace: string): Promise<{
     pinnedFingerprint: config.trust.mode === "NOTARY" ? config.trust.notary.pinnedPubkeyFingerprint : null,
     currentFingerprint: null as string | null,
     attestationLevel: null as "SOFTWARE" | "HARDWARE" | null,
+    attestationBasis: null as NotaryAttestationBasis | null,
     requiredAttestationLevel: config.trust.mode === "NOTARY" ? config.trust.notary.requiredAttestationLevel : null,
     lastAttestationTs: null as number | null
   };
@@ -314,6 +330,7 @@ export async function checkNotaryTrust(workspace: string): Promise<{
     return out;
   }
   out.attestationLevel = verified.parsed.attestation.notary.attestationLevel;
+  out.attestationBasis = verified.parsed.attestation.notary.attestationBasis ?? null;
   out.lastAttestationTs = verified.parsed.attestation.ts;
   if (verified.parsed.pubkeyFingerprint !== config.trust.notary.pinnedPubkeyFingerprint) {
     out.ok = false;
@@ -387,6 +404,16 @@ export async function enableNotaryTrust(params: {
     sigPath: saved.sigPath,
     fingerprint
   };
+}
+
+/** Direct CLI continuation; genuine no-sign/fresh compatibility retains the legacy recipe. */
+export async function enableNotaryTrustAsync(params: Parameters<typeof enableNotaryTrust>[0], beforePublish?: () => void): ReturnType<typeof enableNotaryTrust> {
+  if (process.env.AMC_NO_SIGN === "1") return enableNotaryTrust(params);
+  const keyset = assertKeysetComplete(params.workspace);
+  if (keyset === null && !keysetDeclared(params.workspace)) return enableNotaryTrust(params);
+  const completed = await publishNotaryEnablement(params, beforePublish);
+  completed.assertCurrent();
+  return { path: completed.path, sigPath: completed.sigPath, fingerprint: completed.fingerprint };
 }
 
 export function shouldRequireNotaryForKind(workspace: string, kind: SignKind): boolean {

@@ -11,6 +11,7 @@ import { verifyHexDigestAny } from "../../crypto/keys.js";
 import { canonicalMetadataForHash } from "../../ledger/eventHash.js";
 import { verifyReceipt } from "../../receipts/receipt.js";
 import type { EvidenceEvent } from "../../types.js";
+import { operationalEvidenceProblems, type OperationalEvidenceOptions } from "../../keys/operationalLedgerReader.js";
 import { sha256Hex } from "../../utils/hash.js";
 import type { BindingField, ProducerRecord } from "../types.js";
 import { evaluateControl } from "./evaluate.js";
@@ -34,7 +35,12 @@ const hashed = (event: EvidenceEvent): EvidenceEvent => ({ ...event, payload_inl
  * head signature commits to every row through the hash links. The monitor key is the workspace's own, so this is a
  * local audit trail, not a portable verdict (P0-09), and a truncated tail is invisible until anchoring (P1-26).
  */
-export function ledgerChainError(events: readonly EvidenceEvent[], monitorKeys: string[]): string | null {
+export function ledgerChainError(events: readonly EvidenceEvent[], monitorKeys: string[], options?: OperationalEvidenceOptions & { workspace: string }): string | null {
+  // The two-argument form remains the legacy pure chain check. Workspace readers must supply their actual context.
+  if (options) {
+    const delegated = operationalEvidenceProblems(options.workspace, events, options);
+    if (delegated.length) return delegated.slice(0, 3).join("; ");
+  }
   // ponytail: rehashes the whole chain on every report; checkpoint a verified prefix if ledgers grow large.
   let previous = "GENESIS";
   for (const event of events) {

@@ -1,7 +1,8 @@
 import { createHash } from "node:crypto";
 import { readFileSync, statSync } from "node:fs";
 import type { Command } from "commander";
-import { assertScheduleOwner, manageSchedule, scheduleStatus } from "./autonomy/scheduleStore.js";
+import { assertScheduleOwner, manageScheduleAsync as manageSchedule, scheduleStatus } from "./autonomy/scheduleStore.js";
+import { resolve } from "node:path";
 import { assertNativeScheduleAdmission, startNativeScheduleService } from "./autonomy/scheduleService.js";
 import { approvalGateFor, integerOption, paramsFor, routeFor, type AgentLoopCliIo, type RunOptions } from "./cli-agent-options.js";
 import { STUB_PROVIDER_ID, STUB_PROVIDER_MODEL, stubProviderTransport } from "./agent/stubProvider.js";
@@ -59,21 +60,25 @@ export function registerNativeScheduleCommands(program: Command, io: AgentLoopCl
   group.command("put <file>").description("Add or replace one reviewed definition using the existing workspace signer; does not start a runner")
     .requiredOption("--expect-input-sha256 <digest>", "exact JSON bytes reviewed through inspect-file")
     .requiredOption("--expect-digest <digest>", "current signed config digest from list, or absent for a new configuration")
-    .action((file: string, opts: { expectInputSha256: string; expectDigest: string }) => {
+    .action(async (file: string, opts: { expectInputSha256: string; expectDigest: string }) => {
       try {
-        assertScheduleOwner(workspace());
-        const input = definition(file);
-        if (input.inputSha256 !== opts.expectInputSha256) throw new Error("Schedule definition changed; inspect-file again before signing.");
-        manageSchedule(workspace(), opts.expectDigest, { kind: "put", schedule: input.schedule });
-        report(scheduleStatus(workspace(), now()));
+        const root = resolve(workspace()), inputPath = resolve(file), expectedInput = opts.expectInputSha256;
+        assertScheduleOwner(root);
+        const input = definition(inputPath);
+        if (input.inputSha256 !== expectedInput) throw new Error("Schedule definition changed; inspect-file again before signing.");
+        const beforePublish = () => { if (definition(inputPath).inputSha256 !== expectedInput) throw new Error("Schedule definition changed; inspect-file again before signing."); };
+        beforePublish();
+        await manageSchedule(root, opts.expectDigest, { kind: "put", schedule: input.schedule }, { beforePublish });
+        report(scheduleStatus(root, now()));
       } catch (error) { failed(error); }
     });
   for (const kind of ["enable", "disable", "remove", "reset-failures"] as const) {
     group.command(`${kind} <id>`)
       .description(kind === "disable" ? "Prevent future claims; does not pretend to cancel an already running owner" : `Explicitly ${kind} a schedule without discarding its cadence or claim history`)
       .requiredOption("--expect-digest <digest>", "current signed schedule configuration digest from list")
-      .action((id: string, opts: { expectDigest: string }) => {
-        try { manageSchedule(workspace(), opts.expectDigest, { kind, id }); report(scheduleStatus(workspace(), now())); }
+      .action(async (id: string, opts: { expectDigest: string }) => {
+        const root = resolve(workspace());
+        try { await manageSchedule(root, opts.expectDigest, { kind, id }); report(scheduleStatus(root, now())); }
         catch (error) { failed(error); }
       });
   }

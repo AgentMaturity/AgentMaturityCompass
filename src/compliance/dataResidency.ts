@@ -14,7 +14,9 @@
  */
 
 import { randomUUID } from "node:crypto";
+import { resolve } from "node:path";
 import { sha256Hex } from "../utils/hash.js";
+import { buildResidencyPolicy, buildTenantBoundary } from "./residencyRecordBodies.js";
 import { envelopeForUnverifiedResult } from "../claims/eligibility/adapters/results.js";
 import { formatClaimLabel, renderClaimLabel, renderClaimLegend } from "../claims/eligibility/render.js";
 import type { ClaimEnvelope } from "../claims/eligibility/types.js";
@@ -31,7 +33,9 @@ export { getBuiltInRedactionRules, applyRedaction, runRedactionTests };
 
 import {
   saveWorkspaceRecord,
-  loadWorkspaceRecords
+  loadWorkspaceRecords,
+  prepareWorkspaceRecordAsync,
+  withWorkspaceRecordPublicationLock
 } from "../storage/workspaceRecordStore.js";
 
 /** Where each residency register lives under .amc/. */
@@ -202,29 +206,24 @@ export function createResidencyPolicy(opts: {
   legalHoldEnabled?: boolean;
   privacyRedactionEnabled?: boolean;
 }, workspace?: string): ResidencyPolicy {
-  const policy: ResidencyPolicy = {
-    policyId: `rp_${randomUUID().slice(0, 12)}`,
-    region: opts.region,
-    customRegionLabel: opts.customRegionLabel,
-    allowedRegions: opts.allowedRegions ?? [opts.region],
-    denyRegions: opts.denyRegions ?? [],
-    isolationLevel: opts.isolationLevel ?? "strict",
-    keyCustodyMode: opts.keyCustodyMode ?? "local",
-    requireEncryptionAtRest: opts.requireEncryptionAtRest ?? true,
-    requireEncryptionInTransit: opts.requireEncryptionInTransit ?? true,
-    retentionMinDays: opts.retentionMinDays ?? 30,
-    retentionMaxDays: opts.retentionMaxDays ?? 3650,
-    legalHoldEnabled: opts.legalHoldEnabled ?? false,
-    privacyRedactionEnabled: opts.privacyRedactionEnabled ?? false,
-    createdTs: Date.now(),
-    policyHash: "",
-  };
-  policy.policyHash = sha256Hex(JSON.stringify({ ...policy, policyHash: "" }));
+  const policy = buildResidencyPolicy(opts);
   policies.push(policy);
   if (workspace) {
     saveWorkspaceRecord(workspace, POLICIES_AT, policy.policyId, { ...policy }, policy.createdTs);
   }
   return policy;
+}
+
+export async function createResidencyPolicyAsync(opts: Parameters<typeof createResidencyPolicy>[0], workspace?: string): Promise<ResidencyPolicy> {
+  if (!workspace) return createResidencyPolicy(opts);
+  const root = resolve(workspace);
+  const policy = buildResidencyPolicy(structuredClone(opts));
+  const prepared = await prepareWorkspaceRecordAsync(root, POLICIES_AT, policy.policyId, { ...policy }, policy.createdTs);
+  return withWorkspaceRecordPublicationLock(root, POLICIES_AT, () => {
+    prepared.publish();
+    policies.push(policy);
+    return policy;
+  });
 }
 
 export function getResidencyPolicies(workspace?: string): ResidencyPolicy[] {
@@ -259,19 +258,24 @@ export function registerTenant(opts: {
   isolationLevel?: IsolationLevel;
   keyCustodyMode?: KeyCustodyMode;
 }, workspace?: string): TenantBoundary {
-  const boundary: TenantBoundary = {
-    tenantId: opts.tenantId,
-    workspaceId: opts.workspaceId,
-    region: opts.region,
-    isolationLevel: opts.isolationLevel ?? "strict",
-    keyCustodyMode: opts.keyCustodyMode ?? "local",
-    createdTs: Date.now(),
-  };
+  const boundary = buildTenantBoundary(opts);
   tenants.push(boundary);
   if (workspace) {
     saveWorkspaceRecord(workspace, TENANTS_AT, boundary.tenantId, { ...boundary }, boundary.createdTs);
   }
   return boundary;
+}
+
+export async function registerTenantAsync(opts: Parameters<typeof registerTenant>[0], workspace?: string): Promise<TenantBoundary> {
+  if (!workspace) return registerTenant(opts);
+  const root = resolve(workspace);
+  const boundary = buildTenantBoundary(structuredClone(opts));
+  const prepared = await prepareWorkspaceRecordAsync(root, TENANTS_AT, boundary.tenantId, { ...boundary }, boundary.createdTs);
+  return withWorkspaceRecordPublicationLock(root, TENANTS_AT, () => {
+    prepared.publish();
+    tenants.push(boundary);
+    return boundary;
+  });
 }
 
 export function getTenants(workspace?: string): TenantBoundary[] {

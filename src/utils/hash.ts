@@ -1,6 +1,10 @@
 import { createHash } from "node:crypto";
 
-export function sha256Hex(input: Buffer | string): string {
+export function isSha256HexDigest(value: string): boolean {
+  return /^[a-f0-9]{64}$/.test(value);
+}
+
+export function sha256Hex(input: Uint8Array | string): string {
   return createHash("sha256").update(input).digest("hex");
 }
 

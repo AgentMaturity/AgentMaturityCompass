@@ -123,10 +123,48 @@ export function ed25519KeyId(publicKeyPem: string): string | null {
   return canonical === null ? null : sha256Hex(Buffer.from(canonical, "utf8"));
 }
 
-/** Ed25519 verification that never throws. */
-export function verifyEd25519(message: Uint8Array, publicKeyPem: string, signature: Uint8Array): boolean {
+/** Ed25519 or ECDSA P-256 (P2-08 algorithm policy): the key's algorithm and its canonical SPKI PEM; null for any other key. */
+export function canonicalSigningPem(publicKeyPem: string): { algorithm: "ed25519" | "ecdsa-p256-sha256"; pem: string } | null {
+  if (!publicKeyPem.trimStart().startsWith("-----BEGIN PUBLIC KEY-----")) return null;
   try {
-    return verify(null, message, publicKeyPem, signature);
+    const key = createPublicKey(publicKeyPem);
+    const algorithm = key.asymmetricKeyType === "ed25519" ? "ed25519"
+      : key.asymmetricKeyType === "ec" && key.asymmetricKeyDetails?.namedCurve === "prime256v1" ? "ecdsa-p256-sha256" : null;
+    return algorithm === null ? null : { algorithm, pem: key.export({ format: "pem", type: "spki" }).toString() };
+  } catch {
+    return null;
+  }
+}
+
+/** AMC key id of an Ed25519 or P-256 key (sha256 of the canonical PEM); null for any other key. */
+export function signingKeyId(publicKeyPem: string): string | null {
+  const canonical = canonicalSigningPem(publicKeyPem);
+  return canonical === null ? null : sha256Hex(Buffer.from(canonical.pem, "utf8"));
+}
+
+const P256_ORDER = BigInt("0xffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632551");
+const ED25519_ORDER = 2n ** 252n + 27742317777372353535851937790883648493n;
+const bigBE = (bytes: Uint8Array) => BigInt(`0x${Buffer.from(bytes).toString("hex") || "0"}`);
+
+/** One encoding per signature: 64 bytes; Ed25519 S below the group order; ECDSA 0 < r < n and 0 < s <= n/2 (low S). */
+function canonicalSignature(algorithm: "ed25519" | "ecdsa-p256-sha256", signature: Uint8Array): boolean {
+  if (signature.length !== 64) return false;
+  if (algorithm === "ed25519") return bigBE(Buffer.from(signature.subarray(32)).reverse()) < ED25519_ORDER;
+  const r = bigBE(signature.subarray(0, 32));
+  const s = bigBE(signature.subarray(32));
+  return r > 0n && r < P256_ORDER && s > 0n && s <= P256_ORDER / 2n;
+}
+
+/**
+ * Verification in the key's own algorithm that never throws: Ed25519, or ECDSA P-256 with SHA-256 in IEEE P1363 (64
+ * bytes, low S). A DER-encoded or high-S ECDSA signature, an unreduced Ed25519 S and any other key type are refused.
+ */
+export function verifySignature(message: Uint8Array, publicKeyPem: string, signature: Uint8Array): boolean {
+  const canonical = canonicalSigningPem(publicKeyPem);
+  if (canonical === null || !canonicalSignature(canonical.algorithm, signature)) return false;
+  try {
+    return canonical.algorithm === "ed25519" ? verify(null, message, publicKeyPem, signature)
+      : verify("sha256", message, { key: publicKeyPem, dsaEncoding: "ieee-p1363" }, signature);
   } catch {
     return false;
   }
@@ -135,4 +173,10 @@ export function verifyEd25519(message: Uint8Array, publicKeyPem: string, signatu
 /** Domain-separated bytes: an ASCII tag, one 0x00 byte, then UTF-8 text. */
 export function tagged(tag: string, text: string): Buffer {
   return Buffer.concat([Buffer.from(tag, "ascii"), Buffer.from([0]), Buffer.from(text, "utf8")]);
+}
+
+/** One envelope selects one signing form for all rows; v2 hashes the complete original domain-separated v1 payload. */
+export function statementMessage(v1Tag: string, v2Tag: string, text: string, signatureVersion?: 2): Buffer {
+  const legacy = tagged(v1Tag, text);
+  return signatureVersion === 2 ? Buffer.concat([Buffer.from(v2Tag + "\0", "ascii"), Buffer.from(sha256Hex(legacy), "hex")]) : legacy;
 }

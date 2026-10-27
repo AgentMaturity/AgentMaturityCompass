@@ -1,4 +1,5 @@
-import { createPrivateKey, createPublicKey, generateKeyPairSync, sign, verify } from "node:crypto";
+import { createPrivateKey, generateKeyPairSync, sign } from "node:crypto";
+import { verifyCanonical } from "../keys/algorithmPolicy.js";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { canonicalize } from "../utils/json.js";
@@ -93,8 +94,7 @@ export function signReleaseManifest(manifest: ReleaseManifest, privateKeyPem: st
 export function verifyReleaseManifest(manifest: ReleaseManifest, signatureB64: string, publicKeyPem: string): boolean {
   try {
     const payload = Buffer.from(canonicalize(manifest), "utf8");
-    const publicKey = createPublicKey(publicKeyPem);
-    return verify(null, payload, publicKey, Buffer.from(signatureB64, "base64"));
+    return verifyCanonical(manifest.signing.algorithm, payload, publicKeyPem, Buffer.from(signatureB64, "base64"));
   } catch {
     return false;
   }

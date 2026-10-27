@@ -2,16 +2,24 @@ import { mkdtempSync, readdirSync, readFileSync, rmSync, appendFileSync } from "
 import { spawnSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { dirname, join, relative, resolve } from "node:path";
-import { getPublicKeyHistory, verifyHexDigestAny } from "../crypto/keys.js";
+import { getPublicKeyHistory } from "../crypto/keys.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
-import { currentTreeAlgorithm, updateTransparencyMerkleAfterAppend } from "./merkleIndexStore.js";
+import { currentTreeAlgorithm, readSignedCurrentRoot } from "./merkleIndexStore.js";
+import { prepareMerkle, preparedRootSignature, publishPreparedMerkle } from "./preparedMerkle.js";
+import { clearMerklePendingMarker, TransparencyMerkleLagError, writeMerklePendingMarker } from "./merkleIndexState.js";
+import { captureTransparencyState, publishTransparencyState, stateBytes, workspaceLogPath } from "./workspacePublication.js";
+export { appendTransparencyEntryAsync } from "./asyncWorkspaceAppend.js";
 import type { MerkleAlgorithm } from "./merkle.js";
-import { signDigestWithPolicy, verifySignedDigest } from "../crypto/signing/signer.js";
+import { signDigestWithPolicy, signDigestWithPolicyAsync } from "../crypto/signing/signer.js";
+import { verifyWorkspaceLogSignature } from "./workspaceSignature.js";
 import { extractValidatedTarGzipArchive, type TarArchiveLimits } from "../security/safeTarArchive.js";
 import { buildVerifierReport, checkDigestSignature, envelopePublicKey, type IssuerAdmission, type TrustContext, type VerifierReportV1 } from "../trust/index.js";
 import { fileSha256 } from "../trust/signatureCheck.js";
+import type { SignedDigest } from "../crypto/signing/signerTypes.js";
+import { captureWorkspaceLogAuthority } from "./asyncWorkspaceAppend.js";
+import { captureTransparencyAppendPublication, withTransparencyPublicationLock } from "./workspacePublication.js";
 
 /**
  * Extraction limits for AMC archives.
@@ -69,12 +77,8 @@ function appendLine(path: string, line: string): void {
  * across a crash), so the chosen `prev` is byte-identical to the whole-file read
  * it replaces. Mirrors `lastBlobIndexHash` in the blob store.
  */
-function lastTransparencyEntryHash(workspace: string): string {
-  const path = transparencyLogPath(workspace);
-  if (!pathExists(path)) {
-    return "";
-  }
-  const text = readUtf8(path);
+function lastTransparencyEntryHash(bytes: Buffer | null): string {
+  const text = bytes?.toString("utf8") ?? "";
   let end = text.length;
   while (end > 0 && (text[end - 1] === "\n" || text[end - 1] === "\r")) end -= 1;
   if (end === 0) return "";
@@ -95,11 +99,8 @@ function readEntries(workspace: string): TransparencyEntry[] {
     .map((line) => transparencyEntrySchema.parse(JSON.parse(line) as unknown));
 }
 
-/** `merkleAlgorithm` makes the Merkle tree choice part of the signed, chain-bound seal (P1-26). */
-function writeSeal(workspace: string, lastHash: string, merkleAlgorithm: MerkleAlgorithm): void {
-  ensureDir(transparencyDir(workspace));
-  const auditorPub = getPublicKeyHistory(workspace, "auditor")[0] ?? "";
-  const signerFingerprint = sha256Hex(Buffer.from(auditorPub, "utf8"));
+/** Shared pure wire recipe; the synchronous caller retains its historical role-first fingerprint. */
+function sealBytes(lastHash: string, signerFingerprint: string, merkleAlgorithm: MerkleAlgorithm): Buffer {
   const seal = transparencySealSchema.parse({
     v: 1,
     ts: Date.now(),
@@ -107,14 +108,9 @@ function writeSeal(workspace: string, lastHash: string, merkleAlgorithm: MerkleA
     signerFingerprint,
     merkleAlgorithm
   });
-  const sealPath = transparencySealPath(workspace);
-  writeFileAtomic(sealPath, JSON.stringify(seal, null, 2), 0o644);
-  const digest = sha256Hex(readFileSync(sealPath));
-  const signed = signDigestWithPolicy({
-    workspace,
-    kind: "TRANSPARENCY_ROOT",
-    digestHex: digest
-  });
+  return Buffer.from(JSON.stringify(seal, null, 2));
+}
+function sealSignatureBytes(digest: string, signed: SignedDigest): Buffer {
   const sig = transparencySealSignatureSchema.parse({
     digestSha256: digest,
     signature: signed.signature,
@@ -122,7 +118,19 @@ function writeSeal(workspace: string, lastHash: string, merkleAlgorithm: MerkleA
     signer: "auditor",
     envelope: signed.envelope
   });
-  writeFileAtomic(transparencySealSigPath(workspace), JSON.stringify(sig, null, 2), 0o644);
+  return Buffer.from(JSON.stringify(sig, null, 2));
+}
+/** `merkleAlgorithm` makes the Merkle tree choice part of the signed, chain-bound seal (P1-26). */
+function prepareSeal(workspace: string, lastHash: string, merkleAlgorithm: MerkleAlgorithm): { bytes: Buffer; signature: Buffer } {
+  const auditorPub = getPublicKeyHistory(workspace, "auditor")[0] ?? "";
+  const signerFingerprint = sha256Hex(Buffer.from(auditorPub, "utf8"));
+  const bytes = sealBytes(lastHash, signerFingerprint, merkleAlgorithm), digest = sha256Hex(bytes);
+  const signed = signDigestWithPolicy({
+    workspace,
+    kind: "TRANSPARENCY_ROOT",
+    digestHex: digest
+  });
+  return { bytes, signature: sealSignatureBytes(digest, signed) };
 }
 
 export function initTransparencyLog(workspace: string): {
@@ -130,18 +138,107 @@ export function initTransparencyLog(workspace: string): {
   sealPath: string;
   sealSigPath: string;
 } {
-  ensureDir(transparencyDir(workspace));
-  if (!pathExists(transparencyLogPath(workspace))) {
-    writeFileAtomic(transparencyLogPath(workspace), "", 0o644);
-  }
-  if (!pathExists(transparencySealPath(workspace)) || !pathExists(transparencySealSigPath(workspace))) {
-    writeSeal(workspace, "", currentTreeAlgorithm(workspace));
-  }
+  const before = captureTransparencyState(workspace), log = stateBytes(before, workspaceLogPath(workspace));
+  const seal = !pathExists(transparencySealPath(workspace)) || !pathExists(transparencySealSigPath(workspace))
+    ? prepareSeal(workspace, "", currentTreeAlgorithm(workspace)) : null;
+  publishTransparencyState(workspace, before, () => {
+    if (log === null) writeFileAtomic(transparencyLogPath(workspace), "", 0o644);
+    if (seal !== null) {
+      writeFileAtomic(transparencySealPath(workspace), seal.bytes, 0o644);
+      writeFileAtomic(transparencySealSigPath(workspace), seal.signature, 0o644);
+    }
+  });
   return {
     logPath: transparencyLogPath(workspace),
     sealPath: transparencySealPath(workspace),
     sealSigPath: transparencySealSigPath(workspace)
   };
+}
+
+interface TransparencyInitializationProgress {
+  readonly phase: string;
+  readonly signingCallAttempted: boolean;
+  readonly signingCallReturned: boolean;
+  readonly lockSetupAttempted: boolean;
+  readonly lockEntered: boolean;
+  readonly lockReturned: boolean;
+  readonly attemptedPath: string | null;
+  readonly returnedMembers: readonly string[];
+  readonly acknowledgedMembers: readonly string[];
+  readonly completed: boolean;
+}
+/** Native calls may leave setup/temp effects even without a returned or acknowledged member. */
+export class TransparencyInitializationError extends Error {
+  readonly code = "TRANSPARENCY_INITIALIZATION_INCOMPLETE";
+  constructor(readonly progress: TransparencyInitializationProgress, readonly firstRefusalObserved: boolean,
+    readonly firstRefusal: unknown, cause: unknown) {
+    super("transparency initialization did not complete; earlier native effects may remain", { cause });
+    this.name = "TransparencyInitializationError";
+  }
+}
+/** Fixed internal async sibling; no Sign or await runs inside the short native publication lock. */
+export async function initTransparencyLogAttemptAsync(workspace: string, beforePublish?: () => void) {
+  let phase = "authority-capture", signingCallAttempted = false, signingCallReturned = false;
+  let lockSetupAttempted = false, lockEntered = false, lockReturned = false, completed = false;
+  let attemptedPath: string | null = null, firstRefusalObserved = false, firstRefusal: unknown;
+  const returnedMembers: string[] = [], acknowledgedMembers: string[] = [];
+  const progress = (): TransparencyInitializationProgress => Object.freeze({ phase, signingCallAttempted, signingCallReturned,
+    lockSetupAttempted, lockEntered, lockReturned, attemptedPath, completed,
+    returnedMembers: Object.freeze([...returnedMembers]), acknowledgedMembers: Object.freeze([...acknowledgedMembers]) });
+  const negative = (check: () => void) => {
+    if (firstRefusalObserved) throw firstRefusal;
+    try { check(); } catch (cause) { firstRefusalObserved = true; firstRefusal = cause; throw cause; }
+  };
+  const caller = () => negative(() => {
+    if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize policy signing");
+    beforePublish?.();
+    if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize policy signing");
+  });
+  try {
+    caller();
+    const original = captureWorkspaceLogAuthority(workspace, caller), publication = captureTransparencyAppendPublication(workspace);
+    const logPath = transparencyLogPath(workspace), bodyPath = transparencySealPath(workspace), sigPath = transparencySealSigPath(workspace);
+    const log = stateBytes(publication.state, logPath), needsSeal = !publication.present(bodyPath) || !publication.present(sigPath);
+    let signed: SignedDigest | undefined, seal: { bytes: Buffer; signature: Buffer } | null = null;
+    const stable = () => negative(() => { caller(); original.assertIntrinsicCurrent(signed); publication.assertCurrent(); });
+    stable();
+    if (needsSeal) {
+      phase = "seal-preparation";
+      const algorithm = currentTreeAlgorithm(workspace);
+      const preparing = () => { stable(); negative(() => {
+        if (currentTreeAlgorithm(workspace) !== algorithm) throw new Error("original initialization tree algorithm changed");
+      }); };
+      preparing();
+      const bytes = sealBytes("", original.sealSigner.descriptor.fingerprint, algorithm), digest = sha256Hex(bytes);
+      phase = "seal-sign"; signingCallAttempted = true;
+      signed = await signDigestWithPolicyAsync({ workspace, kind: "TRANSPARENCY_ROOT", digestHex: digest,
+        expectedSigner: original.sealSigner.descriptor, beforeSign: preparing });
+      signingCallReturned = true; preparing();
+      seal = { bytes, signature: sealSignatureBytes(digest, signed) };
+    }
+    const member = (path: string, bytes: Buffer) => {
+      attemptedPath = null; phase = `before:${path}`; stable();
+      phase = `write:${path}`; attemptedPath = path;
+      writeFileAtomic(path, bytes, 0o644); returnedMembers.push(path);
+      phase = `acknowledge:${path}`;
+      publication.acknowledge(path, bytes, 0o644, "replace"); acknowledgedMembers.push(path);
+      attemptedPath = null;
+    };
+    phase = "lock-setup"; lockSetupAttempted = true;
+    withTransparencyPublicationLock(workspace, () => {
+      lockEntered = true; phase = "first-native-gate"; stable();
+      if (log === null) member(logPath, Buffer.alloc(0));
+      if (seal !== null) { member(bodyPath, seal.bytes); member(sigPath, seal.signature); }
+      phase = "final-native-gate"; stable();
+    });
+    lockReturned = true; phase = "after-lock"; stable();
+    completed = true; phase = "complete";
+    return Object.freeze({ paths: Object.freeze({ logPath, sealPath: bodyPath, sealSigPath: sigPath }), progress: progress(),
+      assertCurrent() {
+        try { stable(); }
+        catch (cause) { throw new TransparencyInitializationError(progress(), firstRefusalObserved, firstRefusal, cause); }
+      } });
+  } catch (cause) { throw new TransparencyInitializationError(progress(), firstRefusalObserved, firstRefusal, cause); }
 }
 
 export function appendTransparencyEntry(params: {
@@ -157,9 +254,11 @@ export function appendTransparencyEntry(params: {
   };
 }): TransparencyEntry {
   initTransparencyLog(params.workspace);
+  const before = captureTransparencyState(params.workspace);
   // Read before the line lands, while the seal still covers the log's last entry (P1-26).
   const merkleAlgorithm = currentTreeAlgorithm(params.workspace);
-  const prev = lastTransparencyEntryHash(params.workspace);
+  const log = stateBytes(before, workspaceLogPath(params.workspace));
+  const prev = lastTransparencyEntryHash(log);
   const payload = {
     v: 1 as const,
     ts: Date.now(),
@@ -177,20 +276,23 @@ export function appendTransparencyEntry(params: {
     ...payload,
     hash
   });
-  appendLine(transparencyLogPath(params.workspace), JSON.stringify(entry));
-  writeSeal(params.workspace, entry.hash, merkleAlgorithm);
-  // Not wrapped in a try/catch. The Merkle root is part of what an append
-  // promises: inclusion proofs are generated from the log, so a root that stops
-  // advancing means the exporter keeps issuing proofs against a root nobody
-  // signed. This used to be caught and console.error'd, which reported an
-  // append as fully successful while the published root silently froze — the
-  // exact failure P2.4 exists to remove. On failure the store records a pending
-  // marker (so the lag survives this process) and throws
-  // TransparencyMerkleLagError, whose message states that the log line landed.
-  updateTransparencyMerkleAfterAppend(params.workspace, {
-    entryHash: entry.hash,
-    prevEntryHash: entry.prev,
-    algorithm: merkleAlgorithm
+  // Crypto preparation precedes the lock and the line. A crypto refusal is uncommitted; I/O after the line is not.
+  const seal = prepareSeal(params.workspace, entry.hash, merkleAlgorithm);
+  const plan = prepareMerkle({ workspace: params.workspace, algorithm: merkleAlgorithm, log,
+    append: { entryHash: entry.hash, prevEntryHash: entry.prev }, resumeRoot: readSignedCurrentRoot(params.workspace) });
+  const signedRoot = signDigestWithPolicy({ workspace: params.workspace, kind: "MERKLE_ROOT", digestHex: plan.digest });
+  const rootSignature = preparedRootSignature(plan, signedRoot);
+  publishTransparencyState(params.workspace, before, () => {
+    appendLine(transparencyLogPath(params.workspace), JSON.stringify(entry));
+    try {
+      writeFileAtomic(transparencySealPath(params.workspace), seal.bytes, 0o644);
+      writeFileAtomic(transparencySealSigPath(params.workspace), seal.signature, 0o644);
+      publishPreparedMerkle(params.workspace, plan, rootSignature); clearMerklePendingMarker(params.workspace);
+    } catch (error) {
+      const reason = error instanceof Error ? error.message : String(error);
+      const pendingRecorded = writeMerklePendingMarker({ workspace: params.workspace, entryHash: entry.hash, reason });
+      throw new TransparencyMerkleLagError({ entryHash: entry.hash, pendingRecorded, reason, cause: error });
+    }
   });
   return entry;
 }
@@ -239,23 +341,19 @@ export function verifyTransparencyLog(workspace: string): {
     errors.push("seal or seal signature missing");
   } else {
     try {
-      const seal = transparencySealSchema.parse(JSON.parse(readUtf8(sealPath)) as unknown);
+      const sealBytes = readFileSync(sealPath);
+      const seal = transparencySealSchema.parse(JSON.parse(sealBytes.toString("utf8")) as unknown);
       if (seal.lastHash !== prev) {
         errors.push(`seal lastHash mismatch: expected ${prev}, found ${seal.lastHash}`);
       }
       const sig = transparencySealSignatureSchema.parse(JSON.parse(readUtf8(sealSigPath)) as unknown);
-      const digest = sha256Hex(readFileSync(sealPath));
+      const digest = sha256Hex(sealBytes);
       if (digest !== sig.digestSha256) {
         errors.push("seal signature digest mismatch");
       } else {
-        const valid = verifySignedDigest({
-          workspace,
-          digestHex: digest,
-          signed: {
-            signature: sig.signature,
-            envelope: sig.envelope
-          }
-        }) || verifyHexDigestAny(digest, sig.signature, getPublicKeyHistory(workspace, "auditor"));
+        const valid = verifyWorkspaceLogSignature(workspace, "TRANSPARENCY_ROOT", digest, {
+          signature: sig.signature, envelope: sig.envelope
+        });
         if (!valid) {
           errors.push("seal signature verification failed");
         }
@@ -365,7 +463,7 @@ export function verifyTransparencyBundle(bundleFile: string, trust: TrustContext
     if (digest !== sig.digestSha256) {
       errors.push("seal digest mismatch");
     } else {
-      const check = checkDigestSignature({ signature: "log.seal.sig", purpose: "artifact-seal", digestHex: digest, signatureB64: sig.signature,
+      const check = checkDigestSignature({ signature: "log.seal.sig", purpose: "artifact-seal", digestHex: digest, signatureB64: sig.signature, envelope: sig.envelope,
         candidates: [pubkeyPem, readUtf8(auditorPubPath), envelopePublicKey(sig.envelope)], context: trust, claimedSignedAt: sig.signedTs });
       signatures.push(check.admission);
       if (!check.verified || (sig.envelope !== undefined && sig.signature !== sig.envelope.sigB64)) {

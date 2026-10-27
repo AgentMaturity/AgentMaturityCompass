@@ -16,10 +16,11 @@ import {
   parseStation,
   recordIncidentClockEvent
 } from '../incidents/incidentClockEvents.js';
-import { recordWorkspaceOversight } from '../incidents/oversightRecord.js';
+import { recordWorkspaceOversight, recordWorkspaceOversightAsync } from '../incidents/oversightRecord.js';
 import { signHexDigest, getSigningKey, getPublicKeyHistory } from '../crypto/keys.js';
 import { sha256Hex } from '../utils/hash.js';
 import { canonicalize } from '../utils/json.js';
+import { KeyProviderError } from '../keys/provider.js';
 
 function normalizeSeverity(raw: string | undefined): IncidentSeverity {
   if (!raw) return 'WARN';
@@ -48,8 +49,10 @@ async function handleIncidentClockRoute(
   res: ServerResponse,
   workspace: string,
   principal: string | undefined,
+  revalidateAuthority?: () => boolean,
 ): Promise<boolean> {
   const ledger = openLedger(workspace);
+  let closed = false;
   try {
     const store = createIncidentStore(ledger.db);
     store.initTables();
@@ -102,25 +105,32 @@ async function handleIncidentClockRoute(
     if (!Array.isArray(clockIds) || clockIds.some((id) => typeof id !== 'string')) {
       throw new IncidentInputError('clockIds must be an array of clock ids');
     }
-    const record = recordWorkspaceOversight({
-      workspace,
-      incident,
-      reviewerId: principal,
-      decision: text(body.decision),
-      rationale: text(body.rationale),
-      clockIds: clockIds as string[],
-      reviewedTs: Date.now(),
-      privateKeyPem: getSigningKey(workspace, 'artifact-seal'),
-      publicKeys: getPublicKeyHistory(workspace, 'auditor'),
-    });
+    const input = { workspace, incident, reviewerId: principal, decision: text(body.decision), rationale: text(body.rationale),
+      clockIds: clockIds as string[], reviewedTs: Date.now() };
+    let record: ReturnType<typeof recordWorkspaceOversight>;
+    if (revalidateAuthority) {
+      if (!revalidateAuthority()) { if (!res.headersSent) apiError(res, 403, 'authenticated authority changed while signing'); return true; }
+      ledger.close(); closed = true;
+      record = await recordWorkspaceOversightAsync({ ...input, beforePublish: () => {
+        if (!revalidateAuthority()) {
+          if (!res.headersSent) apiError(res, 403, 'authenticated authority changed while signing');
+          throw new Error('authenticated authority changed while signing');
+        }
+      } });
+    } else {
+      record = recordWorkspaceOversight({ ...input, privateKeyPem: getSigningKey(workspace, 'artifact-seal'), publicKeys: getPublicKeyHistory(workspace, 'auditor') });
+    }
+    if (res.headersSent) return true;
     apiSuccess(res, record, 201);
     return true;
   } catch (err) {
-    if (err instanceof IncidentInputError) apiError(res, 400, err.message);
+    if (res.headersSent) return true;
+    if (action === 'oversight' && revalidateAuthority && err instanceof KeyProviderError) apiError(res, err.status, err.code);
+    else if (err instanceof IncidentInputError) apiError(res, 400, err.message);
     else apiRequestError(res, err, 'Could not process incident clocks', 500);
     return true;
   } finally {
-    ledger.close();
+    if (!closed) ledger.close();
   }
 }
 
@@ -131,6 +141,7 @@ export async function handleIncidentRoute(
   res: ServerResponse,
   workspace = process.cwd(),
   principal?: string,
+  revalidateAuthority?: () => boolean,
 ): Promise<boolean> {
   if (!pathname.startsWith('/api/v1/incidents')) return false;
 
@@ -248,7 +259,7 @@ export async function handleIncidentRoute(
 
   const clockParams = pathParam(pathname, '/api/v1/incidents/:id/:action');
   if (clockParams?.id && clockParams.action && CLOCK_ACTION_METHODS[clockParams.action] === method) {
-    return handleIncidentClockRoute(clockParams.id, clockParams.action, req, res, workspace, principal);
+    return handleIncidentClockRoute(clockParams.id, clockParams.action, req, res, workspace, principal, revalidateAuthority);
   }
 
   // Match /:id routes

@@ -1,12 +1,13 @@
 import { randomUUID } from "node:crypto";
-import { dirname, join } from "node:path";
+import { join, relative } from "node:path";
 import { questionBank } from "../diagnostic/questionBank.js";
 import { notEvaluatedLevel } from "../diagnostic/levelSemantics.js";
 import { openLedger } from "../ledger/ledger.js";
-import { ensureDir, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
-import { appendTransparencyEntry } from "../transparency/logChain.js";
-import { signFileWithAuditor } from "./orgSigner.js";
+import { appendTransparencyEntry, appendTransparencyEntryAsync } from "../transparency/logChain.js";
+import { publishOrgPairs, prepareOrgPairsAsync } from "./preparedOrgPairs.js";
+import { withControlFileLock } from "../lifecycle/controlFileLock.js";
+import { captureOrgCommitmentAuthority, prepareOrgCommitmentMirror, OrgFollowupError, type OrgEffectOptions } from "./orgPublication.js";
 import { orgCommitmentsDir } from "./orgStore.js";
 import type { OrgNodeScorecard, OrgScorecard } from "./orgSchema.js";
 
@@ -66,34 +67,54 @@ function writeOrgAudit(params: {
   }
 }
 
-function writeSignedCommitmentFile(params: {
-  workspace: string;
-  nodeId: string;
-  commitId: string;
-  body: string;
-}): { path: string; sigPath: string; sha256: string } {
-  const outPath = join(orgCommitmentsDir(params.workspace), params.nodeId, `${params.commitId}.md`);
-  ensureDir(dirname(outPath));
-  writeFileAtomic(outPath, params.body, 0o644);
-  const sigPath = signFileWithAuditor(params.workspace, outPath);
-  return {
-    path: outPath,
-    sigPath,
-    sha256: sha256Hex(readUtf8(outPath))
-  };
+type PreparedCommitment = { nodeId: string; commitId: string; markdown: string; days?: 14 | 30 | 90 };
+type CommitmentType = "ORG_EDUCATION_CREATED" | "ORG_OWNERSHIP_CREATED" | "ORG_COMMITMENT_CREATED";
+type CommitmentResult = { commitId: string; outPath: string; sigPath: string; markdown: string; auditEventId: string };
+export interface OrgCommitmentOptions extends OrgEffectOptions { outFile?: string }
+function commitmentPath(workspace: string, prepared: PreparedCommitment): string {
+  return join(orgCommitmentsDir(workspace), prepared.nodeId, `${prepared.commitId}.md`);
+}
+function auditCommitment(workspace: string, prepared: PreparedCommitment, path: string, sha256: string, type: CommitmentType) {
+  return writeOrgAudit({ workspace, nodeId: prepared.nodeId, auditType: type, payload: {
+    commitId: prepared.commitId, ...(prepared.days === undefined ? {} : { days: prepared.days }), path, sha256
+  } });
+}
+function publishCommitmentSync(workspace: string, prepared: PreparedCommitment, type: CommitmentType): CommitmentResult {
+  const path = commitmentPath(workspace, prepared), bytes = Buffer.from(prepared.markdown), digest = sha256Hex(bytes);
+  const written = publishOrgPairs(workspace, [{ path, bytes }])[0]!;
+  let phase: "log" | "audit" = "log", entryHash: string | null = null;
+  const paths = Object.freeze([relative(workspace, written.path), relative(workspace, written.sigPath)]);
+  try {
+    entryHash = appendTransparencyEntry({ workspace, type, agentId: "org", artifact: { kind: "policy", sha256: digest, id: prepared.commitId } }).hash;
+    phase = "audit";
+    const auditEventId = auditCommitment(workspace, prepared, path, digest, type);
+    return { commitId: prepared.commitId, outPath: written.path, sigPath: written.sigPath, markdown: prepared.markdown, auditEventId };
+  } catch (error) { throw new OrgFollowupError(phase, paths, null, error, entryHash); }
+}
+async function publishCommitmentAsync(workspace: string, doc: PreparedCommitment, type: CommitmentType,
+  assertOriginal: () => void, outFile?: string): Promise<CommitmentResult> {
+  const path = commitmentPath(workspace, doc), bytes = Buffer.from(doc.markdown), digest = sha256Hex(bytes);
+  const mirror = prepareOrgCommitmentMirror(workspace, outFile, path);
+  const prepared = await prepareOrgPairsAsync(workspace, [{ path, bytes }], { beforePublish: assertOriginal });
+  const written = prepared.publish()[0]!, paths = Object.freeze([relative(workspace, written.path), relative(workspace, written.sigPath)]);
+  let phase: "log" | "audit" | "mirror" = "log", entryHash: string | null = null, auditEventId: string | null = null;
+  try {
+    const entry = await appendTransparencyEntryAsync({ workspace, type, agentId: "org",
+      artifact: { kind: "policy", sha256: digest, id: doc.commitId } }, { beforeCommit: () => {
+      withControlFileLock({ root: join(workspace, ".amc"), name: "org-auditor-pairs", operation: prepared.assertCurrent });
+    } });
+    entryHash = entry.hash; phase = "audit"; prepared.assertCurrent();
+    auditEventId = auditCommitment(workspace, doc, path, digest, type);
+    phase = "mirror"; mirror.publish(doc.markdown, prepared.assertCurrent);
+    return { commitId: doc.commitId, outPath: written.path, sigPath: written.sigPath, markdown: doc.markdown, auditEventId };
+  } catch (error) { throw new OrgFollowupError(phase, paths, auditEventId, error, entryHash, phase === "mirror" ? mirror.path : null); }
 }
 
-export function generateOrgEducationBrief(params: {
+function prepareOrgEducationBrief(params: {
   workspace: string;
   scorecard: OrgScorecard;
   nodeId: string;
-}): {
-  commitId: string;
-  outPath: string;
-  sigPath: string;
-  markdown: string;
-  auditEventId: string;
-} {
+}): PreparedCommitment {
   const node = findNode(params.scorecard, params.nodeId);
   const commitId = `learn_${Date.now()}_${randomUUID().slice(0, 8)}`;
   const gapIds = node.topGapQuestions.slice(0, 7).map((row) => row.questionId);
@@ -124,55 +145,14 @@ export function generateOrgEducationBrief(params: {
     ""
   ];
   const markdown = lines.join("\n");
-  const written = writeSignedCommitmentFile({
-    workspace: params.workspace,
-    nodeId: params.nodeId,
-    commitId,
-    body: markdown
-  });
-
-  appendTransparencyEntry({
-    workspace: params.workspace,
-    type: "ORG_EDUCATION_CREATED",
-    agentId: "org",
-    artifact: {
-      kind: "policy",
-      sha256: written.sha256,
-      id: commitId
-    }
-  });
-
-  const auditEventId = writeOrgAudit({
-    workspace: params.workspace,
-    nodeId: params.nodeId,
-    auditType: "ORG_EDUCATION_CREATED",
-    payload: {
-      commitId,
-      path: written.path,
-      sha256: written.sha256
-    }
-  });
-
-  return {
-    commitId,
-    outPath: written.path,
-    sigPath: written.sigPath,
-    markdown,
-    auditEventId
-  };
+  return { nodeId: params.nodeId, commitId, markdown };
 }
 
-export function generateOrgOwnershipPlan(params: {
+function prepareOrgOwnershipPlan(params: {
   workspace: string;
   scorecard: OrgScorecard;
   nodeId: string;
-}): {
-  commitId: string;
-  outPath: string;
-  sigPath: string;
-  markdown: string;
-  auditEventId: string;
-} {
+}): PreparedCommitment {
   const node = findNode(params.scorecard, params.nodeId);
   const commitId = `own_${Date.now()}_${randomUUID().slice(0, 8)}`;
   const lines = [
@@ -203,56 +183,15 @@ export function generateOrgOwnershipPlan(params: {
     ""
   ];
   const markdown = lines.join("\n");
-  const written = writeSignedCommitmentFile({
-    workspace: params.workspace,
-    nodeId: params.nodeId,
-    commitId,
-    body: markdown
-  });
-
-  appendTransparencyEntry({
-    workspace: params.workspace,
-    type: "ORG_OWNERSHIP_CREATED",
-    agentId: "org",
-    artifact: {
-      kind: "policy",
-      sha256: written.sha256,
-      id: commitId
-    }
-  });
-
-  const auditEventId = writeOrgAudit({
-    workspace: params.workspace,
-    nodeId: params.nodeId,
-    auditType: "ORG_OWNERSHIP_CREATED",
-    payload: {
-      commitId,
-      path: written.path,
-      sha256: written.sha256
-    }
-  });
-
-  return {
-    commitId,
-    outPath: written.path,
-    sigPath: written.sigPath,
-    markdown,
-    auditEventId
-  };
+  return { nodeId: params.nodeId, commitId, markdown };
 }
 
-export function generateOrgCommitmentPlan(params: {
+function prepareOrgCommitmentPlan(params: {
   workspace: string;
   scorecard: OrgScorecard;
   nodeId: string;
   days: 14 | 30 | 90;
-}): {
-  commitId: string;
-  outPath: string;
-  sigPath: string;
-  markdown: string;
-  auditEventId: string;
-} {
+}): PreparedCommitment {
   const node = findNode(params.scorecard, params.nodeId);
   const commitId = `commit_${Date.now()}_${randomUUID().slice(0, 8)}`;
   const topGaps = node.topGapQuestions.slice(0, 10);
@@ -290,41 +229,32 @@ export function generateOrgCommitmentPlan(params: {
   ];
 
   const markdown = lines.join("\n");
-  const written = writeSignedCommitmentFile({
-    workspace: params.workspace,
-    nodeId: params.nodeId,
-    commitId,
-    body: markdown
-  });
+  return { nodeId: params.nodeId, commitId, markdown, days: params.days };
+}
 
-  appendTransparencyEntry({
-    workspace: params.workspace,
-    type: "ORG_COMMITMENT_CREATED",
-    agentId: "org",
-    artifact: {
-      kind: "policy",
-      sha256: written.sha256,
-      id: commitId
-    }
-  });
+export function generateOrgEducationBrief(params: Parameters<typeof prepareOrgEducationBrief>[0]): CommitmentResult {
+  return publishCommitmentSync(params.workspace, prepareOrgEducationBrief(params), "ORG_EDUCATION_CREATED");
+}
+export async function generateOrgEducationBriefAsync(params: Parameters<typeof prepareOrgEducationBrief>[0], options: OrgCommitmentOptions = {}): Promise<CommitmentResult> {
+  const input = { ...params, scorecard: structuredClone(params.scorecard) }, outFile = options.outFile;
+  const assertOriginal = captureOrgCommitmentAuthority(input.workspace, options.beforePublish);
+  return publishCommitmentAsync(input.workspace, prepareOrgEducationBrief(input), "ORG_EDUCATION_CREATED", assertOriginal, outFile);
+}
 
-  const auditEventId = writeOrgAudit({
-    workspace: params.workspace,
-    nodeId: params.nodeId,
-    auditType: "ORG_COMMITMENT_CREATED",
-    payload: {
-      commitId,
-      days: params.days,
-      path: written.path,
-      sha256: written.sha256
-    }
-  });
+export function generateOrgOwnershipPlan(params: Parameters<typeof prepareOrgOwnershipPlan>[0]): CommitmentResult {
+  return publishCommitmentSync(params.workspace, prepareOrgOwnershipPlan(params), "ORG_OWNERSHIP_CREATED");
+}
+export async function generateOrgOwnershipPlanAsync(params: Parameters<typeof prepareOrgOwnershipPlan>[0], options: OrgCommitmentOptions = {}): Promise<CommitmentResult> {
+  const input = { ...params, scorecard: structuredClone(params.scorecard) }, outFile = options.outFile;
+  const assertOriginal = captureOrgCommitmentAuthority(input.workspace, options.beforePublish);
+  return publishCommitmentAsync(input.workspace, prepareOrgOwnershipPlan(input), "ORG_OWNERSHIP_CREATED", assertOriginal, outFile);
+}
 
-  return {
-    commitId,
-    outPath: written.path,
-    sigPath: written.sigPath,
-    markdown,
-    auditEventId
-  };
+export function generateOrgCommitmentPlan(params: Parameters<typeof prepareOrgCommitmentPlan>[0]): CommitmentResult {
+  return publishCommitmentSync(params.workspace, prepareOrgCommitmentPlan(params), "ORG_COMMITMENT_CREATED");
+}
+export async function generateOrgCommitmentPlanAsync(params: Parameters<typeof prepareOrgCommitmentPlan>[0], options: OrgCommitmentOptions = {}): Promise<CommitmentResult> {
+  const input = { ...params, scorecard: structuredClone(params.scorecard) }, outFile = options.outFile;
+  const assertOriginal = captureOrgCommitmentAuthority(input.workspace, options.beforePublish);
+  return publishCommitmentAsync(input.workspace, prepareOrgCommitmentPlan(input), "ORG_COMMITMENT_CREATED", assertOriginal, outFile);
 }

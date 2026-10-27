@@ -51,7 +51,7 @@ Every field is required unless described as nullable. Unknown values use JSON `n
 | `normalization` | Normalizer version, semantic SHA-256, separate ingestion time, explicit losses |
 | `policyRefs` | Opaque declared references; no policy execution is inferred |
 | `events` | Ordered events with stable IDs and optional source parent/tool identities |
-| `signature` | Nullable Ed25519 envelope; the public key is supplied independently |
+| `signature` | Nullable Ed25519 or ECDSA P-256 signature; the public key is supplied independently |
 
 An event has `id`, `parentId`, `toolCallId`, `kind`, `outcome`, `sourceTime`, `durationNs`, `cost` and flat `attributes`. Kinds are `input`, `output`, `tool-call`, `tool-result`, `error`, `cancel` and `metadata`. Outcome is `success`, `failure`, `cancelled`, `unknown` or `null`. A reported successful tool call is not a successful overall task.
 
@@ -67,7 +67,7 @@ Canonical JSON uses object keys sorted by UTF-16 code units, unchanged array ord
 
 The normalized digest hashes `{profile, version, source, session, provenance, normalizer, losses, policyRefs, events}`. Here `normalizer` and `losses` come from the normalization object. Ingestion time and signature are excluded; re-ingesting unchanged semantic content does not manufacture a different semantic identity. It is separate from the reviewed multi-source import digest.
 
-The signature signs UTF-8 `amc.external-evidence/v1\n` followed by canonical JSON for the full profile with the `signature` field omitted. This includes the ingestion time and normalized digest. Use the exported `externalEvidenceSigningBytes` to obtain these bytes. The signature is exactly 64 bytes encoded as canonical padded Base64. Public keys must be Ed25519 PEMs admitted by the verifier operator.
+The signature signs UTF-8 `amc.external-evidence/v1\n` followed by canonical JSON for the full profile with the `signature` field omitted. This includes the ingestion time and normalized digest. Use the exported `externalEvidenceSigningBytes` to obtain these bytes. The signature is exactly 64 bytes encoded as canonical padded Base64. `algorithm` is `ed25519` or `ecdsa-p256-sha256` and must match the independently admitted public key. Ed25519 signs these bytes directly. ECDSA uses P-256 with SHA-256 over the same bytes and IEEE P1363 encoding (`r || s`, 32 bytes each) with low S; DER, high-S signatures, other curves and unknown algorithms are refused. The domain tag and signed profile fields are unchanged.
 
 Each admitted authority has `id`, `publicKeyPem`, `maxTrustTier`, `captureMethods` and `producers`. The signature identity must match the provenance identity and one uniquely admitted authority for the named producer. Import capture never exceeds `SELF_REPORTED`. Producer callbacks can reach at most `ATTESTED`; `OBSERVED` requires an admitted governed-capture authority. A declaration cannot exceed that admission, and the verifier never raises a producer's own lower declaration. Any verification error returns `SELF_REPORTED` with `ok: false`.
 

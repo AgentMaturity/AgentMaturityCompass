@@ -1,0 +1,247 @@
+import { type BoundGuardrailName } from "../enforce/guardrailControlState.js";
+export type RuntimeFirewallMode = "observe" | "warn" | "block";
+export type RuntimeFirewallDirection = "request" | "response";
+export type RuntimeFirewallAction = "allow" | "warn" | "block";
+export type RuntimeFirewallSeverity = "info" | "low" | "medium" | "high" | "critical";
+export interface RuntimeFirewallPolicy {
+    schemaVersion: "2026-05-22";
+    enabled: boolean;
+    mode: RuntimeFirewallMode;
+    failClosedOnMissingPolicy: boolean;
+    thresholds: {
+        warnAt: number;
+        blockAt: number;
+    };
+    rules: {
+        promptInjection: boolean;
+        secretExposure: boolean;
+        destructiveAction: boolean;
+        piiLeakage: boolean;
+        payloadAnomaly: boolean;
+        maxPayloadChars: number;
+    };
+    redaction: {
+        redactSecrets: boolean;
+        maxPreviewChars: number;
+    };
+    updatedAt: string;
+}
+export interface RuntimeFirewallMatch {
+    ruleId: string;
+    surface: "Shield" | "Enforce" | "Vault" | "Watch" | "Comply";
+    severity: RuntimeFirewallSeverity;
+    scoreImpact: number;
+    reason: string;
+}
+export interface RuntimeFirewallDecision {
+    schemaVersion: "2026-05-22" | "2026-07-12";
+    decisionId: string;
+    createdAt: string;
+    workspace: string;
+    source: "cli" | "studio" | "api" | "bridge" | "gateway" | "sdk";
+    agentId: string;
+    direction: RuntimeFirewallDirection;
+    mode: RuntimeFirewallMode | "disabled" | "missing-policy" | "invalid-policy" | "invalid-control-state";
+    action: RuntimeFirewallAction;
+    riskScore: number;
+    severity: RuntimeFirewallSeverity;
+    degraded: boolean;
+    reasons: string[];
+    matches: RuntimeFirewallMatch[];
+    redactedPreview: string;
+    request: {
+        provider: string | null;
+        model: string | null;
+        route: string | null;
+        method: string | null;
+    };
+    guardrailControl: {
+        integrity: "uninitialized" | "trusted" | "invalid";
+        revision: number | null;
+        applied: BoundGuardrailName[];
+        reason: string;
+    };
+    links: {
+        runId: string | null;
+        episodeId: string | null;
+        lifecycleRunId: string | null;
+        bridgeRequestId: string | null;
+        receiptId: string;
+        receiptSha256: string;
+    };
+    eventPath: string | null;
+    signaturePath: string | null;
+    rollout?: RuntimeFirewallRolloutBinding;
+}
+export interface RuntimeFirewallRolloutBinding {
+    schemaVersion: "2026-07-12";
+    mode: RuntimeFirewallDecision["mode"];
+    sourceIntegrity: RuntimeFirewallPolicyInspection["integrity"];
+    policyRevision: number | null;
+    policySha256: string | null;
+    thresholds: RuntimeFirewallPolicy["thresholds"] | null;
+    candidateAction: RuntimeFirewallAction;
+    actualAction: RuntimeFirewallAction;
+    enforcementSuppressed: boolean;
+}
+export interface RuntimeFirewallRolloutEvidenceCounts {
+    totalEvaluations: number;
+    trustedEvaluations: number;
+    invalidEvaluations: number;
+    legacyUnclassifiedEvaluations: number;
+    otherPolicyEvaluations: number;
+}
+export interface RuntimeFirewallRolloutCounters {
+    evaluations: number;
+    matchedEvaluations: number;
+    nonMatchedEvaluations: number;
+    candidateAllow: number;
+    wouldWarn: number;
+    wouldBlock: number;
+    actualAllow: number;
+    actualWarn: number;
+    actualBlock: number;
+    enforcementSuppressed: number;
+}
+export interface RuntimeFirewallRolloutRuleCounters {
+    matches: number;
+    wouldWarn: number;
+    wouldBlock: number;
+    actualWarn: number;
+    actualBlock: number;
+    enforcementSuppressed: number;
+}
+export interface RuntimeFirewallRolloutStatus {
+    schemaVersion: "2026-07-12";
+    status: "empty" | "trusted" | "partial" | "fail_closed";
+    claimEligible: boolean;
+    currentPolicy: {
+        integrity: RuntimeFirewallPolicyInspection["integrity"];
+        enabled: boolean;
+        mode: RuntimeFirewallDecision["mode"];
+        revision: number | null;
+        sha256: string | null;
+    };
+    evidence: RuntimeFirewallRolloutEvidenceCounts;
+    counters: RuntimeFirewallRolloutCounters;
+    byRule: Record<string, RuntimeFirewallRolloutRuleCounters>;
+    window: {
+        firstEventAt: string | null;
+        lastEventAt: string | null;
+    };
+    reasonCodes: string[];
+    claimBoundary: string;
+}
+export interface RuntimeFirewallEvaluateInput {
+    workspace: string;
+    content: string;
+    direction: RuntimeFirewallDirection;
+    source: RuntimeFirewallDecision["source"];
+    agentId?: string | null;
+    provider?: string | null;
+    model?: string | null;
+    route?: string | null;
+    method?: string | null;
+    runId?: string | null;
+    episodeId?: string | null;
+    lifecycleRunId?: string | null;
+    bridgeRequestId?: string | null;
+    requirePolicy?: boolean;
+    record?: boolean;
+    policy?: RuntimeFirewallPolicy | null;
+}
+export interface RuntimeFirewallExportResult {
+    outputPath: string;
+    format: "json" | "jsonl" | "splunk";
+    redacted: boolean;
+    count: number;
+}
+export interface RuntimeFirewallPolicyInspection {
+    integrity: "uninitialized" | "trusted" | "invalid";
+    policy: RuntimeFirewallPolicy | null;
+    path: string;
+    signaturePath: string;
+    revision: number | null;
+    journalPath: string | null;
+    checkpointPath: string | null;
+    reason: string;
+}
+export interface RuntimeFirewallMigrationReceipt {
+    schemaVersion: "2026-07-10";
+    preservation: "semantic";
+    sourceSignatureSchemaVersion: string;
+    sourceArtifactSha256: string;
+    sourceSignatureRecordSha256: string;
+    committedPolicySha256: string;
+}
+export declare function runtimeFirewallPolicyPath(workspace: string): string;
+export declare function defaultRuntimeFirewallPolicy(mode?: RuntimeFirewallMode): RuntimeFirewallPolicy;
+export declare function writeRuntimeFirewallPolicy(input: {
+    workspace: string;
+    mode?: RuntimeFirewallMode;
+    enabled?: boolean;
+    failClosedOnMissingPolicy?: boolean;
+}): {
+    policy: RuntimeFirewallPolicy;
+    path: string;
+    signaturePath: string;
+    revision: number;
+    checkpointPath: string;
+    mirrorTrusted: boolean;
+    mirrorWarning: string | null;
+};
+export declare function inspectRuntimeFirewallPolicy(workspace: string): RuntimeFirewallPolicyInspection;
+export declare function migrateRuntimeFirewallPolicySignature(input: {
+    workspace: string;
+    approveLegacyArtifactKind: boolean;
+    beforeLegacyCommit?: () => void;
+    afterPendingCommit?: () => void;
+    beforeCheckpointCommit?: () => void;
+    afterTrustPinCommit?: () => void;
+    afterCheckpointCommit?: () => void;
+}): {
+    policy: RuntimeFirewallPolicy;
+    path: string;
+    signaturePath: string;
+    revision: number;
+    checkpointPath: string;
+    mirrorTrusted: boolean;
+    mirrorWarning: string | null;
+    migratedFrom: string;
+    migrationReceipt: RuntimeFirewallMigrationReceipt | null;
+};
+export declare function loadRuntimeFirewallPolicy(workspace: string): RuntimeFirewallPolicy | null;
+export declare function runtimeFirewallEnabled(workspace: string): boolean;
+export declare function evaluateRuntimeFirewall(input: RuntimeFirewallEvaluateInput): RuntimeFirewallDecision;
+export declare function listRuntimeFirewallDecisions(input: {
+    workspace: string;
+    limit?: number;
+    redacted?: boolean;
+}): RuntimeFirewallDecision[];
+export declare function runtimeFirewallStatus(workspace: string): {
+    enabled: boolean;
+    policyPath: string;
+    policyExists: boolean;
+    policyCommitted: boolean;
+    mirrorExists: boolean;
+    policyRevision: number | null;
+    policyJournalPath: string | null;
+    policyCheckpointPath: string | null;
+    mode: RuntimeFirewallDecision["mode"];
+    integrity: RuntimeFirewallPolicyInspection["integrity"];
+    controlIntegrity: RuntimeFirewallDecision["guardrailControl"]["integrity"];
+    controlRevision: number | null;
+    trusted: boolean;
+    reason: string;
+    eventCount: number;
+    latestDecision: RuntimeFirewallDecision | null;
+    rollout: RuntimeFirewallRolloutStatus;
+};
+export declare function renderRuntimeFirewallStatusText(status: ReturnType<typeof runtimeFirewallStatus>): string;
+export declare function exportRuntimeFirewallDecisions(input: {
+    workspace: string;
+    outputPath: string;
+    format?: "json" | "jsonl" | "splunk";
+    redacted?: boolean;
+    limit?: number;
+}): RuntimeFirewallExportResult;

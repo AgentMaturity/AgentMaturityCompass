@@ -17,6 +17,7 @@ import { verifyLedgerIntegrity } from "../ledger/ledgerVerification.js";
 import { DEFAULT_AUTHORIZE_CLASSES } from "../tools/toolPipeline.js";
 import type { EvidenceEvent } from "../types.js";
 import { verifyChainIn } from "./actionJournal.js";
+import type { TrustContext } from "../trust/trustContext.js";
 
 export type ActionEvidenceCoverage =
   | {
@@ -57,9 +58,9 @@ function metaOf(row: EvidenceEvent): Record<string, unknown> {
 }
 const message = (error: unknown): string => (error instanceof Error ? error.message : String(error));
 
-export function actionEvidenceCoverage(workspace: string, sessionId: string): ActionEvidenceCoverage {
+export function actionEvidenceCoverage(workspace: string, sessionId: string, options: { trust?: TrustContext } = {}): ActionEvidenceCoverage {
   if (!existsSync(join(workspace, ".amc", "evidence.sqlite"))) return { status: "not_evaluated", reason: "no evidence ledger in this workspace" };
-  const integrity = verifyLedgerIntegrity(workspace);
+  const integrity = verifyLedgerIntegrity(workspace, options);
   if (!integrity.chain.ok) {
     return { status: "not_evaluated", reason: `ledger_integrity_failed: ${integrity.chain.errors[0] ?? "unknown"}`, integrityErrors: integrity.chain.errors };
   }
@@ -68,7 +69,7 @@ export function actionEvidenceCoverage(workspace: string, sessionId: string): Ac
     ledger.db.exec("BEGIN"); // One snapshot: the rows verified below are the rows counted.
     let rows: EvidenceEvent[];
     try {
-      rows = readBudgetEvents(workspace, ledger);
+      rows = readBudgetEvents(workspace, ledger, options);
     } catch (error) {
       return { status: "not_evaluated", reason: `ledger_integrity_failed: ${message(error)}`, integrityErrors: [message(error)] };
     }
@@ -90,7 +91,7 @@ export function actionEvidenceCoverage(workspace: string, sessionId: string): Ac
     }
     const counts = { calls: 0, linked: 0, operatorResolved: 0, unknown: 0, unlinked: 0, integrityFailures: 0, duplicateExecutions: 0 };
     for (const callId of new Set([...dispatched, ...executions.keys()])) {
-      const chains = [...(executions.get(callId) ?? [])].map((executionId) => verifyChainIn(ledger, executionId));
+      const chains = [...(executions.get(callId) ?? [])].map((executionId) => verifyChainIn(ledger, executionId, options));
       const started = chains.filter((chain) => chain.receipts.some((receipt) => receipt.state === "started"));
       // Not consequential: never dispatched by the tool evidence, a single intact chain, never started (a denial, say).
       if (!dispatched.has(callId) && chains.length === 1 && chains[0]!.ok && started.length === 0) continue;

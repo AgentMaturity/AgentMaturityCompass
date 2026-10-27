@@ -6,6 +6,7 @@
 import { signingRoute } from "../crypto/signing/signer.js";
 import { appendTransparencyEntry } from "../transparency/logChain.js";
 import { anchorArtifact, registerAnchorLogWriter, type AnchorTarget } from "./anchors.js";
+import { assertVaultMaySign } from "./signingKeys.js";
 
 /** Appends the transparency entry for `target` and returns its hash. Raise the machine mark once the file is final. */
 export function logSequence(target: Omit<AnchorTarget, "fileSha256" | "entryHash">): string {
@@ -13,6 +14,7 @@ export function logSequence(target: Omit<AnchorTarget, "fileSha256" | "entryHash
 }
 
 registerAnchorLogWriter(logSequence, workspace => {
-  // The seal of every log append is signed by the route the trust config names; an unverifiable config refuses here.
-  signingRoute(workspace, "TRANSPARENCY_ROOT");
+  // The seal of every log append is signed by the route the trust config names; an unverifiable config refuses here,
+  // and so does a vault route whose artifact-seal key is held by a key provider (P2-08).
+  if (signingRoute(workspace, "TRANSPARENCY_ROOT") === "vault") assertVaultMaySign(workspace, "artifact-seal");
 });

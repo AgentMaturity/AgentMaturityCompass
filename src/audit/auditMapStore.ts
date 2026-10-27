@@ -1,3 +1,7 @@
+import { assertOrgPairsCurrent, captureOrgPairs, orgPairBytes } from "../org/preparedOrgPairs.js";
+import { verifyAuditorSignatureBytes } from "../org/orgSignatureBytes.js";
+import { captureAuditPolicyMapPublication, readAuditMapBodySelection } from "./auditPolicyMapPublication.js";
+import type { AuditPublicationOptions } from "./binderPublication.js";
 import { join } from "node:path";
 import YAML from "yaml";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
@@ -99,4 +103,54 @@ export function verifyAuditMapActiveSignature(workspace: string) {
     };
   }
   return verifyAuditMapFile(workspace, path);
+}
+
+export function prepareAuditMapActiveAsync(workspace: string, map: AuditMapFile, options: AuditPublicationOptions = {}) {
+  return captureAuditPolicyMapPublication(workspace, { active: map }, options).prepare();
+}
+export async function saveAuditMapActiveAsync(workspace: string, map: AuditMapFile, options: AuditPublicationOptions = {}) {
+  const prepared = await prepareAuditMapActiveAsync(workspace, map, options); return prepared.publish().active!;
+}
+export async function initAuditMapsAsync(workspace: string, options: AuditPublicationOptions = {}) {
+  const map = defaultAuditMapBuiltin(), prepared = await captureAuditPolicyMapPublication(workspace, { builtin: map, active: map }, options).prepare();
+  const saved = prepared.publish(); return { builtinPath: saved.builtin!.path, builtinSigPath: saved.builtin!.sigPath,
+    activePath: saved.active!.path, activeSigPath: saved.active!.sigPath, map };
+}
+/** Select actual read/default/copy inputs once before a possible Sign; no original target callback survives its own write. */
+export async function loadAuditMapsAttemptAsync(workspace: string, id: "builtin" | "active" | "list", options: AuditPublicationOptions = {}) {
+  const caller = { ...options }; caller.beforePublish?.(); caller.assertInputsCurrent?.(); caller.assertPreparationInputsCurrent?.();
+  const active = id === "builtin" ? null : readAuditMapBodySelection(workspace, "active");
+  const builtin = id === "active" && active?.bytes !== null ? null : readAuditMapBodySelection(workspace, "builtin");
+  const parsedBuiltin = builtin?.bytes ? auditMapSchema.parse(YAML.parse(builtin.bytes.toString("utf8"))) : null;
+  const parsedActive = active?.bytes && (id === "active" || builtin?.bytes !== null) ? auditMapSchema.parse(YAML.parse(active.bytes.toString("utf8"))) : null;
+  if ((id === "active" && parsedActive !== null) || (id === "builtin" && parsedBuiltin !== null) || (id === "list" && parsedActive !== null && parsedBuiltin !== null)) {
+    const assertCurrent = () => { caller.beforePublish?.(); caller.assertInputsCurrent?.(); builtin?.assertCurrent(); active?.assertCurrent(); };
+    assertCurrent(); return Object.freeze({ map: id === "builtin" ? parsedBuiltin! : parsedActive!, builtin: parsedBuiltin, active: parsedActive, assertCurrent });
+  }
+  const paths = [auditMapBuiltinPath(workspace), auditMapActivePath(workspace)], previous = captureOrgPairs(paths);
+  const originalBuiltin = orgPairBytes(previous, paths[0]!), originalSignature = orgPairBytes(previous, `${paths[0]!}.sig`);
+  const builtinMissing = builtin === null || builtin.bytes === null;
+  if (builtinMissing ? originalBuiltin !== null : originalBuiltin === null || !originalBuiltin.equals(builtin!.bytes!)) throw new Error("audit builtin selection changed before initialization");
+  if (active?.bytes === null && orgPairBytes(previous, paths[1]!) !== null) throw new Error("audit active selection changed before initialization");
+  const map = builtinMissing ? defaultAuditMapBuiltin() : auditMapSchema.parse(YAML.parse(originalBuiltin!.toString("utf8")));
+  const sourceCurrent = () => {
+    if (!builtinMissing) {
+      assertOrgPairsCurrent({ members: previous.members.filter(row => row.path === paths[0] || row.path === `${paths[0]!}.sig`) });
+      if (originalSignature === null || !verifyAuditorSignatureBytes(workspace, "COMPLIANCE_MAPS", originalBuiltin!, originalSignature).valid)
+        throw new Error("audit builtin map is not currently admitted for active-map initialization");
+    }
+  };
+  const beforePublish = () => { caller.beforePublish?.(); sourceCurrent(); };
+  const assertPreparationInputsCurrent = () => { caller.assertPreparationInputsCurrent?.(); assertOrgPairsCurrent(previous); };
+  sourceCurrent();
+  const prepared = await captureAuditPolicyMapPublication(workspace, builtinMissing ? { builtin: map, active: map } : { active: map },
+    { ...caller, beforePublish, assertPreparationInputsCurrent }, previous).prepare();
+  prepared.publish(); prepared.assertCurrent();
+  return Object.freeze({ map, builtin: map, active: map, assertCurrent: prepared.assertCurrent });
+}
+export async function loadAuditMapBuiltinAsync(workspace: string, options: AuditPublicationOptions = {}): Promise<AuditMapFile> {
+  const loaded = await loadAuditMapsAttemptAsync(workspace, "builtin", options); loaded.assertCurrent(); return loaded.map;
+}
+export async function loadAuditMapActiveAsync(workspace: string, options: AuditPublicationOptions = {}): Promise<AuditMapFile> {
+  const loaded = await loadAuditMapsAttemptAsync(workspace, "active", options); loaded.assertCurrent(); return loaded.map;
 }

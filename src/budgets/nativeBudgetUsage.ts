@@ -5,6 +5,7 @@ import { openSessionEventStore, readSessionStoreMarker } from "../persistence/op
 import { extractEnvelope, SESSION_ENVELOPE_META_KEY, SESSION_GENESIS } from "../session/sessionTypes.js";
 import type { ActionClass, EvidenceEvent } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
+import { operationalEvidenceProblems, type OperationalEvidenceOptions } from "../keys/operationalLedgerReader.js";
 
 export const NATIVE_BUDGET_RESERVATION = "NATIVE_BUDGET_RESERVATION";
 export const actionClasses: readonly ActionClass[] = ["READ_ONLY", "WRITE_LOW", "WRITE_HIGH", "DEPLOY", "SECURITY", "FINANCIAL", "NETWORK_EXTERNAL", "DATA_EXPORT", "IDENTITY"];
@@ -28,7 +29,7 @@ export class BudgetEvidenceIntegrityError extends Error {
 }
 
 /** Reads both the native backend and legacy/journal rows, never a caller's event body. */
-export function readBudgetEvents(workspace: string, existing?: Ledger): EvidenceEvent[] {
+export function readBudgetEvents(workspace: string, existing?: Ledger, options: OperationalEvidenceOptions = {}): EvidenceEvent[] {
   const ledger = existing ?? openLedger(workspace);
   try {
     const sources: (readonly EvidenceEvent[])[] = [ledger.getAllEvents()];
@@ -39,6 +40,11 @@ export function readBudgetEvents(workspace: string, existing?: Ledger): Evidence
       } finally { store.close(); }
     }
     const keys = getPublicKeyHistory(workspace, "monitor");
+    // Check each actual source selection against all global streams before projecting or deduplicating spend.
+    for (const source of sources) {
+      const delegated = operationalEvidenceProblems(workspace, source, { ...options, ledger });
+      if (delegated.length) throw new BudgetEvidenceIntegrityError(`Budget evidence delegation is invalid: ${delegated.slice(0, 3).join("; ")}`, "global evidence");
+    }
     const rows = new Map<string, EvidenceEvent>();
     for (const source of sources) {
       let previous = "GENESIS";

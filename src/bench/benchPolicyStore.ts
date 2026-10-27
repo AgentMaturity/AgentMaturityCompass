@@ -1,7 +1,9 @@
 import { join } from "node:path";
 import YAML from "yaml";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
-import { verifySignedFileWithAuditor, signFileWithAuditor } from "../org/orgSigner.js";
+import { captureOrgPairs, orgPairBytes, publishOrgPairs, publishOrgPairsAsync, type OrgPairsOptions } from "../org/preparedOrgPairs.js";
+import { verifyAuditorSignatureBytes } from "../org/orgSignatureBytes.js";
+import { readFileSync } from "node:fs";
 import { benchPolicySchema, defaultBenchPolicy, type BenchPolicy } from "./benchPolicySchema.js";
 import { benchComparisonSchema, benchPiiScanSchema, type BenchComparison, type BenchPiiScanReport } from "./benchSchema.js";
 import { benchRegistryConfigSchema, type BenchRegistryConfig } from "./benchRegistrySchema.js";
@@ -26,7 +28,7 @@ function benchImportsDir(workspace: string): string {
   return join(benchRootDir(workspace), "imports");
 }
 
-function benchImportsRegistriesPath(workspace: string): string {
+export function benchImportsRegistriesPath(workspace: string): string {
   return join(benchImportsDir(workspace), "registries.yaml");
 }
 
@@ -69,9 +71,7 @@ export function saveBenchPolicy(workspace: string, policy: BenchPolicy): {
   ensureBenchDirs(workspace);
   const path = benchPolicyPath(workspace);
   const normalized = benchPolicySchema.parse(policy);
-  writeFileAtomic(path, YAML.stringify(normalized), 0o644);
-  const sigPath = signFileWithAuditor(workspace, path);
-  return { path, sigPath };
+  return publishOrgPairs(workspace, [{ path, bytes: Buffer.from(YAML.stringify(normalized)) }])[0]!;
 }
 
 export function loadBenchPolicy(workspace: string): BenchPolicy {
@@ -83,7 +83,7 @@ export function loadBenchPolicy(workspace: string): BenchPolicy {
 }
 
 export function verifyBenchPolicySignature(workspace: string) {
-  return verifySignedFileWithAuditor(workspace, benchPolicyPath(workspace));
+  return verifyBenchPair(workspace, benchPolicyPath(workspace));
 }
 
 export function initBenchPolicy(workspace: string): {
@@ -108,9 +108,7 @@ export function saveBenchRegistriesConfig(workspace: string, config: BenchRegist
 } {
   ensureBenchDirs(workspace);
   const path = benchImportsRegistriesPath(workspace);
-  writeFileAtomic(path, YAML.stringify(benchRegistryConfigSchema.parse(config)), 0o644);
-  const sigPath = signFileWithAuditor(workspace, path);
-  return { path, sigPath };
+  return publishOrgPairs(workspace, [{ path, bytes: Buffer.from(YAML.stringify(benchRegistryConfigSchema.parse(config))) }])[0]!;
 }
 
 export function loadBenchRegistriesConfig(workspace: string): BenchRegistryConfig {
@@ -134,7 +132,7 @@ export function verifyBenchRegistriesSignature(workspace: string) {
       sigPath: `${path}.sig`
     };
   }
-  return verifySignedFileWithAuditor(workspace, path);
+  return verifyBenchPair(workspace, path);
 }
 
 export function saveBenchComparison(workspace: string, comparison: BenchComparison): {
@@ -143,9 +141,7 @@ export function saveBenchComparison(workspace: string, comparison: BenchComparis
 } {
   ensureBenchDirs(workspace);
   const path = benchComparisonLatestPath(workspace);
-  writeFileAtomic(path, JSON.stringify(benchComparisonSchema.parse(comparison), null, 2), 0o644);
-  const sigPath = signFileWithAuditor(workspace, path);
-  return { path, sigPath };
+  return publishOrgPairs(workspace, [{path,bytes:Buffer.from(JSON.stringify(benchComparisonSchema.parse(comparison),null,2))}])[0]!;
 }
 
 export function loadBenchComparison(workspace: string): BenchComparison | null {
@@ -161,3 +157,34 @@ export function saveBenchPiiScan(workspace: string, report: BenchPiiScanReport, 
   writeFileAtomic(filePath, JSON.stringify(benchPiiScanSchema.parse(report), null, 2), 0o644);
 }
 
+
+function verifyBenchPair(workspace: string, path: string) {
+  const sigPath = `${path}.sig`, signatureExists = pathExists(sigPath);
+  if (!pathExists(path)) return { valid: false, signatureExists: false, reason: "file missing", path, sigPath };
+  if (!signatureExists) return { valid: false, signatureExists, reason: "signature missing", path, sigPath };
+  try { return { ...verifyAuditorSignatureBytes(workspace, "BUNDLE", readFileSync(path), readFileSync(sigPath)), signatureExists, path, sigPath }; }
+  catch { return { valid: false, signatureExists, reason: "invalid file signature", path, sigPath }; }
+}
+export async function saveBenchPolicyAsync(workspace: string, policy: BenchPolicy, options: OrgPairsOptions = {}) {
+  ensureBenchDirs(workspace);
+  const path = benchPolicyPath(workspace), bytes = Buffer.from(YAML.stringify(benchPolicySchema.parse(policy)));
+  return (await publishOrgPairsAsync(workspace, [{ path, bytes }], options))[0]!;
+}
+export async function initBenchPolicyAsync(workspace: string, options: OrgPairsOptions = {}) {
+  return saveBenchPolicyAsync(workspace, defaultBenchPolicy(), options);
+}
+export async function saveBenchRegistriesConfigAsync(workspace: string, config: BenchRegistryConfig, options: OrgPairsOptions = {}) {
+  ensureBenchDirs(workspace);
+  const path = benchImportsRegistriesPath(workspace), bytes = Buffer.from(YAML.stringify(benchRegistryConfigSchema.parse(config)));
+  return (await publishOrgPairsAsync(workspace, [{ path, bytes }], options))[0]!;
+}
+/** Existing registry reads do not acquire signing authority; missing defaults use their exact captured target. */
+export async function loadBenchRegistriesConfigAsync(workspace: string, options: OrgPairsOptions = {}): Promise<BenchRegistryConfig> {
+  const path = benchImportsRegistriesPath(workspace);
+  if (pathExists(path)) return benchRegistryConfigSchema.parse(YAML.parse(readUtf8(path)) as unknown);
+  const previous = captureOrgPairs([path]), bytes = orgPairBytes(previous, path);
+  if (bytes !== null) return benchRegistryConfigSchema.parse(YAML.parse(bytes.toString("utf8")) as unknown);
+  const config = defaultBenchRegistriesConfig();
+  await publishOrgPairsAsync(workspace, [{ path, bytes: Buffer.from(YAML.stringify(config)) }], options, previous);
+  return config;
+}

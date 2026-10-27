@@ -9,11 +9,13 @@
  * A signed statement exists in exactly one byte encoding (canonical JSON, sorted unique signature rows, canonical
  * base64, PEM and timestamps), so two different byte strings never verify as the same statement.
  */
-import { sign, verify } from "node:crypto";
+import { sign } from "node:crypto";
+import { canonicalSigningKey, SIGNING_ALGORITHMS, signingKeyId, verifyWithKey } from "./algorithmPolicy.js";
+import { checkedDescription, KeyProviderError, signChecked, type KeyDescription, type KeyProvider } from "./provider.js";
 import { z } from "zod";
 import { publicKeyFromPrivate } from "../crypto/keyHistoryEnvelope.js";
 import { KEY_PURPOSES, type KeyPurpose } from "../trust/keyPurposes.js";
-import { canonicalEd25519Pem, ed25519KeyId } from "../trust/trustList.js";
+import { ed25519KeyId } from "../trust/trustList.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize, isCanonicalSignatureBase64, isExactIsoTime, parseCanonicalJson } from "../utils/json.js";
 
@@ -39,7 +41,7 @@ const keyRotationStatementSchema = z.strictObject({
   previousStatementSha256: keyIdSchema.nullable(),
   previousKeyId: keyIdSchema.nullable(),
   nextKeyId: keyIdSchema,
-  nextPublicKeyPem: z.string().min(1).max(4096).refine(pem => canonicalEd25519Pem(pem) === pem, "nextPublicKeyPem must be a canonical Ed25519 SPKI PEM"),
+  nextPublicKeyPem: z.string().min(1).max(4096).refine(pem => canonicalSigningKey(pem)?.pem === pem, "nextPublicKeyPem must be a canonical Ed25519 or P-256 SPKI PEM"),
   reason: z.enum(ROTATION_REASONS),
   overlap: z.strictObject({ notBefore: timeSchema, notAfter: timeSchema }).nullable(),
   issuedAt: timeSchema
@@ -52,8 +54,12 @@ const signatureRowSchema = z.strictObject({
 });
 type SignatureRow = z.infer<typeof signatureRowSchema>;
 const rowOrder = (a: SignatureRow, b: SignatureRow) => ROLE_ORDER.indexOf(a.by) - ROLE_ORDER.indexOf(b.by) || a.keyId.localeCompare(b.keyId);
+const authoringSignatureRows = z.array(signatureRowSchema).max(64).refine(
+  rows => rows.every((row, index) => index === 0 || rowOrder(rows[index - 1]!, row) < 0),
+  "signatures must be sorted by role then keyId, one per key and role");
 
 export const signedKeyRotationStatementSchema = z.strictObject({
+  signatureVersion: z.literal(2).optional(),
   statement: keyRotationStatementSchema,
   signatures: z.array(signatureRowSchema).min(1).max(64).refine(
     rows => rows.every((row, index) => index === 0 || rowOrder(rows[index - 1]!, row) < 0),
@@ -63,9 +69,10 @@ export const signedKeyRotationStatementSchema = z.strictObject({
 export type KeyRotationStatementV1 = z.infer<typeof keyRotationStatementSchema>;
 export type SignedKeyRotationStatement = z.infer<typeof signedKeyRotationStatementSchema>;
 
-/** The signed bytes: the tag, one 0x00 byte, then canonicalize(statement). Signed directly, never as a digest. */
-export function rotationStatementBytes(statement: KeyRotationStatementV1): Buffer {
-  return Buffer.concat([Buffer.from(DOMAIN_TAG, "ascii"), Buffer.from([0]), Buffer.from(canonicalize(statement), "utf8")]);
+/** v1 signs tag + NUL + canonical statement. Explicit envelope signatureVersion 2 signs its v2 tag + NUL + SHA-256 of the full v1 payload. */
+export function rotationStatementBytes(statement: KeyRotationStatementV1, signatureVersion: 1 | 2 = 1): Buffer {
+  const legacy = Buffer.concat([Buffer.from(DOMAIN_TAG, "ascii"), Buffer.from([0]), Buffer.from(canonicalize(statement), "utf8")]);
+  return signatureVersion === 2 ? Buffer.concat([Buffer.from("AMC_KEY_ROTATION_V2_DIGEST\0", "ascii"), Buffer.from(sha256Hex(legacy), "hex")]) : legacy;
 }
 
 /** The only accepted file and wire form of a signed statement. */
@@ -90,26 +97,45 @@ function keyIdOfPrivate(privateKeyPem: string): string {
 }
 
 /** Adds one signature; refuses a key that is not the one the statement names for that role. */
-export function addRotationSignature(signed: { statement: KeyRotationStatementV1; signatures: readonly SignatureRow[] }, by: SignatureRow["by"], privateKeyPem: string): SignedKeyRotationStatement {
-  const statement = keyRotationStatementSchema.parse(signed.statement);
+export function addRotationSignature(signed: { statement: KeyRotationStatementV1; signatures: readonly SignatureRow[]; signatureVersion?: 2 }, by: SignatureRow["by"], privateKeyPem: string): SignedKeyRotationStatement {
+  // Authoring also parses the entire envelope; unknown wire modes must not be stripped into valid v1.
+  const parsed = signedKeyRotationStatementSchema.extend({ signatures: authoringSignatureRows }).parse(signed);
+  const { statement } = parsed;
   const keyId = keyIdOfPrivate(privateKeyPem);
   if (by === "next" && keyId !== statement.nextKeyId) throw new Error("the next signature must come from the statement's next key");
   if (by === "previous" && keyId !== statement.previousKeyId) throw new Error("the previous signature must come from the statement's previous key");
   if (by === "root" && (keyId === statement.previousKeyId || keyId === statement.nextKeyId)) {
     throw new Error("a root signature must come from a root other than the keys being rotated");
   }
-  const signature = sign(null, rotationStatementBytes(statement), privateKeyPem).toString("base64");
-  const rows = [...signed.signatures.filter(row => !(row.by === by && row.keyId === keyId)), { by, keyId, signature }].sort(rowOrder);
-  return signedKeyRotationStatementSchema.parse({ statement, signatures: rows });
+  const signature = sign(null, rotationStatementBytes(statement, parsed.signatureVersion), privateKeyPem).toString("base64");
+  const rows = [...parsed.signatures.filter(row => !(row.by === by && row.keyId === keyId)), { by, keyId, signature }].sort(rowOrder);
+  return signedKeyRotationStatementSchema.parse({ ...(parsed.signatureVersion === 2 ? { signatureVersion: 2 } : {}), statement, signatures: rows });
 }
 
-export function signRotationStatement(statement: KeyRotationStatementV1, keys: { next: string; previous?: string | null; roots?: readonly string[] }): SignedKeyRotationStatement {
+export function signRotationStatement(statement: KeyRotationStatementV1, keys: { next: string; previous?: string | null; roots?: readonly string[] }, opts: { signatureVersion?: 1 | 2 } = {}): SignedKeyRotationStatement {
   const parsed = keyRotationStatementSchema.parse(statement);
-  if (ed25519KeyId(parsed.nextPublicKeyPem) !== parsed.nextKeyId) throw new Error("nextKeyId must be the key id of nextPublicKeyPem");
-  let signed = addRotationSignature({ statement: parsed, signatures: [] }, "next", keys.next);
+  if (signingKeyId(parsed.nextPublicKeyPem) !== parsed.nextKeyId) throw new Error("nextKeyId must be the key id of nextPublicKeyPem");
+  let signed = addRotationSignature({ ...(opts.signatureVersion === 2 ? { signatureVersion: 2 as const } : {}), statement: parsed, signatures: [] }, "next", keys.next);
   if (keys.previous) signed = addRotationSignature(signed, "previous", keys.previous);
   for (const root of keys.roots ?? []) signed = addRotationSignature(signed, "root", root);
   return signed;
+}
+
+/** A real owner flow supplies this holder. Provider possession does not change the statement's role authority. */
+export async function addRotationSignatureWithProvider(signed: { statement: KeyRotationStatementV1; signatures: readonly SignatureRow[]; signatureVersion?: 2 },
+  by: SignatureRow["by"], provider: KeyProvider, description: KeyDescription): Promise<SignedKeyRotationStatement> {
+  // Allow the first holder's empty seed, but snapshot and validate all fields before the provider is awaited.
+  const held = signedKeyRotationStatementSchema.extend({ signatures: authoringSignatureRows }).parse(signed);
+  const { statement } = held;
+  if (signingKeyId(statement.nextPublicKeyPem) !== statement.nextKeyId) throw new Error("nextKeyId must be the key id of nextPublicKeyPem");
+  const key = checkedDescription({ ...description, ref: { ...description.ref } }, { allowed: SIGNING_ALGORITHMS, requireNonExportable: false });
+  if (provider.id !== key.ref.provider) throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", provider.id, "the pinned description belongs to another provider");
+  if (by === "next" && key.keyId !== statement.nextKeyId) throw new Error("the next signature must come from the statement's next key");
+  if (by === "previous" && key.keyId !== statement.previousKeyId) throw new Error("the previous signature must come from the statement's previous key");
+  if (by === "root" && (key.keyId === statement.previousKeyId || key.keyId === statement.nextKeyId)) throw new Error("a root signature must come from a root other than the keys being rotated");
+  const signature = (await signChecked(provider, key, rotationStatementBytes(statement, held.signatureVersion))).toString("base64");
+  const rows = [...held.signatures.filter(row => !(row.by === by && row.keyId === key.keyId)), { by, keyId: key.keyId, signature }].sort(rowOrder);
+  return signedKeyRotationStatementSchema.parse({ ...(held.signatureVersion === 2 ? { signatureVersion: 2 } : {}), statement, signatures: rows });
 }
 
 export interface VerifyRotationOptions {
@@ -132,8 +158,7 @@ export type RotationVerdict = { valid: true; signed: SignedKeyRotationStatement 
 
 function verifies(bytes: Buffer, publicKeyPem: string, signature: string): boolean {
   try {
-    // OpenSSL's Ed25519 verify refuses a non-canonical S (S >= L); tests/keys/rotationStatement.test.ts pins that.
-    return verify(null, bytes, publicKeyPem, Buffer.from(signature, "base64"));
+    return verifyWithKey(bytes, publicKeyPem, Buffer.from(signature, "base64"));
   } catch {
     return false;
   }
@@ -143,8 +168,8 @@ function bindingProblem(statement: KeyRotationStatementV1, opts: VerifyRotationO
   if (statement.workspaceId !== opts.expected.workspaceId || statement.purpose !== opts.expected.purpose) {
     return `statement is for ${statement.workspaceId}/${statement.purpose}, not ${opts.expected.workspaceId}/${opts.expected.purpose}`;
   }
-  const trustedId = opts.trustedCurrentPublicKeyPem === null ? null : ed25519KeyId(opts.trustedCurrentPublicKeyPem);
-  if (opts.trustedCurrentPublicKeyPem !== null && trustedId === null) return "the trusted current key is not an Ed25519 public key";
+  const trustedId = opts.trustedCurrentPublicKeyPem === null ? null : signingKeyId(opts.trustedCurrentPublicKeyPem);
+  if (opts.trustedCurrentPublicKeyPem !== null && trustedId === null) return "the trusted current key is not an Ed25519 or P-256 public key";
   if (statement.previousKeyId !== trustedId) return "previousKeyId is not the key this verifier trusts for the purpose";
   const prior = opts.previous;
   if (prior === null) {
@@ -183,14 +208,14 @@ export function verifyRotationStatement(bytes: Buffer, opts: VerifyRotationOptio
     return fail(`not a canonical signed amc.key-rotation statement (${detail})`);
   }
   const { statement, signatures } = signed;
-  if (ed25519KeyId(statement.nextPublicKeyPem) !== statement.nextKeyId) return fail("nextKeyId is not the key id of nextPublicKeyPem");
+  if (signingKeyId(statement.nextPublicKeyPem) !== statement.nextKeyId) return fail("nextKeyId is not the key id of nextPublicKeyPem");
   const binding = bindingProblem(statement, opts);
   if (binding) return fail(binding);
   const overlap = overlapProblem(statement, opts.maxOverlapDays ?? DEFAULT_MAX_OVERLAP_DAYS);
   if (overlap) return fail(overlap);
 
-  const roots = new Map((opts.roots?.publicKeyPems ?? []).flatMap(pem => { const id = ed25519KeyId(pem); return id ? [[id, pem] as const] : []; }));
-  const payload = rotationStatementBytes(statement);
+  const roots = new Map((opts.roots?.publicKeyPems ?? []).flatMap(pem => { const id = signingKeyId(pem); return id ? [[id, pem] as const] : []; }));
+  const payload = rotationStatementBytes(statement, signed.signatureVersion);
   const seen = { next: false, previous: false, roots: new Set<string>() };
   for (const row of signatures) {
     const pem = row.by === "next" ? (row.keyId === statement.nextKeyId ? statement.nextPublicKeyPem : null)

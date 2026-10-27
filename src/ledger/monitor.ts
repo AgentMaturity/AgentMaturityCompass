@@ -85,6 +85,8 @@ async function spawnMonitoredProcess(params: {
   cwd?: string;
   /** Kill the child after this long. Absent means no deadline. */
   timeoutMs?: number;
+  /** Trusted negative launch seam; absent on ordinary monitor callers. */
+  beforeLaunch?: () => void;
   /**
    * What the child's stdin is connected to.
    *
@@ -96,6 +98,7 @@ async function spawnMonitoredProcess(params: {
    */
   stdinMode?: "forward" | "close";
 }): Promise<{ sessionId: string; exitCode: number; terminatedBy: string | null }> {
+  params.beforeLaunch?.();
   // P0-55: rows written under AMC_NO_SIGN=1 (evidence collect --first-run, amc wrap) go to the unsigned store.
   const ledger = openLedger(params.workspace, process.env.AMC_NO_SIGN === "1" ? { store: "unsigned" } : {});
   const sessionId = params.sessionId ?? randomUUID();
@@ -169,6 +172,7 @@ async function spawnMonitoredProcess(params: {
       });
     };
 
+    params.beforeLaunch?.();
     const running = runProcess({
       argv: [params.command, ...params.args],
       cwd: params.cwd ?? process.cwd(),
@@ -313,6 +317,7 @@ export async function wrapAny(
     workspace: string;
     agentId?: string;
     signal?: AbortSignal;
+    beforeLaunch?: () => void;
     /** Environment the process gets beside AMC's (a sandbox's `docker run -e NAME` values). */
     envExtras?: Record<string, string>;
     /** Values to scrub from the recorded argv and output: a lease handed to the process, above all. */
@@ -328,6 +333,7 @@ export async function wrapAny(
     ...(opts.envExtras ? { envExtras: opts.envExtras } : {}),
     ...(opts.scrubValues ? { scrubValues: opts.scrubValues } : {}),
     ...(opts.signal ? { signal: opts.signal } : {}),
+    ...(opts.beforeLaunch ? { beforeLaunch: opts.beforeLaunch } : {}),
     meta: {
       mode: "wrap-any",
       agentId,

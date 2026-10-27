@@ -115,7 +115,7 @@ export function verifyAuditBinderFile(params: {
       envelopePublicKey(signature.envelope)
     ];
     const check = checkDigestSignature({ signature: "binder.sig", purpose: "artifact-seal", digestHex: digest,
-      signatureB64: signature.signature, candidates, context: params.trust, claimedSignedAt: signature.signedTs });
+      signatureB64: signature.signature, envelope: signature.envelope, candidates, context: params.trust, claimedSignedAt: signature.signedTs });
     signatures.push(check.admission);
     if (!check.verified || (signature.envelope !== undefined && signature.signature !== signature.envelope.sigB64)) {
       errors.push({ code: "SIGNATURE_INVALID", message: "binder signature verification failed" });

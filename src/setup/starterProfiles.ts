@@ -24,7 +24,8 @@ import { signAmcConfig } from "../config/amcConfigSignature.js";
 import { readSecretFromEnvOrFile } from "../config/loadConfig.js";
 import { keyPaths } from "../crypto/keys.js";
 import { assertOwnerMode } from "../mode/mode.js";
-import { savePresets } from "../presets/agentPresets.js";
+import { savePresets, preparePresetsAsync } from "../presets/agentPresets.js";
+import { captureOrgFiles, assertOrgPairsCurrent, captureOrgPairsAuthority, type OrgPairsOptions } from "../org/preparedOrgPairs.js";
 import { writeRuntimeFirewallPolicy } from "../runtime/firewall.js";
 import { signToolsConfig, toolsConfigPath } from "../toolhub/toolhubValidators.js";
 import { defaultToolsConfig, toolsConfigSchema, type ToolDefinition } from "../toolhub/toolsSchema.js";
@@ -141,6 +142,48 @@ export function applyStarterProfile(workspace: string, kind: StarterProfileKind,
   };
 }
 
+export class StarterProfilePublicationError extends Error {
+  readonly code = "STARTER_PROFILE_INCOMPLETE";
+  constructor(readonly completedPhases: readonly string[], readonly phase: string, cause: unknown) {
+    super("starter profile did not complete; successful earlier phases remain and the failed phase may be partial", { cause });
+    this.name = "StarterProfilePublicationError";
+  }
+}
+/** Maintained starter counterpart. Existing sync policy/approval/control-plan producers keep their own contracts. */
+export async function applyStarterProfileAsync(workspace: string, kind: StarterProfileKind, owner: StarterOwner, options: OrgPairsOptions = {}): Promise<StarterProfileReport> {
+  const selectedOwner = { username: owner.username, password: owner.password }, caller = options.beforePublish, inputs = options.assertInputsCurrent;
+  const original = captureOrgPairsAuthority(workspace, () => { caller?.(); assertOwnerMode(workspace, "init"); });
+  const completed: string[] = []; let phase = "users-precondition";
+  if (pathExists(usersConfigPath(workspace))) throw new Error(`${usersConfigPath(workspace)} exists; a starter profile only initializes a new workspace.`);
+  try {
+    phase = "tools-body"; writeFileAtomic(toolsConfigPath(workspace), starterTools(), 0o644); completed.push(phase);
+    phase = "tools-signature"; signToolsConfig(workspace); completed.push(phase);
+    const firewallMode = kind === "coding" ? "warn" : "block";
+    phase = "firewall"; const firewall = writeRuntimeFirewallPolicy({ workspace, mode: firewallMode }); completed.push(phase);
+    phase = "config-body"; saveAMCConfig(workspace, applyAMCConfigProfile(kind === "coding" ? "dev" : "prod", loadAMCConfig(workspace))); completed.push(phase);
+    phase = "config-signature"; signAmcConfig(workspace); completed.push(phase);
+    phase = "users"; const users = initUsersConfig({ workspace, ...selectedOwner }); completed.push(phase);
+    const paths = [toolsConfigPath(workspace), `${toolsConfigPath(workspace)}.sig`, join(workspace, ".amc", "amc.config.yaml"),
+      join(workspace, ".amc", "amc.config.yaml.sig"), users.path, users.sigPath, firewall.path, firewall.signaturePath, firewall.checkpointPath];
+    if (kind === "regulated") {
+      phase = "approval-policy"; const approval = initApprovalPolicy(workspace); completed.push(phase); paths.push(approval.path, approval.sigPath);
+    }
+    let presetsCurrent = () => {};
+    const sources = captureOrgFiles(paths), stable = () => { inputs?.(); original(); assertOrgPairsCurrent(sources); presetsCurrent(); };
+    if (kind === "regulated") {
+      phase = "presets";
+      const presets = await preparePresetsAsync(workspace, [{ id: "regulated", description: "Regulated starter (amc init --regulated): every tool call waits for a "
+        + "signed human approval decided under the WRITE_HIGH rule. The stub provider is a synthetic demonstration; name your own provider and model.",
+      model: STUB_PROVIDER_MODEL, providerId: STUB_PROVIDER_ID, tools: "workspace", approveTools: "WRITE_HIGH" }], { beforePublish: original, assertInputsCurrent: stable });
+      presets.publish(); presetsCurrent = presets.assertCurrent; completed.push(phase);
+    }
+    stable(); phase = "report-and-control-plan";
+    return { kind, firewallMode, readiness: checkToolsetReadiness(workspace), owner: { userId: users.owner.userId, username: users.owner.username },
+      monitorFingerprint: sha256Hex(readFileSync(keyPaths(workspace).monitorPublic)), plan: kind === "regulated" ? compileStarterPlan(workspace) : null,
+      nextCommand: `amc agent-loop run "..." --provider stub --tools workspace${kind === "regulated" ? " --preset regulated" : ""}` };
+  } catch (cause) { throw new StarterProfilePublicationError(Object.freeze([...completed]), phase, cause); }
+}
+
 async function promptSecret(message: string): Promise<string> {
   const ask = async (prompt: string): Promise<string> => (await inquirer.prompt<{ value: string }>([{ type: "password", name: "value",
     message: prompt, mask: "*", validate: (v: string) => v.length >= MIN_SECRET || `At least ${MIN_SECRET} characters` }])).value;
@@ -216,8 +259,10 @@ export async function runStarterInit(workspace: string, kind: StarterProfileKind
   if (pathExists(amcDir)) {
     throw new Error(`${workspace} already has an .amc directory; a starter profile initializes a new workspace (--force deletes .amc first).`);
   }
-  initWorkspace({ workspacePath: workspace });
-  const report = applyStarterProfile(workspace, kind, owner);
-  printReport(workspace, report);
-  return report;
+  let initialized = false;
+  try {
+    initWorkspace({ workspacePath: workspace }); initialized = true;
+    const report = await applyStarterProfileAsync(workspace, kind, owner);
+    printReport(workspace, report); return report;
+  } catch (cause) { throw new StarterProfilePublicationError(Object.freeze(initialized ? ["workspace-initialized"] : []), "starter-init", cause); }
 }

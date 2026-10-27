@@ -36,17 +36,21 @@
  * session-path behaviour changes, but a non-session use of this backend would
  * not get incident auto-linking.
  */
-import { createPrivateKey, randomUUID, type KeyObject } from "node:crypto";
+import { randomUUID, type KeyObject } from "node:crypto";
 import { join } from "node:path";
 import type { EvidenceEvent, SessionRecord } from "../../types.js";
 import { assertSessionWriteAllowed } from "../../session/sessionOwnership.js";
 import { verifyStoredSessionEventMetadata } from "../sessionStoreVerification.js";
 import { canonicalMetadataForHash } from "../../ledger/eventHash.js";
-import { ensureSigningKeys, getSigningKey, signHexDigestWith } from "../../crypto/keys.js";
+import { ensureSigningKeys, signHexDigestWith } from "../../crypto/keys.js";
+import { cachedSigningKey } from "../../keys/cachedSigningKey.js";
+import { withOperationalLedgerRow } from "../../keys/operationalLedgerWriter.js";
+import { workspaceSelfTrust } from "../../trust/trustContext.js";
 import { loadOpsPolicy } from "../../ops/policy.js";
 import { queueEvidenceEventSpan } from "../../observability/otelExporter.js";
 import { storeEncryptedBlob } from "../../storage/blobs/blobStore.js";
-import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../../utils/fs.js";
+import { ensureDir, pathExists, writeFileAtomic } from "../../utils/fs.js";
+import { readSessionRecords, type SessionLifecycleLine } from "./sessionRecords.js";
 import { sha256Hex } from "../../utils/hash.js";
 import {
   SESSION_STORE_READ_ONLY,
@@ -73,87 +77,6 @@ import {
 
 /** Sentinel head of the global chain, identical to the ledger's. */
 const GLOBAL_GENESIS = "GENESIS";
-
-type SessionLifecycleLine =
-  | {
-      readonly op: "start";
-      readonly session_id: string;
-      readonly started_ts: number;
-      readonly runtime: string;
-      readonly binary_path: string;
-      readonly binary_sha256: string;
-    }
-  | {
-      readonly op: "seal";
-      readonly session_id: string;
-      readonly ended_ts: number;
-      readonly session_final_event_hash: string;
-      readonly session_seal_sig: string;
-    };
-
-/**
- * Fold `sessions.jsonl` into the session records it describes.
- *
- * The SQLite table is mutated in place by `sealSession`; an append-only file
- * cannot be, so a seal is a second line that updates the record the start line
- * created. A seal for a session with no start is malformed, not ignorable — it
- * would otherwise be a way to manufacture a sealed session out of nothing.
- */
-function readSessionRecords(workspace: string): Map<string, SessionRecord> {
-  const path = jsonlSessionsPath(workspace);
-  const records = new Map<string, SessionRecord>();
-  if (!pathExists(path)) {
-    return records;
-  }
-  const lines = readUtf8(path).split("\n").filter((line) => line.trim().length > 0);
-  lines.forEach((line, index) => {
-    let parsed: SessionLifecycleLine;
-    try {
-      parsed = JSON.parse(line) as SessionLifecycleLine;
-    } catch {
-      throw new Error(`jsonl session log line ${index + 1}: not valid JSON`);
-    }
-    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)
-      || typeof parsed.session_id !== "string" || !parsed.session_id
-      || (parsed.op !== "start" && parsed.op !== "seal")) {
-      throw new Error(`jsonl session log line ${index + 1}: unsupported lifecycle record`);
-    }
-    if (parsed.op === "start") {
-      if (records.has(parsed.session_id) || !Number.isSafeInteger(parsed.started_ts) || parsed.started_ts < 0
-        || typeof parsed.runtime !== "string" || !parsed.runtime || typeof parsed.binary_path !== "string"
-        || typeof parsed.binary_sha256 !== "string") {
-        throw new Error(`jsonl session log line ${index + 1}: duplicate or malformed session start`);
-      }
-      records.set(parsed.session_id, {
-        session_id: parsed.session_id,
-        started_ts: parsed.started_ts,
-        ended_ts: null,
-        runtime: parsed.runtime as SessionRecord["runtime"],
-        binary_path: parsed.binary_path,
-        binary_sha256: parsed.binary_sha256,
-        session_final_event_hash: null,
-        session_seal_sig: null
-      });
-      return;
-    }
-    const existing = records.get(parsed.session_id);
-    if (existing === undefined) {
-      throw new Error(`jsonl session log line ${index + 1}: seal for unstarted session ${parsed.session_id}`);
-    }
-    if (existing.ended_ts !== null || !Number.isSafeInteger(parsed.ended_ts) || parsed.ended_ts < existing.started_ts
-      || typeof parsed.session_final_event_hash !== "string" || !/^[a-f0-9]{64}$/.test(parsed.session_final_event_hash)
-      || typeof parsed.session_seal_sig !== "string" || !parsed.session_seal_sig) {
-      throw new Error(`jsonl session log line ${index + 1}: duplicate or malformed session seal`);
-    }
-    records.set(parsed.session_id, {
-      ...existing,
-      ended_ts: parsed.ended_ts,
-      session_final_event_hash: parsed.session_final_event_hash,
-      session_seal_sig: parsed.session_seal_sig
-    });
-  });
-  return records;
-}
 
 export class JsonlSessionEventStore implements SessionEventStore {
   readonly workspace: string;
@@ -183,12 +106,13 @@ export class JsonlSessionEventStore implements SessionEventStore {
   private readonly knownEventIds: Set<string>;
 
   private headHash: string;
-  private monitorKeyObjectCache: KeyObject | null = null;
+  private readonly monitorSigningKey: () => KeyObject;
   private opsPolicyCache: ReturnType<typeof loadOpsPolicy> | null = null;
   private closed = false;
 
   constructor(workspace: string, options: SessionStoreOpenOptions = {}) {
     this.workspace = workspace;
+    this.monitorSigningKey = cachedSigningKey(workspace, "ledger-row");
     this.readOnly = options.readOnly ?? false;
     this.unsignedSignatures = process.env.AMC_NO_SIGN === "1";
 
@@ -216,7 +140,7 @@ export class JsonlSessionEventStore implements SessionEventStore {
         const prior = readEventRows(workspace);
         const records = [...readSessionRecords(workspace).values()];
         if (prior.length) {
-          const verified = verifyStoredSessionEventMetadata(workspace, prior, { sessionRecords: records });
+          const verified = verifyStoredSessionEventMetadata(workspace, prior, { sessionRecords: records, trust: workspaceSelfTrust(workspace) });
           if (!verified.ok) throw new Error("JSONL writer refused: existing history failed authentication; restore the original evidence before appending");
         }
         options.beforeWriterOpen?.();
@@ -268,55 +192,57 @@ export class JsonlSessionEventStore implements SessionEventStore {
       throw new Error(`duplicate event id: ${id}`);
     }
     const ts = input.ts ?? Date.now();
+    return withOperationalLedgerRow(this.workspace, "jsonl-evidence", input.meta, ts, metadata => {
+      if ((lastEventHash(this.workspace) ?? GLOBAL_GENESIS) !== this.headHash) throw new Error("the JSONL head changed outside this writer; reopen and verify it");
+      const stored = this.storePayload(input.payload);
+      const metaJson = JSON.stringify(metadata);
+      const canonicalMetadata = canonicalMetadataForHash({
+        id,
+        ts,
+        sessionId: input.sessionId,
+        runtime: input.runtime,
+        eventType: input.eventType,
+        payloadPath: stored.path,
+        payloadInline: null,
+        metaJson
+      });
+      const eventHash = sha256Hex(`${this.headHash}${canonicalMetadata}${stored.sha}`);
+      const writerSig = this.signMonitorDigest(eventHash);
 
-    const stored = this.storePayload(input.payload);
-    const metaJson = JSON.stringify(input.meta);
-    const canonicalMetadata = canonicalMetadataForHash({
-      id,
-      ts,
-      sessionId: input.sessionId,
-      runtime: input.runtime,
-      eventType: input.eventType,
-      payloadPath: stored.path,
-      payloadInline: null,
-      metaJson
+      const row: EvidenceEvent = {
+        id,
+        ts,
+        session_id: input.sessionId,
+        runtime: input.runtime,
+        event_type: input.eventType,
+        payload_path: stored.path,
+        payload_inline: null,
+        payload_sha256: stored.sha,
+        meta_json: metaJson,
+        prev_event_hash: this.headHash,
+        event_hash: eventHash,
+        writer_sig: writerSig,
+        canonical_payload_path: stored.path,
+        canonical_payload_inline: null,
+        blob_ref: stored.blobRef,
+        archived: 0,
+        archive_segment_id: null,
+        archive_manifest_sha256: null,
+        payload_pruned: 0,
+        payload_pruned_ts: null
+      };
+
+      this.appendOnlyEvents().appendLine(serializeEventRow(row));
+
+      // Advance ONLY after the write returned, exactly as the ledger advances only
+      // after its transaction commits: a throw above must leave the head pointing
+      // at the last durable row so a retry re-chains from the truth.
+      this.headHash = eventHash;
+      this.knownEventIds.add(id);
+      queueEvidenceEventSpan(row, this.workspace);
+
+      return { id, ts, payloadSha256: stored.sha, eventHash, writerSig };
     });
-    const eventHash = sha256Hex(`${this.headHash}${canonicalMetadata}${stored.sha}`);
-    const writerSig = this.signMonitorDigest(eventHash);
-
-    const row: EvidenceEvent = {
-      id,
-      ts,
-      session_id: input.sessionId,
-      runtime: input.runtime,
-      event_type: input.eventType,
-      payload_path: stored.path,
-      payload_inline: null,
-      payload_sha256: stored.sha,
-      meta_json: metaJson,
-      prev_event_hash: this.headHash,
-      event_hash: eventHash,
-      writer_sig: writerSig,
-      canonical_payload_path: stored.path,
-      canonical_payload_inline: null,
-      blob_ref: stored.blobRef,
-      archived: 0,
-      archive_segment_id: null,
-      archive_manifest_sha256: null,
-      payload_pruned: 0,
-      payload_pruned_ts: null
-    };
-
-    this.appendOnlyEvents().appendLine(serializeEventRow(row));
-
-    // Advance ONLY after the write returned, exactly as the ledger advances only
-    // after its transaction commits: a throw above must leave the head pointing
-    // at the last durable row so a retry re-chains from the truth.
-    this.headHash = eventHash;
-    this.knownEventIds.add(id);
-    queueEvidenceEventSpan(row, this.workspace);
-
-    return { id, ts, payloadSha256: stored.sha, eventHash, writerSig };
   }
 
   readSessionEvents(sessionId: string): readonly EvidenceEvent[] {
@@ -431,13 +357,6 @@ export class JsonlSessionEventStore implements SessionEventStore {
       this.opsPolicyCache = loadOpsPolicy(this.workspace);
     }
     return this.opsPolicyCache;
-  }
-
-  private monitorSigningKey(): KeyObject {
-    if (this.monitorKeyObjectCache === null) {
-      this.monitorKeyObjectCache = createPrivateKey(getSigningKey(this.workspace, "ledger-row"));
-    }
-    return this.monitorKeyObjectCache;
   }
 
   private signMonitorDigest(digestHex: string): string {

@@ -4,6 +4,7 @@ import type { LoadedCatalog } from "../../catalog/loader.js";
 import { compileLegacyScenario, compileStationQuestion } from "./routes.js";
 import { evaluateExecutedControl } from "./controlResults.js";
 import { executedBindingScope, type ExecutedRunScope } from "./reportTypes.js";
+import { workspaceSelfTrust } from "../../trust/trustContext.js";
 
 /** Native admission reads the exact sealed captures; local fixture verdicts never become production passes. */
 export function finalizeExecutedResults(input: { ledger: Ledger; sessionId: string; catalog: LoadedCatalog;
@@ -17,7 +18,7 @@ export function finalizeExecutedResults(input: { ledger: Ledger; sessionId: stri
       compileLegacyScenario(pack.packId, row.scenarioId, input.catalog, packet.attempts);
     if (!selected.ok) throw new Error("EXECUTED_CONTROL_SOURCE_COMPILATION_FAILED");
     const compiled = selected.compiled, scope = input.scope;
-    const projected = evaluateExecutedControl({ ledger: input.ledger, sessionId: input.sessionId, catalog: input.catalog,
+    const projected = evaluateExecutedControl({ ledger: input.ledger, sessionId: input.sessionId, catalog: input.catalog, trust: workspaceSelfTrust(input.ledger.workspace),
       compiled, references: packet.references,
       scope: { ...executedBindingScope(scope), controlId: compiled.controlId, controlVersion: compiled.controlVersion },
       evaluation: { v: 1, planDigest: scope.planDigest, profileSha256: scope.profileSha256,

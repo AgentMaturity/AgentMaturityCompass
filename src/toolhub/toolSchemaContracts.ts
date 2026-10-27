@@ -1,5 +1,10 @@
 import { randomUUID } from "node:crypto";
-import { getSigningKey, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { resolve } from "node:path";
+import { getSigningKey, signHexDigest } from "../crypto/keys.js";
+import { captureConfigSignatureAuthority } from "../config/configSignaturePair.js";
+import { signWithPurposeKey } from "../keys/purposeProviders.js";
+import { assertPurposePublicationCurrent } from "../keys/purposePublication.js";
+import { verifyCurrentPurposeCredentialSignature } from "../keys/purposeCredentialSignature.js";
 import { validateSchema, type SchemaDefinition, type SchemaValidation } from "../enforce/schemaGate.js";
 import type { ActionClass, RiskTier } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -184,7 +189,7 @@ function verifyContractSignature(workspace: string, contract: SignedToolSchemaCo
   if (digest !== contract.contractDigestSha256) {
     return false;
   }
-  return verifyHexDigestAny(digest, contract.contractSignature, getPublicKeyHistory(workspace, "auditor"));
+  return verifyCurrentPurposeCredentialSignature(workspace, "config-signature", Buffer.from(digest, "hex"), Buffer.from(contract.contractSignature, "base64"));
 }
 
 function validateSideEffects(input: {
@@ -347,6 +352,29 @@ export function createSignedToolSchemaContract(input: {
     signer: "auditor",
     signedTs: Date.now()
   };
+}
+
+/** Direct-module async sibling. The exact config-purpose signs the original copied normalized contract bytes. */
+export async function createSignedToolSchemaContractAsync(input: Parameters<typeof createSignedToolSchemaContract>[0],
+  options: { beforePublish?: () => void } = {}): Promise<SignedToolSchemaContract> {
+  const assertSigningEnabled = () => {
+    if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize tool schema contract signing");
+  };
+  assertSigningEnabled();
+  const params = structuredClone(input), workspace = resolve(params.workspace), beforePublish = options.beforePublish;
+  const payload = unsignedContractPayload({
+    schemaVersion: "2026-06-25", contractId: params.contractId, toolName: params.toolName, actionClass: params.actionClass,
+    inputSchema: params.inputSchema, outputSchema: params.outputSchema, sideEffectDeclaration: params.sideEffectDeclaration,
+    failureModes: params.failureModes, mcpServerRiskPosture: params.mcpServerRiskPosture, sourceCitations: params.sourceCitations ?? []
+  });
+  const digest = sha256Hex(canonicalize(payload)), bytes = Buffer.from(digest, "hex");
+  const original = captureConfigSignatureAuthority(workspace, () => { assertSigningEnabled(); beforePublish?.(); assertSigningEnabled(); });
+  const signed = await signWithPurposeKey(workspace, "config-signature", bytes, { beforeSign: original.assertCurrent });
+  original.assertCurrent(); assertPurposePublicationCurrent(workspace, original.captured, signed);
+  if (!verifyCurrentPurposeCredentialSignature(workspace, "config-signature", bytes, signed.signature))
+    throw new Error("prepared tool schema contract is no longer admitted for config-signature");
+  original.assertCurrent();
+  return { ...payload, contractDigestSha256: digest, contractSignature: signed.signature.toString("base64"), signer: "auditor", signedTs: Date.now() };
 }
 
 export function validateToolSchemaContractInvocation(input: {

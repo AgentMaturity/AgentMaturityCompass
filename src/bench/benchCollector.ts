@@ -1,3 +1,4 @@
+import { countBenchAuditRows, countReadonlyBenchAuditEvents, latestReadonlyBenchAssuranceByPack } from "./benchReadOnlyInputs.js";
 import { readdirSync } from "node:fs";
 import { join } from "node:path";
 import type { LayerName, OutcomeReport } from "../types.js";
@@ -10,10 +11,11 @@ import { latestAssuranceByPack } from "../assurance/assuranceRunner.js";
 import { verifyPluginWorkspace } from "../plugins/pluginApi.js";
 import { loadTrustConfig } from "../trust/trustConfig.js";
 import { loadLatestOrgScorecard } from "../org/orgScorecard.js";
-import { collectForecastSignals } from "../forecast/forecastSignals.js";
+import { collectForecastSignals, captureForecastSignals, type ForecastSignalBundle } from "../forecast/forecastSignals.js";
 import { loadLatestForecastArtifact } from "../forecast/forecastStore.js";
 import { openLedger } from "../ledger/ledger.js";
 import { readTransparencyEntries } from "../transparency/logChain.js";
+import { canonicalize } from "../utils/json.js";
 import { hashId } from "./benchRedaction.js";
 import { benchArtifactSchema, type BenchArtifact, type BenchBuildMeta } from "./benchSchema.js";
 import type { BenchPolicy } from "./benchPolicySchema.js";
@@ -166,18 +168,6 @@ function valueDimensionsFromOutcome(report: OutcomeReport | null): {
   };
 }
 
-function parseMeta(metaJson: string): Record<string, unknown> {
-  try {
-    const parsed = JSON.parse(metaJson) as unknown;
-    if (parsed && typeof parsed === "object") {
-      return parsed as Record<string, unknown>;
-    }
-    return {};
-  } catch {
-    return {};
-  }
-}
-
 function countAuditEvents(params: {
   workspace: string;
   startTs: number;
@@ -186,16 +176,7 @@ function countAuditEvents(params: {
 }): number {
   const ledger = openLedger(params.workspace);
   try {
-    const events = ledger.getEventsBetween(params.startTs, params.endTs);
-    const auditSet = new Set(params.auditTypes);
-    return events
-      .filter((event) => event.event_type === "audit")
-      .filter((event) => {
-        const meta = parseMeta(event.meta_json);
-        const auditType = typeof meta.auditType === "string" ? meta.auditType : null;
-        return Boolean(auditType && auditSet.has(auditType));
-      })
-      .length;
+    return countBenchAuditRows(ledger.getEventsBetween(params.startTs, params.endTs), params.auditTypes);
   } finally {
     ledger.close();
   }
@@ -288,7 +269,7 @@ export interface CollectedBenchData {
   runRefs: string[];
 }
 
-export function collectBenchData(params: {
+type BenchCollectionInput = {
   workspace: string;
   scopeType: "WORKSPACE" | "NODE" | "AGENT";
   scopeId: string;
@@ -300,16 +281,24 @@ export function collectBenchData(params: {
     agentType?: "code-agent" | "support-agent" | "ops-agent" | "research-agent" | "sales-agent" | "other";
     deployment?: "single" | "host" | "k8s" | "compose";
   };
-}): CollectedBenchData {
-  const window = resolveWindow(params.windowDays);
-  const scopeIdHash = hashId(params.scopeId, params.policy.benchPolicy.privacy.hashTruncBytes);
-  const workspaceHash = hashId(params.workspace, params.policy.benchPolicy.privacy.hashTruncBytes);
+};
+export function collectBenchData(params: BenchCollectionInput): CollectedBenchData {
+  const window = resolveWindow(params.windowDays), identity = collectionIdentity(params), signals = collectForecastSignals({workspace:params.workspace,scope:{type:params.scopeType,id:params.scopeId},lookbackDays:Math.max(90,params.windowDays)});
+  return collectBenchDataWithInputs(params,window,signals,identity);
+}
+/** Internal selected-value capture: original window and actual forecast selector are retained, not refreshed after signing. */
+export function captureBenchData(input: BenchCollectionInput) {
+  const params = structuredClone(input);
+  const window = resolveWindow(params.windowDays), identity = collectionIdentity(params);
+  const signals = captureForecastSignals({workspace:params.workspace,scope:{type:params.scopeType,id:params.scopeId},lookbackDays:Math.max(90,params.windowDays)});
+  const collected = collectBenchDataWithInputs(params,window,signals.signals,identity,true), selected = canonicalize(collected);
+  return {collected,assertCurrent(){signals.assertCurrent();if(canonicalize(collectBenchDataWithInputs(params,window,signals.signals,identity,true))!==selected)throw new Error("selected bench inputs changed while signing");}};
+}
+function collectionIdentity(params:BenchCollectionInput){return {scopeIdHash:hashId(params.scopeId,params.policy.benchPolicy.privacy.hashTruncBytes),workspaceHash:hashId(params.workspace,params.policy.benchPolicy.privacy.hashTruncBytes)};}
+function collectBenchDataWithInputs(params: BenchCollectionInput, window: ReturnType<typeof resolveWindow>, signals: ForecastSignalBundle, identity:ReturnType<typeof collectionIdentity>, readOnly = false): CollectedBenchData {
+  const {scopeIdHash,workspaceHash} = identity;
+  const countSelectedAudit = readOnly ? countReadonlyBenchAuditEvents : countAuditEvents, selectedAssurance = readOnly ? latestReadonlyBenchAssuranceByPack : latestAssuranceByPack;
   const scope = { type: params.scopeType, id: params.scopeId };
-  const signals = collectForecastSignals({
-    workspace: params.workspace,
-    scope,
-    lookbackDays: Math.max(90, params.windowDays)
-  });
   const latestForecast = loadLatestForecastArtifact(params.workspace, scope);
 
   const evidenceGateReasons: string[] = [];
@@ -424,18 +413,18 @@ export function collectBenchData(params: {
     }
   }
 
-  const pluginState = verifyPluginWorkspace({ workspace: params.workspace });
+  const pluginState = verifyPluginWorkspace({ workspace: params.workspace, readonly: readOnly });
   const operating = {
     approvalsBacklogCount: Math.max(0, Math.round(latestSeriesValue(signals.points.operating.approval_backlog_size))),
     approvalsMedianAgeHours: Number(latestSeriesValue(signals.points.operating.approval_backlog_age_hours).toFixed(6)),
-    budgetExceedEvents: countAuditEvents({
+    budgetExceedEvents: countSelectedAudit({
       workspace: params.workspace,
       startTs: window.startTs,
       endTs: window.endTs,
       auditTypes: ["BUDGET_EXCEEDED", "LEASE_RATE_LIMITED"]
     }),
     toolhubDenialRate: Number(latestSeriesValue(signals.points.operating.toolhub_denial_rate).toFixed(6)),
-    freezeEvents: countAuditEvents({
+    freezeEvents: countSelectedAudit({
       workspace: params.workspace,
       startTs: window.startTs,
       endTs: window.endTs,
@@ -459,7 +448,7 @@ export function collectBenchData(params: {
 
   if (params.scopeType === "AGENT") {
     const agentId = resolveAgentId(params.workspace, params.scopeId);
-    const assurance = latestAssuranceByPack({
+    const assurance = selectedAssurance({
       workspace: params.workspace,
       agentId,
       windowStartTs: window.startTs,

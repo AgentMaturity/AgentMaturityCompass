@@ -1,3 +1,4 @@
+export { createBenchComparisonAsync } from "./benchComparisonAsync.js";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { pathExists, readUtf8 } from "../utils/fs.js";
@@ -33,7 +34,7 @@ function localBenchFromScope(params: {
   return benchArtifactSchema.parse(collected.bench);
 }
 
-function loadImportedBenchObjects(workspace: string): Array<{ bench: BenchArtifact; registryId: string }> {
+export function loadImportedBenchObjects(workspace: string): Array<{ bench: BenchArtifact; registryId: string }> {
   const imports = listImportedBenchArtifacts(workspace);
   const out: Array<{ bench: BenchArtifact; registryId: string }> = [];
   for (const row of imports) {
@@ -118,19 +119,8 @@ function warningSummary(local: BenchArtifact, population: BenchArtifact[]): stri
   return warnings;
 }
 
-export function createBenchComparison(params: {
-  workspace: string;
-  scope: "workspace" | "node" | "agent";
-  id: string;
-  against?: "imported" | `registry:${string}`;
-}): {
-  comparison: BenchComparison;
-  path: string;
-  sigPath: string;
-  transparencyHash: string;
-} {
-  const local = localBenchFromScope(params);
-  const loaded = loadImportedBenchObjects(params.workspace);
+/** Existing diagnostic comparison recipe, with actual selected values supplied by each producer. */
+export function benchComparisonWithInputs(params: {against?:"imported"|`registry:${string}`}, local:BenchArtifact, loaded:ReturnType<typeof loadImportedBenchObjects>, policy:ReturnType<typeof loadBenchPolicy>) {
   const populationRows =
     params.against && params.against.startsWith("registry:")
       ? loaded.filter((row) => row.registryId === params.against!.slice("registry:".length))
@@ -140,7 +130,6 @@ export function createBenchComparison(params: {
   const populationFlat = population.map((row) => flattenBenchMetrics(row));
   const percentiles = percentileTable(localFlat, populationFlat.length > 0 ? populationFlat : [localFlat]);
   const peer = kMedoidsPeerGroup(localFlat, populationFlat.length > 0 ? populationFlat : [localFlat]);
-  const policy = loadBenchPolicy(params.workspace);
   const comparison = benchComparisonSchema.parse({
     v: 1,
     generatedTs: Date.now(),
@@ -165,6 +154,22 @@ export function createBenchComparison(params: {
     peerGroup: peer,
     warnings: warningSummary(local, population)
   });
+  return comparison;
+}
+
+export function createBenchComparison(params: {
+  workspace: string;
+  scope: "workspace" | "node" | "agent";
+  id: string;
+  against?: "imported" | `registry:${string}`;
+}): {
+  comparison: BenchComparison;
+  path: string;
+  sigPath: string;
+  transparencyHash: string;
+} {
+  const local = localBenchFromScope(params);
+  const comparison = benchComparisonWithInputs(params,local,loadImportedBenchObjects(params.workspace),loadBenchPolicy(params.workspace));
   const saved = saveBenchComparison(params.workspace, comparison);
   const transparency = appendTransparencyEntry({
     workspace: params.workspace,

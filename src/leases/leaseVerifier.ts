@@ -3,6 +3,8 @@ import { getPublicKeyHistory } from "../crypto/keys.js";
 import type { ActionClass } from "../types.js";
 import { leasePayloadSchema, type LeasePayload, type LeaseScope } from "./leaseSchema.js";
 
+import { verifyCurrentPurposeCredentialSignature } from "../keys/purposeCredentialSignature.js";
+
 function fromBase64Url(encoded: string): Buffer {
   const normalized = encoded.replace(/-/g, "+").replace(/_/g, "/");
   const pad = normalized.length % 4 === 0 ? "" : "=".repeat(4 - (normalized.length % 4));
@@ -51,7 +53,9 @@ export function verifyLeaseToken(input: VerifyLeaseOptions): VerifyLeaseResult {
     const payload = leasePayloadSchema.parse(JSON.parse(payloadBytes.toString("utf8")) as unknown);
 
     const publicKeys = getPublicKeyHistory(input.workspace, "lease");
-    const validSig = publicKeys.some((pub) => verify(null, payloadBytes, pub, signature));
+    // Preserve the legacy observation and its native throw boundary; neither mathematical verdict bypasses purpose admission.
+    publicKeys.some((pub) => verify(null, payloadBytes, pub, signature));
+    const validSig = verifyCurrentPurposeCredentialSignature(input.workspace, "lease", payloadBytes, signature);
     if (!validSig) {
       return { ok: false, payload, error: "signature verification failed" };
     }

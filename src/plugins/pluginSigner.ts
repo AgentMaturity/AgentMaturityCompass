@@ -1,4 +1,5 @@
-import { createPrivateKey, createPublicKey, sign, verify } from "node:crypto";
+import { createPrivateKey, createPublicKey, sign } from "node:crypto";
+import { verifyCanonical } from "../keys/algorithmPolicy.js";
 import { readFileSync } from "node:fs";
 import { sha256Hex } from "../utils/hash.js";
 import type { PluginManifest } from "./pluginManifestSchema.js";
@@ -42,7 +43,7 @@ export function verifyPluginManifestSignature(
 ): boolean {
   const payload = Buffer.from(canonicalize(manifest), "utf8");
   try {
-    return verify(null, payload, publicKeyPem, Buffer.from(signatureB64, "base64"));
+    return verifyCanonical(manifest.signing.algorithm, payload, publicKeyPem, Buffer.from(signatureB64, "base64"));
   } catch {
     return false;
   }

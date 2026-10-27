@@ -1,8 +1,10 @@
 import { createHash, createPrivateKey, createPublicKey, sign, verify, type KeyObject } from "node:crypto";
+import { canonicalSigningKey, derToP1363, verifyWithKey } from "../keys/algorithmPolicy.js";
+import { encode, encodeUint } from "../time/der.js";
 
 /**
  * C2SP signed notes and transparency-log checkpoints (P1-26), per c2sp.org/signed-note and c2sp.org/tlog-checkpoint
- * as read on 8 Oct 2026. Pure: node:crypto only, so offline verifiers can use it.
+ * as read on 8 Oct 2026. Pure local crypto and DER helpers, so offline verifiers can use it.
  *
  * A note is UTF-8 text ending in a newline, a blank line, then signature lines `— <key name> <base64(key ID || sig)>`.
  * Key IDs are 4 bytes: SHA-256(name || 0x0A || 0x01 || 32-byte key)[:4] for Ed25519 (signature over the text), and
@@ -63,19 +65,44 @@ export function parseSignedNote(note: Uint8Array): { text: string; signatures: A
  * The note's text when a signature by `name` under `publicKeyPem` verifies; null when that key did not sign it or a
  * signature claiming to be from it fails. Other keys' signatures are ignored. Throws when the note is malformed.
  */
-export function verifySignedNote(note: Uint8Array, verifier: { name: string; publicKeyPem: string }): string | null {
+function verifyNote(note: Uint8Array, verifier: { name: string; publicKeyPem: string }, canonical: boolean): string | null {
   const { text, signatures } = parseSignedNote(note);
   const key = createPublicKey(verifier.publicKeyPem);
   const { type, keyId } = noteKey(verifier.name, key);
   const mine = signatures.filter((line) => line.name === verifier.name && line.keyId.equals(keyId));
   const valid = (signature: Buffer): boolean => {
     try {
+      if (canonical) return verifyWithKey(Buffer.from(text, "utf8"), verifier.publicKeyPem, type === "ed25519" ? signature : derToP1363(signature));
       return type === "ed25519" ? verify(null, Buffer.from(text, "utf8"), key, signature) : verify("sha256", Buffer.from(text, "utf8"), key, signature);
     } catch {
       return false;
     }
   };
   return mine.length > 0 && mine.every((line) => valid(line.signature)) ? text : null;
+}
+
+/** External-log compatibility: retains the inherited DER ECDSA protocol, including P-384/P-521. */
+export function verifySignedNote(note: Uint8Array, verifier: { name: string; publicKeyPem: string }): string | null {
+  return verifyNote(note, verifier, false);
+}
+
+/** AMC notes admit only canonical Ed25519 or low-S P-256, with strict DER at the external note-wire boundary. */
+export function verifyCanonicalSignedNote(note: Uint8Array, verifier: { name: string; publicKeyPem: string }): string | null {
+  return verifyNote(note, verifier, true);
+}
+
+/** Encode a checked canonical provider signature into the existing note wire; this boundary also validates its bytes. */
+export function formatSignedNote(text: string, name: string, publicKeyPem: string, signature: Uint8Array): string {
+  if (!isValidKeyName(name)) throw new Error(`invalid note key name "${name}"`);
+  if (!text.endsWith("\n")) throw new Error("note text must end in a newline");
+  const key = canonicalSigningKey(publicKeyPem);
+  if (key === null || !verifyWithKey(Buffer.from(text, "utf8"), key.pem, signature)) throw new Error("note signature is not canonical for its public key and text");
+  const { keyId } = noteKey(name, createPublicKey(key.pem));
+  const raw = Buffer.from(signature);
+  const wire = key.algorithm === "ed25519" ? raw : encode(0x30, encodeUint(raw.subarray(0, 32)), encodeUint(raw.subarray(32)));
+  const note = `${text}\n— ${name} ${Buffer.concat([keyId, wire]).toString("base64")}\n`;
+  parseSignedNote(Buffer.from(note, "utf8"));
+  return note;
 }
 
 /** Signs `text` with an Ed25519 key under key name `name`. */

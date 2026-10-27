@@ -13,6 +13,7 @@ import {
 } from "./integrationDeliveryQueue.js";
 import {
   initIntegrationsConfig,
+  initIntegrationsConfigAsync,
   loadIntegrationsConfig,
   verifyIntegrationsConfigSignature
 } from "./integrationStore.js";
@@ -22,6 +23,10 @@ export function integrationsInitCli(workspace: string): {
   sigPath: string;
 } {
   return initIntegrationsConfig(workspace);
+}
+
+export function integrationsInitCliAsync(workspace: string, beforePublish?: () => void): Promise<{ path: string; sigPath: string }> {
+  return initIntegrationsConfigAsync(workspace, beforePublish);
 }
 
 export function integrationsVerifyCli(workspace: string): {

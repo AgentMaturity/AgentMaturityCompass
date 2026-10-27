@@ -1,32 +1,33 @@
-import { sign, verify, randomUUID } from "node:crypto";
-import { getSigningKey, getPublicKeyHistory } from "../crypto/keys.js";
+import { sign, randomUUID } from "node:crypto";
+import { getSigningKey } from "../crypto/keys.js";
+import { verifyCurrentPurposeCredentialSignature } from "../keys/purposeCredentialSignature.js";
+import { signWithPurposeKey } from "../keys/purposeProviders.js";
+import { capturePurposePublication, assertPurposePublicationCurrent } from "../keys/purposePublication.js";
+import { assertOwnerMode } from "../mode/mode.js";
 import { canonicalize } from "../utils/json.js";
 import { execTicketPayloadSchema, type ExecTicketPayload } from "./execTicketSchema.js";
 import { loadWorkOrder, workOrderDigest } from "../workorders/workorderEngine.js";
 import type { ActionClass } from "../types.js";
 
 function toBase64Url(bytes: Buffer): string {
-  return bytes
-    .toString("base64")
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-    .replace(/=+$/g, "");
+  return bytes.toString("base64url");
 }
 
 function fromBase64Url(encoded: string): Buffer {
-  const normalized = encoded.replace(/-/g, "+").replace(/_/g, "/");
-  const pad = normalized.length % 4 === 0 ? "" : "=".repeat(4 - (normalized.length % 4));
-  return Buffer.from(`${normalized}${pad}`, "base64");
+  if (typeof encoded !== "string") throw new TypeError("base64url input must be a string");
+  return Buffer.from(encoded, "base64url");
 }
 
-export function issueExecTicket(params: {
+export interface ExecTicketInput {
   workspace: string;
   agentId: string;
   workOrderId: string;
   actionClass: ActionClass;
   ttlMs: number;
   toolName?: string;
-}): { ticket: string; payload: ExecTicketPayload } {
+}
+
+function prepareExecTicket(params: ExecTicketInput): { payload: ExecTicketPayload; payloadBytes: Buffer } {
   const workOrder = loadWorkOrder({
     workspace: params.workspace,
     agentId: params.agentId,
@@ -47,12 +48,38 @@ export function issueExecTicket(params: {
   });
 
   const payloadBytes = Buffer.from(canonicalize(payload), "utf8");
+  return { payload, payloadBytes };
+}
+
+export function issueExecTicket(params: ExecTicketInput): { ticket: string; payload: ExecTicketPayload } {
+  assertOwnerMode(params.workspace, "ticket issue");
+  const { payload, payloadBytes } = prepareExecTicket(params);
   const signature = sign(null, payloadBytes, getSigningKey(params.workspace, "config-signature"));
   const ticket = `${toBase64Url(payloadBytes)}.${toBase64Url(signature)}`;
+  assertOwnerMode(params.workspace, "ticket issue");
   return {
     ticket,
     payload
   };
+}
+
+/** Additive runtime issuer. Caller/work-order refusal repeats through Sign and before the unchanged token returns. */
+export async function issueExecTicketAsync(params: ExecTicketInput, options: { beforePublish?: () => void } = {}): Promise<{ ticket: string; payload: ExecTicketPayload }> {
+  const input = { ...params }, beforePublish = options.beforePublish;
+  beforePublish?.(); assertOwnerMode(input.workspace, "ticket issue");
+  const { payload, payloadBytes } = prepareExecTicket(input);
+  const authority = capturePurposePublication(input.workspace, "config-signature");
+  const beforeSign = () => {
+    beforePublish?.();
+    const current = loadWorkOrder({ workspace: input.workspace, agentId: input.agentId, workOrderId: input.workOrderId, requireValidSignature: true });
+    if (workOrderDigest(current) !== payload.workOrderSha256) throw new Error("the work order changed while the execution ticket was signed");
+    if (Date.now() > payload.expiresTs) throw new Error("the execution ticket expired while it was signed");
+    assertOwnerMode(input.workspace, "ticket issue");
+  };
+  const signed = await signWithPurposeKey(input.workspace, "config-signature", payloadBytes, { beforeSign });
+  beforeSign();
+  assertPurposePublicationCurrent(input.workspace, authority, signed);
+  return { ticket: `${toBase64Url(payloadBytes)}.${toBase64Url(signed.signature)}`, payload };
 }
 
 export function parseExecTicket(ticket: string): ExecTicketPayload {
@@ -80,8 +107,7 @@ export function verifyExecTicket(params: {
     const payloadBytes = fromBase64Url(payloadB64);
     const payload = execTicketPayloadSchema.parse(JSON.parse(payloadBytes.toString("utf8")) as unknown);
     const signature = fromBase64Url(signatureB64);
-    const publicKeys = getPublicKeyHistory(params.workspace, "auditor");
-    const validSig = publicKeys.some((pub) => verify(null, payloadBytes, pub, signature));
+    const validSig = verifyCurrentPurposeCredentialSignature(params.workspace, "config-signature", payloadBytes, signature);
     if (!validSig) {
       return { ok: false, payload, error: "signature verification failed" };
     }

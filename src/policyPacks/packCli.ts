@@ -1,4 +1,5 @@
 import { applyPolicyPack } from "./packApply.js";
+import { applyPolicyPackAsync } from "./packPublication.js";
 import { getPolicyPack, listPolicyPacks } from "./builtInPacks.js";
 import { diffPolicyPack } from "./packDiff.js";
 
@@ -40,4 +41,12 @@ export function policyPackApplyCli(params: {
   packId: string;
 }) {
   return applyPolicyPack(params);
+}
+
+/** Maintained async path; legacy policyPackApplyCli remains synchronous. */
+export function policyPackApplyCliAsync(params: Parameters<typeof policyPackApplyCli>[0], options: {
+  beforePublish?: () => void; recordEffect?: (effect: string) => void;
+} = {}) {
+  const input = { ...params }, beforePublish = options.beforePublish, recordEffect = options.recordEffect;
+  return applyPolicyPackAsync(input, { beforePublish, recordEffect });
 }

@@ -1,10 +1,12 @@
 import { join } from "node:path";
 import YAML from "yaml";
 import { questionBank } from "../diagnostic/questionBank.js";
-import { signFileWithAuditor, verifySignedFileWithAuditor } from "../org/orgSigner.js";
-import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
-import type { MechanicTargets } from "./targetSchema.js";
-import { loadMechanicTargets, saveMechanicTargets, mechanicRoot } from "./targetsStore.js";
+import { publishOrgPairs, prepareOrgPairsAsync, type OrgPairsOptions, type OrgPairsSnapshot } from "../org/preparedOrgPairs.js";
+import { captureMechanicPair, requireMechanicPair, verifyMechanicPair } from "./mechanicPairs.js";
+import { pathExists, readUtf8 } from "../utils/fs.js";
+import { mechanicTargetsSchema, type MechanicTargets } from "./targetSchema.js";
+import { canonicalize } from "../utils/json.js";
+import { loadMechanicTargets, saveMechanicTargets, captureMechanicTargets, prepareMechanicTargets, mechanicRoot } from "./targetsStore.js";
 import { mechanicProfilesSchema, type MechanicProfile, type MechanicProfiles } from "./profileSchema.js";
 
 function qids(): string[] {
@@ -153,7 +155,7 @@ function builtInProfiles(): MechanicProfiles {
   });
 }
 
-function mechanicProfilesPath(workspace: string): string {
+export function mechanicProfilesPath(workspace: string): string {
   return join(mechanicRoot(workspace), "profiles.yaml");
 }
 
@@ -164,10 +166,7 @@ export function mechanicProfilesSigPath(workspace: string): string {
 export function initMechanicProfiles(workspace: string): { path: string; sigPath: string; profiles: MechanicProfiles } {
   const profiles = builtInProfiles();
   const path = mechanicProfilesPath(workspace);
-  ensureDir(mechanicRoot(workspace));
-  writeFileAtomic(path, YAML.stringify(profiles), 0o644);
-  const sigPath = signFileWithAuditor(workspace, path);
-  return { path, sigPath, profiles };
+  return { ...publishOrgPairs(workspace, [{ path, bytes: Buffer.from(YAML.stringify(profiles)) }])[0]!, profiles };
 }
 
 function loadMechanicProfiles(workspace: string): MechanicProfiles {
@@ -179,17 +178,15 @@ function loadMechanicProfiles(workspace: string): MechanicProfiles {
 }
 
 export function verifyMechanicProfilesSignature(workspace: string) {
-  const path = mechanicProfilesPath(workspace);
-  if (!pathExists(path)) {
-    return {
-      valid: false,
-      signatureExists: false,
-      reason: "mechanic profiles missing",
-      path,
-      sigPath: `${path}.sig`
-    };
-  }
-  return verifySignedFileWithAuditor(workspace, path);
+  return verifyMechanicPair(workspace, mechanicProfilesPath(workspace), "mechanic profiles missing");
+}
+export function captureMechanicProfiles(workspace: string) {
+  const captured = captureMechanicPair(workspace, mechanicProfilesPath(workspace), "mechanic profiles missing");
+  return { ...captured, profiles: mechanicProfilesSchema.parse(YAML.parse(requireMechanicPair(captured).toString("utf8")) as unknown) };
+}
+export async function prepareInitialMechanicProfiles(workspace: string, options: OrgPairsOptions = {}, before?: OrgPairsSnapshot) {
+  const profiles = builtInProfiles(), path = mechanicProfilesPath(workspace), prepared = await prepareOrgPairsAsync(workspace, [{ path, bytes: Buffer.from(YAML.stringify(profiles)) }], options, before);
+  return { assertCurrent: prepared.assertCurrent, publish() { return { ...prepared.publish()[0]!, profiles }; } };
 }
 
 export function listMechanicProfiles(workspace: string): MechanicProfile[] {
@@ -239,4 +236,21 @@ export function applyMechanicProfile(params: {
     targets: next,
     ...saved
   };
+}
+
+/** Internal async profile application. Missing defaults are initialized explicitly by the maintained driver before calling this preparation. */
+export async function prepareMechanicProfile(params: Parameters<typeof applyMechanicProfile>[0], options: OrgPairsOptions = {}, constructorTargets?: MechanicTargets) {
+  const input = { ...params }, selectedProfiles = captureMechanicProfiles(input.workspace), selectedTargets = captureMechanicTargets(input.workspace);
+  const profile = selectedProfiles.profiles.mechanicProfiles.profiles.find(row => row.id === input.profileId);
+  if (profile === undefined) throw new Error(`unknown mechanic profile: ${input.profileId}`);
+  const sourceTargets = constructorTargets === undefined ? selectedTargets.targets : mechanicTargetsSchema.parse(constructorTargets);
+  if (constructorTargets !== undefined && canonicalize({ ...sourceTargets.mechanicTargets, createdTs: 0, updatedTs: 0 })
+    !== canonicalize({ ...selectedTargets.targets.mechanicTargets, createdTs: 0, updatedTs: 0 }))
+    throw new Error("initial mechanic constructor no longer matches the selected persisted targets");
+  const targets: MechanicTargets = { mechanicTargets: { ...sourceTargets.mechanicTargets, scope: { type: input.scopeType, id: input.scopeId },
+    mode: input.mode, targets: Object.fromEntries(Object.entries(profile.targets).map(([key, value]) => [key, input.mode === "EXCELLENCE" ? 5 : value])), updatedTs: Date.now() } };
+  const prepared = await prepareMechanicTargets({ workspace: input.workspace, targets, reason: input.reason }, {
+    beforePublish: options.beforePublish, assertInputsCurrent() { selectedProfiles.assertCurrent(); selectedTargets.assertCurrent(); options.assertInputsCurrent?.(); }
+  }, selectedTargets.before);
+  return { bytes: prepared.bytes, assertCurrent() { selectedProfiles.assertCurrent(); prepared.assertCurrent(); }, publish() { return { ...prepared.publish(), profile, targets }; } };
 }

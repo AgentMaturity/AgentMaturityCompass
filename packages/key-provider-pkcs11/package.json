@@ -1,0 +1,17 @@
+{
+  "name": "agent-maturity-compass-key-provider-pkcs11",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Optional native PKCS#11 binding loader for AMC key providers. Private until separately published.",
+  "type": "commonjs",
+  "main": "./index.cjs",
+  "exports": {
+    ".": "./index.cjs",
+    "./package.json": "./package.json"
+  },
+  "files": ["index.cjs", "README.md"],
+  "engines": { "node": ">=20" },
+  "peerDependencies": { "pkcs11js": "2.1.7" },
+  "peerDependenciesMeta": { "pkcs11js": { "optional": true } },
+  "license": "MIT"
+}

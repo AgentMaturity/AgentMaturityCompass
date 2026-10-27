@@ -566,7 +566,7 @@ export async function handleAssuranceRoute(
         scopeId,
         pack,
         windowDays
-      });
+      }, { synchronousSeal: true });
       apiSuccess(res, out);
     } catch (err) {
       apiRequestError(res, err, "invalid request");

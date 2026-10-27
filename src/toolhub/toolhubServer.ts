@@ -1,3 +1,4 @@
+import { workspaceSelfTrust } from "../trust/trustContext.js";
 import { randomUUID } from "node:crypto";
 import { resolve } from "node:path";
 import { loadTargetProfile } from "../targets/targetProfile.js";
@@ -41,9 +42,13 @@ import {
   approvalStatusPayload,
   consumeApprovedExecution,
   createApprovalForIntent,
+  createApprovalForIntentAsync,
+  type ApprovalRequestInput,
   verifyApprovalForExecution
 } from "../approvals/approvalEngine.js";
-import { loadApprovalPolicy, verifyApprovalPolicySignature } from "../approvals/approvalPolicyEngine.js";
+import { loadApprovalPolicy, verifyApprovalPolicySignature, approvalPolicyPath } from "../approvals/approvalPolicyEngine.js";
+import { captureApprovalBoundInputs, ApprovalRequestContinuationError } from "../approvals/approvalRequestPublication.js";
+import { captureOrgPairs, assertOrgPairsCurrent } from "../org/preparedOrgPairs.js";
 import {
   inspectToolhubContext,
   requireTrustedToolhubContext,
@@ -108,6 +113,13 @@ interface IntentRecord {
   approvalRequestId?: string;
   approvalRequired: boolean;
   blastRadiusConsent: ToolBlastRadiusConsent;
+}
+
+interface IntentContext {
+  tool: NonNullable<ReturnType<typeof findToolDefinition>>;
+  configTrusted: boolean;
+  decision: GovernorDecision;
+  workOrderContext?: { workOrderId: string; riskTier: "low" | "med" | "high" | "critical"; allowedActionClasses: ActionClass[] };
 }
 
 export interface ExecutionRecord {
@@ -309,6 +321,69 @@ export class ToolHubService {
   }
 
   createIntent(input: ToolIntentRequest): ToolIntentResponse {
+    const state = this.prepareIntent(input, this.inspectIntentContext(input));
+    const approval = state.approvalInput === null ? undefined : createApprovalForIntent(state.approvalInput);
+    return this.finishIntent(state, approval);
+  }
+
+  /** Maintained async entry. The returned negative belongs to this attempt, never to the long-lived intent map. */
+  async createIntentAsync(input: ToolIntentRequest, options: { beforePublish?: () => void } = {}) {
+    const selected = structuredClone(input), shape = canonicalize(selected), caller = options.beforePublish;
+    const originalNoSign = process.env.AMC_NO_SIGN === "1";
+    const raw = captureApprovalBoundInputs(this.workspace, selected.agentId, selected.workOrderId);
+    const approvalBefore = captureOrgPairs([approvalPolicyPath(this.workspace)]);
+    const context = this.inspectIntentContext(selected);
+    raw.assertCurrent(); assertOrgPairsCurrent(approvalBefore);
+    const state = this.prepareIntent(selected, context), contextShape = canonicalize(context);
+    const recordShape = canonicalize({ ...state.record, approvalRequestId: undefined });
+    let finished = false, expectedApprovalId: string | undefined;
+    assertOrgPairsCurrent(approvalBefore); raw.assertCurrent();
+    let failure = null as { cause: unknown } | null;
+    let approval: Awaited<ReturnType<typeof createApprovalForIntentAsync>> | null = null;
+    const intrinsic = () => {
+      if (canonicalize(input) !== shape || canonicalize(selected) !== shape || (process.env.AMC_NO_SIGN === "1") !== originalNoSign)
+        throw new Error("original tool intent input or no-sign choice changed");
+      if (Date.now() > state.record.expiresTs) throw new Error(`Intent expired: ${state.record.intentId}`);
+      if (canonicalize(context) !== contextShape || canonicalize({ ...state.record, approvalRequestId: undefined }) !== recordShape
+        || (state.record.approvalRequestId !== undefined && state.record.approvalRequestId !== expectedApprovalId)
+        || (finished && (this.intents.get(state.record.intentId) !== state.record || state.record.approvalRequestId !== expectedApprovalId)))
+        throw new Error("original tool intent record or actual map result changed");
+      raw.assertCurrent();
+      if (!state.record.approvalRequired) assertOrgPairsCurrent(approvalBefore);
+      if (canonicalize(this.inspectIntentContext(selected)) !== contextShape)
+        throw new Error("original tool intent policy or live eligibility changed");
+      raw.assertCurrent();
+      if (!state.record.approvalRequired) assertOrgPairsCurrent(approvalBefore);
+    };
+    const baseCurrent = () => {
+      if (failure !== null) throw failure.cause;
+      try { intrinsic(); caller?.(); intrinsic(); }
+      catch (cause) { failure = { cause }; throw cause; }
+    };
+    const fullCurrent = () => {
+      if (failure !== null) throw failure.cause;
+      try { baseCurrent(); approval?.assertCurrent(); baseCurrent(); }
+      catch (cause) { failure = { cause }; throw cause; }
+    };
+    try {
+      baseCurrent();
+      if (state.approvalInput !== null) approval = await createApprovalForIntentAsync(state.approvalInput,
+        { beforePublish: baseCurrent, beforePolicyCapture: () => assertOrgPairsCurrent(approvalBefore) });
+      expectedApprovalId = approval?.result.approval.approvalRequestId;
+      fullCurrent();
+      const response = this.finishIntent(state, approval?.result, fullCurrent);
+      finished = true; fullCurrent(); return Object.freeze({ response, assertCurrent: fullCurrent });
+    } catch (cause) {
+      if (failure !== null && failure.cause !== cause) {
+        if (cause instanceof ApprovalRequestContinuationError && cause.primaryCause === failure.cause) throw cause;
+        throw new ApprovalRequestContinuationError(failure.cause, cause);
+      }
+      throw cause;
+    }
+  }
+
+  /** Actual read-oriented inspection. Ledger/keyset/history/cache effects remain real on every invocation. */
+  private inspectIntentContext(input: ToolIntentRequest): IntentContext {
     const actionPolicySig = verifyActionPolicySignature(this.workspace);
     const toolsSig = verifyToolsConfigSignature(this.workspace);
     const configTrusted = actionPolicySig.valid && toolsSig.valid;
@@ -360,11 +435,16 @@ export class ToolHubService {
       workOrder: workOrderContext,
       hasExecTicket: false,
       freezeStatus: activeFreezeStatus(this.workspace, input.agentId),
-      budgetStatus: evaluateBudgetStatus(this.workspace, input.agentId),
+      budgetStatus: evaluateBudgetStatus(this.workspace, input.agentId, Date.now(), { trust: workspaceSelfTrust(this.workspace) }),
       policy: loadActionPolicy(this.workspace),
       policySignatureValid: actionPolicySig.valid
     });
 
+    return { tool, configTrusted, decision, workOrderContext };
+  }
+
+  private prepareIntent(input: ToolIntentRequest, context: IntentContext) {
+    const { tool, decision, workOrderContext } = context;
     const intentId = `intent_${randomUUID().replace(/-/g, "")}`;
     const approvalPolicySig = verifyApprovalPolicySignature(this.workspace);
     let manualApprovalsRequired = 0;
@@ -402,8 +482,7 @@ export class ToolHubService {
     const boundIntent = isJournaledToolhubExecution(decision.effectiveMode, record.actionClass)
       ? toolhubApprovalIntent({ workspace: this.workspace, intentId, agentId: input.agentId, toolName: input.toolName,
           actionClass: record.actionClass, args: input.args, requestedMode: record.request.requestedMode, effectiveMode: decision.effectiveMode }) : null;
-    if (approvalRequired) {
-      const approval = createApprovalForIntent({
+    const approvalInput: ApprovalRequestInput | null = approvalRequired ? {
         workspace: this.workspace,
         initiator: input.initiator,
         agentId: input.agentId,
@@ -424,8 +503,18 @@ export class ToolHubService {
           reasons: decision.reasons,
           blastRadiusConsent
         }
-      });
+    } : null;
+    return { input, context, record, approvalInput };
+  }
+
+  private finishIntent(state: { input: ToolIntentRequest; context: IntentContext; record: IntentRecord },
+    approval?: ReturnType<typeof createApprovalForIntent>, beforePublish?: () => void): ToolIntentResponse {
+    const { input, record } = state, { tool, configTrusted, decision } = state.context;
+    const { intentId, approvalRequired, blastRadiusConsent } = record;
+    if (approval !== undefined) {
+      beforePublish?.();
       record.approvalRequestId = approval.approval.approvalRequestId;
+      beforePublish?.();
       this.writeAuditWithReceipt({
         auditType: "APPROVAL_REQUEST_CREATED",
         severity: "MEDIUM",
@@ -438,6 +527,7 @@ export class ToolHubService {
           quorumReceived: approval.approval.receivedApprovals
         }
       });
+      beforePublish?.();
       this.writeAuditWithReceipt({
         auditType: "APPROVAL_REQUESTED",
         severity: "MEDIUM",
@@ -448,12 +538,15 @@ export class ToolHubService {
         }
       });
     }
+    beforePublish?.();
     this.intents.set(intentId, record);
 
+    beforePublish?.();
     const ledger = openLedger(this.workspace);
     let guardReceipt: string | undefined;
     const sessionId = `toolhub-intent-${randomUUID()}`;
     try {
+      beforePublish?.();
       ledger.startSession({
         sessionId,
         runtime: "unknown",
@@ -474,6 +567,7 @@ export class ToolHubService {
       };
       const payloadText = JSON.stringify(payload);
       const bodySha256 = sha256Hex(Buffer.from(payloadText, "utf8"));
+      beforePublish?.();
       const out = ledger.appendEvidenceWithReceipt({
         sessionId,
         runtime: "unknown",
@@ -496,6 +590,7 @@ export class ToolHubService {
       });
       guardReceipt = out.receipt;
       if (input.workOrderId) {
+        beforePublish?.();
         this.appendOutcomeSignal({
           ledger,
           sessionId,
@@ -509,6 +604,7 @@ export class ToolHubService {
         });
       }
       if (approvalRequired) {
+        beforePublish?.();
         this.appendOutcomeSignal({
           ledger,
           sessionId,
@@ -521,12 +617,14 @@ export class ToolHubService {
           }
         });
       }
+      beforePublish?.();
       ledger.sealSession(sessionId);
     } finally {
       ledger.close();
     }
 
-    return {
+    beforePublish?.();
+    const response: ToolIntentResponse = {
       intentId,
       requiredExecTicket: decision.requiredExecTicket || tool.requireExecTicket === true,
       effectiveMode: decision.effectiveMode,
@@ -548,6 +646,7 @@ export class ToolHubService {
       guardReceipt,
       blastRadiusConsent
     };
+    beforePublish?.(); return response;
   }
 
   async executeIntent(input: ToolExecutionRequest): Promise<ToolExecutionResponse> {
@@ -594,7 +693,7 @@ export class ToolHubService {
       );
     }
 
-    const budget = evaluateBudgetStatus(this.workspace, intent.request.agentId);
+    const budget = evaluateBudgetStatus(this.workspace, intent.request.agentId, Date.now(), { trust: workspaceSelfTrust(this.workspace) });
     if (!budget.budgetConfigValid && requestedMode === "EXECUTE") {
       return this.auditDenied(
         intent,

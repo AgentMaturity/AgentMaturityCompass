@@ -1,3 +1,4 @@
+import { signatureEnvelopeSchema, verifySignatureEnvelope } from "../crypto/signing/signatureEnvelope.js";
 import { readFileSync } from "node:fs";
 import { verifyHexDigest } from "../crypto/keys.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -64,9 +65,13 @@ export function carriedLedgerAnchoring(monitor: IssuerAdmission, ledgerAnchored:
     : { status: "unanchored", detail: `monitor key ${monitor.status}: ${monitor.detail ?? "not admitted for ledger-row"}` };
 }
 
-/** checkSignature for the common case: an Ed25519 signature over a sha256 hex digest (signHexDigest). */
-export function checkDigestSignature(input: Omit<SignatureCheckInput, "verify"> & { digestHex: string; signatureB64: string }): SignatureCheck {
-  return checkSignature({ ...input, verify: pem => verifyHexDigest(input.digestHex, input.signatureB64, pem) });
+/** A digest signature with a supplied envelope must satisfy its algorithm, identity and encoding as well. */
+export function checkDigestSignature(input: Omit<SignatureCheckInput, "verify"> & { digestHex: string; signatureB64: string; envelope?: unknown }): SignatureCheck {
+  const parsed = input.envelope === undefined ? undefined : signatureEnvelopeSchema.safeParse(input.envelope);
+  return checkSignature({ ...input, verify: pem => input.envelope === undefined
+    ? verifyHexDigest(input.digestHex, input.signatureB64, pem)
+    : parsed?.success === true && parsed.data.sigB64 === input.signatureB64
+      && verifySignatureEnvelope(input.digestHex, parsed.data, { trustedPublicKeys: [pem], requireTrustedKey: true }) });
 }
 
 /** The public key an envelope carries (signDigestWithPolicy), or null. Only a candidate, never a vouch. */

@@ -1,6 +1,5 @@
-import { appendFileSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { ensureDir, pathExists } from "../utils/fs.js";
+import { withIntegrationJournalProtocol, type IntegrationJournalIo } from "./integrationJournalProtocol.js";
 import { normalizeWebhookDeliveryError, redactWebhookDestination } from "./webhookDelivery.js";
 
 export interface IntegrationDeadLetterEntry {
@@ -18,10 +17,6 @@ export interface IntegrationDeadLetterEntry {
   reason: string;
 }
 
-function integrationDeadLetterPath(workspace: string): string {
-  return join(workspace, ".amc", "integrations", "dead-letters.jsonl");
-}
-
 function sanitizeDeadLetterEntry(entry: IntegrationDeadLetterEntry): IntegrationDeadLetterEntry {
   return {
     ...entry,
@@ -31,24 +26,24 @@ function sanitizeDeadLetterEntry(entry: IntegrationDeadLetterEntry): Integration
 }
 
 export function appendIntegrationDeadLetter(workspace: string, entry: IntegrationDeadLetterEntry): string {
-  const path = integrationDeadLetterPath(workspace);
-  ensureDir(join(workspace, ".amc", "integrations"));
-  if (pathExists(path)) {
-    const existing = loadIntegrationDeadLetters(workspace, Number.MAX_SAFE_INTEGER);
-    if (existing.some((row) => row.deadLetterId === entry.deadLetterId)) {
-      return path;
-    }
-  }
-  appendFileSync(path, `${JSON.stringify(sanitizeDeadLetterEntry(entry))}\n`, { encoding: "utf8", mode: 0o600 });
-  return path;
+  return withIntegrationJournalProtocol(workspace, journal => appendIntegrationDeadLetterInJournal(journal, workspace, entry));
+}
+/** Normalize, dedupe and append under the same active file-lock scope. */
+export function appendIntegrationDeadLetterInJournal(io: IntegrationJournalIo, workspace: string, entry: IntegrationDeadLetterEntry): string {
+  if (io.workspace !== workspace) throw new Error("integration journal scope belongs to another workspace");
+  const existing = loadDeadLetters(io, Number.MAX_SAFE_INTEGER);
+  if (!existing.some(row => row.deadLetterId === entry.deadLetterId)) io.appendDeadLetter(`${JSON.stringify(sanitizeDeadLetterEntry(entry))}\n`);
+  return join(workspace, ".amc", "integrations", "dead-letters.jsonl");
 }
 
 export function loadIntegrationDeadLetters(workspace: string, limit = 100): IntegrationDeadLetterEntry[] {
-  const path = integrationDeadLetterPath(workspace);
-  if (!pathExists(path)) {
+  return withIntegrationJournalProtocol(workspace, journal => loadDeadLetters(journal, limit));
+}
+function loadDeadLetters(io: IntegrationJournalIo, limit: number): IntegrationDeadLetterEntry[] {
+  const text = io.deadLettersText();
+  if (text === null) {
     return [];
   }
-  const text = readFileSync(path, "utf8");
   const lines = text
     .split(/\r?\n/)
     .map((line) => line.trim())
@@ -80,7 +75,7 @@ export function loadIntegrationDeadLetters(workspace: string, limit = 100): Inte
   const sanitizedText = out.map((entry) => JSON.stringify(entry)).join("\n");
   const normalizedFile = sanitizedText.length > 0 ? `${sanitizedText}\n` : "";
   if (normalizedFile !== text) {
-    writeFileSync(path, normalizedFile, { encoding: "utf8", mode: 0o600 });
+    io.normalizeDeadLetters(normalizedFile);
   }
   return out.slice(-Math.max(0, limit));
 }

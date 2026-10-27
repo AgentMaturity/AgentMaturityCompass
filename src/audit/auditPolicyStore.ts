@@ -1,3 +1,8 @@
+import { assertOrgPairsCurrent, captureOrgPairs } from "../org/preparedOrgPairs.js";
+import { captureAuditPolicyMapPublication, readAuditPolicySelection } from "./auditPolicyMapPublication.js";
+import type { AuditPublicationOptions } from "./binderPublication.js";
+import { verifyAuditBundlePair } from "./binderFileVerification.js";
+import { saveAuditSchedulerStateSync } from "./binderStatePublication.js";
 import { join } from "node:path";
 import YAML from "yaml";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
@@ -51,7 +56,7 @@ export function auditRequestsClosedDir(workspace: string): string {
   return join(auditRequestsDir(workspace), "closed");
 }
 
-function auditSchedulerPath(workspace: string): string {
+export function auditSchedulerPath(workspace: string): string {
   return join(auditRoot(workspace), "scheduler.json");
 }
 
@@ -123,14 +128,7 @@ export function saveAuditSchedulerState(workspace: string, state: AuditScheduler
   path: string;
   sigPath: string;
 } {
-  ensureAuditDirs(workspace);
-  const path = auditSchedulerPath(workspace);
-  writeFileAtomic(path, JSON.stringify(auditSchedulerStateSchema.parse(state), null, 2), 0o644);
-  const sigPath = signFileWithAuditor(workspace, path);
-  return {
-    path,
-    sigPath
-  };
+  return saveAuditSchedulerStateSync(workspace, state);
 }
 
 export function verifyAuditSchedulerSignature(workspace: string) {
@@ -144,5 +142,34 @@ export function verifyAuditSchedulerSignature(workspace: string) {
       sigPath: `${path}.sig`
     };
   }
-  return verifySignedFileWithAuditor(workspace, path);
+  return verifyAuditBundlePair(workspace, path);
+}
+
+export function prepareAuditPolicyAsync(workspace: string, policy: AuditPolicy, options: AuditPublicationOptions = {}) {
+  return captureAuditPolicyMapPublication(workspace, { policy }, options).prepare();
+}
+export async function saveAuditPolicyAsync(workspace: string, policy: AuditPolicy, options: AuditPublicationOptions = {}) {
+  const prepared = await prepareAuditPolicyAsync(workspace, policy, options); return prepared.publish().policy!;
+}
+export async function initAuditPolicyAsync(workspace: string, options: AuditPublicationOptions = {}) {
+  const policy = defaultAuditPolicy(), prepared = await prepareAuditPolicyAsync(workspace, policy, options);
+  const saved = prepared.publish().policy!; prepared.assertCurrent(); return { ...saved, policy };
+}
+export async function loadAuditPolicyAttemptAsync(workspace: string, options: AuditPublicationOptions = {}) {
+  const caller = { ...options }; caller.beforePublish?.(); caller.assertInputsCurrent?.(); caller.assertPreparationInputsCurrent?.();
+  const selected = readAuditPolicySelection(workspace);
+  if (selected.bytes !== null) {
+    const policy = auditPolicySchema.parse(YAML.parse(selected.bytes.toString("utf8")));
+    const assertCurrent = () => { caller.beforePublish?.(); caller.assertInputsCurrent?.(); selected.assertCurrent(); };
+    assertCurrent(); return Object.freeze({ policy, assertCurrent, verification: selected.verification });
+  }
+  const previous = captureOrgPairs([auditPolicyPath(workspace)]), policy = defaultAuditPolicy();
+  if (previous.members.some(row => row.path === auditPolicyPath(workspace) && row.bytes !== null)) throw new Error("audit policy appeared during default selection");
+  assertOrgPairsCurrent(previous);
+  const prepared = await captureAuditPolicyMapPublication(workspace, { policy }, caller, previous).prepare();
+  prepared.publish(); prepared.assertCurrent();
+  return Object.freeze({ policy, assertCurrent: prepared.assertCurrent, verification: () => prepared.verification("policy") });
+}
+export async function loadAuditPolicyAsync(workspace: string, options: AuditPublicationOptions = {}): Promise<AuditPolicy> {
+  const loaded = await loadAuditPolicyAttemptAsync(workspace, options); loaded.assertCurrent(); return loaded.policy;
 }

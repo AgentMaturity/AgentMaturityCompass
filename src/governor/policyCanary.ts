@@ -16,17 +16,22 @@ import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { signHexDigest, getSigningKey } from "../crypto/keys.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
-import { join } from "node:path";
-import { addDebtEntry, loadAllDebt } from "./policyDebt.js";
+import { join, resolve } from "node:path";
+import { addDebtEntry, loadAllDebt, prepareDebtEntryAsync, withDebtPublicationLock } from "./policyDebt.js";
+import { capturePurposePublication, assertPurposePublicationCurrent } from "../keys/purposePublication.js";
+import { signWithPurposeKey } from "../keys/purposeProviders.js";
+import { vaultStatus } from "../vault/vault.js";
 // Rollback packs and emergency overrides live in canaryRegisters.ts; they are
 // re-exported here so the public surface is unchanged.
 import {
   createRollbackPack,
+  createRollbackPackAsync,
   getRollbackPacks,
   getLatestRollbackPack,
   activateEmergencyOverride,
+  activateEmergencyOverrideAsync,
   getActiveOverrides,
-  filePostmortem,
+  filePostmortem, filePostmortemAsync,
   getOverridesMissingPostmortem,
   getInvalidOverrides,
   resetCanaryRegisters
@@ -34,11 +39,13 @@ import {
 
 export {
   createRollbackPack,
+  createRollbackPackAsync,
   getRollbackPacks,
   getLatestRollbackPack,
   activateEmergencyOverride,
+  activateEmergencyOverrideAsync,
   getActiveOverrides,
-  filePostmortem,
+  filePostmortem, filePostmortemAsync,
   getOverridesMissingPostmortem
 };
 
@@ -348,6 +355,12 @@ export function computeCanaryStats(): CanaryStats | null {
 
 const policyDebtRegister: PolicyDebtEntry[] = [];
 
+function policyDebtBody(params: Parameters<typeof registerPolicyDebt>[0]) {
+  const debtId = `pdb_${randomUUID().slice(0, 12)}`, createdTs = Date.now();
+  return { debtId, agentId: params.agentId, waivedRequirement: params.waivedRequirement, justification: params.justification,
+    expiresTs: params.expiresTs, createdTs, createdBy: params.createdBy };
+}
+
 /**
  * Register a temporary policy waiver (debt).
  */
@@ -361,18 +374,7 @@ export function registerPolicyDebt(
   },
   workspace?: string,
 ): PolicyDebtEntry {
-  const debtId = `pdb_${randomUUID().slice(0, 12)}`;
-  const now = Date.now();
-
-  const body = {
-    debtId,
-    agentId: params.agentId,
-    waivedRequirement: params.waivedRequirement,
-    justification: params.justification,
-    expiresTs: params.expiresTs,
-    createdTs: now,
-    createdBy: params.createdBy,
-  };
+  const body = policyDebtBody(params);
 
   const digest = sha256Hex(canonicalize(body));
   let signature = "unsigned";
@@ -415,6 +417,29 @@ export function registerPolicyDebt(
   }
 
   return entry;
+}
+
+/** The high-level waiver and durable debt entry retain their independent ids, clocks, bodies and checked signatures. */
+export async function registerPolicyDebtAsync(params: Parameters<typeof registerPolicyDebt>[0], workspace?: string,
+  options: { beforePublish?: () => void } = {}): Promise<PolicyDebtEntry> {
+  const input = { ...params }, beforePublish = options.beforePublish;
+  beforePublish?.();
+  if (!workspace) return registerPolicyDebt(input, workspace);
+  const root = resolve(workspace), body = policyDebtBody(input), captured = capturePurposePublication(root, "artifact-seal");
+  const signed = await signWithPurposeKey(root, "artifact-seal", Buffer.from(sha256Hex(canonicalize(body)), "hex"), { beforeSign: beforePublish });
+  const original = () => { if (signed.provider === "file" && !vaultStatus(root).unlocked) throw new Error("🔐 Vault locked. Run `amc vault unlock` first, or `amc setup` for first-time setup."); assertPurposePublicationCurrent(root, captured, signed); };
+  beforePublish?.(); original();
+  const entry: PolicyDebtEntry = { ...body, active: true, signature: signed.signature.toString("base64") };
+  const prepared = await prepareDebtEntryAsync(root, { type: "waiver", reason: `${input.waivedRequirement}: ${input.justification}`,
+    expiryTs: input.expiresTs, affectedPolicies: [input.waivedRequirement], riskAssessment: "MEDIUM", agentId: input.agentId, createdBy: input.createdBy },
+    { beforePublish() { beforePublish?.(); original(); } });
+  return withDebtPublicationLock(root, () => {
+    beforePublish?.();
+    original();
+    prepared.publish();
+    policyDebtRegister.push(entry);
+    return entry;
+  });
 }
 
 /**

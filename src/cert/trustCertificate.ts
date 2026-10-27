@@ -4,15 +4,14 @@ import { readdirSync } from "node:fs";
 import { extname, join, resolve } from "node:path";
 import {
   ensureSigningKeys,
-  getSigningKey,
-  getPublicKeyPem,
-  signHexDigest
 } from "../crypto/keys.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import type { DiagnosticReport } from "../types.js";
 import { pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
+import { canonicalSigningKey, SIGNING_ALGORITHMS, type SigningAlgorithm } from "../keys/algorithmPolicy.js";
+import { describePolicySigner, signDigestWithPolicy, signDigestWithPolicyAsync } from "../crypto/signing/signer.js";
 import { buildVerifierReport, checkDigestSignature, type IssuerAdmission, type TrustContext, type VerifierReportV1 } from "../trust/index.js";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -56,7 +55,7 @@ export interface TrustCertificatePayload {
 
 export interface TrustCertificateEnvelope {
   type: "amc-trust-certificate";
-  signatureAlgorithm: "ed25519" | "unsigned-preview";
+  signatureAlgorithm: SigningAlgorithm | "unsigned-preview";
   signatureStatus: TrustCertificateSignatureStatus;
   payloadSha256: string;
   signature: string;
@@ -320,7 +319,7 @@ function renderTrustCertificatePdf(envelope: TrustCertificateEnvelope): Buffer {
   return renderPdfFromLines(lines);
 }
 
-export function generateTrustCertificate(input: GenerateTrustCertificateInput): GeneratedTrustCertificate {
+function prepareTrustCertificate(input: GenerateTrustCertificateInput) {
   const workspace = input.workspace;
   const agentId = resolveAgentId(workspace, input.agentId);
   const nowTs = typeof input.nowTs === "number" ? input.nowTs : Date.now();
@@ -331,21 +330,17 @@ export function generateTrustCertificate(input: GenerateTrustCertificateInput): 
   const runSnapshot = loadLatestRunSnapshot(workspace, agentId);
   const evidenceHashChain = readEvidenceHashChain(workspace);
 
+  const policySigner = input.preview ? null : (() => {
+    ensureSigningKeys(workspace);
+    return describePolicySigner(workspace, "CERT");
+  })();
   const signingKey = input.preview
     ? {
         kind: "preview" as const,
         fingerprint: PREVIEW_FINGERPRINT,
         publicKeyPem: ""
       }
-    : (() => {
-        ensureSigningKeys(workspace);
-        const publicKeyPem = getPublicKeyPem(workspace, "auditor");
-        return {
-          kind: "auditor" as const,
-          fingerprint: sha256Hex(Buffer.from(publicKeyPem, "utf8")),
-          publicKeyPem
-        };
-      })();
+    : { kind: "auditor" as const, fingerprint: policySigner!.fingerprint, publicKeyPem: policySigner!.publicKeyPem };
 
   const payload: TrustCertificatePayload = {
     schemaVersion: 1,
@@ -366,12 +361,14 @@ export function generateTrustCertificate(input: GenerateTrustCertificateInput): 
   };
 
   const payloadSha256 = sha256Hex(Buffer.from(canonicalize(payload), "utf8"));
-  const signature = input.preview
-    ? PREVIEW_SIGNATURE
-    : signHexDigest(payloadSha256, getSigningKey(workspace, "artifact-seal"));
+  return { workspace, policySigner, payload, payloadSha256, signatureStatus };
+}
+
+function publishTrustCertificate(input: GenerateTrustCertificateInput, prepared: ReturnType<typeof prepareTrustCertificate>, signature: string): GeneratedTrustCertificate {
+  const { workspace, policySigner, payload, payloadSha256, signatureStatus } = prepared;
   const envelope: TrustCertificateEnvelope = {
     type: "amc-trust-certificate",
-    signatureAlgorithm: input.preview ? "unsigned-preview" : "ed25519",
+    signatureAlgorithm: input.preview ? "unsigned-preview" : policySigner!.algorithm,
     signatureStatus,
     payloadSha256,
     signature,
@@ -407,6 +404,21 @@ export function generateTrustCertificate(input: GenerateTrustCertificateInput): 
   };
 }
 
+export function generateTrustCertificate(input: GenerateTrustCertificateInput): GeneratedTrustCertificate {
+  const prepared = prepareTrustCertificate(input);
+  const signature = input.preview ? PREVIEW_SIGNATURE : signDigestWithPolicy({ workspace: prepared.workspace,
+    kind: "CERT", digestHex: prepared.payloadSha256, expectedSigner: prepared.policySigner! }).signature;
+  return publishTrustCertificate(input, prepared, signature);
+}
+
+/** Real CLI/API authoring path. Preparation and publication retain the exact v1 payload and output layout. */
+export async function generateTrustCertificateAsync(input: GenerateTrustCertificateInput): Promise<GeneratedTrustCertificate> {
+  const captured = { ...input }, prepared = prepareTrustCertificate(captured);
+  const signature = captured.preview ? PREVIEW_SIGNATURE : (await signDigestWithPolicyAsync({ workspace: prepared.workspace,
+    kind: "CERT", digestHex: prepared.payloadSha256, expectedSigner: prepared.policySigner! })).signature;
+  return publishTrustCertificate(captured, prepared, signature);
+}
+
 /** The signing key in the payload only locates the signer; it must be admitted for artifact-seal (P0-09). */
 export function verifyTrustCertificateEnvelope(
   envelope: TrustCertificateEnvelope,
@@ -424,8 +436,12 @@ export function verifyTrustCertificateEnvelope(
   } else if (signatureStatus !== "SIGNED") {
     errors.push(`Unsupported signature status: ${signatureStatus}`);
   }
-  if (signatureStatus === "SIGNED" && envelope.signatureAlgorithm !== "ed25519") {
-    errors.push(`Unsupported signature algorithm: ${envelope.signatureAlgorithm}`);
+  if (signatureStatus === "SIGNED") {
+    if (!(SIGNING_ALGORITHMS as readonly string[]).includes(envelope.signatureAlgorithm)) {
+      errors.push(`Unsupported signature algorithm: ${envelope.signatureAlgorithm}`);
+    } else if (canonicalSigningKey(envelope.payload.signingKey.publicKeyPem)?.algorithm !== envelope.signatureAlgorithm) {
+      errors.push("signature algorithm does not match signing key");
+    }
   }
   const recalculatedPayloadSha256 = sha256Hex(Buffer.from(canonicalize(envelope.payload), "utf8"));
   if (recalculatedPayloadSha256 !== envelope.payloadSha256) {

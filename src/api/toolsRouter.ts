@@ -5,6 +5,7 @@
 
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { z } from 'zod';
+import { KeyProviderError } from '../keys/provider.js';
 import { bodyJson, apiSuccess, apiError, isRequestBodyError, queryParam, pathParam } from './apiHelpers.js';
 import { withWorkspaceScope } from '../enforce/evidenceEmitter.js';
 
@@ -13,12 +14,14 @@ const guardrailMutationBodySchema = z.object({
 }).strict();
 
 function guardrailErrorStatus(error: unknown): number {
+  if (error instanceof KeyProviderError) return error.status;
   if (isRequestBodyError(error)) return error.statusCode;
   if (error instanceof z.ZodError) return 400;
   if (error && typeof error === "object" && "code" in error) {
     const code = String((error as { code?: unknown }).code ?? "");
     if (code === "UNKNOWN_GUARDRAIL" || code === "UNKNOWN_PROFILE") return 404;
-    if (code === "UNBOUND_GUARDRAIL" || code === "INTEGRITY") return 409;
+    if (code === "UNBOUND_GUARDRAIL" || code === "INTEGRITY" || code === "PUBLICATION") return 409;
+    if (code === "AUTHORIZATION") return 403;
     if (code === "LOCK_TIMEOUT") return 423;
   }
   if (error instanceof Error && error.message.toLowerCase().includes("integrity")) return 409;
@@ -39,8 +42,14 @@ export async function handleToolsRoute(
   method: string,
   req: IncomingMessage,
   res: ServerResponse,
-  workspace = process.cwd()
+  workspace = process.cwd(),
+  revalidateAuthority?: () => boolean
 ): Promise<boolean> {
+  const currentActor = () => {
+    if (revalidateAuthority?.() !== false) return true;
+    if (!res.headersSent) apiError(res, 403, "Current control mutation authority refused.");
+    return false;
+  };
   /* ── Tools (ToolHub) ─────────────────────────────────────────── */
 
   if (pathname.startsWith('/api/v1/tools')) {
@@ -100,18 +109,30 @@ export async function handleToolsRoute(
     // POST /api/v1/guardrails/enable — enable a guardrail
     if (pathname === '/api/v1/guardrails/enable' && method === 'POST') {
       try {
+        if (!currentActor()) return true;
         const name = guardrailName(await bodyJson<unknown>(req));
+        if (!currentActor()) return true;
         const { recoverGuardrailControlState, setGuardrailRequested } = await import('../enforce/guardrailControlState.js');
+        if (!currentActor()) return true;
         const { listGuardrailsWithRuntimeStatus } = await import('../enforce/guardrailRuntimeBindings.js');
+        if (!currentActor()) return true;
         recoverGuardrailControlState(workspace);
         listGuardrailsWithRuntimeStatus(workspace);
-        const state = setGuardrailRequested({
+        const input = {
           workspace,
           name,
           enabled: true,
-          source: 'api',
+          source: 'api' as const,
           actor: 'local-api'
-        });
+        };
+        let state: ReturnType<typeof setGuardrailRequested>;
+        if (revalidateAuthority === undefined) state = setGuardrailRequested(input);
+        else {
+          const control = await import('../enforce/guardrailControlAsync.js');
+          if (!currentActor()) return true;
+          state = await control.setGuardrailRequestedForHandler(input, revalidateAuthority);
+        }
+        if (res.headersSent) return true;
         let guardrail = null;
         let statusError: string | null = null;
         try {
@@ -121,6 +142,7 @@ export async function handleToolsRoute(
         }
         apiSuccess(res, { committed: true, requested: true, name, revision: state.revision, guardrail, statusError });
       } catch (err) {
+        if (res.headersSent) return true;
         apiError(res, guardrailErrorStatus(err), guardrailErrorMessage(err, 'Guardrail enable failed'));
       }
       return true;
@@ -129,18 +151,30 @@ export async function handleToolsRoute(
     // POST /api/v1/guardrails/disable — disable a guardrail
     if (pathname === '/api/v1/guardrails/disable' && method === 'POST') {
       try {
+        if (!currentActor()) return true;
         const name = guardrailName(await bodyJson<unknown>(req));
+        if (!currentActor()) return true;
         const { recoverGuardrailControlState, setGuardrailRequested } = await import('../enforce/guardrailControlState.js');
+        if (!currentActor()) return true;
         const { listGuardrailsWithRuntimeStatus } = await import('../enforce/guardrailRuntimeBindings.js');
+        if (!currentActor()) return true;
         recoverGuardrailControlState(workspace);
         listGuardrailsWithRuntimeStatus(workspace);
-        const state = setGuardrailRequested({
+        const input = {
           workspace,
           name,
           enabled: false,
-          source: 'api',
+          source: 'api' as const,
           actor: 'local-api'
-        });
+        };
+        let state: ReturnType<typeof setGuardrailRequested>;
+        if (revalidateAuthority === undefined) state = setGuardrailRequested(input);
+        else {
+          const control = await import('../enforce/guardrailControlAsync.js');
+          if (!currentActor()) return true;
+          state = await control.setGuardrailRequestedForHandler(input, revalidateAuthority);
+        }
+        if (res.headersSent) return true;
         let guardrail = null;
         let statusError: string | null = null;
         try {
@@ -150,6 +184,7 @@ export async function handleToolsRoute(
         }
         apiSuccess(res, { committed: true, requested: false, name, revision: state.revision, guardrail, statusError });
       } catch (err) {
+        if (res.headersSent) return true;
         apiError(res, guardrailErrorStatus(err), guardrailErrorMessage(err, 'Guardrail disable failed'));
       }
       return true;
@@ -158,17 +193,29 @@ export async function handleToolsRoute(
     // POST /api/v1/guardrails/profile — apply a guardrail profile
     if (pathname === '/api/v1/guardrails/profile' && method === 'POST') {
       try {
+        if (!currentActor()) return true;
         const name = guardrailName(await bodyJson<unknown>(req));
+        if (!currentActor()) return true;
         const { applyGuardrailControlProfile, recoverGuardrailControlState } = await import('../enforce/guardrailControlState.js');
+        if (!currentActor()) return true;
         const { listGuardrailsWithRuntimeStatus } = await import('../enforce/guardrailRuntimeBindings.js');
+        if (!currentActor()) return true;
         recoverGuardrailControlState(workspace);
         listGuardrailsWithRuntimeStatus(workspace);
-        const applied = applyGuardrailControlProfile({
+        const input = {
           workspace,
           profileName: name,
-          source: 'api',
+          source: 'api' as const,
           actor: 'local-api'
-        });
+        };
+        let applied: ReturnType<typeof applyGuardrailControlProfile>;
+        if (revalidateAuthority === undefined) applied = applyGuardrailControlProfile(input);
+        else {
+          const control = await import('../enforce/guardrailControlAsync.js');
+          if (!currentActor()) return true;
+          applied = await control.applyGuardrailControlProfileForHandler(input, revalidateAuthority);
+        }
+        if (res.headersSent) return true;
         let guardrails: ReturnType<typeof listGuardrailsWithRuntimeStatus> = [];
         let statusError: string | null = null;
         try {
@@ -189,6 +236,7 @@ export async function handleToolsRoute(
           statusError
         });
       } catch (err) {
+        if (res.headersSent) return true;
         apiError(res, guardrailErrorStatus(err), guardrailErrorMessage(err, 'Guardrail profile failed'));
       }
       return true;

@@ -6,14 +6,17 @@
  */
 
 import { randomUUID } from "node:crypto";
-import { join } from "node:path";
-import { readdirSync, readFileSync } from "node:fs";
+import { join, resolve } from "node:path";
+import { readdirSync, readFileSync, statSync } from "node:fs";
 import { z } from "zod";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
 import { getSigningKey, signHexDigest } from "../crypto/keys.js";
 import { fleetRoot } from "./paths.js";
+import { withControlFileLock } from "../lifecycle/controlFileLock.js";
+import { capturePurposePublication, assertPurposePublicationCurrent, type PurposePublication } from "../keys/purposePublication.js";
+import { signWithPurposeKey, type PurposeSignature } from "../keys/purposeProviders.js";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -82,82 +85,76 @@ function dagFilePath(workspace: string, dagId: string): string {
 // DAG creation & node appending
 // ---------------------------------------------------------------------------
 
-export function createDag(workspace: string, fleetId?: string): OrchestrationDag {
-  ensureDir(dagDir(workspace));
-  const dagId = `dag_${randomUUID().slice(0, 12)}`;
-  const dag: OrchestrationDag = {
-    dagId,
-    fleetId: fleetId ?? "default",
-    createdTs: Date.now(),
-    nodes: [],
-    dagHash: "",
-    dagSignature: "",
-  };
+type DagNodeInput = {
+  callerAgentId: string; calleeAgentId: string; eventType: OrchestrationEventType;
+  taskDescription: string; contextHash: string; startTs: number;
+  endTs?: number | null; outcome?: string | null; parentNodeId?: string | null;
+};
+interface DagFileState { bytes: Buffer; mode: number }
+function dagState(workspace: string, dagId: string): DagFileState | null {
+  try { return { bytes: readFileSync(dagFilePath(workspace, dagId)), mode: statSync(dagFilePath(workspace, dagId)).mode & 0o777 }; }
+  catch (error) { if ((error as NodeJS.ErrnoException).code === "ENOENT") return null; throw error; }
+}
+function existingDag(workspace: string, dagId: string): { dag: OrchestrationDag; previous: DagFileState } {
+  const previous = dagState(workspace, dagId);
+  if (previous === null) throw new Error(`DAG not found: ${dagId}`);
+  return { dag: JSON.parse(previous.bytes.toString("utf8")) as OrchestrationDag, previous };
+}
+function newDag(fleetId?: string): OrchestrationDag {
+  const dag: OrchestrationDag = { dagId: `dag_${randomUUID().slice(0, 12)}`, fleetId: fleetId ?? "default", createdTs: Date.now(), nodes: [], dagHash: "", dagSignature: "" };
   dag.dagHash = sha256Hex(Buffer.from(canonicalize({ dagId: dag.dagId, fleetId: dag.fleetId, createdTs: dag.createdTs }), "utf8"));
-  try {
-    dag.dagSignature = signHexDigest(dag.dagHash, getSigningKey(workspace, "artifact-seal"));
-  } catch {
-    dag.dagSignature = "unsigned";
-  }
-  saveDag(workspace, dag);
   return dag;
 }
-
-export function appendDagNode(
-  workspace: string,
-  dagId: string,
-  params: {
-    callerAgentId: string;
-    calleeAgentId: string;
-    eventType: OrchestrationEventType;
-    taskDescription: string;
-    contextHash: string;
-    startTs: number;
-    endTs?: number | null;
-    outcome?: string | null;
-    parentNodeId?: string | null;
-  },
-): DagNode {
-  const dag = loadDag(workspace, dagId);
-  const prevHash = dag.nodes.length > 0 ? dag.nodes[dag.nodes.length - 1]!.nodeHash : dag.dagHash;
-
-  const nodeId = `node_${randomUUID().slice(0, 12)}`;
-  const nodeBody = {
-    nodeId,
-    dagId,
-    callerAgentId: params.callerAgentId,
-    calleeAgentId: params.calleeAgentId,
-    eventType: params.eventType,
-    taskDescription: params.taskDescription,
-    contextHash: params.contextHash,
-    startTs: params.startTs,
-    endTs: params.endTs ?? null,
-    outcome: params.outcome ?? null,
-    parentNodeId: params.parentNodeId ?? null,
-    prevHash,
+function nodeBody(dag: OrchestrationDag, dagId: string, params: DagNodeInput) {
+  return {
+    nodeId: `node_${randomUUID().slice(0, 12)}`, dagId,
+    callerAgentId: params.callerAgentId, calleeAgentId: params.calleeAgentId, eventType: params.eventType,
+    taskDescription: params.taskDescription, contextHash: params.contextHash, startTs: params.startTs,
+    endTs: params.endTs ?? null, outcome: params.outcome ?? null, parentNodeId: params.parentNodeId ?? null,
+    prevHash: dag.nodes.length > 0 ? dag.nodes[dag.nodes.length - 1]!.nodeHash : dag.dagHash,
   };
-
-  const nodeHash = sha256Hex(Buffer.from(canonicalize(nodeBody), "utf8"));
+}
+export function createDag(workspace: string, fleetId?: string): OrchestrationDag {
+  ensureDir(dagDir(workspace));
+  const dag = newDag(fleetId), previous = dagState(workspace, dag.dagId);
+  if (previous !== null) throw new Error("DAG destination already exists");
+  try { dag.dagSignature = signHexDigest(dag.dagHash, getSigningKey(workspace, "artifact-seal")); }
+  catch { dag.dagSignature = "unsigned"; }
+  saveDag(workspace, dag, previous);
+  return dag;
+}
+export function appendDagNode(workspace: string, dagId: string, params: DagNodeInput): DagNode {
+  const { dag, previous } = existingDag(workspace, dagId), body = nodeBody(dag, dagId, params);
+  const nodeHash = sha256Hex(Buffer.from(canonicalize(body), "utf8"));
   let signature = "unsigned";
-  try {
-    signature = signHexDigest(nodeHash, getSigningKey(workspace, "artifact-seal"));
-  } catch { /* unsigned */ }
+  try { signature = signHexDigest(nodeHash, getSigningKey(workspace, "artifact-seal")); } catch { /* unsigned */ }
+  const node = dagNodeSchema.parse({ ...body, nodeHash, signature });
+  dag.nodes.push(node); dag.dagHash = nodeHash;
+  try { dag.dagSignature = signHexDigest(dag.dagHash, getSigningKey(workspace, "artifact-seal")); }
+  catch { dag.dagSignature = "unsigned"; }
+  saveDag(workspace, dag, previous);
+  return node;
+}
 
-  const node: DagNode = dagNodeSchema.parse({
-    ...nodeBody,
-    nodeHash,
-    signature,
-  });
-
-  dag.nodes.push(node);
-  dag.dagHash = nodeHash;
-  try {
-    dag.dagSignature = signHexDigest(dag.dagHash, getSigningKey(workspace, "artifact-seal"));
-  } catch {
-    dag.dagSignature = "unsigned";
-  }
-
-  saveDag(workspace, dag);
+/** Checked raw32 signing; failures propagate. The retained sync API above keeps its legacy unsigned fallback. */
+export async function createDagAsync(workspace: string, fleetId?: string): Promise<OrchestrationDag> {
+  workspace = resolve(workspace);
+  const dag = newDag(fleetId), previous = dagState(workspace, dag.dagId);
+  if (previous !== null) throw new Error("DAG destination already exists");
+  const publication = capturePurposePublication(workspace, "artifact-seal");
+  const signed = await signWithPurposeKey(workspace, "artifact-seal", Buffer.from(dag.dagHash, "hex"));
+  dag.dagSignature = signed.signature.toString("base64");
+  saveDag(workspace, dag, previous, { publication, signed });
+  return dag;
+}
+export async function appendDagNodeAsync(workspace: string, dagId: string, params: DagNodeInput): Promise<DagNode> {
+  workspace = resolve(workspace); // nodeBody copies every primitive input before Sign.
+  const { dag, previous } = existingDag(workspace, dagId), body = nodeBody(dag, dagId, params);
+  const nodeHash = sha256Hex(Buffer.from(canonicalize(body), "utf8")), publication = capturePurposePublication(workspace, "artifact-seal");
+  const signed = await signWithPurposeKey(workspace, "artifact-seal", Buffer.from(nodeHash, "hex"));
+  const node = dagNodeSchema.parse({ ...body, nodeHash, signature: signed.signature.toString("base64") });
+  dag.nodes.push(node); dag.dagHash = nodeHash; dag.dagSignature = node.signature;
+  saveDag(workspace, dag, previous, { publication, signed });
   return node;
 }
 
@@ -165,9 +162,17 @@ export function appendDagNode(
 // DAG I/O
 // ---------------------------------------------------------------------------
 
-function saveDag(workspace: string, dag: OrchestrationDag): void {
-  ensureDir(dagDir(workspace));
-  writeFileAtomic(dagFilePath(workspace, dag.dagId), JSON.stringify(dag, null, 2), 0o644);
+function saveDag(workspace: string, dag: OrchestrationDag, previous: DagFileState | null,
+  authority?: { publication: PurposePublication; signed: PurposeSignature }): void {
+  const bytes = JSON.stringify(dag, null, 2);
+  withControlFileLock({ root: dagDir(workspace), name: "dag-publication", operation: () => {
+    if (authority) assertPurposePublicationCurrent(workspace, authority.publication, authority.signed);
+    const current = dagState(workspace, dag.dagId);
+    if (previous === null ? current !== null : current === null || previous.mode !== current.mode || !previous.bytes.equals(current.bytes)) {
+      throw new Error("DAG changed while signing; retry");
+    }
+    writeFileAtomic(dagFilePath(workspace, dag.dagId), bytes, 0o644);
+  } });
 }
 
 export function loadDag(workspace: string, dagId: string): OrchestrationDag {

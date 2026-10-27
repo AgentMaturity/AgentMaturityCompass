@@ -132,7 +132,7 @@ export function verifyAssuranceCertificateFile(params: {
       pathExists(join(root, "signer.pub")) ? readUtf8(join(root, "signer.pub")) : null,
       envelopePublicKey(sig.envelope)
     ];
-    const check = checkDigestSignature({ signature: "cert.sig", purpose: "artifact-seal", digestHex: digest, signatureB64: sig.signature,
+    const check = checkDigestSignature({ signature: "cert.sig", purpose: "artifact-seal", digestHex: digest, signatureB64: sig.signature, envelope: sig.envelope,
       candidates, context: params.trust, claimedSignedAt: sig.signedTs });
     signatures.push(check.admission);
     if (!check.verified || (sig.envelope !== undefined && sig.signature !== sig.envelope.sigB64)) {

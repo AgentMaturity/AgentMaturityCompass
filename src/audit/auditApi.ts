@@ -1,3 +1,14 @@
+import { captureAuditOutputAliases } from "./binderOutputAliases.js";
+import { fulfillAuditEvidenceRequestAsync } from "./evidenceRequestFulfillment.js";
+import { captureAuditPolicyMapPublication, AuditPolicyMapPublicationError, verifyAuditMapSelection } from "./auditPolicyMapPublication.js";
+import { defaultAuditMapBuiltin } from "./auditMapBuiltin.js";
+import { appendTransparencyEntryAttemptAsync, captureWorkspaceLogAuthority } from "../transparency/asyncWorkspaceAppend.js";
+import { TransparencyMerkleLagError } from "../transparency/merkleIndexState.js";
+import { KeyProviderError } from "../keys/provider.js";
+import { KeyRevokedError } from "../keys/keyRevocations.js";
+import { captureOrgFiles, orgPairBytes, assertOrgPairsCurrent } from "../org/preparedOrgPairs.js";
+import { captureAuditApiAuthority, captureBinderEvidenceRequest, AuditBinderExecutionError } from "./binderRequestBoundary.js";
+import { AuditBinderPublicationError, type AuditPublicationOptions } from "./binderPublication.js";
 import { randomUUID } from "node:crypto";
 import { join, relative, resolve } from "node:path";
 import { closeSync, constants, fstatSync, openSync, readFileSync, realpathSync, rmSync, statSync } from "node:fs";
@@ -8,9 +19,9 @@ import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { auditMapSchema, type AuditMapFile } from "./auditMapSchema.js";
-import { auditPolicySchema, type AuditPolicy } from "./auditPolicySchema.js";
+import { auditPolicySchema, defaultAuditPolicy, type AuditPolicy } from "./auditPolicySchema.js";
 import {
-  initAuditMaps,
+  initAuditMaps, prepareAuditMapActiveAsync, loadAuditMapsAttemptAsync,
   loadAuditMapActive,
   loadAuditMapBuiltin,
   saveAuditMapActive,
@@ -19,30 +30,29 @@ import {
 } from "./auditMapStore.js";
 import {
   auditBindersExportsDir,
-  initAuditPolicy,
+  initAuditPolicy, prepareAuditPolicyAsync, loadAuditPolicyAttemptAsync,
   loadAuditPolicy,
   saveAuditPolicy,
   verifyAuditPolicySignature
 } from "./auditPolicyStore.js";
 import {
   createAuditBinderArtifact,
-  defaultAuditExportPath,
+  defaultAuditExportPath, defaultAuditPublicationPath,
   listExportedAuditBinders
 } from "./binderArtifact.js";
 import { verifyAuditBinderFile, verifyAuditWorkspace } from "./binderVerifier.js";
 import { unreadableAuditResult, verifyIndustryPackAuditFile } from "../domains/industryPackAudit.js";
-import { isWithin } from "../utils/pathSafety.js";
+import { isWithin, safeIdSchema } from "../utils/pathSafety.js";
 import { loadBinderCache } from "./binderStore.js";
 import {
-  createAuditEvidenceRequest,
+  createAuditEvidenceRequest, createAuditEvidenceRequestAsync,
   listAuditEvidenceRequests,
-  markAuditEvidenceRequestFulfilled,
-  rejectAuditEvidenceRequest,
+
+  rejectAuditEvidenceRequest, rejectAuditEvidenceRequestAsync,
   requestAuditEvidenceApproval
 } from "./evidenceRequests.js";
-import { loadEvidenceRequest } from "./evidenceRequestStore.js";
 import { evidenceRequestItemSchema } from "./evidenceRequestSchema.js";
-import { auditSchedulerRunNow, auditSchedulerSetEnabled, auditSchedulerStatus } from "./auditScheduler.js";
+import { auditSchedulerRunNow, auditSchedulerSetEnabled, auditSchedulerSetEnabledAsync, auditSchedulerStatus } from "./auditScheduler.js";
 import type { TrustContext } from "../trust/trustContext.js";
 
 const pendingExportSchema = z.object({
@@ -71,14 +81,6 @@ function savePendingExport(workspace: string, pending: z.infer<typeof pendingExp
   const path = pendingExportPath(workspace, pending.approvalRequestId);
   writeFileAtomic(path, JSON.stringify(pendingExportSchema.parse(pending), null, 2), 0o600);
   return path;
-}
-
-function loadPendingExport(workspace: string, approvalRequestId: string): z.infer<typeof pendingExportSchema> {
-  const path = pendingExportPath(workspace, approvalRequestId);
-  if (!pathExists(path)) {
-    throw new Error(`pending audit export not found: ${approvalRequestId}`);
-  }
-  return pendingExportSchema.parse(JSON.parse(readUtf8(path)) as unknown);
 }
 
 function removePendingExport(workspace: string, approvalRequestId: string): void {
@@ -248,21 +250,28 @@ export async function auditBinderCreateForApi(params: {
   scopeType?: string | null;
   scopeId?: string | null;
   requestId?: string | null;
-}) {
+}, options: AuditPublicationOptions = {}) {
+  try {
+  params = { ...params }; options = { ...options };
   const scope = parseScope(params);
-  const request = params.requestId ? loadEvidenceRequest(params.workspace, params.requestId) : null;
+  const original = captureAuditApiAuthority(params.workspace, options), selected = captureBinderEvidenceRequest(params.workspace, params.requestId);
+  const request = selected.request, beforePublish = () => { original(); selected.assertCurrent(); };
   const out = await auditSchedulerRunNow({
     workspace: params.workspace,
     scopeType: scope.scopeType,
     scopeId: scope.scopeId,
     request
-  });
+  }, { beforePublish, assertInputsCurrent: options.assertInputsCurrent, assertPreparationInputsCurrent: options.assertPreparationInputsCurrent,
+    assertOutputsSafe: paths => { options.assertOutputsSafe?.(paths); selected.assertOutputsSafe(paths); } });
   return {
     binder: out.binder,
     cache: out.cache,
     scheduler: out.scheduler,
     transparencyHash: out.transparencyHash
   };
+  } catch (cause) { if (cause instanceof AuditBinderPublicationError || cause instanceof AuditBinderExecutionError || cause instanceof KeyProviderError || cause instanceof KeyRevokedError) throw cause;
+    throw new AuditBinderPublicationError("api-prepare", [], [], cause); }
+
 }
 
 export async function auditBinderExportForApi(params: {
@@ -271,21 +280,28 @@ export async function auditBinderExportForApi(params: {
   scopeId?: string | null;
   outFile?: string | null;
   requestId?: string | null;
-}) {
-  const scope = parseScope(params);
-  const outFile = params.outFile?.trim() || defaultAuditExportPath({
+}, options: AuditPublicationOptions = {}) {
+  try {
+  params = { ...params }; options = { ...options };
+  const original = captureAuditApiAuthority(params.workspace, options), scope = parseScope(params);
+  const outFile = params.outFile?.trim() || defaultAuditPublicationPath({
     workspace: params.workspace,
     scopeType: scope.scopeType,
     scopeId: scope.scopeId
   });
-  const request = params.requestId ? loadEvidenceRequest(params.workspace, params.requestId) : null;
+  const selected = captureBinderEvidenceRequest(params.workspace, params.requestId), request = selected.request;
+  const beforePublish = () => { original(); selected.assertCurrent(); };
   return await createAuditBinderArtifact({
     workspace: params.workspace,
     scopeType: scope.scopeType,
     scopeId: scope.scopeId,
     outFile: resolve(params.workspace, outFile),
     request
-  });
+  }, { beforePublish, assertInputsCurrent: options.assertInputsCurrent, assertPreparationInputsCurrent: options.assertPreparationInputsCurrent,
+    assertOutputsSafe: paths => { options.assertOutputsSafe?.(paths); selected.assertOutputsSafe(paths); } });
+  } catch (cause) { if (cause instanceof AuditBinderPublicationError || cause instanceof AuditBinderExecutionError || cause instanceof KeyProviderError || cause instanceof KeyRevokedError) throw cause;
+    throw new AuditBinderPublicationError("api-prepare", [], [], cause); }
+
 }
 
 export function auditBinderExportRequestForApi(params: {
@@ -355,34 +371,41 @@ export function auditBinderExportRequestForApi(params: {
 export async function auditBinderExportExecuteForApi(params: {
   workspace: string;
   approvalRequestId: string;
-}) {
-  const pending = loadPendingExport(params.workspace, params.approvalRequestId);
-  const verify = verifyApprovalForExecution({
-    workspace: params.workspace,
-    approvalId: pending.approvalRequestId,
-    expectedAgentId: pending.agentId,
-    expectedIntentId: pending.intentId,
-    expectedToolName: "audit.binder.export",
-    expectedActionClass: "SECURITY"
-  });
-  if (!verify.ok) {
-    throw new Error(`audit binder export approval not executable: ${verify.error ?? verify.status ?? "unknown"}`);
-  }
-  const created = await createAuditBinderArtifact({
-    workspace: params.workspace,
-    scopeType: pending.scopeType,
-    scopeId: pending.scopeId,
-    outFile: pending.outFile,
-    request: pending.evidenceRequestId ? loadEvidenceRequest(params.workspace, pending.evidenceRequestId) : null
-  });
-  consumeApprovedExecution({
-    workspace: params.workspace,
-    approvalId: pending.approvalRequestId,
-    expectedAgentId: pending.agentId,
-    executionId: pending.requestId
-  });
-  removePendingExport(params.workspace, pending.approvalRequestId);
-  return created;
+}, options: AuditPublicationOptions = {}) {
+  try {
+  params = { ...params }; options = { ...options };
+  const workspace = params.workspace, approvalRequestId = params.approvalRequestId, original = captureAuditApiAuthority(workspace, options);
+  const path = pendingExportPath(workspace, approvalRequestId), before = captureOrgFiles([path]), bytes = orgPairBytes(before, path);
+  if (bytes === null) throw new Error("pending audit export is missing");
+  const pending = pendingExportSchema.parse(JSON.parse(bytes.toString("utf8")) as unknown);
+  if (pending.approvalRequestId !== approvalRequestId) throw new Error("audit export approval identity differs");
+  const selected = captureBinderEvidenceRequest(workspace, pending.evidenceRequestId);
+  const expectedIntentHash = sha256Hex(canonicalize({ requestId: pending.requestId, scopeType: pending.scopeType, scopeId: pending.scopeId,
+    outFile: resolve(workspace, pending.outFile), evidenceRequestId: pending.evidenceRequestId ?? null }));
+  const approval = { workspace, approvalId: pending.approvalRequestId, expectedAgentId: pending.agentId, expectedIntentId: pending.intentId,
+    expectedIntentHash, expectedToolName: "audit.binder.export", expectedActionClass: "SECURITY" as const };
+  const beforePublish = () => { original(); selected.assertCurrent(); assertOrgPairsCurrent(before);
+    const verified = verifyApprovalForExecution(approval); if (!verified.ok) throw new Error("audit export approval is not executable");
+    original(); selected.assertCurrent(); assertOrgPairsCurrent(before);
+  };
+  beforePublish(); let created: Awaited<ReturnType<typeof createAuditBinderArtifact>> | null = null, consumed: boolean | null = null, removed = false;
+  try {
+    created = await createAuditBinderArtifact({ workspace, scopeType: pending.scopeType, scopeId: pending.scopeId,
+      outFile: pending.outFile, request: selected.request }, { beforePublish, assertInputsCurrent: options.assertInputsCurrent,
+        assertPreparationInputsCurrent: options.assertPreparationInputsCurrent, assertOutputsSafe: paths => {
+          options.assertOutputsSafe?.(paths); selected.assertOutputsSafe(paths); captureAuditOutputAliases(paths, [path])();
+        } });
+    beforePublish();
+    const consumption = consumeApprovedExecution({ workspace, approvalId: pending.approvalRequestId, expectedAgentId: pending.agentId, executionId: pending.requestId });
+    consumed = consumption.consumed && !consumption.replay;
+    if (!consumed) throw new Error("audit export approval was not consumed by this execution");
+    original(); selected.assertCurrent(); assertOrgPairsCurrent(before); removePendingExport(workspace, pending.approvalRequestId); removed = true;
+    return created;
+  } catch (cause) { if (created === null && (cause instanceof KeyProviderError || cause instanceof KeyRevokedError)) throw cause;
+    throw new AuditBinderExecutionError("approved-export", created === null ? null : { outFile: created.outFile, sha256: created.sha256 }, consumed, removed, cause); }
+  } catch (cause) { if (cause instanceof AuditBinderPublicationError || cause instanceof AuditBinderExecutionError || cause instanceof KeyProviderError || cause instanceof KeyRevokedError) throw cause;
+    throw new AuditBinderPublicationError("api-prepare", [], [], cause); }
+
 }
 
 export function auditBindersForApi(workspace: string) {
@@ -510,34 +533,10 @@ export async function auditRequestFulfillForApi(params: {
   workspace: string;
   requestId: string;
   outFile?: string | null;
-}) {
-  const request = loadEvidenceRequest(params.workspace, params.requestId);
-  const scope = parseScope({
-    scopeType: request.scope.type,
-    scopeId: request.scope.id
-  });
-  const outFile = params.outFile?.trim() || defaultAuditExportPath({
-    workspace: params.workspace,
-    scopeType: scope.scopeType,
-    scopeId: scope.scopeId
-  });
-  const created = await createAuditBinderArtifact({
-    workspace: params.workspace,
-    scopeType: scope.scopeType,
-    scopeId: scope.scopeId,
-    outFile: resolve(params.workspace, outFile),
-    request
-  });
-  const fulfilled = markAuditEvidenceRequestFulfilled({
-    workspace: params.workspace,
-    requestId: request.requestId,
-    binderSha256: created.sha256
-  });
-  return {
-    request: fulfilled.request,
-    approvalRequestId: fulfilled.approvalRequestId,
-    export: created
-  };
+}, options: AuditPublicationOptions = {}) {
+  try { return await fulfillAuditEvidenceRequestAsync({ ...params }, { ...options }); }
+  catch (cause) { if (cause instanceof AuditBinderPublicationError || cause instanceof AuditBinderExecutionError || cause instanceof KeyProviderError || cause instanceof KeyRevokedError) throw cause;
+    throw new AuditBinderPublicationError("api-prepare", [], [], cause); }
 }
 
 export function auditSchedulerStatusForApi(workspace: string) {
@@ -548,13 +547,18 @@ export async function auditSchedulerRunNowForApi(params: {
   workspace: string;
   scopeType?: string | null;
   scopeId?: string | null;
-}) {
+}, options: AuditPublicationOptions = {}) {
+  try {
+  params = { ...params }; options = { ...options };
   const scope = parseScope(params);
   return await auditSchedulerRunNow({
     workspace: params.workspace,
     scopeType: scope.scopeType,
     scopeId: scope.scopeId
-  });
+  }, options);
+  } catch (cause) { if (cause instanceof AuditBinderPublicationError || cause instanceof AuditBinderExecutionError || cause instanceof KeyProviderError || cause instanceof KeyRevokedError) throw cause;
+    throw new AuditBinderPublicationError("api-prepare", [], [], cause); }
+
 }
 
 export function auditSchedulerEnableForApi(params: {
@@ -562,4 +566,76 @@ export function auditSchedulerEnableForApi(params: {
   enabled: boolean;
 }) {
   return auditSchedulerSetEnabled(params);
+}
+
+export async function auditSchedulerEnableForApiAsync(params: Parameters<typeof auditSchedulerEnableForApi>[0], options: AuditPublicationOptions = {}) {
+  try {
+  return await auditSchedulerSetEnabledAsync(params, options);
+  } catch (cause) { if (cause instanceof AuditBinderPublicationError || cause instanceof AuditBinderExecutionError || cause instanceof KeyProviderError || cause instanceof KeyRevokedError) throw cause;
+    throw new AuditBinderPublicationError("api-prepare", [], [], cause); }
+
+}
+
+/** Explicit initialization prepares all three real recipes before replacing any member. */
+export async function auditInitForApiAsync(workspace: string, options: AuditPublicationOptions = {}) {
+  const policy = defaultAuditPolicy(), map = defaultAuditMapBuiltin();
+  const prepared = await captureAuditPolicyMapPublication(workspace, { policy, builtin: map, active: map }, options).prepare();
+  const saved = prepared.publish(); prepared.assertCurrent();
+  return { policy: { ...saved.policy!, policy }, maps: { builtinPath: saved.builtin!.path, builtinSigPath: saved.builtin!.sigPath,
+    activePath: saved.active!.path, activeSigPath: saved.active!.sigPath, map } };
+}
+export async function auditPolicyForApiAsync(workspace: string, options: AuditPublicationOptions = {}) {
+  const selected = await loadAuditPolicyAttemptAsync(workspace, options); selected.assertCurrent();
+  return { policy: selected.policy, signature: selected.verification() };
+}
+export async function auditMapListForApiAsync(workspace: string, options: AuditPublicationOptions = {}) {
+  const selected = await loadAuditMapsAttemptAsync(workspace, "list", options); selected.assertCurrent();
+  return [{ id: selected.builtin!.auditMap.id, name: selected.builtin!.auditMap.name, source: "builtin" as const },
+    { id: selected.active!.auditMap.id, name: selected.active!.auditMap.name, source: "active" as const }];
+}
+export async function auditMapShowForApiAsync(params: Parameters<typeof auditMapShowForApi>[0], options: AuditPublicationOptions = {}) {
+  const input = { ...params }, id = input.id ?? "active", selected = await loadAuditMapsAttemptAsync(input.workspace, id, options);
+  selected.assertCurrent(); const signatures = { builtin: verifyAuditMapSelection(input.workspace, "builtin"), active: verifyAuditMapSelection(input.workspace, "active") };
+  selected.assertCurrent(); return { map: selected.map, signatures };
+}
+export async function auditPolicyApplyForApiAsync(params: Parameters<typeof auditPolicyApplyForApi>[0], options: AuditPublicationOptions = {}) {
+  const input = structuredClone(params), caller = { ...options }, parsed = auditPolicySchema.parse(input.policy);
+  caller.beforePublish?.(); caller.assertInputsCurrent?.(); caller.assertPreparationInputsCurrent?.();
+  const originalLog = captureWorkspaceLogAuthority(input.workspace), beforePublish = () => { caller.beforePublish?.(); originalLog.assertCurrent(); };
+  const prepared = await prepareAuditPolicyAsync(input.workspace, parsed, { ...caller, beforePublish }), saved = prepared.publish().policy!;
+  let hash: string | null = null;
+  try {
+    const stable = () => { prepared.assertCurrent(); originalLog.assertCurrent(); };
+    const attempt = await appendTransparencyEntryAttemptAsync({ workspace: input.workspace, type: "AUDIT_POLICY_APPLIED", agentId: "workspace",
+      artifact: { kind: "policy", sha256: sha256Hex(Buffer.from(canonicalize(parsed), "utf8")), id: "audit-policy" } }, { beforeCommit: stable, beforeMember: stable });
+    hash = attempt.entry.hash; stable(); attempt.assertCurrent(); return { ...saved, transparencyHash: hash };
+  } catch (cause) {
+    if (cause instanceof TransparencyMerkleLagError) hash = cause.entryHash;
+    throw new AuditPolicyMapPublicationError("policy-log", prepared.paths, hash === null ? [] : [hash], cause, prepared.createdDirectories, null, true);
+  }
+}
+export async function auditMapApplyForApiAsync(params: Parameters<typeof auditMapApplyForApi>[0], options: AuditPublicationOptions = {}) {
+  const input = structuredClone(params), caller = { ...options }, parsed = auditMapSchema.parse(input.map);
+  caller.beforePublish?.(); caller.assertInputsCurrent?.(); caller.assertPreparationInputsCurrent?.();
+  const originalLog = captureWorkspaceLogAuthority(input.workspace), beforePublish = () => { caller.beforePublish?.(); originalLog.assertCurrent(); };
+  const prepared = await prepareAuditMapActiveAsync(input.workspace, parsed, { ...caller, beforePublish }), saved = prepared.publish().active!;
+  let hash: string | null = null;
+  try {
+    const stable = () => { prepared.assertCurrent(); originalLog.assertCurrent(); };
+    const attempt = await appendTransparencyEntryAttemptAsync({ workspace: input.workspace, type: "AUDIT_MAP_APPLIED", agentId: "workspace",
+      artifact: { kind: "policy", sha256: sha256Hex(Buffer.from(canonicalize(parsed), "utf8")), id: parsed.auditMap.id } }, { beforeCommit: stable, beforeMember: stable });
+    hash = attempt.entry.hash; stable(); attempt.assertCurrent(); return { ...saved, transparencyHash: hash };
+  } catch (cause) {
+    if (cause instanceof TransparencyMerkleLagError) hash = cause.entryHash;
+    throw new AuditPolicyMapPublicationError("map-log", prepared.paths, hash === null ? [] : [hash], cause, prepared.createdDirectories, null, true);
+  }
+}
+
+export function auditRequestCreateForApiAsync(params: Parameters<typeof auditRequestCreateForApi>[0], options: AuditPublicationOptions = {}) {
+  const input = structuredClone(params), scope = parseScope(input);
+  return createAuditEvidenceRequestAsync({ workspace: resolve(input.workspace), scopeType: scope.scopeType, scopeId: scope.scopeId,
+    requestedItems: input.requestedItems, requesterUserId: input.requesterUserId }, { ...options });
+}
+export function auditRequestRejectForApiAsync(params: Parameters<typeof auditRequestRejectForApi>[0], options: AuditPublicationOptions = {}) {
+  const requestId = safeIdSchema.parse(params.requestId); return rejectAuditEvidenceRequestAsync({ ...params, requestId, workspace: resolve(params.workspace) }, { ...options });
 }

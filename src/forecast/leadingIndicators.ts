@@ -45,14 +45,14 @@ function indicatorFromCounts(params: {
   };
 }
 
-export function computeLeadingIndicators(params: {
+function leadingIndicators(params: {
   workspace: string;
   agentId?: string;
   windowStartTs: number;
   windowEndTs: number;
-}): ForecastLeadingIndicator[] {
+}, readonly = false): ForecastLeadingIndicator[] {
   const mid = Math.floor((params.windowStartTs + params.windowEndTs) / 2);
-  const ledger = openLedger(params.workspace);
+  const ledger = openLedger(params.workspace, { readonly });
   try {
     const events = ledger.getEventsBetween(params.windowStartTs, params.windowEndTs).filter((event) => {
       if (!params.agentId) {
@@ -147,4 +147,15 @@ export function computeLeadingIndicators(params: {
   } finally {
     ledger.close();
   }
+}
+
+export function computeLeadingIndicators(params: { workspace: string; agentId?: string; windowStartTs: number; windowEndTs: number }): ForecastLeadingIndicator[] {
+  return leadingIndicators(params);
+}
+/** Both connection lifetimes are synchronous and closed before returning; the final read never initializes a writer. */
+export function captureLeadingIndicators(input: { workspace: string; agentId?: string; windowStartTs: number; windowEndTs: number }) {
+  const params = { ...input }, indicators = leadingIndicators(params), expected = JSON.stringify(indicators);
+  return { indicators, assertCurrent() {
+    if (JSON.stringify(leadingIndicators(params, true)) !== expected) throw new Error("selected forecast audit indicator inputs changed while signing");
+  } };
 }

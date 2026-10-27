@@ -16,7 +16,7 @@ import { assuranceReadinessGate } from "../assurance/assuranceControlPlane.js";
 import { verifyAuditMapActiveSignature } from "../audit/auditMapStore.js";
 import { verifyAuditPolicySignature } from "../audit/auditPolicyStore.js";
 import { verifyAuditWorkspace } from "../audit/binderVerifier.js";
-import { loadValuePolicy, verifyValuePolicySignature } from "../value/valueStore.js";
+import { loadValuePolicyReadOnly as loadValuePolicy, verifyValuePolicySignature } from "../value/valueStore.js";
 import { getWorkspaceRecord, listWorkspaceRecords } from "./hostDb.js";
 import type { WorkspaceContext } from "./workspaceContext.js";
 import { DEFAULT_WORKSPACE_ID, normalizeWorkspaceId } from "./workspaceId.js";

@@ -203,10 +203,30 @@
     "zod": "^4.3.6"
   },
   "peerDependencies": {
-    "@earendil-works/pi-ai": "1.3.0"
+    "@earendil-works/pi-ai": "1.3.0",
+    "@aws-sdk/client-kms": "3.1146.0",
+    "@google-cloud/kms": "6.2.1",
+    "@azure/keyvault-keys": "4.10.2",
+    "@azure/identity": "4.13.3",
+    "agent-maturity-compass-key-provider-pkcs11": "0.1.0"
   },
   "peerDependenciesMeta": {
     "@earendil-works/pi-ai": {
+      "optional": true
+    },
+    "@aws-sdk/client-kms": {
+      "optional": true
+    },
+    "@google-cloud/kms": {
+      "optional": true
+    },
+    "@azure/keyvault-keys": {
+      "optional": true
+    },
+    "@azure/identity": {
+      "optional": true
+    },
+    "agent-maturity-compass-key-provider-pkcs11": {
       "optional": true
     }
   },
@@ -249,7 +269,7 @@
     "overrides": {
       "qs": ">=6.16.0",
       "fast-uri": "^3.1.8",
-      "@modelcontextprotocol/sdk>hono": "^4.13.5",
+      "@modelcontextprotocol/sdk>hono": "4.13.11",
       "ip-address": "^10.7.1",
       "proxy-addr": "^2.0.8"
     }

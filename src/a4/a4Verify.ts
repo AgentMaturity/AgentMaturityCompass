@@ -242,7 +242,7 @@ interface Findings { errors: string[]; warnings: string[]; stale: string[]; sign
 export function verifyA4Chain(ledger: Ledger, projectId: string, trust: TrustContext = loadTrustContext(), now = Date.now()): VerifierReportV1 {
   const out: Findings = { errors: [], warnings: [], stale: [], signatures: [] };
   try {
-    if (readA4Store(ledger).verifyChain(projectId) === null) out.errors.push(`A4_PROJECT_NOT_FOUND: ${projectId}`);
+    if (readA4Store(ledger, trust).verifyChain(projectId) === null) out.errors.push(`A4_PROJECT_NOT_FOUND: ${projectId}`);
   } catch (error) {
     const problems = error instanceof A4StoreError && Array.isArray(error.detail) ? error.detail as string[] : [error instanceof Error ? error.message : String(error)];
     out.errors.push(...problems.map((problem) => problem.startsWith("A4_SIDE_ROW_") ? problem : `A4_CHAIN_INVALID: ${problem}`));
@@ -473,7 +473,7 @@ function recordReport(ledger: Ledger, record: A4RecordV1, trust: TrustContext, n
     freshness: chain.freshness.status === "fail" ? chain.freshness
       : record.tables.a4_decisions.length > 0 ? dimension("pass", ["every decision carries its gate's request digest"]) : dimension("not-evaluated", ["NO_DECISIONS"]),
     completeness: completeness.length > 0 ? dimension("fail", completeness) : dimension("pass", ["every side row the chain names is present and unchanged; every ledger_event ref resolves"]),
-    satisfaction: completeness.length > 0 ? dimension("not-evaluated", ["COMPLETENESS_FAILED"]) : satisfactionOf(readA4Store(ledger).snapshot(record.projectId))
+    satisfaction: completeness.length > 0 ? dimension("not-evaluated", ["COMPLETENESS_FAILED"]) : satisfactionOf(readA4Store(ledger, trust).snapshot(record.projectId))
   };
 }
 

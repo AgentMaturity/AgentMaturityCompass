@@ -1,5 +1,6 @@
+import { captureRunHashAuthority, runHashVerificationKeys, type RunHashPublicationOptions } from "../ledger/runHashSignature.js";
+import { publishAssuranceReport } from "./runReportPublication.js";
 import { verifyHexDigestAny } from "../crypto/keys.js";
-import { getPurposeKeyHistory } from "../keys/signingKeys.js";
 import { validateExecutedReportRow, isExecutedReportPack } from "./executed/reportValidation.js";
 import { loadAdmittedCatalog } from "../catalog/admission/gate.js";
 import { loadExecutedRunScope, ExecutedScopeIntegrityError } from "./executed/scope.js";
@@ -16,17 +17,16 @@ import { loadContextGraph } from "../context/contextGraph.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import { loadAgentConfig } from "../fleet/registry.js";
 import { verifyLedgerIntegrity, openLedger } from "../ledger/ledger.js";
+import { workspaceSelfTrust } from "../trust/trustContext.js";
 import { UNSIGNED_EVIDENCE_STORE } from "../ledger/ledgerConnection.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
-import { persistV1Artifacts } from "./assuranceArtifactPersistence.js";
 import { sealAbortedAssuranceSession } from "./evidenceWriters.js";
 import { parseWindowToMs } from "../utils/time.js";
 import { loadGatewayConfig } from "../gateway/config.js";
 import { writeAssuranceAudit, startAssuranceSession } from "./evidenceWriters.js";
 import { getAssurancePack, listAssurancePacks } from "./packs/index.js";
-import { renderAssuranceMarkdown } from "./report.js";
 import { aggregateOverallScore } from "./scorers.js";
 import { gradeScenarioReply } from "./scenarioGrading.js";
 import {
@@ -195,7 +195,8 @@ async function hasProxyDenyByDefault(workspace: string): Promise<boolean> {
   }
 }
 
-export async function runAssurance(input: RunAssuranceInput): Promise<AssuranceReport> {
+export async function runAssurance(input: RunAssuranceInput, options: RunHashPublicationOptions = {}): Promise<AssuranceReport> {
+  const { beforePublish, synchronousSeal } = options; input = { ...input, packIds: input.packIds?.slice(), stationQuestionIds: input.stationQuestionIds?.slice() }; beforePublish?.();
   // AMC_NO_SIGN=1 rows are unsigned whatever the caller passed; they go to the unsigned store (UNSIGNED_EVIDENCE_STORE).
   const unsignedStore = process.env.AMC_NO_SIGN === "1";
   if (unsignedStore) input = { ...input, noSign: true };
@@ -204,7 +205,7 @@ export async function runAssurance(input: RunAssuranceInput): Promise<AssuranceR
       input.stationQuestionIds.some(id => !STATION_QUESTION_CONVERSIONS.some(row => row.questionId === id)))) {
     throw new Error("STATION_QUESTION_SELECTION_INVALID");
   }
-  const workspace = input.workspace;
+  const workspace = input.workspace, assertOriginal = captureRunHashAuthority(workspace, Boolean(input.noSign || synchronousSeal));
   const agentId = resolveAgentId(workspace, input.agentId);
   const context = buildPromptContext(workspace, agentId);
   const runId = randomUUID();
@@ -316,7 +317,7 @@ export async function runAssurance(input: RunAssuranceInput): Promise<AssuranceR
     const runEndTs = Date.now();
     const verification = input.noSign
       ? { ok: false, errors: ["unsigned assurance run"] }
-      : await verifyLedgerIntegrity(workspace);
+      : await verifyLedgerIntegrity(workspace, { trust: workspaceSelfTrust(workspace) });
     const integrityIndex = Number(scoreIntegrity(packResults).toFixed(4));
     const trustLabel = trustLabelFromIntegrity(integrityIndex);
     const overallScore0to100 = aggregateOverallScore(packResults);
@@ -349,40 +350,8 @@ export async function runAssurance(input: RunAssuranceInput): Promise<AssuranceR
       ...(resolvedResponder ? { target: { transport: resolvedResponder.target.transport, endpoint: resolvedResponder.target.endpoint,
         model: resolvedResponder.target.model, providerTemplateId: resolvedResponder.target.providerTemplateId } } : {})
     };
-    const reportHash = sha256Hex(canonicalize(baseReport));
-    const reportSig = input.noSign ? "unsigned" : ledger.signRunHash(reportHash);
-    const report: AssuranceReport = {
-      ...baseReport,
-      reportJsonSha256: reportHash,
-      runSealSig: reportSig
-    };
-
-    const reportJsonPath = join(reportsDir, `${runId}.json`);
-    const reportMdPath = input.outputMarkdownPath ?? join(reportsDir, `${runId}.md`);
-    writeFileAtomic(reportJsonPath, JSON.stringify(report, null, 2), 0o644);
-    writeFileAtomic(reportMdPath, renderAssuranceMarkdown(report), 0o644);
-
-    ledger.insertAssuranceRun({
-      assurance_run_id: runId,
-      agent_id: agentId,
-      window_start_ts: windowStartTs,
-      window_end_ts: runEndTs,
-      mode: input.mode,
-      pack_ids_json: JSON.stringify(allPackIds),
-      report_json_sha256: reportHash,
-      run_seal_sig: reportSig,
-      status: report.status
-    });
-
-    // Persist the v1 artifacts the store, certificates and scheduler read.
-    persistV1Artifacts({
-      workspace,
-      agentId,
-      report,
-      policySha256: sha256Hex(canonicalize({ packIds, mode: input.mode }))
-    });
-
-    return report;
+    return await publishAssuranceReport({ workspace, ledger, body: baseReport, noSign: Boolean(input.noSign), reportsDir,
+      outputMarkdownPath: input.outputMarkdownPath, sessionId, packIds, allPackIds, options: { beforePublish, synchronousSeal }, assertOriginal });
   } catch (error) {
     throw sealAbortedAssuranceSession({ ledger, sessionId, runId, agentId, error });
   } finally {
@@ -426,16 +395,17 @@ export function loadAssuranceReport(params: {
 
 export async function verifyAssuranceRun(params: {
   workspace: string; assuranceRunId: string; agentId?: string;
+  trust?: import("../trust/trustContext.js").TrustContext;
 }): Promise<VerifyAssuranceResult> {
   const report = loadAssuranceReport(params), agentId = resolveAgentId(params.workspace, params.agentId);
   const context = buildPromptContext(params.workspace, agentId), errors: string[] = [];
-  const verification = await verifyLedgerIntegrity(params.workspace);
+  const verification = await verifyLedgerIntegrity(params.workspace, { trust: params.trust });
   if (!verification.ok) errors.push(...verification.errors.map(error => `ledger verify: ${error}`));
   const hash = sha256Hex(canonicalize({ ...report, reportJsonSha256: "", runSealSig: "" }));
   if (hash !== report.reportJsonSha256) errors.push("reportJsonSha256 mismatch");
   if (report.assuranceRunId !== params.assuranceRunId || report.agentId !== agentId) errors.push("assurance report subject mismatch");
   try {
-    if (!verifyHexDigestAny(hash, report.runSealSig, getPurposeKeyHistory(params.workspace, "artifact-seal"))) errors.push("assurance report seal does not verify");
+    if (!verifyHexDigestAny(hash, report.runSealSig, runHashVerificationKeys(params.workspace))) errors.push("assurance report seal does not verify");
   } catch { errors.push("assurance report seal could not be verified"); }
   const ledger = openLedger(params.workspace);
   try {
@@ -462,7 +432,7 @@ export async function verifyAssuranceRun(params: {
             packResult.scenarioCount !== ids.length || packResult.passCount !== 0 || packResult.failCount !== 0 ||
             packResult.score0to100 !== 0 || packResult.regulatedEligible !== false) errors.push(`executed pack inventory or score mismatch: ${packResult.packId}`);
         for (const row of packResult.scenarioResults) {
-          const checked = validateExecutedReportRow({ ledger, sessionId: report.sessionId ?? "", scope: report.executedScope,
+          const checked = validateExecutedReportRow({ ledger, sessionId: report.sessionId ?? "", scope: report.executedScope, trust: params.trust,
             row, agentId, packId: packResult.packId, catalog: catalog! });
           errors.push(...checked.errors.map(reason => `${packResult.packId}/${row.scenarioId}: ${reason}`));
         }

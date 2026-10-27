@@ -6,6 +6,7 @@ import { ledgerChainError } from "../../catalog/evidence/mappingAdapter.js";
 import { effectiveTrustTier, eventMeta, readerTrustFor } from "../../claims/evidenceProvenance.js";
 import { verifyHexDigestAny } from "../../crypto/keys.js";
 import { getPurposeKeyHistory } from "../../keys/signingKeys.js";
+import { legacyLedgerRowKeys, type OperationalEvidenceOptions } from "../../keys/operationalLedgerReader.js";
 import { verifyReceipt } from "../../receipts/receipt.js";
 import { canonicalize } from "../../utils/json.js";
 import { sha256Hex } from "../../utils/hash.js";
@@ -73,11 +74,11 @@ export function writeExecutedEvidence(ledger: Ledger, sessionId: string,
 }
 
 export function loadExecutedEvidence(ledger: Ledger, ref: ExecutedEvidenceReference,
-  expected: Pick<ExecutedCaptureRecord, "scenarioId" | "packId" | "fixture" | "binding"> & { sessionId: string }):
+  expected: Pick<ExecutedCaptureRecord, "scenarioId" | "packId" | "fixture" | "binding"> & { sessionId: string }, options: OperationalEvidenceOptions = {}):
   { ok: true; record: ExecutedCaptureRecord; item: EvidenceItem } | { ok: false; reason: string } {
   const reject = (reason: string): { ok: false; reason: string } => ({ ok: false, reason });
   try {
-    const keys = getPurposeKeyHistory(ledger.workspace, "ledger-row");
+    const keys = legacyLedgerRowKeys(ledger.workspace);
     const receiptKeys = getPurposeKeyHistory(ledger.workspace, "receipt");
     // All rows, the exact payload and the session seal come from one SQLite snapshot.
     const snapshot = ledger.db.transaction(() => {
@@ -87,7 +88,7 @@ export function loadExecutedEvidence(ledger: Ledger, ref: ExecutedEvidenceRefere
       return { events, event, session };
     })();
     const { events, event, session } = snapshot;
-    const chainError = ledgerChainError(events, keys);
+    const chainError = ledgerChainError(events, keys, { ...options, workspace: ledger.workspace, ledger });
     if (chainError) return reject(chainError);
     if (!event || event.session_id !== expected.sessionId || event.event_hash !== ref.eventSha256
       || event.event_type !== "test" || event.runtime !== "sandbox") return reject("Capture row does not match its reference or expected session");

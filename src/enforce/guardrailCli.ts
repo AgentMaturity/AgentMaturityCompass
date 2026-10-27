@@ -1,6 +1,8 @@
 import chalk from "chalk";
 import type { Command } from "commander";
-import { applyGuardrailControlProfile, recoverGuardrailControlState, setGuardrailRequested } from "./guardrailControlState.js";
+import { assertOwnerMode } from "../mode/mode.js";
+import { recoverGuardrailControlState } from "./guardrailControlState.js";
+import { applyGuardrailControlProfileAsync, setGuardrailRequestedAsync } from "./guardrailControlAsync.js";
 import { listGuardrailsWithRuntimeStatus } from "./guardrailRuntimeBindings.js";
 
 function message(error: unknown): string {
@@ -27,11 +29,12 @@ function registerRequestedStateCommand(guardrails: Command, enabled: boolean): v
     .description(enabled
       ? "Request a signed, runtime-bound guardrail"
       : "Remove an additive guardrail request without weakening signed policy")
-    .action((name: string) => {
+    .action(async (name: string) => {
       try {
+        assertOwnerMode(process.cwd(), enabled ? "guardrails enable" : "guardrails disable");
         recoverGuardrailControlState(process.cwd());
         listGuardrailsWithRuntimeStatus(process.cwd());
-        const state = setGuardrailRequested({
+        const state = await setGuardrailRequestedAsync({
           workspace: process.cwd(),
           name,
           enabled,
@@ -86,11 +89,12 @@ export function registerGuardrailControlCommands(program: Command): void {
   guardrails
     .command("profile <name>")
     .description("Apply bound controls from a signed additive profile")
-    .action((profileName: string) => {
+    .action(async (profileName: string) => {
       try {
+        assertOwnerMode(process.cwd(), "guardrails profile");
         recoverGuardrailControlState(process.cwd());
         listGuardrailsWithRuntimeStatus(process.cwd());
-        const result = applyGuardrailControlProfile({
+        const result = await applyGuardrailControlProfileAsync({
           workspace: process.cwd(),
           profileName,
           source: "cli",

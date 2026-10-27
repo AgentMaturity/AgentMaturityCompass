@@ -1,13 +1,15 @@
 import { randomBytes } from "node:crypto";
 import { spawn } from "node:child_process";
 import { existsSync, openSync, readFileSync, readdirSync, statSync, unlinkSync } from "node:fs";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { verifyGatewayConfigSignature } from "../gateway/config.js";
-import { initActionPolicy, verifyActionPolicySignature } from "../governor/actionPolicyEngine.js";
-import { initToolsConfig, verifyToolsConfigSignature } from "../toolhub/toolhubValidators.js";
+import { initActionPolicyAsync, verifyActionPolicySignature } from "../governor/actionPolicyEngine.js";
+import { initToolsConfigAsync, verifyToolsConfigSignature } from "../toolhub/toolhubValidators.js";
 import { initApprovalPolicy, verifyApprovalPolicySignature } from "../approvals/approvalPolicyEngine.js";
 import { verifyAgentConfigSignature, verifyFleetConfigSignature } from "../fleet/registry.js";
-import { getWorkspacePaths, initWorkspace } from "../workspace.js";
+import { getWorkspacePaths } from "../workspace.js";
+import { initWorkspaceAsync } from "../workspaceInitializationAsync.js";
+import { adaptersConfigPath, initAdaptersConfigAsync } from "../adapters/adapterConfigStore.js";
 import { resolveAgentId } from "../fleet/paths.js";
 import { ensureSigningKeys } from "../crypto/keys.js";
 import { vaultExists, unlockVault, vaultStatus } from "../vault/vault.js";
@@ -19,16 +21,17 @@ import { openLedger } from "../ledger/ledger.js";
 import { sha256Hex } from "../utils/hash.js";
 import { loadLanMode, verifyLanModeSignature } from "../pairing/lanMode.js";
 import { verifyUsersConfigSignature } from "../auth/authApi.js";
-import { initOpsPolicy, opsPolicyPath, verifyOpsPolicySignature } from "../ops/policy.js";
-import { initForecastPolicy } from "../forecast/forecastEngine.js";
+import { initOpsPolicyAsync, opsPolicyPath, verifyOpsPolicySignature } from "../ops/policy.js";
+import { initForecastPolicyAsync } from "../forecast/forecastPublication.js";
 import { forecastPolicyPath } from "../forecast/forecastStore.js";
-import { initPluginWorkspace, verifyPluginWorkspace } from "../plugins/pluginApi.js";
+import { initPluginWorkspaceAsync, verifyPluginWorkspace } from "../plugins/pluginApi.js";
 import { checkNotaryTrust, verifyTrustConfigSignature } from "../trust/trustConfig.js";
-import { initMechanicWorkspace } from "../mechanic/mechanicApi.js";
+import { initMechanicWorkspaceForAuthority } from "../mechanic/mechanicSettingsPublication.js";
 import { mechanicTargetsPath, verifyMechanicTargetsSignature } from "../mechanic/targetsStore.js";
 import { verifyMechanicProfilesSignature } from "../mechanic/profiles.js";
 import { verifyMechanicTuningSignature } from "../mechanic/tuningStore.js";
-import { initPromptPolicy, promptPolicyPath, verifyPromptPolicySignature } from "../prompt/promptPolicyStore.js";
+import { ensurePromptDirs, initPromptPolicy, loadPromptPolicyAttemptAsync, promptPolicyPath, verifyPromptPolicySignature } from "../prompt/promptPolicyStore.js";
+import { captureOrgPairs, orgPairBytes } from "../org/preparedOrgPairs.js";
 import {
   clearStudioState,
   ensureAdminToken,
@@ -96,26 +99,50 @@ function enforceStudioLogRetention(workspace: string, retentionDays: number): vo
   }
 }
 
-function ensureWorkspace(workspace: string): void {
+async function ensureWorkspace(workspace: string): Promise<void> {
   if (!existsSync(join(workspace, ".amc"))) {
-    initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
+    await initWorkspaceAsync({ workspacePath: workspace, trustBoundaryMode: "isolated" });
   }
   ensureSigningKeys(workspace);
   if (!existsSync(opsPolicyPath(workspace))) {
-    initOpsPolicy(workspace);
+    if (!vaultStatus(workspace).unlocked) {
+      const passphrase = process.env.AMC_VAULT_PASSPHRASE;
+      if (!passphrase) throw new Error("Vault locked. Unlock the vault before initializing the missing ops policy.");
+      unlockVault(workspace, passphrase);
+    }
+    await initOpsPolicyAsync(workspace, { onlyIfMissing: true });
+  }
+  if (!existsSync(adaptersConfigPath(workspace))) {
+    if (!vaultStatus(workspace).unlocked) {
+      const passphrase = process.env.AMC_VAULT_PASSPHRASE;
+      if (!passphrase) throw new Error("Vault locked. Unlock the vault before initializing the missing adapters config.");
+      unlockVault(workspace, passphrase);
+    }
+    await initAdaptersConfigAsync(workspace);
   }
   if (!existsSync(forecastPolicyPath(workspace))) {
-    initForecastPolicy(workspace);
+    await initForecastPolicyAsync(workspace, { onlyIfMissing: true });
   }
   if (!existsSync(mechanicTargetsPath(workspace))) {
-    initMechanicWorkspace({
+    await initMechanicWorkspaceForAuthority({
       workspace,
       scopeType: "WORKSPACE",
       scopeId: "workspace"
-    });
+    }, () => {}, true);
   }
   if (!existsSync(promptPolicyPath(workspace))) {
-    initPromptPolicy(workspace);
+    if (process.env.AMC_NO_SIGN === "1") {
+      initPromptPolicy(workspace);
+    } else {
+      const root = resolve(workspace), path = promptPolicyPath(root), before = captureOrgPairs([path]);
+      if (orgPairBytes(before, path) !== null) throw new Error("missing prompt policy appeared before initialization; retry");
+      const assertWorkspace = () => {
+        if (resolve(workspace) !== root) throw new Error("original prompt-policy workspace changed before publication");
+      };
+      ensurePromptDirs(root);
+      const attempt = await loadPromptPolicyAttemptAsync(root, { beforePublish: assertWorkspace }, before);
+      attempt.assertCurrent();
+    }
   }
 }
 
@@ -294,7 +321,7 @@ export async function runStudioForeground(params: {
     }
     const defaultWorkspaceDir = hostWorkspaceDir(hostDir, defaultWorkspaceId);
     if (!existsSync(join(defaultWorkspaceDir, ".amc", "amc.config.yaml"))) {
-      initWorkspace({
+      await initWorkspaceAsync({
         workspacePath: defaultWorkspaceDir,
         trustBoundaryMode: "isolated"
       });
@@ -340,7 +367,7 @@ export async function runStudioForeground(params: {
   }
 
   const workspace = params.workspace;
-  ensureWorkspace(workspace);
+  await ensureWorkspace(workspace);
   enforceStudioLogRetention(workspace, params.dataRetentionDays ?? 30);
   const agentId = resolveAgentId(workspace);
 
@@ -357,15 +384,15 @@ export async function runStudioForeground(params: {
   }
 
   if (!existsSync(join(workspace, ".amc", "plugins", "registries.yaml")) || !existsSync(join(workspace, ".amc", "plugins", "installed.lock.json"))) {
-    initPluginWorkspace({ workspace });
+    await initPluginWorkspaceAsync({ workspace });
   }
 
   const token = ensureAdminToken(workspace);
   if (!existsSync(join(workspace, ".amc", "action-policy.yaml"))) {
-    initActionPolicy(workspace);
+    await initActionPolicyAsync(workspace, undefined, { onlyIfMissing: true });
   }
   if (!existsSync(join(workspace, ".amc", "tools.yaml"))) {
-    initToolsConfig(workspace);
+    await initToolsConfigAsync(workspace, undefined, { onlyIfMissing: true });
   }
   if (!existsSync(join(workspace, ".amc", "approval-policy.yaml"))) {
     initApprovalPolicy(workspace);
@@ -575,7 +602,7 @@ const STUDIO_DAEMON_START_MS = 60_000;
 
 export async function startStudioDaemon(workspace: string, options: StartStudioDaemonOptions = {}): Promise<StudioState> {
   if (!options.hostDir) {
-    ensureWorkspace(workspace);
+    await ensureWorkspace(workspace);
   }
   enforceStudioLogRetention(workspace, 30);
   ensureDir(studioDir(workspace));

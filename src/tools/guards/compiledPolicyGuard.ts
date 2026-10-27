@@ -1,14 +1,9 @@
-import { readFileSync } from "node:fs";
-import YAML from "yaml";
 import type { CompiledPolicyFacts } from "../../actions/authorize.js";
-import { approvalPolicyPath, approvalRuleForAction } from "../../approvals/approvalPolicyEngine.js";
-import { approvalPolicySchema } from "../../approvals/approvalPolicySchema.js";
+import { loadVerifiedApprovalPolicy, approvalRuleForAction } from "../../approvals/approvalPolicyEngine.js";
 import { activeControlPlanHead, loadActiveCompiledPolicy, type ActiveCompiledPolicy } from "../../catalog/compiler/activate.js";
 import type { ApprovalRule, ParamValue } from "../../catalog/compiler/types.js";
-import { getPublicKeyHistory, verifyHexDigestAny } from "../../crypto/keys.js";
 import { loadVerifiedToolsConfigSnapshot, type VerifiedToolsConfigSnapshot } from "../../toolhub/toolhubValidators.js";
 import type { ActionClass } from "../../types.js";
-import { sha256Hex } from "../../utils/hash.js";
 import { RUN_CODE_TOOL } from "../toolPipeline.js";
 import type { ToolExecution, ToolGuard } from "../toolTypes.js";
 
@@ -61,14 +56,10 @@ export function planRequiresPrincipal(workspace: string): boolean {
 
 /** The live signed approval policy must be at least as strict as the compiled rule; read and verified in one read. */
 function approvalDenial(workspace: string, actionClass: ActionClass, rule: ApprovalRule): string | null {
-  const path = approvalPolicyPath(workspace);
   try {
-    const bytes = readFileSync(path);
-    const sig = JSON.parse(readFileSync(`${path}.sig`, "utf8")) as { digestSha256?: unknown; signature?: unknown };
-    const digest = sha256Hex(bytes);
-    if (sig.digestSha256 !== digest || typeof sig.signature !== "string"
-      || !verifyHexDigestAny(digest, sig.signature, getPublicKeyHistory(workspace, "auditor"))) return "the signed approval policy does not verify";
-    const live = approvalRuleForAction(approvalPolicySchema.parse(YAML.parse(bytes.toString("utf8"))), actionClass);
+    const verified = loadVerifiedApprovalPolicy(workspace);
+    if (verified.verdict !== "valid" || verified.policy === null) return "the signed approval policy does not verify";
+    const live = approvalRuleForAction(verified.policy, actionClass);
     const weaker = [
       live.requiredApprovals < rule.requiredApprovals ? `requiredApprovals ${live.requiredApprovals} < ${rule.requiredApprovals}` : "",
       rule.requireDistinctUsers && !live.requireDistinctUsers ? "requireDistinctUsers is off" : "",

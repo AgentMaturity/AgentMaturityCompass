@@ -1,7 +1,7 @@
 import { issueLeaseForPrincipal } from "./leasePrincipal.js";
 import { issueLeaseToken } from "./leaseSigner.js";
 import { verifyLeaseToken } from "./leaseVerifier.js";
-import { bootstrapLeaseRevocations, revokeLease, revokedLeaseIdSet, signLeaseRevocations, verifyLeaseRevocationsSignature } from "./leaseStore.js";
+import { bootstrapLeaseRevocations, revokeLease, revokeLeaseAsync, revokedLeaseIdSet, signLeaseRevocations, signLeaseRevocationsAsync, verifyLeaseRevocationsSignature } from "./leaseStore.js";
 import type { LeaseScope } from "./leaseSchema.js";
 
 export function parseLeaseTtlToMs(ttl: string): number {
@@ -96,13 +96,7 @@ export function verifyLeaseForCli(params: {
   };
 }
 
-export function revokeLeaseForCli(params: {
-  workspace: string;
-  leaseId: string;
-  reason: string;
-  /** The lease itself: its signed expiry lets a later write prune the revocation once the lease has lapsed. */
-  token?: string;
-}): { leaseId: string } {
+function leaseExpiryForCli(params: Parameters<typeof revokeLeaseForCli>[0]): number | undefined {
   let expiresTs: number | undefined;
   if (params.token !== undefined) {
     // Only a payload whose signature verified carries a usable expiry; an expired or already revoked lease still does.
@@ -111,6 +105,17 @@ export function revokeLeaseForCli(params: {
     if (verified.payload?.leaseId !== params.leaseId) throw new Error("--token is not the lease named by --lease-id");
     expiresTs = verified.payload.expiresTs;
   }
+  return expiresTs;
+}
+
+export function revokeLeaseForCli(params: {
+  workspace: string;
+  leaseId: string;
+  reason: string;
+  /** The lease itself: its signed expiry lets a later write prune the revocation once the lease has lapsed. */
+  token?: string;
+}): { leaseId: string } {
+  const expiresTs = leaseExpiryForCli(params);
   revokeLease(params.workspace, params.leaseId, params.reason, { expiresTs });
   return {
     leaseId: params.leaseId
@@ -159,4 +164,23 @@ export function resignLeaseRevocationsForCli(workspace: string, reviewedDigestSh
     previousReason: before.reason,
     revocationCount: signed.revocations.length
   };
+}
+
+
+export async function revokeLeaseForCliAsync(params: Parameters<typeof revokeLeaseForCli>[0] & { beforeSign?: () => void }) {
+  const fixed = { workspace: params.workspace, leaseId: params.leaseId, reason: params.reason, token: params.token };
+  const beforeSign = params.beforeSign, expiresTs = leaseExpiryForCli(fixed);
+  const completed = await revokeLeaseAsync(fixed.workspace, fixed.leaseId, fixed.reason, { expiresTs, beforeSign });
+  completed.assertCurrent();
+  return Object.freeze({ leaseId: fixed.leaseId, assertCurrent: completed.assertCurrent });
+}
+
+export async function resignLeaseRevocationsForCliAsync(workspace: string, reviewedDigestSha256: string,
+  opts: { beforeSign?: () => void } = {}) {
+  const beforeSign = opts.beforeSign;
+  const before = verifyLeaseRevocationsSignature(workspace);
+  const completed = await signLeaseRevocationsAsync(workspace, reviewedDigestSha256, { beforeSign });
+  completed.assertCurrent();
+  return Object.freeze({ wasValid: before.valid, previousReason: before.reason,
+    revocationCount: completed.store.revocations.length, assertCurrent: completed.assertCurrent });
 }

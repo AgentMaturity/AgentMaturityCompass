@@ -9,11 +9,15 @@
  * required a postmortem disappeared from the drift report that chases it.
  */
 import { randomUUID } from "node:crypto";
+import { resolve } from "node:path";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { signHexDigest, getSigningKey } from "../crypto/keys.js";
-import { BreakGlassSigningError, signOverrideDigest, verifyOverrideDigest } from "./overrideSignature.js";
-import { saveWorkspaceRecord, loadWorkspaceRecords } from "../storage/workspaceRecordStore.js";
+import { BreakGlassSigningError, prepareOverrideDigestSignature, signOverrideDigest, verifyOverrideDigest } from "./overrideSignature.js";
+import { canaryOverrideDigest as overrideDigest, publishCanaryOverride } from "./canaryOverridePublication.js";
+import { saveWorkspaceRecord, loadWorkspaceRecords, captureWorkspaceRecordPredecessor, prepareWorkspaceRecordAsync, withWorkspaceRecordPublicationLock } from "../storage/workspaceRecordStore.js";
+import { capturePurposePublication, assertPurposePublicationCurrent } from "../keys/purposePublication.js";
+import { signWithPurposeKey } from "../keys/purposeProviders.js";
 // Type-only, so it is erased at compile time and creates no runtime cycle with
 // policyCanary.ts, which imports the values from here.
 import type { RollbackPack, EmergencyOverride } from "./policyCanary.js";
@@ -74,6 +78,24 @@ export function createRollbackPack(
   return pack;
 }
 
+/** Two checked signatures before durable publication; the retained synchronous API keeps its legacy unsigned behavior. */
+export async function createRollbackPackAsync(agentId: string, policyContent: string, reason: string, workspace?: string): Promise<RollbackPack> {
+  if (!workspace) return createRollbackPack(agentId, policyContent, reason, workspace);
+  const root = resolve(workspace), now = Date.now();
+  const body = { packId: `rbp_${randomUUID().slice(0, 12)}`, agentId, policyFileSha256: sha256Hex(policyContent), reason, createdTs: now };
+  const captured = capturePurposePublication(root, "artifact-seal");
+  const signed = await signWithPurposeKey(root, "artifact-seal", Buffer.from(sha256Hex(canonicalize(body)), "hex"));
+  const pack: RollbackPack = { ...body, policyContent, signature: signed.signature.toString("base64") };
+  const prepared = await prepareWorkspaceRecordAsync(root, ROLLBACK_PACKS_AT, pack.packId, { ...pack }, now, undefined,
+    { beforePublish: () => assertPurposePublicationCurrent(root, captured, signed) });
+  return withWorkspaceRecordPublicationLock(root, ROLLBACK_PACKS_AT, () => {
+    assertPurposePublicationCurrent(root, captured, signed);
+    prepared.publish();
+    rollbackPacks.push(pack);
+    return pack;
+  });
+}
+
 /** Live entries plus any persisted earlier, deduped by id. */
 function mergeStored<T>(live: T[], stored: T[], id: (item: T) => string): T[] {
   const seen = new Set(live.map(id));
@@ -107,12 +129,6 @@ export function getLatestRollbackPack(agentId: string, workspace?: string): Roll
 // Overrides live only in the workspace record store. Activation always needs a
 // workspace, and an in-process cache not keyed by workspace leaked one
 // workspace's overrides into another's report, where they failed verification.
-
-/** The signed activation-time fields; postmortem fields change later. */
-function overrideDigest(o: EmergencyOverride): string {
-  const { overrideId, agentId, reason, actionDescription, ttlMs, startedTs, expiresTs } = o;
-  return sha256Hex(canonicalize({ overrideId, agentId, reason, actionDescription, ttlMs, startedTs, expiresTs }));
-}
 
 function isVerified(o: EmergencyOverride, workspace?: string): boolean {
   return workspace !== undefined && verifyOverrideDigest(workspace, overrideDigest(o), o.signature).valid;
@@ -168,6 +184,18 @@ export function activateEmergencyOverride(
   return override;
 }
 
+/** Actual runtime activation: config-purpose domain signature and artifact-purpose record signature both precede publication. */
+export async function activateEmergencyOverrideAsync(params: Parameters<typeof activateEmergencyOverride>[0], workspace?: string): Promise<EmergencyOverride> {
+  if (workspace === undefined) throw new BreakGlassSigningError("Emergency override requires a workspace with an auditor signing key");
+  const input = { ...params }, now = Date.now();
+  if (!Number.isFinite(input.ttlMs) || input.ttlMs <= 0) throw new Error("canary override TTL must be finite and positive");
+  const body = { overrideId: `emo_${randomUUID().slice(0, 12)}`, agentId: input.agentId, reason: input.reason,
+    actionDescription: input.actionDescription, ttlMs: input.ttlMs, startedTs: now, expiresTs: now + input.ttlMs };
+  const prepared = await prepareOverrideDigestSignature(workspace, overrideDigest(body));
+  const override: EmergencyOverride = { ...body, postmortemFiled: false, postmortemArtifactId: null, signature: prepared.signed.signature.toString("base64") };
+  return publishCanaryOverride(workspace, override, prepared);
+}
+
 /** The workspace's stored overrides, verified or not; none without a workspace (not evaluated). */
 function allOverrides(workspace?: string): EmergencyOverride[] {
   return workspace
@@ -207,6 +235,23 @@ export function filePostmortem(
   if (!workspace || !override) return false;
   persistOverride(workspace, { ...override, postmortemFiled: true, postmortemArtifactId: artifactId }, Date.now());
   return true;
+}
+
+/** Checked outer-record replacement; the existing override domain signature and read admission are unchanged. */
+export async function filePostmortemAsync(overrideId: string, artifactId: string, workspace?: string): Promise<boolean> {
+  if (!workspace || !allOverrides(workspace).some(override => override.overrideId === overrideId)) return false;
+  const root = resolve(workspace), ownId = overrideId, ownArtifactId = artifactId;
+  const predecessor = captureWorkspaceRecordPredecessor(root, OVERRIDES_AT, ownId);
+  let stored: (EmergencyOverride & { override_signature?: string }) | null = null;
+  try { stored = predecessor.target === null ? null : JSON.parse(predecessor.target.toString("utf8")) as EmergencyOverride & { override_signature?: string }; } catch { /* Unreadable legacy records are not selected. */ }
+  if (stored === null || stored.overrideId !== ownId) return false;
+  const override = { ...stored, signature: stored.override_signature ?? "" };
+  const next = { ...override, postmortemFiled: true, postmortemArtifactId: ownArtifactId };
+  const prepared = await prepareWorkspaceRecordAsync(root, OVERRIDES_AT, ownId, { ...next, override_signature: next.signature }, Date.now(), predecessor);
+  return withWorkspaceRecordPublicationLock(root, OVERRIDES_AT, () => {
+    prepared.publish();
+    return true;
+  });
 }
 
 /**

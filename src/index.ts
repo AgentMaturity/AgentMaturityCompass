@@ -9,7 +9,7 @@
  * @packageDocumentation
  */
 
-export { quickstartWizard, initWorkspace, runDoctor, type InitWorkspaceOptions } from "./workspace.js";
+export { quickstartWizard, initWorkspace, runDoctor, saveAMCConfigAsync, signAmcConfigAsync, type InitWorkspaceOptions } from "./workspace.js";
 export { runDoctorCli } from "./doctor/doctorCli.js";
 export {
   buildSupplyChainGuardDecisionReceiptInput,
@@ -36,17 +36,17 @@ export { loadSessionEventHistory, SessionHistoryRefused, type SessionHistoryRefu
 export { wrapRuntime, wrapAny, superviseProcess, startMonitor } from "./ledger/monitor.js";
 
 export {
-  initGatewayConfig,
+  initGatewayConfig, initGatewayConfigAsync, bindGatewayAgentAsync,
   loadGatewayConfig,
   resolveGatewayConfigEnv,
-  signGatewayConfig,
+  signGatewayConfig, signGatewayConfigAsync,
   verifyGatewayConfigSignature,
   routeBaseUrls
 } from "./gateway/config.js";
 export { startGateway, gatewayStatus } from "./gateway/server.js";
 
 export {
-  initFleet,
+  initFleet, initFleetAsync, signFleetConfigAsync, signAgentConfigAsync,
   loadFleetConfig,
   verifyFleetConfigSignature,
   addAgentInteractive,
@@ -55,7 +55,7 @@ export {
   useAgent,
   loadAgentConfig,
   verifyAgentConfigSignature,
-  scaffoldAgent,
+  scaffoldAgent, scaffoldAgentAsync,
   updateAgentProvider
 } from "./fleet/registry.js";
 export { getAgentPaths, resolveAgentId, setCurrentAgent, getCurrentAgent } from "./fleet/paths.js";
@@ -80,15 +80,15 @@ export {
   removeDelegationEdge,
   listDelegationEdges,
   detectCycles,
-  computeTrustComposition,
+  computeTrustComposition, generateTrustCompositionReportAsync,
   saveTrustCompositionReport,
   renderTrustCompositionMarkdown,
   verifyCrossAgentReceipts
 } from "./fleet/trustComposition.js";
 // Orchestration DAG
 export {
-  createDag,
-  appendDagNode,
+  createDag, createDagAsync,
+  appendDagNode, appendDagNodeAsync,
   loadDag,
   listDags,
   queryDagsByAgent,
@@ -125,6 +125,7 @@ export type {
 } from "./fleet/trustInheritance.js";
 
 // Handoff Packets
+export { acceptHandoffPacketAsync, createHandoffPacketAsync } from "./fleet/handoffPacketSigning.js";
 export {
   acceptHandoffPacket,
   createHandoffPacket,
@@ -172,7 +173,7 @@ export type {
 } from "./fleet/trustComposition.js";
 export { listProviderTemplates, getProviderTemplateById } from "./providers/providerTemplates.js";
 export { runSandboxCommand, buildSandboxDockerArgs } from "./sandbox/sandbox.js";
-export { ingestEvidence, attestIngestSession } from "./ingest/ingest.js";
+export { ingestEvidence, attestIngestSession, attestIngestSessionAsync } from "./ingest/ingest.js";
 export {
   importEvalResults,
   evalImportCoverageStatus,
@@ -283,8 +284,8 @@ export {
 export {
   artifactProvenanceManifestSchema,
   artifactProvenanceSignatureSchema,
-  signArtifactProvenance,
-  signArtifactOutput,
+  signArtifactProvenance, signArtifactProvenanceAsync,
+  signArtifactOutput, signArtifactOutputAsync,
   verifyArtifactProvenance,
   detectArtifactTampering
 } from "./artifact/artifactProvenance.js";
@@ -336,11 +337,11 @@ export {
   issueCertificate,
   verifyCertificate,
   inspectCertificate,
-  revokeCertificate,
+  revokeCertificate, revokeCertificateAsync,
   verifyRevocation
 } from "./assurance/certificate.js";
 export {
-  generateTrustCertificate,
+  generateTrustCertificate, generateTrustCertificateAsync,
   verifyTrustCertificateEnvelope
 } from "./cert/trustCertificate.js";
 export type {
@@ -468,12 +469,12 @@ export type {
   OnboardingActivationStatus
 } from "./setup/onboardingActivation.js";
 export {
-  adaptersInitCli,
+  adaptersInitCli, adaptersInitCliAsync,
   adaptersVerifyCli,
   adaptersListCli,
   adaptersDetectCli,
-  adaptersConfigureCli,
-  adaptersCapabilitiesCli,
+  adaptersConfigureCli, adaptersConfigureCliAsync,
+  adaptersCapabilitiesCli, adaptersCapabilitiesCliAsync,
   adaptersRunCli,
   adaptersEnvCli,
   adaptersInitProjectCli
@@ -543,7 +544,7 @@ export {
   taxonomyAllowsModel,
   type ModelTaxonomy
 } from "./bridge/modelTaxonomy.js";
-export { inspectSignatures, fixSignatures } from "./studio/signatures.js";
+export { inspectSignatures, fixSignatures, fixSignaturesAsync } from "./studio/signatures.js";
 export { startStudioApiServer } from "./studio/studioServer.js";
 export { runStudioForeground, startStudioDaemon, stopStudioDaemon, studioStatus } from "./studio/studioSupervisor.js";
 export { createVault, unlockVault, lockVault, vaultStatus, ensureVaultAndPublicKeys } from "./vault/vault.js"; export { rotateMonitorKeyInVault } from "./keys/purposeKeys.js"; // P1-08: index.ts line budget
@@ -562,7 +563,7 @@ export {
   notaryAttestCli,
   notaryVerifyAttestCli,
   notarySignCli,
-  notaryLogVerifyCli
+  notaryLogVerifyCli, notaryStatusCliAsync, notaryPubkeyCliAsync, notaryAttestCliAsync, notarySignCliAsync
 } from "./notary/notaryCli.js";
 export { startNotaryServer } from "./notary/notaryServer.js";
 export { loadNotaryConfig, initNotaryConfig, saveNotaryConfig, defaultNotaryConfig } from "./notary/notaryConfigStore.js";
@@ -570,11 +571,11 @@ export { checkNotaryTrust, initTrustConfig, verifyTrustConfigSignature, enableNo
 export { issueLeaseToken } from "./leases/leaseSigner.js";
 export { verifyLeaseToken } from "./leases/leaseVerifier.js";
 export { loadLeaseRevocations, revokeLease, verifyLeaseRevocationsSignature } from "./leases/leaseStore.js";
-export { initBudgets, verifyBudgetsConfigSignature, evaluateBudgetStatus, resetBudgetDay } from "./budgets/budgets.js";
-export { driftCheckCli, driftReportCli, freezeStatusCli, freezeLiftCli } from "./drift/driftCli.js";
-export { initAlertsConfig, verifyAlertsConfigSignature, sendTestAlert } from "./drift/alerts.js";
+export { initBudgets, initBudgetsAsync, verifyBudgetsConfigSignature, evaluateBudgetStatus, resetBudgetDay } from "./budgets/budgets.js";
+export { driftCheckCli, driftReportCli, freezeStatusCli, freezeLiftCli, driftCheckCliAsync, driftReportCliAsync, freezeLiftCliAsync } from "./drift/driftCli.js";
+export { initAlertsConfig, initAlertsConfigAsync, signAlertsConfigAsync, verifyAlertsConfigSignature, sendTestAlert } from "./drift/alerts.js";
 export { generateBom } from "./bom/bomGenerator.js";
-export { signBomFile, verifyBomSignature } from "./bom/bomVerifier.js";
+export { signBomFile, signBomFileAsync, verifyBomSignature } from "./bom/bomVerifier.js";
 export {
   createApprovalForIntent,
   decideApprovalForIntent,
@@ -611,16 +612,16 @@ export { simulateTargetWhatIf } from "./simulator/targetWhatIf.js";
 export { predictBudgetPressure } from "./simulator/budgetsWhatIf.js";
 export { predictGovernorPermissions } from "./simulator/governorWhatIf.js";
 export { predictCiGateOutcome } from "./simulator/ciGateWhatIf.js";
-export { exportBenchmarkArtifact } from "./benchmarks/benchExport.js";
+export { exportBenchmarkArtifact, exportBenchmarkArtifactAsync } from "./benchmarks/benchExport.js";
 export { verifyBenchmarkArtifact } from "./benchmarks/benchVerify.js";
 export { ingestBenchmarks } from "./benchmarks/benchImport.js";
 export { listImportedBenchmarks } from "./benchmarks/benchStore.js";
 export { benchmarkStats } from "./benchmarks/benchStats.js";
 export {
-  benchInitCli,
+  benchInitCli, benchInitCliAsync,
   benchVerifyPolicyCli,
   benchPrintPolicyCli,
-  benchCreateCli,
+  benchCreateCli, benchCreateCliAsync,
   benchVerifyCli,
   benchPrintCli,
   benchRegistryInitCli,
@@ -631,45 +632,48 @@ export {
   benchImportCli,
   benchListImportsCli,
   benchListExportsCli,
-  benchCompareCli,
+  benchCompareCli, benchCompareCliAsync,
   benchComparisonLatestCli,
-  benchRegistriesCli,
-  benchRegistriesApplyCli,
+  benchRegistriesCli, benchRegistriesCliAsync,
+  benchRegistriesApplyCli, benchRegistriesApplyCliAsync,
   benchPublishRequestCli,
-  benchPublishExecuteCli
+  benchPublishExecuteCli, benchPublishExecuteCliAsync
 } from "./bench/benchCli.js";
-export { createBenchArtifact, inspectBenchArtifact, listExportedBenchArtifacts } from "./bench/benchArtifact.js";
+export { createBenchArtifact, createBenchArtifactAsync, inspectBenchArtifact, listExportedBenchArtifacts } from "./bench/benchArtifact.js";
 export { verifyBenchArtifactFile } from "./bench/benchVerifier.js";
 export { initBenchRegistry, verifyBenchRegistry, publishBenchToRegistry, serveBenchRegistry } from "./bench/benchRegistryServer.js";
 export { browseBenchRegistry, importBenchFromRegistry, listImportedBenchArtifacts } from "./bench/benchRegistryClient.js";
-export { createBenchComparison } from "./bench/benchComparer.js";
+export { createBenchComparison, createBenchComparisonAsync } from "./bench/benchComparer.js";
 export {
-  benchInitForApi,
+  benchInitForApi, benchInitForApiAsync,
   benchPolicyForApi,
-  benchPolicyApplyForApi,
-  benchCreateForApi,
+  benchPolicyApplyForApi, benchPolicyApplyForApiAsync,
+  benchCreateForApi, benchCreateForApiAsync,
   benchExportsForApi,
   benchImportsForApi,
-  benchRegistriesForApi,
-  benchRegistryApplyForApi,
+  benchRegistriesForApi, benchRegistriesForApiAsync,
+  benchRegistryApplyForApi, benchRegistryApplyForApiAsync,
   benchRegistryBrowseForApi,
   benchImportForApi,
-  benchCompareForApi,
+  benchCompareForApi, benchCompareForApiAsync,
   benchComparisonLatestForApi,
   benchPublishRequestForApi,
-  benchPublishExecuteForApi
+  benchPublishExecuteForApi, benchPublishExecuteForApiAsync
 } from "./bench/benchApi.js";
 export { serveConsolePath } from "./console/consoleServer.js";
 export * from "./sdk/index.js";
 export {
   initOutcomeContract,
+  initOutcomeContractAsync,
   loadOutcomeContract,
   signOutcomeContract,
+  signOutcomeContractAsync,
   verifyOutcomeContractSignature,
-  upsertOutcomeContract
+  upsertOutcomeContract,
+  upsertOutcomeContractAsync
 } from "./outcomes/outcomeContractEngine.js";
 export {
-  runOutcomeReport,
+  runOutcomeReport, runOutcomeReportAsync,
   loadOutcomeReport,
   fleetOutcomeReport,
   diffOutcomeReports,
@@ -682,8 +686,8 @@ export {
 } from "./outcomes/outcomeApi.js";
 export { latestOutcomeReport, outcomeTrend, topValueGaps } from "./outcomes/outcomeDashboard.js";
 export {
-  initCasebook,
-  addCaseToCasebook,
+  initCasebook, initCasebookAsync,
+  addCaseToCasebook, addCaseToCasebookAsync,
   listCasebooks,
   verifyCasebook,
   loadCasebook
@@ -700,7 +704,7 @@ export {
 } from "./experiments/experimentRunner.js";
 export { bootstrapDifferenceCI, effectSizeDifference, deterministicSeed } from "./experiments/stats.js";
 export {
-  initComplianceMaps,
+  initComplianceMaps, initComplianceMapsAsync, ComplianceMapsPublicationError,
   loadComplianceMaps,
   verifyComplianceMapsSignature,
   generateComplianceReport
@@ -819,7 +823,7 @@ export {
   type RiskCostLatencyTraceStatus
 } from "./observability/riskCostLatencySlo.js";
 export {
-  initComplianceMapsCli,
+  initComplianceMapsCli, initComplianceMapsCliAsync,
   verifyComplianceMapsCli,
   complianceReportCli,
   complianceFleetReportCli,
@@ -835,6 +839,8 @@ export {
   verifyTransparencyProofBundle,
   generateTransparencyInclusionProof
 } from "./transparency/merkleIndexStore.js";
+export { rebuildTransparencyMerkleAsync } from "./transparency/merkleProducerPublication.js";
+export { exportTransparencyProofBundleAsync } from "./transparency/merkleProofPublication.js";
 export {
   federateInitCli,
   federateVerifyCli,
@@ -847,6 +853,7 @@ export {
 export { exportFederationPackage, importFederationPackage, verifyFederationPackage } from "./federation/federationSync.js";
 export {
   integrationsInitCli,
+  integrationsInitCliAsync,
   integrationsVerifyCli,
   integrationsStatusCli,
   integrationsTestCli,
@@ -862,14 +869,14 @@ export {
   dispatchIntegrationTest
 } from "./integrations/integrationDispatcher.js";
 export { verifyOpsReceipt, verifyOpsReceiptForEvent } from "./integrations/opsReceipt.js";
-export { noCodeAdapterAddCli } from "./integrations/noCodeGovernanceCli.js";
+export { noCodeAdapterAddCli, noCodeAdapterAddCliAsync } from "./integrations/noCodeGovernanceCli.js";
 export {
-  addNoCodeAdapter,
-  initNoCodeGovernanceConfig,
+  addNoCodeAdapter, addNoCodeAdapterAsync,
+  initNoCodeGovernanceConfig, initNoCodeGovernanceConfigAsync,
   loadNoCodeGovernanceConfig,
   noCodeGovernanceConfigPath,
   noCodeGovernanceConfigSigPath,
-  signNoCodeGovernanceConfig,
+  signNoCodeGovernanceConfig, signNoCodeGovernanceConfigAsync,
   verifyNoCodeGovernanceConfigSignature
 } from "./integrations/noCodeGovernanceStore.js";
 export {
@@ -926,7 +933,7 @@ export type {
   IntegrationDeliveryRecord
 } from "./integrations/integrationDeliveryStore.js";
 export {
-  enqueueIntegrationDeliveries,
+  enqueueIntegrationDeliveries, enqueueIntegrationDeliveriesAsync,
   exportIntegrationDeliverySnapshot,
   getIntegrationDeliveryStatusByQueueId,
   getIntegrationDeliveryStatusByQueueIds,
@@ -1043,52 +1050,52 @@ export type {
 } from "./ops/circuitBreaker.js";
 export {
   defaultOrgConfig,
-  initOrgConfig,
+  initOrgConfig, initOrgConfigAsync,
   loadOrgConfig,
-  saveOrgConfig,
+  saveOrgConfig, saveOrgConfigAsync,
   verifyOrgConfigSignature,
-  addOrgNode,
-  assignAgentToNode,
-  unassignAgentFromNode
+  addOrgNode, addOrgNodeAsync,
+  assignAgentToNode, assignAgentToNodeAsync,
+  unassignAgentFromNode, unassignAgentFromNodeAsync
 } from "./org/orgStore.js";
 export {
   computeOrgScorecard,
-  recomputeAndPersistOrgScorecard,
+  recomputeAndPersistOrgScorecard, recomputeAndPersistOrgScorecardAsync,
   nodeHierarchy,
   summarizeNodeForUi,
   scorecardNodeComparison
 } from "./org/orgEngine.js";
 export {
-  writeOrgScorecard,
+  writeOrgScorecard, writeOrgScorecardAsync,
   loadLatestOrgScorecard,
   verifyLatestOrgScorecardSignature,
   compareNodeScorecards
 } from "./org/orgScorecard.js";
 export { OrgSseHub } from "./org/orgSse.js";
 export {
-  orgInitCli,
+  orgInitCli, orgInitCliAsync,
   orgVerifyCli,
-  orgAddNodeCli,
-  orgAssignCli,
-  orgUnassignCli,
-  orgScoreCli,
+  orgAddNodeCli, orgAddNodeCliAsync,
+  orgAssignCli, orgAssignCliAsync,
+  orgUnassignCli, orgUnassignCliAsync,
+  orgScoreCli, orgScoreCliAsync,
   orgReportCli,
   orgCompareCli,
-  orgLearnCli,
-  orgOwnCli,
-  orgCommitCli
+  orgLearnCli, orgLearnCliAsync,
+  orgOwnCli, orgOwnCliAsync,
+  orgCommitCli, orgCommitCliAsync
 } from "./org/orgCli.js";
 export {
-  initTransformMap,
+  initTransformMap, initTransformMapAsync,
   loadTransformMap,
-  saveTransformMap,
+  saveTransformMap, saveTransformMapAsync,
   verifyTransformMap,
-  createTransformPlan
+  createTransformPlan, createTransformPlanAsync
 } from "./transformation/transformPlanner.js";
 export {
   loadLatestTransformPlan,
-  writeSignedTransformPlan,
-  writeSignedTransformSnapshot,
+  writeSignedTransformPlan, writeSignedTransformPlanAsync,
+  writeSignedTransformSnapshot, writeSignedTransformSnapshotAsync,
   verifyLatestTransformPlan
 } from "./transformation/transformTasks.js";
 export {
@@ -1100,49 +1107,50 @@ export {
   schedulerRunNow as forecastSchedulerRunNow,
   schedulerTick as forecastSchedulerTick
 } from "./forecast/forecastEngine.js";
+export { createForecastAsync, initForecastPolicyAsync, refreshForecastsForWorkspaceAsync, schedulerRunNowAsync as forecastSchedulerRunNowAsync, schedulerTickAsync as forecastSchedulerTickAsync } from "./forecast/forecastPublication.js";
 export {
-  forecastInitCli,
+  forecastInitCli, forecastInitCliAsync,
   forecastVerifyCli,
   forecastPrintPolicyCli,
-  forecastRefreshCli,
+  forecastRefreshCli, forecastRefreshCliAsync,
   forecastLatestCli,
   advisoryListCli,
   advisoryShowCli,
-  advisoryAckCli,
+  advisoryAckCli, advisoryAckCliAsync,
   forecastSchedulerStatusCli,
-  forecastSchedulerRunNowCli,
-  forecastSchedulerEnableCli,
-  forecastSchedulerDisableCli,
-  forecastPolicyApplyCli
+  forecastSchedulerRunNowCli, forecastSchedulerRunNowCliAsync,
+  forecastSchedulerEnableCli, forecastSchedulerEnableCliAsync,
+  forecastSchedulerDisableCli, forecastSchedulerDisableCliAsync,
+  forecastPolicyApplyCli, forecastPolicyApplyCliAsync
 } from "./forecast/forecastCli.js";
 export { renderForecastMarkdown } from "./forecast/forecastReports.js";
 export {
   getForecastLatestForApi,
-  refreshForecastForApi,
+  refreshForecastForApi, refreshForecastForApiAsync,
   listAdvisoriesForApi,
-  ackAdvisoryForApi,
+  ackAdvisoryForApi, ackAdvisoryForApiAsync,
   getForecastPolicyForApi,
-  applyForecastPolicyForApi
+  applyForecastPolicyForApi, applyForecastPolicyForApiAsync
 } from "./forecast/forecastApi.js";
 export { verifyForecastPolicy, verifyLatestForecast } from "./forecast/forecastVerifier.js";
-export { runTransformTracker } from "./transformation/transformTracker.js";
+export { runTransformTracker, runTransformTrackerAsync } from "./transformation/transformTracker.js";
 export {
-  writeTransformAttestation,
+  writeTransformAttestation, writeTransformAttestationAsync,
   verifyTransformAttestation,
   listTransformAttestations,
   findLatestAttestationForTask
 } from "./transformation/transformAttestations.js";
 export { renderTransformReportMarkdown, compactTransformStatus } from "./transformation/transformReports.js";
 export {
-  transformInitCli,
+  transformInitCli, transformInitCliAsync,
   transformVerifyCli,
   transformMapReadCli,
-  transformMapApplyCli,
-  transformPlanCli,
+  transformMapApplyCli, transformMapApplyCliAsync,
+  transformPlanCli, transformPlanCliAsync,
   transformStatusCli,
-  transformTrackCli,
+  transformTrackCli, transformTrackCliAsync,
   transformReportCli,
-  transformAttestCli,
+  transformAttestCli, transformAttestCliAsync,
   transformAttestVerifyCli
 } from "./transformation/transformCli.js";
 export { releaseManifestSchema } from "./release/releaseSchema.js";
@@ -1172,33 +1180,33 @@ export {
   releasePrintCli
 } from "./release/releaseCli.js";
 export {
-  promptInitCli,
+  promptInitCli, promptInitCliAsync,
   promptVerifyCli,
-  promptPolicyPrintCli,
-  promptPolicyApplyCli,
-  promptStatusCli,
-  promptPackBuildCli,
+  promptPolicyPrintCli, promptPolicyPrintCliAsync,
+  promptPolicyApplyCli, promptPolicyApplyCliAsync,
+  promptStatusCli, promptStatusCliAsync,
+  promptPackBuildCli, promptPackBuildCliAsync,
   promptPackVerifyCli,
   promptPackShowCli,
   promptPackDiffCli,
   promptSchedulerStatusCli,
-  promptSchedulerRunNowCli,
-  promptSchedulerEnableCli,
-  promptSchedulerDisableCli
+  promptSchedulerRunNowCli, promptSchedulerRunNowCliAsync,
+  promptSchedulerEnableCli, promptSchedulerEnableCliAsync,
+  promptSchedulerDisableCli, promptSchedulerDisableCliAsync
 } from "./prompt/promptPackCli.js";
 export {
-  promptInitForApi,
+  promptInitForApi, promptInitForApiAsync,
   promptVerifyForApi,
-  promptPolicyForApi,
-  promptPolicyApplyForApi,
-  buildPromptPackForApi,
-  promptStatusForApi,
+  promptPolicyForApi, promptPolicyForApiAsync,
+  promptPolicyApplyForApi, promptPolicyApplyForApiAsync,
+  buildPromptPackForApi, buildPromptPackForApiAsync,
+  promptStatusForApi, promptStatusForApiAsync,
   promptShowForApi,
   promptDiffForApi,
   promptSchedulerStatusForApi,
-  promptSchedulerRunNowForApi,
-  promptSchedulerSetEnabledForApi,
-  promptSchedulerTick,
+  promptSchedulerRunNowForApi, promptSchedulerRunNowForApiAsync,
+  promptSchedulerSetEnabledForApi, promptSchedulerSetEnabledForApiAsync,
+  promptSchedulerTick, promptSchedulerTickAsync,
   preparePromptForBridgeRequest,
   validateBridgeResponseWithPromptPolicy
 } from "./prompt/promptPackApi.js";
@@ -1252,6 +1260,7 @@ export {
   renderGovernanceLineageMarkdown,
   renderClaimLineageMarkdown
 } from "./claims/governanceLineage.js";
+export { linkTransitionToTransparencyAsync, recordPolicyChangeIntentAsync } from "./claims/governanceLineageAsync.js";
 export type {
   ClaimTransparencyLink,
   PolicyChangeCategory,
@@ -1367,14 +1376,15 @@ export {
   makeCanaryDecision,
   recordCanaryOutcome,
   computeCanaryStats,
-  createRollbackPack,
+  createRollbackPack, createRollbackPackAsync,
   getRollbackPacks,
   getLatestRollbackPack,
   activateEmergencyOverride,
+  activateEmergencyOverrideAsync,
   getActiveOverrides,
-  filePostmortem,
+  filePostmortem, filePostmortemAsync,
   getOverridesMissingPostmortem,
-  registerPolicyDebt,
+  registerPolicyDebt, registerPolicyDebtAsync,
   getActivePolicyDebt,
   getExpiredPolicyDebt,
   expirePolicyDebt,
@@ -1467,11 +1477,11 @@ export type {
 
 // Data Residency & Tenant Isolation Controls
 export {
-  createResidencyPolicy,
+  createResidencyPolicy, createResidencyPolicyAsync,
   getResidencyPolicies,
   getResidencyPolicy,
   getPolicyForRegion,
-  registerTenant,
+  registerTenant, registerTenantAsync,
   getTenants,
   getTenant,
   checkTenantIsolation,
@@ -1548,14 +1558,14 @@ export type {
 export {
   getLabTemplates,
   getLabTemplate,
-  createLabExperiment,
+  createLabExperiment, createLabExperimentAsync,
   getLabExperiment,
   listLabExperiments,
-  startLabExperiment,
-  recordLabProbeResult,
-  completeLabExperiment,
-  cancelLabExperiment,
-  simulateExperiment,
+  startLabExperiment, startLabExperimentAsync,
+  recordLabProbeResult, recordLabProbeResultAsync,
+  completeLabExperiment, completeLabExperimentAsync,
+  cancelLabExperiment, cancelLabExperimentAsync,
+  simulateExperiment, simulateExperimentAsync,
   compareExperiments,
   importModelSignal,
   getSignalImports,
@@ -1659,8 +1669,8 @@ export {
   resetFPTrackerState,
   configureFPCostModel,
   getFPCostModel,
-  submitFPReport,
-  resolveFPReport,
+  submitFPReport, submitFPReportAsync,
+  resolveFPReport, resolveFPReportAsync,
   getFPReport,
   listFPReports,
   computeFPCostSummary,
@@ -2102,7 +2112,7 @@ export {
   ADAPTER_CAPABILITY_RECEIPT_VERSION,
   adapterCapabilityInspectionSchema,
   adapterCapabilityReceiptSchema,
-  issueAdapterCapabilityReceipt,
+  issueAdapterCapabilityReceipt, issueAdapterCapabilityReceiptAsync,
   trustedAdapterCapabilityReceiptKeys,
   verifyAdapterCapabilityReceipt
 } from "./passport/adapterCapabilityReceipt.js";
@@ -2134,6 +2144,10 @@ export type {
   PassportSchemaCompatibilityVerification,
   PassportSchemaImportExportResult,
 } from "./passport/passportSchemaCompatibility.js";
+
+export { createPassportArtifactAsync } from "./passport/passportArtifact.js";
+export { savePassportPolicyAsync, loadPassportPolicyAsync, savePassportCacheAsync } from "./passport/passportStore.js";
+export { signPassportJsonAsync } from "./passport/passportSigner.js";
 
 // ── Regulatory Automation (RegulatoryMonitor, feed configs, gap analysis) ─
 export {

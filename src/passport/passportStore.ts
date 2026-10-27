@@ -17,7 +17,7 @@ function passportRoot(workspace: string): string {
   return join(workspace, ".amc", "passport");
 }
 
-function passportPolicyPath(workspace: string): string {
+export function passportPolicyPath(workspace: string): string {
   return join(passportRoot(workspace), "policy.yaml");
 }
 
@@ -37,7 +37,7 @@ function passportRevocationsPath(workspace: string): string {
   return join(passportRoot(workspace), "revocations.json");
 }
 
-function passportLatestCachePath(
+export function passportLatestCachePath(
   workspace: string,
   scopeType: "WORKSPACE" | "NODE" | "AGENT",
   scopeId: string
@@ -240,3 +240,6 @@ export function listPassportExportFiles(workspace: string): string[] {
   walk(root);
   return out.sort((a, b) => b.localeCompare(a));
 }
+
+export { savePassportPolicyAsync, loadPassportPolicyAsync, loadPassportPolicyAttemptAsync,
+  savePassportCacheAsync, preparePassportCacheAsync, preparePassportPolicyAsync } from "./passportPairPublication.js";

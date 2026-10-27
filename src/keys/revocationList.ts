@@ -5,8 +5,12 @@
  * a key the file names is only looked up among them. A file exists in exactly one byte encoding (canonical JSON,
  * canonical base64), and `anchor`, the transparency entry that logged this sequence, sits outside the signature: it is
  * checked against the log and the machine mark covers the whole file (src/keys/anchors.ts).
+ * An optional envelope signatureVersion:2 selects AMC_REVOCATION_LIST_V2_DIGEST + NUL + SHA-256 of that full v1 payload;
+ * its absence preserves v1. Every reader selects exactly one form and never retries another tag.
  */
-import { sign, verify } from "node:crypto";
+import { sign } from "node:crypto";
+import { SIGNING_ALGORITHMS, signingKeyId, verifyWithKey } from "./algorithmPolicy.js";
+import { checkedDescription, KeyProviderError, signChecked, type KeyDescription, type KeyProvider } from "./provider.js";
 import { z } from "zod";
 import { publicKeyFromPrivate } from "../crypto/keyHistoryEnvelope.js";
 import { ed25519KeyId } from "../trust/trustList.js";
@@ -40,6 +44,7 @@ export const revocationListSchema = z.strictObject({
 }).refine(list => new Set(list.revoked.map(row => `${row.kind}:${row.id}`)).size === list.revoked.length, "one row per revoked id");
 
 export const signedRevocationListSchema = z.strictObject({
+  signatureVersion: z.literal(2).optional(),
   list: revocationListSchema,
   signature: z.strictObject({
     keyId: hexSchema,
@@ -51,20 +56,34 @@ export const signedRevocationListSchema = z.strictObject({
 export type RevocationListV1 = z.infer<typeof revocationListSchema>;
 export type SignedRevocationList = z.infer<typeof signedRevocationListSchema>;
 
-function signedBytes(list: RevocationListV1): Buffer {
-  return Buffer.concat([Buffer.from(DOMAIN_TAG, "ascii"), Buffer.from([0]), Buffer.from(canonicalize(list), "utf8")]);
+function signedBytes(list: RevocationListV1, signatureVersion: 1 | 2 = 1): Buffer {
+  const legacy = Buffer.concat([Buffer.from(DOMAIN_TAG, "ascii"), Buffer.from([0]), Buffer.from(canonicalize(list), "utf8")]);
+  return signatureVersion === 2 ? Buffer.concat([Buffer.from("AMC_REVOCATION_LIST_V2_DIGEST\0", "ascii"), Buffer.from(sha256Hex(legacy), "hex")]) : legacy;
 }
+export { signedBytes as revocationListSigningBytes };
 
 /** The list's identity: what the next list's previousSha256 and its transparency entry name. */
 export function revocationListSha256(list: RevocationListV1): string {
   return sha256Hex(canonicalize(revocationListSchema.parse(list)));
 }
 
-export function signRevocationList(list: RevocationListV1, privateKeyPem: string): SignedRevocationList {
+export function signRevocationList(list: RevocationListV1, privateKeyPem: string, opts: { signatureVersion?: 1 | 2 } = {}): SignedRevocationList {
   const parsed = revocationListSchema.parse(list);
   const keyId = ed25519KeyId(publicKeyFromPrivate(privateKeyPem));
   if (keyId === null) throw new Error("revocation lists are signed with Ed25519 keys only");
-  return { list: parsed, signature: { keyId, signature: sign(null, signedBytes(parsed), privateKeyPem).toString("base64") }, anchor: null };
+  return { ...(opts.signatureVersion === 2 ? { signatureVersion: 2 as const } : {}), list: parsed,
+    signature: { keyId, signature: sign(null, signedBytes(parsed, opts.signatureVersion), privateKeyPem).toString("base64") }, anchor: null };
+}
+
+/** The caller supplies the purpose's authenticated, pinned provider description; signing itself never grants admission. */
+export async function signRevocationListWithProvider(list: RevocationListV1, provider: KeyProvider, description: KeyDescription, opts: { signatureVersion?: 1 | 2 } = {}): Promise<SignedRevocationList> {
+  const parsed = revocationListSchema.parse(list);
+  const key = checkedDescription({ ...description, ref: { ...description.ref } }, { allowed: SIGNING_ALGORITHMS, requireNonExportable: false });
+  if (provider.id !== key.ref.provider) throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", provider.id, "the pinned description belongs to another provider");
+  const signatureVersion = opts.signatureVersion ?? 1;
+  const signature = await signChecked(provider, key, signedBytes(parsed, signatureVersion));
+  return { ...(signatureVersion === 2 ? { signatureVersion: 2 as const } : {}), list: parsed,
+    signature: { keyId: key.keyId, signature: signature.toString("base64") }, anchor: null };
 }
 
 /** The only accepted file form. */
@@ -85,11 +104,11 @@ function verifySignedRevocationListBytes(bytes: Buffer, opts: { listId: string; 
     throw new Error(`not a canonical signed amc.revocation-list (${detail})`);
   }
   if (signed.list.listId !== opts.listId) throw new Error(`revocation list is ${signed.list.listId}, not ${opts.listId}`);
-  const key = opts.trustedPublicKeyPems.find(pem => ed25519KeyId(pem) === signed.signature.keyId);
+  const key = opts.trustedPublicKeyPems.find(pem => signingKeyId(pem) === signed.signature.keyId);
   if (key === undefined) throw new Error(`revocation list signer ${signed.signature.keyId} is not a trusted revocation-list key`);
   let valid = false;
   try {
-    valid = verify(null, signedBytes(signed.list), key, Buffer.from(signed.signature.signature, "base64"));
+    valid = verifyWithKey(signedBytes(signed.list, signed.signatureVersion), key, Buffer.from(signed.signature.signature, "base64"));
   } catch { /* reported below */ }
   if (!valid) throw new Error("revocation list signature verification failed");
   return signed;
@@ -155,7 +174,13 @@ export function recoverPendingRevocationList(location: AnchoredListLocation): vo
  */
 export function publishRevocationList(location: AnchoredListLocation, list: RevocationListV1, privateKeyPem: string,
   logSequence: (target: Omit<AnchorTarget, "fileSha256" | "entryHash">) => string): SignedRevocationList {
-  const signed = signRevocationList(list, privateKeyPem);
+  return publishSignedRevocationList(location, signRevocationList(list, privateKeyPem), logSequence);
+}
+
+/** The owner holds the list lock and has revalidated predecessor and current signer after any asynchronous signing. */
+export function publishSignedRevocationList(location: AnchoredListLocation, signed: SignedRevocationList,
+  logSequence: (target: Omit<AnchorTarget, "fileSha256" | "entryHash">) => string): SignedRevocationList {
+  if (signed.anchor !== null) throw new Error("a new revocation list must not carry a prior anchor");
   const staged = encodeSignedRevocationList(signed);
   try {
     verifySignedRevocationListBytes(staged, location);
@@ -163,7 +188,7 @@ export function publishRevocationList(location: AnchoredListLocation, list: Revo
     throw new Error(`revocation list signature would not verify against the trusted key history; nothing was published (${error instanceof Error ? error.message : String(error)})`);
   }
   writeContained(location.workspace, `${location.rel}.pending`, staged, 0o644);
-  const entryHash = logSequence({ workspace: location.workspace, type: ANCHOR, id: list.listId, sequence: list.sequence, sha256: revocationListSha256(signed.list) });
+  const entryHash = logSequence({ workspace: location.workspace, type: ANCHOR, id: signed.list.listId, sequence: signed.list.sequence, sha256: revocationListSha256(signed.list) });
   const published = { ...signed, anchor: { transparencyEntryHash: entryHash } };
   writeFinal(location, published);
   removeContained(location.workspace, `${location.rel}.pending`);

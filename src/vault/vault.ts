@@ -1,4 +1,4 @@
-import { generateKeyPairSync } from "node:crypto";
+import { generateKeyPairSync, type KeyObject } from "node:crypto";
 import { chmodSync, readFileSync, rmSync } from "node:fs";
 import { basename, dirname, join } from "node:path";
 import { ensureDir, pathExists, writeFileAtomic, readUtf8 } from "../utils/fs.js";
@@ -11,8 +11,11 @@ import { assertKeysetComplete, boundKeyset, commitKeyset, keepPreviousVault, key
 import { logHistoryRevisions, machineMark, preflightHistoryLog } from "../keys/anchors.js";
 import { assertKeyNotRevoked, keyRevocationLocation } from "../keys/keyRevocations.js";
 import { encodeSignedRevocationList, signRevocationList } from "../keys/revocationList.js";
-import { containedExists } from "../utils/containedFs.js";
+import { containedExists, readContainedOrNull } from "../utils/containedFs.js";
+import { BLOB_AUTHORITY_CURRENT, BLOB_CHILD_FILE, blobAuthorityDigest, blobChildEnvelopeSchema, openBlobChild, parseBlobIndexAuthority } from "../keys/blobIndexAuthority.js";
+import { RECEIPT_AUTHORITY_CURRENT, RECEIPT_CHILD_FILE, receiptAuthorityDigest, receiptChildEnvelopeSchema, openReceiptChild, parseReceiptAuthority } from "../keys/receiptAuthority.js";
 import { canonicalize } from "../utils/json.js";
+import { captureVaultPurposeMaterial } from "./vaultPurposeContinuity.js";
 import {
   LOCAL_PURPOSES, ROLE_PRIMARY_PURPOSE, isLocalPurpose, parseVaultPayload, payloadFromRoleKeys, purposeKey, roleOfPurpose, safeSecrets,
   type LocalPurpose, type VaultPayloadV2
@@ -42,6 +45,9 @@ interface VaultSession {
 }
 
 const sessions = new Map<string, VaultSession>();
+const purposeContinuity = new WeakMap<VaultSession, object>();
+const blobChildren = new Map<string, { stamp: string; key: KeyObject }>();
+const receiptChildren = new Map<string, { stamp: string; key: KeyObject }>();
 // Verification can read encrypted evidence without granting ordinary vault
 // access. Cache only authenticated secrets here, never signing-key payloads.
 const readOnlySecrets = new Map<string, {
@@ -62,6 +68,7 @@ function evictStaleSessions(): void {
       session.unlocked = false;
       session.envelopeDigest = null;
       sessions.delete(key);
+      blobChildren.delete(key); receiptChildren.delete(key);
     }
   }
   for (const [key, cached] of readOnlySecrets) {
@@ -461,7 +468,7 @@ function openVaultSession(workspace: string, phrase: string): void {
   }
   // Publish the session only once its payload is complete.
   session.unlocked = true;
-  session.payload = payload;
+  session.payload = payload; purposeContinuity.set(session, {});
   session.lastUnlockedTs = Date.now();
   session.passphrase = phrase;
   session.envelopeDigest = openedDigest;
@@ -469,9 +476,10 @@ function openVaultSession(workspace: string, phrase: string): void {
 }
 
 export function lockVault(workspace: string): void {
+  blobChildren.delete(workspace); receiptChildren.delete(workspace);
   readOnlySecrets.delete(workspace);
   const session = sessionFor(workspace);
-  session.unlocked = false;
+  session.unlocked = false; purposeContinuity.set(session, {});
   session.payload = null;
   session.passphrase = null;
   session.envelopeDigest = null;
@@ -551,6 +559,24 @@ export function getVaultPrivateKeyPem(workspace: string, kind: VaultKeyKind): st
   if (!(KEY_KINDS as readonly string[]).includes(kind)) throw new Error(`${JSON.stringify(kind)} is not a vault key role`);
   const resolved = signingPayload(workspace);
   return resolved === null ? generateEphemeralKey(kind) : usableKey(workspace, resolved, ROLE_PRIMARY_PURPOSE[kind]);
+}
+
+function vaultPurposeNegative(workspace: string, original: WeakRef<VaultSession>, token: object, material: ReturnType<typeof captureVaultPurposeMaterial>): () => void {
+  return () => {
+    if (process.env.AMC_NO_SIGN === "1") throw new Error("original vault purpose authority is unavailable or changed");
+    evictStaleSessions(); const current = sessions.get(workspace);
+    if (!current?.unlocked || current !== original.deref()
+      || purposeContinuity.get(current) !== token) throw new Error("original vault purpose authority is unavailable or changed");
+    material(current.payload, assertKeysetComplete(workspace));
+  };
+}
+/** Supplemental original/cache negative only; never opens or refreshes a vault, and never authorizes signing. */
+export function captureVaultPurposeContinuity(workspace: string, purpose: LocalPurpose): () => void {
+  if (process.env.AMC_NO_SIGN === "1" || !isLocalPurpose(purpose)) throw new Error("vault purpose continuity capture refused");
+  evictStaleSessions(); const current = sessions.get(workspace);
+  if (!current?.unlocked || !current.payload) throw new Error("original vault purpose authority is unavailable or changed");
+  const token = purposeContinuity.get(current) ?? {}; purposeContinuity.set(current, token);
+  return vaultPurposeNegative(workspace, new WeakRef(current), token, captureVaultPurposeMaterial(current.payload, assertKeysetComplete(workspace), purpose));
 }
 
 /** P1-08: the private key for one local signing purpose (src/keys/purposeKeys.ts getSigningKey). */
@@ -647,7 +673,7 @@ function requireUnlockedPayload(workspace: string): VaultPayload {
     const envelopeRaw = readEnvelopeRaw(workspace);
     const envelopeDigest = sha256Hex(Buffer.from(envelopeRaw, "utf8"));
     if (session.envelopeDigest !== envelopeDigest) {
-      session.payload = decodePayload(envelopeRaw, session.passphrase).payload;
+      session.payload = decodePayload(envelopeRaw, session.passphrase).payload; purposeContinuity.set(session, {});
       session.envelopeDigest = envelopeDigest;
     }
   } catch {
@@ -683,7 +709,7 @@ export function setVaultSecret(workspace: string, secretKey: string, value: stri
   const payload = requireUnlockedPayload(workspace);
   const next = { ...payload, secrets: safeSecrets({ ...payload.secrets, [secretKey]: value }) };
   rewriteUnlockedVault(workspace, next);
-  sessionFor(workspace).payload = next;
+  const current = sessionFor(workspace); current.payload = next; purposeContinuity.set(current, {});
 }
 
 /** Rewrites the vault envelope without `secretKey`; refuses when the vault is locked. True when a secret was removed. */
@@ -693,7 +719,7 @@ export function deleteVaultSecret(workspace: string, secretKey: string): boolean
   if (!Object.hasOwn(payload.secrets, secretKey)) return false;
   const next = { ...payload, secrets: safeSecrets(Object.fromEntries(Object.entries(payload.secrets).filter(([key]) => key !== secretKey))) };
   rewriteUnlockedVault(workspace, next);
-  sessionFor(workspace).payload = next;
+  const current = sessionFor(workspace); current.payload = next; purposeContinuity.set(current, {});
   return true;
 }
 
@@ -729,4 +755,45 @@ export function getVaultSecretReadOnly(workspace: string, secretKey: string): st
     readOnlySecrets.delete(workspace);
     throw new Error("Read-only vault access failed: missing passphrase or vault, incorrect passphrase, or corrupted vault.");
   }
+}
+
+
+/** Internal fixed blob-index child only; never an arbitrary secret/path opener or a flat purpose-history key. */
+export function getBlobIndexChildKey(workspace: string): KeyObject {
+  if (process.env.AMC_NO_SIGN === "1") throw new Error("blob authority is unavailable in no-sign mode");
+  const keyset = assertKeysetComplete(workspace), payload = requireUnlockedPayload(workspace), session = sessionFor(workspace);
+  if (keyset === null || LOCAL_PURPOSES.some(purpose => keyset.keys[purpose] !== payload.keys[purpose]?.keyId)) throw new Error("blob child vault keys differ from the committed key set");
+  const binding = keyset.providers?.["artifact-seal"], expected = binding?.blobIndexAuthoritySha256;
+  const certificate = readContainedOrNull(workspace, BLOB_AUTHORITY_CURRENT, 64 * 1024), sealed = readContainedOrNull(workspace, BLOB_CHILD_FILE, 64 * 1024);
+  if (expected === undefined || certificate === null || sealed === null || sha256Hex(certificate) !== expected
+    || keyset.files["keys/blob-index-child.amcvault"] !== sha256Hex(sealed)) throw new Error("blob child is not the committed operation authority");
+  const signed = parseBlobIndexAuthority(certificate);
+  if (blobAuthorityDigest(signed) !== expected || !session.passphrase) throw new Error("blob child authority is unavailable");
+  const stamp = `${session.envelopeDigest}:${expected}:${sha256Hex(sealed)}`, cached = blobChildren.get(workspace);
+  if (cached?.stamp === stamp) return cached.key;
+  try {
+    const envelope = blobChildEnvelopeSchema.parse(JSON.parse(sealed.toString("utf8")));
+    const key = openBlobChild(decryptVaultPayload(envelope, session.passphrase), signed);
+    blobChildren.set(workspace, { stamp, key }); return key;
+  } catch { blobChildren.delete(workspace); throw new Error("sealed blob child cannot be opened for its committed authority"); }
+}
+
+/** Internal fixed receipt-token child only; never an arbitrary secret/path opener or a flat purpose-history key. */
+export function getReceiptChildKey(workspace: string): KeyObject {
+  if (process.env.AMC_NO_SIGN === "1") throw new Error("receipt authority is unavailable in no-sign mode");
+  const keyset = assertKeysetComplete(workspace), payload = requireUnlockedPayload(workspace), session = sessionFor(workspace);
+  if (keyset === null || LOCAL_PURPOSES.some(purpose => keyset.keys[purpose] !== payload.keys[purpose]?.keyId)) throw new Error("receipt child vault keys differ from the committed key set");
+  const binding = keyset.providers?.["receipt"], expected = binding?.receiptAuthoritySha256;
+  const certificate = readContainedOrNull(workspace, RECEIPT_AUTHORITY_CURRENT, 64 * 1024), sealed = readContainedOrNull(workspace, RECEIPT_CHILD_FILE, 64 * 1024);
+  if (expected === undefined || certificate === null || sealed === null || sha256Hex(certificate) !== expected
+    || keyset.files["keys/receipt-child.amcvault"] !== sha256Hex(sealed)) throw new Error("receipt child is not the committed operation authority");
+  const signed = parseReceiptAuthority(certificate);
+  if (receiptAuthorityDigest(signed) !== expected || !session.passphrase) throw new Error("receipt child authority is unavailable");
+  const stamp = `${session.envelopeDigest}:${expected}:${sha256Hex(sealed)}`, cached = receiptChildren.get(workspace);
+  if (cached?.stamp === stamp) return cached.key;
+  try {
+    const envelope = receiptChildEnvelopeSchema.parse(JSON.parse(sealed.toString("utf8")));
+    const key = openReceiptChild(decryptVaultPayload(envelope, session.passphrase), signed);
+    receiptChildren.set(workspace, { stamp, key }); return key;
+  } catch { receiptChildren.delete(workspace); throw new Error("sealed receipt child cannot be opened for its committed authority"); }
 }
