@@ -662,7 +662,7 @@ import {
   loadTrustConfig,
   verifyTrustConfigSignature
 } from "./trust/trustConfig.js";
-import { resignTrustConfig } from "./trust/trustConfigPublication.js";
+import { describeTrustConfigResign, resignTrustConfig } from "./trust/trustConfigPublication.js";
 import {
   computeTemporalDecayReport,
   decayConfigSchema,
@@ -11787,20 +11787,27 @@ trust
   .command("resign")
   .description("Re-sign the current .amc/trust.yaml in place with the current artifact-seal key, keeping NOTARY settings")
   .option("--confirm", "required: re-sign content signed by a retired or revoked key after reviewing it")
+  .option("--accept-compromised-signer", "also required when the recorded signer was revoked as key-compromise")
   .addHelpText("after", `
 Use after a key rotation or revocation leaves trust.yaml signed by a retired or revoked artifact-seal key.
-The content must verify under its recorded signer from key history; tampered content is refused (recreate it
-with amc trust init, then amc trust enable-notary for NOTARY mode). Owner mode, unlocked vault.
+It prints the content digest and the effective config before re-signing; review them. The content must verify
+under its recorded signer from key history; tampered content, or a signer the operator trust context distrusts,
+is refused (recreate it with amc trust init, then amc trust enable-notary for NOTARY mode). Owner mode, unlocked vault.
 `)
-  .action(async (opts: { confirm?: boolean }) => {
+  .action(async (opts: { confirm?: boolean; acceptCompromisedSigner?: boolean }) => {
     const workspace = process.cwd();
     assertOwnerMode(workspace, "trust resign");
-    if (opts.confirm !== true) throw new Error("amc trust resign re-signs content its previous signer vouched for; review .amc/trust.yaml, then pass --confirm");
+    const review = describeTrustConfigResign(workspace);
+    console.log(`trust.yaml sha256: ${review.sha256}`);
+    console.log(`Signed by: ${review.signerKeyIds.join(", ")}`);
+    console.log(`Effective config:\n${JSON.stringify(review.config, null, 2)}`);
+    if (opts.confirm !== true) throw new Error("amc trust resign re-signs content its previous signer vouched for; review the content above, then pass --confirm");
+    // resignTrustConfig refuses a distrusted signer, and a key-compromise one without --accept-compromised-signer.
     const assertCurrent = () => {
       if (process.cwd() !== workspace) throw new Error("original trust re-sign workspace changed");
       assertOwnerMode(workspace, "trust resign");
     };
-    const resigned = await resignTrustConfig(workspace, assertCurrent);
+    const resigned = await resignTrustConfig(workspace, { acceptCompromisedSigner: opts.acceptCompromisedSigner === true, expectedSha256: review.sha256, beforePublish: assertCurrent });
     assertCurrent();
     console.log(chalk.green(`Trust config re-signed: ${resigned.path}`));
     console.log(`Signature: ${resigned.sigPath}`);

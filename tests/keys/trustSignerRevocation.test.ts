@@ -12,14 +12,22 @@ import { readAnchoredRevocationList, revocationListSha256 } from "../../src/keys
 import { readTransparencyEntries } from "../../src/transparency/logChain.js";
 import { ed25519KeyId } from "../../src/trust/trustList.js";
 import { defaultTrustConfig, loadTrustConfig, trustConfigPath, verifyTrustConfigSignature } from "../../src/trust/trustConfig.js";
-import { resignTrustConfig } from "../../src/trust/trustConfigPublication.js";
+import { describeTrustConfigResign, resignTrustConfig } from "../../src/trust/trustConfigPublication.js";
+import { distrustEntry } from "../trust/trustFixtures.js";
 import { sha256Hex } from "../../src/utils/hash.js";
 import { lockVault } from "../../src/vault/vault.js";
 import { initWorkspace } from "../../src/workspace.js";
 
+/** Operator distrust added on top of the shipped built-in list, for the distrust refusal. */
+const extraDistrust = vi.hoisted(() => [] as import("../../src/trust/trustList.js").DistrustEntry[]);
+vi.mock("../../src/trust/builtInDistrust.js", async importOriginal => {
+  const real = await importOriginal<typeof import("../../src/trust/builtInDistrust.js")>();
+  return { ...real, builtInDistrust: () => [...real.builtInDistrust(), ...extraDistrust] };
+});
+
 const PASS = "amc-test-passphrase";
 const roots: string[] = [];
-afterEach(() => { vi.unstubAllEnvs(); for (const root of roots.splice(0)) { lockVault(root); rmSync(root, { recursive: true, force: true }); } });
+afterEach(() => { extraDistrust.length = 0; vi.unstubAllEnvs(); for (const root of roots.splice(0)) { lockVault(root); rmSync(root, { recursive: true, force: true }); } });
 
 function rotated(): { root: string; oldKeyId: string } {
   const root = mkdtempSync(join(tmpdir(), "amc-trust-signer-revoke-"));
@@ -64,7 +72,7 @@ describe("revoking the key that signs trust.yaml (P0-37)", () => {
     const { root, oldKeyId } = rotated();
     expect(sigEnvelopeKeyId(root)).toBe(oldKeyId);
     const before = readFileSync(trustConfigPath(root));
-    const result = revokeKey(root, "artifact-seal", oldKeyId, "key-compromise");
+    const result = revokeKey(root, "artifact-seal", oldKeyId, "superseded");
     expect(result).toMatchObject({ sequence: 3, trustConfig: { status: "resigned" } });
     expectFullyRevoked(root, oldKeyId, 3);
     expect(readFileSync(trustConfigPath(root))).toEqual(before);
@@ -75,7 +83,7 @@ describe("revoking the key that signs trust.yaml (P0-37)", () => {
 
   it("does the same through the owner CLI's asynchronous revocation", async () => {
     const { root, oldKeyId } = rotated();
-    await expect(revokeKeyAsync(root, "artifact-seal", oldKeyId, "key-compromise", PASS)).resolves.toMatchObject({ sequence: 3, trustConfig: { status: "resigned" } });
+    await expect(revokeKeyAsync(root, "artifact-seal", oldKeyId, "superseded", PASS)).resolves.toMatchObject({ sequence: 3, trustConfig: { status: "resigned" } });
     expectFullyRevoked(root, oldKeyId, 3);
     expect(verifyTrustConfigSignature(root)).toMatchObject({ valid: true });
     expect(() => signDigestWithPolicy({ workspace: root, kind: "BUNDLE", digestHex: "a".repeat(64) })).not.toThrow();
@@ -99,6 +107,20 @@ describe("revoking the key that signs trust.yaml (P0-37)", () => {
     expect(() => signDigestWithPolicy({ workspace: root, kind: "BUNDLE", digestHex: "a".repeat(64) })).toThrow(/trust config signature invalid/);
   });
 
+  it.each([
+    ["sync", (root: string, keyId: string) => Promise.resolve(revokeKey(root, "artifact-seal", keyId, "key-compromise"))],
+    ["async", (root: string, keyId: string) => revokeKeyAsync(root, "artifact-seal", keyId, "key-compromise", PASS)]
+  ])("a key-compromise revocation completes but never re-signs what the compromised key signed (%s)", async (_name, revoke) => {
+    const { root, oldKeyId } = rotated();
+    const body = readFileSync(trustConfigPath(root)), sig = readFileSync(`${trustConfigPath(root)}.sig`);
+    await expect(revoke(root, oldKeyId)).resolves.toMatchObject({ sequence: 3, trustConfig: { status: "refused", reason: "signer-compromised",
+      recovery: "review .amc/trust.yaml, then amc trust resign --confirm --accept-compromised-signer" } });
+    expectFullyRevoked(root, oldKeyId, 3);
+    expect(readFileSync(trustConfigPath(root))).toEqual(body);
+    expect(readFileSync(`${trustConfigPath(root)}.sig`)).toEqual(sig);
+    expect(verifyTrustConfigSignature(root).valid).toBe(false);
+  });
+
   it("leaves a trust.yaml another current key signs untouched", () => {
     const { root, oldKeyId } = rotated();
     rotatePurposeKeys({ workspace: root, purposes: ["receipt"], passphrase: PASS });
@@ -113,7 +135,7 @@ describe("revoking the key that signs trust.yaml (P0-37)", () => {
 
 describe("amc trust resign (P0-37)", () => {
   /** A NOTARY trust.yaml signed by a key that is then rotated out and revoked (trust.yaml restored as it was). */
-  function revokedNotarySigner() {
+  function revokedNotarySigner(reason: "key-compromise" | "superseded" = "key-compromise") {
     const { root, oldKeyId } = rotated();
     // Sign NOTARY settings with the current key, rotate it out and revoke it. With NOTARY on disk every log seal would need
     // the notary, so the rotation and revocations run without a trust config; then the NOTARY pair is put back.
@@ -122,19 +144,40 @@ describe("amc trust resign (P0-37)", () => {
     rmSync(trustConfigPath(root)); rmSync(`${trustConfigPath(root)}.sig`);
     rotatePurposeKeys({ workspace: root, purposes: ["artifact-seal", "revocation-list", "config-signature"], passphrase: PASS });
     revokeKey(root, "artifact-seal", oldKeyId, "superseded");
-    revokeKey(root, "artifact-seal", signerKeyId, "key-compromise");
+    revokeKey(root, "artifact-seal", signerKeyId, reason);
     writeFileSync(trustConfigPath(root), body); writeFileSync(`${trustConfigPath(root)}.sig`, sig);
     expect(verifyTrustConfigSignature(root).valid).toBe(false);
-    return { root, config, body, sig };
+    return { root, config, body, sig, signerKeyId };
   }
 
-  it("re-signs a revoked signer's verified NOTARY trust.yaml in place, keeping its notary settings", async () => {
-    const { root, config, body } = revokedNotarySigner();
+  it("re-signs a retired-and-revoked signer's verified NOTARY trust.yaml in place, keeping its notary settings", async () => {
+    const { root, config, body } = revokedNotarySigner("superseded");
     await expect(resignTrustConfig(root)).resolves.toMatchObject({ mode: "NOTARY" });
     expect(readFileSync(trustConfigPath(root))).toEqual(body);
     expect(loadTrustConfig(root)).toMatchObject(config);
     expect(sigEnvelopeKeyId(root)).toBe(ed25519KeyId(getSigningPublicKeyPem(root, "artifact-seal")));
     expect(verifyTrustConfigSignature(root)).toMatchObject({ valid: true });
+  });
+
+  it("re-signs a key-compromise signer's content only with acceptCompromisedSigner, bound to the reviewed digest", async () => {
+    const { root, config, body, sig, signerKeyId } = revokedNotarySigner();
+    await expect(resignTrustConfig(root)).rejects.toThrow(/revoked as key-compromise.*--accept-compromised-signer/);
+    expect(readFileSync(`${trustConfigPath(root)}.sig`)).toEqual(sig);
+    const review = describeTrustConfigResign(root);
+    expect(review).toMatchObject({ sha256: sha256Hex(body), config, signerKeyIds: [signerKeyId], compromisedSignerKeyIds: [signerKeyId], distrustedSignerKeyIds: [] });
+    await expect(resignTrustConfig(root, { acceptCompromisedSigner: true, expectedSha256: "0".repeat(64) })).rejects.toThrow(/changed since it was reviewed/);
+    await expect(resignTrustConfig(root, { acceptCompromisedSigner: true, expectedSha256: review.sha256 })).resolves.toMatchObject({ mode: "NOTARY" });
+    expect(verifyTrustConfigSignature(root)).toMatchObject({ valid: true });
+    expect(loadTrustConfig(root)).toMatchObject(config);
+  });
+
+  it("never re-signs content whose signer the operator trust context distrusts, even when accepted", async () => {
+    const { root, sig, signerKeyId } = revokedNotarySigner();
+    extraDistrust.push(distrustEntry(signerKeyId));
+    expect(describeTrustConfigResign(root).distrustedSignerKeyIds).toEqual([signerKeyId]);
+    await expect(resignTrustConfig(root, { acceptCompromisedSigner: true })).rejects.toThrow(/operator trust context distrusts/);
+    expect(readFileSync(`${trustConfigPath(root)}.sig`)).toEqual(sig);
+    expect(verifyTrustConfigSignature(root).valid).toBe(false);
   });
 
   it("a revocation under a trust.yaml signed by an already-revoked key completes and names amc trust resign", () => {
@@ -145,7 +188,8 @@ describe("amc trust resign (P0-37)", () => {
     rotatePurposeKeys({ workspace: root, purposes: ["receipt", "ledger-row"], passphrase: PASS });
     writeFileSync(trustConfigPath(root), body); writeFileSync(`${trustConfigPath(root)}.sig`, sig);
     const before = readAnchoredRevocationList(keyRevocationLocation(root))!.list.sequence;
-    expect(revokeKey(root, "ledger-row", monitorKeyId, "superseded")).toMatchObject({ trustConfig: { status: "refused", recovery: "amc trust resign --confirm" } });
+    expect(revokeKey(root, "ledger-row", monitorKeyId, "superseded")).toMatchObject({ trustConfig: { status: "refused",
+      recovery: "review .amc/trust.yaml, then amc trust resign --confirm --accept-compromised-signer" } });
     expectFullyRevoked(root, monitorKeyId, before + 1);
     expect(readFileSync(`${trustConfigPath(root)}.sig`)).toEqual(sig);
   });
@@ -154,12 +198,12 @@ describe("amc trust resign (P0-37)", () => {
     const { root, body, sig } = revokedNotarySigner();
     const tampered = Buffer.from(body.toString("utf8").replace("requiredAttestationLevel: HARDWARE", "requiredAttestationLevel: SOFTWARE"));
     writeFileSync(trustConfigPath(root), tampered);
-    await expect(resignTrustConfig(root)).rejects.toThrow(/does not match its signature/);
+    await expect(resignTrustConfig(root, { acceptCompromisedSigner: true })).rejects.toThrow(/does not match its signature/);
     // Same digest, signature by no history key.
     const forged = JSON.parse(sig.toString("utf8")) as { signature: string; envelope: { sigB64: string } };
     forged.signature = forged.envelope.sigB64 = Buffer.alloc(64, 1).toString("base64");
     writeFileSync(trustConfigPath(root), body); writeFileSync(`${trustConfigPath(root)}.sig`, JSON.stringify(forged));
-    await expect(resignTrustConfig(root)).rejects.toThrow(/does not verify under any artifact-seal history key/);
+    await expect(resignTrustConfig(root, { acceptCompromisedSigner: true })).rejects.toThrow(/does not verify under any artifact-seal history key/);
     expect(readFileSync(`${trustConfigPath(root)}.sig`, "utf8")).toBe(JSON.stringify(forged));
     expect(verifyTrustConfigSignature(root).valid).toBe(false);
   });
@@ -168,19 +212,24 @@ describe("amc trust resign (P0-37)", () => {
     const { root, sig } = revokedNotarySigner();
     lockVault(root);
     vi.stubEnv("AMC_VAULT_PASSPHRASE", undefined); // nothing may unlock it on entry
-    await expect(resignTrustConfig(root)).rejects.toThrow(/vault|passphrase|locked/i);
+    await expect(resignTrustConfig(root, { acceptCompromisedSigner: true })).rejects.toThrow(/vault|passphrase|locked/i);
     expect(readFileSync(`${trustConfigPath(root)}.sig`)).toEqual(sig);
   });
 
-  it("the CLI requires --confirm and re-signs through dist/cli.js", () => {
-    const { root, config } = revokedNotarySigner();
+  it("the CLI shows the content, requires --confirm and --accept-compromised-signer, and re-signs through dist/cli.js", () => {
+    const { root, config, body } = revokedNotarySigner();
     const cli = (...args: string[]) => spawnSync(process.execPath, [resolve("dist/cli.js"), "trust", "resign", ...args],
       { cwd: root, env: { ...process.env, NO_COLOR: "1" }, encoding: "utf8", timeout: 120_000 });
     const refused = cli();
     expect(refused.status).not.toBe(0);
     expect(refused.stderr).toMatch(/--confirm/);
+    expect(refused.stdout).toContain(`trust.yaml sha256: ${sha256Hex(body)}`);
+    expect(refused.stdout).toContain(`"pinnedPubkeyFingerprint": "${"a".repeat(64)}"`);
+    const unaccepted = cli("--confirm");
+    expect(unaccepted.status).not.toBe(0);
+    expect(unaccepted.stderr).toMatch(/--accept-compromised-signer/);
     expect(verifyTrustConfigSignature(root).valid).toBe(false);
-    const done = cli("--confirm");
+    const done = cli("--confirm", "--accept-compromised-signer");
     expect(done.status, done.stderr).toBe(0);
     expect(done.stdout).toMatch(/Mode: NOTARY/);
     expect(verifyTrustConfigSignature(root).valid).toBe(true);

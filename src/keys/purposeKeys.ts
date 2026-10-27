@@ -453,7 +453,8 @@ export function listKeys(workspace: string): { generation: number | null; digest
  * verifiers learn of it when the trust-list owner publishes the revocation.
  *
  * P0-37: trust.yaml refuses a revoked signer. Before the list is staged, a trust.yaml the key signs that verifies under
- * the pre-revocation state is re-signed, unchanged, by the current artifact-seal key; one that does not verify is left
+ * the pre-revocation state is re-signed, unchanged, by the current artifact-seal key, except for a key-compromise
+ * revocation (the attacker may have signed it: it stays refused, signer-compromised); one that does not verify is left
  * refused, and `trustConfig.recovery` names the command. Neither outcome, nor any trust.yaml state, blocks the revocation:
  * its log append never depends on trust.yaml verifying (logRevocationSequence).
  */
@@ -476,7 +477,7 @@ function assertKeyRevocationRequest(workspace: string, purpose: KeyPurpose, keyI
 export function revokeKey(workspace: string, purpose: KeyPurpose, keyId: string, reason: KeyRevocationReason,
   passphrase: string | undefined = process.env.AMC_VAULT_PASSPHRASE): { listId: string; sequence: number; trustConfig: TrustConfigRevocationOutcome } {
   const local = assertKeyRevocationRequest(workspace, purpose, keyId, reason, passphrase);
-  const trustConfig = resignTrustConfigForRevocationSync(workspace, keyId);
+  const trustConfig = resignTrustConfigForRevocationSync(workspace, keyId, reason);
   return withControlFileLock({ root: vaultPaths(workspace).keysDir, name: "key-revocations", operation: () => {
     const location = keyRevocationLocation(workspace);
     recoverPendingRevocationList(location);
@@ -497,7 +498,7 @@ export function revokeKey(workspace: string, purpose: KeyPurpose, keyId: string,
 export async function revokeKeyAsync(workspace: string, purpose: KeyPurpose, keyId: string, reason: KeyRevocationReason,
   passphrase: string | undefined = process.env.AMC_VAULT_PASSPHRASE, opts: { provider?: KeyProvider } = {}): Promise<{ listId: string; sequence: number; trustConfig: TrustConfigRevocationOutcome }> {
   const local = assertKeyRevocationRequest(workspace, purpose, keyId, reason, passphrase);
-  const trustConfig = await resignTrustConfigForRevocation(workspace, keyId);
+  const trustConfig = await resignTrustConfigForRevocation(workspace, keyId, reason);
   const locked = <T>(operation: () => T): T => withControlFileLock({ root: vaultPaths(workspace).keysDir, name: "key-revocations", operation });
   for (let attempt = 0; attempt < 3; ++attempt) {
     const plan = locked(() => {

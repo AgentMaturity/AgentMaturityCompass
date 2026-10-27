@@ -133,11 +133,13 @@ describe("purpose keys and vault payload v2 (P1-08)", () => {
     const old = getSigningPublicKeyPem(root, "artifact-seal");
     expect(() => revokeKey(root, "artifact-seal", ed25519KeyId(old)!, "superseded")).toThrow(/rotate it first/);
     rotatePurposeKeys({ workspace: root, purposes: ["artifact-seal", "revocation-list", "config-signature"], passphrase: PASS });
-    // trust.yaml still carries the retired key's signature; the revocation re-signs it with the current key (P0-37).
+    // trust.yaml still carries the retired key's signature. A key-compromise revocation never re-signs what that key
+    // signed: it completes and leaves trust.yaml refused for review (P0-37).
     // Sequence 1 at creation, 2 when the rotated revocation-list key re-signed it, 3 for this revocation.
-    expect(revokeKey(root, "artifact-seal", ed25519KeyId(old)!, "key-compromise")).toMatchObject({ listId: "keys:default", sequence: 3 });
+    expect(revokeKey(root, "artifact-seal", ed25519KeyId(old)!, "key-compromise")).toMatchObject({ listId: "keys:default", sequence: 3,
+      trustConfig: { status: "refused", reason: "signer-compromised" } });
     expect(admitKey({ publicKeyPem: old, purpose: "artifact-seal", signature: "s", context: workspaceSelfTrust(root) }).status).toBe("distrusted");
-    expect(verifyTrustConfigSignature(root).valid).toBe(true);
+    expect(verifyTrustConfigSignature(root).valid).toBe(false);
     expect(() => revokeKey(root, "artifact-seal", "0".repeat(64), "superseded")).toThrow(/not in the artifact-seal key history/);
   });
 

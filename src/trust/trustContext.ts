@@ -129,7 +129,7 @@ function trustListMarks(listId: string, roots: readonly string[], opts: { amcHom
  * The operator's distrust: the built-in list, every AMC home trust list's distrust entries, and its key-compromise
  * revocations, which refuse a key for every purpose and time. Distrust beats every pin, workspace-self pins included.
  */
-function operatorDistrust(now: Date): DistrustEntry[] {
+export function operatorDistrust(now: Date): DistrustEntry[] {
   const operator = loadTrustContext({ now });
   const compromised = operator.lists.flatMap(list => list.entries.filter(entry => entry.revocationReason === "key-compromise")
     .map((entry): DistrustEntry => ({ keyId: entry.keyId, distrustedFrom: null, reason: "key-compromise",

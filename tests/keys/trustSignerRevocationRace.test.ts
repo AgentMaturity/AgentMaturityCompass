@@ -31,8 +31,8 @@ function rotated() {
   return { root, oldKeyId };
 }
 const revokers = [
-  ["sync", (root: string, keyId: string) => Promise.resolve(revokeKey(root, "artifact-seal", keyId, "key-compromise"))],
-  ["async", (root: string, keyId: string) => revokeKeyAsync(root, "artifact-seal", keyId, "key-compromise", PASS)]
+  ["sync", (root: string, keyId: string) => Promise.resolve(revokeKey(root, "artifact-seal", keyId, "superseded"))],
+  ["async", (root: string, keyId: string) => revokeKeyAsync(root, "artifact-seal", keyId, "superseded", PASS)]
 ] as const;
 
 describe("the revocation re-signs only the pair it verified (P0-37 race)", () => {
