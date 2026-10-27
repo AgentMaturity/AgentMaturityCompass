@@ -1394,7 +1394,7 @@ async function renderHome() {
         <div class="studio-kicker">Desktop app</div>
         <h3>Native macOS shell, same AMC evidence-first surface.</h3>
         <p class="muted">
-          The macOS app now starts local demo-mode Studio and renders this Console inside a native WebKit window. Windows still launches the same local URL in the system browser. Both keep the same flow: 244 default questions, 264 lifecycle questions, <!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> registered assurance packs, 41 Industry Packs, and 1,260 CLI paths.
+          The macOS app now starts local demo-mode Studio and renders this Console inside a native WebKit window. Windows still launches the same local URL in the system browser. Both keep the same flow: 244 default questions, 264 lifecycle questions, <!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> registered assurance packs, 41 Industry Packs, and 1,262 CLI paths.
         </p>
       </div>
       <div class="row wrap">

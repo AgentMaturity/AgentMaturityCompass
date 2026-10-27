@@ -53,6 +53,7 @@ import { handleMarketplaceRoute } from '../marketplace/marketplaceRouter.js';
 import { handleDomainProofRoute } from './domainProofRouter.js';
 import { handleNativeTasksRoute, type NativeTaskApiContext } from './nativeTasksRouter.js';
 import { handleOperatorRoute } from './operatorRouter.js';
+import { handleLifecycleRoute } from './lifecycleRouter.js';
 import { handleA4Route } from '../a4/a4Router.js';
 
 export type ApiAuthPolicy = 'public' | 'protected';
@@ -137,6 +138,15 @@ export const API_ROUTE_REGISTRY: readonly ApiRouteDefinition[] = [
     auth: 'protected',
     validationPolicy: 'schema-validated',
     handler: handleOperatorRoute
+  },
+  {
+    id: 'lifecycle',
+    description: 'Governed agent lifecycle: state, transitions, reassessments and the OWNER transition (P2-23)',
+    prefixes: ['/api/v1/lifecycle/agents'],
+    methods: ['GET', 'POST'],
+    auth: 'protected',
+    validationPolicy: 'schema-validated',
+    handler: handleLifecycleRoute
   },
   {
     id: 'score',

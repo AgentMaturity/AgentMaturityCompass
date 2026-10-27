@@ -5,6 +5,7 @@ import type { ApprovalRule, ParamValue } from "../../catalog/compiler/types.js";
 import { loadVerifiedToolsConfigSnapshot, type VerifiedToolsConfigSnapshot } from "../../toolhub/toolhubValidators.js";
 import { matchingBreakGlass } from "../../governor/breakGlass.js";
 import { matchingScopedExceptions } from "../../governor/scopedExceptions.js";
+import { LIFECYCLE_CONTROL_ID } from "../../lifecycle/governanceLifecycle.js";
 import type { ActionClass } from "../../types.js";
 import { RUN_CODE_TOOL } from "../toolPipeline.js";
 import type { ToolExecution, ToolGuard } from "../toolTypes.js";
@@ -169,6 +170,7 @@ export function compiledPolicyFacts(policy: ActiveCompiledPolicy): CompiledPolic
     digest: policy.runtimePolicy.policyDigest.replace(/^sha256:/, ""),
     revision: policy.revision,
     deployment: policy.deployment,
+    lifecycleEnforced: policy.controls.some((c) => c.controlId === LIFECYCLE_CONTROL_ID),
     // The rule that admitted the call: its class's approval rule first, then the compiled guards every call passes.
     controlFor: (actionClass) => {
       const id = [...(policy.runtimePolicy.approvals[actionClass]?.controlIds ?? []), ...policy.runtimePolicy.toolPipeline.guards.flatMap((g) => g.controlIds)][0];

@@ -666,7 +666,9 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc lessons-promote` | Promote a correction to a reusable lesson | - | - |
 | `amc lifecycle` | Agent lifecycle responsibility and governance mapping | - | - |
 | `amc lifecycle advance` | Advance lifecycle stage after governance gate confirmation | `--agent <agentId>`<br>`--to <stage>`<br>`--actor <actor>`<br>`--actor-role <role>`<br>`--controls <list>`<br>`--note <text>`<br>`--json` | - |
+| `amc lifecycle reassessments` | Show a governed agent's lifecycle state and its reassessment records (JSON) | `--agent <agentId>` | - |
 | `amc lifecycle status` | Show lifecycle stage, accountability matrix, governance gates, and transition trail | `--agent <agentId>`<br>`--json` | - |
+| `amc lifecycle transition` | Move a governed agent between proposed, approved, active, suspended and retired (signed, approval-bound; JSON) | `--to <state>`<br>`--session-token-file <file>`<br>`--agent <agentId>`<br>`--request-approval`<br>`--approval <approvalRequestId>`<br>`--manifest <file>`<br>`--note <text>`<br>`--accept-outcome-unknown <note>` | - |
 | `amc lineage-claim` | Show full governance lineage for a specific claim | - | - |
 | `amc lineage-init` | Initialize governance lineage tables | - | - |
 | `amc lineage-policy-intents` | List all policy change intents for an agent | `--agent <agentId>` | - |

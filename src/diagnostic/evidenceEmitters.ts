@@ -90,6 +90,7 @@ export const NON_MATURITY_AUDIT_MODULES: ReadonlyArray<{ module: string; why: st
   { module: "src/ingest/ingest.ts", why: "ingest bookkeeping; imported rows are self-reported" },
   { module: "src/integrations/integrationDispatcher.ts", why: "outbound integration dispatch bookkeeping" },
   { module: "src/integrations/noCodeWebhookAdapters.ts", why: "webhook ingestion; external reports are self-reported" },
+  { module: "src/lifecycle/governanceLifecycle.ts", why: "agent lifecycle transitions, observed version manifests, reassessments and admission warnings (P2-23): AMC governance bookkeeping, never maturity evidence" },
   { module: "src/llm/adapter/llmRuntime.ts", why: "protected-data admission records (P2-02): aggregate classes and counts only, AMC enforcement bookkeeping, never maturity evidence" },
   { module: "src/operator/reviewTiming.ts", why: "opt-in reviewer timing (P2-22): pseudonymous, self-reported study data about reviewers, never about the agent" },
   { module: "src/ops/backup/backupEngine.ts", why: "AMC backup operations" },

@@ -20,7 +20,7 @@ import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 
-export type BoundRecordKind = "scoped-exception" | "break-glass" | "review-record";
+export type BoundRecordKind = "scoped-exception" | "break-glass" | "review-record" | "lifecycle-transition";
 
 export type { BoundApproval };
 

@@ -20,6 +20,7 @@ import { ACTION_CLASSES } from "../governor/actionCatalog.js";
 import { matchingBreakGlass } from "../governor/breakGlass.js";
 import { matchingScopedExceptions, type DeviationCall } from "../governor/scopedExceptions.js";
 import type { LeasePayload } from "../leases/leaseSchema.js";
+import { lifecycleAdmission } from "../lifecycle/reassessment.js";
 import type { EffectDeclaration } from "../toolhub/toolsSchema.js";
 import { revokedLeaseIdSet } from "../leases/leaseStore.js";
 import { verifyLeaseToken } from "../leases/leaseVerifier.js";
@@ -52,6 +53,8 @@ export interface CompiledPolicyFacts {
   readonly revision: number;
   /** The tenant and deployment its profile names (P1-78); null when the plan names none. */
   readonly deployment: { readonly tenantId: string; readonly deploymentId: string } | null;
+  /** P2-23: the plan carries the lifecycle control, so a non-active agent is denied rather than warned about. */
+  readonly lifecycleEnforced?: boolean;
   controlFor(actionClass: ActionClass): { readonly controlId: string; readonly controlVersion: string | null } | null;
 }
 
@@ -273,6 +276,9 @@ function deviationFailures(record: AuthorizationRecordV1, execution: ToolExecuti
 
 /** Build the record for one call. Issued and expiry times come from AMC's clock, never from a caller. */
 export function bindAuthorization(execution: ToolExecution, ctx: AuthorizationContext = {}): BindResult {
+  // P2-23: a suspended, retired or unapproved agent takes no consequential action (advisory plans: a warning row instead).
+  const lifecycle = lifecycleAdmission(execution.workspace, execution.agentId, ctx.compiledPolicy?.lifecycleEnforced === true);
+  if (!lifecycle.ok) return failed("agent_not_active", lifecycle.reason);
   const facts = actionFacts(execution, ctx.compiledPolicy);
   if (!facts.ok) return facts;
   const approvals: AuthorizationRecordV1["authority"]["approvals"][number][] = [];
@@ -408,6 +414,7 @@ export function recheckAuthorization(record: AuthorizationRecordV1, execution: T
   } catch {
     add("authority_store_unavailable");
   }
+  if (!lifecycleAdmission(execution.workspace, execution.agentId, ctx.compiledPolicy?.lifecycleEnforced === true, { record: false }).ok) add("agent_not_active");
   if (Date.now() >= Date.parse(record.expiresAt)) add("capability_expired");
   // A child can only narrow: its class must be in scope, and a child must name the delegation that made it.
   if (!record.delegation.allowedActionClasses.includes(record.action.actionClass)

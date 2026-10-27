@@ -72,6 +72,8 @@ import type { ActionClass } from "../types.js";
 import { createDriverRunner } from "../agent/subagentRunner.js";
 import { LeasePrincipalRefused } from "../leases/leasePrincipal.js";
 import { planRequiresPrincipal } from "../tools/guards/compiledPolicyGuard.js";
+import { admitNativeSession, refuseRetired } from "../lifecycle/reassessment.js";
+import { nativeSessionManifest } from "../lifecycle/versionManifest.js";
 import { runDueSchedules, type ScheduleRunResult } from "../autonomy/scheduleRunner.js";
 import { assertNativeScheduleAdmission } from "../autonomy/scheduleService.js";
 import type { SubagentCapability } from "../agent/delegateTool.js";
@@ -459,6 +461,7 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
     compositionDigest: compositionDigestOf(options, profile),
     policyDigest: policyDigestOf(options)
   };
+  refuseRetired(options.workspace, options.agentId); // P2-23: before any session row
   let session: SessionService;
   let resumed: ResumeReport | null = null;
   let parent: SessionLineage | null = null;
@@ -516,7 +519,12 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
     // Rendered BEFORE the loop is composed, so an unknown `{{variable}}` throws
     // here — with no turn started, no request sent, and a session that closes
     // cleanly in the `finally`. A prompt with a hole in it never reaches a model.
-    const systemPromptRef = session.recordSystemPrompt(prompt.render());
+    const systemPromptText = prompt.render();
+    const systemPromptRef = session.recordSystemPrompt(systemPromptText);
+    // P2-23: a governed agent's reassessment triggers run on the rendered prompt, before the first request.
+    admitNativeSession({ workspace: options.workspace, agentId: options.agentId, manifest: () => nativeSessionManifest({ workspace: options.workspace,
+      providerId: options.route.providerId, model: options.route.model, systemPrompt: systemPromptText, ...identity,
+      tools: options.tools === undefined ? "none" : "workspace" }) });
 
     const gate = options.approvalGate;
     let approval: ApprovalSeamService | null = null;
