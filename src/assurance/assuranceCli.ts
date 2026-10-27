@@ -24,33 +24,8 @@ import { assurancePolicyPath, initAssurancePolicy, verifyAssurancePolicySignatur
 import { verifyAssuranceCertificateFile, verifyAssuranceWorkspace } from "./assuranceVerifier.js";
 import type { TrustContext } from "../trust/trustContext.js";
 
-export function assuranceInitCli(workspace: string) {
-  return initAssurancePolicy(workspace);
-}
-
 export function assuranceVerifyPolicyCli(workspace: string) {
   return verifyAssurancePolicySignature(workspace);
-}
-
-export function assurancePrintPolicyCli(workspace: string) {
-  return assurancePolicyForApi(workspace).policy;
-}
-
-export function assuranceApplyPolicyCli(params: {
-  workspace: string;
-  file: string;
-}) {
-  const raw = readUtf8(params.file);
-  let policy: unknown;
-  try {
-    policy = YAML.parse(raw) as unknown;
-  } catch {
-    policy = JSON.parse(raw) as unknown;
-  }
-  return assurancePolicyApplyForApi({
-    workspace: params.workspace,
-    policy
-  });
 }
 
 export async function assuranceRunCli(params: {
@@ -106,13 +81,6 @@ export function assuranceSchedulerStatusCli(workspace: string) {
 
 export async function assuranceSchedulerRunNowCli(workspace: string, options: OrgPairsOptions = {}) {
   return assuranceSchedulerRunNowForApi({ workspace }, options);
-}
-
-export function assuranceSchedulerEnableCli(params: {
-  workspace: string;
-  enabled: boolean;
-}) {
-  return assuranceSchedulerEnableForApi(params);
 }
 
 export function assuranceWaiverRequestCli(params: {

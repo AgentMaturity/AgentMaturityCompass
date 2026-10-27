@@ -1,0 +1,80 @@
+[
+ {
+  "case": "Exception for control C, payments.refund, max 100.00, in window",
+  "expected": "80.00 call allowed; record lists the exception id",
+  "test": "tests/governor/scopedExceptions.test.ts: an exception for C, refund, max 100.00, in window",
+  "result": "pass"
+ },
+ {
+  "case": "Same exception, call for 150.00",
+  "expected": "denied by the control (L342)",
+  "test": "scopedExceptions: the same exception does not cover 150.00",
+  "result": "pass"
+ },
+ {
+  "case": "Exception copied from another workspace or with a broken signature",
+  "expected": "ignored; call denied (L348)",
+  "test": "scopedExceptions: an exception copied from another workspace, or with a broken signature, is ignored",
+  "result": "pass"
+ },
+ {
+  "case": "Exception revoked, or window ended",
+  "expected": "next call denied",
+  "test": "scopedExceptions: a revoked exception, or one whose window ended; a revocation between the guard and the recheck",
+  "result": "pass"
+ },
+ {
+  "case": "Break-glass covering FINANCIAL while a signed FINANCIAL freeze is active",
+  "expected": "denied action_class_frozen",
+  "test": "tests/governor/breakGlass.test.ts: covering FINANCIAL while a signed freeze",
+  "result": "pass"
+ },
+ {
+  "case": "Break-glass without a signing key",
+  "expected": "activation refused",
+  "test": "breakGlass: without a signing key activation is refused",
+  "result": "pass"
+ },
+ {
+  "case": "Second break-glass before the first one's review",
+  "expected": "refused previous_break_glass_unreviewed",
+  "test": "breakGlass: a second break-glass before the first one's review",
+  "result": "pass"
+ },
+ {
+  "case": "Legacy override file with signature unsigned (either store)",
+  "expected": "reported invalid, never honoured",
+  "test": "breakGlass: legacy override files ... in either store",
+  "result": "pass"
+ },
+ {
+  "case": "Signed receipt for an agent summary; reviewer rejects with material_fact_omitted",
+  "expected": "status rejected; never passes (L346)",
+  "test": "tests/approvals/reviewRecords.test.ts: a valid signed receipt ... is rejected",
+  "result": "pass"
+ },
+ {
+  "case": "Review of digest A after the artifact changed to B",
+  "expected": "pending (L348 stale)",
+  "test": "reviewRecords: a review of digest A does not count after the artifact changed to B",
+  "result": "pass"
+ },
+ {
+  "case": "Approved and rejected reviews of the same digest",
+  "expected": "rejected",
+  "test": "reviewRecords: approved and rejected reviews of the same digest give rejected",
+  "result": "pass"
+ },
+ {
+  "case": "Control awaiting legal review with an approved exception",
+  "expected": "engineering fixture runs; Review stays pending (L345)",
+  "test": "scopedExceptions: a control awaiting legal review",
+  "result": "pass"
+ },
+ {
+  "case": "Reviewer equals requester",
+  "expected": "refused at creation",
+  "test": "reviewRecords: a reviewer equal to the requester is refused at creation",
+  "result": "pass"
+ }
+]

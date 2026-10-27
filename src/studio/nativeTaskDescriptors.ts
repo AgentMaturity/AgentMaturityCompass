@@ -25,6 +25,8 @@ export const taskDescriptorSchema = z.object({
   archivedAt: z.number().int().nonnegative().optional(),
   // P1-67: the id (never the token) of the lease minted for the latest runtime under a compiled plan; omitted likewise.
   leaseId: z.string().regex(/^lease_[a-f0-9]{32}$/).optional(),
+  // P2-13: the parent task and session a forked task's lineage names; omitted likewise.
+  forkedFrom: z.object({ taskId: z.string().regex(/^[a-f0-9]{64}$/), sessionId: z.string().min(1).max(200) }).strict().optional(),
   submissions: z.array(z.object({ clientRequestId: id, bodyHash: z.string().regex(/^[a-f0-9]{64}$/), revision: z.number().int().min(1).max(32) }).strict()).min(1).max(32)
 }).strict().superRefine((value, ctx) => {
   if (value.submissions.length !== value.revision || value.submissions.some((s, i) => s.revision !== i + 1)

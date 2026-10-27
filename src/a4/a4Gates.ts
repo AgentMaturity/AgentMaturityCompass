@@ -7,7 +7,7 @@
  */
 import { randomBytes } from "node:crypto";
 import { a4RecordAvailable, A4TransitionPublicationError, type A4TransitionAttempt } from "./a4TransitionSigning.js";
-export { requestGate, requestGateAsync } from "./a4GateRequest.js";
+export { requestGateAsync } from "./a4GateRequest.js";
 import { readFileSync } from "node:fs";
 import { hostname } from "node:os";
 import { join } from "node:path";

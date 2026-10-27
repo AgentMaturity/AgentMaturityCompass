@@ -80,7 +80,7 @@ export interface AgentScaffoldResult {
 }
 export interface AgentScaffoldOptions { beforePublish?: () => void }
 /** A returned native write is recorded before acknowledgment; failures do not roll back earlier members. */
-export class AgentScaffoldPublicationError extends Error {
+class AgentScaffoldPublicationError extends Error {
   readonly code = "AGENT_SCAFFOLD_PARTIAL";
   constructor(readonly publishedPaths: readonly string[], readonly createdDirectories: readonly string[], readonly attemptedPath: string | null, cause: unknown) {
     super("agent scaffold publication is incomplete; inspect committed members and directories before retrying", { cause });

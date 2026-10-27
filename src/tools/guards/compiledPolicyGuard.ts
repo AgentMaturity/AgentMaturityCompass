@@ -3,6 +3,8 @@ import { loadVerifiedApprovalPolicy, approvalRuleForAction } from "../../approva
 import { activeControlPlanHead, loadActiveCompiledPolicy, type ActiveCompiledPolicy } from "../../catalog/compiler/activate.js";
 import type { ApprovalRule, ParamValue } from "../../catalog/compiler/types.js";
 import { loadVerifiedToolsConfigSnapshot, type VerifiedToolsConfigSnapshot } from "../../toolhub/toolhubValidators.js";
+import { matchingBreakGlass } from "../../governor/breakGlass.js";
+import { matchingScopedExceptions } from "../../governor/scopedExceptions.js";
 import type { ActionClass } from "../../types.js";
 import { RUN_CODE_TOOL } from "../toolPipeline.js";
 import type { ToolExecution, ToolGuard } from "../toolTypes.js";
@@ -97,6 +99,29 @@ export function compiledPolicyShows(policy: ActiveCompiledPolicy, name: string):
   return name === RUN_CODE_TOOL || policy.runtimePolicy.toolPipeline.visibleTools.includes(name);
 }
 
+/**
+ * P2-24: the controls this call deviates from. Only a scoped exception or break-glass record the bound authorization
+ * record names counts, re-read and re-verified now (signature, workspace, approval, revocation, window, scope, amount),
+ * and an exception only for the control version it was granted for. Any read failure deviates from nothing.
+ */
+function deviatedControls(policy: ActiveCompiledPolicy, execution: ToolExecution): ReadonlySet<string> {
+  const record = execution.authorization?.record;
+  if (!record || (record.authority.exceptions.length === 0 && record.authority.breakGlassId === undefined)) return new Set();
+  const call = { workspace: execution.workspace, agentId: execution.agentId, toolName: record.action.toolName, actionClass: record.action.actionClass,
+    amount: record.bindings.amount, resourceId: record.bindings.resourceId };
+  const named = new Set(record.authority.exceptions.map((exception) => exception.exceptionId));
+  const version = (id: string): string | undefined => policy.controls.find((c) => c.controlId === id)?.controlVersion;
+  try {
+    return new Set([
+      ...matchingScopedExceptions(call).filter((e) => named.has(e.exceptionId) && version(e.control.controlId) === e.control.controlVersion)
+        .map((e) => e.control.controlId),
+      ...matchingBreakGlass(call).filter((b) => b.breakGlassId === record.authority.breakGlassId).flatMap((b) => b.scope.controlIds)
+    ]);
+  } catch {
+    return new Set();
+  }
+}
+
 /** Why the pinned policy denies this call, or undefined. */
 export function compiledPolicyDenial(policy: ActiveCompiledPolicy, workspace: string, execution: ToolExecution,
   readTools: ToolsSnapshotRead = () => loadVerifiedToolsConfigSnapshot(workspace)): string | undefined {
@@ -107,13 +132,17 @@ export function compiledPolicyDenial(policy: ActiveCompiledPolicy, workspace: st
   if (!compiledPolicyShows(policy, execution.name)) {
     return `compiled policy denied this call (toolPipeline.visibleTools): "${execution.name}" is not a visible tool`;
   }
+  // A control is waived only when every control a denial names is covered; the checks above name no control and never are.
+  let deviated: ReadonlySet<string> | null = null;
+  const waived = (controlIds: readonly string[]): boolean =>
+    controlIds.length > 0 && controlIds.every((id) => (deviated ??= deviatedControls(policy, execution)).has(id));
   for (const guard of pipeline.guards) {
     const why = guard.id === "identity-binding" ? identityDenial(guard.params, execution) : `guard ${guard.id} is not implemented by this pipeline`;
-    if (why) return deny(guard.controlIds, why);
+    if (why && !waived(guard.controlIds)) return deny(guard.controlIds, why);
   }
   const rule = policy.runtimePolicy.approvals[execution.actionClass];
   const why = rule ? approvalDenial(workspace, execution.actionClass, rule) : null;
-  return why && rule ? deny(rule.controlIds, why) : undefined;
+  return why && rule && !waived(rule.controlIds) ? deny(rule.controlIds, why) : undefined;
 }
 
 /**

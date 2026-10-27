@@ -19,7 +19,7 @@ import { blobPrefix, readBlobAuthorityState, sameBlobSnapshot, snapshotBlobIndex
 import { BLOB_AUTHORITY_CURRENT, BLOB_CHILD_FILE, BLOB_AUTHORITY_MAX_HOURS, blobAuthorityArchive, blobAuthorityDigest, blobAuthorityIssuer,
   blobChildBytes, encodeBlobIndexAuthority, issueBlobIndexAuthority } from "./blobIndexAuthority.js";
 
-export class BlobAuthorityCommittedError extends Error {
+class BlobAuthorityCommittedError extends Error {
   readonly committed = true;
   constructor(readonly generation: number, readonly phase: "child-open" | "anchor", cause: unknown) {
     super("blob-index authority committed but finalization did not complete; inspect the committed generation before retrying", { cause }); this.name = "BlobAuthorityCommittedError";

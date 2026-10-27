@@ -1,5 +1,5 @@
 // Actual compiled CLI and package-root SDK. Requires root's normal build; no SDK/cloud/native provider import.
-import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, realpathSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -15,7 +15,8 @@ function fixture() {
   const root = mkdtempSync(join(tmpdir(), "amc-maps-compiled-")), workspace = join(root, "workspace"); roots.push({ root, workspace });
   vi.stubEnv("AMC_HOME", join(root, "home")); vi.stubEnv("AMC_VAULT_PASSPHRASE", PASS); vi.stubEnv("AMC_NO_SIGN", "0");
   vi.stubEnv("AMC_EXPECTED_MONITOR_FINGERPRINT", undefined); vi.stubEnv("AMC_SESSION_STORE", "sqlite");
-  initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" }); return { root, workspace, path: join(workspace, ".amc", "compliance-maps.yaml") };
+  // The child's process.cwd() is the real path (macOS tmpdir is under the /var -> /private/var symlink).
+  initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" }); return { root, workspace, path: join(realpathSync(workspace), ".amc", "compliance-maps.yaml") };
 }
 test.skipIf(process.platform === "win32")("actual maintained compliance init command awaits a real file provider and reports its published paths", async () => {
   const f = fixture(), child = spawnOwnedNode([resolve("dist/cli.js"), "compliance", "init"], { cwd: f.workspace, env: { ...process.env, NO_COLOR: "1" } });

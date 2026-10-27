@@ -19,7 +19,7 @@ export function assertPromptFilesCurrent(before: PromptFiles): void {
     if (old.mode !== now.mode || old.identity !== now.identity || (old.bytes === null ? now.bytes !== null : now.bytes === null || !old.bytes.equals(now.bytes)))
       throw new Error("selected prompt inputs or destinations changed while signing; retry"); }
 }
-export function withPromptPublication<T>(workspace: string, operation: () => T): T {
+function withPromptPublication<T>(workspace: string, operation: () => T): T {
   return withControlFileLock({ root: join(workspace, ".amc"), name: "prompt-pack-publication", operation });
 }
 export class PromptPublicationError extends Error {

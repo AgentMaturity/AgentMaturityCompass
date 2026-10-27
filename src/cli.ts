@@ -2001,7 +2001,12 @@ function normalizeCliErrorMessage(error: unknown): string {
       "  amc up"
     ].join("\n");
   }
-  return message;
+  // Publication errors wrap the actual refusal; show its cause chain so the reason is not hidden.
+  const causes: string[] = [], seen = new Set<unknown>();
+  for (let cause = error instanceof Error ? error.cause : undefined; cause instanceof Error && !seen.has(cause) && causes.length < 8; cause = cause.cause) {
+    seen.add(cause); causes.push(`  cause: ${cause.message}`);
+  }
+  return [message, ...causes].join("\n");
 }
 
 // Global crash handlers — catch unhandled promise rejections and exceptions
@@ -2218,11 +2223,12 @@ program
   .option("--minimal", "Startup-friendly setup without vault prompt or immediate full score", false)
   .option("--coding", "Starter profile: signed coding tools, a contained shell without network, firewall warn (P1-40)")
   .option("--regulated", "Starter profile: deny-by-default egress, firewall block, approvals on, a signed Layer 0 plan (P1-40)")
-  .action(async (opts: { trustBoundary?: "isolated" | "shared"; profile: "dev" | "ci" | "prod"; force: boolean; skipVault: boolean; minimal: boolean; coding?: boolean; regulated?: boolean }) => {
+  .option("--web-allow-host <host>", "--coding only: also grant web_fetch and web_search this exact host or origin in the signed tools policy; repeatable (P2-13)", (v: string, p: string[] = []) => [...p, v])
+  .action(async (opts: { trustBoundary?: "isolated" | "shared"; profile: "dev" | "ci" | "prod"; force: boolean; skipVault: boolean; minimal: boolean; coding?: boolean; regulated?: boolean; webAllowHost?: string[] }) => {
     const { starterProfileFlag, runStarterInit } = await import("./setup/starterProfiles.js");
     try {
       const starter = starterProfileFlag(opts);
-      if (starter) { await runStarterInit(process.cwd(), starter, opts.force); return; }
+      if (starter) { await runStarterInit(process.cwd(), starter, opts.force, opts.webAllowHost); return; }
     } catch (error) { console.error(chalk.red(toErrorMessage(error))); process.exit(1); }
     // Force mode: delete existing .amc directory before re-init
     if (opts.force) {
@@ -15953,23 +15959,19 @@ program
 
 program
   .command("emergency-override")
-  .description("Activate an emergency policy override with strict TTL")
+  .description("Request a signed break-glass record (as governor-override); after one bound approval rerun with --activate")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
-  .requiredOption("--reason <reason>", "reason for the emergency override")
-  .requiredOption("--action <desc>", "description of what the override allows")
-  .option("--ttl <ms>", "TTL in milliseconds", "3600000")
-  .action(async (opts: { agent?: string; reason: string; action: string; ttl: string }) => {
-    const { activateEmergencyOverrideAsync } = await import("./governor/policyCanary.js");
-    const agentId = opts.agent ?? activeAgent(program) ?? "default";
-    const override = await activateEmergencyOverrideAsync({
-      agentId,
-      reason: opts.reason,
-      actionDescription: opts.action,
-      ttlMs: parseInt(opts.ttl, 10),
-    }, process.cwd());
-    console.log(chalk.yellow(`Emergency override activated: ${override.overrideId}`));
-    console.log(`  Expires: ${new Date(override.expiresTs).toISOString()}`);
-    console.log(chalk.red("  ⚠  Postmortem required after expiry."));
+  .option("--reason <reason>", "reason for the break-glass (>= 10 chars)")
+  .option("--action <desc>", "description of what the override allows (recorded in the reason)")
+  .option("--ttl <ms>", "TTL in milliseconds, at most 24h", "3600000")
+  .option("--tools <names>", "comma-separated tool names it covers").option("--action-classes <classes>", "comma-separated action classes it covers")
+  .option("--controls <ids>", "comma-separated control ids it deviates from").option("--activate <breakGlassId>", "activate this requested break-glass")
+  .option("--approval <approvalRequestId>", "the approval request holding its bound decision")
+  .option("--session-token-file <file>", "the requester's amc approvals login token (required to request)")
+  .action(async (opts: { agent?: string; reason?: string; action?: string; ttl: string } & Record<string, string | undefined>) => {
+    const { breakGlassCommand } = await import("./governor/breakGlassCommand.js");
+    console.log(chalk.yellow(await breakGlassCommand(process.cwd(), { ...opts, agent: opts.agent ?? activeAgent(program) ?? "default",
+      reason: [opts.reason, opts.action].filter(Boolean).join(" — "), ttlMs: Number(opts.ttl) })));
   });
 
 program
@@ -19681,24 +19683,17 @@ program
 // ── Emergency Override CLI ──────────────────────────────────────────────
 program
   .command("governor-override")
-  .description("Activate an emergency governance override with TTL")
+  .description("Request a signed break-glass record; after one bound approval rerun with --activate and --approval")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
-  .requiredOption("--reason <reason>", "reason for the emergency override (>= 10 chars)")
-  .option("--ttl <ttl>", "TTL (e.g., 4h)", "4h")
-  .option("--mode <mode>", "execute or dry-run", "dry-run")
-  .action(async (opts: { agent?: string; reason: string; ttl: string; mode: string }) => {
-    const { activateOverrideAsync, renderOverrideMarkdown } = await import("./governor/emergencyOverride.js");
-    const agentId = opts.agent ?? activeAgent(program) ?? "default";
-    const ttlMs = parseWindowToMs(opts.ttl);
-    const entry = await activateOverrideAsync(process.cwd(), {
-      agentId,
-      reason: opts.reason,
-      ttlMs,
-      mode: opts.mode as never,
-    });
-    console.log(chalk.yellow(`Emergency override activated: ${entry.overrideId}`));
-    console.log(renderOverrideMarkdown(entry));
-    console.log(chalk.red("⚠  Postmortem required within 48h of override expiry."));
+  .option("--reason <reason>", "reason for the break-glass (>= 10 chars)")
+  .option("--ttl <ttl>", "TTL, at most 24h (e.g., 4h)", "4h")
+  .option("--tools <names>", "comma-separated tool names it covers").option("--action-classes <classes>", "comma-separated action classes it covers")
+  .option("--controls <ids>", "comma-separated control ids it deviates from").option("--activate <breakGlassId>", "activate this requested break-glass")
+  .option("--approval <approvalRequestId>", "the approval request holding its bound decision")
+  .option("--session-token-file <file>", "the requester's amc approvals login token (required to request)")
+  .action(async (opts: { agent?: string; ttl: string } & Record<string, string | undefined>) => {
+    const { breakGlassCommand } = await import("./governor/breakGlassCommand.js");
+    console.log(chalk.yellow(await breakGlassCommand(process.cwd(), { ...opts, agent: opts.agent ?? activeAgent(program) ?? "default", ttlMs: parseWindowToMs(opts.ttl) })));
   });
 
 program

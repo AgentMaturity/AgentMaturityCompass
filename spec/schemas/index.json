@@ -113,7 +113,12 @@
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/authorization-record.schema.json",
       "name": "authorization-record.schema.json",
-      "sha256": "93c50b8e80c49a8d831f990c6899be765be1f66066df3673797a01f730f5e36f"
+      "sha256": "43b20053475b1cb31b8331d50f0d1b209d4fa4b9a31dc7f2a4418f1a87506ba9"
+    },
+    {
+      "$id": "https://agentmaturity.co/spec/schemas/v1/break-glass.schema.json",
+      "name": "break-glass.schema.json",
+      "sha256": "1434e3b23d162ba0d0666917359e24c6f7cf8b4a65ae7f9bc1a3ab8d6057325f"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/catalog-lock.schema.json",
@@ -143,7 +148,7 @@
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/evidence-event.schema.json",
       "name": "evidence-event.schema.json",
-      "sha256": "b3f2e333528cde2e54a3e3d68e8f0691da122b688dab396d175d46aa5460100a"
+      "sha256": "267b80b1afb9841da55e6b833b4fe384604a634207e7036802c01c9b44de56bd"
     },
     {
       "$id": "https://agentmaturity.co/standards/external-evidence/v1/schema.json",
@@ -186,9 +191,19 @@
       "sha256": "14c67aa3f3c81ca4dc1d8460b305e4997bbaaa35cedb231e279756972b4770b9"
     },
     {
+      "$id": "https://agentmaturity.co/spec/schemas/v1/review-record.schema.json",
+      "name": "review-record.schema.json",
+      "sha256": "d30159671e045f308103dca63416d2bd81690f1c7d7ef2648f34f05543bae7d0"
+    },
+    {
       "$id": "https://agentmaturity.co/spec/schemas/v1/scoped-attestation.schema.json",
       "name": "scoped-attestation.schema.json",
       "sha256": "9365091cf1edac8e1ad2ac567cf432df9768f5d78a6e64cc43495c46235dce6a"
+    },
+    {
+      "$id": "https://agentmaturity.co/spec/schemas/v1/scoped-exception.schema.json",
+      "name": "scoped-exception.schema.json",
+      "sha256": "6ba398ddb192b09edfde185a48643ab81b0da1e5c74b5bbf04ab4e67f6802bc7"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/signature-envelope.schema.json",

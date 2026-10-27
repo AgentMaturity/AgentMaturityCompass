@@ -14,7 +14,7 @@ import { assertKeyNotRevoked } from "./keyRevocations.js";
 import { getPurposeKeyHistory } from "./signingKeys.js";
 import { signingKeyId, verifyWithKey } from "./algorithmPolicy.js";
 import { BLOB_AUTHORITY_CURRENT, blobAuthorityArchive, blobAuthorityIssuer, verifyBlobIndexAuthority, type SignedBlobIndexAuthority } from "./blobIndexAuthority.js";
-export const blobIndexPaths = (workspace: string) => ({ index: join(workspace, ".amc/blobs/index.jsonl"), signature: join(workspace, ".amc/blobs/index.jsonl.sig") });
+const blobIndexPaths = (workspace: string) => ({ index: join(workspace, ".amc/blobs/index.jsonl"), signature: join(workspace, ".amc/blobs/index.jsonl.sig") });
 // The common lock lives in metadata, keeping the existing .amc/blobs payload directory file-only.
 export const withBlobIndexLock = <T>(workspace: string, operation: () => T): T => withControlFileLock({ root: join(resolve(workspace), ".amc"), name: "blob-index", operation });
 const readOptional = (path: string): Buffer | null => existsSync(path) ? readFileSync(path) : null;
@@ -38,7 +38,7 @@ export function sameBlobSnapshot(a: BlobIndexSnapshot, b: BlobIndexSnapshot): bo
   const same = (x: Buffer | null, y: Buffer | null) => x === null ? y === null : y !== null && x.equals(y);
   return same(a.indexBytes, b.indexBytes) && same(a.sidecarBytes, b.sidecarBytes);
 }
-export interface BlobAuthorityGrant { sha256: string; bytes: Buffer; signed: SignedBlobIndexAuthority; issuerPublicKeyPem: string }
+interface BlobAuthorityGrant { sha256: string; bytes: Buffer; signed: SignedBlobIndexAuthority; issuerPublicKeyPem: string }
 export interface BlobAuthorityState { chain: BlobAuthorityGrant[]; current: BlobAuthorityGrant; binding: NonNullable<ReturnType<typeof boundProviderKey>> }
 /** Math/committed state only, internal writer/owner input; never substitutes for public issuer admission. */
 export function readBlobAuthorityState(workspace: string): BlobAuthorityState | null {
@@ -75,7 +75,7 @@ export function readBlobAuthorityState(workspace: string): BlobAuthorityState | 
     || signingKeyId(binding.publicKeyPem) !== binding.binding.keyId) throw new Error("blob authority is not its committed issuer");
   return { chain, current, binding };
 }
-export function blobAuthorityAtRow(state: BlobAuthorityState, position: number): BlobAuthorityGrant | null {
+function blobAuthorityAtRow(state: BlobAuthorityState, position: number): BlobAuthorityGrant | null {
   return state.chain.filter(grant => grant.signed.authority.start.count < position).at(-1) ?? null;
 }
 /** Complete actual prefix, including zero-row epoch starts and the one current head sidecar. */

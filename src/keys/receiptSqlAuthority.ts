@@ -31,7 +31,7 @@ export function receiptSqlStarts(snapshot: ReceiptSqlSnapshot) {
     "sqlite-outcome": { count: snapshot.outcomes.length, head: snapshot.outcomes.at(-1)?.event_hash ?? "GENESIS_OUTCOME" } };
 }
 /** Complete hash preimages and chain; callers separately verify ledger-row writer authority. */
-export function assertReceiptSqlHashes(snapshot: ReceiptSqlSnapshot): void {
+function assertReceiptSqlHashes(snapshot: ReceiptSqlSnapshot): void {
   for (const stream of RECEIPT_STREAMS) {
     let previous = stream === "sqlite-evidence" ? "GENESIS" : "GENESIS_OUTCOME";
     for (const row of rowsFor(snapshot, stream)) {

@@ -179,6 +179,8 @@ describe("one nonresetting lifetime timeout and bounded cancellation", () => {
     const timers = vi.spyOn(globalThis, "setTimeout");
     const running = spawn(dir, session, { request: { runAs: "child", goal: "g", continuable: true,
       stopConditions: ["timeout-ms:60000"] }, runner: () => pending.promise });
+    // The handoff packet is minted asynchronously (P2-08 provider signing), so the timer starts after that await.
+    await vi.waitFor(() => expect(timers.mock.calls.some(([_callback, delay]) => delay === 60000)).toBe(true));
     const timerIndex = timers.mock.calls.findIndex(([_callback, delay]) => delay === 60000);
     const timer = timers.mock.results[timerIndex]?.value as ReturnType<typeof setTimeout>;
     try {

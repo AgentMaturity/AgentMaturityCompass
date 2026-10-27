@@ -26,7 +26,7 @@ export async function promptInitForApiAsync(workspace: string, options: OrgPairs
   ensurePromptDirs(workspace);
   return { path, sigPath: `${path}.sig`, policy };
 }
-export class PromptPolicyPublicationError extends Error {
+class PromptPolicyPublicationError extends Error {
   readonly code = "PROMPT_POLICY_LOG_INCOMPLETE";
   readonly committed = true;
   constructor(readonly path: string, readonly sigPath: string, cause: unknown) {

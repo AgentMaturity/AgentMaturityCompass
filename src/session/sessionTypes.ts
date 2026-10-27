@@ -35,6 +35,10 @@ export const SESSION_EVENT_TYPES: ReadonlySet<EvidenceEventType> = new Set<Evide
   "sandbox/mode",
   "session/recovery-claim",
   "session/recovered",
+  // P2-12 writer fencing and resume rules; surface op `none`, recorded between turns.
+  "session/heartbeat",
+  "session/migration",
+  "tool/reconciled",
   // The agent loop's control rows. Each has surface op `none`: a queued message
   // is not model-visible until a step claims it and records a `user/message`.
   "loop/inbox",

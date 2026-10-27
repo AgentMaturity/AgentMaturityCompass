@@ -65,7 +65,9 @@ export const authorizationRecordV1Schema = z.strictObject({
       approverIds: z.array(nonEmpty).min(1),
       expiresAt: isoTimeSchema
     })),
-    exceptions: z.array(exceptionRefSchema)
+    exceptions: z.array(exceptionRefSchema),
+    /** The signed break-glass record the call ran under (P2-24); absent when none. */
+    breakGlassId: nonEmpty.optional()
   }),
   idempotencyKey: nullableText,
   evidenceRefs: z.array(nonEmpty),

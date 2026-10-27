@@ -49,18 +49,7 @@ async function archive(workspace: string, compiled: Awaited<ReturnType<typeof pr
   const assertCurrent = () => { assertInputs(); pack.assertCurrent(); lint.assertCurrent(); };
   assertCurrent(); return { bytes, signature, assertCurrent };
 }
-/** Actual direct producer: checked pack+lint signatures precede the selected archive publication. */
-export async function buildPromptPackArtifactAsync(params: { workspace: string; agentId?: string; outFile: string }, options: OrgPairsOptions = {}) {
-  const input = { workspace: params.workspace, agentId: resolveAgentId(params.workspace, params.agentId ?? "default"), outFile: resolve(params.outFile) };
-  const original = capturePromptPackAuthority(input.workspace, options.beforePublish, false), before = capturePromptFiles([input.outFile]);
-  const inputFiles = capturePromptFiles(promptCompilerInputPaths(input.workspace, input.agentId)); noInputAlias(before, inputFiles);
-  const compiled = await prepareCompiledPromptPackAsync(input, { beforePublish: original.assertCurrent, assertInputsCurrent: options.assertInputsCurrent });
-  const prepared = await archive(input.workspace, compiled, original, () => { noInputAlias(before, inputFiles); assertPromptFilesCurrent(before); });
-  publishPromptFiles(input.workspace, before, [{ path: input.outFile, bytes: prepared.bytes }], prepared.assertCurrent);
-  return { outFile: input.outFile, sha256: sha256Hex(prepared.bytes), pack: compiled.compiled.pack, signature: prepared.signature,
-    lint: compiled.compiled.lint, providerFiles: compiled.compiled.providerFiles };
-}
-export class PromptBuildPublicationError extends Error {
+class PromptBuildPublicationError extends Error {
   readonly code = "PROMPT_BUILD_INCOMPLETE";
   constructor(readonly completedPrerequisites: readonly string[], readonly completedPaths: readonly string[], readonly completedLogHashes: readonly string[], cause: unknown) {
     super("prompt build did not complete; published prerequisites, members and logs are retained", { cause }); this.name = "PromptBuildPublicationError";

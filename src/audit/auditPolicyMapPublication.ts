@@ -49,7 +49,7 @@ function readPair(workspace: string, path: string, kind: "BUNDLE" | "COMPLIANCE_
     }, signatureReadFailed, signatureExists };
 }
 export const readAuditPolicySelection = (workspace: string) => readPair(workspace, auditPolicyPath(workspace), "BUNDLE");
-export const readAuditMapSelection = (workspace: string, id: "builtin" | "active") => readPair(workspace, id === "builtin" ? auditMapBuiltinPath(workspace) : auditMapActivePath(workspace), "COMPLIANCE_MAPS");
+const readAuditMapSelection = (workspace: string, id: "builtin" | "active") => readPair(workspace, id === "builtin" ? auditMapBuiltinPath(workspace) : auditMapActivePath(workspace), "COMPLIANCE_MAPS");
 export const readAuditMapBodySelection = (workspace: string, id: "builtin" | "active") => readPair(workspace, id === "builtin" ? auditMapBuiltinPath(workspace) : auditMapActivePath(workspace), "COMPLIANCE_MAPS", false);
 /** Existing Studio readiness has two hard prerequisites; workspace verification contributes warnings only.
  * Original own-target admission ends before its first replacement; unrelated admission remains stable. */

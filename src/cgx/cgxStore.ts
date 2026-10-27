@@ -174,15 +174,6 @@ export async function loadCgxPolicyAsync(workspace: string, options: OrgPairsOpt
   if (!pathExists(cgxPolicyPath(workspace))) return (await initCgxPolicyAsync(workspace, options)).policy;
   return loadCgxPolicy(workspace);
 }
-export async function saveCgxGraphAsync(workspace: string, scope: CgxScope, graph: CgxGraph, options: OrgPairsOptions = {}, previous?: OrgPairsSnapshot) {
-  const normalized = cgxGraphSchema.parse(graph), payload = Buffer.from(JSON.stringify(normalized, null, 2));
-  const latestPath = cgxLatestGraphPath(workspace, scope), snapshotPath = join(cgxSnapshotGraphDir(workspace, scope), `${normalized.generatedTs}.json`);
-  const saved = await publishOrgPairsAsync(workspace, [{ path: latestPath, bytes: payload }, { path: snapshotPath, bytes: payload }], options, previous);
-  return { latestPath, latestSigPath: saved[0]!.sigPath, snapshotPath, snapshotSigPath: saved[1]!.sigPath };
-}
-export async function saveCgxContextPackAsync(workspace: string, agentId: string, pack: CgxContextPack, options: OrgPairsOptions = {}, previous?: OrgPairsSnapshot) {
-  return (await publishOrgPairsAsync(workspace, [{ path: cgxLatestPackPath(workspace, agentId), bytes: Buffer.from(JSON.stringify(cgxContextPackSchema.parse(pack), null, 2)) }], options, previous))[0]!;
-}
 
 export async function prepareCgxGraphAsync(workspace: string, scope: CgxScope, graph: CgxGraph, options: OrgPairsOptions = {}) {
   const normalized = cgxGraphSchema.parse(graph), payload = Buffer.from(JSON.stringify(normalized, null, 2));

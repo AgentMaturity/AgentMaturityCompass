@@ -34,6 +34,7 @@ import { authorizationRecordV1Schema } from "./v1/authorizationRecord.js";
 import { controlResultV1Schema } from "./v1/controlResult.js";
 import { detokenizationReceiptV1Schema } from "./v1/detokenizationReceipt.js";
 import { evidenceEventV1Schema } from "./v1/evidenceEvent.js";
+import { breakGlassRecordV1Schema, reviewRecordV1Schema, scopedExceptionV1Schema } from "./v1/governanceRecords.js";
 import { receiptV1Schema, receiptV2Schema } from "./v1/receipt.js";
 import { redactionReceiptV1Schema } from "./v1/redactionReceipt.js";
 import { scopedAttestationV1Schema } from "./v1/scopedAttestation.js";
@@ -59,6 +60,7 @@ export * from "./v1/authorizationRecord.js";
 export * from "./v1/controlResult.js";
 export * from "./v1/detokenizationReceipt.js";
 export * from "./v1/evidenceEvent.js";
+export * from "./v1/governanceRecords.js";
 export * from "./v1/receipt.js";
 export * from "./v1/redactionReceipt.js";
 export * from "./v1/scopedAttestation.js";
@@ -80,6 +82,10 @@ export const CONTRACTS = {
   // P2-02: one release of restored values to a processor, the receipt of a PROTECTED_DATA_DETOKENIZED ops row.
   "detokenization-receipt": { title: "AMC Detokenization Receipt", schema: detokenizationReceiptV1Schema },
   "control-result": { title: "AMC Control Result", schema: controlResultV1Schema },
+  // P2-24: signed, approval-bound deviations and reviews; refinements are in spec/ACCEPTANCE_RULES.md.
+  "scoped-exception": { title: "AMC Scoped Exception", schema: scopedExceptionV1Schema },
+  "break-glass": { title: "AMC Break-Glass Record", schema: breakGlassRecordV1Schema },
+  "review-record": { title: "AMC Review Record", schema: reviewRecordV1Schema },
   "claim-envelope": { title: "AMC Claim Envelope", schema: claimEnvelopeSchema },
   "scoped-attestation": { title: "AMC Scoped Attestation", schema: scopedAttestationV1Schema },
   "trust-list": { title: "AMC Signed Trust List", schema: signedTrustListSchema },

@@ -31,7 +31,8 @@ import { verifyActionPolicySignature } from "../governor/actionPolicyEngine.js";
 import { verifyToolsConfigSignature } from "../toolhub/toolhubValidators.js";
 import { verifyReceipt } from "../receipts/receipt.js";
 import { verifyEvidencePayload } from "./retentionVerification.js";
-import { openLedger, targetsDir, canonicalMetadataForHash, type Ledger, type EvidenceLedgerReader } from "./ledger.js";
+import { recomputeEventHash } from "./encryption/ledgerCipher.js";
+import { openLedger, targetsDir, type Ledger, type EvidenceLedgerReader } from "./ledger.js";
 import { extractEnvelope } from "../session/sessionTypes.js";
 import { readSessionWriter } from "../session/sessionOwnership.js";
 import { verifySessionChains } from "./sessionVerification.js";
@@ -114,6 +115,11 @@ export interface VerifyResult {
     /** Agent sessions closed by a `session/close` event and carrying a valid row seal. */
     closed: readonly string[];
   };
+  /**
+   * P2-09: encrypted inline payloads this verifier could not check because the ledger key was out of reach (provider
+   * unreachable or vault locked). Not errors, and not verified: the chain over their ciphertext was still checked.
+   */
+  payloadsNotEvaluated?: readonly string[];
 }
 
 /** P0-09 step 9: what a ledger verdict says when no pinned monitor key anchors it. */
@@ -171,7 +177,8 @@ export function verifyEvidenceEventIntegrity(input: {
     ? buildRetentionProofIndex(input.ledger.workspace)
     : undefined;
   if (retentionProofs && !retentionProofs.ok) errors.push(...retentionProofs.errors);
-  verifyEvidencePayload(event, input.ledger.workspace, errors, undefined, retentionProofs);
+  const notEvaluated: string[] = [];
+  verifyEvidencePayload(event, input.ledger.workspace, errors, undefined, retentionProofs, notEvaluated);
   const prefix = input.ledger.db.prepare(
     "SELECT * FROM evidence_events WHERE rowid <= ? ORDER BY rowid ASC"
   ).all(event.row_id) as EvidenceEvent[];
@@ -180,17 +187,7 @@ export function verifyEvidenceEventIntegrity(input: {
     if (prefixEvent.prev_event_hash !== previousHash) {
       errors.push(`Event ${prefixEvent.id} previous hash mismatch`);
     }
-    const canonicalMetadata = canonicalMetadataForHash({
-      id: prefixEvent.id,
-      ts: prefixEvent.ts,
-      sessionId: prefixEvent.session_id,
-      runtime: prefixEvent.runtime,
-      eventType: prefixEvent.event_type,
-      payloadPath: prefixEvent.canonical_payload_path ?? prefixEvent.payload_path,
-      payloadInline: prefixEvent.canonical_payload_inline ?? prefixEvent.payload_inline,
-      metaJson: prefixEvent.meta_json
-    });
-    const recalculated = sha256Hex(`${prefixEvent.prev_event_hash}${canonicalMetadata}${prefixEvent.payload_sha256}`);
+    const recalculated = recomputeEventHash(input.ledger.workspace, prefixEvent, errors);
     if (recalculated !== prefixEvent.event_hash) errors.push(`Event ${prefixEvent.id} event_hash mismatch`);
     if (!verifyHexDigestAny(prefixEvent.event_hash, prefixEvent.writer_sig, monitorKeys)) {
       errors.push(`Event ${prefixEvent.id} writer signature invalid`);
@@ -244,7 +241,7 @@ export function verifyEvidenceEventIntegrity(input: {
     }
   }
 
-  return chainOnlyResult(errors);
+  return { ...chainOnlyResult(errors), ...(notEvaluated.length ? { payloadsNotEvaluated: notEvaluated } : {}) };
 }
 
 /**
@@ -272,7 +269,8 @@ function verifyEvents(
   ledger: Ledger,
   workspace: string,
   errors: string[],
-  externallyAuthenticatedPayloads?: ReadonlyMap<string, string>
+  externallyAuthenticatedPayloads?: ReadonlyMap<string, string>,
+  notEvaluated?: string[]
 ): void {
   const events = ledger.getAllEvents();
   const retentionProofs = events.some((event) => event.archived === 1 || event.payload_pruned === 1)
@@ -287,24 +285,13 @@ function verifyEvents(
 
   let previous = "GENESIS";
   for (const event of events) {
-    verifyEvidencePayload(event, workspace, errors, externallyAuthenticatedPayloads, retentionProofs);
+    verifyEvidencePayload(event, workspace, errors, externallyAuthenticatedPayloads, retentionProofs, notEvaluated);
 
     if (event.prev_event_hash !== previous) {
       errors.push(`Event ${event.id} previous hash mismatch`);
     }
 
-    const canonicalMetadata = canonicalMetadataForHash({
-      id: event.id,
-      ts: event.ts,
-      sessionId: event.session_id,
-      runtime: event.runtime,
-      eventType: event.event_type,
-      payloadPath: event.canonical_payload_path ?? event.payload_path,
-      payloadInline: event.canonical_payload_inline ?? event.payload_inline,
-      metaJson: event.meta_json
-    });
-
-    const recalculated = sha256Hex(`${event.prev_event_hash}${canonicalMetadata}${event.payload_sha256}`);
+    const recalculated = recomputeEventHash(workspace, event, errors);
     if (recalculated !== event.event_hash) {
       errors.push(`Event ${event.id} event_hash mismatch`);
     }
@@ -664,6 +651,7 @@ export function verifyNativeSessionContinuation(workspacePath: string, targetSes
 function verifyLedger(workspacePath: string, options: LedgerVerifyOptions, continuation?: NativeContinuationScope): VerifyResult {
   let ledger: Ledger | null = null;
   const chainErrors: string[] = [];
+  const payloadsNotEvaluated: string[] = [];
   const governanceErrors: string[] = [];
   const staleAfterMs = options.sessionStaleAfterMs ?? SESSION_STALE_AFTER_MS;
   let sessionLifecycle: SessionLifecycle = { open: [], released: [], interrupted: [], closed: [] };
@@ -716,7 +704,7 @@ function verifyLedger(workspacePath: string, options: LedgerVerifyOptions, conti
     if (ledger) {
       chainErrors.push(...operationalLedgerProblems(workspacePath, ledger, options.trust));
       chainErrors.push(...receiptLedgerProblems(ledger, options.trust));
-      verifyEvents(ledger, workspacePath, chainErrors, options.externallyAuthenticatedPayloads);
+      verifyEvents(ledger, workspacePath, chainErrors, options.externallyAuthenticatedPayloads, payloadsNotEvaluated);
       verifySessionChains(ledger, chainErrors, { trust: options.trust });
       sessionLifecycle = verifySessions(ledger, workspacePath, chainErrors, staleAfterMs, continuation);
       verifyRuns(ledger, workspacePath, chainErrors);
@@ -762,6 +750,7 @@ function verifyLedger(workspacePath: string, options: LedgerVerifyOptions, conti
       released: sessionLifecycle.released,
       interrupted: sessionLifecycle.interrupted,
       closed: sessionLifecycle.closed
-    }
+    },
+    ...(payloadsNotEvaluated.length ? { payloadsNotEvaluated } : {})
   };
 }

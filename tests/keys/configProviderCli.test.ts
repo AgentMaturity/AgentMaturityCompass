@@ -111,26 +111,21 @@ export async function resolve(specifier, context, nextResolve) {
   const revocation = JSON.parse(readFileSync(admitted.path.replace(/\.json$/, ".revocation.json") + ".sig", "utf8"));
   expect(verifyCanonical("ecdsa-p256-sha256", Buffer.from(revocation.digestSha256, "hex"), publicPem(key), Buffer.from(revocation.signature, "base64"))).toBe(true);
   expect(verifyExecTicket({ workspace, ticket: followup.stdout.trim() }).ok).toBe(false);
-  const override = run("governor-override", "--agent", "default", "--reason", "Actual owner runtime incident bypass", "--ttl", "1h", "--mode", "dry-run");
-  expect(override.error).toBeUndefined(); expect(override.signal).toBeNull(); expect(override.status, override.stderr).toBe(0);
-  const active = getActiveGovernorOverrides(workspace, "default"); expect(active).toHaveLength(1); expect(verifyOverrideEntry(workspace, active[0]!)).toEqual({ valid: true });
-  const domain = Buffer.concat([Buffer.from("AMC_BREAK_GLASS_OVERRIDE_V1", "ascii"), Buffer.from([0]), Buffer.from(active[0]!.override_hash, "hex")]);
-  expect(verifyCanonical("ecdsa-p256-sha256", domain, publicPem(key), Buffer.from(active[0]!.signature, "base64"))).toBe(true);
-  const canary = run("emergency-override", "--agent", "default", "--reason", "Actual canary runtime recovery", "--action", "allow DEPLOY during incident response", "--ttl", "3600000");
-  expect(canary.error).toBeUndefined(); expect(canary.signal).toBeNull(); expect(canary.status, canary.stderr).toBe(0);
-  const canaryActive = getActiveCanaryOverrides("default", workspace); expect(canaryActive).toHaveLength(1);
-  const { overrideId, agentId, reason, actionDescription, ttlMs, startedTs, expiresTs } = canaryActive[0]!;
-  const canaryDomain = Buffer.concat([Buffer.from("AMC_BREAK_GLASS_OVERRIDE_V1", "ascii"), Buffer.from([0]), Buffer.from(sha256Hex(canonicalize({ overrideId, agentId, reason, actionDescription, ttlMs, startedTs, expiresTs })), "hex")]);
-  expect(verifyCanonical("ecdsa-p256-sha256", canaryDomain, publicPem(key), Buffer.from(canaryActive[0]!.signature, "base64"))).toBe(true);
-  const savedCanary = JSON.parse(readFileSync(join(workspace, ".amc", "governor", "emergency-overrides", `${overrideId}.json`), "utf8"));
-  expect(savedCanary.override_signature).toBe(canaryActive[0]!.signature); expect(savedCanary.signature).not.toBe("unsigned");
-  expect(verifyCanonical("ed25519", Buffer.from(savedCanary.record_hash, "hex"), getSigningPublicKeyPem(workspace, "artifact-seal"), Buffer.from(savedCanary.signature, "base64"))).toBe(true);
-  expect(generatePolicyCanaryReport("default", workspace)).toMatchObject({ activeOverrides: 1, invalidOverrides: 0 });
+  // P2-24: both override commands now request a signed break-glass record (artifact signature after one bound decision)
+  // from an authenticated `amc approvals login` requester. Without that session they refuse before any signature, so
+  // neither asks the config-signature provider to sign and no legacy override is written.
+  for (const args of [["governor-override", "--ttl", "1h"], ["emergency-override", "--action", "allow refunds during incident response", "--ttl", "3600000"]]) {
+    const requested = run(...args, "--agent", "default", "--reason", "Actual owner runtime incident bypass", "--tools", "payments.refund",
+      "--action-classes", "FINANCIAL", "--controls", "L1-PAY-01");
+    expect(requested.error).toBeUndefined(); expect(requested.signal).toBeNull(); expect(requested.status).toBe(1);
+    expect(requested.stderr).toContain("--session-token-file");
+  }
+  expect(getActiveGovernorOverrides(workspace, "default")).toEqual([]); expect(getActiveCanaryOverrides("default", workspace)).toEqual([]);
   const plugins = run("plugin", "init");
   expect(plugins.error).toBeUndefined(); expect(plugins.signal).toBeNull(); expect(plugins.status, plugins.stderr).toBe(0);
   expect(plugins.stdout).toContain("Plugin workspace initialized"); expect(verifyPluginWorkspace({ workspace }).ok).toBe(true);
   const installedPath = join(workspace, ".amc", "plugins", "installed.lock.json"), installed = JSON.parse(readFileSync(installedPath + ".sig", "utf8"));
   expect(installed.digestSha256).toBe(sha256Hex(readFileSync(installedPath))); expect(installed.envelope).toMatchObject({ alg: "ecdsa-p256-sha256", signer: { type: "VAULT" } });
   expect(verifyCanonical("ecdsa-p256-sha256", Buffer.from(installed.digestSha256, "hex"), publicPem(key), Buffer.from(installed.signature, "base64"))).toBe(true);
-  expect(readFileSync(requests, "utf8").trim().split("\n").map(line => JSON.parse(line)).filter(row => row.operation === "Sign").length).toBe(12);
+  expect(readFileSync(requests, "utf8").trim().split("\n").map(line => JSON.parse(line)).filter(row => row.operation === "Sign").length).toBe(10);
 }, 120_000);

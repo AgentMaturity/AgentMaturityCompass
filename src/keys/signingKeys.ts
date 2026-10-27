@@ -22,6 +22,7 @@ import { assertKeyNotRevoked } from "./keyRevocations.js";
 import { configuredRef, loadKeysConfig } from "./keysConfig.js";
 import { KeyProviderError, type KeyProviderId } from "./provider.js";
 import { operationalIssuerCandidates } from "./operationalDelegationState.js";
+import { inCheckPass } from "../utils/checkPass.js";
 
 export function assertLocal(purpose: KeyPurpose): LocalPurpose {
   if (!isLocalPurpose(purpose)) throw new Error(`${purpose} keys never live in a workspace vault; sign with the key its owner holds`);
@@ -143,7 +144,7 @@ export function getSigningPublicKeyPem(workspace: string, purpose: KeyPurpose): 
   return role;
 }
 
-export function readHistory(workspace: string, subject: KeyHistorySubject, currentPublicPem: string): KeyHistoryEnvelope | null {
+export const readHistory = inCheckPass(function readHistory(workspace: string, subject: KeyHistorySubject, currentPublicPem: string): KeyHistoryEnvelope | null {
   try {
     const raw = keyFile(workspace, `${subject}_history.json`);
     if (raw === null) return null;
@@ -160,10 +161,10 @@ export function readHistory(workspace: string, subject: KeyHistorySubject, curre
   } catch {
     return null; // an unreadable, unauthenticated or rolled-back history admits no older key (fail closed)
   }
-}
+});
 
 /** Every key admitted for `purpose` by its authenticated history, current key last; the role's view before migration. */
-export function getPurposeKeyHistory(workspace: string, purpose: KeyPurpose): string[] {
+export const getPurposeKeyHistory = inCheckPass(function getPurposeKeyHistory(workspace: string, purpose: KeyPurpose): string[] {
   const local = assertLocal(purpose);
   const current = getSigningPublicKeyPem(workspace, local);
   const role = roleOfPurpose(local);
@@ -173,4 +174,4 @@ export function getPurposeKeyHistory(workspace: string, purpose: KeyPurpose): st
   const provider = boundProviderKey(workspace, local)?.publicKeyPem;
   return [...new Set([...(history?.entries.map(entry => entry.publicKeyPem) ?? []), current, ...(provider === undefined ? [] : [provider]),
     ...(local === "ledger-row" ? operationalIssuerCandidates(workspace) : [])])];
-}
+});

@@ -25,9 +25,6 @@ export function canonVerifyForApi(workspace: string) {
 }
 
 export function canonInitForApiAsync(workspace: string, options: OrgPairsOptions = {}) { return initCanonAsync(workspace, options); }
-export function canonApplyForApiAsync(params: { workspace: string; canon: CompassCanon }, options: OrgPairsOptions = {}) {
-  return saveCanonAsync(params.workspace, params.canon, options);
-}
 /** Actual Studio suffix retains the original prepared authority and published bytes. */
 export async function canonApplyForPublicationAsync(params: { workspace: string; canon: CompassCanon }, options: OrgPairsOptions = {}) {
   const prepared = await prepareCanonAsync(params.workspace, params.canon, options), result = prepared.publish()[0]!;

@@ -5,6 +5,7 @@ import { evaluateApprovalQuorum } from "../approvals/approvalQuorum.js";
 import { verifyApprovalPolicySignature } from "../approvals/approvalPolicyEngine.js";
 import type { MechanicUpgradePlan } from "./upgradePlanSchema.js";
 import { selectAgentId } from "./mechanicExecutionActions.js";
+import { inCheckPass } from "../utils/checkPass.js";
 type Action = MechanicUpgradePlan["phases"][number]["actions"][number];
 
 export function captureMechanicApprovals(workspace: string, plan: MechanicUpgradePlan) {
@@ -21,7 +22,7 @@ export function captureMechanicApprovals(workspace: string, plan: MechanicUpgrad
     grants.set(action, { binding: approvalRequestBindingDigest(request), initiator: request.initiator, id: request.approvalRequestId,
       agentId: request.agentId, intentId: request.intentId, mode: request.effectiveMode, executionId: null });
   }
-  const assertGrant = (action: Action) => {
+  const assertGrant = (action: Action, policyPairInFlight: boolean) => {
     const grant = grants.get(action); if (grant === undefined) return;
     const read = () => {
       const request = loadApprovalRequestRecord({ workspace, agentId: grant.agentId, approvalRequestId: grant.id, requireValidSignature: true });
@@ -37,7 +38,9 @@ export function captureMechanicApprovals(workspace: string, plan: MechanicUpgrad
       if (consumed === null || consumed.executionId !== grant.executionId) throw new Error("mechanic approval consumption no longer names this execution");
     } else {
       // Do not rebase the old config hashes after a legitimate earlier config action. Only current lifecycle/quorum narrows.
-      if (!verifyApprovalPolicySignature(workspace).valid) throw new Error("mechanic approval policy signature is no longer valid");
+      // A policy-pack action republishes approval-policy.yaml then its .sig; between them the old sidecar cannot verify.
+      // That publisher checks both members and the original config signer itself; this check reruns right after it returns.
+      if (!policyPairInFlight && !verifyApprovalPolicySignature(workspace).valid) throw new Error("mechanic approval policy signature is no longer valid");
       if (loadApprovalConsumed({ workspace, agentId: grant.agentId, approvalRequestId: grant.id }) !== null)
         throw new Error("mechanic approval was consumed by another execution");
       const decisions = listApprovalDecisions({ workspace, agentId: grant.agentId, approvalRequestId: grant.id });
@@ -50,6 +53,7 @@ export function captureMechanicApprovals(workspace: string, plan: MechanicUpgrad
     }
     if (read().status !== request.status) throw new Error("mechanic approval lifecycle changed during its final check");
   };
-  return { assertCurrent() { for (const action of grants.keys()) assertGrant(action); },
+  const assertCurrent = inCheckPass((policyPairInFlight: boolean) => { for (const action of grants.keys()) assertGrant(action, policyPairInFlight); });
+  return { assertCurrent(policyPairInFlight = false) { assertCurrent(policyPairInFlight); },
     consumed(action: Action, executionId: string) { const grant = grants.get(action); if (grant !== undefined) grant.executionId = executionId; } };
 }

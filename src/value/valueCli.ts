@@ -29,18 +29,6 @@ function parseJsonOrYaml(raw: string): unknown {
   }
 }
 
-export function valueInitCli(workspace: string) {
-  return valueInitForApi(workspace);
-}
-
-export function valueVerifyPolicyCli(workspace: string) {
-  return valuePolicyForApi(workspace).signature;
-}
-
-export function valuePolicyPrintCli(workspace: string) {
-  return valuePolicyForApi(workspace).policy;
-}
-
 export function valuePolicyApplyCli(params: {
   workspace: string;
   file: string;
@@ -182,13 +170,6 @@ export async function valueSchedulerRunNowCli(params: {
     scopeId: params.scope === "workspace" ? "workspace" : params.id,
     windowDays: params.windowDays
   }, { beforePublish: () => assertOwnerMode(params.workspace, "value scheduler run-now") });
-}
-
-export function valueSchedulerEnableCli(params: {
-  workspace: string;
-  enabled: boolean;
-}) {
-  return valueSchedulerSetEnabledForApi(params);
 }
 
 export function valueVerifyWorkspaceCli(workspace: string) {

@@ -37,7 +37,7 @@ interface OrgScorecardPublicationProgress {
   readonly phase: string; readonly lockSetupAttempted: boolean; readonly lockEntered: boolean;
   readonly directorySetupAttempted: boolean; readonly returnedDirectories: readonly string[]; readonly acknowledgedPaths: readonly string[];
 }
-export class OrgScorecardPublicationError extends Error {
+class OrgScorecardPublicationError extends Error {
   readonly code = "ORG_SCORECARD_PARTIAL";
   constructor(readonly publishedPaths: readonly string[], readonly attemptedPath: string, cause: unknown,
     readonly progress: OrgScorecardPublicationProgress | null = null) {

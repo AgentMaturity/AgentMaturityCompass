@@ -271,11 +271,6 @@ export function verifyValueSnapshotSignature(workspace: string, scope: { type: "
   return verifyValuePair(workspace, valueSnapshotLatestPath(workspace, scope));
 }
 
-export function saveValueReport(workspace: string, report: ValueReport): { path: string; sigPath: string; sha256: string } {
-  const normalized = valueReportSchema.parse(report), path = valueReportPath(workspace, normalized.scope, normalized.generatedTs), payload = JSON.stringify(normalized, null, 2);
-  return { ...publishOrgPairs(workspace, [{ path, bytes: Buffer.from(payload) }])[0]!, sha256: sha256Hex(payload) };
-}
-
 export function listValueReports(workspace: string, scope: { type: "WORKSPACE" | "NODE" | "AGENT"; id: string }): ValueReport[] {
   const dir = dirname(valueReportPath(workspace, scope, Date.now()));
   if (!pathExists(dir)) {
@@ -322,27 +317,15 @@ function verifyValuePair(workspace: string, path: string) {
     return { ...verdict, signatureExists: sidecar !== null, path, sigPath: `${path}.sig` };
   } catch { return { valid: false, signatureExists: pathExists(`${path}.sig`), reason: "invalid value signed pair", path, sigPath: `${path}.sig` }; }
 }
-export async function saveValuePolicyAsync(workspace: string, policy: ValuePolicy, options: OrgPairsOptions = {}, previous?: OrgPairsSnapshot) {
+async function saveValuePolicyAsync(workspace: string, policy: ValuePolicy, options: OrgPairsOptions = {}, previous?: OrgPairsSnapshot) {
   return (await publishOrgPairsAsync(workspace, [{ path: valuePolicyPath(workspace), bytes: Buffer.from(YAML.stringify(valuePolicySchema.parse(policy))) }], options, previous))[0]!;
 }
-export async function initValuePolicyAsync(workspace: string, options: OrgPairsOptions = {}) {
+async function initValuePolicyAsync(workspace: string, options: OrgPairsOptions = {}) {
   const policy = defaultValuePolicy(), saved = await saveValuePolicyAsync(workspace, policy, options); return { ...saved, policy };
 }
 export async function loadValuePolicyAsync(workspace: string, options: OrgPairsOptions = {}): Promise<ValuePolicy> {
   if (!pathExists(valuePolicyPath(workspace))) return (await initValuePolicyAsync(workspace, options)).policy;
   return loadValuePolicy(workspace);
-}
-export async function saveValueContractAsync(params: { workspace: string; contract: ValueContract; agentId?: string | null }, options: OrgPairsOptions = {}, previous?: OrgPairsSnapshot) {
-  const path = params.agentId ? valueAgentContractPath(params.workspace, params.agentId) : valueWorkspaceContractPath(params.workspace);
-  return (await publishOrgPairsAsync(params.workspace, [{ path, bytes: Buffer.from(YAML.stringify(valueContractSchema.parse(params.contract))) }], options, previous))[0]!;
-}
-export async function saveValueSnapshotAsync(workspace: string, snapshot: ValueSnapshot, options: OrgPairsOptions = {}, previous?: OrgPairsSnapshot) {
-  const normalized = valueSnapshotSchema.parse(snapshot), path = valueSnapshotLatestPath(workspace, normalized.scope), payload = JSON.stringify(normalized, null, 2);
-  return { ...(await publishOrgPairsAsync(workspace, [{ path, bytes: Buffer.from(payload) }], options, previous))[0]!, sha256: sha256Hex(payload) };
-}
-export async function saveValueReportAsync(workspace: string, report: ValueReport, options: OrgPairsOptions = {}, previous?: OrgPairsSnapshot) {
-  const normalized = valueReportSchema.parse(report), path = valueReportPath(workspace, normalized.scope, normalized.generatedTs), payload = JSON.stringify(normalized, null, 2);
-  return { ...(await publishOrgPairsAsync(workspace, [{ path, bytes: Buffer.from(payload) }], options, previous))[0]!, sha256: sha256Hex(payload) };
 }
 export async function saveValueSchedulerStateAsync(workspace: string, state: ValueSchedulerState, options: OrgPairsOptions = {}, previous?: OrgPairsSnapshot) {
   return (await publishOrgPairsAsync(workspace, [{ path: valueSchedulerPath(workspace), bytes: Buffer.from(JSON.stringify(valueSchedulerStateSchema.parse(state), null, 2)) }], options, previous))[0]!;
@@ -390,8 +373,4 @@ export async function loadValuePolicyAttemptAsync(workspace: string, options: Or
   if (pathExists(valuePolicyPath(workspace))) return { policy: loadValuePolicyReadOnly(workspace), assertCurrent: original };
   const policy = defaultValuePolicy(), prepared = await prepareValuePolicyAsync(workspace, policy, { ...options, beforePublish: original }); prepared.publish();
   return { policy, assertCurrent: prepared.assertCurrent };
-}
-
-export async function initValueFilesAsync(workspace: string, contract: ValueContract, options: OrgPairsOptions = {}) {
-  return (await initValueFilesRunAsync(workspace, contract, options)).result;
 }

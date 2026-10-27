@@ -149,25 +149,16 @@ function verifyPromptPair(workspace: string, path: string) {
   try { return { ...verifyAuditorSignatureBytes(workspace, "BUNDLE", readFileSync(path), readFileSync(sigPath)), signatureExists, path, sigPath }; }
   catch { return { valid: false, signatureExists, reason: "invalid file signature", path, sigPath }; }
 }
-export async function savePromptPolicyAsync(workspace: string, policy: PromptPolicy, options: OrgPairsOptions = {}) {
+async function savePromptPolicyAsync(workspace: string, policy: PromptPolicy, options: OrgPairsOptions = {}) {
   ensurePromptDirs(workspace);
   const path = promptPolicyPath(workspace), bytes = Buffer.from(YAML.stringify(promptPolicySchema.parse(policy)));
   return (await publishOrgPairsAsync(workspace, [{ path, bytes }], options))[0]!;
-}
-export async function initPromptPolicyAsync(workspace: string, options: OrgPairsOptions = {}) {
-  const policy = defaultPromptPolicy(), saved = await savePromptPolicyAsync(workspace, policy, options);
-  return { ...saved, policy };
 }
 /** Existing-body reads remain public; only an actually missing body prepares a default signed pair. */
 export async function loadPromptPolicyAsync(workspace: string, options: OrgPairsOptions = {}): Promise<PromptPolicy> {
   const path = promptPolicyPath(workspace);
   if (pathExists(path)) return promptPolicySchema.parse(YAML.parse(readUtf8(path)) as unknown);
   return (await loadPromptPolicyAttemptAsync(workspace, options)).policy;
-}
-export async function savePromptSchedulerStateAsync(workspace: string, state: PromptSchedulerState, options: OrgPairsOptions = {}) {
-  ensurePromptDirs(workspace);
-  const path = promptSchedulerPath(workspace), bytes = Buffer.from(JSON.stringify(promptSchedulerStateSchema.parse(state), null, 2));
-  return (await publishOrgPairsAsync(workspace, [{ path, bytes }], options))[0]!;
 }
 
 /** Fixed internal cold-policy attempt; callers retain its actual checked publication through later waits. */

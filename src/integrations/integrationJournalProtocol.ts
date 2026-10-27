@@ -20,7 +20,7 @@ export interface IntegrationJournalIo {
   exportJournal(path: string, text: string): void;
   exportQueue(path: string, text: string): void;
 }
-export class IntegrationJournalPartialError extends Error {
+class IntegrationJournalPartialError extends Error {
   constructor(cause: unknown, readonly writes: readonly IntegrationJournalWrite[]) {
     super("Integration journal publication interrupted; earlier writes may remain", { cause }); this.name = "IntegrationJournalPartialError";
   }

@@ -61,6 +61,7 @@ import type { AgentToolSeam } from "./agent/toolSeam.js";
 import type { SubagentCapability } from "./agent/delegateTool.js";
 import type { ComposedToolSession } from "./kernel/agentLoopRunner.js";
 import { readAgentRunSummary, renderRunSummary, renderVerifyReport, verifyAgentRun } from "./agent/runReport.js";
+import { executionStatusFor, recordedExecutionStatus } from "./execution/executionStatus.js";
 import { ledgerExitCode, trustFromFlags, withTrustFlags, type TrustFlags } from "./cli-trust-flags.js";
 import { registerPromptCommands } from "./cli-prompt-commands.js";
 import { registerNativeScheduleCommands } from "./cli-native-schedule-commands.js";
@@ -202,6 +203,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--tool-mode <mode>", '"native" (one call per step) or "code" (dispatch from a program)')
     .option("--unsafe-unconfined-shell", "macOS without Seatbelt only: offer the native shell UNCONFINED, with your full user rights; ignored where Seatbelt or Bubblewrap confines it, refused on Windows")
     .option("--session <id>", "resume this existing, unsealed session as its next writer (verified before dispatch)")
+    .option("--takeover-expired-writer <reason>", "with --session: claim a remote or unresponsive writer whose lease lapsed one lease ago; the reason is recorded")
     .option("--fork-from <id>", "open a new session whose lineage names this parent's verified final row")
     .option("--keep-open", "leave the session unsealed at exit so a later process can --session it")
     .option(
@@ -401,7 +403,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       if (opts.mcpConfig !== undefined && opts.approvalException !== undefined) {
         io.error("MCP tools require the actual signed approval gate; approval exceptions are not accepted."); io.fail(); return;
       }
-      const gate = approvalGateFor(io, opts);
+      const gate = approvalGateFor(io, opts, { workspace: process.cwd(), agentId });
       if (gate === null) return;
       if (opts.interactiveApprovals && gate === undefined) {
         io.error("--interactive-approvals requires --approve-tools to raise actual signed requests."); io.fail(); return;
@@ -421,6 +423,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           io.fail(); return;
         }
       }
+      if (opts.takeoverExpiredWriter !== undefined && opts.session === undefined) { io.error("--takeover-expired-writer requires --session <id>."); io.fail(); return; }
       if (opts.session !== undefined && mcpConfig !== null) {
         // Mounting can execute a process or contact a server. Check the signed
         // identity first; resumeSession repeats admission before taking ownership.
@@ -624,7 +627,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
         let priorTurnEndings = 0;
         const outcome = await runner.runComposedTurn({
           sessionId: turnSessionId,
-          ...(opts.session === undefined ? {} : { resume: { claimant } }),
+          ...(opts.session === undefined ? {} : { resume: { claimant, ...(opts.takeoverExpiredWriter === undefined ? {} : { takeover: { reason: opts.takeoverExpiredWriter } }) } }),
           ...(opts.forkFrom === undefined ? {} : { forkFrom: { parentSessionId: opts.forkFrom, claimant } }),
           ...(opts.keepOpen ? { keepOpen: true } : {}),
           workspace: process.cwd(),
@@ -754,12 +757,14 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
         });
 
         const summary = readAgentRunSummary(process.cwd(), outcome.sessionId, outcome.status);
-        io.log(opts.json ? JSON.stringify(summary, null, 2) : renderRunSummary(summary));
+        const ending = summary.endings.length > priorTurnEndings ? summary.endings.at(-1) : undefined;
+        // P2-13: the four execution phases; evidence verification stays pending until `agent-loop verify`.
+        io.log(opts.json ? JSON.stringify({ ...summary, execution: executionStatusFor(process.cwd(), { sessionId: summary.sessionId, admission: "admitted",
+          turn: ending?.reason ?? (summary.driverStatus === "failed" ? "error" : null), verified: null }) }, null, 2) : renderRunSummary(summary));
         if (!opts.json) {
           io.log("Verify the recorded evidence (this does not evaluate answer quality):\n  " +
             renderNativeGuideCommand({ cwd: process.cwd(), argv: ["amc", "agent-loop", "verify", summary.sessionId] }));
         }
-        const ending = summary.endings.length > priorTurnEndings ? summary.endings.at(-1) : undefined;
         if (summary.driverStatus === "failed" || ending?.reason === "error"
           || (validation !== undefined && summary.validation.status !== "passed")) io.fail();
       } finally {
@@ -782,7 +787,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .action(async (sessionId: string, opts: TrustFlags) => {
       const trust = trustFromFlags(opts, ["ledger-row"]);
       const report = await verifyAgentRun(process.cwd(), sessionId, trust);
-      io.log(opts.json ? JSON.stringify(report, null, 2) : renderVerifyReport(report));
+      io.log(opts.json ? JSON.stringify({ ...report, execution: recordedExecutionStatus(process.cwd(), sessionId, report.ok) }, null, 2) : renderVerifyReport(report));
       // An unanchored run fails (P0-09 step 9); --allow-unanchored makes it an integrity-only exit 2.
       const code = ledgerExitCode({ ok: report.integrityOk, trustRoot: report.trustRoot }, trust);
       if (code === 1) io.fail();

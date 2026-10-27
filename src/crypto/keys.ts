@@ -9,6 +9,7 @@ import { getSigningKey } from "../keys/signingKeys.js";
 import { isLocalPurpose, ROLE_PRIMARY_PURPOSE, type LocalPurpose } from "../vault/vaultPayload.js";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
 import { isSha256HexDigest, sha256Hex } from "../utils/hash.js";
+import { inCheckPass } from "../utils/checkPass.js";
 export { isSha256HexDigest } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { ensureVaultAndPublicKeys, getVaultPrivateKeyPem, vaultPaths } from "../vault/vault.js";
@@ -60,7 +61,7 @@ function publicPath(workspace: string, kind: "monitor" | "auditor" | "lease" | "
 }
 
 /** The history, when its envelope verifies under the current key and is not older than this machine accepted. */
-export function getAuthenticatedKeyHistory(workspace: string, kind: KeyHistoryRole): KeyHistoryEnvelope | null {
+export const getAuthenticatedKeyHistory = inCheckPass(function getAuthenticatedKeyHistory(workspace: string, kind: KeyHistoryRole): KeyHistoryEnvelope | null {
   try {
     const value: unknown = JSON.parse(readFileSync(historyPath(workspace, kind), "utf8"));
     const envelope = verifyKeyHistoryEnvelope(value, kind, getPublicKeyPem(workspace, kind)).envelope;
@@ -69,7 +70,7 @@ export function getAuthenticatedKeyHistory(workspace: string, kind: KeyHistoryRo
   } catch {
     return null;
   }
-}
+});
 
 export function addPublicKeyToHistory(
   workspace: string,
@@ -169,11 +170,11 @@ export function getPublicKeyPem(workspace: string, kind: "monitor" | "auditor" |
   return pem;
 }
 
-export function getPublicKeyHistory(workspace: string, kind: KeyHistoryRole): string[] {
+export const getPublicKeyHistory = inCheckPass(function getPublicKeyHistory(workspace: string, kind: KeyHistoryRole): string[] {
   const current = getPublicKeyPem(workspace, kind);
   const history = getAuthenticatedKeyHistory(workspace, kind);
   return [...new Set([...(history?.entries.map((entry) => entry.publicKeyPem) ?? []), current])];
-}
+});
 
 export function assertSha256HexDigest(value: string): void {
   if (!isSha256HexDigest(value)) throw new Error("Signing requires exactly 64 lowercase hexadecimal SHA-256 characters");

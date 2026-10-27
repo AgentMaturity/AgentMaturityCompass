@@ -111,7 +111,8 @@ export const EVIDENCE_EVENT_TYPES = [
   "step/start", "step/end", "request/header", "request/tools", "request/response", "request/failure", "system/prompt",
   "user/message", "user/attachment", "assistant/block", "tool/call", "tool/result", "tool/spill-commitment",
   "approval/request", "approval/answer", "sandbox/mode", "session/recovery-claim", "session/resume", "session/release",
-  "session/recovered", "loop/inbox", "loop/cancel", "loop/veto", "loop/retry", "loop/compact", "time/checkpoint"
+  "session/recovered", "session/heartbeat", "session/migration", "tool/reconciled", "loop/inbox", "loop/cancel",
+  "loop/veto", "loop/retry", "loop/compact", "time/checkpoint"
 ] as const;
 
 const prevHash: Check<string> = (value, path) => (value === "GENESIS" ? value : sha256(value, path));

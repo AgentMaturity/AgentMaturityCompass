@@ -52,6 +52,7 @@ import { deprecatedBridgeRoute, sdkVersionPolicy } from '../sdk/versioning.js';
 import { handleMarketplaceRoute } from '../marketplace/marketplaceRouter.js';
 import { handleDomainProofRoute } from './domainProofRouter.js';
 import { handleNativeTasksRoute, type NativeTaskApiContext } from './nativeTasksRouter.js';
+import { handleOperatorRoute } from './operatorRouter.js';
 import { handleA4Route } from '../a4/a4Router.js';
 
 export type ApiAuthPolicy = 'public' | 'protected';
@@ -127,6 +128,15 @@ export const API_ROUTE_REGISTRY: readonly ApiRouteDefinition[] = [
     auth: 'protected',
     validationPolicy: 'schema-validated',
     handler: handleA4Route
+  },
+  {
+    id: 'operator',
+    description: 'Operator workflow: plan diff and activation, blocker inbox, review packets, opt-in review timing (P2-22)',
+    prefixes: ['/api/v1/operator'],
+    methods: ['GET', 'POST'],
+    auth: 'protected',
+    validationPolicy: 'schema-validated',
+    handler: handleOperatorRoute
   },
   {
     id: 'score',

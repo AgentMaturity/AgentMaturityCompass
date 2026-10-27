@@ -36,11 +36,13 @@ try {
   process.on("message", (command) => {
     try {
       if (command === "release") { service.releaseWithoutClosing(); process.send?.({ released: true }); process.exit(0); }
+      // P2-12: a dispatch checks the writer fence before any model or tool request leaves this process.
+      if (command === "dispatch") { service.assertWritable(); process.send?.({ dispatched: true }); }
       if (command === "continue") {
         service.startTurn({ trigger: "user" }); service.recordUserMessage("original writer continues");
         service.endTurn({ reason: "complete" }); service.sealTurn(); process.send?.({ continued: true });
       }
-    } catch (error) { process.send?.({ error: error instanceof Error ? error.message : String(error) }); }
+    } catch (error) { process.send?.({ error: error instanceof Error ? error.message : String(error), code: (error as { code?: string }).code }); }
   });
 } catch (error) {
   process.send?.({ error: error instanceof Error ? error.message : String(error), code: (error as { code?: string }).code });

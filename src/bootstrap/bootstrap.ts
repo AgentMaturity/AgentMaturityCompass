@@ -308,7 +308,7 @@ async function publishBootstrapNotaryPrefetch(input: BootstrapNotaryInputs) {
   } catch (cause) { return fail(cause); }
 }
 
-export class BootstrapColdPrerequisitesIncompleteError extends Error {
+class BootstrapColdPrerequisitesIncompleteError extends Error {
   readonly code = "BOOTSTRAP_COLD_PREREQUISITES_INCOMPLETE";
   constructor(readonly completedColdPaths: readonly string[], cause: unknown) {
     super("bootstrap did not complete; published cold prerequisites and any earlier bootstrap effects remain", { cause });

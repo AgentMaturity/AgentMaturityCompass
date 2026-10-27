@@ -24,7 +24,7 @@ interface NativeAttempt {
 }
 
 /** Earlier native and ledger effects remain on failure; this is not a rollback receipt. */
-export class ArchetypePublicationError extends Error {
+class ArchetypePublicationError extends Error {
   readonly code = "ARCHETYPE_PUBLICATION_PARTIAL";
   constructor(readonly phase: string, readonly attempts: readonly Readonly<NativeAttempt>[],
     readonly contextGraphHash: string | null, readonly preparedTargetSha256: string | null,

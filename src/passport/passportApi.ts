@@ -687,9 +687,6 @@ export function capturePassportInitialization(workspace: string, options: Passpo
     loaded.assertCurrent(); return { path, sigPath: `${path}.sig`, policy: loaded.policy };
   } });
 }
-export async function passportInitForApiAsync(workspace: string, options: PassportPublicationOptions = {}) {
-  return capturePassportInitialization(workspace, options).initialize();
-}
 export async function passportPolicyForApiAsync(workspace: string, options: PassportPublicationOptions = {}) {
   const loaded = await loadPassportPolicyAttemptAsync(workspace, { ...options });
   loaded.assertCurrent(); const signature = verifyPassportPolicySignature(workspace); loaded.assertCurrent();

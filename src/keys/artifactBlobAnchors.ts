@@ -38,7 +38,7 @@ export interface ArtifactBlobAnchorBoundary {
 }
 const boundaries = new WeakMap<object, { workspace: string; previousPublicKeyPem: string; assertCurrent: () => void }>();
 
-export class ArtifactAnchorRepairRequiredError extends Error {
+class ArtifactAnchorRepairRequiredError extends Error {
   readonly code = "REPAIR_REQUIRED";
   constructor(cause?: unknown) {
     super("workspace transparency signed coverage is incomplete; repair it before artifact anchoring", { cause });

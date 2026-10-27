@@ -1,4 +1,4 @@
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { verify } from "node:crypto";
@@ -32,7 +32,7 @@ test.skipIf(process.platform === "win32")("actual freeze lift CLI awaits checked
   expect(result.error).toBeUndefined(); expect(result.signal).toBeNull(); expect(result.code, result.stderr).toBe(0);
   const stored = JSON.parse(readFileSync(f.liftPath(incident.incidentId), "utf8")), { signature, ...payload } = stored, digest = sha256Hex(canonicalize(payload));
   expect(verify(null, Buffer.from(digest, "hex"), f.publicKey, Buffer.from(signature, "base64"))).toBe(true);
-  expect(h.calls()).toEqual([{ ref: { provider: "file", id: "artifact-seal" }, hex: digest }]); expect(result.stdout).toContain(`Freeze lifted: ${f.liftPath(incident.incidentId)}`);
+  expect(h.calls()).toEqual([{ ref: { provider: "file", id: "artifact-seal" }, hex: digest }]); expect(result.stdout).toContain(`Freeze lifted: ${realpathSync(f.liftPath(incident.incidentId))}`); // the CLI resolves its cwd (macOS /private/var)
 }, 60_000);
 
 test.skipIf(process.platform === "win32")("actual drift report CLI uses owned diagnostic INPUTS and awaits incident signing before its real Markdown output", async () => {

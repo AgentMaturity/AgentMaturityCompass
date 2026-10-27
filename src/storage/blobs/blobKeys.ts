@@ -252,7 +252,7 @@ export function readBlobKeyMaterial(workspace: string, keyVersion: number): Buff
 
 /** Optional refusal only. Async metadata preparation does not grant a new owner or signer policy. */
 export interface BlobKeyPublicationOptions { beforePublish?: () => void }
-export interface BlobKeySecretProgress {
+interface BlobKeySecretProgress {
   keyVersion: number; attempted: boolean; returned: boolean; acknowledged: boolean;
 }
 export interface BlobKeyPublicationProgress {

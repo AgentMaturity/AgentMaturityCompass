@@ -11,10 +11,6 @@ import {
 } from "./cgxApi.js";
 import type { CgxPolicy } from "./cgxSchema.js";
 
-export function cgxInitCli(workspace: string) {
-  return cgxInitForApi(workspace);
-}
-
 export function cgxBuildCli(params: {
   workspace: string;
   scope: "workspace" | "agent";
@@ -65,5 +61,3 @@ export async function cgxInitCliAsync(workspace: string) { return cgxInitForApiA
 export async function cgxBuildCliAsync(params: Parameters<typeof cgxBuildCli>[0]) {
   const own = { ...params }; return cgxBuildForApiAsync({ workspace: own.workspace, scope: own.scope, targetId: own.id }, { beforePublish: () => assertOwnerMode(own.workspace, "cgx build") });
 }
-export async function cgxPolicyApplyCliAsync(params: { workspace: string; policy: CgxPolicy }) { return cgxPolicyApplyForApiAsync(params); }
-export async function cgxPolicyPrintCliAsync(workspace: string) { return (await cgxPolicyForApiAsync(workspace)).policy; }

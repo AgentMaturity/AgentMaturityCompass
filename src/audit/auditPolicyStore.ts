@@ -148,13 +148,6 @@ export function verifyAuditSchedulerSignature(workspace: string) {
 export function prepareAuditPolicyAsync(workspace: string, policy: AuditPolicy, options: AuditPublicationOptions = {}) {
   return captureAuditPolicyMapPublication(workspace, { policy }, options).prepare();
 }
-export async function saveAuditPolicyAsync(workspace: string, policy: AuditPolicy, options: AuditPublicationOptions = {}) {
-  const prepared = await prepareAuditPolicyAsync(workspace, policy, options); return prepared.publish().policy!;
-}
-export async function initAuditPolicyAsync(workspace: string, options: AuditPublicationOptions = {}) {
-  const policy = defaultAuditPolicy(), prepared = await prepareAuditPolicyAsync(workspace, policy, options);
-  const saved = prepared.publish().policy!; prepared.assertCurrent(); return { ...saved, policy };
-}
 export async function loadAuditPolicyAttemptAsync(workspace: string, options: AuditPublicationOptions = {}) {
   const caller = { ...options }; caller.beforePublish?.(); caller.assertInputsCurrent?.(); caller.assertPreparationInputsCurrent?.();
   const selected = readAuditPolicySelection(workspace);
@@ -169,7 +162,4 @@ export async function loadAuditPolicyAttemptAsync(workspace: string, options: Au
   const prepared = await captureAuditPolicyMapPublication(workspace, { policy }, caller, previous).prepare();
   prepared.publish(); prepared.assertCurrent();
   return Object.freeze({ policy, assertCurrent: prepared.assertCurrent, verification: () => prepared.verification("policy") });
-}
-export async function loadAuditPolicyAsync(workspace: string, options: AuditPublicationOptions = {}): Promise<AuditPolicy> {
-  const loaded = await loadAuditPolicyAttemptAsync(workspace, options); loaded.assertCurrent(); return loaded.policy;
 }

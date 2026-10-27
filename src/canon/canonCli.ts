@@ -2,10 +2,6 @@ import { canonApplyForApi, canonGetForApi, canonInitForApi, canonVerifyForApi, c
 import { assertOwnerMode } from "../mode/mode.js";
 import type { CompassCanon } from "./canonSchema.js";
 
-export function canonInitCli(workspace: string) {
-  return canonInitForApi(workspace);
-}
-
 export function canonVerifyCli(workspace: string) {
   return canonVerifyForApi(workspace);
 }

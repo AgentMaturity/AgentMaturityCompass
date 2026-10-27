@@ -89,7 +89,7 @@ interface AuditPacketProgress {
   outputCallEntered: boolean; outputReturned: boolean; outputAcknowledged: boolean;
   ledgerCloseAttempted: boolean; ledgerClosed: boolean; ledgerCloseFailed: boolean; publishedPaths: readonly string[];
 }
-export class AuditPacketPublicationError extends Error {
+class AuditPacketPublicationError extends Error {
   readonly code = "AUDIT_PACKET_INCOMPLETE";
   constructor(readonly progress: Readonly<AuditPacketProgress>, cause: unknown, readonly closeCause?: unknown) {
     super("audit packet did not complete; inspect output return/acknowledgment and readonly setup/close progress before retrying", { cause });

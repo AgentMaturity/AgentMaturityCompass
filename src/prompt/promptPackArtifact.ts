@@ -8,7 +8,6 @@ import { getPublicKeyHistory } from "../crypto/keys.js";
 import { signSerializedPayloadWithAuditor } from "../org/orgSigner.js";
 import { promptArchiveBytes } from "./promptArchive.js";
 import { capturePromptFiles, publishPromptFiles } from "./promptPublication.js";
-export { buildPromptPackArtifactAsync } from "./promptPackAsync.js";
 import { compilePromptPack } from "./promptCompiler.js";
 import {
   promptLintSchema,

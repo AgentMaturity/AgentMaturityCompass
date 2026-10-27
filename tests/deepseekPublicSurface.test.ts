@@ -111,7 +111,8 @@ function scriptedChild(): ChildProcessWithoutNullStreams {
         const request = JSON.parse(line) as { id: number; method: string };
         const reply = request.method === "initialize"
           ? { jsonrpc: "2.0", id: request.id, result: { protocolVersion: 1,
-            agentInfo: { name: "agent-maturity-compass", version: "scripted-process-edge" }, agentCapabilities: {} } }
+            agentInfo: { name: "agent-maturity-compass", version: "scripted-process-edge" },
+              agentCapabilities: { _meta: { "dev.agentmaturity.amc": { executionApi: 1 } } } } }
           : { jsonrpc: "2.0", id: request.id, error: { code: -32601, message: "Unexpected fixture method" } };
         queueMicrotask(() => stdout.write(JSON.stringify(reply) + "\n"));
       }

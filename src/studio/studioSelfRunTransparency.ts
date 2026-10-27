@@ -39,7 +39,7 @@ const initializationSnapshot = (state: InitializationProgress) => Object.freeze(
 
 /** The primary run/plan and forecast stages have already returned when the route enters this mandatory suffix.
  * Cause retains actual append subclasses/progress. A candidate entry is never projected as a committed hash. */
-export class DiagnosticSelfRunTransparencyError extends Error {
+class DiagnosticSelfRunTransparencyError extends Error {
   readonly code = "DIAGNOSTIC_SELF_RUN_TRANSPARENCY_PARTIAL";
   constructor(readonly agentId: string, readonly runId: string, readonly primaryResult: AutoAnswerOutput,
     readonly phase: string, readonly captureProgress: Readonly<CaptureProgress>,

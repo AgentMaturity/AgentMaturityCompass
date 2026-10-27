@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 1,
+  "key": "P2-22",
+  "date": "2026-10-27",
+  "commit": "a9fdfcd6aed0d26d64862194f125d3217f3f5b61",
+  "branch": "rtd/p2-22-operator-workflow",
+  "node": "v22.23.3",
+  "pnpm": "not used (npm scripts)",
+  "os": "macOS 26.6.2",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "npm run -s build",
+      "exit": 0,
+      "durationMs": 79817
+    },
+    {
+      "cmd": "npm run -s typecheck",
+      "exit": 0,
+      "durationMs": 45886
+    },
+    {
+      "cmd": "npm run -s typecheck:tests",
+      "exit": 0,
+      "durationMs": 78130
+    },
+    {
+      "cmd": "npm run -s lint",
+      "exit": 0,
+      "durationMs": 3685
+    },
+    {
+      "cmd": "npm run -s check:gates",
+      "exit": 0,
+      "durationMs": 423
+    },
+    {
+      "cmd": "npm run -s check:dead-code",
+      "exit": 0,
+      "durationMs": 4913
+    },
+    {
+      "cmd": "npm run -s check:duplicates",
+      "exit": 0,
+      "durationMs": 1017
+    },
+    {
+      "cmd": "npm run -s check:counts",
+      "exit": 0,
+      "durationMs": 925
+    },
+    {
+      "cmd": "npm run -s check:api-ref",
+      "exit": 0,
+      "durationMs": 250
+    },
+    {
+      "cmd": "npm run -s check:docs-drift",
+      "exit": 0,
+      "durationMs": 484
+    },
+    {
+      "cmd": "npm run -s check:architecture-boundaries",
+      "exit": 1,
+      "durationMs": 3065
+    },
+    {
+      "cmd": "npx vitest run tests/operator tests/api/operatorRouter.test.ts tests/operatorWorkflowPage.test.ts tests/lineRatchet.test.ts --maxWorkers=2",
+      "exit": 0,
+      "durationMs": 25211
+    }
+  ],
+  "tests": {
+    "total": 80,
+    "passed": 80,
+    "failed": 0,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "sample-review-packet.zip",
+      "sha256": "91fc95014749cc09e95f070aa9c3ad31bbc543e94156d45c019bb5ebc3d6a7a1"
+    },
+    {
+      "path": "sample-review-timing.csv",
+      "sha256": "5d4dff27f61425859fb65763b81dad510480002d20d884348d6d2ee1e8c0609c"
+    },
+    {
+      "path": "sample-verifier-report.json",
+      "sha256": "0238cff14ff2de30e9d643194fbbd5676081ba2703781dad68e4d1571977060a"
+    }
+  ],
+  "notes": "Focused P2-22 suites; see README.md for the related-file run, mutation checks, red/green and pending items."
+}

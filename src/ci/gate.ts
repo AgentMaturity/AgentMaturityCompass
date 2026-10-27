@@ -281,7 +281,7 @@ export function initCiForAgent(params: {
 }
 
 /** Partial native facts; a returned member is not a helper readback or an atomic multi-file commit. */
-export class CiInitializationError extends Error {
+class CiInitializationError extends Error {
   readonly code = "CI_INITIALIZATION_INCOMPLETE";
   constructor(readonly progress: Readonly<{ phase: string; returnedPolicyMembers: readonly string[]; pairReturned: boolean;
     initialization: Awaited<ReturnType<typeof initTransparencyLogAttemptAsync>>["progress"] | null;

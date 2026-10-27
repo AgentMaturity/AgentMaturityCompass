@@ -6,7 +6,7 @@
 import { createCipheriv, createDecipheriv, randomBytes, sign } from "node:crypto";
 import { getSigningKey, getSigningPublicKeyPem } from "../signingKeys.js";
 import { assertOwnerMode } from "../../mode/mode.js";
-import { getVaultSecret, setVaultSecret } from "../../vault/vault.js";
+import { getVaultSecret, getVaultSecretReadOnly, setVaultSecret } from "../../vault/vault.js";
 import { isLocalPurpose, type LocalPurpose } from "../../vault/vaultPayload.js";
 import { signingKeyId } from "../algorithmPolicy.js";
 import { KeyProviderError, type KeyProvider, type KeyRef } from "../provider.js";
@@ -20,7 +20,8 @@ function purposeOf(ref: KeyRef): LocalPurpose {
 
 function wrapSecret(workspace: string, ref: KeyRef, create: boolean): Buffer {
   const name = `amc.key-provider.file.wrap:${ref.id}`;
-  let value = getVaultSecret(workspace, name);
+  // Unwrapping only reads: an unlocked session or AMC_VAULT_PASSPHRASE, as blob keys are read (P2-09 ledger keys).
+  let value = create ? getVaultSecret(workspace, name) : getVaultSecretReadOnly(workspace, name);
   if (value === null) {
     if (!create) throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", "file", "the vault holds no wrap key of that name");
     // Creating a key is a key change: owner mode, checked here as well as by any caller.
@@ -49,19 +50,24 @@ export function fileKeyProvider(workspace: string): KeyProvider {
       return Buffer.concat([WRAP_MAGIC, iv, cipher.getAuthTag(), body]);
     },
     async unwrapKey(ref, wrapped) {
-      const bytes = Buffer.from(wrapped);
-      if (bytes.length < WRAP_MAGIC.length + 28 || !bytes.subarray(0, WRAP_MAGIC.length).equals(WRAP_MAGIC)) {
-        throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", "file", "not a file-provider wrapped key");
-      }
-      const at = WRAP_MAGIC.length;
-      const decipher = createDecipheriv("aes-256-gcm", wrapSecret(workspace, ref, false), bytes.subarray(at, at + 12));
-      decipher.setAAD(Buffer.from(ref.id, "utf8"));
-      decipher.setAuthTag(bytes.subarray(at + 12, at + 28));
-      try {
-        return Buffer.concat([decipher.update(bytes.subarray(at + 28)), decipher.final()]);
-      } catch {
-        throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", "file", "the wrapped key does not open under this wrap key");
-      }
+      return unwrapFileKeySync(workspace, ref, wrapped);
     }
   };
+}
+
+/** The file provider's unwrap, synchronously, for the ledger's synchronous write path (P2-09). */
+export function unwrapFileKeySync(workspace: string, ref: KeyRef, wrapped: Uint8Array): Buffer {
+  const bytes = Buffer.from(wrapped);
+  if (bytes.length < WRAP_MAGIC.length + 28 || !bytes.subarray(0, WRAP_MAGIC.length).equals(WRAP_MAGIC)) {
+    throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", "file", "not a file-provider wrapped key");
+  }
+  const at = WRAP_MAGIC.length;
+  const decipher = createDecipheriv("aes-256-gcm", wrapSecret(workspace, ref, false), bytes.subarray(at, at + 12));
+  decipher.setAAD(Buffer.from(ref.id, "utf8"));
+  decipher.setAuthTag(bytes.subarray(at + 12, at + 28));
+  try {
+    return Buffer.concat([decipher.update(bytes.subarray(at + 28)), decipher.final()]);
+  } catch {
+    throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", "file", "the wrapped key does not open under this wrap key");
+  }
 }

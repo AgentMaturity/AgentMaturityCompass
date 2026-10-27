@@ -195,6 +195,19 @@ lane is skipped, not passed. All new tests remain unexecuted in this authoring
 batch; clean candidate/package/platform, cold verification and release gates
 remain separate and must not reuse these descriptions as acceptance receipts.
 
+## Execution verbs and phases (P2-13)
+
+The wrapper has the same eight verbs as the CLI, the TypeScript SDK and Studio (docs/sdk/EXECUTION_API.md):
+`new_session`, `Turn.iter_updates`, `approve` and `pending_approvals`, `Turn.cancel`, `resume_session`,
+`fork_session`, `dispose` and `verify_session`. Every `RunResult` carries `execution`, the four phases the runtime
+reported (`admission`, `model-completion`, `side-effect-completion`, `evidence-verification`); evidence verification
+stays `pending` until `verify_session` runs the installed CLI's cold verifier. The wrapper refuses a runtime that does not
+advertise execution API v1. `approve` and `verify_session` run the same `amc` executable the agent was launched with.
+
+The `python-sdk` CI job installs the wheel into a fresh virtual environment and runs these tests against the CLI built
+from the same commit, on Python 3.10 and 3.12. `tests/test_parity.py` runs the shared parity scenario when `AMC_BIN`
+names a built CLI.
+
 ## Industry packs and domains
 
 `amc_sdk.industry.AmcIndustry` wraps the industry pack and domain commands of the installed CLI. Like the proof helpers these are CLI calls: each method runs one `amc domain ... --json` command as an argv list (never a shell string) in the fixed `workspace`, with stdin closed so the CLI cannot prompt, and returns the CLI's JSON unchanged after checking it against the shapes below. `amc_bin`, `AMC_BIN` and `timeout` (default 120 s) behave as for `AmcAgent`.

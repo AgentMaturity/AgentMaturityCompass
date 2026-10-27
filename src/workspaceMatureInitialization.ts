@@ -68,7 +68,7 @@ function assertDirectoriesCurrent(expected: ReadonlyMap<string, Directory>) {
 }
 
 /** Typed partial prefix only: inherited vault, lock, cold and SQLite internals do not expose every native effect. */
-export class WorkspaceMatureInitializationPartialError extends WorkspaceInitializationPartialError {
+class WorkspaceMatureInitializationPartialError extends WorkspaceInitializationPartialError {
   constructor(cause: unknown, paths: readonly string[], readonly observation: {
     nativeProgress: readonly Readonly<Progress>[]; configProgress: readonly Readonly<Progress>[];
     inherited: Readonly<Record<string, boolean>>; closeCauses: readonly unknown[]; cleanupCauses: readonly unknown[];

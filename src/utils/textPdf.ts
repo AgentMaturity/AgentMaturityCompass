@@ -3,6 +3,22 @@ export function escapePdfText(input: string): string {
   return input.replaceAll("\\", "\\\\").replaceAll("(", "\\(").replaceAll(")", "\\)");
 }
 
+/** Wraps each line at `width` characters, at a space when one is near, so no text is cut (P2-22). */
+export function wrapPdfLines(lines: readonly string[], width = 100): string[] {
+  return lines.flatMap((raw) => {
+    const out: string[] = [];
+    let line = raw.trimEnd();
+    while (line.length > width) {
+      const space = line.lastIndexOf(" ", width);
+      const cut = space > width / 2 ? space : width;
+      out.push(line.slice(0, cut).trimEnd());
+      line = line.slice(cut).trimStart();
+    }
+    out.push(line);
+    return out;
+  });
+}
+
 export function renderPdfFromLines(lines: string[], escapeText: (text: string) => string = escapePdfText): Buffer {
   const sliced = lines.map((line) => line.trimEnd()).slice(0, 110);
   const content = ["BT", "/F1 10 Tf", "40 810 Td"];

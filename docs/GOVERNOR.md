@@ -65,6 +65,37 @@ Governor evaluates:
 - optional signed work order context
 - optional execution ticket presence
 
+## Break-glass
+
+Break-glass is the one way to act outside a control in an emergency. It is a signed `amc.break-glass/v1` record under `.amc/governor/break-glass/`, never an unsigned file. A record names the agents, tools, action classes and control ids it covers, a window of at most 24 hours, the incident it opened, and the previous record's digest.
+
+```bash
+amc approvals login ...   # the requester's tracked session; its token file names who asks
+amc governor-override --agent <id> --reason "<why, 10+ chars>" --ttl 2h --session-token-file <file> \
+  --tools payments.refund --action-classes FINANCIAL --controls L1-PAY-01
+# Another signed-in user with a role the signed approval policy allows for SECURITY records a bound decision:
+amc approvals approve --agent <id> --mode execute --reason "<why>" --username <name> --roles OWNER \
+  --session-token-file <their file> --expect-request-digest <digest> <approvalRequestId>
+amc governor-override --agent <id> --activate <breakGlassId> --approval <approvalRequestId>
+```
+
+`amc emergency-override` takes the same flags (`--ttl` in milliseconds) and writes the same record. The request opens a `GOVERNANCE_VIOLATION` incident and raises an approval whose intent is the record's digest. The requester is the authenticated user of an `amc approvals login` session (`--session-token-file`), never a name or OS account; without a valid session the request is refused. That user is recorded as the approval request's initiator, so the engine refuses their decision under any display name. Activation needs one decision bound to that request (`--expect-request-digest`) from an allowed role. Without a signing key, or with `AMC_NO_SIGN=1`, activation is refused; nothing is recorded unsigned. Legacy files in `.amc/governor/overrides/` and `.amc/governor/emergency-overrides/` whose signature is missing or does not verify are reported as `INVALID_SIGNATURE` and never honoured, and no enforcement path reads either legacy store.
+
+At the tool pipeline, a live, verified break-glass record that covers the call is named in the authorization record (`authority.breakGlassId`). The compiled-policy guard then abstains for the record's controls only. The recheck re-reads it before every call.
+
+### Precedence
+
+Break-glass and scoped exceptions never relax:
+
+- the monotonic safety guards (prompt injection, runtime firewall, egress allowlist, budgets);
+- an active freeze (`action_class_frozen`) or kill switch;
+- legal holds and residency blocks;
+- a pending legal review of the control itself: the Review dimension stays `pending`.
+
+### Post-hoc review
+
+Every call that runs under a break-glass record appends a `BREAK_GLASS_ACTION` ledger row; the signed record is never edited. The review covers the packet: the record's digest plus every action digest. Until a review record (`amc.review-record/v1`, see [APPROVALS.md](APPROVALS.md)) exists for the packet as it is now, the next break-glass in the workspace is refused `previous_break_glass_unreviewed`. AMC never resolves the incident itself; the incident workflow does not yet check for the review before it is resolved. A review that is overdue (48 hours after the window ends) shows as `POSTMORTEM_OVERDUE` in `amc governor-override-alerts`. Break-glass is a recorded, reviewed deviation, never compliance.
+
 ## Security Notes
 
 - Unsigned or invalid action policy caps maturity and blocks execute.

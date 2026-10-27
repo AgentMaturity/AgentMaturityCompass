@@ -9,12 +9,13 @@ import { executeAction, selectAgentId } from "./mechanicExecutionActions.js";
 import { captureMechanicApprovals } from "./mechanicExecutionApprovals.js";
 import { captureMechanicRun, mechanicProgress, mechanicFailed, appendMechanicEntry, MechanicPublicationError } from "./mechanicPublication.js";
 import type { MechanicUpgradePlan } from "./upgradePlanSchema.js";
+import { inCheckPass } from "../utils/checkPass.js";
 
 type RequestParams = { workspace: string; planId: string; actor: string; reason: string };
 type ExecuteParams = { workspace: string; planId: string };
 type Executed = { actionId: string; status: "EXECUTED" | "SKIPPED"; note: string };
 type Consumption = ReturnType<typeof consumeApprovedExecution> & { actionId: string; approvalRequestId: string; attemptedExecutionId: string };
-export class MechanicExecutionError extends Error {
+class MechanicExecutionError extends Error {
   readonly code = "MECHANIC_EXECUTION_PARTIAL";
   constructor(readonly executed: readonly Executed[], readonly consumptions: readonly Consumption[], readonly attemptedActionId: string | null,
     readonly completed: readonly string[], readonly phase: string, readonly entryHash: string | null, readonly pendingRecorded: boolean | null,
@@ -26,7 +27,7 @@ function context(workspace: string, planId: string, beforePublish: () => void) {
   const run = captureMechanicRun(workspace, beforePublish), captured = captureMechanicPlanById(workspace, planId), state = mechanicProgress();
   let published: (() => void) | null = null;
   const assertPlan = () => { if (published === null) captured.assertCurrent(); else published(); };
-  const assertCurrent = () => { run.beforePublish(); assertPlan(); run.fixed(); };
+  const assertCurrent = inCheckPass(() => { run.beforePublish(); assertPlan(); run.fixed(); });
   return { run, captured, state, assertPlan, assertInputs: assertPlan, assertCurrent, failed(cause: unknown): never { return mechanicFailed(state, cause); }, async save(plan: MechanicUpgradePlan, assertInputs: () => void = () => {}) {
     state.phase = "plan-prepare"; state.entryHash = null; state.pendingRecorded = null;
     run.beforePublish(); assertPlan(); assertInputs(); run.fixed();
@@ -135,16 +136,12 @@ export async function requestPlanApprovalsForAuthority(params: RequestParams, be
     return { result: { plan, approvalRequests: approvals }, current };
   } catch (cause) { mechanicFailed(current.state, cause); }
 }
-
-export async function executeMechanicPlan(params: ExecuteParams): Promise<{ plan: MechanicUpgradePlan; executed: Executed[] }> {
-  return (await executeMechanicPlanForAuthority(params, () => {})).result;
-}
 /** Internal trusted caller boundary; the callback adds only refusal to original authority and actual grant checks. */
 export async function executeMechanicPlanForAuthority(params: ExecuteParams, beforePublish: () => void) {
   const input = { ...params }, current = context(input.workspace, input.planId, beforePublish), plan = current.captured.plan;
   const grants = captureMechanicApprovals(input.workspace, plan), executed: Executed[] = [], consumptions: Consumption[] = [];
   let attemptedActionId: string | null = null;
-  const assertCurrent = () => { current.run.beforePublish(); current.assertPlan(); grants.assertCurrent(); current.run.fixed(); };
+  const assertCurrent = inCheckPass(() => { current.run.beforePublish(); current.assertPlan(); grants.assertCurrent(); current.run.fixed(); });
   const fail = (cause: unknown, recordingErrors: readonly unknown[] = []): never => {
     let publicationError: unknown | null = null;
     try { mechanicFailed(current.state, recordingErrors.at(-1) ?? cause); }
@@ -157,10 +154,11 @@ export async function executeMechanicPlanForAuthority(params: ExecuteParams, bef
   for (const phase of plan.phases) for (const action of phase.actions) {
     attemptedActionId = action.id;
     try {
-      const beforeEffect = () => { current.run.beforePublish(); current.assertPlan(); grants.assertCurrent(); current.run.fixed(); };
+      const beforeEffect = inCheckPass((policyPairInFlight: boolean = false) => { current.run.beforePublish(); current.assertPlan(); grants.assertCurrent(policyPairInFlight); current.run.fixed(); });
       current.state.phase = `action:${action.id}`; current.state.entryHash = null; current.state.pendingRecorded = null; beforeEffect();
       if (action.approvalRequestId) assertVaultMaySign(input.workspace, "artifact-seal");
-      const out = await executeAction({ workspace: input.workspace, plan, action, beforeEffect,
+      const out = await executeAction({ workspace: input.workspace, plan, action,
+        beforeEffect: action.kind === "POLICY_PACK_APPLY" ? () => beforeEffect(true) : () => beforeEffect(),
         recordEffect(effect) { current.state.completed.push(effect); } });
       // A returned action effect exists even if authority or consumption is refused immediately afterward.
       executed.push({ actionId: action.id, ...out }); current.state.completed.push(`action:${action.id}:${out.status}`);
@@ -186,8 +184,8 @@ export async function executeMechanicPlanForAuthority(params: ExecuteParams, bef
     }
   }
   try {
-    assertCurrent(); await current.save(plan, grants.assertCurrent);
-    await current.log("MECHANIC_PLAN_EXECUTED", "policy", sha256Hex(Buffer.from(JSON.stringify(executed), "utf8")), plan.planId, grants.assertCurrent);
+    assertCurrent(); await current.save(plan, () => grants.assertCurrent());
+    await current.log("MECHANIC_PLAN_EXECUTED", "policy", sha256Hex(Buffer.from(JSON.stringify(executed), "utf8")), plan.planId, () => grants.assertCurrent());
     assertCurrent(); return { result: { plan, executed }, current: { ...current, assertCurrent, failed: fail, assertInputs() { current.assertPlan(); grants.assertCurrent(); } } };
   } catch (cause) { return fail(cause); }
 }

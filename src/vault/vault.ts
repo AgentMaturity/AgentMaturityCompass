@@ -20,7 +20,10 @@ import {
   LOCAL_PURPOSES, ROLE_PRIMARY_PURPOSE, isLocalPurpose, parseVaultPayload, payloadFromRoleKeys, purposeKey, roleOfPurpose, safeSecrets,
   type LocalPurpose, type VaultPayloadV2
 } from "./vaultPayload.js";
+import { noteCheckPassWrite } from "../utils/checkPass.js";
+import { purposeKeyPaths, vaultPaths } from "./vaultPaths.js";
 
+export { purposeKeyPaths, vaultPaths };
 
 export type VaultKeyKind = "monitor" | "auditor" | "lease" | "session";
 type VaultPayload = VaultPayloadV2;
@@ -85,48 +88,6 @@ function assertSafeSecretKey(secretKey: string): void {
   if (UNSAFE_SECRET_KEYS.has(secretKey)) {
     throw new Error(`Unsafe secret key: ${secretKey}`);
   }
-}
-
-export function vaultPaths(workspace: string): {
-  vaultFile: string;
-  metaFile: string;
-  previousVaultFile: string;
-  keysDir: string;
-  monitorPublic: string;
-  auditorPublic: string;
-  leasePublic: string;
-  sessionPublic: string;
-  monitorHistory: string;
-  auditorHistory: string;
-  leaseHistory: string;
-  sessionHistory: string;
-  legacyMonitorPrivate: string;
-  legacyAuditorPrivate: string;
-} {
-  const amcDir = join(workspace, ".amc");
-  const keysDir = join(amcDir, "keys");
-  return {
-    vaultFile: join(amcDir, "vault.amcvault"),
-    metaFile: join(amcDir, "vault.amcvault.meta.json"),
-    previousVaultFile: join(amcDir, "previous-vault.amcvault"),
-    keysDir,
-    monitorPublic: join(keysDir, "monitor_ed25519.pub"),
-    auditorPublic: join(keysDir, "auditor_ed25519.pub"),
-    leasePublic: join(keysDir, "lease_ed25519.pub"),
-    sessionPublic: join(keysDir, "session_ed25519.pub"),
-    monitorHistory: join(keysDir, "monitor_history.json"),
-    auditorHistory: join(keysDir, "auditor_history.json"),
-    leaseHistory: join(keysDir, "lease_history.json"),
-    sessionHistory: join(keysDir, "session_history.json"),
-    legacyMonitorPrivate: join(keysDir, "monitor_ed25519"),
-    legacyAuditorPrivate: join(keysDir, "auditor_ed25519")
-  };
-}
-
-/** P1-08 purpose files: `<purpose>.pub` and `<purpose>_history.json` (for lease and session, the role history). */
-export function purposeKeyPaths(workspace: string, purpose: LocalPurpose): { publicFile: string; historyFile: string } {
-  const keysDir = vaultPaths(workspace).keysDir;
-  return { publicFile: join(keysDir, `${purpose}.pub`), historyFile: join(keysDir, `${purpose}_history.json`) };
 }
 
 function defaultPassphrase(): string {
@@ -466,7 +427,8 @@ function openVaultSession(workspace: string, phrase: string): void {
     payload = decodePayload(readEnvelopeRaw(workspace), phrase).payload;
     openedDigest = null; // the envelope was replaced; the next unlock re-derives from the new bytes
   }
-  // Publish the session only once its payload is complete.
+  // Publish the session only once its payload is complete. A check pass answered before this sees the new session.
+  noteCheckPassWrite();
   session.unlocked = true;
   session.payload = payload; purposeContinuity.set(session, {});
   session.lastUnlockedTs = Date.now();
@@ -476,6 +438,7 @@ function openVaultSession(workspace: string, phrase: string): void {
 }
 
 export function lockVault(workspace: string): void {
+  noteCheckPassWrite();
   blobChildren.delete(workspace); receiptChildren.delete(workspace);
   readOnlySecrets.delete(workspace);
   const session = sessionFor(workspace);

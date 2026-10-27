@@ -183,7 +183,8 @@ export function parseAMCConfigBytes(bytes: Buffer | null): AMCConfig {
     // Carried through so saveAMCConfig never drops them; loadTimeConfig, loadTransparencyConfig and loadKeysConfig validate them.
     ...(raw?.time === undefined ? {} : { time: raw.time }),
     ...(raw?.transparency === undefined ? {} : { transparency: raw.transparency }),
-    ...(raw?.keys === undefined ? {} : { keys: raw.keys })
+    ...(raw?.keys === undefined ? {} : { keys: raw.keys }),
+    ...(raw?.operator === undefined ? {} : { operator: raw.operator })
   };
 }
 

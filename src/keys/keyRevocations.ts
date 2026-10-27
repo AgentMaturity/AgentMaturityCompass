@@ -13,6 +13,7 @@ import { assertNeverAnchored } from "./anchors.js";
 import { highWaterPath } from "./highWater.js";
 import { assertBoundPublicKey, boundProviderKey, keysetPaths } from "./keyset.js";
 import { readAnchoredRevocationList, readStagedRevocationList, type AnchoredListLocation } from "./revocationList.js";
+import { inCheckPass } from "../utils/checkPass.js";
 
 export const KEY_REVOCATION_REASONS = ["key-compromise", "superseded", "unspecified"] as const;
 export type KeyRevocationReason = (typeof KEY_REVOCATION_REASONS)[number];
@@ -49,7 +50,7 @@ const memo = new Map<string, { stamp: string; rows: KeyRevocation[] }>();
  * The workspace's key revocations from one verified, rollback-checked read. `required` (the workspace has a key set):
  * a missing list is refused. Throws whenever the list cannot be read or proven current.
  */
-export function readKeyRevocations(workspace: string, required: boolean): KeyRevocation[] {
+export const readKeyRevocations = inCheckPass((workspace: string, required: boolean): KeyRevocation[] => {
   const path = join(keysDir(workspace), "revocations.signed.json");
   const keyset = keysetPaths(workspace);
   const now = statStamp([path, `${path}.pending`, keyset.keyset, keyset.pending, join(keysDir(workspace), "revocation-list-provider.pub"), highWaterPath()]);
@@ -72,7 +73,7 @@ export function readKeyRevocations(workspace: string, required: boolean): KeyRev
   }));
   memo.set(workspace, { stamp: now, rows });
   return rows;
-}
+});
 
 /** A signing key the workspace key revocation list names: a caller tells it from a locked vault or an unreadable list by type. */
 export class KeyRevokedError extends Error {

@@ -1,0 +1,31 @@
+{
+  "schema": "amc.review-record/v1",
+  "reviewId": "rev_ffffffffffffffffffffffff",
+  "subject": {
+    "kind": "agent-output",
+    "id": "summary-001",
+    "sha256": "1111111111111111111111111111111111111111111111111111111111111111"
+  },
+  "decision": "rejected",
+  "reviewer": {
+    "userId": "reviewer-1",
+    "roles": [
+      "AUDITOR"
+    ]
+  },
+  "requesterId": "requester-1",
+  "findings": [
+    {
+      "code": "material_fact_omitted",
+      "severity": "major",
+      "note": "omits the chargeback spike"
+    }
+  ],
+  "reviewedAt": "2026-10-27T00:00:00.000Z",
+  "expiresAt": null,
+  "approval": {
+    "agentId": "default",
+    "approvalRequestId": "apprreq_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "requestBindingDigest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+  }
+}

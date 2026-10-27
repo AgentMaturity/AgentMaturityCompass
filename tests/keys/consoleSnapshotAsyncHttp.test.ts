@@ -17,7 +17,8 @@ import { fixture, cleanupFixtures, deferred } from "../helpers/consoleOversightF
 const control=vi.hoisted(()=>({afterSign:undefined as (()=>Promise<void>)|undefined,messages:[] as Buffer[]}));
 vi.mock("../../src/keys/providers/file.js",async original=>{const actual=await original<typeof import("../../src/keys/providers/file.js")>();return{...actual,fileKeyProvider:(workspace:string)=>{
   const real=actual.fileKeyProvider(workspace);return{...real,async sign(...args:Parameters<typeof real.sign>){const answer=await real.sign(...args);if(args[0].id==="artifact-seal"){
-    control.messages.push(Buffer.from(args[1]));await control.afterSign?.();}return answer;}};}};});
+    // Only the console snapshot's own Sign is paused or faulted; primary actions also sign with the artifact-seal purpose.
+    control.messages.push(Buffer.from(args[1]));if(new Error().stack?.includes("publishConsoleSnapshotAsync"))await control.afterSign?.();}return answer;}};}};});
 const servers:Array<Awaited<ReturnType<typeof startStudioApiServer>>>=[];
 afterEach(async()=>{control.afterSign=undefined;for(const server of servers.splice(0))await server.close();control.messages=[];cleanupFixtures();});
 async function studio(){const f=fixture(),owner=initUsersConfig({workspace:f.workspace,username:"snapshot-owner",password:"snapshot-owner-password"}).owner,

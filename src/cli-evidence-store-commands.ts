@@ -61,15 +61,15 @@ export function registerEvidenceStoreCommands(program: Command): void {
         process.env.AMC_GUARD_EVENTS_DB_PATH ?? join(workspace, ".amc", "guard_events.sqlite");
       const comparison = compareGuardEventStores({ workspace, legacyDbPath });
       if (opts.json) {
-        console.log(JSON.stringify({ stage: currentStage(), ...comparison }, null, 2));
+        console.log(JSON.stringify({ stage: currentStage(workspace), ...comparison }, null, 2));
         return;
       }
       console.log(chalk.bold("\nGuard event store parity"));
-      console.log(chalk.gray("Stage:            "), currentStage());
+      console.log(chalk.gray("Stage:            "), currentStage(workspace));
       console.log(chalk.gray("Legacy rows:      "), comparison.legacyRows);
       console.log(chalk.gray("Consolidated rows:"), comparison.consolidatedRows);
       if (comparison.identical) {
-        console.log(chalk.green("\nStores agree. Cutover is safe: set AMC_GUARD_EVENTS_STAGE=CUTOVER."));
+        console.log(chalk.green("\nStores agree. Cutover is safe: run amc evidence-stores cutover."));
         return;
       }
       console.log(chalk.yellow("\nStores differ — do not cut over yet."));
@@ -91,6 +91,96 @@ export function registerEvidenceStoreCommands(program: Command): void {
         console.log(chalk.red("  Same id, different content:"), comparison.divergent.length);
       }
       process.exitCode = 1;
+    });
+
+  stores
+    .command("encrypt")
+    .description("Encrypt existing inline evidence payloads under the ledger data key (P2-09)")
+    .option("--key-provider <id>", "provider of the wrapping key for a new data key (default: file)")
+    .option("--key-ref <id>", "wrapping key id: KMS ARN or name, Key Vault URL, PKCS#11 URI, or a vault wrap-key name")
+    .option("--rotate-key", "add a new data key version first; old rows keep theirs")
+    .option("--rewrap", "re-wrap every data key version (under --key-ref when given) and stop; no ciphertext changes")
+    .option("--json", "Output as JSON")
+    .action(async (opts: { keyProvider?: string; keyRef?: string; rotateKey?: boolean; rewrap?: boolean; json?: boolean }) => {
+      const { encryptExistingLedger } = await import("./ledger/encryption/encryptMigration.js");
+      const { rewrapDataKeys, rotateDataKey } = await import("./ledger/encryption/dataKeys.js");
+      const { KEY_PROVIDER_IDS } = await import("./keys/provider.js");
+      const workspace = process.cwd();
+      const provider = KEY_PROVIDER_IDS.find((id) => id === (opts.keyProvider ?? "file"));
+      if (!provider) throw new Error(`--key-provider must be one of ${KEY_PROVIDER_IDS.join(", ")}`);
+      const ref = opts.keyRef ? { provider, id: opts.keyRef } : undefined;
+      if (opts.rewrap) {
+        const keys = await rewrapDataKeys(workspace, { ref });
+        console.log(opts.json ? JSON.stringify({ rewrapped: keys.map((key) => key.keyVersion) }) : chalk.green(`Re-wrapped ${keys.length} ledger data key version(s).`));
+        return;
+      }
+      if (opts.rotateKey) await rotateDataKey(workspace, { ref });
+      const result = await encryptExistingLedger(workspace, { ref });
+      if (opts.json) {
+        console.log(JSON.stringify(result, null, 2));
+        return;
+      }
+      console.log(chalk.green(`Encrypted ${result.receipt.rowsEncrypted} row(s) under data key version ${result.receipt.keyVersion}; ${result.receipt.rowsSkipped} already encrypted.`));
+      console.log(chalk.gray(`Chain head unchanged: ${result.receipt.chainHeadAfter}`));
+      console.log(chalk.gray(`Signed receipt: ${result.receiptPath}`));
+    });
+
+  stores
+    .command("worm-export")
+    .description("Export signed retention segments to an object-lock (WORM) bucket under a retention lock that cannot be shortened (P2-09)")
+    .requiredOption("--bucket <name>", "S3 bucket with Object Lock enabled")
+    .requiredOption("--retain-days <n>", "retain each segment this many days after its last event")
+    .option("--prefix <prefix>", "key prefix inside the bucket", "")
+    .option("--region <region>", "bucket region (default: the AWS SDK's)")
+    .option("--json", "Output as JSON")
+    .action(async (opts: { bucket: string; retainDays: string; prefix: string; region?: string; json?: boolean }) => {
+      const { exportRetentionSegments } = await import("./ops/retention/wormExport.js");
+      const { s3ObjectLockTarget } = await import("./ops/retention/wormTargets.js");
+      const days = Number(opts.retainDays);
+      if (!Number.isInteger(days) || days < 1) throw new Error("--retain-days must be a positive integer");
+      const receipt = await exportRetentionSegments({ workspace: process.cwd(), target: s3ObjectLockTarget({ bucket: opts.bucket, prefix: opts.prefix, region: opts.region }),
+        retainUntil: (segment) => new Date(segment.endTs + days * 86_400_000) });
+      if (opts.json) {
+        console.log(JSON.stringify(receipt, null, 2));
+        return;
+      }
+      console.log(chalk.green(`Exported ${receipt.segments} segment(s): ${receipt.uploaded.length} object(s) uploaded, ${receipt.alreadyPresent.length} already held under lock.`));
+      console.log(chalk.gray(`Signed index: ${receipt.indexKey} (local copy ${receipt.localIndexPath})`));
+      console.log(chalk.gray("WORM export designed for SEC 17a-4-style retention; AMC makes no regulatory claim about it."));
+    });
+
+  stores
+    .command("worm-verify")
+    .description("Verify a downloaded WORM export offline against a trust list (P2-09)")
+    .requiredOption("--index <file>", "the downloaded worm-export-index.json object")
+    .requiredOption("--objects <dir>", "directory holding the downloaded objects by key")
+    .requiredOption("--trust-list <file>", "signed trust list pinning the artifact-seal key")
+    .action(async (opts: { index: string; objects: string; trustList: string }) => {
+      const { verifyWormExport } = await import("./ops/retention/wormExport.js");
+      const verdict = verifyWormExport({ indexFile: opts.index, objectsDir: opts.objects, trustList: opts.trustList });
+      if (verdict.ok) {
+        console.log(chalk.green("WORM export verified: every object, segment signature and chain link checks out under the pinned key."));
+        return;
+      }
+      for (const error of verdict.errors) console.log(chalk.red(`  ${error}`));
+      process.exitCode = 1;
+    });
+
+  stores
+    .command("cutover")
+    .description("Move this workspace's guard events to evidence.sqlite, only when parity is identical (P2-09)")
+    .action(async () => {
+      const { cutOverGuardEvents, guardEventStagePath } = await import("./storage/consolidation/guardEventConsolidation.js");
+      const workspace = process.cwd();
+      const legacyDbPath = process.env.AMC_GUARD_EVENTS_DB_PATH ?? join(workspace, ".amc", "guard_events.sqlite");
+      const { cutOver, comparison } = cutOverGuardEvents({ workspace, legacyDbPath });
+      if (!cutOver) {
+        console.log(chalk.red("Cutover refused: the stores differ. Run amc evidence-stores parity, then backfill if rows are missing."));
+        process.exitCode = 1;
+        return;
+      }
+      console.log(chalk.green(`Cut over at ${comparison.legacyRows} identical row(s). Guard events now read and write evidence.sqlite.`));
+      console.log(chalk.gray(`The legacy file is untouched. To revert, delete ${guardEventStagePath(workspace)} or set AMC_GUARD_EVENTS_STAGE=DUAL_WRITE.`));
     });
 
   stores

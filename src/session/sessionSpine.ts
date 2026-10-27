@@ -15,7 +15,11 @@ import { SessionSpillPolicy } from "./spill/spillPolicy.js";
 import { SessionSpillStore } from "./spill/spillStore.js";
 import type { SpillPolicyConfig } from "./spill/spillTypes.js";
 import type { SessionAttachParams, SessionEventRef } from "./sessionApiTypes.js";
-import { newSessionWriterOwner, sessionWriterMeta, SESSION_WRITER_META } from "./sessionOwnership.js";
+import {
+  DEFAULT_SESSION_LEASE_MS, hasSessionWriter, newSessionWriterOwner, readSessionWriter, sessionWriterMeta, SESSION_WRITER_META,
+  SessionWriterRefused, STALE_EPOCH_MESSAGE, writerMetaMigration, type SessionWriterState
+} from "./sessionOwnership.js";
+import { markSessionJournal, recordFenceRefusal } from "./writerFence.js";
 
 /**
  * The tier every natively-executed row carries.
@@ -61,6 +65,10 @@ export abstract class SessionEventWriter {
   private prevHash: string = SESSION_GENESIS;
   private headEventId: string | null = null;
   private readonly writerOwner = newSessionWriterOwner();
+  // P2-12: the epoch this writer claimed. A new session's open claims 1; attach claims the observed owner's epoch + 1.
+  private epoch = 1;
+  private heartbeat: NodeJS.Timeout | null = null;
+  private lastAppendAt = 0;
 
   // Turn / step labels. `seq` is the cryptographic order; turn and step are the
   // human-facing counters carried in the envelope for projection and reporting.
@@ -175,7 +183,8 @@ export abstract class SessionEventWriter {
     // the top tier would trade one dishonest label for another.
     const released = spec.eventType === "session/release" || spec.eventType === "session/close";
     const claim = spec.eventType === "session/open" || spec.eventType === "session/resume";
-    const meta = embedEnvelope({ trustTier: NATIVE_TRUST_TIER, ...spec.typeMeta, [SESSION_WRITER_META]: sessionWriterMeta(this.writerOwner, released) }, envelope);
+    const writer = sessionWriterMeta({ ...this.writerOwner, epoch: this.epoch, leaseMs: DEFAULT_SESSION_LEASE_MS }, released);
+    const meta = embedEnvelope({ trustTier: NATIVE_TRUST_TIER, ...spec.typeMeta, [SESSION_WRITER_META]: writer }, envelope);
     const input: SessionStoreAppendInput = {
       sessionId,
       runtime: this.runtime,
@@ -187,13 +196,23 @@ export abstract class SessionEventWriter {
       ...(spec.payload !== undefined ? { payload: spec.payload } : {})
     };
 
-    const result = this.store.appendSessionEvent(input);
+    let result: ReturnType<SessionEventStore["appendSessionEvent"]>;
+    try {
+      result = this.store.appendSessionEvent(input);
+    } catch (error) {
+      // A stale or unknown fencing token was refused inside the append transaction: record the refusal (P2-12).
+      if (!(error instanceof SessionWriterRefused) || (error.code !== "STALE_EPOCH" && error.code !== "UNSUPPORTED_OWNER")) throw error;
+      throw this.refuse(error, "append", spec.eventType, this.currentWriter());
+    }
 
     // Advance ONLY after the commit returned. A throw above leaves seq/prevHash
     // untouched, so the head still points at the last durable event.
     this.seqCounter = seq + 1;
     this.prevHash = result.eventHash;
     this.headEventId = result.id;
+    this.lastAppendAt = Date.now();
+    if (claim) this.startHeartbeat();
+    if (released) this.stopHeartbeat();
 
     // Every event of the current turn — except the turn's own seal — is a leaf of
     // that turn's window root and lies within its id bounds.
@@ -231,7 +250,9 @@ export abstract class SessionEventWriter {
     if (rows[rows.length - 1]?.id !== params.observedHeadEventId || rows[rows.length - 1]?.event_hash !== params.observedHeadEventHash) throw new Error("STALE_HEAD: verified session head changed before attach");
     this.seedHead(params.sessionId, rows);
     this.seedTurnChain(rows);
-    return this.appendSessionEvent({
+    const head = rows[rows.length - 1]!;
+    this.epoch = (readSessionWriter(head)?.epoch ?? 0) + 1;
+    const ref = this.appendSessionEvent({
       eventType: "session/resume",
       typeMeta: {
         runtime: this.runtime,
@@ -240,12 +261,75 @@ export abstract class SessionEventWriter {
         compositionDigest: params.compositionDigest,
         policyDigest: params.policyDigest,
         claimant: { ...params.claimant },
-        observedHeadEventId: params.observedHeadEventId
+        observedHeadEventId: params.observedHeadEventId,
+        ...(params.takeover === undefined ? {} : { takeover: params.takeover })
       },
       surface: { op: "none" },
       turn: null,
       step: null
     });
+    // P2-12: the first version-2 append to a version-1 owner's session records the format change; old rows stay as they are.
+    const migration = writerMetaMigration(head);
+    if (migration !== null) this.appendSessionEvent({ eventType: "session/migration", typeMeta: migration, surface: { op: "none" }, turn: null, step: null });
+    return ref;
+  }
+
+  /** Append a resume-time row outside any turn (P2-12 `tool/reconciled`). */
+  recordResumeEvent(eventType: "tool/reconciled", typeMeta: Record<string, unknown>): SessionEventRef {
+    if (this.currentTurn !== null) throw new Error(`SessionService.recordResumeEvent: ${eventType} is recorded between turns`);
+    return this.appendSessionEvent({ eventType, typeMeta, surface: { op: "none" }, turn: null, step: null });
+  }
+
+  /**
+   * Before any model or tool dispatch (P2-12): this writer's signed claim must still be the session's, read from the store
+   * now, or nothing leaves this process. A passing check raises this machine's mark for the session journal.
+   */
+  assertDispatchFence(): void {
+    this.ensureUsable();
+    const last = this.store.readSessionEvents(this.sessionId).at(-1) ?? null;
+    const current = readSessionWriter(last);
+    const ours = current !== null && current.token === this.writerOwner.token && current.epoch === this.epoch && current.state === "active";
+    if (!ours || last === null || last.id !== this.headEventId) {
+      const code = ours ? "STALE_HEAD" : current === null && hasSessionWriter(last) ? "UNSUPPORTED_OWNER" : "STALE_EPOCH";
+      throw this.refuse(new SessionWriterRefused(code, code === "STALE_HEAD" ? "session head changed before dispatch" : STALE_EPOCH_MESSAGE),
+        "dispatch", null, current);
+    }
+    markSessionJournal(this.workspace, this.sessionId, last);
+  }
+
+  /** For the refusal record only: an unreadable head is recorded as no current writer, and the refusal stands. */
+  private currentWriter(): SessionWriterState | null {
+    try { return readSessionWriter(this.store.readSessionEvents(this.sessionId).at(-1) ?? null); } catch { return null; }
+  }
+
+  /** Record a fence refusal in the ledger and return the error to throw; a refusal that could not be recorded says so. */
+  private refuse(error: SessionWriterRefused, stage: "append" | "dispatch", eventType: string | null, current: SessionWriterState | null): Error {
+    const unrecorded = recordFenceRefusal(this.workspace, { sessionId: this.sessionId, code: error.code, stage, eventType,
+      writerToken: this.writerOwner.token, writerEpoch: this.epoch, currentToken: current?.token ?? null, currentEpoch: current?.epoch ?? null });
+    return unrecorded === null ? error : new SessionWriterRefused(error.code, `${error.message.slice(error.code.length + 2)} (the refusal could not be recorded: ${unrecorded})`);
+  }
+
+  /** An idle live writer proves its lease: a signed `session/heartbeat` at half the lease, only between turns. */
+  private startHeartbeat(): void {
+    if (this.heartbeat !== null) return;
+    this.heartbeat = setInterval(() => this.beat(), DEFAULT_SESSION_LEASE_MS / 2);
+    this.heartbeat.unref();
+  }
+
+  private beat(): void {
+    if (this.closed || this.currentTurn !== null || Date.now() - this.lastAppendAt < DEFAULT_SESSION_LEASE_MS / 2) return;
+    try {
+      this.appendSessionEvent({ eventType: "session/heartbeat", typeMeta: { leaseMs: DEFAULT_SESSION_LEASE_MS }, surface: { op: "none" }, turn: null, step: null });
+    } catch (error) {
+      // Not swallowed: said once, and the next append or dispatch fails closed by itself. Only the lease lapses.
+      this.stopHeartbeat();
+      process.stderr.write(`[amc] session ${this.sessionIdValue ?? "?"} heartbeat stopped: ${error instanceof Error ? error.message : String(error)}\n`);
+    }
+  }
+
+  private stopHeartbeat(): void {
+    if (this.heartbeat !== null) clearInterval(this.heartbeat);
+    this.heartbeat = null;
   }
 
   /**
@@ -293,6 +377,7 @@ export abstract class SessionEventWriter {
 
   /** Dispose an unusable writer without claiming its incomplete evidence is sealed or released. */
   disposeWithoutClosing(): void {
+    this.stopHeartbeat();
     this.closed = true;
     this.store.close();
   }
@@ -309,9 +394,9 @@ export abstract class SessionEventWriter {
     }
   }
 
-  /** Throws unless this writer can append now (opened, not closed): a toolset checks it before a tool body runs (P1-78). */
+  /** Throws unless this writer can append and dispatch now (opened, not closed, still fenced in): checked before every tool body (P1-78, P2-12). */
   assertWritable(): void {
-    this.ensureUsable();
+    this.assertDispatchFence();
   }
 
   protected ensureUsable(): void {

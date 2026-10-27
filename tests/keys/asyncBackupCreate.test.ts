@@ -320,14 +320,17 @@ function completedAudit(f: ReturnType<typeof fixture>, backupId: string) {
     return { eventId: row.id, eventHash: row.event_hash };
   } finally { ledger.close(); }
 }
-test("default dot-amc backup replacement retains the selected old archive inside the new encrypted snapshot and completes its own audit and log", async () => {
+test("default dot-amc backup refuses to replace a selected old archive and retains it inside the next encrypted snapshot with its own audit and log", async () => {
   const f = fixture(), policy = loadOpsPolicy(f.workspace); policy.opsPolicy.backups = defaultOpsPolicy().opsPolicy.backups;
   writeFileAtomic(opsPolicyPath(f.workspace), YAML.stringify(policy), 0o644); signOpsPolicy(f.workspace);
   const now = Date.now(), clock = vi.spyOn(Date, "now").mockReturnValue(now + 1000);
   const first = await createBackupAsync({ workspace: f.workspace, outFile: ".amc/backups/default.amcbackup" }), old = readFileSync(first.outFile);
   const firstAudit = completedAudit(f, first.backupId); expect(firstAudit.eventId).not.toBe("");
-  clock.mockReturnValue(now + 2000); const before = boundary.calls.length;
-  const second = await createBackupAsync({ workspace: f.workspace, outFile: ".amc/backups/default.amcbackup" }), actual = inspect(f, second.outFile);
+  clock.mockReturnValue(now + 2000); const before = boundary.calls.length, log = readFileSync(transparencyLogPath(f.workspace));
+  // The old archive is a selected source: the output may not alias it (P2-08), and the refusal precedes every Sign and write.
+  await expect(createBackupAsync({ workspace: f.workspace, outFile: ".amc/backups/default.amcbackup" })).rejects.toThrow(/backup output aliases an actual source/);
+  expect(readFileSync(first.outFile)).toEqual(old); expect(boundary.calls).toHaveLength(before); expect(readFileSync(transparencyLogPath(f.workspace))).toEqual(log);
+  const second = await createBackupAsync({ workspace: f.workspace, outFile: ".amc/backups/next.amcbackup" }), actual = inspect(f, second.outFile);
   expect(second.backupId).not.toBe(first.backupId); expect(readFileSync(second.outFile)).not.toEqual(old);
   expect(readFileSync(join(actual.extracted, ".amc/backups/default.amcbackup"))).toEqual(old);
   expect(actual.manifest.files.find((row: { path: string }) => row.path === ".amc/backups/default.amcbackup")).toMatchObject({ sha256: sha256Hex(old), bytes: old.length });
@@ -365,8 +368,8 @@ test.each(["ops-body", "ops-sidecar", "archive", "archive-mode", "owner-mode", "
       const edited = file(out)!; gate.release.resolve(); const error = await outcome;
       expect(error).toMatchObject({ code: "BACKUP_PUBLICATION_INCOMPLETE", phase: "transparency", publication: { outFile: out, backupId: actual.manifest.backupId },
         archiveSha256: sha256Hex(archive), opsAudit: audit, cause: expect.any(Error) });
-      expect(String(error.cause)).toContain(target.startsWith("ops-") ? "backup ops policy changed after archive publication"
-        : target.startsWith("archive") ? "backup published archive changed while preparing transparency"
+      expect(String(error.cause)).toContain(target.startsWith("ops-") ? "backup ops policy changed while preparing or continuing publication"
+        : target.startsWith("archive") ? "backup acknowledged archive changed during publication continuation"
         : target === "whole-trust" ? "policy signing state changed while signing" : target === "no-sign" ? "no-sign mode does not authorize policy signing" : "blocked in agent mode");
       expect(file(out)).toEqual(edited); expect(readFileSync(transparencyLogPath(f.workspace))).toEqual(log);
       expect(completedAudit(f, actual.manifest.backupId)).toEqual(audit);
@@ -429,9 +432,11 @@ test("backup reports the published archive and ops-audit phase when a real post-
 
 test("backup retains the archive completed audit and native committed-entry cause after a real post-line log I/O failure", async () => {
   const f = fixture(), actualWrite = files.writeFileAtomic; let reached = false;
-  const spy = vi.spyOn(files, "writeFileAtomic").mockImplementation((path, bytes, mode) => { actualWrite(path, bytes, mode);
-    if (path === transparencySealSigPath(f.workspace) && !reached) { reached = true; const root = merkleCurrentRootPath(f.workspace);
-      rmSync(root); mkdirSync(root); writeFileSync(join(root, "occupied"), "owned post-line I/O obstruction"); } });
+  // A native write failure (ENOTDIR under the existing root file) that leaves every captured log-family member unchanged;
+  // an external change to an owned member would instead refuse even the unsigned lag marker (P2-08).
+  const spy = vi.spyOn(files, "writeFileAtomic").mockImplementation((path, bytes, mode) => {
+    if (path === merkleCurrentRootPath(f.workspace) && !reached) { reached = true; return actualWrite(join(path, "owned-post-line-failure"), bytes, mode); }
+    return actualWrite(path, bytes, mode); });
   try {
     const error = await createBackupAsync(f.params).then(() => null, value => value);
     expect(reached).toBe(true); const out = join(f.workspace, f.params.outFile), actual = inspect(f, out), audit = completedAudit(f, actual.manifest.backupId);
@@ -441,7 +446,7 @@ test("backup retains the archive completed audit and native committed-entry caus
     expect(JSON.parse(readFileSync(transparencyLogPath(f.workspace), "utf8").trim().split(/\r?\n/).at(-1)!)).toMatchObject({
       hash: error.cause.entryHash, artifact: { kind: "policy", id: actual.manifest.backupId, sha256: actual.sig.digestSha256 } });
     expect(verifyTransparencyLog(f.workspace).ok).toBe(true);
-  } finally { spy.mockRestore(); rmSync(merkleCurrentRootPath(f.workspace), { recursive: true, force: true }); rebuildTransparencyMerkle(f.workspace); }
+  } finally { spy.mockRestore(); rebuildTransparencyMerkle(f.workspace); }
   inspect(f, (await createBackupAsync({ ...f.params, outFile: "fresh.amcbackup" })).outFile);
 });
 

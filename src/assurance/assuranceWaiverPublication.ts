@@ -150,7 +150,7 @@ export function maybeActivatePendingWaivers(workspace: string): AssuranceWaiver[
 
 interface WaiverEffects { consumeAttempted: boolean; consumeReturned: boolean; consumeAcknowledged: boolean; removeAttempted: boolean; removeReturned: boolean; removeAcknowledged: boolean }
 const noWaiverEffects = (): WaiverEffects => ({ consumeAttempted: false, consumeReturned: false, consumeAcknowledged: false, removeAttempted: false, removeReturned: false, removeAcknowledged: false });
-export class AssuranceWaiverPublicationError extends Error {
+class AssuranceWaiverPublicationError extends Error {
   readonly code = "ASSURANCE_WAIVER_INCOMPLETE";
   constructor(readonly waiverId: string, readonly completedStages: readonly string[], readonly attemptedStage: string,
     readonly consumption: unknown, readonly transparency: unknown, readonly effects: Readonly<WaiverEffects>, cause: unknown) {
@@ -273,7 +273,7 @@ function captureSelectedWaiver(workspace: string, waiver: AssuranceWaiver) {
     || canonicalize(assuranceWaiverSchema.parse(JSON.parse(bytes.toString("utf8")))) !== canonicalize(waiver)) throw new Error("selected waiver changed before revocation");
   return { path, selected };
 }
-export class AssuranceWaiverActivationBatchError extends Error {
+class AssuranceWaiverActivationBatchError extends Error {
   readonly code = "ASSURANCE_WAIVER_BATCH_INCOMPLETE";
   constructor(readonly activated: readonly AssuranceWaiver[], cause: unknown) {
     super("pending waiver activation stopped; earlier activated waivers remain", { cause }); this.name = "AssuranceWaiverActivationBatchError";

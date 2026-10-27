@@ -430,7 +430,7 @@ export async function benchCreateForApiAsync(params: {
 
 export async function benchCompareForApiAsync(params: Parameters<typeof benchCompareForApi>[0], options: OrgPairsOptions = {}) { return createBenchComparisonAsync({...params},options); }
 
-export class BenchApprovedPublicationError extends Error {
+class BenchApprovedPublicationError extends Error {
   readonly code = "BENCH_APPROVED_PUBLICATION_INCOMPLETE";
   constructor(readonly completedRegistryPaths: readonly string[], readonly consumption: ReturnType<typeof consumeApprovedExecution> | null,
     readonly completedLogHashes: readonly string[], readonly pendingRemoved: boolean, cause: unknown) {

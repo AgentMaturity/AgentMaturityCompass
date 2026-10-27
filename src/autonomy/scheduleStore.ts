@@ -406,7 +406,7 @@ export function scheduleStatus(workspace: string, now: number) {
 }
 
 export interface SchedulePublicationOptions { beforePublish?: () => void }
-export class SchedulePublicationError extends Error {
+class SchedulePublicationError extends Error {
   readonly code = "SCHEDULE_CONFIG_PUBLICATION_INCOMPLETE";
   constructor(readonly phase: string, readonly nativeReturnedPaths: readonly string[], readonly publisherCompleted: boolean,
     readonly attemptedPath: string | null, cause: unknown) {
@@ -457,23 +457,6 @@ async function publishSchedulesAsync(workspace: string, selected: ReturnType<typ
     throw new SchedulePublicationError(phase, Object.freeze([...returned, ...(nested?.publishedPaths ?? [])]), completed,
       nested?.attemptedPath ?? null, failure);
   }
-}
-/** Existing no-op init acquires no signer. Actual writes prepare Sign outside either native publication lock. */
-export async function initSchedulesAsync(workspaceInput: string, options: SchedulePublicationOptions = {}): Promise<void> {
-  const noSignAtEntry = process.env.AMC_NO_SIGN === "1";
-  const workspace = resolve(workspaceInput), caller = options.beforePublish; caller?.(); assertScheduleOwner(workspace);
-  const selected = withStoreLock(workspace, () => capturedSchedules(workspace));
-  if (selected.digest !== "absent") return;
-  if (noSignAtEntry) throw new Error("no-sign mode does not authorize schedule configuration signing");
-  assertScheduleSigningEnabled();
-  await publishSchedulesAsync(workspace, selected, [], () => {}, { beforePublish: caller });
-}
-export async function saveSchedulesAsync(workspaceInput: string, supplied: readonly unknown[], options: SchedulePublicationOptions = {}): Promise<void> {
-  assertScheduleSigningEnabled();
-  const workspace = resolve(workspaceInput), values = structuredClone(supplied), caller = options.beforePublish;
-  assertScheduleSigningEnabled(); caller?.(); assertScheduleOwner(workspace); assertScheduleSigningEnabled();
-  const selected = withStoreLock(workspace, () => { const selected = capturedSchedules(workspace); assertNoActiveClaims(workspace); return selected; });
-  await publishSchedulesAsync(workspace, selected, values, () => assertNoActiveClaims(workspace), { beforePublish: caller });
 }
 export async function manageScheduleAsync(workspaceInput: string, expectedDigest: string, supplied: ScheduleChange, options: SchedulePublicationOptions = {}): Promise<void> {
   const noSignAtEntry = process.env.AMC_NO_SIGN === "1";

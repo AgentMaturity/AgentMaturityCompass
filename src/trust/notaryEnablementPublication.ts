@@ -18,14 +18,14 @@ interface NotaryInputs {
   workspace: string; baseUrl: string; pinPubkeyPath: string;
   requiredAttestationLevel: "SOFTWARE" | "HARDWARE"; unixSocketPath?: string | null;
 }
-export interface NotaryEnablementProgress {
+interface NotaryEnablementProgress {
   readonly secretSetAttempted: boolean; readonly secretSetReturned: boolean; readonly secretReadBack: boolean;
   readonly pairPublicationAttempted: boolean; readonly pairPublicationReturned: boolean;
   readonly completedPairPaths: readonly string[];
   readonly historyAdmissionAttempted: boolean; readonly historyAdmissionReturned: boolean; readonly historyReadBack: boolean;
   readonly complete: boolean;
 }
-export class NotaryEnablementIncompleteError extends Error {
+class NotaryEnablementIncompleteError extends Error {
   readonly code = "NOTARY_ENABLEMENT_INCOMPLETE";
   constructor(readonly progress: Readonly<NotaryEnablementProgress>, readonly hasFirstRefusal: boolean,
     readonly firstRefusal: unknown, cause: unknown) {

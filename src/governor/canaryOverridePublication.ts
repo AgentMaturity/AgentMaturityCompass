@@ -18,7 +18,7 @@ export function canaryOverrideDigest(o: Pick<EmergencyOverride, "overrideId" | "
   return sha256Hex(canonicalize({ overrideId, agentId, reason, actionDescription, ttlMs, startedTs, expiresTs }));
 }
 
-export function withCanaryOverridePublicationLock<T>(workspace: string, operation: () => T): T {
+function withCanaryOverridePublicationLock<T>(workspace: string, operation: () => T): T {
   return withWorkspaceRecordPublicationLock(workspace, AT, operation);
 }
 

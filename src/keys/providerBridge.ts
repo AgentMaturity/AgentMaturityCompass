@@ -11,6 +11,20 @@ import { checkedDescription, KEY_PROVIDER_ERRORS, KeyProviderError, providerFail
 
 export type BridgeRequest = { op: "describe"; ref: KeyRef } | { op: "sign"; ref: KeyRef; messageB64: string };
 export type BridgeResponse = { ok: true; description: KeyDescription; signatureB64?: string } | { ok: false; code: KeyProviderErrorCode; detail: string };
+/** P2-09: unwrap a ledger data key for a synchronous ledger writer (src/ledger/encryption/syncUnwrap.ts). */
+export type BridgeUnwrapRequest = { op: "unwrap"; ref: KeyRef; wrappedB64: string };
+export type BridgeUnwrapResponse = { ok: true; keyB64: string } | { ok: false; code: KeyProviderErrorCode; detail: string };
+
+/** The child's unwrap: the plaintext key crosses back on the bridge's stdout pipe only. */
+export async function answerBridgeUnwrap(request: BridgeUnwrapRequest, provider: KeyProvider): Promise<BridgeUnwrapResponse> {
+  try {
+    if (!provider.unwrapKey) throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", request.ref.provider, "this provider does not unwrap keys");
+    return { ok: true, keyB64: Buffer.from(await provider.unwrapKey(request.ref, Buffer.from(request.wrappedB64, "base64"))).toString("base64") };
+  } catch (error) {
+    const failure = providerFailure(request.ref.provider, error, "unwrap");
+    return { ok: false, code: failure.code, detail: failure.message };
+  }
+}
 
 /** The child's work: describe, and for "sign" also sign, the ref's key (no algorithm policy here: the caller applies its own). */
 export async function answerBridgeRequest(request: BridgeRequest, provider: KeyProvider): Promise<BridgeResponse> {
@@ -44,10 +58,11 @@ export function callProviderSync(request: BridgeRequest, opts: { script?: string
 }
 
 if (process.argv[1] !== undefined && fileURLToPath(import.meta.url) === process.argv[1]) {
-  const request = JSON.parse(readFileSync(0, "utf8")) as BridgeRequest;
+  const request = JSON.parse(readFileSync(0, "utf8")) as BridgeRequest | BridgeUnwrapRequest;
   const { loadKeyProvider } = await import("./purposeProviders.js");
   const answer = request.ref.provider === "file"
     ? { ok: false as const, code: "KEY_PROVIDER_KEY_REFUSED" as const, detail: "the provider bridge never serves the vault" }
+    : request.op === "unwrap" ? await answerBridgeUnwrap(request, loadKeyProvider("", request.ref.provider))
     : await answerBridgeRequest(request, loadKeyProvider("", request.ref.provider));
   process.stdout.write(`${JSON.stringify(answer)}\n`);
 }

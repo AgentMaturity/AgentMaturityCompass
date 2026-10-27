@@ -7,14 +7,6 @@ import {
   standardVerifyForApi
 } from "./standardApi.js";
 
-export function standardGenerateCli(workspace: string) {
-  return standardGenerateForApi(workspace);
-}
-
-export function standardVerifyCli(workspace: string) {
-  return standardVerifyForApi(workspace);
-}
-
 export function standardPrintCli(params: {
   workspace: string;
   id: string;

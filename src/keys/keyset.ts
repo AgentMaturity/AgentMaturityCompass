@@ -31,6 +31,7 @@ import { SIGNING_ALGORITHMS, signingKeyId } from "./algorithmPolicy.js";
 import { KEY_PROVIDER_IDS } from "./provider.js";
 import { LOCAL_PURPOSES, type LocalPurpose } from "../vault/vaultPayload.js";
 import { AntiRollbackError, compareHighWater, highWaterKey, highWaterPath, readHighWater, recordHighWater, workspaceScope } from "./highWater.js";
+import { inCheckPass } from "../utils/checkPass.js";
 
 /**
  * The only files a key set may name, relative to `.amc`: the vault and its meta, key files, history backups, the key
@@ -209,12 +210,12 @@ export function keysetAnchoring(workspace: string): { state: "committed" | "adop
 }
 
 /** Verifiers and signers: refuse while a key change is pending. */
-export function assertNoPendingKeyset(workspace: string): void {
+export const assertNoPendingKeyset = inCheckPass((workspace: string): void => {
   if (containedExists(workspace, PENDING_REL)) {
     const pending = readKeysetFile(workspace, PENDING_REL);
     throw new KeysetIncompleteError(pending?.generation ?? 0, "a key change was interrupted");
   }
-}
+});
 
 const bound = new Map<string, { stamp: string; keyset: Keyset | null }>();
 
@@ -225,7 +226,7 @@ const bound = new Map<string, { stamp: string; keyset: Keyset | null }>();
  * bytes at it FORK_DETECTED, and a newer one was never committed on this machine and is refused. A machine that never
  * changed keys for this workspace has no mark and takes the file as found (portable verdicts need pinned keys).
  */
-export function boundKeyset(workspace: string, opts: { allowUnboundFiles?: boolean } = {}): Keyset | null {
+export const boundKeyset = inCheckPass((workspace: string, opts: { allowUnboundFiles?: boolean } = {}): Keyset | null => {
   assertNoPendingKeyset(workspace);
   const stamp = statStamp([keysetPaths(workspace).keyset, highWaterPath()]);
   const memo = bound.get(workspace);
@@ -269,7 +270,7 @@ export function boundKeyset(workspace: string, opts: { allowUnboundFiles?: boole
   }
   bound.set(workspace, { stamp: statStamp([keysetPaths(workspace).keyset, highWaterPath()]), keyset });
   return keyset;
-}
+});
 
 /** The workspace key set's generation and digest as found (what the committing machine shows for `--accept`). */
 export function keysetIdentity(workspace: string): { generation: number; sha256: string } | null {
@@ -397,7 +398,7 @@ export function boundProviderKey(workspace: string, purpose: LocalPurpose): { bi
  * Signers: the bound key set (above), after checking that every public key and statement it pins still has its digest.
  * Null for a workspace that has none yet.
  */
-export function assertKeysetComplete(workspace: string, opts: { allowUnboundFiles?: boolean } = {}): Keyset | null {
+export const assertKeysetComplete = inCheckPass((workspace: string, opts: { allowUnboundFiles?: boolean } = {}): Keyset | null => {
   const keyset = boundKeyset(workspace, opts);
   if (keyset === null) return null;
   const listed = Object.keys(keyset.files).filter(rel => pinned(rel, keyset.providers));
@@ -409,7 +410,7 @@ export function assertKeysetComplete(workspace: string, opts: { allowUnboundFile
   }
   checked.set(workspace, { stamp: now, keyset });
   return keyset;
-}
+});
 
 /** What readers re-check after the commit: published public keys and rotation statements. */
 function pinned(rel: string, providers?: Keyset["providers"]): boolean {

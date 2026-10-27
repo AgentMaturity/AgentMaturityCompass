@@ -22,6 +22,7 @@
 import { join } from "node:path";
 import type { EvidenceEvent } from "../types.js";
 import { loadBlobPlaintext } from "../storage/blobs/blobStore.js";
+import { decryptField, inlinePayloadAad } from "../ledger/encryption/ledgerCipher.js";
 import { pathExists } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 
@@ -41,7 +42,12 @@ export function readEventPayload(workspace: string, event: EvidenceEvent): Event
     return { status: "pruned" };
   }
   if (event.payload_inline !== null && event.payload_inline !== undefined) {
-    return { status: "ok", bytes: Buffer.from(event.payload_inline, "utf8") };
+    // P2-09: an encrypted inline payload is opened here, the one shared read path, under the row's AAD.
+    try {
+      return { status: "ok", bytes: Buffer.from(decryptField(workspace, event.payload_inline, inlinePayloadAad(event.id)), "utf8") };
+    } catch (error: unknown) {
+      return { status: "missing", detail: `inline payload of event ${event.id} could not be decrypted: ${error instanceof Error ? error.message : String(error)}` };
+    }
   }
   const payloadPath = event.payload_path ?? event.canonical_payload_path ?? null;
   if (payloadPath === null) {

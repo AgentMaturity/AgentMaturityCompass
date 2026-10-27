@@ -17,7 +17,7 @@ import { RECEIPT_AUTHORITY_CURRENT } from "../keys/receiptAuthority.js";
 import { readReceiptAuthorityState } from "../keys/receiptAuthorityState.js";
 
 /** Returned flags describe only actual awaited calls; nested causes retain their own partial prefixes. */
-export class InstantInitializedDiagnosticError extends Error {
+class InstantInitializedDiagnosticError extends Error {
   readonly code = "INSTANT_INITIALIZED_DIAGNOSTIC_INCOMPLETE";
   constructor(cause: unknown, readonly phase: "initialize" | "diagnostic", readonly initializationReturned: boolean, readonly diagnosticReturned: boolean) {
     super("initialized instant scoring did not complete; actual prior effects remain", { cause });

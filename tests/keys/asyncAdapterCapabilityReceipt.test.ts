@@ -162,7 +162,7 @@ describe("maintained asynchronous adapter capability receipt signing", () => {
     const spy = vi.spyOn(receipts.adapterCapabilityReceiptSchema, "parse").mockImplementationOnce(value => {
       const receipt = parse(value); lockVault(f.workspace); vi.stubEnv("AMC_VAULT_PASSPHRASE", undefined); return receipt;
     });
-    try { await expect(build(input(f))).rejects.toThrow(/Vault locked/i); expect(spy).toHaveBeenCalledTimes(1); }
+    try { await expect(build(input(f))).rejects.toThrow(/vault (is )?locked/i); expect(spy).toHaveBeenCalledTimes(1); }
     finally { spy.mockRestore(); vi.stubEnv("AMC_VAULT_PASSPHRASE", PASS); unlockVault(f.workspace, PASS); }
     verifyReceipt(await build(input(f)), f.publicKey);
   });

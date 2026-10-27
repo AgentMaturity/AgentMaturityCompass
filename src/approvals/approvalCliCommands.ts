@@ -1,6 +1,7 @@
 import chalk from "chalk";
 import type { Command } from "commander";
 import { deliverApprovalLifecycle } from "./approvalDelivery.js";
+import { approvalRequestBindingDigest } from "./approvalChainStore.js";
 import { decideApprovalForIntent } from "./approvalEngine.js";
 import {
   getApprovalInboxItem,
@@ -26,16 +27,20 @@ interface ApprovalReviewerOptions {
 
 function reviewerFor(workspace: string, approvalId: string, opts: ApprovalReviewerOptions) {
   const roles = parseApprovalReviewerRoles(opts.roles);
-  const supplied = { userId: opts.userId ?? opts.username, username: opts.username, roles };
+  const supplied = { userId: opts.userId ?? opts.username, username: opts.username, roles, boundDigest: undefined as string | undefined };
   if (opts.sessionTokenFile === undefined && opts.expectRequestDigest === undefined) return supplied;
   if (!opts.sessionTokenFile || !opts.expectRequestDigest) throw new Error("Authenticated native decisions require both --session-token-file and --expect-request-digest");
   const actor = readNativeApprovalActor(workspace, opts.sessionTokenFile);
   if (actor.userId !== supplied.userId || actor.username !== supplied.username || [...actor.roles].sort().join(",") !== [...roles].sort().join(",")) throw new Error("Reviewer fields do not match the authenticated workspace session");
   const inbox = getApprovalInboxItem({ workspace, agentId: opts.agent, approvalRequestId: approvalId });
   if (!inbox.requestIntegrity.valid || !inbox.chainIntegrity.valid || !inbox.contextIntegrity.valid || inbox.status !== "PENDING"
-    || inbox.request.approvalRequestId !== approvalId || inbox.request.agentId !== opts.agent || inbox.requestDigestSha256 !== opts.expectRequestDigest) throw new Error("Approval changed or is no longer trusted and pending; review it again");
+    || inbox.request.approvalRequestId !== approvalId || inbox.request.agentId !== opts.agent) throw new Error("Approval changed or is no longer trusted and pending; review it again");
+  // The reviewed digest is the inbox digest (over the whole request) or the engine's binding digest, which leaves the
+  // request's initiator out (P1-78); either names this pending request, and the decision binds the engine's digest.
+  const boundDigest = approvalRequestBindingDigest(inbox.request);
+  if (opts.expectRequestDigest !== inbox.requestDigestSha256 && opts.expectRequestDigest !== boundDigest) throw new Error("Approval changed or is no longer trusted and pending; review it again");
   if (!actor.roles.some(role => inbox.request.rolesAllowed.includes(role))) throw new Error("Authenticated reviewer has no role allowed for this request");
-  return actor;
+  return { ...actor, boundDigest };
 }
 
 export function registerApprovalCliCommands(program: Command): void {
@@ -150,7 +155,7 @@ export function registerApprovalCliCommands(program: Command): void {
         username: reviewer.username,
         userId: reviewer.userId,
         userRoles: reviewer.roles,
-        ...(opts.expectRequestDigest === undefined ? {} : { expectedRequestDigestSha256: opts.expectRequestDigest })
+        ...(reviewer.boundDigest === undefined ? {} : { expectedRequestDigestSha256: reviewer.boundDigest })
       });
       const delivery = await deliverApprovalLifecycle({
         workspace: process.cwd(),
@@ -184,7 +189,7 @@ export function registerApprovalCliCommands(program: Command): void {
         username: reviewer.username,
         userId: reviewer.userId,
         userRoles: reviewer.roles,
-        ...(opts.expectRequestDigest === undefined ? {} : { expectedRequestDigestSha256: opts.expectRequestDigest })
+        ...(reviewer.boundDigest === undefined ? {} : { expectedRequestDigestSha256: reviewer.boundDigest })
       });
       const delivery = await deliverApprovalLifecycle({
         workspace: process.cwd(),

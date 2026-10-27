@@ -29,6 +29,8 @@ export const PRODUCER_BY_SOURCE: Readonly<Record<string, Exclude<EvidenceProduce
   generic_text: "import",
   manual: "manual",
   operator: "manual",
+  // P2-22 review timing: the reviewer's browser reports it, so it is self-reported and never AMC runtime evidence.
+  "operator-review-timing": "manual",
   "feedback.ingest": "manual",
   webhook: "external-report",
   // A4 Forge rows are human statements recorded by AMC, never runtime observations (P1-56).

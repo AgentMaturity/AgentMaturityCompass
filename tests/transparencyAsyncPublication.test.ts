@@ -1,5 +1,5 @@
 import { sign, verify } from "node:crypto";
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { createServer } from "node:http";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -120,8 +120,9 @@ describe("awaitable workspace transparency publication", () => {
       input.type = "mutated caller type"; input.artifact.sha256 = "f".repeat(64);
       if (winner === "append") log.appendTransparencyEntry({ ...f.input, type: "SYNC_WINNER" }); else rebuildTransparencyMerkle(f.workspace);
       const afterWinner = snapshot(f.workspace); gate.release.resolve();
-      expect(await outcome).toMatchObject({ message: expect.stringContaining("transparency state changed while signing was prepared") });
-      expect(snapshot(f.workspace)).toEqual(afterWinner); expect(gate.spy).toHaveBeenCalledTimes(2); healthy(f.workspace);
+      // The captured append members are rechecked right after the first Sign, so the stale attempt refuses before a second Sign.
+      expect(await outcome).toMatchObject({ message: expect.stringContaining("transparency append inputs or owned destinations changed") });
+      expect(snapshot(f.workspace)).toEqual(afterWinner); expect(gate.spy).toHaveBeenCalledTimes(1); healthy(f.workspace);
     } finally { gate.release.resolve(); await Promise.allSettled([pending]); }
     await log.appendTransparencyEntryAsync(f.input); healthy(f.workspace);
   });
@@ -181,11 +182,11 @@ describe("awaitable workspace transparency publication", () => {
 
   test("records actual post-line I/O failure and retains the committed entry until explicit repair", async () => {
     const f = fixture(), actualWrite = files.writeFileAtomic; let blocked = false;
+    // A native write failure on the current root after the line is committed. Changing an owned destination externally
+    // instead would (by design) also refuse the unsigned pending marker, since it must not overwrite changed state.
     const spy = vi.spyOn(files, "writeFileAtomic").mockImplementation((path, bytes, mode) => {
+      if (path === merkleCurrentRootPath(f.workspace) && !blocked) { blocked = true; throw Object.assign(new Error("owned I/O refusal"), { code: "EIO" }); }
       actualWrite(path, bytes, mode);
-      if (path === log.transparencySealSigPath(f.workspace) && !blocked) {
-        blocked = true; const root = merkleCurrentRootPath(f.workspace); rmSync(root); mkdirSync(root); writeFileSync(join(root, "occupied"), "owned I/O refusal");
-      }
     });
     try {
       const error = await log.appendTransparencyEntryAsync(f.input).then(() => null, value => value);
@@ -201,13 +202,15 @@ describe("awaitable workspace transparency publication", () => {
     const f = fixture(), before = snapshot(f.workspace), seal = describePolicySigner(f.workspace, "TRANSPARENCY_ROOT"), root = describePolicySigner(f.workspace, "MERKLE_ROOT");
     const policyBody = readFileSync(trustConfigPath(f.workspace)), policySig = readFileSync(trustConfigSigPath(f.workspace));
     const next = loadTrustConfig(f.workspace); next.trust.enforcement.requireNotaryFor.push("CERT"); const prepared = preparePolicy(f.workspace, next);
+    const sign = vi.spyOn(f.provider, "sign"); let edited = false;
     try {
       await expect(log.appendTransparencyEntryAsync(f.input, { beforeCommit: () => {
+        if (sign.mock.calls.length < 2 || edited) return; edited = true; // the final pre-line gate, after both checked signatures returned
         files.writeFileAtomic(trustConfigPath(f.workspace), prepared.bytes, 0o644); files.writeFileAtomic(trustConfigSigPath(f.workspace), prepared.signature, 0o644);
         expect(verifyTrustConfigSignature(f.workspace)).toMatchObject({ valid: true, signatureExists: true });
         expect(describePolicySigner(f.workspace, "TRANSPARENCY_ROOT")).toEqual(seal); expect(describePolicySigner(f.workspace, "MERKLE_ROOT")).toEqual(root);
       } })).rejects.toThrow("transparency signing policy changed while signing was prepared");
-      expect(snapshot(f.workspace)).toEqual(before);
+      expect(edited).toBe(true); expect(snapshot(f.workspace)).toEqual(before);
     } finally { files.writeFileAtomic(trustConfigPath(f.workspace), policyBody, 0o644); files.writeFileAtomic(trustConfigSigPath(f.workspace), policySig, 0o644); }
     await log.appendTransparencyEntryAsync(f.input); healthy(f.workspace);
   });
@@ -319,6 +322,7 @@ test("rechecks the original last VAULT authority after its checked signature and
   let callbackReached = false;
   try {
     const error = await log.appendTransparencyEntryAsync(f.input, { beforeCommit: () => {
+      if (checked === undefined || callbackReached) return; // capture and pre-Sign gates run first; lock after both signatures
       callbackReached = true;
       lockVault(f.workspace); vi.stubEnv("AMC_VAULT_PASSPHRASE", undefined);
     } }).then(() => null, value => value);

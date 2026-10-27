@@ -222,7 +222,7 @@ interface NativePolicyProgress {
   tempCreationAttempted: boolean; temp: string | null; tempReturned: boolean; tempAcknowledged: boolean;
   tempCleanupCheckAttempted: boolean; tempCleanupAttempted: boolean; tempCleanupReturned: boolean;
 }
-export class NativeExecutablePolicyPublicationError extends Error {
+class NativeExecutablePolicyPublicationError extends Error {
   readonly code = "EXECUTABLE_POLICY_PUBLICATION_INCOMPLETE";
   constructor(readonly progress: Readonly<NativePolicyProgress>, cause: unknown,
     readonly closeCauses: readonly unknown[], readonly cleanupCauses: readonly unknown[]) {
@@ -390,87 +390,4 @@ async function updatePolicyAsync(workspace: string, expectedDigest: string | nul
     if (progress.failurePhase === null) progress.failurePhase = progress.phase;
     throw new NativeExecutablePolicyPublicationError(policyProgressSnapshot(progress), cause, Object.freeze([...closeCauses]), Object.freeze([...cleanupCauses]));
   }
-}
-
-/** Explicit direct-module async approval; no code is loaded or executed and no CLI approval surface is added. */
-export async function approveNativeExecutableExtensionAsync(options: {
-  workspace: string; manifestPath: string; expectedDigest: string;
-  capabilities: readonly NativeExecutableCapability[]; expiresAt: number;
-  expectedPolicyDigest: string | null; beforePublish?: () => void;
-}): Promise<{ path: string; digest: string }> {
-  const refusedNoSign = process.env.AMC_NO_SIGN === "1";
-  if (refusedNoSign) throw new Error("no-sign mode does not authorize policy signing");
-  try {
-  const workspace = resolve(options.workspace), manifestPath = resolve(workspace, options.manifestPath), expectedDigest = options.expectedDigest;
-  const capabilities = [...options.capabilities], expiresAt = options.expiresAt, expectedPolicyDigest = options.expectedPolicyDigest, beforePublish = options.beforePublish;
-  const snapshot = readNativeExtension({ workspace, manifestPath, expectedDigest, requireSignature: false });
-  if (snapshot.manifest.schemaVersion !== 2) throw new NativeExecutableError("EXECUTABLE_DECLARATION_REQUIRED", "Execution approval applies only to a signed v2 executable declaration.");
-  const declaration = snapshot.manifest.executable, requested = [...declaration.capabilities];
-  if (requested.length !== capabilities.length || new Set(capabilities).size !== requested.length || requested.some(capability => !capabilities.includes(capability)))
-    throw new NativeExecutableError("EXECUTABLE_CAPABILITY_MISMATCH", "Explicitly approve exactly the capability set in the reviewed manifest; no inferred or extra grants are accepted.");
-  const approvedAt = Date.now();
-  const assertExpiry = () => {
-    const now = Date.now();
-    if (!Number.isSafeInteger(expiresAt) || now < approvedAt || expiresAt <= now || expiresAt - approvedAt > 86_400_000)
-      throw new NativeExecutableError("EXECUTABLE_APPROVAL_EXPIRY", "Execution approval needs its original future integer expiry, no more than 24 hours from the explicit approval action.");
-  };
-  assertExpiry();
-  const lock = pluginsInstalledLockPath(workspace), archive = pluginInstalledPackagePath(workspace, declaration.pluginId, declaration.version);
-  const rows = [{ root: snapshot.root, path: manifestPath, limit: NATIVE_EXTENSION_LIMITS.manifestBytes },
-    { root: snapshot.root, path: `${manifestPath}.sig`, limit: NATIVE_EXTENSION_LIMITS.manifestBytes },
-    ...[...snapshot.manifest.contexts, ...Object.values(snapshot.manifest.commands)].map(entry => ({ root: snapshot.root, path: resolve(snapshot.root, entry.path), limit: NATIVE_EXTENSION_LIMITS.fileBytes })),
-    { root: workspace, path: lock, limit: NATIVE_EXECUTABLE_LIMITS.policyBytes }, { root: workspace, path: `${lock}.sig`, limit: 65_536 },
-    { root: workspace, path: archive, limit: NATIVE_EXECUTABLE_LIMITS.packageBytes }];
-  const policyPath = nativeExecutablePolicyPath(workspace), parent = dirname(policyPath);
-  for (const row of rows) if (row.path === policyPath || row.path === `${policyPath}.sig`
-    || row.path === join(parent, ".execution-policy-write-lock") || row.path.startsWith(`${join(parent, ".execution-policy-write-lock")}${sep}`)
-    || (dirname(row.path) === parent && row.path.slice(parent.length + 1).startsWith(".execution-policy-"))) policyChanged();
-  const sources = capturePolicyFiles(rows), manifest = sources.get(manifestPath), signature = sources.get(`${manifestPath}.sig`);
-  if (manifest === null || signature === null || !manifest.bytes.equals(snapshot.manifestBytes)
-    || snapshot.signatureBytes === null || !signature.bytes.equals(snapshot.signatureBytes)) policyChanged();
-  for (const entry of [...snapshot.manifest.contexts, ...Object.values(snapshot.manifest.commands)]) {
-    const current = sources.get(resolve(snapshot.root, entry.path));
-    if (current === null || sha256Hex(current.bytes) !== entry.sha256 || !current.bytes.equals(Buffer.from(snapshot.contents.get(entry.path)!, "utf8"))) policyChanged();
-  }
-  const assertManifest = () => {
-    if (!originalBundleAdmitted(workspace, manifest.bytes, signature.bytes))
-      throw new NativeExecutableError("EXECUTABLE_SIGNATURE_INVALID", "The reviewed v2 manifest requires its same-byte admitted BUNDLE signature.");
-  };
-  assertManifest();
-  const publisher = declaration.publisherFingerprint;
-  const originalDistrust = installedPluginTrust(workspace, publisher).distrust.filter(entry => entry.keyId.toLowerCase() === publisher.toLowerCase()).map(entry => ({ ...entry }));
-  // Actual verifier observation, not a positive own-file handle. All bounded source witnesses precede it.
-  const verified = readInstalledNativeExecutable(workspace, declaration);
-  const assertDependencies = () => {
-    assertExpiry(); sources.assertCurrent(); assertManifest();
-    const archiveBytes = assertNativeExecutableInstalled(workspace, verified.reference);
-    if (!archiveBytes.equals(sources.get(archive)!.bytes)) policyChanged();
-    const current = installedPluginTrust(workspace, publisher), now = Date.now();
-    if (distrustAt(originalDistrust, publisher, now) !== undefined || distrustAt(current.distrust, publisher, now) !== undefined)
-      throw new NativeExecutableError("EXECUTABLE_SIGNATURE_INVALID", "The originally admitted installed publisher is currently distrusted; no approval is written.");
-    sources.assertCurrent(); assertExpiry();
-  };
-  assertDependencies();
-  return updatePolicyAsync(workspace, expectedPolicyDigest, policy => {
-    if (policy.revoked.includes(snapshot.manifestDigest)) throw new NativeExecutableError("EXECUTABLE_REVOKED", "A revoked manifest cannot be reapproved. Review a new manifest instead.");
-    return { ...policy, grants: [...policy.grants.filter(grant => grant.manifestDigest !== snapshot.manifestDigest),
-      { manifestDigest: snapshot.manifestDigest, capabilities: requested, approvedAt, expiresAt }] };
-  }, assertDependencies, beforePublish, refusedNoSign);
-  } catch (cause) {
-    if (cause instanceof NativeExecutableError || cause instanceof NativeExtensionError || cause instanceof NativeExecutablePolicyPublicationError) throw cause;
-    throw new NativeExecutablePolicyInputError(cause);
-  }
-}
-
-/** Persistent direct-module async denial. No extension, package or publisher prerequisite is acquired. */
-export async function revokeNativeExecutableExtensionAsync(options: {
-  workspace: string; manifestDigest: string; expectedPolicyDigest: string; beforePublish?: () => void;
-}): Promise<{ path: string; digest: string }> {
-  const refusedNoSign = process.env.AMC_NO_SIGN === "1";
-  if (refusedNoSign) throw new Error("no-sign mode does not authorize policy signing");
-  const workspace = resolve(options.workspace), manifestDigest = nativeExecutableDigestSchema.parse(options.manifestDigest);
-  const expectedPolicyDigest = options.expectedPolicyDigest, beforePublish = options.beforePublish;
-  return updatePolicyAsync(workspace, expectedPolicyDigest, policy => ({ ...policy,
-    grants: policy.grants.filter(grant => grant.manifestDigest !== manifestDigest), revoked: [...new Set([...policy.revoked, manifestDigest])]
-  }), () => {}, beforePublish, refusedNoSign);
 }

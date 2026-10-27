@@ -335,6 +335,49 @@ jobs:
           npx vitest run tests/keys/pkcs11Softhsm.test.ts --reporter=default --reporter=json --outputFile.json="$RUNNER_TEMP/pkcs11.json"
           node -e 'const r=require(process.argv[1]); if (r.numPassedTests < 2) { console.error("the SoftHSM2 suite ran " + r.numPassedTests + " passing tests"); process.exit(1); }' "$RUNNER_TEMP/pkcs11.json"
 
+  # P2-13: the Python wrapper as a user installs it. Build the wheel from sdk/python, install it into a fresh virtual
+  # environment, and run sdk/python/tests from outside the checkout (-I) so the installed wheel, not the source tree,
+  # is what is imported; the native tests drive the CLI built from this commit. requires-python >= 3.10.
+  python-sdk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.12"]
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Build the CLI the wrapper drives
+        run: pnpm run build
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Build the wheel and install it into a fresh virtual environment
+        run: |
+          python -m venv "$RUNNER_TEMP/venv"
+          "$RUNNER_TEMP/venv/bin/python" -m pip install build pytest
+          "$RUNNER_TEMP/venv/bin/python" -m build --wheel --outdir "$RUNNER_TEMP/dist-py" sdk/python
+          "$RUNNER_TEMP/venv/bin/python" -m pip install "$RUNNER_TEMP"/dist-py/*.whl
+      - name: pytest sdk/python/tests against the installed wheel and the built CLI
+        working-directory: ${{ runner.temp }}
+        env:
+          AMC_BIN: ${{ github.workspace }}/dist/cli.js
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: |
+          "$RUNNER_TEMP/venv/bin/python" -I -c "import amc_sdk, sys; assert amc_sdk.__file__.startswith(sys.prefix), amc_sdk.__file__"
+          "$RUNNER_TEMP/venv/bin/python" -I -m pytest -q -p no:cacheprovider -rs "$GITHUB_WORKSPACE/sdk/python/tests"
+
   e2e-playwright:
     runs-on: ubuntu-latest
     permissions:

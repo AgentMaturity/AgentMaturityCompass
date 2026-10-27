@@ -63,7 +63,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc agent-loop guide` | Inspect local setup without writes or provider calls and show the next native task command | `--agent <id>`<br>`--provider <id>`<br>`--model <model>`<br>`--base-url <origin>`<br>`--credential <ref>`<br>`--credentials-home <dir>`<br>`--credentials-file <path>`<br>`--json` | - |
 | `amc agent-loop mcp-catalog` | Connect to an explicitly configured stdio or Streamable HTTP MCP server, report its catalog, and disconnect | `--config <path>`<br>`--credentials-home <dir>`<br>`--credentials-file <path>`<br>`--json`<br>`--authorize` | - |
 | `amc agent-loop providers` | Describe bundled native adapters and usage/cache contracts without provider calls | `--provider <id>`<br>`--json` | - |
-| `amc agent-loop run` | Run one agent turn and report what the signed log recorded | `--agent <id>`<br>`--validation-config <path>`<br>`--validation-config-sha256 <digest>`<br>`--validate <id>`<br>`--extension <manifest>`<br>`--extension-pin <sha256>`<br>`--stream`<br>`--image <path>`<br>`--audio-input <manifest>`<br>`--provider <id>`<br>`--model <model>`<br>`--base-url <url>`<br>`--credential <ref>`<br>`--credentials-home <dir>`<br>`--credentials-file <path>`<br>`--mcp-config <path>`<br>`--mcp-config-sha256 <digest>`<br>`--max-tokens <n>`<br>`--thinking <mode>`<br>`--reasoning-effort <effort>`<br>`--max-steps <n>`<br>`--context-window <tokens>`<br>`--compact-threshold <fraction>`<br>`--no-auto-summary`<br>`--tools <mode>`<br>`--tool-mode <mode>`<br>`--unsafe-unconfined-shell`<br>`--session <id>`<br>`--fork-from <id>`<br>`--keep-open`<br>`--delegate`<br>`--no-delegate`<br>`--max-delegation-depth <n>`<br>`--delegate-provider <id>`<br>`--delegate-timeout <ms>`<br>`--delegate-stop <condition>`<br>`--no-delegate-stop`<br>`--preset <id>`<br>`--delegate-scope <classes>`<br>`--fail-first <n>`<br>`--think-ms <n>`<br>`--cancel-after <ms>`<br>`--steer <text>`<br>`--steer-after <ms>`<br>`--persona <text>`<br>`--approve-tools <actionClass>`<br>`--approve-risk <tier>`<br>`--interactive-approvals`<br>`--approval-exception <file>`<br>`--json` | - |
+| `amc agent-loop run` | Run one agent turn and report what the signed log recorded | `--agent <id>`<br>`--validation-config <path>`<br>`--validation-config-sha256 <digest>`<br>`--validate <id>`<br>`--extension <manifest>`<br>`--extension-pin <sha256>`<br>`--stream`<br>`--image <path>`<br>`--audio-input <manifest>`<br>`--provider <id>`<br>`--model <model>`<br>`--base-url <url>`<br>`--credential <ref>`<br>`--credentials-home <dir>`<br>`--credentials-file <path>`<br>`--mcp-config <path>`<br>`--mcp-config-sha256 <digest>`<br>`--max-tokens <n>`<br>`--thinking <mode>`<br>`--reasoning-effort <effort>`<br>`--max-steps <n>`<br>`--context-window <tokens>`<br>`--compact-threshold <fraction>`<br>`--no-auto-summary`<br>`--tools <mode>`<br>`--tool-mode <mode>`<br>`--unsafe-unconfined-shell`<br>`--session <id>`<br>`--takeover-expired-writer <reason>`<br>`--fork-from <id>`<br>`--keep-open`<br>`--delegate`<br>`--no-delegate`<br>`--max-delegation-depth <n>`<br>`--delegate-provider <id>`<br>`--delegate-timeout <ms>`<br>`--delegate-stop <condition>`<br>`--no-delegate-stop`<br>`--preset <id>`<br>`--delegate-scope <classes>`<br>`--fail-first <n>`<br>`--think-ms <n>`<br>`--cancel-after <ms>`<br>`--steer <text>`<br>`--steer-after <ms>`<br>`--persona <text>`<br>`--approve-tools <actionClass>`<br>`--approve-risk <tier>`<br>`--interactive-approvals`<br>`--approval-exception <file>`<br>`--json` | - |
 | `amc agent-loop verify` | Re-derive every model request in a session from the log and check the chains | `--json`<br>`--expect-monitor <sha256>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unanchored` | - |
 | `amc alert` | SIEM/webhook alerting — configure and send alerts from anomalies | - | - |
 | `amc alert config` | Configure alert destinations (webhooks, Slack, PagerDuty) | `--set-webhook <url>`<br>`--set-slack <url>`<br>`--set-pagerduty <key>`<br>`--show`<br>`--json` | - |
@@ -381,7 +381,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc drift report` | - | `--agent <agentId>`<br>`--out <file>` | - |
 | `amc e2e` | End-to-end smoke verification | - | - |
 | `amc e2e smoke` | Run go-live smoke tests: local, docker, or helm-template | `--mode <mode>`<br>`--workspace <path>`<br>`--repo-root <path>`<br>`--json` | - |
-| `amc emergency-override` | Activate an emergency policy override with strict TTL | `--agent <agentId>`<br>`--reason <reason>`<br>`--action <desc>`<br>`--ttl <ms>` | - |
+| `amc emergency-override` | Request a signed break-glass record (as governor-override); after one bound approval rerun with --activate | `--agent <agentId>`<br>`--reason <reason>`<br>`--action <desc>`<br>`--ttl <ms>`<br>`--tools <names>`<br>`--action-classes <classes>`<br>`--controls <ids>`<br>`--activate <breakGlassId>`<br>`--approval <approvalRequestId>`<br>`--session-token-file <file>` | - |
 | `amc enforce` | Policy enforcement and guardrails | - | - |
 | `amc enforce ato-detect` | Detect account takeover attempts (demo) | `--json` | - |
 | `amc enforce blind-secrets` | Redact secrets from text | `--json` | - |
@@ -448,7 +448,11 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc evidence verify` | Run full workspace verification suite | `--json`<br>`--expect-monitor <sha256>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unanchored` | - |
 | `amc evidence-stores` | Inspect the staged consolidation of databases outside evidence.sqlite | - | - |
 | `amc evidence-stores backfill` | Copy guard events written before dual-write into evidence.sqlite | - | - |
+| `amc evidence-stores cutover` | Move this workspace's guard events to evidence.sqlite, only when parity is identical (P2-09) | - | - |
+| `amc evidence-stores encrypt` | Encrypt existing inline evidence payloads under the ledger data key (P2-09) | `--key-provider <id>`<br>`--key-ref <id>`<br>`--rotate-key`<br>`--rewrap`<br>`--json` | - |
 | `amc evidence-stores parity` | Compare the legacy guard-event store against the consolidated one | `--json` | - |
+| `amc evidence-stores worm-export` | Export signed retention segments to an object-lock (WORM) bucket under a retention lock that cannot be shortened (P2-09) | `--bucket <name>`<br>`--retain-days <n>`<br>`--prefix <prefix>`<br>`--region <region>`<br>`--json` | - |
+| `amc evidence-stores worm-verify` | Verify a downloaded WORM export offline against a trust list (P2-09) | `--index <file>`<br>`--objects <dir>`<br>`--trust-list <file>` | - |
 | `amc executive` | Executive and board-ready AMC artifacts | - | - |
 | `amc executive brief` | Generate a board-ready one-page executive brief from a diagnostic run | `--agent <agentId>`<br>`--run <runId>`<br>`--out <path>`<br>`--format <format>`<br>`--title <title>` | - |
 | `amc experiment` | Deterministic baseline vs candidate experiments | - | - |
@@ -563,7 +567,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc governor confidence-check` | Check if action is allowed given confidence-adjusted maturity | `--action <class>`<br>`--agent <id>`<br>`--required-level <n>` | - |
 | `amc governor explain` | Explain policy requirements for an action class | `--action <class>`<br>`--agent <agentId>` | - |
 | `amc governor report` | Render matrix of current SIMULATE/EXECUTE allowance per ActionClass | `--window <window>`<br>`--out <path>`<br>`--agent <agentId>` | - |
-| `amc governor-override` | Activate an emergency governance override with TTL | `--agent <agentId>`<br>`--reason <reason>`<br>`--ttl <ttl>`<br>`--mode <mode>` | - |
+| `amc governor-override` | Request a signed break-glass record; after one bound approval rerun with --activate and --approval | `--agent <agentId>`<br>`--reason <reason>`<br>`--ttl <ttl>`<br>`--tools <names>`<br>`--action-classes <classes>`<br>`--controls <ids>`<br>`--activate <breakGlassId>`<br>`--approval <approvalRequestId>`<br>`--session-token-file <file>` | - |
 | `amc governor-override-alerts` | Show alerts for active/expired overrides | `--agent <agentId>` | - |
 | `amc guard` | Guard check proposed output from stdin | `--target <name>`<br>`--risk-tier <tier>` | - |
 | `amc guardrails` | Signed runtime guardrail controls | - | - |
@@ -617,7 +621,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc indices` | Compute deterministic failure-risk indices | `--run <runId>`<br>`--agent <agentId>`<br>`--out <path>` | - |
 | `amc indices fleet` | Compute failure-risk indices across fleet | `--window <window>`<br>`--out <path>` | - |
 | `amc ingest` | Ingest external logs/transcripts as SELF_REPORTED evidence | `--type <kind>`<br>`--agent <agentId>` | - |
-| `amc init` | Initialize .amc workspace | `--trust-boundary <mode>`<br>`--profile <name>`<br>`--force`<br>`--skip-vault`<br>`--minimal`<br>`--coding`<br>`--regulated` | - |
+| `amc init` | Initialize .amc workspace | `--trust-boundary <mode>`<br>`--profile <name>`<br>`--force`<br>`--skip-vault`<br>`--minimal`<br>`--coding`<br>`--regulated`<br>`--web-allow-host <host>` | - |
 | `amc insider-alerts` | Show insider risk alerts | `--actor <id>`<br>`--ack <alertId>` | - |
 | `amc insider-risk-report` | Generate insider risk analytics report | `--window <days>` | - |
 | `amc insider-risk-scores` | Show insider risk scores by actor | - | - |

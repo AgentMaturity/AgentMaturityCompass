@@ -50,19 +50,6 @@ export function signStationMergeException(workspace: string, exception: Omit<Sta
   return { ...body, signature: signDigestWithPolicy({ workspace, kind: "CONTROL_PLAN", digestHex }) };
 }
 
-/** Awaitable existing direct reviewer API; independent config-purpose admission remains required by the verifier. */
-export async function signStationMergeExceptionAsync(workspace: string, exception: Omit<StationMergeException, "signature">,
-  options: { beforePublish?: () => void } = {}): Promise<StationMergeException> {
-  const beforePublish = options.beforePublish;
-  const beforeSign = () => { beforePublish?.(); assertOwnerMode(workspace, "catalog compile"); };
-  beforeSign();
-  const { signature: _signature, ...body } = stationMergeExceptionSchema.parse(structuredClone(exception));
-  const prepared = await prepareFileSignatureWithAuditor(workspace, "station-merge-exception.json",
-    Buffer.from(canonicalize(body), "utf8"), "CONTROL_PLAN", beforeSign);
-  beforeSign(); prepared.assertCurrent();
-  return stationMergeExceptionSchema.parse({ ...body, signature: JSON.parse(prepared.signatureBytes) as unknown });
-}
-
 /** No key is trusted because the exception names it; no workspace-self or unpinned admission authorizes a waiver. */
 export function stationExceptionRejection(exception: StationMergeException, profile: DeploymentProfile,
   controls: readonly ControlRecord[], asOfMs: number, trust?: TrustContext): string | null {

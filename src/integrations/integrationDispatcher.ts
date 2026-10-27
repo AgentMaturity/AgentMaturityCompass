@@ -41,7 +41,7 @@ export interface IntegrationDispatchPayload {
   details: Record<string, unknown>;
 }
 
-export interface IntegrationDispatchResult {
+interface IntegrationDispatchResult {
   channelId: string;
   eventName: string;
   payloadSha256: string;
@@ -54,7 +54,7 @@ export interface IntegrationDispatchResult {
   receipt: string;
 }
 
-export interface IntegrationQueuedDispatchResult {
+interface IntegrationQueuedDispatchResult {
   queueId: string;
   channelId: string;
   eventName: string;
@@ -672,11 +672,6 @@ type IntegrationBatchOutcome = { results: Array<{ eventName: string; agentId: st
 /** Existing public batch: fixed original signing authority, no actor is inferred from event data. */
 export async function dispatchIntegrationEventsBatch(params: IntegrationBatchInput): Promise<IntegrationBatchOutcome> {
   return dispatchIntegrationBatchAttempt(params);
-}
-
-/** Internal maintained-caller counterpart; this negative callback is deliberately absent from root SDK exports. */
-export async function dispatchIntegrationEventsBatchWithAuthority(params: IntegrationBatchInput, beforeCommit: () => void): Promise<IntegrationBatchOutcome> {
-  return dispatchIntegrationBatchAttempt(params, beforeCommit);
 }
 
 async function dispatchIntegrationBatchAttempt(params: IntegrationBatchInput, beforeCommit?: () => void): Promise<IntegrationBatchOutcome> {

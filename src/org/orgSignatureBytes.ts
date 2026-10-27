@@ -7,9 +7,10 @@ import { getPurposeKeyHistory, readHistory } from "../keys/signingKeys.js";
 import { getPublicKeyPem } from "../crypto/keys.js";
 import { verifyWithKey } from "../keys/algorithmPolicy.js";
 import { sha256Hex } from "../utils/hash.js";
+import { inCheckPass } from "../utils/checkPass.js";
 
 /** Explicit-kind same-read verifier for migrated consumers; never changes the trust.yaml/bootstrap facade. */
-export function verifyAuditorSignatureBytes(workspace: string, kind: SignKind, bytes: Uint8Array, sidecar: Uint8Array): {
+export const verifyAuditorSignatureBytes = inCheckPass(function verifyAuditorSignatureBytes(workspace: string, kind: SignKind, bytes: Uint8Array, sidecar: Uint8Array): {
   valid: boolean; reason: string | null;
 } {
   try {
@@ -37,4 +38,4 @@ export function verifyAuditorSignatureBytes(workspace: string, kind: SignKind, b
       : signed.signature === signed.envelope.sigB64 && verifySignatureEnvelope(digest, signed.envelope, { trustedPublicKeys: keys, requireTrustedKey: true });
     return { valid, reason: valid ? null : "signature verification failed" };
   } catch { return { valid: false, reason: "invalid file signature" }; }
-}
+});

@@ -1,7 +1,7 @@
 import { resolve } from "node:path";
 import { ensureSigningKeys } from "../crypto/keys.js";
 import { assertOwnerMode } from "../mode/mode.js";
-import { captureSignedControlJournalAppend, ControlMutationAuthorityError } from "../lifecycle/signedControlJournalAsync.js";
+import { captureSignedControlJournalAppend, ControlMutationAuthorityError, retryOnControlJournalConflict } from "../lifecycle/signedControlJournalAsync.js";
 import { captureControlMirror, captureControlMirrorPair } from "../lifecycle/controlJournalMirror.js";
 import { artifactSigPath, readAndVerifyArtifactFileSignature } from "../lifecycle/artifactSignature.js";
 import { pathExists } from "../utils/fs.js";
@@ -52,7 +52,10 @@ function mirrorFor(workspace: string, policy: RuntimeFirewallPolicy, beforeSign:
     Buffer.from(JSON.stringify(policy, null, 2) + "\n"), beforeSign), failure: undefined as unknown }; }
   catch (failure) { return { mirror: undefined, failure }; }
 }
-async function write(input: WriteInput, currentActor?: () => boolean) {
+function write(input: WriteInput, currentActor?: () => boolean) {
+  return retryOnControlJournalConflict(() => writeOnce(input, currentActor));
+}
+async function writeOnce(input: WriteInput, currentActor?: () => boolean) {
   const fixed = { ...input, workspace: resolve(input.workspace) }, command = fixed.enabled === false ? "firewall disable" : "firewall enable";
   const assertCurrent = () => { actorCurrent(currentActor); assertOwnerMode(fixed.workspace, command); };
   assertCurrent(); ensureSigningKeys(fixed.workspace);

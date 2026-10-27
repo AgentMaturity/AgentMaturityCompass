@@ -14,6 +14,7 @@ import { verifyLeaseToken } from "../leases/leaseVerifier.js";
 import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
 import { hasAnyRole } from "../auth/rbac.js";
 import { canonicalize } from "../utils/json.js";
+import { inCheckPass } from "../utils/checkPass.js";
 
 export interface AuthContext {
   isAdmin: boolean;
@@ -181,7 +182,7 @@ export function captureStudioToolhubIntentAuthority(req: IncomingMessage, option
       throw new StudioToolhubIntentAuthorityError(401, "original tool intent authentication credentials changed while signing");
   };
   let failure: { cause: unknown } | null = null;
-  const assertCurrent = () => {
+  const assertCurrent = inCheckPass(() => {
     if (failure !== null) throw failure.cause;
     try {
       if (options.workspace !== originalWorkspace || resolve(originalWorkspace) !== workspace || options.token !== token
@@ -201,6 +202,6 @@ export function captureStudioToolhubIntentAuthority(req: IncomingMessage, option
       if (canonicalize(carrier()) !== originalCarrier) throw new StudioToolhubIntentAuthorityError(401, "original tool intent lease carrier changed while checking");
       assertOriginalCredentials();
     } catch (cause) { failure = { cause }; throw cause; }
-  };
+  });
   assertCurrent(); return assertCurrent;
 }

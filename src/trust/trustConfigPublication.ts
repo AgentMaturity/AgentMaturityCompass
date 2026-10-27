@@ -84,11 +84,6 @@ function notaryTrustBytes(workspace: string, previous: OrgPairsSnapshot, params:
   } });
   return Buffer.from(YAML.stringify(next), "utf8");
 }
-/** Fixed direct driver; no policy-routed BUNDLE signer can select the trust replacement authority. */
-export async function publishNotaryTrustConfig(workspace: string, input: NotaryTrustInputs, beforePublish?: () => void) {
-  const params = { ...input };
-  return publishTrustConfigOperation(workspace, previous => notaryTrustBytes(workspace, previous, params), beforePublish);
-}
 /** Fixed bootstrap staging. No caller supplies an authority, predecessor or generic preparation callback. */
 export function captureNotaryTrustConfig(workspace: string, beforePublish?: () => void) {
   const operation = captureTrustConfigOperation(workspace, beforePublish);

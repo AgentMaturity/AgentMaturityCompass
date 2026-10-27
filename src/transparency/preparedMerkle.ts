@@ -27,7 +27,7 @@ export interface PreparedMerkle {
 function leafLine(entryHash: string, index: number, algorithm: MerkleAlgorithm): string {
   return JSON.stringify(merkleLeafRowSchema.parse({ v: 1, index, entryHash, leafHash: entryLeafHash(algorithm, entryHash) }));
 }
-export function entryHashesFromBytes(bytes: Buffer | null): string[] {
+function entryHashesFromBytes(bytes: Buffer | null): string[] {
   return (bytes?.toString("utf8") ?? "").split(/\r?\n/).map(line => line.trim()).filter(Boolean)
     .map(line => transparencyEntrySchema.parse(JSON.parse(line) as unknown).hash);
 }

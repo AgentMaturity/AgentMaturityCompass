@@ -129,9 +129,12 @@ test.each(["absent", "present"] as const)("no-sign refuses the actual %s pair be
 });
 
 test.each(["generation", "policy", "no-sign", "locked", "actor"] as const)("final producer gate refuses %s after the checked signer returned", async change => {
-  const f = fixture(); await initComplianceMapsAsync(f.workspace); const before = f.pair(); let checks = 0;
+  const f = fixture(); await initComplianceMapsAsync(f.workspace); const before = f.pair(); let signed = false, fired = false;
+  // P2-08 forwards caller gates into the Sign path too, so change state at the first gate after the actual signer returned.
+  const original = f.provider.sign.bind(f.provider);
+  vi.spyOn(f.provider, "sign").mockImplementation(async (...args) => { const signature = await original(...args); signed = true; return signature; });
   const pending = initComplianceMapsAsync(f.workspace, undefined, { beforePublish() {
-    if (++checks !== 2) return;
+    if (!signed || fired) return; fired = true;
     if (change === "generation") rotatePurposeKeys({ workspace: f.workspace, purposes: ["session"], passphrase: PASS });
     if (change === "policy") {
       const policy = loadTrustConfig(f.workspace); policy.trust.enforcement.notaryMaxClockSkewSeconds++;
@@ -142,7 +145,7 @@ test.each(["generation", "policy", "no-sign", "locked", "actor"] as const)("fina
     if (change === "locked") { vi.stubEnv("AMC_VAULT_PASSPHRASE", undefined); lockVault(f.workspace); }
     if (change === "actor") throw new Error("owned trusted actor is no longer current");
   } });
-  try { await expect(pending).rejects.toThrow(); expect(checks).toBe(2); expect(f.pair()).toEqual(before); }
+  try { await expect(pending).rejects.toThrow(); expect(fired).toBe(true); expect(f.pair()).toEqual(before); }
   finally { vi.stubEnv("AMC_NO_SIGN", "0"); vi.stubEnv("AMC_VAULT_PASSPHRASE", PASS); unlockVault(f.workspace, PASS); }
   await initComplianceMapsAsync(f.workspace); healthy(f);
 });

@@ -1,4 +1,5 @@
 import type { NativeValidationResult } from "../agent/nativeValidation.js";
+import type { ExecutionStatus } from "../execution/executionContract.js";
 
 /** Browser-safe contract. Workspace, credentials, process and grant selection stay server-owned. */
 export type NativeTaskProvider = "stub" | "openai" | "openai-responses" | "anthropic" | "deepseek" | "gemini" | "gemini-audio" | "ollama";
@@ -122,6 +123,8 @@ export interface NativeTaskView {
   /** Read-only eligibility, not an ownership grant or a completed recovery. */
   readonly recovery?: { readonly eligible: boolean; readonly state: "ready" | "interrupted" | "blocked"; readonly message: string } | null;
   readonly history: NativeTaskHistory;
+  /** The four execution phases (P2-13); null before a session exists and while no start was refused. */
+  readonly execution: ExecutionStatus | null;
 }
 export interface NativeTaskPoll { readonly task: NativeTaskView; readonly events: readonly NativeTaskEvent[]; readonly truncated: boolean }
 export interface NativeTaskService {
@@ -136,6 +139,8 @@ export interface NativeTaskService {
   release(actor: NativeTaskActor, taskId: string, expectedRevision: number): Promise<NativeTaskView>;
   resume(actor: NativeTaskActor, taskId: string, expectedRevision: number): Promise<NativeTaskView>;
   verify(actor: NativeTaskActor, taskId: string, expectedRevision: number): Promise<NativeTaskView>;
+  /** fork (P2-13): the child task's own request ID, and the parent's current revision. */
+  fork(actor: NativeTaskActor, taskId: string, input: { readonly clientRequestId: string; readonly expectedRevision: number }): Promise<NativeTaskView>;
   archive(actor: NativeTaskActor, taskId: string, expectedRevision: number): NativeTaskView;
   close(): Promise<void>;
 }

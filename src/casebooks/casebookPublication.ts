@@ -11,7 +11,7 @@ import { sha256Hex } from "../utils/hash.js";
 interface Document { path: string; bytes: Uint8Array }
 export interface CasebookPublicationOptions { beforePublish?: () => void; protectedInputs?: readonly string[] }
 interface PublicationInput extends CasebookPublicationOptions { workspace: string; index: Document; selectedCase: Document }
-export class CasebookPublicationError extends Error {
+class CasebookPublicationError extends Error {
   readonly code = "CASEBOOK_PUBLICATION_INCOMPLETE";
   constructor(readonly phase: string, readonly publishedPaths: readonly string[], readonly acknowledgedPaths: readonly string[],
     readonly attemptedPath: string | null, cause: unknown) {

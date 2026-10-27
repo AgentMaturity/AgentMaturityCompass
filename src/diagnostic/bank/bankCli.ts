@@ -7,10 +7,6 @@ import {
 import { assertOwnerMode } from "../../mode/mode.js";
 import type { DiagnosticBank } from "./bankSchema.js";
 
-export function diagnosticBankInitCli(workspace: string) {
-  return diagnosticBankInitForApi(workspace);
-}
-
 export function diagnosticBankVerifyCli(workspace: string) {
   return diagnosticBankVerifyForApi(workspace);
 }

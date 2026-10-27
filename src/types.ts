@@ -63,6 +63,12 @@ export type EvidenceEventType =
   | "session/resume"
   | "session/release"
   | "session/recovered"
+  // Writer fencing and resume rules (P2-12): an idle live writer's lease proof,
+  // the format change a version-2 writer records on a version-1 owner's session,
+  // and how resume settled one interrupted tool call.
+  | "session/heartbeat"
+  | "session/migration"
+  | "tool/reconciled"
   // The agent loop's own control rows (plan P3.2). Namespaced `loop/`, NOT
   // `agent/`: `agent_process_started` and friends above already mean "AMC
   // OBSERVED an external agent", and reusing that prefix would blur the
@@ -3396,6 +3402,8 @@ export interface AMCConfig {
   transparency?: unknown;
   /** P2-08 key providers, kept as written; src/keys/keysConfig.ts parses it strictly. */
   keys?: unknown;
+  /** P2-22 operator workflow (inbox window, opt-in review timing), kept as written; src/operator/operatorSources.ts parses it. */
+  operator?: unknown;
 }
 
 export interface GatePolicy {

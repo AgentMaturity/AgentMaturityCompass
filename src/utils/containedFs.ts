@@ -14,6 +14,7 @@ import {
   type Stats
 } from "node:fs";
 import { join } from "node:path";
+import { noteCheckPassWrite } from "./checkPass.js";
 
 const SEGMENT = /^(?!\.{1,2}$)[A-Za-z0-9._-]{1,255}$/;
 
@@ -101,6 +102,7 @@ export function readContained(root: string, rel: string, maxBytes: number): Buff
 
 /** Atomically replaces (or creates) the contained file through a fresh O_EXCL temporary in the same directory. */
 export function writeContained(root: string, rel: string, data: string | Buffer, mode: number): void {
+  noteCheckPassWrite();
   const { path, dir, parts } = resolveContained(root, rel, true);
   const temporary = join(dir!, `.${randomBytes(8).toString("hex")}.tmp`);
   const fd = openSync(temporary, constants.O_WRONLY | constants.O_CREAT | constants.O_EXCL | constants.O_NOFOLLOW, mode);
@@ -123,6 +125,7 @@ export function writeContained(root: string, rel: string, data: string | Buffer,
 
 /** Renames one contained regular file to another contained name (an existing regular file there is replaced). */
 export function renameContained(root: string, fromRel: string, toRel: string): void {
+  noteCheckPassWrite();
   const from = resolveContained(root, fromRel, false);
   if (from.stat === null) throw Object.assign(new Error(`${from.path} does not exist`), { code: "ENOENT" });
   const to = resolveContained(root, toRel, true);
@@ -131,6 +134,7 @@ export function renameContained(root: string, fromRel: string, toRel: string): v
 
 /** Removes a contained regular file when it exists. */
 export function removeContained(root: string, rel: string): void {
+  noteCheckPassWrite();
   const { path, stat } = resolveContained(root, rel, false);
   if (stat !== null) unlinkSync(path);
 }

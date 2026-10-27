@@ -1,110 +1,19 @@
 import { randomUUID } from "node:crypto";
 import { linkSync, lstatSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { z } from "zod";
 import { getSigningKey, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import type { ActionClass, ExecutionMode } from "../types.js";
-import { USER_ROLES, type UserRole } from "../auth/roles.js";
-import { signatureEnvelopeSchema } from "../crypto/signing/signatureEnvelope.js";
+import type { UserRole } from "../auth/roles.js";
 import { verifyAuditorSignatureBytes } from "../org/orgSignatureBytes.js";
-
-const riskTierSchema = z.enum(["low", "medium", "high", "critical"]);
-const modeSchema = z.enum(["SIMULATE", "EXECUTE"]);
-const actionClassSchema = z.enum([
-  "READ_ONLY",
-  "WRITE_LOW",
-  "WRITE_HIGH",
-  "DEPLOY",
-  "SECURITY",
-  "FINANCIAL",
-  "NETWORK_EXTERNAL",
-  "DATA_EXPORT",
-  "IDENTITY"
-]);
-const roleSchema = z.enum(USER_ROLES);
-
-const approvalRequestStatusSchema = z.enum(["PENDING", "QUORUM_MET", "DENIED", "EXPIRED", "CANCELLED", "CONSUMED"]);
-const approvalDecisionKindSchema = z.enum(["APPROVE_EXECUTE", "APPROVE_SIMULATE", "DENY"]);
-
-const signatureSchema = z.object({
-  digestSha256: z.string().length(64),
-  signature: z.string().min(1),
-  signedTs: z.number().int(),
-  signer: z.literal("auditor"),
-  envelope: signatureEnvelopeSchema.optional()
-});
-
-export const approvalRequestSchema = z.object({
-  v: z.literal(1),
-  approvalRequestId: z.string().min(1),
-  agentId: z.string().min(1),
-  intentId: z.string().min(1),
-  toolName: z.string().min(1),
-  actionClass: actionClassSchema,
-  workOrderId: z.string().min(1).nullable().optional(),
-  requestedMode: modeSchema,
-  effectiveMode: modeSchema,
-  riskTier: riskTierSchema,
-  createdTs: z.number().int(),
-  expiresTs: z.number().int(),
-  status: approvalRequestStatusSchema,
-  requiredApprovals: z.number().int().min(0),
-  requireDistinctUsers: z.boolean(),
-  rolesAllowed: z.array(roleSchema),
-  requiredAssurancePacks: z.record(z.string().min(1), z.object({
-    minScore: z.number().min(0).max(100),
-    maxSucceeded: z.number().int().min(0)
-  })).optional(),
-  boundHashes: z.object({
-    intentHash: z.string().length(64),
-    workOrderHash: z.string().length(64).nullable().optional(),
-    policyHash: z.string().length(64),
-    toolsHash: z.string().length(64),
-    budgetsHash: z.string().length(64),
-    leaseConstraintsHash: z.string().length(64)
-  }),
-  // The authorization intent an approver reviewed (P1-02): protected facts and digests, never raw arguments.
-  // Its hash is `boundHashes.intentHash`, so a recheck can name which fact changed.
-  authorizationIntent: z.record(z.string(), z.unknown()).optional(),
-  // Who raised the request (P1-78): a principal key as A4 keys one (`<plane>:<userId>`) or a user id, supplied by the
-  // server-side caller from its authenticated principal. The engine refuses that principal's approval and the quorum never
-  // counts it. Absent on records written before P1-78 and by callers that name no initiator.
-  initiator: z.string().min(1).optional()
-});
-
-export const approvalDecisionSchema = z.object({
-  v: z.literal(1),
-  approvalDecisionId: z.string().min(1),
-  approvalRequestId: z.string().min(1),
-  agentId: z.string().min(1),
-  userId: z.string().min(1),
-  username: z.string().min(1),
-  roles: z.array(roleSchema),
-  decision: approvalDecisionKindSchema,
-  reason: z.string().min(1),
-  // Optional for legacy compatibility. Bound decisions cannot move to changed requests.
-  requestDigestSha256: z.string().regex(/^[a-f0-9]{64}$/).optional(),
-  decisionTs: z.number().int()
-});
-
-export const approvalConsumedSchema = z.object({
-  v: z.literal(1),
-  approvalRequestId: z.string().min(1),
-  agentId: z.string().min(1),
-  consumedTs: z.number().int(),
-  executionId: z.string().min(1).nullable().optional(),
-  reason: z.string().min(1)
-});
-
-export type ApprovalRequestRecord = z.infer<typeof approvalRequestSchema>;
-export type ApprovalDecisionRecord = z.infer<typeof approvalDecisionSchema>;
-export type ApprovalConsumedRecord = z.infer<typeof approvalConsumedSchema>;
-export type ApprovalRequestStatus = z.infer<typeof approvalRequestStatusSchema>;
-export type ApprovalDecisionKind = z.infer<typeof approvalDecisionKindSchema>;
+import { signatureSchema, approvalRequestSchema, approvalDecisionSchema, approvalConsumedSchema } from "./approvalSchemas.js";
+import { inCheckPass, readFileInPass } from "../utils/checkPass.js";
+export { approvalRequestSchema, approvalDecisionSchema, approvalConsumedSchema } from "./approvalSchemas.js";
+import type { ApprovalRequestRecord, ApprovalDecisionRecord, ApprovalConsumedRecord, ApprovalRequestStatus, ApprovalDecisionKind } from "./approvalSchemas.js";
+export type { ApprovalRequestRecord, ApprovalDecisionRecord, ApprovalConsumedRecord, ApprovalRequestStatus, ApprovalDecisionKind } from "./approvalSchemas.js";
 
 /**
  * Status evolves; every other request field is part of the reviewed authority, except `initiator` (P1-78): it is kept out
@@ -193,21 +102,25 @@ function verifyArtifact(workspace: string, path: string, bytes?: Buffer): { vali
     return { valid: false, reason: "signature missing" };
   }
   try {
-    const sidecar = readFileSync(sigPath);
-    const sig = signatureSchema.parse(JSON.parse(sidecar.toString("utf8")) as unknown);
-    const body = bytes ?? readFileSync(path), digest = sha256Hex(body);
-    if (digest !== sig.digestSha256) {
-      return { valid: false, reason: "digest mismatch" };
-    }
-    const valid = sig.envelope === undefined
-      ? verifyHexDigestAny(digest, sig.signature, getPublicKeyHistory(workspace, "auditor"))
-      : sig.envelope.signer.type === "VAULT" && sig.signature === sig.envelope.sigB64
-        && verifyAuditorSignatureBytes(workspace, "BUNDLE", body, sidecar).valid;
-    return valid ? { valid: true } : { valid: false, reason: "signature verification failed" };
+    const sidecar = readFileInPass(sigPath);
+    return verifyArtifactBytes(workspace, bytes ?? readFileInPass(path), sidecar);
   } catch (error) {
     return { valid: false, reason: String(error) };
   }
 }
+/** The signature check over bytes just read; within one check pass the same bytes are verified once. */
+const verifyArtifactBytes = inCheckPass((workspace: string, body: Buffer, sidecar: Buffer): { valid: boolean; reason?: string } => {
+  const sig = signatureSchema.parse(JSON.parse(sidecar.toString("utf8")) as unknown);
+  const digest = sha256Hex(body);
+  if (digest !== sig.digestSha256) {
+    return { valid: false, reason: "digest mismatch" };
+  }
+  const valid = sig.envelope === undefined
+    ? verifyHexDigestAny(digest, sig.signature, getPublicKeyHistory(workspace, "auditor"))
+    : sig.envelope.signer.type === "VAULT" && sig.signature === sig.envelope.sigB64
+      && verifyAuditorSignatureBytes(workspace, "BUNDLE", body, sidecar).valid;
+  return valid ? { valid: true } : { valid: false, reason: "signature verification failed" };
+});
 
 /**
  * Publish complete bytes at `path` only if nothing is there; false when something already was.
@@ -321,7 +234,7 @@ export function loadApprovalRequestRecord(params: {
   if (!pathExists(path)) {
     throw new Error(`approval request not found: ${path}`);
   }
-  const bytes = readFileSync(path);
+  const bytes = readFileInPass(path);
   if (params.requireValidSignature !== false) {
     const verification = verifyArtifact(params.workspace, path, bytes);
     if (!verification.valid) {
@@ -415,7 +328,7 @@ export function listApprovalDecisions(params: {
       continue;
     }
     try {
-      const row = approvalDecisionSchema.parse(JSON.parse(readUtf8(path)) as unknown);
+      const row = approvalDecisionSchema.parse(JSON.parse(readFileInPass(path).toString("utf8")) as unknown);
       if (params.approvalRequestId && row.approvalRequestId !== params.approvalRequestId) {
         continue;
       }
@@ -482,7 +395,7 @@ export function loadApprovalConsumed(params: {
   if (!pathExists(path)) {
     return null;
   }
-  const bytes = readFileSync(path);
+  const bytes = readFileInPass(path);
   const verification = verifyArtifact(params.workspace, path, bytes);
   if (!verification.valid) {
     throw new Error(`invalid approval consumed signature: ${verification.reason ?? "unknown"}`);
@@ -694,7 +607,7 @@ export function inspectApprovalActivityInventory(params: {
   };
 }
 
-export function inspectApprovalChainIntegrity(params: {
+export const inspectApprovalChainIntegrity = inCheckPass(function inspectApprovalChainIntegrity(params: {
   workspace: string;
   agentId?: string;
   approvalRequestId: string;
@@ -722,7 +635,7 @@ export function inspectApprovalChainIntegrity(params: {
       const path = join(decisionRoot, file);
       let decision: ApprovalDecisionRecord;
       try {
-        decision = approvalDecisionSchema.parse(JSON.parse(readUtf8(path)) as unknown);
+        decision = approvalDecisionSchema.parse(JSON.parse(readFileInPass(path).toString("utf8")) as unknown);
       } catch {
         reasonCodes.push("DECISION_ARTIFACT_UNPARSEABLE");
         continue;
@@ -741,7 +654,7 @@ export function inspectApprovalChainIntegrity(params: {
       reasonCodes.push("CONSUMPTION_INTEGRITY_INVALID");
     } else {
       try {
-        const record = approvalConsumedSchema.parse(JSON.parse(readUtf8(consumed)) as unknown);
+        const record = approvalConsumedSchema.parse(JSON.parse(readFileInPass(consumed).toString("utf8")) as unknown);
         if (record.approvalRequestId !== params.approvalRequestId || record.agentId !== agentId) {
           reasonCodes.push("CONSUMPTION_BINDING_INVALID");
         }
@@ -756,7 +669,7 @@ export function inspectApprovalChainIntegrity(params: {
     valid: unique.length === 0,
     reasonCodes: unique
   };
-}
+});
 
 export function cancelApprovalRequest(params: {
   workspace: string;

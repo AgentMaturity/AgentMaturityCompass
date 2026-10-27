@@ -3,7 +3,6 @@ import { captureMatureWorkspaceInitialization } from "./workspaceMatureInitializ
 import { initWorkspace, type InitWorkspaceOptions } from "./workspace.js";
 import { keysetDeclared } from "./keys/keyset.js";
 import { captureWorkspaceColdOrgPrerequisites } from "./workspaceColdOrgPrerequisites.js";
-export { WorkspaceInitializationPartialError } from "./workspaceColdOrgPrerequisites.js";
 
 /** Selected mature workspaces retain original inputs through cold/core/late signing stages.
  * Fresh, unsigned and unsupported tails keep their existing workspace spelling and entry recipe.

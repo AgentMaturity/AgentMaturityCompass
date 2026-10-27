@@ -84,6 +84,13 @@ function pause() { const entered = deferred(), release = deferred(); boundary.af
 async function expectEntered(p: ReturnType<typeof pause>, pending: Promise<unknown>) {
   expect(await Promise.race([p.entered.promise.then(() => "signed"), pending.then(() => "returned", () => "rejected")])).toBe("signed");
 }
+const CHANGED = "signed pair inputs or destinations changed while signing; retry";
+// The caller callback runs at every gate; the final pre-publication one is the first that runs under the archive lock.
+function finalCallback(f: Awaited<ReturnType<typeof fixture>>, action: () => void) {
+  const outFile = join(f.workspace, f.params.outFile), state = { fired: false };
+  const lock = join(f.workspace, `.benchmark-export-${sha256Hex(outFile).slice(0, 24)}.lock`);
+  return { state, beforePublish: () => { if (state.fired || !existsSync(lock)) return; state.fired = true; action(); } };
+}
 function assertActualSignature(f: Awaited<ReturnType<typeof fixture>>) {
   const call = boundary.calls.at(-1)!; expect(call.ref).toMatchObject({ provider: "file", id: "artifact-seal" });
   expect(verify(null, call.bytes, f.publicKeyPem, call.signature)).toBe(true);
@@ -127,7 +134,7 @@ test.each(["run", "agent", "bom-created", "assurance-added"] as const)("actual b
       mkdirSync(join(f.paths.reportsDir, "assurance"), { recursive: true });
       writeFileAtomic(path, JSON.stringify({ agentId: "default", ts: f.run.windowEndTs, packResults: [] }), 0o644);
     } else writeFileAtomic(path, original ? Buffer.concat([original.bytes, Buffer.from("\n ")]) : Buffer.from("{}\n"), original?.mode ?? 0o644);
-    p.release.resolve(); await expect(pending).rejects.toThrow("benchmark inputs changed while preparing");
+    p.release.resolve(); await expect(pending).rejects.toThrow(target === "assurance-added" ? "benchmark input references changed while preparing" : CHANGED);
     expect(existsSync(join(f.workspace, f.params.outFile))).toBe(false); expect(readFileSync(transparencyLogPath(f.workspace))).toEqual(beforeLog);
   } finally {
     p.release.resolve(); await Promise.allSettled([pending]);
@@ -142,7 +149,7 @@ test("a competing real synchronous benchmark export during the await is preserve
   try {
     await expectEntered(p, pending); assertActualSignature(f);
     const competing = exportBenchmarkArtifact({ ...f.params, notes: "actual competing publisher" }), bytes = readFileSync(competing.outFile), log = readFileSync(transparencyLogPath(f.workspace));
-    p.release.resolve(); await expect(pending).rejects.toThrow("benchmark output changed while preparing");
+    p.release.resolve(); await expect(pending).rejects.toThrow(CHANGED);
     expect(readFileSync(competing.outFile)).toEqual(bytes); expect(readFileSync(transparencyLogPath(f.workspace))).toEqual(log);
     expect(inspect(f, competing.outFile).bench.notes).toBe("actual competing publisher");
   } finally { p.release.resolve(); await Promise.allSettled([pending]); }
@@ -151,15 +158,15 @@ test("a competing real synchronous benchmark export during the await is preserve
 
 test.each(["input", "output"] as const)("the actual final beforePublish hook cannot bypass the final benchmark %s comparison", async target => {
   const f = await fixture(), path = join(f.paths.runsDir, `${f.run.runId}.json`), original = readFileSync(path), mode = lstatSync(path).mode & 0o777;
-  let calls = 0, changedLog: Buffer | undefined, competing: Buffer | undefined;
+  let changedLog: Buffer | undefined, competing: Buffer | undefined;
+  const final = finalCallback(f, () => {
+    if (target === "input") writeFileAtomic(path, Buffer.concat([original, Buffer.from("\n ")]), mode);
+    else competing = readFileSync(exportBenchmarkArtifact({ ...f.params, notes: "final real competing publisher" }).outFile);
+    changedLog = readFileSync(transparencyLogPath(f.workspace));
+  });
   try {
-    await expect(exportBenchmarkArtifactAsync(f.params, { beforePublish: () => {
-      if (++calls !== 2) return;
-      if (target === "input") writeFileAtomic(path, Buffer.concat([original, Buffer.from("\n ")]), mode);
-      else competing = readFileSync(exportBenchmarkArtifact({ ...f.params, notes: "final real competing publisher" }).outFile);
-      changedLog = readFileSync(transparencyLogPath(f.workspace));
-    } })).rejects.toThrow(target === "input" ? "benchmark inputs changed while preparing" : "benchmark output changed while preparing");
-    expect(calls).toBe(2); expect(changedLog).toBeDefined(); expect(readFileSync(transparencyLogPath(f.workspace))).toEqual(changedLog);
+    await expect(exportBenchmarkArtifactAsync(f.params, final)).rejects.toThrow(CHANGED);
+    expect(final.state.fired).toBe(true); expect(changedLog).toBeDefined(); expect(readFileSync(transparencyLogPath(f.workspace))).toEqual(changedLog);
     if (target === "input") expect(existsSync(join(f.workspace, f.params.outFile))).toBe(false);
     else { expect(readFileSync(join(f.workspace, f.params.outFile))).toEqual(competing); expect(inspect(f, join(f.workspace, f.params.outFile)).bench.notes).toBe("final real competing publisher"); }
   } finally { writeFileAtomic(path, original, mode); }
@@ -261,7 +268,7 @@ test.each(["run", "output", "output-mode"] as const)("late benchmark %s drift re
     const after = readFileSync(out), afterMode = lstatSync(out).mode & 0o777, log = readFileSync(transparencyLogPath(f.workspace));
     gate.release.resolve(); const error = await outcome;
     expect(error).toMatchObject({ code: "BENCHMARK_TRANSPARENCY_PUBLICATION_INCOMPLETE", outFile: out, cause: expect.any(Error) });
-    expect(String(error.cause)).toContain(target === "run" ? "benchmark inputs changed while preparing" : "benchmark published output changed while preparing transparency");
+    expect(String(error.cause)).toContain(CHANGED);
     expect(readFileSync(out)).toEqual(after); expect(lstatSync(out).mode & 0o777).toBe(afterMode); expect(readFileSync(transparencyLogPath(f.workspace))).toEqual(log);
   } finally { gate.release.resolve(); await Promise.allSettled([pending]); boundary.afterSign = undefined; if (path && original && mode !== undefined) writeFileAtomic(path, original, mode); }
   inspect(f, (await exportBenchmarkArtifactAsync({ ...f.params, outFile: "fresh.amcbench" })).outFile);
@@ -306,14 +313,16 @@ test("trusted benchmark route rechecks actual current-role loss after archive pu
 });
 
 test("benchmark reports the retained archive and native committed-entry cause after a real post-line log I/O failure", async () => {
-  const f = await fixture(), actualWrite = files.writeFileAtomic; let reached = false;
-  const spy = vi.spyOn(files, "writeFileAtomic").mockImplementation((path, bytes, mode) => { actualWrite(path, bytes, mode);
-    if (path === transparencySealSigPath(f.workspace) && !reached) { reached = true; const root = merkleCurrentRootPath(f.workspace);
-      rmSync(root); mkdirSync(root); writeFileSync(join(root, "occupied"), "owned post-line I/O failure"); } });
+  const f = await fixture(), actualWrite = files.writeFileAtomic, native = Object.assign(new Error("owned post-line I/O failure"), { code: "EIO" });
+  let reached = false, failed = false;
+  // Fail the first Merkle member write after the line and seal are acknowledged, without changing any captured log-family state.
+  const spy = vi.spyOn(files, "writeFileAtomic").mockImplementation((path, bytes, mode) => {
+    if (reached && !failed) { failed = true; throw native; }
+    actualWrite(path, bytes, mode); if (path === transparencySealSigPath(f.workspace)) reached = true; });
   try {
     const error = await exportBenchmarkArtifactAsync(f.params).then(() => null, value => value);
-    expect(reached).toBe(true); expect(error).toMatchObject({ code: "BENCHMARK_TRANSPARENCY_PUBLICATION_INCOMPLETE", outFile: join(f.workspace, f.params.outFile) });
-    expect(error.cause).toBeInstanceOf(TransparencyMerkleLagError); expect(error.cause.pendingRecorded).toBe(true); inspect(f, join(f.workspace, f.params.outFile));
+    expect(failed).toBe(true); expect(error).toMatchObject({ code: "BENCHMARK_TRANSPARENCY_PUBLICATION_INCOMPLETE", outFile: join(f.workspace, f.params.outFile) });
+    expect(error.cause).toBeInstanceOf(TransparencyMerkleLagError); expect(error.cause.cause).toBe(native); expect(error.cause.pendingRecorded).toBe(true); inspect(f, join(f.workspace, f.params.outFile));
     expect(error.sha256).toBe(sha256Hex(readFileSync(join(f.workspace, f.params.outFile))));
     expect(JSON.parse(readFileSync(transparencyLogPath(f.workspace), "utf8").trim().split(/\r?\n/).at(-1)!).hash).toBe(error.cause.entryHash);
     expect(verifyTransparencyLog(f.workspace).ok).toBe(true);

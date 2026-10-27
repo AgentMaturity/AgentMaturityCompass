@@ -77,11 +77,13 @@ test.each(["lock", "rotation", "policy"] as const)("actual checked incident refu
 });
 
 test("final caller guard cannot change generation after the original purpose publication check", async () => {
-  const f = freezeFixture(); let calls = 0;
+  // The caller guard also runs at entry and around preparation; rotate only once the checked Sign has returned.
+  const f = freezeFixture(), sign = vi.spyOn(f.provider, "sign"); let rotated = false;
   await expect(freeze.createFreezeIncidentForAuthority(f.params(), () => {
-    if (++calls === 2) rotatePurposeKeys({ workspace: f.workspace, purposes: ["session"], passphrase: FREEZE_PASS });
+    if (sign.mock.calls.length === 0 || rotated) return; rotated = true;
+    rotatePurposeKeys({ workspace: f.workspace, purposes: ["session"], passphrase: FREEZE_PASS });
   })).rejects.toMatchObject({ code: "KEY_PROVIDER_KEY_REFUSED" });
-  expect(calls).toBe(2); expect(names(f.dir)).toEqual([]); await positive(f);
+  expect(rotated).toBe(true); expect(names(f.dir)).toEqual([]); await positive(f);
 });
 
 test("genuine corrupted and unavailable file-provider answers do not publish an incident", async () => {
@@ -127,13 +129,14 @@ test("freeze lift uses the actual existing mode key initially and again after re
   await freeze.liftFreezeAsync({ workspace: f.workspace, incidentId: incident.incidentId, reason: "owner restored" });
 });
 
-test("retained sync no-sign semantics stay explicit while async refuses an ephemeral mismatched signature", async () => {
-  const f = freezeFixture(); vi.stubEnv("AMC_NO_SIGN", "1");
-  const real = await freeze.createFreezeIncidentAsync(f.params()); expect(freeze.verifyIncidentSignature(f.workspace, real)).toBe(true);
+test("retained sync no-sign semantics stay explicit while async refuses no-sign and an ephemeral mismatched signature", async () => {
+  // Signed run-hash authority refuses no-sign mode even with an unlocked vault; nothing is published.
+  const f = freezeFixture(); vi.stubEnv("AMC_NO_SIGN", "1"); const unlocked = names(f.dir);
+  await expect(freeze.createFreezeIncidentAsync(f.params())).rejects.toThrow("no-sign mode does not authorize policy signing"); expect(names(f.dir)).toEqual(unlocked);
   lockVault(f.workspace); vi.stubEnv("AMC_VAULT_PASSPHRASE", undefined);
-  const before = names(f.dir); await expect(freeze.createFreezeIncidentAsync(f.params())).rejects.toMatchObject({ code: "KEY_PROVIDER_KEY_REFUSED" }); expect(names(f.dir)).toEqual(before);
+  const before = names(f.dir); await expect(freeze.createFreezeIncidentAsync(f.params())).rejects.toThrow("no-sign mode does not authorize policy signing"); expect(names(f.dir)).toEqual(before);
   const legacy = freeze.createFreezeIncident(f.params()); expect(freeze.verifyIncidentSignature(f.workspace, legacy)).toBe(false);
-  unlinkSync(f.incidentPath(legacy.incidentId)); f.unlock(); expect(freeze.verifyIncidentSignature(f.workspace, await freeze.createFreezeIncidentAsync(f.params()))).toBe(true);
+  unlinkSync(f.incidentPath(legacy.incidentId)); f.unlock(); vi.stubEnv("AMC_NO_SIGN", "0"); expect(freeze.verifyIncidentSignature(f.workspace, await freeze.createFreezeIncidentAsync(f.params()))).toBe(true);
 });
 
 test.each(["incident", "lift"] as const)("raw-valid config-purpose %s signatures in broad auditor history cannot clear or authenticate artifact authority", format => {

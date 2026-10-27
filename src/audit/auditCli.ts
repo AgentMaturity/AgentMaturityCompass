@@ -59,18 +59,6 @@ function parseRequestedItems(items: string): string[] {
     .filter((row) => row.length > 0);
 }
 
-export function auditInitCli(workspace: string) {
-  return auditInitForApi(workspace);
-}
-
-export function auditVerifyPolicyCli(workspace: string) {
-  return auditPolicyForApi(workspace).signature;
-}
-
-export function auditPrintPolicyCli(workspace: string) {
-  return auditPolicyForApi(workspace).policy;
-}
-
 export function auditApplyPolicyCli(params: {
   workspace: string;
   file: string;
@@ -79,10 +67,6 @@ export function auditApplyPolicyCli(params: {
     workspace: params.workspace,
     policy: parseJsonOrYaml(readUtf8(resolve(params.file)))
   });
-}
-
-export function auditMapListCli(workspace: string) {
-  return auditMapListForApi(workspace);
 }
 
 export function auditMapShowCli(params: {

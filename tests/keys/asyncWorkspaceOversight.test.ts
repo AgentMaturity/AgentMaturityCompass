@@ -97,7 +97,8 @@ describe("actual stored-incident async oversight publication",()=>{
   test("a callback-created independently valid oversight record wins the final JSONL CAS",async()=>{
     const f=setup(),winner=createOversightRecord({...f.input,decision:"ACKNOWLEDGED",privateKeyPem:getSigningKey(f.workspace,"artifact-seal")}),bytes=Buffer.from(JSON.stringify(winner)+"\n");
     expect(verifyOversightChain([winner],f.incident,workspaceOversightPublicKeys(f.workspace))).toEqual({ok:true,errors:[]});let reached=false;
-    await expect(recordWorkspaceOversightAsync({...f.input,beforePublish:()=>{reached=true;appendFileSync(f.path,bytes);}})).rejects.toThrow("oversight records changed while signing was prepared; retry");
+    // beforePublish also runs at entry and before Sign; the winner appears only at the final post-Sign gate.
+    await expect(recordWorkspaceOversightAsync({...f.input,beforePublish:()=>{if(control.messages.length===0||reached)return;reached=true;appendFileSync(f.path,bytes);}})).rejects.toThrow("oversight records changed while signing was prepared; retry");
     expect(reached).toBe(true);expect(control.messages).toHaveLength(1);expect(readFileSync(f.path)).toEqual(bytes);expect(valid(f)).toEqual([winner]);
     await recordWorkspaceOversightAsync(f.input);expect(valid(f)).toHaveLength(2);
   });

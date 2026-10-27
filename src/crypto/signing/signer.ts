@@ -26,6 +26,7 @@ import { loadTrustContext } from "../../trust/trustContext.js";
 import { distrustAt } from "../../trust/admissionRule.js";
 import { sha256Hex } from "../../utils/hash.js";
 import { canonicalSigningKey } from "../../keys/algorithmPolicy.js";
+import { inCheckPass } from "../../utils/checkPass.js";
 
 function postNotarySync(params: {
   baseUrl: string;
@@ -297,7 +298,7 @@ export interface PolicySignerDescriptor {
 }
 
 /** Current synchronous policy seam only: authenticated public metadata, with no signing probe or private-key read. */
-export function describePolicySigner(workspace: string, kind: SignKind): PolicySignerDescriptor {
+export const describePolicySigner = inCheckPass(function describePolicySigner(workspace: string, kind: SignKind): PolicySignerDescriptor {
   const route = signingRoute(workspace, kind);
   let publicKeyPem: string;
   if (route === "vault") {
@@ -316,7 +317,7 @@ export function describePolicySigner(workspace: string, kind: SignKind): PolicyS
   if (key === null) throw new Error("policy signer has an unsupported public key");
   return { kind, mode: route === "vault" ? "VAULT" : "NOTARY", algorithm: key.algorithm, publicKeyPem: key.pem,
     fingerprint: sha256Hex(Buffer.from(key.pem, "utf8")) };
-}
+});
 
 export function signDigestWithPolicy(params: {
   workspace: string;
@@ -362,11 +363,11 @@ const samePolicySigner = (a: PolicySignerDescriptor, b: PolicySignerDescriptor) 
   && a.algorithm === b.algorithm && a.publicKeyPem === b.publicKeyPem && a.fingerprint === b.fingerprint;
 
 /** Internal final publication gate for producers that prepare more than one policy signature. No remote probe. */
-export function assertPolicySignerCurrent(workspace: string, expected: PolicySignerDescriptor): void {
+export const assertPolicySignerCurrent = inCheckPass(function assertPolicySignerCurrent(workspace: string, expected: PolicySignerDescriptor): void {
   if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize policy signing");
   if (!samePolicySigner(expected, describePolicySigner(workspace, expected.kind))) throw new Error("policy signing state changed while signing");
   assertPolicySignerNotRefused(workspace, expected.kind, expected.fingerprint);
-}
+});
 
 export async function signDigestWithPolicyAsync(input: PolicySignInput & { beforeSign?: () => void }): Promise<SignedDigest> {
   if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize policy signing");

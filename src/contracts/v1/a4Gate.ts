@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { approvalRequestSchema } from "../../approvals/approvalChainStore.js";
+import { approvalRequestSchema } from "../../approvals/approvalSchemas.js";
 import { nonEmpty, sha256HexSchema } from "./common.js";
 import { a4DecisionV1Schema } from "./a4Decision.js";
 import { a4IntentV1Schema } from "./a4Intent.js";

@@ -29,6 +29,7 @@ import { captureOrgFiles, assertOrgPairsCurrent, captureOrgPairsAuthority, type 
 import { writeRuntimeFirewallPolicy } from "../runtime/firewall.js";
 import { signToolsConfig, toolsConfigPath } from "../toolhub/toolhubValidators.js";
 import { defaultToolsConfig, toolsConfigSchema, type ToolDefinition } from "../toolhub/toolsSchema.js";
+import { originForEntry } from "../tools/builtin/nativeToolBreadth/originPolicy.js";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
@@ -63,8 +64,12 @@ const passphraseRefusal = (kind: StarterProfileKind): string =>
 
 /** The starter the init flags select, or null; throws the refusal before anything is written. */
 export function starterProfileFlag(opts: { coding?: boolean; regulated?: boolean; minimal?: boolean; skipVault?: boolean;
-  trustBoundary?: string }): StarterProfileKind | null {
+  trustBoundary?: string; webAllowHost?: readonly string[] }): StarterProfileKind | null {
   if (opts.coding && opts.regulated) throw new Error("--coding and --regulated are mutually exclusive.");
+  if (opts.webAllowHost?.length && !opts.coding) throw new Error("--web-allow-host enables web_fetch and web_search in --coding only; --regulated keeps them off.");
+  for (const host of opts.webAllowHost ?? []) {
+    if (originForEntry(host) === null) throw new Error(`--web-allow-host ${JSON.stringify(host)} is not a hostname or an http(s) origin; nothing was written.`);
+  }
   const kind: StarterProfileKind | null = opts.coding ? "coding" : opts.regulated ? "regulated" : null;
   if (kind === null) return null;
   if (opts.minimal) throw new Error(`--${kind} cannot be combined with --minimal.`);
@@ -73,13 +78,20 @@ export function starterProfileFlag(opts: { coding?: boolean; regulated?: boolean
   return kind;
 }
 
-/** fs.read, fs.write and fs.edit over the workspace, and bash confined by the OS (P1-05) with no egress. */
-function starterTools(): string {
+/**
+ * fs.read, fs.write and fs.edit over the workspace, and bash confined by the OS (P1-05) with no egress. With
+ * `webHosts` (`--coding --web-allow-host`, P2-13), web_fetch and web_search too, granted exactly those origins in the
+ * signed policy; web_search still refuses every call until a caller composes a search provider. The other S8 tools
+ * (ask_user, todo, plan) stay off in both profiles.
+ */
+function starterTools(webHosts: readonly string[] = []): string {
   const defaults = defaultToolsConfig().tools;
   const tool = (name: string): ToolDefinition => defaults.allowedTools.find((t) => t.name === name)!;
   const files = (name: string): ToolDefinition => ({ ...tool(name), allow: { ...tool(name).allow, paths: ["./**"] } });
+  const web = (name: string): ToolDefinition => ({ name, actionClass: "NETWORK_EXTERNAL", allow: { hostAllowlist: [...webHosts] } } as ToolDefinition);
   const config = toolsConfigSchema.parse({ tools: { ...defaults, allowedTools: [files("fs.read"), files("fs.write"), files("fs.edit"),
-    { ...tool("bash"), nativeSandbox: { kind: "os-native", writableDirectories: ["."] } }] } });
+    { ...tool("bash"), nativeSandbox: { kind: "os-native", writableDirectories: ["."] } },
+    ...(webHosts.length ? [web("web_fetch"), web("web_search")] : [])] } });
   return [
     "# amc init starter tools (P1-40). bash runs confined by the OS (Bubblewrap on Linux, Seatbelt on macOS) and has",
     "# no network: without nativeSandbox.egress every connection is denied. To let it reach a package registry, add",
@@ -115,11 +127,12 @@ function compileStarterPlan(workspace: string): NonNullable<StarterProfileReport
  * Writes and signs the starter's policy into an initialized workspace (after initWorkspace), in owner mode. The owner
  * becomes the first ACTIVE OWNER of a signed users.yaml, so identity-binding plans (P1-78) can name a principal.
  */
-export function applyStarterProfile(workspace: string, kind: StarterProfileKind, owner: StarterOwner): StarterProfileReport {
+export function applyStarterProfile(workspace: string, kind: StarterProfileKind, owner: StarterOwner, webHosts: readonly string[] = []): StarterProfileReport {
   assertOwnerMode(workspace, "init");
+  if (webHosts.length && kind !== "coding") throw new Error("--regulated keeps web_fetch and web_search off.");
   // Never over an existing users.yaml: it would replace every user and their roles.
   if (pathExists(usersConfigPath(workspace))) throw new Error(`${usersConfigPath(workspace)} exists; a starter profile only initializes a new workspace.`);
-  writeFileAtomic(toolsConfigPath(workspace), starterTools(), 0o644);
+  writeFileAtomic(toolsConfigPath(workspace), starterTools(webHosts), 0o644);
   signToolsConfig(workspace);
   const firewallMode = kind === "coding" ? "warn" : "block";
   writeRuntimeFirewallPolicy({ workspace, mode: firewallMode });
@@ -142,7 +155,7 @@ export function applyStarterProfile(workspace: string, kind: StarterProfileKind,
   };
 }
 
-export class StarterProfilePublicationError extends Error {
+class StarterProfilePublicationError extends Error {
   readonly code = "STARTER_PROFILE_INCOMPLETE";
   constructor(readonly completedPhases: readonly string[], readonly phase: string, cause: unknown) {
     super("starter profile did not complete; successful earlier phases remain and the failed phase may be partial", { cause });
@@ -150,13 +163,15 @@ export class StarterProfilePublicationError extends Error {
   }
 }
 /** Maintained starter counterpart. Existing sync policy/approval/control-plan producers keep their own contracts. */
-export async function applyStarterProfileAsync(workspace: string, kind: StarterProfileKind, owner: StarterOwner, options: OrgPairsOptions = {}): Promise<StarterProfileReport> {
+async function applyStarterProfileAsync(workspace: string, kind: StarterProfileKind, owner: StarterOwner, webHosts: readonly string[] = [],
+  options: OrgPairsOptions = {}): Promise<StarterProfileReport> {
   const selectedOwner = { username: owner.username, password: owner.password }, caller = options.beforePublish, inputs = options.assertInputsCurrent;
   const original = captureOrgPairsAuthority(workspace, () => { caller?.(); assertOwnerMode(workspace, "init"); });
   const completed: string[] = []; let phase = "users-precondition";
+  if (webHosts.length && kind !== "coding") throw new Error("--regulated keeps web_fetch and web_search off.");
   if (pathExists(usersConfigPath(workspace))) throw new Error(`${usersConfigPath(workspace)} exists; a starter profile only initializes a new workspace.`);
   try {
-    phase = "tools-body"; writeFileAtomic(toolsConfigPath(workspace), starterTools(), 0o644); completed.push(phase);
+    phase = "tools-body"; writeFileAtomic(toolsConfigPath(workspace), starterTools(webHosts), 0o644); completed.push(phase);
     phase = "tools-signature"; signToolsConfig(workspace); completed.push(phase);
     const firewallMode = kind === "coding" ? "warn" : "block";
     phase = "firewall"; const firewall = writeRuntimeFirewallPolicy({ workspace, mode: firewallMode }); completed.push(phase);
@@ -249,7 +264,7 @@ function printReport(workspace: string, report: StarterProfileReport): void {
  * collected first, so a refusal leaves an existing workspace untouched; only then does `force` delete .amc, as
  * `amc init --force` does.
  */
-export async function runStarterInit(workspace: string, kind: StarterProfileKind, force = false): Promise<StarterProfileReport> {
+export async function runStarterInit(workspace: string, kind: StarterProfileKind, force = false, webHosts: readonly string[] = []): Promise<StarterProfileReport> {
   const owner = await starterSecrets(kind);
   const amcDir = join(workspace, ".amc");
   if (force && pathExists(amcDir)) {
@@ -262,7 +277,7 @@ export async function runStarterInit(workspace: string, kind: StarterProfileKind
   let initialized = false;
   try {
     initWorkspace({ workspacePath: workspace }); initialized = true;
-    const report = await applyStarterProfileAsync(workspace, kind, owner);
+    const report = await applyStarterProfileAsync(workspace, kind, owner, webHosts);
     printReport(workspace, report); return report;
   } catch (cause) { throw new StarterProfilePublicationError(Object.freeze(initialized ? ["workspace-initialized"] : []), "starter-init", cause); }
 }

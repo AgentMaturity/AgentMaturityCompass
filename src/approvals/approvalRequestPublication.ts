@@ -18,6 +18,7 @@ import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { vaultStatus } from "../vault/vault.js";
 import { prepareApprovalRequestRecord, type ApprovalRequestRecordInput } from "./approvalChainStore.js";
+import { inCheckPass } from "../utils/checkPass.js";
 
 const INPUT_LIMIT = 1024 * 1024;
 const enabled = () => { if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize policy signing"); };
@@ -64,7 +65,7 @@ export function captureApprovalBoundInputs(inputWorkspace: string, inputAgentId:
   const revokePath = selectedWorkOrder === null ? null : join(agentPaths.rootDir, "workorders", `${selectedWorkOrder.workOrderId}.revocation.json`);
   const revoked = revokePath === null ? null : pathExists(revokePath);
   let positiveWorkOrderDigest: string | null = null;
-  const assertCurrent = () => {
+  const assertCurrent = inCheckPass(() => {
     if (resolve(inputWorkspace) !== workspace || resolveAgentId(workspace, inputAgentId) !== agentId
       || canonicalize(getAgentPaths(workspace, agentId)) !== agentSelection) throw new Error("original approval input location changed");
     for (const old of original) {
@@ -78,7 +79,7 @@ export function captureApprovalBoundInputs(inputWorkspace: string, inputAgentId:
       for (const old of original) if (!sameObservation(old, observeInput(workspace, old.path)))
         throw new Error("original approval input changed during actual work-order admission");
     }
-  };
+  });
   const assertBoundHashes = (hashes: { policyHash: string; toolsHash: string; budgetsHash: string; workOrderHash: string | null }) => {
     assertCurrent();
     const values = [hashes.policyHash, hashes.toolsHash, hashes.budgetsHash], fallbacks = ["missing-action-policy", "missing-tools", "missing-budgets"];
@@ -109,7 +110,7 @@ function captureRequestAuthority(workspace: string) {
   if (key === null) throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", holder, "the original approval request signer is unsupported");
   const policyShape = canonicalize(keyPolicy(loadKeysConfig(workspace)));
   let observedUnlocked = false, failure = null as { cause: unknown } | null;
-  const assertCurrent = () => {
+  const assertCurrent = inCheckPass(() => {
     if (failure !== null) throw failure.cause;
     try {
       enabled();
@@ -131,7 +132,7 @@ function captureRequestAuthority(workspace: string) {
       }
       enabled();
     } catch (cause) { failure = { cause }; throw cause; }
-  };
+  });
   assertCurrent();
   return Object.freeze({ publicKeyPem: key.pem, algorithm: key.algorithm, assertCurrent, assertPrivateReady() {
     assertCurrent();
@@ -152,7 +153,7 @@ interface RequestProgress {
   lockAttempted: boolean; lockEntered: boolean; lockReturned: boolean;
   attemptedMember: string | null; returnedMembers: readonly string[]; acknowledgedMembers: readonly string[]; complete: boolean;
 }
-export class ApprovalRequestPublicationError extends Error {
+class ApprovalRequestPublicationError extends Error {
   readonly code = "APPROVAL_REQUEST_INCOMPLETE";
   constructor(readonly progress: Readonly<RequestProgress>, cause: unknown) {
     super("approval request publication did not complete; native and earlier policy effects may remain", { cause });
@@ -181,7 +182,7 @@ export function captureApprovalRequestPublication(inputWorkspace: string, before
       lockAttempted: false, lockEntered: false, lockReturned: false, attemptedMember: null, returnedMembers: [], acknowledgedMembers: [], complete: false };
     const returned: string[] = [], acknowledged: string[] = [];
     const snapshot = () => Object.freeze({ ...progress, returnedMembers: Object.freeze([...returned]), acknowledgedMembers: Object.freeze([...acknowledged]) });
-    const intrinsic = () => {
+    const intrinsic = inCheckPass(() => {
       authority.assertCurrent();
       if (resolve(inputWorkspace) !== workspace || resolve(selected.workspace) !== workspace || canonicalize(input) !== shape)
         throw new Error("original approval request publication input changed");
@@ -193,16 +194,16 @@ export function captureApprovalRequestPublication(inputWorkspace: string, before
       if (request !== null && Date.now() > request.expiresTs) throw new Error("approval request expired while signing was prepared");
       if (bodyBytes !== null && signatureBytes !== null && !verifyAuditorSignatureBytes(workspace, "BUNDLE", bodyBytes, signatureBytes).valid)
         throw new Error("prepared approval request signature is no longer admitted");
-    };
-    const current = () => {
+    });
+    const current = inCheckPass(function current() {
       if (failure !== null) throw failure.cause;
       try { intrinsic(); caller?.(); intrinsic(); }
       catch (cause) { failure = { cause }; throw cause; }
-    };
-    const assertCurrent = () => {
+    });
+    const assertCurrent = inCheckPass(() => {
       if (!progress.complete) throw new Error("approval request publication has not returned complete");
       current();
-    };
+    });
     try {
       current(); agentSelection = canonicalize(getAgentPaths(selected.workspace, selected.agentId));
       progress.phase = "preparation";

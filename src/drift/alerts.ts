@@ -203,7 +203,7 @@ export async function signAlertsConfigAsync(workspaceInput: string, beforePublis
 }
 
 /** Secret writes precede provider signing; attempted and returned persistence are distinct facts. */
-export class AlertsInitializationError extends Error {
+class AlertsInitializationError extends Error {
   readonly code = "ALERTS_INITIALIZATION_INCOMPLETE";
   constructor(readonly attemptedSecretKeys: readonly string[], readonly returnedSecretKeys: readonly string[], cause: unknown) {
     super("alerts initialization did not complete; inspect secret persistence and nested publication before retrying", { cause });

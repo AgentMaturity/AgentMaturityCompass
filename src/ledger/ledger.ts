@@ -91,12 +91,13 @@ import { hasTable } from "./ledgerSchema.js";
 import { hasOptionalLegacyTable } from "./legacyOptionalTables.js";
 import { openLedgerConnection, type LedgerStore } from "./ledgerConnection.js";
 import { canonicalMetadataForHash, sanitizeMetaForHash } from "./eventHash.js";
+import { encryptField, inlinePayloadAad } from "./encryption/ledgerCipher.js";
 
 function blobDir(workspace: string): string {
   return join(workspace, ".amc", "blobs");
 }
 
-export { canonicalMetadataForHash, sanitizeMetaForHash } from "./eventHash.js";
+export { canonicalMetadataForHash } from "./eventHash.js";
 
 export function targetsDir(workspace: string): string {
   return join(workspace, ".amc", "targets");
@@ -283,6 +284,12 @@ export class Ledger {
       sha: stored.payloadSha256,
       blobRef: stored.blobId
     };
+  }
+
+  // P2-09: inline payloads are stored, and hashed, as ciphertext when ledger encryption is on (ADR 018).
+  private sealInline(id: string, bytes: Buffer): string {
+    const text = bytes.toString("utf8");
+    return this.getOpsPolicy().opsPolicy.encryption.ledgerEncryptionEnabled === true ? encryptField(this.workspace, text, inlinePayloadAad(id), this.db) : text;
   }
 
   private ensureIncidentStore() {
@@ -512,7 +519,7 @@ export class Ledger {
       }
       payloadSha256 = sha256Hex(bytes);
       if (input.inline) {
-        payloadInline = bytes.toString("utf8");
+        payloadInline = this.sealInline(id, bytes);
       } else {
         const blob = this.storeBlob(bytes, input.payloadExt ?? "txt");
         payloadPath = blob.path;
@@ -689,7 +696,7 @@ export class Ledger {
       }
       payloadSha256 = sha256Hex(bytes);
       if (input.inline) {
-        payloadInline = bytes.toString("utf8");
+        payloadInline = this.sealInline(id, bytes);
       } else {
         const blob = this.storeBlob(bytes, input.payloadExt ?? "txt");
         payloadPath = blob.path;
@@ -1233,8 +1240,7 @@ export class Ledger {
 export {
   verifyLedgerIntegrity,
   verifyEvidenceEventIntegrity,
-  type VerifyResult,
-  type LedgerVerifyOptions
+  type VerifyResult
 } from "./ledgerVerification.js";
 
 /** `store: "unsigned"` opens the AMC_NO_SIGN=1 store instead of `.amc/evidence.sqlite`, and is refused without it. */

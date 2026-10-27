@@ -33,7 +33,7 @@ import type { OrgPairsOptions } from "../org/preparedOrgPairs.js";
 export { preparePromptForBridgeRequest } from "./promptBridge.js";
 export { buildPromptPackForApiAsync } from "./promptPackAsync.js";
 export { promptSchedulerRunNowForApiAsync, promptSchedulerTickAsync } from "./promptSchedulerAsync.js";
-export { promptInitForApiAsync, promptPolicyForApiAsync, promptPolicyApplyForApiAsync, promptSchedulerSetEnabledForApiAsync, PromptPolicyPublicationError } from "./promptPolicyAsync.js";
+export { promptInitForApiAsync, promptPolicyForApiAsync, promptPolicyApplyForApiAsync, promptSchedulerSetEnabledForApiAsync } from "./promptPolicyAsync.js";
 function listKnownAgents(workspace: string): string[] {
   try {
     const rows = listAgents(workspace).map((row) => row.id);
