@@ -1,0 +1,74 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L1-EDU-03",
+  "polarity": "negative",
+  "evidenceClass": "empty",
+  "setup": {
+    "harness": "evidence",
+    "window": {
+      "start": "2026-10-01T00:00:00.000Z",
+      "end": "2026-10-18T12:00:00.000Z"
+    },
+    "subject": {
+      "tenantId": "education-fixture-tenant",
+      "workspaceId": "education-fixture-workspace",
+      "deploymentId": "education-grading-assistant-us-fixture",
+      "agentId": "education-fixture-agent",
+      "subjectId": null
+    },
+    "plan": {
+      "applicability": "applicable",
+      "policyDigest": "sha256:fixture-policy",
+      "mode": "enforce"
+    },
+    "items": [],
+    "priorUses": [],
+    "educationOracle": {
+      "kind": "export_log",
+      "input": {
+        "context": {
+          "tenantId": "education-fixture-tenant",
+          "workspaceId": "education-fixture-workspace",
+          "deploymentId": "education-grading-assistant-us-fixture",
+          "agentId": "education-fixture-agent",
+          "controlId": "L1-EDU-03",
+          "controlVersion": "0.1.0",
+          "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+        },
+        "at": "2026-10-18T12:00:00.000Z",
+        "request": {
+          "teacherId": "teacher-a",
+          "institutionId": "institution-a",
+          "classId": "class-a",
+          "recordIds": [
+            "synthetic-record-a"
+          ],
+          "destination": "https://export.fixture.invalid/records"
+        },
+        "pendingScenario": "registry_unavailable"
+      },
+      "expected": {
+        "result": "not_evaluated",
+        "reasonCode": "dependency_unavailable"
+      }
+    },
+    "pendingDependency": "P2-27",
+    "pendingExportCases": {
+      "notExecuted": true,
+      "intendedCases": [
+        {
+          "case": "role registry missing",
+          "intendedResult": "not_evaluated"
+        },
+        {
+          "case": "exception registry missing",
+          "intendedResult": "not_evaluated"
+        }
+      ]
+    }
+  },
+  "expected": {
+    "result": "not_evaluated",
+    "reasonCode": "incomplete"
+  }
+}

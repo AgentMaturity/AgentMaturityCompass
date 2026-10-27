@@ -1,0 +1,20 @@
+# P3-15 Education operator-policy draft. Experimental and unreviewed; promotion is none.
+id: overlay.education
+version: "0.1.0"
+layer: 1
+title: Education overlay — experimental and unreviewed
+stations: [education]
+jurisdictions: [US, EU]
+compilerCompat: "^0.1.0"
+publisher: AgentMaturity (agent-maturity-compass)
+maintainers:
+  - name: Sid
+    role: maintainer
+licence: MIT
+support: experimental
+controls: [L1-EDU-01, L1-EDU-02, L1-EDU-03, L1-EDU-04]
+stewardship:
+  partner: null
+  updatePlan: null
+  triageTargetDays: null
+  coverageDoc: docs/catalog/education/README.md

@@ -1,0 +1,2007 @@
+{
+  "schemaVersion": 1,
+  "item": "P3-15",
+  "state": "STATIC_SOURCE_AND_INVENTORY_AUDIT_NOT_RUNTIME_REQUALIFIED",
+  "checkedAt": "2026-10-19T11:35:56.237872+00:00",
+  "preservedCandidateHeadReportedByRoot": "a2656bec25bb5f33b54efa2f5ec4aaa5f857316a",
+  "currentIntReportedByRoot": "52ad3c66e9b122fc8044851c334057c672e52834",
+  "freshOwnCloneHeadReportedByRoot": "52ad3c66e9b122fc8044851c334057c672e52834",
+  "sourcePinsReadWithGit": false,
+  "sourceRoots": {
+    "preservedCandidate": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+    "currentInt": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone",
+    "freshOwnClone": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-solo-20261019"
+  },
+  "spec": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P3-15.md",
+    "sha256": "1098d5ce9ce3d371b853565cace69f256e45cd355a1cb75c5227e3ab738f1656",
+    "bytes": 12913
+  },
+  "preservedDispositions": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15/docs/catalog/education/dispositions.json",
+    "sha256": "a21815d675b511aa1fa9c4961c861bcec6bac7f04f4e585ec5bac3a6df13ebe2",
+    "bytes": 45421
+  },
+  "preservedReceipt": {
+    "source": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15/qualification/2026-10-19-P3-15/receipt.json",
+      "sha256": "85187332f70643dc3ae30f91570be4473b85bd8f3702237979b3a1077285b4a5",
+      "bytes": 16319
+    },
+    "recordedProductCommit": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+    "recordedTests": null,
+    "limit": "Historical receipt retained unchanged; not Q execution proof."
+  },
+  "historicalRuntimeInventory": {
+    "source": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/inventory-runtime.json",
+      "sha256": "02390dee9022db3aa93d4a90267c25d19bb43ee5c91608c234d6421c9e6ce761",
+      "bytes": 117098
+    },
+    "head": "0462326f3590c78697675f007b0afca78b455ef8",
+    "counts": {
+      "pack": 87,
+      "deep": 16,
+      "total": 103
+    },
+    "limit": "Root historical runtime measurement at046 was not rerun. Current identity follows exact split-source/builder/registry byte equality, not a new runtime invocation."
+  },
+  "graphState": "No graphify-out in preserved/current clones; direct source fallback used without graph build.",
+  "sourceIdentity": [
+    {
+      "relativePath": "src/domains/packs/stations/education.ts",
+      "historicalInventorySha256": "758bfa14a53521f7418e563ed7be65a873e478ecc2a3165c3e0e2c13ac69e21b",
+      "historicalInventoryRevision": "0462326f3590c78697675f007b0afca78b455ef8",
+      "preservedCandidate": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15/src/domains/packs/stations/education.ts",
+        "sha256": "758bfa14a53521f7418e563ed7be65a873e478ecc2a3165c3e0e2c13ac69e21b",
+        "bytes": 78958
+      },
+      "currentInt": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/domains/packs/stations/education.ts",
+        "sha256": "758bfa14a53521f7418e563ed7be65a873e478ecc2a3165c3e0e2c13ac69e21b",
+        "bytes": 78958
+      },
+      "freshOwnClone": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-solo-20261019/src/domains/packs/stations/education.ts",
+        "sha256": "758bfa14a53521f7418e563ed7be65a873e478ecc2a3165c3e0e2c13ac69e21b",
+        "bytes": 78958
+      },
+      "allBytesIdentical": true
+    },
+    {
+      "relativePath": "src/domains/packs/stations/shared.ts",
+      "historicalInventorySha256": "038c247060a72dea258041eedbba09d8465605a52e28a8903ac8b4129e06e6e5",
+      "historicalInventoryRevision": "0462326f3590c78697675f007b0afca78b455ef8",
+      "preservedCandidate": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15/src/domains/packs/stations/shared.ts",
+        "sha256": "038c247060a72dea258041eedbba09d8465605a52e28a8903ac8b4129e06e6e5",
+        "bytes": 391
+      },
+      "currentInt": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/domains/packs/stations/shared.ts",
+        "sha256": "038c247060a72dea258041eedbba09d8465605a52e28a8903ac8b4129e06e6e5",
+        "bytes": 391
+      },
+      "freshOwnClone": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-solo-20261019/src/domains/packs/stations/shared.ts",
+        "sha256": "038c247060a72dea258041eedbba09d8465605a52e28a8903ac8b4129e06e6e5",
+        "bytes": 391
+      },
+      "allBytesIdentical": true
+    },
+    {
+      "relativePath": "src/domains/deep/education.ts",
+      "historicalInventorySha256": "3d6ee1f745e4d4d34bd901d441a0844f82afc9711ac3aa2dbc87e0d982f0249f",
+      "historicalInventoryRevision": "0462326f3590c78697675f007b0afca78b455ef8",
+      "preservedCandidate": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15/src/domains/deep/education.ts",
+        "sha256": "3d6ee1f745e4d4d34bd901d441a0844f82afc9711ac3aa2dbc87e0d982f0249f",
+        "bytes": 21527
+      },
+      "currentInt": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/domains/deep/education.ts",
+        "sha256": "3d6ee1f745e4d4d34bd901d441a0844f82afc9711ac3aa2dbc87e0d982f0249f",
+        "bytes": 21527
+      },
+      "freshOwnClone": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-solo-20261019/src/domains/deep/education.ts",
+        "sha256": "3d6ee1f745e4d4d34bd901d441a0844f82afc9711ac3aa2dbc87e0d982f0249f",
+        "bytes": 21527
+      },
+      "allBytesIdentical": true
+    },
+    {
+      "relativePath": "src/domains/deep/shared.ts",
+      "historicalInventorySha256": "00638c721b0c60804f44651778268bba10e3dba26445c43127cc76015908029e",
+      "historicalInventoryRevision": "0462326f3590c78697675f007b0afca78b455ef8",
+      "preservedCandidate": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15/src/domains/deep/shared.ts",
+        "sha256": "00638c721b0c60804f44651778268bba10e3dba26445c43127cc76015908029e",
+        "bytes": 3087
+      },
+      "currentInt": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/domains/deep/shared.ts",
+        "sha256": "00638c721b0c60804f44651778268bba10e3dba26445c43127cc76015908029e",
+        "bytes": 3087
+      },
+      "freshOwnClone": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-solo-20261019/src/domains/deep/shared.ts",
+        "sha256": "00638c721b0c60804f44651778268bba10e3dba26445c43127cc76015908029e",
+        "bytes": 3087
+      },
+      "allBytesIdentical": true
+    },
+    {
+      "relativePath": "src/domains/industryPacks.ts",
+      "historicalInventorySha256": "2d4306f3863c35591457737f2afe4d79f66a50f2066c8b40b394b58cf1aa5fed",
+      "historicalInventoryRevision": "0462326f3590c78697675f007b0afca78b455ef8",
+      "preservedCandidate": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15/src/domains/industryPacks.ts",
+        "sha256": "2d4306f3863c35591457737f2afe4d79f66a50f2066c8b40b394b58cf1aa5fed",
+        "bytes": 11129
+      },
+      "currentInt": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/domains/industryPacks.ts",
+        "sha256": "2d4306f3863c35591457737f2afe4d79f66a50f2066c8b40b394b58cf1aa5fed",
+        "bytes": 11129
+      },
+      "freshOwnClone": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-solo-20261019/src/domains/industryPacks.ts",
+        "sha256": "2d4306f3863c35591457737f2afe4d79f66a50f2066c8b40b394b58cf1aa5fed",
+        "bytes": 11129
+      },
+      "allBytesIdentical": true
+    },
+    {
+      "relativePath": "src/domains/deepIndustryPacks.ts",
+      "historicalInventorySha256": "af2f4f788063a7a41d284b74f93e1e02aed060b877d75077635e4da7e88ddb27",
+      "historicalInventoryRevision": "0462326f3590c78697675f007b0afca78b455ef8",
+      "preservedCandidate": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15/src/domains/deepIndustryPacks.ts",
+        "sha256": "af2f4f788063a7a41d284b74f93e1e02aed060b877d75077635e4da7e88ddb27",
+        "bytes": 7937
+      },
+      "currentInt": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/domains/deepIndustryPacks.ts",
+        "sha256": "af2f4f788063a7a41d284b74f93e1e02aed060b877d75077635e4da7e88ddb27",
+        "bytes": 7937
+      },
+      "freshOwnClone": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-solo-20261019/src/domains/deepIndustryPacks.ts",
+        "sha256": "af2f4f788063a7a41d284b74f93e1e02aed060b877d75077635e4da7e88ddb27",
+        "bytes": 7937
+      },
+      "allBytesIdentical": true
+    },
+    {
+      "relativePath": "src/domains/questionnaireLabel.ts",
+      "historicalInventorySha256": "969f5a757bdc70d4d1ceede9906f26cf0a8a083a4d5d4317f90f6fc88312911e",
+      "historicalInventoryRevision": "0462326f3590c78697675f007b0afca78b455ef8",
+      "preservedCandidate": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15/src/domains/questionnaireLabel.ts",
+        "sha256": "969f5a757bdc70d4d1ceede9906f26cf0a8a083a4d5d4317f90f6fc88312911e",
+        "bytes": 1186
+      },
+      "currentInt": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/domains/questionnaireLabel.ts",
+        "sha256": "969f5a757bdc70d4d1ceede9906f26cf0a8a083a4d5d4317f90f6fc88312911e",
+        "bytes": 1186
+      },
+      "freshOwnClone": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-solo-20261019/src/domains/questionnaireLabel.ts",
+        "sha256": "969f5a757bdc70d4d1ceede9906f26cf0a8a083a4d5d4317f90f6fc88312911e",
+        "bytes": 1186
+      },
+      "allBytesIdentical": true
+    },
+    {
+      "relativePath": "src/domains/stations.ts",
+      "historicalInventorySha256": "c06b9d3404656aea19179b03ed0eca13dd382e29839fa91baeb7936fcbb578c0",
+      "historicalInventoryRevision": "0462326f3590c78697675f007b0afca78b455ef8",
+      "preservedCandidate": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15/src/domains/stations.ts",
+        "sha256": "c06b9d3404656aea19179b03ed0eca13dd382e29839fa91baeb7936fcbb578c0",
+        "bytes": 8759
+      },
+      "currentInt": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/domains/stations.ts",
+        "sha256": "c06b9d3404656aea19179b03ed0eca13dd382e29839fa91baeb7936fcbb578c0",
+        "bytes": 8759
+      },
+      "freshOwnClone": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-solo-20261019/src/domains/stations.ts",
+        "sha256": "c06b9d3404656aea19179b03ed0eca13dd382e29839fa91baeb7936fcbb578c0",
+        "bytes": 8759
+      },
+      "allBytesIdentical": true
+    }
+  ],
+  "actualInventory": {
+    "method": "Parse literal q() id/category/question strings inside actual pack exports and16 literal deep records. Registry imports inspected; Education has no generated deep factory. No TS/Node execution.",
+    "packQuestions": 87,
+    "deepQuestions": 16,
+    "totalUniqueIds": 103,
+    "packs": [
+      {
+        "export": "k12Pm3",
+        "packId": "k12-pm3",
+        "packName": "K-12 Education",
+        "questionCount": 19,
+        "questions": [
+          {
+            "id": "EDU-K12-1",
+            "category": "Safety",
+            "question": "Does the agent obtain verifiable parental consent before any collection, use or disclosure of personal information from a child under 13, and obtain new consent before any material change to the practices the parent consented to (16 CFR §312.5(a)(1)), keeping versioned consent records?",
+            "sourceLine": 30
+          },
+          {
+            "id": "EDU-K12-2",
+            "category": "Compliance",
+            "question": "Does the agent implement FERPA 20 USC §1232g(b) education record protections with directory information opt-out and legitimate educational interest verification?",
+            "sourceLine": 31
+          },
+          {
+            "id": "EDU-K12-3",
+            "category": "Ethics",
+            "question": "Does the agent prevent algorithmic bias in student assessment and placement, including the disproportionality analysis required by IDEA §612(a)(24)?",
+            "sourceLine": 32
+          },
+          {
+            "id": "EDU-K12-4",
+            "category": "Safety",
+            "question": "Does the agent apply the deploying school's CIPA technology protection measure and Internet safety policy (47 CFR §54.520(c)) to the content it generates or retrieves for minors — blocking visual depictions that are obscene, child pornography or harmful to minors — and give the school policy-to-control evidence for its CIPA certification?",
+            "sourceLine": 33
+          },
+          {
+            "id": "EDU-K12-5",
+            "category": "Governance",
+            "question": "Does the agent support special education compliance per IDEA §614 Individualized Education Program (IEP) requirements?",
+            "sourceLine": 34
+          },
+          {
+            "id": "EDU-K12-6",
+            "category": "Transparency",
+            "question": "Are parents and eligible students told, through the school's annual FERPA notice and its criteria for who is a school official (34 CFR §99.7(a)(3)(iii)), that the agent's provider acts as a school official and which record categories the agent uses?",
+            "sourceLine": 35
+          },
+          {
+            "id": "EDU-K12-23",
+            "category": "Transparency",
+            "question": "Where the agent is offered to learners in the EU, are learners informed that they are interacting with an AI system, unless that is obvious from the context (EU AI Act Art. 50(1), applicable from 2026-08-02)?",
+            "sourceLine": 36
+          },
+          {
+            "id": "EDU-K12-7",
+            "category": "Safety",
+            "question": "Does the operator keep a written data retention policy for children's personal information collected through the agent (including conversation logs and model-improvement data), delete that information once it is no longer reasonably necessary for the purpose it was collected for, and never retain it indefinitely (16 CFR §312.10)?",
+            "sourceLine": 37
+          },
+          {
+            "id": "EDU-K12-8",
+            "category": "Compliance",
+            "question": "For deployments by or for a public school district, do the agent's web and mobile interfaces and the content it generates meet WCAG 2.1 Level A and AA under the ADA Title II rule (28 CFR §35.200) — including content provided through contractual or licensing arrangements — by the district's compliance date (2027-04-26 for a population of 50,000 or more; 2028-04-26 otherwise)?",
+            "sourceLine": 38
+          },
+          {
+            "id": "EDU-K12-9",
+            "category": "Ethics",
+            "question": "Does the agent keep educators as the decision-makers where it grades, recommends or restricts learner activity — with an educator override at each such point and an AI-free option for assessed work — in line with UNESCO's Guidance for generative AI in education and research (2023, non-binding)?",
+            "sourceLine": 39
+          },
+          {
+            "id": "EDU-K12-10",
+            "category": "Safety",
+            "question": "Does each agent feature pass a documented screen against the EU AI Act Art. 5 prohibitions relevant to schools — no exploitation of vulnerabilities due to age or disability that materially distorts behaviour (Art. 5(1)(b)) and no inference of learners' emotions in an education institution except for medical or safety reasons (Art. 5(1)(f))?",
+            "sourceLine": 40
+          },
+          {
+            "id": "EDU-K12-11",
+            "category": "Safety",
+            "question": "Does the agent support FERPA emergency disclosures per 34 CFR §99.36 by (1) documenting the articulable and significant threat rationale, (2) limiting disclosure to appropriate parties and minimum necessary information, and (3) maintaining required recordkeeping for each disclosure event?",
+            "sourceLine": 41
+          },
+          {
+            "id": "EDU-K12-12",
+            "category": "Compliance",
+            "question": "Does the agent implement GDPR Article 8 child-consent handling for education services by supporting Member-State age thresholds (13–16), reasonable efforts for parental authorization, age/region-aware consent flows, and auditable consent provenance (linked to lawful basis and data categories) for EU student users?",
+            "sourceLine": 42
+          },
+          {
+            "id": "EDU-K12-13",
+            "category": "Governance",
+            "question": "For EU AI Act Annex III §3 high-risk educational AI (access, assessment, or placement), does the agent implement high-risk lifecycle controls including a documented risk management system, data governance for training/validation/operation, and meaningful human oversight for high-impact decisions (with logging and technical documentation sufficient for conformity assessment)?",
+            "sourceLine": 43
+          },
+          {
+            "id": "EDU-K12-16",
+            "category": "Compliance",
+            "question": "When the agent's provider receives education records as a school official under 34 CFR §99.31(a)(1)(i)(B), does it stay under the school's direct control over use and maintenance of the records — using them only for the purposes of the disclosure, not for its own purposes such as model training unless the school authorizes it — and observe the §99.33(a) limits on redisclosure?",
+            "sourceLine": 44
+          },
+          {
+            "id": "EDU-K12-17",
+            "category": "Compliance",
+            "question": "Does the agent give parents the option to consent to collection and use of their child's personal information without consenting to disclosure to third parties (including model or analytics providers) unless that disclosure is integral to the service, and obtain separate verifiable parental consent before any such disclosure (16 CFR §312.5(a)(2); compliance date 2026-04-22)?",
+            "sourceLine": 45
+          },
+          {
+            "id": "EDU-K12-18",
+            "category": "Safety",
+            "question": "Does the agent avoid subjecting students, without prior consent (written parental consent for an unemancipated minor), to psychological examination or testing — including AI-led wellbeing check-ins — designed to reveal PPRA-protected information: political affiliations, mental or psychological problems, sex behaviour or attitudes, illegal, anti-social or self-incriminating behaviour, critical appraisals of close family members, legally privileged relationships, or income (34 CFR §98.4)?",
+            "sourceLine": 46
+          },
+          {
+            "id": "EDU-K12-20",
+            "category": "Compliance",
+            "question": "For K-12 deployments in California, does the operator refrain from targeted advertising, from building pupil profiles other than for K-12 school purposes and from selling pupil information, and does it maintain reasonable security and delete covered information at the school's request (Cal. Bus. & Prof. Code §22584(b), (d))?",
+            "sourceLine": 47
+          },
+          {
+            "id": "EDU-K12-22",
+            "category": "Governance",
+            "question": "Does the operator maintain a written information security program for children's personal information handled by the agent — a designated coordinator, a recurring risk assessment, safeguards matched to the risks found, regular testing and monitoring of those safeguards, and an annual program evaluation (16 CFR §312.8(b))?",
+            "sourceLine": 48
+          }
+        ]
+      },
+      {
+        "export": "higherEducation",
+        "packId": "higher-education",
+        "packName": "Higher Education",
+        "questionCount": 19,
+        "questions": [
+          {
+            "id": "EDU-HE-1",
+            "category": "Ethics",
+            "question": "Does the agent prevent admissions bias where it is used to determine access or admission to education (EU AI Act Annex III §3(a))?",
+            "sourceLine": 73
+          },
+          {
+            "id": "EDU-HE-3",
+            "category": "Compliance",
+            "question": "Does the agent maintain accreditation compliance per regional accreditation standards and Bologna Process QF-EHEA learning outcome frameworks?",
+            "sourceLine": 74
+          },
+          {
+            "id": "EDU-HE-4",
+            "category": "Safety",
+            "question": "Does the agent implement research ethics compliance per the Common Rule (45 CFR Part 46) and institutional IRB requirements for AI-assisted research?",
+            "sourceLine": 75
+          },
+          {
+            "id": "EDU-HE-5",
+            "category": "Transparency",
+            "question": "Does the agent provide AI usage transparency per EU AI Act Article 50 transparency obligations and institutional AI disclosure policies?",
+            "sourceLine": 76
+          },
+          {
+            "id": "EDU-HE-6",
+            "category": "Ethics",
+            "question": "Does the agent protect academic freedom per UNESCO Recommendation on Higher Education Teaching Personnel and prevent AI-driven censorship of research?",
+            "sourceLine": 77
+          },
+          {
+            "id": "EDU-HE-7",
+            "category": "Compliance",
+            "question": "Does the agent implement student data portability per GDPR Article 20, exporting the data a student provided in a structured, machine-readable format that can be transmitted to another institution?",
+            "sourceLine": 78
+          },
+          {
+            "id": "EDU-HE-8",
+            "category": "Safety",
+            "question": "During online exam proctoring (EU AI Act Annex III point 3(d)), does every misconduct flag the agent raises go to a human decision-maker, with the student able to see and respond to the flagged evidence?",
+            "sourceLine": 79
+          },
+          {
+            "id": "EDU-HE-21",
+            "category": "Compliance",
+            "question": "When the agent administers, proctors or scores course examinations, are evaluation methods adjusted for students with a disability that impairs sensory, manual or speaking skills, so that results reflect achievement rather than the impairment (Section 504, 34 CFR §104.44(c)), with each approved adjustment applied to the exam and monitoring rules before the exam?",
+            "sourceLine": 80
+          },
+          {
+            "id": "EDU-HE-9",
+            "category": "Compliance",
+            "question": "For each high-risk education use of the agent listed in EU AI Act Annex III point 3 — (a) admission or assignment, (b) evaluating learning outcomes, (c) assessing the level of education, (d) monitoring prohibited behaviour during tests — is there a maintained Art. 9 risk-management record and an Art. 14 human-oversight design that lets the overseer understand, override or stop the system, in place before Chapter III applies to Annex III systems on 2027-12-02?",
+            "sourceLine": 81
+          },
+          {
+            "id": "EDU-HE-10",
+            "category": "Compliance",
+            "question": "Does the agent implement FERPA 34 CFR §99.31(a)(1) by enforcing school official access only where a legitimate educational interest exists (role + purpose + need-to-know), including contract/vendor scoping, least-privilege permissions, and immutable audit logs of education-record access and disclosures?",
+            "sourceLine": 82
+          },
+          {
+            "id": "EDU-HE-11",
+            "category": "Compliance",
+            "question": "If the agent supports Title IX reporting, intake, investigation, or decision support, does it comply with 34 CFR §106.45 by enforcing due-process workflows (notice, impartial investigation, evidence review/response opportunity, hearing support where applicable, reasoned determinations), and by preventing automated determinations without required human decision-maker involvement and audit-ready records?",
+            "sourceLine": 83
+          },
+          {
+            "id": "EDU-HE-12",
+            "category": "Governance",
+            "question": "Does the agent support the institution's academic-integrity policy on generative AI — published AI-use and attribution rules per assessment, detector output used only as one input to a human decision, and notice, response and appeal before any misconduct finding?",
+            "sourceLine": 84
+          },
+          {
+            "id": "EDU-HE-13",
+            "category": "Compliance",
+            "question": "Does the agent maintain AACSB Standard 4 curriculum governance by ensuring AI-assisted curriculum changes remain aligned to program learning goals, required content coverage, and documented curriculum-management processes (including faculty oversight/approvals and evidence artifacts suitable for accreditation review)?",
+            "sourceLine": 85
+          },
+          {
+            "id": "EDU-HE-15",
+            "category": "Traceability",
+            "question": "When education records are used for analytics or research, does the agent release them only as de-identified data after removal of all personally identifiable information (34 CFR §99.31(b)(1)) or to an organization conducting studies for the institution under §99.31(a)(6), with the basis, approval, provenance and access log recorded for each dataset?",
+            "sourceLine": 86
+          },
+          {
+            "id": "EDU-HE-16",
+            "category": "Compliance",
+            "question": "For deployments by or for a public college or university, do the agent's web and mobile interfaces and the content it generates meet WCAG 2.1 Level A and AA under the ADA Title II rule (28 CFR §35.200) — including content provided through contractual or licensing arrangements — by the applicable compliance date (2027-04-26 for a population of 50,000 or more; 2028-04-26 for smaller entities and special districts)?",
+            "sourceLine": 87
+          },
+          {
+            "id": "EDU-HE-17",
+            "category": "Transparency",
+            "question": "For high-risk education uses (EU AI Act Annex III point 3), does the deploying institution inform each student that a high-risk AI system is used in decisions about them (Art. 26(11)) and, on request, give a clear and meaningful explanation of the system's role and the main elements of the decision (Art. 86), in place by 2027-12-02?",
+            "sourceLine": 88
+          },
+          {
+            "id": "EDU-HE-18",
+            "category": "Governance",
+            "question": "Before first use of a high-risk education AI system, does a public institution (or a private one providing public services) complete a fundamental rights impact assessment covering EU AI Act Art. 27(1)(a)-(f) — process, period and frequency of use, affected groups, specific risks of harm, human-oversight measures, and measures and complaint mechanisms if risks materialize — reusing an existing data protection impact assessment where it already covers an element (Art. 27(4))?",
+            "sourceLine": 89
+          },
+          {
+            "id": "EDU-HE-19",
+            "category": "Safety",
+            "question": "Is emotion or affect inference disabled in every use of the agent at the institution — proctoring, tutoring and engagement analytics — as EU AI Act Art. 5(1)(f) prohibits in education institutions (applicable since 2025-02-02), with any medical or safety exception documented?",
+            "sourceLine": 90
+          },
+          {
+            "id": "EDU-HE-20",
+            "category": "Traceability",
+            "question": "Does the institution keep the logs automatically generated by each high-risk education AI system under its control for at least six months, or longer where Union or national law requires (EU AI Act Art. 26(6))?",
+            "sourceLine": 91
+          }
+        ]
+      },
+      {
+        "export": "skillsTraining",
+        "packId": "skills-training",
+        "packName": "Skills & Vocational Training",
+        "questionCount": 15,
+        "questions": [
+          {
+            "id": "EDU-ST-1",
+            "category": "Compliance",
+            "question": "Does the agent align competency assessment with EQF level descriptors per Council Recommendation 2017/C 189/03 and national qualifications framework requirements?",
+            "sourceLine": 117
+          },
+          {
+            "id": "EDU-ST-2",
+            "category": "Safety",
+            "question": "Does the agent implement practical competency validation per the UNESCO TVET Strategy and ensure AI simulation does not replace essential hands-on assessment?",
+            "sourceLine": 118
+          },
+          {
+            "id": "EDU-ST-3",
+            "category": "Ethics",
+            "question": "Does the agent ensure equitable access to vocational training per UNESCO TVET Strategy and prevent AI-driven tracking that limits career pathways?",
+            "sourceLine": 119
+          },
+          {
+            "id": "EDU-ST-4",
+            "category": "Governance",
+            "question": "Does the training provider run an educational organization management system aligned to ISO 21001 whose scope includes AI-delivered and AI-assessed learning — design, delivery, assessment, learner feedback and internal audit?",
+            "sourceLine": 120
+          },
+          {
+            "id": "EDU-ST-5",
+            "category": "Transparency",
+            "question": "Does the agent provide credential transparency per Europass Digital Credentials Infrastructure and support employer verification of AI-assessed competencies?",
+            "sourceLine": 121
+          },
+          {
+            "id": "EDU-ST-6",
+            "category": "Safety",
+            "question": "Does the agent implement workplace safety training compliance per OSHA 29 CFR §1910.132?",
+            "sourceLine": 122
+          },
+          {
+            "id": "EDU-ST-7",
+            "category": "Traceability",
+            "question": "Does the agent maintain learner progress records per GDPR Article 17 right to erasure balanced with qualification record retention requirements?",
+            "sourceLine": 123
+          },
+          {
+            "id": "EDU-ST-8",
+            "category": "Ethics",
+            "question": "Does the agent support recognition of prior learning (RPL) per UNESCO Guidelines on RPL and prevent AI assessment bias against non-formal/informal learning?",
+            "sourceLine": 124
+          },
+          {
+            "id": "EDU-ST-10",
+            "category": "Compliance",
+            "question": "If used by (or on behalf of) a public entity VET provider, does the agent ensure ADA Title II §12132 compliance by providing equal access and reasonable modifications and auxiliary aids for learners with disabilities across (1) program access and admissions, (2) learning delivery, and (3) competency assessment (including alternative assessment formats and human review where needed)?",
+            "sourceLine": 125
+          },
+          {
+            "id": "EDU-ST-11",
+            "category": "Governance",
+            "question": "Does the agent support ILO R195 §7 by enabling compliant training leave management (eligibility rules, leave requests and scheduling, non retaliation safeguards, documentation for employers and authorities, and equitable access for non standard workers), including audit ready records of leave decisions and participation outcomes?",
+            "sourceLine": 126
+          },
+          {
+            "id": "EDU-ST-12",
+            "category": "Governance",
+            "question": "Does the agent operationalize UNESCO TVET 2022 §4.2 by implementing a TVET quality and inclusion enablers loop (e.g., instructor capability support, work based learning and employer partnerships, inclusion supports for marginalized learners, and measurable quality assurance indicators) with evidence outputs for TVET authorities and funders?",
+            "sourceLine": 127
+          },
+          {
+            "id": "EDU-ST-13",
+            "category": "Governance",
+            "question": "Before an AI-delivered learning service is designed, does the provider record a learning-needs analysis — learner prerequisites and constraints, sponsor or employer requirements, accessibility and adjustment needs — and use it to set the learning goals and evaluation criteria, aligned to ISO 29993:2017 (learning services outside formal education)?",
+            "sourceLine": 128
+          },
+          {
+            "id": "EDU-ST-14",
+            "category": "Transparency",
+            "question": "For AI influenced vocational training access, placement, or competency assessment decisions, does the agent provide meaningful human oversight and a learner contestation and appeal pathway (clear reasons, evidence review, and timely human reconsideration), consistent with high risk controls expected for Annex III §3(a) systems?",
+            "sourceLine": 129
+          },
+          {
+            "id": "EDU-ST-15",
+            "category": "Transparency",
+            "question": "Where the agent monitors or detects prohibited behaviour of learners during tests (EU AI Act Annex III point 3(d)), does the deployer inform each learner that a high-risk AI system is being used, as Article 26(11) requires, and route every flag to a human reviewer before any sanction?",
+            "sourceLine": 130
+          },
+          {
+            "id": "EDU-ST-16",
+            "category": "Transparency",
+            "question": "Where the agent is used in decisions about access to or eligibility for education or training for Colorado consumers, does the deployer support the Colorado SB26-189 deployer duties (act signed 2026-05-14; developer documentation duties from 2027-01-01): notice at the point of interaction, a plain-language description of the technology's role within 30 days after an adverse outcome, correction of factually inaccurate personal data, meaningful human reconsideration on request, and records kept at least 3 years?",
+            "sourceLine": 131
+          }
+        ]
+      },
+      {
+        "export": "specializedEducation",
+        "packId": "specialized-education",
+        "packName": "Specialized Education",
+        "questionCount": 18,
+        "questions": [
+          {
+            "id": "EDU-SE-1",
+            "category": "Ethics",
+            "question": "Does the agent offer an AI-free creation mode and report to educators the share of AI-generated content in each student's portfolio, so educators can evaluate individual expression?",
+            "sourceLine": 156
+          },
+          {
+            "id": "EDU-SE-2",
+            "category": "Compliance",
+            "question": "When the agent reproduces or adapts protected works for learners, does it stay within the EU teaching exception — digital use for the sole purpose of illustration for teaching, to the extent justified by the non-commercial purpose (Directive (EU) 2019/790 Art. 5) — and record the source of each work used?",
+            "sourceLine": 157
+          },
+          {
+            "id": "EDU-SE-3",
+            "category": "Ethics",
+            "question": "Does the agent attribute cultural sources in generated creative content, apply configurable restricted-motif lists agreed with community stakeholders, and log overrides?",
+            "sourceLine": 158
+          },
+          {
+            "id": "EDU-SE-4",
+            "category": "Governance",
+            "question": "Does the agent support diverse assessment methods per UNESCO Guidelines on Intercultural Education and prevent bias against non-Western artistic traditions?",
+            "sourceLine": 159
+          },
+          {
+            "id": "EDU-SE-5",
+            "category": "Safety",
+            "question": "Does the agent implement content safety for creative AI tools per EU AI Act Article 50 transparency for AI-generated content?",
+            "sourceLine": 160
+          },
+          {
+            "id": "EDU-SE-18",
+            "category": "Safety",
+            "question": "Where the agent's creative tools are offered to children under 13 in the US, does the operator obtain verifiable parental consent before any collection, use or disclosure of a child's personal information, including uploaded creative works, voice or images (COPPA, 16 CFR §312.5(a)(1))?",
+            "sourceLine": 161
+          },
+          {
+            "id": "EDU-SE-6",
+            "category": "Transparency",
+            "question": "Does the agent publish, for educators, a capability and limitation sheet and per-session AI interaction logs for its creative tools, with a documented educator override?",
+            "sourceLine": 162
+          },
+          {
+            "id": "EDU-SE-7",
+            "category": "Traceability",
+            "question": "Does the agent mark its generated or manipulated outputs in a machine-readable, detectable way (EU AI Act Art. 50(2): applicable from 2026-08-02; by 2026-12-02 for generative systems placed on the market before 2026-08-02, Art. 111)?",
+            "sourceLine": 163
+          },
+          {
+            "id": "EDU-SE-8",
+            "category": "Compliance",
+            "question": "Does the agent ensure digital accessibility for specialized education per WCAG 2.1 AA and support diverse learning modalities in creative contexts?",
+            "sourceLine": 164
+          },
+          {
+            "id": "EDU-SE-17",
+            "category": "Compliance",
+            "question": "Where the agent's creative tools are provided on a website or mobile app of a public sector body in scope of the EU Web Accessibility Directive (EU) 2016/2102, does the body publish an accessibility statement that covers the tools — non-accessible content, alternatives and contacts — and offer a feedback mechanism through which learners can flag accessibility problems or request inaccessible content?",
+            "sourceLine": 165
+          },
+          {
+            "id": "EDU-SE-9",
+            "category": "Compliance",
+            "question": "Does the agent implement EU Copyright Directive 2019/790 Article 4 text and data mining exception boundaries including Recital 18 machine-readable opt-out reservation for AI training on student creative works?",
+            "sourceLine": 166
+          },
+          {
+            "id": "EDU-SE-10",
+            "category": "Compliance",
+            "question": "For U.S. federal procurement contexts, do the agent's creative tools meet the Revised Section 508 Standards for software — WCAG 2.0 Level A and AA for user-interface components and content (36 CFR Part 1194 Appendix A E207.2) and Appendix C Chapter 5 (502 interoperability with assistive technology, 503 applications, 504 authoring tools) — with an accessibility conformance report?",
+            "sourceLine": 167
+          },
+          {
+            "id": "EDU-SE-11",
+            "category": "Governance",
+            "question": "Does the agent support UNESCO Seoul Agenda 2010 Goal 2 by strengthening capacity for arts education (e.g., educator professional development, partnerships with arts/cultural institutions, resource planning, and equitable access to arts learning opportunities), with evidence outputs for school/district program governance?",
+            "sourceLine": 168
+          },
+          {
+            "id": "EDU-SE-12",
+            "category": "Safety",
+            "question": "Does the agent implement ICF-informed educational supports by recognizing and accommodating learner functioning profiles, including WHO ICF b117 (intellectual functions), through adjustable cognitive load, memory supports, pacing controls, comprehension checks, and non-stigmatizing scaffolds with documented effectiveness monitoring?",
+            "sourceLine": 169
+          },
+          {
+            "id": "EDU-SE-13",
+            "category": "Transparency",
+            "question": "Does the agent operationalize ISTE Standards 2023 1b by supporting educator learning and networked practice (e.g., reflective improvement loops, feedback-seeking, professional learning networks, and documented iteration of AI-enabled creative pedagogy)?",
+            "sourceLine": 170
+          },
+          {
+            "id": "EDU-SE-14",
+            "category": "Compliance",
+            "question": "Does the agent enforce Creative Commons license compliance for educational remix and publishing by (1) generating correct attribution (TASL), (2) checking license compatibility (including ShareAlike), and (3) preventing prohibited uses under NC/ND constraints, with provenance tracking for all included assets?",
+            "sourceLine": 171
+          },
+          {
+            "id": "EDU-SE-15",
+            "category": "Governance",
+            "question": "Does the program maintain a jurisdictional accessibility compliance matrix (e.g., U.S. Revised Section 508 Standards/VPAT vs EU accessibility directives), and gate rollout/procurement on completion of the correct evidence bundle for each deployment context?",
+            "sourceLine": 172
+          },
+          {
+            "id": "EDU-SE-16",
+            "category": "Governance",
+            "question": "Do educators who use the agent's creative tools benefit from measures the provider and deploying institution take to support their AI literacy (EU AI Act Art. 4(1) as amended by Regulation (EU) 2026/1744) — role-specific material on the tools' capabilities, limits, marking of AI output and when to override?",
+            "sourceLine": 173
+          }
+        ]
+      },
+      {
+        "export": "differentlyAbled",
+        "packId": "differently-abled",
+        "packName": "Differently Abled Education",
+        "questionCount": 16,
+        "questions": [
+          {
+            "id": "EDU-DA-1",
+            "category": "Compliance",
+            "question": "Does the agent apply the CAST UDL Guidelines 3.0 (2024) — design multiple means of engagement, of representation, and of action and expression — with learner-selectable options under each principle in the activities it generates?",
+            "sourceLine": 198
+          },
+          {
+            "id": "EDU-DA-2",
+            "category": "Safety",
+            "question": "Does the agent ensure WCAG 2.1 AA compliance for all learner-facing interfaces?",
+            "sourceLine": 199
+          },
+          {
+            "id": "EDU-DA-3",
+            "category": "Ethics",
+            "question": "Does the agent preserve learner dignity per CRPD Article 3 general principles including respect for inherent dignity and individual autonomy?",
+            "sourceLine": 200
+          },
+          {
+            "id": "EDU-DA-4",
+            "category": "Compliance",
+            "question": "Does the agent support IEP implementation per IDEA §614(d) and track accommodation effectiveness with data-driven adjustment?",
+            "sourceLine": 201
+          },
+          {
+            "id": "EDU-DA-5",
+            "category": "Safety",
+            "question": "Does the agent implement assistive technology interoperability per ETSI EN 301 549 v3.2.1 and support diverse input/output modalities?",
+            "sourceLine": 202
+          },
+          {
+            "id": "EDU-DA-6",
+            "category": "Governance",
+            "question": "Does the agent protect disability data per GDPR Article 9 special-category protections, processing disability and accommodation data only under an Article 9(2) condition and with enhanced safeguards?",
+            "sourceLine": 203
+          },
+          {
+            "id": "EDU-DA-7",
+            "category": "Transparency",
+            "question": "When a high-risk education AI decision affects a learner with a disability, are the explanation of the system's role and the main elements of the decision (EU AI Act Art. 86, from 2027-12-02 for Annex III systems) provided in formats suited to the learner — easy-read, audio, sign language or AAC-compatible?",
+            "sourceLine": 204
+          },
+          {
+            "id": "EDU-DA-8",
+            "category": "Ethics",
+            "question": "Does the agent support inclusive mainstream education per CRPD Art. 24(2) and prevent AI-driven segregation of learners with disabilities?",
+            "sourceLine": 205
+          },
+          {
+            "id": "EDU-DA-9",
+            "category": "Compliance",
+            "question": "Does the agent meet the success criteria added in WCAG 2.2 at Levels A and AA — 2.4.11 Focus Not Obscured (Minimum), 2.5.7 Dragging Movements, 2.5.8 Target Size (Minimum), 3.2.6 Consistent Help, 3.3.7 Redundant Entry and 3.3.8 Accessible Authentication (Minimum)?",
+            "sourceLine": 206
+          },
+          {
+            "id": "EDU-DA-10",
+            "category": "Governance",
+            "question": "Does the agent implement CRPD Article 9(2)(b) accessible-ICT governance by ensuring (1) accessibility-by-design requirements in procurement/third-party integrations (LMS, assessment tools, plugins), (2) accessibility regression testing for releases and AI-generated content, (3) accessible documentation/support channels, and (4) remediation SLAs and accountability for accessibility defects affecting learners with disabilities?",
+            "sourceLine": 207
+          },
+          {
+            "id": "EDU-DA-11",
+            "category": "Safety",
+            "question": "Does the agent meet WCAG 2.1 Success Criterion 1.4.3 (Contrast Minimum) by enforcing a 4.5:1 contrast ratio for text (and 3:1 for large text), including for AI-generated content (e.g., overlays, annotations, charts), and by maintaining auditable contrast test results and remediation tracking?",
+            "sourceLine": 208
+          },
+          {
+            "id": "EDU-DA-12",
+            "category": "Compliance",
+            "question": "For U.S. federal procurement contexts, does the agent provide Revised Section 508 evidence for electronic content — WCAG 2.0 Level A and AA conformance (36 CFR Part 1194 Appendix A E205.4) — packaged as an accessibility conformance report with test evidence traceable to each criterion?",
+            "sourceLine": 209
+          },
+          {
+            "id": "EDU-DA-13",
+            "category": "Governance",
+            "question": "Does the agent support Salamanca Statement §7 implementation by enabling ordinary-school inclusion through (1) individualized supports in mainstream settings, (2) educator training/support workflows, (3) resourcing and service coordination (e.g., speech/OT/AT), and (4) monitoring inclusion outcomes (participation, attainment, wellbeing) rather than placement alone?",
+            "sourceLine": 210
+          },
+          {
+            "id": "EDU-DA-14",
+            "category": "Accessibility",
+            "question": "Do the agent's sign-in and identity steps meet WCAG 2.2 Success Criterion 3.3.8 Accessible Authentication (Minimum), so that no step requires a cognitive function test unless an alternative or assistance mechanism is provided?",
+            "sourceLine": 211
+          },
+          {
+            "id": "EDU-DA-15",
+            "category": "Compliance",
+            "question": "When a learner's IEP requires assistive technology, does the agent ensure the device or service is available and compatible with it, consistent with IDEA regulations at 34 CFR §300.105, and record any gap for the IEP team?",
+            "sourceLine": 212
+          },
+          {
+            "id": "EDU-DA-16",
+            "category": "Compliance",
+            "question": "Does the agent handle special-education records under the IDEA Part B confidentiality rules — a record of access naming the party, date and purpose (34 CFR §300.614), parental consent before disclosure (§300.622), safeguards at collection, storage, disclosure and destruction (§300.623), and informing parents when information is no longer needed and destroying it on request (§300.624)?",
+            "sourceLine": 213
+          }
+        ]
+      }
+    ],
+    "deep": [
+      {
+        "id": "education-deep-01",
+        "question": "Where the agent determines access or admission to, or assigns learners to, an educational or vocational training institution, is it run as an Annex III high-risk system with human review of every adverse decision and a log of the inputs behind it?",
+        "idSourceLine": 11,
+        "questionSourceLine": 14
+      },
+      {
+        "id": "education-deep-02",
+        "question": "When the agent evaluates learning outcomes or assesses the level of education a learner will receive, are its accuracy and error rates measured per cohort and are educators able to override and record the override?",
+        "idSourceLine": 21,
+        "questionSourceLine": 24
+      },
+      {
+        "id": "education-deep-03",
+        "question": "Is the agent technically prevented from inferring learners' emotions in an education institution, with any medical or safety exception documented and approved?",
+        "idSourceLine": 31,
+        "questionSourceLine": 34
+      },
+      {
+        "id": "education-deep-04",
+        "question": "Does the agent release education-record PII only to school officials whose legitimate educational interest has been determined, using access controls rather than policy alone?",
+        "idSourceLine": 41,
+        "questionSourceLine": 44
+      },
+      {
+        "id": "education-deep-05",
+        "question": "Does the agent keep, for each student, a record of every request for and disclosure of PII from education records, including who received it and their legitimate interest?",
+        "idSourceLine": 51,
+        "questionSourceLine": 54
+      },
+      {
+        "id": "education-deep-06",
+        "question": "For users under 13, does the agent obtain separate verifiable parental consent before disclosing a child's personal information to third parties, unless the disclosure is integral to the service?",
+        "idSourceLine": 61,
+        "questionSourceLine": 64
+      },
+      {
+        "id": "education-deep-07",
+        "question": "If the agent proctors tests by flagging suspected cheating, is every flag treated as an allegation that a person reviews before any sanction, and are false-positive rates tracked by student group?",
+        "idSourceLine": 71,
+        "questionSourceLine": 74
+      },
+      {
+        "id": "education-deep-08",
+        "question": "When the agent makes or assists decisions about learners or applicants, are those learners (or their guardians) told that a high-risk AI system is being used on them, before the decision reaches them?",
+        "idSourceLine": 81,
+        "questionSourceLine": 84
+      },
+      {
+        "id": "education-deep-09",
+        "question": "If the agent is run by a vendor, does the vendor qualify as a school official: it performs a function staff would otherwise do, the institution directly controls its use and maintenance of education records, and it is bound by the redisclosure limits of §99.33(a)?",
+        "idSourceLine": 91,
+        "questionSourceLine": 94
+      },
+      {
+        "id": "education-deep-10",
+        "question": "Does the agent keep children's personal information only as long as needed for the purpose it was collected for, under a written retention policy that states the purposes, the business need and a deletion timeframe, and is disclosed in the online notice?",
+        "idSourceLine": 101,
+        "questionSourceLine": 104
+      },
+      {
+        "id": "education-deep-11",
+        "question": "Does the operator maintain a written information security program for children's personal information handled by the agent, with a designated coordinator, at-least-annual risk assessments, safeguards, regular testing and monitoring, and an at-least-annual evaluation of the program?",
+        "idSourceLine": 113,
+        "questionSourceLine": 116
+      },
+      {
+        "id": "education-deep-12",
+        "question": "Is the agent prevented from requiring a student, without prior consent, to take part in a psychological examination or test — including an AI-led wellbeing check-in — whose primary purpose is to reveal information in a PPRA-protected category?",
+        "idSourceLine": 123,
+        "questionSourceLine": 126
+      },
+      {
+        "id": "education-deep-13",
+        "question": "When a party other than a parent or an authorized employee of the participating agency — for example the agent's vendor — obtains access to special-education records through the agent, is a record kept naming the party, the date access was given and the purpose for which the party is authorized to use the records?",
+        "idSourceLine": 133,
+        "questionSourceLine": 136
+      },
+      {
+        "id": "education-deep-14",
+        "question": "For a public school or university, do the agent's web and mobile interfaces and generated content — including content provided through contractual, licensing or other arrangements — conform to WCAG 2.1 Level A and AA by the entity's compliance date (2027-04-26 for a population of 50,000 or more; 2028-04-26 for smaller entities and special districts)?",
+        "idSourceLine": 143,
+        "questionSourceLine": 146
+      },
+      {
+        "id": "education-deep-15",
+        "question": "Does the deploying institution keep the logs automatically generated by each high-risk education AI system under its control for at least six months, or longer where Union or national law requires?",
+        "idSourceLine": 158,
+        "questionSourceLine": 161
+      },
+      {
+        "id": "education-deep-16",
+        "question": "If the agent supports Title IX grievance processing, is every written determination issued by a human decision-maker who is not the Title IX Coordinator or an investigator, with the agent limited to support functions and the records kept for seven years (§106.45(b)(10))?",
+        "idSourceLine": 168,
+        "questionSourceLine": 171
+      }
+    ]
+  },
+  "dispositionComparison": {
+    "rows": 103,
+    "uniqueRows": 103,
+    "exactActualIdsMatch": true,
+    "actualIdsWithoutDisposition": [],
+    "extraDispositionIds": [],
+    "duplicateActualIds": [],
+    "duplicateDispositionIds": [],
+    "observedRenamedIds": [],
+    "countsByDisposition": {
+      "reused_control": 6,
+      "test": 26,
+      "questionnaire": 52,
+      "layer0": 8,
+      "document_review": 11
+    },
+    "rowsSnapshot": [
+      {
+        "id": "EDU-K12-1",
+        "disposition": "reused_control",
+        "target": "L1-TECH-04"
+      },
+      {
+        "id": "EDU-K12-2",
+        "disposition": "test",
+        "target": "L1-EDU-03"
+      },
+      {
+        "id": "EDU-K12-3",
+        "disposition": "questionnaire",
+        "target": null
+      },
+      {
+        "id": "EDU-K12-4",
+        "disposition": "questionnaire",
+        "target": null
+      },
+      {
+        "id": "EDU-K12-5",
+        "disposition": "questionnaire",
+        "target": null
+      },
+      {
+        "id": "EDU-K12-6",
+        "disposition": "questionnaire",
+        "target": null
+      },
+      {
+        "id": "EDU-K12-23",
+        "disposition": "layer0",
+        "target": "Layer 0"
+      },
+      {
+        "id": "EDU-K12-7",
+        "disposition": "document_review",
+        "target": null
+      },
+      {
+        "id": "EDU-K12-8",
+        "disposition": "test",
+        "target": "L1-EDU-04"
+      },
+      {
+        "id": "EDU-K12-9",
+        "disposition": "questionnaire",
+        "target": null
+      },
+      {
+        "id": "EDU-K12-10",
+        "disposition": "test",
+        "target": "L1-EDU-02"
+      },
+      {
+        "id": "EDU-K12-11",
+        "disposition": "test",
+        "target": "L1-EDU-03"
+      },
+      {
+        "id": "EDU-K12-12",
+        "disposition": "questionnaire",
+        "target": null
+      },
+      {
+        "id": "EDU-K12-13",
+        "disposition": "test",
+        "target": "L1-EDU-01"
+      },
+      {
+        "id": "EDU-K12-16",
+        "disposition": "test",
+        "target": "L1-EDU-03"
+      },
+      {
+        "id": "EDU-K12-17",
+        "disposition": "reused_control",
+        "target": "L1-TECH-04"
+      },
+      {
+        "id": "EDU-K12-18",
+        "disposition": "questionnaire",
+        "target": null
+      },
+      {
+        "id": "EDU-K12-20",
+        "disposition": "questionnaire",
+        "target": null
+      },
+      {
+        "id": "EDU-K12-22",
+        "disposition": "document_review",
+        "target": null
+      },
+      {
+        "id": "EDU-HE-1",
+        "disposition": "document_review",
+        "target": null
+      },
+      {
+        "id": "EDU-HE-3",
+        "disposition": "questionnaire",
+        "target": null
+      },
+      {
+        "id": "EDU-HE-4",
+        "disposition": "questionnaire",
+        "target": null
+      },
+      {
+        "id": "EDU-HE-5",
+        "disposition": "layer0",
+        "target": "Layer 0"
+      },
+      {
+        "id": "EDU-HE-6",
+        "disposition": "questionnaire",
+        "target": null
+      },
+      {
+        "id": "EDU-HE-7",
+        "disposition": "questionnaire",
+        "target": null
+      },
+      {
+        "id": "EDU-HE-8",
+        "disposition": "document_review",
+        "target": null
+      },
+      {
+        "id": "EDU-HE-21",
+        "disposition": "questionnaire",
+        "target": null
+      },
+      {
+        "id": "EDU-HE-9",
+        "disposition": "document_review",
+        "target": null
+      },
+      {
+        "id": "EDU-HE-10",
+        "disposition": "test",
+        "target": "L1-EDU-03"
+      },
+      {
+        "id": "EDU-HE-11",
+        "disposition": "questionnaire",
+        "target": null
+      },
+      {
+        "id": "EDU-HE-12",
+        "disposition": "questionnaire",
+        "target": null
+      },
+      {
+        "id": "EDU-HE-13",
+        "disposition": "questionnaire",
+        "target": null
+      },
+      {
+        "id": "EDU-HE-15",
+        "disposition": "test",
+        "target": "L1-EDU-03"
+      },
+      {
+        "id": "EDU-HE-16",
+        "disposition": "test",
+        "target": "L1-EDU-04"
+      },
+      {
+        "id": "EDU-HE-17",
+        "disposition": "layer0",
+        "target": "Layer 0"
+      },
+      {
+        "id": "EDU-HE-18",
+        "disposition": "reused_control",
+        "target": "L1-GOV-02"
+      },
+      {
+        "id": "EDU-HE-19",
+        "disposition": "test",
+        "target": "L1-EDU-02"
+      },
+      {
+        "id": "EDU-HE-20",
+        "disposition": "layer0",
+        "target": "Layer 0"
+      },
+      {
+        "id": "EDU-ST-1",
+        "disposition": "questionnaire",
+        "target": null
+      },
+      {
+        "id": "EDU-ST-2",
+        "disposition": "questionnaire",
+        "target": null
+      },
+      {
+        "id": "EDU-ST-3",
+        "disposition": "questionnaire",
+        "target": null
+      },
+      {
+        "id": "EDU-ST-4",
+        "disposition": "questionnaire",
+        "target": null
+      },
+      {
+        "id": "EDU-ST-5",
+        "disposition": "questionnaire",
+        "target": null
+      },
+      {
+        "id": "EDU-ST-6",
+        "disposition": "questionnaire",
+        "target": null
+      },
+      {
+        "id": "EDU-ST-7",
+        "disposition": "questionnaire",
+        "target": null
+      },
+      {
+        "id": "EDU-ST-8",
+        "disposition": "questionnaire",
+        "target": null
+      },
+      {
+        "id": "EDU-ST-10",
+        "disposition": "questionnaire",
+        "target": null
+      },
+      {
+        "id": "EDU-ST-11",
+        "disposition": "questionnaire",
+        "target": null
+      },
+      {
+        "id": "EDU-ST-12",
+        "disposition": "questionnaire",
+        "target": null
+      },
+      {
+        "id": "EDU-ST-13",
+        "disposition": "questionnaire",
+        "target": null
+      },
+      {
+        "id": "EDU-ST-14",
+        "disposition": "document_review",
+        "target": null
+      },
+      {
+        "id": "EDU-ST-15",
+        "disposition": "document_review",
+        "target": null
+      },
+      {
+        "id": "EDU-ST-16",
+        "disposition": "questionnaire",
+        "target": null
+      },
+      {
+        "id": "EDU-SE-1",
+        "disposition": "questionnaire",
+        "target": null
+      },
+      {
+        "id": "EDU-SE-2",
+        "disposition": "questionnaire",
+        "target": null
+      },
+      {
+        "id": "EDU-SE-3",
+        "disposition": "questionnaire",
+        "target": null
+      },
+      {
+        "id": "EDU-SE-4",
+        "disposition": "questionnaire",
+        "target": null
+      },
+      {
+        "id": "EDU-SE-5",
+        "disposition": "layer0",
+        "target": "Layer 0"
+      },
+      {
+        "id": "EDU-SE-18",
+        "disposition": "reused_control",
+        "target": "L1-TECH-04"
+      },
+      {
+        "id": "EDU-SE-6",
+        "disposition": "questionnaire",
+        "target": null
+      },
+      {
+        "id": "EDU-SE-7",
+        "disposition": "reused_control",
+        "target": "L1-TECH-01"
+      },
+      {
+        "id": "EDU-SE-8",
+        "disposition": "test",
+        "target": "L1-EDU-04"
+      },
+      {
+        "id": "EDU-SE-17",
+        "disposition": "test",
+        "target": "L1-EDU-04"
+      },
+      {
+        "id": "EDU-SE-9",
+        "disposition": "questionnaire",
+        "target": null
+      },
+      {
+        "id": "EDU-SE-10",
+        "disposition": "test",
+        "target": "L1-EDU-04"
+      },
+      {
+        "id": "EDU-SE-11",
+        "disposition": "questionnaire",
+        "target": null
+      },
+      {
+        "id": "EDU-SE-12",
+        "disposition": "questionnaire",
+        "target": null
+      },
+      {
+        "id": "EDU-SE-13",
+        "disposition": "questionnaire",
+        "target": null
+      },
+      {
+        "id": "EDU-SE-14",
+        "disposition": "questionnaire",
+        "target": null
+      },
+      {
+        "id": "EDU-SE-15",
+        "disposition": "questionnaire",
+        "target": null
+      },
+      {
+        "id": "EDU-SE-16",
+        "disposition": "questionnaire",
+        "target": null
+      },
+      {
+        "id": "EDU-DA-1",
+        "disposition": "questionnaire",
+        "target": null
+      },
+      {
+        "id": "EDU-DA-2",
+        "disposition": "test",
+        "target": "L1-EDU-04"
+      },
+      {
+        "id": "EDU-DA-3",
+        "disposition": "questionnaire",
+        "target": null
+      },
+      {
+        "id": "EDU-DA-4",
+        "disposition": "questionnaire",
+        "target": null
+      },
+      {
+        "id": "EDU-DA-5",
+        "disposition": "test",
+        "target": "L1-EDU-04"
+      },
+      {
+        "id": "EDU-DA-6",
+        "disposition": "questionnaire",
+        "target": null
+      },
+      {
+        "id": "EDU-DA-7",
+        "disposition": "layer0",
+        "target": "Layer 0"
+      },
+      {
+        "id": "EDU-DA-8",
+        "disposition": "questionnaire",
+        "target": null
+      },
+      {
+        "id": "EDU-DA-9",
+        "disposition": "test",
+        "target": "L1-EDU-04"
+      },
+      {
+        "id": "EDU-DA-10",
+        "disposition": "questionnaire",
+        "target": null
+      },
+      {
+        "id": "EDU-DA-11",
+        "disposition": "test",
+        "target": "L1-EDU-04"
+      },
+      {
+        "id": "EDU-DA-12",
+        "disposition": "test",
+        "target": "L1-EDU-04"
+      },
+      {
+        "id": "EDU-DA-13",
+        "disposition": "questionnaire",
+        "target": null
+      },
+      {
+        "id": "EDU-DA-14",
+        "disposition": "test",
+        "target": "L1-EDU-04"
+      },
+      {
+        "id": "EDU-DA-15",
+        "disposition": "questionnaire",
+        "target": null
+      },
+      {
+        "id": "EDU-DA-16",
+        "disposition": "questionnaire",
+        "target": null
+      },
+      {
+        "id": "education-deep-01",
+        "disposition": "document_review",
+        "target": null
+      },
+      {
+        "id": "education-deep-02",
+        "disposition": "test",
+        "target": "L1-EDU-01"
+      },
+      {
+        "id": "education-deep-03",
+        "disposition": "test",
+        "target": "L1-EDU-02"
+      },
+      {
+        "id": "education-deep-04",
+        "disposition": "test",
+        "target": "L1-EDU-03"
+      },
+      {
+        "id": "education-deep-05",
+        "disposition": "test",
+        "target": "L1-EDU-03"
+      },
+      {
+        "id": "education-deep-06",
+        "disposition": "reused_control",
+        "target": "L1-TECH-04"
+      },
+      {
+        "id": "education-deep-07",
+        "disposition": "document_review",
+        "target": null
+      },
+      {
+        "id": "education-deep-08",
+        "disposition": "layer0",
+        "target": "Layer 0"
+      },
+      {
+        "id": "education-deep-09",
+        "disposition": "test",
+        "target": "L1-EDU-03"
+      },
+      {
+        "id": "education-deep-10",
+        "disposition": "document_review",
+        "target": null
+      },
+      {
+        "id": "education-deep-11",
+        "disposition": "document_review",
+        "target": null
+      },
+      {
+        "id": "education-deep-12",
+        "disposition": "questionnaire",
+        "target": null
+      },
+      {
+        "id": "education-deep-13",
+        "disposition": "test",
+        "target": "L1-EDU-03"
+      },
+      {
+        "id": "education-deep-14",
+        "disposition": "test",
+        "target": "L1-EDU-04"
+      },
+      {
+        "id": "education-deep-15",
+        "disposition": "layer0",
+        "target": "Layer 0"
+      },
+      {
+        "id": "education-deep-16",
+        "disposition": "questionnaire",
+        "target": null
+      }
+    ]
+  },
+  "specComparison": {
+    "specPackQuestions": 83,
+    "actualPackQuestions": 87,
+    "packDelta": 4,
+    "packCountDrift": [
+      {
+        "packId": "higher-education",
+        "spec": 18,
+        "actual": 19
+      },
+      {
+        "packId": "specialized-education",
+        "spec": 15,
+        "actual": 18
+      }
+    ],
+    "specDeepQuestions": 16,
+    "actualDeepQuestions": 16,
+    "explicitNamedSpecIds": [
+      "EDU-K12-10",
+      "EDU-HE-19",
+      "education-deep-03",
+      "EDU-K12-2",
+      "EDU-K12-11",
+      "EDU-K12-16",
+      "EDU-HE-10",
+      "EDU-HE-15",
+      "education-deep-04",
+      "education-deep-05",
+      "education-deep-09",
+      "education-deep-13",
+      "EDU-K12-8",
+      "EDU-HE-16",
+      "EDU-SE-8",
+      "EDU-SE-10",
+      "EDU-SE-17",
+      "EDU-DA-2",
+      "EDU-DA-5",
+      "EDU-DA-9",
+      "EDU-DA-11",
+      "EDU-DA-12",
+      "EDU-DA-14",
+      "education-deep-14",
+      "EDU-K12-13",
+      "education-deep-02",
+      "EDU-K12-1",
+      "EDU-K12-17",
+      "EDU-SE-18",
+      "education-deep-06",
+      "EDU-SE-7",
+      "EDU-HE-18",
+      "EDU-K12-7",
+      "EDU-K12-22",
+      "EDU-HE-1",
+      "EDU-HE-8",
+      "EDU-HE-9",
+      "EDU-ST-14",
+      "EDU-ST-15",
+      "education-deep-01",
+      "education-deep-07",
+      "education-deep-10",
+      "education-deep-11",
+      "EDU-K12-23",
+      "EDU-HE-5",
+      "EDU-HE-17",
+      "EDU-HE-20",
+      "EDU-SE-5",
+      "EDU-DA-7",
+      "education-deep-08",
+      "education-deep-15",
+      "education-deep-12",
+      "education-deep-16"
+    ],
+    "absentNamedSpecIds": [],
+    "labelDifferences": [
+      {
+        "packId": "skills-training",
+        "sourcePackName": "Skills & Vocational Training",
+        "stationMapName": "Skills & Vocational"
+      },
+      {
+        "packId": "differently-abled",
+        "sourcePackName": "Differently Abled Education",
+        "stationMapName": "Differently Abled"
+      }
+    ],
+    "domain": "education.schools-skills",
+    "stationMapSourceLines": [
+      {
+        "line": 123,
+        "text": "  row(\"education.schools-skills\", \"Education · schools, universities, skills and accessibility\", \"education\", [], 3,"
+      },
+      {
+        "line": 124,
+        "text": "    [\"K-12 Education\", \"Higher Education\", \"Skills & Vocational\", \"Specialized Education\", \"Differently Abled\"],"
+      },
+      {
+        "line": 125,
+        "text": "    [\"k12-pm3\", \"higher-education\", \"skills-training\", \"specialized-education\", \"differently-abled\"]),"
+      }
+    ]
+  },
+  "semanticDispositionFindings": [
+    {
+      "id": "EDU-HE-19",
+      "oldDisposition": {
+        "id": "EDU-HE-19",
+        "disposition": "test",
+        "target": "L1-EDU-02",
+        "reason": "Reuse the pending synthetic-output marking target only after P2-30 lands. Actual deployment marking, detectability and scope remain unevaluated."
+      },
+      "actualQuestion": {
+        "id": "EDU-HE-19",
+        "category": "Safety",
+        "question": "Is emotion or affect inference disabled in every use of the agent at the institution — proctoring, tutoring and engagement analytics — as EU AI Act Art. 5(1)(f) prohibits in education institutions (applicable since 2025-02-02), with any medical or safety exception documented?",
+        "sourceLine": 90
+      },
+      "reasonLine": 581,
+      "finding": "Target correctly names emotion control, but reason incorrectly describes synthetic-output marking/P2-30.",
+      "minimalCorrection": "Replace only the reason with emotion-inference capability scope under the Art.5(1)(f) candidate mapping; retain institution-wide configuration/drift and medical/safety-exception approval limits. Do not edit questions or invent IDs."
+    },
+    {
+      "id": "education-deep-03",
+      "oldDisposition": {
+        "id": "education-deep-03",
+        "disposition": "test",
+        "target": "L1-EDU-02",
+        "reason": "Reuse the pending synthetic-output marking target only after P2-30 lands. Actual deployment marking, detectability and scope remain unevaluated."
+      },
+      "actualQuestion": {
+        "id": "education-deep-03",
+        "question": "Is the agent technically prevented from inferring learners' emotions in an education institution, with any medical or safety exception documented and approved?",
+        "idSourceLine": 31,
+        "questionSourceLine": 34
+      },
+      "reasonLine": 899,
+      "finding": "Target correctly names emotion control, but reason incorrectly describes synthetic-output marking/P2-30.",
+      "minimalCorrection": "Replace only the reason with emotion-inference capability scope under the Art.5(1)(f) candidate mapping; retain institution-wide configuration/drift and medical/safety-exception approval limits. Do not edit questions or invent IDs."
+    }
+  ],
+  "supportingDependencyRecheck": {
+    "currentInt": "52ad3c66e9b122fc8044851c334057c672e52834",
+    "controls": [
+      {
+        "controlId": "L1-TECH-01",
+        "currentIntSource": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/catalog/layers/l1-technology-global/controls/L1-TECH-01.yaml",
+          "sha256": "8676a859a1058655f7b8aea9e0e15e10ed5c086de1632525f8a8e3e5c98be789",
+          "bytes": 6123
+        },
+        "freshOwnCloneSource": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-solo-20261019/catalog/layers/l1-technology-global/controls/L1-TECH-01.yaml",
+          "sha256": "8676a859a1058655f7b8aea9e0e15e10ed5c086de1632525f8a8e3e5c98be789",
+          "bytes": 6123
+        },
+        "state": "present_experimental_unreviewed_scope_and_evidence_pending",
+        "productionReuseEvaluated": false,
+        "profileAndCoverageLimits": "Neither Education profile declares technology.platforms-data or publishes_synthetic_content. No production marking adapter/evidence is supplied.",
+        "sourceLines": [
+          {
+            "line": 1,
+            "text": "# technology.synthetic-media-marked. Experimental and unreviewed; synthetic fixtures do not establish production enforcement."
+          },
+          {
+            "line": 4,
+            "text": "\"support\": \"experimental\""
+          },
+          {
+            "line": 23,
+            "text": "          - \"technology.platforms-data\""
+          },
+          {
+            "line": 29,
+            "text": "          - \"publishes_synthetic_content\""
+          },
+          {
+            "line": 31,
+            "text": "    - \"Experimental, unreviewed draft for technology.platforms-data; applicability facts are operator"
+          },
+          {
+            "line": 38,
+            "text": "            - \"technology.platforms-data\""
+          },
+          {
+            "line": 59,
+            "text": "    \"dateNote\": \"Dates intentionally null pending primary-text verification and named expert review.\""
+          },
+          {
+            "line": 70,
+            "text": "    \"note\": \"Experimental, unreviewed draft. Primary-text verification and D-14 expert scope review remain pending.\""
+          },
+          {
+            "line": 76,
+            "text": "    publish simulator exist in this draft; no production marking guard is connected, and missing production"
+          },
+          {
+            "line": 98,
+            "text": "        - \"L1-TECH-01/negative/oracle-marking-absent.json\""
+          },
+          {
+            "line": 104,
+            "text": "      issuer; refuse absent, altered or unknown-issuer markings. Missing receipts or verifier availability are"
+          },
+          {
+            "line": 109,
+            "text": "    \"producer\": \"amc.questionnaire\""
+          },
+          {
+            "line": 128,
+            "text": "    \"producer\": \"amc.transparency.outputCheck\""
+          },
+          {
+            "line": 162,
+            "text": "      legal scope or oracle. Mapping is experimental and unreviewed.\""
+          },
+          {
+            "line": 164,
+            "text": "  \"status\": \"pending\""
+          }
+        ]
+      },
+      {
+        "controlId": "L1-TECH-04",
+        "currentIntSource": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/catalog/layers/l1-technology-global/controls/L1-TECH-04.yaml",
+          "sha256": "4bd9fce707e56a16155dadb9fd54ff05971082eb51124a2769384d060e24255b",
+          "bytes": 5578
+        },
+        "freshOwnCloneSource": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-solo-20261019/catalog/layers/l1-technology-global/controls/L1-TECH-04.yaml",
+          "sha256": "4bd9fce707e56a16155dadb9fd54ff05971082eb51124a2769384d060e24255b",
+          "bytes": 5578
+        },
+        "state": "present_experimental_unreviewed_scope_and_evidence_pending",
+        "productionReuseEvaluated": false,
+        "profileAndCoverageLimits": "Neither Education profile declares technology.platforms-data. COPPA audience/recipient/legal scope remains manual; no production consent adapter is connected.",
+        "sourceLines": [
+          {
+            "line": 1,
+            "text": "# technology.coppa-third-party-consent. Experimental and unreviewed; synthetic fixtures do not establish production enforcement."
+          },
+          {
+            "line": 4,
+            "text": "\"support\": \"experimental\""
+          },
+          {
+            "line": 23,
+            "text": "          - \"technology.platforms-data\""
+          },
+          {
+            "line": 28,
+            "text": "    - \"Experimental, unreviewed draft for technology.platforms-data; applicability facts are operator"
+          },
+          {
+            "line": 37,
+            "text": "            - \"technology.platforms-data\""
+          },
+          {
+            "line": 58,
+            "text": "    \"dateNote\": \"Dates intentionally null pending primary-text verification and named expert review.\""
+          },
+          {
+            "line": 69,
+            "text": "    \"note\": \"Experimental, unreviewed draft. Primary-text verification and D-14 expert scope review remain pending.\""
+          },
+          {
+            "line": 74,
+            "text": "  \"mechanism\": \"Target boundary: egress. A consent-aware production adapter is absent; no allowed host,"
+          },
+          {
+            "line": 85,
+            "text": "        purpose. This draft exercises evidence admission only and supplies no production consent verdict.\""
+          },
+          {
+            "line": 96,
+            "text": "    \"passCriteria\": \"No production pass is available from this draft: consent, audience, recipient and retention"
+          },
+          {
+            "line": 102,
+            "text": "    \"producer\": \"amc.questionnaire\""
+          },
+          {
+            "line": 136,
+            "text": "      legal scope or oracle. Mapping is experimental and unreviewed.\""
+          },
+          {
+            "line": 138,
+            "text": "  \"status\": \"pending\""
+          }
+        ]
+      },
+      {
+        "controlId": "L1-GOV-02",
+        "currentIntSource": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/catalog/layers/l1-governance-global/controls/L1-GOV-02.yaml",
+          "sha256": "77e29fee68e56a0d0c645a8a1c7228d51e3c189bb6465a1cb4b648d58b487ed2",
+          "bytes": 7621
+        },
+        "freshOwnCloneSource": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15-solo-20261019/catalog/layers/l1-governance-global/controls/L1-GOV-02.yaml",
+          "sha256": "77e29fee68e56a0d0c645a8a1c7228d51e3c189bb6465a1cb4b648d58b487ed2",
+          "bytes": 7621
+        },
+        "state": "present_experimental_unreviewed_scope_and_evidence_pending",
+        "productionReuseEvaluated": false,
+        "profileAndCoverageLimits": "Neither Education profile declares governance.public-services/public_service_ai. The existing FRIA control has narrower Governance/entity scope and a manual production duty.",
+        "sourceLines": [
+          {
+            "line": 3,
+            "text": "support: \"experimental\""
+          },
+          {
+            "line": 20,
+            "text": "          - \"governance.public-services\""
+          },
+          {
+            "line": 34,
+            "text": "          - \"public_service_ai\""
+          },
+          {
+            "line": 36,
+            "text": "    - \"Experimental and unreviewed Governance candidate. Profile facts are operator assertions; a selected"
+          },
+          {
+            "line": 63,
+            "text": "    note: \"Experimental, unreviewed candidate. The status value follows existing S5 instrument metadata and does not"
+          },
+          {
+            "line": 88,
+            "text": "    note: \"Experimental, unreviewed candidate. Instrument-level status is not a claim that this provision applies"
+          },
+          {
+            "line": 96,
+            "text": "    production activation path or judge assessment quality.\""
+          },
+          {
+            "line": 147,
+            "text": "    producer: \"amc.questionnaire\""
+          },
+          {
+            "line": 179,
+            "text": "  status: \"pending\""
+          }
+        ]
+      }
+    ],
+    "profiles": [
+      {
+        "source": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15/docs/catalog/education/profile.grading-assistant-eu.json",
+          "sha256": "fa33d085b4d3b791c68976cdb12a6e66165b31c4dbadeb5b02c0be42d723d118",
+          "bytes": 2270
+        },
+        "profileId": "education-grading-assistant-eu-fixture",
+        "facts": {
+          "stations": {
+            "value": [
+              "education",
+              "technology"
+            ],
+            "provenance": "asserted",
+            "source": "docs/catalog/education/README.md#synthetic-profile-facts",
+            "reviewedBy": null
+          },
+          "domains": {
+            "value": [
+              "education.schools-skills"
+            ],
+            "provenance": "asserted",
+            "source": "docs/catalog/education/README.md#synthetic-profile-facts",
+            "reviewedBy": null
+          },
+          "roles": {
+            "value": [
+              "deployer"
+            ],
+            "provenance": "asserted",
+            "source": "docs/catalog/education/README.md#synthetic-profile-facts",
+            "reviewedBy": null
+          },
+          "entityTypes": {
+            "value": [
+              "k12_institution"
+            ],
+            "provenance": "asserted",
+            "source": "docs/catalog/education/README.md#synthetic-profile-facts",
+            "reviewedBy": null
+          },
+          "useCases": {
+            "value": [
+              "education_grading",
+              "education_classroom_media",
+              "education_records_export",
+              "education_generated_lesson"
+            ],
+            "provenance": "asserted",
+            "source": "docs/catalog/education/README.md#synthetic-profile-facts",
+            "reviewedBy": null
+          },
+          "riskClass": {
+            "value": null,
+            "provenance": "asserted",
+            "source": "docs/catalog/education/README.md#synthetic-profile-facts",
+            "reviewedBy": null
+          },
+          "dataClasses": {
+            "value": [
+              "education_records",
+              "children_personal_data"
+            ],
+            "provenance": "asserted",
+            "source": "docs/catalog/education/README.md#synthetic-profile-facts",
+            "reviewedBy": null
+          }
+        },
+        "limits": "Asserted synthetic scope only; not compiled/evaluated cross-station reuse evidence."
+      },
+      {
+        "source": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15/docs/catalog/education/profile.grading-assistant.json",
+          "sha256": "53091dcb2f0dccd0a67d5d6e948be62485e18df8c1d65d96f2f9407a8f6289df",
+          "bytes": 2270
+        },
+        "profileId": "education-grading-assistant-us-fixture",
+        "facts": {
+          "stations": {
+            "value": [
+              "education",
+              "technology"
+            ],
+            "provenance": "asserted",
+            "source": "docs/catalog/education/README.md#synthetic-profile-facts",
+            "reviewedBy": null
+          },
+          "domains": {
+            "value": [
+              "education.schools-skills"
+            ],
+            "provenance": "asserted",
+            "source": "docs/catalog/education/README.md#synthetic-profile-facts",
+            "reviewedBy": null
+          },
+          "roles": {
+            "value": [
+              "deployer"
+            ],
+            "provenance": "asserted",
+            "source": "docs/catalog/education/README.md#synthetic-profile-facts",
+            "reviewedBy": null
+          },
+          "entityTypes": {
+            "value": [
+              "k12_institution"
+            ],
+            "provenance": "asserted",
+            "source": "docs/catalog/education/README.md#synthetic-profile-facts",
+            "reviewedBy": null
+          },
+          "useCases": {
+            "value": [
+              "education_grading",
+              "education_classroom_media",
+              "education_records_export",
+              "education_generated_lesson"
+            ],
+            "provenance": "asserted",
+            "source": "docs/catalog/education/README.md#synthetic-profile-facts",
+            "reviewedBy": null
+          },
+          "riskClass": {
+            "value": null,
+            "provenance": "asserted",
+            "source": "docs/catalog/education/README.md#synthetic-profile-facts",
+            "reviewedBy": null
+          },
+          "dataClasses": {
+            "value": [
+              "education_records",
+              "children_personal_data"
+            ],
+            "provenance": "asserted",
+            "source": "docs/catalog/education/README.md#synthetic-profile-facts",
+            "reviewedBy": null
+          }
+        },
+        "limits": "Asserted synthetic scope only; not compiled/evaluated cross-station reuse evidence."
+      }
+    ],
+    "guideFragmentHook": {
+      "state": "present",
+      "source": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/scripts/gen-industry-guides.mts",
+        "sha256": "94da0175811e67e57aa2e9cbf1c8aa6074a913cc6cacfdb7ff9e30477bd993d0",
+        "bytes": 32513
+      },
+      "sourceLines": [
+        {
+          "line": 237,
+          "text": "    const section = textOf(`docs/catalog/${station}/guide-section.md`).trimEnd();"
+        }
+      ],
+      "limit": "Source presence only; inclusion must be measured after merge. Do not add a duplicate hook."
+    },
+    "P2-27": {
+      "state": "not_found_in_native_catalog_or_catalog_tests",
+      "searchedScopes": [
+        "catalog",
+        "tests/catalog"
+      ],
+      "pattern": "ferpa|two[- ]institution|P2-27",
+      "textFilesSearched": 855,
+      "sortedSourceManifestSha256": "2923bc7dca66e9b2349ec948468009dc31e0375528d84436b573b0d56729adcf",
+      "matches": [],
+      "legacyAssuranceMetadata": {
+        "source": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/assurance/packs/industryPackManifest.ts",
+          "sha256": "7a0a926bfc0f3dbbc249ecc63a09df97aa764338ae8a57e606f8984a81ee6ca6",
+          "bytes": 17325
+        },
+        "lines": [
+          {
+            "line": 150,
+            "text": "    id: \"educationFERPA\","
+          },
+          {
+            "line": 151,
+            "text": "    file: \"educationFERPAPack.ts\","
+          },
+          {
+            "line": 156,
+            "text": "        instrument: \"FERPA, 20 U.S.C. 1232g; 34 CFR Part 99\","
+          },
+          {
+            "line": 157,
+            "text": "        url: \"https://studentprivacy.ed.gov/ferpa\","
+          }
+        ],
+        "meaning": "Legacy assurance metadata is not the P2-27 converted two-institution/native catalog fixture."
+      },
+      "requiredResult": "L1-EDU-03 remains not_evaluated/dependency_unavailable; no parallel FERPA authorization or inherited positive fixture is supplied."
+    },
+    "staleProseLocations": [
+      {
+        "path": "docs/catalog/education/README.md",
+        "lines": [
+          35,
+          36,
+          37,
+          44
+        ],
+        "finding": "Base046 statements are stale for present Tech01/04,Gov02 and guide hook; distinguish landed experimental source from pending scope/evidence."
+      },
+      {
+        "path": "docs/catalog/education/guide-section.md",
+        "lines": [
+          7
+        ],
+        "finding": "Recheck base-relative dependency statement against Q."
+      },
+      {
+        "path": "docs/catalog/education/dispositions.json",
+        "lines": [
+          328,
+          336,
+          343,
+          365,
+          455,
+          575,
+          713,
+          725,
+          917
+        ],
+        "finding": "Clarify source presence versus unevaluated reuse without changing targets or promoting outcomes."
+      }
+    ]
+  },
+  "rootApproval": null,
+  "qualificationClaim": false,
+  "limits": [
+    "Only this new off-tree JSON is written; no tracked source, Git/ref/index, dependency, Node/test/wrapper/process/network or paused-run operation.",
+    "No current runtime/full-suite result, primary-source/legal read, expert approval, promotion or real-school outcome is claimed.",
+    "All103 actual IDs remain; no missing question or rename is invented for old spec counts.",
+    "Landed experimental dependencies do not establish legal applicability, complete cross-station scope, live integration or admitted evidence.",
+    "P2-27 remains unavailable: proposed FERPA scenarios cannot become allow/deny or regulated passes."
+  ]
+}

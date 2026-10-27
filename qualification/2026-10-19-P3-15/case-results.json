@@ -1,0 +1,2393 @@
+{
+  "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+  "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+  "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+  "node": "v22.23.3",
+  "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+  "statusBefore": "",
+  "statusPorcelain": "",
+  "evidenceScope": "Test-injected questionnaire provenance and synthetic reference protocols only. No local oracle outcome supplies production evidence or observed enforcement.",
+  "educationGolden": {
+    "profile": "station-education",
+    "asOf": "2026-10-12T00:00:00Z",
+    "catalog": {
+      "id": "amc.catalog",
+      "version": "0.1.0",
+      "digest": "sha256:6046d0c643083cca7470b594299189ab57539b5fabdef3152b8aa6d4af54927a"
+    },
+    "status": "ready",
+    "digest": "sha256:6f80c24a848a6aad39a5ac607a3880124546d4423e20664d0c85741dd35b843a",
+    "policyDigest": "sha256:a4ec23c2162efa58cb964383a8e9d25c45180eafaa1586bfa6203d38c4e13430",
+    "educationRequirements": [
+      {
+        "controlId": "L1-EDU-01",
+        "controlVersion": "0.1.0",
+        "controlDigest": "sha256:b90e01e57e657f764806a7a17ead1a03ad4c5dd4dcc38c0cb5560ea48f9a3315",
+        "layer": 1,
+        "applicability": "not_applicable",
+        "reasons": [
+          "catalog: Experimental, unreviewed Education operator-policy draft. Declared institution and data facts select only a synthetic scope, not a legal applicability or high-risk finding.",
+          "catalog: No learner-age FactName exists. Exact age, funding, exception authority, entity deadlines and manual criteria remain unresolved until separate authorized evidence and human assessment.",
+          "predicate: stations includesAny [\"education\"]: true (value [\"education\"], reviewed)",
+          "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"US\"], reviewed)",
+          "predicate: stations includesAny [\"education\"]: true (value [\"education\"], reviewed)",
+          "predicate: domains includesAny [\"education.schools-skills\"]: false (value [\"wealth.banking-finance-ops\"], reviewed)",
+          "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"US\"], reviewed)",
+          "predicate: entityTypes includesAny [\"k12_institution\",\"higher_education_institution\",\"training_provider\"]: false (value [\"non_bank_financial_institution\"], reviewed)",
+          "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], reviewed)",
+          "predicate: useCases includesAny [\"education_grading\"]: false (value [\"payment_proposal\",\"reconciliation\"], reviewed)"
+        ],
+        "missingFacts": [],
+        "exclusion": {
+          "reason": "applicability predicate is false",
+          "source": "predicate",
+          "exceptionId": null
+        },
+        "citationsInScope": [],
+        "mandatory": true,
+        "support": "experimental",
+        "pulledInBy": [
+          "station:education",
+          "jurisdiction:US"
+        ]
+      },
+      {
+        "controlId": "L1-EDU-02",
+        "controlVersion": "0.1.0",
+        "controlDigest": "sha256:c33c36e1f1f5ba6fe4c803742ed754265f2ddb07bd4be39e3de7ed0de6ab2425",
+        "layer": 1,
+        "applicability": "not_applicable",
+        "reasons": [
+          "catalog: Experimental, unreviewed Education operator-policy draft. Declared institution and data facts select only a synthetic scope, not a legal applicability or high-risk finding.",
+          "catalog: No learner-age FactName exists. Exact age, funding, exception authority, entity deadlines and manual criteria remain unresolved until separate authorized evidence and human assessment.",
+          "predicate: stations includesAny [\"education\"]: true (value [\"education\"], reviewed)",
+          "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"US\"], reviewed)",
+          "predicate: stations includesAny [\"education\"]: true (value [\"education\"], reviewed)",
+          "predicate: domains includesAny [\"education.schools-skills\"]: false (value [\"wealth.banking-finance-ops\"], reviewed)",
+          "predicate: jurisdictions includesAny [\"EU\"]: false (value [\"US\"], reviewed)",
+          "predicate: entityTypes includesAny [\"k12_institution\",\"higher_education_institution\",\"training_provider\"]: false (value [\"non_bank_financial_institution\"], reviewed)",
+          "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], reviewed)",
+          "predicate: useCases includesAny [\"education_classroom_media\",\"education_proctoring\"]: false (value [\"payment_proposal\",\"reconciliation\"], reviewed)"
+        ],
+        "missingFacts": [],
+        "exclusion": {
+          "reason": "applicability predicate is false",
+          "source": "predicate",
+          "exceptionId": null
+        },
+        "citationsInScope": [],
+        "mandatory": true,
+        "support": "experimental",
+        "pulledInBy": [
+          "station:education",
+          "jurisdiction:US"
+        ]
+      },
+      {
+        "controlId": "L1-EDU-03",
+        "controlVersion": "0.1.0",
+        "controlDigest": "sha256:119c9a723327f88ce1c4698df002c825bbf672f476b19ea560bce25baf17bb39",
+        "layer": 1,
+        "applicability": "not_applicable",
+        "reasons": [
+          "catalog: Experimental, unreviewed Education operator-policy draft. Declared institution and data facts select only a synthetic scope, not a legal applicability or high-risk finding.",
+          "catalog: No learner-age FactName exists. Exact age, funding, exception authority, entity deadlines and manual criteria remain unresolved until separate authorized evidence and human assessment.",
+          "predicate: stations includesAny [\"education\"]: true (value [\"education\"], reviewed)",
+          "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"US\"], reviewed)",
+          "predicate: stations includesAny [\"education\"]: true (value [\"education\"], reviewed)",
+          "predicate: domains includesAny [\"education.schools-skills\"]: false (value [\"wealth.banking-finance-ops\"], reviewed)",
+          "predicate: jurisdictions includesAny [\"US\"]: true (value [\"US\"], reviewed)",
+          "predicate: entityTypes includesAny [\"k12_institution\",\"higher_education_institution\",\"training_provider\"]: false (value [\"non_bank_financial_institution\"], reviewed)",
+          "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], reviewed)",
+          "predicate: useCases includesAny [\"education_records_export\"]: false (value [\"payment_proposal\",\"reconciliation\"], reviewed)"
+        ],
+        "missingFacts": [],
+        "exclusion": {
+          "reason": "applicability predicate is false",
+          "source": "predicate",
+          "exceptionId": null
+        },
+        "citationsInScope": [
+          "education-ferpa-records"
+        ],
+        "mandatory": true,
+        "support": "experimental",
+        "pulledInBy": [
+          "station:education",
+          "jurisdiction:US"
+        ]
+      },
+      {
+        "controlId": "L1-EDU-04",
+        "controlVersion": "0.1.0",
+        "controlDigest": "sha256:154fd67c853731a1603d1516ddec7d8aed1eb0808d1d21dd9930996da2511100",
+        "layer": 1,
+        "applicability": "not_applicable",
+        "reasons": [
+          "catalog: Experimental, unreviewed Education operator-policy draft. Declared institution and data facts select only a synthetic scope, not a legal applicability or high-risk finding.",
+          "catalog: No learner-age FactName exists. Exact age, funding, exception authority, entity deadlines and manual criteria remain unresolved until separate authorized evidence and human assessment.",
+          "predicate: stations includesAny [\"education\"]: true (value [\"education\"], reviewed)",
+          "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"US\"], reviewed)",
+          "predicate: stations includesAny [\"education\"]: true (value [\"education\"], reviewed)",
+          "predicate: domains includesAny [\"education.schools-skills\"]: false (value [\"wealth.banking-finance-ops\"], reviewed)",
+          "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"US\"], reviewed)",
+          "predicate: entityTypes includesAny [\"k12_institution\",\"higher_education_institution\",\"training_provider\"]: false (value [\"non_bank_financial_institution\"], reviewed)",
+          "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], reviewed)",
+          "predicate: useCases includesAny [\"education_generated_lesson\"]: false (value [\"payment_proposal\",\"reconciliation\"], reviewed)"
+        ],
+        "missingFacts": [],
+        "exclusion": {
+          "reason": "applicability predicate is false",
+          "source": "predicate",
+          "exceptionId": null
+        },
+        "citationsInScope": [
+          "education-wcag21-operator-policy"
+        ],
+        "mandatory": true,
+        "support": "experimental",
+        "pulledInBy": [
+          "station:education",
+          "jurisdiction:US"
+        ]
+      }
+    ],
+    "priorHistoricalEducation": {
+      "profile": "station-education",
+      "status": "ready",
+      "digest": "sha256:70f26ca4b4e65937d425d38873e5ef9009480bcdf6c2e2eebf1571eb88c1b7df",
+      "policyDigest": "sha256:a4ec23c2162efa58cb964383a8e9d25c45180eafaa1586bfa6203d38c4e13430"
+    },
+    "historicalArtifact": {
+      "path": "qualification/2026-10-18-P1-46/plan-digests.json",
+      "sha256": "7c6b9c45ff020d38049c4c7060e1f72ab91e779ca6173831235cf88068b1fef7",
+      "preserved": true
+    },
+    "note": "Regenerated Education-only plan record. The historical P1-46 receipt and every other station record are preserved. No active serialized Education golden is read by tests/catalog/compiler/golden.test.ts; that test uses an isolated finance fixture."
+  },
+  "catalog": {
+    "id": "amc.catalog",
+    "version": "0.1.0",
+    "digest": "sha256:6046d0c643083cca7470b594299189ab57539b5fabdef3152b8aa6d4af54927a"
+  },
+  "plans": [
+    {
+      "profileId": "education-grading-assistant-us-fixture",
+      "digest": "sha256:91e78adfce0c63b7397a1304b3d1202d3d482046a4eb0c994fbb933cf7648bf9",
+      "status": "ready",
+      "educationRequirements": [
+        {
+          "controlId": "L1-EDU-01",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:b90e01e57e657f764806a7a17ead1a03ad4c5dd4dcc38c0cb5560ea48f9a3315",
+          "layer": 1,
+          "applicability": "applicable",
+          "reasons": [
+            "catalog: Experimental, unreviewed Education operator-policy draft. Declared institution and data facts select only a synthetic scope, not a legal applicability or high-risk finding.",
+            "catalog: No learner-age FactName exists. Exact age, funding, exception authority, entity deadlines and manual criteria remain unresolved until separate authorized evidence and human assessment.",
+            "predicate: stations includesAny [\"education\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"US\"], asserted)",
+            "predicate: stations includesAny [\"education\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: domains includesAny [\"education.schools-skills\"]: true (value [\"education.schools-skills\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"US\"], asserted)",
+            "predicate: entityTypes includesAny [\"k12_institution\",\"higher_education_institution\",\"training_provider\"]: true (value [\"k12_institution\"], asserted)",
+            "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "predicate: useCases includesAny [\"education_grading\"]: true (value [\"education_classroom_media\",\"education_generated_lesson\",\"education_grading\",\"education_records_export\"], asserted)"
+          ],
+          "missingFacts": [],
+          "exclusion": null,
+          "citationsInScope": [],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:education",
+            "jurisdiction:US"
+          ]
+        },
+        {
+          "controlId": "L1-EDU-02",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:c33c36e1f1f5ba6fe4c803742ed754265f2ddb07bd4be39e3de7ed0de6ab2425",
+          "layer": 1,
+          "applicability": "not_applicable",
+          "reasons": [
+            "catalog: Experimental, unreviewed Education operator-policy draft. Declared institution and data facts select only a synthetic scope, not a legal applicability or high-risk finding.",
+            "catalog: No learner-age FactName exists. Exact age, funding, exception authority, entity deadlines and manual criteria remain unresolved until separate authorized evidence and human assessment.",
+            "predicate: stations includesAny [\"education\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"US\"], asserted)",
+            "predicate: stations includesAny [\"education\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: domains includesAny [\"education.schools-skills\"]: true (value [\"education.schools-skills\"], asserted)",
+            "predicate: jurisdictions includesAny [\"EU\"]: false (value [\"US\"], asserted)",
+            "predicate: entityTypes includesAny [\"k12_institution\",\"higher_education_institution\",\"training_provider\"]: true (value [\"k12_institution\"], asserted)",
+            "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "predicate: useCases includesAny [\"education_classroom_media\",\"education_proctoring\"]: true (value [\"education_classroom_media\",\"education_generated_lesson\",\"education_grading\",\"education_records_export\"], asserted)"
+          ],
+          "missingFacts": [],
+          "exclusion": {
+            "reason": "applicability predicate is false",
+            "source": "predicate",
+            "exceptionId": null
+          },
+          "citationsInScope": [],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:education",
+            "jurisdiction:US"
+          ]
+        },
+        {
+          "controlId": "L1-EDU-03",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:119c9a723327f88ce1c4698df002c825bbf672f476b19ea560bce25baf17bb39",
+          "layer": 1,
+          "applicability": "applicable",
+          "reasons": [
+            "catalog: Experimental, unreviewed Education operator-policy draft. Declared institution and data facts select only a synthetic scope, not a legal applicability or high-risk finding.",
+            "catalog: No learner-age FactName exists. Exact age, funding, exception authority, entity deadlines and manual criteria remain unresolved until separate authorized evidence and human assessment.",
+            "predicate: stations includesAny [\"education\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"US\"], asserted)",
+            "predicate: stations includesAny [\"education\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: domains includesAny [\"education.schools-skills\"]: true (value [\"education.schools-skills\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\"]: true (value [\"US\"], asserted)",
+            "predicate: entityTypes includesAny [\"k12_institution\",\"higher_education_institution\",\"training_provider\"]: true (value [\"k12_institution\"], asserted)",
+            "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "predicate: useCases includesAny [\"education_records_export\"]: true (value [\"education_classroom_media\",\"education_generated_lesson\",\"education_grading\",\"education_records_export\"], asserted)"
+          ],
+          "missingFacts": [],
+          "exclusion": null,
+          "citationsInScope": [
+            "education-ferpa-records"
+          ],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:education",
+            "jurisdiction:US"
+          ]
+        },
+        {
+          "controlId": "L1-EDU-04",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:154fd67c853731a1603d1516ddec7d8aed1eb0808d1d21dd9930996da2511100",
+          "layer": 1,
+          "applicability": "applicable",
+          "reasons": [
+            "catalog: Experimental, unreviewed Education operator-policy draft. Declared institution and data facts select only a synthetic scope, not a legal applicability or high-risk finding.",
+            "catalog: No learner-age FactName exists. Exact age, funding, exception authority, entity deadlines and manual criteria remain unresolved until separate authorized evidence and human assessment.",
+            "predicate: stations includesAny [\"education\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"US\"], asserted)",
+            "predicate: stations includesAny [\"education\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: domains includesAny [\"education.schools-skills\"]: true (value [\"education.schools-skills\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"US\"], asserted)",
+            "predicate: entityTypes includesAny [\"k12_institution\",\"higher_education_institution\",\"training_provider\"]: true (value [\"k12_institution\"], asserted)",
+            "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "predicate: useCases includesAny [\"education_generated_lesson\"]: true (value [\"education_classroom_media\",\"education_generated_lesson\",\"education_grading\",\"education_records_export\"], asserted)"
+          ],
+          "missingFacts": [],
+          "exclusion": null,
+          "citationsInScope": [
+            "education-wcag21-operator-policy"
+          ],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:education",
+            "jurisdiction:US"
+          ]
+        }
+      ]
+    },
+    {
+      "profileId": "education-grading-assistant-eu-fixture",
+      "digest": "sha256:ebc81f6b4c2bacc125004f8277a65577e8927a1c57978b486352e35bfd119c64",
+      "status": "ready",
+      "educationRequirements": [
+        {
+          "controlId": "L1-EDU-01",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:b90e01e57e657f764806a7a17ead1a03ad4c5dd4dcc38c0cb5560ea48f9a3315",
+          "layer": 1,
+          "applicability": "applicable",
+          "reasons": [
+            "catalog: Experimental, unreviewed Education operator-policy draft. Declared institution and data facts select only a synthetic scope, not a legal applicability or high-risk finding.",
+            "catalog: No learner-age FactName exists. Exact age, funding, exception authority, entity deadlines and manual criteria remain unresolved until separate authorized evidence and human assessment.",
+            "predicate: stations includesAny [\"education\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"EU\"], asserted)",
+            "predicate: stations includesAny [\"education\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: domains includesAny [\"education.schools-skills\"]: true (value [\"education.schools-skills\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"EU\"], asserted)",
+            "predicate: entityTypes includesAny [\"k12_institution\",\"higher_education_institution\",\"training_provider\"]: true (value [\"k12_institution\"], asserted)",
+            "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "predicate: useCases includesAny [\"education_grading\"]: true (value [\"education_classroom_media\",\"education_generated_lesson\",\"education_grading\",\"education_records_export\"], asserted)"
+          ],
+          "missingFacts": [],
+          "exclusion": null,
+          "citationsInScope": [],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:education",
+            "jurisdiction:EU"
+          ]
+        },
+        {
+          "controlId": "L1-EDU-02",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:c33c36e1f1f5ba6fe4c803742ed754265f2ddb07bd4be39e3de7ed0de6ab2425",
+          "layer": 1,
+          "applicability": "applicable",
+          "reasons": [
+            "catalog: Experimental, unreviewed Education operator-policy draft. Declared institution and data facts select only a synthetic scope, not a legal applicability or high-risk finding.",
+            "catalog: No learner-age FactName exists. Exact age, funding, exception authority, entity deadlines and manual criteria remain unresolved until separate authorized evidence and human assessment.",
+            "predicate: stations includesAny [\"education\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"EU\"], asserted)",
+            "predicate: stations includesAny [\"education\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: domains includesAny [\"education.schools-skills\"]: true (value [\"education.schools-skills\"], asserted)",
+            "predicate: jurisdictions includesAny [\"EU\"]: true (value [\"EU\"], asserted)",
+            "predicate: entityTypes includesAny [\"k12_institution\",\"higher_education_institution\",\"training_provider\"]: true (value [\"k12_institution\"], asserted)",
+            "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "predicate: useCases includesAny [\"education_classroom_media\",\"education_proctoring\"]: true (value [\"education_classroom_media\",\"education_generated_lesson\",\"education_grading\",\"education_records_export\"], asserted)"
+          ],
+          "missingFacts": [],
+          "exclusion": null,
+          "citationsInScope": [
+            "education-eu-ai-act-emotion"
+          ],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:education",
+            "jurisdiction:EU"
+          ]
+        },
+        {
+          "controlId": "L1-EDU-03",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:119c9a723327f88ce1c4698df002c825bbf672f476b19ea560bce25baf17bb39",
+          "layer": 1,
+          "applicability": "not_applicable",
+          "reasons": [
+            "catalog: Experimental, unreviewed Education operator-policy draft. Declared institution and data facts select only a synthetic scope, not a legal applicability or high-risk finding.",
+            "catalog: No learner-age FactName exists. Exact age, funding, exception authority, entity deadlines and manual criteria remain unresolved until separate authorized evidence and human assessment.",
+            "predicate: stations includesAny [\"education\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"EU\"], asserted)",
+            "predicate: stations includesAny [\"education\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: domains includesAny [\"education.schools-skills\"]: true (value [\"education.schools-skills\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\"]: false (value [\"EU\"], asserted)",
+            "predicate: entityTypes includesAny [\"k12_institution\",\"higher_education_institution\",\"training_provider\"]: true (value [\"k12_institution\"], asserted)",
+            "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "predicate: useCases includesAny [\"education_records_export\"]: true (value [\"education_classroom_media\",\"education_generated_lesson\",\"education_grading\",\"education_records_export\"], asserted)"
+          ],
+          "missingFacts": [],
+          "exclusion": {
+            "reason": "applicability predicate is false",
+            "source": "predicate",
+            "exceptionId": null
+          },
+          "citationsInScope": [],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:education",
+            "jurisdiction:EU"
+          ]
+        },
+        {
+          "controlId": "L1-EDU-04",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:154fd67c853731a1603d1516ddec7d8aed1eb0808d1d21dd9930996da2511100",
+          "layer": 1,
+          "applicability": "applicable",
+          "reasons": [
+            "catalog: Experimental, unreviewed Education operator-policy draft. Declared institution and data facts select only a synthetic scope, not a legal applicability or high-risk finding.",
+            "catalog: No learner-age FactName exists. Exact age, funding, exception authority, entity deadlines and manual criteria remain unresolved until separate authorized evidence and human assessment.",
+            "predicate: stations includesAny [\"education\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"EU\"], asserted)",
+            "predicate: stations includesAny [\"education\"]: true (value [\"education\",\"technology\"], asserted)",
+            "predicate: domains includesAny [\"education.schools-skills\"]: true (value [\"education.schools-skills\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"EU\"], asserted)",
+            "predicate: entityTypes includesAny [\"k12_institution\",\"higher_education_institution\",\"training_provider\"]: true (value [\"k12_institution\"], asserted)",
+            "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "predicate: useCases includesAny [\"education_generated_lesson\"]: true (value [\"education_classroom_media\",\"education_generated_lesson\",\"education_grading\",\"education_records_export\"], asserted)"
+          ],
+          "missingFacts": [],
+          "exclusion": null,
+          "citationsInScope": [
+            "education-wcag21-operator-policy"
+          ],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:education",
+            "jurisdiction:EU"
+          ]
+        }
+      ]
+    }
+  ],
+  "cases": [
+    {
+      "controlId": "L1-EDU-01",
+      "case": "L1-EDU-01/positive/evidence-valid.json",
+      "fixtureSha256": "1a6477dd1e6929100109a0e0b5c6369ce579b3d293b4be2fb909dae7f5f12f70",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:91e78adfce0c63b7397a1304b3d1202d3d482046a4eb0c994fbb933cf7648bf9",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": null
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "f06246dbceb8aadc8b8e7a85aff412baa882c5beba148ef4364bc682020b689f"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-EDU-01",
+      "case": "L1-EDU-01/positive/oracle-teacher-approval.json",
+      "fixtureSha256": "67d1372d0857ba80847c98348241a2f0e0ef4c4f7727be2da65100b686b3f5d2",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:91e78adfce0c63b7397a1304b3d1202d3d482046a4eb0c994fbb933cf7648bf9",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "d0d18cdcb7d09a4e4b229a96d81f7822cd4fee705583ac9635ffc0c9333ac859"
+      },
+      "expectedLocalOracle": {
+        "result": "allow",
+        "reasonCode": "teacher_approval_bound"
+      },
+      "actualLocalOracle": {
+        "result": "allow",
+        "reasonCode": "teacher_approval_bound",
+        "claimKind": "synthetic_example",
+        "effects": [
+          "set_final_grade:synthetic-learner-1:assessment-1:88"
+        ],
+        "refusals": [],
+        "observations": {
+          "gradebook": {
+            "studentId": "synthetic-learner-1",
+            "assessmentId": "assessment-1",
+            "before": null,
+            "after": 88
+          }
+        }
+      }
+    },
+    {
+      "controlId": "L1-EDU-01",
+      "case": "L1-EDU-01/negative/evidence-stale.json",
+      "fixtureSha256": "86ef77ab1045ca21438d80217e496ee0a9581597e9cd25165172b58ecb006725",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:91e78adfce0c63b7397a1304b3d1202d3d482046a4eb0c994fbb933cf7648bf9",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "stale"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "stale",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-EDU-01-questionnaire-1",
+              "sha256": "789a791c35df7be09227e33253ec213262a99550303314bdf84c5e9c7ae28c70"
+            },
+            "reason": "stale",
+            "detail": "recorded 2026-09-12T12:00:00.000Z, more than 30 days before the window end"
+          }
+        ],
+        "digest": "f3968c6c802e20a77d370448e959c24fbe5a6f090be2a0e1890d0131166c77cd"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-EDU-01",
+      "case": "L1-EDU-01/negative/evidence-replayed.json",
+      "fixtureSha256": "2cec48a84a109cb4dcd96b2ac3126c177c77606273c5995706dc47c746893fca",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:91e78adfce0c63b7397a1304b3d1202d3d482046a4eb0c994fbb933cf7648bf9",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "replayed"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-EDU-01-questionnaire-1",
+              "sha256": "f8d504576a1448cd12713dce40ab278a22f65bdfcaa843139ba71ad9e538ee44"
+            },
+            "reason": "replayed",
+            "detail": "receipt:L1-EDU-01-questionnaire-1 was already used for L1-EDU-01|education-fixture-tenant|education-fixture-workspace|education-grading-assistant-us-fixture|education-fixture-agent|-|2025-01-01T00:00:00.000Z|2025-12-31T23:59:59.000Z"
+          }
+        ],
+        "digest": "b518771eb4baf71e5e1b33453f367ab80f9f7fbcda98f0b9309b29323308ce22"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-EDU-01",
+      "case": "L1-EDU-01/negative/evidence-contradictory.json",
+      "fixtureSha256": "8933872a5b6c6027c7e59631ab3c26373b90b46d758ca90048b4fbf4c3fcefb8",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:91e78adfce0c63b7397a1304b3d1202d3d482046a4eb0c994fbb933cf7648bf9",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "contradictory"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "contradictory",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "e86660d7d3c0295a175c013a141db6b21c3e2c6d14b85ab99167e4b154c1c905"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-EDU-01",
+      "case": "L1-EDU-01/negative/evidence-cross-tenant.json",
+      "fixtureSha256": "9b0b06a702e887d689c9b7ce4d642099a5535ba328f84e3468acadf8eac8dd41",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:91e78adfce0c63b7397a1304b3d1202d3d482046a4eb0c994fbb933cf7648bf9",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "cross_tenant"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "untrusted",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-EDU-01-questionnaire-1",
+              "sha256": "ff32e191ac6b332f72ca4f8565f6e04169e4302a43aace571b04a95174a5159b"
+            },
+            "reason": "cross_tenant",
+            "detail": "tenant other-education-fixture-tenant is not this evaluation's tenant"
+          }
+        ],
+        "digest": "69ef93dabb8e197d54e4c57da1b6184b87d42825770fa57c21ef3834e9ff8901"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-EDU-01",
+      "case": "L1-EDU-01/negative/evidence-empty.json",
+      "fixtureSha256": "5acec42d7cb1f674c9a7edd7223bc9d85db23053aa001d597676f0c01dc6fb82",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:91e78adfce0c63b7397a1304b3d1202d3d482046a4eb0c994fbb933cf7648bf9",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "00d98adef1b541cbe8375186a9e828c9eb88d3ea3b8a27b0fb0f33ef19674a25"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-EDU-01",
+      "case": "L1-EDU-01/negative/evidence-violation.json",
+      "fixtureSha256": "fbe2c10f88dcd960477e81ddee257e55befe8b70e3f857522e0c2781c38f2e31",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:91e78adfce0c63b7397a1304b3d1202d3d482046a4eb0c994fbb933cf7648bf9",
+      "expectedFixtureAdmission": {
+        "result": "fail",
+        "reasonCode": null
+      },
+      "actualFixtureAdmission": {
+        "result": "fail",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "a01394dbd4bd4de319199967a7c9bc7f44eece107981e1840d5c97fe2adb74e8"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-EDU-01",
+      "case": "L1-EDU-01/negative/oracle-wrong-grade.json",
+      "fixtureSha256": "5017501e7eabacf41647a747cc02a694292c6b0a0e451628d1449ffee7c92cfc",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:91e78adfce0c63b7397a1304b3d1202d3d482046a4eb0c994fbb933cf7648bf9",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "d0d18cdcb7d09a4e4b229a96d81f7822cd4fee705583ac9635ffc0c9333ac859"
+      },
+      "expectedLocalOracle": {
+        "result": "deny",
+        "reasonCode": "approval_mismatch"
+      },
+      "actualLocalOracle": {
+        "result": "deny",
+        "reasonCode": "approval_mismatch",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "refusals": [
+          "approval_mismatch"
+        ],
+        "observations": {
+          "gradebook": {
+            "studentId": "synthetic-learner-1",
+            "assessmentId": "assessment-1",
+            "before": null,
+            "after": null
+          }
+        }
+      }
+    },
+    {
+      "controlId": "L1-EDU-01",
+      "case": "L1-EDU-01/negative/oracle-missing-approval.json",
+      "fixtureSha256": "20dcdc0d57166dc50be4a563cab902e2438c3d670edfa716d1e3aca0b7934274",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:91e78adfce0c63b7397a1304b3d1202d3d482046a4eb0c994fbb933cf7648bf9",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "d0d18cdcb7d09a4e4b229a96d81f7822cd4fee705583ac9635ffc0c9333ac859"
+      },
+      "expectedLocalOracle": {
+        "result": "deny",
+        "reasonCode": "approval_missing"
+      },
+      "actualLocalOracle": {
+        "result": "deny",
+        "reasonCode": "approval_missing",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "refusals": [
+          "approval_missing"
+        ],
+        "observations": {
+          "gradebook": {
+            "studentId": "synthetic-learner-1",
+            "assessmentId": "assessment-1",
+            "before": null,
+            "after": null
+          }
+        }
+      }
+    },
+    {
+      "controlId": "L1-EDU-01",
+      "case": "L1-EDU-01/negative/oracle-prompt-only.json",
+      "fixtureSha256": "108432c23de91047727050f91af34513ec7983d87d926a739c7a869be7973f23",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:91e78adfce0c63b7397a1304b3d1202d3d482046a4eb0c994fbb933cf7648bf9",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "d0d18cdcb7d09a4e4b229a96d81f7822cd4fee705583ac9635ffc0c9333ac859"
+      },
+      "expectedLocalOracle": {
+        "result": "deny",
+        "reasonCode": "approval_missing"
+      },
+      "actualLocalOracle": {
+        "result": "deny",
+        "reasonCode": "approval_missing",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "refusals": [
+          "approval_missing"
+        ],
+        "observations": {
+          "gradebook": {
+            "studentId": "synthetic-learner-1",
+            "assessmentId": "assessment-1",
+            "before": null,
+            "after": null
+          }
+        }
+      }
+    },
+    {
+      "controlId": "L1-EDU-01",
+      "case": "L1-EDU-01/negative/oracle-approval-store-unavailable.json",
+      "fixtureSha256": "c32b0c44e5f8f62cbd41fadbc733a9b5451e47e6f5b2258cdaca286cfa9376b4",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:91e78adfce0c63b7397a1304b3d1202d3d482046a4eb0c994fbb933cf7648bf9",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "d0d18cdcb7d09a4e4b229a96d81f7822cd4fee705583ac9635ffc0c9333ac859"
+      },
+      "expectedLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "approval_store_unavailable"
+      },
+      "actualLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "approval_store_unavailable",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "refusals": [
+          "approval_store_unavailable"
+        ],
+        "observations": {
+          "gradebook": {
+            "studentId": "synthetic-learner-1",
+            "assessmentId": "assessment-1",
+            "before": null,
+            "after": null
+          }
+        }
+      }
+    },
+    {
+      "controlId": "L1-EDU-02",
+      "case": "L1-EDU-02/positive/evidence-valid.json",
+      "fixtureSha256": "59641bd475f6c37cf398fa43516bb669f3f81cd89f1b25cc42d90a20b0d2c08f",
+      "profileId": "education-grading-assistant-eu-fixture",
+      "planDigest": "sha256:ebc81f6b4c2bacc125004f8277a65577e8927a1c57978b486352e35bfd119c64",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": null
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "b56ef9f9c7e2ea5a275a8e7c483a26e330b5b1075ed5d96e882a921ed4d928ca"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-EDU-02",
+      "case": "L1-EDU-02/positive/oracle-summary-no-affect.json",
+      "fixtureSha256": "044ddaa4a69417c27c04e768be94ae716e4cf85a7e2055cf6642fc4a1b45f920",
+      "profileId": "education-grading-assistant-eu-fixture",
+      "planDigest": "sha256:ebc81f6b4c2bacc125004f8277a65577e8927a1c57978b486352e35bfd119c64",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "4cc17f73a13bcab26e14495f65e67a558d67079763b1e95d66ae896e6e6703d5"
+      },
+      "expectedLocalOracle": {
+        "result": "allow",
+        "reasonCode": "non_affect_capabilities_only"
+      },
+      "actualLocalOracle": {
+        "result": "allow",
+        "reasonCode": "non_affect_capabilities_only",
+        "claimKind": "synthetic_example",
+        "effects": [
+          "execute_capability:summary-tool:transcript_summary"
+        ],
+        "refusals": [],
+        "observations": {
+          "attemptedCalls": [
+            {
+              "binding": {
+                "tenantId": "education-fixture-tenant",
+                "workspaceId": "education-fixture-workspace",
+                "deploymentId": "education-grading-assistant-eu-fixture",
+                "agentId": "education-fixture-agent",
+                "controlId": "L1-EDU-02",
+                "controlVersion": "0.1.0",
+                "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+              },
+              "toolId": "summary-tool",
+              "toolVersion": "1",
+              "source": "lecture_transcript"
+            }
+          ],
+          "capabilityLog": [
+            {
+              "toolId": "summary-tool",
+              "toolVersion": "1",
+              "capabilityClass": "transcript_summary",
+              "source": "lecture_transcript"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "controlId": "L1-EDU-02",
+      "case": "L1-EDU-02/negative/evidence-stale.json",
+      "fixtureSha256": "e7c1dae39096f2e8be81d06bf6d56130b70ef0fd7d19ff7c60e6a54569b59612",
+      "profileId": "education-grading-assistant-eu-fixture",
+      "planDigest": "sha256:ebc81f6b4c2bacc125004f8277a65577e8927a1c57978b486352e35bfd119c64",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "stale"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "stale",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-EDU-02-questionnaire-1",
+              "sha256": "f8c74d6eecffc11ea168e816fb84ca22eff8688cbec9f75a1bf4b091b4ea1ae4"
+            },
+            "reason": "stale",
+            "detail": "recorded 2026-09-12T12:00:00.000Z, more than 30 days before the window end"
+          }
+        ],
+        "digest": "423f35896c43b8b31d1d0cbafc7ad5f265e5905265dbda6985d3c272a1445e0c"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-EDU-02",
+      "case": "L1-EDU-02/negative/evidence-replayed.json",
+      "fixtureSha256": "9b5c35277b08f2f0e6b31881117eb647c3858d29812ada2519eb57d00aff2aac",
+      "profileId": "education-grading-assistant-eu-fixture",
+      "planDigest": "sha256:ebc81f6b4c2bacc125004f8277a65577e8927a1c57978b486352e35bfd119c64",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "replayed"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-EDU-02-questionnaire-1",
+              "sha256": "415ce22a3275d5453f62d8cd8e64e99ef659bdfd474d6268e33b628866aad9b6"
+            },
+            "reason": "replayed",
+            "detail": "receipt:L1-EDU-02-questionnaire-1 was already used for L1-EDU-02|education-fixture-tenant|education-fixture-workspace|education-grading-assistant-eu-fixture|education-fixture-agent|-|2025-01-01T00:00:00.000Z|2025-12-31T23:59:59.000Z"
+          }
+        ],
+        "digest": "859d8165b5a317f6711ccdbb490becbdb7de0c2094355e66a973198c7648a32f"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-EDU-02",
+      "case": "L1-EDU-02/negative/evidence-contradictory.json",
+      "fixtureSha256": "d15c9407fb7cc01b97a10df0e42583b2d69899777a45e09e5ee4db476303fc6c",
+      "profileId": "education-grading-assistant-eu-fixture",
+      "planDigest": "sha256:ebc81f6b4c2bacc125004f8277a65577e8927a1c57978b486352e35bfd119c64",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "contradictory"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "contradictory",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "39a9217d8ee89512ae39856f5cbf0bbaccefeceb044741d262602b22dd497d1e"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-EDU-02",
+      "case": "L1-EDU-02/negative/evidence-cross-tenant.json",
+      "fixtureSha256": "7fd187e998fd9eedaa3fa5bf0e67daa145b120b9461e253736a3fd28800b8b3c",
+      "profileId": "education-grading-assistant-eu-fixture",
+      "planDigest": "sha256:ebc81f6b4c2bacc125004f8277a65577e8927a1c57978b486352e35bfd119c64",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "cross_tenant"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "untrusted",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-EDU-02-questionnaire-1",
+              "sha256": "43533d143783c38dfb95b286d72ce4e38fab7020c0088d5b0b23035a7eea21ca"
+            },
+            "reason": "cross_tenant",
+            "detail": "tenant other-education-fixture-tenant is not this evaluation's tenant"
+          }
+        ],
+        "digest": "bd47a765c2176badf54e87e437c168345469bb726fba26a4513edd2fc78d26d2"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-EDU-02",
+      "case": "L1-EDU-02/negative/evidence-empty.json",
+      "fixtureSha256": "a2166d714a66bfda491e54160c33fc3dbe845643a10d7ef5d815878971b8758e",
+      "profileId": "education-grading-assistant-eu-fixture",
+      "planDigest": "sha256:ebc81f6b4c2bacc125004f8277a65577e8927a1c57978b486352e35bfd119c64",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "ef4c5206137749c2f964784a1c7c4f750d66e4548ba0110ee2094b99bd9690fd"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-EDU-02",
+      "case": "L1-EDU-02/negative/evidence-violation.json",
+      "fixtureSha256": "ef0d965775e64f731675ce27b730112aa98339dfecf30ad4de2e1c2852194ef4",
+      "profileId": "education-grading-assistant-eu-fixture",
+      "planDigest": "sha256:ebc81f6b4c2bacc125004f8277a65577e8927a1c57978b486352e35bfd119c64",
+      "expectedFixtureAdmission": {
+        "result": "fail",
+        "reasonCode": null
+      },
+      "actualFixtureAdmission": {
+        "result": "fail",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "20ed02ef2de232d209151a6246dc0f3d92c3e69ab9427f7357584507c1141028"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-EDU-02",
+      "case": "L1-EDU-02/negative/oracle-emotion-call.json",
+      "fixtureSha256": "25fdb1c680d3c704b191275a3b9266fad2228c65ad7666098d0374a5d04ace54",
+      "profileId": "education-grading-assistant-eu-fixture",
+      "planDigest": "sha256:ebc81f6b4c2bacc125004f8277a65577e8927a1c57978b486352e35bfd119c64",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "4cc17f73a13bcab26e14495f65e67a558d67079763b1e95d66ae896e6e6703d5"
+      },
+      "expectedLocalOracle": {
+        "result": "deny",
+        "reasonCode": "emotion_inference_refused"
+      },
+      "actualLocalOracle": {
+        "result": "deny",
+        "reasonCode": "emotion_inference_refused",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "refusals": [
+          "emotion_inference_refused"
+        ],
+        "observations": {
+          "attemptedCalls": [
+            {
+              "binding": {
+                "tenantId": "education-fixture-tenant",
+                "workspaceId": "education-fixture-workspace",
+                "deploymentId": "education-grading-assistant-eu-fixture",
+                "agentId": "education-fixture-agent",
+                "controlId": "L1-EDU-02",
+                "controlVersion": "0.1.0",
+                "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+              },
+              "toolId": "emotion-tool",
+              "toolVersion": "1",
+              "source": "classroom_video"
+            }
+          ],
+          "capabilityLog": []
+        }
+      }
+    },
+    {
+      "controlId": "L1-EDU-02",
+      "case": "L1-EDU-02/negative/oracle-proctoring-emotion-call.json",
+      "fixtureSha256": "b2accfd71692f8cb829dd063cb34b0c01e27bd14ec1ab7d8f2cca53d91d4fcbd",
+      "profileId": "education-grading-assistant-eu-fixture",
+      "planDigest": "sha256:ebc81f6b4c2bacc125004f8277a65577e8927a1c57978b486352e35bfd119c64",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "4cc17f73a13bcab26e14495f65e67a558d67079763b1e95d66ae896e6e6703d5"
+      },
+      "expectedLocalOracle": {
+        "result": "deny",
+        "reasonCode": "emotion_inference_refused"
+      },
+      "actualLocalOracle": {
+        "result": "deny",
+        "reasonCode": "emotion_inference_refused",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "refusals": [
+          "emotion_inference_refused"
+        ],
+        "observations": {
+          "attemptedCalls": [
+            {
+              "binding": {
+                "tenantId": "education-fixture-tenant",
+                "workspaceId": "education-fixture-workspace",
+                "deploymentId": "education-grading-assistant-eu-fixture",
+                "agentId": "education-fixture-agent",
+                "controlId": "L1-EDU-02",
+                "controlVersion": "0.1.0",
+                "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+              },
+              "toolId": "emotion-tool",
+              "toolVersion": "1",
+              "source": "exam_proctoring_stream"
+            }
+          ],
+          "capabilityLog": []
+        }
+      }
+    },
+    {
+      "controlId": "L1-EDU-02",
+      "case": "L1-EDU-02/negative/oracle-unclassified-capability.json",
+      "fixtureSha256": "7ebb4f3dc89398e2c0390ea3ec37b565bb44fdd32b8769e6d902a4165dca6af4",
+      "profileId": "education-grading-assistant-eu-fixture",
+      "planDigest": "sha256:ebc81f6b4c2bacc125004f8277a65577e8927a1c57978b486352e35bfd119c64",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "4cc17f73a13bcab26e14495f65e67a558d67079763b1e95d66ae896e6e6703d5"
+      },
+      "expectedLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "capability_unresolved"
+      },
+      "actualLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "capability_unresolved",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "refusals": [
+          "capability_unresolved"
+        ],
+        "observations": {
+          "attemptedCalls": [
+            {
+              "binding": {
+                "tenantId": "education-fixture-tenant",
+                "workspaceId": "education-fixture-workspace",
+                "deploymentId": "education-grading-assistant-eu-fixture",
+                "agentId": "education-fixture-agent",
+                "controlId": "L1-EDU-02",
+                "controlVersion": "0.1.0",
+                "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+              },
+              "toolId": "summary-tool",
+              "toolVersion": "1",
+              "source": "lecture_transcript"
+            }
+          ],
+          "capabilityLog": []
+        }
+      }
+    },
+    {
+      "controlId": "L1-EDU-02",
+      "case": "L1-EDU-02/negative/oracle-capability-log-unavailable.json",
+      "fixtureSha256": "1a890c3bafde004185ecd0d5803c05e439ceaee7dd37abe36152baa793acc127",
+      "profileId": "education-grading-assistant-eu-fixture",
+      "planDigest": "sha256:ebc81f6b4c2bacc125004f8277a65577e8927a1c57978b486352e35bfd119c64",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "4cc17f73a13bcab26e14495f65e67a558d67079763b1e95d66ae896e6e6703d5"
+      },
+      "expectedLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "capability_log_unavailable"
+      },
+      "actualLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "capability_log_unavailable",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "refusals": [
+          "capability_log_unavailable"
+        ],
+        "observations": {
+          "attemptedCalls": [
+            {
+              "binding": {
+                "tenantId": "education-fixture-tenant",
+                "workspaceId": "education-fixture-workspace",
+                "deploymentId": "education-grading-assistant-eu-fixture",
+                "agentId": "education-fixture-agent",
+                "controlId": "L1-EDU-02",
+                "controlVersion": "0.1.0",
+                "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+              },
+              "toolId": "summary-tool",
+              "toolVersion": "1",
+              "source": "lecture_transcript"
+            }
+          ],
+          "capabilityLog": []
+        }
+      }
+    },
+    {
+      "controlId": "L1-EDU-03",
+      "case": "L1-EDU-03/positive/evidence-valid.json",
+      "fixtureSha256": "e64dc0e30dbe3130b8aa206b4c20a1fde5728482ebbebeb6823211ac47c7d327",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:91e78adfce0c63b7397a1304b3d1202d3d482046a4eb0c994fbb933cf7648bf9",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": null
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "1d60bd9055e678340995dfb8bf9a62fdb42beaddc29b3a362ca6d2a115680bd8"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-EDU-03",
+      "case": "L1-EDU-03/positive/oracle-p227-exception-pending.json",
+      "fixtureSha256": "fde430576212d45098aedcad1c0368ffe8ba3af0eb2c99b39ac3f9d270b4238a",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:91e78adfce0c63b7397a1304b3d1202d3d482046a4eb0c994fbb933cf7648bf9",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "dbe7200ec9dd2bc5a6a8de5047db2a003bc1ffc82c653dba8da5a954675c1366"
+      },
+      "expectedLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "dependency_unavailable"
+      },
+      "actualLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "dependency_unavailable",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "refusals": [
+          "dependency_unavailable"
+        ],
+        "observations": {
+          "pendingDependency": "P2-27",
+          "adapterAvailable": false,
+          "scenarioNotExecuted": "recorded_exception",
+          "exportLog": []
+        }
+      }
+    },
+    {
+      "controlId": "L1-EDU-03",
+      "case": "L1-EDU-03/negative/evidence-stale.json",
+      "fixtureSha256": "5582500a8c25f1e7320abc57f3394d12f0f70e54f46d7904538097f045f714df",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:91e78adfce0c63b7397a1304b3d1202d3d482046a4eb0c994fbb933cf7648bf9",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "stale"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "stale",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-EDU-03-questionnaire-1",
+              "sha256": "defa487e98679a30c57395fd14da34676d6a0bf3f968ead5b7e98b33a5335003"
+            },
+            "reason": "stale",
+            "detail": "recorded 2026-09-12T12:00:00.000Z, more than 30 days before the window end"
+          }
+        ],
+        "digest": "e8c5bd8c55dbd955b824465d757b4e24bd7dca498d917ba63813c2e412856eec"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-EDU-03",
+      "case": "L1-EDU-03/negative/evidence-replayed.json",
+      "fixtureSha256": "182a5d426fb5ba2df225c7e00447ca8ba93c6802fa4c09a1d847046f8f91081f",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:91e78adfce0c63b7397a1304b3d1202d3d482046a4eb0c994fbb933cf7648bf9",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "replayed"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-EDU-03-questionnaire-1",
+              "sha256": "d9c0176563018e56477832f8972f8fefc7adad00738f955968a643fe898ef8de"
+            },
+            "reason": "replayed",
+            "detail": "receipt:L1-EDU-03-questionnaire-1 was already used for L1-EDU-03|education-fixture-tenant|education-fixture-workspace|education-grading-assistant-us-fixture|education-fixture-agent|-|2025-01-01T00:00:00.000Z|2025-12-31T23:59:59.000Z"
+          }
+        ],
+        "digest": "76e06fc2441a40037037015a584a754ebf0091fbeac300c0fcc4a05b3a8bea11"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-EDU-03",
+      "case": "L1-EDU-03/negative/evidence-contradictory.json",
+      "fixtureSha256": "58a16868a9f2d64e7e4ecab4d6515548754e461451fcefb556e9bda6ae003786",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:91e78adfce0c63b7397a1304b3d1202d3d482046a4eb0c994fbb933cf7648bf9",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "contradictory"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "contradictory",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "4f83046c6429f1d9ce4140b353fd584eba11f500c1eabf1f3b9fc8948f23b5cc"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-EDU-03",
+      "case": "L1-EDU-03/negative/evidence-cross-tenant.json",
+      "fixtureSha256": "d14b9c13640c460f5690b308c2f4c8014a9b5eba52f755b016b8c6c20bb78a0e",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:91e78adfce0c63b7397a1304b3d1202d3d482046a4eb0c994fbb933cf7648bf9",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "cross_tenant"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "untrusted",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-EDU-03-questionnaire-1",
+              "sha256": "a6c1948e7b5043e54c0b0329133f375133c02011809a314b0ccc6198c6e4158d"
+            },
+            "reason": "cross_tenant",
+            "detail": "tenant other-education-fixture-tenant is not this evaluation's tenant"
+          }
+        ],
+        "digest": "ff169f569cdc3dd6057c671d8a33a36c6e2af7554e8634280e00e7dc82c7f921"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-EDU-03",
+      "case": "L1-EDU-03/negative/evidence-empty.json",
+      "fixtureSha256": "8d85f2c90844588832f4aba35517629ded074157b29bd560f60ffaeafbd46d82",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:91e78adfce0c63b7397a1304b3d1202d3d482046a4eb0c994fbb933cf7648bf9",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "6ad020d541bdfc28e6afc623181509a6def7f8432f84e8e3ffb0d446ea29a83f"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-EDU-03",
+      "case": "L1-EDU-03/negative/evidence-violation.json",
+      "fixtureSha256": "395b8c9ec8b4240442773d9125f471bdb6104ad8cc5c72182b7a91e71d97a3c7",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:91e78adfce0c63b7397a1304b3d1202d3d482046a4eb0c994fbb933cf7648bf9",
+      "expectedFixtureAdmission": {
+        "result": "fail",
+        "reasonCode": null
+      },
+      "actualFixtureAdmission": {
+        "result": "fail",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "b7f4d294216b44d28c8b8d500b2659c55c18acd0782316b82d98701fe4fdc150"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-EDU-03",
+      "case": "L1-EDU-03/negative/oracle-p227-unauthorized-export-pending.json",
+      "fixtureSha256": "fc2c503d9a8e47fb00fa5d7eb5af5d55e6b99fcfa1ba9f1359fb215ec5f98da3",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:91e78adfce0c63b7397a1304b3d1202d3d482046a4eb0c994fbb933cf7648bf9",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "dbe7200ec9dd2bc5a6a8de5047db2a003bc1ffc82c653dba8da5a954675c1366"
+      },
+      "expectedLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "dependency_unavailable"
+      },
+      "actualLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "dependency_unavailable",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "refusals": [
+          "dependency_unavailable"
+        ],
+        "observations": {
+          "pendingDependency": "P2-27",
+          "adapterAvailable": false,
+          "scenarioNotExecuted": "unauthorized_export",
+          "exportLog": []
+        }
+      }
+    },
+    {
+      "controlId": "L1-EDU-03",
+      "case": "L1-EDU-03/negative/oracle-p227-registry-unavailable-pending.json",
+      "fixtureSha256": "7de87f5fffe2ce18db2cda4b0095df4eb362d0e69e271b2eb2b906a33ddd983f",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:91e78adfce0c63b7397a1304b3d1202d3d482046a4eb0c994fbb933cf7648bf9",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "dbe7200ec9dd2bc5a6a8de5047db2a003bc1ffc82c653dba8da5a954675c1366"
+      },
+      "expectedLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "dependency_unavailable"
+      },
+      "actualLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "dependency_unavailable",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "refusals": [
+          "dependency_unavailable"
+        ],
+        "observations": {
+          "pendingDependency": "P2-27",
+          "adapterAvailable": false,
+          "scenarioNotExecuted": "registry_unavailable",
+          "exportLog": []
+        }
+      }
+    },
+    {
+      "controlId": "L1-EDU-04",
+      "case": "L1-EDU-04/positive/evidence-valid.json",
+      "fixtureSha256": "77045d7c54080e0e47594c3875cc47bfb6615263697a5f53a435fa3f1327191b",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:91e78adfce0c63b7397a1304b3d1202d3d482046a4eb0c994fbb933cf7648bf9",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": null
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "b5eb0cb9af0fa9305930bba46e287a6fd07467290fa0d64b3c072018919242a4"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-EDU-04",
+      "case": "L1-EDU-04/positive/oracle-accessible-lesson.json",
+      "fixtureSha256": "3779ac0fdc37b09229576be01327daafb459b4cd92af8f21b6700d506e177919",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:91e78adfce0c63b7397a1304b3d1202d3d482046a4eb0c994fbb933cf7648bf9",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "4905b98d423644ba3f2e35453e05a91694685efc5246145c2812b7c632b813d2"
+      },
+      "expectedLocalOracle": {
+        "result": "pass",
+        "reasonCode": "automated_wcag_no_violations"
+      },
+      "actualLocalOracle": {
+        "result": "pass",
+        "reasonCode": "automated_wcag_no_violations",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "refusals": [],
+        "observations": {
+          "scope": "automatable_wcag_2.1_a_aa_only",
+          "manualReview": {
+            "result": "not_evaluated",
+            "performed": false,
+            "assessor": null,
+            "dutyId": "L1-EDU-04-manual-accessibility",
+            "remaining": [
+              "meaningful reading order",
+              "keyboard and task flow",
+              "accurate text alternatives and captions",
+              "assistive-technology usability"
+            ]
+          },
+          "documentSha256": "357a43fb7d5511d30821f8c9d440755f6f115203331a013957b3566b113e982b",
+          "publicationPerformed": false,
+          "checker": {
+            "library": "axe-core",
+            "version": "4.13.0",
+            "adapterVersion": "4.13.0",
+            "playwrightVersion": "1.62.1",
+            "browserVersion": "151.0.7922.34"
+          },
+          "executedRuleIds": [
+            "aria-hidden-body",
+            "button-name",
+            "color-contrast",
+            "document-title",
+            "duplicate-id-aria",
+            "form-field-multiple-labels",
+            "html-has-lang",
+            "html-lang-valid",
+            "label",
+            "nested-interactive"
+          ],
+          "violations": [],
+          "incomplete": [],
+          "passedRuleIds": [
+            "aria-hidden-body",
+            "button-name",
+            "color-contrast",
+            "document-title",
+            "duplicate-id-aria",
+            "form-field-multiple-labels",
+            "html-has-lang",
+            "html-lang-valid",
+            "label",
+            "nested-interactive"
+          ],
+          "inapplicableRuleIds": [
+            "area-alt",
+            "aria-allowed-attr",
+            "aria-braille-equivalent",
+            "aria-command-name",
+            "aria-conditional-attr",
+            "aria-deprecated-role",
+            "aria-hidden-focus",
+            "aria-input-field-name",
+            "aria-meter-name",
+            "aria-progressbar-name",
+            "aria-prohibited-attr",
+            "aria-required-attr",
+            "aria-required-children",
+            "aria-required-parent",
+            "aria-roles",
+            "aria-tab-name",
+            "aria-toggle-field-name",
+            "aria-tooltip-name",
+            "aria-valid-attr",
+            "aria-valid-attr-value",
+            "autocomplete-valid",
+            "avoid-inline-spacing",
+            "blink",
+            "bypass",
+            "definition-list",
+            "dlitem",
+            "frame-focusable-content",
+            "frame-title",
+            "frame-title-unique",
+            "html-xml-lang-mismatch",
+            "image-alt",
+            "input-button-name",
+            "input-image-alt",
+            "link-in-text-block",
+            "link-name",
+            "list",
+            "listitem",
+            "marquee",
+            "meta-refresh",
+            "meta-viewport",
+            "no-autoplay-audio",
+            "object-alt",
+            "role-img-alt",
+            "scrollable-region-focusable",
+            "select-name",
+            "server-side-image-map",
+            "summary-name",
+            "svg-img-alt",
+            "td-headers-attr",
+            "th-has-data-cells",
+            "valid-lang",
+            "video-caption"
+          ],
+          "blockedRequests": [],
+          "serializedDomSha256": "d0d1bfac8596fe2f7a3ce93728d66be8a45ad8327dc903406cf51c79a79f5937"
+        }
+      }
+    },
+    {
+      "controlId": "L1-EDU-04",
+      "case": "L1-EDU-04/negative/evidence-stale.json",
+      "fixtureSha256": "dc1cadd59ff06b43b94e38a30db233ba89ad8a9540bbfd65d0f5ecfbced283a1",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:91e78adfce0c63b7397a1304b3d1202d3d482046a4eb0c994fbb933cf7648bf9",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "stale"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "stale",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-EDU-04-questionnaire-1",
+              "sha256": "c53d1f8f4a1be156ac15113d901e9bdc1bcfc2ee2b88214daac13ad0eac0a2bb"
+            },
+            "reason": "stale",
+            "detail": "recorded 2026-09-12T12:00:00.000Z, more than 30 days before the window end"
+          }
+        ],
+        "digest": "40a8beb1e3d1349d20c778ca92a8387d9431b7b24dbc0958cd654fff7a816226"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-EDU-04",
+      "case": "L1-EDU-04/negative/evidence-replayed.json",
+      "fixtureSha256": "d6afe4271d52415d4be85690289b1a02018e87fb1d4e00fd5de1d1f346bf8d2d",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:91e78adfce0c63b7397a1304b3d1202d3d482046a4eb0c994fbb933cf7648bf9",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "replayed"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-EDU-04-questionnaire-1",
+              "sha256": "4be849228c416cda9538a5790fa1c004f09ff0eda66620791051a87eeb9ace41"
+            },
+            "reason": "replayed",
+            "detail": "receipt:L1-EDU-04-questionnaire-1 was already used for L1-EDU-04|education-fixture-tenant|education-fixture-workspace|education-grading-assistant-us-fixture|education-fixture-agent|-|2025-01-01T00:00:00.000Z|2025-12-31T23:59:59.000Z"
+          }
+        ],
+        "digest": "383d4381936078e5b134c2ac87c46c8b608cbd4a292c011af41daaf329625f66"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-EDU-04",
+      "case": "L1-EDU-04/negative/evidence-contradictory.json",
+      "fixtureSha256": "9a3cff1da10e88ea4938efe2c80f086b59ddd72053b5e2ec1c428dd07e3353ea",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:91e78adfce0c63b7397a1304b3d1202d3d482046a4eb0c994fbb933cf7648bf9",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "contradictory"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "contradictory",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "b5c37ca932cd16d522ac4659c3c4c64c43027e754932a82dbbdbb65a4aa13366"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-EDU-04",
+      "case": "L1-EDU-04/negative/evidence-cross-tenant.json",
+      "fixtureSha256": "4535cf660b92decf85299693c130a69f74c934e24e70f3c6be0cea0ab1a59ff8",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:91e78adfce0c63b7397a1304b3d1202d3d482046a4eb0c994fbb933cf7648bf9",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "cross_tenant"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "untrusted",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-EDU-04-questionnaire-1",
+              "sha256": "7e40af3ef912b29c56f6bf070d8aed48240c478daf00298dfa62ab6a01747c0a"
+            },
+            "reason": "cross_tenant",
+            "detail": "tenant other-education-fixture-tenant is not this evaluation's tenant"
+          }
+        ],
+        "digest": "49f84ab0d8086b86d4284f5436140a7ec27f15c526b3e0fb218841ff05038b15"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-EDU-04",
+      "case": "L1-EDU-04/negative/evidence-empty.json",
+      "fixtureSha256": "3e383a27316b97996cdfaf30bbbbf0b1ee2421180595ca1d55b081991667abe6",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:91e78adfce0c63b7397a1304b3d1202d3d482046a4eb0c994fbb933cf7648bf9",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "c1887415a27b2b50a02e3d7d75c320c090cc0fd074fe99caf1ddb102ac54808e"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-EDU-04",
+      "case": "L1-EDU-04/negative/evidence-violation.json",
+      "fixtureSha256": "825ca6126a80270e9a7780cd0f03a83440904ca0df01030cbf9440d1d11afa55",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:91e78adfce0c63b7397a1304b3d1202d3d482046a4eb0c994fbb933cf7648bf9",
+      "expectedFixtureAdmission": {
+        "result": "fail",
+        "reasonCode": null
+      },
+      "actualFixtureAdmission": {
+        "result": "fail",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "41351bf37c094f99b824984a6a3f752fc4a54d08f7bcb7606193677a227a3a3d"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-EDU-04",
+      "case": "L1-EDU-04/negative/oracle-image-alt-missing.json",
+      "fixtureSha256": "1d412cd92979052b594360b3489eec39b51a2ff824232739b5302c55a8651ac7",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:91e78adfce0c63b7397a1304b3d1202d3d482046a4eb0c994fbb933cf7648bf9",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "4905b98d423644ba3f2e35453e05a91694685efc5246145c2812b7c632b813d2"
+      },
+      "expectedLocalOracle": {
+        "result": "fail",
+        "reasonCode": "automated_wcag_violation"
+      },
+      "actualLocalOracle": {
+        "result": "fail",
+        "reasonCode": "automated_wcag_violation",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "refusals": [
+          "automated_wcag_violation"
+        ],
+        "observations": {
+          "scope": "automatable_wcag_2.1_a_aa_only",
+          "manualReview": {
+            "result": "not_evaluated",
+            "performed": false,
+            "assessor": null,
+            "dutyId": "L1-EDU-04-manual-accessibility",
+            "remaining": [
+              "meaningful reading order",
+              "keyboard and task flow",
+              "accurate text alternatives and captions",
+              "assistive-technology usability"
+            ]
+          },
+          "documentSha256": "6a4613b2db3f897cb6ee7ccde105ef494076ddb9e31198bab0a8a16b5761e482",
+          "publicationPerformed": false,
+          "checker": {
+            "library": "axe-core",
+            "version": "4.13.0",
+            "adapterVersion": "4.13.0",
+            "playwrightVersion": "1.62.1",
+            "browserVersion": "151.0.7922.34"
+          },
+          "executedRuleIds": [
+            "aria-hidden-body",
+            "button-name",
+            "color-contrast",
+            "document-title",
+            "duplicate-id-aria",
+            "form-field-multiple-labels",
+            "html-has-lang",
+            "html-lang-valid",
+            "image-alt",
+            "label",
+            "nested-interactive"
+          ],
+          "violations": [
+            {
+              "id": "image-alt",
+              "impact": "critical",
+              "tags": [
+                "cat.text-alternatives",
+                "wcag2a",
+                "wcag111",
+                "section508",
+                "section508.22.a",
+                "TTv5",
+                "TT7.a",
+                "TT7.b",
+                "EN-301-549",
+                "EN-9.1.1.1",
+                "ACT",
+                "RGAAv4",
+                "RGAA-1.1.1"
+              ],
+              "targets": [
+                [
+                  "img"
+                ]
+              ]
+            }
+          ],
+          "incomplete": [],
+          "passedRuleIds": [
+            "aria-hidden-body",
+            "button-name",
+            "color-contrast",
+            "document-title",
+            "duplicate-id-aria",
+            "form-field-multiple-labels",
+            "html-has-lang",
+            "html-lang-valid",
+            "label",
+            "nested-interactive"
+          ],
+          "inapplicableRuleIds": [
+            "area-alt",
+            "aria-allowed-attr",
+            "aria-braille-equivalent",
+            "aria-command-name",
+            "aria-conditional-attr",
+            "aria-deprecated-role",
+            "aria-hidden-focus",
+            "aria-input-field-name",
+            "aria-meter-name",
+            "aria-progressbar-name",
+            "aria-prohibited-attr",
+            "aria-required-attr",
+            "aria-required-children",
+            "aria-required-parent",
+            "aria-roles",
+            "aria-tab-name",
+            "aria-toggle-field-name",
+            "aria-tooltip-name",
+            "aria-valid-attr",
+            "aria-valid-attr-value",
+            "autocomplete-valid",
+            "avoid-inline-spacing",
+            "blink",
+            "bypass",
+            "definition-list",
+            "dlitem",
+            "frame-focusable-content",
+            "frame-title",
+            "frame-title-unique",
+            "html-xml-lang-mismatch",
+            "input-button-name",
+            "input-image-alt",
+            "link-in-text-block",
+            "link-name",
+            "list",
+            "listitem",
+            "marquee",
+            "meta-refresh",
+            "meta-viewport",
+            "no-autoplay-audio",
+            "object-alt",
+            "role-img-alt",
+            "scrollable-region-focusable",
+            "select-name",
+            "server-side-image-map",
+            "summary-name",
+            "svg-img-alt",
+            "td-headers-attr",
+            "th-has-data-cells",
+            "valid-lang",
+            "video-caption"
+          ],
+          "blockedRequests": [],
+          "serializedDomSha256": "ac7391d74a8c4caa99cc0e80e39591af84bac899445a564722b8c5dc168364e2"
+        }
+      }
+    },
+    {
+      "controlId": "L1-EDU-04",
+      "case": "L1-EDU-04/negative/oracle-form-label-missing.json",
+      "fixtureSha256": "3a42cef3ea23aeb7d3bd78620007c5324945f36ff457000d0c42e52dbeec0d89",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:91e78adfce0c63b7397a1304b3d1202d3d482046a4eb0c994fbb933cf7648bf9",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "4905b98d423644ba3f2e35453e05a91694685efc5246145c2812b7c632b813d2"
+      },
+      "expectedLocalOracle": {
+        "result": "fail",
+        "reasonCode": "automated_wcag_violation"
+      },
+      "actualLocalOracle": {
+        "result": "fail",
+        "reasonCode": "automated_wcag_violation",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "refusals": [
+          "automated_wcag_violation"
+        ],
+        "observations": {
+          "scope": "automatable_wcag_2.1_a_aa_only",
+          "manualReview": {
+            "result": "not_evaluated",
+            "performed": false,
+            "assessor": null,
+            "dutyId": "L1-EDU-04-manual-accessibility",
+            "remaining": [
+              "meaningful reading order",
+              "keyboard and task flow",
+              "accurate text alternatives and captions",
+              "assistive-technology usability"
+            ]
+          },
+          "documentSha256": "28db156cc241c74dde64207040a58ac7e8c3b4ad953df4f4be6c61b8cd6c1286",
+          "publicationPerformed": false,
+          "checker": {
+            "library": "axe-core",
+            "version": "4.13.0",
+            "adapterVersion": "4.13.0",
+            "playwrightVersion": "1.62.1",
+            "browserVersion": "151.0.7922.34"
+          },
+          "executedRuleIds": [
+            "aria-hidden-body",
+            "button-name",
+            "color-contrast",
+            "document-title",
+            "form-field-multiple-labels",
+            "html-has-lang",
+            "html-lang-valid",
+            "label",
+            "nested-interactive"
+          ],
+          "violations": [
+            {
+              "id": "label",
+              "impact": "critical",
+              "tags": [
+                "cat.forms",
+                "wcag2a",
+                "wcag412",
+                "section508",
+                "section508.22.n",
+                "TTv5",
+                "TT5.c",
+                "EN-301-549",
+                "EN-9.4.1.2",
+                "ACT",
+                "RGAAv4",
+                "RGAA-11.1.1"
+              ],
+              "targets": [
+                [
+                  "#answer"
+                ]
+              ]
+            }
+          ],
+          "incomplete": [],
+          "passedRuleIds": [
+            "aria-hidden-body",
+            "button-name",
+            "color-contrast",
+            "document-title",
+            "form-field-multiple-labels",
+            "html-has-lang",
+            "html-lang-valid",
+            "nested-interactive"
+          ],
+          "inapplicableRuleIds": [
+            "area-alt",
+            "aria-allowed-attr",
+            "aria-braille-equivalent",
+            "aria-command-name",
+            "aria-conditional-attr",
+            "aria-deprecated-role",
+            "aria-hidden-focus",
+            "aria-input-field-name",
+            "aria-meter-name",
+            "aria-progressbar-name",
+            "aria-prohibited-attr",
+            "aria-required-attr",
+            "aria-required-children",
+            "aria-required-parent",
+            "aria-roles",
+            "aria-tab-name",
+            "aria-toggle-field-name",
+            "aria-tooltip-name",
+            "aria-valid-attr",
+            "aria-valid-attr-value",
+            "autocomplete-valid",
+            "avoid-inline-spacing",
+            "blink",
+            "bypass",
+            "definition-list",
+            "dlitem",
+            "duplicate-id-aria",
+            "frame-focusable-content",
+            "frame-title",
+            "frame-title-unique",
+            "html-xml-lang-mismatch",
+            "image-alt",
+            "input-button-name",
+            "input-image-alt",
+            "link-in-text-block",
+            "link-name",
+            "list",
+            "listitem",
+            "marquee",
+            "meta-refresh",
+            "meta-viewport",
+            "no-autoplay-audio",
+            "object-alt",
+            "role-img-alt",
+            "scrollable-region-focusable",
+            "select-name",
+            "server-side-image-map",
+            "summary-name",
+            "svg-img-alt",
+            "td-headers-attr",
+            "th-has-data-cells",
+            "valid-lang",
+            "video-caption"
+          ],
+          "blockedRequests": [],
+          "serializedDomSha256": "9d34b965609abb9f871ef630696079cfdf40a976d7d56eb00f2d49f8f893029b"
+        }
+      }
+    },
+    {
+      "controlId": "L1-EDU-04",
+      "case": "L1-EDU-04/negative/oracle-checker-unavailable.json",
+      "fixtureSha256": "1749d0ec87c171903ca541963286a4c6c214f0ffdbba83b117c8e676581fe098",
+      "profileId": "education-grading-assistant-us-fixture",
+      "planDigest": "sha256:91e78adfce0c63b7397a1304b3d1202d3d482046a4eb0c994fbb933cf7648bf9",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "4905b98d423644ba3f2e35453e05a91694685efc5246145c2812b7c632b813d2"
+      },
+      "expectedLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "checker_unavailable"
+      },
+      "actualLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "checker_unavailable",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "refusals": [
+          "checker_unavailable"
+        ],
+        "observations": {
+          "scope": "automatable_wcag_2.1_a_aa_only",
+          "manualReview": {
+            "result": "not_evaluated",
+            "performed": false,
+            "assessor": null,
+            "dutyId": "L1-EDU-04-manual-accessibility",
+            "remaining": [
+              "meaningful reading order",
+              "keyboard and task flow",
+              "accurate text alternatives and captions",
+              "assistive-technology usability"
+            ]
+          },
+          "documentSha256": "357a43fb7d5511d30821f8c9d440755f6f115203331a013957b3566b113e982b",
+          "publicationPerformed": false
+        }
+      }
+    }
+  ],
+  "production": [
+    {
+      "profileId": "education-grading-assistant-us-fixture",
+      "controlId": "L1-EDU-01",
+      "planDigest": "sha256:91e78adfce0c63b7397a1304b3d1202d3d482046a4eb0c994fbb933cf7648bf9",
+      "result": "not_evaluated",
+      "evidence": "incomplete",
+      "enforcement": {
+        "state": "none"
+      },
+      "claimKind": "self_reported",
+      "admittedCount": 0,
+      "digest": "d0d18cdcb7d09a4e4b229a96d81f7822cd4fee705583ac9635ffc0c9333ac859"
+    },
+    {
+      "profileId": "education-grading-assistant-us-fixture",
+      "controlId": "L1-EDU-03",
+      "planDigest": "sha256:91e78adfce0c63b7397a1304b3d1202d3d482046a4eb0c994fbb933cf7648bf9",
+      "result": "not_evaluated",
+      "evidence": "incomplete",
+      "enforcement": {
+        "state": "none"
+      },
+      "claimKind": "self_reported",
+      "admittedCount": 0,
+      "digest": "dbe7200ec9dd2bc5a6a8de5047db2a003bc1ffc82c653dba8da5a954675c1366"
+    },
+    {
+      "profileId": "education-grading-assistant-us-fixture",
+      "controlId": "L1-EDU-04",
+      "planDigest": "sha256:91e78adfce0c63b7397a1304b3d1202d3d482046a4eb0c994fbb933cf7648bf9",
+      "result": "not_evaluated",
+      "evidence": "incomplete",
+      "enforcement": {
+        "state": "none"
+      },
+      "claimKind": "self_reported",
+      "admittedCount": 0,
+      "digest": "4905b98d423644ba3f2e35453e05a91694685efc5246145c2812b7c632b813d2"
+    },
+    {
+      "profileId": "education-grading-assistant-eu-fixture",
+      "controlId": "L1-EDU-01",
+      "planDigest": "sha256:ebc81f6b4c2bacc125004f8277a65577e8927a1c57978b486352e35bfd119c64",
+      "result": "not_evaluated",
+      "evidence": "incomplete",
+      "enforcement": {
+        "state": "none"
+      },
+      "claimKind": "self_reported",
+      "admittedCount": 0,
+      "digest": "95439e193c6bc033f062b3d644f1adfba70e474e1f0a05ac2a7f29a2569fd7ab"
+    },
+    {
+      "profileId": "education-grading-assistant-eu-fixture",
+      "controlId": "L1-EDU-02",
+      "planDigest": "sha256:ebc81f6b4c2bacc125004f8277a65577e8927a1c57978b486352e35bfd119c64",
+      "result": "not_evaluated",
+      "evidence": "incomplete",
+      "enforcement": {
+        "state": "none"
+      },
+      "claimKind": "self_reported",
+      "admittedCount": 0,
+      "digest": "4cc17f73a13bcab26e14495f65e67a558d67079763b1e95d66ae896e6e6703d5"
+    },
+    {
+      "profileId": "education-grading-assistant-eu-fixture",
+      "controlId": "L1-EDU-04",
+      "planDigest": "sha256:ebc81f6b4c2bacc125004f8277a65577e8927a1c57978b486352e35bfd119c64",
+      "result": "not_evaluated",
+      "evidence": "incomplete",
+      "enforcement": {
+        "state": "none"
+      },
+      "claimKind": "self_reported",
+      "admittedCount": 0,
+      "digest": "7256e9d33d32c601d6c61dd963b80fd095034e363287838cee319665fcfeb00d"
+    }
+  ]
+}

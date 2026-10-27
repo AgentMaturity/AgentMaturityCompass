@@ -1,0 +1,24 @@
+{
+  "head": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+  "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+  "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+  "node": "v22.23.3",
+  "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-15",
+  "statusBefore": "",
+  "statusAfter": "",
+  "command": [
+    "pnpm",
+    "exec",
+    "tsx",
+    "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/probe-education-final-attempt-2.mts",
+    "a625ee5cae3cde551701f7c9cfed33a4f142480f"
+  ],
+  "startedAt": "2026-10-18T21:30:23.095720+00:00",
+  "durationMs": 5721,
+  "exit": 0,
+  "rawLogSha256": "19973eaee7fca37e3e402874976ddaf9c9670bd0a388c9eede86e94cf587569d",
+  "probeSourceSha256": "2714024790e91ad5a928e32e6bac4796395f4a0251076052818d0879d581354d",
+  "priorAttempt": "../command.json: preserved EEXIST output collision; no source or previous artifact changed",
+  "resultSha256": "47ba7f32d546e7fdb658a67bff3662f9923ef8b07965eeaa36a3ce8895380139",
+  "resultBytes": 96447
+}

@@ -1,0 +1,84 @@
+{
+  "station": "education",
+  "packId": "overlay.education",
+  "support": "experimental",
+  "review": "pending",
+  "promotion": "none",
+  "approvedBy": null,
+  "experts": {
+    "studentPrivacyCounsel": null,
+    "accessibilitySpecialist": null
+  },
+  "expertRecruitment": {
+    "decision": "D-14",
+    "ownerRoute": "D-10",
+    "contacted": false
+  },
+  "partner": null,
+  "partnerDependency": "P1-29",
+  "sidPromotionApproval": null,
+  "manualWcagAssessor": null,
+  "admissionCriteria": [
+    {
+      "criterion": 1,
+      "title": "Manifest and reproducible digest",
+      "status": "not_evaluated",
+      "reason": "The integrated source requires its own recorded pack, compiler, digest and admission evidence; historical checks retain their original pins. No admission result is inferred from this tracking record. D-04 licence decision remains pending."
+    },
+    {
+      "criterion": 2,
+      "title": "Citations verified and legally reviewed",
+      "status": "not_met",
+      "reason": "No fresh primary reads, content hashes or qualified legal review. Missing S5 sources remain candidates."
+    },
+    {
+      "criterion": 3,
+      "title": "Applicability predicates, reasons and exclusions",
+      "status": "not_evaluated",
+      "reason": "The asserted native profiles now include Education and Technology domains. Predicate and unknown-fact verification must be bound to the integrated source in its qualification receipt. No learner-age FactName exists."
+    },
+    {
+      "criterion": 4,
+      "title": "Binding",
+      "status": "not_evaluated",
+      "reason": "Four signature bindings and the manual WCAG remainder require actual producer and enforcement-point checks."
+    },
+    {
+      "criterion": 5,
+      "title": "Tests and observable oracles",
+      "status": "not_evaluated",
+      "reason": "Historical fixture execution remains pinned to its original source in the preserved receipt. The integrated candidate requires separately recorded current-source results; no test result or admission criterion is inferred here."
+    },
+    {
+      "criterion": 6,
+      "title": "Negative fixtures",
+      "status": "not_evaluated",
+      "reason": "Five negative classes per signature and false-pass checks require measured execution."
+    },
+    {
+      "criterion": 7,
+      "title": "Evidence contracts",
+      "status": "not_evaluated",
+      "reason": "Producer availability, source binding, freshness, sampling and invalidation need measured validation."
+    },
+    {
+      "criterion": 8,
+      "title": "Unknown facts fail closed",
+      "status": "not_evaluated",
+      "reason": "Current unknown-fact compilation and empty-production observations must be attached at their measured source in the new receipt. This tracking record supplies no execution result."
+    },
+    {
+      "criterion": 9,
+      "title": "Independent human sign-offs",
+      "status": "not_met",
+      "reason": "D-14/D-10 privacy and accessibility experts, distinct legal/domain/risk sign-offs and AI-draft approval are absent."
+    },
+    {
+      "criterion": 10,
+      "title": "Stewardship",
+      "status": "not_met",
+      "reason": "P1-29 partner, funded update owner and triage commitment are unassigned. Sid has not approved promotion."
+    }
+  ],
+  "note": "Draft promotion tracking only. Historical and current mechanical evidence retain separate source pins in their receipts; mechanical results do not satisfy human criteria or grant promotion. No native admission result is inferred. No third-party review request or contact has been sent."
+}

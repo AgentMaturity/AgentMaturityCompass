@@ -2,7 +2,9 @@
 # Seeded by P1-09 for L0-IDN-01, extended by P1-14 for the Layer 0 baseline and by P1-18 for the US register and the
 # Wealth overlay; add terms with the content that needs them.
 stations: [education, environment, health, wealth, technology, mobility, governance]
-jurisdictions: [US, US-CA, US-CO, US-NYC, US-NY, US-TX, US-IL, EU]
+jurisdictions: [US, US-CA, US-CO, US-NYC, US-NY, US-TX, US-IL, EU,
+  # P3-15: global voluntary-standard scope, inherited from the international catalogue vocabulary.
+  INT]
 # EU AI Act roles.
 roles: [provider, deployer]
 entityTypes:
@@ -17,6 +19,10 @@ entityTypes:
   - public_service_provider
   - law_firm
   - defense_contractor
+  # P3-15: declared Education institution scope; no legal applicability is inferred.
+  - k12_institution
+  - higher_education_institution
+  - training_provider
 riskClasses: []
 useCases:
   - consequential_decision_about_people
@@ -33,9 +39,19 @@ useCases:
   - legal_drafting
   - explanation_request
   - defense_analysis
+  # P3-15: asserted Education use cases.
+  - education_grading
+  - education_admission
+  - education_proctoring
+  - education_classroom_media
+  - education_records_export
+  - education_generated_lesson
 dataClasses:
   # P3-14: Governance defense fixture data class; no real CUI is supplied by the draft.
   - controlled_unclassified_information
+  # P3-15: synthetic data scope; no learner age is established.
+  - education_records
+  - children_personal_data
 domains:
   # P2-30 Technology domain from STATION_DOMAINS; own additive block.
   - technology.platforms-data
@@ -43,6 +59,8 @@ domains:
   - governance.public-services
   - governance.law-rights-democracy
   - governance.defense
+  # P3-15: exact P1-13 Education domain.
+  - education.schools-skills
 ownerRoles: [ciso, dpo, senior_manager, head_of_qa]
 # amc-audit-map-v1: the built-in audit map amc.audit.map.builtin.v1 (src/audit/auditMapBuiltin.ts).
 # atlas: MITRE ATLAS technique ids (src/compliance/citations/reference/atlas.json holds the release they are checked against).
