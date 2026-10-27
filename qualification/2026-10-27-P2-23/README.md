@@ -40,3 +40,14 @@ Pending:
 - **Mutations.** `mutations-security-review.json` records them (M13 to M17, plus the admission mutations re-run on the
   new code). All were killed. M17 survived until a test for a tools config that does not verify was added.
 - **Checks.** All 11 checks passed. The 159 related test files (2,419 tests) passed.
+
+## Held agents (commit `db74b9cef`)
+
+- **Rule.** A suspended or retired agent is now denied every action class, reads included. This holds at the bind
+  (provider hooks), for the tool pipeline's unbound calls, and on ToolHub's unjournaled path. Reads stay open only
+  before activation.
+- **Red before the fix.** `red-before-held-agents.txt` shows 5 tests failing on the previous sources.
+- **Mutations.** `mutations-held-agents.json` records M18 to M21; all were killed.
+- **Checks.** All 11 checks passed (architecture after fitting ToolHub's line budget).
+- **Related tests.** 181 files, 2,575 tests: 3 failed, all from the entry-point test's mock import order, which was
+  then fixed. The `tests/lifecycle` and `lifecycleRouter` files were re-run afterwards: 15 files, 56 tests passed.

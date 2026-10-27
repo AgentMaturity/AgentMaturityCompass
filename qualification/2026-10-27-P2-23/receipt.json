@@ -142,5 +142,62 @@
   },
   "mutations": "mutations-security-review.json",
   "red": "red-before-security-fixes.txt"
+ },
+ "heldAgents": {
+  "commit": "db74b9cef",
+  "checks": [
+   {
+    "cmd": "npm run -s typecheck",
+    "exit": 0
+   },
+   {
+    "cmd": "npm run -s typecheck:tests",
+    "exit": 0
+   },
+   {
+    "cmd": "npm run -s lint",
+    "exit": 0
+   },
+   {
+    "cmd": "npm run -s check:gates",
+    "exit": 0
+   },
+   {
+    "cmd": "npm run -s check:dead-code",
+    "exit": 0
+   },
+   {
+    "cmd": "npm run -s check:duplicates",
+    "exit": 0
+   },
+   {
+    "cmd": "npm run -s check:counts",
+    "exit": 0
+   },
+   {
+    "cmd": "npm run -s check:api-ref",
+    "exit": 0
+   },
+   {
+    "cmd": "npm run -s check:docs-drift",
+    "exit": 0
+   },
+   {
+    "cmd": "npm run -s check:architecture-boundaries",
+    "exit": 0
+   },
+   {
+    "cmd": "npm run -s build",
+    "exit": 0
+   }
+  ],
+  "relatedTests": {
+   "testFiles": 181,
+   "tests": 2575,
+   "failedBeforeImportOrderFix": 3,
+   "note": "the 3 entryPoints failures were the test's mock import order (fixed); tests/lifecycle + lifecycleRouter rerun 15 files / 56 tests passed"
+  },
+  "mutations": "mutations-held-agents.json",
+  "red": "red-before-held-agents.txt"
  }
 }
