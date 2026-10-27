@@ -198,12 +198,30 @@ function admissionProblem(view: LifecycleView, enforced: boolean): string | null
 }
 
 /**
- * Admission at P1-02's authorization stage, from the materialized row. `record` writes what admission decides (an overdue
- * mandatory review's suspension, an advisory warning); the recheck passes false so one call writes once. A state that
- * cannot be read denies under an enforcing plan.
+ * Whether lifecycle admission enforces here: the workspace's verified active plan carries LIFECYCLE_CONTROL_ID as an
+ * applicable control. Read from the workspace on every decision, never from a caller's context, so every entry point
+ * (tool pipeline, ToolHub, provider hooks) decides alike. No active plan: advisory. A plan that cannot be read or
+ * verified throws, and the caller denies.
  */
-export function lifecycleAdmission(workspace: string, agentId: string, enforced: boolean, options: { record?: boolean; now?: number } = {}): AdmissionResult {
+function lifecycleEnforcedIn(workspace: string): boolean {
+  return activeControlPlan(workspace)?.requirements.some((row) => row.controlId === LIFECYCLE_CONTROL_ID && row.applicability !== "not_applicable") ?? false;
+}
+
+/**
+ * Admission at P1-02's authorization stage, from the materialized row. `record` writes what admission decides (an overdue
+ * mandatory review's suspension, an advisory warning); the recheck passes false so one call writes once. The plan is read
+ * only when the agent could be held, so an active agent's call costs one row read. A state or plan that cannot be read
+ * denies, unless the workspace verifiably has no enforcing plan.
+ */
+export function lifecycleAdmission(workspace: string, agentId: string, options: { record?: boolean; now?: number } = {}): AdmissionResult {
   const record = options.record ?? true;
+  const enforcedOrRefusal = (): boolean | AdmissionResult => {
+    try {
+      return lifecycleEnforcedIn(workspace);
+    } catch (error) {
+      return { ok: false, reason: `agent ${agentId}: the active plan cannot be verified, so lifecycle admission fails closed (${error instanceof Error ? error.name : "error"})` };
+    }
+  };
   let view: LifecycleView;
   try {
     view = lifecycleView(workspace, agentId);
@@ -211,9 +229,13 @@ export function lifecycleAdmission(workspace: string, agentId: string, enforced:
       view = scheduledTrigger(workspace, view, options.now ?? Date.now());
     }
   } catch (error) {
-    if (enforced) return { ok: false, reason: `agent ${agentId} lifecycle state unavailable (${error instanceof Error ? error.name : "error"})` };
+    const enforced = enforcedOrRefusal();
+    if (enforced !== false) return enforced === true ? { ok: false, reason: `agent ${agentId} lifecycle state unavailable (${error instanceof Error ? error.name : "error"})` } : enforced;
     return { ok: true, warning: "lifecycle state unavailable" };
   }
+  if (admissionProblem(view, true) === null) return { ok: true, warning: null };
+  const enforced = enforcedOrRefusal();
+  if (typeof enforced !== "boolean") return enforced;
   const problem = admissionProblem(view, enforced);
   if (problem === null) return { ok: true, warning: null };
   if (enforced) return { ok: false, reason: problem };

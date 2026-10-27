@@ -74,22 +74,46 @@ export function invalidationTrigger(kind: ChangeKind): InvalidationTrigger {
   return `${kind}_version` as InvalidationTrigger;
 }
 
+/** The tool surface a session resolved: what its seam offers the model. Only `schemas()` is read. */
+export interface ResolvedToolSurface { schemas(): readonly unknown[] | null }
+
 /**
- * The manifest of a native session as it opens (src/agent/agentSession.ts): the route's provider and model, the system
- * prompt, the signed tools config (null when it does not verify, which counts as changed), the session's policy and
- * composition digests, and the active plan with its deployment. No provider reports a model version and no corpus is
- * pinned by the native runtime yet, so the model is unpinned and the corpus list is empty.
+ * The manifest of a native session as it opens (src/agent/agentSession.ts, src/kernel/agentLoopRunner.ts), built only
+ * from what the session resolved, never from a caller's pins (P2-23 security review; P2-26 builds its manifests the same
+ * way):
+ * - `toolsDigest` digests the tool schemas the composed seam offers the model (so additional capabilities and the tool
+ *   mode count) together with the verified signed tools config. A seam that cannot list its schemas (a pinned digest
+ *   that no longer matches throws there) or a workspace config that does not verify gives null, which counts as changed.
+ * - `policyDigest` and `compiledPlanDigest` come from the verified active plan ("none" without one).
+ * The route, prompt, harness version and composition digest are the session's own identity, as its open row records.
+ * No provider reports a model version and the native runtime pins no corpus yet, so the model is unpinned and the
+ * corpus list is empty.
  */
 export function nativeSessionManifest(input: { workspace: string; agentId: string; providerId: string; model: string; systemPrompt: string;
-  harnessVersion: string; compositionDigest: string; policyDigest: string; tools: "none" | "workspace"; expectedToolsDigest?: string }): AgentVersionManifest {
+  harnessVersion: string; compositionDigest: string; tools: "none" | "workspace"; surface: ResolvedToolSurface }): AgentVersionManifest {
   const plan = activeControlPlan(input.workspace);
-  const snapshot = input.tools === "workspace" && input.expectedToolsDigest === undefined ? loadVerifiedToolsConfigSnapshot(input.workspace) : null;
   return {
     v: 1, agentId: input.agentId, deploymentId: plan?.profile.deployment?.deploymentId ?? "not_bound",
     model: { providerId: input.providerId, model: input.model, providerReportedVersion: null },
     systemPromptSha256: sha256Hex(input.systemPrompt),
-    toolsDigest: input.tools === "none" ? sha256Hex("amc.native-tools/none") : input.expectedToolsDigest ?? (snapshot?.signatureValid ? snapshot.digestSha256 ?? null : null),
-    policyDigest: input.policyDigest, compiledPlanDigest: plan?.digest ?? "none",
+    toolsDigest: resolvedToolsDigest(input.workspace, input.tools, input.surface),
+    policyDigest: plan?.runtimePolicy.policyDigest ?? "none", compiledPlanDigest: plan?.digest ?? "none",
     harnessVersion: input.harnessVersion, compositionDigest: input.compositionDigest, corpusDigests: []
   };
+}
+
+function resolvedToolsDigest(workspace: string, tools: "none" | "workspace", surface: ResolvedToolSurface): string | null {
+  let signedToolsConfig: string | null = null;
+  if (tools === "workspace") {
+    const snapshot = loadVerifiedToolsConfigSnapshot(workspace);
+    if (!snapshot.signatureValid || snapshot.digestSha256 === null) return null;
+    signedToolsConfig = snapshot.digestSha256;
+  }
+  let schemas: readonly unknown[] | null;
+  try {
+    schemas = surface.schemas();
+  } catch {
+    return null;
+  }
+  return sha256Hex(canonicalize({ tools, signedToolsConfig, schemas: schemas ?? [] }));
 }

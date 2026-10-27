@@ -521,10 +521,6 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
     // cleanly in the `finally`. A prompt with a hole in it never reaches a model.
     const systemPromptText = prompt.render();
     const systemPromptRef = session.recordSystemPrompt(systemPromptText);
-    // P2-23: a governed agent's reassessment triggers run on the rendered prompt, before the first request.
-    admitNativeSession({ workspace: options.workspace, agentId: options.agentId, manifest: () => nativeSessionManifest({ workspace: options.workspace,
-      providerId: options.route.providerId, model: options.route.model, systemPrompt: systemPromptText, ...identity,
-      tools: options.tools === undefined ? "none" : "workspace" }) });
 
     const gate = options.approvalGate;
     let approval: ApprovalSeamService | null = null;
@@ -557,6 +553,11 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
       approval === null || gate === undefined
         ? options.tools
         : gateToolCallsOnApproval(options.tools ?? EMPTY_TOOL_SEAM, approval, gate);
+    // P2-23: a governed agent's reassessment triggers run on the rendered prompt and composed tools, before the first request.
+    admitNativeSession({ workspace: options.workspace, agentId: options.agentId, manifest: () => nativeSessionManifest({ workspace: options.workspace,
+      agentId: options.agentId, providerId: options.route.providerId, model: options.route.model, systemPrompt: systemPromptText,
+      harnessVersion: identity.harnessVersion, compositionDigest: identity.compositionDigest,
+      tools: options.tools === undefined ? "none" : "workspace", surface: options.tools ?? EMPTY_TOOL_SEAM }) });
 
     // Always present, so context reaches the model whether or not anyone asked
     // to watch. `notify` is the live mirror and is optional; `preStep` is how the

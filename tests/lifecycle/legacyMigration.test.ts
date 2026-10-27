@@ -1,12 +1,28 @@
-import { afterEach, describe, expect, test } from "vitest";
+// First: activate.js and the lifecycle modules form an import cycle, so the lifecycle module must load the mocked plan reader.
+import { lifecycleAdmission } from "../../src/lifecycle/reassessment.js";
+import { afterEach, describe, expect, test, vi } from "vitest";
 import { openLedger } from "../../src/ledger/ledger.js";
 import { LIFECYCLE_AUDIT, lifecycleEvents, lifecycleView, migrateLegacyAgents } from "../../src/lifecycle/governanceLifecycle.js";
 import { lifecycleAdvanceCli, lifecycleStatusCli } from "../../src/lifecycle/lifecycleCli.js";
-import { lifecycleAdmission } from "../../src/lifecycle/reassessment.js";
 import { cleanupGovernanceFixtures, governanceFixture } from "../governor/governanceFixture.js";
 import { AGENT, approvedMove, manifest, ownerActor } from "./lifecycleFixture.js";
 
-afterEach(cleanupGovernanceFixtures);
+// Enforcement is read from the workspace's active plan: a typed stand-in carrying L0-CHG-01 when `enforcing` is set.
+const active = vi.hoisted(() => ({ plan: null as unknown }));
+vi.mock("../../src/catalog/compiler/activate.js", async (original) => ({
+  ...(await original<typeof import("../../src/catalog/compiler/activate.js")>()), activeControlPlan: () => active.plan
+}));
+const ENFORCING = { digest: `sha256:${"5".repeat(64)}`, requirements: [{ controlId: "L0-CHG-01", applicability: "applicable", mandatory: true }],
+  evidencePlan: { tests: [], evidenceRequests: [], manualDuties: [], releaseGates: [] } };
+const admission = (workspace: string, enforcing: boolean) => {
+  active.plan = enforcing ? ENFORCING : null;
+  return lifecycleAdmission(workspace, AGENT);
+};
+
+afterEach(() => {
+  active.plan = null;
+  cleanupGovernanceFixtures();
+});
 
 describe("legacy migration (P2-23)", () => {
   test("an existing agent reads as active legacy_migration before migration, and migration records exactly that, self_reported", () => {
@@ -26,15 +42,17 @@ describe("legacy migration (P2-23)", () => {
 
   test("no outage: unmigrated agents keep running; once migrated, an enforcing plan needs a bound approval before the next consequential action", async () => {
     const { workspace } = governanceFixture();
-    expect(lifecycleAdmission(workspace, AGENT, false)).toEqual({ ok: true, warning: null });
+    expect(admission(workspace, false)).toEqual({ ok: true, warning: null });
     // Never migrated: not held, even under an enforcing plan (upgrading a regulated workspace stops nothing).
-    expect(lifecycleAdmission(workspace, AGENT, true)).toEqual({ ok: true, warning: null });
+    expect(admission(workspace, true)).toEqual({ ok: true, warning: null });
     migrateLegacyAgents(workspace);
-    expect(lifecycleAdmission(workspace, AGENT, false).ok).toBe(true);
-    expect(lifecycleAdmission(workspace, AGENT, true)).toMatchObject({ ok: false, reason: expect.stringContaining("active (legacy_migration) without a bound approval") });
+    expect(admission(workspace, false).ok).toBe(true);
+    console.log("DBG", JSON.stringify(lifecycleView(workspace, AGENT)));
+    expect(admission(workspace, true)).toMatchObject({ ok: false, reason: expect.stringContaining("active (legacy_migration) without a bound approval") });
+    active.plan = ENFORCING;
     await approvedMove(workspace, ownerActor(workspace), "active", manifest());
     expect(lifecycleView(workspace, AGENT)).toMatchObject({ state: "active", reason: "approval", claimKind: "observed" });
-    expect(lifecycleAdmission(workspace, AGENT, true)).toEqual({ ok: true, warning: null });
+    expect(admission(workspace, true)).toEqual({ ok: true, warning: null });
   });
 
   test("amc lifecycle advance still works and its records are labelled self_reported", () => {

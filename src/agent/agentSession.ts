@@ -20,7 +20,7 @@ import { SessionService } from "../session/sessionService.js";
 import { redactingSessionFor } from "../dataflow/redactingSession.js";
 import { resumeSession } from "../session/sessionResume.js";
 import { runLease } from "../leases/runLease.js";
-import { admitNativeSession } from "../lifecycle/reassessment.js";
+import { admitNativeSession, refuseRetired } from "../lifecycle/reassessment.js";
 import { nativeSessionManifest } from "../lifecycle/versionManifest.js";
 import type { RecoveryClaimant } from "../session/sessionRecovery.js";
 
@@ -147,11 +147,7 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
     if (init.expectedToolsDigest !== undefined && (init.tools !== "workspace" || !/^[a-f0-9]{64}$/.test(init.expectedToolsDigest))) throw new Error("A native tool policy pin requires explicit workspace tools and a SHA-256 digest.");
     if (init.maxSteps !== undefined && (!Number.isSafeInteger(init.maxSteps) || init.maxSteps < 1 || init.maxSteps > 1024)) throw new Error("Native maxSteps must be an integer from 1 through 1024.");
     const compaction = init.compaction === undefined ? undefined : resolveCompactionConfig(init.compaction);
-    // P2-23: a retired agent opens no session; a governed agent's reassessment triggers run before its first turn.
-    admitNativeSession({ workspace, agentId: init.agentId, manifest: () => nativeSessionManifest({ workspace, agentId: init.agentId,
-      providerId: init.route.providerId, model: init.route.model, systemPrompt: init.systemPrompt, harnessVersion: init.harnessVersion,
-      compositionDigest: init.compositionDigest, policyDigest: init.policyDigest, tools: init.tools ?? "workspace",
-      ...(init.expectedToolsDigest === undefined ? {} : { expectedToolsDigest: init.expectedToolsDigest }) }) });
+    refuseRetired(workspace, init.agentId); // P2-23: a retired agent opens no session
     // P1-79: the caller's lease, or the run's (LeasePrincipalRefused before any session row or recovery).
     const lease = runLease({ workspace, agentId: init.agentId, model: init.route.model || init.route.providerId, tools: init.tools ?? "workspace",
       ...(init.leaseToken === undefined ? {} : { leaseToken: init.leaseToken }) });
@@ -230,6 +226,10 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
       toolset = init.tools === "none" ? undefined : makeToolset();
       const tools = init.bindTools?.({ session, toolset: toolset ?? null }) ?? toolset?.seam ?? EMPTY_TOOL_SEAM;
       const systemPromptEventId = session.recordSystemPrompt(init.systemPrompt).eventId;
+      // P2-23: the reassessment triggers run on the composed tool surface, before the first turn.
+      admitNativeSession({ workspace, agentId: init.agentId, manifest: () => nativeSessionManifest({ workspace, agentId: init.agentId,
+        providerId: init.route.providerId, model: init.route.model, systemPrompt: init.systemPrompt, harnessVersion: init.harnessVersion,
+        compositionDigest: init.compositionDigest, tools: init.tools ?? "workspace", surface: tools }) });
       driver = new AgentDriver({
         session,
         llm: init.makeLlm(session),

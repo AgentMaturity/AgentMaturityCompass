@@ -1,4 +1,6 @@
-import { afterEach, describe, expect, test } from "vitest";
+// First: activate.js and the lifecycle modules form an import cycle, so the lifecycle module must load the mocked plan reader.
+import "../../src/lifecycle/reassessment.js";
+import { afterEach, describe, expect, test, vi } from "vitest";
 import { openActionJournal, type ActionJournal } from "../../src/actions/actionJournal.js";
 import { openLedger } from "../../src/ledger/ledger.js";
 import { LIFECYCLE_AUDIT, lifecycleEvents, suspendAgent } from "../../src/lifecycle/governanceLifecycle.js";
@@ -9,9 +11,16 @@ import { defineTool } from "../../src/tools/toolRegistry.js";
 import { cleanupGovernanceFixtures, governanceFixture, REFUND } from "../governor/governanceFixture.js";
 import { activate, AGENT, compiledPlan, ownerActor } from "./lifecycleFixture.js";
 
+// Lifecycle enforcement is read from the workspace's active plan: a typed stand-in carrying L0-CHG-01, or none (advisory).
+const active = vi.hoisted(() => ({ plan: null as unknown }));
+vi.mock("../../src/catalog/compiler/activate.js", async (original) => ({
+  ...(await original<typeof import("../../src/catalog/compiler/activate.js")>()), activeControlPlan: () => active.plan
+}));
+
 const READ = "fixture.read";
 const journals: ActionJournal[] = [];
 afterEach(() => {
+  active.plan = null;
   for (const journal of journals.splice(0)) journal.close();
   cleanupGovernanceFixtures();
 });
@@ -22,6 +31,8 @@ async function admissionFixture(options: { lifecycleControl: boolean; suspend: b
   const plan = { ...base, runtimePolicy: { ...base.runtimePolicy, toolPipeline: { ...base.runtimePolicy.toolPipeline,
     visibleTools: [...base.runtimePolicy.toolPipeline.visibleTools, READ] } } };
   const f = governanceFixture(plan);
+  active.plan = options.lifecycleControl ? { digest: `sha256:${"5".repeat(64)}`, requirements: [{ controlId: "L0-CHG-01", applicability: "applicable", mandatory: true }],
+    evidencePlan: { tests: [], evidenceRequests: [], manualDuties: [], releaseGates: [] } } : null;
   f.registry.define(defineTool({ name: READ, description: "Reads nothing; records the call in memory", actionClass: "READ_ONLY",
     body: (execution) => { f.bodies.push(execution); return { output: "read", effect: "not_applied" }; } }));
   await activate(f.workspace, ownerActor(f.workspace));

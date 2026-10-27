@@ -55,9 +55,18 @@ A null, empty or missing component in the current manifest counts as changed (fa
 version to the native runtime yet, so the model is reported as unpinned (`unpinned: ["model"]` on a reassessment)
 rather than suspending every session. The native runtime pins no corpus yet, so `corpusDigests` is empty.
 
-At each native session open AMC builds the manifest from the route's provider and model, the system prompt, the
-signed tools config, the session's policy and composition digests and the active plan. For a governed agent it records
-the manifest when it changed (`LIFECYCLE_MANIFEST_OBSERVED`). An approval binds the observed manifest by default, or a
+At each native session open AMC builds the manifest from what the session resolved, never from a caller's declared
+pins:
+
+- the route's provider and model, and the system prompt;
+- `toolsDigest`: the tool schemas the composed tool surface offers the model (so added capabilities and the tool mode
+  count), together with the verified signed tools config. A surface that cannot list its tools, for example a declared
+  tools pin that no longer matches, or a config that does not verify, gives `null`, which counts as changed;
+- `policyDigest` and `compiledPlanDigest`: from the verified active plan (`none` without one);
+- the session's harness version and composition digest, as its open row records them.
+
+The triggers run after the tools are composed and before the first turn. For a governed agent AMC records the manifest
+when it changed (`LIFECYCLE_MANIFEST_OBSERVED`). An approval binds the observed manifest by default, or a
 manifest file (`--manifest <file>`, API `manifest`).
 
 ## Reassessment triggers
@@ -91,8 +100,11 @@ reads the agent's row. An agent that is not active is denied with the message `a
 the denial is the call's receipt (`agent_not_active`). Reads and low-impact writes are not bound at that stage, so they
 follow the plan's visible-tool allowlist. A row that does not match the agent's newest signed lifecycle row refuses.
 
-Admission enforces only when the active plan carries `L0-CHG-01` (Pinned versions). Without such a plan it is
-advisory: the call runs and AMC writes a `LIFECYCLE_ADMISSION_WARNING` row.
+Admission enforces only when the active plan carries `L0-CHG-01` (Pinned versions). AMC reads that from the
+workspace's verified active plan on every decision, never from a caller's context. The tool pipeline, ToolHub's
+journaled dispatch and provider hook decisions therefore decide alike. If the agent could be held and the active
+plan cannot be read or verified, the call is denied (fail closed). Without an enforcing plan, admission is advisory:
+the call runs and AMC writes a `LIFECYCLE_ADMISSION_WARNING` row.
 
 A retired agent opens no native session. A suspended agent can still open one and read.
 
