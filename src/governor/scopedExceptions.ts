@@ -19,7 +19,7 @@ import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
 import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
 import {
   amountWithin, approvalMatches, assertRecordApproved, BoundRecordError, draftDigest, inWindow,
-  publishSignedRecord, raiseRecordApproval, readSignedRecords
+  publishSignedRecord, raiseRecordApproval, readSignedRecords, sessionPrincipal
 } from "./boundRecords.js";
 
 const scopedExceptionDraftSchema = scopedExceptionV1Schema.omit({ approval: true });
@@ -54,11 +54,19 @@ function checkDraft(workspace: string, draft: ScopedExceptionDraft): void {
   }
 }
 
-/** Step 1: validate the draft and raise its approval under the signed SECURITY rule. Nothing is honoured yet. */
+/**
+ * Step 1: validate the draft and raise its approval under the signed SECURITY rule. Nothing is honoured yet. The
+ * requester is the authenticated user of an `amc approvals login` token (`sessionTokenFile`), never a caller-supplied
+ * name; it is recorded as the request's initiator, so the engine refuses that user's own decision.
+ */
 export async function requestScopedException(workspace: string,
-  input: Omit<ScopedExceptionDraft, "schema" | "exceptionId" | "scope"> & { scope: Omit<ScopedExceptionDraft["scope"], "workspaceId"> }) {
-  const draft = scopedExceptionDraftSchema.parse({ ...input, schema: "amc.scoped-exception/v1",
-    exceptionId: `sex_${randomUUID().replace(/-/g, "").slice(0, 24)}`, scope: { ...input.scope, workspaceId: workspaceIdFromDirectory(workspace) } });
+  input: Omit<ScopedExceptionDraft, "schema" | "exceptionId" | "scope" | "requestedBy">
+    & { scope: Omit<ScopedExceptionDraft["scope"], "workspaceId">; sessionTokenFile: string }) {
+  const { sessionTokenFile, ...fields } = input;
+  if ("requestedBy" in fields) throw new BoundRecordError("principal_unresolved", "the requester comes from the session, never from input");
+  const requester = sessionPrincipal(workspace, sessionTokenFile);
+  const draft = scopedExceptionDraftSchema.parse({ ...fields, requestedBy: requester.userId, schema: "amc.scoped-exception/v1",
+    exceptionId: `sex_${randomUUID().replace(/-/g, "").slice(0, 24)}`, scope: { ...fields.scope, workspaceId: workspaceIdFromDirectory(workspace) } });
   checkDraft(workspace, draft);
   const approval = await raiseRecordApproval(workspace, { kind: "scoped-exception", recordId: draft.exceptionId, digest: draftDigest(draft),
     agentId: draft.scope.agentIds[0]!, initiator: draft.requestedBy });
