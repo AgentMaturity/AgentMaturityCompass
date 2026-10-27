@@ -1,7 +1,7 @@
 import { resolve } from "node:path";
 import { ensureSigningKeys } from "../crypto/keys.js";
 import { assertOwnerMode } from "../mode/mode.js";
-import { captureSignedControlJournalAppend, ControlMutationAuthorityError } from "../lifecycle/signedControlJournalAsync.js";
+import { captureSignedControlJournalAppend, ControlMutationAuthorityError, retryOnControlJournalConflict } from "../lifecycle/signedControlJournalAsync.js";
 import { captureControlMirror } from "../lifecycle/controlJournalMirror.js";
 import {
   GUARDRAIL_CONTROL_SCHEMA_VERSION, GuardrailControlError, assertKnownBoundGuardrail, guardrailControlHeadsDir,
@@ -16,6 +16,10 @@ type Profile = { workspace: string; profileName: string; source: GuardrailContro
 const actorCurrent = (check?: () => boolean) => { if (check?.() === false) throw new ControlMutationAuthorityError(); };
 
 async function mutate(workspace: string, command: string, build: (snapshot: GuardrailControlSnapshot) => GuardrailControlState,
+  currentActor?: () => boolean): Promise<GuardrailControlState> {
+  return retryOnControlJournalConflict(() => mutateOnce(workspace, command, build, currentActor));
+}
+async function mutateOnce(workspace: string, command: string, build: (snapshot: GuardrailControlSnapshot) => GuardrailControlState,
   currentActor?: () => boolean): Promise<GuardrailControlState> {
   const assertCurrent = () => { actorCurrent(currentActor); assertOwnerMode(workspace, command); };
   assertCurrent(); ensureSigningKeys(workspace);
