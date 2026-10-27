@@ -22,7 +22,8 @@ export type RecheckFailure =
   | "binding_changed:amount" | "binding_changed:recipient" | "binding_changed:destination"
   | "binding_changed:resource" | "tool_changed" | "deployment_changed" | "policy_revision_changed"
   | "capability_expired" | "lease_revoked" | "scope_widened" | "action_class_frozen"
-  | "authority_store_unavailable" | "binding_fields_missing" | "principal_unresolved" | "purpose_violation";
+  | "authority_store_unavailable" | "binding_fields_missing" | "principal_unresolved" | "purpose_violation"
+  | "exception_not_honoured" | "break_glass_not_honoured";
 
 export interface RecheckResult {
   readonly ok: boolean;

@@ -138,6 +138,29 @@ Contract only: P1-02 builds it at the enforcement point and defines its digest
 - `delegation.depth` is 0 exactly when `delegation.parentExecutionId` is null.
 - `agentSuppliedMetadata` is what the agent said. It is untrusted and no rule may read it.
 - Freshness: the record is valid only while `asOf` < `expiresAt`.
+- `authority.exceptions` and `authority.breakGlassId` (P2-24) name scoped-exception and break-glass records that
+  verified and covered the call when it was bound; the recheck re-verifies them before the call runs.
+
+## scoped-exception, break-glass and review-record
+
+P2-24 records under `.amc/governor/`, each with a domain-separated artifact signature (`.sig`, artifact kinds
+`scoped-exception`, `break-glass`, `review-record`) by the workspace auditor key. Rules the schema cannot express:
+
+- `approval` names an approval request, under the signed policy's `SECURITY` rule, whose intent is
+  `{ kind, digest }`: the kind and the SHA-256 of the canonical record without `approval`. Only decisions bound to
+  `approval.requestBindingDigest` count; the requester never does. A scoped exception and a review need the quorum; a
+  break-glass record needs one bound decision from an allowed role.
+- No scope name contains `*`. A scoped exception's window is positive and at most 30 days; a break-glass window at
+  most 24 hours, and `postHocReviewDueAt` is 48 hours after it ends. `scope.workspaceId` is the reading workspace.
+- A break-glass record's `prevBreakGlassDigest` is the SHA-256 of the previous record's bytes, or `GENESIS`; the
+  register is one chain. Its actions are `BREAK_GLASS_ACTION` ledger rows (`breakGlassId`, `executionId`,
+  `authorizationDigest`, `at`), and its review subject is the packet: the record's SHA-256 plus every action digest.
+- A review's `reviewer.userId` differs from `requesterId`. A review counts only for its exact `subject.sha256`: any
+  rejection of that digest gives `rejected`, an unexpired approval gives `approved`, a lapsed one `expired`, and
+  anything else `pending`.
+- A scoped exception is revoked by any file `revocations/<exceptionId>.json`, signed or not.
+- These records are recorded deviations and human decisions. A signature shows who recorded them, not that a
+  deviation was justified, and none is a compliance verdict.
 
 ## redaction-receipt
 

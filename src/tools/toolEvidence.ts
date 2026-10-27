@@ -40,12 +40,26 @@ import type { RecordedToolCall, ToolOutcome } from "./toolTypes.js";
  * distinction the published score has to make rests on it being accurate here.
  */
 
+/**
+ * P2-24: a call that ran under a break-glass record appends one BreakGlassActionV1 row; the signed record itself is
+ * never edited. Its post-hoc review covers these rows (src/governor/breakGlass.ts reads them back).
+ */
+function breakGlassAction(authorization: NonNullable<RecordedToolCall["authorization"]>, outcome: ToolOutcome,
+  call: Record<string, unknown>): ToolEvidenceRecord[] {
+  const breakGlassId = authorization.record.authority.breakGlassId;
+  if (breakGlassId === undefined || outcome.denied !== null) return [];
+  const action = { breakGlassId, executionId: authorization.record.executionId, authorizationDigest: authorization.digest, at: new Date().toISOString() };
+  return [{ eventType: "audit", payload: JSON.stringify({ auditType: "BREAK_GLASS_ACTION", action }),
+    meta: { ...call, auditType: "BREAK_GLASS_ACTION", breakGlassId, executionId: action.executionId } }];
+}
+
 /** Audit types a governed tool call can produce. */
 export type ToolAuditType =
   | "TOOL_CALL_ALLOWED"
   | "TOOL_CALL_DENIED"
   | "TOOL_CALL_FAILED"
-  | "AUTHORIZATION_RECORD";
+  | "AUTHORIZATION_RECORD"
+  | "BREAK_GLASS_ACTION";
 
 export interface ToolEvidenceRecord {
   readonly eventType: "audit" | "metric" | "stdout";
@@ -143,7 +157,7 @@ export function toolEvidenceFor(execution: RecordedToolCall, outcome: ToolOutcom
     eventType: "audit",
     payload: JSON.stringify({ auditType: "AUTHORIZATION_RECORD", record: execution.authorization.record }),
     meta: { ...call, auditType: "AUTHORIZATION_RECORD", executionId: execution.authorization.record.executionId }
-  }];
+  }, ...breakGlassAction(execution.authorization, outcome, call)];
 
   const audit: ToolEvidenceRecord = {
     eventType: "audit",

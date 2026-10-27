@@ -112,7 +112,7 @@ export function registerNativeScheduleCommands(program: Command, io: AgentLoopCl
         const root = workspace();
         assertScheduleOwner(root);
         if (opts.agent.trim().length === 0) throw new Error("--agent must identify the governing root agent.");
-        const gate = approvalGateFor(io, opts);
+        const gate = approvalGateFor(io, opts, { workspace: root, agentId: opts.agent });
         if (gate == null) return;
         const route = routeFor(io, opts.provider, opts, opts.model);
         if (route === null) return;

@@ -17,6 +17,8 @@ import { assertContract } from "../contracts/index.js";
 import { purposeResource } from "../dataflow/purposePolicy.js";
 import { activeFreezeStatus } from "../drift/freezeEngine.js";
 import { ACTION_CLASSES } from "../governor/actionCatalog.js";
+import { matchingBreakGlass } from "../governor/breakGlass.js";
+import { matchingScopedExceptions, type DeviationCall } from "../governor/scopedExceptions.js";
 import type { LeasePayload } from "../leases/leaseSchema.js";
 import type { EffectDeclaration } from "../toolhub/toolsSchema.js";
 import { revokedLeaseIdSet } from "../leases/leaseStore.js";
@@ -236,6 +238,39 @@ export function carryBoundPrincipal(from: AuthorizationRecordV1, to: Authorizati
   return to;
 }
 
+type Deviations = Pick<AuthorizationRecordV1["authority"], "exceptions" | "breakGlassId">;
+
+function deviationCall(execution: Pick<ToolExecution, "workspace" | "agentId">, facts: Pick<AuthorizationRecordV1, "action" | "bindings">): DeviationCall {
+  return { workspace: execution.workspace, agentId: execution.agentId, toolName: facts.action.toolName, actionClass: facts.action.actionClass,
+    amount: facts.bindings.amount, resourceId: facts.bindings.resourceId };
+}
+
+/**
+ * The verified, live scoped exceptions and break-glass record that cover this call (P2-24), re-read on every call. A
+ * store that cannot be read contributes none: the call then runs with no deviation, which only ever denies more.
+ */
+function deviationsFor(call: DeviationCall): Deviations {
+  try {
+    const breakGlass = matchingBreakGlass(call)[0];
+    return { exceptions: matchingScopedExceptions(call).map((exception) => ({ exceptionId: exception.exceptionId,
+      issuer: exception.approval.approvalRequestId, expiresAt: exception.window.notAfter })),
+    ...(breakGlass === undefined ? {} : { breakGlassId: breakGlass.breakGlassId }) };
+  } catch {
+    return { exceptions: [] };
+  }
+}
+
+/** A deviation the record names that no longer verifies, is revoked, ended or no longer covers the call. */
+function deviationFailures(record: AuthorizationRecordV1, execution: ToolExecution): RecheckFailure[] {
+  if (record.authority.exceptions.length === 0 && record.authority.breakGlassId === undefined) return [];
+  const now = deviationsFor(deviationCall(execution, record));
+  const live = new Set(now.exceptions.map((exception) => exception.exceptionId));
+  return [
+    ...(record.authority.exceptions.every((exception) => live.has(exception.exceptionId)) ? [] : ["exception_not_honoured" as const]),
+    ...(record.authority.breakGlassId === undefined || record.authority.breakGlassId === now.breakGlassId ? [] : ["break_glass_not_honoured" as const])
+  ];
+}
+
 /** Build the record for one call. Issued and expiry times come from AMC's clock, never from a caller. */
 export function bindAuthorization(execution: ToolExecution, ctx: AuthorizationContext = {}): BindResult {
   const facts = actionFacts(execution, ctx.compiledPolicy);
@@ -251,9 +286,10 @@ export function bindAuthorization(execution: ToolExecution, ctx: AuthorizationCo
   const named = lease === null ? null : leasePrincipal(execution.workspace, lease.payload);
   if (named !== null && "ok" in named) return named;
   const issuedTs = Date.now();
+  const deviations = deviationsFor(deviationCall(execution, facts.facts));
   // Earliest of every authority's own expiry. ponytail: no parent record is in reach in-process; P2-25 clamps to it.
   const expiresTs = Math.min(issuedTs + DEFAULT_RECORD_TTL_MS, lease?.payload.expiresTs ?? Infinity,
-    ...approvals.map(approval => Date.parse(approval.expiresAt)));
+    ...approvals.map(approval => Date.parse(approval.expiresAt)), ...deviations.exceptions.map(exception => Date.parse(exception.expiresAt)));
   if (expiresTs <= issuedTs) return failed("capability_expired", "authority expired before the call");
   const approverIds = [...new Set(approvals.flatMap(approval => approval.approverIds))].sort();
   const delegation = ctx.delegation ?? { depth: 0, parentExecutionId: null };
@@ -280,7 +316,7 @@ export function bindAuthorization(execution: ToolExecution, ctx: AuthorizationCo
       action: facts.facts.action,
       resource: facts.facts.resource,
       bindings: facts.facts.bindings,
-      authority: { approvals, exceptions: [] },
+      authority: { approvals, ...deviations },
       // Minted here, before dispatch, never taken from a caller (P1-04).
       idempotencyKey: mintIdempotencyKey(),
       evidenceRefs: [...(ctx.evidenceRefs ?? [])],
@@ -353,6 +389,7 @@ export function recheckAuthorization(record: AuthorizationRecordV1, execution: T
     if (canonicalize(record.resource) !== canonicalize(current.facts.resource)) add("purpose_violation");
   }
   for (const approval of record.authority.approvals) add(...recheckApproval(record, execution, approval));
+  add(...deviationFailures(record, execution));
   if (ctx.leaseToken !== undefined || record.delegation.leaseId !== null) {
     const lease = ctx.leaseToken === undefined ? failed("scope_widened", "the record names a lease the call does not carry")
       : checkLease(execution, ctx.leaseToken);

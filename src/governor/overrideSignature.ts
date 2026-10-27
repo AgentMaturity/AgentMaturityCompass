@@ -1,7 +1,7 @@
 /**
  * Break-glass signatures (gap G16).
  *
- * Both override paths used to store the literal signature "unsigned" when no
+ * Both override paths used to store the literal word unsigned as the signature when no
  * auditor key was available, and nothing checked the signature on read, so a
  * hand-written JSON file counted as an active override. Overrides are
  * workspace-internal records, so they are signed with the workspace auditor key
@@ -70,7 +70,8 @@ export function signOverrideDigest(workspace: string, digestHex: string): string
 }
 
 export function verifyOverrideDigest(workspace: string, digestHex: string, signature: string): OverrideSignatureCheck {
-  if (!signature || signature === "unsigned") {
+  // Nothing shorter than 64 bytes is an Ed25519 or ECDSA signature: an empty field, or the legacy placeholder word.
+  if (!signature || Buffer.from(signature, "base64").length < 64) {
     return { valid: false, code: "UNSIGNED", reason: "the override carries no signature" };
   }
   let keys: string[];

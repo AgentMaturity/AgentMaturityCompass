@@ -18,6 +18,7 @@ import { withControlFileLock } from "../lifecycle/controlFileLock.js";
 import { capturePurposePublication } from "../keys/purposePublication.js";
 import { assertKeysetComplete } from "../keys/keyset.js";
 import { getSigningKey } from "../keys/signingKeys.js";
+import { breakGlassAlerts } from "./breakGlass.js";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -304,12 +305,13 @@ export function isOverrideActive(workspace: string, agentId: string): boolean {
 }
 
 /**
- * Generate alerts for override states.
+ * Generate alerts for legacy override states and for signed break-glass records (P2-24): an overdue post-hoc review is
+ * `POSTMORTEM_OVERDUE`, and a break-glass file that does not verify is `INVALID_SIGNATURE`.
  */
 export function getOverrideAlerts(workspace: string, agentId: string): OverrideAlert[] {
   const now = Date.now();
   const all = loadAllOverrides(workspace).filter((o) => o.agentId === agentId);
-  const alerts: OverrideAlert[] = [];
+  const alerts: OverrideAlert[] = [...breakGlassAlerts(workspace, agentId, now)];
 
   for (const o of all) {
     const check = verifyOverrideEntry(workspace, o);

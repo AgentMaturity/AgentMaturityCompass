@@ -403,7 +403,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       if (opts.mcpConfig !== undefined && opts.approvalException !== undefined) {
         io.error("MCP tools require the actual signed approval gate; approval exceptions are not accepted."); io.fail(); return;
       }
-      const gate = approvalGateFor(io, opts);
+      const gate = approvalGateFor(io, opts, { workspace: process.cwd(), agentId });
       if (gate === null) return;
       if (opts.interactiveApprovals && gate === undefined) {
         io.error("--interactive-approvals requires --approve-tools to raise actual signed requests."); io.fail(); return;

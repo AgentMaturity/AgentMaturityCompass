@@ -111,9 +111,9 @@ export function recordProviderOutage(input: { readonly workspace: string; readon
     triggerId: input.outcomeEventId ?? input.sessionId });
 }
 
-/** One signed `WARN` incident per agent about its journaled actions. Returns the incident ids. */
+/** One signed `WARN` incident per agent about its journaled actions (or a break-glass request, P2-24). Returns the incident ids. */
 export function recordActionIncidents(workspace: string, agentIds: readonly string[],
-  text: { readonly title: string; readonly description: string; readonly triggerId: string }): string[] {
+  text: { readonly title: string; readonly description: string; readonly triggerId: string; readonly triggerType?: Incident["triggerType"] }): string[] {
   if (agentIds.length === 0) return [];
   const ledger = openLedger(workspace);
   try {
@@ -125,7 +125,7 @@ export function recordActionIncidents(workspace: string, agentIds: readonly stri
       // ASSURANCE_FAILURE is the nearest trigger the incident table accepts; the cause itself is named in the text.
       const partial: Omit<Incident, "incident_hash" | "signature"> = {
         incidentId: `incident_${randomUUID().replace(/-/g, "")}`, agentId, severity: "WARN", state: "OPEN",
-        title: text.title, description: text.description, triggerType: "ASSURANCE_FAILURE", triggerId: text.triggerId, rootCauseClaimIds: [],
+        title: text.title, description: text.description, triggerType: text.triggerType ?? "ASSURANCE_FAILURE", triggerId: text.triggerId, rootCauseClaimIds: [],
         affectedQuestionIds: [], causalEdges: [], timelineEventIds: [], createdTs: now, updatedTs: now, resolvedTs: null,
         postmortemRef: null, prev_incident_hash: store.getLastIncidentHash(agentId)
       };
