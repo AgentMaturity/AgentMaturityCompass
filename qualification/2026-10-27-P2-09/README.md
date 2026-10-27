@@ -38,7 +38,9 @@ New tests: `tests/wormExport.test.ts` (7, fake targets): unlocked target refused
 
 Mutation checks: skipping the HEAD mode check makes "refuses when HEAD reports governance mode" fail; skipping the object-lock configuration check makes "refuses a target without object lock before uploading anything" fail. Both restored.
 
-Interface deviation: the spec's `WormTarget` has no way to ask whether a bucket has object lock, so `lockConfiguration()` was added (S3 `GetObjectLockConfiguration`); `headObject` returns null for a missing object.
+Security review follow-up (09b, second commit): an object already present under our key was accepted on its lock alone. `headObject` now also returns the store's SHA-256 checksum (S3 HEAD with `ChecksumMode: ENABLED`) and version id; a present object must match our sha256, its lock and retain-until, and the recorded version id when known, or the export is refused (never overwritten). Regression test "refuses an object already present under our key whose content, lock or version is not ours (pre-planted object)" failed before the fix (the export resolved) and passes after; mutation: dropping the checksum comparison makes it fail again.
+
+Interface deviation: the spec's `WormTarget` has no way to ask whether a bucket has object lock, so `lockConfiguration()` was added (S3 `GetObjectLockConfiguration`); `headObject` returns null for a missing object and also reports the store's checksum and version id.
 
 ### Real object-lock bucket run: PENDING SID (not run, not faked)
 

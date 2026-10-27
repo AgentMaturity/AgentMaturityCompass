@@ -33,8 +33,11 @@ export interface WormTarget {
   /** Whether the bucket or container has object lock (immutability) enabled. P2-09 addition to the spec's interface. */
   lockConfiguration(): Promise<{ enabled: boolean }>;
   putObject(key: string, body: Buffer, opts: { retainUntil: Date; mode: "COMPLIANCE" }): Promise<{ versionId: string | null; etag: string }>;
-  /** null when the object does not exist. */
-  headObject(key: string): Promise<{ retainUntil: Date | null; mode: string | null } | null>;
+  /**
+   * null when the object does not exist. `sha256` is the store's own checksum of the stored bytes (S3: HEAD with
+   * ChecksumMode ENABLED), null when it cannot say; `versionId` is null where the store has no versions.
+   */
+  headObject(key: string): Promise<{ retainUntil: Date | null; mode: string | null; sha256: string | null; versionId: string | null } | null>;
 }
 
 const objectSchema = z.strictObject({
@@ -82,24 +85,32 @@ function readLocalState(workspace: string, kind: string): Record<string, { versi
   return pathExists(path) ? JSON.parse(readFileSync(path, "utf8")) as Record<string, { versionId: string | null; etag: string }> : {};
 }
 
-async function checkedHead(target: WormTarget, key: string, retainUntil: Date): Promise<"locked" | "missing"> {
+/**
+ * HEAD-checks one object: compliance mode, a retain-until at least as late as requested, the store's checksum equal to
+ * our sha256 and, when we recorded one, the same version id. An object we did not write (pre-planted under our key, or
+ * replaced) is refused, never overwritten.
+ */
+async function checkedHead(target: WormTarget, key: string, expected: { sha256: string; versionId: string | null; retainUntil: Date }): Promise<"locked" | "missing"> {
   const head = await target.headObject(key);
   if (head === null) return "missing";
   if (head.mode !== "COMPLIANCE") throw new WormExportRefusedError(`${key} is held in ${head.mode ?? "no"} retention mode, not COMPLIANCE`);
-  if (head.retainUntil === null || head.retainUntil.getTime() < retainUntil.getTime()) {
-    throw new WormExportRefusedError(`${key} is retained until ${head.retainUntil?.toISOString() ?? "nothing"}, earlier than the requested ${retainUntil.toISOString()}`);
+  if (head.retainUntil === null || head.retainUntil.getTime() < expected.retainUntil.getTime()) {
+    throw new WormExportRefusedError(`${key} is retained until ${head.retainUntil?.toISOString() ?? "nothing"}, earlier than the requested ${expected.retainUntil.toISOString()}`);
+  }
+  if (head.sha256 !== expected.sha256) throw new WormExportRefusedError(`${key} content does not match (store checksum ${head.sha256 ?? "unavailable"}, expected ${expected.sha256})`);
+  if (expected.versionId !== null && head.versionId !== null && head.versionId !== expected.versionId) {
+    throw new WormExportRefusedError(`${key} is version ${head.versionId}, not the recorded ${expected.versionId}`);
   }
   return "locked";
 }
 
-/** Uploads one object unless the target already holds it under a sufficient lock; then HEAD-checks it either way. */
+/** Uploads one object unless the target already holds exactly it under a sufficient lock; then HEAD-checks it either way. */
 async function putLocked(target: WormTarget, workspace: string, body: Buffer, retainUntil: Date, receipt: Pick<WormExportReceipt, "uploaded" | "alreadyPresent">): Promise<WormObject> {
   const sha256 = sha256Hex(body), key = objectKey(sha256);
-  const known = readLocalState(workspace, target.kind)[sha256];
-  let stored = known ?? null;
-  if ((await checkedHead(target, key, retainUntil)) === "missing") {
+  let stored = readLocalState(workspace, target.kind)[sha256] ?? null;
+  if ((await checkedHead(target, key, { sha256, versionId: stored?.versionId ?? null, retainUntil })) === "missing") {
     stored = await target.putObject(key, body, { retainUntil, mode: "COMPLIANCE" });
-    if ((await checkedHead(target, key, retainUntil)) === "missing") throw new WormExportRefusedError(`${key} is not readable after upload`);
+    if ((await checkedHead(target, key, { sha256, versionId: stored.versionId, retainUntil })) === "missing") throw new WormExportRefusedError(`${key} is not readable after upload`);
     receipt.uploaded.push(key);
     const state = { ...readLocalState(workspace, target.kind), [sha256]: stored };
     ensureDir(join(workspace, ".amc", "archive", "worm"));

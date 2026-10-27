@@ -53,10 +53,13 @@ export function s3ObjectLockTarget(p: { bucket: string; prefix?: string; region?
     },
     async headObject(name) {
       try {
-        const answer = await send("HeadObject", { Key: key(name) });
+        const answer = await send("HeadObject", { Key: key(name), ChecksumMode: "ENABLED" });
         const until = answer.ObjectLockRetainUntilDate;
+        // A full-object SHA-256 checksum is base64; a multipart composite ("…-N") is not comparable and counts as none.
+        const checksum = typeof answer.ChecksumSHA256 === "string" && !answer.ChecksumSHA256.includes("-") ? Buffer.from(answer.ChecksumSHA256, "base64").toString("hex") : null;
         return { mode: typeof answer.ObjectLockMode === "string" ? answer.ObjectLockMode : null,
-          retainUntil: until instanceof Date ? until : typeof until === "string" ? new Date(until) : null };
+          retainUntil: until instanceof Date ? until : typeof until === "string" ? new Date(until) : null,
+          sha256: checksum, versionId: typeof answer.VersionId === "string" ? answer.VersionId : null };
       } catch (error) {
         if (isNotFound(error)) return null;
         throw error;
@@ -89,7 +92,7 @@ export function filesystemTestTarget(root: string, opts: { lock?: boolean; mode?
     async headObject(name) {
       if (!existsSync(meta(name))) return null;
       const stored = JSON.parse(readFileSync(meta(name), "utf8")) as { mode: string; retainUntil: string };
-      return { mode: stored.mode, retainUntil: new Date(stored.retainUntil) };
+      return { mode: stored.mode, retainUntil: new Date(stored.retainUntil), sha256: sha256Hex(readFileSync(join(root, name))), versionId: null };
     }
   };
 }

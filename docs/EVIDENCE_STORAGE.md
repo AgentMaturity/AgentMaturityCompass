@@ -49,6 +49,7 @@ amc evidence-stores worm-verify --index <downloaded index object> --objects <dow
 
 - Every segment, its manifest and its signature are uploaded as content-addressed objects (`objects/<sha256>`) with `ObjectLockMode: COMPLIANCE`, a retain-until date, a SHA-256 checksum and `If-None-Match: *`. Then a signed `worm-export-index.json` names each object's key, sha256, retain-until and version id.
 - A bucket without Object Lock is refused before any upload. Every object is HEAD-checked after upload; anything not in compliance mode, or retained for less than requested, is refused.
+- An object already at our key is accepted only if HEAD (with `ChecksumMode: ENABLED`) shows compliance mode, a retain-until at least as late as requested, a SHA-256 checksum equal to ours and, where one was recorded, the same version id. Anything else (for example an object planted under our key) refuses the export; it is never overwritten.
 - Nothing is deleted and no retention is shortened. Re-running the export uploads only objects the bucket does not already hold.
 - Offline verification needs the downloaded objects and a signed trust list that pins the workspace's artifact-seal key: a key carried in the export never vouches for itself. It checks every object's sha256, every manifest signature, and the event-hash chain inside and across segments (keyless, as for encrypted rows).
 - Compliance-mode locks cannot be shortened or removed, even by the account owner. Test with a dedicated bucket and a short retention.

@@ -119,15 +119,18 @@ describe("WORM export (P2-09b)", () => {
   });
 
   it("drives S3 Object Lock with compliance mode, a SHA-256 checksum and no overwrite", async () => {
-    const objects = new Map<string, { mode: string; until: Date }>();
+    const objects = new Map<string, { mode: string; until: Date; checksum: string }>();
     const calls: Array<[string, Record<string, unknown>]> = [];
     const call: S3Call = async (operation, input) => {
       calls.push([operation, input]);
       if (operation === "GetObjectLockConfiguration") return { ObjectLockConfiguration: { ObjectLockEnabled: "Enabled" } };
-      if (operation === "PutObject") { objects.set(String(input.Key), { mode: String(input.ObjectLockMode), until: input.ObjectLockRetainUntilDate as Date }); return { VersionId: "v1", ETag: "\"e\"" }; }
+      if (operation === "PutObject") {
+        objects.set(String(input.Key), { mode: String(input.ObjectLockMode), until: input.ObjectLockRetainUntilDate as Date, checksum: String(input.ChecksumSHA256) });
+        return { VersionId: "v1", ETag: "\"e\"" };
+      }
       const found = objects.get(String(input.Key));
       if (!found) throw Object.assign(new Error("not found"), { name: "NotFound" });
-      return { ObjectLockMode: found.mode, ObjectLockRetainUntilDate: found.until };
+      return { ObjectLockMode: found.mode, ObjectLockRetainUntilDate: found.until, VersionId: "v1", ...(input.ChecksumMode === "ENABLED" ? { ChecksumSHA256: found.checksum } : {}) };
     };
     const receipt = await exportRetentionSegments({ workspace, target: s3ObjectLockTarget({ bucket: "amc-worm", prefix: "ws/", call }), retainUntil });
     const puts = calls.filter(([operation]) => operation === "PutObject").map(([, input]) => input);
@@ -135,8 +138,38 @@ describe("WORM export (P2-09b)", () => {
     expect(puts.every((input) => input.Bucket === "amc-worm" && String(input.Key).startsWith("ws/objects/") && input.ObjectLockMode === "COMPLIANCE"
       && input.IfNoneMatch === "*" && typeof input.ChecksumSHA256 === "string")).toBe(true);
     expect(receipt.uploaded).toHaveLength(7);
+    expect(calls.filter(([operation]) => operation === "HeadObject").every(([, input]) => input.ChecksumMode === "ENABLED")).toBe(true);
     expect(existsSync(receipt.localIndexPath)).toBe(true);
     await expect(exportRetentionSegments({ workspace, target: s3ObjectLockTarget({ bucket: "amc-worm", call: async () => ({}) }), retainUntil }))
       .rejects.toThrow(/no object lock/);
+  });
+
+  it("refuses an object already present under our key whose content, lock or version is not ours (pre-planted object)", async () => {
+    type Stored = { body: Buffer; mode: string; until: Date; version: string };
+    const objects = new Map<string, Stored>();
+    const call: S3Call = async (operation, input) => {
+      if (operation === "GetObjectLockConfiguration") return { ObjectLockConfiguration: { ObjectLockEnabled: "Enabled" } };
+      if (operation === "PutObject") {
+        objects.set(String(input.Key), { body: input.Body as Buffer, mode: String(input.ObjectLockMode), until: input.ObjectLockRetainUntilDate as Date, version: `v${objects.size + 1}` });
+        return { VersionId: `v${objects.size}`, ETag: "\"e\"" };
+      }
+      const found = objects.get(String(input.Key));
+      if (!found) throw Object.assign(new Error("not found"), { name: "NotFound" });
+      return { ObjectLockMode: found.mode, ObjectLockRetainUntilDate: found.until, VersionId: found.version,
+        ...(input.ChecksumMode === "ENABLED" ? { ChecksumSHA256: Buffer.from(sha256Hex(found.body), "hex").toString("base64") } : {}) };
+    };
+    // Plant attacker bytes, under a sufficient lock, at the key our first segment will use.
+    const { listRetentionSegments } = await import("../src/ops/retention/retentionArchive.js");
+    const first = readFileSync(listRetentionSegments(workspace)[0]!.segmentPath);
+    objects.set(`objects/${sha256Hex(first)}`, { body: Buffer.from("planted"), mode: "COMPLIANCE", until: new Date(Date.now() + 3650 * DAY), version: "planted" });
+    await expect(exportRetentionSegments({ workspace, target: s3ObjectLockTarget({ bucket: "b", call }), retainUntil }))
+      .rejects.toThrow(/content does not match/);
+    // A genuine re-export whose recorded version id differs from the one the bucket reports is refused too.
+    objects.clear();
+    await exportRetentionSegments({ workspace, target: s3ObjectLockTarget({ bucket: "b", call }), retainUntil });
+    const [key, stored] = [...objects.entries()][0]!;
+    objects.set(key, { ...stored, version: "replaced" });
+    await expect(exportRetentionSegments({ workspace, target: s3ObjectLockTarget({ bucket: "b", call }), retainUntil }))
+      .rejects.toThrow(/version replaced, not the recorded/);
   });
 });
