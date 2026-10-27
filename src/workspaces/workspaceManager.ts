@@ -156,7 +156,10 @@ export class WorkspaceManager {
         }
       })();
       const valuePolicySig = verifyValuePolicySignature(dir);
-      if (!valuePolicySig.valid) {
+      // Health reads no longer initialize the value policy (P2-08). A never-initialized pair (body and sidecar both
+      // absent) gets the signed default on first value use, as this read used to create; any other invalid pair still fails.
+      const valuePolicyUninitialized = valuePolicySig.reason === "file missing" && !valuePolicySig.signatureExists;
+      if (!valuePolicySig.valid && !valuePolicyUninitialized) {
         if (!valuePolicy || valuePolicy.valuePolicy.enforceSignedInputs) {
           reasons.push(`value policy invalid: ${valuePolicySig.reason ?? "signature verification failed"}`);
         }

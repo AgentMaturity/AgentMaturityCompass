@@ -280,6 +280,7 @@ const m = vi.hoisted(() => ({
   freezeStatusCli: vi.fn(() => ({ active: true, incidentIds: ["inc-1"], actionClasses: ["WRITE"] })),
   freezeLiftCli: vi.fn(() => ({ incidentId: "inc-1" })),
   initAlertsConfig: vi.fn(() => ({ configPath: "alerts.yaml" })),
+  initAlertsConfigAsync: vi.fn(async () => ({ configPath: "alerts.yaml" })),
   verifyAlertsConfigSignature: vi.fn(() => ({ valid: true })),
   sendTestAlert: vi.fn(async () => undefined),
 
@@ -710,6 +711,7 @@ vi.mock("../src/drift/driftCli.js", () => ({
 vi.mock("../src/drift/driftDetector.js", () => ({ lastDriftCheckSummary: m.lastDriftCheckSummary }));
 vi.mock("../src/drift/alerts.js", () => ({
   initAlertsConfig: m.initAlertsConfig,
+  initAlertsConfigAsync: m.initAlertsConfigAsync,
   verifyAlertsConfigSignature: m.verifyAlertsConfigSignature,
   sendTestAlert: m.sendTestAlert
 }));
@@ -743,7 +745,11 @@ vi.mock("../src/gateway/config.js", () => ({
   saveGatewayConfig: m.saveGatewayConfig,
   signGatewayConfig: m.signGatewayConfig,
   bindAgentRoute: m.bindAgentRoute,
-  verifyGatewayConfigSignature: m.verifyGatewayConfigSignature
+  verifyGatewayConfigSignature: m.verifyGatewayConfigSignature,
+  // P2-08 provider-backed publication exports; the unauthenticated legacy route keeps the sync path.
+  defaultGatewayConfig: vi.fn(),
+  gatewayConfigSchema: { parse: vi.fn() },
+  prepareGatewayConfigPair: vi.fn()
 }));
 vi.mock("../src/providers/providerTemplates.js", () => ({ listProviderTemplates: m.listProviderTemplates }));
 
