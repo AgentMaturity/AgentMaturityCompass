@@ -8,7 +8,7 @@ import { captureIntegrationPendingRows, listIntegrationDeliveriesNeedingFinaliza
   type IntegrationQueueRow, type IntegrationQueueDeliveryStatus } from "./integrationDeliveryQueue.js";
 import type { IntegrationEventInput } from "./integrationDispatcher.js";
 
-export type IntegrationBatchEvent = Omit<IntegrationEventInput, "workspace">;
+type IntegrationBatchEvent = Omit<IntegrationEventInput, "workspace">;
 export interface IntegrationBatchInput { workspace: string; events: IntegrationBatchEvent[] }
 
 /** Fixed integration batch context. No actor or authority is read from an event body or chosen after an await. */

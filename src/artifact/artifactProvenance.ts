@@ -24,7 +24,6 @@ import { distrustAt } from "../trust/admissionRule.js";
 import { normalizePathForManifest, mediaTypeFromFile, defaultManifestPath, defaultSignaturePath, computePromptDigest, normalizeEvidenceRefs,
   buildChain, validateChain, buildC2paSection, recordArtifactEvidence, captureProvenanceFile, assertProvenanceFile, assertDistinctProvenanceFiles,
   withProvenanceFiles, assertSelectedProvenanceEvidence, ArtifactProvenancePublicationError } from "./artifactProvenanceSupport.js";
-export { ArtifactProvenancePublicationError } from "./artifactProvenanceSupport.js";
 
 const hexDigestSchema = z.string().regex(/^[a-f0-9]{64}$/);
 const provenanceNodeSchema = z.enum(["artifact", "agent", "model", "prompt", "evidence"]);

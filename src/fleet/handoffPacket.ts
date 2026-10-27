@@ -154,11 +154,11 @@ function handoffReceiptDir(workspace: string): string {
   return join(handoffDir(workspace), "receipts");
 }
 
-export function handoffReceiverReceiptPath(workspace: string, packetId: string): string {
+function handoffReceiverReceiptPath(workspace: string, packetId: string): string {
   return join(handoffReceiptDir(workspace), `${packetId}.receiver.json`);
 }
 
-export function handoffUnresolvedDependencyPath(workspace: string, packetId: string): string {
+function handoffUnresolvedDependencyPath(workspace: string, packetId: string): string {
   return join(handoffReceiptDir(workspace), `${packetId}.unresolved.json`);
 }
 
@@ -252,7 +252,7 @@ export function assertHandoffFilesCurrent(files: readonly HandoffFile[]): void {
 function withHandoffPublicationLock<T>(workspace: string, operation: () => T): T {
   return withControlFileLock({ root: fleetRoot(workspace), name: "handoff-publication", operation });
 }
-export class HandoffPublicationError extends Error {
+class HandoffPublicationError extends Error {
   readonly code = "HANDOFF_PUBLICATION_PARTIAL" as const;
   readonly attemptedMemberMayExist = true;
   constructor(readonly phase: "packet" | "packet-cleanup" | "receiver-receipt" | "unresolved-log", readonly published: readonly string[], cause: unknown) {

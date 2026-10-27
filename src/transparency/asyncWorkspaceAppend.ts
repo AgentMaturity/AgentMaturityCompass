@@ -151,7 +151,7 @@ export interface TransparencyAppendAttempt {
   assertCurrent(): void;
 }
 /** Setup or append is incomplete without exact line acknowledgment. No committed-entry claim is made. */
-export class TransparencyAppendPublicationError extends Error {
+class TransparencyAppendPublicationError extends Error {
   readonly code = "TRANSPARENCY_APPEND_INCOMPLETE";
   constructor(readonly candidateEntry: TransparencyEntry, readonly progress: TransparencyAppendProgress, cause: unknown) {
     super("transparency append did not complete; inspect native-return and acknowledgment progress before retrying", { cause });

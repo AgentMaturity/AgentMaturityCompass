@@ -107,28 +107,6 @@ function writeAudit(workspace: string, auditType: string, payload: Record<string
   assertAuditCurrent?.();
 }
 
-export function blobKeyInitCli(workspace: string): { keyVersion: number } {
-  const key = ensureBlobKey(workspace);
-  writeAudit(workspace, "BLOB_KEY_ROTATED", {
-    keyVersion: key.keyVersion,
-    initialized: true
-  });
-  return { keyVersion: key.keyVersion };
-}
-
-export function blobKeyRotateCli(workspace: string): { fromVersion: number; toVersion: number } {
-  const before = ensureBlobKey(workspace);
-  const after = rotateBlobKey(workspace);
-  writeAudit(workspace, "BLOB_KEY_ROTATED", {
-    fromVersion: before.keyVersion,
-    toVersion: after.keyVersion
-  });
-  return {
-    fromVersion: before.keyVersion,
-    toVersion: after.keyVersion
-  };
-}
-
 export function blobsVerifyCli(workspace: string): { ok: boolean; errors: string[]; checkedBlobRefs: number; checkedRows: number } {
   return verifyBlobStore(workspace, { decrypt: true, verifyLedgerReferences: true });
 }
@@ -155,7 +133,7 @@ function blobReencryptSnapshot(progress: BlobReencryptProgress) {
       returnedMembers: Object.freeze([...progress.initialization.returnedMembers]), acknowledgedMembers: Object.freeze([...progress.initialization.acknowledgedMembers]) }) });
 }
 /** Actual returned writes and lower typed causes are retained; this is not a batch transaction or a no-effects claim. */
-export class BlobReencryptIncompleteError extends Error {
+class BlobReencryptIncompleteError extends Error {
   readonly code = "BLOB_REENCRYPT_INCOMPLETE";
   constructor(readonly workspace: string, readonly fromVersion: number, readonly toVersion: number,
     readonly progress: ReturnType<typeof blobReencryptSnapshot>, cause: unknown) {
@@ -220,7 +198,7 @@ function rewriteBlobBatch(workspace: string, params: { fromVersion: number; toVe
   return { processed, skipped };
 }
 
-export function blobsReencryptCli(workspace: string, params: { fromVersion: number; toVersion: number; limit: number }): {
+function blobsReencryptCli(workspace: string, params: { fromVersion: number; toVersion: number; limit: number }): {
   processed: number;
   skipped: number;
 } {
@@ -358,7 +336,7 @@ export function blobsIndexVerifyCli(workspace: string): { ok: boolean; errors: s
 
 
 /** Metadata may already be committed when the unchanged local audit suffix refuses or throws. */
-export class BlobKeyAuditIncompleteError extends Error {
+class BlobKeyAuditIncompleteError extends Error {
   readonly code = "BLOB_KEY_AUDIT_PARTIAL";
   constructor(readonly keyVersions: readonly number[], readonly metadataProgress: Readonly<BlobKeyPublicationProgress> | null,
     readonly auditAttempted: boolean, readonly auditReturned: boolean, cause: unknown) {

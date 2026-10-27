@@ -20,7 +20,7 @@ export class ControlMutationAuthorityError extends Error {
 type OwnedKind = "guardrail-control" | "runtime-firewall-policy";
 type Phase = "pending" | "entry" | "genesis-pin-or-checkpoint" | "checkpoint" | "pending-cleanup";
 
-export class ControlJournalPublicationError extends Error {
+class ControlJournalPublicationError extends Error {
   readonly code = "PUBLICATION" as const;
   constructor(readonly controlKind: OwnedKind, readonly revision: number, readonly phase: Phase,
     readonly pendingPath: string, options: { cause: unknown }) {

@@ -12,23 +12,6 @@ import { captureVaultPurposeContinuity, vaultStatus } from "../vault/vault.js";
 
 type EmitOrgEvent = (type: OrgSseEvent["type"], nodeIds?: string[]) => void;
 
-/** Retained synchronous compatibility recipe; no maintained Studio caller uses this legacy helper. */
-export function recomputeStudioOrgLegacy(workspace: string, type: OrgSseEvent["type"], nodeIds: string[] | undefined,
-  emitOrgEvent: EmitOrgEvent): void {
-  try {
-    recomputeAndPersistOrgScorecard({
-      workspace,
-      window: "14d"
-    });
-  } catch {
-    // Do not fail primary workflow if org scorecard recompute fails.
-  }
-  emitOrgEvent(type, nodeIds);
-  if (type !== "ORG_SCORECARD_UPDATED") {
-    emitOrgEvent("ORG_SCORECARD_UPDATED", nodeIds);
-  }
-}
-
 /** Original public authority plus conditional already-cached file-purpose continuity; no private warming or reopening.
  * Authenticated readers may advance high-water state and TTL may evict sessions before the first actor.
  * Managed cache replacements/locks refuse this optional attempt; restored transient live mutations are not observed.

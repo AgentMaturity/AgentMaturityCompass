@@ -96,7 +96,7 @@ function blobDir(workspace: string): string {
   return join(workspace, ".amc", "blobs");
 }
 
-export { canonicalMetadataForHash, sanitizeMetaForHash } from "./eventHash.js";
+export { canonicalMetadataForHash } from "./eventHash.js";
 
 export function targetsDir(workspace: string): string {
   return join(workspace, ".amc", "targets");
@@ -1233,8 +1233,7 @@ export class Ledger {
 export {
   verifyLedgerIntegrity,
   verifyEvidenceEventIntegrity,
-  type VerifyResult,
-  type LedgerVerifyOptions
+  type VerifyResult
 } from "./ledgerVerification.js";
 
 /** `store: "unsigned"` opens the AMC_NO_SIGN=1 store instead of `.amc/evidence.sqlite`, and is refused without it. */

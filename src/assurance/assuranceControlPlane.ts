@@ -631,7 +631,7 @@ export async function assurancePolicyForApiAsync(workspace: string, options: Org
   const cold = captureAssurancePolicyInitialization(workspace, { ...options, assertInputsCurrent: () => { options.assertInputsCurrent?.(); assertOrgPairsCurrent(selected.snapshot); } }); await cold.initialize(); cold.assertCurrent();
   const own = captureAssurancePolicy(workspace); cold.assertCurrent(); return { policy: own.parsePolicy()!, signature: own.signature };
 }
-export class AssurancePolicyPublicationError extends Error {
+class AssurancePolicyPublicationError extends Error {
   readonly code = "ASSURANCE_POLICY_INCOMPLETE";
   constructor(readonly completedStages: readonly string[], readonly attemptedStage: string, readonly transparency: unknown, cause: unknown) {
     super("assurance policy publication did not complete; pair and transparency effects may remain", { cause }); this.name = "AssurancePolicyPublicationError";

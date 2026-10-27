@@ -301,7 +301,7 @@ function captureLeaseChangeAuthority(workspace: string) {
   } };
 }
 
-export interface LeaseRevocationProgress {
+interface LeaseRevocationProgress {
   readonly firstLockAttempted: boolean; readonly firstLockEntered: boolean; readonly firstLockReturned: boolean;
   readonly secondLockAttempted: boolean; readonly secondLockEntered: boolean; readonly secondLockReturned: boolean;
   readonly publicationAttempted: boolean; readonly publicationReturned: boolean; readonly publicationAcknowledged: boolean;
@@ -309,7 +309,7 @@ export interface LeaseRevocationProgress {
   readonly legacyRemoveAttempted: boolean; readonly legacyRemoveReturned: boolean; readonly legacyRemoveAcknowledged: boolean;
   readonly complete: boolean;
 }
-export class LeaseRevocationPublicationError extends Error {
+class LeaseRevocationPublicationError extends Error {
   constructor(readonly progress: Readonly<LeaseRevocationProgress>, readonly hasPrimaryCause: boolean,
     readonly primaryCause: unknown, cause: unknown) {
     super("lease revocation publication did not complete; inspect actual progress before retrying", { cause });

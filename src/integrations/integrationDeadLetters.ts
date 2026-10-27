@@ -24,10 +24,6 @@ function sanitizeDeadLetterEntry(entry: IntegrationDeadLetterEntry): Integration
     reason: normalizeWebhookDeliveryError(entry.reason)
   };
 }
-
-export function appendIntegrationDeadLetter(workspace: string, entry: IntegrationDeadLetterEntry): string {
-  return withIntegrationJournalProtocol(workspace, journal => appendIntegrationDeadLetterInJournal(journal, workspace, entry));
-}
 /** Normalize, dedupe and append under the same active file-lock scope. */
 export function appendIntegrationDeadLetterInJournal(io: IntegrationJournalIo, workspace: string, entry: IntegrationDeadLetterEntry): string {
   if (io.workspace !== workspace) throw new Error("integration journal scope belongs to another workspace");

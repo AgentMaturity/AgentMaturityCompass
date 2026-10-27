@@ -10,7 +10,7 @@ import type { MintReceiptInput } from "./receipt.js";
 
 export const RECEIPT_TRANSPORT_TAG = "amc-receipt-delegated-v1";
 const proofSchema = z.strictObject({ version: z.literal(1), authority: z.unknown(), issuerPublicKeyPem: z.string().min(1).max(4096) });
-export const receiptChildSigningBytes = (sha256: string, payload: Buffer) => {
+const receiptChildSigningBytes = (sha256: string, payload: Buffer) => {
   if (!/^[0-9a-f]{64}$/.test(sha256)) throw new Error("receipt authority digest invalid");
   return Buffer.concat([Buffer.from("AMC_LEDGER_RECEIPT_V1\0", "ascii"), Buffer.from(sha256, "hex"), payload]);
 };

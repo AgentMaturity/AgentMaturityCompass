@@ -39,7 +39,7 @@ export function freezeFixture() {
     liftPath: (id: string) => join(dir, id + ".lift.json"), unlock() { vi.stubEnv("AMC_VAULT_PASSPHRASE", FREEZE_PASS); unlockVault(workspace, FREEZE_PASS); } };
 }
 export type FreezeFixture = ReturnType<typeof freezeFixture>;
-export function freezeDeferred() { let resolve!: () => void; const promise = new Promise<void>(done => { resolve = done; }); return { promise, resolve }; }
+function freezeDeferred() { let resolve!: () => void; const promise = new Promise<void>(done => { resolve = done; }); return { promise, resolve }; }
 export function pauseFreezeSign(f: FreezeFixture) {
   const entered = freezeDeferred(), release = freezeDeferred(), actual = f.provider.sign.bind(f.provider);
   const spy = vi.spyOn(f.provider, "sign").mockImplementationOnce(async (ref, bytes) => {

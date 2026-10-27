@@ -326,10 +326,6 @@ export function mechanicPlanRequestApprovalCli(params: {
   return mechanicPlanRequestApprovalForApi(params);
 }
 
-export async function mechanicPlanRequestApprovalCliAsync(params: Parameters<typeof mechanicPlanRequestApprovalCli>[0]) {
-  return mechanicPlanRequestApprovalForApiAsync({ ...params });
-}
-
 export async function mechanicPlanExecuteCli(params: {
   workspace: string;
   planId: string;

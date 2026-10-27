@@ -16,7 +16,7 @@ import { assertPolicySignerCurrent, describePolicySigner } from "../crypto/signi
 import { KeyProviderError } from "../keys/provider.js";
 import { KeyRevokedError } from "../keys/keyRevocations.js";
 
-export class AssuranceSchedulerPublicationError extends Error {
+class AssuranceSchedulerPublicationError extends Error {
   readonly code = "ASSURANCE_SCHEDULER_INCOMPLETE";
   constructor(readonly completedStages: readonly string[], readonly attemptedStage: string, readonly runId: string | null, readonly certificateFailure: unknown, cause: unknown) {
     super("assurance scheduler did not complete; earlier run/certificate/state effects may remain", { cause }); this.name = "AssuranceSchedulerPublicationError";

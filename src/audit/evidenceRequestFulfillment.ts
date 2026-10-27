@@ -20,7 +20,7 @@ export interface AuditFulfillmentProgress {
   consumption: ReturnType<typeof consumeApprovedExecution> | null;
   pendingRemoveAttempted: boolean; pendingRemoveReturned: boolean; pendingRemoveAcknowledged: boolean;
 }
-export class AuditEvidenceFulfillmentError extends AuditBinderExecutionError {
+class AuditEvidenceFulfillmentError extends AuditBinderExecutionError {
   constructor(readonly progress: Readonly<AuditFulfillmentProgress>, binder: AuditBinderArtifactAttempt | null, cause: unknown) {
     super(progress.phase, binder === null ? null : { outFile: binder.result.outFile, sha256: binder.result.sha256 },
       progress.consumption?.consumed ?? null, progress.pendingRemoveAcknowledged, cause); this.name = "AuditEvidenceFulfillmentError";

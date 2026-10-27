@@ -668,6 +668,3 @@ export async function buildCgxGraphRunAsync(input: { workspace: string; scope: C
     return { result: { graph, saved, transparencyHash: entry.hash }, assertCurrent: prepared.assertCurrent };
   } catch (error) { throw new CgxOutputsPartialError([saved.latestPath, saved.latestSigPath, saved.snapshotPath, saved.snapshotSigPath], "graph-transparency", error); }
 }
-export async function buildCgxGraphAsync(params: Parameters<typeof buildCgxGraphRunAsync>[0], options: OrgPairsOptions = {}) {
-  return (await buildCgxGraphRunAsync(params, options)).result;
-}

@@ -40,20 +40,6 @@ export function prepareReceipt(workspace: string, receipt: MigrationReceipt): { 
   return { path, json };
 }
 
-/** The receipt's bytes, its path and its signature. Call before anything is written: a failed signature stops the run. */
-export function signReceipt(workspace: string, receipt: MigrationReceipt, sign: (digestHex: string) => SignedDigest):
-  { path: string; json: string; signed: SignedDigest } {
-  const out = prepareReceipt(workspace, receipt);
-  return { ...out, signed: sign(sha256Hex(out.json)) };
-}
-
-/** Signature first, as the repair receipt does, so a receipt on disk always has its signature beside it. Never overwrites. */
-export function writeReceipt(workspace: string, out: { path: string; json: string; signed: SignedDigest }): void {
-  mkdirSync(join(workspace, RECEIPTS_DIR), { recursive: true });
-  writeFileSync(join(workspace, `${out.path}.sig`), `${JSON.stringify(out.signed, null, 2)}\n`, { flag: "wx" });
-  writeFileSync(join(workspace, out.path), out.json, { flag: "wx" });
-}
-
 /** Receipt file names, oldest first (names are UTC timestamps). */
 export function receiptNames(workspace: string): string[] {
   const dir = join(workspace, RECEIPTS_DIR);

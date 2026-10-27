@@ -56,7 +56,7 @@ export function captureMerkleProducerSigner(workspace: string) {
   } };
 }
 
-export class MerkleProducerPublicationError extends Error {
+class MerkleProducerPublicationError extends Error {
   readonly code = "MERKLE_PRODUCER_INCOMPLETE";
   constructor(readonly progress: TransparencyAppendProgress, readonly migrationDigest: string | null, cause: unknown,
     readonly entryHash: string | null = null, readonly priorCoverAcknowledged = false) {

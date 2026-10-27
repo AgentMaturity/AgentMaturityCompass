@@ -5,7 +5,7 @@ import { canonicalize } from "../utils/json.js";
 import { A4_STAGE_STATES, a4GatePolicyV1Schema, type A4Principal, type A4ProjectRow, type A4TransitionKind } from "./a4Schema.js";
 import { A4StoreError } from "./a4Store.js";
 
-export type A4StageState = (typeof A4_STAGE_STATES)[number];
+type A4StageState = (typeof A4_STAGE_STATES)[number];
 export type A4Actor = Pick<A4Principal, "key" | "username">;
 export type Cell = string | number | null;
 /** The append-only tables a transition may insert into, with their key columns. */
@@ -21,7 +21,7 @@ const HEAD_COLUMNS = ["stage", "step", "hold", "hold_reason", "revision_no", "de
 export type A4HeadState = Pick<A4ProjectRow, (typeof HEAD_COLUMNS)[number]>;
 /** The state a new project's head row is inserted with. */
 export const NEW_HEAD: A4HeadState = { stage: "aspire", step: "asked", hold: 0, hold_reason: null, revision_no: 0, deployed_release_id: null, base_release_id: null };
-export const headStateOf = (row: A4HeadState): A4HeadState => Object.fromEntries(HEAD_COLUMNS.map((column) => [column, row[column]])) as A4HeadState;
+const headStateOf = (row: A4HeadState): A4HeadState => Object.fromEntries(HEAD_COLUMNS.map((column) => [column, row[column]])) as A4HeadState;
 /** Which head columns differ from the state the last signed body left. */
 export const headProblems = (head: A4ProjectRow, body: Record<string, unknown>): string[] => {
   const after = (body.headAfter ?? {}) as Record<string, unknown>;

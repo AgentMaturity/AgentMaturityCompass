@@ -36,7 +36,7 @@ const authSchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("none") })
 ]);
 
-export const fleetSchema = z.object({
+const fleetSchema = z.object({
   orgName: z.string().min(1),
   globalPolicies: z.object({
     privacy: z.string().min(1),
@@ -50,7 +50,7 @@ export const fleetSchema = z.object({
 
 export type FleetConfig = z.infer<typeof fleetSchema>;
 
-export const fleetEnvironmentSchema = z.enum(["development", "staging", "production"]);
+const fleetEnvironmentSchema = z.enum(["development", "staging", "production"]);
 export type FleetEnvironment = z.infer<typeof fleetEnvironmentSchema>;
 
 export const agentConfigSchema = z.object({
@@ -271,14 +271,6 @@ export function saveAgentConfig(workspace: string, config: AgentConfig): {
     configPath: paths.agentConfig,
     sigPath
   };
-}
-
-export async function saveAgentConfigAsync(workspace: string, config: AgentConfig): Promise<{ configPath: string; sigPath: string }> {
-  const copied = structuredClone(config), paths = getAgentPaths(workspace, copied.id);
-  const prepared = await captureRawConfigPairForAsync(workspace, paths.agentConfig, Buffer.from(YAML.stringify(copied)), {
-    beforePublish() { if (getAgentPaths(workspace, copied.id).agentConfig !== paths.agentConfig) throw new Error("agent config selection changed while signing"); }
-  }).prepare();
-  const result = prepared.publish(); return { configPath: result.path, sigPath: result.sigPath };
 }
 
 export function updateAgentProvider(
@@ -601,7 +593,7 @@ export function ensureDefaultFleetAgent(workspace: string): void {
   }
 }
 
-export function mandatoryTrustTierForLevel5(workspace: string): TrustTier {
+function mandatoryTrustTierForLevel5(workspace: string): TrustTier {
   try {
     return loadFleetConfig(workspace).mandatoryTrustTierForLevel5;
   } catch {

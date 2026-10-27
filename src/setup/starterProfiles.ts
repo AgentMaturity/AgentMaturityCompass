@@ -142,7 +142,7 @@ export function applyStarterProfile(workspace: string, kind: StarterProfileKind,
   };
 }
 
-export class StarterProfilePublicationError extends Error {
+class StarterProfilePublicationError extends Error {
   readonly code = "STARTER_PROFILE_INCOMPLETE";
   constructor(readonly completedPhases: readonly string[], readonly phase: string, cause: unknown) {
     super("starter profile did not complete; successful earlier phases remain and the failed phase may be partial", { cause });
@@ -150,7 +150,7 @@ export class StarterProfilePublicationError extends Error {
   }
 }
 /** Maintained starter counterpart. Existing sync policy/approval/control-plan producers keep their own contracts. */
-export async function applyStarterProfileAsync(workspace: string, kind: StarterProfileKind, owner: StarterOwner, options: OrgPairsOptions = {}): Promise<StarterProfileReport> {
+async function applyStarterProfileAsync(workspace: string, kind: StarterProfileKind, owner: StarterOwner, options: OrgPairsOptions = {}): Promise<StarterProfileReport> {
   const selectedOwner = { username: owner.username, password: owner.password }, caller = options.beforePublish, inputs = options.assertInputsCurrent;
   const original = captureOrgPairsAuthority(workspace, () => { caller?.(); assertOwnerMode(workspace, "init"); });
   const completed: string[] = []; let phase = "users-precondition";

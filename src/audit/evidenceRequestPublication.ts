@@ -20,13 +20,13 @@ export interface CreateEvidenceRequestInput {
   requestedItems: EvidenceRequest["requestedItems"]; requesterUserIdHash: string;
 }
 interface ReturnedMember { operation: "replace" | "rename"; path: string; source?: string }
-export interface EvidenceRequestPublicationProgress {
+interface EvidenceRequestPublicationProgress {
   phase: string; returnedMembers: readonly Readonly<ReturnedMember>[]; acknowledgedSteps: readonly string[];
   attemptedPath: string | null; attemptedSource: string | null; publicationSetupAttempted: boolean;
   returnedDirectories: readonly string[]; attemptedDirectory: string | null; completedLogHashes: readonly string[];
   acknowledgedLogHash: string | null;
 }
-export class EvidenceRequestPublicationError extends AuditBinderPublicationError {
+class EvidenceRequestPublicationError extends AuditBinderPublicationError {
   constructor(readonly requestId: string, readonly progress: Readonly<EvidenceRequestPublicationProgress>, cause: unknown) {
     super(progress.phase, Object.freeze(progress.returnedMembers.map(row => row.path)), progress.completedLogHashes, cause, progress.attemptedPath);
     this.name = "EvidenceRequestPublicationError";

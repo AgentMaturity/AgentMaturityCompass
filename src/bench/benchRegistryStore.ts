@@ -43,27 +43,6 @@ export function benchRegistryCachePath(workspace: string, registryId: string): {
   };
 }
 
-export function cacheRegistryIndex(params: {
-  workspace: string;
-  registryId: string;
-  indexRaw: string;
-  sigRaw: string;
-  pubRaw: string;
-}): {
-  indexPath: string;
-  sigPath: string;
-  pubPath: string;
-} {
-  const paths = benchRegistryCachePath(params.workspace, params.registryId);
-  return withBenchImportLock(params.workspace, () => {
-    ensureDir(dirname(paths.indexPath));
-    writeFileAtomic(paths.indexPath, params.indexRaw, 0o644);
-    writeFileAtomic(paths.sigPath, params.sigRaw, 0o644);
-    writeFileAtomic(paths.pubPath, params.pubRaw, 0o644);
-    return paths;
-  });
-}
-
 export function importedBenchPath(workspace: string, benchId: string, version: string): {
   dir: string;
   artifactPath: string;
@@ -80,42 +59,6 @@ export function importedBenchPath(workspace: string, benchId: string, version: s
     metaPath: join(dir, "meta.json"),
     benchJsonPath: join(dir, "bench.json")
   };
-}
-
-export function storeImportedBench(params: {
-  workspace: string;
-  registryId: string;
-  registryFingerprint: string;
-  signerFingerprint: string;
-  sourceUrl: string;
-  version: string;
-  file: string;
-  trust: TrustContext;
-}): {
-  meta: ImportedBenchMeta;
-  artifactPath: string;
-  metaPath: string;
-} {
-  const verified = verifyBenchArtifactFile({ file: params.file, trust: params.trust });
-  if (!verified.ok || !verified.bench) {
-    throw new Error(`cannot store imported bench; verification failed: ${verified.errors.map((e) => e.message).join("; ")}`);
-  }
-  const bench = benchArtifactSchema.parse(verified.bench);
-  const target = importedBenchPath(params.workspace, bench.benchId, params.version);
-  return withBenchImportLock(params.workspace, () => {
-    ensureDir(target.dir);
-    copyFileSync(resolve(params.file), target.artifactPath);
-    const digest = sha256Hex(readFileSync(target.artifactPath));
-    writeFileAtomic(target.shaPath, `${digest}\n`, 0o644);
-    writeFileAtomic(target.benchJsonPath, JSON.stringify(bench, null, 2), 0o644);
-    const meta = buildImportedBenchMeta(params, bench, digest);
-    writeFileAtomic(target.metaPath, `${canonicalize(meta)}\n`, 0o644);
-    return {
-      meta,
-      artifactPath: target.artifactPath,
-      metaPath: target.metaPath
-    };
-  });
 }
 
 /** Existing metadata recipe shared by the actual cache importer; it does not admit or sign keys. */

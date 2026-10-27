@@ -80,7 +80,7 @@ const progressSnapshot = (progress: SuffixProgress) => Object.freeze({ ...progre
   completedStages: Object.freeze([...progress.completedStages]) });
 
 /** Genuine child errors remain the cause, including append lag/root-covered diagnostics and native cleanup failures. */
-export class BootstrapProviderSuffixError extends Error {
+class BootstrapProviderSuffixError extends Error {
   readonly code = "BOOTSTRAP_PROVIDER_SUFFIX_INCOMPLETE";
   constructor(readonly progress: ReturnType<typeof progressSnapshot>, readonly firstRefusal: ReturnType<ReturnType<typeof refusalLatch>["snapshot"]>,
     cause: unknown) {

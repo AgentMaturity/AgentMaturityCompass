@@ -22,7 +22,7 @@ import {
 
 const MAX_RETENTION_SEGMENT_DECOMPRESSED_BYTES = 256 * 1024 * 1024;
 
-export interface ArchivedEventProof {
+interface ArchivedEventProof {
   event: EvidenceEvent;
   segmentId: string;
   manifestSha256: string;

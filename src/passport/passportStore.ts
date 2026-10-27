@@ -241,5 +241,5 @@ export function listPassportExportFiles(workspace: string): string[] {
   return out.sort((a, b) => b.localeCompare(a));
 }
 
-export { savePassportPolicyAsync, loadPassportPolicyAsync, loadPassportPolicyAttemptAsync,
-  savePassportCacheAsync, preparePassportCacheAsync, preparePassportPolicyAsync } from "./passportPairPublication.js";
+export { savePassportPolicyAsync, loadPassportPolicyAsync,
+  savePassportCacheAsync, preparePassportCacheAsync } from "./passportPairPublication.js";

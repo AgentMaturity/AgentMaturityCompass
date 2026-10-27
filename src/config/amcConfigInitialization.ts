@@ -18,7 +18,7 @@ import { captureConfigSignatureAuthority } from "./configSignaturePair.js";
 import { withAmcConfigPublicationLock } from "./configPublicationLock.js";
 
 type Progress = { path: string; stage: string; attempted: true; returned: boolean; acknowledged?: boolean };
-export class AmcInitializationNativeError extends Error {
+class AmcInitializationNativeError extends Error {
   readonly code = "AMC_INITIALIZATION_NATIVE_PARTIAL";
   constructor(cause: unknown, readonly closeCauses: readonly unknown[], readonly cleanupCauses: readonly unknown[], readonly progress: readonly Readonly<Progress>[]) {
     super("AMC initializer native publication did not complete; prior effects remain", { cause });

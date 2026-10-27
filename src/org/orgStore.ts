@@ -110,7 +110,7 @@ function asyncOrgPairPlan(workspace: string, options: OrgConfigPublicationOption
     }
   } };
 }
-export class OrgConfigPublicationError extends Error {
+class OrgConfigPublicationError extends Error {
   readonly code = "ORG_CONFIG_PARTIAL";
   constructor(readonly phase: "directories" | "body" | "signature", readonly publishedPaths: readonly string[], cause: unknown) {
     super("org config publication is incomplete; inspect the signed pair before retrying", { cause });

@@ -82,7 +82,7 @@ function requestPlan(store: A4Store, projectId: string, input: GateRequest, eval
   } };
 }
 /** Original fixed-time synchronous contract. No promise or new actor is introduced on this path. */
-export function requestGate(store: A4Store, projectId: string, input: GateRequest): A4TransitionResult {
+function requestGate(store: A4Store, projectId: string, input: GateRequest): A4TransitionResult {
   const actual = requestPlan(store, projectId, input, evaluateFor);
   return governed(store, projectId, actual.principal, input, actual.plan);
 }

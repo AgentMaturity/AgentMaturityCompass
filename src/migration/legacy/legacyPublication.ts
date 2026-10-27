@@ -72,7 +72,7 @@ function directory(path: string, roster: boolean): Directory {
 }
 
 /** Native entry, return and acknowledgment are distinct; setup effects are independent of file attempts. */
-export class LegacyRelabelPublicationError extends Error {
+class LegacyRelabelPublicationError extends Error {
   readonly code = "LEGACY_RELABEL_PARTIAL";
   constructor(readonly attemptedPath: string | null, readonly returnedPaths: readonly string[], readonly acknowledgedPaths: readonly string[],
     readonly setupAttempts: readonly string[], readonly setupReturns: readonly string[], cause: unknown) {

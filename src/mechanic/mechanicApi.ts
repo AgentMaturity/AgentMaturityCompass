@@ -205,14 +205,6 @@ export function mechanicTuningApplyForApi(params: {
   };
 }
 
-export async function mechanicGapForApi(params: {
-  workspace: string;
-  scopeType?: "WORKSPACE" | "NODE" | "AGENT";
-  scopeId?: string;
-}) {
-  return mechanicGapForAuthority(params, () => {});
-}
-
 export async function mechanicCreatePlanForApi(params: {
   workspace: string;
   scopeType?: "WORKSPACE" | "NODE" | "AGENT";

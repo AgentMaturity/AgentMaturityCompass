@@ -148,10 +148,6 @@ function leadingIndicators(params: {
     ledger.close();
   }
 }
-
-export function computeLeadingIndicators(params: { workspace: string; agentId?: string; windowStartTs: number; windowEndTs: number }): ForecastLeadingIndicator[] {
-  return leadingIndicators(params);
-}
 /** Both connection lifetimes are synchronous and closed before returning; the final read never initializes a writer. */
 export function captureLeadingIndicators(input: { workspace: string; agentId?: string; windowStartTs: number; windowEndTs: number }) {
   const params = { ...input }, indicators = leadingIndicators(params), expected = JSON.stringify(indicators);

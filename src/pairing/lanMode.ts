@@ -161,23 +161,6 @@ export function enableLanMode(params: {
   };
 }
 
-export function disableLanMode(workspace: string): { path: string; sigPath: string } {
-  const current = loadLanMode(workspace);
-  const next: LanModeConfig = {
-    ...current,
-    enabled: false,
-    bind: "127.0.0.1",
-    requirePairing: false
-  };
-  const path = lanPath(workspace);
-  ensureDir(join(workspace, ".amc", "studio"));
-  writeFileAtomic(path, YAML.stringify(next), 0o644);
-  return {
-    path,
-    sigPath: signLanMode(workspace)
-  };
-}
-
 /** Actual raw config-purpose successors. Inputs/defaults and original target pair precede the first provider wait. */
 export async function enableLanModeAsync(supplied: Parameters<typeof enableLanMode>[0], beforePublish?: () => void): Promise<{ path: string; sigPath: string }> {
   const params = { ...supplied, workspace: resolve(supplied.workspace), allowedCIDRs: supplied.allowedCIDRs === undefined ? undefined : [...supplied.allowedCIDRs] };

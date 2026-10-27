@@ -11,7 +11,7 @@ function agents(workspace: string): string[] {
   try { return [...new Set(["default", ...listAgents(workspace).map(row => row.id)])].sort((a, b) => a.localeCompare(b)); }
   catch { return ["default"]; }
 }
-export class PromptSchedulerPublicationError extends Error {
+class PromptSchedulerPublicationError extends Error {
   readonly code = "PROMPT_SCHEDULER_INCOMPLETE";
   constructor(readonly completedBuilds: readonly {agentId:string;packId:string;sha256:string;lint:string}[], cause: unknown) {
     super("prompt scheduler did not complete; successful pack, log and scheduler effects are retained", { cause }); this.name = "PromptSchedulerPublicationError";

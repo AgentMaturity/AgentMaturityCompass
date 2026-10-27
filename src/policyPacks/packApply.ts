@@ -192,7 +192,7 @@ export function applyPolicyPack(params: {
 }
 
 /** Actual held signer preflight. Required-notary approval logging has no held async handoff yet. */
-export function preflightPolicyPackCompatibility(workspace: string): void {
+function preflightPolicyPackCompatibility(workspace: string): void {
   assertVaultMaySign(workspace, "config-signature"); assertVaultMaySign(workspace, "artifact-seal");
   for (const purpose of ["config-signature", "artifact-seal"] as const) {
     const key = getSigningKey(workspace, purpose);
@@ -204,7 +204,7 @@ export function preflightPolicyPackCompatibility(workspace: string): void {
 }
 
 /** Existing synchronous five-config phase; the caller must hold ACTION_POLICY_WRITER_LOCK. */
-export function publishPolicyPackCompatibility(workspace: string, pack: PolicyPack, options: {
+function publishPolicyPackCompatibility(workspace: string, pack: PolicyPack, options: {
   beforeMember?: (path: string) => void; recorded?: (path: string) => void; approvalLogReturned?: () => void;
 } = {}): Array<{ path: string; sha256: string }> {
   assertActionPolicyWriterReady(workspace);

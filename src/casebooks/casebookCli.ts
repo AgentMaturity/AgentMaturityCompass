@@ -13,10 +13,6 @@ import {
   verifyCasebook
 } from "./casebookStore.js";
 
-export function casebookInitCli(params: { workspace: string; agentId?: string; casebookId?: string }) {
-  return initCasebook(params.workspace, params.agentId, params.casebookId ?? "default");
-}
-
 export function casebookListCli(params: { workspace: string; agentId?: string }) {
   return listCasebooks(params.workspace, params.agentId);
 }

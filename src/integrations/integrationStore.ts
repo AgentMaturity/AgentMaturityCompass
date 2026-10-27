@@ -134,7 +134,7 @@ export function initIntegrationsConfig(workspace: string): {
 }
 
 /** Secret persistence can precede a later signer refusal; do not report it as rollback or zero effects. */
-export class IntegrationsInitializationError extends Error {
+class IntegrationsInitializationError extends Error {
   readonly code = "INTEGRATIONS_INITIALIZATION_INCOMPLETE";
   constructor(readonly secretWriteAttempted: boolean, readonly secretWriteReturned: boolean, cause: unknown) {
     super("integration initialization did not complete; inspect secret persistence and nested config publication before retrying", { cause });

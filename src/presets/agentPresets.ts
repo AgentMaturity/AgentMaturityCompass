@@ -143,9 +143,6 @@ export function preparePresetsAsync(workspace: string, presets: readonly unknown
   const bytes = Buffer.from(YAML.stringify({ presets: parsed }), "utf8"), previous = captureOrgPairs([path]);
   return prepareOrgPairsAsync(workspace, [{ path, bytes }], options, previous);
 }
-export async function savePresetsAsync(workspace: string, presets: readonly unknown[], options: OrgPairsOptions = {}): Promise<void> {
-  (await preparePresetsAsync(workspace, presets, options)).publish();
-}
 
 export type ReadPresets =
   | { readonly ok: true; readonly presets: readonly AgentPreset[] }

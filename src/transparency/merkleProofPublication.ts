@@ -33,7 +33,7 @@ interface ProofProgress {
   outputCloseAttempted: boolean; outputClosed: boolean; cleanupAttempts: readonly string[]; cleanupReturns: readonly string[];
   outputDirectoryReturns: readonly string[];
 }
-export class MerkleProofPublicationError extends Error {
+class MerkleProofPublicationError extends Error {
   readonly code = "MERKLE_PROOF_PUBLICATION_INCOMPLETE";
   constructor(readonly progress: Readonly<ProofProgress>, cause: unknown, readonly closeCauses: readonly unknown[], readonly cleanupCauses: readonly unknown[]) {
     super("Merkle proof publication did not complete; inspect cold initialization, archive, output and cleanup progress before retrying", { cause });

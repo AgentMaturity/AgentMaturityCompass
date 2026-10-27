@@ -445,7 +445,7 @@ function preferredGatewayRoute(workspace: string): string {
   }
 }
 
-export class SetupAdaptersPublicationError extends Error {
+class SetupAdaptersPublicationError extends Error {
   readonly code = "SETUP_ADAPTERS_PARTIAL";
   constructor(readonly completedAgentIds: readonly string[], cause: unknown) {
     super("setup stopped after publishing adapter profiles; completed agents remain configured", { cause });

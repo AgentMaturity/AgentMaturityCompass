@@ -513,10 +513,6 @@ export function routeBaseUrls(config: GatewayConfig): Array<{
   }));
 }
 
-export function gatewayConfigHash(config: GatewayConfig): string {
-  return sha256Hex(canonicalize(config));
-}
-
 export function bindAgentRoute(config: GatewayConfig, routePrefix: string, agentId: string): GatewayConfig {
   const next = cloneConfig(config);
   const route = next.routes.find((item) => item.prefix === routePrefix);

@@ -249,78 +249,8 @@ export function rejectAuditEvidenceRequest(params: {
   return next;
 }
 
-export function markAuditEvidenceRequestFulfilled(params: {
-  workspace: string;
-  requestId: string;
-  binderSha256: string;
-  exportedAtTs?: number;
-}): {
-  request: EvidenceRequest;
-  approvalRequestId: string;
-  approvals: EvidenceRequest["approvals"];
-} {
-  const request = loadEvidenceRequest(params.workspace, params.requestId);
-  if (request.status !== "OPEN" && request.status !== "APPROVED") {
-    throw new Error(`request is not fulfillable from status ${request.status}`);
-  }
-  const pending = loadPendingApproval(params.workspace, request.requestId);
-  const verified = verifyApprovalForExecution({
-    workspace: params.workspace,
-    approvalId: pending.approvalRequestId,
-    expectedAgentId: pending.agentId,
-    expectedIntentId: pending.intentId,
-    expectedToolName: "audit.request.fulfill",
-    expectedActionClass: "SECURITY"
-  });
-  if (!verified.ok) {
-    throw new Error(`approval not executable: ${verified.error ?? verified.status ?? "unknown"}`);
-  }
-
-  const decisions = listApprovalDecisions({
-    workspace: params.workspace,
-    agentId: pending.agentId,
-    approvalRequestId: pending.approvalRequestId
-  });
-  const approvals = decisions
-    .filter((row) => row.decision === "APPROVE_EXECUTE" || row.decision === "APPROVE_SIMULATE")
-    .map((row) => ({
-      approvalEventHash: sha256Hex(row.approvalDecisionId),
-      userIdHash: sha256Hex(row.userId).slice(0, 16),
-      role: (row.roles.find((role) => role === "OWNER" || role === "AUDITOR" || role === "APPROVER" || role === "OPERATOR" || role === "VIEWER") ??
-        "APPROVER") as "OWNER" | "AUDITOR" | "APPROVER" | "OPERATOR" | "VIEWER"
-    }));
-
-  const next: EvidenceRequest = {
-    ...request,
-    status: "FULFILLED",
-    approvals,
-    fulfillment: {
-      binderSha256: params.binderSha256,
-      exportedAtTs: params.exportedAtTs ?? Date.now()
-    }
-  };
-  updateEvidenceRequest({
-    workspace: params.workspace,
-    request: next
-  });
-
-  consumeApprovedExecution({
-    workspace: params.workspace,
-    approvalId: pending.approvalRequestId,
-    expectedAgentId: pending.agentId,
-    executionId: request.requestId
-  });
-  removePendingApproval(params.workspace, request.requestId);
-
-  return {
-    request: next,
-    approvalRequestId: pending.approvalRequestId,
-    approvals
-  };
-}
-
 /** A completed request mutation can precede a refused or partial pending-file removal. */
-export class AuditEvidenceRequestExecutionError extends Error {
+class AuditEvidenceRequestExecutionError extends Error {
   readonly code = "AUDIT_REQUEST_EXECUTION_INCOMPLETE";
   constructor(readonly requestId: string, readonly completedRequest: Awaited<ReturnType<typeof rejectEvidenceRequestAsync>>["progress"],
     readonly pendingRemoveAttempted: boolean, readonly pendingRemoveReturned: boolean, readonly pendingRemoveAcknowledged: boolean, cause: unknown) {

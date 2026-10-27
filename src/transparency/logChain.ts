@@ -168,7 +168,7 @@ interface TransparencyInitializationProgress {
   readonly completed: boolean;
 }
 /** Native calls may leave setup/temp effects even without a returned or acknowledged member. */
-export class TransparencyInitializationError extends Error {
+class TransparencyInitializationError extends Error {
   readonly code = "TRANSPARENCY_INITIALIZATION_INCOMPLETE";
   constructor(readonly progress: TransparencyInitializationProgress, readonly firstRefusalObserved: boolean,
     readonly firstRefusal: unknown, cause: unknown) {
@@ -483,32 +483,4 @@ export function tailTransparencyEntries(workspace: string, n: number): Transpare
   const entries = readEntries(workspace);
   const limit = Math.max(1, Math.floor(n));
   return entries.slice(Math.max(0, entries.length - limit));
-}
-
-export function transparencyFingerprint(workspace: string): string {
-  return sha256Hex(readFileSync(transparencySealPath(workspace)));
-}
-
-export function artifactSha256(filePath: string): string {
-  return sha256Hex(readFileSync(filePath));
-}
-
-export function listTransparencyFiles(workspace: string): string[] {
-  const root = transparencyDir(workspace);
-  if (!pathExists(root)) {
-    return [];
-  }
-  const out: string[] = [];
-  const walk = (dir: string): void => {
-    for (const entry of readdirSync(dir, { withFileTypes: true })) {
-      const full = join(dir, entry.name);
-      if (entry.isDirectory()) {
-        walk(full);
-      } else if (entry.isFile()) {
-        out.push(relative(root, full).replace(/\\/g, "/"));
-      }
-    }
-  };
-  walk(root);
-  return out.sort((a, b) => a.localeCompare(b));
 }

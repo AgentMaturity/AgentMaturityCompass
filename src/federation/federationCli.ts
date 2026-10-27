@@ -14,7 +14,7 @@ import { exportFederationPackage, importFederationPackage, verifyFederationPacka
 import type { TrustContext } from "../trust/trustContext.js";
 
 type InitInput = { workspace: string; orgName: string };
-export class FederationInitializationError extends Error {
+class FederationInitializationError extends Error {
   readonly code = "FEDERATION_INITIALIZATION_INCOMPLETE";
   readonly publisherPreparationMayHaveChanged = true;
   readonly publishedPaths: readonly string[];

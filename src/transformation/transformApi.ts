@@ -19,13 +19,6 @@ export function getTransformMapForApi(workspace: string): {
   };
 }
 
-export function applyTransformMapForApi(params: {
-  workspace: string;
-  map: ReturnType<typeof loadTransformMap>;
-}): ReturnType<typeof saveTransformMap> {
-  return saveTransformMap(params.workspace, params.map);
-}
-
 export function getLatestAgentTransformPlanForApi(params: {
   workspace: string;
   agentId: string;
@@ -85,108 +78,6 @@ export function createAgentTransformPlanForApi(params: {
     window: params.window,
     targetOverride: params.targetOverride,
     preview: params.preview
-  });
-}
-
-export function createNodeTransformPlanForApi(params: {
-  workspace: string;
-  nodeId: string;
-  to: "targets" | "excellence" | "custom";
-  window?: string;
-  targetOverride?: Record<string, number>;
-  preview?: boolean;
-}): ReturnType<typeof createTransformPlan> {
-  return createTransformPlan({
-    workspace: params.workspace,
-    scope: {
-      type: "NODE",
-      nodeId: params.nodeId
-    },
-    to: params.to,
-    window: params.window,
-    targetOverride: params.targetOverride,
-    preview: params.preview
-  });
-}
-
-export function trackAgentTransformPlanForApi(params: {
-  workspace: string;
-  agentId: string;
-  window?: string;
-}): ReturnType<typeof runTransformTracker> {
-  return runTransformTracker({
-    workspace: params.workspace,
-    scope: {
-      type: "AGENT",
-      agentId: resolveAgentId(params.workspace, params.agentId)
-    },
-    window: params.window
-  });
-}
-
-export function trackNodeTransformPlanForApi(params: {
-  workspace: string;
-  nodeId: string;
-  window?: string;
-}): ReturnType<typeof runTransformTracker> {
-  return runTransformTracker({
-    workspace: params.workspace,
-    scope: {
-      type: "NODE",
-      nodeId: params.nodeId
-    },
-    window: params.window
-  });
-}
-
-export function attestAgentTransformTaskForApi(params: {
-  workspace: string;
-  agentId: string;
-  taskId: string;
-  statement: string;
-  files?: string[];
-  evidenceLinks?: string[];
-  createdByUser: string;
-  role: "OWNER" | "AUDITOR";
-}): ReturnType<typeof writeTransformAttestation> {
-  const agentId = resolveAgentId(params.workspace, params.agentId);
-  return writeTransformAttestation({
-    workspace: params.workspace,
-    scope: {
-      type: "AGENT",
-      agentId
-    },
-    taskId: params.taskId,
-    statement: params.statement,
-    files: params.files,
-    evidenceLinks: params.evidenceLinks,
-    createdByUser: params.createdByUser,
-    role: params.role
-  });
-}
-
-export function attestNodeTransformTaskForApi(params: {
-  workspace: string;
-  nodeId: string;
-  taskId: string;
-  statement: string;
-  files?: string[];
-  evidenceLinks?: string[];
-  createdByUser: string;
-  role: "OWNER" | "AUDITOR";
-}): ReturnType<typeof writeTransformAttestation> {
-  return writeTransformAttestation({
-    workspace: params.workspace,
-    scope: {
-      type: "NODE",
-      nodeId: params.nodeId
-    },
-    taskId: params.taskId,
-    statement: params.statement,
-    files: params.files,
-    evidenceLinks: params.evidenceLinks,
-    createdByUser: params.createdByUser,
-    role: params.role
   });
 }
 

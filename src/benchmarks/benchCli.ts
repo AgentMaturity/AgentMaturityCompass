@@ -12,11 +12,3 @@ function assertBenchmarkWriteOwnerMode(workspace: string, label: "benchmark expo
 export const assertBenchmarkExportOwnerMode = (workspace: string): void => assertBenchmarkWriteOwnerMode(workspace, "benchmark export");
 export const assertBenchCreateOwnerMode = (workspace: string): void => assertBenchmarkWriteOwnerMode(workspace, "bench create");
 
-export function parseBenchGroupBy(value?: string): "archetype" | "riskTier" | "trustLabel" {
-  const normalized = (value ?? "riskTier").trim();
-  if (normalized === "archetype" || normalized === "riskTier" || normalized === "trustLabel") {
-    return normalized;
-  }
-  throw new Error(`Invalid --group-by value '${value}'. Expected archetype|riskTier|trustLabel.`);
-}
-

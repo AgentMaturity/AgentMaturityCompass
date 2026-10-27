@@ -14,7 +14,7 @@ type RequestParams = { workspace: string; planId: string; actor: string; reason:
 type ExecuteParams = { workspace: string; planId: string };
 type Executed = { actionId: string; status: "EXECUTED" | "SKIPPED"; note: string };
 type Consumption = ReturnType<typeof consumeApprovedExecution> & { actionId: string; approvalRequestId: string; attemptedExecutionId: string };
-export class MechanicExecutionError extends Error {
+class MechanicExecutionError extends Error {
   readonly code = "MECHANIC_EXECUTION_PARTIAL";
   constructor(readonly executed: readonly Executed[], readonly consumptions: readonly Consumption[], readonly attemptedActionId: string | null,
     readonly completed: readonly string[], readonly phase: string, readonly entryHash: string | null, readonly pendingRecorded: boolean | null,
@@ -134,10 +134,6 @@ export async function requestPlanApprovalsForAuthority(params: RequestParams, be
     current.assertCurrent();
     return { result: { plan, approvalRequests: approvals }, current };
   } catch (cause) { mechanicFailed(current.state, cause); }
-}
-
-export async function executeMechanicPlan(params: ExecuteParams): Promise<{ plan: MechanicUpgradePlan; executed: Executed[] }> {
-  return (await executeMechanicPlanForAuthority(params, () => {})).result;
 }
 /** Internal trusted caller boundary; the callback adds only refusal to original authority and actual grant checks. */
 export async function executeMechanicPlanForAuthority(params: ExecuteParams, beforePublish: () => void) {

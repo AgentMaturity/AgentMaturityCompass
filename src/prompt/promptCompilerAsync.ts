@@ -82,6 +82,3 @@ export async function prepareCompiledPromptPackAsync(params: { workspace: string
     assertCurrent(); return { compiled, assertCurrent, completedPrerequisites: Object.freeze([...completedPrerequisites]) };
   } catch (cause) { throw new PromptPackPreparationError(Object.freeze([...completedPrerequisites]), cause); }
 }
-export async function compilePromptPackAsync(params: { workspace: string; agentId?: string }, options: OrgPairsOptions = {}) {
-  const prepared = await prepareCompiledPromptPackAsync(params, options); prepared.assertCurrent(); return prepared.compiled;
-}

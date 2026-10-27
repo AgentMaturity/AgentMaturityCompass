@@ -15,7 +15,7 @@ import { canonicalize } from "../utils/json.js";
 import { vaultStatus } from "../vault/vault.js";
 
 export const CONSOLE_SNAPSHOT_UNAVAILABLE = "CONSOLE_SNAPSHOT_UNAVAILABLE";
-export class ConsoleSnapshotPublicationError extends Error {
+class ConsoleSnapshotPublicationError extends Error {
   readonly code = CONSOLE_SNAPSHOT_UNAVAILABLE;
   constructor(readonly phase: "predecessor" | "signature-removal" | "body" | "signature", readonly bodyWritten: boolean,
     readonly signatureRemoved: boolean, cause: unknown) {

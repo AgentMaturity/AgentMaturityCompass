@@ -94,12 +94,6 @@ export function signAdaptersConfig(workspace: string): string {
   if (previous.body === null) throw new Error(`File not found: ${adaptersConfigPath(workspace)}`);
   return signSync(plan(workspace, "adapters configure", previous, previous.body.bytes, false)).sigPath;
 }
-export async function signAdaptersConfigAsync(workspace: string): Promise<string> {
-  assertOwnerMode(workspace, "adapters configure");
-  const previous = pair(workspace);
-  if (previous.body === null) throw new Error(`File not found: ${adaptersConfigPath(workspace)}`);
-  return (await prepareAsync(plan(workspace, "adapters configure", previous, previous.body.bytes, false))).publish().sigPath;
-}
 export function verifyAdaptersConfigSignature(workspace: string): SignedFileVerification {
   const path = adaptersConfigPath(workspace), sigPath = adaptersConfigSigPath(workspace);
   try {
@@ -171,9 +165,6 @@ function profilePlan(workspace: string, agentId: string, profile: AdapterAgentPr
 }
 export function setAgentAdapterProfile(workspace: string, agentId: string, profile: AdapterAgentProfile): Result {
   return signSync(profilePlan(workspace, agentId, profile));
-}
-export async function setAgentAdapterProfileAsync(workspace: string, agentId: string, profile: AdapterAgentProfile): Promise<Result> {
-  return (await prepareAsync(profilePlan(workspace, agentId, profile, true))).publish();
 }
 /** Internal actual CLI input boundary; not exported from the SDK or accepted from an HTTP request. */
 export function prepareAgentAdapterProfileAsync(workspace: string, agentId: string, profile: AdapterAgentProfile, beforeSign?: () => void) {

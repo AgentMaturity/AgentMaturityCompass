@@ -35,7 +35,7 @@ export interface ApprovalConsumptionProgress {
   attemptedMember: string | null; returnedMembers: readonly string[]; acknowledgedMembers: readonly string[];
   replayObserved: boolean; replayRecord: Readonly<ApprovalConsumedRecord> | null; committed: boolean;
 }
-export class ApprovalConsumptionPublicationError extends Error {
+class ApprovalConsumptionPublicationError extends Error {
   readonly code = "APPROVAL_CONSUMPTION_INCOMPLETE";
   constructor(readonly progress: Readonly<ApprovalConsumptionProgress>, cause: unknown) {
     super("approval consumption did not complete; retain actual member and native uncertainty", { cause });

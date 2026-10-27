@@ -71,7 +71,7 @@ export function assuranceTimestampedCertificateShaPath(workspace: string, ts: nu
   return `${assuranceTimestampedCertificatePath(workspace, ts)}.sha256`;
 }
 
-export function assuranceSchedulerPath(workspace: string): string {
+function assuranceSchedulerPath(workspace: string): string {
   return join(assuranceRoot(workspace), "scheduler.json");
 }
 
@@ -79,7 +79,7 @@ export function assuranceWaiversDir(workspace: string): string {
   return join(assuranceRoot(workspace), "waivers");
 }
 
-export function defaultAssuranceSchedulerState(): AssuranceSchedulerState {
+function defaultAssuranceSchedulerState(): AssuranceSchedulerState {
   return assuranceSchedulerStateSchema.parse({
     enabled: true,
     lastRunTs: null,
@@ -331,14 +331,14 @@ export async function prepareAssurancePolicyAsync(workspace: string, policy: Ass
   const path = assurancePolicyPath(workspace), bytes = Buffer.from(YAML.stringify(assurancePolicySchema.parse(structuredClone(policy))));
   return prepareOrgPairsAsync(workspace, [{ path, bytes }], options, previous);
 }
-export async function saveAssurancePolicyAsync(workspace: string, policy: AssurancePolicy, options: OrgPairsOptions = {}) {
+async function saveAssurancePolicyAsync(workspace: string, policy: AssurancePolicy, options: OrgPairsOptions = {}) {
   const prepared = await prepareAssurancePolicyAsync(workspace, policy, options); const [saved] = prepared.publish();
   return { ...saved!, assertCurrent: prepared.assertCurrent };
 }
 export async function initAssurancePolicyAsync(workspace: string, options: OrgPairsOptions = {}) {
   const policy = defaultAssurancePolicy(), saved = await saveAssurancePolicyAsync(workspace, policy, options); saved.assertCurrent(); return { ...saved, policy };
 }
-export class AssurancePolicyInitializationError extends Error {
+class AssurancePolicyInitializationError extends Error {
   readonly code = "ASSURANCE_POLICY_INITIALIZATION_INCOMPLETE";
   constructor(readonly publishedPaths: readonly string[], readonly attemptedStage: string, cause: unknown) {
     super("assurance policy initialization did not complete; known and uncertain publication effects remain", { cause }); this.name = "AssurancePolicyInitializationError";
@@ -367,7 +367,7 @@ export function captureAssurancePolicyInitialization(workspace: string, options:
     }
   } });
 }
-export async function prepareAssuranceSchedulerStateAsync(workspace: string, state: AssuranceSchedulerState, options: OrgPairsOptions = {}, previous?: OrgPairsSnapshot) {
+async function prepareAssuranceSchedulerStateAsync(workspace: string, state: AssuranceSchedulerState, options: OrgPairsOptions = {}, previous?: OrgPairsSnapshot) {
   options.beforePublish?.(); ensureAssuranceDirs(workspace);
   const path = assuranceSchedulerPath(workspace), bytes = Buffer.from(JSON.stringify(assuranceSchedulerStateSchema.parse(structuredClone(state)), null, 2));
   return prepareOrgPairsAsync(workspace, [{ path, bytes }], options, previous);

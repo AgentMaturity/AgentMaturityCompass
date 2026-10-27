@@ -74,6 +74,3 @@ export async function prepareStandardSchemasAsync(workspace: string, options: Or
   const assertCurrent = () => { inputs?.(); original(); signedMeta.assertCurrent(); signedBundle.assertCurrent(); if (published !== null) assertOrgPairsCurrent(published); };
   return { generated: plan.generated, assertCurrent, publish() { published = publish(plan, writes, assertCurrent); return plan.generated; } };
 }
-export async function generateStandardSchemasAsync(workspace: string, options: OrgPairsOptions = {}) {
-  return (await prepareStandardSchemasAsync(workspace, options)).publish();
-}

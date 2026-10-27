@@ -28,7 +28,7 @@ import type { DiagnosticReport, TrustLabel, RiskTier } from "../types.js";
 
 export type TrustInheritanceMode = "strict" | "weighted" | "no-inherit";
 
-export const delegationEdgeSchema = z.object({
+const delegationEdgeSchema = z.object({
   id: z.string().min(1),
   fromAgentId: z.string().min(1),
   toAgentId: z.string().min(1),
@@ -42,7 +42,7 @@ export const delegationEdgeSchema = z.object({
 
 export type DelegationEdge = z.infer<typeof delegationEdgeSchema>;
 
-export const trustCompositionConfigSchema = z.object({
+const trustCompositionConfigSchema = z.object({
   schemaVersion: z.literal(1),
   defaultInheritanceMode: z.enum(["strict", "weighted", "no-inherit"]).default("strict"),
   defaultWeight: z.number().min(0).max(1).default(1),

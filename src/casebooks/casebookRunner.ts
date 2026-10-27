@@ -6,7 +6,7 @@ import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import { pathExists, readUtf8 } from "../utils/fs.js";
 import { loadCase, loadCasebook, verifyCasebook } from "./casebookStore.js";
 
-export interface CaseRunResult {
+interface CaseRunResult {
   caseId: string;
   title: string;
   success: boolean;

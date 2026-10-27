@@ -306,7 +306,7 @@ export function workspaceOversightPublicKeys(workspace: string): string[] {
   return [...new Set(keys)];
 }
 export type RecordWorkspaceOversightAsyncInput = Omit<RecordWorkspaceOversightInput, "privateKeyPem" | "publicKeys"> & { beforePublish?: () => void };
-export class OversightPublicationError extends Error {
+class OversightPublicationError extends Error {
   readonly code = "OVERSIGHT_PUBLICATION_INCOMPLETE";
   constructor(readonly recordHash: string, readonly appendAttempted: boolean, readonly appended: boolean, cause: unknown) {
     super("Oversight publication did not complete", { cause }); this.name = "OversightPublicationError";

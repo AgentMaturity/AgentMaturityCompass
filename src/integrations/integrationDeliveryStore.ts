@@ -264,7 +264,7 @@ export function resolveIntegrationDeadLetter(params: {
 }
 
 /** Internal active-scope implementation; no recursive public lock acquisition. */
-export function resolveIntegrationDeadLetterInJournal(io: IntegrationJournalIo, params: Parameters<typeof resolveIntegrationDeadLetter>[0]): IntegrationDeadLetter | null {
+function resolveIntegrationDeadLetterInJournal(io: IntegrationJournalIo, params: Parameters<typeof resolveIntegrationDeadLetter>[0]): IntegrationDeadLetter | null {
   if (io.workspace !== params.workspace) throw new Error("integration journal scope belongs to another workspace");
   const journal = loadJournal(io);
   const entry = journal.deadLetters.find((row) => row.deadLetterId === params.deadLetterId);

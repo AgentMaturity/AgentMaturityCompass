@@ -13,7 +13,7 @@ import type { scanBinderForPii } from "./binderRedaction.js";
 import type { buildBinderProofs } from "./binderProofs.js";
 import type { collectAuditBinderData } from "./binderCollector.js";
 
-export function markdownSummary(params: {
+function markdownSummary(params: {
   binder: AuditBinderJson;
   map: AuditMapFile;
 }): string {
@@ -57,7 +57,7 @@ function escapePdfText(input: string): string {
   return input.replaceAll("\\", "\\\\").replaceAll("(", "\\(").replaceAll(")", "\\)");
 }
 
-export function renderSummaryPdf(markdown: string): Buffer {
+function renderSummaryPdf(markdown: string): Buffer {
   const lines = markdown
     .split(/\r?\n/)
     .map((line) => line.trimEnd())

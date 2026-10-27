@@ -243,7 +243,7 @@ interface NativeExtensionSignProgress {
   renameAttempted: boolean; renameReturned: boolean; targetAcknowledged: boolean;
   cleanupCheckAttempted: boolean; cleanupAttempted: boolean; cleanupReturned: boolean;
 }
-export class NativeExtensionSigningPublicationError extends Error {
+class NativeExtensionSigningPublicationError extends Error {
   readonly code = "NATIVE_EXTENSION_SIGN_INCOMPLETE";
   constructor(readonly progress: Readonly<NativeExtensionSignProgress>, cause: unknown,
     readonly closeCauses: readonly unknown[], readonly cleanupCauses: readonly unknown[]) {

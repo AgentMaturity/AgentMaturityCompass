@@ -20,7 +20,7 @@ function read(workspace: string, path: string): Member {
   } catch (error) { if ((error as NodeJS.ErrnoException).code === "ENOENT") return { workspace, path, physicalPath, bytes: null, mode: null, identity: null }; throw error; }
 }
 export function captureBenchImportFiles(workspace: string, paths: readonly string[]) { return [...new Set(paths)].map(path => read(workspace, path)); }
-export function assertBenchImportFiles(before: readonly Member[], identical?: ReadonlyMap<string, Buffer>): void {
+function assertBenchImportFiles(before: readonly Member[], identical?: ReadonlyMap<string, Buffer>): void {
   for (const old of before) { const now = read(old.workspace, old.path), sameBytes = (left: Buffer | null, right: Buffer | null) => left === null ? right === null : right !== null && left.equals(right);
     if (old.physicalPath !== now.physicalPath) throw new Error("selected bench import location changed; retry");
     if (old.mode === now.mode && old.identity === now.identity && sameBytes(old.bytes, now.bytes)) continue;

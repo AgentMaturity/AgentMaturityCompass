@@ -2,32 +2,12 @@
 import YAML from "yaml";
 import { loadDiagnosticBank, diagnosticBankPath } from "../diagnostic/bank/bankLoader.js";
 import { diagnosticBankSchema } from "../diagnostic/bank/bankSchema.js";
-export { captureMechanicAnalysisCanon } from "./mechanicAnalysisCanon.js";
 import { captureOrgPairs, orgPairBytes } from "../org/preparedOrgPairs.js";
 import { calculateForecast } from "../forecast/forecastEngine.js";
 import { canonicalize } from "../utils/json.js";
 import { pathExists } from "../utils/fs.js";
 import { buildGapAnalysis } from "./gapAnalysis.js";
 import { mechanicEtaFromForecast, readMechanicCgxHash } from "./upgradePlanner.js";
-
-export function captureMechanicAnalysisBank(workspace: string) {
-  const path = diagnosticBankPath(workspace);
-  // Preserve the actual old cold constructor. Its separate synchronous producer remains an upstream integration limit.
-  if (!pathExists(path)) loadDiagnosticBank(workspace);
-  const read = () => {
-    const bytes = orgPairBytes(captureOrgPairs([path]), path);
-    if (bytes === null) throw new Error("selected mechanic diagnostic bank is missing");
-    return diagnosticBankSchema.parse(YAML.parse(bytes.toString("utf8")) as unknown);
-  };
-  const bank = read();
-  const project = (value: typeof bank, questionIds: readonly string[]) => {
-    const byId = new Map(value.diagnosticBank.questions.map(row => [row.qId, row]));
-    return canonicalize({ version: value.diagnosticBank.version, selected: questionIds.map(qId => ({ qId, hints: byId.get(qId)?.upgradeHints ?? null })) });
-  };
-  return { bank, assertCurrent(questionIds: readonly string[]) {
-    if (project(read(), questionIds) !== project(bank, questionIds)) throw new Error("selected mechanic bank version or upgrade hints changed while signing");
-  } };
-}
 export function captureMechanicAnalysisCgx(workspace: string, agentId: string) {
   const hash = readMechanicCgxHash(workspace, agentId);
   return { hash, assertCurrent() { if (readMechanicCgxHash(workspace, agentId) !== hash) throw new Error("selected mechanic CGX pack changed while signing"); } };

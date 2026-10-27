@@ -88,11 +88,6 @@ export async function loadDiagnosticBankAttemptAsync(workspace: string, options:
   const prepared = await prepareOrgPairsAsync(workspace, [{ path, bytes }], { beforePublish, assertInputsCurrent }, previous), saved = prepared.publish()[0]!;
   return { bank, bytes: Buffer.from(bytes), completedPaths: Object.freeze([saved.path, saved.sigPath]), assertCurrent: prepared.assertCurrent };
 }
-export async function loadDiagnosticBankAsync(workspace: string, options: OrgPairsOptions = {}) {
-  const selected = await loadDiagnosticBankAttemptAsync(workspace, options);
-  try { selected.assertCurrent(); return selected.bank; }
-  catch (cause) { if (selected.completedPaths.length > 0) throw new DiagnosticBankFollowupError(selected.completedPaths, cause); throw cause; }
-}
 /** Same selected body is parsed and verified; an unreadable sidecar remains an invalid-signature verdict. */
 export function readDiagnosticBankForApi(workspace: string, expectedBytes?: Uint8Array) {
   const path = diagnosticBankPath(workspace), sigPath = `${path}.sig`, body = orgPairBytes(captureOrgFiles([path]), path);

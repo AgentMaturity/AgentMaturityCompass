@@ -152,7 +152,7 @@ interface RequestProgress {
   lockAttempted: boolean; lockEntered: boolean; lockReturned: boolean;
   attemptedMember: string | null; returnedMembers: readonly string[]; acknowledgedMembers: readonly string[]; complete: boolean;
 }
-export class ApprovalRequestPublicationError extends Error {
+class ApprovalRequestPublicationError extends Error {
   readonly code = "APPROVAL_REQUEST_INCOMPLETE";
   constructor(readonly progress: Readonly<RequestProgress>, cause: unknown) {
     super("approval request publication did not complete; native and earlier policy effects may remain", { cause });

@@ -108,14 +108,6 @@ export function verifyAuditMapActiveSignature(workspace: string) {
 export function prepareAuditMapActiveAsync(workspace: string, map: AuditMapFile, options: AuditPublicationOptions = {}) {
   return captureAuditPolicyMapPublication(workspace, { active: map }, options).prepare();
 }
-export async function saveAuditMapActiveAsync(workspace: string, map: AuditMapFile, options: AuditPublicationOptions = {}) {
-  const prepared = await prepareAuditMapActiveAsync(workspace, map, options); return prepared.publish().active!;
-}
-export async function initAuditMapsAsync(workspace: string, options: AuditPublicationOptions = {}) {
-  const map = defaultAuditMapBuiltin(), prepared = await captureAuditPolicyMapPublication(workspace, { builtin: map, active: map }, options).prepare();
-  const saved = prepared.publish(); return { builtinPath: saved.builtin!.path, builtinSigPath: saved.builtin!.sigPath,
-    activePath: saved.active!.path, activeSigPath: saved.active!.sigPath, map };
-}
 /** Select actual read/default/copy inputs once before a possible Sign; no original target callback survives its own write. */
 export async function loadAuditMapsAttemptAsync(workspace: string, id: "builtin" | "active" | "list", options: AuditPublicationOptions = {}) {
   const caller = { ...options }; caller.beforePublish?.(); caller.assertInputsCurrent?.(); caller.assertPreparationInputsCurrent?.();
@@ -147,10 +139,4 @@ export async function loadAuditMapsAttemptAsync(workspace: string, id: "builtin"
     { ...caller, beforePublish, assertPreparationInputsCurrent }, previous).prepare();
   prepared.publish(); prepared.assertCurrent();
   return Object.freeze({ map, builtin: map, active: map, assertCurrent: prepared.assertCurrent });
-}
-export async function loadAuditMapBuiltinAsync(workspace: string, options: AuditPublicationOptions = {}): Promise<AuditMapFile> {
-  const loaded = await loadAuditMapsAttemptAsync(workspace, "builtin", options); loaded.assertCurrent(); return loaded.map;
-}
-export async function loadAuditMapActiveAsync(workspace: string, options: AuditPublicationOptions = {}): Promise<AuditMapFile> {
-  const loaded = await loadAuditMapsAttemptAsync(workspace, "active", options); loaded.assertCurrent(); return loaded.map;
 }
