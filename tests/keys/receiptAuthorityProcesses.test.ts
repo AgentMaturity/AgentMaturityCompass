@@ -14,7 +14,8 @@ const owned: Array<ReturnType<typeof spawnOwnedNode>> = [];
 afterEach(async () => { try { await Promise.all(owned.splice(0).map(child => child.stop())); } finally { cleanupReceiptAuthorityFixtures(); vi.unstubAllEnvs(); } });
 const deniedSdkLoader = 'data:text/javascript,' + encodeURIComponent('export async function resolve(s,c,n){if(["@aws-sdk/client-kms","@google-cloud/kms","@azure/keyvault-keys","@azure/identity","pkcs11js"].includes(s))throw new Error("owned receipt child forbids real SDK access");return n(s,c)}');
 function child(workspace: string, body: string) {
-  const program = `import { writeFileSync, existsSync } from 'node:fs'; import { randomUUID } from 'node:crypto';\n` +
+  const program = `import { writeFileSync, existsSync, renameSync } from 'node:fs'; import { randomUUID } from 'node:crypto';\n` +
+    `const publish = path => { writeFileSync(path + '.tmp', String(process.pid)); renameSync(path + '.tmp', path); };\n` +
     `import { openLedger } from ${JSON.stringify(pathToFileURL(join(root, "dist/ledger/ledger.js")).href)};\n` +
     `import { unlockVault } from ${JSON.stringify(pathToFileURL(join(root, "dist/vault/vault.js")).href)};\n` +
     `import { sha256Hex } from ${JSON.stringify(pathToFileURL(join(root, "dist/utils/hash.js")).href)};\n` +
@@ -33,7 +34,7 @@ async function ready(path: string, handle: ReturnType<typeof child>) {
 const posix = process.platform === "win32" ? test.skip : test;
 posix("a real other-process SQL writer makes receipt owner publication refuse natively without waiting or replacing keyset", async () => {
   const f = makeReceiptAuthorityFixture(), readyFile = join(f.root, "sql-ready"), release = join(f.root, "sql-release");
-  const held = child(f.workspace, `ledger.db.exec('BEGIN IMMEDIATE');writeFileSync(${JSON.stringify(readyFile)},String(process.pid));while(!existsSync(${JSON.stringify(release)}))await new Promise(r=>setTimeout(r,10));ledger.db.exec('COMMIT');console.log(JSON.stringify({released:true}));`);
+  const held = child(f.workspace, `ledger.db.exec('BEGIN IMMEDIATE');publish(${JSON.stringify(readyFile)});while(!existsSync(${JSON.stringify(release)}))await new Promise(r=>setTimeout(r,10));ledger.db.exec('COMMIT');console.log(JSON.stringify({released:true}));`);
   try {
     await ready(readyFile, held); const before = f.state(), at = performance.now(), outcome = await f.own().then(value => ({ value }), error => ({ error }));
     expect(outcome).toHaveProperty("error"); if ("error" in outcome) expect(outcome.error).toMatchObject({ code: "SQLITE_BUSY" });
@@ -46,7 +47,7 @@ posix("two actual cold processes append independent receipts at the live SQL hea
   const f = makeReceiptAuthorityFixture(); await f.own(); const before = f.fake.requests.length, go = join(f.root, "append-go");
   const children = [0, 1].map(index => {
     const readyFile = join(f.root, `append-ready-${index}`), handle = child(f.workspace,
-      `writeFileSync(${JSON.stringify(readyFile)},String(process.pid));while(!existsSync(${JSON.stringify(go)}))await new Promise(r=>setTimeout(r,10));` +
+      `publish(${JSON.stringify(readyFile)});while(!existsSync(${JSON.stringify(go)}))await new Promise(r=>setTimeout(r,10));` +
       `const sessionId='cold-receipt-'+randomUUID();ledger.startSession({sessionId,runtime:'unknown',binaryPath:'owned',binarySha256:sha256Hex('owned')});` +
       `const text='cold-'+${index};const out=ledger.appendEvidenceWithReceipt({sessionId,runtime:'unknown',eventType:'audit',inline:true,payload:text,meta:{trustTier:'OBSERVED'},receipt:{kind:'guard_check',agentId:'default',providerId:'owned',model:null,bodySha256:sha256Hex(text)}});ledger.sealSession(sessionId);console.log(JSON.stringify(out));`);
     return { readyFile, handle };
