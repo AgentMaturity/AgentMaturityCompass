@@ -1,0 +1,12 @@
+{
+  "suite": "1.0.0",
+  "doubles": [
+    { "double": "trust-embedded-key", "case": "VER-022 forged-embedded-key", "outcome": "fail", "conformant": false },
+    { "double": "ignore-revocation", "case": "revoked-key-compromise", "outcome": "fail", "conformant": false },
+    { "double": "ignore-as-of", "case": "stale-attestation, key-expired", "outcome": "fail", "conformant": false },
+    { "double": "merge-results", "case": "empty", "outcome": "fail", "conformant": false },
+    { "double": "crash-on-empty", "case": "empty", "outcome": "error", "conformant": false },
+    { "double": "correct", "case": "all 61", "outcome": "pass", "conformant": true }
+  ],
+  "source": "tests/conformance/brokenVerifiers.test.ts"
+}

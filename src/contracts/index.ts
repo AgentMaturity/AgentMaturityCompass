@@ -31,6 +31,7 @@ import { a4RollbackReceiptV1Schema } from "./v1/a4RollbackReceipt.js";
 import { a4TransitionV1Schema } from "./v1/a4Transition.js";
 import { a4ValueClaimV1Schema } from "./v1/a4ValueClaim.js";
 import { authorizationRecordV1Schema } from "./v1/authorizationRecord.js";
+import { conformanceResultsV1Schema } from "./v1/conformanceResults.js";
 import { controlResultV1Schema } from "./v1/controlResult.js";
 import { detokenizationReceiptV1Schema } from "./v1/detokenizationReceipt.js";
 import { evidenceEventV1Schema } from "./v1/evidenceEvent.js";
@@ -57,6 +58,7 @@ export * from "./v1/a4RollbackReceipt.js";
 export * from "./v1/a4Transition.js";
 export * from "./v1/a4ValueClaim.js";
 export * from "./v1/authorizationRecord.js";
+export * from "./v1/conformanceResults.js";
 export * from "./v1/controlResult.js";
 export * from "./v1/detokenizationReceipt.js";
 export * from "./v1/evidenceEvent.js";
@@ -91,6 +93,8 @@ export const CONTRACTS = {
   "trust-list": { title: "AMC Signed Trust List", schema: signedTrustListSchema },
   "verifier-report": { title: "AMC Verifier Report", schema: verifierReportSchema },
   "signature-envelope": { title: "AMC Signature Envelope", schema: signatureEnvelopeSchema },
+  // P1-32: one conformance-suite run (packages/amc-conformance); refinements are in spec/ACCEPTANCE_RULES.md.
+  "conformance-results": { title: "AMC Conformance Results", schema: conformanceResultsV1Schema },
   // Regulated Control Catalog (P1-09); refinements are in docs/catalog/CONTROL_RECORD.md.
   "control-record": { title: "AMC Control Record", schema: controlRecordSchema },
   "pack-manifest": { title: "AMC Catalog Pack Manifest", schema: packManifestSchema },

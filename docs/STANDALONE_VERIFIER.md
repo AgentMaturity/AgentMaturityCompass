@@ -194,13 +194,17 @@ The runner writes `conformance-results.json` (`suite`, `version`, `implementatio
 per case `result` and `diff`). The CI job `verifier-conformance` is set up to install the packed package with no other
 dependency and run it against the fixtures on Node 20, 22 and 24.
 
+The conformance suite (P1-32, [CONFORMANCE_SUITE.md](CONFORMANCE_SUITE.md)) runs the same fixtures as its `verifier`
+class through any command template and writes a `conformance-results` v1 record; the same CI job runs it too. This
+fixture runner stays in the verifier's package for its own packed-tarball check.
+
 ## Limits
 
 - `.amcbundle` archives carry a SQLite ledger, which a zero-dependency verifier cannot read on Node 20; verify them with
   `amc bundle verify` (P0-09). `amc-verify` refuses them as malformed rather than read part of them.
 - Not yet: keyless Sigstore bundles and transparency-log entries (P1-27 verifies key-based DSSE bundles only), RFC 3161 timestamp tokens (P1-25; a trust list's
   `timestampAuthorities` are validated but unused), Merkle inclusion proofs and public-log receipts (P1-26),
-  conformance classes (P1-32). A4 project records (`a4-record`) are checked by AMC's `verifyA4Bundle`.
+  the producer, adapter and compiler conformance classes, which `packages/amc-conformance` runs (P1-32). A4 project records (`a4-record`) are checked by AMC's `verifyA4Bundle`.
 - A chain predecessor (`previousSha256`, `previousStatementSha256`) is not fetched or checked; `--known-sequence` gives
   anti-rollback. The verifier keeps no state between runs: you supply the sequences you saw.
 - Fixture keys are public by design. They are marked `TEST ONLY` and must never appear in a trust list outside the

@@ -131,6 +131,11 @@
       "sha256": "4f6e86e990419e882a984e1da270180a7f98b18b59d4de362a6222a498201567"
     },
     {
+      "$id": "https://agentmaturity.co/spec/schemas/v1/conformance-results.schema.json",
+      "name": "conformance-results.schema.json",
+      "sha256": "28ce563f898073569c797cd7aa40ce26e046c9a513b603c7dfb19a93c4e230f6"
+    },
+    {
       "$id": "https://agentmaturity.co/spec/schemas/v1/control-record.schema.json",
       "name": "control-record.schema.json",
       "sha256": "bb8a3a363a8091b3c0cf9283d3bafc39ff43a908818ff08d8da6de8ff83da0d2"
