@@ -1,5 +1,4 @@
-import { decodedFinds, keyedSpan, MAX_PROTECTED_TEXT_CHARS, MAX_REQUEST_SCAN_CHARS, nestedJsonRedactor, redactJsonLeaves,
-  redactProtectedText, secretMember } from "../dataflow/detectors.js";
+import { MAX_REQUEST_SCAN_CHARS, protectedWalk, type ProtectedWalk, type WalkOptions } from "../dataflow/detectors.js";
 import { redactSecrets } from "../shield/redaction/redactSecrets.js";
 import { sha256Hex } from "../utils/hash.js";
 import type { GatewayConfig } from "./config.js";
@@ -51,8 +50,7 @@ export function redactHeaders(
   const deny = new Set([...denylist, ...ALWAYS_REDACTED_HEADER_KEYS].map((key) => key.toLowerCase()));
   const out = Object.create(null) as Record<string, string>;
   const reasons = new Set<string>();
-  const unscanned = () => { reasons.add("protectedData:unscanned"); return "[REDACTED]"; };
-  const scan = options.protectedData ? nestedJsonRedactor(protectedRedactor(reasons), unscanned) : undefined;
+  const walk = options.protectedData ? protectedWalkFor(reasons) : undefined;
   let redacted = false;
 
   for (const [rawKey, value] of Object.entries(headers)) {
@@ -68,8 +66,8 @@ export function redactHeaders(
     const regexResult = applyTextRegexRedaction(stored, options.textRegexDenylist ?? []);
     regexResult.reasons.forEach((reason) => reasons.add(reason));
     stored = regexResult.value;
-    if (scan) {
-      try { stored = scan(stored, key); } catch { stored = unscanned(); }
+    if (walk) {
+      try { stored = walk.text(stored, key); } catch { reasons.add("protectedData:unscanned"); stored = "[REDACTED]"; }
     }
     redacted ||= stored !== normalized;
     out[rawKey] = stored;
@@ -139,33 +137,21 @@ function applyTextRegexRedaction(text: string, patterns: readonly string[]): { c
   return { changed, value: current, reasons };
 }
 
-class ScanBudgetExceeded extends Error {}
-
 /**
- * The protected-data detectors (P2-02), as the native session uses them, over stored gateway evidence, in a workspace that
- * opted in (a processor registry or its `.sig` exists). A detected value becomes `[REDACTED]` (no key or token here, so
- * nothing is restorable). A text over the detectors' per-leaf limit is replaced whole, and once one body's scanned keys and
- * leaves pass the request-wide scan budget the whole body is: never stored unscanned. So is a JSON integer that parsing
- * rounded (a 17-19 digit card number sent as a number), whose digits can no longer be checked. A member's value is also
- * checked with its name (`key`): a secret name (`secretMember`) or a detection only the name beside it shows (`keyedSpan`)
- * replaces it whole.
+ * The protected-data walk (P2-02), as the native session uses it, over stored gateway evidence, in a workspace that opted in
+ * (a processor registry or its `.sig` exists). A finding becomes `[REDACTED]` with a `protectedData:<class>` reason (no key
+ * or token here, so nothing is restorable), and a unit or line the walk cannot read (over the per-text limit, a JSON integer
+ * parsing rounded, decoding that does not settle) becomes `[REDACTED]` with `protectedData:unscanned`. Past the scan budget,
+ * or on an unsupported shape, the walk throws and the caller replaces the whole value: never stored unscanned. `declared`
+ * carries a ToolHub tool's declared fields.
  * ponytail: the budget is the native path's (16 MiB), so hostile text (IBAN-shaped words) can still hold the event loop
  * for about 10 s per body before the whole body is replaced; a smaller gateway budget trades that for whole-body
  * replacement of large ordinary bodies.
  */
-function protectedRedactor(reasons: Set<string>): (text: string, key?: string) => string {
-  let scanned = 0;
-  const charge = (length: number) => { scanned += length; if (scanned > MAX_REQUEST_SCAN_CHARS) throw new ScanBudgetExceeded(); };
-  return (text, key) => {
-    if (text.length > MAX_PROTECTED_TEXT_CHARS) { reasons.add("protectedData:unscanned"); return "[REDACTED]"; }
-    charge(text.length);
-    if (secretMember(key, text)) { reasons.add("protectedData:credential"); return "[REDACTED]"; }
-    const redacted = redactProtectedText(text, (region) => { reasons.add(`protectedData:${region.dataClass}`); return "[REDACTED]"; }).text;
-    const keyed = keyedSpan(key, redacted, undefined, charge);
-    if (keyed === undefined) return redacted;
-    reasons.add(`protectedData:${keyed.dataClass}`);
-    return "[REDACTED]";
-  };
+function protectedWalkFor(reasons: Set<string>, declared?: WalkOptions["declared"]): ProtectedWalk {
+  return protectedWalk({ budget: MAX_REQUEST_SCAN_CHARS, declared,
+    replace: (finding) => { reasons.add(`protectedData:${finding.dataClass}`); return "[REDACTED]"; },
+    opaque: () => { reasons.add("protectedData:unscanned"); return "[REDACTED]"; } });
 }
 
 /** The whole stored body replaced, as a JSON string so a JSON body still parses. */
@@ -193,10 +179,10 @@ function* streamChunks(stored: string, sse: boolean): Generator<unknown> {
  * an NDJSON body, the elements of a JSON array such as Gemini's streamGenerateContent). A model streams each value in
  * token-sized deltas, so an email or a card number is split over chunks and no single one shows it. Each chunk's delta
  * leaves are joined per stream (the leaf's path and each object's own index) and all together in stream order, and the
- * joins, made from the stored chunks (each already redacted), are scanned as they are and with their escapes decoded.
- * Anything found, or a chunk that is not JSON, means the caller replaces the whole body.
+ * joins, made from the stored chunks (each already redacted), are walked like any stored text. Anything found, or a chunk
+ * that is not JSON, means the caller replaces the whole body.
  */
-function streamHidesProtected(chunks: Iterable<unknown>, redact: (text: string) => string): boolean {
+function streamHidesProtected(chunks: Iterable<unknown>, walk: ProtectedWalk): boolean {
   const streams = new Map<string, string>();
   let all = "";
   const visit = (value: unknown, path: string): void => {
@@ -212,12 +198,12 @@ function streamHidesProtected(chunks: Iterable<unknown>, redact: (text: string) 
     }
   };
   for (const chunk of chunks) visit(chunk, "");
-  return [...streams.values(), all].some(text => redact(text) !== text || decodedFinds(text, decoded => redact(decoded) !== decoded));
+  return [...streams.values(), all].some(text => walk.text(text) !== text);
 }
 
 /**
  * The request path and query a gateway row stores. The credential query keys are replaced in every workspace. Where the
- * workspace opted in, each is also scanned like a stored text, percent-decoded too: a detection is replaced in place, and
+ * workspace opted in, both are walked like a stored text (one walk, one budget): a detection is replaced in place, and
  * anything only decoding shows replaces it whole.
  */
 export function redactRequestTarget(url: URL, protectedData: boolean): { readonly path: string; readonly query: string } {
@@ -226,8 +212,8 @@ export function redactRequestTarget(url: URL, protectedData: boolean): { readonl
   for (const key of AGENT_AUTH_QUERY_KEYS) if (params.has(key)) params.set(key, "[REDACTED]");
   const query = carriesAuth ? `?${params.toString()}` : url.search;
   if (!protectedData) return { path: url.pathname, query };
-  const scan = nestedJsonRedactor(protectedRedactor(new Set()), () => "[REDACTED]");
-  try { return { path: scan(url.pathname), query: scan(query) }; } catch { return { path: "[REDACTED]", query: "[REDACTED]" }; }
+  const walk = protectedWalkFor(new Set());
+  try { return { path: walk.text(url.pathname), query: walk.text(query) }; } catch { return { path: "[REDACTED]", query: "[REDACTED]" }; }
 }
 
 // UTF-8, UTF-16 BE and LE byte-order marks (UTF-32 LE starts like UTF-16 LE; UTF-32 BE starts with a zero byte).
@@ -249,7 +235,7 @@ export function redactBody(
   body: Buffer,
   contentType: string | undefined,
   redaction: GatewayConfig["redaction"],
-  options: { readonly protectedData: boolean }
+  options: { readonly protectedData: boolean; readonly declared?: WalkOptions["declared"] }
 ): RedactionResult {
   const originalSha = sha256Hex(body);
 
@@ -272,11 +258,10 @@ export function redactBody(
       const protectedReasons = new Set<string>();
       let leaves = pathResult.value;
       if (options.protectedData) {
-        const opaque = () => { protectedReasons.add("protectedData:unscanned"); return "[REDACTED]"; };
-        const redact = protectedRedactor(protectedReasons);
-        leaves = redactJsonLeaves(pathResult.value, nestedJsonRedactor(redact, opaque), opaque);
+        const walk = protectedWalkFor(protectedReasons, options.declared);
+        leaves = walk.value(pathResult.value);
         // A top-level array is how some providers stream as JSON (Gemini's streamGenerateContent): join its elements.
-        if (Array.isArray(leaves) && streamHidesProtected(leaves, redact)) return unscannedJsonBody();
+        if (Array.isArray(leaves) && streamHidesProtected(leaves, walk)) return unscannedJsonBody();
       }
       let text = JSON.stringify(leaves);
       const regexResult = applyTextRegexRedaction(text, redaction.textRegexDenylist);
@@ -296,9 +281,8 @@ export function redactBody(
         originalHashOmitted: wasRedacted
       };
     } catch {
-      // Where the workspace opted in, a JSON body that does not parse, or whose walk fails (nesting too deep for it, the
-      // scan budget), is replaced whole rather than stored as text: escaped, a value right after \n or \t has no word
-      // boundary, so the text detectors would miss it.
+      // Where the workspace opted in, a JSON body that does not parse, or whose walk fails (the scan budget), is replaced
+      // whole rather than stored as text.
       if (options.protectedData) return unscannedJsonBody();
       // fall through to text mode
     }
@@ -311,16 +295,14 @@ export function redactBody(
     // scanned: it is replaced whole.
     const plain = plainUtf8(body, contentType);
     if (!("text" in plain) || plain.text.includes("\u0000")) return unscannedJsonBody();
-    const redact = protectedRedactor(protectedReasons);
+    const walk = protectedWalkFor(protectedReasons, options.declared);
     const sse = ct.includes("text/event-stream");
     try {
-      stored = redact(plain.text);
-      // Text can carry JSON escapes too (an event stream of JSON chunks, JSON inside them) and web escapes (a form post):
-      // anything the detectors still find in the stored text decoded replaces the whole body, and so does a value a
-      // stream (events, or NDJSON lines) split across its chunks. Any failure (the scan budget, a chunk that is not JSON)
-      // does too.
-      if (decodedFinds(stored, decoded => redact(decoded) !== decoded)
-        || ((sse || /application\/(?:x-)?ndjson|application\/jsonl/.test(ct)) && streamHidesProtected(streamChunks(stored, sse), redact))) {
+      // The walk reads JSON inside the text (an event stream's chunks, NDJSON lines) and decodes each other line (a form
+      // post's web escapes): what only decoding shows replaces its line. A value a stream (events, or NDJSON lines) split
+      // across its chunks replaces the whole body, and so does any failure (the scan budget, a chunk that is not JSON).
+      stored = walk.text(plain.text);
+      if ((sse || /application\/(?:x-)?ndjson|application\/jsonl/.test(ct)) && streamHidesProtected(streamChunks(stored, sse), walk)) {
         return unscannedJsonBody();
       }
     } catch {

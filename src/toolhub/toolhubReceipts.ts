@@ -1,40 +1,35 @@
 import type { Ledger } from "../ledger/ledger.js";
 import { defaultGatewayConfig, loadGatewayConfig } from "../gateway/config.js";
 import { redactBody } from "../gateway/redaction.js";
-import { nestedJsonRedactor, redactJsonLeaves } from "../dataflow/detectors.js";
+import type { DeclaredFields } from "../dataflow/detectors.js";
 import { protectedDataOptedIn } from "../dataflow/processorRegistry.js";
-import { declaredRepeats, tokenizeDeclared } from "../dataflow/redactingSession.js";
-import type { ProtectedDataClass } from "../vault/dataClassification.js";
 import { sha256Hex } from "../utils/hash.js";
 import { findToolDefinition, loadVerifiedToolsConfigSnapshot } from "./toolhubValidators.js";
 
 const MARKER = "[REDACTED]";
 
 /**
- * Where the workspace opted in (P2-02), a tool_result payload's `result` with the values its signed tool definition
- * declares in `protectedFields` replaced by the marker, by the native session's walk (arrays fan out, an object or array
- * end covers every key and leaf beneath it, JSON held in a string leaf is followed), and every repeat of one of them too,
- * the session's way (`declaredRepeats`: a whole leaf or key, or a JSON string or number inside text the walk does not parse,
- * such as JSONL or JSON nested deeper, as it is or decoded). Null, so the caller stores nothing of the body, when the tools
- * config does not verify or the walk fails.
+ * The `protectedFields` a tool_result's signed tool definition declares, for the walk to cover under the payload's
+ * `result` (P2-02, opted-in workspaces): undefined when it declares none or the tools config is unsigned, null, so the
+ * caller stores nothing of the body, when the tools config does not verify or cannot be read.
  */
-function withDeclaredFields(workspace: string, toolName: string, payload: Record<string, unknown>): Record<string, unknown> | null {
+function declaredFieldsOf(workspace: string, toolName: string): DeclaredFields | undefined | null {
   try {
     const snapshot = loadVerifiedToolsConfigSnapshot(workspace);
-    if (snapshot.config === null) return snapshot.signatureExists ? null : payload;
+    if (snapshot.config === null) return snapshot.signatureExists ? null : undefined;
     const declared = findToolDefinition(snapshot.config, toolName)?.protectedFields;
-    if (declared === undefined || Object.keys(declared).length === 0 || !Object.hasOwn(payload, "result")) return payload;
-    const values = new Map<string, ProtectedDataClass>(), matched = new Set<string>();
-    const result = tokenizeDeclared(payload.result, declared, () => MARKER, matched, () => false, values);
-    if (matched.size === 0) return payload;
-    const repeated = declaredRepeats(values);
-    const repeats = nestedJsonRedactor((text) => repeated(text) === undefined ? text : MARKER, () => MARKER);
-    return { ...payload, result: values.size === 0 ? result : redactJsonLeaves(result, repeats, () => MARKER) };
+    return declared === undefined || Object.keys(declared).length === 0 ? undefined : declared;
   } catch {
     return null;
   }
 }
 
+/**
+ * A payload as evidence stores it: `redactBody`, so where the workspace opted in the protected-data walk runs over it, a
+ * tool_result's declared fields (`declaredFieldsOf`) covered under `result` the native session's way (arrays fan out, an
+ * object or array end covers every key and leaf beneath it, JSON held in a string is followed) and every repeat of one of
+ * their values replaced too, with `[REDACTED]`.
+ */
 function redactToolPayload(workspace: string, payload: Record<string, unknown> | string, toolName?: string): {
   redacted: string;
   wasRedacted: boolean;
@@ -46,14 +41,15 @@ function redactToolPayload(workspace: string, payload: Record<string, unknown> |
   } catch {
     // fall back to defaults
   }
-  // P2-02: the protected-data detectors and declared fields run only where the workspace opted in.
+  // P2-02: the protected-data walk and declared fields run only where the workspace opted in.
   const protectedData = protectedDataOptedIn(workspace);
-  const declared = protectedData && toolName !== undefined && typeof payload !== "string" ? withDeclaredFields(workspace, toolName, payload) : payload;
-  const text = declared === null ? JSON.stringify(MARKER) : typeof declared === "string" ? declared : JSON.stringify(declared);
-  const redacted = redactBody(Buffer.from(text, "utf8"), "application/json", redaction, { protectedData });
+  const fields = protectedData && toolName !== undefined && typeof payload !== "string" ? declaredFieldsOf(workspace, toolName) : undefined;
+  const text = fields === null ? JSON.stringify(MARKER) : typeof payload === "string" ? payload : JSON.stringify(payload);
+  const redacted = redactBody(Buffer.from(text, "utf8"), "application/json", redaction,
+    { protectedData, declared: fields ? { fields, at: ["result"] } : undefined });
   return {
     redacted: redacted.redactedBytes.toString("utf8"),
-    wasRedacted: redacted.wasRedacted || declared !== payload,
+    wasRedacted: redacted.wasRedacted || fields === null,
     bodySha256: sha256Hex(redacted.redactedBytes)
   };
 }
