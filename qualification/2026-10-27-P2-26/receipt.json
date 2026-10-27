@@ -1,0 +1,116 @@
+{
+ "schemaVersion": 1,
+ "key": "P2-26",
+ "date": "2026-10-27",
+ "commit": "c1a1d8d45286e28a37d297f3ec1ad8b48c0c5600",
+ "branch": "rtd/p2-26d-retention",
+ "node": "v22.23.3",
+ "pnpm": "10.33.0",
+ "os": "macOS 26.6.2",
+ "arch": "arm64",
+ "commands": [
+  {
+   "cmd": "npm run -s build",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s typecheck",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s typecheck:tests",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s lint",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:gates",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:dead-code",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:duplicates",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:counts",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:api-ref",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:docs-drift",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:architecture-boundaries",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "node scripts/drills/kill-switch-drill.mjs --out qualification/2026-10-27-P2-26/kill-switch.json",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "node scripts/drills/provider-exit-drill.mjs --provider openai --alternate anthropic/claude-fixture --out qualification/2026-10-27-P2-26/provider-exit.json",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npx vitest run tests/incidents tests/runtime tests/ops tests/operator/blockerInbox.test.ts tests/actions/receiptStates.test.ts tests/actions/authorizationRecheck.test.ts tests/governor/breakGlass.test.ts tests/incidentClockSurfaces.test.ts tests/fleetMode.test.ts --maxWorkers=2",
+   "exit": 0,
+   "durationMs": 0
+  }
+ ],
+ "tests": {
+  "total": 260,
+  "passed": 260,
+  "failed": 0,
+  "skipped": 0
+ },
+ "artifacts": [
+  {
+   "path": "kill-switch.json",
+   "sha256": "985e90b90d09cc439d2700f69ec2b8700e9a8c6736a44cb0f2f0db0274bd832c"
+  },
+  {
+   "path": "provider-exit.json",
+   "sha256": "966ccc9f2be40fe9129d5f35f82c98a31f794ee4ad347b8b4d4b9f197d269a37"
+  },
+  {
+   "path": "sample-notice-draft.md",
+   "sha256": "82d8b8bc22493ebd6564c9fc287ca655c98ad810ffef05538120cd36fcde1ce4"
+  },
+  {
+   "path": "sample-notice-draft.json",
+   "sha256": "d136f5a801795113bc3f79cbdedeab9651b50902af122f02a322fceaad3426aa"
+  },
+  {
+   "path": "mutations.json",
+   "sha256": "61f672b787c458aee3c802469ef0b58f018f82fc3103d77ba759b010c6b78f49"
+  },
+  {
+   "path": "README.md",
+   "sha256": "2f17a935fea1f064ac8d9e32a998266876bcab6f6b41dad3d9851e76cdcfefba"
+  }
+ ],
+ "notes": "Totals are the P2-26 focused set. Wider related sets were also run per slice (A: 244 files/4,567 tests; B: 53 files/823 and 191 files/2,698; C: 117 files incl. native session suites; D: 96 files/1,886 and 27 files/428), all green after fixes. The full npm test suite was not run in this window. durationMs not measured (0). Pending for people: D-08 expert review, kind-cluster kill-switch fallback rehearsal, drill cadence with the P2-03 partner."
+}

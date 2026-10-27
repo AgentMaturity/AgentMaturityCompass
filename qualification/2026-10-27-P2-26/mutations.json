@@ -1,0 +1,153 @@
+{
+  "key": "P2-26",
+  "note": "Each guard was broken locally, the named test run, and the source restored (git diff empty afterwards).",
+  "mutations": [
+    {
+      "slice": "A",
+      "guard": "decideClock: NEEDS_CLASSIFICATION treated as not applicable (classify returns null)",
+      "failed": [
+        "clockRuntime: undecidable condition -> NEEDS_CLASSIFICATION + inbox item",
+        "clockRuntime: unknown facts never drop a clock"
+      ]
+    },
+    {
+      "slice": "B",
+      "guard": "tool pipeline authorization-stage kill check skipped",
+      "failed": [
+        "killSwitch: an unbound WRITE_LOW call is refused; an allowlisted read runs"
+      ]
+    },
+    {
+      "slice": "B",
+      "guard": "pipeline and P1-02 recheck kill checks both skipped",
+      "failed": [
+        "killSwitchEnforcement: workspace kill denies a consequential fixture action with a receipt",
+        "killSwitchEnforcement: break-glass during a kill is refused"
+      ]
+    },
+    {
+      "slice": "B",
+      "guard": "unverifiable record counted inactive",
+      "failed": [
+        "killSwitch: an unverifiable record counts as an active stop_all"
+      ]
+    },
+    {
+      "slice": "B",
+      "guard": "release signature not verified",
+      "failed": [
+        "killSwitch: a forged release lifts nothing"
+      ]
+    },
+    {
+      "slice": "B (review)",
+      "guard": "gateway proxy/CONNECT without the egress kill check (pre-fix server.ts)",
+      "failed": [
+        "killSwitchGateway: provider kill refuses the model route, HTTP proxy and CONNECT"
+      ]
+    },
+    {
+      "slice": "B (review)",
+      "guard": "unmapped proxy host ignores provider kills",
+      "failed": [
+        "killSwitchGateway: provider kill denies its upstream's host and fails closed",
+        "killSwitchGateway: running gateway"
+      ]
+    },
+    {
+      "slice": "B (review)",
+      "guard": "mapped proxy host checked without its provider id",
+      "failed": [
+        "killSwitchGateway: provider kill denies its upstream's host",
+        "killSwitchGateway: running gateway"
+      ]
+    },
+    {
+      "slice": "B (review)",
+      "guard": "checkEgress choke-point kill check removed",
+      "failed": [
+        "killSwitchGateway: checkEgress workspace stop_new_effects",
+        "killSwitchGateway: checkEgress provider kill"
+      ]
+    },
+    {
+      "slice": "C",
+      "guard": "envelope comparison skipped (changed = [])",
+      "failed": [
+        "changeEnvelope: 5 cases incl. out-of-envelope prompt blocked + reassessment"
+      ]
+    },
+    {
+      "slice": "C (review)",
+      "guard": "test-result signature not verified",
+      "failed": [
+        "changeEnvelope: forged or unbound test evidence never counts"
+      ]
+    },
+    {
+      "slice": "C (review)",
+      "guard": "test result not bound to the manifest tested",
+      "failed": [
+        "changeEnvelope: forged or unbound test evidence never counts"
+      ]
+    },
+    {
+      "slice": "C (review)",
+      "guard": "tool digest without additional capabilities, unresolved tools not null",
+      "failed": [
+        "changeEnvelope: the session manifest comes from what the session resolves"
+      ]
+    },
+    {
+      "slice": "C (review)",
+      "guard": "requester may attest",
+      "failed": [
+        "changeEnvelope: the envelope's requester cannot attest its tests"
+      ]
+    },
+    {
+      "slice": "C (review)",
+      "guard": "exact auditType equality replaced by a substring match",
+      "failed": [],
+      "survived": "signature verification subsumes it: a row that only names the type cannot carry a valid workspace signature; kept as defence in depth"
+    },
+    {
+      "slice": "D",
+      "guard": "floor comparison disabled (days < 0)",
+      "failed": [
+        "regimeRetention: 6-month rule refuses apply",
+        "regimeRetention: floor refuses the executor"
+      ]
+    },
+    {
+      "slice": "D",
+      "guard": "executor floor check skipped",
+      "failed": [
+        "regimeRetention: the same floor refuses the retention executor"
+      ]
+    },
+    {
+      "slice": "D (review)",
+      "guard": "pre-fix sources: maintenance.rotateLogsDays not a deleting knob, no floor in rotation",
+      "failed": [
+        "regimeRetention: maintenance log rotation is a deleting knob",
+        "regimeRetention: log rotation never deletes a log younger than the floor"
+      ]
+    },
+    {
+      "slice": "D (review)",
+      "guard": "size-based rotation ignores the floor",
+      "failed": [
+        "regimeRetention: log rotation never deletes a log younger than the floor"
+      ]
+    },
+    {
+      "slice": "D (review)",
+      "guard": "maintenance CLI assert and rotateLogs floor check skipped",
+      "failed": [
+        "regimeRetention: maintenance log rotation is a deleting knob",
+        "regimeRetention: log rotation never deletes a log younger than the floor"
+      ]
+    }
+  ]
+}
