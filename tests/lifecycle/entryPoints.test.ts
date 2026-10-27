@@ -4,6 +4,8 @@
  * suspended agent too. The active plan is a typed stand-in carrying L0-CHG-01 (the module mock below); an unverifiable
  * plan is the real reader failing (checkpoint root inside the workspace).
  */
+// First: activate.js and the lifecycle modules form an import cycle, so the lifecycle module must load the mocked plan reader.
+import "../../src/lifecycle/reassessment.js";
 import { join } from "node:path";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { bindAuthorization } from "../../src/actions/authorize.js";
@@ -94,7 +96,7 @@ describe("lifecycle enforcement comes from the workspace, at every entry point (
     expect(before).toMatchObject({ decision: "allow" });
   });
 
-  test("no compiled-policy context is needed: bindAuthorization alone denies; reads are not held", () => {
+  test("no compiled-policy context is needed: bindAuthorization alone denies", () => {
     const f = governanceFixture();
     active.plan = enforcingPlan;
     suspended(f.workspace, "default");

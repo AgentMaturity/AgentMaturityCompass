@@ -272,15 +272,12 @@ function deviationFailures(record: AuthorizationRecordV1, execution: ToolExecuti
   ];
 }
 
-/** P2-23: reads and low-impact writes are not held by lifecycle admission (the plan's visible-tool allowlist governs them). */
-const consequential = (execution: Pick<ToolExecution, "actionClass">): boolean => execution.actionClass !== "READ_ONLY" && execution.actionClass !== "WRITE_LOW";
-
 /** Build the record for one call. Issued and expiry times come from AMC's clock, never from a caller. */
 export function bindAuthorization(execution: ToolExecution, ctx: AuthorizationContext = {}): BindResult {
   // P2-23: a suspended, retired or unapproved agent takes no consequential action (advisory plans: a warning row instead).
   // Enforcement is read from the workspace's active plan, never from `ctx`, so every entry point decides alike.
-  const lifecycle = consequential(execution) ? lifecycleAdmission(execution.workspace, execution.agentId) : null;
-  if (lifecycle !== null && !lifecycle.ok) return failed("agent_not_active", lifecycle.reason);
+  const lifecycle = lifecycleAdmission(execution.workspace, execution.agentId, { actionClass: execution.actionClass });
+  if (!lifecycle.ok) return failed("agent_not_active", lifecycle.reason);
   const facts = actionFacts(execution, ctx.compiledPolicy);
   if (!facts.ok) return facts;
   const approvals: AuthorizationRecordV1["authority"]["approvals"][number][] = [];
@@ -416,7 +413,7 @@ export function recheckAuthorization(record: AuthorizationRecordV1, execution: T
   } catch {
     add("authority_store_unavailable");
   }
-  if (consequential(execution) && !lifecycleAdmission(execution.workspace, execution.agentId, { record: false }).ok) add("agent_not_active");
+  if (!lifecycleAdmission(execution.workspace, execution.agentId, { record: false, actionClass: execution.actionClass }).ok) add("agent_not_active");
   if (Date.now() >= Date.parse(record.expiresAt)) add("capability_expired");
   // A child can only narrow: its class must be in scope, and a child must name the delegation that made it.
   if (!record.delegation.allowedActionClasses.includes(record.action.actionClass)

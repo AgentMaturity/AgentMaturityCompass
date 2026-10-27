@@ -89,11 +89,11 @@ describe("lifecycle admission at the authorization stage (P2-23)", () => {
     expect(f.bodies).toHaveLength(0);
   });
 
-  test("an allowlisted read still runs for a suspended agent", async () => {
+  test("a suspended agent's read (an unbound READ_ONLY call) is denied too", async () => {
     const f = await admissionFixture({ lifecycleControl: true, suspend: true });
     const outcome = await f.call(READ);
-    expect(outcome.denied).toBeNull();
-    expect(f.bodies.map((execution) => execution.name)).toEqual([READ]);
+    expect(outcome.denied?.reason).toContain("agent_not_active: agent default is suspended (manual)");
+    expect(f.bodies).toHaveLength(0);
   });
 
   test("an advisory plan (no lifecycle control) lets the call run and writes a warning row", async () => {

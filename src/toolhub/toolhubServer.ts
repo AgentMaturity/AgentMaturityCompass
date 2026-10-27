@@ -26,7 +26,7 @@ import {
   type ToolBlastRadiusConsent,
   type ToolBlastRadiusReviewerDecision
 } from "./blastRadiusConsent.js";
-import { ToolhubJournal, isJournaledToolhubExecution, toolhubApprovalIntent, toolhubExecutionId, openToolhubExecutionEvidence, classifyToolhubOutcome, type JournaledToolhubOutcome } from "./toolhubJournal.js";
+import { ToolhubJournal, isJournaledToolhubExecution, toolhubLifecycleHold, toolhubApprovalIntent, toolhubExecutionId, openToolhubExecutionEvidence, classifyToolhubOutcome, type JournaledToolhubOutcome } from "./toolhubJournal.js";
 import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
 import { executeFsRead, executeFsWrite } from "./toolhubExecutors/fs.js";
 import { executeGit } from "./toolhubExecutors/git.js";
@@ -792,7 +792,7 @@ export class ToolHubService {
       });
     }
 
-    const journaled = isJournaledToolhubExecution(effectiveMode, intent.actionClass);
+    const journaled = isJournaledToolhubExecution(effectiveMode, intent.actionClass), held = journaled ? null : toolhubLifecycleHold(this.workspace, intent.request.agentId, intent.actionClass); if (held !== null) return this.auditDenied(intent, "AGENT_NOT_ACTIVE", held, { executeAttempted: requestedMode === "EXECUTE", executeWithoutTicketAttempted: false }); // P2-23: held agents, unjournaled calls
     const executionId = journaled ? toolhubExecutionId(workspaceIdFromDirectory(this.workspace), intent.intentId) : `exec_${randomUUID().replace(/-/g, "")}`;
     const blastRadiusReviewerDecision: ToolBlastRadiusReviewerDecision =
       approvalUsedId !== null
