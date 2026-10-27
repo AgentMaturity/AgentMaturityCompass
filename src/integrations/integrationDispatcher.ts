@@ -500,6 +500,7 @@ async function dispatchIntegrationEventAttempt(params: IntegrationEventInput, be
   const standardPayloadBody = canonicalize(payload);
 
   const skipped: string[] = [];
+  const openJournals = journals; // A const keeps the narrowing inside the callback below; `journals` is a reassigned let.
   const prepared = buildQueueDeliveries({
     workspace: params.workspace,
     config,
@@ -507,7 +508,7 @@ async function dispatchIntegrationEventAttempt(params: IntegrationEventInput, be
     standardPayloadBody,
     channels,
     skipped, secretValues: batch?.secretValues,
-    publishSequence: journals ? channelId => journals.publish("reserve-sequence", journal => {
+    publishSequence: openJournals ? channelId => openJournals.publish("reserve-sequence", journal => {
       const sequence = nextIntegrationChannelSequenceInJournal(journal, params.workspace, channelId); reservedSequences.push({ channelId, sequence }); return sequence;
     }) : undefined
   });

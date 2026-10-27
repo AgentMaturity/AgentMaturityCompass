@@ -50,6 +50,7 @@ export function appendOpsAuditEvent(params: {
   } catch (cause) { failed = true; primary = cause; throw cause; }
   finally {
     try { ledger.close(); }
+    // oxlint-disable-next-line no-unsafe-finally -- A cleanup failure must surface, with any primary failure, instead of reporting success.
     catch (cleanup) { if (failed) throw new AggregateError([primary, cleanup], "ops audit and ledger close failed", { cause: primary }); throw cleanup; }
   }
 }

@@ -5,7 +5,7 @@ import { capturePurposePublication, assertPurposePublicationCurrent } from "../.
 import type { PurposeSignature } from "../../keys/purposeProviders.js";
 import { canonicalSigningKey } from "../../keys/algorithmPolicy.js";
 import { keyPolicy, loadKeysConfig } from "../../keys/keysConfig.js";
-import { KeyProviderError } from "../../keys/provider.js";
+import { KeyProviderError, type KeyProviderId } from "../../keys/provider.js";
 import { publicKeyFromPrivate } from "../../crypto/keyHistoryEnvelope.js";
 import { canonicalize } from "../../utils/json.js";
 import { vaultStatus } from "../../vault/vault.js";
@@ -16,7 +16,7 @@ export function captureRetentionAuthority(workspace: string, asynchronous: boole
   if (!asynchronous) getSigningKey(workspace, "artifact-seal"); // A blocking private-key API refuses held/configured providers before effects.
   // Warm the actual vault/history before any final gate. Configured-but-unbound file fallback refuses here.
   const captured = capturePurposePublication(workspace, "artifact-seal"), bound = boundProviderKey(workspace, "artifact-seal");
-  const holder = bound?.binding.provider ?? "file", publicKey = bound?.publicKeyPem ?? getSigningPublicKeyPem(workspace, "artifact-seal");
+  const holder: KeyProviderId = bound?.binding.provider ?? "file", publicKey = bound?.publicKeyPem ?? getSigningPublicKeyPem(workspace, "artifact-seal");
   const algorithm = canonicalSigningKey(publicKey)?.algorithm;
   if (!algorithm) throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", holder, "the retention key has no supported signing identity");
   assertSigningKeyUsable(workspace, "artifact-seal", publicKey, holder);

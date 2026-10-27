@@ -548,7 +548,9 @@ export async function runExperimentAsync(params: Parameters<typeof runExperiment
   finally {
     try { evidence.close(); }
     catch (closeError) {
+      // oxlint-disable-next-line no-unsafe-finally -- A cleanup failure must surface, with any primary failure, instead of reporting success.
       if (failed) throw new ExperimentReportPublicationError(Object.freeze([...publishedFiles]), failure, phase, attemptedFile, entryHash, closeError);
+      // oxlint-disable-next-line no-unsafe-finally -- A cleanup failure must surface, with any primary failure, instead of reporting success.
       throw new ExperimentReportPublicationError(Object.freeze([...publishedFiles]), closeError, "close", null, entryHash);
     }
   }

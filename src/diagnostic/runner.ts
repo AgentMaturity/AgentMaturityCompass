@@ -651,7 +651,7 @@ async function runDiagnosticCore(input: RunDiagnosticInput, outputMarkdownPath?:
       0;
 
     let targetProfile: TargetProfile | null = instant?.targetProfile ?? null;
-    let targetSignatureValid = instant?.targetSignatureValid ?? true;
+    let targetSignatureValid: boolean = instant?.targetSignatureValid ?? true;
     if (input.targetName && instant === undefined) {
       targetProfile = loadTargetProfile(workspace, input.targetName, agentId);
       targetSignatureValid = verifyTargetProfileSignature(workspace, targetProfile);

@@ -96,7 +96,7 @@ class DriftPartialError extends Error {
   }
 }
 /** Preserve an already published incident when a maintained caller's secondary effect fails. */
-export function driftPostPublicationError(workspace: string, result: DriftCheckResult, phase: string, cause: unknown): unknown {
+export function driftPostPublicationError(workspace: string, result: Pick<DriftCheckResult, "agentId" | "incidentId">, phase: string, cause: unknown): unknown {
   return result.incidentId === null ? cause : new DriftPartialError(result.incidentId,
     join(getAgentPaths(workspace, result.agentId).rootDir, "incidents", `${result.incidentId}.json`), phase, ["incident", "drift-check"], cause);
 }
@@ -175,6 +175,7 @@ async function finishDriftCheck(params: DriftCheckParams, ready: ReadyDrift, inc
     finally {
       if (failed === undefined) phase = "ledger-close";
       try { ledger.close(); completed.push("ledger-close"); }
+      // oxlint-disable-next-line no-unsafe-finally -- A cleanup failure must surface, with any primary failure, instead of reporting success.
       catch (error) { if (failed !== undefined) throw new AggregateError([failed, error], "drift ledger close also failed", { cause: failed }); throw error; }
     }
 

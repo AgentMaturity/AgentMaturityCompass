@@ -29,5 +29,6 @@ export function promptArchiveBytes(compiled: CompiledPromptPack, signature: Prom
     if (out.status !== 0) throw new Error("failed to create prompt pack archive", { cause: out.error ?? new Error(out.stderr || out.stdout || "tar did not complete") });
     return readFileSync(target);
   } catch (cause) { failure = cause; throw cause; }
+  // oxlint-disable-next-line no-unsafe-finally -- A cleanup failure must surface, with any primary failure, instead of reporting success.
   finally { try { rmSync(temp, { recursive: true, force: true }); } catch (cleanup) { throw new Error("prompt archive staging cleanup did not complete", { cause: failure === undefined ? cleanup : new AggregateError([failure, cleanup]) }); } }
 }

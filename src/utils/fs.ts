@@ -6,7 +6,7 @@ export function ensureDir(path: string): void {
   mkdirSync(path, { recursive: true });
 }
 
-export function writeFileAtomic(path: string, data: string | Buffer, mode?: number): void {
+export function writeFileAtomic(path: string, data: string | Uint8Array, mode?: number): void {
   const dir = dirname(path);
   ensureDir(dir);
   const tmp = join(dir, `.${randomBytes(6).toString("hex")}.tmp`);

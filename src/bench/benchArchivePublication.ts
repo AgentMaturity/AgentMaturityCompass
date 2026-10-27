@@ -40,5 +40,6 @@ export function benchArchiveBytes(input:{bench:BenchArtifact;signature:ReturnTyp
     for(const row of members){const path=join(root,row.path);ensureDir(dirname(path));writeFileAtomic(path,row.bytes,0o644);}
     const files=collectFiles(temp),candidate=join(temp,".candidate.amcbench"),out=spawnSync("tar",["-czf",candidate,"-C",temp,...files],{encoding:"utf8"});
     if(out.status!==0)throw new Error("failed to create bench archive",{cause:out.error??new Error(out.stderr||out.stdout||"tar did not complete")});return readFileSync(candidate);
+  // oxlint-disable-next-line no-unsafe-finally -- A cleanup failure must surface, with any primary failure, instead of reporting success.
   }catch(cause){failure=cause;throw cause;}finally{try{rmSync(temp,{recursive:true,force:true});}catch(cleanup){throw new Error("bench archive staging cleanup did not complete",{cause:failure===undefined?cleanup:new AggregateError([failure,cleanup])});}}
 }

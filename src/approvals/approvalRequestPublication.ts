@@ -108,7 +108,7 @@ function captureRequestAuthority(workspace: string) {
   const originalPublic = bound?.publicKeyPem ?? getSigningPublicKeyPem(workspace, "artifact-seal"), key = canonicalSigningKey(originalPublic);
   if (key === null) throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", holder, "the original approval request signer is unsupported");
   const policyShape = canonicalize(keyPolicy(loadKeysConfig(workspace)));
-  let observedUnlocked = false, failure: { cause: unknown } | null = null;
+  let observedUnlocked = false, failure = null as { cause: unknown } | null;
   const assertCurrent = () => {
     if (failure !== null) throw failure.cause;
     try {
@@ -169,7 +169,7 @@ export function captureApprovalRequestPublication(inputWorkspace: string, before
     entered = true;
     const selected = structuredClone(input), shape = canonicalize(selected);
     let expected: OrgPairsSnapshot | null = null, request: ReturnType<typeof prepareApprovalRequestRecord>["request"] | null = null;
-    let signatureBytes: Buffer | null = null, bodyBytes: Buffer | null = null, failure: { cause: unknown } | null = null;
+    let signatureBytes: Buffer | null = null, bodyBytes: Buffer | null = null, failure = null as { cause: unknown } | null;
     let agentSelection: string | null = null, parents: { path: string; identity: string; mode: number }[] = [];
     const directory = (path: string) => {
       const stat = lstatSync(path);

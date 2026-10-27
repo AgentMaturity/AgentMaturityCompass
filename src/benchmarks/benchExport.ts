@@ -281,6 +281,7 @@ export async function exportBenchmarkArtifactAsync(input: BenchmarkExportInput, 
   } catch (cause) { failed = true; primary = cause; throw cause; }
   finally { try { rmSync(tmp, { recursive: true, force: true }); } catch (cleanup) {
     const error = new AggregateError(failed ? [primary, cleanup] : [cleanup], "Benchmark temporary cleanup failed", { cause: failed ? primary : cleanup });
+    // oxlint-disable-next-line no-unsafe-finally -- A cleanup failure must surface, with any primary failure, instead of reporting success.
     Object.assign(error, { outFile, archiveSha256, archiveWriteAttempted, archiveWriteReturned, transparency }); throw error;
   } }
 }

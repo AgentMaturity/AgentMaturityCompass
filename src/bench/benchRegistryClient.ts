@@ -267,6 +267,7 @@ export async function importBenchFromRegistryAttempt(params: { workspace: string
     try { actor?.(); } catch (refusal) { failure = new BenchImportPublicationError("authority", completedPaths, null, new AggregateError([cause, refusal])); throw failure; }
     throw cause;
   } finally { if (stage !== null) try { rmSync(stage, { recursive: true, force: true }); } catch (cleanup) {
+    // oxlint-disable-next-line no-unsafe-finally -- A cleanup failure must surface, with any primary failure, instead of reporting success.
     throw new BenchImportPublicationError("staging-cleanup", completedPaths, null, failure === undefined ? cleanup : new AggregateError([failure, cleanup]));
   } }
 }

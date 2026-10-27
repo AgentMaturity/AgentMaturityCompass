@@ -43,7 +43,7 @@ export function cgxLatestPackPath(workspace: string, agentId: string): string {
   return join(cgxRoot(workspace), "packs", "agents", agentId, "latest.pack.json");
 }
 
-function defaultCgxPolicy(): CgxPolicy {
+export function defaultCgxPolicy(): CgxPolicy {
   return cgxPolicySchema.parse({
     cgxPolicy: {
       version: 1,

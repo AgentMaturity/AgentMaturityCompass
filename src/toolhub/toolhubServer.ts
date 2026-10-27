@@ -338,7 +338,7 @@ export class ToolHubService {
     const recordShape = canonicalize({ ...state.record, approvalRequestId: undefined });
     let finished = false, expectedApprovalId: string | undefined;
     assertOrgPairsCurrent(approvalBefore); raw.assertCurrent();
-    let failure: { cause: unknown } | null = null;
+    let failure = null as { cause: unknown } | null;
     let approval: Awaited<ReturnType<typeof createApprovalForIntentAsync>> | null = null;
     const intrinsic = () => {
       if (canonicalize(input) !== shape || canonicalize(selected) !== shape || (process.env.AMC_NO_SIGN === "1") !== originalNoSign)

@@ -304,7 +304,7 @@ export async function createApprovalForIntentAsync(input: ApprovalRequestInput, 
   const selected = structuredClone(input), shape = canonicalize(selected), workspace = selected.workspace;
   const caller = options.beforePublish, raw = captureApprovalBoundInputs(workspace, selected.agentId, selected.workOrderId);
   options.beforePolicyCapture?.();
-  let expected = captureOrgPairs([approvalPolicyPath(workspace)]), failure: { cause: unknown } | null = null;
+  let expected = captureOrgPairs([approvalPolicyPath(workspace)]), failure = null as { cause: unknown } | null;
   options.beforePolicyCapture?.();
   let artifactCurrent: (() => void) | null = null;
   let policyCurrent: (() => void) | null = null, requestCurrent: (() => void) | null = null;

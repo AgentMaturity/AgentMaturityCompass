@@ -189,5 +189,5 @@ export async function executeMechanicPlanForAuthority(params: ExecuteParams, bef
     assertCurrent(); await current.save(plan, grants.assertCurrent);
     await current.log("MECHANIC_PLAN_EXECUTED", "policy", sha256Hex(Buffer.from(JSON.stringify(executed), "utf8")), plan.planId, grants.assertCurrent);
     assertCurrent(); return { result: { plan, executed }, current: { ...current, assertCurrent, failed: fail, assertInputs() { current.assertPlan(); grants.assertCurrent(); } } };
-  } catch (cause) { fail(cause); }
+  } catch (cause) { return fail(cause); }
 }

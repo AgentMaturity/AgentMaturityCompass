@@ -162,6 +162,7 @@ function readReportEvidence(workspace: string, agentId: string, start: number, e
   } catch (cause) { failed = true; failure = cause; throw cause; }
   finally {
     try { ledger.close(); }
+    // oxlint-disable-next-line no-unsafe-finally -- A cleanup failure must surface, with any primary failure, instead of reporting success.
     catch (close) { if (readonly && failed) throw new AggregateError([failure, close], "Outcome report evidence observation and close failed"); throw close; }
   }
 }

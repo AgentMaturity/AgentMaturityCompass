@@ -9,6 +9,7 @@ import { assertAllowed, DAY_MS, engineRiskTier, evaluateFor, evaluateForAsyncRec
   intentOf, livePrincipal, randomId, type A4Call } from "./a4Gates.js";
 import type { A4Store, A4TransitionResult } from "./a4Store.js";
 import type { A4TransitionAttempt } from "./a4TransitionSigning.js";
+import type { A4ChangeSpec } from "./a4TransitionRecords.js";
 
 type GateRequest = A4Call & { stage: A4Stage; gate: "direction" | "completion" | "policy"; proposedGatePolicy?: unknown; expectedHeadSeq: number };
 /** One actual gate recipe, shared by the explicit retained sync API and the maintained async callers. */
@@ -77,7 +78,7 @@ function requestPlan(store: A4Store, projectId: string, input: GateRequest, eval
         request_json: canonicalize(request), binding_digest: bindingDigest, intent_json: canonicalize(intent), readiness_sha256: intent.readinessBindingDigest,
         bound_items_json: JSON.stringify(boundItemIds), gate_policy_digest: intent.gatePolicyDigest, requested_by_key: principal.key,
         excluded_keys_json: JSON.stringify(intent.excludedKeys), expires_ts: request.expiresTs, envelope_json: null, ts } }]
-    } };
+    } satisfies A4ChangeSpec };
   } };
 }
 /** Original fixed-time synchronous contract. No promise or new actor is introduced on this path. */

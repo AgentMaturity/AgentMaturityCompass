@@ -6,6 +6,7 @@ import { assertKeysetComplete, boundProviderKey } from "../keys/keyset.js";
 import { capturePurposePublication } from "../keys/purposePublication.js";
 import { assertSigningKeyUsable, getSigningKey } from "../keys/signingKeys.js";
 import { keyPolicy, loadKeysConfig } from "../keys/keysConfig.js";
+import type { KeyProviderId } from "../keys/provider.js";
 import { publicKeyFromPrivate } from "../crypto/keyHistoryEnvelope.js";
 import { assertPolicySignerCurrent, describePolicySigner } from "../crypto/signing/signer.js";
 import { prepareFileSignatureWithAuditor, type SignedFileVerification } from "../org/orgSigner.js";
@@ -118,7 +119,7 @@ export function captureAuditPolicyMapPublication(workspace: string, input: Audit
   const originals = [...new Set(rows.map(row => row.kind))].map(kind => {
     const descriptor = describePolicySigner(workspace, kind), purpose = kind === "BUNDLE" ? "artifact-seal" as const : "config-signature" as const;
     const captured = descriptor.mode === "VAULT" ? capturePurposePublication(workspace, purpose) : null;
-    const holder = descriptor.mode === "VAULT" ? boundProviderKey(workspace, purpose)?.binding.provider ?? "file" : null;
+    const holder: KeyProviderId | null = descriptor.mode === "VAULT" ? boundProviderKey(workspace, purpose)?.binding.provider ?? "file" : null;
     return { descriptor, purpose, captured, holder };
   });
   const generation = canonicalize(assertKeysetComplete(workspace)), trust = canonicalize(loadTrustConfig(workspace));

@@ -71,7 +71,7 @@ describe("internal artifact/blob owner workspace anchors (not normal binding)", 
     const f = fixture(), bodies: Buffer[] = [], raw: Array<{ message: Buffer; signature: Buffer }> = [];
     const write = files.writeFileAtomic;
     vi.spyOn(files, "writeFileAtomic").mockImplementation((path, data, mode) => {
-      if (path === transparencySealPath(f.workspace) || path === merkleCurrentRootPath(f.workspace)) bodies.push(Buffer.isBuffer(data) ? Buffer.from(data) : Buffer.from(data, "utf8"));
+      if (path === transparencySealPath(f.workspace) || path === merkleCurrentRootPath(f.workspace)) bodies.push(typeof data === "string" ? Buffer.from(data, "utf8") : Buffer.from(data));
       return write(path, data, mode);
     });
     sdk.dispatch = async (operation, request, region) => {

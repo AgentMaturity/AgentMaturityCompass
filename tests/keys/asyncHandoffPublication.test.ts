@@ -62,7 +62,7 @@ function fixture() {
   initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
   boundary.calls = []; boundary.descriptions = 0;
   const params = { fromAgentId: "parent", toAgentId: "child", goal: "owned task", constraints: ["original"], evidenceSnapshot: ["evidence-original"],
-    ownershipTransfer: { evidenceRefs: ["owned-ref"] }, dependencyStatuses: [{ dependencyId: "d", status: "pending" as const }] };
+    ownershipTransfer: { evidenceRefs: ["owned-ref"] }, dependencyStatuses: [{ dependencyId: "d", ownerAgentId: null, status: "pending" as const, required: true, evidenceRefs: [], refusalReason: null }] };
   return { root, workspace, params, publicKey: getSigningPublicKeyPem(workspace, "artifact-seal") };
 }
 function files(workspace: string, id: string) {

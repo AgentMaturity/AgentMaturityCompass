@@ -212,7 +212,7 @@ function publishIngestAttestation(ledger: ReturnType<typeof openLedger>, params:
   const { workspace, agentId, sourceEvents, bundleHash, verdict, trustTier, attestation } = plan;
   for (const [index, event] of sourceEvents.entries()) {
     const payload = plan.payloads?.[index] ?? payloadForEvent(workspace, event);
-    const copy = ledger.appendEvidence({
+    const copyId = ledger.appendEvidence({
       sessionId: params.ingestSessionId,
       runtime: "unknown",
       eventType: "review",
@@ -227,10 +227,10 @@ function publishIngestAttestation(ledger: ReturnType<typeof openLedger>, params:
         attestation
       }
     });
-    onAppend?.(copy.id);
+    onAppend?.(copyId);
   }
 
-  const audit = ledger.appendEvidence({
+  const auditId = ledger.appendEvidence({
     sessionId: params.ingestSessionId,
     runtime: "unknown",
     eventType: "audit",
@@ -258,7 +258,7 @@ function publishIngestAttestation(ledger: ReturnType<typeof openLedger>, params:
     }
   });
 
-  onAppend?.(audit.id);
+  onAppend?.(auditId);
   return {
     attestedEventCount: sourceEvents.length,
     bundleHash,

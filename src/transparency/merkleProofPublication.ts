@@ -229,6 +229,7 @@ async function exportProof(input: { workspace: string; entryHash: string; outFil
     if (outputFd !== null && !outputCloseAttempted) { outputCloseAttempted = true; try { closeSync(outputFd); outputClosed = true; } catch (cause) { closeCauses.push(cause); } }
     for (const selected of [{ path: stage, owned: stageDirectory }, { path: archiveStage, owned: archiveDirectory }]) if (selected.path !== null) {
       try { const now = lstatSync(selected.path);
+        // oxlint-disable-next-line no-unsafe-finally -- The local cleanup catch handles this throw; it does not leave the finally.
         if (selected.owned === null || !now.isDirectory() || now.dev !== selected.owned.dev || now.ino !== selected.owned.ino || now.mode !== selected.owned.mode) throw new Error("proof cleanup refuses an unacknowledged stage directory");
         cleanupAttempts.push(selected.path); rmSync(selected.path, { recursive: true, force: true }); cleanupReturns.push(selected.path);
       } catch (cause) { cleanupCauses.push(cause); }

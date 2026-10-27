@@ -42,7 +42,9 @@ function withLedger<T>(workspace: string, operation: (ledger: Writer) => T, read
   try { return operation(ledger); }
   catch (cause) { failed = true; primary = cause; throw cause; }
   finally { try { ledger.close(); } catch (cleanup) {
+    // oxlint-disable-next-line no-unsafe-finally -- A cleanup failure must surface, with any primary failure, instead of reporting success.
     if (failed) throw new AggregateError([primary, cleanup], "retention operation and ledger close failed", { cause: primary });
+    // oxlint-disable-next-line no-unsafe-finally -- A cleanup failure must surface, with any primary failure, instead of reporting success.
     throw cleanup;
   } }
 }
@@ -274,7 +276,7 @@ function commitBlob(run: Run, prepared: NonNullable<ReturnType<typeof blobPlan>>
         assertRetentionFilesCurrent(own); run.prunedPrefix = own;
       }
       return "removed" as const;
-    })))));
+    }))));
   } catch (error) { if (error instanceof DeletionDenied) return; throw error; }
   if (outcome !== "removed") {
     run.progress.attemptedStages.push("blob-skip-audit");

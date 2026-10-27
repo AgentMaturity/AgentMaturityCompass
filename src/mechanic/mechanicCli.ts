@@ -281,7 +281,7 @@ export async function mechanicGapCli(params: {
       writeFileAtomic(output, `${JSON.stringify(published.result.gap, null, 2)}\n`, 0o644);
     }
     return published.result;
-  } catch (cause) { published.failOutput(cause); }
+  } catch (cause) { return published.failOutput(cause); }
 }
 
 export async function mechanicPlanCreateCli(params: {

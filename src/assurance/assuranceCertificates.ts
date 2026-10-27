@@ -346,6 +346,7 @@ export async function issueAssuranceCertificate(input: {
   } catch (cause) { failed = true; primary = cause; throw cause; }
   finally { try { cleanup(tmp); } catch (cleanupCause) {
     const error = new AggregateError(failed ? [primary, cleanupCause] : [cleanupCause], "Assurance certificate temporary cleanup failed", { cause: failed ? primary : cleanupCause });
+    // oxlint-disable-next-line no-unsafe-finally -- A cleanup failure must surface, with any primary failure, instead of reporting success.
     Object.assign(error, { publication, publishedPaths: Object.freeze([...publishedPaths]), attemptedPath, transparency }); throw error;
   } }
 }

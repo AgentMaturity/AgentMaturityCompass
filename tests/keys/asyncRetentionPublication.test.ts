@@ -398,7 +398,7 @@ describe("retention async staged raw artifact publication", () => {
         // blob ID, so this owned SQL competitor signs the actual shared-path preimage instead of assuming dedup.
         const original = selected(f), prev = ledger.getAllEvents().at(-1)!.event_hash, ts = Date.now();
         const row: EvidenceEvent = { ...original, id: "owned-shared-blob-reference", ts, session_id: "new-reference",
-          payload_path: original.canonical_payload_path, payload_inline: null, meta_json: "{}", prev_event_hash: prev,
+          payload_path: original.canonical_payload_path ?? null, payload_inline: null, meta_json: "{}", prev_event_hash: prev,
           archived: 0, archive_segment_id: null, archive_manifest_sha256: null, payload_pruned: 0, payload_pruned_ts: null };
         const metadata = canonicalMetadataForHash({ id: row.id, ts, sessionId: row.session_id, runtime: row.runtime,
           eventType: row.event_type, payloadPath: row.payload_path, payloadInline: row.payload_inline, metaJson: row.meta_json });
@@ -432,7 +432,7 @@ describe("retention async staged raw artifact publication", () => {
     const f = fixture(), file = source(f), bytes = readFileSync(file), p = pause(f, 2);
     const pending = runRetentionAsync({ workspace: f.workspace, dryRun: false }); let originalTs: number | null = null;
     try {
-      await atPause(p, pending); originalTs = selected(f).payload_pruned_ts;
+      await atPause(p, pending); originalTs = selected(f).payload_pruned_ts ?? null;
       const ledger = openLedger(f.workspace);
       try { ledger.pruneEventPayloadColumns(["retention-owned-event"], Date.now() + 1); } finally { ledger.close(); }
       expect(selected(f)).toMatchObject({ payload_pruned: 1, ts: expect.any(Number) });

@@ -105,7 +105,7 @@ async function routed(handler: typeof handleFleetRoute | typeof handleDriftRoute
   const req = Readable.from([JSON.stringify(body)]) as IncomingMessage; req.method = "POST"; req.url = path;
   const headers = new Map<string, unknown>(); let payload = "";
   const response = { statusCode: 0, headersSent: false, setHeader(name: string, value: unknown) { headers.set(name, value); }, getHeader(name: string) { return headers.get(name); },
-    writeHead(status: number) { this.statusCode = status; this.headersSent = true; return this; }, end(bytes: string) { payload = String(bytes); } } as unknown as ServerResponse;
+    writeHead(this: { statusCode: number; headersSent: boolean }, status: number) { this.statusCode = status; this.headersSent = true; return this; }, end(bytes: string) { payload = String(bytes); } } as unknown as ServerResponse;
   expect(await handler(path, "POST", req, response, workspace, guard)).toBe(true);
   return { status: response.statusCode, body: JSON.parse(payload) };
 }

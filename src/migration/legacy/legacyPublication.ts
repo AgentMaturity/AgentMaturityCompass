@@ -5,7 +5,7 @@ import { assertKeysetComplete } from "../../keys/keyset.js";
 import { captureRunHashAuthority } from "../../ledger/runHashSignature.js";
 import { withControlFileLock } from "../../lifecycle/controlFileLock.js";
 import { prepareFileSignatureWithAuditor } from "../../org/orgSigner.js";
-import { assertOrgPairsCurrent, captureOrgFiles, orgPairBytes } from "../../org/preparedOrgPairs.js";
+import { assertOrgPairsCurrent, captureOrgFiles, orgPairBytes, type OrgPairsSnapshot } from "../../org/preparedOrgPairs.js";
 import { loadTrustConfig } from "../../trust/trustConfig.js";
 import { sha256Hex } from "../../utils/hash.js";
 import { canonicalize } from "../../utils/json.js";
@@ -128,7 +128,7 @@ export function captureLegacyPublication(workspace: string, originalLog: Extract
         throw new Error("legacy relabel prefix has no final newline; refusing to append before signing");
       const suffix = Buffer.from(lines.length > 0 ? `${lines.join("\n")}\n` : "");
       const logBytes = Buffer.concat([prefix, suffix]);
-      const expected = { members: [...original.members, ...targets.members].map(row => ({ ...row, bytes: row.bytes === null ? null : Buffer.from(row.bytes) })) };
+      const expected: { members: OrgPairsSnapshot["members"][number][] } = { members: [...original.members, ...targets.members].map(row => ({ ...row, bytes: row.bytes === null ? null : Buffer.from(row.bytes) })) };
       let expectedNamespace = originalNamespace.map(row => ({ ...row, names: row.names === null ? null : [...row.names] }));
       const assertExpected = () => {
         assertNamespace(expectedNamespace); assertOrgPairsCurrent(expected);

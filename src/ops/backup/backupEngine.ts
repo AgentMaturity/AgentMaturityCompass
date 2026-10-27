@@ -482,6 +482,7 @@ export async function createBackupAsync(input: Parameters<typeof createBackup>[0
   } catch (cause) { failed = true; primary = cause; throw cause; }
   finally {
     try { rmSync(temp, { recursive: true, force: true }); }
+    // oxlint-disable-next-line no-unsafe-finally -- A cleanup failure must surface, with any primary failure, instead of reporting success.
     catch (cleanup) { throw new BackupCleanupIncompleteError(Object.freeze({ ...progress }), temp, failed, primary, cleanup); }
   }
 }

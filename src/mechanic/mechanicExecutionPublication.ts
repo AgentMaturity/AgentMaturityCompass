@@ -13,7 +13,7 @@ export async function mechanicPlanRequestApprovalForAuthority(params: Parameters
       artifact: { kind: "policy", sha256: sha256Hex(Buffer.from(JSON.stringify(result.approvalRequests), "utf8")), id: result.plan.planId } },
       current.run, current.assertInputs, current.state);
     current.assertCurrent(); return { ...result, transparencyHash };
-  } catch (cause) { current.failed(cause); }
+  } catch (cause) { return current.failed(cause); }
 }
 export async function mechanicPlanExecuteForAuthority(params: Parameters<typeof executeMechanicPlanForAuthority>[0], beforePublish: () => void) {
   const { result, current } = await executeMechanicPlanForAuthority({ ...params }, beforePublish);
@@ -22,5 +22,5 @@ export async function mechanicPlanExecuteForAuthority(params: Parameters<typeof 
       artifact: { kind: "policy", sha256: sha256Hex(Buffer.from(JSON.stringify(result.executed), "utf8")), id: result.plan.planId } },
       current.run, current.assertInputs, current.state);
     current.assertCurrent(); return { ...result, transparencyHash };
-  } catch (cause) { current.failed(cause); }
+  } catch (cause) { return current.failed(cause); }
 }

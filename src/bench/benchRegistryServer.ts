@@ -240,6 +240,7 @@ export function prepareBenchRegistryPublish(params: { dir: string; benchFile: st
     inspected = inspectBenchArtifact(file);
     if (verifyResult.fileSha256 !== digest || inspected.sha256 !== digest) throw new Error("selected registry artifact changed during verification");
   } catch (cause) { failure = cause; throw cause; } finally { try { rmSync(stage, { recursive: true, force: true }); } catch (cleanup) {
+    // oxlint-disable-next-line no-unsafe-finally -- A cleanup failure must surface, with any primary failure, instead of reporting success.
     throw new Error("registry private staging cleanup did not complete", { cause: failure === undefined ? cleanup : new AggregateError([failure, cleanup]) });
   } }
   const benchId = inspected.bench.benchId, version = input.version ?? new Date(inspected.bench.generatedTs).toISOString();

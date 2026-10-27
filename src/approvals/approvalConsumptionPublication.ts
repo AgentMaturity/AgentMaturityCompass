@@ -262,6 +262,7 @@ export function captureApprovalConsumptionEntry(inputWorkspace: string) {
                 native.cleanupAttempted = true;
                 unlinkSync(temp);
                 native.cleanupReturned = true;
+                // oxlint-disable-next-line no-unsafe-finally -- The local cleanup catch handles this throw; it does not leave the finally.
                 if (orgPairBytes(captureOrgFiles([temp]), temp) !== null) throw new Error("approval temporary name is not absent after unlink returned");
                 native.cleanupAcknowledged = true; native.cleanupDisposition = "returned-and-absent";
               } catch (error) { native.cleanupCause = error; native.cleanupDisposition = native.cleanupAttempted ? "cleanup-uncertain" : "stage-observation-refused-retained"; fail(error); }

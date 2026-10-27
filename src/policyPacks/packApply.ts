@@ -79,7 +79,9 @@ export function writePolicyPackAudit(workspace: string, agentId: string, payload
     return out.id;
   } catch (cause) { failed = cause; throw cause; } finally {
     try { ledger.close(); } catch (close) {
+      // oxlint-disable-next-line no-unsafe-finally -- A cleanup failure must surface, with any primary failure, instead of reporting success.
       if (failed !== undefined) throw new AggregateError([failed, close], "policy-pack audit and connection close failed", { cause: failed });
+      // oxlint-disable-next-line no-unsafe-finally -- A cleanup failure must surface, with any primary failure, instead of reporting success.
       throw close;
     }
   }

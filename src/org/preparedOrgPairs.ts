@@ -136,7 +136,7 @@ export function publishOrgPairs(workspace: string, writes: readonly OrgPairWrite
 /** Internal fixed BUNDLE preparation. Retain the original gate across a real later log/scheduler phase. */
 export async function prepareOrgPairsAsync(workspace: string, writes: readonly OrgPairWrite[], options: OrgPairsOptions = {}, previous?: OrgPairsSnapshot) {
   const beforePublish = captureOrgPairsAuthority(workspace, options.beforePublish), assertInputsCurrent = options.assertInputsCurrent;
-  beforePublish(); const planned = plan(writes, previous), prepared = [];
+  beforePublish(); const planned = plan(writes, previous), prepared: Awaited<ReturnType<typeof prepareFileSignatureWithAuditor>>[] = [];
   const beforeSign = () => { beforePublish(); assertInputsCurrent?.(); beforePublish(); assertOrgPairsCurrent(planned.before); };
   for (const row of planned.own) { beforeSign(); prepared.push(await prepareFileSignatureWithAuditor(workspace, row.path, row.bytes, "BUNDLE", beforeSign)); beforePublish(); }
   let assertPublishedCurrent: (() => void) | null = null;

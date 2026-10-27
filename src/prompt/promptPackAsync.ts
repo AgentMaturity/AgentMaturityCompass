@@ -112,5 +112,6 @@ export async function buildPromptPackForApiAsync(params: { workspace: string; ag
     if (cause instanceof PromptPublicationError) completedPaths = cause.completedPaths.map(path => resolve(input.workspace, path));
     failure = cause; throw new PromptBuildPublicationError(prerequisites, Object.freeze([...completedPaths]), Object.freeze([...logs]), cause);
   } finally { if (ownedTemp !== null) { try { rmSync(ownedTemp, { recursive: true, force: true }); }
+    // oxlint-disable-next-line no-unsafe-finally -- A cleanup failure must surface, with any primary failure, instead of reporting success.
     catch (cleanup) { throw new PromptBuildPublicationError(prerequisites, Object.freeze([...completedPaths]), Object.freeze([...logs]), failure === undefined ? cleanup : new AggregateError([failure, cleanup])); } } }
 }

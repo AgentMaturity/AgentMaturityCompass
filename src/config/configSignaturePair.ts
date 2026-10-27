@@ -129,8 +129,9 @@ function capture(workspace: string, file: string, field: "configSha256" | "diges
   beforePublish();
   const selected = options.previous ?? withConfigSignaturePairLock(workspace, () => captureOrgPairs([file]));
   const previous: OrgPairsSnapshot = { members: selected.members.filter(row => row.path === file || row.path === `${file}.sig`).map(row => ({ ...row, bytes: row.bytes === null ? null : Buffer.from(row.bytes) })) };
-  const bytes = copy ?? orgPairBytes(previous, file);
-  if (bytes === null) throw new Error("config file missing: " + file);
+  const found = copy ?? orgPairBytes(previous, file);
+  if (found === null) throw new Error("config file missing: " + file);
+  const bytes: Buffer = found; // `complete` is a hoisted declaration, so the null check above does not narrow inside it.
   orgPairBytes(previous, `${file}.sig`); // Both actual destinations must belong to the captured pair.
   const original = captureCompatibilityAuthority(workspace);
   publicCurrent?.(); // Refuse a changed generation after the actual existing private warm, before another actor or await.

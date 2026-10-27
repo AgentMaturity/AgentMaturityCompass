@@ -96,7 +96,7 @@ interface FactCatalog {
   toolDenialsObserved: FactResult;
 }
 
-interface BinderCollectResult {
+export interface BinderCollectResult {
   binder: AuditBinderJson;
   includedEventKinds: string[];
   calculationManifest: Record<string, unknown>;
