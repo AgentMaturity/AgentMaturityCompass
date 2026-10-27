@@ -1,0 +1,100 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L1-MOB-04",
+  "polarity": "negative",
+  "evidenceClass": "empty",
+  "setup": {
+    "harness": "evidence",
+    "fixtureClaimKind": "synthetic_example",
+    "window": {
+      "start": "2026-10-01T00:00:00.000Z",
+      "end": "2026-10-18T12:00:00.000Z"
+    },
+    "subject": {
+      "tenantId": "mobility-fixture-tenant",
+      "workspaceId": "mobility-fixture-workspace",
+      "deploymentId": "mobility-fleet-software-fixture",
+      "agentId": "mobility-fixture-agent",
+      "subjectId": null
+    },
+    "plan": {
+      "applicability": "applicable",
+      "policyDigest": "sha256:fixture-policy",
+      "mode": "enforce"
+    },
+    "items": [],
+    "priorUses": [],
+    "mobilityOracle": {
+      "kind": "change_gate",
+      "input": {
+        "context": {
+          "tenantId": "mobility-fixture-tenant",
+          "workspaceId": "mobility-fixture-workspace",
+          "deploymentId": "mobility-fleet-software-fixture",
+          "agentId": "mobility-fixture-agent",
+          "controlId": "L1-MOB-04",
+          "controlVersion": "0.1.0",
+          "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+        },
+        "at": "2026-10-18T12:00:00.000Z",
+        "proposerId": "mobility-fixture-agent",
+        "change": {
+          "binding": {
+            "tenantId": "mobility-fixture-tenant",
+            "workspaceId": "mobility-fixture-workspace",
+            "deploymentId": "mobility-fleet-software-fixture",
+            "agentId": "mobility-fixture-agent",
+            "controlId": "L1-MOB-04",
+            "controlVersion": "0.1.0",
+            "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+          },
+          "changeId": "change-1",
+          "createdAt": "2026-10-18T09:00:00.000Z",
+          "classification": "unknown",
+          "bytesUtf8": "SYNTHETIC ECU calibration proposal v1\n"
+        },
+        "analysis": {
+          "binding": {
+            "tenantId": "mobility-fixture-tenant",
+            "workspaceId": "mobility-fixture-workspace",
+            "deploymentId": "mobility-fleet-software-fixture",
+            "agentId": "mobility-fixture-agent",
+            "controlId": "L1-MOB-04",
+            "controlVersion": "0.1.0",
+            "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+          },
+          "changeId": "change-1",
+          "changeDigest": "sha256:9e4ec1a8afb0be08004a24ba2da12d046f2a947e53e01528f7b99d7ea78c9c1e",
+          "createdAt": "2026-10-18T10:00:00.000Z",
+          "impactSummary": "Synthetic change-impact note; no vehicle safety case performed.",
+          "validationRecordId": "synthetic-validation-1"
+        },
+        "approval": {
+          "binding": {
+            "tenantId": "mobility-fixture-tenant",
+            "workspaceId": "mobility-fixture-workspace",
+            "deploymentId": "mobility-fleet-software-fixture",
+            "agentId": "mobility-fixture-agent",
+            "controlId": "L1-MOB-04",
+            "controlVersion": "0.1.0",
+            "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+          },
+          "changeId": "change-1",
+          "changeDigest": "sha256:9e4ec1a8afb0be08004a24ba2da12d046f2a947e53e01528f7b99d7ea78c9c1e",
+          "approverId": "synthetic-human-1",
+          "decision": "approve",
+          "approvedAt": "2026-10-18T11:00:00.000Z",
+          "expiresAt": "2026-10-18T13:00:00.000Z"
+        }
+      },
+      "expected": {
+        "result": "not_evaluated",
+        "reasonCode": "change_classification_unavailable"
+      }
+    }
+  },
+  "expected": {
+    "result": "not_evaluated",
+    "reasonCode": "incomplete"
+  }
+}

@@ -30,6 +30,12 @@ entityTypes:
   - water_system_operator
   - power_generator
   - food_facility
+  # P3-17 Mobility: asserted example entity scope only.
+  - port_facility_operator
+  - freight_logistics_operator
+  - housing_provider
+  - vehicle_software_provider
+  - fleet_operator
 riskClasses: []
 useCases:
   - consequential_decision_about_people
@@ -60,6 +66,13 @@ useCases:
   - food_recall
   - food_lot_release
   - lot_due_diligence
+  # P3-17 Mobility: own additive use cases.
+  - cold_chain_release
+  - tenant_screening
+  - port_access
+  - vehicle_safety_change
+  - vehicle_ota_update
+  - vehicle_fallback_drill
 dataClasses:
   # P3-14: Governance defense fixture data class; no real CUI is supplied by the draft.
   - controlled_unclassified_information
@@ -69,6 +82,11 @@ dataClasses:
   # P3-16: declared fixture data categories.
   - ot_telemetry
   - food_traceability_records
+  # P3-17 Mobility: synthetic data scope, not classification assurance.
+  - shipment_condition_records
+  - port_access_records
+  - tenant_application_records
+  - vehicle_software_artifacts
 domains:
   # P2-30 Technology domain from STATION_DOMAINS; own additive block.
   - technology.platforms-data
@@ -81,6 +99,9 @@ domains:
   # P3-16: exact native P1-13 Environment domain IDs.
   - environment.energy-utilities-water
   - environment.food-textiles-manufacturing
+  # P3-17 Mobility: native domains; disputed source pack placement remains unchanged.
+  - mobility.ports-logistics-cities
+  - mobility.vehicles-aviation
 ownerRoles: [ciso, dpo, senior_manager, head_of_qa]
 # amc-audit-map-v1: the built-in audit map amc.audit.map.builtin.v1 (src/audit/auditMapBuiltin.ts).
 # atlas: MITRE ATLAS technique ids (src/compliance/citations/reference/atlas.json holds the release they are checked against).

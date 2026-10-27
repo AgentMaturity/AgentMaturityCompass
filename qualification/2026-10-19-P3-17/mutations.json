@@ -1,0 +1,2394 @@
+{
+  "sourceHead": "7458c47c343d1b54921501a04e0be6f280a38963",
+  "int": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+  "summary": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/summary.json",
+    "sha256": "c44bc0b49f2c4eea74b4bb95b87e027dc33d6bddfd2bfe6ee8bc60f1068f4866",
+    "bytes": 39017
+  },
+  "planned": 69,
+  "attempted": 69,
+  "killed": 69,
+  "matrixComplete": true,
+  "guardCoverageComplete": true,
+  "coverageGaps": [],
+  "subconditionLimits": [
+    "One mutation per compound guard family proves only its targeted independently asserted counterexample(s), not every sibling predicate.",
+    "The initial security future-time sibling is independently dominated by ordered event-stream chronology. Initial binding/facility subconditions now have one-record counterexamples.",
+    "Application/event generic whole-binding tests do not establish every caller record or every field predicate separately. The added ECU and initial-security tests independently exercise the specifically named records.",
+    "Standard-library primitive literals, every min/max and each enum are not each claimed independently mutated; the targeted duration/digest/version primitives now have explicit tests.",
+    "The future-metadata row is diagnostic-only; the fleet-availability and unsafe-deadline promotion rows test result truth without installing/releasing effects."
+  ],
+  "qualificationComplete": true,
+  "initialGreen": {
+    "passed": true,
+    "command": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/initial-green/command.json",
+      "sha256": "8b9a0e5f658008e5fe9ca0638330bd306fea33b6ed38f33ba3f00ee03643b02a",
+      "bytes": 3555
+    },
+    "nativeReport": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/initial-green/report.json",
+      "sha256": "a59a25268b6594fe2056117ea9dd9126869dd29619067f45e94a31ad1352b15f",
+      "bytes": 78826
+    },
+    "rawLog": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/initial-green/raw.log",
+      "sha256": "ce16990e874377fe8e9d8b0c66a6716154f596112aa17188cd42137ec3de734e",
+      "bytes": 805
+    },
+    "counts": {
+      "numTotalTests": 176,
+      "numPassedTests": 176,
+      "numFailedTests": 0,
+      "numPendingTests": 0,
+      "numTodoTests": 0
+    }
+  },
+  "restoredGreen": {
+    "passed": true,
+    "command": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/restored-green/command.json",
+      "sha256": "90951c5e2ebec8674da022a0562c6366f5f3186132b75f3691ecf3c50534dedf",
+      "bytes": 3558
+    },
+    "nativeReport": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/restored-green/report.json",
+      "sha256": "625b7ed39eb30ad752575847ba121b030cae7fa0e755cf0e6801611027877476",
+      "bytes": 78835
+    },
+    "rawLog": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/restored-green/raw.log",
+      "sha256": "8ada8bfd2ff2e60c611898223cafbaa8a729e948b232221c6763fd0e36aadcdf",
+      "bytes": 806
+    },
+    "counts": {
+      "numTotalTests": 176,
+      "numPassedTests": 176,
+      "numFailedTests": 0,
+      "numPendingTests": 0,
+      "numTodoTests": 0
+    }
+  },
+  "sourceRestoreChecks": [
+    {
+      "path": "tests/catalog/stations/mobility/vehicleSimulator.ts",
+      "sha256": "92c17cef59cbb6d1c61615dd15b07c92d6bc106077b1fb14a1d0cc666f0fa835",
+      "exactRestore": true
+    },
+    {
+      "path": "tests/catalog/stations/mobility/fixtures.test.ts",
+      "sha256": "929561268885b0188af73d1634062bf02e9c8d92357c37117a5a9b20e5e4add2",
+      "exactRestore": true
+    },
+    {
+      "path": "tests/catalog/stations/mobility/screeningLog.ts",
+      "sha256": "4bcf2a91c454455d094cd5e2e2b7a35279993e11f461e9c0b0eabd0ab1fcc449",
+      "exactRestore": true
+    },
+    {
+      "path": "tests/catalog/stations/mobility/otaDeployer.ts",
+      "sha256": "737219d1e85cb0e70363a8605720caaddde744c26ad8aeaee661942f8b6ad917",
+      "exactRestore": true
+    },
+    {
+      "path": "tests/catalog/stations/mobility/portAccess.ts",
+      "sha256": "5d07451aca8687b497d8bf8bcf127aa88cb720869d1d11d08693388e046b9785",
+      "exactRestore": true
+    },
+    {
+      "path": "tests/catalog/stations/mobility/releaseCheck.ts",
+      "sha256": "67a2954d20db980f1e85199159ffde99627591c51ba1368ade582ad8a334e5af",
+      "exactRestore": true
+    },
+    {
+      "path": "tests/catalog/stations/mobility/changeGate.ts",
+      "sha256": "cd6b071e653d7862034338a65835f51868d8a343d981a97ab9c958ebd9c07fa3",
+      "exactRestore": true
+    },
+    {
+      "path": "tests/catalog/stations/mobility/protocol.ts",
+      "sha256": "a66de96b55e867fc27adbc5610c072c5209b363447b21785477f2557244b3120",
+      "exactRestore": true
+    },
+    {
+      "path": "tests/catalog/stations/mobility/harness.ts",
+      "sha256": "9d7a4807d9df7720614e3d82fb90728afcaf4a050ec47b6a1a4ea4e3db5c691c",
+      "exactRestore": true
+    },
+    {
+      "path": "tests/catalog/stations/mobility/compiled.test.ts",
+      "sha256": "9539c487906ad9012930c48436d96e8d3bf84c96cd0b19900c8a64d6ecdd3659",
+      "exactRestore": true
+    },
+    {
+      "path": "tests/catalog/stations/mobility/overlay.test.ts",
+      "sha256": "41c3f7cbb884e775a7b37656e4d8c7467b21de47c58230922728ba2597c494c7",
+      "exactRestore": true
+    }
+  ],
+  "mutations": [
+    {
+      "id": "shared-bounded-identifiers",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-01-shared-bounded-identifiers.json",
+        "sha256": "3c93e0a912434efdd41ec5a09c8a2ecbdaa758503266a292438e1cadb9066f04",
+        "bytes": 1887
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/01-shared-bounded-identifiers/command.json",
+        "sha256": "e9a2d3c4e4b1dd19e25d2a213994213e4aee575653b47f27187d91e554da79af",
+        "bytes": 4111
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/01-shared-bounded-identifiers/report.json",
+        "sha256": "414cc671ff5bf6a47b26d855746d54d6de4913f2df2a1667297cfce4bb12dbec",
+        "bytes": 31123
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/01-shared-bounded-identifiers/raw.log",
+        "sha256": "ec2cfb8c6944151640b336f6292992f994d3bbf058f004c8b19c8c2c5a760e8f",
+        "bytes": 1382
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) rejects complete wrong-control protocols and consistently malformed facility identifiers"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "a66de96b55e867fc27adbc5610c072c5209b363447b21785477f2557244b3120",
+      "restoredSha256": "a66de96b55e867fc27adbc5610c072c5209b363447b21785477f2557244b3120"
+    },
+    {
+      "id": "shared-exact-control",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-02-shared-exact-control.json",
+        "sha256": "cc74de01541181e2cafedd84fa54872e66e18eb08ed3fe153f1fd4d0252ebb87",
+        "bytes": 1886
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/02-shared-exact-control/command.json",
+        "sha256": "da89b32d2f8dcb47230ea7de59b6b001ce0a481557ba47dbe984ae7670c4b30c",
+        "bytes": 4091
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/02-shared-exact-control/report.json",
+        "sha256": "d548d4f41282b198ee567e209c93b51ab98bcce110fccdc53a4e432bf410b48f",
+        "bytes": 31121
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/02-shared-exact-control/raw.log",
+        "sha256": "8c21d90881c82c83d7e0c8645393b4758e789d1927b1a72f1c1d67eb6e37d5e8",
+        "bytes": 1375
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) rejects complete wrong-control protocols and consistently malformed facility identifiers"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "a66de96b55e867fc27adbc5610c072c5209b363447b21785477f2557244b3120",
+      "restoredSha256": "a66de96b55e867fc27adbc5610c072c5209b363447b21785477f2557244b3120"
+    },
+    {
+      "id": "shared-whole-binding",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-03-shared-whole-binding.json",
+        "sha256": "e9da3fdce8bc2c0d4c3408cdaeac6217b3bc96687b682ee9f7194824a987739e",
+        "bytes": 1878
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/03-shared-whole-binding/command.json",
+        "sha256": "cca5eeaa5335f3f0ef8ceb114b8efb97baa2113e2462028f6843eecd5a591691",
+        "bytes": 4084
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/03-shared-whole-binding/report.json",
+        "sha256": "515a5c45b8985473bbe3185531c0df6c0a7c8884c3519a11af65c07c33147de6",
+        "bytes": 31122
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/03-shared-whole-binding/raw.log",
+        "sha256": "7b699a323a72eef1fd1d5a81decfe68284c0ffeec7ddb15d9ed6d0a5fad3a577",
+        "bytes": 1369
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) binds every subject, control version and illustrative plan field in nested records"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "a66de96b55e867fc27adbc5610c072c5209b363447b21785477f2557244b3120",
+      "restoredSha256": "a66de96b55e867fc27adbc5610c072c5209b363447b21785477f2557244b3120"
+    },
+    {
+      "id": "shared-uniqueness",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-04-shared-uniqueness.json",
+        "sha256": "ac0151ef45ffbc72efcb60839863f9cbb0dc1e396ffa12279b44075c3087e0d6",
+        "bytes": 2878
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/04-shared-uniqueness/command.json",
+        "sha256": "830f467624ff61ba23fe7d93c45113f67ba99dd2833d639bdf640f997c90c628",
+        "bytes": 7507
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/04-shared-uniqueness/report.json",
+        "sha256": "e8c88ec3f73ec4a7d0634602e11d423ed237de2caa02d8418b111942f4ee567c",
+        "bytes": 36951
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/04-shared-uniqueness/raw.log",
+        "sha256": "a23280735e009076e7a593e70f7b593aeed0a21db8c13c4b22bfbdd2df212d09",
+        "bytes": 2091
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) refuses duplicate screening pair identities without a second mismatch",
+        "Mobility synthetic local reference oracles (P3-17) refuses duplicate screening application identities without a second mismatch",
+        "Mobility synthetic local reference oracles (P3-17) refuses duplicate screening reason identities without a second mismatch",
+        "Mobility synthetic local reference oracles (P3-17) refuses duplicate screening feature identities without a second mismatch",
+        "Mobility synthetic local reference oracles (P3-17) refuses duplicate screening source identities without a second mismatch"
+      ],
+      "requiredFailurePatterns": [
+        "refuses\\ duplicate\\ screening\\ pair\\ identities\\ without\\ a\\ second\\ mismatch",
+        "refuses\\ duplicate\\ screening\\ application\\ identities\\ without\\ a\\ second\\ mismatch",
+        "refuses\\ duplicate\\ screening\\ reason\\ identities\\ without\\ a\\ second\\ mismatch",
+        "refuses\\ duplicate\\ screening\\ feature\\ identities\\ without\\ a\\ second\\ mismatch",
+        "refuses\\ duplicate\\ screening\\ source\\ identities\\ without\\ a\\ second\\ mismatch"
+      ],
+      "requiredFailureMatches": {
+        "refuses\\ duplicate\\ screening\\ pair\\ identities\\ without\\ a\\ second\\ mismatch": true,
+        "refuses\\ duplicate\\ screening\\ application\\ identities\\ without\\ a\\ second\\ mismatch": true,
+        "refuses\\ duplicate\\ screening\\ reason\\ identities\\ without\\ a\\ second\\ mismatch": true,
+        "refuses\\ duplicate\\ screening\\ feature\\ identities\\ without\\ a\\ second\\ mismatch": true,
+        "refuses\\ duplicate\\ screening\\ source\\ identities\\ without\\ a\\ second\\ mismatch": true
+      },
+      "sourceSha256": "a66de96b55e867fc27adbc5610c072c5209b363447b21785477f2557244b3120",
+      "restoredSha256": "a66de96b55e867fc27adbc5610c072c5209b363447b21785477f2557244b3120"
+    },
+    {
+      "id": "shared-complete-text",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-05-shared-complete-text.json",
+        "sha256": "0bf681e7a927c9f169613b2b1454354d054d94e17c45348f558245e8f01e0452",
+        "bytes": 1879
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/05-shared-complete-text/command.json",
+        "sha256": "b0679ac94d7068e86870961b496c86db647adf05d5a726d55536ca45df26d5c7",
+        "bytes": 4026
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/05-shared-complete-text/report.json",
+        "sha256": "74624508a89666aa8b96c872a585f29c2a46b014dab1d0998bb5fb1b2ebc7fdf",
+        "bytes": 31008
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/05-shared-complete-text/raw.log",
+        "sha256": "6170e4e3d9ebf991e2c08e900503107892b90ccf3bdc99172ca7e53738a4566b",
+        "bytes": 1440
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) L1-MOB-05/negative/oracle-ota-incomplete-r156.json: synthetic outcome and atomic effects"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "a66de96b55e867fc27adbc5610c072c5209b363447b21785477f2557244b3120",
+      "restoredSha256": "a66de96b55e867fc27adbc5610c072c5209b363447b21785477f2557244b3120"
+    },
+    {
+      "id": "shared-time-precision",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-06-shared-time-precision.json",
+        "sha256": "34c38091562199ef783e53c5a29a5ca55ac11a9069e41f23aee5ceb87616d607",
+        "bytes": 1889
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/06-shared-time-precision/command.json",
+        "sha256": "7287c21bbf86a1fa220c7a171d7a2c8d5024a92a1534e7db307b12e69aa1704c",
+        "bytes": 4115
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/06-shared-time-precision/report.json",
+        "sha256": "c0242cef369b4e306aae968ea485dd71a7f9982eb41d7d204e2d5aec8fee01ef",
+        "bytes": 31005
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/06-shared-time-precision/raw.log",
+        "sha256": "f890c1e2f852d713229fbbcfdbc2681cd3df918ab2be6944858150e64f532c2e",
+        "bytes": 1519
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) rejects rolled, zone-less and submillisecond protocol times without truncating expiry or deadline"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "a66de96b55e867fc27adbc5610c072c5209b363447b21785477f2557244b3120",
+      "restoredSha256": "a66de96b55e867fc27adbc5610c072c5209b363447b21785477f2557244b3120"
+    },
+    {
+      "id": "shared-finite-speed",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-07-shared-finite-speed.json",
+        "sha256": "73481833919dc9471bbacfba9b136bd6f1bafdd8754508064c3db8c972837f8e",
+        "bytes": 1904
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/07-shared-finite-speed/command.json",
+        "sha256": "82f263a1cc8fb51f7a207681620309858e092791f46e0ca886c08737e04649a1",
+        "bytes": 4097
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/07-shared-finite-speed/report.json",
+        "sha256": "8b4ca70d3c469226fdb07291534bab7d86978fa85747529933d465b39d3c0874",
+        "bytes": 31121
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/07-shared-finite-speed/raw.log",
+        "sha256": "ba6a1def9d4718537de26a31846e2c353cc0dd2214fd7731f99d394018cb787f",
+        "bytes": 1378
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) rejects nonfinite speed, unsafe deadlines and string booleans from complete fallback inputs"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "a66de96b55e867fc27adbc5610c072c5209b363447b21785477f2557244b3120",
+      "restoredSha256": "a66de96b55e867fc27adbc5610c072c5209b363447b21785477f2557244b3120"
+    },
+    {
+      "id": "shared-strict-boolean",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-08-shared-strict-boolean.json",
+        "sha256": "704503d696d8e98f14ec3d86af245c9588d496f122fa3ee832989d21de4b45ce",
+        "bytes": 1876
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/08-shared-strict-boolean/command.json",
+        "sha256": "1de43cd7c0c745a3d2a65f5d3fc547e12f8f4af0b2e9ea119672a25b2553ab63",
+        "bytes": 4103
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/08-shared-strict-boolean/report.json",
+        "sha256": "d006f404a6d5bd558a1b5473829bb7b62eabe67197a83e2be9036f8c8f190765",
+        "bytes": 31121
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/08-shared-strict-boolean/raw.log",
+        "sha256": "b586d0dd63d9ac5bef671657510198ca93fd014d8daa85fe6c57eeb9066f3354",
+        "bytes": 1379
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) rejects nonfinite speed, unsafe deadlines and string booleans from complete fallback inputs"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "a66de96b55e867fc27adbc5610c072c5209b363447b21785477f2557244b3120",
+      "restoredSha256": "a66de96b55e867fc27adbc5610c072c5209b363447b21785477f2557244b3120"
+    },
+    {
+      "id": "shared-no-envelope-trust-flags",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-09-shared-no-envelope-trust-flags.json",
+        "sha256": "f3d0cc8f07610c9ea9096447039b79c37817f10a80f18fbe0c6c241f6d43ed8f",
+        "bytes": 1902
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/09-shared-no-envelope-trust-flags/command.json",
+        "sha256": "45519d6276e7567988874cb3f6930e497cfa7fc2fad5c229417f2a2b25df026e",
+        "bytes": 4159
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/09-shared-no-envelope-trust-flags/report.json",
+        "sha256": "364ad8bed515cdd16254173ec11601fe060aa21d44d8ae5f26c2b8b1ba6414d3",
+        "bytes": 31124
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/09-shared-no-envelope-trust-flags/raw.log",
+        "sha256": "e7a647b1727c1a3713abc2054ae9649fd0730a1e6398f830ac6c7a20026d8eac",
+        "bytes": 1398
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) does not install with an envelope-supplied trust context or absent, invalid, future or expired trust"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "a66de96b55e867fc27adbc5610c072c5209b363447b21785477f2557244b3120",
+      "restoredSha256": "a66de96b55e867fc27adbc5610c072c5209b363447b21785477f2557244b3120"
+    },
+    {
+      "id": "missing-cold-dependency-promotion",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-10-missing-cold-dependency-promotion.json",
+        "sha256": "e909007462ea5b80633f564796f87526a34c7bb68763e73def44c3ade6b22fd6",
+        "bytes": 1926
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/10-missing-cold-dependency-promotion/command.json",
+        "sha256": "d7a88d3a571401bf65cb2ec16066d7acf10bccc91e4389009303fb67eabe9877",
+        "bytes": 4182
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/10-missing-cold-dependency-promotion/report.json",
+        "sha256": "a3ba341c8a8665d15121e5856f1457b4a21e023e2bbcba8dcb0fe77a8ba5d8cb",
+        "bytes": 31205
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/10-missing-cold-dependency-promotion/raw.log",
+        "sha256": "c1b377b7aa7cf655e3d3780fd20ddee7f981a44cd0bac5786ade8cab2da5d0ad",
+        "bytes": 1573
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) never invents a P2-27 adapter or releases a warm lot under pending scenario metadata"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "67a2954d20db980f1e85199159ffde99627591c51ba1368ade582ad8a334e5af",
+      "restoredSha256": "67a2954d20db980f1e85199159ffde99627591c51ba1368ade582ad8a334e5af"
+    },
+    {
+      "id": "screening-proxy-normalization",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-11-screening-proxy-normalization.json",
+        "sha256": "a051b711eacfd2257c96c216c52034d5c95197caf567cb4fe24daf62dae77cad",
+        "bytes": 1892
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/11-screening-proxy-normalization/command.json",
+        "sha256": "e4df1954a3653516075d9159be81a2de36b31b18183756e4ce7bf7bd9ce68b7d",
+        "bytes": 4110
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/11-screening-proxy-normalization/report.json",
+        "sha256": "9c39cc4f86c3671f7af671a8297d21bbe6e3682a57ca5e126f8e25d5af460269",
+        "bytes": 31014
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/11-screening-proxy-normalization/raw.log",
+        "sha256": "f6f95e9d95be54e48993052f1d31100b782c7399f8a46fddaa7ca3ba29a7fb17",
+        "bytes": 1361
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) refuses whitespace-equivalent ZIP proxy lineage before releasing any notice"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "4bcf2a91c454455d094cd5e2e2b7a35279993e11f461e9c0b0eabd0ab1fcc449",
+      "restoredSha256": "4bcf2a91c454455d094cd5e2e2b7a35279993e11f461e9c0b0eabd0ab1fcc449"
+    },
+    {
+      "id": "screening-pair-application-identity",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-12-screening-pair-application-identity.json",
+        "sha256": "7cc4e2c9996a70f150df87cf7a6ecfa03287c5b959389dfd07733f51355efff5",
+        "bytes": 2302
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/12-screening-pair-application-identity/command.json",
+        "sha256": "17f3b2088b682847f26801b809c5b3cbb7b71355599f1ecf82f98133723d8ff3",
+        "bytes": 4981
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/12-screening-pair-application-identity/report.json",
+        "sha256": "fd2bc936a985fc20061adfa41d38d759feef5a55df6efb6f0280f30b8ef03a19",
+        "bytes": 32567
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/12-screening-pair-application-identity/raw.log",
+        "sha256": "ed407476a75fc907bf7f313ca96a882534901f841e6f96389f1974acfa366ea9",
+        "bytes": 1559
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) refuses duplicate screening pair identities without a second mismatch",
+        "Mobility synthetic local reference oracles (P3-17) refuses duplicate screening application identities without a second mismatch"
+      ],
+      "requiredFailurePatterns": [
+        "refuses\\ duplicate\\ screening\\ pair\\ identities\\ without\\ a\\ second\\ mismatch",
+        "refuses\\ duplicate\\ screening\\ application\\ identities\\ without\\ a\\ second\\ mismatch"
+      ],
+      "requiredFailureMatches": {
+        "refuses\\ duplicate\\ screening\\ pair\\ identities\\ without\\ a\\ second\\ mismatch": true,
+        "refuses\\ duplicate\\ screening\\ application\\ identities\\ without\\ a\\ second\\ mismatch": true
+      },
+      "sourceSha256": "4bcf2a91c454455d094cd5e2e2b7a35279993e11f461e9c0b0eabd0ab1fcc449",
+      "restoredSha256": "4bcf2a91c454455d094cd5e2e2b7a35279993e11f461e9c0b0eabd0ab1fcc449"
+    },
+    {
+      "id": "screening-record-binding-time",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-13-screening-record-binding-time.json",
+        "sha256": "7ed8afa0e8ddb27959c235a3246404e80e6a5aa28cc26180b91788e6e30aee2a",
+        "bytes": 1902
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/13-screening-record-binding-time/command.json",
+        "sha256": "8cd96783f0af17b0ddf57ed8df4afba5a0f9da6be742be84711321b452631a4f",
+        "bytes": 4122
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/13-screening-record-binding-time/report.json",
+        "sha256": "b01a6e7d1d522d8dbc6c5521bc4f170019772757096267531c6f90efdfb03885",
+        "bytes": 31122
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/13-screening-record-binding-time/raw.log",
+        "sha256": "1cad14eb612b19ad8d43fc0cf1a03ba66d55a35ee2676bac6d3c46a89abf2c7f",
+        "bytes": 1378
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) binds every subject, control version and illustrative plan field in nested records"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "4bcf2a91c454455d094cd5e2e2b7a35279993e11f461e9c0b0eabd0ab1fcc449",
+      "restoredSha256": "4bcf2a91c454455d094cd5e2e2b7a35279993e11f461e9c0b0eabd0ab1fcc449"
+    },
+    {
+      "id": "screening-feature-reason-source-uniqueness",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-14-screening-feature-reason-source-uniqueness.json",
+        "sha256": "f8f57e9ebb0e9971c6ef2e2bec134952ab980dfed1a776aaf60143382e4c09ce",
+        "bytes": 2542
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/14-screening-feature-reason-source-uniqueness/command.json",
+        "sha256": "c28aafd6737cc3bd94d46bbf31875023dd207c53c62d30d94f3773c4b5510a65",
+        "bytes": 5860
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/14-screening-feature-reason-source-uniqueness/report.json",
+        "sha256": "b57a24d86fd8503248a595d64918470070c379e5bede6f9715c09a7c0a9d39f9",
+        "bytes": 34027
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/14-screening-feature-reason-source-uniqueness/raw.log",
+        "sha256": "490a2f831117f818fc2e4287f19b95c112e89ad1ebbb2d077b7b3a18675c3709",
+        "bytes": 1747
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) refuses duplicate screening reason identities without a second mismatch",
+        "Mobility synthetic local reference oracles (P3-17) refuses duplicate screening feature identities without a second mismatch",
+        "Mobility synthetic local reference oracles (P3-17) refuses duplicate screening source identities without a second mismatch"
+      ],
+      "requiredFailurePatterns": [
+        "refuses\\ duplicate\\ screening\\ reason\\ identities\\ without\\ a\\ second\\ mismatch",
+        "refuses\\ duplicate\\ screening\\ feature\\ identities\\ without\\ a\\ second\\ mismatch",
+        "refuses\\ duplicate\\ screening\\ source\\ identities\\ without\\ a\\ second\\ mismatch"
+      ],
+      "requiredFailureMatches": {
+        "refuses\\ duplicate\\ screening\\ reason\\ identities\\ without\\ a\\ second\\ mismatch": true,
+        "refuses\\ duplicate\\ screening\\ feature\\ identities\\ without\\ a\\ second\\ mismatch": true,
+        "refuses\\ duplicate\\ screening\\ source\\ identities\\ without\\ a\\ second\\ mismatch": true
+      },
+      "sourceSha256": "4bcf2a91c454455d094cd5e2e2b7a35279993e11f461e9c0b0eabd0ab1fcc449",
+      "restoredSha256": "4bcf2a91c454455d094cd5e2e2b7a35279993e11f461e9c0b0eabd0ab1fcc449"
+    },
+    {
+      "id": "screening-valid-counterfactual",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-15-screening-valid-counterfactual.json",
+        "sha256": "408aa92e0a870ceababe4d0401ec9c0a56626189d62b4ad0c467302d8d48c5ce",
+        "bytes": 1917
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/15-screening-valid-counterfactual/command.json",
+        "sha256": "8ad1a295c8d7011a624a2b583f4b6f3454bcb2cab669eb8849af76a5b6b8f612",
+        "bytes": 4081
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/15-screening-valid-counterfactual/report.json",
+        "sha256": "86222aac68af90f502b44510de9837f353f1bd0c637b460b33e03a0b2155bf32",
+        "bytes": 31007
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/15-screening-valid-counterfactual/raw.log",
+        "sha256": "8dee112e08089e1d2b807eec6eb797776295049ea07bc3d88dc489e9ea6a47b7",
+        "bytes": 1456
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) L1-MOB-02/negative/oracle-screening-inconsistent-pair.json: synthetic outcome and atomic effects"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "4bcf2a91c454455d094cd5e2e2b7a35279993e11f461e9c0b0eabd0ab1fcc449",
+      "restoredSha256": "4bcf2a91c454455d094cd5e2e2b7a35279993e11f461e9c0b0eabd0ab1fcc449"
+    },
+    {
+      "id": "screening-lineage-availability",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-16-screening-lineage-availability.json",
+        "sha256": "130ce7cb22e64b338529b065070a508ef9e09c3ee2f031aed9d93a9b0edf97dd",
+        "bytes": 1883
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/16-screening-lineage-availability/command.json",
+        "sha256": "b9041f649ffa83c7f806f738c9fdb319ee94ff88cec0346c1d5072e8bbb2e93f",
+        "bytes": 4077
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/16-screening-lineage-availability/report.json",
+        "sha256": "5c55259dae86821a18bfe74ed3d054a08e3d9e8337ff1d270465b223975dcc93",
+        "bytes": 31016
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/16-screening-lineage-availability/raw.log",
+        "sha256": "b4edfcbd7b8e78feaa73599d2bdd8f6040e38a2da486a3a827caf1e4f64cc8ea",
+        "bytes": 1467
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) L1-MOB-02/negative/oracle-screening-no-lineage.json: synthetic outcome and atomic effects"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "4bcf2a91c454455d094cd5e2e2b7a35279993e11f461e9c0b0eabd0ab1fcc449",
+      "restoredSha256": "4bcf2a91c454455d094cd5e2e2b7a35279993e11f461e9c0b0eabd0ab1fcc449"
+    },
+    {
+      "id": "mandatory-screening-decisions-only",
+      "specRequired": true,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-17-mandatory-screening-decisions-only.json",
+        "sha256": "263eb1567018c5213d6c42d87f47875b8a5003fa3d7a4cf5f6d6728a21a0fffb",
+        "bytes": 2159
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/17-mandatory-screening-decisions-only/command.json",
+        "sha256": "fa3d8982f3b74704905abdbb87df3dc520f88429b6758455f7e3d938e502a906",
+        "bytes": 4934
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/17-mandatory-screening-decisions-only/report.json",
+        "sha256": "e61f938ed011f5b6238fba7519c2055dabb00bd4abc071c2dfc6dacdb14636be",
+        "bytes": 32369
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/17-mandatory-screening-decisions-only/raw.log",
+        "sha256": "676c36c413135876da19834e44a9382a7712f529d4e03edcd1345772e372f270",
+        "bytes": 1664
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) L1-MOB-02/negative/oracle-screening-proxy-lineage.json: synthetic outcome and atomic effects",
+        "Mobility synthetic local reference oracles (P3-17) L1-MOB-02/negative/oracle-screening-reason-difference.json: synthetic outcome and atomic effects"
+      ],
+      "requiredFailurePatterns": [
+        "oracle\\-screening\\-reason\\-difference\\.json",
+        "oracle\\-screening\\-proxy\\-lineage\\.json"
+      ],
+      "requiredFailureMatches": {
+        "oracle\\-screening\\-reason\\-difference\\.json": true,
+        "oracle\\-screening\\-proxy\\-lineage\\.json": true
+      },
+      "sourceSha256": "4bcf2a91c454455d094cd5e2e2b7a35279993e11f461e9c0b0eabd0ab1fcc449",
+      "restoredSha256": "4bcf2a91c454455d094cd5e2e2b7a35279993e11f461e9c0b0eabd0ab1fcc449"
+    },
+    {
+      "id": "screening-decision-comparison",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-18-screening-decision-comparison.json",
+        "sha256": "9c10f8c88b374b54d87b4bbe1c84b040518f1b18879fd2ba21cc07db823c6569",
+        "bytes": 1894
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/18-screening-decision-comparison/command.json",
+        "sha256": "8393e6c4cbd27e1f23edd7a966ed0c547f34bfa2b2a91f56c94c291f2361b841",
+        "bytes": 4083
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/18-screening-decision-comparison/report.json",
+        "sha256": "b582cf019086f495a2f4c5186f619578170ee50fc0c6c54106ec5614701cf00f",
+        "bytes": 31008
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/18-screening-decision-comparison/raw.log",
+        "sha256": "7ba8a0b4186f5a061f6e98f6dc39282c15924814f5a9d14fa23c7d4bfd875ac1",
+        "bytes": 1457
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) L1-MOB-02/negative/oracle-screening-decision-difference.json: synthetic outcome and atomic effects"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "4bcf2a91c454455d094cd5e2e2b7a35279993e11f461e9c0b0eabd0ab1fcc449",
+      "restoredSha256": "4bcf2a91c454455d094cd5e2e2b7a35279993e11f461e9c0b0eabd0ab1fcc449"
+    },
+    {
+      "id": "screening-atomic-notice-release",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-19-screening-atomic-notice-release.json",
+        "sha256": "e2e215aed3aa68a1863ccd3be87e4e93fd4716456a12847973d43e72924e5971",
+        "bytes": 1897
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/19-screening-atomic-notice-release/command.json",
+        "sha256": "8180d4674f215480da4ea607a84bc7c29f9fe2497077bab009425f958fd80c19",
+        "bytes": 4130
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/19-screening-atomic-notice-release/report.json",
+        "sha256": "92409f56ecb3bc64e085b761aba638af58d25f470d3287efffc3b4088dbc750c",
+        "bytes": 31014
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/19-screening-atomic-notice-release/raw.log",
+        "sha256": "34a52e94df13e234ebbfff4f8bad63b0feab8b316a6fd27230d68e92e408056c",
+        "bytes": 1650
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) holds every adverse notice until all paired applications and lineage have passed"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "4bcf2a91c454455d094cd5e2e2b7a35279993e11f461e9c0b0eabd0ab1fcc449",
+      "restoredSha256": "4bcf2a91c454455d094cd5e2e2b7a35279993e11f461e9c0b0eabd0ab1fcc449"
+    },
+    {
+      "id": "port-current-level-availability",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-20-port-current-level-availability.json",
+        "sha256": "2d6b23438fcd8ebf3366448b0775adb8542272ac8ae4d9ca823dfbe9826b8d4d",
+        "bytes": 1888
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/20-port-current-level-availability/command.json",
+        "sha256": "801b32ffd01306886236a2b14aab2e7c5c89738bf2403d0a99f1ead0d20205de",
+        "bytes": 4072
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/20-port-current-level-availability/report.json",
+        "sha256": "a4adb6ac9eeb16acc075f6c6ce485eed5fa775db82f7c684120b413ff6d74da2",
+        "bytes": 31018
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/20-port-current-level-availability/raw.log",
+        "sha256": "0cde9e0ece64dff997ced1baa186f7b7c7235262891d2125556d407905ea5f9a",
+        "bytes": 1468
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) L1-MOB-03/negative/oracle-port-unknown-level.json: synthetic outcome and atomic effects"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "5d07451aca8687b497d8bf8bcf127aa88cb720869d1d11d08693388e046b9785",
+      "restoredSha256": "5d07451aca8687b497d8bf8bcf127aa88cb720869d1d11d08693388e046b9785"
+    },
+    {
+      "id": "port-captured-event-order",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-21-port-captured-event-order.json",
+        "sha256": "bd40d7d3b29526c7d8458b6362208695ff73da3a350df57e22360996b1af6337",
+        "bytes": 1891
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/21-port-captured-event-order/command.json",
+        "sha256": "5623529dc1e18bdc1ed12947a42afd824a474ad504269f496280340b380f619a",
+        "bytes": 4089
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/21-port-captured-event-order/report.json",
+        "sha256": "882f3b3da237f229f031d41879d83d4a113217bcbfba7d4de39db51eab4cd266",
+        "bytes": 31123
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/21-port-captured-event-order/raw.log",
+        "sha256": "ce64f9c33c62939bb051cb9db7b3f78a716f04093d2b1c3cd1b4ae9caf25c0bb",
+        "bytes": 1370
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) requires current authorization identity, expiry and chronological port events"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "5d07451aca8687b497d8bf8bcf127aa88cb720869d1d11d08693388e046b9785",
+      "restoredSha256": "5d07451aca8687b497d8bf8bcf127aa88cb720869d1d11d08693388e046b9785"
+    },
+    {
+      "id": "port-authorization-identity",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-22-port-authorization-identity.json",
+        "sha256": "4c2966aa346f9bc0fc093613f591b392960dea572fa511dd554353d6dbe01e10",
+        "bytes": 1900
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/22-port-authorization-identity/command.json",
+        "sha256": "517dd4b6c58834279a7ac578b783cacad265fe62354651e35b9db8d6662dc0a1",
+        "bytes": 4095
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/22-port-authorization-identity/report.json",
+        "sha256": "8d3eded95903a91abab696641e72d870ff8fc108776fcecdc634f536c2426b4b",
+        "bytes": 31123
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/22-port-authorization-identity/raw.log",
+        "sha256": "85b84465177d572bbf8dfa9f3e1aa28d59a02e28093dffafa27565c18722174b",
+        "bytes": 1372
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) requires current authorization identity, expiry and chronological port events"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "5d07451aca8687b497d8bf8bcf127aa88cb720869d1d11d08693388e046b9785",
+      "restoredSha256": "5d07451aca8687b497d8bf8bcf127aa88cb720869d1d11d08693388e046b9785"
+    },
+    {
+      "id": "port-authorization-availability",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-23-port-authorization-availability.json",
+        "sha256": "38c4e3819a856c7d0e75b70719042314230689b95b526aa2137dd089c035f515",
+        "bytes": 1899
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/23-port-authorization-availability/command.json",
+        "sha256": "2fa90758030bbba82fd8201d805aef7aaa5a213d5c885e6966875bf7ba044c1b",
+        "bytes": 4107
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/23-port-authorization-availability/report.json",
+        "sha256": "bb2df13001a46f3af074b55ebaf416bd6a3086574fb3fa83b2d2dd6f4c5af04f",
+        "bytes": 31123
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/23-port-authorization-availability/raw.log",
+        "sha256": "b42271f21dc1f1e47e2d85721d14c7cfc4d6718dc704f6db1b52495ec76061f5",
+        "bytes": 1376
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) requires current authorization identity, expiry and chronological port events"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "5d07451aca8687b497d8bf8bcf127aa88cb720869d1d11d08693388e046b9785",
+      "restoredSha256": "5d07451aca8687b497d8bf8bcf127aa88cb720869d1d11d08693388e046b9785"
+    },
+    {
+      "id": "port-authorization-level",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-24-port-authorization-level.json",
+        "sha256": "be348944af90aba4db86c25cb8993f32c7012ffa3db73ff294521deb24140975",
+        "bytes": 1891
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/24-port-authorization-level/command.json",
+        "sha256": "838c87ca0e73369adcab93a72f7b8706bbb0fcaaeafba0c31ff19f343fae8682",
+        "bytes": 4054
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/24-port-authorization-level/report.json",
+        "sha256": "ea2dd9cb0a3b66668400b916af609101fbf14059dae65d65a1e70730200e4330",
+        "bytes": 31007
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/24-port-authorization-level/raw.log",
+        "sha256": "7f776212e928950cdac68d3a0eec115f86d20ccd4354272c109241ae6bf361f1",
+        "bytes": 1449
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) L1-MOB-03/negative/oracle-port-lower-authorization.json: synthetic outcome and atomic effects"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "5d07451aca8687b497d8bf8bcf127aa88cb720869d1d11d08693388e046b9785",
+      "restoredSha256": "5d07451aca8687b497d8bf8bcf127aa88cb720869d1d11d08693388e046b9785"
+    },
+    {
+      "id": "port-raise-recheck",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-25-port-raise-recheck.json",
+        "sha256": "c790b9457da078a0a00df81fe844915e7940e9af37891a110111cf98a9fb7374",
+        "bytes": 1875
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/25-port-raise-recheck/command.json",
+        "sha256": "83543474b64210a299aa37c307b4e806e1a6f876fc8be7e0da7a3fc3ee424688",
+        "bytes": 4042
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/25-port-raise-recheck/report.json",
+        "sha256": "826c603bc5acd0339c8f9c7caf59142fbb221d6105c895fbc38f4796c9f03ecb",
+        "bytes": 31005
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/25-port-raise-recheck/raw.log",
+        "sha256": "88babc3d28873900d953174457fbe03ecbe3d1873715d70616d71f6b06e44bbb",
+        "bytes": 1446
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) L1-MOB-03/negative/oracle-port-raised-without-recheck.json: synthetic outcome and atomic effects"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "5d07451aca8687b497d8bf8bcf127aa88cb720869d1d11d08693388e046b9785",
+      "restoredSha256": "5d07451aca8687b497d8bf8bcf127aa88cb720869d1d11d08693388e046b9785"
+    },
+    {
+      "id": "port-authorization-time",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-26-port-authorization-time.json",
+        "sha256": "c2feafa74723e9b6ff6190f70870ac5e7b559fdaf29ec5b234d7a14049581585",
+        "bytes": 1889
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/26-port-authorization-time/command.json",
+        "sha256": "45b2cb97e3140992c16b11a5c81653a5a0b77b5c48f8e1ac8f250f1036d8c887",
+        "bytes": 4084
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/26-port-authorization-time/report.json",
+        "sha256": "b2067b057dfff889febe5e2bbe276da614469823b8f0e45a783f1232352e8cb0",
+        "bytes": 31124
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/26-port-authorization-time/raw.log",
+        "sha256": "0ff02c80bc87cc8a767927774002d05420598356b995f14771af5dc4c4e7e33f",
+        "bytes": 1368
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) requires current authorization identity, expiry and chronological port events"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "5d07451aca8687b497d8bf8bcf127aa88cb720869d1d11d08693388e046b9785",
+      "restoredSha256": "5d07451aca8687b497d8bf8bcf127aa88cb720869d1d11d08693388e046b9785"
+    },
+    {
+      "id": "ecu-unknown-classification",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-27-ecu-unknown-classification.json",
+        "sha256": "d76db986d40f89cb240dcfdde9626d913ddbdce3dc8898a6a11c8ec2ae9bcac5",
+        "bytes": 1902
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/27-ecu-unknown-classification/command.json",
+        "sha256": "465e7aaccb394e9af88af96e9272ba151d61384121946bd35fc4dc933c399437",
+        "bytes": 4056
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/27-ecu-unknown-classification/report.json",
+        "sha256": "1b5ee4fcd8c1fe058641cccf9208828bbce78be25e24ddfd8fd5545b24eefaf6",
+        "bytes": 31017
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/27-ecu-unknown-classification/raw.log",
+        "sha256": "e29285f1197a7eff8deac9bee35fcb98a5b48ba0433fe605a504351b5b17ca05",
+        "bytes": 1462
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) L1-MOB-04/negative/oracle-change-unclassified.json: synthetic outcome and atomic effects"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "cd6b071e653d7862034338a65835f51868d8a343d981a97ab9c958ebd9c07fa3",
+      "restoredSha256": "cd6b071e653d7862034338a65835f51868d8a343d981a97ab9c958ebd9c07fa3"
+    },
+    {
+      "id": "ecu-analysis-required",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-28-ecu-analysis-required.json",
+        "sha256": "0cbed55b9dcb2a1cf4f64aaf488b0adacc8fe264e2ed79e6ae6c4d90e2631411",
+        "bytes": 1892
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/28-ecu-analysis-required/command.json",
+        "sha256": "b854baeaee0c7c904004bdb141eda1dcd5bb386543386baeadf5844d9d8246b0",
+        "bytes": 4041
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/28-ecu-analysis-required/report.json",
+        "sha256": "5d6f657a3c8b746cc66192b4de5d4b4875bb3576158ac4b20f0e18defbbb559e",
+        "bytes": 31007
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/28-ecu-analysis-required/raw.log",
+        "sha256": "80badb5e5c73594af967f0edad7478f513811fa8710df147c615a334e4bc13f9",
+        "bytes": 1443
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) L1-MOB-04/negative/oracle-change-missing-analysis.json: synthetic outcome and atomic effects"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "cd6b071e653d7862034338a65835f51868d8a343d981a97ab9c958ebd9c07fa3",
+      "restoredSha256": "cd6b071e653d7862034338a65835f51868d8a343d981a97ab9c958ebd9c07fa3"
+    },
+    {
+      "id": "ecu-approval-required",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-29-ecu-approval-required.json",
+        "sha256": "0924f62677173b2c6b810f44ed9ef326e15ef761833c804358d3e95973550264",
+        "bytes": 1892
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/29-ecu-approval-required/command.json",
+        "sha256": "2924379b657ebfb8cdacfc989e9845d363f9489d9675a17815317e65e7b26956",
+        "bytes": 4041
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/29-ecu-approval-required/report.json",
+        "sha256": "ad2159fadcf33bcb58db07f3b3d2e45acbf84d4278b29ff8bda20a9441e20a5c",
+        "bytes": 31007
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/29-ecu-approval-required/raw.log",
+        "sha256": "df6902d83dd68e0b278e408bd3d8f893b6bcf51715bc24380516ea02e5a628b6",
+        "bytes": 1443
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) L1-MOB-04/negative/oracle-change-missing-approval.json: synthetic outcome and atomic effects"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "cd6b071e653d7862034338a65835f51868d8a343d981a97ab9c958ebd9c07fa3",
+      "restoredSha256": "cd6b071e653d7862034338a65835f51868d8a343d981a97ab9c958ebd9c07fa3"
+    },
+    {
+      "id": "ecu-actual-byte-digest",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-30-ecu-actual-byte-digest.json",
+        "sha256": "98987df7ff46d2a986bb0eb44fa4b3ddc15f33f82d6a088cf6ba570efe9b2782",
+        "bytes": 1888
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/30-ecu-actual-byte-digest/command.json",
+        "sha256": "2836f2c32d303c0497ec8d82787f4aaf4d0672d3d5d79c40bf0d144d511c7b00",
+        "bytes": 4903
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/30-ecu-actual-byte-digest/report.json",
+        "sha256": "dca5e270eda2860eb47a6bebc76f6f44730ebbb47a7cf04edb635957e5ae8160",
+        "bytes": 32482
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/30-ecu-actual-byte-digest/raw.log",
+        "sha256": "e6074eec3f3ec5a073d6545627970eba45460ec23f9adc196ee95e64b9773587",
+        "bytes": 2179
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) L1-MOB-04/negative/oracle-change-wrong-digest.json: synthetic outcome and atomic effects",
+        "Mobility synthetic local reference oracles (P3-17) binds current change bytes and approval identity, decision and chronology"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "cd6b071e653d7862034338a65835f51868d8a343d981a97ab9c958ebd9c07fa3",
+      "restoredSha256": "cd6b071e653d7862034338a65835f51868d8a343d981a97ab9c958ebd9c07fa3"
+    },
+    {
+      "id": "ecu-human-separation",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-31-ecu-human-separation.json",
+        "sha256": "e866e9830c23d08b0972fce16a1e71ec3e26b8b0bc16081b4ea430695dc10d94",
+        "bytes": 1894
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/31-ecu-human-separation/command.json",
+        "sha256": "c5868aef2fe96c210ea75104b36422e93bd83d3243c7a836ef7fe4680ab367c2",
+        "bytes": 4067
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/31-ecu-human-separation/report.json",
+        "sha256": "9cd09b8428720d09ee85fe50f3a7e186cbdd37f4f0e3f308a8c30e0fd805dda7",
+        "bytes": 31122
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/31-ecu-human-separation/raw.log",
+        "sha256": "4a4312a53d86e0038fc0b7f018c13b9478ab9a31f9bd716f6cefcb7b7d4988ef",
+        "bytes": 1360
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) binds current change bytes and approval identity, decision and chronology"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "cd6b071e653d7862034338a65835f51868d8a343d981a97ab9c958ebd9c07fa3",
+      "restoredSha256": "cd6b071e653d7862034338a65835f51868d8a343d981a97ab9c958ebd9c07fa3"
+    },
+    {
+      "id": "ecu-positive-approval",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-32-ecu-positive-approval.json",
+        "sha256": "0cb40f5424795b32f2fb5945f85e62fa92a6bf0748dded71bbf0808bc3f108c4",
+        "bytes": 1896
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/32-ecu-positive-approval/command.json",
+        "sha256": "8a46255a550959a67592ac2fafc725de8a58e5f5b28c7082176c486e05a0f1fe",
+        "bytes": 4070
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/32-ecu-positive-approval/report.json",
+        "sha256": "cdab6e0155a1bab0951c1471a30e17778a9bed15a5fbbfa8c964421246950d93",
+        "bytes": 31122
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/32-ecu-positive-approval/raw.log",
+        "sha256": "cd07eed0a36c6c53c6361a1530eeace76de34bb3641b02110d635c705b7926da",
+        "bytes": 1361
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) binds current change bytes and approval identity, decision and chronology"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "cd6b071e653d7862034338a65835f51868d8a343d981a97ab9c958ebd9c07fa3",
+      "restoredSha256": "cd6b071e653d7862034338a65835f51868d8a343d981a97ab9c958ebd9c07fa3"
+    },
+    {
+      "id": "ecu-approval-expiry",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-33-ecu-approval-expiry.json",
+        "sha256": "5fec86f2b9fd0292e37682cad98edb4bf0c842a62aac1774b60a07c01aad7581",
+        "bytes": 1892
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/33-ecu-approval-expiry/command.json",
+        "sha256": "988f6563e9b5afc75cd0b126cbddc890690ad60cf826ba417a2264dc5fb1ba48",
+        "bytes": 4035
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/33-ecu-approval-expiry/report.json",
+        "sha256": "f236ae0e68a81a4b70dd6cf5d02172b3c764b81ef290dfedada7a23941c26bf1",
+        "bytes": 31006
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/33-ecu-approval-expiry/raw.log",
+        "sha256": "a89d0909ea40b0c9288b312108beb078210e4c21c6f27a4c6727a39e31d1441e",
+        "bytes": 1441
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) L1-MOB-04/negative/oracle-change-expired-approval.json: synthetic outcome and atomic effects"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "cd6b071e653d7862034338a65835f51868d8a343d981a97ab9c958ebd9c07fa3",
+      "restoredSha256": "cd6b071e653d7862034338a65835f51868d8a343d981a97ab9c958ebd9c07fa3"
+    },
+    {
+      "id": "ecu-record-chronology",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-34-ecu-record-chronology.json",
+        "sha256": "1fac5c0afa4fa73af48d3cd0bda032c7a5e08d5c1305e3f3464fcdb86ca25cce",
+        "bytes": 1896
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/34-ecu-record-chronology/command.json",
+        "sha256": "ed4e91da25e97daa84445c9a89e6c1da62fb5cc942b98eb6c41e8d0f184457e4",
+        "bytes": 4070
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/34-ecu-record-chronology/report.json",
+        "sha256": "edee2a96f651609043a0e6f499208a28d271906224b7bc2b1037168121903de4",
+        "bytes": 31121
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/34-ecu-record-chronology/raw.log",
+        "sha256": "67f10a19ef44e13ca54713051529a577feffe8dcb2c875301c790d395f1cf483",
+        "bytes": 1361
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) binds current change bytes and approval identity, decision and chronology"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "cd6b071e653d7862034338a65835f51868d8a343d981a97ab9c958ebd9c07fa3",
+      "restoredSha256": "cd6b071e653d7862034338a65835f51868d8a343d981a97ab9c958ebd9c07fa3"
+    },
+    {
+      "id": "ota-trust-availability",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-35-ota-trust-availability.json",
+        "sha256": "2de9cf1d2cf87300f84cf382b304fa1164556a0ff9824db20049844a44adb8ed",
+        "bytes": 1871
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/35-ota-trust-availability/command.json",
+        "sha256": "fdb93558f88e5416276d9c027268197ca033780583d1113a0516163065fa4cdd",
+        "bytes": 4054
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/35-ota-trust-availability/report.json",
+        "sha256": "38c53817a24d9e5c9d14cc2959a8b6fab882af296d4760ecff79d51c8d16d9ea",
+        "bytes": 31018
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/35-ota-trust-availability/raw.log",
+        "sha256": "77af42d5c83c2d189549d9ab425f77182f8c9ae3822c78e5edd6bb9c2a2f9f2d",
+        "bytes": 1462
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) L1-MOB-05/negative/oracle-ota-trust-unavailable.json: synthetic outcome and atomic effects"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "737219d1e85cb0e70363a8605720caaddde744c26ad8aeaee661942f8b6ad917",
+      "restoredSha256": "737219d1e85cb0e70363a8605720caaddde744c26ad8aeaee661942f8b6ad917"
+    },
+    {
+      "id": "ota-package-fleet-binding",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-36-ota-package-fleet-binding.json",
+        "sha256": "86f7820dbf2dec9f0457a08bfcb5527c0191f6a841ed2b73846c864a69cb29c6",
+        "bytes": 1885
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/36-ota-package-fleet-binding/command.json",
+        "sha256": "824ed5858436986b386985c1743615c52052553845d72612f4941bf544ab27e5",
+        "bytes": 5010
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/36-ota-package-fleet-binding/report.json",
+        "sha256": "9bfdf10f4c2d23ab464e09ebeed74253dc8c428e73cfd4ac6b3e018aea3f3b5a",
+        "bytes": 32473
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/36-ota-package-fleet-binding/raw.log",
+        "sha256": "84ce9e4059e6ac9b9c42511c27e8af7a24a22442f52ad29ebfe0d8ac539901c7",
+        "bytes": 3196
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) refuses duplicate fleet and model identities before any synthetic install",
+        "Mobility synthetic local reference oracles (P3-17) refuses actual content, records, fleet/model/version and metadata-time mismatches without install effects"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "737219d1e85cb0e70363a8605720caaddde744c26ad8aeaee661942f8b6ad917",
+      "restoredSha256": "737219d1e85cb0e70363a8605720caaddde744c26ad8aeaee661942f8b6ad917"
+    },
+    {
+      "id": "ota-complete-update-records",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-37-ota-complete-update-records.json",
+        "sha256": "30761838956ba40ec4be4e20b0a9d8e80347385fef2dd8c21ffc3d4b458eff5b",
+        "bytes": 1915
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/37-ota-complete-update-records/command.json",
+        "sha256": "4697dc14ee5323befc894274c418f623146a5ed422985e2420106423804891b7",
+        "bytes": 4056
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/37-ota-complete-update-records/report.json",
+        "sha256": "fefa6fbe042c83ee016e173f86c158363ad3aec2e82161019edf63b71a8b42d2",
+        "bytes": 31009
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/37-ota-complete-update-records/raw.log",
+        "sha256": "f89ca3496c029d45c6c6711601ce59ead0f4b58022b0fe61edf7736c3b2e5230",
+        "bytes": 1447
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) L1-MOB-05/negative/oracle-ota-incomplete-r156.json: synthetic outcome and atomic effects"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "737219d1e85cb0e70363a8605720caaddde744c26ad8aeaee661942f8b6ad917",
+      "restoredSha256": "737219d1e85cb0e70363a8605720caaddde744c26ad8aeaee661942f8b6ad917"
+    },
+    {
+      "id": "ota-update-version-model",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-38-ota-update-version-model.json",
+        "sha256": "0bab1bbd77de05dff75e92b2c5cb22b826f5abc1d2be8f0d63167aebc5acb711",
+        "bytes": 1883
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/38-ota-update-version-model/command.json",
+        "sha256": "5ec23d64fd618f4a51e89b53f810ad65cc67a1a59f59520747a1415711bed4f0",
+        "bytes": 5007
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/38-ota-update-version-model/report.json",
+        "sha256": "c561ab9b2d5dee009b2a83a6b7ff1b30e56098e9b621f890bc91969534c0d8cf",
+        "bytes": 32472
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/38-ota-update-version-model/raw.log",
+        "sha256": "82fa4ebd8215defaf4e34c57f8ccd89439fcc07b3bc5adb0e258b79f457c0577",
+        "bytes": 2846
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) refuses duplicate fleet and model identities before any synthetic install",
+        "Mobility synthetic local reference oracles (P3-17) refuses actual content, records, fleet/model/version and metadata-time mismatches without install effects"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "737219d1e85cb0e70363a8605720caaddde744c26ad8aeaee661942f8b6ad917",
+      "restoredSha256": "737219d1e85cb0e70363a8605720caaddde744c26ad8aeaee661942f8b6ad917"
+    },
+    {
+      "id": "ota-canonical-nonempty-payload",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-39-ota-canonical-nonempty-payload.json",
+        "sha256": "fe667c24a9b2ee00ff043d743cffdfd5819ef0701ca4c3d893e0fa8f4aea2e23",
+        "bytes": 1915
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/39-ota-canonical-nonempty-payload/command.json",
+        "sha256": "9d2375faf87a21c7e7cf1d7ed0e129a7cc729572eb893262661b62ef5de23d11",
+        "bytes": 4108
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/39-ota-canonical-nonempty-payload/report.json",
+        "sha256": "f2505404d8a61598fa48b112fb8405d868abb0f47bfb07b256fc6456d2bfc1f7",
+        "bytes": 30995
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/39-ota-canonical-nonempty-payload/raw.log",
+        "sha256": "8426758829a17b2049f71b26e9488224021db8aa5af8eee801f72b407cd8deb8",
+        "bytes": 2134
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) refuses empty and noncanonical payload bytes even with their actual signed digest"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "737219d1e85cb0e70363a8605720caaddde744c26ad8aeaee661942f8b6ad917",
+      "restoredSha256": "737219d1e85cb0e70363a8605720caaddde744c26ad8aeaee661942f8b6ad917"
+    },
+    {
+      "id": "ota-actual-content-digest",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-40-ota-actual-content-digest.json",
+        "sha256": "740331bc8408760388a34fcceabd4c9b4f0e37d57b08e93e9baf7e6e2322e3a8",
+        "bytes": 1896
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/40-ota-actual-content-digest/command.json",
+        "sha256": "a2bc684750284189c7dd3a0d0ce60143c67fa0d9f8fe5252895d76598d62e278",
+        "bytes": 4042
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/40-ota-actual-content-digest/report.json",
+        "sha256": "4786f65edec8411c49f61046e29a53297f2c0c91e1e7d7c6bb5e810f1f9fb58b",
+        "bytes": 31008
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/40-ota-actual-content-digest/raw.log",
+        "sha256": "4f003ab461bd594ed116e898f50bffc21fde5ebd5e06f8495ac16eebd1452c6c",
+        "bytes": 1441
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) L1-MOB-05/negative/oracle-ota-bad-content.json: synthetic outcome and atomic effects"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "737219d1e85cb0e70363a8605720caaddde744c26ad8aeaee661942f8b6ad917",
+      "restoredSha256": "737219d1e85cb0e70363a8605720caaddde744c26ad8aeaee661942f8b6ad917"
+    },
+    {
+      "id": "ota-no-authority-flags",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-41-ota-no-authority-flags.json",
+        "sha256": "9e3f95ae558a44fd8bba5f4d9dd650585f22b36006f847823e32b8c65aeb1436",
+        "bytes": 1876
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/41-ota-no-authority-flags/command.json",
+        "sha256": "088211a5788f9899c3c4675b7959b108750bab81f82fde2c0368e4f332e40961",
+        "bytes": 4111
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/41-ota-no-authority-flags/report.json",
+        "sha256": "847a58228f070e56e54e0cce47fa90d8b1e145d3aabda97805b764959a77af2a",
+        "bytes": 30997
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/41-ota-no-authority-flags/raw.log",
+        "sha256": "ce2db44d6b05b4d481eec365334ef8ccfb98e3b5221de1d2e2edd138fc141ba0",
+        "bytes": 2062
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) refuses duplicate root pins and caller trust flags under an otherwise valid signed authority"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "737219d1e85cb0e70363a8605720caaddde744c26ad8aeaee661942f8b6ad917",
+      "restoredSha256": "737219d1e85cb0e70363a8605720caaddde744c26ad8aeaee661942f8b6ad917"
+    },
+    {
+      "id": "ota-distinct-root-pins",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-42-ota-distinct-root-pins.json",
+        "sha256": "5c46fb72a0815f6a7c565a61416f5ad4d9842cf9fd4ec1e6da2887c35643586d",
+        "bytes": 1888
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/42-ota-distinct-root-pins/command.json",
+        "sha256": "ce43d8a1bf807743ea02294b83b96d78f1d80e0c47b0dba1957b5ad32333abe7",
+        "bytes": 4111
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/42-ota-distinct-root-pins/report.json",
+        "sha256": "4a223bf353dddeecad0abc322fa5c514ecc515f02b0c637e8b84aa19283647c1",
+        "bytes": 30997
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/42-ota-distinct-root-pins/raw.log",
+        "sha256": "14e3c1d5b7e128cd13ce2344cf8b38f4f943a2f60b2d36fd4e78bd760236a88c",
+        "bytes": 2062
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) refuses duplicate root pins and caller trust flags under an otherwise valid signed authority"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "737219d1e85cb0e70363a8605720caaddde744c26ad8aeaee661942f8b6ad917",
+      "restoredSha256": "737219d1e85cb0e70363a8605720caaddde744c26ad8aeaee661942f8b6ad917"
+    },
+    {
+      "id": "ota-native-signed-list",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-43-ota-native-signed-list.json",
+        "sha256": "2fc99742af059b72332777e4f8e2773a061b8ee17b1e61476af89ad9aec523c0",
+        "bytes": 1909
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/43-ota-native-signed-list/command.json",
+        "sha256": "c82ba7b04c04a8f41970e4a6d5b0f827bb6dc6ed6c97d3028855ac2f1de7d0f5",
+        "bytes": 4971
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/43-ota-native-signed-list/report.json",
+        "sha256": "b96ec063a1417b83c9270244ae22177f76db6f1620eec5b33ff6ce3b14eb2856",
+        "bytes": 32485
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/43-ota-native-signed-list/raw.log",
+        "sha256": "f0d6e5f688a24848678499f48b713f31c7fb5ba26f7440229cea3ce081d8d85b",
+        "bytes": 2208
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) L1-MOB-05/negative/oracle-ota-invalid-trust.json: synthetic outcome and atomic effects",
+        "Mobility synthetic local reference oracles (P3-17) does not install with an envelope-supplied trust context or absent, invalid, future or expired trust"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "737219d1e85cb0e70363a8605720caaddde744c26ad8aeaee661942f8b6ad917",
+      "restoredSha256": "737219d1e85cb0e70363a8605720caaddde744c26ad8aeaee661942f8b6ad917"
+    },
+    {
+      "id": "ota-owned-trust-currentness",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-44-ota-owned-trust-currentness.json",
+        "sha256": "25fbdbfa2f2bdd3fadb7d51491daa3f3d44ee001dbd2cdfd56380df6c7ef525b",
+        "bytes": 1920
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/44-ota-owned-trust-currentness/command.json",
+        "sha256": "b7852383666a085b1c762801f6bc49f50146a78b6f928f04c831368091ae2bca",
+        "bytes": 4159
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/44-ota-owned-trust-currentness/report.json",
+        "sha256": "b70b22b3de5f4e13b7b42fc774e4aa0386a3e458229fe9edf2d18cd1af047b93",
+        "bytes": 31124
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/44-ota-owned-trust-currentness/raw.log",
+        "sha256": "6f8b7d4cff3196e1728cdfdca38c1058b358d66efd090aa2d45f7d5ca1bf499a",
+        "bytes": 1396
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) does not install with an envelope-supplied trust context or absent, invalid, future or expired trust"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "737219d1e85cb0e70363a8605720caaddde744c26ad8aeaee661942f8b6ad917",
+      "restoredSha256": "737219d1e85cb0e70363a8605720caaddde744c26ad8aeaee661942f8b6ad917"
+    },
+    {
+      "id": "mandatory-ota-signature-integrity",
+      "specRequired": true,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-45-mandatory-ota-signature-integrity.json",
+        "sha256": "aa84c7e626139e4df33d65f7b378970b4df605a9cc2122284222ddd707ee30a6",
+        "bytes": 2253
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/45-mandatory-ota-signature-integrity/command.json",
+        "sha256": "d26470e2742936c1e7dee67d44b95c0058982aa93f47fc8f8f08a2442bfd4808",
+        "bytes": 4921
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/45-mandatory-ota-signature-integrity/report.json",
+        "sha256": "8ab7ffdd05fc6bfc1ecf5d900b3c80e6437fc17548785aa1db10138125f2cead",
+        "bytes": 32360
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/45-mandatory-ota-signature-integrity/raw.log",
+        "sha256": "a510de4eff8746e3d68d0d4ac8c2d1ee5ee0a5103a365ac0e5fb854fca7d8950",
+        "bytes": 2941
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) L1-MOB-05/negative/oracle-ota-unsigned.json: synthetic outcome and atomic effects",
+        "Mobility synthetic local reference oracles (P3-17) keeps the unsigned OTA install log empty despite native candidate admission"
+      ],
+      "requiredFailurePatterns": [
+        "oracle\\-ota\\-unsigned\\.json",
+        "keeps\\ the\\ unsigned\\ OTA\\ install\\ log\\ empty\\ despite\\ native\\ candidate\\ admission"
+      ],
+      "requiredFailureMatches": {
+        "oracle\\-ota\\-unsigned\\.json": true,
+        "keeps\\ the\\ unsigned\\ OTA\\ install\\ log\\ empty\\ despite\\ native\\ candidate\\ admission": true
+      },
+      "sourceSha256": "737219d1e85cb0e70363a8605720caaddde744c26ad8aeaee661942f8b6ad917",
+      "restoredSha256": "737219d1e85cb0e70363a8605720caaddde744c26ad8aeaee661942f8b6ad917"
+    },
+    {
+      "id": "ota-native-release-admission",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-46-ota-native-release-admission.json",
+        "sha256": "278da828a966d4bd7e83542f6b277d602afaa0266c8dbbae6eb4fbd505eb1cf8",
+        "bytes": 1905
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/46-ota-native-release-admission/command.json",
+        "sha256": "6e97486a4b911194cbbb8d300c388d6d49c36980aacd6bdb2c8d59638050e4f4",
+        "bytes": 5716
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/46-ota-native-release-admission/report.json",
+        "sha256": "0fe92ed7f697468c055bab4b0692e3ec8412e1b25043fef06be7d8b079b57e6d",
+        "bytes": 33734
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/46-ota-native-release-admission/raw.log",
+        "sha256": "c6a1770d81478e24fdc2524213ada02b8b5cc4fefae031ea3c62de31af3e65c4",
+        "bytes": 1844
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) L1-MOB-05/negative/oracle-ota-revoked-signer.json: synthetic outcome and atomic effects",
+        "Mobility synthetic local reference oracles (P3-17) L1-MOB-05/negative/oracle-ota-unknown-signer.json: synthetic outcome and atomic effects",
+        "Mobility synthetic local reference oracles (P3-17) L1-MOB-05/negative/oracle-ota-wrong-purpose.json: synthetic outcome and atomic effects"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "737219d1e85cb0e70363a8605720caaddde744c26ad8aeaee661942f8b6ad917",
+      "restoredSha256": "737219d1e85cb0e70363a8605720caaddde744c26ad8aeaee661942f8b6ad917"
+    },
+    {
+      "id": "ota-no-candidate-pin-bypass",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-47-ota-no-candidate-pin-bypass.json",
+        "sha256": "ca627d28e7d1ee87e0328abcf71f8eb2615fa82205b917bab5fc40cfb6d71ea8",
+        "bytes": 1910
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/47-ota-no-candidate-pin-bypass/command.json",
+        "sha256": "cc7047cb1195e147420099d363da0d01ed359450960bd4a16824896053f3cbd9",
+        "bytes": 4054
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/47-ota-no-candidate-pin-bypass/report.json",
+        "sha256": "f3061b7defd87ff1f3cf68c197e6280c71e46ea6c442ed12c26c836bd378e693",
+        "bytes": 31009
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/47-ota-no-candidate-pin-bypass/raw.log",
+        "sha256": "8e311ff4da91171ef594efbe898978816a967b677622a1c6ea749a550f502672",
+        "bytes": 1446
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) L1-MOB-05/negative/oracle-ota-revoked-signer.json: synthetic outcome and atomic effects"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "737219d1e85cb0e70363a8605720caaddde744c26ad8aeaee661942f8b6ad917",
+      "restoredSha256": "737219d1e85cb0e70363a8605720caaddde744c26ad8aeaee661942f8b6ad917"
+    },
+    {
+      "id": "ota-verification-error-fail-closed",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-48-ota-verification-error-fail-closed.json",
+        "sha256": "1a11c0f820d67ce9e7099a6d195f1acb59b42732cb380e1b8c6652101d584424",
+        "bytes": 1914
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/48-ota-verification-error-fail-closed/command.json",
+        "sha256": "7310ac7afbfe31b79b5d5e8e13b47083f1dd2e63a2ae96c1f84d91fde7e74c86",
+        "bytes": 4073
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/48-ota-verification-error-fail-closed/report.json",
+        "sha256": "ea969d3cc250f819c0d5646fae80f99bfc7be6cd3260eed8f0e11db68ab0fae9",
+        "bytes": 31009
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/48-ota-verification-error-fail-closed/raw.log",
+        "sha256": "1fa722baa4563f981e422e43edb6f832a67ca31a42031b5dd904dedf60845925",
+        "bytes": 1452
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) L1-MOB-05/negative/oracle-ota-invalid-trust.json: synthetic outcome and atomic effects"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "737219d1e85cb0e70363a8605720caaddde744c26ad8aeaee661942f8b6ad917",
+      "restoredSha256": "737219d1e85cb0e70363a8605720caaddde744c26ad8aeaee661942f8b6ad917"
+    },
+    {
+      "id": "fallback-defined-condition",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-49-fallback-defined-condition.json",
+        "sha256": "f1acc5af83a2fb3a4b9126e6bb7e37652dcececef64998980f1590275f584de1",
+        "bytes": 1896
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/49-fallback-defined-condition/command.json",
+        "sha256": "a4bcf416ab06af71a3cea3f982047c53babfbbfbe1f5df8c6d5bb62b93494602",
+        "bytes": 4071
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/49-fallback-defined-condition/report.json",
+        "sha256": "a94522a7499b263d6241b12882b7ec8ff17740127e38c663c499ec419979c364",
+        "bytes": 31016
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/49-fallback-defined-condition/raw.log",
+        "sha256": "ecb218584d1fa9f6b59ed89fe440b25aa1f7e4120bdaa70748a1a6e022fc92f3",
+        "bytes": 1461
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) L1-MOB-06/negative/oracle-fallback-undefined.json: synthetic outcome and atomic effects"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "92c17cef59cbb6d1c61615dd15b07c92d6bc106077b1fb14a1d0cc666f0fa835",
+      "restoredSha256": "92c17cef59cbb6d1c61615dd15b07c92d6bc106077b1fb14a1d0cc666f0fa835"
+    },
+    {
+      "id": "fallback-trajectory-identity",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-50-fallback-trajectory-identity.json",
+        "sha256": "193d68477d369e9c76266f204898f6304f6eb4eb20c9ea0223fc7b4787eacad2",
+        "bytes": 1924
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/50-fallback-trajectory-identity/command.json",
+        "sha256": "5e7e7d41091f51d995b6607972d70f9ee2ef10e80df9fd232a4628bf31276262",
+        "bytes": 4147
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/50-fallback-trajectory-identity/report.json",
+        "sha256": "d91c62a11935ea36049dcb9a9b55e0931242710a9002344659c595528cfea7cf",
+        "bytes": 31120
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/50-fallback-trajectory-identity/raw.log",
+        "sha256": "9c9527fa578e19410e85761091dbf695f253493d826f3a368f087898ee4dfe74",
+        "bytes": 1384
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) requires actual independent safe stop, exact vehicle identity and post-crash sample order"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "92c17cef59cbb6d1c61615dd15b07c92d6bc106077b1fb14a1d0cc666f0fa835",
+      "restoredSha256": "92c17cef59cbb6d1c61615dd15b07c92d6bc106077b1fb14a1d0cc666f0fa835"
+    },
+    {
+      "id": "fallback-trajectory-time",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-51-fallback-trajectory-time.json",
+        "sha256": "bc650d0c28f9c1959ecf885e65e4b12dddbc6a76fdd780318a8a0677ee5fa73f",
+        "bytes": 1916
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/51-fallback-trajectory-time/command.json",
+        "sha256": "6418143f6c2286cc02e27189192501a8204e9e9da4f0559425690eba1470bc57",
+        "bytes": 4135
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/51-fallback-trajectory-time/report.json",
+        "sha256": "c1e2eb775cb9467a51e78c8a8ba27d70fc6e8b26ecdda0eed3ba9cece17e6ab7",
+        "bytes": 31122
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/51-fallback-trajectory-time/raw.log",
+        "sha256": "025093c7f1ac9941bc1a9257b97ffc53cd5a6631eb0bacc8e9700b915020b819",
+        "bytes": 1380
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) requires actual independent safe stop, exact vehicle identity and post-crash sample order"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "92c17cef59cbb6d1c61615dd15b07c92d6bc106077b1fb14a1d0cc666f0fa835",
+      "restoredSha256": "92c17cef59cbb6d1c61615dd15b07c92d6bc106077b1fb14a1d0cc666f0fa835"
+    },
+    {
+      "id": "fallback-zero-speed",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-52-fallback-zero-speed.json",
+        "sha256": "ad4de4de5c2b8f2ef4bb4ad49c942d3ea6d40fb86273ea99c07f71d77871fe81",
+        "bytes": 1886
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/52-fallback-zero-speed/command.json",
+        "sha256": "05a1f4148e68739828462ee0eadc14a854d0804d4827b2b2da22089355e5637f",
+        "bytes": 4120
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/52-fallback-zero-speed/report.json",
+        "sha256": "0651c25d1245bfc298f0ba9d691d7da178e5954273d068f3bc5376a5a5bf5237",
+        "bytes": 31121
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/52-fallback-zero-speed/raw.log",
+        "sha256": "a43eabf8942ba49119864b17656de58071cf4b2db64eac2c5a6a5eb060d24132",
+        "bytes": 1375
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) requires actual independent safe stop, exact vehicle identity and post-crash sample order"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "92c17cef59cbb6d1c61615dd15b07c92d6bc106077b1fb14a1d0cc666f0fa835",
+      "restoredSha256": "92c17cef59cbb6d1c61615dd15b07c92d6bc106077b1fb14a1d0cc666f0fa835"
+    },
+    {
+      "id": "fallback-safe-area",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-53-fallback-safe-area.json",
+        "sha256": "d164aa96a6ba3f1b2db48d0e9f288233fafd6efc36c15a14d02dea2986e40356",
+        "bytes": 1884
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/53-fallback-safe-area/command.json",
+        "sha256": "747da9857bfa5478148c137244ba20280d41acf6e06209cf91d93bb26d081460",
+        "bytes": 4117
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/53-fallback-safe-area/report.json",
+        "sha256": "80f744f0e801c9aea73d7bf32ce302a3004e2559640dfe2ec4de8575813e5222",
+        "bytes": 31122
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/53-fallback-safe-area/raw.log",
+        "sha256": "06cab99d67f1d5aee981640632fb1c4c584cac2f98571d7bf9fcd970837ebefd",
+        "bytes": 1374
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) requires actual independent safe stop, exact vehicle identity and post-crash sample order"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "92c17cef59cbb6d1c61615dd15b07c92d6bc106077b1fb14a1d0cc666f0fa835",
+      "restoredSha256": "92c17cef59cbb6d1c61615dd15b07c92d6bc106077b1fb14a1d0cc666f0fa835"
+    },
+    {
+      "id": "fallback-independent-controller",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-54-fallback-independent-controller.json",
+        "sha256": "d3b01f3014ae9b299120e6e5ea7fc20a49e5a3a4857b8cfec59aa7652d723ec3",
+        "bytes": 1910
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/54-fallback-independent-controller/command.json",
+        "sha256": "495d010a9d30a6b34f54361c0aac9c72a4b82feb52841b111972e224230e4f32",
+        "bytes": 4157
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/54-fallback-independent-controller/report.json",
+        "sha256": "d6ee60c24313761f2dd4233c98bf354f4b71f3f561a318022721b45c54eddb40",
+        "bytes": 31123
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/54-fallback-independent-controller/raw.log",
+        "sha256": "af2e59b0c221a2d2b8999061493fd7c327aca23a367b26360c5ffd3bf840b2a0",
+        "bytes": 1387
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) requires actual independent safe stop, exact vehicle identity and post-crash sample order"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "92c17cef59cbb6d1c61615dd15b07c92d6bc106077b1fb14a1d0cc666f0fa835",
+      "restoredSha256": "92c17cef59cbb6d1c61615dd15b07c92d6bc106077b1fb14a1d0cc666f0fa835"
+    },
+    {
+      "id": "fallback-inclusive-deadline",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-55-fallback-inclusive-deadline.json",
+        "sha256": "a7fe2c9be5847acfe06277af5c760641f3197ccce0cefcec8cc666834e823e0d",
+        "bytes": 1915
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/55-fallback-inclusive-deadline/command.json",
+        "sha256": "7ad08c48e64616a0e15e20b934be7ed08cf1f538104dfe5cb1b9208446843b9a",
+        "bytes": 4055
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/55-fallback-inclusive-deadline/report.json",
+        "sha256": "b026650163dfa9bfa4be5948765583f9e4eaa5c51137c512665148c5417930b0",
+        "bytes": 31007
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/55-fallback-inclusive-deadline/raw.log",
+        "sha256": "ac7006776d9696ddd7f64477fb313b4365cafc659ef860430706d243ca62c4bc",
+        "bytes": 1439
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) L1-MOB-06/negative/oracle-fallback-late.json: synthetic outcome and atomic effects"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "92c17cef59cbb6d1c61615dd15b07c92d6bc106077b1fb14a1d0cc666f0fa835",
+      "restoredSha256": "92c17cef59cbb6d1c61615dd15b07c92d6bc106077b1fb14a1d0cc666f0fa835"
+    },
+    {
+      "id": "adapter-compiled-subject",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-56-adapter-compiled-subject.json",
+        "sha256": "d93113916dbce3c76611b03c6414edb6a9ccd023d762b82d54680a1966f0303d",
+        "bytes": 1886
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/56-adapter-compiled-subject/command.json",
+        "sha256": "d7dba80bfbdccc56869312e4f2e53ffe77b306e9ffd218816e0151cdb3165126",
+        "bytes": 4056
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/56-adapter-compiled-subject/report.json",
+        "sha256": "b2122e0771ecfbb7a6b1013df87238d07d32d81c35ed4fdbd7b234b6a743a371",
+        "bytes": 43642
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/56-adapter-compiled-subject/raw.log",
+        "sha256": "fbdf3d38ce2e917a999712cb04e527830a2c6f67b72f6950104921bae0e830ef",
+        "bytes": 1415
+      },
+      "failedAssertionNames": [
+        "Mobility real compiled policy and native evidence admission (P3-17) refuses every fixture subject outside the actual compiled profile"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "9d7a4807d9df7720614e3d82fb90728afcaf4a050ec47b6a1a4ea4e3db5c691c",
+      "restoredSha256": "9d7a4807d9df7720614e3d82fb90728afcaf4a050ec47b6a1a4ea4e3db5c691c"
+    },
+    {
+      "id": "adapter-selected-control",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-57-adapter-selected-control.json",
+        "sha256": "24df5e33738ba221b60b6d30a985b07ddbe9af79544061d0149e26dd726b7f03",
+        "bytes": 1881
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/57-adapter-selected-control/command.json",
+        "sha256": "19749b9e6e606c682e090d1b246db1ea856e54076a5a3d3605d85d75bf6e4d5a",
+        "bytes": 4092
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/57-adapter-selected-control/report.json",
+        "sha256": "bfd5ef85e9aceb09d594b4a2f8c5a46150264006feb19b4cb7ea300ed21232c7",
+        "bytes": 43643
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/57-adapter-selected-control/raw.log",
+        "sha256": "01cde82b391a29aef164e5f68a62569d6ffbe444b4f284c8cd381c1f0601bd6f",
+        "bytes": 1453
+      },
+      "failedAssertionNames": [
+        "Mobility real compiled policy and native evidence admission (P3-17) refuses an unselected Mobility control even when its subject matches the profile"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "9d7a4807d9df7720614e3d82fb90728afcaf4a050ec47b6a1a4ea4e3db5c691c",
+      "restoredSha256": "9d7a4807d9df7720614e3d82fb90728afcaf4a050ec47b6a1a4ea4e3db5c691c"
+    },
+    {
+      "id": "shared-duration-contract",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-58-shared-duration-contract.json",
+        "sha256": "e575bb116397327b6a6bc9a3f48235ffb9b3bf1135183e6b2fe79c06d87d0f42",
+        "bytes": 1991
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/58-shared-duration-contract/command.json",
+        "sha256": "b244fd712112efe641e30ef4da726f1a6e92ec1d086f5e23a4e78c4504101679",
+        "bytes": 3994
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/58-shared-duration-contract/report.json",
+        "sha256": "31d668dacface62632b77846c29abf93ef2fa0ab1f23997525360c0eef265f35",
+        "bytes": 31001
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/58-shared-duration-contract/raw.log",
+        "sha256": "fb35862eba98929b95101611bb5eec60605c0888af250612adfa3ee38c17b953",
+        "bytes": 1447
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) rejects invalid bounded duration contracts"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "a66de96b55e867fc27adbc5610c072c5209b363447b21785477f2557244b3120",
+      "restoredSha256": "a66de96b55e867fc27adbc5610c072c5209b363447b21785477f2557244b3120"
+    },
+    {
+      "id": "shared-digest-contract",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-59-shared-digest-contract.json",
+        "sha256": "3cd3be069900ea3aeb94cbc34e701b39036e3b075fea201b92588438c4179628",
+        "bytes": 1919
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/59-shared-digest-contract/command.json",
+        "sha256": "f316c44a34663f4260274a239319dca47c81f706ebfc2ac5f9dcfcb90cc97596",
+        "bytes": 4026
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/59-shared-digest-contract/report.json",
+        "sha256": "f4cfa82ce1ae8ef01ba2846024e268a9adeed7fe2e7c1a92e284eb1881392fce",
+        "bytes": 31009
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/59-shared-digest-contract/raw.log",
+        "sha256": "27de1fa969c12e930724beb402588aed5cc6815d8e21f49e2fb3954055cda109",
+        "bytes": 1385
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) rejects consistently malformed illustrative plan digests"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "a66de96b55e867fc27adbc5610c072c5209b363447b21785477f2557244b3120",
+      "restoredSha256": "a66de96b55e867fc27adbc5610c072c5209b363447b21785477f2557244b3120"
+    },
+    {
+      "id": "shared-version-contract",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-60-shared-version-contract.json",
+        "sha256": "2e451755bef35eeed186a93279f58bc8a9e8da6d3828469f3648f64df1382907",
+        "bytes": 1925
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/60-shared-version-contract/command.json",
+        "sha256": "8b41867b5d0eaef69ef0746505455bcfc4c4f6dbd455610310e967472e7afc8a",
+        "bytes": 4007
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/60-shared-version-contract/report.json",
+        "sha256": "852d0b4da1ff5118584f5e1095d7e103e6f65d8fe080fb11c13c2b775d9f4fa4",
+        "bytes": 31007
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/60-shared-version-contract/raw.log",
+        "sha256": "5dff8a1aec95b50686df557cf443cd15307bd298889c79716e8059d4142f2295",
+        "bytes": 1377
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) rejects consistently malformed control versions"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "a66de96b55e867fc27adbc5610c072c5209b363447b21785477f2557244b3120",
+      "restoredSha256": "a66de96b55e867fc27adbc5610c072c5209b363447b21785477f2557244b3120"
+    },
+    {
+      "id": "port-event-request-uniqueness",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-61-port-event-request-uniqueness.json",
+        "sha256": "92d8e9fac1927e58635c21762e3fb870523a9237787b31460c3809c3e37a7ef8",
+        "bytes": 1965
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/61-port-event-request-uniqueness/command.json",
+        "sha256": "1518188c6960b23e6e617ab98a2b9c000a81c4ffa91cb07bd52e2ea2087296f7",
+        "bytes": 4052
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/61-port-event-request-uniqueness/report.json",
+        "sha256": "db7c440459c15a2af1c5ea96a61c8fee53d3c1fd2176e271d812114224756e94",
+        "bytes": 31015
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/61-port-event-request-uniqueness/raw.log",
+        "sha256": "cf901231fedee5c48787e176fc58ed57ff6275f4b0bbb8d81522e07b86fb8da8",
+        "bytes": 1402
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) refuses duplicate port event and request identities"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "5d07451aca8687b497d8bf8bcf127aa88cb720869d1d11d08693388e046b9785",
+      "restoredSha256": "5d07451aca8687b497d8bf8bcf127aa88cb720869d1d11d08693388e046b9785"
+    },
+    {
+      "id": "port-initial-state-binding",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-62-port-initial-state-binding.json",
+        "sha256": "2858c8ec5a825685e069f496adde29a62ef2dc513b07fb9856a4b07045b56437",
+        "bytes": 1964
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/62-port-initial-state-binding/command.json",
+        "sha256": "02b2e8bcfdc9f7611a0084987321a1a69542cf816e304bdc2e9d8747923c0da3",
+        "bytes": 4075
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/62-port-initial-state-binding/report.json",
+        "sha256": "a1d1e757d99e25e9780b44009f36629cd81075c7d1e965271c76956cf88f462f",
+        "bytes": 31008
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/62-port-initial-state-binding/raw.log",
+        "sha256": "56e3588788a106ca0fdaa23b13bfeceda01d57ee67abcf8b5e2ef9e86bd2d2d1",
+        "bytes": 1403
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) refuses a foreign initial security record with a valid event stream"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "5d07451aca8687b497d8bf8bcf127aa88cb720869d1d11d08693388e046b9785",
+      "restoredSha256": "5d07451aca8687b497d8bf8bcf127aa88cb720869d1d11d08693388e046b9785"
+    },
+    {
+      "id": "ecu-proposer-change-binding",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-63-ecu-proposer-change-binding.json",
+        "sha256": "9d3dc57d96c1bd311c4e82bcd39f1b646f3ba06af7df340d1acf2509da2af8aa",
+        "bytes": 1950
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/63-ecu-proposer-change-binding/command.json",
+        "sha256": "b42ee2e4e0a3085711c240cd866b547a95b6f08969ba076724fec91cf7610bcf",
+        "bytes": 4020
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/63-ecu-proposer-change-binding/report.json",
+        "sha256": "584b07cf505ddb872a2c12e9ea6b7bed0486bf9d1050a2ef02893c61955ea85a",
+        "bytes": 30997
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/63-ecu-proposer-change-binding/raw.log",
+        "sha256": "c14f12dc83331e4ad79bd4caf489cb79882db65a8e633e961bfd3255f9ff28fb",
+        "bytes": 1426
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) refuses a mismatched proposer or change binding"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "cd6b071e653d7862034338a65835f51868d8a343d981a97ab9c958ebd9c07fa3",
+      "restoredSha256": "cd6b071e653d7862034338a65835f51868d8a343d981a97ab9c958ebd9c07fa3"
+    },
+    {
+      "id": "ecu-analysis-approval-binding",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-64-ecu-analysis-approval-binding.json",
+        "sha256": "e0b54f6005e676fe501534b23dafe2cb42e9c1fd9a8320feeb29b96628a6385b",
+        "bytes": 1942
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/64-ecu-analysis-approval-binding/command.json",
+        "sha256": "44faae258662f045f766eab93eaf580eeff86d6b43aa351b247b3592efe147d5",
+        "bytes": 4042
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/64-ecu-analysis-approval-binding/report.json",
+        "sha256": "3910af0717b998d12b49c2d244e717657943a7f704fc7ad357da9ce253460134",
+        "bytes": 30996
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/64-ecu-analysis-approval-binding/raw.log",
+        "sha256": "25fba32a787bfdbf3eec0639c1f267619f187ef0c4f78eceba3e19e9816d32a1",
+        "bytes": 1426
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) refuses analysis and approval for another exact change"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "cd6b071e653d7862034338a65835f51868d8a343d981a97ab9c958ebd9c07fa3",
+      "restoredSha256": "cd6b071e653d7862034338a65835f51868d8a343d981a97ab9c958ebd9c07fa3"
+    },
+    {
+      "id": "ecu-analysis-text-completeness",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-65-ecu-analysis-text-completeness.json",
+        "sha256": "dcdcfa990684f48b34743b982e459a561e8e76b50c61f1ccf9133a0eee9f3bf9",
+        "bytes": 1965
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/65-ecu-analysis-text-completeness/command.json",
+        "sha256": "30dcf90f0dcc74e94e7b9325163a61c4f85c40aa6e1990e79d36f02f034bc9c9",
+        "bytes": 4019
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/65-ecu-analysis-text-completeness/report.json",
+        "sha256": "6e0eea9415c11443d819e5a98a96a71094bc7ac38bcc09040f0ed330c7ee57a6",
+        "bytes": 30997
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/65-ecu-analysis-text-completeness/raw.log",
+        "sha256": "540dba14ccd95b63349e14484011c1917d0fe49d683edd0672fbdb791f9d4470",
+        "bytes": 1409
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) refuses whitespace-only current impact text"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "cd6b071e653d7862034338a65835f51868d8a343d981a97ab9c958ebd9c07fa3",
+      "restoredSha256": "cd6b071e653d7862034338a65835f51868d8a343d981a97ab9c958ebd9c07fa3"
+    },
+    {
+      "id": "ota-fleet-availability",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-66-ota-fleet-availability.json",
+        "sha256": "e86f59798e51f1d163f9c78db1072f2101349a693949162354afb9a6b19a7d8e",
+        "bytes": 1929
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/66-ota-fleet-availability/command.json",
+        "sha256": "d2f31c6a233d605ae23e409f2788ea93ccfb3a16ad502b6b6b177ac11386bb21",
+        "bytes": 4029
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/66-ota-fleet-availability/report.json",
+        "sha256": "5adeefb4272a08cde53a90d827f3c11fc9049366c5c4dd641aa7d76c4089e3cb",
+        "bytes": 31018
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/66-ota-fleet-availability/raw.log",
+        "sha256": "e9a64cf6364a11cfacc0bc0d39963050b2799afe04544007be08ab9d74695bfd",
+        "bytes": 1406
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) refuses an OTA package without target inventory"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "737219d1e85cb0e70363a8605720caaddde744c26ad8aeaee661942f8b6ad917",
+      "restoredSha256": "737219d1e85cb0e70363a8605720caaddde744c26ad8aeaee661942f8b6ad917"
+    },
+    {
+      "id": "ota-owned-metadata-time",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-67-ota-owned-metadata-time.json",
+        "sha256": "e1ba251a76ef1e39ad177f721fc86fff13471642a7e9d3474f337ac2f7f6d50a",
+        "bytes": 1932
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/67-ota-owned-metadata-time/command.json",
+        "sha256": "4a26f94fb2fa0980609f7004e015f5672cdcd59b7e1fbbc3441ae16990062dbc",
+        "bytes": 4081
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/67-ota-owned-metadata-time/report.json",
+        "sha256": "eb35a99535751ba28f57dae39f03347c51f90531e5fb57e3fb0080f39725f8d8",
+        "bytes": 31040
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/67-ota-owned-metadata-time/raw.log",
+        "sha256": "2c155ea8195d12095df580cf08075f291af9c9c63f02fa15492f84e6fc541675",
+        "bytes": 1478
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) reports future metadata as an explicit package-time refusal"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "737219d1e85cb0e70363a8605720caaddde744c26ad8aeaee661942f8b6ad917",
+      "restoredSha256": "737219d1e85cb0e70363a8605720caaddde744c26ad8aeaee661942f8b6ad917"
+    },
+    {
+      "id": "fallback-profile-identity",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-68-fallback-profile-identity.json",
+        "sha256": "f5e3c2b2415da724dff58f2b1cd845fa095ed447ba5b341630f38aaea31a361f",
+        "bytes": 1939
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/68-fallback-profile-identity/command.json",
+        "sha256": "3647eb49746462ea8017544616354892c5e4d0007b3510e692fb55121835863e",
+        "bytes": 4065
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/68-fallback-profile-identity/report.json",
+        "sha256": "49e122b1d94b5f9eceeec6a3b5ab3239ca9776895b4a73fb1b77d2e7af1a5569",
+        "bytes": 31000
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/68-fallback-profile-identity/raw.log",
+        "sha256": "cba18d88b528aa8b89da2b563be6f7d5fadee23665498de0003b2d26d2250ca1",
+        "bytes": 1386
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) refuses a foreign fallback profile with valid own trajectory"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "92c17cef59cbb6d1c61615dd15b07c92d6bc106077b1fb14a1d0cc666f0fa835",
+      "restoredSha256": "92c17cef59cbb6d1c61615dd15b07c92d6bc106077b1fb14a1d0cc666f0fa835"
+    },
+    {
+      "id": "fallback-safe-deadline-arithmetic",
+      "specRequired": false,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutation-69-fallback-safe-deadline-arithmetic.json",
+        "sha256": "fd745dad54c3eb9818d11d8496a3400993c160351d75be595d826185624a8644",
+        "bytes": 1971
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/69-fallback-safe-deadline-arithmetic/command.json",
+        "sha256": "42121fac574bb9fe041d465612fcb365855842a3fd9b1e1898925b06ca54a1d9",
+        "bytes": 4131
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/69-fallback-safe-deadline-arithmetic/report.json",
+        "sha256": "9fbc5d232f46461bfadb2b49b9363e707109fd06436242a842a7df0be361c121",
+        "bytes": 31016
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/isolated-mutations/7458c47c343d1b54921501a04e0be6f280a38963/reviewed-69-v1/mutations/69-fallback-safe-deadline-arithmetic/raw.log",
+        "sha256": "2e09c40ab1b4904f7fdc10e2746463fd12dd503f8bca9dfa5c965b5f3c5436f6",
+        "bytes": 1343
+      },
+      "failedAssertionNames": [
+        "Mobility synthetic local reference oracles (P3-17) refuses computed fallback deadline overflow from a schema-valid duration"
+      ],
+      "requiredFailurePatterns": [],
+      "requiredFailureMatches": {},
+      "sourceSha256": "92c17cef59cbb6d1c61615dd15b07c92d6bc106077b1fb14a1d0cc666f0fa835",
+      "restoredSha256": "92c17cef59cbb6d1c61615dd15b07c92d6bc106077b1fb14a1d0cc666f0fa835"
+    }
+  ],
+  "limit": "Intended isolated synthetic assertion kills only; no production or full-suite qualification."
+}

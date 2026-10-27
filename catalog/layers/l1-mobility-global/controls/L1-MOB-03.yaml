@@ -1,0 +1,123 @@
+# mobility.port-access-follows-isps-level. Experimental and unreviewed; local synthetic results do not establish production enforcement.
+"id": "L1-MOB-03"
+"version": "0.1.0"
+"support": "experimental"
+"layer": 1
+"family": "port-facility-access"
+"stations":
+  - "mobility"
+"title": "Recheck access against the current simulated port security level"
+"statement": "Open a simulated access request only after a current-level authorization and revision-bound check follow the most recent security-level change."
+"riskRationale": "An authorization or check made at a lower security level can remain cached after the facility raises its level."
+"mandatory": true
+"applicability":
+  "predicate":
+    "all":
+      - "fact": "stations"
+        "includesAny":
+          - "mobility"
+      - "fact": "domains"
+        "includesAny":
+          - "mobility.ports-logistics-cities"
+      - "fact": "useCases"
+        "includesAny":
+          - "port_access"
+      - "fact": "entityTypes"
+        "includesAny":
+          - "port_facility_operator"
+      - "fact": "roles"
+        "includesAny":
+          - "provider"
+          - "deployer"
+  "reasons":
+    - "Experimental, unreviewed operator-policy draft for the asserted mobility.ports-logistics-cities example scope. Entity, role and use-case facts are operator assertions; no legal applicability follows from the station name."
+    - "ISPS text and legal scope have not been read or reviewed for this draft. Level checks are local operator-policy behavior, not the complete facility/ship security plan, SSP content, Declaration of Security, drill, retention or physical access system."
+    - "Port status, physical asset or change authority, vehicle type approval, operating domain and safety case require manual expert determination; no unsupported native fact or riskClass surrogate is introduced."
+  "exclusions":
+    - "when":
+        "not":
+          "fact": "domains"
+          "includesAny":
+            - "mobility.ports-logistics-cities"
+      "reason": "An explicitly different domain is outside this operator-policy draft; unknown scope is not treated as an exclusion or a pass."
+    - "when":
+        "not":
+          "fact": "useCases"
+          "includesAny":
+            - "port_access"
+      "reason": "The explicit deployment use-case set does not include this signature behavior; unknown use-case facts remain unresolved."
+"citations": []
+"binding":
+  "kind": "enforcement_point"
+  "points":
+    - "tool_pipeline"
+  "mechanism": "Target boundary: the governed tool pipeline. This experimental draft installs no production hook, physical tool or runtime guard. Only local synthetic reference behavior and actual native evidence admission are exercised; no speculative compiler parameter is supplied. ISPS text and legal scope have not been read or reviewed for this draft. Level checks are local operator-policy behavior, not the complete facility/ship security plan, SSP content, Declaration of Security, drill, retention or physical access system."
+  "parameters": []
+  "manualDuty": null
+"tests":
+  - "id": "L1-MOB-03-T1"
+    "type": "runtime_enforced"
+    "oracle":
+      "kind": "enforcement_receipt"
+      "observes": "The locally derived current security level and revision, ordered level-change/access events, principal/facility-bound authorization, point-of-access recheck and openedRequests log."
+    "fixtures":
+      "positive":
+        - "L1-MOB-03/positive/evidence-valid.json"
+        - "L1-MOB-03/positive/oracle-port-level-1.json"
+        - "L1-MOB-03/positive/oracle-port-level-2.json"
+        - "L1-MOB-03/positive/oracle-port-level-3.json"
+        - "L1-MOB-03/positive/oracle-port-raised-rechecked.json"
+      "negative":
+        - "L1-MOB-03/negative/evidence-contradictory.json"
+        - "L1-MOB-03/negative/evidence-cross-tenant.json"
+        - "L1-MOB-03/negative/evidence-empty.json"
+        - "L1-MOB-03/negative/evidence-replayed.json"
+        - "L1-MOB-03/negative/evidence-stale.json"
+        - "L1-MOB-03/negative/evidence-violation.json"
+        - "L1-MOB-03/negative/oracle-port-lower-authorization.json"
+        - "L1-MOB-03/negative/oracle-port-raised-without-recheck.json"
+        - "L1-MOB-03/negative/oracle-port-unknown-level.json"
+    "passCriteria": "Synthetic fixture behavior only. Known levels1,2,3 require authorization adequate for the current level and a check against its derived revision after the latest change. Lower authorization or a stale check denies. Unknown level or unavailable authorization/check is not evaluated and opens nothing. Separate native questionnaire evidence can never create a regulated pass; missing production evidence is not evaluated."
+    "attempts": 1
+"evidence":
+  - "id": "L1-MOB-03-E1"
+    "producer": "amc.questionnaire"
+    "bindingFields":
+      - "tenantId"
+      - "workspaceId"
+      - "deploymentId"
+      - "agentId"
+      - "controlId"
+      - "controlVersion"
+    "freshness":
+      "maxAgeDays": 30
+    "sampling":
+      "method": "all"
+      "ratePercent": null
+      "minItems": 1
+    "retention":
+      "mode": "regime_max"
+    "residency":
+      "mode": "inherit_deployment"
+"invalidatedBy":
+  - "model_version"
+  - "prompt_version"
+  - "tool_version"
+  - "policy_version"
+  - "deployment_version"
+"owner":
+  "role": "ciso"
+"clock": null
+"levels":
+  - "L1"
+"crosswalk": []
+"review":
+  "status": "pending"
+  "expert": null
+  "credential": null
+  "reviewedAt": null
+  "nextReview": null
+"provenance":
+  "draftedBy": "ai"
+  "draftedAt": "2026-10-19"
+  "approvedBy": null

@@ -1,0 +1,48 @@
+{
+  "item": "P3-17",
+  "support": "experimental",
+  "review": "pending",
+  "promotion": "none",
+  "legalReview": null,
+  "experts": {
+    "maritimePortSecurity": null,
+    "fairHousing": null,
+    "automotiveSafety": null
+  },
+  "manualSafetyCaseAssessor": null,
+  "partners": {
+    "mobility.ports-logistics-cities": null,
+    "mobility.vehicles-aviation": null
+  },
+  "sidPromotionApproval": null,
+  "thirdPartyContact": false,
+  "sourceReadsThisItem": false,
+  "unverifiedInstrumentCandidates": 20,
+  "missingDependencies": [
+    "P2-27 cold-chain and ship-sulphur fixture/API",
+    "P2-26 production change envelopes and runtime authority",
+    "P2-11 dated EU/Annex I and substantive DORA coordination",
+    "P3-13 workforce algorithmic-management duties"
+  ],
+  "otherOpenItems": [
+    "cold-chain allow/deny integration; all wrappers remain dependency-unavailable",
+    "P1-13 decision for both unplaced packs",
+    "real facility/housing/type-approval/ODD/minimal-risk facts and manual safety cases",
+    "full R156 SUMS, ISPS/NIS2/CRA scope and staged reporting",
+    "D-14/D-10 experts and independent domain/legal/risk signers",
+    "P1-29 partner per assigned domain",
+    "funded stewardship",
+    "D-04 licence",
+    "Sid promotion"
+  ],
+  "tddAndHistory": {
+    "integrationTestHistory": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-17/solo-20261019/root-integration-tdd-history-031a9.json",
+      "sha256": "3a3e9ace8d9f9382cc9685b423e6480ac253f70348e77201e92fb9df65378af9",
+      "bytes": 2838
+    },
+    "oldReceipt": "qualification/2026-10-19-P3-17/receipt.json preserved at historical product7458/baseDC.",
+    "limit": "Original feature TDD, scoped failures, owner proposals, matrices and probe history remain at their actual pins. No old measurement substitutes for the current matrix."
+  },
+  "scope": "Local macOS arm64, not CI. Missing production evidence remains NE/none; synthetic screening/access/update/fallback observations establish no live port/fleet enforcement, legal approval or safety case."
+}
