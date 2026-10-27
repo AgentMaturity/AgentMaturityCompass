@@ -3402,6 +3402,8 @@ export interface AMCConfig {
   transparency?: unknown;
   /** P2-08 key providers, kept as written; src/keys/keysConfig.ts parses it strictly. */
   keys?: unknown;
+  /** P2-22 operator workflow (inbox window, opt-in review timing), kept as written; src/operator/operatorSources.ts parses it. */
+  operator?: unknown;
 }
 
 export interface GatePolicy {
