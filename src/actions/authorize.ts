@@ -16,6 +16,7 @@ import { activeUserRecord } from "../auth/authApi.js";
 import { assertContract } from "../contracts/index.js";
 import { purposeResource } from "../dataflow/purposePolicy.js";
 import { activeFreezeStatus } from "../drift/freezeEngine.js";
+import { killSwitchDenial } from "../runtime/killSwitch.js";
 import { ACTION_CLASSES } from "../governor/actionCatalog.js";
 import { matchingBreakGlass } from "../governor/breakGlass.js";
 import { matchingScopedExceptions, type DeviationCall } from "../governor/scopedExceptions.js";
@@ -407,6 +408,8 @@ export function recheckAuthorization(record: AuthorizationRecordV1, execution: T
       else if (now === null || now.state !== boundPrincipalState.get(record) || now.principal.principalId !== record.principal.principalId) add("principal_unresolved");
     }
   }
+  // P2-26: a kill switch refuses before any freeze, break-glass or exception is weighed; nothing in the record overrides it.
+  if (killSwitchDenial(execution.workspace, { kind: "tool", agentId: execution.agentId, actionClass: record.action.actionClass }) !== null) add("kill_switch_active");
   try {
     const freeze = activeFreezeStatus(execution.workspace, execution.agentId);
     if (freeze.active && freeze.actionClasses.includes(record.action.actionClass)) add("action_class_frozen");

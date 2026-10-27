@@ -78,7 +78,7 @@ describe("never all clear by default", () => {
   test("an empty ledger yields a not_evaluated item, not an empty inbox", () => {
     vi.stubEnv("AMC_A4_PREVIEW", "1");
     const inbox = buildBlockerInbox({ workspace, nowTs: NOW });
-    expect(inbox.sources).toEqual({ a4: "ok", assuranceWaivers: "ok", actionReceipts: "ok" });
+    expect(inbox.sources).toEqual({ a4: "ok", assuranceWaivers: "ok", actionReceipts: "ok", incidentClocks: "ok" });
     expect(inbox.items.length).toBeGreaterThan(0);
     expect(inbox.items).toContainEqual(expect.objectContaining({ id: "a4:none", kind: "not_evaluated", severity: "mandatory" }));
   });

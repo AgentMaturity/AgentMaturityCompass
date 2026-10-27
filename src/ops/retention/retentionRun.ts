@@ -33,6 +33,7 @@ import { finishRetentionTail } from "./retentionTail.js";
 import { captureRetentionAuthority, assertRetentionAuthorityCurrent } from "./retentionAuthority.js";
 import type { RetentionRunResult } from "./retentionEngine.js";
 import type { EvidenceEvent } from "../../types.js";
+import { assertRetentionMeetsRegimes } from "./regimeRetention.js";
 
 type Parameters = { workspace: string; dryRun: boolean };
 type Writer = ReturnType<typeof openLedger>;
@@ -84,6 +85,7 @@ function prepareRun(input: Parameters, asynchronous: boolean, caller?: () => voi
   const verdict = verifyOpsPolicyBytes(workspace, policyFiles[0]!.bytes, policyFiles[1]!.bytes);
   if (!verdict.valid) throw new Error(`ops policy invalid: ${verdict.reason ?? "unknown reason"}`);
   const policy = opsPolicySchema.parse(YAML.parse(policyFiles[0]!.bytes!.toString("utf8")) as unknown);
+  if (!dryRun) assertRetentionMeetsRegimes(workspace, policy); // P2-26: never delete below an applicable regime's floor.
   const archiveBeforeTs = Date.now() - Math.max(1, policy.opsPolicy.retention.archivePayloadsAfterDays) * DAY;
   const pruneBeforeTs = Date.now() - Math.max(1, policy.opsPolicy.retention.prunePayloadsAfterDays) * DAY;
   const guardDays = policy.opsPolicy.retention.pruneGuardEventsAfterDays;

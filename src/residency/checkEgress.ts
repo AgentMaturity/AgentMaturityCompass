@@ -2,6 +2,7 @@ import { resolve } from "node:path";
 import { ControlCheckpointRootInWorkspaceError, loadActiveCompiledPolicy,
   type ActiveCompiledPolicy } from "../catalog/compiler/activate.js";
 import { emitGuardEvent, getWorkspaceScope } from "../enforce/evidenceEmitter.js";
+import { assertEgressNotKilled } from "../runtime/killSwitch.js";
 import { sha256Hex } from "../utils/hash.js";
 import { loadDestinationRegistrySnapshot, loadPinnedResidencyProfile } from "./destinationRegistry.js";
 import { EGRESS_CHANNELS, type CheckEgressInput, type DestinationRecordV1, type DestinationRegistryV1, type EgressChannel,
@@ -96,6 +97,7 @@ function known(values: readonly string[] | null | undefined): readonly string[] 
     && values.every(value => typeof value === "string" && /^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$/.test(value)) ? values : null;
 }
 function evaluate(input: CheckEgressInput, state: Context): Accepted {
+  assertEgressNotKilled(input); // P2-26: every residency-gated egress meets the kill switch, before any route decision.
   const url = destinationUrl(input);
   if (!EGRESS_CHANNELS.includes(input.channel)) return block(input, "registry_unverifiable", "invalid_channel");
   if (!state.registry) return Object.freeze({ verdict: "no_rule", destinationId: null });

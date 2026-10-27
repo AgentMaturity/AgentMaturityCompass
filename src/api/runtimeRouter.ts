@@ -16,6 +16,7 @@ import {
   type RuntimeRunSeverity,
   type RuntimeRunSource
 } from "../runtime/runManager.js";
+import { activateKillSwitch, killSwitchStatus, releaseKillSwitch, type KillSwitchRecord } from "../runtime/killSwitch.js";
 
 function numericLimit(value: unknown, fallback: number): number {
   const parsed = Number.parseInt(String(value ?? fallback), 10);
@@ -241,5 +242,40 @@ export async function handleRuntimeRoute(
   }
 
   apiError(res, 404, `Runtime route not found: ${method} ${pathname}`);
+  return true;
+}
+
+/**
+ * GET /api/v1/runtime/kill-switch (status, any human role), POST /api/v1/runtime/kill-switch { scope, mode, reason,
+ * incidentId } and POST /api/v1/runtime/kill-switch/release { killId, incidentId } (OWNER, accessPolicy.ts). The issuer
+ * and releaser are the authenticated principal, never a body field.
+ */
+export async function handleKillSwitchRoute(
+  pathname: string, method: string, req: IncomingMessage, res: ServerResponse, workspace: string, principal: string | undefined
+): Promise<boolean> {
+  if (pathname === "/api/v1/runtime/kill-switch" && method === "GET") {
+    const status = killSwitchStatus(workspace);
+    apiSuccess(res, { active: status.active, kills: status.kills, unverifiable: status.unverifiable.length });
+    return true;
+  }
+  if (method !== "POST" || (pathname !== "/api/v1/runtime/kill-switch" && pathname !== "/api/v1/runtime/kill-switch/release")) return false;
+  if (!principal) {
+    apiError(res, 403, "the kill switch needs an authenticated OWNER principal");
+    return true;
+  }
+  const body = await bodyJson<Record<string, unknown>>(req);
+  const text = (value: unknown) => (typeof value === "string" ? value : "");
+  try {
+    if (pathname.endsWith("/release")) {
+      apiSuccess(res, await releaseKillSwitch({ workspace, releasedBy: principal, killId: text(body.killId), incidentId: text(body.incidentId) }), 201);
+      return true;
+    }
+    const scope = (body.scope ?? { kind: "workspace", id: "workspace" }) as KillSwitchRecord["scope"];
+    apiSuccess(res, await activateKillSwitch({ workspace, issuedBy: principal, scope: { kind: scope.kind, id: text(scope.id) },
+      mode: text(body.mode) as KillSwitchRecord["mode"], reason: text(body.reason),
+      incidentId: typeof body.incidentId === "string" ? body.incidentId : null }), 201);
+  } catch (error) {
+    apiError(res, 400, error instanceof Error ? error.message : String(error));
+  }
   return true;
 }

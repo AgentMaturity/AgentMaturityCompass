@@ -17,6 +17,8 @@ import {
   recordIncidentClockEvent
 } from '../incidents/incidentClockEvents.js';
 import { recordWorkspaceOversight, recordWorkspaceOversightAsync } from '../incidents/oversightRecord.js';
+import { startIncidentClocks } from '../incidents/clockRuntime.js';
+import { incidentNoticeDrafts } from '../incidents/noticeDraft.js';
 import { signHexDigest, getSigningKey, getPublicKeyHistory } from '../crypto/keys.js';
 import { sha256Hex } from '../utils/hash.js';
 import { canonicalize } from '../utils/json.js';
@@ -38,7 +40,7 @@ function text(value: unknown): string {
 }
 
 /**
- * GET /api/v1/incidents/:id/clocks?station=&now=, POST /api/v1/incidents/:id/clock-events
+ * GET /api/v1/incidents/:id/clocks?station=&now= (without station: P2-26's recorded clock run and notice drafts), POST /api/v1/incidents/:id/clock-events
  * and POST /api/v1/incidents/:id/oversight (P1-17). 400 on a bad station, trigger, clock,
  * decision or timestamp; 404 on an unknown incident.
  */
@@ -61,9 +63,15 @@ async function handleIncidentClockRoute(
 
     if (action === 'clocks') {
       const url = req.url ?? '';
-      const station = parseStation(queryParam(url, 'station') ?? '');
       const now = queryParam(url, 'now');
       const nowTs = now === undefined ? Date.now() : parseIsoTimestamp(now, 'now');
+      // P2-26: without ?station=, the clocks the incident's recorded run decided, with notice drafts for people to file.
+      if (queryParam(url, 'station') === undefined) {
+        const { runtime, drafts } = incidentNoticeDrafts({ workspace, db: ledger.db, incidentId, nowTs });
+        apiSuccess(res, { incidentId, now: new Date(nowTs).toISOString(), ...runtime, noticeDrafts: drafts.map((draft) => draft.json) });
+        return true;
+      }
+      const station = parseStation(queryParam(url, 'station') ?? '');
       const loaded = loadIncidentClocks(store, incidentId, station, nowTs, getPublicKeyHistory(workspace, 'monitor'));
       apiSuccess(res, clockListing(loaded, station, nowTs));
       return true;
@@ -243,11 +251,13 @@ export async function handleIncidentRoute(
       };
 
       store.insertIncident(incident);
+      const clockRun = startIncidentClocks({ workspace, db: ledger.db, incidentId, nowTs: now });
 
       apiSuccess(res, {
         incidentId,
         agentId,
         state: 'OPEN',
+        clocks: { status: clockRun.status, recorded: clockRun.decisions.length },
       }, 201);
     } catch (err) {
       apiError(res, 500, err instanceof Error ? err.message : 'Could not create incident');

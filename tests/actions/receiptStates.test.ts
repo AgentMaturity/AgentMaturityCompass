@@ -406,8 +406,8 @@ test("a real historical v11 file migrates to current v15 including action tables
     db.prepare("INSERT INTO amc_guard_events(id,agent_id,module_code,decision,reason,severity,created_at) VALUES ('synthetic-migration-guard','default','TEST','deny','synthetic migration sentinel','low','1970-01-01T00:00:00.001Z')").run();
     const before = logical(db);
     runMigrations(db);
-    expect(db.prepare("SELECT version FROM schema_migrations ORDER BY version").all()).toEqual(Array.from({ length: 15 }, (_, i) => ({ version: i + 1 })));
-    for (const name of ["action_executions", "action_transitions", "a4_projects", "agent_lifecycle_state"]) expect(db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name=?").get(name)).toEqual({ name });
+    expect(db.prepare("SELECT version FROM schema_migrations ORDER BY version").all()).toEqual(Array.from({ length: 16 }, (_, i) => ({ version: i + 1 })));
+    for (const name of ["action_executions", "action_transitions", "a4_projects", "agent_lifecycle_state", "incident_clock_runs"]) expect(db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name=?").get(name)).toEqual({ name });
     const after = logical(db);
     for (const [name, rows] of Object.entries(before.rows)) {
       if (name === "schema_migrations") expect(after.rows[name]!.slice(0, 11)).toEqual(rows);
