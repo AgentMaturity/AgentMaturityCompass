@@ -338,6 +338,13 @@ async function prepareSignedCapabilityReceipt(workspace: string, base: z.infer<t
   return Object.freeze({ receipt, assertCurrent });
 }
 
+/** Existing v1 receipt bytes through the selected asynchronous policy route; no new purpose binding. */
+export async function buildAdapterCapabilityReceiptAsync(input: BuildAdapterCapabilityReceiptInput, beforeSign?: () => void): Promise<AdapterCapabilityReceipt> {
+  const workspace = input.workspace, base = prepareAdapterCapabilityReceipt(input);
+  const authority = receiptSigningAuthority(workspace, beforeSign);
+  return (await prepareSignedCapabilityReceipt(workspace, base, authority)).receipt;
+}
+
 function inspectConfiguration(workspace: string, agentId: string, adapterId: string): AdapterCapabilityInspection["configuration"] {
   const signature = verifyAdaptersConfigSignature(workspace);
   if (!signature.signatureExists) return { status: "missing" };
