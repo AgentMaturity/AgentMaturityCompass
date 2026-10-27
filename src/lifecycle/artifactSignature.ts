@@ -1,8 +1,8 @@
 import { closeSync, constants, fstatSync, openSync, readFileSync, readSync } from "node:fs";
 import { z } from "zod";
 import { ensureSigningKeys } from "../crypto/keys.js";
-import { signDigestWithPolicy, verifySignedDigest } from "../crypto/signing/signer.js";
-import type { SignatureEnvelope } from "../crypto/signing/signerTypes.js";
+import { signDigestWithPolicy, signDigestWithPolicyAsync, verifySignedDigest } from "../crypto/signing/signer.js";
+import type { SignatureEnvelope, SignedDigest } from "../crypto/signing/signerTypes.js";
 import { pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 
@@ -47,7 +47,11 @@ const artifactKindSchema = z.enum([
     "a4-deployment-plan",
     "a4-deployment-receipt",
     "a4-rollback-receipt",
-    "a4-amc-check"
+    "a4-amc-check",
+    "scoped-exception",
+    "scoped-exception-revocation",
+    "break-glass",
+    "review-record"
 ]);
 
 const artifactSignatureFields = {
@@ -100,24 +104,28 @@ function domainSeparatedArtifactDigest(input: {
   ));
 }
 
-/** Sign exact bytes using existing workspace keys, without publishing an artifact or signature file. */
-export function signArtifactBytes(input: {
-  workspace: string;
-  artifactKind: ArtifactSignature["artifactKind"];
-  bytes: Buffer;
-}): ArtifactSignature {
+type ArtifactBytes = { workspace: string; artifactKind: ArtifactSignature["artifactKind"]; bytes: Buffer };
+
+function artifactDigest(input: ArtifactBytes): { artifactSha256: string; digestHex: string } {
   const artifactSha256 = sha256Hex(Buffer.from(input.bytes));
-  const digestHex = domainSeparatedArtifactDigest({ artifactKind: input.artifactKind, artifactSha256 });
-  const signed = signDigestWithPolicy({ workspace: input.workspace, kind: "BUNDLE", digestHex });
-  return artifactSignatureSchema.parse({
-    schemaVersion: "2026-07-10",
-    artifactKind: input.artifactKind,
-    artifactSha256,
-    signature: signed.signature,
-    signedTs: signed.signedTs,
-    signer: "auditor",
-    envelope: signed.envelope
-  });
+  return { artifactSha256, digestHex: domainSeparatedArtifactDigest({ artifactKind: input.artifactKind, artifactSha256 }) };
+}
+
+function artifactSignatureOf(input: ArtifactBytes, artifactSha256: string, signed: SignedDigest): ArtifactSignature {
+  return artifactSignatureSchema.parse({ schemaVersion: "2026-07-10", artifactKind: input.artifactKind, artifactSha256,
+    signature: signed.signature, signedTs: signed.signedTs, signer: "auditor", envelope: signed.envelope });
+}
+
+/** Sign exact bytes using existing workspace keys, without publishing an artifact or signature file. */
+export function signArtifactBytes(input: ArtifactBytes): ArtifactSignature {
+  const { artifactSha256, digestHex } = artifactDigest(input);
+  return artifactSignatureOf(input, artifactSha256, signDigestWithPolicy({ workspace: input.workspace, kind: "BUNDLE", digestHex }));
+}
+
+/** `signArtifactBytes` through the awaitable policy signer (P2-08 key providers); refuses in no-sign mode and without a key. */
+export async function signArtifactBytesAsync(input: ArtifactBytes): Promise<ArtifactSignature> {
+  const { artifactSha256, digestHex } = artifactDigest(input);
+  return artifactSignatureOf(input, artifactSha256, await signDigestWithPolicyAsync({ workspace: input.workspace, kind: "BUNDLE", digestHex }));
 }
 
 /** Verify a prepared signature against its exact bytes before publishing either file. */

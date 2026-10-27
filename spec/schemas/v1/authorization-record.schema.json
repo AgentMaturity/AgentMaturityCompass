@@ -120,6 +120,10 @@
           },
           "type": "array"
         },
+        "breakGlassId": {
+          "minLength": 1,
+          "type": "string"
+        },
         "exceptions": {
           "items": {
             "additionalProperties": false,

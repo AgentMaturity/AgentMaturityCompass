@@ -1,0 +1,11 @@
+---
+"agent-maturity-compass": minor
+---
+
+Bind reviews, scope exceptions and sign break-glass actions (P2-24, backlog A08). Three signed, approval-bound records are added under `.amc/governor/`: `amc.scoped-exception/v1`, `amc.break-glass/v1` and `amc.review-record/v1`. Each is approved before it exists: its draft digest is raised as an approval request, and only decisions bound to that exact request count. Each is signed with a domain-separated artifact signature through the awaitable policy signer. A missing signing key refuses the operation; nothing is recorded unsigned.
+
+The compiled-policy guard abstains for a control only while a verified, live scoped exception or break-glass record named in the call's authorization record covers that control version and the call's agent, tool, class, resource and amount. The authorization record lists exceptions in `authority.exceptions` and a new optional `authority.breakGlassId`, and the recheck re-reads both before every call. A revocation takes effect on the next call. Exceptions and break-glass never relax monotonic safety guards, an active freeze or kill switch, legal holds, residency blocks, or a pending legal review of the control.
+
+`amc governor-override` and `amc emergency-override` now request and then activate a signed break-glass record: one bound decision from an allowed role, a window of at most 24 hours, and an incident opened on request. The `--mode` option of `governor-override` is removed, because the record has no mode and the legacy mode was never enforced. Calls made under break-glass append `BREAK_GLASS_ACTION` ledger rows. The next break-glass is refused `previous_break_glass_unreviewed` until a review record covers the packet, and an overdue review raises `POSTMORTEM_OVERDUE`.
+
+`reviewStatusFor` reports the Review dimension for an exact digest: `rejected` on any rejection, `approved` only for an unexpired approval of the current digest, `expired`, or `pending`. A reviewer equal to the requester is refused. In a regulated profile, `--approval-exception` accepts only the id of a signed scoped exception for the plan's approval control; the unsigned ADR-5 note keeps working only outside a regulated profile. These records are recorded, reviewed deviations and human decisions, never a compliance verdict.

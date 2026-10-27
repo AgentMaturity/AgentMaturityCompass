@@ -394,7 +394,7 @@ AMC provides 1,260 public CLI command paths in the live command inventory.
 | 375 | `amc drift report` | - |
 | 376 | `amc e2e` | End-to-end smoke verification |
 | 377 | `amc e2e smoke` | Run go-live smoke tests: local, docker, or helm-template |
-| 378 | `amc emergency-override` | Activate an emergency policy override with strict TTL |
+| 378 | `amc emergency-override` | Request a signed break-glass record (as governor-override); after one bound approval rerun with --activate |
 | 379 | `amc enforce` | Policy enforcement and guardrails |
 | 380 | `amc enforce ato-detect` | Detect account takeover attempts (demo) |
 | 381 | `amc enforce blind-secrets` | Redact secrets from text |
@@ -580,7 +580,7 @@ AMC provides 1,260 public CLI command paths in the live command inventory.
 | 561 | `amc governor confidence-check` | Check if action is allowed given confidence-adjusted maturity |
 | 562 | `amc governor explain` | Explain policy requirements for an action class |
 | 563 | `amc governor report` | Render matrix of current SIMULATE/EXECUTE allowance per ActionClass |
-| 564 | `amc governor-override` | Activate an emergency governance override with TTL |
+| 564 | `amc governor-override` | Request a signed break-glass record; after one bound approval rerun with --activate and --approval |
 | 565 | `amc governor-override-alerts` | Show alerts for active/expired overrides |
 | 566 | `amc guard` | Guard check proposed output from stdin |
 | 567 | `amc guardrails` | Signed runtime guardrail controls |
@@ -4307,7 +4307,7 @@ Run go-live smoke tests: local, docker, or helm-template
 
 #### `amc emergency-override`
 
-Activate an emergency policy override with strict TTL
+Request a signed break-glass record (as governor-override); after one bound approval rerun with --activate
 
 
 | Option | Description |
@@ -4316,6 +4316,11 @@ Activate an emergency policy override with strict TTL
 | `--reason <reason>` | - |
 | `--action <desc>` | - |
 | `--ttl <ms>` | - |
+| `--tools <names>` | - |
+| `--action-classes <classes>` | - |
+| `--controls <ids>` | - |
+| `--activate <breakGlassId>` | - |
+| `--approval <approvalRequestId>` | - |
 
 #### `amc enforce ato-detect`
 
@@ -5770,7 +5775,7 @@ Render matrix of current SIMULATE/EXECUTE allowance per ActionClass
 
 #### `amc governor-override`
 
-Activate an emergency governance override with TTL
+Request a signed break-glass record; after one bound approval rerun with --activate and --approval
 
 
 | Option | Description |
@@ -5778,7 +5783,11 @@ Activate an emergency governance override with TTL
 | `--agent <agentId>` | - |
 | `--reason <reason>` | - |
 | `--ttl <ttl>` | - |
-| `--mode <mode>` | - |
+| `--tools <names>` | - |
+| `--action-classes <classes>` | - |
+| `--controls <ids>` | - |
+| `--activate <breakGlassId>` | - |
+| `--approval <approvalRequestId>` | - |
 
 #### `amc governor-override-alerts`
 

@@ -29,6 +29,8 @@ import {
   describeApprovalException,
   parseApprovalExceptionNote
 } from "./approvals/seam/devProfileException.js";
+import { loadActiveCompiledPolicy } from "./catalog/compiler/activate.js";
+import { createScopedExceptionAnswerer } from "./governor/scopedExceptions.js";
 
 /** The side-effecting edges, injectable so the wiring itself is testable. */
 export interface AgentLoopCliIo {
@@ -127,10 +129,14 @@ export interface ApprovalGateChoice {
  * somebody typed. The banner is printed to stderr because an exception nobody
  * sees is a default; the durable record is the signed `approval/answer` row,
  * which names the exception on every call it grants.
+ *
+ * P2-24: in a regulated profile (an active compiled plan, or one that cannot be verified) that unsigned note is
+ * refused; `--approval-exception` then names a signed scoped exception for the plan's approval control instead.
  */
 export function approvalGateFor(
   io: AgentLoopCliIo,
-  opts: RunOptions
+  opts: RunOptions,
+  scope: { readonly workspace: string; readonly agentId: string }
 ): ApprovalGateChoice | null | undefined {
   if (opts.approveTools === undefined) {
     if (opts.approvalException !== undefined) {
@@ -158,7 +164,18 @@ export function approvalGateFor(
     return null;
   }
   const answerers: ApprovalAnswerer[] = [];
-  if (opts.approvalException !== undefined) {
+  const regulated = opts.approvalException === undefined ? null : regulatedApprovalControls(scope.workspace, actionClass);
+  if (opts.approvalException !== undefined && regulated !== null) {
+    try {
+      const answerer = createScopedExceptionAnswerer({ ...scope, exceptionId: opts.approvalException, approvalControlIds: regulated });
+      answerers.push(answerer);
+      io.error(chalk.yellow(`SCOPED APPROVAL EXCEPTION ACTIVE — ${answerer.name}`));
+    } catch (error: unknown) {
+      io.error(chalk.red(error instanceof Error ? error.message : String(error)));
+      io.fail();
+      return null;
+    }
+  } else if (opts.approvalException !== undefined) {
     try {
       const note = parseApprovalExceptionNote(
         JSON.parse(readFileSync(opts.approvalException, "utf8")) as unknown
@@ -182,6 +199,19 @@ export function approvalGateFor(
     }
   }
   return { actionClass, riskTier: riskTier as ApprovalRiskTier, answerers };
+}
+
+/**
+ * The active plan's approval control ids for `actionClass`, or null outside a regulated profile. A plan that cannot be
+ * verified counts as regulated with no approval control, so no exception can relax it.
+ */
+function regulatedApprovalControls(workspace: string, actionClass: ActionClass): readonly string[] | null {
+  try {
+    const plan = loadActiveCompiledPolicy(workspace);
+    return plan === null ? null : plan.runtimePolicy.approvals[actionClass]?.controlIds ?? [];
+  } catch {
+    return [];
+  }
 }
 
 /** Parse a positive-integer option, or report the flag that was wrong. */

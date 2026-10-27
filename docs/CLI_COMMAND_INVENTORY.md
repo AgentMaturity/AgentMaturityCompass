@@ -381,7 +381,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc drift report` | - | `--agent <agentId>`<br>`--out <file>` | - |
 | `amc e2e` | End-to-end smoke verification | - | - |
 | `amc e2e smoke` | Run go-live smoke tests: local, docker, or helm-template | `--mode <mode>`<br>`--workspace <path>`<br>`--repo-root <path>`<br>`--json` | - |
-| `amc emergency-override` | Activate an emergency policy override with strict TTL | `--agent <agentId>`<br>`--reason <reason>`<br>`--action <desc>`<br>`--ttl <ms>` | - |
+| `amc emergency-override` | Request a signed break-glass record (as governor-override); after one bound approval rerun with --activate | `--agent <agentId>`<br>`--reason <reason>`<br>`--action <desc>`<br>`--ttl <ms>`<br>`--tools <names>`<br>`--action-classes <classes>`<br>`--controls <ids>`<br>`--activate <breakGlassId>`<br>`--approval <approvalRequestId>` | - |
 | `amc enforce` | Policy enforcement and guardrails | - | - |
 | `amc enforce ato-detect` | Detect account takeover attempts (demo) | `--json` | - |
 | `amc enforce blind-secrets` | Redact secrets from text | `--json` | - |
@@ -567,7 +567,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc governor confidence-check` | Check if action is allowed given confidence-adjusted maturity | `--action <class>`<br>`--agent <id>`<br>`--required-level <n>` | - |
 | `amc governor explain` | Explain policy requirements for an action class | `--action <class>`<br>`--agent <agentId>` | - |
 | `amc governor report` | Render matrix of current SIMULATE/EXECUTE allowance per ActionClass | `--window <window>`<br>`--out <path>`<br>`--agent <agentId>` | - |
-| `amc governor-override` | Activate an emergency governance override with TTL | `--agent <agentId>`<br>`--reason <reason>`<br>`--ttl <ttl>`<br>`--mode <mode>` | - |
+| `amc governor-override` | Request a signed break-glass record; after one bound approval rerun with --activate and --approval | `--agent <agentId>`<br>`--reason <reason>`<br>`--ttl <ttl>`<br>`--tools <names>`<br>`--action-classes <classes>`<br>`--controls <ids>`<br>`--activate <breakGlassId>`<br>`--approval <approvalRequestId>` | - |
 | `amc governor-override-alerts` | Show alerts for active/expired overrides | `--agent <agentId>` | - |
 | `amc guard` | Guard check proposed output from stdin | `--target <name>`<br>`--risk-tier <tier>` | - |
 | `amc guardrails` | Signed runtime guardrail controls | - | - |

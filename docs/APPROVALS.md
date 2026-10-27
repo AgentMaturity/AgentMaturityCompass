@@ -43,6 +43,23 @@ A `FINANCIAL` tool must declare `bindingFields` for `amount`, `currency` and `re
 
 Arguments such as `approvalId`, `approved` or `consent` grant nothing. Only the approval gate names approvals, after a grant. Under a gate, a call in an authorized class needs a signed approval from the approvals engine: an answerer's allow, including an ADR-5 exception, names none and is denied `approval_missing`. Code Mode sub-calls are asked one by one. Each call's tool evidence rows carry `authorizationId` and `authorizationDigest`, and one `AUTHORIZATION_RECORD` audit row holds the full record. The record and its signatures are checked against the workspace's own keys: a local audit trail, not a portable verdict.
 
+## Scoped exceptions and review records
+
+A scoped exception (`amc.scoped-exception/v1`, `src/governor/scopedExceptions.ts`) is a signed deviation from one control version. It names the workspace, agents, tools and action classes (no wildcards), the resource ids (or `null`, justified in the reason), a maximum amount, and a window of at most 30 days. `requestScopedException` raises an approval under the signed policy's `SECURITY` rule whose intent is the draft's digest. Once the quorum has recorded decisions bound to that request (`expectedRequestDigestSha256`), `issueScopedException` signs and writes the exact approved draft under `.amc/governor/scoped-exceptions/`. The requester never counts as an approver. A missing signing key refuses the operation.
+
+Only the enforcement point honours an exception. The compiled-policy guard abstains for that control when the exception verifies, names this workspace and its approval, is in window, is not revoked, and covers the call's agent, tool, class, resource and amount. The authorization record lists it in `authority.exceptions`, and the recheck re-reads it before every call. An exception copied from another workspace, with a broken signature, for another control version, or for a larger amount is ignored. `revokeScopedException(workspace, id, reason, revokedBy)` takes effect on the next call. Any revocation file revokes, even unsigned, because a revocation only ever denies.
+
+`--approval-exception` in a regulated profile (an active compiled plan, or one that cannot be verified) takes the id of a signed scoped exception for the plan's approval control. The unsigned ADR-5 note is refused there and keeps working only outside a regulated profile.
+
+A review record (`amc.review-record/v1`, `src/approvals/reviewRecords.ts`) is signed and approval-bound the same way. It names its subject (`compiled-plan`, `control-result`, `scoped-exception`, `break-glass-packet`, `agent-output` or `attestation-draft`) by id and exact SHA-256. A reviewer equal to the requester is refused at creation. `reviewStatusFor` is the Review dimension:
+
+- `rejected` when any review of the current digest rejects it, even beside an approval;
+- `approved` when an unexpired review approves exactly the current digest;
+- `expired` when the only approvals have lapsed;
+- `pending` otherwise, including reviews of an earlier digest.
+
+An exception or review is a recorded human decision, never a certification or a compliance verdict.
+
 ## CLI
 
 ```bash

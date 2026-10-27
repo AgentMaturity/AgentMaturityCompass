@@ -1,0 +1,110 @@
+{
+ "schemaVersion": 1,
+ "key": "P2-24",
+ "date": "2026-10-27",
+ "commit": "9050b7352f405f6edf56c2419c7f1d60930988e9",
+ "branch": "rtd/p2-24-bound-reviews",
+ "node": "v22.23.3",
+ "pnpm": "10.33.0",
+ "os": "macOS 26.6.2",
+ "arch": "arm64",
+ "commands": [
+  {
+   "cmd": "npm run -s build",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s typecheck",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s typecheck:tests",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s lint",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:gates",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:dead-code",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:duplicates",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "node scripts/gen-counts.mjs --write",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:counts",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s gen:api-ref",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:api-ref",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:docs-drift",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:schemas",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npx vitest run --maxWorkers=2 <56 test files: tests/actions, tests/governor, tests/approvals, tests/policy, tests/catalog/l0, tests/lifecycle, canary/override/rollback key tests, agent-loop and schedule CLI tests>",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:architecture-boundaries",
+   "exit": 1,
+   "durationMs": 0
+  },
+  {
+   "cmd": "node scripts/check-freeze.mjs",
+   "exit": 1,
+   "durationMs": 0
+  }
+ ],
+ "tests": {
+  "total": 1679,
+  "passed": 1679,
+  "failed": 0,
+  "skipped": 0
+ },
+ "artifacts": [
+  {
+   "path": "table-coverage.json",
+   "sha256": "ac5139305feb1bd7f786ee68efed4ad9310e06e153c71017ea15368d307ecef2"
+  },
+  {
+   "path": "mutations.json",
+   "sha256": "798f0394925c5d68060414b94ea4184e20d58807558ea9195a7c430d000f7b65"
+  }
+ ],
+ "notes": "durationMs not measured (0). The two non-zero exits fail identically on base 6ddbcadfb: architecture-boundaries flags src/vault/vault.ts (803 lines, untouched here); check-freeze refuses the P2-09, P2-30 and P3-14 exceptions other changesets name. This item adds no CLI command path. The 13 table rows pass; all 13 mutations make a test fail; the four new test files fail on base because the modules do not exist."
+}
