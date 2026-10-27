@@ -164,7 +164,7 @@ describe("actual action policy init under config-purpose provider authority", ()
     try {
       await atPause(paused.entered, operation); const candidate = policy.defaultActionPolicy(); candidate.actions = candidate.actions.slice(0, 1);
       await policy.initActionPolicyAsync(f.workspace, candidate); const committed = f.pair(); f.verify();
-      paused.release.resolve(); expect(await outcome).toMatchObject({ message: "action policy or signature changed while signing; retry" }); expect(f.pair()).toEqual(committed);
+      paused.release.resolve(); expect(await outcome).toMatchObject({ message: "signed pair inputs or destinations changed while signing; retry" }); expect(f.pair()).toEqual(committed);
     } finally { paused.release.resolve(); await outcome; }
   });
 
@@ -172,7 +172,7 @@ describe("actual action policy init under config-purpose provider authority", ()
     const f = fixture(); await f.bind(); const paused = f.pause(), operation = policy.initActionPolicyAsync(f.workspace), outcome = operation.then(() => null, error => error);
     try {
       await atPause(paused.entered, operation); writeFileSync(f.sigFile, readFileSync(f.sigFile, "utf8") + "\n"); const changed = f.pair();
-      paused.release.resolve(); expect(await outcome).toMatchObject({ message: "action policy or signature changed while signing; retry" }); expect(f.pair()).toEqual(changed);
+      paused.release.resolve(); expect(await outcome).toMatchObject({ message: "signed pair inputs or destinations changed while signing; retry" }); expect(f.pair()).toEqual(changed);
     } finally { paused.release.resolve(); await outcome; }
   });
 
@@ -198,7 +198,7 @@ describe("actual action policy init under config-purpose provider authority", ()
     const operation = policy.initActionPolicyAsync(f.workspace, undefined, { onlyIfMissing: true }), outcome = operation.then(() => null, error => error);
     try {
       await atPause(paused.entered, operation); await policy.initActionPolicyAsync(f.workspace); const committed = f.pair(); f.verify();
-      paused.release.resolve(); expect(await outcome).toMatchObject({ message: "action policy or signature changed while signing; retry" }); expect(f.pair()).toEqual(committed);
+      paused.release.resolve(); expect(await outcome).toMatchObject({ message: "signed pair inputs or destinations changed while signing; retry" }); expect(f.pair()).toEqual(committed);
     } finally { paused.release.resolve(); await outcome; }
   });
 });

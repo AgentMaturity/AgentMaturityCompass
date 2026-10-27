@@ -292,10 +292,19 @@ function additionalCollector(source: string) {
   runInNewContext(result.outputText, { exports, readdirSync, join, relative, collectArchiveFiles: collectFiles }, { timeout: 1_000 });
   return exports.collectFiles;
 }
+// P2-08 moved prompt pack archive construction into promptArchive.ts, which calls the shared collector
+// directly; every other file still declares its own collectFiles delegate.
+function additionalCurrentCollector(path: string) {
+  const live = read(path);
+  if (parsed(live).statements.some(node => ts.isFunctionDeclaration(node) && node.name?.text === "collectFiles")) return additionalCollector(live);
+  expect(path).toBe("src/prompt/promptPackArtifact.ts");
+  expect(read("src/prompt/promptArchive.ts")).toContain('import { collectFiles } from "../utils/archiveFiles.js";');
+  return collectFiles;
+}
 for (const row of additionalRestoration.files.filter(item => item.originalPath.startsWith("src/"))) {
   const originalSource = read(row.archivePath);
   if (createHash("sha256").update(originalSource).digest("hex") !== row.sha256) throw new Error(`Original changed: ${row.originalPath}`);
-  const original = additionalCollector(originalSource), current = additionalCollector(read(row.originalPath));
+  const original = additionalCollector(originalSource), current = additionalCurrentCollector(row.originalPath);
   describe(`additional archive file utility: ${row.originalPath}`, () => {
     test("retains all other declarations, cleanup, crypto, extraction guards and public APIs", () => {
       expect(additionalUntouched(landedText(row.originalPath))).toBe(additionalUntouched(originalSource));

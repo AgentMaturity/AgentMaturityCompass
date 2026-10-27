@@ -464,8 +464,15 @@ describe("signing paths refuse a synthetic_example result", () => {
   test("amc audit binder create (auditBinderCreateCli)", async () => {
     writeExampleRun(join(workspace, ".amc", "agents", "example-binder", "runs"), "example-binder-run");
     const { auditBinderCreateCli } = await import("../src/audit/auditCli.js");
-    await expect(auditBinderCreateCli({ workspace, scope: "agent", id: "example-binder" }))
-      .rejects.toThrow(/synthetic_example results cannot be/);
+    const { AuditBinderPublicationError } = await import("../src/audit/binderPublication.js");
+    // P2-08 reports every binder failure as a publication error; the synthetic refusal is its cause and nothing was published.
+    const failure = await auditBinderCreateCli({ workspace, scope: "agent", id: "example-binder" }).then(() => null, (error: unknown) => error);
+    expect(failure).toBeInstanceOf(AuditBinderPublicationError);
+    const published = failure as InstanceType<typeof AuditBinderPublicationError>;
+    expect(published.publishedPaths).toEqual([]); expect(published.completedLogHashes).toEqual([]);
+    const messages: string[] = [];
+    for (let cause: unknown = failure; cause instanceof Error; cause = cause.cause) messages.push(cause.message);
+    expect(messages.join("\n")).toMatch(/synthetic_example results cannot be/);
   });
 
   test("amc notary sign (notarySignCli) refuses the banner-stamped Markdown --example --output writes", async () => {
