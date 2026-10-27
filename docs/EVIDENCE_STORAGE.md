@@ -1,6 +1,6 @@
 # Evidence storage
 
-How AMC stores evidence at rest, which keys protect it, and what is not claimed. Design and trade-offs: [ADR 018](adr/018-encrypted-ledger-worm-postgres.md) (proposed; Sid approval pending).
+How AMC stores evidence at rest, which keys protect it, and what is not claimed. Design and trade-offs: [ADR 018](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/adr/018-encrypted-ledger-worm-postgres.md) (proposed; Sid approval pending).
 
 ## Modes
 

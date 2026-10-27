@@ -166,7 +166,7 @@ POST /api/v1/native-tasks/{taskId}/verify          {expectedRevision}
 ## Web tools through the starter profiles
 
 `amc init --coding --web-allow-host <host>` (repeatable) also grants `web_fetch` and `web_search` exactly those hosts or
-origins in the signed tool policy, where the egress decision reads them (see [NATIVE_TOOLS.md](../NATIVE_TOOLS.md)).
+origins in the signed tool policy, where the egress decision reads them (see [NATIVE_TOOLS.md](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/NATIVE_TOOLS.md)).
 `web_search` still refuses every call until a caller composes a search provider. `--regulated` keeps both off. The
 other S8 tools (`ask_user`, `todo`, `plan`) stay off in both profiles; an operator lists them in a signed `tools.yaml`.
 
