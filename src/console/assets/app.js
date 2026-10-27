@@ -1198,9 +1198,14 @@ async function refreshUnifiedBanner() {
       }
     }
     const freezes = Array.isArray(status?.studio?.activeFreezes) ? status.studio.activeFreezes.length : 0;
+    // P2-26: an active kill switch heads the banner; an unreadable status says so rather than showing nothing.
+    const killEnvelope = await apiGet("/api/v1/runtime/kill-switch").catch(() => null);
+    const kill = killEnvelope?.data ?? killEnvelope;
+    const killLine = kill === null ? `<div class="danger"><strong>Kill switch:</strong> status unavailable</div>`
+      : kill.active ? `<div class="danger"><strong>KILL SWITCH ACTIVE:</strong> ${htmlEscape(kill.kills.map((k) => `${k.killId} (${k.scope.kind}:${k.scope.id}, ${k.mode})`).join("; ") || "unverifiable record treated as stop_all")}. Protected effects are refused until an OWNER releases it.</div>` : "";
     const trustMode = status?.trust?.mode || "UNKNOWN";
     const trustOk = status?.trust?.ok === true;
-    bannerEl.innerHTML = `
+    bannerEl.innerHTML = `${killLine}
       <strong>Unified Clarity</strong>
       <div class="row wrap">
         <span><strong>Agent:</strong> ${htmlEscape(agentId)}</span>

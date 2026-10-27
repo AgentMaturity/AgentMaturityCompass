@@ -459,7 +459,10 @@ const GOVERNANCE_DETECTORS: Readonly<Record<string, { title: string; severity: I
   RESIDENCY_ROUTE_BLOCKED: { title: "Residency route blocked", severity: "WARN", triggerId: (_meta, event) => `residency:${event.id}` },
   // P2-24: an action taken under break-glass; one incident per break-glass record.
   BREAK_GLASS_ACTION: { title: "Break-glass used", severity: "CRITICAL",
-    triggerId: (meta) => typeof meta.breakGlassId === "string" ? `break_glass:${meta.breakGlassId}` : null }
+    triggerId: (meta) => typeof meta.breakGlassId === "string" ? `break_glass:${meta.breakGlassId}` : null },
+  // P2-26 slice B: a kill switch activation is itself an incident.
+  KILL_SWITCH_ACTIVATED: { title: "Kill switch activated", severity: "CRITICAL",
+    triggerId: (meta) => typeof meta.killId === "string" ? `kill_switch:${meta.killId}` : null }
 };
 
 /** Whether autoDetectAndAssemble reads this audit type at all; lets the ledger hook skip every other row cheaply. */

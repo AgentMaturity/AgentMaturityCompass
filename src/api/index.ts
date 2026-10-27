@@ -29,7 +29,7 @@ import { handleBenchmarkRoute } from './benchmarkRouter.js';
 import { handleWorkflowRoute } from './workflowRouter.js';
 import { handleOrgRunRoute } from './orgRunRouter.js';
 import { handleFirewallRoute } from './firewallRouter.js';
-import { handleRuntimeRoute } from './runtimeRouter.js';
+import { handleKillSwitchRoute, handleRuntimeRoute } from './runtimeRouter.js';
 import { handleImporterRoute } from './importerRouter.js';
 import { handleStrategyRoute } from './strategyRouter.js';
 import { handleGovernorRoute } from './governorRouter.js';
@@ -227,6 +227,16 @@ export const API_ROUTE_REGISTRY: readonly ApiRouteDefinition[] = [
     auth: 'protected',
     validationPolicy: 'router-local',
     handler: (pathname, method, req, res, context) => handleFirewallRoute(pathname, method, req, res, context.workspace, context.revalidateAuthority)
+  },
+  {
+    // Before 'runtime': its prefix would match first. The kill switch records the authenticated principal (P2-26).
+    id: 'runtime-kill-switch',
+    description: 'Runtime kill switch: status, OWNER activation and signed OWNER release',
+    prefixes: ['/api/v1/runtime/kill-switch'],
+    methods: ['GET', 'POST'],
+    auth: 'protected',
+    validationPolicy: 'router-local',
+    handler: (pathname, method, req, res, context) => handleKillSwitchRoute(pathname, method, req, res, context.workspace, context.principal)
   },
   {
     id: 'runtime',

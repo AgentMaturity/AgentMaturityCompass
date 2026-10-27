@@ -27,6 +27,7 @@ import {
   type ToolOutcome,
   type RecordedToolCall
 } from "./toolTypes.js";
+import { killSwitchDenial } from "../runtime/killSwitch.js";
 
 /**
  * The tool execution pipeline (P4.1, ADR-4).
@@ -442,6 +443,9 @@ export class ToolPipeline {
 
   /** The authorization stage: a reason to deny, or null. Synchronous, so nothing runs between it and the body. */
   private authorizationDenial(execution: ToolExecution, authorization: CallAuthorization): string | null {
+    // P2-26: every class, bound or not, meets the kill switch here; a dispatched body is never interrupted, the next call is refused.
+    const killed = killSwitchDenial(execution.workspace, { kind: "tool", agentId: execution.agentId, actionClass: execution.actionClass });
+    if (killed !== null) return killed;
     const binding = this.bindingDenial(authorization);
     if (binding !== null) return binding.reason;
     const { bound, context } = authorization;

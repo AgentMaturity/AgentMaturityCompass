@@ -1,0 +1,22 @@
+{
+  "body": {
+    "schema": "amc.drill/1",
+    "drillId": "drill_cb7d958b48cb449e87389a4bf871c51b",
+    "kind": "kill_switch",
+    "activatedAt": "2026-10-27T19:40:09.721Z",
+    "firstDeniedAt": "2026-10-27T19:40:09.852Z",
+    "liftedAt": "2026-10-27T19:40:10.252Z",
+    "actionsAttempted": 5,
+    "actionsDenied": 5,
+    "effectsAfterActivation": 0,
+    "result": "pass",
+    "killId": "kill_f8fdf6f76ede405d8bf9ca3708b8457f",
+    "manualFallbackRehearsal": {
+      "status": "pending",
+      "note": "Rehearse docs/runbooks/kill-switch.md on a kind cluster (scale to zero, deny-all egress NetworkPolicy, provider key revocation) and record the result here; needs a person with a cluster."
+    }
+  },
+  "digestSha256": "410326b80da55b22d15ca2abe66fe392a817a08bf51bdf4c16e801c67b51e222",
+  "signature": "Wm1R8tzj1nMP7xMUdxtYldmIT1UYz+fFFCKymBquFebcEJjjuLhZKtlgYl9UsrziBrNIeUTZpipJasjxeBXkAw==",
+  "signerPublicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAbLfcj3Pzlu6Yg/eyuhY45taNQGbEqeeZEZl6Rkhxt7E=\n-----END PUBLIC KEY-----\n"
+}

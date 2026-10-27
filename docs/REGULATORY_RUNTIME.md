@@ -75,4 +75,33 @@ The CRA clock `eu-cra-early-warning-24h` was already in the table; it stays
 
 There is no Studio incident view to add a clocks panel to; the API route
 serves the clocks for one when it lands. The provider-outage detector lands
-with slice D and the kill-switch detector with slice B.
+with slice D.
+
+## Slice B: kill switch
+
+`src/runtime/killSwitch.ts` holds the signed `KillSwitchRecord`
+(`killId`, `scope`, `mode`, `reason`, `incidentId`, `issuedBy`, `issuedTs`,
+`signature`). Operation is in [the runbook](runbooks/kill-switch.md).
+
+| Boundary | Check | Refusal |
+|---|---|---|
+| Tool pipeline, authorization stage (every class) | `killSwitchDenial` | `kill_switch_active`, `TOOL_CALL_DENIED` row |
+| P1-02 recheck (journaled calls) | `recheckAuthorization` | `recheck_failed:kill_switch_active` receipt |
+| Toolhub | `activeFreezeStatus` (the incident-freeze path) | `EXECUTE_FROZEN_ACTIVE` |
+| Gateway, before model calls | lease verification | 403, `KILL_SWITCH_DENIED` |
+
+- Attacker-writable workspace state cannot block activation: each kill and
+  release is its own new file, so activation never reads, locks or rewrites
+  an existing one. A record that cannot be read or verified counts as an
+  active `stop_all` and raises an alert.
+- Deleting the workspace copy lifts nothing while the mirror under the
+  control checkpoint root (outside the workspace) holds the record. With the
+  checkpoint root inside the workspace there is no mirror; AMC already
+  refuses compiled plans in that configuration.
+- Lifting needs a signed release by an OWNER naming the kill's incident.
+  Break-glass is weighed after the kill check and never overrides it.
+- `GET /api/v1/runtime/kill-switch` serves the status; the Studio banner
+  (pages with the unified banner) shows an active switch in red.
+- `scripts/drills/kill-switch-drill.mjs` writes the signed `amc.drill/1`
+  receipt. The kind-cluster rehearsal of the manual fallback is pending.
+- `KILL_SWITCH_ACTIVATED` opens an incident through the slice A detectors.

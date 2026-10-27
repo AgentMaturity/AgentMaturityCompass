@@ -81,6 +81,9 @@ const OWNER_MUTATION_PATHS = new Set([
   "/api/v1/adapters/init-project",
   "/api/v1/ci/init",
   "/api/v1/drift/freeze/lift",
+  // P2-26: only an OWNER activates or releases the kill switch.
+  "/api/v1/runtime/kill-switch",
+  "/api/v1/runtime/kill-switch/release",
   "/api/v1/firewall/enable",
   "/api/v1/firewall/migrate-signature",
   "/api/v1/bom/sign",
