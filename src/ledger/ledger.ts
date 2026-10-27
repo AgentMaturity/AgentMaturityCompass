@@ -289,7 +289,7 @@ export class Ledger {
   // P2-09: inline payloads are stored, and hashed, as ciphertext when ledger encryption is on (ADR 018).
   private sealInline(id: string, bytes: Buffer): string {
     const text = bytes.toString("utf8");
-    return this.getOpsPolicy().opsPolicy.encryption.ledgerEncryptionEnabled === true ? encryptField(this.workspace, text, inlinePayloadAad(id)) : text;
+    return this.getOpsPolicy().opsPolicy.encryption.ledgerEncryptionEnabled === true ? encryptField(this.workspace, text, inlinePayloadAad(id), this.db) : text;
   }
 
   private ensureIncidentStore() {

@@ -5,6 +5,7 @@
  * so. Those rows hashed their plaintext, so recomputing their event hash needs the key (or a plaintext export) from now
  * on; rows written with encryption on hash their ciphertext and verify without it (ADR 018).
  */
+import type Database from "better-sqlite3";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { getPublicKeyHistory, getSigningKey, signHexDigest, verifyHexDigestAny } from "../../crypto/keys.js";
@@ -31,8 +32,8 @@ export interface EncryptionMigrationReceipt {
 
 type Row = { rowid: number; id: string; payload_inline: string | null; canonical_payload_inline: string | null };
 
-function sealRow(workspace: string, row: Row): { payload_inline: string | null; canonical_payload_inline: string | null } | null {
-  const seal = (value: string | null) => value === null || isEncryptedField(value) ? value : encryptField(workspace, value, inlinePayloadAad(row.id));
+function sealRow(workspace: string, row: Row, db: Database.Database): { payload_inline: string | null; canonical_payload_inline: string | null } | null {
+  const seal = (value: string | null) => value === null || isEncryptedField(value) ? value : encryptField(workspace, value, inlinePayloadAad(row.id), db);
   if (!(row.payload_inline !== null && !isEncryptedField(row.payload_inline)) && !(row.canonical_payload_inline !== null && !isEncryptedField(row.canonical_payload_inline))) return null;
   const payload = seal(row.payload_inline);
   // The two columns hold one ciphertext when they held one plaintext, as rows written with encryption on do.
@@ -63,7 +64,7 @@ export async function encryptExistingLedger(workspace: string, opts: { provider?
       if (rows.length === 0) break;
       db.transaction(() => {
         for (const row of rows) {
-          const sealed = sealRow(workspace, row);
+          const sealed = sealRow(workspace, row, db);
           if (sealed === null) rowsSkipped += 1;
           else { update.run({ ...sealed, rowid: row.rowid }); rowsEncrypted += 1; }
         }

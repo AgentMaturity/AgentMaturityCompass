@@ -7,6 +7,7 @@
  * The stored ciphertext is what the event hash covers (src/ledger/ledger.ts), so the chain and its signatures verify
  * without any key; `payload_sha256` (over the plaintext) is checked only by a holder of the key or of a plaintext export.
  */
+import type Database from "better-sqlite3";
 import { createCipheriv, createDecipheriv, randomBytes } from "node:crypto";
 import { KeyProviderError } from "../../keys/provider.js";
 import type { EvidenceEvent } from "../../types.js";
@@ -24,9 +25,30 @@ export function isEncryptedField(value: string | null | undefined): value is str
   return typeof value === "string" && value.startsWith(LEDGER_CIPHER_PREFIX);
 }
 
-/** Encrypts under the workspace's active data key. A KeyProviderError (key unavailable) propagates: nothing is written. */
-export function encryptField(workspace: string, plain: string, aad: LedgerAad): string {
+const floors = new WeakMap<Database.Database, number>();
+
+/** The highest key version among the ledger's inline ciphertexts, read once per connection and kept current here. */
+function ciphertextFloor(db: Database.Database): number {
+  const known = floors.get(db);
+  if (known !== undefined) return known;
+  // ponytail: one full scan per connection; keep a max-version column or index if ledgers grow past what that allows.
+  const row = db.prepare(`SELECT MAX(CAST(substr(v, 11, instr(substr(v, 11), ':') - 1) AS INTEGER)) AS version FROM
+    (SELECT COALESCE(canonical_payload_inline, payload_inline) AS v FROM evidence_events) WHERE v LIKE '${LEDGER_CIPHER_PREFIX}%'`).get() as { version: number | null };
+  floors.set(db, row.version ?? 0);
+  return row.version ?? 0;
+}
+
+/**
+ * Encrypts under the workspace's active data key. A KeyProviderError (key unavailable) propagates: nothing is written.
+ * With `db`, a key version older than one the ledger already holds is refused (a rolled-back key file).
+ */
+export function encryptField(workspace: string, plain: string, aad: LedgerAad, db?: Database.Database): string {
   const { keyVersion, key } = dataKeySync(workspace);
+  if (db !== undefined) {
+    const floor = ciphertextFloor(db);
+    if (keyVersion < floor) throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", "file", `ledger data key version ${keyVersion} is older than version ${floor} already in the ledger`);
+    floors.set(db, keyVersion);
+  }
   const nonce = randomBytes(12);
   const cipher = createCipheriv("aes-256-gcm", key, nonce);
   cipher.setAAD(aadBytes(aad, keyVersion));
@@ -62,12 +84,16 @@ export function decryptField(workspace: string, value: string, aad: LedgerAad): 
 /** The AAD of an evidence row's inline payload; `canonical_payload_inline` holds the same ciphertext. */
 export const inlinePayloadAad = (eventId: string): LedgerAad => ({ table: "evidence_events", rowId: eventId, column: "payload_inline" });
 
-/** Decrypts an evidence row's inline payload, or null when no key is available here (KeyProviderError). */
+/**
+ * Decrypts an evidence row's inline payload, or null only when the key is genuinely out of reach here: the provider
+ * could not be reached or the vault is locked (KEY_PROVIDER_UNAVAILABLE). A missing or rolled-back key file, a key
+ * version the signed file does not hold, a refused key or a ciphertext that does not open all throw.
+ */
 export function inlinePlaintextOrNull(workspace: string, eventId: string, value: string): string | null {
   try {
     return decryptField(workspace, value, inlinePayloadAad(eventId));
   } catch (error) {
-    if (error instanceof KeyProviderError) return null;
+    if (error instanceof KeyProviderError && error.code === "KEY_PROVIDER_UNAVAILABLE") return null;
     throw error;
   }
 }

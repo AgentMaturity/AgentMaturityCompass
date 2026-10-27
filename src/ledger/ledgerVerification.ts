@@ -115,6 +115,11 @@ export interface VerifyResult {
     /** Agent sessions closed by a `session/close` event and carrying a valid row seal. */
     closed: readonly string[];
   };
+  /**
+   * P2-09: encrypted inline payloads this verifier could not check because the ledger key was out of reach (provider
+   * unreachable or vault locked). Not errors, and not verified: the chain over their ciphertext was still checked.
+   */
+  payloadsNotEvaluated?: readonly string[];
 }
 
 /** P0-09 step 9: what a ledger verdict says when no pinned monitor key anchors it. */
@@ -172,7 +177,8 @@ export function verifyEvidenceEventIntegrity(input: {
     ? buildRetentionProofIndex(input.ledger.workspace)
     : undefined;
   if (retentionProofs && !retentionProofs.ok) errors.push(...retentionProofs.errors);
-  verifyEvidencePayload(event, input.ledger.workspace, errors, undefined, retentionProofs);
+  const notEvaluated: string[] = [];
+  verifyEvidencePayload(event, input.ledger.workspace, errors, undefined, retentionProofs, notEvaluated);
   const prefix = input.ledger.db.prepare(
     "SELECT * FROM evidence_events WHERE rowid <= ? ORDER BY rowid ASC"
   ).all(event.row_id) as EvidenceEvent[];
@@ -235,7 +241,7 @@ export function verifyEvidenceEventIntegrity(input: {
     }
   }
 
-  return chainOnlyResult(errors);
+  return { ...chainOnlyResult(errors), ...(notEvaluated.length ? { payloadsNotEvaluated: notEvaluated } : {}) };
 }
 
 /**
@@ -263,7 +269,8 @@ function verifyEvents(
   ledger: Ledger,
   workspace: string,
   errors: string[],
-  externallyAuthenticatedPayloads?: ReadonlyMap<string, string>
+  externallyAuthenticatedPayloads?: ReadonlyMap<string, string>,
+  notEvaluated?: string[]
 ): void {
   const events = ledger.getAllEvents();
   const retentionProofs = events.some((event) => event.archived === 1 || event.payload_pruned === 1)
@@ -278,7 +285,7 @@ function verifyEvents(
 
   let previous = "GENESIS";
   for (const event of events) {
-    verifyEvidencePayload(event, workspace, errors, externallyAuthenticatedPayloads, retentionProofs);
+    verifyEvidencePayload(event, workspace, errors, externallyAuthenticatedPayloads, retentionProofs, notEvaluated);
 
     if (event.prev_event_hash !== previous) {
       errors.push(`Event ${event.id} previous hash mismatch`);
@@ -644,6 +651,7 @@ export function verifyNativeSessionContinuation(workspacePath: string, targetSes
 function verifyLedger(workspacePath: string, options: LedgerVerifyOptions, continuation?: NativeContinuationScope): VerifyResult {
   let ledger: Ledger | null = null;
   const chainErrors: string[] = [];
+  const payloadsNotEvaluated: string[] = [];
   const governanceErrors: string[] = [];
   const staleAfterMs = options.sessionStaleAfterMs ?? SESSION_STALE_AFTER_MS;
   let sessionLifecycle: SessionLifecycle = { open: [], released: [], interrupted: [], closed: [] };
@@ -696,7 +704,7 @@ function verifyLedger(workspacePath: string, options: LedgerVerifyOptions, conti
     if (ledger) {
       chainErrors.push(...operationalLedgerProblems(workspacePath, ledger, options.trust));
       chainErrors.push(...receiptLedgerProblems(ledger, options.trust));
-      verifyEvents(ledger, workspacePath, chainErrors, options.externallyAuthenticatedPayloads);
+      verifyEvents(ledger, workspacePath, chainErrors, options.externallyAuthenticatedPayloads, payloadsNotEvaluated);
       verifySessionChains(ledger, chainErrors, { trust: options.trust });
       sessionLifecycle = verifySessions(ledger, workspacePath, chainErrors, staleAfterMs, continuation);
       verifyRuns(ledger, workspacePath, chainErrors);
@@ -742,6 +750,7 @@ function verifyLedger(workspacePath: string, options: LedgerVerifyOptions, conti
       released: sessionLifecycle.released,
       interrupted: sessionLifecycle.interrupted,
       closed: sessionLifecycle.closed
-    }
+    },
+    ...(payloadsNotEvaluated.length ? { payloadsNotEvaluated } : {})
   };
 }

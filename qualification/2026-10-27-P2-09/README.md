@@ -20,6 +20,13 @@ Mutation checks (each made one named test fail, then restored):
 
 Checks on the 09a tree: build, typecheck, typecheck:tests, lint, check:gates, check:dead-code (0 new), check:counts (after `gen-counts --write`), check:docs-drift, check:architecture-boundaries, check:api-ref pass. check:duplicates reports 3 `transformation/transformApi.ts` findings that the base reports identically (not touched here); two re-fingerprinted pre-existing clones were accepted with reasons. check:freeze fails on the base already (P3-14, P2-30 not in the base baseline) and P2-09 must be added to `allowedExceptionKeys` by the integrator: a PR cannot authorize itself.
 
+### Security review follow-up (09a, second commit)
+
+Two findings from the coordinator's security review, each with a regression test in `tests/ledgerEncryptionSecurity.test.ts` that failed on the first 09a commit (5 of 5 red) and passes after the fix (5 of 5 green):
+1. Fail-open payload check: an encrypted payload was skipped whenever decryption threw a KeyProviderError. Now only `KEY_PROVIDER_UNAVAILABLE` (unreachable provider, locked vault) yields "not evaluated", reported in the verdict's `payloadsNotEvaluated`; a missing or rolled-back key file, an unknown key version or a ciphertext that does not open is an error, and `payload_inline` is decrypted and compared with `canonical_payload_inline`.
+2. Key-file rollback: the signed key file now has a `sequence`; the P1-08 high-water store (`<AMC home>/state/high-water.json`, kind `ledger-dek`, per workspace scope) refuses an older one, and `encryptField` refuses a key version older than the newest ciphertext in the ledger.
+The 48 verification, retention, bundle, backup and high-water test files were rerun after the fix: 501 passed, 15 failed, all 15 also failing on the base.
+
 ## Pending Sid
 
 - Approve or reject ADR 018 (the code follows its proposal).

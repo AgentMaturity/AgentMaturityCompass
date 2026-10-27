@@ -19,6 +19,7 @@ import { KEY_PROVIDER_IDS, KeyProviderError, type KeyProvider, type KeyProviderI
 import { unwrapKeySync } from "./syncUnwrap.js";
 import { unwrapFileKeySync } from "../../keys/providers/file.js";
 import { loadKeyProvider } from "../../keys/purposeProviders.js";
+import { AntiRollbackError, highWaterKey, recordHighWater, workspaceScope } from "../../keys/highWater.js";
 import { statStamp } from "../../utils/containedFs.js";
 import { ensureDir, pathExists, writeFileAtomic } from "../../utils/fs.js";
 import { sha256Hex } from "../../utils/hash.js";
@@ -29,7 +30,8 @@ const wrappedDataKeySchema = z.strictObject({
   v: z.literal(1), keyVersion: z.number().int().min(1), providerId: z.enum(KEY_PROVIDER_IDS), keyRef: z.string().min(1).max(2048),
   wrapped: z.string().min(1), createdTs: z.number().int()
 });
-const dekFileSchema = z.strictObject({ v: z.literal(1), activeVersion: z.number().int().min(1), keys: z.array(wrappedDataKeySchema).min(1) });
+/** `sequence` rises on every rotate and rewrap; the machine's high-water mark refuses an older signed file (rollback). */
+const dekFileSchema = z.strictObject({ v: z.literal(1), sequence: z.number().int().min(1), activeVersion: z.number().int().min(1), keys: z.array(wrappedDataKeySchema).min(1) });
 const dekSigSchema = z.strictObject({ digestSha256: z.string().length(64), signature: z.string().min(1), signedTs: z.number().int() });
 type DekFile = z.infer<typeof dekFileSchema>;
 
@@ -71,9 +73,19 @@ export function readDataKeyFile(workspace: string): DekFile | null {
   }
   const file = dekFileSchema.parse(JSON.parse(bytes.toString("utf8")));
   if (!file.keys.some(key => key.keyVersion === file.activeVersion)) throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", "file", "ledger data key file names no active key");
+  if (file.activeVersion !== Math.max(...file.keys.map(key => key.keyVersion))) throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", "file", "ledger data key file's active version is not its newest");
+  // Anti-rollback (P1-08 store, outside the workspace): an older validly signed key file is refused, then the mark rises.
+  try {
+    recordHighWater(dekMark(workspace), file.sequence, digest);
+  } catch (error) {
+    if (error instanceof AntiRollbackError) throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", "file", `ledger data key file: ${error.code}`);
+    throw error;
+  }
   files.set(resolve(workspace), { stamp, file });
   return file;
 }
+
+const dekMark = (workspace: string) => highWaterKey("ledger-dek", workspaceScope(workspace));
 
 function writeDataKeyFile(workspace: string, file: DekFile): void {
   ensureDir(join(workspace, ".amc", "keys"));
@@ -83,6 +95,7 @@ function writeDataKeyFile(workspace: string, file: DekFile): void {
   const signature = signHexDigest(digest, getSigningKey(workspace, "config-signature"));
   writeFileAtomic(sigPath(workspace), JSON.stringify({ digestSha256: digest, signature, signedTs: Date.now() }, null, 2), 0o644);
   files.delete(resolve(workspace));
+  recordHighWater(dekMark(workspace), file.sequence, digest);
 }
 
 const refOf = (key: WrappedDataKey): KeyRef => ({ provider: key.providerId, id: key.keyRef });
@@ -156,7 +169,7 @@ export async function rotateDataKey(workspace: string, opts: ProviderOptions & {
   const keyVersion = Math.max(0, ...(file?.keys ?? []).map(key => key.keyVersion)) + 1;
   const key = randomBytes(32);
   const added: WrappedDataKey = { v: 1, keyVersion, providerId: ref.provider, keyRef: ref.id, wrapped: await wrapWith(workspace, ref, key, opts), createdTs: Date.now() };
-  writeDataKeyFile(workspace, { v: 1, activeVersion: keyVersion, keys: [...(file?.keys ?? []), added] });
+  writeDataKeyFile(workspace, { v: 1, sequence: (file?.sequence ?? 0) + 1, activeVersion: keyVersion, keys: [...(file?.keys ?? []), added] });
   cacheFor(workspace).set(keyVersion, key);
   return added;
 }
@@ -173,7 +186,7 @@ export async function rewrapDataKeys(workspace: string, opts: ProviderOptions & 
     rewrapped.push({ ...old, providerId: ref.provider, keyRef: ref.id, wrapped: await wrapWith(workspace, ref, key, opts) });
     key.fill(0);
   }
-  writeDataKeyFile(workspace, { ...file, keys: rewrapped });
+  writeDataKeyFile(workspace, { ...file, sequence: file.sequence + 1, keys: rewrapped });
   return rewrapped;
 }
 

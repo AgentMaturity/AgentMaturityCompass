@@ -21,20 +21,32 @@ export function verifyEvidencePayload(
   workspace: string,
   errors: string[],
   externallyAuthenticatedPayloads?: ReadonlyMap<string, string>,
-  retentionProofs?: RetentionProofIndex
+  retentionProofs?: RetentionProofIndex,
+  /** Rows whose payload could not be checked here (key out of reach): reported, never counted as verified. */
+  notEvaluated?: string[]
 ): void {
   verifyEventRetentionState(event, workspace, errors, retentionProofs);
   if (event.payload_inline !== null) {
-    // P2-09: an encrypted inline payload is checked only where its key is available; without the key the chain
-    // (which covers the ciphertext) still verifies and this content check is not evaluated.
+    // P2-09: never trust either inline column alone. Each is opened where encrypted; "not evaluated" is reported only
+    // when the key is out of reach (provider unreachable or vault locked), never counted as verified. Any other failure
+    // (missing or rolled-back key file, unknown key version, a ciphertext that does not open) is an error.
     let plain: string | null;
+    let canonical: string | null;
     try {
       plain = inlinePlaintextOrNull(workspace, event.id, event.payload_inline);
+      canonical = event.canonical_payload_inline === null || event.canonical_payload_inline === undefined || event.canonical_payload_inline === event.payload_inline
+        ? plain : inlinePlaintextOrNull(workspace, event.id, event.canonical_payload_inline);
     } catch {
       errors.push(`Event ${event.id} payload authentication failed`);
       return;
     }
-    if (plain === null) return;
+    const columnsDiffer = event.canonical_payload_inline != null && event.canonical_payload_inline !== event.payload_inline;
+    if (plain === null || (columnsDiffer && canonical === null)) {
+      if (columnsDiffer) errors.push(`Event ${event.id} payload_inline differs from canonical_payload_inline and cannot be compared without the ledger key`);
+      else notEvaluated?.push(`Event ${event.id} payload not evaluated: the ledger key is unavailable here`);
+      return;
+    }
+    if (columnsDiffer && canonical !== plain) errors.push(`Event ${event.id} payload_inline differs from canonical_payload_inline`);
     const payloadSha = sha256Hex(Buffer.from(plain, "utf8"));
     if (payloadSha !== event.payload_sha256) errors.push(`Event ${event.id} payload hash mismatch`);
     return;
