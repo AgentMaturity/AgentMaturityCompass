@@ -32,14 +32,14 @@ let f: GovernanceFixture;
 const bound = manifest();
 const open = (current: AgentVersionManifest) => admitSessionAtOpen({ workspace: f.workspace, agentId: AGENT, manifest: () => current });
 
-async function promptEnvelope(): Promise<string> {
+async function promptEnvelope(tested: AgentVersionManifest = manifest({ systemPromptSha256: NEW_PROMPT })): Promise<string> {
   const { draft, approval } = await requestChangeEnvelope(f.workspace, { sessionTokenFile: loginAs(f.workspace, "fixture-envelope-requester", ["OPERATOR"]).tokenFile,
     agentId: AGENT, baseline: bound, allowed: [{ component: "prompt", rule: "digest_in_set", values: [NEW_PROMPT], requiredTests: ["prompt-regression"] }],
     validUntil: Date.now() + 86_400_000 });
   decideBound(f.workspace, approval, [OWNER, AUDITOR]);
   const envelope = await activateChangeEnvelope(f.workspace, draft.envelopeId, approval);
   await recordEnvelopeTestResult(f.workspace, { sessionTokenFile: loginAs(f.workspace, "fixture-envelope-tester", ["AUDITOR"]).tokenFile,
-    envelopeId: envelope.envelopeId, testId: "prompt-regression", passed: true, manifest: manifest({ systemPromptSha256: NEW_PROMPT }) });
+    envelopeId: envelope.envelopeId, testId: "prompt-regression", passed: true, manifest: tested });
   return envelope.envelopeId;
 }
 
@@ -58,6 +58,16 @@ describe("change envelopes inside P2-23 admission", () => {
     expect(open(manifest({ systemPromptSha256: NEW_PROMPT })).state).toBe("active");
     expect(listReassessments(f.workspace, AGENT)).toEqual([expect.objectContaining({ trigger: "invalidated_by", changed: ["prompt"], status: "passed",
       envelopeId, invalidatedControls: ["L0-CHG-01"] })]);
+  });
+
+  test("a change with a kind the envelope does not pin (deployment) is not covered, even when the envelope admits the rest", async () => {
+    await activate(f.workspace, ownerActor(f.workspace), bound);
+    const live = manifest({ systemPromptSha256: NEW_PROMPT, harnessVersion: "9.9.9" });
+    // The envelope admits the prompt change with passing tests for exactly this manifest; it pins no deployment.
+    await promptEnvelope(live);
+    active.plan = planView().plan as unknown as CompiledPlan;
+    expect(open(live)).toMatchObject({ state: "suspended", reason: "reassessment_required" });
+    expect(listReassessments(f.workspace, AGENT)).toEqual([expect.objectContaining({ changed: ["prompt", "deployment"], status: "open", envelopeId: null })]);
   });
 
   test("an out-of-envelope change: P2-23 suspends, the envelope blocks the session, and one reassessment is recorded", async () => {

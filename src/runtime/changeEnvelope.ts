@@ -266,7 +266,7 @@ function decideChangeEnvelope(workspace: string, agentId: string, live: AgentVer
  * trigger asks this module whether an envelope covers the change, then the envelope check itself. The manifest is built
  * once, and only when one of them needs it: never for a retired agent, nor for an ungoverned one in a workspace without
  * envelopes. An envelope covers a change when the live manifest is its approved baseline or every change is inside it
- * with passing tests.
+ * with passing tests, and only when every kind that changed from the bound manifest is one the envelope pins.
  */
 export function admitSessionAtOpen(p: { workspace: string; agentId: string; manifest: () => AgentVersionManifest; now?: number }): LifecycleView {
   const nowTs = p.now ?? Date.now();
@@ -275,8 +275,10 @@ export function admitSessionAtOpen(p: { workspace: string; agentId: string; mani
   let decision: EnvelopeDecision | undefined;
   const decide = (): EnvelopeDecision => (decision ??= decideChangeEnvelope(p.workspace, p.agentId, manifest(), nowTs));
   const hasEnvelopes = existsSync(envelopeDir(p.workspace));
-  const covers: ChangeEnvelopeLookup = () => {
-    if (!hasEnvelopes) return null;
+  const covers: ChangeEnvelopeLookup = ({ changed }) => {
+    // Covered only when the envelope pins every kind that changed: a deployment change, or any kind it does not pin, is
+    // never pre-approved by it, however the rest of the decision went.
+    if (!hasEnvelopes || !changed.every((kind) => (COMPONENTS as readonly string[]).includes(kind))) return null;
     const d = decide();
     return (d.outcome === "allow" || d.outcome === "allow_in_envelope") && d.envelopeId !== null ? { envelopeId: d.envelopeId } : null;
   };

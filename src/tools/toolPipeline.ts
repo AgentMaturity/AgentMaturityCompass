@@ -409,11 +409,12 @@ export class ToolPipeline {
     }
     if (!authorizes) {
       // P2-23: an unbound call (a read or low-impact write) still passes lifecycle admission; suspended and retired agents are held.
-      // A kill is left to the authorization stage, which checks it first, so a killed (and suspended) agent's denial names the kill.
-      const killed = killSwitchDenial(draft.workspace, { kind: "tool", agentId: draft.agentId, actionClass: draft.actionClass }) !== null;
-      const lifecycle = killed ? { ok: true as const } : lifecycleAdmission(draft.workspace, draft.agentId, { actionClass: draft.actionClass });
-      return { refused: lifecycle.ok ? null : { stage: "authorization", reason: `agent_not_active: ${lifecycle.reason}`, guardLabel: null },
-        context: null, bound: null, required: false };
+      // Both checks always run (a kill released before the authorization stage must not let a held agent through); a kill,
+      // the cause when it also suspended the agent, is the one reason reported.
+      const killed = killSwitchDenial(draft.workspace, { kind: "tool", agentId: draft.agentId, actionClass: draft.actionClass });
+      const lifecycle = lifecycleAdmission(draft.workspace, draft.agentId, { actionClass: draft.actionClass });
+      const reason = killed ?? (lifecycle.ok ? null : `agent_not_active: ${lifecycle.reason}`);
+      return { refused: reason === null ? null : { stage: "authorization", reason, guardLabel: null }, context: null, bound: null, required: false };
     }
     const context: AuthorizationContext = { ...(this.init.authorizationContext?.() ?? {}), ...(authority ? { authority } : {}) };
     const required = gate !== undefined || (this.init.boundApprovalRequiredFor?.has(draft.actionClass) ?? false);
