@@ -152,6 +152,8 @@ export async function handleComplianceRoute(
           // Null when no category had control-bound evidence (not evaluated), never a default 0.
           coverageScore: out.report.coverage.score,
           coverageEvaluated: out.report.coverage.evaluated,
+          // Experimental until a named expert signs off, with the family's currency flags (P1-45).
+          familyReview: out.report.familyReview,
         }, 201);
       } catch (err) {
         apiError(res, 500, err instanceof Error ? err.message : 'Compliance report failed');
