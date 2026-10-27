@@ -67,8 +67,8 @@ export function verifyTrustConfigPublication(workspace: string) {
 }
 
 /** The commands that re-sign a verified trust.yaml whose signer was retired or revoked (P0-37). */
-const TRUST_RESIGN_RECOVERY = "amc trust resign --confirm";
-const TRUST_COMPROMISED_RECOVERY = "review .amc/trust.yaml, then amc trust resign --confirm --accept-compromised-signer";
+const TRUST_RESIGN_RECOVERY = "amc trust resign (review its output), then amc trust resign --confirm <sha256>";
+const TRUST_COMPROMISED_RECOVERY = "amc trust resign (review .amc/trust.yaml and its output), then amc trust resign --confirm <sha256> --accept-compromised-signer";
 const TRUST_INIT_RECOVERY = "amc trust init";
 type AcceptSigners = (signers: string[]) => void;
 

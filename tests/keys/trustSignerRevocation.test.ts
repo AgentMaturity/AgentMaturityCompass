@@ -114,7 +114,7 @@ describe("revoking the key that signs trust.yaml (P0-37)", () => {
     const { root, oldKeyId } = rotated();
     const body = readFileSync(trustConfigPath(root)), sig = readFileSync(`${trustConfigPath(root)}.sig`);
     await expect(revoke(root, oldKeyId)).resolves.toMatchObject({ sequence: 3, trustConfig: { status: "refused", reason: "signer-compromised",
-      recovery: "review .amc/trust.yaml, then amc trust resign --confirm --accept-compromised-signer" } });
+      recovery: "amc trust resign (review .amc/trust.yaml and its output), then amc trust resign --confirm <sha256> --accept-compromised-signer" } });
     expectFullyRevoked(root, oldKeyId, 3);
     expect(readFileSync(trustConfigPath(root))).toEqual(body);
     expect(readFileSync(`${trustConfigPath(root)}.sig`)).toEqual(sig);
@@ -189,7 +189,7 @@ describe("amc trust resign (P0-37)", () => {
     writeFileSync(trustConfigPath(root), body); writeFileSync(`${trustConfigPath(root)}.sig`, sig);
     const before = readAnchoredRevocationList(keyRevocationLocation(root))!.list.sequence;
     expect(revokeKey(root, "ledger-row", monitorKeyId, "superseded")).toMatchObject({ trustConfig: { status: "refused",
-      recovery: "review .amc/trust.yaml, then amc trust resign --confirm --accept-compromised-signer" } });
+      recovery: "amc trust resign (review .amc/trust.yaml and its output), then amc trust resign --confirm <sha256> --accept-compromised-signer" } });
     expectFullyRevoked(root, monitorKeyId, before + 1);
     expect(readFileSync(`${trustConfigPath(root)}.sig`)).toEqual(sig);
   });
@@ -225,11 +225,16 @@ describe("amc trust resign (P0-37)", () => {
     expect(refused.stderr).toMatch(/--confirm/);
     expect(refused.stdout).toContain(`trust.yaml sha256: ${sha256Hex(body)}`);
     expect(refused.stdout).toContain(`"pinnedPubkeyFingerprint": "${"a".repeat(64)}"`);
-    const unaccepted = cli("--confirm");
+    const reviewed = sha256Hex(body);
+    // The operator binds the digest they reviewed; a digest the run computes itself would bind nothing they saw.
+    const stale = cli("--confirm", "0".repeat(64), "--accept-compromised-signer");
+    expect(stale.status).not.toBe(0);
+    expect(stale.stderr).toMatch(/changed since the reviewed digest/);
+    const unaccepted = cli("--confirm", reviewed);
     expect(unaccepted.status).not.toBe(0);
     expect(unaccepted.stderr).toMatch(/--accept-compromised-signer/);
     expect(verifyTrustConfigSignature(root).valid).toBe(false);
-    const done = cli("--confirm", "--accept-compromised-signer");
+    const done = cli("--confirm", reviewed, "--accept-compromised-signer");
     expect(done.status, done.stderr).toBe(0);
     expect(done.stdout).toMatch(/Mode: NOTARY/);
     expect(verifyTrustConfigSignature(root).valid).toBe(true);
