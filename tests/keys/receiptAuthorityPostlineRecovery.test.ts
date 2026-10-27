@@ -1,5 +1,4 @@
-import { existsSync, mkdirSync, readFileSync, renameSync, rmSync } from "node:fs";
-import { join } from "node:path";
+import { readFileSync, rmSync } from "node:fs";
 import { afterEach, expect, test, vi } from "vitest";
 import { assertKeysetComplete } from "../../src/keys/keyset.js";
 import { loadKeyProvider } from "../../src/keys/purposeProviders.js";
@@ -14,11 +13,11 @@ import { rebuildTransparencyMerkle, verifyTransparencyMerkle } from "../../src/t
 import { workspaceIdFromDirectory } from "../../src/workspaces/workspaceId.js";
 import { cleanupReceiptAuthorityFixtures, makeReceiptAuthorityFixture } from "../helpers/receiptAuthorityFixture.js";
 
-const io = vi.hoisted(() => ({ beforeRename: null as ((target: string) => void) | null }));
+const io = vi.hoisted(() => ({ beforeRename: null as ((source: string, target: string) => void) | null }));
 vi.mock("node:fs", async importOriginal => {
   const actual = await importOriginal<typeof import("node:fs")>();
   return { ...actual, renameSync: ((from: Parameters<typeof actual.renameSync>[0], to: Parameters<typeof actual.renameSync>[1]) => {
-    io.beforeRename?.(String(to)); return actual.renameSync(from, to);
+    io.beforeRename?.(String(from), String(to)); return actual.renameSync(from, to);
   }) as typeof actual.renameSync };
 });
 afterEach(() => { io.beforeRename = null; vi.restoreAllMocks(); cleanupReceiptAuthorityFixtures(); vi.unstubAllEnvs(); });
@@ -26,16 +25,15 @@ afterEach(() => { io.beforeRename = null; vi.restoreAllMocks(); cleanupReceiptAu
 test("a real receipt post-line root rename failure retains its generation and requires explicit signed repair before idempotent recovery", async () => {
   const f = makeReceiptAuthorityFixture(), entriesBefore = readTransparencyEntries(f.workspace), file = loadKeyProvider(f.workspace, "file");
   const fileSigns = vi.spyOn(file, "sign"), rootPath = merkleCurrentRootPath(f.workspace), oldRoot = readFileSync(rootPath);
-  const backup = join(f.root, "owned-prior-root.json"), id = `${workspaceIdFromDirectory(f.workspace)}:receipt`;
+  const id = `${workspaceIdFromDirectory(f.workspace)}:receipt`;
   const priorMark = machineMark(f.workspace, "KEY_ROTATION", id);
   let reached = false;
-  const restoreObstruction = () => {
-    io.beforeRename = null;
-    if (existsSync(backup)) { rmSync(rootPath, { recursive: true, force: true }); renameSync(backup, rootPath); }
-  };
-  io.beforeRename = target => {
+  const restoreObstruction = () => { io.beforeRename = null; };
+  // A native rename failure (ENOENT: the staged root vanished) that leaves every captured transparency member unchanged.
+  // An external change to an owned member instead refuses even the unsigned lag marker (P2-08).
+  io.beforeRename = (source, target) => {
     if (target !== rootPath) return;
-    io.beforeRename = null; renameSync(rootPath, backup); mkdirSync(rootPath); reached = true;
+    io.beforeRename = null; rmSync(source); reached = true;
   };
   try {
     const error = await f.own().then(() => null, cause => cause);

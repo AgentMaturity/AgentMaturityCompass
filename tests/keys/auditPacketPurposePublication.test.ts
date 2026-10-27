@@ -66,6 +66,9 @@ function verifies(f: ReturnType<typeof fixture>, file = f.output) {
   expect(entries.get("README.md")!.toString("utf8")).toContain("pinned outside this packet");
   return { digest, expected };
 }
+/** The producer reports its refusal with completed-effect progress; the signer's own refusal is the cause (P2-08). */
+const incomplete = (cause: Record<string, unknown>) => expect.objectContaining({ code: "AUDIT_PACKET_INCOMPLETE",
+  progress: expect.objectContaining({ outputAcknowledged: false }), cause: expect.objectContaining(cause) });
 function deferred() { let resolve!: () => void; const promise = new Promise<void>(done => { resolve = done; }); return { promise, resolve }; }
 function pauseSign(f: ReturnType<typeof fixture>) {
   const entered = deferred(), release = deferred(), original = f.provider.sign.bind(f.provider);
@@ -113,7 +116,7 @@ describe("audit packet async checked artifact-purpose publication", () => {
     const pending = generateAuditPacket({ workspace: f.workspace, outputFile: "packet.zip" }), outcome = pending.then(() => null, error => error);
     try {
       await atPause(paused, pending); lockVault(f.workspace); vi.stubEnv("AMC_VAULT_PASSPHRASE", undefined);
-      paused.release.resolve(); expect(await outcome).toMatchObject({ message: expect.stringMatching(/Vault locked/i) });
+      paused.release.resolve(); expect(await outcome).toEqual(incomplete({ message: expect.stringMatching(/Vault locked/i) }));
       expect(readFileSync(f.output)).toEqual(SENTINEL);
     } finally { paused.release.resolve(); await Promise.allSettled([pending]); vi.stubEnv("AMC_VAULT_PASSPHRASE", PASS); unlockVault(f.workspace, PASS); }
     await freshPositive(f);
@@ -126,8 +129,8 @@ describe("audit packet async checked artifact-purpose publication", () => {
       await atPause(paused, pending); rotatePurposeKeys({ workspace: f.workspace, purposes: ["session"], passphrase: PASS });
       expect(assertKeysetComplete(f.workspace)!.generation).toBeGreaterThan(generation);
       expect(getSigningPublicKeyPem(f.workspace, "artifact-seal")).toBe(f.publicKey);
-      paused.release.resolve(); expect(await outcome).toMatchObject({ code: "KEY_PROVIDER_KEY_REFUSED",
-        message: expect.stringContaining("the committed purpose authority changed while signing was prepared") });
+      paused.release.resolve(); expect(await outcome).toEqual(incomplete({ code: "KEY_PROVIDER_KEY_REFUSED",
+        message: expect.stringMatching(/the committed purpose authority changed while signing was prepared|the original run purpose generation changed while preparing publication/) }));
       expect(readFileSync(f.output)).toEqual(SENTINEL);
     } finally { paused.release.resolve(); await Promise.allSettled([pending]); }
     await freshPositive(f);
@@ -141,8 +144,8 @@ describe("audit packet async checked artifact-purpose publication", () => {
       return bytes;
     });
     try {
-      await expect(generateAuditPacket({ workspace: f.workspace, outputFile: "packet.zip" })).rejects.toMatchObject({
-        message: expect.stringMatching(/Vault locked/i) });
+      await expect(generateAuditPacket({ workspace: f.workspace, outputFile: "packet.zip" })).rejects.toEqual(incomplete({
+        message: expect.stringMatching(/Vault locked/i) }));
       expect(spy).toHaveBeenCalledTimes(1); expect(existsSync(f.output)).toBe(false);
     } finally { spy.mockRestore(); vi.stubEnv("AMC_VAULT_PASSPHRASE", PASS); unlockVault(f.workspace, PASS); }
     await freshPositive(f);
@@ -153,8 +156,8 @@ describe("audit packet async checked artifact-purpose publication", () => {
     vi.spyOn(f.provider, "sign").mockImplementationOnce(async (ref, message) => {
       const bytes = Buffer.from(await original(ref, message)); bytes[0] = bytes[0]! ^ 1; return bytes;
     });
-    await expect(generateAuditPacket({ workspace: f.workspace, outputFile: "packet.zip" })).rejects.toMatchObject({
-      code: "KEY_PROVIDER_KEY_REFUSED", message: expect.stringContaining("the provider's signature does not verify under the described public key") });
+    await expect(generateAuditPacket({ workspace: f.workspace, outputFile: "packet.zip" })).rejects.toEqual(incomplete({
+      code: "KEY_PROVIDER_KEY_REFUSED", message: expect.stringContaining("the provider's signature does not verify under the described public key") }));
     expect(readFileSync(f.output)).toEqual(SENTINEL); await freshPositive(f);
   });
 
@@ -165,7 +168,7 @@ describe("audit packet async checked artifact-purpose publication", () => {
     try {
       await atPause(paused, pending); const config = YAML.parse(originalConfig.toString("utf8")) as Record<string, unknown>;
       config.keys = { requireNonExportable: true }; writeFileSync(configPath, YAML.stringify(config)); paused.release.resolve();
-      expect(await outcome).toMatchObject({ code: "KEY_PROVIDER_KEY_REFUSED" }); expect(readFileSync(f.output)).toEqual(SENTINEL);
+      expect(await outcome).toEqual(incomplete({ code: "KEY_PROVIDER_KEY_REFUSED" })); expect(readFileSync(f.output)).toEqual(SENTINEL);
     } finally { paused.release.resolve(); await Promise.allSettled([pending]); writeFileSync(configPath, originalConfig); }
     await freshPositive(f);
   });
@@ -183,15 +186,18 @@ describe("audit packet async checked artifact-purpose publication", () => {
     await freshPositive(f);
   });
 
-  test("refuses the historical locked no-sign ephemeral mismatch and preserves unlocked no-sign byte compatibility", async () => {
-    const f = fixture(); writeFileSync(f.output, SENTINEL); lockVault(f.workspace);
+  test("refuses no-sign mode, locked or unlocked, before any signing and preserves the existing output", async () => {
+    const f = fixture(), spy = vi.spyOn(f.provider, "sign"); writeFileSync(f.output, SENTINEL); lockVault(f.workspace);
     vi.stubEnv("AMC_VAULT_PASSPHRASE", undefined); vi.stubEnv("AMC_NO_SIGN", "1");
     try {
-      await expect(generateAuditPacket({ workspace: f.workspace, outputFile: "packet.zip" })).rejects.toMatchObject({
-        code: "KEY_PROVIDER_KEY_REFUSED" });
+      // The historical locked no-sign ephemeral signature never reaches the packet.
+      await expect(generateAuditPacket({ workspace: f.workspace, outputFile: "packet.zip" })).rejects.toThrow(/no-sign mode does not authorize policy signing/);
       expect(readFileSync(f.output)).toEqual(SENTINEL);
-    } finally { vi.stubEnv("AMC_VAULT_PASSPHRASE", PASS); unlockVault(f.workspace, PASS); }
-    // This producer adds no blanket AMC_NO_SIGN prohibition: a real unlocked file key still verifies.
+      // The packet's original-authority gate (shared with run seals) refuses no-sign outright, even with a real unlocked key.
+      vi.stubEnv("AMC_VAULT_PASSPHRASE", PASS); unlockVault(f.workspace, PASS);
+      await expect(generateAuditPacket({ workspace: f.workspace, outputFile: "packet.zip" })).rejects.toThrow(/no-sign mode does not authorize policy signing/);
+      expect(readFileSync(f.output)).toEqual(SENTINEL); expect(spy).not.toHaveBeenCalled();
+    } finally { vi.stubEnv("AMC_VAULT_PASSPHRASE", PASS); vi.stubEnv("AMC_NO_SIGN", "0"); unlockVault(f.workspace, PASS); }
     await freshPositive(f);
   });
 });
