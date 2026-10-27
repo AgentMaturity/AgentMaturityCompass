@@ -1,0 +1,20 @@
+{
+  "state": "EXPERIMENTAL_CUT_FIRST_DRAFT",
+  "nativeWindowsEnablement": "NO_GO_ON_CURRENT_EVIDENCE",
+  "sidReview": null,
+  "fullSuite": {
+    "state": "NOT_RUN",
+    "command": null,
+    "exit": null,
+    "durationMs": null,
+    "totals": null
+  },
+  "fullSuiteObligation": "Final merged-HEAD full execution remains required; no equivalence substitution.",
+  "nativeValidation": "NOT_RUN_AT_ASSEMBLY; subsequent actual validation recorded off-tree and in handoff",
+  "directHumanProof": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/user-directives.json",
+    "sha256": "143b8b8be8a6ea2c0a5b88879db3db9e566681eba6f609e1af56dc4d4773f42d",
+    "bytes": 2649
+  },
+  "liveWindows": "not measured: no Windows host"
+}

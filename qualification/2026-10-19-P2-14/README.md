@@ -1,0 +1,11 @@
+# P2-14 cut-first prototype draft
+
+Source `760bf885a4f601a1786912dbc687dc245d123d0f`, int `dc8c34d0403c7e4d7513ad546f202574e3e78af8`; local macOS arm64, not Windows or CI. This packet records completed scoped checks, initial RED21, earlier GREEN22, status-cap RED22/21/1, historical f85 GREEN23 and current private-type/isolated GREEN23, intended assertion mutations and source hashes. Focused totals are {'numTotalTests': 113, 'numPassedTests': 113, 'numFailedTests': 0, 'numPendingTests': 0, 'numTodoTests': 0}; no broader total was presumed.
+
+Main guard FAIL: ENTRY_COUNT reproduced on clean int; baseline default-ref SHA was not recorded. Int-relative guard and all other required checks PASS. Count diagnostic1/generation0/final0 remain separate measured rows. All other checks pass; logs and exact native reports remain off-tree hash references.
+
+The real-host entry reads actual process.platform and always refuses unsupported or unqualified execution. The distinct fake-API exercise can validate synthetic nonce/status correspondence only. It cannot prove an actual command, workspace or applied policy. Even a valid fake result has confined:false, no enforcement, treeExitProven:false and real exit:null. Live Windows: **not measured: no Windows host**. No production gate, backend/type union, process-tree, native launcher, catalog or escape CI change is included.
+
+The previous f85 formal run remains historical: focused113/113 passed, while dead-code failed on one unused exported WindowsPrototypeReason type. Its 34 intended mutation kills remain bound to f85, not this current source. Only that owned type export keyword changed; current formal checks and the complete mutation matrix were repeated. Neither a historical pass nor a historical failure is silently waived or projected into current commands.
+
+Full suite is NOT_RUN and receipt.tests is null under the direct initial-draft instruction. Actual final merged-HEAD full execution remains required. Sid ADR/capacity review, Microsoft primary research and Windows-host qualification remain open; present no-go does not establish technical impossibility. Native validation is NOT_RUN_AT_ASSEMBLY; root records its subsequent measured result separately. No source-only or synthetic result is a Windows boundary pass.

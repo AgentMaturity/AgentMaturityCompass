@@ -1,0 +1,29 @@
+{
+  "adoptionRed": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/solo-20261019/adoption-red-v1/command.json",
+    "sha256": "334bb328f33b653c37ea3dc540da545d3fe95827fd2052ca1543089ea3822a65",
+    "bytes": 1881
+  },
+  "scaffold": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/solo-20261019/adoption-red-v1/scaffold.test.ts",
+    "sha256": "be473a15decf2a6af73cf3ad5beae6062bd6c2f826affe6627c1439278cfe3f6",
+    "bytes": 1976
+  },
+  "testOnlyCommit": "36259f2960b95af3a594ab3da40842074309f090",
+  "green": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/solo-20261019/product-focused-green-v1/command.json",
+    "sha256": "55f371455d1acf6cad525a56e843ad8145ad49869683710c26fbe54fb3817d38",
+    "bytes": 1776
+  },
+  "ownProjection": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/solo-20261019/current-own-green-projection-cab126-v1.json",
+    "sha256": "04e056b76e69ab1d0bceb8d0d9d9451f7a1a71ac8c866f64e2c73c51f7d0ac75",
+    "bytes": 10895
+  },
+  "actual": {
+    "redFailed": 1,
+    "focusedPassed": 113,
+    "ownPassed": 23
+  },
+  "limit": "Absence RED is adoption-seam evidence only. The direct-import original full23 suite replaces the scaffold; its bytes are not misrepresented as the RED scaffold. Current guard proofs are the isolated mutations."
+}
