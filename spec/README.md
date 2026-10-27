@@ -11,6 +11,8 @@ them the schema does too. Nothing here is hand-edited.
   failure gives, and every rule a JSON Schema cannot express.
 - [`fixtures/v1/`](fixtures/v1/README.md): normative verifier fixtures, each with its expected verdict and reason
   codes, and the runner any implementation can be checked with (docs/STANDALONE_VERIFIER.md).
+- [`conformance/v1/`](conformance/v1/README.md): the conformance classes (verifier, producer, adapter, compiler),
+  their cases, and AMC's own results under `conformance/results/` (P1-32).
 
 Schema validation checks shape only. It does not show who wrote a record, that the record is unchanged, or that it is
 true; the acceptance rules cover those checks.
@@ -32,6 +34,7 @@ true; the acceptance rules cover those checks.
 | `trust-list` | A signed list of pinned keys and their purposes (docs/TRUST_LIST.md) | Read by every verifier |
 | `verifier-report` | The separate results of one verification | Emitted by the verify commands and `amc-verify` with `--json` |
 | `signature-envelope` | The Ed25519 envelope AMC artifacts carry | Emitted |
+| `conformance-results` | One conformance-suite run for one implementation and class (P1-32) | Written by `amc-conformance` (spec/conformance/v1/README.md) |
 | `control-record` | One Regulated Control Catalog control (docs/catalog/CONTROL_RECORD.md) | Read by `loadCatalog`; content under `catalog/` |
 | `pack-manifest` | One catalog pack: its controls, layer, stations and declared support | Read by `loadCatalog` |
 | `catalog-lock` | The digests that pin one catalog tree | Built by `buildCatalogLock`; P1-10 embeds it in compiled plans |

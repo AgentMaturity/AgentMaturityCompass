@@ -522,11 +522,22 @@ jobs:
           npm install --offline --no-audit --no-fund --ignore-scripts "$GITHUB_WORKSPACE"/tmp/verifier-pack/*.tgz
       - name: Run the normative fixtures
         run: node packages/verifier/conformance/run.mjs --cmd "$RUNNER_TEMP/consumer/node_modules/.bin/amc-verify" --out "conformance-results-node${{ matrix.node-version }}.json"
+      # P1-32: the conformance suite's verifier class, packed and installed with
+      # no dependency, against the same packed verifier.
+      - name: Run the conformance suite (verifier class)
+        run: |
+          mkdir -p tmp/conformance-pack && (cd packages/amc-conformance && npm pack --pack-destination ../../tmp/conformance-pack)
+          (cd "$RUNNER_TEMP/consumer" && npm install --offline --no-audit --no-fund --ignore-scripts "$GITHUB_WORKSPACE"/tmp/conformance-pack/*.tgz)
+          "$RUNNER_TEMP/consumer/node_modules/.bin/amc-conformance" run --root "$GITHUB_WORKSPACE" --class verifier \
+            --impl "$RUNNER_TEMP/consumer/node_modules/.bin/amc-verify verify {artifact} {verifierArgs}" \
+            --name amc-verify --impl-version 0.1.0 --out "suite-results-node${{ matrix.node-version }}.json"
       - if: always()
         uses: actions/upload-artifact@v7
         with:
           name: verifier-conformance-node${{ matrix.node-version }}
-          path: conformance-results-node${{ matrix.node-version }}.json
+          path: |
+            conformance-results-node${{ matrix.node-version }}.json
+            suite-results-node${{ matrix.node-version }}.json
 
   # P0-35: every image is built and qualified natively on each published
   # architecture (GitHub-hosted arm64 Linux runner for public repositories).

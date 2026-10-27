@@ -290,6 +290,23 @@ tolerance (5 minutes). The optional `anchoring.public` (P1-26) says whether the 
 held by a public log the verifier pinned: `anchored` (with `backend` and `logIndex`), `not-anchored`, or `invalid`,
 which is also an integrity error (docs/PUBLIC_ANCHORING.md).
 
+## conformance-results
+
+What one run of the conformance suite (`packages/amc-conformance`, P1-32) found for one implementation and one class
+(spec/conformance/v1/README.md). It is the implementer's own record of a run: self-reported evidence of conformity for
+the named `suiteVersion` and `fixtureSetDigest`, never a certificate. Rules the schema cannot express:
+
+1. `summary.normativeTotal` is the number of cases with `normative: true` and `summary.normativePassed` the number of
+   those whose `outcome` is `pass`.
+2. `conformant` is true exactly when `summary.normativeTotal` is above 0 and every normative case passed. A skipped,
+   failed or errored normative case, or a class with no normative case, makes it false.
+3. Case `id`s are unique. `diff` is null on a pass.
+4. Two results files are comparable only when they name the same `suiteVersion` and `fixtureSetDigest`. The digest is
+   sha256 over the lines `<sha256 of file>  <path from the repository root>\n`, sorted by path, for the class manifest
+   and every input file its run read.
+5. `signature` is optional and the runner does not sign. Until a signer defines what the envelope covers, a reader
+   treats a results file as unsigned: it proves nothing about who ran it.
+
 ## signature-envelope
 
 The Ed25519 envelope AMC artifacts carry. AMC parses it without refusing unknown members, so the schema does not

@@ -1,0 +1,10 @@
+{
+  "scenario": "importer-session",
+  "role": "importer",
+  "sessionId": "conformance-import-1",
+  "source": "a recorded log of another system's run; the importer re-states it and enforced nothing",
+  "actions": [
+    { "tool": "Bash", "input": "rm -rf build", "output": "", "sourceDecision": "deny" },
+    { "tool": "Read", "input": "README.md", "output": "# Example", "sourceDecision": "allow" }
+  ]
+}
