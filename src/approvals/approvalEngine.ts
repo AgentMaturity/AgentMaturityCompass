@@ -42,6 +42,7 @@ import { evaluateApprovalQuorum, isApprovalInitiator } from "./approvalQuorum.js
 import { AUTHZ_INTENT_SCHEMA } from "../actions/authorizationRecord.js";
 import { captureApprovalConsumptionEntry, type ApprovalConsumptionOptions } from "./approvalConsumptionPublication.js";
 import { parseUserRoles, type UserRole } from "../auth/roles.js";
+import { inCheckPass } from "../utils/checkPass.js";
 
 export interface ApprovalRequestInput {
   workspace: string;
@@ -308,15 +309,15 @@ export async function createApprovalForIntentAsync(input: ApprovalRequestInput, 
   options.beforePolicyCapture?.();
   let artifactCurrent: (() => void) | null = null;
   let policyCurrent: (() => void) | null = null, requestCurrent: (() => void) | null = null;
-  const intrinsic = () => {
+  const intrinsic = inCheckPass(() => {
     if (canonicalize(input) !== shape) throw new Error("original approval request input changed");
     artifactCurrent?.(); raw.assertCurrent(); assertOrgPairsCurrent(expected);
-  };
-  const baseCurrent = () => {
+  });
+  const baseCurrent = inCheckPass(() => {
     if (failure !== null) throw failure.cause;
     try { intrinsic(); caller?.(); intrinsic(); }
     catch (cause) { failure = { cause }; throw cause; }
-  };
+  });
   baseCurrent();
   let hashes: ReturnType<typeof requestBoundHashes> | null = null, hashCaptureStarted = false;
   let publication: ReturnType<typeof captureApprovalRequestPublication> | null = null;
@@ -330,11 +331,11 @@ export async function createApprovalForIntentAsync(input: ApprovalRequestInput, 
     publication = captureApprovalRequestPublication(workspace, baseCurrent);
     artifactCurrent = publication.assertPublicCurrent; baseCurrent();
   };
-  const fullCurrent = () => {
+  const fullCurrent = inCheckPass(() => {
     if (failure !== null) throw failure.cause;
     try { baseCurrent(); policyCurrent?.(); requestCurrent?.(); baseCurrent(); }
     catch (cause) { if (failure === null) failure = { cause }; throw failure.cause; }
-  };
+  });
   try {
     let policySig = verifyApprovalPolicySignature(workspace);
     baseCurrent();
@@ -498,7 +499,7 @@ export function decideApprovalForIntent(params: {
   };
 }
 
-export function verifyApprovalForExecution(params: {
+export const verifyApprovalForExecution = inCheckPass(function verifyApprovalForExecution(params: {
   workspace: string;
   approvalId: string;
   expectedAgentId: string;
@@ -584,7 +585,7 @@ export function verifyApprovalForExecution(params: {
       received: status.received
     }
   };
-}
+});
 
 export function consumeApprovedExecution(params: {
   workspace: string;
@@ -619,10 +620,10 @@ export function captureApprovedExecutionConsumptionEntry(workspace: string) {
     selectGrant(input: Parameters<typeof verifyApprovalForExecution>[0] & { executionId?: string | null }, options: ApprovalConsumptionOptions = {}) {
       const selection = Object.freeze(structuredClone(input));
       const originalExecution = Object.freeze({ ...selection, workspace: entry.workspace });
-      const verifyOriginalExecution = () => {
+      const verifyOriginalExecution = inCheckPass(() => {
         const verified = verifyApprovalForExecution(originalExecution);
         if (!verified.ok || verified.approval === null) throw new Error("audit fulfillment approval is not executable");
-      };
+      });
       return entry.selectGrant(selection, verifyOriginalExecution, options);
     } });
 }

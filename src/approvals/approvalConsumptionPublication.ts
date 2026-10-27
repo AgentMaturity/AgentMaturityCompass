@@ -13,6 +13,7 @@ import { verifyAuditorSignatureBytes } from "../org/orgSignatureBytes.js";
 import { writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
+import { inCheckPass } from "../utils/checkPass.js";
 import { isWithin, physicalPathWithMissingSuffix, safeIdSchema } from "../utils/pathSafety.js";
 import { vaultStatus } from "../vault/vault.js";
 import { approvalConsumptionPaths, approvalConsumedSchema, approvalDecisionSchema, approvalRequestSchema,
@@ -57,7 +58,7 @@ function capturePublicArtifactAuthority(workspace: string) {
   if (key === null) throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", holder, "the original approval signer is unsupported");
   const publicKeyPem = key.pem, algorithm = key.algorithm;
   let observedUnlocked = false, refused = false, refusal: unknown;
-  const assertCurrent = () => {
+  const assertCurrent = inCheckPass(() => {
     if (refused) throw refusal;
     try {
       enabled();
@@ -81,15 +82,16 @@ function capturePublicArtifactAuthority(workspace: string) {
       }
       enabled();
     } catch (cause) { refused = true; refusal = cause; throw cause; }
-  };
+  });
   assertCurrent();
-  return { holder, publicKeyPem, algorithm, assertCurrent, assertPrivateReady() {
+  const assertPrivateReady = inCheckPass(() => {
     try {
       assertCurrent();
       if (holder === "file" && !vaultStatus(workspace).unlocked) throw new Error("approval consumption vault is locked; unlock before starting a new attempt");
       assertCurrent();
     } catch (cause) { refused = true; refusal = cause; throw cause; }
-  } };
+  });
+  return { holder, publicKeyPem, algorithm, assertCurrent, assertPrivateReady };
 }
 function directory(path: string) {
   const stat = lstatSync(path);
@@ -152,7 +154,7 @@ export function captureApprovalConsumptionEntry(inputWorkspace: string) {
           native: Object.freeze({ ...native }), attemptedMember, returnedMembers: Object.freeze([...returnedMembers]),
           acknowledgedMembers: Object.freeze([...acknowledgedMembers]), replayObserved,
           replayRecord: replayRecord === null ? null : Object.freeze({ ...replayRecord }), committed });
-        const assertInputs = () => {
+        const assertInputs = inCheckPass(() => {
           publicAuthority.assertPrivateReady();
           if (process.umask() !== originalUmask) throw new Error("original approval creation umask changed");
           for (const parent of parents) if (canonicalize(directory(parent.path)) !== canonicalize(parent)) throw new Error("original approval parent changed");
@@ -160,8 +162,8 @@ export function captureApprovalConsumptionEntry(inputWorkspace: string) {
             throw new Error("original approval agent location changed");
           if (!sameNames(inventory(paths.decisions), decisionNames)) throw new Error("original approval decision inventory changed");
           assertOrgPairsCurrent(decisionBefore); assertOrgPairsCurrent(policies);
-        };
-        const assertCurrent = () => {
+        });
+        const assertCurrent = inCheckPass(() => {
           if (failed) throw failure;
           assertInputs(); assertOrgPairsCurrent(expected);
           if (!native.linkAcknowledged) {
@@ -173,8 +175,8 @@ export function captureApprovalConsumptionEntry(inputWorkspace: string) {
           for (const item of prepared) if (!verifyAuditorSignatureBytes(workspace, "BUNDLE", item.bytes, item.signatureBytes).valid)
             throw new Error("prepared approval signature is no longer admitted");
           publicAuthority.assertPrivateReady();
-        };
-        const assertOutputsSafe = (outputs: readonly string[]) => {
+        });
+        const assertOutputsSafe = inCheckPass((outputs: readonly string[]) => {
           assertCurrent();
           for (const output of outputs) {
             const physical = physicalPathWithMissingSuffix(output);
@@ -185,9 +187,9 @@ export function captureApprovalConsumptionEntry(inputWorkspace: string) {
                 throw new Error("audit output aliases an original approval input");
           }
           assertCurrent();
-        };
-        const stable = () => { enabled(); publicAuthority.assertCurrent(); caller.beforePublish?.(); enabled(); assertCurrent();
-          caller.assertOutputsSafe?.(before.members.map(row => row.path)); enabled(); assertCurrent(); };
+        });
+        const stable = inCheckPass(() => { enabled(); publicAuthority.assertCurrent(); caller.beforePublish?.(); enabled(); assertCurrent();
+          caller.assertOutputsSafe?.(before.members.map(row => row.path)); enabled(); assertCurrent(); });
         const acknowledge = (path: string, bytes: Buffer, mode: number, acquired?: string) => {
           const own = captureOrgFiles([path]).members[0]!;
           if (own.bytes === null || !own.bytes.equals(bytes) || own.mode !== mode || (acquired !== undefined && own.identity !== acquired))

@@ -55,6 +55,7 @@ import {
   type ToolContextTool,
   type ToolHubContextProjection
 } from "./toolContext.js";
+import { inCheckPass } from "../utils/checkPass.js";
 
 export interface ToolIntentRequest {
   agentId: string;
@@ -340,7 +341,7 @@ export class ToolHubService {
     assertOrgPairsCurrent(approvalBefore); raw.assertCurrent();
     let failure = null as { cause: unknown } | null;
     let approval: Awaited<ReturnType<typeof createApprovalForIntentAsync>> | null = null;
-    const intrinsic = () => {
+    const intrinsic = inCheckPass(() => {
       if (canonicalize(input) !== shape || canonicalize(selected) !== shape || (process.env.AMC_NO_SIGN === "1") !== originalNoSign)
         throw new Error("original tool intent input or no-sign choice changed");
       if (Date.now() > state.record.expiresTs) throw new Error(`Intent expired: ${state.record.intentId}`);
@@ -354,7 +355,7 @@ export class ToolHubService {
         throw new Error("original tool intent policy or live eligibility changed");
       raw.assertCurrent();
       if (!state.record.approvalRequired) assertOrgPairsCurrent(approvalBefore);
-    };
+    });
     const baseCurrent = () => {
       if (failure !== null) throw failure.cause;
       try { intrinsic(); caller?.(); intrinsic(); }

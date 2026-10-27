@@ -12,6 +12,7 @@ import { captureEvidenceRequestFulfillmentPublication } from "./evidenceRequestP
 import { captureAuditOutputAliases } from "./binderOutputAliases.js";
 import { AuditBinderPublicationError, type AuditPublicationOptions } from "./binderPublication.js";
 import type { EvidenceRequest } from "./evidenceRequestSchema.js";
+import { inCheckPass } from "../utils/checkPass.js";
 
 function enabled() { if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize policy signing"); }
 export interface AuditFulfillmentProgress {
@@ -31,10 +32,10 @@ class AuditEvidenceFulfillmentError extends AuditBinderExecutionError {
 export async function fulfillAuditEvidenceRequestAsync(input: { workspace: string; requestId: string; outFile?: string | null }, options: AuditPublicationOptions = {}) {
   const requestId = safeIdSchema.parse(input.requestId), workspace = resolve(input.workspace), params = { ...input, workspace, requestId }, caller = { ...options };
   const entry = captureApprovedExecutionConsumptionEntry(workspace);
-  const callerCurrent = () => {
+  const callerCurrent = inCheckPass(() => {
     enabled(); entry.assertPublicCurrent(); caller.beforePublish?.(); enabled(); entry.assertPublicCurrent();
     caller.assertInputsCurrent?.(); enabled(); entry.assertPublicCurrent();
-  };
+  });
   callerCurrent(); const original = captureAuditApiAuthority(workspace, { beforePublish: callerCurrent }); entry.assertPublicCurrent();
   const selected = captureBinderFulfillment(workspace, requestId, original), request = selected.request, pending = selected.pending;
   const pendingPath = join(workspace, ".amc", "audit", "requests", "pending", `${requestId}.approval.json`);
@@ -48,11 +49,11 @@ export async function fulfillAuditEvidenceRequestAsync(input: { workspace: strin
   let consumeAttempted = false, consumeReturned = false, consumeAcknowledged = false, consumption: ReturnType<typeof consumeApprovedExecution> | null = null;
   let pendingRemoveAttempted = false, pendingRemoveReturned = false, pendingRemoveAcknowledged = false;
   // This fixed audit negative contains no completed request handle or consumption intrinsic.
-  const inputsCurrent = () => {
+  const inputsCurrent = inCheckPass(() => {
     callerCurrent(); if (physicalPathWithMissingSuffix(pendingPath) !== pendingPhysical) throw new Error("original fulfillment pending location changed");
     assertOrgPairsCurrent(policies); assertOrgPairsCurrent(expectedPending);
     original(); binder?.assertArtifactCurrent(); assertOrgPairsCurrent(policies); assertOrgPairsCurrent(expectedPending); enabled();
-  };
+  });
   const consume = entry.selectGrant({ ...execution, executionId: requestId }, {
     beforePublish() { inputsCurrent(); requestAttempt?.assertCurrent(); }, assertOutputsSafe: caller.assertOutputsSafe
   });
@@ -61,7 +62,7 @@ export async function fulfillAuditEvidenceRequestAsync(input: { workspace: strin
     approvalEventHash: sha256Hex(row.approvalDecisionId), userIdHash: sha256Hex(row.userId).slice(0, 16),
     role: (row.roles.find(role => role === "OWNER" || role === "AUDITOR" || role === "APPROVER" || role === "OPERATOR" || role === "VIEWER") ?? "APPROVER") as "OWNER" | "AUDITOR" | "APPROVER" | "OPERATOR" | "VIEWER" }));
   // Intrinsic currentness never invokes the above callback, so request stable -> base -> intrinsic terminates.
-  const base = () => { inputsCurrent(); consume.assertCurrent(); inputsCurrent(); };
+  const base = inCheckPass(() => { inputsCurrent(); consume.assertCurrent(); inputsCurrent(); });
   let requestAliases: (() => void) | null = null;
   const publication = captureEvidenceRequestFulfillmentPublication(workspace, requestId, { beforePublish: base,
     assertOutputsSafe(paths) { caller.assertOutputsSafe?.(paths); consume.assertOutputsSafe(paths); if (requestAliases === null) requestAliases = captureAuditOutputAliases(paths, [pendingPath, ...policies.members.map(row => row.path)]); requestAliases(); base(); } });

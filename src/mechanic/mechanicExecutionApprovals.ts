@@ -5,6 +5,7 @@ import { evaluateApprovalQuorum } from "../approvals/approvalQuorum.js";
 import { verifyApprovalPolicySignature } from "../approvals/approvalPolicyEngine.js";
 import type { MechanicUpgradePlan } from "./upgradePlanSchema.js";
 import { selectAgentId } from "./mechanicExecutionActions.js";
+import { inCheckPass } from "../utils/checkPass.js";
 type Action = MechanicUpgradePlan["phases"][number]["actions"][number];
 
 export function captureMechanicApprovals(workspace: string, plan: MechanicUpgradePlan) {
@@ -52,6 +53,7 @@ export function captureMechanicApprovals(workspace: string, plan: MechanicUpgrad
     }
     if (read().status !== request.status) throw new Error("mechanic approval lifecycle changed during its final check");
   };
-  return { assertCurrent(policyPairInFlight = false) { for (const action of grants.keys()) assertGrant(action, policyPairInFlight); },
+  const assertCurrent = inCheckPass((policyPairInFlight: boolean) => { for (const action of grants.keys()) assertGrant(action, policyPairInFlight); });
+  return { assertCurrent(policyPairInFlight = false) { assertCurrent(policyPairInFlight); },
     consumed(action: Action, executionId: string) { const grant = grants.get(action); if (grant !== undefined) grant.executionId = executionId; } };
 }

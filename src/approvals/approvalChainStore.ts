@@ -10,6 +10,7 @@ import type { ActionClass, ExecutionMode } from "../types.js";
 import type { UserRole } from "../auth/roles.js";
 import { verifyAuditorSignatureBytes } from "../org/orgSignatureBytes.js";
 import { signatureSchema, approvalRequestSchema, approvalDecisionSchema, approvalConsumedSchema } from "./approvalSchemas.js";
+import { inCheckPass, readFileInPass } from "../utils/checkPass.js";
 export { approvalRequestSchema, approvalDecisionSchema, approvalConsumedSchema } from "./approvalSchemas.js";
 import type { ApprovalRequestRecord, ApprovalDecisionRecord, ApprovalConsumedRecord, ApprovalRequestStatus, ApprovalDecisionKind } from "./approvalSchemas.js";
 export type { ApprovalRequestRecord, ApprovalDecisionRecord, ApprovalConsumedRecord, ApprovalRequestStatus, ApprovalDecisionKind } from "./approvalSchemas.js";
@@ -101,21 +102,25 @@ function verifyArtifact(workspace: string, path: string, bytes?: Buffer): { vali
     return { valid: false, reason: "signature missing" };
   }
   try {
-    const sidecar = readFileSync(sigPath);
-    const sig = signatureSchema.parse(JSON.parse(sidecar.toString("utf8")) as unknown);
-    const body = bytes ?? readFileSync(path), digest = sha256Hex(body);
-    if (digest !== sig.digestSha256) {
-      return { valid: false, reason: "digest mismatch" };
-    }
-    const valid = sig.envelope === undefined
-      ? verifyHexDigestAny(digest, sig.signature, getPublicKeyHistory(workspace, "auditor"))
-      : sig.envelope.signer.type === "VAULT" && sig.signature === sig.envelope.sigB64
-        && verifyAuditorSignatureBytes(workspace, "BUNDLE", body, sidecar).valid;
-    return valid ? { valid: true } : { valid: false, reason: "signature verification failed" };
+    const sidecar = readFileInPass(sigPath);
+    return verifyArtifactBytes(workspace, bytes ?? readFileInPass(path), sidecar);
   } catch (error) {
     return { valid: false, reason: String(error) };
   }
 }
+/** The signature check over bytes just read; within one check pass the same bytes are verified once. */
+const verifyArtifactBytes = inCheckPass((workspace: string, body: Buffer, sidecar: Buffer): { valid: boolean; reason?: string } => {
+  const sig = signatureSchema.parse(JSON.parse(sidecar.toString("utf8")) as unknown);
+  const digest = sha256Hex(body);
+  if (digest !== sig.digestSha256) {
+    return { valid: false, reason: "digest mismatch" };
+  }
+  const valid = sig.envelope === undefined
+    ? verifyHexDigestAny(digest, sig.signature, getPublicKeyHistory(workspace, "auditor"))
+    : sig.envelope.signer.type === "VAULT" && sig.signature === sig.envelope.sigB64
+      && verifyAuditorSignatureBytes(workspace, "BUNDLE", body, sidecar).valid;
+  return valid ? { valid: true } : { valid: false, reason: "signature verification failed" };
+});
 
 /**
  * Publish complete bytes at `path` only if nothing is there; false when something already was.
@@ -229,7 +234,7 @@ export function loadApprovalRequestRecord(params: {
   if (!pathExists(path)) {
     throw new Error(`approval request not found: ${path}`);
   }
-  const bytes = readFileSync(path);
+  const bytes = readFileInPass(path);
   if (params.requireValidSignature !== false) {
     const verification = verifyArtifact(params.workspace, path, bytes);
     if (!verification.valid) {
@@ -323,7 +328,7 @@ export function listApprovalDecisions(params: {
       continue;
     }
     try {
-      const row = approvalDecisionSchema.parse(JSON.parse(readUtf8(path)) as unknown);
+      const row = approvalDecisionSchema.parse(JSON.parse(readFileInPass(path).toString("utf8")) as unknown);
       if (params.approvalRequestId && row.approvalRequestId !== params.approvalRequestId) {
         continue;
       }
@@ -390,7 +395,7 @@ export function loadApprovalConsumed(params: {
   if (!pathExists(path)) {
     return null;
   }
-  const bytes = readFileSync(path);
+  const bytes = readFileInPass(path);
   const verification = verifyArtifact(params.workspace, path, bytes);
   if (!verification.valid) {
     throw new Error(`invalid approval consumed signature: ${verification.reason ?? "unknown"}`);
@@ -602,7 +607,7 @@ export function inspectApprovalActivityInventory(params: {
   };
 }
 
-export function inspectApprovalChainIntegrity(params: {
+export const inspectApprovalChainIntegrity = inCheckPass(function inspectApprovalChainIntegrity(params: {
   workspace: string;
   agentId?: string;
   approvalRequestId: string;
@@ -630,7 +635,7 @@ export function inspectApprovalChainIntegrity(params: {
       const path = join(decisionRoot, file);
       let decision: ApprovalDecisionRecord;
       try {
-        decision = approvalDecisionSchema.parse(JSON.parse(readUtf8(path)) as unknown);
+        decision = approvalDecisionSchema.parse(JSON.parse(readFileInPass(path).toString("utf8")) as unknown);
       } catch {
         reasonCodes.push("DECISION_ARTIFACT_UNPARSEABLE");
         continue;
@@ -649,7 +654,7 @@ export function inspectApprovalChainIntegrity(params: {
       reasonCodes.push("CONSUMPTION_INTEGRITY_INVALID");
     } else {
       try {
-        const record = approvalConsumedSchema.parse(JSON.parse(readUtf8(consumed)) as unknown);
+        const record = approvalConsumedSchema.parse(JSON.parse(readFileInPass(consumed).toString("utf8")) as unknown);
         if (record.approvalRequestId !== params.approvalRequestId || record.agentId !== agentId) {
           reasonCodes.push("CONSUMPTION_BINDING_INVALID");
         }
@@ -664,7 +669,7 @@ export function inspectApprovalChainIntegrity(params: {
     valid: unique.length === 0,
     reasonCodes: unique
   };
-}
+});
 
 export function cancelApprovalRequest(params: {
   workspace: string;

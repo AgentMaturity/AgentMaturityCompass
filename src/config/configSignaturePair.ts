@@ -14,6 +14,7 @@ import { writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { vaultStatus } from "../vault/vault.js";
+import { inCheckPass } from "../utils/checkPass.js";
 
 function signingEnabled() { if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize policy signing"); }
 
@@ -40,7 +41,7 @@ export function capturePublicConfigAuthority(workspace: string): () => void {
     const ref = configuredRef(settings, "config-signature");
     if (ref !== null) throw new KeyProviderError("KEY_PROVIDER_HELD", ref.provider, "the original config purpose is configured to an unbound provider key");
   }
-  const assertCurrent = () => {
+  const assertCurrent = inCheckPass(() => {
     signingEnabled();
     if (committedMark() !== originalMark || canonicalize(assertKeysetComplete(workspace)) !== keyset
       || canonicalize(keyPolicy(loadKeysConfig(workspace))) !== policy || canonicalize(boundProviderKey(workspace, "config-signature")) !== binding)
@@ -52,7 +53,7 @@ export function capturePublicConfigAuthority(workspace: string): () => void {
         throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", holder, "the original public config key changed before signing");
     }
     signingEnabled();
-  };
+  });
   assertCurrent(); return assertCurrent;
 }
 
@@ -63,7 +64,7 @@ function captureCompatibilityAuthority(workspace: string, beforePublish?: () => 
   const holder = bound?.binding.provider ?? "file", publicKeyPem = bound?.publicKeyPem ?? getSigningPublicKeyPem(workspace, "config-signature");
   const algorithm = canonicalSigningKey(publicKeyPem)?.algorithm, originalPolicy = canonicalize(keyPolicy(loadKeysConfig(workspace)));
   if (algorithm === undefined) throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", holder, "the original config signer is unsupported");
-  const assertCurrent = () => {
+  const assertCurrent = inCheckPass(() => {
     caller?.();
     const policy = keyPolicy(loadKeysConfig(workspace));
     if (canonicalize(assertKeysetComplete(workspace)) !== captured.keyset || canonicalize(policy) !== originalPolicy
@@ -74,7 +75,7 @@ function captureCompatibilityAuthority(workspace: string, beforePublish?: () => 
       if (!vaultStatus(workspace).unlocked) throw new Error("original config vault is locked; unlock before signing");
       assertVaultMaySign(workspace, "config-signature");
     }
-  };
+  });
   assertCurrent(); return Object.freeze({ captured, publicKeyPem, assertCurrent });
 }
 
@@ -114,18 +115,18 @@ function capture(workspace: string, file: string, field: "configSha256" | "diges
   let refusedNoSign = process.env.AMC_NO_SIGN === "1";
   const caller = options.beforePublish, copy = replacement === undefined ? undefined : Buffer.from(replacement);
   // Retained mixed entries record negatives without new public reads; only the source-fixed async entry supplies publicCurrent.
-  const beforePublish = () => {
+  const beforePublish = inCheckPass(() => {
     if (process.env.AMC_NO_SIGN === "1") refusedNoSign = true;
     if (publicCurrent !== undefined) { signingEnabled(); publicCurrent(); }
     caller?.();
     if (process.env.AMC_NO_SIGN === "1") refusedNoSign = true;
     if (publicCurrent !== undefined) { signingEnabled(); publicCurrent(); }
-  };
+  });
   const assertAsyncSigning = () => {
     if (refusedNoSign) throw new Error("no-sign mode does not authorize policy signing");
     signingEnabled();
   };
-  const beforeAsyncPublish = () => { assertAsyncSigning(); beforePublish(); assertAsyncSigning(); };
+  const beforeAsyncPublish = inCheckPass(() => { assertAsyncSigning(); beforePublish(); assertAsyncSigning(); });
   beforePublish();
   const selected = options.previous ?? withConfigSignaturePairLock(workspace, () => captureOrgPairs([file]));
   const previous: OrgPairsSnapshot = { members: selected.members.filter(row => row.path === file || row.path === `${file}.sig`).map(row => ({ ...row, bytes: row.bytes === null ? null : Buffer.from(row.bytes) })) };
@@ -136,27 +137,27 @@ function capture(workspace: string, file: string, field: "configSha256" | "diges
   const original = captureCompatibilityAuthority(workspace);
   publicCurrent?.(); // Refuse a changed generation after the actual existing private warm, before another actor or await.
   const digestSha256 = sha256Hex(bytes);
-  const beforeSign = () => { beforePublish(); original.assertCurrent(); assertOrgPairsCurrent(previous); };
-  const beforeAsyncSign = () => { beforeAsyncPublish(); original.assertCurrent(); assertOrgPairsCurrent(previous); };
+  const beforeSign = inCheckPass(() => { beforePublish(); original.assertCurrent(); assertOrgPairsCurrent(previous); });
+  const beforeAsyncSign = inCheckPass(() => { beforeAsyncPublish(); original.assertCurrent(); assertOrgPairsCurrent(previous); });
   beforeSign();
   function complete(signature: string, checkedCurrent?: () => void) {
     // Only the actual private async prepare call below supplies its genuine response-currentness gate.
     const actor = checkedCurrent === undefined ? beforePublish : beforeAsyncPublish;
     let published: OrgPairsSnapshot | null = null;
-    const assertSignatureCurrent = () => {
+    const assertSignatureCurrent = inCheckPass(() => {
       if (checkedCurrent !== undefined) assertAsyncSigning();
       publicCurrent?.(); original.assertCurrent(); checkedCurrent?.(); publicCurrent?.();
       if (!verifyWithKey(Buffer.from(digestSha256, "hex"), original.publicKeyPem, Buffer.from(signature, "base64")))
         throw new Error("prepared config signature does not match the original actual signer");
-    };
-    const assertCurrent = () => { actor(); assertSignatureCurrent(); assertOrgPairsCurrent(published ?? previous); };
+    });
+    const assertCurrent = inCheckPass(() => { actor(); assertSignatureCurrent(); assertOrgPairsCurrent(published ?? previous); });
     assertCurrent();
     return Object.freeze({ bytes: Buffer.from(bytes), digestSha256, assertCurrent, assertSignatureCurrent, publish(recorded?: (path: string) => void) {
       return withConfigSignaturePairLock(workspace, () => {
         const signatureBytes = Buffer.from(JSON.stringify({ [field]: digestSha256, signature, signedTs: Date.now(), signer: "auditor" }, null, 2));
         const expected = new Map(previous.members.map(row => [row.path, row]));
         const currentExpected = (): OrgPairsSnapshot => ({ members: [...expected.values()] });
-        const beforeMember = () => { actor(); assertSignatureCurrent(); assertOrgPairsCurrent(currentExpected()); };
+        const beforeMember = inCheckPass(() => { actor(); assertSignatureCurrent(); assertOrgPairsCurrent(currentExpected()); });
         const acknowledge = (path: string, intended: Buffer) => {
           const row = captureOrgFiles([path]).members[0];
           if (row === undefined || row.mode !== 0o644 || row.bytes === null || !row.bytes.equals(intended))

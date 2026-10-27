@@ -19,6 +19,7 @@ import { writeAuditBinderStaging, createStagedAuditTar } from "./binderArtifactM
 import type { AuditBinderCreateResult } from "./binderArtifact.js";
 import type { EvidenceRequest } from "./evidenceRequestSchema.js";
 import type { TrustContext } from "../trust/trustContext.js";
+import { inCheckPass } from "../utils/checkPass.js";
 
 export interface AuditBinderArtifactAttempt {
   readonly result: AuditBinderCreateResult;
@@ -35,7 +36,7 @@ async function createAuditBinderArtifactOwned(input: { workspace: string; scopeT
   const scopeId = scopeType === "WORKSPACE" ? "workspace" : (params.scopeId?.trim() || "default"), cacheId = scopeId.replace(/[^a-zA-Z0-9._-]/g, "_");
   const actor = options.beforePublish; actor?.(); signingEnabled();
   const originalBundle = captureOrgPairsAuthority(workspace), originalLog = captureWorkspaceLogAuthority(workspace);
-  const policies = captureAuditBinderPolicies(workspace, true), original = () => { originalBundle(); originalLog.assertCurrent(); policies.assertCurrent(); };
+  const policies = captureAuditBinderPolicies(workspace, true), original = inCheckPass(() => { originalBundle(); originalLog.assertCurrent(); policies.assertCurrent(); });
   const outFile = resolve(workspace, params.outFile), cachePath = binderCachePath(workspace, scopeType, cacheId);
   if (new Set([outFile, `${outFile}.sha256`, cachePath, `${cachePath}.sig`]).size !== 4) throw new Error("audit archive and cache destinations must differ");
   const targets = captureOrgFiles([outFile, `${outFile}.sha256`, cachePath, `${cachePath}.sig`]);
@@ -43,9 +44,9 @@ async function createAuditBinderArtifactOwned(input: { workspace: string; scopeT
   const collection = prepareAuditBinderCollection({ workspace, scope: { type: scopeType, id: scopeId }, policy: policies.policy, map: policies.map,
     nowTs: params.nowTs, request: params.request ?? null, trust: params.trust }, original, true);
   const destinations = Object.freeze(targets.members.map(row => row.path)), aliases = captureAuditOutputAliases(destinations, [...policies.inputPaths, ...collection.inputPaths]);
-  const stableActor = () => { signingEnabled(); actor?.(); signingEnabled(); options.assertInputsCurrent?.(); signingEnabled(); options.assertOutputsSafe?.(destinations); signingEnabled(); aliases(); };
-  const publicationInputs = () => { stableActor(); original(); collection.assertCurrent(); };
-  const inputs = () => { signingEnabled(); options.assertPreparationInputsCurrent?.(); signingEnabled(); publicationInputs(); assertOrgPairsCurrent(targets); };
+  const stableActor = inCheckPass(() => { signingEnabled(); actor?.(); signingEnabled(); options.assertInputsCurrent?.(); signingEnabled(); options.assertOutputsSafe?.(destinations); signingEnabled(); aliases(); });
+  const publicationInputs = inCheckPass(() => { stableActor(); original(); collection.assertCurrent(); });
+  const inputs = inCheckPass(() => { signingEnabled(); options.assertPreparationInputsCurrent?.(); signingEnabled(); publicationInputs(); assertOrgPairsCurrent(targets); });
   inputs();
   let phase = "collection", published: readonly string[] = [], result: AuditBinderCreateResult | undefined;
   const logs: string[] = []; let tmp: string | undefined, failed = false, failure: unknown;
@@ -65,10 +66,10 @@ async function createAuditBinderArtifactOwned(input: { workspace: string; scopeT
     }
     phase = "binder-signature";
     const signed = await prepareBinderSignatureAsync(workspace, binder, inputs);
-    const beforeCache = () => { inputs(); signed.assertCurrent(); };
+    const beforeCache = inCheckPass(() => { inputs(); signed.assertCurrent(); });
     phase = "cache-signature";
     const cache = await prepareBinderCacheAsync({ workspace, scopeType, scopeId: cacheId, binder }, { beforePublish: original, assertInputsCurrent: beforeCache }, targets);
-    const beforeFiles = () => { publicationInputs(); signed.assertCurrent(); cache.assertCurrent(); };
+    const beforeFiles = inCheckPass(() => { publicationInputs(); signed.assertCurrent(); cache.assertCurrent(); });
     phase = "private-staging"; tmp = mkdtempSync(join(tmpdir(), "amc-audit-binder-"));
     writeAuditBinderStaging({ root: join(tmp, "members", "amc-audit"), binder, signature: signed.signature, publicKeyPem: signed.publicKeyPem,
       piiScan, policy: policies.policy, map: policies.map, scopeId, collected, proofs });
@@ -79,8 +80,8 @@ async function createAuditBinderArtifactOwned(input: { workspace: string; scopeT
     phase = "files"; const files = publishAuditFiles(workspace, writes, targets, beforeFiles, inputs); published = files.publishedPaths;
     const assertPublished = files.assertCurrent;
     // The report is now an immutable observation. Later valid evidence/log progress is not a reason to rebase it.
-    const intrinsicArtifact = () => { signingEnabled(); aliases(); original(); signed.assertCurrent(); cache.assertCurrent(); assertPublished(); };
-    const continuePublication = () => { stableActor(); intrinsicArtifact(); };
+    const intrinsicArtifact = inCheckPass(() => { signingEnabled(); aliases(); original(); signed.assertCurrent(); cache.assertCurrent(); assertPublished(); });
+    const continuePublication = inCheckPass(() => { stableActor(); intrinsicArtifact(); });
     phase = "created-log";
     const created = await appendTransparencyEntryAttemptAsync({ workspace, type: "AUDIT_BINDER_CREATED", agentId: scopeType === "AGENT" ? scopeId : "workspace",
       artifact: { kind: "policy", sha256: signed.signature.digestSha256, id: binder.binderId } }, { beforeCommit: continuePublication, beforeMember: continuePublication }); logs.push(created.entry.hash);

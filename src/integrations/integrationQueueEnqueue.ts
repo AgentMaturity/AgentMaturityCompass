@@ -17,6 +17,7 @@ import { publicKeyFromPrivate } from "../crypto/keyHistoryEnvelope.js";
 import { vaultStatus } from "../vault/vault.js";
 import { openIntegrationQueueDb } from "./integrationQueueDb.js";
 import type { IntegrationChannelType, IntegrationQueueItemInput, QueuedIntegrationDelivery, IntegrationQueueRow } from "./integrationDeliveryQueue.js";
+import { inCheckPass } from "../utils/checkPass.js";
 
 const DEFAULT_MAX_ROUNDS = 3;
 function clampMaxRounds(input: number | undefined): number {
@@ -193,7 +194,7 @@ export function captureIntegrationQueueAuthority(workspace: string): () => void 
   const publicKey = selected?.publicKeyPem ?? getSigningPublicKeyPem(workspace, "artifact-seal");
   const identity = signingKeyIdentity(publicKey), config = canonicalize(loadKeysConfig(workspace));
   if (identity === null) throw new Error("integration queue signing key is invalid");
-  const assertCurrent = () => {
+  const assertCurrent = inCheckPass(() => {
     if (canonicalize(assertKeysetComplete(workspace)) !== purpose.keyset || canonicalize(loadKeysConfig(workspace)) !== config)
       throw new Error("integration queue original signing authority changed");
     const policy = keyPolicy(loadKeysConfig(workspace));
@@ -202,7 +203,7 @@ export function captureIntegrationQueueAuthority(workspace: string): () => void 
     assertSigningKeyUsable(workspace, "artifact-seal", publicKey, holder);
     if (holder === "file" && (!vaultStatus(workspace).unlocked || publicKeyFromPrivate(getSigningKey(workspace, "artifact-seal")) !== publicKey))
       throw new Error("integration queue original vault key is unavailable");
-  };
+  });
   assertCurrent(); return assertCurrent;
 }
 
@@ -224,11 +225,11 @@ export function captureIntegrationConfiguration(workspace: string) {
   const signature = z.object({ digestSha256: z.string().length(64), signature: z.string().min(1),
     signedTs: z.number().int(), signer: z.literal("auditor") }).parse(JSON.parse(signatureBytes.toString("utf8")));
   const digest = sha256Hex(bytes), config = integrationsConfigSchema.parse(YAML.parse(bytes.toString("utf8")));
-  const assertCurrent = () => {
+  const assertCurrent = inCheckPass(() => {
     if (mode(path) !== bodyMode || mode(sidecar) !== signatureMode || !bytes.equals(readFileSync(path)) || !signatureBytes.equals(readFileSync(sidecar)) || signature.digestSha256 !== digest
       || !verifyHexDigestAny(digest, signature.signature, getPublicKeyHistory(workspace, "auditor")))
       throw new Error("integration configuration changed or no longer verifies");
-  };
+  });
   assertCurrent(); return { config, assertCurrent };
 }
 
@@ -240,7 +241,7 @@ export function prepareIntegrationEnqueue(params: EnqueueInput, options: { befor
   const original = input.deliveries.length === 0 ? () => {} : captureIntegrationQueueAuthority(input.workspace);
   const captured = input.deliveries.length === 0 ? null : capturePurposePublication(input.workspace, "artifact-seal");
   const nowTs = typeof input.nowTs === "number" ? input.nowTs : Date.now(), rows = input.deliveries.map(item => prepareItem(item, nowTs));
-  const assertCurrent = () => { beforePublish?.(); original(); };
+  const assertCurrent = inCheckPass(() => { beforePublish?.(); original(); });
   let publishedRows: IntegrationQueueRow[] = [];
   return { publishedRows: () => publishedRows.map(row => ({ ...row })), queueIds: Object.freeze(rows.map(row => row.queueId)), assertCurrent, publish: async (): Promise<QueuedIntegrationDelivery[]> => {
     assertCurrent();
