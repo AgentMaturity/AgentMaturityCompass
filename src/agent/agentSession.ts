@@ -147,7 +147,7 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
     if (init.maxSteps !== undefined && (!Number.isSafeInteger(init.maxSteps) || init.maxSteps < 1 || init.maxSteps > 1024)) throw new Error("Native maxSteps must be an integer from 1 through 1024.");
     const compaction = init.compaction === undefined ? undefined : resolveCompactionConfig(init.compaction);
     // P2-26: an out-of-envelope model, prompt, tool or policy change is refused here, before any lease or session row.
-    checkChangeEnvelopeAtOpen({ workspace, agentId: init.agentId, live: nativeSessionManifest(init) });
+    checkChangeEnvelopeAtOpen({ workspace, agentId: init.agentId, live: nativeSessionManifest(workspace, init) });
     // P1-79: the caller's lease, or the run's (LeasePrincipalRefused before any session row or recovery).
     const lease = runLease({ workspace, agentId: init.agentId, model: init.route.model || init.route.providerId, tools: init.tools ?? "workspace",
       ...(init.leaseToken === undefined ? {} : { leaseToken: init.leaseToken }) });

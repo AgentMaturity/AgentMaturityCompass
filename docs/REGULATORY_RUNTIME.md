@@ -139,9 +139,14 @@ At native session open (`composeAgentSession`), `checkChangeEnvelopeAtOpen`
 compares the live manifest with the agent's newest envelope:
 
 - Identical to the baseline: allowed.
-- Every change admitted, with a passing result recorded for each required
-  test (`recordEnvelopeTestResult`, self-reported): allowed, citing the
-  envelope (`CHANGE_ENVELOPE_APPLIED`).
+- Every change admitted, with a passing result for each required test:
+  allowed, citing the envelope (`CHANGE_ENVELOPE_APPLIED`). A result counts
+  only when `recordEnvelopeTestResult` recorded it: attributed to the
+  authenticated session user (refused for the envelope's requester or the
+  agent), bound to the envelope id, its approval's request digest and the
+  digest of the exact manifest tested, and signed with the artifact-seal key
+  through the P2-08 async signer. Other ledger rows, unsigned or
+  unverifiable rows, and rows that only mention the type are ignored.
 - Anything else (a change outside it, missing or failing test evidence, an
   expired envelope, an envelope file that fails verification): in a
   regulated workspace (an active compiled plan, or a plan that cannot be
@@ -149,6 +154,12 @@ compares the live manifest with the agent's newest envelope:
   it is a warning. Both record `AGENT_REASSESSMENT_REQUIRED`, which opens an
   incident.
 - No envelope at all: nothing is compared.
+
+The live manifest is what the session resolves, never the caller's pins:
+the tool digest covers the tool mode, the verified signed `tools.yaml` and
+every additional capability (a tools config that does not verify gives no
+digest, which always counts as changed), and the policy digest is the
+active compiled plan's (one that cannot be read always counts as changed).
 
 A model with no provider-reported version is `unpinned`, a claim downgrade.
 No provider reports a version before the first response, so a native session
