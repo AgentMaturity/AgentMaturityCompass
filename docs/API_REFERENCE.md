@@ -13,7 +13,7 @@
 
 ## CLI Commands
 
-AMC provides 1,261 public CLI command paths in the live command inventory.
+AMC provides 1,263 public CLI command paths in the live command inventory.
 
 | # | Command | Description |
 |---|---------|-------------|
