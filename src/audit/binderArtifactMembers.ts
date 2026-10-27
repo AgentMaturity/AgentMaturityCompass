@@ -4,6 +4,7 @@ import { dirname, join } from "node:path";
 import { ensureDir, writeFileAtomic } from "../utils/fs.js";
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
+import { wrapPdfLines } from "../utils/textPdf.js";
 import { benchProofFileBytes } from "../bench/benchProofs.js";
 import type { AuditMapFile } from "./auditMapSchema.js";
 import type { AuditPolicy } from "./auditPolicySchema.js";
@@ -57,11 +58,10 @@ function escapePdfText(input: string): string {
   return input.replaceAll("\\", "\\\\").replaceAll("(", "\\(").replaceAll(")", "\\)");
 }
 
-function renderSummaryPdf(markdown: string): Buffer {
-  const lines = markdown
-    .split(/\r?\n/)
-    .map((line) => line.trimEnd())
-    .slice(0, 40);
+/** Long lines wrap (P2-22); a page holds 56 lines at 14 pt, and a longer summary says it continues in summary.md. */
+export function renderSummaryPdf(markdown: string): Buffer {
+  const wrapped = wrapPdfLines(markdown.split(/\r?\n/).slice(0, 40), 110);
+  const lines = wrapped.length > 56 ? [...wrapped.slice(0, 55), "(continued in summaries/summary.md)"] : wrapped;
   const contentLines = ["BT", "/F1 10 Tf", "40 800 Td"];
   let first = true;
   for (const rawLine of lines) {
@@ -70,7 +70,7 @@ function renderSummaryPdf(markdown: string): Buffer {
       contentLines.push("0 -14 Td");
     }
     first = false;
-    contentLines.push(`(${escapePdfText(line.slice(0, 110))}) Tj`);
+    contentLines.push(`(${escapePdfText(line)}) Tj`);
   }
   contentLines.push("ET");
   const stream = contentLines.join("\n");

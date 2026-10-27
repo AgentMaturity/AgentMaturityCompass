@@ -1,6 +1,5 @@
 /**
  * OpenAPI 3.0 Spec Generator for the full AMC Studio + Bridge + Gateway API.
- *
  * Extends the Bridge-only spec from integrationScaffold with Studio API
  * endpoints, Gateway routes, and authentication documentation.
  *
@@ -9,6 +8,7 @@
  *   HTTP:  GET /openapi.yaml from Studio server
  */
 import { a4Endpoints, a4Schemas } from "./a4Openapi.js";
+import { operatorEndpoints, operatorSchemas } from "./operatorOpenapi.js";
 import { generateBridgeOpenApiSpec, type OpenApiSpec } from "../setup/integrationScaffold.js";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
@@ -2128,13 +2128,13 @@ export function generateFullOpenApiSpec(): OpenApiSpec {
     ...studioEndpoints(),
     ...gatewayEndpoints(),
     ...nativeTaskEndpoints(),
-    ...a4Endpoints(),
+    ...a4Endpoints(), ...operatorEndpoints(),
   };
   const allSchemas = {
     ...bridgeSpec.components.schemas,
     ...studioSchemas(),
     ...nativeTaskSchemas(),
-    ...a4Schemas(),
+    ...a4Schemas(), ...operatorSchemas(),
     ...claimOpenApiSchemas(),
   };
   return {
