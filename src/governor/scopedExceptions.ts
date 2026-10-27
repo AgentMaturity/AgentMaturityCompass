@@ -19,7 +19,7 @@ import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
 import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
 import {
   amountWithin, approvalMatches, assertRecordApproved, BoundRecordError, draftDigest, inWindow,
-  publishSignedRecord, raiseRecordApproval, readSignedRecords
+  publishSignedRecord, raiseRecordApproval, readSignedRecords, sessionPrincipal
 } from "./boundRecords.js";
 
 const scopedExceptionDraftSchema = scopedExceptionV1Schema.omit({ approval: true });
@@ -54,14 +54,22 @@ function checkDraft(workspace: string, draft: ScopedExceptionDraft): void {
   }
 }
 
-/** Step 1: validate the draft and raise its approval under the signed SECURITY rule. Nothing is honoured yet. */
+/**
+ * Step 1: validate the draft and raise its approval under the signed SECURITY rule. Nothing is honoured yet. The
+ * requester is the authenticated user of an `amc approvals login` token (`sessionTokenFile`), never a caller-supplied
+ * name; it is recorded as the request's initiator, so the engine refuses that user's own decision.
+ */
 export async function requestScopedException(workspace: string,
-  input: Omit<ScopedExceptionDraft, "schema" | "exceptionId" | "scope"> & { scope: Omit<ScopedExceptionDraft["scope"], "workspaceId"> }) {
-  const draft = scopedExceptionDraftSchema.parse({ ...input, schema: "amc.scoped-exception/v1",
-    exceptionId: `sex_${randomUUID().replace(/-/g, "").slice(0, 24)}`, scope: { ...input.scope, workspaceId: workspaceIdFromDirectory(workspace) } });
+  input: Omit<ScopedExceptionDraft, "schema" | "exceptionId" | "scope" | "requestedBy">
+    & { scope: Omit<ScopedExceptionDraft["scope"], "workspaceId">; sessionTokenFile: string }) {
+  const { sessionTokenFile, ...fields } = input;
+  if ("requestedBy" in fields) throw new BoundRecordError("principal_unresolved", "the requester comes from the session, never from input");
+  const requester = sessionPrincipal(workspace, sessionTokenFile);
+  const draft = scopedExceptionDraftSchema.parse({ ...fields, requestedBy: requester.userId, schema: "amc.scoped-exception/v1",
+    exceptionId: `sex_${randomUUID().replace(/-/g, "").slice(0, 24)}`, scope: { ...fields.scope, workspaceId: workspaceIdFromDirectory(workspace) } });
   checkDraft(workspace, draft);
   const approval = await raiseRecordApproval(workspace, { kind: "scoped-exception", recordId: draft.exceptionId, digest: draftDigest(draft),
-    agentId: draft.scope.agentIds[0]! });
+    agentId: draft.scope.agentIds[0]!, initiator: draft.requestedBy });
   return { draft, approval };
 }
 
@@ -71,7 +79,7 @@ export async function issueScopedException(workspace: string, draft: ScopedExcep
   const parsed = scopedExceptionDraftSchema.parse(draft);
   checkDraft(workspace, parsed);
   assertRecordApproved(workspace, approval, { kind: "scoped-exception", recordId: parsed.exceptionId, digest: draftDigest(parsed),
-    initiator: parsed.requestedBy, mode: "quorum" });
+    excluded: [parsed.requestedBy], mode: "quorum" });
   const record = scopedExceptionV1Schema.parse({ ...parsed, approval });
   await publishSignedRecord(workspace, exceptionsDir(workspace), record.exceptionId, record, "scoped-exception");
   return record;
@@ -149,17 +157,23 @@ export function createScopedExceptionAnswerer(input: {
   readonly workspace: string;
   readonly agentId: string;
   readonly exceptionId: string;
-  /** The control ids the active plan's approval rule for the gate's class names. */
-  readonly approvalControlIds: readonly string[];
+  /** The controls (id and current version in the active plan) its approval rule for the gate's class names. */
+  readonly approvalControls: readonly { readonly controlId: string; readonly controlVersion: string }[];
 }): ApprovalAnswerer {
   const exception = scopedExceptionStatus(input.workspace).honoured.find((row) => row.exceptionId === input.exceptionId);
   if (!exception) {
     throw new Error(`--approval-exception ${input.exceptionId} is not a signed, approved, live scoped exception in this workspace; `
       + "a regulated profile refuses the unsigned ADR-5 note");
   }
-  if (!input.approvalControlIds.includes(exception.control.controlId)) {
+  const current = input.approvalControls.find((control) => control.controlId === exception.control.controlId);
+  if (current === undefined) {
     throw new Error(`scoped exception ${exception.exceptionId} is for control ${exception.control.controlId}, not the approval control `
-      + `(${input.approvalControlIds.join(", ") || "none in the active plan"})`);
+      + `(${input.approvalControls.map((control) => control.controlId).join(", ") || "none in the active plan"})`);
+  }
+  // An exception granted for one control version never covers another (the compiled-policy guard applies the same rule).
+  if (current.controlVersion !== exception.control.controlVersion) {
+    throw new Error(`scoped exception ${exception.exceptionId} was granted for ${exception.control.controlId}@${exception.control.controlVersion}; `
+      + `the active plan runs version ${current.controlVersion}`);
   }
   return {
     name: `scoped-exception:${exception.exceptionId} (control ${exception.control.controlId}@${exception.control.controlVersion}, `

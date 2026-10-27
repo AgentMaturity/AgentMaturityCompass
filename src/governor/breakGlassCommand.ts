@@ -2,9 +2,9 @@
  * `amc governor-override` and `amc emergency-override` (P2-24): both delegate here and write a signed
  * BreakGlassRecordV1 in two steps. The first run requests it (opens the incident, raises the approval); after one
  * approver with an allowed role records a decision bound to the request digest, `--activate --approval` signs it.
- * The OS account running the command is self-reported, so it claims no role and can never approve its own request.
+ * The requester is the authenticated user of an `amc approvals login` token (`--session-token-file`), recorded as the
+ * approval request's initiator, so the engine refuses that user's own decision. Without a valid session it refuses.
  */
-import { cliInitiator } from "../approvals/approvalEngine.js";
 import { isActionClass } from "./actionCatalog.js";
 import { activateBreakGlass, requestBreakGlass } from "./breakGlass.js";
 import { boundApprovalFor } from "./boundRecords.js";
@@ -18,6 +18,7 @@ export interface BreakGlassCommandOptions {
   readonly controls?: string;
   readonly activate?: string;
   readonly approval?: string;
+  readonly sessionTokenFile?: string;
 }
 
 const list = (raw: string | undefined, flag: string): string[] => {
@@ -35,10 +36,11 @@ export async function breakGlassCommand(workspace: string, opts: BreakGlassComma
       `  Window: ${record.window.notBefore} to ${record.window.notAfter}`, `  Controls: ${record.scope.controlIds.join(", ")}`,
       `  Post-hoc review due: ${record.postHocReviewDueAt}. The next break-glass is refused until it is filed.`].join("\n");
   }
+  if (opts.sessionTokenFile === undefined) throw new Error("--session-token-file is required: run amc approvals login; break-glass names an authenticated requester");
   const named = list(opts.actionClasses, "--action-classes"), actionClasses = named.filter(isActionClass);
   if (actionClasses.length !== named.length) throw new Error(`--action-classes: unknown action class in ${named.join(", ")}`);
   const { draft, approval } = await requestBreakGlass(workspace, {
-    activatedBy: { userId: cliInitiator(), roles: [] }, reason: opts.reason ?? "", ttlMs: opts.ttlMs,
+    sessionTokenFile: opts.sessionTokenFile, reason: opts.reason ?? "", ttlMs: opts.ttlMs,
     scope: { agentIds: [opts.agent], toolNames: list(opts.tools, "--tools"), actionClasses, controlIds: list(opts.controls, "--controls") }
   });
   return [`Break-glass requested: ${draft.breakGlassId} (incident ${draft.incidentId}); nothing is honoured until it is activated.`,

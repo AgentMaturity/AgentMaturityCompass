@@ -11,8 +11,9 @@ import { z } from "zod";
 import { reviewRecordV1Schema, type ReviewableKind, type ReviewRecordV1 } from "../contracts/v1/governanceRecords.js";
 import {
   approvalMatches, assertRecordApproved, BoundRecordError, draftDigest, publishSignedRecord, raiseRecordApproval,
-  readSignedRecords, type BoundApproval
+  readSignedRecords, sessionPrincipal, type BoundApproval
 } from "../governor/boundRecords.js";
+import { breakGlassRegister } from "../governor/breakGlass.js";
 
 export type { ReviewableKind, ReviewRecordV1 };
 /** The P0-08 Review dimension. */
@@ -32,23 +33,42 @@ function parseDraft(raw: unknown): ReviewRecordDraft {
 }
 
 /**
- * Step 1: validate the review and raise its approval (the signed policy's quorum; the reviewer's own decision never
- * counts). `agentId` names the approval store the request lives in.
+ * Who asked for the review. For a break-glass packet it is the break-glass record's authenticated activator, never the
+ * caller's input; an unknown or unverified break-glass record refuses.
+ */
+function requesterFor(workspace: string, subject: ReviewRecordDraft["subject"], given: string): string {
+  if (subject.kind !== "break-glass-packet") return given;
+  const record = breakGlassRegister(workspace).records.find((row) => row.record.breakGlassId === subject.id);
+  if (record === undefined) throw new BoundRecordError("unknown_break_glass", `no verified break-glass record ${subject.id}`);
+  return record.record.activatedBy.userId;
+}
+
+/**
+ * Step 1: validate the review and raise its approval under the signed policy's quorum. The reviewer is the
+ * authenticated user of `sessionTokenFile`, recorded as the request's initiator; neither the reviewer nor the requester
+ * ever counts toward the quorum. `agentId` names the approval store the request lives in.
  */
 export async function requestReviewRecord(workspace: string, agentId: string,
-  input: Omit<ReviewRecordDraft, "schema" | "reviewId" | "reviewedAt">): Promise<{ draft: ReviewRecordDraft; approval: BoundApproval }> {
-  const draft = parseDraft({ ...input, schema: "amc.review-record/v1", reviewId: `rev_${randomUUID().replace(/-/g, "").slice(0, 24)}`,
-    reviewedAt: new Date().toISOString() });
+  input: Omit<ReviewRecordDraft, "schema" | "reviewId" | "reviewedAt" | "reviewer"> & { sessionTokenFile: string }):
+  Promise<{ draft: ReviewRecordDraft; approval: BoundApproval }> {
+  const { sessionTokenFile, ...fields } = input;
+  const reviewer = sessionPrincipal(workspace, sessionTokenFile);
+  const draft = parseDraft({ ...fields, requesterId: requesterFor(workspace, fields.subject, fields.requesterId),
+    reviewer: { userId: reviewer.userId, roles: reviewer.roles }, schema: "amc.review-record/v1",
+    reviewId: `rev_${randomUUID().replace(/-/g, "").slice(0, 24)}`, reviewedAt: new Date().toISOString() });
   const approval = await raiseRecordApproval(workspace, { kind: "review-record", recordId: draft.reviewId, digest: draftDigest(draft),
-    agentId });
+    agentId, initiator: draft.reviewer.userId });
   return { draft, approval };
 }
 
 /** Step 2: with the quorum's bound decisions in place, sign and publish exactly the reviewed draft. */
 export async function fileReviewRecord(workspace: string, draft: ReviewRecordDraft, approval: BoundApproval): Promise<ReviewRecordV1> {
   const parsed = parseDraft(draft);
+  if (requesterFor(workspace, parsed.subject, parsed.requesterId) !== parsed.requesterId) {
+    throw new BoundRecordError("requester_mismatch", "a break-glass packet review must name the break-glass activator as its requester");
+  }
   assertRecordApproved(workspace, approval, { kind: "review-record", recordId: parsed.reviewId, digest: draftDigest(parsed),
-    initiator: parsed.reviewer.userId, mode: "quorum" });
+    excluded: [parsed.reviewer.userId, parsed.requesterId], mode: "quorum" });
   const record = reviewRecordV1Schema.parse({ ...parsed, approval });
   await publishSignedRecord(workspace, reviewsDir(workspace), record.reviewId, record, "review-record");
   return record;

@@ -58,6 +58,17 @@ describe("P2-24 regulated profiles refuse unsigned approval exception notes", ()
     expect(gate?.answerers.map((answerer) => answerer.name)).toEqual([expect.stringContaining(`scoped-exception:${exception.exceptionId}`)]);
   });
 
+  test("a signed exception for v1.0.0 of the approval control is refused when the active plan runs v2.0.0", async () => {
+    const f = governanceFixture();
+    const exception = await issueRefundException(f.workspace);
+    const plan = regulatedPlan();
+    active.plan = { ...plan, controls: plan.controls.map((c) => ({ ...c, controlVersion: "2.0.0" })) };
+    const out = io();
+    expect(approvalGateFor(out.value, { approveTools: "FINANCIAL", approvalException: exception.exceptionId }, { workspace: f.workspace, agentId: AGENT })).toBeNull();
+    expect(out.failed()).toBe(true);
+    expect(out.errors.join("\n")).toContain("version 2.0.0");
+  });
+
   test("a plan that cannot be verified counts as regulated with no approval control, so no exception relaxes it", async () => {
     const f = governanceFixture();
     const exception = await issueRefundException(f.workspace);

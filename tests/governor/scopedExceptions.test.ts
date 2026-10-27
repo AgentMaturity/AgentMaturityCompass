@@ -6,7 +6,8 @@ import { reviewStatusFor } from "../../src/approvals/reviewRecords.js";
 import {
   createScopedExceptionAnswerer, issueScopedException, requestScopedException, revokeScopedException, scopedExceptionStatus
 } from "../../src/governor/scopedExceptions.js";
-import { AGENT, AUDITOR, cleanupGovernanceFixtures, CONTROL, decideBound, governanceFixture, issueRefundException, OWNER, planWithControl, REFUND } from "./governanceFixture.js";
+import { decideApprovalForIntent } from "../../src/approvals/approvalEngine.js";
+import { AGENT, AUDITOR, cleanupGovernanceFixtures, CONTROL, decideBound, governanceFixture, issueRefundException, OWNER, planWithControl, REFUND, requesterSession } from "./governanceFixture.js";
 
 /**
  * P2-24 scoped exceptions on real signed records, real approval requests with bound decisions, and the real tool
@@ -125,13 +126,18 @@ describe("P2-24 scoped exceptions at the enforcement point", () => {
     const input = { control: { controlId: CONTROL, controlVersion: "1.0.0" },
       scope: { agentIds: [AGENT], toolNames: [REFUND], actionClasses: ["FINANCIAL" as const], resourceIds: null, maxAmount: null },
       window: { notBefore: new Date(now).toISOString(), notAfter: new Date(now + 3600_000).toISOString() },
-      reason: "fixture refusal cases for the approval binding", compensatingControls: [], requestedBy: OWNER.id };
+      reason: "fixture refusal cases for the approval binding", compensatingControls: [], sessionTokenFile: requesterSession(f.workspace).tokenFile };
     const one = await requestScopedException(f.workspace, input);
     decideBound(f.workspace, one.approval, [AUDITOR]);
     await expect(issueScopedException(f.workspace, one.draft, one.approval)).rejects.toThrow(/approval_missing/);
-    // The requester's own decision makes the engine's quorum, but never counts here.
-    decideBound(f.workspace, one.approval, [OWNER]);
-    await expect(issueScopedException(f.workspace, one.draft, one.approval)).rejects.toThrow(/approval_missing: .*other than the requester/);
+    // The requester is the session user and the signed request's initiator: the engine refuses their decision under
+    // their id or another display name, and it would never count here.
+    expect(one.draft.requestedBy).toBe(requesterSession(f.workspace).userId);
+    expect(() => decideBound(f.workspace, one.approval, [{ id: requesterSession(f.workspace).userId, role: "OWNER" }])).toThrow(/initiator cannot approve/);
+    expect(() => decideApprovalForIntent({ workspace: f.workspace, agentId: AGENT, approvalId: one.approval.approvalRequestId, decision: "APPROVED",
+      mode: "EXECUTE", reason: "alias", userId: requesterSession(f.workspace).userId, username: "requester-alias", userRoles: ["OWNER"],
+      expectedRequestDigestSha256: one.approval.requestBindingDigest })).toThrow(/initiator cannot approve/);
+    await expect(issueScopedException(f.workspace, one.draft, one.approval)).rejects.toThrow(/approval_missing/);
     const widened = { ...one.draft, scope: { ...one.draft.scope, toolNames: [REFUND, "payments.transfer"] } };
     await expect(issueScopedException(f.workspace, widened, one.approval)).rejects.toThrow(/approval_mismatch/);
     await expect(requestScopedException(f.workspace, { ...input, scope: { ...input.scope, toolNames: ["payments.*"] } })).rejects.toThrow(/wildcard/);
@@ -139,18 +145,33 @@ describe("P2-24 scoped exceptions at the enforcement point", () => {
       window: { notBefore: input.window.notBefore, notAfter: new Date(now + 31 * 24 * 3600_000).toISOString() } })).rejects.toThrow(/invalid_window/);
     expect(scopedExceptionStatus(f.workspace).honoured).toEqual([]);
   });
+
+  test("a request without an authenticated session, or naming its own requester, is refused (principal_unresolved)", async () => {
+    const f = governanceFixture();
+    const now = Date.now();
+    const input = { control: { controlId: CONTROL, controlVersion: "1.0.0" },
+      scope: { agentIds: [AGENT], toolNames: [REFUND], actionClasses: ["FINANCIAL" as const], resourceIds: null, maxAmount: null },
+      window: { notBefore: new Date(now).toISOString(), notAfter: new Date(now + 3600_000).toISOString() },
+      reason: "fixture refusal: an exception needs an authenticated requester", compensatingControls: [] };
+    await expect(requestScopedException(f.workspace, { ...input, sessionTokenFile: join(f.workspace, "missing.token") })).rejects.toThrow(/principal_unresolved/);
+    // A caller-supplied requester is never accepted in place of the session.
+    await expect(requestScopedException(f.workspace, { ...input, requestedBy: "anyone" } as never)).rejects.toThrow(/principal_unresolved|sessionTokenFile/);
+  });
 });
 
 describe("P2-24 regulated --approval-exception answerer", () => {
   test("answers only questions the signed exception covers, and abstains after revocation", async () => {
     const f = governanceFixture();
     const exception = await issueRefundException(f.workspace);
-    expect(() => createScopedExceptionAnswerer({ workspace: f.workspace, agentId: AGENT, exceptionId: exception.exceptionId, approvalControlIds: ["L1-OTHER"] }))
+    expect(() => createScopedExceptionAnswerer({ workspace: f.workspace, agentId: AGENT, exceptionId: exception.exceptionId, approvalControls: [{ controlId: "L1-OTHER", controlVersion: "1.0.0" }] }))
       .toThrow(/not the approval control/);
-    expect(() => createScopedExceptionAnswerer({ workspace: f.workspace, agentId: AGENT, exceptionId: "sex_000000000000000000000000", approvalControlIds: [CONTROL] }))
+    expect(() => createScopedExceptionAnswerer({ workspace: f.workspace, agentId: AGENT, exceptionId: "sex_000000000000000000000000", approvalControls: [{ controlId: CONTROL, controlVersion: "1.0.0" }] }))
       .toThrow(/not a signed, approved, live scoped exception/);
-    const answerer = createScopedExceptionAnswerer({ workspace: f.workspace, agentId: AGENT, exceptionId: exception.exceptionId, approvalControlIds: [CONTROL] });
+    const answerer = createScopedExceptionAnswerer({ workspace: f.workspace, agentId: AGENT, exceptionId: exception.exceptionId, approvalControls: [{ controlId: CONTROL, controlVersion: "1.0.0" }] });
     expect(answerer.name).toContain(exception.exceptionId);
+    // Granted for v1.0.0: never for the same control at another version in the active plan.
+    expect(() => createScopedExceptionAnswerer({ workspace: f.workspace, agentId: AGENT, exceptionId: exception.exceptionId,
+      approvalControls: [{ controlId: CONTROL, controlVersion: "2.0.0" }] })).toThrow(/version 2.0.0/);
     const ask = (amount: string) => answerer.answer({ approvalId: "a", toolCallId: "t", toolName: REFUND, actionClass: "FINANCIAL", riskTier: "high",
       question: "refund", intentPayload: { bindings: { amount: { value: amount, currency: "USD" }, resourceId: "invoice-001" } } });
     expect(await ask("80")).toBe("allow");

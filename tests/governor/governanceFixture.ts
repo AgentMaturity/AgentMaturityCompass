@@ -5,12 +5,13 @@
  * in-memory list; no payment or external service is invoked. Reviewer ids are fixture data, not authenticated people.
  */
 import { randomUUID } from "node:crypto";
-import { mkdirSync, mkdtempSync, realpathSync, rmSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { vi } from "vitest";
 import { decideApprovalForIntent } from "../../src/approvals/approvalEngine.js";
 import { initApprovalPolicy } from "../../src/approvals/approvalPolicyEngine.js";
+import { addUser, createSession, initUsersConfig } from "../../src/auth/authApi.js";
 import { initBudgets } from "../../src/budgets/budgets.js";
 import type { ActiveCompiledPolicy } from "../../src/catalog/compiler/activate.js";
 import { initActionPolicy } from "../../src/governor/actionPolicyEngine.js";
@@ -103,6 +104,7 @@ export function governanceFixture(plan: ActiveCompiledPolicy = planWithControl()
 }
 
 export function cleanupGovernanceFixtures(): void {
+  requesters.clear();
   for (const ledger of ledgers.splice(0)) {
     try { ledger.close(); } catch { /* already closed */ }
   }
@@ -126,6 +128,13 @@ export function decideBound(workspace: string, approval: BoundApproval, reviewer
     userRoles: [reviewer.role], expectedRequestDigestSha256: approval.requestBindingDigest });
 }
 
+const requesters = new Map<string, ReturnType<typeof loginAs>>();
+/** The exception requester: a real users.yaml OPERATOR with a tracked login, one per workspace. */
+export function requesterSession(workspace: string): ReturnType<typeof loginAs> {
+  if (!requesters.has(workspace)) requesters.set(workspace, loginAs(workspace, "fixture-requester", ["OPERATOR"]));
+  return requesters.get(workspace)!;
+}
+
 /** A scoped exception for control C on the refund tool, max 100.00 USD, approved by the SECURITY quorum and issued. */
 export async function issueRefundException(workspace: string, overrides: { maxAmount?: { value: string; currency: string } | null;
   controlVersion?: string } = {}): Promise<ScopedExceptionV1> {
@@ -136,8 +145,22 @@ export async function issueRefundException(workspace: string, overrides: { maxAm
       maxAmount: overrides.maxAmount === undefined ? { value: "100.00", currency: "USD" } : overrides.maxAmount },
     window: { notBefore: new Date(now - 1000).toISOString(), notAfter: new Date(now + 24 * 3600_000).toISOString() },
     reason: "Refunds under 100 USD during the fixture; any resource, since refunds name no fixed invoice set",
-    compensatingControls: ["daily refund reconciliation"], requestedBy: "fixture-requester"
+    compensatingControls: ["daily refund reconciliation"], sessionTokenFile: requesterSession(workspace).tokenFile
   });
   decideBound(workspace, approval, [OWNER, AUDITOR]);
   return issueScopedException(workspace, draft, approval);
+}
+
+/**
+ * A real tracked login for a users.yaml user (created on first use; the first user is the workspace OWNER), written to
+ * a private token file the way `amc approvals login` leaves one. Passwords and tokens are fixture values in temp dirs.
+ */
+export function loginAs(workspace: string, username: string, roles: readonly ("OWNER" | "AUDITOR" | "OPERATOR" | "APPROVER")[]):
+  { tokenFile: string; userId: string; username: string } {
+  if (!existsSync(join(workspace, ".amc", "users.yaml"))) initUsersConfig({ workspace, username: "fixture-workspace-owner", password: "p224-owner-password" });
+  const user = addUser({ workspace, username, roles: [...roles], password: `p224-${username}-password` });
+  const { token } = createSession({ workspace, user });
+  const tokenFile = join(workspace, "..", `${username}.token`);
+  writeFileSync(tokenFile, token, { mode: 0o600 });
+  return { tokenFile, userId: user.userId, username: user.username };
 }

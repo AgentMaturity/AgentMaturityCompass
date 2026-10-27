@@ -167,7 +167,7 @@ export function approvalGateFor(
   const regulated = opts.approvalException === undefined ? null : regulatedApprovalControls(scope.workspace, actionClass);
   if (opts.approvalException !== undefined && regulated !== null) {
     try {
-      const answerer = createScopedExceptionAnswerer({ ...scope, exceptionId: opts.approvalException, approvalControlIds: regulated });
+      const answerer = createScopedExceptionAnswerer({ ...scope, exceptionId: opts.approvalException, approvalControls: regulated });
       answerers.push(answerer);
       io.error(chalk.yellow(`SCOPED APPROVAL EXCEPTION ACTIVE — ${answerer.name}`));
     } catch (error: unknown) {
@@ -202,13 +202,18 @@ export function approvalGateFor(
 }
 
 /**
- * The active plan's approval control ids for `actionClass`, or null outside a regulated profile. A plan that cannot be
- * verified counts as regulated with no approval control, so no exception can relax it.
+ * The active plan's approval controls for `actionClass`, each with the version the plan runs, or null outside a
+ * regulated profile. A plan that cannot be verified counts as regulated with no approval control, so no exception can
+ * relax it; so does a control id the plan names without a version.
  */
-function regulatedApprovalControls(workspace: string, actionClass: ActionClass): readonly string[] | null {
+function regulatedApprovalControls(workspace: string, actionClass: ActionClass): readonly { controlId: string; controlVersion: string }[] | null {
   try {
     const plan = loadActiveCompiledPolicy(workspace);
-    return plan === null ? null : plan.runtimePolicy.approvals[actionClass]?.controlIds ?? [];
+    if (plan === null) return null;
+    return (plan.runtimePolicy.approvals[actionClass]?.controlIds ?? []).flatMap((controlId) => {
+      const control = plan.controls.find((row) => row.controlId === controlId);
+      return control === undefined ? [] : [{ controlId, controlVersion: control.controlVersion }];
+    });
   } catch {
     return [];
   }

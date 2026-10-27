@@ -4321,6 +4321,7 @@ Request a signed break-glass record (as governor-override); after one bound appr
 | `--controls <ids>` | - |
 | `--activate <breakGlassId>` | - |
 | `--approval <approvalRequestId>` | - |
+| `--session-token-file <file>` | - |
 
 #### `amc enforce ato-detect`
 
@@ -5788,6 +5789,7 @@ Request a signed break-glass record; after one bound approval rerun with --activ
 | `--controls <ids>` | - |
 | `--activate <breakGlassId>` | - |
 | `--approval <approvalRequestId>` | - |
+| `--session-token-file <file>` | - |
 
 #### `amc governor-override-alerts`
 

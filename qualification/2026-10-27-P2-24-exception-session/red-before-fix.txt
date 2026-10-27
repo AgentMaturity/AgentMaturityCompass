@@ -1,0 +1,13 @@
+     × an exception for C, refund, max 100.00, in window: an 80.00 call runs and its record lists the exception 926ms
+     × the same exception does not cover 150.00: denied by the control (decisive L342) 845ms
+     × an exception copied from another workspace, or with a broken signature, is ignored (decisive L348) 827ms
+     × an exception whose approval request no longer verifies is ignored 779ms
+     × a revoked exception, or one whose window ended, denies the next call 784ms
+     × a revocation between the guard and the recheck denies exception_not_honoured, and any revocation file revokes 795ms
+     × a control awaiting legal review: the exception lets the engineering fixture run, and Review stays pending (decisive L345) 793ms
+     × an exception for another control version never waives this one 768ms
+     × issuing refuses an approval without the quorum, an unbound decision or the requester as approver 894ms
+     × a request without an authenticated session, or naming its own requester, is refused (principal_unresolved) 735ms
+     × answers only questions the signed exception covers, and abstains after revocation 789ms
+⎯⎯⎯⎯⎯⎯ Failed Tests 11 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  11 failed | 1 passed (12)

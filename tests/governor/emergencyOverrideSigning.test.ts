@@ -161,7 +161,8 @@ describe("activation refuses to record an override it cannot sign", () => {
     delete env.AMC_VAULT_PASSPHRASE;
     delete env.AMC_VAULT_PASSPHRASE_FILE;
     const cli = resolve(process.cwd(), "dist/cli.js");
-    // P2-24: both commands now request a signed break-glass record; without a key the request is refused first.
+    // P2-24: both commands now request a signed break-glass record from an authenticated requester; a workspace with
+    // no keys and no login refuses before anything is written.
     const scope = ["--tools", "payments.refund", "--action-classes", "FINANCIAL", "--controls", "L1-PAY-01"];
     for (const args of [
       ["governor-override", "--agent", AGENT, "--reason", PARAMS.reason, ...scope],
@@ -169,7 +170,7 @@ describe("activation refuses to record an override it cannot sign", () => {
     ]) {
       const result = spawnSync(process.execPath, [cli, ...args], { cwd: ws, env, encoding: "utf8" });
       expect(result.status).toBe(1);
-      expect(result.stderr).toContain("signing_unavailable");
+      expect(result.stderr).toContain("--session-token-file");
     }
     expect(filesIn(join(ws, ".amc", "governor", "break-glass"))).toEqual([]);
     expect(filesIn(overridesDir(ws))).toEqual([]);

@@ -12,6 +12,9 @@ import { join } from "node:path";
 import { boundApprovalSchema, type BoundApproval } from "../contracts/v1/governanceRecords.js";
 import { approvalRequestBindingDigest, inspectApprovalChainIntegrity, listApprovalDecisions, loadApprovalRequestRecord } from "../approvals/approvalChainStore.js";
 import { consumeApprovedExecution, createApprovalForIntentAsync, verifyApprovalForExecution } from "../approvals/approvalEngine.js";
+import { activeUserRecord } from "../auth/authApi.js";
+import type { UserRole } from "../auth/roles.js";
+import { readNativeApprovalActor } from "../setup/nativeApprovalIdentity.js";
 import { readAndVerifyArtifactFileSignature, signArtifactBytesAsync, verifyArtifactBytesSignature, type ArtifactSignature } from "../lifecycle/artifactSignature.js";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -41,16 +44,36 @@ export function draftDigest(record: object): string {
 const intentHash = (kind: BoundRecordKind, digest: string): string => sha256Hex(canonicalize({ kind, digest }));
 
 /**
- * Raise the approval a draft needs. The requester is excluded when the decisions are counted (assertRecordApproved), not
- * recorded as the request's initiator: the native CLI's bound decision (`--expect-request-digest`) checks a digest that
- * covers the whole request, which only equals the binding digest for a request without one.
+ * The authenticated principal of an `amc approvals login` token: the tracked session must verify, and the user must
+ * still be ACTIVE in the signed users.yaml with the same username and every role the token holds. Anything else refuses;
+ * no flag, OS account or request body names an identity.
+ */
+export function sessionPrincipal(workspace: string, sessionTokenFile: string): { userId: string; username: string; roles: UserRole[] } {
+  let actor: ReturnType<typeof readNativeApprovalActor>;
+  let user: ReturnType<typeof activeUserRecord>;
+  try {
+    actor = readNativeApprovalActor(workspace, sessionTokenFile);
+    user = activeUserRecord(workspace, actor.userId);
+  } catch (error) {
+    throw new BoundRecordError("principal_unresolved", `no authenticated AMC session (${error instanceof Error ? error.message : "error"}); run amc approvals login and pass its --session-token-file`);
+  }
+  if (user === null || user.username !== actor.username || actor.roles.some((role) => !user.roles.includes(role as UserRole))) {
+    throw new BoundRecordError("principal_unresolved", "the session's user is not active in users.yaml with the roles the session holds; log in again");
+  }
+  return { userId: user.userId, username: user.username, roles: [...actor.roles] as UserRole[] };
+}
+
+/**
+ * Raise the approval a draft needs. `initiator` is the requester's authenticated user id, recorded on the signed request:
+ * under the SECURITY rule's distinct users the engine refuses that user's decision, and assertRecordApproved never
+ * counts it either.
  */
 export async function raiseRecordApproval(workspace: string, input: {
-  kind: BoundRecordKind; recordId: string; digest: string; agentId: string;
+  kind: BoundRecordKind; recordId: string; digest: string; agentId: string; initiator: string;
 }): Promise<BoundApproval> {
   const created = await createApprovalForIntentAsync({ workspace, agentId: input.agentId, intentId: `${input.kind}:${input.recordId}`,
     toolName: toolNameFor(input.kind), actionClass: APPROVAL_CLASS, requestedMode: "EXECUTE", effectiveMode: "EXECUTE",
-    riskTier: "critical", intentPayload: { kind: input.kind, digest: input.digest } });
+    riskTier: "critical", intentPayload: { kind: input.kind, digest: input.digest }, initiator: input.initiator });
   const request = created.result.request;
   return { agentId: request.agentId, approvalRequestId: request.approvalRequestId, requestBindingDigest: approvalRequestBindingDigest(request) };
 }
@@ -77,10 +100,12 @@ function boundRequest(workspace: string, approval: BoundApproval, kind: BoundRec
 /**
  * Before signing: the approval must be granted for exactly this draft. `single` (break-glass) needs one bound approving
  * decision from an allowed role and no denial; `quorum` needs the signed rule's quorum, every counted decision bound,
- * and spends the approval so it approves one record. Neither counts the initiator, and neither accepts zero approvers.
+ * and spends the approval so it approves one record. Neither counts an excluded user, and neither accepts zero approvers.
  */
 export function assertRecordApproved(workspace: string, approval: BoundApproval, input: {
-  kind: BoundRecordKind; recordId: string; digest: string; initiator: string; mode: "single" | "quorum";
+  kind: BoundRecordKind; recordId: string; digest: string; mode: "single" | "quorum";
+  /** Users whose decisions never count: the requester, and for a packet review the break-glass activator too. */
+  excluded: readonly string[];
 }): void {
   const request = boundRequest(workspace, approval, input.kind, input.digest);
   if (request.expiresTs <= Date.now()) throw new BoundRecordError("approval_expired", `approval ${approval.approvalRequestId} expired`);
@@ -88,7 +113,7 @@ export function assertRecordApproved(workspace: string, approval: BoundApproval,
   if (decisions.some((decision) => decision.decision === "DENY")) throw new BoundRecordError("approval_denied", `approval ${approval.approvalRequestId} was denied`);
   const unbound = decisions.filter((decision) => decision.requestDigestSha256 !== approval.requestBindingDigest);
   const approving = decisions.filter((decision) => decision.decision === "APPROVE_EXECUTE" && decision.requestDigestSha256 === approval.requestBindingDigest
-    && decision.userId !== input.initiator && decision.roles.some((role) => request.rolesAllowed.includes(role)));
+    && !input.excluded.includes(decision.userId) && !input.excluded.includes(decision.username) && decision.roles.some((role) => request.rolesAllowed.includes(role)));
   if (approving.length === 0) throw new BoundRecordError("approval_missing", `approval ${approval.approvalRequestId} has no bound decision from an allowed role`);
   if (input.mode === "single") return;
   if (unbound.length > 0) throw new BoundRecordError("approval_unbound", "every decision must be bound to the reviewed request digest");

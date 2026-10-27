@@ -70,15 +70,16 @@ Governor evaluates:
 Break-glass is the one way to act outside a control in an emergency. It is a signed `amc.break-glass/v1` record under `.amc/governor/break-glass/`, never an unsigned file. A record names the agents, tools, action classes and control ids it covers, a window of at most 24 hours, the incident it opened, and the previous record's digest.
 
 ```bash
-amc governor-override --agent <id> --reason "<why, 10+ chars>" --ttl 2h \
+amc approvals login ...   # the requester's tracked session; its token file names who asks
+amc governor-override --agent <id> --reason "<why, 10+ chars>" --ttl 2h --session-token-file <file> \
   --tools payments.refund --action-classes FINANCIAL --controls L1-PAY-01
-# One approver with a role the signed approval policy allows for SECURITY records a bound decision:
+# Another signed-in user with a role the signed approval policy allows for SECURITY records a bound decision:
 amc approvals approve --agent <id> --mode execute --reason "<why>" --username <name> --roles OWNER \
-  --expect-request-digest <digest> <approvalRequestId>
+  --session-token-file <their file> --expect-request-digest <digest> <approvalRequestId>
 amc governor-override --agent <id> --activate <breakGlassId> --approval <approvalRequestId>
 ```
 
-`amc emergency-override` takes the same flags (`--ttl` in milliseconds) and writes the same record. The request opens a `GOVERNANCE_VIOLATION` incident and raises an approval whose intent is the record's digest. Activation needs one decision bound to that request (`--expect-request-digest`) from an allowed role, and never the requester's own. Without a signing key, or with `AMC_NO_SIGN=1`, activation is refused; nothing is recorded unsigned. Legacy files in `.amc/governor/overrides/` and `.amc/governor/emergency-overrides/` whose signature is missing or does not verify are reported as `INVALID_SIGNATURE` and never honoured, and no enforcement path reads either legacy store.
+`amc emergency-override` takes the same flags (`--ttl` in milliseconds) and writes the same record. The request opens a `GOVERNANCE_VIOLATION` incident and raises an approval whose intent is the record's digest. The requester is the authenticated user of an `amc approvals login` session (`--session-token-file`), never a name or OS account; without a valid session the request is refused. That user is recorded as the approval request's initiator, so the engine refuses their decision under any display name. Activation needs one decision bound to that request (`--expect-request-digest`) from an allowed role. Without a signing key, or with `AMC_NO_SIGN=1`, activation is refused; nothing is recorded unsigned. Legacy files in `.amc/governor/overrides/` and `.amc/governor/emergency-overrides/` whose signature is missing or does not verify are reported as `INVALID_SIGNATURE` and never honoured, and no enforcement path reads either legacy store.
 
 At the tool pipeline, a live, verified break-glass record that covers the call is named in the authorization record (`authority.breakGlassId`). The compiled-policy guard then abstains for the record's controls only. The recheck re-reads it before every call.
 
