@@ -65,6 +65,16 @@ function currentGuardCalls(source: string): string[] {
       }
       rows.push(call);
     }
+    // P2-08 moved the human-role guard of GET /passport/badge into passportBadgeRead.ts, unchanged:
+    // the same four roles through the same requireRoles. Count it at its route position.
+    if (ts.isCallExpression(node) && ts.isIdentifier(node.expression) && node.expression.text === "handleStudioPassportBadge") {
+      const badge = readFileSync(resolve("src/studio/passportBadgeRead.ts"), "utf8");
+      if (!badge.includes('const roles: UserRole[] = ["VIEWER", "OPERATOR", "AUDITOR", "OWNER"];')
+        || !badge.includes("if (!self && !requireRoles({ auth: params.auth, res, workspace, roles })) return;")) {
+        throw new Error("Actual Studio passport badge role guard changed");
+      }
+      rows.push('requireRouteRoles(["VIEWER", "OPERATOR", "AUDITOR", "OWNER"])');
+    }
     ts.forEachChild(node, walk);
   }
   walk(ast);
