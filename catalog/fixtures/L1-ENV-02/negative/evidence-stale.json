@@ -1,0 +1,60 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L1-ENV-02",
+  "polarity": "negative",
+  "evidenceClass": "stale",
+  "setup": {
+    "harness": "evidence",
+    "window": {
+      "start": "2026-09-01T00:00:00.000Z",
+      "end": "2026-10-18T12:00:00.000Z"
+    },
+    "subject": {
+      "tenantId": "environment-fixture-tenant",
+      "workspaceId": "environment-fixture-workspace",
+      "deploymentId": "environment-grid-operations-us-fixture",
+      "agentId": "environment-fixture-agent",
+      "subjectId": null
+    },
+    "plan": {
+      "applicability": "applicable",
+      "policyDigest": "sha256:fixture-policy",
+      "mode": "enforce"
+    },
+    "items": [
+      {
+        "ref": {
+          "kind": "receipt",
+          "id": "L1-ENV-02-questionnaire-1"
+        },
+        "producerId": "amc.questionnaire",
+        "provenance": {
+          "verified": true,
+          "producerId": "amc.questionnaire",
+          "trustTier": "SELF_REPORTED"
+        },
+        "recordedAt": "2026-09-12T12:00:00.000Z",
+        "binding": {
+          "tenantId": "environment-fixture-tenant",
+          "workspaceId": "environment-fixture-workspace",
+          "deploymentId": "environment-grid-operations-us-fixture",
+          "agentId": "environment-fixture-agent",
+          "controlId": "L1-ENV-02",
+          "controlVersion": "0.1.0"
+        },
+        "verdict": "conforms",
+        "attributes": {
+          "fixtureOnly": true,
+          "receiptId": "L1-ENV-02-questionnaire-1-receipt",
+          "observationKey": "L1-ENV-02-questionnaire-observation",
+          "observation": "conforms"
+        }
+      }
+    ],
+    "priorUses": []
+  },
+  "expected": {
+    "result": "not_evaluated",
+    "reasonCode": "stale"
+  }
+}

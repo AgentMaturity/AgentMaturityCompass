@@ -1,0 +1,828 @@
+{
+  "schemaVersion": 1,
+  "station": "environment",
+  "sourceBase": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+  "support": "experimental",
+  "review": "pending",
+  "promotion": "none",
+  "marketOrder": [
+    "US",
+    "EU",
+    "RoW",
+    "Standard"
+  ],
+  "primaryReadsThisTask": false,
+  "actualS5Matches": [
+    "us-nerc-cip",
+    "us-sdwa-1433",
+    "eu-nis2",
+    "eu-eudr",
+    "eu-espr"
+  ],
+  "missingExactS5Ids": [
+    "us-cisa-ai-ot",
+    "us-fsma-traceability",
+    "us-fsma-pchf",
+    "us-nist-sp800-82",
+    "eu-red3",
+    "eu-wfd",
+    "eu-reach",
+    "eu-rohs",
+    "eu-weee",
+    "eu-batteries",
+    "in-cea-power-cyber-2026",
+    "codex",
+    "iso-22000",
+    "cites",
+    "nagoya",
+    "iec-62443"
+  ],
+  "identityLimit": "These are 21 draft candidate metadata rows, not new central register entries or accepted legal conclusions. A legacy questionnaire catalogue match does not resolve an absent S5 identity. Inherited discovery locators retain exact local provenance without a new retrieval claim.",
+  "instruments": [
+    {
+      "id": "us-nerc-cip",
+      "market": "US",
+      "title": "NERC Critical Infrastructure Protection Reliability Standards",
+      "domainIntent": "energy",
+      "status": "unverified",
+      "reverify": true,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "retrievedAt": null,
+      "contentSha256": null,
+      "legalReview": null,
+      "source": {
+        "url": null,
+        "readThisTask": false,
+        "retrievedAt": null,
+        "contentSha256": null,
+        "authorityAndContentRead": false
+      },
+      "s5Match": {
+        "state": "present",
+        "registerId": "us-nerc-cip",
+        "candidateId": "us-nerc-cip",
+        "path": "src/compliance/regulatory/register.json",
+        "sha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+        "sourceRevision": "ccaabe07fdddfad442bfd1a738026862c67f7985"
+      },
+      "discoveryLocators": [
+        {
+          "url": "https://www.federalregister.gov/documents/2025/07/02/2025-12309/critical-infrastructure-protection-reliability-standard-cip-015-1-cyber-security-internal-network",
+          "purpose": "discovery_only",
+          "readThisTask": false,
+          "provenancePath": "src/compliance/regulatory/register.json",
+          "provenanceSha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+          "registerId": "us-nerc-cip",
+          "sourceIndex": 0,
+          "limit": "Inherited local S5 locator; no current primary retrieval, date verification or legal assessment."
+        },
+        {
+          "url": "https://www.nerc.com/globalassets/standards/reliability-standards/cip/cip-015-1.pdf",
+          "purpose": "discovery_only",
+          "readThisTask": false,
+          "provenancePath": "src/compliance/regulatory/register.json",
+          "provenanceSha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+          "registerId": "us-nerc-cip",
+          "sourceIndex": 1,
+          "limit": "Inherited local S5 locator; no current primary retrieval, date verification or legal assessment."
+        },
+        {
+          "url": "https://www.federalregister.gov/documents/2025/09/23/2025-18394/supply-chain-risk-management-reliability-standards-revisions-equipment-and-services-produced-or",
+          "purpose": "discovery_only",
+          "readThisTask": false,
+          "provenancePath": "src/compliance/regulatory/register.json",
+          "provenanceSha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+          "registerId": "us-nerc-cip",
+          "sourceIndex": 2,
+          "limit": "Inherited local S5 locator; no current primary retrieval, date verification or legal assessment."
+        },
+        {
+          "url": "https://www.nerc.com/globalassets/who-we-are/news/2026/01/2026_1_5_standardscompliancebulletin.pdf",
+          "purpose": "discovery_only",
+          "readThisTask": false,
+          "provenancePath": "src/compliance/regulatory/register.json",
+          "provenanceSha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+          "registerId": "us-nerc-cip",
+          "sourceIndex": 3,
+          "limit": "Inherited local S5 locator; no current primary retrieval, date verification or legal assessment."
+        }
+      ],
+      "note": "Scope, current editions and inherited NERC mappings need primary/legal re-verification; no universal statutory ban on agent writes is asserted."
+    },
+    {
+      "id": "us-cisa-ai-ot",
+      "market": "US",
+      "title": "CISA and partners AI in operational technology principles",
+      "domainIntent": "energy",
+      "status": "unverified",
+      "reverify": true,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "retrievedAt": null,
+      "contentSha256": null,
+      "legalReview": null,
+      "source": {
+        "url": null,
+        "readThisTask": false,
+        "retrievedAt": null,
+        "contentSha256": null,
+        "authorityAndContentRead": false
+      },
+      "s5Match": {
+        "state": "absent_on_base",
+        "registerId": null,
+        "candidateId": "us-cisa-ai-ot",
+        "path": "src/compliance/regulatory/register.json",
+        "sha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+        "sourceRevision": "ccaabe07fdddfad442bfd1a738026862c67f7985"
+      },
+      "discoveryLocators": [],
+      "note": "Spec-only candidate; exact source and asserted publication facts remain unread/unverified."
+    },
+    {
+      "id": "us-fsma-traceability",
+      "market": "US",
+      "title": "FDA additional traceability records for certain foods",
+      "domainIntent": "food",
+      "status": "unverified",
+      "reverify": true,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "retrievedAt": null,
+      "contentSha256": null,
+      "legalReview": null,
+      "source": {
+        "url": null,
+        "readThisTask": false,
+        "retrievedAt": null,
+        "contentSha256": null,
+        "authorityAndContentRead": false
+      },
+      "s5Match": {
+        "state": "absent_on_base",
+        "registerId": null,
+        "candidateId": "us-fsma-traceability",
+        "path": "src/compliance/regulatory/register.json",
+        "sha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+        "sourceRevision": "ccaabe07fdddfad442bfd1a738026862c67f7985"
+      },
+      "discoveryLocators": [
+        {
+          "url": "https://www.govinfo.gov/content/pkg/CFR-2025-title21-vol1/xml/CFR-2025-title21-vol1-sec1-1455.xml",
+          "purpose": "discovery_only",
+          "readThisTask": false,
+          "provenancePath": "src/domains/packs/catalogueUs.ts",
+          "provenanceSha256": "5d9aa346ac6c5a63ab6cc64156854185598c853d423216322713e0b3a2ab8071",
+          "line": 195,
+          "limit": "Legacy questionnaire catalogue locator, not an S5 match or a current primary read."
+        }
+      ],
+      "note": "Exact S5 ID absent on CCA. Legacy locator is discovery only. The24-hour FDA-request sortable-record requirement is not a recall-completion deadline; scope and legal dates require re-verification."
+    },
+    {
+      "id": "us-fsma-pchf",
+      "market": "US",
+      "title": "FDA preventive controls for human food",
+      "domainIntent": "food",
+      "status": "unverified",
+      "reverify": true,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "retrievedAt": null,
+      "contentSha256": null,
+      "legalReview": null,
+      "source": {
+        "url": null,
+        "readThisTask": false,
+        "retrievedAt": null,
+        "contentSha256": null,
+        "authorityAndContentRead": false
+      },
+      "s5Match": {
+        "state": "absent_on_base",
+        "registerId": null,
+        "candidateId": "us-fsma-pchf",
+        "path": "src/compliance/regulatory/register.json",
+        "sha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+        "sourceRevision": "ccaabe07fdddfad442bfd1a738026862c67f7985"
+      },
+      "discoveryLocators": [],
+      "note": "Exact S5 ID absent on CCA; a legacy catalogue entry does not establish current primary text or a complete facility food-safety plan."
+    },
+    {
+      "id": "us-sdwa-1433",
+      "market": "US",
+      "title": "Community water system risk/resilience assessments and emergency response plans",
+      "domainIntent": "energy",
+      "status": "unverified",
+      "reverify": true,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "retrievedAt": null,
+      "contentSha256": null,
+      "legalReview": null,
+      "source": {
+        "url": null,
+        "readThisTask": false,
+        "retrievedAt": null,
+        "contentSha256": null,
+        "authorityAndContentRead": false
+      },
+      "s5Match": {
+        "state": "present",
+        "registerId": "us-sdwa-1433",
+        "candidateId": "us-sdwa-1433",
+        "path": "src/compliance/regulatory/register.json",
+        "sha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+        "sourceRevision": "ccaabe07fdddfad442bfd1a738026862c67f7985"
+      },
+      "discoveryLocators": [
+        {
+          "url": "https://www.epa.gov/waterresilience/awia-section-2013",
+          "purpose": "discovery_only",
+          "readThisTask": false,
+          "provenancePath": "src/compliance/regulatory/register.json",
+          "provenanceSha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+          "registerId": "us-sdwa-1433",
+          "sourceIndex": 0,
+          "limit": "Inherited local S5 locator; no current primary retrieval, date verification or legal assessment."
+        }
+      ],
+      "note": "The inherited EPA locator supports only discovery. Control02 is a partial emergency-plan context, not proof of hazard review, population-band scope or statutory date compliance."
+    },
+    {
+      "id": "us-nist-sp800-82",
+      "market": "US",
+      "title": "NIST SP 800-82 OT security guidance",
+      "domainIntent": "energy",
+      "status": "unverified",
+      "reverify": true,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "retrievedAt": null,
+      "contentSha256": null,
+      "legalReview": null,
+      "source": {
+        "url": null,
+        "readThisTask": false,
+        "retrievedAt": null,
+        "contentSha256": null,
+        "authorityAndContentRead": false
+      },
+      "s5Match": {
+        "state": "absent_on_base",
+        "registerId": null,
+        "candidateId": "us-nist-sp800-82",
+        "path": "src/compliance/regulatory/register.json",
+        "sha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+        "sourceRevision": "ccaabe07fdddfad442bfd1a738026862c67f7985"
+      },
+      "discoveryLocators": [
+        {
+          "url": "https://csrc.nist.gov/pubs/sp/800/82/r3/final",
+          "purpose": "discovery_only",
+          "readThisTask": false,
+          "provenancePath": "src/domains/packs/catalogueUs.ts",
+          "provenanceSha256": "5d9aa346ac6c5a63ab6cc64156854185598c853d423216322713e0b3a2ab8071",
+          "line": 206,
+          "limit": "Legacy questionnaire catalogue locator, not an S5 match or a current primary read."
+        }
+      ],
+      "note": "Legacy Rev.3 discovery locator only; edition, current text and applicability are unverified in this task."
+    },
+    {
+      "id": "eu-nis2",
+      "market": "EU",
+      "title": "NIS2 Directive",
+      "domainIntent": "energy",
+      "status": "unverified",
+      "reverify": true,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "retrievedAt": null,
+      "contentSha256": null,
+      "legalReview": null,
+      "source": {
+        "url": null,
+        "readThisTask": false,
+        "retrievedAt": null,
+        "contentSha256": null,
+        "authorityAndContentRead": false
+      },
+      "s5Match": {
+        "state": "present",
+        "registerId": "eu-nis2",
+        "candidateId": "eu-nis2",
+        "path": "src/compliance/regulatory/register.json",
+        "sha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+        "sourceRevision": "ccaabe07fdddfad442bfd1a738026862c67f7985"
+      },
+      "discoveryLocators": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/32022L2555",
+          "purpose": "discovery_only",
+          "readThisTask": false,
+          "provenancePath": "src/compliance/regulatory/register.json",
+          "provenanceSha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+          "registerId": "eu-nis2",
+          "sourceIndex": 0,
+          "limit": "Inherited local S5 locator; no current primary retrieval, date verification or legal assessment."
+        },
+        {
+          "url": "https://publications.europa.eu/resource/celex/32024R2690",
+          "purpose": "discovery_only",
+          "readThisTask": false,
+          "provenancePath": "src/compliance/regulatory/register.json",
+          "provenanceSha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+          "registerId": "eu-nis2",
+          "sourceIndex": 1,
+          "limit": "Inherited local S5 locator; no current primary retrieval, date verification or legal assessment."
+        },
+        {
+          "url": "https://digital-strategy.ec.europa.eu/en/policies/nis2-directive",
+          "purpose": "discovery_only",
+          "readThisTask": false,
+          "provenancePath": "src/compliance/regulatory/register.json",
+          "provenanceSha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+          "registerId": "eu-nis2",
+          "sourceIndex": 2,
+          "limit": "Inherited local S5 locator; no current primary retrieval, date verification or legal assessment."
+        },
+        {
+          "url": "https://digital-strategy.ec.europa.eu/en/news/commission-refers-ireland-spain-france-and-netherlands-court-justice-failing-transpose-rules",
+          "purpose": "discovery_only",
+          "readThisTask": false,
+          "provenancePath": "src/compliance/regulatory/register.json",
+          "provenanceSha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+          "registerId": "eu-nis2",
+          "sourceIndex": 3,
+          "limit": "Inherited local S5 locator; no current primary retrieval, date verification or legal assessment."
+        }
+      ],
+      "note": "Candidate24-hour/72-hour/one-calendar-month reporting and supplier-risk scope need current primary/legal review; existing F4 clocks do not prove reporting execution."
+    },
+    {
+      "id": "eu-red3",
+      "market": "EU",
+      "title": "Renewable Energy Directive III",
+      "domainIntent": "energy",
+      "status": "unverified",
+      "reverify": true,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "retrievedAt": null,
+      "contentSha256": null,
+      "legalReview": null,
+      "source": {
+        "url": null,
+        "readThisTask": false,
+        "retrievedAt": null,
+        "contentSha256": null,
+        "authorityAndContentRead": false
+      },
+      "s5Match": {
+        "state": "absent_on_base",
+        "registerId": null,
+        "candidateId": "eu-red3",
+        "path": "src/compliance/regulatory/register.json",
+        "sha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+        "sourceRevision": "ccaabe07fdddfad442bfd1a738026862c67f7985"
+      },
+      "discoveryLocators": [],
+      "note": "Exact S5 ID absent on CCA; relevant permitting clauses and dates remain unverified."
+    },
+    {
+      "id": "eu-wfd",
+      "market": "EU",
+      "title": "Water Framework Directive",
+      "domainIntent": "energy",
+      "status": "unverified",
+      "reverify": true,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "retrievedAt": null,
+      "contentSha256": null,
+      "legalReview": null,
+      "source": {
+        "url": null,
+        "readThisTask": false,
+        "retrievedAt": null,
+        "contentSha256": null,
+        "authorityAndContentRead": false
+      },
+      "s5Match": {
+        "state": "absent_on_base",
+        "registerId": null,
+        "candidateId": "eu-wfd",
+        "path": "src/compliance/regulatory/register.json",
+        "sha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+        "sourceRevision": "ccaabe07fdddfad442bfd1a738026862c67f7985"
+      },
+      "discoveryLocators": [],
+      "note": "Exact S5 ID absent on CCA; monitoring, ecological-status and scope interpretations require primary review."
+    },
+    {
+      "id": "eu-eudr",
+      "market": "EU",
+      "title": "EU Deforestation Regulation",
+      "domainIntent": "food",
+      "status": "unverified",
+      "reverify": true,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "retrievedAt": null,
+      "contentSha256": null,
+      "legalReview": null,
+      "source": {
+        "url": null,
+        "readThisTask": false,
+        "retrievedAt": null,
+        "contentSha256": null,
+        "authorityAndContentRead": false
+      },
+      "s5Match": {
+        "state": "present",
+        "registerId": "eu-eudr",
+        "candidateId": "eu-eudr",
+        "path": "src/compliance/regulatory/register.json",
+        "sha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+        "sourceRevision": "ccaabe07fdddfad442bfd1a738026862c67f7985"
+      },
+      "discoveryLocators": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/32023R1115",
+          "purpose": "discovery_only",
+          "readThisTask": false,
+          "provenancePath": "src/compliance/regulatory/register.json",
+          "provenanceSha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+          "registerId": "eu-eudr",
+          "sourceIndex": 0,
+          "limit": "Inherited local S5 locator; no current primary retrieval, date verification or legal assessment."
+        },
+        {
+          "url": "https://publications.europa.eu/resource/celex/32025R2650",
+          "purpose": "discovery_only",
+          "readThisTask": false,
+          "provenancePath": "src/compliance/regulatory/register.json",
+          "provenanceSha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+          "registerId": "eu-eudr",
+          "sourceIndex": 1,
+          "limit": "Inherited local S5 locator; no current primary retrieval, date verification or legal assessment."
+        }
+      ],
+      "note": "Inherited S5 identity/locator only. Control06 tests same-lot reference binding; role, commodity, geolocation, legality, statements/declarations, dates and five-year records remain open."
+    },
+    {
+      "id": "eu-reach",
+      "market": "EU",
+      "title": "REACH Regulation",
+      "domainIntent": "food",
+      "status": "unverified",
+      "reverify": true,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "retrievedAt": null,
+      "contentSha256": null,
+      "legalReview": null,
+      "source": {
+        "url": null,
+        "readThisTask": false,
+        "retrievedAt": null,
+        "contentSha256": null,
+        "authorityAndContentRead": false
+      },
+      "s5Match": {
+        "state": "absent_on_base",
+        "registerId": null,
+        "candidateId": "eu-reach",
+        "path": "src/compliance/regulatory/register.json",
+        "sha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+        "sourceRevision": "ccaabe07fdddfad442bfd1a738026862c67f7985"
+      },
+      "discoveryLocators": [],
+      "note": "Exact S5 ID absent on CCA; restricted-substance scope, edition and thresholds remain unverified."
+    },
+    {
+      "id": "eu-rohs",
+      "market": "EU",
+      "title": "RoHS Directive",
+      "domainIntent": "food",
+      "status": "unverified",
+      "reverify": true,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "retrievedAt": null,
+      "contentSha256": null,
+      "legalReview": null,
+      "source": {
+        "url": null,
+        "readThisTask": false,
+        "retrievedAt": null,
+        "contentSha256": null,
+        "authorityAndContentRead": false
+      },
+      "s5Match": {
+        "state": "absent_on_base",
+        "registerId": null,
+        "candidateId": "eu-rohs",
+        "path": "src/compliance/regulatory/register.json",
+        "sha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+        "sourceRevision": "ccaabe07fdddfad442bfd1a738026862c67f7985"
+      },
+      "discoveryLocators": [],
+      "note": "Exact S5 ID absent on CCA; product scope, substances and exemptions remain unverified."
+    },
+    {
+      "id": "eu-weee",
+      "market": "EU",
+      "title": "WEEE Directive",
+      "domainIntent": "food",
+      "status": "unverified",
+      "reverify": true,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "retrievedAt": null,
+      "contentSha256": null,
+      "legalReview": null,
+      "source": {
+        "url": null,
+        "readThisTask": false,
+        "retrievedAt": null,
+        "contentSha256": null,
+        "authorityAndContentRead": false
+      },
+      "s5Match": {
+        "state": "absent_on_base",
+        "registerId": null,
+        "candidateId": "eu-weee",
+        "path": "src/compliance/regulatory/register.json",
+        "sha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+        "sourceRevision": "ccaabe07fdddfad442bfd1a738026862c67f7985"
+      },
+      "discoveryLocators": [],
+      "note": "Exact S5 ID absent on CCA; producer/product scope and duties remain unverified."
+    },
+    {
+      "id": "eu-espr",
+      "market": "EU",
+      "title": "Ecodesign for Sustainable Products Regulation",
+      "domainIntent": "food",
+      "status": "unverified",
+      "reverify": true,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "retrievedAt": null,
+      "contentSha256": null,
+      "legalReview": null,
+      "source": {
+        "url": null,
+        "readThisTask": false,
+        "retrievedAt": null,
+        "contentSha256": null,
+        "authorityAndContentRead": false
+      },
+      "s5Match": {
+        "state": "present",
+        "registerId": "eu-espr",
+        "candidateId": "eu-espr",
+        "path": "src/compliance/regulatory/register.json",
+        "sha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+        "sourceRevision": "ccaabe07fdddfad442bfd1a738026862c67f7985"
+      },
+      "discoveryLocators": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/32024R1781",
+          "purpose": "discovery_only",
+          "readThisTask": false,
+          "provenancePath": "src/compliance/regulatory/register.json",
+          "provenanceSha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+          "registerId": "eu-espr",
+          "sourceIndex": 0,
+          "limit": "Inherited local S5 locator; no current primary retrieval, date verification or legal assessment."
+        },
+        {
+          "url": "https://environment.ec.europa.eu/news/new-eu-rules-stop-destruction-unsold-clothes-and-shoes-2026-02-09_en",
+          "purpose": "discovery_only",
+          "readThisTask": false,
+          "provenancePath": "src/compliance/regulatory/register.json",
+          "provenanceSha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+          "registerId": "eu-espr",
+          "sourceIndex": 1,
+          "limit": "Inherited local S5 locator; no current primary retrieval, date verification or legal assessment."
+        }
+      ],
+      "note": "Inherited S5 identity/locator only. Product delegated acts, passport requirements, dates and scope are not established by this overlay."
+    },
+    {
+      "id": "eu-batteries",
+      "market": "EU",
+      "title": "EU Battery Regulation",
+      "domainIntent": "food",
+      "status": "unverified",
+      "reverify": true,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "retrievedAt": null,
+      "contentSha256": null,
+      "legalReview": null,
+      "source": {
+        "url": null,
+        "readThisTask": false,
+        "retrievedAt": null,
+        "contentSha256": null,
+        "authorityAndContentRead": false
+      },
+      "s5Match": {
+        "state": "absent_on_base",
+        "registerId": null,
+        "candidateId": "eu-batteries",
+        "path": "src/compliance/regulatory/register.json",
+        "sha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+        "sourceRevision": "ccaabe07fdddfad442bfd1a738026862c67f7985"
+      },
+      "discoveryLocators": [],
+      "note": "Exact S5 ID absent on CCA; product and supply-chain clause/date interpretation remains unverified."
+    },
+    {
+      "id": "in-cea-power-cyber-2026",
+      "market": "RoW",
+      "title": "India CEA power-sector cybersecurity regulations candidate",
+      "domainIntent": "energy",
+      "status": "unverified",
+      "reverify": true,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "retrievedAt": null,
+      "contentSha256": null,
+      "legalReview": null,
+      "source": {
+        "url": null,
+        "readThisTask": false,
+        "retrievedAt": null,
+        "contentSha256": null,
+        "authorityAndContentRead": false
+      },
+      "s5Match": {
+        "state": "absent_on_base",
+        "registerId": null,
+        "candidateId": "in-cea-power-cyber-2026",
+        "path": "src/compliance/regulatory/register.json",
+        "sha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+        "sourceRevision": "ccaabe07fdddfad442bfd1a738026862c67f7985"
+      },
+      "discoveryLocators": [],
+      "note": "Spec-supplied 50 MW threshold, 6-hour incident / 24-hour sabotage proposals, publication/commencement dates and six separately commenced provisions are unverified. All date fields remain null; unknown capacity and absent P3-09/F4 records remain unresolved."
+    },
+    {
+      "id": "codex",
+      "market": "RoW",
+      "title": "Codex HACCP candidate",
+      "domainIntent": "food",
+      "status": "unverified",
+      "reverify": true,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "retrievedAt": null,
+      "contentSha256": null,
+      "legalReview": null,
+      "source": {
+        "url": null,
+        "readThisTask": false,
+        "retrievedAt": null,
+        "contentSha256": null,
+        "authorityAndContentRead": false
+      },
+      "s5Match": {
+        "state": "absent_on_base",
+        "registerId": null,
+        "candidateId": "codex",
+        "path": "src/compliance/regulatory/register.json",
+        "sha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+        "sourceRevision": "ccaabe07fdddfad442bfd1a738026862c67f7985"
+      },
+      "discoveryLocators": [],
+      "note": "Exact S5 ID absent on CCA; current edition, hazard analysis, control validation and corrective-action sign-off require expert/primary review."
+    },
+    {
+      "id": "iso-22000",
+      "market": "RoW",
+      "title": "ISO 22000 food-safety management candidate",
+      "domainIntent": "food",
+      "status": "unverified",
+      "reverify": true,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "retrievedAt": null,
+      "contentSha256": null,
+      "legalReview": null,
+      "source": {
+        "url": null,
+        "readThisTask": false,
+        "retrievedAt": null,
+        "contentSha256": null,
+        "authorityAndContentRead": false
+      },
+      "s5Match": {
+        "state": "absent_on_base",
+        "registerId": null,
+        "candidateId": "iso-22000",
+        "path": "src/compliance/regulatory/register.json",
+        "sha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+        "sourceRevision": "ccaabe07fdddfad442bfd1a738026862c67f7985"
+      },
+      "discoveryLocators": [],
+      "note": "Exact S5 ID absent on CCA; edition and licensed text have not been read or copied."
+    },
+    {
+      "id": "cites",
+      "market": "RoW",
+      "title": "CITES candidate",
+      "domainIntent": "food",
+      "status": "unverified",
+      "reverify": true,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "retrievedAt": null,
+      "contentSha256": null,
+      "legalReview": null,
+      "source": {
+        "url": null,
+        "readThisTask": false,
+        "retrievedAt": null,
+        "contentSha256": null,
+        "authorityAndContentRead": false
+      },
+      "s5Match": {
+        "state": "absent_on_base",
+        "registerId": null,
+        "candidateId": "cites",
+        "path": "src/compliance/regulatory/register.json",
+        "sha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+        "sourceRevision": "ccaabe07fdddfad442bfd1a738026862c67f7985"
+      },
+      "discoveryLocators": [],
+      "note": "Exact S5 ID absent on CCA; species, permit and cross-border scope remain unverified."
+    },
+    {
+      "id": "nagoya",
+      "market": "RoW",
+      "title": "Nagoya Protocol candidate",
+      "domainIntent": "food",
+      "status": "unverified",
+      "reverify": true,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "retrievedAt": null,
+      "contentSha256": null,
+      "legalReview": null,
+      "source": {
+        "url": null,
+        "readThisTask": false,
+        "retrievedAt": null,
+        "contentSha256": null,
+        "authorityAndContentRead": false
+      },
+      "s5Match": {
+        "state": "absent_on_base",
+        "registerId": null,
+        "candidateId": "nagoya",
+        "path": "src/compliance/regulatory/register.json",
+        "sha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+        "sourceRevision": "ccaabe07fdddfad442bfd1a738026862c67f7985"
+      },
+      "discoveryLocators": [],
+      "note": "Exact S5 ID absent on CCA; access/benefit-sharing, domestic measures and operational scope remain unverified."
+    },
+    {
+      "id": "iec-62443",
+      "market": "Standard",
+      "title": "IEC 62443 industrial security candidate",
+      "domainIntent": "both",
+      "status": "unverified",
+      "reverify": true,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "retrievedAt": null,
+      "contentSha256": null,
+      "legalReview": null,
+      "source": {
+        "url": null,
+        "readThisTask": false,
+        "retrievedAt": null,
+        "contentSha256": null,
+        "authorityAndContentRead": false
+      },
+      "s5Match": {
+        "state": "absent_on_base",
+        "registerId": null,
+        "candidateId": "iec-62443",
+        "path": "src/compliance/regulatory/register.json",
+        "sha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+        "sourceRevision": "ccaabe07fdddfad442bfd1a738026862c67f7985"
+      },
+      "discoveryLocators": [],
+      "note": "Voluntary crosswalk candidate only. Edition unconfirmed; licensed text unread and not copied; no legal jurisdiction inferred."
+    }
+  ]
+}

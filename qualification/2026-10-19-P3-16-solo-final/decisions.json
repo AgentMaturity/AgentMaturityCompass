@@ -1,0 +1,51 @@
+{
+  "item": "P3-16",
+  "support": "experimental",
+  "review": "pending",
+  "promotion": "none",
+  "legalReview": null,
+  "experts": {
+    "gridCybersecurity": null,
+    "foodSafety": null
+  },
+  "manualHazardAssessor": null,
+  "partners": {
+    "environment.energy-utilities-water": null,
+    "environment.food-textiles-manufacturing": null
+  },
+  "sidPromotionApproval": null,
+  "thirdPartyContact": false,
+  "sourceReadsThisItem": false,
+  "unverifiedInstrumentCandidates": 21,
+  "missingDependencies": [
+    "P2-27 recall fixture/API",
+    "P3-09 actual CEA/F4 clock and separate orders",
+    "P2-26/P1-76 runtime/kill-switch",
+    "P2-11 dated EU profile"
+  ],
+  "otherOpenItems": [
+    "real asset/capacity/write authority and hazard-reviewed safe state",
+    "full CRA/NIS2 reporting/legal applicability",
+    "IN Technology pack support gap",
+    "D-14/D-10 experts and independent domain/legal/risk signers",
+    "P1-29 partner per domain",
+    "funded stewardship",
+    "D-04 licence",
+    "Sid promotion"
+  ],
+  "tddAndHistory": {
+    "compositionRed": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/composition-red/command.json",
+      "sha256": "0a78a5bc75b3474e0090541b77def1dbf0b77d333cf7a809dfe8678f6b0c14f0",
+      "bytes": 3071
+    },
+    "compositionGreen": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/composition-green/command.json",
+      "sha256": "b9a9b79a97ecb8d03571a0deba5a0893fb4c13861a186de95ce32d9920b482f6",
+      "bytes": 3363
+    },
+    "oldReceipt": "qualification/2026-10-19-P3-16/receipt.json preserved at historical49cd product source.",
+    "limit": "Limited dirty-source composition RED/GREEN is separately pinned. Original feature TDD and49 proofs are historical; none substitutes for the current matrix."
+  },
+  "scope": "Local macOS arm64, not CI. Missing production evidence remains NE/none; local synthetic protocols establish no live physical safety, recall delivery or legal approval."
+}

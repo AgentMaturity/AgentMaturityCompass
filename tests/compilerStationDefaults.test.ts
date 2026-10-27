@@ -64,6 +64,8 @@ const TECHNOLOGY_OVERLAY = [
   "L1-TECH-05", "L1-TECH-06", "L1-TECH-07", "L1-TECH-08"
 ];
 
+const ENVIRONMENT_OVERLAY = Array.from({ length: 6 }, (_, i) => `L1-ENV-${String(i + 1).padStart(2, "0")}`);
+
 describe("P1-46: the compiled plan holds F2's station-profile rules for every station", () => {
   test("seven stations", () => {
     expect(listDomainIds().sort()).toEqual(["education", "environment", "governance", "health", "mobility", "technology", "wealth"]);
@@ -72,7 +74,7 @@ describe("P1-46: the compiled plan holds F2's station-profile rules for every st
   test.each(listDomainIds().sort())("golden: %s", (station) => {
     const plan = compilePlan({ profile: stationProfile(station) as never, catalog, asOf: AS_OF });
     const overlayControls = station === "wealth" ? WEALTH_OVERLAY : station === "technology" ? ["L1-GOV-06", ...TECHNOLOGY_OVERLAY]
-      : station === "governance" ? GOVERNANCE_OVERLAY : station === "education" ? EDUCATION_OVERLAY : [];
+      : station === "governance" ? GOVERNANCE_OVERLAY : station === "education" ? EDUCATION_OVERLAY : station === "environment" ? ENVIRONMENT_OVERLAY : [];
     expect(f2View(plan)).toEqual({ ...EVERY_STATION, overlayControls });
   });
 });

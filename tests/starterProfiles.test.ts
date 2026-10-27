@@ -161,7 +161,7 @@ describe("amc init --regulated (P1-40)", () => {
     expect(compiled.requirements.map((r: { controlId: string }) => r.controlId).sort()).toEqual(expect.arrayContaining(layer0));
     expect(plan!.unresolved.length).toBeGreaterThan(0);
     // Layer 0 waits for useCases and jurisdictions. Wealth adds stations because an unknown station may include
-    // wealth; Technology also waits for domains (P2-30), and Governance adds dataClasses, entityTypes and roles (P3-14).
+    // wealth; Technology adds domains, Governance adds dataClasses/entityTypes/roles, and Environment also needs entityTypes/roles.
     const facts = new Set(plan!.unresolved.flatMap((r) => r.missingFacts));
     expect(facts).toEqual(new Set(["useCases", "jurisdictions", "stations", "domains", "dataClasses", "entityTypes", "roles"]));
     // The SDK page names exactly the facts this plan waits for.
