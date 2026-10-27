@@ -2001,7 +2001,12 @@ function normalizeCliErrorMessage(error: unknown): string {
       "  amc up"
     ].join("\n");
   }
-  return message;
+  // Publication errors wrap the actual refusal; show its cause chain so the reason is not hidden.
+  const causes: string[] = [], seen = new Set<unknown>();
+  for (let cause = error instanceof Error ? error.cause : undefined; cause instanceof Error && !seen.has(cause) && causes.length < 8; cause = cause.cause) {
+    seen.add(cause); causes.push(`  cause: ${cause.message}`);
+  }
+  return [message, ...causes].join("\n");
 }
 
 // Global crash handlers — catch unhandled promise rejections and exceptions
