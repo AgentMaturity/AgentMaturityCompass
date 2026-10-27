@@ -10328,6 +10328,7 @@ Re-sign the current .amc/trust.yaml in place with the current artifact-seal key,
 | Option | Description |
 |--------|-------------|
 | `--confirm` | - |
+| `--accept-compromised-signer` | - |
 
 #### `amc truthguard validate`
 
