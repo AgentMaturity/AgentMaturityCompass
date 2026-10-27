@@ -171,6 +171,22 @@ type PublicVerifyError = {
   message: string;
 };
 
+export function passportInitForApi(workspace: string) {
+  if (pathExists(join(workspace, ".amc", "passport", "policy.yaml"))) {
+    return {
+      path: join(workspace, ".amc", "passport", "policy.yaml"),
+      sigPath: `${join(workspace, ".amc", "passport", "policy.yaml")}.sig`,
+      policy: loadPassportPolicy(workspace)
+    };
+  }
+  const policy = passportPolicySchema.parse(loadPassportPolicy(workspace));
+  return {
+    path: join(workspace, ".amc", "passport", "policy.yaml"),
+    sigPath: `${join(workspace, ".amc", "passport", "policy.yaml")}.sig`,
+    policy
+  };
+}
+
 export function passportPolicyForApi(workspace: string): {
   policy: PassportPolicy;
   signature: ReturnType<typeof verifyPassportPolicySignature>;
