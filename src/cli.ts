@@ -215,6 +215,7 @@ import { registerCompositionCommands } from "./cli-composition-commands.js";
 import { registerVaultZkCommands } from "./cli-vault-zk-commands.js";
 import { registerKeysCommands, registerVaultHistoryCommands, registerVaultRotationCommand } from "./cli-vault-history-commands.js";
 import { registerEvidenceStoreCommands, renderLedgerVerdict } from "./cli-evidence-store-commands.js";
+import { registerLifecycleGovernanceCommands } from "./cli-lifecycle-governance-commands.js";
 import {
   exitIfUntrusted, finishVerify, ledgerExitCode, trustFromFlags, unsignedArtifactReport, verifyAllExit, withTrustFlags, type TrustFlags
 } from "./cli-trust-flags.js";
@@ -21996,6 +21997,7 @@ vault
 
 registerVaultZkCommands(vault);
 registerEvidenceStoreCommands(program);
+registerLifecycleGovernanceCommands(lifecycle, () => activeAgent(program));
 
 // ── Watch Behavioral Profiler ─────────────────────────────────────────────────
 watch

@@ -118,6 +118,9 @@ function isIncidentOversight(pathname: string): boolean {
   return /^\/api\/v1\/incidents\/[^/]+\/oversight$/.test(pathname);
 }
 
+/** P2-23: a governed agent's lifecycle transition is OWNER only. */
+const LIFECYCLE_TRANSITION = /^\/api\/v1\/lifecycle\/agents\/[^/]+\/transition$/;
+
 function isPassportRevocation(pathname: string): boolean {
   return /^\/api\/v1\/passport\/[^/]+\/revoke$/.test(pathname);
 }
@@ -207,6 +210,7 @@ export function resolveApiRolePolicy(pathname: string, rawMethod: string): ApiRo
   if (
     OWNER_MUTATION_PATHS.has(pathname) ||
     isPassportRevocation(pathname) ||
+    LIFECYCLE_TRANSITION.test(pathname) ||
     isA4OwnerPath(pathname) ||
     OWNER_MUTATION_PREFIXES.some((prefix) => matchesPrefix(pathname, prefix))
   ) {
