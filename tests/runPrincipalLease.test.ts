@@ -307,6 +307,57 @@ describe("ACP session/fork under an activated identity-binding plan (P1-79)", ()
   });
 });
 
+describe("ACP _amc/session/fork, the lineage fork every SDK's fork verb reaches, under an activated identity-binding plan (P2-13)", () => {
+  /** session/new and a READ turn, then `_amc/session/fork` of it and a READ turn in the child: ids, and each step's frame. */
+  async function lineageRun(parent: "real" | "missing"): Promise<{ fork: Frame; parentId?: string; childId?: string }> {
+    const stdin = new EventEmitter();
+    const frames: Frame[] = [];
+    const handle = startAcpStdio({ workspace, agentId: "default", providerId: "stub", systemPrompt: "s", tools: "workspace",
+      credentialsMode: "operator-only", credentialsHome: home, stdin,
+      stdout: { write: (bytes) => { frames.push(JSON.parse(bytes.toString("utf8")) as Frame); return true; } }, stderr: { write: () => true } });
+    let next = 1;
+    const call = async (method: string, params: unknown): Promise<Frame> => {
+      const id = next++;
+      stdin.emit("data", Buffer.from(`${JSON.stringify({ jsonrpc: "2.0", id, method, params })}\n`));
+      await vi.waitFor(() => expect(frames.find((frame) => frame.id === id)).toBeDefined(), { timeout: LOADED_MS });
+      return frames.find((frame) => frame.id === id)!;
+    };
+    const read = async (sessionId: string) => expect((await call("session/prompt", { sessionId, prompt: [{ type: "text", text: READ }] })).error).toBeUndefined();
+    try {
+      expect((await call("initialize", { protocolVersion: 1, clientCapabilities: {} })).error).toBeUndefined();
+      let parentId: string | undefined;
+      if (parent === "real") { parentId = ((await call("session/new", { cwd: workspace, mcpServers: [] })).result as { sessionId: string }).sessionId; await read(parentId); }
+      const fork = await call("_amc/session/fork", { sessionId: parentId ?? randomUUID(), cwd: workspace, mcpServers: [] });
+      const childId = (fork.result as { sessionId?: string } | undefined)?.sessionId;
+      if (childId !== undefined) await read(childId);
+      return { fork, ...(parentId === undefined ? {} : { parentId }), ...(childId === undefined ? {} : { childId }) };
+    } finally { await handle.close(); }
+  }
+
+  it("mints the child's own lease, naming the OS user's users.yaml user, and binds it to the child's calls", async () => {
+    const ownerId = activatePlan(OS_USER);
+    const { fork, childId } = await lineageRun("real");
+    expect(fork.error).toBeUndefined();
+    expect(minted, "the parent's lease, then the child's own").toHaveBeenCalledTimes(2);
+    const childLease = minted.mock.results[1]!.value as ReturnType<typeof issueLeaseToken>;
+    expect(childLease.payload.principal).toEqual({ userId: ownerId });
+    const { allowed, denied, records } = governed(childId!);
+    expect(denied).toEqual([]);
+    expect(allowed).toBeGreaterThan(0);
+    for (const record of records) expect(record.delegation.leaseId).toBe(childLease.payload.leaseId);
+  });
+
+  it("refuses PRINCIPAL_UNRESOLVED, coded, before any lease or session row", async () => {
+    activatePlan(`not-${OS_USER}`);
+    const before = ledgerState();
+    const { fork } = await lineageRun("missing");
+    expect(fork.error?.message).toMatch(/^PRINCIPAL_UNRESOLVED: /);
+    expect(fork.error?.data?.reason).toBe("PRINCIPAL_UNRESOLVED");
+    expect(minted, "no lease was minted").not.toHaveBeenCalled();
+    expect(ledgerState(), "no session row and no evidence row").toEqual(before);
+  });
+});
+
 describe("in-process delegated children under an activated identity-binding plan (P1-79)", () => {
   // Under an activated plan the compiled visible tools come from the default tools config, which has no `delegate`, so a
   // root turn's delegate call is refused (toolPipeline.visibleTools) before any child exists. The child is spawned through

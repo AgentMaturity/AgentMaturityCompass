@@ -6188,6 +6188,7 @@ Initialize .amc workspace
 | `--minimal` | - |
 | `--coding` | - |
 | `--regulated` | - |
+| `--web-allow-host <host>` | - |
 
 #### `amc insider-alerts`
 

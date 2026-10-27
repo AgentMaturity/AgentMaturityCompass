@@ -61,6 +61,7 @@ import type { AgentToolSeam } from "./agent/toolSeam.js";
 import type { SubagentCapability } from "./agent/delegateTool.js";
 import type { ComposedToolSession } from "./kernel/agentLoopRunner.js";
 import { readAgentRunSummary, renderRunSummary, renderVerifyReport, verifyAgentRun } from "./agent/runReport.js";
+import { executionStatusFor, recordedExecutionStatus } from "./execution/executionStatus.js";
 import { ledgerExitCode, trustFromFlags, withTrustFlags, type TrustFlags } from "./cli-trust-flags.js";
 import { registerPromptCommands } from "./cli-prompt-commands.js";
 import { registerNativeScheduleCommands } from "./cli-native-schedule-commands.js";
@@ -754,12 +755,14 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
         });
 
         const summary = readAgentRunSummary(process.cwd(), outcome.sessionId, outcome.status);
-        io.log(opts.json ? JSON.stringify(summary, null, 2) : renderRunSummary(summary));
+        const ending = summary.endings.length > priorTurnEndings ? summary.endings.at(-1) : undefined;
+        // P2-13: the four execution phases; evidence verification stays pending until `agent-loop verify`.
+        io.log(opts.json ? JSON.stringify({ ...summary, execution: executionStatusFor(process.cwd(), { sessionId: summary.sessionId, admission: "admitted",
+          turn: ending?.reason ?? (summary.driverStatus === "failed" ? "error" : null), verified: null }) }, null, 2) : renderRunSummary(summary));
         if (!opts.json) {
           io.log("Verify the recorded evidence (this does not evaluate answer quality):\n  " +
             renderNativeGuideCommand({ cwd: process.cwd(), argv: ["amc", "agent-loop", "verify", summary.sessionId] }));
         }
-        const ending = summary.endings.length > priorTurnEndings ? summary.endings.at(-1) : undefined;
         if (summary.driverStatus === "failed" || ending?.reason === "error"
           || (validation !== undefined && summary.validation.status !== "passed")) io.fail();
       } finally {
@@ -782,7 +785,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .action(async (sessionId: string, opts: TrustFlags) => {
       const trust = trustFromFlags(opts, ["ledger-row"]);
       const report = await verifyAgentRun(process.cwd(), sessionId, trust);
-      io.log(opts.json ? JSON.stringify(report, null, 2) : renderVerifyReport(report));
+      io.log(opts.json ? JSON.stringify({ ...report, execution: recordedExecutionStatus(process.cwd(), sessionId, report.ok) }, null, 2) : renderVerifyReport(report));
       // An unanchored run fails (P0-09 step 9); --allow-unanchored makes it an integrity-only exit 2.
       const code = ledgerExitCode({ ok: report.integrityOk, trustRoot: report.trustRoot }, trust);
       if (code === 1) io.fail();

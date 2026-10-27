@@ -451,3 +451,33 @@ test("a physical workspace alias runs the same native session, while a different
     }
   }
 }, 40_000);
+
+test("fork (P2-13): an owned child task whose session names the verified parent, its phases reported, and an unverifiable parent refused by code", async () => {
+  const s = service();
+  let parent = await s.start(actor, input("Synthetic parent turn."));
+  parent = await idle(s, parent.taskId);
+  expect(parent.execution).toEqual({ sessionId: parent.sessionId, receiptStates: [], recheckFailures: [],
+    phases: { admission: "succeeded", "model-completion": "succeeded", "side-effect-completion": "succeeded", "evidence-verification": "pending" } });
+  const request = { clientRequestId: randomUUID(), expectedRevision: parent.revision };
+  const [child, again] = [await s.fork(actor, parent.taskId, request), await s.fork(actor, parent.taskId, request)];
+  expect(again.taskId).toBe(child.taskId);
+  expect(child).toMatchObject({ state: "idle", provider: "stub", tools: "none", revision: 1 });
+  expect(child.sessionId).not.toBe(parent.sessionId);
+  const opening = rows(child.sessionId).find(row => row.event_type === "session/open")!;
+  expect((JSON.parse(opening.meta_json) as { parentSession: { sessionId: string } }).parentSession.sessionId).toBe(parent.sessionId);
+  await s.turn(actor, child.taskId, { clientRequestId: randomUUID(), expectedRevision: 1, prompt: "Synthetic child turn." });
+  expect((await idle(s, child.taskId)).execution?.phases["model-completion"]).toBe("succeeded");
+  await expect(s.fork(actor, parent.taskId, { clientRequestId: randomUUID(), expectedRevision: 9 })).rejects.toMatchObject({ code: "NATIVE_STALE_REVISION" });
+  await expect(s.fork({ ...actor, principalId: "studio-test:other" }, parent.taskId, request)).rejects.toMatchObject({ code: "NATIVE_TASK_NOT_FOUND" });
+  await s.release(actor, child.taskId, 2); await s.release(actor, parent.taskId, parent.revision);
+
+  // Tamper with the parent's signed rows: the runtime refuses the fork with the same coded reason every surface reports.
+  const ledger = openLedger(root);
+  try {
+    for (const trigger of ["protect_evidence_immutable", "no_delete_evidence", "no_update_evidence"]) ledger.db.exec(`DROP TRIGGER IF EXISTS ${trigger}`);
+    ledger.db.prepare("UPDATE evidence_events SET payload_sha256 = ? WHERE id = (SELECT id FROM evidence_events WHERE session_id = ? ORDER BY rowid LIMIT 1 OFFSET 1)")
+      .run("0".repeat(64), parent.sessionId);
+  } finally { ledger.close(); }
+  await expect(s.fork(actor, parent.taskId, { clientRequestId: randomUUID(), expectedRevision: parent.revision }))
+    .rejects.toMatchObject({ code: "NATIVE_FORK_TAMPERED" });
+}, 120_000);

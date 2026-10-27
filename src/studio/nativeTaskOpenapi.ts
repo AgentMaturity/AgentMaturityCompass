@@ -67,14 +67,15 @@ export function nativeTaskEndpoints(): Record<string, Record<string, OpenApiOper
       taskParameter, agentParameter, { name: "cursor", in: "query", required: false, schema: { ...integer, maximum: 999999999999999 },
         description: "Exclusive event cursor. Retention may truncate earlier updates; this is not a complete evidence verification." }
     ]) },
-    [`${prefix}/{taskId}/turn`]: { post: operation("Admit a follow-up with an explicit revision and unique request ID", "NativeTaskResponse", true, "NativeTaskTurn", "202", [taskParameter, agentParameter]) }
+    [`${prefix}/{taskId}/turn`]: { post: operation("Admit a follow-up with an explicit revision and unique request ID", "NativeTaskResponse", true, "NativeTaskTurn", "202", [taskParameter, agentParameter]) },
+    [`${prefix}/{taskId}/fork`]: { post: operation("Fork this task's session into a new owned task: a child whose signed open row names the verified parent (P2-13)", "NativeTaskResponse", true, "NativeTaskFork", "202", [taskParameter, agentParameter]) }
   };
   for (const [action, summary] of [
     ["cancel", "Request cancellation of this task revision; cancellation is not successful completion"],
-    ["release", "Release the native writer while keeping an eligible session resumable"],
+    ["release", "Dispose: release the native writer, keeping an eligible session resumable, then stop the runtime process"],
     ["resume", "Resume an owned signed session without replaying a pending prompt"],
     ["verify", "Close an active idle writer and verify native evidence; a sealed session cannot resume"],
-    ["archive", "Archive an owned closed task after authenticating its sealed history; retain evidence and request identities"]
+    ["archive", "Studio-only housekeeping, not an execution verb: archive an owned closed task after authenticating its sealed history; retain evidence and request identities"]
   ]) {
     paths[`${prefix}/{taskId}/${action}`] = { post: operation(summary!, "NativeTaskResponse", true, "NativeTaskControl",
       action === "cancel" ? "202" : "200", [taskParameter, agentParameter]) };
@@ -103,6 +104,12 @@ export function nativeTaskSchemas(): Record<string, unknown> {
       ] } } }),
       description: "Exact ordered text/original canonical-base64 parts; empty and adjacent text are preserved. At most eight images and eight audio parts, aggregate text 16 KiB UTF-8, serialized parts 260096 bytes and complete ACP frame 262144 bytes. Image format requires an image and forbids audio; audio format requires audio and literal gemini-audio. Gemini refuses GIF. No URLs, filenames, paths, annotations, transcoding or client commitments. Native header checks and runtime negotiation still apply; no remote model support is claimed." },
     NativeTaskControl: object({ expectedRevision: { type: "integer", minimum: 1, maximum: 32 } }),
+    NativeTaskFork: { ...object({ clientRequestId: uuid, expectedRevision: { type: "integer", minimum: 1, maximum: 32 } }),
+      description: "A new owner-scoped request ID for the child task, and the parent's current revision. The child keeps the parent's pinned provider, model, tools digest, checks and limits, with its own lease; it starts with no inherited model context. A parent that does not verify is refused with code NATIVE_FORK_<reason>." },
+    ExecutionStatus: { ...object({ sessionId: string, receiptStates: strings, recheckFailures: strings,
+      phases: object(Object.fromEntries(["admission", "model-completion", "side-effect-completion", "evidence-verification"].map(phase =>
+        [phase, { type: "string", enum: ["pending", "succeeded", "failed", "refused", "unknown"] }]))) }),
+      description: "The four execution phases (P2-13, docs/sdk/EXECUTION_API.md). Each has one source and none implies another: a finished turn whose evidence nobody verified reads model-completion succeeded, evidence-verification pending." },
     NativeTask: object({ taskId: digest, sessionId: nullableString, agentId: agent, revision: integer,
       clientRequestId: uuid, lastClientRequestId: uuid, provider, model: nullableString, tools,
       toolsDigest: { ...digest, type: ["string", "null"] },
@@ -117,7 +124,8 @@ export function nativeTaskSchemas(): Record<string, unknown> {
       approvals: { type: "array", items: ref("NativeTaskApproval") }, approvalError: nullableString,
       nextCursor: integer, firstCursor: integer, droppedEvents: integer, canResume: bool,
       resumeBlockedReason: nullableString, history: ref("NativeTaskHistory"),
-      recovery: { oneOf: [{ type: "null" }, ref("NativeTaskRecovery")] }
+      recovery: { oneOf: [{ type: "null" }, ref("NativeTaskRecovery")] },
+      execution: { oneOf: [{ type: "null" }, ref("ExecutionStatus")] }
     }),
     NativeTaskVerificationScope: { ...object({ scope: { type: "string", enum: ["complete-ledger", "verified-prefix"] },
       unfinalizedSessions: { type: "array", items: string } }),

@@ -6,6 +6,7 @@ import { ACP_MAX_SESSION_ROWS, ACP_MAX_TURN_UPDATE_BYTES } from "./acpCommittedU
 import { ACP_ERROR, AcpFailure } from "./acpErrors.js";
 import { acpSupportsImageInput, type AcpPromptBlock, type AcpPromptRoute } from "./acpPromptInput.js";
 import { ACP_NATIVE_AUDIO_CONTRACT, acpSupportsAudioInput } from "./acpAudioInput.js";
+import { EXECUTION_API_VERSION } from "../execution/executionContract.js";
 
 /** Shared wire contract for SDKs. None of these declarations is a cold-verifier verdict. */
 export const ACP_RUNTIME_META_KEY = "dev.agentmaturity.amc";
@@ -35,6 +36,9 @@ export interface AcpForkSessionParams {
   readonly leaseToken?: string;
 }
 export type AcpForkSessionFactory = (params: AcpForkSessionParams) => AgentSession | Promise<AgentSession>;
+/** `_amc/session/fork` (P2-13): the CLI's --fork-from. The child's signed open row names the verified parent's final row;
+ * it starts with no inherited model context, so it is never advertised as the standard context-inheriting `session/fork`. */
+const ACP_LINEAGE_FORK = "verified-parent-reference";
 
 export function nativeAcpCapabilities(options: {
   readonly route?: AcpPromptRoute;
@@ -42,6 +46,7 @@ export function nativeAcpCapabilities(options: {
   readonly audioInput?: boolean;
   readonly loadSession: boolean;
   readonly forkSession: boolean;
+  readonly lineageFork?: boolean;
   readonly nativeExecution?: { readonly tools: "none" | "workspace"; readonly signedApprovalGate: boolean;
     readonly reviewedMcpConfigured: boolean; readonly taskValidation?: boolean };
 }) {
@@ -53,6 +58,8 @@ export function nativeAcpCapabilities(options: {
     promptCapabilities: Object.freeze({ image, audio, embeddedContext: false }),
     _meta: Object.freeze({ [ACP_RUNTIME_META_KEY]: Object.freeze({
       ...(options.nativeExecution ?? {}),
+      // The execution contract version each SDK pins (P2-13). Phases ride on prompt results of native compositions only.
+      executionApi: EXECUTION_API_VERSION,
       runtimeFormat: ACP_RUNTIME_FORMAT,
       committedUpdates: "live-completed-blocks" as const,
       verification: "not-verified" as const,
@@ -60,6 +67,7 @@ export function nativeAcpCapabilities(options: {
       limits: ACP_RUNTIME_LIMITS,
       ...(options.loadSession ? { releaseSession: true } : {}),
       ...(options.forkSession ? { forkContext: "authenticated-parent-history" as const } : {}),
+      ...(options.lineageFork ? { lineageFork: ACP_LINEAGE_FORK } : {}),
       ...(image && options.orderedImageInput === true ? { orderedImageInput: NATIVE_ORDERED_INPUT_FORMAT } : {}),
       ...(audio ? { audioInput: ACP_NATIVE_AUDIO_CONTRACT } : {})
     }) })

@@ -1,4 +1,4 @@
-import { assertNativeTaskData, nativeTaskStartSchema as startSchema, nativeTaskTurnSchema as turnSchema } from "../studio/nativeTaskInput.js";
+import { assertNativeTaskData, nativeTaskForkSchema as forkSchema, nativeTaskStartSchema as startSchema, nativeTaskTurnSchema as turnSchema } from "../studio/nativeTaskInput.js";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { z } from "zod";
 import { resolveAgentId } from "../fleet/paths.js";
@@ -110,7 +110,7 @@ export async function handleNativeTasksRoute(
       apiSuccess(res, await native.service.start(actor, input), 202);
       return true;
     }
-    const match = pathname.slice(prefix.length).match(/^\/([a-zA-Z0-9_-]{8,128})(?:\/(turn|cancel|release|resume|verify|archive))?$/);
+    const match = pathname.slice(prefix.length).match(/^\/([a-zA-Z0-9_-]{8,128})(?:\/(turn|cancel|release|resume|verify|archive|fork))?$/);
     if (!match) { apiError(res, 404, "Native task route not found."); return true; }
     const taskId = match[1]!;
     const action = match[2];
@@ -132,6 +132,13 @@ export async function handleNativeTasksRoute(
       const current = await native.service.poll(actor, taskId);
       assertNativeExecutionIdentity({ actor: native.admissionActor, provider: current.task.provider, tools: current.task.tools });
       apiSuccess(res, await native.service.turn(actor, taskId, await bodyJsonSchema(req, turnSchema)), 202);
+      return true;
+    }
+    if (action === "fork") {
+      if (!native.executionAllowed()) throw new NativeTaskServiceError("READ_ONLY", 403, "Workspace signatures require read-only operation. No fork was started.");
+      const current = await native.service.poll(actor, taskId);
+      assertNativeExecutionIdentity({ actor: native.admissionActor, provider: current.task.provider, tools: current.task.tools });
+      apiSuccess(res, await native.service.fork(actor, taskId, await bodyJsonSchema(req, forkSchema)), 202);
       return true;
     }
     const { expectedRevision } = await bodyJsonSchema(req, controlSchema);
