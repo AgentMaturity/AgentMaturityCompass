@@ -79,6 +79,8 @@ export interface RunOptions {
   session?: string;
   forkFrom?: string;
   keepOpen?: boolean;
+  /** P2-12: claim a lapsed remote or unresponsive writer of `--session`; the reason is recorded in the claim row. */
+  takeoverExpiredWriter?: string;
   steerAfter?: string;
   persona?: string;
   approveTools?: string;

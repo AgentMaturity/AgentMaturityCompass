@@ -142,6 +142,8 @@ export async function runStep(
   signal: AbortSignal
 ): Promise<StepResult> {
   signal.throwIfAborted();
+  // P2-12: a writer a newer claim replaced dispatches nothing, checked before the model request and again before tools.
+  init.session.assertDispatchFence();
   const settled = await dispatchStepRequest(
     {
       session: init.session,
@@ -175,6 +177,7 @@ export async function runStep(
     return { ending: { reason: "complete" }, stopReason, usage };
   }
 
+  init.session.assertDispatchFence();
   const outcome = await runToolCalls({
     session: init.session,
     tools: init.tools,
