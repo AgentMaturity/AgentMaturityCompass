@@ -47,8 +47,16 @@ function inventory(directory: string, checkpoints: boolean): unknown {
   const names = pathExists(directory) ? readdirSync(directory).filter(name =>
     /^\d{12}\.json$/.test(name) || (checkpoints && (name === "trust-pin.json" || name === "pending.json"))).sort() : [];
   return { physical: physicalPath(directory), files: names.map(name => {
-    const path = join(directory, name), bytes = readFileSync(path);
-    return { name, physical: physicalPath(path), mode: statSync(path).mode & 0o777, sha256: sha256Hex(bytes) };
+    const path = join(directory, name);
+    try {
+      const bytes = readFileSync(path);
+      return { name, physical: physicalPath(path), mode: statSync(path).mode & 0o777, sha256: sha256Hex(bytes) };
+    } catch (error) {
+      // A listed file vanished: a concurrent publication (e.g. its pending.json cleanup) moved the predecessor.
+      if ((error as NodeJS.ErrnoException).code === "ENOENT")
+        throw new SignedControlJournalConflictError("Signed control journal changed during inventory.");
+      throw error;
+    }
   }) };
 }
 
