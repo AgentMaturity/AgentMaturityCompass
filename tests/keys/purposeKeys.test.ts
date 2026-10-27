@@ -21,6 +21,7 @@ import { lockVault, purposeKeyPaths, unlockVault, vaultPaths } from "../../src/v
 import { decryptVaultPayload } from "../../src/vault/vaultCrypto.js";
 import { v1Workspace } from "../helpers/legacyVault.js";
 import { initWorkspace } from "../../src/workspace.js";
+import { initTrustConfig } from "../../src/trust/trustConfig.js";
 import { context, listEntry } from "../trust/trustFixtures.js";
 
 const PASS = "amc-test-passphrase";
@@ -132,6 +133,11 @@ describe("purpose keys and vault payload v2 (P1-08)", () => {
     const old = getSigningPublicKeyPem(root, "artifact-seal");
     expect(() => revokeKey(root, "artifact-seal", ed25519KeyId(old)!, "superseded")).toThrow(/rotate it first/);
     rotatePurposeKeys({ workspace: root, purposes: ["artifact-seal", "revocation-list", "config-signature"], passphrase: PASS });
+    // trust.yaml still carries the retired key's signature; revoking it then would strand every policy signature (P2-08).
+    const list = readFileSync(join(root, ".amc", "keys", "revocations.signed.json"));
+    expect(() => revokeKey(root, "artifact-seal", ed25519KeyId(old)!, "key-compromise")).toThrow(/still signs \.amc\/trust\.yaml/);
+    expect(readFileSync(join(root, ".amc", "keys", "revocations.signed.json"))).toEqual(list);
+    initTrustConfig(root);
     // Sequence 1 at creation, 2 when the rotated revocation-list key re-signed it, 3 for this revocation.
     expect(revokeKey(root, "artifact-seal", ed25519KeyId(old)!, "key-compromise")).toMatchObject({ listId: "keys:default", sequence: 3 });
     expect(admitKey({ publicKeyPem: old, purpose: "artifact-seal", signature: "s", context: workspaceSelfTrust(root) }).status).toBe("distrusted");
@@ -182,6 +188,7 @@ describe("key use refuses revoked keys and unreadable revocation state (P1-08, s
     const root = workspace();
     const old = getSigningPublicKeyPem(root, "artifact-seal");
     rotatePurposeKeys({ workspace: root, purposes: ["artifact-seal", "revocation-list", "config-signature"], passphrase: PASS });
+    initTrustConfig(root); // re-signed by the current artifact-seal key, so the retired one may be revoked
     revokeKey(root, "artifact-seal", ed25519KeyId(old)!, "superseded");
     return { root, old };
   };
@@ -223,6 +230,7 @@ describe("key use refuses revoked keys and unreadable revocation state (P1-08, s
     const older = readFileSync(keysList(root));
     const retired = getSigningPublicKeyPem(root, "config-signature");
     rotatePurposeKeys({ workspace: root, purposes: ["artifact-seal", "revocation-list", "config-signature"], passphrase: PASS });
+    initTrustConfig(root);
     revokeKey(root, "config-signature", ed25519KeyId(retired)!, "superseded");
     writeFileSync(keysList(root), older);
     expect(() => getSigningKey(root, "receipt")).toThrow(/ROLLBACK_DETECTED/);
