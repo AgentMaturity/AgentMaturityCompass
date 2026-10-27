@@ -345,13 +345,16 @@ describe("P2-27 artifact-bound calibration authority (synthetic contracts)", () 
   it("validates malformed wire JSON before entering the duplicate-key scanner", async () => {
     const f = fixture();
     // The utility requires valid JSON. This spy detects incorrect ordering without running an unbounded scanner.
-    const scan = vi.spyOn(jsonUtils, "assertNoDuplicateJsonKeys").mockImplementation(() => {
-      throw new Error("WIRE_SCANNER_ENTERED_BEFORE_JSON_VALIDATION");
+    // Other callers (the protected-data detector scans text its parse already accepted) keep the real scanner.
+    const wire = '{"model":"unterminated', original = jsonUtils.assertNoDuplicateJsonKeys;
+    const scan = vi.spyOn(jsonUtils, "assertNoDuplicateJsonKeys").mockImplementation(text => {
+      if (text === wire) throw new Error("WIRE_SCANNER_ENTERED_BEFORE_JSON_VALIDATION");
+      original(text);
     });
-    vi.stubGlobal("fetch", vi.fn(async () => new Response('{"model":"unterminated')));
+    vi.stubGlobal("fetch", vi.fn(async () => new Response(wire)));
     const error = await capture(f).then(() => null, (failure: unknown) => failure);
     expect(error).toBeInstanceOf(Error);
-    expect(scan).not.toHaveBeenCalled();
+    expect(scan).not.toHaveBeenCalledWith(wire);
   });
   it.each(["openai", "anthropic"] as const)("cancels a non-success %s strict response before reading its body", async provider => {
     const f = fixture(); let canceled = false, read = false;
