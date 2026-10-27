@@ -4,20 +4,25 @@ import { afterEach, describe, expect, test, vi } from "vitest";
 import { fileReviewRecord, requestReviewRecord, reviewStatusFor, verifiedReviewRecords, type ReviewRecordV1 } from "../../src/approvals/reviewRecords.js";
 import { signArtifactFile, verifyArtifactFileSignature } from "../../src/lifecycle/artifactSignature.js";
 import { sha256Hex } from "../../src/utils/hash.js";
-import { AGENT, AUDITOR, cleanupGovernanceFixtures, decideBound, governanceFixture, OWNER } from "../governor/governanceFixture.js";
+import { AGENT, AUDITOR, cleanupGovernanceFixtures, decideBound, governanceFixture, loginAs, OWNER } from "../governor/governanceFixture.js";
 
 /**
  * P2-24 review records on real signed records and approval requests with bound decisions: a review counts only for the
  * exact digest it reviewed. Reviewer and requester ids are fixture data.
  */
-afterEach(cleanupGovernanceFixtures);
+afterEach(() => { reviewers.clear(); cleanupGovernanceFixtures(); });
 
-const REVIEWER = { userId: "fixture-reviewer", roles: ["AUDITOR" as const] };
+const reviewers = new Map<string, ReturnType<typeof loginAs>>();
+/** The reviewer: a real users.yaml AUDITOR with a tracked login, one per workspace. */
+const reviewer = (workspace: string) => {
+  if (!reviewers.has(workspace)) reviewers.set(workspace, loginAs(workspace, "fixture-reviewer", ["AUDITOR"]));
+  return reviewers.get(workspace)!;
+};
 
 async function review(workspace: string, sha256: string, decision: ReviewRecordV1["decision"], options: {
   findings?: ReviewRecordV1["findings"]; expiresAt?: string | null } = {}): Promise<ReviewRecordV1> {
   const { draft, approval } = await requestReviewRecord(workspace, AGENT, { subject: { kind: "agent-output", id: "summary-001", sha256 },
-    decision, reviewer: REVIEWER, requesterId: "fixture-requester", findings: options.findings ?? [], expiresAt: options.expiresAt ?? null });
+    decision, sessionTokenFile: reviewer(workspace).tokenFile, requesterId: "fixture-requester", findings: options.findings ?? [], expiresAt: options.expiresAt ?? null });
   decideBound(workspace, approval, [OWNER, AUDITOR]);
   return fileReviewRecord(workspace, draft, approval);
 }
@@ -68,7 +73,17 @@ describe("P2-24 review records bind to the exact digest", () => {
   test("a reviewer equal to the requester is refused at creation", async () => {
     const f = governanceFixture();
     await expect(requestReviewRecord(f.workspace, AGENT, { subject: { kind: "agent-output", id: "summary-001", sha256: sha256Hex("x") },
-      decision: "approved", reviewer: REVIEWER, requesterId: REVIEWER.userId, findings: [], expiresAt: null })).rejects.toThrow(/reviewer_is_requester/);
+      decision: "approved", sessionTokenFile: reviewer(f.workspace).tokenFile, requesterId: reviewer(f.workspace).userId, findings: [], expiresAt: null }))
+      .rejects.toThrow(/reviewer_is_requester/);
+  });
+
+  test("the reviewer comes from the authenticated session, and no session refuses", async () => {
+    const f = governanceFixture();
+    const filed = await review(f.workspace, sha256Hex("who reviewed"), "approved");
+    expect(filed.reviewer).toEqual({ userId: reviewer(f.workspace).userId, roles: ["AUDITOR"] });
+    await expect(requestReviewRecord(f.workspace, AGENT, { subject: { kind: "agent-output", id: "summary-001", sha256: sha256Hex("x") },
+      decision: "approved", sessionTokenFile: join(f.workspace, "missing.token"), requesterId: "fixture-requester", findings: [], expiresAt: null }))
+      .rejects.toThrow(/principal_unresolved/);
   });
 
   test("a tampered review record is never counted", async () => {

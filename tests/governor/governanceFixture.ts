@@ -5,12 +5,13 @@
  * in-memory list; no payment or external service is invoked. Reviewer ids are fixture data, not authenticated people.
  */
 import { randomUUID } from "node:crypto";
-import { mkdirSync, mkdtempSync, realpathSync, rmSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { vi } from "vitest";
 import { decideApprovalForIntent } from "../../src/approvals/approvalEngine.js";
 import { initApprovalPolicy } from "../../src/approvals/approvalPolicyEngine.js";
+import { addUser, createSession, initUsersConfig } from "../../src/auth/authApi.js";
 import { initBudgets } from "../../src/budgets/budgets.js";
 import type { ActiveCompiledPolicy } from "../../src/catalog/compiler/activate.js";
 import { initActionPolicy } from "../../src/governor/actionPolicyEngine.js";
@@ -140,4 +141,18 @@ export async function issueRefundException(workspace: string, overrides: { maxAm
   });
   decideBound(workspace, approval, [OWNER, AUDITOR]);
   return issueScopedException(workspace, draft, approval);
+}
+
+/**
+ * A real tracked login for a users.yaml user (created on first use; the first user is the workspace OWNER), written to
+ * a private token file the way `amc approvals login` leaves one. Passwords and tokens are fixture values in temp dirs.
+ */
+export function loginAs(workspace: string, username: string, roles: readonly ("OWNER" | "AUDITOR" | "OPERATOR" | "APPROVER")[]):
+  { tokenFile: string; userId: string; username: string } {
+  if (!existsSync(join(workspace, ".amc", "users.yaml"))) initUsersConfig({ workspace, username: "fixture-workspace-owner", password: "p224-owner-password" });
+  const user = addUser({ workspace, username, roles: [...roles], password: `p224-${username}-password` });
+  const { token } = createSession({ workspace, user });
+  const tokenFile = join(workspace, "..", `${username}.token`);
+  writeFileSync(tokenFile, token, { mode: 0o600 });
+  return { tokenFile, userId: user.userId, username: user.username };
 }

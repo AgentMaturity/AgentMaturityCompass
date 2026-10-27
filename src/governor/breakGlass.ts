@@ -14,7 +14,6 @@ import { z } from "zod";
 import { breakGlassActionV1Schema, breakGlassRecordV1Schema, type BreakGlassActionV1, type BreakGlassRecordV1 } from "../contracts/v1/governanceRecords.js";
 import { recordActionIncidents } from "../actions/actionRecovery.js";
 import { reviewStatusFor } from "../approvals/reviewRecords.js";
-import type { UserRole } from "../auth/roles.js";
 import { openLedger } from "../ledger/ledger.js";
 import type { ActionClass } from "../types.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
@@ -23,7 +22,7 @@ import { canonicalize } from "../utils/json.js";
 import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
 import {
   approvalMatches, assertRecordApproved, BoundRecordError, draftDigest, inWindow, publishSignedRecord,
-  raiseRecordApproval, readSignedRecords, type BoundApproval
+  raiseRecordApproval, readSignedRecords, sessionPrincipal, type BoundApproval
 } from "./boundRecords.js";
 import type { DeviationCall } from "./scopedExceptions.js";
 
@@ -106,7 +105,8 @@ function assertMayActivate(workspace: string): string {
 }
 
 export interface BreakGlassRequest {
-  readonly activatedBy: { readonly userId: string; readonly roles: readonly UserRole[] };
+  /** An `amc approvals login` token: the activator is its authenticated user, never a name the caller supplies. */
+  readonly sessionTokenFile: string;
   readonly reason: string;
   readonly scope: Omit<BreakGlassDraft["scope"], "workspaceId">;
   readonly ttlMs: number;
@@ -120,10 +120,11 @@ export async function requestBreakGlass(workspace: string, input: BreakGlassRequ
   if (!Number.isFinite(input.ttlMs) || input.ttlMs <= 0 || input.ttlMs > BREAK_GLASS_MAX_WINDOW_MS) {
     throw new BoundRecordError("invalid_window", "a break-glass window must be positive and at most 24 hours");
   }
+  const activator = sessionPrincipal(workspace, input.sessionTokenFile);
   const head = assertMayActivate(workspace);
   const breakGlassId = `bg_${randomUUID().replace(/-/g, "").slice(0, 24)}`;
   const now = Date.now();
-  const base = draftSchema.parse({ schema: "amc.break-glass/v1", breakGlassId, activatedBy: { userId: input.activatedBy.userId, roles: [...input.activatedBy.roles] },
+  const base = draftSchema.parse({ schema: "amc.break-glass/v1", breakGlassId, activatedBy: { userId: activator.userId, roles: activator.roles },
     reason: input.reason, scope: { ...input.scope, workspaceId: workspaceIdFromDirectory(workspace) },
     window: { notBefore: new Date(now).toISOString(), notAfter: new Date(now + input.ttlMs).toISOString() },
     incidentId: "pending", postHocReviewDueAt: new Date(now + input.ttlMs + POST_HOC_REVIEW_MS).toISOString(), prevBreakGlassDigest: head });
@@ -139,7 +140,7 @@ export async function requestBreakGlass(workspace: string, input: BreakGlassRequ
   ensureDir(join(breakGlassDir(workspace), "pending"));
   writeFileAtomic(pendingPath(workspace, breakGlassId), JSON.stringify(draft, null, 2), 0o600);
   const approval = await raiseRecordApproval(workspace, { kind: "break-glass", recordId: breakGlassId, digest: draftDigest(draft),
-    agentId: draft.scope.agentIds[0]! });
+    agentId: draft.scope.agentIds[0]!, initiator: draft.activatedBy.userId });
   return { draft, approval };
 }
 
@@ -150,7 +151,7 @@ export async function activateBreakGlass(workspace: string, breakGlassId: string
   }
   const draft = draftSchema.parse(JSON.parse(readUtf8(pendingPath(workspace, breakGlassId))) as unknown);
   assertRecordApproved(workspace, approval, { kind: "break-glass", recordId: breakGlassId, digest: draftDigest(draft),
-    initiator: draft.activatedBy.userId, mode: "single" });
+    excluded: [draft.activatedBy.userId], mode: "single" });
   if (assertMayActivate(workspace) !== draft.prevBreakGlassDigest) throw new BoundRecordError("register_moved", "another break-glass was activated meanwhile; request again");
   if (Date.now() >= Date.parse(draft.window.notAfter)) throw new BoundRecordError("window_ended", "the break-glass window ended before activation");
   const record = breakGlassRecordV1Schema.parse({ ...draft, approval });

@@ -15967,6 +15967,7 @@ program
   .option("--tools <names>", "comma-separated tool names it covers").option("--action-classes <classes>", "comma-separated action classes it covers")
   .option("--controls <ids>", "comma-separated control ids it deviates from").option("--activate <breakGlassId>", "activate this requested break-glass")
   .option("--approval <approvalRequestId>", "the approval request holding its bound decision")
+  .option("--session-token-file <file>", "the requester's amc approvals login token (required to request)")
   .action(async (opts: { agent?: string; reason?: string; action?: string; ttl: string } & Record<string, string | undefined>) => {
     const { breakGlassCommand } = await import("./governor/breakGlassCommand.js");
     console.log(chalk.yellow(await breakGlassCommand(process.cwd(), { ...opts, agent: opts.agent ?? activeAgent(program) ?? "default",
@@ -19689,6 +19690,7 @@ program
   .option("--tools <names>", "comma-separated tool names it covers").option("--action-classes <classes>", "comma-separated action classes it covers")
   .option("--controls <ids>", "comma-separated control ids it deviates from").option("--activate <breakGlassId>", "activate this requested break-glass")
   .option("--approval <approvalRequestId>", "the approval request holding its bound decision")
+  .option("--session-token-file <file>", "the requester's amc approvals login token (required to request)")
   .action(async (opts: { agent?: string; ttl: string } & Record<string, string | undefined>) => {
     const { breakGlassCommand } = await import("./governor/breakGlassCommand.js");
     console.log(chalk.yellow(await breakGlassCommand(process.cwd(), { ...opts, agent: opts.agent ?? activeAgent(program) ?? "default", ttlMs: parseWindowToMs(opts.ttl) })));

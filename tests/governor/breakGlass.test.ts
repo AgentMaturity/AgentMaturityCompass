@@ -1,3 +1,4 @@
+import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterEach, describe, expect, test, vi } from "vitest";
@@ -10,17 +11,26 @@ import {
 import { getActiveOverrides, getOverrideAlerts, isOverrideActive } from "../../src/governor/emergencyOverride.js";
 import { generatePolicyCanaryReport, getActiveOverrides as getActiveCanaryOverrides } from "../../src/governor/policyCanary.js";
 import { lockVault } from "../../src/vault/vault.js";
-import { AGENT, AUDITOR, cleanupGovernanceFixtures, CONTROL, decideBound, governanceFixture, OWNER, REFUND, type GovernanceFixture } from "./governanceFixture.js";
+import { AGENT, AUDITOR, cleanupGovernanceFixtures, CONTROL, decideBound, governanceFixture, loginAs, OWNER, REFUND, type GovernanceFixture } from "./governanceFixture.js";
 
 /**
  * P2-24 break-glass on real signed records, a real approval request with one bound decision, the real incident store,
  * freeze engine, tool pipeline, compiled-policy guard and signed ledger. The fixture plan's control C denies every call.
  */
-afterEach(cleanupGovernanceFixtures);
+afterEach(() => { people.clear(); cleanupGovernanceFixtures(); });
 
-const ONCALL = "fixture-oncall";
+/** The on-call activator and the post-hoc reviewer, each a real users.yaml user with a tracked login (one per workspace). */
+const people = new Map<string, { oncall: ReturnType<typeof loginAs>; reviewer: ReturnType<typeof loginAs> }>();
+function who(f: GovernanceFixture) {
+  let found = people.get(f.workspace);
+  if (!found) {
+    found = { oncall: loginAs(f.workspace, "fixture-oncall", ["OPERATOR"]), reviewer: loginAs(f.workspace, "fixture-reviewer", ["AUDITOR"]) };
+    people.set(f.workspace, found);
+  }
+  return found;
+}
 const request = (f: GovernanceFixture, controlIds = [CONTROL]) => requestBreakGlass(f.workspace, {
-  activatedBy: { userId: ONCALL, roles: ["OPERATOR"] }, reason: "payment processor outage needs manual refunds",
+  sessionTokenFile: who(f).oncall.tokenFile, reason: "payment processor outage needs manual refunds",
   scope: { agentIds: [AGENT], toolNames: [REFUND], actionClasses: ["FINANCIAL"], controlIds }, ttlMs: 3600_000 });
 
 async function activate(f: GovernanceFixture, controlIds = [CONTROL]): Promise<BreakGlassRecordV1> {
@@ -29,11 +39,15 @@ async function activate(f: GovernanceFixture, controlIds = [CONTROL]): Promise<B
   return activateBreakGlass(f.workspace, draft.breakGlassId, approval);
 }
 
-async function fileReview(f: GovernanceFixture, decision: "approved" | "rejected" = "approved"): Promise<void> {
+async function packetReview(f: GovernanceFixture, decision: "approved" | "rejected", tokenFile = who(f).reviewer.tokenFile) {
   const activated = breakGlassRegister(f.workspace).records[0]!;
-  const { draft, approval } = await requestReviewRecord(f.workspace, AGENT, { subject: { kind: "break-glass-packet",
+  return requestReviewRecord(f.workspace, AGENT, { sessionTokenFile: tokenFile, subject: { kind: "break-glass-packet",
     id: activated.record.breakGlassId, sha256: breakGlassPacketDigest(f.workspace, activated) }, decision,
-    reviewer: { userId: "fixture-reviewer", roles: ["AUDITOR"] }, requesterId: ONCALL, findings: [], expiresAt: null });
+    requesterId: "someone-the-input-names", findings: [], expiresAt: null });
+}
+
+async function fileReview(f: GovernanceFixture, decision: "approved" | "rejected" = "approved"): Promise<void> {
+  const { draft, approval } = await packetReview(f, decision);
   decideBound(f.workspace, approval, [OWNER, AUDITOR]);
   await fileReviewRecord(f.workspace, draft, approval);
 }
@@ -100,7 +114,13 @@ describe("P2-24 break-glass", () => {
   test("activation refuses the activator's own decision, an unbound decision and a denial", async () => {
     const f = governanceFixture();
     const own = await request(f);
-    decideBound(f.workspace, own.approval, [{ id: ONCALL, role: "OWNER" }]);
+    // The activator is the authenticated session user, recorded as the request's initiator: the engine refuses their
+    // decision under their user id, and under another display name for the same id.
+    expect(() => decideBound(f.workspace, own.approval, [{ id: who(f).oncall.userId, role: "OWNER" }])).toThrow(/initiator cannot approve/);
+    expect(() => decideApprovalForIntent({ workspace: f.workspace, agentId: AGENT, approvalId: own.approval.approvalRequestId, decision: "APPROVED",
+      mode: "EXECUTE", reason: "alias", userId: who(f).oncall.userId, username: "fixture-oncall-alias", userRoles: ["OWNER"],
+      expectedRequestDigestSha256: own.approval.requestBindingDigest })).toThrow(/initiator cannot approve/);
+    expect(own.draft.activatedBy).toEqual({ userId: who(f).oncall.userId, roles: ["OPERATOR"] });
     await expect(activateBreakGlass(f.workspace, own.draft.breakGlassId, own.approval)).rejects.toThrow(/approval_missing/);
     const g = governanceFixture();
     const unbound = await request(g);
@@ -139,5 +159,53 @@ describe("P2-24 break-glass", () => {
     expect(generatePolicyCanaryReport(AGENT, f.workspace).invalidOverrides).toBe(1);
     const outcome = await f.execute();
     expect(outcome.denied?.reason).toContain(`control ${CONTROL}@1.0.0`);
+  });
+
+  test("a request without an authenticated session is refused, from the API and from both CLI commands", async () => {
+    const f = governanceFixture();
+    await expect(requestBreakGlass(f.workspace, { sessionTokenFile: join(f.workspace, "no-such.token"), reason: "payment processor outage",
+      scope: { agentIds: [AGENT], toolNames: [REFUND], actionClasses: ["FINANCIAL"], controlIds: [CONTROL] }, ttlMs: 3600_000 }))
+      .rejects.toThrow(/principal_unresolved/);
+    const cli = join(process.cwd(), "dist", "cli.js");
+    for (const command of ["governor-override", "emergency-override"]) {
+      const result = spawnSync(process.execPath, [cli, command, "--agent", AGENT, "--reason", "payment processor outage", "--tools", REFUND,
+        "--action-classes", "FINANCIAL", "--controls", CONTROL], { cwd: f.workspace, env: { ...process.env, NO_COLOR: "1" }, encoding: "utf8" });
+      expect(result.status).toBe(1);
+      expect(result.stderr).toContain("--session-token-file");
+    }
+    expect(breakGlassRegister(f.workspace).records).toEqual([]);
+  });
+
+  test("a packet review takes its reviewer from the session and its requester from the record, never from input", async () => {
+    const f = governanceFixture();
+    const record = await activate(f);
+    const { draft, approval } = await packetReview(f, "approved");
+    expect(draft.reviewer).toEqual({ userId: who(f).reviewer.userId, roles: ["AUDITOR"] });
+    expect(draft.requesterId).toBe(record.activatedBy.userId);
+    await expect(packetReview(f, "approved", who(f).oncall.tokenFile)).rejects.toThrow(/reviewer_is_requester/);
+    // The activator's own bound decision never counts toward the review's quorum.
+    decideBound(f.workspace, approval, [AUDITOR, { id: who(f).oncall.userId, role: "OWNER" }]);
+    await expect(fileReviewRecord(f.workspace, draft, approval)).rejects.toThrow(/approval_missing/);
+  });
+
+  test("the CLI requests with a session, an approver's bound CLI decision counts, and activation signs the record", async () => {
+    const f = governanceFixture();
+    const approver = loginAs(f.workspace, "fixture-approver", ["OWNER"]);
+    const cli = (...args: string[]) => spawnSync(process.execPath, [join(process.cwd(), "dist", "cli.js"), ...args],
+      { cwd: f.workspace, env: { ...process.env, NO_COLOR: "1" }, encoding: "utf8" });
+    const requested = cli("governor-override", "--agent", AGENT, "--reason", "payment processor outage", "--tools", REFUND,
+      "--action-classes", "FINANCIAL", "--controls", CONTROL, "--session-token-file", who(f).oncall.tokenFile);
+    expect(requested.status, requested.stderr).toBe(0);
+    const [, breakGlassId] = /Break-glass requested: (bg_[a-f0-9]{24})/.exec(requested.stdout)!;
+    const [, digest, approvalId] = /--expect-request-digest ([a-f0-9]{64}) (apprreq_[a-f0-9]{32})/.exec(requested.stdout)!;
+    const own = cli("approvals", "approve", "--agent", AGENT, "--mode", "execute", "--reason", "self", "--username", "fixture-oncall",
+      "--roles", "OPERATOR", "--session-token-file", who(f).oncall.tokenFile, "--expect-request-digest", digest!, approvalId!);
+    expect(own.status).not.toBe(0);
+    const approved = cli("approvals", "approve", "--agent", AGENT, "--mode", "execute", "--reason", "reviewed the outage", "--username",
+      approver.username, "--user-id", approver.userId, "--roles", "OWNER", "--session-token-file", approver.tokenFile, "--expect-request-digest", digest!, approvalId!);
+    expect(approved.status, approved.stderr).toBe(0);
+    const activated = cli("governor-override", "--agent", AGENT, "--activate", breakGlassId!, "--approval", approvalId!);
+    expect(activated.status, activated.stderr).toBe(0);
+    expect(breakGlassRegister(f.workspace).records.map((row) => row.record.activatedBy.userId)).toEqual([who(f).oncall.userId]);
   });
 });

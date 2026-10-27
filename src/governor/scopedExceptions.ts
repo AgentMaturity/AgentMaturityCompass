@@ -61,7 +61,7 @@ export async function requestScopedException(workspace: string,
     exceptionId: `sex_${randomUUID().replace(/-/g, "").slice(0, 24)}`, scope: { ...input.scope, workspaceId: workspaceIdFromDirectory(workspace) } });
   checkDraft(workspace, draft);
   const approval = await raiseRecordApproval(workspace, { kind: "scoped-exception", recordId: draft.exceptionId, digest: draftDigest(draft),
-    agentId: draft.scope.agentIds[0]! });
+    agentId: draft.scope.agentIds[0]!, initiator: draft.requestedBy });
   return { draft, approval };
 }
 
@@ -71,7 +71,7 @@ export async function issueScopedException(workspace: string, draft: ScopedExcep
   const parsed = scopedExceptionDraftSchema.parse(draft);
   checkDraft(workspace, parsed);
   assertRecordApproved(workspace, approval, { kind: "scoped-exception", recordId: parsed.exceptionId, digest: draftDigest(parsed),
-    initiator: parsed.requestedBy, mode: "quorum" });
+    excluded: [parsed.requestedBy], mode: "quorum" });
   const record = scopedExceptionV1Schema.parse({ ...parsed, approval });
   await publishSignedRecord(workspace, exceptionsDir(workspace), record.exceptionId, record, "scoped-exception");
   return record;
@@ -149,17 +149,23 @@ export function createScopedExceptionAnswerer(input: {
   readonly workspace: string;
   readonly agentId: string;
   readonly exceptionId: string;
-  /** The control ids the active plan's approval rule for the gate's class names. */
-  readonly approvalControlIds: readonly string[];
+  /** The controls (id and current version in the active plan) its approval rule for the gate's class names. */
+  readonly approvalControls: readonly { readonly controlId: string; readonly controlVersion: string }[];
 }): ApprovalAnswerer {
   const exception = scopedExceptionStatus(input.workspace).honoured.find((row) => row.exceptionId === input.exceptionId);
   if (!exception) {
     throw new Error(`--approval-exception ${input.exceptionId} is not a signed, approved, live scoped exception in this workspace; `
       + "a regulated profile refuses the unsigned ADR-5 note");
   }
-  if (!input.approvalControlIds.includes(exception.control.controlId)) {
+  const current = input.approvalControls.find((control) => control.controlId === exception.control.controlId);
+  if (current === undefined) {
     throw new Error(`scoped exception ${exception.exceptionId} is for control ${exception.control.controlId}, not the approval control `
-      + `(${input.approvalControlIds.join(", ") || "none in the active plan"})`);
+      + `(${input.approvalControls.map((control) => control.controlId).join(", ") || "none in the active plan"})`);
+  }
+  // An exception granted for one control version never covers another (the compiled-policy guard applies the same rule).
+  if (current.controlVersion !== exception.control.controlVersion) {
+    throw new Error(`scoped exception ${exception.exceptionId} was granted for ${exception.control.controlId}@${exception.control.controlVersion}; `
+      + `the active plan runs version ${current.controlVersion}`);
   }
   return {
     name: `scoped-exception:${exception.exceptionId} (control ${exception.control.controlId}@${exception.control.controlVersion}, `
