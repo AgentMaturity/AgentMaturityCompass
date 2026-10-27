@@ -153,10 +153,11 @@ export async function executeMechanicPlanForAuthority(params: ExecuteParams, bef
   for (const phase of plan.phases) for (const action of phase.actions) {
     attemptedActionId = action.id;
     try {
-      const beforeEffect = () => { current.run.beforePublish(); current.assertPlan(); grants.assertCurrent(); current.run.fixed(); };
+      const beforeEffect = (policyPairInFlight = false) => { current.run.beforePublish(); current.assertPlan(); grants.assertCurrent(policyPairInFlight); current.run.fixed(); };
       current.state.phase = `action:${action.id}`; current.state.entryHash = null; current.state.pendingRecorded = null; beforeEffect();
       if (action.approvalRequestId) assertVaultMaySign(input.workspace, "artifact-seal");
-      const out = await executeAction({ workspace: input.workspace, plan, action, beforeEffect,
+      const out = await executeAction({ workspace: input.workspace, plan, action,
+        beforeEffect: action.kind === "POLICY_PACK_APPLY" ? () => beforeEffect(true) : () => beforeEffect(),
         recordEffect(effect) { current.state.completed.push(effect); } });
       // A returned action effect exists even if authority or consumption is refused immediately afterward.
       executed.push({ actionId: action.id, ...out }); current.state.completed.push(`action:${action.id}:${out.status}`);
@@ -182,8 +183,8 @@ export async function executeMechanicPlanForAuthority(params: ExecuteParams, bef
     }
   }
   try {
-    assertCurrent(); await current.save(plan, grants.assertCurrent);
-    await current.log("MECHANIC_PLAN_EXECUTED", "policy", sha256Hex(Buffer.from(JSON.stringify(executed), "utf8")), plan.planId, grants.assertCurrent);
+    assertCurrent(); await current.save(plan, () => grants.assertCurrent());
+    await current.log("MECHANIC_PLAN_EXECUTED", "policy", sha256Hex(Buffer.from(JSON.stringify(executed), "utf8")), plan.planId, () => grants.assertCurrent());
     assertCurrent(); return { result: { plan, executed }, current: { ...current, assertCurrent, failed: fail, assertInputs() { current.assertPlan(); grants.assertCurrent(); } } };
   } catch (cause) { return fail(cause); }
 }
