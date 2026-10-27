@@ -30,7 +30,7 @@ import { assertOwnerMode } from "../mode/mode.js";
 import { resolveAmcHome } from "../credentials/credentialsPaths.js";
 import { readPinnedTrustRoots } from "../trust/rootRotation.js";
 import { withControlFileLock } from "../lifecycle/controlFileLock.js";
-import { logSequence } from "./anchorLog.js";
+import { logRevocationSequence, logSequence } from "./anchorLog.js";
 import { assertNeverAnchored, assertNotRolledBack, machineMark, markSequence, preflightHistoryLog } from "./anchors.js";
 import { checkHighWater, keyHistoryMarkKey } from "./highWater.js";
 import { assertLocal, assertSigningKeyUsable, assertVaultMaySign, getPurposeKeyHistory, getSigningKey, getSigningPublicKeyPem, keyFile, readHistory } from "./signingKeys.js";
@@ -46,6 +46,7 @@ import { assertArtifactBlobAnchorBoundary, type ArtifactBlobAnchorBoundary } fro
 import { assertReceiptOwnerBoundary, type ReceiptOwnerBoundary } from "./receiptOwnerAnchors.js";
 import { signingKeyId, verifyWithKey } from "./algorithmPolicy.js";
 import { KEY_REVOCATION_REASONS, keyRevocationLocation, type KeyRevocationReason } from "./keyRevocations.js";
+import { resignTrustConfigForRevocation, resignTrustConfigForRevocationSync, type TrustConfigRevocationOutcome } from "../trust/trustConfigPublication.js";
 export type { KeyRevocationReason } from "./keyRevocations.js";
 import {
   encodeSignedRevocationList, nextRevocationList, publishRevocationList, publishSignedRevocationList, readAnchoredRevocationList, recoverPendingRevocationList, revocationListSha256,
@@ -450,6 +451,12 @@ export function listKeys(workspace: string): { generation: number | null; digest
  * sequenced and anchored key revocation list (`.amc/keys/revocations.signed.json`, revocation-list purpose). A key a
  * purpose still signs with is refused: rotate it first. The workspace's own self-check honours the list; portable
  * verifiers learn of it when the trust-list owner publishes the revocation.
+ *
+ * P0-37: trust.yaml refuses a revoked signer. Before the list is staged, a trust.yaml the key signs that verifies under
+ * the pre-revocation state is re-signed, unchanged, by the current artifact-seal key, except for a key-compromise
+ * revocation (the attacker may have signed it: it stays refused, signer-compromised); one that does not verify is left
+ * refused, and `trustConfig.recovery` names the command. Neither outcome, nor any trust.yaml state, blocks the revocation:
+ * its log append never depends on trust.yaml verifying (logRevocationSequence).
  */
 function assertKeyRevocationRequest(workspace: string, purpose: KeyPurpose, keyId: string, reason: KeyRevocationReason,
   passphrase: string | undefined): LocalPurpose {
@@ -468,8 +475,9 @@ function assertKeyRevocationRequest(workspace: string, purpose: KeyPurpose, keyI
 }
 
 export function revokeKey(workspace: string, purpose: KeyPurpose, keyId: string, reason: KeyRevocationReason,
-  passphrase: string | undefined = process.env.AMC_VAULT_PASSPHRASE): { listId: string; sequence: number } {
+  passphrase: string | undefined = process.env.AMC_VAULT_PASSPHRASE): { listId: string; sequence: number; trustConfig: TrustConfigRevocationOutcome } {
   const local = assertKeyRevocationRequest(workspace, purpose, keyId, reason, passphrase);
+  const trustConfig = resignTrustConfigForRevocationSync(workspace, keyId, reason);
   return withControlFileLock({ root: vaultPaths(workspace).keysDir, name: "key-revocations", operation: () => {
     const location = keyRevocationLocation(workspace);
     recoverPendingRevocationList(location);
@@ -481,15 +489,16 @@ export function revokeKey(workspace: string, purpose: KeyPurpose, keyId: string,
     const rows = [...(current?.list.revoked ?? []).filter(row => row.id !== keyId),
       { id: keyId, kind: "key" as const, revokedAt: new Date().toISOString(), reason: `${reason}: ${local}` }];
     const previous = current ? { sequence: current.list.sequence, sha256: revocationListSha256(current.list) } : null;
-    const published = publishRevocationList(location, nextRevocationList(location.listId, previous, rows, 0), getSigningKey(workspace, "revocation-list"), logSequence);
-    return { listId: location.listId, sequence: published.list.sequence };
+    const published = publishRevocationList(location, nextRevocationList(location.listId, previous, rows, 0), getSigningKey(workspace, "revocation-list"), logRevocationSequence);
+    return { listId: location.listId, sequence: published.list.sequence, trustConfig };
   } });
 }
 
 /** Same owner operation, with provider signing outside the synchronous lock and exact state revalidation before publication. */
 export async function revokeKeyAsync(workspace: string, purpose: KeyPurpose, keyId: string, reason: KeyRevocationReason,
-  passphrase: string | undefined = process.env.AMC_VAULT_PASSPHRASE, opts: { provider?: KeyProvider } = {}): Promise<{ listId: string; sequence: number }> {
+  passphrase: string | undefined = process.env.AMC_VAULT_PASSPHRASE, opts: { provider?: KeyProvider } = {}): Promise<{ listId: string; sequence: number; trustConfig: TrustConfigRevocationOutcome }> {
   const local = assertKeyRevocationRequest(workspace, purpose, keyId, reason, passphrase);
+  const trustConfig = await resignTrustConfigForRevocation(workspace, keyId, reason);
   const locked = <T>(operation: () => T): T => withControlFileLock({ root: vaultPaths(workspace).keysDir, name: "key-revocations", operation });
   for (let attempt = 0; attempt < 3; ++attempt) {
     const plan = locked(() => {
@@ -524,8 +533,8 @@ export async function revokeKeyAsync(workspace: string, purpose: KeyPurpose, key
         }
       }
       assertSigningKeyUsable(workspace, "revocation-list", description.publicKeyPem, provider);
-      const published = publishSignedRevocationList(location, prepared.signed, logSequence);
-      return { listId: location.listId, sequence: published.list.sequence };
+      const published = publishSignedRevocationList(location, prepared.signed, logRevocationSequence);
+      return { listId: location.listId, sequence: published.list.sequence, trustConfig };
     });
     if (result !== null) return result;
   }

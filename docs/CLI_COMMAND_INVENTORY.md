@@ -1173,6 +1173,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc trust enable-notary` | Enable fail-closed NOTARY trust mode | `--base-url <url>`<br>`--pin <pubkeyFile>`<br>`--require <level>`<br>`--unix-socket <path>` | - |
 | `amc trust freshness` | Report temporal trust freshness and half-life decay | `--agent <agentId>`<br>`--lookback-days <n>`<br>`--stale-threshold <n>`<br>`--half-life-behavioral <days>`<br>`--half-life-assurance <days>`<br>`--half-life-cryptographic <days>`<br>`--half-life-self-reported <days>`<br>`--view <mode>` | - |
 | `amc trust init` | Create and sign .amc/trust.yaml — sets up the trust mode (SELF/NOTARY) that governs artifact signing | - | - |
+| `amc trust resign` | Re-sign the current .amc/trust.yaml in place with the current artifact-seal key, keeping NOTARY settings | `--confirm`<br>`--accept-compromised-signer` | - |
 | `amc trust status` | Show trust mode, signature status, and notary health | - | - |
 | `amc truthguard` | Deterministic output truth-constraint validator | - | - |
 | `amc truthguard validate` | Validate structured agent output claims against deterministic truth constraints | `--file <json>` | - |
