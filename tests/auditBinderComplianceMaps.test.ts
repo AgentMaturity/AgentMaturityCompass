@@ -253,9 +253,7 @@ describe("audit binder + compliance maps", () => {
     } finally {
       await server.close();
     }
-  // P2-08: the checked fulfillment re-runs its nested publication gates thousands of times (~60-120s here); the
-  // functional and denial assertions are unchanged. Follow-up: reduce the gate fan-out, then restore the default.
-  }, 300_000);
+  });
 
   test("audit console pages serve without CDN refs or obvious secret patterns", async () => {
     const ws = workspace();

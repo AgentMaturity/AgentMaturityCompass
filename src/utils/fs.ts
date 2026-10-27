@@ -1,12 +1,14 @@
 import { chmodSync, existsSync, mkdirSync, readFileSync, renameSync, unlinkSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { randomBytes } from "node:crypto";
+import { noteCheckPassWrite } from "./checkPass.js";
 
 export function ensureDir(path: string): void {
   mkdirSync(path, { recursive: true });
 }
 
 export function writeFileAtomic(path: string, data: string | Uint8Array, mode?: number): void {
+  noteCheckPassWrite();
   const dir = dirname(path);
   ensureDir(dir);
   const tmp = join(dir, `.${randomBytes(6).toString("hex")}.tmp`);
@@ -27,6 +29,7 @@ export function readUtf8(path: string): string {
 }
 
 export function writeUtf8(path: string, data: string): void {
+  noteCheckPassWrite();
   writeFileSync(path, data, "utf8");
 }
 

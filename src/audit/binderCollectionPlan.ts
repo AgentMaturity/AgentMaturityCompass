@@ -15,6 +15,7 @@ import { auditPolicySchema } from "./auditPolicySchema.js";
 import { auditMapActivePath, auditMapBuiltinPath } from "./auditMapStore.js";
 import { auditMapSchema } from "./auditMapSchema.js";
 import { buildBinderProofs } from "./binderProofs.js";
+import { inCheckPass } from "../utils/checkPass.js";
 
 export function captureAuditBinderPolicies(workspace: string, includeBuiltin: boolean) {
   const policyPath = auditPolicyPath(workspace), mapPath = auditMapActivePath(workspace), builtinPath = auditMapBuiltinPath(workspace);
@@ -28,9 +29,9 @@ export function captureAuditBinderPolicies(workspace: string, includeBuiltin: bo
   const policy = auditPolicySchema.parse(YAML.parse(checked(policyPath, "BUNDLE").toString("utf8")) as unknown);
   const map = auditMapSchema.parse(YAML.parse(checked(mapPath, "COMPLIANCE_MAPS").toString("utf8")) as unknown);
   if (includeBuiltin) checked(builtinPath, "COMPLIANCE_MAPS");
-  return { policy, map, inputPaths: Object.freeze(before.members.map(row => row.path)), assertCurrent() {
+  return { policy, map, inputPaths: Object.freeze(before.members.map(row => row.path)), assertCurrent: inCheckPass(() => {
     assertOrgPairsCurrent(before); checked(policyPath, "BUNDLE"); checked(mapPath, "COMPLIANCE_MAPS"); if (includeBuiltin) checked(builtinPath, "COMPLIANCE_MAPS"); assertOrgPairsCurrent(before);
-  } };
+  }) };
 }
 /** All local facts/selected window rows are observed before the first actual notary await. */
 export function prepareAuditBinderCollection(input: AuditBinderCollectionInput, assertOriginal: () => void, includeProofs: boolean) {
@@ -47,14 +48,14 @@ export function prepareAuditBinderCollection(input: AuditBinderCollectionInput, 
   assertOriginal();
   const local = collectAuditBinderLocalData(params, true), observed = canonicalize(local);
   const proofs = includeProofs ? buildBinderProofs({ workspace: params.workspace, includeEventKinds: local.includedEventKinds }) : null;
-  const assertCurrent = () => {
+  const assertCurrent = inCheckPass(() => {
     assertOriginal(); assertOrgPairsCurrent(fixed);
     // Re-read only this operation's used projection and exact selected time-window rows; new unrelated valid rows may progress.
     if (canonicalize(collectAuditBinderLocalData(params, true)) !== observed) throw new Error("audit collection inputs changed while signing");
     if (proofs !== null && canonicalize(buildBinderProofs({ workspace: params.workspace, includeEventKinds: local.includedEventKinds })) !== canonicalize(proofs))
       throw new Error("audit inclusion proof inputs changed while signing");
     assertOriginal(); assertOrgPairsCurrent(fixed);
-  };
+  });
   assertCurrent();
   const inputPaths = Object.freeze([...fixed.members.map(row => row.path),
     ...["evidence.sqlite", "evidence.sqlite-wal", "evidence.sqlite-shm", "ops-policy.yaml", "trust.yaml", "tools.yaml", "budgets.yaml",

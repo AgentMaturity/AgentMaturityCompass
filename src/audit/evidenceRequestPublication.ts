@@ -14,6 +14,7 @@ import { captureDirectories } from "./auditPolicyMapPublication.js";
 import { captureAuditOutputAliases } from "./binderOutputAliases.js";
 import { AuditBinderPublicationError, publishAuditFiles, type AuditPublicationOptions } from "./binderPublication.js";
 import { evidenceRequestSchema, type EvidenceRequest } from "./evidenceRequestSchema.js";
+import { inCheckPass } from "../utils/checkPass.js";
 
 export interface CreateEvidenceRequestInput {
   workspace: string; scopeType: "WORKSPACE" | "NODE" | "AGENT"; scopeId: string;
@@ -51,7 +52,7 @@ function captureRequestPublication(workspace: string, next: EvidenceRequest, bef
   let phase = "capture", attemptedPath: string | null = null, attemptedSource: string | null = null, setup = false, acknowledgedLogHash: string | null = null;
   let expected: OrgPairsSnapshot = { members: before.members.map(row => ({ ...row, bytes: row.bytes === null ? null : Buffer.from(row.bytes) })) };
   let ownLog: (() => void) | null = null, preparingOriginal = true;
-  const stable = () => {
+  const stable = inCheckPass(() => {
     if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize policy signing");
     caller.beforePublish?.(); if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize policy signing");
     caller.assertInputsCurrent?.(); if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize policy signing");
@@ -61,12 +62,12 @@ function captureRequestPublication(workspace: string, next: EvidenceRequest, bef
       throw new Error("original evidence request is not historically admitted for BUNDLE");
     if (authority !== undefined) { authority.parents.assertCurrent(); if (ownLog === null && phase !== "request-log") authority.priorLogCurrent?.(); }
     original(); originalLog.assertCurrent(); for (const signature of signatures) signature.assertCurrent(); dirs.assertCurrent();
-  };
-  const assertCurrent = () => { stable(); ownLog?.(); assertOrgPairsCurrent(expected); };
-  const beforeSign = () => {
+  });
+  const assertCurrent = inCheckPass(() => { stable(); ownLog?.(); assertOrgPairsCurrent(expected); });
+  const beforeSign = inCheckPass(() => {
     if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize policy signing");
     if (preparingOriginal) caller.assertPreparationInputsCurrent?.(); assertCurrent();
-  };
+  });
   const lock = <T>(operation: () => T) => withControlFileLock({ root: join(workspace, ".amc", "audit"), name: "binder-publication", operation });
   const progress = (): Readonly<EvidenceRequestPublicationProgress> => Object.freeze({ phase,
     returnedMembers: Object.freeze(returned.map(row => Object.freeze({ ...row }))), acknowledgedSteps: Object.freeze([...acknowledged]),
@@ -159,10 +160,10 @@ function captureRequestParents(workspace: string) {
     return { path, physical, identity: `${row.dev}:${row.ino}`, mode: row.mode & 0o777 };
   } catch (cause) { if ((cause as NodeJS.ErrnoException).code === "ENOENT") return { path, physical, identity: null, mode: null }; throw cause; } };
   const expected = new Map(paths.map(path => [path, read(path)])), mode = 0o777 & ~process.umask();
-  const assertCurrent = () => { if ((0o777 & ~process.umask()) !== mode) throw new Error("original evidence request directory mode changed");
+  const assertCurrent = inCheckPass(() => { if ((0o777 & ~process.umask()) !== mode) throw new Error("original evidence request directory mode changed");
     for (const old of expected.values()) { const current = read(old.path);
     if (old.physical !== current.physical || old.identity !== current.identity || old.mode !== current.mode) throw new Error("original evidence request parent changed");
-  } };
+  } });
   return { assertCurrent, assertBinderOutputsSafe(outputs: readonly string[]) { assertCurrent();
     for (const output of outputs) { const destination = physicalPathWithMissingSuffix(output);
       for (const parent of expected.values()) if (isWithin(destination, parent.physical) || (parent.identity === null && isWithin(parent.physical, destination)))
@@ -190,14 +191,14 @@ export function captureEvidenceRequestFulfillmentPublication(workspace: string, 
   const request = evidenceRequestSchema.parse(JSON.parse(bytes.toString("utf8")));
   if (request.requestId !== requestId || (request.status !== "OPEN" && request.status !== "APPROVED")) throw new Error("evidence request is not fulfillable");
   const parents = captureRequestParents(workspace), original = captureOrgPairsAuthority(workspace), log = captureWorkspaceLogAuthority(workspace);
-  const assertPreparingCurrent = () => {
+  const assertPreparingCurrent = inCheckPass(() => {
     if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize policy signing");
     caller.beforePublish?.(); if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize policy signing");
     caller.assertInputsCurrent?.();
     if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize policy signing");
     if (signature === null || !verifyAuditorSignatureBytes(workspace, "BUNDLE", bytes, signature).valid) throw new Error("original evidence request is not historically admitted for BUNDLE");
     parents.assertCurrent(); original(); log.assertCurrent(); assertOrgPairsCurrent(before);
-  };
+  });
   assertPreparingCurrent();
   return Object.freeze({ request: structuredClone(request), assertPreparingCurrent,
     assertBinderOutputsSafe(outputs: readonly string[]) { parents.assertBinderOutputsSafe(outputs); captureAuditOutputAliases(outputs, before.members.map(row => row.path))(); },

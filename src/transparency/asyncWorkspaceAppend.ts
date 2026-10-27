@@ -16,6 +16,7 @@ import { loadTrustConfig } from "../trust/trustConfig.js";
 import { ensureDir, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
+import { inCheckPass } from "../utils/checkPass.js";
 import { transparencyEntrySchema, transparencySealSchema, transparencySealSignatureSchema,
   type TransparencyArtifactKind, type TransparencyEntry } from "./logSchema.js";
 import { entryTreeRoot, type MerkleAlgorithm } from "./merkle.js";
@@ -128,13 +129,13 @@ export function captureWorkspaceLogAuthority(workspace: string, beforeCommit?: (
   const sealSigner = captureSigner(workspace, describePolicySigner(workspace, "TRANSPARENCY_ROOT"));
   const rootSigner = captureSigner(workspace, describePolicySigner(workspace, "MERKLE_ROOT"));
   const policy = JSON.stringify(loadTrustConfig(workspace)), keyset = canonicalize(assertKeysetComplete(workspace));
-  const assertIntrinsicCurrent = (signedSeal?: SignedDigest, signedRoot?: SignedDigest) => {
+  const assertIntrinsicCurrent = inCheckPass((signedSeal?: SignedDigest, signedRoot?: SignedDigest) => {
     signingEnabled();
     assertSignerCurrent(workspace, sealSigner, signedSeal); assertSignerCurrent(workspace, rootSigner, signedRoot);
     if (canonicalize(assertKeysetComplete(workspace)) !== keyset) throw new Error("transparency original keyset changed while signing was prepared");
     if (JSON.stringify(loadTrustConfig(workspace)) !== policy) throw new Error("transparency signing policy changed while signing was prepared");
-  };
-  const assertCurrent = (signedSeal?: SignedDigest, signedRoot?: SignedDigest) => { signingEnabled(); beforeCommit?.(); signingEnabled(); assertIntrinsicCurrent(signedSeal, signedRoot); };
+  });
+  const assertCurrent = inCheckPass((signedSeal?: SignedDigest, signedRoot?: SignedDigest) => { signingEnabled(); beforeCommit?.(); signingEnabled(); assertIntrinsicCurrent(signedSeal, signedRoot); });
   assertCurrent(); return { sealSigner, rootSigner, assertCurrent, assertIntrinsicCurrent };
 }
 
@@ -163,7 +164,7 @@ class TransparencyAppendPublicationError extends Error {
 export async function appendTransparencyEntryAttemptAsync(input: TransparencyAppendInput, options: TransparencyAppendOptions = {}): Promise<TransparencyAppendAttempt> {
   const params = { workspace: input.workspace, type: input.type, agentId: input.agentId, artifact: { ...input.artifact } };
   const beforeCommit = options.beforeCommit, memberCaller = options.beforeMember, workspace = params.workspace;
-  const beforeMember = () => { signingEnabled(); memberCaller?.(); signingEnabled(); };
+  const beforeMember = inCheckPass(() => { signingEnabled(); memberCaller?.(); signingEnabled(); });
   beforeMember();
   const original = captureWorkspaceLogAuthority(workspace, beforeCommit), { sealSigner, rootSigner } = original;
   const publication = captureTransparencyAppendPublication(workspace), before = publication.state, predecessor = verifiedPredecessor(workspace, before);
@@ -176,9 +177,9 @@ export async function appendTransparencyEntryAttemptAsync(input: TransparencyApp
     signerFingerprint: sealSigner.descriptor.fingerprint, merkleAlgorithm: predecessor.algorithm }), null, 2));
   const plan = prepareMerkle({ workspace, algorithm: predecessor.algorithm, log: stateBytes(before, workspaceLogPath(workspace)),
     append: { entryHash: entry.hash, prevEntryHash: entry.prev }, rebuild: true });
-  const assertPreparing = (signedSeal?: SignedDigest, signedRoot?: SignedDigest) => {
+  const assertPreparing = inCheckPass((signedSeal?: SignedDigest, signedRoot?: SignedDigest) => {
     beforeMember?.(); original.assertCurrent(signedSeal, signedRoot); publication.assertCurrent();
-  };
+  });
   assertPreparing();
   const signedSeal = await signDigestWithPolicyAsync({ workspace, kind: "TRANSPARENCY_ROOT", digestHex: sha256Hex(seal), expectedSigner: sealSigner.descriptor,
     beforeSign: () => assertPreparing() });
@@ -199,8 +200,8 @@ export async function appendTransparencyEntryAttemptAsync(input: TransparencyApp
     directoryAttempts: Object.freeze([...directoryAttempts]), directoryReturns: Object.freeze([...directoryReturns]),
     returnedMembers: Object.freeze(returnedMembers.map(row => Object.freeze({ ...row }))), attemptedPath,
     lineWriteReturned, lineAcknowledged, rootCovered });
-  const intrinsic = () => original.assertIntrinsicCurrent(signedSeal, signedRoot);
-  const assertStable = () => { beforeMember?.(); intrinsic(); publication.assertCurrent(); };
+  const intrinsic = inCheckPass(() => original.assertIntrinsicCurrent(signedSeal, signedRoot));
+  const assertStable = inCheckPass(() => { beforeMember?.(); intrinsic(); publication.assertCurrent(); });
   const directory = (path: string) => {
     phase = `directory:${path}`; directoryAttempts.push(path); ensureDir(path); directoryReturns.push(path);
   };
@@ -240,7 +241,7 @@ export async function appendTransparencyEntryAttemptAsync(input: TransparencyApp
       }
       publication.acknowledgeAbsent(pendingPath); attemptedPath = null;
       phase = "final-continuation"; assertStable();
-      const assertCurrent = () => { intrinsic(); publication.assertCurrent(); };
+      const assertCurrent = inCheckPass(() => { intrinsic(); publication.assertCurrent(); });
       return Object.freeze({ entry, assertCurrent });
     } catch (cause) {
       const failed = progress();

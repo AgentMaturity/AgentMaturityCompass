@@ -7,6 +7,7 @@ import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
 import { getApprovalInboxItem } from "./approvalInbox.js";
 import { ApprovalRequestContinuationError } from "./approvalRequestPublication.js";
+import { inCheckPass } from "../utils/checkPass.js";
 
 export const approvalDeliveryTriggerSchema = z.enum([
   "REQUEST_CREATED",
@@ -279,10 +280,10 @@ export async function deliverApprovalLifecycle(params: {
 }, options: { beforePublish?: () => void } = {}): Promise<ApprovalDeliverySummary> {
   const caller = options.beforePublish;
   let failure: { cause: unknown } | null = null;
-  const current = () => {
+  const current = inCheckPass(() => {
     if (failure !== null) throw failure.cause;
     try { caller?.(); } catch (cause) { failure = { cause }; throw cause; }
-  };
+  });
   const afterFailure = (cause: unknown) => {
     try { current(); }
     catch (primary) {

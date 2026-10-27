@@ -14,6 +14,7 @@ import { keyPolicy, loadKeysConfig } from "../keys/keysConfig.js";
 import { assertSigningKeyUsable, getSigningKey } from "../keys/signingKeys.js";
 import { vaultStatus } from "../vault/vault.js";
 import { publicKeyFromPrivate } from "../crypto/keyHistoryEnvelope.js";
+import { inCheckPass } from "../utils/checkPass.js";
 
 /** Fixed BUNDLE operation gate. Capture before the caller's FIRST await, not after a prerequisite. */
 export function captureOrgPairsAuthority(workspace: string, beforePublish?: () => void): () => void {
@@ -25,7 +26,7 @@ export function captureOrgPairsAuthority(workspace: string, beforePublish?: () =
   const keyset = canonicalize(assertKeysetComplete(workspace)), trust = canonicalize(loadTrustConfig(workspace));
   const holder = descriptor.mode === "VAULT" ? boundProviderKey(workspace, "artifact-seal")?.binding.provider ?? "file" : null;
   const selectedPolicy = purpose === null ? null : canonicalize(keyPolicy(loadKeysConfig(workspace)));
-  const assertCurrent = () => {
+  const assertCurrent = inCheckPass(() => {
     enabled(); actor?.(); enabled();
     assertPolicySignerCurrent(workspace, descriptor);
     if (canonicalize(assertKeysetComplete(workspace)) !== keyset || canonicalize(loadTrustConfig(workspace)) !== trust)
@@ -41,7 +42,7 @@ export function captureOrgPairsAuthority(workspace: string, beforePublish?: () =
           throw new Error("original BUNDLE vault key changed or is unavailable");
       }
     }
-  };
+  });
   assertCurrent(); return assertCurrent;
 }
 
@@ -137,13 +138,13 @@ export function publishOrgPairs(workspace: string, writes: readonly OrgPairWrite
 export async function prepareOrgPairsAsync(workspace: string, writes: readonly OrgPairWrite[], options: OrgPairsOptions = {}, previous?: OrgPairsSnapshot) {
   const beforePublish = captureOrgPairsAuthority(workspace, options.beforePublish), assertInputsCurrent = options.assertInputsCurrent;
   beforePublish(); const planned = plan(writes, previous), prepared: Awaited<ReturnType<typeof prepareFileSignatureWithAuditor>>[] = [];
-  const beforeSign = () => { beforePublish(); assertInputsCurrent?.(); beforePublish(); assertOrgPairsCurrent(planned.before); };
+  const beforeSign = inCheckPass(() => { beforePublish(); assertInputsCurrent?.(); beforePublish(); assertOrgPairsCurrent(planned.before); });
   for (const row of planned.own) { beforeSign(); prepared.push(await prepareFileSignatureWithAuditor(workspace, row.path, row.bytes, "BUNDLE", beforeSign)); beforePublish(); }
   let assertPublishedCurrent: (() => void) | null = null;
-  const assertCurrent = () => { beforePublish?.(); for (const row of prepared) row.assertCurrent();
+  const assertCurrent = inCheckPass(() => { beforePublish?.(); for (const row of prepared) row.assertCurrent();
     // Retain the exact own identities validated inside publication; never adopt a fresh byte-equivalent winner.
     assertPublishedCurrent?.();
-  };
+  });
   return Object.freeze({ assertCurrent, publish() {
     const result = publish(workspace, planned, prepared.map(row => row.signatureBytes), assertCurrent, { beforePublish, assertInputsCurrent });
     assertPublishedCurrent = result.assertCurrent; return result.paths;

@@ -9,6 +9,7 @@ import { executeAction, selectAgentId } from "./mechanicExecutionActions.js";
 import { captureMechanicApprovals } from "./mechanicExecutionApprovals.js";
 import { captureMechanicRun, mechanicProgress, mechanicFailed, appendMechanicEntry, MechanicPublicationError } from "./mechanicPublication.js";
 import type { MechanicUpgradePlan } from "./upgradePlanSchema.js";
+import { inCheckPass } from "../utils/checkPass.js";
 
 type RequestParams = { workspace: string; planId: string; actor: string; reason: string };
 type ExecuteParams = { workspace: string; planId: string };
@@ -26,7 +27,7 @@ function context(workspace: string, planId: string, beforePublish: () => void) {
   const run = captureMechanicRun(workspace, beforePublish), captured = captureMechanicPlanById(workspace, planId), state = mechanicProgress();
   let published: (() => void) | null = null;
   const assertPlan = () => { if (published === null) captured.assertCurrent(); else published(); };
-  const assertCurrent = () => { run.beforePublish(); assertPlan(); run.fixed(); };
+  const assertCurrent = inCheckPass(() => { run.beforePublish(); assertPlan(); run.fixed(); });
   return { run, captured, state, assertPlan, assertInputs: assertPlan, assertCurrent, failed(cause: unknown): never { return mechanicFailed(state, cause); }, async save(plan: MechanicUpgradePlan, assertInputs: () => void = () => {}) {
     state.phase = "plan-prepare"; state.entryHash = null; state.pendingRecorded = null;
     run.beforePublish(); assertPlan(); assertInputs(); run.fixed();
@@ -140,7 +141,7 @@ export async function executeMechanicPlanForAuthority(params: ExecuteParams, bef
   const input = { ...params }, current = context(input.workspace, input.planId, beforePublish), plan = current.captured.plan;
   const grants = captureMechanicApprovals(input.workspace, plan), executed: Executed[] = [], consumptions: Consumption[] = [];
   let attemptedActionId: string | null = null;
-  const assertCurrent = () => { current.run.beforePublish(); current.assertPlan(); grants.assertCurrent(); current.run.fixed(); };
+  const assertCurrent = inCheckPass(() => { current.run.beforePublish(); current.assertPlan(); grants.assertCurrent(); current.run.fixed(); });
   const fail = (cause: unknown, recordingErrors: readonly unknown[] = []): never => {
     let publicationError: unknown | null = null;
     try { mechanicFailed(current.state, recordingErrors.at(-1) ?? cause); }
@@ -153,7 +154,7 @@ export async function executeMechanicPlanForAuthority(params: ExecuteParams, bef
   for (const phase of plan.phases) for (const action of phase.actions) {
     attemptedActionId = action.id;
     try {
-      const beforeEffect = (policyPairInFlight = false) => { current.run.beforePublish(); current.assertPlan(); grants.assertCurrent(policyPairInFlight); current.run.fixed(); };
+      const beforeEffect = inCheckPass((policyPairInFlight: boolean = false) => { current.run.beforePublish(); current.assertPlan(); grants.assertCurrent(policyPairInFlight); current.run.fixed(); });
       current.state.phase = `action:${action.id}`; current.state.entryHash = null; current.state.pendingRecorded = null; beforeEffect();
       if (action.approvalRequestId) assertVaultMaySign(input.workspace, "artifact-seal");
       const out = await executeAction({ workspace: input.workspace, plan, action,

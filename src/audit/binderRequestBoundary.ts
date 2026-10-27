@@ -9,10 +9,11 @@ import { sha256Hex } from "../utils/hash.js";
 import { auditRequestsOpenDir, auditRequestsClosedDir } from "./auditPolicyStore.js";
 import { evidenceRequestSchema } from "./evidenceRequestSchema.js";
 import type { AuditPublicationOptions } from "./binderPublication.js";
+import { inCheckPass } from "../utils/checkPass.js";
 
 export function captureAuditApiAuthority(workspace: string, options: AuditPublicationOptions) {
   const bundle = captureOrgPairsAuthority(workspace, options.beforePublish), log = captureWorkspaceLogAuthority(workspace, bundle);
-  return () => { bundle(); log.assertCurrent(); };
+  return inCheckPass(() => { bundle(); log.assertCurrent(); });
 }
 /** Preserve the existing loader's open-before-closed semantics. This snapshot adds no new request trust admission. */
 export function captureBinderEvidenceRequest(workspace: string, requestId?: string | null) {
@@ -35,12 +36,12 @@ export function captureBinderFulfillment(workspace: string, requestId: string, a
   const pending = pendingFulfillmentSchema.parse(JSON.parse(bytes.toString("utf8")) as unknown);
   if (pending.requestId !== request.requestId) throw new Error("audit fulfillment approval identity differs");
   const expectedIntentHash = sha256Hex(canonicalize({ requestId: request.requestId, scopeType: request.scope.type, scopeId: request.scope.id, requestedItems: request.requestedItems }));
-  const assertCurrent = () => { assertOriginal(); selected.assertCurrent(); assertOrgPairsCurrent(before);
+  const assertCurrent = inCheckPass(() => { assertOriginal(); selected.assertCurrent(); assertOrgPairsCurrent(before);
     const verified = verifyApprovalForExecution({ workspace, approvalId: pending.approvalRequestId, expectedAgentId: pending.agentId,
       expectedIntentId: pending.intentId, expectedIntentHash, expectedToolName: "audit.request.fulfill", expectedActionClass: "SECURITY" });
     if (!verified.ok) throw new Error("audit fulfillment approval is not executable");
     assertOriginal(); selected.assertCurrent(); assertOrgPairsCurrent(before);
-  };
+  });
   assertCurrent(); return { request, pending: structuredClone(pending), assertCurrent, assertPendingCurrent: () => assertOrgPairsCurrent(before), assertOutputsSafe(paths: readonly string[]) {
     selected.assertOutputsSafe(paths); captureAuditOutputAliases(paths, [path])();
   } };

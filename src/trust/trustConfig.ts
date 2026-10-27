@@ -14,6 +14,7 @@ import { addPublicKeyToHistory } from "../crypto/keys.js";
 import { buildNotaryAuthSignature } from "../notary/notaryAuth.js";
 import { signDigestWithVault } from "../crypto/signing/signerVault.js";
 import type { NotaryAttestationBasis } from "../notary/notaryApiTypes.js";
+import { inCheckPass } from "../utils/checkPass.js";
 
 function signTrustConfigWithVault(workspace: string, path: string): string {
   const digest = sha256Hex(Buffer.from(readUtf8(path), "utf8"));
@@ -144,13 +145,13 @@ export function defaultTrustConfig(): TrustConfig {
   });
 }
 
-export function loadTrustConfig(workspace: string): TrustConfig {
+export const loadTrustConfig = inCheckPass(function loadTrustConfig(workspace: string): TrustConfig {
   const path = trustConfigPath(workspace);
   if (!pathExists(path)) {
     return defaultTrustConfig();
   }
   return trustConfigSchema.parse(YAML.parse(readUtf8(path)) as unknown);
-}
+});
 
 export function initTrustConfig(workspace: string): {
   path: string;
@@ -189,7 +190,7 @@ function saveTrustConfig(workspace: string, config: TrustConfig): {
   };
 }
 
-export function verifyTrustConfigSignature(workspace: string): {
+export const verifyTrustConfigSignature = inCheckPass(function verifyTrustConfigSignature(workspace: string): {
   valid: boolean;
   signatureExists: boolean;
   reason: string | null;
@@ -197,7 +198,7 @@ export function verifyTrustConfigSignature(workspace: string): {
   sigPath: string;
 } {
   return verifyTrustConfigPublication(workspace);
-}
+});
 
 async function httpJsonGet(params: {
   baseUrl: string;

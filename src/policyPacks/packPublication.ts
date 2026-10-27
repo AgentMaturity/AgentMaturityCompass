@@ -29,6 +29,7 @@ import { canonicalize } from "../utils/json.js";
 import { ensureDir, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { buildDashboard } from "../dashboard/build.js";
+import { inCheckPass } from "../utils/checkPass.js";
 
 interface Options { beforePublish?: () => void; recordEffect?: (effect: string) => void }
 class PolicyPackPublicationError extends Error {
@@ -92,12 +93,12 @@ export async function applyPolicyPackAsync(input: { workspace: string; agentId?:
   const record = (effect: string) => { completed.push(effect); recordEffect?.(effect); };
   const fixed = () => { config.assertCurrent(); log.assertCurrent(); };
   // PP-D1: child callbacks never invoke completed handles, so this base is nonrecursive.
-  const base = () => {
+  const base = inCheckPass(() => {
     beforePublish?.(); assertActionPolicyWriterReady(workspace);
     selectionCurrent(); fixed();
     assertOrgPairsCurrent(contextBefore); if (previousBefore !== null) assertOrgPairsCurrent(previousBefore);
     assertOrgPairsCurrent(expected);
-  };
+  });
   const observe = (path: string) => {
     // Gate returns an absolute path. Retain the original snapshot's spelling and genuine physical destination.
     const selectedPath = expected.members.find(member => resolve(member.path) === resolve(path))?.path;
@@ -128,12 +129,12 @@ export async function applyPolicyPackAsync(input: { workspace: string; agentId?:
     let actionDone = false, toolsDone = false, budgetsDone = false, alertsDone = false, approvalDone = false;
     let gateCurrent: (() => void) | null = null, targetCurrent: (() => void) | null = null;
     let latestLog: TransparencyAppendAttempt | null = null;
-    const current = () => {
+    const current = inCheckPass(() => {
       base();
       if (actionDone) action.assertCurrent(); if (toolsDone) tools.assertCurrent();
       if (budgetsDone) budgets.assertCurrent(); if (alertsDone) alerts.assertCurrent(); if (approvalDone) approval.assertCurrent();
       gateCurrent?.(); targetCurrent?.(); base();
-    };
+    });
     action.assertCurrent(); tools.assertCurrent(); budgets.assertCurrent(); alerts.assertCurrent(); approval.assertCurrent(); base();
     const files: PolicyPackApplyResult["files"] = [];
     withControlFileLock({ root: dirname(actionPolicyPath(workspace)), name: ACTION_POLICY_WRITER_LOCK, timeoutMs: 500, operation: () => {
@@ -195,7 +196,7 @@ export async function applyPolicyPackAsync(input: { workspace: string; agentId?:
     files.push({ path: targetPath, sha256: sha256Hex(Buffer.from(JSON.stringify(profile))) });
     const transparencyHash = await append("POLICY_PACK_APPLIED", sha256Hex(Buffer.from(JSON.stringify(files))), pack.id);
     phase = "ledger-audit"; attemptedPath = null; entryHash = null; pendingRecorded = null; current(); latestLog!.assertCurrent();
-    const auditCurrent = () => { current(); latestLog!.assertCurrent(); base(); };
+    const auditCurrent = inCheckPass(() => { current(); latestLog!.assertCurrent(); base(); });
     const auditEventId = writePolicyPackAudit(workspace, agentId, { auditType: "POLICY_PACK_APPLIED", severity: "LOW", packId: pack.id, files }, auditCurrent, record);
     phase = "dashboard"; auditCurrent();
     try { const dashboard = buildDashboard({ workspace, agentId, outDir: `.amc/agents/${agentId}/dashboard` });
