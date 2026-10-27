@@ -2,20 +2,65 @@
  * One check pass (P2-08 performance). Currentness gates nest: an outer gate re-runs inner gates that re-run the same
  * authority checks, so one outer gate evaluated the same keyset, signer and trust checks many times with nothing in
  * between. A function wrapped here opens a pass when it is the outermost wrapped call on the stack; inside that pass a
- * wrapped call with the same arguments that already returned is answered from the pass, unless this process wrote a file
- * since (writeFileAtomic and the contained writers end the reuse). The pass is synchronous and closes when the outermost
- * call returns or throws, so nothing survives an await, a later gate, or another operation: every outermost gate (the
- * one each caller runs before a write) reads current state again. Failures are never reused. Wrap only synchronous checks.
+ * wrapped call with the same arguments that already returned is answered from the pass, unless anything that could
+ * change its answer happened since: any synchronous node:fs mutation by this process (every writer, including a caller
+ * callback's raw writes, is counted), a vault lock or unlock, or a change to an AMC_* environment variable. The pass
+ * is synchronous and closes when the outermost call returns or throws, so nothing survives an await, a later gate, or
+ * another operation: every outermost gate (the one each caller runs before a write) reads current state again.
+ * Failures are never reused, and a reused value is a fresh copy, so a caller mutating it cannot change a later answer.
+ * Wrap only synchronous checks.
  */
-import { readFileSync, statSync } from "node:fs";
+import fs, { readFileSync, statSync } from "node:fs";
+import { syncBuiltinESMExports } from "node:module";
 
-let open: Map<Function, { args: unknown[]; writes: number; value: unknown }[]> | null = null;
+let open: Map<Function, { args: unknown[]; writes: number; env: string; value: unknown }[]> | null = null;
 let reads = new Map<string, { identity: string; writes: number; bytes: Buffer }>();
 let writes = 0;
 
-/** Called by this process's file writers: a later check in the same pass reads again. */
+/** Ends reuse in the current pass: a later check reads again. Called for state changes node:fs does not see. */
 export function noteCheckPassWrite(): void {
   writes++;
+}
+
+// Count every synchronous mutation through node:fs, so a write anywhere in a pass (a caller's beforePublish hook
+// included) ends reuse. Read-only opens are not counted; any other open flag is.
+const MUTATORS = ["writeFileSync", "appendFileSync", "renameSync", "unlinkSync", "rmSync", "rmdirSync",
+  "mkdtempSync", "symlinkSync", "linkSync", "chmodSync", "fchmodSync", "lchmodSync", "chownSync", "fchownSync",
+  "lchownSync", "truncateSync", "ftruncateSync", "copyFileSync", "cpSync", "utimesSync", "futimesSync", "lutimesSync",
+  "writeSync", "writevSync", "fsyncSync", "fdatasyncSync"] as const;
+const mutable = fs as unknown as Record<string, unknown>;
+for (const name of MUTATORS) {
+  const original = mutable[name];
+  if (typeof original !== "function") continue;
+  mutable[name] = function (this: unknown, ...args: unknown[]) { writes++; return (original as (...a: unknown[]) => unknown).apply(this, args); };
+}
+// mkdirSync counts only when it creates a directory: a recursive call on an existing path (ensureDir) changes nothing.
+const originalMkdirSync = fs.mkdirSync;
+mutable.mkdirSync = function (this: unknown, ...args: unknown[]) {
+  const created = (originalMkdirSync as (...a: unknown[]) => unknown).apply(this, args);
+  const options = args[1];
+  if (created !== undefined || !(typeof options === "object" && options !== null && (options as { recursive?: boolean }).recursive)) writes++;
+  return created;
+};
+const originalOpenSync = fs.openSync;
+mutable.openSync = function (this: unknown, ...args: unknown[]) {
+  const flags = args[1];
+  if (!(flags === undefined || flags === "r" || flags === "rs" || flags === fs.constants.O_RDONLY
+    || (typeof flags === "number" && (flags & (fs.constants.O_WRONLY | fs.constants.O_RDWR | fs.constants.O_CREAT | fs.constants.O_TRUNC | fs.constants.O_APPEND)) === 0))) writes++;
+  return (originalOpenSync as (...a: unknown[]) => unknown).apply(this, args);
+};
+syncBuiltinESMExports();
+
+function envFingerprint(): string {
+  let out = "";
+  for (const key of Object.keys(process.env)) if (key.startsWith("AMC_")) out += `${key}=${process.env[key]}\0`;
+  return out;
+}
+
+/** A private copy, or undefined when the value cannot be copied (then it is not reused). */
+function copyOf(value: unknown): { value: unknown } | undefined {
+  if (value === undefined || value === null || typeof value !== "object") return { value };
+  try { return { value: structuredClone(value) }; } catch { return undefined; }
 }
 
 function sameArg(a: unknown, b: unknown): boolean {
@@ -34,25 +79,29 @@ export function inCheckPass<A extends unknown[], R>(fn: (...args: A) => R): (...
       open = new Map();
       try { return fn(...args); } finally { open = null; reads = new Map(); }
     }
-    const hit = open.get(fn)?.find(row => row.writes === writes && row.args.length === args.length && row.args.every((arg, i) => sameArg(arg, args[i])));
-    if (hit !== undefined) return hit.value as R;
+    const env = envFingerprint();
+    const hit = open.get(fn)?.find(row => row.writes === writes && row.env === env && row.args.length === args.length
+      && row.args.every((arg, i) => sameArg(arg, args[i])));
+    if (hit !== undefined) { const copy = copyOf(hit.value); if (copy !== undefined) return copy.value as R; }
     const before = writes, value = fn(...args);
-    if (open !== null && writes === before) open.set(fn, [...(open.get(fn) ?? []), { args, writes, value }]);
+    const stored = copyOf(value);
+    if (open !== null && writes === before && stored !== undefined && envFingerprint() === env)
+      open.set(fn, [...(open.get(fn) ?? []), { args: [...args], writes, env, value: stored.value }]);
     return value;
   };
 }
 
 /**
  * A file read inside a check pass: the same path with the same stat identity (dev, inode, size, mtime and ctime in
- * nanoseconds) and no write by this process since is answered with the bytes already read in this pass. Every call
- * stats the file again, so a replaced or rewritten file is read again. Outside a pass it is a plain read.
+ * nanoseconds) and no write by this process since is answered with a copy of the bytes already read in this pass. Every
+ * call stats the file again, so a replaced or rewritten file is read again. Outside a pass it is a plain read.
  */
 export function readFileInPass(path: string): Buffer {
   if (open === null) return readFileSync(path);
   const stat = statSync(path, { bigint: true }), identity = `${stat.dev}:${stat.ino}:${stat.size}:${stat.mtimeNs}:${stat.ctimeNs}`;
   const hit = reads.get(path);
-  if (hit !== undefined && hit.identity === identity && hit.writes === writes) return hit.bytes;
+  if (hit !== undefined && hit.identity === identity && hit.writes === writes) return Buffer.from(hit.bytes);
   const bytes = readFileSync(path);
-  reads.set(path, { identity, writes, bytes });
+  reads.set(path, { identity, writes, bytes: Buffer.from(bytes) });
   return bytes;
 }

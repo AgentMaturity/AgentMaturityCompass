@@ -1,4 +1,4 @@
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, test } from "vitest";
@@ -44,5 +44,30 @@ describe("check pass (P2-08 gate dedupe)", () => {
     });
     expect(outer()).toEqual(["one", "one", "three"]);
     expect(readFileInPass(path).toString()).toBe("three");
+  });
+});
+
+describe("check pass reuse never outlives what it answered (security review)", () => {
+  test("a caller mutating a returned value cannot change a later answer in the same pass", () => {
+    const history = inCheckPass(() => ["key-a"]);
+    const outer = inCheckPass(() => {
+      const first = history(); first.push("attacker-key");
+      return history();
+    });
+    expect(outer()).toEqual(["key-a"]);
+  });
+
+  test("a raw node:fs write inside a caller callback ends reuse", () => {
+    const dir = mkdtempSync(join(tmpdir(), "amc-check-pass-")), path = join(dir, "state"); roots.push(dir);
+    writeFileSync(path, "one");
+    const check = inCheckPass(() => readFileSync(path, "utf8"));
+    const outer = inCheckPass((callback: () => void) => { const before = check(); callback(); return [before, check()]; });
+    expect(outer(() => writeFileSync(path, "two"))).toEqual(["one", "two"]);
+  });
+
+  test("an AMC_* environment change inside the pass ends reuse", () => {
+    const check = inCheckPass(() => process.env.AMC_NO_SIGN ?? "unset");
+    const outer = inCheckPass(() => { const before = check(); process.env.AMC_NO_SIGN = "1"; return [before, check()]; });
+    try { expect(outer()).toEqual(["unset", "1"]); } finally { delete process.env.AMC_NO_SIGN; }
   });
 });

@@ -20,6 +20,7 @@ import {
   LOCAL_PURPOSES, ROLE_PRIMARY_PURPOSE, isLocalPurpose, parseVaultPayload, payloadFromRoleKeys, purposeKey, roleOfPurpose, safeSecrets,
   type LocalPurpose, type VaultPayloadV2
 } from "./vaultPayload.js";
+import { noteCheckPassWrite } from "../utils/checkPass.js";
 
 
 export type VaultKeyKind = "monitor" | "auditor" | "lease" | "session";
@@ -466,7 +467,8 @@ function openVaultSession(workspace: string, phrase: string): void {
     payload = decodePayload(readEnvelopeRaw(workspace), phrase).payload;
     openedDigest = null; // the envelope was replaced; the next unlock re-derives from the new bytes
   }
-  // Publish the session only once its payload is complete.
+  // Publish the session only once its payload is complete. A check pass answered before this sees the new session.
+  noteCheckPassWrite();
   session.unlocked = true;
   session.payload = payload; purposeContinuity.set(session, {});
   session.lastUnlockedTs = Date.now();
@@ -476,6 +478,7 @@ function openVaultSession(workspace: string, phrase: string): void {
 }
 
 export function lockVault(workspace: string): void {
+  noteCheckPassWrite();
   blobChildren.delete(workspace); receiptChildren.delete(workspace);
   readOnlySecrets.delete(workspace);
   const session = sessionFor(workspace);
