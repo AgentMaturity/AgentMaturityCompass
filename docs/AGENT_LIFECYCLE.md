@@ -98,7 +98,8 @@ as invalidated.
 Every call reads the agent's row: calls bound at P1-02's authorization stage, and the tool pipeline's and ToolHub's
 unbound reads and low-impact writes. Who is held depends on the state:
 
-- A **suspended** or **retired** agent is denied every action class, reads included.
+- A **suspended** or **retired** agent is denied every action class, reads included, in every workspace, whether or not
+  the plan enforces lifecycle. A suspension or retirement is a deliberate act by a person or an incident.
 - An agent **not yet active** (proposed, approved, or migrated without approval) is denied consequential actions only.
   These are every class except `READ_ONLY` and `WRITE_LOW`. Its reads follow the plan's visible-tool allowlist.
 
@@ -106,11 +107,12 @@ A denial carries the message `agent {id} is {state} ({reason})` and is the call'
 audits it as `AGENT_NOT_ACTIVE`). A row that does not match the agent's newest signed lifecycle row refuses. The
 scheduled-review check runs on every call.
 
-Admission enforces only when the active plan carries `L0-CHG-01` (Pinned versions). AMC reads that from the
+For an agent not yet active, admission enforces only when the active plan carries `L0-CHG-01` (Pinned versions). AMC reads that from the
 workspace's verified active plan on every decision, never from a caller's context. The tool pipeline, ToolHub's
 dispatch and provider hook decisions therefore decide alike. If the agent could be held and the active
 plan cannot be read or verified, the call is denied (fail closed). Without an enforcing plan, admission is advisory:
-the call runs and AMC writes a `LIFECYCLE_ADMISSION_WARNING` row.
+the call runs and AMC writes a `LIFECYCLE_ADMISSION_WARNING` row. This advisory mode applies only to agents not yet
+active; it never applies to a suspended or retired agent.
 
 A retired agent opens no native session. A suspended agent can still open one, but every tool call it makes is denied
 while it stays suspended.

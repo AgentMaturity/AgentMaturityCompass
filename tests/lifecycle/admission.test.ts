@@ -3,7 +3,7 @@ import "../../src/lifecycle/reassessment.js";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { openActionJournal, type ActionJournal } from "../../src/actions/actionJournal.js";
 import { openLedger } from "../../src/ledger/ledger.js";
-import { LIFECYCLE_AUDIT, lifecycleEvents, suspendAgent } from "../../src/lifecycle/governanceLifecycle.js";
+import { LIFECYCLE_AUDIT, lifecycleEvents, suspendAgent, transitionAgent } from "../../src/lifecycle/governanceLifecycle.js";
 import { compiledPolicyFacts } from "../../src/tools/guards/compiledPolicyGuard.js";
 import { toolEvidenceFor } from "../../src/tools/toolEvidence.js";
 import { ToolPipeline } from "../../src/tools/toolPipeline.js";
@@ -26,7 +26,7 @@ afterEach(() => {
 });
 
 /** The P2-24 fixture behind a journaled pipeline (receipts per state), plus one READ_ONLY tool the plan shows. */
-async function admissionFixture(options: { lifecycleControl: boolean; suspend: boolean }) {
+async function admissionFixture(options: { lifecycleControl: boolean; suspend: boolean; proposedOnly?: boolean }) {
   const base = compiledPlan({ lifecycleControl: options.lifecycleControl });
   const plan = { ...base, runtimePolicy: { ...base.runtimePolicy, toolPipeline: { ...base.runtimePolicy.toolPipeline,
     visibleTools: [...base.runtimePolicy.toolPipeline.visibleTools, READ] } } };
@@ -35,7 +35,8 @@ async function admissionFixture(options: { lifecycleControl: boolean; suspend: b
     evidencePlan: { tests: [], evidenceRequests: [], manualDuties: [], releaseGates: [] } } : null;
   f.registry.define(defineTool({ name: READ, description: "Reads nothing; records the call in memory", actionClass: "READ_ONLY",
     body: (execution) => { f.bodies.push(execution); return { output: "read", effect: "not_applied" }; } }));
-  await activate(f.workspace, ownerActor(f.workspace));
+  if (options.proposedOnly) transitionAgent({ workspace: f.workspace, agentId: AGENT, to: "proposed", actor: ownerActor(f.workspace) });
+  else await activate(f.workspace, ownerActor(f.workspace));
   if (options.suspend) suspendAgent(f.workspace, { agentId: AGENT, reason: "manual", actor: ownerActor(f.workspace, "second-owner") });
   const journal = openActionJournal(f.workspace);
   journals.push(journal);
@@ -96,11 +97,19 @@ describe("lifecycle admission at the authorization stage (P2-23)", () => {
     expect(f.bodies).toHaveLength(0);
   });
 
-  test("an advisory plan (no lifecycle control) lets the call run and writes a warning row", async () => {
+  test("an advisory plan still denies a suspended agent (an explicit suspension holds everywhere)", async () => {
     const f = await admissionFixture({ lifecycleControl: false, suspend: true });
     const outcome = await f.call(REFUND);
+    expect(outcome.denied?.reason).toContain("agent default is suspended (manual)");
+    expect(f.bodies).toHaveLength(0);
+    expect(warnings(f.workspace)).toEqual([]);
+  });
+
+  test("an advisory plan lets a proposed agent's consequential call run and writes a warning row", async () => {
+    const g = await admissionFixture({ lifecycleControl: false, suspend: false, proposedOnly: true });
+    const outcome = await g.call(REFUND);
     expect(outcome.denied).toBeNull();
-    expect(f.bodies.map((execution) => execution.name)).toEqual([REFUND]);
-    expect(warnings(f.workspace).map((row) => row.meta.problem)).toEqual(["agent default is suspended (manual)"]);
+    expect(g.bodies.map((execution) => execution.name)).toEqual([REFUND]);
+    expect(warnings(g.workspace).map((row) => row.meta.problem)).toEqual(["agent default is proposed (registered)"]);
   });
 });

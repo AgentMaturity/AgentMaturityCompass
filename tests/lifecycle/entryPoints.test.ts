@@ -105,13 +105,14 @@ describe("lifecycle enforcement comes from the workspace, at every entry point (
       requestedMode: "EXECUTE" as const, effectiveMode: "EXECUTE" as const };
     expect(bindAuthorization(execution, {})).toMatchObject({ ok: false, failures: ["agent_not_active"] });
     expect(lifecycleAdmission(f.workspace, "default")).toMatchObject({ ok: false });
+    // An explicit suspension holds in an advisory workspace (no enforcing plan) too.
     active.plan = null;
-    expect(lifecycleAdmission(f.workspace, "default")).toMatchObject({ ok: true, warning: "agent default is suspended (incident)" });
+    expect(lifecycleAdmission(f.workspace, "default")).toMatchObject({ ok: false, reason: "agent default is suspended (incident)" });
   });
 
-  test("an active plan that cannot be verified denies a held agent (fail closed); an active agent is not affected", () => {
+  test("an active plan that cannot be verified denies an agent that could be held (fail closed); an active agent is not affected", () => {
     const f = governanceFixture();
-    suspended(f.workspace, "default");
+    migrateLegacyAgents(f.workspace, ["default"]); // migrated, unapproved: held only under an enforcing plan
     active.plan = "real";
     vi.stubEnv("AMC_CONTROL_CHECKPOINT_DIR", join(f.workspace, "checkpoints-inside"));
     expect(lifecycleAdmission(f.workspace, "default")).toMatchObject({ ok: false, reason: expect.stringContaining("cannot be verified, so lifecycle admission fails closed") });
