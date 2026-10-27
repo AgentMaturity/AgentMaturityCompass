@@ -223,11 +223,14 @@ describe("actual async canary postmortem record replacement", () => {
     } finally { paused.release.resolve(); await Promise.allSettled([pending]); }
   });
 
-  test("filing retains unlocked no-sign behavior but checked locked ephemeral persistence refuses", async () => {
-    const f = fixture(); vi.stubEnv("AMC_NO_SIGN", "1"); await positive(f, "unlocked-no-sign"); const before = readFileSync(f.file);
+  test("checked filing refuses no-sign mode with an unlocked vault and locked ephemeral persistence", async () => {
+    // Signed run-hash authority refuses no-sign mode even with an unlocked vault (no unsigned or ephemeral record is written).
+    const f = fixture(); vi.stubEnv("AMC_NO_SIGN", "1"); const before = readFileSync(f.file);
+    await expect(canary.filePostmortemAsync(f.override.overrideId, "unlocked-no-sign", f.workspace)).rejects.toThrow("no-sign mode does not authorize policy signing");
+    expect(readFileSync(f.file)).toEqual(before);
     lockVault(f.workspace); vi.stubEnv("AMC_VAULT_PASSPHRASE", undefined);
     try { await expect(canary.filePostmortemAsync(f.override.overrideId, "locked", f.workspace)).rejects.toBeInstanceOf(Error); expect(readFileSync(f.file)).toEqual(before); }
-    finally { vi.stubEnv("AMC_VAULT_PASSPHRASE", PASS); unlockVault(f.workspace, PASS); }
+    finally { vi.stubEnv("AMC_VAULT_PASSPHRASE", PASS); unlockVault(f.workspace, PASS); vi.stubEnv("AMC_NO_SIGN", "0"); }
     await positive(f);
   });
 });

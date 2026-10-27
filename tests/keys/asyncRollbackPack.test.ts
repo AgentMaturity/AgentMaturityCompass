@@ -133,9 +133,9 @@ describe("actual async rollback-pack producer", () => {
     const signed: Array<{ bytes: Buffer; signature: Uint8Array }> = [], realSign = f.provider.sign.bind(f.provider);
     vi.spyOn(f.provider, "sign").mockImplementation(async (ref, bytes) => { const signature = await realSign(ref, bytes); signed.push({ bytes: Buffer.from(bytes), signature }); return signature; });
     await expect(canary.createRollbackPackAsync("default", f.policy, "changed between signatures", f.workspace)).rejects.toMatchObject({ code: "KEY_PROVIDER_KEY_REFUSED" });
-    expect(changed).toBe(true); expect(assertKeysetComplete(f.workspace)!.generation).toBeGreaterThan(generation); expect(signed).toHaveLength(2);
+    // The record preparer rechecks the inner authority at entry, so the rotated generation never reaches a second Sign.
+    expect(changed).toBe(true); expect(assertKeysetComplete(f.workspace)!.generation).toBeGreaterThan(generation); expect(signed).toHaveLength(1);
     expect(verify(null, signed[0]!.bytes, firstPem, signed[0]!.signature)).toBe(true);
-    expect(verify(null, signed[1]!.bytes, getSigningPublicKeyPem(f.workspace, "artifact-seal"), signed[1]!.signature)).toBe(true);
     expect(storedFiles(f)).toEqual([]); expect(canary.getRollbackPacks("default")).toEqual([]); vi.restoreAllMocks(); await positive(f);
   });
 
@@ -203,8 +203,11 @@ describe("actual async rollback-pack producer", () => {
     } finally { paused.release.resolve(); await Promise.allSettled([pending]); }
   });
 
-  test("unlocked no-sign compatibility remains signed while locked async refusal does not rewrite retained sync unsigned/ephemeral behavior", async () => {
-    const f = fixture(); vi.stubEnv("AMC_NO_SIGN", "1"); await positive(f, "unlocked no-sign compatibility");
+  test("checked async refuses unlocked and locked no-sign while retained sync unsigned/ephemeral behavior is unchanged", async () => {
+    // Signed run-hash authority refuses no-sign mode even with an unlocked vault; nothing is stored or cached.
+    const f = fixture(); await positive(f); vi.stubEnv("AMC_NO_SIGN", "1"); const unlocked = storedFiles(f), cached = [...canary.getRollbackPacks("default")];
+    await expect(canary.createRollbackPackAsync("default", f.policy, "unlocked no-sign", f.workspace)).rejects.toThrow("no-sign mode does not authorize policy signing");
+    expect(storedFiles(f)).toEqual(unlocked); expect(canary.getRollbackPacks("default")).toEqual(cached);
     vi.stubEnv("AMC_VAULT_PASSPHRASE", undefined); lockVault(f.workspace); const before = storedFiles(f), live = [...canary.getRollbackPacks("default")];
     try {
       await expect(canary.createRollbackPackAsync("default", f.policy, "locked no-sign", f.workspace)).rejects.toMatchObject({ code: "KEY_PROVIDER_KEY_REFUSED" });

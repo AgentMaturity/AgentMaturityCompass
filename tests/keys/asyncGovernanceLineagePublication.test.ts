@@ -134,10 +134,14 @@ test.each(["link", "intent"] as const)("%s final original generation survives ch
   const f = fixture(), tr = transition(f, "generation-" + kind), generation = keysetIdentity(f.workspace)!.generation, real = purposeProviders.signWithPurposeKey; let reached = false, changed = 0;
   vi.spyOn(purposeProviders, "signWithPurposeKey").mockImplementationOnce(async (...args) => { const signed = await real(...args); changed = rotatePurposeKeys({ workspace: f.workspace, purposes: ["session"], passphrase: PASS }).generation; reached = true; return signed; });
   const run = () => kind === "link" ? linkTransitionToTransparencyAsync(f.db, tr, "5".repeat(64), f.workspace) : recordPolicyChangeIntentAsync(f.db, params(), f.workspace);
-  await expect(run()).rejects.toThrow("committed purpose authority changed"); expect(reached).toBe(true); expect(changed).toBe(generation + 1); expect(counts(f)).toEqual([0, 0, 0]); await run();
+  // The retained original run authority refuses the new generation before the purpose publication comparison.
+  await expect(run()).rejects.toMatchObject({ code: "KEY_PROVIDER_KEY_REFUSED", message: expect.stringContaining("the original run purpose generation changed") }); expect(reached).toBe(true); expect(changed).toBe(generation + 1); expect(counts(f)).toEqual([0, 0, 0]); await run();
 });
-test("lineage checked compatibility permits unlocked no-sign and never publishes unsigned after locked refusal", async () => {
-  const f = fixture(); vi.stubEnv("AMC_NO_SIGN", "1"); const intent = await recordPolicyChangeIntentAsync(f.db, params(), f.workspace), { signature, intent_hash, ...body } = intent; expect(math(f, body, signature)).toBe(intent_hash);
+test("lineage checked signing refuses unlocked no-sign and never publishes unsigned after locked refusal", async () => {
+  // Signed run-hash authority refuses no-sign mode even with an unlocked vault; nothing is published.
+  const f = fixture(), first = await recordPolicyChangeIntentAsync(f.db, params(), f.workspace), { signature, intent_hash, ...body } = first; expect(math(f, body, signature)).toBe(intent_hash);
+  vi.stubEnv("AMC_NO_SIGN", "1"); const unlocked = counts(f);
+  await expect(recordPolicyChangeIntentAsync(f.db, params(), f.workspace)).rejects.toThrow("no-sign mode does not authorize policy signing"); expect(counts(f)).toEqual(unlocked);
   const before = counts(f); vi.stubEnv("AMC_VAULT_PASSPHRASE", undefined); lockVault(f.workspace); await expect(recordPolicyChangeIntentAsync(f.db, params(), f.workspace)).rejects.toThrow(); expect(counts(f)).toEqual(before);
-  vi.stubEnv("AMC_VAULT_PASSPHRASE", PASS); unlockVault(f.workspace, PASS); await recordPolicyChangeIntentAsync(f.db, params(), f.workspace);
+  vi.stubEnv("AMC_VAULT_PASSPHRASE", PASS); unlockVault(f.workspace, PASS); vi.stubEnv("AMC_NO_SIGN", "0"); await recordPolicyChangeIntentAsync(f.db, params(), f.workspace);
 });

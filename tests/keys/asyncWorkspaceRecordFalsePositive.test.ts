@@ -234,13 +234,17 @@ describe("prepared workspace record and actual false-positive publication", () =
     expect(resolved?.status).toBe("confirmed"); verifyRecord(f, report.reportId, { ...previous, status: "confirmed", resolution: "durable" }, previous.record_hash, now);
   });
 
-  test("retains explicit memory-only and unlocked no-sign behavior but refuses checked locked ephemeral publication", async () => {
+  test("retains explicit memory-only behavior but refuses checked no-sign and locked ephemeral publication", async () => {
     const f = fixture(), spy = vi.spyOn(f.provider, "sign"), memory = await fp.submitFPReportAsync(f.input);
     expect(fp.getFPReport(memory.reportId)).toEqual(memory); expect(existsSync(path(f.workspace, memory.reportId))).toBe(false); expect(spy).not.toHaveBeenCalled(); fp.resetFPTrackerState();
-    vi.stubEnv("AMC_NO_SIGN", "1"); await positive(f); const before = fp.listFPReports(undefined, f.workspace);
+    await positive(f); const before = fp.listFPReports(undefined, f.workspace), calls = spy.mock.calls.length;
+    // Signed run-hash authority refuses no-sign mode even with an unlocked vault, before any Sign.
+    vi.stubEnv("AMC_NO_SIGN", "1");
+    await expect(fp.submitFPReportAsync(f.input, f.workspace)).rejects.toThrow("no-sign mode does not authorize policy signing");
+    expect(fp.listFPReports(undefined, f.workspace)).toEqual(before); expect(spy).toHaveBeenCalledTimes(calls);
     lockVault(f.workspace); vi.stubEnv("AMC_VAULT_PASSPHRASE", undefined);
     try { await expect(fp.submitFPReportAsync(f.input, f.workspace)).rejects.toBeInstanceOf(Error); expect(fp.listFPReports(undefined, f.workspace)).toEqual(before); }
-    finally { vi.stubEnv("AMC_VAULT_PASSPHRASE", PASS); unlockVault(f.workspace, PASS); }
+    finally { vi.stubEnv("AMC_VAULT_PASSPHRASE", PASS); unlockVault(f.workspace, PASS); vi.stubEnv("AMC_NO_SIGN", "0"); }
     await positive(f);
   });
 
