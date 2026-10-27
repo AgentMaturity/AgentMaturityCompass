@@ -13,7 +13,7 @@
 import fs, { readFileSync, statSync } from "node:fs";
 import { syncBuiltinESMExports } from "node:module";
 
-let open: Map<Function, { args: unknown[]; writes: number; env: string; value: unknown }[]> | null = null;
+let open: Map<Function, { args: unknown[]; writes: number; value: unknown }[]> | null = null;
 let reads = new Map<string, { identity: string; writes: number; bytes: Buffer }>();
 let writes = 0;
 
@@ -51,11 +51,14 @@ mutable.openSync = function (this: unknown, ...args: unknown[]) {
 };
 syncBuiltinESMExports();
 
-function envFingerprint(): string {
-  let out = "";
-  for (const key of Object.keys(process.env)) if (key.startsWith("AMC_")) out += `${key}=${process.env[key]}\0`;
-  return out;
-}
+// An AMC_* environment change ends reuse. process.env is wrapped once so a change is counted when it is made, rather
+// than scanning the environment on every wrapped call.
+const counted = (key: string | symbol): boolean => typeof key === "string" && key.startsWith("AMC_");
+process.env = new Proxy(process.env, {
+  set(target, key, value) { if (counted(key)) writes++; return Reflect.set(target, key, value); },
+  deleteProperty(target, key) { if (counted(key)) writes++; return Reflect.deleteProperty(target, key); },
+  defineProperty(target, key, descriptor) { if (counted(key)) writes++; return Reflect.defineProperty(target, key, descriptor); }
+});
 
 /** A private copy, or undefined when the value cannot be copied (then it is not reused). */
 function copyOf(value: unknown): { value: unknown } | undefined {
@@ -79,14 +82,13 @@ export function inCheckPass<A extends unknown[], R>(fn: (...args: A) => R): (...
       open = new Map();
       try { return fn(...args); } finally { open = null; reads = new Map(); }
     }
-    const env = envFingerprint();
-    const hit = open.get(fn)?.find(row => row.writes === writes && row.env === env && row.args.length === args.length
+    const hit = open.get(fn)?.find(row => row.writes === writes && row.args.length === args.length
       && row.args.every((arg, i) => sameArg(arg, args[i])));
     if (hit !== undefined) { const copy = copyOf(hit.value); if (copy !== undefined) return copy.value as R; }
     const before = writes, value = fn(...args);
     const stored = copyOf(value);
-    if (open !== null && writes === before && stored !== undefined && envFingerprint() === env)
-      open.set(fn, [...(open.get(fn) ?? []), { args: [...args], writes, env, value: stored.value }]);
+    if (open !== null && writes === before && stored !== undefined)
+      open.set(fn, [...(open.get(fn) ?? []), { args: [...args], writes, value: stored.value }]);
     return value;
   };
 }
