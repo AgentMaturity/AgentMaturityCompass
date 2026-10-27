@@ -34,27 +34,6 @@ function assertTrustKeyCurrent(workspace: string, publicKeyPem: string): void {
   }
 }
 
-type TrustSignature = ReturnType<typeof orgSignatureSchema.parse>;
-/** Keys whose signature trust.yaml carries: legacy auditor history first, then direct artifact-seal history. */
-function trustSignatureMatches(workspace: string, signed: TrustSignature, digest: string): string[] {
-  const matches = (keys: string[]) => keys.filter(publicKeyPem => signed.envelope === undefined
-    ? verifyWithKey(Buffer.from(digest, "hex"), publicKeyPem, Buffer.from(signed.signature, "base64"))
-    : signed.signature === signed.envelope.sigB64
-      && verifySignatureEnvelope(digest, signed.envelope, { trustedPublicKeys: [publicKeyPem], requireTrustedKey: true }));
-  const matching = matches(getPublicKeyHistory(workspace, "auditor"));
-  // A refused legacy match cannot fall through to another purpose; NOTARY never selects a policy route here.
-  return matching.length === 0 && signed.envelope?.signer.type !== "NOTARY" ? matches(getPurposeKeyHistory(workspace, "artifact-seal")) : matching;
-}
-
-/** Key ids trust.yaml's current signature verifies under, revocation not considered: revoking one would strand every policy signature. */
-export function trustConfigSignerKeyIds(workspace: string): string[] {
-  const path = trustConfigPath(workspace), sigPath = `${path}.sig`;
-  if (!pathExists(path) || !pathExists(sigPath)) return [];
-  const signed = orgSignatureSchema.parse(JSON.parse(readUtf8(sigPath)) as unknown), digest = sha256Hex(readFileSync(path));
-  if (digest !== signed.digestSha256) return [];
-  return trustSignatureMatches(workspace, signed, digest).flatMap(publicKeyPem => signingKeyId(publicKeyPem) ?? []);
-}
-
 /** Same captured body/signature bytes and old role precedence, with a direct purpose-only successor. */
 export function verifyTrustConfigPublication(workspace: string) {
   const path = trustConfigPath(workspace), sigPath = `${path}.sig`;
@@ -64,7 +43,14 @@ export function verifyTrustConfigPublication(workspace: string) {
     const signed = orgSignatureSchema.parse(JSON.parse(readUtf8(sigPath)) as unknown);
     const digest = sha256Hex(readFileSync(path));
     if (digest !== signed.digestSha256) return { valid: false, signatureExists: true, reason: "digest mismatch", path, sigPath };
-    const matching = trustSignatureMatches(workspace, signed, digest);
+    const legacy = getPublicKeyHistory(workspace, "auditor");
+    const matches = (keys: string[]) => keys.filter(publicKeyPem => signed.envelope === undefined
+      ? verifyWithKey(Buffer.from(digest, "hex"), publicKeyPem, Buffer.from(signed.signature, "base64"))
+      : signed.signature === signed.envelope.sigB64
+        && verifySignatureEnvelope(digest, signed.envelope, { trustedPublicKeys: [publicKeyPem], requireTrustedKey: true }));
+    let matching = matches(legacy);
+    // A refused legacy match cannot fall through to another purpose; NOTARY never selects a policy route here.
+    if (matching.length === 0 && signed.envelope?.signer.type !== "NOTARY") matching = matches(getPurposeKeyHistory(workspace, "artifact-seal"));
     for (const publicKeyPem of matching) assertTrustKeyCurrent(workspace, publicKeyPem);
     const valid = matching.length > 0;
     return { valid, signatureExists: true, reason: valid ? null : "signature verify failed", path, sigPath };

@@ -46,7 +46,6 @@ import { assertArtifactBlobAnchorBoundary, type ArtifactBlobAnchorBoundary } fro
 import { assertReceiptOwnerBoundary, type ReceiptOwnerBoundary } from "./receiptOwnerAnchors.js";
 import { signingKeyId, verifyWithKey } from "./algorithmPolicy.js";
 import { KEY_REVOCATION_REASONS, keyRevocationLocation, type KeyRevocationReason } from "./keyRevocations.js";
-import { trustConfigSignerKeyIds } from "../trust/trustConfigPublication.js";
 export type { KeyRevocationReason } from "./keyRevocations.js";
 import {
   encodeSignedRevocationList, nextRevocationList, publishRevocationList, publishSignedRevocationList, readAnchoredRevocationList, recoverPendingRevocationList, revocationListSha256,
@@ -465,10 +464,6 @@ function assertKeyRevocationRequest(workspace: string, purpose: KeyPurpose, keyI
     throw new Error(`key ${keyId} still signs for this workspace; rotate it first (amc keys rotate --purpose ${local})`);
   }
   if (!getPurposeKeyHistory(workspace, local).some(pem => signingKeyId(pem) === keyId)) throw new Error(`key ${keyId} is not in the ${local} key history`);
-  // trust.yaml verification refuses a revoked signer, so revoking its signer would stop every policy signature mid-revocation.
-  if (trustConfigSignerKeyIds(workspace).includes(keyId)) {
-    throw new Error(`key ${keyId} still signs .amc/trust.yaml; re-sign the trust config with the current artifact-seal key (amc trust init) before revoking it`);
-  }
   return local;
 }
 
