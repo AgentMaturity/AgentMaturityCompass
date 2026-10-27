@@ -85,16 +85,17 @@ test("sync and async consecutive entries verify, and complete-triplet reads neit
   expect(f.snapshot()).toEqual(before); expect(key).not.toHaveBeenCalled(); expect(calls).toHaveBeenCalledTimes(1);
 });
 
-test("unlocked raw signing stays compatible with AMC_NO_SIGN while an unavailable or ephemeral locked key cannot publish", async () => {
-  const f = fixture(); appendHumanActionEvent(input(f)); const wait = pause(f), pending = appendHumanActionEventAsync(input(f, "UNLOCKED_FLAG"));
-  try { await reached(wait, pending); vi.stubEnv("AMC_NO_SIGN", "1"); wait.gate.resolve(); await pending; healthy(f); }
+test("checked async refuses AMC_NO_SIGN set during Sign while sync stays compatible and an unavailable or ephemeral locked key cannot publish", async () => {
+  // Signed run-hash authority refuses no-sign mode, including a flag set while the checked Sign is pending.
+  const f = fixture(); appendHumanActionEvent(input(f)); const signedBefore = f.snapshot(), wait = pause(f), pending = appendHumanActionEventAsync(input(f, "UNLOCKED_FLAG"));
+  try { await reached(wait, pending); vi.stubEnv("AMC_NO_SIGN", "1"); wait.gate.resolve(); await expect(pending).rejects.toThrow("no-sign mode does not authorize policy signing"); expect(f.snapshot()).toEqual(signedBefore); healthy(f); }
   finally { wait.gate.resolve(); await Promise.allSettled([pending]); }
   appendHumanActionEvent(input(f, "UNLOCKED_SYNC_FLAG")); healthy(f);
   const before = f.snapshot(); vi.stubEnv("AMC_VAULT_PASSPHRASE", undefined); lockVault(f.workspace);
   await expect(appendHumanActionEventAsync(input(f, "UNAVAILABLE"))).rejects.toThrow();
   expect(() => appendHumanActionEvent(input(f, "UNAVAILABLE_SYNC"))).toThrow();
   expect(f.snapshot()).toEqual(before); expect(verifyHumanActionLog(f.workspace).ok).toBe(true);
-  vi.stubEnv("AMC_VAULT_PASSPHRASE", PASS); unlockVault(f.workspace, PASS); await appendHumanActionEventAsync(input(f, "FRESH")); healthy(f);
+  vi.stubEnv("AMC_VAULT_PASSPHRASE", PASS); unlockVault(f.workspace, PASS); vi.stubEnv("AMC_NO_SIGN", "0"); await appendHumanActionEventAsync(input(f, "FRESH")); healthy(f);
 });
 
 test("only all-absent public verification lazily initializes, then an actual append verifies", async () => {

@@ -74,14 +74,17 @@ describe("actual async console snapshot publication",()=>{
     writeFileSync(actual,YAML.stringify(config));try{await expect(publishConsoleSnapshotAsync(f.workspace,payload())).rejects.toMatchObject({code:"KEY_PROVIDER_HELD"});expect(pair(f.workspace)).toEqual({body:null,signature:null});}
     finally{writeFileSync(actual,before);}await publishConsoleSnapshotAsync(f.workspace,payload());verifies(f.workspace);
   });
-  test("locked local diagnostics remove a stale signature through the real hold gate, while an unlocked no-sign key remains real",async()=>{
+  test("locked local diagnostics remove a stale signature through the real hold gate, while unlocked no-sign refuses checked signing",async()=>{
     const f=fixture();await publishConsoleSnapshotAsync(f.workspace,payload());registerTenant({tenantId:"tenant-a",workspaceId:"owned-cache-workspace",region:"us-east-1"},f.workspace);initLegalHoldRegistry(f.workspace);
     const hold=issueScopedLegalHold({workspace:f.workspace,scope:{tenantId:"tenant-a",workspaceIds:[],sessionIds:[],dataKinds:["caches"]},reason:"owned cache hold",issuedBy:"owner"});
     expect(holdVerdict({workspace:f.workspace,target:{kind:"caches"}})).toMatchObject({verdict:"held"});const before=pair(f.workspace);lockVault(f.workspace);vi.stubEnv("AMC_VAULT_PASSPHRASE","");
     await expect(publishConsoleSnapshotAsync(f.workspace,{...payload(),ts:2})).rejects.toMatchObject({name:"DeletionDenied"});expect(pair(f.workspace)).toEqual(before);
     vi.stubEnv("AMC_VAULT_PASSPHRASE",PASS);unlockVault(f.workspace,PASS);expect(releaseScopedLegalHold(f.workspace,hold.holdId)).toBe(true);
     lockVault(f.workspace);vi.stubEnv("AMC_VAULT_PASSPHRASE","");vi.stubEnv("AMC_NO_SIGN","1");expect((await publishConsoleSnapshotAsync(f.workspace,payload())).sigPath).toBeNull();expect(pair(f.workspace).signature).toBeNull();
-    vi.stubEnv("AMC_VAULT_PASSPHRASE",PASS);unlockVault(f.workspace,PASS);vi.stubEnv("AMC_NO_SIGN","1");expect((await publishConsoleSnapshotAsync(f.workspace,payload())).sigPath).not.toBeNull();verifies(f.workspace);
+    // Signed run-hash authority refuses no-sign mode even with an unlocked vault; nothing is published.
+    vi.stubEnv("AMC_VAULT_PASSPHRASE",PASS);unlockVault(f.workspace,PASS);vi.stubEnv("AMC_NO_SIGN","1");const unsigned=pair(f.workspace);
+    await expect(publishConsoleSnapshotAsync(f.workspace,{...payload(),ts:3})).rejects.toThrow("no-sign mode does not authorize policy signing");expect(pair(f.workspace)).toEqual(unsigned);
+    vi.stubEnv("AMC_NO_SIGN","0");expect((await publishConsoleSnapshotAsync(f.workspace,payload())).sigPath).not.toBeNull();verifies(f.workspace);
   });
   test("a native sidecar failure exposes bounded partial truth and retains its native cause privately",async()=>{
     const f=fixture();control.faultSignature=join(f.workspace,".amc/studio/console-snapshot.json.sig");const err=await publishConsoleSnapshotAsync(f.workspace,payload()).catch(e=>e);
@@ -99,7 +102,8 @@ describe("actual async console snapshot publication",()=>{
     const signature=Buffer.from(JSON.stringify({digestSha256:digest,signature:sign(null,Buffer.from(digest,"hex"),key).toString("base64"),signedTs:Date.now(),signer:"auditor"},null,2));
     expect(verify(null,Buffer.from(digest,"hex"),getSigningPublicKeyPem(f.workspace,"artifact-seal"),Buffer.from(JSON.parse(signature.toString()).signature,"base64"))).toBe(true);
     let reached=false;
-    await expect(publishConsoleSnapshotAsync(f.workspace,payload(),()=>{reached=true;writeFileSync(path,body);writeFileSync(path+".sig",signature);})).rejects.toMatchObject({code:"CONSOLE_SNAPSHOT_UNAVAILABLE",phase:"predecessor",bodyWritten:false});
+    // The callback also runs at entry and before Sign; the winner appears only at the final post-Sign gate.
+    await expect(publishConsoleSnapshotAsync(f.workspace,payload(),()=>{if(control.messages.length===0||reached)return;reached=true;writeFileSync(path,body);writeFileSync(path+".sig",signature);})).rejects.toMatchObject({code:"CONSOLE_SNAPSHOT_UNAVAILABLE",phase:"predecessor",bodyWritten:false});
     expect(reached).toBe(true);expect(control.messages).toHaveLength(1);expect(pair(f.workspace)).toEqual({body,signature});verifies(f.workspace);
     await publishConsoleSnapshotAsync(f.workspace,payload());verifies(f.workspace);
   });

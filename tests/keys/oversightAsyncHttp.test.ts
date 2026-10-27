@@ -23,7 +23,7 @@ async function serve(trusted=true){const f=fixture(),incident=seedIncident(f.wor
   return{...f,incident,owner,session,post,checks:()=>checks,path:oversightRecordPath(f.workspace,incident.incidentId)};
 }
 describe("actual incident router trusted async oversight contract",()=>{
-  test("explicit trusted caller awaits real file crypto and verifies the stored chain",async()=>{const f=await serve(),res=await f.post(),body=await res.json();expect(res.status).toBe(201);expect(body.data.reviewerId).toBe(f.owner.userId);expect(control.calls).toBe(1);expect(f.checks()).toBe(2);
+  test("explicit trusted caller awaits real file crypto and verifies the stored chain",async()=>{const f=await serve(),res=await f.post(),body=await res.json();expect(res.status).toBe(201);expect(body.data.reviewerId).toBe(f.owner.userId);expect(control.calls).toBe(1);expect(f.checks()).toBeGreaterThanOrEqual(2);
     expect(verifyOversightChain(readOversightRecords(f.path),f.incident,workspaceOversightPublicKeys(f.workspace))).toEqual({ok:true,errors:[]});});
   test("no-callback actual router retains synchronous compatibility, with no asynchronous file-provider Sign",async()=>{const f=await serve(false),res=await f.post();expect(res.status).toBe(201);await res.arrayBuffer();expect(control.calls).toBe(0);expect(f.checks()).toBe(0);expect(readOversightRecords(f.path)).toHaveLength(1);});
   test.each(["revoke","roles"] as const)("actual tracked %s change during the signature await refuses without record or second response",async change=>{

@@ -56,6 +56,12 @@ function fixture() {
 type Fixture = ReturnType<typeof fixture>;
 const pair = (f: Fixture) => ({ body: readFileSync(f.body), signature: readFileSync(f.signature) });
 function restore(f: Fixture, before: ReturnType<typeof pair>) { writeFileSync(f.body, before.body); writeFileSync(f.signature, before.signature); }
+/** beforePublish also runs at entry and before Sign; this reports when the checked signer has returned. */
+function afterSign(f: Fixture) {
+  const actual = f.provider.sign.bind(f.provider); let returned = false;
+  vi.spyOn(f.provider, "sign").mockImplementation(async (ref, bytes) => { const signature = await actual(ref, bytes); returned = true; return signature; });
+  return () => returned;
+}
 function deferred() { let resolve!: () => void; const promise = new Promise<void>(done => { resolve = done; }); return { promise, resolve }; }
 function pause(f: Fixture) { const entered = deferred(), release = deferred(), original = f.provider.sign.bind(f.provider);
   vi.spyOn(f.provider, "sign").mockImplementationOnce(async (ref, bytes) => { const signature = await original(ref, bytes); entered.resolve(); await release.promise; return signature; }); return { entered, release }; }
@@ -149,14 +155,14 @@ describe("actual async OPS_POLICY config-purpose pair publication", () => {
     await positive(f);
   });
   test("final producer gate refuses an unrelated full-generation change after the checked signer returns", async () => {
-    const f = fixture(), before = pair(f); let callbacks = 0;
-    await expect(initOpsPolicyAsync(f.workspace, { beforePublish: () => { if (++callbacks === 2) rotatePurposeKeys({ workspace: f.workspace, purposes: ["session"], passphrase: PASS }); } })).rejects.toThrow("committed purpose authority changed");
-    expect(callbacks).toBe(2); expect(pair(f)).toEqual(before); await positive(f);
+    const f = fixture(), before = pair(f), signed = afterSign(f); let changed = false;
+    await expect(initOpsPolicyAsync(f.workspace, { beforePublish: () => { if (!signed() || changed) return; changed = true; rotatePurposeKeys({ workspace: f.workspace, purposes: ["session"], passphrase: PASS }); } })).rejects.toThrow("committed purpose authority changed");
+    expect(changed).toBe(true); expect(pair(f)).toEqual(before); await positive(f);
   });
   test("final producer gate compares the complete authenticated policy after the checked signer returns", async () => {
-    const f = fixture(), before = pair(f), original = loadTrustConfig(f.workspace); let callbacks = 0;
-    try { await expect(initOpsPolicyAsync(f.workspace, { beforePublish: () => { if (++callbacks === 2) { const next = structuredClone(original); next.trust.enforcement.notaryMaxClockSkewSeconds += 1; saveTrust(f, next); } } })).rejects.toThrow("signing policy changed");
-      expect(callbacks).toBe(2); expect(pair(f)).toEqual(before);
+    const f = fixture(), before = pair(f), original = loadTrustConfig(f.workspace), signed = afterSign(f); let changed = false;
+    try { await expect(initOpsPolicyAsync(f.workspace, { beforePublish: () => { if (!signed() || changed) return; changed = true; const next = structuredClone(original); next.trust.enforcement.notaryMaxClockSkewSeconds += 1; saveTrust(f, next); } })).rejects.toThrow("signing policy changed");
+      expect(changed).toBe(true); expect(pair(f)).toEqual(before);
     } finally { saveTrust(f, original); } await positive(f);
   });
   test("final producer gate refuses a real vault lock after the checked signer returns", async () => {
