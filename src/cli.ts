@@ -121,6 +121,8 @@ import {
 } from "./incidents/incidentClockEvents.js";
 import { buildEvidencePacket, renderEvidencePacketMarkdown } from "./incidents/evidencePacket.js";
 import { oversightRecordPath, readOversightRecords, recordWorkspaceOversightAsync, workspaceOversightPublicKeys } from "./incidents/oversightRecord.js";
+import { startIncidentClocks } from "./incidents/clockRuntime.js";
+import { incidentNoticeDrafts } from "./incidents/noticeDraft.js";
 import {
   addAgentInteractive,
   buildAgentConfig,
@@ -7946,7 +7948,8 @@ incident
   .description("Show incident details, or write its regulator evidence packet with --packet")
   .option("--packet <dir>", "write <id>.packet.json and <id>.packet.md (needs --station)")
   .option("--station <station>", "station whose regulatory clocks the packet lists")
-  .action((id: string, opts: { packet?: string; station?: string }) => {
+  .option("--clocks", "print the clocks recorded when the incident opened, with notice drafts (P2-26); with --packet, write the drafts there")
+  .action((id: string, opts: { packet?: string; station?: string; clocks?: boolean }) => {
     const workspace = process.cwd();
     const ledger = openLedger(workspace);
     try {
@@ -7960,6 +7963,13 @@ incident
       }
       const transitions = store.getIncidentTransitions(id);
       const edges = store.getCausalEdges(id);
+      if (opts.clocks) {
+        const { runtime, drafts } = incidentNoticeDrafts({ workspace, db: ledger.db, incidentId: id, nowTs: Date.now() });
+        if (!opts.packet) return void console.log(JSON.stringify({ ...runtime, noticeDrafts: drafts.map((draft) => draft.json) }, null, 2));
+        mkdirSync(resolve(workspace, opts.packet), { recursive: true });
+        for (const draft of drafts) writeFileSync(join(resolve(workspace, opts.packet), `${id}.${draft.json.clockId}.notice.md`), draft.markdown, "utf8");
+        return void console.log(`${drafts.length} notice draft(s) in ${resolve(workspace, opts.packet)}; AMC does not file notices`);
+      }
       if (opts.packet) {
         if (!opts.station) throw new Error("--packet needs --station <station>");
         const station = parseStation(opts.station);
@@ -8034,6 +8044,7 @@ incident
       } as unknown as Parameters<typeof store.insertIncident>[0]);
 
       console.log(chalk.green(`Incident created: ${incidentId}`));
+      console.log(`clocks=${startIncidentClocks({ workspace, db: ledger.db, incidentId, nowTs: now }).status}`);
       console.log(`agent=${agentId}`);
       console.log(`severity=${opts.severity.toLowerCase()}`);
     } finally {

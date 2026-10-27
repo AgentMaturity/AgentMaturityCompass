@@ -560,6 +560,25 @@ const migrations: Migration[] = [
         SELECT RAISE(ABORT, 'evidence immutable fields changed');
       END;
     `
+  },
+  {
+    // P2-26 clock runtime: the signed applicability decision startIncidentClocks records once per incident (clockRuntime.ts).
+    version: 15,
+    sql: `
+      CREATE TABLE IF NOT EXISTS incident_clock_runs (
+        incident_id TEXT PRIMARY KEY,
+        status TEXT NOT NULL CHECK (status IN ('started', 'not_evaluated')),
+        reason TEXT,
+        plan_digest TEXT,
+        decisions_json TEXT NOT NULL,
+        decided_ts INTEGER NOT NULL,
+        signature TEXT NOT NULL
+      );
+      CREATE TRIGGER IF NOT EXISTS incident_clock_runs_append_only BEFORE UPDATE ON incident_clock_runs
+      BEGIN SELECT RAISE(ABORT, 'incident_clock_runs is append-only'); END;
+      CREATE TRIGGER IF NOT EXISTS incident_clock_runs_no_delete BEFORE DELETE ON incident_clock_runs
+      BEGIN SELECT RAISE(ABORT, 'incident_clock_runs is append-only'); END;
+    `
   }
 ];
 

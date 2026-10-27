@@ -33,6 +33,7 @@ import { loadOpsPolicy } from "../ops/policy.js";
 import { loadBlobPlaintext, storeEncryptedBlob } from "../storage/blobs/blobStore.js";
 import type { SqliteConnectionLease } from "../storage/sqlitePool.js";
 import { createIncidentStore } from "../incidents/incidentStore.js";
+import { runLedgerDetectors } from "../incidents/incidentDetectors.js";
 import type { Incident, CausalRelationship } from "../incidents/incidentTypes.js";
 import { queueEvidenceEventSpan } from "../observability/otelExporter.js";
 import { buildRetentionProofIndex, type RetentionProofIndex } from "../ops/retention/retentionArchive.js";
@@ -402,9 +403,8 @@ export class Ledger {
     ts: number;
   }): void {
     const context = contextFromEvidenceMeta(params.meta);
-    if (!context.agentId) {
-      return;
-    }
+    if (!context.agentId) return;
+    runLedgerDetectors(this.workspace, this.db, context.agentId, params, (digest) => this.signMonitorDigest(digest));
 
     let open: Incident[] = [];
     try {

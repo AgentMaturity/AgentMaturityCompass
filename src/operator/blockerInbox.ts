@@ -7,6 +7,7 @@
 import { listAssuranceWaivers } from "../assurance/assurancePolicyStore.js";
 import { conformanceView } from "../a4/a4Conformance.js";
 import type { BlockerKind } from "../a4/a4Readiness.js";
+import { incidentRuntimeClocks } from "../incidents/clockRuntime.js";
 import { openLedger } from "../ledger/ledger.js";
 import { loadOperatorConfig, readA4Projects } from "./operatorSources.js";
 
@@ -84,7 +85,40 @@ const receiptSource: InboxSource = ({ workspace }) => {
   }
 };
 
-export const DEFAULT_INBOX_SOURCES: Readonly<Record<string, InboxSource>> = { a4: a4Source, assuranceWaivers: waiverSource, actionReceipts: receiptSource };
+/**
+ * P2-26 clocks of open incidents: NEEDS_CLASSIFICATION (not_evaluated until a person classifies it), DUE_SOON and
+ * OVERDUE (review_pending: a person files the notice), and incidents whose clocks were never evaluated.
+ */
+const clockSource: InboxSource = ({ workspace, nowTs }) => {
+  const ledger = openLedger(workspace, { readonly: true });
+  try {
+    const hasTables = (ledger.db.prepare("SELECT COUNT(*) AS n FROM sqlite_master WHERE type = 'table' AND name IN ('incidents', 'incident_clock_runs')").get() as { n: number }).n === 2;
+    if (!hasTables) return [];
+    const open = ledger.db.prepare("SELECT incident_id, agent_id, created_ts FROM incidents WHERE state IN ('OPEN', 'INVESTIGATING', 'MITIGATED') ORDER BY created_ts")
+      .all() as Array<{ incident_id: string; agent_id: string; created_ts: number }>;
+    return open.flatMap((incident): BlockerItem[] => {
+      const base = { controlId: null, subject: subject(incident.agent_id), severity: "mandatory" as const, links: [`/api/v1/incidents/${incident.incident_id}/clocks`] };
+      const { run, clocks } = incidentRuntimeClocks({ workspace, db: ledger.db, incidentId: incident.incident_id, nowTs });
+      if (run === null || run.status === "not_evaluated") {
+        return [{ ...base, id: `clocks:${incident.incident_id}`, kind: "not_evaluated", since: incident.created_ts, dueTs: null,
+          nextAction: `Reporting clocks for incident ${incident.incident_id} were not evaluated: ${run?.reason ?? "no clock run is recorded"}.` }];
+      }
+      return clocks.filter((clock) => ["NEEDS_CLASSIFICATION", "DUE_SOON", "OVERDUE"].includes(clock.status)).map((clock): BlockerItem => ({
+        ...base, id: `clock:${incident.incident_id}:${clock.clockId}:${clock.status}`, since: incident.created_ts, dueTs: clock.dueTs,
+        kind: clock.status === "NEEDS_CLASSIFICATION" ? "not_evaluated" : "review_pending",
+        nextAction: clock.status === "NEEDS_CLASSIFICATION"
+          ? `NEEDS_CLASSIFICATION ${clock.clockId}: record a REPORT_REQUIRED or NO_REPORT_REQUIRED oversight decision naming it.`
+          : `${clock.status} ${clock.clockId}: a person files the ${clock.instrument} notice (AMC drafts, never files), then records NOTIFIED.`
+      }));
+    });
+  } finally {
+    ledger.close();
+  }
+};
+
+export const DEFAULT_INBOX_SOURCES: Readonly<Record<string, InboxSource>> = {
+  a4: a4Source, assuranceWaivers: waiverSource, actionReceipts: receiptSource, incidentClocks: clockSource
+};
 
 /** Mandatory first, then the earliest due time (none last), then the oldest. */
 const byPriority = (a: BlockerItem, b: BlockerItem): number => (a.severity === b.severity ? 0 : a.severity === "mandatory" ? -1 : 1)

@@ -18,6 +18,8 @@ interface DriftAdvisory {
   delta: number;
   severity: "WARN" | "CRITICAL";
   evidenceRefs: string[];
+  /** The id autoDetectAndAssemble deduplicates on; defaults to the first evidence ref. */
+  triggerId?: string;
 }
 
 interface FreezeIncidentData {
@@ -73,6 +75,12 @@ function createCausalEdge(
 
   edge.signature = signFn(digest);
   return edge;
+}
+
+/** Signs the payload verifyIncidentSignature checks: every field but the signature itself. */
+function signIncident(incident: Incident, signFn: SignFn): string {
+  const { signature: _unsigned, ...payload } = incident;
+  return signFn(sha256Hex(canonicalize(payload)));
 }
 
 // Helper to parse meta_json safely
@@ -175,7 +183,7 @@ export function assembleFromDrift(
     title,
     description,
     triggerType: "DRIFT",
-    triggerId: driftAdvisory.evidenceRefs[0] || incidentId,
+    triggerId: driftAdvisory.triggerId ?? (driftAdvisory.evidenceRefs[0] || incidentId),
     rootCauseClaimIds: [],
     affectedQuestionIds,
     causalEdges,
@@ -191,8 +199,7 @@ export function assembleFromDrift(
 
   // Compute hash and signature
   incident.incident_hash = computeIncidentHash(incident);
-  const digest = sha256Hex(canonicalize(incident));
-  incident.signature = signFn(digest);
+  incident.signature = signIncident(incident, signFn);
 
   return incident;
 }
@@ -292,8 +299,7 @@ export function assembleFromAssuranceFailure(
 
   // Compute hash and signature
   incident.incident_hash = computeIncidentHash(incident);
-  const digest = sha256Hex(canonicalize(incident));
-  incident.signature = signFn(digest);
+  incident.signature = signIncident(incident, signFn);
 
   return incident;
 }
@@ -363,8 +369,7 @@ export function assembleFromFreeze(
 
   // Compute hash and signature
   incident.incident_hash = computeIncidentHash(incident);
-  const digest = sha256Hex(canonicalize(incident));
-  incident.signature = signFn(digest);
+  incident.signature = signIncident(incident, signFn);
 
   return incident;
 }
@@ -436,9 +441,46 @@ export function assembleFromBudgetExceed(
 
   // Compute hash and signature
   incident.incident_hash = computeIncidentHash(incident);
-  const digest = sha256Hex(canonicalize(incident));
-  incident.signature = signFn(digest);
+  incident.signature = signIncident(incident, signFn);
 
+  return incident;
+}
+
+/**
+ * P2-26 detectors: audit events that open a governance incident, one per trigger id. Each returns the trigger id, or
+ * null when the event is not one it detects. The incidents table's trigger_type CHECK predates these, so they share
+ * GOVERNANCE_VIOLATION and the title names the detector.
+ */
+const GOVERNANCE_DETECTORS: Readonly<Record<string, { title: string; severity: Incident["severity"]; triggerId: (meta: Record<string, unknown>, event: EvidenceEvent) => string | null }>> = {
+  // P1-03: a consequential (journaled) action whose outcome AMC could not observe.
+  ACTION_STATE: { title: "Action outcome unknown", severity: "CRITICAL",
+    triggerId: (meta) => meta.state === "outcome_unknown" && typeof meta.executionId === "string" ? `outcome_unknown:${meta.executionId}` : null },
+  // P2-01: an export or egress refused by the residency registry.
+  RESIDENCY_ROUTE_BLOCKED: { title: "Residency route blocked", severity: "WARN", triggerId: (_meta, event) => `residency:${event.id}` },
+  // P2-24: an action taken under break-glass; one incident per break-glass record.
+  BREAK_GLASS_ACTION: { title: "Break-glass used", severity: "CRITICAL",
+    triggerId: (meta) => typeof meta.breakGlassId === "string" ? `break_glass:${meta.breakGlassId}` : null }
+};
+
+/** Whether autoDetectAndAssemble reads this audit type at all; lets the ledger hook skip every other row cheaply. */
+export function isDetectedAuditType(auditType: unknown): boolean {
+  return typeof auditType === "string" && (auditType in GOVERNANCE_DETECTORS || auditType.startsWith("FREEZE_")
+    || ["DRIFT_REGRESSION_DETECTED", "ASSURANCE_FAILURE", "BUDGET_EXCEEDED"].includes(auditType));
+}
+
+function assembleGovernanceIncident(
+  db: Database.Database, agentId: string, event: EvidenceEvent, auditType: string, triggerId: string, signFn: SignFn, now: number
+): Incident {
+  const detector = GOVERNANCE_DETECTORS[auditType]!;
+  const incident: Incident = {
+    incidentId: createIncidentId(), agentId, severity: detector.severity, state: "OPEN", title: `${detector.title} (${auditType})`,
+    description: `Opened by the ${auditType} detector from audit event ${event.id}.`, triggerType: "GOVERNANCE_VIOLATION", triggerId,
+    rootCauseClaimIds: [], affectedQuestionIds: [], causalEdges: [], timelineEventIds: [event.id],
+    createdTs: now, updatedTs: now, resolvedTs: null, postmortemRef: null,
+    prev_incident_hash: getLastIncidentHash(db, agentId), incident_hash: "", signature: ""
+  };
+  incident.incident_hash = computeIncidentHash(incident);
+  incident.signature = signIncident(incident, signFn);
   return incident;
 }
 
@@ -479,7 +521,8 @@ export function autoDetectAndAssemble(
           latest: (meta.latest as number) || 0,
           delta: (meta.delta as number) || 0,
           severity: (meta.severity as "WARN" | "CRITICAL") || "WARN",
-          evidenceRefs: [event.id]
+          evidenceRefs: [event.id],
+          triggerId
         };
 
         const incident = assembleFromDrift(db, agentId, driftAdvisory, newEvents, signFn, now);
@@ -534,6 +577,13 @@ export function autoDetectAndAssemble(
         const incident = assembleFromFreeze(db, agentId, freezeIncidentId, freezeDeltas, newEvents, signFn, now);
         incidents.push(incident);
       }
+    }
+
+    const governance = GOVERNANCE_DETECTORS[auditType];
+    const governanceTriggerId = governance ? governance.triggerId(meta, event) : null;
+    if (governanceTriggerId !== null && !openIncidentExistsForTriggerId(db, agentId, governanceTriggerId)
+      && !incidents.some((incident) => incident.triggerId === governanceTriggerId)) {
+      incidents.push(assembleGovernanceIncident(db, agentId, event, auditType, governanceTriggerId, signFn, now));
     }
 
     // Check for budget exceeded
