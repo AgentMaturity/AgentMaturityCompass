@@ -55,8 +55,9 @@ const EVERY_STATION = {
   notExecutable: ["DATA_EXPORT", "FINANCIAL", "IDENTITY", "NETWORK_EXTERNAL", "SECURITY"],
   execTicket: ["DATA_EXPORT", "DEPLOY", "FINANCIAL", "IDENTITY", "NETWORK_EXTERNAL", "SECURITY", "WRITE_HIGH"]
 };
-/** Wealth and Technology have Layer 1 overlays; each overlay stays within its station's profile. */
+/** Station overlays add requirement rows; the Governance defense row is also scoped to Technology. */
 const WEALTH_OVERLAY = Array.from({ length: 15 }, (_, i) => `L1-WLT-US-${String(i + 1).padStart(2, "0")}`);
+const GOVERNANCE_OVERLAY = ["L1-GOV-01", "L1-GOV-02", "L1-GOV-03", "L1-GOV-04", "L1-GOV-05", "L1-GOV-06"];
 const TECHNOLOGY_OVERLAY = [
   "L1-TECH-01", "L1-TECH-02", "L1-TECH-03", "L1-TECH-04",
   "L1-TECH-05", "L1-TECH-06", "L1-TECH-07", "L1-TECH-08"
@@ -69,7 +70,8 @@ describe("P1-46: the compiled plan holds F2's station-profile rules for every st
 
   test.each(listDomainIds().sort())("golden: %s", (station) => {
     const plan = compilePlan({ profile: stationProfile(station) as never, catalog, asOf: AS_OF });
-    const overlayControls = station === "wealth" ? WEALTH_OVERLAY : station === "technology" ? TECHNOLOGY_OVERLAY : [];
+    const overlayControls = station === "wealth" ? WEALTH_OVERLAY : station === "technology" ? ["L1-GOV-06", ...TECHNOLOGY_OVERLAY]
+      : station === "governance" ? GOVERNANCE_OVERLAY : [];
     expect(f2View(plan)).toEqual({ ...EVERY_STATION, overlayControls });
   });
 });

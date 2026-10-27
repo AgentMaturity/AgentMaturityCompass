@@ -1,0 +1,1819 @@
+{
+  "schemaVersion": 1,
+  "item": "P3-14",
+  "state": "ROOT_REVIEWED_SOURCE_386_CLASSIFICATIONS",
+  "complete": true,
+  "sourceHead": "386a9a993a9c0997dbbe8c7b74bad9bf84760c46",
+  "int": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+  "createdAt": "2026-10-19T09:54:46.846825+00:00",
+  "fullResult": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/full-suite/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-final-v1/result.json",
+    "sha256": "ee2060f397c0e7965ab80465e3595918aa3cde86d8f59a158654729133b28229",
+    "bytes": 16934
+  },
+  "nativeReport": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/full-suite/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-final-v1/report.json",
+    "sha256": "f8317bf7be32208ba0f910d49626cdedd352dc486f52e674484ddf1301a2b3a6",
+    "bytes": 10222698
+  },
+  "rawLog": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/full-suite/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-final-v1/raw.log",
+    "sha256": "b67881ca138b9fef83ef0ce1a6b38c3f960954228286cce303cf2ad0a0cd1940",
+    "bytes": 3309794
+  },
+  "nativeAudit": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/full-suite/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-final-v1/native-audit.json",
+    "sha256": "96d696044a86486494fae3e78f1b90437c0a9ef317baaf46d72eb490e4a7c173",
+    "bytes": 591239
+  },
+  "completedFullAuditAndSkips": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/completed-full-audit-and-skips-386a9.json",
+    "sha256": "0cbc45cd667aa25c9788d41ec252e304ecd3ba69dfb770b96bc06fd323e3b786",
+    "bytes": 71406
+  },
+  "unitsSchemaSource": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/assemble-v2-packet-final-proposal-v7.py",
+    "sha256": "10d06150de56766db90bc72913179ba3fad8dea6237764308adbd451993e5743",
+    "bytes": 53738
+  },
+  "descriptorCoverageComplete": true,
+  "unitCounts": {
+    "all": 21,
+    "failedAssertions": 10,
+    "intentionalSkippedAssertions": 7,
+    "failedFileSuiteDescriptors": 4,
+    "runDescriptors": 0
+  },
+  "proposedClassificationCounts": {
+    "BASELINE_MATCHED": 12,
+    "RECORDED_SKIP_OR_TODO": 7,
+    "BASELINE_MATCHED_ASYNC_DISPATCH_FRAME": 2
+  },
+  "classificationCountsAreDescriptorCountsNotFailedTestCounts": true,
+  "units": [
+    {
+      "unit": {
+        "kind": "assertion",
+        "suiteIndex": 81,
+        "assertionIndex": 124,
+        "path": "tests/apiRouterResponseParity.test.ts",
+        "fullName": "unchanged public admission and other owned routes score schema guard and oversized body keep native status",
+        "status": "failed",
+        "failureMessages": [
+          "Error: write ECONNRESET\n    at WriteWrap.onWriteComplete [as oncomplete] (node:internal/stream_base_commons:87:19)"
+        ]
+      },
+      "classification": "BASELINE_MATCHED",
+      "reason": "Verified per-descriptor signature match: clean actual-int whole-file execution reproduces the same failed fullName and native failureMessages after only fixed clone-root prefix mapping. Native exit1, identical test/config bytes and default budgets are captured. This is not a blanket baseline or root-cause claim.",
+      "isolation": {
+        "baselineInt": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+        "defaultBudgetsAndAssertions": true,
+        "command": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-api-router-v1/command.json",
+          "sha256": "cb91a9f7950b77f7c9a29b3c5d4a725f12801a8d5a8ce12524b738c3d4bd9f17",
+          "bytes": 19444
+        },
+        "report": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-api-router-v1/report.json",
+          "sha256": "29e1972eac05f59ab3a292095ea52e3b21d3162a6f518d8aea56b4f8336395d3",
+          "bytes": 42109
+        },
+        "rawLog": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-api-router-v1/raw.log",
+          "sha256": "a60fe5d640a50050102fddce793e6f71af80831daf80b9ab0247f76ae9c2648f",
+          "bytes": 39783
+        }
+      },
+      "baselineActualDescriptor": {
+        "kind": "assertion",
+        "suiteIndex": 0,
+        "assertionIndex": 124,
+        "path": "tests/apiRouterResponseParity.test.ts",
+        "fullName": "unchanged public admission and other owned routes score schema guard and oversized body keep native status",
+        "status": "failed",
+        "failureMessages": [
+          "Error: write ECONNRESET\n    at WriteWrap.onWriteComplete [as oncomplete] (node:internal/stream_base_commons:87:19)"
+        ]
+      },
+      "comparison": {
+        "cloneRootPrefixMappingOnlyEqual": true,
+        "candidateCloneRoot": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019",
+        "baselineCloneRoot": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34",
+        "candidateNativeValueSha256": "dc7a293ebefbe99b35be4c293c4613d8568e9ec5c2723a802aa7bad831303ee0",
+        "baselineNativeValueSha256": "dc7a293ebefbe99b35be4c293c4613d8568e9ec5c2723a802aa7bad831303ee0",
+        "derivedComparisonSha256": "dc7a293ebefbe99b35be4c293c4613d8568e9ec5c2723a802aa7bad831303ee0",
+        "nativeMessagesPreserved": true,
+        "scope": "This exact descriptor only; no native array or message is rewritten."
+      }
+    },
+    {
+      "unit": {
+        "kind": "suite",
+        "suiteIndex": 81,
+        "path": "tests/apiRouterResponseParity.test.ts",
+        "status": "failed",
+        "message": "",
+        "testExecError": null,
+        "assertionCounts": {
+          "passed": 144,
+          "failed": 1
+        },
+        "failedAssertions": [
+          {
+            "fullName": "unchanged public admission and other owned routes score schema guard and oversized body keep native status",
+            "failureMessages": [
+              "Error: write ECONNRESET\n    at WriteWrap.onWriteComplete [as oncomplete] (node:internal/stream_base_commons:87:19)"
+            ]
+          }
+        ]
+      },
+      "classification": "BASELINE_MATCHED",
+      "reason": "Verified per-descriptor signature match: clean actual-int whole-file execution reproduces the complete failed-file descriptor, all failed fullNames/messages and assertion-status counts after only fixed clone-root prefix mapping. Native exit1, identical test/config bytes and default budgets are captured. This is not a blanket baseline or root-cause claim.",
+      "isolation": {
+        "baselineInt": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+        "defaultBudgetsAndAssertions": true,
+        "command": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-api-router-v1/command.json",
+          "sha256": "cb91a9f7950b77f7c9a29b3c5d4a725f12801a8d5a8ce12524b738c3d4bd9f17",
+          "bytes": 19444
+        },
+        "report": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-api-router-v1/report.json",
+          "sha256": "29e1972eac05f59ab3a292095ea52e3b21d3162a6f518d8aea56b4f8336395d3",
+          "bytes": 42109
+        },
+        "rawLog": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-api-router-v1/raw.log",
+          "sha256": "a60fe5d640a50050102fddce793e6f71af80831daf80b9ab0247f76ae9c2648f",
+          "bytes": 39783
+        }
+      },
+      "baselineActualDescriptor": {
+        "kind": "suite",
+        "suiteIndex": 0,
+        "path": "tests/apiRouterResponseParity.test.ts",
+        "status": "failed",
+        "message": "",
+        "testExecError": null,
+        "assertionCounts": {
+          "passed": 144,
+          "failed": 1
+        },
+        "failedAssertions": [
+          {
+            "fullName": "unchanged public admission and other owned routes score schema guard and oversized body keep native status",
+            "failureMessages": [
+              "Error: write ECONNRESET\n    at WriteWrap.onWriteComplete [as oncomplete] (node:internal/stream_base_commons:87:19)"
+            ]
+          }
+        ]
+      },
+      "comparison": {
+        "cloneRootPrefixMappingOnlyEqual": true,
+        "candidateCloneRoot": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019",
+        "baselineCloneRoot": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34",
+        "candidateNativeValueSha256": "1c66a2393d62ccae5abe00d2df01064703976f7a7896aec6b479e0d5c7e5a2b5",
+        "baselineNativeValueSha256": "1c66a2393d62ccae5abe00d2df01064703976f7a7896aec6b479e0d5c7e5a2b5",
+        "derivedComparisonSha256": "1c66a2393d62ccae5abe00d2df01064703976f7a7896aec6b479e0d5c7e5a2b5",
+        "nativeMessagesPreserved": true,
+        "scope": "This exact descriptor only; no native array or message is rewritten."
+      }
+    },
+    {
+      "unit": {
+        "kind": "assertion",
+        "suiteIndex": 1323,
+        "assertionIndex": 2,
+        "path": "tests/publicDocsGraph.test.ts",
+        "fullName": "AMC public Docs graph every local guide edge resolves to another promoted guide",
+        "status": "failed",
+        "failureMessages": [
+          "AssertionError: expected [ { source: 'MCP_SERVER', …(2) } ] to deeply equal []\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/publicDocsGraph.test.ts:70:21\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+        ]
+      },
+      "classification": "BASELINE_MATCHED",
+      "reason": "Verified per-descriptor signature match: clean actual-int whole-file execution reproduces the same failed fullName and native failureMessages after only fixed clone-root prefix mapping. Native exit1, identical test/config bytes and default budgets are captured. This is not a blanket baseline or root-cause claim.",
+      "isolation": {
+        "baselineInt": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+        "defaultBudgetsAndAssertions": true,
+        "command": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-public-docs-v1/command.json",
+          "sha256": "a574f94069daaae4d378c3d8a80cb2183c83c90236bc1259f0f09810e6a3ed1b",
+          "bytes": 19430
+        },
+        "report": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-public-docs-v1/report.json",
+          "sha256": "09782772baab925f669c97ac32d6265df6adcdbce5e9a4ffd1a8dd83039a00b4",
+          "bytes": 3907
+        },
+        "rawLog": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-public-docs-v1/raw.log",
+          "sha256": "588060cac507627ba8070d8b02586c6819806f6a52e98ffd84b64289b4552ee5",
+          "bytes": 1093
+        }
+      },
+      "baselineActualDescriptor": {
+        "kind": "assertion",
+        "suiteIndex": 0,
+        "assertionIndex": 2,
+        "path": "tests/publicDocsGraph.test.ts",
+        "fullName": "AMC public Docs graph every local guide edge resolves to another promoted guide",
+        "status": "failed",
+        "failureMessages": [
+          "AssertionError: expected [ { source: 'MCP_SERVER', …(2) } ] to deeply equal []\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/tests/publicDocsGraph.test.ts:70:21\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+        ]
+      },
+      "comparison": {
+        "cloneRootPrefixMappingOnlyEqual": true,
+        "candidateCloneRoot": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019",
+        "baselineCloneRoot": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34",
+        "candidateNativeValueSha256": "41628481ac2e232513bb12c1d51ad65b44544711604c70d48d4bcfe588fe1f62",
+        "baselineNativeValueSha256": "efe86e3f492283534ca9d4379efa02a5dd0f473a3cc686361ebdd30f89280991",
+        "derivedComparisonSha256": "c5df133a4fe99b885388073f555e9f0cd907539494fb0e17c83e727a2eed37fe",
+        "nativeMessagesPreserved": true,
+        "scope": "This exact descriptor only; no native array or message is rewritten."
+      }
+    },
+    {
+      "unit": {
+        "kind": "suite",
+        "suiteIndex": 1323,
+        "path": "tests/publicDocsGraph.test.ts",
+        "status": "failed",
+        "message": "",
+        "testExecError": null,
+        "assertionCounts": {
+          "passed": 5,
+          "failed": 1
+        },
+        "failedAssertions": [
+          {
+            "fullName": "AMC public Docs graph every local guide edge resolves to another promoted guide",
+            "failureMessages": [
+              "AssertionError: expected [ { source: 'MCP_SERVER', …(2) } ] to deeply equal []\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/publicDocsGraph.test.ts:70:21\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+            ]
+          }
+        ]
+      },
+      "classification": "BASELINE_MATCHED",
+      "reason": "Verified per-descriptor signature match: clean actual-int whole-file execution reproduces the complete failed-file descriptor, all failed fullNames/messages and assertion-status counts after only fixed clone-root prefix mapping. Native exit1, identical test/config bytes and default budgets are captured. This is not a blanket baseline or root-cause claim.",
+      "isolation": {
+        "baselineInt": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+        "defaultBudgetsAndAssertions": true,
+        "command": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-public-docs-v1/command.json",
+          "sha256": "a574f94069daaae4d378c3d8a80cb2183c83c90236bc1259f0f09810e6a3ed1b",
+          "bytes": 19430
+        },
+        "report": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-public-docs-v1/report.json",
+          "sha256": "09782772baab925f669c97ac32d6265df6adcdbce5e9a4ffd1a8dd83039a00b4",
+          "bytes": 3907
+        },
+        "rawLog": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-public-docs-v1/raw.log",
+          "sha256": "588060cac507627ba8070d8b02586c6819806f6a52e98ffd84b64289b4552ee5",
+          "bytes": 1093
+        }
+      },
+      "baselineActualDescriptor": {
+        "kind": "suite",
+        "suiteIndex": 0,
+        "path": "tests/publicDocsGraph.test.ts",
+        "status": "failed",
+        "message": "",
+        "testExecError": null,
+        "assertionCounts": {
+          "passed": 5,
+          "failed": 1
+        },
+        "failedAssertions": [
+          {
+            "fullName": "AMC public Docs graph every local guide edge resolves to another promoted guide",
+            "failureMessages": [
+              "AssertionError: expected [ { source: 'MCP_SERVER', …(2) } ] to deeply equal []\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/tests/publicDocsGraph.test.ts:70:21\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+            ]
+          }
+        ]
+      },
+      "comparison": {
+        "cloneRootPrefixMappingOnlyEqual": true,
+        "candidateCloneRoot": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019",
+        "baselineCloneRoot": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34",
+        "candidateNativeValueSha256": "8443e77c0c39101f38e8193b94df89b89a1f06afe48283008d64a33373aa1184",
+        "baselineNativeValueSha256": "17a8f3a429092bfba5f185fc4bb5be5a209f3005fa9caaa2322e9c56723afd0d",
+        "derivedComparisonSha256": "a1c7a99e26a50050b07825bffe3c4ea086f62005b4f03cc10d65ed404dda8bf3",
+        "nativeMessagesPreserved": true,
+        "scope": "This exact descriptor only; no native array or message is rewritten."
+      }
+    },
+    {
+      "unit": {
+        "kind": "assertion",
+        "suiteIndex": 1663,
+        "assertionIndex": 0,
+        "path": "tests/conformance/claudeCodeHooks.conformance.test.ts",
+        "fullName": "Claude Code 2.1.296 hook conformance (P1-23) an allowed Read runs in a registered session, the claim reads enforced, and the lifecycle verifies with no mismatch",
+        "status": "skipped",
+        "failureMessages": []
+      },
+      "classification": "RECORDED_SKIP_OR_TODO",
+      "reason": "Actual native status is skipped. Launch captured AMC_CLAUDE_CODE_CONFORMANCE present=false/enabled=false; tracked source compares it to \"1\" and gates the enclosing suite with describe.runIf(enabled). Environment was inherited unchanged; no unset or override is claimed. This is an opt-in conformance nonmeasurement, not a passed control.",
+      "source": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/conformance/claudeCodeHooks.conformance.test.ts",
+        "sha256": "76d780fcb6bdcee6f68fbd470c11647b9529331325abd6bdeeef83dee1f31032",
+        "bytes": 19398
+      },
+      "sourceLines": [
+        {
+          "line": 26,
+          "text": "const enabled = process.env.AMC_CLAUDE_CODE_CONFORMANCE === \"1\";"
+        },
+        {
+          "line": 86,
+          "text": "describe.runIf(enabled)(`Claude Code ${version} hook conformance (P1-23)`, { timeout: 300_000 }, () => {"
+        },
+        {
+          "line": 179,
+          "text": "  test(\"an allowed Read runs in a registered session, the claim reads enforced, and the lifecycle verifies with no mismatch\", async () => {"
+        }
+      ],
+      "environmentCapture": {
+        "launch": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/full-suite/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-final-v1/launch.json",
+          "sha256": "eae73b13f68f32cc0017db1dcdd560d4ac2d7507e2ff004fa93d98c156d1c0a4",
+          "bytes": 8961
+        },
+        "jsonPointer": "/optInConformanceAtStart/AMC_CLAUDE_CODE_CONFORMANCE",
+        "actual": {
+          "present": false,
+          "enabled": false
+        }
+      }
+    },
+    {
+      "unit": {
+        "kind": "assertion",
+        "suiteIndex": 1663,
+        "assertionIndex": 1,
+        "path": "tests/conformance/claudeCodeHooks.conformance.test.ts",
+        "fullName": "Claude Code 2.1.296 hook conformance (P1-23) a denied Bash command, a Write that needs approval, an MCP tool and a Write to AMC's hook settings have no effect",
+        "status": "skipped",
+        "failureMessages": []
+      },
+      "classification": "RECORDED_SKIP_OR_TODO",
+      "reason": "Actual native status is skipped. Launch captured AMC_CLAUDE_CODE_CONFORMANCE present=false/enabled=false; tracked source compares it to \"1\" and gates the enclosing suite with describe.runIf(enabled). Environment was inherited unchanged; no unset or override is claimed. This is an opt-in conformance nonmeasurement, not a passed control.",
+      "source": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/conformance/claudeCodeHooks.conformance.test.ts",
+        "sha256": "76d780fcb6bdcee6f68fbd470c11647b9529331325abd6bdeeef83dee1f31032",
+        "bytes": 19398
+      },
+      "sourceLines": [
+        {
+          "line": 26,
+          "text": "const enabled = process.env.AMC_CLAUDE_CODE_CONFORMANCE === \"1\";"
+        },
+        {
+          "line": 86,
+          "text": "describe.runIf(enabled)(`Claude Code ${version} hook conformance (P1-23)`, { timeout: 300_000 }, () => {"
+        },
+        {
+          "line": 194,
+          "text": "  test(\"a denied Bash command, a Write that needs approval, an MCP tool and a Write to AMC's hook settings have no effect\", async () => {"
+        }
+      ],
+      "environmentCapture": {
+        "launch": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/full-suite/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-final-v1/launch.json",
+          "sha256": "eae73b13f68f32cc0017db1dcdd560d4ac2d7507e2ff004fa93d98c156d1c0a4",
+          "bytes": 8961
+        },
+        "jsonPointer": "/optInConformanceAtStart/AMC_CLAUDE_CODE_CONFORMANCE",
+        "actual": {
+          "present": false,
+          "enabled": false
+        }
+      }
+    },
+    {
+      "unit": {
+        "kind": "assertion",
+        "suiteIndex": 1663,
+        "assertionIndex": 2,
+        "path": "tests/conformance/claudeCodeHooks.conformance.test.ts",
+        "fullName": "Claude Code 2.1.296 hook conformance (P1-23) a foreign PreToolUse hook in the project settings leaves the session not governed",
+        "status": "skipped",
+        "failureMessages": []
+      },
+      "classification": "RECORDED_SKIP_OR_TODO",
+      "reason": "Actual native status is skipped. Launch captured AMC_CLAUDE_CODE_CONFORMANCE present=false/enabled=false; tracked source compares it to \"1\" and gates the enclosing suite with describe.runIf(enabled). Environment was inherited unchanged; no unset or override is claimed. This is an opt-in conformance nonmeasurement, not a passed control.",
+      "source": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/conformance/claudeCodeHooks.conformance.test.ts",
+        "sha256": "76d780fcb6bdcee6f68fbd470c11647b9529331325abd6bdeeef83dee1f31032",
+        "bytes": 19398
+      },
+      "sourceLines": [
+        {
+          "line": 26,
+          "text": "const enabled = process.env.AMC_CLAUDE_CODE_CONFORMANCE === \"1\";"
+        },
+        {
+          "line": 86,
+          "text": "describe.runIf(enabled)(`Claude Code ${version} hook conformance (P1-23)`, { timeout: 300_000 }, () => {"
+        },
+        {
+          "line": 220,
+          "text": "  test(\"a foreign PreToolUse hook in the project settings leaves the session not governed\", async () => {"
+        }
+      ],
+      "environmentCapture": {
+        "launch": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/full-suite/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-final-v1/launch.json",
+          "sha256": "eae73b13f68f32cc0017db1dcdd560d4ac2d7507e2ff004fa93d98c156d1c0a4",
+          "bytes": 8961
+        },
+        "jsonPointer": "/optInConformanceAtStart/AMC_CLAUDE_CODE_CONFORMANCE",
+        "actual": {
+          "present": false,
+          "enabled": false
+        }
+      }
+    },
+    {
+      "unit": {
+        "kind": "assertion",
+        "suiteIndex": 1663,
+        "assertionIndex": 3,
+        "path": "tests/conformance/claudeCodeHooks.conformance.test.ts",
+        "fullName": "Claude Code 2.1.296 hook conformance (P1-23) UserPromptSubmit admission: an active freeze blocks the prompt before the model sees it",
+        "status": "skipped",
+        "failureMessages": []
+      },
+      "classification": "RECORDED_SKIP_OR_TODO",
+      "reason": "Actual native status is skipped. Launch captured AMC_CLAUDE_CODE_CONFORMANCE present=false/enabled=false; tracked source compares it to \"1\" and gates the enclosing suite with describe.runIf(enabled). Environment was inherited unchanged; no unset or override is claimed. This is an opt-in conformance nonmeasurement, not a passed control.",
+      "source": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/conformance/claudeCodeHooks.conformance.test.ts",
+        "sha256": "76d780fcb6bdcee6f68fbd470c11647b9529331325abd6bdeeef83dee1f31032",
+        "bytes": 19398
+      },
+      "sourceLines": [
+        {
+          "line": 26,
+          "text": "const enabled = process.env.AMC_CLAUDE_CODE_CONFORMANCE === \"1\";"
+        },
+        {
+          "line": 86,
+          "text": "describe.runIf(enabled)(`Claude Code ${version} hook conformance (P1-23)`, { timeout: 300_000 }, () => {"
+        },
+        {
+          "line": 233,
+          "text": "  test(\"UserPromptSubmit admission: an active freeze blocks the prompt before the model sees it\", async () => {"
+        }
+      ],
+      "environmentCapture": {
+        "launch": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/full-suite/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-final-v1/launch.json",
+          "sha256": "eae73b13f68f32cc0017db1dcdd560d4ac2d7507e2ff004fa93d98c156d1c0a4",
+          "bytes": 8961
+        },
+        "jsonPointer": "/optInConformanceAtStart/AMC_CLAUDE_CODE_CONFORMANCE",
+        "actual": {
+          "present": false,
+          "enabled": false
+        }
+      }
+    },
+    {
+      "unit": {
+        "kind": "assertion",
+        "suiteIndex": 1663,
+        "assertionIndex": 4,
+        "path": "tests/conformance/claudeCodeHooks.conformance.test.ts",
+        "fullName": "Claude Code 2.1.296 hook conformance (P1-23) hook round trip latency: the installed PreToolUse handler spawned against the local Bridge",
+        "status": "skipped",
+        "failureMessages": []
+      },
+      "classification": "RECORDED_SKIP_OR_TODO",
+      "reason": "Actual native status is skipped. Launch captured AMC_CLAUDE_CODE_CONFORMANCE present=false/enabled=false; tracked source compares it to \"1\" and gates the enclosing suite with describe.runIf(enabled). Environment was inherited unchanged; no unset or override is claimed. This is an opt-in conformance nonmeasurement, not a passed control.",
+      "source": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/conformance/claudeCodeHooks.conformance.test.ts",
+        "sha256": "76d780fcb6bdcee6f68fbd470c11647b9529331325abd6bdeeef83dee1f31032",
+        "bytes": 19398
+      },
+      "sourceLines": [
+        {
+          "line": 26,
+          "text": "const enabled = process.env.AMC_CLAUDE_CODE_CONFORMANCE === \"1\";"
+        },
+        {
+          "line": 86,
+          "text": "describe.runIf(enabled)(`Claude Code ${version} hook conformance (P1-23)`, { timeout: 300_000 }, () => {"
+        },
+        {
+          "line": 246,
+          "text": "  test(\"hook round trip latency: the installed PreToolUse handler spawned against the local Bridge\", async () => {"
+        }
+      ],
+      "environmentCapture": {
+        "launch": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/full-suite/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-final-v1/launch.json",
+          "sha256": "eae73b13f68f32cc0017db1dcdd560d4ac2d7507e2ff004fa93d98c156d1c0a4",
+          "bytes": 8961
+        },
+        "jsonPointer": "/optInConformanceAtStart/AMC_CLAUDE_CODE_CONFORMANCE",
+        "actual": {
+          "present": false,
+          "enabled": false
+        }
+      }
+    },
+    {
+      "unit": {
+        "kind": "assertion",
+        "suiteIndex": 1663,
+        "assertionIndex": 5,
+        "path": "tests/conformance/claudeCodeHooks.conformance.test.ts",
+        "fullName": "Claude Code 2.1.296 hook conformance (P1-23) every decision receipt and event verifies cold",
+        "status": "skipped",
+        "failureMessages": []
+      },
+      "classification": "RECORDED_SKIP_OR_TODO",
+      "reason": "Actual native status is skipped. Launch captured AMC_CLAUDE_CODE_CONFORMANCE present=false/enabled=false; tracked source compares it to \"1\" and gates the enclosing suite with describe.runIf(enabled). Environment was inherited unchanged; no unset or override is claimed. This is an opt-in conformance nonmeasurement, not a passed control.",
+      "source": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/conformance/claudeCodeHooks.conformance.test.ts",
+        "sha256": "76d780fcb6bdcee6f68fbd470c11647b9529331325abd6bdeeef83dee1f31032",
+        "bytes": 19398
+      },
+      "sourceLines": [
+        {
+          "line": 26,
+          "text": "const enabled = process.env.AMC_CLAUDE_CODE_CONFORMANCE === \"1\";"
+        },
+        {
+          "line": 86,
+          "text": "describe.runIf(enabled)(`Claude Code ${version} hook conformance (P1-23)`, { timeout: 300_000 }, () => {"
+        },
+        {
+          "line": 273,
+          "text": "  test(\"every decision receipt and event verifies cold\", () => {"
+        }
+      ],
+      "environmentCapture": {
+        "launch": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/full-suite/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-final-v1/launch.json",
+          "sha256": "eae73b13f68f32cc0017db1dcdd560d4ac2d7507e2ff004fa93d98c156d1c0a4",
+          "bytes": 8961
+        },
+        "jsonPointer": "/optInConformanceAtStart/AMC_CLAUDE_CODE_CONFORMANCE",
+        "actual": {
+          "present": false,
+          "enabled": false
+        }
+      }
+    },
+    {
+      "unit": {
+        "kind": "assertion",
+        "suiteIndex": 1663,
+        "assertionIndex": 6,
+        "path": "tests/conformance/claudeCodeHooks.conformance.test.ts",
+        "fullName": "Claude Code 2.1.296 hook conformance (P1-23) with the Bridge stopped the tool call is blocked",
+        "status": "skipped",
+        "failureMessages": []
+      },
+      "classification": "RECORDED_SKIP_OR_TODO",
+      "reason": "Actual native status is skipped. Launch captured AMC_CLAUDE_CODE_CONFORMANCE present=false/enabled=false; tracked source compares it to \"1\" and gates the enclosing suite with describe.runIf(enabled). Environment was inherited unchanged; no unset or override is claimed. This is an opt-in conformance nonmeasurement, not a passed control.",
+      "source": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/conformance/claudeCodeHooks.conformance.test.ts",
+        "sha256": "76d780fcb6bdcee6f68fbd470c11647b9529331325abd6bdeeef83dee1f31032",
+        "bytes": 19398
+      },
+      "sourceLines": [
+        {
+          "line": 26,
+          "text": "const enabled = process.env.AMC_CLAUDE_CODE_CONFORMANCE === \"1\";"
+        },
+        {
+          "line": 86,
+          "text": "describe.runIf(enabled)(`Claude Code ${version} hook conformance (P1-23)`, { timeout: 300_000 }, () => {"
+        },
+        {
+          "line": 285,
+          "text": "  test(\"with the Bridge stopped the tool call is blocked\", async () => {"
+        }
+      ],
+      "environmentCapture": {
+        "launch": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/full-suite/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-final-v1/launch.json",
+          "sha256": "eae73b13f68f32cc0017db1dcdd560d4ac2d7507e2ff004fa93d98c156d1c0a4",
+          "bytes": 8961
+        },
+        "jsonPointer": "/optInConformanceAtStart/AMC_CLAUDE_CODE_CONFORMANCE",
+        "actual": {
+          "present": false,
+          "enabled": false
+        }
+      }
+    },
+    {
+      "unit": {
+        "kind": "assertion",
+        "suiteIndex": 1790,
+        "assertionIndex": 0,
+        "path": "tests/time/checkpointWindow.test.ts",
+        "fullName": "P1-25 real signed ledger checkpoint transitions completes the same signed pending checkpoint with a genuine query-bound token and ledger event",
+        "status": "failed",
+        "failureMessages": [
+          "AssertionError: expected null not to be null\n    at withGrantFixture (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/time/tsaTestFixture.ts:289:30)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/time/checkpointWindow.test.ts:261:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+        ]
+      },
+      "classification": "BASELINE_MATCHED",
+      "reason": "Verified per-descriptor signature match: clean actual-int whole-file execution reproduces the same failed fullName and native failureMessages after only fixed clone-root prefix mapping. Native exit1, identical test/config bytes and default budgets are captured. This is not a blanket baseline or root-cause claim.",
+      "isolation": {
+        "baselineInt": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+        "defaultBudgetsAndAssertions": true,
+        "command": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-checkpoint-v1/command.json",
+          "sha256": "6b30fb23c23c2215130cfdaa759a4bc48bd872f40c5b28958a3c0698895ccd8a",
+          "bytes": 19439
+        },
+        "report": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-checkpoint-v1/report.json",
+          "sha256": "17b6d107741785cf6fbbcd9d9daf98dac7f7b3a9a91b45a6c43f955f95201f7d",
+          "bytes": 6081
+        },
+        "rawLog": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-checkpoint-v1/raw.log",
+          "sha256": "8c3cf3d49feea53635089567ea25a6d5457df26dffe74cd35e6bb8e37889b20f",
+          "bytes": 19580
+        }
+      },
+      "baselineActualDescriptor": {
+        "kind": "assertion",
+        "suiteIndex": 0,
+        "assertionIndex": 0,
+        "path": "tests/time/checkpointWindow.test.ts",
+        "fullName": "P1-25 real signed ledger checkpoint transitions completes the same signed pending checkpoint with a genuine query-bound token and ledger event",
+        "status": "failed",
+        "failureMessages": [
+          "AssertionError: expected null not to be null\n    at withGrantFixture (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/tests/time/tsaTestFixture.ts:289:30)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/tests/time/checkpointWindow.test.ts:261:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+        ]
+      },
+      "comparison": {
+        "cloneRootPrefixMappingOnlyEqual": true,
+        "candidateCloneRoot": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019",
+        "baselineCloneRoot": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34",
+        "candidateNativeValueSha256": "5ce48a70682bb931e74a707b7bd61fd6274d787da31be5a545a2ac36a8424f1b",
+        "baselineNativeValueSha256": "1326faf3cba3b900743ddf872dbbe0c347b1bcc75394f4dffc7331a2e319950f",
+        "derivedComparisonSha256": "c61649d5dcf1ed79b086df91bfb49e85ce74c76fca419091bd7a8693045df97a",
+        "nativeMessagesPreserved": true,
+        "scope": "This exact descriptor only; no native array or message is rewritten."
+      }
+    },
+    {
+      "unit": {
+        "kind": "assertion",
+        "suiteIndex": 1790,
+        "assertionIndex": 1,
+        "path": "tests/time/checkpointWindow.test.ts",
+        "fullName": "P1-25 real signed ledger checkpoint transitions rejects required time only after the real TSA refusal while preserving the signed pending checkpoint",
+        "status": "failed",
+        "failureMessages": [
+          "AssertionError: expected null not to be null\n    at withGrantFixture (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/time/tsaTestFixture.ts:289:30)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/time/checkpointWindow.test.ts:328:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+        ]
+      },
+      "classification": "BASELINE_MATCHED",
+      "reason": "Verified per-descriptor signature match: clean actual-int whole-file execution reproduces the same failed fullName and native failureMessages after only fixed clone-root prefix mapping. Native exit1, identical test/config bytes and default budgets are captured. This is not a blanket baseline or root-cause claim.",
+      "isolation": {
+        "baselineInt": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+        "defaultBudgetsAndAssertions": true,
+        "command": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-checkpoint-v1/command.json",
+          "sha256": "6b30fb23c23c2215130cfdaa759a4bc48bd872f40c5b28958a3c0698895ccd8a",
+          "bytes": 19439
+        },
+        "report": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-checkpoint-v1/report.json",
+          "sha256": "17b6d107741785cf6fbbcd9d9daf98dac7f7b3a9a91b45a6c43f955f95201f7d",
+          "bytes": 6081
+        },
+        "rawLog": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-checkpoint-v1/raw.log",
+          "sha256": "8c3cf3d49feea53635089567ea25a6d5457df26dffe74cd35e6bb8e37889b20f",
+          "bytes": 19580
+        }
+      },
+      "baselineActualDescriptor": {
+        "kind": "assertion",
+        "suiteIndex": 0,
+        "assertionIndex": 1,
+        "path": "tests/time/checkpointWindow.test.ts",
+        "fullName": "P1-25 real signed ledger checkpoint transitions rejects required time only after the real TSA refusal while preserving the signed pending checkpoint",
+        "status": "failed",
+        "failureMessages": [
+          "AssertionError: expected null not to be null\n    at withGrantFixture (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/tests/time/tsaTestFixture.ts:289:30)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/tests/time/checkpointWindow.test.ts:328:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+        ]
+      },
+      "comparison": {
+        "cloneRootPrefixMappingOnlyEqual": true,
+        "candidateCloneRoot": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019",
+        "baselineCloneRoot": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34",
+        "candidateNativeValueSha256": "3d5fd9e1f27a4e856af137d099673fc0d64eb6c26530ae5ef1c7e98cf83352ae",
+        "baselineNativeValueSha256": "f7e2e50be9f74da8da75877f9de8df7820b6232a60812f1a4a1447ee19a78340",
+        "derivedComparisonSha256": "27310a87dae2f1f2fe5aa2c94ff257118b66263a54a47c6752e82adb1d3e17ab",
+        "nativeMessagesPreserved": true,
+        "scope": "This exact descriptor only; no native array or message is rewritten."
+      }
+    },
+    {
+      "unit": {
+        "kind": "assertion",
+        "suiteIndex": 1790,
+        "assertionIndex": 2,
+        "path": "tests/time/checkpointWindow.test.ts",
+        "fullName": "P1-25 real signed ledger checkpoint transitions derives a genuine two-checkpoint window and inclusive default and zero-tolerance reader boundaries",
+        "status": "failed",
+        "failureMessages": [
+          "AssertionError: expected null not to be null\n    at withGrantFixture (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/time/tsaTestFixture.ts:289:30)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/time/checkpointWindow.test.ts:365:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+        ]
+      },
+      "classification": "BASELINE_MATCHED",
+      "reason": "Verified per-descriptor signature match: clean actual-int whole-file execution reproduces the same failed fullName and native failureMessages after only fixed clone-root prefix mapping. Native exit1, identical test/config bytes and default budgets are captured. This is not a blanket baseline or root-cause claim.",
+      "isolation": {
+        "baselineInt": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+        "defaultBudgetsAndAssertions": true,
+        "command": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-checkpoint-v1/command.json",
+          "sha256": "6b30fb23c23c2215130cfdaa759a4bc48bd872f40c5b28958a3c0698895ccd8a",
+          "bytes": 19439
+        },
+        "report": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-checkpoint-v1/report.json",
+          "sha256": "17b6d107741785cf6fbbcd9d9daf98dac7f7b3a9a91b45a6c43f955f95201f7d",
+          "bytes": 6081
+        },
+        "rawLog": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-checkpoint-v1/raw.log",
+          "sha256": "8c3cf3d49feea53635089567ea25a6d5457df26dffe74cd35e6bb8e37889b20f",
+          "bytes": 19580
+        }
+      },
+      "baselineActualDescriptor": {
+        "kind": "assertion",
+        "suiteIndex": 0,
+        "assertionIndex": 2,
+        "path": "tests/time/checkpointWindow.test.ts",
+        "fullName": "P1-25 real signed ledger checkpoint transitions derives a genuine two-checkpoint window and inclusive default and zero-tolerance reader boundaries",
+        "status": "failed",
+        "failureMessages": [
+          "AssertionError: expected null not to be null\n    at withGrantFixture (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/tests/time/tsaTestFixture.ts:289:30)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/tests/time/checkpointWindow.test.ts:365:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+        ]
+      },
+      "comparison": {
+        "cloneRootPrefixMappingOnlyEqual": true,
+        "candidateCloneRoot": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019",
+        "baselineCloneRoot": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34",
+        "candidateNativeValueSha256": "3b32c14b73cd861e195cde22f70085b6d58e4a3c6761498bd770825d710375b7",
+        "baselineNativeValueSha256": "bf4944b5edd778c8686a1a7c248029d9c63c1b7584b1c822ad7ce234bc38fc4b",
+        "derivedComparisonSha256": "a6814f238d1636131d2bdb717cfea608f50a5f176df74305275293d877d14d20",
+        "nativeMessagesPreserved": true,
+        "scope": "This exact descriptor only; no native array or message is rewritten."
+      }
+    },
+    {
+      "unit": {
+        "kind": "assertion",
+        "suiteIndex": 1790,
+        "assertionIndex": 3,
+        "path": "tests/time/checkpointWindow.test.ts",
+        "fullName": "P1-25 real signed ledger checkpoint transitions uses the default signed trust home and checkpoints after exactly two new audit events",
+        "status": "failed",
+        "failureMessages": [
+          "AssertionError: expected null not to be null\n    at withGrantFixture (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/time/tsaTestFixture.ts:289:30)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/time/checkpointWindow.test.ts:500:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+        ]
+      },
+      "classification": "BASELINE_MATCHED_ASYNC_DISPATCH_FRAME",
+      "reason": "Observed failure-signature equivalence: the clean actual-int whole-file run reproduces this named checkpoint failure, with only the additional baseline async-dispatch frame specified in normalization. Error and fixture/test locations are unchanged; every sibling failure and all other suite fields match. This is not exact native-message equality or a root-cause determination.",
+      "isolation": {
+        "baselineInt": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+        "defaultBudgetsAndAssertions": true,
+        "command": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-checkpoint-v1/command.json",
+          "sha256": "6b30fb23c23c2215130cfdaa759a4bc48bd872f40c5b28958a3c0698895ccd8a",
+          "bytes": 19439
+        },
+        "report": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-checkpoint-v1/report.json",
+          "sha256": "17b6d107741785cf6fbbcd9d9daf98dac7f7b3a9a91b45a6c43f955f95201f7d",
+          "bytes": 6081
+        },
+        "rawLog": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-checkpoint-v1/raw.log",
+          "sha256": "8c3cf3d49feea53635089567ea25a6d5457df26dffe74cd35e6bb8e37889b20f",
+          "bytes": 19580
+        }
+      },
+      "baselineActualDescriptor": {
+        "kind": "assertion",
+        "suiteIndex": 0,
+        "assertionIndex": 3,
+        "path": "tests/time/checkpointWindow.test.ts",
+        "fullName": "P1-25 real signed ledger checkpoint transitions uses the default signed trust home and checkpoints after exactly two new audit events",
+        "status": "failed",
+        "failureMessages": [
+          "AssertionError: expected null not to be null\n    at withGrantFixture (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/tests/time/tsaTestFixture.ts:289:30)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/tests/time/checkpointWindow.test.ts:500:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+        ]
+      },
+      "comparison": {
+        "cloneRootPrefixMappingOnlyEqual": false,
+        "candidateCloneRoot": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019",
+        "baselineCloneRoot": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34",
+        "candidateNativeValueSha256": "474fa7881f14b9a15c87238ac00239a91f98483fadbcf1225a96fc63d3933f8b",
+        "baselineNativeValueSha256": "23b421deac32d0692ee2ff77f04a272be04f59b04a453fc64578fee2c129a53b",
+        "derivedComparisonSha256": "39274ee82c7125d35e4cdfbac352996c25efd2943030ee636e0bfadb07ab683d",
+        "nativeMessagesPreserved": true,
+        "scope": "This exact descriptor only; no native array or message is rewritten.",
+        "narrowOptionalFrameComparisonEqual": true,
+        "derivedSuiteOrdering": null
+      },
+      "normalization": {
+        "kind": "OPTIONAL_NODE_ASYNC_DISPATCH_FRAME",
+        "path": "tests/time/checkpointWindow.test.ts",
+        "fullName": "P1-25 real signed ledger checkpoint transitions uses the default signed trust home and checkpoints after exactly two new audit events",
+        "frame": "\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)",
+        "fullOccurrences": 0,
+        "baselineOccurrences": 1
+      },
+      "oracleReview": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/baseline-four-comparison-386a9.json",
+        "sha256": "4f431cdcac9e3c0bccf02366436039d1b54076a91953f6502f8de52399e8e2b1",
+        "bytes": 88853
+      }
+    },
+    {
+      "unit": {
+        "kind": "assertion",
+        "suiteIndex": 1790,
+        "assertionIndex": 4,
+        "path": "tests/time/checkpointWindow.test.ts",
+        "fullName": "P1-25 real signed ledger checkpoint transitions persists backdated and postdated producer claims in the signed ledger and reports their genuine checkpoint window",
+        "status": "failed",
+        "failureMessages": [
+          "AssertionError: expected null not to be null\n    at withGrantFixture (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/time/tsaTestFixture.ts:289:30)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/time/checkpointWindow.test.ts:642:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+        ]
+      },
+      "classification": "BASELINE_MATCHED",
+      "reason": "Verified per-descriptor signature match: clean actual-int whole-file execution reproduces the same failed fullName and native failureMessages after only fixed clone-root prefix mapping. Native exit1, identical test/config bytes and default budgets are captured. This is not a blanket baseline or root-cause claim.",
+      "isolation": {
+        "baselineInt": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+        "defaultBudgetsAndAssertions": true,
+        "command": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-checkpoint-v1/command.json",
+          "sha256": "6b30fb23c23c2215130cfdaa759a4bc48bd872f40c5b28958a3c0698895ccd8a",
+          "bytes": 19439
+        },
+        "report": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-checkpoint-v1/report.json",
+          "sha256": "17b6d107741785cf6fbbcd9d9daf98dac7f7b3a9a91b45a6c43f955f95201f7d",
+          "bytes": 6081
+        },
+        "rawLog": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-checkpoint-v1/raw.log",
+          "sha256": "8c3cf3d49feea53635089567ea25a6d5457df26dffe74cd35e6bb8e37889b20f",
+          "bytes": 19580
+        }
+      },
+      "baselineActualDescriptor": {
+        "kind": "assertion",
+        "suiteIndex": 0,
+        "assertionIndex": 4,
+        "path": "tests/time/checkpointWindow.test.ts",
+        "fullName": "P1-25 real signed ledger checkpoint transitions persists backdated and postdated producer claims in the signed ledger and reports their genuine checkpoint window",
+        "status": "failed",
+        "failureMessages": [
+          "AssertionError: expected null not to be null\n    at withGrantFixture (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/tests/time/tsaTestFixture.ts:289:30)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/tests/time/checkpointWindow.test.ts:642:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+        ]
+      },
+      "comparison": {
+        "cloneRootPrefixMappingOnlyEqual": true,
+        "candidateCloneRoot": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019",
+        "baselineCloneRoot": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34",
+        "candidateNativeValueSha256": "a99d823eeb32aa5da57e931a5f494f54feda9746826af3552948bce3e9d39b89",
+        "baselineNativeValueSha256": "cd94c821d22fa1b33a83a7c0cbf7f8e70f356ab0dea89ace6875d35113b19cdc",
+        "derivedComparisonSha256": "a0d7f8d2a994e14efd11c060d333e4c1841884ce1bbeb0ddde62fe43aa1f2aaa",
+        "nativeMessagesPreserved": true,
+        "scope": "This exact descriptor only; no native array or message is rewritten."
+      }
+    },
+    {
+      "unit": {
+        "kind": "assertion",
+        "suiteIndex": 1790,
+        "assertionIndex": 5,
+        "path": "tests/time/checkpointWindow.test.ts",
+        "fullName": "P1-25 real signed ledger checkpoint transitions widens genuine signed checkpoint windows by nonzero accuracy at inclusive default and zero-tolerance edges",
+        "status": "failed",
+        "failureMessages": [
+          "AssertionError: expected null not to be null\n    at withGrantFixture (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/time/tsaTestFixture.ts:289:30)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/time/checkpointWindow.test.ts:799:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+        ]
+      },
+      "classification": "BASELINE_MATCHED",
+      "reason": "Verified per-descriptor signature match: clean actual-int whole-file execution reproduces the same failed fullName and native failureMessages after only fixed clone-root prefix mapping. Native exit1, identical test/config bytes and default budgets are captured. This is not a blanket baseline or root-cause claim.",
+      "isolation": {
+        "baselineInt": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+        "defaultBudgetsAndAssertions": true,
+        "command": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-checkpoint-v1/command.json",
+          "sha256": "6b30fb23c23c2215130cfdaa759a4bc48bd872f40c5b28958a3c0698895ccd8a",
+          "bytes": 19439
+        },
+        "report": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-checkpoint-v1/report.json",
+          "sha256": "17b6d107741785cf6fbbcd9d9daf98dac7f7b3a9a91b45a6c43f955f95201f7d",
+          "bytes": 6081
+        },
+        "rawLog": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-checkpoint-v1/raw.log",
+          "sha256": "8c3cf3d49feea53635089567ea25a6d5457df26dffe74cd35e6bb8e37889b20f",
+          "bytes": 19580
+        }
+      },
+      "baselineActualDescriptor": {
+        "kind": "assertion",
+        "suiteIndex": 0,
+        "assertionIndex": 5,
+        "path": "tests/time/checkpointWindow.test.ts",
+        "fullName": "P1-25 real signed ledger checkpoint transitions widens genuine signed checkpoint windows by nonzero accuracy at inclusive default and zero-tolerance edges",
+        "status": "failed",
+        "failureMessages": [
+          "AssertionError: expected null not to be null\n    at withGrantFixture (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/tests/time/tsaTestFixture.ts:289:30)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/tests/time/checkpointWindow.test.ts:799:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+        ]
+      },
+      "comparison": {
+        "cloneRootPrefixMappingOnlyEqual": true,
+        "candidateCloneRoot": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019",
+        "baselineCloneRoot": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34",
+        "candidateNativeValueSha256": "3e2c3013397c9b74a5b4f4b84c9ded8ae65e0cf93980ea3a07de2e39168b3bc5",
+        "baselineNativeValueSha256": "b364667db5cc193f7823098457a715ef62d5bf33753ae69fff94d370908b0fc6",
+        "derivedComparisonSha256": "a4d3bf9692f2814702a5212e83ba7dd8b443d8f43d90dc489103b2a031b47792",
+        "nativeMessagesPreserved": true,
+        "scope": "This exact descriptor only; no native array or message is rewritten."
+      }
+    },
+    {
+      "unit": {
+        "kind": "suite",
+        "suiteIndex": 1790,
+        "path": "tests/time/checkpointWindow.test.ts",
+        "status": "failed",
+        "message": "",
+        "testExecError": null,
+        "assertionCounts": {
+          "failed": 6
+        },
+        "failedAssertions": [
+          {
+            "fullName": "P1-25 real signed ledger checkpoint transitions completes the same signed pending checkpoint with a genuine query-bound token and ledger event",
+            "failureMessages": [
+              "AssertionError: expected null not to be null\n    at withGrantFixture (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/time/tsaTestFixture.ts:289:30)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/time/checkpointWindow.test.ts:261:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          },
+          {
+            "fullName": "P1-25 real signed ledger checkpoint transitions rejects required time only after the real TSA refusal while preserving the signed pending checkpoint",
+            "failureMessages": [
+              "AssertionError: expected null not to be null\n    at withGrantFixture (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/time/tsaTestFixture.ts:289:30)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/time/checkpointWindow.test.ts:328:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          },
+          {
+            "fullName": "P1-25 real signed ledger checkpoint transitions derives a genuine two-checkpoint window and inclusive default and zero-tolerance reader boundaries",
+            "failureMessages": [
+              "AssertionError: expected null not to be null\n    at withGrantFixture (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/time/tsaTestFixture.ts:289:30)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/time/checkpointWindow.test.ts:365:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          },
+          {
+            "fullName": "P1-25 real signed ledger checkpoint transitions uses the default signed trust home and checkpoints after exactly two new audit events",
+            "failureMessages": [
+              "AssertionError: expected null not to be null\n    at withGrantFixture (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/time/tsaTestFixture.ts:289:30)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/time/checkpointWindow.test.ts:500:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          },
+          {
+            "fullName": "P1-25 real signed ledger checkpoint transitions persists backdated and postdated producer claims in the signed ledger and reports their genuine checkpoint window",
+            "failureMessages": [
+              "AssertionError: expected null not to be null\n    at withGrantFixture (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/time/tsaTestFixture.ts:289:30)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/time/checkpointWindow.test.ts:642:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          },
+          {
+            "fullName": "P1-25 real signed ledger checkpoint transitions widens genuine signed checkpoint windows by nonzero accuracy at inclusive default and zero-tolerance edges",
+            "failureMessages": [
+              "AssertionError: expected null not to be null\n    at withGrantFixture (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/time/tsaTestFixture.ts:289:30)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/time/checkpointWindow.test.ts:799:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          }
+        ]
+      },
+      "classification": "BASELINE_MATCHED_ASYNC_DISPATCH_FRAME",
+      "reason": "Observed failure-signature equivalence: the clean actual-int whole-file run reproduces this named checkpoint failure, with only the additional baseline async-dispatch frame specified in normalization. Error and fixture/test locations are unchanged; every sibling failure and all other suite fields match. This is not exact native-message equality or a root-cause determination.",
+      "isolation": {
+        "baselineInt": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+        "defaultBudgetsAndAssertions": true,
+        "command": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-checkpoint-v1/command.json",
+          "sha256": "6b30fb23c23c2215130cfdaa759a4bc48bd872f40c5b28958a3c0698895ccd8a",
+          "bytes": 19439
+        },
+        "report": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-checkpoint-v1/report.json",
+          "sha256": "17b6d107741785cf6fbbcd9d9daf98dac7f7b3a9a91b45a6c43f955f95201f7d",
+          "bytes": 6081
+        },
+        "rawLog": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-checkpoint-v1/raw.log",
+          "sha256": "8c3cf3d49feea53635089567ea25a6d5457df26dffe74cd35e6bb8e37889b20f",
+          "bytes": 19580
+        }
+      },
+      "baselineActualDescriptor": {
+        "kind": "suite",
+        "suiteIndex": 0,
+        "path": "tests/time/checkpointWindow.test.ts",
+        "status": "failed",
+        "message": "",
+        "testExecError": null,
+        "assertionCounts": {
+          "failed": 6
+        },
+        "failedAssertions": [
+          {
+            "fullName": "P1-25 real signed ledger checkpoint transitions completes the same signed pending checkpoint with a genuine query-bound token and ledger event",
+            "failureMessages": [
+              "AssertionError: expected null not to be null\n    at withGrantFixture (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/tests/time/tsaTestFixture.ts:289:30)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/tests/time/checkpointWindow.test.ts:261:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          },
+          {
+            "fullName": "P1-25 real signed ledger checkpoint transitions rejects required time only after the real TSA refusal while preserving the signed pending checkpoint",
+            "failureMessages": [
+              "AssertionError: expected null not to be null\n    at withGrantFixture (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/tests/time/tsaTestFixture.ts:289:30)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/tests/time/checkpointWindow.test.ts:328:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          },
+          {
+            "fullName": "P1-25 real signed ledger checkpoint transitions derives a genuine two-checkpoint window and inclusive default and zero-tolerance reader boundaries",
+            "failureMessages": [
+              "AssertionError: expected null not to be null\n    at withGrantFixture (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/tests/time/tsaTestFixture.ts:289:30)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/tests/time/checkpointWindow.test.ts:365:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          },
+          {
+            "fullName": "P1-25 real signed ledger checkpoint transitions persists backdated and postdated producer claims in the signed ledger and reports their genuine checkpoint window",
+            "failureMessages": [
+              "AssertionError: expected null not to be null\n    at withGrantFixture (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/tests/time/tsaTestFixture.ts:289:30)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/tests/time/checkpointWindow.test.ts:642:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          },
+          {
+            "fullName": "P1-25 real signed ledger checkpoint transitions widens genuine signed checkpoint windows by nonzero accuracy at inclusive default and zero-tolerance edges",
+            "failureMessages": [
+              "AssertionError: expected null not to be null\n    at withGrantFixture (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/tests/time/tsaTestFixture.ts:289:30)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/tests/time/checkpointWindow.test.ts:799:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          },
+          {
+            "fullName": "P1-25 real signed ledger checkpoint transitions uses the default signed trust home and checkpoints after exactly two new audit events",
+            "failureMessages": [
+              "AssertionError: expected null not to be null\n    at withGrantFixture (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/tests/time/tsaTestFixture.ts:289:30)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/tests/time/checkpointWindow.test.ts:500:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          }
+        ]
+      },
+      "comparison": {
+        "cloneRootPrefixMappingOnlyEqual": false,
+        "candidateCloneRoot": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019",
+        "baselineCloneRoot": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34",
+        "candidateNativeValueSha256": "b43473d2fbbe5abea0d9b7df8a2b595d241e2fe771a627b38842d135fd490a63",
+        "baselineNativeValueSha256": "1ee4825ef1948e4efee24af697213b51a8f2124207b585aafeaaae9c6526ccf3",
+        "derivedComparisonSha256": "635316dd0d931713b5cea1aaf62f67a2e5a1b43a5aac32e2bf2c9872aa045ac1",
+        "nativeMessagesPreserved": true,
+        "scope": "This exact descriptor only; no native array or message is rewritten.",
+        "narrowOptionalFrameComparisonEqual": true,
+        "derivedSuiteOrdering": "Re-sort only the derived failedAssertions by v7 canonical ordering after the single permitted target-message frame removal; preserve both native arrays."
+      },
+      "normalization": {
+        "kind": "OPTIONAL_NODE_ASYNC_DISPATCH_FRAME",
+        "path": "tests/time/checkpointWindow.test.ts",
+        "fullName": "P1-25 real signed ledger checkpoint transitions uses the default signed trust home and checkpoints after exactly two new audit events",
+        "frame": "\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)",
+        "fullOccurrences": 0,
+        "baselineOccurrences": 1
+      },
+      "oracleReview": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/baseline-four-comparison-386a9.json",
+        "sha256": "4f431cdcac9e3c0bccf02366436039d1b54076a91953f6502f8de52399e8e2b1",
+        "bytes": 88853
+      }
+    },
+    {
+      "unit": {
+        "kind": "assertion",
+        "suiteIndex": 1793,
+        "assertionIndex": 0,
+        "path": "tests/time/tsaGrant.test.ts",
+        "fullName": "P1-25 optional OpenSSL genuine fresh-query timestamp grants accepts the genuine first grant and never dispatches the later TSA",
+        "status": "failed",
+        "failureMessages": [
+          "AssertionError: expected null not to be null\n    at withGrantFixture (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/time/tsaTestFixture.ts:289:30)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/time/tsaGrant.test.ts:10:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+        ]
+      },
+      "classification": "BASELINE_MATCHED",
+      "reason": "Verified per-descriptor signature match: clean actual-int whole-file execution reproduces the same failed fullName and native failureMessages after only fixed clone-root prefix mapping. Native exit1, identical test/config bytes and default budgets are captured. This is not a blanket baseline or root-cause claim.",
+      "isolation": {
+        "baselineInt": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+        "defaultBudgetsAndAssertions": true,
+        "command": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-tsa-grant-v1/command.json",
+          "sha256": "855d0e3e2411dc64e42689823a85ce259163d51d7b079c1e45363846c8d6c641",
+          "bytes": 19418
+        },
+        "report": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-tsa-grant-v1/report.json",
+          "sha256": "731d5452ec596521b7269de03266450e211beda8671cde081df2056348073819",
+          "bytes": 2376
+        },
+        "rawLog": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-tsa-grant-v1/raw.log",
+          "sha256": "2fb0f3e181fc58a13880f9dbf4a5ad87f3cd989245540adb54d9f86fefb39ddf",
+          "bytes": 6637
+        }
+      },
+      "baselineActualDescriptor": {
+        "kind": "assertion",
+        "suiteIndex": 0,
+        "assertionIndex": 0,
+        "path": "tests/time/tsaGrant.test.ts",
+        "fullName": "P1-25 optional OpenSSL genuine fresh-query timestamp grants accepts the genuine first grant and never dispatches the later TSA",
+        "status": "failed",
+        "failureMessages": [
+          "AssertionError: expected null not to be null\n    at withGrantFixture (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/tests/time/tsaTestFixture.ts:289:30)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/tests/time/tsaGrant.test.ts:10:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+        ]
+      },
+      "comparison": {
+        "cloneRootPrefixMappingOnlyEqual": true,
+        "candidateCloneRoot": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019",
+        "baselineCloneRoot": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34",
+        "candidateNativeValueSha256": "5f9074b6d6535065cd12c883293fdeb0dfb16a7a7fe005aac7d94c431fae44c9",
+        "baselineNativeValueSha256": "c0c7307d362be61731d4b88e5fe15e438aa8d7e990e30db9c2dd2d06f11701c1",
+        "derivedComparisonSha256": "cb3b7c83313afd139a89673aca70c00878ec88a6fc28995fdb799a53c35e6e82",
+        "nativeMessagesPreserved": true,
+        "scope": "This exact descriptor only; no native array or message is rewritten."
+      }
+    },
+    {
+      "unit": {
+        "kind": "assertion",
+        "suiteIndex": 1793,
+        "assertionIndex": 1,
+        "path": "tests/time/tsaGrant.test.ts",
+        "fullName": "P1-25 optional OpenSSL genuine fresh-query timestamp grants preserves the finite first refusal then accepts the genuine second grant",
+        "status": "failed",
+        "failureMessages": [
+          "AssertionError: expected null not to be null\n    at withGrantFixture (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/time/tsaTestFixture.ts:289:30)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/time/tsaGrant.test.ts:30:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+        ]
+      },
+      "classification": "BASELINE_MATCHED",
+      "reason": "Verified per-descriptor signature match: clean actual-int whole-file execution reproduces the same failed fullName and native failureMessages after only fixed clone-root prefix mapping. Native exit1, identical test/config bytes and default budgets are captured. This is not a blanket baseline or root-cause claim.",
+      "isolation": {
+        "baselineInt": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+        "defaultBudgetsAndAssertions": true,
+        "command": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-tsa-grant-v1/command.json",
+          "sha256": "855d0e3e2411dc64e42689823a85ce259163d51d7b079c1e45363846c8d6c641",
+          "bytes": 19418
+        },
+        "report": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-tsa-grant-v1/report.json",
+          "sha256": "731d5452ec596521b7269de03266450e211beda8671cde081df2056348073819",
+          "bytes": 2376
+        },
+        "rawLog": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-tsa-grant-v1/raw.log",
+          "sha256": "2fb0f3e181fc58a13880f9dbf4a5ad87f3cd989245540adb54d9f86fefb39ddf",
+          "bytes": 6637
+        }
+      },
+      "baselineActualDescriptor": {
+        "kind": "assertion",
+        "suiteIndex": 0,
+        "assertionIndex": 1,
+        "path": "tests/time/tsaGrant.test.ts",
+        "fullName": "P1-25 optional OpenSSL genuine fresh-query timestamp grants preserves the finite first refusal then accepts the genuine second grant",
+        "status": "failed",
+        "failureMessages": [
+          "AssertionError: expected null not to be null\n    at withGrantFixture (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/tests/time/tsaTestFixture.ts:289:30)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/tests/time/tsaGrant.test.ts:30:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+        ]
+      },
+      "comparison": {
+        "cloneRootPrefixMappingOnlyEqual": true,
+        "candidateCloneRoot": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019",
+        "baselineCloneRoot": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34",
+        "candidateNativeValueSha256": "64bbf17847a7db5c1dde21888dd34bb0f49c17fab7b7ffb622672bf053bb8a85",
+        "baselineNativeValueSha256": "4b8c71c23d8787e232b762fadd7ad4864202a69d9c93c0c0b204aeffc89942d6",
+        "derivedComparisonSha256": "a0bc8c175ccaf8683aaa83d89d90928a8c6bf99da29b5ada2166c452ddfa7d70",
+        "nativeMessagesPreserved": true,
+        "scope": "This exact descriptor only; no native array or message is rewritten."
+      }
+    },
+    {
+      "unit": {
+        "kind": "suite",
+        "suiteIndex": 1793,
+        "path": "tests/time/tsaGrant.test.ts",
+        "status": "failed",
+        "message": "",
+        "testExecError": null,
+        "assertionCounts": {
+          "failed": 2
+        },
+        "failedAssertions": [
+          {
+            "fullName": "P1-25 optional OpenSSL genuine fresh-query timestamp grants accepts the genuine first grant and never dispatches the later TSA",
+            "failureMessages": [
+              "AssertionError: expected null not to be null\n    at withGrantFixture (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/time/tsaTestFixture.ts:289:30)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/time/tsaGrant.test.ts:10:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          },
+          {
+            "fullName": "P1-25 optional OpenSSL genuine fresh-query timestamp grants preserves the finite first refusal then accepts the genuine second grant",
+            "failureMessages": [
+              "AssertionError: expected null not to be null\n    at withGrantFixture (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/time/tsaTestFixture.ts:289:30)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/time/tsaGrant.test.ts:30:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          }
+        ]
+      },
+      "classification": "BASELINE_MATCHED",
+      "reason": "Verified per-descriptor signature match: clean actual-int whole-file execution reproduces the complete failed-file descriptor, all failed fullNames/messages and assertion-status counts after only fixed clone-root prefix mapping. Native exit1, identical test/config bytes and default budgets are captured. This is not a blanket baseline or root-cause claim.",
+      "isolation": {
+        "baselineInt": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+        "defaultBudgetsAndAssertions": true,
+        "command": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-tsa-grant-v1/command.json",
+          "sha256": "855d0e3e2411dc64e42689823a85ce259163d51d7b079c1e45363846c8d6c641",
+          "bytes": 19418
+        },
+        "report": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-tsa-grant-v1/report.json",
+          "sha256": "731d5452ec596521b7269de03266450e211beda8671cde081df2056348073819",
+          "bytes": 2376
+        },
+        "rawLog": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-tsa-grant-v1/raw.log",
+          "sha256": "2fb0f3e181fc58a13880f9dbf4a5ad87f3cd989245540adb54d9f86fefb39ddf",
+          "bytes": 6637
+        }
+      },
+      "baselineActualDescriptor": {
+        "kind": "suite",
+        "suiteIndex": 0,
+        "path": "tests/time/tsaGrant.test.ts",
+        "status": "failed",
+        "message": "",
+        "testExecError": null,
+        "assertionCounts": {
+          "failed": 2
+        },
+        "failedAssertions": [
+          {
+            "fullName": "P1-25 optional OpenSSL genuine fresh-query timestamp grants accepts the genuine first grant and never dispatches the later TSA",
+            "failureMessages": [
+              "AssertionError: expected null not to be null\n    at withGrantFixture (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/tests/time/tsaTestFixture.ts:289:30)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/tests/time/tsaGrant.test.ts:10:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          },
+          {
+            "fullName": "P1-25 optional OpenSSL genuine fresh-query timestamp grants preserves the finite first refusal then accepts the genuine second grant",
+            "failureMessages": [
+              "AssertionError: expected null not to be null\n    at withGrantFixture (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/tests/time/tsaTestFixture.ts:289:30)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/tests/time/tsaGrant.test.ts:30:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          }
+        ]
+      },
+      "comparison": {
+        "cloneRootPrefixMappingOnlyEqual": true,
+        "candidateCloneRoot": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019",
+        "baselineCloneRoot": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34",
+        "candidateNativeValueSha256": "a59e32085c3015f66a30b2f74aed53f2e34699e3b6e815fdb46559da375ea4e6",
+        "baselineNativeValueSha256": "0b6645be536c82bb0cd622868d46742e53b809aa1d7931a89dfdd5a9e6e92a10",
+        "derivedComparisonSha256": "e12ed80baedbe8c039d746d61e3aff4c781ebd2a2a7bad136ef601a11501bf82",
+        "nativeMessagesPreserved": true,
+        "scope": "This exact descriptor only; no native array or message is rewritten."
+      }
+    }
+  ],
+  "fileCategoryExplanations": [
+    {
+      "path": "tests/conformance/claudeCodeHooks.conformance.test.ts",
+      "nativeStatus": "passed",
+      "rawStatus": "skipped",
+      "reason": "JSON reporter encodes this all-seven-skipped file as passed; source runIf gate and captured disabled opt-in explain its zero executed assertions. These are the only two nonfailed JSON file entries with zero executed assertions; their source-supported categories reconcile aggregate raw1844passed/2skipped with JSON1846passed. Raw dot output does not independently name the skipped files; no per-file raw filename observation is invented.",
+      "source": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/conformance/claudeCodeHooks.conformance.test.ts",
+        "sha256": "76d780fcb6bdcee6f68fbd470c11647b9529331325abd6bdeeef83dee1f31032",
+        "bytes": 19398
+      },
+      "sourceLines": [
+        {
+          "line": 26,
+          "text": "const enabled = process.env.AMC_CLAUDE_CODE_CONFORMANCE === \"1\";"
+        },
+        {
+          "line": 86,
+          "text": "describe.runIf(enabled)(`Claude Code ${version} hook conformance (P1-23)`, { timeout: 300_000 }, () => {"
+        }
+      ],
+      "environmentCapture": {
+        "launch": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/full-suite/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-final-v1/launch.json",
+          "sha256": "eae73b13f68f32cc0017db1dcdd560d4ac2d7507e2ff004fa93d98c156d1c0a4",
+          "bytes": 8961
+        },
+        "jsonPointer": "/optInConformanceAtStart/AMC_CLAUDE_CODE_CONFORMANCE",
+        "actual": {
+          "present": false,
+          "enabled": false
+        }
+      },
+      "nativeAssertionStatuses": {
+        "skipped": 7
+      },
+      "nativeAssertionCount": 7
+    },
+    {
+      "path": "tests/conformance/piToolCall.conformance.test.ts",
+      "nativeStatus": "passed",
+      "rawStatus": "skipped",
+      "reason": "JSON reporter encodes this empty file as passed; disabled opt-in gates runIf and the enabled ? piPrefixes() : [] loop registers zero per-version assertions. These are the only two nonfailed JSON file entries with zero executed assertions; their source-supported categories reconcile aggregate raw1844passed/2skipped with JSON1846passed. Raw dot output does not independently name the skipped files; no per-file raw filename observation is invented.",
+      "source": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/conformance/piToolCall.conformance.test.ts",
+        "sha256": "e56c5e2a0f10e3b36097a872c704ae1da176ae72135e58f24e24597a843a192b",
+        "bytes": 24601
+      },
+      "sourceLines": [
+        {
+          "line": 27,
+          "text": "const enabled = process.env.AMC_PI_CONFORMANCE === \"1\";"
+        },
+        {
+          "line": 97,
+          "text": "describe.runIf(enabled)(\"Pi tool_call conformance (P1-22)\", () => {"
+        },
+        {
+          "line": 105,
+          "text": "  for (const { version, prefix } of enabled ? piPrefixes() : []) {"
+        }
+      ],
+      "environmentCapture": {
+        "launch": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/full-suite/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-final-v1/launch.json",
+          "sha256": "eae73b13f68f32cc0017db1dcdd560d4ac2d7507e2ff004fa93d98c156d1c0a4",
+          "bytes": 8961
+        },
+        "jsonPointer": "/optInConformanceAtStart/AMC_PI_CONFORMANCE",
+        "actual": {
+          "present": false,
+          "enabled": false
+        }
+      },
+      "nativeAssertionStatuses": {},
+      "nativeAssertionCount": 0
+    }
+  ],
+  "baselineCaptures": [
+    {
+      "path": "tests/apiRouterResponseParity.test.ts",
+      "capture": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-api-router-v1/command.json",
+        "sha256": "cb91a9f7950b77f7c9a29b3c5d4a725f12801a8d5a8ce12524b738c3d4bd9f17",
+        "bytes": 19444
+      },
+      "launch": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-api-router-v1/launch.json",
+        "sha256": "8562ab683e80e416bd7f09a61f2eaf1be8238628764ff963da52463bc80e1b51",
+        "bytes": 10699
+      },
+      "start": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-api-router-v1/start.json",
+        "sha256": "49cb257d7e9e8eaae9d63673c0eca48fa629309933739abea7bfe60ada6f0df7",
+        "bytes": 10765
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-api-router-v1/report.json",
+        "sha256": "29e1972eac05f59ab3a292095ea52e3b21d3162a6f518d8aea56b4f8336395d3",
+        "bytes": 42109
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-api-router-v1/raw.log",
+        "sha256": "a60fe5d640a50050102fddce793e6f71af80831daf80b9ab0247f76ae9c2648f",
+        "bytes": 39783
+      },
+      "nativeAudit": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-api-router-v1/native-audit.json",
+        "sha256": "90a85fa8b908c7fe1c23e33c655cbfe12fccbdd2d2f3b348d1f98b4b46056de1",
+        "bytes": 2286
+      },
+      "role": "baseline",
+      "recordedMeasurementComplete": true,
+      "nativeExit": 1,
+      "nativeSummary": {
+        "numTotalTests": 145,
+        "numPassedTests": 144,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "durationMs": 8241,
+      "sourceEquivalence": [
+        {
+          "path": "tests/apiRouterResponseParity.test.ts",
+          "baselineState": "present",
+          "candidateState": "present",
+          "baselineSha256": "23c793f104fd3636a560955cc3cf47c711d5c5351d99ff9f578b036957678b18",
+          "candidateSha256": "23c793f104fd3636a560955cc3cf47c711d5c5351d99ff9f578b036957678b18",
+          "byteIdentical": true
+        },
+        {
+          "path": "package.json",
+          "baselineState": "present",
+          "candidateState": "present",
+          "baselineSha256": "ee82f35d492d71df771d4d88e2fc1e6f8a970e027ac91ede3a90fa292ca668fd",
+          "candidateSha256": "ee82f35d492d71df771d4d88e2fc1e6f8a970e027ac91ede3a90fa292ca668fd",
+          "byteIdentical": true
+        },
+        {
+          "path": "pnpm-lock.yaml",
+          "baselineState": "present",
+          "candidateState": "present",
+          "baselineSha256": "f948d569d509e227d68aaeb183f10f403f7f9016a1abbbd5dc75042ded4af914",
+          "candidateSha256": "f948d569d509e227d68aaeb183f10f403f7f9016a1abbbd5dc75042ded4af914",
+          "byteIdentical": true
+        },
+        {
+          "path": "vitest.config.ts",
+          "baselineState": "present",
+          "candidateState": "present",
+          "baselineSha256": "abebaa7aafcbc9a8a6321e4a9c1ee00b7e489e860c8295c5964de3632cd9d119",
+          "candidateSha256": "abebaa7aafcbc9a8a6321e4a9c1ee00b7e489e860c8295c5964de3632cd9d119",
+          "byteIdentical": true
+        }
+      ],
+      "recordedSourceRuntimeBeforeAfterIdentical": true,
+      "recordedHead": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+      "recordedNode": "v22.23.3",
+      "defaultBudgetsAndAssertions": true,
+      "limit": "Completed unchanged-budget whole-file-alone actual-int observation. Proposed signature equivalence is not root-cause or qualification evidence."
+    },
+    {
+      "path": "tests/publicDocsGraph.test.ts",
+      "capture": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-public-docs-v1/command.json",
+        "sha256": "a574f94069daaae4d378c3d8a80cb2183c83c90236bc1259f0f09810e6a3ed1b",
+        "bytes": 19430
+      },
+      "launch": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-public-docs-v1/launch.json",
+        "sha256": "de856f1af9a88389c0978a7fe5ab1b2b04550c2250857e91355331eba0c723a4",
+        "bytes": 10684
+      },
+      "start": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-public-docs-v1/start.json",
+        "sha256": "c1e5baef4aedc7744e70da2385e286a5be1dc815f58603da8d9e76e7f674fbe1",
+        "bytes": 10750
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-public-docs-v1/report.json",
+        "sha256": "09782772baab925f669c97ac32d6265df6adcdbce5e9a4ffd1a8dd83039a00b4",
+        "bytes": 3907
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-public-docs-v1/raw.log",
+        "sha256": "588060cac507627ba8070d8b02586c6819806f6a52e98ffd84b64289b4552ee5",
+        "bytes": 1093
+      },
+      "nativeAudit": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-public-docs-v1/native-audit.json",
+        "sha256": "fa2e159336145267a8cdadd590d7861baf7c98352e3a4cfcb25b4d553f174da0",
+        "bytes": 3423
+      },
+      "role": "baseline",
+      "recordedMeasurementComplete": true,
+      "nativeExit": 1,
+      "nativeSummary": {
+        "numTotalTests": 6,
+        "numPassedTests": 5,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "durationMs": 1212,
+      "sourceEquivalence": [
+        {
+          "path": "tests/publicDocsGraph.test.ts",
+          "baselineState": "present",
+          "candidateState": "present",
+          "baselineSha256": "162cad72bc0a32b5398478750926d6a30fe69f3f4e88413a9eb216b52d7df104",
+          "candidateSha256": "162cad72bc0a32b5398478750926d6a30fe69f3f4e88413a9eb216b52d7df104",
+          "byteIdentical": true
+        },
+        {
+          "path": "package.json",
+          "baselineState": "present",
+          "candidateState": "present",
+          "baselineSha256": "ee82f35d492d71df771d4d88e2fc1e6f8a970e027ac91ede3a90fa292ca668fd",
+          "candidateSha256": "ee82f35d492d71df771d4d88e2fc1e6f8a970e027ac91ede3a90fa292ca668fd",
+          "byteIdentical": true
+        },
+        {
+          "path": "pnpm-lock.yaml",
+          "baselineState": "present",
+          "candidateState": "present",
+          "baselineSha256": "f948d569d509e227d68aaeb183f10f403f7f9016a1abbbd5dc75042ded4af914",
+          "candidateSha256": "f948d569d509e227d68aaeb183f10f403f7f9016a1abbbd5dc75042ded4af914",
+          "byteIdentical": true
+        },
+        {
+          "path": "vitest.config.ts",
+          "baselineState": "present",
+          "candidateState": "present",
+          "baselineSha256": "abebaa7aafcbc9a8a6321e4a9c1ee00b7e489e860c8295c5964de3632cd9d119",
+          "candidateSha256": "abebaa7aafcbc9a8a6321e4a9c1ee00b7e489e860c8295c5964de3632cd9d119",
+          "byteIdentical": true
+        }
+      ],
+      "recordedSourceRuntimeBeforeAfterIdentical": true,
+      "recordedHead": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+      "recordedNode": "v22.23.3",
+      "defaultBudgetsAndAssertions": true,
+      "limit": "Completed unchanged-budget whole-file-alone actual-int observation. Proposed signature equivalence is not root-cause or qualification evidence."
+    },
+    {
+      "path": "tests/time/checkpointWindow.test.ts",
+      "capture": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-checkpoint-v1/command.json",
+        "sha256": "6b30fb23c23c2215130cfdaa759a4bc48bd872f40c5b28958a3c0698895ccd8a",
+        "bytes": 19439
+      },
+      "launch": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-checkpoint-v1/launch.json",
+        "sha256": "2fb26115858508d334bd042381ab5237ff78e673fede027f12676a55f8fb15dd",
+        "bytes": 10695
+      },
+      "start": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-checkpoint-v1/start.json",
+        "sha256": "911cefe45d9ffc4d5e606055d463237da58823fcf6f99a1762a0f4827501438f",
+        "bytes": 10761
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-checkpoint-v1/report.json",
+        "sha256": "17b6d107741785cf6fbbcd9d9daf98dac7f7b3a9a91b45a6c43f955f95201f7d",
+        "bytes": 6081
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-checkpoint-v1/raw.log",
+        "sha256": "8c3cf3d49feea53635089567ea25a6d5457df26dffe74cd35e6bb8e37889b20f",
+        "bytes": 19580
+      },
+      "nativeAudit": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-checkpoint-v1/native-audit.json",
+        "sha256": "f136ee7ab90702c1843f8c7a7072759ac7430811b206df0e1ee56e7f0e6e2c5e",
+        "bytes": 7390
+      },
+      "role": "baseline",
+      "recordedMeasurementComplete": true,
+      "nativeExit": 1,
+      "nativeSummary": {
+        "numTotalTests": 6,
+        "numPassedTests": 0,
+        "numFailedTests": 6,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "durationMs": 3795,
+      "sourceEquivalence": [
+        {
+          "path": "tests/time/checkpointWindow.test.ts",
+          "baselineState": "present",
+          "candidateState": "present",
+          "baselineSha256": "4e5179eb18483be99a5c7d91b2e94e7db60b4ec4ba1476aa33241144baade304",
+          "candidateSha256": "4e5179eb18483be99a5c7d91b2e94e7db60b4ec4ba1476aa33241144baade304",
+          "byteIdentical": true
+        },
+        {
+          "path": "package.json",
+          "baselineState": "present",
+          "candidateState": "present",
+          "baselineSha256": "ee82f35d492d71df771d4d88e2fc1e6f8a970e027ac91ede3a90fa292ca668fd",
+          "candidateSha256": "ee82f35d492d71df771d4d88e2fc1e6f8a970e027ac91ede3a90fa292ca668fd",
+          "byteIdentical": true
+        },
+        {
+          "path": "pnpm-lock.yaml",
+          "baselineState": "present",
+          "candidateState": "present",
+          "baselineSha256": "f948d569d509e227d68aaeb183f10f403f7f9016a1abbbd5dc75042ded4af914",
+          "candidateSha256": "f948d569d509e227d68aaeb183f10f403f7f9016a1abbbd5dc75042ded4af914",
+          "byteIdentical": true
+        },
+        {
+          "path": "vitest.config.ts",
+          "baselineState": "present",
+          "candidateState": "present",
+          "baselineSha256": "abebaa7aafcbc9a8a6321e4a9c1ee00b7e489e860c8295c5964de3632cd9d119",
+          "candidateSha256": "abebaa7aafcbc9a8a6321e4a9c1ee00b7e489e860c8295c5964de3632cd9d119",
+          "byteIdentical": true
+        }
+      ],
+      "recordedSourceRuntimeBeforeAfterIdentical": true,
+      "recordedHead": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+      "recordedNode": "v22.23.3",
+      "defaultBudgetsAndAssertions": true,
+      "limit": "Completed unchanged-budget whole-file-alone actual-int observation. Proposed signature equivalence is not root-cause or qualification evidence."
+    },
+    {
+      "path": "tests/time/tsaGrant.test.ts",
+      "capture": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-tsa-grant-v1/command.json",
+        "sha256": "855d0e3e2411dc64e42689823a85ce259163d51d7b079c1e45363846c8d6c641",
+        "bytes": 19418
+      },
+      "launch": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-tsa-grant-v1/launch.json",
+        "sha256": "f9706b7e817c6b66b9ac508f5d38e946dd7ea411f652677e589a55192ba214c3",
+        "bytes": 10678
+      },
+      "start": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-tsa-grant-v1/start.json",
+        "sha256": "25994ddafaf5ef0c17239d38f0384bfa706157e6aad4386c2067361400c771c7",
+        "bytes": 10744
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-tsa-grant-v1/report.json",
+        "sha256": "731d5452ec596521b7269de03266450e211beda8671cde081df2056348073819",
+        "bytes": 2376
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-tsa-grant-v1/raw.log",
+        "sha256": "2fb0f3e181fc58a13880f9dbf4a5ad87f3cd989245540adb54d9f86fefb39ddf",
+        "bytes": 6637
+      },
+      "nativeAudit": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-tsa-grant-v1/native-audit.json",
+        "sha256": "08eb12fe3eb1d732e44c9d77e5f341549ffcda4654fae2412118baac597c49c8",
+        "bytes": 3439
+      },
+      "role": "baseline",
+      "recordedMeasurementComplete": true,
+      "nativeExit": 1,
+      "nativeSummary": {
+        "numTotalTests": 2,
+        "numPassedTests": 0,
+        "numFailedTests": 2,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "durationMs": 2415,
+      "sourceEquivalence": [
+        {
+          "path": "tests/time/tsaGrant.test.ts",
+          "baselineState": "present",
+          "candidateState": "present",
+          "baselineSha256": "c8c8901449610883c5a7a73d6b8f38de65a833824deb912b67c6255d1973caca",
+          "candidateSha256": "c8c8901449610883c5a7a73d6b8f38de65a833824deb912b67c6255d1973caca",
+          "byteIdentical": true
+        },
+        {
+          "path": "package.json",
+          "baselineState": "present",
+          "candidateState": "present",
+          "baselineSha256": "ee82f35d492d71df771d4d88e2fc1e6f8a970e027ac91ede3a90fa292ca668fd",
+          "candidateSha256": "ee82f35d492d71df771d4d88e2fc1e6f8a970e027ac91ede3a90fa292ca668fd",
+          "byteIdentical": true
+        },
+        {
+          "path": "pnpm-lock.yaml",
+          "baselineState": "present",
+          "candidateState": "present",
+          "baselineSha256": "f948d569d509e227d68aaeb183f10f403f7f9016a1abbbd5dc75042ded4af914",
+          "candidateSha256": "f948d569d509e227d68aaeb183f10f403f7f9016a1abbbd5dc75042ded4af914",
+          "byteIdentical": true
+        },
+        {
+          "path": "vitest.config.ts",
+          "baselineState": "present",
+          "candidateState": "present",
+          "baselineSha256": "abebaa7aafcbc9a8a6321e4a9c1ee00b7e489e860c8295c5964de3632cd9d119",
+          "candidateSha256": "abebaa7aafcbc9a8a6321e4a9c1ee00b7e489e860c8295c5964de3632cd9d119",
+          "byteIdentical": true
+        }
+      ],
+      "recordedSourceRuntimeBeforeAfterIdentical": true,
+      "recordedHead": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+      "recordedNode": "v22.23.3",
+      "defaultBudgetsAndAssertions": true,
+      "limit": "Completed unchanged-budget whole-file-alone actual-int observation. Proposed signature equivalence is not root-cause or qualification evidence."
+    }
+  ],
+  "cloneRootNormalization": {
+    "candidate": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019",
+    "baseline": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-int-dc8c34",
+    "replacement": "<clone>",
+    "scope": "Two exact fixed source-clone root strings only; no other stack-frame, message, timing or source-location changes."
+  },
+  "narrowNormalizationProposal": {
+    "kind": "OPTIONAL_NODE_ASYNC_DISPATCH_FRAME",
+    "path": "tests/time/checkpointWindow.test.ts",
+    "fullName": "P1-25 real signed ledger checkpoint transitions uses the default signed trust home and checkpoints after exactly two new audit events",
+    "frame": "\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)",
+    "fullOccurrences": 0,
+    "baselineOccurrences": 1
+  },
+  "oracleReview": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/baseline-four-comparison-386a9.json",
+    "sha256": "4f431cdcac9e3c0bccf02366436039d1b54076a91953f6502f8de52399e8e2b1",
+    "bytes": 88853
+  },
+  "rootApproval": {
+    "at": "2026-10-19T09:57:32.599530+00:00",
+    "proposal": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/failure-classifications-proposal-v1.json",
+      "sha256": "f223d2dc9c4e99c01b664072fa723bc71ef65a916190397f8c1214ac4916eb41",
+      "bytes": 108212
+    },
+    "scope": "Technical classification of the actual source386 full only. No regulatory review, all-green full claim, root-cause inference, Q-head measurement or local landing.",
+    "verifiedCurrentDescriptorCount": 21,
+    "verifiedReferenceCount": 34,
+    "independentBaselineProof": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/baseline-four-comparison-386a9.json",
+      "sha256": "4f431cdcac9e3c0bccf02366436039d1b54076a91953f6502f8de52399e8e2b1",
+      "bytes": 88853
+    },
+    "decision": "Retain nine exact clone-prefix assertion matches and one explicitly scoped observational async-frame comparison, its containing suite, seven actual opt-in skips and both file-category explanations. Final assembler revalidates all signatures and anchors against immutable native bytes before preview."
+  },
+  "readinessClaim": false,
+  "nativeMeasurements": {
+    "exit": 1,
+    "durationMs": 3398547,
+    "reportedSummary": {
+      "numTotalTests": 28032,
+      "numPassedTests": 28015,
+      "numFailedTests": 10,
+      "numPendingTests": 7,
+      "numTodoTests": 0,
+      "success": false,
+      "numTotalTestSuites": 5563,
+      "numPassedTestSuites": 5555,
+      "numFailedTestSuites": 8,
+      "numPendingTestSuites": 0,
+      "numRuntimeErrorTestSuites": null
+    },
+    "assertionStatuses": {
+      "passed": 28015,
+      "failed": 10,
+      "skipped": 7
+    },
+    "jsonFileEntryCount": 1850,
+    "jsonFileStatuses": {
+      "passed": 1846,
+      "failed": 4
+    },
+    "rawFiles": {
+      "line": " Test Files  4 failed | 1844 passed | 2 skipped (1850)",
+      "total": 1850,
+      "counts": {
+        "failed": 4,
+        "passed": 1844,
+        "skipped": 2
+      }
+    },
+    "rawTests": {
+      "line": "      Tests  10 failed | 28015 passed | 7 skipped (28032)",
+      "total": 28032,
+      "counts": {
+        "failed": 10,
+        "passed": 28015,
+        "skipped": 7
+      }
+    }
+  },
+  "limits": [
+    "Root-reviewed classification coverage for source386 is complete. The original proposal retained complete=false/state=REVIEW_REQUIRED; this new final file records the reviewed decision. This is not an all-green result, regulatory review, exact-Q qualification or local landing claim.",
+    "Actual full remains exit1,28032total/28015passed/10failed/7skipped; raw/report/messages/statuses/counts and historical evidence are preserved.",
+    "Twelve failure descriptors propose clone-root-only identity. Exactly two checkpoint descriptors use separately labelled optional-frame equivalence, not exact native-message equality or root-cause evidence.",
+    "Only one exact newline-prefixed dispatch frame in one named baseline assertion is removed for derived comparison, with required adjacent fixture289:30/test500:5 frames and arrays of length1. Other sibling/suite fields must remain equal. Derived canonical array sorting is not a native evidence rewrite.",
+    "Seven skips and two file-category explanations retain exact source gates and captured disabled opt-ins. No environment unset, executed opt-in case or per-file raw filename is invented.",
+    "Whole-file-alone baseline captures record actual int/default budgets/unchanged source/configuration and inherited environment. Metadata-only .modules.yaml differs across clones; no complete installed-byte identity or whole-repository baseline is claimed.",
+    "No load-dependent, readiness, production, legal-review or promotion conclusion is made."
+  ],
+  "annotationCorrection": {
+    "at": "2026-10-19T10:04:11.334448+00:00",
+    "previousFinalFile": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/failure-classifications-root-reviewed-v1.json",
+      "sha256": "e5962b06c1fcc32941e1be9f3fb4b673683948e624d5708d59135e3d57538ed6",
+      "bytes": 109376
+    },
+    "changedJSONPaths": [
+      "/limits/0"
+    ],
+    "reason": "Correct inherited proposal-only annotation after root review; preserve the original proposal and v1 final file.",
+    "nativeMeasurementOrClassificationChanged": false
+  }
+}
