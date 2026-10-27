@@ -16,6 +16,7 @@
  */
 import type { RuntimeName } from "../types.js";
 import type { RecordedGeminiPart } from "./geminiPartMeta.js";
+import type { WriterTakeover } from "./sessionOwnership.js";
 import type {
   ApprovalAnswer,
   SurfaceKind,
@@ -93,6 +94,8 @@ export interface SessionAttachParams {
   /** The last enveloped row the resumer observed before claiming. */
   readonly observedHeadEventId: string;
   readonly observedHeadEventHash: string;
+  /** An explicit takeover of a lapsed remote or unresponsive writer (P2-12), recorded in the claim row and re-checked there. */
+  readonly takeover?: WriterTakeover;
 }
 
 export interface TurnStartParams {

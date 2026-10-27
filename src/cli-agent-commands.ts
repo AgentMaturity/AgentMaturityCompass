@@ -202,6 +202,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--tool-mode <mode>", '"native" (one call per step) or "code" (dispatch from a program)')
     .option("--unsafe-unconfined-shell", "macOS without Seatbelt only: offer the native shell UNCONFINED, with your full user rights; ignored where Seatbelt or Bubblewrap confines it, refused on Windows")
     .option("--session <id>", "resume this existing, unsealed session as its next writer (verified before dispatch)")
+    .option("--takeover-expired-writer <reason>", "with --session: claim a remote or unresponsive writer whose lease lapsed one lease ago; the reason is recorded")
     .option("--fork-from <id>", "open a new session whose lineage names this parent's verified final row")
     .option("--keep-open", "leave the session unsealed at exit so a later process can --session it")
     .option(
@@ -421,6 +422,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           io.fail(); return;
         }
       }
+      if (opts.takeoverExpiredWriter !== undefined && opts.session === undefined) { io.error("--takeover-expired-writer requires --session <id>."); io.fail(); return; }
       if (opts.session !== undefined && mcpConfig !== null) {
         // Mounting can execute a process or contact a server. Check the signed
         // identity first; resumeSession repeats admission before taking ownership.
@@ -624,7 +626,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
         let priorTurnEndings = 0;
         const outcome = await runner.runComposedTurn({
           sessionId: turnSessionId,
-          ...(opts.session === undefined ? {} : { resume: { claimant } }),
+          ...(opts.session === undefined ? {} : { resume: { claimant, ...(opts.takeoverExpiredWriter === undefined ? {} : { takeover: { reason: opts.takeoverExpiredWriter } }) } }),
           ...(opts.forkFrom === undefined ? {} : { forkFrom: { parentSessionId: opts.forkFrom, claimant } }),
           ...(opts.keepOpen ? { keepOpen: true } : {}),
           workspace: process.cwd(),

@@ -143,7 +143,7 @@
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/evidence-event.schema.json",
       "name": "evidence-event.schema.json",
-      "sha256": "b3f2e333528cde2e54a3e3d68e8f0691da122b688dab396d175d46aa5460100a"
+      "sha256": "267b80b1afb9841da55e6b833b4fe384604a634207e7036802c01c9b44de56bd"
     },
     {
       "$id": "https://agentmaturity.co/standards/external-evidence/v1/schema.json",

@@ -60,6 +60,8 @@ import { SessionService } from "../session/sessionService.js";
 import { materializeNativeImages, snapshotNativeImages, type NativeImageInput } from "../attachments/nativeImageInput.js";
 import { materializeNativeAudioParts, snapshotNativeAudioParts, type NativeAudioPart } from "../attachments/nativeAudioInput.js";
 import { forkSession, resumeSession, type ResumeReport } from "../session/sessionResume.js";
+import { reconcileInterruptedCalls } from "../session/resumeRules.js";
+import type { ReconcileAdapter } from "../actions/reconcile.js";
 import type { RecoveryClaimant } from "../session/sessionRecovery.js";
 import type { SessionLineage } from "../session/sessionApiTypes.js";
 import { rootIdentity } from "../agent/delegationIdentity.js";
@@ -160,7 +162,14 @@ export interface ComposedTurnOptions {
    * sessionResume.ts before anything is dispatched; a refusal throws
    * SessionResumeRefused and this turn never starts.
    */
-  readonly resume?: { readonly claimant: RecoveryClaimant; readonly staleAfterMs?: number };
+  readonly resume?: {
+    readonly claimant: RecoveryClaimant;
+    readonly staleAfterMs?: number;
+    /** Claim a remote or unresponsive writer whose lease lapsed one lease ago; the reason is recorded (P2-12). */
+    readonly takeover?: { readonly reason: string };
+    /** Reconcile adapters by id for interrupted `reconcile-first` calls (P1-04); none leaves them unknown and blocking. */
+    readonly reconcileAdapters?: ReadonlyMap<string, ReconcileAdapter>;
+  };
   /** Open a NEW session whose open row names this parent's verified final row. */
   readonly forkFrom?: { readonly parentSessionId: string; readonly claimant: RecoveryClaimant };
   /**
@@ -473,6 +482,11 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
   let steerTimer: NodeJS.Timeout | null = null;
 
   try {
+    // P2-12: interrupted calls follow their resume rules before this turn's first request; nothing is dispatched again.
+    if (resumed !== null) {
+      resumed = { ...resumed, interruptedCalls: await reconcileInterruptedCalls({ workspace: options.workspace, session,
+        adapters: options.resume?.reconcileAdapters ?? new Map() }) };
+    }
     options.bindToolSession?.({
       sessionId,
       recordProjectedEvidence: (row) => session.recordProjectedEvidence(row),
@@ -664,7 +678,8 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
       // From the ASSEMBLY, not from `sectionNames()`: a `complete` section
       // replaces the section list, and reporting the registered names there
       // would name sections the prompt does not contain.
-      promptSections: prompt.assemble().sections.map((section) => section.name)
+      promptSections: prompt.assemble().sections.map((section) => section.name),
+      ...(resumed === null ? {} : { resumed })
     };
   } finally {
     if (steerTimer !== null) clearTimeout(steerTimer);
