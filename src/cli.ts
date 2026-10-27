@@ -662,6 +662,7 @@ import {
   loadTrustConfig,
   verifyTrustConfigSignature
 } from "./trust/trustConfig.js";
+import { resignTrustConfig } from "./trust/trustConfigPublication.js";
 import {
   computeTemporalDecayReport,
   decayConfigSchema,
@@ -11780,6 +11781,30 @@ Example workflow:
     console.log("");
     console.log(chalk.gray("Next: amc trust status   — verify the config is valid and signed"));
     console.log(chalk.gray("Docs: amc trust init --help   — see concepts and workflow"));
+  });
+
+trust
+  .command("resign")
+  .description("Re-sign the current .amc/trust.yaml in place with the current artifact-seal key, keeping NOTARY settings")
+  .option("--confirm", "required: re-sign content signed by a retired or revoked key after reviewing it")
+  .addHelpText("after", `
+Use after a key rotation or revocation leaves trust.yaml signed by a retired or revoked artifact-seal key.
+The content must verify under its recorded signer from key history; tampered content is refused (recreate it
+with amc trust init, then amc trust enable-notary for NOTARY mode). Owner mode, unlocked vault.
+`)
+  .action(async (opts: { confirm?: boolean }) => {
+    const workspace = process.cwd();
+    assertOwnerMode(workspace, "trust resign");
+    if (opts.confirm !== true) throw new Error("amc trust resign re-signs content its previous signer vouched for; review .amc/trust.yaml, then pass --confirm");
+    const assertCurrent = () => {
+      if (process.cwd() !== workspace) throw new Error("original trust re-sign workspace changed");
+      assertOwnerMode(workspace, "trust resign");
+    };
+    const resigned = await resignTrustConfig(workspace, assertCurrent);
+    assertCurrent();
+    console.log(chalk.green(`Trust config re-signed: ${resigned.path}`));
+    console.log(`Signature: ${resigned.sigPath}`);
+    console.log(`Mode: ${resigned.mode}`);
   });
 
 trust

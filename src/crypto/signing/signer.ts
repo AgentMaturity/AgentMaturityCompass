@@ -18,6 +18,7 @@ import type { SignatureEnvelope } from "./signerTypes.js";
 import * as http from "node:http";
 import * as https from "node:https";
 import { isIP, type LookupFunction } from "node:net";
+import { resolve } from "node:path";
 import { canonicalHost, resolveAndCheck } from "../../enforce/egressAllowlist.js";
 import { checkScopedEgress } from "../../residency/checkEgress.js";
 import { assertKeyNotRevoked, KeyRevokedError } from "../../keys/keyRevocations.js";
@@ -265,6 +266,18 @@ function signWithNotary(params: PolicySignInput): SignedDigest {
   return acceptNotarySigning(params, prepared, postNotarySync(prepared.request));
 }
 
+const revocationLogAppends = new Set<string>();
+/**
+ * A key revocation's own transparency append (P0-37). trust.yaml is workspace-writable, so its signature state must never
+ * block a revocation: while `append` runs, a refused trust config routes the log seal and Merkle root to the vault.
+ * ponytail: under a real NOTARY config this one seal is vault-signed; the next append after trust.yaml recovers re-seals.
+ */
+export function withRevocationLogRoute<T>(workspace: string, append: () => T): T {
+  const key = resolve(workspace);
+  revocationLogAppends.add(key);
+  try { return append(); } finally { revocationLogAppends.delete(key); }
+}
+
 /** Who signs `kind` under the workspace's trust config; throws when that config's signature is invalid. */
 export function signingRoute(workspace: string, kind: SignKind): "vault" | "notary" {
   const trustSig = verifyTrustConfigSignature(workspace);
@@ -278,6 +291,7 @@ export function signingRoute(workspace: string, kind: SignKind): "vault" | "nota
     if (!trustSig.signatureExists && trust.trust.mode === "LOCAL_VAULT") {
       return "vault";
     }
+    if (revocationLogAppends.has(resolve(workspace)) && (kind === "TRANSPARENCY_ROOT" || kind === "MERKLE_ROOT")) return "vault";
     throw new Error(`trust config signature invalid: ${trustSig.reason ?? "unknown"}`);
   }
   const trust = loadTrustConfig(workspace);
