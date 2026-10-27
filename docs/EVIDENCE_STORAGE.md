@@ -37,6 +37,23 @@ amc evidence-stores encrypt --rewrap [--key-provider P --key-ref R]   # re-wrap 
 - **Reading payloads.** `readEventPayload` (`src/session/eventPayload.ts`) decrypts. Code that reads `payload_inline` with its own SQL sees ciphertext when encryption is on. Known readers to move onto `readEventPayload` before enabling encryption where they matter: `src/wire/workAcceptance.ts`, `src/agent/foreignSubagentRunner.ts`, `src/studio/nativeTaskValidation.ts`, `src/diagnostic/runner.ts`, `src/cli-trace-commands.ts`, `src/catalog/evidence/mappingAdapter.ts`, `src/budgets/nativeBudgetUsage.ts`, `src/actions/actionJournal.ts`, `src/session/surfaceCompaction.ts`, `src/session/spill/spillEvidence.ts`, `src/score/productionReadiness.ts`, `src/drift/continuousMonitor.ts`, `src/diagnostic/gates.ts`, `src/dashboard/build.ts`, `src/compliance/evidenceBinding.ts`, `src/audit/binderCollector.ts`, `src/assurance/executed/evidence.ts`, `src/acp/acpCommittedUpdates.ts`, and `src/a4` (P2-36).
 - **Zeroization.** Plaintext keys live in process memory and are zeroized on exit or `closeLedgerDataKeys()`. In Node this is best effort. Keys and wrapped keys are never logged.
 
+## WORM export
+
+Signed retention segments (`amc retention run`) can be exported to an object store under a compliance-mode retention lock: "WORM export designed for SEC 17a-4-style retention". AMC makes no claim that an export meets any rule; the record-keeping duties need the D-08 experts.
+
+```bash
+npm install @aws-sdk/client-s3          # optional peer, loaded only for S3 targets
+amc evidence-stores worm-export --bucket <object-lock-bucket> --retain-days 2190 [--prefix ws1/] [--region eu-west-1]
+amc evidence-stores worm-verify --index <downloaded index object> --objects <download dir> --trust-list <signed trust list>
+```
+
+- Every segment, its manifest and its signature are uploaded as content-addressed objects (`objects/<sha256>`) with `ObjectLockMode: COMPLIANCE`, a retain-until date, a SHA-256 checksum and `If-None-Match: *`. Then a signed `worm-export-index.json` names each object's key, sha256, retain-until and version id.
+- A bucket without Object Lock is refused before any upload. Every object is HEAD-checked after upload; anything not in compliance mode, or retained for less than requested, is refused.
+- Nothing is deleted and no retention is shortened. Re-running the export uploads only objects the bucket does not already hold.
+- Offline verification needs the downloaded objects and a signed trust list that pins the workspace's artifact-seal key: a key carried in the export never vouches for itself. It checks every object's sha256, every manifest signature, and the event-hash chain inside and across segments (keyless, as for encrypted rows).
+- Compliance-mode locks cannot be shortened or removed, even by the account owner. Test with a dedicated bucket and a short retention.
+- S3 Object Lock ships first. Azure immutable blobs and GCS bucket lock fit the same `WormTarget` interface and are not implemented. MinIO, a possible local object-lock target for CI, is AGPL-3.0, so CI uses the `filesystem-test` target until that licence is accepted.
+
 ## Backups
 
 Backups capture each SQLite file with `VACUUM INTO`, a consistent snapshot taken from a read transaction, so appends during a backup cannot tear it. WAL and shared-memory sidecars are not copied. An encrypted ledger is backed up as ciphertext with only its wrapped keys, so restoring it needs the KeyProvider. See [BACKUPS.md](BACKUPS.md).

@@ -126,6 +126,47 @@ export function registerEvidenceStoreCommands(program: Command): void {
     });
 
   stores
+    .command("worm-export")
+    .description("Export signed retention segments to an object-lock (WORM) bucket under a retention lock that cannot be shortened (P2-09)")
+    .requiredOption("--bucket <name>", "S3 bucket with Object Lock enabled")
+    .requiredOption("--retain-days <n>", "retain each segment this many days after its last event")
+    .option("--prefix <prefix>", "key prefix inside the bucket", "")
+    .option("--region <region>", "bucket region (default: the AWS SDK's)")
+    .option("--json", "Output as JSON")
+    .action(async (opts: { bucket: string; retainDays: string; prefix: string; region?: string; json?: boolean }) => {
+      const { exportRetentionSegments } = await import("./ops/retention/wormExport.js");
+      const { s3ObjectLockTarget } = await import("./ops/retention/wormTargets.js");
+      const days = Number(opts.retainDays);
+      if (!Number.isInteger(days) || days < 1) throw new Error("--retain-days must be a positive integer");
+      const receipt = await exportRetentionSegments({ workspace: process.cwd(), target: s3ObjectLockTarget({ bucket: opts.bucket, prefix: opts.prefix, region: opts.region }),
+        retainUntil: (segment) => new Date(segment.endTs + days * 86_400_000) });
+      if (opts.json) {
+        console.log(JSON.stringify(receipt, null, 2));
+        return;
+      }
+      console.log(chalk.green(`Exported ${receipt.segments} segment(s): ${receipt.uploaded.length} object(s) uploaded, ${receipt.alreadyPresent.length} already held under lock.`));
+      console.log(chalk.gray(`Signed index: ${receipt.indexKey} (local copy ${receipt.localIndexPath})`));
+      console.log(chalk.gray("WORM export designed for SEC 17a-4-style retention; AMC makes no regulatory claim about it."));
+    });
+
+  stores
+    .command("worm-verify")
+    .description("Verify a downloaded WORM export offline against a trust list (P2-09)")
+    .requiredOption("--index <file>", "the downloaded worm-export-index.json object")
+    .requiredOption("--objects <dir>", "directory holding the downloaded objects by key")
+    .requiredOption("--trust-list <file>", "signed trust list pinning the artifact-seal key")
+    .action(async (opts: { index: string; objects: string; trustList: string }) => {
+      const { verifyWormExport } = await import("./ops/retention/wormExport.js");
+      const verdict = verifyWormExport({ indexFile: opts.index, objectsDir: opts.objects, trustList: opts.trustList });
+      if (verdict.ok) {
+        console.log(chalk.green("WORM export verified: every object, segment signature and chain link checks out under the pinned key."));
+        return;
+      }
+      for (const error of verdict.errors) console.log(chalk.red(`  ${error}`));
+      process.exitCode = 1;
+    });
+
+  stores
     .command("backfill")
     .description("Copy guard events written before dual-write into evidence.sqlite")
     .action(async () => {

@@ -103,7 +103,7 @@ export function inlinePlaintextOrNull(workspace: string, eventId: string, value:
  * needed. Rows encrypted later by `amc evidence-stores encrypt` hashed their plaintext; for those the key is needed, and
  * without it the mismatch is reported with that reason.
  */
-export function recomputeEventHash(workspace: string, event: EvidenceEvent, errors: string[]): string {
+export function recomputeEventHash(workspace: string | null, event: EvidenceEvent, errors: string[]): string {
   const inline = event.canonical_payload_inline ?? event.payload_inline;
   const hashWith = (payloadInline: string | null) => sha256Hex(`${event.prev_event_hash}${canonicalMetadataForHash({
     id: event.id, ts: event.ts, sessionId: event.session_id, runtime: event.runtime, eventType: event.event_type,
@@ -112,7 +112,8 @@ export function recomputeEventHash(workspace: string, event: EvidenceEvent, erro
   const stored = hashWith(inline ?? null);
   if (stored === event.event_hash || !isEncryptedField(inline)) return stored;
   try {
-    const plain = inlinePlaintextOrNull(workspace, event.id, inline);
+    // A null workspace (an offline verifier) never looks for a key.
+    const plain = workspace === null ? null : inlinePlaintextOrNull(workspace, event.id, inline);
     if (plain !== null) return hashWith(plain);
     // Without the key a row encrypted after hashing cannot be told from an altered one: it fails, saying why.
     errors.push(`Event ${event.id} event_hash mismatch over its stored ciphertext; a row encrypted after hashing needs the ledger key or a plaintext export to verify`);

@@ -31,3 +31,26 @@ The 48 verification, retention, bundle, backup and high-water test files were re
 
 - Approve or reject ADR 018 (the code follows its proposal).
 - Add `P2-09` to `scripts/freeze-baseline.json` `allowedExceptionKeys` on the base (new CLI paths: `amc evidence-stores encrypt`, and in later branches the WORM and cutover commands).
+
+## 09b: WORM export
+
+New tests: `tests/wormExport.test.ts` (7, fake targets): unlocked target refused before any upload; shorter retain-until refused; governance mode refused; offline verification passes against a signed trust list; one flipped segment byte fails; an index signed by a key the trust list does not pin fails; re-export uploads nothing; the S3 adapter sends `COMPLIANCE`, a SHA-256 checksum and `If-None-Match: *`.
+
+Mutation checks: skipping the HEAD mode check makes "refuses when HEAD reports governance mode" fail; skipping the object-lock configuration check makes "refuses a target without object lock before uploading anything" fail. Both restored.
+
+Interface deviation: the spec's `WormTarget` has no way to ask whether a bucket has object lock, so `lockConfiguration()` was added (S3 `GetObjectLockConfiguration`); `headObject` returns null for a missing object.
+
+### Real object-lock bucket run: PENDING SID (not run, not faked)
+
+Needs a dedicated S3 bucket created with Object Lock enabled, credentials in the AWS SDK default chain, and a workspace with at least one retention segment. Compliance-mode locks cannot be removed: use a test bucket and a short retention.
+
+```bash
+npm install --no-save @aws-sdk/client-s3
+amc retention run                                   # produces signed segments if any are due
+amc evidence-stores worm-export --bucket <bucket> --retain-days 1 --prefix p2-09-qual/ --json > worm-export-receipt.json
+aws s3api head-object --bucket <bucket> --key p2-09-qual/<indexKey>   # expect ObjectLockMode COMPLIANCE
+aws s3 cp --recursive s3://<bucket>/p2-09-qual/ ./download/
+amc evidence-stores worm-verify --index ./download/<indexKey> --objects ./download --trust-list <signed trust list pinning the artifact-seal key>
+```
+
+Record `worm-export-receipt.json`, the head-object output and the verify output here as `worm-real-bucket/`.
