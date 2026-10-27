@@ -70,6 +70,15 @@ async function atPause(paused: ReturnType<typeof pauseSign>, pending: Promise<un
   expect(await Promise.race([paused.entered.promise.then(() => "signed"), pending.then(() => "returned", () => "refused")])).toBe("signed");
 }
 async function positive(f: ReturnType<typeof fixture>) { const out = await bom.signBomFileAsync(f.params); expect(out.sigFile).toBe(f.sigFile); return verified(f); }
+// The caller callback runs at every gate; the final pre-publication one is the first that runs under the sidecar lock.
+function finalCallback(f: ReturnType<typeof fixture>, action: () => void) {
+  const state = { fired: false };
+  return { state, beforePublish: () => {
+    if (state.fired || !existsSync(join(dirname(f.sigFile), ".bom-signature.lock"))) return;
+    state.fired = true; action();
+  } };
+}
+const CHANGED = "signed pair inputs or destinations changed while signing; retry";
 async function postOwnedRoute(f: ReturnType<typeof fixture>, revalidateAuthority: () => boolean) {
   let dispatch: Promise<void> | undefined;
   const server = createServer((req, res) => {
@@ -109,7 +118,8 @@ describe("BOM awaitable policy publication", () => {
     const outputSigFile = alias === "same path" ? f.input : f.sigFile;
     if (alias === "hardlink") linkSync(f.input, f.sigFile);
     try {
-      await expect(bom.signBomFileAsync({ ...f.params, outputSigFile })).rejects.toThrow(/^BOM signature destination must differ from its input$/);
+      await expect(bom.signBomFileAsync({ ...f.params, outputSigFile })).rejects.toThrow(
+        `Bom output ${alias === "same path" ? "aliases" : "hardlinks"} a used input, authority or later log destination`);
       expect(spy).not.toHaveBeenCalled(); expect(readFileSync(f.input)).toEqual(f.bytes);
       expect(readFileSync(outputSigFile)).toEqual(f.bytes); expect(readFileSync(transparencyLogPath(f.workspace))).toEqual(beforeLog);
     } finally { if (alias === "hardlink") unlinkSync(f.sigFile); }
@@ -119,19 +129,19 @@ describe("BOM awaitable policy publication", () => {
   test.skipIf(process.platform === "win32")("refuses a real input symlink alias of its signature output before Sign", async () => {
     const f = fixture(), alias = join(f.workspace, "bom-input-alias.json"), spy = vi.spyOn(f.provider, "sign");
     symlinkSync(f.input, alias);
-    await expect(bom.signBomFileAsync({ ...f.params, inputFile: alias, outputSigFile: f.input })).rejects.toThrow(/^BOM signature destination must differ from its input$/);
+    // The input is captured as a regular file only, so a symlinked input is refused before any alias comparison.
+    await expect(bom.signBomFileAsync({ ...f.params, inputFile: alias, outputSigFile: f.input })).rejects.toThrow(/^signed pair member must be a regular file$/);
     expect(spy).not.toHaveBeenCalled(); expect(readFileSync(alias)).toEqual(f.bytes); expect(readFileSync(f.input)).toEqual(f.bytes);
     await positive(f);
   });
 
   test("rechecks actual same-file identity after the final trusted callback even when both preimage bytes still match", async () => {
     const f = fixture(), spy = vi.spyOn(f.provider, "sign"), beforeLog = readFileSync(transparencyLogPath(f.workspace));
-    writeFileSync(f.sigFile, f.bytes); let callbacks = 0;
+    writeFileSync(f.sigFile, f.bytes);
+    const final = finalCallback(f, () => { unlinkSync(f.sigFile); linkSync(f.input, f.sigFile); });
     try {
-      await expect(bom.signBomFileAsync(f.params, { beforePublish: () => {
-        if (++callbacks === 2) { unlinkSync(f.sigFile); linkSync(f.input, f.sigFile); }
-      } })).rejects.toThrow(/^BOM signature destination must differ from its input$/);
-      expect(callbacks).toBe(2); expect(spy).toHaveBeenCalledTimes(1); expect(readFileSync(f.input)).toEqual(f.bytes);
+      await expect(bom.signBomFileAsync(f.params, final)).rejects.toThrow(/^Bom output hardlinks a used input, authority or later log destination$/);
+      expect(final.state.fired).toBe(true); expect(spy).toHaveBeenCalledTimes(1); expect(readFileSync(f.input)).toEqual(f.bytes);
       expect(readFileSync(f.sigFile)).toEqual(f.bytes); expect(readFileSync(transparencyLogPath(f.workspace))).toEqual(beforeLog);
     } finally { if (existsSync(f.sigFile)) unlinkSync(f.sigFile); }
     await positive(f);
@@ -150,17 +160,16 @@ describe("BOM awaitable policy publication", () => {
 
   test.each(["input", "sidecar"] as const)("compares actual %s bytes again after the trusted final callback", async changed => {
     const f = fixture(), beforeLog = readFileSync(transparencyLogPath(f.workspace)), spy = vi.spyOn(f.provider, "sign");
-    const replacement = Buffer.from("owned callback sidecar"); writeFileSync(f.sigFile, SENTINEL); let callbacks = 0;
+    const replacement = Buffer.from("owned callback sidecar"); writeFileSync(f.sigFile, SENTINEL);
+    const final = finalCallback(f, () => {
+      if (changed === "input") writeFileSync(f.input, JSON.stringify({ ...f.value, agentName: "Changed in final callback" }));
+      else writeFileSync(f.sigFile, replacement);
+    });
     try {
-      const outcome = await bom.signBomFileAsync(f.params, { beforePublish: () => {
-        if (++callbacks === 2) {
-          if (changed === "input") writeFileSync(f.input, JSON.stringify({ ...f.value, agentName: "Changed in final callback" }));
-          else writeFileSync(f.sigFile, replacement);
-        }
-      } }).then(() => null, error => error);
-      expect(callbacks).toBe(2); expect(spy).toHaveBeenCalledTimes(1);
+      const outcome = await bom.signBomFileAsync(f.params, final).then(() => null, error => error);
+      expect(final.state.fired).toBe(true); expect(spy).toHaveBeenCalledTimes(1);
       expect(Buffer.from(spy.mock.calls[0]![1])).toEqual(Buffer.from(sha256Hex(f.bytes), "hex"));
-      expect(outcome).toMatchObject({ message: changed === "input" ? "BOM input changed while signing was prepared" : "BOM signature destination changed while signing was prepared" });
+      expect(outcome).toMatchObject({ message: CHANGED });
       expect(readFileSync(f.sigFile)).toEqual(changed === "input" ? SENTINEL : replacement);
       expect(readFileSync(transparencyLogPath(f.workspace))).toEqual(beforeLog);
     } finally { writeFileSync(f.input, f.bytes); }
@@ -173,7 +182,7 @@ describe("BOM awaitable policy publication", () => {
     try {
       await atPause(paused, pending);
       if (changed === "input") writeFileSync(f.input, JSON.stringify({ ...f.value, agentName: "Changed during signing" })); else writeFileSync(f.sigFile, replacement);
-      paused.release.resolve(); expect(await outcome).toMatchObject({ message: changed === "input" ? "BOM input changed while signing was prepared" : "BOM signature destination changed while signing was prepared" });
+      paused.release.resolve(); expect(await outcome).toMatchObject({ message: CHANGED });
       expect(readFileSync(f.sigFile)).toEqual(changed === "input" ? SENTINEL : replacement); expect(readFileSync(transparencyLogPath(f.workspace))).toEqual(beforeLog);
     } finally { paused.release.resolve(); await Promise.allSettled([pending]); writeFileSync(f.input, f.bytes); }
     await positive(f);
@@ -198,19 +207,20 @@ describe("BOM awaitable policy publication", () => {
   test("refuses a real signed whole-policy edit in the final callback while the BOM signer stays identical", async () => {
     const f = fixture(), selected = describePolicySigner(f.workspace, "BOM"), path = trustConfigPath(f.workspace), sigPath = trustConfigSigPath(f.workspace);
     const body = readFileSync(path), sidecar = readFileSync(sigPath), beforeLog = readFileSync(transparencyLogPath(f.workspace));
-    writeFileSync(f.sigFile, SENTINEL); let callbacks = 0;
+    writeFileSync(f.sigFile, SENTINEL);
+    const final = finalCallback(f, () => {
+      const next = trustConfigSchema.parse(loadTrustConfig(f.workspace)); next.trust.enforcement.requireNotaryFor.push("CERT");
+      const bytes = Buffer.from(YAML.stringify(next)); files.writeFileAtomic(path, bytes, 0o644);
+      const signed = signDigestWithVault({ workspace: f.workspace, kind: "BUNDLE", digestHex: sha256Hex(bytes) });
+      files.writeFileAtomic(sigPath, JSON.stringify({ digestSha256: signed.digestSha256, signature: signed.signature,
+        signedTs: signed.signedTs, signer: "auditor", envelope: signed.envelope }, null, 2), 0o644);
+      expect(verifyTrustConfigSignature(f.workspace)).toMatchObject({ valid: true, signatureExists: true });
+      expect(describePolicySigner(f.workspace, "BOM")).toEqual(selected);
+    });
     try {
-      const outcome = await bom.signBomFileAsync(f.params, { beforePublish: () => {
-        if (++callbacks !== 2) return;
-        const next = trustConfigSchema.parse(loadTrustConfig(f.workspace)); next.trust.enforcement.requireNotaryFor.push("CERT");
-        const bytes = Buffer.from(YAML.stringify(next)); files.writeFileAtomic(path, bytes, 0o644);
-        const signed = signDigestWithVault({ workspace: f.workspace, kind: "BUNDLE", digestHex: sha256Hex(bytes) });
-        files.writeFileAtomic(sigPath, JSON.stringify({ digestSha256: signed.digestSha256, signature: signed.signature,
-          signedTs: signed.signedTs, signer: "auditor", envelope: signed.envelope }, null, 2), 0o644);
-        expect(verifyTrustConfigSignature(f.workspace)).toMatchObject({ valid: true, signatureExists: true });
-        expect(describePolicySigner(f.workspace, "BOM")).toEqual(selected);
-      } }).then(() => null, error => error);
-      expect(callbacks).toBe(2); expect(outcome).toMatchObject({ message: "BOM signing policy changed while signing was prepared" });
+      const outcome = await bom.signBomFileAsync(f.params, final).then(() => null, error => error);
+      // The retained log authority compares the same whole policy before the BOM-specific comparison does.
+      expect(final.state.fired).toBe(true); expect(outcome).toMatchObject({ message: expect.stringMatching(/^(BOM|transparency) signing policy changed while signing was prepared$/) });
       expect(readFileSync(f.sigFile)).toEqual(SENTINEL); expect(readFileSync(transparencyLogPath(f.workspace))).toEqual(beforeLog);
     } finally { files.writeFileAtomic(path, body, 0o644); files.writeFileAtomic(sigPath, sidecar, 0o644); }
     await positive(f);
@@ -218,14 +228,14 @@ describe("BOM awaitable policy publication", () => {
 
   test("refuses a real unrelated purpose-generation change in the final callback with the BOM signer unchanged", async () => {
     const f = fixture(), selected = describePolicySigner(f.workspace, "BOM");
-    writeFileSync(f.sigFile, SENTINEL); let callbacks = 0, afterRotationLog: Buffer | undefined;
-    const outcome = await bom.signBomFileAsync(f.params, { beforePublish: () => {
-      if (++callbacks !== 2) return;
+    writeFileSync(f.sigFile, SENTINEL); let afterRotationLog: Buffer | undefined;
+    const final = finalCallback(f, () => {
       rotatePurposeKeys({ workspace: f.workspace, purposes: ["session"], passphrase: PASS });
       afterRotationLog = readFileSync(transparencyLogPath(f.workspace));
       expect(describePolicySigner(f.workspace, "BOM")).toEqual(selected);
-    } }).then(() => null, error => error);
-    expect(callbacks).toBe(2); expect(outcome).toMatchObject({ code: "KEY_PROVIDER_KEY_REFUSED" });
+    });
+    const outcome = await bom.signBomFileAsync(f.params, final).then(() => null, error => error);
+    expect(final.state.fired).toBe(true); expect(outcome).toMatchObject({ code: "KEY_PROVIDER_KEY_REFUSED" });
     expect(afterRotationLog).toBeDefined(); expect(readFileSync(f.sigFile)).toEqual(SENTINEL);
     expect(readFileSync(transparencyLogPath(f.workspace))).toEqual(afterRotationLog);
     await positive(f);
