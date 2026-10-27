@@ -22,7 +22,7 @@ import type { SessionService } from "./sessionService.js";
 
 export type ResumeRule = "may-repeat" | "repeat-with-same-idempotency-key" | "reconcile-first";
 /** `completed`: settled (see `effect`); `denied`: refused or cancelled before dispatch; `not-found`: no journaled execution. */
-export type ReconciledResult = "completed" | "denied" | "not-found" | "unknown";
+type ReconciledResult = "completed" | "denied" | "not-found" | "unknown";
 
 const WORKSPACE_FILE_TOOLS: ReadonlySet<string> = new Set(["fs.write", "fs.edit"]);
 const SETTLED: ReadonlySet<unknown> = new Set(["completed", "denied", "not-found"]);

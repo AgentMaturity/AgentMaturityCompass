@@ -1860,6 +1860,7 @@ Run one agent turn and report what the signed log recorded
 | `--tool-mode <mode>` | - |
 | `--unsafe-unconfined-shell` | - |
 | `--session <id>` | - |
+| `--takeover-expired-writer <reason>` | - |
 | `--fork-from <id>` | - |
 | `--keep-open` | - |
 | `--delegate` | - |

@@ -18,7 +18,7 @@ export class ControlMutationAuthorityError extends Error {
 }
 
 /** The captured predecessor moved before publication; no record was written, so a fresh attempt is safe. */
-export class SignedControlJournalConflictError extends SignedControlJournalError {}
+class SignedControlJournalConflictError extends SignedControlJournalError {}
 
 const CONFLICT_ATTEMPTS = 8; // ponytail: fixed bound; contention beyond 8 concurrent writers still refuses.
 /** Re-run a whole capture → prepare → publish attempt from the fresh head when only its predecessor moved. */

@@ -10,7 +10,7 @@ export const SESSION_WRITER_META = "amcSessionWriter";
  * append transaction against the signed row it follows, and every row carries the writer's `leaseMs`. A lease is live
  * while the session's last signed row is younger than it. Version 1 rows (no epoch, no lease) stay readable as epoch 0.
  */
-export const SESSION_WRITER_META_VERSION = 2;
+const SESSION_WRITER_META_VERSION = 2;
 export const DEFAULT_SESSION_LEASE_MS = 60_000;
 export const STALE_EPOCH_MESSAGE = "a newer writer claimed this session; no further effects are dispatched by this process";
 const TAKEOVER_REASON_MAX = 500;

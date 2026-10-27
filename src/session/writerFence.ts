@@ -14,7 +14,7 @@ import { runImmediateTransaction } from "../ledger/ledgerSessionTransactions.js"
 import type { EvidenceEvent } from "../types.js";
 import { extractEnvelope } from "./sessionTypes.js";
 
-export const FENCE_REFUSAL_AUDIT = "SESSION_WRITER_FENCE_REFUSED";
+const FENCE_REFUSAL_AUDIT = "SESSION_WRITER_FENCE_REFUSED";
 
 /** The machine-local key of one session's journal mark: the session id in a digest of the workspace's real path. */
 export function sessionJournalMarkKey(workspace: string, sessionId: string): string {
