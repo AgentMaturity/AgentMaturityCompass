@@ -164,7 +164,7 @@ describe("actual tools config publication under config-purpose provider authorit
       await atPause(paused.entered, operation);
       const replacement = defaultToolsConfig(); replacement.tools.allowedTools = replacement.tools.allowedTools.slice(0, 1);
       await tools.initToolsConfigAsync(f.workspace, replacement); const committed = f.pair(); f.verify();
-      paused.release.resolve(); expect(await outcome).toMatchObject({ message: "tools config or signature changed while signing; retry" });
+      paused.release.resolve(); expect(await outcome).toMatchObject({ message: "signed pair inputs or destinations changed while signing; retry" });
       expect(f.pair()).toEqual(committed);
     } finally { paused.release.resolve(); await outcome; }
   });
@@ -173,7 +173,7 @@ describe("actual tools config publication under config-purpose provider authorit
     const f = fixture(); await f.bind(); const paused = f.pause(), operation = tools.signToolsConfigAsync(f.workspace), outcome = operation.then(() => null, error => error);
     try {
       await atPause(paused.entered, operation); const previous = f.pair(); writeFileSync(f.sigFile, previous.signature!.toString() + "\n"); const changed = f.pair();
-      paused.release.resolve(); expect(await outcome).toMatchObject({ message: "tools config or signature changed while signing; retry" }); expect(f.pair()).toEqual(changed);
+      paused.release.resolve(); expect(await outcome).toMatchObject({ message: "signed pair inputs or destinations changed while signing; retry" }); expect(f.pair()).toEqual(changed);
     } finally { paused.release.resolve(); await outcome; }
   });
 
@@ -200,7 +200,7 @@ describe("actual tools config publication under config-purpose provider authorit
     const operation = tools.initToolsConfigAsync(f.workspace, undefined, { onlyIfMissing: true }), outcome = operation.then(() => null, error => error);
     try {
       await atPause(paused.entered, operation); await tools.initToolsConfigAsync(f.workspace); const committed = f.pair(); f.verify();
-      paused.release.resolve(); expect(await outcome).toMatchObject({ message: "tools config or signature changed while signing; retry" }); expect(f.pair()).toEqual(committed);
+      paused.release.resolve(); expect(await outcome).toMatchObject({ message: "signed pair inputs or destinations changed while signing; retry" }); expect(f.pair()).toEqual(committed);
     } finally { paused.release.resolve(); await outcome; }
   });
 });

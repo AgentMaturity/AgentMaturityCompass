@@ -88,6 +88,8 @@ function tracked(value: unknown, trace: string[], path = "input"): unknown {
 }
 function rehash(receipt: Receipt): void { const { receiptHash: _, ...rest } = receipt; receipt.receiptHash = sha256Hex(canonicalize(rest)); }
 
+// P2-08 added these exports for awaited provider-backed signing; every original export stays.
+const P2_08_ADDED_EXPORTS: Partial<Record<string, string[]>> = { gate: ["initCiForAgentAttemptAsync", "prepareSignedGatePolicy"] };
 for (const [name, path, currentNamespace, buildName, verifyName, renderName, rowInput] of definitions) {
   const current = currentNamespace as unknown as WorkflowModule;
   const old = () => originals.get(path)!;
@@ -101,7 +103,7 @@ for (const [name, path, currentNamespace, buildName, verifyName, renderName, row
   }
   describe(`${name} complete original workflow`, () => {
     test("preserves complete module exports, root public consumers and unchanged domain source bytes", () => {
-      expect(Object.keys(currentNamespace).sort()).toEqual(Object.keys(old()).sort());
+      expect(Object.keys(currentNamespace).sort()).toEqual([...Object.keys(old()), ...(P2_08_ADDED_EXPORTS[name] ?? [])].sort());
       for (const exported of [buildName, verifyName, renderName]) expect((publicApi as unknown as Record<string, unknown>)[exported]).toBe(current[exported]);
       const inverses = JSON.parse(readFileSync(resolve(archive, "inverse-text.json"), "utf8")) as Record<string, Array<{ position: number; before: string; after: string }>>;
       let restored = landedText(path);

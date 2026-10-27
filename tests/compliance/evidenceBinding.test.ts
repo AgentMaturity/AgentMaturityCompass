@@ -88,6 +88,9 @@ const REVIEWED_RUNTIME_OR_NON_EVIDENCE = new Set([
   "dataflow",
   // P1-10F: compileCatalogPlan reports where visible tools came from (defaults or the signed tools.yaml); not evidence.
   "signed-tools-yaml",
+  // P2-08 (src/passport/passportCli.ts): whether a compared passport was read from the cache or created for the
+  // comparison. A CLI read record's label, never a ledger meta.source.
+  "cache", "created",
 ]);
 
 function sourceFiles(dir: string): string[] {
