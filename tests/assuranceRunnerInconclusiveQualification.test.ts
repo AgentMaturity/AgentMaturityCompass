@@ -347,12 +347,18 @@ describe("P0-19 actual local runner inconclusive contracts", () => {
     expect(result.reportFiles).toEqual([]); expect(result.runs).toEqual([]);
   });
 
-  test("a real late Markdown-write failure preserves its error and the already-sealed session without abort or reseal", async () => {
+  test("a real Markdown-destination failure preserves its error and the already-sealed session without abort or reseal", async () => {
     const result = await completionFault("markdown");
     expect(result.calls).toBe(scenarioIds.length); expect(result.returned).toBeUndefined();
     expect(result.caught).toBeInstanceOf(Error);
-    expect(result.caught).toMatchObject({ code: "EEXIST", syscall: "mkdir", path: result.blocker });
-    expect((result.caught as Error).cause).toBeUndefined();
+    // P2-08: report destinations are captured before signing, so the unusable Markdown destination is refused before
+    // any report file is written. The error names the sealed session it leaves committed and keeps the filesystem cause.
+    const caught = result.caught as Error & { phase: string; completed: readonly string[] };
+    expect(caught).toMatchObject({ code: "RUN_REPORT_PARTIAL", phase: "assurance-destinations" });
+    expect(caught.completed).toEqual([`sealed-session:${result.sessions[0]!.session_id}`]);
+    let root: unknown = caught.cause; while (root instanceof Error && root.cause !== undefined) root = root.cause;
+    expect(root).toMatchObject({ code: "ENOTDIR", syscall: "lstat", path: join(result.blocker, "report.md") });
+    expect(result.reportFiles).toEqual([]);
     expect(result.sessions).toHaveLength(1); expect(result.sealUpdates).toHaveLength(1);
     const session = result.sessions[0]!;
     expect(session.ended_ts).not.toBeNull(); expect(session.session_final_event_hash).toBe(result.events.at(-1)!.event_hash);
