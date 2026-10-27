@@ -115,3 +115,47 @@ with slice D.
 - `scripts/drills/kill-switch-drill.mjs` writes the signed `amc.drill/1`
   receipt. The kind-cluster rehearsal of the manual fallback is pending.
 - `KILL_SWITCH_ACTIVATED` opens an incident through the slice A detectors.
+
+## Slice C: change envelopes
+
+`src/runtime/changeEnvelope.ts` pins an agent's model, prompt, tool, policy
+and corpus versions and pre-declares the changes allowed, each with the tests
+that must pass first, in the style of a predetermined change control plan.
+AMC claims no FDA or other conformity for it.
+
+An envelope is a P2-24 bound record (kind `change-envelope`):
+`requestChangeEnvelope` writes the draft under
+`.amc/runtime/envelopes/pending/` and raises its approval;
+`activateChangeEnvelope` signs it once the approval's quorum is met, the
+requester's own decision never counting. `approvalId` is that approval.
+
+| Rule | Admits |
+|---|---|
+| `pinned` | No change |
+| `digest_in_set` | A live value (prompt, tool, policy or corpus digest, or `provider/model@version`) in `values` |
+| `provider_version_in_set` | The same provider and model at a provider-reported version in `values` |
+
+At native session open (`composeAgentSession`), `checkChangeEnvelopeAtOpen`
+compares the live manifest with the agent's newest envelope:
+
+- Identical to the baseline: allowed.
+- Every change admitted, with a passing result recorded for each required
+  test (`recordEnvelopeTestResult`, self-reported): allowed, citing the
+  envelope (`CHANGE_ENVELOPE_APPLIED`).
+- Anything else (a change outside it, missing or failing test evidence, an
+  expired envelope, an envelope file that fails verification): in a
+  regulated workspace (an active compiled plan, or a plan that cannot be
+  read) the session is refused before any lease or session row; elsewhere
+  it is a warning. Both record `AGENT_REASSESSMENT_REQUIRED`, which opens an
+  incident.
+- No envelope at all: nothing is compared.
+
+A model with no provider-reported version is `unpinned`, a claim downgrade.
+No provider reports a version before the first response, so a native session
+is always unpinned at open (Not verified per provider: Gemini reports
+`modelVersion` mid-stream; the others were not checked).
+
+P2-23 owns the version manifest (`src/lifecycle/versionManifest.ts`) and
+reassessment as a lifecycle state, and is built in parallel. Until they are
+reconciled, `AgentVersionManifest` here is the minimal shape compared and the
+`AGENT_REASSESSMENT_REQUIRED` ledger row is the reassessment record.

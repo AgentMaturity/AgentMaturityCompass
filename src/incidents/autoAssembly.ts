@@ -462,7 +462,10 @@ const GOVERNANCE_DETECTORS: Readonly<Record<string, { title: string; severity: I
     triggerId: (meta) => typeof meta.breakGlassId === "string" ? `break_glass:${meta.breakGlassId}` : null },
   // P2-26 slice B: a kill switch activation is itself an incident.
   KILL_SWITCH_ACTIVATED: { title: "Kill switch activated", severity: "CRITICAL",
-    triggerId: (meta) => typeof meta.killId === "string" ? `kill_switch:${meta.killId}` : null }
+    triggerId: (meta) => typeof meta.killId === "string" ? `kill_switch:${meta.killId}` : null },
+  // P2-26 slice C: a version change outside the agent's change envelope needs a reassessment (P2-23 consumes it).
+  AGENT_REASSESSMENT_REQUIRED: { title: "Reassessment required: version change outside the change envelope", severity: "CRITICAL",
+    triggerId: (meta) => typeof meta.liveManifestSha256 === "string" ? `reassessment:${String(meta.envelopeId)}:${meta.liveManifestSha256}` : null }
 };
 
 /** Whether autoDetectAndAssemble reads this audit type at all; lets the ledger hook skip every other row cheaply. */
