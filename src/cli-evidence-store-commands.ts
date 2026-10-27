@@ -61,15 +61,15 @@ export function registerEvidenceStoreCommands(program: Command): void {
         process.env.AMC_GUARD_EVENTS_DB_PATH ?? join(workspace, ".amc", "guard_events.sqlite");
       const comparison = compareGuardEventStores({ workspace, legacyDbPath });
       if (opts.json) {
-        console.log(JSON.stringify({ stage: currentStage(), ...comparison }, null, 2));
+        console.log(JSON.stringify({ stage: currentStage(workspace), ...comparison }, null, 2));
         return;
       }
       console.log(chalk.bold("\nGuard event store parity"));
-      console.log(chalk.gray("Stage:            "), currentStage());
+      console.log(chalk.gray("Stage:            "), currentStage(workspace));
       console.log(chalk.gray("Legacy rows:      "), comparison.legacyRows);
       console.log(chalk.gray("Consolidated rows:"), comparison.consolidatedRows);
       if (comparison.identical) {
-        console.log(chalk.green("\nStores agree. Cutover is safe: set AMC_GUARD_EVENTS_STAGE=CUTOVER."));
+        console.log(chalk.green("\nStores agree. Cutover is safe: run amc evidence-stores cutover."));
         return;
       }
       console.log(chalk.yellow("\nStores differ — do not cut over yet."));
@@ -164,6 +164,23 @@ export function registerEvidenceStoreCommands(program: Command): void {
       }
       for (const error of verdict.errors) console.log(chalk.red(`  ${error}`));
       process.exitCode = 1;
+    });
+
+  stores
+    .command("cutover")
+    .description("Move this workspace's guard events to evidence.sqlite, only when parity is identical (P2-09)")
+    .action(async () => {
+      const { cutOverGuardEvents, guardEventStagePath } = await import("./storage/consolidation/guardEventConsolidation.js");
+      const workspace = process.cwd();
+      const legacyDbPath = process.env.AMC_GUARD_EVENTS_DB_PATH ?? join(workspace, ".amc", "guard_events.sqlite");
+      const { cutOver, comparison } = cutOverGuardEvents({ workspace, legacyDbPath });
+      if (!cutOver) {
+        console.log(chalk.red("Cutover refused: the stores differ. Run amc evidence-stores parity, then backfill if rows are missing."));
+        process.exitCode = 1;
+        return;
+      }
+      console.log(chalk.green(`Cut over at ${comparison.legacyRows} identical row(s). Guard events now read and write evidence.sqlite.`));
+      console.log(chalk.gray(`The legacy file is untouched. To revert, delete ${guardEventStagePath(workspace)} or set AMC_GUARD_EVENTS_STAGE=DUAL_WRITE.`));
     });
 
   stores

@@ -27,6 +27,16 @@ Two findings from the coordinator's security review, each with a regression test
 2. Key-file rollback: the signed key file now has a `sequence`; the P1-08 high-water store (`<AMC home>/state/high-water.json`, kind `ledger-dek`, per workspace scope) refuses an older one, and `encryptField` refuses a key version older than the newest ciphertext in the ledger.
 The 48 verification, retention, bundle, backup and high-water test files were rerun after the fix: 501 passed, 15 failed, all 15 also failing on the base.
 
+## 09c: guard-events cutover
+
+New tests: `tests/guardEventCutover.test.ts` (3): divergent parity refuses cutover and the workspace stays DUAL_WRITE; identical parity allows it, new events then reach only `evidence.sqlite`, the legacy rows are unchanged, and `AMC_GUARD_EVENTS_STAGE=DUAL_WRITE` reverts; retention with `pruneGuardEventsAfterDays` prunes both stores and parity stays identical. All 3 failed on the 09b source (no cutover function; the evidence-store copy was never pruned) and pass now.
+
+Mutation checks: dropping the identical-parity check fails "refuses cutover while parity diverges"; dropping the DUAL_WRITE prune of the evidence-store copy fails "prunes both stores". Both restored.
+
+Existing tests touching the emitter, guard events, retention or the deletion gate: 74 files, 1,728 passed, 3 failed; all 3 fail on base `7bdb1627a` as well (`auditEvidenceAccountingParity` gate exports, `domainExampleMode` binder signing, `evidenceBinding` source literals).
+
+Deviation: the spec says to use CUTOVER for new workspaces. CUTOVER is recorded per workspace by `amc evidence-stores cutover` (immediately allowed on a new workspace, whose two stores are empty and identical) rather than switched on by `initWorkspace`, because 16 existing test files and P2-01's path contract assume DUAL_WRITE by default and `src/workspace.ts` is outside the touch scope. Making it automatic is one line in `initWorkspace` once Sid accepts the test churn. The new deletion site is registered in `scripts/deletion-executors.json` as gated.
+
 ## Pending Sid
 
 - Approve or reject ADR 018 (the code follows its proposal).

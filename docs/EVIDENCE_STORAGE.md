@@ -55,6 +55,18 @@ amc evidence-stores worm-verify --index <downloaded index object> --objects <dow
 - Compliance-mode locks cannot be shortened or removed, even by the account owner. Test with a dedicated bucket and a short retention.
 - S3 Object Lock ships first. Azure immutable blobs and GCS bucket lock fit the same `WormTarget` interface and are not implemented. MinIO, a possible local object-lock target for CI, is AGPL-3.0, so CI uses the `filesystem-test` target until that licence is accepted.
 
+## Guard events
+
+Guard events still default to DUAL_WRITE: every event goes to `.amc/guard_events.sqlite` (authoritative for reads) and to `amc_guard_events` in `evidence.sqlite`. Retention with `retention.pruneGuardEventsAfterDays` now prunes both copies through P2-01's hold-aware deletion gate, so they stay in parity.
+
+```bash
+amc evidence-stores parity      # must report identical
+amc evidence-stores backfill    # copies rows written before dual-write, if parity reports them missing
+amc evidence-stores cutover     # refused unless parity is identical; records .amc/guard-events-stage.json
+```
+
+After cutover the workspace reads and writes guard events in `evidence.sqlite` only. The legacy file is left untouched, so reverting is a setting change: delete `.amc/guard-events-stage.json` or set `AMC_GUARD_EVENTS_STAGE=DUAL_WRITE` (the variable overrides the record in both directions). A new workspace is cut over the same way; parity of two empty stores is identical.
+
 ## Backups
 
 Backups capture each SQLite file with `VACUUM INTO`, a consistent snapshot taken from a read transaction, so appends during a backup cannot tear it. WAL and shared-memory sidecars are not copied. An encrypted ledger is backed up as ciphertext with only its wrapped keys, so restoring it needs the KeyProvider. See [BACKUPS.md](BACKUPS.md).
