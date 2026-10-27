@@ -9,6 +9,7 @@ import {
 } from "../actions/authorize.js";
 import { ActionBlocked, blockReason, type BlockCode, type EffectState, type ReceiptState } from "../actions/receiptStates.js";
 import { ACTION_CLASSES } from "../governor/actionCatalog.js";
+import { lifecycleAdmission } from "../lifecycle/reassessment.js";
 import { withWorkspaceScope } from "../enforce/evidenceEmitter.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
@@ -405,7 +406,12 @@ export class ToolPipeline {
       }
       authority = granted;
     }
-    if (!authorizes) return { refused: null, context: null, bound: null, required: false };
+    if (!authorizes) {
+      // P2-23: an unbound call (a read or low-impact write) still passes lifecycle admission; suspended and retired agents are held.
+      const lifecycle = lifecycleAdmission(draft.workspace, draft.agentId, { actionClass: draft.actionClass });
+      return { refused: lifecycle.ok ? null : { stage: "authorization", reason: `agent_not_active: ${lifecycle.reason}`, guardLabel: null },
+        context: null, bound: null, required: false };
+    }
     const context: AuthorizationContext = { ...(this.init.authorizationContext?.() ?? {}), ...(authority ? { authority } : {}) };
     const required = gate !== undefined || (this.init.boundApprovalRequiredFor?.has(draft.actionClass) ?? false);
     return { refused: null, context, bound: bindAuthorization(draft, context), required };

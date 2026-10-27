@@ -4,6 +4,7 @@ import { resolve } from "node:path";
 import { openActionJournal, type ActionJournal } from "../actions/actionJournal.js";
 import { authorizationIntentFor, bindAuthorization, recheckAuthorization } from "../actions/authorize.js";
 import { authorizationRecordDigest } from "../actions/authorizationRecord.js";
+import { lifecycleAdmission } from "../lifecycle/reassessment.js";
 import { ActionBlocked, type EffectState, type ReceiptState } from "../actions/receiptStates.js";
 import { openLedger, type Ledger } from "../ledger/ledger.js";
 import { DefiniteFailureError, type ToolExecution } from "../tools/toolTypes.js";
@@ -32,6 +33,12 @@ const executionFor = (call: Call): ToolExecution => ({
   parentToken: null, name: call.toolName, agentId: call.agentId, actionClass: call.actionClass,
   arguments: call.args, requestedMode: call.requestedMode, effectiveMode: call.effectiveMode
 });
+
+/** P2-23: why lifecycle admission holds an unjournaled ToolHub call (a read or low-impact write), or null. */
+export function toolhubLifecycleHold(workspace: string, agentId: string, actionClass: ActionClass): string | null {
+  const admission = lifecycleAdmission(workspace, agentId, { actionClass });
+  return admission.ok ? null : admission.reason;
+}
 
 /** Protected facts for intent creation, or null when invalid; dispatch still binds and denies invalid authorization. */
 export function toolhubApprovalIntent(call: Call): Record<string, unknown> | null {

@@ -7,10 +7,12 @@
  * (reassessment_required) before the session's first turn, unless a P2-26 change envelope covers the change. A review
  * past its plan-derived due date suspends too (review_expired), or records a warning when only optional controls set it.
  *
- * Admission (P1-02's authorization stage) reads the materialized row only: an agent that is not active is denied
- * consequential actions, `agent {id} is {state} ({reason})`, and the denial is the call's receipt. Where the active plan
- * does not carry LIFECYCLE_CONTROL_ID (or there is no plan) admission is advisory: the call runs and a warning row is
- * written. Reads and low-impact writes are never bound at that stage, so they follow the plan's visible-tool allowlist.
+ * Admission (P1-02's authorization stage, and every unbound call in the tool pipeline and ToolHub) reads the
+ * materialized row only. A suspended or retired agent is denied every action class; an agent not yet active (proposed,
+ * approved, migrated without approval) is denied consequential actions only. The message is `agent {id} is {state}
+ * ({reason})` and the denial is the call's receipt. Suspended and retired agents are denied in every workspace. For an
+ * agent not yet active, where the active plan does not carry LIFECYCLE_CONTROL_ID (or there is no plan) admission is
+ * advisory: the call runs and a warning row is written.
  */
 import { randomUUID } from "node:crypto";
 import { existsSync } from "node:fs";
@@ -20,6 +22,7 @@ import type { CompiledPlan } from "../catalog/compiler/types.js";
 import { loadAdmittedCatalog } from "../catalog/admission/gate.js";
 import type { InvalidationTrigger } from "../catalog/types.js";
 import { openLedger } from "../ledger/ledger.js";
+import type { ActionClass } from "../types.js";
 import {
   appendLifecycleEvent, LIFECYCLE_AUDIT, LIFECYCLE_CONTROL_ID, lifecycleEvents, lifecycleView, recordObservedManifest, suspendAgent,
   transitionAgent, type LifecycleView, type TransitionInput
@@ -197,6 +200,8 @@ function admissionProblem(view: LifecycleView, enforced: boolean): string | null
   return null;
 }
 
+const LOW_IMPACT: ReadonlySet<ActionClass> = new Set<ActionClass>(["READ_ONLY", "WRITE_LOW"]);
+
 /**
  * Whether lifecycle admission enforces here: the workspace's verified active plan carries LIFECYCLE_CONTROL_ID as an
  * applicable control. Read from the workspace on every decision, never from a caller's context, so every entry point
@@ -213,7 +218,7 @@ function lifecycleEnforcedIn(workspace: string): boolean {
  * only when the agent could be held, so an active agent's call costs one row read. A state or plan that cannot be read
  * denies, unless the workspace verifiably has no enforcing plan.
  */
-export function lifecycleAdmission(workspace: string, agentId: string, options: { record?: boolean; now?: number } = {}): AdmissionResult {
+export function lifecycleAdmission(workspace: string, agentId: string, options: { record?: boolean; now?: number; actionClass?: ActionClass } = {}): AdmissionResult {
   const record = options.record ?? true;
   const enforcedOrRefusal = (): boolean | AdmissionResult => {
     try {
@@ -234,6 +239,11 @@ export function lifecycleAdmission(workspace: string, agentId: string, options: 
     return { ok: true, warning: "lifecycle state unavailable" };
   }
   if (admissionProblem(view, true) === null) return { ok: true, warning: null };
+  // Reads and low-impact writes stay open only before activation (proposed, approved, migrated without approval);
+  // a suspended or retired agent is held for every action class.
+  // An explicit suspension or retirement (a person's or an incident's act) denies everywhere, enforcing plan or not.
+  if (view.state === "suspended" || view.state === "retired") return { ok: false, reason: `agent ${view.agentId} is ${view.state} (${view.reason})` };
+  if (options.actionClass !== undefined && LOW_IMPACT.has(options.actionClass)) return { ok: true, warning: null };
   const enforced = enforcedOrRefusal();
   if (typeof enforced !== "boolean") return enforced;
   const problem = admissionProblem(view, enforced);
