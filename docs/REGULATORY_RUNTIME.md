@@ -89,6 +89,8 @@ with slice D.
 | P1-02 recheck (journaled calls) | `recheckAuthorization` | `recheck_failed:kill_switch_active` receipt |
 | Toolhub | `activeFreezeStatus` (the incident-freeze path) | `EXECUTE_FROZEN_ACTIVE` |
 | Gateway, before model calls | lease verification | 403, `KILL_SWITCH_DENIED` |
+| Gateway HTTP proxy and CONNECT | lease verification, host mapped to a configured upstream | 403, `KILL_SWITCH_DENIED` |
+| `checkEgress` (native provider calls, MCP over HTTP, bridge, network tools) | `assertEgressNotKilled` | `KillSwitchDenied` |
 
 - Attacker-writable workspace state cannot block activation: each kill and
   release is its own new file, so activation never reads, locks or rewrites
@@ -98,6 +100,14 @@ with slice D.
   control checkpoint root (outside the workspace) holds the record. With the
   checkpoint root inside the workspace there is no mirror; AMC already
   refuses compiled plans in that configuration.
+- Proxy egress to a host that is a configured upstream's is a model call to
+  that provider; any other host is `NETWORK_EXTERNAL`, and while a provider
+  kill is active a host that maps to no upstream is refused (fail closed).
+  At `checkEgress`, AMC's own traffic is exempt: `agentId` `system` and the
+  `callback` and `storage` channels. A native provider call names its
+  provider; a provider call that names none is refused while a provider kill
+  is active. Traffic of a shell command already dispatched (the native shell's
+  own egress proxy) is not interrupted.
 - Lifting needs a signed release by an OWNER naming the kill's incident.
   Break-glass is weighed after the kill check and never overrides it.
 - `GET /api/v1/runtime/kill-switch` serves the status; the Studio banner

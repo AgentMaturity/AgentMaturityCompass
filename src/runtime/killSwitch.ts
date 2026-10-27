@@ -18,6 +18,7 @@ import { workspaceOversightPublicKeys } from "../incidents/oversightRecord.js";
 import { assertPurposePublicationCurrent, capturePurposePublication } from "../keys/purposePublication.js";
 import { signWithPurposeKey } from "../keys/purposeProviders.js";
 import { openLedger } from "../ledger/ledger.js";
+import { resolveGatewayConfigEnv, type GatewayConfig } from "../gateway/config.js";
 import { controlCheckpointDir } from "../lifecycle/signedControlJournalRecords.js";
 import { appendOpsAuditEvent } from "../ops/audit.js";
 import type { ActionClass } from "../types.js";
@@ -154,6 +155,68 @@ export function killSwitchDenial(workspace: string, boundary: KillBoundary): str
   const hit = status.kills.find((kill) => scopeMatches(kill, boundary)
     && (kill.mode === "stop_all" || (boundary.kind === "tool" && boundary.actionClass !== "READ_ONLY")));
   return hit ? `${KILL_SWITCH_DENIAL_CODE}: ${hit.killId} (${hit.scope.kind}:${hit.scope.id}, ${hit.mode})` : null;
+}
+
+/**
+ * The denial for gateway proxy egress (HTTP proxy and CONNECT) to `host`. A host that is a configured upstream's is a
+ * model call to that provider. Any other host is external network egress (NETWORK_EXTERNAL), refused by every kill
+ * that covers the agent; and while any provider-scoped kill is active an unmapped host is refused too, since nothing
+ * proves it is not that provider under another name (fail closed).
+ */
+export function killSwitchEgressDenial(workspace: string, agentId: string, host: string, config: GatewayConfig): string | null {
+  const wanted = host.trim().toLowerCase().replace(/^\[|\]$/g, "");
+  let upstreams: GatewayConfig["upstreams"];
+  try { upstreams = resolveGatewayConfigEnv(config).upstreams; } catch { upstreams = {}; }
+  const providers = Object.entries(upstreams).filter(([, upstream]) => {
+    try { return new URL(upstream.baseUrl).hostname.toLowerCase().replace(/^\[|\]$/g, "") === wanted; } catch { return false; }
+  }).map(([id]) => id);
+  if (providers.length > 0) {
+    for (const providerId of providers) {
+      const denied = killSwitchDenial(workspace, { kind: "model", agentId, providerId });
+      if (denied !== null) return denied;
+    }
+    return null;
+  }
+  const denied = killSwitchDenial(workspace, { kind: "tool", agentId, actionClass: "NETWORK_EXTERNAL" });
+  if (denied !== null) return denied;
+  let status: KillSwitchStatus;
+  try { status = killSwitchStatus(workspace); } catch (error) { return `${KILL_SWITCH_DENIAL_CODE}: kill switch state unreadable (${String(error)})`; }
+  const providerKill = status.kills.find((kill) => kill.scope.kind === "provider");
+  return providerKill ? `${KILL_SWITCH_DENIAL_CODE}: ${providerKill.killId} (provider:${providerKill.scope.id}); egress host ${wanted || "(none)"} maps to no configured upstream` : null;
+}
+
+/** A refusal by the kill switch at an egress choke point; callers treat it like any other denied dispatch. */
+export class KillSwitchDenied extends Error {
+  readonly code = "KILL_SWITCH_ACTIVE" as const;
+  constructor(reason: string) {
+    super(reason);
+    this.name = "KillSwitchDenied";
+  }
+}
+
+/**
+ * checkEgress's kill check, so every residency-gated egress meets it: native provider calls, MCP over HTTP, the bridge
+ * and network tools (web fetch, toolhub HTTP, gateway proxy targets). A provider call is a model call (refused by
+ * stop_all and its provider's kill; one with no provider id fails closed while any provider kill is active); the rest
+ * are NETWORK_EXTERNAL effects. AMC's own operator traffic is exempt: agentId "system" and the callback and storage
+ * channels (alerts, webhooks, evidence storage), which incident response needs while a kill is active.
+ */
+export function assertEgressNotKilled(input: { workspace: string; channel: string; agentId?: string; providerId?: string }): void {
+  if (input.agentId === "system" || input.channel === "callback" || input.channel === "storage") return;
+  const agentId = input.agentId ?? "unknown";
+  let denied: string | null;
+  if (input.channel === "provider") {
+    denied = killSwitchDenial(input.workspace, { kind: "model", agentId, providerId: input.providerId ?? null });
+    if (denied === null && input.providerId === undefined) {
+      let status: KillSwitchStatus;
+      try { status = killSwitchStatus(input.workspace); } catch (error) { throw new KillSwitchDenied(`${KILL_SWITCH_DENIAL_CODE}: kill switch state unreadable (${String(error)})`); }
+      const providerKill = status.kills.find((kill) => kill.scope.kind === "provider");
+      if (providerKill) denied = `${KILL_SWITCH_DENIAL_CODE}: ${providerKill.killId} (provider:${providerKill.scope.id}); this provider call names no provider`;
+    }
+  } else {
+    denied = killSwitchDenial(input.workspace, { kind: "tool", agentId, actionClass: "NETWORK_EXTERNAL" });
+  }
+  if (denied !== null) throw new KillSwitchDenied(denied);
 }
 
 /** The action classes a kill freezes for this agent, for activeFreezeStatus (toolhub's incident-freeze path). */

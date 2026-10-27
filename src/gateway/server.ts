@@ -38,7 +38,7 @@ import { CircuitOpenError, TimeoutError, withCircuitBreaker } from "../ops/circu
 import { checkUpstreamEgress, pinnedLookup, prepareFieldGuard, requestFieldRefusal, type FieldGuard } from "./requestFieldGuard.js";
 import { checkEgress, EgressBlocked } from "../residency/checkEgress.js";
 import { parseConnectAuthority } from "./connectResidency.js";
-import { killSwitchDenial } from "../runtime/killSwitch.js";
+import { killSwitchDenial, killSwitchEgressDenial } from "../runtime/killSwitch.js";
 export interface StartGatewayOptions {
   workspace: string;
   workspaceId?: string;
@@ -425,7 +425,7 @@ function verifyLeaseAndMapError(input: {
   requiredScope: "gateway:llm" | "proxy:connect";
   routePath?: string;
   model?: string | null;
-  upstreamId?: string;
+  upstreamId?: string; egress?: { host: string; config: GatewayConfig };
 }): {
   ok: boolean;
   payload?: {
@@ -440,7 +440,7 @@ function verifyLeaseAndMapError(input: {
   message: string;
 } {
   // P2-26: before any lease work, a kill switch (stop_all, or this provider) refuses the model call with a 403 and an audit row.
-  const killed = killSwitchDenial(input.workspace, { kind: "model", agentId: input.expectedAgentId, providerId: input.upstreamId ?? null });
+  const killed = input.egress ? killSwitchEgressDenial(input.workspace, input.expectedAgentId, input.egress.host, input.egress.config) : killSwitchDenial(input.workspace, { kind: "model", agentId: input.expectedAgentId, providerId: input.upstreamId ?? null });
   if (killed !== null) return { ok: false, statusCode: 403, auditType: "KILL_SWITCH_DENIED", message: killed };
   if (!input.leaseToken) {
     return {
@@ -762,7 +762,7 @@ function createProxyServer(params: {
       expectedWorkspaceId: params.workspaceId,
       leaseToken: leaseCarrier.leaseToken ?? undefined,
       expectedAgentId: proxyAgentId ?? "unknown",
-      requiredScope: "proxy:connect"
+      requiredScope: "proxy:connect", egress: { host: targetUrl.hostname, config: params.config }
     });
     if (!proxyAgentId || !leaseVerification.ok) {
       params.appendEvidence({
@@ -950,7 +950,7 @@ function createProxyServer(params: {
       expectedWorkspaceId: params.workspaceId,
       leaseToken: leaseCarrier.leaseToken ?? undefined,
       expectedAgentId: proxyAgentId ?? "unknown",
-      requiredScope: "proxy:connect"
+      requiredScope: "proxy:connect", egress: { host: host ?? "", config: params.config }
     });
 
     if (!authority || !host || !Number.isInteger(port) || port < 1 || port > 65535) {

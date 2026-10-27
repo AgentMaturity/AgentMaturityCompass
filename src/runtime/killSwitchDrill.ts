@@ -63,10 +63,12 @@ export async function runKillSwitchDrill(p: { workspace: string; actions?: numbe
     body: (execution) => { appendFileSync(systemOfRecord, `${JSON.stringify({ ts: Date.now(), callId: execution.callId })}\n`); return { output: "effect", effect: "applied" }; } }));
   const pipeline = new ToolPipeline({ registry, workspace: p.workspace });
   const attempt = () => pipeline.execute({ name: "drill.record_effect", agentId: "default", arguments: {}, requestedMode: "EXECUTE" });
-  const effects = () => existsSync(systemOfRecord) ? readFileSync(systemOfRecord, "utf8").trim().split("\n").filter(Boolean).map((l) => JSON.parse(l) as { ts: number }) : [];
+  const effects = () => existsSync(systemOfRecord) ? readFileSync(systemOfRecord, "utf8").trim().split("\n").filter(Boolean).map((l) => JSON.parse(l) as unknown) : [];
 
   const baseline = await attempt();
   if (baseline.denied !== null || effects().length !== 1) throw new Error(`kill-switch drill: the fixture call did not take effect before activation (${baseline.denied?.reason ?? "no effect"})`);
+  // Effects are counted by row, not by clock: a row in the activation's own millisecond must not be misattributed.
+  const effectsBeforeActivation = effects().length;
   const owner = p.owner ?? "drill-owner";
   const kill = await activateKillSwitch({ workspace: p.workspace, issuedBy: owner, scope: { kind: "workspace", id: "workspace" },
     mode: "stop_new_effects", reason: `kill-switch drill ${drillId}`, incidentId: drillId });
@@ -85,7 +87,7 @@ export async function runKillSwitchDrill(p: { workspace: string; actions?: numbe
     await releaseKillSwitch({ workspace: p.workspace, releasedBy: owner, killId: kill.killId, incidentId: drillId });
   }
   const liftedTs = Date.now();
-  const effectsAfter = effects().filter((row) => row.ts >= kill.issuedTs).length;
+  const effectsAfter = effects().length - effectsBeforeActivation;
   const body: KillSwitchDrillBody = {
     schema: "amc.drill/1", drillId, kind: "kill_switch", activatedAt: new Date(kill.issuedTs).toISOString(),
     firstDeniedAt: firstDeniedTs === null ? null : new Date(firstDeniedTs).toISOString(), liftedAt: new Date(liftedTs).toISOString(),
