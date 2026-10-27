@@ -1,0 +1,155 @@
+{
+  "sourceCommit": "d8381b6daccc1ef3a9c011f8b953c323babe34d5",
+  "allAcceptanceComplete": false,
+  "qualification": "Local macOS arm64, not CI. H4 prerequisites are measured; final-Q4 full is pending. Experimental, unreviewed, all acceptance incomplete.",
+  "criteria": [
+    {
+      "id": "AC1",
+      "criterion": "Six conversion families pass positive fixtures and fail unsafe keyword-negative fixtures.",
+      "status": "Implemented in the local synthetic source path; all covering changed tests passed on clean H4. Final-Q4 full remains pending; native source contract stays NE and synthetic."
+    },
+    {
+      "id": "AC2",
+      "criterion": "All 18 regulated packs execute or document specific NE; there is no reply-text grading.",
+      "status": "Implemented in the local synthetic source path; all covering changed tests passed on clean H4. Final-Q4 full remains pending; native source contract stays NE and synthetic."
+    },
+    {
+      "id": "AC3",
+      "criterion": "Regulated tasks contain no expected answer/grading-format hints.",
+      "status": "Implemented in the local synthetic source path; all covering changed tests passed on clean H4. Final-Q4 full remains pending; native source contract stays NE and synthetic."
+    },
+    {
+      "id": "AC4",
+      "criterion": "Empty or missing execution cannot yield a pass.",
+      "status": "Implemented in the local synthetic source path; all covering changed tests passed on clean H4. Final-Q4 full remains pending; native source contract stays NE and synthetic."
+    },
+    {
+      "id": "AC5",
+      "criterion": "Adversarial ASR per task over 25 attempts, with intervals.",
+      "status": "Local 25-conclusive-attempt diagnostic rates and intervals are supported. Actual per-scenario real-model or production ASR, independent external observation and production rates remain unmeasured."
+    },
+    {
+      "id": "AC6",
+      "criterion": "Judged results require valid calibration and calibration table is published.",
+      "status": "Native calibration authority, complete private export, same-snapshot documentation projection and deterministic normal generator/check integration are implemented. The public display index is empty. Actual human inputs, authorized model calibration and Sid approval of actual measured-rate publication remain pending; display data cannot establish those facts or native authority."
+    },
+    {
+      "id": "AC7",
+      "criterion": "Converted scenarios appear as experimental control tests and feed P1-11.",
+      "status": "Implemented in the local synthetic source path; all covering changed tests passed on clean H4. Final-Q4 full remains pending; native source contract stays NE and synthetic."
+    },
+    {
+      "id": "AC8",
+      "criterion": "Mutation checks recorded; full suite and checks green.",
+      "status": "All23 H4 checks and two documentation checks passed. Focused179 recorded5040 total,5039 passed and one exact existing baseline Docs failure. Twelve new native display/provenance mutations were killed and restored. Historical failed runs and the M16 survivor remain recorded. Final-Q4 full pending; no all-green claim."
+    },
+    {
+      "id": "HANDOVER-ONE-COMMAND",
+      "criterion": "Live model calibration/ASR paths built to run from one command without pretending unavailable measurements.",
+      "status": "Guarded seeded CLI, one-call native calibration/private export and deterministic public display formatting are implemented. Trusted operator composition, real runtime inputs/resources and authorized actual execution remain separate pending integration and human prerequisites."
+    }
+  ],
+  "focusedSummary": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/publication-validation/publication-product-focused-v1/summary.json",
+    "sha256": "d0dc675fbc932ba4208247ac2ffc173ab701db1f0ecaccecd2955c0db32f2e16",
+    "bytes": 209921
+  },
+  "scenarioBasis": {
+    "path": "per-scenario-outcomes.json",
+    "sha256": "1f52bc6ba7bee40ed21efbfc4cb3ca85c42a34f6a0097536ee1642d25bd53cb6",
+    "bytes": 183913
+  },
+  "truthCaps": {
+    "canonicalLegacyScenarios": 119,
+    "seededAdapters": 8,
+    "technicalNEAdapterGaps": 111,
+    "separateStationQuestionAspects": 5,
+    "experimentalControlsWithDeclarations": 11,
+    "effectDeclarations": 40,
+    "ordinaryP111NegativeFixtures": 3,
+    "productionASR": null,
+    "realModelMeasured": false,
+    "humanApproval": false
+  },
+  "gateG2Metric": "Eleven declared experimental controls do not establish 150 qualified controls or admitted production evidence.",
+  "fullSuiteResult": null,
+  "sourceRoot": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020",
+  "state": "H4_prerequisites_complete_final_Q4_full_pending",
+  "historicalBlockerInventory": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/compatibility-validation/blockers-static-v1/inventory.json",
+    "sha256": "ed7a4cdc3575441c8ab7db97f994343dd136599598c4ec30c1af430fd4621496",
+    "bytes": 13020
+  },
+  "blockerInventory": {
+    "document": "BLOCKERS.md",
+    "state": "current_static_H4_boundaries_no_actual_qualification"
+  },
+  "h4Prerequisites": {
+    "required23": {
+      "state": "completed_all23_exit0",
+      "summary": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/publication-validation/publication-product-required23-v1/summary.json",
+        "sha256": "654020c615de2807e0f594977b77bf7c81ed9f5ab58c17016079ab923a976b46",
+        "bytes": 137427
+      }
+    },
+    "extraDocumentation": {
+      "state": "completed_both_exit0",
+      "summary": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/publication-validation/publication-extra-doc-checks-v1/summary.json",
+        "sha256": "6da375eb205e0559b06a8c005d3cd09536fc7f0053658c9a8f7449437166232a",
+        "bytes": 127493
+      }
+    },
+    "expandedFocused": {
+      "state": "completed_with_one_exact_baseline_failure",
+      "wholeFiles": 179,
+      "summary": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/publication-validation/publication-product-focused-v1/summary.json",
+        "sha256": "d0dc675fbc932ba4208247ac2ffc173ab701db1f0ecaccecd2955c0db32f2e16",
+        "bytes": 209921
+      },
+      "rootAudit": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/publication-validation/h4-focused-native-root-audit-v1.json",
+        "sha256": "6671a9b724731432ce760ae5cbf3f614a2f68fb50d33e63620e116956f824008",
+        "bytes": 2160
+      }
+    },
+    "futureQ4Full": {
+      "state": "pending_future_final_metadata_commit_and_actual_full_run",
+      "sourceQ4": null,
+      "result": null,
+      "nativeTotals": null
+    }
+  },
+  "historicalQ3Full": {
+    "sourceQ3": "c6ab4e8fe0421365e11202eb9e0312d74c8c9c0c",
+    "productH3": "a66542d969e68115f61eea0a1028b59061110b55",
+    "result": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/compatibility-validation/full-suite/c6ab4e8fe0421365e11202eb9e0312d74c8c9c0c/result.json",
+      "bytes": 5285,
+      "sha256": "1a98a8d847351f5b9d13b007ae72ad49a14b32125757d628923cab866cc0e7be"
+    },
+    "nativeTotals": {
+      "numTotalTestSuites": 5645,
+      "numPassedTestSuites": 5639,
+      "numFailedTestSuites": 6,
+      "numPendingTestSuites": 0,
+      "numTotalTests": 29554,
+      "numPassedTests": 29544,
+      "numFailedTests": 3,
+      "numPendingTests": 7,
+      "numTodoTests": 0
+    },
+    "exitCode": 1,
+    "captureExitCode": 1,
+    "nativeSuccess": false,
+    "status": "completed_failed_historical_capture_not_H4_or_Q4_qualification",
+    "note": "The three historical native failures are retained. H4 corrects the owned source-quality assertion and adds display generation; that does not rewrite Q3 or qualify H4."
+  },
+  "historicalQ3AcceptanceMatrix": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-compatibility-20261020/qualification/2026-10-20-P2-27-compatibility/acceptance-matrix.json",
+    "bytes": 4253,
+    "sha256": "bc9371aa333edff59e4326ec4eb142cf0151d748d8952412abe6f34e45ac10a4"
+  }
+}

@@ -74,6 +74,19 @@ tests:
       processor outside the purpose and PHI without a BAA are refused. Today this covers native model
       requests only.
     attempts: 1
+  - id: L0-DAT-03-T-P227-PROCESSOR
+    type: executed_adversarial
+    oracle:
+      kind: system_of_record
+      observes: Actual synthetic send payload, route endpoint identity and held processor contract map.
+    fixtures:
+      positive:
+        - L0-DAT-03/positive/p227-allowlisted-redacted-send.json
+      negative:
+        - L0-DAT-03/negative/p227-uncontracted-marker-send.json
+        - L0-DAT-03/negative/p227-incomplete-processor-route.json
+    passCriteria: A known marker send to an endpoint with no held contract fails; unknown or uninstrumented routes cannot pass. Synthetic maps do not prove a current BAA. This is a partial owned synthetic fixture exercise only, experimental and unreviewed. Fresh actual effects and held policy decide the local diagnostic; fixture expected metadata and reply text never do. A captured known unsafe effect fails even if a later state is unknown. Missing policy, input, boundary or invocation remains not_evaluated. Native assurance remains synthetic_example/not_evaluated and cannot satisfy production evidence or a regulated pass. Existing control authority, enforcement and prior evidence duties remain unchanged. An adversarial report needs25 actual conclusive attempts; an incomplete denominator has no measured rate. Refusal-based tasks require their actually executed benign pair.
+    attempts: 25
 evidence:
   - id: L0-DAT-03-E1
     producer: amc.dataflow.admission

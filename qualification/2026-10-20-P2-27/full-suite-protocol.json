@@ -1,0 +1,26 @@
+{
+  "state": "pending_not_executed_at_this_frozen_preparation",
+  "productHead": "b2b512513eba8799b9050dbe13d178bfe448acef",
+  "nextCommit": "Q must have H as its sole parent and add exactly this qualification directory; no product changes.",
+  "command": [
+    "npx",
+    "vitest",
+    "run",
+    "--maxWorkers=2",
+    "--reporter=verbose",
+    "--reporter=json"
+  ],
+  "captureHelper": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/capture-full-suite-root-reviewed-v1.py",
+    "sha256": "35fa2d9f5a16a3a155a8eb1bc492e25563a44d55045fac4c5a6b292c03eaa5d6",
+    "bytes": 12956
+  },
+  "exclusiveOutputPattern": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/full-suite/<exact-Q-sha>/result.json",
+  "afterCapture": [
+    "Inspect actual native totals, every failed assertion, skip and suite error.",
+    "Classify failures against current clean int. Fix own failures forward. A reproduction is not a green result or causal waiver.",
+    "Write an external completed receipt bound to exact Q and full result hashes.",
+    "Validate qualification metadata and append handoff only after actual completion. No main merge or push."
+  ],
+  "externalCompletionReason": "The full suite must run on final Q; writing its result back into that same commit changes Q again. Immutable preparation plus external completed receipt preserves the measured final HEAD."
+}

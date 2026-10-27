@@ -2146,6 +2146,8 @@ Run assurance pack(s) with deterministic validation
 | `--verbose` | - |
 | `--model <modelId>` | - |
 | `--no-sign` | - |
+| `--executed-attempts <1|25>` | - |
+| `--station-questions <ids>` | - |
 
 #### `amc assurance show`
 

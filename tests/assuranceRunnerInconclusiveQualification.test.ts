@@ -1,4 +1,4 @@
-import { verify } from "node:crypto";
+import { randomUUID, verify } from "node:crypto";
 import { chmodSync, existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, readlinkSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, relative, resolve } from "node:path";
@@ -235,17 +235,54 @@ describe("P0-19 actual local runner inconclusive contracts", () => {
     expect(run.packRuns).toHaveLength(1); expect(run.packRuns[0]!.scenarios.map(row => row.scenarioId)).toEqual(scenarioIds);
     expect(run.packRuns[0]!.scenarios.every(row => row.inconclusive && !row.passed)).toBe(true); expect(findings.findings).toEqual([]);
   });
-  test.each(["pass", "score100", "score5"] as const)("refuses an inconclusive stored row carrying %s and restores exact report bytes", async mutation => {
+  test.each(["pass", "score100", "score5"] as const)("refuses an unauthenticated inconclusive stored row carrying %s before semantic grading and restores exact report bytes", async mutation => {
     activate(tool); const original = readFileSync(tool.reportPath), changed: AssuranceReport = JSON.parse(original.toString("utf8"));
     const row = changed.packResults[0]!.scenarioResults[0]!;
     if (mutation === "pass") row.pass = true; else if (mutation === "score100") row.score0to100 = 1; else row.score0to5 = 1;
     try {
       writeFileSync(tool.reportPath, JSON.stringify(changed, null, 2));
       const result = await laterVerify(tool, `tampered-inconclusive-${mutation}`);
-      expect(result.ok).toBe(false); expect(result.errors).toContain(`inconclusive row carries a score: injection/${row.scenarioId}`);
+      expect(result.ok).toBe(false);
       expect(result.errors).toContain("reportJsonSha256 mismatch");
+      expect(result.errors).toContain("assurance report seal does not verify");
+      expect(result.errors).not.toContain(`inconclusive row carries a score: injection/${row.scenarioId}`);
     } finally { writeFileSync(tool.reportPath, original); }
     expect(readFileSync(tool.reportPath)).toEqual(original);
+  });
+  test.each(["pass", "score100", "score5"] as const)("refuses an authentically re-sealed synthetic inconclusive-row %s witness", async mutation => {
+    activate(tool);
+    const originalBytes = readFileSync(tool.reportPath);
+    const synthetic: AssuranceReport = JSON.parse(originalBytes.toString("utf8"));
+    // An intentionally invalid owned test artifact, not another target execution or a production measurement.
+    synthetic.assuranceRunId = randomUUID();
+    const row = synthetic.packResults[0]!.scenarioResults[0]!;
+    if (mutation === "pass") row.pass = true; else if (mutation === "score100") row.score0to100 = 1; else row.score0to5 = 1;
+    const ledger = openLedger(tool.workspace);
+    try {
+      const originalRecord = ledger.getAssuranceRun(tool.report.assuranceRunId);
+      expect(originalRecord).not.toBeNull();
+      if (!originalRecord) throw new Error("Owned original assurance run is missing");
+      expect(ledger.getAssuranceRun(synthetic.assuranceRunId)).toBeNull();
+      synthetic.reportJsonSha256 = sha256Hex(canonicalize({ ...synthetic, reportJsonSha256: "", runSealSig: "" }));
+      synthetic.runSealSig = ledger.signRunHash(synthetic.reportJsonSha256);
+      ledger.insertAssuranceRun({ ...originalRecord, assurance_run_id: synthetic.assuranceRunId,
+        report_json_sha256: synthetic.reportJsonSha256, run_seal_sig: synthetic.runSealSig });
+      expect(ledger.getAssuranceRun(tool.report.assuranceRunId)).toEqual(originalRecord);
+    } finally { ledger.close(); }
+    const syntheticPath = join(getAgentPaths(tool.workspace, "default").reportsDir, "assurance", `${synthetic.assuranceRunId}.json`);
+    writeFileSync(syntheticPath, JSON.stringify(synthetic, null, 2));
+    try {
+      const result = await verifyAssuranceRun({ workspace: tool.workspace, agentId: "default", assuranceRunId: synthetic.assuranceRunId });
+      records.push({ name: `authentic-invalid-synthetic-inconclusive-${mutation}`, syntheticWitnessOnly: true, result });
+      expect(result.ok).toBe(false);
+      expect(result.errors).toContain(`inconclusive row carries a score: injection/${row.scenarioId}`);
+      expect(result.errors).not.toContain("reportJsonSha256 mismatch");
+      expect(result.errors).not.toContain("assurance report seal does not verify");
+      expect(result.errors).not.toContain("ledger assurance run binding mismatch");
+    } finally {
+      // The append-only fixture record/file remain in this owned workspace until normal suite cleanup.
+      expect(readFileSync(tool.reportPath)).toEqual(originalBytes);
+    }
   });
   test("real text measurements retain pass/fail counts, plain-text digests and nonempty failure findings", async () => {
     for (const f of [measured, failure]) {

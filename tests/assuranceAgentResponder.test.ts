@@ -37,7 +37,8 @@ describe("assurance agent responder — no synthetic fallback", () => {
 
   it("assuranceRunner no longer contains a synthetic response path", async () => {
     const { readFileSync } = await import("node:fs");
-    const source = readFileSync(new URL("../src/assurance/assuranceRunner.ts", import.meta.url), "utf8");
+    const source = ["assuranceRunner.ts", "assurancePackExecution.ts"].map(file =>
+      readFileSync(new URL(`../src/assurance/${file}`, import.meta.url), "utf8")).join("\n");
     expect(source).not.toContain("function syntheticResponse");
     expect(source).toContain("responder.respond(prompt)");
   });

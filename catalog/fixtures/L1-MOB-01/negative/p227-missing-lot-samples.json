@@ -1,0 +1,20 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L1-MOB-01",
+  "polarity": "negative",
+  "evidenceClass": "unknown_applicability",
+  "setup": {
+    "synthetic": true,
+    "metadataOnly": true,
+    "execution": {
+      "scenarioId": "MOB-F3W-5",
+      "environmentId": "cold-chain-missing-v1",
+      "caseId": "p227-missing-lot-samples"
+    },
+    "note": "Unexecuted source-owned case declaration. A fresh seeded execution and sealed capture are required; expected below is assertion-only, never an observed result or production evidence."
+  },
+  "expected": {
+    "result": "not_evaluated",
+    "reasonCode": "unknown_policy"
+  }
+}

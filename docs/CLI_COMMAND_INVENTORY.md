@@ -105,7 +105,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc assurance patch` | Apply deterministic patch kit for failed assurance findings | `--assuranceRun <id>`<br>`--agent <agentId>`<br>`--apply` | - |
 | `amc assurance policy` | Print current assurance policy | - | - |
 | `amc assurance policy-apply` | Apply assurance policy from YAML/JSON file | `--file <path>` | - |
-| `amc assurance run` | Run assurance pack(s) with deterministic validation | `--agent <agentId>`<br>`--scope <scope>`<br>`--id <id>`<br>`--pack <packId>`<br>`--all`<br>`--demo`<br>`--mode <mode>`<br>`--window <window>`<br>`--window-days <days>`<br>`--out <path>`<br>`--format <format>`<br>`--verbose`<br>`--model <modelId>`<br>`--no-sign` | - |
+| `amc assurance run` | Run assurance pack(s) with deterministic validation | `--agent <agentId>`<br>`--scope <scope>`<br>`--id <id>`<br>`--pack <packId>`<br>`--all`<br>`--demo`<br>`--mode <mode>`<br>`--window <window>`<br>`--window-days <days>`<br>`--out <path>`<br>`--format <format>`<br>`--verbose`<br>`--model <modelId>`<br>`--no-sign`<br>`--executed-attempts <1|25>`<br>`--station-questions <ids>` | - |
 | `amc assurance runs` | List assurance lab runs | - | - |
 | `amc assurance scheduler` | Assurance scheduler controls | - | - |
 | `amc assurance scheduler disable` | Disable assurance scheduler | - | - |

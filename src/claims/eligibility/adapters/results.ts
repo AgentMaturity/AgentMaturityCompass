@@ -120,6 +120,15 @@ export function envelopeForAssuranceReport(report: Pick<AssuranceReport, "assura
 
 export function envelopeForAssurancePack(assuranceRunId: string, pack: AssuranceReport["packResults"][number],
   options: { sealVerified: boolean | null; now: number }): ClaimEnvelope {
+  // Native seals establish integrity, never production observation of a seeded synthetic fixture.
+  if (pack.gradingMethod === "executed" && pack.regulatedEligible === false) {
+    return evaluateClaimEligibility({ producer: `assurance:${pack.packId}`, method: "synthetic", regulated: true,
+      proposed: { result: "not_evaluated", level: null },
+      evidence: { eventCount: pack.scenarioResults.reduce((n, row) => n + row.evidenceEventIds.length, 0),
+        tiers: ["SELF_REPORTED"], newestTs: null, boundToControl: true, sameScope: true, contradictory: false,
+        signatureValid: options.sealVerified === false ? false : null, issuerPinned: null },
+      evidenceRefs: [assuranceRunId], now: options.now });
+  }
   return envelopeForExecutedTest({ producer: `assurance:${pack.packId}`,
     measured: pack.scenarioResults.filter((scenario) => !scenario.inconclusive).length,
     result: pack.failCount > 0 ? "fail" : "pass", sealVerified: options.sealVerified, evidenceRefs: [assuranceRunId], now: options.now });

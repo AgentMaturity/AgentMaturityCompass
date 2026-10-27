@@ -1,0 +1,38 @@
+{
+  "scope": "Separate deliberately mutated runs; do not sum into ordinary tests or unique trust guards. Byte restorations recorded.",
+  "sets": [
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/calibration-and-capture-guard-mutations-measured-index-v1.json",
+      "sha256": "10db65145c6f122d6bcfcf2381c910872332296b1d396e87b2ab3c1fa8eab18a",
+      "bytes": 19415
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/judge-response-security-mutations-v1/index.json",
+      "sha256": "35657b76311c50db1343a668394583432461e0bd34ebb148cd2dae1c816615e2",
+      "bytes": 7231
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/executed-core-native-guard-mutations-measured-v1/index.json",
+      "sha256": "528baa46c70a63fff4ff2c22ac305809fd31326afc36a49abc7bc386b46f7c10",
+      "bytes": 73903
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/executed-final-corrections-guard-mutations-measured-v2/index.json",
+      "sha256": "8c2a4aabb288ca6349560dd2aa98eb4e24b2ad99ee30bdb73046b70bac70ce9d",
+      "bytes": 38436
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/cli-truth-mutations-native-expectation-adjudication-v1.json",
+      "sha256": "70c2663f2ba855261d1d020ba541cc443c04b933fdf59908ee28e162a8cdf026",
+      "bytes": 9682
+    }
+  ],
+  "summary": [
+    "24 calibration/capture probes killed;37 native AssertionErrors.",
+    "4 response-security probes killed;6 native AssertionErrors.",
+    "19 core probes:18 assertion kills and1 redundant-guard survivor M16; no kill claimed for M16.",
+    "9 final-correction probes killed;11 native AssertionErrors. F08 retests a moved guard; F09 mutates built JavaScript.",
+    "10 CLI/presentation probes killed;6 branded AssertionErrors plus17 native Vitest .rejects expectation failures. Separate adjudication corrects the generic raw classifier without overwriting raw evidence.",
+    "Affected CLI test files passed39/39 after byte restoration."
+  ]
+}

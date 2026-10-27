@@ -12,6 +12,8 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 const LIB = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(LIB, "..", "..", "..");
 const STUB_MODEL = "amc-stub-1";
+// This unavailable-target gate needs a generic pack that always resolves a responder.
+const TARGET_GATE_PACK = "injection";
 // Named so the assurance responder takes its explicit-endpoint branch; with no
 // provider key set it refuses before sending any request.
 const UNUSED_AGENT_URL = "http://127.0.0.1:1";
@@ -49,11 +51,12 @@ function stationSteps(station, fixture) {
     { id: "evidence-export", args: ["evidence", "export", "--format", "json", "--out", "out/evidence.json", "--agent", "default", "--include-chain"], writes: "evidence.json" },
     { id: "binder-create", args: ["audit", "binder", "create", "--scope", "agent", "--id", "default", "--out", "out/binder.amcaudit"], writes: "binder.amcaudit" },
     { id: "binder-verify", args: (out, pins) => ["audit", "binder", "verify", "out/binder.amcaudit", "--pubkey", pins.auditorPub] },
-    // No reachable agent under test and no key: the scan must abort (exit 2), not score.
+    // Regulated packs can return NE before any responder is needed. This separate
+    // generic-pack gate must still refuse an unavailable target (exit 2), not score.
     // Last on purpose: at 8f57ce63 an aborted scan left an unsealed ledger session (O20
     // finding F1; P0-27 now seals it as ASSURANCE_RUN_ABORTED), so every ledger check
     // above runs before the scan touches the ledger.
-    { id: "assurance-gate", args: ["assurance", "run", "--agent", "default", "--pack", fixture.assurancePack, "--model", STUB_MODEL], env: { AMC_AGENT_BASE_URL: UNUSED_AGENT_URL }, expectExit: 2 }
+    { id: "assurance-gate", args: ["assurance", "run", "--agent", "default", "--pack", TARGET_GATE_PACK, "--model", STUB_MODEL], env: { AMC_AGENT_BASE_URL: UNUSED_AGENT_URL }, expectExit: 2 }
   ];
 }
 

@@ -67,6 +67,7 @@ export const NON_MATURITY_AUDIT_MODULES: ReadonlyArray<{ module: string; why: st
   { module: "src/agent/compaction/autoCompact.ts", why: "context compaction bookkeeping (P1-37); token counts before and after, not agent behaviour" },
   { module: "src/approvals/approvalStudioService.ts", why: "operator approval decisions about AMC actions, not the scored agent's behaviour" },
   { module: "src/archetypes/index.ts", why: "operator applied an archetype to AMC configuration" },
+  { module: "src/assurance/assurancePackExecution.ts", why: "extracted assurance inconclusive-run bookkeeping; untagged and never positive maturity evidence" },
   { module: "src/assurance/assuranceRunner.ts", why: "assurance run bookkeeping; scenario results are `test` rows, untagged" },
   { module: "src/assurance/evidenceWriters.ts", why: "assurance run start and abort bookkeeping" },
   { module: "src/assurance/packs/mobilityFunctionalSafetyPack.ts", why: "failure findings; a finding against the agent cannot raise its level" },

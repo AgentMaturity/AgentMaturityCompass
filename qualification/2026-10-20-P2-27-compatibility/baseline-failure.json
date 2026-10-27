@@ -1,0 +1,539 @@
+{
+  "status": "classification_of_saved_native_artifacts_only",
+  "candidateArtifacts": {
+    "report": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/compatibility-validation/compatibility-product-focused-v1/report.json",
+      "bytes": 1887966,
+      "sha256": "716851301ff3dff18b48f88ca505d323659e3d9c4e4fe9b8bd829ba80c88281d"
+    },
+    "raw": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/compatibility-validation/compatibility-product-focused-v1/raw.log",
+      "bytes": 892591,
+      "sha256": "ae2a47fc7fdfc3d8df0eba025ca7d49093e4d05436d73e614d278aab876c3d26"
+    }
+  },
+  "candidateTopLevel": {
+    "numTotalTestSuites": 560,
+    "numPassedTestSuites": 558,
+    "numFailedTestSuites": 2,
+    "numPendingTestSuites": 0,
+    "numTotalTests": 4834,
+    "numPassedTests": 4833,
+    "numFailedTests": 1,
+    "numPendingTests": 0,
+    "numTodoTests": 0,
+    "snapshot": {
+      "added": 0,
+      "failure": false,
+      "filesAdded": 0,
+      "filesRemoved": 0,
+      "filesRemovedList": [],
+      "filesUnmatched": 0,
+      "filesUpdated": 0,
+      "matched": 4,
+      "total": 4,
+      "unchecked": 0,
+      "uncheckedKeysByFile": [],
+      "unmatched": 0,
+      "updated": 0,
+      "didUpdate": false
+    },
+    "startTime": 1792477124956,
+    "success": false
+  },
+  "assertionNonpasses": [
+    {
+      "candidate": {
+        "file": "<CLONE_ROOT>/tests/publicDocsGraph.test.ts",
+        "nativeFullName": "AMC public Docs graph every local guide edge resolves to another promoted guide",
+        "normalizedFullName": "AMC public Docs graph every local guide edge resolves to another promoted guide",
+        "status": "failed",
+        "failureMessages": [
+          "AssertionError: expected [ { source: 'MCP_SERVER', \u2026(2) } ] to deeply equal []\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-compatibility-20261020/tests/publicDocsGraph.test.ts:70:21\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-compatibility-20261020/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-compatibility-20261020/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-compatibility-20261020/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-compatibility-20261020/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-compatibility-20261020/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-compatibility-20261020/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-compatibility-20261020/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+        ],
+        "normalizedFailureMessages": [
+          "AssertionError: expected [ { source: 'MCP_SERVER', \u2026(2) } ] to deeply equal []\n    at <CLONE_ROOT>/tests/publicDocsGraph.test.ts:70:21\n    at file://<CLONE_ROOT>/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file://<CLONE_ROOT>/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file://<CLONE_ROOT>/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file://<CLONE_ROOT>/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file://<CLONE_ROOT>/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file://<CLONE_ROOT>/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file://<CLONE_ROOT>/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+        ]
+      },
+      "owner": "candidate until fixed or exactly classified",
+      "causalWaiver": false,
+      "baselineMatches": [
+        {
+          "file": "<CLONE_ROOT>/tests/publicDocsGraph.test.ts",
+          "nativeFullName": "AMC public Docs graph every local guide edge resolves to another promoted guide",
+          "normalizedFullName": "AMC public Docs graph every local guide edge resolves to another promoted guide",
+          "status": "failed",
+          "failureMessages": [
+            "AssertionError: expected [ { source: 'MCP_SERVER', \u2026(2) } ] to deeply equal []\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-int-baseline-20261020/tests/publicDocsGraph.test.ts:70:21\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-int-baseline-20261020/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-int-baseline-20261020/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-int-baseline-20261020/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-int-baseline-20261020/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-int-baseline-20261020/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-int-baseline-20261020/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-int-baseline-20261020/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+          ],
+          "normalizedFailureMessages": [
+            "AssertionError: expected [ { source: 'MCP_SERVER', \u2026(2) } ] to deeply equal []\n    at <CLONE_ROOT>/tests/publicDocsGraph.test.ts:70:21\n    at file://<CLONE_ROOT>/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file://<CLONE_ROOT>/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file://<CLONE_ROOT>/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file://<CLONE_ROOT>/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file://<CLONE_ROOT>/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file://<CLONE_ROOT>/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file://<CLONE_ROOT>/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+          ]
+        }
+      ],
+      "classification": "same_baseline_failure"
+    }
+  ],
+  "suiteOrCollectionRecords": [],
+  "skipPendingTodoRecordsRequireSeparateSourceEnvironmentProof": [],
+  "baselineCaptureProofs": {
+    "tests/compilerStationDefaults.test.ts": {
+      "report": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/baseline-after-final-q2/q2-failed-file-00-v1/report.json",
+        "bytes": 5987,
+        "sha256": "52da2b7cfdd17c1a44e460395312eba1c343b7e083a2bece3a30f0a36e6b4b7a"
+      },
+      "raw": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/baseline-after-final-q2/q2-failed-file-00-v1/raw.log",
+        "bytes": 2862,
+        "sha256": "9aa4e27012decd2ff1d6e03c9817860334c4bcb89d73126dd7dc8072380deac3"
+      },
+      "statusBefore": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/baseline-after-final-q2/q2-failed-file-00-v1/status-before.stdout",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "statusAfter": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/baseline-after-final-q2/q2-failed-file-00-v1/status-after.stdout",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "headBefore": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/baseline-after-final-q2/q2-failed-file-00-v1/head-before.stdout",
+        "bytes": 41,
+        "sha256": "e25123fbeb1dc0bd73ed45a6f4578c9867c8e653bf05ef05c2189d3cfe55e7d7"
+      },
+      "headAfter": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/baseline-after-final-q2/q2-failed-file-00-v1/head-after.stdout",
+        "bytes": 41,
+        "sha256": "e25123fbeb1dc0bd73ed45a6f4578c9867c8e653bf05ef05c2189d3cfe55e7d7"
+      },
+      "command": [
+        "pnpm",
+        "exec",
+        "vitest",
+        "run",
+        "tests/compilerStationDefaults.test.ts",
+        "--maxWorkers=1",
+        "--reporter=verbose",
+        "--reporter=json",
+        "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/baseline-after-final-q2/q2-failed-file-00-v1/report.json"
+      ],
+      "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-int-baseline-20261020",
+      "exitCode": 0,
+      "nativeFileAlonePassed": true,
+      "sourceEnvironmentProof": [],
+      "nativeTopLevel": {
+        "numTotalTestSuites": 4,
+        "numPassedTestSuites": 4,
+        "numFailedTestSuites": 0,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 14,
+        "numPassedTests": 14,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1792476308072,
+        "success": true
+      }
+    },
+    "tests/compliance/evidenceBinding.test.ts": {
+      "report": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/baseline-after-final-q2/q2-failed-file-01-v1/report.json",
+        "bytes": 11411,
+        "sha256": "ec679ed42c0ac2e6ef29d57574d92004ad5b05f481b108b45683d34a57bf753a"
+      },
+      "raw": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/baseline-after-final-q2/q2-failed-file-01-v1/raw.log",
+        "bytes": 5135,
+        "sha256": "55c26b4db1bec42ba6064bfa1776fb8443b024eb8ec441ef5cb1b37c07e4d669"
+      },
+      "statusBefore": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/baseline-after-final-q2/q2-failed-file-01-v1/status-before.stdout",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "statusAfter": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/baseline-after-final-q2/q2-failed-file-01-v1/status-after.stdout",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "headBefore": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/baseline-after-final-q2/q2-failed-file-01-v1/head-before.stdout",
+        "bytes": 41,
+        "sha256": "e25123fbeb1dc0bd73ed45a6f4578c9867c8e653bf05ef05c2189d3cfe55e7d7"
+      },
+      "headAfter": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/baseline-after-final-q2/q2-failed-file-01-v1/head-after.stdout",
+        "bytes": 41,
+        "sha256": "e25123fbeb1dc0bd73ed45a6f4578c9867c8e653bf05ef05c2189d3cfe55e7d7"
+      },
+      "command": [
+        "pnpm",
+        "exec",
+        "vitest",
+        "run",
+        "tests/compliance/evidenceBinding.test.ts",
+        "--maxWorkers=1",
+        "--reporter=verbose",
+        "--reporter=json",
+        "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/baseline-after-final-q2/q2-failed-file-01-v1/report.json"
+      ],
+      "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-int-baseline-20261020",
+      "exitCode": 0,
+      "nativeFileAlonePassed": true,
+      "sourceEnvironmentProof": [],
+      "nativeTopLevel": {
+        "numTotalTestSuites": 6,
+        "numPassedTestSuites": 6,
+        "numFailedTestSuites": 0,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 40,
+        "numPassedTests": 40,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1792476311432,
+        "success": true
+      }
+    },
+    "tests/publicDocsGraph.test.ts": {
+      "report": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/baseline-after-final-q2/q2-failed-file-02-v1/report.json",
+        "bytes": 3972,
+        "sha256": "853d83a0d05698ed31aba6405532fb22025517774cf528086dc6db6f9f1190c6"
+      },
+      "raw": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/baseline-after-final-q2/q2-failed-file-02-v1/raw.log",
+        "bytes": 1985,
+        "sha256": "63693fd0e6d6ad175a6fcfa91bc86a1ef47359f98d67c4993b0533f06416f2ff"
+      },
+      "statusBefore": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/baseline-after-final-q2/q2-failed-file-02-v1/status-before.stdout",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "statusAfter": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/baseline-after-final-q2/q2-failed-file-02-v1/status-after.stdout",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "headBefore": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/baseline-after-final-q2/q2-failed-file-02-v1/head-before.stdout",
+        "bytes": 41,
+        "sha256": "e25123fbeb1dc0bd73ed45a6f4578c9867c8e653bf05ef05c2189d3cfe55e7d7"
+      },
+      "headAfter": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/baseline-after-final-q2/q2-failed-file-02-v1/head-after.stdout",
+        "bytes": 41,
+        "sha256": "e25123fbeb1dc0bd73ed45a6f4578c9867c8e653bf05ef05c2189d3cfe55e7d7"
+      },
+      "command": [
+        "pnpm",
+        "exec",
+        "vitest",
+        "run",
+        "tests/publicDocsGraph.test.ts",
+        "--maxWorkers=1",
+        "--reporter=verbose",
+        "--reporter=json",
+        "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/baseline-after-final-q2/q2-failed-file-02-v1/report.json"
+      ],
+      "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-int-baseline-20261020",
+      "exitCode": 1,
+      "nativeFileAlonePassed": false,
+      "sourceEnvironmentProof": [],
+      "nativeTopLevel": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 0,
+        "numFailedTestSuites": 2,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 6,
+        "numPassedTests": 5,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1792476318135,
+        "success": false
+      }
+    },
+    "tests/regulatedExamples.test.ts": {
+      "report": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/baseline-after-final-q2/q2-failed-file-03-v1/report.json",
+        "bytes": 2901,
+        "sha256": "d7d842540f5fba76b1202f1df704587cc14567668406a9ccadfb1ba3773b4983"
+      },
+      "raw": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/baseline-after-final-q2/q2-failed-file-03-v1/raw.log",
+        "bytes": 1434,
+        "sha256": "467a08a1e0aab7a640ad677aefc07a992a5b2c81e60ae1d5553ad90b93205b89"
+      },
+      "statusBefore": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/baseline-after-final-q2/q2-failed-file-03-v1/status-before.stdout",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "statusAfter": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/baseline-after-final-q2/q2-failed-file-03-v1/status-after.stdout",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "headBefore": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/baseline-after-final-q2/q2-failed-file-03-v1/head-before.stdout",
+        "bytes": 41,
+        "sha256": "e25123fbeb1dc0bd73ed45a6f4578c9867c8e653bf05ef05c2189d3cfe55e7d7"
+      },
+      "headAfter": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/baseline-after-final-q2/q2-failed-file-03-v1/head-after.stdout",
+        "bytes": 41,
+        "sha256": "e25123fbeb1dc0bd73ed45a6f4578c9867c8e653bf05ef05c2189d3cfe55e7d7"
+      },
+      "command": [
+        "pnpm",
+        "exec",
+        "vitest",
+        "run",
+        "tests/regulatedExamples.test.ts",
+        "--maxWorkers=1",
+        "--reporter=verbose",
+        "--reporter=json",
+        "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/baseline-after-final-q2/q2-failed-file-03-v1/report.json"
+      ],
+      "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-int-baseline-20261020",
+      "exitCode": 0,
+      "nativeFileAlonePassed": true,
+      "sourceEnvironmentProof": [],
+      "nativeTopLevel": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 2,
+        "numFailedTestSuites": 0,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 6,
+        "numPassedTests": 6,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1792476319594,
+        "success": true
+      }
+    },
+    "tests/time/checkpointWindow.test.ts": {
+      "report": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/baseline-after-final-q2/q2-failed-file-04-v1/report.json",
+        "bytes": 3298,
+        "sha256": "d768cae1b728191a205f787e9dcda087a1dde61ea3e3a72b773927ed6b18b442"
+      },
+      "raw": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/baseline-after-final-q2/q2-failed-file-04-v1/raw.log",
+        "bytes": 76579,
+        "sha256": "8257c7e314b2cf7c8fa4f0f62a24877a3fa00d5d36f738df9bfc9790f3597c55"
+      },
+      "statusBefore": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/baseline-after-final-q2/q2-failed-file-04-v1/status-before.stdout",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "statusAfter": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/baseline-after-final-q2/q2-failed-file-04-v1/status-after.stdout",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "headBefore": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/baseline-after-final-q2/q2-failed-file-04-v1/head-before.stdout",
+        "bytes": 41,
+        "sha256": "e25123fbeb1dc0bd73ed45a6f4578c9867c8e653bf05ef05c2189d3cfe55e7d7"
+      },
+      "headAfter": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/baseline-after-final-q2/q2-failed-file-04-v1/head-after.stdout",
+        "bytes": 41,
+        "sha256": "e25123fbeb1dc0bd73ed45a6f4578c9867c8e653bf05ef05c2189d3cfe55e7d7"
+      },
+      "command": [
+        "pnpm",
+        "exec",
+        "vitest",
+        "run",
+        "tests/time/checkpointWindow.test.ts",
+        "--maxWorkers=1",
+        "--reporter=verbose",
+        "--reporter=json",
+        "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/baseline-after-final-q2/q2-failed-file-04-v1/report.json"
+      ],
+      "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-int-baseline-20261020",
+      "exitCode": 0,
+      "nativeFileAlonePassed": true,
+      "sourceEnvironmentProof": [],
+      "nativeTopLevel": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 2,
+        "numFailedTestSuites": 0,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 6,
+        "numPassedTests": 6,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1792476354806,
+        "success": true
+      }
+    },
+    "tests/time/tsaGrant.test.ts": {
+      "report": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/baseline-after-final-q2/q2-failed-file-05-v1/report.json",
+        "bytes": 1496,
+        "sha256": "62b3aef19bf8188ae88c83b7372eef9ad2719f5517a522f7277ef3a2ff5171e1"
+      },
+      "raw": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/baseline-after-final-q2/q2-failed-file-05-v1/raw.log",
+        "bytes": 22462,
+        "sha256": "5d31904ebdaad6370aa8ff83d7a4dcd501b3c238dc5b94a293b6b69a986c6566"
+      },
+      "statusBefore": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/baseline-after-final-q2/q2-failed-file-05-v1/status-before.stdout",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "statusAfter": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/baseline-after-final-q2/q2-failed-file-05-v1/status-after.stdout",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "headBefore": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/baseline-after-final-q2/q2-failed-file-05-v1/head-before.stdout",
+        "bytes": 41,
+        "sha256": "e25123fbeb1dc0bd73ed45a6f4578c9867c8e653bf05ef05c2189d3cfe55e7d7"
+      },
+      "headAfter": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/baseline-after-final-q2/q2-failed-file-05-v1/head-after.stdout",
+        "bytes": 41,
+        "sha256": "e25123fbeb1dc0bd73ed45a6f4578c9867c8e653bf05ef05c2189d3cfe55e7d7"
+      },
+      "command": [
+        "pnpm",
+        "exec",
+        "vitest",
+        "run",
+        "tests/time/tsaGrant.test.ts",
+        "--maxWorkers=1",
+        "--reporter=verbose",
+        "--reporter=json",
+        "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/baseline-after-final-q2/q2-failed-file-05-v1/report.json"
+      ],
+      "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-int-baseline-20261020",
+      "exitCode": 0,
+      "nativeFileAlonePassed": true,
+      "sourceEnvironmentProof": [],
+      "nativeTopLevel": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 2,
+        "numFailedTestSuites": 0,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 2,
+        "numPassedTests": 2,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1792476363143,
+        "success": true
+      }
+    }
+  },
+  "baselineCaptureErrors": {},
+  "truth": "Only literal clone-root prefix normalization is allowed. File-alone pass is context evidence, not a causal waiver. Unmatched or nonexact failures remain owned/unresolved. No test was run by this helper."
+}
