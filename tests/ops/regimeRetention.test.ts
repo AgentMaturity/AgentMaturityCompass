@@ -1,5 +1,5 @@
 /** P2-26 slice D: retention can never be set or run below an applicable regime's minimum. */
-import { existsSync, mkdtempSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, realpathSync, rmSync, utimesSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
@@ -10,6 +10,8 @@ import {
   RegimeRetentionRefused, effectiveRetention, regimeRetentionRules, retentionFloorViolations, type RegimeRetentionRule
 } from "../../src/ops/retention/regimeRetention.js";
 import { runRetention } from "../../src/ops/retention/retentionEngine.js";
+import { maintenanceRotateLogsCli } from "../../src/ops/maintenance/maintenanceCli.js";
+import { rotateLogs } from "../../src/ops/maintenance/logRotation.js";
 import { initWorkspace } from "../../src/workspace.js";
 
 const plan = vi.hoisted(() => ({ requirements: null as RequirementDecision[] | null }));
@@ -54,6 +56,7 @@ describe("regime floors", () => {
     expect(() => runRetention({ workspace, dryRun: false })).toThrow(/eu-ai-act-art-26-6-deployer-logs/);
     const policy = defaultOpsPolicy();
     policy.opsPolicy.retention.prunePayloadsAfterDays = 200;
+    policy.opsPolicy.maintenance.rotateLogsDays = 200;
     writeFileSync(opsPolicyPath(workspace), YAML.stringify(policy));
     expect(() => signOpsPolicy(workspace)).not.toThrow();
     expect(() => runRetention({ workspace, dryRun: false })).not.toThrow();
@@ -81,5 +84,34 @@ describe("regime floors", () => {
     expect(regimeRetentionRules([requirement({ applicability: "not_applicable", citationsInScope: ["eu-ai-act-art-26-6"] })])).toEqual([]);
     expect(retentionFloorViolations(defaultOpsPolicy(), [])).toEqual([]);
     expect(() => signOpsPolicy(workspace)).not.toThrow();
+  });
+
+  test("maintenance log rotation is a deleting knob: a rotateLogsDays below the floor is refused at apply and in the CLI", () => {
+    plan.requirements = AI_ACT;
+    const policy = defaultOpsPolicy();
+    policy.opsPolicy.retention.prunePayloadsAfterDays = 200;
+    policy.opsPolicy.retention.keepArchiveSegmentsDays = 3650;
+    policy.opsPolicy.maintenance.rotateLogsDays = 30;
+    writeFileSync(opsPolicyPath(workspace), YAML.stringify(policy));
+    expect(() => signOpsPolicy(workspace)).toThrow(/maintenance\.rotateLogsDays 30 days undercuts/);
+    plan.requirements = null;
+    signOpsPolicy(workspace); // signed before the plan applied; the floor still refuses the deletion
+    plan.requirements = AI_ACT;
+    expect(() => maintenanceRotateLogsCli(workspace)).toThrow(/eu-ai-act-art-26-6-deployer-logs/);
+  });
+
+  test("log rotation never deletes a log younger than the floor, even an oversized one; older ones still rotate", () => {
+    plan.requirements = AI_ACT;
+    const logDir = join(workspace, ".amc", "studio", "logs");
+    mkdirSync(logDir, { recursive: true });
+    const young = join(logDir, "young-large.log"), old = join(logDir, "old.log");
+    writeFileSync(young, Buffer.alloc(2 * 1024 * 1024));
+    writeFileSync(old, "x");
+    const longAgo = (Date.now() - 400 * 86_400_000) / 1000;
+    utimesSync(old, longAgo, longAgo);
+    expect(() => rotateLogs({ workspace, logDir, maxDays: 30, maxFileMb: 1 })).toThrow(RegimeRetentionRefused);
+    const result = rotateLogs({ workspace, logDir, maxDays: 200, maxFileMb: 1 });
+    expect(result.removed).toEqual([old]);
+    expect(existsSync(young)).toBe(true);
   });
 });

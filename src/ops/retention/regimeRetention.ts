@@ -53,12 +53,19 @@ export function regimeRetentionRules(requirements: readonly RequirementDecision[
   return TEMPLATES.filter((template) => template.when(requirements)).map((template) => ({ ...template.rule, verified: false }));
 }
 
-/** The ops-policy knobs that delete each record class. */
-const KNOBS: Record<RetentionClass, ReadonlyArray<keyof OpsPolicy["opsPolicy"]["retention"]>> = {
-  payloads: ["prunePayloadsAfterDays"],
-  logs: ["prunePayloadsAfterDays", "pruneGuardEventsAfterDays", "keepArchiveSegmentsDays"],
-  evidence_events: ["keepArchiveSegmentsDays", "pruneGuardEventsAfterDays"],
-  receipts: ["keepArchiveSegmentsDays"]
+type Knob = { [S in "retention" | "maintenance"]: { section: S; key: keyof OpsPolicy["opsPolicy"][S] } }["retention" | "maintenance"];
+const retention = (key: keyof OpsPolicy["opsPolicy"]["retention"]): Knob => ({ section: "retention", key });
+/**
+ * Every ops-policy knob that deletes a record class (scripts/deletion-executors.json: retention payload and blob
+ * pruning, guard-event pruning, archive segments, and maintenance log rotation). The console and transform snapshot
+ * caches (maintenance.prune*SnapshotsDays) hold UI caches, not records, so no regime floor binds them.
+ */
+const KNOBS: Record<RetentionClass, readonly Knob[]> = {
+  payloads: [retention("prunePayloadsAfterDays")],
+  logs: [retention("prunePayloadsAfterDays"), retention("pruneGuardEventsAfterDays"), retention("keepArchiveSegmentsDays"),
+    { section: "maintenance", key: "rotateLogsDays" }],
+  evidence_events: [retention("keepArchiveSegmentsDays"), retention("pruneGuardEventsAfterDays")],
+  receipts: [retention("keepArchiveSegmentsDays")]
 };
 
 export interface EffectiveRetention {
@@ -88,12 +95,11 @@ export function effectiveRetention(rules: readonly RegimeRetentionRule[], wormTa
 /** Each knob that would delete a class sooner than its floor, naming the regimes. An absent optional knob deletes nothing. */
 export function retentionFloorViolations(policy: OpsPolicy, rules: readonly RegimeRetentionRule[]): string[] {
   const { minimums } = effectiveRetention(rules);
-  const retention = policy.opsPolicy.retention;
   return (Object.entries(minimums) as Array<[RetentionClass, { days: number; regimeIds: string[] }]>).flatMap(([cls, floor]) =>
     KNOBS[cls].flatMap((knob) => {
-      const days = retention[knob];
+      const days = (policy.opsPolicy[knob.section] as Record<string, unknown>)[knob.key];
       return typeof days === "number" && days < floor.days
-        ? [`${knob} ${days} days undercuts the ${floor.days}-day ${cls} minimum of ${floor.regimeIds.join(", ")} (experimental, pending D-08 review)`] : [];
+        ? [`${knob.section}.${knob.key} ${days} days undercuts the ${floor.days}-day ${cls} minimum of ${floor.regimeIds.join(", ")} (experimental, pending D-08 review)`] : [];
     }));
 }
 
@@ -109,13 +115,22 @@ export class RegimeRetentionRefused extends Error {
  * Refuses a policy that undercuts the active plan's regimes. A plan that cannot be read refuses too: without it the
  * floors are unknown, and deleting under unknown floors could destroy records a regime still requires.
  */
-export function assertRetentionMeetsRegimes(workspace: string, policy: OpsPolicy): void {
+function workspaceRules(workspace: string): RegimeRetentionRule[] {
   let requirements: readonly RequirementDecision[] | null;
   try {
     requirements = activeControlPlan(workspace)?.requirements ?? null;
   } catch (error) {
     throw new RegimeRetentionRefused([`the active compiled plan could not be read, so regime floors are unknown (${error instanceof Error ? error.message : String(error)})`]);
   }
-  const violations = retentionFloorViolations(policy, regimeRetentionRules(requirements));
+  return regimeRetentionRules(requirements);
+}
+
+/** The floor for one record class in this workspace, or null; refuses when the plan cannot be read (fail closed). */
+export function regimeFloor(workspace: string, cls: RetentionClass): { days: number; regimeIds: string[] } | null {
+  return effectiveRetention(workspaceRules(workspace)).minimums[cls] ?? null;
+}
+
+export function assertRetentionMeetsRegimes(workspace: string, policy: OpsPolicy): void {
+  const violations = retentionFloorViolations(policy, workspaceRules(workspace));
   if (violations.length > 0) throw new RegimeRetentionRefused(violations);
 }

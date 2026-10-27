@@ -189,8 +189,13 @@ plan's applicable requirements:
 The effective minimum per record class is the largest applicable one.
 Signing an ops policy (`amc ops` sign paths) and running retention (not a
 dry run) are refused with `REGIME_RETENTION_REFUSED`, naming each knob and
-regime, when `prunePayloadsAfterDays`, `pruneGuardEventsAfterDays` or
-`keepArchiveSegmentsDays` would delete a class sooner than its floor. A plan
+regime, when `retention.prunePayloadsAfterDays`,
+`retention.pruneGuardEventsAfterDays`, `retention.keepArchiveSegmentsDays` or
+`maintenance.rotateLogsDays` would delete a class sooner than its floor. The
+maintenance CLIs (`rotate-logs`, `prune-cache`) refuse under such a policy, and
+log rotation itself never deletes a log younger than the logs floor, by age
+or by size. The console and transform snapshot caches are UI caches, not
+records, so no floor binds them. A plan
 that cannot be read refuses too. Conflicting maximums are listed for a
 reviewer. A rule that needs WORM leaves its control `not_evaluated` until a
 WORM export target is configured (P2-09 has no configured-target registry
