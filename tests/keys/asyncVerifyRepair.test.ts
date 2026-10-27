@@ -121,9 +121,10 @@ describe("actual asynchronous verify-repair preparation and quarantine", () => {
   });
   test("the first actual signer remains authoritative when the second signature legitimately captures a new artifact key", async () => {
     const f = fixture(), input = plan(f), before = storeBytes(f, input); let calls = 0;
-    const ready = await prepare(f, input, async (path, bytes) => { if (++calls === 2) rotatePurposeKeys({ workspace: f.workspace, purposes: ["artifact-seal"], passphrase: PASS });
-      return prepareFileSignatureWithAuditor(f.workspace, path, bytes, "REPAIR_RECEIPT"); });
-    expect(() => apply(f, ready)).toThrow(/policy signing state changed|committed purpose authority changed/); unchanged(f, before); receiptMath(f, apply(f, await prepare(f)));
+    // Preparation rechecks the first signer before the second Sign (P2-08), so the refusal precedes any apply handle.
+    await expect(prepare(f, input, async (path, bytes) => { if (++calls === 2) rotatePurposeKeys({ workspace: f.workspace, purposes: ["artifact-seal"], passphrase: PASS });
+      return prepareFileSignatureWithAuditor(f.workspace, path, bytes, "REPAIR_RECEIPT"); })).rejects.toThrow(/policy signing state changed|committed purpose authority changed/);
+    expect(calls).toBe(2); unchanged(f, before); receiptMath(f, apply(f, await prepare(f)));
   });
   test.each(["lock", "no-sign", "policy"] as const)("late %s after both checked signatures refuses before quarantine with a restored positive", async change => {
     const f = fixture(), input = plan(f), before = storeBytes(f, input), ready = await prepare(f, input), original = loadTrustConfig(f.workspace);
@@ -150,9 +151,11 @@ describe("actual asynchronous verify-repair preparation and quarantine", () => {
       else if (change === "changed-file") { target = join(f.workspace, input.files.at(-1)!.path); old = fs.readFileSync(target); fs.writeFileSync(target, Buffer.concat([old, Buffer.from("extra")])); }
       else if (change === "marker") { target = join(f.workspace, ".amc", "session-store.json"); old = fs.existsSync(target) ? fs.readFileSync(target) : undefined; fs.writeFileSync(target, JSON.stringify({ backend: "jsonl" })); }
       else { target = join(paths[1]!, ".."); fs.mkdirSync(target, { recursive: true }); fs.writeFileSync(join(target, "owned-competitor"), "competing output"); }
-      p.release.done(); const ready = await settled; if (!("value" in ready)) throw ready.error;
-      if (change === "destination") { expect(() => apply(f, ready.value)).toThrow("quarantine folder already exists"); expect(fs.readFileSync(join(target, "owned-competitor"), "utf8")).toBe("competing output"); }
-      else { const competing = fs.readFileSync(target); expect(() => apply(f, ready.value)).toThrow("evidence changed since the plan"); expect(fs.readFileSync(target)).toEqual(competing);
+      // The drift is refused when preparation rechecks its preconditions after the receipt Sign (P2-08), before any apply handle.
+      p.release.done(); const ready = await settled; if (!("error" in ready)) throw new Error("repair preparation accepted drift during receipt Sign");
+      expect(ready.error).toBeInstanceOf(RepairRefused);
+      if (change === "destination") { expect(String(ready.error)).toContain("quarantine folder already exists"); expect(fs.readFileSync(join(target, "owned-competitor"), "utf8")).toBe("competing output"); }
+      else { const competing = fs.readFileSync(target); expect(String(ready.error)).toContain("evidence changed since the plan"); expect(fs.readFileSync(target)).toEqual(competing);
         unchanged(f, new Map([...before].filter(([path]) => join(f.workspace, path) !== target))); }
     } finally { p.release.done(); await Promise.allSettled([pending]); if (target) { if (change === "destination") fs.rmSync(target, { recursive: true, force: true }); else if (old) fs.writeFileSync(target, old); else fs.rmSync(target); } }
     receiptMath(f, apply(f, await prepare(f)));
