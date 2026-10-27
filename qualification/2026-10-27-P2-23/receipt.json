@@ -86,5 +86,61 @@
   "full suite run (integrator)",
   "freeze allowedExceptionKeys entry for P2-23 (integrator)",
   "Sid decision: hold never-migrated agents under an enforcing plan, or keep the migration opt-in"
- ]
+ ],
+ "securityReview": {
+  "commit": "51ab20745",
+  "checks": [
+   {
+    "cmd": "npm run -s typecheck",
+    "exit": 0
+   },
+   {
+    "cmd": "npm run -s typecheck:tests",
+    "exit": 0
+   },
+   {
+    "cmd": "npm run -s lint",
+    "exit": 0
+   },
+   {
+    "cmd": "npm run -s check:gates",
+    "exit": 0
+   },
+   {
+    "cmd": "npm run -s check:dead-code",
+    "exit": 0
+   },
+   {
+    "cmd": "npm run -s check:duplicates",
+    "exit": 0
+   },
+   {
+    "cmd": "npm run -s check:counts",
+    "exit": 0
+   },
+   {
+    "cmd": "npm run -s check:api-ref",
+    "exit": 0
+   },
+   {
+    "cmd": "npm run -s check:docs-drift",
+    "exit": 0
+   },
+   {
+    "cmd": "npm run -s check:architecture-boundaries",
+    "exit": 0
+   },
+   {
+    "cmd": "npm run -s build",
+    "exit": 0
+   }
+  ],
+  "relatedTests": {
+   "testFiles": 159,
+   "tests": 2419,
+   "failed": 0
+  },
+  "mutations": "mutations-security-review.json",
+  "red": "red-before-security-fixes.txt"
+ }
 }

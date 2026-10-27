@@ -27,3 +27,16 @@ Pending:
 - The `allowedExceptionKeys` entry for P2-23 (integrator).
 - Sid's decision on whether never-migrated agents are held under an enforcing plan. See docs/AGENT_LIFECYCLE.md,
   "Migration".
+
+## Security review fixes (commit `51ab20745`)
+
+- **Lifecycle enforcement.** It is now read from the workspace's verified active plan on every decision, never from a
+  caller's context, so ToolHub dispatch and provider hook decisions hold a suspended agent too. A plan that cannot be
+  verified denies an agent that could be held.
+- **Session manifest.** It is now built from the resolved session (the composed tool surface, the verified tools config
+  and the active plan's policy), never from declared pins.
+- **Red before the fixes.** `red-before-security-fixes.txt` shows the 4 entry-point tests and the resolved-manifest
+  test failing on the previous sources.
+- **Mutations.** `mutations-security-review.json` records them (M13 to M17, plus the admission mutations re-run on the
+  new code). All were killed. M17 survived until a test for a tools config that does not verify was added.
+- **Checks.** All 11 checks passed. The 159 related test files (2,419 tests) passed.
