@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "key": "P2-09",
+  "slice": "a-ledger-encryption",
+  "date": "2026-10-27",
+  "base": "7bdb1627a",
+  "branch": "rtd/p2-09a-ledger-encryption",
+  "node": "v22.23.3",
+  "os": "macOS 26.6.2",
+  "arch": "arm64",
+  "commands": [
+    { "cmd": "npm run -s build", "exit": 0 },
+    { "cmd": "npm run -s typecheck", "exit": 0 },
+    { "cmd": "npm run -s typecheck:tests", "exit": 0 },
+    { "cmd": "npm run -s lint", "exit": 0 },
+    { "cmd": "npm run -s check:gates", "exit": 0 },
+    { "cmd": "npm run -s check:dead-code", "exit": 0, "new": 0 },
+    { "cmd": "npm run -s check:duplicates", "exit": 0, "new": 3, "note": "3 transformApi.ts findings identical on base 7bdb1627a" },
+    { "cmd": "npm run -s check:counts", "exit": 0 },
+    { "cmd": "npm run -s check:docs-drift", "exit": 0 },
+    { "cmd": "npm run -s check:architecture-boundaries", "exit": 0 },
+    { "cmd": "npm run -s check:api-ref", "exit": 0 },
+    { "cmd": "npm run -s check:freeze", "exit": 1, "note": "fails on base (P3-14, P2-30); P2-09 needs adding to the base baseline by the integrator" },
+    { "cmd": "npx vitest run tests/ledgerEncryption.test.ts tests/ledgerEncryptionMigration.test.ts tests/ledgerDowngradeGuard.test.ts tests/backupWalSafety.test.ts tests/keys/providerContract.test.ts tests/actions/receiptStates.test.ts --maxWorkers=2", "exit": 0, "files": 6, "tests": 129, "failed": 0 },
+    { "cmd": "npx vitest run <362 related files> --maxWorkers=2", "exit": 1, "files": 362, "tests": 4589, "failed": 177, "note": "first pass, before two fixes; failing files rerun below" },
+    { "cmd": "npx vitest run <49 failing files> (base 7bdb1627a, rebuilt dist)", "exit": 1, "failed": 113, "passed": 779 },
+    { "cmd": "npx vitest run <13 files with failures not on base, after fixes>", "exit": 1, "failed": 1, "passed": 108, "note": "the 1 failure (freezePublicationCli 'actual freeze lift CLI…') also fails on base" }
+  ],
+  "mutations": [
+    { "guard": "AAD binding (ledgerCipher aadBytes)", "failingTest": "ledgerEncryption: refuses a ciphertext moved to another row (AAD binds the row id)" },
+    { "guard": "deny append without key (ledger sealInline)", "failingTest": "ledgerEncryption: denies the append with the provider's reason when the KeyProvider is down, and writes no row" },
+    { "guard": "downgrade guard (runMigrations assertSchemaNotNewer)", "failingTest": "ledgerDowngradeGuard: refuses a ledger holding a migration one above the highest this AMC knows" }
+  ],
+  "pendingSid": ["ADR 018 approval", "P2-09 in freeze-baseline allowedExceptionKeys"]
+}

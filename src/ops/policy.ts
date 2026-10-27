@@ -40,7 +40,9 @@ export const opsPolicySchema = z.object({
       algorithm: z.literal("AES-256-GCM"),
       keyRotationDays: z.number().int().min(1),
       reencryptOnRotate: z.boolean(),
-      aadMode: z.literal("BLOB_ID_AND_VERSION")
+      aadMode: z.literal("BLOB_ID_AND_VERSION"),
+      /** P2-09: encrypt inline evidence payloads under provider-wrapped data keys. Optional; absent means off. */
+      ledgerEncryptionEnabled: z.boolean().optional()
     }),
     backups: z.object({
       requireEncryptedBackups: z.boolean(),

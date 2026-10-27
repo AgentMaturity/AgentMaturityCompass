@@ -12,6 +12,7 @@ import { loadOpsPolicy, opsPolicyPath, opsPolicySigPath, opsPolicySchema, verify
 import { currentTransparencyMerkleRoot, verifyTransparencyMerkle } from "../../transparency/merkleIndexStore.js";
 import { transparencySealSigPath, verifyTransparencyLog, appendTransparencyEntry, appendTransparencyEntryAsync } from "../../transparency/logChain.js";
 import { verifyLedgerIntegrity } from "../../ledger/ledger.js";
+import { snapshotSqliteFiles, withoutSqliteSidecars } from "./sqliteSnapshot.js";
 import { backupManifestSchema, backupManifestSigSchema, type BackupManifest, type BackupManifestSig } from "./backupSchema.js";
 import { decryptBackupPayload, encryptBackupPayload, type BackupEncryptionEnvelope } from "./backupCrypto.js";
 import { appendOpsAuditEvent } from "../audit.js";
@@ -120,13 +121,24 @@ function copySelectedFiles(params: {
   sourceRoot: string;
   destinationRoot: string;
   files: string[];
+  snapshots: ReturnType<typeof snapshotSqliteFiles>;
 }): void {
   for (const rel of params.files) {
     const source = join(params.sourceRoot, rel);
     const dest = join(params.destinationRoot, rel);
     ensureDir(dirname(dest));
-    copyFileSync(source, dest);
+    const snapshot = params.snapshots.get(rel);
+    if (snapshot) writeFileAtomic(dest, snapshot.bytes, snapshot.mode);
+    else copyFileSync(source, dest);
   }
+}
+
+/** The backed-up evidence database's digest: its consistent snapshot when it was snapshotted. */
+function evidenceSnapshotSha(workspace: string, snapshots: ReturnType<typeof snapshotSqliteFiles>): string | null {
+  const snapshot = snapshots.get(".amc/evidence.sqlite");
+  if (snapshot) return sha256Hex(snapshot.bytes);
+  const live = join(workspace, ".amc", "evidence.sqlite");
+  return pathExists(live) ? sha256Hex(readFileSync(live)) : null;
 }
 
 function backupPassphraseFromEnv(): string | null {
@@ -157,8 +169,9 @@ export function createBackup(params: { workspace: string; outFile: string }): {
   }
 
   const policySigner = describePolicySigner(params.workspace, "BACKUP_MANIFEST");
-  const files = collectFiles(params.workspace, policy.opsPolicy.backups.includePaths, policy.opsPolicy.backups.excludePaths);
+  const files = withoutSqliteSidecars(collectFiles(params.workspace, policy.opsPolicy.backups.includePaths, policy.opsPolicy.backups.excludePaths));
   const temp = mkdtempSync(join(tmpdir(), "amc-backup-"));
+  const snapshots = snapshotSqliteFiles(params.workspace, files, temp);
   const payloadSrc = join(temp, "payload-src");
   const payloadTar = join(temp, "workspace.tar.gz");
   const bundleRoot = join(temp, "amc-backup");
@@ -170,7 +183,8 @@ export function createBackup(params: { workspace: string; outFile: string }): {
   copySelectedFiles({
     sourceRoot: params.workspace,
     destinationRoot: payloadSrc,
-    files
+    files,
+    snapshots
   });
   tarCreate(payloadSrc, payloadTar);
   const payloadPlain = readFileSync(payloadTar);
@@ -201,8 +215,7 @@ export function createBackup(params: { workspace: string; outFile: string }): {
       payloadSha256: payloadSha
     },
     files: files.map((relPath) => {
-      const full = join(params.workspace, relPath);
-      const bytes = readFileSync(full);
+      const bytes = readFileSync(join(payloadSrc, relPath));
       return {
         path: relPath,
         sha256: sha256Hex(bytes),
@@ -212,9 +225,7 @@ export function createBackup(params: { workspace: string; outFile: string }): {
     integrity: {
       transparencyRoot: root?.root ?? "",
       transparencySealSigSha256: pathExists(sealSigPath) ? sha256Hex(readFileSync(sealSigPath)) : sha256Hex(Buffer.alloc(0)),
-      evidenceDbSha256: pathExists(join(params.workspace, ".amc", "evidence.sqlite"))
-        ? sha256Hex(readFileSync(join(params.workspace, ".amc", "evidence.sqlite")))
-        : null
+      evidenceDbSha256: evidenceSnapshotSha(params.workspace, snapshots)
     },
     signing: {
       algorithm: policySigner.algorithm,
@@ -396,14 +407,19 @@ export async function createBackupAsync(input: Parameters<typeof createBackup>[0
   const name = `backup-create-${sha256Hex(outFile).slice(0, 24)}`, lockRoot = dirname(outFile);
   const exclude = [...policy.opsPolicy.backups.excludePaths, relative(workspace, join(lockRoot, `.${name}.lock`)),
     relative(workspace, join(lockRoot, `.${name}-locks`))];
-  const files = collectFiles(workspace, policy.opsPolicy.backups.includePaths, exclude);
+  const files = withoutSqliteSidecars(collectFiles(workspace, policy.opsPolicy.backups.includePaths, exclude));
+  // P2-09: SQLite files are captured as consistent snapshots, so live appends neither tear nor invalidate the backup.
+  const snapshotDir = mkdtempSync(join(tmpdir(), "amc-backup-sqlite-"));
+  let snapshots: ReturnType<typeof snapshotSqliteFiles>;
+  try { snapshots = snapshotSqliteFiles(workspace, files, snapshotDir); } finally { rmSync(snapshotDir, { recursive: true, force: true }); }
+  const snapshotted = (path: string) => snapshots.has(relative(workspace, path).replaceAll("\\", "/"));
   const extras = [policyPath, policySigPath, join(workspace, "package.json"), merkleCurrentRootPath(workspace),
     merkleCurrentRootSigPath(workspace), transparencySealSigPath(workspace), join(workspace, ".amc", "evidence.sqlite")];
-  const original = new Map([...new Set([...files.map(path => join(workspace, path)), ...extras])].map(path => [path, backupFileState(path)] as const));
+  const original = new Map([...new Set([...files.map(path => join(workspace, path)), ...extras])].filter(path => !snapshotted(path)).map(path => [path, backupFileState(path)] as const));
   if (!sameBackupFile(policyBytes, original.get(policyPath)!) || !sameBackupFile(policySigBytes, original.get(policySigPath)!)) throw new Error("backup inputs changed while preparing");
-  const output = captureBackupOutput(workspace, outFile, [...original.keys(), ...(passphraseFile?.trim() ? [resolve(passphraseFile.trim())] : [])]);
+  const output = captureBackupOutput(workspace, outFile, [...original.keys(), ...[...snapshots.keys()].map(path => join(workspace, path)), ...(passphraseFile?.trim() ? [resolve(passphraseFile.trim())] : [])]);
   const assertInputsCurrent = () => {
-    const currentFiles = collectFiles(workspace, policy.opsPolicy.backups.includePaths, exclude);
+    const currentFiles = withoutSqliteSidecars(collectFiles(workspace, policy.opsPolicy.backups.includePaths, exclude));
     if (JSON.stringify(currentFiles) !== JSON.stringify(files) || [...original].some(([path, before]) => !sameBackupFile(before, backupFileState(path))))
       throw new Error("backup inputs changed while preparing");
   };
@@ -424,7 +440,7 @@ export async function createBackupAsync(input: Parameters<typeof createBackup>[0
     const payloadSrc = join(temp, "payload-src"), payloadTar = join(temp, "workspace.tar.gz"), bundleRoot = join(temp, "amc-backup");
     ensureDir(payloadSrc); ensureDir(join(bundleRoot, "payload")); ensureDir(join(bundleRoot, "keys"));
     for (const path of files) {
-      const state = original.get(join(workspace, path));
+      const state = snapshots.get(path) ?? original.get(join(workspace, path));
       if (state === undefined || state === null) throw new Error("backup source disappeared while preparing");
       writeFileAtomic(join(payloadSrc, path), state.bytes, state.mode);
     }
@@ -432,11 +448,11 @@ export async function createBackupAsync(input: Parameters<typeof createBackup>[0
     const encrypted = encryptBackupPayload(readFileSync(payloadTar), passphrase ?? ""), payloadSha = sha256Hex(encrypted.encrypted);
     writeFileAtomic(join(bundleRoot, "payload", "workspace.tar.gz.enc"), encrypted.encrypted, 0o600);
     writeFileAtomic(join(bundleRoot, "payload.sha256"), `${payloadSha}\n`, 0o644);
-    const backupId = `bkp_${randomUUID()}`, seal = original.get(transparencySealSigPath(workspace)), db = original.get(join(workspace, ".amc", "evidence.sqlite"));
+    const backupId = `bkp_${randomUUID()}`, seal = original.get(transparencySealSigPath(workspace)), db = snapshots.get(".amc/evidence.sqlite") ?? original.get(join(workspace, ".amc", "evidence.sqlite"));
     const manifest = backupManifestSchema.parse({
       v: 1, backupId, createdTs: Date.now(), workspace: { pathHint: params.workspace, amcVersion: version, nodeVersion: process.version },
       policy: { opsPolicySha256: policyDigest }, payload: { encryption: encrypted.envelope, payloadSha256: payloadSha },
-      files: files.map(path => { const bytes = original.get(join(workspace, path))!.bytes; return { path, sha256: sha256Hex(bytes), bytes: bytes.byteLength }; }),
+      files: files.map(path => { const bytes = (snapshots.get(path) ?? original.get(join(workspace, path)))!.bytes; return { path, sha256: sha256Hex(bytes), bytes: bytes.byteLength }; }),
       integrity: { transparencyRoot: root?.root ?? "", transparencySealSigSha256: sha256Hex(seal?.bytes ?? Buffer.alloc(0)), evidenceDbSha256: db === null || db === undefined ? null : sha256Hex(db.bytes) },
       signing: { algorithm: policySigner.algorithm, auditorFingerprint: policySigner.fingerprint }
     });

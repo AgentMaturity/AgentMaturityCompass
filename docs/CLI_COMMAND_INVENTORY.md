@@ -448,7 +448,11 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc evidence verify` | Run full workspace verification suite | `--json`<br>`--expect-monitor <sha256>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unanchored` | - |
 | `amc evidence-stores` | Inspect the staged consolidation of databases outside evidence.sqlite | - | - |
 | `amc evidence-stores backfill` | Copy guard events written before dual-write into evidence.sqlite | - | - |
+| `amc evidence-stores cutover` | Move this workspace's guard events to evidence.sqlite, only when parity is identical (P2-09) | - | - |
+| `amc evidence-stores encrypt` | Encrypt existing inline evidence payloads under the ledger data key (P2-09) | `--key-provider <id>`<br>`--key-ref <id>`<br>`--rotate-key`<br>`--rewrap`<br>`--json` | - |
 | `amc evidence-stores parity` | Compare the legacy guard-event store against the consolidated one | `--json` | - |
+| `amc evidence-stores worm-export` | Export signed retention segments to an object-lock (WORM) bucket under a retention lock that cannot be shortened (P2-09) | `--bucket <name>`<br>`--retain-days <n>`<br>`--prefix <prefix>`<br>`--region <region>`<br>`--json` | - |
+| `amc evidence-stores worm-verify` | Verify a downloaded WORM export offline against a trust list (P2-09) | `--index <file>`<br>`--objects <dir>`<br>`--trust-list <file>` | - |
 | `amc executive` | Executive and board-ready AMC artifacts | - | - |
 | `amc executive brief` | Generate a board-ready one-page executive brief from a diagnostic run | `--agent <agentId>`<br>`--run <runId>`<br>`--out <path>`<br>`--format <format>`<br>`--title <title>` | - |
 | `amc experiment` | Deterministic baseline vs candidate experiments | - | - |

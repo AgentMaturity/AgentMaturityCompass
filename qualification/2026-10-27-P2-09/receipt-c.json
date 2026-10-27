@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "key": "P2-09",
+  "slice": "c-guard-events-cutover",
+  "date": "2026-10-27",
+  "branch": "rtd/p2-09c-guard-events-cutover",
+  "parent": "ec563cbd7",
+  "node": "v22.23.3",
+  "os": "macOS 26.6.2",
+  "arch": "arm64",
+  "commands": [
+    { "cmd": "npm run -s build", "exit": 0 },
+    { "cmd": "npm run -s typecheck", "exit": 0 },
+    { "cmd": "npm run -s typecheck:tests", "exit": 0 },
+    { "cmd": "npm run -s lint", "exit": 0 },
+    { "cmd": "npm run -s check:gates", "exit": 0 },
+    { "cmd": "npm run -s check:dead-code", "exit": 0, "new": 0 },
+    { "cmd": "npm run -s check:duplicates", "exit": 0, "new": 3, "note": "same 3 transformApi.ts findings as base" },
+    { "cmd": "npm run -s check:counts", "exit": 0 },
+    { "cmd": "npm run -s check:docs-drift", "exit": 0 },
+    { "cmd": "npm run -s check:architecture-boundaries", "exit": 0 },
+    { "cmd": "npm run -s check:api-ref", "exit": 0 },
+    { "cmd": "npx vitest run tests/guardEventCutover.test.ts tests/cliResultCommandRegistry.test.ts --maxWorkers=2", "exit": 0, "tests": 11, "failed": 0 },
+    { "cmd": "npx vitest run <74 files touching evidenceEmitter, guard events, retention, deletionGate> --maxWorkers=2", "exit": 1, "passed": 1728, "failed": 3, "note": "all 3 fail on base 7bdb1627a" }
+  ],
+  "redGreen": "tests/guardEventCutover.test.ts: 3/3 failed on the 09b source, 3/3 pass",
+  "mutations": [
+    { "guard": "identical-parity check (cutOverGuardEvents)", "failingTest": "guardEventCutover: refuses cutover while parity diverges and leaves the workspace in DUAL_WRITE" },
+    { "guard": "DUAL_WRITE prune of the evidence-store copy (retentionRun guardRows)", "failingTest": "guardEventCutover: prunes both stores after pruneGuardEventsAfterDays under DUAL_WRITE, keeping parity" }
+  ]
+}

@@ -1467,6 +1467,16 @@
       "reason": "removeSpillObject places the private unlink inside a fresh withDeletionGate callback after validating the reference and checked object path. It supplies explicit workspace and broad spill scope, without inferring shared-session coverage from the locator hash."
     },
     {
+      "siteId": "src/storage/consolidation/guardEventConsolidation.ts:98:1",
+      "path": "src/storage/consolidation/guardEventConsolidation.ts",
+      "line": 98,
+      "call": "DELETE FROM",
+      "category": "sqlite-delete-literal",
+      "source": "() => ledger.db.prepare(\"DELETE FROM amc_guard_events WHERE created_at < ?\").run(beforeIso));",
+      "status": "gated",
+      "reason": "P2-09c pruneConsolidatedGuardEvents prunes the evidence store's DUAL_WRITE copy of guard events inside a fresh withDeletionGate call for guard-events (executor guard-events.prune-consolidated), called by retention only under DUAL_WRITE so both stores stay in parity."
+    },
+    {
       "siteId": "src/studio/studioState.ts:102:1",
       "path": "src/studio/studioState.ts",
       "line": 102,

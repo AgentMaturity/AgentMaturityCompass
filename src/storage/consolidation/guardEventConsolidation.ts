@@ -19,12 +19,19 @@
  *                         file is left in place, untouched and complete, so
  *                         reverting is a setting change rather than a restore.
  *
- * The stage is read from AMC_GUARD_EVENTS_STAGE. It defaults to DUAL_WRITE
- * rather than CUTOVER because a consolidation that flips on upgrade is a
- * one-way migration wearing a staged migration's clothes.
+ * The stage is read from AMC_GUARD_EVENTS_STAGE when it names a stage (an
+ * operator override, in both directions). Otherwise a workspace is CUTOVER once
+ * `amc evidence-stores cutover` recorded `.amc/guard-events-stage.json`, which
+ * it writes only on identical parity (P2-09c), and DUAL_WRITE before that. It
+ * never flips on upgrade: a consolidation that did would be a one-way
+ * migration wearing a staged migration's clothes.
  */
 import Database from "better-sqlite3";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import { openLedger } from "../../ledger/ledger.js";
+import { withDeletionGate } from "../../residency/deletionGate.js";
+import { writeFileAtomic } from "../../utils/fs.js";
 import { sha256Hex } from "../../utils/hash.js";
 
 export type ConsolidationStage = "DUAL_WRITE" | "CUTOVER";
@@ -55,8 +62,44 @@ export interface StoreComparison {
   divergent: string[];
 }
 
-export function currentStage(): ConsolidationStage {
-  return process.env["AMC_GUARD_EVENTS_STAGE"] === "CUTOVER" ? "CUTOVER" : "DUAL_WRITE";
+/** The per-workspace record that guard events cut over, written only after identical parity (P2-09c). */
+export function guardEventStagePath(workspace: string): string {
+  return join(workspace, ".amc", "guard-events-stage.json");
+}
+
+/** AMC_GUARD_EVENTS_STAGE when it names a stage; else CUTOVER once this workspace recorded it; else DUAL_WRITE. */
+export function currentStage(workspace?: string): ConsolidationStage {
+  const configured = process.env["AMC_GUARD_EVENTS_STAGE"];
+  if (configured === "CUTOVER" || configured === "DUAL_WRITE") return configured;
+  return workspace !== undefined && existsSync(guardEventStagePath(workspace)) ? "CUTOVER" : "DUAL_WRITE";
+}
+
+/**
+ * Records CUTOVER for this workspace, refused unless the two stores are identical. The legacy file is not touched, so
+ * reverting is deleting the record or setting AMC_GUARD_EVENTS_STAGE=DUAL_WRITE.
+ */
+export function cutOverGuardEvents(params: { workspace: string; legacyDbPath: string }): { cutOver: boolean; comparison: StoreComparison } {
+  const comparison = compareGuardEventStores(params);
+  if (!comparison.identical) return { cutOver: false, comparison };
+  writeFileAtomic(guardEventStagePath(params.workspace), JSON.stringify({ v: 1, stage: "CUTOVER", ts: Date.now(),
+    legacyRows: comparison.legacyRows, consolidatedRows: comparison.consolidatedRows }, null, 2), 0o644);
+  return { cutOver: true, comparison };
+}
+
+/**
+ * Under DUAL_WRITE, prunes the evidence store's copy as `pruneGuardEvents` prunes the legacy file, through the same
+ * hold-aware deletion gate (P2-01), so both stores stay in parity and the copy is no longer something nothing prunes.
+ */
+export function pruneConsolidatedGuardEvents(workspace: string, beforeIso: string): number {
+  if (!Number.isFinite(Date.parse(beforeIso))) return 0;
+  const ledger = openLedger(workspace);
+  try {
+    const result = withDeletionGate({ workspace, executor: "guard-events.prune-consolidated", target: { kind: "guard-events", before: new Date(beforeIso).toISOString() } },
+      () => ledger.db.prepare("DELETE FROM amc_guard_events WHERE created_at < ?").run(beforeIso));
+    return Number(result.changes ?? 0);
+  } finally {
+    ledger.close();
+  }
 }
 
 /**
