@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { openLedger } from "../ledger/ledger.js";
 import { sha256Hex } from "../utils/hash.js";
 
@@ -8,7 +9,8 @@ export function appendOpsAuditEvent(params: {
   severity?: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
 }): { eventId: string; eventHash: string } {
   const ledger = openLedger(params.workspace);
-  const sessionId = `ops-${params.auditType.toLowerCase()}-${Date.now()}`;
+  // A random suffix: two audits of one type in the same millisecond must not collide on the session primary key.
+  const sessionId = `ops-${params.auditType.toLowerCase()}-${Date.now()}-${randomUUID()}`;
   const json = JSON.stringify({
     auditType: params.auditType,
     ...(params.payload ?? {})

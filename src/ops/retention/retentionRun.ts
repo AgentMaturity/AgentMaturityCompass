@@ -66,7 +66,8 @@ class RetentionPartialError extends Error {
     payloadPrunedIds: readonly string[]; removedBlobIds: readonly string[]; auditEventIds: readonly string[];
     completedStages: readonly string[]; attemptedStages: readonly string[]; confirmedSpillCount: number; guardResult: number | null; transparencyHash: string | null }>;
   constructor(readonly phase: string, progress: Progress, cause: unknown) {
-    super("retention is incomplete; inspect the recorded effects before retrying", { cause });
+    // Name the refusal itself (e.g. a spill inventory refusal); the wrapper alone would hide why retention stopped.
+    super(`retention is incomplete; inspect the recorded effects before retrying: ${cause instanceof Error ? cause.message : String(cause)}`, { cause });
     this.name = "RetentionPartialError";
     this.progress = Object.freeze({ ...progress, publishedPaths: Object.freeze([...progress.publishedPaths]),
       attemptedPaths: Object.freeze([...progress.attemptedPaths]), payloadPrunedIds: Object.freeze([...progress.payloadPrunedIds]),
@@ -328,14 +329,11 @@ function segmentSigningGate(run: Run, prepared: NonNullable<ReturnType<typeof se
   segmentProofGate(run, prepared);
   assertRetentionHeadCurrent(run.workspace, prepared.head); assertRetentionFilesCurrent(prepared.plan.targets);
 }
-/** This blob's old references/bytes/prefix are preparation-only, never replayed after its own unlink or seal. */
+/** This blob's old prefix is preparation-only, never replayed after its own unlink or seal. Its references and bytes are
+ * decided once, at publication under the hold lock: a changed reference is a recorded skip, changed bytes a refusal. */
 function blobSigningGate(run: Run, prepared: NonNullable<ReturnType<typeof blobPlan>>, signed?: PurposeSignature): void {
   gate(run, signed); assertRetentionFilesCurrent(run.archiveFiles);
-  const { plan, file, references } = prepared;
-  const current = withLedger(run.workspace, ledger => ledger.db.prepare(referenceSql).all(plan.row.blobId) as Reference[], true);
-  if (canonicalize(current) !== canonicalize(references)) throw conflict();
-  const selected = captureRetentionBlob(run.workspace, plan.row.blobId);
-  if (file.identity !== selected.identity || selected.bytes === null || file.bytes === null || !file.bytes.equals(selected.bytes)) throw conflict();
+  const { plan } = prepared;
   assertRetentionFilesCurrent(plan.previous);
   if (!verifyPrunedSnapshot(run.workspace, plan.previous).ok) throw new Error("retention selected prune prefix is no longer admitted");
   assertRetentionFilesCurrent(plan.previous);

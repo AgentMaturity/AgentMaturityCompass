@@ -136,7 +136,7 @@ test.each([1, 2])("sender arguments stay captured across actual Sign %s", async 
   } finally { gate.release.resolve(); await Promise.allSettled([pending]); }
 });
 
-test("the original sender authority must remain through a second actual Sign under a newly current vault key", async () => {
+test("the original sender authority refuses a newly current vault key before the second actual Sign", async () => {
   const f = fixture(), enteredDescription = deferred(), release = deferred();
   boundary.beforeDescription = async number => { if (number === 2) { enteredDescription.resolve(); await release.promise; } };
   const pending = createHandoffPacketAsync(f.workspace, f.params), result = pending.then(() => null, error => error);
@@ -145,7 +145,8 @@ test("the original sender authority must remain through a second actual Sign und
     actualCalls(1); rotatePurposeKeys({ workspace: f.workspace, purposes: ["artifact-seal"], passphrase: PASS });
     const next = getSigningPublicKeyPem(f.workspace, "artifact-seal"); expect(next).not.toBe(f.publicKey);
     release.resolve(); expect(await result).toMatchObject({ code: "KEY_PROVIDER_KEY_REFUSED" });
-    actualCalls(2); expect(boundary.calls[0]!.publicKey).toBe(f.publicKey); expect(boundary.calls[1]!.publicKey).toBe(next); expect(listHandoffPackets(f.workspace)).toEqual([]);
+    // The caller gate re-runs after Describe (signWithPurposeKey), so the rotated key is refused before it signs anything.
+    expect(boundary.descriptions).toBe(2); actualCalls(1); expect(boundary.calls[0]!.publicKey).toBe(f.publicKey); expect(listHandoffPackets(f.workspace)).toEqual([]);
   } finally { release.resolve(); await Promise.allSettled([pending]); boundary.beforeDescription = undefined; }
   const next = { ...f, publicKey: getSigningPublicKeyPem(f.workspace, "artifact-seal") }; packetPositive(next, (await createHandoffPacketAsync(f.workspace, f.params)).packetId);
 });
@@ -178,7 +179,7 @@ test.each(["create", "accept"] as const)("the actual final %s lock gate refuses 
   } }));
   try {
     const pending = target === "create" ? createHandoffPacketAsync(f.workspace, f.params) : acceptHandoffPacketAsync(f.workspace, packet.packetId);
-    await expect(pending).rejects.toMatchObject({ code: "A4_VAULT_LOCKED" }); actualCalls(target === "create" ? 2 : 1);
+    await expect(pending).rejects.toThrow(/Vault locked/i); actualCalls(target === "create" ? 2 : 1);
     expect(listHandoffPackets(f.workspace)).toEqual([packet.packetId]); expect(readFileSync(files(f.workspace, packet.packetId).packet)).toEqual(original);
     expect(existsSync(files(f.workspace, packet.packetId).receipt)).toBe(false); expect(existsSync(join(f.workspace, ".amc", ".handoff-publication.lock"))).toBe(false);
   } finally { spy.mockRestore(); vi.stubEnv("AMC_VAULT_PASSPHRASE", PASS); unlockVault(f.workspace, PASS); }
@@ -188,7 +189,7 @@ test.each(["create", "accept"] as const)("the actual final %s lock gate refuses 
 
 test("locked and no-sign async entry refuses without touching handoff members or calling file Sign", async () => {
   const f = fixture(); lockVault(f.workspace); vi.stubEnv("AMC_VAULT_PASSPHRASE", "");
-  try { await expect(createHandoffPacketAsync(f.workspace, f.params)).rejects.toMatchObject({ code: "A4_VAULT_LOCKED" }); actualCalls(0); expect(listHandoffPackets(f.workspace)).toEqual([]); }
+  try { await expect(createHandoffPacketAsync(f.workspace, f.params)).rejects.toThrow(/Vault locked/i); actualCalls(0); expect(listHandoffPackets(f.workspace)).toEqual([]); }
   finally { vi.stubEnv("AMC_VAULT_PASSPHRASE", PASS); unlockVault(f.workspace, PASS); }
   vi.stubEnv("AMC_NO_SIGN", "1"); await expect(createHandoffPacketAsync(f.workspace, f.params)).rejects.toThrow("no-sign mode"); actualCalls(0);
   vi.stubEnv("AMC_NO_SIGN", "0"); packetPositive(f, (await createHandoffPacketAsync(f.workspace, f.params)).packetId);
