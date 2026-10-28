@@ -1,5 +1,7 @@
 # AMC Open Rubric Standard v1.0
 
+> **Superseded by the AMC Core Spec 1.0 draft in spec/; kept for history.** See [spec/README.md](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/spec/README.md). Nothing in this document is normative.
+
 **Agent Maturity Compass — Open Assessment Framework**
 
 > A structured, vendor-neutral rubric for evaluating the maturity of AI agent deployments across strategy, autonomy, culture, resilience, and skills.
@@ -10,7 +12,7 @@
 
 This rubric document is licensed under **[CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/)**. You are free to share, adapt, and build upon this rubric for any purpose, including commercial use, provided you give appropriate attribution.
 
-> **Note:** The AMC software, scoring engine, and tooling are proprietary. This open rubric covers the assessment framework and question definitions only.
+> **Note:** The AMC software, scoring engine and tooling are licensed under the repository licence (MIT, `LICENSE`). Licences for the spec, catalog content and code are pending decision D-04. This rubric covers the assessment framework and question definitions only.
 
 Attribution: `Agent Maturity Compass (AMC) by AgentMaturityCompass contributors`
 

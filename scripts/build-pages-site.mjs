@@ -160,12 +160,42 @@ export async function copySpec(output) {
     }
   }
   const { marked } = await import(pathToFileURL(resolve(repositoryRoot, "node_modules/marked/lib/marked.esm.js")).href);
-  for (const [source, target, title] of [["README.md", "index.html", "AMC public contracts"],
-    ["ACCEPTANCE_RULES.md", "acceptance-rules.html", "AMC acceptance rules"]]) {
-    const html = marked.parse(readFileSync(resolve(specRoot, source), "utf8")).replace(/href="ACCEPTANCE_RULES\.md"/g, 'href="acceptance-rules.html"');
-    writeFileSync(resolve(output, "spec", target), `<!doctype html>\n<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${title}</title><link rel="stylesheet" href="../brand.css"></head><body><main>\n${html}</main></body></html>\n`, "utf8");
+  const pages = specPages(specRoot);
+  for (const [source, target] of pages) {
+    const markdown = readFileSync(resolve(specRoot, source), "utf8");
+    const title = escapeHtml(/^# (.+)$/m.exec(markdown)?.[1] ?? "AMC specification");
+    const depth = target.split("/").length - 1;
+    const html = rewriteSpecLinks(marked.parse(markdown), source, pages);
+    const file = resolve(output, "spec", target);
+    mkdirSync(dirname(file), { recursive: true });
+    writeFileSync(file, `<!doctype html>\n<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${title}</title><link rel="stylesheet" href="${"../".repeat(depth + 1)}brand.css"></head><body><main>\n${html}</main></body></html>\n`, "utf8");
   }
   return index.schemas.map(row => row.$id);
+}
+
+const escapeHtml = (text) => text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+/** P1-30: every spec page rendered under /spec/: [source under spec/, target under <out>/spec/]. */
+export function specPages(specRoot) {
+  const pages = new Map([["README.md", "index.html"], ["ACCEPTANCE_RULES.md", "acceptance-rules.html"], ["CHANGELOG.md", "changelog.html"]]);
+  for (const dir of ["core", "annex", "rfcs"]) {
+    const full = resolve(specRoot, dir);
+    if (!existsSync(full)) continue;
+    for (const name of readdirSync(full).filter((file) => file.endsWith(".md")).sort()) {
+      pages.set(`${dir}/${name}`, `${dir}/${name === "README.md" ? "index.html" : name.replace(/\.md$/, ".html")}`);
+    }
+  }
+  return pages;
+}
+
+/** Relative links to a rendered spec page point at its HTML; other repository files point at GitHub. */
+export function rewriteSpecLinks(html, source, pages) {
+  return html.replace(/href="([^"#:]+?\.md)(#[^"]*)?"/g, (_whole, href, hash = "") => {
+    const target = new URL(href, `https://spec.invalid/${source}`).pathname.slice(1);
+    const page = pages.get(target);
+    if (page) return `href="${relative(dirname(`/${pages.get(source)}`), `/${page}`) || page}${hash}"`;
+    return `href="https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/spec/${target}${hash}"`;
+  });
 }
 
 async function readDocsBuildManifest() {

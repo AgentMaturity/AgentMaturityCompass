@@ -1,5 +1,7 @@
 # Open Compass Standard
 
+> The normative text is the AMC Core Spec 1.0 draft in [spec/](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/spec/README.md). This page documents the schema bundle.
+
 Open Compass Standard provides signed JSON Schemas for AMC artifacts so external tools can validate payloads without linking AMC internals.
 
 Every schema is generated from the zod schema AMC itself parses with, so it states what AMC enforces. The same files are committed under [`spec/schemas/v1/`](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/spec/README.md) and served at their `$id` (`https://agentmaturity.co/spec/schemas/v1/<name>.schema.json`); `amc standard generate` writes identical bytes. [`spec/ACCEPTANCE_RULES.md`](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/spec/ACCEPTANCE_RULES.md) lists the checks a verifier runs beyond shape.

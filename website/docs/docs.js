@@ -700,6 +700,7 @@ function showWelcome() {
         <a href="#NATIVE_AGENT_WORKFLOW" onclick="event.preventDefault();loadDoc('NATIVE_AGENT_WORKFLOW')"><span>04</span> Run a Native Agent</a>
         <a href="#SECURITY" onclick="event.preventDefault();loadDoc('SECURITY')"><span>05</span> Security</a>
         <a href="#EU_AI_ACT_COMPLIANCE" onclick="event.preventDefault();loadDoc('EU_AI_ACT_COMPLIANCE')"><span>06</span> Compliance</a>
+        <a href="../spec/index.html"><span>07</span> AMC Core Spec (draft)</a>
       </div>
 
       <h2>Featured Guides</h2>
