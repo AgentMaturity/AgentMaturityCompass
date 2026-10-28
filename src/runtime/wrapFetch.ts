@@ -23,6 +23,8 @@ export interface WrapFetchOptions {
   retryNonIdempotent?: boolean;
   circuitName?: string;
   steerPipeline?: SteerPipeline;
+  /** Trusted workspace for the egress check; absent uses the scoped fallback (ALS scope, else an unregulated cwd only). */
+  workspace?: string;
 }
 
 export type FetchLike = typeof fetch;
@@ -295,6 +297,9 @@ async function applyLiquidStreamingTransform(
   });
 }
 
+/** A 3xx is returned, never followed: the egress check covered only the URL it was given (as residencyFetch does). */
+const noFollow = (init: RequestInit): RequestRedirect => init.redirect === "error" ? "error" : "manual";
+
 export function wrapFetch(originalFetch: FetchLike, opts: WrapFetchOptions): FetchLike {
   const providerId = providerFromGatewayBase(opts.gatewayBaseUrl);
   const timeoutMs = normalizePositiveInt(opts.timeoutMs, 30_000);
@@ -356,7 +361,8 @@ export function wrapFetch(originalFetch: FetchLike, opts: WrapFetchOptions): Fet
         note: `race fan-out to ${raceOptions.candidates.length} candidates`
       });
 
-      const raceResult = await raceModels(finalInit, { ...raceOptions, agentId: opts.agentId });
+      const raceWorkspace = raceOptions.workspace ?? opts.workspace;
+      const raceResult = await raceModels(finalInit, { ...raceOptions, workspace: raceWorkspace, agentId: opts.agentId });
 
       // Find the winning candidate's full result to build a proper Response
       const winnerIdx = raceResult.candidates.findIndex(c => c.id === raceResult.winnerId);
@@ -364,9 +370,10 @@ export function wrapFetch(originalFetch: FetchLike, opts: WrapFetchOptions): Fet
 
       // Re-fetch the winner to get the actual Response object
       // (raceModels consumed the response bodies for scoring)
-      checkScopedEgress(raceOptions.workspace, "provider", winnerCandidate.url, { agentId: opts.agentId, dataClasses: null, purpose: "steer-race" });
+      checkScopedEgress(raceWorkspace, "provider", winnerCandidate.url, { agentId: opts.agentId, dataClasses: null, purpose: "steer-race" });
       const fetchWinner = await originalFetch(winnerCandidate.url, {
         ...finalInit,
+        redirect: noFollow(finalInit),
         ...(winnerCandidate.headers ? { headers: mergeHeaders(finalInit.headers, winnerCandidate.headers) } : {}),
         ...(winnerCandidate.bodyOverrides && typeof finalInit.body === "string" ? {
           body: JSON.stringify({ ...JSON.parse(finalInit.body), ...winnerCandidate.bodyOverrides })
@@ -422,6 +429,8 @@ export function wrapFetch(originalFetch: FetchLike, opts: WrapFetchOptions): Fet
 
     let lastError: unknown;
     for (let attempt = 1; attempt <= totalAttempts; attempt += 1) {
+      // Synchronous, before each dispatch and outside the try: a typed refusal (isEgressRefusal) is never retried or caught.
+      checkScopedEgress(opts.workspace, "provider", finalUrl, { agentId: opts.agentId, dataClasses: null, purpose: "wrap-fetch" });
       try {
         const timeoutSignal = AbortSignal.timeout(timeoutMs);
         const response = await withCircuitBreaker(
@@ -429,6 +438,7 @@ export function wrapFetch(originalFetch: FetchLike, opts: WrapFetchOptions): Fet
           () =>
             originalFetch(finalUrl as RequestInfo | URL, {
               ...finalInit,
+              redirect: noFollow(finalInit),
               signal: combineSignals(finalInit.signal ?? undefined, timeoutSignal)
             }),
           { timeoutMs: timeoutMs + 1000 }

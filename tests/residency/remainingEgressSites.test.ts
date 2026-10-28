@@ -7,6 +7,10 @@ import { mkdirSync, mkdtempSync, realpathSync, rmSync, writeFileSync } from "nod
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+import { probeDestination } from "../../src/a4/a4DeployVerify.js";
+import type { EgressCheck } from "../../src/enforce/egressAllowlist.js";
+import { sendA4Error } from "../../src/a4/a4Router.js";
+import { LLMApiClient } from "../../src/eval/llmApiIntegration.js";
 import { installHookIntegration } from "../../src/adapters/hookIntegration.js";
 import { forwardProviderHookEvent } from "../../src/adapters/hookForwarder.js";
 import { postToBridge, type PiHookConfig } from "../../src/adapters/pi/piControlClient.js";
@@ -208,5 +212,141 @@ describe("steer race fan-out", () => {
       steerPipeline: createSteerPipeline({ stages: [createRaceStage({ workspace, candidates: [{ id: "a", url: `${origin.url}/a` }] })] }) });
     await expect(wrapped(`${origin.url}/v1`, { method: "POST", body: "{}" })).rejects.toBeInstanceOf(KillSwitchDenied);
     expect(original).not.toHaveBeenCalled();
+  });
+});
+
+describe("wrapFetch ordinary dispatch", () => {
+  const wrap = (original: typeof fetch, extra: { maxRetries?: number } = {}) => wrapFetch(original, { agentId: "default",
+    gatewayBaseUrl: origin.url, forceBaseUrl: false, workspace, retryBaseDelayMs: 1, ...extra });
+
+  test("without a block the request reaches the provider", async () => {
+    expect((await wrap(fetch)(`${origin.url}/v1`, { method: "POST", body: "{}" })).status).toBe(201);
+    expect(origin.connections).toBe(1);
+  });
+
+  for (const [name, arrange, type] of BLOCKS) {
+    test(`${name} refuses typed before any socket, without a retry`, async () => {
+      await arrange();
+      const original = vi.fn(fetch);
+      await expect(wrap(original, { maxRetries: 3 })(`${origin.url}/v1`, { method: "GET" })).rejects.toBeInstanceOf(type);
+      expect(original).not.toHaveBeenCalled();
+      expect(origin.connections).toBe(0);
+    });
+  }
+
+  test("a kill that lands after a retriable status refuses the retry", async () => {
+    const original = vi.fn(async () => { await kill(); return new Response("busy", { status: 503 }); });
+    await expect(wrap(original, { maxRetries: 3 })(`${origin.url}/v1`, { method: "GET" })).rejects.toBeInstanceOf(KillSwitchDenied);
+    expect(original).toHaveBeenCalledTimes(1);
+  });
+
+  test("a race stage without its own workspace is checked against wrapFetch's", async () => {
+    blockResidency();
+    const original = vi.fn(fetch);
+    const wrapped = wrapFetch(original, { agentId: "default", gatewayBaseUrl: origin.url, forceBaseUrl: false, workspace,
+      steerPipeline: createSteerPipeline({ stages: [createRaceStage({ candidates: [{ id: "a", url: `${origin.url}/a` }] })] }) });
+    await expect(wrapped(`${origin.url}/v1`, { method: "POST", body: "{}" })).rejects.toBeInstanceOf(EgressBlocked);
+    expect(original).not.toHaveBeenCalled();
+    expect(origin.connections).toBe(0);
+  });
+});
+
+describe("A4 deployment verify (AMC's own operator traffic)", () => {
+  const egress = { addresses: ["127.0.0.1"], decision: { allowed: true, reason: "fixture" } } as unknown as EgressCheck;
+  const ready = Buffer.from(JSON.stringify({ status: "READY", reasons: [], checks: {}, ts: 1 }));
+  const fetched = () => vi.fn(async () => ({ status: 200, body: ready }));
+
+  test("an active kill switch does not refuse the readyz and healthz GETs (agentId system)", async () => {
+    await kill();
+    const fetch = fetched();
+    expect((await probeDestination(workspace, "deploy.example:8443", egress, fetch)).amcCheckStatus).toBe("reachable");
+    expect(fetch).toHaveBeenCalledTimes(2);
+  });
+
+  test("a residency block refuses typed before either GET", async () => {
+    blockResidency();
+    const fetch = fetched();
+    await expect(probeDestination(workspace, "deploy.example:8443", egress, fetch)).rejects.toBeInstanceOf(EgressBlocked);
+    expect(fetch).not.toHaveBeenCalled();
+  });
+});
+
+describe("wrapFetch and race never follow a redirect past the egress check", () => {
+  let redirector: Server;
+  let redirectUrl: string;
+  beforeEach(async () => {
+    // Every path answers 302 to the origin server, a destination these requests never checked.
+    redirector = createServer((req, res) => { req.resume(); res.writeHead(302, { location: `${origin.url}/elsewhere` }).end(); });
+    await new Promise<void>((done) => redirector.listen(0, "127.0.0.1", () => done()));
+    redirectUrl = `http://127.0.0.1:${(redirector.address() as { port: number }).port}`;
+  });
+  afterEach(async () => {
+    redirector.closeAllConnections();
+    await new Promise<void>((done) => redirector.close(() => done()));
+  });
+
+  test("ordinary dispatch returns the 302 unfollowed", async () => {
+    const wrapped = wrapFetch(fetch, { agentId: "default", gatewayBaseUrl: redirectUrl, forceBaseUrl: false, workspace });
+    expect((await wrapped(`${redirectUrl}/v1`, { method: "GET" })).status).toBe(302);
+    expect(origin.connections).toBe(0);
+  });
+
+  test("a race candidate's 302 is not followed", async () => {
+    await raceModels({ method: "POST", body: "{}" }, { workspace, agentId: "default", candidates: [{ id: "a", url: `${redirectUrl}/a` }] })
+      .catch(() => undefined);
+    expect(origin.connections).toBe(0);
+  });
+
+  test("the generic LLM API client does not follow a provider 302", async () => {
+    const client = new LLMApiClient({ provider: "openai", apiKey: "k", baseUrl: `${redirectUrl}/v1`, timeout: 5_000, maxRetries: 0, rateLimit: 1000, workspace });
+    await expect(client.request({ model: "m", prompt: "p", temperature: 0, maxTokens: 1 })).rejects.toThrow(/OpenAI API error: 302/);
+    expect(origin.connections).toBe(0);
+  });
+
+  test("the race winner re-fetch returns the 302 unfollowed", async () => {
+    const realFetch = globalThis.fetch;
+    vi.spyOn(globalThis, "fetch").mockImplementation(async () => new Response(JSON.stringify({ choices: [{ message: { content: "answer" } }] })));
+    const wrapped = wrapFetch((input, init) => realFetch(input, init), { agentId: "default", gatewayBaseUrl: redirectUrl, forceBaseUrl: false, workspace,
+      steerPipeline: createSteerPipeline({ stages: [createRaceStage({ candidates: [{ id: "a", url: `${redirectUrl}/a` }] })] }) });
+    expect((await wrapped(`${redirectUrl}/v1`, { method: "POST", body: "{}" })).status).toBe(302);
+    expect(origin.connections).toBe(0);
+  });
+});
+
+describe("generic LLM API client provider dispatch", () => {
+  const client = (captureWire: boolean) => new LLMApiClient({ provider: "openai", apiKey: "k", baseUrl: `${origin.url}/v1`, timeout: 5_000,
+    maxRetries: 2, rateLimit: 1000, workspace, agentId: "default", captureWire });
+  // captureWire true is the strict judge wrapper: its regulated preflight refuses before dispatch here; it shares this dispatch and catch.
+  for (const captureWire of [false]) {
+    for (const [name, arrange, type] of BLOCKS) {
+      test(`${name} refuses typed before any socket, without a retry (captureWire ${captureWire})`, async () => {
+        await arrange();
+        const spy = vi.spyOn(globalThis, "fetch");
+        await expect(client(captureWire).request({ model: "m", prompt: "p", temperature: 0, maxTokens: 1 })).rejects.toBeInstanceOf(type);
+        expect(spy).not.toHaveBeenCalled();
+        expect(origin.connections).toBe(0);
+      });
+    }
+  }
+});
+
+describe("A4 router answers an egress refusal by name", () => {
+  const answer = (error: unknown) => {
+    const res = { headersSent: false, status: 0, body: "", writeHead(status: number) { this.status = status; return this; },
+      end(body: string) { this.body = body; } };
+    sendA4Error(res as never, error, "p-1");
+    return { status: res.status, body: JSON.parse(res.body) as { code: string; error: string } };
+  };
+
+  test("a residency block is 403 AMC_RESIDENCY_EGRESS_BLOCKED, not the generic 500", async () => {
+    blockResidency();
+    const refusal = await probeDestination(workspace, "deploy.example:8443", { addresses: ["127.0.0.1"], decision: { allowed: true, reason: "fixture" } } as unknown as EgressCheck,
+      vi.fn()).then(() => null, (error: unknown) => error);
+    expect(refusal).toBeInstanceOf(EgressBlocked);
+    expect(answer(refusal)).toEqual({ status: 403, body: expect.objectContaining({ ok: false, code: "AMC_RESIDENCY_EGRESS_BLOCKED" }) });
+  });
+
+  test("an active kill switch is 403 KILL_SWITCH_ACTIVE", () => {
+    expect(answer(new KillSwitchDenied("kill_switch_active"))).toEqual({ status: 403, body: expect.objectContaining({ code: "KILL_SWITCH_ACTIVE" }) });
   });
 });

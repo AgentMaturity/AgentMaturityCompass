@@ -96,6 +96,8 @@ async function fetchCandidate(
       ...baseInit,
       headers,
       body: bodyStr,
+      // A 3xx is never followed: the egress check covered only the candidate URL.
+      redirect: baseInit.redirect === "error" ? "error" : "manual",
       signal: controller.signal,
     });
 

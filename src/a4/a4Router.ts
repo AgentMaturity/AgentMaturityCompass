@@ -24,6 +24,7 @@ import { signingRoute } from "../crypto/signing/signer.js";
 import { getAgentPaths } from "../fleet/paths.js";
 import { highSeveritySecretTypes } from "../release/releaseSecretScan.js";
 import { requestTrustOverride } from "../trust/requestTrust.js";
+import { EgressBlocked, isEgressRefusal } from "../residency/checkEgress.js";
 import { pathExists } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
@@ -92,7 +93,7 @@ export function assertQuery(params: URLSearchParams, allowed: readonly string[])
 
 /**
  * A client value (body, path segment, query parameter) parsed against `schema`: 400 INPUT_INVALID on a mismatch. Any
- * other ZodError is a stored row that no longer parses, which sendError reports as an integrity failure.
+ * other ZodError is a stored row that no longer parses, which sendA4Error reports as an integrity failure.
  */
 function parseInput<S extends z.ZodType>(schema: S, value: unknown, what = "body"): z.output<S> {
   const parsed = schema.safeParse(value);
@@ -235,7 +236,8 @@ export function precheck(route: A4Route, projectId: string, action: A4Action, ex
   return state;
 }
 
-function sendError(res: ServerResponse, error: unknown, projectId: string | null): void {
+/** Every A4 route error as the API answers it; an egress refusal (nothing was sent) is a definite 403 by name, never A4_INTERNAL. */
+export function sendA4Error(res: ServerResponse, error: unknown, projectId: string | null): void {
   if (isRequestBodyError(error)) return apiError(res, error.statusCode, error.message);
   const send = (status: number, code: string, message: string, extra: Record<string, unknown> = {}): void => {
     if (res.headersSent) return;
@@ -247,6 +249,7 @@ function sendError(res: ServerResponse, error: unknown, projectId: string | null
     const issue = error.issues[0];
     return send(409, "A4_INTEGRITY_FAILED", `A stored A4 record does not parse${issue ? ` (${issue.path.join(".") || "row"}: ${issue.message})` : ""}.`);
   }
+  if (isEgressRefusal(error)) return send(403, error instanceof EgressBlocked ? "AMC_RESIDENCY_EGRESS_BLOCKED" : error.code, error.message);
   if (error instanceof A4TransitionPublicationError) return send(error.status, error.code, error.message, { detail: error.detail });
   if (error instanceof A4StoreError) {
     const stale = error.code === "A4_STALE_HEAD" && projectId !== null
@@ -776,7 +779,7 @@ export async function serveA4(route: Omit<A4Route, "store" | "assertGateRequestC
   try {
     store = openA4Store(route.workspace);
   } catch (error) {
-    sendError(route.res, error, null);
+    sendA4Error(route.res, error, null);
     return;
   }
   try {
@@ -787,7 +790,7 @@ export async function serveA4(route: Omit<A4Route, "store" | "assertGateRequestC
       ? captureA4RequestActor(route) : undefined;
     await dispatch({ ...route, store, assertGateRequestCurrent: original });
   } catch (error) {
-    sendError(route.res, error, PROJECT_PATH.exec(route.pathname.slice(A4_API_PREFIX.length))?.[1] ?? null);
+    sendA4Error(route.res, error, PROJECT_PATH.exec(route.pathname.slice(A4_API_PREFIX.length))?.[1] ?? null);
   } finally {
     store.close();
   }

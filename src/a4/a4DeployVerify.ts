@@ -15,6 +15,7 @@ import tls from "node:tls";
 import { z } from "zod";
 import { pinnedLookup } from "../gateway/requestFieldGuard.js";
 import { isNonPublicAddress, resolveAndCheck, type EgressCheck } from "../enforce/egressAllowlist.js";
+import { checkEgress } from "../residency/checkEgress.js";
 import { assertOwnerMode } from "../mode/mode.js";
 import { loadTrustContext } from "../trust/trustContext.js";
 import { buildVerifierReport } from "../trust/verifierReport.js";
@@ -98,15 +99,24 @@ function fetchPinned(host: string, port: number, address: string, path: string, 
 type Check = { name: string; status: "passed" | "failed" | "not_evaluated"; detail: string };
 export type ProbeResult = { checks: Check[]; amcCheckStatus: "reachable" | "failed"; reasonCodes: string[]; resolvedAddress: string | null; responseSha256: string | null };
 
-/** `/readyz` decides the status (READY → reachable, anything else → failed); `/healthz` is recorded beside it. */
-export async function probeDestination(destinationRef: string, egress: EgressCheck, fetch: typeof fetchPinned = fetchPinned): Promise<ProbeResult> {
+/**
+ * `/readyz` decides the status (READY → reachable, anything else → failed); `/healthz` is recorded beside it. Each GET is
+ * AMC's own operator traffic: residency for the workspace applies immediately before it (agentId system, so a kill does
+ * not refuse it), and a typed refusal propagates rather than becoming a failed check.
+ */
+export async function probeDestination(workspace: string, destinationRef: string, egress: EgressCheck,
+  fetch: typeof fetchPinned = fetchPinned): Promise<ProbeResult> {
   const [host, rawPort] = destinationRef.split(":");
   const port = rawPort === undefined ? 443 : Number(rawPort);
   const address = egress.addresses[0]!;
   // One 5 s deadline for both requests.
   const signal = AbortSignal.timeout(TIMEOUT_MS);
-  const readyz = await fetch(host!, port, address, "/readyz", signal);
-  const healthz = await fetch(host!, port, address, "/healthz", signal);
+  const get = (path: string): Promise<Fetched> => {
+    checkEgress({ workspace, channel: "network-tool", url: `https://${destinationRef}${path}`, agentId: "system", dataClasses: null, purpose: "a4-deploy-verify" });
+    return fetch(host!, port, address, path, signal);
+  };
+  const readyz = await get("/readyz");
+  const healthz = await get("/healthz");
   const parse = <T>(fetched: Fetched, schema: z.ZodType<T>): { value: T | null; code: string | null } => {
     if ("error" in fetched) return { value: null, code: fetched.error };
     try {
@@ -182,7 +192,7 @@ export async function verifyDeployment(store: A4Store, projectId: string, releas
     if (!egress.decision.allowed && egress.unresolved !== true) {
       throw fail(409, "VERIFY_EGRESS_REFUSED", `AMC does not connect to ${host}: ${egress.decision.reason}`, { addresses: egress.addresses });
     }
-    probed = egress.decision.allowed ? await probe(destination, egress)
+    probed = egress.decision.allowed ? await probe(store.workspace, destination, egress)
       : { checks: [{ name: "destination", status: "failed", detail: egress.decision.reason }], amcCheckStatus: "failed", reasonCodes: ["DESTINATION_UNRESOLVED"],
         resolvedAddress: null, responseSha256: null };
   }
