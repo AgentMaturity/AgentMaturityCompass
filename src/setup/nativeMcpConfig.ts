@@ -10,6 +10,7 @@ import { discoverNativeMcpCatalog, nativeMcpToolName, type NativeMcpCatalog, typ
 import type { ActionClass } from "../types.js";
 import { NativeMcpHttpRefused, nativeMcpHttpEndpoint, nativeMcpNotificationLifetime, validateNativeMcpHeaderNames } from "../mcp/nativeMcpHttpTransport.js";
 import { isNativeMcpProtocolVersion } from "../mcp/protocol/version.js";
+import { isEgressRefusal } from "../residency/checkEgress.js";
 import { NativeMcpOAuthRefused, nativeMcpOAuthUrl, nativeMcpScopes } from "../mcp/oauth/discovery.js";
 import { NativeMcpOAuthTokenStore } from "../mcp/oauth/tokenStore.js";
 import {
@@ -215,9 +216,12 @@ export async function resolveNativeMcpServer(config: NativeMcpConfiguration, opt
   if (server.transport === "streamable-http" && source.transport === "streamable-http" && source.auth) {
     try {
       const { accessToken, receipt } = await resolveNativeMcpOAuth({ endpoint: nativeMcpHttpEndpoint(server.url, server.origin),
-        config: source.auth, store: oauthStore(options), timeoutMs: source.timeoutMs ?? 30_000 });
+        config: source.auth, store: oauthStore(options), timeoutMs: source.timeoutMs ?? 30_000, workspace: options.workspace });
       return { ...server, headers: { Authorization: `Bearer ${accessToken}` }, auth: receipt };
-    } catch (error) { return refuse(oauthFailure(error)); }
+    } catch (error) {
+      if (isEgressRefusal(error)) throw error; // a typed preflight refusal, never an OAuth failure
+      return refuse(oauthFailure(error));
+    }
   }
   if (references === undefined || Object.keys(references).length === 0) return server;
   let store: LocalCredentialsService | undefined;
@@ -270,8 +274,11 @@ export async function authorizeNativeMcpCatalog(config: NativeMcpConfiguration, 
   const authorize = async (extraScopes?: readonly string[]) => {
     try {
       receipt = await authorizeNativeMcpOAuth({ endpoint, config: auth, store, timeoutMs, onAuthorizationUrl: options.onAuthorizationUrl,
-        ...(extraScopes ? { extraScopes } : {}), ...(options.signal ? { signal: options.signal } : {}) });
-    } catch (error) { refuse(oauthFailure(error)); }
+        workspace: options.workspace, ...(extraScopes ? { extraScopes } : {}), ...(options.signal ? { signal: options.signal } : {}) });
+    } catch (error) {
+      if (isEgressRefusal(error)) throw error;
+      refuse(oauthFailure(error));
+    }
   };
   await authorize();
   let server: NativeMcpServer | undefined;

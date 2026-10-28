@@ -2,7 +2,7 @@ import { resolve } from "node:path";
 import { ControlCheckpointRootInWorkspaceError, loadActiveCompiledPolicy,
   type ActiveCompiledPolicy } from "../catalog/compiler/activate.js";
 import { emitGuardEvent, getWorkspaceScope } from "../enforce/evidenceEmitter.js";
-import { assertEgressNotKilled } from "../runtime/killSwitch.js";
+import { assertEgressNotKilled, KillSwitchDenied } from "../runtime/killSwitch.js";
 import { sha256Hex } from "../utils/hash.js";
 import { loadDestinationRegistrySnapshot, loadPinnedResidencyProfile } from "./destinationRegistry.js";
 import { EGRESS_CHANNELS, type CheckEgressInput, type DestinationRecordV1, type DestinationRegistryV1, type EgressChannel,
@@ -21,6 +21,9 @@ export class EgressBlocked extends Error {
     this.controlResult = Object.freeze({ ...controlResult, controlIds: Object.freeze([...controlResult.controlIds]) });
   }
 }
+/** A preflight refusal from checkEgress: a residency block or an active kill. Either means nothing was sent. */
+export const isEgressRefusal = (error: unknown): error is EgressBlocked | KillSwitchDenied =>
+  error instanceof EgressBlocked || error instanceof KillSwitchDenied;
 /**
  * `cause` is appended to the EgressBlocked message only. That message leaves the process: the gateway returns it in its
  * HTTP error body, LlmRuntime records it as the request failure, and tool and MCP refusals carry it. So `cause` is fixed

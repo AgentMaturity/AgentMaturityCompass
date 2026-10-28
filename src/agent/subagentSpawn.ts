@@ -59,6 +59,11 @@ export interface SubagentRunContext {
   /** The signed delegation packet that authorized this child; its authorization records name it as their parent. */
   readonly packetId?: string;
   /**
+   * The lease of the run that spawned this child (P2-25), passed explicitly from the parent's composition, never looked
+   * up by a name the model chose. Absent for a child of the root run, whose parent lease is the runner's own.
+   */
+  readonly parentLeaseToken?: string;
+  /**
    * The action classes this child is authorised for, validated.
    *
    * Absent means unrestricted, which is deliberately distinct from an empty
@@ -198,6 +203,8 @@ export interface SpawnSubagentInit {
    * two actually happened.
    */
   readonly cancelGraceMs?: number;
+  /** The spawning run's own lease (P2-25); see `SubagentRunContext.parentLeaseToken`. Absent at the root. */
+  readonly parentLeaseToken?: string;
 }
 
 export type SubagentOutcome =
@@ -450,6 +457,7 @@ export async function spawnSubagent(init: SpawnSubagentInit): Promise<SubagentOu
   }
   const first = await execute(() => runner({ continuable: request.continuable === true,
     toolsetAgentId: identity.governedAs, identity, childSessionId, goal: request.goal, packetId,
+    ...(init.parentLeaseToken === undefined ? {} : { parentLeaseToken: init.parentLeaseToken }),
     ...(scopeClasses === undefined ? {} : { delegationScope: scopeClasses }),
     ...(request.stopConditions === undefined ? {} : { stopConditions: stops.conditions }), signal: controller.signal }));
   if (!first.ok) return { ok: false, reason: first.reason ?? closeReason, packetId,

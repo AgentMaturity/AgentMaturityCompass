@@ -1,0 +1,95 @@
+{
+ "schemaVersion": 1,
+ "key": "P2-34",
+ "date": "2026-10-27",
+ "commit": "fc86c813c9fffe24dca009815118aee11aaf00f4",
+ "branch": "rtd/w3-p2-34",
+ "node": "v22.23.3",
+ "pnpm": "10.33.0",
+ "os": "macOS 26.6.2",
+ "arch": "arm64",
+ "commands": [
+  {
+   "cmd": "npm run -s build",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s typecheck",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s typecheck:tests",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s lint",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:gates",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:dead-code",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:duplicates",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:counts",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:api-ref",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:docs-drift",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:schemas",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:architecture-boundaries",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npx vitest run tests/a4 tests/a4GuardQualification.test.ts tests/a4OwnerModeQualification.test.ts tests/keys/a4SigningProbe.test.ts tests/keys/a4ActivateSigningProbe.test.ts tests/architectureBoundaries.test.ts tests/verifier/parityWithAmc.test.ts tests/approvalRecordCompatibility.test.ts tests/lifecycle tests/runtime/changeEnvelope.test.ts tests/runtime/killSwitch.test.ts tests/ops/regimeRetention.test.ts --maxWorkers=2",
+   "exit": 0,
+   "durationMs": 0
+  }
+ ],
+ "tests": {
+  "total": 185,
+  "passed": 185,
+  "failed": 0,
+  "skipped": 0
+ },
+ "artifacts": [
+  {
+   "path": "mutations.json",
+   "sha256": "44b13495a9e0664486d2acd6536a4784d331dedaa3400cf6639f08ca9e244bc3"
+  },
+  {
+   "path": "README.md",
+   "sha256": "caf78ce1207d755299ddf768f4bbeeb05be6760f0b7c7789b0ef2e66df43c9df"
+  }
+ ],
+ "notes": "Totals are the focused set (25 files, 185 tests). The full npm test suite was not run. durationMs not measured (0). node scripts/check-freeze.mjs fails on keys from other items (P1-65, P0-37, P2-23, ...), not P2-34: this item adds no CLI command."
+}

@@ -114,6 +114,7 @@ for every control in the catalog, applicable or not.
 | `toolPipeline.visibleTools` | `tool_pipeline` | `intersection` | tool names |
 | `toolPipeline.approvalRequiredFor` | `tool_pipeline` | `union` | action classes |
 | `toolPipeline.requireAgentLease`, `toolPipeline.requirePrincipal` | `tool_pipeline` (guard `identity-binding`) | `true_wins` | boolean |
+| `toolPipeline.maxLeaseTtlMinutes` | `tool_pipeline` (guard `identity-binding`) | `min` | integer >= 1 |
 | `approvals.<ActionClass>.requiredApprovals` | `approvals` | `max` | integer >= 0 |
 | `approvals.<ActionClass>.requireDistinctUsers` | `approvals` | `true_wins` | boolean |
 | `approvals.<ActionClass>.rolesAllowed` | `approvals` | `intersection` | user roles |

@@ -9,7 +9,9 @@ import { A4_STAGE_STATES } from "./a4Project.js";
 export const A4_TRANSITION_KINDS = [
   "CREATED", "STEP", "REVISION", "GATE_REQUESTED", "GATE_DECIDED", "GATE_CONSUMED", "EFFECT_GATE_OPENED", "EFFECT_STARTED",
   "EFFECT_FINISHED", "EFFECT_FAILED", "CHANGES_REQUESTED", "HOLD", "RESUME", "REOPEN", "MEMBER", "GATE_POLICY_CHANGED",
-  "EVIDENCE_REF", "ACKNOWLEDGED", "RELEASE", "DEPLOYMENT", "VERIFICATION", "ROLLBACK", "TUNE", "RETIRE", "COMMENT"
+  "EVIDENCE_REF", "ACKNOWLEDGED", "RELEASE", "DEPLOYMENT", "VERIFICATION", "ROLLBACK", "TUNE", "RETIRE", "COMMENT",
+  // P2-36: the owner erasure action (src/a4/a4Erasure.ts); a4_transitions.kind is TEXT, so no table rebuild.
+  "ERASED"
 ] as const;
 export type A4TransitionKind = (typeof A4_TRANSITION_KINDS)[number];
 

@@ -150,7 +150,8 @@ export function a4Endpoints(): Record<string, Record<string, OpenApiOperation>> 
   }
   for (const [action, body, summary] of [["hold", "A4Reason", "Hold the project (owner)"], ["resume", "A4Reason", "Resume once any freeze is lifted (owner)"],
     ["reopen", "A4Reopen", "Move back to an earlier stage (owner)"], ["tune", "A4Tune", "Tune a deployed project (owner; stage derived)"],
-    ["retire", "A4Retire", "Retire the project (owner, or the creator of a never-proposed draft)"]] as const) {
+    ["retire", "A4Retire", "Retire the project (owner, or the creator of a never-proposed draft)"],
+    ["private/erase", "A4Reason", "Erase the project's private text (owner, owner mode): destroys the project key through the P2-01 deletion gate (409 DELETION_DENIED under a hold) and records ERASED; effective only once older backups, WORM segments and mirrors are rotated out"]] as const) {
     paths[`${p}/${action}`] = { post: write(summary, body) };
   }
   return paths;

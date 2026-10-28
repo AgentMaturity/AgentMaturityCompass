@@ -3,6 +3,7 @@ import { getSigningKey } from "../crypto/keys.js";
 import { canonicalize } from "../utils/json.js";
 import type { ActionClass } from "../types.js";
 import { leasePayloadSchema, type LeasePayload, type LeaseScope } from "./leaseSchema.js";
+import { leaseLifetimeRefusal, regulatedLeaseProfile } from "./regulatedProfile.js";
 
 import { resolve } from "node:path";
 import { publicKeyFromPrivate } from "../crypto/keyHistoryEnvelope.js";
@@ -34,12 +35,20 @@ export interface IssueLeaseInput {
   executeActionClasses?: ActionClass[];
   /** The users.yaml user the lease is issued for (P1-78); see `LeasePayload.principal`. */
   principal?: LeasePayload["principal"];
+  /**
+   * Lease v2 (P2-25): the signed delegation chain (stored with `saveDelegationChain`) and the SPIFFE ID the issuer verified
+   * for its leaf delegate. The verifier refuses the lease when that chain is missing, does not verify, is revoked or does
+   * not end at this agent.
+   */
+  delegation?: { readonly chainDigest: string; readonly spiffeId: string | null; readonly ancestorLeaseIds?: readonly string[] };
 }
 
 function createLeasePayload(input: IssueLeaseInput): LeasePayload {
   const now = Date.now();
+  const lifetime = leaseLifetimeRefusal(regulatedLeaseProfile(input.workspace), Math.max(60_000, input.ttlMs));
+  if (lifetime !== null) throw new Error(`lease refused: ${lifetime}`);
   const payload = leasePayloadSchema.parse({
-    v: 1,
+    v: input.delegation === undefined ? 1 : 2,
     leaseId: `lease_${randomUUID().replace(/-/g, "")}`,
     issuedTs: now,
     expiresTs: now + Math.max(60_000, input.ttlMs),
@@ -55,7 +64,9 @@ function createLeasePayload(input: IssueLeaseInput): LeasePayload {
     maxRequestsPerMinute: input.maxRequestsPerMinute,
     maxCostUsdPerDay: input.maxCostUsdPerDay,
     nonce: randomUUID().replace(/-/g, ""),
-    ...(input.principal === undefined ? {} : { principal: input.principal })
+    ...(input.principal === undefined ? {} : { principal: input.principal }),
+    ...(input.delegation === undefined ? {} : { delegationChainDigest: input.delegation.chainDigest, spiffeId: input.delegation.spiffeId,
+      ...(input.delegation.ancestorLeaseIds === undefined ? {} : { ancestorLeaseIds: [...input.delegation.ancestorLeaseIds] }) })
   });
 
   return payload;

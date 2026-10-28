@@ -28,6 +28,7 @@ import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { auditA4 } from "./a4Audit.js";
 import { controlResultsNow } from "./a4Conformance.js";
+import { memoryRetentionFloor } from "./adaptMemoryPolicy.js";
 import { releaseEntries } from "./a4Transparency.js";
 import { blockingExecutionsIn, engineRequestStatusesIn, unrecordedResolutionsIn } from "./assembleLockout.js";
 import { resolveRefs } from "./a4Evidence.js";
@@ -41,6 +42,8 @@ import {
   A4_STAGES, DEFAULT_A4_GATE_POLICY, a4DecisionRowSchema, a4EvidenceRefRowSchema, a4GatePolicyV1Schema, a4GateRowSchema, a4IntentV1Schema,
   a4RevisionRowSchema, flatSlots, gatePolicyDigestOf, gatePolicyOf, mapRiskTier, type A4GatePolicyV1, type A4IntentV1, type A4Principal, type A4ReadinessV1, type A4Stage
 } from "./a4Schema.js";
+import { ledgerBackendGap } from "./a4LedgerBackend.js";
+import { A4_RUNTIME, holdIncidentIds, retireGovernedAgent, syncRuntimeLifecycle, tuneStage } from "./a4RuntimeLifecycle.js";
 import { authorsOf, buildersOf, evaluateSod } from "./a4SoD.js";
 import { ensureA4Stages } from "./a4Stages.js";
 import {
@@ -61,8 +64,7 @@ export interface A4Call {
   readonly integrity?: A4LiveFacts["integrity"];
 }
 type Facts = Pick<A4Call, "hostedRouter" | "hostMode" | "fullIntegrity" | "integrity">;
-/** Writes the server makes on its own behalf (automatic hold, effect outcomes); never a person. */
-export const A4_RUNTIME: A4Actor = { key: "amc-runtime", username: "amc-runtime" };
+export { A4_RUNTIME };
 export const DAY_MS = 86_400_000;
 const EXPIRING_GUARD_MS = 60_000;
 const NOTARY_RETRY_MS = 5 * 60_000;
@@ -219,11 +221,13 @@ function collectFacts(store: A4Store, state: A4ReadinessState, call: Facts, appr
     // From the signed CREATED body, never the unsigned head row; a chain without one counts every user (fail closed).
     usersAddedSinceCreated: usersCreatedSince(workspace, typeof createdTs === "number" ? createdTs : 0),
     hostSessionsSinceCreated: hostSessionsSince(workspace, typeof createdTs === "number" ? createdTs : 0),
+    ledgerBackendGap: ledgerBackendGap(workspace, store.ledger.db),
     lostEffects: state.effects.filter((row) => row.state === "running" && effectOwnerLost(row, Date.now() - DEFAULT_ACTION_STALE_AFTER_MS)).map((row) => row.effect_id),
     blockingExecutions: blocking,
     unrecordedResolutions: stage === "assemble" ? unrecordedResolutionsOf(store, state.chain, blocking) : null,
     engineRequests: stage === "assemble" ? engineRequestStatusesIn(workspace, state.project.agent_id, state.chain, blocking ?? []) : null,
-    ...(stage === "adapt" ? { controlResults: controlResultsNow(workspace, state), sessionStore: resolveSessionStoreBackend(workspace) } : {}),
+    ...(stage === "adapt" ? { controlResults: controlResultsNow(workspace, state), sessionStore: resolveSessionStoreBackend(workspace),
+      retentionFloor: memoryRetentionFloor(workspace) } : {}),
     ...(stage === "activate" ? { packageSigningRoute: collectRoute(workspace, "A4_PACKAGE"), packageTransparency: releaseEntries(workspace, state.chain), ...leasePrincipalFacts(workspace) } : {})
   };
 }
@@ -286,7 +290,8 @@ export function assertAllowed(readiness: A4ReadinessV1, action: A4Action, ignore
  * The automatic HOLD by amc-runtime naming the incidents (design §6.6); a project already held is left as it is. Like a
  * manual hold it is mirrored to the human action log and the A4_HOLD integration event, best effort.
  */
-export function autoHold(store: A4Store, projectId: string, incidentIds: readonly string[]): void {
+export function autoHold(store: A4Store, projectId: string, freezeIds: readonly string[]): void {
+  const incidentIds = holdIncidentIds(store.workspace, freezeIds); // a kill switch's own incident beside its id (P2-34)
   let held: { agentId: string; name: string; reason: string } | null = null;
   try {
     const result = store.transition(projectId, A4_RUNTIME, ({ head }) => {
@@ -305,12 +310,15 @@ export function autoHold(store: A4Store, projectId: string, incidentIds: readonl
   }
 }
 
-/** Refuses under an active or unreadable freeze, writing the automatic hold first. */
+/** Refuses under an active or unreadable freeze (a kill switch included), writing the automatic hold first; else consumes the runtime's changes. */
 export function refuseOnFreeze(store: A4Store, projectId: string): void {
   const head = store.readHead(projectId);
   if (head === null) throw fail(404, "A4_PROJECT_NOT_FOUND", `no A4 project ${projectId}`);
   const { freeze } = refreshVolatileFacts(store.workspace, head);
-  if (freeze !== null && !freeze.active) return;
+  if (freeze !== null && !freeze.active) {
+    syncRuntimeLifecycle(store, projectId); // P2-34: the runtime's change records move a deployed project first
+    return;
+  }
   autoHold(store, projectId, freeze?.incidentIds ?? []);
   throw fail(409, "FREEZE_ACTIVE", "An incident freeze is active for this agent; the project is held until it is lifted and an owner resumes.");
 }
@@ -665,9 +673,6 @@ export function reopenStage(store: A4Store, projectId: string, input: A4Call & {
   }, "a4 reopen");
 }
 
-/** The Assemble-bound slots: a TUNE whose head revision differs from the deployed one in any of them reopens Assemble. */
-const ASSEMBLE_SLOTS = /^(enforce|composition|graph)\./;
-
 /**
  * TUNE (owner, deployed projects only; design §6.6): the stage is derived — Assemble when the owner flags a capability
  * change or any Assemble-bound slot of the head revision differs from the deployed release's revision, else Adapt.
@@ -680,39 +685,44 @@ export function tuneProject(store: A4Store, projectId: string, input: A4Call & {
   return headTransition(store, projectId, input, "tune", (state) => {
     const releaseId = state.project.deployed_release_id;
     if (releaseId === null) throw fail(409, "A4_NOT_DEPLOYED", "Only a deployed project is tuned; retire it to start over.");
-    const release = releases.find((row) => row.release_id === releaseId);
-    const slotsOf = (revisionNo: unknown) => flatSlots(JSON.parse(state.revisions.find((row) => row.revision_no === revisionNo)?.resource_digests_json ?? "{}"));
-    const deployed = slotsOf(release?.revision_no), head = slotsOf(state.project.revision_no);
-    const assemble = input.capabilityChange || release === undefined
-      || Object.keys({ ...deployed, ...head }).some((slot) => ASSEMBLE_SLOTS.test(slot) && deployed[slot] !== head[slot]);
+    const stage = tuneStage(state.revisions, releases, releaseId, state.project.revision_no, input.capabilityChange);
     return { kind: "TUNE", payload: { baseReleaseId: releaseId, capabilityChange: input.capabilityChange, mechanicPlanId: input.mechanicPlanId ?? null, reason: input.reason },
-      head: { stage: assemble ? "assemble" : "adapt", step: "asked", base_release_id: releaseId } };
+      head: { stage, step: "asked", base_release_id: releaseId } };
   }, "a4 tune");
 }
 
 const PRE_PROPOSAL_STEPS = new Set(["asked", "understood", "explained"]);
+type RetireInput = A4Call & { reason: string; acceptanceNote?: string; expectedHeadSeq: number };
+/** RETIRE's plan; `lifecycle` names P2-23's retirement row when the agent was retired with the project. */
+function retirePlan(store: A4Store, principal: A4Principal, input: RetireInput, state: A4ReadinessState, now: number, lifecycle: { lifecycleEventId: string } | null) {
+  if (state.project.stage === "retired") throw fail(409, "A4_RETIRED", "The project is already retired.");
+  const { readiness } = evaluateFor(store, state, principal, input, state.project.stage, now);
+  // "Never reached proposed" from the signed head states (an answers REVISION keeps the step before proposed), and the
+  // creator from the signed CREATED body, never the unsigned head row.
+  const draftCreator = state.chain[0]?.kind === "CREATED" && state.chain[0].body.actorKey === principal.key
+    && state.chain.every((link) => PRE_PROPOSAL_STEPS.has(String((link.body.headAfter as { step?: unknown } | undefined)?.step)));
+  assertAllowed(readiness, "retire", draftCreator ? ["PRINCIPAL_ROLE_INSUFFICIENT"] : []);
+  if (state.effects.some((effect) => effect.state === "running") && !input.acceptanceNote?.trim()) {
+    throw fail(409, "OUTCOME_UNKNOWN_OPEN", "An effect is still running; record an owner acceptance note to retire anyway.");
+  }
+  return { readiness, specs: { kind: "RETIRE" as const, payload: { reason: input.reason, acceptanceNote: input.acceptanceNote ?? null,
+    ...(lifecycle === null ? {} : { lifecycleRetirement: lifecycle }) }, head: { stage: "retired" as const } } };
+}
+
 /**
  * RETIRE (owner; or the creator of a project that never reached `proposed`, so an abandoned draft never holds the agent's
- * slot, answers or not). Refused while an effect is running unless an owner acceptance note is recorded.
+ * slot, answers or not). Refused while an effect is running unless an owner acceptance note is recorded. A deployed
+ * project's agent is retired through P2-23 first, after the same plan passed (P2-34; design §6.6).
  */
-export function retireProject(store: A4Store, projectId: string, input: A4Call & { reason: string; acceptanceNote?: string; expectedHeadSeq: number }): A4TransitionResult {
+export async function retireProject(store: A4Store, projectId: string, input: RetireInput): Promise<A4TransitionResult> {
   const principal = livePrincipal(store, input);
   assertOwnerMode(store.workspace, "a4 retire");
+  refuseOnFreeze(store, projectId); // before P2-23 is asked: a frozen project retires nothing, there or here
   const now = Date.now();
-  return governed(store, projectId, principal, input, (_ts, load) => {
-    const state = load(now);
-    if (state.project.stage === "retired") throw fail(409, "A4_RETIRED", "The project is already retired.");
-    const { readiness } = evaluateFor(store, state, principal, input, state.project.stage, now);
-    // "Never reached proposed" from the signed head states (an answers REVISION keeps the step before proposed), and the
-    // creator from the signed CREATED body, never the unsigned head row.
-    const draftCreator = state.chain[0]?.kind === "CREATED" && state.chain[0].body.actorKey === principal.key
-      && state.chain.every((link) => PRE_PROPOSAL_STEPS.has(String((link.body.headAfter as { step?: unknown } | undefined)?.step)));
-    assertAllowed(readiness, "retire", draftCreator ? ["PRINCIPAL_ROLE_INSUFFICIENT"] : []);
-    if (state.effects.some((effect) => effect.state === "running") && !input.acceptanceNote?.trim()) {
-      throw fail(409, "OUTCOME_UNKNOWN_OPEN", "An effect is still running; record an owner acceptance note to retire anyway.");
-    }
-    return { readiness, specs: { kind: "RETIRE", payload: { reason: input.reason, acceptanceNote: input.acceptanceNote ?? null }, head: { stage: "retired" } } };
-  });
+  const before = loadA4State(store, projectId, now);
+  retirePlan(store, principal, input, before, now, null);
+  const lifecycle = await retireGovernedAgent(store.workspace, before.project, principal, input);
+  return governed(store, projectId, principal, input, (_ts, load) => retirePlan(store, principal, input, load(now), now, lifecycle));
 }
 
 /**

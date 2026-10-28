@@ -22,7 +22,7 @@ A licence unlocks access to Industry Pack questions and runs. It never changes a
 | **Passport** | ✅ Full | ✅ Full | ✅ Full |
 | **Comply** | ✅ Full | ✅ Full | ✅ Full |
 | **All 14 adapters** | ✅ Full | ✅ Full | ✅ Full |
-| **1,263 CLI command paths** | ✅ Full | ✅ Full | ✅ Full |
+| **1,268 CLI command paths** | ✅ Full | ✅ Full | ✅ Full |
 | **Browser playground** | ✅ Full | ✅ Full | ✅ Full |
 | **CI trust gates** | ✅ Full | ✅ Full | ✅ Full |
 | **Industry Packs** (41 verticals) | ❌ | ✅ All 41 packs | ✅ All 41 packs |

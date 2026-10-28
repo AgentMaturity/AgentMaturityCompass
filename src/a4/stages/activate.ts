@@ -24,6 +24,7 @@ import { monitorRecord } from "../a4Monitor.js";
 import { AMC_ROOT, captureInputs, enforceSnapshot, PRODUCTION_LEASE_EFFECT, RELEASE_EFFECT, writeReleaseRecord } from "../a4Package.js";
 import { isRegulated } from "../a4Readiness.js";
 import { recordReviewResults } from "../a4Value.js";
+import { KILL_SWITCH_HOLD } from "../a4RuntimeLifecycle.js";
 import type { A4ProducerContext, A4ProducerResult } from "../a4RouterStages.js";
 import type { A4Answer, A4StageRegistry } from "../a4Schema.js";
 import { errorCodeOf } from "../aspireUnderstand.js";
@@ -158,9 +159,9 @@ function activateFacts(spec: Record<string, unknown>, answers: readonly A4Answer
       practitioner: `recorded_status comes from the operator; amc_check_status is AMC's probe of the destination, reachable at best in v1: ${IDENTITY_NOT_EVALUATED}. A failed check blocks the deployment approval.`,
       expert: "amc_check_status ∈ not_evaluated | reachable | passed | failed; passed needs a release-identifying check (P2-40); verify runs through resolveAndCheck pinned to the receipt's destinationRef." },
     { id: "operate", sources: ["design §14.4", "P2-34", "P2-26"], dataStatus: null,
-      novice: "Monitoring, update rules and rollback are recorded. The update policy is written down but nothing enforces it yet, and there is no kill switch in this release.",
+      novice: "Monitoring, update rules and rollback are recorded. The update policy is written down but nothing enforces it yet, and an active kill switch holds the project until it is released and an owner resumes.",
       practitioner: "Monitoring refs are self_reported; the update policy is signed inside the package with enforcement none (P2-34); rollback restores the Enforce snapshot and revokes leases "
-        + "without moving the lifecycle backwards; the kill switch is not available in this release (P2-26).",
+        + `without moving the lifecycle backwards; ${KILL_SWITCH_HOLD} (P2-34).`,
       expert: "monitor refs: stage_output, lane implementation, one ClaimEnvelope per source folded with envelopeForAggregate; update policy enforcement: none." }
   ];
 }
@@ -218,7 +219,7 @@ function propose(ctx: A4ProducerContext): A4ProducerResult {
       effect: RELEASE_EFFECT_ID },
     monitoringPlan: { expectations: textValue(values.get("monitoringExpectations")), slos: ["readyz", "ledger_verify", "outcome_unknown_open", "backup_age", "gateway_failures"],
       alerts: ["pod not ready", "ledger verify failure", "open outcome_unknown", "stale backup", "gateway failures", "/readyz"].map((rule) => ({ rule, status: "proposal" })),
-      killSwitch: "not available in this release (P2-26)" },
+      killSwitch: KILL_SWITCH_HOLD },
     // The release running in production now (as it stands at Propose; the release record fixes it when the package is built).
     rollbackPlan: { releaseId: productionReleaseOf(state.chain), acceptance: textValue(values.get("rollbackAcceptance")),
       steps: ["a high or critical risk tier: an incident freeze first, and the project holds", "an owner previews the rollback and opens its DEPLOY engine request (a4.activate.rollback)",
@@ -244,7 +245,7 @@ const LIMITATIONS = [
   `The image is pinned by tag (IMAGE_TAG_ONLY): ${IMAGE_TAG_ONLY_REASON}.`,
   "D-03 keeps Helm, Compose, Railway and Vercel documented, and A4 v1 prepares Compose and Helm only (D-18). Neither is qualified in CI: Helm passed its qualification checks locally only, and Railway and Vercel stay unqualified.",
   "rollback_plan_validated and operator_handoff_acknowledged stay not evaluated until AMC's check can pass (P2-40), so the lifecycle stays at staging.",
-  "The update policy is signed and not enforced (P2-34); the kill switch is not available in this release (P2-26).",
+  `The update policy is signed and not enforced (P2-34); ${KILL_SWITCH_HOLD}.`,
   "The SLO source is in-memory and unsigned: the monitor record carries it self_reported with evidence incomplete.",
   "Independently reviewed value needs an admitted external record naming the KPI and its window (P2-24, P3-21)."
 ];

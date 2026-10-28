@@ -11,7 +11,7 @@ import { captureRunHashAuthority } from "../ledger/runHashSignature.js";
 import { captureOrgFiles, assertOrgPairsCurrent, orgPairBytes } from "../org/preparedOrgPairs.js";
 import { assertKeysetComplete, keysetFileRel, keysetPaths } from "../keys/keyset.js";
 import { getAgentPaths, fleetAgentsDir } from "../fleet/paths.js";
-import { readSessionStoreMarker } from "../persistence/openSessionEventStore.js";
+import { openSessionEventStore, readSessionStoreMarker } from "../persistence/openSessionEventStore.js";
 import { readEventRows } from "../persistence/jsonl/jsonlEventLog.js";
 import { captureRetentionProofs } from "../ops/retention/retentionArchive.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -125,8 +125,15 @@ function verifierInputSelection(workspace: string, db: Database.Database) {
     }
   }
   const events = db.prepare("SELECT * FROM evidence_events ORDER BY rowid ASC").all() as Record<string, unknown>[];
-  if (readSessionStoreMarker(workspace) === "jsonl") {
+  const marker = readSessionStoreMarker(workspace);
+  if (marker === "jsonl") {
     try { events.push(...readEventRows(workspace) as unknown as Record<string, unknown>[]); } catch { /* Actual verifier retains invalid-backend verdict; raw log remains captured. */ }
+  } else if (marker === "postgres") {
+    // An unreadable Postgres store is an error in the packet's own verifier verdict (verifyAlternateBackendEvidence).
+    try {
+      const store = openSessionEventStore(workspace, "postgres", { readOnly: true });
+      try { events.push(...store.readAllEvents() as unknown as Record<string, unknown>[]); } finally { store.close(); }
+    } catch { /* see above */ }
   }
   const retained = captureRetentionProofs(workspace);
   for (const archived of retained.index.archivedEvents.values()) events.push(archived.event as unknown as Record<string, unknown>);

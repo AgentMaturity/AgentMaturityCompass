@@ -103,6 +103,8 @@ function registrationRefusal(found: ReturnType<typeof piSessionRegistration>, pi
 function governedSession(input: { ledger: Parameters<typeof piSessionRegistration>[0]; agentId: string; call: HookCall; now: number; leaseId?: string }):
   { refusal: string | null; enforced: boolean; version: string | null } {
   const { call } = input;
+  // ACS (P2-19): no installation registers an ACS runtime, so a decision is advisory and its session is not checked.
+  if (call.acs) return { refusal: null, enforced: false, version: call.acs.version };
   if (call.pi) {
     const found = piSessionRegistration(input.ledger, input.agentId, call.sessionId);
     const refusal = registrationRefusal(found, call.pi)
@@ -163,12 +165,12 @@ export function boundDecisionFacts(call: HookCall, facts: { version: string | nu
   targets: ReadonlyArray<{ name: string; args: Record<string, unknown> }> }): Record<string, unknown> {
   const { authorization } = facts;
   return {
-    [call.pi ? "piVersion" : "claudeCodeVersion"]: facts.version,
+    [call.pi ? "piVersion" : call.acs ? "acsVersion" : "claudeCodeVersion"]: facts.version,
     authorizationRecordDigest: authorization?.ok ? authorization.digest : null,
     ...(authorization?.ok ? { authorizedAction: { toolName: authorization.record.action.toolName, actionClass: authorization.record.action.actionClass,
       argumentsDigest: authorization.record.action.argumentsDigest } } : {}),
     leaseId: facts.lease?.leaseId ?? null,
-    ...(call.pi ? {} : { claudePayloadSha256: call.payloadSha256,
+    ...(call.pi || call.acs ? {} : { claudePayloadSha256: call.payloadSha256,
       resolvedTargetsSha256: sha256Hex(canonicalize(facts.targets.map(({ name, args }) => ({ name, args })))) }),
   };
 }

@@ -10,7 +10,7 @@
  * deployed agent before the release's succeeded deploy receipt is recorded (the bound one): the journal counts only
  * executions started since that receipt's server-recorded time, outside A4's own probe sessions. The newest such row of
  * this agent is named for Review's post-commit step (src/a4/a4Value.ts) to record as its own ledger_event ref, whose lane
- * derives from that row; nothing here labels a lane. The kill switch is not available in this release (P2-26).
+ * derives from that row; nothing here labels a lane. The kill switch field states the hold rule (KILL_SWITCH_HOLD, P2-34).
  */
 import { envelopeForAggregate } from "../claims/eligibility/adapters/results.js";
 import { evaluateClaimEligibility } from "../claims/eligibility/evaluate.js";
@@ -26,11 +26,12 @@ import { ledgerRefClaim } from "./a4Evidence.js";
 import { readReleaseRecord } from "./a4Package.js";
 import { latestGate, type A4ReadinessState } from "./a4Readiness.js";
 import { A4_PROBE_SESSION_PREFIX, type A4ChainLink } from "./a4Schema.js";
+import { KILL_SWITCH_HOLD } from "./a4RuntimeLifecycle.js";
 import { blockingExecutionsIn } from "./assembleLockout.js";
 import { boundReceipt, cycleLinks, monitorResolves, PRODUCTION_LEASE_EFFECT_ID, RELEASE_EFFECT_ID } from "./spec/activate.js";
 
 const MONITOR_SCHEMA = "amc.a4-monitor/v1";
-const KILL_SWITCH = "not available in this release (P2-26)";
+const KILL_SWITCH = KILL_SWITCH_HOLD;
 const SLO_NOTE = "in-memory measurements, unsigned: governanceSlo keeps its state in this process and writes no ledger row";
 /** governanceSlo's report covers every agent of this Studio and labels none, so it cannot be scoped to one project. */
 const SLO_SCOPE = "process_wide: this Studio process's SLO report labels no agent, so it is not scoped to this agent";

@@ -197,6 +197,9 @@ function currentStore(workspace: string) {
   let backend: "sqlite" | "jsonl" | null = null;
   if (marker !== null) {
     const parsed: unknown = JSON.parse(marker.toString("utf8"));
+    if (parsed && typeof parsed === "object" && "backend" in parsed && parsed.backend === "postgres") {
+      throw new RepairRefused("this workspace's session store is Postgres; repair covers local SQLite and JSONL files only, so restore Postgres from the database's own backups");
+    }
     if (!parsed || typeof parsed !== "object" || !("backend" in parsed) || (parsed.backend !== "sqlite" && parsed.backend !== "jsonl")) throw new RepairRefused("session-store marker is invalid");
     backend = parsed.backend;
   }

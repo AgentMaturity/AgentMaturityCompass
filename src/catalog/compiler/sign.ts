@@ -51,7 +51,7 @@ const RUNTIME_RULES: Rules = [
   [/^(toolPipeline\.visibleTools|egress\.allowHosts|egress\.processorAllowlist)$|\.rolesAllowed$/, { kind: "addedIsWeaker" }],
   [/^toolPipeline\.approvalRequiredFor$|^toolPipeline\.guards\[[^\]]+\]$|^approvals\.[A-Z_]+$/, { kind: "removedIsWeaker" }],
   [/\.requiredApprovals$/, { kind: "floor", absent: -Infinity }],
-  [/\.ttlMinutes$/, { kind: "ceiling", absent: Infinity }],
+  [/\.(ttlMinutes|maxLeaseTtlMinutes)$/, { kind: "ceiling", absent: Infinity }],
   [/\.(requireDistinctUsers|requireAgentLease|requirePrincipal)$/, { kind: "falseIsWeaker" }]
 ];
 const EVIDENCE_RULES: Rules = [

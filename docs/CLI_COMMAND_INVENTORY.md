@@ -450,6 +450,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc evidence-stores backfill` | Copy guard events written before dual-write into evidence.sqlite | - | - |
 | `amc evidence-stores cutover` | Move this workspace's guard events to evidence.sqlite, only when parity is identical (P2-09) | - | - |
 | `amc evidence-stores encrypt` | Encrypt existing inline evidence payloads under the ledger data key (P2-09) | `--key-provider <id>`<br>`--key-ref <id>`<br>`--rotate-key`<br>`--rewrap`<br>`--json` | - |
+| `amc evidence-stores migrate` | Copy this SQLite workspace's session history to Postgres, check parity, then pin the Postgres session store (P2-09) | `--to <backend>`<br>`--json` | - |
 | `amc evidence-stores parity` | Compare the legacy guard-event store against the consolidated one | `--json` | - |
 | `amc evidence-stores worm-export` | Export signed retention segments to an object-lock (WORM) bucket under a retention lock that cannot be shortened (P2-09) | `--bucket <name>`<br>`--retain-days <n>`<br>`--prefix <prefix>`<br>`--region <region>`<br>`--json` | - |
 | `amc evidence-stores worm-verify` | Verify a downloaded WORM export offline against a trust list (P2-09) | `--index <file>`<br>`--objects <dir>`<br>`--trust-list <file>` | - |
@@ -600,6 +601,10 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc identity provider` | Identity provider management | - | - |
 | `amc identity provider add` | Add an identity provider | `--host-dir <path>`<br>`--id <providerId>`<br>`--display-name <name>`<br>`--issuer <issuer>`<br>`--client-id <id>`<br>`--client-secret-file <path>`<br>`--redirect-uri <uri>`<br>`--scopes <scopes>`<br>`--use-well-known <bool>`<br>`--authorization-endpoint <url>`<br>`--token-endpoint <url>`<br>`--jwks-uri <url>`<br>`--entry-point <url>`<br>`--idp-cert-file <path>`<br>`--sp-entity-id <id>`<br>`--acs-url <url>` | - |
 | `amc identity verify` | Verify identity.yaml signature | `--host-dir <path>` | - |
+| `amc identity workload-trust` | Signed workload trust config: pinned SPIFFE bundles, agent-token issuers and bindings (experimental) | - | - |
+| `amc identity workload-trust publish` | Validate a YAML workload trust config and publish it signed with the auditor key (owner mode) | - | - |
+| `amc identity workload-trust show` | Show what the verified workload trust config pins (names and counts, no key material) | `--json` | - |
+| `amc identity workload-trust verify` | Verify the workload trust config's signature and schema; exits 1 when it does not verify | - | - |
 | `amc import` | Import neutral traces, runs, workflow graphs, configs, memory, evals, and benchmarks | `--agent <agentId>`<br>`--dry-run`<br>`--validate`<br>`--json`<br>`--expected-digest <sha256>`<br>`--no-retain-original` | - |
 | `amc imports` | List, inspect, and roll back neutral import runs | - | - |
 | `amc imports list` | List recent neutral import runs | `--limit <n>`<br>`--json` | - |

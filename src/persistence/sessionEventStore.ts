@@ -31,7 +31,7 @@ import type { EvidenceEvent, EvidenceEventType, RuntimeName, SessionRecord } fro
 import type { SessionWriteFence } from "../session/sessionOwnership.js";
 
 /** Backends shipped in-tree. A new backend adds a member and a conformance run. */
-export type SessionStoreBackendId = "sqlite" | "jsonl";
+export type SessionStoreBackendId = "sqlite" | "jsonl" | "postgres";
 
 /**
  * One session event to append.

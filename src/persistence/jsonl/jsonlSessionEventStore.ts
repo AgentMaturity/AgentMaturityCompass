@@ -41,17 +41,15 @@ import { join } from "node:path";
 import type { EvidenceEvent, SessionRecord } from "../../types.js";
 import { assertSessionWriteAllowed } from "../../session/sessionOwnership.js";
 import { verifyStoredSessionEventMetadata } from "../sessionStoreVerification.js";
-import { canonicalMetadataForHash } from "../../ledger/eventHash.js";
 import { ensureSigningKeys, signHexDigestWith } from "../../crypto/keys.js";
 import { cachedSigningKey } from "../../keys/cachedSigningKey.js";
 import { withOperationalLedgerRow } from "../../keys/operationalLedgerWriter.js";
 import { workspaceSelfTrust } from "../../trust/trustContext.js";
 import { loadOpsPolicy } from "../../ops/policy.js";
 import { queueEvidenceEventSpan } from "../../observability/otelExporter.js";
-import { storeEncryptedBlob } from "../../storage/blobs/blobStore.js";
-import { ensureDir, pathExists, writeFileAtomic } from "../../utils/fs.js";
+import { ensureDir } from "../../utils/fs.js";
 import { readSessionRecords, type SessionLifecycleLine } from "./sessionRecords.js";
-import { sha256Hex } from "../../utils/hash.js";
+import { buildSessionEventRow, EMPTY_SESSION_SEAL_DIGEST, GLOBAL_GENESIS, storeSessionPayload } from "../sessionEventRows.js";
 import {
   SESSION_STORE_READ_ONLY,
   SESSION_STORE_SEALED,
@@ -74,9 +72,6 @@ import {
   readEventRows,
   serializeEventRow
 } from "./jsonlEventLog.js";
-
-/** Sentinel head of the global chain, identical to the ledger's. */
-const GLOBAL_GENESIS = "GENESIS";
 
 export class JsonlSessionEventStore implements SessionEventStore {
   readonly workspace: string;
@@ -194,43 +189,12 @@ export class JsonlSessionEventStore implements SessionEventStore {
     const ts = input.ts ?? Date.now();
     return withOperationalLedgerRow(this.workspace, "jsonl-evidence", input.meta, ts, metadata => {
       if ((lastEventHash(this.workspace) ?? GLOBAL_GENESIS) !== this.headHash) throw new Error("the JSONL head changed outside this writer; reopen and verify it");
-      const stored = this.storePayload(input.payload);
-      const metaJson = JSON.stringify(metadata);
-      const canonicalMetadata = canonicalMetadataForHash({
-        id,
-        ts,
-        sessionId: input.sessionId,
-        runtime: input.runtime,
-        eventType: input.eventType,
-        payloadPath: stored.path,
-        payloadInline: null,
-        metaJson
+      const stored = storeSessionPayload(this.workspace, this.getOpsPolicy(), input.payload);
+      const row = buildSessionEventRow({
+        id, ts, input, metaJson: JSON.stringify(metadata), stored, prevHash: this.headHash,
+        sign: (digest) => this.signMonitorDigest(digest)
       });
-      const eventHash = sha256Hex(`${this.headHash}${canonicalMetadata}${stored.sha}`);
-      const writerSig = this.signMonitorDigest(eventHash);
-
-      const row: EvidenceEvent = {
-        id,
-        ts,
-        session_id: input.sessionId,
-        runtime: input.runtime,
-        event_type: input.eventType,
-        payload_path: stored.path,
-        payload_inline: null,
-        payload_sha256: stored.sha,
-        meta_json: metaJson,
-        prev_event_hash: this.headHash,
-        event_hash: eventHash,
-        writer_sig: writerSig,
-        canonical_payload_path: stored.path,
-        canonical_payload_inline: null,
-        blob_ref: stored.blobRef,
-        archived: 0,
-        archive_segment_id: null,
-        archive_manifest_sha256: null,
-        payload_pruned: 0,
-        payload_pruned_ts: null
-      };
+      const { event_hash: eventHash, writer_sig: writerSig } = row;
 
       this.appendOnlyEvents().appendLine(serializeEventRow(row));
 
@@ -273,7 +237,7 @@ export class JsonlSessionEventStore implements SessionEventStore {
     // Mirrors the ledger: a session with no events seals to a fixed sentinel
     // digest rather than to nothing, so the sealed/unsealed distinction never
     // depends on an empty string.
-    const finalEventHash = events[events.length - 1]?.event_hash ?? sha256Hex("EMPTY_SESSION");
+    const finalEventHash = events[events.length - 1]?.event_hash ?? EMPTY_SESSION_SEAL_DIGEST;
     const sealSig = this.signMonitorDigest(finalEventHash);
     const endedTs = Date.now();
     const line: SessionLifecycleLine = {
@@ -311,45 +275,6 @@ export class JsonlSessionEventStore implements SessionEventStore {
       throw new Error(SESSION_STORE_READ_ONLY);
     }
     this.sessions.appendLine(JSON.stringify(line));
-  }
-
-  /**
-   * Blob-backed payload storage, mirroring `Ledger.storeBlob` including its
-   * unencrypted fallback. Sharing the content-addressed blob store is what lets
-   * both backends produce the same `payload_sha256` for the same bytes — and
-   * the same `payload_path` when encryption is off, since that path is the
-   * content digest.
-   */
-  private storePayload(payload: string | Buffer | undefined): {
-    path: string | null;
-    sha: string;
-    blobRef: string | null;
-  } {
-    if (payload === undefined) {
-      return { path: null, sha: sha256Hex(Buffer.alloc(0)), blobRef: null };
-    }
-    const bytes = typeof payload === "string" ? Buffer.from(payload, "utf8") : payload;
-    const policy = this.getOpsPolicy();
-    const maxBytes = policy.opsPolicy.retention.maxPayloadBytesPerEvent;
-    if (bytes.byteLength > maxBytes) {
-      throw new Error(`payload exceeds max bytes per event (${bytes.byteLength} > ${maxBytes})`);
-    }
-    if (bytes.byteLength > policy.opsPolicy.retention.maxBlobBytes) {
-      throw new Error(
-        `payload exceeds max blob bytes (${bytes.byteLength} > ${policy.opsPolicy.retention.maxBlobBytes})`
-      );
-    }
-    if (!policy.opsPolicy.encryption.blobEncryptionEnabled) {
-      const sha = sha256Hex(bytes);
-      const name = `${sha}.txt`;
-      const full = join(this.workspace, ".amc", "blobs", name);
-      if (!pathExists(full)) {
-        writeFileAtomic(full, bytes);
-      }
-      return { path: join(".amc", "blobs", name), sha, blobRef: null };
-    }
-    const blob = storeEncryptedBlob(this.workspace, bytes);
-    return { path: blob.path, sha: blob.payloadSha256, blobRef: blob.blobId };
   }
 
   private getOpsPolicy(): ReturnType<typeof loadOpsPolicy> {

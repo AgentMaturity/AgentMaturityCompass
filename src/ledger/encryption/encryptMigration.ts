@@ -6,14 +6,12 @@
  * on; rows written with encryption on hash their ciphertext and verify without it (ADR 018).
  */
 import type Database from "better-sqlite3";
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
-import { getPublicKeyHistory, getSigningKey, signHexDigest, verifyHexDigestAny } from "../../crypto/keys.js";
 import type { KeyProvider, KeyRef } from "../../keys/provider.js";
 import { loadOpsPolicy } from "../../ops/policy.js";
 import { sha256Hex } from "../../utils/hash.js";
 import { canonicalize } from "../../utils/json.js";
 import { openLedger } from "../ledger.js";
+import { verifySignedMigrationReceipt, writeSignedMigrationReceipt } from "../signedMigrationReceipt.js";
 import { getActiveDataKey, readDataKeyFile, rotateDataKey } from "./dataKeys.js";
 import { encryptField, inlinePayloadAad, isEncryptedField } from "./ledgerCipher.js";
 
@@ -78,24 +76,12 @@ export async function encryptExistingLedger(workspace: string, opts: { provider?
       headEventId: head?.id ?? null, chainHeadBefore: head?.event_hash ?? "GENESIS", chainHeadAfter: headAfter
     };
     if (receipt.chainHeadAfter !== receipt.chainHeadBefore) throw new Error("ledger encryption changed the chain head; restore the pre-migration backup");
-    return { receipt, receiptPath: writeSignedReceipt(workspace, receipt) };
+    return { receipt, receiptPath: writeSignedMigrationReceipt(workspace, "ledger-encryption", `migration-${receipt.ts}.json`, receipt) };
   } finally {
     ledger.close();
   }
 }
 
-function writeSignedReceipt(workspace: string, receipt: EncryptionMigrationReceipt): string {
-  const dir = join(workspace, ".amc", "ledger-encryption");
-  mkdirSync(dir, { recursive: true });
-  const digest = sha256Hex(canonicalize(receipt));
-  const path = join(dir, `migration-${receipt.ts}.json`);
-  writeFileSync(path, JSON.stringify({ receipt, digestSha256: digest, signature: signHexDigest(digest, getSigningKey(workspace, "config-signature")) }, null, 2), { mode: 0o644 });
-  return path;
-}
-
-/** True when the receipt file's signature verifies under the workspace's auditor key history. */
 export function verifyEncryptionReceipt(workspace: string, path: string): boolean {
-  const signed = JSON.parse(readFileSync(path, "utf8")) as { receipt: EncryptionMigrationReceipt; digestSha256: string; signature: string };
-  const digest = sha256Hex(canonicalize(signed.receipt));
-  return digest === signed.digestSha256 && verifyHexDigestAny(digest, signed.signature, getPublicKeyHistory(workspace, "auditor"));
+  return verifySignedMigrationReceipt(workspace, path);
 }

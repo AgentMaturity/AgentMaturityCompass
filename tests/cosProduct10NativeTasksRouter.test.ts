@@ -22,7 +22,7 @@ const view: NativeTaskView = { taskId, sessionId: "route-unit-session", agentId:
   maxSteps: 2, maxTokens: 64, state: "idle", archived: false, createdAt: 1, updatedAt: 2, turnEndReason: null, error: null,
   validationSelection: null, validationOutputs: [], validation: { status: "not-requested", turn: null, configSha256: null, checks: [] },
   verification: "not-verified", verificationScope: null, approvals: [], approvalError: null, nextCursor: 0, firstCursor: 1, droppedEvents: 0, canResume: false,
-  resumeBlockedReason: null, history: { status: "not-started", backend: null, headEventHash: null, eventCount: 0, message: "Synthetic routing fixture" }, execution: null };
+  resumeBlockedReason: null, history: { status: "not-started", backend: null, headEventHash: null, eventCount: 0, message: "Synthetic routing fixture" }, execution: null, delegation: null };
 const configuration: NativeTaskConfiguration = { schemaVersion: "2026-09-08", agentId: "default", demo: false,
   providers: [{ id: "gemini-audio", local: false, model: "required", credential: { ref: "GEMINI_API_KEY", configured: false, source: null }, input: nativeTaskInputCapabilities("gemini-audio") }],
   validation: { ready: false, configSha256: null, checks: [], message: "No operator checks configured." },

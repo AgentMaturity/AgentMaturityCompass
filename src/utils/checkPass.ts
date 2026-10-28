@@ -15,6 +15,7 @@ import { syncBuiltinESMExports } from "node:module";
 
 let open: Map<Function, { args: unknown[]; writes: number; value: unknown }[]> | null = null;
 let reads = new Map<string, { identity: string; writes: number; bytes: Buffer }>();
+let stats = new Map<string, { writes: number; identity: string }>();
 let writes = 0;
 
 /** Ends reuse in the current pass: a later check reads again. Called for state changes node:fs does not see. */
@@ -80,7 +81,7 @@ export function inCheckPass<A extends unknown[], R>(fn: (...args: A) => R): (...
   return (...args: A): R => {
     if (open === null) {
       open = new Map();
-      try { return fn(...args); } finally { open = null; reads = new Map(); }
+      try { return fn(...args); } finally { open = null; reads = new Map(); stats = new Map(); }
     }
     const hit = open.get(fn)?.find(row => row.writes === writes && row.args.length === args.length
       && row.args.every((arg, i) => sameArg(arg, args[i])));
@@ -106,4 +107,18 @@ export function readFileInPass(path: string): Buffer {
   const bytes = readFileSync(path);
   reads.set(path, { identity, writes, bytes: Buffer.from(bytes) });
   return bytes;
+}
+
+/**
+ * A file's identity (device, inode, size, ctime; "-" when absent) for a memo stamp. Inside a check pass the same path
+ * with no write by this process since is answered from the pass, as a wrapped check's result would be: nested checks
+ * stamp the same key-set and anti-rollback files several times per gate. Outside a pass it is a plain stat.
+ */
+export function statIdentityInPass(path: string): string {
+  const hit = open === null ? undefined : stats.get(path);
+  if (hit !== undefined && hit.writes === writes) return hit.identity;
+  let identity = "-";
+  try { const s = statSync(path); identity = `${s.dev}:${s.ino}:${s.size}:${s.ctimeMs}`; } catch { /* absent */ }
+  if (open !== null) stats.set(path, { writes, identity });
+  return identity;
 }

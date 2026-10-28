@@ -38,7 +38,7 @@
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/a4-package.schema.json",
       "name": "a4-package.schema.json",
-      "sha256": "e9d9e2722a4d3fd4d36c66fee2a740c3d23d2a45de976e8b0a8dde7fc39d9661"
+      "sha256": "18ed1a399204553ec52de67903e673e763ebffa9a871210cda6dca6a550c0bc6"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/a4-project.schema.json",
@@ -73,7 +73,7 @@
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/a4-transition.schema.json",
       "name": "a4-transition.schema.json",
-      "sha256": "81f41c4c6321efa8ac8a17abc2a4690e76da83a52f07e31a8eb8a3b33b06323c"
+      "sha256": "81dbd0c044ba80a8745b0449408ef212f50c13628eb6361ca7b799c40958f094"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/a4-value-claim.schema.json",
@@ -113,7 +113,7 @@
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/authorization-record.schema.json",
       "name": "authorization-record.schema.json",
-      "sha256": "43b20053475b1cb31b8331d50f0d1b209d4fa4b9a31dc7f2a4418f1a87506ba9"
+      "sha256": "da1f3725f614aeca52c974781042c99bbd1c25cbcc21167199365d878a478ef3"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/break-glass.schema.json",

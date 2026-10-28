@@ -291,6 +291,7 @@ export const NON_RESULT_COMMANDS: readonly NonResultCommand[] = [
   non("fleet slo define", "defines a fleet SLO"),
   non("fp-submit", "files a false-positive report"),
   non("identity init", "creates the host identity configuration"),
+  non("identity workload-trust", GROUP),
   non("leaderboard", GROUP),
   non("lint", "lints configuration files for schema errors; no maturity or compliance result"),
   non("monitor live", "a long-running monitor; per-event output, no final result"),

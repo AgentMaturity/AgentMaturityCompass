@@ -86,6 +86,7 @@ export const NON_MATURITY_AUDIT_MODULES: ReadonlyArray<{ module: string; why: st
   { module: "src/enforce/scopeTemplates.ts", why: "policy scope template applied; untagged, so it binds to no question" },
   { module: "src/eoc/flows.ts", why: "education, ownership and commitment bookkeeping" },
   { module: "src/eval/evalImporters.ts", why: "import bookkeeping and imported failures; self-reported by provenance" },
+  { module: "src/governor/decisionLog.ts", why: "AuthZEN authorization decision log (P2-25): one AMC decision per call, allow or deny, untagged and never maturity evidence" },
   { module: "src/gateway/server.ts", why: "gateway refusals and misconfiguration; read only by score caps and penalties" },
   { module: "src/ingest/ingest.ts", why: "ingest bookkeeping; imported rows are self-reported" },
   { module: "src/integrations/integrationDispatcher.ts", why: "outbound integration dispatch bookkeeping" },

@@ -92,7 +92,7 @@ function proposalSummary(proposal) {
       `<code>${esc(scope)}</code>`, codes(leases[scope].scopes), codes(leases[scope].executeActionClasses), codes(leases[scope].routeAllowlist),
       esc(leases[scope].ttlHours), esc(leases[scope].token)]), "No lease plan.")}
     <p class="muted">Update policy: enforcement <code>${esc(proposal.updatePolicy?.enforcement ?? "none")}</code> (signed in the package; nothing enforces it yet).
-      Kill switch: ${esc(proposal.monitoringPlan?.killSwitch ?? "not available in this release")}.</p>`;
+      Kill switch: ${esc(proposal.monitoringPlan?.killSwitch ?? "an active kill switch holds the project until it is released and an owner resumes")}.</p>`;
 }
 
 /** The release record as GET …/releases/:rid returned it: header, surfaces, leases, lifecycle provenance and the package files. */
@@ -276,7 +276,7 @@ function renderMonitor(ctx) {
       overall <code>${esc(doc.claim?.claimKind)}</code> <code>${esc(doc.claim?.statusDimensions?.evidence)}</code></p>${tiles}
       ${table(["Source", "Read", "Claim kind", "Evidence", "Reasons"], envelopes, "No source.")}
       <p class="muted">Alert rules (proposals): ${list(doc.alertRules).map((rule) => esc(rule.rule)).join("; ")}.</p>` : ""}
-    <p class="muted">Kill switch: ${esc(monitor?.killSwitch ?? "not available in this release (P2-26)")}.</p>${loadButton(ctx)}`;
+    <p class="muted">Kill switch: ${esc(monitor?.killSwitch ?? "an active kill switch holds the project until it is released and an owner resumes")}.</p>${loadButton(ctx)}`;
 }
 
 const observedCell = (observed) => {

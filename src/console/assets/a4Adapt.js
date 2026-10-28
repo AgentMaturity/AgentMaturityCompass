@@ -198,7 +198,8 @@ function renderClocks(ctx) {
 function renderDataHandling(ctx) {
   const declared = isObject(specOf(ctx).dataHandling) ? specOf(ctx).dataHandling : null;
   const shown = (value) => (Array.isArray(value) ? value.join(", ") : value) || "not stated";
-  const rows = declared === null ? [] : [["Data classes", declared.dataClasses, "none", "P2-01"], ["Residency", declared.residency, "none", "P2-01"],
+  // P2-36: Propose records whether P2-02's redaction was confirmed for the declared classes ("enforced at redaction").
+  const rows = declared === null ? [] : [["Data classes", declared.dataClasses, declared.dataClassesEnforcement ?? "none", "P2-02"], ["Residency", declared.residency, "none", "P2-01"],
     ["Retention", declared.retention, "none", "P2-02"], ["Processors", declared.processors, "none", "P2-01"],
     ["Memory policy", buildOf(ctx)?.memoryPolicy?.policy?.retentionTag, "advisory", "the reasoning-memory writeback"]]
     .map(([field, value, enforced, key]) => [esc(field), esc(shown(value)), `<code>${esc(enforced)}</code>`, esc(key)]);

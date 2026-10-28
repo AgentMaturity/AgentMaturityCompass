@@ -48,6 +48,8 @@ export interface WorkflowRunInit {
   readonly maxDepth?: number;
   readonly signal?: AbortSignal;
   readonly cancelGraceMs?: number;
+  /** The run's own lease, handed to each child's runner (P2-25); see `SubagentRunContext.parentLeaseToken`. */
+  readonly parentLeaseToken?: string;
 }
 
 export interface WorkflowFailure {
@@ -108,6 +110,7 @@ async function runNode(
       session: init.session,
       runner: init.runner,
       mintSessionId: init.mintSessionId,
+      ...(init.parentLeaseToken === undefined ? {} : { parentLeaseToken: init.parentLeaseToken }),
       ...(init.maxDepth === undefined ? {} : { maxDepth: init.maxDepth }),
       ...(init.signal === undefined ? {} : { signal: init.signal }),
       ...(init.cancelGraceMs === undefined ? {} : { cancelGraceMs: init.cancelGraceMs })

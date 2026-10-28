@@ -1,4 +1,5 @@
 import { digestField } from "../dataflow/tokenizer.js";
+import { AUTHZ_DECISION_AUDIT_TYPE, decisionEvidence, decisionReasons, pipelineDecision, recordlessDecision } from "../governor/decisionLog.js";
 import { sha256Hex } from "../utils/hash.js";
 import {
   LIVE_PROJECTION_VERSION,
@@ -53,13 +54,32 @@ function breakGlassAction(authorization: NonNullable<RecordedToolCall["authoriza
     meta: { ...call, auditType: "BREAK_GLASS_ACTION", breakGlassId, executionId: action.executionId } }];
 }
 
+/**
+ * P2-25: one AuthZEN decision-log entry for a call that reached the authorization stage: a call with a bound
+ * authorization record (allowed, or denied at any stage after it bound), or a call refused at the authorization stage
+ * before a record bound. Unbound calls the authorization stage never saw (reads, low-impact writes) make no decision.
+ */
+function authzDecision(execution: RecordedToolCall, outcome: ToolOutcome, call: Record<string, unknown>): ToolEvidenceRecord[] {
+  const denial = outcome.denied?.reason ?? null;
+  const entry = execution.authorization !== undefined
+    ? pipelineDecision({ record: execution.authorization.record, allowed: outcome.denied === null, denial })
+    : outcome.denied?.stage === "authorization" && execution.actionClass !== null
+      ? recordlessDecision({ agentId: execution.agentId, toolName: execution.name, actionClass: execution.actionClass, args: execution.arguments,
+        allowed: false, reasons: decisionReasons(denial).map((reason) => reason.text), policyDigest: null, resource: {} })
+      : null;
+  if (entry === null) return [];
+  const row = decisionEvidence(entry);
+  return [{ ...row, meta: { ...call, ...row.meta } }];
+}
+
 /** Audit types a governed tool call can produce. */
 export type ToolAuditType =
   | "TOOL_CALL_ALLOWED"
   | "TOOL_CALL_DENIED"
   | "TOOL_CALL_FAILED"
   | "AUTHORIZATION_RECORD"
-  | "BREAK_GLASS_ACTION";
+  | "BREAK_GLASS_ACTION"
+  | typeof AUTHZ_DECISION_AUDIT_TYPE;
 
 export interface ToolEvidenceRecord {
   readonly eventType: "audit" | "metric" | "stdout";
@@ -158,6 +178,7 @@ export function toolEvidenceFor(execution: RecordedToolCall, outcome: ToolOutcom
     payload: JSON.stringify({ auditType: "AUTHORIZATION_RECORD", record: execution.authorization.record }),
     meta: { ...call, auditType: "AUTHORIZATION_RECORD", executionId: execution.authorization.record.executionId }
   }, ...breakGlassAction(execution.authorization, outcome, call)];
+  const decision = authzDecision(execution, outcome, call);
 
   const audit: ToolEvidenceRecord = {
     eventType: "audit",
@@ -209,7 +230,7 @@ export function toolEvidenceFor(execution: RecordedToolCall, outcome: ToolOutcom
   // workspace that opted in to protected-data redaction.
   const produced = outcome.bytes > 0 || outcome.output.length > 0;
   if (!produced) {
-    return [audit, metric, ...authorization];
+    return [audit, metric, ...authorization, ...decision];
   }
   const outputDigest = digestField("output", outcome.outputDigest ?? { kind: "sha256", value: sha256Hex(outcome.output) });
 
@@ -230,5 +251,5 @@ export function toolEvidenceFor(execution: RecordedToolCall, outcome: ToolOutcom
     }
   };
 
-  return [audit, metric, stdout, ...authorization];
+  return [audit, metric, stdout, ...authorization, ...decision];
 }

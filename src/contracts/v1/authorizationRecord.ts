@@ -28,7 +28,10 @@ export const authorizationRecordV1Schema = z.strictObject({
     depth: z.number().int().nonnegative(),
     parentExecutionId: nullableText,
     allowedActionClasses: z.array(actionClassSchema),
-    leaseId: nullableText
+    leaseId: nullableText,
+    /** From a v2 lease (P2-25): the signed delegation chain it binds and the SPIFFE ID verified for its delegate. */
+    chainDigest: sha256HexSchema.optional(),
+    spiffeId: nullableText.optional()
   }),
   session: z.strictObject({ sessionId: nullableText, runId: nullableText, callId: nonEmpty, rootCallId: nonEmpty, parentToken: nullableText }),
   control: z.strictObject({ controlId: nullableText, controlVersion: nullableText }),

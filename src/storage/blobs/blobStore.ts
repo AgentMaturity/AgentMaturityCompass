@@ -16,6 +16,7 @@ import { loadTrustContext, type TrustContext } from "../../trust/trustContext.js
 import { publicKeyFromPrivate } from "../../crypto/keyHistoryEnvelope.js";
 import { assertVaultMaySign, assertSigningKeyUsable } from "../../keys/signingKeys.js";
 import { vaultStatus } from "../../vault/vault.js";
+import { inCheckPass } from "../../utils/checkPass.js";
 
 const blobIdRegex = /^blob_[a-z2-7]{26}$/;
 
@@ -162,6 +163,18 @@ function readLegacyOrEncryptedBlob(workspace: string, payloadPath: string): {
   }
 }
 
+/** The vault signer re-checked under the publication lock, as one check pass (its nested key-set checks run once). */
+const assertVaultBlobSignerCurrent = inCheckPass((workspace: string, privateKeyPem: string, unvaulted: boolean): void => {
+  assertVaultMaySign(workspace, "artifact-seal");
+  const unlocked = vaultStatus(workspace).unlocked;
+  if (unvaulted) {
+    if (process.env.AMC_NO_SIGN !== "1" || unlocked) throw new Error("blob signing mode changed before publication; retry");
+  } else {
+    if (!unlocked) throw new Error("the vault was locked before blob publication");
+    assertSigningKeyUsable(workspace, "artifact-seal", publicKeyFromPrivate(privateKeyPem), "file");
+  }
+});
+
 export function storeEncryptedBlob(workspace: string, plaintext: Buffer): {
   blobId: string;
   path: string;
@@ -186,16 +199,7 @@ export function storeEncryptedBlob(workspace: string, plaintext: Buffer): {
   const privateKeyPem = prepared === null ? getSigningKey(workspace, "artifact-seal") : null;
   const unvaulted = prepared === null && process.env.AMC_NO_SIGN === "1" && !vaultStatus(workspace).unlocked;
   return withBlobIndexLock(workspace, () => {
-  if (prepared === null) {
-    assertVaultMaySign(workspace, "artifact-seal");
-    const unlocked = vaultStatus(workspace).unlocked;
-    if (unvaulted) {
-      if (process.env.AMC_NO_SIGN !== "1" || unlocked) throw new Error("blob signing mode changed before publication; retry");
-    } else {
-      if (!unlocked) throw new Error("the vault was locked before blob publication");
-      assertSigningKeyUsable(workspace, "artifact-seal", publicKeyFromPrivate(privateKeyPem!), "file");
-    }
-  }
+  if (prepared === null) assertVaultBlobSignerCurrent(workspace, privateKeyPem!, unvaulted);
   let blobId = nextBlobId();
   while (pathExists(join(blobV1Dir(workspace), `${blobId}.blob`))) {
     blobId = nextBlobId();

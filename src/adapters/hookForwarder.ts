@@ -8,6 +8,11 @@
  * against the sealed ledger row; every failure denies with exit 2. SessionStart registers the session, UserPromptSubmit
  * asks for admission (only the prompt's length and SHA-256 leave this process; a failure blocks the prompt), Stop and
  * PostToolUse record what happened. SessionStart and Stop never exit 2: Claude Code reads exit 2 on Stop as "keep going".
+ *
+ * Every POST meets checkEgress (residency) on the `bridge` channel for the hook's workspace right before it is sent. It
+ * is AMC's own control and evidence traffic (agentId "system"), so an active kill switch does not refuse it: the
+ * Bridge's control route enforces the kill and answers deny, and the record of what the agent did must still land.
+ * A residency refusal is not retried and answers the event's deny; it is never reported as AMC being unavailable.
  */
 import { randomUUID } from "node:crypto";
 import { realpathSync } from "node:fs";
@@ -24,6 +29,7 @@ import { redactBridgeText } from "../bridge/bridgeRedaction.js";
 import {
   renderProviderControlResponse, serializeProviderControlResponse, type HookControlDecision, type HookProvider, type ProviderControlResponse,
 } from "../bridge/hookProviders.js";
+import { checkEgress, EgressBlocked, isEgressRefusal } from "../residency/checkEgress.js";
 import { sha256Hex } from "../utils/hash.js";
 import { boundedFetchSignal, forwardDeadlineMs, HookDeadlineError, withHookDeadline } from "./hookDeadline.js";
 import {
@@ -35,11 +41,17 @@ import { claudeEnvelope, claudeHookSchemasFor, strictClaudeJson, type ClaudeHook
 import { claudeActionId, claudeSessionSha256 } from "./hookProviders/claudeCode.js";
 import { claudeAllow, claudeDeny } from "./hookProviders/claudeAllow.js";
 
+/** Synchronous preflight right before each hook POST; its typed refusal is thrown outside every retry loop. */
+function admitHookEgress(workspace: string, url: string): void {
+  checkEgress({ workspace, channel: "bridge", url, agentId: "system", dataClasses: null, purpose: "provider-hook" });
+}
+
 function delay(ms: number): Promise<void> {
   return ms <= 0 ? Promise.resolve() : new Promise((resolvePromise) => setTimeout(resolvePromise, ms));
 }
 
 async function resolveProviderTerminalAction(input: {
+  workspace: string;
   authorization: { bridgeBase: string; token: string };
   provider: ConfigHookProvider;
   correlationSha256: string;
@@ -54,6 +66,7 @@ async function resolveProviderTerminalAction(input: {
   const url = `${input.authorization.bridgeBase}${OBSERVED_HOOK_CORRELATION_PATH}`;
   let lastError: string | null = null;
   for (let attempt = 0; attempt < 2; attempt += 1) {
+    admitHookEgress(input.workspace, url);
     try {
       const response = await fetch(url, {
         method: "POST",
@@ -135,6 +148,7 @@ export async function forwardProviderHookEvent(input: {
   const inspection = inspectProviderHookEvent({ provider, rawInput: input.rawInput });
   const resolvedActionId = provider === "gemini-cli" && inspection.phase !== "requested"
     ? await resolveProviderTerminalAction({
+        workspace,
         authorization,
         provider,
         correlationSha256: inspection.correlationSha256,
@@ -155,6 +169,7 @@ export async function forwardProviderHookEvent(input: {
   let lastStatus: number | null = null;
   let lastError: string | null = null;
   for (let attempt = 0; attempt < 2; attempt += 1) {
+    admitHookEgress(workspace, url);
     try {
       const response = await fetch(url, {
         method: "POST",
@@ -253,6 +268,7 @@ export async function forwardProviderHookControl(input: {
   let lastStatus: number | null = null;
   let lastError: string | null = null;
   for (let attempt = 0; attempt < 2; attempt += 1) {
+    admitHookEgress(workspace, url);
     try {
       const response = await fetch(url, {
         method: "POST",
@@ -400,9 +416,10 @@ function claudeSessionBody(payload: ClaudeHookPayload, workspace: string, agentI
 }
 
 /** POST one Claude Code session hook to the control route under the lease; resolves to its JSON object or throws. */
-async function postClaudeSessionEvent(authorization: { bridgeBase: string; token: string }, body: Record<string, unknown>,
+async function postClaudeSessionEvent(workspace: string, authorization: { bridgeBase: string; token: string }, body: Record<string, unknown>,
   signal: AbortSignal): Promise<Record<string, unknown>> {
   const text = JSON.stringify(body);
+  admitHookEgress(workspace, `${authorization.bridgeBase}${CONTROL_HOOK_PATH}`);
   const response = await fetch(`${authorization.bridgeBase}${CONTROL_HOOK_PATH}`, {
     method: "POST", redirect: "error", signal: boundedFetchSignal(5_000, signal),
     headers: { authorization: `Bearer ${authorization.token}`, "content-type": "application/json", "x-amc-hook-provider": "claude-code" }, body: text,
@@ -447,10 +464,13 @@ async function forwardClaudeSessionHook(payload: ClaudeHookPayload, opts: HookFo
   if (payload.hook_event_name === "PostToolUse" || payload.hook_event_name === "PostToolUseFailure") {
     // The control route records whether the observed ingress got this outcome; a miss latches the session there.
     let ingressRecorded = true;
-    await forwardProviderHookEvent({ ...forward, rawInput, mode: "control", signal }).catch(() => { ingressRecorded = false; });
+    await forwardProviderHookEvent({ ...forward, rawInput, mode: "control", signal }).catch((error: unknown) => {
+      if (isEgressRefusal(error)) throw error;
+      ingressRecorded = false;
+    });
     body.ingressRecorded = ingressRecorded;
   }
-  const answer = await postClaudeSessionEvent(authorization, body, signal);
+  const answer = await postClaudeSessionEvent(workspace, authorization, body, signal);
   if (payload.hook_event_name === "UserPromptSubmit") {
     if (answer.admitted === true && verifiedAdmission(workspace, opts.agent, answer.eventId, payload.session_id, body)) return { stdout: "{}\n", stderr: "", exitCode: 0 };
     if (answer.admitted === false && typeof answer.reason === "string") return PROMPT_BLOCKED(`AMC admission denied: ${redactBridgeText(answer.reason)}`);
@@ -481,11 +501,14 @@ function claudeFailure(handler: string | null, payloadEvents: ReadonlySet<string
     return { stdout: `${JSON.stringify({ systemMessage: `AMC did not register this Claude Code session, so AMC denies its tool calls (${why}).` })}\n`, stderr: "", exitCode: 0 };
   }
   if (event === "Stop") return { stdout: `${JSON.stringify({ systemMessage: "AMC could not record the end of this turn." })}\n`, stderr: "", exitCode: 0 };
-  if (event === "UserPromptSubmit") return PROMPT_BLOCKED("AMC admission unavailable; prompt blocked.");
+  if (event === "UserPromptSubmit") {
+    return PROMPT_BLOCKED(error instanceof EgressBlocked ? `AMC residency refused hook delivery; prompt blocked (${why}).` : "AMC admission unavailable; prompt blocked.");
+  }
   if (event === "PostToolUse" || event === "PostToolUseFailure") {
     return { stdout: "{}\n", stderr: "AMC could not record the tool outcome; the action already ran.\n", exitCode: 2 };
   }
   if (error instanceof HookDeadlineError) return claudeDeny("AMC hook control timed out; action denied.");
+  if (error instanceof EgressBlocked) return claudeDeny(`AMC residency refused hook delivery; action denied (${why}).`);
   return claudeDeny(forwarding ? "AMC hook control unavailable; action denied." : "AMC hook control input invalid; action denied.");
 }
 
@@ -612,6 +635,7 @@ export async function runHookForward(
   } catch (error) {
     if (opts.mode === "control" && stage !== "empty" && stage !== "observe") {
       if (error instanceof HookDeadlineError) return deny("AMC hook control timed out; action denied.");
+      if (error instanceof EgressBlocked) return deny(`AMC residency refused hook delivery; action denied (${error.message}).`);
       return deny(stage === "control" ? "AMC hook control unavailable; action denied." : "AMC hook control input invalid; action denied.");
     }
     return { stdout: "", stderr: `${error instanceof Error ? error.message : String(error)}\n`, exitCode: 1 };

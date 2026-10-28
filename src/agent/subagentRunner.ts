@@ -14,6 +14,7 @@ import { readAgentRunSummary } from "./runReport.js";
 import { compactionSummaryRows } from "./compaction/summaryPrompt.js";
 import type { LoopLlm, LoopRoute } from "./stepRunner.js";
 import type { SubagentRunContext, SubagentRunResult, SubagentRunner } from "./subagentSpawn.js";
+import { issueChildLease } from "../leases/delegatedLease.js";
 
 /**
  * The runner that actually executes a child (P6.1a).
@@ -282,6 +283,22 @@ export function createDriverRunner(init: DriverRunnerInit): SubagentRunner {
       if (!active) finalize();
     };
 
+    // P2-25: the parent's own lease is extended to this child (narrowing only, depth cap 3) before its session opens; a
+    // refusal fails the spawn. A v1 lease is inherited unchanged. The parent lease arrives explicitly in the context from
+    // the parent's composition; only a child of the root run uses the runner's own lease. A deeper child whose parent
+    // lease is missing is refused: falling back to the root's lease would hand it the root's broader grant.
+    let childLease: string | undefined;
+    try {
+      if (init.leaseToken !== undefined && ctx.identity.depth > 1 && ctx.parentLeaseToken === undefined) {
+        throw new Error("delegation refused: this child's parent lease was not handed to it; no lease was minted");
+      }
+      const parentLease = ctx.parentLeaseToken ?? (ctx.identity.depth === 1 ? init.leaseToken : undefined);
+      childLease = parentLease === undefined ? undefined
+        : issueChildLease(init.workspace, parentLease, { runAs: ctx.identity.runAs, ...(scope === undefined ? {} : { allowedActionClasses: scope }) });
+    } catch (error) {
+      session.disposeWithoutClosing();
+      return { ok: false, text: "", reason: error instanceof Error ? error.message : String(error) };
+    }
     try {
       session.open({ sessionId: ctx.childSessionId, agentId: ctx.toolsetAgentId,
         harnessVersion: init.harnessVersion, compositionDigest: init.compositionDigest, policyDigest: init.policyDigest });
@@ -289,11 +306,12 @@ export function createDriverRunner(init: DriverRunnerInit): SubagentRunner {
       toolset = agentToolset({ workspace: init.workspace, sessionId: ctx.childSessionId,
         recorder: session, agentId: ctx.toolsetAgentId,
         parentShell: init.parentShell ?? null,
-        ...(init.leaseToken === undefined ? {} : { leaseToken: init.leaseToken }),
+        ...(childLease === undefined ? {} : { leaseToken: childLease }),
         delegation: { runAs: ctx.identity.runAs, depth: ctx.identity.depth, parentExecutionId: ctx.packetId ?? null,
           ...(scope === undefined ? {} : { allowedActionClasses: scope }) },
         ...(grant === undefined ? {} : { subagents: {
           identity: ctx.identity, runner: grant.runner, session,
+          ...(childLease === undefined ? {} : { parentLeaseToken: childLease }),
           ...(grant.maxDepth === undefined ? {} : { maxDepth: grant.maxDepth }),
           ...(grant.mintSessionId === undefined ? {} : { mintSessionId: grant.mintSessionId }),
           ...(descendantScope === undefined ? {} : { delegationScope: descendantScope }),

@@ -39,6 +39,7 @@ import { readTurnEndMeta } from "../session/turnLifecycleMeta.js";
 import type { EvidenceEvent } from "../types.js";
 import { ensureDir, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
+import { LEDGER_BACKEND_INCOMPLETE_MESSAGE, ledgerBackendGap } from "./a4LedgerBackend.js";
 import { readinessItemBuilders, type A4ReadinessItem, type A4ReadinessQuery, type A4ReadinessState } from "./a4Readiness.js";
 import { a4Fail, mutationResult, precheck, priorReplay, readJson, requirePrincipal, type A4Route } from "./a4Router.js";
 import { A4StoreError } from "./a4Store.js";
@@ -265,8 +266,12 @@ export function probeFrameStatus(ledger: Ledger, probe: { snapshotEventId?: unkn
  * refuses it, as agentToolset refuses a session; so does a JSONL session store (sticky per workspace), before any turn.
  */
 async function runContextProbe(input: { workspace: string; agentId: string; plugin: AdaptContextPlugin; ledger: Ledger }): Promise<ContextProbeOutcome> {
-  if (resolveSessionStoreBackend(input.workspace) === "jsonl") {
-    throw fail(409, "PROBE_NOT_RECORDED", "This workspace's session store is JSONL, which has no ledger row an A4 ref can name; nothing was run.", { reasonCodes: ["SESSION_STORE_JSONL"] });
+  const sessionStore = resolveSessionStoreBackend(input.workspace);
+  // P2-36: a backend that drops A4 state refuses every A4 write with this one code, the probe included.
+  if (ledgerBackendGap(input.workspace, input.ledger.db).length > 0) throw fail(503, "LEDGER_BACKEND_INCOMPLETE", LEDGER_BACKEND_INCOMPLETE_MESSAGE, { reasonCodes: ["LEDGER_BACKEND_INCOMPLETE"] });
+  if (sessionStore !== "sqlite") {
+    throw fail(409, "PROBE_NOT_RECORDED", `This workspace's session store is ${sessionStore === "jsonl" ? "JSONL" : "Postgres"}, which has no ledger row an A4 ref can name; nothing was run.`,
+      { reasonCodes: [`SESSION_STORE_${sessionStore.toUpperCase()}`] });
   }
   try {
     loadActiveCompiledPolicy(input.workspace);

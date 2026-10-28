@@ -9,6 +9,7 @@ How AMC stores evidence at rest, which keys protect it, and what is not claimed.
 | SQLite ledger | `.amc/evidence.sqlite`, one writer, WAL | Yes |
 | Encrypted inline payloads | Same file; `payload_inline` and `canonical_payload_inline` hold `amcenc:v1:` ciphertext | Off |
 | Encrypted blobs | `.amc/blobs/`, AES-256-GCM | On (`blobEncryptionEnabled`) |
+| Postgres session store | Session rows in a Postgres database; blobs and keys stay on the volume | Off (`amc evidence-stores migrate --to postgres`) |
 
 ## Ledger encryption
 
@@ -67,6 +68,32 @@ amc evidence-stores cutover     # refused unless parity is identical; records .a
 
 After cutover the workspace reads and writes guard events in `evidence.sqlite` only. The legacy file is left untouched, so reverting is a setting change: delete `.amc/guard-events-stage.json` or set `AMC_GUARD_EVENTS_STAGE=DUAL_WRITE` (the variable overrides the record in both directions). A new workspace is cut over the same way; parity of two empty stores is identical.
 
+## Postgres session store
+
+An optional backend for the session spine (ADR 018, decision 5). It keeps the session-store contract synchronous by running the `pg` driver in a worker thread and blocking on `Atomics.wait` until each call returns.
+
+```bash
+npm install pg                                   # optional peer; without it the store refuses with POSTGRES_DRIVER_MISSING
+printf '%s\n' 'postgres://amc@db.internal/amc?sslmode=verify-full&sslrootcert=/etc/amc/pg-ca.pem' > /etc/amc/pg-url
+chmod 600 /etc/amc/pg-url
+export AMC_POSTGRES_URL_FILE=/etc/amc/pg-url     # the variable names the file; the URL is never read from env or argv
+amc evidence-stores migrate --to postgres        # copy, check parity, write a signed receipt, pin the backend
+```
+
+- **Connection requirements.** The URL comes only from the file named by `AMC_POSTGRES_URL_FILE`, which must not be readable by group or others. It must set `sslmode=verify-full`. The server must authenticate with SCRAM over TLS: a server that asks for MD5 or a cleartext password has the socket closed before the password is sent, and a connection without a SCRAM exchange (for example `trust`) is refused.
+- **One writer per chain.** Every append locks the chain head (`SELECT … FOR UPDATE` on `amc_chain_heads`) in one transaction. `UNIQUE (chain_id, prev_event_hash)` makes a fork unwritable even without the lock, and the head update only applies to the head that was read. Several AMC processes may write the same workspace; they queue.
+- **Idempotent retries.** An append retried with the same event id after a lost reply returns the committed row. A different event under a used id is refused. Callers that want this pass `id`.
+- **Primary loss.** Every call fails closed with `POSTGRES_UNAVAILABLE` and writes nothing: a lost connection, a demoted primary (SQLSTATE 25006), or no reply within 10 s. The next call reconnects, so appends resume once the HA platform has promoted a new primary. Measure the stall a failover causes against the 50 ms p95 local-authorization budget with `scripts/postgres-failover-harness.mjs`.
+- **Writer open authenticates history.** A writer verifies the stored chain, signatures and session seals before it appends, as the JSONL writer does. `amc verify` on a Postgres workspace reads the store and reports it as an error when it cannot (no driver, unreachable, no chain id); it never passes evidence it did not see.
+- **Signed head in the workspace.** Whoever controls the database can delete the tail and rewind `amc_chain_heads`. So after each append it commits (and after a migration) AMC signs the chain head with the monitor key into `.amc/postgres-store-head.json`. Verification and writer open require the last row to match `amc_chain_heads` and the chain to still hold the signed head at its sequence; a missing signed head while rows exist is an error. The signed head is a floor: rows appended after it by another process are allowed.
+- **Readers.** Run verification, budget projections, native session reads and audit packets read a Postgres workspace's rows from Postgres, as they read JSONL. `amc verify --repair` refuses a Postgres workspace by name, and the A4 Adapt probe refuses one (`SESSION_STORE_POSTGRES`), as it refuses JSONL.
+- **Shared databases.** Each workspace writes its own `chain_id` (recorded in `.amc/postgres-store.json`), so one database can hold several workspaces. Event ids are keyed per chain, and an append whose id another chain already holds is refused rather than treated as a retry.
+- **Migration.** `amc evidence-stores migrate --to postgres` authenticates the SQLite history, copies every mirrored table (`evidence_events`, `sessions`, `runs`) in one transaction, compares every copied event column for column, runs the backend determinism check (which writes three rows to a scratch chain), writes `.amc/postgres-store/migration-<ts>.json` signed with the config-signature key, and only then pins the workspace to Postgres. A chain that already holds rows is refused, never merged. Producers that write through the SQLite ledger directly keep writing `evidence.sqlite`.
+- **Mirrored tables are a list.** `POSTGRES_MIRROR_TABLES` (`src/persistence/postgres/postgresSchema.ts`) declares each table's DDL, columns and SQLite reader. P2-36 adds the `a4_*` and `action_*` tables there.
+- **Grants.** Give the AMC role `SELECT, INSERT` on `evidence_events` and `SELECT, INSERT, UPDATE` on `sessions` and `amc_chain_heads`, and nothing else, so the database role cannot rewrite evidence even with AMC's credentials.
+- **HA platform.** CloudNativePG, Patroni or a managed service; the operator chooses. Use synchronous replication if a committed append must survive the primary's loss: AMC cannot observe the server's durability settings, so the store declares `powerLossDurable: false`.
+- **Not verified here.** The tests run the store against a SQLite-backed fake driver through the real worker bridge. Conformance, determinism and failover against a real Postgres are the runbook `docs/runbooks/POSTGRES_FAILOVER.md`, pending.
+
 ## Backups
 
 Backups capture each SQLite file with `VACUUM INTO`, a consistent snapshot taken from a read transaction, so appends during a backup cannot tear it. WAL and shared-memory sidecars are not copied. An encrypted ledger is backed up as ciphertext with only its wrapped keys, so restoring it needs the KeyProvider. See [BACKUPS.md](BACKUPS.md).
@@ -78,4 +105,5 @@ An AMC refuses a ledger migrated by a newer AMC: "ledger schema version N is new
 ## What is not claimed
 
 - Field encryption hides inline payload content from someone who reads the database file. It does not hide `meta_json`, row counts, timing or sizes.
+- Postgres HA protects session rows and speeds failover. Blobs, keys, Studio, `host.db` and the other SQLite files stay on the volume, so the chart keeps one replica.
 - Key protection is whatever the KeyProvider describes ([KEY_PROVIDERS.md](KEY_PROVIDERS.md)); the file provider is a development option.
