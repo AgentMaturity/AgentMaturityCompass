@@ -68,6 +68,7 @@ import { acknowledgementOf, adaptSpecOf, lockDigestOf, proposedPlan } from "./sp
 import { aspireSpecOf } from "./spec/aspire.js";
 import { assembleSpecOf } from "./spec/assemble.js";
 import { relPath } from "./stages/common.js";
+import { packageVersionManifest, recordLifecycleActivation } from "./a4RuntimeLifecycle.js";
 
 /** A coded failure: the effect runner records the message, whose first word is the code the route answers. */
 const coded = (code: string, message: string): Error => Object.assign(new Error(`${code}: ${message}`), { code });
@@ -492,6 +493,7 @@ async function createRelease(ctx: A4EffectContext): Promise<A4EffectOutcome> {
   if (!quality.success) throw coded("QUALITY_SPEC_MISSING", "the Aspire brief carries no quality specification");
   const integration = integrationClaimFor(assembleSpecOf(state).spec.path);
   if (integration === null) throw coded("INTEGRATION_PATH_UNKNOWN", "Assemble recorded no integration path");
+  const versionManifest = packageVersionManifest(workspace, state.project.agent_id); // P2-34: P2-23's manifest and digest, checked
   assertLeaseKeys(workspace, ctx.principal, "mint the release's staging lease");
   revokeJournaled(workspace, projectId, releaseId, "staging");
   const projectDir = realDir(join(realDir(a4ReleasesRoot(workspace)), projectId));
@@ -545,7 +547,7 @@ async function createRelease(ctx: A4EffectContext): Promise<A4EffectOutcome> {
         signedConfigsSha256: sha256Hex(canonicalize(Object.fromEntries(Object.keys(CAPTURED_SLOTS).filter((slot) => slot.startsWith("signedConfigs.")).map((slot) => [slot, bound[slot] ?? null])))),
         presetSha256: hex(bound["composition.presetSha256"]), contextPluginSha256: hex(bound["context.contextPluginSha256"]),
         memoryPolicySha256: hex(bound["context.memoryPolicySha256"]), updatePolicySha256: shaOf(UPDATE_POLICY_PATH), secretScanSha256, sbomSha256, aibomSha256: null },
-      approvals: approvalsOf(state), leases: [{ leaseId: stagingLease.leaseId, scope: "staging" }], integration, quality: quality.data,
+      approvals: approvalsOf(state), leases: [{ leaseId: stagingLease.leaseId, scope: "staging" }], integration, quality: quality.data, versionManifest,
       provenance: { note: "AMC provenance record (not a formal SLSA claim)", builtFrom: { enforceSnapshot: snapshotId, revisionDigest: revision.spec_digest,
         gateBindingDigest: gate.binding_digest, provenanceSha256, sbom: sbomSha256 === null ? "not generated (no lockfile in AMC's install root)"
           : "AMC runtime dependencies only; not the agent's AIBOM (P1-27/P2-18)" } },
@@ -771,9 +773,10 @@ async function mintProductionLease(ctx: A4EffectContext): Promise<A4EffectOutcom
   if (regulated && acknowledgement === null) throw coded("EXPERT_REVIEW_PENDING", "a regulated deployment approval needs the owner's acknowledgement of the pending expert review (D-21)");
   assertLeaseKeys(workspace, ctx.principal, "mint the production lease");
   revokeJournaled(workspace, state.project.project_id, releaseId, "production");
+  const governance = recordLifecycleActivation(workspace, state.project.agent_id, ctx.principal, gate); // P2-34: P2-23's activation, before the lease
   const lease = mintLease(workspace, state, releaseId, plans.production, ctx.principal);
   // Then the lifecycle bridge to production, only with every production control evidenced (in v1 it stays at staging, P2-40).
-  return { record: { lease: lease.projection, expertReview: { releaseId, regulated, itemId: EXPERT_REVIEW_ITEM, status: regulated ? "EXPERT_REVIEW_PENDING" : "NOT_REGULATED",
+  return { record: { lease: lease.projection, governance, expertReview: { releaseId, regulated, itemId: EXPERT_REVIEW_ITEM, status: regulated ? "EXPERT_REVIEW_PENDING" : "NOT_REGULATED",
     acknowledgement: regulated ? acknowledgement : null }, lifecycle: lifecycleRecord(releaseId, advance(workspace, state, "production", releaseId)) },
     deliver: { production: { leaseId: lease.leaseId, token: lease.token, expiresAt: lease.expiresAt, scope: "production", tokenNotice: TOKEN_NOTICE } } };
 }

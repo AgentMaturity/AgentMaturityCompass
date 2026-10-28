@@ -475,6 +475,51 @@
         "pubkeyFingerprint"
       ],
       "type": "object"
+    },
+    "versionManifest": {
+      "additionalProperties": false,
+      "properties": {
+        "manifest": {
+          "anyOf": [
+            {
+              "additionalProperties": {},
+              "propertyNames": {
+                "type": "string"
+              },
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "manifestDigest": {
+          "anyOf": [
+            {
+              "pattern": "^sha256:[a-f0-9]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source": {
+          "enum": [
+            "lifecycle_bound",
+            "lifecycle_observed",
+            "not_governed",
+            "not_observed"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "manifest",
+        "manifestDigest",
+        "source"
+      ],
+      "type": "object"
     }
   },
   "required": [

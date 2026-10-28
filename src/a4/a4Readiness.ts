@@ -124,6 +124,8 @@ export interface A4LiveFacts {
   readonly controlResults?: { readonly status: "verified" | "not_evaluated" | "failed"; readonly reason: string | null } | null;
   /** Adapt only: the workspace's session store backend (a JSONL store cannot record the context probe); absent when not read. */
   readonly sessionStore?: "sqlite" | "jsonl" | "postgres";
+  /** Adapt only: P2-26's regime retention floor for logs (`floor: null` when no regime sets one); null when the plan cannot be read. */
+  readonly retentionFloor?: { readonly floor: { readonly days: number; readonly regimeIds: readonly string[] } | null } | null;
   /** Activate only: who signs A4_PACKAGE (null: the trust config does not verify); absent when not read. */
   readonly packageSigningRoute?: "vault" | "notary" | null;
   /** Activate only: each release's transparency entry in the log now (release id → entry hash, null for none); null when the log does not read. */
