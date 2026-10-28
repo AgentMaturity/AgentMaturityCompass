@@ -15,6 +15,20 @@
     "Rows include sync filesystem source occurrences, namespace and literal-require bindings, literal or template SQLite DELETE text, followed indirect erasure calls and the public payload-erasure definition. Several rows trace the same physical effect, so row totals are not counts of distinct deleted resources.",
     "Line numbers and source excerpts are navigation hints that may move. This inventory does not close computed aliases or SQL, asynchronous filesystem calls, rename-based replacement, schema cascades, external subprocess deletions or third-party storage APIs."
   ],
+  "directories": [
+    {
+      "path": "a4-projects/",
+      "policy": "never",
+      "owner": "P2-36",
+      "reason": "A4 project state: per-project private blob stores (personal context, brief free text, comment bodies) and their keys. AMC deletes no file here except the owner erasure action's key destruction, which runs through withDeletionGate (src/a4/a4Erasure.ts); any future A4 cleanup must go through assertDeletionAllowed or withDeletionGate. Outside .amc/, retention and backups unless includePaths lists it."
+    },
+    {
+      "path": "a4-releases/",
+      "policy": "never",
+      "owner": "P2-36",
+      "reason": "A4 release packages a chain names by content address. AMC deletes no package a RELEASE names; a4Package.ts removes only a failed attempt's own staging and the outputs no RELEASE names (rows below). Any other A4 cleanup must go through assertDeletionAllowed or withDeletionGate. Outside .amc/, retention and backups unless includePaths lists it."
+    }
+  ],
   "sites": [
     {
       "siteId": "src/a4/a4Blobs.ts:179:1",
@@ -23,8 +37,8 @@
       "call": "rmSync(",
       "category": "filesystem-sync",
       "source": "rmSync(join(dir, \"key.enc\"), { force: true });",
-      "status": "deferred",
-      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+      "status": "gated",
+      "reason": "destroyProjectKey's only caller is the P2-36 owner erasure action (src/a4/a4Erasure.ts eraseProjectPrivate), which runs it inside a fresh withDeletionGate call (executor a4-private-erase, target blobs) using the A4 store's workspace, before the ERASED transition commits. A hold or an unacknowledged audit refuses it with 409 DELETION_DENIED. The tombstone write and deleteVaultSecret on the wrap record run in the same callback."
     },
     {
       "siteId": "src/a4/a4Blobs.ts:180:1",
@@ -33,13 +47,53 @@
       "call": "rmSync(",
       "category": "filesystem-sync",
       "source": "rmSync(join(dir, \"key.pub\"), { force: true });",
-      "status": "deferred",
-      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+      "status": "gated",
+      "reason": "destroyProjectKey's only caller is the P2-36 owner erasure action (src/a4/a4Erasure.ts eraseProjectPrivate), which runs it inside a fresh withDeletionGate call (executor a4-private-erase, target blobs) using the A4 store's workspace, before the ERASED transition commits. A hold or an unacknowledged audit refuses it with 409 DELETION_DENIED. The tombstone write and deleteVaultSecret on the wrap record run in the same callback."
     },
     {
-      "siteId": "src/a4/a4Store.ts:529:1",
+      "siteId": "src/a4/a4Package.ts:561:1",
+      "path": "src/a4/a4Package.ts",
+      "line": 561,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "if (pathExists(finalDir)) rmSync(finalDir, { recursive: true, force: true }); // an earlier attempt's directory, which no RELEASE names",
+      "status": "deferred",
+      "reason": "Removes an earlier failed release attempt's directory under a4-releases/ that no RELEASE transition names, before this attempt's rename. Unpublished to the chain but outside a mkdtemp staging directory, so it is not exempt; no hold target is defined for A4 release attempts yet (P2-36 lists a4-releases/ as never-deleted)."
+    },
+    {
+      "siteId": "src/a4/a4Package.ts:572:1",
+      "path": "src/a4/a4Package.ts",
+      "line": 572,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(tarDir, { recursive: true, force: true });",
+      "status": "exempt",
+      "reason": "Removes this attempt's own mkdtemp tar staging directory after its tarball was renamed out; operation-owned unpublished staging."
+    },
+    {
+      "siteId": "src/a4/a4Package.ts:592:1",
+      "path": "src/a4/a4Package.ts",
+      "line": 592,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(staging, { recursive: true, force: true });",
+      "status": "exempt",
+      "reason": "Removes this failed attempt's own mkdtemp staging directory; operation-owned unpublished staging."
+    },
+    {
+      "siteId": "src/a4/a4Package.ts:593:1",
+      "path": "src/a4/a4Package.ts",
+      "line": 593,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "if (!landed) for (const path of [finalDir, tarPath, `${tarPath}.sig`, `${tarPath}.sha256`]) rmSync(path, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "Removes this failed attempt's package directory, tarball, signature and digest only when the chain names no RELEASE for it (an unreadable chain keeps them). Unpublished to the chain but not a staging file; no hold target is defined for A4 release attempts yet."
+    },
+    {
+      "siteId": "src/a4/a4Store.ts:489:1",
       "path": "src/a4/a4Store.ts",
-      "line": 529,
+      "line": 489,
       "call": "DELETE FROM",
       "category": "sqlite-delete-literal",
       "source": "db.prepare(\"DELETE FROM a4_requests WHERE ts < ?\").run(ts - A4_REQUEST_WINDOW_MS);",

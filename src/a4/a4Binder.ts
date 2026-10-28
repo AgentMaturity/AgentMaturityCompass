@@ -3,7 +3,8 @@
  * allowlisted, hashed projection in the P1-16 pattern (src/audit/binderConformanceRun.ts): ids, kinds, statuses, digests,
  * counts and times, principals hashed with the binder's identifier hashing. Specification text, comment bodies, decision
  * reasons, ref labels and transition bodies never leave as text: each is represented by the digest the chain already
- * binds. Every file passes the binder PII scan and a key-material scan before the manifest is signed (`a4-binder`), and
+ * binds. P2-02's detectors then run over every string (each match replaced by its hash, a credential refusing the slice),
+ * and every file passes the binder PII scan and a key-material scan before the manifest is signed (`a4-binder`), and
  * the slice is written only under `.amc/audit/binders/exports/` (P0-20). A signature proves these bytes, not their truth.
  */
 import { mkdtempSync, renameSync, rmSync } from "node:fs";
@@ -20,6 +21,7 @@ import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { containedPath } from "../utils/pathSafety.js";
 import { resolveRefs } from "./a4Evidence.js";
+import { emptyScan, redactExportValue } from "./a4ExportScan.js";
 import { a4EvidenceRefRowSchema, a4PreviewEnabled, type A4Stage } from "./a4Schema.js";
 import { A4StoreError, readA4Store } from "./a4Store.js";
 import { verifyA4Chain } from "./a4Verify.js";
@@ -80,7 +82,7 @@ export function buildA4BinderSlice(workspace: string, input: { projectId: string
       const gates = rows.a4_gates.filter((gate) => (input.stage === undefined || gate.stage === input.stage) && (input.gateId === undefined || gate.gate_id === input.gateId));
       if (input.gateId !== undefined && gates.length === 0) throw new A4StoreError(404, "A4_GATE_NOT_FOUND", `no gate ${input.gateId} on this project`);
       const revisionNos = new Set(gates.map((gate) => gate.revision_no));
-      const inSlice = (row: Record<string, Cell>): boolean => input.gateId !== undefined ? revisionNos.has(row.revision_no) : input.stage === undefined || row.stage === input.stage;
+      const inSlice = (row: Record<string, Cell>): boolean => input.gateId !== undefined ? revisionNos.has(row.revision_no as number) : input.stage === undefined || row.stage === input.stage;
       const refs = rows.a4_evidence_refs.filter(inSlice).map((row) => a4EvidenceRefRowSchema.parse(row));
       const files = Object.fromEntries([
         ...rows.a4_revisions.filter(inSlice).map((row) => [`revisions/r${text(row.revision_no)}.json`, json({
@@ -114,8 +116,13 @@ export function buildA4BinderSlice(workspace: string, input: { projectId: string
   } finally {
     ledger.close();
   }
-  const { files, agentId } = built;
-  const problems = exportProblems(files);
+  const { agentId } = built;
+  // P2-02's detectors after the projection (P2-36): each match becomes its hash; a credential refuses the slice.
+  const scan = emptyScan();
+  const files = Object.fromEntries(Object.entries(built.files).map(([path, body]) => [path, path.endsWith(".jsonl")
+    ? `${body.trim().split("\n").map((line) => canonicalize(redactExportValue(JSON.parse(line), path, hashed, scan))).join("\n")}\n`
+    : json(redactExportValue(JSON.parse(body), path, hashed, scan))]));
+  const problems = [...scan.credentials, ...exportProblems(files)];
   if (problems.length > 0) throw new A4StoreError(409, "A4_BINDER_REFUSED", "The binder slice failed the PII or key-material scan; nothing was written.", problems);
   const manifest = Buffer.from(json({ schema: "amc.a4-binder/v1", projectId: input.projectId, agentIdHash: hashAuditId(agentId, policy), stage: input.stage ?? null,
     gateId: input.gateId ?? null, headSeq: built.headSeq, headDigest: built.headDigest, generatedTs: now, claimBoundary: CLAIM_BOUNDARY,

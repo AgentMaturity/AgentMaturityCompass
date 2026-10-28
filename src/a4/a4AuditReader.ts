@@ -4,24 +4,52 @@ import { verifyHexDigestAny } from "../crypto/keys.js";
 import { legacyLedgerRowKeys, operationalEvidenceProblems } from "../keys/operationalLedgerReader.js";
 import { receiptLedgerProblems } from "../keys/receiptSqlAuthority.js";
 import { getPurposeKeyHistory } from "../keys/signingKeys.js";
-import { canonicalMetadataForHash, type Ledger } from "../ledger/ledger.js";
+import { readDataKeyFile } from "../ledger/encryption/dataKeys.js";
+import { inlinePlaintextOrNull, isEncryptedField, recomputeEventHash } from "../ledger/encryption/ledgerCipher.js";
+import type { Ledger } from "../ledger/ledger.js";
 import { verifyReceipt } from "../receipts/receipt.js";
 import type { TrustContext } from "../trust/trustContext.js";
-import { sha256Hex } from "../utils/hash.js";
 import type { A4TransitionRow } from "./a4Schema.js";
+
+/** Whether this workspace holds no ledger key file at all: a verifier's workspace, such as a materialized export. */
+function keyless(workspace: string): boolean {
+  try {
+    return readDataKeyFile(workspace) === null;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Whether a stored inline column carries the transition body (P2-36; reconcile/G2.md conflict 12): as is, or, under ledger
+ * encryption, as a ciphertext the ledger's own cipher opens to it. Where the key is out of reach (a locked vault or an
+ * unreachable provider) or the workspace holds no ledger key (an offline verifier), the ciphertext stands on the signed
+ * binding instead: the row hash covers it and its payload_sha256 is the body digest. A ciphertext that does not open
+ * under a key this workspace holds is a failure.
+ */
+function inlineCarries(workspace: string, eventId: string, inline: string, body: string): boolean {
+  if (inline === body) return true;
+  if (!isEncryptedField(inline)) return false;
+  try {
+    const plain = inlinePlaintextOrNull(workspace, eventId, inline);
+    return plain === null || plain === body;
+  } catch {
+    return keyless(workspace);
+  }
+}
 
 /** SQL reads use the caller's actual transaction; public files and operator trust are current point-in-time reads. */
 export function a4AuditProblems(ledger: Ledger, row: A4TransitionRow, trust?: TrustContext): string[] {
   const keys = legacyLedgerRowKeys(ledger.workspace);
   const event = ledger.getEventById(row.evidence_event_id);
   if (!event || event.event_type !== "audit" || event.payload_sha256 !== row.body_digest
-    || [event.payload_inline, event.canonical_payload_inline].some((inline) => inline != null && inline !== row.body_json)) {
+    || [event.payload_inline, event.canonical_payload_inline].some((inline) => inline != null && !inlineCarries(ledger.workspace, event.id, inline, row.body_json))) {
     return [`transition ${row.seq} audit row missing or carries other bytes`];
   }
-  const recomputed = sha256Hex(`${event.prev_event_hash}${canonicalMetadataForHash({ id: event.id, ts: event.ts, sessionId: event.session_id,
-    runtime: event.runtime, eventType: event.event_type, payloadPath: event.canonical_payload_path ?? event.payload_path,
-    payloadInline: event.canonical_payload_inline ?? event.payload_inline, metaJson: event.meta_json })}${event.payload_sha256}`);
-  if (recomputed !== event.event_hash || !verifyHexDigestAny(event.event_hash, event.writer_sig, keys)) {
+  // A row encrypted after it was hashed (`amc evidence-stores encrypt`) recomputes over its plaintext, which needs the key.
+  const hashErrors: string[] = [];
+  const recomputed = recomputeEventHash(ledger.workspace, event, hashErrors);
+  if (hashErrors.length > 0 || recomputed !== event.event_hash || !verifyHexDigestAny(event.event_hash, event.writer_sig, keys)) {
     return [`transition ${row.seq} audit row signature does not verify`];
   }
   const delegation = operationalEvidenceProblems(ledger.workspace, [event], { ledger, trust });
