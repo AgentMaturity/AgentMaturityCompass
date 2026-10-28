@@ -7,6 +7,7 @@ import {
 } from "../src/adapters/conformance/adapterManifest.js";
 import { QUALIFIED_PI_VERSIONS } from "../src/adapters/pi/piVersions.js";
 import { QUALIFIED_CLAUDE_CODE_VERSIONS } from "../src/adapters/hookProviders/claudeCode.js";
+import { QUALIFIED_DSH_VERSIONS } from "../src/adapters/dsh/dshVersions.js";
 import { sha256Hex } from "../src/utils/hash.js";
 
 const root = process.cwd();
@@ -49,6 +50,7 @@ describe("committed adapter claim manifests", () => {
   test("qualified versions equal the versions control accepts (control fails closed on any other)", () => {
     expect(committed("pi").manifest!.harness.versions).toEqual([...QUALIFIED_PI_VERSIONS]);
     expect(committed("claude-code").manifest!.harness.versions).toEqual([...QUALIFIED_CLAUDE_CODE_VERSIONS]);
+    expect(committed("dsh").manifest!.harness.versions).toEqual([...QUALIFIED_DSH_VERSIONS]);
   });
 
   test("Codex and DSH claim no enforcement", () => {
