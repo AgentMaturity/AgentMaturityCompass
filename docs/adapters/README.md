@@ -24,6 +24,10 @@ Individual setup and integration guides for each supported adapter.
 
 Pi is connected through its `tool_call` hook rather than an adapter id: `amc connect hooks install --provider pi`. See [pi.md](pi.md) for what is enforced, for which Pi versions, and what is not covered.
 
+## Harness support matrix
+
+What AMC claims for Pi, Claude Code, DeepSeek Harness and Codex, hook by hook and version by version, is in the generated [SUPPORT_MATRIX.md](SUPPORT_MATRIX.md), rendered from the adapter claim manifests in [manifests/](manifests/). The draft support policy is [SUPPORT_POLICY.md](SUPPORT_POLICY.md).
+
 ## Quick Start
 
 ```bash
