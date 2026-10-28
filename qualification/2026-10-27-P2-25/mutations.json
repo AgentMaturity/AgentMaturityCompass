@@ -111,11 +111,43 @@
       "failed": [
         "tests/leases/delegatedLease.test.ts > session leases > issues a v1 lease without a root outside a regulated profile, and refuses inside one"
       ]
+    },
+    {
+      "guard": "subagentRunner: deeper child without its parent lease falls back to the root lease",
+      "failed": [
+        "tests/agent/childLeaseLineage.test.ts > delegated child lease lineage > refuses a grandchild whose parent lease was not handed to it, instead of extending the root's lease"
+      ]
+    },
+    {
+      "guard": "subagentRunner: parent lease looked up from the runner, not the context",
+      "failed": [
+        "tests/agent/childLeaseLineage.test.ts > delegated child lease lineage > extends the parent lease handed in the context, whatever names its siblings chose"
+      ]
+    },
+    {
+      "guard": "delegateTool: composer's lease not handed to the spawn",
+      "failed": [
+        "tests/agent/childLeaseLineage.test.ts > delegated child lease lineage > the delegate and workflow tools hand their composer's lease, never a model argument, to the child's runner"
+      ]
+    },
+    {
+      "guard": "workflowTool: composer's lease not handed to the workflow",
+      "failed": [
+        "tests/agent/childLeaseLineage.test.ts > delegated child lease lineage > the delegate and workflow tools hand their composer's lease, never a model argument, to the child's runner"
+      ]
+    },
+    {
+      "guard": "subagentSpawn: lease not placed in the child's context",
+      "failed": [
+        "tests/agent/childLeaseLineage.test.ts > delegated child lease lineage > the delegate and workflow tools hand their composer's lease, never a model argument, to the child's runner"
+      ]
     }
   ],
   "red": [
     "tests/leases/leaseLifetimeCap.test.ts: both tests failed on 7a557437 (src stashed) before the central cap fix",
     "tests/leases/delegatedLease.test.ts > runLease mints a v2 lease...: failed with src/leases/runLease.ts at HEAD (v1 issuance)",
-    "tests/runPrincipalLease.test.ts: the two child-lease tests failed when subagentRunner inherited the parent lease (mutation above)"
-  ]
+    "tests/runPrincipalLease.test.ts: the two child-lease tests failed when subagentRunner inherited the parent lease (mutation above)",
+    "tests/agent/childLeaseLineage.test.ts: the missing-parent refusal and explicit-parent lineage tests failed on 46508ca6 (src stashed)"
+  ],
+  "note_untested": "subagentRunner handing its child's lease to the grandchild's capability has no dedicated end-to-end test; removing it makes every grandchild spawn refused (fails closed)."
 }
