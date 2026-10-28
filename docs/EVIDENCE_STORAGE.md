@@ -92,7 +92,7 @@ amc evidence-stores migrate --to postgres        # copy, check parity, write a s
 - **Mirrored tables are a list.** `POSTGRES_MIRROR_TABLES` (`src/persistence/postgres/postgresSchema.ts`) declares each table's DDL, columns and SQLite reader. P2-36 adds the `a4_*` and `action_*` tables there.
 - **Grants.** Give the AMC role `SELECT, INSERT` on `evidence_events` and `SELECT, INSERT, UPDATE` on `sessions` and `amc_chain_heads`, and nothing else, so the database role cannot rewrite evidence even with AMC's credentials.
 - **HA platform.** CloudNativePG, Patroni or a managed service; the operator chooses. Use synchronous replication if a committed append must survive the primary's loss: AMC cannot observe the server's durability settings, so the store declares `powerLossDurable: false`.
-- **Not verified here.** The tests run the store against a SQLite-backed fake driver through the real worker bridge. Conformance, determinism and failover against a real Postgres are the runbook [POSTGRES_FAILOVER.md](runbooks/POSTGRES_FAILOVER.md), pending.
+- **Not verified here.** The tests run the store against a SQLite-backed fake driver through the real worker bridge. Conformance, determinism and failover against a real Postgres are the runbook `docs/runbooks/POSTGRES_FAILOVER.md`, pending.
 
 ## Backups
 
