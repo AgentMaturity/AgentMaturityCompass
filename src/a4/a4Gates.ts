@@ -161,7 +161,7 @@ export function effectOwnerLost(row: Pick<A4EffectRow, "effect_id" | "owner_pid"
 
 /** The full chain verification as readiness's integrity section: valid only when every byte check passes. */
 const fullIntegrity = (store: A4Store, projectId: string): A4LiveFacts["integrity"] => {
-  const report = verifyA4Chain(store.ledger, projectId);
+  const report = verifyA4Chain(store.ledger, projectId, undefined, undefined, { mirror: true });
   return { valid: report.integrity.status === "pass", problems: report.integrity.errors, report };
 };
 /**

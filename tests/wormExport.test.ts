@@ -1,6 +1,7 @@
 /**
  * P2-09b WORM export with a fake target: refusals for unlocked, short-retention and governance-mode targets; offline
- * verification against a trust list; tamper and unpinned-key failures; idempotent re-export.
+ * verification against a trust list; tamper and unpinned-key failures; idempotent re-export. Each export carries two
+ * more objects since P2-36: the ledger side-table snapshot and its manifest (tests/wormSideTables.test.ts).
  */
 import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { generateKeyPairSync } from "node:crypto";
@@ -80,14 +81,14 @@ describe("WORM export (P2-09b)", () => {
     const target = filesystemTestTarget(bucket);
     const receipt = await exportRetentionSegments({ workspace, target, retainUntil });
     expect(receipt.segments).toBe(2);
-    expect(receipt.uploaded).toHaveLength(7);
+    expect(receipt.uploaded).toHaveLength(9);
     const offline = { indexFile: join(bucket, receipt.indexKey), objectsDir: bucket, trustList: trustList() };
     expect(verifyWormExport(offline)).toEqual({ ok: true, errors: [] });
 
     const again = await exportRetentionSegments({ workspace, target, retainUntil });
     expect(again.uploaded).toEqual([]);
     expect(again.indexSha256).toBe(receipt.indexSha256);
-    expect(target.puts).toHaveLength(7);
+    expect(target.puts).toHaveLength(9);
   });
 
   it("fails offline verification when one segment byte flips", async () => {
@@ -134,10 +135,10 @@ describe("WORM export (P2-09b)", () => {
     };
     const receipt = await exportRetentionSegments({ workspace, target: s3ObjectLockTarget({ bucket: "amc-worm", prefix: "ws/", call }), retainUntil });
     const puts = calls.filter(([operation]) => operation === "PutObject").map(([, input]) => input);
-    expect(puts).toHaveLength(7);
+    expect(puts).toHaveLength(9);
     expect(puts.every((input) => input.Bucket === "amc-worm" && String(input.Key).startsWith("ws/objects/") && input.ObjectLockMode === "COMPLIANCE"
       && input.IfNoneMatch === "*" && typeof input.ChecksumSHA256 === "string")).toBe(true);
-    expect(receipt.uploaded).toHaveLength(7);
+    expect(receipt.uploaded).toHaveLength(9);
     expect(calls.filter(([operation]) => operation === "HeadObject").every(([, input]) => input.ChecksumMode === "ENABLED")).toBe(true);
     expect(existsSync(receipt.localIndexPath)).toBe(true);
     await expect(exportRetentionSegments({ workspace, target: s3ObjectLockTarget({ bucket: "amc-worm", call: async () => ({}) }), retainUntil }))

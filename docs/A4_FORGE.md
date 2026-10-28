@@ -812,12 +812,21 @@ wrap secret. The `ERASED` record states this in its `effective` field.
 file there except the erasure above and a failed release attempt's own outputs that no `RELEASE` names. Any future A4
 cleanup must go through `assertDeletionAllowed` or `withDeletionGate`.
 
-**Ledger backends.** A4 keeps its `a4_*` and `action_*` tables in the SQLite ledger. The Postgres session store (P2-09d)
-mirrors only the tables its mirror list declares, and that list does not declare A4's tables yet. On a Postgres
-workspace every A4 write is refused with 503 `LEDGER_BACKEND_INCOMPLETE`, and readiness lists `store.ledger_backend`
-BLOCKED with one `NOT_MIRRORED:<table>` code per missing table. Reads still work. The Adapt context probe gives the same
-refusal. WORM segments (P2-09b) carry A4's audit rows, which are ordinary ledger rows. They do not carry the side tables:
-restore those from a workspace backup.
+**Ledger backends.** A4 keeps its `a4_*` tables, and the action journal its `action_*` tables, in the SQLite ledger. On
+a workspace pinned to the Postgres session store (P2-09d) every A4 commit writes its project's rows through to Postgres,
+inside the SQLite transaction and committed before it, so a Postgres write that cannot commit leaves no A4 transition
+(503 `LEDGER_MIRROR_UNAVAILABLE`). Each write is logged in a hash-chained mirror log under a head the workspace signs.
+Before every write, `snapshot` reads, `amc a4 verify` and readiness's integrity item check the project's Postgres rows
+against that log, against the SQLite rows and against the signed head; divergence, rows changed outside AMC and a log
+cut back below the signed head are refused with `LEDGER_MIRROR_DIVERGED`. An unreachable mirror, or a project Postgres
+has never held (`LEDGER_MIRROR_BEHIND`, healed by its next write), fails verification but not reads. `amc evidence-stores migrate --to postgres` carries existing A4 rows and compares them row by row. A WORM
+export (P2-09b) carries A4's audit rows in its retention segments and every side-table row in a signed side-table
+segment, so a WORM restore covers A4 state. Details: [EVIDENCE_STORAGE.md](EVIDENCE_STORAGE.md).
+`LEDGER_BACKEND_INCOMPLETE` remains for one case: a later `a4_*` or `action_*` table the ledger holds that the Postgres
+mirror does not declare. Then every A4 write is refused with 503 `LEDGER_BACKEND_INCOMPLETE`, readiness lists
+`store.ledger_backend` BLOCKED with one `NOT_MIRRORED:<table>` code per missing table, and the Adapt context probe gives
+the same refusal. Reads still work. Behaviour against a real Postgres is the pending drill in
+`docs/runbooks/POSTGRES_FAILOVER.md`.
 
 **Ledger encryption.** With `ledgerEncryptionEnabled`, each transition's audit row stores its payload as ciphertext.
 The store and `verifyA4Chain` open it through the ledger cipher and compare it with the transition body. Where the key

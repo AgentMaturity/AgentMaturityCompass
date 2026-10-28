@@ -706,7 +706,7 @@ function verifyRead(route: A4Route, projectId: string): true {
     }
     assertVisible(route, members);
   }
-  apiSuccess(route.res, { schema: "amc.a4-verify/v1", projectId, section: "integrity", report: verifyA4Chain(store.ledger, projectId),
+  apiSuccess(route.res, { schema: "amc.a4-verify/v1", projectId, section: "integrity", report: verifyA4Chain(store.ledger, projectId, undefined, undefined, { mirror: true }),
     boundary: "Integrity of bytes under this workspace's keys and the operator's trust list; not evidence about the agent.",
     claim: unboundClaim(projectId, "verify", false) });
   return true;

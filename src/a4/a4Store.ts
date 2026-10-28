@@ -44,6 +44,7 @@ import { captureA4RecordSigner, assertA4HotWriters, createA4CurrentLatch, A4Tran
 import { A4BlobError, a4ProjectsRoot, createProjectKey, putPrivate } from "./a4Blobs.js";
 import { LEDGER_BACKEND_INCOMPLETE_MESSAGE, ledgerBackendGap } from "./a4LedgerBackend.js";
 import { ledgerRefClaim, resolveLedgerEvent } from "./a4Evidence.js";
+import { type LedgerMirror, LedgerMirrorError, openLedgerMirror } from "../persistence/postgres/postgresLedgerMirror.js";
 import { assertMember, liveRolesFor, memberCandidates, populationFacts, principalPopulation } from "./a4Identity.js";
 import {
   A4_ENVELOPE_KINDS, defaultGatePolicyFor, a4EffectRowSchema, a4GatePolicyV1Schema, a4MemberRowSchema, a4ProjectRowSchema,
@@ -145,16 +146,27 @@ export function openA4Store(workspace: string): A4Store {
     ledger.close();
     throw new A4StoreError(503, "LEDGER_NOT_DURABLE", "the ledger connection commits below synchronous=FULL");
   }
-  return createStore(workspace, ledger);
+  return createStore(workspace, ledger, undefined, openLedgerMirror(workspace));
 }
 
 /** The store's readers and verifiers over a ledger opened elsewhere (read-only for `verifyA4Chain`); never for writes. */
 export const readA4Store = (ledger: Ledger, trust?: TrustContext): A4Store => createStore(ledger.workspace, ledger, trust);
 
-function createStore(workspace: string, ledger: Ledger, trust?: TrustContext) {
+function createStore(workspace: string, ledger: Ledger, trust?: TrustContext, mirror: LedgerMirror | null = null) {
   const db = ledger.db;
   /** Recorded on each project only: the ledger is the workspace's own, so no query filters on this path-derived id. */
   const workspaceId = workspaceIdFromDirectory(workspace);
+  // P2-36: on a Postgres-pinned workspace (`openA4Store` only) every commit writes its project's rows through to Postgres
+  // before SQLite commits, and `snapshot` refuses a project whose mirror diverges. Readers over other ledgers have none.
+  const mirrorWrite = (projectId: string): void => {
+    try {
+      mirror?.write(db, { kind: "a4", id: projectId });
+    } catch (error) {
+      if (!(error instanceof LedgerMirrorError)) throw error;
+      throw error.code === "LEDGER_MIRROR_UNAVAILABLE" ? new A4StoreError(503, error.code, "The Postgres ledger mirror could not commit; nothing was recorded.", error.problems)
+        : new A4StoreError(409, error.code, `project ${projectId}'s Postgres mirror diverges from the ledger; nothing was recorded`, error.problems);
+    }
+  };
 
   /** The unsigned head row as stored; only `verified` and the write path, which verifies it, read it. */
   const readHeadRow = (projectId: string): A4ProjectRow | null => {
@@ -487,6 +499,8 @@ function createStore(workspace: string, ledger: Ledger, trust?: TrustContext) {
         .run({ ...patch, project_id: projectId });
       current?.();
       db.prepare("DELETE FROM a4_requests WHERE ts < ?").run(ts - A4_REQUEST_WINDOW_MS);
+      current?.();
+      mirrorWrite(projectId); // last: Postgres commits first, so a mirror that cannot commit rolls this transaction back
       return { replay: false, projectId, seq: last.seq, kind: last.spec.kind, bodyDigest: last.digest, evidenceEventId: evidence!.id, envelope: last.envelope };
     });
   };
@@ -636,6 +650,9 @@ function createStore(workspace: string, ledger: Ledger, trust?: TrustContext) {
         return [table, named];
       })) as Record<A4SideTable, Record<string, Cell>[]>;
       const effects = (db.prepare("SELECT * FROM a4_effects WHERE project_id = ?").all(projectId) as unknown[]).map((row) => a4EffectRowSchema.parse(row));
+      // Divergence refuses the read; an unreachable mirror does not, since the rows read here verified on their own.
+      const diverged = (mirror?.problems(db, { kind: "a4", id: projectId }) ?? []).filter((problem) => problem.startsWith("LEDGER_MIRROR_DIVERGED"));
+      if (diverged.length > 0) throw integrityFailed(projectId, diverged);
       return { head, links: links as A4ChainLink[], rows, members: membersFrom(rows.a4_members), effects };
     })(),
     /** Running effects across projects, for the liveness sweeper. */
@@ -794,6 +811,6 @@ function createStore(workspace: string, ledger: Ledger, trust?: TrustContext) {
 
     /** Whether the chain ratchets single-user self-approval off (design §5.3). */
     ratcheted: (projectId: string): boolean => ratchetedFromChain(readChain(projectId)),
-    close: (): void => ledger.close()
+    close: (): void => { mirror?.close(); ledger.close(); }
   };
 }

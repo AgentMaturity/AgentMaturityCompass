@@ -21,6 +21,7 @@ import { receiptLedgerProblems } from "../keys/receiptSqlAuthority.js";
 import { openLedger, type Ledger } from "../ledger/ledger.js";
 import { ledgerSynchronousMode } from "../ledger/ledgerDurability.js";
 import { runImmediateTransaction } from "../ledger/ledgerSessionTransactions.js";
+import { openLedgerMirror } from "../persistence/postgres/postgresLedgerMirror.js";
 import { noteTelemetryDropped, takeDroppedTelemetry } from "../observability/telemetryDrops.js";
 import { verifyReceipt, type ActionReceiptMembers } from "../receipts/receipt.js";
 import type { ActionClass } from "../types.js";
@@ -305,6 +306,8 @@ function createJournal(workspace: string, ledger: Ledger, staleAfterMs: number):
   /** This process's executions and their agents, so a failed post-dispatch write can block the right agent. */
   // ponytail: one small entry per journaled call for the life of the journal; prune settled ones if processes run for weeks.
   const agents = new Map<string, string>();
+  /** The Postgres mirror of the journal's rows on a Postgres-pinned workspace (P2-36); null otherwise. */
+  const mirror = openLedgerMirror(workspace);
 
   const verified = (executionId: string): ChainVerification => {
     const chain = verifyChainIn(ledger, executionId, { trust: workspaceSelfTrust(workspace) });
@@ -357,7 +360,11 @@ function createJournal(workspace: string, ledger: Ledger, staleAfterMs: number):
   const transition = (executionId: string, change: Change): ActionReceiptV1 => {
     try {
       if (process.env.AMC_NO_SIGN === "1") throw new JournalUnavailable("AMC_NO_SIGN=1: an unsigned receipt attests to nothing");
-      const receipt = runImmediateTransaction(db, () => append(executionId, change, verified(executionId)));
+      const receipt = runImmediateTransaction(db, () => {
+        const appended = append(executionId, change, verified(executionId));
+        mirror?.write(db, { kind: "action", id: executionId }); // P2-36: Postgres commits first, or this transition rolls back
+        return appended;
+      });
       writeTelemetryDrops(ledger);
       return receipt;
     } catch (error) {
@@ -514,7 +521,7 @@ function createJournal(workspace: string, ledger: Ledger, staleAfterMs: number):
     block,
     unsettled: () => (db.prepare(`SELECT execution_id AS executionId, agent_id AS agentId, state, owner_pid AS ownerPid, owner_host AS ownerHost,
         heartbeat_ts AS heartbeatTs FROM action_executions WHERE state IN ('requested', 'authorized', 'started')`).all() as UnsettledExecution[]),
-    close: () => ledger.close()
+    close: () => { mirror?.close(); ledger.close(); }
   };
 }
 

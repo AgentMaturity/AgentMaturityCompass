@@ -40,6 +40,7 @@ import {
 } from "./a4Schema.js";
 import { authorsOf, buildersOf, evaluateSod, type SodDecision } from "./a4SoD.js";
 import { a4WitnessExists, A4StoreError, readA4Store } from "./a4Store.js";
+import { openLedgerMirror } from "../persistence/postgres/postgresLedgerMirror.js";
 
 /** The ledger migration that created the A4 tables (src/ledger/ledgerSchemaA4.ts). */
 const A4_MIGRATION = 13;
@@ -244,8 +245,22 @@ function checkEffects(links: readonly A4ChainLink[], gates: Map<string, Row>, ou
 interface Findings { errors: string[]; warnings: string[]; stale: string[]; signatures: IssuerAdmission[] }
 
 /** One project's VerifierReportV1. Trust is the operator's (`loadTrustContext()`), never a request's. */
-export function verifyA4Chain(ledger: Ledger, projectId: string, trust: TrustContext = loadTrustContext(), now = Date.now()): VerifierReportV1 {
+/**
+ * `options.mirror` (the workspace's own ledger only, never an exported one): on a Postgres-pinned workspace the
+ * project's Postgres mirror must also be in parity, its log whole and its signed head held (P2-36); an unreachable
+ * mirror is an integrity error, never a pass.
+ */
+export function verifyA4Chain(ledger: Ledger, projectId: string, trust: TrustContext = loadTrustContext(), now = Date.now(),
+  options: { mirror?: boolean } = {}): VerifierReportV1 {
   const out: Findings = { errors: [], warnings: [], stale: [], signatures: [] };
+  if (options.mirror) {
+    const mirror = openLedgerMirror(ledger.workspace);
+    try {
+      out.errors.push(...(mirror?.problems(ledger.db, { kind: "a4", id: projectId }, { walk: true }) ?? []));
+    } finally {
+      mirror?.close();
+    }
+  }
   try {
     if (readA4Store(ledger, trust).verifyChain(projectId) === null) out.errors.push(`A4_PROJECT_NOT_FOUND: ${projectId}`);
   } catch (error) {
@@ -290,7 +305,7 @@ export function verifyA4Projects(workspace: string, trust: TrustContext): Array<
     const projects = a4ProjectIds(db);
     if (projects.length === 0) return [{ status: "SKIP", details: ["no A4 projects"] }];
     return projects.map((projectId) => {
-      const report = verifyA4Chain(ledger, projectId, trust);
+      const report = verifyA4Chain(ledger, projectId, trust, Date.now(), { mirror: true });
       const failed = report.integrity.status === "fail";
       return { status: failed ? "FAIL" : "PASS", details: [projectId, ...(failed ? report.integrity.errors.slice(0, 20)
         : ["chain, side rows and envelopes verify (integrity of bytes under this workspace's keys)"]),

@@ -358,7 +358,7 @@ function registerReads(a4: Command): void {
       if (PROJECT_ID.test(target)) {
         const ledger = openLedger(process.cwd(), { readonly: true });
         try {
-          report = verifyA4Chain(ledger, target, trust);
+          report = verifyA4Chain(ledger, target, trust, Date.now(), { mirror: true });
         } finally {
           ledger.close();
         }
