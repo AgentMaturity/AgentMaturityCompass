@@ -2,31 +2,59 @@
   "item": "P2-35",
   "branch": "rtd/w4-p2-35",
   "base": "e95619acb",
-  "testedCommit": "596013810",
-  "machine": { "os": "macOS 26.6.2 arm64", "node": "v22.23.3", "vitestWorkers": 2 },
+  "testedCommit": "6e4e23d48 (first slice 596013810)",
+  "machine": {
+    "os": "macOS 26.6.2 arm64",
+    "node": "v22.23.3",
+    "vitestWorkers": 2
+  },
   "newTests": {
-    "set": "tests/a4/{guards,recordFixtures,routerAdmission,storeDedupe,scenario01..13}.test.ts, tests/crypto/signKindLists.test.ts, tests/studioApiAuthorization.test.ts (A4 rows added)",
-    "files": 15,
-    "passed": 123,
-    "failed": 0
+    "set": "tests/a4/{guards,recordFixtures,routerAdmission,storeDedupe,verifiedLane,hypotheses,leases,twoProcessRace,scenario01..16}.test.ts, tests/crypto/signKindLists.test.ts, tests/studioApiAuthorization.test.ts (A4 rows)",
+    "note": "journey harness tests/a4/a4Journey.ts; second process tests/fixtures/a4/a4Child.mjs on dist/"
   },
   "relatedTests": [
     {
-      "set": "tests/a4 (incl. P2-34/P2-36 files), tests/crypto, tests/a4GuardQualification, tests/keys/a4SigningProbe, tests/keys/a4ActivateSigningProbe, tests/enforce/egressAllowlist",
-      "files": 24, "passed": 396, "failed": 0
+      "set": "tests/a4 (all, incl. P2-34/P2-36 files), tests/crypto, tests/studioApiAuthorization, tests/a4GuardQualification, tests/keys/a4SigningProbe, tests/keys/a4ActivateSigningProbe, tests/enforce/egressAllowlist",
+      "files": 36,
+      "passed": 438,
+      "failed": 0
     },
     {
       "set": "pinned suites: apiRouterResponseParity, openapiContracts, studioApiAuthorization, threatModelMap, nativeSecondSharingRestoration, amc1472OutcomeOnboarding, architectureBoundaries; first-CI watch list: questionScoreExplainability, spineProjectionEndToEnd, evaluation/scoreConsistency.property",
-      "files": 10, "passed": 248, "failed": 0, "expectationsChanged": 0
+      "files": 10,
+      "passed": 248,
+      "failed": 0,
+      "expectationsChanged": 0
     }
   ],
-  "mutations": "tests/a4/DEBT.md § Mutation checks: 24 guards broken in src one at a time and restored; 23 turned a named test red; S1 (consumeGate's QUORUM_MET check) is equivalent: readiness allowed.progress refuses first with the same 409. verifyAndConsumeEffect and the quorum now path are pending (no effect gate reachable).",
+  "mutations": "tests/a4/DEBT.md \u00a7 Mutation checks: 40 guards broken in src one at a time and restored; 37 turned a named test red; 3 are equivalent with the reason recorded (S1 consumeGate QUORUM_MET and E1 verifyAndConsumeEffect count, each shadowed by an earlier identical refusal; Q1 the quorum now path, distinguishable only in a millisecond commit window).",
   "redGreen": "Tests-only item: no product code changed, so there is no red-before-fix run; each guard's red run is its mutation check.",
   "checks": {
-    "build": 0, "typecheck": 0, "typecheck:tests": 0, "lint": 0, "check:gates": 0,
+    "build": 0,
+    "typecheck": 0,
+    "typecheck:tests": 0,
+    "lint": 0,
+    "check:gates": 0,
     "check:dead-code": "0 after `quality:baseline dead-code --shrink` removed the two sign-kind export findings the new test resolves",
-    "check:duplicates": 0, "gen-counts --write": 0, "check:counts": 0, "gen:api-ref": 0, "check:api-ref": 0, "check:docs-drift": 0
+    "check:duplicates": 0,
+    "gen-counts --write": 0,
+    "check:counts": 0,
+    "gen:api-ref": 0,
+    "check:api-ref": 0,
+    "check:docs-drift": 0
   },
-  "notRun": ["full suite (npm test)", "a two-process clientRequestId run", "scenarios 6-9, 14, 16 (need Assemble/Adapt/Activate fixtures)", "the a4-record fixtures through P1-06's packages/verifier (it has no a4-record kind)"],
-  "pendingForSid": ["the P1-62 qualification receipt (D-23): one project Aspire to Activate on a non-stub provider, signed deployment and rollback receipts"]
+  "notRun": [
+    "full suite (npm test)",
+    "Assemble's native path (a stub-provider build session)",
+    "a WORKSPACE_ROUTER session fixture (cross-plane over HTTP, hosted single-user)",
+    "freeze or kill switch mid-effect; freeze-first rollback for high/critical",
+    "the a4-record fixtures through P1-06's packages/verifier (it has no a4-record kind)"
+  ],
+  "pendingForSid": [
+    "the D-23 / P1-62 end-to-end qualification: one project Aspire to Activate on a non-stub provider on macOS and Linux ARM64, signed deployment and rollback receipts"
+  ],
+  "followUps": [
+    "Proposed P2-41: hold refusal code (A4_NOT_READY ON_HOLD vs the design's A4_ON_HOLD) and tampered readiness (409 vs BLOCKED)",
+    "Proposed P2-42: Adapt's proposal exceeds SPEC_ROOM_FOR_BUILD (240 KiB) on the shipped catalog for every station measured: POST \u2026/stages/adapt/propose is 413 INPUT_TOO_LARGE; tests cross Adapt on the synthetic five-control catalog"
+  ]
 }
