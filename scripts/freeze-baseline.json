@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "freezeActive": true,
-  "measuredAt": "2026-10-28T05:44:56.486Z",
-  "measuredOn": "65767ae36540fc5a55920e3b520ac31c6673c3a4",
+  "measuredAt": "2026-10-28T17:44:34.589Z",
+  "measuredOn": "794a790b340a7a9ffde433c8783a93e8eb5c3867",
   "counts": {
     "cliCommandPaths": 1268,
     "cliInventoryPaths": 1268,
