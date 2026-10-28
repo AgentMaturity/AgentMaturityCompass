@@ -273,7 +273,8 @@ function mountProject(projectId, options) {
     const [readiness, gates, revision, comments, members, diff, revisions, refs] = await Promise.all([
       apiNativeRequest(projectPath(`/readiness?stage=${viewStage}`)).then((data) => one(data, "readiness")),
       apiNativeRequest(projectPath("/gates")).then((data) => listOf(data, "gates")),
-      project.revisionNo > 0 ? apiNativeRequest(projectPath(`/revisions/${project.revisionNo}`)).then((data) => one(data, "revision")) : null,
+      // The resolved view (P2-42): Adapt's derived parts put back and checked by Studio; the stored form binds them by sha256.
+      project.revisionNo > 0 ? apiNativeRequest(projectPath(`/revisions/${project.revisionNo}/resolved`)).then((data) => one(data, "revision")) : null,
       apiNativeRequest(projectPath("/comments")).then((data) => listOf(data, "comments")),
       apiNativeRequest(projectPath("/members")).catch((error) => ({ error: errorText(error) })),
       project.revisionNo > 1
@@ -287,7 +288,7 @@ function mountProject(projectId, options) {
       .map((row) => row.revisionNo);
     const stageNo = atStage.length > 0 ? Math.max(...atStage) : null;
     const stageRevision = stageNo === null ? null : stageNo === revision?.revisionNo ? revision
-      : one(await apiNativeRequest(projectPath(`/revisions/${stageNo}`)), "revision");
+      : one(await apiNativeRequest(projectPath(`/revisions/${stageNo}/resolved`)), "revision");
     return { project, readiness, gates, revision, stageRevision, comments, members, diff, refs, stage: viewStage };
   }
 

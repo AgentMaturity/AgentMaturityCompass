@@ -491,7 +491,7 @@ function recordReport(ledger: Ledger, record: A4RecordV1, trust: TrustContext, n
   const report = buildVerifierReport({ artifact, context: trust, integrityErrors, signatures, anchoring, verifiedAt: new Date(now),
     warnings: [...chain.warnings.filter((warning) => !warning.startsWith("workspace-self:")), ...(note === null ? [] : [note]),
       ...(fileRefs > 0 ? [`FILE_REFS_BOUND_BY_DIGEST: ${fileRefs} file evidence refs are bound by sha256; their bytes are not part of an export`] : []),
-      ...(derived > 0 ? [`DERIVED_BOUND_BY_DIGEST: ${derived} compiled plans are bound by sha256; their bytes stay under the workspace's a4-projects/<projectId>/derived`] : [])] });
+      ...(derived > 0 ? [`DERIVED_BOUND_BY_DIGEST: ${derived} derived parts (compiled plans, catalog-sized lists) are bound by sha256; their bytes stay under the workspace's a4-projects/<projectId>/derived`] : [])] });
   if (!intact) return { ...report, ...allNotEvaluated("INTEGRITY_FAILED") };
   // A project with no envelope yet has no auditor signature to admit (issuer admission not-evaluated): only a refused key blocks.
   if (report.issuerAdmission.status === "fail" || anchoring.status !== "anchored") return { ...report, ...allNotEvaluated(NOT_ADMITTED) };

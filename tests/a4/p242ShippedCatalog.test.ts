@@ -1,8 +1,9 @@
 /**
- * P2-42 · Adapt on the shipped catalog. With no catalog mock, a project on the technology or the wealth station crosses
- * Adapt (Propose, Build, the probe, Review, completion) through the HTTP routes. Each Adapt revision row binds its
- * compiled plan by sha256 (`amc.a4-derived-ref/v1`) and stays under the 240 KiB Build room; the plan is stored once under
- * `a4-projects/<projectId>/derived/`. A missing, changed or substituted plan file is an integrity failure for
+ * P2-42 · Adapt on the shipped catalog. With no catalog mock, a project on the technology or the wealth station, or on
+ * all seven, crosses Adapt (Propose, Build, the probe, Review, completion) through the HTTP routes. Each Adapt revision
+ * row binds its compiled plan and its other catalog-sized parts by sha256 (`amc.a4-derived-ref/v1`) and stays under the
+ * 240 KiB Build room; each part is stored once under `a4-projects/<projectId>/derived/`, and `…/resolved` answers them
+ * checked. A missing, changed or substituted plan file is an integrity failure for
  * verifyA4Chain and for every route that loads the project (409 A4_INTEGRITY_FAILED), never an empty plan; an exported
  * record still verifies offline without a key and says the plans are bound by digest.
  */
@@ -73,6 +74,46 @@ describe.each(["technology", "wealth"])("P2-42 · Adapt on the shipped catalog (
     const revision = (await j.p.get(j.t.alice, `/revisions/${last.revision_no}`)).body.data!;
     expect(sha256Hex(canonicalize(revision.spec))).toBe(revision.specDigest);
     expect(revision.specDigest).toBe(last.spec_digest);
+  });
+});
+
+describe("P2-42 · all seven stations, and the resolved view", () => {
+  const ALL = ["education", "environment", "health", "wealth", "technology", "mobility", "governance"];
+  test("a project on all seven stations crosses Adapt through Review; the explanation and Review's control lists are bound by sha256", async () => {
+    const j = await Journey.start();
+    await j.throughAspire(aspireAnswers({ stations: ALL }));
+    await j.stage("assemble", ASSEMBLE_ANSWERS);
+    await j.stage("adapt", ADAPT_ANSWERS);
+    expect((await j.p.get(j.t.alice)).body.data).toMatchObject({ stage: "activate" });
+    const rows = adaptRows(j);
+    for (const row of rows) expect(row.spec_json.length).toBeLessThan(ROOM);
+    const reviewed = JSON.parse(rows.at(-1)!.spec_json) as { explanation: { facts: unknown }; review: { conformance: { controls: unknown }; statement: { controls: unknown } };
+      understanding: { facts: { requirements: unknown; register: unknown; clocks: unknown } } };
+    for (const part of [reviewed.explanation.facts, reviewed.review.conformance.controls, reviewed.review.statement.controls, reviewed.understanding.facts.requirements,
+      reviewed.understanding.facts.register, reviewed.understanding.facts.clocks]) {
+      expect(part).toMatchObject({ schema: DERIVED_REF_SCHEMA, kind: "json", digest: null });
+    }
+    expect(chainErrors(j)).toEqual([]);
+  });
+
+  test("…/resolved answers the parts checked against their refs, the stored route answers the refs, and a missing part refuses both", async () => {
+    const { j } = await acrossAdapt("wealth");
+    const last = adaptRows(j).at(-1)!;
+    const stored = (await j.p.get(j.t.alice, `/revisions/${last.revision_no}`)).body.data!;
+    const resolved = (await j.p.get(j.t.alice, `/revisions/${last.revision_no}/resolved`)).body.data!;
+    expect(resolved).toMatchObject({ schema: "amc.a4-revision-resolved/v1", revisionNo: last.revision_no, specDigest: last.spec_digest });
+    const facts = (spec: unknown) => (spec as { understanding: { facts: { requirements: unknown; plan: unknown } } }).understanding.facts;
+    expect(Array.isArray(facts(resolved.spec).requirements)).toBe(true);
+    expect(facts(resolved.spec).plan).toMatchObject({ planVersion: 1 });
+    const ref = facts(stored.spec).requirements as { sha256: string };
+    expect(ref).toMatchObject({ schema: DERIVED_REF_SCHEMA, kind: "json" });
+    rmSync(planFile(j, ref.sha256));
+    for (const path of [`/revisions/${last.revision_no}/resolved`, `/revisions/${last.revision_no}`]) {
+      const reply = await j.p.get(j.t.alice, path);
+      expect(reply.status).toBe(409);
+      expect(JSON.stringify(reply.body)).toContain("A4_INTEGRITY_FAILED");
+    }
+    expect(chainErrors(j).some((error) => error.startsWith("A4_DERIVED_MISSING: json"))).toBe(true);
   });
 });
 
@@ -155,6 +196,8 @@ describe("P2-42 · the derived-content guards", () => {
     expect(refused(workspace, other)).toMatch(/^A4_INTEGRITY_FAILED: .*A4_DERIVED_MISMATCH/);
     expect(revisionDerivedProblems(workspace, PROJECT, other)[0]).toMatch(/^A4_DERIVED_MISMATCH/);
     const bad = { ...row, spec_json: row.spec_json.replace(/"sha256":"[0-9a-f]{64}"/, "\"sha256\":\"../../x\"") };
+    const misplaced = { ...row, spec_json: row.spec_json.replace('"kind":"compiled-plan"', '"kind":"json"').replace('"digest":"sha256:aaaa"', '"digest":null') };
+    expect(refused(workspace, misplaced)).toMatch(/^A4_INTEGRITY_FAILED: .*A4_DERIVED_REF_INVALID/);
     expect(refused(workspace, bad)).toMatch(/^A4_INTEGRITY_FAILED: .*A4_DERIVED_REF_INVALID/);
     rmSync(workspace, { recursive: true, force: true });
   });

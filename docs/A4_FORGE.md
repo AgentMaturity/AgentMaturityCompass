@@ -283,20 +283,26 @@ the agent's prompt pack.
   approval is an acknowledgement, not an expert review), activation and the lockout, and what is declared but not
   enforced (data handling: P2-01, P2-02; reporting clocks: P3-23).
 - **Propose** freezes the profile, the plan, the diff against this project's previous proposal, the operating scope
-  and the declared data handling (`enforcement: none`). The compiled plan is stored once, outside the revision rows (P2-42): on the
-  shipped catalog a plan is about 140 to 150 KiB (the catalog lock, the evidence plan, the requirements), more than the
-  256 KiB specification limit leaves once Understand's facts are recorded. Each Adapt row (Understand's facts and the
-  proposal) binds the plan by a ref, `{ schema: "amc.a4-derived-ref/v1", kind: "compiled-plan", sha256, digest }`
-  (`digest` is the plan's own digest), and the plan's canonical bytes are written, after the release secret scan, to
-  `a4-projects/<projectId>/derived/<sha256>.json` (plain directories, no link on the way). Every reader (readiness,
-  Build, Review, activation, the producers) gets the plan back checked against the ref; a missing file, other bytes or
-  a ref that does not parse is `409 A4_INTEGRITY_FAILED` on every route that loads the project, never an empty plan,
-  and `verifyA4Chain` reports it as `A4_DERIVED_MISSING`, `A4_DERIVED_MISMATCH` or `A4_DERIVED_REF_INVALID`. Restoring
-  the file (any copy with the same bytes) heals it. `GET …/revisions/:n` answers the stored form, so its `spec` still
-  hashes to `specDigest`. The plan holds AMC's compilation of the catalog and fact names, no member free text, so it is
-  stored plain: erasure leaves it and a verifier needs no key to read it. A revision recorded before P2-42 carries its
-  plan inline and is read as it is. The 256 KiB limit is unchanged; one to four stations fit (a project on all seven
-  stations is still refused at Review, 413, nothing written). **Build** signs the plan (`CONTROL_PLAN`, checked against this
+  and the declared data handling (`enforcement: none`). Adapt's catalog-sized parts are stored once, outside the revision rows (P2-42): on
+  the shipped catalog the compiled plan alone is about 140 to 150 KiB (the catalog lock, the evidence plan, the
+  requirements), and the why-view, the register entries, the clock candidates, the explanation and Review's control
+  lists grow with every station, past the 256 KiB specification limit. Each Adapt row binds them by a ref,
+  `{ schema: "amc.a4-derived-ref/v1", kind, sha256, digest }`: kind `compiled-plan` for the plan (at `plan` and
+  `understanding.facts.plan`; `digest` is the plan's own digest) and kind `json` (`digest: null`) for
+  `understanding.facts.requirements`, `.register` and `.clocks`, `explanation.facts`, and
+  `review.conformance.controls` and `review.statement.controls` when larger than 1 KiB. The canonical bytes are written,
+  after the release secret scan, to `a4-projects/<projectId>/derived/<sha256>.json` (plain directories, no link on the
+  way). Every reader (readiness, Build, Review, activation, the producers) gets each part back checked against its ref;
+  a missing file, other bytes, a ref that does not parse or a ref of the wrong kind for its place is
+  `409 A4_INTEGRITY_FAILED` on every route that loads the project, never an empty part, and `verifyA4Chain` reports it
+  as `A4_DERIVED_MISSING`, `A4_DERIVED_MISMATCH` or `A4_DERIVED_REF_INVALID` with the sha256. Restoring the file (any
+  copy with the same bytes) heals it. `GET …/revisions/:n` answers the stored form, so its `spec` still hashes to
+  `specDigest`; `GET …/revisions/:n/resolved` (`amc.a4-revision-resolved/v1`) answers the spec with every part put
+  back and checked exactly as above (fail closed), with the stored form's `specDigest`, and is what the Studio pages
+  read. The parts hold AMC's compilation of the catalog, the register and the explanation renderings of it, with no
+  member free text, so they are stored plain: erasure leaves them and a verifier needs no key to read them. A revision
+  recorded before P2-42 carries its parts inline and is read as it is. The 256 KiB limit is unchanged; a project on
+  all seven stations stores about 15 KiB per Adapt row (about 810 KiB resolved). **Build** signs the plan (`CONTROL_PLAN`, checked against this
   workspace's keys: a local audit trail). Build is an owner's, as at Aspire and Assemble: it signs the plan and re-signs
   the agent's Enforce manifest. Before it writes, the agent's resources must match its signed Enforce manifest (else
   `409 ENFORCE_DRIFTED`: review the drift in Enforce and re-baseline it there), and it re-writes the manifest only when
@@ -810,6 +816,18 @@ ledger keeps a salted hash and the ciphertext's hash. Pasted text is retained un
 destruction is effective only after every backup, WORM segment or mirror older than it has been rotated out. Back up
 `a4-projects/` and `a4-releases/` with the workspace: a restore without them orphans every blob reference in the chain.
 
+**What carries `a4-projects/`.** `amc backup create` (src/ops/backup/backupEngine.ts) archives the paths the signed ops
+policy's `backups.includePaths` lists, and the default list is `.amc` only: add `a4-projects` and `a4-releases` and
+re-sign the policy (Activate's readiness item `backup.include_paths` reads WAITING with `BACKUP_PATH_MISSING:<dir>/`
+until both are listed). A WORM export (src/ops/retention/wormSideTables.ts) and the Postgres mirror carry ledger rows
+only, never `a4-projects/`. Since P2-42 that directory also holds Adapt's derived parts (`derived/<sha256>.json`), so a
+restore of the ledger alone (a database backup, a WORM restore, a Postgres failover to a host without the workspace
+files) leaves every Adapt revision of a project unreadable: each route that loads it answers `409 A4_INTEGRITY_FAILED`.
+To restore: put back `a4-projects/` from an `amc backup` archive whose policy listed it (or any copy of the workspace
+files), then run `amc verify all` or `GET …/verify`. Each part still missing is named `A4_DERIVED_MISSING: <kind>
+<sha256>`; the files are content-addressed, so any copy with that name and those bytes heals it, and a copy with other
+bytes is refused (`A4_DERIVED_MISMATCH`).
+
 **Erasure.** A project owner erases the private text with `POST /api/v1/a4/projects/:id/private/erase` (body `reason`,
 `expectedHeadSeq`, `clientRequestId`; owner mode). AMC destroys the project's key: a tombstone first, then the vault wrap
 secret and `key.enc`. Every `private/*.enc` blob stays on disk and becomes unreadable (`GET .../comments` answers
@@ -887,8 +905,8 @@ residency or retention.
   certification (`A4_INTEGRITY_FAILED`); the certificate itself copies none of the A4 records.
 - **Verify offline.** `verifyA4Bundle` (`src/a4/a4Verify.ts`) checks a bundle or an `amc.a4-record/v1` JSON export
   without AMC's keys: every digest recomputes from the exported bytes, and keys count only when the caller's pinned
-  trust list admits them. An export carries the rows as stored, so an Adapt row's compiled plan is there as its sha256
-  ref; the report warns `DERIVED_BOUND_BY_DIGEST` with the count (the plan files stay under the workspace's
+  trust list admits them. An export carries the rows as stored, so an Adapt row's derived parts are there as their sha256
+  ref; the report warns `DERIVED_BOUND_BY_DIGEST` with the count (the files stay under the workspace's
   `a4-projects/<projectId>/derived/`, which `verifyA4Chain` checks in place). Run it with `amc a4 verify <file> --trust-list <file>` (exit 0 trusted, 1 failed, 2
   integrity-only under `--allow-unpinned` or `--allow-unanchored`). With no trust list the report states integrity only. In a bundle, a record whose `CREATED` body or signed
   seq-0 receipt names another agent than the manifest's fails scope (`A4_SCOPE_AGENT`). Seven normative fixtures,

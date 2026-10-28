@@ -160,14 +160,16 @@ is reachable directly (`storeDedupe.test.ts`) and by two processes that both pas
   Understand's facts and in the proposal, so every proposal exceeded `SPEC_ROOM_FOR_BUILD` (240 KiB) and
   `POST …/stages/adapt/propose` answered 413 INPUT_TOO_LARGE. Since P2-42 an Adapt row binds the plan by sha256
   (`amc.a4-derived-ref/v1`) and the plan is stored once under `a4-projects/<projectId>/derived/` (src/a4/a4Derived.ts);
-  readers get it back checked, and a missing or changed file is `A4_INTEGRITY_FAILED`. The 256 KiB limit stays.
-  `tests/a4/p242ShippedCatalog.test.ts` crosses Adapt on the technology and wealth stations with no mock, and the
-  journey scenarios (06, 08, 09, leases) now run on the shipped catalog: scenario 06 asserts an `UNRESOLVED:<control>`
-  of the shipped catalog instead of the fixture's `L2-FIX-US-01`. Sizes per station are in
-  `qualification/2026-10-29-P2-42/spec-sizes.txt`. Left: a project on all seven stations still overflows at Review
-  (its row is 218 KiB at Build, and Review adds the conformance statement and the control results, 46 to 66 KiB on
-  one station: 413 at Review, nothing written); binding the explanation and Review's control lists by digest too
-  would lift it. One to four stations cross (measured).
+  readers get it back checked, and a missing or changed file is `A4_INTEGRITY_FAILED`. The same binding then took the
+  why-view, the register entries, the clock candidates, the explanation and Review's control lists out of the rows
+  (kind `json`), so a project on all seven stations crosses Review too (about 15 KiB per stored row). The revision
+  route keeps the stored form; `GET …/revisions/:n/resolved` is the checked, resolved view the Studio pages read. The
+  256 KiB limit stays. `tests/a4/p242ShippedCatalog.test.ts` crosses Adapt on the technology and wealth stations and on
+  all seven, with no mock, and the journey scenarios (06, 08, 09, leases) now run on the shipped catalog: scenario 06
+  asserts an `UNRESOLVED:<control>` of the shipped catalog instead of the fixture's `L2-FIX-US-01`. Sizes per station
+  are in `qualification/2026-10-29-P2-42/spec-sizes.txt` and `spec-sizes-v2.txt`. A restore of the ledger without
+  `a4-projects/` now leaves Adapt unreadable (`A4_INTEGRITY_FAILED`); docs/A4_FORGE.md "What carries `a4-projects/`"
+  says which backup carries it and how to restore.
 - **Note (no defect) · lease ids in `a4_requests`.** The spec's case greps `response_json` for `lease_` and expects
   none; by design (P1-62) a credential-bearing request stores the projection `{ releaseId, leaseIds, tokenDelivered }`,
   so lease *ids* are recorded and the token never is. The tests assert the token, not the id, is absent.

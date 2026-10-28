@@ -73,6 +73,8 @@ export function a4Endpoints(): Record<string, Record<string, OpenApiOperation>> 
     [`${p}/revisions/diff`]: { get: read("Changed specification and resource slots between two revisions", [
       query("from", integer, "Revision number."), query("to", integer, "Revision number.")]) },
     [`${p}/revisions/{revisionNo}`]: { get: read("One revision (amc.a4-revision/v1)", [path("revisionNo", integer)]) },
+    [`${p}/revisions/{revisionNo}/resolved`]: { get: read("One revision with its derived parts resolved and checked (amc.a4-revision-resolved/v1)",
+      [path("revisionNo", integer)]) },
     [`${p}/transitions`]: { get: read("Transitions (amc.a4-transition/v1), at most 512 per page", [query("cursor", integer, "The first seq to return.")]) },
     [`${p}/gates`]: { get: read("Gates with their decisions and quorum (amc.a4-gate/v1)") },
     [`${p}/members`]: { get: read("Members; owners also see who can be added"), post: write("Add, change or remove a member (owner)", "A4Members") },

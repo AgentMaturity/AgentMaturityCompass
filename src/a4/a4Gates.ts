@@ -149,6 +149,15 @@ export function storedSpecOf(row: Pick<A4ReadinessState["revisions"][number], "s
   return sha256Hex(row.spec_json) === row.spec_digest ? spec : compactSpec(row.stage, spec).spec;
 }
 
+/**
+ * GET …/revisions/:n/resolved (P2-42): the spec with every derived part put back, as stateOf read and checked it against
+ * its ref (a missing or changed part refused the load with 409 A4_INTEGRITY_FAILED). Not content-addressed: `specDigest`
+ * is the stored form's, which GET …/revisions/:n answers. The Studio pages read this view.
+ */
+export const resolvedRevisionOf = (projectId: string, row: A4ReadinessState["revisions"][number]) => ({ schema: "amc.a4-revision-resolved/v1", projectId,
+  revisionNo: row.revision_no, stage: row.stage, specDigest: row.spec_digest, spec: JSON.parse(row.spec_json) as Record<string, unknown>,
+  boundary: "The specification with its derived parts resolved and checked against their sha256 refs; specDigest hashes the stored form (GET …/revisions/:n)." });
+
 /** The project's rows, read in one verified snapshot; refs resolved against the ledger and the trust list now. */
 export const loadA4State = (store: A4Store, projectId: string, now: number): A4ReadinessState => stateOf(store, store.snapshot(projectId), now);
 
