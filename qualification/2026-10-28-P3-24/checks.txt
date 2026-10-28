@@ -1,0 +1,60 @@
+$ npm run -s build
+exit 0
+
+
+$ npm run -s typecheck
+exit 0
+
+
+$ npm run -s typecheck:tests
+exit 0
+
+
+$ npm run -s lint
+exit 0
+
+
+$ npm run -s check:gates
+exit 0
+
+
+$ npm run -s check:dead-code
+exit 0
+No source-quality baseline at origin/main (merge-base 5ea5e866a42a): one-time bootstrap, base check skipped
+
+
+$ npm run -s check:duplicates
+exit 0
+No source-quality baseline at origin/main (merge-base 5ea5e866a42a): one-time bootstrap, base check skipped
+
+
+$ npm run -s check:counts
+exit 0
+
+
+$ npm run -s check:api-ref
+exit 0
+
+
+$ npm run -s check:docs-drift
+exit 0
+
+
+$ npm run -s check:schemas
+exit 0
+
+
+$ node packages/amc-conformance/bin/amc-conformance.mjs run --class a4-record --impl "env AMC_A4_PREVIEW=1 node dist/cli.js a4 verify {record} --trust-list {trustList} --trust-root {trustRoot} --json" --out tmp/p3-24-a4-record.json
+exit 0
+a4-record: 7/7 normative cases pass; conformant
+
+
+$ node packages/amc-conformance/bin/amc-conformance.mjs run --class verifier --impl "node packages/verifier/bin/amc-verify.mjs verify {artifact} {verifierArgs}" --out tmp/p3-24-verifier.json
+exit 0
+verifier: 61/61 normative cases pass; conformant
+
+
+$ npx vitest run tests/conformance tests/verifier/conformance.test.ts tests/acsConformance.test.ts --maxWorkers=2 --reporter=json --outputFile=tmp/p3-24-vitest.json
+exit 0
+
+
