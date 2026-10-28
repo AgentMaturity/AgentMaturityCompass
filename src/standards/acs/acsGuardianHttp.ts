@@ -19,11 +19,11 @@ function refuse(res: ServerResponse, status: number, code: number, reason: strin
   return true;
 }
 
-function isLoopback(address: string | undefined): boolean {
+export function isLoopback(address: string | undefined): boolean {
   return Boolean(address) && (address === "::1" || address!.startsWith("127.") || address!.startsWith("::ffff:127."));
 }
 
-async function readCapped(req: IncomingMessage, maxBytes: number): Promise<string | null> {
+export async function readCapped(req: IncomingMessage, maxBytes: number): Promise<string | null> {
   const chunks: Buffer[] = [];
   let total = 0;
   for await (const chunk of req) {

@@ -5,6 +5,7 @@ import {
   getHookIntegrationStatus,
   type HookIntegrationStatus,
   type HookMode,
+  type HookIntegrationProvider,
   type HookProvider,
 } from "../adapters/hookIntegration.js";
 import { verifyEvidenceEventIntegrity, type EvidenceLedgerReader } from "../ledger/ledger.js";
@@ -36,7 +37,7 @@ export interface HookHealthLastEvent {
 
 export interface HookHealthDiagnostic {
   schemaVersion: "2026-07-13";
-  provider: HookProvider;
+  provider: HookIntegrationProvider;
   agentId: string | null;
   mode: HookMode | null;
   status: HookHealthStatus;
@@ -106,7 +107,7 @@ function installationReason(state: HookIntegrationStatus["state"]): HookHealthRe
 }
 
 function repairCommands(
-  provider: HookProvider,
+  provider: HookIntegrationProvider,
   state: HookHealthStatus,
   reasons: ReadonlySet<HookHealthReasonCode> = new Set(),
 ): string[] {

@@ -90,6 +90,26 @@ Recognized session JSONL (DSH or Pi) may be up to 32 MiB, DSH's own limit; with 
 
 A retained original proves the bytes are unchanged since import. It does not prove the harness told the truth or that the recorded actions happened, and it never makes an import observed: imports stay `SELF_REPORTED` and `NOT_EVALUATED`. Originals can hold secrets or personal data; they are not included in external-evidence profiles. The record map (`amc-record-map/2`) lists per source the original SHA-256, format version and pinned revision, and the losses of each conversion stage (`redaction`, `projection`, `external-evidence`).
 
+## Tool-call control plugin (not qualified)
+
+AMC also has a DSH plugin that asks AMC before every DSH tool call (`packages/dsh-amc-plugin`, written against DSH
+0.2.1-rc.2). **No DSH version is qualified, so AMC denies every DSH call the plugin sends, and AMC claims nothing for
+DSH tool calls.** It exists so that qualification can follow; see the
+[support matrix](SUPPORT_MATRIX.md).
+
+```sh
+amc up
+amc connect hooks install --provider dsh --agent my-agent --mode control --dry-run   # with the dsh you run on PATH
+amc connect hooks install --provider dsh --agent my-agent --mode control
+amc connect hooks status --provider dsh
+```
+
+AMC does not edit DSH profiles. The install prints the plugin entry to add to your DSH profile: the plugin module,
+with the workspace, the path of AMC's transport module and the DSH version as its config. DSH runs ungoverned while
+it does not load the plugin. The plugin denies a call when AMC is unreachable or answers anything but a signed allow
+for exactly that call. It also denies a call with no arguments, or from a DSH version AMC has not qualified. Only
+`read`, `write`, `edit` and `web_fetch` with absolute paths are mapped; every other DSH tool is denied.
+
 ## Session-log uploads to DeepSeek
 
 The plugin's defaults differ between the two pinned revisions. Its README and configuration schema were rechecked on 2026-10-16:

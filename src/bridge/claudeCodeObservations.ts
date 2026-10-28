@@ -18,6 +18,7 @@
  * AMC records it, it does not vouch for it. A mismatch (`authorizationMismatch: true`) is observed, not prevented,
  * because the tool already ran. Raw tool input reaches AMC over loopback only and is never stored.
  */
+import { codexActionId, codexSessionSha256 } from "../adapters/codex/codexIdentity.js";
 import { randomUUID } from "node:crypto";
 import { resolve } from "node:path";
 import { z } from "zod";
@@ -46,10 +47,12 @@ type Ledger = ReturnType<typeof openLedger>;
 const observationCounters = new IntakeCounters(OBSERVATION_LIMITS);
 
 /** The providers whose after-the-fact observations AMC records here, and how each names its sessions, calls and registrations. */
-export type ObservedProvider = "claude-code" | "pi";
+export type ObservedProvider = "claude-code" | "pi" | "codex";
+/** Codex (P2-17) is observed only: no installation registers a Codex session, so its observations are never under registration. */
 const PROVIDERS = {
   "claude-code": { label: "Claude Code", prefix: "cc", sessionSha256: claudeSessionSha256, actionId: claudeActionId, registration: claudeCodeSessionRegistration },
   pi: { label: "Pi", prefix: "pi", sessionSha256: piSessionSha256, actionId: piActionId, registration: piSessionRegistration },
+  codex: { label: "Codex", prefix: "cx", sessionSha256: codexSessionSha256, actionId: codexActionId, registration: () => ({ status: "missing" as const }) },
 } as const;
 
 /** Whether `provider` session `sessionId` has a verified registration: only then can a fault of its writer latch. */
@@ -89,7 +92,7 @@ function summaryWriter(input: ScopeInput & { registered: boolean; now: number })
  * its session, its lease and its workspace (hookIntake.ts). Over a cap it is refused (429), never silently: it is listed
  * in a signed intake summary row, and decisions under the capped scope are denied until its window passes.
  */
-function admitObservation(input: ScopeInput & { now: number; toolUseId?: string }): { registered: boolean } {
+export function admitObservation(input: ScopeInput & { now: number; toolUseId?: string }): { registered: boolean } {
   const registered = sessionRegistered(input.workspace, input.agentId, input.sessionId, input.provider);
   const write = summaryWriter({ ...input, registered });
   const refused = observationCounters.admit(intakeScope({ ...input, registered }), input.now, write,
@@ -245,7 +248,7 @@ const decisionMetaSchema = z.object({
 });
 
 /** The verified decision row of `provider`'s action `actionId`, or null when there is none or it does not verify. */
-function verifiedDecision(ledger: Ledger, agentId: string, actionId: string, provider: ObservedProvider):
+function verifiedDecision(ledger: Ledger, agentId: string, actionId: string, provider: Exclude<ObservedProvider, "codex">):
   (z.infer<typeof decisionMetaSchema> & { eventId: string }) | null {
   const eventId = decisionEventId(agentId, provider, actionId);
   try {
@@ -260,7 +263,8 @@ function verifiedDecision(ledger: Ledger, agentId: string, actionId: string, pro
 
 /** One tool call's outcome as the provider's hook reports it, in AMC's terms. */
 export interface ReportedOutcome {
-  provider: ObservedProvider;
+  /** A provider whose outcomes follow an AMC control decision; Codex has none. */
+  provider: Exclude<ObservedProvider, "codex">;
   /** The provider's event name (PostToolUse, PostToolUseFailure, tool_result). */
   event: string;
   sessionId: string;

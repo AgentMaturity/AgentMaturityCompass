@@ -21,9 +21,12 @@ import YAML from "yaml";
 import { redactBridgeText } from "./bridgeRedaction.js";
 import { ACS_TOOL_CALL_METHOD, acsControlResponseSchema, acsHookCall, acsLossyNote, acsToolRequest, renderAcsControlResponse, type AcsControlContext }
   from "../standards/acs/acsProvider.js";
+import { DSH_TOOL_CALL_EVENT, dshControlResponseSchema, dshHookCall, dshLossyNote, dshToolRequest, renderDshControlResponse, type DshControlContext }
+  from "../adapters/dsh/dshProvider.js";
+import { dshVersionRefusal } from "../adapters/dsh/dshVersions.js";
 
-/** `acs`: an OWASP ACS v0.1 tool call, reached only through the ACS guardian route (src/standards/acs/acsGuardian.ts). */
-const HOOK_PROVIDERS = ["claude-code", "gemini-cli", "pi", "acs"] as const;
+/** `acs`: an OWASP ACS v0.1 tool call, reached only through the ACS guardian route (src/standards/acs/acsGuardian.ts). `dsh`: AMC's DSH plugin. */
+const HOOK_PROVIDERS = ["claude-code", "gemini-cli", "pi", "acs", "dsh"] as const;
 export type HookProvider = (typeof HOOK_PROVIDERS)[number];
 export type HookControlDecision = "allow" | "deny" | "ask";
 export type HookControlOutcome = HookControlDecision | "steer";
@@ -73,6 +76,7 @@ export const CONTROL_HOOK_EVENTS: Readonly<Record<HookProvider, string>> = {
   "gemini-cli": "BeforeTool",
   pi: "tool_call",
   acs: ACS_TOOL_CALL_METHOD,
+  dsh: DSH_TOOL_CALL_EVENT,
 };
 
 export function runtimeFor(provider: HookProvider): RuntimeName {
@@ -80,7 +84,8 @@ export function runtimeFor(provider: HookProvider): RuntimeName {
     case "claude-code": return "claude";
     case "gemini-cli": return "gemini";
     case "pi": return "pi";
-    case "acs": return "unknown";
+    case "acs":
+    case "dsh": return "unknown";
     default: {
       const unreachable: never = provider;
       throw new Error(`unknown hook provider ${String(unreachable)}`);
@@ -123,7 +128,7 @@ function piControlContext(provider: HookProvider, input: Record<string, unknown>
  * authority. Other providers carry none; a Pi or Claude Code request that does not match its pinned shape is refused.
  */
 export interface HookCall {
-  readonly provider: "pi" | "claude-code" | "acs";
+  readonly provider: "pi" | "claude-code" | "acs" | "dsh";
   readonly actionId: string;
   readonly sessionId: string;
   readonly callId: string;
@@ -133,6 +138,8 @@ export interface HookCall {
   readonly pi: PiControlContext | null;
   /** ACS: the context the guardian route derived from the ACS request (acsProvider.ts). */
   readonly acs: AcsControlContext | null;
+  /** DSH: the context AMC's DSH plugin sent (dshProvider.ts). */
+  readonly dsh: DshControlContext | null;
   /** Claude Code: the payload, which the session's registered release must accept (claudeRequestRefusal). */
   readonly request: Record<string, unknown> | null;
   /** Claude Code: the SHA-256 of the payload bytes exactly as Claude Code sent them, which the decision binds. */
@@ -166,11 +173,16 @@ export function hookCall(provider: HookProvider, input: Record<string, unknown>,
   const pi = piControlContext(provider, input);
   if (pi) {
     return { provider: "pi", actionId: piActionId(pi.sessionId, pi.toolCallId), sessionId: pi.sessionId, callId: pi.toolCallId, cwd: pi.cwd, pi,
-      parentActionId: pi.parentToolCallId === null ? null : piActionId(pi.sessionId, pi.parentToolCallId), acs: null, request: null, payloadSha256: null };
+      parentActionId: pi.parentToolCallId === null ? null : piActionId(pi.sessionId, pi.parentToolCallId), acs: null, dsh: null, request: null, payloadSha256: null };
   }
   if (provider === "acs") {
     const call = acsHookCall(input);
     if (!call) throw new HookControlError("HOOK_CONTROL_INPUT_INVALID", 400, "ACS hook input needs a valid acs context");
+    return call;
+  }
+  if (provider === "dsh") {
+    const call = dshHookCall(input);
+    if (!call) throw new HookControlError("HOOK_CONTROL_INPUT_INVALID", 400, "DSH hook input needs a valid dsh context");
     return call;
   }
   if (provider !== "claude-code") return null;
@@ -179,13 +191,14 @@ export function hookCall(provider: HookProvider, input: Record<string, unknown>,
     throw new HookControlError("HOOK_CONTROL_INPUT_INVALID", 400, "Claude Code hook input is not a qualified release's PreToolUse payload in AMC's envelope");
   }
   const { session_id: sessionId, tool_use_id: callId, cwd } = parsed;
-  return { provider: "claude-code", actionId: claudeActionId(sessionId, callId), sessionId, callId, parentActionId: null, cwd, pi: null, acs: null, request: input,
+  return { provider: "claude-code", actionId: claudeActionId(sessionId, callId), sessionId, callId, parentActionId: null, cwd, pi: null, acs: null, dsh: null, request: input,
     payloadSha256: envelope.payloadSha256 };
 }
 
 /** Why AMC refuses a Pi or Claude Code call before mapping it, or null. */
 export function hookCallRefusal(call: HookCall, workspace: string, toolName: string, toolInput: Record<string, unknown>): string | null {
   if (call.acs) return null;
+  if (call.dsh) return dshVersionRefusal(call.dsh.version);
   return call.pi ? piRefusal(call.pi, workspace, toolName) : claudeCodeRefusal(call.cwd, workspace, toolName, toolInput);
 }
 
@@ -217,6 +230,7 @@ export function controlMappingValid(value: { provider: HookProvider; requestedDe
 /** Why AMC denied an outcome the provider's hook cannot carry (capability-lossy). */
 function lossyOutcomeNote(outcome: "ask" | "steer", provider: HookProvider): string {
   if (provider === "acs") return acsLossyNote(outcome);
+  if (provider === "dsh") return dshLossyNote(outcome);
   if (provider === "claude-code") return "A Claude Code ask is not AMC approval, and AMC has no approval path for hook calls, so AMC denied the action.";
   if (provider === "pi") {
     return outcome === "ask"
@@ -275,6 +289,7 @@ const CONTROL_RESPONSE_SCHEMAS: Readonly<Record<HookProvider, z.ZodType>> = {
   "gemini-cli": geminiControlResponseSchema,
   pi: piControlResponseSchema,
   acs: acsControlResponseSchema,
+  dsh: dshControlResponseSchema,
 };
 
 export function parseProvider(provider: unknown): HookProvider {
@@ -317,6 +332,7 @@ export function renderProviderControlResponse(
     };
   }
   if (provider === "acs") return renderAcsControlResponse(decision, reason, extra.requestSha256);
+  if (provider === "dsh") return renderDshControlResponse(decision, reason, extra.requestSha256);
   if (provider === "pi") {
     if (!extra.requestSha256) throw new Error("a Pi control response must bind the request it decided");
     return decision === "allow" ? { block: false, requestSha256: extra.requestSha256 } : { block: true, reason, requestSha256: extra.requestSha256 };
@@ -510,7 +526,7 @@ export function canonicalToolRequests(
   toolName: string,
   toolInput: Record<string, unknown>,
   workspace: string,
-  call: (Pick<HookCall, "cwd"> & Partial<Pick<HookCall, "acs">>) | null = null,
+  call: (Pick<HookCall, "cwd"> & Partial<Pick<HookCall, "acs" | "dsh">>) | null = null,
 ): { requests: CanonicalToolRequest[]; commandPlan: ShellCommandPlan | null } {
   if (provider !== "gemini-cli" && !call) return { requests: [], commandPlan: null };
   const command = shellCommandForProviderTool(provider, toolName, toolInput);
@@ -533,6 +549,8 @@ export function canonicalToolRequests(
     request = call ? piToolRequest(toolName, toolInput, workspace, call.cwd) : null;
   } else if (provider === "acs") {
     request = acsToolRequest(toolName, toolInput, call);
+  } else if (provider === "dsh") {
+    request = dshToolRequest(toolName, toolInput, workspace, call);
   } else if (["read_file", "list_directory", "glob", "search_file_content"].includes(toolName)) {
     request = {
       name: "fs.read",

@@ -1,0 +1,84 @@
+name: Harness conformance
+
+# P2-17: qualifies AMC's hook integrations against the pinned harness versions in docs/adapters/manifests/*.json.
+# Each suite installs its pinned harness from npm into a temporary prefix and drives it with a local scripted model
+# endpoint on loopback: no secrets, no live models. Results are uploaded as artifacts; a failure opens nothing
+# automatically and is triaged by hand. Codex and DSH have no qualified version, so they have no job.
+
+on:
+  schedule:
+    - cron: '41 3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pi:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Build
+        run: npm run build
+      - name: Manifests still match their qualification records and the matrix
+        run: node scripts/gen-harness-matrix.mjs --check
+      - name: Pi conformance at the qualified versions
+        env:
+          AMC_PI_CONFORMANCE: '1'
+          AMC_PI_CONFORMANCE_OUT: tmp/harness-conformance/pi-conformance.json
+        run: |
+          mkdir -p tmp/harness-conformance
+          npx vitest run tests/conformance/piToolCall.conformance.test.ts
+      - name: Upload Pi results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: harness-conformance-pi
+          path: tmp/harness-conformance/
+          if-no-files-found: warn
+
+  claude-code:
+    # The suite denies the binary outbound network with sandbox-exec, which exists only on macOS.
+    runs-on: macos-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Build
+        run: npm run build
+      - name: Claude Code conformance at the qualified version
+        env:
+          AMC_CLAUDE_CODE_CONFORMANCE: '1'
+          AMC_CLAUDE_CODE_CONFORMANCE_OUT: tmp/harness-conformance/claude-code-conformance.json
+        run: |
+          mkdir -p tmp/harness-conformance
+          npx vitest run tests/conformance/claudeCodeHooks.conformance.test.ts
+      - name: Upload Claude Code results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: harness-conformance-claude-code
+          path: tmp/harness-conformance/
+          if-no-files-found: warn

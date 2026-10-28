@@ -73,7 +73,7 @@ function claudeResolvePath(value: string, workspace: string, cwd: string): strin
  * claudeResolvePath, for a value in its one canonical spelling: absolute, no `.` or `..` segment, no repeated or
  * trailing separator. Null otherwise (the call is then unmapped and denied).
  */
-function claudeFileLocation(value: unknown, workspace: string): string | null {
+export function claudeFileLocation(value: unknown, workspace: string): string | null {
   if (typeof value !== "string" || !isAbsolute(value) || normalize(value) !== value || (value.length > 1 && value.endsWith(sep))) return null;
   return claudeResolvePath(value, workspace, "/");
 }
@@ -115,7 +115,7 @@ function claudePureBash(command: unknown, workspace: string): { binary: string; 
  * Whether `value` is an http(s) URL written exactly as the URL parser serializes it, every percent-encoding in upper
  * case and none for an unreserved character: one URL, one spelling, so ToolHub's rules see what Claude Code fetches.
  */
-function canonicalUrl(value: unknown): boolean {
+export function canonicalUrl(value: unknown): boolean {
   if (typeof value !== "string") return false;
   try {
     const url = new URL(value);

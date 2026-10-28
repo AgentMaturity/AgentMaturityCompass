@@ -736,7 +736,8 @@ describe("AMC provider hook integration", () => {
     const workspace = newWorkspace();
     expect(() => installHookIntegration({
       workspace,
-      provider: "codex" as "claude-code",
+      // Codex installs in observe mode since P2-17; Cursor still has no pinned hook contract.
+      provider: "cursor" as "claude-code",
       agentId: "unsupported-agent"
     })).toThrowError(expect.objectContaining<Partial<HookIntegrationError>>({ code: "HOOK_PROVIDER_UNSUPPORTED" }));
     expect(() => installHookIntegration({

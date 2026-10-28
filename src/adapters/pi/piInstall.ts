@@ -98,14 +98,19 @@ export function measurePiInstall(packageDir: string): PiInstall | null {
   }
 }
 
-/** The Pi package behind the `pi` command on `searchPath` (what a person running `pi` gets), or null. */
-export function findPiPackage(searchPath = process.env.PATH ?? ""): string | null {
+/** The package directory behind `command` on `searchPath` (what a person running it gets) that `measure` accepts, or null. */
+export function findPackageOnPath(command: string, measure: (dir: string) => unknown, searchPath = process.env.PATH ?? ""): string | null {
   for (const dir of searchPath.split(delimiter).filter(Boolean)) {
-    const bin = join(dir, "pi");
+    const bin = join(dir, command);
     if (!existsSync(bin)) continue;
     for (let current = dirname(realpathSync(bin)); dirname(current) !== current; current = dirname(current)) {
-      if (measurePiInstall(current)) return current;
+      if (measure(current)) return current;
     }
   }
   return null;
+}
+
+/** The Pi package behind the `pi` command on `searchPath`, or null. */
+export function findPiPackage(searchPath = process.env.PATH ?? ""): string | null {
+  return findPackageOnPath("pi", measurePiInstall, searchPath);
 }

@@ -54,10 +54,10 @@ function text(value: unknown, label: string): string {
   return value;
 }
 
-/** The installation `.amc/hooks/pi.json` names, for an extension installed in `mode`. */
-export function readPiHookConfig(workspace: string, mode: "observe" | "control"): PiHookConfig {
-  const manifest = JSON.parse(readFileSync(join(workspace, ".amc", "hooks", "pi.json"), "utf8")) as Record<string, unknown>;
-  if (manifest.provider !== "pi" || manifest.mode !== mode) throw new Error(`Pi hook manifest is not a ${mode} installation`);
+/** The installation `.amc/hooks/<provider>.json` names, for a hook installed in `mode` (Pi's extension, or AMC's DSH transport). */
+export function readPiHookConfig(workspace: string, mode: "observe" | "control", provider: "pi" | "dsh" | "codex" = "pi"): PiHookConfig {
+  const manifest = JSON.parse(readFileSync(join(workspace, ".amc", "hooks", `${provider}.json`), "utf8")) as Record<string, unknown>;
+  if (manifest.provider !== provider || manifest.mode !== mode) throw new Error(`${provider} hook manifest is not a ${mode} installation`);
   const bridge = new URL(text(manifest.bridgeBase, "bridgeBase"));
   const loopback = LOOPBACK_HOSTS.has(bridge.hostname);
   if (!["http:", "https:"].includes(bridge.protocol) || bridge.origin !== text(manifest.bridgeBase, "bridgeBase")
@@ -118,7 +118,7 @@ function nonEmpty(value: unknown): value is string {
 }
 
 /** The payload of a receipt that verifies under one of the pinned receipt keys, over the received payload bytes, or a throw. */
-function verifiedReceiptPayload(receipt: unknown, publicKeys: readonly string[]): Record<string, unknown> {
+export function verifiedReceiptPayload(receipt: unknown, publicKeys: readonly string[]): Record<string, unknown> {
   const parts = typeof receipt === "string" ? receipt.split(".") : [];
   if (parts.length !== 2 || !parts[0] || !parts[1]) throw new Error("AMC decision receipt is malformed");
   const payload = Buffer.from(parts[0], "base64url");
