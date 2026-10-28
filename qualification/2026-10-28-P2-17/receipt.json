@@ -1,0 +1,102 @@
+{
+ "schemaVersion": 1,
+ "key": "P2-17",
+ "date": "2026-10-28",
+ "commit": "29f8d2722193f3c69e3a45b64f5d98b90ca230ce",
+ "branch": "rtd/w4-p2-17",
+ "node": "v22.23.3",
+ "pnpm": "10.33.0",
+ "os": "macOS 26.6.2",
+ "arch": "arm64",
+ "commands": [
+  {
+   "cmd": "npm run -s build",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npx vitest run tests/adapterManifest.test.ts tests/harnessMatrix.test.ts tests/piConformanceMatrix.test.ts --maxWorkers=2",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "node scripts/gen-harness-matrix.mjs --check",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s typecheck",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s typecheck:tests",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s lint",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:gates",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:dead-code",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:duplicates",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:counts",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:api-ref",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:docs-drift",
+   "exit": 0,
+   "durationMs": 0
+  }
+ ],
+ "tests": {
+  "total": 18,
+  "passed": 18,
+  "failed": 0,
+  "skipped": 0
+ },
+ "artifacts": [
+  {
+   "path": "SUPPORT_MATRIX.md",
+   "sha256": "4048af0c5d4d5e4e681428550842983fb4c007ca28899bc036a738fdc113ea2a"
+  },
+  {
+   "path": "manifests/claude-code.json",
+   "sha256": "d4931622f417b6a99184c9939efb0a4560d896b22e0be61ac87ecb9955d8c095"
+  },
+  {
+   "path": "manifests/codex.json",
+   "sha256": "729dc310f21bffd7adf09db4219dc51e7f667fbad593d36e90143c7deecd1e1a"
+  },
+  {
+   "path": "manifests/dsh.json",
+   "sha256": "4fd4431690f64b061503c284950ef7f5a3929f8272e2ac6b4bb8d22f4e3cfd94"
+  },
+  {
+   "path": "manifests/pi.json",
+   "sha256": "7779fcfbbf942b7e928b96b91940c560b38df2804fe50ad71facf96b687d011a"
+  }
+ ],
+ "notes": "P2-17 part A only (manifests, generated matrix, draft policy). Local macOS run, not CI; durations not recorded. Mutation checks, each killed by tests/adapterManifest.test.ts then restored: M1 enforce accepted without a receipt case; M2 enforce accepted with onFailure proceeds/unknown; M3 record hash not compared; M4 case values not compared. Red before green: the first generator run refused every Pi case because the path splitter broke inside [version=1.0.2]; fixed by bracket-aware tokenizing. check:freeze fails at the base on other items' exception keys not yet in origin/main's allowedExceptionKeys; P2-17 adds no CLI command and no exception. Parts B (Codex hooks), C (DSH plugin) and D (GA docs, nightly harness workflow, npm pack for Sid) are not done."
+}

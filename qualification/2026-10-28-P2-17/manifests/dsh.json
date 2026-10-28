@@ -1,0 +1,17 @@
+{
+  "schema": "amc.adapter-claim-manifest/v1",
+  "adapter": "dsh",
+  "harness": { "package": "@deepseek-ai/dsh", "versions": [], "commit": "c389f96bf3a9b6807cb71ed6bdad5849be0df6d8" },
+  "hooks": [
+    { "name": "launch (process boundary)", "role": "observe", "tools": [], "onFailure": "unknown", "source": "docs/adapters/deepseek-harness.md", "cases": [] },
+    { "name": "gateway (model traffic)", "role": "observe", "tools": [], "onFailure": "unknown", "source": "docs/adapters/deepseek-harness.md", "cases": [] }
+  ],
+  "notCovered": [
+    "every DSH tool call: no native DSH hook is installed; the DSH plugin (P2-17 part C) is not built",
+    "DSH's own sandbox and approval settings (AMC does not rely on them)",
+    "custom plugins, changed profiles and direct web requests outside the gateway",
+    "the exec-by-path window after the last launcher hash"
+  ],
+  "qualifiedAt": null,
+  "receipt": null
+}

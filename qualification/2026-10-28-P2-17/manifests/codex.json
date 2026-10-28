@@ -1,0 +1,11 @@
+{
+  "schema": "amc.adapter-claim-manifest/v1",
+  "adapter": "codex",
+  "harness": { "package": "@openai/codex", "versions": [] },
+  "hooks": [],
+  "notCovered": [
+    "every Codex tool call: AMC has no Codex integration; Codex's lifecycle hooks are not yet reviewed or qualified (P2-17 part B)"
+  ],
+  "qualifiedAt": null,
+  "receipt": null
+}
