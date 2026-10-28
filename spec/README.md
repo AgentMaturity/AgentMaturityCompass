@@ -1,4 +1,39 @@
-# AMC public contracts
+<!-- SPDX-License-Identifier: MIT -->
+# AMC specification
+
+Draft. Not a standard. AMC output is evidence of conformity, never proof of compliance.
+
+## AMC Core Spec 1.0 (draft)
+
+Version 1.0.0-draft.1. Chapters 2 to 10 are normative; the rest is informative.
+
+1. [Scope, status and terms](core/01-scope.md)
+2. [Conformance classes](core/02-conformance-classes.md)
+3. [Claim kinds and vocabulary](core/03-claim-kinds.md)
+4. [Evidence model](core/04-evidence-model.md)
+5. [Control results](core/05-control-results.md)
+6. [Maturity levels](core/06-maturity-levels.md)
+7. [Authorization records, receipt states and failure behaviour](core/07-authorization-and-receipts.md)
+8. [Scoped attestations](core/08-scoped-attestations.md)
+9. [Verification](core/09-verification.md)
+10. [Versioning and change process](core/10-versioning.md)
+
+- [Annex A. Levels and EU AI Act articles](annex/eu-ai-act-levels.md) (informative, experimental; expert sign-off open)
+- [Annex B. Reading AMC 1.x results](annex/legacy-1x.md)
+- [Changelog](CHANGELOG.md) and the [RFC process](rfcs/README.md)
+
+The spec's tables of levels, claim kinds, banned wording, schema `$id`s and receipt states are generated from the code
+(`node scripts/check-spec-sync.mjs --write`); CI runs `--check`. It supersedes `docs/AMC_STANDARD_RFC.md` and
+`docs/OPEN_RUBRIC_STANDARD.md`, which stay for history.
+
+### Licence
+
+The spec files carry an SPDX licence line. Until the maintainer records decision D-04 (licences for the spec, catalog
+content and code), the spec ships under the repository licence, MIT (`LICENSE`). D-04's recommended option would put
+the spec under CC BY 4.0; when D-04 is recorded the licence line changes in `scripts/check-spec-sync.mjs` and every
+file is regenerated. Code samples in the spec follow the code licence.
+
+## Public contracts
 
 This folder holds the JSON Schemas for the records AMC writes and reads, and the rules a verifier applies to them.
 Each schema is generated from the zod schema AMC itself parses with (`src/contracts/`), so a schema here states what

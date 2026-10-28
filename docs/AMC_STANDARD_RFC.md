@@ -1,4 +1,7 @@
 # AMC Standard — Agent Maturity Compass
+
+> **Superseded by the AMC Core Spec 1.0 draft in spec/; kept for history.** See [spec/README.md](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/spec/README.md). Nothing in this document is normative.
+
 ## RFC-style Specification v1.0
 
 **Status:** Proposed Standard  
