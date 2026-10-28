@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "key": "P2-09",
+  "slice": "d-postgres",
+  "date": "2026-10-28",
+  "branch": "rtd/w3-p2-09d",
+  "parent": "93ccb82b5",
+  "commit": "a3b6e2a92",
+  "node": "v22.23.3",
+  "os": "macOS (darwin 25.6.0)",
+  "arch": "arm64",
+  "postgresServer": "none: tests use tests/fixtures/fake-pg (SQLite-backed, pg-shaped) through the real worker bridge",
+  "commands": [
+    { "cmd": "npm run -s build", "exit": 0 },
+    { "cmd": "npm run -s typecheck", "exit": 0 },
+    { "cmd": "npm run -s typecheck:tests", "exit": 0 },
+    { "cmd": "npm run -s lint", "exit": 0 },
+    { "cmd": "npm run -s check:gates", "exit": 0 },
+    { "cmd": "npm run -s check:dead-code", "exit": 0, "new": 0, "accepted": ["scripts/drills/postgres-failover-drill.mjs (operator-run drill)"] },
+    { "cmd": "npm run -s check:duplicates", "exit": 0, "new": 0, "accepted": ["jsonl/postgres store private accessors (3-line getOpsPolicy/signMonitorDigest/assertWritable)"] },
+    { "cmd": "node scripts/gen-counts.mjs --write && npm run -s check:counts", "exit": 0 },
+    { "cmd": "npm run -s gen:api-ref && npm run -s check:api-ref", "exit": 0 },
+    { "cmd": "npm run -s check:docs-drift", "exit": 0 },
+    { "cmd": "node scripts/check-freeze.mjs --write-baseline", "exit": 0, "note": "cliCommandPaths 1263 -> 1264; P2-09d needs adding to allowedExceptionKeys by the integrator" },
+    { "cmd": "npx vitest run tests/postgresSessionEventStore.test.ts tests/ledgerEncryptionMigration.test.ts --maxWorkers=2", "exit": 0, "tests": 27, "failed": 0 },
+    { "cmd": "npx vitest run <85 test files touching the session stores, ledger verification, encryptMigration, evidence-stores CLI, a4Readiness, nativeTaskTypes> --maxWorkers=2", "exit": 0, "files": 85, "passed": 1362, "failed": 0 },
+    { "cmd": "AMC_POSTGRES_URL_FILE=<600 file> node scripts/drills/postgres-failover-drill.mjs --seconds 1", "exit": 1, "note": "smoke only: refuses with POSTGRES_DRIVER_MISSING because pg is not installed here; the real run is pending for Sid" }
+  ],
+  "redGreen": "New backend: no prior code path. Each guard below was broken and the named test went red, then restored green.",
+  "mutations": [
+    { "guard": "UNIQUE (chain_id, prev_event_hash) dropped from the evidence_events DDL", "failingTest": "refuses a forked row at the database (UNIQUE chain_id, prev_event_hash)" },
+    { "guard": "SCRAM requirement removed from the worker's post-connect check", "failingTest": "refuses a server that authenticates with trust instead of SCRAM" },
+    { "guard": "sslmode=verify-full check disabled", "failingTest": "refuses a connection string without sslmode=verify-full before connecting" },
+    { "guard": "writer-open history authentication disabled", "failingTest": "refuses a writer whose stored history was edited" },
+    { "guard": "retry equality check disabled (any duplicate id returns the stored row)", "failingTest": "a retry after a lost commit reply returns the committed row instead of a duplicate" },
+    { "guard": "migration's never-merge check disabled", "failingTest": "refuses to merge into a Postgres chain that already holds rows" },
+    { "guard": "migration's SQLite history authentication disabled", "failingTest": "refuses to copy a SQLite history that fails authentication" },
+    { "guard": "postgres branch removed from verifyAlternateBackendEvidence", "failingTest": "verify reports a Postgres store it cannot read as an error, never as a pass" }
+  ],
+  "pending": [
+    "Sid: real-Postgres conformance, determinism and failover drill (docs/runbooks/POSTGRES_FAILOVER.md), receipt under this folder",
+    "Sid: ADR 018 approval",
+    "Integrator: add P2-09d to freeze allowedExceptionKeys"
+  ]
+}
