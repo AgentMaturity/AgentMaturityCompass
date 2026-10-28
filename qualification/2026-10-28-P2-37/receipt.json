@@ -2,7 +2,7 @@
  "schemaVersion": 1,
  "key": "P2-37",
  "date": "2026-10-28",
- "commit": "b3102b613c3e748e78b44e46d52f67ca04c56eea",
+ "commit": "e1699efa394f57e312bc8debfb4cd30bf96fc850",
  "branch": "rtd/w4-p2-37",
  "node": "v22.23.3",
  "pnpm": "10.33.0",
@@ -20,12 +20,7 @@
    "durationMs": 0
   },
   {
-   "cmd": "npx vitest run tests/a4/p237IntegrationClaims.test.ts tests/a4/p237PhasesAndRetry.test.ts --maxWorkers=2",
-   "exit": 0,
-   "durationMs": 0
-  },
-  {
-   "cmd": "npx vitest run tests/a4 tests/adapterManifest.test.ts tests/executionContract.test.ts tests/resumeRules.test.ts tests/resumeReconciliation.test.ts tests/checkPackContents.test.ts tests/architectureBoundaries.test.ts tests/a4GuardQualification.test.ts tests/keys/a4ActivateSigningProbe.test.ts tests/keys/a4SigningProbe.test.ts tests/executionApiParity.test.ts tests/trust/trustContext.test.ts --maxWorkers=2",
+   "cmd": "npx vitest run <40 files: tests/a4 (4 P2-37 files + 2 existing) and every existing test file touching the changed modules: native tasks, acp, prompt packs, artifact signatures, Enforce manifests, execution contract, resume rules, adapter manifests, pack contents, architecture boundaries, A4 signing probes> --maxWorkers=2",
    "exit": 0,
    "durationMs": 0
   },
@@ -85,22 +80,27 @@
    "durationMs": 0
   },
   {
+   "cmd": "npm run -s check:architecture-boundaries",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
    "cmd": "npm run -s check:freeze",
    "exit": 1,
    "durationMs": 0
   }
  ],
  "tests": {
-  "total": 182,
-  "passed": 182,
+  "total": 598,
+  "passed": 598,
   "failed": 0,
   "skipped": 0
  },
  "artifacts": [
   {
    "path": "integration-claims.json",
-   "sha256": "2f78436c9903946668d2cf7a0323309b72550ebb2a0c9dcf79f8ab8edb2fc49b"
+   "sha256": "1a01963bb3e012bdb21936f2d39afe9d15e85886982b91f49328e28ab6a9d33f"
   }
  ],
- "notes": "P2-37 sub-parts: manifest-projected IntegrationClaims (+ acs:<hook> reserved boundary, card source/pinned version, dist/adapter-claims packaging), contract execution phases in Assemble Review, P2-12 resume rule on A4 effect retry. Local macOS run, not CI; durations not recorded. The 182 tests are the second vitest command (16 files, includes the 13 new P2-37 tests). Red before green: both new test files fail at base 8494d9644 (integrationClaimsFrom, executionPhaseRows and src/a4/a4EffectResume.ts do not exist there). Mutation checks, each killed then restored: claim ignores manifest problems (2 tests fail); adapter-name check skipped (1); role check dropped (1); signed ACTION_STATE lookup dropped from journaled() (1); applied effect allowed to retry (1); any completed head allowed to retry (1). check:freeze exits 1 at base and here only on other items' exception keys not yet in allowedExceptionKeys; P2-37 adds no CLI command. Not done: the Studio native-task prompt-pack/context-plugin runtime loader and the Mechanic write link (see README)."
+ "notes": "All P2-37 In-list parts: manifest-projected IntegrationClaims (+ acs:<hook>, card source/pinned version, dist/adapter-claims packaging); contract execution phases in Assemble Review; P2-12 resume rule on A4 effect retry; the Studio native-task loader for the signed prompt pack and A4 context plugin (fail closed in a regulated workspace) with context.native_delivery evaluated at Adapt Review; the mechanic write link (checked TUNE seed, signed attach of executed results, mechanic:<phaseId> vocabulary); a4Package's boundary row from the claim. Local macOS run, not CI; durations not recorded. Red before green: every new P2-37 test file fails at its base (the functions it tests do not exist there). Mutation checks, each killed then restored: claim ignores manifest problems; adapter-name check skipped; role check dropped; signed ACTION_STATE lookup dropped; applied effect may retry; any completed head may retry; release boundary back to tool_pipeline-only; regulated refusal skipped in the loader; plugin signature verdict ignored (consistent forgery); pack verification ignored; mechanic pair verification ignored; mechanic scope check dropped; native-delivery agent filter dropped. check:freeze exits 1 at base and here only on other items' exception keys; P2-37 adds no CLI command. Not covered by a test: the end-to-end A4 retry route and the attach route over a real deployed, tuned project (P2-35 scenario work)."
 }

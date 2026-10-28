@@ -1,6 +1,7 @@
 [
  {
   "label": "enforced at tool_pipeline",
+  "release": "enforced",
   "path": "native",
   "enforcementBoundary": "tool_pipeline",
   "evidenceTier": "observed",
@@ -15,6 +16,7 @@
  },
  {
   "label": "enforced at hook:PreToolUse",
+  "release": "enforced",
   "path": "claude-code",
   "enforcementBoundary": "hook:PreToolUse",
   "evidenceTier": "observed",
@@ -36,6 +38,7 @@
  },
  {
   "label": "enforced at pi:tool_call",
+  "release": "enforced",
   "path": "pi",
   "enforcementBoundary": "pi:tool_call",
   "evidenceTier": "observed",
@@ -57,6 +60,7 @@
  },
  {
   "label": "preview",
+  "release": "observed",
   "path": "langgraph",
   "enforcementBoundary": "gateway",
   "evidenceTier": "observed",
@@ -71,6 +75,7 @@
  },
  {
   "label": "preview",
+  "release": "observed",
   "path": "langchain",
   "enforcementBoundary": "gateway",
   "evidenceTier": "observed",
@@ -85,6 +90,7 @@
  },
  {
   "label": "preview",
+  "release": "observed",
   "path": "crewai",
   "enforcementBoundary": "gateway",
   "evidenceTier": "observed",
@@ -99,6 +105,7 @@
  },
  {
   "label": "preview",
+  "release": "observed",
   "path": "openai-agents",
   "enforcementBoundary": "gateway",
   "evidenceTier": "observed",
@@ -113,6 +120,7 @@
  },
  {
   "label": "preview",
+  "release": "observed",
   "path": "vercel-ai",
   "enforcementBoundary": "gateway",
   "evidenceTier": "observed",
@@ -127,6 +135,7 @@
  },
  {
   "label": "preview",
+  "release": "none",
   "path": "generic-http",
   "enforcementBoundary": "gateway",
   "evidenceTier": "self_reported",
@@ -141,6 +150,7 @@
  },
  {
   "label": "preview",
+  "release": "none",
   "path": "other",
   "enforcementBoundary": "none",
   "evidenceTier": "self_reported",
