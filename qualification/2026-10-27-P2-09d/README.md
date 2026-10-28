@@ -8,6 +8,10 @@ Branch `rtd/w3-p2-09d` on base `93ccb82b5`, code commit `a3b6e2a92`. Details and
 - 85 existing test files that touch the changed modules: 1,362 passed, 0 failed.
 - Eight mutation checks, each turning its named test red (listed in `receipt.json`).
 
+## Security review fixes
+
+Three findings, fixed with tests in "security review fixes (P2-09d)": event ids keyed per chain with cross-chain ids refused; verification and writer open check the last row against `amc_chain_heads` and against a head AMC signs into the workspace after each append and migration, with session seals verified; run verification, budgets, native session reads and audit packets read Postgres rows. Red/green and mutations are in `receipt.json` (`securityReview`). Related suites: 123 files, 2,089 passed.
+
 ## What this does not show
 
 There is no Postgres server here and `pg` is not a dependency. Every test drives `tests/fixtures/fake-pg`, a `pg`-shaped driver over SQLite, through the real worker-thread bridge. It cannot show real Postgres locking, real TLS and SCRAM negotiation, or a real failover.

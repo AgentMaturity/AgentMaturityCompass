@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import Database from "better-sqlite3";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
 import { openSessionEventStore, readSessionStoreMarker } from "../src/persistence/openSessionEventStore.js";
 import { migrateSqliteToPostgres } from "../src/persistence/postgres/postgresMigration.js";
@@ -11,7 +11,12 @@ import { verifySignedMigrationReceipt } from "../src/ledger/signedMigrationRecei
 import { verifyLedgerIntegrity } from "../src/ledger/ledgerVerification.js";
 import { ensurePostgresChainId, PostgresSessionEventStore } from "../src/persistence/postgres/postgresSessionEventStore.js";
 import { POSTGRES_MIRROR_TABLES } from "../src/persistence/postgres/postgresSchema.js";
-import { POSTGRES_URL_FILE_ENV } from "../src/persistence/postgres/syncPgClient.js";
+import { POSTGRES_URL_FILE_ENV, setDefaultPostgresDriver } from "../src/persistence/postgres/syncPgClient.js";
+import type { SessionEventStore } from "../src/persistence/sessionEventStore.js";
+import { verifyAlternateBackendEvidence } from "../src/ledger/alternateBackendVerification.js";
+import { verifyAgentRun } from "../src/agent/runReport.js";
+import { readBudgetEvents } from "../src/budgets/nativeBudgetUsage.js";
+import { readNativeSessionEvents } from "../src/session/readNativeSessionEvents.js";
 import { verifyStoredSessionEvents } from "../src/persistence/sessionStoreVerification.js";
 import { embedEnvelope, SESSION_GENESIS } from "../src/session/sessionTypes.js";
 import { sha256Hex } from "../src/utils/hash.js";
@@ -98,7 +103,7 @@ const sqliteBackend: ConformanceBackend = {
 };
 
 /** One spine-shaped append: the envelope chains on the session's previous event. */
-function append(store: PostgresSessionEventStore, sessionId: string, seq: number, prev: string, id?: string) {
+function append(store: SessionEventStore, sessionId: string, seq: number, prev: string, id?: string) {
   return store.appendSessionEvent({
     sessionId,
     runtime: "amc",
@@ -372,7 +377,119 @@ describe("amc evidence-stores migrate --to postgres", () => {
   it("verify reports a Postgres store it cannot read as an error, never as a pass", () => {
     const ws = sqliteWorkspace();
     migrateSqliteToPostgres(ws, { pg: { driverModule: FAKE_PG } });
-    // verify opens the store with the default driver (pg), which is not installed here.
+    writeFileSync(`${dbFile(ws)}.down`, "");
     expect(verifyLedgerIntegrity(ws).errors).toContain("postgres session store could not be read: unreachable, misconfigured or unauthenticated evidence");
+  }, TIMEOUT_MS);
+});
+
+describe("security review fixes (P2-09d)", () => {
+  // Verifiers and read paths open the store without options; point them at the fake.
+  beforeAll(() => setDefaultPostgresDriver(FAKE_PG));
+  afterAll(() => setDefaultPostgresDriver("pg"));
+
+  /** A workspace pinned to Postgres with one closed, sealed session of three events. */
+  function pinnedWorkspace(): string {
+    const ws = workspace();
+    process.env[POSTGRES_URL_FILE_ENV] = join(pgDir(ws), "url");
+    const store = openSessionEventStore(ws, "postgres");
+    store.startSession({ sessionId: "s-v", runtime: "amc", binaryPath: "pg-test", binarySha256: sha256Hex("v") });
+    let prev = SESSION_GENESIS;
+    for (const seq of [0, 1, 2]) {
+      prev = store.appendSessionEvent({
+        sessionId: "s-v", runtime: "amc", eventType: seq === 0 ? "session/open" : seq === 1 ? "user/message" : "session/close",
+        meta: embedEnvelope({}, { v: 1, sessionId: "s-v", seq, prevSessionEventHash: prev, turn: null, step: null, surface: { op: "none" }, synthetic: false }),
+        ...(seq === 1 ? { payload: "hello" } : {})
+      }).eventHash;
+    }
+    store.sealSession("s-v");
+    store.close();
+    return ws;
+  }
+
+  function sql(ws: string, statement: string): void {
+    const db = new Database(dbFile(ws));
+    try { db.exec(statement); } finally { db.close(); }
+  }
+
+  it("an id used by another workspace's chain is refused, never returned as a retry", () => {
+    const one = workspace();
+    const two = workspace();
+    writeFileSync(join(pgDir(two), "url"), `postgres://amc@db.example/amc?sslmode=verify-full&fakeSqlite=${encodeURIComponent(dbFile(one))}\n`, { mode: 0o600 });
+    const first = startedStore(one, "s-same");
+    const theirs = append(first, "s-same", 0, SESSION_GENESIS, "shared-id");
+    first.close();
+    const second = startedStore(two, "s-same");
+    expect(() => append(second, "s-same", 0, SESSION_GENESIS, "shared-id")).toThrow(/already used by another chain/);
+    expect(second.readAllEvents()).toEqual([]);
+    second.close();
+    const again = openPg(one, { readOnly: true });
+    expect(again.readAllEvents().map((row) => row.event_hash)).toEqual([theirs.eventHash]);
+    again.close();
+  }, TIMEOUT_MS);
+
+  it("a clean Postgres workspace verifies", () => {
+    expect(verifyAlternateBackendEvidence(pinnedWorkspace(), null)).toEqual([]);
+  }, TIMEOUT_MS);
+
+  it("tail deletion that also rewinds amc_chain_heads is caught by the workspace's signed head", () => {
+    const ws = pinnedWorkspace();
+    sql(ws, `DELETE FROM evidence_events WHERE chain_seq = (SELECT max(chain_seq) FROM evidence_events);
+      UPDATE amc_chain_heads SET head_seq = head_seq - 1,
+        head_hash = (SELECT event_hash FROM evidence_events ORDER BY chain_seq DESC LIMIT 1)`);
+    expect(verifyAlternateBackendEvidence(ws, null).join("\n")).toMatch(/signed head/);
+  }, TIMEOUT_MS);
+
+  it("tail deletion that leaves amc_chain_heads alone is caught by the database head", () => {
+    const ws = pinnedWorkspace();
+    sql(ws, "DELETE FROM evidence_events WHERE chain_seq = (SELECT max(chain_seq) FROM evidence_events)");
+    expect(verifyAlternateBackendEvidence(ws, null).join("\n")).toMatch(/chain head/);
+  }, TIMEOUT_MS);
+
+  it("an emptied chain is an error when a head exists", () => {
+    const ws = pinnedWorkspace();
+    sql(ws, "DELETE FROM evidence_events; UPDATE amc_chain_heads SET head_seq = 0, head_hash = 'GENESIS'");
+    expect(verifyAlternateBackendEvidence(ws, null).length).toBeGreaterThan(0);
+  }, TIMEOUT_MS);
+
+  it("a forged session seal is caught (session records are verified)", () => {
+    const ws = pinnedWorkspace();
+    sql(ws, "UPDATE sessions SET session_seal_sig = 'AAAA'");
+    expect(verifyAlternateBackendEvidence(ws, null).join("\n")).toMatch(/seal/i);
+  }, TIMEOUT_MS);
+
+  it("a migrated chain truncated below the migration head is caught", () => {
+    const ws = workspace();
+    const sqlite = openSessionEventStore(ws, "sqlite");
+    sqlite.startSession({ sessionId: "s-m", runtime: "amc", binaryPath: "pg-test", binarySha256: sha256Hex("m") });
+    let prev = SESSION_GENESIS;
+    for (const seq of [0, 1]) {
+      prev = sqlite.appendSessionEvent({ sessionId: "s-m", runtime: "amc", eventType: seq === 0 ? "session/open" : "session/close",
+        meta: embedEnvelope({}, { v: 1, sessionId: "s-m", seq, prevSessionEventHash: prev, turn: null, step: null, surface: { op: "none" }, synthetic: false }) }).eventHash;
+    }
+    sqlite.sealSession("s-m");
+    sqlite.close();
+    process.env[POSTGRES_URL_FILE_ENV] = join(pgDir(ws), "url");
+    migrateSqliteToPostgres(ws);
+    expect(verifyAlternateBackendEvidence(ws, null)).toEqual([]);
+    // The determinism check left a scratch chain in the same database: scope the edit to this workspace's chain.
+    const chain = `'${ensurePostgresChainId(ws)}'`;
+    sql(ws, `DELETE FROM evidence_events WHERE chain_id = ${chain} AND chain_seq = (SELECT max(chain_seq) FROM evidence_events WHERE chain_id = ${chain});
+      UPDATE amc_chain_heads SET head_seq = (SELECT max(chain_seq) FROM evidence_events WHERE chain_id = ${chain}),
+        head_hash = (SELECT event_hash FROM evidence_events WHERE chain_id = ${chain} ORDER BY chain_seq DESC LIMIT 1) WHERE chain_id = ${chain}`);
+    expect(verifyAlternateBackendEvidence(ws, null).join("\n")).toMatch(/signed head/);
+  }, TIMEOUT_MS);
+
+  it("run verification reads the session from Postgres, not from the operations ledger", async () => {
+    const ws = pinnedWorkspace();
+    const run = await verifyAgentRun(ws, "s-v");
+    expect(run.sessionChainErrors).not.toContain("Session s-v not found");
+    expect(run.ledgerErrors).toEqual([]);
+  }, TIMEOUT_MS);
+
+  it("budget and native-session readers include the Postgres rows", () => {
+    const ws = pinnedWorkspace();
+    const ids = readNativeSessionEvents(ws, "s-v").map((row) => row.id);
+    expect(ids).toHaveLength(3);
+    expect(readBudgetEvents(ws).map((row) => row.id)).toEqual(expect.arrayContaining(ids));
   }, TIMEOUT_MS);
 });
