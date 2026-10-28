@@ -225,9 +225,6 @@ export function createDriverRunner(init: DriverRunnerInit): SubagentRunner {
   const control = init.hookControl === undefined ? undefined
     : Object.freeze({ preStep: init.hookControl.preStep, turnStopping: init.hookControl.turnStopping });
 
-  // P2-25: each child's lease by its runAs, so a grandchild extends its own parent's chain, not the root's.
-  // ponytail: keyed by runAs; two live children sharing a runAs share a lineage. Key by packet id if that ever matters.
-  const childLeases = new Map<string, string>();
   const runChild = async function runChild(ctx: SubagentRunContext): Promise<SubagentRunResult> {
     if (ctx.signal?.aborted) return { ok: false, text: "", reason: "parent cancelled before child execution" };
     const scope = ctx.delegationScope === undefined ? undefined : [...ctx.delegationScope];
@@ -286,18 +283,22 @@ export function createDriverRunner(init: DriverRunnerInit): SubagentRunner {
       if (!active) finalize();
     };
 
-    // P2-25: a v2 parent lease is extended to this child (narrowing only, depth cap 3) before its session opens; a
-    // refusal fails the spawn. A v1 lease is inherited unchanged.
+    // P2-25: the parent's own lease is extended to this child (narrowing only, depth cap 3) before its session opens; a
+    // refusal fails the spawn. A v1 lease is inherited unchanged. The parent lease arrives explicitly in the context from
+    // the parent's composition; only a child of the root run uses the runner's own lease. A deeper child whose parent
+    // lease is missing is refused: falling back to the root's lease would hand it the root's broader grant.
     let childLease: string | undefined;
     try {
-      const parentLease = (ctx.identity.parent === null ? undefined : childLeases.get(ctx.identity.parent)) ?? init.leaseToken;
+      if (init.leaseToken !== undefined && ctx.identity.depth > 1 && ctx.parentLeaseToken === undefined) {
+        throw new Error("delegation refused: this child's parent lease was not handed to it; no lease was minted");
+      }
+      const parentLease = ctx.parentLeaseToken ?? (ctx.identity.depth === 1 ? init.leaseToken : undefined);
       childLease = parentLease === undefined ? undefined
         : issueChildLease(init.workspace, parentLease, { runAs: ctx.identity.runAs, ...(scope === undefined ? {} : { allowedActionClasses: scope }) });
     } catch (error) {
       session.disposeWithoutClosing();
       return { ok: false, text: "", reason: error instanceof Error ? error.message : String(error) };
     }
-    if (childLease !== undefined) childLeases.set(ctx.identity.runAs, childLease);
     try {
       session.open({ sessionId: ctx.childSessionId, agentId: ctx.toolsetAgentId,
         harnessVersion: init.harnessVersion, compositionDigest: init.compositionDigest, policyDigest: init.policyDigest });
@@ -310,6 +311,7 @@ export function createDriverRunner(init: DriverRunnerInit): SubagentRunner {
           ...(scope === undefined ? {} : { allowedActionClasses: scope }) },
         ...(grant === undefined ? {} : { subagents: {
           identity: ctx.identity, runner: grant.runner, session,
+          ...(childLease === undefined ? {} : { parentLeaseToken: childLease }),
           ...(grant.maxDepth === undefined ? {} : { maxDepth: grant.maxDepth }),
           ...(grant.mintSessionId === undefined ? {} : { mintSessionId: grant.mintSessionId }),
           ...(descendantScope === undefined ? {} : { delegationScope: descendantScope }),
