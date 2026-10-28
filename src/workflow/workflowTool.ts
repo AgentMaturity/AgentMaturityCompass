@@ -79,6 +79,7 @@ export function workflowTool(capability: SubagentCapability): ToolDefinition {
         runner: capability.runner,
         mintSessionId: capability.mintSessionId ?? (() => `child-${crypto.randomUUID().slice(0, 12)}`),
         ...(capability.maxDepth === undefined ? {} : { maxDepth: capability.maxDepth }),
+        ...(capability.parentLeaseToken === undefined ? {} : { parentLeaseToken: capability.parentLeaseToken }),
         ...(execution.signal === undefined ? {} : { signal: execution.signal })
       });
 

@@ -62,6 +62,11 @@ export interface SubagentCapability {
   readonly stopConditions?: readonly string[];
   /** Injected so a test can pin the child's session id. */
   readonly mintSessionId?: () => string;
+  /**
+   * The lease of the run that holds this capability (P2-25), handed to each child's runner as the parent lease its own
+   * delegated lease extends. Set by whoever composes the toolset, never by the model. Absent at the root.
+   */
+  readonly parentLeaseToken?: string;
 }
 
 const DELEGATE_PARAMETERS = Object.freeze({
@@ -150,6 +155,7 @@ export function delegateTool(capability: SubagentCapability): ToolDefinition {
         session: capability.session,
         runner: capability.runner,
         mintSessionId,
+        ...(capability.parentLeaseToken === undefined ? {} : { parentLeaseToken: capability.parentLeaseToken }),
         maxDepth,
         ...(execution.signal === undefined ? {} : { signal: execution.signal })
       });
