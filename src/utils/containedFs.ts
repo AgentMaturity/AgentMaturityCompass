@@ -10,11 +10,11 @@
  */
 import { randomBytes } from "node:crypto";
 import {
-  closeSync, constants, fchmodSync, fstatSync, fsyncSync, lstatSync, mkdirSync, openSync, readdirSync, readSync, renameSync, statSync, unlinkSync, writeSync,
+  closeSync, constants, fchmodSync, fstatSync, fsyncSync, lstatSync, mkdirSync, openSync, readdirSync, readSync, renameSync, unlinkSync, writeSync,
   type Stats
 } from "node:fs";
 import { join } from "node:path";
-import { noteCheckPassWrite } from "./checkPass.js";
+import { noteCheckPassWrite, statIdentityInPass } from "./checkPass.js";
 
 const SEGMENT = /^(?!\.{1,2}$)[A-Za-z0-9._-]{1,255}$/;
 
@@ -155,5 +155,5 @@ export function listContainedDir(root: string, rel: string): string[] {
  * write replaces the inode, and any in-place write changes ctime, which (unlike mtime) cannot be set back by utimes.
  */
 export function statStamp(paths: readonly string[]): string {
-  return paths.map(path => { try { const s = statSync(path); return `${s.dev}:${s.ino}:${s.size}:${s.ctimeMs}`; } catch { return "-"; } }).join("|");
+  return paths.map(statIdentityInPass).join("|");
 }

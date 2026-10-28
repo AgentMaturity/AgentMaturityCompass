@@ -62,9 +62,17 @@ export function canonicalSigningKey(publicKey: string | Uint8Array): { algorithm
   return identity === null ? null : { algorithm: identity.algorithm, pem: identity.pem };
 }
 
+// Pure, memoized for PEM text: every signing gate identifies the same few public keys.
+const keyIds = new Map<string, string | null>();
 /** AMC key id of an Ed25519 or P-256 key (see signingKeyIdentity); equals ed25519KeyId for Ed25519 keys. */
 export function signingKeyId(publicKey: string | Uint8Array): string | null {
-  return signingKeyIdentity(publicKey)?.keyId ?? null;
+  if (typeof publicKey !== "string") return signingKeyIdentity(publicKey)?.keyId ?? null;
+  const memo = keyIds.get(publicKey);
+  if (memo !== undefined) return memo;
+  const keyId = signingKeyIdentity(publicKey)?.keyId ?? null;
+  if (keyIds.size >= 256) keyIds.clear();
+  keyIds.set(publicKey, keyId);
+  return keyId;
 }
 
 /**

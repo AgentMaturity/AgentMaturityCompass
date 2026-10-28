@@ -34,7 +34,7 @@ export function assertLocal(purpose: KeyPurpose): LocalPurpose {
  * whenever the purpose's key is held by a provider: the vault never stands in for it. The one exception is the
  * ledger-row delegate, a vault key served only while a provider-signed delegation for that very key is current.
  */
-export function getSigningKey(workspace: string, purpose: KeyPurpose): string {
+export const getSigningKey = inCheckPass(function getSigningKey(workspace: string, purpose: KeyPurpose): string {
   const local = assertLocal(purpose);
   // Authorization before the vault is touched: a provider-held purpose never unlocks or reads it.
   const delegateKeyId = assertVaultMaySign(workspace, local);
@@ -48,7 +48,7 @@ export function getSigningKey(workspace: string, purpose: KeyPurpose): string {
     throw new KeyProviderError("KEY_DELEGATION_INVALID", boundProviderKey(workspace, local)?.binding.provider ?? "file", "the delegation names another key than the vault's ledger-row key");
   }
   return privateKeyPem;
-}
+});
 
 /**
  * The pre-sign gate every signing key passes, the vault's and a provider's alike, decided from AMC's own signed state
@@ -56,7 +56,7 @@ export function getSigningKey(workspace: string, purpose: KeyPurpose): string {
  * committed, mark-bound key set names for the purpose and holder (`file` is the vault; any other id is the bound
  * provider). Then assertKeyUsableNow. Returns the key id.
  */
-export function assertSigningKeyUsable(workspace: string, purpose: LocalPurpose, publicKeyPem: string, holder: KeyProviderId): string {
+export const assertSigningKeyUsable = inCheckPass(function assertSigningKeyUsable(workspace: string, purpose: LocalPurpose, publicKeyPem: string, holder: KeyProviderId): string {
   const keyId = signingKeyId(publicKeyPem);
   const keyset = assertKeysetComplete(workspace);
   const named = holder === "file" ? keyset?.keys[purpose] : keyset?.providers?.[purpose]?.provider === holder ? keyset.providers[purpose]!.keyId : undefined;
@@ -65,7 +65,7 @@ export function assertSigningKeyUsable(workspace: string, purpose: LocalPurpose,
   }
   assertKeyUsableNow(workspace, purpose, keyId, holder);
   return keyId;
-}
+});
 
 /**
  * A key about to sign or be bound, at the server clock: the workspace key revocation list must load and verify (a
@@ -83,7 +83,7 @@ export function assertKeyUsableNow(workspace: string, purpose: LocalPurpose, key
  * requireNonExportable. The config is read unsigned here because it can only refuse; it never picks a key. For a bound
  * ledger-row it returns the key id the current delegation names, after checking the issuer is not revoked.
  */
-export function assertVaultMaySign(workspace: string, purpose: LocalPurpose): string | null {
+export const assertVaultMaySign = inCheckPass(function assertVaultMaySign(workspace: string, purpose: LocalPurpose): string | null {
   const config = loadKeysConfig(workspace);
   const bound = boundProviderKey(workspace, purpose);
   const ref = configuredRef(config, purpose);
@@ -99,7 +99,7 @@ export function assertVaultMaySign(workspace: string, purpose: LocalPurpose): st
   throw new KeyProviderError("KEY_PROVIDER_HELD", bound?.binding.provider ?? ref!.provider, bound === null
     ? `the ${purpose} key is configured to a provider key that the key set does not bind yet; run amc keys rotate --purpose ${purpose}`
     : `the ${purpose} key never leaves the provider; this signer needs a vault key and cannot use it`);
-}
+});
 
 export const DELEGATION_REL = ".amc/keys/delegations/ledger-row.json";
 const delegationMemo = new Map<string, { stamp: string; notBefore: number; notAfter: number; delegateKeyId: string }>();
