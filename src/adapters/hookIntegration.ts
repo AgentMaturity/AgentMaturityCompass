@@ -7,6 +7,7 @@ import { observedAepActionEventSchema, type ObservedAepActionEvent } from "../br
 import { CONTROL_HOOK_ROUTE } from "../bridge/hookControl.js";
 import type { HookControlDecision, HookProvider } from "../bridge/hookProviders.js";
 import { installPiHook, piHookStatus, PI_HOOK_SOURCE, removePiHook } from "./hookProviders/pi.js";
+import { DSH_HOOK_SOURCE, dshHookStatus, dshModules, installDshHook, removeDshHook } from "./hookProviders/dsh.js";
 import type { PiGovernance } from "../bridge/piSessionRegistry.js";
 import { CLAUDE_NOT_GOVERNED_NOTE, claudeCodeGovernance, type ClaudeCodeGovernance } from "../bridge/claudeCodeSessionRegistry.js";
 import { redactBridgeText } from "../bridge/bridgeRedaction.js";
@@ -24,20 +25,14 @@ import { readOnlyCapabilityGovernance, readOnlyCapabilityLeaseStatus } from "./h
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
 import { writeFileAtomic } from "../utils/fs.js";
-import {
-  isSafeProviderActionId,
-  resolveProviderHookRequestIdentity,
-  type HookActionIdentitySource,
-} from "../bridge/hookActionIdentity.js";
+import { isSafeProviderActionId, resolveProviderHookRequestIdentity, type HookActionIdentitySource } from "../bridge/hookActionIdentity.js";
 import {
   addManagedIgnoreBlock, assertAllPathsSafe, assertControlBridgeLocal, assertManagedPathSafe, controlApprovalPolicy, managedLeaseStatus,
   leaseManifestFields, obtainHookLease, parseInstallOptions, fileChange, HOOK_CONTROL_INTEGRATION_ID, HOOK_INTEGRATION_ID, HOOK_TOKEN_MODE, HookIntegrationError,
   hasManagedIgnoreBlock, hookModeSchema, ignoreBlockHash, integrationId, leaseScopes, normalizeBridgeBase, parseMode, relativePortable,
   removeManagedIgnoreBlock, restore, snapshot, validateAgentId, withInstallLock, type HookFileChange, type HookMode,
 } from "./hookProviders/installFiles.js";
-export {
-  HOOK_CONTROL_INTEGRATION_ID, HOOK_INTEGRATION_ID, HookIntegrationError, type HookFileChange, type HookMode,
-} from "./hookProviders/installFiles.js";
+export { HOOK_CONTROL_INTEGRATION_ID, HOOK_INTEGRATION_ID, HookIntegrationError, type HookFileChange, type HookMode } from "./hookProviders/installFiles.js";
 
 export { CLAUDE_CODE_HOOK_SOURCE } from "./hookProviders/claudeCode.js";
 export const GEMINI_CLI_HOOK_SOURCE = {
@@ -141,7 +136,7 @@ export interface HookMutationResult {
   operation: "install" | "remove";
   provider: HookProvider;
   mode: HookMode;
-  source: typeof CLAUDE_CODE_HOOK_SOURCE | typeof GEMINI_CLI_HOOK_SOURCE | typeof PI_HOOK_SOURCE;
+  source: typeof CLAUDE_CODE_HOOK_SOURCE | typeof GEMINI_CLI_HOOK_SOURCE | typeof PI_HOOK_SOURCE | typeof DSH_HOOK_SOURCE;
   dryRun: boolean;
   applied: boolean;
   changed: boolean;
@@ -163,7 +158,7 @@ export interface HookIntegrationStatus {
   agentId: string | null;
   mode: HookMode | null;
   state: "not-installed" | "installed" | "drifted" | "expired" | "invalid";
-  source: typeof CLAUDE_CODE_HOOK_SOURCE | typeof GEMINI_CLI_HOOK_SOURCE | typeof PI_HOOK_SOURCE;
+  source: typeof CLAUDE_CODE_HOOK_SOURCE | typeof GEMINI_CLI_HOOK_SOURCE | typeof PI_HOOK_SOURCE | typeof DSH_HOOK_SOURCE;
   configOwned: boolean;
   manifestValid: boolean;
   leaseValid: boolean;
@@ -184,8 +179,8 @@ export interface InstallHookIntegrationOptions {
   ttl?: string;
   rpm?: number;
   dryRun?: boolean;
-  /** Pi control mode: the installed @earendil-works/pi-coding-agent package sessions must run (the CLI finds it on PATH). */
-  piPackageDir?: string;
+  /** Pi or DSH control mode: the installed Pi (@earendil-works/pi-coding-agent) or DSH (@deepseek-ai/dsh) package sessions must run (found on PATH). */
+  piPackageDir?: string; dshPackageDir?: string;
   /** Claude Code control mode: the `claude` binary sessions must run (the CLI finds it on PATH), or its measurement. */
   claudeCodeBinary?: string;
   claudeCodeInstall?: ClaudeCodeInstall;
@@ -698,6 +693,7 @@ function claudeControlStatus(workspace: string, manifest: HookManifest, issues: 
 
 export function installHookIntegration(options: InstallHookIntegrationOptions): HookMutationResult {
   if (options.provider === "pi") return installPiHook(options, join(dirname(amcCliScriptPath(parseMode(options.mode))), "adapters", "pi", "amcPiExtension.js"));
+  if (options.provider === "dsh") return installDshHook(options, ...dshModules(amcCliScriptPath(parseMode(options.mode))));
   const provider = parseProvider(options.provider);
   const { mode, workspace, agentId, bridgeBase, ttl, rpm } = parseInstallOptions(options);
   const paths = managedPaths(workspace, provider);
@@ -932,6 +928,7 @@ export function installHookIntegration(options: InstallHookIntegrationOptions): 
 
 export function getHookIntegrationStatus(input: { workspace: string; provider: HookProvider; readonly?: boolean }): HookIntegrationStatus {
   if (input.provider === "pi") return piHookStatus(input.workspace);
+  if (input.provider === "dsh") return dshHookStatus(input.workspace);
   const provider = parseProvider(input.provider);
   const workspace = resolve(input.workspace);
   const paths = managedPaths(workspace, provider);
@@ -1050,6 +1047,7 @@ export function getHookIntegrationStatus(input: { workspace: string; provider: H
 
 export function removeHookIntegration(options: RemoveHookIntegrationOptions): HookMutationResult {
   if (options.provider === "pi") return removePiHook(options);
+  if (options.provider === "dsh") return removeDshHook(options);
   const provider = parseProvider(options.provider);
   const workspace = resolve(options.workspace);
   const paths = managedPaths(workspace, provider);

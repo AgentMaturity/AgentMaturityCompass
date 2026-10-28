@@ -4,8 +4,11 @@
  * the guards only on allow, and a throwing listener fails the call undispatched. Not a run of the DSH binary.
  */
 import { describe, expect, test, vi } from "vitest";
+import { mkdtempSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import {
-  createAmcDshPlugin, DENY_MALFORMED, DENY_NO_ARGUMENTS, DENY_NOT_ALLOWED, DENY_UNAVAILABLE,
+  apply, createAmcDshPlugin, DENY_MALFORMED, DENY_NO_ARGUMENTS, DENY_NOT_ALLOWED, DENY_UNAVAILABLE,
   type AmcDshAnswer, type AmcDshPluginOptions,
 } from "../packages/dsh-amc-plugin/index.mjs";
 
@@ -127,5 +130,39 @@ describe("dsh-amc-plugin gate", () => {
     await run("bash", { command: "cat secret" });
     expect(observe).toHaveBeenCalledWith({ tool: "bash", callId: "call-1", rootCallId: "call-1", isError: false });
     expect(JSON.stringify(observe.mock.calls)).not.toMatch(/secret/);
+  });
+});
+
+describe("dsh-amc-plugin profile entry (apply with config)", () => {
+  const dir = mkdtempSync(join(tmpdir(), "amc-dsh-transport-"));
+  const transport = join(dir, "transport.mjs");
+  writeFileSync(transport, "export function createAmcDshTransport({ workspace, pluginPath }) {\n"
+    + "  if (!workspace || !pluginPath.endsWith('index.mjs')) throw new Error('bad transport options');\n"
+    + "  return { decide: async (request) => (request.tool === 'read' ? { decision: 'allow' } : { decision: 'deny', reason: 'stub deny' }) };\n}\n");
+  const config = { workspace: dir, transport, dshVersion: "0.2.1-rc.2", qualifiedVersions: ["0.2.1-rc.2"] };
+  const mounted = (entry: unknown) => {
+    const dsh = fakeDsh();
+    apply(dsh.ctx, entry as Parameters<typeof apply>[1]);
+    return dsh;
+  };
+
+  test("a valid entry asks AMC through the transport module it names", async () => {
+    const { run } = mounted(config);
+    expect(await run("read", { file_path: "/a" })).toEqual({ dispatched: true });
+    expect(await run("write", { file_path: "/a", content: "x" })).toEqual({ dispatched: false, reason: "stub deny" });
+  });
+
+  test.each([
+    ["no config", undefined],
+    ["a relative transport path", { ...config, transport: "transport.mjs" }],
+    ["a relative workspace", { ...config, workspace: "ws" }],
+    ["non-string qualified versions", { ...config, qualifiedVersions: [1] }],
+  ])("%s denies every call", async (_label, entry) => {
+    expect((await mounted(entry).run("read", { file_path: "/a" })).dispatched).toBe(false);
+  });
+
+  test("a transport module that does not load denies every call", async () => {
+    const { run } = mounted({ ...config, transport: join(dir, "missing.mjs") });
+    expect(await run("read", { file_path: "/a" })).toEqual({ dispatched: false, reason: DENY_UNAVAILABLE });
   });
 });

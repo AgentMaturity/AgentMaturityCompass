@@ -10,6 +10,7 @@ import { bindAuthorization, leasePrincipal } from "../actions/authorize.js";
 import { piSessionRegistration } from "./piSessionRegistry.js";
 import { claudeCodeSessionRegistration } from "./claudeCodeSessionRegistry.js";
 import { dshVersionRefusal } from "../adapters/dsh/dshVersions.js";
+import { dshSessionRegistration } from "./dshSessionRegistry.js";
 import { claudeRequestRefusal } from "../adapters/hookProviders/claudeCodePayloads.js";
 import { intakeBackpressure } from "./claudeCodeObservations.js";
 import { assertContract } from "../contracts/index.js";
@@ -106,10 +107,14 @@ function governedSession(input: { ledger: Parameters<typeof piSessionRegistratio
   const { call } = input;
   // ACS (P2-19): no installation registers an ACS runtime, so a decision is advisory and its session is not checked.
   if (call.acs) return { refusal: null, enforced: false, version: call.acs.version };
-  // DSH (P2-17): no DSH version is qualified and no DSH session registration exists yet, so every DSH call is denied.
   if (call.dsh) {
-    return { refusal: dshVersionRefusal(call.dsh.version) ?? "This DSH session has no AMC registration, so it is not governed; AMC denied the call.",
-      enforced: false, version: call.dsh.version };
+    const found = dshSessionRegistration(input.ledger, input.agentId, call.sessionId);
+    const refusal = dshVersionRefusal(call.dsh.version)
+      ?? (found.status === "missing" ? "This DSH session has no AMC registration, so it is not governed; AMC denied the call."
+        : found.status === "invalid" ? `${found.reason}; this DSH session is not governed, so AMC denied the call.`
+          : found.record.dshVersion === call.dsh.version ? null
+            : `This call names DSH ${call.dsh.version}, but its session registered DSH ${found.record.dshVersion}; AMC denied the call.`);
+    return { refusal, enforced: !refusal && found.status === "registered" && found.record.qualified, version: call.dsh.version };
   }
   if (call.pi) {
     const found = piSessionRegistration(input.ledger, input.agentId, call.sessionId);

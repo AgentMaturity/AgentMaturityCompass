@@ -1789,6 +1789,16 @@
       "source": "handle.db.prepare(`DELETE FROM scim_groups WHERE group_id = ?`).run(groupId);",
       "status": "deferred",
       "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/adapters/hookProviders/dsh.ts:213:1",
+      "path": "src/adapters/hookProviders/dsh.ts",
+      "line": 213,
+      "call": "unlinkSync(",
+      "category": "filesystem-sync",
+      "source": "for (const path of targets) if (existsSync(path)) unlinkSync(path);",
+      "status": "gated",
+      "reason": "removeDshHook (amc connect hooks remove --provider dsh, P2-17) revokes the installation's lease first, then removes only the AMC-owned installation files it names (.amc/hooks/dsh.lease, dsh.json, dsh.json.sig) inside a fresh withDeletionGate call (executor hook-dsh-remove, target caches: no target kind names hook installation files, so the closest one is used and a hold on caches refuses the removal). A refused gate leaves every file in place."
     }
   ]
 }

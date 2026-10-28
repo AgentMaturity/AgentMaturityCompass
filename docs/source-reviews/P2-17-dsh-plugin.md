@@ -53,16 +53,31 @@ arguments still holds (`docs/subsystems/approval.md`), which is why the plugin d
   registration for DSH yet, so it cannot tell a governed session from an ungoverned one. Until it does, no
   enforcement claim is possible.
 
-## Not built (pending)
+## Built since, and still pending
 
-- The transport: the Bridge control route has no `dsh` provider (`src/bridge/hookProviders.ts`), so there is no
-  mapping from DSH tool names and argument shapes to ToolHub requests. A transport posting to it today would receive
-  `HOOK_CONTROL_PROVIDER_UNSUPPORTED` and deny every call. The mapping must be written from payloads recorded from the
-  pinned binary, with signed-receipt binding like Pi's `piControlAnswer`.
-- Session registration (lease-holder attestation), an installer and the version read from DSH itself (the plugin is
-  given `dshVersion`).
+Built (P2-17, on the AMC side):
+
+- The Bridge control route accepts provider `dsh` (`src/adapters/dsh/dshProvider.ts`). Each mapped built-in has a fixed
+  argument schema taken from DSH 0.2.1-rc.2's `defineTool` parameters: `read` (`file_path`, `offset`, `limit`),
+  `write` (`file_path`, `content`), `edit` (`file_path`, `old_string`, `new_string`, `replace_all`) and `web_fetch`
+  (`url`). Paths must be absolute in one canonical spelling and are resolved through symlinks; DSH resolves relative
+  paths against a per-session working directory AMC cannot see. `write`'s sandbox-escalation fields, any other
+  argument, and the shell, search, PTC, subagent and MCP tools are not mapped, so they are denied.
+- Session registration (`src/bridge/dshSessionRegistry.ts`): one session per plugin instance, measured against the
+  signed installation (plugin module, AMC's transport module, the `@deepseek-ai/dsh` and `@deepseek-ai/dsh-tools`
+  packages on disk).
+- The installer (`amc connect hooks install --provider dsh`, control mode only) and AMC's transport
+  (`src/adapters/dsh/dshControlClient.ts`), which checks that each answer is signed and bound to its request. The
+  plugin imports the transport by the path in its profile entry.
+
+Pending:
+
+- No DSH version is qualified (`src/adapters/dsh/dshVersions.ts`), so the Bridge denies every DSH call.
+- Before any qualification, AMC must protect DSH's own configuration and profile files from mapped writes, so an
+  allowed `write` cannot unmount the plugin. Their paths were not reviewed at this pin.
 - Installed conformance with the pinned DSH and a local scripted provider: a denied write leaves no file; a bridge
-  outage blocks. Needs an approved install of the pinned package.
+  outage blocks. This needs an approved install of the pinned package.
+- The other DSH packages (fs, shell and web tools, Cordis) are not measured at registration.
 
 ## Files reviewed (SHA-256 of the retrieved bytes)
 

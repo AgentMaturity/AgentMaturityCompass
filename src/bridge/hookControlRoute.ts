@@ -1,6 +1,7 @@
 import { evaluateProviderHookControl, MAX_CONTROL_HOOK_BODY_BYTES, type ProviderHookControlResult } from "./hookControl.js";
 import { isPiSessionStart, registerPiSession, type PiSessionRegistrationResult } from "./piSessionRegistry.js";
 import { recordPiToolResult } from "./piObservations.js";
+import { isDshSessionStart, registerDshSession, type DshSessionRegistrationResult } from "./dshSessionRegistry.js";
 import { registerClaudeCodeSession, type ClaudeCodeRegistrationResult } from "./claudeCodeSessionRegistry.js";
 import { recordClaudeCodePostExecution, recordClaudeCodeStop, type HookObservationResult } from "./claudeCodeObservations.js";
 import { admitClaudeCodePrompt } from "./hookAdmission.js";
@@ -30,15 +31,16 @@ function eventName(rawInput: string): unknown {
  * workspace's hook audit latch (hookAuditLatch.ts): refused while latched, and one that fails with a 5xx latches it.
  */
 export function handleHookControlRequest(input: Input):
-  ProviderHookControlResult | PiSessionRegistrationResult | ClaudeCodeRegistrationResult | HookObservationResult {
+  ProviderHookControlResult | PiSessionRegistrationResult | DshSessionRegistrationResult | ClaudeCodeRegistrationResult | HookObservationResult {
   return guardHookAudit(input.workspace, (message) => new HookControlError("HOOK_CONTROL_LEDGER_UNAVAILABLE", 503, message), () => route(input));
 }
 
-function route(input: Input): ProviderHookControlResult | PiSessionRegistrationResult | ClaudeCodeRegistrationResult | HookObservationResult {
+function route(input: Input): ProviderHookControlResult | PiSessionRegistrationResult | DshSessionRegistrationResult | ClaudeCodeRegistrationResult | HookObservationResult {
   // The size cap comes before any parse.
   if (Buffer.byteLength(input.rawInput, "utf8") > MAX_CONTROL_HOOK_BODY_BYTES) throw new HookControlError("HOOK_CONTROL_INPUT_TOO_LARGE", 413, "hook input is too large");
   if (input.provider === "pi" && isPiSessionStart(input.rawInput)) return registerPiSession(input);
   if (input.provider === "pi" && eventName(input.rawInput) === "tool_result") return recordPiToolResult(input);
+  if (input.provider === "dsh" && isDshSessionStart(input.rawInput)) return registerDshSession(input);
   // A repeated key could be read one way by AMC and another by whoever sent it: refused for every Claude Code body.
   if (input.provider === "claude-code") assertUnambiguousJson(input.rawInput);
   const event = eventName(input.rawInput);

@@ -9,8 +9,15 @@
  * denies the call. A throwing listener makes DSH fail the call without dispatching it.
  *
  * Fails closed: an unqualified DSH version, missing arguments, a transport error or timeout, and any answer other than
- * an exact allow or deny all deny. It imports nothing, so it never loads a second Cordis kernel.
+ * an exact allow or deny all deny. It imports only Node built-ins, so it never loads a second Cordis kernel.
+ *
+ * Mounted from a DSH profile, the module's own `apply(ctx, config)` takes the entry `amc connect hooks install
+ * --provider dsh` prints: the AMC workspace, the absolute path of AMC's transport (dist/adapters/dsh/dshControlClient.js),
+ * DSH's version and the qualified versions. It imports the transport on the first call; a bad config or a failed
+ * import denies every call.
  */
+import { isAbsolute } from "node:path";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 export const name = "amc-governance";
 export const inject = ["tools"];
@@ -80,4 +87,21 @@ export function createAmcDshPlugin({ decide, observe, dshVersion, qualifiedVersi
       }
     },
   };
+}
+
+const validConfig = (config) => config !== null && typeof config === "object" && typeof config.workspace === "string" && isAbsolute(config.workspace)
+  && typeof config.transport === "string" && isAbsolute(config.transport) && typeof config.dshVersion === "string"
+  && Array.isArray(config.qualifiedVersions) && config.qualifiedVersions.every((version) => typeof version === "string");
+
+/** Cordis entry point: the gate, asking AMC through the transport the config names. */
+export function apply(ctx, config) {
+  const valid = validConfig(config);
+  let transport = null;
+  const decide = async (request) => {
+    if (!valid) throw new Error("the AMC DSH plugin config is invalid");
+    transport ??= import(pathToFileURL(config.transport).href)
+      .then((module) => module.createAmcDshTransport({ workspace: config.workspace, pluginPath: fileURLToPath(import.meta.url) }));
+    return (await transport).decide(request);
+  };
+  createAmcDshPlugin({ decide, dshVersion: valid ? config.dshVersion : "unknown", qualifiedVersions: valid ? config.qualifiedVersions : [] }).apply(ctx);
 }

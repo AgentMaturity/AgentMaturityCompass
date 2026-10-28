@@ -6,7 +6,7 @@ import { mkdirSync, mkdtempSync, realpathSync, rmSync, symlinkSync, writeFileSyn
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, afterEach, describe, expect, test } from "vitest";
-import { dshActionId } from "../src/adapters/dsh/dshProvider.js";
+import { dshActionId } from "../src/adapters/dsh/dshIdentity.js";
 import { evaluateProviderHookControl } from "../src/bridge/hookControl.js";
 import { canonicalToolRequests, HookControlError, hookCallRefusal, hookCall, validateProviderControlResponse } from "../src/bridge/hookProviders.js";
 import { controlledWorkspace, removeFixtureWorkspaces } from "./helpers/piHookFixtures.js";

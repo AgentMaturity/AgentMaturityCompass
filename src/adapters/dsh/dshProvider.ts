@@ -9,9 +9,8 @@
  */
 import { z } from "zod";
 import type { ActionClass } from "../../types.js";
-import { sha256Hex } from "../../utils/hash.js";
-import { canonicalize } from "../../utils/json.js";
 import { canonicalUrl, claudeFileLocation } from "../hookProviders/claudeCode.js";
+import { dshActionId } from "./dshIdentity.js";
 import type { CanonicalToolRequest, HookCall, HookControlDecision } from "../../bridge/hookProviders.js";
 
 /** The hook control event a DSH tool call arrives as: DSH's waterfall name. */
@@ -31,11 +30,6 @@ const dshControlContextSchema = z.strictObject({
   nonce: z.string().min(16).max(128),
 });
 export type DshControlContext = z.infer<typeof dshControlContextSchema>;
-
-/** AMC's action id for one DSH tool call, from the session and call id (call ids repeat across sessions). */
-export function dshActionId(sessionId: string, callId: string): string {
-  return `dsh_${sha256Hex(canonicalize({ sessionId, callId })).slice(0, 40)}`;
-}
 
 /** The call a DSH control request names, or null when it carries no valid DSH context (hookProviders.ts refuses it). */
 export function dshHookCall(input: Record<string, unknown>): HookCall | null {

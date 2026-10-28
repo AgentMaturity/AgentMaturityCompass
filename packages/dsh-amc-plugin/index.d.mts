@@ -44,3 +44,14 @@ export const DENY_UNAVAILABLE: string;
 export const DENY_MALFORMED: string;
 export const DENY_NOT_ALLOWED: string;
 export function createAmcDshPlugin(options: AmcDshPluginOptions): AmcDshPlugin;
+
+/** What the DSH profile entry passes: the AMC workspace, AMC's transport module, DSH's version and the qualified versions. */
+export interface AmcDshPluginConfig {
+  workspace: string;
+  transport: string;
+  dshVersion: string;
+  qualifiedVersions: readonly string[];
+}
+
+/** Cordis entry point: the gate, asking AMC through the transport `config` names; a bad config denies every call. */
+export function apply(ctx: unknown, config: AmcDshPluginConfig): void;
