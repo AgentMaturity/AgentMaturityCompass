@@ -1198,9 +1198,14 @@ async function refreshUnifiedBanner() {
       }
     }
     const freezes = Array.isArray(status?.studio?.activeFreezes) ? status.studio.activeFreezes.length : 0;
+    // P2-26: an active kill switch heads the banner; an unreadable status says so rather than showing nothing.
+    const killEnvelope = await apiGet("/api/v1/runtime/kill-switch").catch(() => null);
+    const kill = killEnvelope?.data ?? killEnvelope;
+    const killLine = kill === null ? `<div class="danger"><strong>Kill switch:</strong> status unavailable</div>`
+      : kill.active ? `<div class="danger"><strong>KILL SWITCH ACTIVE:</strong> ${htmlEscape(kill.kills.map((k) => `${k.killId} (${k.scope.kind}:${k.scope.id}, ${k.mode})`).join("; ") || "unverifiable record treated as stop_all")}. Protected effects are refused until an OWNER releases it.</div>` : "";
     const trustMode = status?.trust?.mode || "UNKNOWN";
     const trustOk = status?.trust?.ok === true;
-    bannerEl.innerHTML = `
+    bannerEl.innerHTML = `${killLine}
       <strong>Unified Clarity</strong>
       <div class="row wrap">
         <span><strong>Agent:</strong> ${htmlEscape(agentId)}</span>
@@ -1394,7 +1399,7 @@ async function renderHome() {
         <div class="studio-kicker">Desktop app</div>
         <h3>Native macOS shell, same AMC evidence-first surface.</h3>
         <p class="muted">
-          The macOS app now starts local demo-mode Studio and renders this Console inside a native WebKit window. Windows still launches the same local URL in the system browser. Both keep the same flow: 244 default questions, 264 lifecycle questions, <!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> registered assurance packs, 41 Industry Packs, and 1,260 CLI paths.
+          The macOS app now starts local demo-mode Studio and renders this Console inside a native WebKit window. Windows still launches the same local URL in the system browser. Both keep the same flow: 244 default questions, 264 lifecycle questions, <!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> registered assurance packs, 41 Industry Packs, and 1,263 CLI paths.
         </p>
       </div>
       <div class="row wrap">

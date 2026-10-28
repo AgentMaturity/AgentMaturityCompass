@@ -16,10 +16,12 @@ import { activeUserRecord } from "../auth/authApi.js";
 import { assertContract } from "../contracts/index.js";
 import { purposeResource } from "../dataflow/purposePolicy.js";
 import { activeFreezeStatus } from "../drift/freezeEngine.js";
+import { killSwitchDenial } from "../runtime/killSwitch.js";
 import { ACTION_CLASSES } from "../governor/actionCatalog.js";
 import { matchingBreakGlass } from "../governor/breakGlass.js";
 import { matchingScopedExceptions, type DeviationCall } from "../governor/scopedExceptions.js";
 import type { LeasePayload } from "../leases/leaseSchema.js";
+import { lifecycleAdmission } from "../lifecycle/reassessment.js";
 import type { EffectDeclaration } from "../toolhub/toolsSchema.js";
 import { revokedLeaseIdSet } from "../leases/leaseStore.js";
 import { verifyLeaseToken } from "../leases/leaseVerifier.js";
@@ -273,6 +275,10 @@ function deviationFailures(record: AuthorizationRecordV1, execution: ToolExecuti
 
 /** Build the record for one call. Issued and expiry times come from AMC's clock, never from a caller. */
 export function bindAuthorization(execution: ToolExecution, ctx: AuthorizationContext = {}): BindResult {
+  // P2-23: a suspended, retired or unapproved agent takes no consequential action (advisory plans: a warning row instead).
+  // Enforcement is read from the workspace's active plan, never from `ctx`, so every entry point decides alike.
+  const lifecycle = lifecycleAdmission(execution.workspace, execution.agentId, { actionClass: execution.actionClass });
+  if (!lifecycle.ok) return failed("agent_not_active", lifecycle.reason);
   const facts = actionFacts(execution, ctx.compiledPolicy);
   if (!facts.ok) return facts;
   const approvals: AuthorizationRecordV1["authority"]["approvals"][number][] = [];
@@ -402,12 +408,15 @@ export function recheckAuthorization(record: AuthorizationRecordV1, execution: T
       else if (now === null || now.state !== boundPrincipalState.get(record) || now.principal.principalId !== record.principal.principalId) add("principal_unresolved");
     }
   }
+  // P2-26: a kill switch refuses before any freeze, break-glass or exception is weighed; nothing in the record overrides it.
+  if (killSwitchDenial(execution.workspace, { kind: "tool", agentId: execution.agentId, actionClass: record.action.actionClass }) !== null) add("kill_switch_active");
   try {
     const freeze = activeFreezeStatus(execution.workspace, execution.agentId);
     if (freeze.active && freeze.actionClasses.includes(record.action.actionClass)) add("action_class_frozen");
   } catch {
     add("authority_store_unavailable");
   }
+  if (!lifecycleAdmission(execution.workspace, execution.agentId, { record: false, actionClass: execution.actionClass }).ok) add("agent_not_active");
   if (Date.now() >= Date.parse(record.expiresAt)) add("capability_expired");
   // A child can only narrow: its class must be in scope, and a child must name the delegation that made it.
   if (!record.delegation.allowedActionClasses.includes(record.action.actionClass)

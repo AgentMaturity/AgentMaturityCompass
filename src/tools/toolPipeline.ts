@@ -9,6 +9,7 @@ import {
 } from "../actions/authorize.js";
 import { ActionBlocked, blockReason, type BlockCode, type EffectState, type ReceiptState } from "../actions/receiptStates.js";
 import { ACTION_CLASSES } from "../governor/actionCatalog.js";
+import { lifecycleAdmission } from "../lifecycle/reassessment.js";
 import { withWorkspaceScope } from "../enforce/evidenceEmitter.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
@@ -27,6 +28,7 @@ import {
   type ToolOutcome,
   type RecordedToolCall
 } from "./toolTypes.js";
+import { killSwitchDenial } from "../runtime/killSwitch.js";
 
 /**
  * The tool execution pipeline (P4.1, ADR-4).
@@ -405,7 +407,15 @@ export class ToolPipeline {
       }
       authority = granted;
     }
-    if (!authorizes) return { refused: null, context: null, bound: null, required: false };
+    if (!authorizes) {
+      // P2-23: an unbound call (a read or low-impact write) still passes lifecycle admission; suspended and retired agents are held.
+      // Both checks always run (a kill released before the authorization stage must not let a held agent through); a kill,
+      // the cause when it also suspended the agent, is the one reason reported.
+      const killed = killSwitchDenial(draft.workspace, { kind: "tool", agentId: draft.agentId, actionClass: draft.actionClass });
+      const lifecycle = lifecycleAdmission(draft.workspace, draft.agentId, { actionClass: draft.actionClass });
+      const reason = killed ?? (lifecycle.ok ? null : `agent_not_active: ${lifecycle.reason}`);
+      return { refused: reason === null ? null : { stage: "authorization", reason, guardLabel: null }, context: null, bound: null, required: false };
+    }
     const context: AuthorizationContext = { ...(this.init.authorizationContext?.() ?? {}), ...(authority ? { authority } : {}) };
     const required = gate !== undefined || (this.init.boundApprovalRequiredFor?.has(draft.actionClass) ?? false);
     return { refused: null, context, bound: bindAuthorization(draft, context), required };
@@ -442,6 +452,9 @@ export class ToolPipeline {
 
   /** The authorization stage: a reason to deny, or null. Synchronous, so nothing runs between it and the body. */
   private authorizationDenial(execution: ToolExecution, authorization: CallAuthorization): string | null {
+    // P2-26: every class, bound or not, meets the kill switch here; a dispatched body is never interrupted, the next call is refused.
+    const killed = killSwitchDenial(execution.workspace, { kind: "tool", agentId: execution.agentId, actionClass: execution.actionClass });
+    if (killed !== null) return killed;
     const binding = this.bindingDenial(authorization);
     if (binding !== null) return binding.reason;
     const { bound, context } = authorization;

@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { linkSync, lstatSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { linkSync, lstatSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { getSigningKey, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
@@ -223,6 +223,11 @@ export function prepareApprovalRequestRecord(input: ApprovalRequestRecordInput, 
   return { request, path };
 }
 
+/** At most 500 ms of re-reads, spent only on a digest mismatch whose body was written within TORN_READ_FRESH_MS. */
+const TORN_READ_RETRIES = 25, TORN_READ_WAIT_MS = 20, TORN_READ_FRESH_MS = 2_000;
+/** A write in progress: the body was replaced moments ago. An older mismatch (tampering) is refused without waiting. */
+const freshlyWritten = (path: string): boolean => { try { return Date.now() - statSync(path).mtimeMs < TORN_READ_FRESH_MS; } catch { return false; } };
+
 export function loadApprovalRequestRecord(params: {
   workspace: string;
   agentId?: string;
@@ -234,9 +239,16 @@ export function loadApprovalRequestRecord(params: {
   if (!pathExists(path)) {
     throw new Error(`approval request not found: ${path}`);
   }
-  const bytes = readFileInPass(path);
+  let bytes = readFileInPass(path);
   if (params.requireValidSignature !== false) {
-    const verification = verifyArtifact(params.workspace, path, bytes);
+    let verification = verifyArtifact(params.workspace, path, bytes);
+    // updateApprovalRequestStatus replaces the body, then its sidecar: a reader in another process between the two
+    // renames sees a torn pair. Re-read both while the writer finishes; a mismatch that outlasts this is still refused.
+    for (let retry = 0; !verification.valid && verification.reason === "digest mismatch" && retry < TORN_READ_RETRIES && freshlyWritten(path); ++retry) {
+      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, TORN_READ_WAIT_MS);
+      bytes = readFileInPass(path);
+      verification = verifyArtifact(params.workspace, path, bytes);
+    }
     if (!verification.valid) {
       throw new Error(`invalid approval request signature: ${verification.reason ?? "unknown"}`);
     }

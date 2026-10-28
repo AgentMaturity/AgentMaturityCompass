@@ -13,6 +13,7 @@ import type { ActionClass } from "../types.js";
 import { pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
+import { killSwitchFrozenClasses } from "../runtime/killSwitch.js";
 
 const incidentSchema = z.object({
   v: z.literal(1),
@@ -277,13 +278,16 @@ export function activeFreezeStatus(workspace: string, agentId?: string): {
     ...unreadableIncidentFiles(workspace, resolved).map((name) => `unreadable incident file ${name}`),
     ...incidents.filter((incident) => !verified.includes(incident)).map((incident) => `incident ${incident.incidentId} signature invalid`)
   ];
+  // P2-26: an active kill switch freezes its classes here too, so toolhub's incident-freeze path refuses them.
+  const killed = killSwitchFrozenClasses(workspace, resolved, ["READ_ONLY", ...INTEGRITY_FREEZE_CLASSES]);
   const actionClasses = [...new Set([
     ...active.flatMap((incident) => incident.freeze.actionClasses),
-    ...(integrityProblems.length > 0 ? INTEGRITY_FREEZE_CLASSES : [])
+    ...(integrityProblems.length > 0 ? INTEGRITY_FREEZE_CLASSES : []),
+    ...killed.classes
   ])] as ActionClass[];
   return {
-    active: active.length > 0 || integrityProblems.length > 0,
-    incidentIds: [...active.map((incident) => incident.incidentId), ...(integrityProblems.length > 0 ? ["integrity"] : [])],
+    active: active.length > 0 || integrityProblems.length > 0 || killed.classes.length > 0,
+    incidentIds: [...active.map((incident) => incident.incidentId), ...(integrityProblems.length > 0 ? ["integrity"] : []), ...killed.ids],
     actionClasses,
     integrityProblems
   };

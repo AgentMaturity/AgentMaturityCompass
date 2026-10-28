@@ -1,0 +1,47 @@
+[
+ {
+  "mutation": "M18 exempt low-impact classes for every state (the reverted rule)",
+  "file": "src/lifecycle/reassessment.ts",
+  "test": "tests/lifecycle/heldAgents.test.ts",
+  "exit": 1,
+  "failing": [
+   "ToolHub: a suspended agent's READ_ONLY call is denied",
+   "ToolHub: a retired agent's READ_ONLY call is denied",
+   "hook: a suspended agent's read decision is denied",
+   "hook: a retired agent's read decision is denied"
+  ],
+  "restored": true
+ },
+ {
+  "mutation": "M19 hold low-impact classes before activation too",
+  "file": "src/lifecycle/reassessment.ts",
+  "test": "tests/lifecycle/heldAgents.test.ts",
+  "exit": 1,
+  "failing": [
+   "ToolHub: a proposed agent's READ_ONLY call is not held by the lifecycle",
+   "hook: a proposed agent's read decision is allowed"
+  ],
+  "restored": true
+ },
+ {
+  "mutation": "M20 skip ToolHub's unjournaled lifecycle check",
+  "file": "src/toolhub/toolhubServer.ts",
+  "test": "tests/lifecycle/heldAgents.test.ts",
+  "exit": 1,
+  "failing": [
+   "ToolHub: a suspended agent's READ_ONLY call is denied",
+   "ToolHub: a retired agent's READ_ONLY call is denied"
+  ],
+  "restored": true
+ },
+ {
+  "mutation": "M21 skip the pipeline's unbound-call lifecycle check",
+  "file": "src/tools/toolPipeline.ts",
+  "test": "tests/lifecycle/admission.test.ts",
+  "exit": 1,
+  "failing": [
+   "a suspended agent's read (an unbound READ_ONLY call) is denied too"
+  ],
+  "restored": true
+ }
+]

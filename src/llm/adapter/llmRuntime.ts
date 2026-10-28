@@ -365,7 +365,7 @@ export class LlmRuntime {
     try {
       // The same gate covers injected transports and fetch, before either can transmit the pinned bytes. checkEgress
       // resolves the session's workspace itself and refuses a missing one as workspace_scope_required.
-      checkEgress({ workspace: this.init.session.workspace, channel: "provider", url: request.url });
+      checkEgress({ workspace: this.init.session.workspace, channel: "provider", url: request.url, providerId: route.providerId });
       dispatchAttempted = true;
       response = await this.transport({ ...request, redirect: "error" });
     } catch (error: unknown) {

@@ -16,6 +16,7 @@ import { withControlFileLock } from "../lifecycle/controlFileLock.js";
 import { assertOwnerMode } from "../mode/mode.js";
 import { capturePublicConfigAuthority } from "../config/configSignaturePair.js";
 import { assertOrgPairsCurrent, captureOrgFiles, captureOrgPairs, orgPairBytes } from "../org/preparedOrgPairs.js";
+import { assertRetentionMeetsRegimes } from "./retention/regimeRetention.js";
 
 export const opsPolicySchema = z.object({
   opsPolicy: z.object({
@@ -158,7 +159,11 @@ function prepare(workspace: string, initialize: boolean, options: OpsPolicyOptio
   if (onlyIfMissing && (previous.body !== null || previous.signature !== null)) throw new Error("ops policy pair is no longer absent; retry");
   const bytes = initialize ? Buffer.from(YAML.stringify(defaultOpsPolicy())) : previous.body;
   if (bytes === null) throw new Error("ops policy missing");
-  if (validate) opsPolicySchema.parse(YAML.parse(bytes.toString("utf8")) as unknown);
+  if (validate || !initialize) {
+    const parsed = opsPolicySchema.parse(YAML.parse(bytes.toString("utf8")) as unknown);
+    // P2-26: applying (signing) a policy whose pruning undercuts an applicable regime's floor is refused, naming the regime.
+    if (!initialize) assertRetentionMeetsRegimes(workspace, parsed);
+  }
   return { workspace, initialize, beforePublish, previous, bytes };
 }
 function assertPairCurrent(workspace: string, previous: ReturnType<typeof pair>): void {

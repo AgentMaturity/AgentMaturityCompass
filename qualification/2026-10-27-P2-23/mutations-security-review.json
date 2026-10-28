@@ -1,0 +1,87 @@
+[
+ {
+  "mutation": "M13 lifecycle enforcement never read from the workspace plan",
+  "file": "src/lifecycle/reassessment.ts",
+  "test": "tests/lifecycle/entryPoints.test.ts",
+  "exit": 1,
+  "failing": [
+   "ToolHub's journaled dispatch denies a suspended migrated agent, and runs nothing",
+   "a provider hook decision (Pi write, signed WRITE_HIGH) for a suspended migrated agent is denied with the lifecycle reason",
+   "no compiled-policy context is needed: bindAuthorization alone denies; reads are not held",
+   "an active plan that cannot be verified denies a held agent (fail closed); an active agent is not affected"
+  ],
+  "restored": true
+ },
+ {
+  "mutation": "M14 an unverifiable plan fails open",
+  "file": "src/lifecycle/reassessment.ts",
+  "test": "tests/lifecycle/entryPoints.test.ts",
+  "exit": 1,
+  "failing": [
+   "an active plan that cannot be verified denies a held agent (fail closed); an active agent is not affected"
+  ],
+  "restored": true
+ },
+ {
+  "mutation": "M10b remove the authorization-stage admission",
+  "file": "src/actions/authorize.ts",
+  "test": "tests/lifecycle/admission.test.ts",
+  "exit": 1,
+  "failing": [
+   "a suspended agent's consequential call is denied with the reason, and the denial is a journal receipt"
+  ],
+  "restored": true
+ },
+ {
+  "mutation": "M11b drop the recheck admission (bind still checks)",
+  "file": "src/actions/authorize.ts",
+  "test": "tests/lifecycle/admission.test.ts",
+  "exit": 1,
+  "failing": [
+   "a suspension after the record bound (here, from inside a guard) is caught by the recheck before the body"
+  ],
+  "restored": true
+ },
+ {
+  "mutation": "M2b let suspended agents pass admission",
+  "file": "src/lifecycle/reassessment.ts",
+  "test": "tests/lifecycle/admission.test.ts",
+  "exit": 1,
+  "failing": [
+   "a suspended agent's consequential call is denied with the reason, and the denial is a journal receipt",
+   "a suspension after the record bound (here, from inside a guard) is caught by the recheck before the body",
+   "an advisory plan (no lifecycle control) lets the call run and writes a warning row"
+  ],
+  "restored": true
+ },
+ {
+  "mutation": "M15 a surface that cannot list its tools gets a constant digest instead of null",
+  "file": "src/lifecycle/versionManifest.ts",
+  "test": "tests/lifecycle/resolvedManifest.test.ts",
+  "exit": 1,
+  "failing": [
+   "a declared tools pin that differs from the resolved config is not the manifest: the agent is suspended for reassessment"
+  ],
+  "restored": true
+ },
+ {
+  "mutation": "M16 the session's declared policy digest stands in for the resolved plan's",
+  "file": "src/lifecycle/versionManifest.ts",
+  "test": "tests/lifecycle/resolvedManifest.test.ts",
+  "exit": 1,
+  "failing": [
+   "a declared tools pin that differs from the resolved config is not the manifest: the agent is suspended for reassessment"
+  ],
+  "restored": true
+ },
+ {
+  "mutation": "M17 an unverified signed tools config still digests",
+  "file": "src/lifecycle/versionManifest.ts",
+  "test": "tests/lifecycle/resolvedManifest.test.ts",
+  "exit": 1,
+  "failing": [
+   "a workspace tools config that does not verify gives a null tools digest (unpinned, fail closed)"
+  ],
+  "restored": true
+ }
+]

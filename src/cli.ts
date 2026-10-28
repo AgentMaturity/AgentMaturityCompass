@@ -121,6 +121,8 @@ import {
 } from "./incidents/incidentClockEvents.js";
 import { buildEvidencePacket, renderEvidencePacketMarkdown } from "./incidents/evidencePacket.js";
 import { oversightRecordPath, readOversightRecords, recordWorkspaceOversightAsync, workspaceOversightPublicKeys } from "./incidents/oversightRecord.js";
+import { startIncidentClocks } from "./incidents/clockRuntime.js";
+import { printIncidentClocks } from "./cli-incident-clocks.js";
 import {
   addAgentInteractive,
   buildAgentConfig,
@@ -215,6 +217,7 @@ import { registerCompositionCommands } from "./cli-composition-commands.js";
 import { registerVaultZkCommands } from "./cli-vault-zk-commands.js";
 import { registerKeysCommands, registerVaultHistoryCommands, registerVaultRotationCommand } from "./cli-vault-history-commands.js";
 import { registerEvidenceStoreCommands, renderLedgerVerdict } from "./cli-evidence-store-commands.js";
+import { registerLifecycleGovernanceCommands } from "./cli-lifecycle-governance-commands.js";
 import {
   exitIfUntrusted, finishVerify, ledgerExitCode, trustFromFlags, unsignedArtifactReport, verifyAllExit, withTrustFlags, type TrustFlags
 } from "./cli-trust-flags.js";
@@ -662,6 +665,7 @@ import {
   loadTrustConfig,
   verifyTrustConfigSignature
 } from "./trust/trustConfig.js";
+import { registerTrustResignCommand } from "./cli-trust-resign-command.js";
 import {
   computeTemporalDecayReport,
   decayConfigSchema,
@@ -7946,7 +7950,8 @@ incident
   .description("Show incident details, or write its regulator evidence packet with --packet")
   .option("--packet <dir>", "write <id>.packet.json and <id>.packet.md (needs --station)")
   .option("--station <station>", "station whose regulatory clocks the packet lists")
-  .action((id: string, opts: { packet?: string; station?: string }) => {
+  .option("--clocks", "print the clocks recorded when the incident opened, with notice drafts (P2-26); with --packet, write the drafts there")
+  .action((id: string, opts: { packet?: string; station?: string; clocks?: boolean }) => {
     const workspace = process.cwd();
     const ledger = openLedger(workspace);
     try {
@@ -7960,6 +7965,7 @@ incident
       }
       const transitions = store.getIncidentTransitions(id);
       const edges = store.getCausalEdges(id);
+      if (opts.clocks) return printIncidentClocks(workspace, ledger.db, id, opts.packet);
       if (opts.packet) {
         if (!opts.station) throw new Error("--packet needs --station <station>");
         const station = parseStation(opts.station);
@@ -8034,6 +8040,7 @@ incident
       } as unknown as Parameters<typeof store.insertIncident>[0]);
 
       console.log(chalk.green(`Incident created: ${incidentId}`));
+      console.log(`clocks=${startIncidentClocks({ workspace, db: ledger.db, incidentId, nowTs: now }).status}`);
       console.log(`agent=${agentId}`);
       console.log(`severity=${opts.severity.toLowerCase()}`);
     } finally {
@@ -11781,6 +11788,8 @@ Example workflow:
     console.log(chalk.gray("Next: amc trust status   — verify the config is valid and signed"));
     console.log(chalk.gray("Docs: amc trust init --help   — see concepts and workflow"));
   });
+
+registerTrustResignCommand(trust);
 
 trust
   .command("enable-notary")
@@ -21960,6 +21969,7 @@ vault
 
 registerVaultZkCommands(vault);
 registerEvidenceStoreCommands(program);
+registerLifecycleGovernanceCommands(lifecycle, () => activeAgent(program));
 
 // ── Watch Behavioral Profiler ─────────────────────────────────────────────────
 watch

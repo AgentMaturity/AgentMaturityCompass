@@ -48,6 +48,8 @@ export interface CheckEgressInput {
   readonly dataClasses?: readonly string[] | null;
   readonly purpose?: string | null;
   readonly agentId?: string;
+  /** P2-26: the model provider a "provider" call goes to, so a provider-scoped kill switch can match it. */
+  readonly providerId?: string;
 }
 
 export const DELETION_TARGET_KINDS = ["evidence-payloads", "blobs", "spills", "guard-events", "logs", "caches", "token-vault"] as const;

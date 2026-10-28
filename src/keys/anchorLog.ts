@@ -3,7 +3,7 @@
  * (src/crypto/keys.ts, src/vault/vault.ts) never loads the log writer and its import graph, which reaches the ledger
  * and the question bank and would close an import cycle through them.
  */
-import { signingRoute } from "../crypto/signing/signer.js";
+import { signingRoute, withRevocationLogRoute } from "../crypto/signing/signer.js";
 import { appendTransparencyEntry } from "../transparency/logChain.js";
 import { anchorArtifact, registerAnchorLogWriter, type AnchorTarget } from "./anchors.js";
 import { assertVaultMaySign } from "./signingKeys.js";
@@ -11,6 +11,11 @@ import { assertVaultMaySign } from "./signingKeys.js";
 /** Appends the transparency entry for `target` and returns its hash. Raise the machine mark once the file is final. */
 export function logSequence(target: Omit<AnchorTarget, "fileSha256" | "entryHash">): string {
   return appendTransparencyEntry({ workspace: target.workspace, type: target.type, agentId: "workspace", artifact: anchorArtifact(target) }).hash;
+}
+
+/** logSequence for a key revocation: a refused trust config never blocks it (P0-37, see withRevocationLogRoute). */
+export function logRevocationSequence(target: Omit<AnchorTarget, "fileSha256" | "entryHash">): string {
+  return withRevocationLogRoute(target.workspace, () => logSequence(target));
 }
 
 registerAnchorLogWriter(logSequence, workspace => {

@@ -119,7 +119,11 @@ export function registerKeysCommands(program: Command): void {
     .requiredOption("--reason <reason>", "key-compromise, superseded or unspecified")
     .action(async (opts: { purpose: string; keyId: string; reason: string }) => {
       const passphrase = process.env.AMC_VAULT_PASSPHRASE ?? (await promptPassphrase("Vault passphrase (owner):"));
-      console.log(JSON.stringify(await revokeKeyAsync(process.cwd(), purposeOption(opts.purpose), opts.keyId, opts.reason as KeyRevocationReason, passphrase), null, 2));
+      const revoked = await revokeKeyAsync(process.cwd(), purposeOption(opts.purpose), opts.keyId, opts.reason as KeyRevocationReason, passphrase);
+      console.log(JSON.stringify(revoked, null, 2));
+      if (revoked.trustConfig.status === "refused") {
+        console.error(`The revocation is recorded, but .amc/trust.yaml is refused (${revoked.trustConfig.reason}). Recover with: ${revoked.trustConfig.recovery}`);
+      }
     });
   keys.command("export-public")
     .description("Print a purpose's public key, key id and proof of possession, for an organisation's trust list")

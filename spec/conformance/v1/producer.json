@@ -1,0 +1,12 @@
+{
+  "suite": "1.0.0",
+  "class": "producer",
+  "cases": [
+    { "id": "PRD-001", "name": "records-parse-as-contracts", "normative": true, "scenario": "spec/conformance/v1/producer/basic-session.json", "check": "contract" },
+    { "id": "PRD-002", "name": "events-chain-by-hash", "normative": true, "scenario": "spec/conformance/v1/producer/basic-session.json", "check": "chain" },
+    { "id": "PRD-003", "name": "importer-records-parse-as-contracts", "normative": true, "scenario": "spec/conformance/v1/producer/importer-session.json", "check": "contract" },
+    { "id": "PRD-004", "name": "importer-never-claims-enforcement", "normative": true, "scenario": "spec/conformance/v1/producer/importer-session.json", "check": "importer-enforcement" },
+    { "id": "PRD-005", "name": "signatures-verify-under-test-trust-list", "normative": false, "scenario": "spec/conformance/v1/producer/basic-session.json", "check": "signature",
+      "pending": "informative: writerSignature verification waits for P1-30's single key-id rule (spec/ACCEPTANCE_RULES.md)" }
+  ]
+}

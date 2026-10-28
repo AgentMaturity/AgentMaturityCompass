@@ -51,7 +51,8 @@ const artifactKindSchema = z.enum([
     "scoped-exception",
     "scoped-exception-revocation",
     "break-glass",
-    "review-record"
+    "review-record",
+    "change-envelope"
 ]);
 
 const artifactSignatureFields = {

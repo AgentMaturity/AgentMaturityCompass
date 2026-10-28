@@ -1,0 +1,340 @@
+[
+  {
+    "eventId": "30e94b09-8f01-4c97-a6b3-a0b76d8b8cab",
+    "ts": 1793129755008,
+    "schema": "amc.lifecycle-transition/v1",
+    "from": null,
+    "to": "proposed",
+    "reason": "registered",
+    "manifestDigest": null,
+    "manifest": null,
+    "approvalId": null,
+    "planDigest": null,
+    "reviewDueTs": null,
+    "reviewAdvisory": false,
+    "actor": {
+      "userId": "b75893d0-f858-47ef-bf25-d9406e1a2c5b",
+      "username": "lifecycle-owner",
+      "roles": [
+        "OWNER"
+      ],
+      "via": "approvals-session"
+    },
+    "claimKind": "observed",
+    "note": null,
+    "auditType": "LIFECYCLE_TRANSITION",
+    "agentId": "default",
+    "trustTier": "OBSERVED",
+    "eventHash": "c3ce655efbfdab8c782d40311ac6f40e01dff34290b4780f533e90ae00d15063"
+  },
+  {
+    "eventId": "5296a87a-a86e-4b4a-814a-17d9a95fad6e",
+    "ts": 1793129755168,
+    "schema": "amc.lifecycle-transition/v1",
+    "from": "proposed",
+    "to": "approved",
+    "reason": "approval",
+    "manifestDigest": "sha256:c5755a87b62e334d53eafee6b5bf7638650fdceb8b573bad05aba46f6ae84d67",
+    "manifest": {
+      "v": 1,
+      "agentId": "default",
+      "deploymentId": "not_bound",
+      "model": {
+        "providerId": "fixture-provider",
+        "model": "fixture-model-a",
+        "providerReportedVersion": "2026-10-01"
+      },
+      "systemPromptSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "toolsDigest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "policyDigest": "policy-a",
+      "compiledPlanDigest": "none",
+      "harnessVersion": "1.2.0",
+      "compositionDigest": "composition-a",
+      "corpusDigests": []
+    },
+    "approvalId": "apprreq_33d03a02617b4652a3a7d2e0e9359073",
+    "planDigest": "none",
+    "reviewDueTs": null,
+    "reviewAdvisory": false,
+    "actor": {
+      "userId": "b75893d0-f858-47ef-bf25-d9406e1a2c5b",
+      "username": "lifecycle-owner",
+      "roles": [
+        "OWNER"
+      ],
+      "via": "approvals-session"
+    },
+    "claimKind": "observed",
+    "note": null,
+    "auditType": "LIFECYCLE_TRANSITION",
+    "agentId": "default",
+    "trustTier": "OBSERVED",
+    "eventHash": "5117b6de2d1b3e45a9df6be00b41556dd4ffb857f5af87b7afeebf05acb01165"
+  },
+  {
+    "eventId": "4615c3b8-bbb0-4fac-95fd-c32947be0857",
+    "ts": 1793129755173,
+    "schema": "amc.lifecycle-transition/v1",
+    "from": "approved",
+    "to": "active",
+    "reason": "activation",
+    "manifestDigest": "sha256:c5755a87b62e334d53eafee6b5bf7638650fdceb8b573bad05aba46f6ae84d67",
+    "manifest": {
+      "v": 1,
+      "agentId": "default",
+      "deploymentId": "not_bound",
+      "model": {
+        "providerId": "fixture-provider",
+        "model": "fixture-model-a",
+        "providerReportedVersion": "2026-10-01"
+      },
+      "systemPromptSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "toolsDigest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "policyDigest": "policy-a",
+      "compiledPlanDigest": "none",
+      "harnessVersion": "1.2.0",
+      "compositionDigest": "composition-a",
+      "corpusDigests": []
+    },
+    "approvalId": "apprreq_33d03a02617b4652a3a7d2e0e9359073",
+    "planDigest": "none",
+    "reviewDueTs": null,
+    "reviewAdvisory": false,
+    "actor": {
+      "userId": "b75893d0-f858-47ef-bf25-d9406e1a2c5b",
+      "username": "lifecycle-owner",
+      "roles": [
+        "OWNER"
+      ],
+      "via": "approvals-session"
+    },
+    "claimKind": "observed",
+    "note": null,
+    "auditType": "LIFECYCLE_TRANSITION",
+    "agentId": "default",
+    "trustTier": "OBSERVED",
+    "eventHash": "e4397de16f939b1d320d6b4d1f2c70dd99e1f2cf8b8cf69f9cf0adde3c76bfed"
+  },
+  {
+    "eventId": "a38e6366-0264-4c2d-ac8e-0949ba9bc6bb",
+    "ts": 1793129755182,
+    "manifest": {
+      "v": 1,
+      "agentId": "default",
+      "deploymentId": "not_bound",
+      "model": {
+        "providerId": "fixture-provider",
+        "model": "fixture-model-b",
+        "providerReportedVersion": "2026-10-01"
+      },
+      "systemPromptSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "toolsDigest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "policyDigest": "policy-a",
+      "compiledPlanDigest": "none",
+      "harnessVersion": "1.2.0",
+      "compositionDigest": "composition-a",
+      "corpusDigests": []
+    },
+    "manifestDigest": "sha256:d0f919585409970f1e1ce666313082a682391392923ddc6445a8de37e77442e9",
+    "auditType": "LIFECYCLE_MANIFEST_OBSERVED",
+    "agentId": "default",
+    "trustTier": "OBSERVED",
+    "eventHash": "633db537a726bd0215510fbcc7f465c9c042ef56fdb39c40803fe3125a71a846"
+  },
+  {
+    "eventId": "e1be9ad0-6b78-47d3-8509-d358d4b66b4f",
+    "ts": 1793129755187,
+    "schema": "amc.lifecycle-reassessment/v1",
+    "trigger": "invalidated_by",
+    "changed": [
+      "model"
+    ],
+    "invalidatedControls": [
+      "L0-CHG-01"
+    ],
+    "requiredTests": [
+      "L0-CHG-01-T2"
+    ],
+    "status": "open",
+    "manifestDigest": "sha256:d0f919585409970f1e1ce666313082a682391392923ddc6445a8de37e77442e9",
+    "unpinned": [],
+    "envelopeId": null,
+    "approvalId": "apprreq_33d03a02617b4652a3a7d2e0e9359073",
+    "note": "mandatory controls invalidated: L0-CHG-01",
+    "reassessmentId": "reas_3c99f22e66274e3eaa397ec08b639764",
+    "createdTs": 1793129755187,
+    "closedTs": null,
+    "auditType": "LIFECYCLE_REASSESSMENT",
+    "agentId": "default",
+    "trustTier": "OBSERVED",
+    "eventHash": "457d4a6688ae4f5e8c0c747fc6c2e0a32a093facf634ff7f7d304107ee629ac5"
+  },
+  {
+    "eventId": "4a1cd0f2-e59d-4a1b-b257-c6a43bdeafc5",
+    "ts": 1793129755190,
+    "schema": "amc.lifecycle-transition/v1",
+    "from": "active",
+    "to": "suspended",
+    "reason": "reassessment_required",
+    "manifestDigest": "sha256:c5755a87b62e334d53eafee6b5bf7638650fdceb8b573bad05aba46f6ae84d67",
+    "manifest": {
+      "v": 1,
+      "agentId": "default",
+      "deploymentId": "not_bound",
+      "model": {
+        "providerId": "fixture-provider",
+        "model": "fixture-model-a",
+        "providerReportedVersion": "2026-10-01"
+      },
+      "systemPromptSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "toolsDigest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "policyDigest": "policy-a",
+      "compiledPlanDigest": "none",
+      "harnessVersion": "1.2.0",
+      "compositionDigest": "composition-a",
+      "corpusDigests": []
+    },
+    "approvalId": "apprreq_33d03a02617b4652a3a7d2e0e9359073",
+    "planDigest": "none",
+    "reviewDueTs": null,
+    "reviewAdvisory": false,
+    "actor": {
+      "userId": "amc",
+      "username": "amc",
+      "roles": [],
+      "via": "amc"
+    },
+    "claimKind": "observed",
+    "note": null,
+    "auditType": "LIFECYCLE_TRANSITION",
+    "agentId": "default",
+    "trustTier": "OBSERVED",
+    "eventHash": "2e0dc791dac04f0e9427060f75252211148d186f9758ce96210afdecd146cc00"
+  },
+  {
+    "eventId": "50177591-a874-4c98-bc30-607a5d130652",
+    "ts": 1793129755380,
+    "schema": "amc.lifecycle-transition/v1",
+    "from": "suspended",
+    "to": "active",
+    "reason": "resumed",
+    "manifestDigest": "sha256:d0f919585409970f1e1ce666313082a682391392923ddc6445a8de37e77442e9",
+    "manifest": {
+      "v": 1,
+      "agentId": "default",
+      "deploymentId": "not_bound",
+      "model": {
+        "providerId": "fixture-provider",
+        "model": "fixture-model-b",
+        "providerReportedVersion": "2026-10-01"
+      },
+      "systemPromptSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "toolsDigest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "policyDigest": "policy-a",
+      "compiledPlanDigest": "none",
+      "harnessVersion": "1.2.0",
+      "compositionDigest": "composition-a",
+      "corpusDigests": []
+    },
+    "approvalId": "apprreq_59b3e8328f844235acac3e50a99a4519",
+    "planDigest": "none",
+    "reviewDueTs": null,
+    "reviewAdvisory": false,
+    "actor": {
+      "userId": "b75893d0-f858-47ef-bf25-d9406e1a2c5b",
+      "username": "lifecycle-owner",
+      "roles": [
+        "OWNER"
+      ],
+      "via": "approvals-session"
+    },
+    "claimKind": "observed",
+    "note": null,
+    "auditType": "LIFECYCLE_TRANSITION",
+    "agentId": "default",
+    "trustTier": "OBSERVED",
+    "eventHash": "5431d194305adbe6913ce42af86ac98d059c0eeae99049395dfed5a7ecd0663d"
+  },
+  {
+    "eventId": "1ee68202-8f16-419c-b158-b0cfc30d7d9e",
+    "ts": 1793129755390,
+    "schema": "amc.lifecycle-reassessment/v1",
+    "trigger": "invalidated_by",
+    "changed": [
+      "model"
+    ],
+    "invalidatedControls": [
+      "L0-CHG-01"
+    ],
+    "requiredTests": [
+      "L0-CHG-01-T2"
+    ],
+    "status": "passed",
+    "manifestDigest": "sha256:d0f919585409970f1e1ce666313082a682391392923ddc6445a8de37e77442e9",
+    "unpinned": [],
+    "envelopeId": null,
+    "approvalId": "apprreq_59b3e8328f844235acac3e50a99a4519",
+    "note": "mandatory controls invalidated: L0-CHG-01",
+    "reassessmentId": "reas_3c99f22e66274e3eaa397ec08b639764",
+    "createdTs": 1793129755187,
+    "closedTs": 1793129755390,
+    "auditType": "LIFECYCLE_REASSESSMENT",
+    "agentId": "default",
+    "trustTier": "OBSERVED",
+    "eventHash": "70c948b58c74899017a61f4dc550b704d1bfdbe5b122aadf42efa49121e33356"
+  },
+  {
+    "eventId": "b5ba63e6-81c5-43e1-8786-2d7e3c7f2fb4",
+    "ts": 1793129755710,
+    "schema": "amc.lifecycle-transition/v1",
+    "from": "active",
+    "to": "retired",
+    "reason": "retired",
+    "manifestDigest": "sha256:d0f919585409970f1e1ce666313082a682391392923ddc6445a8de37e77442e9",
+    "manifest": {
+      "v": 1,
+      "agentId": "default",
+      "deploymentId": "not_bound",
+      "model": {
+        "providerId": "fixture-provider",
+        "model": "fixture-model-b",
+        "providerReportedVersion": "2026-10-01"
+      },
+      "systemPromptSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "toolsDigest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "policyDigest": "policy-a",
+      "compiledPlanDigest": "none",
+      "harnessVersion": "1.2.0",
+      "compositionDigest": "composition-a",
+      "corpusDigests": []
+    },
+    "approvalId": "apprreq_59b3e8328f844235acac3e50a99a4519",
+    "planDigest": "none",
+    "reviewDueTs": null,
+    "reviewAdvisory": false,
+    "actor": {
+      "userId": "b75893d0-f858-47ef-bf25-d9406e1a2c5b",
+      "username": "lifecycle-owner",
+      "roles": [
+        "OWNER"
+      ],
+      "via": "approvals-session"
+    },
+    "claimKind": "observed",
+    "note": "fixture decommissioned",
+    "retirement": {
+      "leaseRevocationId": "agent:default",
+      "staticTokenRotated": false,
+      "cancelledApprovals": [],
+      "outcomeUnknown": [],
+      "outcomeUnknownAcceptance": null,
+      "ledgerHeadHash": "70c948b58c74899017a61f4dc550b704d1bfdbe5b122aadf42efa49121e33356",
+      "retentionSegmentIds": [],
+      "bundleIds": []
+    },
+    "auditType": "LIFECYCLE_TRANSITION",
+    "agentId": "default",
+    "trustTier": "OBSERVED",
+    "eventHash": "7fa98b3a4ce8ae69b7806b1ffec46157bee97b20767646e168fcd1c8908b3fbb"
+  }
+]

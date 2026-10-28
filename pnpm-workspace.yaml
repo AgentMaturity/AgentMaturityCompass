@@ -9,6 +9,10 @@
 packages:
   - "vendor/*"
   - "packages/*"
+  # P1-32: the conformance runner has no dependency and is run from its packed
+  # tarball, so it needs no lockfile importer. Remove this line together with
+  # adding `packages/amc-conformance: {}` to pnpm-lock.yaml if it ever gains one.
+  - "!packages/amc-conformance"
 
 # Vendored names must resolve to the workspace copies, never to a registry
 # package of the same name. The verify-vendored-links gate asserts this.

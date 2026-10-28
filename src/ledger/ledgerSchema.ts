@@ -560,6 +560,49 @@ const migrations: Migration[] = [
         SELECT RAISE(ABORT, 'evidence immutable fields changed');
       END;
     `
+  },
+  {
+    // P2-23 agent lifecycle: each row is materialized from the signed LIFECYCLE_* audit rows (rebuildable from them, see
+    // src/lifecycle/governanceLifecycle.ts) so admission reads one row per action. The index serves the per-agent reads.
+    version: 15,
+    sql: `
+      CREATE TABLE IF NOT EXISTS agent_lifecycle_state (
+        agent_id TEXT PRIMARY KEY,
+        state TEXT NOT NULL CHECK (state IN ('proposed','approved','active','suspended','retired')),
+        reason TEXT NOT NULL,
+        claim_kind TEXT NOT NULL CHECK (claim_kind IN ('self_reported','observed')),
+        approval_id TEXT,
+        bound_manifest_json TEXT,
+        plan_digest TEXT,
+        review_due_ts INTEGER,
+        review_advisory INTEGER NOT NULL DEFAULT 0,
+        observed_manifest_json TEXT,
+        last_event_id TEXT NOT NULL,
+        updated_ts INTEGER NOT NULL
+      );
+      CREATE INDEX IF NOT EXISTS idx_evidence_lifecycle_audit
+        ON evidence_events(json_extract(meta_json, '$.auditType'), json_extract(meta_json, '$.agentId'))
+        WHERE event_type = 'audit' AND json_valid(meta_json);
+    `
+  },
+  {
+    // P2-26 clock runtime: the signed applicability decision startIncidentClocks records once per incident (clockRuntime.ts).
+    version: 16,
+    sql: `
+      CREATE TABLE IF NOT EXISTS incident_clock_runs (
+        incident_id TEXT PRIMARY KEY,
+        status TEXT NOT NULL CHECK (status IN ('started', 'not_evaluated')),
+        reason TEXT,
+        plan_digest TEXT,
+        decisions_json TEXT NOT NULL,
+        decided_ts INTEGER NOT NULL,
+        signature TEXT NOT NULL
+      );
+      CREATE TRIGGER IF NOT EXISTS incident_clock_runs_append_only BEFORE UPDATE ON incident_clock_runs
+      BEGIN SELECT RAISE(ABORT, 'incident_clock_runs is append-only'); END;
+      CREATE TRIGGER IF NOT EXISTS incident_clock_runs_no_delete BEFORE DELETE ON incident_clock_runs
+      BEGIN SELECT RAISE(ABORT, 'incident_clock_runs is append-only'); END;
+    `
   }
 ];
 

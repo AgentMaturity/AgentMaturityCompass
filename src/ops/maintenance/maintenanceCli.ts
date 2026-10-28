@@ -5,6 +5,7 @@ import { pruneOpsCaches } from "./cachePrune.js";
 import { rotateLogs } from "./logRotation.js";
 import { ensureOperationalIndexes, runVacuum } from "./sqliteMaintenance.js";
 import { maintenanceStats } from "./stats.js";
+import { assertRetentionMeetsRegimes } from "../retention/regimeRetention.js";
 
 export function maintenanceStatsCli(workspace: string): ReturnType<typeof maintenanceStats> {
   return maintenanceStats(workspace);
@@ -40,6 +41,7 @@ export function maintenanceRotateLogsCli(workspace: string): ReturnType<typeof r
     throw new Error(`ops policy invalid: ${verify.reason ?? "unknown reason"}`);
   }
   const policy = loadOpsPolicy(workspace);
+  assertRetentionMeetsRegimes(workspace, policy); // P2-26: no maintenance deletion under a policy that undercuts a regime floor.
   const result = rotateLogs({
     workspace,
     logDir: join(workspace, ".amc", "studio", "logs"),
@@ -63,6 +65,7 @@ export function maintenancePruneCacheCli(workspace: string): ReturnType<typeof p
     throw new Error(`ops policy invalid: ${verify.reason ?? "unknown reason"}`);
   }
   const policy = loadOpsPolicy(workspace);
+  assertRetentionMeetsRegimes(workspace, policy); // P2-26: no maintenance deletion under a policy that undercuts a regime floor.
   return pruneOpsCaches({
     workspace,
     pruneConsoleSnapshotsDays: policy.opsPolicy.maintenance.pruneConsoleSnapshotsDays,

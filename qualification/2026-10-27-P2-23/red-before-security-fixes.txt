@@ -1,0 +1,13 @@
+Entry points (tests/lifecycle/entryPoints.test.ts) on 6cdb1eda1 sources:
+     × ToolHub's journaled dispatch denies a suspended migrated agent, and runs nothing 1317ms
+     × a provider hook decision (Pi write, signed WRITE_HIGH) for a suspended migrated agent is denied with the lifecycle reason 1151ms
+     × no compiled-policy context is needed: bindAuthorization alone denies; reads are not held 738ms
+     × an active plan that cannot be verified denies a held agent (fail closed); an active agent is not affected 1059ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  4 failed (4)
+
+Resolved manifest (tests/lifecycle/resolvedManifest.test.ts, first test) on 6cdb1eda1 sources:
+     × a declared tools pin that differs from the resolved config is not the manifest: the agent is suspended for reassessment 1240ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+AssertionError: expected { v: 1, agentId: 'default', …(9) } to match object { …(2) }
+      Tests  1 failed (1)

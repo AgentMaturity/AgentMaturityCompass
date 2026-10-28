@@ -23,6 +23,14 @@ function hasScope(payload: LeasePayload, scope: LeaseScope): boolean {
   return payload.scopes.includes(scope);
 }
 
+/**
+ * The revocation-list id that revokes every lease of one agent (P2-23 retirement). Lease ids are minted by AMC, so a
+ * lease named like this can only revoke more. P2-25 replaces it with its own revocation primitives.
+ */
+export function agentLeaseRevocationId(agentId: string): string {
+  return `agent:${agentId}`;
+}
+
 export interface VerifyLeaseOptions {
   workspace: string;
   token: string;
@@ -62,7 +70,7 @@ export function verifyLeaseToken(input: VerifyLeaseOptions): VerifyLeaseResult {
     if (Date.now() > payload.expiresTs) {
       return { ok: false, payload, error: "lease expired" };
     }
-    if (input.revokedLeaseIds?.has(payload.leaseId)) {
+    if (input.revokedLeaseIds?.has(payload.leaseId) || input.revokedLeaseIds?.has(agentLeaseRevocationId(payload.agentId))) {
       return { ok: false, payload, error: "lease revoked" };
     }
     if (input.expectedAgentId && payload.agentId !== input.expectedAgentId) {

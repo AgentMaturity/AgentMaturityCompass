@@ -29,7 +29,7 @@ import { handleBenchmarkRoute } from './benchmarkRouter.js';
 import { handleWorkflowRoute } from './workflowRouter.js';
 import { handleOrgRunRoute } from './orgRunRouter.js';
 import { handleFirewallRoute } from './firewallRouter.js';
-import { handleRuntimeRoute } from './runtimeRouter.js';
+import { handleKillSwitchRoute, handleRuntimeRoute } from './runtimeRouter.js';
 import { handleImporterRoute } from './importerRouter.js';
 import { handleStrategyRoute } from './strategyRouter.js';
 import { handleGovernorRoute } from './governorRouter.js';
@@ -53,6 +53,7 @@ import { handleMarketplaceRoute } from '../marketplace/marketplaceRouter.js';
 import { handleDomainProofRoute } from './domainProofRouter.js';
 import { handleNativeTasksRoute, type NativeTaskApiContext } from './nativeTasksRouter.js';
 import { handleOperatorRoute } from './operatorRouter.js';
+import { handleLifecycleRoute } from './lifecycleRouter.js';
 import { handleA4Route } from '../a4/a4Router.js';
 
 export type ApiAuthPolicy = 'public' | 'protected';
@@ -137,6 +138,15 @@ export const API_ROUTE_REGISTRY: readonly ApiRouteDefinition[] = [
     auth: 'protected',
     validationPolicy: 'schema-validated',
     handler: handleOperatorRoute
+  },
+  {
+    id: 'lifecycle',
+    description: 'Governed agent lifecycle: state, transitions, reassessments and the OWNER transition (P2-23)',
+    prefixes: ['/api/v1/lifecycle/agents'],
+    methods: ['GET', 'POST'],
+    auth: 'protected',
+    validationPolicy: 'schema-validated',
+    handler: handleLifecycleRoute
   },
   {
     id: 'score',
@@ -227,6 +237,16 @@ export const API_ROUTE_REGISTRY: readonly ApiRouteDefinition[] = [
     auth: 'protected',
     validationPolicy: 'router-local',
     handler: (pathname, method, req, res, context) => handleFirewallRoute(pathname, method, req, res, context.workspace, context.revalidateAuthority)
+  },
+  {
+    // Before 'runtime': its prefix would match first. The kill switch records the authenticated principal (P2-26).
+    id: 'runtime-kill-switch',
+    description: 'Runtime kill switch: status, OWNER activation and signed OWNER release',
+    prefixes: ['/api/v1/runtime/kill-switch'],
+    methods: ['GET', 'POST'],
+    auth: 'protected',
+    validationPolicy: 'router-local',
+    handler: (pathname, method, req, res, context) => handleKillSwitchRoute(pathname, method, req, res, context.workspace, context.principal)
   },
   {
     id: 'runtime',

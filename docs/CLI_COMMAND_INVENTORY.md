@@ -614,7 +614,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc incident link` | Link evidence to an incident | `--evidence <evidenceId>` | - |
 | `amc incident list` | List incidents for an agent | `--status <status>`<br>`--limit <n>`<br>`--agent <agentId>` | - |
 | `amc incident oversight` | Append a signed human-oversight record (the auditor key proves the workspace, not the reviewer) | `--decision <decision>`<br>`--reviewer <id>`<br>`--rationale <text>`<br>`--clock <clockId...>` | - |
-| `amc incident show` | Show incident details, or write its regulator evidence packet with --packet | `--packet <dir>`<br>`--station <station>` | - |
+| `amc incident show` | Show incident details, or write its regulator evidence packet with --packet | `--packet <dir>`<br>`--station <station>`<br>`--clocks` | - |
 | `amc incidents` | Incident operations and dispatch workflows | - | - |
 | `amc incidents alert` | Dispatch INCIDENT_CREATED to configured integration channels | `--agent <agentId>`<br>`--summary <text>`<br>`--details <json>` | - |
 | `amc incidents help` | Show incident-focused command groups | - | - |
@@ -666,7 +666,9 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc lessons-promote` | Promote a correction to a reusable lesson | - | - |
 | `amc lifecycle` | Agent lifecycle responsibility and governance mapping | - | - |
 | `amc lifecycle advance` | Advance lifecycle stage after governance gate confirmation | `--agent <agentId>`<br>`--to <stage>`<br>`--actor <actor>`<br>`--actor-role <role>`<br>`--controls <list>`<br>`--note <text>`<br>`--json` | - |
+| `amc lifecycle reassessments` | Show a governed agent's lifecycle state and its reassessment records (JSON) | `--agent <agentId>` | - |
 | `amc lifecycle status` | Show lifecycle stage, accountability matrix, governance gates, and transition trail | `--agent <agentId>`<br>`--json` | - |
+| `amc lifecycle transition` | Move a governed agent between proposed, approved, active, suspended and retired (signed, approval-bound; JSON) | `--to <state>`<br>`--session-token-file <file>`<br>`--agent <agentId>`<br>`--request-approval`<br>`--approval <approvalRequestId>`<br>`--manifest <file>`<br>`--note <text>`<br>`--accept-outcome-unknown <note>` | - |
 | `amc lineage-claim` | Show full governance lineage for a specific claim | - | - |
 | `amc lineage-init` | Initialize governance lineage tables | - | - |
 | `amc lineage-policy-intents` | List all policy change intents for an agent | `--agent <agentId>` | - |
@@ -1173,6 +1175,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc trust enable-notary` | Enable fail-closed NOTARY trust mode | `--base-url <url>`<br>`--pin <pubkeyFile>`<br>`--require <level>`<br>`--unix-socket <path>` | - |
 | `amc trust freshness` | Report temporal trust freshness and half-life decay | `--agent <agentId>`<br>`--lookback-days <n>`<br>`--stale-threshold <n>`<br>`--half-life-behavioral <days>`<br>`--half-life-assurance <days>`<br>`--half-life-cryptographic <days>`<br>`--half-life-self-reported <days>`<br>`--view <mode>` | - |
 | `amc trust init` | Create and sign .amc/trust.yaml — sets up the trust mode (SELF/NOTARY) that governs artifact signing | - | - |
+| `amc trust resign` | Re-sign the current .amc/trust.yaml in place with the current artifact-seal key, keeping NOTARY settings | `--confirm <sha256>`<br>`--accept-compromised-signer` | - |
 | `amc trust status` | Show trust mode, signature status, and notary health | - | - |
 | `amc truthguard` | Deterministic output truth-constraint validator | - | - |
 | `amc truthguard validate` | Validate structured agent output claims against deterministic truth constraints | `--file <json>` | - |
