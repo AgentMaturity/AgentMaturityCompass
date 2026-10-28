@@ -3,37 +3,51 @@
  * are real signed users.yaml rows (the governance fixture's keyed workspace), so principals, roles, population and SoD
  * read live records; nothing about identity is mocked. The preview gate is on unless a case turns it off.
  */
+import { spawn } from "node:child_process";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { Readable } from "node:stream";
+import { fileURLToPath } from "node:url";
 import { vi } from "vitest";
+import { pendingExecutors } from "../../src/a4/a4Gates.js";
 import { handleA4Route } from "../../src/a4/a4Router.js";
 import type { NativeTaskApiContext } from "../../src/api/nativeTasksRouter.js";
 import { addUser, initUsersConfig } from "../../src/auth/authApi.js";
+import { createNativeTaskService } from "../../src/studio/nativeTaskService.js";
+import type { NativeTaskService } from "../../src/studio/nativeTaskTypes.js";
 import { governanceFixture } from "../governor/governanceFixture.js";
 
 export type Who = { userId: string } | "admin" | "demo" | "none";
 export interface Reply { status: number; body: { ok?: boolean; data?: Record<string, unknown>; code?: string; error?: string; detail?: unknown } }
 
-export interface A4Workspace { workspace: string; owner: { userId: string }; alice: { userId: string }; bob: { userId: string } }
+export interface A4Workspace { workspace: string; sessionId: string; owner: { userId: string }; alice: { userId: string }; bob: { userId: string } }
 
 /**
  * A keyed workspace with three ACTIVE local users: the bootstrap OWNER and two OWNER-role users (alice, bob). `solo`
  * leaves the bootstrap OWNER alone (the single-user workspace of design §5.3); alice and bob then name that user.
  */
 export function a4Workspace(options: { solo?: boolean } = {}): A4Workspace {
-  const { workspace } = governanceFixture();
+  const { workspace, sessionId } = governanceFixture();
   vi.stubEnv("AMC_A4_PREVIEW", "1");
   const owner = { userId: initUsersConfig({ workspace, username: "a4-owner", password: "p235-owner-password" }).owner.userId };
-  if (options.solo === true) return { workspace, owner, alice: owner, bob: owner };
+  if (options.solo === true) return { workspace, sessionId, owner, alice: owner, bob: owner };
   const alice = addUser({ workspace, username: "alice", roles: ["OWNER"], password: "p235-alice-password" });
   const bob = addUser({ workspace, username: "bob", roles: ["OWNER"], password: "p235-bob-password" });
-  return { workspace, owner, alice: { userId: alice.userId }, bob: { userId: bob.userId } };
+  return { workspace, sessionId, owner, alice: { userId: alice.userId }, bob: { userId: bob.userId } };
 }
 
-function context(who: Who, executionAllowed: boolean): NativeTaskApiContext | undefined {
+/** One Studio native task service per workspace, as Studio holds one (Assemble's Understand and Build read it). */
+const services = new Map<string, NativeTaskService>();
+function serviceFor(workspace: string): NativeTaskService {
+  if (!services.has(workspace)) services.set(workspace, createNativeTaskService({ workspace }));
+  return services.get(workspace)!;
+}
+
+function context(workspace: string, who: Who, executionAllowed: boolean): NativeTaskApiContext | undefined {
   if (who === "none") return undefined;
   const principalId = who === "admin" ? "bootstrap-admin" : who === "demo" ? "demo" : `session:LOCAL_USER:${who.userId}`;
-  return { service: {} as never, principalId, demo: who === "demo", nativeCsrfToken: null, admissionActor: {} as never, executionAllowed: () => executionAllowed };
+  const csrf = "p235-native-csrf";
+  return { service: serviceFor(workspace), principalId, demo: who === "demo", nativeCsrfToken: csrf,
+    admissionActor: { isAdmin: who === "admin", userId: typeof who === "object" ? who.userId : null, nativeCsrfToken: csrf }, executionAllowed: () => executionAllowed };
 }
 
 /** One request through the A4 HTTP entry; a body is sent as JSON bytes. */
@@ -47,7 +61,7 @@ export async function a4(workspace: string, who: Who, method: string, path: stri
     writeHead(code: number) { status = code; this.headersSent = true; return this; },
     end(chunk?: string) { out += chunk ?? ""; } };
   const handled = await handleA4Route(new URL(path, "http://a4.test").pathname, method, req as unknown as IncomingMessage, res as unknown as ServerResponse,
-    { workspace, nativeTasks: context(who, options.executionAllowed ?? true), revalidateAuthority: () => true });
+    { workspace, nativeTasks: context(workspace, who, options.executionAllowed ?? true), revalidateAuthority: () => true });
   if (!handled) throw new Error(`${method} ${path} is not an A4 route`);
   return { status, body: out === "" ? {} : JSON.parse(out) as Reply["body"] };
 }
@@ -72,8 +86,9 @@ export class A4Project {
   constructor(readonly workspace: string, readonly projectId: string, readonly author: Who) {}
   get path(): string { return `/api/v1/a4/projects/${this.projectId}`; }
 
-  static async create(workspace: string, author: Who, name = "P2-35 scenario"): Promise<A4Project> {
-    const reply = await a4(workspace, author, "POST", "/api/v1/a4/projects", { clientRequestId: requestId(), name, expertise: "practitioner" });
+  static async create(workspace: string, author: Who, name = "P2-35 scenario", agentId?: string): Promise<A4Project> {
+    const reply = await a4(workspace, author, "POST", "/api/v1/a4/projects", { clientRequestId: requestId(), name, expertise: "practitioner",
+      ...(agentId === undefined ? {} : { agentId }) });
     if (reply.status !== 201) throw new Error(`create: ${reply.status} ${JSON.stringify(reply.body)}`);
     return new A4Project(workspace, reply.body.data!.projectId as string, author);
   }
@@ -117,6 +132,11 @@ export class A4Project {
     if (reply.status < 300 && typeof reply.body.data?.seq === "number") this.head = Math.max(this.head, reply.body.data.seq);
     return reply;
   }
+  /** Re-reads the head seq (after an effect that ran after the response moved it). */
+  async sync(): Promise<number> {
+    this.head = (await this.get(this.author)).body.data!.headSeq as number;
+    return this.head;
+  }
   async gate(who: Who, gateId: string): Promise<Record<string, unknown>> {
     const gates = (await this.get(who, "/gates")).body.data!.gates as Array<Record<string, unknown>>;
     return gates.find((entry) => entry.gateId === gateId)!;
@@ -125,3 +145,33 @@ export class A4Project {
 
 /** The status and code of a refusal, for one-line expectations. */
 export const refusal = (reply: Reply): [number, string | undefined] => [reply.status, reply.body.code];
+
+/** Waits until no A4 effect executor of this process is running (effects that run after the response). */
+export async function settled(timeoutMs = 60_000): Promise<void> {
+  const deadline = Date.now() + timeoutMs;
+  while (pendingExecutors.size > 0) {
+    if (Date.now() > deadline) throw new Error(`A4 effects still running: ${[...pendingExecutors].join(", ")}`);
+    await new Promise((done) => setTimeout(done, 25));
+  }
+}
+
+/**
+ * Runs tests/fixtures/a4/a4Child.mjs as a separate Node process on the built code (dist/) with this process's
+ * environment (the fixture's stubbed HOME, AMC_HOME and vault passphrase included); resolves its one JSON line.
+ */
+export function a4Child(input: Record<string, unknown>): Promise<Record<string, unknown>> {
+  const repo = fileURLToPath(new URL("../..", import.meta.url));
+  const script = fileURLToPath(new URL("../fixtures/a4/a4Child.mjs", import.meta.url));
+  return new Promise((done, fail) => {
+    const child = spawn(process.execPath, [script, JSON.stringify({ repo, ...input })], { env: { ...process.env }, stdio: ["ignore", "pipe", "pipe"] });
+    let stdout = "", stderr = "";
+    child.stdout.on("data", (chunk: Buffer) => { stdout += chunk.toString("utf8"); });
+    child.stderr.on("data", (chunk: Buffer) => { stderr += chunk.toString("utf8"); });
+    child.once("error", fail);
+    child.once("close", (code) => {
+      const line = stdout.trim().split("\n").at(-1);
+      if (code !== 0 || line === undefined || line === "") return fail(new Error(`a4 child exited ${String(code)}: ${stderr.slice(0, 2000)}`));
+      done(JSON.parse(line) as Record<string, unknown>);
+    });
+  });
+}

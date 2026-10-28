@@ -7,10 +7,19 @@ marked **pending** has no test yet; the reason is given. Nothing here is skipped
 
 ## Harness
 
-`tests/a4/a4Harness.ts` drives `handleA4Route` (the HTTP entry) in process with a Studio-session identity. Users are
-real, signed `users.yaml` rows in the keyed governance fixture workspace (`tests/governor/governanceFixture.ts`), so
-roles, population, SoD and the ratchet read live records. The clock is faked only where a case needs it (gate TTL).
-The provider is never called: Aspire runs no model.
+- `tests/a4/a4Harness.ts` drives `handleA4Route` (the HTTP entry) in process with a Studio-session identity and a real
+  native task service. Users are real, signed `users.yaml` rows in the keyed governance fixture workspace
+  (`tests/governor/governanceFixture.ts`), so roles, population, SoD and the ratchet read live records. The clock is
+  faked only where a case needs it (gate TTL, acknowledgement expiry). `a4Child` runs `tests/fixtures/a4/a4Child.mjs`, a
+  second Node process on the built code (`dist/`), for the two-process races and the crashed effect owner.
+- `tests/a4/a4Journey.ts` drives one project from Aspire to production through the routes: alice (OWNER) authors and
+  builds; bob and a4-owner approve; audrey (AUDITOR) casts Adapt's required role vote. Assemble takes the `other` path
+  (no native build session; its unsupported items are acknowledged out of scope). Adapt runs on the synthetic compiler
+  catalog (`tests/a4/thinCatalog.ts`, mocked per file) because the shipped catalog overflows Adapt's proposal (follow-up
+  below). Activate targets helm on a Studio that reads as hosted (`KUBERNETES_SERVICE_HOST`, the v1 same-host restart);
+  the destination is a public IPv4 literal and every reachability probe runs the real `probeDestination` with its HTTP
+  fetch replaced, so no socket opens. Effect gates are opened by alice and approved through the engine by bob and a4-owner.
+- The provider is never called: Aspire runs no model, Assemble's `other` path starts no build session.
 
 ## Acceptance scenarios (design §17)
 
@@ -18,31 +27,32 @@ The provider is never called: Aspire runs no model.
 | --- | --- | --- | --- | --- |
 | 1 | Misunderstood intent | covered | `scenario01MisunderstoodIntent.test.ts` | UNDERSTANDING_NOT_CONFIRMED, A4_STEP_ORDER |
 | 2 | Requested revisions | covered | `scenario02RequestedRevisions.test.ts` | CHANGES_REQUESTED, A4_GATE_STALE, A4_GATE_SEQ_MISMATCH |
-| 3 | Stale approvals | covered (RESOURCE_DRIFTED pending) | `scenario03StaleApprovals.test.ts` | A4_GATE_STALE (request, memberSet, consumed), A4_GATE_SEQ_MISMATCH, GATE_EXPIRING, GATE_EXPIRED |
-| 4 | Unauthorized progression | covered (effect-gate and cross-plane HTTP rows pending) | `scenario04UnauthorizedProgression.test.ts`, `routerAdmission.test.ts` | SOD_VIOLATION, A4_NOT_A_MEMBER, ADMIN_TOKEN_REFUSED, DEMO_REFUSED, A4_NOT_READY, A4_DUPLICATE_DECISION, PRINCIPAL_ROLE_INSUFFICIENT, A4_USER_DISABLED |
-| 5 | Collaborative conflicts | covered (two-process case pending) | `scenario05CollaborativeConflicts.test.ts`, `storeDedupe.test.ts` | A4_STALE_HEAD, REQUEST_CONFLICT, SECRET_IN_REQUEST_ROW |
-| 6 | Changed operating markets | **pending** | — | needs Adapt (compiled plan, plan digest) and Activate (deployed release) |
-| 7 | Unsupported integrations | **pending** | — | needs Assemble's path card and plan items |
-| 8 | Failed deployment | **pending** | — | needs an Activate release, a deploy receipt and `verify` against a destination |
-| 9 | Rollback | **pending** | — | needs a deployed release and the rollback effect gate |
+| 3 | Stale approvals | covered (RESOURCE_DRIFTED on an open gate: scenario 16 covers it at the executor) | `scenario03StaleApprovals.test.ts` | A4_GATE_STALE (request, memberSet, consumed), A4_GATE_SEQ_MISMATCH, GATE_EXPIRING, GATE_EXPIRED |
+| 4 | Unauthorized progression | covered (cross-plane HTTP session pending) | `scenario04UnauthorizedProgression.test.ts`, `routerAdmission.test.ts`, `scenario16…`, `scenario09…` | SOD_VIOLATION, A4_NOT_A_MEMBER, ADMIN_TOKEN_REFUSED, DEMO_REFUSED, A4_NOT_READY, A4_DUPLICATE_DECISION, PRINCIPAL_ROLE_INSUFFICIENT, A4_USER_DISABLED, EFFECT_QUORUM_INSUFFICIENT |
+| 5 | Collaborative conflicts | covered | `scenario05CollaborativeConflicts.test.ts`, `storeDedupe.test.ts`, `twoProcessRace.test.ts` | A4_STALE_HEAD, REQUEST_CONFLICT, SECRET_IN_REQUEST_ROW, replay across processes |
+| 6 | Changed operating markets | covered | `scenario06ChangedMarkets.test.ts` | PLAN_STALE, PLAN_MISSING_FACTS, UNRESOLVED:L2-FIX-US-01, A4_GATE_STALE, NO_RELEASE |
+| 7 | Unsupported integrations | covered | `scenario07UnsupportedIntegrations.test.ts` | UNSUPPORTED_INTEGRATION, PATH:other, STATUS:preview, OWNER_ACKNOWLEDGED, A4_NOT_ACKNOWLEDGEABLE |
+| 8 | Failed deployment | covered | `scenario08FailedDeployment.test.ts` | DEPLOYMENT_UNCHECKED, RECEIPT_NOT_SUCCEEDED, READYZ_FAILED, REDIRECT_REFUSED, DESTINATION_MISMATCH, PACKAGE_DIGEST_MISMATCH, DEPLOYMENT_IDENTITY_NOT_EVALUATED |
+| 9 | Rollback | covered (freeze-first for high/critical pending) | `scenario09Rollback.test.ts` | EFFECT_QUORUM_INSUFFICIENT, SOD_VIOLATION, RELEASE_ROLLED_BACK, PACKAGE_DIGEST_MISMATCH |
 | 10 | Hold / freeze / kill switch | covered (freeze and kill switch pending) | `scenario10HoldFreeze.test.ts` | ON_HOLD, NOT_ON_HOLD |
-| 11 | Single-user workspace | covered (regulated and hosted rows pending) | `scenario11SingleUser.test.ts`, `guards.test.ts` | SOD_DEGRADED_SINGLE_USER (selfApproved), SOD_VIOLATION after the ratchet |
+| 11 | Single-user workspace | covered (hosted rows pending) | `scenario11SingleUser.test.ts`, `scenario15AcknowledgedBlocker.test.ts`, `guards.test.ts` | SOD_DEGRADED_SINGLE_USER (selfApproved), SOD_VIOLATION after the ratchet, SOD_DEGRADED_SELF_PROVISIONED |
 | 12 | Vault locked / no-sign | covered | `scenario12VaultLocked.test.ts` | A4_VAULT_LOCKED (423), VAULT_LOCKED, UNSIGNED_STORE |
 | 13 | Tampered record | covered | `scenario13TamperedRecord.test.ts`, `recordFixtures.test.ts` | A4_SIDE_ROW_MISMATCH, A4_CHAIN_INVALID, A4_INTEGRITY_FAILED |
-| 14 | `outcome_unknown` lockout | **pending** | — | needs an Assemble build execution left `outcome_unknown` |
-| 15 | Acknowledged blocker | partial: the acknowledgeable rule only | `guards.test.ts` | BLOCKED never acknowledgeable; the listed items only; regulated `plan_unresolved` refused |
-| 16 | Effect drift and crash | **pending** | — | needs an effect gate (Assemble build or Activate release) and a second process for liveness |
+| 14 | `outcome_unknown` lockout | covered | `scenario14OutcomeUnknown.test.ts` | OUTCOME_UNKNOWN_OPEN, EXECUTION:<id>, A4_NOT_READY, SOD_VIOLATION |
+| 15 | Acknowledged blocker | covered | `scenario15AcknowledgedBlocker.test.ts`, `scenario07…`, `guards.test.ts` | SOD_DEGRADED_SELF_PROVISIONED, OWNER_ACKNOWLEDGED (bound, never READY, expires after 90 days), A4_GATE_STALE |
+| 16 | Effect drift and crash | covered | `scenario16EffectDriftCrash.test.ts` | EFFECT_QUORUM_INSUFFICIENT, SOD_VIOLATION, EFFECT_FAILED (RESOURCE_DRIFTED signedConfigs.tools, process_lost), EFFECT_RUNNING / EFFECT_NOT_RETRYABLE |
 
-The pending scenarios share one blocker: the harness reaches Aspire's completion only. Assemble needs native build
-sessions on the stub provider, Adapt a compiled and activated plan, Activate a release package, a deploy receipt and a
-destination for `verify`. Each is a fixture of its own (the P1-62 qualification under `qualification/<date>-P1-62/`
-is Sid's and needs a non-stub provider; D-23).
+Still open inside covered scenarios: a freeze or kill switch raised mid-effect (scenario 10/16), freeze-first rollback
+for a high or critical risk tier (scenario 9), a WORKSPACE_ROUTER session (cross-plane, hosted single-user; needs a
+router session record), and Assemble's native path (a stub-provider build session through the native task service).
+The D-23 end-to-end qualification (one project Aspire → Activate on a non-stub provider, macOS and Linux ARM64, receipts
+under `qualification/<date>-P1-62/`) is Sid's and stays pending.
 
 ## Negative fixtures
 
 The fixtures are data tables inside the tests (the published OpenAPI route list, the tamper SQL, the a4-record
-verdict table) rather than files under `tests/fixtures/a4/`: each is generated from the code under test, so a new
-route or table is covered without a fixture edit.
+verdict table, the trust-list entries) rather than files under `tests/fixtures/a4/`: each is generated from the code
+under test, so a new route or table is covered without a fixture edit. `tests/fixtures/a4/a4Child.mjs` is the one file.
 
 | Fixture | Status | Test |
 | --- | --- | --- |
@@ -50,41 +60,46 @@ route or table is covered without a fixture edit.
 | demo POST to every mutation route and demo GET | covered | `routerAdmission.test.ts` |
 | `?trustList=` on `GET …/verify` → 400 QUERY_INVALID; a body → 400 INPUT_INVALID | covered | `routerAdmission.test.ts` |
 | no Studio session; preview off; read-only Studio; unknown user | covered | `routerAdmission.test.ts` |
-| stale (old request digest; superseded; expired) | covered | `scenario03StaleApprovals.test.ts` |
-| replayed (same clientRequestId, concurrent) | covered | `scenario05CollaborativeConflicts.test.ts`, `storeDedupe.test.ts` |
+| stale (old request digest; superseded; expired; expired before complete) | covered | `scenario03StaleApprovals.test.ts` |
+| replayed (same clientRequestId, concurrent, two processes) | covered | `scenario05…`, `storeDedupe.test.ts`, `twoProcessRace.test.ts` |
 | cross-workspace / cross-project request id | covered (cross-project) | `storeDedupe.test.ts` |
-| cross-plane vote | covered (pure) | `guards.test.ts` (one_plane); an HTTP router session is **pending** (needs a WORKSPACE_ROUTER session record) |
-| forged key, rotated-out key, expired attestation | **pending** | needs a verified-lane ref (P1-06 attestations) |
+| cross-plane vote | covered (pure) | `guards.test.ts`; an HTTP router session is **pending** (no WORKSPACE_ROUTER session record fixture) |
+| forged key, rotated-out key (expired, revoked, key-compromise), expired or inactive attestation, own workspace key, wrong purpose, other bytes | covered | `verifiedLane.test.ts` |
 | missing evidence, deleted side row | covered | `scenario13TamperedRecord.test.ts`, `recordFixtures.test.ts` |
 | digest-less decision | covered | `recordFixtures.test.ts` (stale-approval: DECISION_NOT_BOUND) |
-| single-user | covered | `scenario11SingleUser.test.ts`, `guards.test.ts` |
-| self-provisioned quorum | covered (pure) | `guards.test.ts` (SOD_DEGRADED_SELF_PROVISIONED) |
+| single-user; self-provisioned regulated quorum | covered | `scenario11SingleUser.test.ts`, `scenario15AcknowledgedBlocker.test.ts` |
 | a member or evidence ref added after the gate opened | covered | `scenario03StaleApprovals.test.ts`, `guards.test.ts` |
-| an OBSERVED `A4_STATE` row; a `lane = observed` ref on a SELF_REPORTED row | covered (lane rule) | `guards.test.ts` (laneForClaimKind); the stored-row writer case is **pending** |
-| a hypothesis observed with a SELF_REPORTED ref, outside its window, or with another metric | **pending** | needs a project past Aspire and a runtime-written ledger row |
-| verify against another host, a 3xx, drift, effect_failed, `process_lost` | **pending** | Activate and effects (scenarios 8, 16) |
+| an OBSERVED tier declared on an imported row; a `lane = observed` ref on a SELF_REPORTED row | covered | `hypotheses.test.ts` (the ledger refuses the declaration), `guards.test.ts` |
+| a hypothesis observed with a SELF_REPORTED ref, outside its window, about another metric, before Aspire is left, dangling, twice | covered | `hypotheses.test.ts` |
+| a verify against a host other than the receipt's | covered: the receipt itself is refused (DESTINATION_MISMATCH), so no check can probe another host | `scenario08FailedDeployment.test.ts` |
+| a 3xx from the destination; a 503 | covered | `scenario08FailedDeployment.test.ts` |
+| drift; effect_failed; `process_lost` | covered | `scenario16EffectDriftCrash.test.ts` |
 | head regression | covered | `scenario05CollaborativeConflicts.test.ts` (A4_STALE_HEAD) |
 | duplicate vote | covered | `scenario04UnauthorizedProgression.test.ts` (A4_DUPLICATE_DECISION), `guards.test.ts` |
 | dangling value ref | covered (ledger ref) | `recordFixtures.test.ts` (REF_DANGLING); value claims **pending** |
 | readiness item `section: integrity` with a `claimKind` | covered before P2-35 | `tests/fixtures/contracts/a4-readiness/invalid/integrity-item-with-claim.json` |
-| `claimKind: observed` without a resolved OBSERVED ref | covered (lane rule) | `guards.test.ts` |
+| `claimKind: observed` without a resolved OBSERVED ref | covered | `guards.test.ts`, `hypotheses.test.ts` |
 | a second vote whose readiness binding differs (`second-vote-lands` must hold) | covered | `recordFixtures.test.ts` |
-| a decision while a bound mandatory item is NOT_EVALUATED | **pending** | needs a stage whose bound item is unproduced at decision time |
-| an acknowledged item rendered READY or COMPLETE; an expired acknowledgement | **pending** | needs an acknowledgeable WAITING item (regulated or Assemble) |
-| `a4_evidence_refs.trust_tier` differing from the row's tier | **pending** | |
+| a decision while a bound mandatory item is NOT_EVALUATED | **pending** | no stage leaves a bound item unproduced at decision time in the reachable flow |
+| an acknowledged item rendered READY or COMPLETE; an expired acknowledgement still unblocking | covered | `scenario07…`, `scenario15AcknowledgedBlocker.test.ts` |
+| `a4_evidence_refs.trust_tier` differing from the referenced row's tier | covered by code reading only (TRUST_TIER_CHANGED/INFLATED in `resolveRefs`); a test is **pending** | |
 | a composed "experimental" sentence in `src/a4` text | covered before P2-35 | `tests/a4GuardQualification.test.ts` (P0-54 scanner) |
-| two POSTs with one clientRequestId from two processes | **pending** | in-process concurrency is covered; a two-process runner is not built |
-| resource edited between `complete` and the executor; slow executor swept; production lease at release; package file sha mismatch; monitor ref lane | **pending** | effects and Activate |
-| decision on a consumed gate | covered | `scenario03StaleApprovals.test.ts` |
-| post-consume DENY revoking a lease | **pending** | Activate staging lease |
-| client `expectedGateSeq` equal to the head seq | covered | `scenario03StaleApprovals.test.ts` |
-| verify row `passed` without a release-identifying check | **pending** | Activate |
-| no `lease_` in `a4_requests.response_json` | covered | `scenario05CollaborativeConflicts.test.ts`; the store refusal of an `eyJ…` token in `storeDedupe.test.ts` |
+| two POSTs with one clientRequestId from two processes | covered | `twoProcessRace.test.ts` |
+| a resource edited between `complete` and the executor still packaged | covered (Assemble's apply effect) | `scenario16EffectDriftCrash.test.ts` |
+| a live slow executor swept by a wall-clock bound | covered (not swept at a zero staleness bound) | `scenario16EffectDriftCrash.test.ts` |
+| a decision landing on a consumed gate; a post-consume DENY revoking a lease | covered | `scenario03…`, `leases.test.ts` |
+| a client `expectedGateSeq` equal to the head seq | covered | `scenario03StaleApprovals.test.ts` |
+| a production-scoped lease minted at release | covered (none is) | `leases.test.ts` |
+| a package file whose sha256 differs from its bound slot | covered at the receipt (PACKAGE_DIGEST_MISMATCH); a tampered file inside the package directory is **pending** | `scenario08…`, `scenario09…` |
+| a monitor ref resolving to lane `observed` | covered | `leases.test.ts` |
+| a verify row `passed` without a release-identifying check | covered (`reachable`, never `passed`) | `scenario08FailedDeployment.test.ts` |
+| no lease token in `a4_requests.response_json` | covered with real leases | `leases.test.ts`, `scenario05…`, `storeDedupe.test.ts` |
 
 ## Mutation checks
 
 Each guard was broken in the worktree (`src/` edited, the named tests run, the file restored with `git checkout`). A
-mutation is **killed** when at least one named test failed.
+mutation is **killed** when at least one named test failed. Mutations run against `src/` through vitest; the child
+processes of `twoProcessRace.test.ts` run `dist/`, so the store dedupe they exercise is mutated through D1 to D3.
 
 | Id | Guard | Mutation | Result | Failing test |
 | --- | --- | --- | --- | --- |
@@ -111,10 +126,25 @@ mutation is **killed** when at least one named test failed.
 | D3 | `dedupeRequest` credential | drop the lease-token check | killed | storeDedupe › a response carrying a lease token is refused … |
 | T1 | `verifyChain` side rows | accept a mismatched side row | killed | scenario13 › each tamper case |
 | V1 | `verifyA4Record` decision binding | drop the request-digest comparison | killed | recordFixtures › stale-approval |
-| — | `verifyAndConsumeEffect`, the quorum `now` path (`Math.max(now, ts)`) | — | **pending** | no effect gate is reached (scenario 16) |
+| E1 | `verifyAndConsumeEffect` quorum count | never refuse a short count | survived: equivalent (the engine's own `verifyApprovalForExecution` refuses the same short quorum first, with the same 409 EFFECT_QUORUM_INSUFFICIENT) | — |
+| E2 | `verifyAndConsumeEffect` | skip it (count the caller and return) | killed | scenario16 › the engine quorum is re-counted under A4's SoD before the grant is consumed |
+| Q1 | the quorum `now` path (`consumeGate` expiry at `Math.max(now, ts)`) | evaluate at a year earlier | survived: equivalent here (readiness reads the gate EXPIRED at `now` first); only the few-millisecond window where the commit ts passes expiry after the read distinguishes it, which P1-63's dist probe covered and a test cannot time | — |
+| V2 | `verifiedDowngradeReason` attestation expiry | drop ATTESTATION_EXPIRED | killed | verifiedLane › an expired attestation … |
+| V3 | `verifiedDowngradeReason` rotation | drop KEY_ROTATED_OUT | killed | verifiedLane › a rotated-out key … |
+| V4 | `verifiedDowngradeReason` own key | drop the workspace-key refusal | killed | verifiedLane › the workspace's own auditor key never counts … |
+| H1 | observe: OBSERVED tier | drop HYPOTHESIS_NOT_OBSERVED | killed | hypotheses › refusals and the one observation that counts |
+| H2 | observe: window | drop HYPOTHESIS_OUTSIDE_WINDOW | killed | hypotheses › refusals and the one observation that counts |
+| DR1 | executor preamble drift | drop RESOURCE_DRIFTED | killed | scenario16 › a bound resource edited after the attempt started … |
+| SW1 | `effectOwnerLost` dead owner | ignore a dead pid | killed | scenario16 › a dead owner is swept to process_lost … |
+| SW2 | `effectOwnerLost` live executor | sweep this process's running executor | killed | scenario16 › a dead owner is swept … a live executor is not … |
+| DP1 | `recordDeployment` destination | accept any destination | killed | scenario08 › … a receipt for another host is refused |
+| DP2 | `deployment.amc_check` on a failed check | never BLOCKED | killed | scenario08 › a failed receipt … a 503 then blocks the approval; … a 3xx is refused and blocks |
+| LS1 | `revokeStagingAfterDeny` | revoke nothing | killed | leases › a DENY of the deployment approval revokes the staging lease |
+| RB1 | rollback lease revocation | revoke nothing | killed | scenario09 › a production rollback … |
+| OU1 | `no_open_outcome_unknown` | READY while an execution is open | killed | scenario14 › an open outcome_unknown blocks Assemble … |
 
 Notes: at the router, `priorReplay` answers a recorded request before the store runs, so the store's dedupe (D1 to D3)
-is only reachable directly (`storeDedupe.test.ts`); the in-process concurrent POSTs in scenario 5 are served by either.
+is reachable directly (`storeDedupe.test.ts`) and by two processes that both pass the router check.
 
 ## Follow-ups found (not fixed here; no security or fail-open defect was found)
 
@@ -125,6 +155,16 @@ is only reachable directly (`storeDedupe.test.ts`); the in-process concurrent PO
 - **Proposed P2-41 (same item) · tampered readiness.** Design §17 says readiness reads BLOCKED on a tampered record;
   `GET …/readiness` answers `409 A4_INTEGRITY_FAILED` instead (no body to read BLOCKED from). Fail-closed; the
   wording or the route should be aligned.
+- **Proposed P2-42 · Adapt cannot propose on the shipped catalog.** With the shipped admitted catalog (layer 0 plus the
+  L1 station controls), Adapt's proposal carries the Understand facts (about 172 to 214 KiB), the explanation (about
+  31 to 39 KiB) and the compiled plan (about 134 to 149 KiB), measured for the stations education, governance,
+  technology and wealth, and every one exceeds `SPEC_ROOM_FOR_BUILD` (240 KiB): `POST …/stages/adapt/propose` answers
+  413 INPUT_TOO_LARGE whatever the answers, so no project can cross Adapt today. Fail-closed (nothing is written). The
+  journey crosses Adapt on the synthetic five-control catalog instead. Proposed fix: keep the plan and the
+  understanding out of the proposal record (reference them by digest) or raise the room for Adapt.
+- **Note (no defect) · lease ids in `a4_requests`.** The spec's case greps `response_json` for `lease_` and expects
+  none; by design (P1-62) a credential-bearing request stores the projection `{ releaseId, leaseIds, tokenDelivered }`,
+  so lease *ids* are recorded and the token never is. The tests assert the token, not the id, is absent.
 
 ## Pinned suites
 

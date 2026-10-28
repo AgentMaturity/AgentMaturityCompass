@@ -72,4 +72,12 @@ describe("scenario: stale approvals", () => {
     expect(fresh.gateId).not.toBe(gate.gateId);
     expect((await p.decide(bob, fresh)).status).toBe(201);
   });
+
+  test("a quorum met before expiry is not consumed after it: complete counts the quorum at its commit time", async () => {
+    const { p, alice, bob, gate } = await openProject();
+    expect((await p.decide(bob, gate)).status).toBe(201);
+    const expiresTs = (await p.gate(alice, gate.gateId)).expiresTs as number;
+    vi.useFakeTimers({ toFake: ["Date"], now: expiresTs + 1_000 });
+    expect(refusal(await p.post(alice, "/stages/aspire/complete", { gateId: gate.gateId }))).toEqual([409, "GATE_EXPIRED"]);
+  });
 });
