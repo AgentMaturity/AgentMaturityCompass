@@ -1,0 +1,145 @@
+{
+  "note": "Fixture entries: a v2-lease allow, a pipeline deny and a toolhub-intent deny (fixture policy digest).",
+  "entries": [
+    {
+      "v": 1,
+      "decisionId": "authzdec_838bd585ed1a420fad46d271c4f3793d",
+      "ts": 1793162564570,
+      "subject": {
+        "type": "agent",
+        "id": "agent-1",
+        "properties": {
+          "spiffeId": "spiffe://example.org/agent/payments",
+          "principal": "human:ops-lead",
+          "delegationChainDigest": "1fd1b1feff855ef7064c5c4120748abb0b55faaf9014ceed06c62376e8677876",
+          "claimKind": "observed"
+        }
+      },
+      "action": {
+        "name": "FINANCIAL",
+        "properties": {
+          "tool": "payments.transfer",
+          "argumentsDigest": "6666666666666666666666666666666666666666666666666666666666666666"
+        }
+      },
+      "resource": {
+        "type": "tool",
+        "id": "payments.transfer",
+        "properties": {
+          "workspaceId": "ws-1",
+          "deploymentId": "unregistered",
+          "purpose": "vendor payment"
+        }
+      },
+      "context": {
+        "authorizationRecordDigest": "82296f4383cbac46c1f7b2900fc7abc761a1f3aedf0dad78f60cf122028255b1",
+        "policyDigest": "3333333333333333333333333333333333333333333333333333333333333333",
+        "controlIds": [],
+        "sessionId": "session-1",
+        "runId": null
+      },
+      "decision": true,
+      "reasons": [],
+      "pdp": {
+        "name": "amc",
+        "version": "1.2.0"
+      }
+    },
+    {
+      "v": 1,
+      "decisionId": "authzdec_8a231396b8a14601861ddfcf579b5860",
+      "ts": 1793162564571,
+      "subject": {
+        "type": "agent",
+        "id": "agent-1",
+        "properties": {
+          "spiffeId": null,
+          "principal": "human:ops-lead",
+          "delegationChainDigest": null,
+          "claimKind": "self_reported"
+        }
+      },
+      "action": {
+        "name": "FINANCIAL",
+        "properties": {
+          "tool": "payments.transfer",
+          "argumentsDigest": "6666666666666666666666666666666666666666666666666666666666666666"
+        }
+      },
+      "resource": {
+        "type": "tool",
+        "id": "payments.transfer",
+        "properties": {
+          "workspaceId": "ws-1",
+          "deploymentId": "unregistered",
+          "purpose": "vendor payment"
+        }
+      },
+      "context": {
+        "authorizationRecordDigest": "6bf1c633e588407a20d39260f0149663f2acd10d1f2945aa3b16b61fd02d137b",
+        "policyDigest": "3333333333333333333333333333333333333333333333333333333333333333",
+        "controlIds": [],
+        "sessionId": "session-1",
+        "runId": null
+      },
+      "decision": false,
+      "reasons": [
+        {
+          "id": "approval_missing:",
+          "text": "approval_missing: this composition requires a signed approval named through the authority channel"
+        }
+      ],
+      "pdp": {
+        "name": "amc",
+        "version": "1.2.0"
+      }
+    },
+    {
+      "v": 1,
+      "decisionId": "authzdec_f9e2f71b4b8b47fc9dab552031162df9",
+      "ts": 1793162564571,
+      "subject": {
+        "type": "agent",
+        "id": "default",
+        "properties": {
+          "spiffeId": null,
+          "principal": null,
+          "delegationChainDigest": null,
+          "claimKind": "self_reported"
+        }
+      },
+      "action": {
+        "name": "WRITE_LOW",
+        "properties": {
+          "tool": "fs.write",
+          "argumentsDigest": "5c71ee09c8dff29e500c72994c476ea6e24166aea00b07c0418ac669bf5df6a0"
+        }
+      },
+      "resource": {
+        "type": "tool",
+        "id": "fs.write",
+        "properties": {
+          "intentId": "intent_fixture"
+        }
+      },
+      "context": {
+        "authorizationRecordDigest": null,
+        "policyDigest": "0000000000000000000000000000000000000000000000000000000000000000",
+        "controlIds": [],
+        "sessionId": null,
+        "runId": null
+      },
+      "decision": false,
+      "reasons": [
+        {
+          "id": "denied",
+          "text": "Action class WRITE_LOW is denied by default policy."
+        }
+      ],
+      "pdp": {
+        "name": "amc",
+        "version": "1.2.0"
+      }
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+---
+"agent-maturity-compass": minor
+---
+
+Agent identity, delegation chains and decision logs (P2-25, experimental). **Static agent tokens are now disabled for regulated profiles**: in a workspace with an active compiled plan, Studio refuses any request that carries an `x-amc-agent-token` (or a static token as a bearer), even beside a lease, with "static agent tokens are disabled for regulated profiles; use a lease". Move agents to leases before activating a plan (docs/AGENT_IDENTITY.md, "Migrating off static agent tokens"). Leases keep working everywhere, and static tokens keep working in workspaces without a plan.
+
+New: workload identities verify only against trust pinned in the signed `.amc/workload-trust.yaml` (JWT-SVIDs and X.509-SVIDs against a pinned SPIFFE bundle, Entra Agent ID, AgentCore and other OIDC agent tokens against a pinned issuer), and a run that presents none is labelled `self_reported`. Signed delegation chains start at a human or a declared service and only narrow. A lease v2 binds a chain digest and SPIFFE ID and is refused when its chain is missing, revoked or does not end at its agent. A plan can cap lease lifetimes with `toolPipeline.maxLeaseTtlMinutes`. Every authorization decision, allow or deny, writes one AuthZEN-shaped `AUTHZ_DECISION` ledger entry with an argument digest, never raw arguments. AMC keeps no identity directory of its own. NYDFS and HIPAA mappings await expert review; nothing here is a compliance claim.

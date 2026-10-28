@@ -25,6 +25,7 @@ import { lifecycleAdmission } from "../lifecycle/reassessment.js";
 import type { EffectDeclaration } from "../toolhub/toolsSchema.js";
 import { revokedLeaseIdSet } from "../leases/leaseStore.js";
 import { verifyLeaseToken } from "../leases/leaseVerifier.js";
+import { regulatedLeaseProfile } from "../leases/regulatedProfile.js";
 import { findToolDefinition, loadVerifiedToolsConfigSnapshot } from "../toolhub/toolhubValidators.js";
 import type { ToolExecution } from "../tools/toolTypes.js";
 import type { ActionClass } from "../types.js";
@@ -199,7 +200,8 @@ export function checkLease(execution: Pick<ToolExecution, "workspace" | "agentId
   const workspace = execution.workspace;
   try {
     const verified = verifyLeaseToken({ workspace, token, expectedAgentId: execution.agentId, requiredScope: "toolhub:execute",
-      expectedWorkspaceId: workspaceIdFromDirectory(workspace), actionClass: execution.actionClass, revokedLeaseIds: revokedLeaseIdSet(workspace) });
+      expectedWorkspaceId: workspaceIdFromDirectory(workspace), actionClass: execution.actionClass, revokedLeaseIds: revokedLeaseIdSet(workspace),
+      maxLifetimeMs: regulatedLeaseProfile(workspace).maxLeaseTtlMs });
     if (verified.ok && verified.payload) return { payload: verified.payload };
     return failed(LEASE_ERRORS[verified.error ?? ""] ?? "scope_widened", verified.error ?? "lease refused");
   } catch (error) {
@@ -314,7 +316,8 @@ export function bindAuthorization(execution: ToolExecution, ctx: AuthorizationCo
         : named?.principal ?? { principalId: cliInitiator(), kind: "human", authenticatedVia: "cli-os-user" },
       delegation: { depth: delegation.depth, parentExecutionId: delegation.parentExecutionId,
         allowedActionClasses: intersectDelegationScopes(delegation.allowedActionClasses, lease?.payload.executeActionClasses) ?? [...ACTION_CLASSES],
-        leaseId: lease?.payload.leaseId ?? null },
+        leaseId: lease?.payload.leaseId ?? null,
+        ...(lease?.payload.delegationChainDigest === undefined ? {} : { chainDigest: lease.payload.delegationChainDigest, spiffeId: lease.payload.spiffeId ?? null }) },
       session: { sessionId: ctx.sessionId ?? null, runId: null, callId: execution.callId, rootCallId: execution.rootCallId,
         parentToken: execution.parentToken },
       control: ctx.compiledPolicy?.controlFor(execution.actionClass) ?? { controlId: null, controlVersion: null },

@@ -1,9 +1,12 @@
 import { verify } from "node:crypto";
 import { getPublicKeyHistory } from "../crypto/keys.js";
 import type { ActionClass } from "../types.js";
-import { leasePayloadSchema, type LeasePayload, type LeaseScope } from "./leaseSchema.js";
+import { agentLeaseRevocationId, leasePayloadSchema, type LeasePayload, type LeaseScope } from "./leaseSchema.js";
 
 import { verifyCurrentPurposeCredentialSignature } from "../keys/purposeCredentialSignature.js";
+import { chainLeaf, loadDelegationChain, verifyChain } from "../agent/delegationChain.js";
+import { loadWorkloadTrustConfig } from "../identity/workload/workloadTrust.js";
+import { revokedLeaseIdSet } from "./leaseStore.js";
 
 function fromBase64Url(encoded: string): Buffer {
   const normalized = encoded.replace(/-/g, "+").replace(/_/g, "/");
@@ -23,13 +26,7 @@ function hasScope(payload: LeasePayload, scope: LeaseScope): boolean {
   return payload.scopes.includes(scope);
 }
 
-/**
- * The revocation-list id that revokes every lease of one agent (P2-23 retirement). Lease ids are minted by AMC, so a
- * lease named like this can only revoke more. P2-25 replaces it with its own revocation primitives.
- */
-export function agentLeaseRevocationId(agentId: string): string {
-  return `agent:${agentId}`;
-}
+export { agentLeaseRevocationId };
 
 export interface VerifyLeaseOptions {
   workspace: string;
@@ -42,12 +39,32 @@ export interface VerifyLeaseOptions {
   revokedLeaseIds?: Set<string>;
   /** The class about to execute; a lease that names `executeActionClasses` must include it (AMC-1546). */
   actionClass?: ActionClass;
+  /** A regulated plan's maximum lease lifetime (P2-25, `regulatedLeaseProfile`); a longer-lived lease is refused. */
+  maxLifetimeMs?: number | null;
 }
 
 export interface VerifyLeaseResult {
   ok: boolean;
   payload: LeasePayload | null;
   error?: string;
+}
+
+/**
+ * Lease v2 (P2-25): the chain the lease binds, loaded by its digest and verified now (signatures, root, narrowing, depth,
+ * validity and revocation), must end at this lease's agent and SPIFFE ID and outlive the lease. Any read that fails
+ * refuses: a missing chain store, an unverifiable workload trust config or revocation list is never "no chain".
+ */
+function delegationChainRefusal(workspace: string, payload: LeasePayload, revoked: Set<string> | undefined): string | null {
+  const chain = loadDelegationChain(workspace, payload.delegationChainDigest ?? "");
+  if (chain === null || chain.digest !== payload.delegationChainDigest) return "delegation chain unavailable for this lease";
+  const trust = loadWorkloadTrustConfig(workspace);
+  const verified = verifyChain(chain, { workspace, declaredServices: trust?.services ?? [], revokedIds: revoked ?? revokedLeaseIdSet(workspace) });
+  if (!verified.ok) return verified.reason.endsWith(" is revoked") ? "lease revoked" : `delegation chain refused: ${verified.reason}`;
+  const leaf = chainLeaf(chain);
+  if (leaf.delegate.agentId !== payload.agentId) return "delegation chain refused: its delegate is not this lease's agent";
+  if (leaf.delegate.spiffeId !== payload.spiffeId) return "delegation chain refused: its delegate's SPIFFE ID is not this lease's";
+  if (payload.expiresTs > leaf.notAfter) return "delegation chain refused: the lease outlives its delegation";
+  return null;
 }
 
 export function verifyLeaseToken(input: VerifyLeaseOptions): VerifyLeaseResult {
@@ -73,6 +90,11 @@ export function verifyLeaseToken(input: VerifyLeaseOptions): VerifyLeaseResult {
     if (input.revokedLeaseIds?.has(payload.leaseId) || input.revokedLeaseIds?.has(agentLeaseRevocationId(payload.agentId))) {
       return { ok: false, payload, error: "lease revoked" };
     }
+    if (input.maxLifetimeMs != null && payload.expiresTs - payload.issuedTs > input.maxLifetimeMs) {
+      return { ok: false, payload, error: "lease lifetime exceeds the regulated plan's maximum" };
+    }
+    const chain = payload.v === 2 ? delegationChainRefusal(input.workspace, payload, input.revokedLeaseIds) : null;
+    if (chain !== null) return { ok: false, payload, error: chain };
     if (input.expectedAgentId && payload.agentId !== input.expectedAgentId) {
       return { ok: false, payload, error: "lease agent mismatch" };
     }

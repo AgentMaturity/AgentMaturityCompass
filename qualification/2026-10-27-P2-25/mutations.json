@@ -1,0 +1,60 @@
+{
+  "key": "P2-25",
+  "note": "Each guard was broken locally, the named test file run, and the source restored (scripted; git diff of src empty afterwards).",
+  "mutations": [
+    {
+      "guard": "delegationChain: scope-subset check skipped",
+      "failed": [
+        "delegationChain > narrowing > refuses wider scopes"
+      ]
+    },
+    {
+      "guard": "agentTokenVerify: unpinned OIDC issuer accepted",
+      "failed": [
+        "workloadIdentity > OIDC agent token > refuses an unpinned issuer before any key is read"
+      ]
+    },
+    {
+      "guard": "toolEvidence: no decision entry on deny",
+      "failed": [
+        "decisionLog > tool pipeline decisions > a deny produces exactly one entry with its reasons"
+      ]
+    },
+    {
+      "guard": "toolhubServer: intent decision emitted only when allowed",
+      "failed": [
+        "decisionLog > toolhub decisions in the ledger > each intent, allowed or denied, writes exactly one entry"
+      ]
+    },
+    {
+      "guard": "agentCredentialAuth: static token accepted in a regulated profile",
+      "failed": [
+        "leaseV2Binding > static agent tokens > ... refuses the token once a plan is active"
+      ]
+    },
+    {
+      "guard": "leaseVerifier: v2 chain check skipped",
+      "failed": [
+        "leaseV2Binding > lease v2 binding: 4 tests (digest unavailable, delegate mismatch, outlives chain, revoked link)"
+      ]
+    },
+    {
+      "guard": "spiffe: chain accepted without reaching a pinned authority",
+      "failed": [
+        "workloadIdentity > X.509-SVID > refuses a self-signed leaf / an unpinned root / a leaf without its intermediate"
+      ]
+    },
+    {
+      "guard": "delegationChain: link signature check skipped",
+      "failed": [
+        "delegationChain > integrity > tampered link; unsigned link an agent appended"
+      ]
+    },
+    {
+      "guard": "leaseVerifier: regulated lifetime cap skipped",
+      "failed": [
+        "leaseV2Binding > refuses a lease longer than a regulated plan's maximum lifetime"
+      ]
+    }
+  ]
+}

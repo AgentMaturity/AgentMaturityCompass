@@ -296,6 +296,10 @@
           },
           "type": "array"
         },
+        "chainDigest": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
         "depth": {
           "maximum": 9007199254740991,
           "minimum": 0,
@@ -313,6 +317,17 @@
           ]
         },
         "parentExecutionId": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "spiffeId": {
           "anyOf": [
             {
               "minLength": 1,
