@@ -188,7 +188,7 @@ function governed(sessionId: string) {
     allowed: rows.filter((row) => row.meta.auditType === "TOOL_CALL_ALLOWED").length,
     denied: rows.filter((row) => row.meta.auditType === "TOOL_CALL_DENIED").map((row) => row.payload),
     records: rows.filter((row) => row.meta.auditType === "AUTHORIZATION_RECORD").map((row) => (JSON.parse(row.payload!) as {
-      record: { principal: Record<string, string>; delegation: { leaseId: string | null; allowedActionClasses: string[] } } }).record)
+      record: { principal: Record<string, string>; delegation: { leaseId: string | null; allowedActionClasses: string[]; chainDigest?: string } } }).record)
   };
 }
 
@@ -382,13 +382,17 @@ describe("in-process delegated children under an activated identity-binding plan
 
     const child = await spawn(true);
     expect(child.outcome.ok, JSON.stringify(child.outcome)).toBe(true);
-    expect(minted, "the child mints nothing: it inherits").toHaveBeenCalledTimes(1);
+    // P2-25: the run's lease is v2, so the child gets its own lease on the run's chain extended to it, descending from the run's.
+    expect(minted, "the child's own delegated lease").toHaveBeenCalledTimes(2);
+    const childLease = minted.mock.results[1]!.value.payload;
+    expect(childLease).toMatchObject({ v: 2, ancestorLeaseIds: [leaseId], executeActionClasses: ["READ_ONLY"] });
     expect(child.denied, "no child call was denied").toEqual([]);
     expect(child.allowed, "the child's fs.read ran").toBeGreaterThan(0);
     expect(child.records.length).toBeGreaterThan(0);
     for (const record of child.records) {
       expect(record.principal).toEqual({ principalId: ownerId, kind: "human", authenticatedVia: "lease" });
-      expect(record.delegation.leaseId).toBe(leaseId);
+      expect(record.delegation.leaseId).toBe(childLease.leaseId);
+      expect(record.delegation.chainDigest).toBe(childLease.delegationChainDigest);
       expect(record.delegation.allowedActionClasses).toEqual(["READ_ONLY"]);
     }
 
@@ -442,8 +446,10 @@ describe("a native-schedule pass under an activated identity-binding plan (P1-79
     const pass = JSON.parse(output.at(-1)!) as { scheduleResults: { ok: boolean; childSessionIds: string[] }[] };
     expect(pass.scheduleResults).toHaveLength(1);
     expect(pass.scheduleResults[0]!.ok).toBe(true);
-    expect(minted, "one lease for the pass; its child mints none").toHaveBeenCalledTimes(1);
-    const leaseId = minted.mock.results[0]!.value.payload.leaseId;
+    // P2-25: one lease for the pass and one delegated lease for its child, descending from it.
+    expect(minted, "the pass's lease and its child's").toHaveBeenCalledTimes(2);
+    expect(minted.mock.results[1]!.value.payload.ancestorLeaseIds).toEqual([minted.mock.results[0]!.value.payload.leaseId]);
+    const leaseId = minted.mock.results[1]!.value.payload.leaseId;
     const { allowed, denied, records } = governed(pass.scheduleResults[0]!.childSessionIds[0]!);
     expect(denied, "the scheduled child's call was not denied").toEqual([]);
     expect(allowed, "its fs.write ran").toBeGreaterThan(0);

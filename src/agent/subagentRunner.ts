@@ -14,6 +14,7 @@ import { readAgentRunSummary } from "./runReport.js";
 import { compactionSummaryRows } from "./compaction/summaryPrompt.js";
 import type { LoopLlm, LoopRoute } from "./stepRunner.js";
 import type { SubagentRunContext, SubagentRunResult, SubagentRunner } from "./subagentSpawn.js";
+import { issueChildLease } from "../leases/delegatedLease.js";
 
 /**
  * The runner that actually executes a child (P6.1a).
@@ -224,6 +225,9 @@ export function createDriverRunner(init: DriverRunnerInit): SubagentRunner {
   const control = init.hookControl === undefined ? undefined
     : Object.freeze({ preStep: init.hookControl.preStep, turnStopping: init.hookControl.turnStopping });
 
+  // P2-25: each child's lease by its runAs, so a grandchild extends its own parent's chain, not the root's.
+  // ponytail: keyed by runAs; two live children sharing a runAs share a lineage. Key by packet id if that ever matters.
+  const childLeases = new Map<string, string>();
   const runChild = async function runChild(ctx: SubagentRunContext): Promise<SubagentRunResult> {
     if (ctx.signal?.aborted) return { ok: false, text: "", reason: "parent cancelled before child execution" };
     const scope = ctx.delegationScope === undefined ? undefined : [...ctx.delegationScope];
@@ -282,6 +286,18 @@ export function createDriverRunner(init: DriverRunnerInit): SubagentRunner {
       if (!active) finalize();
     };
 
+    // P2-25: a v2 parent lease is extended to this child (narrowing only, depth cap 3) before its session opens; a
+    // refusal fails the spawn. A v1 lease is inherited unchanged.
+    let childLease: string | undefined;
+    try {
+      const parentLease = (ctx.identity.parent === null ? undefined : childLeases.get(ctx.identity.parent)) ?? init.leaseToken;
+      childLease = parentLease === undefined ? undefined
+        : issueChildLease(init.workspace, parentLease, { runAs: ctx.identity.runAs, ...(scope === undefined ? {} : { allowedActionClasses: scope }) });
+    } catch (error) {
+      session.disposeWithoutClosing();
+      return { ok: false, text: "", reason: error instanceof Error ? error.message : String(error) };
+    }
+    if (childLease !== undefined) childLeases.set(ctx.identity.runAs, childLease);
     try {
       session.open({ sessionId: ctx.childSessionId, agentId: ctx.toolsetAgentId,
         harnessVersion: init.harnessVersion, compositionDigest: init.compositionDigest, policyDigest: init.policyDigest });
@@ -289,7 +305,7 @@ export function createDriverRunner(init: DriverRunnerInit): SubagentRunner {
       toolset = agentToolset({ workspace: init.workspace, sessionId: ctx.childSessionId,
         recorder: session, agentId: ctx.toolsetAgentId,
         parentShell: init.parentShell ?? null,
-        ...(init.leaseToken === undefined ? {} : { leaseToken: init.leaseToken }),
+        ...(childLease === undefined ? {} : { leaseToken: childLease }),
         delegation: { runAs: ctx.identity.runAs, depth: ctx.identity.depth, parentExecutionId: ctx.packetId ?? null,
           ...(scope === undefined ? {} : { allowedActionClasses: scope }) },
         ...(grant === undefined ? {} : { subagents: {

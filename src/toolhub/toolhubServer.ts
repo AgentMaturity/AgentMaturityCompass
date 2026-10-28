@@ -9,6 +9,7 @@ import {
   verifyActionPolicySignature,
   type GovernorDecision
 } from "../governor/actionPolicyEngine.js";
+import { toolhubIntentDecisionEvidence } from "../governor/decisionLog.js";
 import { type ActionClass, type ExecutionMode } from "../types.js";
 import { openLedger } from "../ledger/ledger.js";
 import {
@@ -164,7 +165,6 @@ function normalizeMode(value: unknown): ExecutionMode {
 export class ToolHubService {
   private readonly intents = new Map<string, IntentRecord>();
   private readonly executions = new Map<string, ExecutionRecord>();
-
   private readonly actionJournal: ToolhubJournal;
 
   constructor(private readonly workspace: string) { this.actionJournal = new ToolhubJournal(workspace); }
@@ -541,7 +541,6 @@ export class ToolHubService {
     }
     beforePublish?.();
     this.intents.set(intentId, record);
-
     beforePublish?.();
     const ledger = openLedger(this.workspace);
     let guardReceipt: string | undefined;
@@ -590,6 +589,7 @@ export class ToolHubService {
         }
       });
       guardReceipt = out.receipt;
+      ledger.appendEvidence({ sessionId, runtime: "unknown", payloadExt: "json", inline: true, ...toolhubIntentDecisionEvidence(this.workspace, { intentId, agentId: input.agentId, toolName: input.toolName, actionClass: record.actionClass, args: input.args, allowed: decision.allowed, reasons: decision.reasons }) });
       if (input.workOrderId) {
         beforePublish?.();
         this.appendOutcomeSignal({

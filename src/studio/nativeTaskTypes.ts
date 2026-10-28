@@ -1,3 +1,4 @@
+import type { DelegationChainView } from "../agent/delegationChain.js";
 import type { NativeValidationResult } from "../agent/nativeValidation.js";
 import type { ExecutionStatus } from "../execution/executionContract.js";
 
@@ -125,6 +126,8 @@ export interface NativeTaskView {
   readonly history: NativeTaskHistory;
   /** The four execution phases (P2-13); null before a session exists and while no start was refused. */
   readonly execution: ExecutionStatus | null;
+  /** The signed delegation chain this process's runtime lease binds (P2-25); null when its lease is v1 or none was minted. */
+  readonly delegation: DelegationChainView | null;
 }
 export interface NativeTaskPoll { readonly task: NativeTaskView; readonly events: readonly NativeTaskEvent[]; readonly truncated: boolean }
 export interface NativeTaskService {

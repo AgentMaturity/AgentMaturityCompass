@@ -113,7 +113,7 @@
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/authorization-record.schema.json",
       "name": "authorization-record.schema.json",
-      "sha256": "43b20053475b1cb31b8331d50f0d1b209d4fa4b9a31dc7f2a4418f1a87506ba9"
+      "sha256": "da1f3725f614aeca52c974781042c99bbd1c25cbcc21167199365d878a478ef3"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/break-glass.schema.json",

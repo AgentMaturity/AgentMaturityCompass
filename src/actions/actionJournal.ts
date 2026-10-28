@@ -472,7 +472,9 @@ function createJournal(workspace: string, ledger: Ledger, staleAfterMs: number):
         actionClass: record.action.actionClass, argumentsDigest: record.action.argumentsDigest, bindings: record.bindings,
         idempotencyKey: record.idempotencyKey,
         parentExecutionId: record.delegation.parentExecutionId || null, sessionId: record.session.sessionId || null, callId: record.session.callId,
-        owner: { pid: process.pid, hostname: hostname() }, startedAt: new Date().toISOString()
+        owner: { pid: process.pid, hostname: hostname() }, startedAt: new Date().toISOString(),
+        ...(record.delegation.chainDigest === undefined ? {} : { delegation: { chainDigest: record.delegation.chainDigest,
+          spiffeId: record.delegation.spiffeId ?? null, principal: `${record.principal.kind}:${record.principal.principalId}` } })
       });
     } }),
     complete: (executionId, result) => transition(executionId, { to: "completed", reasonCode: result.reasonCode, effect: result.effect,

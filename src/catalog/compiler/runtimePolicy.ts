@@ -37,6 +37,8 @@ export const PARAMETERS: readonly ParamSpec[] = [
   { pattern: /^toolPipeline\.visibleTools$/, point: "tool_pipeline", strictness: "intersection", check: listOf((s) => s.length > 0), expects: "a list of tool names" },
   { pattern: /^toolPipeline\.approvalRequiredFor$/, point: "tool_pipeline", strictness: "union", check: listOf(isActionClass), expects: "a list of action classes" },
   { pattern: /^toolPipeline\.(requireAgentLease|requirePrincipal)$/, point: "tool_pipeline", strictness: "true_wins", check: bool, expects: "a boolean" },
+  // P2-25: the longest lease a regulated profile issues or accepts.
+  { pattern: /^toolPipeline\.maxLeaseTtlMinutes$/, point: "tool_pipeline", strictness: "min", check: int(1), expects: "an integer >= 1" },
   { pattern: approval("requiredApprovals"), point: "approvals", strictness: "max", check: int(0), expects: "an integer >= 0" },
   { pattern: approval("requireDistinctUsers"), point: "approvals", strictness: "true_wins", check: bool, expects: "a boolean" },
   { pattern: approval("rolesAllowed"), point: "approvals", strictness: "intersection", check: listOf(isRole), expects: `a list of ${USER_ROLES.join(", ")}` },
@@ -49,7 +51,8 @@ export const PARAMETERS: readonly ParamSpec[] = [
 /** Tool-pipeline parameters and the guard that enforces them. */
 const GUARD_OF: Readonly<Record<string, string>> = {
   "toolPipeline.requireAgentLease": "identity-binding",
-  "toolPipeline.requirePrincipal": "identity-binding"
+  "toolPipeline.requirePrincipal": "identity-binding",
+  "toolPipeline.maxLeaseTtlMinutes": "identity-binding"
 };
 /**
  * Guards the native tool pipeline registers (src/agent/agentToolset.ts). identity-binding is enforced inside the

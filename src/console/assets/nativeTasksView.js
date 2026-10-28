@@ -56,7 +56,14 @@ export function renderTaskIdentity(task) {
   return `<dl class="native-task-identity"><dt>Agent</dt><dd>${esc(task.agentId)}</dd><dt>Provider / model</dt><dd>${esc(providerLabel(task.provider))} / ${esc(task.model ?? "local stub")}</dd><dt>Tools</dt><dd>${task.tools === "workspace" ? "Signed workspace scope" : "None"}</dd><dt>Task ID</dt><dd><code>${esc(task.taskId)}</code></dd><dt>Session ID</dt><dd><code>${esc(task.sessionId || "not accepted yet")}</code></dd><dt>Task last changed</dt><dd>${esc(time(task.updatedAt))}</dd><dt>Last recorded turn ending</dt><dd>${esc(task.turnEndReason ?? "not yet known")}</dd></dl>
     ${task.history ? `<p>Persisted history: <strong>${esc(task.history.status)}</strong>${task.history.backend ? ` · ${esc(task.history.backend)}` : ""}</p><p class="muted">${esc(task.history.message)}</p>` : ""}
     ${task.recovery ? `<p data-native-recovery-state="${esc(task.recovery.state)}"><strong>${task.recovery.state === "interrupted" ? "Interrupted session · recovery available" : task.recovery.state === "ready" ? "Session ready to resume" : "Recovery unavailable"}</strong></p><p class="muted">${esc(task.recovery.message)}</p>` : ""}
-    ${task.resumeBlockedReason ? `<p class="muted">${esc(task.resumeBlockedReason)}</p>` : ""}${task.error ? `<p class="status-bad">${esc(task.error)}</p>` : ""}`;
+    ${task.resumeBlockedReason ? `<p class="muted">${esc(task.resumeBlockedReason)}</p>` : ""}${task.error ? `<p class="status-bad">${esc(task.error)}</p>` : ""}${renderTaskDelegation(task.delegation)}`;
+}
+/** P2-25: the signed delegation chain the runtime's lease binds, as Studio verified it on this read. */
+export function renderTaskDelegation(delegation) {
+  if (!delegation) return "";
+  const status = { verified: "Verified now", refused: "Refused", unavailable: "Unavailable" }[delegation.status] || "Unknown";
+  const links = delegation.links.map(link => `<li data-delegation-depth="${esc(link.depth)}"><code>${esc(link.principal)}</code> → <code>${esc(link.delegate)}</code> · scopes ${link.scopes.map(scope => `<code>${esc(scope)}</code>`).join(", ") || "none"} · until ${esc(time(link.notAfter))}</li>`).join("");
+  return `<details data-native-delegation="${esc(delegation.status)}"><summary>Delegation chain: <strong class="${delegation.status === "verified" ? "" : "status-bad"}">${esc(status)}</strong></summary><p>Chain digest: <code>${esc(delegation.chainDigest)}</code></p>${delegation.reason ? `<p class="status-bad">${esc(delegation.reason)}</p>` : ""}<ol>${links}</ol><p class="muted">Who authorized this runtime, signed by the workspace's lease authority. Experimental; identity is not authorization.</p></details>`;
 }
 export function renderTaskValidationSetup(config, selectedIds, task) {
   const catalogue = config.validation;

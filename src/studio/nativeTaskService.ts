@@ -23,7 +23,10 @@ import { inspectRuntimeFirewallPolicy } from "../runtime/firewall.js";
 import { ControlCheckpointRootInWorkspaceError, loadActiveCompiledPolicy } from "../catalog/compiler/activate.js";
 import { planRequiresAgentLease } from "../tools/guards/compiledPolicyGuard.js";
 import { isActionClass } from "../governor/actionCatalog.js";
-import { issueLeaseForPrincipal, LeasePrincipalRefused } from "../leases/leasePrincipal.js";
+import { issueSessionLease } from "../leases/delegatedLease.js";
+import { delegationChainView } from "../agent/delegationChain.js";
+import { loadWorkloadTrustConfig } from "../identity/workload/workloadTrust.js";
+import { LeasePrincipalRefused } from "../leases/leasePrincipal.js";
 import { revokeLease, revokedLeaseIdSet } from "../leases/leaseStore.js";
 import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
 import { NATIVE_TASK_INITIATOR_ENV, NATIVE_TASK_LEASE_ENV } from "../acp/acpRuntimeContracts.js";
@@ -59,6 +62,8 @@ interface Entry {
   preparation?: Promise<void>; runtimeStartedAt: number;
   /** P1-67: the lease this process minted for its runtime, until it is revoked (another process may record a newer one). */
   leaseId?: string;
+  /** P2-25: the delegation chain that lease binds, for the session detail; absent for a v1 lease. */
+  delegationChainDigest?: string;
   startupCancelled: boolean; startupAbort: AbortController;
   validationPriorTurn?: number | null;
   projection?: NativeTaskProjection; projectionError?: string; projectionAt: number; touchedAt: number;
@@ -199,7 +204,7 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
    * lifetime). The token goes to the child alone. prepare records the id, and revokes the previous runtime's lease, only
    * once this runtime holds the session's writer claim, so a refused resume never touches another process's runtime.
    */
-  function runtimeLease(entry: Entry, scope: NativeTaskConfiguration["scope"]): ReturnType<typeof issueLeaseForPrincipal> | null {
+  function runtimeLease(entry: Entry, scope: NativeTaskConfiguration["scope"]): ReturnType<typeof issueSessionLease> | null {
     const d = entry.descriptor;
     if (d.tools !== "workspace") return null;
     let plan: ReturnType<typeof loadActiveCompiledPolicy>;
@@ -211,10 +216,11 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
     if (!planRequiresAgentLease(plan)) return null;
     if (scope.digest !== d.toolsDigest) throw new NativeTaskServiceError("SCOPE_CHANGED", 409,
       "The signed workspace tool scope changed. Review the current scope and create a new task; this task cannot silently adopt new grants.");
-    let lease: ReturnType<typeof issueLeaseForPrincipal>;
+    let lease: ReturnType<typeof issueSessionLease>;
     try {
       // P1-78: the lease names the task's Studio user when they are an active users.yaml user; none refuses here.
-      lease = issueLeaseForPrincipal({ workspace, workspaceId: workspaceIdFromDirectory(workspace), agentId: d.agentId, workOrderId: d.taskId,
+      // P2-25: that user roots the signed delegation chain the lease binds (lease v2).
+      lease = issueSessionLease({ workspace, workspaceId: workspaceIdFromDirectory(workspace), agentId: d.agentId, workOrderId: d.taskId,
         principalKey: d.principalId.startsWith("session:") ? d.principalId.slice("session:".length) : null,
         ttlMs: LIMITS.lifetimeMs, scopes: ["toolhub:execute"], executeActionClasses: [...new Set(scope.tools.map(t => t.actionClass).filter(isActionClass))],
         routeAllowlist: ["/native-task"], modelAllowlist: [d.model ?? d.provider], maxTokensPerMinute: d.maxTokens, maxRequestsPerMinute: d.maxSteps, maxCostUsdPerDay: null });
@@ -223,6 +229,7 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
       throw new NativeTaskServiceError("LEASE_UNAVAILABLE", 409, `The active compiled plan requires an agent lease for this runtime, and none could be minted (${reasonOf(error)}). Nothing was started.`);
     }
     entry.leaseId = lease.payload.leaseId; // From here stop() revokes it.
+    entry.delegationChainDigest = lease.chain?.digest;
     return lease;
   }
   /**
@@ -280,6 +287,16 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
     // Keep the signed descriptor, pendingTurn and every submission untouched.
     // Only resume() may rebuild the fixed native approval/validation controller.
   }
+  /** P2-25: the runtime lease's chain as it verifies now; an unreadable trust config or revocation list reads as refused. */
+  function delegationView(entry: Entry): NativeTaskView["delegation"] {
+    if (entry.delegationChainDigest === undefined) return null;
+    try {
+      return delegationChainView(workspace, entry.delegationChainDigest,
+        { declaredServices: loadWorkloadTrustConfig(workspace)?.services ?? [], revokedIds: revokedLeaseIdSet(workspace) });
+    } catch (error) {
+      return { chainDigest: entry.delegationChainDigest, status: "refused", reason: reasonOf(error), links: [] };
+    }
+  }
   function view(entry: Entry, retainProjection = false): NativeTaskView {
     reconcileClosedClient(entry);
     refresh(entry);
@@ -313,7 +330,7 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
       nextCursor: p?.nextCursor ?? 0, firstCursor: p?.firstCursor ?? 1, droppedEvents: p?.droppedEvents ?? 0,
       history, resumeBlockedReason, recovery: recovery ? { eligible: recovery.eligible, state: recovery.state, message: recovery.message } : null,
       canResume: !!d.sessionId && !!p && (p.history.backend === "sqlite" || recovery?.eligible === true) && !d.closed && !p.closed && !entry.client && entry.state !== "starting" && entry.state !== "verifying",
-      execution };
+      execution, delegation: delegationView(entry) };
     // Released task history is reconstructed on demand, not retained for every descriptor in memory.
     if (!entry.client && !retainProjection) { entry.projection = undefined; entry.projectionAt = 0; }
     return result;
