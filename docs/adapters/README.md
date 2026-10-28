@@ -28,6 +28,15 @@ Pi is connected through its `tool_call` hook rather than an adapter id: `amc con
 
 What AMC claims for Pi, Claude Code, DeepSeek Harness and Codex, hook by hook and version by version, is in the generated [SUPPORT_MATRIX.md](SUPPORT_MATRIX.md), rendered from the adapter claim manifests in [manifests/](manifests/). The draft support policy is [SUPPORT_POLICY.md](SUPPORT_POLICY.md).
 
+| Harness | Status | Guide |
+|---|---|---|
+| Pi | Supported at the qualified versions: enforced at `tool_call` | [pi.md](pi.md) |
+| Claude Code | Supported at the qualified version: enforced at `PreToolUse`, admission at `UserPromptSubmit` | [claude-code-hooks.md](claude-code-hooks.md) |
+| DeepSeek Harness | Launch capture observed; no tool-call claim (the plugin gate is not qualified) | [deepseek-harness.md](deepseek-harness.md) |
+| Codex | Unsupported: Codex 0.165.0's PreToolUse hook lets a call run when the hook fails | [SUPPORT_MATRIX.md](SUPPORT_MATRIX.md) |
+
+"Supported" means listed in the harness's manifest and backed by its qualification record; the matrix lists the versions.
+
 ## Quick Start
 
 ```bash

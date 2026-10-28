@@ -2,7 +2,8 @@
 
 Hook provider: `pi` (installed with `amc connect hooks install --provider pi`; it is not an `amc adapters` id)  
 Package export: `agent-maturity-compass/pi` (`createAmcPiExtension`)  
-Qualified Pi: the `pi` CLI of `@earendil-works/pi-coding-agent` 1.0.2 and 1.0.4 (see [Qualification](#qualification))
+Qualified Pi: the `pi` CLI of `@earendil-works/pi-coding-agent` 1.0.2 and 1.0.4 (see [Qualification](#qualification))  
+Support status: supported at the qualified versions in the [harness support matrix](SUPPORT_MATRIX.md), which is generated from [manifests/pi.json](manifests/pi.json)
 
 AMC ships an optional Pi extension. In control mode it sends every Pi `tool_call` to AMC's loopback hook control route, applies AMC's decision, and AMC records each decision as a signed receipt bound to an authorization record. In observe mode it records requested and finished tool calls without arguments or output. This page states exactly where that enforcement starts and ends.
 
