@@ -22,7 +22,7 @@ export const ASSEMBLE_ANSWERS: Answers = { capabilities: ["draft refund replies"
 export const ADAPT_ANSWERS: Answers = { audiences: ["support staff"], languages: ["en"] };
 /** A public IPv4 literal: the egress check needs no DNS, and every probe of it in these tests replaces the HTTP fetch. */
 const DESTINATION = "8.8.8.8:443";
-type Fetch = NonNullable<Parameters<typeof probeDestination>[2]>;
+type Fetch = NonNullable<Parameters<typeof probeDestination>[3]>;
 const json = (status: number, body: unknown) => ({ status, body: Buffer.from(JSON.stringify(body)) });
 /** A destination answering READY and a healthy /healthz; nothing leaves the process. */
 const REACHABLE: Fetch = async (_host, _port, _address, path) => path === "/readyz" ? json(200, { status: "READY", reasons: [], checks: {}, ts: 1 })
@@ -173,7 +173,7 @@ export class Journey {
     const store = openA4Store(this.t.workspace);
     try {
       return await verifyDeployment(store, this.p.projectId, releaseId, { ...this.call(this.t.alice, requestId()),
-        body: { environment, expectedHeadSeq: this.p.head, clientRequestId: requestId() } }, (ref, egress) => probeDestination(ref, egress, fetch));
+        body: { environment, expectedHeadSeq: this.p.head, clientRequestId: requestId() } }, (workspace, ref, egress) => probeDestination(workspace, ref, egress, fetch));
     } finally {
       store.close();
       await this.p.sync();

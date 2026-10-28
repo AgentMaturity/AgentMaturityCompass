@@ -21,7 +21,7 @@ vi.setConfig({ testTimeout: 300_000 });
 afterEach(() => cleanupGovernanceFixtures());
 
 const HOST = "8.8.8.8:443";
-type Fetch = Parameters<typeof probeDestination>[2];
+type Fetch = Parameters<typeof probeDestination>[3];
 const answer = (status: number, body: unknown) => ({ status, body: Buffer.from(JSON.stringify(body)) });
 const READY = answer(200, { status: "READY", reasons: [], checks: {}, ts: 1 });
 const HEALTHY = answer(200, { status: "ok", version: "1.2.0", uptime: 5, dbStatus: "ok" });
@@ -41,7 +41,7 @@ async function verify(j: Journey, releaseId: string, fetch: NonNullable<Fetch>) 
   try {
     await j.p.sync();
     return await verifyDeployment(store, j.p.projectId, releaseId, { ...j.call(j.t.alice, requestId()),
-      body: { environment: "staging", expectedHeadSeq: j.p.head, clientRequestId: requestId() } }, (ref, egress) => probeDestination(ref, egress, fetch));
+      body: { environment: "staging", expectedHeadSeq: j.p.head, clientRequestId: requestId() } }, (workspace, ref, egress) => probeDestination(workspace, ref, egress, fetch));
   } finally {
     store.close();
     await j.p.sync();

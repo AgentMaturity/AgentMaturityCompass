@@ -114,3 +114,8 @@ export async function handleMechanicRoute(route: A4Route, projectId: string, tai
   if (tail !== "/mechanic/attach") return false;
   return attach(route, projectId);
 }
+
+/** P2-37: a TUNE that names a seed plan needs it to exist, verify under the auditor key and be scoped to this agent. */
+export function assertTuneMechanicPlan(workspace: string, planId: string | undefined, agentId: string): void {
+  if (planId !== undefined) readSignedMechanicPlan(workspace, planId, agentId);
+}

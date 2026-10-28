@@ -11,6 +11,7 @@ import type Database from "better-sqlite3";
 import { A4_RECORD_TABLES } from "../contracts/v1/a4Record.js";
 import { resolveSessionStoreBackend } from "../persistence/openSessionEventStore.js";
 import { POSTGRES_MIRROR_TABLES } from "../persistence/postgres/postgresSchema.js";
+import { type LedgerMirror, LedgerMirrorError } from "../persistence/postgres/postgresLedgerMirror.js";
 
 export const LEDGER_BACKEND_INCOMPLETE_MESSAGE = "This workspace's ledger backend (Postgres) does not mirror every A4 table, so A4 state would be lost on failover; "
   + "A4 records nothing until the backend declares them.";
@@ -24,3 +25,22 @@ export function ledgerBackendGap(workspace: string, db: Database.Database): stri
   // The record tables count even if this ledger lacks them, so an empty or unmigrated ledger never reads complete.
   return [...new Set([...A4_RECORD_TABLES, ...local])].filter((name) => !mirrored.has(name)).sort();
 }
+
+/**
+ * P2-36: writes one project's rows through to Postgres before SQLite commits (call it last in the transaction), so a
+ * mirror that cannot commit rolls the transition back. `refuse` builds the store's error: 503 unavailable, 409 diverged.
+ */
+export function writeA4Mirror(mirror: LedgerMirror | null, db: Database.Database, projectId: string,
+  refuse: (status: number, code: string, message: string, problems: unknown) => Error): void {
+  try {
+    mirror?.write(db, { kind: "a4", id: projectId });
+  } catch (error) {
+    if (!(error instanceof LedgerMirrorError)) throw error;
+    throw error.code === "LEDGER_MIRROR_UNAVAILABLE" ? refuse(503, error.code, "The Postgres ledger mirror could not commit; nothing was recorded.", error.problems)
+      : refuse(409, error.code, `project ${projectId}'s Postgres mirror diverges from the ledger; nothing was recorded`, error.problems);
+  }
+}
+
+/** A project's mirror divergence, which refuses a read; an unreachable mirror does not, since the rows verified on their own. */
+export const a4MirrorDivergence = (mirror: LedgerMirror | null, db: Database.Database, projectId: string): string[] =>
+  (mirror?.problems(db, { kind: "a4", id: projectId }) ?? []).filter((problem) => problem.startsWith("LEDGER_MIRROR_DIVERGED"));

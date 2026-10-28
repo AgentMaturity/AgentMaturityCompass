@@ -18,20 +18,17 @@ import { randomBytes } from "node:crypto";
 import { hostname } from "node:os";
 import type Database from "better-sqlite3";
 import { a4FloorFor, loadVerifiedApprovalPolicy } from "../approvals/approvalPolicyEngine.js";
-import { verifyUsersConfigSignature } from "../auth/authApi.js";
 import { eventMeta, readerTrustFor } from "../claims/evidenceProvenance.js";
 import type { ClaimKind } from "../claims/eligibility/types.js";
 import { getPrivateKeyPem } from "../crypto/keys.js";
 import { signDigestWithPolicy } from "../crypto/signing/signer.js";
 import type { SignedDigest } from "../crypto/signing/signerTypes.js";
-import { activeFreezeStatus } from "../drift/freezeEngine.js";
 import { openLedger, type Ledger } from "../ledger/ledger.js";
 import { ledgerSynchronousMode } from "../ledger/ledgerDurability.js";
 import { A4_STORE_BINARY, runImmediateTransaction } from "../ledger/ledgerSessionTransactions.js";
 import { withControlFileLock } from "../lifecycle/controlFileLock.js";
 import { assertOwnerMode } from "../mode/mode.js";
 import { highSeveritySecretTypes } from "../release/releaseSecretScan.js";
-import { verifyTrustConfigSignature } from "../trust/trustConfig.js";
 import type { TrustContext } from "../trust/trustContext.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
@@ -42,9 +39,9 @@ import { prepareA4Record, SIDE_TABLE_KEYS, NEW_HEAD, headProblems, type A4Actor,
 export type { A4Actor, A4ChangeSpec, A4RequestKey, A4TransitionOptions, A4TransitionResult } from "./a4TransitionRecords.js";
 import { captureA4RecordSigner, assertA4HotWriters, createA4CurrentLatch, A4TransitionPublicationError, type A4TransitionAttempt, type A4TransitionProgress } from "./a4TransitionSigning.js";
 import { A4BlobError, a4ProjectsRoot, createProjectKey, putPrivate } from "./a4Blobs.js";
-import { LEDGER_BACKEND_INCOMPLETE_MESSAGE, ledgerBackendGap } from "./a4LedgerBackend.js";
+import { a4MirrorDivergence, LEDGER_BACKEND_INCOMPLETE_MESSAGE, ledgerBackendGap, writeA4Mirror } from "./a4LedgerBackend.js";
 import { ledgerRefClaim, resolveLedgerEvent } from "./a4Evidence.js";
-import { type LedgerMirror, LedgerMirrorError, openLedgerMirror } from "../persistence/postgres/postgresLedgerMirror.js";
+import { type LedgerMirror, openLedgerMirror } from "../persistence/postgres/postgresLedgerMirror.js";
 import { assertMember, liveRolesFor, memberCandidates, populationFacts, principalPopulation } from "./a4Identity.js";
 import {
   A4_ENVELOPE_KINDS, defaultGatePolicyFor, a4EffectRowSchema, a4GatePolicyV1Schema, a4MemberRowSchema, a4ProjectRowSchema,
@@ -103,35 +100,7 @@ const integrityFailed = (projectId: string, problems: readonly string[]): A4Stor
   new A4StoreError(409, "A4_INTEGRITY_FAILED", `project ${projectId} failed verification`, problems);
 const randomId = (prefix: string): string => `${prefix}_${randomBytes(16).toString("hex")}`;
 
-/** Studio's read-only rule (users or trust signature invalid), re-read here because studioServer keeps it private; `amc a4` refuses writes on it. */
-export function readOnlyNow(workspace: string): boolean | null {
-  try {
-    const users = verifyUsersConfigSignature(workspace);
-    return (users.signatureExists && !users.valid) || !verifyTrustConfigSignature(workspace).valid;
-  } catch {
-    return null;
-  }
-}
-
-/** Freeze and read-only facts; P1-57 calls this inside the transaction for consume, complete and effect transitions. Null = unreadable. */
-export function refreshVolatileFacts(workspace: string, project: Pick<A4ProjectRow, "agent_id">): {
-  freeze: ReturnType<typeof activeFreezeStatus> | null; readOnly: boolean | null;
-} {
-  let freeze: ReturnType<typeof activeFreezeStatus> | null;
-  try {
-    freeze = activeFreezeStatus(workspace, project.agent_id);
-  } catch {
-    freeze = null;
-  }
-  return { freeze, readOnly: readOnlyNow(workspace) };
-}
-
-/** The live facts readiness reads; each source the store cannot read is null, never "all clear". Stage lanes add theirs. */
-export function collectLiveFacts(workspace: string, project: Pick<A4ProjectRow, "agent_id">, options: { hostedRouter: boolean }): {
-  activeLocal: string[] | null; hostPrincipals: number | null; hostedRouter: boolean
-} & ReturnType<typeof refreshVolatileFacts> {
-  return { ...principalPopulation(workspace), hostedRouter: options.hostedRouter, ...refreshVolatileFacts(workspace, project) };
-}
+export { collectLiveFacts, readOnlyNow, refreshVolatileFacts } from "./a4LiveFacts.js";
 
 export type A4Store = ReturnType<typeof createStore>;
 
@@ -156,17 +125,8 @@ function createStore(workspace: string, ledger: Ledger, trust?: TrustContext, mi
   const db = ledger.db;
   /** Recorded on each project only: the ledger is the workspace's own, so no query filters on this path-derived id. */
   const workspaceId = workspaceIdFromDirectory(workspace);
-  // P2-36: on a Postgres-pinned workspace (`openA4Store` only) every commit writes its project's rows through to Postgres
-  // before SQLite commits, and `snapshot` refuses a project whose mirror diverges. Readers over other ledgers have none.
-  const mirrorWrite = (projectId: string): void => {
-    try {
-      mirror?.write(db, { kind: "a4", id: projectId });
-    } catch (error) {
-      if (!(error instanceof LedgerMirrorError)) throw error;
-      throw error.code === "LEDGER_MIRROR_UNAVAILABLE" ? new A4StoreError(503, error.code, "The Postgres ledger mirror could not commit; nothing was recorded.", error.problems)
-        : new A4StoreError(409, error.code, `project ${projectId}'s Postgres mirror diverges from the ledger; nothing was recorded`, error.problems);
-    }
-  };
+  // P2-36: on a Postgres-pinned workspace (`openA4Store` only) every commit writes through to Postgres before SQLite commits.
+  const mirrorWrite = (projectId: string): void => writeA4Mirror(mirror, db, projectId, (...args) => new A4StoreError(...args));
 
   /** The unsigned head row as stored; only `verified` and the write path, which verifies it, read it. */
   const readHeadRow = (projectId: string): A4ProjectRow | null => {
@@ -650,8 +610,7 @@ function createStore(workspace: string, ledger: Ledger, trust?: TrustContext, mi
         return [table, named];
       })) as Record<A4SideTable, Record<string, Cell>[]>;
       const effects = (db.prepare("SELECT * FROM a4_effects WHERE project_id = ?").all(projectId) as unknown[]).map((row) => a4EffectRowSchema.parse(row));
-      // Divergence refuses the read; an unreachable mirror does not, since the rows read here verified on their own.
-      const diverged = (mirror?.problems(db, { kind: "a4", id: projectId }) ?? []).filter((problem) => problem.startsWith("LEDGER_MIRROR_DIVERGED"));
+      const diverged = a4MirrorDivergence(mirror, db, projectId);
       if (diverged.length > 0) throw integrityFailed(projectId, diverged);
       return { head, links: links as A4ChainLink[], rows, members: membersFrom(rows.a4_members), effects };
     })(),
