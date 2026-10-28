@@ -1,0 +1,73 @@
+[
+ {
+  "mutation": "M1 audit reader compares raw inline bytes (base behaviour)",
+  "file": "src/a4/a4AuditReader.ts",
+  "exit": 1,
+  "failing": [
+   "\u00d7 verifyA4Chain passes on encrypted audit rows, and the exported slice verifies without any key 991ms"
+  ]
+ },
+ {
+  "mutation": "M2 store write guard removed",
+  "file": "src/a4/a4Store.ts",
+  "exit": 1,
+  "failing": [
+   "\u00d7 a Postgres backend whose mirror lacks the a4_* tables refuses every A4 write, and readiness shows LEDGER_BACKEND_INCOMPLETE 1532ms"
+  ]
+ },
+ {
+  "mutation": "M3 readiness item dropped",
+  "file": "src/a4/a4Readiness.ts",
+  "exit": 1,
+  "failing": [
+   "\u00d7 a Postgres backend whose mirror lacks the a4_* tables refuses every A4 write, and readiness shows LEDGER_BACKEND_INCOMPLETE 1208ms"
+  ]
+ },
+ {
+  "mutation": "M4 algorithm filter skipped in verifyA4Chain",
+  "file": "src/a4/a4Verify.ts",
+  "exit": 1,
+  "failing": [
+   "\u00d7 an ecdsa-p256-sha256 envelope verifies under a policy that allows it and is refused under one that does not 1011ms"
+  ]
+ },
+ {
+  "mutation": "M5 erasure bypasses the deletion gate",
+  "file": "src/a4/a4Erasure.ts",
+  "exit": 1,
+  "failing": [
+   "\u00d7 a legal hold on blobs refuses the erasure before anything is destroyed or recorded 1103ms"
+  ]
+ },
+ {
+  "mutation": "M6 credential matches not reported",
+  "file": "src/a4/a4ExportScan.ts",
+  "exit": 1,
+  "failing": [
+   "\u00d7 a bundle slice whose A4 rows hold a credential is refused; other detector matches are counted, not rewritten 1212ms",
+   "\u00d7 detector matches become hashes and a credential is reported 1ms"
+  ]
+ },
+ {
+  "mutation": "M7 migrated rows exported as ciphertext",
+  "file": "src/bundles/bundleA4.ts",
+  "exit": 1,
+  "failing": [
+   "\u00d7 rows encrypted after they were hashed verify with the key and are exported as their plaintext 1093ms"
+  ]
+ },
+ {
+  "mutation": "M8 algorithm policy ignored",
+  "file": "src/a4/a4Evidence.ts",
+  "exit": 1,
+  "failing": [
+   "\u00d7 an ecdsa-p256-sha256 envelope verifies under a policy that allows it and is refused under one that does not 1312ms"
+  ]
+ },
+ {
+  "mutation": "M9 binder redaction skipped",
+  "file": "src/a4/a4Binder.ts",
+  "exit": 0,
+  "failing": []
+ }
+]

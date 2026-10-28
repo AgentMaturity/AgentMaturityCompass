@@ -1,0 +1,27 @@
+{
+  "item": "P2-36",
+  "branch": "rtd/w3-p2-36",
+  "base": "4683eecc7",
+  "machine": { "os": "macOS 26.6.2 arm64", "node": "v22.23.3", "vitestWorkers": 2 },
+  "newTests": { "file": "tests/a4/enterpriseData.test.ts", "passed": 9, "failed": 0 },
+  "relatedTests": [
+    { "set": "59 test files importing src/a4, the bundles, A4 contracts, the A4 OpenAPI or spec schemas (plus tests/a4/*)", "passed": 603, "failed": 1,
+      "failing": ["tests/compliance/evidenceBinding.test.ts > every source literal in src is classified"],
+      "failingOnBase": true, "note": "Same four unclassified literals (envelope, lifecycle_bound, not_governed, reassessment) on base 4683eecc7 with this branch's changes stashed; not touched here." },
+    { "set": "51 test files importing ledger encryption, the deletion gate, the Postgres store, the P2-02 detectors or processor registry, keysConfig or the signer", "passed": 814, "failed": 0 }
+  ],
+  "redGreen": [
+    { "case": "verifyA4Chain passes on encrypted audit rows", "red": "base a4AuditReader compares raw inline bytes with body_json; mutation M1 restores that comparison and the test fails (A4 integrity fails under ledger encryption)", "green": "passes" },
+    { "case": "Postgres backend refuses A4 writes, readiness BLOCKED", "red": "base has no guard (mutation M2/M3)", "green": "passes" },
+    { "case": "ecdsa-p256-sha256 envelope refused under a policy that disallows it", "red": "base verifies it regardless of policy (mutation M4/M8)", "green": "passes" },
+    { "case": "erasure, legal-hold refusal, bundle credential refusal, migrated-row plaintext export", "red": "new behaviour: the routes/functions do not exist on base", "green": "passes" }
+  ],
+  "mutations": "mutations.json (M1-M8 each turned a named test red; M9, the binder detector pass, survives: no projected binder field carries detector-matching text, so the pass is defence in depth with its own unit test on redactExportValue)",
+  "checks": {
+    "build": 0, "typecheck": 0, "typecheck:tests": 0, "lint": 0, "check:gates": 0, "check:dead-code": 0, "check:duplicates": 0,
+    "check:counts": 0, "check:api-ref": 0, "check:docs-drift": 0, "check:architecture-boundaries": 0,
+    "check-freeze": "1 on base and here: earlier exception keys (P1-65, P2-09, P2-09d, ...) are not in the base baseline; nothing from P2-36 (no CLI command added)"
+  },
+  "generated": ["spec/schemas/v1/a4-transition.schema.json (ERASED)", "spec/schemas/index.json", "counts (gen-counts --write)", "website/openapi.yaml (the erase path only, from src/studio/a4Openapi.ts)"],
+  "qualityBaseline": "dead-code --shrink removed 2 findings now used (a4Binder.ts file, a4Blobs.ts destroyProjectKey export)"
+}
