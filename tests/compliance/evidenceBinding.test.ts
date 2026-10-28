@@ -91,6 +91,9 @@ const REVIEWED_RUNTIME_OR_NON_EVIDENCE = new Set([
   // P2-08 (src/passport/passportCli.ts): whether a compared passport was read from the cache or created for the
   // comparison. A CLI read record's label, never a ledger meta.source.
   "cache", "created",
+  // P2-34 (src/a4/a4RuntimeLifecycle.ts): which runtime record a TUNE came from (a P2-23 reassessment or a P2-26
+  // envelope log entry) and how the package's version manifest was resolved. A4 record labels, never a ledger meta.source.
+  "envelope", "lifecycle_bound", "not_governed", "reassessment",
 ]);
 
 function sourceFiles(dir: string): string[] {
