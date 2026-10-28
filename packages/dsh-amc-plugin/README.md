@@ -5,7 +5,7 @@ context, not a DSH binary, and AMC makes no enforcement claim for DSH. See `docs
 AMC repository.
 
 Written against `@deepseek-ai/dsh@0.2.1-rc.2` (contract in `docs/source-reviews/P2-17-dsh-plugin.md`). It imports
-nothing at runtime and declares `@deepseek-ai/cordis` `~4.0.5` as a peer, so it never loads AMC's vendored Cordis.
+only Node built-ins and declares `@deepseek-ai/cordis` `~4.0.5` as a peer, so it never loads AMC's vendored Cordis.
 
 ## What it does
 
@@ -25,7 +25,10 @@ export default createAmcDshPlugin({
 });
 ```
 
-There is no AMC transport yet: the AMC Bridge has no `dsh` provider. With `qualifiedVersions: []` every call is denied.
+Mounted from a DSH profile, the module's own `apply(ctx, config)` takes the entry `amc connect hooks install --provider
+dsh` prints: the AMC workspace, the path of AMC's transport module, DSH's version and the qualified versions. It imports
+the transport on the first call; a bad config or a transport that does not load denies every call. No DSH version is
+qualified yet, so AMC denies every call either way.
 
 ## Publishing
 
