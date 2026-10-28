@@ -30,6 +30,8 @@ import { canonicalize } from "../utils/json.js";
 import { auditA4 } from "./a4Audit.js";
 import { conformanceView } from "./a4Conformance.js";
 import { A4BlobError, getPrivate } from "./a4Blobs.js";
+import { eraseProjectPrivate } from "./a4Erasure.js";
+import { LEDGER_BACKEND_INCOMPLETE_MESSAGE, ledgerBackendGap } from "./a4LedgerBackend.js";
 import { A4_EVENT_WINDOW, a4Events } from "./a4Events.js";
 import {
   acknowledgeItem, assertAllowed, autoHold, changeGatePolicy, evaluateFor, holdProject, loadA4State, reopenStage, requestGateAsync, resumeProject, retireProject,
@@ -383,6 +385,7 @@ const OWNER_SCHEMAS = {
   reopen: z.strictObject({ ...ownerBase, toStage: z.enum(A4_STAGES) }),
   tune: z.strictObject({ ...ownerBase, capabilityChange: z.boolean(), mechanicPlanId: z.string().min(1).max(200).optional() }),
   retire: z.strictObject({ ...ownerBase, acceptanceNote: z.string().trim().min(1).max(2000).optional() }),
+  erase: z.strictObject(ownerBase),
   acknowledge: z.strictObject({ ...ownerBase, itemId: z.string().min(1).max(128), stage: z.enum(A4_STAGES).optional() })
 } as const;
 const gatePolicySchema = z.union([
@@ -486,6 +489,8 @@ async function projectMutation(route: A4Route, projectId: string, rest: string):
       return mutate(route, projectId, OWNER_SCHEMAS.tune, (body, request) => tuneProject(store, projectId, { ...callOf(route, request), ...body }));
     case "/retire":
       return mutate(route, projectId, OWNER_SCHEMAS.retire, (body, request) => retireProject(store, projectId, { ...callOf(route, request), ...body }));
+    case "/private/erase":
+      return mutate(route, projectId, OWNER_SCHEMAS.erase, (body, request) => eraseProjectPrivate(store, projectId, { ...callOf(route, request), ...body }));
     case "/acknowledge":
       return mutate(route, projectId, OWNER_SCHEMAS.acknowledge, (body, request) =>
         acknowledgeItem(store, projectId, { ...callOf(route, request), ...body, stage: body.stage ?? headStage(headOf()) }));
@@ -775,6 +780,8 @@ export async function serveA4(route: Omit<A4Route, "store" | "assertGateRequestC
     return;
   }
   try {
+    // One refusal for every write before anything runs (a probe, a blob), not only at the store's commit (P2-36).
+    if (route.method === "POST" && ledgerBackendGap(route.workspace, store.ledger.db).length > 0) throw a4Fail(503, "LEDGER_BACKEND_INCOMPLETE", LEDGER_BACKEND_INCOMPLETE_MESSAGE);
     const tail = PROJECT_PATH.exec(route.pathname.slice(A4_API_PREFIX.length))?.[2];
     const original = route.method === "POST" && (tail === "/gate-policy" || /^\/stages\/[a-z]+\/gates\/(direction|completion)\/request$/.test(tail ?? ""))
       ? captureA4RequestActor(route) : undefined;

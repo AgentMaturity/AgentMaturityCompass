@@ -10,14 +10,18 @@ import { readFileSync } from "node:fs";
 import { isAbsolute, relative, resolve } from "node:path";
 import { effectiveTrustTier, workspaceOwnKeyIds, type ReaderTrust } from "../claims/evidenceProvenance.js";
 import type { ClaimKind } from "../claims/eligibility/types.js";
+import { getPublicKeyHistory, verifyHexDigest } from "../crypto/keys.js";
 import { verifySignatureEnvelope } from "../crypto/signing/signatureEnvelope.js";
 import { signingRoute, verifySignedDigest } from "../crypto/signing/signer.js";
 import type { SignatureEnvelope, SignKind } from "../crypto/signing/signerTypes.js";
+import { canonicalSigningKey } from "../keys/algorithmPolicy.js";
+import { loadKeysConfig } from "../keys/keysConfig.js";
 import type { Ledger } from "../ledger/ledger.js";
 import { verifyEvidenceEventIntegrity } from "../ledger/ledgerVerification.js";
 import { readAndVerifyArtifactFileSignature, type ArtifactSignature } from "../lifecycle/artifactSignature.js";
 import { admitKey } from "../trust/admission.js";
 import type { TrustContext } from "../trust/trustContext.js";
+import { envelopePublicKey } from "../trust/signatureCheck.js";
 import { loadTrustConfig } from "../trust/trustConfig.js";
 import { sha256Hex } from "../utils/hash.js";
 import type { EvidenceEvent } from "../types.js";
@@ -40,13 +44,33 @@ export function pinnedNotarySignature(workspace: string, sha256: string, envelop
 }
 
 /**
+ * Whether this workspace's signing algorithm policy (P2-08: `keys.algorithmPolicy.allowed` in amc.config.yaml, both
+ * `ed25519` and `ecdsa-p256-sha256` by default) allows this key's algorithm (P2-36). The section is read to refuse only;
+ * one that does not parse allows nothing, and neither does a key of another type.
+ */
+export function a4AlgorithmAllowed(workspace: string, publicKeyPem: string | null | undefined): boolean {
+  const algorithm = typeof publicKeyPem === "string" ? canonicalSigningKey(publicKeyPem)?.algorithm : undefined;
+  if (algorithm === undefined) return false;
+  try {
+    return loadKeysConfig(workspace).algorithmPolicy.allowed.includes(algorithm);
+  } catch {
+    return false;
+  }
+}
+
+/**
  * A digest A4 signed (an A4_RECORD envelope, the A4_PACKAGE-signed update policy) checked now: under this workspace's
- * auditor key history, or as the pinned notary's envelope when `kind` routes there (NOTARY mode signs both by the notary).
- * Either way a local audit trail, never a portable verdict.
+ * auditor key history, or as the pinned notary's envelope when `kind` routes there (NOTARY mode signs both by the notary),
+ * by a key whose algorithm the workspace's policy allows (a4AlgorithmAllowed). Either way a local audit trail, never a
+ * portable verdict.
  */
 export function verifiedA4Digest(workspace: string, digestHex: string, signed: { signature: string; envelope?: unknown }, kind: "A4_RECORD" | "A4_PACKAGE"): boolean {
-  if (verifySignedDigest({ workspace, digestHex, signed })) return true;
-  return (signed.envelope as { sigB64?: unknown } | null | undefined)?.sigB64 === signed.signature && pinnedNotarySignature(workspace, digestHex, signed.envelope, kind);
+  const verified = verifySignedDigest({ workspace, digestHex, signed })
+    || ((signed.envelope as { sigB64?: unknown } | null | undefined)?.sigB64 === signed.signature && pinnedNotarySignature(workspace, digestHex, signed.envelope, kind));
+  // The envelope names its key; a bare signature is the auditor key that made it.
+  const signer = signed.envelope === undefined ? getPublicKeyHistory(workspace, "auditor").find((pem) => verifyHexDigest(digestHex, signed.signature, pem))
+    : envelopePublicKey(signed.envelope);
+  return verified && a4AlgorithmAllowed(workspace, signer);
 }
 
 /**

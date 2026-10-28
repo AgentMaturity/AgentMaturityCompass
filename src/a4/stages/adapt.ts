@@ -42,7 +42,7 @@ import {
   operatingProfileActivationSha256, operatingProfileSha256, permissionItems, permissionsDryRun, permissionsOf, profileGeneratedAt, profileStation
 } from "../adaptPermissions.js";
 import {
-  activateBoundPlan, activationExecutionId, activationWeakenings, activePlanRecord, boundPlanOf, openPlanReview, proposalDiff, shippedLockDigest, signAdaptPlan,
+  activateBoundPlan, activationExecutionId, activationWeakenings, activePlanRecord, dataClassEnforcement, boundPlanOf, openPlanReview, proposalDiff, shippedLockDigest, signAdaptPlan,
   understandAdapt
 } from "../adaptPolicy.js";
 import {
@@ -219,7 +219,7 @@ export function adaptFacts(spec: Record<string, unknown>, answers: readonly A4An
         + "the user/message snapshot row must carry the frame's exact text." },
     { id: "enforcement-none", sources: ["design §10.3", "P2-01", "P2-02", "P3-23"], dataStatus: null,
       novice: "Some of what you declared is recorded but not enforced by AMC yet: where data may go, how long it is kept, what the agent may remember, and which incident reporting deadlines apply.",
-      practitioner: `Data handling (classes, residency, retention, processors) is declared, not enforced (P2-01, P2-02). The memory policy is advisory until the writeback reads it. ${clocks.length} reporting clock(s) are candidates an operator classifies; AMC decides none (P3-23).`,
+      practitioner: `Data handling (classes, residency, retention, processors) is declared, not enforced (P2-01, P2-02); the data classes read enforced at redaction once the workspace opts into P2-02's redaction with a verified processor registry, which every native session (build sessions included) then applies before it records anything. The memory policy is advisory until the writeback reads it. ${clocks.length} reporting clock(s) are candidates an operator classifies; AMC decides none (P3-23).`,
       expert: `enforcement: none for data handling; advisory for the memory policy; clocks: ${clocks.map((clock) => clock.clockId).join(", ") || "none"}, each NEEDS_CLASSIFICATION; ${CLOCK_REVIEW_STATUS}.` }
   ];
 }
@@ -273,7 +273,7 @@ function propose(ctx: A4ProducerContext): A4ProducerResult {
       languages: listValue(values.get("languages")), dataClasses: fact("dataClasses"), activities: fact("useCases"), excludedUses: listValue(values.get("excludedUses")),
       deploymentNeeds: textValue(values.get("deploymentNeeds")) },
     dataHandling: { dataClasses: fact("dataClasses"), residency: textValue(values.get("dataResidency")), retention: textValue(values.get("dataRetention")),
-      processors: listValue(values.get("processors")), enforcement: "none", keys: ["P2-01", "P2-02"] },
+      processors: listValue(values.get("processors")), enforcement: "none", dataClassesEnforcement: dataClassEnforcement(ctx.workspace), keys: ["P2-01", "P2-02"] },
     claimBoundary: ADAPT_CLAIM_BOUNDARY };
   // Build would otherwise be refused only by the router's size check (its record joins this specification).
   if (tooLargeForBuild(next)) throw fail(413, "INPUT_TOO_LARGE", "The proposal leaves Build no room under the 256 KiB specification limit; shorten the answers.");

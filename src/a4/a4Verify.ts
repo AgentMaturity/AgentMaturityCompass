@@ -20,7 +20,7 @@ import { evaluateApprovalQuorum } from "../approvals/approvalQuorum.js";
 import { a4ProjectIds, materializeA4Record, seqZeroReceiptAgent, syntheticIn, type A4BundleSlice } from "../bundles/bundleA4.js";
 import { eventMeta } from "../claims/evidenceProvenance.js";
 import { a4RecordV1Schema, type A4RecordV1 } from "../contracts/v1/a4Record.js";
-import { getPublicKeyHistory, verifyHexDigestAny } from "../crypto/keys.js";
+import { getPublicKeyHistory, verifyHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
 import { canonicalMetadataForHash, openLedger, type Ledger } from "../ledger/ledger.js";
 import { hasTable } from "../ledger/ledgerSchema.js";
 import { highSeveritySecretTypes } from "../release/releaseSecretScan.js";
@@ -33,7 +33,7 @@ import { buildVerifierReport, type VerifierReportV1 } from "../trust/verifierRep
 import type { EvidenceEvent } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
-import { resolveRefs } from "./a4Evidence.js";
+import { a4AlgorithmAllowed, resolveRefs } from "./a4Evidence.js";
 import {
   A4_BOUND_ITEMS, A4_ENVELOPE_KINDS, DEFAULT_A4_GATE_POLICY, a4EvidenceRefRowSchema, a4TransitionRowSchema, flatSlots, gatePolicyDigestOf, gateSupersededBy,
   ratchetedFromChain, type A4ChainLink, type A4EvidenceRefRow, type A4Stage
@@ -103,11 +103,16 @@ function checkTransitions(ledger: Ledger, rows: ReturnType<typeof chainOf>["rows
       out.errors.push(`A4_ENVELOPE_INVALID: transition ${row.seq} envelope does not sign its body`);
       continue;
     }
+    // Only keys whose algorithm the workspace's policy allows may have made it (P2-08 algorithm policy; P2-36).
+    const candidates = [envelopePublicKey(envelope.envelope), ...auditorKeys];
+    const allowed = candidates.filter((pem) => a4AlgorithmAllowed(ledger.workspace, pem));
     const check = checkDigestSignature({ signature: `a4 transition ${row.seq}`, purpose: "artifact-seal", digestHex: row.body_digest,
-      signatureB64: envelope.signature, candidates: [envelopePublicKey(envelope.envelope), ...auditorKeys], context: trust,
+      signatureB64: envelope.signature, candidates: allowed, context: trust,
       claimedSignedAt: typeof envelope.signedTs === "number" ? envelope.signedTs : null });
     out.signatures.push(check.admission);
-    if (!check.verified) out.errors.push(`A4_ENVELOPE_INVALID: transition ${row.seq} envelope does not verify`);
+    const refusedAlgorithm = !check.verified && candidates.some((pem) => typeof pem === "string" && !allowed.includes(pem) && verifyHexDigest(row.body_digest, String(envelope.signature), pem));
+    if (refusedAlgorithm) out.errors.push(`A4_ENVELOPE_ALGORITHM_REFUSED: transition ${row.seq} envelope is signed with an algorithm this workspace's policy does not allow`);
+    else if (!check.verified) out.errors.push(`A4_ENVELOPE_INVALID: transition ${row.seq} envelope does not verify`);
     else if (ROTATED_OUT.has(check.admission.status)) out.warnings.push(`KEY_ROTATED_OUT: transition ${row.seq} envelope key is ${check.admission.status} (not evaluated)`);
   }
 }

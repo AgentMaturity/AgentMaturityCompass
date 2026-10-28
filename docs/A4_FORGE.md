@@ -797,6 +797,45 @@ ledger keeps a salted hash and the ciphertext's hash. Pasted text is retained un
 destruction is effective only after every backup, WORM segment or mirror older than it has been rotated out. Back up
 `a4-projects/` and `a4-releases/` with the workspace: a restore without them orphans every blob reference in the chain.
 
+**Erasure.** A project owner erases the private text with `POST /api/v1/a4/projects/:id/private/erase` (body `reason`,
+`expectedHeadSeq`, `clientRequestId`; owner mode). AMC destroys the project's key: a tombstone first, then the vault wrap
+secret and `key.enc`. Every `private/*.enc` blob stays on disk and becomes unreadable (`GET .../comments` answers
+`reasonCode: PROJECT_KEY_DESTROYED`), and no new private text is accepted. The destruction runs inside the P2-01 deletion
+gate (executor `a4-private-erase`, target `blobs`): an acknowledged `DELETION_ALLOWED` audit row comes first, and a legal
+hold or an unreadable hold registry refuses it with 409 `DELETION_DENIED` before anything is destroyed. The action is
+recorded as an `ERASED` transition. The inline rows keep their salted hashes, so the chain still verifies. A hold, a
+freeze or retirement does not block erasure; read-only mode does. Erasure is effective only once every backup, WORM
+segment and mirror older than it has been rotated out: each still holds the key file and the vault envelope with the
+wrap secret. The `ERASED` record states this in its `effective` field.
+
+**Deletion.** `scripts/deletion-executors.json` lists `a4-projects/` and `a4-releases/` as never deleted. AMC removes no
+file there except the erasure above and a failed release attempt's own outputs that no `RELEASE` names. Any future A4
+cleanup must go through `assertDeletionAllowed` or `withDeletionGate`.
+
+**Ledger backends.** A4 keeps its `a4_*` and `action_*` tables in the SQLite ledger. The Postgres session store (P2-09d)
+mirrors only the tables its mirror list declares, and that list does not declare A4's tables yet. On a Postgres
+workspace every A4 write is refused with 503 `LEDGER_BACKEND_INCOMPLETE`, and readiness lists `store.ledger_backend`
+BLOCKED with one `NOT_MIRRORED:<table>` code per missing table. Reads still work. The Adapt context probe gives the same
+refusal. WORM segments (P2-09b) carry A4's audit rows, which are ordinary ledger rows. They do not carry the side tables:
+restore those from a workspace backup.
+
+**Ledger encryption.** With `ledgerEncryptionEnabled`, each transition's audit row stores its payload as ciphertext.
+The store and `verifyA4Chain` open it through the ledger cipher and compare it with the transition body. Where the key
+is out of reach (a locked vault, an unreachable provider, or a verifier with no ledger key), the ciphertext stands on
+the signed row: the row hash covers it, and its `payload_sha256` is the body digest. A row encrypted after it was hashed
+(`amc evidence-stores encrypt`) needs the key to verify in place.
+
+**Signing algorithms.** A4 envelopes and A4-signed digests verify only under a key whose algorithm the workspace's P2-08
+policy allows (`keys.algorithmPolicy.allowed` in `.amc/amc.config.yaml`; `ed25519` and `ecdsa-p256-sha256` by default).
+An envelope signed by a refused algorithm fails integrity with `A4_ENVELOPE_ALGORITHM_REFUSED`. An offline verifier
+applies the default policy.
+
+**Data classes.** Every native session, build sessions included, is wrapped by P2-02's redacting session. It redacts
+before commit once the workspace opts in. Adapt's Propose records `dataClassesEnforcement`: `enforced at redaction`
+when the workspace has opted in and its processor registry verifies, otherwise `none`. The Data handling card shows that
+value. Redaction is P2-02's experimental, heuristic detector set. It is not de-identification, and it does not enforce
+residency or retention.
+
 ## Exports and verification
 
 - **Verify in place.** `GET /api/v1/a4/projects/:id/verify` returns a `VerifierReportV1` under the server operator's
@@ -806,6 +845,17 @@ destruction is effective only after every backup, WORM segment or mirror older t
 - **Export.** With `AMC_A4_PREVIEW=1`, `amc bundle export` adds each A4 project of the run's agent to the `.amcbundle`
   as an `amc.a4-record/v1` file, `a4/<projectId>.json`: the project rows as stored and the ledger rows they name.
   `a4/index.json` names each project's head and `containsSyntheticExamples`, and the signed manifest lists every file.
+  The records are plaintext: the structured brief is included so that a verifier can recompute every digest without a
+  key. Keep the bundle under the operator's control. `a4/index.json` says so in `plaintext.note`. Its
+  `protectedDataFindings` counts P2-02 detector matches in the exported rows by class; they are reported, not rewritten.
+  A credential match refuses the export with 409 `A4_BUNDLE_REFUSED`. Every payload decrypted for the export is scanned
+  too. The project's own audit rows may have been encrypted after they were hashed. Those rows are exported as their
+  plaintext, decrypted under the operator's key, and `plaintext.decryptedLedgerRows` counts them. Their payload is the
+  transition body the record already carries. Without the key the export is refused with 503 `A4_EXPORT_KEY_UNAVAILABLE`.
+  Other evidence that an evidence ref names may also have been encrypted after it was hashed. That evidence is never
+  decrypted into an export. It would verify only with the key, so the export is refused with 409
+  `A4_EXPORT_REF_ENCRYPTED`. Rows written under encryption are exported as stored. The record files are written
+  owner-only (0600).
   A project is the agent's by the receipt signed for its first audit row, never by the head row's editable `agent_id`.
   Each project's chain is verified whole before it is exported. A project that does not verify, has lost its head row,
   or names two agents refuses the export with `A4_INTEGRITY_FAILED`. Only the store writes in the `a4-` session
@@ -822,8 +872,9 @@ destruction is effective only after every backup, WORM segment or mirror older t
 - **Binder slice.** `buildA4BinderSlice` (`src/a4/a4Binder.ts`) writes a project's revisions, gates, transitions,
   evidence refs and verifier summary under `.amc/audit/binders/exports/` only: digests, statuses and hashed principals,
   never specification text, comment bodies or decision reasons. Only ledger row ids are kept as they are; every other
-  ref id (a file name, a receipt or external id) is hashed with its kind. The slice is scanned for personal data and
-  key material, then staged, signed and moved into place, so a refused slice leaves nothing behind. It is a library
+  ref id (a file name, a receipt or external id) is hashed with its kind. P2-02's detectors then run over every string,
+  and each match is replaced by its hash. A credential match refuses the slice. The slice is then scanned for personal
+  data and key material, staged, signed and moved into place, so a refused slice leaves nothing behind. It is a library
   function for now, absent without `AMC_A4_PREVIEW=1` (404 `A4_PREVIEW_DISABLED`): no route or command serves it yet.
 
 ## The `amc a4` command line

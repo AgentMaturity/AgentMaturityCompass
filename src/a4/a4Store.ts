@@ -42,6 +42,7 @@ import { prepareA4Record, SIDE_TABLE_KEYS, NEW_HEAD, headProblems, type A4Actor,
 export type { A4Actor, A4ChangeSpec, A4RequestKey, A4TransitionOptions, A4TransitionResult } from "./a4TransitionRecords.js";
 import { captureA4RecordSigner, assertA4HotWriters, createA4CurrentLatch, A4TransitionPublicationError, type A4TransitionAttempt, type A4TransitionProgress } from "./a4TransitionSigning.js";
 import { A4BlobError, a4ProjectsRoot, createProjectKey, putPrivate } from "./a4Blobs.js";
+import { LEDGER_BACKEND_INCOMPLETE_MESSAGE, ledgerBackendGap } from "./a4LedgerBackend.js";
 import { ledgerRefClaim, resolveLedgerEvent } from "./a4Evidence.js";
 import { assertMember, liveRolesFor, memberCandidates, populationFacts, principalPopulation } from "./a4Identity.js";
 import {
@@ -388,7 +389,7 @@ function createStore(workspace: string, ledger: Ledger, trust?: TrustContext) {
   };
 
   const validateTransition = (projectId: string, actor: A4Actor, options: A4TransitionOptions): void => {
-    assertProjectId(projectId);
+    assertProjectId(projectId); if (ledgerBackendGap(workspace, db).length > 0) throw new A4StoreError(503, "LEDGER_BACKEND_INCOMPLETE", LEDGER_BACKEND_INCOMPLETE_MESSAGE);
     if (options.request && options.request.principalKey !== actor.key) throw new A4StoreError(400, "INPUT_INVALID", "The request key names another principal.");
   };
   const prepareTransition = (projectId: string, actor: A4Actor, build: Build, options: A4TransitionOptions, create: NewHead | null,

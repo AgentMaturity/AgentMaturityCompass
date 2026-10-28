@@ -122,6 +122,8 @@ export interface A4LiveFacts {
    * null when Review recorded none, absent when not read (the item then says not re-checked, never verified).
    */
   readonly controlResults?: { readonly status: "verified" | "not_evaluated" | "failed"; readonly reason: string | null } | null;
+  /** P2-36: the A4 and action tables the ledger backend does not carry (a4LedgerBackend.ts); absent or empty when it carries them. */
+  readonly ledgerBackendGap?: readonly string[];
   /** Adapt only: the workspace's session store backend (a JSONL store cannot record the context probe); absent when not read. */
   readonly sessionStore?: "sqlite" | "jsonl" | "postgres";
   /** Adapt only: P2-26's regime retention floor for logs (`floor: null` when no regime sets one); null when the plan cannot be read. */
@@ -391,6 +393,9 @@ function governanceItems(state: A4ReadinessState, query: A4ReadinessQuery, gates
     live.signingRoute === "notary" && live.notaryReachable === false
       ? item("signing.notary_reachable", "WAITING", { kind: "source_unavailable", reasonCodes: ["NOTARY_UNREACHABLE"] }) : item("signing.notary_reachable", "READY"),
     // Integrity of bytes, checked against this workspace's own keys: a self-check, never anchored, never a claim.
+    // Listed only when the backend drops A4 state (P2-36), so readiness reads exactly as before on every other backend.
+    ...(live.ledgerBackendGap?.length ? [item("store.ledger_backend", "BLOCKED", { kind: "source_unavailable", reasonCodes: ["LEDGER_BACKEND_INCOMPLETE",
+      ...live.ledgerBackendGap.slice(0, 8).map((table) => `NOT_MIRRORED:${table}`)], nextAction: { label: "Keep this workspace on the SQLite ledger until the Postgres mirror declares A4's tables" } })] : []),
     item("store.integrity", live.integrity.valid ? "READY" : "BLOCKED", { section: "integrity", report: live.integrity.report ?? null,
       reasonCodes: live.integrity.valid ? ["SELF_CHECK", "UNANCHORED"] : ["A4_INTEGRITY_FAILED", ...live.integrity.problems.slice(0, 8)] }),
     live.approvalPolicy === "valid" ? item("approvals.policy_signed", "READY") : item("approvals.policy_signed", "BLOCKED", {

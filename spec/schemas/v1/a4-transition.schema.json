@@ -52,7 +52,8 @@
         "ROLLBACK",
         "TUNE",
         "RETIRE",
-        "COMMENT"
+        "COMMENT",
+        "ERASED"
       ],
       "type": "string"
     },

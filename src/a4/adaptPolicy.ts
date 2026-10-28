@@ -23,6 +23,7 @@ import { loadApprovalConsumed } from "../approvals/approvalChainStore.js";
 import type { ApprovalRequestInput } from "../approvals/approvalEngine.js";
 import { loadVerifiedApprovalPolicy } from "../approvals/approvalPolicyEngine.js";
 import { verifyBudgetsConfigSignature } from "../budgets/budgets.js";
+import { loadProcessorRegistrySnapshot, protectedDataOptedIn } from "../dataflow/processorRegistry.js";
 import { getRegisterEntriesForStation } from "../compliance/regulatory/index.js";
 import type { Station } from "../domains/stations.js";
 import { inspectRuntimeFirewallPolicy } from "../runtime/firewall.js";
@@ -55,6 +56,21 @@ export function shippedLockDigest(): string {
     throw fail(409, "RESOURCE_UNREADABLE", "plan.lockDigest: the shipped catalog did not load cleanly");
   }
   return shippedLock;
+}
+
+/**
+ * How AMC handles the data classes Adapt declares (P2-36). Every native session, build sessions included, is wrapped by
+ * P2-02's createRedactingSession (redactingSessionFor), which redacts before commit once the workspace has opted in. The
+ * row reads `enforced at redaction` only when P2-02 confirms it: opted in and the processor registry verifies under the
+ * workspace auditor key; otherwise `none`. Redaction is P2-02's experimental, heuristic detector set: it reduces
+ * identifiers in what sessions record, it is not de-identification, and it decides nothing about residency or retention.
+ */
+export function dataClassEnforcement(workspace: string): "enforced at redaction" | "none" {
+  try {
+    return protectedDataOptedIn(workspace) && loadProcessorRegistrySnapshot(workspace).state === "verified" ? "enforced at redaction" : "none";
+  } catch {
+    return "none";
+  }
 }
 
 /** The raw DeploymentProfile of these answers (parseDeploymentProfile checks it strictly). One profile id per project. */

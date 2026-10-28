@@ -73,7 +73,7 @@
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/a4-transition.schema.json",
       "name": "a4-transition.schema.json",
-      "sha256": "81f41c4c6321efa8ac8a17abc2a4690e76da83a52f07e31a8eb8a3b33b06323c"
+      "sha256": "81dbd0c044ba80a8745b0449408ef212f50c13628eb6361ca7b799c40958f094"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/a4-value-claim.schema.json",

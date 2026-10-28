@@ -42,6 +42,7 @@ import {
   A4_STAGES, DEFAULT_A4_GATE_POLICY, a4DecisionRowSchema, a4EvidenceRefRowSchema, a4GatePolicyV1Schema, a4GateRowSchema, a4IntentV1Schema,
   a4RevisionRowSchema, flatSlots, gatePolicyDigestOf, gatePolicyOf, mapRiskTier, type A4GatePolicyV1, type A4IntentV1, type A4Principal, type A4ReadinessV1, type A4Stage
 } from "./a4Schema.js";
+import { ledgerBackendGap } from "./a4LedgerBackend.js";
 import { A4_RUNTIME, holdIncidentIds, retireGovernedAgent, syncRuntimeLifecycle, tuneStage } from "./a4RuntimeLifecycle.js";
 import { authorsOf, buildersOf, evaluateSod } from "./a4SoD.js";
 import { ensureA4Stages } from "./a4Stages.js";
@@ -220,6 +221,7 @@ function collectFacts(store: A4Store, state: A4ReadinessState, call: Facts, appr
     // From the signed CREATED body, never the unsigned head row; a chain without one counts every user (fail closed).
     usersAddedSinceCreated: usersCreatedSince(workspace, typeof createdTs === "number" ? createdTs : 0),
     hostSessionsSinceCreated: hostSessionsSince(workspace, typeof createdTs === "number" ? createdTs : 0),
+    ledgerBackendGap: ledgerBackendGap(workspace, store.ledger.db),
     lostEffects: state.effects.filter((row) => row.state === "running" && effectOwnerLost(row, Date.now() - DEFAULT_ACTION_STALE_AFTER_MS)).map((row) => row.effect_id),
     blockingExecutions: blocking,
     unrecordedResolutions: stage === "assemble" ? unrecordedResolutionsOf(store, state.chain, blocking) : null,
