@@ -4,8 +4,13 @@
  * Fans a single request out to N model endpoints in parallel,
  * scores all responses via micro-score, and returns the best one.
  * Integrates as a SteerStage that replaces the single-model path.
+ *
+ * Candidates are model endpoints reached directly, not through the gateway, so every candidate URL meets
+ * checkScopedEgress (residency and the kill switch, `provider` channel) before any is sent: one refusal refuses the
+ * whole race, typed, rather than letting the other candidates win by fallback.
  */
 
+import { checkScopedEgress } from "../residency/checkEgress.js";
 import type { SteerStage, SteerRequestContext, SteerResponseContext } from "./types.js";
 import { microScore, type MicroScoreResult, type MicroScoreOptions } from "./microScore.js";
 
@@ -40,6 +45,10 @@ export interface RaceOptions {
   timeoutMs?: number;
   /** If true, return fastest response above threshold instead of best score */
   fastestAboveThreshold?: number;
+  /** Trusted workspace for the egress check; absent uses the scoped fallback (ALS scope, else an unregulated cwd only). */
+  workspace?: string;
+  /** The calling agent; wrapFetch sets its own, never a value from the request. */
+  agentId?: string;
 }
 
 // ── Core race logic ────────────────────────────────────────────────────────
@@ -116,6 +125,11 @@ export async function raceModels(
     }
   }
 
+  // Synchronous and before the first dispatch, so a refusal sends nothing to any candidate.
+  for (const candidate of options.candidates) {
+    checkScopedEgress(options.workspace, "provider", candidate.url,
+      { ...(options.agentId === undefined ? {} : { agentId: options.agentId }), dataClasses: null, purpose: "steer-race" });
+  }
   const results = await Promise.allSettled(
     options.candidates.map((candidate) =>
       fetchCandidate(candidate, init, baseBody, timeoutMs).then(

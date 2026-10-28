@@ -1,0 +1,5 @@
+---
+"agent-maturity-compass": patch
+---
+
+The remaining outbound paths now meet checkEgress, which applies residency (P2-01) and the kill switch (P2-26) before any socket is opened. The native shell's egress proxy checks each connection the allowlist admits for the shell's workspace and agent: an active kill refuses every new connection, while a command that is already running and an open tunnel are not interrupted. MCP OAuth discovery and token requests, the finance payment fixture client, the faithfulness LLM judge and the steer race fan-out (including wrapFetch's winner re-fetch) are refused by a kill or a residency block. Their typed refusal propagates and is never reported as an OAuth failure, an unknown payment outcome, a simulated score or a fallback race winner. Provider hook delivery from the hook forwarder, and from the Pi extension to a remote Bridge, checks residency as AMC's own traffic, so a kill does not refuse it. A Claude Code control hook answers a residency refusal with a named deny. `startShellEgressProxy` now requires `workspace` and `agentId`, and the native shell declines an egress allowlist without them.

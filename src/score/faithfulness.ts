@@ -13,7 +13,14 @@
  * Supports both:
  *   - Offline/simulated mode (heuristic overlap scoring, no LLM calls)
  *   - LLM mode (actual LLM-as-judge calls for production use)
+ *
+ * Each judge call sends agent output and context to a model, so it meets checkScopedEgress (residency and the kill
+ * switch) on the `provider` channel for `config.workspace` right before it is sent. It is not AMC's incident-response
+ * traffic: it is a model call naming no provider, refused by a stop_all kill and, failing closed, by any provider kill.
+ * A refusal propagates; it never falls back to simulated scoring.
  */
+
+import { checkScopedEgress, isEgressRefusal } from '../residency/checkEgress.js';
 
 /* ── Types ──────────────────────────────────────────────────────── */
 
@@ -75,6 +82,8 @@ export interface FaithfulnessConfig {
   temperature?: number;
   /** Minimum overlap ratio to consider a claim supported in simulated mode */
   overlapThreshold?: number;
+  /** The trusted workspace whose residency registry and kill switch govern judge calls; absent uses the scoped fallback */
+  workspace?: string;
 }
 
 /* ── Prompts for LLM-as-judge ────────────────────────────────────── */
@@ -342,7 +351,8 @@ export async function scoreFaithfulnessLLM(
       maturitySignals,
       recommendations,
     };
-  } catch {
+  } catch (error) {
+    if (isEgressRefusal(error)) throw error; // nothing was sent; never disguised as a simulated score
     // Fallback to simulated
     return scoreFaithfulness(input, { ...config, mode: 'simulated' });
   }
@@ -356,6 +366,7 @@ async function callLLMForClaims(
 ): Promise<string[]> {
   const prompt = CLAIM_DECOMPOSITION_PROMPT.replace('{{output}}', input.output);
 
+  checkScopedEgress(config.workspace, 'provider', config.apiEndpoint!, { dataClasses: null, purpose: 'faithfulness-judge' });
   const response = await fetch(config.apiEndpoint!, {
     method: 'POST',
     headers: {
@@ -395,6 +406,7 @@ async function callLLMForVerification(
     .replace('{{context}}', context)
     .replace('{{claim}}', claim);
 
+  checkScopedEgress(config.workspace, 'provider', config.apiEndpoint!, { dataClasses: null, purpose: 'faithfulness-judge' });
   const response = await fetch(config.apiEndpoint!, {
     method: 'POST',
     headers: {

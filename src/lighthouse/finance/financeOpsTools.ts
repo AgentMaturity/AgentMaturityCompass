@@ -6,6 +6,7 @@ import { authorizationRecordDigest } from "../../actions/authorizationRecord.js"
 import type { ReconcileAdapter } from "../../actions/reconcile.js";
 import { createApprovalForIntent } from "../../approvals/approvalEngine.js";
 import { loadActiveCompiledPolicy } from "../../catalog/compiler/activate.js";
+import { isEgressRefusal } from "../../residency/checkEgress.js";
 import { loadVerifiedToolsConfigSnapshot } from "../../toolhub/toolhubValidators.js";
 import { compiledPolicyGuard } from "../../tools/guards/compiledPolicyGuard.js";
 import {
@@ -109,7 +110,8 @@ export function createFinanceOpsTools(options: FinanceOpsOptions): {
   if (!same(executeDefinition.bindingFields, financePaymentBindingFields) || !same(executeDefinition.effects, effects)) {
     throw new Error("Finance execute requires exact signed bindings, Idempotency-Key header and native reconciliation");
   }
-  const readerOptions = Object.freeze({ ...options.reader });
+  // Every request is checked for this workspace and agent (checkScopedEgress), never for values from the reader options.
+  const readerOptions = Object.freeze({ ...options.reader, workspace, agentId: options.agentId });
   const reader = createPaymentServiceClient(readerOptions);
   const context = createFinancePaymentContext({ workspace, agentId: options.agentId, journal: options.journal });
   const readerAdapter = createPaymentAdapter({ client: reader, adapterId: "native", resolveLookupContext: context.resolveLookupContext });
@@ -131,9 +133,11 @@ export function createFinanceOpsTools(options: FinanceOpsOptions): {
         && payee.destinationTokenSha256 === envelope.destinationTokenSha256;
       refreshed.set(execution, matches ? null : "finance_payee_changed");
       return "allow"; // The synchronous deny-only guard reports a changed resource; this answer grants no authority.
-    } catch {
-      refreshed.set(execution, "finance_payee_refresh_unavailable");
-      return "unavailable";
+    } catch (error) {
+      // An egress refusal (residency or kill switch) denies by name; it is not an unavailable provider.
+      const refused = error instanceof DefiniteFailureError && isEgressRefusal(error.cause);
+      refreshed.set(execution, refused ? "finance_payee_refresh_egress_refused" : "finance_payee_refresh_unavailable");
+      return refused ? "deny" : "unavailable";
     }
   }
 

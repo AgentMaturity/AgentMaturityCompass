@@ -97,6 +97,7 @@ export function createNativeSandboxBash(options: {
       if (executionJson(execution) !== admission.executionJson || execution.signal !== admission.signal) throw new Error("Native shell execution changed after admission.");
       if (execution.signal?.aborted) throw new Error("Native shell was cancelled before dispatch.");
       const policy = { ...nativeShellSandboxPolicy(workspace, timeoutMs, execution.signal, scrubValues, admission.policySha256),
+        egressScope: { workspace, agentId: execution.agentId },
         ...(recordEgress ? { onEgress: (row: ShellEgressRow) => recordEgress(execution, row) } : {}) };
       const backend = process.platform === "darwin" ? seatbeltNativeShell() : bwrapBackend();
       outcome = await new SandboxRunner({ backends: [backend] }).run(["/bin/sh", "-c", command], workspace, policy);
