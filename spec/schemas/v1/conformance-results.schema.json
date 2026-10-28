@@ -59,7 +59,8 @@
         "verifier",
         "producer",
         "adapter",
-        "compiler"
+        "compiler",
+        "a4-record"
       ],
       "type": "string"
     },
