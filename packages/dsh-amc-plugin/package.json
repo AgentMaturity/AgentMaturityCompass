@@ -1,0 +1,26 @@
+{
+  "name": "dsh-amc-plugin",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AMC governance gate for DeepSeek Harness (DSH) tool calls: asks AMC before every tool runs and fails closed. Not qualified against a DSH binary yet. Private until Sid publishes it.",
+  "keywords": ["dsh-plugin", "agent-maturity-compass"],
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "exports": {
+    ".": {
+      "types": "./index.d.mts",
+      "default": "./index.mjs"
+    }
+  },
+  "files": [
+    "index.mjs",
+    "index.d.mts",
+    "README.md"
+  ],
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "~4.0.5"
+  },
+  "license": "MIT"
+}
