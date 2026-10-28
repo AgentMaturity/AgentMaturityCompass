@@ -2,7 +2,7 @@
  "schemaVersion": 1,
  "key": "P2-25",
  "date": "2026-10-27",
- "commit": "7a5574370d32a0305cf100842d740b869ee62e71",
+ "commit": "5e326bd5ce323f452b5dc2b168320024127dcfc7",
  "branch": "rtd/w3-p2-25",
  "node": "v22.23.3",
  "pnpm": "10.33.0",
@@ -70,14 +70,14 @@
    "durationMs": 0
   },
   {
-   "cmd": "npx vitest run <217 test files touching changed modules + tests/identity tests/agent tests/governor tests/leases> --maxWorkers=2",
+   "cmd": "npx vitest run <294 test files touching changed modules, incl. tests/identity tests/agent tests/governor tests/leases> --maxWorkers=2",
    "exit": 0,
    "durationMs": 0
   }
  ],
  "tests": {
-  "total": 3363,
-  "passed": 3363,
+  "total": 4298,
+  "passed": 4298,
   "failed": 0,
   "skipped": 0
  },
@@ -92,12 +92,12 @@
   },
   {
    "path": "mutations.json",
-   "sha256": "87ed9e19bc9688aeff7ffb4a39715b318d2bbd7467b06e2b60dd745a2b258ebb"
+   "sha256": "90e274aa788601f332121bcd7a182bb5ab3c356661954e1a01cd514a8d400a70"
   },
   {
    "path": "README.md",
-   "sha256": "deb7827c687925d3ff3de82b5a703e93b85f6225d64cfb61c9900f56b8a31d7c"
+   "sha256": "b86fad6c7e60e23b7e5ab124fa81cea6b361ac7f127af217699fa7d12d9b6358"
   }
  ],
- "notes": "Totals are the related set: 217 files (every test file importing a changed module, plus the four new P2-25 files: 52 new tests). The full npm test suite was not run. durationMs not measured (0). check:freeze and check:qualification fail on base for other keys' entries, unchanged here. Pending for people: spec version pins re-checked against primary sources, real SPIRE/Entra/AgentCore interop, NYDFS/HIPAA expert review."
+ "notes": "Totals are the related set: 294 files (every test file importing a changed module), including 66 new P2-25 tests in 7 files. The full npm test suite was not run. durationMs not measured (0). check:freeze fails only on other keys' entries missing from the base baseline plus P2-25 until the integrator lands its allowedExceptionKeys entry; check:qualification fails on base for other keys. Pending for people: spec version pins, real SPIRE/Entra/AgentCore interop, NYDFS/HIPAA expert review, catalog maxLeaseTtlMinutes default."
 }

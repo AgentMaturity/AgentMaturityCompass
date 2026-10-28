@@ -55,6 +55,67 @@
       "failed": [
         "leaseV2Binding > refuses a lease longer than a regulated plan's maximum lifetime"
       ]
+    },
+    {
+      "guard": "leaseVerifier: cap read only when the caller passes it",
+      "failed": [
+        "tests/leases/leaseLifetimeCap.test.ts > the plan's lease lifetime cap on sibling verification paths > refuses a lease longer than the cap in Studio agent auth and the bridge, and admits one within it",
+        "tests/leases/leaseLifetimeCap.test.ts > the plan's lease lifetime cap on sibling verification paths > refuses every lease on both paths once the active plan's journal no longer verifies"
+      ]
+    },
+    {
+      "guard": "leaseVerifier: unverifiable plan admits leases",
+      "failed": [
+        "tests/leases/leaseLifetimeCap.test.ts > the plan's lease lifetime cap on sibling verification paths > refuses every lease on both paths once the active plan's journal no longer verifies"
+      ]
+    },
+    {
+      "guard": "delegatedLease: child scopes not narrowed to its classes",
+      "failed": [
+        "tests/leases/delegatedLease.test.ts > child leases > extends the parent's chain by one narrowing link and binds the child lease to it"
+      ]
+    },
+    {
+      "guard": "leaseVerifier: revoked ancestor lease ignored",
+      "failed": [
+        "tests/leases/delegatedLease.test.ts > child leases > dies with the parent lease"
+      ]
+    },
+    {
+      "guard": "subagentRunner: child inherits the parent lease (pre-P2-25)",
+      "failed": [
+        "tests/runPrincipalLease.test.ts > in-process delegated children under an activated identity-binding plan (P1-79) > a child spawned with the run's lease binds the OS user's principal, that lease id and the delegation scope; without it, the child is denied",
+        "tests/runPrincipalLease.test.ts > a native-schedule pass under an activated identity-binding plan (P1-79) > amc native-schedule run-due mints the pass's lease, and the scheduled child's calls bind it"
+      ]
+    },
+    {
+      "guard": "actionJournal: intent omits the delegation",
+      "failed": [
+        "tests/leases/delegatedLease.test.ts > receipts > the authorization record and the started receipt's intent name the chain, its SPIFFE ID and the principal"
+      ]
+    },
+    {
+      "guard": "nativeTasksView: delegation not rendered",
+      "failed": [
+        "tests/leases/delegatedLease.test.ts > display > shows the chain's links as they verify now, and a revoked one as refused"
+      ]
+    },
+    {
+      "guard": "workload-trust verify: failure exits 0",
+      "failed": [
+        "tests/identity/workloadTrustCli.test.ts > amc identity workload-trust > publishes a signed config, verifies it, shows names and counts only, and refuses a tampered one"
+      ]
+    },
+    {
+      "guard": "delegatedLease: regulated session without a root gets a v1 lease",
+      "failed": [
+        "tests/leases/delegatedLease.test.ts > session leases > issues a v1 lease without a root outside a regulated profile, and refuses inside one"
+      ]
     }
+  ],
+  "red": [
+    "tests/leases/leaseLifetimeCap.test.ts: both tests failed on 7a557437 (src stashed) before the central cap fix",
+    "tests/leases/delegatedLease.test.ts > runLease mints a v2 lease...: failed with src/leases/runLease.ts at HEAD (v1 issuance)",
+    "tests/runPrincipalLease.test.ts: the two child-lease tests failed when subagentRunner inherited the parent lease (mutation above)"
   ]
 }
