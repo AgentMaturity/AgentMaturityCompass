@@ -43,6 +43,24 @@ The drill exits 0 only when every check passes:
 
 Also record `unavailableWindowMs` (how long appends were refused) and `latencyMs.p95` against the 50 ms local-authorization budget. A p95 over budget is a finding to record, not a failed drill.
 
+## 4b. A4 and the action journal (P2-36, pending)
+
+The in-tree tests drive A4's write-through mirror against the fake driver only. On the same server, after the session
+drill:
+
+1. In a scratch workspace pinned to Postgres, with a signed approval policy, create an A4 project, add a revision and
+   two comments (`amc a4` or Studio). Run `amc a4 verify <projectId>`: it must pass, and `amc_ledger_mirror_log` must hold
+   one entry per transition.
+2. Fail the primary over while comments are being added in a loop. Every refused write must be 503
+   `LEDGER_MIRROR_UNAVAILABLE`; afterwards `amc a4 verify` must pass and every acknowledged comment must be present in
+   both SQLite and Postgres (`a4_comments`). Record any `LEDGER_MIRROR_DIVERGED` with the timestamps: a commit whose
+   reply was lost and whose read-back also failed leaves Postgres one write ahead, which AMC refuses rather than guesses.
+3. Run one journaled tool call and check `action_transitions` holds the same receipts in both databases.
+4. Run `amc evidence-stores worm-export` to a test bucket and `worm-verify` on the download; the result must name no
+   side-table error.
+
+Record the counts and any refusal codes in the receipt README.
+
 ## 5. Record
 
 Commit the receipt under `qualification/<date>-P2-09d/` with a README naming the HA platform, its version, the replication mode and how the failover was triggered. Then update the P2-09 issue: acceptance criterion "failover tests pass in CI, and a failover receipt is recorded". A CI job with a Postgres service is a separate follow-up; it needs `pg` added as a dev dependency, which this item did not do.

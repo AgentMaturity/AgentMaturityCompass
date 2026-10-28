@@ -28,7 +28,7 @@ export interface PostgresChainSnapshot {
   readonly head: { readonly hash: string; readonly seq: number } | null;
 }
 
-interface SignedHead {
+export interface SignedHead {
   readonly v: 1;
   readonly chainId: string;
   readonly headHash: string;
@@ -36,16 +36,19 @@ interface SignedHead {
   readonly sig: string;
 }
 
-function headPath(workspace: string): string {
-  return join(workspace, ".amc", "postgres-store-head.json");
+/** The session chain (P2-09d) or the side-table mirror log (P2-36); each keeps its own signed floor. */
+export type PostgresHeadStream = "events" | "ledger-mirror";
+
+function headPath(workspace: string, stream: PostgresHeadStream): string {
+  return join(workspace, ".amc", stream === "events" ? "postgres-store-head.json" : "postgres-ledger-mirror-head.json");
 }
 
-function headDigest(chainId: string, headHash: string, headSeq: number): string {
-  return sha256Hex(canonicalize({ v: 1, kind: "amc.postgres-chain-head", chainId, headHash, headSeq }));
+function headDigest(chainId: string, headHash: string, headSeq: number, stream: PostgresHeadStream): string {
+  return sha256Hex(canonicalize({ v: 1, kind: stream === "events" ? "amc.postgres-chain-head" : "amc.postgres-ledger-mirror-head", chainId, headHash, headSeq }));
 }
 
-function readSignedHead(workspace: string): SignedHead | null {
-  const path = headPath(workspace);
+function readSignedHead(workspace: string, stream: PostgresHeadStream): SignedHead | null {
+  const path = headPath(workspace, stream);
   if (!pathExists(path)) return null;
   const parsed = JSON.parse(readUtf8(path)) as Partial<SignedHead>;
   if (parsed.v !== 1 || typeof parsed.chainId !== "string" || typeof parsed.headHash !== "string"
@@ -60,24 +63,24 @@ function readSignedHead(workspace: string): SignedHead | null {
  * ponytail: read-then-write without a lock; two processes racing can leave the
  * lower of their two heads, which is still a valid (weaker) floor.
  */
-export function recordSignedPostgresHead(workspace: string, chainId: string, headHash: string, headSeq: number): void {
+export function recordSignedPostgresHead(workspace: string, chainId: string, headHash: string, headSeq: number, stream: PostgresHeadStream = "events"): void {
   let existing: SignedHead | null = null;
   try {
-    existing = readSignedHead(workspace);
+    existing = readSignedHead(workspace, stream);
   } catch {
     existing = null; // a malformed file is replaced by a valid one; verification reported it already
   }
   if (existing !== null && existing.chainId === chainId && existing.headSeq >= headSeq) return;
-  const digest = headDigest(chainId, headHash, headSeq);
+  const digest = headDigest(chainId, headHash, headSeq, stream);
   const sig = process.env.AMC_NO_SIGN === "1" ? "unsigned" : signHexDigestWith(cachedSigningKey(workspace, "ledger-row")(), digest);
   const record: SignedHead = { v: 1, chainId, headHash, headSeq, sig };
-  writeFileAtomic(headPath(workspace), `${JSON.stringify(record, null, 2)}\n`, 0o644);
+  writeFileAtomic(headPath(workspace, stream), `${JSON.stringify(record, null, 2)}\n`, 0o644);
 }
 
 /** Read the signed head before the database snapshot, so any head it names was committed before the snapshot began. */
-export function readSignedPostgresHeadForCheck(workspace: string): { head: SignedHead | null; error: string | null } {
+export function readSignedPostgresHeadForCheck(workspace: string, stream: PostgresHeadStream = "events"): { head: SignedHead | null; error: string | null } {
   try {
-    return { head: readSignedHead(workspace), error: null };
+    return { head: readSignedHead(workspace, stream), error: null };
   } catch (error) {
     return { head: null, error: (error as Error).message };
   }
@@ -99,23 +102,23 @@ export function postgresChainProblems(
   } else if (last.seq !== snapshot.head.seq || last.event.event_hash !== snapshot.head.hash) {
     problems.push("the last Postgres row does not match the database chain head: rows were deleted or written outside AMC");
   }
-  const floor = signed.head;
-  if (floor === null) {
-    if (last !== undefined) problems.push("the workspace holds no signed head for its Postgres chain; a database head alone is not evidence");
-    return problems;
+  return [...problems, ...signedFloorProblems(workspace, "events", snapshot.chainId, signed.head, last !== undefined,
+    (seq) => snapshot.events.find((entry) => entry.seq === seq)?.event.event_hash ?? null)];
+}
+
+/**
+ * The signed floor against a database chain: present once the chain holds rows, naming this chain, verifying under the
+ * monitor key, and naming a row the chain still holds at that sequence (`hashAt`). Rows after the floor are allowed.
+ */
+export function signedFloorProblems(workspace: string, stream: PostgresHeadStream, chainId: string, floor: SignedHead | null,
+  hasRows: boolean, hashAt: (seq: number) => string | null): string[] {
+  const what = stream === "events" ? "Postgres chain" : "Postgres ledger mirror log";
+  const head = stream === "events" ? "Postgres" : "Postgres ledger mirror";
+  if (floor === null) return hasRows ? [`the workspace holds no signed head for its ${what}; a database head alone is not evidence`] : [];
+  if (floor.chainId !== chainId) return [`the workspace's signed ${head} head names another chain`];
+  if (!verifyHexDigestAny(headDigest(floor.chainId, floor.headHash, floor.headSeq, stream), floor.sig, getPublicKeyHistory(workspace, "monitor"))) {
+    return [`the workspace's signed ${head} head does not verify under the monitor key`];
   }
-  if (floor.chainId !== snapshot.chainId) {
-    problems.push("the workspace's signed Postgres head names another chain");
-    return problems;
-  }
-  if (!verifyHexDigestAny(headDigest(floor.chainId, floor.headHash, floor.headSeq), floor.sig, getPublicKeyHistory(workspace, "monitor"))) {
-    problems.push("the workspace's signed Postgres head does not verify under the monitor key");
-    return problems;
-  }
-  if (floor.headSeq === 0) return problems;
-  const named = snapshot.events.find((entry) => entry.seq === floor.headSeq);
-  if (named === undefined || named.event.event_hash !== floor.headHash) {
-    problems.push(`the Postgres chain does not contain the workspace's signed head (seq ${floor.headSeq}): truncated or rewritten`);
-  }
-  return problems;
+  if (floor.headSeq === 0 || hashAt(floor.headSeq) === floor.headHash) return [];
+  return [`the ${what} does not contain the workspace's signed head (seq ${floor.headSeq}): truncated or rewritten`];
 }

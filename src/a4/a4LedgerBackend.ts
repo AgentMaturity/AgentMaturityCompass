@@ -1,16 +1,18 @@
 /**
  * Whether the workspace's ledger backend carries A4 state (P2-36; reconcile/G2.md conflict 11). A4 writes its `a4_*`
- * and `action_*` rows into the SQLite ledger. A Postgres session store (P2-09d) mirrors only the tables
- * POSTGRES_MIRROR_TABLES declares, so on Postgres every such table missing from that list is A4 state an HA deployment
- * would silently lose. The gap is then readiness item `store.ledger_backend` (BLOCKED, LEDGER_BACKEND_INCOMPLETE) and
- * every A4 write is refused with that code. SQLite and JSONL session stores leave A4's tables in the SQLite ledger.
+ * and `action_*` rows into the SQLite ledger; on a Postgres session store (P2-09d) every table POSTGRES_MIRROR_TABLES
+ * declares is written through to Postgres in the same transaction (postgresLedgerMirror.ts) and carried in WORM
+ * exports (wormSideTables.ts). Every A4 and action table is declared there today, so the gap is empty. A later
+ * `a4_*` or `action_*` table the ledger gains without a declaration is state an HA deployment would silently lose:
+ * the gap then names it, readiness lists `store.ledger_backend` BLOCKED with LEDGER_BACKEND_INCOMPLETE, and every A4
+ * write is refused with that code. SQLite and JSONL session stores leave A4's tables in the SQLite ledger alone.
  */
 import type Database from "better-sqlite3";
 import { A4_RECORD_TABLES } from "../contracts/v1/a4Record.js";
 import { resolveSessionStoreBackend } from "../persistence/openSessionEventStore.js";
 import { POSTGRES_MIRROR_TABLES } from "../persistence/postgres/postgresSchema.js";
 
-export const LEDGER_BACKEND_INCOMPLETE_MESSAGE = "This workspace's ledger backend (Postgres) does not mirror A4's tables, so A4 state would be lost on failover; "
+export const LEDGER_BACKEND_INCOMPLETE_MESSAGE = "This workspace's ledger backend (Postgres) does not mirror every A4 table, so A4 state would be lost on failover; "
   + "A4 records nothing until the backend declares them.";
 
 /** The A4 and action tables the backend does not carry, sorted; empty when it carries them all (any non-Postgres backend). */

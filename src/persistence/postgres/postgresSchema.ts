@@ -1,18 +1,19 @@
 /**
  * The tables the Postgres session store mirrors from the SQLite ledger.
  *
- * This list is the seam later items extend: P2-36 adds its `a4_*` and
- * `action_*` tables as entries here (DDL, the columns to copy and the SQLite
- * SELECT that reads them), and `amc evidence-stores migrate --to postgres`
- * creates and copies every entry with no other change. A table the ledger
- * keeps that is missing here is a table a Postgres workspace does not have;
- * P2-36 reports that as LEDGER_BACKEND_INCOMPLETE by checking its own table
- * names against the names in this list.
+ * P2-36 appends A4's `a4_*` and the action journal's `action_*` tables
+ * (LEDGER_SIDE_TABLES), which their writers mirror inside each SQLite write
+ * transaction (postgresLedgerMirror.ts); `amc evidence-stores migrate --to
+ * postgres` creates and copies every entry. A table the ledger keeps that is
+ * missing here is a table a Postgres workspace does not have; A4 reports that
+ * as LEDGER_BACKEND_INCOMPLETE by checking its own table names against the
+ * names in this list.
  *
  * Every mirrored row carries `chain_id`, so one database can hold several
  * workspaces' chains without their rows meeting. The DDL keeps to the subset
  * Postgres and SQLite share, so the contract tests run it unchanged.
  */
+import { LEDGER_SIDE_TABLES, type LedgerSideTable } from "./postgresLedgerSideTables.js";
 import type { SyncPgClient } from "./syncPgClient.js";
 
 export interface MirroredTable {
@@ -43,6 +44,21 @@ const RUN_COLUMNS = [
 export const EVENT_READ_COLUMNS = EVENT_COLUMNS.filter((column) => column !== "chain_seq");
 
 export const SESSION_READ_COLUMNS = SESSION_COLUMNS;
+
+/** A side table's Postgres DDL: every column, keyed per chain, indexed by its scope. */
+function sideTable(table: LedgerSideTable): MirroredTable {
+  const columns = Object.keys(table.columns);
+  const types = columns.map((column) => `${column} ${table.columns[column] === "int" ? "BIGINT" : "TEXT"}`);
+  return {
+    name: table.name,
+    ddl: [
+      `CREATE TABLE IF NOT EXISTS ${table.name} (chain_id TEXT NOT NULL, ${types.join(", ")}, PRIMARY KEY (chain_id, ${table.key.join(", ")}))`,
+      `CREATE INDEX IF NOT EXISTS amc_${table.name}_scope ON ${table.name} (chain_id, ${table.scopeColumn})`
+    ],
+    columns,
+    sqliteSelect: `SELECT ${columns.join(", ")} FROM ${table.name} ORDER BY rowid ASC`
+  };
+}
 
 export const POSTGRES_MIRROR_TABLES: readonly MirroredTable[] = [
   {
@@ -118,16 +134,26 @@ export const POSTGRES_MIRROR_TABLES: readonly MirroredTable[] = [
     ],
     columns: RUN_COLUMNS,
     sqliteSelect: `SELECT ${RUN_COLUMNS.join(", ")} FROM runs ORDER BY rowid ASC`
-  }
+  },
+  ...LEDGER_SIDE_TABLES.map(sideTable)
 ];
 
 /** The chain head every append locks (`FOR UPDATE`) before it reads, so writers queue rather than fork. */
 const CHAIN_HEADS_DDL =
   "CREATE TABLE IF NOT EXISTS amc_chain_heads (chain_id TEXT PRIMARY KEY, head_hash TEXT NOT NULL, head_seq BIGINT NOT NULL)";
 
-/** Create every mirrored table and the chain-head table. Safe to repeat. */
+/**
+ * The side-table mirror's own hash chain: one entry per mirrored write, naming the scope and the parity digest of its
+ * rows after the write. Its head lives in `amc_chain_heads` under `<chainId>/ledger-mirror`.
+ */
+const MIRROR_LOG_DDL = `CREATE TABLE IF NOT EXISTS amc_ledger_mirror_log (chain_id TEXT NOT NULL, mirror_seq BIGINT NOT NULL, scope TEXT NOT NULL,
+  scope_digest TEXT NOT NULL, prev_hash TEXT NOT NULL, entry_hash TEXT NOT NULL, PRIMARY KEY (chain_id, mirror_seq), UNIQUE (chain_id, prev_hash))`;
+
+/** Create every mirrored table, the chain-head table and the mirror log. Safe to repeat. */
 export function ensurePostgresSchema(client: SyncPgClient): void {
   client.query(CHAIN_HEADS_DDL);
+  client.query(MIRROR_LOG_DDL);
+  client.query("CREATE INDEX IF NOT EXISTS amc_ledger_mirror_scope ON amc_ledger_mirror_log (chain_id, scope, mirror_seq)");
   for (const table of POSTGRES_MIRROR_TABLES) {
     for (const statement of table.ddl) client.query(statement);
   }

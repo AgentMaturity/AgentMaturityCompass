@@ -6,6 +6,10 @@
  * is refused before anything is uploaded. Nothing is ever deleted and no retention is shortened; objects are addressed
  * by their sha256, so a re-export uploads only what the target does not hold.
  *
+ * Beside the segments goes one ledger side-table segment (wormSideTables.ts, P2-36): A4's and the action journal's
+ * rows, which retention segments do not carry. The index names it as `sideTables`; an index without it is an older
+ * export, verified as before and reported as not covering A4.
+ *
  * Offline verification (`verifyWormExport`) needs the downloaded objects and a trust list: the index and segment
  * signatures must come from a key the trust list admits for artifact-seal. A key carried by the export never vouches
  * for itself. The record-keeping duties themselves (D-08 experts) are out of scope; AMC claims no regulatory status.
@@ -26,6 +30,7 @@ import { ensureDir, pathExists } from "../../utils/fs.js";
 import { sha256Hex } from "../../utils/hash.js";
 import { canonicalize } from "../../utils/json.js";
 import { listRetentionSegments, verifyRetentionSegment } from "./retentionArchive.js";
+import { sideTableSegment, verifySideTableSegment } from "./wormSideTables.js";
 import { retentionSegmentManifestSchema, retentionSegmentSignatureSchema } from "./retentionSchema.js";
 
 export interface WormTarget {
@@ -49,7 +54,8 @@ const segmentSchema = z.strictObject({
 });
 const indexSchema = z.strictObject({
   v: z.literal(1), type: z.literal("amc.worm-export-index"), targetKind: z.string().min(1),
-  signerPublicKeyPem: z.string().min(1), objects: z.array(objectSchema), segments: z.array(segmentSchema)
+  signerPublicKeyPem: z.string().min(1), objects: z.array(objectSchema), segments: z.array(segmentSchema),
+  sideTables: z.strictObject({ data: z.string().min(1), manifest: z.string().min(1) }).optional()
 });
 const signedIndexSchema = z.strictObject({ index: indexSchema, digestSha256: z.string().length(64), signature: z.string().min(1) });
 type WormIndex = z.infer<typeof indexSchema>;
@@ -141,9 +147,19 @@ export async function exportRetentionSegments(p: { workspace: string; target: Wo
     objects.push(...stored);
     indexed.push({ segmentId: segment.manifest!.segmentId, segment: stored[0]!.key, manifest: stored[1]!.key, signature: stored[2]!.key });
   }
+  // Held as long as the ledger's newest row would be, and never shorter than any segment.
+  const side = sideTableSegment(p.workspace, (headTs) => {
+    const until = p.retainUntil({ endTs: headTs });
+    return until.getTime() > latest.getTime() ? until : latest;
+  });
+  if (side.retainUntil.getTime() > latest.getTime()) latest = side.retainUntil;
+  const sideObjects = [await putLocked(p.target, p.workspace, side.data, side.retainUntil, receipt),
+    await putLocked(p.target, p.workspace, side.manifest, side.retainUntil, receipt)];
+  objects.push(...sideObjects);
   const sealKey = getSigningKey(p.workspace, "artifact-seal");
   const index: WormIndex = { v: 1, type: "amc.worm-export-index", targetKind: p.target.kind,
-    signerPublicKeyPem: createPublicKey(sealKey).export({ format: "pem", type: "spki" }).toString(), objects, segments: indexed };
+    signerPublicKeyPem: createPublicKey(sealKey).export({ format: "pem", type: "spki" }).toString(), objects, segments: indexed,
+    sideTables: { data: sideObjects[0]!.key, manifest: sideObjects[1]!.key } };
   const digest = sha256Hex(canonicalize(index));
   const signed = Buffer.from(JSON.stringify({ index, digestSha256: digest, signature: signHexDigest(digest, sealKey) }, null, 2));
   const indexObject = await putLocked(p.target, p.workspace, signed, latest, receipt);
@@ -224,6 +240,13 @@ export function verifyWormExport(p: { indexFile: string; objectsDir: string; tru
     } catch {
       errors.push(`segment ${entry.segmentId}: unreadable`);
     }
+  }
+  if (signed.index.sideTables === undefined) {
+    errors.push("side tables: this export carries no ledger side-table segment, so it does not cover A4 or the action journal");
+  } else {
+    const [data, manifest] = [signed.index.sideTables.data, signed.index.sideTables.manifest].map((key) => byKey.get(key) ?? null);
+    if (!data || !manifest) errors.push("side tables: objects missing or altered");
+    else verifySideTableSegment(data, manifest, errors);
   }
   return { ok: errors.length === 0, errors };
 }
