@@ -1274,7 +1274,6 @@
     {"id":"1467633ca6a99b0d02a73cb7d2a948f3e84c7f66b2204887d98f6238ab55249d","file":"src/wire/wireClient.ts","kind":"exports"},
     {"id":"14733046ce3366c84b29ea29486073f893a17faf4cc1263945f59d895af45e95","file":"src/assurance/packs/overthinkingDetectionPack.ts","kind":"types"},
     {"id":"14a11dda1a3ed811c498c37b60e2a34b3996ee3a41781d68a6e8bfb3f732b001","file":"src/cgx/cgxSchema.ts","kind":"exports"},
-    {"id":"14b3011a6686685fbf2bf839270f16dd20e2a8deea27e9c4d3947c6a41b3cabd","file":"src/a4/a4Gates.ts","kind":"exports"},
     {"id":"14b5b93c570e6fd60be8953a46b3236c4e11e569090a09685836232a5f55121f","file":"src/audit/auditMapSchema.ts","kind":"exports"},
     {"id":"14c51cf064803d47833f176e7660a66a1b43270412e1b98168de73e53b2d5d8c","file":"src/credentials/index.ts","kind":"types"},
     {"id":"152046b2535373be0d78f7822394ec1038d2bb2135878a4b90a0506179de4b10","file":"src/benchmarks/replayBenchmarkCorpus.ts","kind":"types"},
