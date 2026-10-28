@@ -2,7 +2,7 @@
  "schemaVersion": 1,
  "key": "P2-17",
  "date": "2026-10-28",
- "commit": "29f8d2722193f3c69e3a45b64f5d98b90ca230ce",
+ "commit": "ce6fb85e5bd202cff4cbffb5b067886e15f3aba2",
  "branch": "rtd/w4-p2-17",
  "node": "v22.23.3",
  "pnpm": "10.33.0",
@@ -15,7 +15,7 @@
    "durationMs": 0
   },
   {
-   "cmd": "npx vitest run tests/adapterManifest.test.ts tests/harnessMatrix.test.ts tests/piConformanceMatrix.test.ts --maxWorkers=2",
+   "cmd": "npx vitest run tests/adapterManifest.test.ts tests/harnessMatrix.test.ts tests/dshAmcPlugin.test.ts tests/piConformanceMatrix.test.ts tests/conformance/piToolCall.conformance.test.ts tests/conformance/claudeCodeHooks.conformance.test.ts --maxWorkers=2",
    "exit": 0,
    "durationMs": 0
   },
@@ -68,18 +68,27 @@
    "cmd": "npm run -s check:docs-drift",
    "exit": 0,
    "durationMs": 0
+  },
+  {
+   "cmd": "npm pack --dry-run --json (packages/dsh-amc-plugin)",
+   "exit": 0,
+   "durationMs": 0
   }
  ],
  "tests": {
-  "total": 18,
-  "passed": 18,
+  "total": 41,
+  "passed": 34,
   "failed": 0,
-  "skipped": 0
+  "skipped": 7
  },
  "artifacts": [
   {
    "path": "SUPPORT_MATRIX.md",
-   "sha256": "4048af0c5d4d5e4e681428550842983fb4c007ca28899bc036a738fdc113ea2a"
+   "sha256": "792f767233ae938efbe61303bcde8cac3d8956f7470255faf4b22ddf5b6cf8e9"
+  },
+  {
+   "path": "PUBLISH.md",
+   "sha256": "68d4ac400c400cb65968285025d56d92eea3003ab81a88f46efa17139f4ee783"
   },
   {
    "path": "manifests/claude-code.json",
@@ -87,16 +96,16 @@
   },
   {
    "path": "manifests/codex.json",
-   "sha256": "729dc310f21bffd7adf09db4219dc51e7f667fbad593d36e90143c7deecd1e1a"
+   "sha256": "8051aa7e6305553bc6170e91434e87b403f97e5e5d3558cca19637e6c45c17c6"
   },
   {
    "path": "manifests/dsh.json",
-   "sha256": "4fd4431690f64b061503c284950ef7f5a3929f8272e2ac6b4bb8d22f4e3cfd94"
+   "sha256": "8aaf24a26df627de45a6ead4996f843865fc03c9eb27344ec13e296332a20940"
   },
   {
    "path": "manifests/pi.json",
    "sha256": "7779fcfbbf942b7e928b96b91940c560b38df2804fe50ad71facf96b687d011a"
   }
  ],
- "notes": "P2-17 part A only (manifests, generated matrix, draft policy). Local macOS run, not CI; durations not recorded. Mutation checks, each killed by tests/adapterManifest.test.ts then restored: M1 enforce accepted without a receipt case; M2 enforce accepted with onFailure proceeds/unknown; M3 record hash not compared; M4 case values not compared. Red before green: the first generator run refused every Pi case because the path splitter broke inside [version=1.0.2]; fixed by bracket-aware tokenizing. check:freeze fails at the base on other items' exception keys not yet in origin/main's allowedExceptionKeys; P2-17 adds no CLI command and no exception. Parts B (Codex hooks), C (DSH plugin) and D (GA docs, nightly harness workflow, npm pack for Sid) are not done."
+ "notes": "P2-17 parts A-D on rtd/w4-p2-17, local macOS arm64 run, not CI; durations not recorded. Skipped 7 = the opt-in Pi and Claude Code binary conformance suites (AMC_*_CONFORMANCE unset), which the new harness-conformance workflow runs; its first run is pending. A: manifests + generated matrix; mutations killed: enforce without a receipt case, onFailure not blocks, record hash not compared, case values not compared; red first: path splitter broke on [version=1.0.2]. B: Codex 0.165.0 (rust-v0.165.0, 360319d8) reviewed from source: PreToolUse fails open, so no Codex hook and no claim; binary not run. C: DSH 0.2.1-rc.2 (687f282e) reviewed; packages/dsh-amc-plugin gate tested against a fake Cordis context; mutations killed: missing-arguments guard dropped, order guard dropped, version gate dropped, outage allows, loose allow shape. No Bridge dsh provider, no installed run, so no DSH claim. D: support-status docs, harness-conformance.yml, npm pack dry-run and publish steps in PUBLISH.md (not published). check:freeze fails at the base on other items' exception keys; P2-17 adds no CLI command. check:qualification reports problems only in other folders."
 }

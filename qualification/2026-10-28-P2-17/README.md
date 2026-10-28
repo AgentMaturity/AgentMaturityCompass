@@ -1,9 +1,11 @@
-# P2-17 part A: adapter claim manifests and the harness support matrix
+# P2-17: govern any harness (parts A to D)
 
-Recorded on 2026-10-28 on local macOS arm64 (not CI) at commit `29f8d2722193f3c69e3a45b64f5d98b90ca230ce`.
+Recorded on 2026-10-28 on local macOS arm64 (not CI) at commit `ce6fb85e5bd202cff4cbffb5b067886e15f3aba2`, branch `rtd/w4-p2-17`.
 
-- Four manifests in `docs/adapters/manifests/`: Pi 1.0.2 and 1.0.4 (enforced at `tool_call`), Claude Code 2.1.296 (enforced at `PreToolUse` and `UserPromptSubmit`), backed by the P1-22 and P1-23 qualification records (hashes checked against each folder's `receipt.json`); DSH observe-only (launch capture, no qualified version); Codex unsupported (no integration yet).
-- `SUPPORT_MATRIX.md` here and `manifests/` are copies of the generated matrix and the manifests at that commit.
-- Tests: 18/18 across `tests/adapterManifest.test.ts`, `tests/harnessMatrix.test.ts`, `tests/piConformanceMatrix.test.ts`.
-- Mutation checks (each killed, then restored): enforce without a receipt case; enforce with `onFailure` other than `blocks`; record hash not compared; case values not compared.
-- Pending: Sid's approval of `docs/adapters/SUPPORT_POLICY.md` (a `DECISION:` comment on the P2-17 heading); parts B, C and D.
+- **A. Manifests and matrix.** Four manifests in `docs/adapters/manifests/` (copies in `manifests/`). Pi 1.0.2 and 1.0.4 are enforced at `tool_call`, and Claude Code 2.1.296 at `PreToolUse` and `UserPromptSubmit`. Both are backed by the P1-22 and P1-23 records, whose hashes are checked against each folder's `receipt.json`. `SUPPORT_MATRIX.md` is a copy of the generated matrix. The support policy is a draft pending Sid.
+- **B. Codex.** `@openai/codex@0.165.0` (tag `rust-v0.165.0`, commit `360319d8`) reviewed from source in `docs/source-reviews/P2-17-codex-hooks.md`. Its `PreToolUse` fails open, so AMC installs no Codex hook and claims nothing. The binary was not run.
+- **C. DSH plugin.** `@deepseek-ai/dsh@0.2.1-rc.2` (commit `687f282e`) reviewed in `docs/source-reviews/P2-17-dsh-plugin.md`. `packages/dsh-amc-plugin` gates `tools/pre-execute`, backed by a guard, and fails closed. It is tested against a fake Cordis context only. No Bridge `dsh` provider and no installed run exist, so there is no DSH claim.
+- **D. GA.** Support-status docs; `.github/workflows/harness-conformance.yml` (first run pending, in CI); `PUBLISH.md` with the `npm pack` dry run and Sid's publish steps (not published).
+- **Tests:** 34 passed, 7 skipped (the opt-in binary conformance suites), 0 failed.
+- **Mutation checks:** 9, all killed and restored (listed in `receipt.json`).
+- **Pending:** Sid approves `SUPPORT_POLICY.md` and accepts the DSH pre-release pin. Still to come: the first green nightly run, a recorded Codex or DSH binary run, the Bridge `dsh` provider and transport, and DSH session registration.

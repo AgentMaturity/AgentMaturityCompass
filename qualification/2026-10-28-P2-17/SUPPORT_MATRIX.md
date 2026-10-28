@@ -39,7 +39,8 @@ Not covered:
 
 Not covered:
 
-- every Codex tool call: AMC has no Codex integration; Codex's lifecycle hooks are not yet reviewed or qualified (P2-17 part B)
+- every Codex tool call: unsupported at 0.165.0 because PreToolUse fails open (a handler that errors, times out, exits other than 0 or 2, or is untrusted lets the call run), so AMC installs no Codex hook; see docs/source-reviews/P2-17-codex-hooks.md
+- observe mode through PostToolUse is not built
 
 ### dsh
 
@@ -50,7 +51,8 @@ Not covered:
 
 Not covered:
 
-- every DSH tool call: no native DSH hook is installed; the DSH plugin (P2-17 part C) is not built
+- every DSH tool call: packages/dsh-amc-plugin gates DSH's tools/pre-execute (arguments available, fails closed) but is tested only against a fake Cordis context; there is no Bridge dsh provider, session registration or recorded run of the pinned DSH 0.2.1-rc.2 (pre-release, pending Sid's acceptance), so nothing is claimed; see docs/source-reviews/P2-17-dsh-plugin.md
+- DSH sessions that did not load the plugin (an unresolvable plugin entry is skipped, not fatal)
 - DSH's own sandbox and approval settings (AMC does not rely on them)
 - custom plugins, changed profiles and direct web requests outside the gateway
 - the exec-by-path window after the last launcher hash
