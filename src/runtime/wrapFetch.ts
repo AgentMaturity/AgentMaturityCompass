@@ -297,6 +297,9 @@ async function applyLiquidStreamingTransform(
   });
 }
 
+/** A 3xx is returned, never followed: the egress check covered only the URL it was given (as residencyFetch does). */
+const noFollow = (init: RequestInit): RequestRedirect => init.redirect === "error" ? "error" : "manual";
+
 export function wrapFetch(originalFetch: FetchLike, opts: WrapFetchOptions): FetchLike {
   const providerId = providerFromGatewayBase(opts.gatewayBaseUrl);
   const timeoutMs = normalizePositiveInt(opts.timeoutMs, 30_000);
@@ -370,6 +373,7 @@ export function wrapFetch(originalFetch: FetchLike, opts: WrapFetchOptions): Fet
       checkScopedEgress(raceWorkspace, "provider", winnerCandidate.url, { agentId: opts.agentId, dataClasses: null, purpose: "steer-race" });
       const fetchWinner = await originalFetch(winnerCandidate.url, {
         ...finalInit,
+        redirect: noFollow(finalInit),
         ...(winnerCandidate.headers ? { headers: mergeHeaders(finalInit.headers, winnerCandidate.headers) } : {}),
         ...(winnerCandidate.bodyOverrides && typeof finalInit.body === "string" ? {
           body: JSON.stringify({ ...JSON.parse(finalInit.body), ...winnerCandidate.bodyOverrides })
@@ -434,6 +438,7 @@ export function wrapFetch(originalFetch: FetchLike, opts: WrapFetchOptions): Fet
           () =>
             originalFetch(finalUrl as RequestInfo | URL, {
               ...finalInit,
+              redirect: noFollow(finalInit),
               signal: combineSignals(finalInit.signal ?? undefined, timeoutSignal)
             }),
           { timeoutMs: timeoutMs + 1000 }

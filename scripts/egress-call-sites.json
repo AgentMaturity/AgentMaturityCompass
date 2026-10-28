@@ -12,12 +12,12 @@
   ],
   "sites": [
     {
-      "siteId": "src/a4/a4DeployVerify.ts:66:1",
+      "siteId": "src/a4/a4DeployVerify.ts:67:1",
       "path": "src/a4/a4DeployVerify.ts",
-      "line": 66,
+      "line": 67,
       "call": "request(",
-      "status": "deferred",
-      "reason": "Owner-only `amc a4 verify` GET of the operator's own deployment /readyz through resolveAndCheck with a pinned address, no redirects and size/time bounds. Operator verification traffic, not agent traffic; channel and kill-switch applicability need review before a residency guard. No exemption or coverage claim."
+      "status": "gated",
+      "reason": "Owner-run `amc a4 verify` GETs of the operator's own deployment /readyz and /healthz check network-tool residency with the A4 store's workspace immediately before each request, as AMC's own traffic (agentId system: kill-exempt). The typed refusal propagates, never recorded as a failed check. resolveAndCheck pinning, no redirects and the 5 s / 256 KiB bounds remain."
     },
     {
       "siteId": "src/adapters/hookForwarder.ts:71:1",
@@ -108,33 +108,33 @@
       "reason": "Gateway reachability GET checks and fetches the same full gateway POST endpoint with captured explicit workspace and bridge residency. Restrictive path prefixes need no root-path widening. Typed EgressBlocked escapes availability handling, so denial cannot trigger direct-provider fallback. Ordinary listener failures retain the existing fallback. Source-only; no synthetic/public classification or no-send proof for a multi-request scan."
     },
     {
-      "siteId": "src/bench/benchRegistryClient.ts:27:1",
+      "siteId": "src/bench/benchRegistryClient.ts:35:1",
       "path": "src/bench/benchRegistryClient.ts",
-      "line": 27,
+      "line": 35,
       "call": "fetch(",
       "status": "gated",
       "reason": "Benchmark registry GET uses captured private workspace scope and endpoint, prepared manual-redirect options, and network-tool residency immediately before fetch. API/CLI browse install explicit ALS scope; import passes captured explicit workspace and snapshots request/persistence inputs. Resource classes/purpose stay unknown; no payload-free exemption. Source-only; concurrent/prior requests, self-key browse integrity versus pinned import, global trust/environment timing, DNS, body/timeout and cache/temp limits remain."
     },
     {
-      "siteId": "src/bench/benchRegistryClient.ts:44:1",
+      "siteId": "src/bench/benchRegistryClient.ts:52:1",
       "path": "src/bench/benchRegistryClient.ts",
-      "line": 44,
+      "line": 52,
       "call": "fetch(",
       "status": "gated",
       "reason": "Benchmark registry GET uses captured private workspace scope and endpoint, prepared manual-redirect options, and network-tool residency immediately before fetch. API/CLI browse install explicit ALS scope; import passes captured explicit workspace and snapshots request/persistence inputs. Resource classes/purpose stay unknown; no payload-free exemption. Source-only; concurrent/prior requests, self-key browse integrity versus pinned import, global trust/environment timing, DNS, body/timeout and cache/temp limits remain."
     },
     {
-      "siteId": "src/bootstrap/bootstrap.ts:210:1",
+      "siteId": "src/bootstrap/bootstrap.ts:217:1",
       "path": "src/bootstrap/bootstrap.ts",
-      "line": 210,
+      "line": 217,
       "call": "httpRequest(",
       "status": "gated",
       "reason": "Bootstrap public-key GET uses captured absolute workspace and notary URL, prepared native GET options, network-tool admission before notary/auth persistence and again immediately before the same-URL native constructor. Unknown resource classes/purpose and system actor; native redirects are not followed. Source-only: earlier workspace/vault/owner/config/LAN effects and a late secret write remain possible. Later trustConfig/signer transports remain deferred; no complete notary, HTTPS, response-bound, region or legal qualification claim."
     },
     {
-      "siteId": "src/bridge/bridgeServer.ts:283:1",
+      "siteId": "src/bridge/bridgeServer.ts:284:1",
       "path": "src/bridge/bridgeServer.ts",
-      "line": 283,
+      "line": 284,
       "call": "residencyFetch(",
       "status": "gated",
       "reason": "residencyFetch checks the immediate gateway hop; final gateway HTTP and CONNECT hops have separate gated rows."
@@ -180,17 +180,17 @@
       "reason": "Alert watch POST uses action-entry cwd workspace, captured endpoint and prepared JSON/options, followed by adjacent synchronous network-tool admission and manual-redirect fetch. Null resource classes/purpose and system actor; test/watch config and watch timeline use captured workspace. Typed refusal is logged inside the callback without throwing; response.ok controls sent reporting and other legacy swallowed errors/timer overlap remain. Source-only; earlier channel effects, unsigned/reloaded config, global-fetch/DNS/timeout/response limits and actual source/region qualification remain."
     },
     {
-      "siteId": "src/cli.ts:842:1",
+      "siteId": "src/cli.ts:850:1",
       "path": "src/cli.ts",
-      "line": 842,
+      "line": 850,
       "call": "httpRequest(",
       "status": "deferred",
       "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
     },
     {
-      "siteId": "src/cli.ts:871:1",
+      "siteId": "src/cli.ts:879:1",
       "path": "src/cli.ts",
-      "line": 871,
+      "line": 879,
       "call": "httpRequest(",
       "status": "deferred",
       "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
@@ -204,17 +204,17 @@
       "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
     },
     {
-      "siteId": "src/crypto/signing/signer.ts:34:1",
+      "siteId": "src/crypto/signing/signer.ts:47:1",
       "path": "src/crypto/signing/signer.ts",
-      "line": 34,
+      "line": 47,
       "call": "http.request(",
       "status": "deferred",
       "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
     },
     {
-      "siteId": "src/crypto/signing/signer.ts:53:1",
+      "siteId": "src/crypto/signing/signer.ts:66:1",
       "path": "src/crypto/signing/signer.ts",
-      "line": 53,
+      "line": 66,
       "call": "http.request(",
       "status": "deferred",
       "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
@@ -236,9 +236,9 @@
       "reason": "Doctor rules capture one bridge probe URL and check known workspace before diagnostic lease issuance; both sequential carrier POSTs pass that scope to helper. Copied headers/prepared native options and body precede a final same-URL bridge gate; null resource facts, caller-declared agent header (system if absent), no independent actor/lease proof. Typed refusal rejects before connection mapping and becomes residency FAIL, not invalid config. Source-only; a late denial can follow lease/first POST and earlier local effects; ordinary deadline/draining and DNS/HTTP/proof limitations remain."
     },
     {
-      "siteId": "src/drift/alerts.ts:215:1",
+      "siteId": "src/drift/alerts.ts:275:1",
       "path": "src/drift/alerts.ts",
-      "line": 215,
+      "line": 275,
       "call": "requestImpl(",
       "status": "gated",
       "reason": "Private drift webhook receives captured explicit workspace and agent from dispatchAlert; prepared URL/options/secret headers are checked as callback immediately before requestImpl. Classes/purpose remain unknown. Native HTTP does not follow redirects; typed refusal rejects unchanged. Source-only; prior channel sends, monitor error suppression, unpinned DNS, no timeout/body cap and separate config/signature reads remain limits."
@@ -284,9 +284,9 @@
       "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
     },
     {
-      "siteId": "src/eval/llmApiIntegration.ts:159:1",
+      "siteId": "src/eval/llmApiIntegration.ts:226:1",
       "path": "src/eval/llmApiIntegration.ts",
-      "line": 159,
+      "line": 226,
       "call": "fetch(",
       "status": "deferred",
       "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
@@ -308,25 +308,25 @@
       "reason": "Generated policy-export source text, not executed by AMC here; generated application needs its own deployment controls."
     },
     {
-      "siteId": "src/gateway/server.ts:259:1",
+      "siteId": "src/gateway/server.ts:262:1",
       "path": "src/gateway/server.ts",
-      "line": 259,
+      "line": 262,
       "call": "impl(",
       "status": "gated",
       "reason": "Both final gateway HTTP paths check the trusted workspace registry before every attempt, outside breaker accounting. CONNECT tunnels are listed separately."
     },
     {
-      "siteId": "src/gateway/server.ts:1016:1",
+      "siteId": "src/gateway/server.ts:1006:1",
       "path": "src/gateway/server.ts",
-      "line": 1016,
+      "line": 1006,
       "call": "netConnect(",
       "status": "gated",
       "reason": "Strict CONNECT authority parsing supplies the actual socket host and port and an HTTPS root registry locator. After DNS and allowlist admission, a final synchronous checkEgress precedes netConnect using the trusted gateway workspace, lease-verified agent, network-tool channel and explicit unknown data classes. Typed residency refusal returns before socket creation. This seam does not prove TLS, an encrypted request path or payload classification, or physical region."
     },
     {
-      "siteId": "src/gateway/server.ts:1766:1",
+      "siteId": "src/gateway/server.ts:1760:1",
       "path": "src/gateway/server.ts",
-      "line": 1766,
+      "line": 1760,
       "call": "httpRequest(",
       "status": "exempt",
       "reason": "gatewayStatus probes the gateway health endpoint with a GET and no protected agent body or credentials; final provider requests are separate gated rows."
@@ -364,9 +364,9 @@
       "reason": "Synthetic finance fixture client checks network-tool residency and the kill switch with the finance composition's workspace and agent before each request is built (Unix sockets are located as localhost). Refusal is a DefiniteFailureError carrying the typed cause; the adapter rethrows it rather than reporting unknown, and the payee refresh denies by name."
     },
     {
-      "siteId": "src/llm/adapter/llmRuntime.ts:326:1",
+      "siteId": "src/llm/adapter/llmRuntime.ts:370:1",
       "path": "src/llm/adapter/llmRuntime.ts",
-      "line": 326,
+      "line": 370,
       "call": "this.transport(",
       "status": "gated",
       "reason": "LlmRuntime checks the trusted session workspace before injected or default transport dispatch."
@@ -468,28 +468,28 @@
       "reason": "residencyFetch checks each attempt using captured trusted workspace or ALS scope."
     },
     {
-      "siteId": "src/residency/checkEgress.ts:120:1",
+      "siteId": "src/residency/checkEgress.ts:144:1",
       "path": "src/residency/checkEgress.ts",
-      "line": 120,
+      "line": 144,
       "call": "fetch(",
       "status": "gated",
       "reason": "The helper checks the selected workspace registry/profile before native fetch; redirects do not forward automatically."
     },
     {
-      "siteId": "src/runtime/wrapFetch.ts:371:1",
+      "siteId": "src/runtime/wrapFetch.ts:374:1",
       "path": "src/runtime/wrapFetch.ts",
-      "line": 371,
+      "line": 374,
       "call": "originalFetch(",
       "status": "gated",
-      "reason": "wrapFetch's race winner re-fetch rechecks provider residency and the kill switch immediately before the direct candidate fetch, so a kill landing during the race refuses it. The race and the re-fetch use the race stage's workspace, else wrapFetch's configured workspace, else the scoped fallback."
+      "reason": "wrapFetch's race winner re-fetch rechecks provider residency and the kill switch immediately before the direct candidate fetch, so a kill landing during the race refuses it. The race and the re-fetch use the race stage's workspace, else wrapFetch's configured workspace, else the scoped fallback. Redirects are returned, never followed (redirect manual unless the caller asked for error), so a 3xx cannot reach an unchecked host."
     },
     {
-      "siteId": "src/runtime/wrapFetch.ts:435:1",
+      "siteId": "src/runtime/wrapFetch.ts:439:1",
       "path": "src/runtime/wrapFetch.ts",
-      "line": 435,
+      "line": 439,
       "call": "originalFetch(",
       "status": "gated",
-      "reason": "wrapFetch's ordinary dispatch checks provider residency and the kill switch (wrapFetch's configured workspace or the scoped fallback; agent from its configured agentId) synchronously before every attempt, outside the retry try block, so a typed refusal is never retried, caught or turned into a fallback, and a kill landing between attempts refuses the retry."
+      "reason": "wrapFetch's ordinary dispatch checks provider residency and the kill switch (wrapFetch's configured workspace or the scoped fallback; agent from its configured agentId) synchronously before every attempt, outside the retry try block, so a typed refusal is never retried, caught or turned into a fallback, and a kill landing between attempts refuses the retry. Redirects are returned, never followed (redirect manual unless the caller asked for error), so a 3xx cannot reach an unchecked host."
     },
     {
       "siteId": "src/sandbox/egress/shellEgressProxy.ts:102:1",
@@ -601,7 +601,7 @@
       "line": 95,
       "call": "fetch(",
       "status": "gated",
-      "reason": "Race fan-out checks every candidate URL with provider residency and the kill switch (RaceOptions workspace or scoped fallback; agent from wrapFetch's configured agentId) before any candidate is sent; one refusal refuses the race, so no fallback winner."
+      "reason": "Race fan-out checks every candidate URL with provider residency and the kill switch (RaceOptions workspace or scoped fallback; agent from wrapFetch's configured agentId) before any candidate is sent; one refusal refuses the race, so no fallback winner. Redirects are returned, never followed (redirect manual unless the caller asked for error), so a 3xx cannot reach an unchecked host."
     },
     {
       "siteId": "src/time/tsaClient.ts:110:1",
@@ -636,9 +636,9 @@
       "reason": "Native web_fetch and each web_search GET carry captured execution workspace/agent and authorization resource facts. checkScopedEgress rechecks after DNS/allowlist admission immediately before the pinned socket. Existing no-redirect, fixed-header and byte-cap constraints remain. Legacy direct-helper scope follows the conservative scoped fallback; a search refusal can follow earlier dispatched GETs, so composition uncertainty is retained. Source-only, not physical-region or legal approval evidence."
     },
     {
-      "siteId": "src/trust/trustConfig.ts:193:1",
+      "siteId": "src/trust/trustConfig.ts:211:1",
       "path": "src/trust/trustConfig.ts",
-      "line": 193,
+      "line": 211,
       "call": "httpRequest(",
       "status": "deferred",
       "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
@@ -668,17 +668,17 @@
       "reason": "Stale-socket probe of a local Unix domain socket path before listening, not a network destination."
     },
     {
-      "siteId": "src/workspaces/workspaceRouter.ts:1424:1",
+      "siteId": "src/workspaces/workspaceRouter.ts:1431:1",
       "path": "src/workspaces/workspaceRouter.ts",
-      "line": 1424,
+      "line": 1431,
       "call": "fetch(",
       "status": "exempt",
       "reason": "Embedded browser UI makes same-origin host API requests, not server-side outbound agent traffic."
     },
     {
-      "siteId": "src/workspaces/workspaceRouter.ts:1424:2",
+      "siteId": "src/workspaces/workspaceRouter.ts:1431:2",
       "path": "src/workspaces/workspaceRouter.ts",
-      "line": 1424,
+      "line": 1431,
       "call": "fetch(",
       "status": "exempt",
       "reason": "Embedded browser UI makes same-origin host API requests, not server-side outbound agent traffic."

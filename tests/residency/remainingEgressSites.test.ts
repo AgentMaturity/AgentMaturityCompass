@@ -7,6 +7,8 @@ import { mkdirSync, mkdtempSync, realpathSync, rmSync, writeFileSync } from "nod
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+import { probeDestination } from "../../src/a4/a4DeployVerify.js";
+import type { EgressCheck } from "../../src/enforce/egressAllowlist.js";
 import { installHookIntegration } from "../../src/adapters/hookIntegration.js";
 import { forwardProviderHookEvent } from "../../src/adapters/hookForwarder.js";
 import { postToBridge, type PiHookConfig } from "../../src/adapters/pi/piControlClient.js";
@@ -243,6 +245,62 @@ describe("wrapFetch ordinary dispatch", () => {
       steerPipeline: createSteerPipeline({ stages: [createRaceStage({ candidates: [{ id: "a", url: `${origin.url}/a` }] })] }) });
     await expect(wrapped(`${origin.url}/v1`, { method: "POST", body: "{}" })).rejects.toBeInstanceOf(EgressBlocked);
     expect(original).not.toHaveBeenCalled();
+    expect(origin.connections).toBe(0);
+  });
+});
+
+describe("A4 deployment verify (AMC's own operator traffic)", () => {
+  const egress = { addresses: ["127.0.0.1"], decision: { allowed: true, reason: "fixture" } } as unknown as EgressCheck;
+  const ready = Buffer.from(JSON.stringify({ status: "READY", reasons: [], checks: {}, ts: 1 }));
+  const fetched = () => vi.fn(async () => ({ status: 200, body: ready }));
+
+  test("an active kill switch does not refuse the readyz and healthz GETs (agentId system)", async () => {
+    await kill();
+    const fetch = fetched();
+    expect((await probeDestination(workspace, "deploy.example:8443", egress, fetch)).amcCheckStatus).toBe("reachable");
+    expect(fetch).toHaveBeenCalledTimes(2);
+  });
+
+  test("a residency block refuses typed before either GET", async () => {
+    blockResidency();
+    const fetch = fetched();
+    await expect(probeDestination(workspace, "deploy.example:8443", egress, fetch)).rejects.toBeInstanceOf(EgressBlocked);
+    expect(fetch).not.toHaveBeenCalled();
+  });
+});
+
+describe("wrapFetch and race never follow a redirect past the egress check", () => {
+  let redirector: Server;
+  let redirectUrl: string;
+  beforeEach(async () => {
+    // Every path answers 302 to the origin server, a destination these requests never checked.
+    redirector = createServer((req, res) => { req.resume(); res.writeHead(302, { location: `${origin.url}/elsewhere` }).end(); });
+    await new Promise<void>((done) => redirector.listen(0, "127.0.0.1", () => done()));
+    redirectUrl = `http://127.0.0.1:${(redirector.address() as { port: number }).port}`;
+  });
+  afterEach(async () => {
+    redirector.closeAllConnections();
+    await new Promise<void>((done) => redirector.close(() => done()));
+  });
+
+  test("ordinary dispatch returns the 302 unfollowed", async () => {
+    const wrapped = wrapFetch(fetch, { agentId: "default", gatewayBaseUrl: redirectUrl, forceBaseUrl: false, workspace });
+    expect((await wrapped(`${redirectUrl}/v1`, { method: "GET" })).status).toBe(302);
+    expect(origin.connections).toBe(0);
+  });
+
+  test("a race candidate's 302 is not followed", async () => {
+    await raceModels({ method: "POST", body: "{}" }, { workspace, agentId: "default", candidates: [{ id: "a", url: `${redirectUrl}/a` }] })
+      .catch(() => undefined);
+    expect(origin.connections).toBe(0);
+  });
+
+  test("the race winner re-fetch returns the 302 unfollowed", async () => {
+    const realFetch = globalThis.fetch;
+    vi.spyOn(globalThis, "fetch").mockImplementation(async () => new Response(JSON.stringify({ choices: [{ message: { content: "answer" } }] })));
+    const wrapped = wrapFetch((input, init) => realFetch(input, init), { agentId: "default", gatewayBaseUrl: redirectUrl, forceBaseUrl: false, workspace,
+      steerPipeline: createSteerPipeline({ stages: [createRaceStage({ candidates: [{ id: "a", url: `${redirectUrl}/a` }] })] }) });
+    expect((await wrapped(`${redirectUrl}/v1`, { method: "POST", body: "{}" })).status).toBe(302);
     expect(origin.connections).toBe(0);
   });
 });
