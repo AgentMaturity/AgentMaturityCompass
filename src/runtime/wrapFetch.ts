@@ -1,6 +1,7 @@
 import { logTrace } from "./traceLogger.js";
 import { withCircuitBreaker } from "../ops/circuitBreaker.js";
 import type { SteerPipeline, SteerRequestContext, SteerResponseContext } from "../steer/index.js";
+import { checkScopedEgress } from "../residency/checkEgress.js";
 import { raceModels, type RaceOptions } from "../steer/race.js";
 import {
   createLiquidStreamState,
@@ -355,7 +356,7 @@ export function wrapFetch(originalFetch: FetchLike, opts: WrapFetchOptions): Fet
         note: `race fan-out to ${raceOptions.candidates.length} candidates`
       });
 
-      const raceResult = await raceModels(finalInit, raceOptions);
+      const raceResult = await raceModels(finalInit, { ...raceOptions, agentId: opts.agentId });
 
       // Find the winning candidate's full result to build a proper Response
       const winnerIdx = raceResult.candidates.findIndex(c => c.id === raceResult.winnerId);
@@ -363,6 +364,7 @@ export function wrapFetch(originalFetch: FetchLike, opts: WrapFetchOptions): Fet
 
       // Re-fetch the winner to get the actual Response object
       // (raceModels consumed the response bodies for scoring)
+      checkScopedEgress(raceOptions.workspace, "provider", winnerCandidate.url, { agentId: opts.agentId, dataClasses: null, purpose: "steer-race" });
       const fetchWinner = await originalFetch(winnerCandidate.url, {
         ...finalInit,
         ...(winnerCandidate.headers ? { headers: mergeHeaders(finalInit.headers, winnerCandidate.headers) } : {}),

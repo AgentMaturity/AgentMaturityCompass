@@ -7,6 +7,12 @@
  * status --provider pi` does. It refuses a manifest for another provider or mode, a non-loopback Bridge for control,
  * a lease file that is not mode 0600, and a control manifest without the receipt keys AMC pinned at install. Those
  * keys are workspace keys: a verified receipt is a local audit trail, not a portable verdict.
+ *
+ * Egress: a POST to a remote (HTTPS, observe-mode) Bridge leaves the host, so it meets checkEgress (residency) on the
+ * `bridge` channel for the installation's workspace right before it is sent, as AMC's own traffic (agentId "system":
+ * a kill switch does not refuse the record of what the agent did). That check loads AMC's runtime (the ledger's native
+ * module included) into Pi's process, so it is imported only then; failing to load it refuses the POST. A loopback
+ * Bridge is AMC's own local process, which checks its own onward hops: that POST stays dependency-free.
  */
 import { verifyWithKey } from "../../keys/algorithmPolicy.js";
 import { readFileSync, statSync } from "node:fs";
@@ -22,6 +28,8 @@ export const PI_OBSERVE_PATH = "/bridge/hooks/aep/0.1/events";
 const LOOPBACK_HOSTS = new Set(["127.0.0.1", "localhost", "::1", "[::1]"]);
 
 export interface PiHookConfig {
+  /** The AMC workspace the installation belongs to: its residency registry governs a remote Bridge. */
+  readonly workspace: string;
   readonly agentId: string;
   readonly bridgeBase: string;
   readonly token: string;
@@ -66,7 +74,7 @@ export function readPiHookConfig(workspace: string, mode: "observe" | "control")
   const keys = manifest.receiptPublicKeys;
   const receiptPublicKeys = Array.isArray(keys) ? keys.filter((key): key is string => typeof key === "string" && key.includes("PUBLIC KEY")) : [];
   if (mode === "control" && receiptPublicKeys.length === 0) throw new Error("Pi hook manifest pins no AMC receipt keys");
-  return { agentId: text(manifest.agentId, "agentId"), bridgeBase: bridge.origin, token, receiptPublicKeys };
+  return { workspace, agentId: text(manifest.agentId, "agentId"), bridgeBase: bridge.origin, token, receiptPublicKeys };
 }
 
 /**
@@ -77,8 +85,14 @@ export function readPiHookConfig(workspace: string, mode: "observe" | "control")
  */
 export async function postToBridge(config: PiHookConfig, path: string, body: string, timeoutMs: number,
   headers: Record<string, string> = {}): Promise<unknown> {
+  const url = `${config.bridgeBase}${path}`;
+  const remote = !LOOPBACK_HOSTS.has(new URL(url).hostname);
   return withHookDeadline(timeoutMs, async (signal) => {
-    const response = await fetch(`${config.bridgeBase}${path}`, {
+    if (remote) {
+      const { checkEgress } = await import("../../residency/checkEgress.js");
+      checkEgress({ workspace: config.workspace, channel: "bridge", url, agentId: "system", dataClasses: null, purpose: "provider-hook" });
+    }
+    const response = await fetch(url, {
       method: "POST",
       redirect: "error",
       signal,

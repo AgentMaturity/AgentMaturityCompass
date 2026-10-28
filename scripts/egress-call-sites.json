@@ -12,6 +12,38 @@
   ],
   "sites": [
     {
+      "siteId": "src/adapters/hookForwarder.ts:71:1",
+      "path": "src/adapters/hookForwarder.ts",
+      "line": 71,
+      "call": "fetch(",
+      "status": "gated",
+      "reason": "Hook event, correlation and control POSTs to AMC's Bridge check bridge residency with the hook's workspace immediately before fetch, outside each retry loop, as AMC's own traffic (agentId system: kill-exempt; the Bridge's control route enforces the kill). Typed refusal is not retried or reported as unavailable; Claude Code control answers a named residency deny."
+    },
+    {
+      "siteId": "src/adapters/hookForwarder.ts:174:1",
+      "path": "src/adapters/hookForwarder.ts",
+      "line": 174,
+      "call": "fetch(",
+      "status": "gated",
+      "reason": "Hook event, correlation and control POSTs to AMC's Bridge check bridge residency with the hook's workspace immediately before fetch, outside each retry loop, as AMC's own traffic (agentId system: kill-exempt; the Bridge's control route enforces the kill). Typed refusal is not retried or reported as unavailable; Claude Code control answers a named residency deny."
+    },
+    {
+      "siteId": "src/adapters/hookForwarder.ts:273:1",
+      "path": "src/adapters/hookForwarder.ts",
+      "line": 273,
+      "call": "fetch(",
+      "status": "gated",
+      "reason": "Hook event, correlation and control POSTs to AMC's Bridge check bridge residency with the hook's workspace immediately before fetch, outside each retry loop, as AMC's own traffic (agentId system: kill-exempt; the Bridge's control route enforces the kill). Typed refusal is not retried or reported as unavailable; Claude Code control answers a named residency deny."
+    },
+    {
+      "siteId": "src/adapters/hookForwarder.ts:423:1",
+      "path": "src/adapters/hookForwarder.ts",
+      "line": 423,
+      "call": "fetch(",
+      "status": "gated",
+      "reason": "Hook event, correlation and control POSTs to AMC's Bridge check bridge residency with the hook's workspace immediately before fetch, outside each retry loop, as AMC's own traffic (agentId system: kill-exempt; the Bridge's control route enforces the kill). Typed refusal is not retried or reported as unavailable; Claude Code control answers a named residency deny."
+    },
+    {
       "siteId": "src/adapters/hookIntegration.ts:1678:1",
       "path": "src/adapters/hookIntegration.ts",
       "line": 1678,
@@ -34,6 +66,14 @@
       "call": "fetch(",
       "status": "deferred",
       "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
+    },
+    {
+      "siteId": "src/adapters/pi/piControlClient.ts:95:1",
+      "path": "src/adapters/pi/piControlClient.ts",
+      "line": 95,
+      "call": "fetch(",
+      "status": "gated",
+      "reason": "Pi extension POSTs to a remote (HTTPS, observe-mode) Bridge lazily load checkEgress and check bridge residency with the installation workspace as AMC's own traffic (agentId system, kill-exempt) before fetch; a load failure refuses the POST. A loopback Bridge is AMC's own local process and stays dependency-free inside Pi's process without a check."
     },
     {
       "siteId": "src/assurance/agentResponder.ts:378:1",
@@ -300,12 +340,12 @@
       "reason": "Prepared native webhook POST checks callback residency immediately before request construction; each captured injected-client attempt is also checked before invocation. Queue installs captured explicit ALS scope and typed denials bypass retry/queue round accounting, leaving PENDING. Shared dispatcher isolates only that typed refusal to its channel, letting other drains/finalization and truthful queued status continue. ALS supplies workspace only: actor system/unknown, classes/purpose null. Source-only; prior attempts/2xx callback failure, ordered blocking, lost partial receipts, trusted custom-client hops, DNS/default-agent and body limits remain."
     },
     {
-      "siteId": "src/lighthouse/finance/paymentServiceClient.ts:104:1",
+      "siteId": "src/lighthouse/finance/paymentServiceClient.ts:127:1",
       "path": "src/lighthouse/finance/paymentServiceClient.ts",
-      "line": 104,
+      "line": 127,
       "call": "httpRequest(",
-      "status": "exempt",
-      "reason": "Synthetic finance fixture client is restricted to a local Unix socket or literal 127.0.0.1; no real payment provider is supported."
+      "status": "gated",
+      "reason": "Synthetic finance fixture client checks network-tool residency and the kill switch with the finance composition's workspace and agent before each request is built (Unix sockets are located as localhost). Refusal is a DefiniteFailureError carrying the typed cause; the adapter rethrows it rather than reporting unknown, and the payee refresh denies by name."
     },
     {
       "siteId": "src/llm/adapter/llmRuntime.ts:326:1",
@@ -340,20 +380,20 @@
       "reason": "Both outbound transport requests use residencyFetch; explicit constructor workspace or ALS scope is required for regulated mounts."
     },
     {
-      "siteId": "src/mcp/oauth/discovery.ts:111:1",
+      "siteId": "src/mcp/oauth/discovery.ts:122:1",
       "path": "src/mcp/oauth/discovery.ts",
-      "line": 111,
+      "line": 122,
       "call": "fetch(",
-      "status": "deferred",
-      "reason": "OAuth discovery/token requests use pinned network policy; identity-region applicability and trusted workspace scope need integration."
+      "status": "gated",
+      "reason": "MCP OAuth challenge, metadata, token and registration requests check mcp-http residency and the kill switch with the operator workspace carried by resolveNativeMcpServer/authorizeNativeMcpCatalog (scoped fallback for direct library calls) immediately before fetch, outside the request catch. Typed refusal propagates past NativeMcpOAuthRefused and the config's oauthFailure mapping. Agent-path traffic: a kill refuses it. Unknown classes; identity-region applicability is the registry's."
     },
     {
-      "siteId": "src/mcp/oauth/discovery.ts:135:1",
+      "siteId": "src/mcp/oauth/discovery.ts:148:1",
       "path": "src/mcp/oauth/discovery.ts",
-      "line": 135,
+      "line": 148,
       "call": "fetch(",
-      "status": "deferred",
-      "reason": "OAuth discovery/token requests use pinned network policy; identity-region applicability and trusted workspace scope need integration."
+      "status": "gated",
+      "reason": "MCP OAuth challenge, metadata, token and registration requests check mcp-http residency and the kill switch with the operator workspace carried by resolveNativeMcpServer/authorizeNativeMcpCatalog (scoped fallback for direct library calls) immediately before fetch, outside the request catch. Typed refusal propagates past NativeMcpOAuthRefused and the config's oauthFailure mapping. Agent-path traffic: a kill refuses it. Unknown classes; identity-region applicability is the registry's."
     },
     {
       "siteId": "src/observability/otelExportTransport.ts:75:1",
@@ -420,12 +460,28 @@
       "reason": "The helper checks the selected workspace registry/profile before native fetch; redirects do not forward automatically."
     },
     {
-      "siteId": "src/sandbox/egress/shellEgressProxy.ts:82:1",
+      "siteId": "src/runtime/wrapFetch.ts:368:1",
+      "path": "src/runtime/wrapFetch.ts",
+      "line": 368,
+      "call": "originalFetch(",
+      "status": "gated",
+      "reason": "wrapFetch's race winner re-fetch rechecks provider residency and the kill switch immediately before the direct candidate fetch, so a kill landing during the race refuses it."
+    },
+    {
+      "siteId": "src/sandbox/egress/shellEgressProxy.ts:102:1",
       "path": "src/sandbox/egress/shellEgressProxy.ts",
-      "line": 82,
+      "line": 102,
       "call": "httpRequest(",
-      "status": "deferred",
-      "reason": "Shell proxy host/IP admission is not a residency check; protected payload classification and final-hop guard remain open."
+      "status": "gated",
+      "reason": "Each allowlist-admitted proxied HTTP request and CONNECT tunnel checks network-tool residency and the kill switch with the composition's trusted workspace and the executing agent (from the tool execution, never the proxied request) after DNS and allowlist admission, immediately before the socket. Refusal is a recorded deny row and 403; a running command is not interrupted and an open tunnel stays open. CONNECT uses the HTTPS root locator, as the gateway does."
+    },
+    {
+      "siteId": "src/sandbox/egress/shellEgressProxy.ts:120:1",
+      "path": "src/sandbox/egress/shellEgressProxy.ts",
+      "line": 120,
+      "call": "connect(",
+      "status": "gated",
+      "reason": "Each allowlist-admitted proxied HTTP request and CONNECT tunnel checks network-tool residency and the kill switch with the composition's trusted workspace and the executing agent (from the tool execution, never the proxied request) after DNS and allowlist admission, immediately before the socket. Refusal is a recorded deny row and 403; a running command is not interrupted and an open tunnel stays open. CONNECT uses the HTTPS root locator, as the gateway does."
     },
     {
       "siteId": "src/scanner/endpointProbe.ts:21:1",
@@ -460,20 +516,20 @@
       "reason": "Replacement-example source text, not a request execution."
     },
     {
-      "siteId": "src/score/faithfulness.ts:359:1",
+      "siteId": "src/score/faithfulness.ts:370:1",
       "path": "src/score/faithfulness.ts",
-      "line": 359,
+      "line": 370,
       "call": "fetch(",
-      "status": "deferred",
-      "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
+      "status": "gated",
+      "reason": "LLM-judge claim and verification POSTs check provider residency and the kill switch for config.workspace (scoped fallback when absent) immediately before fetch. A model call naming no provider: refused by stop_all and, failing closed, any provider kill. Typed refusal propagates instead of the simulated-score fallback. Library API with no AMC caller."
     },
     {
-      "siteId": "src/score/faithfulness.ts:398:1",
+      "siteId": "src/score/faithfulness.ts:410:1",
       "path": "src/score/faithfulness.ts",
-      "line": 398,
+      "line": 410,
       "call": "fetch(",
-      "status": "deferred",
-      "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
+      "status": "gated",
+      "reason": "LLM-judge claim and verification POSTs check provider residency and the kill switch for config.workspace (scoped fallback when absent) immediately before fetch. A model call naming no provider: refused by stop_all and, failing closed, any provider kill. Typed refusal propagates instead of the simulated-score fallback. Library API with no AMC caller."
     },
     {
       "siteId": "src/sdk/amcClient.ts:123:1",
@@ -516,12 +572,12 @@
       "reason": "Pattern string used to detect network capability, not a request execution."
     },
     {
-      "siteId": "src/steer/race.ts:86:1",
+      "siteId": "src/steer/race.ts:95:1",
       "path": "src/steer/race.ts",
-      "line": 86,
+      "line": 95,
       "call": "fetch(",
-      "status": "deferred",
-      "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
+      "status": "gated",
+      "reason": "Race fan-out checks every candidate URL with provider residency and the kill switch (RaceOptions workspace or scoped fallback; agent from wrapFetch's configured agentId) before any candidate is sent; one refusal refuses the race, so no fallback winner."
     },
     {
       "siteId": "src/time/tsaClient.ts:110:1",

@@ -1,6 +1,8 @@
 import { request as httpRequest, type ClientRequest, type IncomingMessage } from "node:http";
 import { isAbsolute } from "node:path";
 import { z } from "zod";
+import { checkScopedEgress, isEgressRefusal } from "../../residency/checkEgress.js";
+import { DefiniteFailureError } from "../../tools/toolTypes.js";
 import { canonicalize } from "../../utils/json.js";
 import { normalizePaymentArgs, paymentArgsSchema, paymentIdSchema, paymentReferenceSchema } from "./paymentArgs.js";
 
@@ -42,6 +44,9 @@ export interface PaymentServiceClientOptions {
   readonly token: string;
   /** Total deadline, including connection and response body: 1–60,000 ms, default 10,000. */
   readonly timeoutMs?: number;
+  /** The trusted workspace and agent each request is checked for (checkScopedEgress); absent uses the scoped fallback. */
+  readonly workspace?: string;
+  readonly agentId?: string;
 }
 
 type TransportReply =
@@ -53,7 +58,10 @@ const ERROR_CODES = new Set(["idempotency_key_required", "invalid_body", "unauth
   "payee_not_found", "currency_not_supported", "idempotency_key_reuse_mismatch", "account_not_found",
   "source_account_not_found", "payment_not_found", "original_transaction_not_found", "invalid_query", "invalid_date_range"]);
 
-/** Local synthetic provider only. This client does not grant approval, retry a payment, or follow redirects. */
+/**
+ * Local synthetic provider only. This client does not grant approval, retry a payment, or follow redirects. A request
+ * egress refuses throws a DefiniteFailureError before any socket is opened.
+ */
 export function createPaymentServiceClient(options: PaymentServiceClientOptions) {
   const hasSocket = options.socketPath !== undefined, hasUrl = options.baseUrl !== undefined;
   if (hasSocket === hasUrl) throw new Error("Configure exactly one payment API socketPath or baseUrl");
@@ -76,7 +84,22 @@ export function createPaymentServiceClient(options: PaymentServiceClientOptions)
   if (!Number.isSafeInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > 60_000) {
     throw new Error("Payment API timeoutMs must be an integer from 1 to 60000");
   }
-  const socketPath = options.socketPath, token = options.token;
+  const socketPath = options.socketPath, token = options.token, workspace = options.workspace, agentId = options.agentId;
+
+  /**
+   * Agent tool traffic (`network-tool`): residency and the kill switch, synchronously before the request is built. A
+   * refusal is a DefiniteFailureError carrying the typed refusal as its cause: nothing was sent, never `unknown`. The
+   * URL locates the destination for the registry; a Unix socket is named as localhost.
+   */
+  function preflight(path: string): void {
+    try {
+      checkScopedEgress(workspace, "network-tool", `http://${socketPath === undefined ? `127.0.0.1:${port}` : "localhost"}${path}`,
+        { ...(agentId === undefined ? {} : { agentId }), dataClasses: null, purpose: "finance-payment-api" });
+    } catch (error) {
+      if (isEgressRefusal(error)) throw new DefiniteFailureError(error.message, { cause: error });
+      throw error;
+    }
+  }
 
   function send(method: "GET" | "POST", path: string, body: string | undefined,
     idempotencyKey: string | undefined, signal?: AbortSignal): Promise<TransportReply> {
@@ -143,6 +166,7 @@ export function createPaymentServiceClient(options: PaymentServiceClientOptions)
 
   async function call<T>(method: "GET" | "POST", path: string, schema: z.ZodType<T>,
     signal?: AbortSignal, body?: string, idempotencyKey?: string): Promise<PaymentServiceResult<T>> {
+    preflight(path);
     const reply = await send(method, path, body, idempotencyKey, signal);
     if (reply.kind === "unknown") return reply;
     if (reply.statusCode >= 500) return { kind: "unknown", reason: "provider_server_error" };

@@ -50,9 +50,10 @@ interface Discovered {
   readonly resource: NativeMcpProtectedResource; readonly server: NativeMcpAuthorizationServer; readonly network: NativeMcpOAuthNetwork;
   readonly challengeScopes?: readonly string[];
 }
-async function discover(endpoint: URL, config: NativeMcpOAuthConfig, timeoutMs: number): Promise<Discovered> {
-  const network = nativeMcpOAuthNetwork(endpoint, config.allowPrivateNetwork === undefined ? {} : { allowPrivateNetwork: config.allowPrivateNetwork });
-  const challenge = await nativeMcpOAuthChallenge(endpoint, timeoutMs);
+async function discover(endpoint: URL, config: NativeMcpOAuthConfig, timeoutMs: number, workspace: string | undefined): Promise<Discovered> {
+  const network = nativeMcpOAuthNetwork(endpoint, { ...(config.allowPrivateNetwork === undefined ? {} : { allowPrivateNetwork: config.allowPrivateNetwork }),
+    ...(workspace === undefined ? {} : { workspace }) });
+  const challenge = await nativeMcpOAuthChallenge(endpoint, timeoutMs, network);
   const resource = await discoverNativeMcpProtectedResource(endpoint, challenge, timeoutMs, network);
   const server = await discoverNativeMcpAuthorizationServer(resource.authorizationServer, network, timeoutMs);
   return { resource, server, network, ...(challenge.scopes ? { challengeScopes: challenge.scopes } : {}) };
@@ -146,10 +147,12 @@ export async function authorizeNativeMcpOAuth(options: {
   readonly extraScopes?: readonly string[];
   readonly onAuthorizationUrl: (url: string) => void;
   readonly signal?: AbortSignal;
+  /** The operator's workspace: its residency registry and kill switch govern every OAuth request. */
+  readonly workspace?: string;
 }): Promise<NativeMcpOAuthReceipt> {
   const { endpoint, config, timeoutMs } = options;
   const development = isLoopbackHttp(endpoint);
-  const { resource, server, network, challengeScopes } = await discover(endpoint, config, timeoutMs);
+  const { resource, server, network, challengeScopes } = await discover(endpoint, config, timeoutMs, options.workspace);
   // authorization §Scope Selection Strategy: the challenge, else scopes_supported; plus operator scopes and step-up scopes.
   const scopes = union(config.scopes, challengeScopes ?? resource.scopesSupported, options.extraScopes);
   const callback = await loopbackCallback(config.redirectPort ?? 0, options.signal);
@@ -183,9 +186,10 @@ export async function resolveNativeMcpOAuth(options: {
   readonly config: NativeMcpOAuthConfig;
   readonly store: NativeMcpOAuthTokenStore;
   readonly timeoutMs: number;
+  readonly workspace?: string;
 }): Promise<{ readonly accessToken: string; readonly receipt: NativeMcpOAuthReceipt }> {
   const { endpoint, config, store, timeoutMs } = options;
-  const { resource, server, network } = await discover(endpoint, config, timeoutMs);
+  const { resource, server, network } = await discover(endpoint, config, timeoutMs, options.workspace);
   let grant = await store.load(server.issuer, resource.resource);
   if (!grant || (config.clientId !== undefined && grant.clientId !== config.clientId)) {
     return refuse(`MCP OAuth authorization is required (AUTH_REQUIRED). ${NATIVE_MCP_AUTHORIZE_HINT}`, "AUTH_REQUIRED");
