@@ -7,6 +7,7 @@ import { verifyCurrentPurposeCredentialSignature } from "../keys/purposeCredenti
 import { chainLeaf, loadDelegationChain, verifyChain } from "../agent/delegationChain.js";
 import { loadWorkloadTrustConfig } from "../identity/workload/workloadTrust.js";
 import { revokedLeaseIdSet } from "./leaseStore.js";
+import { regulatedLeaseProfile } from "./regulatedProfile.js";
 
 function fromBase64Url(encoded: string): Buffer {
   const normalized = encoded.replace(/-/g, "+").replace(/_/g, "/");
@@ -39,7 +40,10 @@ export interface VerifyLeaseOptions {
   revokedLeaseIds?: Set<string>;
   /** The class about to execute; a lease that names `executeActionClasses` must include it (AMC-1546). */
   actionClass?: ActionClass;
-  /** A regulated plan's maximum lease lifetime (P2-25, `regulatedLeaseProfile`); a longer-lived lease is refused. */
+  /**
+   * The maximum lease lifetime. Absent (every production caller), it is the active plan's cap read here
+   * (`regulatedLeaseProfile`, P2-25), and a plan that cannot be verified refuses every lease. Tests pass it explicitly.
+   */
   maxLifetimeMs?: number | null;
 }
 
@@ -90,7 +94,12 @@ export function verifyLeaseToken(input: VerifyLeaseOptions): VerifyLeaseResult {
     if (input.revokedLeaseIds?.has(payload.leaseId) || input.revokedLeaseIds?.has(agentLeaseRevocationId(payload.agentId))) {
       return { ok: false, payload, error: "lease revoked" };
     }
-    if (input.maxLifetimeMs != null && payload.expiresTs - payload.issuedTs > input.maxLifetimeMs) {
+    const profile = input.maxLifetimeMs === undefined ? regulatedLeaseProfile(input.workspace) : null;
+    if (profile !== null && !profile.verified) {
+      return { ok: false, payload, error: "lease refused: the active compiled plan cannot be verified, so its lease lifetime cap is unknown" };
+    }
+    const maxLifetimeMs = profile === null ? input.maxLifetimeMs : profile.maxLeaseTtlMs;
+    if (maxLifetimeMs != null && payload.expiresTs - payload.issuedTs > maxLifetimeMs) {
       return { ok: false, payload, error: "lease lifetime exceeds the regulated plan's maximum" };
     }
     const chain = payload.v === 2 ? delegationChainRefusal(input.workspace, payload, input.revokedLeaseIds) : null;

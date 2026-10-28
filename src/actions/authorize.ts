@@ -25,7 +25,6 @@ import { lifecycleAdmission } from "../lifecycle/reassessment.js";
 import type { EffectDeclaration } from "../toolhub/toolsSchema.js";
 import { revokedLeaseIdSet } from "../leases/leaseStore.js";
 import { verifyLeaseToken } from "../leases/leaseVerifier.js";
-import { regulatedLeaseProfile } from "../leases/regulatedProfile.js";
 import { findToolDefinition, loadVerifiedToolsConfigSnapshot } from "../toolhub/toolhubValidators.js";
 import type { ToolExecution } from "../tools/toolTypes.js";
 import type { ActionClass } from "../types.js";
@@ -200,8 +199,7 @@ export function checkLease(execution: Pick<ToolExecution, "workspace" | "agentId
   const workspace = execution.workspace;
   try {
     const verified = verifyLeaseToken({ workspace, token, expectedAgentId: execution.agentId, requiredScope: "toolhub:execute",
-      expectedWorkspaceId: workspaceIdFromDirectory(workspace), actionClass: execution.actionClass, revokedLeaseIds: revokedLeaseIdSet(workspace),
-      maxLifetimeMs: regulatedLeaseProfile(workspace).maxLeaseTtlMs });
+      expectedWorkspaceId: workspaceIdFromDirectory(workspace), actionClass: execution.actionClass, revokedLeaseIds: revokedLeaseIdSet(workspace) });
     if (verified.ok && verified.payload) return { payload: verified.payload };
     return failed(LEASE_ERRORS[verified.error ?? ""] ?? "scope_widened", verified.error ?? "lease refused");
   } catch (error) {

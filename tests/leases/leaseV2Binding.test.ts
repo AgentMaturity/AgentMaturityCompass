@@ -90,7 +90,7 @@ describe("lease v2 binding", () => {
     const { token } = lease({ ttlMs: HOUR });
     expect(verifyLeaseToken({ workspace, token, maxLifetimeMs: HOUR / 2 })).toMatchObject({ ok: false, error: /exceeds the regulated plan's maximum/ });
     expect(verifyLeaseToken({ workspace, token, maxLifetimeMs: null }).ok).toBe(true);
-    expect(leaseLifetimeRefusal({ regulated: true, maxLeaseTtlMs: HOUR / 2 }, HOUR)).toMatch(/60 minutes exceeds the regulated plan's maximum of 30 minutes/);
+    expect(leaseLifetimeRefusal({ regulated: true, maxLeaseTtlMs: HOUR / 2, verified: true }, HOUR)).toMatch(/60 minutes exceeds the regulated plan's maximum of 30 minutes/);
   });
 });
 
