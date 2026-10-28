@@ -1,4 +1,4 @@
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync, utimesSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Worker } from "node:worker_threads";
@@ -29,6 +29,15 @@ test("a torn request/sidecar pair is re-read until consistent; a lasting digest 
     const newSig = readFileSync(sig);
     writeFileSync(sig, oldSig);
     expect(() => loadApprovalRequestRecord({ workspace, agentId: "default", approvalRequestId })).toThrow("digest mismatch");
+    // A mismatch on a body written long ago is tampering, not a write in progress: refused without the wait, so a
+    // tampered request cannot stall every reader for the retry budget.
+    const body = approvalConsumptionPaths({ workspace, agentId: "default", approvalRequestId }).request;
+    const longAgo = new Date(Date.now() - 60_000);
+    utimesSync(body, longAgo, longAgo);
+    const started = Date.now();
+    expect(() => loadApprovalRequestRecord({ workspace, agentId: "default", approvalRequestId })).toThrow("digest mismatch");
+    expect(Date.now() - started).toBeLessThan(200);
+    utimesSync(body, new Date(), new Date());
 
     // The writer's sidecar lands while this thread is inside the read.
     const writer = new Worker(`const { parentPort } = require("node:worker_threads"); const { writeFileSync, renameSync } = require("node:fs");
