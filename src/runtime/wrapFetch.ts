@@ -23,6 +23,8 @@ export interface WrapFetchOptions {
   retryNonIdempotent?: boolean;
   circuitName?: string;
   steerPipeline?: SteerPipeline;
+  /** Trusted workspace for the egress check; absent uses the scoped fallback (ALS scope, else an unregulated cwd only). */
+  workspace?: string;
 }
 
 export type FetchLike = typeof fetch;
@@ -356,7 +358,8 @@ export function wrapFetch(originalFetch: FetchLike, opts: WrapFetchOptions): Fet
         note: `race fan-out to ${raceOptions.candidates.length} candidates`
       });
 
-      const raceResult = await raceModels(finalInit, { ...raceOptions, agentId: opts.agentId });
+      const raceWorkspace = raceOptions.workspace ?? opts.workspace;
+      const raceResult = await raceModels(finalInit, { ...raceOptions, workspace: raceWorkspace, agentId: opts.agentId });
 
       // Find the winning candidate's full result to build a proper Response
       const winnerIdx = raceResult.candidates.findIndex(c => c.id === raceResult.winnerId);
@@ -364,7 +367,7 @@ export function wrapFetch(originalFetch: FetchLike, opts: WrapFetchOptions): Fet
 
       // Re-fetch the winner to get the actual Response object
       // (raceModels consumed the response bodies for scoring)
-      checkScopedEgress(raceOptions.workspace, "provider", winnerCandidate.url, { agentId: opts.agentId, dataClasses: null, purpose: "steer-race" });
+      checkScopedEgress(raceWorkspace, "provider", winnerCandidate.url, { agentId: opts.agentId, dataClasses: null, purpose: "steer-race" });
       const fetchWinner = await originalFetch(winnerCandidate.url, {
         ...finalInit,
         ...(winnerCandidate.headers ? { headers: mergeHeaders(finalInit.headers, winnerCandidate.headers) } : {}),
@@ -422,6 +425,8 @@ export function wrapFetch(originalFetch: FetchLike, opts: WrapFetchOptions): Fet
 
     let lastError: unknown;
     for (let attempt = 1; attempt <= totalAttempts; attempt += 1) {
+      // Synchronous, before each dispatch and outside the try: a typed refusal (isEgressRefusal) is never retried or caught.
+      checkScopedEgress(opts.workspace, "provider", finalUrl, { agentId: opts.agentId, dataClasses: null, purpose: "wrap-fetch" });
       try {
         const timeoutSignal = AbortSignal.timeout(timeoutMs);
         const response = await withCircuitBreaker(

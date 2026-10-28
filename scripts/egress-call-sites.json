@@ -12,6 +12,14 @@
   ],
   "sites": [
     {
+      "siteId": "src/a4/a4DeployVerify.ts:66:1",
+      "path": "src/a4/a4DeployVerify.ts",
+      "line": 66,
+      "call": "request(",
+      "status": "deferred",
+      "reason": "Owner-only `amc a4 verify` GET of the operator's own deployment /readyz through resolveAndCheck with a pinned address, no redirects and size/time bounds. Operator verification traffic, not agent traffic; channel and kill-switch applicability need review before a residency guard. No exemption or coverage claim."
+    },
+    {
       "siteId": "src/adapters/hookForwarder.ts:71:1",
       "path": "src/adapters/hookForwarder.ts",
       "line": 71,
@@ -74,6 +82,14 @@
       "call": "fetch(",
       "status": "gated",
       "reason": "Pi extension POSTs to a remote (HTTPS, observe-mode) Bridge lazily load checkEgress and check bridge residency with the installation workspace as AMC's own traffic (agentId system, kill-exempt) before fetch; a load failure refuses the POST. A loopback Bridge is AMC's own local process and stays dependency-free inside Pi's process without a check."
+    },
+    {
+      "siteId": "src/api/apiCli.ts:30:1",
+      "path": "src/api/apiCli.ts",
+      "line": 30,
+      "call": "net.createConnection(",
+      "status": "exempt",
+      "reason": "CLI liveness probe opens and immediately closes a TCP connection to the local Studio port (3212) with no payload; not outbound agent traffic."
     },
     {
       "siteId": "src/assurance/agentResponder.ts:378:1",
@@ -460,12 +476,20 @@
       "reason": "The helper checks the selected workspace registry/profile before native fetch; redirects do not forward automatically."
     },
     {
-      "siteId": "src/runtime/wrapFetch.ts:368:1",
+      "siteId": "src/runtime/wrapFetch.ts:371:1",
       "path": "src/runtime/wrapFetch.ts",
-      "line": 368,
+      "line": 371,
       "call": "originalFetch(",
       "status": "gated",
-      "reason": "wrapFetch's race winner re-fetch rechecks provider residency and the kill switch immediately before the direct candidate fetch, so a kill landing during the race refuses it."
+      "reason": "wrapFetch's race winner re-fetch rechecks provider residency and the kill switch immediately before the direct candidate fetch, so a kill landing during the race refuses it. The race and the re-fetch use the race stage's workspace, else wrapFetch's configured workspace, else the scoped fallback."
+    },
+    {
+      "siteId": "src/runtime/wrapFetch.ts:435:1",
+      "path": "src/runtime/wrapFetch.ts",
+      "line": 435,
+      "call": "originalFetch(",
+      "status": "gated",
+      "reason": "wrapFetch's ordinary dispatch checks provider residency and the kill switch (wrapFetch's configured workspace or the scoped fallback; agent from its configured agentId) synchronously before every attempt, outside the retry try block, so a typed refusal is never retried, caught or turned into a fallback, and a kill landing between attempts refuses the retry."
     },
     {
       "siteId": "src/sandbox/egress/shellEgressProxy.ts:102:1",
@@ -626,6 +650,22 @@
       "call": "reqFn(",
       "status": "deferred",
       "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
+    },
+    {
+      "siteId": "src/wire/wireClient.ts:276:1",
+      "path": "src/wire/wireClient.ts",
+      "line": 276,
+      "call": "connect(",
+      "status": "exempt",
+      "reason": "Connects to a local Unix domain socket path (AMC wire IPC), not a network destination."
+    },
+    {
+      "siteId": "src/wire/wireListener.ts:240:1",
+      "path": "src/wire/wireListener.ts",
+      "line": 240,
+      "call": "connect(",
+      "status": "exempt",
+      "reason": "Stale-socket probe of a local Unix domain socket path before listening, not a network destination."
     },
     {
       "siteId": "src/workspaces/workspaceRouter.ts:1424:1",

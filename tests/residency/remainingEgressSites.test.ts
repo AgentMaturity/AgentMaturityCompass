@@ -210,3 +210,39 @@ describe("steer race fan-out", () => {
     expect(original).not.toHaveBeenCalled();
   });
 });
+
+describe("wrapFetch ordinary dispatch", () => {
+  const wrap = (original: typeof fetch, extra: { maxRetries?: number } = {}) => wrapFetch(original, { agentId: "default",
+    gatewayBaseUrl: origin.url, forceBaseUrl: false, workspace, retryBaseDelayMs: 1, ...extra });
+
+  test("without a block the request reaches the provider", async () => {
+    expect((await wrap(fetch)(`${origin.url}/v1`, { method: "POST", body: "{}" })).status).toBe(201);
+    expect(origin.connections).toBe(1);
+  });
+
+  for (const [name, arrange, type] of BLOCKS) {
+    test(`${name} refuses typed before any socket, without a retry`, async () => {
+      await arrange();
+      const original = vi.fn(fetch);
+      await expect(wrap(original, { maxRetries: 3 })(`${origin.url}/v1`, { method: "GET" })).rejects.toBeInstanceOf(type);
+      expect(original).not.toHaveBeenCalled();
+      expect(origin.connections).toBe(0);
+    });
+  }
+
+  test("a kill that lands after a retriable status refuses the retry", async () => {
+    const original = vi.fn(async () => { await kill(); return new Response("busy", { status: 503 }); });
+    await expect(wrap(original, { maxRetries: 3 })(`${origin.url}/v1`, { method: "GET" })).rejects.toBeInstanceOf(KillSwitchDenied);
+    expect(original).toHaveBeenCalledTimes(1);
+  });
+
+  test("a race stage without its own workspace is checked against wrapFetch's", async () => {
+    blockResidency();
+    const original = vi.fn(fetch);
+    const wrapped = wrapFetch(original, { agentId: "default", gatewayBaseUrl: origin.url, forceBaseUrl: false, workspace,
+      steerPipeline: createSteerPipeline({ stages: [createRaceStage({ candidates: [{ id: "a", url: `${origin.url}/a` }] })] }) });
+    await expect(wrapped(`${origin.url}/v1`, { method: "POST", body: "{}" })).rejects.toBeInstanceOf(EgressBlocked);
+    expect(original).not.toHaveBeenCalled();
+    expect(origin.connections).toBe(0);
+  });
+});
