@@ -9,3 +9,9 @@ Recorded on 2026-10-28 on local macOS arm64 (not CI) at commit `ce6fb85e5bd202cf
 - **Tests:** 34 passed, 7 skipped (the opt-in binary conformance suites), 0 failed.
 - **Mutation checks:** 9, all killed and restored (listed in `receipt.json`).
 - **Pending:** Sid approves `SUPPORT_POLICY.md` and accepts the DSH pre-release pin. Still to come: the first green nightly run, a recorded Codex or DSH binary run, the Bridge `dsh` provider and transport, and DSH session registration.
+
+## Follow-on on the same branch (2026-10-28)
+
+- **DSH, AMC side:** Bridge provider `dsh` with a fixed argument schema per tool (`src/adapters/dsh/dshProvider.ts`), session registration (`src/bridge/dshSessionRegistry.ts`), installer (`--provider dsh`, control only) and transport (`src/adapters/dsh/dshControlClient.ts`), which the plugin loads by dynamic import. No DSH version is qualified, so the Bridge denies every DSH call.
+- **Codex observe:** route `/bridge/hooks/codex/v1`, recorder (`src/bridge/codexObservations.ts`, digests only), forwarder and installer (`--provider codex --mode observe`). Control is refused.
+- **Tests:** 312/312 across the 27 hook-path suites in `receipt.json`. Mutation checks are listed in its notes; one mutant was equivalent.

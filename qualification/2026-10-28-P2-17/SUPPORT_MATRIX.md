@@ -10,7 +10,7 @@ cited qualification record. Everything else is observed or not covered. The supp
 | Harness | Package | Qualified versions | Enforced at | Observed at | Status | Qualification record |
 |---|---|---|---|---|---|---|
 | claude-code | `@anthropic-ai/claude-code` | 2.1.296 | `PreToolUse`, `UserPromptSubmit` | `SessionStart`, `PostToolUse`, `PostToolUseFailure`, `Stop` | enforced at listed hooks | `qualification/2026-10-18-P1-23/claude-code-conformance.json` (2026-10-18, sha256 `7adc12dc0f1b`) |
-| codex | `@openai/codex` | none | none | none | unsupported: not qualified | none |
+| codex | `@openai/codex` | none (source pin `360319d8`) | none | `PostToolUse` | observe only, no qualified version | none |
 | dsh | `@deepseek-ai/dsh` | none (source pin `c389f96b`) | none | `launch (process boundary)`, `gateway (model traffic)` | observe only, no qualified version | none |
 | pi | `@earendil-works/pi-coding-agent` | 1.0.2, 1.0.4 | `tool_call` | `tool_result` | enforced at listed hooks | `qualification/2026-10-18-P1-22/pi-conformance.json` (2026-10-18, sha256 `d421dee04466`) |
 
@@ -37,10 +37,16 @@ Not covered:
 
 ### codex
 
+| Hook | Role | Tools | On hook failure | Backing cases | Contract |
+|---|---|---|---|---|---|
+| `PostToolUse` | observe | every tool Codex reports at PostToolUse | proceeds | none | docs/adapters/codex.md |
+
 Not covered:
 
-- every Codex tool call: unsupported at 0.165.0 because PreToolUse fails open (a handler that errors, times out, exits other than 0 or 2, or is untrusted lets the call run), so AMC installs no Codex hook; see docs/source-reviews/P2-17-codex-hooks.md
-- observe mode through PostToolUse is not built
+- every Codex tool call is uncontrolled: Codex 0.165.0's PreToolUse lets a call run when its hook fails, so AMC installs no Codex control hook; see docs/source-reviews/P2-17-codex-hooks.md
+- no Codex version is qualified: the observe hook has no recorded run of the pinned Codex binary
+- calls Codex does not report at PostToolUse, and sessions where Codex has not trusted the project hook
+- tool input and output contents (AMC records their SHA-256 only)
 
 ### dsh
 
@@ -51,7 +57,7 @@ Not covered:
 
 Not covered:
 
-- every DSH tool call: packages/dsh-amc-plugin gates DSH's tools/pre-execute (arguments available, fails closed) but is tested only against a fake Cordis context; there is no Bridge dsh provider, session registration or recorded run of the pinned DSH 0.2.1-rc.2 (pre-release, pending Sid's acceptance), so nothing is claimed; see docs/source-reviews/P2-17-dsh-plugin.md
+- every DSH tool call: AMC's plugin, Bridge provider, session registration and installer exist, but no DSH version is qualified and the pinned DSH 0.2.1-rc.2 (pre-release, pending Sid's acceptance) has no recorded run, so the Bridge denies every DSH call and nothing is claimed; see docs/source-reviews/P2-17-dsh-plugin.md
 - DSH sessions that did not load the plugin (an unresolvable plugin entry is skipped, not fatal)
 - DSH's own sandbox and approval settings (AMC does not rely on them)
 - custom plugins, changed profiles and direct web requests outside the gateway
