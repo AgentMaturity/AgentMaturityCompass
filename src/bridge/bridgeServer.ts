@@ -38,6 +38,7 @@ import {
 import { handleHookControlRequest } from "./hookControlRoute.js";
 import { guardHookAudit, hookAuditLatchState, latchedMessage } from "./hookAuditLatch.js";
 import { HookControlError, isHookProvider } from "./hookProviders.js";
+import { ACS_GUARDIAN_PATH, handleAcsGuardianHttp } from "../standards/acs/acsGuardianHttp.js";
 interface HandleBridgeRequestOptions {
   workspace: string;
   req: IncomingMessage;
@@ -292,9 +293,8 @@ async function forwardToGateway(params: {
   };
 }
 export async function handleBridgeRequest(options: HandleBridgeRequestOptions): Promise<boolean> {
-  if (!options.pathname.startsWith("/bridge/")) {
-    return false;
-  }
+  if (!options.pathname.startsWith("/bridge/")) return false;
+  if (options.pathname === ACS_GUARDIAN_PATH) return handleAcsGuardianHttp(options);
 
   if (options.pathname === "/bridge/health") {
     if ((options.req.method ?? "GET").toUpperCase() !== "GET") {
@@ -493,7 +493,7 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
     }
     const providerHeader = options.req.headers["x-amc-hook-provider"];
     const provider = Array.isArray(providerHeader) ? providerHeader[0] : providerHeader;
-    if (!isHookProvider(provider)) {
+    if (!isHookProvider(provider) || provider === "acs") {
       writeControlError(options.res, 400, "supported hook provider header required");
       return true;
     }
