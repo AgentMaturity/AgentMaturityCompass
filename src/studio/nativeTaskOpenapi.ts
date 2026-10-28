@@ -125,8 +125,12 @@ export function nativeTaskSchemas(): Record<string, unknown> {
       nextCursor: integer, firstCursor: integer, droppedEvents: integer, canResume: bool,
       resumeBlockedReason: nullableString, history: ref("NativeTaskHistory"),
       recovery: { oneOf: [{ type: "null" }, ref("NativeTaskRecovery")] },
-      execution: { oneOf: [{ type: "null" }, ref("ExecutionStatus")] }
+      execution: { oneOf: [{ type: "null" }, ref("ExecutionStatus")] },
+      delegation: { oneOf: [{ type: "null" }, ref("DelegationChain")] }
     }),
+    DelegationChain: { ...object({ chainDigest: digest, status: { type: "string", enum: ["verified", "refused", "unavailable"] }, reason: nullableString,
+      links: { type: "array", items: object({ linkId: string, depth: integer, principal: string, delegate: string, scopes: strings, notAfter: integer }) } }),
+      description: "The signed delegation chain the task runtime's v2 lease binds (P2-25, docs/AGENT_IDENTITY.md), from the human or declared service that authorized it to the runtime, re-verified on every read. Experimental." },
     NativeTaskVerificationScope: { ...object({ scope: { type: "string", enum: ["complete-ledger", "verified-prefix"] },
       unfinalizedSessions: { type: "array", items: string } }),
       description: "What an anchored verdict covers. verified-prefix (verification anchored-prefix): the task's session closed and sealed, every recorded row and every sealed session verified, while the listed unended, unsealed legacy sessions (a running gateway's) were named instead of failed; nothing is claimed about how they end." },

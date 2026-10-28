@@ -60,7 +60,13 @@ bindings:
     oidcSubjects: [{ issuer: https://login.microsoftonline.com/<tenant>/v2.0, subject: "<agent object id>" }]
 ```
 
-There is no CLI for this file yet (the CLI freeze holds); a follow-up adds one under a freeze exception.
+Manage it with the CLI (P2-25 freeze exception):
+
+```bash
+amc identity workload-trust publish trust.yaml   # validate and publish, signed (owner mode)
+amc identity workload-trust verify               # exits 1 when the signature or schema does not verify
+amc identity workload-trust show --json          # names and counts only, never key material
+```
 
 ## Delegation chains
 
@@ -83,6 +89,20 @@ the run.
 Verification results are cached per process by digest for at most one minute and never past the chain's earliest
 `notAfter`. Validity windows and revocations are rechecked on every call.
 
+### Who creates chains
+
+- **Session leases** (`issueSessionLease`, `src/leases/delegatedLease.ts`). A Studio native-task runtime, and a CLI, ACP or
+  native-schedule run under an identity-binding plan, gets a lease whose chain starts at the session's authenticated
+  users.yaml user (`human`, provider `LOCAL_USER`), or at a declared service when a caller names
+  one. With neither, a regulated profile mints nothing; elsewhere the lease is a v1 lease, as before.
+- **Child leases** (`issueChildLease`). Each in-process delegated child extends its parent's chain by one link to its
+  own `runAs`, narrowed to its delegation scope, ending no later than the parent's lease, and gets its own v2 lease.
+  The child lease lists the leases it descends from (`ancestorLeaseIds`), so revoking a parent lease revokes every
+  descendant. A v1 parent lease is inherited unchanged.
+
+These synchronous session paths sign links with the vault's lease key in-process, exactly as the lease that binds them
+is signed. `issueRootDelegation` and `extendDelegation` sign through the key-provider path for asynchronous callers.
+
 ## Lease v2
 
 A lease issued with `delegation: { chainDigest, spiffeId }` is version 2. It carries `delegationChainDigest` and
@@ -92,7 +112,10 @@ verify, is revoked, does not end at the lease's agent and SPIFFE ID, or ends bef
 keep working.
 
 The authorization record (P1-02) copies the chain digest and SPIFFE ID of a v2 lease into `delegation.chainDigest` and
-`delegation.spiffeId`, next to the principal it already records.
+`delegation.spiffeId`, next to the principal it already records. The started-action receipt's intent
+(`amc.action-intent/v1`) carries `delegation: { chainDigest, spiffeId, principal }`. Studio's native-task detail
+(`delegation` in the task API, and the console's task identity panel) shows the runtime lease's chain link by link,
+re-verified on every read.
 
 ### Regulated profiles
 
@@ -102,8 +125,9 @@ or verified also counts as regulated.
 - Static agent tokens are refused: "static agent tokens are disabled for regulated profiles; use a lease". A request
   that carries a static token beside a lease is refused as a whole.
 - The plan can cap lease lifetimes with the catalog parameter `toolPipeline.maxLeaseTtlMinutes` (enforced by the
-  `identity-binding` guard, strictness `min`). Leases longer than the cap are refused at issuance and at every
-  authorization-stage check. No shipped catalog control sets this parameter yet.
+  `identity-binding` guard, strictness `min`). Leases longer than the cap are refused at issuance and by
+  `verifyLeaseToken` on every path (authorization stage, Studio, gateway, bridge, toolhub). An active plan that cannot
+  be verified refuses every lease. No shipped catalog control sets this parameter yet.
 
 ### Migrating off static agent tokens
 

@@ -61,8 +61,10 @@ export interface VerifyLeaseResult {
 function delegationChainRefusal(workspace: string, payload: LeasePayload, revoked: Set<string> | undefined): string | null {
   const chain = loadDelegationChain(workspace, payload.delegationChainDigest ?? "");
   if (chain === null || chain.digest !== payload.delegationChainDigest) return "delegation chain unavailable for this lease";
-  const trust = loadWorkloadTrustConfig(workspace);
-  const verified = verifyChain(chain, { workspace, declaredServices: trust?.services ?? [], revokedIds: revoked ?? revokedLeaseIdSet(workspace) });
+  const trust = loadWorkloadTrustConfig(workspace), revokedIds = revoked ?? revokedLeaseIdSet(workspace);
+  // A delegated child's lease dies with any lease it descends from.
+  if (payload.ancestorLeaseIds?.some((id) => revokedIds.has(id))) return "lease revoked";
+  const verified = verifyChain(chain, { workspace, declaredServices: trust?.services ?? [], revokedIds });
   if (!verified.ok) return verified.reason.endsWith(" is revoked") ? "lease revoked" : `delegation chain refused: ${verified.reason}`;
   const leaf = chainLeaf(chain);
   if (leaf.delegate.agentId !== payload.agentId) return "delegation chain refused: its delegate is not this lease's agent";

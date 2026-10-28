@@ -13,7 +13,7 @@
 
 ## CLI Commands
 
-AMC provides 1,263 public CLI command paths in the live command inventory.
+AMC provides 1,267 public CLI command paths in the live command inventory.
 
 | # | Command | Description |
 |---|---------|-------------|
@@ -613,673 +613,677 @@ AMC provides 1,263 public CLI command paths in the live command inventory.
 | 594 | `amc identity provider` | Identity provider management |
 | 595 | `amc identity provider add` | Add an identity provider |
 | 596 | `amc identity verify` | Verify identity.yaml signature |
-| 597 | `amc import` | Import neutral traces, runs, workflow graphs, configs, memory, evals, and benchmarks |
-| 598 | `amc imports` | List, inspect, and roll back neutral import runs |
-| 599 | `amc imports list` | List recent neutral import runs |
-| 600 | `amc imports rollback` | Remove files written by a neutral import run |
-| 601 | `amc imports show` | Inspect a neutral import manifest |
-| 602 | `amc imports verify-profile` | Independently verify an external-evidence profile without opening a workspace |
-| 603 | `amc improve` | Guided improvement — shows what to fix next based on your current score |
-| 604 | `amc incident` | Incident tracking and response operations |
-| 605 | `amc incident clocks` | List an incident's regulatory reporting clocks for a station, or record a trigger or a submitted notice |
-| 606 | `amc incident close` | Close an incident with a resolution summary |
-| 607 | `amc incident create` | Create a manual incident |
-| 608 | `amc incident link` | Link evidence to an incident |
-| 609 | `amc incident list` | List incidents for an agent |
-| 610 | `amc incident oversight` | Append a signed human-oversight record (the auditor key proves the workspace, not the reviewer) |
-| 611 | `amc incident show` | Show incident details, or write its regulator evidence packet with --packet |
-| 612 | `amc incidents` | Incident operations and dispatch workflows |
-| 613 | `amc incidents alert` | Dispatch INCIDENT_CREATED to configured integration channels |
-| 614 | `amc incidents help` | Show incident-focused command groups |
-| 615 | `amc indices` | Compute deterministic failure-risk indices |
-| 616 | `amc indices fleet` | Compute failure-risk indices across fleet |
-| 617 | `amc ingest` | Ingest external logs/transcripts as SELF_REPORTED evidence |
-| 618 | `amc init` | Initialize .amc workspace |
-| 619 | `amc insider-alerts` | Show insider risk alerts |
-| 620 | `amc insider-risk-report` | Generate insider risk analytics report |
-| 621 | `amc insider-risk-scores` | Show insider risk scores by actor |
-| 622 | `amc integrate` | Generate integration scaffold for a framework |
-| 623 | `amc integrate-list` | List available integration frameworks |
-| 624 | `amc integrations` | Integration hub operations |
-| 625 | `amc integrations catalog` | List available integrations |
-| 626 | `amc integrations dispatch` | Dispatch a deterministic integration event |
-| 627 | `amc integrations export-journal` | Export integration delivery journal (receipts + dead letters) |
-| 628 | `amc integrations init` | Create and sign integrations.yaml with vault-backed secret refs |
-| 629 | `amc integrations setup` | Generate integration config files |
-| 630 | `amc integrations status` | Show integration channels and routing |
-| 631 | `amc integrations test` | Dispatch deterministic test event to an integration channel |
-| 632 | `amc integrations verify` | Verify integrations config signature |
-| 633 | `amc inventory` | AI asset inventory — discover and catalog AI agents, models, and tools |
-| 634 | `amc inventory list` | List AI assets (alias for 'inventory scan') |
-| 635 | `amc inventory scan` | Scan workspace for AI assets (agents, models, configs, API keys) |
-| 636 | `amc key-custody-modes` | List available key custody modes and their configurations |
-| 637 | `amc keys` | Purpose signing keys: list, rotate, revoke and export public keys |
-| 638 | `amc keys export-public` | Print a purpose's public key, key id and proof of possession, for an organisation's trust list |
-| 639 | `amc keys list` | List each signing purpose's key id, shared keys, history size, rotations, provider, algorithm and protection (public files only) |
-| 640 | `amc keys revoke` | Record a retired key's revocation in the workspace's signed, anchored key revocation list |
-| 641 | `amc keys rotate` | Rotate one purpose's key with a signed, chained statement (or bind the provider key keys.refs names); --resume completes or rolls back an interrupted change |
-| 642 | `amc lab-compare` | Compare two lab experiments |
-| 643 | `amc lab-create` | Create a new lab experiment |
-| 644 | `amc lab-list` | List all lab experiments |
-| 645 | `amc lab-report` | Generate a lab experiment report |
-| 646 | `amc lab-simulate` | Simulate the lab workflow with placeholder probe results (no model is called) |
-| 647 | `amc lab-templates` | List available experiment templates |
-| 648 | `amc leaderboard` | Benchmark leaderboard — compare agent maturity scores |
-| 649 | `amc leaderboard export` | Export leaderboard as JSON/HTML for public sharing |
-| 650 | `amc leaderboard public-export` | Build an anonymized public leaderboard dataset bundle |
-| 651 | `amc leaderboard show` | Show fleet-wide maturity leaderboard |
-| 652 | `amc learn` | Education flow for a specific maturity question |
-| 653 | `amc lease` | Issue/verify/revoke short-lived agent leases |
-| 654 | `amc lease issue` | - |
-| 655 | `amc lease resign-revocations` | Re-sign the lease revocation store as owner, only if its sha256 is the reviewed digest |
-| 656 | `amc lease revoke` | - |
-| 657 | `amc lease verify` | - |
-| 658 | `amc legal-hold` | Issue or manage legal holds |
-| 659 | `amc lessons-list` | List lessons learned from corrections |
-| 660 | `amc lessons-promote` | Promote a correction to a reusable lesson |
-| 661 | `amc lifecycle` | Agent lifecycle responsibility and governance mapping |
-| 662 | `amc lifecycle advance` | Advance lifecycle stage after governance gate confirmation |
-| 663 | `amc lifecycle reassessments` | Show a governed agent's lifecycle state and its reassessment records (JSON) |
-| 664 | `amc lifecycle status` | Show lifecycle stage, accountability matrix, governance gates, and transition trail |
-| 665 | `amc lifecycle transition` | Move a governed agent between proposed, approved, active, suspended and retired (signed, approval-bound; JSON) |
-| 666 | `amc lineage-claim` | Show full governance lineage for a specific claim |
-| 667 | `amc lineage-init` | Initialize governance lineage tables |
-| 668 | `amc lineage-policy-intents` | List all policy change intents for an agent |
-| 669 | `amc lineage-report` | Generate governance lineage report |
-| 670 | `amc lint` | Lint agent configuration files for schema compliance, anti-patterns, and best practices |
-| 671 | `amc lint rules` | List all available lint rules |
-| 672 | `amc lite-score` | Lite scoring mode for non-agent LLMs / chatbots — simplified assessment without agentic features |
-| 673 | `amc logs` | Print latest AMC Studio logs |
-| 674 | `amc loop` | Continuous self-serve maturity loop |
-| 675 | `amc loop init` | Initialize recurring loop config |
-| 676 | `amc loop plan` | Print recurring loop plan |
-| 677 | `amc loop run` | Run recurring diagnostic + assurance + dashboard + snapshot |
-| 678 | `amc loop schedule` | Print OS scheduler config (no automatic installation) |
-| 679 | `amc maintenance` | Operational maintenance operations |
-| 680 | `amc maintenance prune-cache` | Prune dashboard/console/transform cache artifacts |
-| 681 | `amc maintenance reindex` | Ensure operational SQLite indexes |
-| 682 | `amc maintenance rotate-logs` | Rotate Studio logs based on ops policy |
-| 683 | `amc maintenance stats` | Show DB/blob/archive/cache operational stats |
-| 684 | `amc maintenance vacuum` | Run SQLite VACUUM + ANALYZE |
-| 685 | `amc marketplace` | AMC Pack Marketplace — browse, install, rate community packs |
-| 686 | `amc marketplace deprecate` | Deprecate a pack |
-| 687 | `amc marketplace featured` | Show featured packs |
-| 688 | `amc marketplace info` | Show details for a specific pack |
-| 689 | `amc marketplace install` | Install a pack from the marketplace |
-| 690 | `amc marketplace list` | List installed packs |
-| 691 | `amc marketplace rate` | Rate a pack |
-| 692 | `amc marketplace search` | Search marketplace for packs |
-| 693 | `amc marketplace undeprecate` | Remove deprecation from a pack |
-| 694 | `amc marketplace uninstall` | Uninstall a pack |
-| 695 | `amc mcp` | AMC Model Context Protocol (MCP) server for AI coding assistants |
-| 696 | `amc mcp config` | Print MCP configuration snippets for supported AI coding assistants |
-| 697 | `amc mcp list-tools` | List all tools exposed by the AMC MCP server |
-| 698 | `amc mcp serve` | Start the AMC MCP server (stdio transport for IDE integration) |
-| 699 | `amc mechanic` | Mechanic Workbench (targets, plans, simulation) |
-| 700 | `amc mechanic export` | Export latest gap analysis as reward functions, DSPy targets, or fine-tune recipes |
-| 701 | `amc mechanic gap` | - |
-| 702 | `amc mechanic init` | - |
-| 703 | `amc mechanic plan` | Create, diff, approve, and execute upgrade plans |
-| 704 | `amc mechanic plan create` | - |
-| 705 | `amc mechanic plan diff` | - |
-| 706 | `amc mechanic plan execute` | - |
-| 707 | `amc mechanic plan request-approval` | - |
-| 708 | `amc mechanic plan show` | - |
-| 709 | `amc mechanic profile` | Apply one-click signed target profiles |
-| 710 | `amc mechanic profile apply` | - |
-| 711 | `amc mechanic profile list` | - |
-| 712 | `amc mechanic profile verify` | - |
-| 713 | `amc mechanic rca` | Generate fixer root-cause reports from trace failure indexes |
-| 714 | `amc mechanic rca list` | List generated fixer RCA reports |
-| 715 | `amc mechanic rca run` | Classify a failed run and create regression-preserving fix proposals |
-| 716 | `amc mechanic rca show` | Inspect a fixer RCA report |
-| 717 | `amc mechanic simulate` | - |
-| 718 | `amc mechanic simulations` | Show latest signed simulation artifact |
-| 719 | `amc mechanic targets` | Manage signed equalizer targets |
-| 720 | `amc mechanic targets apply` | - |
-| 721 | `amc mechanic targets init` | - |
-| 722 | `amc mechanic targets print` | - |
-| 723 | `amc mechanic targets set` | - |
-| 724 | `amc mechanic targets verify` | - |
-| 725 | `amc mechanic tuning` | Manage signed mechanic tuning intent |
-| 726 | `amc mechanic tuning apply` | - |
-| 727 | `amc mechanic tuning init` | - |
-| 728 | `amc mechanic tuning print` | - |
-| 729 | `amc mechanic tuning set` | - |
-| 730 | `amc mechanic tuning verify` | - |
-| 731 | `amc mechanic verify` | Verify mechanic signatures and artifacts |
-| 732 | `amc memory` | Memory maturity assessment and management |
-| 733 | `amc memory assess` | Full memory maturity assessment |
-| 734 | `amc memory retrieve` | Retrieve active reasoning memory for a consumer |
-| 735 | `amc memory show` | Show one reasoning memory item |
-| 736 | `amc memory writeback` | Write governed reasoning memory from an EpisodeRecord |
-| 737 | `amc memory-advisories` | Show advisories from correction memory for prompt injection |
-| 738 | `amc memory-expire` | Expire stale lessons past their TTL |
-| 739 | `amc memory-extract` | Extract lessons from verified effective corrections |
-| 740 | `amc memory-report` | Generate correction memory report |
-| 741 | `amc meta-confidence` | Report confidence in the maturity score itself |
-| 742 | `amc methodology` | Print the public AMC scoring methodology manifest and hash |
-| 743 | `amc metrics` | Prometheus metrics endpoint helpers |
-| 744 | `amc metrics status` | Show configured metrics endpoint bind/port |
-| 745 | `amc micro-canary-alerts` | Show active micro-canary alerts |
-| 746 | `amc micro-canary-report` | Generate micro-canary status report |
-| 747 | `amc micro-canary-run` | Run all micro-canary probes immediately |
-| 748 | `amc mirofish` | Agent behavior simulation framework — flight simulator for AI agents |
-| 749 | `amc mirofish compare` | Side-by-side comparison of two scenarios |
-| 750 | `amc mirofish create` | Interactive scenario builder |
-| 751 | `amc mirofish list` | List available built-in scenarios |
-| 752 | `amc mirofish run` | Run a Monte Carlo simulation with a scenario |
-| 753 | `amc mirofish stress` | Find governance breaking points for a scenario |
-| 754 | `amc mode` | Switch CLI role mode |
-| 755 | `amc mode agent` | Switch to agent mode (read-only / self-check commands) |
-| 756 | `amc mode owner` | Switch to owner mode (configuration + signing allowed) |
-| 757 | `amc monitor` | Continuous production monitoring — real-time scoring, drift detection, and alerting |
-| 758 | `amc monitor check` | One-shot trust drift analysis (check for degradation without running continuously) |
-| 759 | `amc monitor events` | Show recent monitoring events |
-| 760 | `amc monitor live` | Start real-time monitoring with live assurance checks on incoming traces |
-| 761 | `amc monitor metrics` | Get metrics for a specific agent |
-| 762 | `amc monitor start` | Start continuous monitoring: scores agent at intervals, detects drift, sends alerts on degradation |
-| 763 | `amc monitor status` | Show monitoring status for all agents |
-| 764 | `amc native-extension` | Inspect, explicitly sign and install declarative native context and prompt commands |
-| 765 | `amc native-extension inspect` | Read manifest/content hashes and workspace signature status without loading or writing |
-| 766 | `amc native-extension install` | Copy an already signed extension into the local plugin store without activation |
-| 767 | `amc native-extension sign` | Sign the exact reviewed manifest with existing AMC workspace BUNDLE signing policy |
-| 768 | `amc notary` | AMC Notary signing boundary operations |
-| 769 | `amc notary attest` | Generate signed notary runtime attestation bundle (.amcattest) |
-| 770 | `amc notary init` | Initialize AMC Notary config and signing backend |
-| 771 | `amc notary log-verify` | Verify notary append-only signing log + seal signature |
-| 772 | `amc notary pubkey` | Print notary public key and fingerprint |
-| 773 | `amc notary sign` | Sign a payload file using Notary (admin utility) |
-| 774 | `amc notary start` | Start AMC Notary service (foreground) |
-| 775 | `amc notary status` | Show notary backend and log status |
-| 776 | `amc notary verify-attest` | Verify a .amcattest bundle offline |
-| 777 | `amc observe` | Observability — timeline, anomaly detection, and tracing |
-| 778 | `amc observe anomalies` | Detect observability anomalies (evidence rate drops, trust regressions, score volatility) |
-| 779 | `amc observe timeline` | Show agent evidence timeline with score progression |
-| 780 | `amc openapi-generate` | Generate live OpenAPI spec (Studio + Bridge + Gateway) |
-| 781 | `amc operator-dashboard` | Generate operator dashboard showing why questions are capped and how to unlock |
-| 782 | `amc ops` | Operational hardening policy controls |
-| 783 | `amc ops backpressure` | Show backpressure pipeline health |
-| 784 | `amc ops circuit-breaker-init` | Initialize circuit breaker policy |
-| 785 | `amc ops circuit-breaker-reset` | Reset all circuit breakers |
-| 786 | `amc ops circuit-breaker-status` | Show circuit breaker status |
-| 787 | `amc ops dead-letters` | Show dead letter queue |
-| 788 | `amc ops init` | Create and sign .amc/ops-policy.yaml |
-| 789 | `amc ops latency` | Show latency accounting report |
-| 790 | `amc ops mode` | Show or set degradation mode |
-| 791 | `amc ops print` | Print effective ops policy |
-| 792 | `amc ops sign` | Re-sign an edited .amc/ops-policy.yaml so the ledger, retention and payload caps apply it |
-| 793 | `amc ops slo` | Show governance SLO dashboard |
-| 794 | `amc ops verify` | Verify ops-policy signature |
-| 795 | `amc org` | Org graph and real-time comparative scorecards |
-| 796 | `amc org add` | - |
-| 797 | `amc org add node` | - |
-| 798 | `amc org assign` | - |
-| 799 | `amc org commit` | - |
-| 800 | `amc org community` | Community/platform governance scoring |
-| 801 | `amc org community init` | - |
-| 802 | `amc org community score` | - |
-| 803 | `amc org compare` | - |
-| 804 | `amc org init` | - |
-| 805 | `amc org inspect` | - |
-| 806 | `amc org learn` | - |
-| 807 | `amc org own` | - |
-| 808 | `amc org report` | - |
-| 809 | `amc org roles` | List the canonical 70 AMC org roles |
-| 810 | `amc org run` | Run the advanced 70-role org lifecycle loop with isolated role workspaces |
-| 811 | `amc org runs` | List org lifecycle runs |
-| 812 | `amc org score` | - |
-| 813 | `amc org unassign` | - |
-| 814 | `amc org verify` | Verify signed org.yaml |
-| 815 | `amc outcomes` | Outcome contracts, value signals, and reports |
-| 816 | `amc outcomes attest` | Record a manual outcome signal (self-attested, SELF_REPORTED) |
-| 817 | `amc outcomes diff` | Diff two outcome reports |
-| 818 | `amc outcomes init` | Create and sign outcome contract |
-| 819 | `amc outcomes report` | Generate outcomes report (agent) or fleet outcomes report |
-| 820 | `amc outcomes verify` | Verify outcome contract signature |
-| 821 | `amc overhead-profile` | Set the overhead mode profile (STRICT, BALANCED, LEAN) |
-| 822 | `amc overhead-report` | Generate per-feature overhead accounting report |
-| 823 | `amc oversight` | Human oversight quality assessment |
-| 824 | `amc oversight assess` | Assess human oversight quality |
-| 825 | `amc own` | Ownership flow for top maturity gaps |
-| 826 | `amc pack` | Community assurance pack registry — NPM-style package management |
-| 827 | `amc pack info` | Show detailed information about a pack |
-| 828 | `amc pack init` | Initialize a new pack in <name>/ or an explicit --dir |
-| 829 | `amc pack install` | Install a community assurance pack |
-| 830 | `amc pack list` | List installed packs |
-| 831 | `amc pack publish` | Publish a pack to the registry |
-| 832 | `amc pack registry` | Pack registry management |
-| 833 | `amc pack registry init` | Initialize local pack registry |
-| 834 | `amc pack registry serve` | Start a local pack registry server |
-| 835 | `amc pack search` | Search for packs in the registry |
-| 836 | `amc pack test` | Test a local pack directory; defaults to cwd and auto-detects one child pack |
-| 837 | `amc pack uninstall` | Uninstall a pack |
-| 838 | `amc pair` | LAN pairing code operations |
-| 839 | `amc pair create` | Create one-time pairing code (LAN login pairing or agent bridge pairing) |
-| 840 | `amc pair redeem` | Redeem pairing code for a lease token file |
-| 841 | `amc passport` | Agent Passport (shareable maturity credential) |
-| 842 | `amc passport badge` | Print deterministic single-line badge from latest cache |
-| 843 | `amc passport capabilities-add` | Add capability declaration to agent passport |
-| 844 | `amc passport compare` | Compare two agents by passport maturity dimensions |
-| 845 | `amc passport create` | Create deterministic signed .amcpass artifact |
-| 846 | `amc passport export-latest` | Export latest passport for a scope to .amcpass |
-| 847 | `amc passport init` | Create and sign .amc/passport/policy.yaml |
-| 848 | `amc passport issue-token` | Issue an AMC Trust Token for an agent |
-| 849 | `amc passport link` | Link agent passport to external platform identity |
-| 850 | `amc passport policy` | Passport policy operations |
-| 851 | `amc passport policy apply` | Apply passport policy from JSON/YAML file |
-| 852 | `amc passport policy print` | Print effective passport policy |
-| 853 | `amc passport search` | Search agents by capability and minimum maturity level |
-| 854 | `amc passport share` | Generate shareable passport material |
-| 855 | `amc passport show` | Show .amcpass as JSON or single-line badge |
-| 856 | `amc passport translate-score` | Translate trust scores between scoring systems |
-| 857 | `amc passport verify` | Verify .amcpass artifact offline |
-| 858 | `amc passport verify-policy` | Verify signed passport policy |
-| 859 | `amc passport verify-token` | Verify an AMC Trust Token (pass JSON string) |
-| 860 | `amc playground` | Interactive scenario runner |
-| 861 | `amc playground list` | List available scenarios |
-| 862 | `amc playground run` | Run all demo scenarios |
-| 863 | `amc plugin` | Signed content-only extension marketplace |
-| 864 | `amc plugin execute` | Execute approved plugin install/upgrade/remove request |
-| 865 | `amc plugin init` | Initialize signed plugin workspace files |
-| 866 | `amc plugin install` | Request plugin install (requires SECURITY dual-control approval) |
-| 867 | `amc plugin keygen` | Generate plugin publisher keypair |
-| 868 | `amc plugin limits` | Show current plugin sandbox resource limits |
-| 869 | `amc plugin list` | List installed plugins and verification status |
-| 870 | `amc plugin pack` | Create signed .amcplug package from a plugin folder |
-| 871 | `amc plugin print` | Print plugin manifest summary |
-| 872 | `amc plugin registries` | List signed workspace registry configuration |
-| 873 | `amc plugin registries-apply` | Apply and sign workspace registries.yaml from JSON or YAML file |
-| 874 | `amc plugin registry` | Manage plugin registries |
-| 875 | `amc plugin registry init` | Initialize local signed plugin registry directory |
-| 876 | `amc plugin registry publish` | Publish plugin package into registry and re-sign index |
-| 877 | `amc plugin registry serve` | Serve plugin registry over local HTTP |
-| 878 | `amc plugin registry verify` | Verify registry signature and package hashes |
-| 879 | `amc plugin registry-fingerprint` | Compute registry public key fingerprint |
-| 880 | `amc plugin remove` | Request plugin removal (requires SECURITY dual-control approval) |
-| 881 | `amc plugin search` | Search a plugin registry by id/fingerprint |
-| 882 | `amc plugin upgrade` | Request plugin upgrade (requires SECURITY dual-control approval) |
-| 883 | `amc plugin verify` | Verify plugin package signature + artifact hashes |
-| 884 | `amc plugin workspace-verify` | Verify workspace plugin signatures/integrity |
-| 885 | `amc policy` | Policy-as-code operations |
-| 886 | `amc policy action` | Signed autonomy action policy |
-| 887 | `amc policy action init` | Create and sign .amc/action-policy.yaml |
-| 888 | `amc policy action logic` | Compose existing Action Policy evidence requirements |
-| 889 | `amc policy action logic apply` | Apply evidence logic after exact confirmation |
-| 890 | `amc policy action logic compile` | Preview a deterministic evidence-logic change without writing |
-| 891 | `amc policy action logic show` | Show declared evidence gates and effective logic |
-| 892 | `amc policy action verify` | Verify action policy signature |
-| 893 | `amc policy approval` | Signed dual-control approval policy |
-| 894 | `amc policy approval init` | Create and sign .amc/approval-policy.yaml |
-| 895 | `amc policy approval verify` | Verify approval-policy signature |
-| 896 | `amc policy controls` | Show one verified Scope / When / Then projection of existing controls |
-| 897 | `amc policy pack` | Policy packs by archetype and risk tier |
-| 898 | `amc policy pack apply` | Apply policy pack and sign updated configs/targets |
-| 899 | `amc policy pack describe` | Describe policy pack contents |
-| 900 | `amc policy pack diff` | Show deterministic diff for applying a policy pack |
-| 901 | `amc policy pack list` | List built-in policy packs |
-| 902 | `amc policy scope` | Compile reusable action-class scopes into existing signed policies |
-| 903 | `amc policy scope apply` | Apply a scope preview after exact compile-ID confirmation |
-| 904 | `amc policy scope compile` | Preview a deterministic selected-rule merge without writing |
-| 905 | `amc policy scope list` | List immutable AMC action-class scope templates |
-| 906 | `amc policy simulate` | Simulate one projected control through its production evaluator without recording |
-| 907 | `amc policy test` | Run deterministic policy fixtures through production control evaluators |
-| 908 | `amc policy-canary-report` | Generate canary mode report for an agent |
-| 909 | `amc policy-canary-start` | Start policy canary mode (observation-only) |
-| 910 | `amc policy-debt-add` | Register a temporary policy waiver (debt) |
-| 911 | `amc policy-debt-list` | List active policy debt entries |
-| 912 | `amc product` | Product operations: routing, autonomy, metering, workflows |
-| 913 | `amc product autonomy` | Decide autonomy level for an agent |
-| 914 | `amc product features` | List product features |
-| 915 | `amc product features-recommended` | Show top recommended product features |
-| 916 | `amc product loop-detect` | Detect infinite loops in agent behavior |
-| 917 | `amc product metering` | Show metering and billing for an agent |
-| 918 | `amc product retry` | Execute a command with retry logic |
-| 919 | `amc product route` | Route a task to the best model/provider |
-| 920 | `amc prompt` | Northstar prompt policy + pack operations |
-| 921 | `amc prompt init` | Create and sign .amc/prompt/policy.yaml |
-| 922 | `amc prompt pack` | Prompt pack artifact operations |
-| 923 | `amc prompt pack build` | Build and sign .amcprompt for an agent |
-| 924 | `amc prompt pack diff` | Diff latest prompt pack against previous snapshot |
-| 925 | `amc prompt pack show` | Show provider-specific enforced system prompt |
-| 926 | `amc prompt pack verify` | Verify .amcprompt signature and lint signature |
-| 927 | `amc prompt policy` | Prompt policy operations |
-| 928 | `amc prompt policy apply` | Apply prompt policy from YAML file and sign |
-| 929 | `amc prompt policy print` | Print prompt policy |
-| 930 | `amc prompt scheduler` | Prompt pack recurrence scheduler |
-| 931 | `amc prompt scheduler disable` | Disable prompt scheduler |
-| 932 | `amc prompt scheduler enable` | Enable prompt scheduler |
-| 933 | `amc prompt scheduler run-now` | Run prompt scheduler now for one agent or all |
-| 934 | `amc prompt scheduler status` | Show prompt scheduler status |
-| 935 | `amc prompt status` | List per-agent prompt pack status |
-| 936 | `amc prompt verify` | Verify prompt policy, pack, lint and scheduler signatures |
-| 937 | `amc proof` | Domain Proof Lane source-to-rule proof checks |
-| 938 | `amc proof check` | Check a claim against a declared source-to-rule manifest and emit an amcproof artifact |
-| 939 | `amc provider` | Provider template operations |
-| 940 | `amc provider add` | Assign or update provider template for an agent |
-| 941 | `amc provider list` | List provider templates |
-| 942 | `amc python-sdk` | Generate the Python SDK package for AMC Bridge API |
-| 943 | `amc quality-report` | Show quality report |
-| 944 | `amc quickscore` | Full default interactive diagnostic — or use --rapid for 5-question express, --auto for ledger evidence |
-| 945 | `amc quickstart` | 2-minute quickstart with Quick Score assessment |
-| 946 | `amc rate` | Rate agent run quality (thumbs up/down) |
-| 947 | `amc receipts-chain` | Show full delegation chain for a receipt |
-| 948 | `amc redaction-test` | Run privacy redaction tests against built-in rules |
-| 949 | `amc redteam` | Run red-team attack simulations against a target agent |
-| 950 | `amc redteam attack` | Run attack plugins (prompt-injection, data-exfiltration, privilege-escalation, model-manipulation, denial-of-service) |
-| 951 | `amc redteam attack-list` | List available attack plugins |
-| 952 | `amc redteam plugins` | List available attack plugins (assurance packs) |
-| 953 | `amc redteam run` | Execute red-team plugins with chosen attack strategies and generate a vulnerability report |
-| 954 | `amc redteam strategies` | List available attack strategies |
-| 955 | `amc release` | Deterministic release engineering and offline verification |
-| 956 | `amc release init` | Initialize AMC release signing keypair |
-| 957 | `amc release licenses` | Generate dependency license inventory |
-| 958 | `amc release pack` | Build a signed .amcrelease bundle |
-| 959 | `amc release print` | Print release bundle manifest summary |
-| 960 | `amc release provenance` | Generate AMC provenance record |
-| 961 | `amc release sbom` | Generate deterministic CycloneDX SBOM |
-| 962 | `amc release scan` | Run strict secret scan on a .amcrelease bundle |
-| 963 | `amc release verify` | Verify a .amcrelease bundle offline |
-| 964 | `amc report` | Render report for run ID, saved alias, prefix, or 'latest' |
-| 965 | `amc residency-policy` | Create or list data residency policies |
-| 966 | `amc residency-report` | Generate data residency compliance report for a tenant |
-| 967 | `amc resource` | Govern prompts, tools, memory, policies, routes, and other agent-defining resources |
-| 968 | `amc resource apply` | Accept current resources as the new signed manifest; dry-run unless --yes is set |
-| 969 | `amc resource contract` | Show the AMC-native governed resource lifecycle contract |
-| 970 | `amc resource diff` | Diff an Enforce resource manifest against the current workspace |
-| 971 | `amc resource evaluate` | Evaluate a resource proposal against Enforce gates |
-| 972 | `amc resource get` | Inspect one resource in an Enforce resource manifest |
-| 973 | `amc resource history` | Show signed Enforce resource manifests, snapshots, and receipts |
-| 974 | `amc resource list` | List resources in an Enforce resource manifest |
-| 975 | `amc resource propose` | Create a dry-run resource change proposal from the latest manifest to current workspace state |
-| 976 | `amc resource restore` | Restore resources from an Enforce snapshot; dry-run unless --apply is set |
-| 977 | `amc resource rollback` | Roll back to the signed previous version, or an explicit canonical snapshot |
-| 978 | `amc resource snapshot` | Write the current Enforce resource manifest |
-| 979 | `amc resource status` | Show the signed active, previous, rollback, drift, and integrity state |
-| 980 | `amc resource validate` | Validate governed resource changes before accepting them |
-| 981 | `amc retention` | Retention/archive payload lifecycle operations |
-| 982 | `amc retention run` | Run archival + payload prune lifecycle |
-| 983 | `amc retention status` | Show retention/archive status |
-| 984 | `amc retention verify` | Verify archive manifests/signatures and ledger continuity |
-| 985 | `amc role-presets` | List available dashboard role presets |
-| 986 | `amc rollback-create` | Create a rollback pack from the current policy file |
-| 987 | `amc run` | Full assessment — Score + Shield + Enforce + Vault + Watch + Comply + Fleet + Passport in one command |
-| 988 | `amc run-alias` | Name diagnostic runs for report and history workflows |
-| 989 | `amc run-alias list` | List diagnostic run aliases for the active agent |
-| 990 | `amc run-alias remove` | Remove a diagnostic run alias |
-| 991 | `amc run-alias set` | Assign a reusable alias to a diagnostic run |
-| 992 | `amc runtime` | Runtime run manager for connected agents |
-| 993 | `amc runtime cancel` | Cancel a runtime run cleanly |
-| 994 | `amc runtime complete` | Complete a runtime run |
-| 995 | `amc runtime create` | Create a persisted connected-agent runtime run |
-| 996 | `amc runtime degrade` | Mark a runtime run degraded |
-| 997 | `amc runtime event` | Append an event to a persisted runtime run |
-| 998 | `amc runtime export` | Export runtime run events as JSON or JSONL |
-| 999 | `amc runtime inspect` | Inspect a runtime run and its event stream |
-| 1000 | `amc runtime list` | List persisted runtime runs |
-| 1001 | `amc runtime resume` | Resume a running or degraded runtime run from persisted state |
-| 1002 | `amc runtime status` | Show persisted runtime run-manager status |
-| 1003 | `amc sandbox` | Hardened sandbox execution |
-| 1004 | `amc sandbox run` | Run agent command in hardened Docker sandbox |
-| 1005 | `amc scan` | Zero-integration agent assessment scanner |
-| 1006 | `amc scan model-scan` | Scan ML model files for security threats (malicious code, backdoors, supply chain attacks) |
-| 1007 | `amc scim` | SCIM token management |
-| 1008 | `amc scim init` | Enable SCIM provisioning and optionally create an initial bearer token |
-| 1009 | `amc scim token` | SCIM bearer token operations |
-| 1010 | `amc scim token create` | Create a SCIM bearer token and store hash in host vault |
-| 1011 | `amc score` | Maturity scoring, adversarial testing, and evidence collection |
-| 1012 | `amc score a2a-protocol` | Score agent-to-agent protocol maturity: card completeness, lifecycle, auth, format, errors, discovery |
-| 1013 | `amc score adversarial` | Test gaming resistance of scoring |
-| 1014 | `amc score alignment-index` | Compute composite alignment index |
-| 1015 | `amc score audit-depth` | Score audit trail depth and completeness |
-| 1016 | `amc score autonomy-duration` | Track time between human checkpoints with domain risk profiles |
-| 1017 | `amc score behavioral-contract` | Score agent behavioral contract maturity (alignment card, permitted/forbidden actions) |
-| 1018 | `amc score calibration-gap` | Measure delta between agent self-reported confidence and observed behavior |
-| 1019 | `amc score collect-evidence` | Collect an agent's evidence from the ledger |
-| 1020 | `amc score density-map` | Heatmap of evidence density per question per dimension — reveals blind spots |
-| 1021 | `amc score distributed-agents` | Score distributed multi-agent execution: partitions, sync, failover, consensus, load, observability |
-| 1022 | `amc score eu-ai-act` | EU AI Act obligations (Art. 9-17, GPAI systemic risk); not evaluated: file presence is not evidence |
-| 1023 | `amc score evidence-conflict` | Measure internal consistency of evidence — detect conflicting signals |
-| 1024 | `amc score evidence-coverage` | Show automated vs manual evidence coverage |
-| 1025 | `amc score evidence-ingest` | Ingest evidence from external systems (openai-evals, langsmith, mlflow, custom) |
-| 1026 | `amc score factuality` | Score factuality across parametric, retrieval, and grounded dimensions |
-| 1027 | `amc score fail-secure` | Score fail-secure tool governance (deny-by-default, rate limiting, anomaly detection) |
-| 1028 | `amc score faithfulness` | Score how well LLM output is grounded in provided context |
-| 1029 | `amc score formal-spec` | Compute formal maturity score for an agent |
-| 1030 | `amc score gaming-resistance` | Inventory AMC source controls; behavioral gaming resistance is not measured |
-| 1031 | `amc score industry-adjust` | Adjust a score using an industry-specific trust model |
-| 1032 | `amc score industry-benchmark` | Show industry benchmark percentiles (not evaluated: no peer data) |
-| 1033 | `amc score industry-list` | List all available industry trust models |
-| 1034 | `amc score interpretability` | Score structural transparency and explainability |
-| 1035 | `amc score kernel-sandbox` | Score kernel-level sandbox maturity (OS isolation, filesystem/network restrictions) |
-| 1036 | `amc score lean-profile` | Show lean AMC profile |
-| 1037 | `amc score level-transition` | Track formal promotion/demotion events with evidence gates |
-| 1038 | `amc score memory-depth` | Score deep memory infrastructure: backend resilience, compression fidelity, cross-session consistency, TTL, capacity |
-| 1039 | `amc score memory-integrity` | Score memory correction persistence and poisoning resistance |
-| 1040 | `amc score mutual-verification` | Score agent-to-agent trust verification (challenge-response) |
-| 1041 | `amc score operational-independence` | Calculate operational independence score |
-| 1042 | `amc score output-attestation` | Score output signing and trust metadata for receiving agents |
-| 1043 | `amc score output-integrity` | Score output integrity maturity (OWASP LLM02, confidence calibration, citation) |
-| 1044 | `amc score owasp-llm` | OWASP LLM Top 10 coverage (all 10 risks); not evaluated: file presence is not evidence |
-| 1045 | `amc score pause-quality` | Score quality of agent-initiated pauses |
-| 1046 | `amc score policy-consistency` | Test policy enforcement consistency across repeated trials (pass^k) |
-| 1047 | `amc score production-ready` | Run production readiness gate for an agent |
-| 1048 | `amc score regulatory-readiness` | Regulatory readiness (EU AI Act + ISO + OWASP); not evaluated: file presence is not evidence |
-| 1049 | `amc score runtime-identity` | Score runtime execution identity maturity (JIT credentials, user propagation, revocation) |
-| 1050 | `amc score safety-research` | Run the AI Safety Research evaluation lane — 4-dimension assessment based on frontier safety research |
-| 1051 | `amc score self-knowledge` | Score prior art self-knowledge maturity (typed attention, trace layer, confidence+citation) |
-| 1052 | `amc score simulation-lane` | Run the Simulation & Forecast evaluation lane — 5-dimension assessment for simulation/forecast systems |
-| 1053 | `amc score sleeper-detection` | Detect context-dependent behavioral inconsistencies |
-| 1054 | `amc score state-portability` | Score agent state portability (vendor-neutral format, serialization, integrity on transfer) |
-| 1055 | `amc score task-horizon` | Score task-completion time horizon (METR-inspired) |
-| 1056 | `amc score tier` | Run tiered maturity assessment (quick/standard/deep) |
-| 1057 | `amc score transparency-log` | Score network transparency log (Merkle tree, inclusion proofs) |
-| 1058 | `amc session` | Native signed sessions: inspect, compact, verify, replay and recover |
-| 1059 | `amc session anchor` | Anchor a closed session's root into the transparency log |
-| 1060 | `amc session compact` | List signed history origins, then apply an explicit native summary or drop without rewriting evidence |
-| 1061 | `amc session proof` | Export a session's inclusion proof (verifiable offline, without this workspace) |
-| 1062 | `amc session recover` | Recover a crashed session by appending synthetic closers under a fenced claim (append-only) |
-| 1063 | `amc session replay-request` | Rebuild each request this session sent from its signed rows and check it against the recorded digest |
-| 1064 | `amc session show` | Show a session's projected conversation and its event spine |
-| 1065 | `amc session spill-read` | Read a bounded byte range of retained output against its signed origin |
-| 1066 | `amc session verify` | Verify the ledger and report per-session lifecycle verdicts (open / released / interrupted / closed) |
-| 1067 | `amc session verify-proof` | Verify a session inclusion proof offline — needs only the bundle and a pinned fingerprint |
-| 1068 | `amc sessions` | View and analyze user sessions |
-| 1069 | `amc sessions list` | List tracked sessions |
-| 1070 | `amc setup` | Setup wizard for the full-score path and Studio gateway |
-| 1071 | `amc shell` | Interactive AMC session — natural language + commands |
-| 1072 | `amc shield` | Threat detection and security scanning |
-| 1073 | `amc shield analyze` | Run static code analyzer on a skill file |
-| 1074 | `amc shield analyze-mcp` | Scan an MCP server definition for security risks (score L0–L5) |
-| 1075 | `amc shield analyze-runtime` | Analyze a proposed runtime agent action through the Shield trust pipeline |
-| 1076 | `amc shield confirm` | Controlled exploit confirmation with strict authorization gates |
-| 1077 | `amc shield confirm export` | Export a redacted safe proof without exploit instructions |
-| 1078 | `amc shield confirm proofs` | List safe exploit-confirmation proof artifacts |
-| 1079 | `amc shield confirm run` | Run authorized safe exploit confirmation from a task JSON file |
-| 1080 | `amc shield confirm scope-write` | Write a signed exploit-confirmation authorization scope from JSON |
-| 1081 | `amc shield confirm scopes` | List exploit-confirmation authorization scopes |
-| 1082 | `amc shield conversation-integrity` | Check conversation integrity for an agent (demo) |
-| 1083 | `amc shield detect-injection` | Detect prompt injection attempts in text |
-| 1084 | `amc shield mcp-ledger` | Signed MCP trust ledger: scan a set of MCP servers and record a clean-as-of receipt |
-| 1085 | `amc shield posture` | One-command agent-security posture scorecard (config, MCP trust, secrets, isolation, supply-chain) — L0–L5, signed receipt |
-| 1086 | `amc shield red-team` | Run a quick red team campaign (5 attacks on demo target). Tip: For full red-team suite with strategies, use `amc redteam run` |
-| 1087 | `amc shield red-team-status` | Show current red team capabilities and attack template count |
-| 1088 | `amc shield reputation` | Check reputation score for a tool |
-| 1089 | `amc shield sandbox` | Check sandbox configuration for an agent |
-| 1090 | `amc shield sanitize` | Sanitize text — strip LLM prompt injection and dangerous AI patterns (not SQL/XSS) |
-| 1091 | `amc shield sbom` | Generate software bill of materials from package.json |
-| 1092 | `amc shield scan-config` | Scan the coding-agent config surface (CLAUDE.md, settings, hooks, MCP, agent defs) for security risks (L0–L5, signed receipt) |
-| 1093 | `amc shield threat-intel` | Check threat intelligence for an input |
-| 1094 | `amc shield trust-pipeline` | Run end-to-end trust pipeline for an agent action |
-| 1095 | `amc simulate-bridge` | Run a simulated bridge request for local testing |
-| 1096 | `amc snapshot` | Generate Unified Clarity Snapshot markdown |
-| 1097 | `amc spill` | Inventory, transport and deliberately erase native retained output |
-| 1098 | `amc spill erase` | Plan exact local erasure read-only; apply only an unchanged reviewed plan |
-| 1099 | `amc spill export` | Export authenticated ciphertext to a new directory, retaining explicit gaps |
-| 1100 | `amc spill inventory` | Read all selected session evidence and inventory ciphertext without decrypting |
-| 1101 | `amc spill restore` | Restore ciphertext against this destination's existing signed evidence |
-| 1102 | `amc sso` | SSO setup shortcuts for OIDC and SAML providers |
-| 1103 | `amc sso configure` | Configure an OIDC or SAML SSO provider |
-| 1104 | `amc standard` | Open Compass Standard schema bundle and validation |
-| 1105 | `amc standard generate` | Generate signed Open Compass schema bundle under .amc/standard/ |
-| 1106 | `amc standard print` | Print one generated schema |
-| 1107 | `amc standard schemas` | List generated schemas with digests |
-| 1108 | `amc standard validate` | Validate a JSON file or AMC artifact against a standard schema |
-| 1109 | `amc standard verify` | Verify schema bundle signatures and manifest digests |
-| 1110 | `amc status` | Show AMC Studio and vault status |
-| 1111 | `amc strategy` | Compare inference strategies and govern route changes |
-| 1112 | `amc strategy compare` | Compare model/provider strategies with score, cost, latency, risk, and evidence |
-| 1113 | `amc strategy list` | List inference strategy comparison runs |
-| 1114 | `amc strategy rollback` | Roll back an accepted inference route change |
-| 1115 | `amc strategy show` | Inspect an inference strategy comparison run |
-| 1116 | `amc studio` | Studio API helpers |
-| 1117 | `amc studio healthcheck` | Health/readiness probe for deployment runtime |
-| 1118 | `amc studio lan` | LAN mode controls for Compass Console |
-| 1119 | `amc studio lan disable` | Disable LAN mode and revert to localhost-only |
-| 1120 | `amc studio lan enable` | Enable LAN mode with pairing gate |
-| 1121 | `amc studio ping` | Ping local Studio API /health endpoint |
-| 1122 | `amc studio start` | Start Studio in foreground (non-interactive, deployment-safe) |
-| 1123 | `amc supervise` | DEPRECATED — use 'amc adapters run'. Supervises any process and injects gateway routing env vars, but mints no lease, so its evidence is not OBSERVED. |
-| 1124 | `amc target` | Target profile operations |
-| 1125 | `amc target diff` | Diff run against target profile |
-| 1126 | `amc target set` | Interactive equalizer wizard |
-| 1127 | `amc target verify` | Verify target profile signature |
-| 1128 | `amc tenant-isolation-check` | Check tenant isolation between all registered tenants |
-| 1129 | `amc tenant-register` | Register a tenant boundary |
-| 1130 | `amc ticket` | Execution ticket operations |
-| 1131 | `amc ticket issue` | Issue short-lived signed execution ticket |
-| 1132 | `amc ticket verify` | Verify signed execution ticket |
-| 1133 | `amc tools` | ToolHub tools config |
-| 1134 | `amc tools init` | Create and sign .amc/tools.yaml |
-| 1135 | `amc tools list` | List signed ToolHub tools grouped by provider context |
-| 1136 | `amc tools sign` | Validate and sign the existing reviewed tool policy without changing its grants |
-| 1137 | `amc tools verify` | Verify tools.yaml signature |
-| 1138 | `amc trace` | Trace explorer — inspect agent execution traces, sessions, and tool calls |
-| 1139 | `amc trace failures` | Show top recurring failure clusters mined from trace indexes |
-| 1140 | `amc trace index` | List or inspect distilled trace failure indexes |
-| 1141 | `amc trace inspect` | Inspect evidence events — show tool calls, decisions, and trust tiers |
-| 1142 | `amc trace list` | List recent agent sessions with evidence summary |
-| 1143 | `amc trace stats` | Show trace statistics — event counts by type, trust tier, tool usage |
-| 1144 | `amc transform` | Transformation OS (4C plans, tracking, attestations) |
-| 1145 | `amc transform attest` | - |
-| 1146 | `amc transform attest-verify` | - |
-| 1147 | `amc transform init` | Initialize signed .amc/transform-map.yaml |
-| 1148 | `amc transform map` | Inspect or apply transform map |
-| 1149 | `amc transform map apply` | - |
-| 1150 | `amc transform map show` | - |
-| 1151 | `amc transform plan` | - |
-| 1152 | `amc transform report` | - |
-| 1153 | `amc transform status` | - |
-| 1154 | `amc transform track` | - |
-| 1155 | `amc transform verify` | Verify signed transform map |
-| 1156 | `amc transparency` | Append-only transparency log operations |
-| 1157 | `amc transparency export` | Export transparency bundle |
-| 1158 | `amc transparency init` | Initialize append-only transparency log |
-| 1159 | `amc transparency merkle` | Merkle transparency root/proof operations |
-| 1160 | `amc transparency merkle prove` | Export signed inclusion proof bundle for entry hash |
-| 1161 | `amc transparency merkle rebuild` | Rebuild Merkle leaves/roots from transparency log |
-| 1162 | `amc transparency merkle root` | Show current Merkle root and history |
-| 1163 | `amc transparency merkle verify-proof` | Verify signed inclusion proof bundle |
-| 1164 | `amc transparency report` | Generate an Agent Transparency Report — what the agent does, can access, and how trustworthy it is |
-| 1165 | `amc transparency tail` | Tail transparency entries |
-| 1166 | `amc transparency verify` | Verify transparency chain + seal signature |
-| 1167 | `amc transparency verify-bundle` | Verify exported transparency bundle |
-| 1168 | `amc trust` | Trust mode and Notary enforcement configuration |
-| 1169 | `amc trust enable-notary` | Enable fail-closed NOTARY trust mode |
-| 1170 | `amc trust freshness` | Report temporal trust freshness and half-life decay |
-| 1171 | `amc trust init` | Create and sign .amc/trust.yaml — sets up the trust mode (SELF/NOTARY) that governs artifact signing |
-| 1172 | `amc trust resign` | Re-sign the current .amc/trust.yaml in place with the current artifact-seal key, keeping NOTARY settings |
-| 1173 | `amc trust status` | Show trust mode, signature status, and notary health |
-| 1174 | `amc truthguard` | Deterministic output truth-constraint validator |
-| 1175 | `amc truthguard validate` | Validate structured agent output claims against deterministic truth constraints |
-| 1176 | `amc tune` | Mechanic mode tuning wizard |
-| 1177 | `amc unknowns` | List known unknowns for an agent's latest diagnostic run |
-| 1178 | `amc up` | Start AMC control plane in one command (studio + gateway + bridge) |
-| 1179 | `amc upgrade` | Generate upgrade plan |
-| 1180 | `amc user` | Multi-user RBAC account management |
-| 1181 | `amc user add` | Add a user with RBAC roles |
-| 1182 | `amc user init` | Initialize signed users.yaml with first OWNER user |
-| 1183 | `amc user list` | List RBAC users |
-| 1184 | `amc user revoke` | Revoke a user account |
-| 1185 | `amc user role` | Set user roles |
-| 1186 | `amc user role set` | Replace roles for a user |
-| 1187 | `amc user verify` | Verify users.yaml signature |
-| 1188 | `amc value` | Value realization engine (contracts, scoring, ROI) |
-| 1189 | `amc value contract` | Value contract operations |
-| 1190 | `amc value contract apply` | Apply value contract from YAML/JSON file |
-| 1191 | `amc value contract init` | Create and sign value contract template |
-| 1192 | `amc value contract print` | Print value contract and signature status |
-| 1193 | `amc value contract verify` | Verify value contract signature |
-| 1194 | `amc value import` | Import numeric KPI points from CSV (ts,value) |
-| 1195 | `amc value ingest` | Ingest value webhook payload JSON |
-| 1196 | `amc value init` | Initialize signed value policy, default contract, and scheduler |
-| 1197 | `amc value policy` | Value policy operations |
-| 1198 | `amc value policy apply` | Apply signed value policy from YAML/JSON file |
-| 1199 | `amc value policy default` | Print default value policy JSON |
-| 1200 | `amc value policy print` | Print effective value policy JSON |
-| 1201 | `amc value report` | Generate signed value report |
-| 1202 | `amc value scheduler` | Value scheduler controls |
-| 1203 | `amc value scheduler disable` | Disable value scheduler |
-| 1204 | `amc value scheduler enable` | Enable value scheduler |
-| 1205 | `amc value scheduler run-now` | Run value scheduler now |
-| 1206 | `amc value scheduler status` | Show value scheduler status |
-| 1207 | `amc value snapshot` | Generate/load latest signed value snapshot |
-| 1208 | `amc value verify` | Verify value workspace signatures/artifacts |
-| 1209 | `amc value verify-policy` | Verify signed value policy |
-| 1210 | `amc vault` | Encrypted key vault operations |
-| 1211 | `amc vault classify` | Classify data sensitivity level |
-| 1212 | `amc vault dlp` | DLP scanner for PII and secrets |
-| 1213 | `amc vault dlp scan` | Scan text for PII and secrets |
-| 1214 | `amc vault dsar` | Persistent DSAR (Data Subject Access Request) workflow |
-| 1215 | `amc vault dsar complete` | Mark a DSAR request complete and append an audit event |
-| 1216 | `amc vault dsar list` | List persistent DSAR requests |
-| 1217 | `amc vault dsar status` | Show a persistent DSAR request |
-| 1218 | `amc vault dsar submit` | Submit a persistent DSAR request |
-| 1219 | `amc vault dsar-status` | Show DSAR (Data Subject Access Request) status |
-| 1220 | `amc vault forget` | Remove the remembered vault passphrase for this workspace (Keychain or credentials file) |
-| 1221 | `amc vault history` | Review and explicitly migrate signing-key history |
-| 1222 | `amc vault history migrate` | Authenticate only current and explicitly approved keys; preserve original untrusted bytes |
-| 1223 | `amc vault init` | Initialize encrypted vault for signing keys |
-| 1224 | `amc vault lock` | Lock vault and clear in-memory private keys |
-| 1225 | `amc vault privacy-budget` | Check privacy budget for an agent |
-| 1226 | `amc vault rag-guard` | Guard RAG chunks against injection |
-| 1227 | `amc vault rotate-keys` | Rotate the monitor key (ledger-row and receipt purposes) with a signed rotation statement; alias of amc keys rotate |
-| 1228 | `amc vault scrub` | Scrub metadata from a file |
-| 1229 | `amc vault secret-share` | Split a secret into shares using Shamir's Secret Sharing |
-| 1230 | `amc vault status` | Show vault status |
-| 1231 | `amc vault unlock` | Unlock vault into memory for signing operations |
-| 1232 | `amc vault zk-commit` | Create a Pedersen commitment to a value |
-| 1233 | `amc vault zk-range-proof` | Create a range commitment for an AMC score threshold (NOT a zero-knowledge proof; unsound, does not verify) |
-| 1234 | `amc vault zk-verify` | Check a range commitment (NOT a zero-knowledge verification; unsound) |
-| 1235 | `amc verify` | Verify integrity across AMC artifacts |
-| 1236 | `amc verify all` | Verify trust/policies/plugins/logs/ledger/artifacts in one pass |
-| 1237 | `amc vibe-audit` | Run static safety checks for AI-generated code |
-| 1238 | `amc watch` | Observability, attestation, and safety testing |
-| 1239 | `amc watch alerts` | Show recent alerts for a monitored agent |
-| 1240 | `amc watch attest` | Attest an agent output |
-| 1241 | `amc watch connect` | Connect to an observability provider (langfuse, helicone, otlp, datadog, webhook) |
-| 1242 | `amc watch explain` | Generate explainability packet for an agent run |
-| 1243 | `amc watch host-hardening` | Check host hardening status for this AMC deployment |
-| 1244 | `amc watch profiler-anomalies` | List detected behavioral anomalies for an agent |
-| 1245 | `amc watch profiler-start` | Start behavioral profiling for an agent |
-| 1246 | `amc watch profiler-status` | Show behavioral profiler status and any recent anomalies |
-| 1247 | `amc watch providers` | Show connected observability providers and trace stats |
-| 1248 | `amc watch safety-test` | Run safety tests for an agent |
-| 1249 | `amc watch start` | Start continuous production monitoring for an agent |
-| 1250 | `amc watch status` | Show all monitored agents and their current state |
-| 1251 | `amc whatif` | Equalizer what-if simulator |
-| 1252 | `amc whatif equalizer` | - |
-| 1253 | `amc whatif targets` | - |
-| 1254 | `amc why-capped` | Show why each question is capped at its current level |
-| 1255 | `amc wire` | Serve the NDJSON JSON-RPC wire on a unix socket (accepts work; does not run it) |
-| 1256 | `amc wiring-status` | Show in-process production wiring counters (cannot observe other processes) |
-| 1257 | `amc workorder` | Signed work order operations |
-| 1258 | `amc workorder create` | Create and sign a work order |
-| 1259 | `amc workorder expire` | Expire/revoke a work order |
-| 1260 | `amc workorder list` | List work orders for agent |
-| 1261 | `amc workorder show` | Show signed work order JSON |
-| 1262 | `amc workorder verify` | Verify work order signature |
-| 1263 | `amc wrap` | DEPRECATED — use 'amc adapters run', which also mints a lease and routes through the gateway. Wraps a runtime and captures tamper-evident evidence. |
+| 597 | `amc identity workload-trust` | Signed workload trust config: pinned SPIFFE bundles, agent-token issuers and bindings (experimental) |
+| 598 | `amc identity workload-trust publish` | Validate a YAML workload trust config and publish it signed with the auditor key (owner mode) |
+| 599 | `amc identity workload-trust show` | Show what the verified workload trust config pins (names and counts, no key material) |
+| 600 | `amc identity workload-trust verify` | Verify the workload trust config's signature and schema; exits 1 when it does not verify |
+| 601 | `amc import` | Import neutral traces, runs, workflow graphs, configs, memory, evals, and benchmarks |
+| 602 | `amc imports` | List, inspect, and roll back neutral import runs |
+| 603 | `amc imports list` | List recent neutral import runs |
+| 604 | `amc imports rollback` | Remove files written by a neutral import run |
+| 605 | `amc imports show` | Inspect a neutral import manifest |
+| 606 | `amc imports verify-profile` | Independently verify an external-evidence profile without opening a workspace |
+| 607 | `amc improve` | Guided improvement — shows what to fix next based on your current score |
+| 608 | `amc incident` | Incident tracking and response operations |
+| 609 | `amc incident clocks` | List an incident's regulatory reporting clocks for a station, or record a trigger or a submitted notice |
+| 610 | `amc incident close` | Close an incident with a resolution summary |
+| 611 | `amc incident create` | Create a manual incident |
+| 612 | `amc incident link` | Link evidence to an incident |
+| 613 | `amc incident list` | List incidents for an agent |
+| 614 | `amc incident oversight` | Append a signed human-oversight record (the auditor key proves the workspace, not the reviewer) |
+| 615 | `amc incident show` | Show incident details, or write its regulator evidence packet with --packet |
+| 616 | `amc incidents` | Incident operations and dispatch workflows |
+| 617 | `amc incidents alert` | Dispatch INCIDENT_CREATED to configured integration channels |
+| 618 | `amc incidents help` | Show incident-focused command groups |
+| 619 | `amc indices` | Compute deterministic failure-risk indices |
+| 620 | `amc indices fleet` | Compute failure-risk indices across fleet |
+| 621 | `amc ingest` | Ingest external logs/transcripts as SELF_REPORTED evidence |
+| 622 | `amc init` | Initialize .amc workspace |
+| 623 | `amc insider-alerts` | Show insider risk alerts |
+| 624 | `amc insider-risk-report` | Generate insider risk analytics report |
+| 625 | `amc insider-risk-scores` | Show insider risk scores by actor |
+| 626 | `amc integrate` | Generate integration scaffold for a framework |
+| 627 | `amc integrate-list` | List available integration frameworks |
+| 628 | `amc integrations` | Integration hub operations |
+| 629 | `amc integrations catalog` | List available integrations |
+| 630 | `amc integrations dispatch` | Dispatch a deterministic integration event |
+| 631 | `amc integrations export-journal` | Export integration delivery journal (receipts + dead letters) |
+| 632 | `amc integrations init` | Create and sign integrations.yaml with vault-backed secret refs |
+| 633 | `amc integrations setup` | Generate integration config files |
+| 634 | `amc integrations status` | Show integration channels and routing |
+| 635 | `amc integrations test` | Dispatch deterministic test event to an integration channel |
+| 636 | `amc integrations verify` | Verify integrations config signature |
+| 637 | `amc inventory` | AI asset inventory — discover and catalog AI agents, models, and tools |
+| 638 | `amc inventory list` | List AI assets (alias for 'inventory scan') |
+| 639 | `amc inventory scan` | Scan workspace for AI assets (agents, models, configs, API keys) |
+| 640 | `amc key-custody-modes` | List available key custody modes and their configurations |
+| 641 | `amc keys` | Purpose signing keys: list, rotate, revoke and export public keys |
+| 642 | `amc keys export-public` | Print a purpose's public key, key id and proof of possession, for an organisation's trust list |
+| 643 | `amc keys list` | List each signing purpose's key id, shared keys, history size, rotations, provider, algorithm and protection (public files only) |
+| 644 | `amc keys revoke` | Record a retired key's revocation in the workspace's signed, anchored key revocation list |
+| 645 | `amc keys rotate` | Rotate one purpose's key with a signed, chained statement (or bind the provider key keys.refs names); --resume completes or rolls back an interrupted change |
+| 646 | `amc lab-compare` | Compare two lab experiments |
+| 647 | `amc lab-create` | Create a new lab experiment |
+| 648 | `amc lab-list` | List all lab experiments |
+| 649 | `amc lab-report` | Generate a lab experiment report |
+| 650 | `amc lab-simulate` | Simulate the lab workflow with placeholder probe results (no model is called) |
+| 651 | `amc lab-templates` | List available experiment templates |
+| 652 | `amc leaderboard` | Benchmark leaderboard — compare agent maturity scores |
+| 653 | `amc leaderboard export` | Export leaderboard as JSON/HTML for public sharing |
+| 654 | `amc leaderboard public-export` | Build an anonymized public leaderboard dataset bundle |
+| 655 | `amc leaderboard show` | Show fleet-wide maturity leaderboard |
+| 656 | `amc learn` | Education flow for a specific maturity question |
+| 657 | `amc lease` | Issue/verify/revoke short-lived agent leases |
+| 658 | `amc lease issue` | - |
+| 659 | `amc lease resign-revocations` | Re-sign the lease revocation store as owner, only if its sha256 is the reviewed digest |
+| 660 | `amc lease revoke` | - |
+| 661 | `amc lease verify` | - |
+| 662 | `amc legal-hold` | Issue or manage legal holds |
+| 663 | `amc lessons-list` | List lessons learned from corrections |
+| 664 | `amc lessons-promote` | Promote a correction to a reusable lesson |
+| 665 | `amc lifecycle` | Agent lifecycle responsibility and governance mapping |
+| 666 | `amc lifecycle advance` | Advance lifecycle stage after governance gate confirmation |
+| 667 | `amc lifecycle reassessments` | Show a governed agent's lifecycle state and its reassessment records (JSON) |
+| 668 | `amc lifecycle status` | Show lifecycle stage, accountability matrix, governance gates, and transition trail |
+| 669 | `amc lifecycle transition` | Move a governed agent between proposed, approved, active, suspended and retired (signed, approval-bound; JSON) |
+| 670 | `amc lineage-claim` | Show full governance lineage for a specific claim |
+| 671 | `amc lineage-init` | Initialize governance lineage tables |
+| 672 | `amc lineage-policy-intents` | List all policy change intents for an agent |
+| 673 | `amc lineage-report` | Generate governance lineage report |
+| 674 | `amc lint` | Lint agent configuration files for schema compliance, anti-patterns, and best practices |
+| 675 | `amc lint rules` | List all available lint rules |
+| 676 | `amc lite-score` | Lite scoring mode for non-agent LLMs / chatbots — simplified assessment without agentic features |
+| 677 | `amc logs` | Print latest AMC Studio logs |
+| 678 | `amc loop` | Continuous self-serve maturity loop |
+| 679 | `amc loop init` | Initialize recurring loop config |
+| 680 | `amc loop plan` | Print recurring loop plan |
+| 681 | `amc loop run` | Run recurring diagnostic + assurance + dashboard + snapshot |
+| 682 | `amc loop schedule` | Print OS scheduler config (no automatic installation) |
+| 683 | `amc maintenance` | Operational maintenance operations |
+| 684 | `amc maintenance prune-cache` | Prune dashboard/console/transform cache artifacts |
+| 685 | `amc maintenance reindex` | Ensure operational SQLite indexes |
+| 686 | `amc maintenance rotate-logs` | Rotate Studio logs based on ops policy |
+| 687 | `amc maintenance stats` | Show DB/blob/archive/cache operational stats |
+| 688 | `amc maintenance vacuum` | Run SQLite VACUUM + ANALYZE |
+| 689 | `amc marketplace` | AMC Pack Marketplace — browse, install, rate community packs |
+| 690 | `amc marketplace deprecate` | Deprecate a pack |
+| 691 | `amc marketplace featured` | Show featured packs |
+| 692 | `amc marketplace info` | Show details for a specific pack |
+| 693 | `amc marketplace install` | Install a pack from the marketplace |
+| 694 | `amc marketplace list` | List installed packs |
+| 695 | `amc marketplace rate` | Rate a pack |
+| 696 | `amc marketplace search` | Search marketplace for packs |
+| 697 | `amc marketplace undeprecate` | Remove deprecation from a pack |
+| 698 | `amc marketplace uninstall` | Uninstall a pack |
+| 699 | `amc mcp` | AMC Model Context Protocol (MCP) server for AI coding assistants |
+| 700 | `amc mcp config` | Print MCP configuration snippets for supported AI coding assistants |
+| 701 | `amc mcp list-tools` | List all tools exposed by the AMC MCP server |
+| 702 | `amc mcp serve` | Start the AMC MCP server (stdio transport for IDE integration) |
+| 703 | `amc mechanic` | Mechanic Workbench (targets, plans, simulation) |
+| 704 | `amc mechanic export` | Export latest gap analysis as reward functions, DSPy targets, or fine-tune recipes |
+| 705 | `amc mechanic gap` | - |
+| 706 | `amc mechanic init` | - |
+| 707 | `amc mechanic plan` | Create, diff, approve, and execute upgrade plans |
+| 708 | `amc mechanic plan create` | - |
+| 709 | `amc mechanic plan diff` | - |
+| 710 | `amc mechanic plan execute` | - |
+| 711 | `amc mechanic plan request-approval` | - |
+| 712 | `amc mechanic plan show` | - |
+| 713 | `amc mechanic profile` | Apply one-click signed target profiles |
+| 714 | `amc mechanic profile apply` | - |
+| 715 | `amc mechanic profile list` | - |
+| 716 | `amc mechanic profile verify` | - |
+| 717 | `amc mechanic rca` | Generate fixer root-cause reports from trace failure indexes |
+| 718 | `amc mechanic rca list` | List generated fixer RCA reports |
+| 719 | `amc mechanic rca run` | Classify a failed run and create regression-preserving fix proposals |
+| 720 | `amc mechanic rca show` | Inspect a fixer RCA report |
+| 721 | `amc mechanic simulate` | - |
+| 722 | `amc mechanic simulations` | Show latest signed simulation artifact |
+| 723 | `amc mechanic targets` | Manage signed equalizer targets |
+| 724 | `amc mechanic targets apply` | - |
+| 725 | `amc mechanic targets init` | - |
+| 726 | `amc mechanic targets print` | - |
+| 727 | `amc mechanic targets set` | - |
+| 728 | `amc mechanic targets verify` | - |
+| 729 | `amc mechanic tuning` | Manage signed mechanic tuning intent |
+| 730 | `amc mechanic tuning apply` | - |
+| 731 | `amc mechanic tuning init` | - |
+| 732 | `amc mechanic tuning print` | - |
+| 733 | `amc mechanic tuning set` | - |
+| 734 | `amc mechanic tuning verify` | - |
+| 735 | `amc mechanic verify` | Verify mechanic signatures and artifacts |
+| 736 | `amc memory` | Memory maturity assessment and management |
+| 737 | `amc memory assess` | Full memory maturity assessment |
+| 738 | `amc memory retrieve` | Retrieve active reasoning memory for a consumer |
+| 739 | `amc memory show` | Show one reasoning memory item |
+| 740 | `amc memory writeback` | Write governed reasoning memory from an EpisodeRecord |
+| 741 | `amc memory-advisories` | Show advisories from correction memory for prompt injection |
+| 742 | `amc memory-expire` | Expire stale lessons past their TTL |
+| 743 | `amc memory-extract` | Extract lessons from verified effective corrections |
+| 744 | `amc memory-report` | Generate correction memory report |
+| 745 | `amc meta-confidence` | Report confidence in the maturity score itself |
+| 746 | `amc methodology` | Print the public AMC scoring methodology manifest and hash |
+| 747 | `amc metrics` | Prometheus metrics endpoint helpers |
+| 748 | `amc metrics status` | Show configured metrics endpoint bind/port |
+| 749 | `amc micro-canary-alerts` | Show active micro-canary alerts |
+| 750 | `amc micro-canary-report` | Generate micro-canary status report |
+| 751 | `amc micro-canary-run` | Run all micro-canary probes immediately |
+| 752 | `amc mirofish` | Agent behavior simulation framework — flight simulator for AI agents |
+| 753 | `amc mirofish compare` | Side-by-side comparison of two scenarios |
+| 754 | `amc mirofish create` | Interactive scenario builder |
+| 755 | `amc mirofish list` | List available built-in scenarios |
+| 756 | `amc mirofish run` | Run a Monte Carlo simulation with a scenario |
+| 757 | `amc mirofish stress` | Find governance breaking points for a scenario |
+| 758 | `amc mode` | Switch CLI role mode |
+| 759 | `amc mode agent` | Switch to agent mode (read-only / self-check commands) |
+| 760 | `amc mode owner` | Switch to owner mode (configuration + signing allowed) |
+| 761 | `amc monitor` | Continuous production monitoring — real-time scoring, drift detection, and alerting |
+| 762 | `amc monitor check` | One-shot trust drift analysis (check for degradation without running continuously) |
+| 763 | `amc monitor events` | Show recent monitoring events |
+| 764 | `amc monitor live` | Start real-time monitoring with live assurance checks on incoming traces |
+| 765 | `amc monitor metrics` | Get metrics for a specific agent |
+| 766 | `amc monitor start` | Start continuous monitoring: scores agent at intervals, detects drift, sends alerts on degradation |
+| 767 | `amc monitor status` | Show monitoring status for all agents |
+| 768 | `amc native-extension` | Inspect, explicitly sign and install declarative native context and prompt commands |
+| 769 | `amc native-extension inspect` | Read manifest/content hashes and workspace signature status without loading or writing |
+| 770 | `amc native-extension install` | Copy an already signed extension into the local plugin store without activation |
+| 771 | `amc native-extension sign` | Sign the exact reviewed manifest with existing AMC workspace BUNDLE signing policy |
+| 772 | `amc notary` | AMC Notary signing boundary operations |
+| 773 | `amc notary attest` | Generate signed notary runtime attestation bundle (.amcattest) |
+| 774 | `amc notary init` | Initialize AMC Notary config and signing backend |
+| 775 | `amc notary log-verify` | Verify notary append-only signing log + seal signature |
+| 776 | `amc notary pubkey` | Print notary public key and fingerprint |
+| 777 | `amc notary sign` | Sign a payload file using Notary (admin utility) |
+| 778 | `amc notary start` | Start AMC Notary service (foreground) |
+| 779 | `amc notary status` | Show notary backend and log status |
+| 780 | `amc notary verify-attest` | Verify a .amcattest bundle offline |
+| 781 | `amc observe` | Observability — timeline, anomaly detection, and tracing |
+| 782 | `amc observe anomalies` | Detect observability anomalies (evidence rate drops, trust regressions, score volatility) |
+| 783 | `amc observe timeline` | Show agent evidence timeline with score progression |
+| 784 | `amc openapi-generate` | Generate live OpenAPI spec (Studio + Bridge + Gateway) |
+| 785 | `amc operator-dashboard` | Generate operator dashboard showing why questions are capped and how to unlock |
+| 786 | `amc ops` | Operational hardening policy controls |
+| 787 | `amc ops backpressure` | Show backpressure pipeline health |
+| 788 | `amc ops circuit-breaker-init` | Initialize circuit breaker policy |
+| 789 | `amc ops circuit-breaker-reset` | Reset all circuit breakers |
+| 790 | `amc ops circuit-breaker-status` | Show circuit breaker status |
+| 791 | `amc ops dead-letters` | Show dead letter queue |
+| 792 | `amc ops init` | Create and sign .amc/ops-policy.yaml |
+| 793 | `amc ops latency` | Show latency accounting report |
+| 794 | `amc ops mode` | Show or set degradation mode |
+| 795 | `amc ops print` | Print effective ops policy |
+| 796 | `amc ops sign` | Re-sign an edited .amc/ops-policy.yaml so the ledger, retention and payload caps apply it |
+| 797 | `amc ops slo` | Show governance SLO dashboard |
+| 798 | `amc ops verify` | Verify ops-policy signature |
+| 799 | `amc org` | Org graph and real-time comparative scorecards |
+| 800 | `amc org add` | - |
+| 801 | `amc org add node` | - |
+| 802 | `amc org assign` | - |
+| 803 | `amc org commit` | - |
+| 804 | `amc org community` | Community/platform governance scoring |
+| 805 | `amc org community init` | - |
+| 806 | `amc org community score` | - |
+| 807 | `amc org compare` | - |
+| 808 | `amc org init` | - |
+| 809 | `amc org inspect` | - |
+| 810 | `amc org learn` | - |
+| 811 | `amc org own` | - |
+| 812 | `amc org report` | - |
+| 813 | `amc org roles` | List the canonical 70 AMC org roles |
+| 814 | `amc org run` | Run the advanced 70-role org lifecycle loop with isolated role workspaces |
+| 815 | `amc org runs` | List org lifecycle runs |
+| 816 | `amc org score` | - |
+| 817 | `amc org unassign` | - |
+| 818 | `amc org verify` | Verify signed org.yaml |
+| 819 | `amc outcomes` | Outcome contracts, value signals, and reports |
+| 820 | `amc outcomes attest` | Record a manual outcome signal (self-attested, SELF_REPORTED) |
+| 821 | `amc outcomes diff` | Diff two outcome reports |
+| 822 | `amc outcomes init` | Create and sign outcome contract |
+| 823 | `amc outcomes report` | Generate outcomes report (agent) or fleet outcomes report |
+| 824 | `amc outcomes verify` | Verify outcome contract signature |
+| 825 | `amc overhead-profile` | Set the overhead mode profile (STRICT, BALANCED, LEAN) |
+| 826 | `amc overhead-report` | Generate per-feature overhead accounting report |
+| 827 | `amc oversight` | Human oversight quality assessment |
+| 828 | `amc oversight assess` | Assess human oversight quality |
+| 829 | `amc own` | Ownership flow for top maturity gaps |
+| 830 | `amc pack` | Community assurance pack registry — NPM-style package management |
+| 831 | `amc pack info` | Show detailed information about a pack |
+| 832 | `amc pack init` | Initialize a new pack in <name>/ or an explicit --dir |
+| 833 | `amc pack install` | Install a community assurance pack |
+| 834 | `amc pack list` | List installed packs |
+| 835 | `amc pack publish` | Publish a pack to the registry |
+| 836 | `amc pack registry` | Pack registry management |
+| 837 | `amc pack registry init` | Initialize local pack registry |
+| 838 | `amc pack registry serve` | Start a local pack registry server |
+| 839 | `amc pack search` | Search for packs in the registry |
+| 840 | `amc pack test` | Test a local pack directory; defaults to cwd and auto-detects one child pack |
+| 841 | `amc pack uninstall` | Uninstall a pack |
+| 842 | `amc pair` | LAN pairing code operations |
+| 843 | `amc pair create` | Create one-time pairing code (LAN login pairing or agent bridge pairing) |
+| 844 | `amc pair redeem` | Redeem pairing code for a lease token file |
+| 845 | `amc passport` | Agent Passport (shareable maturity credential) |
+| 846 | `amc passport badge` | Print deterministic single-line badge from latest cache |
+| 847 | `amc passport capabilities-add` | Add capability declaration to agent passport |
+| 848 | `amc passport compare` | Compare two agents by passport maturity dimensions |
+| 849 | `amc passport create` | Create deterministic signed .amcpass artifact |
+| 850 | `amc passport export-latest` | Export latest passport for a scope to .amcpass |
+| 851 | `amc passport init` | Create and sign .amc/passport/policy.yaml |
+| 852 | `amc passport issue-token` | Issue an AMC Trust Token for an agent |
+| 853 | `amc passport link` | Link agent passport to external platform identity |
+| 854 | `amc passport policy` | Passport policy operations |
+| 855 | `amc passport policy apply` | Apply passport policy from JSON/YAML file |
+| 856 | `amc passport policy print` | Print effective passport policy |
+| 857 | `amc passport search` | Search agents by capability and minimum maturity level |
+| 858 | `amc passport share` | Generate shareable passport material |
+| 859 | `amc passport show` | Show .amcpass as JSON or single-line badge |
+| 860 | `amc passport translate-score` | Translate trust scores between scoring systems |
+| 861 | `amc passport verify` | Verify .amcpass artifact offline |
+| 862 | `amc passport verify-policy` | Verify signed passport policy |
+| 863 | `amc passport verify-token` | Verify an AMC Trust Token (pass JSON string) |
+| 864 | `amc playground` | Interactive scenario runner |
+| 865 | `amc playground list` | List available scenarios |
+| 866 | `amc playground run` | Run all demo scenarios |
+| 867 | `amc plugin` | Signed content-only extension marketplace |
+| 868 | `amc plugin execute` | Execute approved plugin install/upgrade/remove request |
+| 869 | `amc plugin init` | Initialize signed plugin workspace files |
+| 870 | `amc plugin install` | Request plugin install (requires SECURITY dual-control approval) |
+| 871 | `amc plugin keygen` | Generate plugin publisher keypair |
+| 872 | `amc plugin limits` | Show current plugin sandbox resource limits |
+| 873 | `amc plugin list` | List installed plugins and verification status |
+| 874 | `amc plugin pack` | Create signed .amcplug package from a plugin folder |
+| 875 | `amc plugin print` | Print plugin manifest summary |
+| 876 | `amc plugin registries` | List signed workspace registry configuration |
+| 877 | `amc plugin registries-apply` | Apply and sign workspace registries.yaml from JSON or YAML file |
+| 878 | `amc plugin registry` | Manage plugin registries |
+| 879 | `amc plugin registry init` | Initialize local signed plugin registry directory |
+| 880 | `amc plugin registry publish` | Publish plugin package into registry and re-sign index |
+| 881 | `amc plugin registry serve` | Serve plugin registry over local HTTP |
+| 882 | `amc plugin registry verify` | Verify registry signature and package hashes |
+| 883 | `amc plugin registry-fingerprint` | Compute registry public key fingerprint |
+| 884 | `amc plugin remove` | Request plugin removal (requires SECURITY dual-control approval) |
+| 885 | `amc plugin search` | Search a plugin registry by id/fingerprint |
+| 886 | `amc plugin upgrade` | Request plugin upgrade (requires SECURITY dual-control approval) |
+| 887 | `amc plugin verify` | Verify plugin package signature + artifact hashes |
+| 888 | `amc plugin workspace-verify` | Verify workspace plugin signatures/integrity |
+| 889 | `amc policy` | Policy-as-code operations |
+| 890 | `amc policy action` | Signed autonomy action policy |
+| 891 | `amc policy action init` | Create and sign .amc/action-policy.yaml |
+| 892 | `amc policy action logic` | Compose existing Action Policy evidence requirements |
+| 893 | `amc policy action logic apply` | Apply evidence logic after exact confirmation |
+| 894 | `amc policy action logic compile` | Preview a deterministic evidence-logic change without writing |
+| 895 | `amc policy action logic show` | Show declared evidence gates and effective logic |
+| 896 | `amc policy action verify` | Verify action policy signature |
+| 897 | `amc policy approval` | Signed dual-control approval policy |
+| 898 | `amc policy approval init` | Create and sign .amc/approval-policy.yaml |
+| 899 | `amc policy approval verify` | Verify approval-policy signature |
+| 900 | `amc policy controls` | Show one verified Scope / When / Then projection of existing controls |
+| 901 | `amc policy pack` | Policy packs by archetype and risk tier |
+| 902 | `amc policy pack apply` | Apply policy pack and sign updated configs/targets |
+| 903 | `amc policy pack describe` | Describe policy pack contents |
+| 904 | `amc policy pack diff` | Show deterministic diff for applying a policy pack |
+| 905 | `amc policy pack list` | List built-in policy packs |
+| 906 | `amc policy scope` | Compile reusable action-class scopes into existing signed policies |
+| 907 | `amc policy scope apply` | Apply a scope preview after exact compile-ID confirmation |
+| 908 | `amc policy scope compile` | Preview a deterministic selected-rule merge without writing |
+| 909 | `amc policy scope list` | List immutable AMC action-class scope templates |
+| 910 | `amc policy simulate` | Simulate one projected control through its production evaluator without recording |
+| 911 | `amc policy test` | Run deterministic policy fixtures through production control evaluators |
+| 912 | `amc policy-canary-report` | Generate canary mode report for an agent |
+| 913 | `amc policy-canary-start` | Start policy canary mode (observation-only) |
+| 914 | `amc policy-debt-add` | Register a temporary policy waiver (debt) |
+| 915 | `amc policy-debt-list` | List active policy debt entries |
+| 916 | `amc product` | Product operations: routing, autonomy, metering, workflows |
+| 917 | `amc product autonomy` | Decide autonomy level for an agent |
+| 918 | `amc product features` | List product features |
+| 919 | `amc product features-recommended` | Show top recommended product features |
+| 920 | `amc product loop-detect` | Detect infinite loops in agent behavior |
+| 921 | `amc product metering` | Show metering and billing for an agent |
+| 922 | `amc product retry` | Execute a command with retry logic |
+| 923 | `amc product route` | Route a task to the best model/provider |
+| 924 | `amc prompt` | Northstar prompt policy + pack operations |
+| 925 | `amc prompt init` | Create and sign .amc/prompt/policy.yaml |
+| 926 | `amc prompt pack` | Prompt pack artifact operations |
+| 927 | `amc prompt pack build` | Build and sign .amcprompt for an agent |
+| 928 | `amc prompt pack diff` | Diff latest prompt pack against previous snapshot |
+| 929 | `amc prompt pack show` | Show provider-specific enforced system prompt |
+| 930 | `amc prompt pack verify` | Verify .amcprompt signature and lint signature |
+| 931 | `amc prompt policy` | Prompt policy operations |
+| 932 | `amc prompt policy apply` | Apply prompt policy from YAML file and sign |
+| 933 | `amc prompt policy print` | Print prompt policy |
+| 934 | `amc prompt scheduler` | Prompt pack recurrence scheduler |
+| 935 | `amc prompt scheduler disable` | Disable prompt scheduler |
+| 936 | `amc prompt scheduler enable` | Enable prompt scheduler |
+| 937 | `amc prompt scheduler run-now` | Run prompt scheduler now for one agent or all |
+| 938 | `amc prompt scheduler status` | Show prompt scheduler status |
+| 939 | `amc prompt status` | List per-agent prompt pack status |
+| 940 | `amc prompt verify` | Verify prompt policy, pack, lint and scheduler signatures |
+| 941 | `amc proof` | Domain Proof Lane source-to-rule proof checks |
+| 942 | `amc proof check` | Check a claim against a declared source-to-rule manifest and emit an amcproof artifact |
+| 943 | `amc provider` | Provider template operations |
+| 944 | `amc provider add` | Assign or update provider template for an agent |
+| 945 | `amc provider list` | List provider templates |
+| 946 | `amc python-sdk` | Generate the Python SDK package for AMC Bridge API |
+| 947 | `amc quality-report` | Show quality report |
+| 948 | `amc quickscore` | Full default interactive diagnostic — or use --rapid for 5-question express, --auto for ledger evidence |
+| 949 | `amc quickstart` | 2-minute quickstart with Quick Score assessment |
+| 950 | `amc rate` | Rate agent run quality (thumbs up/down) |
+| 951 | `amc receipts-chain` | Show full delegation chain for a receipt |
+| 952 | `amc redaction-test` | Run privacy redaction tests against built-in rules |
+| 953 | `amc redteam` | Run red-team attack simulations against a target agent |
+| 954 | `amc redteam attack` | Run attack plugins (prompt-injection, data-exfiltration, privilege-escalation, model-manipulation, denial-of-service) |
+| 955 | `amc redteam attack-list` | List available attack plugins |
+| 956 | `amc redteam plugins` | List available attack plugins (assurance packs) |
+| 957 | `amc redteam run` | Execute red-team plugins with chosen attack strategies and generate a vulnerability report |
+| 958 | `amc redteam strategies` | List available attack strategies |
+| 959 | `amc release` | Deterministic release engineering and offline verification |
+| 960 | `amc release init` | Initialize AMC release signing keypair |
+| 961 | `amc release licenses` | Generate dependency license inventory |
+| 962 | `amc release pack` | Build a signed .amcrelease bundle |
+| 963 | `amc release print` | Print release bundle manifest summary |
+| 964 | `amc release provenance` | Generate AMC provenance record |
+| 965 | `amc release sbom` | Generate deterministic CycloneDX SBOM |
+| 966 | `amc release scan` | Run strict secret scan on a .amcrelease bundle |
+| 967 | `amc release verify` | Verify a .amcrelease bundle offline |
+| 968 | `amc report` | Render report for run ID, saved alias, prefix, or 'latest' |
+| 969 | `amc residency-policy` | Create or list data residency policies |
+| 970 | `amc residency-report` | Generate data residency compliance report for a tenant |
+| 971 | `amc resource` | Govern prompts, tools, memory, policies, routes, and other agent-defining resources |
+| 972 | `amc resource apply` | Accept current resources as the new signed manifest; dry-run unless --yes is set |
+| 973 | `amc resource contract` | Show the AMC-native governed resource lifecycle contract |
+| 974 | `amc resource diff` | Diff an Enforce resource manifest against the current workspace |
+| 975 | `amc resource evaluate` | Evaluate a resource proposal against Enforce gates |
+| 976 | `amc resource get` | Inspect one resource in an Enforce resource manifest |
+| 977 | `amc resource history` | Show signed Enforce resource manifests, snapshots, and receipts |
+| 978 | `amc resource list` | List resources in an Enforce resource manifest |
+| 979 | `amc resource propose` | Create a dry-run resource change proposal from the latest manifest to current workspace state |
+| 980 | `amc resource restore` | Restore resources from an Enforce snapshot; dry-run unless --apply is set |
+| 981 | `amc resource rollback` | Roll back to the signed previous version, or an explicit canonical snapshot |
+| 982 | `amc resource snapshot` | Write the current Enforce resource manifest |
+| 983 | `amc resource status` | Show the signed active, previous, rollback, drift, and integrity state |
+| 984 | `amc resource validate` | Validate governed resource changes before accepting them |
+| 985 | `amc retention` | Retention/archive payload lifecycle operations |
+| 986 | `amc retention run` | Run archival + payload prune lifecycle |
+| 987 | `amc retention status` | Show retention/archive status |
+| 988 | `amc retention verify` | Verify archive manifests/signatures and ledger continuity |
+| 989 | `amc role-presets` | List available dashboard role presets |
+| 990 | `amc rollback-create` | Create a rollback pack from the current policy file |
+| 991 | `amc run` | Full assessment — Score + Shield + Enforce + Vault + Watch + Comply + Fleet + Passport in one command |
+| 992 | `amc run-alias` | Name diagnostic runs for report and history workflows |
+| 993 | `amc run-alias list` | List diagnostic run aliases for the active agent |
+| 994 | `amc run-alias remove` | Remove a diagnostic run alias |
+| 995 | `amc run-alias set` | Assign a reusable alias to a diagnostic run |
+| 996 | `amc runtime` | Runtime run manager for connected agents |
+| 997 | `amc runtime cancel` | Cancel a runtime run cleanly |
+| 998 | `amc runtime complete` | Complete a runtime run |
+| 999 | `amc runtime create` | Create a persisted connected-agent runtime run |
+| 1000 | `amc runtime degrade` | Mark a runtime run degraded |
+| 1001 | `amc runtime event` | Append an event to a persisted runtime run |
+| 1002 | `amc runtime export` | Export runtime run events as JSON or JSONL |
+| 1003 | `amc runtime inspect` | Inspect a runtime run and its event stream |
+| 1004 | `amc runtime list` | List persisted runtime runs |
+| 1005 | `amc runtime resume` | Resume a running or degraded runtime run from persisted state |
+| 1006 | `amc runtime status` | Show persisted runtime run-manager status |
+| 1007 | `amc sandbox` | Hardened sandbox execution |
+| 1008 | `amc sandbox run` | Run agent command in hardened Docker sandbox |
+| 1009 | `amc scan` | Zero-integration agent assessment scanner |
+| 1010 | `amc scan model-scan` | Scan ML model files for security threats (malicious code, backdoors, supply chain attacks) |
+| 1011 | `amc scim` | SCIM token management |
+| 1012 | `amc scim init` | Enable SCIM provisioning and optionally create an initial bearer token |
+| 1013 | `amc scim token` | SCIM bearer token operations |
+| 1014 | `amc scim token create` | Create a SCIM bearer token and store hash in host vault |
+| 1015 | `amc score` | Maturity scoring, adversarial testing, and evidence collection |
+| 1016 | `amc score a2a-protocol` | Score agent-to-agent protocol maturity: card completeness, lifecycle, auth, format, errors, discovery |
+| 1017 | `amc score adversarial` | Test gaming resistance of scoring |
+| 1018 | `amc score alignment-index` | Compute composite alignment index |
+| 1019 | `amc score audit-depth` | Score audit trail depth and completeness |
+| 1020 | `amc score autonomy-duration` | Track time between human checkpoints with domain risk profiles |
+| 1021 | `amc score behavioral-contract` | Score agent behavioral contract maturity (alignment card, permitted/forbidden actions) |
+| 1022 | `amc score calibration-gap` | Measure delta between agent self-reported confidence and observed behavior |
+| 1023 | `amc score collect-evidence` | Collect an agent's evidence from the ledger |
+| 1024 | `amc score density-map` | Heatmap of evidence density per question per dimension — reveals blind spots |
+| 1025 | `amc score distributed-agents` | Score distributed multi-agent execution: partitions, sync, failover, consensus, load, observability |
+| 1026 | `amc score eu-ai-act` | EU AI Act obligations (Art. 9-17, GPAI systemic risk); not evaluated: file presence is not evidence |
+| 1027 | `amc score evidence-conflict` | Measure internal consistency of evidence — detect conflicting signals |
+| 1028 | `amc score evidence-coverage` | Show automated vs manual evidence coverage |
+| 1029 | `amc score evidence-ingest` | Ingest evidence from external systems (openai-evals, langsmith, mlflow, custom) |
+| 1030 | `amc score factuality` | Score factuality across parametric, retrieval, and grounded dimensions |
+| 1031 | `amc score fail-secure` | Score fail-secure tool governance (deny-by-default, rate limiting, anomaly detection) |
+| 1032 | `amc score faithfulness` | Score how well LLM output is grounded in provided context |
+| 1033 | `amc score formal-spec` | Compute formal maturity score for an agent |
+| 1034 | `amc score gaming-resistance` | Inventory AMC source controls; behavioral gaming resistance is not measured |
+| 1035 | `amc score industry-adjust` | Adjust a score using an industry-specific trust model |
+| 1036 | `amc score industry-benchmark` | Show industry benchmark percentiles (not evaluated: no peer data) |
+| 1037 | `amc score industry-list` | List all available industry trust models |
+| 1038 | `amc score interpretability` | Score structural transparency and explainability |
+| 1039 | `amc score kernel-sandbox` | Score kernel-level sandbox maturity (OS isolation, filesystem/network restrictions) |
+| 1040 | `amc score lean-profile` | Show lean AMC profile |
+| 1041 | `amc score level-transition` | Track formal promotion/demotion events with evidence gates |
+| 1042 | `amc score memory-depth` | Score deep memory infrastructure: backend resilience, compression fidelity, cross-session consistency, TTL, capacity |
+| 1043 | `amc score memory-integrity` | Score memory correction persistence and poisoning resistance |
+| 1044 | `amc score mutual-verification` | Score agent-to-agent trust verification (challenge-response) |
+| 1045 | `amc score operational-independence` | Calculate operational independence score |
+| 1046 | `amc score output-attestation` | Score output signing and trust metadata for receiving agents |
+| 1047 | `amc score output-integrity` | Score output integrity maturity (OWASP LLM02, confidence calibration, citation) |
+| 1048 | `amc score owasp-llm` | OWASP LLM Top 10 coverage (all 10 risks); not evaluated: file presence is not evidence |
+| 1049 | `amc score pause-quality` | Score quality of agent-initiated pauses |
+| 1050 | `amc score policy-consistency` | Test policy enforcement consistency across repeated trials (pass^k) |
+| 1051 | `amc score production-ready` | Run production readiness gate for an agent |
+| 1052 | `amc score regulatory-readiness` | Regulatory readiness (EU AI Act + ISO + OWASP); not evaluated: file presence is not evidence |
+| 1053 | `amc score runtime-identity` | Score runtime execution identity maturity (JIT credentials, user propagation, revocation) |
+| 1054 | `amc score safety-research` | Run the AI Safety Research evaluation lane — 4-dimension assessment based on frontier safety research |
+| 1055 | `amc score self-knowledge` | Score prior art self-knowledge maturity (typed attention, trace layer, confidence+citation) |
+| 1056 | `amc score simulation-lane` | Run the Simulation & Forecast evaluation lane — 5-dimension assessment for simulation/forecast systems |
+| 1057 | `amc score sleeper-detection` | Detect context-dependent behavioral inconsistencies |
+| 1058 | `amc score state-portability` | Score agent state portability (vendor-neutral format, serialization, integrity on transfer) |
+| 1059 | `amc score task-horizon` | Score task-completion time horizon (METR-inspired) |
+| 1060 | `amc score tier` | Run tiered maturity assessment (quick/standard/deep) |
+| 1061 | `amc score transparency-log` | Score network transparency log (Merkle tree, inclusion proofs) |
+| 1062 | `amc session` | Native signed sessions: inspect, compact, verify, replay and recover |
+| 1063 | `amc session anchor` | Anchor a closed session's root into the transparency log |
+| 1064 | `amc session compact` | List signed history origins, then apply an explicit native summary or drop without rewriting evidence |
+| 1065 | `amc session proof` | Export a session's inclusion proof (verifiable offline, without this workspace) |
+| 1066 | `amc session recover` | Recover a crashed session by appending synthetic closers under a fenced claim (append-only) |
+| 1067 | `amc session replay-request` | Rebuild each request this session sent from its signed rows and check it against the recorded digest |
+| 1068 | `amc session show` | Show a session's projected conversation and its event spine |
+| 1069 | `amc session spill-read` | Read a bounded byte range of retained output against its signed origin |
+| 1070 | `amc session verify` | Verify the ledger and report per-session lifecycle verdicts (open / released / interrupted / closed) |
+| 1071 | `amc session verify-proof` | Verify a session inclusion proof offline — needs only the bundle and a pinned fingerprint |
+| 1072 | `amc sessions` | View and analyze user sessions |
+| 1073 | `amc sessions list` | List tracked sessions |
+| 1074 | `amc setup` | Setup wizard for the full-score path and Studio gateway |
+| 1075 | `amc shell` | Interactive AMC session — natural language + commands |
+| 1076 | `amc shield` | Threat detection and security scanning |
+| 1077 | `amc shield analyze` | Run static code analyzer on a skill file |
+| 1078 | `amc shield analyze-mcp` | Scan an MCP server definition for security risks (score L0–L5) |
+| 1079 | `amc shield analyze-runtime` | Analyze a proposed runtime agent action through the Shield trust pipeline |
+| 1080 | `amc shield confirm` | Controlled exploit confirmation with strict authorization gates |
+| 1081 | `amc shield confirm export` | Export a redacted safe proof without exploit instructions |
+| 1082 | `amc shield confirm proofs` | List safe exploit-confirmation proof artifacts |
+| 1083 | `amc shield confirm run` | Run authorized safe exploit confirmation from a task JSON file |
+| 1084 | `amc shield confirm scope-write` | Write a signed exploit-confirmation authorization scope from JSON |
+| 1085 | `amc shield confirm scopes` | List exploit-confirmation authorization scopes |
+| 1086 | `amc shield conversation-integrity` | Check conversation integrity for an agent (demo) |
+| 1087 | `amc shield detect-injection` | Detect prompt injection attempts in text |
+| 1088 | `amc shield mcp-ledger` | Signed MCP trust ledger: scan a set of MCP servers and record a clean-as-of receipt |
+| 1089 | `amc shield posture` | One-command agent-security posture scorecard (config, MCP trust, secrets, isolation, supply-chain) — L0–L5, signed receipt |
+| 1090 | `amc shield red-team` | Run a quick red team campaign (5 attacks on demo target). Tip: For full red-team suite with strategies, use `amc redteam run` |
+| 1091 | `amc shield red-team-status` | Show current red team capabilities and attack template count |
+| 1092 | `amc shield reputation` | Check reputation score for a tool |
+| 1093 | `amc shield sandbox` | Check sandbox configuration for an agent |
+| 1094 | `amc shield sanitize` | Sanitize text — strip LLM prompt injection and dangerous AI patterns (not SQL/XSS) |
+| 1095 | `amc shield sbom` | Generate software bill of materials from package.json |
+| 1096 | `amc shield scan-config` | Scan the coding-agent config surface (CLAUDE.md, settings, hooks, MCP, agent defs) for security risks (L0–L5, signed receipt) |
+| 1097 | `amc shield threat-intel` | Check threat intelligence for an input |
+| 1098 | `amc shield trust-pipeline` | Run end-to-end trust pipeline for an agent action |
+| 1099 | `amc simulate-bridge` | Run a simulated bridge request for local testing |
+| 1100 | `amc snapshot` | Generate Unified Clarity Snapshot markdown |
+| 1101 | `amc spill` | Inventory, transport and deliberately erase native retained output |
+| 1102 | `amc spill erase` | Plan exact local erasure read-only; apply only an unchanged reviewed plan |
+| 1103 | `amc spill export` | Export authenticated ciphertext to a new directory, retaining explicit gaps |
+| 1104 | `amc spill inventory` | Read all selected session evidence and inventory ciphertext without decrypting |
+| 1105 | `amc spill restore` | Restore ciphertext against this destination's existing signed evidence |
+| 1106 | `amc sso` | SSO setup shortcuts for OIDC and SAML providers |
+| 1107 | `amc sso configure` | Configure an OIDC or SAML SSO provider |
+| 1108 | `amc standard` | Open Compass Standard schema bundle and validation |
+| 1109 | `amc standard generate` | Generate signed Open Compass schema bundle under .amc/standard/ |
+| 1110 | `amc standard print` | Print one generated schema |
+| 1111 | `amc standard schemas` | List generated schemas with digests |
+| 1112 | `amc standard validate` | Validate a JSON file or AMC artifact against a standard schema |
+| 1113 | `amc standard verify` | Verify schema bundle signatures and manifest digests |
+| 1114 | `amc status` | Show AMC Studio and vault status |
+| 1115 | `amc strategy` | Compare inference strategies and govern route changes |
+| 1116 | `amc strategy compare` | Compare model/provider strategies with score, cost, latency, risk, and evidence |
+| 1117 | `amc strategy list` | List inference strategy comparison runs |
+| 1118 | `amc strategy rollback` | Roll back an accepted inference route change |
+| 1119 | `amc strategy show` | Inspect an inference strategy comparison run |
+| 1120 | `amc studio` | Studio API helpers |
+| 1121 | `amc studio healthcheck` | Health/readiness probe for deployment runtime |
+| 1122 | `amc studio lan` | LAN mode controls for Compass Console |
+| 1123 | `amc studio lan disable` | Disable LAN mode and revert to localhost-only |
+| 1124 | `amc studio lan enable` | Enable LAN mode with pairing gate |
+| 1125 | `amc studio ping` | Ping local Studio API /health endpoint |
+| 1126 | `amc studio start` | Start Studio in foreground (non-interactive, deployment-safe) |
+| 1127 | `amc supervise` | DEPRECATED — use 'amc adapters run'. Supervises any process and injects gateway routing env vars, but mints no lease, so its evidence is not OBSERVED. |
+| 1128 | `amc target` | Target profile operations |
+| 1129 | `amc target diff` | Diff run against target profile |
+| 1130 | `amc target set` | Interactive equalizer wizard |
+| 1131 | `amc target verify` | Verify target profile signature |
+| 1132 | `amc tenant-isolation-check` | Check tenant isolation between all registered tenants |
+| 1133 | `amc tenant-register` | Register a tenant boundary |
+| 1134 | `amc ticket` | Execution ticket operations |
+| 1135 | `amc ticket issue` | Issue short-lived signed execution ticket |
+| 1136 | `amc ticket verify` | Verify signed execution ticket |
+| 1137 | `amc tools` | ToolHub tools config |
+| 1138 | `amc tools init` | Create and sign .amc/tools.yaml |
+| 1139 | `amc tools list` | List signed ToolHub tools grouped by provider context |
+| 1140 | `amc tools sign` | Validate and sign the existing reviewed tool policy without changing its grants |
+| 1141 | `amc tools verify` | Verify tools.yaml signature |
+| 1142 | `amc trace` | Trace explorer — inspect agent execution traces, sessions, and tool calls |
+| 1143 | `amc trace failures` | Show top recurring failure clusters mined from trace indexes |
+| 1144 | `amc trace index` | List or inspect distilled trace failure indexes |
+| 1145 | `amc trace inspect` | Inspect evidence events — show tool calls, decisions, and trust tiers |
+| 1146 | `amc trace list` | List recent agent sessions with evidence summary |
+| 1147 | `amc trace stats` | Show trace statistics — event counts by type, trust tier, tool usage |
+| 1148 | `amc transform` | Transformation OS (4C plans, tracking, attestations) |
+| 1149 | `amc transform attest` | - |
+| 1150 | `amc transform attest-verify` | - |
+| 1151 | `amc transform init` | Initialize signed .amc/transform-map.yaml |
+| 1152 | `amc transform map` | Inspect or apply transform map |
+| 1153 | `amc transform map apply` | - |
+| 1154 | `amc transform map show` | - |
+| 1155 | `amc transform plan` | - |
+| 1156 | `amc transform report` | - |
+| 1157 | `amc transform status` | - |
+| 1158 | `amc transform track` | - |
+| 1159 | `amc transform verify` | Verify signed transform map |
+| 1160 | `amc transparency` | Append-only transparency log operations |
+| 1161 | `amc transparency export` | Export transparency bundle |
+| 1162 | `amc transparency init` | Initialize append-only transparency log |
+| 1163 | `amc transparency merkle` | Merkle transparency root/proof operations |
+| 1164 | `amc transparency merkle prove` | Export signed inclusion proof bundle for entry hash |
+| 1165 | `amc transparency merkle rebuild` | Rebuild Merkle leaves/roots from transparency log |
+| 1166 | `amc transparency merkle root` | Show current Merkle root and history |
+| 1167 | `amc transparency merkle verify-proof` | Verify signed inclusion proof bundle |
+| 1168 | `amc transparency report` | Generate an Agent Transparency Report — what the agent does, can access, and how trustworthy it is |
+| 1169 | `amc transparency tail` | Tail transparency entries |
+| 1170 | `amc transparency verify` | Verify transparency chain + seal signature |
+| 1171 | `amc transparency verify-bundle` | Verify exported transparency bundle |
+| 1172 | `amc trust` | Trust mode and Notary enforcement configuration |
+| 1173 | `amc trust enable-notary` | Enable fail-closed NOTARY trust mode |
+| 1174 | `amc trust freshness` | Report temporal trust freshness and half-life decay |
+| 1175 | `amc trust init` | Create and sign .amc/trust.yaml — sets up the trust mode (SELF/NOTARY) that governs artifact signing |
+| 1176 | `amc trust resign` | Re-sign the current .amc/trust.yaml in place with the current artifact-seal key, keeping NOTARY settings |
+| 1177 | `amc trust status` | Show trust mode, signature status, and notary health |
+| 1178 | `amc truthguard` | Deterministic output truth-constraint validator |
+| 1179 | `amc truthguard validate` | Validate structured agent output claims against deterministic truth constraints |
+| 1180 | `amc tune` | Mechanic mode tuning wizard |
+| 1181 | `amc unknowns` | List known unknowns for an agent's latest diagnostic run |
+| 1182 | `amc up` | Start AMC control plane in one command (studio + gateway + bridge) |
+| 1183 | `amc upgrade` | Generate upgrade plan |
+| 1184 | `amc user` | Multi-user RBAC account management |
+| 1185 | `amc user add` | Add a user with RBAC roles |
+| 1186 | `amc user init` | Initialize signed users.yaml with first OWNER user |
+| 1187 | `amc user list` | List RBAC users |
+| 1188 | `amc user revoke` | Revoke a user account |
+| 1189 | `amc user role` | Set user roles |
+| 1190 | `amc user role set` | Replace roles for a user |
+| 1191 | `amc user verify` | Verify users.yaml signature |
+| 1192 | `amc value` | Value realization engine (contracts, scoring, ROI) |
+| 1193 | `amc value contract` | Value contract operations |
+| 1194 | `amc value contract apply` | Apply value contract from YAML/JSON file |
+| 1195 | `amc value contract init` | Create and sign value contract template |
+| 1196 | `amc value contract print` | Print value contract and signature status |
+| 1197 | `amc value contract verify` | Verify value contract signature |
+| 1198 | `amc value import` | Import numeric KPI points from CSV (ts,value) |
+| 1199 | `amc value ingest` | Ingest value webhook payload JSON |
+| 1200 | `amc value init` | Initialize signed value policy, default contract, and scheduler |
+| 1201 | `amc value policy` | Value policy operations |
+| 1202 | `amc value policy apply` | Apply signed value policy from YAML/JSON file |
+| 1203 | `amc value policy default` | Print default value policy JSON |
+| 1204 | `amc value policy print` | Print effective value policy JSON |
+| 1205 | `amc value report` | Generate signed value report |
+| 1206 | `amc value scheduler` | Value scheduler controls |
+| 1207 | `amc value scheduler disable` | Disable value scheduler |
+| 1208 | `amc value scheduler enable` | Enable value scheduler |
+| 1209 | `amc value scheduler run-now` | Run value scheduler now |
+| 1210 | `amc value scheduler status` | Show value scheduler status |
+| 1211 | `amc value snapshot` | Generate/load latest signed value snapshot |
+| 1212 | `amc value verify` | Verify value workspace signatures/artifacts |
+| 1213 | `amc value verify-policy` | Verify signed value policy |
+| 1214 | `amc vault` | Encrypted key vault operations |
+| 1215 | `amc vault classify` | Classify data sensitivity level |
+| 1216 | `amc vault dlp` | DLP scanner for PII and secrets |
+| 1217 | `amc vault dlp scan` | Scan text for PII and secrets |
+| 1218 | `amc vault dsar` | Persistent DSAR (Data Subject Access Request) workflow |
+| 1219 | `amc vault dsar complete` | Mark a DSAR request complete and append an audit event |
+| 1220 | `amc vault dsar list` | List persistent DSAR requests |
+| 1221 | `amc vault dsar status` | Show a persistent DSAR request |
+| 1222 | `amc vault dsar submit` | Submit a persistent DSAR request |
+| 1223 | `amc vault dsar-status` | Show DSAR (Data Subject Access Request) status |
+| 1224 | `amc vault forget` | Remove the remembered vault passphrase for this workspace (Keychain or credentials file) |
+| 1225 | `amc vault history` | Review and explicitly migrate signing-key history |
+| 1226 | `amc vault history migrate` | Authenticate only current and explicitly approved keys; preserve original untrusted bytes |
+| 1227 | `amc vault init` | Initialize encrypted vault for signing keys |
+| 1228 | `amc vault lock` | Lock vault and clear in-memory private keys |
+| 1229 | `amc vault privacy-budget` | Check privacy budget for an agent |
+| 1230 | `amc vault rag-guard` | Guard RAG chunks against injection |
+| 1231 | `amc vault rotate-keys` | Rotate the monitor key (ledger-row and receipt purposes) with a signed rotation statement; alias of amc keys rotate |
+| 1232 | `amc vault scrub` | Scrub metadata from a file |
+| 1233 | `amc vault secret-share` | Split a secret into shares using Shamir's Secret Sharing |
+| 1234 | `amc vault status` | Show vault status |
+| 1235 | `amc vault unlock` | Unlock vault into memory for signing operations |
+| 1236 | `amc vault zk-commit` | Create a Pedersen commitment to a value |
+| 1237 | `amc vault zk-range-proof` | Create a range commitment for an AMC score threshold (NOT a zero-knowledge proof; unsound, does not verify) |
+| 1238 | `amc vault zk-verify` | Check a range commitment (NOT a zero-knowledge verification; unsound) |
+| 1239 | `amc verify` | Verify integrity across AMC artifacts |
+| 1240 | `amc verify all` | Verify trust/policies/plugins/logs/ledger/artifacts in one pass |
+| 1241 | `amc vibe-audit` | Run static safety checks for AI-generated code |
+| 1242 | `amc watch` | Observability, attestation, and safety testing |
+| 1243 | `amc watch alerts` | Show recent alerts for a monitored agent |
+| 1244 | `amc watch attest` | Attest an agent output |
+| 1245 | `amc watch connect` | Connect to an observability provider (langfuse, helicone, otlp, datadog, webhook) |
+| 1246 | `amc watch explain` | Generate explainability packet for an agent run |
+| 1247 | `amc watch host-hardening` | Check host hardening status for this AMC deployment |
+| 1248 | `amc watch profiler-anomalies` | List detected behavioral anomalies for an agent |
+| 1249 | `amc watch profiler-start` | Start behavioral profiling for an agent |
+| 1250 | `amc watch profiler-status` | Show behavioral profiler status and any recent anomalies |
+| 1251 | `amc watch providers` | Show connected observability providers and trace stats |
+| 1252 | `amc watch safety-test` | Run safety tests for an agent |
+| 1253 | `amc watch start` | Start continuous production monitoring for an agent |
+| 1254 | `amc watch status` | Show all monitored agents and their current state |
+| 1255 | `amc whatif` | Equalizer what-if simulator |
+| 1256 | `amc whatif equalizer` | - |
+| 1257 | `amc whatif targets` | - |
+| 1258 | `amc why-capped` | Show why each question is capped at its current level |
+| 1259 | `amc wire` | Serve the NDJSON JSON-RPC wire on a unix socket (accepts work; does not run it) |
+| 1260 | `amc wiring-status` | Show in-process production wiring counters (cannot observe other processes) |
+| 1261 | `amc workorder` | Signed work order operations |
+| 1262 | `amc workorder create` | Create and sign a work order |
+| 1263 | `amc workorder expire` | Expire/revoke a work order |
+| 1264 | `amc workorder list` | List work orders for agent |
+| 1265 | `amc workorder show` | Show signed work order JSON |
+| 1266 | `amc workorder verify` | Verify work order signature |
+| 1267 | `amc wrap` | DEPRECATED — use 'amc adapters run', which also mints a lease and routes through the gateway. Wraps a runtime and captures tamper-evident evidence. |
 
 ### Command Details
 
@@ -6044,6 +6048,15 @@ Verify identity.yaml signature
 | Option | Description |
 |--------|-------------|
 | `--host-dir <path>` | - |
+
+#### `amc identity workload-trust show`
+
+Show what the verified workload trust config pins (names and counts, no key material)
+
+
+| Option | Description |
+|--------|-------------|
+| `--json` | - |
 
 #### `amc import`
 

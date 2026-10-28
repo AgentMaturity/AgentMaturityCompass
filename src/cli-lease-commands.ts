@@ -11,6 +11,9 @@ import { ensureLeaseRevocationStore, issueLeaseForCli, revokeLeaseForCliAsync, v
 import { workspaceIdFromDirectory } from "./workspaces/workspaceId.js";
 import { assertOwnerMode } from "./mode/mode.js";
 
+// The workload trust commands (P2-25) are registered beside `amc identity`; re-exported here so cli.ts stays in budget.
+export { registerWorkloadTrustCommands } from "./cli-workload-trust-commands.js";
+
 export function registerLeaseCliCommands(program: Command): void {
   const leases = program.command("lease").description("Issue/verify/revoke short-lived agent leases");
 

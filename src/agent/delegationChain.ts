@@ -11,9 +11,10 @@
  * A lease v2 carries the chain's digest; the verifier loads the chain by that digest from the workspace's chain store,
  * so a chain that is missing, tampered with or revoked refuses the lease.
  */
-import { randomUUID } from "node:crypto";
+import { randomUUID, sign } from "node:crypto";
 import { join } from "node:path";
 import { z } from "zod";
+import { getSigningKey } from "../crypto/keys.js";
 import { verifyCurrentPurposeCredentialSignature } from "../keys/purposeCredentialSignature.js";
 import { signWithPurposeKey } from "../keys/purposeProviders.js";
 import { agentLeaseRevocationId } from "../leases/leaseSchema.js";
@@ -153,9 +154,39 @@ export function chainLeaf(chain: DelegationChain): DelegationLink {
   return chain.links[chain.links.length - 1]!;
 }
 
-async function signLink(workspace: string, unsigned: Omit<DelegationLink, "signature">): Promise<DelegationLink> {
+type Unsigned = Omit<DelegationLink, "signature">;
+const newLinkId = (): string => `dlink_${randomUUID().replace(/-/g, "")}`;
+const rootUnsigned = (root: UnsignedLink): Unsigned => ({ v: 1, linkId: newLinkId(), parentLinkId: null, depth: 0, ...root });
+
+function childUnsigned(parent: DelegationChain, child: Omit<UnsignedLink, "principal">, trust: ChainTrust): Unsigned {
+  const parentCheck = verifyChain(parent, trust);
+  if (!parentCheck.ok) throw new Error(`delegation refused: ${parentCheck.reason}`);
+  const leaf = chainLeaf(parent);
+  return { v: 1, linkId: newLinkId(), parentLinkId: leaf.linkId, depth: leaf.depth + 1, principal: { kind: "agent", ...leaf.delegate }, ...child };
+}
+
+/** The chain with `link` appended, verified as a whole; anything that widens, deepens past the cap or does not verify throws. */
+function appended(parent: readonly DelegationLink[], link: DelegationLink, trust: ChainTrust): DelegationChain {
+  const links = [...parent, link];
+  const chain = { links, digest: delegationChainDigest(links) };
+  const check = verifyChain(chain, trust);
+  if (!check.ok) throw new Error(`delegation refused: ${check.reason}`);
+  return chain;
+}
+
+async function signLink(workspace: string, unsigned: Unsigned): Promise<DelegationLink> {
   const signed = await signWithPurposeKey(workspace, "lease", signingBytes(unsigned));
   return { ...unsigned, signature: signed.signature.toString("base64url") };
+}
+
+/**
+ * Signs with the vault's lease key in-process, exactly as `issueLeaseToken` signs the lease that will bind this link, for
+ * the synchronous session-composition paths (Studio native tasks, CLI and ACP runs, in-process children). A workspace
+ * whose lease key lives in an external provider cannot mint those leases either; it uses the async variants.
+ */
+function signLinkSync(workspace: string, unsigned: Unsigned): DelegationLink {
+  if (process.env.AMC_NO_SIGN === "1") throw new Error("no-sign mode does not authorize delegation");
+  return { ...unsigned, signature: sign(null, signingBytes(unsigned), getSigningKey(workspace, "lease")).toString("base64url") };
 }
 
 /**
@@ -163,26 +194,23 @@ async function signLink(workspace: string, unsigned: Omit<DelegationLink, "signa
  * authority: Studio or the lease issuer, never an agent.
  */
 export async function issueRootDelegation(workspace: string, root: UnsignedLink, trust: ChainTrust): Promise<DelegationChain> {
-  const link = await signLink(workspace, { v: 1, linkId: `dlink_${randomUUID().replace(/-/g, "")}`, parentLinkId: null, depth: 0, ...root });
-  const chain = { links: [link], digest: delegationChainDigest([link]) };
-  const check = verifyChain(chain, trust);
-  if (!check.ok) throw new Error(`delegation refused: ${check.reason}`);
-  return chain;
+  return appended([], await signLink(workspace, rootUnsigned(root)), trust);
+}
+
+/** `issueRootDelegation`, signed in-process (see `signLinkSync`). */
+export function issueRootDelegationSync(workspace: string, root: UnsignedLink, trust: ChainTrust): DelegationChain {
+  return appended([], signLinkSync(workspace, rootUnsigned(root)), trust);
 }
 
 /** Extend a verified chain by one hop from its leaf delegate to `child`; refuses anything that would widen. */
 export async function extendDelegation(workspace: string, parent: DelegationChain,
   child: Omit<UnsignedLink, "principal">, trust: ChainTrust): Promise<DelegationChain> {
-  const parentCheck = verifyChain(parent, trust);
-  if (!parentCheck.ok) throw new Error(`delegation refused: ${parentCheck.reason}`);
-  const leaf = chainLeaf(parent);
-  const link = await signLink(workspace, { v: 1, linkId: `dlink_${randomUUID().replace(/-/g, "")}`, parentLinkId: leaf.linkId,
-    depth: leaf.depth + 1, principal: { kind: "agent", ...leaf.delegate }, ...child });
-  const links = [...parent.links, link];
-  const chain = { links, digest: delegationChainDigest(links) };
-  const check = verifyChain(chain, trust);
-  if (!check.ok) throw new Error(`delegation refused: ${check.reason}`);
-  return chain;
+  return appended(parent.links, await signLink(workspace, childUnsigned(parent, child, trust)), trust);
+}
+
+/** `extendDelegation`, signed in-process (see `signLinkSync`). */
+export function extendDelegationSync(workspace: string, parent: DelegationChain, child: Omit<UnsignedLink, "principal">, trust: ChainTrust): DelegationChain {
+  return appended(parent.links, signLinkSync(workspace, childUnsigned(parent, child, trust)), trust);
 }
 
 const CHAIN_DIR = ".amc/delegation/chains";
@@ -209,4 +237,24 @@ export function loadDelegationChain(workspace: string, digest: string): Delegati
   } catch {
     return null;
   }
+}
+
+/** What Studio's session detail shows of a chain (P2-25): each link's principal, delegate, scopes and window, and whether it verifies now. */
+export interface DelegationChainView {
+  readonly chainDigest: string;
+  readonly status: "verified" | "refused" | "unavailable";
+  readonly reason: string | null;
+  readonly links: readonly { readonly linkId: string; readonly depth: number; readonly principal: string; readonly delegate: string;
+    readonly scopes: readonly string[]; readonly notAfter: number }[];
+}
+
+export function delegationChainView(workspace: string, digest: string, trust: Omit<ChainTrust, "workspace">): DelegationChainView {
+  const chain = loadDelegationChain(workspace, digest);
+  if (chain === null || chain.digest !== digest) return { chainDigest: digest, status: "unavailable", reason: "the chain is not in this workspace's chain store", links: [] };
+  const verified = verifyChain(chain, { ...trust, workspace });
+  const principal = (link: DelegationLink): string => link.principal.kind === "human" ? `human:${link.principal.providerId}:${link.principal.subject}`
+    : link.principal.kind === "service" ? `service:${link.principal.serviceId}` : `agent:${link.principal.runAs}`;
+  return { chainDigest: digest, status: verified.ok ? "verified" : "refused", reason: verified.ok ? null : verified.reason,
+    links: chain.links.map((link) => ({ linkId: link.linkId, depth: link.depth, principal: principal(link), delegate: link.delegate.runAs,
+      scopes: [...link.scopes], notAfter: link.notAfter })) };
 }

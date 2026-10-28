@@ -47,10 +47,12 @@ export const leasePayloadSchema = z.object({
   // Lease v2 (P2-25): the digest of the signed delegation chain the lease was issued under, and the SPIFFE ID the lease
   // authority verified for the leaf delegate (null when it presented none). Present exactly when v is 2.
   delegationChainDigest: z.string().regex(/^[a-f0-9]{64}$/).optional(),
-  spiffeId: z.string().startsWith("spiffe://").nullable().optional()
+  spiffeId: z.string().startsWith("spiffe://").nullable().optional(),
+  // Lease v2 for a delegated child (P2-25): the leases it descends from, root first. Revoking any of them revokes it.
+  ancestorLeaseIds: z.array(z.string().min(1)).min(1).optional()
 }).refine((lease) => lease.v === 2 ? lease.delegationChainDigest !== undefined && lease.spiffeId !== undefined
-  : lease.delegationChainDigest === undefined && lease.spiffeId === undefined,
-  "a v2 lease carries delegationChainDigest and spiffeId; a v1 lease carries neither");
+  : lease.delegationChainDigest === undefined && lease.spiffeId === undefined && lease.ancestorLeaseIds === undefined,
+  "a v2 lease carries delegationChainDigest and spiffeId; a v1 lease carries none of the v2 fields");
 
 /**
  * The revocation-list id that revokes every lease and every delegation link of one agent (P2-23 retirement, P2-25).

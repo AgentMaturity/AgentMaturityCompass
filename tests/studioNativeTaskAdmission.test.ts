@@ -18,7 +18,7 @@ const view: NativeTaskView = { taskId, sessionId: "session-1", agentId: "reviewe
   maxSteps: 2, maxTokens: 64, state: "idle", archived: false, createdAt: 1, updatedAt: 2, turnEndReason: "complete", error: null,
   validationOutputs: [], validationSelection: null, validation: { status: "not-requested", turn: null, configSha256: null, checks: [] },
   verification: "not-verified", verificationScope: null, approvals: [], approvalError: null, nextCursor: 2, firstCursor: 0, droppedEvents: 0, canResume: true,
-  resumeBlockedReason: null, history: { status: "authenticated", backend: "sqlite", headEventHash: "a".repeat(64), eventCount: 2, message: "Synthetic route dispatch fixture" }, execution: null };
+  resumeBlockedReason: null, history: { status: "authenticated", backend: "sqlite", headEventHash: "a".repeat(64), eventCount: 2, message: "Synthetic route dispatch fixture" }, execution: null, delegation: null };
 const configuration: NativeTaskConfiguration = { schemaVersion: "2026-09-08", agentId: "reviewer", demo: false,
   providers: [{ id: "stub", local: true, model: "fixed", credential: null }],
   validation: { ready: false, configSha256: null, checks: [], message: "No operator checks configured." },

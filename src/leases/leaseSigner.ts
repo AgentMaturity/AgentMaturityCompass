@@ -40,7 +40,7 @@ export interface IssueLeaseInput {
    * for its leaf delegate. The verifier refuses the lease when that chain is missing, does not verify, is revoked or does
    * not end at this agent.
    */
-  delegation?: { readonly chainDigest: string; readonly spiffeId: string | null };
+  delegation?: { readonly chainDigest: string; readonly spiffeId: string | null; readonly ancestorLeaseIds?: readonly string[] };
 }
 
 function createLeasePayload(input: IssueLeaseInput): LeasePayload {
@@ -65,7 +65,8 @@ function createLeasePayload(input: IssueLeaseInput): LeasePayload {
     maxCostUsdPerDay: input.maxCostUsdPerDay,
     nonce: randomUUID().replace(/-/g, ""),
     ...(input.principal === undefined ? {} : { principal: input.principal }),
-    ...(input.delegation === undefined ? {} : { delegationChainDigest: input.delegation.chainDigest, spiffeId: input.delegation.spiffeId })
+    ...(input.delegation === undefined ? {} : { delegationChainDigest: input.delegation.chainDigest, spiffeId: input.delegation.spiffeId,
+      ...(input.delegation.ancestorLeaseIds === undefined ? {} : { ancestorLeaseIds: [...input.delegation.ancestorLeaseIds] }) })
   });
 
   return payload;
