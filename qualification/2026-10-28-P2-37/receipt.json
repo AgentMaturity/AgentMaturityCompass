@@ -1,0 +1,106 @@
+{
+ "schemaVersion": 1,
+ "key": "P2-37",
+ "date": "2026-10-28",
+ "commit": "b3102b613c3e748e78b44e46d52f67ca04c56eea",
+ "branch": "rtd/w4-p2-37",
+ "node": "v22.23.3",
+ "pnpm": "10.33.0",
+ "os": "macOS 26.6.2",
+ "arch": "arm64",
+ "commands": [
+  {
+   "cmd": "npm run -s build",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s gen:schemas",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npx vitest run tests/a4/p237IntegrationClaims.test.ts tests/a4/p237PhasesAndRetry.test.ts --maxWorkers=2",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npx vitest run tests/a4 tests/adapterManifest.test.ts tests/executionContract.test.ts tests/resumeRules.test.ts tests/resumeReconciliation.test.ts tests/checkPackContents.test.ts tests/architectureBoundaries.test.ts tests/a4GuardQualification.test.ts tests/keys/a4ActivateSigningProbe.test.ts tests/keys/a4SigningProbe.test.ts tests/executionApiParity.test.ts tests/trust/trustContext.test.ts --maxWorkers=2",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s typecheck",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s typecheck:tests",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s lint",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:gates",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:schemas",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:dead-code",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:duplicates",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:counts",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:api-ref",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:docs-drift",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:pack-contents",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:freeze",
+   "exit": 1,
+   "durationMs": 0
+  }
+ ],
+ "tests": {
+  "total": 182,
+  "passed": 182,
+  "failed": 0,
+  "skipped": 0
+ },
+ "artifacts": [
+  {
+   "path": "integration-claims.json",
+   "sha256": "2f78436c9903946668d2cf7a0323309b72550ebb2a0c9dcf79f8ab8edb2fc49b"
+  }
+ ],
+ "notes": "P2-37 sub-parts: manifest-projected IntegrationClaims (+ acs:<hook> reserved boundary, card source/pinned version, dist/adapter-claims packaging), contract execution phases in Assemble Review, P2-12 resume rule on A4 effect retry. Local macOS run, not CI; durations not recorded. The 182 tests are the second vitest command (16 files, includes the 13 new P2-37 tests). Red before green: both new test files fail at base 8494d9644 (integrationClaimsFrom, executionPhaseRows and src/a4/a4EffectResume.ts do not exist there). Mutation checks, each killed then restored: claim ignores manifest problems (2 tests fail); adapter-name check skipped (1); role check dropped (1); signed ACTION_STATE lookup dropped from journaled() (1); applied effect allowed to retry (1); any completed head allowed to retry (1). check:freeze exits 1 at base and here only on other items' exception keys not yet in allowedExceptionKeys; P2-37 adds no CLI command. Not done: the Studio native-task prompt-pack/context-plugin runtime loader and the Mechanic write link (see README)."
+}
