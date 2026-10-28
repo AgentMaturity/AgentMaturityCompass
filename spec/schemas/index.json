@@ -133,7 +133,7 @@
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/conformance-results.schema.json",
       "name": "conformance-results.schema.json",
-      "sha256": "28ce563f898073569c797cd7aa40ce26e046c9a513b603c7dfb19a93c4e230f6"
+      "sha256": "171a5b371d6b89156d8c430ff93800671546f10ede456bc3c5b7cc600ec32137"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/control-record.schema.json",

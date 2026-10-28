@@ -50,22 +50,64 @@ const verifier = {
   },
   inputs: (item, at) => [at(item.fixture)],
   judge(item, at, run, schemas) {
-    const { value: report, result } = stdoutJson(run);
-    if (result) return result;
-    const invalid = schemaError(schemas("verifier-report"), report);
-    if (invalid) return fail({ report: `not a verifier-report v1: ${invalid}` });
     const expected = readJson(join(at(item.fixture), item.expect));
-    const diff = {};
-    for (const dimension of DIMENSIONS) {
-      const actual = report[dimension]?.status ?? null;
-      if (actual !== expected.dimensions[dimension]) (diff.dimensions ??= {})[dimension] = { expected: expected.dimensions[dimension], actual };
-      const reported = report.reasonCodes?.[dimension] ?? [];
-      const missing = (expected.reasonCodes?.[dimension] ?? []).filter(code => !reported.includes(code));
-      if (missing.length > 0) (diff.reasonCodes ??= {})[dimension] = { missing, actual: reported };
-    }
-    if (run.status !== expected.exitCode) diff.exitCode = { expected: expected.exitCode, actual: run.status };
-    return Object.keys(diff).length === 0 ? PASS : fail(diff);
+    return judgeReport(run, schemas, expected, (report, dimension) => report.reasonCodes?.[dimension] ?? [], {
+      more: diff => { if (run.status !== expected.exitCode) diff.exitCode = { expected: expected.exitCode, actual: run.status }; }
+    });
   }
+};
+
+/**
+ * A verifier report on stdout against `expected` ({ dimensions, reasonCodes }): a valid verifier-report v1, the six
+ * statuses exactly, and every expected reason code among those `codesOf` reads for that dimension. `besideReport` names
+ * top-level members a class lets an implementation print next to the report; they are dropped before the schema check
+ * and never judged.
+ */
+function judgeReport(run, schemas, expected, codesOf, { more = () => {}, besideReport = [] } = {}) {
+  const { value: printed, result } = stdoutJson(run);
+  if (result) return result;
+  const report = printed !== null && typeof printed === "object" && !Array.isArray(printed)
+    ? Object.fromEntries(Object.entries(printed).filter(([key]) => !besideReport.includes(key)))
+    : printed;
+  const invalid = schemaError(schemas("verifier-report"), report);
+  if (invalid) return fail({ report: `not a verifier-report v1: ${invalid}` });
+  const diff = {};
+  for (const dimension of DIMENSIONS) {
+    const actual = report[dimension]?.status ?? null;
+    if (actual !== expected.dimensions[dimension]) (diff.dimensions ??= {})[dimension] = { expected: expected.dimensions[dimension], actual };
+    const reported = codesOf(report, dimension);
+    const missing = (expected.reasonCodes?.[dimension] ?? []).filter(code => !reported.includes(code));
+    if (missing.length > 0) (diff.reasonCodes ??= {})[dimension] = { missing, actual: reported };
+  }
+  more(diff);
+  return Object.keys(diff).length === 0 ? PASS : fail(diff);
+}
+
+/**
+ * The reason codes an A4 record report gives for a dimension: its `reasonCodes` entry, and the code each `errors`
+ * (integrity) or `reasons` line opens with (`A4_CHAIN_INVALID: …`, `GATE_OPEN: …`, `A4_SIDE_ROW_MISMATCH a4_evidence_refs …`).
+ */
+function a4ReasonCodes(report, dimension) {
+  const lines = [report[dimension]?.errors ?? [], report[dimension]?.reasons ?? []].flat().filter(line => typeof line === "string");
+  const leading = lines.map(line => /^([A-Z][A-Z0-9_]*)(?=[:\s]|$)/.exec(line)?.[1]).filter(Boolean);
+  return [...(Array.isArray(report.reasonCodes?.[dimension]) ? report.reasonCodes[dimension] : []), ...leading];
+}
+
+/**
+ * P3-24: an `amc.a4-record/v1` export (P1-63) judged under its pinned trust list. Kept apart from `verifier`, so the
+ * verifier class's conformance never depends on the A4 rules. The exit code is not judged: the A4 record rules
+ * (spec/ACCEPTANCE_RULES.md "A4 project record") define the report, not an exit code. The claim fields every AMC CLI
+ * JSON result carries (`claimKind`, `statusDimensions`, `claimLabel`) may sit beside the report.
+ */
+const A4_CLAIM_FIELDS = ["claimKind", "statusDimensions", "claimLabel"];
+
+const a4Record = {
+  placeholders(item, at) {
+    const roots = readJson(at(item.input.trustRoots)).roots;
+    return { record: at(item.record), trustList: at(item.input.trustList), trustRoots: at(item.input.trustRoots), trustRoot: roots[0] };
+  },
+  inputs: (item, at) => [at(item.record), at(item.input.trustList), at(item.input.trustRoots)],
+  judge: (item, at, run, schemas) => judgeReport(run, schemas, item.expect, a4ReasonCodes, { besideReport: A4_CLAIM_FIELDS })
 };
 
 function jsonLines(path) {
@@ -168,4 +210,4 @@ const compiler = {
   judge: () => error("no compiler case is judged until P1-10's golden outputs exist")
 };
 
-export const CLASS_RULES = { verifier, producer, adapter, compiler };
+export const CLASS_RULES = { verifier, producer, adapter, compiler, "a4-record": a4Record };

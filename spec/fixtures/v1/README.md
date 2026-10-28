@@ -6,7 +6,8 @@ Each case directory here that holds an `expected.json` is one normative case for
 The rules each case exercises are in [docs/STANDALONE_VERIFIER.md](../../../docs/STANDALONE_VERIFIER.md) and
 [ACCEPTANCE_RULES.md](../../ACCEPTANCE_RULES.md). Other folders here are separate fixture families with their own
 format: `lighthouse-finance/` (P1-19) is not run by the conformance runner. The A4 project record fixtures (P1-63) are
-still in `tests/fixtures/contracts/a4-record/`, checked by AMC's `verifyA4Bundle`.
+still in `tests/fixtures/contracts/a4-record/`, checked by AMC's `verifyA4Bundle` and run as the separate `a4-record`
+conformance class (P3-24), never as verifier cases.
 
 ## Case format
 

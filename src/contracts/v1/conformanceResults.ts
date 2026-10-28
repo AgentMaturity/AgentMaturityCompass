@@ -20,7 +20,7 @@ const conformanceCaseSchema = z.strictObject({
 export const conformanceResultsV1Schema = z.strictObject({
   suiteVersion: z.string().regex(/^\d+\.\d+\.\d+$/),
   specVersion: z.string().regex(/^\d+\.\d+$/),
-  class: z.enum(["verifier", "producer", "adapter", "compiler"]),
+  class: z.enum(["verifier", "producer", "adapter", "compiler", "a4-record"]),
   /** sha256 over the manifest and every input file the run judged (packages/amc-conformance/README.md). */
   fixtureSetDigest: sha256HexSchema,
   implementation: z.strictObject({

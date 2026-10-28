@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * amc-conformance run --class <verifier|producer|adapter|compiler> --impl "<command template>"
+ * amc-conformance run --class <verifier|producer|adapter|compiler|a4-record> --impl "<command template>"
  *   [--cases <glob>] [--out results.json] [--root <spec checkout>] [--timeout <ms>]
  *   [--name <n>] [--impl-version <v>] [--vendor <v>] [--repository <url>] [--language <l>]
  * Exit codes: 0 conformant; 1 not conformant; 64 usage error.

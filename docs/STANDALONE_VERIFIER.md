@@ -204,7 +204,7 @@ fixture runner stays in the verifier's package for its own packed-tarball check.
   `amc bundle verify` (P0-09). `amc-verify` refuses them as malformed rather than read part of them.
 - Not yet: keyless Sigstore bundles and transparency-log entries (P1-27 verifies key-based DSSE bundles only), RFC 3161 timestamp tokens (P1-25; a trust list's
   `timestampAuthorities` are validated but unused), Merkle inclusion proofs and public-log receipts (P1-26),
-  the producer, adapter and compiler conformance classes, which `packages/amc-conformance` runs (P1-32). A4 project records (`a4-record`) are checked by AMC's `verifyA4Bundle`.
+  the producer, adapter and compiler conformance classes, which `packages/amc-conformance` runs (P1-32). A4 project records (`a4-record`) are checked by AMC's `verifyA4Bundle`; the suite runs them as their own `a4-record` class.
 - A chain predecessor (`previousSha256`, `previousStatementSha256`) is not fetched or checked; `--known-sequence` gives
   anti-rollback. The verifier keeps no state between runs: you supply the sequences you saw.
 - Fixture keys are public by design. They are marked `TEST ONLY` and must never appear in a trust list outside the
