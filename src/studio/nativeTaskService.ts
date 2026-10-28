@@ -29,7 +29,9 @@ import { loadWorkloadTrustConfig } from "../identity/workload/workloadTrust.js";
 import { LeasePrincipalRefused } from "../leases/leasePrincipal.js";
 import { revokeLease, revokedLeaseIdSet } from "../leases/leaseStore.js";
 import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
-import { NATIVE_TASK_INITIATOR_ENV, NATIVE_TASK_LEASE_ENV } from "../acp/acpRuntimeContracts.js";
+import { NATIVE_TASK_INITIATOR_ENV, NATIVE_TASK_LEASE_ENV, NATIVE_TASK_SYSTEM_PROMPT_ENV } from "../acp/acpRuntimeContracts.js";
+import { loadNativeTaskContext } from "./nativeTaskContext.js";
+import { regulatedLeaseProfile } from "../leases/regulatedProfile.js";
 import { NativeTaskDescriptors, nativeTaskId, taskBodyHash, type NativeTaskDescriptor } from "./nativeTaskDescriptors.js";
 import { readNativeTaskProjection, type NativeTaskProjection } from "./nativeTaskProjection.js";
 import { inspectJsonlSessionRecovery } from "../session/jsonlContinuation.js";
@@ -399,8 +401,11 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
     const previousLeases = new Set([d.leaseId, entry.leaseId].filter((id): id is string => id !== undefined));
     // The lifetime clock starts no later than the lease, so the sweeper stops the runtime before the lease expires.
     entry.runtimeStartedAt = Date.now();
+    // P2-37: the agent's signed prompt pack and A4 context plugin; an unverified one refuses here in a regulated workspace.
+    const agentContext = loadNativeTaskContext({ workspace, agentId: d.agentId, provider: d.provider, regulated: regulatedLeaseProfile(workspace).regulated });
     const lease = runtimeLease(entry, config.scope);
     entry.client = await AMCNativeClient.start({ workspace, command, env: { ...childEnvironment(d.provider), ...(lease ? { [NATIVE_TASK_LEASE_ENV]: lease.token } : {}),
+      ...(agentContext.systemPrompt === null ? {} : { [NATIVE_TASK_SYSTEM_PROMPT_ENV]: agentContext.systemPrompt }),
       // P1-78: the task's Studio principal raises its runtime's approvals (`LOCAL_USER:<id>`, `WORKSPACE_ROUTER:<id>`, or the admin token).
       [NATIVE_TASK_INITIATOR_ENV]: d.principalId.startsWith("session:") ? d.principalId.slice("session:".length) : d.principalId }, provider: d.provider,
       ...(d.model === null ? {} : { model: d.model }), agentId: d.agentId, tools: d.tools,

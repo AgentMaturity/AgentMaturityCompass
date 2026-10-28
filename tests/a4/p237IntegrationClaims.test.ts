@@ -9,7 +9,7 @@ import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { afterAll, describe, expect, test } from "vitest";
 import { loadAdapterManifests } from "../../src/adapters/conformance/adapterManifest.js";
-import { claimLabel, INTEGRATION_CLAIMS, integrationClaimsFrom } from "../../src/a4/assemblePaths.js";
+import { claimLabel, INTEGRATION_CLAIMS, integrationClaimsFrom, releaseBoundaryOf } from "../../src/a4/assemblePaths.js";
 import { a4IntegrationClaimV1Schema } from "../../src/contracts/v1/a4IntegrationClaim.js";
 
 const repo = process.cwd();
@@ -127,5 +127,20 @@ describe("IntegrationClaim from adapter claim manifests (P2-37)", () => {
       expect(a4IntegrationClaimV1Schema.safeParse({ ...base, enforcementBoundary: bad }).success, bad).toBe(false);
     }
     expect(Object.values(INTEGRATION_CLAIMS).some((claim) => claim.enforcementBoundary.startsWith("acs:"))).toBe(false);
+  });
+
+  test("the release record's boundary row reads enforced only where the claim is enforced, else what the claim's evidence is", () => {
+    const enforced = claimsAt(fixtureRoot());
+    const noReceipt = fixtureRoot();
+    rmSync(join(noReceipt, receiptOf(noReceipt, CC)));
+    const preview = claimsAt(noReceipt);
+    expect(releaseBoundaryOf(enforced["claude-code"])).toMatchObject({ boundary: "hook:PreToolUse", status: "enforced" });
+    expect(releaseBoundaryOf(enforced.pi)).toMatchObject({ boundary: "pi:tool_call", status: "enforced" });
+    expect(releaseBoundaryOf(preview["claude-code"])).toMatchObject({ boundary: "hook:PreToolUse", status: "none" });
+    expect(releaseBoundaryOf(enforced.native).status).toBe("enforced");
+    expect(releaseBoundaryOf(enforced.langchain).status).toBe("observed");
+    expect(releaseBoundaryOf(enforced["generic-http"]).status).toBe("none");
+    expect(releaseBoundaryOf(enforced.other).status).toBe("none");
+    expect(releaseBoundaryOf(preview["claude-code"]).note).toContain("enforced only with a conformance receipt");
   });
 });

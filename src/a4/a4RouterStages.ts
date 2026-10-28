@@ -43,6 +43,7 @@ import { openA4Store, type A4ChangeSpec, type A4RequestKey, type A4TransitionRes
 import { assertStagingRevocable, revokeStagingAfterDeny } from "./a4Deploy.js";
 import { handleAssembleRoute } from "./assembleResolve.js";
 import { handleAdaptRoute } from "./adaptContextPlugin.js";
+import { handleMechanicRoute } from "./a4Mechanic.js";
 
 /** Each stage's question bank as its lane publishes it (empty until P1-59…P1-62). */
 export const STAGE_QUESTIONS: Readonly<Record<A4Stage, readonly A4Question[]>> = {
@@ -473,7 +474,7 @@ async function observeHypothesis(route: A4Route, projectId: string, hypothesisId
 /** Stage, gate, effect and hypothesis POSTs. Returns false when none matches. */
 export async function handleA4StageRoute(route: A4Route, projectId: string, tail: string): Promise<boolean> {
   if (route.method !== "POST") return false;
-  if (await handleAssembleRoute(route, projectId, tail) || await handleAdaptRoute(route, projectId, tail)) return true;
+  if (await handleAssembleRoute(route, projectId, tail) || await handleAdaptRoute(route, projectId, tail) || await handleMechanicRoute(route, projectId, tail)) return true;
   const { store } = route;
   const step = /^\/stages\/([a-z]+)\/(answers|understand|confirm-understanding|explain|propose|build|review)$/.exec(tail);
   if (step !== null) return stageStep(route, projectId, stageInput(step[1]), step[2] as StepRoute);

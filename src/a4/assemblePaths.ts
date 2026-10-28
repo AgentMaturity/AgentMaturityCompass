@@ -112,6 +112,16 @@ export const claimLabel = (claim: A4IntegrationClaimV1): string =>
     ? `enforced at ${claim.enforcementBoundary}` : claim.supported;
 
 /**
+ * The release record's row for the claim's boundary (src/a4/a4Package.ts enforcementBoundaries): `enforced` exactly when
+ * the card reads "enforced at <boundary>" (claimLabel), `observed` when the claim's evidence is observed, else `none`.
+ */
+export const releaseBoundaryOf = (claim: A4IntegrationClaimV1): { boundary: string; status: "enforced" | "observed" | "none"; note: string } => ({
+  boundary: claim.enforcementBoundary,
+  status: claimLabel(claim) !== claim.supported ? "enforced" : claim.enforcementBoundary !== "none" && claim.evidenceTier === "observed" ? "observed" : "none",
+  note: claim.notCovered.join("; ") || claim.supported
+});
+
+/**
  * The scaffold each external path gets (design §13; src/a4/assembleConnect.ts): the LangChain callback handler for the
  * LangChain family, the generic HTTP guide for gateway-observed paths, the custom guide for `other`. Hook and pi paths
  * connect instead, and the native path builds through native tasks.
