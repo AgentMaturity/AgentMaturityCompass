@@ -55,10 +55,18 @@ function payloadBytes(envelope: Omit<KeyHistoryEnvelope, "signature">): Buffer {
 
 const versionOf = (subject: KeyHistorySubject): 1 | 2 => ROLES.includes(subject) ? 1 : 2;
 
+// Pure derivation, memoized by the private key's digest (the PEM itself is never kept). Every signing gate derives it.
+const publicFromPrivate = new Map<string, string>();
 export function publicKeyFromPrivate(privateKeyPem: string): string {
+  const digest = sha256Hex(Buffer.from(privateKeyPem, "utf8"));
+  const memo = publicFromPrivate.get(digest);
+  if (memo !== undefined) return memo;
   const key = createPrivateKey(privateKeyPem);
   if (key.asymmetricKeyType !== "ed25519") throw new Error("Key history requires an Ed25519 role key");
-  return createPublicKey(key).export({ format: "pem", type: "spki" }).toString();
+  const publicKeyPem = createPublicKey(key).export({ format: "pem", type: "spki" }).toString();
+  if (publicFromPrivate.size >= 64) publicFromPrivate.clear();
+  publicFromPrivate.set(digest, publicKeyPem);
+  return publicKeyPem;
 }
 
 export function validHistoryEntry(entry: unknown): entry is KeyHistoryEntry {
