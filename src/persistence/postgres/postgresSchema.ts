@@ -51,7 +51,7 @@ export const POSTGRES_MIRROR_TABLES: readonly MirroredTable[] = [
       `CREATE TABLE IF NOT EXISTS evidence_events (
         chain_id TEXT NOT NULL,
         chain_seq BIGINT NOT NULL,
-        id TEXT PRIMARY KEY,
+        id TEXT NOT NULL,
         ts BIGINT NOT NULL,
         session_id TEXT NOT NULL,
         runtime TEXT NOT NULL,
@@ -72,9 +72,11 @@ export const POSTGRES_MIRROR_TABLES: readonly MirroredTable[] = [
         payload_pruned INTEGER NOT NULL DEFAULT 0,
         payload_pruned_ts BIGINT,
         UNIQUE (chain_id, prev_event_hash),
-        UNIQUE (chain_id, chain_seq)
+        UNIQUE (chain_id, chain_seq),
+        PRIMARY KEY (chain_id, id)
       )`,
-      "CREATE INDEX IF NOT EXISTS amc_events_session ON evidence_events (chain_id, session_id, chain_seq)"
+      "CREATE INDEX IF NOT EXISTS amc_events_session ON evidence_events (chain_id, session_id, chain_seq)",
+      "CREATE INDEX IF NOT EXISTS amc_events_id ON evidence_events (id)"
     ],
     columns: EVENT_COLUMNS,
     sqliteSelect: `SELECT rowid AS chain_seq, ${EVENT_COLUMNS.filter((c) => c !== "chain_seq").join(", ")} FROM evidence_events ORDER BY rowid ASC`

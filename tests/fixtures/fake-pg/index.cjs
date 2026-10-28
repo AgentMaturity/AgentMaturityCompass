@@ -54,7 +54,7 @@ class Client extends EventEmitter {
       bound.push(params[Number(n) - 1]);
       return "?";
     });
-    if (/^\s*BEGIN\s*$/i.test(sql)) sql = "BEGIN IMMEDIATE";
+    if (/^\s*BEGIN\b/i.test(sql)) sql = "BEGIN IMMEDIATE";
     try {
       const statement = this.db.prepare(sql);
       if (statement.reader) {

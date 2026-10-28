@@ -251,12 +251,13 @@ export async function verifyAgentRun(workspace: string, sessionId: string, trust
     sessionChainErrors.push(`Session ${sessionId} is not closed and sealed; a verified prefix needs a finalized target`);
   }
   let unsignedRowIds: string[];
-  if (readSessionStoreMarker(workspace) === "jsonl") {
-    // The operations SQLite ledger is not the JSONL session lifecycle.
+  const marker = readSessionStoreMarker(workspace);
+  if (marker === "jsonl" || marker === "postgres") {
+    // The operations SQLite ledger is not the JSONL (or Postgres) session lifecycle.
     // Read the selected backend without taking a writer lock or initializing
     // anything. verifyLedgerIntegrity above still authenticates the complete
     // JSONL global/session chains, lifecycle seals, payloads and monitor pin.
-    const store = openSessionEventStore(workspace, "jsonl", { readOnly: true });
+    const store = openSessionEventStore(workspace, marker, { readOnly: true });
     try {
       if (store.readSessionRecord(sessionId) === null) {
         sessionChainErrors.push(`Session ${sessionId} not found`);

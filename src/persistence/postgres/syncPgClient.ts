@@ -113,6 +113,17 @@ export function readPostgresUrl(): string {
   return url;
 }
 
+let defaultDriverModule = "pg";
+
+/**
+ * Replace the driver every store opened without `pg.driverModule` uses (the
+ * verifier, read paths). Code-only, like the option: nothing reads it from env
+ * or argv. The contract tests point it at their fake driver.
+ */
+export function setDefaultPostgresDriver(driverModule: string): void {
+  defaultDriverModule = driverModule;
+}
+
 function resolveDriver(driverModule: string): string {
   try {
     return createRequire(import.meta.url).resolve(driverModule);
@@ -194,7 +205,7 @@ export class SyncPgClient {
   private closed = false;
 
   constructor(private readonly connectionString: string, options: SyncPgOptions = {}) {
-    this.driverPath = resolveDriver(options.driverModule ?? "pg");
+    this.driverPath = resolveDriver(options.driverModule ?? defaultDriverModule);
     this.timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
   }
 

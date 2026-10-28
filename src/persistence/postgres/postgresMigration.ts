@@ -29,6 +29,7 @@ import { compareBackendDeterminism, type ConformanceBackend } from "../conforman
 import { openSessionEventStore, readSessionStoreMarker, repinSqliteToPostgres } from "../openSessionEventStore.js";
 import { GLOBAL_GENESIS } from "../sessionEventRows.js";
 import { verifyStoredSessionEventMetadata } from "../sessionStoreVerification.js";
+import { recordSignedPostgresHead } from "./postgresHead.js";
 import { ensurePostgresSchema, EVENT_READ_COLUMNS, POSTGRES_MIRROR_TABLES } from "./postgresSchema.js";
 import { ensurePostgresChainId, PostgresSessionEventStore } from "./postgresSessionEventStore.js";
 import { readPostgresUrl, SyncPgClient, type SyncPgOptions } from "./syncPgClient.js";
@@ -157,6 +158,8 @@ export function migrateSqliteToPostgres(workspace: string, options: PostgresMigr
     sqliteChainHead: sqliteHead, postgresChainHead: postgresHead,
     determinism: { ok: determinism.ok, eventHashes: determinism.eventHashes }
   };
+  // The workspace's signed floor: verification refuses a chain later truncated below the migrated head.
+  recordSignedPostgresHead(workspace, chainId, postgresHead, (copied.head as { chain_seq?: number } | undefined)?.chain_seq ?? 0);
   const receiptPath = writeSignedMigrationReceipt(workspace, "postgres-store", `migration-${receipt.ts}.json`, receipt);
   repinSqliteToPostgres(workspace);
   return { receipt, receiptPath };

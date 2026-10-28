@@ -50,6 +50,7 @@ import {
   type SessionStoreSeal,
   type SessionStoreStartParams
 } from "../sessionEventStore.js";
+import { postgresChainProblems, readSignedPostgresHeadForCheck, recordSignedPostgresHead, type PostgresChainSnapshot } from "./postgresHead.js";
 import { ensurePostgresSchema, EVENT_READ_COLUMNS, numberOrNull, SESSION_READ_COLUMNS } from "./postgresSchema.js";
 import { PostgresStatementError, readPostgresUrl, SyncPgClient, type SyncPgOptions } from "./syncPgClient.js";
 
@@ -138,12 +139,13 @@ export class PostgresSessionEventStore implements SessionEventStore {
       );
       // Authenticate the history this writer will chain from, as JSONL does:
       // rows in a database are as editable as lines in a file.
-      const prior = this.readAllEvents();
-      if (prior.length > 0) {
-        const verified = verifyStoredSessionEventMetadata(workspace, prior, {
-          sessionRecords: this.readAllSessionRecords(), trust: workspaceSelfTrust(workspace)
-        });
-        if (!verified.ok) throw new Error("Postgres writer refused: existing history failed authentication; restore the original evidence before appending");
+      const signed = readSignedPostgresHeadForCheck(workspace);
+      const snapshot = this.readChainSnapshot();
+      if (snapshot === null) throw new Error("Postgres writer has no chain id");
+      const prior = snapshot.events.map((entry) => entry.event);
+      const verified = verifyStoredSessionEventMetadata(workspace, prior, { sessionRecords: snapshot.sessions, trust: workspaceSelfTrust(workspace) });
+      if ((prior.length > 0 && !verified.ok) || postgresChainProblems(workspace, snapshot, signed).length > 0) {
+        throw new Error("Postgres writer refused: existing history failed authentication; restore the original evidence before appending");
       }
       options.beforeWriterOpen?.();
       if (!this.unsignedSignatures) ensureSigningKeys(workspace);
@@ -177,11 +179,15 @@ export class PostgresSessionEventStore implements SessionEventStore {
       if (!this.unsignedSignatures && readOperationalDelegationState(this.workspace) !== null) {
         throw new Error("the Postgres session store does not support provider-delegated ledger signing; use the sqlite or jsonl store");
       }
-      return this.transaction(() => {
+      const committed = this.transaction(() => {
         const head = this.client.query("SELECT head_hash, head_seq FROM amc_chain_heads WHERE chain_id = $1 FOR UPDATE", [this.chainId]).rows[0];
         if (head === undefined) throw new Error("Postgres chain head is missing; reopen the store");
-        const existing = this.client.query(`${EVENT_SELECT} WHERE id = $1`, [id]).rows[0];
-        if (existing !== undefined) return this.retriedAppend(toEvent(existing), input, metaJson);
+        // Ids are keyed per chain. An id another workspace's chain holds is never this chain's retry.
+        if (this.client.query("SELECT 1 AS hit FROM evidence_events WHERE id = $1 AND chain_id <> $2 LIMIT 1", [id, this.chainId]).rows.length > 0) {
+          throw new Error(`event id ${id} is already used by another chain in this database; refused`);
+        }
+        const existing = this.client.query(`${EVENT_SELECT} WHERE chain_id = $1 AND id = $2`, [this.chainId, id]).rows[0];
+        if (existing !== undefined) return { result: this.retriedAppend(toEvent(existing), input, metaJson), committedSeq: null };
         const last = this.client.query(`${EVENT_SELECT} WHERE chain_id = $1 AND session_id = $2 ORDER BY chain_seq DESC LIMIT 1`,
           [this.chainId, input.sessionId]).rows[0];
         assertSessionWriteAllowed(input, last === undefined ? null : toEvent(last), this.readSessionRecord(input.sessionId));
@@ -200,8 +206,11 @@ export class PostgresSessionEventStore implements SessionEventStore {
         );
         if (moved.rowCount !== 1) throw new Error("Postgres chain head moved during the append; nothing was committed");
         queueEvidenceEventSpan(row, this.workspace);
-        return { id, ts, payloadSha256: stored.sha, eventHash: row.event_hash, writerSig: row.writer_sig };
+        return { result: { id, ts, payloadSha256: stored.sha, eventHash: row.event_hash, writerSig: row.writer_sig }, committedSeq: seq };
       });
+      // Sign only the head this writer committed, never one read back from the database.
+      if (committed.committedSeq !== null) recordSignedPostgresHead(this.workspace, this.chainId!, committed.result.eventHash, committed.committedSeq);
+      return committed.result;
     });
   }
 
@@ -251,8 +260,22 @@ export class PostgresSessionEventStore implements SessionEventStore {
     this.client.close();
   }
 
-  private readAllSessionRecords(): SessionRecord[] {
-    return this.client.query(`${SESSION_SELECT} WHERE chain_id = $1`, [this.chainId]).rows.map(toSession);
+  /**
+   * Rows, sequence numbers, the database head and session records from one
+   * snapshot (REPEATABLE READ), so a live writer cannot make them disagree.
+   * Null on a read-only open of a workspace that never wrote to Postgres.
+   */
+  readChainSnapshot(): (PostgresChainSnapshot & { readonly sessions: SessionRecord[] }) | null {
+    this.assertOpen();
+    const chainId = this.chainId;
+    if (chainId === null) return null;
+    return this.transaction(() => {
+      const head = this.client.query("SELECT head_hash, head_seq FROM amc_chain_heads WHERE chain_id = $1", [chainId]).rows[0];
+      const events = this.client.query(`SELECT chain_seq, ${EVENT_READ_COLUMNS.join(", ")} FROM evidence_events WHERE chain_id = $1 ORDER BY chain_seq ASC`, [chainId])
+        .rows.map((row) => ({ seq: Number(row.chain_seq), event: toEvent(Object.fromEntries(Object.entries(row).filter(([key]) => key !== "chain_seq"))) }));
+      const sessions = this.client.query(`${SESSION_SELECT} WHERE chain_id = $1`, [chainId]).rows.map(toSession);
+      return { chainId, events, sessions, head: head === undefined ? null : { hash: String(head.head_hash), seq: Number(head.head_seq) } };
+    }, "BEGIN ISOLATION LEVEL REPEATABLE READ");
   }
 
   /** A retry whose first attempt committed returns that row; anything else under a used id is refused. */
@@ -264,8 +287,8 @@ export class PostgresSessionEventStore implements SessionEventStore {
     return { id: existing.id, ts: existing.ts, payloadSha256: existing.payload_sha256, eventHash: existing.event_hash, writerSig: existing.writer_sig };
   }
 
-  private transaction<T>(body: () => T): T {
-    this.client.query("BEGIN");
+  private transaction<T>(body: () => T, begin = "BEGIN"): T {
+    this.client.query(begin);
     try {
       const result = body();
       this.client.query("COMMIT");
