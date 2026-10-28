@@ -223,6 +223,9 @@ export function prepareApprovalRequestRecord(input: ApprovalRequestRecordInput, 
   return { request, path };
 }
 
+/** At most 500 ms of re-reads, spent only on a digest mismatch. */
+const TORN_READ_RETRIES = 25, TORN_READ_WAIT_MS = 20;
+
 export function loadApprovalRequestRecord(params: {
   workspace: string;
   agentId?: string;
@@ -234,9 +237,16 @@ export function loadApprovalRequestRecord(params: {
   if (!pathExists(path)) {
     throw new Error(`approval request not found: ${path}`);
   }
-  const bytes = readFileInPass(path);
+  let bytes = readFileInPass(path);
   if (params.requireValidSignature !== false) {
-    const verification = verifyArtifact(params.workspace, path, bytes);
+    let verification = verifyArtifact(params.workspace, path, bytes);
+    // updateApprovalRequestStatus replaces the body, then its sidecar: a reader in another process between the two
+    // renames sees a torn pair. Re-read both while the writer finishes; a mismatch that outlasts this is still refused.
+    for (let retry = 0; !verification.valid && verification.reason === "digest mismatch" && retry < TORN_READ_RETRIES; ++retry) {
+      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, TORN_READ_WAIT_MS);
+      bytes = readFileInPass(path);
+      verification = verifyArtifact(params.workspace, path, bytes);
+    }
     if (!verification.valid) {
       throw new Error(`invalid approval request signature: ${verification.reason ?? "unknown"}`);
     }
