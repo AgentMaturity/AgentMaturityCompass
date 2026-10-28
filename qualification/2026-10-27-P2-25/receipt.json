@@ -1,0 +1,103 @@
+{
+ "schemaVersion": 1,
+ "key": "P2-25",
+ "date": "2026-10-27",
+ "commit": "7a5574370d32a0305cf100842d740b869ee62e71",
+ "branch": "rtd/w3-p2-25",
+ "node": "v22.23.3",
+ "pnpm": "10.33.0",
+ "os": "macOS 26.6.2",
+ "arch": "arm64",
+ "commands": [
+  {
+   "cmd": "npm run -s build",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s typecheck",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s typecheck:tests",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s lint",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:gates",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:dead-code",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:duplicates",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:counts",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:api-ref",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:docs-drift",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:schemas",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:architecture-boundaries",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npx vitest run <217 test files touching changed modules + tests/identity tests/agent tests/governor tests/leases> --maxWorkers=2",
+   "exit": 0,
+   "durationMs": 0
+  }
+ ],
+ "tests": {
+  "total": 3363,
+  "passed": 3363,
+  "failed": 0,
+  "skipped": 0
+ },
+ "artifacts": [
+  {
+   "path": "sample-chain.json",
+   "sha256": "01dbcd2de5f8915011db023eb235d13d9a85e57ceace44bb14f1956e6e1356bb"
+  },
+  {
+   "path": "sample-decision-log.json",
+   "sha256": "d145453a84e4d21cda997a51a7d99175f1fedcb765132c127ec577417e10bccd"
+  },
+  {
+   "path": "mutations.json",
+   "sha256": "87ed9e19bc9688aeff7ffb4a39715b318d2bbd7467b06e2b60dd745a2b258ebb"
+  },
+  {
+   "path": "README.md",
+   "sha256": "deb7827c687925d3ff3de82b5a703e93b85f6225d64cfb61c9900f56b8a31d7c"
+  }
+ ],
+ "notes": "Totals are the related set: 217 files (every test file importing a changed module, plus the four new P2-25 files: 52 new tests). The full npm test suite was not run. durationMs not measured (0). check:freeze and check:qualification fail on base for other keys' entries, unchanged here. Pending for people: spec version pins re-checked against primary sources, real SPIRE/Entra/AgentCore interop, NYDFS/HIPAA expert review."
+}
