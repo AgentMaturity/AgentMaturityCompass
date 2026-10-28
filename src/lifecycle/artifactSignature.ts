@@ -48,6 +48,7 @@ const artifactKindSchema = z.enum([
     "a4-deployment-receipt",
     "a4-rollback-receipt",
     "a4-amc-check",
+    "a4-context-plugin",
     "scoped-exception",
     "scoped-exception-revocation",
     "break-glass",

@@ -371,7 +371,8 @@ and `a4_effects` (liveness) are bookkeeping no transition names and are never ex
 `verifyA4Chain` and `amc verify all` (check `a4-projects`) apply the integrity rules; `verifyA4Bundle`
 (`src/a4/a4Verify.ts`) applies all of them to an export. Normative fixtures, each with its expected verdict:
 `tests/fixtures/contracts/a4-record/` (to move to `spec/fixtures/v1/a4-record/` in one coordinated commit; P1-06 left
-them in place).
+them in place). The conformance suite runs them as their own class, `a4-record`, never inside `verifier`
+(spec/conformance/v1/README.md, P3-24).
 
 Canonical form. Every digest below is sha256 over the UTF-8 bytes of the canonical form above: sorted keys with
 integer-like keys first, ECMAScript number text, **not RFC 8785**. Every JSON column (`body_json`, `spec_json`,

@@ -10,7 +10,7 @@
 import { randomUUID } from "node:crypto";
 import { sha256Hex } from "../utils/hash.js";
 import { assertNoDuplicateJsonKeys } from "../utils/json.js";
-import { residencyFetch } from "../residency/checkEgress.js";
+import { checkScopedEgress, isEgressRefusal } from "../residency/checkEgress.js";
 import { assertStrictJudgeRequest } from "../assurance/judges/regulatedJudgeRequestGuard.js";
 
 // ---------------------------------------------------------------------------
@@ -20,6 +20,8 @@ import { assertStrictJudgeRequest } from "../assurance/judges/regulatedJudgeRequ
 export interface LLMApiConfig {
   /** Trusted workspace scope for residency admission; omitted only for native unregulated fallback. */
   workspace?: string;
+  /** The calling agent for the egress check (kill-switch scope); absent checks as an unattributed provider call. */
+  agentId?: string;
   /** Capture exact wire digests/actual response model for the strict regulated wrapper. */
   captureWire?: boolean;
   /** API provider */
@@ -137,6 +139,8 @@ export class LLMApiClient {
           requestId
         };
       } catch (error) {
+        // A residency or kill-switch refusal sent nothing: it propagates typed and is never retried.
+        if (isEgressRefusal(error)) throw error;
         lastError = error as Error;
         
         if (attempt < this.config.maxRetries) {
@@ -221,9 +225,10 @@ export class LLMApiClient {
     // Runs after native rate-limit waits and immediately before each actual strict provider dispatch.
     if (this.config.captureWire) assertStrictJudgeRequest(this.config.workspace, request);
     const init: RequestInit = { method: "POST", headers, body, signal: AbortSignal.timeout(this.config.timeout) };
-    const response = this.config.captureWire
-      ? await residencyFetch(this.config.workspace, "provider", url, { ...init, redirect: "error" })
-      : await fetch(url, init);
+    checkScopedEgress(this.config.workspace, "provider", url, { ...(this.config.agentId === undefined ? {} : { agentId: this.config.agentId }),
+      dataClasses: null, purpose: "llm-api" });
+    // A 3xx is returned, never followed: the check covered only this URL.
+    const response = await fetch(url, { ...init, redirect: this.config.captureWire ? "error" : "manual" });
     if (!response.ok) {
       if (this.config.captureWire) await response.body?.cancel().catch(() => undefined);
       throw new Error(`${errorLabel} API error: ${response.status} ${response.statusText}`);

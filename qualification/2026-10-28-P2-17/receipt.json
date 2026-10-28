@@ -1,0 +1,116 @@
+{
+ "schemaVersion": 1,
+ "key": "P2-17",
+ "date": "2026-10-28",
+ "commit": "67f0e18c3ab355197affe51098767261d2cc23cb",
+ "branch": "rtd/w4-p2-17",
+ "node": "v22.23.3",
+ "pnpm": "10.33.0",
+ "os": "macOS 26.6.2",
+ "arch": "arm64",
+ "commands": [
+  {
+   "cmd": "npm run -s build",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npx vitest run tests/codexObserve.test.ts tests/dshHookControl.test.ts tests/dshSessionRegistration.test.ts tests/dshAmcPlugin.test.ts tests/adapterManifest.test.ts tests/harnessMatrix.test.ts tests/piConformanceMatrix.test.ts tests/piHookControl.test.ts tests/piSessionRegistration.test.ts tests/amcPiExtension.test.ts tests/piToolMapping.test.ts tests/piAuditLatch.test.ts tests/acsHooks.test.ts tests/acsGuardianErrors.test.ts tests/acsConformance.test.ts tests/connectHookIntegration.test.ts tests/claudeHookInstalledConfig.test.ts tests/hookControl.test.ts tests/hookIntake.test.ts tests/hookAdmission.test.ts tests/hookAuditLatch.test.ts tests/claudeCodeHookSecurity.test.ts tests/claudeCodeIntake.test.ts tests/claudeCodeRecordedHooks.test.ts tests/claudeCodeAllowFunnel.test.ts tests/hookActionLifecycle.test.ts tests/leaseRevocationFailClosed.test.ts --maxWorkers=2",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "node scripts/gen-harness-matrix.mjs --check",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s typecheck",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s typecheck:tests",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s lint",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:gates",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:dead-code",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:duplicates",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:counts",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:api-ref",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:docs-drift",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:architecture-boundaries",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm pack --dry-run --json (packages/dsh-amc-plugin)",
+   "exit": 0,
+   "durationMs": 0
+  }
+ ],
+ "tests": {
+  "total": 312,
+  "passed": 312,
+  "failed": 0,
+  "skipped": 0
+ },
+ "artifacts": [
+  {
+   "path": "SUPPORT_MATRIX.md",
+   "sha256": "ef2e09ef4990063023b868bd729ce0cdad8eee95fc8bb8174bc238d5ca00acdc"
+  },
+  {
+   "path": "PUBLISH.md",
+   "sha256": "a5d3aeee52a5dab22b2fdad89088f5e42384ff35c5579a6f62b6394312157270"
+  },
+  {
+   "path": "manifests/claude-code.json",
+   "sha256": "d4931622f417b6a99184c9939efb0a4560d896b22e0be61ac87ecb9955d8c095"
+  },
+  {
+   "path": "manifests/codex.json",
+   "sha256": "e0e1dc998fa6ec339678014a87812e2429e0d4301ea26050af4f25b7c6ed3fe4"
+  },
+  {
+   "path": "manifests/dsh.json",
+   "sha256": "cea2287b3fa8947049d98180e440da548c6bdc57ac6f15b5cca6840fdf31b9bb"
+  },
+  {
+   "path": "manifests/pi.json",
+   "sha256": "7779fcfbbf942b7e928b96b91940c560b38df2804fe50ad71facf96b687d011a"
+  }
+ ],
+ "notes": "P2-17 parts A-D on rtd/w4-p2-17, local macOS arm64 run, not CI; durations not recorded. Skipped 7 = the opt-in Pi and Claude Code binary conformance suites (AMC_*_CONFORMANCE unset), which the new harness-conformance workflow runs; its first run is pending. A: manifests + generated matrix; mutations killed: enforce without a receipt case, onFailure not blocks, record hash not compared, case values not compared; red first: path splitter broke on [version=1.0.2]. B: Codex 0.165.0 (rust-v0.165.0, 360319d8) reviewed from source: PreToolUse fails open, so no Codex hook and no claim; binary not run. C: DSH 0.2.1-rc.2 (687f282e) reviewed; packages/dsh-amc-plugin gate tested against a fake Cordis context; mutations killed: missing-arguments guard dropped, order guard dropped, version gate dropped, outage allows, loose allow shape. No Bridge dsh provider, no installed run, so no DSH claim. D: support-status docs, harness-conformance.yml, npm pack dry-run and publish steps in PUBLISH.md (not published). check:freeze fails at the base on other items' exception keys; P2-17 adds no CLI command. check:qualification reports problems only in other folders. Follow-on (same day): Bridge dsh provider with fixed per-tool argument schemas (red 9/10 first; mutations killed: extra keys, argument types, version gate, context strictness, URL spelling); DSH session registration, installer and AMC transport (red: modules absent; mutations killed: plugin digest, disk recheck, registered version, request digest binding, receipt call id, reported version, plugin config validation); Codex observe-only route /bridge/hooks/codex/v1 and installer (red: modules absent; mutations killed: schema strictness, raw input stored, foreign hooks.json overwrite, replay as conflict, control mode accepted; one equivalent mutant: auth.ok, since verifyBridgeLease returns a payload only when ok). The 312 tests are the hook-path suites listed in commands (27 files), opt-in binary conformance not included. No DSH or Codex version is qualified; binary runs pending Sid's approval."
+}

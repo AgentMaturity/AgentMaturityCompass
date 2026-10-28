@@ -769,14 +769,22 @@
           ]
         },
         "enforcementBoundary": {
-          "enum": [
-            "tool_pipeline",
-            "hook:PreToolUse",
-            "pi:tool_call",
-            "gateway",
-            "none"
-          ],
-          "type": "string"
+          "anyOf": [
+            {
+              "enum": [
+                "tool_pipeline",
+                "hook:PreToolUse",
+                "pi:tool_call",
+                "gateway",
+                "none"
+              ],
+              "type": "string"
+            },
+            {
+              "pattern": "^acs:[A-Za-z][A-Za-z0-9_]{0,63}$",
+              "type": "string"
+            }
+          ]
         },
         "evidenceTier": {
           "enum": [

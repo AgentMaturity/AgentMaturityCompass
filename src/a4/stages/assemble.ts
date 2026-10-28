@@ -31,7 +31,7 @@ import { RESOURCE_SLOTS } from "../a4Gates.js";
 import type { A4GateRow } from "../a4Readiness.js";
 import type { A4ProducerContext, A4ProducerResult } from "../a4RouterStages.js";
 import type { A4Answer, A4StageRegistry } from "../a4Schema.js";
-import { INTEGRATION_CLAIMS, integrationClaimFor, SCAFFOLD_FRAMEWORK } from "../assemblePaths.js";
+import { claimLabel, INTEGRATION_CLAIMS, integrationClaimFor, SCAFFOLD_FRAMEWORK } from "../assemblePaths.js";
 import { buildAssemble, nativeActor, reviewAssemble } from "../assembleBuild.js";
 import { blockingExecutionsIn } from "../assembleLockout.js";
 import { errorCodeOf } from "../aspireUnderstand.js";
@@ -155,7 +155,8 @@ async function understandFacts(ctx: A4ProducerContext) {
     compiledPolicy: compiled === null ? "none" : "error" in compiled ? compiled : "active",
     workflowTool: compiled === null ? { visible: true, revision: null } : "error" in compiled ? compiled : workflowVisibility(compiled),
     outcomeUnknown: Array.isArray(outcomeUnknown) ? outcomeUnknown.length : outcomeUnknown, baseline,
-    paths: Object.values(INTEGRATION_CLAIMS).map(({ path, enforcementBoundary, evidenceTier, supported, reason }) => ({ path, enforcementBoundary, evidenceTier, supported, reason }))
+    paths: Object.values(INTEGRATION_CLAIMS).map((claim) => ({ path: claim.path, enforcementBoundary: claim.enforcementBoundary, evidenceTier: claim.evidenceTier,
+      supported: claim.supported, reason: claim.reason, label: claimLabel(claim), source: claim.source, pinnedVersion: claim.conformanceReceipt?.pinnedVersion ?? null }))
   };
   const output = (label: string, body: unknown, lane: "implementation" | "recommendation" = "implementation") =>
     ({ output: "understanding", label: `assemble understand: ${label}`, lane, method: null, body });
@@ -210,9 +211,9 @@ export function assembleFacts(spec: Record<string, unknown>, answers: readonly A
       novice: "Each build session is small on purpose: a few steps and a short answer per turn. A bigger build is done in more turns, never with bigger limits.",
       practitioner: limits ? `Per turn: ${limits.maxSteps} steps and ${limits.maxTokens} tokens; ${limits.maxActive} active sessions across Studio; ${Math.round(limits.lifetimeMs / 60_000)} minutes per session, ${Math.round(limits.idleTimeoutMs / 60_000)} idle.` : "Native task limits were not readable (Understand runs from Studio).",
       expert: "LIMITS in src/studio/nativeTaskService.ts are never raised by A4; Build chunks work into turns of at most maxSteps." },
-    { id: "path", sources: ["src/a4/assemblePaths.ts", "design §13"], dataStatus: null,
+    { id: "path", sources: ["src/a4/assemblePaths.ts", "docs/adapters/manifests (P2-17)", "design §13"], dataStatus: null,
       novice: claim ? `You chose ${claim.path}: AMC ${claim.supported === "supported" ? "builds and controls it" : `can only ${claim.supported === "preview" ? "partly" : "not yet"} support it`} (${claim.reason ?? "fully supported"}).` : "No engineering path is chosen yet.",
-      practitioner: claim ? `${claim.path}: enforcement boundary ${claim.enforcementBoundary}, evidence ${claim.evidenceTier}, ${claim.supported}${claim.reason ? ` (${claim.reason})` : ""}. Not covered: ${claim.notCovered.join("; ")}.` : "No path chosen.",
+      practitioner: claim ? `${claim.path}: ${claimLabel(claim)} (boundary ${claim.enforcementBoundary}), evidence ${claim.evidenceTier}${claim.reason ? ` (${claim.reason})` : ""}; source ${claim.source}${claim.conformanceReceipt ? `, pinned ${claim.conformanceReceipt.pinnedVersion}` : ""}. Not covered: ${claim.notCovered.join("; ")}.` : "No path chosen.",
       expert: claim ? `IntegrationClaim ${JSON.stringify({ path: claim.path, enforcementBoundary: claim.enforcementBoundary, supported: claim.supported })}; enforced only for hook:*/pi:* with a conformance receipt for the pinned version.` : "integrationClaimFor(null) = null." },
     { id: "shell", sources: ["nativeShellReadiness", "decideNativeShell", "src/sandbox/nativeShellGate.ts"], dataStatus: null,
       novice: shell === null ? "AMC has not read how this computer runs the agent's shell commands: run Understand."

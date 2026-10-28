@@ -1,0 +1,43 @@
+{
+  "schema": "amc.adapter-claim-manifest/v1",
+  "adapter": "pi",
+  "harness": { "package": "@earendil-works/pi-coding-agent", "versions": ["1.0.2", "1.0.4"] },
+  "hooks": [
+    {
+      "name": "tool_call",
+      "role": "enforce",
+      "tools": ["read", "grep", "find", "ls", "write", "edit", "bash", "every other tool name (denied)"],
+      "onFailure": "blocks",
+      "source": "docs/adapters/pi.md",
+      "cases": [
+        { "id": "allowed-read-runs", "path": "pi[version={version}].cases.allowedRead.ranTool", "expect": true },
+        { "id": "allowed-read-version", "path": "pi[version={version}].cases.allowedRead.piVersion", "expect": "{version}" },
+        { "id": "denied-write-no-effect", "path": "pi[version={version}].cases.deniedWrite.fileCreated", "expect": false },
+        { "id": "denied-bash-no-effect", "path": "pi[version={version}].cases.deniedBash.fileCreated", "expect": false },
+        { "id": "unmapped-tool-no-effect", "path": "pi[version={version}].cases.unmappedExtensionTool.effect", "expect": false },
+        { "id": "builtin-override-no-effect", "path": "pi[version={version}].cases.builtinOverride.effect", "expect": false },
+        { "id": "bridge-stopped-blocks", "path": "pi[version={version}].cases.bridgeStopped.ranTool", "expect": false },
+        { "id": "receipts-verified", "path": "pi[version={version}].cases.receiptsVerified.failures", "expect": 0 }
+      ]
+    },
+    {
+      "name": "tool_result",
+      "role": "observe",
+      "tools": ["read", "grep", "find", "ls", "write", "edit", "bash"],
+      "onFailure": "unknown",
+      "source": "docs/adapters/pi.md",
+      "cases": [
+        { "id": "outcome-bound-to-decision", "path": "pi[version={version}].cases.allowedRead.outcomeBound", "expect": true }
+      ]
+    }
+  ],
+  "notCovered": [
+    "OS containment: Pi has no sandbox, and extensions run with the rights of the account that started Pi",
+    "effects that bypass tool_call: another extension's own I/O, Pi Durable",
+    "an extension that rewrites Pi's tool registry itself",
+    "sessions in which Pi did not load AMC's extension (reported as not governed)",
+    "commands an allowed call starts"
+  ],
+  "qualifiedAt": "2026-10-18",
+  "receipt": "qualification/2026-10-18-P1-22/pi-conformance.json"
+}

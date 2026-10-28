@@ -1,7 +1,7 @@
 # amc-conformance
 
-The conformance suite runner for the AMC spec. It tests any verifier, producer, adapter or compiler, written in any
-language, through its command line, and writes a `conformance-results` v1 file. It needs Node 20 or later and nothing
+The conformance suite runner for the AMC spec. It tests any verifier, producer, adapter, compiler or A4 record verifier,
+written in any language, through its command line, and writes a `conformance-results` v1 file. It needs Node 20 or later and nothing
 else: no AMC build and no dependency. The classes and their cases are in
 [`spec/conformance/v1/`](../../spec/conformance/v1/README.md).
 
@@ -19,7 +19,7 @@ npx amc-conformance run --root ~/AgentMaturityCompass --class verifier \
 
 | Option | Meaning |
 | --- | --- |
-| `--class` | `verifier`, `producer`, `adapter` or `compiler` |
+| `--class` | `verifier`, `producer`, `adapter`, `compiler` or `a4-record` |
 | `--impl` | The command template. It is split on whitespace and run without a shell; placeholders are filled in after the split |
 | `--cases <glob>` | Run only the case ids matching the glob (`*` is the only wildcard). The others are reported `skipped`, so a filtered run is never conformant |
 | `--out <file>` | Where the results go (standard output otherwise) |
@@ -36,11 +36,13 @@ Placeholders per class:
 | `producer` | `{scenario}`, `{outDir}` |
 | `adapter` | `{hookPayload}`, `{policy}` |
 | `compiler` | `{profile}`, `{catalogLock}`, `{outDir}` |
+| `a4-record` | `{record}`, `{trustList}`, `{trustRoots}` (the `amc.trust-roots` file), `{trustRoot}` (its root key id) |
 
 A placeholder the class does not provide is a usage error. AMC's own verifier runs as:
 
 ```bash
 amc-conformance run --class verifier --impl "amc-verify verify {artifact} {verifierArgs}"
+amc-conformance run --class a4-record --impl "env AMC_A4_PREVIEW=1 amc a4 verify {record} --trust-list {trustList} --trust-root {trustRoot} --json"
 ```
 
 The runner makes no network call and no case needs one. It does not sandbox the implementation; run it in your own

@@ -1,0 +1,11 @@
+build rc=0 | bundle-kernel: dist/kernel/amcRuntime.js 386 KB, 17 packages inlined: @amc/cordis, @amc/cordis-plugin-group, @amc/cordis-plugin-hmr, @amc/cordis-plugi
+typecheck rc=0 | 
+typecheck:tests rc=0 | 
+lint rc=0 | check-no-fabrication: passed; allowlisted findings R1 0, R2 0, R3 304, R4 21; 16 random marker(s); 0 pending entries.
+check:gates rc=0 | check:gates: every evaluated gate requirement has a registered, non-synthetic emitter.
+check:dead-code rc=0 | No source-quality baseline at origin/main (merge-base 5ea5e866a42a): one-time bootstrap, base check skipped
+check:duplicates rc=0 | No source-quality baseline at origin/main (merge-base 5ea5e866a42a): one-time bootstrap, base check skipped
+check:counts rc=0 | Published source counts match the repository; this check does not execute tests.
+check:api-ref rc=0 | docs/API_REFERENCE.md matches the source.
+check:docs-drift rc=0 | Docs drift check passed (342 files scanned; truth claims and commands checked in 264 public files; 5 logged exceptions).
+check:schemas rc=0 | gen-spec-schemas: 46 schemas current; 90 contract fixtures agree

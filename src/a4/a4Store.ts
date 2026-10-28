@@ -18,20 +18,17 @@ import { randomBytes } from "node:crypto";
 import { hostname } from "node:os";
 import type Database from "better-sqlite3";
 import { a4FloorFor, loadVerifiedApprovalPolicy } from "../approvals/approvalPolicyEngine.js";
-import { verifyUsersConfigSignature } from "../auth/authApi.js";
 import { eventMeta, readerTrustFor } from "../claims/evidenceProvenance.js";
 import type { ClaimKind } from "../claims/eligibility/types.js";
 import { getPrivateKeyPem } from "../crypto/keys.js";
 import { signDigestWithPolicy } from "../crypto/signing/signer.js";
 import type { SignedDigest } from "../crypto/signing/signerTypes.js";
-import { activeFreezeStatus } from "../drift/freezeEngine.js";
 import { openLedger, type Ledger } from "../ledger/ledger.js";
 import { ledgerSynchronousMode } from "../ledger/ledgerDurability.js";
 import { A4_STORE_BINARY, runImmediateTransaction } from "../ledger/ledgerSessionTransactions.js";
 import { withControlFileLock } from "../lifecycle/controlFileLock.js";
 import { assertOwnerMode } from "../mode/mode.js";
 import { highSeveritySecretTypes } from "../release/releaseSecretScan.js";
-import { verifyTrustConfigSignature } from "../trust/trustConfig.js";
 import type { TrustContext } from "../trust/trustContext.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
@@ -42,8 +39,9 @@ import { prepareA4Record, SIDE_TABLE_KEYS, NEW_HEAD, headProblems, type A4Actor,
 export type { A4Actor, A4ChangeSpec, A4RequestKey, A4TransitionOptions, A4TransitionResult } from "./a4TransitionRecords.js";
 import { captureA4RecordSigner, assertA4HotWriters, createA4CurrentLatch, A4TransitionPublicationError, type A4TransitionAttempt, type A4TransitionProgress } from "./a4TransitionSigning.js";
 import { A4BlobError, a4ProjectsRoot, createProjectKey, putPrivate } from "./a4Blobs.js";
-import { LEDGER_BACKEND_INCOMPLETE_MESSAGE, ledgerBackendGap } from "./a4LedgerBackend.js";
+import { a4MirrorDivergence, LEDGER_BACKEND_INCOMPLETE_MESSAGE, ledgerBackendGap, writeA4Mirror } from "./a4LedgerBackend.js";
 import { ledgerRefClaim, resolveLedgerEvent } from "./a4Evidence.js";
+import { type LedgerMirror, openLedgerMirror } from "../persistence/postgres/postgresLedgerMirror.js";
 import { assertMember, liveRolesFor, memberCandidates, populationFacts, principalPopulation } from "./a4Identity.js";
 import {
   A4_ENVELOPE_KINDS, defaultGatePolicyFor, a4EffectRowSchema, a4GatePolicyV1Schema, a4MemberRowSchema, a4ProjectRowSchema,
@@ -102,35 +100,7 @@ const integrityFailed = (projectId: string, problems: readonly string[]): A4Stor
   new A4StoreError(409, "A4_INTEGRITY_FAILED", `project ${projectId} failed verification`, problems);
 const randomId = (prefix: string): string => `${prefix}_${randomBytes(16).toString("hex")}`;
 
-/** Studio's read-only rule (users or trust signature invalid), re-read here because studioServer keeps it private; `amc a4` refuses writes on it. */
-export function readOnlyNow(workspace: string): boolean | null {
-  try {
-    const users = verifyUsersConfigSignature(workspace);
-    return (users.signatureExists && !users.valid) || !verifyTrustConfigSignature(workspace).valid;
-  } catch {
-    return null;
-  }
-}
-
-/** Freeze and read-only facts; P1-57 calls this inside the transaction for consume, complete and effect transitions. Null = unreadable. */
-export function refreshVolatileFacts(workspace: string, project: Pick<A4ProjectRow, "agent_id">): {
-  freeze: ReturnType<typeof activeFreezeStatus> | null; readOnly: boolean | null;
-} {
-  let freeze: ReturnType<typeof activeFreezeStatus> | null;
-  try {
-    freeze = activeFreezeStatus(workspace, project.agent_id);
-  } catch {
-    freeze = null;
-  }
-  return { freeze, readOnly: readOnlyNow(workspace) };
-}
-
-/** The live facts readiness reads; each source the store cannot read is null, never "all clear". Stage lanes add theirs. */
-export function collectLiveFacts(workspace: string, project: Pick<A4ProjectRow, "agent_id">, options: { hostedRouter: boolean }): {
-  activeLocal: string[] | null; hostPrincipals: number | null; hostedRouter: boolean
-} & ReturnType<typeof refreshVolatileFacts> {
-  return { ...principalPopulation(workspace), hostedRouter: options.hostedRouter, ...refreshVolatileFacts(workspace, project) };
-}
+export { collectLiveFacts, readOnlyNow, refreshVolatileFacts } from "./a4LiveFacts.js";
 
 export type A4Store = ReturnType<typeof createStore>;
 
@@ -145,16 +115,18 @@ export function openA4Store(workspace: string): A4Store {
     ledger.close();
     throw new A4StoreError(503, "LEDGER_NOT_DURABLE", "the ledger connection commits below synchronous=FULL");
   }
-  return createStore(workspace, ledger);
+  return createStore(workspace, ledger, undefined, openLedgerMirror(workspace));
 }
 
 /** The store's readers and verifiers over a ledger opened elsewhere (read-only for `verifyA4Chain`); never for writes. */
 export const readA4Store = (ledger: Ledger, trust?: TrustContext): A4Store => createStore(ledger.workspace, ledger, trust);
 
-function createStore(workspace: string, ledger: Ledger, trust?: TrustContext) {
+function createStore(workspace: string, ledger: Ledger, trust?: TrustContext, mirror: LedgerMirror | null = null) {
   const db = ledger.db;
   /** Recorded on each project only: the ledger is the workspace's own, so no query filters on this path-derived id. */
   const workspaceId = workspaceIdFromDirectory(workspace);
+  // P2-36: on a Postgres-pinned workspace (`openA4Store` only) every commit writes through to Postgres before SQLite commits.
+  const mirrorWrite = (projectId: string): void => writeA4Mirror(mirror, db, projectId, (...args) => new A4StoreError(...args));
 
   /** The unsigned head row as stored; only `verified` and the write path, which verifies it, read it. */
   const readHeadRow = (projectId: string): A4ProjectRow | null => {
@@ -487,6 +459,8 @@ function createStore(workspace: string, ledger: Ledger, trust?: TrustContext) {
         .run({ ...patch, project_id: projectId });
       current?.();
       db.prepare("DELETE FROM a4_requests WHERE ts < ?").run(ts - A4_REQUEST_WINDOW_MS);
+      current?.();
+      mirrorWrite(projectId); // last: Postgres commits first, so a mirror that cannot commit rolls this transaction back
       return { replay: false, projectId, seq: last.seq, kind: last.spec.kind, bodyDigest: last.digest, evidenceEventId: evidence!.id, envelope: last.envelope };
     });
   };
@@ -636,6 +610,8 @@ function createStore(workspace: string, ledger: Ledger, trust?: TrustContext) {
         return [table, named];
       })) as Record<A4SideTable, Record<string, Cell>[]>;
       const effects = (db.prepare("SELECT * FROM a4_effects WHERE project_id = ?").all(projectId) as unknown[]).map((row) => a4EffectRowSchema.parse(row));
+      const diverged = a4MirrorDivergence(mirror, db, projectId);
+      if (diverged.length > 0) throw integrityFailed(projectId, diverged);
       return { head, links: links as A4ChainLink[], rows, members: membersFrom(rows.a4_members), effects };
     })(),
     /** Running effects across projects, for the liveness sweeper. */
@@ -794,6 +770,6 @@ function createStore(workspace: string, ledger: Ledger, trust?: TrustContext) {
 
     /** Whether the chain ratchets single-user self-approval off (design §5.3). */
     ratcheted: (projectId: string): boolean => ratchetedFromChain(readChain(projectId)),
-    close: (): void => ledger.close()
+    close: (): void => { mirror?.close(); ledger.close(); }
   };
 }

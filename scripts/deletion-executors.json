@@ -1789,6 +1789,16 @@
       "source": "handle.db.prepare(`DELETE FROM scim_groups WHERE group_id = ?`).run(groupId);",
       "status": "deferred",
       "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/adapters/hookProviders/installFiles.ts:389:1",
+      "path": "src/adapters/hookProviders/installFiles.ts",
+      "line": 389,
+      "call": "unlinkSync(",
+      "category": "filesystem-sync",
+      "source": "for (const path of targets) if (existsSync(path)) unlinkSync(path);",
+      "status": "gated",
+      "reason": "removeInstallationFiles, called only by removeDshHook and removeCodexHook (amc connect hooks remove --provider dsh|codex, P2-17), after each has verified its signed manifest (Codex also refuses when .codex/hooks.json differs from it) and revoked the installation's lease. It removes only the AMC-owned files the caller names (DSH: .amc/hooks/dsh.lease, dsh.json, dsh.json.sig; Codex: those for codex plus .codex/hooks.json) inside a fresh withDeletionGate call (executors hook-dsh-remove and hook-codex-remove, target caches: no target kind names hook installation files, so the closest one is used and a hold on caches refuses the removal). A refused gate leaves every file in place."
     }
   ]
 }

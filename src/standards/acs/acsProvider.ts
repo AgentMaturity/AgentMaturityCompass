@@ -42,7 +42,7 @@ export function acsHookCall(input: Record<string, unknown>): HookCall | null {
   const acs = parsed.data;
   // ACS carries no working directory, so AMC resolves nothing against one.
   return { provider: "acs", actionId: acsActionId(acs.sessionId, acs.requestId), sessionId: acs.sessionId, callId: acs.requestId,
-    parentActionId: null, cwd: "", pi: null, acs, request: null, payloadSha256: null };
+    parentActionId: null, cwd: "", pi: null, acs, dsh: null, request: null, payloadSha256: null };
 }
 
 /**

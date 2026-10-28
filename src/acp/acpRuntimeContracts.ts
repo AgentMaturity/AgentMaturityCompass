@@ -16,6 +16,8 @@ export const ACP_MAX_UPDATE_PARAMS_BYTES = 900_000;
 export const NATIVE_TASK_LEASE_ENV = "AMC_NATIVE_TASK_LEASE";
 /** The Studio principal a native task belongs to (P1-78), recorded as the initiator of the approvals its runtime raises. */
 export const NATIVE_TASK_INITIATOR_ENV = "AMC_NATIVE_TASK_INITIATOR";
+/** The system prompt Studio composed for a native task's agent (P2-37, src/studio/nativeTaskContext.ts); read and unset at startup. */
+export const NATIVE_TASK_SYSTEM_PROMPT_ENV = "AMC_NATIVE_TASK_SYSTEM_PROMPT";
 export const ACP_RUNTIME_LIMITS = Object.freeze({
   inputFrameBytes: MAX_WIRE_LINE_BYTES,
   updateParamsBytes: ACP_MAX_UPDATE_PARAMS_BYTES,

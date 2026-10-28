@@ -1,0 +1,5 @@
+check-spec-sync: 1 failure(s)
+- spec/core/06-maturity-levels.md: amc:spec:levels is stale: run node scripts/check-spec-sync.mjs --write
+exit 1
+check-spec-sync: 16 spec files in sync with the code
+restored exit 0

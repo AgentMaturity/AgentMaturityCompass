@@ -2,7 +2,8 @@
  * P2-36: A4 under the G2 enterprise-data systems. The workspace is the owned P2-24 governance fixture (signed policies, a
  * real vault, a real ledger); live roles are OWNER by fiat, everything else is real: the store, the deletion gate and
  * legal-hold registry (P2-01), the detectors (P2-02), the algorithm policy (P2-08), ledger encryption and the Postgres
- * backend selection (P2-09). No Postgres server runs: the backend check reads the selection and the mirror list only.
+ * backend selection (P2-09). No Postgres server runs: the backend check reads the selection and the mirror list, and a
+ * write's mirror finds no Postgres configured (the mirror itself is tests/a4PostgresMirror.test.ts).
  */
 import { generateKeyPairSync, sign } from "node:crypto";
 import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
@@ -121,20 +122,25 @@ function exportSlice(workspace: string): { index: A4BundleSlice; record: string 
 }
 
 describe("ledger backend (P2-36, reconcile/G2.md conflict 11)", () => {
-  test("a Postgres backend whose mirror lacks the a4_* tables refuses every A4 write, and readiness shows LEDGER_BACKEND_INCOMPLETE", () => {
+  test("the Postgres mirror declares every A4 table; an undeclared a4_* table still refuses every A4 write, and readiness shows LEDGER_BACKEND_INCOMPLETE", () => {
     const { workspace } = governanceFixture();
     const { store, projectId } = project(workspace);
     expect(readinessFor(store, projectId, owner, {}).items.some((item) => item.id === "store.ledger_backend")).toBe(false);
     vi.stubEnv("AMC_SESSION_STORE", "postgres");
-    const gap = ledgerBackendGap(workspace, store.ledger.db);
-    expect(gap).toEqual(expect.arrayContaining(["a4_projects", "a4_transitions", "a4_comments"]));
+    expect(ledgerBackendGap(workspace, store.ledger.db)).toEqual([]);
+    // P2-36: with no reachable Postgres the write-through mirror cannot commit, so nothing is recorded (tests/a4PostgresMirror.test.ts drives a real bridge).
+    const before = store.readHead(projectId)!.head_seq;
+    expect(() => store.addComment(projectId, { actor: owner, body: "after the switch", cardId: "brief" })).toThrow(/LEDGER_MIRROR_UNAVAILABLE/);
+    expect(store.readHead(projectId)!.head_seq).toBe(before);
+    store.ledger.db.exec("CREATE TABLE a4_unmirrored (x TEXT)");
+    expect(ledgerBackendGap(workspace, store.ledger.db)).toEqual(["a4_unmirrored"]);
     expect(() => store.addComment(projectId, { actor: owner, body: "after the switch", cardId: "brief" })).toThrow(/LEDGER_BACKEND_INCOMPLETE/);
     const fresh = openA4Store(workspace);
     stores.push(fresh);
     expect(() => fresh.createProject({ actor: owner, agentId: "agent-two", name: "refused", hostedRouter: false })).toThrow(/LEDGER_BACKEND_INCOMPLETE/);
     const readiness = readinessFor(store, projectId, owner, {});
     expect(readiness.items.find((item) => item.id === "store.ledger_backend")).toMatchObject({ status: "BLOCKED",
-      reasonCodes: expect.arrayContaining(["LEDGER_BACKEND_INCOMPLETE", "NOT_MIRRORED:a4_projects"]) });
+      reasonCodes: expect.arrayContaining(["LEDGER_BACKEND_INCOMPLETE", "NOT_MIRRORED:a4_unmirrored"]) });
     expect(readiness.status).toBe("BLOCKED");
   });
 });

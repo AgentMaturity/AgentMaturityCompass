@@ -59,7 +59,7 @@ import { packageEntry } from "./a4Transparency.js";
 import { UPDATE_POLICY_PATH, updatePolicyYaml } from "./a4UpdatePolicy.js";
 import { contextPluginPath } from "./adaptContextPlugin.js";
 import { memoryPolicyPath } from "./adaptMemoryPolicy.js";
-import { integrationClaimFor } from "./assemblePaths.js";
+import { integrationClaimFor, releaseBoundaryOf } from "./assemblePaths.js";
 import {
   ACTIVATE_CLAIM_BOUNDARY, activateSpecOf, CAPTURED_SLOTS, currentRelease, enforceManifestIdFor, EXPERT_REVIEW_ITEM, IDENTITY_NOT_EVALUATED, IMAGE_TAG_ONLY_REASON, leasePlans,
   PRODUCTION_LEASE_EFFECT_ID, productionReleaseOf, proposedFor, RELEASE_EFFECT_ID, rolledBackTarget, rollbackRecorded, rollbackRoute, rollbackStarted, TOPOLOGY_QUALIFICATION, type LeasePlan
@@ -278,7 +278,7 @@ function artifactSignature(workspace: string, artifactKind: ArtifactSignature["a
  * with its artifact signature beside it; every directory on the way is a real one, never a link. Named by a fresh id and
  * harmless when the transition that would name it is refused. Returns its workspace-relative path and sha256.
  */
-export function writeReleaseRecord(workspace: string, projectId: string, folder: "receipts" | "checks" | "rollbacks" | "monitors" | "value", releaseId: string, id: string,
+export function writeReleaseRecord(workspace: string, projectId: string, folder: "receipts" | "checks" | "rollbacks" | "monitors" | "value" | "mechanic", releaseId: string, id: string,
   doc: unknown, artifactKind: ArtifactSignature["artifactKind"]): { path: string; sha256: string } {
   if (!/^[a-z0-9_]{1,80}$/.test(id) || !/^a4r_[0-9a-f]{32}$/.test(releaseId)) throw new A4StoreError(400, "INPUT_INVALID", "not an A4 record id");
   const dir = [projectId, folder, releaseId].reduce((parent, segment) => realDir(join(parent, segment)), realDir(a4ReleasesRoot(workspace)));
@@ -676,8 +676,7 @@ function recordRelease(ctx: A4EffectContext, input: RecordInput): void {
         claim: envelopeForUnboundResult({ producer: `a4:${projectId}:release:${input.releaseId}:passport`, method: "human_review", regulated, now }) }
     },
     enforcementBoundaries: [
-      { boundary: input.integration.enforcementBoundary, status: input.integration.enforcementBoundary === "none" ? "none" : input.integration.enforcementBoundary === "tool_pipeline" ? "enforced" : "observed",
-        note: input.integration.notCovered.join("; ") || input.integration.supported },
+      releaseBoundaryOf(input.integration),
       { boundary: "deployment", status: "none", note: "AMC prepares, signs and records; the operator deploys (contract §7)" },
       { boundary: "update_policy", status: "none", note: "no runner enforces the update policy yet (P2-34)" }
     ],

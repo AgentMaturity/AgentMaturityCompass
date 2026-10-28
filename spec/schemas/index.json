@@ -28,7 +28,7 @@
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/a4-integration-claim.schema.json",
       "name": "a4-integration-claim.schema.json",
-      "sha256": "7240b74fc3fa61020ad6f0042157f905a967c32567767e36647df7012909e821"
+      "sha256": "02618dcc091573a6e5d818e7bfeb0e725ae09ef34286dcdef4cfa187fe9f97c1"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/a4-intent.schema.json",
@@ -38,7 +38,7 @@
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/a4-package.schema.json",
       "name": "a4-package.schema.json",
-      "sha256": "18ed1a399204553ec52de67903e673e763ebffa9a871210cda6dca6a550c0bc6"
+      "sha256": "e7e55ad156dde1c1e5ca57f5c2633e2e9a175f7e4d98fb655cc5b2af72d114b4"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/a4-project.schema.json",
@@ -58,7 +58,7 @@
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/a4-release.schema.json",
       "name": "a4-release.schema.json",
-      "sha256": "7e28f578c217d4dc19368c568b1f781c0369e28b533aa1af72ed502d97af821d"
+      "sha256": "a3bb26a7df9af122a4f5898f0d8e32c814519eecade6d01ea6fff39518ff9e19"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/a4-revision.schema.json",
@@ -133,7 +133,7 @@
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/conformance-results.schema.json",
       "name": "conformance-results.schema.json",
-      "sha256": "28ce563f898073569c797cd7aa40ce26e046c9a513b603c7dfb19a93c4e230f6"
+      "sha256": "171a5b371d6b89156d8c430ff93800671546f10ede456bc3c5b7cc600ec32137"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/control-record.schema.json",

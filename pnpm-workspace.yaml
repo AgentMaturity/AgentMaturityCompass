@@ -13,6 +13,9 @@ packages:
   # tarball, so it needs no lockfile importer. Remove this line together with
   # adding `packages/amc-conformance: {}` to pnpm-lock.yaml if it ever gains one.
   - "!packages/amc-conformance"
+  # P2-17: the DSH plugin imports nothing and only peers on DSH's own @deepseek-ai/cordis, which AMC must never
+  # install next to its vendored copy; it is tested from tests/dshAmcPlugin.test.ts and needs no lockfile importer.
+  - "!packages/dsh-amc-plugin"
 
 # Vendored names must resolve to the workspace copies, never to a registry
 # package of the same name. The verify-vendored-links gate asserts this.
