@@ -6,7 +6,9 @@
  * module holds only what is ACS-specific there: the call AMC derives from the ACS session and request ids, the
  * canonical ToolHub request, and the response row AMC signs. Pinned source: docs/source-reviews/P2-19-owasp-acs.md.
  */
+import { isAbsolute } from "node:path";
 import { z } from "zod";
+import type { ActionClass } from "../../types.js";
 import { sha256Hex } from "../../utils/hash.js";
 import { canonicalize } from "../../utils/json.js";
 import type { CanonicalToolRequest, HookCall, HookControlDecision } from "../../bridge/hookProviders.js";
@@ -44,15 +46,33 @@ export function acsHookCall(input: Record<string, unknown>): HookCall | null {
 }
 
 /**
- * The canonical ToolHub request for an ACS tool call. ACS names tools in the runtime's own vocabulary, so AMC maps only
- * a tool named by its ToolHub id (fs.read, fs.write, http.fetch, ...); the signed ToolHub config then decides, and any
- * other name is denied there. A call carrying `raw_command` or `operation` is not mapped: AMC evaluates the structured
- * arguments only and would not see what those fields make the runtime run.
+ * Every ACS tool AMC maps: an AMC ToolHub id, the one argument the ToolHub validator reads for it, the other argument
+ * names the call may carry, and the lowest action class the signed config may give the tool (a lower class is denied).
+ * A call with any other argument name is not mapped: a key the validator does not read could carry the real effect.
+ * Shell, process and git tools are not mapped at all, so they never bypass the shell-plan parsing other providers use.
+ */
+const ACS_TOOLS: Readonly<Record<string, { key: "path" | "url"; optional: readonly string[]; minimumActionClass: ActionClass }>> = {
+  "fs.read": { key: "path", optional: [], minimumActionClass: "READ_ONLY" },
+  "fs.write": { key: "path", optional: ["content"], minimumActionClass: "WRITE_LOW" },
+  "http.fetch": { key: "url", optional: [], minimumActionClass: "NETWORK_EXTERNAL" },
+};
+
+/**
+ * The canonical ToolHub request for an ACS tool call, or null when AMC does not map it: a tool outside ACS_TOOLS, an
+ * argument outside its schema, a non-string value, a relative path (ACS names no working directory to resolve it
+ * against), or a call carrying `raw_command` or `operation` (AMC evaluates structured arguments only). `http.fetch` is
+ * a GET. The signed ToolHub config then decides.
  */
 export function acsToolRequest(toolName: string, toolInput: Record<string, unknown>, call: { readonly acs?: AcsControlContext | null } | null):
   Omit<CanonicalToolRequest, "segment"> | null {
-  if (!call?.acs || call.acs.unevaluable.length > 0) return null;
-  return { name: toolName, args: toolInput, argumentsReviewable: true };
+  if (!call?.acs || call.acs.unevaluable.length > 0 || !Object.hasOwn(ACS_TOOLS, toolName)) return null;
+  const tool = ACS_TOOLS[toolName]!;
+  const value = toolInput[tool.key];
+  if (Object.keys(toolInput).some((key) => key !== tool.key && !tool.optional.includes(key))) return null;
+  if (Object.values(toolInput).some((argument) => typeof argument !== "string") || typeof value !== "string" || !value) return null;
+  if (tool.key === "path" && !isAbsolute(value)) return null;
+  return { name: toolName, args: tool.key === "url" ? { url: value, method: "GET" } : { path: value }, argumentsReviewable: true,
+    minimumActionClass: tool.minimumActionClass };
 }
 
 /**

@@ -193,8 +193,10 @@ function toolCallRequest(id: JsonRpcId, params: AcsParams, input: { workspace: s
     if (error instanceof HookControlError && error.statusCode < 500 && error.statusCode !== 429) {
       return fail(id, ACS_ERRORS.INVALID_PARAMS, "Invalid params", { reason: error.code, message: error.message });
     }
-    // No decision could be recorded: AMC answers deny rather than an error the runtime may fail open on (ACS §6.4).
-    return final({ decision: "deny", reasoning: `AMC could not record a decision, so it denied the call: ${error instanceof Error ? error.message : "unknown error"}`,
+    // No decision could be recorded: AMC answers deny rather than an error the runtime may fail open on (ACS §6.4). Only
+    // a HookControlError's own message reaches the caller, as on the generic route; any other detail stays in local stderr.
+    if (!(error instanceof HookControlError)) process.stderr.write(`[amc] ACS guardian: ${error instanceof Error ? error.message : String(error)}\n`);
+    return final({ decision: "deny", reasoning: `AMC could not record a decision, so it denied the call${error instanceof HookControlError ? `: ${error.message}` : "."}`,
       reason_codes: ["amc_decision_unrecorded"] });
   }
   // ACS §10.3: a duplicate request_id within the session is rejected, even when AMC holds its earlier decision.

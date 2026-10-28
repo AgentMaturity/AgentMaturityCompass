@@ -111,20 +111,20 @@
   }
  ],
  "tests": {
-  "total": 390,
-  "passed": 383,
+  "total": 394,
+  "passed": 387,
   "failed": 0,
   "skipped": 7
  },
  "artifacts": [
   {
    "path": "mutations.json",
-   "sha256": "486d80d562666f99475cee527fb85b634d5629464150b87752444297c861081d"
+   "sha256": "fd15716dc12797dca6c13cc71649c1edac565a28f152bbe03d2d545ccb8a1fbe"
   },
   {
    "path": "conformance.json",
    "sha256": "9a49d40c57965b9212f6b366905c41a615c8a6219fbe740d37b3c7a7cb10a80d"
   }
  ],
- "notes": "Related suite: 35 files run, 379 passed, 7 skipped (pre-existing live-Claude-Code skips); plus tests/asiCrosswalk.test.ts 4 passed. check:freeze exit 1 is pre-existing (P0-37, P1-32, P1-33, P1-65, P2-09, P2-23, P2-30, P3-14 not in base allowedExceptionKeys); P2-19 adds no CLI command. check:catalog-changelog exit 1 is pre-existing at base 93ccb82b5 (GOV_CHANGELOG_ENTRY_COUNT); P2-19 touches no catalog file. ACS v0.1.4 834f3f0d51e7bbbd9a68ff682bec89f97ddd72d8, tree 37f9688e7a3181cc1cce4be4e3bff293faae8666."
+ "notes": "Security-review fixes (argument schema, shell tools unmapped, no error detail to callers) re-run: 37 related files, 387 passed, 7 skipped (pre-existing live-Claude-Code skips), 0 failed; commit field is the first code commit, fixes are its successor. check:freeze exit 1 is pre-existing (P0-37, P1-32, P1-33, P1-65, P2-09, P2-23, P2-30, P3-14 not in base allowedExceptionKeys); P2-19 adds no CLI command. check:catalog-changelog exit 1 is pre-existing at base 93ccb82b5 (GOV_CHANGELOG_ENTRY_COUNT); P2-19 touches no catalog file. ACS v0.1.4 834f3f0d51e7bbbd9a68ff682bec89f97ddd72d8, tree 37f9688e7a3181cc1cce4be4e3bff293faae8666."
 }

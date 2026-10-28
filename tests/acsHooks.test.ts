@@ -98,6 +98,40 @@ describe("ACS v0.1 guardian on AMC's hook control path", () => {
     }
   });
 
+  // Security review 1: a key the ToolHub validator does not read could carry the real effect, and a relative path
+  // resolves against a working directory ACS does not name. Each mapped tool has a fixed argument schema.
+  test("an argument outside the mapped tool's fixed schema, or a relative path, is not mapped and is denied", () => {
+    const workspace = controlledWorkspace(agentId);
+    const publicFile = join(workspace, "workspace", "public.txt");
+    for (const request of [
+      toolCall("fs.read", { path: publicFile, target: "/etc/shadow" }),
+      toolCall("fs.read", { path: publicFile, cwd: "/" }),
+      toolCall("fs.read", { path: "workspace/public.txt" }),
+      toolCall("fs.read", { path: [publicFile, "/etc/shadow"] }),
+      toolCall("fs.write", { path: join(workspace, "workspace", "output", "a.txt"), content: "x", destination: "/etc/passwd" }),
+      toolCall("http.fetch", { url: "https://api.github.com/", method: "POST" }),
+    ]) {
+      const decided = result(send(workspace, request));
+      expect(decided, JSON.stringify(request.params.payload)).toMatchObject({ decision: "deny", reasoning: expect.stringContaining("not mapped") });
+    }
+    // The schema's own keys still map: a write with content reaches policy (which asks, so ACS gets the 9.2 deny).
+    const write = result(send(workspace, toolCall("fs.write", { path: join(workspace, "workspace", "output", "a.txt"), content: "x" })));
+    expect(write).toMatchObject({ decision: "deny", reason_codes: ["approver_unavailable"] });
+  });
+
+  // Security review 2: shell and process tools would skip the shell-plan parsing Gemini and Pi use; AMC does not map them.
+  test("shell, process and git tools are not mapped and are denied before policy", () => {
+    const workspace = controlledWorkspace(agentId);
+    for (const request of [
+      toolCall("process.spawn", { binary: "node", argv: ["-e", "1"] }),
+      toolCall("bash", { command: "ls" }),
+      toolCall("git.status", { cwd: workspace }),
+    ]) {
+      expect(result(send(workspace, request)), JSON.stringify(request.params.payload.tool))
+        .toMatchObject({ decision: "deny", reasoning: expect.stringContaining("not mapped") });
+    }
+  });
+
   test("ask: a write that needs approval is the ACS section 9.2 substitution, deny with approver_unavailable", () => {
     const workspace = controlledWorkspace(agentId);
     const decided = result(send(workspace, toolCall("fs.write", { path: join(workspace, "workspace", "output", "PRIVATE.txt") })));

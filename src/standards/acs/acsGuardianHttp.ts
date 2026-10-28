@@ -54,7 +54,8 @@ export async function handleAcsGuardianHttp(options: { workspace: string; req: I
     writeControlJson(res, 200, handleAcsGuardianRequest({ workspace: options.workspace, authenticatedAgentId: auth.payload.agentId,
       lease: auth.payload, rawBody }));
   } catch (error) {
-    return refuse(res, 503, ACS_ERRORS.SESSION_REFUSED, "guardian_unavailable", error instanceof Error ? error.message : "ACS guardian failed");
+    process.stderr.write(`[amc] ACS guardian route: ${error instanceof Error ? error.message : String(error)}\n`);
+    return refuse(res, 503, ACS_ERRORS.SESSION_REFUSED, "guardian_unavailable", "ACS guardian unavailable");
   }
   return true;
 }
