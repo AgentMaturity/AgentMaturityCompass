@@ -66,7 +66,7 @@ export const MAX_PROVIDER_HOOK_INPUT_BYTES = 262_144;
 
 const MAX_PROVIDER_CONFIG_BYTES = 4 * 1024 * 1024;
 /** The providers configured through a JSON hooks file; Pi installs through src/adapters/hookProviders/pi.ts. */
-type ConfigHookProvider = Exclude<HookProvider, "pi">;
+type ConfigHookProvider = Exclude<HookProvider, "pi" | "acs">;
 export type { HookProvider };
 const hookProviderSchema = z.enum(["claude-code", "gemini-cli"]);
 const nativeHookEventNameSchema = z.enum(["AfterTool", "BeforeTool", "PostToolUse", "PostToolUseFailure", "PreToolUse", ...CLAUDE_SESSION_HOOKS]);

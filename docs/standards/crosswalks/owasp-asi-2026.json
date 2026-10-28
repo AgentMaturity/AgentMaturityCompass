@@ -1,0 +1,53 @@
+{
+  "$comment": "P2-19: experimental crosswalk from AMC Layer 0 controls to the OWASP Top 10 for Agentic Applications 2026. Entries use the P1-09 crosswalk format plus support. AI-drafted; not reviewed. It stays experimental until a named expert signs it off (P1-34). A crosswalk entry never satisfies a target, an obligation or a control.",
+  "framework": "owasp-asi-2026",
+  "title": "OWASP Top 10 for Agentic Applications 2026",
+  "source": "ASI01 to ASI10 as listed in docs/security/THREAT_MODEL.md and catalog/vocabulary.yaml; titles to re-verify against the primary source before publishing",
+  "support": "experimental",
+  "satisfiesTargets": false,
+  "review": { "status": "pending", "expert": null, "credential": null, "reviewedAt": null },
+  "provenance": { "draftedBy": "ai", "draftedAt": "2026-10-28", "approvedBy": null },
+  "reused": {
+    "$comment": "P1-48's scenario-to-ASI mapping, used as is and not restated here: each adversarial case's owaspAsi tags and the L0-ADV controls' own crosswalk entries.",
+    "scenarios": "examples/adversarial-suite/cases.json",
+    "controls": ["L0-ADV-01", "L0-ADV-02", "L0-ADV-03", "L0-ADV-04"]
+  },
+  "entries": [
+    { "control": "L0-TOOL-01", "framework": "owasp-asi-2026", "clause": "ASI02", "relation": "partial", "support": "experimental",
+      "rationale": "A signed tool allowlist refuses tools outside it; misuse of an allowed tool within its arguments is not covered by this control alone." },
+    { "control": "L0-TOOL-02", "framework": "owasp-asi-2026", "clause": "ASI02", "relation": "partial", "support": "experimental",
+      "rationale": "Limits on amount, recipient, resource and rate enforced outside the model bound how far an allowed tool can be misused." },
+    { "control": "L0-IDN-01", "framework": "owasp-asi-2026", "clause": "ASI03", "relation": "partial", "support": "experimental",
+      "rationale": "Attributing every tool call to a unique agent bound to a human principal makes privilege use traceable; it does not by itself prevent abuse." },
+    { "control": "L0-IDN-02", "framework": "owasp-asi-2026", "clause": "ASI03", "relation": "partial", "support": "experimental",
+      "rationale": "Short-lived, scoped, signed leases narrow the privileges an agent identity can exercise and refuse expired or revoked ones." },
+    { "control": "L0-IDN-03", "framework": "owasp-asi-2026", "clause": "ASI03", "relation": "partial", "support": "experimental",
+      "rationale": "Delegation that never widens scope, limits or expiry addresses privilege escalation through subagents." },
+    { "control": "L0-CHG-01", "framework": "owasp-asi-2026", "clause": "ASI04", "relation": "partial", "support": "experimental",
+      "rationale": "Pinning model, prompt, tool and corpus versions in a signed manifest refuses an unpinned or changed component." },
+    { "control": "L0-INV-02", "framework": "owasp-asi-2026", "clause": "ASI04", "relation": "partial", "support": "experimental",
+      "rationale": "An AI bill of materials with component digests records the agentic supply chain; it detects but does not block a compromised component." },
+    { "control": "L0-TOOL-03", "framework": "owasp-asi-2026", "clause": "ASI04", "relation": "partial", "support": "experimental",
+      "rationale": "Remote MCP servers used only with authorization limits untrusted tool servers entering the supply chain." },
+    { "control": "L0-MON-03", "framework": "owasp-asi-2026", "clause": "ASI08", "relation": "partial", "support": "experimental",
+      "rationale": "A kill switch with a manual fallback stops new protected effects, bounding a cascade once detected." },
+    { "control": "L0-MON-04", "framework": "owasp-asi-2026", "clause": "ASI08", "relation": "partial", "support": "experimental",
+      "rationale": "Stopping new effects or entering a recorded safe state on a provider outage keeps one failure from propagating into effects." },
+    { "control": "L0-OVS-02", "framework": "owasp-asi-2026", "clause": "ASI09", "relation": "partial", "support": "experimental",
+      "rationale": "An approval bound to the exact action digest prevents an agent from obtaining consent for one action and performing another." },
+    { "control": "L0-OVS-04", "framework": "owasp-asi-2026", "clause": "ASI09", "relation": "partial", "support": "experimental",
+      "rationale": "Override and rubber-stamp telemetry surfaces reviewers who approve without scrutiny, a symptom of misplaced trust in the agent." },
+    { "control": "L0-TRN-01", "framework": "owasp-asi-2026", "clause": "ASI09", "relation": "partial", "support": "experimental",
+      "rationale": "Disclosing that the agent is an AI at first interaction addresses one form of human trust exploitation." },
+    { "control": "L0-MON-03", "framework": "owasp-asi-2026", "clause": "ASI10", "relation": "partial", "support": "experimental",
+      "rationale": "An operator kill switch can stop a rogue agent's new protected effects; it does not detect the agent going rogue." },
+    { "control": "L0-IDN-04", "framework": "owasp-asi-2026", "clause": "ASI10", "relation": "partial", "support": "experimental",
+      "rationale": "Revoking an agent credential stops new protected actions within the profile's time bound." },
+    { "control": "L0-INV-01", "framework": "owasp-asi-2026", "clause": "ASI10", "relation": "partial", "support": "experimental",
+      "rationale": "A signed registry entry for every running agent makes an unregistered agent visible as such." }
+  ],
+  "gaps": [
+    { "clause": "ASI05", "reason": "No Layer 0 control states execution containment. The native-shell sandbox (P0-06, P1-05) is an enforcement point in docs/security/THREAT_MODEL.md, not a catalog control, so no control maps to Unexpected Code Execution yet." },
+    { "clause": "ASI07", "reason": "No Layer 0 control covers the integrity or authentication of messages between agents. L0-IDN-03 bounds delegated authority but not the channel; the threat model lists only in-process ACP session binding (P2-25)." }
+  ]
+}

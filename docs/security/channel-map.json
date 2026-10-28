@@ -258,12 +258,14 @@
       "name": "Managed hooks",
       "enforcementPoints": [
         { "path": "src/adapters/managedHookLease.ts", "symbol": "verifyManagedLease" },
-        { "path": "src/bridge/hookControl.ts", "symbol": "evaluateProviderHookControl" }
+        { "path": "src/bridge/hookControl.ts", "symbol": "evaluateProviderHookControl" },
+        { "path": "src/standards/acs/acsGuardianHttp.ts", "symbol": "handleAcsGuardianHttp" }
       ],
       "evidence": "Hook control results",
       "status": "enforced",
       "bypasses": [
-        "Enforcement holds only while the external harness calls the hook; a harness run without it is not governed"
+        "Enforcement holds only while the external harness calls the hook; a harness run without it is not governed",
+        "An OWASP ACS runtime (P2-19) is not verified to honour AMC's answer, so ACS decisions are advisory"
       ],
       "owners": ["P0-30"],
       "asi": ["ASI02", "ASI10"]

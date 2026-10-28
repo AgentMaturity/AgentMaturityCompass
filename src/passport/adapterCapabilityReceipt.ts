@@ -357,7 +357,7 @@ function inspectConfiguration(workspace: string, agentId: string, adapterId: str
   }
 }
 
-function hookProviderForAdapter(adapterId: string): Exclude<HookProvider, "pi"> | null {
+function hookProviderForAdapter(adapterId: string): Exclude<HookProvider, "pi" | "acs"> | null {
   if (adapterId === "claude-cli") return "claude-code";
   if (adapterId === "gemini-cli") return "gemini-cli";
   return null;
