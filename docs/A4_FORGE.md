@@ -283,7 +283,20 @@ the agent's prompt pack.
   approval is an acknowledgement, not an expert review), activation and the lockout, and what is declared but not
   enforced (data handling: P2-01, P2-02; reporting clocks: P3-23).
 - **Propose** freezes the profile, the plan, the diff against this project's previous proposal, the operating scope
-  and the declared data handling (`enforcement: none`). **Build** signs the plan (`CONTROL_PLAN`, checked against this
+  and the declared data handling (`enforcement: none`). The compiled plan is stored once, outside the revision rows (P2-42): on the
+  shipped catalog a plan is about 140 to 150 KiB (the catalog lock, the evidence plan, the requirements), more than the
+  256 KiB specification limit leaves once Understand's facts are recorded. Each Adapt row (Understand's facts and the
+  proposal) binds the plan by a ref, `{ schema: "amc.a4-derived-ref/v1", kind: "compiled-plan", sha256, digest }`
+  (`digest` is the plan's own digest), and the plan's canonical bytes are written, after the release secret scan, to
+  `a4-projects/<projectId>/derived/<sha256>.json` (plain directories, no link on the way). Every reader (readiness,
+  Build, Review, activation, the producers) gets the plan back checked against the ref; a missing file, other bytes or
+  a ref that does not parse is `409 A4_INTEGRITY_FAILED` on every route that loads the project, never an empty plan,
+  and `verifyA4Chain` reports it as `A4_DERIVED_MISSING`, `A4_DERIVED_MISMATCH` or `A4_DERIVED_REF_INVALID`. Restoring
+  the file (any copy with the same bytes) heals it. `GET …/revisions/:n` answers the stored form, so its `spec` still
+  hashes to `specDigest`. The plan holds AMC's compilation of the catalog and fact names, no member free text, so it is
+  stored plain: erasure leaves it and a verifier needs no key to read it. A revision recorded before P2-42 carries its
+  plan inline and is read as it is. The 256 KiB limit is unchanged; one to four stations fit (a project on all seven
+  stations is still refused at Review, 413, nothing written). **Build** signs the plan (`CONTROL_PLAN`, checked against this
   workspace's keys: a local audit trail). Build is an owner's, as at Aspire and Assemble: it signs the plan and re-signs
   the agent's Enforce manifest. Before it writes, the agent's resources must match its signed Enforce manifest (else
   `409 ENFORCE_DRIFTED`: review the drift in Enforce and re-baseline it there), and it re-writes the manifest only when
@@ -874,7 +887,9 @@ residency or retention.
   certification (`A4_INTEGRITY_FAILED`); the certificate itself copies none of the A4 records.
 - **Verify offline.** `verifyA4Bundle` (`src/a4/a4Verify.ts`) checks a bundle or an `amc.a4-record/v1` JSON export
   without AMC's keys: every digest recomputes from the exported bytes, and keys count only when the caller's pinned
-  trust list admits them. Run it with `amc a4 verify <file> --trust-list <file>` (exit 0 trusted, 1 failed, 2
+  trust list admits them. An export carries the rows as stored, so an Adapt row's compiled plan is there as its sha256
+  ref; the report warns `DERIVED_BOUND_BY_DIGEST` with the count (the plan files stay under the workspace's
+  `a4-projects/<projectId>/derived/`, which `verifyA4Chain` checks in place). Run it with `amc a4 verify <file> --trust-list <file>` (exit 0 trusted, 1 failed, 2
   integrity-only under `--allow-unpinned` or `--allow-unanchored`). With no trust list the report states integrity only. In a bundle, a record whose `CREATED` body or signed
   seq-0 receipt names another agent than the manifest's fails scope (`A4_SCOPE_AGENT`). Seven normative fixtures,
   with their expected verdicts, are in `tests/fixtures/contracts/a4-record/`.

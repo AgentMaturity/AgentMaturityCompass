@@ -1,0 +1,9 @@
+== lint exit=0 :: Lint contract passed: three unsafe patterns rejected; safe counterparts accepted. check-no-fabrication: passed; allowlisted findings R1 0, R2 0, R3 304, R4 21; 16 random marker(s); 0 pending entries. 
+== check:gates exit=0 :: 11 registered emitters, 4 evidence maps, 285 literal audit emissions classified, 9 evaluated gate requirements checked. check:gates: every evaluated gate requirement has a registered, non-synthetic emitter. 
+== check:dead-code exit=0 :: {"scan":"dead-code","baseline":2569,"current":2621,"new":0,"stale":0,"accepted":52} No source-quality baseline at origin/main (merge-base 5ea5e866a42a): one-time bootstrap, base check skipped 
+== check:duplicates exit=0 :: {"scan":"duplicates","baseline":1058,"current":1313,"new":0,"stale":0,"accepted":255} No source-quality baseline at origin/main (merge-base 5ea5e866a42a): one-time bootstrap, base check skipped 
+== check:counts exit=0 :: Published source counts match the repository; this check does not execute tests. 
+== check:api-ref exit=0 :: docs/API_REFERENCE.md matches the source. 
+== check:docs-drift exit=0 :: Docs drift check passed (342 files scanned; truth claims and commands checked in 264 public files; 5 logged exceptions). 
+== check:schemas exit=0 :: gen-spec-schemas: 46 schemas current; 90 contract fixtures agree 
+== check:architecture-boundaries exit=0 ::   "failures": [] } 

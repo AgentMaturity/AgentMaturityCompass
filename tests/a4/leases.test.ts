@@ -12,7 +12,6 @@ import { cleanupGovernanceFixtures } from "../governor/governanceFixture.js";
 import { a4, requestId } from "./a4Harness.js";
 import { Journey } from "./a4Journey.js";
 
-vi.mock("../../src/catalog/admission/gate.js", async (original) => (await import("./thinCatalog.js")).thinCatalog(original));
 vi.setConfig({ testTimeout: 300_000 });
 afterEach(() => cleanupGovernanceFixtures());
 

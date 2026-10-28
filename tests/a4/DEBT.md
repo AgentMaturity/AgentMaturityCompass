@@ -14,9 +14,9 @@ marked **pending** has no test yet; the reason is given. Nothing here is skipped
   second Node process on the built code (`dist/`), for the two-process races and the crashed effect owner.
 - `tests/a4/a4Journey.ts` drives one project from Aspire to production through the routes: alice (OWNER) authors and
   builds; bob and a4-owner approve; audrey (AUDITOR) casts Adapt's required role vote. Assemble takes the `other` path
-  (no native build session; its unsupported items are acknowledged out of scope). Adapt runs on the synthetic compiler
-  catalog (`tests/a4/thinCatalog.ts`, mocked per file) because the shipped catalog overflows Adapt's proposal (follow-up
-  below). Activate targets helm on a Studio that reads as hosted (`KUBERNETES_SERVICE_HOST`, the v1 same-host restart);
+  (no native build session; its unsupported items are acknowledged out of scope). Adapt runs on the shipped catalog
+  (P2-42 closed the overflow that made P2-35 mock a five-control catalog; the mock and `tests/a4/thinCatalog.ts` are gone).
+  Activate targets helm on a Studio that reads as hosted (`KUBERNETES_SERVICE_HOST`, the v1 same-host restart);
   the destination is a public IPv4 literal and every reachability probe runs the real `probeDestination` with its HTTP
   fetch replaced, so no socket opens. Effect gates are opened by alice and approved through the engine by bob and a4-owner.
 - The provider is never called: Aspire runs no model, Assemble's `other` path starts no build session.
@@ -155,13 +155,19 @@ is reachable directly (`storeDedupe.test.ts`) and by two processes that both pas
 - **Proposed P2-41 (same item) · tampered readiness.** Design §17 says readiness reads BLOCKED on a tampered record;
   `GET …/readiness` answers `409 A4_INTEGRITY_FAILED` instead (no body to read BLOCKED from). Fail-closed; the
   wording or the route should be aligned.
-- **Proposed P2-42 · Adapt cannot propose on the shipped catalog.** With the shipped admitted catalog (layer 0 plus the
-  L1 station controls), Adapt's proposal carries the Understand facts (about 172 to 214 KiB), the explanation (about
-  31 to 39 KiB) and the compiled plan (about 134 to 149 KiB), measured for the stations education, governance,
-  technology and wealth, and every one exceeds `SPEC_ROOM_FOR_BUILD` (240 KiB): `POST …/stages/adapt/propose` answers
-  413 INPUT_TOO_LARGE whatever the answers, so no project can cross Adapt today. Fail-closed (nothing is written). The
-  journey crosses Adapt on the synthetic five-control catalog instead. Proposed fix: keep the plan and the
-  understanding out of the proposal record (reference them by digest) or raise the room for Adapt.
+- **Closed by P2-42 · Adapt cannot propose on the shipped catalog.** With the shipped admitted catalog, Adapt carried
+  the compiled plan (about 140 to 150 KiB: the catalog lock, the evidence plan, the requirements) twice, in
+  Understand's facts and in the proposal, so every proposal exceeded `SPEC_ROOM_FOR_BUILD` (240 KiB) and
+  `POST …/stages/adapt/propose` answered 413 INPUT_TOO_LARGE. Since P2-42 an Adapt row binds the plan by sha256
+  (`amc.a4-derived-ref/v1`) and the plan is stored once under `a4-projects/<projectId>/derived/` (src/a4/a4Derived.ts);
+  readers get it back checked, and a missing or changed file is `A4_INTEGRITY_FAILED`. The 256 KiB limit stays.
+  `tests/a4/p242ShippedCatalog.test.ts` crosses Adapt on the technology and wealth stations with no mock, and the
+  journey scenarios (06, 08, 09, leases) now run on the shipped catalog: scenario 06 asserts an `UNRESOLVED:<control>`
+  of the shipped catalog instead of the fixture's `L2-FIX-US-01`. Sizes per station are in
+  `qualification/2026-10-29-P2-42/spec-sizes.txt`. Left: a project on all seven stations still overflows at Review
+  (its row is 218 KiB at Build, and Review adds the conformance statement and the control results, 46 to 66 KiB on
+  one station: 413 at Review, nothing written); binding the explanation and Review's control lists by digest too
+  would lift it. One to four stations cross (measured).
 - **Note (no defect) · lease ids in `a4_requests`.** The spec's case greps `response_json` for `lease_` and expects
   none; by design (P1-62) a credential-bearing request stores the projection `{ releaseId, leaseIds, tokenDelivered }`,
   so lease *ids* are recorded and the token never is. The tests assert the token, not the id, is absent.

@@ -2,8 +2,8 @@
  * P2-35 journey: one A4 project driven through the HTTP routes from Aspire to an Activate release, as a team of real
  * signed users does it. alice (OWNER) authors and builds; bob (OWNER) and a4-owner approve; audrey (AUDITOR) casts the
  * role vote Adapt's completion needs. Assemble takes the `other` path (no native build session; its path and unsupported
- * items are acknowledged out of scope). Adapt runs on the thin catalog (tests/a4/thinCatalog.ts, mocked by the caller),
- * and Activate targets helm on a Studio that reads as hosted in Kubernetes (KUBERNETES_SERVICE_HOST), the v1 same-host
+ * items are acknowledged out of scope). Adapt runs on the shipped catalog (P2-42: its plan is bound by sha256, so the
+ * proposal fits), and Activate targets helm on a Studio that reads as hosted in Kubernetes (KUBERNETES_SERVICE_HOST), the v1 same-host
  * restart. Effect gates are opened by alice and approved through the engine by bob and a4-owner.
  */
 import { vi } from "vitest";
@@ -129,8 +129,8 @@ export class Journey {
     must(await this.complete(stage, completion), `${stage} completion complete`);
   }
 
-  async throughAspire(): Promise<void> {
-    await this.p.proposeAspire();
+  async throughAspire(answers = aspireAnswers()): Promise<void> {
+    await this.p.proposeAspire(answers);
     must(await this.complete("aspire", await this.approve("aspire", "direction")), "aspire direction complete");
     await this.build("aspire");
     must(await this.complete("aspire", await this.approve("aspire", "completion")), "aspire completion complete");

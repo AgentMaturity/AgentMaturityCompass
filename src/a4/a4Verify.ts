@@ -33,6 +33,7 @@ import { buildVerifierReport, type VerifierReportV1 } from "../trust/verifierRep
 import type { EvidenceEvent } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
+import { derivedRefCount, revisionDerivedProblems } from "./a4Derived.js";
 import { a4AlgorithmAllowed, resolveRefs } from "./a4Evidence.js";
 import {
   A4_BOUND_ITEMS, A4_ENVELOPE_KINDS, DEFAULT_A4_GATE_POLICY, a4EvidenceRefRowSchema, a4TransitionRowSchema, flatSlots, gatePolicyDigestOf, gateSupersededBy,
@@ -251,7 +252,7 @@ interface Findings { errors: string[]; warnings: string[]; stale: string[]; sign
  * mirror is an integrity error, never a pass.
  */
 export function verifyA4Chain(ledger: Ledger, projectId: string, trust: TrustContext = loadTrustContext(), now = Date.now(),
-  options: { mirror?: boolean } = {}): VerifierReportV1 {
+  options: { mirror?: boolean; derived?: boolean } = {}): VerifierReportV1 {
   const out: Findings = { errors: [], warnings: [], stale: [], signatures: [] };
   if (options.mirror) {
     const mirror = openLedgerMirror(ledger.workspace);
@@ -272,6 +273,12 @@ export function verifyA4Chain(ledger: Ledger, projectId: string, trust: TrustCon
   const gates = checkGates(ledger, projectId, links, out, !out.errors.some((error) => error.startsWith("A4_SIDE_ROW_")));
   checkRefs(ledger, projectId, trust, now, out);
   checkEffects(links, gates, out);
+  // P2-42: each Adapt plan a revision binds by sha256 is read back from the workspace (an offline record does not carry them).
+  if (options.derived !== false) {
+    for (const row of ledger.db.prepare("SELECT revision_no, stage, spec_json FROM a4_revisions WHERE project_id = ? AND stage = 'adapt'").all(projectId) as Row[]) {
+      out.errors.push(...revisionDerivedProblems(ledger.workspace, projectId, row as Parameters<typeof revisionDerivedProblems>[2]));
+    }
+  }
   for (const request of ledger.db.prepare("SELECT client_request_id, response_json FROM a4_requests WHERE project_id = ?").all(projectId) as Row[]) {
     const json = String(request.response_json);
     if (LEASE_TOKEN.test(json) || highSeveritySecretTypes(json).length > 0) out.errors.push(`A4_REQUEST_SECRET: request ${String(request.client_request_id)} stores a credential`);
@@ -470,7 +477,7 @@ function satisfactionOf(snapshot: ReturnType<ReturnType<typeof readA4Store>["sna
 /** One exported project: verifyA4Chain on its rows, the export's own checks, then the four dimensions under admitted keys only. */
 function recordReport(ledger: Ledger, record: A4RecordV1, trust: TrustContext, now: number, artifact: VerifierReportV1["artifact"], note: string | null,
   bundleAgentId: string | null | undefined): VerifierReportV1 {
-  const chain = verifyA4Chain(ledger, record.projectId, trust, now);
+  const chain = verifyA4Chain(ledger, record.projectId, trust, now, { derived: false });
   const checks = recordChecks(ledger, record, bundleAgentId);
   const integrityErrors = [...chain.integrity.errors, ...checks.errors];
   const sideRows = integrityErrors.filter((error) => error.startsWith("A4_SIDE_ROW_"));
@@ -480,9 +487,11 @@ function recordReport(ledger: Ledger, record: A4RecordV1, trust: TrustContext, n
     keyHistory: record.publicKeys.monitor.history ?? undefined });
   const anchoring = carriedLedgerAnchoring(monitor, intact, signatures);
   const fileRefs = record.tables.a4_evidence_refs.filter((row) => row.ref_kind !== "ledger_event" && row.ref_kind !== "external").length;
+  const derived = derivedRefCount(record.tables.a4_revisions);
   const report = buildVerifierReport({ artifact, context: trust, integrityErrors, signatures, anchoring, verifiedAt: new Date(now),
     warnings: [...chain.warnings.filter((warning) => !warning.startsWith("workspace-self:")), ...(note === null ? [] : [note]),
-      ...(fileRefs > 0 ? [`FILE_REFS_BOUND_BY_DIGEST: ${fileRefs} file evidence refs are bound by sha256; their bytes are not part of an export`] : [])] });
+      ...(fileRefs > 0 ? [`FILE_REFS_BOUND_BY_DIGEST: ${fileRefs} file evidence refs are bound by sha256; their bytes are not part of an export`] : []),
+      ...(derived > 0 ? [`DERIVED_BOUND_BY_DIGEST: ${derived} compiled plans are bound by sha256; their bytes stay under the workspace's a4-projects/<projectId>/derived`] : [])] });
   if (!intact) return { ...report, ...allNotEvaluated("INTEGRITY_FAILED") };
   // A project with no envelope yet has no auditor signature to admit (issuer admission not-evaluated): only a refused key blocks.
   if (report.issuerAdmission.status === "fail" || anchoring.status !== "anchored") return { ...report, ...allNotEvaluated(NOT_ADMITTED) };

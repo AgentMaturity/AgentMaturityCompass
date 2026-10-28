@@ -33,6 +33,7 @@ import { flatSlots, gatePolicyOf, type A4Answer, type A4StageRegistry } from "..
 import { assertNoSecrets } from "../a4Router.js";
 import { errorCodeOf } from "../aspireUnderstand.js";
 import { conformanceStatement, recordControlResults } from "../a4Conformance.js";
+import { compactSpec } from "../a4Derived.js";
 import { checkMemoryPolicy, MEMORY_ENFORCEMENT_NOTE, memoryPolicyDraft, memoryPolicyFields, memoryPolicySha256, writeMemoryPolicy } from "../adaptMemoryPolicy.js";
 import {
   contextItems, contextPluginDraft, contextPluginSha256, nativeDeliveryOf, PROBE_LIMITATION, PROBE_PURPOSE, probeFrameStatus, promptPackSha256, promptPackStatus, readContextPlugin,
@@ -52,9 +53,13 @@ import {
 import { answersDigestOf, answerValues, askGapCodes, listValue, mergeCarried, textValue, understandingCurrent } from "../spec/aspire.js";
 import { assertUnderstood, explanationResult, fail, relPath } from "./common.js";
 
-/** The largest proposal Propose records: Build's record (signature, memory policy, context record, signed diff) must still fit the router's 256 KiB. */
+/**
+ * The largest proposal Propose records, as the row stores it (the plan bound by sha256, a4Derived): Build's record
+ * (signature, memory policy, context record, signed diff) must still fit the router's 256 KiB.
+ */
 const SPEC_ROOM_FOR_BUILD = 240 * 1024; // ponytail: Build's record is ~3 KiB plus the signed plan diff; Build checks the exact record before it writes
-const tooLargeForBuild = (spec: Record<string, unknown>): boolean => canonicalize(spec).length + canonicalize(spec.diff ?? null).length > SPEC_ROOM_FOR_BUILD;
+const tooLargeForBuild = (spec: Record<string, unknown>): boolean =>
+  canonicalize(compactSpec("adapt", spec).spec).length + canonicalize(spec.diff ?? null).length > SPEC_ROOM_FOR_BUILD;
 /** Build keeps the bytes it replaces (memory policy, context plugin, the Enforce manifest and its signature) to put them back. */
 const MAX_KEPT_BYTES = 4 * 1024 * 1024;
 
@@ -402,7 +407,8 @@ function build(ctx: A4ProducerContext): A4ProducerResult {
   const record = (manifest: NonNullable<AdaptBuild["manifest"]>): AdaptBuild => ({ ...signed,
     memoryPolicy: { path: relPath(workspace, memory.path), sha256: memory.sha256, policy: memory.policy }, context: context.record, manifest });
   // The router checks the produced specification (256 KiB, credentials) only after Build returns: the same check, first.
-  assertNoSecrets({ ...spec, build: record({ manifestId: `enforce-resources-${"0".repeat(16)}`, path: relPath(workspace, manifestPath) }) }, "The produced specification");
+  assertNoSecrets(compactSpec("adapt", { ...spec, build: record({ manifestId: `enforce-resources-${"0".repeat(16)}`, path: relPath(workspace, manifestPath) }) }).spec,
+    "The produced specification");
   const restore = keptBytes([memory.path, context.path, artifactSigPath(context.path), manifestPath, artifactSigPath(manifestPath)]);
   let manifest: NonNullable<AdaptBuild["manifest"]>;
   try {
