@@ -6,8 +6,8 @@ where the claim stops. The Claude Code contract it relies on is pinned in
 
 - Qualified Claude Code release: **2.1.296** (macOS arm64 run against AMC; Linux packages pinned, not run; Windows not verified).
 - Any other release is refused at registration, so its sessions are not governed.
-- Support status: supported at the qualified release in the [harness support matrix](SUPPORT_MATRIX.md), which is generated
-  from [manifests/claude-code.json](manifests/claude-code.json).
+- Support status: supported at the qualified release in the harness support matrix (`docs/adapters/SUPPORT_MATRIX.md`),
+  which is generated from `docs/adapters/manifests/claude-code.json`.
 
 ## The claim, per hook
 

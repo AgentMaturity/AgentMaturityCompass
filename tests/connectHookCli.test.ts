@@ -102,7 +102,7 @@ describe("amc connect hooks CLI", () => {
     expect(result.status).toBe(2);
     expect(JSON.parse(result.stdout)).toEqual({
       ok: false,
-      error: "provider must be claude-code, gemini-cli or pi",
+      error: "provider must be claude-code, gemini-cli, pi or dsh",
     });
   });
 
