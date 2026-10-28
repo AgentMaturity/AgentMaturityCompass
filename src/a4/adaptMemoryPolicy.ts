@@ -11,6 +11,7 @@ import { z } from "zod";
 import { DEFAULT_COMPACTION } from "../agent/compaction/promptPressure.js";
 import type { CompactionConfig } from "../agent/loopTypes.js";
 import { getAgentPaths } from "../fleet/paths.js";
+import { regimeFloor } from "../ops/retention/regimeRetention.js";
 import type { ReasoningMemoryConsumer, ReasoningMemoryPrivacyClass } from "../learning/reasoningMemory.js";
 import { sessionSpillCap } from "../session/sessionPayloadCap.js";
 import { ensureDir, writeFileAtomic } from "../utils/fs.js";
@@ -90,6 +91,19 @@ export function memoryPolicyFields(values: ReadonlyMap<string, unknown>): { fiel
   const privacy = privacyClass ?? DEFAULTS.privacyClass;
   return { invalid, fields: { privacyClass: privacy, allowedConsumers, retentionTag: `reasoning-memory:${privacy}:ttl-${expiresAfterDays}d:review-${reviewAfterDays}d`,
     expiresAfterDays, reviewAfterDays, sources } };
+}
+
+/**
+ * The regime retention floor the memory policy's retention is held to (P2-34): P2-26's largest `logs` minimum for the
+ * active plan's regimes (the reasoning memory an agent keeps is among the automatically generated records those regimes
+ * name), `floor: null` when no regime sets one, and null when the plan cannot be read (fail closed: not evaluated).
+ */
+export function memoryRetentionFloor(workspace: string): { floor: { days: number; regimeIds: string[] } | null } | null {
+  try {
+    return { floor: regimeFloor(workspace, "logs") };
+  } catch {
+    return null;
+  }
 }
 
 /** `<agent>/memory/policy.json`: inside the agent's `memory` Enforce resource (src/enforce/resourceManifest.ts). */

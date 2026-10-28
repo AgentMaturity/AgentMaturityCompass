@@ -392,11 +392,11 @@ const gatePolicySchema = z.union([
 
 /** Answers a recorded request, or runs `write` and answers its result. */
 async function mutate<S extends z.ZodType>(route: A4Route, projectId: string, schema: S,
-  write: (body: z.output<S>, request: A4RequestKey | undefined) => A4TransitionResult, status = 200): Promise<true> {
+  write: (body: z.output<S>, request: A4RequestKey | undefined) => A4TransitionResult | Promise<A4TransitionResult>, status = 200): Promise<true> {
   const { body, request } = await readJson(route, schema);
   const replay = priorReplay(route.store, request, projectId);
   if (replay) apiSuccess(route.res, replay);
-  else apiSuccess(route.res, mutationResult(write(body, request)), status);
+  else apiSuccess(route.res, mutationResult(await write(body, request)), status);
   return true;
 }
 
