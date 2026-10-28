@@ -23,6 +23,10 @@ AMC supports signed, encrypted, offline-verifiable workspace backups.
 - Each SQLite database in the backup set (`evidence.sqlite` among them) is captured with `VACUUM INTO` from a read-only connection: one consistent snapshot, committed WAL content included, taken without stopping writers. Its `-wal`, `-shm` and `-journal` sidecars are not copied, and the manifest hashes the snapshot.
 - An encrypted ledger ([EVIDENCE_STORAGE.md](EVIDENCE_STORAGE.md)) is backed up as ciphertext with only its wrapped data keys, so restoring it needs the same KeyProvider.
 
+## Postgres session store
+
+A workspace pinned to the Postgres session store (see [EVIDENCE_STORAGE.md](EVIDENCE_STORAGE.md)) keeps its session rows in Postgres, and `amc backup` does not copy them. Back them up with the database's own tooling (base backups with WAL archiving, or the managed service's point-in-time recovery). The workspace backup still carries what the rows need to verify and to be read: `.amc/postgres-store.json` (the chain id), the signing keys and the blobs.
+
 ## Format
 `.amcbackup` contains:
 - `manifest.json`

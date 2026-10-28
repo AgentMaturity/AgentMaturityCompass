@@ -94,7 +94,7 @@ export interface NativeTaskEvent {
 }
 export interface NativeTaskHistory {
   readonly status: "not-started" | "authenticated" | "unavailable";
-  readonly backend: "sqlite" | "jsonl" | null;
+  readonly backend: "sqlite" | "jsonl" | "postgres" | null;
   readonly headEventHash: string | null;
   readonly eventCount: number;
   /** Metadata authentication is not a full run-verification or payload-access grant. */

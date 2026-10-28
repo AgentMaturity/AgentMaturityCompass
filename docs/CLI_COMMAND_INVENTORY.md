@@ -450,6 +450,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc evidence-stores backfill` | Copy guard events written before dual-write into evidence.sqlite | - | - |
 | `amc evidence-stores cutover` | Move this workspace's guard events to evidence.sqlite, only when parity is identical (P2-09) | - | - |
 | `amc evidence-stores encrypt` | Encrypt existing inline evidence payloads under the ledger data key (P2-09) | `--key-provider <id>`<br>`--key-ref <id>`<br>`--rotate-key`<br>`--rewrap`<br>`--json` | - |
+| `amc evidence-stores migrate` | Copy this SQLite workspace's session history to Postgres, check parity, then pin the Postgres session store (P2-09) | `--to <backend>`<br>`--json` | - |
 | `amc evidence-stores parity` | Compare the legacy guard-event store against the consolidated one | `--json` | - |
 | `amc evidence-stores worm-export` | Export signed retention segments to an object-lock (WORM) bucket under a retention lock that cannot be shortened (P2-09) | `--bucket <name>`<br>`--retain-days <n>`<br>`--prefix <prefix>`<br>`--region <region>`<br>`--json` | - |
 | `amc evidence-stores worm-verify` | Verify a downloaded WORM export offline against a trust list (P2-09) | `--index <file>`<br>`--objects <dir>`<br>`--trust-list <file>` | - |

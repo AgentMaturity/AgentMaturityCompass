@@ -18,19 +18,19 @@ export function readNativeSessionEvents(workspace: string, sessionId: string): E
       throw new Error("Cannot read the native session-store marker. Inspect .amc/session-store.json and its permissions; no alternate backend was read.");
     }
   }
-  let backend: "sqlite" | "jsonl" = "sqlite";
+  let backend: "sqlite" | "jsonl" | "postgres" = "sqlite";
   if (marker !== undefined) {
     let value: unknown;
     try { value = JSON.parse(marker); } catch { value = null; }
     const selected = value !== null && typeof value === "object" && !Array.isArray(value)
       ? (value as { backend?: unknown }).backend : undefined;
-    if (selected !== "sqlite" && selected !== "jsonl") {
+    if (selected !== "sqlite" && selected !== "jsonl" && selected !== "postgres") {
       throw new Error("The native session-store marker is invalid. Inspect .amc/session-store.json against the original workspace configuration; do not switch backends to hide this error.");
     }
     backend = selected;
   }
-  if (backend === "jsonl") {
-    const store = openSessionEventStore(workspace, "jsonl", { readOnly: true });
+  if (backend !== "sqlite") {
+    const store = openSessionEventStore(workspace, backend, { readOnly: true });
     try { return [...store.readSessionEvents(sessionId)]; }
     finally { store.close(); }
   }

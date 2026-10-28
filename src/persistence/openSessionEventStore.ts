@@ -21,6 +21,7 @@
 import { join } from "node:path";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { JsonlSessionEventStore } from "./jsonl/jsonlSessionEventStore.js";
+import { PostgresSessionEventStore } from "./postgres/postgresSessionEventStore.js";
 import { SqliteSessionEventStore } from "./sqliteSessionEventStore.js";
 import type {
   SessionEventStore,
@@ -35,7 +36,7 @@ function markerPath(workspace: string): string {
 }
 
 function isBackendId(value: unknown): value is SessionStoreBackendId {
-  return value === "sqlite" || value === "jsonl";
+  return value === "sqlite" || value === "jsonl" || value === "postgres";
 }
 
 /** The backend this workspace has already committed to, if any. */
@@ -79,6 +80,23 @@ function pinBackend(workspace: string, backendId: SessionStoreBackendId): void {
         `two backends would write two disjoint hash chains. Export and re-import the session log to switch.`
     );
   }
+  writeMarker(workspace, backendId);
+}
+
+/**
+ * Move the pin from SQLite to Postgres. Only `migrateSqliteToPostgres` calls
+ * this, after it has copied the history and checked parity; it refuses any
+ * other switch, so mixed chains stay refused everywhere else.
+ */
+export function repinSqliteToPostgres(workspace: string): void {
+  const existing = readSessionStoreMarker(workspace);
+  if (existing !== null && existing !== "sqlite") {
+    throw new Error(`workspace session store is ${existing}; only a SQLite workspace can migrate to Postgres`);
+  }
+  writeMarker(workspace, "postgres");
+}
+
+function writeMarker(workspace: string, backendId: SessionStoreBackendId): void {
   ensureDir(join(workspace, ".amc"));
   writeFileAtomic(
     markerPath(workspace),
@@ -102,9 +120,9 @@ export function openSessionEventStore(
   if (options.readOnly !== true) {
     pinBackend(workspace, backendId);
   }
-  return backendId === "jsonl"
-    ? new JsonlSessionEventStore(workspace, options)
-    : new SqliteSessionEventStore(workspace, options);
+  if (backendId === "jsonl") return new JsonlSessionEventStore(workspace, options);
+  if (backendId === "postgres") return new PostgresSessionEventStore(workspace, options);
+  return new SqliteSessionEventStore(workspace, options);
 }
 
 /**

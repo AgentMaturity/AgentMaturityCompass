@@ -60,6 +60,8 @@ Driver: `pg` 8.23.1 (MIT; SCRAM-SHA-256 and TLS through Node `tls`) over `postgr
 
 Mirrored tables are a data list (`evidence_events`, `sessions`, `runs`) that A4 (P2-36) extends with `a4_*` and `action_*`.
 
+Branch d as built: the worker is evaluated in-process (as Code Mode's is) and loads `pg` by resolved path, refusing with `POSTGRES_DRIVER_MISSING` when it is absent. SCRAM is enforced on the driver's own authentication events (MD5 or cleartext requests close the socket before the password is sent; no SCRAM exchange is refused), and TLS on the socket. Each workspace writes its own `chain_id`, so one database can hold several. Blobs and keys stay on the volume. Provider-delegated ledger signing is refused on this backend, because its usage accounting reads only the SQLite and JSONL streams. Not run against a real Postgres in this branch; the failover drill is `docs/runbooks/POSTGRES_FAILOVER.md`, pending for Sid.
+
 ## Consequences
 
 - Deviation: the hash covers the ciphertext for rows written encrypted. Readers that recompute hashes from row columns (`ledgerVerification`, `a4Verify`, `a4AuditReader`, `sessionRootDescriptor`) need no change for those rows. For migrated rows only `ledgerVerification` decrypts; `src/a4` is P2-36's to change.

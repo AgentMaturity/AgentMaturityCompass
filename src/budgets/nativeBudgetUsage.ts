@@ -33,8 +33,9 @@ export function readBudgetEvents(workspace: string, existing?: Ledger, options: 
   const ledger = existing ?? openLedger(workspace);
   try {
     const sources: (readonly EvidenceEvent[])[] = [ledger.getAllEvents()];
-    if (readSessionStoreMarker(workspace) === "jsonl") {
-      const store = openSessionEventStore(workspace, "jsonl", { readOnly: true });
+    const marker = readSessionStoreMarker(workspace);
+    if (marker === "jsonl" || marker === "postgres") {
+      const store = openSessionEventStore(workspace, marker, { readOnly: true });
       try {
         sources.push(store.readAllEvents());
       } finally { store.close(); }

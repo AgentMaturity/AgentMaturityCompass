@@ -265,8 +265,10 @@ export function probeFrameStatus(ledger: Ledger, probe: { snapshotEventId?: unkn
  * refuses it, as agentToolset refuses a session; so does a JSONL session store (sticky per workspace), before any turn.
  */
 async function runContextProbe(input: { workspace: string; agentId: string; plugin: AdaptContextPlugin; ledger: Ledger }): Promise<ContextProbeOutcome> {
-  if (resolveSessionStoreBackend(input.workspace) === "jsonl") {
-    throw fail(409, "PROBE_NOT_RECORDED", "This workspace's session store is JSONL, which has no ledger row an A4 ref can name; nothing was run.", { reasonCodes: ["SESSION_STORE_JSONL"] });
+  const sessionStore = resolveSessionStoreBackend(input.workspace);
+  if (sessionStore !== "sqlite") {
+    throw fail(409, "PROBE_NOT_RECORDED", `This workspace's session store is ${sessionStore === "jsonl" ? "JSONL" : "Postgres"}, which has no ledger row an A4 ref can name; nothing was run.`,
+      { reasonCodes: [`SESSION_STORE_${sessionStore.toUpperCase()}`] });
   }
   try {
     loadActiveCompiledPolicy(input.workspace);
