@@ -1,11 +1,28 @@
 {
   "schema": "amc.adapter-claim-manifest/v1",
   "adapter": "codex",
-  "harness": { "package": "@openai/codex", "versions": [] },
-  "hooks": [],
+  "harness": {
+    "package": "@openai/codex",
+    "versions": [],
+    "commit": "360319d8dee62d87e2d59fc0c21805d79519cfed"
+  },
+  "hooks": [
+    {
+      "name": "PostToolUse",
+      "role": "observe",
+      "tools": [
+        "every tool Codex reports at PostToolUse"
+      ],
+      "onFailure": "proceeds",
+      "source": "docs/adapters/codex.md",
+      "cases": []
+    }
+  ],
   "notCovered": [
-    "every Codex tool call: unsupported at 0.165.0 because PreToolUse fails open (a handler that errors, times out, exits other than 0 or 2, or is untrusted lets the call run), so AMC installs no Codex hook; see docs/source-reviews/P2-17-codex-hooks.md",
-    "observe mode through PostToolUse is not built"
+    "every Codex tool call is uncontrolled: Codex 0.165.0's PreToolUse lets a call run when its hook fails, so AMC installs no Codex control hook; see docs/source-reviews/P2-17-codex-hooks.md",
+    "no Codex version is qualified: the observe hook has no recorded run of the pinned Codex binary",
+    "calls Codex does not report at PostToolUse, and sessions where Codex has not trusted the project hook",
+    "tool input and output contents (AMC records their SHA-256 only)"
   ],
   "qualifiedAt": null,
   "receipt": null

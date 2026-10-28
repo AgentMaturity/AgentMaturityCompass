@@ -53,8 +53,8 @@ export function registerHookIntegrationCommands(
 
   hooks
     .command("install")
-    .description("Install a reversible project hook for Claude Code, Gemini CLI or Pi")
-    .requiredOption("--provider <provider>", "claude-code|gemini-cli|pi|dsh")
+    .description("Install a reversible project hook for Claude Code, Gemini CLI, Pi, DSH (control) or Codex (observe)")
+    .requiredOption("--provider <provider>", "claude-code|gemini-cli|pi|dsh|codex")
     .option("--mode <mode>", "observe|control", "observe")
     .option("--agent <agentId>", "agent ID (defaults to active agent)")
     .option("--bridge-url <url>", "Bridge origin", "http://127.0.0.1:3212")
@@ -109,7 +109,7 @@ export function registerHookIntegrationCommands(
   hooks
     .command("status")
     .description("Verify provider config ownership, mode, signed manifest, and hook lease")
-    .requiredOption("--provider <provider>", "claude-code|gemini-cli|pi|dsh")
+    .requiredOption("--provider <provider>", "claude-code|gemini-cli|pi|dsh|codex")
     .option("--json", "emit structured JSON", false)
     .action(async (opts: { provider: HookProvider; json: boolean }) => {
       const status = getHookIntegrationStatus({ workspace: process.cwd(), provider: opts.provider });
@@ -142,7 +142,7 @@ export function registerHookIntegrationCommands(
     .option("--json", "emit structured JSON", false)
     .action(async (opts: { provider: string; json: boolean; recoverLatch: boolean }) => {
       if (!isHookProvider(opts.provider)) {
-        const message = "provider must be claude-code, gemini-cli or pi";
+        const message = "provider must be claude-code, gemini-cli, pi or dsh";
         if (opts.json) console.log(JSON.stringify({ ok: false, error: message }, null, 2));
         else console.error(chalk.red(message));
         process.exitCode = 2;
@@ -197,7 +197,7 @@ export function registerHookIntegrationCommands(
   hooks
     .command("remove")
     .description("Remove only the signed AMC-owned hook and revoke its lease")
-    .requiredOption("--provider <provider>", "claude-code|gemini-cli|pi|dsh")
+    .requiredOption("--provider <provider>", "claude-code|gemini-cli|pi|dsh|codex")
     .option("--dry-run", "show exact files without changing provider config", false)
     .option("--json", "emit structured JSON", false)
     .action(async (opts: { provider: HookProvider; dryRun: boolean; json: boolean }) => {

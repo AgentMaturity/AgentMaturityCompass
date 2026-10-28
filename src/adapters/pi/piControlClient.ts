@@ -55,7 +55,7 @@ function text(value: unknown, label: string): string {
 }
 
 /** The installation `.amc/hooks/<provider>.json` names, for a hook installed in `mode` (Pi's extension, or AMC's DSH transport). */
-export function readPiHookConfig(workspace: string, mode: "observe" | "control", provider: "pi" | "dsh" = "pi"): PiHookConfig {
+export function readPiHookConfig(workspace: string, mode: "observe" | "control", provider: "pi" | "dsh" | "codex" = "pi"): PiHookConfig {
   const manifest = JSON.parse(readFileSync(join(workspace, ".amc", "hooks", `${provider}.json`), "utf8")) as Record<string, unknown>;
   if (manifest.provider !== provider || manifest.mode !== mode) throw new Error(`${provider} hook manifest is not a ${mode} installation`);
   const bridge = new URL(text(manifest.bridgeBase, "bridgeBase"));

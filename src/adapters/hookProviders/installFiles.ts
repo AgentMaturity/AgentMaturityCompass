@@ -10,6 +10,8 @@ import { approvalPolicyPath, approvalPolicySigPath, verifyApprovalPolicySignatur
 import { ensureLeaseRevocationStore, issueLeaseForCli, parseLeaseTtlToMs } from "../../leases/leaseCli.js";
 import { leasePayloadSchema, type LeasePayload } from "../../leases/leaseSchema.js";
 import { workspaceIdFromDirectory } from "../../workspaces/workspaceId.js";
+import { verifySignedFileWithAuditor } from "../../org/orgSigner.js";
+import { withDeletionGate } from "../../residency/deletionGate.js";
 import { verifyManagedLease } from "../managedHookLease.js";
 import { sha256Hex } from "../../utils/hash.js";
 import { writeFileAtomic } from "../../utils/fs.js";
@@ -366,4 +368,24 @@ export function managedLeaseStatus(workspace: string, tokenPath: string,
     issues.push("lease ID differs from the signed installation manifest");
   }
   return lease;
+}
+
+/** A provider's signed installation manifest, or null when neither it nor its signature exists; anything else throws. */
+export function loadSignedHookManifest<T>(workspace: string, paths: { manifest: string; signature: string }, schema: z.ZodType<T>, label: string): T | null {
+  if (!existsSync(paths.manifest) && !existsSync(paths.signature)) return null;
+  const verification = existsSync(paths.manifest) && existsSync(paths.signature) ? verifySignedFileWithAuditor(workspace, paths.manifest) : null;
+  if (!verification?.valid) throw new HookIntegrationError("HOOK_MANIFEST_INVALID", `${label} hook installation manifest or its signature is missing or invalid`);
+  const parsed = schema.safeParse(JSON.parse(readFileSync(paths.manifest, "utf8")) as unknown);
+  if (!parsed.success) throw new HookIntegrationError("HOOK_MANIFEST_INVALID", `${label} hook installation manifest does not match schema`);
+  return parsed.data;
+}
+
+/**
+ * Remove an installation's own files (DSH and Codex, P2-17) inside a fresh deletion gate. No deletion target kind names
+ * hook installation files, so the closest one (caches) is used: a hold on caches refuses the removal and leaves every file.
+ */
+export function removeInstallationFiles(workspace: string, executor: string, targets: readonly string[]): void {
+  withDeletionGate({ workspace, executor, target: { kind: "caches" } }, () => {
+    for (const path of targets) if (existsSync(path)) unlinkSync(path);
+  });
 }

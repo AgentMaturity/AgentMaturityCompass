@@ -38,7 +38,7 @@ import {
 import { handleHookControlRequest } from "./hookControlRoute.js";
 import { guardHookAudit, hookAuditLatchState, latchedMessage } from "./hookAuditLatch.js";
 import { HookControlError, isHookProvider } from "./hookProviders.js";
-import { ACS_GUARDIAN_PATH, handleAcsGuardianHttp } from "../standards/acs/acsGuardianHttp.js";
+import { handleLeasedHookRoute, isLeasedHookPath } from "./leasedHookRoutes.js";
 interface HandleBridgeRequestOptions {
   workspace: string;
   req: IncomingMessage;
@@ -294,7 +294,7 @@ async function forwardToGateway(params: {
 }
 export async function handleBridgeRequest(options: HandleBridgeRequestOptions): Promise<boolean> {
   if (!options.pathname.startsWith("/bridge/")) return false;
-  if (options.pathname === ACS_GUARDIAN_PATH) return handleAcsGuardianHttp(options);
+  if (isLeasedHookPath(options.pathname)) return handleLeasedHookRoute(options);
 
   if (options.pathname === "/bridge/health") {
     if ((options.req.method ?? "GET").toUpperCase() !== "GET") {

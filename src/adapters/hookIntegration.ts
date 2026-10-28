@@ -7,7 +7,8 @@ import { observedAepActionEventSchema, type ObservedAepActionEvent } from "../br
 import { CONTROL_HOOK_ROUTE } from "../bridge/hookControl.js";
 import type { HookControlDecision, HookProvider } from "../bridge/hookProviders.js";
 import { installPiHook, piHookStatus, PI_HOOK_SOURCE, removePiHook } from "./hookProviders/pi.js";
-import { DSH_HOOK_SOURCE, dshHookStatus, dshModules, installDshHook, removeDshHook } from "./hookProviders/dsh.js";
+import { DSH_HOOK_SOURCE, dshHookStatus, installDshHook, removeDshHook } from "./hookProviders/dsh.js";
+import { CODEX_HOOK_SOURCE, codexHookStatus, installCodexHook, removeCodexHook } from "./hookProviders/codex.js";
 import type { PiGovernance } from "../bridge/piSessionRegistry.js";
 import { CLAUDE_NOT_GOVERNED_NOTE, claudeCodeGovernance, type ClaudeCodeGovernance } from "../bridge/claudeCodeSessionRegistry.js";
 import { redactBridgeText } from "../bridge/bridgeRedaction.js";
@@ -63,6 +64,7 @@ const MAX_PROVIDER_CONFIG_BYTES = 4 * 1024 * 1024;
 /** The providers configured through a JSON hooks file; Pi installs through src/adapters/hookProviders/pi.ts. */
 type ConfigHookProvider = Exclude<HookProvider, "pi" | "acs" | "dsh">;
 export type { HookProvider };
+export type HookIntegrationProvider = HookProvider | "codex"; // what `amc connect hooks` installs: Codex observes only (P2-17)
 const hookProviderSchema = z.enum(["claude-code", "gemini-cli"]);
 const nativeHookEventNameSchema = z.enum(["AfterTool", "BeforeTool", "PostToolUse", "PostToolUseFailure", "PreToolUse", ...CLAUDE_SESSION_HOOKS]);
 const lifecyclePhaseSchema = z.enum(["requested", "completed", "failed", "completed-or-failed", "session-start", "turn-end", "prompt-submit"]);
@@ -134,9 +136,9 @@ type JsonObject = Record<string, unknown>;
 
 export interface HookMutationResult {
   operation: "install" | "remove";
-  provider: HookProvider;
+  provider: HookIntegrationProvider;
   mode: HookMode;
-  source: typeof CLAUDE_CODE_HOOK_SOURCE | typeof GEMINI_CLI_HOOK_SOURCE | typeof PI_HOOK_SOURCE | typeof DSH_HOOK_SOURCE;
+  source: typeof CLAUDE_CODE_HOOK_SOURCE | typeof GEMINI_CLI_HOOK_SOURCE | typeof PI_HOOK_SOURCE | typeof DSH_HOOK_SOURCE | typeof CODEX_HOOK_SOURCE;
   dryRun: boolean;
   applied: boolean;
   changed: boolean;
@@ -154,11 +156,11 @@ export interface HookMutationResult {
 }
 
 export interface HookIntegrationStatus {
-  provider: HookProvider;
+  provider: HookIntegrationProvider;
   agentId: string | null;
   mode: HookMode | null;
   state: "not-installed" | "installed" | "drifted" | "expired" | "invalid";
-  source: typeof CLAUDE_CODE_HOOK_SOURCE | typeof GEMINI_CLI_HOOK_SOURCE | typeof PI_HOOK_SOURCE | typeof DSH_HOOK_SOURCE;
+  source: typeof CLAUDE_CODE_HOOK_SOURCE | typeof GEMINI_CLI_HOOK_SOURCE | typeof PI_HOOK_SOURCE | typeof DSH_HOOK_SOURCE | typeof CODEX_HOOK_SOURCE;
   configOwned: boolean;
   manifestValid: boolean;
   leaseValid: boolean;
@@ -172,7 +174,7 @@ export interface HookIntegrationStatus {
 
 export interface InstallHookIntegrationOptions {
   workspace: string;
-  provider: HookProvider;
+  provider: HookIntegrationProvider;
   agentId: string;
   mode?: HookMode;
   bridgeBase?: string;
@@ -188,7 +190,7 @@ export interface InstallHookIntegrationOptions {
 
 export interface RemoveHookIntegrationOptions {
   workspace: string;
-  provider: HookProvider;
+  provider: HookIntegrationProvider;
   dryRun?: boolean;
 }
 
@@ -693,7 +695,7 @@ function claudeControlStatus(workspace: string, manifest: HookManifest, issues: 
 
 export function installHookIntegration(options: InstallHookIntegrationOptions): HookMutationResult {
   if (options.provider === "pi") return installPiHook(options, join(dirname(amcCliScriptPath(parseMode(options.mode))), "adapters", "pi", "amcPiExtension.js"));
-  if (options.provider === "dsh") return installDshHook(options, ...dshModules(amcCliScriptPath(parseMode(options.mode))));
+  if (options.provider === "dsh" || options.provider === "codex") return (options.provider === "dsh" ? installDshHook : installCodexHook)(options, amcCliScriptPath(parseMode(options.mode)));
   const provider = parseProvider(options.provider);
   const { mode, workspace, agentId, bridgeBase, ttl, rpm } = parseInstallOptions(options);
   const paths = managedPaths(workspace, provider);
@@ -926,9 +928,9 @@ export function installHookIntegration(options: InstallHookIntegrationOptions): 
   return options.dryRun ? execute() : withInstallLock(workspace, paths.lock, execute);
 }
 
-export function getHookIntegrationStatus(input: { workspace: string; provider: HookProvider; readonly?: boolean }): HookIntegrationStatus {
+export function getHookIntegrationStatus(input: { workspace: string; provider: HookIntegrationProvider; readonly?: boolean }): HookIntegrationStatus {
   if (input.provider === "pi") return piHookStatus(input.workspace);
-  if (input.provider === "dsh") return dshHookStatus(input.workspace);
+  if (input.provider === "dsh" || input.provider === "codex") return input.provider === "dsh" ? dshHookStatus(input.workspace) : codexHookStatus(input.workspace);
   const provider = parseProvider(input.provider);
   const workspace = resolve(input.workspace);
   const paths = managedPaths(workspace, provider);
@@ -1047,7 +1049,7 @@ export function getHookIntegrationStatus(input: { workspace: string; provider: H
 
 export function removeHookIntegration(options: RemoveHookIntegrationOptions): HookMutationResult {
   if (options.provider === "pi") return removePiHook(options);
-  if (options.provider === "dsh") return removeDshHook(options);
+  if (options.provider === "dsh" || options.provider === "codex") return options.provider === "dsh" ? removeDshHook(options) : removeCodexHook(options);
   const provider = parseProvider(options.provider);
   const workspace = resolve(options.workspace);
   const paths = managedPaths(workspace, provider);

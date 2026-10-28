@@ -8,14 +8,13 @@
  * module (dshControlClient.ts) and of the DSH install (dshInstall.ts), which AMC measures again when a session
  * registers. No DSH version is qualified, so nothing is enforced yet; DSH runs ungoverned while it does not load the plugin.
  */
-import { existsSync, readFileSync, unlinkSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { z } from "zod";
 import { CONTROL_HOOK_ROUTE } from "../../bridge/hookControl.js";
 import { getPurposeKeyHistory } from "../../keys/signingKeys.js";
 import { revokeLeaseForCli } from "../../leases/leaseCli.js";
-import { signFileWithAuditor, verifySignedFileWithAuditor } from "../../org/orgSigner.js";
-import { withDeletionGate } from "../../residency/deletionGate.js";
+import { signFileWithAuditor } from "../../org/orgSigner.js";
 import { writeFileAtomic } from "../../utils/fs.js";
 import { sha256Hex } from "../../utils/hash.js";
 import { measureDshInstall } from "../dsh/dshInstall.js";
@@ -25,7 +24,7 @@ import { verifyManagedLease } from "../managedHookLease.js";
 import { clearPiDigestCache } from "../pi/piInstall.js";
 import {
   addManagedIgnoreBlock, assertAllPathsSafe, fileChange, HOOK_CONTROL_INTEGRATION_ID, HOOK_TOKEN_MODE, HookIntegrationError, hasManagedIgnoreBlock,
-  ignoreBlockHash, leaseManifestFields, managedLeaseStatus, obtainHookLease, parseInstallOptions, relativePortable, restore, snapshot, withInstallLock,
+  ignoreBlockHash, leaseManifestFields, loadSignedHookManifest, managedLeaseStatus, obtainHookLease, parseInstallOptions, relativePortable, removeInstallationFiles, restore, snapshot, withInstallLock,
   type HookFileChange,
 } from "./installFiles.js";
 
@@ -77,7 +76,7 @@ const LIMITATIONS = [
  * AMC's DSH plugin module and transport, next to the AMC CLI at `cliPath` (dist/cli.js): the plugin ships in AMC's
  * source tree (packages/dsh-amc-plugin) until it is published, and the transport is AMC's built dshControlClient.js.
  */
-export function dshModules(cliPath: string): [string, string] {
+function dshModules(cliPath: string): [string, string] {
   return [resolve(dirname(cliPath), "..", "packages", "dsh-amc-plugin", "index.mjs"), join(dirname(cliPath), "adapters", "dsh", "dshControlClient.js")];
 }
 
@@ -87,14 +86,7 @@ function dshPluginEntry(manifest: Pick<DshManifest, "pluginPath" | "modulePath" 
     dshVersion: manifest.dshInstall?.version ?? "unknown", qualifiedVersions: manifest.qualifiedDshVersions } });
 }
 
-function loadManifest(workspace: string, paths: ReturnType<typeof dshPaths>): DshManifest | null {
-  if (!existsSync(paths.manifest) && !existsSync(paths.signature)) return null;
-  const verification = existsSync(paths.manifest) && existsSync(paths.signature) ? verifySignedFileWithAuditor(workspace, paths.manifest) : null;
-  if (!verification?.valid) throw new HookIntegrationError("HOOK_MANIFEST_INVALID", "DSH hook installation manifest or its signature is missing or invalid");
-  const parsed = dshManifestSchema.safeParse(JSON.parse(readFileSync(paths.manifest, "utf8")) as unknown);
-  if (!parsed.success) throw new HookIntegrationError("HOOK_MANIFEST_INVALID", "DSH hook installation manifest does not match schema");
-  return parsed.data;
-}
+const loadManifest = (workspace: string, paths: ReturnType<typeof dshPaths>): DshManifest | null => loadSignedHookManifest(workspace, paths, dshManifestSchema, "DSH");
 
 const fileSha = (path: string): string | null => (existsSync(path) ? sha256Hex(readFileSync(path)) : null);
 
@@ -105,12 +97,11 @@ function result(operation: "install" | "remove", dryRun: boolean, applied: boole
     limitations: entry ? [...LIMITATIONS, `DSH profile plugin entry: ${entry}`] : LIMITATIONS };
 }
 
-/** Install the DSH control binding: `pluginPath` is AMC's DSH plugin module, `modulePath` AMC's built transport. */
-export function installDshHook(options: InstallHookIntegrationOptions, pluginPathInput: string, modulePathInput: string): HookMutationResult {
+/** Install the DSH control binding for the AMC CLI at `cliPath`: its DSH plugin module and built transport (dshModules). */
+export function installDshHook(options: InstallHookIntegrationOptions, cliPath: string): HookMutationResult {
   const { mode, workspace, agentId, bridgeBase, ttl, rpm } = parseInstallOptions(options);
   if (mode !== "control") throw new HookIntegrationError("HOOK_PROVIDER_UNSUPPORTED", "DSH supports control mode only; its plugin has no observe mode");
-  const pluginPath = resolve(pluginPathInput);
-  const modulePath = resolve(modulePathInput);
+  const [pluginPath, modulePath] = dshModules(cliPath);
   for (const path of [pluginPath, modulePath]) if (!existsSync(path)) throw new HookIntegrationError("HOOK_PATH_UNSAFE", `AMC's DSH module is missing: ${path}`);
   const dshInstall = options.dshPackageDir ? measureDshInstall(resolve(options.dshPackageDir)) : null;
   if (options.dshPackageDir && !dshInstall) throw new HookIntegrationError("HOOK_PATH_UNSAFE", `not a DSH package with its tool pipeline: ${resolve(options.dshPackageDir)}`);
@@ -209,9 +200,7 @@ export function removeDshHook(options: RemoveHookIntegrationOptions): HookMutati
     const lease = { leaseId: manifest.leaseId, expiresTs: manifest.leaseExpiresTs };
     if (dryRun) return result("remove", true, false, files, lease);
     revokeLeaseForCli({ workspace, leaseId: manifest.leaseId, reason: "AMC DSH hook integration removed" });
-    withDeletionGate({ workspace, executor: "hook-dsh-remove", target: { kind: "caches" } }, () => {
-      for (const path of targets) if (existsSync(path)) unlinkSync(path);
-    });
+    removeInstallationFiles(workspace, "hook-dsh-remove", targets);
     return result("remove", false, true, files, lease);
   };
   return dryRun ? execute() : withInstallLock(workspace, paths.lock, execute);

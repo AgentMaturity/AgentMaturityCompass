@@ -103,5 +103,9 @@ tools) skip `PreToolUse`. To check, review each `pre_tool_use_payload` override 
 
 - Recording payloads from the pinned binary (needs an approved install of `@openai/codex@0.165.0` into a scratch
   prefix and a loopback scripted model provider). Not needed for the current verdict, which rests on source.
-- Observe mode through `PostToolUse` is not built: it would need a Codex ingestion path, and `hookIngress.ts` must not
-  grow under P2-17. Proposed as a follow-up item.
+- Observe mode through `PostToolUse` is built (`amc connect hooks install --provider codex --mode observe`; see
+  `docs/adapters/codex.md`). It records Codex's own `post-tool-use.command.input` payload (SHA-256
+  `8ea1e4bccb262fad05b85c300d562d2653c5a64118d6a2c5704468fc4ea836a9` at the pin; hooks file shape from
+  `codex-rs/protocol/src/hooks.rs`, SHA-256 `adb3a5c02a215f2bf66d7c8f8c79facbd4fe3d4478ac4db0816fb466ca864ce7`). Not
+  verified: that a matcher group with no `matcher` selects every tool, and whether Codex loads a project's `.codex/`
+  hooks for an untrusted project. Check both with the pinned binary before qualifying.
