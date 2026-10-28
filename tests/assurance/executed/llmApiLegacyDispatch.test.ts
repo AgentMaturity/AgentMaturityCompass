@@ -21,7 +21,7 @@ describe("P2-27 shared provider dispatch legacy compatibility", () => {
     expect(transport).toHaveBeenCalledTimes(1);
     const [url, init] = transport.mock.calls[0] as unknown as [string, RequestInit];
     expect(url).toBe(provider === "openai" ? "https://fixture.invalid/v1/chat/completions" : "https://fixture.invalid/v1/messages");
-    expect(init.method).toBe("POST"); expect(init.redirect).toBeUndefined(); expect(init.signal).toBeInstanceOf(AbortSignal);
+    expect(init.method).toBe("POST"); expect(init.redirect).toBe("manual"); expect(init.signal).toBeInstanceOf(AbortSignal);
     expect(init.headers).toEqual(provider === "openai"
       ? { Authorization: "Bearer fixture-not-a-real-key", "Content-Type": "application/json" }
       : { "x-api-key": "fixture-not-a-real-key", "Content-Type": "application/json", "anthropic-version": "2023-06-01" });

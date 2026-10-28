@@ -52,30 +52,6 @@
       "reason": "Hook event, correlation and control POSTs to AMC's Bridge check bridge residency with the hook's workspace immediately before fetch, outside each retry loop, as AMC's own traffic (agentId system: kill-exempt; the Bridge's control route enforces the kill). Typed refusal is not retried or reported as unavailable; Claude Code control answers a named residency deny."
     },
     {
-      "siteId": "src/adapters/hookIntegration.ts:1678:1",
-      "path": "src/adapters/hookIntegration.ts",
-      "line": 1678,
-      "call": "fetch(",
-      "status": "deferred",
-      "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
-    },
-    {
-      "siteId": "src/adapters/hookIntegration.ts:1779:1",
-      "path": "src/adapters/hookIntegration.ts",
-      "line": 1779,
-      "call": "fetch(",
-      "status": "deferred",
-      "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
-    },
-    {
-      "siteId": "src/adapters/hookIntegration.ts:1874:1",
-      "path": "src/adapters/hookIntegration.ts",
-      "line": 1874,
-      "call": "fetch(",
-      "status": "deferred",
-      "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
-    },
-    {
       "siteId": "src/adapters/pi/piControlClient.ts:95:1",
       "path": "src/adapters/pi/piControlClient.ts",
       "line": 95,
@@ -284,20 +260,12 @@
       "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
     },
     {
-      "siteId": "src/eval/llmApiIntegration.ts:226:1",
+      "siteId": "src/eval/llmApiIntegration.ts:231:1",
       "path": "src/eval/llmApiIntegration.ts",
-      "line": 226,
+      "line": 231,
       "call": "fetch(",
-      "status": "deferred",
-      "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
-    },
-    {
-      "siteId": "src/eval/llmApiIntegration.ts:196:1",
-      "path": "src/eval/llmApiIntegration.ts",
-      "line": 196,
-      "call": "fetch(",
-      "status": "deferred",
-      "reason": "Outside the released P2-01 slice: review trusted workspace, payload classes and route applicability before adding a residency guard. No exemption or coverage claim."
+      "status": "gated",
+      "reason": "The generic LLM API client's shared OpenAI/Anthropic dispatch checks provider residency and the kill switch (configured workspace or scoped fallback; configured agentId when given) immediately before every fetch, with or without captureWire. A typed refusal propagates out of the retry loop unretried. Redirects are returned, never followed (error under captureWire, manual otherwise)."
     },
     {
       "siteId": "src/exports/policyExport.ts:77:1",

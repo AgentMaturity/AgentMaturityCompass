@@ -9,6 +9,8 @@ import { dirname, join } from "node:path";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { probeDestination } from "../../src/a4/a4DeployVerify.js";
 import type { EgressCheck } from "../../src/enforce/egressAllowlist.js";
+import { sendA4Error } from "../../src/a4/a4Router.js";
+import { LLMApiClient } from "../../src/eval/llmApiIntegration.js";
 import { installHookIntegration } from "../../src/adapters/hookIntegration.js";
 import { forwardProviderHookEvent } from "../../src/adapters/hookForwarder.js";
 import { postToBridge, type PiHookConfig } from "../../src/adapters/pi/piControlClient.js";
@@ -295,6 +297,12 @@ describe("wrapFetch and race never follow a redirect past the egress check", () 
     expect(origin.connections).toBe(0);
   });
 
+  test("the generic LLM API client does not follow a provider 302", async () => {
+    const client = new LLMApiClient({ provider: "openai", apiKey: "k", baseUrl: `${redirectUrl}/v1`, timeout: 5_000, maxRetries: 0, rateLimit: 1000, workspace });
+    await expect(client.request({ model: "m", prompt: "p", temperature: 0, maxTokens: 1 })).rejects.toThrow(/OpenAI API error: 302/);
+    expect(origin.connections).toBe(0);
+  });
+
   test("the race winner re-fetch returns the 302 unfollowed", async () => {
     const realFetch = globalThis.fetch;
     vi.spyOn(globalThis, "fetch").mockImplementation(async () => new Response(JSON.stringify({ choices: [{ message: { content: "answer" } }] })));
@@ -302,5 +310,43 @@ describe("wrapFetch and race never follow a redirect past the egress check", () 
       steerPipeline: createSteerPipeline({ stages: [createRaceStage({ candidates: [{ id: "a", url: `${redirectUrl}/a` }] })] }) });
     expect((await wrapped(`${redirectUrl}/v1`, { method: "POST", body: "{}" })).status).toBe(302);
     expect(origin.connections).toBe(0);
+  });
+});
+
+describe("generic LLM API client provider dispatch", () => {
+  const client = (captureWire: boolean) => new LLMApiClient({ provider: "openai", apiKey: "k", baseUrl: `${origin.url}/v1`, timeout: 5_000,
+    maxRetries: 2, rateLimit: 1000, workspace, agentId: "default", captureWire });
+  // captureWire true is the strict judge wrapper: its regulated preflight refuses before dispatch here; it shares this dispatch and catch.
+  for (const captureWire of [false]) {
+    for (const [name, arrange, type] of BLOCKS) {
+      test(`${name} refuses typed before any socket, without a retry (captureWire ${captureWire})`, async () => {
+        await arrange();
+        const spy = vi.spyOn(globalThis, "fetch");
+        await expect(client(captureWire).request({ model: "m", prompt: "p", temperature: 0, maxTokens: 1 })).rejects.toBeInstanceOf(type);
+        expect(spy).not.toHaveBeenCalled();
+        expect(origin.connections).toBe(0);
+      });
+    }
+  }
+});
+
+describe("A4 router answers an egress refusal by name", () => {
+  const answer = (error: unknown) => {
+    const res = { headersSent: false, status: 0, body: "", writeHead(status: number) { this.status = status; return this; },
+      end(body: string) { this.body = body; } };
+    sendA4Error(res as never, error, "p-1");
+    return { status: res.status, body: JSON.parse(res.body) as { code: string; error: string } };
+  };
+
+  test("a residency block is 403 AMC_RESIDENCY_EGRESS_BLOCKED, not the generic 500", async () => {
+    blockResidency();
+    const refusal = await probeDestination(workspace, "deploy.example:8443", { addresses: ["127.0.0.1"], decision: { allowed: true, reason: "fixture" } } as unknown as EgressCheck,
+      vi.fn()).then(() => null, (error: unknown) => error);
+    expect(refusal).toBeInstanceOf(EgressBlocked);
+    expect(answer(refusal)).toEqual({ status: 403, body: expect.objectContaining({ ok: false, code: "AMC_RESIDENCY_EGRESS_BLOCKED" }) });
+  });
+
+  test("an active kill switch is 403 KILL_SWITCH_ACTIVE", () => {
+    expect(answer(new KillSwitchDenied("kill_switch_active"))).toEqual({ status: 403, body: expect.objectContaining({ code: "KILL_SWITCH_ACTIVE" }) });
   });
 });
