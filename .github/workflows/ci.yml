@@ -102,7 +102,7 @@ jobs:
       # P1-30: the Core Spec's level, claim-kind, banned-wording, $id and receipt-state tables match the code, every
       # spec file carries its licence line and every cited $id is published. (npm alias check:spec: integrator.)
       - name: Core Spec matches the code (P1-30, check:spec)
-        run: node scripts/check-spec-sync.mjs --check
+        run: npm run -s check:spec
 
       - name: Regulatory register currency
         run: npm run check:regulatory-currency
