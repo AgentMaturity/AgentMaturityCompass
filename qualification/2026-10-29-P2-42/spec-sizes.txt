@@ -1,0 +1,99 @@
+# P2-42 measured Adapt revision sizes (KiB). stored = the row as recorded after P2-42 (plan bound by sha256); inline = the same spec with the plan inline twice, as base 88f77309b would have stored it (Propose refused it with 413 at > 240 KiB room; the router refuses any row > 256 KiB).
+education [crossed] 18.0s
+  r14 answers stored=0.4 inline=0.4
+  r15 understand stored=39.4 inline=172.8
+  r16 understand stored=39.4 inline=172.8
+  r17 understand stored=39.4 inline=172.8
+  r18 explain stored=70.5 inline=203.9
+  r19 propose stored=72.7 inline=339.6
+  r20 build stored=74.9 inline=341.8
+  r21 review stored=123.7 inline=390.6
+governance [crossed] 16.4s
+  r14 answers stored=0.4 inline=0.4
+  r15 understand stored=51.2 inline=188.4
+  r16 understand stored=51.2 inline=188.4
+  r17 understand stored=51.2 inline=188.4
+  r18 explain stored=84.7 inline=221.8
+  r19 propose stored=86.9 inline=361.1
+  r20 build stored=89.1 inline=363.4
+  r21 review stored=139.9 inline=414.1
+technology [crossed] 16.4s
+  r14 answers stored=0.4 inline=0.4
+  r15 understand stored=59.0 inline=206.1
+  r16 understand stored=59.0 inline=206.1
+  r17 understand stored=59.0 inline=206.1
+  r18 explain stored=97.7 inline=244.7
+  r19 propose stored=99.9 inline=394.0
+  r20 build stored=102.1 inline=396.2
+  r21 review stored=154.8 inline=448.9
+wealth [crossed] 16.6s
+  r14 answers stored=0.4 inline=0.4
+  r15 understand stored=65.3 inline=214.2
+  r16 understand stored=65.3 inline=214.2
+  r17 understand stored=65.3 inline=214.2
+  r18 explain stored=100.9 inline=249.8
+  r19 propose stored=103.1 inline=400.8
+  r20 build stored=105.4 inline=403.1
+  r21 review stored=163.3 inline=461.0
+education+environment+health+wealth+technology+mobility+governance [Error: /stages/adapt/review: 413 {"ok":false,"error":"INPUT_TOO_LARGE: The produced specification is larger than 256 KiB.","code":"INPUT_TOO_LARGE"}] 14.2s
+  r14 answers stored=0.4 inline=0.4
+  r15 understand stored=119.4 inline=371.9
+  r16 understand stored=119.4 inline=371.9
+  r17 understand stored=119.4 inline=371.9
+  r18 explain stored=213.6 inline=466.0
+  r19 propose stored=215.9 inline=720.8
+  r20 build stored=218.1 inline=723.1
+technology+wealth [crossed] 18.8s
+  r14 answers stored=0.4 inline=0.4
+  r15 understand stored=82.2 inline=258.2
+  r16 understand stored=82.2 inline=258.2
+  r17 understand stored=82.2 inline=258.2
+  r18 explain stored=132.1 inline=308.1
+  r19 propose stored=134.3 inline=486.3
+  r20 build stored=136.6 inline=488.6
+  r21 review stored=202.0 inline=554.0
+technology+wealth+governance [crossed] 17.0s
+  r14 answers stored=0.4 inline=0.4
+  r15 understand stored=90.9 inline=281.7
+  r16 understand stored=90.9 inline=281.7
+  r17 understand stored=90.9 inline=281.7
+  r18 explain stored=148.3 inline=339.2
+  r19 propose stored=150.5 inline=532.3
+  r20 build stored=152.8 inline=534.5
+  r21 review stored=222.8 inline=604.6
+education+health+governance+wealth [crossed] 17.2s
+  r14 answers stored=0.4 inline=0.4
+  r15 understand stored=97.4 inline=279.0
+  r16 understand stored=97.4 inline=279.0
+  r17 understand stored=97.4 inline=279.0
+  r18 explain stored=152.1 inline=333.8
+  r19 propose stored=154.4 inline=517.7
+  r20 build stored=156.6 inline=519.9
+  r21 review stored=224.6 inline=587.9
+health [crossed] 16.1s
+  r14 answers stored=0.4 inline=0.4
+  r15 understand stored=48.0 inline=170.0
+  r16 understand stored=48.0 inline=170.0
+  r17 understand stored=48.0 inline=170.0
+  r18 explain stored=75.0 inline=197.0
+  r19 propose stored=77.2 inline=321.2
+  r20 build stored=79.4 inline=323.5
+  r21 review stored=125.4 inline=369.4
+environment [crossed] 16.4s
+  r14 answers stored=0.4 inline=0.4
+  r15 understand stored=44.4 inline=182.8
+  r16 understand stored=44.4 inline=182.8
+  r17 understand stored=44.4 inline=182.8
+  r18 explain stored=78.4 inline=216.8
+  r19 propose stored=80.6 inline=357.4
+  r20 build stored=82.8 inline=359.6
+  r21 review stored=133.5 inline=410.3
+mobility [crossed] 16.3s
+  r14 answers stored=0.4 inline=0.4
+  r15 understand stored=43.7 inline=188.0
+  r16 understand stored=43.7 inline=188.0
+  r17 understand stored=43.7 inline=188.0
+  r18 explain stored=82.4 inline=226.7
+  r19 propose stored=84.6 inline=373.2
+  r20 build stored=86.8 inline=375.4
+  r21 review stored=138.3 inline=426.9

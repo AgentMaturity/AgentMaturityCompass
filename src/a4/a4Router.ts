@@ -36,7 +36,7 @@ import { LEDGER_BACKEND_INCOMPLETE_MESSAGE, ledgerBackendGap } from "./a4LedgerB
 import { A4_EVENT_WINDOW, a4Events } from "./a4Events.js";
 import {
   acknowledgeItem, assertAllowed, autoHold, changeGatePolicy, evaluateFor, holdProject, loadA4State, reopenStage, requestGateAsync, resumeProject, retireProject,
-  signedA4Floor, tuneProject, type A4Call
+  resolvedRevisionOf, signedA4Floor, storedSpecOf, tuneProject, type A4Call
 } from "./a4Gates.js";
 import { captureA4RequestActor, gateRequestActor, A4TransitionPublicationError } from "./a4TransitionSigning.js";
 import { memberCandidates, resolveA4Principal } from "./a4Identity.js";
@@ -590,13 +590,13 @@ function projectRead(route: A4Route, projectId: string, rest: string): boolean {
       .filter((key) => a[key] !== b[key]).map((key) => ({ path: key, from: a[key] ?? null, to: b[key] ?? null })) });
     return true;
   }
-  const revisionNo = /^\/revisions\/([1-9][0-9]{0,8})$/.exec(rest)?.[1];
+  const [, revisionNo, resolved] = /^\/revisions\/([1-9][0-9]{0,8})(\/resolved)?$/.exec(rest) ?? [];
   if (revisionNo !== undefined) {
     assertQuery(params, []);
     const row = state.revisions.find((candidate) => candidate.revision_no === Number(revisionNo));
     if (!row) throw a4Fail(404, "A4_REVISION_NOT_FOUND", `no revision ${revisionNo}`);
-    apiSuccess(route.res, { schema: "amc.a4-revision/v1", projectId, revisionNo: row.revision_no, stage: row.stage, parentRevisionNo: row.parent_revision_no,
-      spec: JSON.parse(row.spec_json) as unknown, specDigest: row.spec_digest, resourceDigests: JSON.parse(row.resource_digests_json) as unknown,
+    apiSuccess(route.res, resolved !== undefined ? resolvedRevisionOf(projectId, row) : { schema: "amc.a4-revision/v1", projectId, revisionNo: row.revision_no, stage: row.stage, parentRevisionNo: row.parent_revision_no,
+      spec: storedSpecOf(row), specDigest: row.spec_digest, resourceDigests: JSON.parse(row.resource_digests_json) as unknown,
       resourceDigestsSha256: row.resource_digests_sha256, operatingScope: row.operating_scope_json === null ? null : JSON.parse(row.operating_scope_json) as unknown,
       createdByKey: row.created_by_key, evidenceEventId: row.evidence_event_id, ts: row.ts });
     return true;

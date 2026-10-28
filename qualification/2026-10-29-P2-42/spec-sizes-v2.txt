@@ -1,0 +1,45 @@
+education [crossed]
+  r14 answers stored=0.4 resolved=0.4
+  r15 understand stored=5.7 resolved=172.8
+  r16 understand stored=5.7 resolved=172.8
+  r17 understand stored=5.7 resolved=172.8
+  r18 explain stored=5.9 resolved=203.9
+  r19 propose stored=8.1 resolved=339.6
+  r20 build stored=10.3 resolved=341.8
+  r21 review stored=13.9 resolved=390.6
+governance [crossed]
+  r14 answers stored=0.4 resolved=0.4
+  r15 understand stored=5.8 resolved=188.4
+  r16 understand stored=5.8 resolved=188.4
+  r17 understand stored=5.8 resolved=188.4
+  r18 explain stored=6.0 resolved=221.8
+  r19 propose stored=8.1 resolved=361.1
+  r20 build stored=10.4 resolved=363.4
+  r21 review stored=14.0 resolved=414.1
+technology [crossed]
+  r14 answers stored=0.4 resolved=0.4
+  r15 understand stored=5.8 resolved=206.1
+  r16 understand stored=5.8 resolved=206.1
+  r17 understand stored=5.8 resolved=206.1
+  r18 explain stored=6.0 resolved=244.7
+  r19 propose stored=8.1 resolved=394.0
+  r20 build stored=10.4 resolved=396.2
+  r21 review stored=14.1 resolved=448.9
+wealth [crossed]
+  r14 answers stored=0.4 resolved=0.4
+  r15 understand stored=5.7 resolved=214.2
+  r16 understand stored=5.7 resolved=214.2
+  r17 understand stored=5.7 resolved=214.2
+  r18 explain stored=5.9 resolved=249.8
+  r19 propose stored=8.1 resolved=400.8
+  r20 build stored=10.4 resolved=403.1
+  r21 review stored=14.3 resolved=461.0
+education+environment+health+wealth+technology+mobility+governance [crossed]
+  r14 answers stored=0.4 resolved=0.4
+  r15 understand stored=5.8 resolved=371.9
+  r16 understand stored=5.8 resolved=371.9
+  r17 understand stored=5.8 resolved=371.9
+  r18 explain stored=6.0 resolved=466.0
+  r19 propose stored=8.4 resolved=720.8
+  r20 build stored=10.6 resolved=723.1
+  r21 review stored=14.6 resolved=809.4

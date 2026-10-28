@@ -19,6 +19,7 @@ import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { auditA4 } from "./a4Audit.js";
 import { a4ProjectsRoot, putPrivate } from "./a4Blobs.js";
+import { compactSpec, writeDerived } from "./a4Derived.js";
 import { completeStage, inlineEffect, openEffectGate, reconcileForRetry, retryEffect, runA4Effect } from "./a4Effects.js";
 import {
   assertAllowed, driftedSlots, evaluateFor, gateRowOf, governed, livePrincipal, loadA4State, pendingExecutors, recordDecision, refuseOnFreeze,
@@ -153,9 +154,14 @@ function genericResourceDigests(workspace: string, state: A4ReadinessState) {
   });
 }
 
-/** A REVISION spec (as `appendRevision` writes it) for revision head + 1 at `stage`. */
-function revisionSpec(workspace: string, state: A4ReadinessState, stage: A4Stage, spec: Record<string, unknown>, actorKey: string, ts: number): A4ChangeSpec {
+/**
+ * A REVISION spec (as `appendRevision` writes it) for revision head + 1 at `stage`. An Adapt plan is stored once, by its
+ * sha256, and the row binds the ref (a4Derived, P2-42).
+ */
+function revisionSpec(workspace: string, state: A4ReadinessState, stage: A4Stage, full: Record<string, unknown>, actorKey: string, ts: number): A4ChangeSpec {
   const projectId = state.project.project_id;
+  const { spec, blobs } = compactSpec(stage, full);
+  writeDerived(workspace, projectId, blobs);
   const revisionNo = state.project.revision_no + 1;
   const digests = genericResourceDigests(workspace, state);
   const values = { project_id: projectId, revision_no: revisionNo, stage, parent_revision_no: state.project.revision_no === 0 ? null : state.project.revision_no,
@@ -244,7 +250,7 @@ async function stageStep(route: A4Route, projectId: string, stage: A4Stage, kind
   let result: ReturnType<typeof governed>;
   try {
     // A producer's spec carries the members' free text inline (the brief, the hypotheses, the reflection): scanned as sent text is.
-    if (produced?.spec !== undefined) assertNoSecrets(produced.spec, "The produced specification");
+    if (produced?.spec !== undefined) assertNoSecrets(compactSpec(stage, produced.spec).spec, "The produced specification");
     const outputs = [
       ...(produced?.outputs ?? []).map((entry) => ({ ...entry, producer: producer!.id, ...writeStageOutput(route, projectId, canonicalize(entry.body ?? null)) })),
       ...(def.output !== null && fields.content !== undefined ? [{ output: def.output, lane: "implementation" as const, method: null, producer: null,
