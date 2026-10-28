@@ -30,6 +30,10 @@ import { A4StoreError, type A4Actor, type A4ChangeSpec, type A4Store, type A4Tra
 export const A4_RUNTIME: A4Actor = { key: "amc-runtime", username: "amc-runtime" };
 const fail = (status: number, code: string, message: string): A4StoreError => new A4StoreError(status, code, message);
 
+/** What the monitor record and the Activate plan say about P2-26's kill switch: the behaviour holdIncidentIds and autoHold implement. */
+export const KILL_SWITCH_HOLD = "an active P2-26 kill switch that covers this agent (workspace, agent or action-class scope) holds the project automatically, "
+  + "naming the kill and its incident id; RESUME is refused until the kill is released, then an owner resumes; break-glass never lifts the hold";
+
 /** P2-26's envelope audit rows (src/runtime/changeEnvelope.ts), read for an agent P2-23 does not govern. */
 const ENVELOPE_APPLIED = "CHANGE_ENVELOPE_APPLIED";
 const ENVELOPE_REQUIRED = "AGENT_REASSESSMENT_REQUIRED";

@@ -23,9 +23,10 @@ vi.mock("../../src/ops/retention/regimeRetention.js", async (original) => {
   } };
 });
 
-import { readinessFor, refuseOnFreeze, resumeProject, retireProject } from "../../src/a4/a4Gates.js";
+import { loadA4State, readinessFor, refuseOnFreeze, resumeProject, retireProject } from "../../src/a4/a4Gates.js";
+import { monitorView } from "../../src/a4/a4Monitor.js";
 import {
-  A4_RUNTIME, packageVersionManifest, recordLifecycleActivation, syncRuntimeLifecycle
+  A4_RUNTIME, KILL_SWITCH_HOLD, packageVersionManifest, recordLifecycleActivation, syncRuntimeLifecycle
 } from "../../src/a4/a4RuntimeLifecycle.js";
 import { openA4Store, type A4Store } from "../../src/a4/a4Store.js";
 import { a4PackageV1Schema } from "../../src/contracts/v1/a4Package.js";
@@ -156,6 +157,15 @@ describe("the kill switch holds the project (P2-34)", () => {
     expect(store.readHead(projectId)!.hold).toBe(1); // a released kill lifts nothing by itself
     resume();
     expect(store.readHead(projectId)!.hold).toBe(0);
+  });
+
+  test("the monitor view states the hold rule, not the pre-P2-26 'not available' text", () => {
+    const { workspace } = governanceFixture();
+    const { store, projectId } = project(workspace);
+    const view = monitorView(workspace, loadA4State(store, projectId, Date.now()), null);
+    expect(view.killSwitch).toBe(KILL_SWITCH_HOLD);
+    expect(KILL_SWITCH_HOLD).toMatch(/holds the project automatically, naming the kill and its incident id/);
+    expect(KILL_SWITCH_HOLD).not.toMatch(/not available/);
   });
 
   test("break-glass never lifts an A4 hold: no A4 module reads break-glass records", () => {

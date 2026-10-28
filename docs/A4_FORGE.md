@@ -688,7 +688,8 @@ Review at Activate (`POST …/stages/activate/review`, after `RELEASE`) reviews 
   - `runtime` and `backup`: always `source_unavailable` in v1, with `value: null`.
 
   `evaluateSloAlerts` is not called, because it advances the process's shared alert state; the record counts the alerts
-  already emitted by severity. The kill switch is not available in this release (P2-26). Only a source that observed the deployed
+  already emitted by severity. The record's `killSwitch` field states the hold rule: an active P2-26 kill switch that covers the agent holds the
+  project, naming the kill and its incident id, until it is released and an owner resumes (P2-34). Only a source that observed the deployed
   agent counts toward `monitoring.source`, and nothing does before the release's bound deploy receipt is recorded
   `succeeded`. After it, a source counts when it is an execution in the action journal started since that receipt (at
   its row's own tier; a row of A4's own probe session has none), or AMC's check of that receipt that connected and found
