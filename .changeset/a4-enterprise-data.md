@@ -15,8 +15,10 @@ A4 Forge now works with the G2 enterprise-data systems (P2-36, preview behind `A
   tables.
 - **Ledger encryption.** With ledger encryption on, `verifyA4Chain` opens audit rows through the ledger cipher; before
   this change, every encrypted A4 audit row failed verification. The bundle slice exports any row encrypted after it was
-  hashed as its plaintext, so an offline verifier still recomputes every digest without a key. `a4/index.json` now
-  states that the slice is plaintext under the operator's control.
+  hashed as its plaintext, so an offline verifier still recomputes every digest without a key. This applies only to the
+  project's own audit rows. Other evidence that a ref names and that was encrypted after hashing is never decrypted;
+  the export is refused with 409 `A4_EXPORT_REF_ENCRYPTED`. Decrypted payloads are scanned for credentials. Record files
+  are written owner-only (0600). `a4/index.json` now states that the slice is plaintext under the operator's control.
 - **Redaction.** P2-02's detectors run over the binder slice, and each match is replaced by its hash. They also run
   over the bundle slice, where matches are counted rather than rewritten. A credential match refuses either export.
 - **Signing algorithms.** A4 envelope checks follow the P2-08 algorithm policy. An `ecdsa-p256-sha256` envelope fails

@@ -122,17 +122,25 @@ function scanRecord(record: A4RecordV1, scan: A4ExportScan): void {
 /**
  * The record's ledger rows as a keyless verifier recomputes them. A row written under ledger encryption hashed its
  * ciphertext and is exported as stored. A row encrypted after it was hashed (`amc evidence-stores encrypt`) hashed its
- * plaintext, so it is exported as that plaintext, decrypted here under the operator's key; a key out of reach refuses.
+ * plaintext: only this project's own audit rows (each transition's `evidence_event_id`, whose payload is the transition
+ * body the record already carries) are exported as that plaintext, decrypted here under the operator's key; a key out of
+ * reach refuses. Any other such row (a `ledger_event` ref to other evidence) is never decrypted into the export: it
+ * would verify only with the key, so the export is refused (A4_EXPORT_REF_ENCRYPTED) rather than leak or fail offline.
  */
-function plaintextEvents(workspace: string, rows: readonly Row[]): { rows: Row[]; decrypted: number } {
+function plaintextEvents(workspace: string, record: A4RecordV1, scan: A4ExportScan): { rows: Row[]; decrypted: number } {
+  const own = new Set(record.tables.a4_transitions.map((row) => String(row.evidence_event_id)));
   let decrypted = 0;
-  const out = rows.map((row) => {
+  const out = record.evidence.events.map((row) => {
     const event = row as unknown as EvidenceEvent;
     const inline = event.canonical_payload_inline ?? event.payload_inline;
     if (!isEncryptedField(inline)) return row;
     const errors: string[] = [];
     recomputeEventHash(null, event, errors);
     if (errors.length === 0) return row;
+    if (!own.has(event.id)) {
+      throw new A4StoreError(409, "A4_EXPORT_REF_ENCRYPTED", `ledger row ${event.id}, which an evidence ref of ${record.projectId} names, was encrypted after it was hashed; `
+        + "it verifies only with the ledger key and is not decrypted into an export, so the bundle is not exported.");
+    }
     let plain: string;
     try {
       plain = decryptField(workspace, inline, inlinePayloadAad(event.id));
@@ -140,6 +148,8 @@ function plaintextEvents(workspace: string, rows: readonly Row[]): { rows: Row[]
       throw new A4StoreError(503, "A4_EXPORT_KEY_UNAVAILABLE", `ledger row ${event.id} was encrypted after it was hashed and its key is out of reach here `
         + `(${error instanceof Error ? error.message : String(error)}); the bundle is not exported.`);
     }
+    // Every decrypted payload is scanned too, not only the A4 rows it should equal.
+    redactExportText(plain, `${record.projectId} evidence_events.${event.id}`, () => "", scan);
     decrypted += 1;
     return { ...row, payload_inline: plain, canonical_payload_inline: row.canonical_payload_inline === null ? null : plain };
   });
@@ -190,18 +200,20 @@ export function copyA4Slice<T>(input: { workspace: string; root: string; agentId
   if (exported.length === 0) return input.slice;
   // P2-36: a credential in any exported A4 row refuses the export; other detector matches are counted, never rewritten.
   const scan = emptyScan();
-  for (const { record } of exported) scanRecord(record, scan);
-  if (scan.credentials.length > 0) {
-    throw new A4StoreError(409, "A4_BUNDLE_REFUSED", "An exported A4 row matches a credential pattern; the bundle is not exported.", scan.credentials.slice(0, 16));
-  }
   let decryptedLedgerRows = 0;
   exported = exported.map(({ head, record }) => {
-    const events = plaintextEvents(input.workspace, record.evidence.events);
+    scanRecord(record, scan);
+    const events = plaintextEvents(input.workspace, record, scan);
     decryptedLedgerRows += events.decrypted;
     return { head, record: { ...record, evidence: { ...record.evidence, events: events.rows } } };
   });
+  // After decryption, so a decrypted payload is scanned before anything is written.
+  if (scan.credentials.length > 0) {
+    throw new A4StoreError(409, "A4_BUNDLE_REFUSED", "An exported A4 row matches a credential pattern; the bundle is not exported.", scan.credentials.slice(0, 16));
+  }
   ensureDir(join(input.root, "a4"));
-  for (const { record } of exported) writeFileAtomic(join(input.root, "a4", `${record.projectId}.json`), JSON.stringify(record), 0o644);
+  // Plaintext A4 rows (the structured brief included): owner-only on disk.
+  for (const { record } of exported) writeFileAtomic(join(input.root, "a4", `${record.projectId}.json`), JSON.stringify(record), 0o600);
   const index: A4BundleSlice = { schema: "amc.a4-bundle-slice/v1", containsSyntheticExamples: exported.some(({ record }) => record.containsSyntheticExamples),
     projects: exported.map(({ head }) => ({ projectId: head.project_id, headSeq: head.head_seq, headDigest: head.head_digest })),
     plaintext: { note: A4_PLAINTEXT_NOTE, decryptedLedgerRows, protectedDataFindings: scan.counts } };

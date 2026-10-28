@@ -5,7 +5,7 @@
  * backend selection (P2-09). No Postgres server runs: the backend check reads the selection and the mirror list only.
  */
 import { generateKeyPairSync, sign } from "node:crypto";
-import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import YAML from "yaml";
@@ -30,6 +30,7 @@ import { copyA4Slice, type A4BundleSlice } from "../../src/bundles/bundleA4.js";
 import { registerTenant } from "../../src/compliance/dataResidency.js";
 import type { A4Principal } from "../../src/contracts/v1/a4Project.js";
 import { getPublicKeyPem } from "../../src/crypto/keys.js";
+import { lowS } from "../../src/keys/algorithmPolicy.js";
 import { closeLedgerDataKeys, rotateDataKey } from "../../src/ledger/encryption/dataKeys.js";
 import { encryptExistingLedger } from "../../src/ledger/encryption/encryptMigration.js";
 import { isEncryptedField } from "../../src/ledger/encryption/ledgerCipher.js";
@@ -216,6 +217,30 @@ describe("ledger encryption (P2-36, reconcile/G2.md conflict 12)", () => {
     expect(index.plaintext?.decryptedLedgerRows).toBeGreaterThan(0);
     expect((await verifyA4Bundle(record, pinnedTrust(workspace))).integrity.status).toBe("pass");
   });
+
+  test("a referenced ledger row of other evidence, encrypted after it was hashed, is never decrypted into the export", async () => {
+    const { workspace, ledger, sessionId } = governanceFixture();
+    const { store, projectId } = project(workspace);
+    const SECRET = "api_key = sk_live_51HqLyjWDarjtT1zdp7dcFOREIGNROW00";
+    const rowId = ledger.appendEvidence({ sessionId, runtime: "unknown", eventType: "stdout", payload: `unrelated evidence ${SECRET}`, inline: true,
+      meta: { agentId: AGENT, trustTier: "SELF_REPORTED" } });
+    store.addEvidenceRef(projectId, { actor: owner, refKind: "ledger_event", refId: rowId, sha256: ledger.getEventById(rowId)!.event_hash, claimKind: "self_reported",
+      method: null, label: "foreign row", column: "implementation", expectedHeadSeq: store.readHead(projectId)!.head_seq });
+    enableLedgerEncryption(workspace);
+    await rotateDataKey(workspace);
+    await encryptExistingLedger(workspace);
+    vi.stubEnv("AMC_A4_PREVIEW", "1");
+    const root = temp("amc-p236-foreign-");
+    expect(() => copyA4Slice({ workspace, root, agentId: AGENT, slice: null })).toThrow(/A4_EXPORT_REF_ENCRYPTED/);
+    expect(existsSync(join(root, "a4"))).toBe(false);
+  });
+
+  test("record files carrying plaintext are written owner-only (0o600)", () => {
+    const { workspace } = governanceFixture();
+    project(workspace);
+    const { record } = exportSlice(workspace);
+    expect(statSync(record).mode & 0o777).toBe(0o600);
+  });
 });
 
 describe("redacted exports (P2-36, CISO must-fix §8.1)", () => {
@@ -255,7 +280,8 @@ describe("algorithm policy (P2-08, P2-36)", () => {
     const { publicKey, privateKey } = generateKeyPairSync("ec", { namedCurve: "prime256v1" });
     const pem = publicKey.export({ type: "spki", format: "pem" }).toString();
     const signature = sign("sha256", Buffer.from(digest, "hex"), { key: privateKey, dsaEncoding: "ieee-p1363" });
-    return { pem, signature: signature.toString("base64") };
+    // AMC accepts only the low-S encoding (algorithmPolicy.ts); Node signs with a random S.
+    return { pem, signature: lowS(signature).toString("base64") };
   }
   function allowOnly(workspace: string, allowed: string[]): void {
     mkdirSync(join(workspace, ".amc"), { recursive: true });

@@ -69,5 +69,29 @@
   "file": "src/a4/a4Binder.ts",
   "exit": 0,
   "failing": []
+ },
+ {
+  "mutation": "M10 foreign rows decrypted (own-row check removed)",
+  "file": "src/bundles/bundleA4.ts",
+  "exit": 1,
+  "failing": [
+   "\u00d7 a referenced ledger row of other evidence, encrypted after it was hashed, is never decrypted into the export 1459ms"
+  ]
+ },
+ {
+  "mutation": "M11 foreign rows decrypted and decrypted payloads not scanned",
+  "file": "src/bundles/bundleA4.ts",
+  "exit": 1,
+  "failing": [
+   "\u00d7 a referenced ledger row of other evidence, encrypted after it was hashed, is never decrypted into the export 1828ms"
+  ]
+ },
+ {
+  "mutation": "M12 record files written 0o644",
+  "file": "src/bundles/bundleA4.ts",
+  "exit": 1,
+  "failing": [
+   "\u00d7 record files carrying plaintext are written owner-only (0o600) 1603ms"
+  ]
  }
 ]

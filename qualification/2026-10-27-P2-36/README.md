@@ -4,7 +4,7 @@ Branch `rtd/w3-p2-36` on base `4683eecc7`. Details: `receipt.json`; mutation res
 
 ## What was run
 
-- `tests/a4/enterpriseData.test.ts` (9 tests, all pass). It uses the owned P2-24 governance fixture (real vault, ledger, deletion gate, legal-hold registry, ledger encryption) and covers these cases:
+- `tests/a4/enterpriseData.test.ts` (11 tests, all pass). It uses the owned P2-24 governance fixture (real vault, ledger, deletion gate, legal-hold registry, ledger encryption) and covers these cases:
   - Postgres backend: every write is refused and readiness shows `LEDGER_BACKEND_INCOMPLETE`.
   - Owner erasure: the blobs become unreadable, the hashes are kept, the chain verifies, `ERASED` is recorded and the `DELETION_ALLOWED` audit row is written.
   - Legal hold: a hold refuses erasure before anything is destroyed.
@@ -27,3 +27,7 @@ Branch `rtd/w3-p2-36` on base `4683eecc7`. Details: `receipt.json`; mutation res
 
 - Land `docs/runbooks/POSTGRES_FAILOVER.md` (P2-09d) before any decision to mirror A4's tables. Mirroring them is a follow-up and needs Postgres-side writes for A4, not just a list entry.
 - Erasure semantics for regulated deployments (backup and WORM rotation windows) need expert review before any claim beyond "effective after rotation".
+
+## Security review fix (bundle slice)
+
+Only the project's own audit rows are decrypted for export. A referenced row of other evidence that was encrypted after hashing refuses the export with `A4_EXPORT_REF_ENCRYPTED` and is never decrypted. Every decrypted payload is scanned for credentials before anything is written, and record files are written 0600. Both regression tests failed before the fix and pass after it. Mutations M10 to M12 are in `mutations.json`.

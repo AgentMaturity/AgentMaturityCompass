@@ -848,9 +848,14 @@ residency or retention.
   The records are plaintext: the structured brief is included so that a verifier can recompute every digest without a
   key. Keep the bundle under the operator's control. `a4/index.json` says so in `plaintext.note`. Its
   `protectedDataFindings` counts P2-02 detector matches in the exported rows by class; they are reported, not rewritten.
-  A credential match refuses the export with 409 `A4_BUNDLE_REFUSED`. A ledger row encrypted after it was hashed is
-  exported as its plaintext, decrypted under the operator's key (`plaintext.decryptedLedgerRows`). Without the key the
-  export is refused with 503 `A4_EXPORT_KEY_UNAVAILABLE`. Rows written under encryption are exported as stored.
+  A credential match refuses the export with 409 `A4_BUNDLE_REFUSED`. Every payload decrypted for the export is scanned
+  too. The project's own audit rows may have been encrypted after they were hashed. Those rows are exported as their
+  plaintext, decrypted under the operator's key, and `plaintext.decryptedLedgerRows` counts them. Their payload is the
+  transition body the record already carries. Without the key the export is refused with 503 `A4_EXPORT_KEY_UNAVAILABLE`.
+  Other evidence that an evidence ref names may also have been encrypted after it was hashed. That evidence is never
+  decrypted into an export. It would verify only with the key, so the export is refused with 409
+  `A4_EXPORT_REF_ENCRYPTED`. Rows written under encryption are exported as stored. The record files are written
+  owner-only (0600).
   A project is the agent's by the receipt signed for its first audit row, never by the head row's editable `agent_id`.
   Each project's chain is verified whole before it is exported. A project that does not verify, has lost its head row,
   or names two agents refuses the export with `A4_INTEGRITY_FAILED`. Only the store writes in the `a4-` session
