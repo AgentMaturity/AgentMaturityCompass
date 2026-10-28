@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "key": "P1-30",
+  "date": "2026-10-28",
+  "commit": "2bf2375c8a726574561d96950d80b572839b4c8d",
+  "branch": "rtd/w4-p1-30",
+  "node": "v22.23.3",
+  "pnpm": "10.33.0",
+  "os": "macOS 26.6.2",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "node scripts/check-spec-sync.mjs --check",
+      "exit": 0,
+      "durationMs": 178
+    },
+    {
+      "cmd": "npm run -s check:docs-drift",
+      "exit": 0,
+      "durationMs": 512
+    },
+    {
+      "cmd": "npm run -s check:gates",
+      "exit": 0,
+      "durationMs": 725
+    },
+    {
+      "cmd": "npm run -s check:schemas",
+      "exit": 0,
+      "durationMs": 940
+    },
+    {
+      "cmd": "npm run -s check:counts",
+      "exit": 0,
+      "durationMs": 1175
+    },
+    {
+      "cmd": "npm run -s check:api-ref",
+      "exit": 0,
+      "durationMs": 218
+    },
+    {
+      "cmd": "node scripts/check-freeze.mjs --base-ref e95619acb",
+      "exit": 0,
+      "durationMs": 2421
+    },
+    {
+      "cmd": "npx vitest run --maxWorkers=2 --reporter=json --outputFile=<scratchpad>/p130-vitest.json tests/spec tests/ciWorkflowContract.test.ts tests/publicDocsArtifact.test.ts tests/publicDocsGraph.test.ts tests/publicDistributionTruth.test.ts tests/publicTypographyArtifact.test.ts tests/publicBrandSystem.test.ts tests/crossSurfaceBrandIdentity.test.ts tests/pagesWorkflowRuntime.test.ts tests/regulatedExamples.test.ts tests/rfcSpec.test.ts tests/citationMetadata.test.ts tests/publicStatsDrift.test.ts tests/publishedCountsAccuracy.test.ts tests/maturityTaxonomyConsistency.test.ts tests/complianceArtifactFreshness.test.ts tests/sourceQualityRatchet.test.ts tests/architectureBoundaries.test.ts tests/gap1013JamAiBasePublicMethodologyBoundary.test.ts tests/metricValidity.test.ts tests/decibenchVoiceLiveDrift.test.ts tests/gap1012FinSightAiLiveDriftBoundary.test.ts tests/gap4977CtfusionPassportSchemaCompatibilityBoundary.test.ts tests/explainabilityContractParity.test.ts",
+      "exit": 0,
+      "durationMs": 69354
+    }
+  ],
+  "tests": {
+    "total": 361,
+    "passed": 361,
+    "failed": 0,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "mutation-check-spec.log",
+      "sha256": "aaccd521ebdcc3cef9baa7a409f5f4def1568c55fb75acb50c0c346d9c5deb1f"
+    },
+    {
+      "path": "red-run.log",
+      "sha256": "c7c7b043beb04ca0b866f68ab5d58d4ecc24a11c761b568d13e4cd96762129f7"
+    }
+  ],
+  "notes": "Docs-only item: no CLI command added (freeze guard vs base e95619acb passes). check:spec is wired in CI as `node scripts/check-spec-sync.mjs --check`; the npm alias check:spec is left to the integrator (package.json not edited in this worktree). Related test set = tests/spec plus 23 files touching the docs site, CI workflow, counts, public docs and level semantics. Red run before the spec existed: 9 failed / 3 passed (red-run.log). Mutation checks: see README.md. Open: D-04 licence (Sid), Annex A expert sign-off (D-08), Pages deploy and the SPEC DRAFT: public URL comment (Sid)."
+}

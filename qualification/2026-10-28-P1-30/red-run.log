@@ -1,0 +1,13 @@
+Red run (2026-10-28, before spec/core, the annexes and the banners existed; scripts/check-spec-sync.mjs written):
+npx vitest run tests/spec --maxWorkers=2
+     × normative chapters use RFC 2119 keywords and say which status they carry
+     × every Annex A row carries the re-verify flag, Art. 13 stays blank and the annex stays experimental
+     × the scope chapter carries the draft status line
+     × the old RFC and rubric carry the superseded banner and no contradictory licence statement
+     × spec/ holds chapters 1-10, both annexes, the changelog and the RFC process
+     × every generated region matches its source and every spec file carries the licence line
+     × every $id the spec cites exists in spec/schemas/index.json
+     × a changed level definition, claim kind or schema $id makes the check fail
+     × every region name is generated somewhere in the spec
+      Tests  9 failed | 3 passed (12)
+Green after the spec landed: 14 passed (14) (two cases added after the red run: the check's own refusals, and the Pages link rewrite).
