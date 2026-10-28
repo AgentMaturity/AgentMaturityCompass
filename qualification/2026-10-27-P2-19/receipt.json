@@ -1,0 +1,130 @@
+{
+ "schemaVersion": 1,
+ "key": "P2-19",
+ "date": "2026-10-27",
+ "commit": "50ffa124609e27063c5f3c5d2b3df1ee668499c5",
+ "branch": "rtd/w3-p2-19",
+ "node": "v22.23.3",
+ "pnpm": "10.33.0",
+ "os": "macOS 26.6.2",
+ "arch": "arm64",
+ "commands": [
+  {
+   "cmd": "npm run -s build",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s typecheck",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s typecheck:tests",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s lint",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:gates",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:dead-code",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:duplicates",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "node scripts/gen-counts.mjs --write",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:counts",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s gen:api-ref",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:api-ref",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:docs-drift",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "node scripts/architecture-boundaries-check.mjs",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:threat-model",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:catalog-admission",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:catalog-currency",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npx vitest run <36 related test files> --maxWorkers=2",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npx vitest run tests/asiCrosswalk.test.ts tests/acsHooks.test.ts tests/acsConformance.test.ts --maxWorkers=2",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:freeze",
+   "exit": 1,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:catalog-changelog",
+   "exit": 1,
+   "durationMs": 0
+  }
+ ],
+ "tests": {
+  "total": 390,
+  "passed": 383,
+  "failed": 0,
+  "skipped": 7
+ },
+ "artifacts": [
+  {
+   "path": "mutations.json",
+   "sha256": "486d80d562666f99475cee527fb85b634d5629464150b87752444297c861081d"
+  },
+  {
+   "path": "conformance.json",
+   "sha256": "9a49d40c57965b9212f6b366905c41a615c8a6219fbe740d37b3c7a7cb10a80d"
+  }
+ ],
+ "notes": "Related suite: 35 files run, 379 passed, 7 skipped (pre-existing live-Claude-Code skips); plus tests/asiCrosswalk.test.ts 4 passed. check:freeze exit 1 is pre-existing (P0-37, P1-32, P1-33, P1-65, P2-09, P2-23, P2-30, P3-14 not in base allowedExceptionKeys); P2-19 adds no CLI command. check:catalog-changelog exit 1 is pre-existing at base 93ccb82b5 (GOV_CHANGELOG_ENTRY_COUNT); P2-19 touches no catalog file. ACS v0.1.4 834f3f0d51e7bbbd9a68ff682bec89f97ddd72d8, tree 37f9688e7a3181cc1cce4be4e3bff293faae8666."
+}

@@ -1,0 +1,15 @@
+{
+  "key": "P2-19",
+  "note": "Each guard was broken by hand in the working tree, tests/acsHooks.test.ts was run, the guard was restored and the file re-run green.",
+  "mutations": [
+    { "guard": "src/standards/acs/acsGuardian.ts toAcsDecision", "mutation": "return outcome === \"deny\" ? \"deny\" : \"allow\" (an unknown ACS decision value becomes allow)",
+      "failed": ["ACS v0.1 guardian on AMC's hook control path > mutation guard: the translator maps only an AMC allow to an ACS allow"] },
+    { "guard": "src/standards/acs/acsProvider.ts acsToolRequest unevaluable check", "mutation": "map a call carrying raw_command or operation",
+      "failed": ["ACS v0.1 guardian on AMC's hook control path > deny: an unmapped tool and a call AMC cannot evaluate are ACS denies with signed receipts"] },
+    { "guard": "src/bridge/bridgeServer.ts generic control route refuses provider acs", "mutation": "if (!isHookProvider(provider))",
+      "failed": ["ACS guardian over the Bridge > unauthenticated, wrong-scope and generic-route ACS requests are refused; a leased request is decided"] },
+    { "guard": "src/standards/acs/acsGuardian.ts clock skew, agent_id and duplicate request_id checks", "mutation": "each condition replaced by false",
+      "failed": ["ACS v0.1 guardian on AMC's hook control path > version, clock skew and identity are refused with the ACS section 17.1 codes",
+        "ACS v0.1 guardian on AMC's hook control path > a replayed request id is REPLAY_DETECTED, and with different input it is the conflict"] }
+  ]
+}
