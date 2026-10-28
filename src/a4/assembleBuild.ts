@@ -18,6 +18,8 @@ import { actionEvidenceCoverage } from "../actions/actionEvidenceCoverage.js";
 import { verifyAgentRun } from "../agent/runReport.js";
 import type { NativeTaskApiContext } from "../api/nativeTasksRouter.js";
 import { readBudgetEvents } from "../budgets/nativeBudgetUsage.js";
+import { EXECUTION_PHASES, type ExecutionPhase, type ExecutionStatus } from "../execution/executionContract.js";
+import { executionStatusFor } from "../execution/executionStatus.js";
 import { loadActiveCompiledPolicy } from "../catalog/compiler/activate.js";
 import { getPrivateKeyPem } from "../crypto/keys.js";
 import { readAndVerifyArtifactFileSignature } from "../lifecycle/artifactSignature.js";
@@ -293,23 +295,33 @@ function effectivePolicyOf(workspace: string, sessionId: string): { status: "eva
   return { status: receipts.length === 0 ? "not_evaluated" : "evaluated", reason: receipts.length === 0 ? "NO_EFFECTIVE_POLICY_RECEIPT" : null, receipts, downgrades, unverified: 0 };
 }
 
+const PHASE_SOURCES: Readonly<Record<ExecutionPhase, string>> = {
+  admission: "native task descriptor (the runtime opened the session)", "model-completion": "the session's recorded turn ending",
+  "side-effect-completion": "verified receipt chains of the session's journaled actions (sessionReceipts)", "evidence-verification": "verifyAgentRun (integrity self-check)"
+};
+
 /**
- * The four execution phases (design §10.2; P2-37 replaces this with P2-13's contract), derived from existing sources:
- * admission from the task, model completion from its state and turn end, side-effect completion from the action
- * journal's coverage, evidence verification from AMC's integrity self-check. Admission is not task completion.
+ * The four execution phases of one build session as P2-13's contract states them (P2-37; design §10.2): each phase's
+ * state is the contract's own, and the detail says what it rests on (the turn ending, the receipt states, the anchoring).
+ * A cancelled journaled call leaves `outcome_unknown`, which the contract reads `side-effect-completion: unknown`.
  */
-function executionPhases(view: NativeTaskView, coverage: ReturnType<typeof actionEvidenceCoverage>, integrity: Awaited<ReturnType<typeof sessionIntegrity>>) {
-  const model = view.state === "failed" ? "failed" : view.turnEndReason !== null && !RUNNING.has(view.state) ? `completed (${view.turnEndReason.slice(0, 64)})` : "not_evaluated";
-  const effects = coverage.status !== "evaluated" ? "not_evaluated" : coverage.calls === 0 ? "not_evaluated (no consequential calls)"
-    : coverage.unknown > 0 || coverage.integrityFailures > 0 ? "outcome_unknown" : coverage.linked === coverage.calls ? "receipts_linked" : "incomplete";
-  const verification = integrity.notEvaluated !== null ? "not_evaluated" : integrity.integrityOk !== true ? "failed"
-    : integrity.anchored === true ? "externally-anchored" : "workspace-key-consistency";
-  return [
-    { phase: "admission", status: view.sessionId === null ? "not_admitted" : "admitted", source: "native task descriptor" },
-    { phase: "model-completion", status: model, source: "native task state and turn end" },
-    { phase: "side-effect-completion", status: effects, source: "actionEvidenceCoverage (action journal)" },
-    { phase: "evidence-verification", status: verification, source: "verifyAgentRun (integrity self-check)" }
-  ];
+export function executionPhaseRows(status: ExecutionStatus, turnEndReason: string | null, anchoring: string | null) {
+  const detail: Readonly<Record<ExecutionPhase, string | null>> = {
+    admission: null, "model-completion": turnEndReason?.slice(0, 64) ?? null,
+    "side-effect-completion": status.receiptStates.length === 0 ? "no journaled actions" : [...new Set(status.receiptStates)].join(", "),
+    "evidence-verification": anchoring
+  };
+  return EXECUTION_PHASES.map((phase) => ({ phase, status: status.phases[phase], detail: detail[phase], source: PHASE_SOURCES[phase] }));
+}
+
+/** The session's status from the contract: admitted (it has a session), its recorded ending, and AMC's integrity check. */
+function executionPhases(workspace: string, view: NativeTaskView, integrity: Awaited<ReturnType<typeof sessionIntegrity>>) {
+  // Studio feeds evidence-verification the same way: any verdict but a failure is verified (src/studio/nativeTaskService.ts).
+  const status = executionStatusFor(workspace, { sessionId: view.sessionId!, admission: "admitted",
+    turn: RUNNING.has(view.state) ? "running" : view.turnEndReason ?? (view.state === "failed" ? "error" : null),
+    verified: integrity.notEvaluated !== null ? null : integrity.integrityOk === true });
+  const anchoring = integrity.notEvaluated ?? (integrity.integrityOk !== true ? null : integrity.anchored === true ? "externally-anchored" : "workspace-key-consistency");
+  return executionPhaseRows(status, view.turnEndReason, anchoring);
 }
 
 /**
@@ -409,7 +421,7 @@ export async function reviewAssemble(ctx: A4ProducerContext): Promise<A4Producer
       && pinned.every((id) => view.validation.checks.some((check) => check.id === id && check.status === "passed"));
     const coverage = actionEvidenceCoverage(workspace, sessionId);
     const effectivePolicy = effectivePolicyOf(workspace, sessionId);
-    const phases = executionPhases(view, coverage, integrity);
+    const phases = executionPhases(workspace, view, integrity);
     const agentFacing = stub ? { claimKind: "synthetic_example" as const, method: "synthetic" } : { claimKind: "self_reported" as const, method: null };
     outputs.push({ output: "review", lane: "implementation", ...agentFacing, label: `assemble review: build session ${sessionId}${stub ? " (stub provider: synthetic)" : ""}`,
       body: { taskId: view.taskId, sessionId, headEventHash: view.history.headEventHash, provider: view.provider, model: view.model, state: view.state,

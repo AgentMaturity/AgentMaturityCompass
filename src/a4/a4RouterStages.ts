@@ -19,7 +19,7 @@ import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { auditA4 } from "./a4Audit.js";
 import { a4ProjectsRoot, putPrivate } from "./a4Blobs.js";
-import { completeStage, inlineEffect, openEffectGate, retryEffect, runA4Effect } from "./a4Effects.js";
+import { completeStage, inlineEffect, openEffectGate, reconcileForRetry, retryEffect, runA4Effect } from "./a4Effects.js";
 import {
   assertAllowed, driftedSlots, evaluateFor, gateRowOf, governed, livePrincipal, loadA4State, pendingExecutors, recordDecision, refuseOnFreeze,
   requestChanges, requestGateAsync, RESOURCE_SLOTS
@@ -547,6 +547,7 @@ export async function handleA4StageRoute(route: A4Route, projectId: string, tail
     if (replay) return (apiSuccess(route.res, attemptReplay(route, projectId, replay)), true);
     const started = store.readChain(projectId).find((link) => link.kind === "EFFECT_STARTED" && link.body.effectId === body.attemptId);
     if (started?.body.effect !== effectId) throw a4Fail(404, "A4_EFFECT_NOT_FOUND", `no attempt ${body.attemptId} of effect ${effectId}`);
+    await reconcileForRetry(store, projectId, body.attemptId);
     const retried = retryEffect(store, projectId, { ...callOf(route, request), attemptId: body.attemptId, expectedHeadSeq: body.expectedHeadSeq });
     if (retried.result.replay) return (apiSuccess(route.res, attemptReplay(route, projectId, mutationResult(retried.result))), true);
     apiSuccess(route.res, mutationResult(retried.result, { attemptId: retried.attemptId, ...await runEffect(route, projectId, retried.attemptId) }), 201);
