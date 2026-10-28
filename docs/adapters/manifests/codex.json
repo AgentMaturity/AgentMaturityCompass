@@ -4,7 +4,8 @@
   "harness": { "package": "@openai/codex", "versions": [] },
   "hooks": [],
   "notCovered": [
-    "every Codex tool call: AMC has no Codex integration; Codex's lifecycle hooks are not yet reviewed or qualified (P2-17 part B)"
+    "every Codex tool call: unsupported at 0.165.0 because PreToolUse fails open (a handler that errors, times out, exits other than 0 or 2, or is untrusted lets the call run), so AMC installs no Codex hook; see docs/source-reviews/P2-17-codex-hooks.md",
+    "observe mode through PostToolUse is not built"
   ],
   "qualifiedAt": null,
   "receipt": null
