@@ -27,6 +27,7 @@ import { assertMember, liveRolesFor, memberCandidates } from "./a4Identity.js";
 import { gateStatus, isRegulated, redoneStages, roleRefusals, type A4GateRow, type A4ReadinessState } from "./a4Readiness.js";
 import type { A4ChainLink, A4Principal, A4RefKind, A4Stage } from "./a4Schema.js";
 import { buildersOf, evaluateSod, type SodDecision } from "./a4SoD.js";
+import { assertEffectResumable, reconcileBeforeRetry } from "./a4EffectResume.js";
 import { ensureA4Stages } from "./a4Stages.js";
 import { A4StoreError, refreshVolatileFacts, type A4Store, type A4TransitionResult } from "./a4Store.js";
 
@@ -111,6 +112,15 @@ const lookupEffect = (id: string): A4EffectDef | undefined => {
   ensureA4Stages();
   return EFFECTS.get(id);
 };
+/**
+ * Before `retryEffect`, outside the project lock: P2-12's reconcile-first step for the attempt's execution (P2-37;
+ * src/a4/a4EffectResume.ts). An unknown attempt or effect does nothing here; retryEffect refuses it.
+ */
+export async function reconcileForRetry(store: A4Store, projectId: string, attemptId: string): Promise<void> {
+  const started = store.readChain(projectId).find((link) => link.kind === "EFFECT_STARTED" && link.body.effectId === attemptId);
+  const def = started === undefined ? undefined : lookupEffect(String(started.body.effect));
+  if (def !== undefined) await reconcileBeforeRetry(store.ledger, def, String(started!.body.executionId));
+}
 /** Whether effect `id` runs inline (inside the request that started its attempt; A4EffectDef.inline). */
 export const inlineEffect = (id: string): boolean => lookupEffect(id)?.inline === true;
 const effectDef = (id: string): A4EffectDef => {
@@ -685,6 +695,7 @@ export function retryEffect(store: A4Store, projectId: string, input: A4Call & {
     if (!runs.some((link) => link.kind === "EFFECT_FAILED") || runs.some((link) => link.kind === "EFFECT_FINISHED")) {
       throw fail(409, "EFFECT_NOT_RETRYABLE", "Only a failed, unfinished effect is retried.");
     }
+    assertEffectResumable(store.ledger, def, executionId); // P2-12's rule (P2-37): a journaled external effect is settled first
     // Lost attempts were just swept; one still running is live, or could not be settled, and either way is not retried over.
     if (state.effects.some((row) => row.execution_id === executionId && row.state === "running")) {
       throw fail(409, "EFFECT_RUNNING", "A previous attempt may still be running; the sweeper settles it first.");

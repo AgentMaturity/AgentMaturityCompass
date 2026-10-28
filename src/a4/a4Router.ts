@@ -45,6 +45,7 @@ import { gateStatus, isRegulated, type A4Action, type A4ReadinessState } from ".
 import { monitorView } from "./a4Monitor.js";
 import { valueView } from "./a4Value.js";
 import { handleA4ReleaseRoute } from "./a4RouterReleases.js";
+import { readSignedMechanicPlan } from "./a4Mechanic.js";
 import { handleA4StageRoute, STAGE_QUESTIONS } from "./a4RouterStages.js";
 import {
   A4_GATES, A4_PROJECT_ROLES, A4_REF_KINDS, A4_STAGES, A4_STEPS, a4GatePolicyV1Schema, a4PreviewEnabled, clientRequestIdSchema, headSeqSchema, reasonSchema,
@@ -489,7 +490,11 @@ async function projectMutation(route: A4Route, projectId: string, rest: string):
     case "/reopen":
       return mutate(route, projectId, OWNER_SCHEMAS.reopen, (body, request) => reopenStage(store, projectId, { ...callOf(route, request), ...body }));
     case "/tune":
-      return mutate(route, projectId, OWNER_SCHEMAS.tune, (body, request) => tuneProject(store, projectId, { ...callOf(route, request), ...body }));
+      return mutate(route, projectId, OWNER_SCHEMAS.tune, (body, request) => {
+        // P2-37: a seed plan must exist, verify under the auditor key and be scoped to this agent before a TUNE names it.
+        if (body.mechanicPlanId !== undefined) readSignedMechanicPlan(route.workspace, body.mechanicPlanId, headOf().agent_id);
+        return tuneProject(store, projectId, { ...callOf(route, request), ...body });
+      });
     case "/retire":
       return mutate(route, projectId, OWNER_SCHEMAS.retire, (body, request) => retireProject(store, projectId, { ...callOf(route, request), ...body }));
     case "/private/erase":

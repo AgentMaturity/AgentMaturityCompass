@@ -1,6 +1,6 @@
 import type { Command } from "commander";
 import { startAcpStdio } from "./acpStdioMain.js";
-import { NATIVE_TASK_INITIATOR_ENV, NATIVE_TASK_LEASE_ENV } from "./acpRuntimeContracts.js";
+import { NATIVE_TASK_INITIATOR_ENV, NATIVE_TASK_LEASE_ENV, NATIVE_TASK_SYSTEM_PROMPT_ENV } from "./acpRuntimeContracts.js";
 import { compactionFromFlags } from "../agent/compaction/promptPressure.js";
 
 /**
@@ -82,6 +82,9 @@ export function registerAcpCommands(program: Command): void {
       const initiator = process.env[NATIVE_TASK_INITIATOR_ENV];
       delete process.env[NATIVE_TASK_LEASE_ENV];
       delete process.env[NATIVE_TASK_INITIATOR_ENV];
+      // P2-37: the agent's verified prompt pack and A4 context plugin, as Studio composed them; unset like the lease.
+      const composedPrompt = process.env[NATIVE_TASK_SYSTEM_PROMPT_ENV];
+      delete process.env[NATIVE_TASK_SYSTEM_PROMPT_ENV];
       try {
         const compaction = compactionFromFlags(opts);
         handle = startAcpStdio({
@@ -91,7 +94,7 @@ export function registerAcpCommands(program: Command): void {
           workspace: process.cwd(),
           agentId: opts.agentId,
           providerId: opts.provider,
-          systemPrompt: opts.systemPrompt,
+          systemPrompt: composedPrompt ? composedPrompt : opts.systemPrompt,
           tools: opts.tools as "none" | "workspace",
           ...(opts.unsafeUnconfinedShell === true ? { unconfinedShell: true } : {}),
           ...(opts.expectedToolsDigest === undefined ? {} : { expectedToolsDigest: opts.expectedToolsDigest }),

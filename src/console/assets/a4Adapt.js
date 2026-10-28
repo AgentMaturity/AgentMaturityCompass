@@ -137,13 +137,13 @@ function renderConformance(ctx) {
 const buildOf = (ctx) => (isObject(specOf(ctx).build) ? specOf(ctx).build : null);
 const factsOf = (ctx) => (isObject(specOf(ctx).understanding?.facts) ? specOf(ctx).understanding.facts : null);
 
-/** The context plugin Build wrote and the probe: where it reaches (an in-process run) and where it does not (native tasks, P2-37). */
+/** The context plugin Build wrote and the probe: where it reaches (an in-process run, Studio native tasks since P2-37) and where it does not (a deployed agent). */
 function renderContext(ctx) {
   const context = buildOf(ctx)?.context;
   const probeOffer = ctx.project.stage === "adapt" && ["built", "reviewed"].includes(ctx.project.step) ? ctx.allowed.build : view.held("The probe runs after Build");
   return `<p class="muted">Build writes your audience, market, sector, language, accessibility, data-handling and regulatory-note answers as one attributed
-      context plugin (order 160). Only an in-process run loads it: a Studio native task started now shows no A4 context plugin in its frame, and a deployed
-      agent does not load it either (P2-37). The probe runs one turn on the stub provider and AMC checks that session's signed user/message row for the
+      context plugin (order 160), signed. An in-process run loads it, and a Studio native task started after Build loads it into its system prompt
+      when its signature checks out (in a regulated workspace a plugin that does not verify refuses the task). A deployed agent does not load it. The probe runs one turn on the stub provider and AMC checks that session's signed user/message row for the
       plugin's text. A4 ran the turn on the stub provider, so the probe's ref is a synthetic example, never observed, and the runtime writes no
       effective-policy receipt for a turn with no tool call. A workspace on the JSONL session store cannot record the probe: an owner acknowledges that instead.</p>
     ${isObject(context) ? `<p class="muted">Plugin <code>${esc(context.name)}</code> · sha256 <code>${esc(context.sha256)}</code> · source <code>${esc(context.source)}</code>
@@ -151,7 +151,7 @@ function renderContext(ctx) {
     <div class="row wrap">${view.actionButton("Run the context probe", "probe", isObject(context) ? probeOffer : view.held("Build writes the context plugin first"))}</div>
     ${["prompts_attributed", "context_reaches_runtime_frame", "context_probe_unavailable", "model_delivery", "context.native_delivery", "adapt.prompt_pack_signature"]
     .map((id) => status(ctx, id)).join("")}
-    <p class="muted">A prompt pack is a signed Score resource; the runtime does not load it into a model's prompt.</p>`;
+    <p class="muted">A prompt pack is a signed Score resource; Studio native tasks load it into the system prompt when it verifies, and a deployed agent does not.</p>`;
 }
 
 /** The memory policy Build wrote, field by field with its source (answer or default); advisory, and the card says so. */

@@ -35,7 +35,7 @@ import { errorCodeOf } from "../aspireUnderstand.js";
 import { conformanceStatement, recordControlResults } from "../a4Conformance.js";
 import { checkMemoryPolicy, MEMORY_ENFORCEMENT_NOTE, memoryPolicyDraft, memoryPolicyFields, memoryPolicySha256, writeMemoryPolicy } from "../adaptMemoryPolicy.js";
 import {
-  contextItems, contextPluginDraft, contextPluginSha256, PROBE_LIMITATION, PROBE_PURPOSE, probeFrameStatus, promptPackSha256, promptPackStatus, readContextPlugin,
+  contextItems, contextPluginDraft, contextPluginSha256, nativeDeliveryOf, PROBE_LIMITATION, PROBE_PURPOSE, probeFrameStatus, promptPackSha256, promptPackStatus, readContextPlugin,
   writeContextPlugin
 } from "../adaptContextPlugin.js";
 import {
@@ -127,7 +127,7 @@ function understand(ctx: A4ProducerContext): A4ProducerResult {
       output("reporting-clock candidates (each needs classification)", { reviewStatus: CLOCK_REVIEW_STATUS, clocks: facts.clocks }),
       output("signed configs and the active compiled plan", { configs: facts.configs, activePlan: facts.activePlan }, "implementation"),
       output("the station operating profile's dry run: widenings activateOperatingProfile({ allowWidening: false }) refuses", facts.permissions, "implementation"),
-      output("the agent's existing prompt pack (a signed Score resource; the runtime does not load it)", facts.promptPack, "implementation")
+      output("the agent's existing prompt pack (a signed Score resource; Studio native tasks load it when it verifies)", facts.promptPack, "implementation")
     ],
     spec: { ...spec, answers: merged, understanding },
     response: { understanding: { answersDigest: understanding.answersDigest, carried: understanding.carried, planDigest: plan?.digest ?? null,
@@ -209,11 +209,11 @@ export function adaptFacts(spec: Record<string, unknown>, answers: readonly A4An
         + `error ${permissions.error ?? "none"}. Not built yet: the effect a4.adapt.activate_profile, per-agent gatePolicy.json and lease caps, the prompt-pack build (A4_PROFILE_EFFECT).` },
     { id: "context", sources: ["src/a4/adaptContextPlugin.ts", "extraContextPlugins (src/prompt/agentPromptProfile.ts)", "P2-37"], dataStatus: null,
       novice: "Build turns your answers about audiences, markets, sector, languages, accessibility and data into a labelled note the agent reads as context. "
-        + "Today only an in-process run reads it: Studio native tasks and a deployed agent do not, and AMC says so.",
+        + "An in-process run reads it, and so does a Studio native task started after Build (when its signature checks out); a deployed agent does not, and AMC says so.",
       practitioner: "Build writes <agent>/a4/context-plugin.json (order 160, attributed to this project's revision). The probe runs one in-process turn on the stub provider "
         + `and records that session as a synthetic-example ref (A4 ran it on the stub provider, so it is never observed); the frame is the session's signed user/message row holding the `
         + `plugin's text, which AMC checks at the probe and again at Review (${PROBE_LIMITATION}). The turn makes no tool call, so the runtime writes no `
-        + "effective-policy receipt for it. Delivery to a model is not evaluated on the stub provider; delivery to native tasks and to a deployed agent is not evaluated (P2-37).",
+        + "effective-policy receipt for it. Delivery to a model is not evaluated on the stub provider. Studio native tasks load the signed plugin into the session's system prompt, and Review checks the agent's native sessions for it (P2-37); delivery to a deployed agent is not evaluated.",
       expert: "ContextPlugin { name: \"a4:context\", order: 160 } through runComposedTurn({ promptProfile: { extraContextPlugins } }) (never contextPlugins, which drops AGENTS.md); "
         + "no tools and no bindToolSession, so nothing A4 authors enters the session; the ref is its session/open row (claimKind synthetic_example, method synthetic; the session is named a4probe-<uuid>, and any A4 ref to its rows is synthetic_example); "
         + "the user/message snapshot row must carry the frame's exact text." },
@@ -403,11 +403,11 @@ function build(ctx: A4ProducerContext): A4ProducerResult {
     memoryPolicy: { path: relPath(workspace, memory.path), sha256: memory.sha256, policy: memory.policy }, context: context.record, manifest });
   // The router checks the produced specification (256 KiB, credentials) only after Build returns: the same check, first.
   assertNoSecrets({ ...spec, build: record({ manifestId: `enforce-resources-${"0".repeat(16)}`, path: relPath(workspace, manifestPath) }) }, "The produced specification");
-  const restore = keptBytes([memory.path, context.path, manifestPath, artifactSigPath(manifestPath)]);
+  const restore = keptBytes([memory.path, context.path, artifactSigPath(context.path), manifestPath, artifactSigPath(manifestPath)]);
   let manifest: NonNullable<AdaptBuild["manifest"]>;
   try {
     writeMemoryPolicy(memory);
-    writeContextPlugin(context);
+    writeContextPlugin(workspace, context);
     assertEnforceCurrent(workspace, project.agent_id, new Set(["memory"]));
     manifest = enforceSnapshot(workspace, project.agent_id);
   } catch (error) {
@@ -423,7 +423,7 @@ function build(ctx: A4ProducerContext): A4ProducerResult {
           diff: signed.diff === null ? null : renderPlanDiffMarkdown(signed.diff) } },
       { output: "build", label: `adapt build: the memory policy written (${MEMORY_ENFORCEMENT_NOTE}) and the Enforce manifest re-written`,
         lane: "implementation", method: null, body: { memoryPolicy: built.memoryPolicy, manifest } },
-      { output: "build", label: "adapt build: the attributed A4 context plugin (order 160; delivered only to an in-process run; native tasks and a deployed agent do not load it, P2-37)",
+      { output: "build", label: "adapt build: the attributed A4 context plugin, signed (order 160; an in-process run and Studio native tasks load it, P2-37; a deployed agent does not)",
         lane: "implementation", method: null, body: context.record }
     ],
     spec: { ...spec, build: built }
@@ -448,6 +448,20 @@ function assertBuiltCurrent(ctx: A4ProducerContext): void {
 }
 
 /** Review's re-check of the probe's frame row (probeFrameStatus) against the plugin Build wrote; a code when it cannot be read. */
+/** Review's read of the agent's native sessions for the plugin Build wrote (P2-37; nativeDeliveryOf); a code when it cannot read. */
+function nativeDeliveryRead(ctx: A4ProducerContext, fileSha256: string): Record<string, unknown> {
+  let ledger: ReturnType<typeof openLedger> | null = null;
+  try {
+    const text = readContextPlugin(ctx.workspace, ctx.state.project.agent_id, fileSha256).text;
+    ledger = openLedger(ctx.workspace, { readonly: true });
+    return nativeDeliveryOf(ledger, ctx.state.project.agent_id, text);
+  } catch (error) {
+    return { status: "unreadable", reason: errorCodeOf(error, "NATIVE_DELIVERY_UNREADABLE") };
+  } finally {
+    ledger?.close();
+  }
+}
+
 function recheckFrame(ctx: A4ProducerContext, probe: Record<string, unknown>, fileSha256: string): string {
   let text: string;
   try {
@@ -516,8 +530,9 @@ function review(ctx: A4ProducerContext): A4ProducerResult {
   const probe = probeLink === undefined || context === undefined ? { status: "not_run", reason: context === undefined ? "CONTEXT_PLUGIN_NOT_BUILT" : "CONTEXT_PROBE_NOT_RUN" }
     : { status: "recorded", refEventId: probeLink.body.refId, sessionId: probeLink.body.sessionId, inFrame: probeLink.body.inFrame, turnStatus: probeLink.body.turnStatus,
       snapshotEventId: probeLink.body.snapshotEventId, frame: recheckFrame(ctx, probeLink.body, context.fileSha256), claimKind: "synthetic_example",
-      effectivePolicyReceipt: "none: the turn made no governed tool call", modelDelivery: "not_evaluated", nativeDelivery: "not_evaluated", limitation: PROBE_LIMITATION };
+      effectivePolicyReceipt: "none: the turn made no governed tool call", modelDelivery: "not_evaluated", limitation: PROBE_LIMITATION };
   const promptPack = promptPackStatus(ctx.workspace, project.agent_id);
+  const nativeDelivery = context === undefined ? { status: "not_built" } : { ...nativeDeliveryRead(ctx, context.fileSha256), pluginSha256: context.sha256 };
   return {
     outputs: [
       { output: "review", label: "adapt review: the conformance statement (amc.a4-conformance-statement/v1; signed CONTROL_RESULT set; counts, never a percentage)",
@@ -527,11 +542,13 @@ function review(ctx: A4ProducerContext): A4ProducerResult {
       { output: "review", label: `adapt review: the memory policy re-read (${MEMORY_ENFORCEMENT_NOTE})`, lane: "implementation", method: null, body: memoryPolicy },
       { output: "review", label: "adapt review: the context probe's frame row re-checked (stub provider; A4 ran the turn, so its ref is synthetic_example; no effective-policy receipt)",
         lane: "implementation", method: null, body: probe },
-      { output: "review", label: "adapt review: the agent's prompt pack re-verified under this workspace's keys (integrity of bytes; the runtime does not load it)",
-        lane: "implementation", method: null, body: promptPack }
+      { output: "review", label: "adapt review: the agent's prompt pack re-verified under this workspace's keys (integrity of bytes; Studio native tasks load it when it verifies)",
+        lane: "implementation", method: null, body: promptPack },
+      { output: "review", label: "adapt review: the agent's native sessions read for the plugin in their signed system prompt (AMC's check; P2-37)",
+        lane: "implementation", method: null, body: nativeDelivery }
     ],
     // Nothing in Adapt is observed: the probe's ref is synthetic_example (A4 ran the turn on the stub provider) and no runtime receipt exists for it.
     notEvaluated: ["NO_OBSERVED_REF", probeLink === undefined ? "CONTEXT_PROBE_NOT_RUN" : "PROBE_SYNTHETIC_EXAMPLE"],
-    spec: { ...spec, review: { conformance, statement, head, memoryPolicy, probe, promptPack, claimBoundary: ADAPT_CLAIM_BOUNDARY } }
+    spec: { ...spec, review: { conformance, statement, head, memoryPolicy, probe, promptPack, nativeDelivery, claimBoundary: ADAPT_CLAIM_BOUNDARY } }
   };
 }

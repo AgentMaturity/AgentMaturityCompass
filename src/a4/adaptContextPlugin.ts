@@ -2,10 +2,11 @@
  * Adapt's context plugin and its probe (P1-61 slice B; design §10.3 Propose, Build and Review, §7 item 10). Build renders
  * the members' audience, market, sector, language, accessibility, data-handling and regulatory-note answers as one
  * attributed ContextPlugin literal (`# A4 context: <section>`, source `a4:<projectId>@r<n>`, order 160, the
- * skillContextPlugin pattern) and writes it under the agent's directory. The only delivery path that exists is
- * `extraContextPlugins` of an in-process `runComposedTurn` (the CLI's agent-loop run): a Studio native task's ACP child
- * loads only the instructions file and the time plugin, and nothing loads this plugin into it or into a deployed agent,
- * so `context.native_delivery` stays not_evaluated naming P2-37. The probe is one bounded in-process turn on the stub
+ * skillContextPlugin pattern) and writes it under the agent's directory, signed (`a4-context-plugin`). Two paths deliver it:
+ * `extraContextPlugins` of an in-process `runComposedTurn` (the CLI's agent-loop run, and the probe below), and, since
+ * P2-37, Studio's native-task loader (src/studio/nativeTaskContext.ts), which puts the verified plugin into the ACP
+ * child's system prompt; Review reads the agent's native sessions for it (`context.native_delivery`). A deployed agent
+ * loads nothing (not evaluated). The probe is one bounded in-process turn on the stub
  * provider (no network, no credential) that A4 composes and writes nothing into: its ref is the session's own signed
  * `session/open` row, recorded synthetic_example because A4 ran the turn on the stub provider (never observed). The
  * runtime stamps that session's rows OBSERVED like any native run, so the session is named `a4probe-<uuid>` and the A4
@@ -18,21 +19,21 @@
  * turn did not end `complete` (blocked, error, cancelled, max steps) or whose row lacks the text never satisfies it.
  */
 import { randomUUID } from "node:crypto";
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { basename, dirname, join, relative, sep } from "node:path";
+import { readFileSync } from "node:fs";
+import { dirname, relative, sep } from "node:path";
 import { z } from "zod";
 import { STUB_PROVIDER_ID, STUB_PROVIDER_MODEL, stubProviderRoute, stubProviderTransport } from "../agent/stubProvider.js";
 import { apiSuccess } from "../api/apiHelpers.js";
 import { loadActiveCompiledPolicy } from "../catalog/compiler/activate.js";
-import { getAgentPaths } from "../fleet/paths.js";
 import { CLOCK_REVIEW_STATUS } from "../incidents/regulatoryClocks.js";
 import type { Ledger } from "../ledger/ledger.js";
+import { artifactSigPath, signArtifactBytes } from "../lifecycle/artifactSignature.js";
 import { verifyEvidenceEventIntegrity } from "../ledger/ledgerVerification.js";
 import { resolveSessionStoreBackend } from "../persistence/openSessionEventStore.js";
 import { assertOwnerMode } from "../mode/mode.js";
 import type { ContextPlugin } from "../prompt/context/contextTypes.js";
-import { verifyWorkspacePromptPack } from "../prompt/promptPackVerifier.js";
+import { agentContextPluginFileSchema, agentContextPluginPath, AGENT_CONTEXT_PLUGIN_ARTIFACT, AGENT_CONTEXT_PLUGIN_ORDER, AGENT_CONTEXT_PLUGIN_SCHEMA, type AgentContextPluginFile } from "../prompt/agentContextPluginFile.js";
+import { readPromptPackSnapshot } from "../prompt/promptPackSnapshot.js";
 import { promptLatestPackPath } from "../prompt/promptPolicyStore.js";
 import { readEventPayload } from "../session/eventPayload.js";
 import { readTurnEndMeta } from "../session/turnLifecycleMeta.js";
@@ -50,8 +51,6 @@ import {
 import { answerValues, listValue, textValue } from "./spec/aspire.js";
 import { A4_PROBE_SESSION_PREFIX, type A4Answer } from "./a4Schema.js";
 
-const A4_CONTEXT_ORDER = 160;
-const CONTEXT_PLUGIN_SCHEMA = "amc.a4-context-plugin/v1";
 export const PROBE_PURPOSE = "adapt_context_probe";
 export const PROBE_LIMITATION = "observed in-process, not in a Studio native session";
 const PROBE_PROMPT = "AMC A4 Adapt context probe: reply in one line.";
@@ -59,11 +58,10 @@ const NATIVE_LOADER_KEY = "P2-37";
 const MAX_TEXT = 2000;
 const MAX_ITEMS = 64;
 
-const pluginFileSchema = z.strictObject({
-  schema: z.literal(CONTEXT_PLUGIN_SCHEMA), name: z.string().min(1), order: z.literal(A4_CONTEXT_ORDER), source: z.string().regex(/^a4:[A-Za-z0-9_-]+@r\d+$/),
-  sha256: z.string().regex(/^[0-9a-f]{64}$/), text: z.string().min(1)
-});
-export type AdaptContextPlugin = z.infer<typeof pluginFileSchema>;
+const pluginFileSchema = agentContextPluginFileSchema;
+const CONTEXT_PLUGIN_SCHEMA = AGENT_CONTEXT_PLUGIN_SCHEMA;
+const A4_CONTEXT_ORDER = AGENT_CONTEXT_PLUGIN_ORDER;
+export type AdaptContextPlugin = AgentContextPluginFile;
 
 const fail = (status: number, code: string, message: string, detail?: unknown): A4StoreError => new A4StoreError(status, code, message, detail);
 /** One answer on one line (a member's text is data; a line break never opens a section of its own). */
@@ -101,7 +99,7 @@ function contextPluginText(input: { projectId: string; revisionNo: number; answe
 }
 
 /** `<agent>/a4/context-plugin.json`: the literal Build wrote, beside the agent's own files (no Enforce resource kind holds it). */
-export const contextPluginPath = (workspace: string, agentId: string): string => join(getAgentPaths(workspace, agentId).rootDir, "a4", "context-plugin.json");
+export const contextPluginPath = agentContextPluginPath;
 
 /** The `context.contextPluginSha256` slot: the file's sha256, null only when it is absent; any other read error is 409 RESOURCE_UNREADABLE. */
 export function contextPluginSha256(workspace: string, agentId: string): string | null {
@@ -126,10 +124,17 @@ export function contextPluginDraft(input: { workspace: string; agentId: string; 
     order: plugin.order, source: plugin.source } };
 }
 
-/** Build's write of a draft contextPluginDraft made. */
-export function writeContextPlugin(draft: { path: string; bytes: string }): void {
+/**
+ * Build's write of a draft contextPluginDraft made, signed as an `a4-context-plugin` artifact beside it (P2-37: the
+ * Studio native-task loader loads only a plugin whose signature verifies). The signature is made before either file is
+ * written, so a refusal to sign writes nothing.
+ */
+export function writeContextPlugin(workspace: string, draft: { path: string; bytes: string }): void {
+  const bytes = Buffer.from(draft.bytes, "utf8");
+  const signature = signArtifactBytes({ workspace, artifactKind: AGENT_CONTEXT_PLUGIN_ARTIFACT, bytes });
   ensureDir(dirname(draft.path));
   writeFileAtomic(draft.path, draft.bytes, 0o644);
+  writeFileAtomic(artifactSigPath(draft.path), `${JSON.stringify(signature, null, 2)}\n`, 0o644);
 }
 
 /** The file Build wrote, from one read: other bytes than the build recorded are RESOURCE_DRIFTED, a body whose text is not its sha256 is A4_INTEGRITY_FAILED. */
@@ -153,43 +158,12 @@ export function readContextPlugin(workspace: string, agentId: string, fileSha256
 
 /**
  * The agent's latest prompt pack (Score's signed `.amcprompt`), checked with this workspace's own keys: a self-check of
- * bytes, never evidence about the agent, and never a prompt the runtime loads (the card says so). Absent is absent.
+ * bytes, never evidence about the agent. Studio native tasks load a pack that verifies (P2-37); a deployed agent does not. Absent is absent.
  */
 export function promptPackStatus(workspace: string, agentId: string): { present: boolean; sha256: string | null; packId: string | null; verified: boolean | null;
   problems: number } {
-  const path = promptLatestPackPath(workspace, agentId);
-  let bytes: Buffer;
-  try {
-    bytes = readFileSync(path);
-  } catch (error) {
-    return (error as NodeJS.ErrnoException).code === "ENOENT" ? { present: false, sha256: null, packId: null, verified: null, problems: 0 }
-      : { present: true, sha256: null, packId: null, verified: false, problems: 1 };
-  }
-  let sidecar: Buffer | null;
-  try {
-    sidecar = readFileSync(`${path}.sha256`);
-  } catch (error) {
-    if ((error as NodeJS.ErrnoException).code !== "ENOENT") return { present: true, sha256: sha256Hex(bytes), packId: null, verified: false, problems: 1 };
-    sidecar = null;
-  }
-  const checked = verifyPackBytes(workspace, basename(path), bytes, sidecar);
-  return { present: true, sha256: sha256Hex(bytes), packId: checked.packId, verified: checked.ok, problems: checked.errors.length };
-}
-
-/**
- * verifyWorkspacePromptPack over exactly `bytes` and the `.sha256` sidecar read beside them (a private copy), so the
- * verdict and the recorded sha256 describe the same bytes.
- */
-function verifyPackBytes(workspace: string, name: string, bytes: Buffer, sidecar: Buffer | null): ReturnType<typeof verifyWorkspacePromptPack> {
-  const dir = mkdtempSync(join(tmpdir(), "amc-a4-pack-"));
-  try {
-    const file = join(dir, name);
-    writeFileSync(file, bytes, { mode: 0o600 });
-    if (sidecar !== null) writeFileSync(`${file}.sha256`, sidecar, { mode: 0o600 });
-    return verifyWorkspacePromptPack(workspace, file);
-  } finally {
-    rmSync(dir, { recursive: true, force: true });
-  }
+  const { present, sha256, packId, verified, problems } = readPromptPackSnapshot(workspace, agentId);
+  return { present, sha256, packId, verified, problems };
 }
 
 /** The `context.promptPackSha256` slot: the latest pack's sha256, null only when it is absent; any other read error is 409 RESOURCE_UNREADABLE. */
@@ -242,6 +216,30 @@ function turnEndOf(ledger: Ledger, sessionId: string): string {
   const row = (ledger.db.prepare("SELECT * FROM evidence_events WHERE session_id = ? AND event_type = 'turn/end' ORDER BY rowid").all(sessionId) as EvidenceEvent[]).at(-1);
   if (row === undefined || row.writer_sig === "unsigned" || !verifyEvidenceEventIntegrity({ ledger, eventId: row.id }).ok) return "unknown";
   return readTurnEndMeta(row.meta_json)?.reason ?? "unknown";
+}
+
+/** How many of the agent's newest native system-prompt rows Review reads for the plugin (P2-37). */
+const NATIVE_DELIVERY_SCAN = 256;
+
+/**
+ * Whether a native session of this agent ran with the plugin (P2-37): the newest signed `system/prompt` row of a session
+ * the agent opened (sessions.binary_path is its agent id; A4's own probe sessions excluded) whose payload holds the
+ * plugin's exact text, its chain verified now. The Studio native-task loader puts the verified plugin there; nothing
+ * else is read as delivery. AMC's check of the runtime's signed row, never a claim about what a model did with it.
+ */
+export function nativeDeliveryOf(ledger: Ledger, agentId: string, text: string): { status: "loaded"; sessionId: string; eventId: string; eventHash: string }
+  | { status: "not_found" } {
+  const rows = ledger.db.prepare(`SELECT e.* FROM evidence_events e JOIN sessions s ON s.session_id = e.session_id
+      WHERE s.binary_path = ? AND e.event_type = 'system/prompt' AND e.session_id NOT LIKE ? ORDER BY e.rowid DESC LIMIT ?`)
+    .all(agentId, `${A4_PROBE_SESSION_PREFIX}%`, NATIVE_DELIVERY_SCAN) as EvidenceEvent[];
+  for (const row of rows) {
+    const payload = readEventPayload(ledger.workspace, row);
+    if (payload.status !== "ok" || sha256Hex(payload.bytes) !== row.payload_sha256 || !payload.bytes.toString("utf8").includes(text)) continue;
+    if (row.writer_sig !== "unsigned" && verifyEvidenceEventIntegrity({ ledger, eventId: row.id }).ok) {
+      return { status: "loaded", sessionId: row.session_id, eventId: row.id, eventHash: row.event_hash };
+    }
+  }
+  return { status: "not_found" };
 }
 
 /**
@@ -372,8 +370,7 @@ export function contextItems(state: A4ReadinessState, query: Pick<A4ReadinessQue
   const deliveries = [
     item("model_delivery", "NOT_EVALUATED", { kind: "not_evaluated", mandatory: false, reasonCodes: ["STUB_PROVIDER", "NO_REAL_PROVIDER_RECEIPT"],
       nextAction: { label: "Delivery to a model is not evaluated: the probe runs on the stub provider (no network, no credential)" } }),
-    item("context.native_delivery", "NOT_EVALUATED", { kind: "not_evaluated", mandatory: false, reasonCodes: ["NO_NATIVE_LOADER", `KEY:${NATIVE_LOADER_KEY}`],
-      nextAction: { label: "Nothing loads an A4 context plugin into a Studio native task's session or a deployed agent; a native task started now carries none (P2-37)" } })
+    nativeDeliveryItem(spec, context?.sha256)
   ];
   if (context === undefined) {
     return [
@@ -388,7 +385,7 @@ export function contextItems(state: A4ReadinessState, query: Pick<A4ReadinessQue
   if (link === undefined && query.live.sessionStore === "jsonl") {
     return [
       item("prompts_attributed", "READY", { reasonCodes: [`CONTEXT_PLUGIN:${context.sha256.slice(0, 16)}`, `ORDER:${context.order}`, `SOURCE:${context.source}`,
-        "PROMPT_PACK_NOT_LOADED_BY_RUNTIME"] }),
+        "PROMPT_PACK_NATIVE_TASKS_ONLY"] }),
       item("context_reaches_runtime_frame", "NOT_EVALUATED", { kind: "source_unavailable", mandatory: false, reasonCodes: ["SESSION_STORE_JSONL", "PROBE_NOT_RECORDABLE"],
         nextAction: { label: "This workspace's session store is JSONL, so the probe cannot be recorded and the plugin's delivery to the runtime frame is not evaluated" } }),
       item("context_probe_unavailable", "WAITING", { kind: "source_unavailable", reasonCodes: ["SESSION_STORE_JSONL"],
@@ -423,9 +420,28 @@ export function contextItems(state: A4ReadinessState, query: Pick<A4ReadinessQue
             + `effective-policy receipt (it writes one only before a governed tool call); ${PROBE_LIMITATION}; delivery to a model: not evaluated on the stub provider` } });
   return [
     item("prompts_attributed", "READY", { reasonCodes: [`CONTEXT_PLUGIN:${context.sha256.slice(0, 16)}`, `ORDER:${context.order}`, `SOURCE:${context.source}`,
-      "PROMPT_PACK_NOT_LOADED_BY_RUNTIME"] }),
+      "PROMPT_PACK_NATIVE_TASKS_ONLY"] }),
     frame, ...deliveries, ...promptPackItem(spec)
   ];
+}
+
+/**
+ * `context.native_delivery` (P2-37): Review's read of the agent's native sessions for this build's plugin
+ * (nativeDeliveryOf). READY when a signed system-prompt row carries its exact text; otherwise not evaluated, saying a
+ * native task started after the plugin was built and signed loads it. Never about a deployed agent, which loads nothing.
+ */
+function nativeDeliveryItem(spec: Record<string, unknown>, pluginSha256: string | undefined): A4ReadinessItem {
+  const read = (spec.review as { nativeDelivery?: { status?: unknown; pluginSha256?: unknown; sessionId?: unknown; eventId?: unknown } } | undefined)?.nativeDelivery;
+  if (pluginSha256 !== undefined && read?.status === "loaded" && read.pluginSha256 === pluginSha256) {
+    return item("context.native_delivery", "READY", { mandatory: false, reasonCodes: ["CONTEXT_IN_NATIVE_SESSION_FRAME", `SESSION:${String(read.sessionId)}`,
+      `SYSTEM_PROMPT_ROW:${String(read.eventId)}`, "DEPLOYED_AGENT_NOT_EVALUATED"],
+      nextAction: { label: `A Studio native session of this agent ran with the plugin's exact text in its signed system prompt row ${String(read.eventId)} `
+        + "(AMC's check at Review). A deployed agent loads no plugin: not evaluated" } });
+  }
+  return item("context.native_delivery", "NOT_EVALUATED", { kind: "not_evaluated", mandatory: false,
+    reasonCodes: [pluginSha256 === undefined ? "CONTEXT_PLUGIN_NOT_BUILT" : read === undefined ? "NOT_REVIEWED" : "NO_NATIVE_SESSION_WITH_PLUGIN", `KEY:${NATIVE_LOADER_KEY}`],
+    nextAction: { label: "Start a Studio native task for this agent after Build (it loads the signed plugin into its system prompt), then review again; "
+      + "a deployed agent loads no plugin" } });
 }
 
 /** Review's re-check of the agent's prompt pack: integrity of bytes under this workspace's keys (no lane, no claim); informational. */
@@ -434,7 +450,7 @@ function promptPackItem(spec: Record<string, unknown>): A4ReadinessItem[] {
   if (pack === undefined) return [];
   const integrity = { section: "integrity" as const, mandatory: false, evidence: [], claim: null };
   return [pack.present !== true ? item("adapt.prompt_pack_signature", "NOT_EVALUATED", { ...integrity, kind: "not_evaluated", reasonCodes: ["NO_PROMPT_PACK"] })
-    : pack.verified === true ? item("adapt.prompt_pack_signature", "READY", { ...integrity, reasonCodes: ["SELF_CHECK", "UNANCHORED", "PROMPT_PACK_NOT_LOADED_BY_RUNTIME"] })
+    : pack.verified === true ? item("adapt.prompt_pack_signature", "READY", { ...integrity, reasonCodes: ["SELF_CHECK", "UNANCHORED", "PROMPT_PACK_NATIVE_TASKS_ONLY"] })
       : item("adapt.prompt_pack_signature", "BLOCKED", { ...integrity, kind: "evidence_untrusted", reasonCodes: ["PROMPT_PACK_UNVERIFIED"],
         nextAction: { label: "The agent's prompt pack does not verify under this workspace's keys: rebuild it (amc prompt pack build), then review again" } })];
 }
