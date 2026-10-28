@@ -167,6 +167,26 @@ export function registerEvidenceStoreCommands(program: Command): void {
     });
 
   stores
+    .command("migrate")
+    .description("Copy this SQLite workspace's session history to Postgres, check parity, then pin the Postgres session store (P2-09)")
+    .requiredOption("--to <backend>", "target session store (postgres)")
+    .option("--json", "Output as JSON")
+    .action(async (opts: { to: string; json?: boolean }) => {
+      if (opts.to !== "postgres") throw new Error("--to must be postgres");
+      const { migrateSqliteToPostgres } = await import("./persistence/postgres/postgresMigration.js");
+      const result = migrateSqliteToPostgres(process.cwd());
+      if (opts.json) {
+        console.log(JSON.stringify(result, null, 2));
+        return;
+      }
+      const rows = Object.entries(result.receipt.rowsCopied).map(([table, n]) => `${table} ${n}`).join(", ");
+      console.log(chalk.green(`Copied ${rows} to Postgres chain ${result.receipt.chainId}; parity and determinism checks passed.`));
+      console.log(chalk.gray(`Chain head (both stores): ${result.receipt.postgresChainHead}`));
+      console.log(chalk.gray(`Signed receipt: ${result.receiptPath}`));
+      console.log(chalk.gray("This workspace's session store is now postgres."));
+    });
+
+  stores
     .command("cutover")
     .description("Move this workspace's guard events to evidence.sqlite, only when parity is identical (P2-09)")
     .action(async () => {

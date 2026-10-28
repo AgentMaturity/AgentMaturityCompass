@@ -693,7 +693,8 @@ function verifyLedger(workspacePath: string, options: LedgerVerifyOptions, conti
   // evidence must never call it verified, so the JSONL rows are verified
   // through the backend-independent verifier and their failures land here.
   try {
-    const jsonlBackend = readSessionStoreMarker(workspacePath) === "jsonl";
+    const marker = readSessionStoreMarker(workspacePath);
+    const jsonlBackend = marker === "jsonl" || marker === "postgres"; // session rows live outside evidence_events
     if (pathExists(join(workspacePath, ".amc", "evidence.sqlite"))) {
       ledger = openLedger(workspacePath, { readonly: true });
     } else if (!jsonlBackend) {
