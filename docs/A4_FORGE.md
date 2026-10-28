@@ -36,6 +36,11 @@ project; each is a transition in the chain.
 | SoD-distinct | a second principal in the same auth plane whom the separation-of-duties rules accept as a different person; satisfies a quorum, and the decision stays `self_reported` | independent |
 | independently reviewed | the claim kind reachable only from an admitted external record whose issuer key is outside the workspace and on the operator's trust list (P2-24, P3-21; not available yet) | a second member's APPROVE; AMC checking its own signatures |
 
+**Three lifecycle axes.** An agent moves on three axes that never share a word: the A4 **stage** above (`aspire` to
+`activate`, then `retired`), the `lifecycle.ts` **deployment stage** (`development`, `testing`, `staging`, `production`,
+`deprecated`), and the P2-23 **governance state** (`proposed`, `approved`, `active`, `suspended`, `retired`). A4 moves
+the deployment stage only through its bridge and reads and calls P2-23; it never re-keys either.
+
 **SoD-distinct is not independent.** Two members of one workspace sign under one workspace signing authority. Their two
 approvals meet a two-person quorum; they are not two independent reviews.
 
@@ -744,6 +749,35 @@ The Studio cards on the Activate page:
 - The four-column value table and the hypotheses, with the observe form.
 
 The release, value and monitor views are read when you press Load, never on render.
+
+## Running agents: governance, envelopes, the kill switch and retention floors
+
+A4 consumes P2-23's governed lifecycle and P2-26's regulatory runtime (P2-34); it changes neither engine.
+
+- **Runtime changes.** A deployed project at Activate consumes the change records the runtime wrote since its release
+  last settled (a later `TUNE`, `REOPEN`, `RELEASE`, deployment or rollback row), once, as `amc-runtime`, before the next
+  write on the project. A change P2-23 recorded as passed (inside a P2-26 change envelope, or no mandatory control
+  invalidated) is a `TUNE` from the deployed release, at Assemble or Adapt as an owner's tune would derive it, without
+  reopening Adapt. A change P2-23 left open (a mandatory invalidated control, or a change outside the envelope, which
+  P2-23 suspends) is a `REOPEN` to Adapt followed by that `TUNE`. An overdue scheduled review is a `TUNE` only. For an
+  agent P2-23 does not govern, P2-26's envelope rows say the same: an applied envelope is covered, a required
+  reassessment is not. Both rows carry `automatic: true` and the runtime refs. A held project, or one already being
+  tuned, keeps the changes waiting.
+- **Kill switch.** An active kill switch that covers the agent (workspace, agent or action-class scope) is a freeze, so
+  the project is held automatically on the freeze path, naming the kill and its incident. `RESUME` is refused until the
+  kill is released and then needs an owner. Break-glass never lifts an A4 hold: A4 does not read break-glass records.
+- **Retention floors.** Adapt's readiness item `memory_policy_retention_floor` compares the memory policy's retention
+  (`memoryRetentionDays`) with P2-26's largest `logs` minimum for the active plan's regimes. Below it the item is
+  BLOCKED; a plan that cannot be read leaves it NOT_EVALUATED. The rules are experimental until the D-08 experts review
+  them.
+- **Version manifest.** The package embeds P2-23's `AgentVersionManifest` under `versionManifest` (the approval-bound
+  manifest, else the one observed at the agent's last session open) with the `manifestDigest` P2-23's signed row
+  carries; a digest that does not match refuses the release. An agent P2-23 does not govern is `not_governed`.
+- **Activation and retirement.** The deployment approval's effect moves an `approved` agent to `active` in P2-23 before
+  the production lease, its note naming the gate and its `binding_digest`: one human decision, two records. Any state
+  but `approved` or `active` refuses the effect. `RETIRE` of a deployed project retires the agent through P2-23 first
+  (leases revoked, open `outcome_unknown` receipts refused without the owner's acceptance note), then records `RETIRE`
+  naming that row.
 
 ## Deployment boundary
 

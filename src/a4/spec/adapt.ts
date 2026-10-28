@@ -515,6 +515,26 @@ function memoryItem(state: A4ReadinessState, spec: Record<string, unknown>, answ
   return item("memory_policy_present", "READY", { section: "implementation", reasonCodes: [...facts, checked === null ? "REVIEW_RECHECK_PENDING" : "MEMORY_POLICY_PARSES"] });
 }
 
+/**
+ * P2-26's regime retention floors as an Adapt blocker (P2-34): the memory policy's retention (`expiresAfterDays`, from the
+ * answers Build writes) below the floor is BLOCKED; a floor that cannot be read is NOT_EVALUATED. The rules are
+ * experimental until the D-08 experts review them, and the item says so.
+ */
+function retentionFloorItem(query: A4ReadinessQuery, answers: readonly A4Answer[]): A4ReadinessItem {
+  const id = "memory_policy_retention_floor";
+  const read = query.live.retentionFloor;
+  if (read === undefined || read === null) {
+    return item(id, "NOT_EVALUATED", { section: "governance", kind: "source_unavailable", reasonCodes: ["REGIME_FLOOR_UNREADABLE"],
+      nextAction: { label: "The active compiled plan could not be read, so the regime retention floors are unknown: repair or re-activate the plan" } });
+  }
+  const days = memoryPolicyFields(answerValues(answers)).fields.expiresAfterDays;
+  if (read.floor === null) return item(id, "READY", { section: "governance", reasonCodes: ["NO_REGIME_FLOOR", `RETENTION_DAYS:${days}`] });
+  const codes = [`RETENTION_DAYS:${days}`, `FLOOR_DAYS:${read.floor.days}`, ...read.floor.regimeIds.map((regimeId) => `REGIME:${regimeId}`), "EXPERIMENTAL", "KEY:D-08"];
+  if (days >= read.floor.days) return item(id, "READY", { section: "governance", reasonCodes: codes });
+  return item(id, "BLOCKED", { section: "governance", kind: "evidence_contradictory", reasonCodes: ["MEMORY_RETENTION_BELOW_FLOOR", ...codes],
+    nextAction: { label: `Answer memoryRetentionDays with at least ${read.floor.days} days: ${read.floor.regimeIds.join(", ")} keep logs that long (experimental, pending D-08 review)` } });
+}
+
 /** Informational items: clocks to classify, the completion rule's required reviews by kind, the sources' status, data handling. */
 function contextItems(state: A4ReadinessState, query: A4ReadinessQuery, answers: readonly A4Answer[], understanding: AdaptUnderstanding | null): A4ReadinessItem[] {
   const clocks = understanding?.facts.clocks ?? [];
@@ -577,6 +597,7 @@ export function adaptItems(state: A4ReadinessState, query: A4ReadinessQuery): A4
     ...signingItems(state, query, spec, answers, revisionNo, regulated),
     lockoutItem(state, query, regulated),
     memoryItem(state, spec, answers),
+    retentionFloorItem(query, answers),
     ...contextItems(state, query, answers, understanding)
   ];
 }
