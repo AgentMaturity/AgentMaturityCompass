@@ -326,8 +326,9 @@ describe("built-in probes", () => {
   test("secret exposure probe passes with clean audit", () => {
     registerBuiltInProbes();
     const secretProbe = listRegisteredProbes().find((p) => p.probeId === "mc-secret-exposure")!;
-    const ctx = makeContext({ auditCounts: {} });
-    const result = secretProbe.evaluate(ctx);
+    // Clean = audit telemetry present with no exposure; an empty window is not evaluated (WP37).
+    expect(secretProbe.evaluate(makeContext({ auditCounts: {} })).status).toBe("SKIP");
+    const result = secretProbe.evaluate(makeContext({ auditCounts: { TOOL_CALLED: 3 } }));
     expect(result.status).toBe("PASS");
   });
 });

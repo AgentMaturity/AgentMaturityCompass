@@ -12,8 +12,7 @@ import { verifyBudgetsConfigSignature } from "../budgets/budgets.js";
 import { canonPath } from "../canon/canonLoader.js";
 import { cgxLatestGraphPath, cgxLatestPackPath } from "../cgx/cgxStore.js";
 import { diagnosticBankPath } from "../diagnostic/bank/bankLoader.js";
-import { loadRunReport } from "../diagnostic/runner.js";
-import { latestRunId } from "../diagnostic/runReportResolution.js";
+import { listVerifiedRuns } from "../diagnostic/runReportResolution.js";
 import { resolveAgentId } from "../fleet/paths.js";
 import { verifyLedgerIntegrity, openLedger } from "../ledger/ledger.js";
 import { mechanicTargetsPath } from "../mechanic/targetsStore.js";
@@ -699,9 +698,9 @@ export function collectAuditBinderLocalData(params: AuditBinderCollectionInput, 
   let runCount = 0;
 
   if (scope.type === "AGENT") {
-    const runId = latestRunId(params.workspace, scope.id);
-    if (runId) {
-      const run = loadRunReport(params.workspace, runId, scope.id);
+    // Only a sealed run feeds a signed binder (WP37): an edited newest run falls back to the last sealed one.
+    const run = listVerifiedRuns(params.workspace, scope.id)[0];
+    if (run) {
       assertNotExample(run, "included in an audit binder");
       maturityOverall = Number((run.layerScores.reduce((sum, row) => sum + row.avgFinalLevel, 0) / Math.max(1, run.layerScores.length)).toFixed(6));
       maturityByDim = byDimensionFromRun(run);
@@ -716,7 +715,7 @@ export function collectAuditBinderLocalData(params: AuditBinderCollectionInput, 
       maturityRefs = dedupeSorted([sha256Hex(Buffer.from(run.runId, "utf8"))]);
       maturityNotes = dedupeSorted(run.evidenceToCollectNext.slice(0, 6));
     } else {
-      maturityNotes = ["No agent diagnostic runs were found."];
+      maturityNotes = ["No sealed agent diagnostic runs were found."];
     }
   } else {
     const scorecard = loadLatestOrgScorecard(params.workspace);
@@ -1051,7 +1050,7 @@ export function collectAuditBinderLocalData(params: AuditBinderCollectionInput, 
       recurrence: {
         diagnosticCadence: {
           configuredHours: tuning?.diagnosticCadenceHours ?? null,
-          lastRunTs: scope.type === "AGENT" ? (latestRunId(params.workspace, scope.id) ? loadRunReport(params.workspace, latestRunId(params.workspace, scope.id)!, scope.id).ts : null) : (loadLatestOrgScorecard(params.workspace)?.computedAt ?? null),
+          lastRunTs: scope.type === "AGENT" ? (listVerifiedRuns(params.workspace, scope.id)[0]?.ts ?? null) : (loadLatestOrgScorecard(params.workspace)?.computedAt ?? null),
           nextRunTs: tuning?.diagnosticCadenceHours && maturityOverall !== null
             ? nowTs + tuning.diagnosticCadenceHours * 60 * 60 * 1000
             : null,

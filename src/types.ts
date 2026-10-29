@@ -928,6 +928,13 @@ export interface QuestionScoreAgentTrialStatisticalLensRef {
   rowHash: string;
 }
 
+/**
+ * Whether a result rests on a measurement (WP37), lifted from a4 readiness's NOT_EVALUATED / source_unavailable
+ * vocabulary: measured; not_evaluated (the input was empty, so there is nothing to score); source_unavailable (the
+ * input could not be read). Anything but "measured" must never be presented as a pass, 100% or healthy.
+ */
+export type EvidenceOutcome = "measured" | "not_evaluated" | "source_unavailable";
+
 export type QuestionScoreCodeQuestLanguage =
   | "python"
   | "java"

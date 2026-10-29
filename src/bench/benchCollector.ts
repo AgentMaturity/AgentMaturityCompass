@@ -1,11 +1,11 @@
 import { countBenchAuditRows, countReadonlyBenchAuditEvents, latestReadonlyBenchAssuranceByPack } from "./benchReadOnlyInputs.js";
 import { readdirSync } from "node:fs";
 import { join } from "node:path";
-import type { LayerName, OutcomeReport } from "../types.js";
+import type { DiagnosticReport, LayerName, OutcomeReport } from "../types.js";
 import { parseWindowToMs } from "../utils/time.js";
 import { pathExists, readUtf8 } from "../utils/fs.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
-import { loadRunReport } from "../diagnostic/runner.js";
+import { listVerifiedRuns } from "../diagnostic/runReportResolution.js";
 import { computeFailureRiskIndices } from "../assurance/indices.js";
 import { latestAssuranceByPack } from "../assurance/assuranceRunner.js";
 import { verifyPluginWorkspace } from "../plugins/pluginApi.js";
@@ -36,22 +36,9 @@ function parseOutcomeReport(file: string): OutcomeReport | null {
   }
 }
 
-function listAgentRuns(workspace: string, agentId: string): Array<ReturnType<typeof loadRunReport>> {
-  const dir = getAgentPaths(workspace, agentId).runsDir;
-  if (!pathExists(dir)) {
-    return [];
-  }
-  return readdirSync(dir)
-    .filter((name) => name.endsWith(".json"))
-    .map((name) => {
-      try {
-        return JSON.parse(readUtf8(join(dir, name))) as ReturnType<typeof loadRunReport>;
-      } catch {
-        return null;
-      }
-    })
-    .filter((row): row is ReturnType<typeof loadRunReport> => row !== null)
-    .sort((a, b) => a.ts - b.ts);
+/** Sealed runs only, oldest first (WP37): an edited run must not enter a signed bench. */
+function listAgentRuns(workspace: string, agentId: string): DiagnosticReport[] {
+  return listVerifiedRuns(workspace, agentId).reverse();
 }
 
 function listAgentOutcomeReports(workspace: string, agentId: string): OutcomeReport[] {
@@ -79,7 +66,7 @@ function latestInWindow<T extends { ts: number }>(rows: T[], startTs: number, en
   return latest;
 }
 
-function layerMapFromRun(run: ReturnType<typeof loadRunReport>): Record<"strategicOps" | "leadership" | "culture" | "resilience" | "skills", number> {
+function layerMapFromRun(run: DiagnosticReport): Record<"strategicOps" | "leadership" | "culture" | "resilience" | "skills", number> {
   const base = {
     strategicOps: 0,
     leadership: 0,
@@ -207,13 +194,17 @@ function resolveWindow(windowDays: number): { startTs: number; endTs: number; da
 function latestSeriesValue(
   series:
     | Array<{ ts: number; value: number }>
-    | undefined
+    | undefined,
+  missing = 0
 ): number {
   if (!series || series.length === 0) {
-    return 0;
+    return missing;
   }
-  return Number((series[series.length - 1]?.value ?? 0).toFixed(6));
+  return Number((series[series.length - 1]?.value ?? missing).toFixed(6));
 }
+
+/** A risk index with no series is unmeasured: score it as worst-case risk, never as risk 0 (= a perfect 100) (WP37). */
+const UNMEASURED_RISK = 100;
 
 function determineIncludedEventKinds(workspace: string, startTs: number, endTs: number): string[] {
   const allow = new Set([
@@ -383,11 +374,11 @@ function collectBenchDataWithInputs(params: BenchCollectionInput, window: Return
   }
 
   const risk = {
-    ecosystemFocusRisk: latestSeriesValue(signals.points.indices.EcosystemFocusRisk),
-    clarityPathRisk: latestSeriesValue(signals.points.indices.ClarityPathRisk),
-    economicSignificanceRisk: latestSeriesValue(signals.points.indices.EconomicSignificanceRisk),
-    riskAssuranceRisk: latestSeriesValue(signals.points.indices.RiskAssuranceRisk),
-    digitalDualityRisk: latestSeriesValue(signals.points.indices.DigitalDualityRisk)
+    ecosystemFocusRisk: latestSeriesValue(signals.points.indices.EcosystemFocusRisk, UNMEASURED_RISK),
+    clarityPathRisk: latestSeriesValue(signals.points.indices.ClarityPathRisk, UNMEASURED_RISK),
+    economicSignificanceRisk: latestSeriesValue(signals.points.indices.EconomicSignificanceRisk, UNMEASURED_RISK),
+    riskAssuranceRisk: latestSeriesValue(signals.points.indices.RiskAssuranceRisk, UNMEASURED_RISK),
+    digitalDualityRisk: latestSeriesValue(signals.points.indices.DigitalDualityRisk, UNMEASURED_RISK)
   };
 
   let values = {

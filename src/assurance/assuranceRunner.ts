@@ -1,6 +1,7 @@
 import { captureRunHashAuthority, runHashVerificationKeys, type RunHashPublicationOptions } from "../ledger/runHashSignature.js";
 import { publishAssuranceReport } from "./runReportPublication.js";
 import { verifyHexDigestAny } from "../crypto/keys.js";
+import { sealedRunReportVerifies } from "../diagnostic/reportSeal.js";
 import { validateExecutedReportRow, isExecutedReportPack } from "./executed/reportValidation.js";
 import { loadAdmittedCatalog } from "../catalog/admission/gate.js";
 import { loadExecutedRunScope, ExecutedScopeIntegrityError } from "./executed/scope.js";
@@ -458,12 +459,17 @@ export async function verifyAssuranceRun(params: {
   return { ok: errors.length === 0, errors };
 }
 
-export function latestAssuranceByPack(params: {
+/**
+ * The newest in-window pack results from SEALED assurance reports only (WP37). Every caller (bench, drift freeze rules,
+ * transform, org, indices, BOM, snapshot, dashboard, bench export) inherits the guard; `unverifiedReports` names the
+ * in-window files that were refused so a caller can say INSUFFICIENT_EVIDENCE instead of treating them as absent.
+ */
+export function scanVerifiedAssuranceByPack(params: {
   workspace: string;
   agentId?: string;
   windowStartTs: number;
   windowEndTs: number;
-}): Map<string, AssurancePackResult> {
+}): { byPack: Map<string, AssurancePackResult>; unverifiedReports: string[] } {
   const agentId = resolveAgentId(params.workspace, params.agentId);
   const reportsDir = assuranceReportsDir(params.workspace, agentId);
   const files = readdirSync(reportsDir)
@@ -471,12 +477,23 @@ export function latestAssuranceByPack(params: {
     .map((file) => join(reportsDir, file))
     .sort((a, b) => a.localeCompare(b));
   const map = new Map<string, { ts: number; pack: AssurancePackResult }>();
+  const unverifiedReports: string[] = [];
   for (const file of files) {
-    const report = JSON.parse(readUtf8(file)) as AssuranceReport;
+    let report: AssuranceReport;
+    try {
+      report = JSON.parse(readUtf8(file)) as AssuranceReport;
+    } catch {
+      unverifiedReports.push(file);
+      continue;
+    }
     if (report.agentId !== agentId) {
       continue;
     }
     if (report.ts < params.windowStartTs || report.ts > params.windowEndTs) {
+      continue;
+    }
+    if (!sealedRunReportVerifies(params.workspace, report as unknown as Record<string, unknown>)) {
+      unverifiedReports.push(file);
       continue;
     }
     for (const pack of report.packResults) {
@@ -486,9 +503,19 @@ export function latestAssuranceByPack(params: {
       }
     }
   }
-  return new Map<string, AssurancePackResult>(
-    [...map.entries()].map(([packId, row]) => [packId, row.pack])
-  );
+  return {
+    byPack: new Map<string, AssurancePackResult>([...map.entries()].map(([packId, row]) => [packId, row.pack])),
+    unverifiedReports
+  };
+}
+
+export function latestAssuranceByPack(params: {
+  workspace: string;
+  agentId?: string;
+  windowStartTs: number;
+  windowEndTs: number;
+}): Map<string, AssurancePackResult> {
+  return scanVerifiedAssuranceByPack(params).byPack;
 }
 
 export function generateAssurancePatchKit(params: {

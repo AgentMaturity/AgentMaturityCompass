@@ -12,6 +12,7 @@ import { basename, join } from "node:path";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import { pathExists, readUtf8 } from "../utils/fs.js";
 import { resolveRunAlias } from "./runAliases.js";
+import { sealedRunReportVerifies } from "./reportSeal.js";
 import type { DiagnosticReport } from "../types.js";
 
 export function loadRunReport(workspace: string, runId: string, agentId?: string): DiagnosticReport {
@@ -152,6 +153,34 @@ export function latestRunSummary(workspace: string, agentId: string): { runId: s
     const parsed = JSON.parse(readUtf8(latest)) as { runId?: string; integrityIndex?: number; trustLabel?: string };
     if (!parsed.runId) return null;
     return { runId: parsed.runId, integrityIndex: Number(parsed.integrityIndex ?? 0), trustLabel: String(parsed.trustLabel ?? "UNKNOWN") };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * The scoring/signing run reader (WP37): the agent's runs whose seal verifies (`sealedRunReportVerifies`), newest first.
+ * Unparseable, unsealed and tampered files are never returned — anything that gates, signs or scores reads runs here,
+ * not through `agentRunFiles`/`loadRunReport`, which select for display.
+ */
+export function listVerifiedRuns(workspace: string, agentId: string): DiagnosticReport[] {
+  return agentRunFiles(workspace, agentId)
+    .flatMap((file) => {
+      try {
+        const parsed = JSON.parse(readUtf8(file)) as Record<string, unknown>;
+        return sealedRunReportVerifies(workspace, parsed) ? [parsed as unknown as DiagnosticReport] : [];
+      } catch {
+        return [];
+      }
+    })
+    .sort((a, b) => b.ts - a.ts || b.runId.localeCompare(a.runId));
+}
+
+/** `loadRunReport` for scoring and signing: the run, or null when it is missing, unreadable or its seal fails. */
+export function loadVerifiedRunReport(workspace: string, runId: string, agentId?: string): DiagnosticReport | null {
+  try {
+    const report = loadRunReport(workspace, runId, agentId);
+    return sealedRunReportVerifies(workspace, report as unknown as Record<string, unknown>) ? report : null;
   } catch {
     return null;
   }

@@ -204,11 +204,11 @@ describe("generateReport", () => {
     expect(Array.isArray(report.criticalFindings)).toBe(true);
   });
 
-  it("recommendedRemediations should be a non-empty array", () => {
+  it("recommendedRemediations is empty over zero attacks (WP37: no GOOD verdict on nothing)", () => {
     const rt = new ContinuousRedTeam(makeMinimalConfig());
     const report = rt.generateReport();
-    expect(Array.isArray(report.recommendedRemediations)).toBe(true);
-    expect(report.recommendedRemediations.length).toBeGreaterThan(0);
+    expect(report.evidenceStatus).toBe("INSUFFICIENT_EVIDENCE");
+    expect(report.recommendedRemediations).toEqual([]);
   });
 
   it("should generate report for a specific targetId", () => {

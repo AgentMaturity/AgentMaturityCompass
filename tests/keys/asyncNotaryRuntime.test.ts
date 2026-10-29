@@ -25,6 +25,8 @@ import { sha256Hex } from "../../src/utils/hash.js";
 import { AWS_ARN, awsFake, fakeKey } from "./providerFakes.js";
 import { awsKmsProvider, type KmsCall } from "../../src/keys/providers/awsKms.js";
 import { spawnOwnedNode } from "../helpers/ownedNodeGroup.js";
+import { writeSealedReport } from "../helpers/sealedRun.js";
+import { getAgentPaths } from "../../src/fleet/paths.js";
 
 const boundary = vi.hoisted(() => ({ call: null as KmsCall | null, syncCalls: 0 }));
 vi.mock("../../src/keys/providerBridge.js", async original => ({ ...await original<typeof import("../../src/keys/providerBridge.js")>(),
@@ -67,6 +69,9 @@ async function api(path: string, body: unknown, root: string, exported = false) 
   let status = 0, text = ""; const res = { writeHead(code: number) { status = code; return this; }, end(value: string) { text = value; } } as unknown as ServerResponse;
   expect(await (exported ? handleExportRoute : handleCryptoRoute)(path, "POST", req, res, root)).toBe(true); return { status, body: JSON.parse(text) };
 }
+
+/** Since WP37 a trust certificate is signed only from a sealed run; seed one sealed with the workspace's own key. */
+const seedSealedRun = (root: string) => { writeSealedReport(root, getAgentPaths(root, "default").runsDir, "seed-run", { runId: "seed-run", ts: 1, integrityIndex: 0.5 }); return root; };
 
 test("owned sync bridge denial is effective before a real SDK could load; async production signer never invokes it", async () => {
   const f = await prepared(); expect(() => loadNotarySigner({ notaryDir: f.root, backend: f.config.notary.backend })).toThrow("owned runtime test forbids");
@@ -117,7 +122,7 @@ test.each([1, 2])("actual production notary stays responsive during awaited prov
 test("the actual server, asynchronous policy client, certificate producer and verifier form one provider-backed runtime flow", async () => {
   const f = await prepared(), server = await startNotaryServer({ notaryDir: f.root }); closers.push(server.close);
   vi.stubEnv("AMC_VAULT_PASSPHRASE", PASS); vi.stubEnv("AMC_HOME", fresh()); vi.stubEnv("AMC_NO_SIGN", "0");
-  const root = fresh(); workspaces.push(root); initWorkspace({ workspacePath: root, trustBoundaryMode: "isolated" });
+  const root = fresh(); workspaces.push(root); initWorkspace({ workspacePath: root, trustBoundaryMode: "isolated" }); seedSealedRun(root);
   const pin = join(root, "notary.pub"); writeFileSync(pin, f.description.publicKeyPem);
   await enableNotaryTrust({ workspace: root, baseUrl: "http://127.0.0.1:1", unixSocketPath: f.config.notary.unixSocketPath, pinPubkeyPath: pin, requiredAttestationLevel: "SOFTWARE" });
   const made = await generateTrustCertificateAsync({ workspace: root, agentId: "default", outputPath: "actual.json" });

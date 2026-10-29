@@ -34,6 +34,8 @@ import { encodeSignedRevocationList, nextRevocationList, readAnchoredRevocationL
 import { writeContained } from "../../src/utils/containedFs.js";
 import { spawnOwnedNode } from "../helpers/ownedNodeGroup.js";
 import { writeFileAtomic } from "../../src/utils/fs.js";
+import { writeSealedReport } from "../helpers/sealedRun.js";
+import { getAgentPaths } from "../../src/fleet/paths.js";
 
 const roots: string[] = [], closers: Array<() => Promise<void>> = [];
 const ownedDns = vi.hoisted(() => ({ resolve: null as null | (() => Promise<Array<{ address: string; family: number }>>), transportAttempts: 0 }));
@@ -66,7 +68,9 @@ afterEach(async () => {
 });
 function fresh() { const root = mkdtempSync(join(tmpdir(), "amc-async-artifact-")); roots.push(root); return root; }
 function workspace() { vi.stubEnv("AMC_VAULT_PASSPHRASE", PASS); vi.stubEnv("AMC_HOME", fresh()); vi.stubEnv("AMC_NO_SIGN", "0");
-  const root = fresh(); initWorkspace({ workspacePath: root, trustBoundaryMode: "isolated" }); return root; }
+  const root = fresh(); initWorkspace({ workspacePath: root, trustBoundaryMode: "isolated" }); return seedSealedRun(root); }
+/** Since WP37 a trust certificate is signed only from a sealed run; seed one sealed with the workspace's own key. */
+const seedSealedRun = (root: string) => { writeSealedReport(root, getAgentPaths(root, "default").runsDir, "seed-run", { runId: "seed-run", ts: 1, integrityIndex: 0.5 }); return root; };
 /** The real owner-held vault key and exact existing trust sidecar wire format; no private production helper export. */
 function saveOwnedSignedTrustConfig(root: string, candidate: TrustConfig): void {
   const bytes = Buffer.from(YAML.stringify(trustConfigSchema.parse(candidate)), "utf8");

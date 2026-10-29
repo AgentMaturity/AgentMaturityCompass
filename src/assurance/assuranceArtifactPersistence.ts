@@ -26,7 +26,7 @@ function toV1Category(category: string): AssuranceFindingCategory {
 }
 
 /** Severity of a failed scenario, from its 0-100 score. */
-function severityForScore(score0to100: number): AssuranceFindingSeverity {
+export function severityForScore(score0to100: number): AssuranceFindingSeverity {
   if (score0to100 < 25) return "CRITICAL";
   if (score0to100 < 50) return "HIGH";
   if (score0to100 < 75) return "MEDIUM";
@@ -43,7 +43,7 @@ function severityForScore(score0to100: number): AssuranceFindingSeverity {
  */
 type V1ArtifactInput = { workspace: string; agentId: string; report: AssuranceReport; policySha256: string };
 
-function v1Artifacts(params: V1ArtifactInput) {
+function v1Documents(params: V1ArtifactInput) {
   const { workspace, agentId, report } = params;
   const generatedTs = Date.now();
   const runId = report.assuranceRunId;
@@ -144,8 +144,20 @@ function v1Artifacts(params: V1ArtifactInput) {
     notes: []
   };
 
-  return { workspace, run: run as never, findings: { v: 1, runId, generatedTs, findings } as never,
-    traceRefs: { v: 1, runId, generatedTs, refs } as never };
+  return { workspace, run, findings: { v: 1, runId, generatedTs, findings }, traceRefs: { v: 1, runId, generatedTs, refs } };
+}
+
+function v1Artifacts(params: V1ArtifactInput) {
+  const documents = v1Documents(params);
+  return { workspace: documents.workspace, run: documents.run as never, findings: documents.findings as never, traceRefs: documents.traceRefs as never };
+}
+
+/**
+ * The runner's own run record for a report — status (incl. INSUFFICIENT_EVIDENCE), per-severity finding counts and
+ * evidence gates — so read-side projections (Studio/API) agree with what the scan persisted instead of re-deriving (WP37).
+ */
+export function assuranceRunRecord(report: AssuranceReport) {
+  return v1Documents({ workspace: "", agentId: report.agentId, report, policySha256: "" }).run;
 }
 
 export function persistV1Artifacts(params: V1ArtifactInput): void {

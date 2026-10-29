@@ -1,13 +1,13 @@
 import { createHash, randomUUID } from "node:crypto";
 import Database from "better-sqlite3";
-import { readdirSync } from "node:fs";
 import { extname, join, resolve } from "node:path";
 import {
   ensureSigningKeys,
 } from "../crypto/keys.js";
-import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
+import { resolveAgentId } from "../fleet/paths.js";
+import { listVerifiedRuns } from "../diagnostic/runReportResolution.js";
 import type { DiagnosticReport } from "../types.js";
-import { pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
+import { pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { canonicalSigningKey, SIGNING_ALGORITHMS, type SigningAlgorithm } from "../keys/algorithmPolicy.js";
@@ -40,6 +40,8 @@ export interface TrustCertificatePayload {
   integrityIndex: number;
   scoreSourceRunId: string | null;
   scoreSourceRunTs: number | null;
+  /** The sealed reportJsonSha256 of the score source run (WP37); absent on certificates issued before it. */
+  scoreSourceRunSha256?: string | null;
   evidenceHashChain: TrustCertificateEvidenceHashChain;
   signingKey: {
     kind: "auditor" | "preview";
@@ -89,6 +91,7 @@ export interface TrustCertificateVerificationResult {
 interface RunSnapshot {
   runId: string | null;
   runTs: number | null;
+  runSha256: string | null;
   integrityIndex: number;
   score0to100: number;
 }
@@ -120,50 +123,17 @@ function deriveIntegrityIndex(report: Partial<DiagnosticReport>): number {
   return 0;
 }
 
+/** The newest run whose seal verifies (WP37): an edited run file must not become a signed score. */
 function loadLatestRunSnapshot(workspace: string, agentId: string): RunSnapshot {
-  const paths = getAgentPaths(workspace, agentId);
-  if (!pathExists(paths.runsDir)) {
-    return {
-      runId: null,
-      runTs: null,
-      integrityIndex: 0,
-      score0to100: 0
-    };
-  }
-
-  const entries = readdirSync(paths.runsDir, { withFileTypes: true })
-    .filter((entry) => entry.isFile() && entry.name.endsWith(".json"));
-
-  let best: { report: Partial<DiagnosticReport>; runId: string; runTs: number } | null = null;
-  for (const entry of entries) {
-    const file = join(paths.runsDir, entry.name);
-    try {
-      const parsed = JSON.parse(readUtf8(file)) as Partial<DiagnosticReport>;
-      const runId = typeof parsed.runId === "string" && parsed.runId.length > 0
-        ? parsed.runId
-        : entry.name.slice(0, -5);
-      const runTs = typeof parsed.ts === "number" && Number.isFinite(parsed.ts) ? parsed.ts : 0;
-      if (!best || runTs > best.runTs || (runTs === best.runTs && runId > best.runId)) {
-        best = { report: parsed, runId, runTs };
-      }
-    } catch {
-      // Ignore unreadable run files and continue.
-    }
-  }
-
+  const best = listVerifiedRuns(workspace, agentId)[0];
   if (!best) {
-    return {
-      runId: null,
-      runTs: null,
-      integrityIndex: 0,
-      score0to100: 0
-    };
+    return { runId: null, runTs: null, runSha256: null, integrityIndex: 0, score0to100: 0 };
   }
-
-  const integrityIndex = deriveIntegrityIndex(best.report);
+  const integrityIndex = deriveIntegrityIndex(best);
   return {
     runId: best.runId,
-    runTs: best.runTs,
+    runTs: best.ts,
+    runSha256: best.reportJsonSha256,
     integrityIndex,
     score0to100: round2(integrityIndex * 100)
   };
@@ -328,6 +298,9 @@ function prepareTrustCertificate(input: GenerateTrustCertificateInput) {
   const signatureStatus: TrustCertificateSignatureStatus = input.preview ? "UNSIGNED_PREVIEW" : "SIGNED";
 
   const runSnapshot = loadLatestRunSnapshot(workspace, agentId);
+  if (!input.preview && runSnapshot.runId === null) {
+    throw new Error(`No sealed diagnostic run verifies for agent ${agentId}; refusing to sign a trust certificate (use --preview for an unsigned preview).`);
+  }
   const evidenceHashChain = readEvidenceHashChain(workspace);
 
   const policySigner = input.preview ? null : (() => {
@@ -351,6 +324,7 @@ function prepareTrustCertificate(input: GenerateTrustCertificateInput) {
     integrityIndex: runSnapshot.integrityIndex,
     scoreSourceRunId: runSnapshot.runId,
     scoreSourceRunTs: runSnapshot.runTs,
+    scoreSourceRunSha256: runSnapshot.runSha256,
     evidenceHashChain,
     signingKey,
     validity: {

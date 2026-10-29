@@ -19,6 +19,7 @@ import { passportCompareCli, passportShareCli } from "../src/passport/passportCl
 import { defaultPassportPolicy } from "../src/passport/passportPolicySchema.js";
 import { savePassportPolicy } from "../src/passport/passportStore.js";
 import { operatorTrustHome, workspaceKeyPem } from "./helpers/trustContext.js";
+import { writeSealedReport } from "./helpers/sealedRun.js";
 
 const roots: string[] = [];
 const previousVaultPassphrase = process.env.AMC_VAULT_PASSPHRASE;
@@ -64,8 +65,8 @@ function writeDiagnosticRun(params: {
     }))
   };
   const dir = join(params.workspace, ".amc", "agents", params.agentId, "runs");
-  mkdirSync(dir, { recursive: true });
-  writeFileSync(join(dir, `${params.runId}.json`), JSON.stringify(run, null, 2));
+  // Sealed: since WP37 a passport embeds only runs whose seal verifies.
+  writeSealedReport(params.workspace, dir, params.runId, run);
 }
 
 function createAgentPassport(workspacePath: string, agentId: string, outName = "latest.amcpass") {

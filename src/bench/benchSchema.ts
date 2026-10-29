@@ -195,7 +195,8 @@ export const benchComparisonSchema = z.object({
       high: z.number().int().min(0)
     })
   }),
-  percentiles: z.record(z.string().min(1), z.number().min(0).max(100)),
+  /** null per metric when there is no imported population to rank against (WP37). */
+  percentiles: z.record(z.string().min(1), z.number().min(0).max(100).nullable()),
   composites: z.object({
     ecosystemAlignmentScore: z.number().min(0).max(100),
     riskAssuranceScore: z.number().min(0).max(100),

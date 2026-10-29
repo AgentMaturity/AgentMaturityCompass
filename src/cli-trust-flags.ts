@@ -112,9 +112,15 @@ export function ledgerExitCode(result: { ok: boolean; trustRoot: { anchored: boo
   return 2;
 }
 
-/** verify all and evidence verify, after a PASS: exit 2 when the ledger was only allowed unanchored. */
-export function verifyAllExit(out: { checks: ReadonlyArray<{ id: string; status: string }> }, trust: TrustContext): void {
+/** verify all and evidence verify, after no FAIL: exit 2 when the ledger was only allowed unanchored, 1 when INCOMPLETE. */
+export function verifyAllExit(out: { status?: string; skippedCritical?: readonly string[]; checks: ReadonlyArray<{ id: string; status: string }> },
+  trust: TrustContext): void {
   const anchored = out.checks.some((check) => check.id === "ledger-trust-root" && check.status === "PASS");
   const code = ledgerExitCode({ ok: true, trustRoot: { anchored } }, trust);
   if (code !== 0) process.exit(code);
+  // A skipped critical check was never performed: withhold PASS rather than exit 0 on it (WP37).
+  if (out.status === "INCOMPLETE") {
+    console.error(`INCOMPLETE: critical checks not performed: ${(out.skippedCritical ?? []).join(", ")}`);
+    process.exit(1);
+  }
 }

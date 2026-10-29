@@ -1,6 +1,7 @@
 import { readdirSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
 import { listAgents, verifyAgentConfigSignature, verifyFleetConfigSignature } from "../fleet/registry.js";
+import { listVerifiedRuns } from "../diagnostic/runReportResolution.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import { parseWindowToMs } from "../utils/time.js";
 import type { DiagnosticReport, TrustTier } from "../types.js";
@@ -56,24 +57,10 @@ function clamp(n: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, n));
 }
 
+/** Sealed runs only (WP37): an edited run must not move an org scorecard. */
 function latestRunInWindow(workspace: string, agentId: string, windowStartTs: number, windowEndTs: number): DiagnosticReport | null {
-  const runsDir = getAgentPaths(workspace, agentId).runsDir;
-  if (!pathExists(runsDir)) {
-    return null;
-  }
-  const rows = readdirSync(runsDir)
-    .filter((file) => file.endsWith(".json"))
-    .map((file) => {
-      try {
-        return JSON.parse(readUtf8(join(runsDir, file))) as DiagnosticReport;
-      } catch {
-        return null;
-      }
-    })
-    .filter((row): row is DiagnosticReport => row !== null)
-    .filter((row) => row.ts >= windowStartTs && row.ts <= windowEndTs && row.status === "VALID")
-    .sort((a, b) => b.ts - a.ts);
-  return rows[0] ?? null;
+  return listVerifiedRuns(workspace, agentId)
+    .find((row) => row.ts >= windowStartTs && row.ts <= windowEndTs && row.status === "VALID") ?? null;
 }
 
 function latestOutcomeValuesInWindow(workspace: string, agentId: string, windowStartTs: number, windowEndTs: number): {

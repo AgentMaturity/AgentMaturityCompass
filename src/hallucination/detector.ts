@@ -77,7 +77,8 @@ export async function detectHallucinations(
   }
 
   // Phase 2: LLM judge (optional)
-  if (cfg.enableLlmJudge && cfg.llmJudgeFn) {
+  const judgeRan = Boolean(cfg.enableLlmJudge && cfg.llmJudgeFn);
+  if (judgeRan && cfg.llmJudgeFn) {
     detectorsUsed.push("llm_judge");
     const llmFindings = await runLlmJudge(input, cfg.llmJudgeFn);
     allFindings.push(...llmFindings);
@@ -98,10 +99,13 @@ export async function detectHallucinations(
     summary[t] = allFindings.filter(f => f.type === t).length;
   }
 
+  const grounded = Boolean(input.context?.trim()) || Object.keys(input.knownFacts ?? {}).length > 0;
+  const notEvaluated = !grounded && !judgeRan && allFindings.length === 0;
   return {
     findings: allFindings,
     score,
-    passed: score <= cfg.threshold,
+    passed: notEvaluated ? null : score <= cfg.threshold,
+    outcome: notEvaluated ? "not_evaluated" : "measured",
     summary,
     totalFindings: allFindings.length,
     detectorsUsed,

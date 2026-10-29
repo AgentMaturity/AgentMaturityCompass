@@ -10,6 +10,10 @@ describe('Shield runtime action analysis', () => {
       parameters: { ticketId: 'T-100' },
       sessionId: 'runtime-session-001',
       workspaceId: 'runtime-workspace-001',
+      // WP37: missing trust context is untrusted, so an allowed action states it.
+      instructionSource: 'user',
+      lastVerifiedAt: Date.now(),
+      cumulativeConfidence: 0.9,
     });
 
     expect(report.mode).toBe('runtime-action-analysis');

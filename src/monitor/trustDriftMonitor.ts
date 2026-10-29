@@ -1,6 +1,6 @@
-import { readdirSync } from "node:fs";
 import { join } from "node:path";
-import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
+import { resolveAgentId } from "../fleet/paths.js";
+import { listVerifiedRuns } from "../diagnostic/runReportResolution.js";
 import type { DiagnosticReport } from "../types.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -99,41 +99,14 @@ function deriveIntegrityIndex(report: Partial<DiagnosticReport>): number {
   return 0;
 }
 
+/** Only sealed runs form the series (WP37): an edited run must neither raise nor fake a drift alert. */
 function loadTrustSeries(workspace: string, agentId: string): TrustDriftPoint[] {
-  const paths = getAgentPaths(workspace, agentId);
-  if (!pathExists(paths.runsDir)) {
-    return [];
-  }
-
-  const out: TrustDriftPoint[] = [];
-  const entries = readdirSync(paths.runsDir, { withFileTypes: true })
-    .filter((entry) => entry.isFile() && entry.name.endsWith(".json"));
-  for (const entry of entries) {
-    const file = join(paths.runsDir, entry.name);
-    try {
-      const parsed = JSON.parse(readUtf8(file)) as Partial<DiagnosticReport>;
-      const runId = typeof parsed.runId === "string" && parsed.runId.length > 0
-        ? parsed.runId
-        : entry.name.slice(0, -5);
-      const ts = typeof parsed.ts === "number" && Number.isFinite(parsed.ts) ? parsed.ts : 0;
-      const integrityIndex = deriveIntegrityIndex(parsed);
-      out.push({
-        runId,
-        ts,
-        integrityIndex,
-        score0to100: round2(integrityIndex * 100)
-      });
-    } catch {
-      // Ignore malformed run JSON.
-    }
-  }
-  out.sort((a, b) => {
-    if (a.ts !== b.ts) {
-      return a.ts - b.ts;
-    }
-    return a.runId.localeCompare(b.runId);
-  });
-  return out;
+  return listVerifiedRuns(workspace, agentId)
+    .map((run) => {
+      const integrityIndex = deriveIntegrityIndex(run);
+      return { runId: run.runId, ts: run.ts, integrityIndex, score0to100: round2(integrityIndex * 100) };
+    })
+    .sort((a, b) => a.ts - b.ts || a.runId.localeCompare(b.runId));
 }
 
 function severityFromDrop(drop: number, threshold: number): TrustDriftSeverity {

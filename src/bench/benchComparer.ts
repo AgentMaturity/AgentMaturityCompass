@@ -128,7 +128,9 @@ export function benchComparisonWithInputs(params: {against?:"imported"|`registry
   const population = populationRows.map((row) => row.bench);
   const localFlat = flattenBenchMetrics(local);
   const populationFlat = population.map((row) => flattenBenchMetrics(row));
-  const percentiles = percentileTable(localFlat, populationFlat.length > 0 ? populationFlat : [localFlat]);
+  // No imported population → no percentile (WP37): ranking the local bench against itself read 100th on every metric.
+  const percentiles: Record<string, number | null> = populationFlat.length > 0 ? percentileTable(localFlat, populationFlat)
+    : Object.fromEntries(Object.keys(percentileTable(localFlat, [localFlat])).map((key) => [key, null]));
   const peer = kMedoidsPeerGroup(localFlat, populationFlat.length > 0 ? populationFlat : [localFlat]);
   const comparison = benchComparisonSchema.parse({
     v: 1,

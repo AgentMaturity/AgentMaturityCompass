@@ -69,6 +69,8 @@ export interface RedTeamReport {
   generatedAt: number;
   totalRounds: number;
   totalAttacks: number;
+  /** INSUFFICIENT_EVIDENCE when no attack ran: the 0 success rate then measured nothing (WP37). */
+  evidenceStatus: "MEASURED" | "INSUFFICIENT_EVIDENCE";
   overallSuccessRate: number;
   trendDirection: "improving" | "stable" | "degrading";
   criticalFindings: string[];
@@ -514,11 +516,14 @@ export class ContinuousRedTeam extends EventEmitter {
       generatedAt: Date.now(),
       totalRounds: allRounds.length,
       totalAttacks,
+      evidenceStatus: totalAttacks > 0 ? "MEASURED" : "INSUFFICIENT_EVIDENCE",
       overallSuccessRate,
       trendDirection: direction,
       criticalFindings: allRounds.flatMap(r => r.newVulnerabilities).slice(-10),
       evolutionInsights,
-      recommendedRemediations: overallSuccessRate > 0.2
+      // Zero attacks is not a low success rate: no "GOOD" verdict on nothing.
+      recommendedRemediations: totalAttacks === 0 ? []
+        : overallSuccessRate > 0.2
         ? ["URGENT: Attack success rate exceeds 20%. Patch identified vulnerabilities immediately."]
         : overallSuccessRate > 0.05
         ? ["MODERATE: Some attacks succeed. Strengthen identified weak points."]

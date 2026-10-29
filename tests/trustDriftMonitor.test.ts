@@ -1,8 +1,12 @@
 import { existsSync, mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { afterEach, describe, expect, test } from "vitest";
+import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { startTrustDriftMonitor } from "../src/monitor/trustDriftMonitor.js";
+import { writeSealedReport } from "./helpers/sealedRun.js";
+
+const previousPassphrase = process.env.AMC_VAULT_PASSPHRASE;
+beforeEach(() => { process.env.AMC_VAULT_PASSPHRASE = "trust-drift-test-passphrase"; });
 
 const roots: string[] = [];
 
@@ -13,16 +17,14 @@ function newWorkspace(): string {
   return root;
 }
 
+/** Sealed like the runner's runs: since WP37 only sealed runs form the trust series. */
 function writeRun(workspace: string, agentId: string, runId: string, ts: number, integrityIndex: number): void {
-  const dir = join(workspace, ".amc", "agents", agentId, "runs");
-  mkdirSync(dir, { recursive: true });
-  writeFileSync(
-    join(dir, `${runId}.json`),
-    `${JSON.stringify({ runId, ts, integrityIndex }, null, 2)}\n`
-  );
+  writeSealedReport(workspace, join(workspace, ".amc", "agents", agentId, "runs"), runId, { runId, ts, integrityIndex });
 }
 
 afterEach(() => {
+  if (previousPassphrase === undefined) delete process.env.AMC_VAULT_PASSPHRASE;
+  else process.env.AMC_VAULT_PASSPHRASE = previousPassphrase;
   while (roots.length > 0) {
     const root = roots.pop();
     if (root) {

@@ -450,7 +450,9 @@ describe("detectHallucinationsDeterministic", () => {
 describe("edge cases", () => {
   it("handles empty response", async () => {
     const result = await detectHallucinations({ response: "" });
-    expect(result.passed).toBe(true);
+    // WP37: nothing to judge against is not a pass.
+    expect(result.passed).toBeNull();
+    expect(result.outcome).toBe("not_evaluated");
     expect(result.totalFindings).toBe(0);
   });
 
@@ -458,7 +460,9 @@ describe("edge cases", () => {
     const result = await detectHallucinations({
       response: "The sky is blue and water is wet.",
     });
-    expect(result.passed).toBe(true);
+    // WP37: without grounding the detector could not judge, so it does not pass.
+    expect(result.passed).toBeNull();
+    expect(result.outcome).toBe("not_evaluated");
   });
 
   it("handles very long response", async () => {

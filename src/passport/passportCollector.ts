@@ -2,9 +2,9 @@ import { join } from "node:path";
 import YAML from "yaml";
 import { defaultPromptPolicy, promptPolicySchema } from "../prompt/promptPolicySchema.js";
 import { promptPolicyPath } from "../prompt/promptPolicyStore.js";
-import type { DiagnosticReport, LayerScore } from "../types.js";
+import type { LayerScore } from "../types.js";
 import { readUtf8, pathExists } from "../utils/fs.js";
-import { agentRunFiles } from "../diagnostic/runReportResolution.js";
+import { listVerifiedRuns } from "../diagnostic/runReportResolution.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { loadTrustConfig } from "../trust/trustConfig.js";
@@ -64,21 +64,6 @@ function normalizedScope(scopeType: "WORKSPACE" | "NODE" | "AGENT", scopeId?: st
     id: "workspace",
     agentIdForDiagnostic: "default"
   };
-}
-
-function readLatestDiagnosticRun(workspace: string, agentId: string): DiagnosticReport | null {
-  let best: DiagnosticReport | null = null;
-  for (const file of agentRunFiles(workspace, agentId)) {
-    try {
-      const parsed = JSON.parse(readUtf8(file)) as DiagnosticReport;
-      if (!best || parsed.ts > best.ts) {
-        best = parsed;
-      }
-    } catch {
-      // ignore broken run files
-    }
-  }
-  return best;
 }
 
 function mapTrustLabel(input: string | undefined): "LOW" | "MEDIUM" | "HIGH" {
@@ -191,7 +176,8 @@ function collectPassportLocalData(params: {
   const truncBytes = params.policy.passportPolicy.privacy.hashTruncBytes;
   const scopeIdHash = hashPassportId(`${scope.type}:${scope.id}`, truncBytes);
 
-  const report = readLatestDiagnosticRun(params.workspace, scope.agentIdForDiagnostic);
+  // Only a sealed run is signed into a passport (WP37); none verifies → the null-report path (insufficient evidence).
+  const report = listVerifiedRuns(params.workspace, scope.agentIdForDiagnostic)[0] ?? null;
   assertNotExample(report, "signed into a passport");
   const trustLabel = mapTrustLabel(report?.trustLabel);
   const integrityIndex = Number((report?.integrityIndex ?? 0).toFixed(4));

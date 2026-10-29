@@ -6,6 +6,7 @@ import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { generateTrustCertificate, verifyTrustCertificateEnvelope } from "../src/cert/trustCertificate.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import { pinnedTrust, workspaceKeyPem } from "./helpers/trustContext.js";
+import { writeSealedReport } from "./helpers/sealedRun.js";
 
 /** The workspace operator pins the auditor key that signs its trust certificates (P0-09). */
 const auditorTrust = (workspace: string) => pinnedTrust([{ publicKeyPem: workspaceKeyPem(workspace, "auditor"), purposes: ["artifact-seal"] }]);
@@ -20,13 +21,9 @@ function newWorkspace(): string {
   return root;
 }
 
+/** Sealed like the runner's runs: since WP37 an unsealed run file is never signed into a certificate. */
 function writeRun(workspace: string, agentId: string, runId: string, ts: number, integrityIndex: number): void {
-  const dir = join(workspace, ".amc", "agents", agentId, "runs");
-  mkdirSync(dir, { recursive: true });
-  writeFileSync(
-    join(dir, `${runId}.json`),
-    `${JSON.stringify({ runId, ts, integrityIndex }, null, 2)}\n`
-  );
+  writeSealedReport(workspace, join(workspace, ".amc", "agents", agentId, "runs"), runId, { runId, ts, integrityIndex });
 }
 
 function writeEvidenceChain(workspace: string, hashes: Array<{ prev: string; hash: string }>): void {
@@ -115,8 +112,8 @@ describe("generateTrustCertificate", () => {
 
   test("generates an unsigned preview without vault signing and verifier rejects it", () => {
     const workspace = newWorkspace();
-    delete process.env.AMC_VAULT_PASSPHRASE;
     writeRun(workspace, "agent-x", "run-1", 1000, 0.73);
+    delete process.env.AMC_VAULT_PASSPHRASE;
 
     const out = generateTrustCertificate({
       workspace,
