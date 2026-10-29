@@ -3,6 +3,7 @@ import { z } from "zod";
 import { defineTool } from "../toolRegistry.js";
 import type { ToolDefinition } from "../toolTypes.js";
 import type { SearchWorkerInput, SearchResult } from "./grepWorker.js";
+import { insideWorkspace } from "./fsTools.js";
 
 /**
  * Search tools (P4.3).
@@ -24,6 +25,7 @@ import type { SearchWorkerInput, SearchResult } from "./grepWorker.js";
 
 const globArgs = z.object({
   pattern: z.string().min(1),
+  path: z.string().min(1).optional(),
   includeIgnored: z.boolean().default(false),
   timeoutMs: z.number().int().positive().max(10_000).default(10_000),
   maxResults: z.number().int().positive().max(5_000).default(200)
@@ -31,6 +33,7 @@ const globArgs = z.object({
 
 const grepArgs = z.object({
   pattern: z.string().min(1),
+  path: z.string().min(1).optional(),
   /** Optional glob narrowing which files are searched. */
   include: z.string().optional(),
   includeIgnored: z.boolean().default(false),
@@ -84,6 +87,7 @@ export function searchTools(): readonly ToolDefinition[] {
         type: "object",
         properties: {
           pattern: { type: "string", description: "e.g. **/*.ts" },
+          path: { type: "string", description: "workspace-relative directory to search (default workspace root); results remain workspace-relative" },
           maxResults: { type: "integer" },
           includeIgnored: { type: "boolean", description: "include files excluded by repository ignore rules" },
           timeoutMs: { type: "integer", minimum: 1, maximum: 10000, description: "deadline for the entire search, in milliseconds" }
@@ -92,6 +96,7 @@ export function searchTools(): readonly ToolDefinition[] {
       },
       body: (execution) => {
         const args = globArgs.parse(execution.arguments);
+        if (args.path !== undefined) args.path = insideWorkspace(execution.workspace, args.path).rel;
         return searchInWorker({ kind: "glob", workspace: execution.workspace, args }, execution.signal);
       }
     }),
@@ -104,6 +109,7 @@ export function searchTools(): readonly ToolDefinition[] {
         type: "object",
         properties: {
           pattern: { type: "string", description: "JavaScript regular expression" },
+          path: { type: "string", description: "workspace-relative directory to search (default workspace root); results remain workspace-relative" },
           include: { type: "string", description: "glob narrowing which files are searched" },
           includeIgnored: { type: "boolean", description: "include files excluded by repository ignore rules" },
           caseInsensitive: { type: "boolean" },
@@ -116,6 +122,7 @@ export function searchTools(): readonly ToolDefinition[] {
       },
       body: (execution) => {
         const args = grepArgs.parse(execution.arguments);
+        if (args.path !== undefined) args.path = insideWorkspace(execution.workspace, args.path).rel;
         return searchInWorker({ kind: "grep", workspace: execution.workspace, args }, execution.signal);
       }
     })

@@ -1,9 +1,16 @@
+import { signSerializedPayloadWithAuditorAsync } from "../org/orgSigner.js";
+import { verifyAuditorSignatureBytes } from "../org/orgSignatureBytes.js";
 import { nearestRank } from "../experiments/stats.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 
 export type IncidentRegressionReceiptStatus = "ready_to_close" | "fail_closed";
-export type IncidentRegressionValidationStatus = "passed" | "failed" | "not_run";
+export type IncidentRegressionValidationStatus = "passed" | "failed" | "not_run" | "skipped" | "pending";
+export type IncidentRegressionReceiptSignature = Awaited<ReturnType<typeof signSerializedPayloadWithAuditorAsync>>;
+export interface IncidentRegressionReceiptVerification {
+  valid: boolean;
+  failClosedReasons: string[];
+}
 export type IncidentRegressionAlertSeverity = "warning" | "critical";
 
 export interface IncidentRegressionTraceRow {
@@ -29,6 +36,9 @@ export interface IncidentRegressionTraceIndexEntry {
   failureMode: string;
   riskEvent: string;
   promptToolBoundary: string;
+  /** Retained separately so verification can distinguish missing boundaries from literal labels. */
+  promptBoundary?: string;
+  toolBoundary?: string;
   latencyMs: number;
   costUsd: number;
   remediationState: string;
@@ -90,6 +100,9 @@ export interface IncidentRegressionValidationRun {
   runId: string;
   testId: string;
   status: IncidentRegressionValidationStatus;
+  /** Legacy unbound runs remain readable but cannot authorize incident closure. */
+  phase?: "pre_fix" | "post_fix";
+  buildRef?: string;
   validatedAt: string;
   evidenceRefs: string[];
 }
@@ -143,6 +156,7 @@ export interface IncidentRegressionReceipt {
   failClosed: boolean;
   failClosedReasons: string[];
   receiptHash: string;
+  signature?: IncidentRegressionReceiptSignature;
 }
 
 const SURFACE_BINDINGS = ["Watch", "Studio", "API"] as const;
@@ -218,6 +232,8 @@ function validationRunHash(run: IncidentRegressionValidationRun): string {
     runId: run.runId,
     testId: run.testId,
     status: run.status,
+    phase: run.phase,
+    buildRef: run.buildRef,
     validatedAt: run.validatedAt,
     evidenceRefs: unique(run.evidenceRefs),
   }));
@@ -238,6 +254,8 @@ function buildTraceIndex(traces: IncidentRegressionTraceRow[]): IncidentRegressi
         failureMode,
         riskEvent,
         promptToolBoundary: boundary,
+        promptBoundary: row.promptBoundary,
+        toolBoundary: row.toolBoundary,
         latencyMs: round(row.latencyMs),
         costUsd: round(row.costUsd),
         remediationState,
@@ -326,10 +344,13 @@ function traceReasons(traces: IncidentRegressionTraceRow[]): string[] {
   if (traces.length === 0) return ["incidentTraces:missing"];
 
   const reasons: string[] = [];
+  const seenTraceIds = new Set<string>();
   for (const row of traces) {
     const traceRef = nonEmpty(row.traceId) ? row.traceId : "unknown";
     if (!nonEmpty(row.incidentId)) reasons.push(`${traceRef}:incidentId:missing`);
     if (!nonEmpty(row.traceId)) reasons.push("traceId:missing");
+    if (seenTraceIds.has(row.traceId.trim())) reasons.push(`${traceRef}:traceId:duplicate`);
+    seenTraceIds.add(row.traceId.trim());
     if (!nonEmpty(row.agentId)) reasons.push(`${traceRef}:agentId:missing`);
     if (!Number.isFinite(parseTime(row.timestamp))) reasons.push(`${traceRef}:timestamp:invalid`);
     if (!nonEmpty(row.failureMode)) reasons.push(`${traceRef}:failureMode:missing`);
@@ -354,15 +375,27 @@ function generatedTestReasons(
 
   const traceIds = new Set(traces.map((entry) => entry.traceId));
   const incidentIds = new Set(traces.map((entry) => entry.incidentId));
+  const seenTestIds = new Set<string>();
   const reasons: string[] = [];
+  for (const incidentId of incidentIds) {
+    if (!tests.some((test) => test.sourceIncidentId === incidentId)) {
+      reasons.push(`incident:${incidentId}:generatedRegressionTests:missing`);
+    }
+  }
   for (const test of tests) {
     const testRef = nonEmpty(test.testId) ? test.testId : "unknown";
     if (!nonEmpty(test.testId)) reasons.push("testId:missing");
+    if (seenTestIds.has(test.testId.trim())) reasons.push(`test:${testRef}:testId:duplicate`);
+    seenTestIds.add(test.testId.trim());
     if (!nonEmpty(test.sourceIncidentId) || !incidentIds.has(test.sourceIncidentId)) {
       reasons.push(`test:${testRef}:sourceIncident:missing`);
     }
     if (!nonEmpty(test.sourceTraceId) || !traceIds.has(test.sourceTraceId)) {
       reasons.push(`test:${testRef}:sourceTrace:missing`);
+    }
+    const sourceTrace = traces.find((entry) => entry.traceId === test.sourceTraceId);
+    if (sourceTrace && sourceTrace.incidentId !== test.sourceIncidentId) {
+      reasons.push(`test:${testRef}:sourceIncident:mismatch`);
     }
     if (!nonEmpty(test.name)) reasons.push(`test:${testRef}:name:missing`);
     if (!nonEmpty(test.assertion)) reasons.push(`test:${testRef}:assertion:missing`);
@@ -370,6 +403,34 @@ function generatedTestReasons(
     if (!Array.isArray(test.evidenceRefs) || test.evidenceRefs.filter(nonEmpty).length === 0) {
       reasons.push(`test:${testRef}:evidenceRefs:missing`);
     }
+  }
+  return reasons;
+}
+
+function validationPairReasons(testId: string, runs: IncidentRegressionValidationRun[]): string[] {
+  const before = runs.filter((run) => run.testId === testId && run.phase === "pre_fix");
+  const after = runs.filter((run) => run.testId === testId && run.phase === "post_fix");
+  const reasons: string[] = [];
+  for (const [phase, arms] of [["pre_fix", before], ["post_fix", after]] as const) {
+    if (arms.length !== 1) {
+      reasons.push(`test:${testId}:${phase}:${arms.length === 0 ? "missing_evidence" : "duplicate"}`);
+    }
+  }
+  if (before.length !== 1 || after.length !== 1) return reasons;
+  const pre = before[0]!;
+  const post = after[0]!;
+  if (pre.status !== "failed") reasons.push(`test:${testId}:pre_fix:notFailed`);
+  if (post.status !== "passed") reasons.push(`test:${testId}:validation:notPassed`);
+  if (!nonEmpty(pre.buildRef) || !nonEmpty(post.buildRef)) {
+    reasons.push(`test:${testId}:buildRef:missing_evidence`);
+  } else if (pre.buildRef.trim() === post.buildRef.trim()) {
+    reasons.push(`test:${testId}:buildRef:identical`);
+  }
+  if (!nonEmpty(pre.runId) || !nonEmpty(post.runId) || pre.runId.trim() === post.runId.trim()) {
+    reasons.push(`test:${testId}:runId:notDistinct`);
+  }
+  if (!(parseTime(pre.validatedAt) < parseTime(post.validatedAt))) {
+    reasons.push(`test:${testId}:validation:invalidOrder`);
   }
   return reasons;
 }
@@ -385,14 +446,21 @@ function validationReasons(
     runs.filter((run) => run.status === "passed").map((run) => run.testId)
   );
   const reasons: string[] = [];
+  const seenRunIds = new Set<string>();
 
   for (const run of runs) {
     const runRef = nonEmpty(run.runId) ? run.runId : "unknown";
     if (!nonEmpty(run.runId)) reasons.push("validationRunId:missing");
+    if (seenRunIds.has(run.runId.trim())) reasons.push(`validation:${runRef}:runId:duplicate`);
+    seenRunIds.add(run.runId.trim());
     if (!nonEmpty(run.testId) || !testIds.has(run.testId)) reasons.push(`validation:${runRef}:test:missing`);
-    if (run.status !== "passed" && run.status !== "failed" && run.status !== "not_run") {
-      reasons.push(`validation:${runRef}:status:invalid`);
+    if (run.status !== "passed" && run.status !== "failed") {
+      reasons.push(`validation:${runRef}:status:missing_evidence`);
     }
+    if (run.phase !== "pre_fix" && run.phase !== "post_fix") {
+      reasons.push(`validation:${runRef}:phase:missing_evidence`);
+    }
+    if (!nonEmpty(run.buildRef)) reasons.push(`validation:${runRef}:buildRef:missing_evidence`);
     if (!Number.isFinite(parseTime(run.validatedAt))) reasons.push(`validation:${runRef}:validatedAt:invalid`);
     if (!Array.isArray(run.evidenceRefs) || run.evidenceRefs.filter(nonEmpty).length === 0) {
       reasons.push(`validation:${runRef}:evidenceRefs:missing`);
@@ -400,6 +468,7 @@ function validationReasons(
   }
 
   for (const test of tests) {
+    reasons.push(...validationPairReasons(test.testId, runs));
     if (!passedTestIds.has(test.testId)) {
       reasons.push(`test:${test.testId}:validation:notPassed`);
     }
@@ -412,9 +481,12 @@ function buildClosureStatus(
   traces: IncidentRegressionTraceIndexEntry[],
   tests: IncidentRegressionGeneratedTestReceipt[],
   runs: IncidentRegressionValidationRunReceipt[],
-  closureEvidenceRefs: string[]
+  closureEvidenceRefs: string[],
+  failClosedReasons: string[]
 ): IncidentRegressionClosureStatus {
-  const passedTestIds = new Set(runs.filter((run) => run.status === "passed").map((run) => run.testId));
+  const passedTestIds = new Set(tests
+    .filter((test) => validationReasons([test], runs.filter((run) => run.testId === test.testId)).length === 0)
+    .map((test) => test.testId));
   const missingValidationTestIds = tests
     .filter((test) => !passedTestIds.has(test.testId))
     .map((test) => test.testId)
@@ -434,7 +506,7 @@ function buildClosureStatus(
   for (const incidentId of incidentIds) {
     const incidentTests = testsByIncident.get(incidentId) ?? [];
     const allValidated = incidentTests.length > 0 && incidentTests.every((test) => passedTestIds.has(test.testId));
-    if (hasClosureEvidence && allValidated) {
+    if (hasClosureEvidence && allValidated && failClosedReasons.length === 0) {
       readyIncidentIds.push(incidentId);
     } else {
       blockedIncidentIds.push(incidentId);
@@ -452,7 +524,7 @@ function buildClosureStatus(
   };
 }
 
-function receiptHash(receipt: Omit<IncidentRegressionReceipt, "receiptHash">): string {
+function receiptHash(receipt: Omit<IncidentRegressionReceipt, "receiptHash" | "signature">): string {
   return sha256Hex(canonicalize(receipt));
 }
 
@@ -470,7 +542,8 @@ export function buildIncidentRegressionReceipt(input: BuildIncidentRegressionRec
     traceIndex.entries,
     generatedTests,
     validationRuns,
-    input.closureEvidenceRefs
+    input.closureEvidenceRefs,
+    failClosedReasons
   );
   const status: IncidentRegressionReceiptStatus = failClosedReasons.length > 0 ? "fail_closed" : "ready_to_close";
   const base = {
@@ -491,12 +564,66 @@ export function buildIncidentRegressionReceipt(input: BuildIncidentRegressionRec
     status,
     failClosed: failClosedReasons.length > 0,
     failClosedReasons,
-  } satisfies Omit<IncidentRegressionReceipt, "receiptHash">;
+  } satisfies Omit<IncidentRegressionReceipt, "receiptHash" | "signature">;
 
   return {
     ...base,
     receiptHash: receiptHash(base),
   };
+}
+
+/** Sign a captured receipt through the existing auditor policy/provider route. */
+export async function signIncidentRegressionReceipt(
+  workspace: string,
+  receipt: IncidentRegressionReceipt
+): Promise<IncidentRegressionReceipt> {
+  const { signature: _signature, ...snapshot } = structuredClone(receipt);
+  const { receiptHash: hash, ...body } = snapshot;
+  if (hash !== receiptHash(body)) throw new Error("incident regression receipt hash mismatch");
+  const signature = await signSerializedPayloadWithAuditorAsync(workspace, canonicalize(snapshot));
+  return { ...snapshot, signature };
+}
+
+/** Hash-only legacy receipts remain readable but cannot verify as closure evidence. */
+export function verifyIncidentRegressionReceipt(
+  receipt: IncidentRegressionReceipt,
+  workspace?: string
+): IncidentRegressionReceiptVerification {
+  try {
+    const { signature, receiptHash: hash, ...body } = receipt;
+    const reasons = [...receipt.failClosedReasons];
+    if (receipt.schemaVersion !== "2026-06-26") reasons.push("schema version mismatch");
+    if (hash !== receiptHash(body)) reasons.push("receipt hash mismatch");
+    for (const entry of receipt.traceIndex.entries) {
+      const { rowHash, ...payload } = entry;
+      if (rowHash !== entryHash(payload)) reasons.push(`${entry.traceId}:row hash mismatch`);
+    }
+    for (const test of receipt.generatedTests) {
+      if (test.testHash !== generatedTestHash(test)) reasons.push(`${test.testId}:test hash mismatch`);
+    }
+    for (const run of receipt.validationRuns) {
+      if (run.runHash !== validationRunHash(run)) reasons.push(`${run.runId}:run hash mismatch`);
+    }
+    reasons.push(...generatedTestReasons(receipt.traceIndex.entries, receipt.generatedTests));
+    reasons.push(...validationReasons(receipt.generatedTests, receipt.validationRuns));
+    reasons.push(...traceReasons(receipt.traceIndex.entries.map((entry) => ({
+      ...entry,
+      promptBoundary: entry.promptBoundary ?? "",
+      toolBoundary: entry.toolBoundary ?? "",
+    }))));
+    if (receipt.closureStatus.closureEvidenceRefs.filter(nonEmpty).length === 0) reasons.push("closureEvidence:missing");
+    const expectedClosure = buildClosureStatus(receipt.traceIndex.entries, receipt.generatedTests,
+      receipt.validationRuns, receipt.closureStatus.closureEvidenceRefs, reasons);
+    if (canonicalize(receipt.closureStatus) !== canonicalize(expectedClosure)) reasons.push("closure status mismatch");
+    if (receipt.status !== "ready_to_close" || receipt.failClosed) reasons.push("receipt is fail_closed");
+    if (!signature || !workspace || !verifyAuditorSignatureBytes(workspace, "BUNDLE",
+      Buffer.from(canonicalize({ ...body, receiptHash: hash })), Buffer.from(JSON.stringify(signature))).valid) {
+      reasons.push("receipt signature missing or untrusted");
+    }
+    return { valid: reasons.length === 0, failClosedReasons: unique(reasons) };
+  } catch {
+    return { valid: false, failClosedReasons: ["incident regression receipt malformed"] };
+  }
 }
 
 export function buildIncidentRegressionWatchAlerts(

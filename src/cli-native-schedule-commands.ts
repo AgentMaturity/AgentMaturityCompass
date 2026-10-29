@@ -1,7 +1,8 @@
+import { manageObjective, readObjective } from "./autonomy/objectiveStore.js";
 import { createHash } from "node:crypto";
 import { readFileSync, statSync } from "node:fs";
 import type { Command } from "commander";
-import { assertScheduleOwner, closeInterruptedClaim, manageScheduleAsync as manageSchedule, scheduleStatus } from "./autonomy/scheduleStore.js";
+import { assertScheduleOwner, closeInterruptedClaim, manageScheduleAsync as manageSchedule, scheduleStatus, parseScheduleDefinition, readSchedules } from "./autonomy/scheduleStore.js";
 import { resolve } from "node:path";
 import { assertNativeScheduleAdmission, startNativeScheduleService } from "./autonomy/scheduleService.js";
 import { approvalGateFor, integerOption, paramsFor, routeFor, type AgentLoopCliIo, type RunOptions } from "./cli-agent-options.js";
@@ -51,7 +52,8 @@ export function registerNativeScheduleCommands(program: Command, io: AgentLoopCl
       try {
         const status = scheduleStatus(workspace(), now());
         const tools = loadVerifiedToolsConfigSnapshot(workspace());
-        report({ ...status, toolsPolicy: { digestSha256: tools.digestSha256,
+        report({ ...status, objectives: status.schedules.filter(schedule => schedule.objective !== undefined)
+          .map(schedule => ({ scheduleId: schedule.id, record: readObjective(workspace(), schedule.id) })), toolsPolicy: { digestSha256: tools.digestSha256,
           signatureValid: tools.signatureValid, schemaValid: tools.config !== null, reason: tools.reason } });
       } catch (error) { failed(error); }
     });
@@ -60,7 +62,9 @@ export function registerNativeScheduleCommands(program: Command, io: AgentLoopCl
   group.command("put <file>").description("Add or replace one reviewed definition using the existing workspace signer; does not start a runner")
     .requiredOption("--expect-input-sha256 <digest>", "exact JSON bytes reviewed through inspect-file")
     .requiredOption("--expect-digest <digest>", "current signed config digest from list, or absent for a new configuration")
-    .action(async (file: string, opts: { expectInputSha256: string; expectDigest: string }) => {
+    .option("--objective-action <action>", "explicit human create, edit, pause or resume of this definition's durable objective; does not replace schedule policy")
+    .option("--expect-objective-revision <revision>", "exact signed objective revision, or absent for create")
+    .action(async (file: string, opts: { expectInputSha256: string; expectDigest: string; objectiveAction?: string; expectObjectiveRevision?: string }) => {
       try {
         const root = resolve(workspace()), inputPath = resolve(file), expectedInput = opts.expectInputSha256;
         assertScheduleOwner(root);
@@ -68,8 +72,25 @@ export function registerNativeScheduleCommands(program: Command, io: AgentLoopCl
         if (input.inputSha256 !== expectedInput) throw new Error("Schedule definition changed; inspect-file again before signing.");
         const beforePublish = () => { if (definition(inputPath).inputSha256 !== expectedInput) throw new Error("Schedule definition changed; inspect-file again before signing."); };
         beforePublish();
-        await manageSchedule(root, opts.expectDigest, { kind: "put", schedule: input.schedule }, { beforePublish });
-        report(scheduleStatus(root, now()));
+        if (opts.objectiveAction !== undefined) {
+          if (!["create", "edit", "pause", "resume"].includes(opts.objectiveAction)) throw new Error("--objective-action must be create, edit, pause or resume.");
+          const expected = opts.expectObjectiveRevision;
+          if (expected === undefined || (expected !== "absent" && (!/^[1-9][0-9]*$/.test(expected) || !Number.isSafeInteger(Number(expected)))))
+            throw new Error("--expect-objective-revision must be an exact positive integer or absent.");
+          const selected = parseScheduleDefinition(input.schedule);
+          const reviewed = readSchedules(root);
+          if (!reviewed.ok) throw new Error(reviewed.reason);
+          const current = reviewed.schedules.find(schedule => schedule.id === selected.id);
+          if (reviewed.digest !== opts.expectDigest || JSON.stringify(current) !== JSON.stringify(selected))
+            throw new Error("Objective input does not match the exact current signed schedule definition; review list and inspect-file again.");
+          const record = await manageObjective(root, selected.id, expected === "absent" ? "absent" : Number(expected), opts.expectDigest,
+            opts.objectiveAction as "create" | "edit" | "pause" | "resume", { beforePublish });
+          report({ objective: record });
+        } else {
+          if (opts.expectObjectiveRevision !== undefined) throw new Error("--expect-objective-revision requires --objective-action.");
+          await manageSchedule(root, opts.expectDigest, { kind: "put", schedule: input.schedule }, { beforePublish });
+          report(scheduleStatus(root, now()));
+        }
       } catch (error) { failed(error); }
     });
   for (const kind of ["enable", "disable", "remove", "reset-failures"] as const) {

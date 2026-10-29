@@ -1,5 +1,5 @@
 import { closeSync, constants, fstatSync, lstatSync, openSync, readSync, readdirSync, realpathSync, statSync } from "node:fs";
-import { join, relative, resolve, sep } from "node:path";
+import { isAbsolute, join, relative, resolve, sep } from "node:path";
 
 /**
  * A bounded workspace walker (P4.3).
@@ -25,6 +25,8 @@ export interface WalkLimits {
   readonly maxFileBytes: number;
   /** Explicit searches may include repository-ignored files. */
   readonly includeIgnored?: boolean;
+  /** Start in this workspace-relative directory; returned paths still use the workspace root. */
+  readonly path?: string;
 }
 
 export interface WalkResult {
@@ -157,7 +159,25 @@ function ignored(path: string, isDirectory: boolean, rules: readonly IgnoreRule[
 export function walkWorkspace(workspace: string, limits: WalkLimits): WalkResult {
   const root = realpathSync(workspace);
   const files: string[] = [];
-  const queue: { dir: string; rules: readonly IgnoreRule[] }[] = [{ dir: root, rules: [] }];
+  const start = resolve(root, limits.path ?? ".");
+  const startPath = relative(root, start);
+  if (startPath === ".." || startPath.startsWith(`..${sep}`) || isAbsolute(startPath)) {
+    throw new Error(`search path escapes the workspace: ${limits.path}`);
+  }
+  if (realpathSync(start) !== start || !statSync(start).isDirectory()) {
+    throw new Error(`search path must be a workspace directory: ${limits.path}`);
+  }
+  // A scoped walk inherits ignore rules from each ancestor without visiting unrelated files.
+  const inherited: IgnoreRule[] = [];
+  let ancestor = root;
+  for (const segment of startPath === "" ? [] : startPath.split(sep)) {
+    if (!limits.includeIgnored) inherited.push(...ignoreRules(root, ancestor));
+    ancestor = join(ancestor, segment);
+    if (SKIP_DIRECTORIES.has(segment) || ignored(forMatching(relative(root, ancestor)), true, inherited)) {
+      return { files, truncated: false };
+    }
+  }
+  const queue: { dir: string; rules: readonly IgnoreRule[] }[] = [{ dir: start, rules: inherited }];
 
   while (queue.length > 0) {
     const next = queue.shift();

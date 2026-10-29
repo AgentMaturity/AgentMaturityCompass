@@ -28,6 +28,12 @@ import {
  * or a file with no receipt, is refused. A failed receipt write leaves the
  * file untouched; a failed file write after its receipt fails closed.
  *
+ * COST (DXC-21). Reading the whole chain grows with workspace history, so a
+ * tool instance does it once per session: after that it compares against the
+ * digest it committed itself, held in process memory, which a file restored
+ * on disk cannot change. A fresh process, or a session this instance has not
+ * written, still reads the verified chain.
+ *
  * READ_ONLY on purpose. Neither tool changes the workspace or anything outside
  * AMC's own signed session records — the same reason a ledger row written for
  * a `grep` call does not make `grep` a write. The composed allowlist guard
@@ -80,12 +86,13 @@ function ledgerRecordDigest(workspace: string, sessionId: string, auditType: str
   return digest;
 }
 
-function readBoundList<P extends object>(workspace: string, sessionId: string, store: SessionListStore): SignedRecordFile<SessionListHeader & P> | null {
+function readBoundList<P extends object>(workspace: string, sessionId: string, store: SessionListStore,
+  committed?: string | null): SignedRecordFile<SessionListHeader & P> | null {
   const stored = readSignedRecord<SessionListHeader & P>(workspace, sessionListPath(workspace, sessionId, store.fileName), "monitor");
   if (stored && (stored.record.kind !== store.kind || stored.record.sessionId !== sessionId)) {
     throw new NativeToolRefusal(store.name, `the record is bound to ${stored.record.kind}/${stored.record.sessionId}, not ${store.kind}/${sessionId}`);
   }
-  if ((stored?.digestSha256 ?? null) !== ledgerRecordDigest(workspace, sessionId, store.auditType)) {
+  if ((stored?.digestSha256 ?? null) !== (committed !== undefined ? committed : ledgerRecordDigest(workspace, sessionId, store.auditType))) {
     throw new NativeToolRefusal(store.name, "native tool record does not match the session ledger");
   }
   return stored;
@@ -98,6 +105,8 @@ export function readSessionList<P extends object>(workspace: string, sessionId: 
 
 export function sessionListTool<P extends object>(spec: SessionListSpec<P>, session: SessionIdSource, record: NativeReceiptRecorder): ToolDefinition {
   const currentSession = sessionIdResolver(session);
+  // The digest this instance last committed per session (see COST above).
+  const committed = new Map<string, string>();
   return defineTool({
     name: spec.name,
     actionClass: "READ_ONLY",
@@ -112,7 +121,7 @@ export function sessionListTool<P extends object>(spec: SessionListSpec<P>, sess
         return { ok: true, output: `${rendered}\n[amc: SIMULATE ${spec.name}; not recorded]` };
       }
       const sessionId = currentSession();
-      const previous = readBoundList<object>(execution.workspace, sessionId, spec);
+      const previous = readBoundList<object>(execution.workspace, sessionId, spec, committed.get(sessionId));
       if (previous && previous.record.agentId !== execution.agentId) {
         throw new NativeToolRefusal(spec.name, `the existing record is bound to ${previous.record.agentId}@${sessionId}, not ${execution.agentId}@${sessionId}`);
       }
@@ -128,6 +137,8 @@ export function sessionListTool<P extends object>(spec: SessionListSpec<P>, sess
       };
       const signed = signRecord(execution.workspace, { ...header, ...payload }, "monitor");
       allow({ recordSha256: signed.digestSha256, revision: header.revision });
+      // Remembered once the receipt exists: from here the ledger names this digest, whether or not the file write lands.
+      committed.set(sessionId, signed.digestSha256);
       persistSignedRecord(sessionListPath(execution.workspace, sessionId, spec.fileName), signed);
       return { ok: true, output: `${rendered}\n[amc: ${spec.name} revision ${header.revision}, sha256 ${signed.digestSha256}]` };
     })

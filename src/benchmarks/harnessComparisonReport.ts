@@ -27,6 +27,8 @@ export function summarizeHarnessComparison(report: HarnessComparisonReport) {
     groups: report.manifest.targets.flatMap(target => report.manifest.lanes.map(lane => {
       const rows = report.trials.filter(row => row.targetId === target.id && row.laneId === lane.id);
       const determinate = rows.filter(row => row.status === "executed");
+      const checks = determinate.flatMap(row => row.oracle?.checks ?? []).filter(check => check.passed !== null);
+      const checksPassed = checks.filter(check => check.passed === true).length;
       const passing = determinate.filter(row => row.verdict === "pass").length;
       const fp = rows.flatMap(row => row.oracle?.falsePositives ? [row.oracle.falsePositives] : []);
       const fpEligible = fp.reduce((sum, observation) => sum + observation.eligible, 0);
@@ -53,6 +55,8 @@ export function summarizeHarnessComparison(report: HarnessComparisonReport) {
         // Denominator is always visible. Unavailable trials are never failures
         // or passes, and a contract pass rate is not a human usability rating.
         oraclePassRate: determinate.length ? passing / determinate.length : null,
+        checksPassed, checksDeterminate: checks.length,
+        checkPassFraction: checks.length ? checksPassed / checks.length : null,
         latencyMsIncludingFailedAndInconclusiveExecutions: observed(rows, row => row.process?.durationMs),
         inputTokens: observed(rows, row => row.observations?.usage?.inputTokens),
         outputTokens: observed(rows, row => row.observations?.usage?.outputTokens),
@@ -98,6 +102,14 @@ export function renderHarnessComparisonReport(report: HarnessComparisonReport): 
     "",
     "Timing includes failed/inconclusive executions and adapter startup/cleanup wait. Missing timings, usage, cache, costs and interventions remain unknown; `summary.json` includes each metric's actual sample count and missing count. Cost observations retain their source URL/date. Human actions and automated fixture actions are separate.",
     "",
+    "## Partial credit and all-pass",
+    "",
+    "Partial credit counts only determinate checks in qualified trials; null checks are excluded. The all-pass rate counts qualified trial verdicts.",
+    "",
+    "| Target | Lane | Check pass fraction | Passed checks | Determinate checks | All-pass rate |",
+    "|---|---|---:|---:|---:|---:|",
+    ...summary.groups.map(group => `| ${cell(group.targetId)} | ${cell(group.laneId)} | ${number(group.checkPassFraction)} | ${group.checksPassed} | ${group.checksDeterminate} | ${number(group.oraclePassRate)} |`),
+    "",
     "## Observed task outcomes before qualification",
     "",
     "These independent oracle outcomes passed the input-integrity checks. They do not imply verified budgets or successful cleanup. A local model call is an attributed adapter observation, not model-identity or quality attestation; missing token usage keeps the qualification above inconclusive.",
@@ -118,7 +130,7 @@ export function renderHarnessComparisonReport(report: HarnessComparisonReport): 
     "",
     "## Unavailable and inconclusive trials",
     "",
-    ...report.trials.filter(trial => trial.status !== "executed").map(trial => `- ${cell(trial.id)}: ${trial.status}; ${cell(trial.reason ?? "No determinate oracle outcome.")}`),
+    ...report.trials.filter(trial => trial.status !== "executed").map(trial => `- ${cell(trial.id)}: ${trial.status}; ${cell(trial.reason ?? "No determinate oracle outcome.")}${trial.failureKind ? ` [${trial.failureKind}: ${cell(trial.failureMessage ?? "")}]` : ""}`),
     ""
   ].join("\n");
 }

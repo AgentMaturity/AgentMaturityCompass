@@ -580,14 +580,14 @@ import {
   casebookVerifyCli
 } from "./casebooks/casebookCli.js";
 import {
-  experimentAnalyzeCli,
+  experimentAnalyzeCommandCli,
   experimentCreateCli,
   experimentGateCli,
   experimentListCli,
   experimentOptimizeCli,
   experimentOptimizerListCli,
   experimentOptimizerShowCli,
-  experimentRunCliAsync,
+  experimentRunCommandCli,
   experimentSetBaselineCli,
   experimentSetCandidateCli
 } from "./experiments/experimentCli.js";
@@ -13795,38 +13795,34 @@ experiment
 
 experiment
   .command("run")
-  .description("Run deterministic experiment against signed casebook")
+  .description("Run deterministic experiment against signed casebook (exit 0 all candidate cases pass, 1 failure or error, 3 inconclusive)")
   .requiredOption("--experiment <id>", "experiment ID")
   .requiredOption("--mode <mode>", "supervise|sandbox")
   .requiredOption("--candidate-window <window>", "evidence window covering the candidate's actual run")
   .option("--candidate-agent <agentId>", "candidate agent, if different from the baseline")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
   .action(async (opts: { experiment: string; mode: string; agent?: string; candidateWindow: string; candidateAgent?: string }) => {
-    const out = await experimentRunCliAsync({
+    await experimentRunCommandCli({
       workspace: process.cwd(),
       agentId: opts.agent ?? activeAgent(program),
       experimentId: opts.experiment,
       mode: opts.mode as "supervise" | "sandbox", /* the runner refuses any other mode; never coerced */ candidateWindow: opts.candidateWindow, candidateAgentId: opts.candidateAgent
-    });
-    console.log(chalk.green(`Experiment run recorded: ${out.report.runId}`));
-    console.log(`json=${out.jsonPath}`);
-    console.log(`md=${out.mdPath}`);
+    }, normalizeCliErrorMessage);
   });
 
 experiment
   .command("analyze")
-  .description("Analyze latest experiment run")
+  .description("Analyze latest experiment run (exit 0 all candidate cases pass, 1 failure or error, 3 inconclusive)")
   .requiredOption("--experiment <id>", "experiment ID")
   .requiredOption("--out <path>", "output .md or .json")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
   .action((opts: { experiment: string; out: string; agent?: string }) => {
-    const out = experimentAnalyzeCli({
+    experimentAnalyzeCommandCli({
       workspace: process.cwd(),
       agentId: opts.agent ?? activeAgent(program),
       experimentId: opts.experiment,
       outFile: resolve(process.cwd(), opts.out)
-    });
-    console.log(chalk.green(`Experiment analysis written: ${out.outFile ?? "none"}`));
+    }, normalizeCliErrorMessage);
   });
 
 experiment
@@ -15786,7 +15782,7 @@ program
 // ── Architecture Experiment CLI ────────────────────────────────────────
 program
   .command("experiment-architecture")
-  .description("Run a controlled architecture comparison experiment")
+  .description("Run a controlled architecture comparison experiment (exit 0 measured pass, 1 failure or error, 3 inconclusive or simulated)")
   .requiredOption("--name <name>", "experiment name")
   .requiredOption("--model <modelId>", "model ID (must be same for both)")
   .requiredOption("--baseline-file <path>", "path to baseline architecture artifact")
@@ -15809,7 +15805,7 @@ program
     // a measured comparison.
     if (!process.env.AMC_ARCHITECTURE_ALLOW_SIMULATED) {
       console.error(
-        chalk.red("Architecture comparison aborted — no real probe runner is configured.")
+        chalk.yellow("Architecture comparison INCONCLUSIVE — no real probe runner is configured.")
       );
       console.error(
         chalk.gray(
@@ -15821,7 +15817,7 @@ program
           "Set AMC_ARCHITECTURE_ALLOW_SIMULATED=1 to run it explicitly as a simulation for pipeline testing."
         )
       );
-      process.exitCode = 2;
+      process.exitCode = 3;
       return;
     }
     const fs = await import("node:fs");
@@ -15846,6 +15842,8 @@ program
       candidateDescription: `Loaded from ${opts.candidateFile}`,
     });
     console.log(markdown);
+    console.log(chalk.yellow("Architecture comparison INCONCLUSIVE: simulated outcomes are not measured task results."));
+    process.exitCode = 3;
   });
 
 program

@@ -42,6 +42,10 @@ export {
 
 export {
   buildIncidentRegressionReceipt,
+  signIncidentRegressionReceipt,
+  verifyIncidentRegressionReceipt,
+  type IncidentRegressionReceiptSignature,
+  type IncidentRegressionReceiptVerification,
   buildIncidentRegressionWatchAlerts,
   type BuildIncidentRegressionReceiptInput,
   type IncidentRegressionAlertSeverity,

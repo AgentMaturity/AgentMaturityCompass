@@ -116,6 +116,7 @@ export const NON_MATURITY_AUDIT_MODULES: ReadonlyArray<{ module: string; why: st
   { module: "src/session/sessionResume.ts", why: "AMC's own session-log boundary record (instrumentation, not maturity)" },
   { module: "src/session/spill/spillLifecycle.ts", why: "AMC's own spill erasure records (instrumentation, not maturity)" },
   { module: "src/shield/exploitConfirmation.ts", why: "operator-scoped exploit confirmation workflow" },
+  { module: "src/skills/skillLoadTool.ts", why: "which skill file and digest the model loaded (DXC-29); workspace content provenance, never maturity evidence" },
   { module: "src/studio/signatures.ts", why: "operator re-signed AMC configuration" },
   { module: "src/studio/studioServer.ts", why: "Studio operator actions on AMC itself" },
   { module: "src/studio/studioSupervisor.ts", why: "Studio runtime lifecycle and configuration signature failures" },

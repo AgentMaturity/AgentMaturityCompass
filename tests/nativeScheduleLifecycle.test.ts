@@ -26,7 +26,7 @@ function workspace() {
   return dir;
 }
 const schedule = (over: Record<string, unknown> = {}) => ({ id: "one", runAs: "reader", goal: "review only",
-  maxRounds: 1, everyMs: 1_000, enabled: true, scope: ["READ_ONLY"], ...over });
+  maxRounds: 1, everyMs: 60_000, enabled: true, scope: ["READ_ONLY"], ...over });
 function digest(dir: string) {
   const read = store.readSchedules(dir);
   if (!read.ok) throw new Error(read.reason);
@@ -74,7 +74,7 @@ describe("exclusive, accountable schedule occurrence ownership", () => {
     store.completeRun(dir, "one", { ok: true, summary: "actual", sessionId: "parent-one" }, first.claimId);
     expect(() => store.completeRun(dir, "one", { ok: false, summary: "duplicate" }, first.claimId)).toThrow(/matching owned claim/);
     expect(store.scheduleStatus(dir, 1_000_001).schedules[0]?.lastOutcome).toMatchObject({ claimId: first.claimId, ok: true, sessionId: "parent-one" });
-    const second = claim(dir, 1_001_000);
+    const second = claim(dir, 1_060_000);
     expect(second.claimId).not.toBe(first.claimId);
     expect(() => store.completeRun(dir, "one", { ok: true, summary: "late" }, first.claimId)).toThrow(/matching owned claim/);
     expect(store.interruptedClaims(dir)[0]?.claimId).toBe(second.claimId);
@@ -102,8 +102,8 @@ describe("exclusive, accountable schedule occurrence ownership", () => {
     const dir = workspace(); store.saveSchedules(dir, [schedule()]); const owned = claim(dir);
     store.completeRun(dir, "one", { ok: true, summary: "done" }, owned.claimId);
     expect(store.dueSchedules(dir, 999_000)).toEqual([]);
-    expect(store.dueSchedules(dir, 1_000_999)).toEqual([]);
-    expect(store.dueSchedules(dir, 1_001_000)).toHaveLength(1);
+    expect(store.dueSchedules(dir, 1_059_999)).toEqual([]);
+    expect(store.dueSchedules(dir, 1_060_000)).toHaveLength(1);
     const late = claim(dir, 9_000_000);
     store.completeRun(dir, "one", { ok: true, summary: "one catch-up" }, late.claimId);
     expect(store.dueSchedules(dir, 9_000_001)).toEqual([]);
@@ -146,13 +146,13 @@ describe("signed management does not widen or reset live authority", () => {
   it("only resets failure suspension explicitly, without moving the cadence", () => {
     const dir = workspace(); store.saveSchedules(dir, [schedule()]);
     for (let i = 0; i < store.MAX_CONSECUTIVE_FAILURES; i++) {
-      const owned = claim(dir, 1_000_000 + i * 1_000);
+      const owned = claim(dir, 1_000_000 + i * 60_000);
       store.completeRun(dir, "one", { ok: false, summary: "refused" }, owned.claimId);
     }
-    const before = store.scheduleStatus(dir, 1_100_000).schedules[0]!;
+    const before = store.scheduleStatus(dir, 1_300_000).schedules[0]!;
     expect(before.due).toBe(false);
     store.manageSchedule(dir, digest(dir), { kind: "reset-failures", id: "one" });
-    const after = store.scheduleStatus(dir, 1_100_000).schedules[0]!;
+    const after = store.scheduleStatus(dir, 1_300_000).schedules[0]!;
     expect(after.lastClaimedTs).toBe(before.lastClaimedTs);
     expect(after.lastOutcome).toEqual(before.lastOutcome);
     expect(after.due).toBe(true);

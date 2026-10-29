@@ -101,7 +101,7 @@ function realPathOfNearestExisting(target: string): string {
  * filesystem will actually open. Both sides are realpath'd, because the
  * workspace root is itself often a link (`/var` to `/private/var` on macOS).
  */
-function insideWorkspace(workspace: string, path: string): { readonly full: string; readonly rel: string } {
+export function insideWorkspace(workspace: string, path: string): { readonly full: string; readonly rel: string } {
   const root = realPathOfNearestExisting(resolve(workspace));
   const requested = isAbsolute(path) ? resolve(path) : resolve(root, path);
   const real = realPathOfNearestExisting(requested);
@@ -217,17 +217,26 @@ function shownDiff(rel: string, before: Buffer, after: Buffer): { readonly text:
 }
 
 /**
- * Write `after` only while the file still holds the bytes this call read and planned against.
+ * Validate the planning snapshot and observation at publication, after staging has finished.
  *
- * ponytail: a re-read just before the rename, so a writer racing the call is refused rather than overwritten; the
- * window between this check and the rename remains, as it does for any unlocked write.
+ * These synchronous bodies cannot interleave within one JavaScript thread. Portable Node has no digest-CAS
+ * against external writers: an uncooperative process can still race the final check and rename.
  */
-function writeIfUnchanged(full: string, path: string, before: Buffer | null, after: Buffer): void {
-  const current = readIfExists(full);
-  if ((current === null ? null : sha256Hex(current)) !== (before === null ? null : sha256Hex(before))) {
-    throw new Error(`"${path}" changed while this call ran — read it again, then retry`);
-  }
-  writeFileAtomicSync(full, after);
+function writeIfUnchanged(execution: ToolExecution, ledger: ReadBeforeEditLedger, full: string, path: string,
+  before: Buffer | null, after: Buffer): void {
+  const snapshotDigest = before === null ? undefined : sha256Hex(before);
+  writeFileAtomicSync(full, after, {
+    createOnly: before === null,
+    beforeCommit: () => {
+      if (insideWorkspace(execution.workspace, path).full !== full) {
+        throw new Error(`"${path}" changed location while this call ran — read it again, then retry`);
+      }
+      const verdict = before === null
+        ? ledger.mayWrite(execution.agentId, full)
+        : ledger.mayEdit(execution.agentId, full, snapshotDigest);
+      if (!verdict.ok) throw new Error(`"${path}" changed while this call ran — ${verdict.reason}`);
+    }
+  });
 }
 
 function editsOf(args: z.infer<typeof editArgs>): LiteralEdit[] {
@@ -295,7 +304,7 @@ export function fsTools(deps: FsToolDeps): readonly ToolDefinition[] {
         const args = writeArgs.parse(execution.arguments);
         const { full, rel } = insideWorkspace(execution.workspace, args.path);
         const before = readIfExists(full);
-        const verdict = ledger.mayWrite(execution.agentId, full);
+        const verdict = ledger.mayWrite(execution.agentId, full, before === null ? undefined : sha256Hex(before));
         if (!verdict.ok) throw new Error(verdict.reason);
         const after = Buffer.from(args.content, "utf8");
         const diff = before === null ? null : shownDiff(rel, before, after);
@@ -303,7 +312,7 @@ export function fsTools(deps: FsToolDeps): readonly ToolDefinition[] {
           return { ok: true, output: withDiff(`SIMULATE fs.write ${args.path} (${after.length} bytes)`, diff?.text ?? ""), bytes: 0 };
         }
         mkdirSync(dirname(full), { recursive: true });
-        writeIfUnchanged(full, args.path, before, after);
+        writeIfUnchanged(execution, ledger, full, args.path, before, after);
         // Refresh: the agent now knows this file's contents, because it just
         // produced them.
         ledger.recordRead(execution.agentId, full, after);
@@ -355,7 +364,7 @@ export function fsTools(deps: FsToolDeps): readonly ToolDefinition[] {
         // Read before the policy check, and write only if the file still holds
         // these bytes: the plan, the diff and the evidence all describe them.
         const raw = readIfExists(full);
-        const verdict = ledger.mayEdit(execution.agentId, full);
+        const verdict = ledger.mayEdit(execution.agentId, full, raw === null ? undefined : sha256Hex(raw));
         if (!verdict.ok) throw new Error(verdict.reason);
         if (raw === null) throw new Error(`"${args.path}" changed while this call ran — read it again, then retry`);
         const before = utf8(raw);
@@ -369,7 +378,7 @@ export function fsTools(deps: FsToolDeps): readonly ToolDefinition[] {
         if (simulated(execution)) {
           return { ok: true, output: withDiff(`SIMULATE fs.edit ${args.path} (${summary})`, diff.text), bytes: 0 };
         }
-        writeIfUnchanged(full, args.path, raw, after);
+        writeIfUnchanged(execution, ledger, full, args.path, raw, after);
         ledger.recordRead(execution.agentId, full, after);
         noteFileChange(execution.token, {
           path: rel, beforeSha256: sha256Hex(raw), afterSha256: sha256Hex(after), bytesBefore: raw.length,

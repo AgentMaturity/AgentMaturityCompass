@@ -1322,7 +1322,7 @@ export {
   autoDetectAndAssemble
 } from "./incidents/autoAssembly.js";
 export {
-  buildIncidentRegressionReceipt,
+  buildIncidentRegressionReceipt, signIncidentRegressionReceipt, verifyIncidentRegressionReceipt,
   buildIncidentRegressionWatchAlerts,
   type BuildIncidentRegressionReceiptInput,
   type IncidentRegressionAlertSeverity,
@@ -1331,8 +1331,8 @@ export {
   type IncidentRegressionGeneratedTest,
   type IncidentRegressionGeneratedTestReceipt,
   type IncidentRegressionLiveTrends,
-  type IncidentRegressionReceipt,
-  type IncidentRegressionReceiptStatus,
+  type IncidentRegressionReceipt, type IncidentRegressionReceiptSignature,
+  type IncidentRegressionReceiptStatus, type IncidentRegressionReceiptVerification,
   type IncidentRegressionTraceIndex,
   type IncidentRegressionTraceIndexEntry,
   type IncidentRegressionTraceRow,
@@ -2408,8 +2408,8 @@ export type {
 // ── Red Team: Prompt Injection Regression Suite ─
 export {
   PROMPT_INJECTION_REGRESSION_SUITE_SCHEMA_VERSION,
-  buildPromptInjectionRegressionSuiteReceipt,
-  renderPromptInjectionRegressionSuiteMarkdown,
+  buildPromptInjectionRegressionSuiteReceipt, promptInjectionRegressionEvidencePayload,
+  renderPromptInjectionRegressionSuiteMarkdown, signPromptInjectionRegressionSuiteReceipt,
   verifyPromptInjectionRegressionSuiteReceipt,
 } from "./redteam/promptInjectionRegressionSuite.js";
 export type {

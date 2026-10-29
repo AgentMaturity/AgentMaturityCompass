@@ -30,10 +30,18 @@ export interface BootOptions {
    * enforced and what is recorded — is the last thing that should be editable
    * without attestation.
    *
-   * Default false: boot() has no production caller yet, so unsigned
-   * development compositions keep booting and their `signature` status says
-   * unverified. Whether a production carrier requires it is decided where
-   * boot() is adopted (GAP-WP39), not here.
+   * Default false: unsigned development compositions keep booting and their
+   * `signature` status says unverified.
+   *
+   * boot() is LIBRARY-ONLY (GAP-WP39 decision). No native surface boots
+   * amc.cordis.yml: agent-loop, ACP, Studio native tasks, the SDK and delegated
+   * children all compose through composeNativeAgent / runComposedTurn, whose
+   * services take per-run inputs (the session, routes, credentials, prompt
+   * profile, approval gate) that a static workspace file cannot carry. Booting
+   * a workspace-writable YAML on that path would also make the file decide
+   * which code loads under a governed run -- broader executable composition
+   * than WP12's admission was built to authorise. `amc composition` reports
+   * `bootedBy: []` so an operator is not told otherwise.
    */
   requireSignature?: boolean;
   /**
