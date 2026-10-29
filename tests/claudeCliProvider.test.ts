@@ -74,6 +74,8 @@ const runnerFor = (dir: string, over: Record<string, unknown> = {}) =>
     providerRoute: "/anthropic",
     model: "claude-opus-4-6",
     timeoutMs: 20_000,
+    // AXR-10: these cases are about the model route; the control-hook requirement has its own file.
+    observeOnly: true,
     ...over
   });
 

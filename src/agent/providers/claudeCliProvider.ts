@@ -1,4 +1,6 @@
 import { claudeCliAdapter } from "../../adapters/builtins/claudeCli.js";
+import { getHookIntegrationStatus } from "../../adapters/hookIntegration.js";
+import { verifyManagedLease } from "../../adapters/managedHookLease.js";
 import { detectAdapter } from "../../adapters/adapterDetection.js";
 import { assembleAdapterEnv } from "../../adapters/envAssembler.js";
 import { issueLeaseToken } from "../../leases/leaseSigner.js";
@@ -60,6 +62,40 @@ export interface ClaudeCliForeignRunnerInit {
   readonly leaseTtlMs?: number;
   readonly maxRequestsPerMinute?: number;
   readonly maxTokensPerMinute?: number;
+  /**
+   * AXR-10: run the child WITHOUT AMC's PreToolUse control hook, governing only its model route (`gateway:llm`).
+   * Off by default: a delegated Claude Code child otherwise runs Bash, Edit and Write under no AMC tool policy, so
+   * without this the runner refuses to spawn unless the workspace's signed control hook is installed and admitted.
+   */
+  readonly observeOnly?: boolean;
+}
+
+/**
+ * Why a delegated Claude Code child's own tool calls would not meet AMC's hook control, or null when they would (AXR-10).
+ *
+ * The child runs the workspace's signed Claude Code control installation: Claude Code loads it from the project's
+ * `.claude/settings.local.json` when started in the workspace, and every PreToolUse call is decided by the Bridge's
+ * control route under that installation's `hook:control` lease. Nothing is handed to the child on its command line:
+ * AMC's forwarder accepts only the installation's lease, and AMC refuses to govern a session started with `--settings`
+ * (it can add hooks AMC did not install), so a per-child lease or settings file would leave every call denied.
+ */
+function claudeControlHookRefusal(workspace: string, agentId: string): string | null {
+  const install = "install it with: amc connect hooks install --provider claude-code --mode control --agent " + agentId + ", or delegate observe-only";
+  let status: ReturnType<typeof getHookIntegrationStatus>;
+  try {
+    status = getHookIntegrationStatus({ workspace, provider: "claude-code", readonly: true });
+  } catch (error) {
+    return `AMC's Claude Code control hook cannot be inspected (${error instanceof Error ? error.message : String(error)}); ${install}`;
+  }
+  if (status.state !== "installed" || status.mode !== "control" || !status.configOwned || !status.manifestValid) {
+    return `AMC's Claude Code control hook is not installed (${status.mode ?? "no"} hook, ${status.state}${status.issues.length > 0 ? `: ${status.issues.join("; ")}` : ""}); ${install}`;
+  }
+  if (status.agentId !== agentId) return `AMC's Claude Code control hook governs ${status.agentId ?? "no agent"}, not ${agentId}; ${install}`;
+  const lease = verifyManagedLease({ workspace, tokenPath: status.files.token, expectedAgentId: agentId, mode: "control" });
+  if (!lease.valid || lease.payload?.leaseId !== status.leaseId) {
+    return `AMC's Claude Code control hook is not admitted: ${lease.error ?? "its lease is not the installation's"}; ${install}`;
+  }
+  return null;
 }
 
 export function claudeCliForeignRunner(init: ClaudeCliForeignRunnerInit): SubagentRunner {
@@ -79,8 +115,15 @@ export function claudeCliForeignRunner(init: ClaudeCliForeignRunnerInit): Subage
       };
     }
 
+    // AXR-10: the child's own tool calls meet AMC's hook control, or it is not started.
+    const refusal = init.observeOnly === true ? null : claudeControlHookRefusal(init.workspace, ctx.toolsetAgentId);
+    if (refusal !== null) return { ok: false, text: "", reason: `refusing to delegate to Claude Code: ${refusal}` };
+
     const runner = createForeignRunner({
       workspace: init.workspace,
+      // Claude Code loads the installed control hook from the workspace it starts in, and the forwarder reads its
+      // workspace from the same working directory.
+      ...(init.observeOnly === true ? {} : { cwd: init.workspace }),
       ...(init.timeoutMs === undefined ? {} : { timeoutMs: init.timeoutMs }),
       spawn: (goal) => ({
         command: detection.command as string,
