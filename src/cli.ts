@@ -102,6 +102,7 @@ import {
   unverifiedClaim, withClaimFields, withClaimFieldsEach
 } from "./cli/claimOutput.js";
 import { renderDiagnosticReportHtml } from "./cli/reportRenderers.js";
+import { emitScoreEvidenceResult } from "./cli/scoreEvidenceOutput.js";
 import { envelopeForComplianceReport } from "./claims/eligibility/adapters/results.js";
 import { formatClaimLabel, renderClaimLabel, renderClaimLegend } from "./claims/eligibility/render.js";
 import { listDecisionReceipts, loadDecisionReceipt, observeDecisionOutcomes, writeDecisionReceipts, type DecisionReceipt } from "./lifecycle/decisionReceipt.js";
@@ -22827,12 +22828,11 @@ score
     try {
       const { scoreFactuality } = await import("./score/factuality.js");
       const result = scoreFactuality({});
-      if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n📚  Factuality"), result, unverifiedClaim("score:factuality", 0), opts)) return;
-      console.log(chalk.gray("Score:"), result.overallScore.toFixed(2));
-      console.log(chalk.gray("  Parametric:"), result.parametric.score.toFixed(2));
-      console.log(chalk.gray("  Search/Retrieval:"), result.searchRetrieval.score.toFixed(2));
-      console.log(chalk.gray("  Grounded:"), result.grounded.score.toFixed(2));
-      if (result.overallScore === 0) { console.log(chalk.yellow("\n💡 No data provided. Pipe evidence via --json or use 'amc score collect-evidence <agentId>' first.")); }
+      if (emitScoreEvidenceResult(chalk.bold.hex('#4AEF79')("\n📚  Factuality"), result, unverifiedClaim("score:factuality", 0), opts)) return;
+      console.log(chalk.gray("Score:"), result.overallScore?.toFixed(2) ?? "not_evaluated");
+      console.log(chalk.gray("  Parametric:"), result.parametric.score?.toFixed(2) ?? "not_evaluated");
+      console.log(chalk.gray("  Search/Retrieval:"), result.searchRetrieval.score?.toFixed(2) ?? "not_evaluated");
+      console.log(chalk.gray("  Grounded:"), result.grounded.score?.toFixed(2) ?? "not_evaluated");
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
 
@@ -23036,7 +23036,7 @@ score
     try {
       const { scoreOutputAttestation } = await import("./score/outputAttestation.js");
       const result = scoreOutputAttestation({});
-      if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n📜  Output Attestation"), result, unverifiedClaim("score:outputAttestation", 0), opts)) return;
+      if (emitScoreEvidenceResult(chalk.bold.hex('#4AEF79')("\n📜  Output Attestation"), result, unverifiedClaim("score:outputAttestation", 0), opts)) return;
       console.log(chalk.gray("Score:"), result.score, chalk.gray(`(L${result.level})`));
       console.log(chalk.gray("Output signing:"), result.hasOutputSigning ? chalk.green("yes") : chalk.red("no"));
       console.log(chalk.gray("Trust level binding:"), result.hasTrustLevelBinding ? chalk.green("yes") : chalk.red("no"));
@@ -23051,7 +23051,7 @@ score
     try {
       const { scoreMutualVerification } = await import("./score/mutualVerification.js");
       const result = scoreMutualVerification({});
-      if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n🤝  Mutual Verification"), result, unverifiedClaim("score:mutualVerification", 0), opts)) return;
+      if (emitScoreEvidenceResult(chalk.bold.hex('#4AEF79')("\n🤝  Mutual Verification"), result, unverifiedClaim("score:mutualVerification", 0), opts)) return;
       console.log(chalk.gray("Score:"), result.score, chalk.gray(`(L${result.level})`));
       console.log(chalk.gray("Challenge-response:"), result.hasChallengeResponse ? chalk.green("yes") : chalk.red("no"));
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
@@ -23174,7 +23174,8 @@ const classify = program.command("classify").description("Classify agent vs work
 classify.command("agent <agentId>").description("Classify whether system is workflow or agent").option("--json", "JSON output").action(async (agentId: string, opts: { json?: boolean }) => {
   const { classifyAgentVsWorkflow } = await import("./score/agentVsWorkflow.js");
   const result = classifyAgentVsWorkflow({});
-  if (opts.json) { console.log(JSON.stringify(result, null, 2)); } else { console.log(chalk.bold(`Classification — ${agentId}`)); console.log(`  Type:       ${result.classification}`); console.log(`  AMC Level:  ${result.amcLevel}`); console.log(`  Label:      ${result.marketingLabel}`); console.log(`  Governance: ${result.governanceUrgency}`); }
+  if (result.outcome !== "measured") process.exitCode = 1;
+  if (opts.json) { console.log(JSON.stringify(result, null, 2)); } else if (result.outcome !== "measured") { console.log(chalk.bold(`Classification — ${agentId}`)); console.log("No data: not_evaluated."); } else { console.log(chalk.bold(`Classification — ${agentId}`)); console.log(`  Type:       ${result.classification}`); console.log(`  AMC Level:  ${result.amcLevel}`); console.log(`  Label:      ${result.marketingLabel}`); console.log(`  Governance: ${result.governanceUrgency}`); }
 });
 
 // Claims command
@@ -23182,7 +23183,8 @@ const claims = program.command("claims").description("Evidence claim expiry trac
 claims.command("list <agentId>").description("List all evidence claims with TTL status").option("--json", "JSON output").action(async (agentId: string, opts: { json?: boolean }) => {
   const { checkClaimExpiry, CLAIM_TTL } = await import("./score/claimExpiry.js");
   const result = checkClaimExpiry([]);
-  if (opts.json) { console.log(JSON.stringify({ agentId, ...result, ttlDefaults: CLAIM_TTL }, null, 2)); } else { console.log(chalk.bold(`Claims — ${agentId}`)); console.log(`  Expired: ${result.expired.length}`); console.log(`  Stale:   ${result.stale.length}`); console.log(`  Fresh:   ${result.fresh.length}`); console.log(`  Certification blocked: ${result.certificationBlocked}`); }
+  if (result.outcome !== "measured") process.exitCode = 1;
+  if (opts.json) { console.log(JSON.stringify({ agentId, ...result, ttlDefaults: CLAIM_TTL }, null, 2)); } else if (result.outcome !== "measured") { console.log(chalk.bold(`Claims — ${agentId}`)); console.log("No data: not_evaluated."); } else { console.log(chalk.bold(`Claims — ${agentId}`)); console.log(`  Expired: ${result.expired.length}`); console.log(`  Stale:   ${result.stale.length}`); console.log(`  Fresh:   ${result.fresh.length}`); console.log(`  Certification blocked: ${result.certificationBlocked}`); }
 });
 
 // DAG command
@@ -23197,8 +23199,9 @@ dag.command("score").description("Score DAG governance").option("--json", "JSON 
   const { captureDAG, scoreDAGGovernance } = await import("./score/orchestrationDAG.js");
   const dagResult = captureDAG([]);
   const result = scoreDAGGovernance(dagResult);
+  if (result.outcome !== "measured") process.exitCode = 1;
   const claim = unverifiedClaim("score:orchestrationDAG", 0);
-  if (opts.json) { console.log(JSON.stringify(withClaimFields(result, claim), null, 2)); } else { console.log(chalk.bold("DAG Governance Score")); printClaimResult(claim, opts); console.log(`  Score: ${result.score}/100`); console.log(`  Level: ${result.level}`); }
+  if (opts.json) { console.log(JSON.stringify(withClaimFields(result, claim), null, 2)); } else { console.log(chalk.bold("DAG Governance Score")); printClaimResult(claim, opts); if (result.outcome !== "measured") { console.log("No data: not_evaluated."); } else { console.log(`  Score: ${result.score}/100`); console.log(`  Level: ${result.level}`); } }
 });
 
 // Confidence command
