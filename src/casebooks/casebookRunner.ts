@@ -78,9 +78,11 @@ function sameExecution(meta: Record<string, unknown>, expected: CaseExecutionRef
 
 /** Tokens of llm_response rows; null unless every row reports complete usage (measuredUsage: totals win, aliases once). */
 function measuredTokens(events: readonly { event: EvidenceEvent; meta: Record<string, unknown> }[]): number | null {
+  const responses = events.filter(({ event }) => event.event_type === "llm_response");
+  // No attributable usage row is unknown cost, not zero cost.
+  if (responses.length === 0) return null;
   let tokens = 0;
-  for (const { event, meta } of events) {
-    if (event.event_type !== "llm_response") continue;
+  for (const { meta } of responses) {
     const usage = measuredUsage(meta.usage, false);
     if (!usage.tokensKnown) return null;
     tokens += usage.tokens;
@@ -93,6 +95,8 @@ function judgeCase(params: {
   mode: "supervise" | "sandbox";
   kase: ReturnType<typeof loadCase>;
   evidence: readonly { event: EvidenceEvent; meta: Record<string, unknown> }[];
+  /** Audit rows in the window not attributed to any case execution; a forbidden one fails every bound case. */
+  unattributedAudits: readonly string[];
   correlationRatio: number | null;
 }): { status: CaseRunStatus; reasons: string[] } {
   const { kase, evidence, correlationRatio } = params;
@@ -100,6 +104,9 @@ function judgeCase(params: {
   const unavailable: string[] = [];
   if ((kase.riskTier === "high" || kase.riskTier === "critical") && params.mode !== "sandbox") {
     failed.push("high-risk case requires sandbox mode");
+  }
+  for (const audit of kase.validators.forbiddenAudits) {
+    if (params.unattributedAudits.includes(audit)) failed.push(`forbidden audit in the evidence window is not attributable to another execution: ${audit}`);
   }
   // Nothing ran: missing evidence is neither a pass nor a behavioural failure of any evidence validator.
   if (evidence.length === 0) return { status: failed.length > 0 ? "failed" : "unavailable", reasons: [...failed, "no execution evidence for case"] };
@@ -169,6 +176,10 @@ function runCasebookAtWindow(params: {
       .map((event) => ({ event, meta: parseMeta(event) }))
       .filter((row): row is { event: EvidenceEvent; meta: Record<string, unknown> } => row.meta !== null && (row.meta.agentId ?? "default") === agentId);
 
+    // Bound mode: an unstamped audit cannot be ruled out as this execution's, so it is checked against every case.
+    const unattributedAudits = params.trial ? evidence
+      .filter(({ event, meta }) => event.event_type === "audit" && meta.caseExecution === undefined)
+      .map(({ meta }) => typeof meta.auditType === "string" ? meta.auditType : "") : [];
     const results: CaseRunResult[] = loaded.casebook.caseIds.map((caseId) => {
       const kase = loadCase(params.workspace, params.casebookId, caseId, agentId);
       const ref: CaseExecutionRef | null = params.trial ? {
@@ -178,7 +189,7 @@ function runCasebookAtWindow(params: {
       } : null;
       // A legacy window cannot attribute rows to a case: every case sees the whole window and no case gets a cost.
       const own = ref ? evidence.filter(({ meta }) => sameExecution(meta, ref)) : evidence;
-      const judged = judgeCase({ ledger, mode: params.mode, kase, evidence: own, correlationRatio });
+      const judged = judgeCase({ ledger, mode: params.mode, kase, evidence: own, unattributedAudits, correlationRatio });
       return {
         caseId: kase.caseId,
         title: kase.title,

@@ -152,6 +152,41 @@ describe("casebook results are bound to case, trial and configuration identity (
   });
 });
 
+describe("security review: unattributed audits and missing usage (WP03)", () => {
+  test("an unstamped forbidden audit in the trial window fails the case; no usage row is unknown cost, not zero", () => {
+    const ws = newWorkspace();
+    writeCasebook(ws, "audit", ["case_a"]);
+    const casePath = join(casebookDir(ws, "audit"), "cases", "case_a.json");
+    const kase = JSON.parse(readFileSync(casePath, "utf8")) as { validators: { forbiddenAudits: string[] } };
+    kase.validators.forbiddenAudits = ["TOOLHUB_BYPASS_ATTEMPTED"];
+    writeFileSync(casePath, JSON.stringify(kase, null, 2));
+    signConfig(ws, casePath);
+    const execution = ref(ws, "audit", "case_a", "t", DIGEST_A);
+    const ledger = openLedger(ws);
+    try {
+      ledger.startSession({ sessionId: "nousage", runtime: "unknown", binaryPath: "vitest", binarySha256: "vitest" });
+      appendToolEvidenceWithReceipt({ ledger, workspace: ws, sessionId: "nousage", agentId: "default", toolName: "fs.read",
+        eventType: "tool_action", payload: { path: "/tmp/x" }, extraMeta: { caseExecution: execution } });
+      ledger.sealSession("nousage");
+    } finally { ledger.close(); }
+    const trial = { trialId: "t", configDigest: DIGEST_A };
+    const clean = runCasebook({ workspace: ws, agentId: "default", casebookId: "audit", mode: "sandbox", window: "1d", trial });
+    expect(clean.results[0]!.status).toBe("passed");
+    expect(clean.results[0]!.costTokens).toBeNull();
+
+    const audit = openLedger(ws);
+    try {
+      audit.startSession({ sessionId: "bypass", runtime: "unknown", binaryPath: "vitest", binarySha256: "vitest" });
+      audit.appendEvidence({ sessionId: "bypass", runtime: "unknown", eventType: "audit", payload: "{}", payloadExt: "json", inline: true,
+        meta: { agentId: "default", trustTier: "OBSERVED", auditType: "TOOLHUB_BYPASS_ATTEMPTED" } });
+      audit.sealSession("bypass");
+    } finally { audit.close(); }
+    const dirty = runCasebook({ workspace: ws, agentId: "default", casebookId: "audit", mode: "sandbox", window: "1d", trial });
+    expect(dirty.results[0]!.status).toBe("failed");
+    expect(dirty.results[0]!.reasons.some((reason) => reason.includes("TOOLHUB_BYPASS_ATTEMPTED"))).toBe(true);
+  });
+});
+
 describe("paired statistics (WP05)", () => {
   test("paired bootstrap keeps pairs, is deterministic, and reports insufficiency instead of [0, 0]", () => {
     const pairs = [[10, 12], [50, 51], [90, 93], [30, 31]] as const;
