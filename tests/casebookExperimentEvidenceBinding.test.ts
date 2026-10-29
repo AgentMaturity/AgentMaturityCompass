@@ -328,7 +328,8 @@ describe("experiment promotion verifies its inputs and keeps the baseline eligib
   });
 
   test("analyze --all CLI exposes verified history without executing trials", () => {
-    const { ws, created, run } = setup(false, 1);
+    // A passing candidate: analyze exits by task outcome (1 when the candidate failed), so exit 0 here is the history read.
+    const { ws, created, run } = setup(true, 1);
     const outFile = join(ws, "cli-history.json");
     const before = readdirSync(join(ws, ".amc", "experiments", created.experimentId, "runs")).sort();
     execFileSync(process.execPath, [join(process.cwd(), "dist/cli.js"), "experiment", "analyze", "--experiment", created.experimentId, "--all", "--out", outFile], { cwd: ws });

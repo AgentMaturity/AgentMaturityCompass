@@ -18792,6 +18792,8 @@ program
     console.log(chalk.bold(`\nComparison: ${opts.baseline} vs ${opts.candidate}\n`));
     const { printLabComparison } = await import("./lab/labComparisonCli.js");
     printLabComparison(pairs);
+    // Unmatched rows are reported, but a comparison with no matched probe is not a successful comparison.
+    if (!pairs.some(pair => pair.status === "matched")) { console.log(chalk.yellow("No matching probes to compare.")); process.exitCode = 1; }
   });
 
 program
