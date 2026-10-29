@@ -1,7 +1,7 @@
 import { join } from "node:path";
 import { resolveAgentId } from "../fleet/paths.js";
-import { listVerifiedRuns } from "../diagnostic/runReportResolution.js";
-import type { DiagnosticReport } from "../types.js";
+import { refusedRunsBlocking, scanVerifiedRuns } from "../diagnostic/runReportResolution.js";
+import { deriveIntegrityIndex } from "../cert/trustCertificate.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 
@@ -50,6 +50,9 @@ export interface TrustDriftMonitorResult {
   agentId: string;
   threshold: number;
   analyzedRuns: number;
+  /** INSUFFICIENT_EVIDENCE when a tampered, unreadable or newer unsealed run was refused: the series may be stale (WP37). */
+  evidenceStatus: "MEASURED" | "INSUFFICIENT_EVIDENCE";
+  unverifiedRuns: string[];
   latestPoint: TrustDriftPoint | null;
   alerts: TrustDriftAlert[];
   statePath: string;
@@ -83,30 +86,16 @@ function trustMonitorStatePath(workspace: string, agentId: string): string {
   return join(trustMonitorRoot(workspace), `${agentId}.json`);
 }
 
-function deriveIntegrityIndex(report: Partial<DiagnosticReport>): number {
-  if (typeof report.integrityIndex === "number" && Number.isFinite(report.integrityIndex)) {
-    return clamp01(report.integrityIndex);
-  }
-  if (Array.isArray(report.layerScores) && report.layerScores.length > 0) {
-    const scores = report.layerScores
-      .map((row) => row?.avgFinalLevel)
-      .filter((value): value is number => typeof value === "number" && Number.isFinite(value));
-    if (scores.length > 0) {
-      const avg = scores.reduce((sum, value) => sum + value, 0) / scores.length;
-      return clamp01(avg / 5);
-    }
-  }
-  return 0;
-}
-
-/** Only sealed runs form the series (WP37): an edited run must neither raise nor fake a drift alert. */
-function loadTrustSeries(workspace: string, agentId: string): TrustDriftPoint[] {
-  return listVerifiedRuns(workspace, agentId)
+/** Only sealed runs form the series (WP37): an edited run must neither raise nor fake a drift alert; refused files that block the latest point are returned. */
+function loadTrustSeries(workspace: string, agentId: string): { points: TrustDriftPoint[]; blocking: string[] } {
+  const { runs, refused } = scanVerifiedRuns(workspace, agentId);
+  const points = runs
     .map((run) => {
       const integrityIndex = deriveIntegrityIndex(run);
       return { runId: run.runId, ts: run.ts, integrityIndex, score0to100: round2(integrityIndex * 100) };
     })
     .sort((a, b) => a.ts - b.ts || a.runId.localeCompare(b.runId));
+  return { points, blocking: refusedRunsBlocking(refused, points.at(-1)?.ts ?? null).map((row) => row.file) };
 }
 
 function severityFromDrop(drop: number, threshold: number): TrustDriftSeverity {
@@ -183,7 +172,7 @@ export function startTrustDriftMonitor(input: StartTrustDriftMonitorInput): Trus
   const agentId = resolveAgentId(workspace, input.agentId);
   const threshold = normalizeThreshold(input.alertThreshold);
   const nowTs = typeof input.nowTs === "number" ? input.nowTs : Date.now();
-  const points = loadTrustSeries(workspace, agentId);
+  const { points, blocking } = loadTrustSeries(workspace, agentId);
   const existingState = loadState(workspace, agentId);
 
   let startIndex = 0;
@@ -247,6 +236,8 @@ export function startTrustDriftMonitor(input: StartTrustDriftMonitorInput): Trus
     agentId,
     threshold,
     analyzedRuns: newPoints.length,
+    evidenceStatus: blocking.length > 0 ? "INSUFFICIENT_EVIDENCE" : "MEASURED",
+    unverifiedRuns: blocking,
     latestPoint: lastPoint,
     alerts,
     statePath

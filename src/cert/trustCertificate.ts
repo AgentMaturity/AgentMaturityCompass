@@ -5,7 +5,7 @@ import {
   ensureSigningKeys,
 } from "../crypto/keys.js";
 import { resolveAgentId } from "../fleet/paths.js";
-import { listVerifiedRuns } from "../diagnostic/runReportResolution.js";
+import { latestVerifiedRun } from "../diagnostic/runReportResolution.js";
 import type { DiagnosticReport } from "../types.js";
 import { pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -107,7 +107,8 @@ function round2(value: number): number {
   return Math.round(value * 100) / 100;
 }
 
-function deriveIntegrityIndex(report: Partial<DiagnosticReport>): number {
+/** A run's integrity 0..1: its integrityIndex, else mean layer level / 5. Shared by the trust certificate, drift monitor and regulatory readiness. */
+export function deriveIntegrityIndex(report: Partial<DiagnosticReport>): number {
   if (typeof report.integrityIndex === "number" && Number.isFinite(report.integrityIndex)) {
     return clamp01(report.integrityIndex);
   }
@@ -124,10 +125,10 @@ function deriveIntegrityIndex(report: Partial<DiagnosticReport>): number {
 }
 
 /** The newest run whose seal verifies (WP37): an edited run file must not become a signed score. */
-function loadLatestRunSnapshot(workspace: string, agentId: string): RunSnapshot {
-  const best = listVerifiedRuns(workspace, agentId)[0];
+function loadLatestRunSnapshot(workspace: string, agentId: string): RunSnapshot & { blocking: string[] } {
+  const { run: best, blocking } = latestVerifiedRun(workspace, agentId);
   if (!best) {
-    return { runId: null, runTs: null, runSha256: null, integrityIndex: 0, score0to100: 0 };
+    return { runId: null, runTs: null, runSha256: null, integrityIndex: 0, score0to100: 0, blocking: blocking.map((row) => row.file) };
   }
   const integrityIndex = deriveIntegrityIndex(best);
   return {
@@ -135,7 +136,8 @@ function loadLatestRunSnapshot(workspace: string, agentId: string): RunSnapshot 
     runTs: best.ts,
     runSha256: best.reportJsonSha256,
     integrityIndex,
-    score0to100: round2(integrityIndex * 100)
+    score0to100: round2(integrityIndex * 100),
+    blocking: []
   };
 }
 
@@ -298,6 +300,10 @@ function prepareTrustCertificate(input: GenerateTrustCertificateInput) {
   const signatureStatus: TrustCertificateSignatureStatus = input.preview ? "UNSIGNED_PREVIEW" : "SIGNED";
 
   const runSnapshot = loadLatestRunSnapshot(workspace, agentId);
+  if (!input.preview && runSnapshot.blocking.length > 0) {
+    // Signing the last sealed run here would roll the certificate back past a tampered or unverifiable newer run.
+    throw new Error(`Unverifiable diagnostic run(s) for agent ${agentId} (${runSnapshot.blocking.join(", ")}); refusing to sign a trust certificate from older evidence.`);
+  }
   if (!input.preview && runSnapshot.runId === null) {
     throw new Error(`No sealed diagnostic run verifies for agent ${agentId}; refusing to sign a trust certificate (use --preview for an unsigned preview).`);
   }

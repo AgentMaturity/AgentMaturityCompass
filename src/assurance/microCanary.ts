@@ -234,18 +234,11 @@ export function getProbesByTier(tier: CanaryProbeRiskTier): MicroCanaryProbeDefi
 // Built-in probes
 // ---------------------------------------------------------------------------
 
-/**
- * Register the standard set of built-in micro-canary probes.
- */
-/**
- * A count probe that sees no audit telemetry at all observed nothing: it is not evaluated (SKIP), never a PASS on
- * zero counts (WP37). Returns the SKIP result, or null when the window carries audit events.
- */
+/** A count probe with no audit telemetry observed nothing: SKIP (not evaluated), never PASS on zero counts (WP37). */
 function noAuditTelemetry(ctx: MicroCanaryContext, start: number): MicroCanaryProbeResult | null {
-  const total = Object.values(ctx.auditCounts).reduce((sum, count) => sum + count, 0);
-  return total > 0 ? null : { status: "SKIP", reason: "No audit telemetry in window: not evaluated", latencyMs: Date.now() - start, evidenceRefs: [] };
+  return Object.values(ctx.auditCounts).some((count) => count > 0) ? null : { status: "SKIP", reason: "No audit telemetry in window: not evaluated", latencyMs: Date.now() - start, evidenceRefs: [] };
 }
-
+/** Register the standard set of built-in micro-canary probes. */
 export function registerBuiltInProbes(): void {
   registerProbe({
     probeId: "mc-evidence-chain",
@@ -372,19 +365,11 @@ export function registerBuiltInProbes(): void {
     description: "Checks for injection attempt markers in recent audit events",
     evaluate: (ctx) => {
       const start = Date.now();
-      const unobserved = noAuditTelemetry(ctx, start);
-      if (unobserved) return unobserved;
+      const unobserved = noAuditTelemetry(ctx, start); if (unobserved) return unobserved;
       const injectionCount = ctx.auditCounts["INJECTION_ATTEMPT"] ?? 0;
       const blockedCount = ctx.auditCounts["INJECTION_BLOCKED"] ?? 0;
 
-      if (injectionCount === 0) {
-        return {
-          status: "PASS",
-          reason: "No injection attempts detected",
-          latencyMs: Date.now() - start,
-          evidenceRefs: [],
-        };
-      }
+      if (injectionCount === 0) return { status: "PASS", reason: "No injection attempts detected", latencyMs: Date.now() - start, evidenceRefs: [] };
 
       const blockRate = blockedCount / injectionCount;
 
@@ -405,8 +390,7 @@ export function registerBuiltInProbes(): void {
     description: "Checks for secret exposure events in recent audit trail",
     evaluate: (ctx) => {
       const start = Date.now();
-      const unobserved = noAuditTelemetry(ctx, start);
-      if (unobserved) return unobserved;
+      const unobserved = noAuditTelemetry(ctx, start); if (unobserved) return unobserved;
       const exposureCount = ctx.auditCounts["SECRET_EXPOSED"] ?? 0;
       const leakCount = ctx.auditCounts["PII_LEAKED"] ?? 0;
 
@@ -431,8 +415,7 @@ export function registerBuiltInProbes(): void {
     description: "Checks for unauthorized tool usage patterns",
     evaluate: (ctx) => {
       const start = Date.now();
-      const unobserved = noAuditTelemetry(ctx, start);
-      if (unobserved) return unobserved;
+      const unobserved = noAuditTelemetry(ctx, start); if (unobserved) return unobserved;
       const deniedCount = ctx.auditCounts["TOOL_DENIED"] ?? 0;
       const unauthorizedCount = ctx.auditCounts["UNAUTHORIZED_TOOL_USE"] ?? 0;
 
@@ -462,8 +445,7 @@ export function registerBuiltInProbes(): void {
     description: "Checks for unexpected configuration changes",
     evaluate: (ctx) => {
       const start = Date.now();
-      const unobserved = noAuditTelemetry(ctx, start);
-      if (unobserved) return unobserved;
+      const unobserved = noAuditTelemetry(ctx, start); if (unobserved) return unobserved;
       const configChanges = ctx.auditCounts["CONFIG_CHANGED"] ?? 0;
       const unsignedChanges = ctx.auditCounts["UNSIGNED_CONFIG_CHANGE"] ?? 0;
 

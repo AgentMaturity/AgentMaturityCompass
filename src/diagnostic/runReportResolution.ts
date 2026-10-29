@@ -158,22 +158,64 @@ export function latestRunSummary(workspace: string, agentId: string): { runId: s
   }
 }
 
+/** A run file the verifying reader refused: unparseable, unsealed, or sealed but failing (tampered). */
+export interface RefusedRun {
+  file: string;
+  /** The ts the file claims, or null when unreadable. Attacker-controlled: never trusted to place a tampered file in time. */
+  ts: number | null;
+  /** Unreadable, or it carries a seal that fails: evidence of tampering rather than an honest unsigned run. */
+  tampered: boolean;
+}
+
 /**
- * The scoring/signing run reader (WP37): the agent's runs whose seal verifies (`sealedRunReportVerifies`), newest first.
- * Unparseable, unsealed and tampered files are never returned — anything that gates, signs or scores reads runs here,
- * not through `agentRunFiles`/`loadRunReport`, which select for display.
+ * The scoring/signing run reader (WP37): the agent's runs whose seal verifies (`sealedRunReportVerifies`), newest
+ * first, and every file it refused. Anything that gates, signs or scores reads runs here, not through
+ * `agentRunFiles`/`loadRunReport`, which select for display.
  */
+export function scanVerifiedRuns(workspace: string, agentId: string): { runs: DiagnosticReport[]; refused: RefusedRun[] } {
+  const runs: DiagnosticReport[] = [], refused: RefusedRun[] = [];
+  for (const file of agentRunFiles(workspace, agentId)) {
+    let parsed: Record<string, unknown>;
+    try {
+      parsed = JSON.parse(readUtf8(file)) as Record<string, unknown>;
+    } catch {
+      refused.push({ file, ts: null, tampered: true });
+      continue;
+    }
+    if (parsed !== null && typeof parsed === "object" && sealedRunReportVerifies(workspace, parsed)) {
+      runs.push(parsed as unknown as DiagnosticReport);
+      continue;
+    }
+    const seal = parsed?.runSealSig;
+    refused.push({ file, ts: typeof parsed?.ts === "number" && Number.isFinite(parsed.ts) ? parsed.ts : null,
+      tampered: typeof seal === "string" && seal.length > 0 && seal !== "unsigned" });
+  }
+  runs.sort((a, b) => b.ts - a.ts || b.runId.localeCompare(a.runId));
+  return { runs, refused };
+}
+
+/** The sealed runs only, newest first; see `scanVerifiedRuns` for the refused files. */
 export function listVerifiedRuns(workspace: string, agentId: string): DiagnosticReport[] {
-  return agentRunFiles(workspace, agentId)
-    .flatMap((file) => {
-      try {
-        const parsed = JSON.parse(readUtf8(file)) as Record<string, unknown>;
-        return sealedRunReportVerifies(workspace, parsed) ? [parsed as unknown as DiagnosticReport] : [];
-      } catch {
-        return [];
-      }
-    })
-    .sort((a, b) => b.ts - a.ts || b.runId.localeCompare(a.runId));
+  return scanVerifiedRuns(workspace, agentId).runs;
+}
+
+/**
+ * Refused runs that block using `selectedTs` as the latest evidence: anything tampered or unreadable (its claimed ts
+ * cannot be trusted), and any honest unsigned run newer than the selection. Non-empty means a consumer would roll
+ * back to stale evidence, so signing refuses and gates report INSUFFICIENT_EVIDENCE.
+ */
+export function refusedRunsBlocking(refused: readonly RefusedRun[], selectedTs: number | null): RefusedRun[] {
+  return refused.filter((row) => row.tampered || row.ts === null || selectedTs === null || row.ts > selectedTs);
+}
+
+/**
+ * The newest sealed run for a signing or gating consumer, or null with the refused files that block it: a tampered or
+ * newer unverifiable run must not silently roll the consumer back to an older sealed run.
+ */
+export function latestVerifiedRun(workspace: string, agentId: string): { run: DiagnosticReport | null; blocking: RefusedRun[] } {
+  const { runs, refused } = scanVerifiedRuns(workspace, agentId);
+  const blocking = refusedRunsBlocking(refused, runs[0]?.ts ?? null);
+  return { run: blocking.length > 0 ? null : runs[0] ?? null, blocking };
 }
 
 /** `loadRunReport` for scoring and signing: the run, or null when it is missing, unreadable or its seal fails. */

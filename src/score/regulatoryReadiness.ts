@@ -1,5 +1,6 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { sealedRunReportVerifies } from "../diagnostic/reportSeal.js";
+import { deriveIntegrityIndex } from "../cert/trustCertificate.js";
 import { join } from "node:path";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import type { DiagnosticReport } from "../types.js";
@@ -75,13 +76,6 @@ const DEFAULT_WEIGHTS: WeightedComponents = {
   owaspLLM: 0.2
 };
 
-function clamp01(value: number): number {
-  if (!Number.isFinite(value)) {
-    return 0;
-  }
-  return Math.max(0, Math.min(1, value));
-}
-
 function normalizeWeights(overrides?: Partial<WeightedComponents>): WeightedComponents {
   const raw: WeightedComponents = {
     euAiAct: typeof overrides?.euAiAct === "number" ? overrides.euAiAct : DEFAULT_WEIGHTS.euAiAct,
@@ -102,22 +96,6 @@ function normalizeWeights(overrides?: Partial<WeightedComponents>): WeightedComp
     iso42001: safe.iso42001 / sum,
     owaspLLM: safe.owaspLLM / sum
   };
-}
-
-function deriveIntegrityIndex(report: Partial<DiagnosticReport>): number {
-  if (typeof report.integrityIndex === "number" && Number.isFinite(report.integrityIndex)) {
-    return clamp01(report.integrityIndex);
-  }
-  if (Array.isArray(report.layerScores) && report.layerScores.length > 0) {
-    const scores = report.layerScores
-      .map((row) => row?.avgFinalLevel)
-      .filter((value): value is number => typeof value === "number" && Number.isFinite(value));
-    if (scores.length > 0) {
-      const avg = scores.reduce((sum, value) => sum + value, 0) / scores.length;
-      return clamp01(avg / 5);
-    }
-  }
-  return 0;
 }
 
 function loadLatestAgentIntegrity(workspace: string, agentId: string): LatestAgentIntegrity {

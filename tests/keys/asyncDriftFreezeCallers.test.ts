@@ -166,3 +166,12 @@ test("a raw-valid split artifact signature cannot authenticate the actual alerts
   } finally { writeFileSync(alias, original); }
   await success(f);
 });
+
+test("a tampered newest run is INSUFFICIENT_EVIDENCE, never a rollback to the older sealed pair (WP37)", async () => {
+  const f = freezeFixture(), inputs = writeFreezeDecisionInputs(f);
+  const edited = JSON.parse(readFileSync(inputs.current, "utf8")); edited.layerScores[0].avgFinalLevel = 1; writeFileSync(inputs.current, JSON.stringify(edited));
+  const result = await drift.runDriftCheckAsync({ workspace: f.workspace });
+  expect(result.triggered).toBe(false);
+  expect(result.reasons[0]).toMatch(/^INSUFFICIENT_EVIDENCE: unverifiable diagnostic run/);
+  expect(incidents(f)).toEqual([]);
+});

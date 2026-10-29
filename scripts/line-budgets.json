@@ -37,7 +37,7 @@
     "src/toolhub/toolhubServer.ts": 1131,
     "src/org/orgRun.ts": 1124,
     "src/bundles/bundle.ts": 1122,
-    "src/audit/binderCollector.ts": 1114,
+    "src/audit/binderCollector.ts": 1113,
     "src/bridge/hookControl.ts": 1084,
     "src/cli-business-commands.ts": 1078,
     "src/redteam/mcpAgentProvider.ts": 1070,

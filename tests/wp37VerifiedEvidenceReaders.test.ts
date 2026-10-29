@@ -1,10 +1,10 @@
-import { mkdtempSync, rmSync } from "node:fs";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
 import { getAgentPaths } from "../src/fleet/paths.js";
-import { listVerifiedRuns, loadVerifiedRunReport } from "../src/diagnostic/runReportResolution.js";
+import { latestVerifiedRun, listVerifiedRuns, loadVerifiedRunReport } from "../src/diagnostic/runReportResolution.js";
 import { generateTrustCertificate } from "../src/cert/trustCertificate.js";
 import { startTrustDriftMonitor } from "../src/monitor/trustDriftMonitor.js";
 import { latestAssuranceByPack, scanVerifiedAssuranceByPack } from "../src/assurance/assuranceRunner.js";
@@ -68,16 +68,28 @@ describe("WP37 verified run readers", () => {
     expect(loadVerifiedRunReport(ws, "missing", "agent-x")).toBeNull();
   });
 
-  test("generateTrustCertificate signs the last sealed run, never a tampered newest one", () => {
+  test("generateTrustCertificate refuses rather than roll back past a tampered newest run", () => {
     const ws = workspace();
     writeSealedReport(ws, runsDir(ws), "run-1", run("run-1", 1000, 0.5));
     const edited = writeSealedReport(ws, runsDir(ws), "run-2", run("run-2", 2000, 0.6));
     tamperReport(edited, (report) => { report.integrityIndex = 0.99; });
 
+    expect(latestVerifiedRun(ws, "agent-x")).toMatchObject({ run: null, blocking: [{ file: edited, tampered: true }] });
+    expect(() => generateTrustCertificate({ workspace: ws, agentId: "agent-x", outputPath: "cert.json", nowTs: 1_700_000_000_000 }))
+      .toThrow(/refusing to sign a trust certificate from older evidence/);
+  });
+
+  test("generateTrustCertificate signs the newest sealed run; an older unsigned run does not block, a newer one does", () => {
+    const ws = workspace();
+    writeSealedReport(ws, runsDir(ws), "run-1", run("run-1", 1000, 0.5));
+    writeFileSync(join(runsDir(ws), "run-0.json"), JSON.stringify({ ...run("run-0", 500, 0.9), runSealSig: "unsigned" }));
     const out = generateTrustCertificate({ workspace: ws, agentId: "agent-x", outputPath: "cert.json", nowTs: 1_700_000_000_000 });
     expect(out.envelope.payload.scoreSourceRunId).toBe("run-1");
     expect(out.envelope.payload.score).toBe(50);
     expect(out.envelope.payload.scoreSourceRunSha256).toMatch(/^[a-f0-9]{64}$/);
+
+    writeFileSync(join(runsDir(ws), "run-2.json"), JSON.stringify({ ...run("run-2", 2000, 0.9), runSealSig: "unsigned" }));
+    expect(() => generateTrustCertificate({ workspace: ws, agentId: "agent-x", outputPath: "cert2.json" })).toThrow(/Unverifiable diagnostic run/);
   });
 
   test("generateTrustCertificate refuses to sign when no run verifies, but still previews", () => {
@@ -86,7 +98,7 @@ describe("WP37 verified run readers", () => {
     tamperReport(edited, (report) => { report.integrityIndex = 0.99; });
 
     expect(() => generateTrustCertificate({ workspace: ws, agentId: "agent-x", outputPath: "cert.json" }))
-      .toThrow(/No sealed diagnostic run verifies/);
+      .toThrow(/refusing to sign a trust certificate/);
     const preview = generateTrustCertificate({ workspace: ws, agentId: "agent-x", outputPath: "preview.json", preview: true });
     expect(preview.envelope.payload.scoreSourceRunId).toBeNull();
     expect(preview.envelope.payload.score).toBe(0);
@@ -101,9 +113,11 @@ describe("WP37 verified run readers", () => {
     const result = startTrustDriftMonitor({ workspace: ws, agentId: "agent-x", alertThreshold: 10, nowTs: 3000 });
     expect(result.analyzedRuns).toBe(1);
     expect(result.alerts).toEqual([]);
+    expect(result.evidenceStatus).toBe("INSUFFICIENT_EVIDENCE");
+    expect(result.unverifiedRuns).toEqual([edited]);
   });
 
-  test("the audit binder reports the last sealed run after the newest run was edited", async () => {
+  test("the audit binder reports insufficient evidence, not the older sealed run, after the newest run was edited", async () => {
     const ws = workspace();
     writeSealedReport(ws, runsDir(ws), "run-1", run("run-1", Date.now() - 2000, 0.5));
     const edited = writeSealedReport(ws, runsDir(ws), "run-2", run("run-2", Date.now() - 1000, 0.6));
@@ -112,8 +126,9 @@ describe("WP37 verified run readers", () => {
     const { binder } = await collectAuditBinderData({ workspace: ws, scope: { type: "AGENT", id: "agent-x" },
       policy: loadAuditPolicy(ws), map: loadAuditMapActive(ws), nowTs: Date.now() });
     const text = JSON.stringify(binder);
-    expect(text).toContain("\"integrityIndex\":0.5");
+    expect(text).toContain("Unverifiable agent diagnostic runs block the latest result");
     expect(text).not.toContain("0.99");
+    expect(text).not.toContain("\"integrityIndex\":0.5");
   });
 });
 

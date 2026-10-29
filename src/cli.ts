@@ -20279,8 +20279,7 @@ shield
       const overallSuccessRate = totalAttacks > 0 ? (totalSuccesses / totalAttacks) * 100 : 0;
       console.log(chalk.bold("\nSummary:"));
       console.log(chalk.gray("Total attacks:"), totalAttacks);
-      console.log(chalk.gray("Overall success rate:"), totalAttacks === 0 ? chalk.yellow("not evaluated (no attacks ran)")
-        : overallSuccessRate < 10 ? chalk.green(`${overallSuccessRate.toFixed(1)}%`) : chalk.red(`${overallSuccessRate.toFixed(1)}%`));
+      console.log(chalk.gray("Overall success rate:"), totalAttacks === 0 ? chalk.yellow("not evaluated (no attacks ran)") : overallSuccessRate < 10 ? chalk.green(`${overallSuccessRate.toFixed(1)}%`) : chalk.red(`${overallSuccessRate.toFixed(1)}%`));
       console.log(chalk.gray("Regressions detected:"), regressions.length > 0 ? chalk.red(regressions.length.toString()) : chalk.green("none"));
       if (regressions.length > 0) {
         for (const r of regressions) console.log(chalk.red(`  ⚠ ${r}`));
