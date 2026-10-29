@@ -488,23 +488,18 @@ describe("outcome compass", () => {
       })
     ).toThrow(/candidate evidence window/i);
 
-    const run = runExperiment({
-      workspace,
-      agentId: "default",
-      experimentId: created.experimentId,
-      mode: "sandbox",
-      candidateWindow: "14d"
-    });
-    expect(typeof run.report.baselineCostPerSuccess).toBe("number");
-    expect(typeof run.report.upliftSuccessRate).toBe("number");
-    expect(typeof run.report.upliftValuePoints).toBe("number");
-
-    const analysis = analyzeExperiment({
-      workspace,
-      agentId: "default",
-      experimentId: created.experimentId
-    });
-    expect(analysis.report.runId).toBe(run.report.runId);
+    // With no case evidence on either side there is nothing to compare: the run refuses instead of sealing a
+    // report computed from missing evidence (GAP WP03/WP05; the old assertion accepted that report).
+    expect(() =>
+      runExperiment({
+        workspace,
+        agentId: "default",
+        experimentId: created.experimentId,
+        mode: "sandbox",
+        candidateWindow: "14d"
+      })
+    ).toThrow(/determinate evidence on both sides/);
+    expect(() => analyzeExperiment({ workspace, agentId: "default", experimentId: created.experimentId })).toThrow(/no experiment runs/);
 
     const seed = deterministicSeed(["fixture", 42]);
     const ciA = bootstrapDifferenceCI({
@@ -533,14 +528,12 @@ describe("outcome compass", () => {
         2
       )
     );
-    const gate = gateExperiment({
+    expect(() => gateExperiment({
       workspace,
       agentId: "default",
       experimentId: created.experimentId,
       policyPath: gatePolicyPath
-    });
-    expect(gate.pass).toBe(false);
-    expect(gate.reasons.length).toBeGreaterThan(0);
+    })).toThrow(/no experiment runs/);
   });
 
   test("bundle gate enforces value score and regression policy and passes when configured", async () => {

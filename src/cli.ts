@@ -13846,6 +13846,7 @@ experiment
     });
     const verdict = { pass: chalk.green("Experiment gate PASSED"), inconclusive: chalk.yellow("Experiment gate INCONCLUSIVE"), fail: chalk.red("Experiment gate FAILED") };
     console.log(verdict[out.status]);
+    console.log(`Decision: ${out.decision}`);
     console.log("Threshold checks:");
     for (const row of experimentGateComparisonRows(out.report, policy)) {
       console.log(row);

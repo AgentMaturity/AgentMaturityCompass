@@ -27,7 +27,11 @@ export const experimentGateSchema = z.object({
   minUpliftSuccessRate: z.number(),
   minUpliftValuePoints: z.number(),
   maxCostIncreaseRatio: z.number().positive().optional(),
-  denyIfRegression: z.boolean().optional()
+  denyIfRegression: z.boolean().optional(),
+  /** Fewer cases determinate on both sides makes the gate inconclusive (default DEFAULT_MIN_PAIRED_CASES). */
+  minPairedCases: z.number().int().min(1).optional(),
+  /** Require the paired 95% interval of the value-point difference to lie above zero. */
+  requireIntervalAboveZero: z.boolean().optional()
 });
 
 export type ExperimentFile = z.infer<typeof experimentSchema>;

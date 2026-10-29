@@ -299,4 +299,24 @@ describe("governed optimizer", () => {
     expect(() => loadGovernedOptimizerRun({ workspace: ws, agentId: "default", selector: "latest" })).toThrow(/digest mismatch/);
     expect(() => loadGovernedOptimizerRun({ workspace: ws, agentId: "default", selector: "optcand_forged" })).toThrow(/unreadable run/);
   });
+
+  test("keeps the baseline instead of forcing a winner when no candidate gains or the top candidates tie", () => {
+    const ws = workspace();
+    writeMutableManifest(ws);
+    const rca = writeRca(ws, "trace-run-opt-no-gain", 2);
+    writeFileSync(rca.path, `${JSON.stringify({ ...rca.report, proposals: rca.report.proposals.map((proposal) => ({ ...proposal, expectedScoreImpact: 0 })) }, null, 2)}\n`);
+    const flat = writeGovernedOptimizerRun({ workspace: ws, agentId: "default", rcaSelector: rca.report.reportId });
+    expect(flat.run.acceptedCandidateId).toBeNull();
+    expect(flat.run.selection).toBe("baseline");
+    expect(flat.run.validationReceipt.status).toBe("passed");
+    expect(flat.run.candidates.every((candidate) => candidate.decision === "rejected")).toBe(true);
+    expect(flat.run.candidates.some((candidate) => candidate.decisionReason.startsWith("Baseline retained"))).toBe(true);
+
+    const twin = rca.report.proposals[0]!;
+    writeFileSync(rca.path, `${JSON.stringify({ ...rca.report, proposals: [twin, { ...twin, proposalId: `${twin.proposalId}-twin` }] }, null, 2)}\n`);
+    const tied = writeGovernedOptimizerRun({ workspace: ws, agentId: "default", rcaSelector: rca.report.reportId });
+    expect(tied.run.candidates.every((candidate) => candidate.leakageChecks.every((check) => check.status === "passed"))).toBe(true);
+    expect(tied.run.selection).toBe("baseline");
+    expect(tied.run.candidates.some((candidate) => candidate.decisionReason.includes("tie"))).toBe(true);
+  });
 });

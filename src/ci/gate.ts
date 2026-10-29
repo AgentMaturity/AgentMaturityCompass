@@ -1,6 +1,7 @@
 import { lstatSync, readFileSync, realpathSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { z } from "zod";
+import { evaluateExperimentGate } from "../experiments/experimentGatePolicy.js";
 import type { DiagnosticReport, GatePolicy, LayerName } from "../types.js";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -62,7 +63,10 @@ const gatePolicySchema = z.object({
       enabled: z.boolean(),
       experimentId: z.string().min(1),
       minUpliftSuccessRate: z.number(),
-      minUpliftValuePoints: z.number()
+      minUpliftValuePoints: z.number(),
+      denyIfRegression: z.boolean().optional(),
+      candidateConfigDigest: z.string().regex(/^[a-f0-9]{64}$/).optional(),
+      minPairedCases: z.number().int().min(1).optional()
     })
     .optional()
 });
@@ -479,50 +483,31 @@ export async function runBundleGate(params: {
     }
   }
 
+  // One experiment rule set (AXE-33): the same evaluator as `amc experiment gate`. Inconclusive never passes.
   const experiment = loaded.experimentReport;
-  if (policy.requireExperimentPass?.enabled) {
+  const required = policy.requireExperimentPass;
+  if (required?.enabled) {
     if (!experiment) {
       reasons.push("Experiment gate enabled but experiments/report.json is missing in bundle.");
     } else {
-      const experimentId = typeof experiment.experimentId === "string" ? experiment.experimentId : null;
-      const upliftSuccessRate =
-        typeof experiment.upliftSuccessRate === "number" ? experiment.upliftSuccessRate : Number.NaN;
-      const upliftValuePoints =
-        typeof experiment.upliftValuePoints === "number" ? experiment.upliftValuePoints : Number.NaN;
-      if (!experimentId) {
-        reasons.push("Experiment report is present but missing experimentId.");
-      } else if (experimentId !== policy.requireExperimentPass.experimentId) {
-        reasons.push(
-          `Experiment ID mismatch: expected ${policy.requireExperimentPass.experimentId}, got ${experimentId}.`
-        );
+      if (experiment.experimentId !== required.experimentId) {
+        reasons.push(`Experiment ID mismatch: expected ${required.experimentId}, got ${String(experiment.experimentId ?? "missing")}.`);
       }
-      if (!Number.isFinite(upliftSuccessRate)) {
-        reasons.push("Experiment report missing upliftSuccessRate.");
-      } else if (upliftSuccessRate < policy.requireExperimentPass.minUpliftSuccessRate) {
-        reasons.push(
-          `Experiment upliftSuccessRate ${upliftSuccessRate.toFixed(4)} is below ${policy.requireExperimentPass.minUpliftSuccessRate.toFixed(4)}.`
-        );
-      }
-      if (!Number.isFinite(upliftValuePoints)) {
-        reasons.push("Experiment report missing upliftValuePoints.");
-      } else if (upliftValuePoints < policy.requireExperimentPass.minUpliftValuePoints) {
-        reasons.push(
-          `Experiment upliftValuePoints ${upliftValuePoints.toFixed(4)} is below ${policy.requireExperimentPass.minUpliftValuePoints.toFixed(4)}.`
-        );
-      }
+      const evaluated = evaluateExperimentGate(experiment, {
+        minUpliftSuccessRate: required.minUpliftSuccessRate,
+        minUpliftValuePoints: required.minUpliftValuePoints,
+        maxCostIncreaseRatio: policy.maxCostIncreaseRatio,
+        denyIfRegression: required.denyIfRegression,
+        minPairedCases: required.minPairedCases,
+        candidateConfigDigest: required.candidateConfigDigest
+      });
+      reasons.push(...evaluated.reasons.map((reason) => `Experiment ${evaluated.status}: ${reason}.`));
     }
-  }
-  if (typeof policy.maxCostIncreaseRatio === "number" && experiment) {
-    const baseline =
-      typeof experiment.baselineCostPerSuccess === "number" ? experiment.baselineCostPerSuccess : Number.NaN;
-    const candidate =
-      typeof experiment.candidateCostPerSuccess === "number" ? experiment.candidateCostPerSuccess : Number.NaN;
-    if (Number.isFinite(baseline) && Number.isFinite(candidate) && baseline > 0) {
-      const ratio = candidate / baseline;
-      if (ratio > policy.maxCostIncreaseRatio) {
-        reasons.push(`Experiment cost increase ratio ${ratio.toFixed(4)} exceeds ${policy.maxCostIncreaseRatio.toFixed(4)}.`);
-      }
-    }
+  } else if (typeof policy.maxCostIncreaseRatio === "number" && experiment) {
+    // Cost-only policy: the shared evaluator's cost rule, including unknown or zero-baseline cost.
+    const evaluated = evaluateExperimentGate(experiment, { minUpliftSuccessRate: Number.NEGATIVE_INFINITY,
+      minUpliftValuePoints: Number.NEGATIVE_INFINITY, maxCostIncreaseRatio: policy.maxCostIncreaseRatio, minPairedCases: 1 });
+    reasons.push(...evaluated.reasons.filter((reason) => reason.startsWith("cost ")).map((reason) => `Experiment ${reason}.`));
   }
 
   return {
