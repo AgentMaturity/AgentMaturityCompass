@@ -284,6 +284,33 @@ describe("forecast planning", () => {
     expect(latest.etaToTarget.status).toBe("UNKNOWN");
   });
 
+  test("a transform plan signed for another agent is not used for this one", () => {
+    const workspace = newWorkspace();
+    const other = { ...validPlanFixture(workspace), scope: { type: "AGENT" as const, agentId: "other-agent" } };
+    const written = writeSignedTransformPlan(workspace, other);
+    const dir = join(workspace, ".amc", "agents", "default", "transform");
+    mkdirSync(dir, { recursive: true });
+    writeFileSync(join(dir, "latest.json"), readFileSync(written.latestPath));
+    writeFileSync(join(dir, "latest.json.sig"), readFileSync(written.latestSigPath));
+    const out = forecastRefreshCli({ workspace, scope: "agent", targetId: "default" });
+    const latest = JSON.parse(readFileSync(out.latestPath!, "utf8")) as ForecastArtifact;
+    expect(latest.transformPlanInput).toEqual({ outcome: "source_unavailable", reason: "Transform plan is signed for a different scope." });
+  });
+
+  test("an older signed latest.json restored over a newer plan is a rollback", () => {
+    const workspace = newWorkspace();
+    const older = validPlanFixture(workspace);
+    const first = writeSignedTransformPlan(workspace, older);
+    const savedPlan = readFileSync(first.latestPath), savedSig = readFileSync(first.latestSigPath);
+    writeSignedTransformPlan(workspace, { ...older, planId: `${older.planId}-newer`, createdTs: older.createdTs + 60_000 });
+    writeFileSync(first.latestPath, savedPlan);
+    writeFileSync(first.latestSigPath, savedSig);
+    const out = forecastRefreshCli({ workspace, scope: "agent", targetId: "default" });
+    const latest = JSON.parse(readFileSync(out.latestPath!, "utf8")) as ForecastArtifact;
+    expect(latest.transformPlanInput).toEqual({ outcome: "source_unavailable", reason: "A newer signed transform plan exists; latest.json was rolled back." });
+    expect(latest.etaToTarget.status).toBe("UNKNOWN");
+  });
+
   test("transform plan changes still invalidate a captured forecast before signing", () => {
     const workspace = newWorkspace();
     const written = writeSignedTransformPlan(workspace, validPlanFixture(workspace));
