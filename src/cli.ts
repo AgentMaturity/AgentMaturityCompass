@@ -10059,7 +10059,7 @@ runtime
 
 runtime
   .command("resume <runId>")
-  .description("Resume a running or degraded runtime run from persisted state")
+  .description("Record a runtime run resume (record-only; does not resume native execution)")
   .option("--agent <agentId>", "agent id")
   .option("--stage <stage>", "stage after resume")
   .option("--message <text>", "resume message")
@@ -10076,12 +10076,12 @@ runtime
       console.log(JSON.stringify(written, null, 2));
       return;
     }
-    console.log(chalk.green(`Runtime run resumed: ${written.run.runId}`));
+    console.log(chalk.green(`Runtime run resume recorded (record-only; no process or native session resumed): ${written.run.runId}`));
   });
 
 runtime
   .command("cancel <runId>")
-  .description("Cancel a runtime run cleanly")
+  .description("Record a runtime run cancellation (record-only; does not cancel native execution)")
   .option("--agent <agentId>", "agent id")
   .option("--reason <text>", "cancel reason")
   .option("--json", "emit JSON output", false)
@@ -10096,7 +10096,7 @@ runtime
       console.log(JSON.stringify(written, null, 2));
       return;
     }
-    console.log(chalk.yellow(`Runtime run canceled: ${written.run.runId}`));
+    console.log(chalk.yellow(`Runtime run cancellation recorded (record-only; no process or native session canceled): ${written.run.runId}`));
   });
 
 runtime
@@ -24344,9 +24344,12 @@ agent
     });
     console.log(chalk.bold(`Running harness for ${opts.type} agent (target: ${opts.target}, max: ${opts.iterations} iterations)...`));
     const result = await runner.run();
+    // Only the initial probe is measured; later scores come from simulated module integration and are labelled so.
+    const simulated = result.scoreKind === "simulated" ? " (simulated, not executed)" : "";
     console.log(chalk.bold(`\nResult:`));
-    console.log(`  Final score: ${result.finalScore}`);
-    console.log(`  Total improvement: +${result.totalImprovement}`);
+    console.log(`  Measured probe score: ${result.measuredScore}`);
+    console.log(`  Projected final score${simulated}: ${result.finalScore}`);
+    console.log(`  Projected improvement${simulated}: +${result.totalImprovement}`);
     console.log(`  Iterations: ${result.iterations.length}`);
     console.log(`  Converged: ${result.converged ? chalk.green("yes") : chalk.yellow("no")}`);
     console.log(`  Duration: ${result.durationMs}ms`);

@@ -1,3 +1,9 @@
+/**
+ * library-only, not enforced by the native runtime. These checkpoint and restore
+ * proof helpers have no production caller and do not restore a native session.
+ * Canonical native persistence and resumption live in src/session/sessionService.ts
+ * and src/session/sessionResume.ts.
+ */
 import { randomUUID } from "node:crypto";
 import { existsSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
@@ -466,6 +472,8 @@ export function renderRuntimeStateCheckpointAuditExport(
     : "FAIL_CLOSED";
   const lines = [
     "# AMC Runtime State Checkpoint Export",
+    "",
+    "> library-only, not enforced by the native runtime; this proof does not restore or resume a native session. See src/session/sessionService.ts and src/session/sessionResume.ts.",
     "",
     `- Run: ${checkpoint.runId}`,
     `- Agent: ${checkpoint.agentId}`,

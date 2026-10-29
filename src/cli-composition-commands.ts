@@ -22,7 +22,10 @@ export function registerCompositionCommands(program: Command): void {
         // Reads the file rather than the live tree, so a composition that does
         // not currently boot can still be inspected — which is exactly when an
         // operator most needs to see it.
-        const source = loadComposition({ workspace: process.cwd(), configPath: opts.config });
+        // The signer is authenticated with the workspace's admitted keys; a digest match alone reports unverified.
+        const { createCompositionSignatureVerifier } = await import("./config/amcConfigSignature.js");
+        const options = { workspace: process.cwd(), configPath: opts.config, verifySignature: createCompositionSignatureVerifier(process.cwd()) };
+        const source = loadComposition(options);
         const dump = dumpComposition(source);
         if (opts.json) {
           console.log(JSON.stringify(dump, null, 2));

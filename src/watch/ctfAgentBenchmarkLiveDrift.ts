@@ -8,9 +8,11 @@
  * from, authenticates to, or verifies anything with that vendor, so a receipt
  * attests only to the data the caller provided.
  */
+import type { EvidenceOutcome } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import {
+  guardedDrop,
   runLiveScoreBehaviorDrift,
   type LiveDriftAlert,
   type LiveDriftMetricId,
@@ -133,6 +135,7 @@ export interface RunCtfAgentBenchmarkLiveDriftInput {
 
 export interface CtfAgentBenchmarkDistribution {
   rowCount: number;
+  evidenceOutcome: EvidenceOutcome;
   scoreMean0to1: number;
   solveRate0to1: number;
   firstFlagForwardingRate0to1: number;
@@ -144,7 +147,7 @@ export interface CtfAgentBenchmarkDistribution {
   partialCreditScoreMean0to1: number;
   traceCoverage0to1: number;
   sandboxIsolationRate0to1: number;
-  evidenceCoverage0to1: number;
+  evidenceCoverage0to1: number | null;
   timeToFlagMeanMs: number;
   submissionCountMean: number;
   challengeCategoryDistribution: Record<string, number>;
@@ -164,7 +167,7 @@ export interface CtfAgentBenchmarkScoreDrift {
   partialCreditScoreDrop0to1: number;
   traceCoverageDrop0to1: number;
   sandboxIsolationRateDrop0to1: number;
-  evidenceCoverageDrop0to1: number;
+  evidenceCoverageDrop0to1: number | null;
 }
 
 export interface CtfAgentBenchmarkBehaviorDrift {
@@ -357,12 +360,13 @@ function distribution(rows: CtfAgentBenchmarkReceiptRow[]): CtfAgentBenchmarkDis
     partialCreditScoreMean0to1: mean(rows.map((row) => row.partialCreditScore0to1)),
     traceCoverage0to1: boolMean(rows.map((row) => row.traceCaptured)),
     sandboxIsolationRate0to1: boolMean(rows.map((row) => row.sandboxIsolated)),
-    evidenceCoverage0to1: mean(rows.map((row) => row.evidenceCoverage0to1), rows.length === 0 ? 1 : 0),
+    evidenceCoverage0to1: mean(rows.map((row) => row.evidenceCoverage0to1), null),
     timeToFlagMeanMs: mean(rows.map((row) => row.timeToFlagMs)),
     submissionCountMean: mean(rows.map((row) => row.submissionCount)),
     challengeCategoryDistribution: labelDistribution(rows, (row) => row.challengeCategory),
     runtimeModeDistribution: labelDistribution(rows, (row) => row.runtimeMode),
     contextDistribution: labelDistribution(rows, contextLabel),
+    evidenceOutcome: rows.length > 0 ? "measured" : "not_evaluated",
   };
 }
 
@@ -390,7 +394,7 @@ export function runCtfAgentBenchmarkLiveDrift(input: RunCtfAgentBenchmarkLiveDri
     partialCreditScoreDrop0to1: round(Math.max(0, baselineDistribution.partialCreditScoreMean0to1 - liveDistribution.partialCreditScoreMean0to1)),
     traceCoverageDrop0to1: round(Math.max(0, baselineDistribution.traceCoverage0to1 - liveDistribution.traceCoverage0to1)),
     sandboxIsolationRateDrop0to1: round(Math.max(0, baselineDistribution.sandboxIsolationRate0to1 - liveDistribution.sandboxIsolationRate0to1)),
-    evidenceCoverageDrop0to1: round(Math.max(0, baselineDistribution.evidenceCoverage0to1 - liveDistribution.evidenceCoverage0to1)),
+    evidenceCoverageDrop0to1: guardedDrop(true, baselineDistribution.evidenceCoverage0to1, liveDistribution.evidenceCoverage0to1),
   };
   const behaviorDrift: CtfAgentBenchmarkBehaviorDrift = {
     challengeCategoryDivergence0to1: totalVariationDistance(baselineDistribution.challengeCategoryDistribution, liveDistribution.challengeCategoryDistribution),
@@ -428,8 +432,8 @@ export function runCtfAgentBenchmarkLiveDrift(input: RunCtfAgentBenchmarkLiveDri
   if (liveDistribution.sandboxIsolationRate0to1 < thresholds.minSandboxIsolationRate0to1) {
     additionalAlerts.push(buildAlert(input, "ctfAgentBenchmarkSandboxIsolationRate0to1", liveDistribution.sandboxIsolationRate0to1, thresholds.minSandboxIsolationRate0to1, "Live FishCodeTech CTF benchmark sandbox isolation dropped below threshold.", "critical"));
   }
-  if (liveDistribution.evidenceCoverage0to1 < thresholds.minEvidenceCoverage0to1) {
-    additionalAlerts.push(buildAlert(input, "ctfAgentBenchmarkEvidenceCoverage0to1", liveDistribution.evidenceCoverage0to1, thresholds.minEvidenceCoverage0to1, "Live FishCodeTech CTF benchmark rows are missing source snapshot, GPL license, README, challenge catalog, challenge manifest, Docker/runtime, backend API, MCP tool, sidecar, agent template, scoring, scoreboard, flag log, result, drift statistic, alert receipt, evidence, or signed evidence proof.", "critical"));
+  if (liveDistribution.evidenceCoverage0to1 === null || liveDistribution.evidenceCoverage0to1 < thresholds.minEvidenceCoverage0to1) {
+    additionalAlerts.push(buildAlert(input, "ctfAgentBenchmarkEvidenceCoverage0to1", liveDistribution.evidenceCoverage0to1, thresholds.minEvidenceCoverage0to1, liveDistribution.evidenceCoverage0to1 === null ? "Live evidence missing; coverage is not evaluated." : "Live FishCodeTech CTF benchmark rows are missing source snapshot, GPL license, README, challenge catalog, challenge manifest, Docker/runtime, backend API, MCP tool, sidecar, agent template, scoring, scoreboard, flag log, result, drift statistic, alert receipt, evidence, or signed evidence proof.", "critical"));
   }
   if (behaviorDrift.challengeCategoryDivergence0to1 > thresholds.maxChallengeCategoryDivergence0to1) {
     additionalAlerts.push(buildAlert(input, "ctfAgentBenchmarkChallengeCategoryDistribution", behaviorDrift.challengeCategoryDivergence0to1, thresholds.maxChallengeCategoryDivergence0to1, "Live FishCodeTech CTF benchmark challenge-category distribution diverged beyond threshold.", "medium"));

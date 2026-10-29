@@ -1014,7 +1014,7 @@ AMC provides 1,268 public CLI command paths in the live command inventory.
 | 995 | `amc run-alias remove` | Remove a diagnostic run alias |
 | 996 | `amc run-alias set` | Assign a reusable alias to a diagnostic run |
 | 997 | `amc runtime` | Runtime run manager for connected agents |
-| 998 | `amc runtime cancel` | Cancel a runtime run cleanly |
+| 998 | `amc runtime cancel` | Record a runtime run cancellation (record-only; does not cancel native execution) |
 | 999 | `amc runtime complete` | Complete a runtime run |
 | 1000 | `amc runtime create` | Create a persisted connected-agent runtime run |
 | 1001 | `amc runtime degrade` | Mark a runtime run degraded |
@@ -1022,7 +1022,7 @@ AMC provides 1,268 public CLI command paths in the live command inventory.
 | 1003 | `amc runtime export` | Export runtime run events as JSON or JSONL |
 | 1004 | `amc runtime inspect` | Inspect a runtime run and its event stream |
 | 1005 | `amc runtime list` | List persisted runtime runs |
-| 1006 | `amc runtime resume` | Resume a running or degraded runtime run from persisted state |
+| 1006 | `amc runtime resume` | Record a runtime run resume (record-only; does not resume native execution) |
 | 1007 | `amc runtime status` | Show persisted runtime run-manager status |
 | 1008 | `amc sandbox` | Hardened sandbox execution |
 | 1009 | `amc sandbox run` | Run agent command in hardened Docker sandbox |
@@ -8871,7 +8871,7 @@ Alias: `amc run-name set`
 
 #### `amc runtime cancel`
 
-Cancel a runtime run cleanly
+Record a runtime run cancellation (record-only; does not cancel native execution)
 
 
 | Option | Description |
@@ -8981,7 +8981,7 @@ List persisted runtime runs
 
 #### `amc runtime resume`
 
-Resume a running or degraded runtime run from persisted state
+Record a runtime run resume (record-only; does not resume native execution)
 
 
 | Option | Description |

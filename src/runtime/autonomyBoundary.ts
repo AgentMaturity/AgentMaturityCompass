@@ -1,3 +1,9 @@
+/**
+ * library-only, not enforced by the native runtime. No production caller evaluates
+ * these autonomy contracts before dispatch. Native tool authority belongs to
+ * src/tools/toolPipeline.ts and src/governor/actionPolicyEngine.ts.
+ * A library decision or receipt alone does not authorize native execution.
+ */
 import { randomUUID } from "node:crypto";
 import { existsSync } from "node:fs";
 import { join, resolve } from "node:path";
@@ -330,6 +336,8 @@ export function renderRuntimeAutonomyBoundaryAuditExport(decision: RuntimeAutono
   const status = decision.action === "approve" ? "APPROVED" : "BLOCKED";
   const lines = [
     "# AMC Runtime Autonomy Boundary Decision",
+    "",
+    "> library-only, not enforced by the native runtime; this decision does not authorize tool execution. See src/tools/toolPipeline.ts and src/governor/actionPolicyEngine.ts.",
     "",
     `- Decision: ${decision.decisionId}`,
     `- Status: ${status}`,

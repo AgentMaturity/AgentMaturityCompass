@@ -433,7 +433,7 @@ export {
   validateTruthProtocol,
   truthProtocolTemplate,
   extractApprovalToken,
-  hasValidApprovalToken,
+  hasApprovalTokenMarker, hasValidApprovalToken,
   withApprovalTrace,
   buildDegradedModeBehaviorReceipt,
   verifyDegradedModeBehaviorReceipt,
