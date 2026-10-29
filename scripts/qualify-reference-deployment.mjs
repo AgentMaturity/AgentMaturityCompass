@@ -5,7 +5,9 @@
 //
 //   node scripts/qualify-reference-deployment.mjs --kube-context CTX --release amc-rd \
 //     --image-a REPO@sha256:A --image-b REPO@sha256:B --out qualification/YYYY-MM-DD-P2-06/kind \
-//     [--namespace NS] [--targets FILE] [--ephemeral-secrets] [--ha] [--keep]
+//     [--namespace NS] [--targets FILE] [--ephemeral-secrets] [--ha] [--keep] [--only ID,ID]
+//
+// --only runs the named checks and records every other one as not run, so a partial rerun never passes.
 //
 // helm and kubectl run through execFile-style argument arrays, never shell strings.
 // Exit 0: every check passed. Exit 1: any check failed or did not run (a check that did not
@@ -52,7 +54,7 @@ export function targetProblems(targets) {
 export function parseArgs(argv) {
   const opts = { namespace: "default", targets: join(MATRIX_DIR, "targets.json"), ephemeralSecrets: false, ha: false, keep: false };
   const flags = { "--kube-context": "kubeContext", "--release": "release", "--image-a": "imageA", "--image-b": "imageB",
-    "--out": "out", "--namespace": "namespace", "--targets": "targets" };
+    "--out": "out", "--namespace": "namespace", "--targets": "targets", "--only": "only" };
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
     if (arg === "--ephemeral-secrets") opts.ephemeralSecrets = true;
@@ -72,6 +74,12 @@ export function parseArgs(argv) {
     if (!DIGEST_REF.test(opts[flags[flag]])) throw new UsageError(`${flag} must be REPO@sha256:<64 hex>`);
   }
   if (!/^[a-z0-9]([-a-z0-9]*[a-z0-9])?$/.test(opts.release)) throw new UsageError("--release must be a DNS label");
+  if (opts.only !== undefined) {
+    opts.only = opts.only.split(",");
+    const ids = new Set(loadMatrix().checks.map((check) => check.id));
+    const unknown = opts.only.filter((id) => !ids.has(id));
+    if (unknown.length > 0) throw new UsageError(`--only names checks that are not in the matrix: ${unknown.join(", ")}`);
+  }
   return opts;
 }
 
@@ -157,7 +165,8 @@ export async function runChecks({ matrix, registry, ctx }) {
     const started = Date.now();
     const fn = registry.get(check.id);
     let result;
-    if (check.haOnly && !ctx.ha) result = { status: "not_run", reason: "HA mode is not part of this topology (--ha not given)" };
+    if (ctx.only && !ctx.only.includes(check.id)) result = { status: "not_run", reason: "not selected (--only)" };
+    else if (check.haOnly && !ctx.ha) result = { status: "not_run", reason: "HA mode is not part of this topology (--ha not given)" };
     else if (!fn) result = { status: "not_run", reason: "no implementation registered" };
     else {
       try { result = await fn(ctx, check); }

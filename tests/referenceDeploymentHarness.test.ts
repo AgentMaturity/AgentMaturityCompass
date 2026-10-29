@@ -76,6 +76,16 @@ describe("receipt verdict", () => {
     expect(results.find((result: { id: string }) => result.id === "CR-5").reason).toMatch(/HA mode/);
   });
 
+  it("--only runs the named checks and records every other one as not run, so a partial rerun never passes", async () => {
+    expect(parseArgs([...ARGS, "--out", "x", "--only", "INS-1,BR-1"]).only).toEqual(["INS-1", "BR-1"]);
+    expect(() => parseArgs([...ARGS, "--out", "x", "--only", "INS-1,XX-9"])).toThrow(/XX-9/);
+    const registry = new Map(IDS.map((id) => [id, async () => ({ status: "passed" })]));
+    const results = await silenced(() => runChecks({ matrix, registry, ctx: { ha: true, only: ["INS-1", "BR-1"] } }));
+    expect(results.filter((result: { status: string }) => result.status === "passed").map((result: { id: string }) => result.id)).toEqual(["INS-1", "BR-1"]);
+    expect(results.find((result: { id: string }) => result.id === "INS-2").reason).toBe("not selected (--only)");
+    expect(evaluateResults(matrix, results).pass).toBe(false);
+  });
+
   it("writes a contract receipt that check:qualification accepts, with not-run checks counted as failed", () => {
     const root = mkdtempSync(join(tmpdir(), "amc-p206-receipt-"));
     try {
