@@ -1,6 +1,6 @@
-import { join, resolve } from "node:path";
+import { join, relative, resolve } from "node:path";
 import { createHash, randomUUID } from "node:crypto";
-import { closeSync, openSync, unlinkSync } from "node:fs";
+import { closeSync, lstatSync, openSync, unlinkSync } from "node:fs";
 import YAML from "yaml";
 import { z } from "zod";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
@@ -9,6 +9,8 @@ import { parseDelegationScope } from "../agent/delegationScope.js";
 import { getMode } from "../mode/mode.js";
 import { assertOrgPairsCurrent, captureOrgPairs, orgPairBytes, prepareOrgPairsAsync, OrgPairsPublicationError } from "../org/preparedOrgPairs.js";
 import { verifyAuditorSignatureBytes } from "../org/orgSignatureBytes.js";
+import { loadSessionEventHistory } from "../session/sessionEventHistory.js";
+import { assertSessionOwnerAvailable, readSessionWriter } from "../session/sessionOwnership.js";
 
 /**
  * Durable schedules (plan P6.1d).
@@ -74,7 +76,8 @@ const stateSchema = z.object({
       inFlightSince: z.number().int().min(0).max(Number.MAX_SAFE_INTEGER).nullable(),
       claimId: z.string().min(1).nullable().default(null),
       consecutiveFailures: z.number().int().min(0).max(Number.MAX_SAFE_INTEGER),
-      lastOutcome: z.object({ claimId: z.string(), ok: z.boolean(), summary: z.string(), sessionId: z.string().optional() }).nullable().default(null)
+      lastOutcome: z.object({ claimId: z.string(), ok: z.boolean(), summary: z.string(), sessionId: z.string().optional(),
+        reason: z.literal("interrupted").optional(), auditPath: z.string().optional() }).nullable().default(null)
     }).strict()
   )
 }).strict();
@@ -292,25 +295,98 @@ function claimLocked(workspace: string, scheduleId: string, now: number, expecte
 export function completeRun(
   workspace: string,
   scheduleId: string,
-  outcome: { readonly ok: boolean; readonly summary: string; readonly sessionId?: string },
+  outcome: { readonly ok: boolean; readonly summary: string; readonly sessionId?: string; readonly reason?: "interrupted"; readonly auditPath?: string },
   claimId: string
 ): void {
-  withStoreLock(workspace, () => {
-    const state = readState(workspace);
-    const entry = entryFor(state, scheduleId);
-    if (entry.inFlightSince === null || !claimId || entry.claimId !== claimId) {
-      throw new Error(`Refusing completion of schedule ${scheduleId}: no matching owned claim; its state was not changed.`);
+  withStoreLock(workspace, () => completeLocked(workspace, scheduleId, outcome, claimId));
+}
+
+function completeLocked(workspace: string, scheduleId: string, outcome: Parameters<typeof completeRun>[2], claimId: string): void {
+  const state = readState(workspace);
+  const entry = entryFor(state, scheduleId);
+  if (entry.inFlightSince === null || !claimId || entry.claimId !== claimId) {
+    throw new Error(`Refusing completion of schedule ${scheduleId}: no matching owned claim; its state was not changed.`);
+  }
+  state.schedules[scheduleId] = {
+    lastClaimedTs: entry.lastClaimedTs,
+    inFlightSince: null,
+    claimId: null,
+    lastOutcome: { claimId, ok: outcome.ok, summary: outcome.summary.slice(0, 4096),
+      ...(outcome.sessionId === undefined ? {} : { sessionId: outcome.sessionId }),
+      ...(outcome.reason === undefined ? {} : { reason: outcome.reason }),
+      ...(outcome.auditPath === undefined ? {} : { auditPath: outcome.auditPath }) },
+    // One success clears the count: suspension is for a schedule broken now.
+    consecutiveFailures: outcome.ok ? 0 : entry.consecutiveFailures + 1
+  };
+  writeState(workspace, state);
+}
+
+/** Close only a verified dead native owner; mutable operational state cannot establish liveness. */
+export async function closeInterruptedClaim(workspaceInput: string, scheduleId: string, claimId: string, expectedDigest: string): Promise<{ auditPath: string }> {
+  const workspace = resolve(workspaceInput);
+  const auditDirectory = join(workspace, ".amc", "schedule-closures");
+  scheduleIdSchema.parse(scheduleId);
+  if (typeof claimId !== "string" || claimId.length === 0) throw new Error("An exact nonempty claim id is required.");
+  if (typeof expectedDigest !== "string" || !/^[a-f0-9]{64}$/.test(expectedDigest)) throw new Error("An exact signed configuration digest is required.");
+  const currentClaim = () => {
+    assertScheduleOwner(workspace);
+    const read = readSchedules(workspace);
+    if (!read.ok) throw new Error(read.reason);
+    if (read.digest !== expectedDigest) throw new Error("Schedule configuration digest changed. Review native-schedule list before closing an interrupted claim.");
+    if (!read.schedules.some(schedule => schedule.id === scheduleId)) throw new Error("No signed schedule matches the requested claim.");
+    const entry = entryFor(readState(workspace), scheduleId);
+    if (entry.inFlightSince === null || entry.claimId !== claimId) throw new Error("No matching interrupted claim; its state was not changed.");
+    return entry;
+  };
+  const authenticatedClaim = (entry: ReturnType<typeof currentClaim>) => {
+    // ponytail: authenticate all available history; add a verified claim index only if recovery volume warrants it.
+    const history = loadSessionEventHistory({ workspace });
+    const claims = history.events.flatMap(event => {
+      const meta = JSON.parse(event.meta_json) as Record<string, unknown>;
+      return event.event_type === "audit" && meta.type === "native_schedule_claimed" && meta.scheduleId === scheduleId
+        ? [{ event, meta }] : [];
+    });
+    const selected = claims.at(-1);
+    if (selected === undefined || selected.meta.claimId !== claimId || selected.meta.now !== entry.inFlightSince
+      || selected.meta.parentSessionId !== selected.event.session_id
+      || typeof selected.meta.schedulesDigest !== "string" || !/^[a-f0-9]{64}$/.test(selected.meta.schedulesDigest)
+      || claims.filter(row => row.meta.claimId === claimId).length !== 1) {
+      throw new Error("No unique latest authenticated native occurrence matches this claim; legacy or changed claims require evidence investigation.");
     }
-    state.schedules[scheduleId] = {
-      lastClaimedTs: entry.lastClaimedTs,
-      inFlightSince: null,
-      claimId: null,
-      lastOutcome: { claimId, ok: outcome.ok, summary: outcome.summary.slice(0, 4096),
-        ...(outcome.sessionId === undefined ? {} : { sessionId: outcome.sessionId }) },
-      // One success clears the count: suspension is for a schedule broken now.
-      consecutiveFailures: outcome.ok ? 0 : entry.consecutiveFailures + 1
-    };
-    writeState(workspace, state);
+    const owner = readSessionWriter(selected.event);
+    if (owner === null || owner.state !== "active") throw new Error("The signed claim has no supported active owner; liveness cannot be established.");
+    assertSessionOwnerAvailable(selected.event); // No expired-lease takeover: only demonstrably dead local owners.
+    return { ...selected, owner };
+  };
+  const selected = withStoreLock(workspace, () => {
+    const entry = currentClaim();
+    return { entry, ...authenticatedClaim(entry) };
+  });
+  const assertCurrent = () => {
+    try {
+      if (!lstatSync(auditDirectory).isDirectory()) throw new Error("Schedule closure audit directory must be a real directory, not a link.");
+    } catch (error) { if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error; }
+    if (JSON.stringify(currentClaim()) !== JSON.stringify(selected.entry)) throw new Error("The interrupted claim changed while preparing its closure audit.");
+    assertSessionOwnerAvailable(selected.event);
+  };
+  const auditPath = relative(workspace, join(auditDirectory, `${randomUUID()}.json`));
+  const audit = { auditType: "NATIVE_SCHEDULE_CLOSE_INTERRUPTED", phase: "authorized", scheduleId, claimId,
+    configDigest: expectedDigest, claimedConfigDigest: selected.meta.schedulesDigest,
+    sourceEventId: selected.event.id, sourceEventHash: selected.event.event_hash, sessionId: selected.event.session_id,
+    owner: selected.owner, authorizedTs: Date.now(), ok: false, reason: "interrupted",
+    consecutiveFailures: selected.entry.consecutiveFailures + 1,
+    boundary: "Signed closure authorization, published before the operational state write; inspect schedule status for settlement. No goal was re-run." };
+  const prepared = await prepareOrgPairsAsync(workspace, [{ path: join(workspace, auditPath), bytes: Buffer.from(JSON.stringify(audit, null, 2)) }],
+    { beforePublish: assertCurrent });
+  return withStoreLock(workspace, () => {
+    assertCurrent();
+    if (authenticatedClaim(currentClaim()).event.event_hash !== selected.event.event_hash) throw new Error("The authenticated occurrence changed while signing its closure audit.");
+    prepared.publish();
+    prepared.assertCurrent();
+    // Audit publication must succeed before releasing the claim. A failed write leaves the signed authorization and open claim visible.
+    completeLocked(workspace, scheduleId, { ok: false, summary: "interrupted: the owning process exited before closing this occurrence",
+      reason: "interrupted", auditPath, sessionId: selected.event.session_id }, claimId);
+    return { auditPath };
   });
 }
 
