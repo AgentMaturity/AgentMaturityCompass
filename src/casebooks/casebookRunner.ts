@@ -23,9 +23,9 @@ export interface CaseExecutionRef {
   configDigest: string;
 }
 
-export type CaseRunStatus = "passed" | "failed" | "unavailable";
+type CaseRunStatus = "passed" | "failed" | "unavailable";
 
-export interface CaseRunResult {
+interface CaseRunResult {
   caseId: string;
   title: string;
   /** `unavailable`: the evidence needed to judge the case is missing; neither a pass nor a behavioural failure. */
@@ -42,7 +42,7 @@ export interface CaseRunResult {
   execution: (CaseExecutionRef & { eventIds: string[] }) | null;
 }
 
-export interface CasebookTrial {
+interface CasebookTrial {
   trialId: string;
   configDigest: string;
 }

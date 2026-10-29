@@ -59,7 +59,7 @@ export function meanDifference(baseline: number[], candidate: number[]): number 
 export const effectSizeDifference = meanDifference;
 
 /** Fewer matched pairs than this cannot support a resampled interval. */
-export const MIN_BOOTSTRAP_PAIRS = 2;
+const MIN_BOOTSTRAP_PAIRS = 2;
 
 export type PairedInterval =
   | { status: "estimated"; interval: [number, number]; pairs: number }

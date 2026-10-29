@@ -3638,7 +3638,7 @@ export interface CasebookRunCaseResult {
 }
 
 /** One side of a v2 experiment: whose evidence, which closed range, and which bound trial (null: legacy window). */
-export interface ExperimentSideIdentity {
+interface ExperimentSideIdentity {
   agentId: string;
   startedTs: number;
   endedTs: number;

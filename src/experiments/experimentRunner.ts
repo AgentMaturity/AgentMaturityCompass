@@ -248,7 +248,7 @@ export function setExperimentCandidate(params: {
  * @throws when no candidate evidence window is supplied, because AMC cannot
  * execute a candidate configuration itself.
  */
-export const EXPERIMENT_METHOD_VERSION = "casebook-paired/2";
+const EXPERIMENT_METHOD_VERSION = "casebook-paired/2";
 
 type CasebookSide = ReturnType<typeof runCasebook>;
 const executionOf = (row: CasebookSide["results"][number]) =>

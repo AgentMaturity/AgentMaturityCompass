@@ -29,7 +29,7 @@ export function experimentGatePolicyPreset(preset: ExperimentGatePreset): Experi
 }
 
 /** The paired-case floor below which no gate can pass on an experiment report. */
-export const DEFAULT_MIN_PAIRED_CASES = 3;
+const DEFAULT_MIN_PAIRED_CASES = 3;
 
 export type ExperimentGateStatus = "pass" | "fail" | "inconclusive";
 
