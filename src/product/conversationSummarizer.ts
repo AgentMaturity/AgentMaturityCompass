@@ -77,10 +77,11 @@ function slidingSummary(messages: Array<{ role: string; content: string }>, wind
 function jaccardSimilarity(a: string, b: string): number {
   const setA = new Set(tokenize(a));
   const setB = new Set(tokenize(b));
+  // Identical empty token sets have similarity 1; this is set equality, not evaluated evidence coverage.
   if (setA.size === 0 && setB.size === 0) return 1;
   const intersection = [...setA].filter(x => setB.has(x)).length;
   const union = new Set([...setA, ...setB]).size;
-  return union === 0 ? 1 : intersection / union;
+  return intersection / union; // The empty-union identity was handled above.
 }
 
 function topicChangeSummary(messages: Array<{ role: string; content: string }>, threshold = 0.15): { summary: string; segments: string[] } {

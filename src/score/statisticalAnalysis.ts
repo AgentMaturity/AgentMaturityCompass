@@ -204,6 +204,7 @@ function welchDF(n1: number, s1sq: number, n2: number, s2sq: number): number {
   const se2 = s2sq / n2;
   const num = (se1 + se2) ** 2;
   const denom = (se1 ** 2) / (n1 - 1) + (se2 ** 2) / (n2 - 1);
+  // One is the conservative degrees-of-freedom bound for degenerate variances, not a success ratio.
   return denom > 0 ? num / denom : 1;
 }
 

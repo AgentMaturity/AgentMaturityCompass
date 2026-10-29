@@ -1,5 +1,5 @@
 import { createServer, request as httpRequest } from "node:http";
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { afterEach, describe, expect, test } from "vitest";
@@ -443,5 +443,50 @@ describe("org compass", () => {
     const merkle = verifyTransparencyMerkle(workspace);
     expect(merkle.ok).toBe(true);
     expect(currentTransparencyMerkleRoot(workspace)).not.toBeNull();
+  });
+});
+
+
+describe("AXE-27 ecosystem peer denominator", () => {
+  function measuredEnterprise(): string {
+    const workspace = newWorkspace();
+    ensureAgent(workspace, "default");
+    orgInitCli({ workspace, enterpriseName: "Peer Test" });
+    orgAssignCli({ workspace, agentId: "default", nodeId: "enterprise", weight: 1 });
+    writeRunFixture({ workspace, agentId: "default", runId: "run_peer_local", overall: 4,
+      integrity: 0.95, observed: 0.95, attested: 0.04, selfReported: 0.01, correlation: 0.98 });
+    const reportsDir = join(getAgentPaths(workspace, "default").rootDir, "outcomes", "reports");
+    mkdirSync(reportsDir, { recursive: true });
+    writeFileSync(join(reportsDir, "value.json"), JSON.stringify({ ts: Date.now(), valueScore: 72,
+      economicSignificanceIndex: 42 }));
+    return workspace;
+  }
+
+  test("AXE-27 zero peers cannot produce a perfect enterprise percentile", () => {
+    const workspace = measuredEnterprise();
+    const result = computeOrgScorecard({ workspace, window: "14d" }).summary.ecosystemRollup;
+    expect(result?.percentiles).toEqual({ overall: null, integrity: null, value: null });
+    expect(result?.outcome).toBe("not_evaluated");
+    expect(result?.sampleSize).toBe(0);
+    expect(result?.metricOutcomes).toEqual({ overall: "not_evaluated", integrity: "not_evaluated", value: "not_evaluated" });
+  });
+
+  test("AXE-27 absent peer value rows stay null while populated percentiles remain measured", () => {
+    const workspace = measuredEnterprise();
+    const dir = join(workspace, ".amc", "benchmarks", "imported", "peer-1");
+    mkdirSync(dir, { recursive: true });
+    writeFileSync(join(dir, "bench.json"), JSON.stringify({
+      v: 1, benchId: "peer-1", createdTs: Date.now(), publisher: { orgName: "Peer" },
+      agent: { agentId: "peer", riskTier: "med" }, hashes: {},
+      run: { runId: "run_peer", windowDays: 14, overall: 3, layers: {}, questions: {},
+        integrityIndex: 0.7, trustLabel: "HIGH TRUST", assurance: {},
+        indices: { EcosystemFocusRisk: 0, ClarityPathRisk: 0, EconomicSignificanceRisk: 0,
+          RiskAssuranceRisk: 0, DigitalDualityRisk: 0 } },
+    }));
+    const result = computeOrgScorecard({ workspace, window: "14d" }).summary.ecosystemRollup;
+    expect(result?.percentiles).toEqual({ overall: 100, integrity: 100, value: null });
+    expect(result?.outcome).toBe("measured");
+    expect(result?.sampleSize).toBe(1);
+    expect(result?.metricOutcomes).toEqual({ overall: "measured", integrity: "measured", value: "not_evaluated" });
   });
 });

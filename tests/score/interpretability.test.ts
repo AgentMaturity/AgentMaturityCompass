@@ -18,9 +18,9 @@ describe("interpretability scoring", () => {
     ...overrides,
   });
 
-  it("returns zero for no events", () => {
+  it("reports no evaluation for no events", () => {
     const result = scoreInterpretability([]);
-    expect(result.overallScore).toBe(0);
+    expect(result.overallScore).toBeNull();
     expect(result.recommendations.length).toBeGreaterThan(0);
   });
 
@@ -72,10 +72,10 @@ describe("interpretability scoring", () => {
     expect(result.refusalTransparency).toBe(0.5);
   });
 
-  it("gives full refusal transparency when no refusals", () => {
+  it("does not evaluate refusal transparency when no refusals", () => {
     const events = [makeEvent()];
     const result = scoreInterpretability(events);
-    expect(result.refusalTransparency).toBe(1.0);
+    expect(result.refusalTransparency).toBeNull();
   });
 
   it("penalizes lack of attribution", () => {

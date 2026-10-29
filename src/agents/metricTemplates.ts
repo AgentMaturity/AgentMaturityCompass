@@ -1,3 +1,5 @@
+import type { EvidenceOutcome } from "../types.js";
+import { ratioOrNull } from "../utils/ratio.js";
 /**
  * metricTemplates.ts — Pre-built evaluation metric templates for agent assessment.
  *
@@ -24,8 +26,10 @@ export type MetricCategory = 'safety' | 'quality' | 'compliance' | 'performance'
 export interface MetricResult {
   metricId: string;
   metricName: string;
-  score: number;           // 0-1 for float, 0 or 1 for binary
+  score: number | null;    // 0-1 for float, 0 or 1 for binary
   passed: boolean;
+  outcome?: EvidenceOutcome;
+  sampleSize?: number;
   details: string;
   category: MetricCategory;
   outputType: MetricOutputType;
@@ -66,8 +70,10 @@ export interface MetricGroupResult {
   groupId: string;
   groupName: string;
   results: MetricResult[];
-  overallScore: number;
-  passRate: number;
+  overallScore: number | null;
+  passRate: number | null;
+  outcome?: EvidenceOutcome;
+  sampleSize?: number;
   failedMetrics: string[];
 }
 
@@ -150,13 +156,15 @@ const hallucinationMetric: MetricTemplate = {
       if (contextTerms.has(term)) grounded++;
     }
 
-    const score = outputTerms.length > 0 ? grounded / outputTerms.length : 1;
+    const score = ratioOrNull(grounded, outputTerms.length);
     return {
       metricId: 'hallucination',
       metricName: 'Hallucination Detection',
       score,
-      passed: score >= 0.7,
-      details: `${Math.round(score * 100)}% of output terms grounded in input (${grounded}/${outputTerms.length})`,
+      passed: score !== null && score >= 0.7,
+      outcome: score === null ? "not_evaluated" : "measured",
+      sampleSize: outputTerms.length,
+      details: score === null ? "No evaluable output terms" : `${Math.round(score * 100)}% of output terms grounded in input (${grounded}/${outputTerms.length})`,
       category: 'quality',
       outputType: 'float',
       metadata: { groundedTerms: grounded, totalTerms: outputTerms.length },
@@ -190,7 +198,7 @@ const coherencyMetric: MetricTemplate = {
 
     // No excessive repetition
     const words = content.toLowerCase().split(/\s+/);
-    const uniqueRatio = new Set(words).size / Math.max(words.length, 1);
+    const uniqueRatio = new Set(words).size / words.length;
     if (uniqueRatio > 0.4) { score += 0.2; checks.push('low_repetition'); }
 
     // Contains relevant connectors/structure words
@@ -243,13 +251,15 @@ const intentFulfillmentMetric: MetricTemplate = {
       if (outputLower.includes(term)) addressed++;
     }
 
-    const score = inputTerms.length > 0 ? addressed / inputTerms.length : 1;
+    const score = ratioOrNull(addressed, inputTerms.length);
     return {
       metricId: 'intent_fulfillment',
       metricName: 'Intent Fulfillment',
       score,
-      passed: score >= 0.5,
-      details: `${addressed}/${inputTerms.length} intent terms addressed (${Math.round(score * 100)}%)`,
+      passed: score !== null && score >= 0.5,
+      outcome: score === null ? "not_evaluated" : "measured",
+      sampleSize: inputTerms.length,
+      details: score === null ? "No evaluable intent terms" : `${addressed}/${inputTerms.length} intent terms addressed (${Math.round(score * 100)}%)`,
       category: 'quality',
       outputType: 'float',
       metadata: { addressedTerms: addressed, totalIntentTerms: inputTerms.length },
@@ -327,13 +337,15 @@ const completenessMetric: MetricTemplate = {
       if (actualLower.includes(term)) covered++;
     }
 
-    const recall = expectedTerms.length > 0 ? covered / expectedTerms.length : 1;
+    const recall = ratioOrNull(covered, expectedTerms.length);
     return {
       metricId: 'completeness',
       metricName: 'Response Completeness',
       score: recall,
-      passed: recall >= 0.6,
-      details: `${covered}/${expectedTerms.length} expected terms present (recall: ${Math.round(recall * 100)}%)`,
+      passed: recall !== null && recall >= 0.6,
+      outcome: recall === null ? "not_evaluated" : "measured",
+      sampleSize: expectedTerms.length,
+      details: recall === null ? "No evaluable expected terms" : `${covered}/${expectedTerms.length} expected terms present (recall: ${Math.round(recall * 100)}%)`,
       category: 'quality',
       outputType: 'float',
       metadata: { coveredTerms: covered, expectedTermCount: expectedTerms.length },
@@ -401,11 +413,11 @@ const concisenessMetric: MetricTemplate = {
     // Detect filler words
     const fillers = /\b(basically|actually|literally|really|very|quite|rather|somewhat|kind of|sort of|you know|I mean)\b/gi;
     const fillerMatches = content.match(fillers) ?? [];
-    const fillerRatio = fillerMatches.length / Math.max(wordCount, 1);
+    const fillerRatio = fillerMatches.length / wordCount;
 
     // Detect repetitive phrases
     const uniqueWords = new Set(words.map(w => w.toLowerCase()));
-    const uniqueRatio = uniqueWords.size / Math.max(wordCount, 1);
+    const uniqueRatio = uniqueWords.size / wordCount;
 
     let score = 1;
     // Penalize excessive filler
@@ -478,11 +490,11 @@ const latencyMetric: MetricTemplate = {
   outputType: 'float',
   defaultThreshold: 0.7,
   evaluate: (input: MetricInput): MetricResult => {
-    const durationMs = (input.context?.durationMs as number) ?? 0;
+    const durationMs = input.context?.durationMs;
     const maxAcceptableMs = (input.context?.maxAcceptableMs as number) ?? 5000;
 
-    if (durationMs === 0) {
-      return { metricId: 'latency', metricName: 'Response Latency', score: 1, passed: true, details: 'No duration data', category: 'performance', outputType: 'float' };
+    if (typeof durationMs !== 'number' || !Number.isFinite(durationMs) || durationMs < 0 || ratioOrNull(durationMs, maxAcceptableMs) === null) {
+      return { metricId: 'latency', metricName: 'Response Latency', score: null, passed: false, outcome: 'not_evaluated', sampleSize: 0, details: 'No valid duration or positive latency budget', category: 'performance', outputType: 'float' };
     }
 
     // Score: 1.0 if instant, decreasing as we approach max
@@ -494,6 +506,8 @@ const latencyMetric: MetricTemplate = {
       metricName: 'Response Latency',
       score,
       passed: score >= 0.7,
+      outcome: "measured",
+      sampleSize: 1,
       details: `${durationMs}ms (threshold: ${maxAcceptableMs}ms, ${Math.round(ratio * 100)}% of budget)`,
       category: 'performance',
       outputType: 'float',
@@ -596,7 +610,8 @@ export class MetricRegistry {
   evaluate(metricId: string, input: MetricInput): MetricResult | undefined {
     const metric = this.metrics.get(metricId);
     if (!metric) return undefined;
-    return metric.evaluate(input);
+    const result = metric.evaluate(input);
+    return { ...result, outcome: result.outcome ?? (result.score === null ? "not_evaluated" : "measured") };
   }
 
   /** Evaluate a group of metrics */
@@ -604,19 +619,22 @@ export class MetricRegistry {
     const group = this.groups.get(groupId);
     if (!group) return undefined;
 
-    const results = group.metrics.map(m => m.evaluate(input));
-    const passCount = results.filter(r => r.passed).length;
-    const overallScore = results.length > 0
-      ? results.reduce((sum, r) => sum + r.score, 0) / results.length
-      : 0;
+    const results: MetricResult[] = group.metrics.map(m => {
+      const result = m.evaluate(input);
+      return { ...result, outcome: result.outcome ?? (result.score === null ? "not_evaluated" : "measured") };
+    });
+    const measured = results.filter((r): r is MetricResult & { score: number } => r.score !== null && Number.isFinite(r.score));
+    const overallScore = ratioOrNull(measured.reduce((sum, r) => sum + r.score, 0), measured.length);
 
     return {
       groupId: group.id,
       groupName: group.name,
       results,
-      overallScore: Math.round(overallScore * 1000) / 1000,
-      passRate: results.length > 0 ? passCount / results.length : 0,
-      failedMetrics: results.filter(r => !r.passed).map(r => r.metricId),
+      overallScore: overallScore === null ? null : Math.round(overallScore * 1000) / 1000,
+      passRate: ratioOrNull(measured.filter(r => r.passed).length, measured.length),
+      outcome: measured.length === 0 ? "not_evaluated" : "measured",
+      sampleSize: measured.length,
+      failedMetrics: measured.filter(r => !r.passed).map(r => r.metricId),
     };
   }
 
