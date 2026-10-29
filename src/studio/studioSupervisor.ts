@@ -24,6 +24,7 @@ import { verifyUsersConfigSignature } from "../auth/authApi.js";
 import { initOpsPolicyAsync, opsPolicyPath, verifyOpsPolicySignature } from "../ops/policy.js";
 import { initForecastPolicyAsync } from "../forecast/forecastPublication.js";
 import { forecastPolicyPath } from "../forecast/forecastStore.js";
+import { loadValuePolicyAsync, valuePolicyPath } from "../value/valueStore.js";
 import { initPluginWorkspaceAsync, verifyPluginWorkspace } from "../plugins/pluginApi.js";
 import { checkNotaryTrust, verifyTrustConfigSignature } from "../trust/trustConfig.js";
 import { initMechanicWorkspaceForAuthority } from "../mechanic/mechanicSettingsPublication.js";
@@ -122,6 +123,10 @@ async function ensureWorkspace(workspace: string): Promise<void> {
   }
   if (!existsSync(forecastPolicyPath(workspace))) {
     await initForecastPolicyAsync(workspace, { onlyIfMissing: true });
+  }
+  // Workspaces initialized before P2-06-D2 lack the value policy that read-only readiness requires.
+  if (!existsSync(valuePolicyPath(workspace))) {
+    await loadValuePolicyAsync(workspace);
   }
   if (!existsSync(mechanicTargetsPath(workspace))) {
     await initMechanicWorkspaceForAuthority({

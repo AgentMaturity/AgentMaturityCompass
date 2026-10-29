@@ -41,6 +41,7 @@ import { forecastPolicyPath } from "./forecast/forecastStore.js";
 import { canonPath, initCanon } from "./canon/canonLoader.js";
 import { diagnosticBankPath, initDiagnosticBank } from "./diagnostic/bank/bankLoader.js";
 import { cgxPolicyPath, initCgxPolicy } from "./cgx/cgxStore.js";
+import { initValuePolicy, valuePolicyPath } from "./value/valueStore.js";
 import { initMechanicWorkspace } from "./mechanic/mechanicApi.js";
 import { mechanicTargetsPath } from "./mechanic/targetsStore.js";
 import { benchPolicyPath, initBenchPolicy } from "./bench/benchPolicyStore.js";
@@ -379,6 +380,11 @@ export function initWorkspace(opts: InitWorkspaceOptions = {}): { workspacePath:
 
   if (!pathExists(cgxPolicyPath(workspace))) {
     initCgxPolicy(workspace);
+  }
+
+  // Studio readiness reads the value policy read-only (P2-06-D2), so a fresh workspace signs its default here.
+  if (!pathExists(valuePolicyPath(workspace))) {
+    initValuePolicy(workspace);
   }
 
   if (!pathExists(mechanicTargetsPath(workspace))) {
