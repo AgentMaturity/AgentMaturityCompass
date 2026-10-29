@@ -78,11 +78,16 @@ export class ReadBeforeEditLedger {
    * Re-reads the file rather than trusting the recorded digest, because the
    * question is whether the file changed and only the file can answer that.
    */
-  mayEdit(agentId: string, path: string): EditVerdict {
+  mayEdit(agentId: string, path: string, snapshotDigest?: string): EditVerdict {
     const key = canonicalKey(path);
     const record = this.reads.get(agentId)?.get(key);
     if (!record) {
       return { ok: false, reason: `edit requires reading "${path}" first — read the file, then retry` };
+    }
+    // Bind permission to the bytes used for planning as well as the live file.
+    // Otherwise a change away from, and back to, the observation can authorize an unseen snapshot.
+    if (snapshotDigest !== undefined && snapshotDigest !== record.digest) {
+      return { ok: false, reason: `"${path}" changed since you read it — read it again, then retry` };
     }
     let current: string;
     try {
@@ -108,13 +113,13 @@ export class ReadBeforeEditLedger {
    * content the agent has not seen is a blind destructive act, and the whole
    * point of the policy is that it cannot happen by accident.
    */
-  mayWrite(agentId: string, path: string): EditVerdict {
+  mayWrite(agentId: string, path: string, snapshotDigest?: string): EditVerdict {
     try {
       if (regularFileStat(path) === null) return { ok: true };
     } catch (error) {
       return { ok: false, reason: (error as Error).message };
     }
-    return this.mayEdit(agentId, path);
+    return this.mayEdit(agentId, path, snapshotDigest);
   }
 
   /**

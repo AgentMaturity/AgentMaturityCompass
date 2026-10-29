@@ -473,3 +473,62 @@ describe("safe search file opens", () => {
     expect(JSON.parse(child.stdout)).toEqual({ refused: true, swapped: true });
   });
 });
+
+
+describe("scoped search roots", () => {
+  it("refuses unvalidated worker roots before walking outside or following a replaced link", async () => {
+    const h = harness();
+    const outside = mkdtempSync(join(tmpdir(), "amc-search-walk-outside-"));
+    dirs.push(outside);
+    write(outside, "private.ts", "NEEDLE");
+    symlinkSync(outside, join(h.workspace, "escape"));
+    write(h.workspace, "file.ts", "NEEDLE");
+    const { walkWorkspace } = await import("../dist/tools/builtin/workspaceWalk.js");
+    for (const path of ["../", outside, "escape", "file.ts"]) {
+      expect(() => walkWorkspace(h.workspace, { path, maxFiles: 10, maxFileBytes: 100 }), path).toThrow();
+    }
+  });
+
+  it.each(["glob", "grep"])("roots %s in the requested directory and keeps workspace-relative paths", async (name) => {
+    const h = harness();
+    write(h.workspace, "src/deep/inside.ts", "NEEDLE");
+    write(h.workspace, "outside.ts", "NEEDLE");
+    const outcome = await h.run(name, { pattern: name === "glob" ? "**/*.ts" : "needle", path: "src", caseInsensitive: true });
+    expect(outcome.ok).toBe(true);
+    expect(outcome.output).toContain("src/deep/inside.ts");
+    expect(outcome.output).not.toContain("outside.ts");
+  });
+
+  it.each(["glob", "grep"])("keeps ancestor ignore rules when scoping %s", async (name) => {
+    const h = harness();
+    write(h.workspace, ".gitignore", "src/drop.ts\nignored/\n");
+    write(h.workspace, "src/.ignore", "local.ts\n");
+    for (const path of ["src/drop.ts", "src/local.ts", "src/keep.ts", "ignored/file.ts"]) write(h.workspace, path, "NEEDLE");
+    const args = { pattern: name === "glob" ? "**/*.ts" : "NEEDLE", path: "src" };
+    const outcome = await h.run(name, args);
+    expect(outcome.ok).toBe(true);
+    expect(outcome.output).toContain("src/keep.ts");
+    expect(outcome.output).not.toContain("src/drop.ts");
+    expect(outcome.output).not.toContain("src/local.ts");
+    const explicit = await h.run(name, { ...args, includeIgnored: true });
+    expect(explicit.output).toContain("src/drop.ts");
+    expect(explicit.output).toContain("src/local.ts");
+    expect((await h.run(name, { ...args, path: "ignored" })).output).not.toContain("ignored/file.ts");
+    expect((await h.run(name, { ...args, path: "ignored", includeIgnored: true })).output).toContain("ignored/file.ts");
+  });
+
+  it.each(["glob", "grep"])("refuses lexical, symlink, protected and non-directory roots in %s", async (name) => {
+    const h = harness();
+    const outside = mkdtempSync(join(tmpdir(), "amc-search-outside-"));
+    dirs.push(outside);
+    write(outside, "private.ts", "NEEDLE");
+    symlinkSync(outside, join(h.workspace, "escape"));
+    write(h.workspace, "file.ts", "NEEDLE");
+    for (const directory of [".amc", ".git"]) mkdirSync(join(h.workspace, directory));
+    for (const path of ["../", outside, "escape", ".amc", ".git", "file.ts", "missing"]) {
+      const outcome = await h.run(name, { pattern: name === "glob" ? "**/*.ts" : "NEEDLE", path });
+      expect(outcome.ok, path).toBe(false);
+      expect(outcome.output, path).not.toContain("private.ts");
+    }
+  });
+});

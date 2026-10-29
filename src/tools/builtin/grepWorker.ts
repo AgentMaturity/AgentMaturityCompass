@@ -10,6 +10,7 @@ interface GrepWorkerInput {
   readonly workspace: string;
   readonly args: {
     readonly pattern: string;
+    readonly path?: string;
     readonly include?: string;
     readonly includeIgnored: boolean;
     readonly caseInsensitive: boolean;
@@ -25,6 +26,7 @@ interface GlobWorkerInput {
   readonly workspace: string;
   readonly args: {
     readonly pattern: string;
+    readonly path?: string;
     readonly includeIgnored: boolean;
     readonly timeoutMs: number;
     readonly maxResults: number;
@@ -44,7 +46,8 @@ function scanGlob({ workspace, args }: GlobWorkerInput): SearchResult {
   const walked = walkWorkspace(workspace, {
     maxFiles: MAX_FILES_WALKED,
     maxFileBytes: Number.MAX_SAFE_INTEGER,
-    includeIgnored: args.includeIgnored
+    includeIgnored: args.includeIgnored,
+    path: args.path
   });
   const matches = walked.files.filter(path => matcher.test(forMatching(path)));
   const shown = matches.slice(0, args.maxResults);
@@ -67,7 +70,8 @@ function scanWorkspace({ workspace, args }: GrepWorkerInput): SearchResult {
   const walked = walkWorkspace(workspace, {
     maxFiles: MAX_FILES_WALKED,
     maxFileBytes: MAX_FILE_BYTES,
-    includeIgnored: args.includeIgnored
+    includeIgnored: args.includeIgnored,
+    path: args.path
   });
   const lines: string[] = [];
   let emittedBytes = 0;

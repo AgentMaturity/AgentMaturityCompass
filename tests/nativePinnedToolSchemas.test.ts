@@ -3,6 +3,8 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, expect, test, vi } from "vitest";
 import { agentToolset } from "../src/agent/agentToolset.js";
+import { bashTool } from "../src/tools/builtin/bashTool.js";
+import { searchTools } from "../src/tools/builtin/searchTools.js";
 import { DEFAULT_AGENT_LOOP_CONFIG } from "../src/agent/loopTypes.js";
 import { DEFAULT_RETRY_RUNTIME } from "../src/agent/requestRetry.js";
 import { runStep, type LoopLlm } from "../src/agent/stepRunner.js";
@@ -210,4 +212,14 @@ test("a native session without a signed spill reader grant cannot invoke it", as
   const f = fixture();
   expect(f.names()).not.toContain("session.spill_read");
   expect((await f.call("session.spill_read", { locator: "amc-spill:invalid" })).outcome).toBe("DENIED");
+});
+
+// WP34b follows the canonical-schema review process above. The fs schema digest is unchanged.
+// Review optional bash workdir/description and search path through one explicit digest change.
+const BASH_SEARCH_TOOL_SCHEMAS_SHA256 = "f82eccbf1763c16bcf3652d24f7950cddef0043fa66ab9ea395903104784168c";
+test("the bash and search schemas pin the reviewed WP34b arguments", () => {
+  const offered = [bashTool(), ...searchTools()].map(({ name, description, parameters }) => ({ name, description, parameters }))
+    .sort((a, b) => a.name.localeCompare(b.name));
+  expect(offered.map(schema => schema.name)).toEqual(["bash", "glob", "grep"]);
+  expect(sha256Hex(canonicalize(offered))).toBe(BASH_SEARCH_TOOL_SCHEMAS_SHA256);
 });
