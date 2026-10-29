@@ -1,7 +1,7 @@
-import { chmodSync, existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { chmodSync, existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import YAML from "yaml";
 
@@ -40,6 +40,33 @@ describe("container source build and runtime contracts", () => {
     expect(file).not.toMatch(/(?:ENV|ARG)\s+AMC_.*(?:PASSPHRASE|PASSWORD|SECRET)/);
     expect(existsSync("Dockerfile.runner")).toBe(false);
     expect(existsSync("deploy/compose/Dockerfile")).toBe(false);
+  });
+
+  it("copies every path the build and npm pack read into the build stage (P2-06-D1)", () => {
+    const stage = read("Dockerfile").split(/^FROM /m).find((block) => / AS build\n/.test(block))!;
+    const sources = [...stage.matchAll(/^COPY (?!--from)(.+)$/gm)].flatMap((match) => match[1]!.split(/\s+/).filter((token) => !token.startsWith("--")).slice(0, -1));
+    const covered = (path: string) => sources.some((source) => source === path || (source.endsWith("/") && path.startsWith(source)));
+    const assets = [...read("scripts/copy-build-assets.mjs").matchAll(/"([a-z][\w-]*\/[\w./-]+)"/g)].map((match) => match[1]!)
+      .filter((path) => !path.startsWith("dist/") && existsSync(path));
+    expect(assets).toContain("docs/adapters/manifests");
+    const receipts = readdirSync("docs/adapters/manifests").filter((name) => name.endsWith(".json"))
+      .map((name) => JSON.parse(read(`docs/adapters/manifests/${name}`)).receipt).filter((receipt): receipt is string => typeof receipt === "string")
+      .flatMap((receipt) => [receipt, `${dirname(receipt)}/receipt.json`]).filter((path) => existsSync(path));
+    expect(receipts.length).toBeGreaterThan(0);
+    const packed = (JSON.parse(read("package.json")).files as string[]).filter((entry) => !entry.startsWith("!") && !entry.startsWith("dist"))
+      .map((entry) => entry.replace(/\/\*\*$/, "/"));
+    const missing = [...assets.map((path) => statSync(path).isDirectory() ? `${path}/x` : path), ...receipts, ...packed].filter((path) => !covered(path));
+    expect(missing).toEqual([]);
+  });
+
+  it("creates the AMC home and every directory under it at mode 0700 (P2-06-D3)", () => {
+    const file = read("Dockerfile");
+    const created = [...file.matchAll(/mkdir -p ([^&\n\\]+)/g)].flatMap((match) => match[1]!.trim().split(/\s+/)).filter((path) => path.startsWith("/home/amc/.config/amc"));
+    expect(created.length).toBeGreaterThan(0);
+    const restricted = [...file.matchAll(/chmod 0?700 ([^&\n\\]+)/g)].flatMap((match) => match[1]!.trim().split(/\s+/));
+    const required = new Set(["/home/amc/.config/amc", ...created]);
+    expect([...required].filter((path) => !restricted.includes(path))).toEqual([]);
+    expect(file.indexOf("chmod 0700")).toBeGreaterThan(file.indexOf("chown -R 10001:10001"));
   });
 
   it("points source compose services at the canonical target and installed executable", () => {
