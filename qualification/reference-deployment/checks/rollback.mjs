@@ -1,5 +1,5 @@
 // RB-1 and RB-2 (docs/deploy/reference/ROLLBACK.md).
-import { criterion, fullname, governedTurn, helm, helmRevision, isPrefix, kubectl, ledgerSnapshot, notRun, restoreInPod, restoreWarnings,
+import { criterion, fullname, imageBase, upgradeCtx, governedTurn, helm, helmRevision, isPrefix, kubectl, ledgerSnapshot, notRun, restoreInPod, restoreWarnings,
   startToolPod, summary, verdict, waitRollout } from "./lib.mjs";
 
 /**
@@ -19,7 +19,7 @@ async function rb1(ctx) {
   const after = ledgerSnapshot(ctx);
   // Each receipt binds an event hash; an unchanged chain prefix keeps every earlier receipt's event verifiable.
   criteria.push(criterion("events behind receipts issued before the rollback unchanged (chain prefix)", isPrefix(before, after) && after.linked,
-    { receipts: ctx.state.receipts ?? [], before: before?.count ?? null, after: after?.count ?? null }));
+    { receipts: ctx.state.upgradeReceipts ?? [], before: before?.count ?? null, after: after?.count ?? null }));
   return verdict(criteria);
 }
 
@@ -42,7 +42,8 @@ async function rb2(ctx) {
   kubectl(ctx, ["scale", `deploy/${fullname(ctx)}`, "--replicas=0"]);
   kubectl(ctx, ["wait", "--for=delete", "pod", "-l", `app.kubernetes.io/instance=${ctx.release}`, "--timeout=180s"]);
   const pod = `${ctx.release}-rb2-restore`;
-  const started = startToolPod(ctx, { name: pod, claim: fullname(ctx), image: ctx.imageA });
+  // Deliberately N-1: RB-2 is about N-1 restoring its own pre-upgrade backup (N would migrate the restored ledger again).
+  const started = startToolPod(ctx, { name: pod, claim: fullname(ctx), image: imageBase(ctx) });
   const restored = started ? restoreInPod(ctx, { pod, backup, target: "/data/amc/.p206-restore" }) : { status: 1, stderr: "tool pod did not start" };
   const warnings = started ? restoreWarnings(ctx, { pod, target: "/data/amc/.p206-restore" }) : { all: [], unexpected: [] };
   const swapped = restored.status === 0
@@ -60,4 +61,5 @@ async function rb2(ctx) {
   return verdict(criteria);
 }
 
-export const checks = { "RB-1": rb1, "RB-2": rb2 };
+// RB-* continue the UPG-1 release (N-1 upgraded to N), never the fresh-install release that INS-1 created with N.
+export const checks = { "RB-1": (ctx) => rb1(upgradeCtx(ctx)), "RB-2": (ctx) => rb2(upgradeCtx(ctx)) };

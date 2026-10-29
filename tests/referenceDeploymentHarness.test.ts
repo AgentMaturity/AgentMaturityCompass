@@ -5,7 +5,11 @@ import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { describe, expect, it } from "vitest";
 import { validateQualificationDir } from "../scripts/check-qualification-receipts.mjs";
+import { checks as backupChecks } from "../qualification/reference-deployment/checks/backup.mjs";
+import { checks as installChecks } from "../qualification/reference-deployment/checks/install.mjs";
 import { isPrefix, isRestoredPrefix } from "../qualification/reference-deployment/checks/lib.mjs";
+import { checks as rollbackChecks } from "../qualification/reference-deployment/checks/rollback.mjs";
+import { checks as upgradeChecks } from "../qualification/reference-deployment/checks/upgrade.mjs";
 import { buildReceipt, evaluateResults, loadMatrix, main, MATRIX_DIR, parseArgs, runChecks, targetProblems } from "../scripts/qualify-reference-deployment.mjs";
 
 // The 22 checks P2-06 names, in its order.
@@ -90,6 +94,58 @@ describe("receipt verdict", () => {
     } finally {
       rmSync(root, { recursive: true, force: true });
     }
+  });
+});
+
+/**
+ * A fake cluster: records every command and stdin, answers 0 with empty output, and fails `helm install` so a check
+ * stops right after choosing its image. `kubectl get secret … -o json` returns an empty Secret.
+ */
+function fakeCluster() {
+  const calls: { args: string[]; input: string }[] = [];
+  const run = (cmd: string, args: string[], opts: { input?: string | Buffer } = {}) => {
+    calls.push({ args: [cmd, ...args], input: opts.input === undefined ? "" : String(opts.input) });
+    if (cmd === "helm" && args.includes("install")) return { status: 1, stdout: "", stderr: "fake install refused", durationMs: 0 };
+    if (cmd === "kubectl" && args.includes("secret") && args.includes("json")) return { status: 0, stdout: '{"type":"Opaque","data":{}}', stderr: "", durationMs: 0 };
+    return { status: 0, stdout: "", stderr: "", durationMs: 0 };
+  };
+  const ctx = { kubeContext: "kind-x", namespace: "default", release: "amc-rd", imageA: A, imageB: B, chartDir: "chart", ephemeralSecrets: true,
+    state: {} as Record<string, unknown>, run };
+  const installs = () => calls.filter((call) => call.args[0] === "helm" && call.args.includes("install") && !call.args.some((arg) => arg.includes("-ins2-")))
+    .map((call) => ({ release: call.args[call.args.indexOf("install") + 1], digest: call.args.find((arg) => arg.startsWith("image.digest="))?.split("=")[1] }));
+  const podImages = () => calls.filter((call) => call.input.includes('"kind":"Pod"')).map((call) => JSON.parse(call.input).spec.containers[0].image);
+  const podClaims = () => calls.filter((call) => call.input.includes('"kind":"Pod"'))
+    .map((call) => JSON.parse(call.input).spec.volumes[0].persistentVolumeClaim.claimName);
+  return { ctx, installs, podImages, podClaims };
+}
+const digestOf = (ref: string) => ref.split("@")[1];
+
+describe("which image each check qualifies (H1, H2)", () => {
+  it("INS-1 installs N, the image under test, on the main release", async () => {
+    const cluster = fakeCluster();
+    await silenced(() => installChecks["INS-1"](cluster.ctx));
+    expect(cluster.installs()).toEqual([{ release: "amc-rd", digest: digestOf(B) }]);
+  });
+
+  it("UPG-1 starts from N-1 on its own release", async () => {
+    const cluster = fakeCluster();
+    await silenced(() => upgradeChecks["UPG-1"](cluster.ctx));
+    expect(cluster.installs()).toEqual([{ release: "amc-rd-upg", digest: digestOf(A) }]);
+  });
+
+  it("BR restore pods run N", async () => {
+    const cluster = fakeCluster();
+    cluster.ctx.state.loadBackup = { bytes: Buffer.from("backup"), auditorPem: "-----BEGIN PUBLIC KEY-----\n" };
+    await silenced(() => backupChecks["BR-3"](cluster.ctx));
+    expect(cluster.podImages()).toEqual([B]);
+  });
+
+  it("RB-2 restores with N-1 on the upgrade release, by design", async () => {
+    const cluster = fakeCluster();
+    Object.assign(cluster.ctx.state, { preUpgradeRevision: 2, preUpgradeBackup: { bytes: Buffer.from("b"), auditorPem: "k" } });
+    await silenced(() => rollbackChecks["RB-2"](cluster.ctx));
+    expect(cluster.podImages()).toEqual([A]);
+    expect(cluster.podClaims()).toEqual(["amc-rd-upg-amc"]);
   });
 });
 

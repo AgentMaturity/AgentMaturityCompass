@@ -65,7 +65,7 @@ GUI launcher runs are manual: Sid follows `docs/deploy/reference/GUI_CHECKLIST.m
 
 ### Reference deployment
 
-`scripts/qualify-reference-deployment.mjs` runs the 22 checks in `qualification/reference-deployment/matrix.json` against one Helm release (topology: `docs/deploy/reference/TOPOLOGY.md`). It exits 0 only when every check passed; a check that did not run is a failure; it exits 2 on a usage error, a missing tool, or recovery targets that are not filled in.
+`scripts/qualify-reference-deployment.mjs` runs the 22 checks in `qualification/reference-deployment/matrix.json` against one Helm release (topology: `docs/deploy/reference/TOPOLOGY.md`). INS-1 and every check that needs a running release qualify image N (`--image-b`) on the release named by `--release`, and every restore pod runs N. Only UPG-* and RB-* start from N-1 (`--image-a`), on a second release `<release>-upg`; RB-2's restore pod runs N-1 on purpose, because that check is N-1 restoring its own pre-upgrade backup. It exits 0 only when every check passed; a check that did not run is a failure; it exits 2 on a usage error, a missing tool, or recovery targets that are not filled in.
 
 - On kind: `.github/workflows/reference-deployment.yml` (manual and nightly) with ephemeral secrets.
 - On the D-03 cluster: Sid runs the same command with his credentials and `--out qualification/<date>-P2-06/cluster`, then gives the release gate a staging URL through `AMC_RELEASE_GATE_LIVE_URL`.
