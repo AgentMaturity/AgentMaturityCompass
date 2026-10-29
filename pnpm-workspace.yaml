@@ -25,6 +25,11 @@ linkWorkspacePackages: true
 # Keep cloud SDKs and native bindings opt-in; required workspace peers stay explicit.
 autoInstallPeers: false
 
+# PXB-44: pnpm >=10.16.0 supports this delay in minutes (pinned: 10.33.0).
+# Give newly published registry versions 48 hours for compromise reports to surface.
+# https://github.com/pnpm/pnpm/blob/v10.33.0/pnpm/CHANGELOG.md#10160
+minimumReleaseAge: 2880
+
 # Native modules whose install scripts must run.
 #
 # pnpm 10 blocks lifecycle scripts by default. better-sqlite3 is AMC's evidence
