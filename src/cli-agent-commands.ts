@@ -533,6 +533,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
             toolset.readiness.writeScope.length > 0 ? toolset.readiness.writeScope.join(", ") : "(nothing)"
           }`
         ));
+        progress(chalk.dim(`action policy: ${toolset.readiness.actionPolicy}`));
         if (!toolset.readiness.confined) {
           // A warning, not a refusal: an unconfined fs.read is still governed
           // by the allowlist and the firewall. Code Mode is the part that

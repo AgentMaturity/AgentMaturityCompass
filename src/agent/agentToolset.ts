@@ -28,6 +28,7 @@ import {
   runtimeFirewallGuard,
   toolhubAllowlistGuard
 } from "../tools/guards/policyGuards.js";
+import { actionPolicyGuard, actionPolicyMode, actionPolicyState, type ActionPolicyState } from "../tools/guards/actionPolicyGuard.js";
 import { compiledApprovalClasses, compiledPolicyFacts, compiledPolicyGuard, compiledPolicyShows, planRequiresAgentLease } from "../tools/guards/compiledPolicyGuard.js";
 import { ToolPipeline } from "../tools/toolPipeline.js";
 import type { ActionClass } from "../types.js";
@@ -196,6 +197,8 @@ export interface ToolsetReadiness {
   readonly writeScope: readonly string[];
   /** Whether `bash` is offered, and under what enforcement (P0-06). */
   readonly shell: NativeShellReadiness;
+  /** The signed Action Policy native calls meet (AXR-02); "not configured" means none is checked. */
+  readonly actionPolicy: ActionPolicyState;
 }
 
 /**
@@ -230,6 +233,11 @@ export function checkToolsetReadiness(workspace: string, options: {
     blockers.push("the signed tool allowlist grants no supported native capability with its exact name, action class and context — review .amc/tools.yaml, then run: amc tools sign");
   }
 
+  const actionPolicy = actionPolicyState(workspace);
+  if (actionPolicy === "untrusted") {
+    blockers.push("the Action Policy does not verify, so every governed call is denied — restore .amc/action-policy.yaml or re-sign it: amc policy action init");
+  }
+
   const writeScope = [...new Set(selected.filter(tool => tool.name === "fs.write" || tool.name === "fs.edit")
     .flatMap(tool => tool.allow?.paths ?? []))];
 
@@ -251,6 +259,7 @@ export function checkToolsetReadiness(workspace: string, options: {
       ? `${confinementReason}; no sandbox backend on this machine: ${sandbox.unavailableReasons().join("; ")}`
       : confinementReason,
     writeScope,
+    actionPolicy,
     shell: options.parentShell === undefined ? nativeShellReadiness(workspace, options.unconfinedShell)
       : childShellReadiness(workspace, options.parentShell)
   };
@@ -465,6 +474,9 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
   // CLI binds the native writer after constructing the toolset; forks can
   // replace it. Resolve the current session only when the guard executes.
   registry.guard("budgets", execution => budgetGuard(workspace, options.sessionId)(execution));
+  // AXR-02: the governor's signed Action Policy, as ToolHub decides it; not configured, it does not apply. After the
+  // budgets guard, so an exhausted budget is named by it; its SIMULATE downgrade is applied at entry (narrowMode).
+  registry.guard("action-policy", actionPolicyGuard(workspace));
   // web_search's destination is its composed provider's declared origin, never
   // a url the model passes; both host checks read that. Unconfigured, it names
   // no url and network-egress denies it.
@@ -487,6 +499,7 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
     workspace,
     ...(options.mode ? { mode: options.mode } : {}),
     journal: () => (journal ??= openActionJournal(workspace)),
+    narrowMode: actionPolicyMode(workspace),
     // Under a compiled policy every call is bound to a record, and its approval classes need a signed approval.
     ...(compiled ? { authorizeClasses: new Set<string>(ACTION_CLASSES), boundApprovalRequiredFor: compiledApprovalClasses(compiled) } : {}),
     // Read per call: the CLI binds its session writer after composing.

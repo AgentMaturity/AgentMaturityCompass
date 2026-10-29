@@ -19,6 +19,7 @@ import { PATH_ARGUMENTS } from "../src/toolhub/toolArgumentRoles.js";
 import { canonicalize } from "../src/utils/json.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import { initWorkspace } from "../src/workspace.js";
+import { removeActionPolicy } from "./helpers/actionPolicyFixtures.js";
 
 // AUTHORED UNEXECUTED: source regressions, not installed or provider acceptance.
 const cleanups: Array<() => void> = [];
@@ -34,6 +35,7 @@ function fixture(options: { pinned?: boolean; code?: boolean; extension?: boolea
   vi.stubEnv("AMC_VAULT_PASSPHRASE", "synthetic-pinned-schema-fixture-only");
   vi.stubEnv("AMC_CONTROL_CHECKPOINT_DIR", join(root, "control-checkpoints"));
   initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
+  removeActionPolicy(workspace); // AXR-02: no Action Policy configured, as before; this file is not about it (amc init signs one).
   initBudgets(workspace, "default"); writeRuntimeFirewallPolicy({ workspace, mode: "observe" });
   const config = defaultToolsConfig(); config.tools.allowedTools = [read, ...(options.grants ?? [])];
   // A signed legacy permissive default cannot override the explicit native pin.

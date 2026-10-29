@@ -15,6 +15,7 @@ import { loadNativeMcpConfiguration, requireReviewedNativeMcpGrants, resolveNati
 import { sha256Hex } from "../src/utils/hash.js";
 import { openActionJournal } from "../src/actions/actionJournal.js";
 import { initProcessorRegistry } from "../src/dataflow/processorRegistry.js";
+import { removeActionPolicy } from "./helpers/actionPolicyFixtures.js";
 
 // A genuine separate stdio process speaking JSON-RPC. No shared dist, SDK
 // server implementation, network connection or provider credentials are used.
@@ -85,6 +86,7 @@ function setup(state: FixtureState, permitted = state.tools.map(remote => remote
   const statePath = join(workspace, "fixture-state.json"), logPath = join(workspace, "fixture-calls.jsonl"), pidPath = join(workspace, "fixture-pid");
   writeFileSync(statePath, JSON.stringify(state));
   initWorkspace({ workspacePath: workspace, agentId: "default", trustBoundaryMode: "isolated" });
+  removeActionPolicy(workspace); // AXR-02: no Action Policy configured, as before; this file is not about it (amc init signs one).
   initBudgets(workspace, "default"); writeRuntimeFirewallPolicy({ workspace, mode: "observe" });
   const config = loadToolsConfig(workspace);
   initToolsConfig(workspace, { ...config, tools: { ...config.tools, allowedTools: [...config.tools.allowedTools,

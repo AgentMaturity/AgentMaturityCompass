@@ -13,7 +13,7 @@ import { JournalUnavailable } from "../../src/actions/receiptStates.js";
 import { initApprovalPolicy } from "../../src/approvals/approvalPolicyEngine.js";
 import { initBudgets } from "../../src/budgets/budgets.js";
 import { createFreezeIncident } from "../../src/drift/freezeEngine.js";
-import { initActionPolicy } from "../../src/governor/actionPolicyEngine.js";
+import { permitAgentActions } from "./actionPolicyFixtures.js";
 import { openLedger } from "../../src/ledger/ledger.js";
 import { initToolsConfig } from "../../src/toolhub/toolhubValidators.js";
 import { defaultToolsConfig } from "../../src/toolhub/toolsSchema.js";
@@ -48,7 +48,8 @@ export const FAULT_ARGUMENTS: Readonly<Record<FaultTool, Record<string, unknown>
 export function prepareFaultWorkspace(workspacePath?: string): string {
   const workspace = workspacePath ?? mkdtempSync(join(tmpdir(), "amc-action-faults-"));
   initWorkspace({ workspacePath: workspace, agentId: "default", trustBoundaryMode: "isolated" });
-  initActionPolicy(workspace);
+  // AXR-02: native calls meet the signed Action Policy; this one lets the fixture's agent EXECUTE (an observed run included).
+  permitAgentActions(workspace, "default");
   initBudgets(workspace, "default");
   initApprovalPolicy(workspace);
   const config = defaultToolsConfig();

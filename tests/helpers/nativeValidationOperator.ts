@@ -10,6 +10,7 @@ import { writeRuntimeFirewallPolicy } from "../../src/runtime/firewall.js";
 import { defaultToolsConfig } from "../../src/toolhub/toolsSchema.js";
 import { initToolsConfig, loadVerifiedToolsConfigSnapshot } from "../../src/toolhub/toolhubValidators.js";
 import { loadNativeValidationConfiguration } from "../../src/setup/nativeValidationConfig.js";
+import { permitAgentActions } from "./actionPolicyFixtures.js";
 
 export type OutcomeCase = "success" | "nonzero" | "denied" | "budget";
 /** The one directory the signed shell policy lets the fixture command write. */
@@ -18,6 +19,9 @@ const EFFECT_DIR = "validation-out";
 export function validationOperatorFixture(workspace: string, mode: OutcomeCase) {
   mkdirSync(workspace, { recursive: true });
   initWorkspace({ workspacePath: workspace, agentId: "default", trustBoundaryMode: "isolated" });
+  // AXR-02: native calls meet the signed Action Policy; this one lets the fixture's agent EXECUTE (an observed run included).
+  // Removing it instead would not do: the approval engine binds the signed policy files it reads.
+  permitAgentActions(workspace, "default");
   // The checks run through the native shell. Since P1-05 it is confined with
   // Seatbelt on macOS whenever Seatbelt is available (Bubblewrap on Linux); the
   // operator opt-in (P0-06) callers pass applies only without it. The confined

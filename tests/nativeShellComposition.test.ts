@@ -27,6 +27,7 @@ import { startAcpStdio } from "../src/acp/acpStdioMain.js";
 import { createNativeTaskService } from "../src/studio/nativeTaskService.js";
 import type { SandboxOutcome } from "../src/sandbox/sandboxTypes.js";
 import { FixedCredentials, LOOP_MODEL, LOOP_PROVIDER, scriptedAdapter, silentTransport, textStep } from "./helpers/agentLoopHarness.js";
+import { removeActionPolicy } from "./helpers/actionPolicyFixtures.js";
 
 /**
  * P0-06: the native shell is offered only when it is confined (Linux with a
@@ -82,6 +83,7 @@ function workspace(): string {
   const dir = realpathSync(mkdtempSync(join(tmpdir(), "amc-shell-gate-")));
   dirs.push(dir);
   initWorkspace({ workspacePath: dir, agentId: "default", trustBoundaryMode: "isolated" });
+  removeActionPolicy(dir); // AXR-02: no Action Policy configured, as before; this file is not about it (amc init signs one).
   initBudgets(dir, "default");
   writeRuntimeFirewallPolicy({ workspace: dir, mode: "observe" });
   return dir;

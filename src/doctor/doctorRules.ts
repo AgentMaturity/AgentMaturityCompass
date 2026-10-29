@@ -221,7 +221,12 @@ export async function runDoctorRules(workspace: string, options: DoctorOptions =
 
   pushRuntimeFirewallCheck(checks, workspace, strict);
 
-  pushSignatureCheck(checks, "sig-action-policy", "action-policy.yaml", verifyActionPolicySignature(workspace));
+  // AXR-02: absent, native agent calls meet no Action Policy; said as such rather than as a missing signature.
+  const actionPolicySig = verifyActionPolicySignature(workspace);
+  if (actionPolicySig.reason === "action policy missing" && !existsSync(actionPolicySig.sigPath)) {
+    checks.push({ id: "sig-action-policy", status: "WARN", message: "action policy: not configured (native agent calls are not checked against an Action Policy)",
+      fixHint: "Create and sign one with: amc policy action init" });
+  } else pushSignatureCheck(checks, "sig-action-policy", "action-policy.yaml", actionPolicySig);
   pushSignatureCheck(checks, "sig-tools", "tools.yaml", verifyToolhubConfig(workspace));
   pushSignatureCheck(checks, "sig-budgets", "budgets.yaml", verifyBudgetsConfigSignature(workspace));
   pushSignatureCheck(checks, "sig-approval-policy", "approval-policy.yaml", verifyApprovalPolicySignature(workspace));

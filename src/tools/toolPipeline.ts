@@ -9,6 +9,7 @@ import {
 } from "../actions/authorize.js";
 import { ActionBlocked, blockReason, type BlockCode, type EffectState, type ReceiptState } from "../actions/receiptStates.js";
 import { ACTION_CLASSES } from "../governor/actionCatalog.js";
+import type { ActionClass } from "../types.js";
 import { lifecycleAdmission } from "../lifecycle/reassessment.js";
 import { withWorkspaceScope } from "../enforce/evidenceEmitter.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -143,6 +144,8 @@ export interface ToolPipelineInit {
    * the authorized classes are journaled. A journal that cannot be read or opened denies the call `journal_unavailable`.
    */
   readonly journal?: () => ActionJournal;
+  /** The mode a call enters with (AXR-02: the signed Action Policy's downgrade). It can only turn EXECUTE into SIMULATE. */
+  readonly narrowMode?: (call: { readonly name: string; readonly agentId: string; readonly actionClass: ActionClass; readonly requestedMode: ToolMode }) => ToolMode;
 }
 
 export interface ToolCallInput {
@@ -287,7 +290,12 @@ export class ToolPipeline {
     const definition = this.init.registry.visible(input.agentId).get(input.name);
     if (!definition || !this.authorizes(definition.actionClass)) return null;
     return authorizationIntentFor({ workspace: this.init.workspace, name: definition.name, actionClass: definition.actionClass,
-      effectiveMode: input.requestedMode, arguments: input.arguments }, this.init.authorizationContext?.());
+      effectiveMode: this.entryMode(definition.name, definition.actionClass, input), arguments: input.arguments }, this.init.authorizationContext?.());
+  }
+
+  private entryMode(name: string, actionClass: ActionClass, input: Pick<ToolCallInput, "agentId" | "requestedMode">): ToolMode {
+    return input.requestedMode === "EXECUTE" && this.init.narrowMode?.({ name, agentId: input.agentId, actionClass, requestedMode: "EXECUTE" }) === "SIMULATE"
+      ? "SIMULATE" : input.requestedMode;
   }
 
   private authorizes(actionClass: string): boolean {
@@ -326,7 +334,7 @@ export class ToolPipeline {
         workspace: this.init.workspace,
         actionClass: definition.actionClass,
         requestedMode: input.requestedMode,
-        effectiveMode: input.requestedMode,
+        effectiveMode: this.entryMode(definition.name, definition.actionClass, input),
         arguments: freezeToolArguments(input.arguments),
         parentToken: input.parentToken ?? null,
         ...(input.signal === undefined ? {} : { signal: input.signal }),

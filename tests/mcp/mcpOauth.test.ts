@@ -26,6 +26,7 @@ import { readEventPayload } from "../../src/session/eventPayload.js";
 import { initToolsConfig, loadToolsConfig } from "../../src/toolhub/toolhubValidators.js";
 import { lockVault } from "../../src/vault/vault.js";
 import { initWorkspace } from "../../src/workspace.js";
+import { removeActionPolicy } from "../helpers/actionPolicyFixtures.js";
 
 const CHECKOUT = realpathSync(fileURLToPath(new URL("../../", import.meta.url)));
 const TIMEOUT = 2000;
@@ -688,7 +689,8 @@ describe("P1-39 OAuth governed evidence secrecy qualification", () => {
       try {
         // The real Vitest runner supplies its documented test-vault environment;
         // this fixture neither sets a passphrase nor changes process.env.
-        initWorkspace({ workspacePath: f.root, trustBoundaryMode: "isolated" }); initBudgets(f.root);
+        initWorkspace({ workspacePath: f.root, trustBoundaryMode: "isolated" });
+        removeActionPolicy(f.root); // AXR-02: no Action Policy configured, as before; this file is not about it (amc init signs one). initBudgets(f.root);
         writeRuntimeFirewallPolicy({ workspace: f.root, mode: "observe" });
         const name = nativeMcpToolName("oauth_fixture", "lookup"), configured = loadToolsConfig(f.root);
         initToolsConfig(f.root, { ...configured, tools: { ...configured.tools,

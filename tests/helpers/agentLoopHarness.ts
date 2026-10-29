@@ -35,6 +35,7 @@ import type { AgentLoopConfig, LoopHooks, LoopRetryRuntime } from "../../src/age
 import { NO_HOOKS } from "../../src/agent/loopTypes.js";
 import type { AgentToolSeam, ToolCallOutcome, ToolCallRequest } from "../../src/agent/toolSeam.js";
 import type { EvidenceEvent } from "../../src/types.js";
+import { removeActionPolicy } from "./actionPolicyFixtures.js";
 
 export const LOOP_PROVIDER = "anthropic";
 export const LOOP_MODEL = "claude-loop-test";
@@ -283,6 +284,7 @@ export function recordingRetryRuntime(random = 0.5): LoopRetryRuntime & { readon
 export function loopHarness(options: LoopHarnessOptions): LoopHarness {
   const dir = mkdtempSync(join(tmpdir(), "amc-agent-loop-"));
   initWorkspace({ workspacePath: dir, agentId: "default", trustBoundaryMode: "isolated" });
+  removeActionPolicy(dir); // AXR-02: no Action Policy configured, as before; this file is not about it (amc init signs one).
 
   const session = new SessionService(dir);
   session.open({
