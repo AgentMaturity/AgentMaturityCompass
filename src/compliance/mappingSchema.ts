@@ -69,7 +69,13 @@ export const complianceMappingSchema = z.object({
     packs: z.array(z.string().min(1)).default([]),
     configs: z.array(z.string().min(1)).default([])
   }),
-  sources: z.array(complianceMappingSourceSchema).min(1).optional()
+  sources: z.array(complianceMappingSourceSchema).min(1).optional(),
+  /**
+   * Catalog control ids this mapping corresponds to (P1-53). Information only: it never changes how the mapping is
+   * evaluated or its result. Built-in pairings are AI-proposed and pending review (docs/catalog/CONSOLIDATION.md).
+   * The default keeps maps signed before P1-53 parseable.
+   */
+  catalogControls: z.array(z.string().regex(/^L[0-3](-[A-Z0-9]{2,8}){1,2}-[0-9]{2,3}$/, "must be a catalog control id")).default([])
 });
 
 export const complianceMapsSchema = z.object({
@@ -121,6 +127,8 @@ export type ComplianceEvidenceRequirement = z.infer<typeof complianceEvidenceReq
 export type ComplianceMapping = z.infer<typeof complianceMappingSchema>;
 export type ComplianceMappingSource = z.infer<typeof complianceMappingSourceSchema>;
 export type ComplianceMapsFile = z.infer<typeof complianceMapsSchema>;
+/** What a caller may pass to be parsed: defaulted fields such as `catalogControls` may be left out. */
+export type ComplianceMapsFileInput = z.input<typeof complianceMapsSchema>;
 
 /**
  * PARTIAL and UNKNOWN are kept only to read reports written before P1-11 and P0-17; the engine never emits them. The

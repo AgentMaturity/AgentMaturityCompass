@@ -17,6 +17,7 @@ import {
   type ComplianceCategoryStatus,
   type ComplianceMapping,
   type ComplianceMapsFile,
+  type ComplianceMapsFileInput,
   type ComplianceReportJson
 } from "./mappingSchema.js";
 import { coverageScore } from "./coverageScorer.js";
@@ -34,11 +35,11 @@ import { stationsForMapping } from "./stationTags.js";
 import type { Station } from "../domains/stations.js";
 
 /** Retained sync SDK API. Its checked signature is prepared before the first body replacement. */
-export function initComplianceMaps(workspace: string, file?: ComplianceMapsFile): { path: string; sigPath: string } {
+export function initComplianceMaps(workspace: string, file?: ComplianceMapsFileInput): { path: string; sigPath: string } {
   return publishComplianceMaps(workspace, file);
 }
 /** Maintained initialized-workspace path; no provider work occurs under the short publication lock. */
-export function initComplianceMapsAsync(workspace: string, file?: ComplianceMapsFile, options: ComplianceMapsPublicationOptions = {}): Promise<{ path: string; sigPath: string }> {
+export function initComplianceMapsAsync(workspace: string, file?: ComplianceMapsFileInput, options: ComplianceMapsPublicationOptions = {}): Promise<{ path: string; sigPath: string }> {
   return publishComplianceMapsAsync(workspace, file, options);
 }
 

@@ -19,7 +19,7 @@ import type { ControlResult, EvaluatedContract, EvaluationContext, EvidenceItem,
 
 const LEDGER_PRODUCER = "amc.ledger";
 const ASSURANCE_PRODUCER = "amc.assuranceRunner";
-// ponytail: one freshness bound for every mapping-derived contract; per-control freshness comes with P1-53's re-keying.
+// ponytail: one freshness bound for every mapping-derived contract; per-control freshness from catalogControls (P1-53) waits for review.
 const MAPPING_FRESHNESS_DAYS = 30;
 
 const iso = (ms: number): string => {

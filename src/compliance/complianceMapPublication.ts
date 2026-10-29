@@ -6,7 +6,7 @@ import { withControlFileLock } from "../lifecycle/controlFileLock.js";
 import { signDigestWithPolicy } from "../crypto/signing/signer.js";
 import { sha256Hex } from "../utils/hash.js";
 import { prepareFileSignatureWithAuditor } from "../org/orgSigner.js";
-import { complianceMapsSchema, type ComplianceMapsFile } from "./mappingSchema.js";
+import { complianceMapsSchema, type ComplianceMapsFileInput } from "./mappingSchema.js";
 import { defaultComplianceMapsFile } from "./builtInMappings.js";
 
 export const complianceMapsPath = (workspace: string): string => join(workspace, ".amc", "compliance-maps.yaml");
@@ -26,7 +26,7 @@ export class ComplianceMapsPublicationError extends Error {
     super("compliance maps publication is incomplete; inspect the published pair before retrying", { cause }); this.name = "ComplianceMapsPublicationError";
   }
 }
-function prepare(workspace: string, file: ComplianceMapsFile | undefined, options: ComplianceMapsPublicationOptions) {
+function prepare(workspace: string, file: ComplianceMapsFileInput | undefined, options: ComplianceMapsPublicationOptions) {
   const beforePublish = options.beforePublish; beforePublish?.();
   const path = complianceMapsPath(workspace), previous = readComplianceMapsPair(path);
   // Parse/copy and serialize once, before the first await. Preserve existing YAML bytes/defaults.
@@ -47,13 +47,13 @@ function publish(plan: ReturnType<typeof prepare>, signatureBytes: string, asser
   } });
 }
 /** Existing synchronous SDK compatibility; signature refusal occurs before either member is replaced. */
-export function publishComplianceMaps(workspace: string, file?: ComplianceMapsFile): { path: string; sigPath: string } {
+export function publishComplianceMaps(workspace: string, file?: ComplianceMapsFileInput): { path: string; sigPath: string } {
   const plan = prepare(workspace, file, {}), signed = signDigestWithPolicy({ workspace, kind: "COMPLIANCE_MAPS", digestHex: sha256Hex(plan.bytes) });
   const signatureBytes = JSON.stringify({ digestSha256: signed.digestSha256, signature: signed.signature, signedTs: signed.signedTs,
     signer: "auditor", envelope: signed.envelope }, null, 2);
   return publish(plan, signatureBytes, () => {});
 }
-export async function publishComplianceMapsAsync(workspace: string, file?: ComplianceMapsFile, options: ComplianceMapsPublicationOptions = {}): Promise<{ path: string; sigPath: string }> {
+export async function publishComplianceMapsAsync(workspace: string, file?: ComplianceMapsFileInput, options: ComplianceMapsPublicationOptions = {}): Promise<{ path: string; sigPath: string }> {
   const plan = prepare(workspace, file, options);
   const beforeSign = () => {
     plan.beforePublish?.();

@@ -1,7 +1,8 @@
 import type { ComplianceMapping, ComplianceMappingSource, ComplianceMapsFile } from "./mappingSchema.js";
 
-function mapping(params: ComplianceMapping): ComplianceMapping {
-  return params;
+/** `catalogControls` (P1-53) is optional here, as in a signed map, and defaults to []. */
+function mapping(params: Omit<ComplianceMapping, "catalogControls"> & { catalogControls?: string[] }): ComplianceMapping {
+  return { ...params, catalogControls: params.catalogControls ?? [] };
 }
 
 const commonSecurityDenylist = [
@@ -513,6 +514,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
   }),
   mapping({
     id: "iso_access_control",
+    catalogControls: ["L0-IDN-01", "L0-IDN-02"],
     framework: "ISO_27001",
     category: "Access Control",
     description: "Signals for least-privilege access and approval gates.",
@@ -535,6 +537,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
   }),
   mapping({
     id: "iso_logging_monitoring",
+    catalogControls: ["L0-LOG-01"],
     framework: "ISO_27001",
     category: "Logging & Monitoring",
     description: "Signals for traceability and operational telemetry.",
@@ -553,6 +556,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
   }),
   mapping({
     id: "iso_incident_management",
+    catalogControls: ["L0-MON-02"],
     framework: "ISO_27001",
     category: "Incident Management",
     description: "Signals for drift/regression response and controlled recovery.",
@@ -575,6 +579,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
   }),
   mapping({
     id: "iso_supplier_security",
+    catalogControls: ["L0-DAT-03"],
     framework: "ISO_27001",
     category: "Supplier Security",
     description: "Signals for upstream/provider route governance and provenance controls.",
@@ -692,6 +697,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
   }),
   mapping({
     id: "euai_art12_record_keeping",
+    catalogControls: ["L0-LOG-01", "L0-LOG-02"],
     framework: "EU_AI_ACT",
     category: "Art. 12 Record-Keeping",
     description: "Automatic logging of events throughout the AI system lifecycle enabling traceability of system functioning.",
@@ -732,6 +738,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
   }),
   mapping({
     id: "euai_art14_human_oversight",
+    catalogControls: ["L0-OVS-01", "L0-OVS-02"],
     framework: "EU_AI_ACT",
     category: "Art. 14 Human Oversight",
     description: "Human oversight measures built into the AI system design, enabling effective oversight during use including ability to intervene, override, or stop.",
@@ -872,6 +879,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
   }),
   mapping({
     id: "euai_art86_right_to_explanation",
+    catalogControls: ["L0-EXP-01"],
     framework: "EU_AI_ACT",
     category: "Art. 86 Right to Explanation",
     description: "Affected persons can obtain clear, meaningful explanations of AI-assisted decisions with contestability and appeal mechanisms.",
@@ -933,6 +941,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
   }),
   mapping({
     id: "gdpr_art5_data_minimisation",
+    catalogControls: ["L0-DAT-01"],
     framework: "GDPR",
     category: "Art. 5 Data Minimisation",
     description: "Personal data adequate, relevant, and limited to what is necessary for processing purposes.",
@@ -1226,6 +1235,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
   }),
   mapping({
     id: "atlas_prompt_injection",
+    catalogControls: ["L0-ADV-01", "L0-ADV-02"],
     framework: "MITRE_ATLAS",
     category: "Initial Access",
     description: "Adversary injects malicious prompts to manipulate LLM behavior and bypass safety controls (AML.T0051).",
@@ -1274,6 +1284,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
   }),
   mapping({
     id: "atlas_llm_jailbreak",
+    catalogControls: ["L0-ADV-01"],
     framework: "MITRE_ATLAS",
     category: "Evasion",
     description: "Adversary bypasses LLM safety guardrails through crafted multi-turn or encoded prompts (AML.T0054).",
@@ -1326,6 +1337,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
   }),
   mapping({
     id: "atlas_cost_harvesting",
+    catalogControls: ["L0-TOOL-02"],
     framework: "MITRE_ATLAS",
     category: "Impact",
     description: "Adversary exploits ML APIs to consume compute resources and inflate costs (AML.T0034).",
@@ -1792,6 +1804,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
   }),
   mapping({
     id: "sox_itgc_change_management",
+    catalogControls: ["L0-CHG-01"],
     framework: "SOX",
     category: "ITGC Change Management",
     description: "Change control for AI models, prompts, guardrails, and configurations in financial reporting scope.",
@@ -1822,6 +1835,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
   }),
   mapping({
     id: "sox_segregation_of_duties",
+    catalogControls: ["L0-OVS-03"],
     framework: "SOX",
     category: "Segregation of Duties",
     description: "Separation of AI agent capabilities to prevent single-agent control over conflicting financial functions.",
@@ -1837,6 +1851,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
   }),
   mapping({
     id: "sox_audit_trail",
+    catalogControls: ["L0-LOG-01", "L0-LOG-02"],
     framework: "SOX",
     category: "Audit Trail and Evidence Retention",
     description: "Signals from control-bound audit events and the listed governance/authorization audit-absence checks. They do not verify a seven-year or longer retention period, storage/expiry policy or long-term reconstructability.",
@@ -1899,6 +1914,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
   }),
   mapping({
     id: "fedramp_audit_accountability",
+    catalogControls: ["L0-LOG-01", "L0-LOG-02"],
     framework: "FEDRAMP",
     category: "AU Audit and Accountability",
     description: "Audit event generation, content, storage, review, and protection for AI agent actions in federal information systems.",
@@ -1929,6 +1945,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
   }),
   mapping({
     id: "fedramp_config_management",
+    catalogControls: ["L0-CHG-01"],
     framework: "FEDRAMP",
     category: "CM Configuration Management",
     description: "Baseline configuration, change control, least functionality, and software usage restrictions for AI model and infrastructure.",
@@ -1959,6 +1976,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
   }),
   mapping({
     id: "fedramp_identification_authentication",
+    catalogControls: ["L0-IDN-01"],
     framework: "FEDRAMP",
     category: "IA Identification and Authentication",
     description: "User, device, and service identification and authentication for AI agent endpoints and API consumers.",
@@ -1974,6 +1992,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
   }),
   mapping({
     id: "fedramp_incident_response",
+    catalogControls: ["L0-MON-02"],
     framework: "FEDRAMP",
     category: "IR Incident Response",
     description: "Incident handling, monitoring, reporting, and assistance for AI-related security incidents in federal systems.",
@@ -2109,6 +2128,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
   }),
   mapping({
     id: "dora_art8_identification",
+    catalogControls: ["L0-INV-01", "L0-INV-02"],
     framework: "DORA",
     category: "Art. 8 Identification",
     description: "Signals that the agent's tools, models and data dependencies are identified and documented (Art. 8(1) asks for ICT assets and their dependencies to be classified and reviewed at least yearly).",
@@ -2147,6 +2167,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
   }),
   mapping({
     id: "dora_art11_response_recovery",
+    catalogControls: ["L0-MON-04"],
     framework: "DORA",
     category: "Art. 11 Response and recovery",
     description: "Signals that the agent degrades safely and recovers (circuit breakers, model fallback) in support of an ICT business continuity policy (Art. 11(1)-(2)). Does not evidence the policy itself.",
@@ -2195,6 +2216,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
   }),
   mapping({
     id: "dora_art28_third_party_risk",
+    catalogControls: ["L0-DAT-03", "L0-MON-05"],
     framework: "DORA",
     category: "Art. 28 ICT third-party risk management",
     description: "Signals that third-party models, tools and MCP servers used by the agent are governed as ICT third-party risk (Art. 28(1)). Contract terms (Art. 30) and the register of information are not evidenced.",
@@ -2258,6 +2280,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
   }),
   mapping({
     id: "nis2_art21_2d_supply_chain",
+    catalogControls: ["L0-INV-02"],
     framework: "NIS2",
     category: "Art. 21(2)(d) Supply chain security",
     description: "Signals that the agent's direct suppliers (models, tools, MCP servers) are inventoried and resist supply-chain attack (Art. 21(2)(d), 21(3)).",
@@ -2307,6 +2330,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
   }),
   mapping({
     id: "nis2_art23_reporting",
+    catalogControls: ["L0-MON-02"],
     framework: "NIS2",
     category: "Art. 23 Reporting obligations",
     description: "Signals that timestamped incident records exist to support the 24-hour early warning, 72-hour notification and one-month final report (Art. 23(4)). AMC does not notify the CSIRT or competent authority.",
@@ -2421,6 +2445,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
   }),
   mapping({
     id: "nist600_information_integrity",
+    catalogControls: ["L0-TRN-03"],
     framework: "NIST_AI_600_1",
     category: "2.8 Information Integrity",
     description: "Signals that the origin and modification of generated content can be traced (MS-1.1-001) and that generated content is labelled.",
@@ -2499,6 +2524,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
   }),
   mapping({
     id: "co_admt_human_review",
+    catalogControls: ["L0-EXP-03"],
     framework: "CO_AI_ACT",
     category: "§6-1-1705 Correction, human review and reconsideration",
     description: "Signals that a human can review and overturn the agent's output, supporting the meaningful human review and reconsideration of §6-1-1705(1)(a)(II). The consumer request process is not evidenced.",
@@ -2514,6 +2540,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
   // Enforced only by the attorney general (§552.101). The prohibitions turn on intent, which agent evidence cannot prove.
   mapping({
     id: "tx_traiga_consumer_disclosure",
+    catalogControls: ["L0-TRN-01"],
     framework: "TX_TRAIGA",
     category: "§552.051 Disclosure to consumers",
     description: "Signals that the agent identifies itself as AI in its responses, supporting the clear, plain-language disclosure a governmental agency or health care provider must give (§552.051). Whether the disclosure reached each consumer in time is not evidenced.",
@@ -2538,6 +2565,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
   }),
   mapping({
     id: "tx_traiga_unlawful_discrimination",
+    catalogControls: ["L0-FAI-01", "L0-FAI-02"],
     framework: "TX_TRAIGA",
     category: "§552.056 Unlawful discrimination",
     description: "Signals that outcomes are tested for demographic parity, counterfactual fairness and disparate impact. §552.056 prohibits intent to discriminate against a protected class; these metrics do not establish intent either way.",
@@ -2621,6 +2649,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
   }),
   mapping({
     id: "ca_ccpa_admt_human_appeal",
+    catalogControls: ["L0-EXP-03"],
     framework: "CA_AI_LAWS",
     category: "11 CCR §7221 ADMT opt-out and human appeal",
     description: "Signals that a human reviewer with authority to overturn the decision reviews the ADMT output, as the §7221(b)(1) human-appeal exception to opt-out requires. The consumer opt-out channel is not evidenced.",
@@ -2648,6 +2677,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
   // Article text read from the KLRI English reference translation; the Korean text governs.
   mapping({
     id: "kr_ai_act_art31_transparency",
+    catalogControls: ["L0-TRN-03"],
     framework: "KR_AI_BASIC_ACT",
     category: "Art. 31 Transparency",
     description: "Signals that generative outputs are labelled as AI-generated (Art. 31(2)-(3)). Advance notice to users (Art. 31(1)) is not evidenced.",

@@ -12,10 +12,11 @@ import type { CrossStationProfile } from "../domains/stations.js";
 import { sha256Hex } from "../utils/hash.js";
 import { jurisdictionProfilesSchema, registerFileSchema, type JurisdictionProfile, type RegisterFile } from "./register.js";
 import {
-  catalogManifestSchema, controlRecordSchema, crossStationProfilesSchema, fixtureEnvelopeSchema, packManifestSchema, producersFileSchema,
-  publisherHostsSchema, vocabularySchema, zodToCatalogIssues, type CatalogIssue, type CatalogManifest, type Vocabulary
+  catalogManifestSchema, controlRecordSchema, crossStationProfilesSchema, fixtureEnvelopeSchema, packManifestSchema, policyPackBindingMapSchema,
+  producersFileSchema, publisherHostsSchema, questionnaireSchema, vocabularySchema, zodToCatalogIssues, type CatalogIssue, type CatalogManifest,
+  type Vocabulary
 } from "./schema.js";
-import type { ControlRecord, FixtureEnvelope, PackManifest, ProducerRecord } from "./types.js";
+import type { ControlRecord, FixtureEnvelope, PackManifest, PolicyPackBindingMap, ProducerRecord, Questionnaire } from "./types.js";
 
 export interface LoadedFixture {
   /** Catalog-relative path, `fixtures/<controlId>/<polarity>/<name>.json`. */
@@ -46,6 +47,13 @@ export interface LoadedCatalog {
   registers?: Map<string, RegisterFile>;
   /** Jurisdiction profiles keyed by folder (`jurisdictions/<folder>/profiles.json`, P1-18). */
   jurisdictionProfiles?: Map<string, JurisdictionProfile[]>;
+  /**
+   * Self-reported questionnaires keyed by id (`questionnaires/<id>.yaml`, P1-53). Like the policy-pack binding map below,
+   * they are outside every digest: no compiled plan reads them, so they never change the catalog a plan pins.
+   */
+  questionnaires?: Map<string, Questionnaire>;
+  /** Built-in policy-pack settings to catalog binding parameters (`bindings/policy-packs.yaml`, P1-53). */
+  policyPackBindings?: PolicyPackBindingMap;
 }
 
 const TOP_FILES = new Set(["README.md", "LICENSE.md", "CHANGELOG.md", "catalog.yaml", "vocabulary.yaml", "producers.yaml", "publisher-hosts.yaml"]);
@@ -190,6 +198,12 @@ export function loadCatalog(opts: { root?: string } = {}): LoadedCatalog {
     } else if (parts.length === 3 && parts[0] === "jurisdictions" && parts[2] === "profiles.json") {
       const profiles = readJson(root, rel, jurisdictionProfilesSchema, issues);
       if (profiles) (cat.jurisdictionProfiles ??= new Map()).set(parts[1] as string, profiles);
+    } else if (parts.length === 2 && parts[0] === "questionnaires" && rel.endsWith(".yaml")) {
+      const questionnaire = parseWith(questionnaireSchema, read(rel), rel, issues);
+      if (questionnaire && parts[1] !== `${questionnaire.id}.yaml`) issues.push(issue("CAT_SCHEMA", rel, `file name must be ${questionnaire.id}.yaml`, "id"));
+      else if (questionnaire) (cat.questionnaires ??= new Map()).set(questionnaire.id, questionnaire);
+    } else if (rel === "bindings/policy-packs.yaml") {
+      cat.policyPackBindings = parseWith(policyPackBindingMapSchema, read(rel), rel, issues) ?? undefined;
     } else if (parts.length === 3 && parts[0] === "layers" && parts[2] === "pack.yaml") {
       const manifest = parseWith(packManifestSchema, read(rel), rel, issues);
       if (!manifest) continue;

@@ -12,16 +12,21 @@ describe("PBSAI governance mapping", () => {
     expect(pbsai?.description).toContain("twelve-domain");
   });
 
-  test("generates PBSAI report with context-envelope artifacts", () => {
+  // P1-53: this test asserted that passed questions and active modules cover PBSAI domains, which encoded the wrong
+  // behaviour. The domains stay listed, each not_evaluated, and nothing is covered.
+  test("generates PBSAI report with context-envelope artifacts and no coverage", () => {
     const report = generateFrameworkReport("PBSAI", {
       passedQIDs: ["AMC-3.6.1", "AMC-2.7", "AMC-2.5"],
       activeModules: ["outputAttestation", "watch", "supplyChain"],
     });
 
     expect(report.framework).toBe("PBSAI");
-    expect(report.coveredControls).toContain("PBSAI-ARCHITECTURE");
-    expect(report.coveredControls).toContain("PBSAI-INCIDENT-RESPONSE");
-    expect(report.coveredControls).toContain("PBSAI-SUPPLY-CHAIN");
+    expect(report.coveredControls).toEqual([]);
+    expect(report.coveragePercent).toBe(0);
+    expect(report.controls.map((c) => c.id)).toEqual(
+      expect.arrayContaining(["PBSAI-ARCHITECTURE", "PBSAI-INCIDENT-RESPONSE", "PBSAI-SUPPLY-CHAIN"])
+    );
+    expect(report.controls.every((c) => c.status === "not_evaluated")).toBe(true);
     expect(report.auditArtifacts).toEqual(
       expect.arrayContaining(["PBSAI_Context_Envelope.json", "PBSAI_Output_Contracts.json"])
     );

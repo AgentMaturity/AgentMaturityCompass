@@ -30,10 +30,14 @@ catalog/
   governance/                    f5-confirmations.yaml, reverify-before-publishing.yaml, standards-licences.md (P1-34)
   reviews/<subject>/<version>/<record>.json   review records (P1-34)
   admission/<pack-id>-<version>.json         pack admission reports (P1-33, ADMISSION.md)
+  questionnaires/<id>.yaml       self-reported questionnaire items, capped at L1 (P1-53, CONSOLIDATION.md)
+  bindings/policy-packs.yaml     built-in policy-pack settings to binding parameters (P1-53, CONSOLIDATION.md)
 ```
 
 The P1-34 governance files are read by `src/catalog/governance/`, never as catalog content, so they change no digest.
 Admission reports are checker output, outside every digest; only the admission gate below and `amc catalog check` read them.
+Questionnaires and the policy-pack binding map are loaded and validated but stay outside every digest, because no
+compiled plan reads them (CONSOLIDATION.md).
 
 `package.json` ships `catalog/**`, and `loadCatalog()` finds it from `src/catalog/` and `dist/catalog/` alike
 (`new URL("../../catalog/", import.meta.url)`). `npm run check:packed-install` loads and validates the installed copy.
@@ -208,7 +212,8 @@ Compliance mappings (`.amc/compliance-maps.yaml`) run through the same evaluator
 `amc.ledger` bound to the control and the agent (or the workspace); `requires_no_audit` admits any record of the
 subject as coverage, so an empty window is incomplete, and treats a denied audit type as a violation;
 `requires_assurance_pack` admits sealed reports from `amc.assuranceRunner`. Mapping contracts use a 30-day freshness
-bound and no invalidation triggers until P1-53 re-keys them to catalog controls.
+bound and no invalidation triggers. P1-53 links mappings to catalog controls through `catalogControls`, but those
+pairings are AI-proposed and change no result until a reviewer confirms them (CONSOLIDATION.md).
 
 ## Digests
 

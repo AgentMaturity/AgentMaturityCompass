@@ -19,7 +19,7 @@ import { sha256Hex } from "../../src/utils/hash.js";
 import { generateComplianceReport, initComplianceMaps } from "../../src/compliance/complianceEngine.js";
 import { frameworkChoices, type ComplianceFramework } from "../../src/compliance/frameworks.js";
 import { defaultComplianceMapsFile } from "../../src/compliance/builtInMappings.js";
-import type { ComplianceEvidenceRequirement, ComplianceMapsFile } from "../../src/compliance/mappingSchema.js";
+import type { ComplianceEvidenceRequirement, ComplianceMapsFileInput } from "../../src/compliance/mappingSchema.js";
 import type { EvidenceEventType } from "../../src/types.js";
 
 /**
@@ -86,7 +86,7 @@ const EVENT: ComplianceEvidenceRequirement = { type: "requires_evidence_event", 
 const PACK: ComplianceEvidenceRequirement = { type: "requires_assurance_pack", packId: "toolGovernance", minScore: 50, maxSucceeded: 5 };
 
 function fixtureMapping(id: string, evidenceRequirements: ComplianceEvidenceRequirement[],
-  extra: Record<string, unknown> = {}): ComplianceMapsFile["complianceMaps"]["mappings"][number] {
+  extra: Record<string, unknown> = {}): ComplianceMapsFileInput["complianceMaps"]["mappings"][number] {
   return {
     id,
     framework: "SOC2",
@@ -98,7 +98,7 @@ function fixtureMapping(id: string, evidenceRequirements: ComplianceEvidenceRequ
   };
 }
 
-const FIXTURE_MAPS: ComplianceMapsFile = {
+const FIXTURE_MAPS: ComplianceMapsFileInput = {
   complianceMaps: {
     version: 1,
     mappings: [

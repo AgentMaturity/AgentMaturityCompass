@@ -149,13 +149,22 @@ function checkPacksAndFixtures(cat: LoadedCatalog): CatalogIssue[] {
   return out;
 }
 
+/** A questionnaire item maps only to controls that exist (P1-53); the mapping never makes an answer evidence of more than L1. */
+function checkQuestionnaires(cat: LoadedCatalog): CatalogIssue[] {
+  return [...(cat.questionnaires?.values() ?? [])].flatMap((q) => q.items.flatMap((item, i) => item.mapsTo
+    .filter((id) => !cat.controls.has(id))
+    .map((id): CatalogIssue => ({ code: "CAT_QUESTIONNAIRE_MAPPING", severity: "error", file: `questionnaires/${q.id}.yaml`, controlId: null,
+      path: `items.${i}.mapsTo`, message: `${item.id} maps to ${id}, which is not a catalog control` }))));
+}
+
 export function validateCatalog(cat: LoadedCatalog, opts: { asOf?: Date } = {}): CatalogValidation {
   const asOf = (opts.asOf ?? new Date()).toISOString().slice(0, 10);
   const all = [
     ...cat.issues,
     ...[...cat.controls.values()].flatMap((r) => checkControl(cat, r, asOf)),
     ...checkPacksAndFixtures(cat),
-    ...checkRegisters(cat, asOf)
+    ...checkRegisters(cat, asOf),
+    ...checkQuestionnaires(cat)
   ];
   const errors = all.filter((i) => i.severity === "error");
   return { ok: errors.length === 0, errors, warnings: all.filter((i) => i.severity === "warning") };

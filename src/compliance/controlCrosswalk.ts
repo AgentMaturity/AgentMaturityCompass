@@ -1,5 +1,8 @@
+import { catalogCrosswalkEntries } from "../catalog/crosswalks.js";
+import type { LoadedCatalog } from "../catalog/loader.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
+import { builtInComplianceMappings } from "./builtInMappings.js";
 import type { ComplianceMapping } from "./mappingSchema.js";
 
 export type ControlCrosswalkExceptionState = "none" | "pending" | "approved" | "rejected" | "expired";
@@ -100,6 +103,32 @@ function hashRow(row: Omit<ControlCrosswalkRow, "rowHash">): string {
 
 function receiptHash(receipt: Omit<ControlCrosswalkReceipt, "receiptHash">): string {
   return sha256Hex(canonicalize(receipt));
+}
+
+/**
+ * Receipt rows from the catalog's crosswalks (P1-53), so buildControlCrosswalkReceipt reads the catalog rather than a
+ * separate table. One row per crosswalk entry naming `framework` (a catalog vocabulary term). A row borrows evidence
+ * requirements and AMC question ids only from compliance mappings whose `catalogControls` name its control; a row with
+ * none keeps them empty, so the receipt fails closed for it instead of inventing coverage.
+ */
+export function crosswalkRowsFromCatalog(catalog: LoadedCatalog, framework: string,
+  mappings: readonly ComplianceMapping[] = builtInComplianceMappings): ComplianceMapping[] {
+  return catalogCrosswalkEntries(catalog, framework).map(({ control, clause, relation, rationale }) => {
+    const linked = mappings.filter((m) => m.catalogControls.includes(control.id));
+    return {
+      id: `${control.id}:${framework}:${clause}`,
+      framework,
+      category: clause,
+      description: `${control.id} ${control.title} (${relation}): ${rationale}`,
+      evidenceRequirements: linked.flatMap((m) => m.evidenceRequirements),
+      related: {
+        questions: [...new Set(linked.flatMap((m) => m.related.questions))],
+        packs: [...new Set(linked.flatMap((m) => m.related.packs))],
+        configs: [...new Set(linked.flatMap((m) => m.related.configs))]
+      },
+      catalogControls: [control.id]
+    };
+  });
 }
 
 export function buildControlCrosswalkReceipt(input: {

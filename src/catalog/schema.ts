@@ -8,8 +8,8 @@ import { z } from "zod";
 import { CITATION_STATUS_TYPES } from "../compliance/citations/citationRecord.js";
 import { validateStationScope } from "../domains/stations.js";
 import type {
-  Binding, Citation, ControlRecord, ControlTest, EvidenceContract, FactName, FixtureEnvelope, PackManifest, Predicate,
-  ProducerRecord, Station
+  Binding, Citation, ControlRecord, ControlTest, EvidenceContract, FactName, FixtureEnvelope, PackManifest, PolicyPackBindingMap,
+  Predicate, ProducerRecord, Questionnaire, QuestionnaireItem, Station
 } from "./types.js";
 
 export interface CatalogIssue {
@@ -328,6 +328,41 @@ export const fixtureEnvelopeSchema = z.strictObject({
   expected: z.strictObject({ result: z.enum(["allow", "deny", "pass", "fail", "not_evaluated"]), reasonCode: text.nullable() })
 });
 
+/** A self-reported questionnaire item (P1-53): capped at L1, mapped to controls only by a reviewer. */
+const questionnaireItemSchema = z.strictObject({
+  id: z.string().regex(/^[A-Za-z][A-Za-z0-9-]*$/, "must be a question id"),
+  station,
+  source: z.enum(["domain_rubric", "deep_template", "deep_handwritten"]),
+  dimension: text,
+  text,
+  legacyRef: z.strictObject({ text, verified: z.literal(false) }),
+  evidenceRequired: text,
+  levelDescriptors: z.strictObject({ l1: text, l3: text, l5: text }),
+  weight: int.min(1),
+  mapsTo: z.array(z.string().regex(CONTROL_ID, "must be a control id")),
+  claimKind: z.literal("self_reported")
+}).superRefine((q, ctx) => unique(ctx, q.mapsTo, ["mapsTo"], "control"));
+
+export const questionnaireSchema = z.strictObject({
+  id: term,
+  title: text,
+  items: z.array(questionnaireItemSchema).min(1)
+}).superRefine((q, ctx) => unique(ctx, q.items.map((i) => i.id), ["items"], "item id", "CAT_DUPLICATE_ID"));
+
+/** Policy-pack settings to catalog binding parameters (P1-53); cross-checked against the packs by validatePolicyPackBindings. */
+export const policyPackBindingMapSchema = z.strictObject({
+  id: z.literal("policy-packs"),
+  packs: z.array(term).min(1),
+  settings: z.array(z.strictObject({
+    setting: z.string().regex(/^[A-Za-z][A-Za-z0-9]*(\.([A-Za-z][A-Za-z0-9]*|\{actionClass\})|\[\*\])*$/, "must be a dotted setting path"),
+    parameter: z.string().regex(/^[A-Za-z][A-Za-z0-9]*(\.([A-Za-z][A-Za-z0-9]*|\{actionClass\}))*$/, "must be a dotted parameter name").nullable(),
+    reason: text
+  })).min(1)
+}).superRefine((m, ctx) => {
+  unique(ctx, m.packs, ["packs"], "pack id");
+  unique(ctx, m.settings.map((s) => s.setting), ["settings"], "setting");
+});
+
 /** Maps zod issues to catalog issues; a refinement keeps its own code, everything else is CAT_SCHEMA. */
 export function zodToCatalogIssues(error: z.ZodError, file: string, controlId: string | null): CatalogIssue[] {
   return error.issues.map((issue) => {
@@ -355,5 +390,8 @@ export type SchemaInfersExportedTypes = [
   Assert<Same<z.infer<typeof packManifestSchema>, PackManifest>>,
   Assert<Same<z.infer<typeof producerRecordSchema>, ProducerRecord>>,
   Assert<Same<z.infer<typeof fixtureEnvelopeSchema>, FixtureEnvelope>>,
+  Assert<Same<z.infer<typeof questionnaireItemSchema>, QuestionnaireItem>>,
+  Assert<Same<z.infer<typeof questionnaireSchema>, Questionnaire>>,
+  Assert<Same<z.infer<typeof policyPackBindingMapSchema>, PolicyPackBindingMap>>,
   Assert<Same<(typeof STATIONS)[number], Station>>
 ];

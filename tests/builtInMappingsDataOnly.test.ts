@@ -64,8 +64,9 @@ describe("builtInMappings.ts stays a data registry", () => {
   test("logic hidden in data fails too: an arrow function, a loop, or a grown helper", () => {
     expect(violations(`${text}\nconst pick = (rows: string[]) => rows[0];\n`)).toContain("function <ArrowFunction>");
     expect(violations(`${text}\nfor (const row of []) console.log(row);\n`)).toContain("top-level ForOfStatement");
-    const grown = text.replace("function mapping(params: ComplianceMapping): ComplianceMapping {\n  return params;",
-      "function mapping(params: ComplianceMapping): ComplianceMapping {\n  if (!params.id) throw new Error(\"id\");\n  params.id.trim();\n  return params;");
+    // P1-53 gave mapping() a defaulted catalogControls; the grown helper keeps that one return and adds two statements.
+    const helper = "function mapping(params: Omit<ComplianceMapping, \"catalogControls\"> & { catalogControls?: string[] }): ComplianceMapping {\n";
+    const grown = text.replace(helper, `${helper}  if (!params.id) throw new Error("id");\n  params.id.trim();\n`);
     expect(grown).not.toBe(text);
     expect(violations(grown)).toContain("function mapping has 3 statements");
   });

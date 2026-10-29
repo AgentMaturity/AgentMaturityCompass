@@ -1,9 +1,13 @@
 /**
- * Cross-Framework Automated Mapping
+ * Cross-Framework Mapping (deprecated by P1-53)
  *
- * Whitepaper Section 9.4: "Generating NIST AI RMF, ISO 42001, and EU AI Act
- * compliance artifacts automatically from AMC assessment results."
+ * A legacy table of 108 framework controls with the AMC questions and modules once thought to cover them. Coverage is no
+ * longer computed: a passed question or an active module is not evidence that a control is met, and the table's labels
+ * are known to be wrong (gap G9). Regulated status comes only from catalog controls; listFrameworkCrosswalks lists the
+ * catalog's crosswalks as information. Removal is P2-29's.
  */
+import { catalogCrosswalkEntries } from "../catalog/crosswalks.js";
+import { loadCatalog } from "../catalog/loader.js";
 
 export type ComplianceFramework = 'NIST_AI_RMF' | 'ISO_42001' | 'EU_AI_ACT' | 'SOC2_TYPE2' | 'GDPR' | 'FORESIGHT_SAFETY' | 'AGENTIC_4C' | 'MITRE_ATLAS' | 'OWASP_API_TOP10' | 'PBSAI';
 
@@ -18,15 +22,37 @@ export interface FrameworkControl {
 
 export interface FrameworkComplianceReport {
   framework: ComplianceFramework;
+  /** Always 0 since P1-53: nothing here is evaluated. */
   coveragePercent: number;
+  /** Always empty since P1-53. */
   coveredControls: string[];
+  /** Every control as "<id> (<name>)": listed for reference, none evaluated. */
   gapControls: string[];
+  /** Always empty since P1-53. */
   automatedControls: string[];
+  /** Always empty since P1-53. */
   manualControls: string[];
   auditArtifacts: string[];  // file types AMC can generate
-  /** Self-reported coverage target (80% covered, at most two gaps). Meeting it certifies nothing. */
+  /** Always false since P1-53. Meeting a coverage target never certified anything. */
   targetMet: boolean;
+  /** Every legacy control, each not_evaluated. */
+  controls: Array<{ id: string; name: string; status: "not_evaluated" }>;
+  deprecation: { replacement: string; removalOwner: "P2-29" };
 }
+
+/** A catalog crosswalk entry, as information only: it never passes, covers or certifies anything. */
+export interface FrameworkCrosswalk {
+  controlId: string;
+  controlVersion: string;
+  title: string;
+  clause: string;
+  relation: "equivalent" | "partial" | "conflicting";
+  rationale: string;
+  status: "not_evaluated";
+}
+
+const FRAMEWORK_REPORT_REPLACEMENT =
+  "catalog controls evaluated by the compliance engine (amc compliance report); listFrameworkCrosswalks lists catalog crosswalks as information";
 
 // NIST AI RMF control mapping
 const NIST_AI_RMF_CONTROLS: FrameworkControl[] = [
@@ -202,42 +228,41 @@ const FRAMEWORK_ARTIFACTS: Record<ComplianceFramework, string[]> = {
   PBSAI: ['*.amcaudit (PBSAI twelve-domain mapping)', 'PBSAI_Context_Envelope.json', 'PBSAI_Output_Contracts.json', 'PBSAI_Evidence_Graph.pdf'],
 };
 
+/**
+ * @deprecated Reports no coverage since P1-53: every control is not_evaluated, coveragePercent is 0 and targetMet is
+ * false, whatever questions passed or modules are active. Use catalog controls evaluated by the compliance engine, and
+ * listFrameworkCrosswalks for crosswalk information. Removal is P2-29's.
+ */
 export function generateFrameworkReport(
   framework: ComplianceFramework,
-  amcScoreData: { passedQIDs: string[]; activeModules: string[] },
+  // Kept for signature compatibility; never read, because a passed question or active module covers nothing.
+  _amcScoreData: { passedQIDs: string[]; activeModules: string[] },
 ): FrameworkComplianceReport {
   const controls = FRAMEWORK_CONTROLS[framework];
-
-  const covered: string[] = [];
-  const gaps: string[] = [];
-  const automated: string[] = [];
-  const manual: string[] = [];
-
-  for (const ctrl of controls) {
-    const hasQID = ctrl.amcQIDs.some(q => amcScoreData.passedQIDs.includes(q));
-    const hasModule = ctrl.amcModules.some(m => amcScoreData.activeModules.includes(m));
-
-    if (hasQID || hasModule) {
-      covered.push(ctrl.id);
-      if (ctrl.automatable) automated.push(ctrl.id);
-      else manual.push(ctrl.id);
-    } else {
-      gaps.push(`${ctrl.id} (${ctrl.name})`);
-    }
-  }
-
-  const coveragePercent = controls.length > 0 ? Math.round((covered.length / controls.length) * 100) : 0;
-
   return {
     framework,
-    coveragePercent,
-    coveredControls: covered,
-    gapControls: gaps,
-    automatedControls: automated,
-    manualControls: manual,
+    coveragePercent: 0,
+    coveredControls: [],
+    gapControls: controls.map((ctrl) => `${ctrl.id} (${ctrl.name})`),
+    automatedControls: [],
+    manualControls: [],
     auditArtifacts: FRAMEWORK_ARTIFACTS[framework],
-    targetMet: coveragePercent >= 80 && gaps.length <= 2,
+    targetMet: false,
+    controls: controls.map((ctrl) => ({ id: ctrl.id, name: ctrl.name, status: "not_evaluated" as const })),
+    deprecation: { replacement: FRAMEWORK_REPORT_REPLACEMENT, removalOwner: "P2-29" },
   };
+}
+
+/**
+ * Catalog controls whose crosswalk names `framework` (a catalog vocabulary term such as "atlas", "owasp-asi-2026" or
+ * "amc-audit-map-v1"). Information only: every entry is not_evaluated, and passing one framework's control never passes
+ * its crosswalk targets.
+ */
+export function listFrameworkCrosswalks(framework: string, opts: { catalogRoot?: string } = {}): FrameworkCrosswalk[] {
+  return catalogCrosswalkEntries(loadCatalog({ root: opts.catalogRoot }), framework).map((e) => ({
+    controlId: e.control.id, controlVersion: e.control.version, title: e.control.title,
+    clause: e.clause, relation: e.relation, rationale: e.rationale, status: "not_evaluated" as const,
+  }));
 }
 
 export function listSupportedFrameworks(): { framework: ComplianceFramework; controlCount: number; description: string }[] {
