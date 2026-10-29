@@ -6,6 +6,7 @@
 import Database from "better-sqlite3";
 import { getSigningKey, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
 import { highWaterKey, readHighWater, recordHighWater, workspaceScope } from "../keys/highWater.js";
+import { getPurposeKeyHistory } from "../keys/signingKeys.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import type { CorrectionLesson, LessonStatus } from "./correctionMemory.js";
@@ -21,9 +22,32 @@ function lessonStatusAnchorKey(workspace: string, agentId: string): string {
   return highWaterKey("lesson-status", `${agentId}@${workspaceScope(workspace)}`);
 }
 
-/** Append a signed status entry for `lesson` and raise the agent's anchored log head. Callers run it in their transaction. */
+/**
+ * Whether a new entry may extend the agent's log without re-anchoring: the anchor exists and the log verifies and ends
+ * exactly at it, or this is a true genesis (no anchor, no entries, and no lesson of the agent other than `lessonId`).
+ */
+export function lessonStatusLogExtendable(db: Database.Database, agentId: string, workspace: string, lessonId: string): boolean {
+  let keys: string[] = [];
+  try { keys = getPurposeKeyHistory(workspace, "ledger-row"); } catch { keys = []; }
+  if (verifiedLessonStatuses(db, agentId, workspace, keys).trusted) return true;
+  let anchor: unknown;
+  try { anchor = readHighWater(lessonStatusAnchorKey(workspace, agentId)); } catch { return false; }
+  const entries = db.prepare("SELECT COUNT(*) AS n FROM correction_lesson_status_log WHERE agent_id = ?").get(agentId) as { n: number };
+  const others = db.prepare("SELECT COUNT(*) AS n FROM correction_lessons WHERE agent_id = ? AND lesson_id <> ?").get(agentId, lessonId) as { n: number };
+  return anchor === null && entries.n === 0 && others.n === 0;
+}
+
+/**
+ * Append a signed status entry for `lesson` and raise the agent's anchored log head; callers run it in their
+ * transaction. It refuses unless the log is extendable, so a rolled-back log is never blessed; `reanchor` is the
+ * owner's explicit recovery after review and starts the anchor from the log as it now stands. The high-water file
+ * still refuses an anchor lower than, or forked from, one this machine recorded.
+ */
 export function appendLessonStatus(db: Database.Database, lesson: Pick<CorrectionLesson, "lessonId" | "agentId" | "lesson_hash">,
-  status: LessonStatus, workspace: string): void {
+  status: LessonStatus, workspace: string, reanchor = false): void {
+  if (!reanchor && !lessonStatusLogExtendable(db, lesson.agentId, workspace, lesson.lessonId)) {
+    throw new Error(`the lesson status log for agent ${lesson.agentId} does not end at its anchored head; review it and re-sign with reanchor`);
+  }
   const head = db
     .prepare("SELECT entry_hash, (SELECT COUNT(*) FROM correction_lesson_status_log WHERE agent_id = ?) AS count FROM correction_lesson_status_log WHERE agent_id = ? ORDER BY seq DESC LIMIT 1")
     .get(lesson.agentId, lesson.agentId) as { entry_hash: string; count: number } | undefined;

@@ -21,7 +21,7 @@ import { canonicalize } from "../utils/json.js";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
 import { signHexDigest, getSigningKey, verifyHexDigestAny } from "../crypto/keys.js";
 import { getPurposeKeyHistory } from "../keys/signingKeys.js";
-import { appendLessonStatus, verifiedLessonStatuses } from "./lessonStatusLog.js";
+import { appendLessonStatus, lessonStatusLogExtendable, verifiedLessonStatuses } from "./lessonStatusLog.js";
 import type { DiagnosticReport } from "../types.js";
 import type { CorrectionEvent, CorrectionEffectivenessReport } from "../corrections/correctionTypes.js";
 import {
@@ -323,20 +323,22 @@ export function getLastLessonHash(db: Database.Database, agentId: string): strin
  * This is also the owner's re-anchor path. A lesson is injectable only once its current status is signed into the
  * log, so a lesson created before the status log existed, or every lesson of an agent whose anchor was lost (a new
  * machine, or a removed AMC home), stays out of injection until the owner re-signs its current status here. Re-signing
- * appends to the log and moves the anchor to the new head, so the owner should first review the lessons' statuses.
+ * appends to the log; when the log does not end at a valid anchor it is refused unless the owner, after reviewing the
+ * lessons' statuses, passes `{ reanchor: true }`, which anchors the log as it now stands.
  */
 export function updateLessonStatus(
   db: Database.Database,
   lessonId: string,
   status: LessonStatus,
   workspace: string,
+  options: { reanchor?: boolean } = {},
 ): void {
   if (!workspace) throw new Error("updateLessonStatus requires the workspace to sign the status transition");
   db.transaction(() => {
     const lesson = getLessonById(db, lessonId);
     if (!lesson) return;
     db.prepare("UPDATE correction_lessons SET status = ? WHERE lesson_id = ?").run(status, lessonId);
-    appendLessonStatus(db, lesson, status, workspace);
+    appendLessonStatus(db, lesson, status, workspace, options.reanchor === true);
   })();
 }
 
@@ -493,7 +495,9 @@ export function extractLessonsFromCorrections(
     // lesson gets no entry: it is never injectable, so there is no status to protect.
     db.transaction(() => {
       insertLesson(db, lesson);
-      if (signature !== "unsigned") appendLessonStatus(db, lesson, "ACTIVE", workspace);
+      // Extraction never re-anchors: when the log does not end at its anchor, the lesson is stored without a status
+      // entry (non-injectable) and only the owner's updateLessonStatus(..., { reanchor: true }) can admit it.
+      if (signature !== "unsigned" && lessonStatusLogExtendable(db, agentId, workspace, lessonId)) appendLessonStatus(db, lesson, "ACTIVE", workspace);
     })();
     created.push(lesson);
   }

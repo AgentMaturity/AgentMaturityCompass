@@ -1,4 +1,4 @@
-import { mkdtempSync, rmSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import Database from "better-sqlite3";
@@ -689,7 +689,8 @@ describe("buildLessonAdvisories", () => {
     makeSignedLesson(db, { lessonId: "lsn_anchored" });
     rmSync(join(process.env.AMC_HOME!, "state", "high-water.json"));
     expect(buildLessonAdvisories(db, "agent-1", undefined, ws)).toEqual([]);
-    updateLessonStatus(db, "lsn_anchored", "ACTIVE", ws); // owner re-anchor path
+    expect(() => updateLessonStatus(db, "lsn_anchored", "ACTIVE", ws)).toThrow(/does not end at its anchored head/);
+    updateLessonStatus(db, "lsn_anchored", "ACTIVE", ws, { reanchor: true }); // owner re-anchor path, after review
     expect(buildLessonAdvisories(db, "agent-1", undefined, ws).map((a) => a.advisoryId)).toEqual(["lsn_anchored"]);
 
     // A lesson stored before the status log existed: hash and signature verify, but no status entry.
@@ -708,6 +709,26 @@ describe("buildLessonAdvisories", () => {
     expect(getLessonById(db, "lsn_nosign")!.status).toBe("ACTIVE");
     expect(db.prepare("SELECT COUNT(*) AS n FROM correction_lesson_status_log").get()).toEqual({ n: 1 }); // only its creation entry
     expect(() => updateLessonStatus(db, "lsn_nosign", "REVOKED", "" as string)).toThrow(/requires the workspace/);
+    db.close();
+  });
+
+  test("extraction after a rolled-back log neither re-anchors nor admits lessons", () => {
+    const { db } = freshDb();
+    const ws = lessonWorkspace();
+    initCorrectionTables(db);
+    makeSignedLesson(db, { lessonId: "lsn_roll" });
+    updateLessonStatus(db, "lsn_roll", "REVOKED", ws);
+    const anchorFile = join(process.env.AMC_HOME!, "state", "high-water.json");
+    const anchorBefore = readFileSync(anchorFile, "utf8");
+    // Roll the log back past the revocation and restore the column.
+    db.prepare("DELETE FROM correction_lesson_status_log WHERE lesson_id = ? AND status = 'REVOKED'").run("lsn_roll");
+    db.prepare("UPDATE correction_lessons SET status = 'ACTIVE' WHERE lesson_id = ?").run("lsn_roll");
+    makeCorrection(db, { correctionId: "corr_roll", status: "VERIFIED_EFFECTIVE", effectivenessScore: 0.9 });
+    const extracted = extractLessonsFromCorrections(db, "agent-1", ws);
+    expect(extracted).toHaveLength(1);
+    expect(readFileSync(anchorFile, "utf8")).toBe(anchorBefore);
+    expect(db.prepare("SELECT COUNT(*) AS n FROM correction_lesson_status_log WHERE lesson_id = ?").get(extracted[0]!.lessonId)).toEqual({ n: 0 });
+    expect(buildLessonAdvisories(db, "agent-1", undefined, ws)).toEqual([]);
     db.close();
   });
 
@@ -738,8 +759,8 @@ describe("expireStaleLessons", () => {
   test("expires lessons past TTL", () => {
     const { db } = freshDb();
     const pastExpiry = Date.now() - 1000;
-    makeLesson(db, { lessonId: "lsn_stale1", createdTs: pastExpiry - 1000, expiryTs: pastExpiry });
-    makeLesson(db, { lessonId: "lsn_active1", expiryTs: Date.now() + 999999 });
+    makeSignedLesson(db, { lessonId: "lsn_stale1", createdTs: pastExpiry - 1000, expiryTs: pastExpiry });
+    makeSignedLesson(db, { lessonId: "lsn_active1", expiryTs: Date.now() + 999999 });
 
     const expired = expireStaleLessons(db, "agent-1", lessonWorkspace());
     expect(expired).toEqual(["lsn_stale1"]);
