@@ -3,6 +3,8 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, test } from "vitest";
 import { writeEnforceResourceManifest } from "../src/enforce/resourceManifest.js";
+import { listExperiments } from "../src/experiments/experimentRunner.js";
+import { signArtifactFile } from "../src/lifecycle/artifactSignature.js";
 import {
   listGovernedOptimizerRuns,
   loadGovernedOptimizerRun,
@@ -152,8 +154,9 @@ describe("governed optimizer", () => {
     expect(accepted?.rank).toBe(1);
 
     const listed = listGovernedOptimizerRuns({ workspace: ws, agentId: "default", redacted: true });
-    expect(listed).toHaveLength(1);
-    expect(listed[0]!.workspace).toBe("$WORKSPACE");
+    expect(listed.problems).toEqual([]);
+    expect(listed.runs).toHaveLength(1);
+    expect(listed.runs[0]!.workspace).toBe("$WORKSPACE");
 
     const loaded = loadGovernedOptimizerRun({ workspace: ws, agentId: "default", selector: "latest" });
     expect(loaded.optimizerRunId).toBe(written.run.optimizerRunId);
@@ -204,5 +207,96 @@ describe("governed optimizer", () => {
     expect(leakedCandidate?.decision).toBe("rejected");
     expect(leakedCandidate?.leakageChecks.some((check) => check.id === "heldout-not-in-candidate-source" && check.status === "blocked")).toBe(true);
     expect(written.run.receipts.find((receipt) => receipt.candidateId === leakedCandidate?.candidateId)?.reason).toContain("held-out");
+  });
+
+  test("optimizer runs never appear as experiments, and amc experiment list still works after optimize", () => {
+    const ws = workspace();
+    writeMutableManifest(ws);
+    const rca = writeRca(ws, "trace-run-opt-namespace", 2);
+    writeGovernedOptimizerRun({ workspace: ws, agentId: "default", rcaSelector: rca.report.reportId });
+    expect(listExperiments({ workspace: ws, agentId: "default" })).toEqual([]);
+  });
+
+  test("metrics are labelled estimates, the receipt is structural, and nothing claims held-out execution", () => {
+    const ws = workspace();
+    writeMutableManifest(ws);
+    const rca = writeRca(ws, "trace-run-opt-estimates", 2);
+    const written = writeGovernedOptimizerRun({ workspace: ws, agentId: "default", rcaSelector: rca.report.reportId });
+    expect(written.run.schemaVersion).toBe("2026-10-29");
+    expect(written.run.validationReceipt).toMatchObject({ validationKind: "structural", executedValidationRefs: [] });
+    for (const candidate of written.run.candidates) {
+      expect(candidate).toMatchObject({ metricSource: "estimated", evaluationState: "not-run", observedMetrics: null });
+      expect(candidate.decisionReason).not.toMatch(/after held-out validation/);
+    }
+    const accepted = written.run.candidates.find((candidate) => candidate.decision === "accepted");
+    expect(accepted?.decisionReason).toMatch(/estimated metrics/);
+    const loaded = loadGovernedOptimizerRun({ workspace: ws, agentId: "default", selector: "latest", redacted: true });
+    expect(loaded.candidates.every((candidate) => candidate.metricSource === "estimated" && candidate.observedMetrics === null)).toBe(true);
+  });
+
+  test("a signed record whose candidate claims measured evaluation is refused", () => {
+    const ws = workspace();
+    writeMutableManifest(ws);
+    const rca = writeRca(ws, "trace-run-opt-measured", 2);
+    const written = writeGovernedOptimizerRun({ workspace: ws, agentId: "default", rcaSelector: rca.report.reportId });
+    const forged = { ...written.run, candidates: written.run.candidates.map((candidate) => ({ ...candidate, evaluationState: "measured" })) };
+    writeFileSync(written.path, `${JSON.stringify(forged, null, 2)}\n`);
+    signArtifactFile({ workspace: ws, path: written.path, artifactKind: "governed-optimizer-run" });
+    expect(() => loadGovernedOptimizerRun({ workspace: ws, agentId: "default", selector: written.run.optimizerRunId }))
+      .toThrow(/measured evaluation without executed trial receipts/);
+    expect(listGovernedOptimizerRuns({ workspace: ws, agentId: "default" }).runs).toEqual([]);
+  });
+
+  test("a legacy 2026-05-22 record reads as estimated and not run, without rewriting its signed bytes", () => {
+    const ws = workspace();
+    writeMutableManifest(ws);
+    const rca = writeRca(ws, "trace-run-opt-legacy", 2);
+    const written = writeGovernedOptimizerRun({ workspace: ws, agentId: "default", rcaSelector: rca.report.reportId });
+    const legacy = {
+      ...written.run,
+      schemaVersion: "2026-05-22",
+      candidates: written.run.candidates.map(({ metricSource: _s, evaluationState: _e, observedMetrics: _o, ...candidate }) => candidate),
+      validationReceipt: (({ validationKind: _k, executedValidationRefs: _r, ...receipt }) => receipt)(written.run.validationReceipt)
+    };
+    writeFileSync(written.path, `${JSON.stringify(legacy, null, 2)}\n`);
+    signArtifactFile({ workspace: ws, path: written.path, artifactKind: "governed-optimizer-run" });
+    const bytes = readFileSync(written.path);
+    const loaded = loadGovernedOptimizerRun({ workspace: ws, agentId: "default", selector: "latest" });
+    expect(loaded.schemaVersion).toBe("2026-05-22");
+    expect(loaded.candidates.every((candidate) => candidate.metricSource === "estimated" && candidate.evaluationState === "not-run")).toBe(true);
+    expect(loaded.validationReceipt.validationKind).toBe("structural");
+    expect(readFileSync(written.path).equals(bytes)).toBe(true);
+  });
+
+  test("a selector shared by two runs is ambiguous, and a run ID still resolves exactly", () => {
+    const ws = workspace();
+    writeMutableManifest(ws);
+    const rca = writeRca(ws, "trace-run-opt-ambiguous", 2);
+    const first = writeGovernedOptimizerRun({ workspace: ws, agentId: "default", rcaSelector: rca.report.reportId });
+    const second = writeGovernedOptimizerRun({ workspace: ws, agentId: "default", rcaSelector: rca.report.reportId });
+    expect(() => loadGovernedOptimizerRun({ workspace: ws, agentId: "default", selector: rca.report.reportId })).toThrow(/ambiguous/);
+    expect(loadGovernedOptimizerRun({ workspace: ws, agentId: "default", selector: first.run.optimizerRunId }).optimizerRunId)
+      .toBe(first.run.optimizerRunId);
+    expect(loadGovernedOptimizerRun({ workspace: ws, agentId: "default", selector: "latest" }).optimizerRunId).toBe(second.run.optimizerRunId);
+    expect(() => loadGovernedOptimizerRun({ workspace: ws, agentId: "default", selector: "../../../etc" })).toThrow(/not found/);
+  });
+
+  test("a corrupt or tampered newest run makes latest refuse instead of returning an older run", () => {
+    const ws = workspace();
+    writeMutableManifest(ws);
+    const rca = writeRca(ws, "trace-run-opt-corrupt", 2);
+    const older = writeGovernedOptimizerRun({ workspace: ws, agentId: "default", rcaSelector: rca.report.reportId });
+    const newer = writeGovernedOptimizerRun({ workspace: ws, agentId: "default", rcaSelector: rca.report.reportId });
+    writeFileSync(newer.path, "{ partial");
+    expect(() => loadGovernedOptimizerRun({ workspace: ws, agentId: "default", selector: "latest" })).toThrow(/unreadable/);
+    const listed = listGovernedOptimizerRuns({ workspace: ws, agentId: "default" });
+    expect(listed.runs.map((run) => run.optimizerRunId)).toEqual([older.run.optimizerRunId]);
+    expect(listed.problems).toEqual([{ optimizerRunId: newer.run.optimizerRunId, reason: "digest mismatch" }]);
+
+    // A well-formed but edited record fails its signature the same way.
+    const edited = { ...newer.run, acceptedCandidateId: "optcand_forged" };
+    writeFileSync(newer.path, `${JSON.stringify(edited, null, 2)}\n`);
+    expect(() => loadGovernedOptimizerRun({ workspace: ws, agentId: "default", selector: "latest" })).toThrow(/digest mismatch/);
+    expect(() => loadGovernedOptimizerRun({ workspace: ws, agentId: "default", selector: "optcand_forged" })).toThrow(/unreadable run/);
   });
 });

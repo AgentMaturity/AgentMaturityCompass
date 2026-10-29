@@ -13808,12 +13808,12 @@ experiment
   .option("--candidate-agent <agentId>", "candidate agent, if different from the baseline")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
   .action(async (opts: { experiment: string; mode: string; agent?: string; candidateWindow: string; candidateAgent?: string }) => {
-    const modeValue = opts.mode === "sandbox" ? "sandbox" : "supervise";
     const out = await experimentRunCliAsync({
       workspace: process.cwd(),
       agentId: opts.agent ?? activeAgent(program),
       experimentId: opts.experiment,
-      mode: modeValue, candidateWindow: opts.candidateWindow, candidateAgentId: opts.candidateAgent
+      // The runner refuses any other mode before casebook work; it is never coerced.
+      mode: opts.mode as "supervise" | "sandbox", candidateWindow: opts.candidateWindow, candidateAgentId: opts.candidateAgent
     });
     console.log(chalk.green(`Experiment run recorded: ${out.report.runId}`));
     console.log(`json=${out.jsonPath}`);
@@ -13838,7 +13838,7 @@ experiment
 
 experiment
   .command("gate")
-  .description("Evaluate latest experiment run against gate policy")
+  .description("Evaluate latest experiment run against gate policy (exit 0 pass, 1 fail or error, 3 inconclusive)")
   .requiredOption("--experiment <id>", "experiment ID")
   .requiredOption("--policy <path>", "experiment gate policy JSON")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
@@ -13851,8 +13851,10 @@ experiment
       experimentId: opts.experiment,
       policyPath
     });
-    if (out.pass) {
+    if (out.status === "pass") {
       console.log(chalk.green("Experiment gate PASSED"));
+    } else if (out.status === "inconclusive") {
+      console.log(chalk.yellow("Experiment gate INCONCLUSIVE"));
     } else {
       console.log(chalk.red("Experiment gate FAILED"));
     }
@@ -13860,11 +13862,11 @@ experiment
     for (const row of experimentGateComparisonRows(out.report, policy)) {
       console.log(row);
     }
-    if (!out.pass) {
+    if (out.status !== "pass") {
       for (const reason of out.reasons) {
         console.log(`- ${reason}`);
       }
-      process.exit(1);
+      process.exit(out.status === "inconclusive" ? 3 : 1);
     }
   });
 
@@ -13910,9 +13912,9 @@ experiment
       return;
     }
     console.log(chalk.green(`Governed optimizer run: ${out.run.optimizerRunId}`));
-    console.log(`accepted=${out.run.acceptedCandidateId ?? "none"}`);
+    console.log(`accepted=${out.run.acceptedCandidateId ?? "none"} (selected for probing on estimated metrics; no candidate was executed)`);
     console.log(`candidates=${out.run.candidateCount}`);
-    console.log(`receipt=${out.run.validationReceipt.receiptId} status=${out.run.validationReceipt.status}`);
+    console.log(`receipt=${out.run.validationReceipt.receiptId} kind=${out.run.validationReceipt.validationKind} status=${out.run.validationReceipt.status}`);
     console.log(`path=${out.path}`);
   });
 
@@ -13932,8 +13934,11 @@ experiment
       console.log(JSON.stringify(out, null, 2));
       return;
     }
-    for (const run of out) {
-      console.log(`${run.optimizerRunId} accepted=${run.acceptedCandidateId ?? "none"} status=${run.validationReceipt.status}`);
+    for (const run of out.runs) {
+      console.log(`${run.optimizerRunId} accepted=${run.acceptedCandidateId ?? "none"} status=${run.validationReceipt.status} metrics=estimated`);
+    }
+    for (const problem of out.problems) {
+      console.error(chalk.red(`${problem.optimizerRunId} unreadable: ${problem.reason}`));
     }
   });
 
@@ -13955,9 +13960,11 @@ experiment
     }
     console.log(chalk.green(`Governed optimizer run: ${out.optimizerRunId}`));
     console.log(`sourceRca=${out.sourceRcaReportId}`);
-    console.log(`accepted=${out.acceptedCandidateId ?? "none"}`);
+    console.log(`accepted=${out.acceptedCandidateId ?? "none"} (selected for probing on estimated metrics; no candidate was executed)`);
     for (const candidate of out.candidates) {
-      console.log(`- ${candidate.candidateId}: ${candidate.decision} rank=${candidate.rank ?? "-"} pareto=${candidate.paretoFront} reason=${candidate.decisionReason}`);
+      const m = candidate.metrics;
+      console.log(`- ${candidate.candidateId}: ${candidate.decision} rank=${candidate.rank ?? "-"} pareto=${candidate.paretoFront} evaluation=${candidate.evaluationState} reason=${candidate.decisionReason}`);
+      console.log(`  estimated: scoreGain=${m.scoreGain} risk=${m.risk} cost=${m.cost} latencyMs=${m.latencyMs} confidence=${m.confidence}; observed: none`);
     }
   });
 
@@ -16154,7 +16161,7 @@ program
     const db = ledger.db;
     initLessonTables(db);
     const agentId = opts.agent ?? activeAgent(program) ?? "default";
-    const advisories = buildLessonAdvisories(db, agentId);
+    const advisories = buildLessonAdvisories(db, agentId, undefined, process.cwd());
     ledger.close();
     if (advisories.length === 0) {
       console.log("No active lessons to inject. Run memory-extract first.");

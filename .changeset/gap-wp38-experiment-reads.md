@@ -1,0 +1,14 @@
+---
+"agent-maturity-compass": patch
+---
+
+Experiment, optimizer and lesson reads are verified, unambiguous, and keep working after `amc experiment optimize` (GAP-WP38, WP02, WP01).
+
+- `amc experiment list` and Studio's `/experiments/list` and `/experiments/history` no longer break after `amc experiment optimize`: only directories holding an `experiment.yaml` are experiments, so the optimizer runs stored under the same root stay out of the list. The on-disk layout is unchanged.
+- The latest experiment run is read only when its seal verifies and it describes the experiment's current casebook, baseline and candidate. `amc experiment analyze`, `amc experiment gate` and Studio refuse a tampered, unsealed or out-of-date report and say why; Studio history shows the reason as `latestRunProblem`.
+- `amc experiment gate` exits 3 when the latest run measured no cases (`status: "inconclusive"`), distinct from 1 for a failed gate or an error.
+- `amc experiment set-baseline` and `set-candidate` serialize their `experiment.yaml` update under a control-file lock, so concurrent updates cannot drop each other. Experiment IDs must be a single path segment.
+- `amc experiment run` and Studio `POST /experiments/:id/run` reject an unknown mode (it is no longer coerced to `supervise`), a malformed `--candidate-window`, a candidate agent without the casebook and a non-object request body before any casebook work; Studio answers 400 with `code: "EXPERIMENT_INPUT_INVALID"`. The console's Run button now asks for the candidate window and agent.
+- Governed optimizer runs are verified against their `governed-optimizer-run` signature on every read. `amc experiment optimizer-list --json` and Studio `/experiments/optimizers` now return `{ runs, problems }`, listing each unreadable or tampered run as a problem instead of skipping it; `optimizer-show latest` refuses when the newest run is unreadable; a selector that matches more than one run is an error naming the matches.
+- Optimizer metrics are labelled what they are: new runs (`schemaVersion` `2026-10-29`) mark each candidate `metricSource: "estimated"`, `evaluationState: "not-run"`, `observedMetrics: null`, and the validation receipt `validationKind: "structural"` with no executed validation references. The accepted candidate is "selected for probing" on estimates. Older `2026-05-22` records read with the same labels without being rewritten, and a record claiming measured evaluation is refused.
+- Correction-memory lessons are verified (content hash, chain link and `ledger-row` signature) before `amc memory-advisories` or `/api/v1/memory/advisories` inject them; edited, forged, unsigned or unchained lessons are excluded. Status and injection updates do not affect verification. `buildLessonAdvisories` now requires the workspace argument.

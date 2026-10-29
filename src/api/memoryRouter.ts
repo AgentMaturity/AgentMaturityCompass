@@ -194,7 +194,7 @@ export async function handleMemoryRoute(
       try {
         const db = ledger.db;
         initLessonTables(db);
-        const advisories = buildLessonAdvisories(db, agentId);
+        const advisories = buildLessonAdvisories(db, agentId, undefined, workspace);
         apiSuccess(res, { agentId, advisories, total: advisories.length });
       } finally {
         ledger.close();
