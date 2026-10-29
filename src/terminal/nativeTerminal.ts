@@ -48,7 +48,7 @@ export class NativeTerminalHost {
   support(): NativePtySupport { return nativePtySupport(); }
   get openCount(): number { return this.sessions.size; }
 
-  async open(options: { readonly workspace: string; readonly cols?: number; readonly rows?: number; readonly timeoutMs?: number }): Promise<TerminalSession> {
+  async open(options: { readonly workspace: string; readonly cols?: number; readonly rows?: number; readonly timeoutMs?: number; readonly signal?: AbortSignal }): Promise<TerminalSession> {
     if (this.disposed) throw new Error("The terminal host is disposed.");
     if (!this.options.authorize) throw new Error("Interactive PTY access requires an explicit host authorizer; a bash approval is not an interactive grant.");
     const cols = options.cols ?? 80;
@@ -58,11 +58,23 @@ export class NativeTerminalHost {
     if (!Number.isSafeInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > 86_400_000) throw new RangeError("Invalid terminal lifetime.");
     const request = Object.freeze({ capability: "interactive-pty" as const, workspace: realpathSync(options.workspace), cols, rows, timeoutMs });
     const lifetime = new AbortController();
+    const cancelOpen = (): void => lifetime.abort();
+    options.signal?.addEventListener("abort", cancelOpen, { once: true });
+    if (options.signal?.aborted) cancelOpen();
     this.opening.add(lifetime);
     let detachRevocation: (() => void) | undefined;
     let transferred = false;
     try {
-      const grant = await this.options.authorize(request);
+      const authorization = this.options.authorize(request);
+      let cancelAuthorization!: () => void;
+      const cancelled = new Promise<never>((_resolve, reject) => {
+        cancelAuthorization = () => reject(new Error("The terminal host closed while authorization was pending."));
+        lifetime.signal.addEventListener("abort", cancelAuthorization, { once: true });
+        if (lifetime.signal.aborted) cancelAuthorization();
+      });
+      let grant: NativeTerminalGrant | undefined;
+      try { grant = await Promise.race([Promise.resolve(authorization), cancelled]); }
+      finally { lifetime.signal.removeEventListener("abort", cancelAuthorization); }
       if (this.disposed || lifetime.signal.aborted) throw new Error("The terminal host closed while authorization was pending.");
       if (!grant || grant.capability !== "interactive-pty" || grant.workspace !== request.workspace || !grant.policy ||
           grant.policy.network !== "deny" || !grant.policy.signal || typeof grant.policy.signal.addEventListener !== "function" || typeof grant.check !== "function" ||
@@ -107,14 +119,23 @@ export class NativeTerminalHost {
       try { session = new TerminalSession(guarded, this.options.session); }
       catch (error) { backend.dispose(); throw error; }
       this.sessions.add(session);
-      void session.done.then(() => { this.sessions.delete(session); detachRevocation?.(); lifetime.abort(); });
+      void session.done.then(() => {
+        this.sessions.delete(session);
+        detachRevocation?.();
+        options.signal?.removeEventListener("abort", cancelOpen);
+        lifetime.abort();
+      });
       // Transfer lifetime ownership from pending authorization to the session.
       this.opening.delete(lifetime);
       transferred = true;
       return session;
     } finally {
       this.opening.delete(lifetime);
-      if (!transferred) { detachRevocation?.(); lifetime.abort(); }
+      if (!transferred) {
+        detachRevocation?.();
+        options.signal?.removeEventListener("abort", cancelOpen);
+        lifetime.abort();
+      }
     }
   }
 

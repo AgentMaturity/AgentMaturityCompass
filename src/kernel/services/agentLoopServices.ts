@@ -164,26 +164,9 @@ export class AgentLoopSeamService extends AmcSeam {
     return this.driver.whenIdle();
   }
 
-  /**
-   * Cancel as `disposed` and wait for the turn to close.
-   *
-   * TWO CASES ARE DELIBERATELY LEFT ALONE, because in both a cancel row would
-   * claim a stop that stopped nothing — and a `loop/cancel` on every clean
-   * shutdown would devalue the one signal an auditor scans for.
-   *
-   *   - A `failed` driver. Its session already has an open turn that only
-   *     `recoverSession` may close.
-   *   - An idle driver with an empty inbox. There is no turn to stop and no
-   *     queued work to drop.
-   *
-   * An idle driver with PENDING work is cancelled: that work is really being
-   * abandoned, and the row is what says so.
-   */
+  /** Disposal closes admission even for an idle or failed driver. */
   private async shutdown(): Promise<void> {
-    if (this.driver.status === "failed") return;
-    if (this.driver.status !== "running" && !this.driver.inbox.hasPending) return;
-    this.driver.cancel({ kind: "disposed" });
-    await this.driver.whenIdle();
+    if (!await this.driver.dispose()) throw new Error("Agent loop disposal timed out; cleanup remains unknown.");
   }
 }
 

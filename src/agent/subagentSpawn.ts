@@ -99,7 +99,7 @@ export interface SubagentContinuation {
   /** Post more work into the child's inbox and run it to quiescence. */
   continue(text: string): Promise<SubagentRunResult>;
   /** Release the child. Called by the handle, which is idempotent. */
-  close(): void;
+  close(): void | Promise<void>;
 }
 
 /** What the child executor reports back. `text` is the CHILD's own words. */
@@ -157,7 +157,7 @@ export interface SubagentHandle {
   /** More work, through the inbox and nowhere else. */
   continue(text: string): Promise<SubagentRunResult>;
   /** Account for the delegation and release the child. Safe to call twice. */
-  close(settledAs: DelegationSettlement, reason: string): void;
+  close(settledAs: DelegationSettlement, reason: string): void | Promise<void>;
 }
 
 /** How the runtime saw a delegation end. */
@@ -354,39 +354,67 @@ export async function spawnSubagent(init: SpawnSubagentInit): Promise<SubagentOu
   let continuation: SubagentContinuation | undefined;
   const retained = new Set<SubagentContinuation>();
   const released = new Set<SubagentContinuation>();
+  const releasing = new Set<Promise<void>>();
+  let releaseFailure: string | undefined;
+  let cleanupUnknown = false;
+  let accounting: Promise<void> | undefined;
+  let closing: Promise<void> | undefined;
+  let activeSettlement: Promise<void> | undefined;
 
-  const releaseResources = (late?: SubagentRunResult): string | undefined => {
+  const releaseResources = (late?: SubagentRunResult): string | undefined | Promise<string | undefined> => {
     if (late?.continuation !== undefined) retained.add(late.continuation);
-    let failure: string | undefined;
+    const failed = (error: unknown): void => {
+      cleanupUnknown = true;
+      releaseFailure ??= `child resource release failed: TOOL_OUTCOME_UNKNOWN: ${String(error)}`;
+    };
     for (const resource of retained) {
       if (released.has(resource)) continue;
       released.add(resource);
-      try { resource.close(); }
-      catch (error) { failure ??= `child resource release failed: ${String(error)}`; }
+      try {
+        const close = resource.close();
+        if (close && typeof close.then === "function") {
+          const pending = Promise.resolve(close).then(() => undefined, failed);
+          releasing.add(pending);
+          void pending.then(() => releasing.delete(pending));
+        }
+      } catch (error) { failed(error); }
     }
-    return failure;
+    if (releasing.size === 0) return releaseFailure;
+    return new Promise(resolve => {
+      const timer = setTimeout(() => {
+        failed(`cleanup did not acknowledge release within ${graceMs} ms`);
+        resolve(releaseFailure);
+      }, graceMs);
+      void Promise.all([...releasing]).then(() => { clearTimeout(timer); resolve(releaseFailure); });
+    });
   };
-  const account = (settledAs: DelegationSettlement, reason: string, release = true): void => {
-    if (closed) return;
+  const account = (settledAs: DelegationSettlement, reason: string, release = true): void | Promise<void> => {
+    if (closed) return accounting;
     closed = true;
     if (lifetimeTimer !== undefined) clearTimeout(lifetimeTimer);
     parentSignal?.removeEventListener("abort", onParentAbort);
-    const releaseFailure = release ? releaseResources() : undefined;
-    closeReason = `${reason}${releaseFailure === undefined ? "" : `; ${releaseFailure}`}`;
-    if (releaseFailure !== undefined && settledAs === "reported") settledAs = "failed";
-    // Mark terminal before calling external writers or release hooks. An idle
-    // timeout can run after the parent writer was closed; retain that error for
-    // the handle without throwing from an asynchronous timer or inventing a row.
-    try {
-      session.recordLoopEvent({ kind: "delegation-completed", childRunAs: identity.runAs,
-        childSessionId, packetId, settledAs, reason: closeReason });
-      writeDelegationEvidence(session, { settledAs, depth: identity.depth, packetId,
-        childRunAs: identity.runAs, childSessionId, governedAs: identity.governedAs,
-        ...(scopeClasses === undefined ? {} : { scopeDeclared: scopeClasses }), childText: latestText });
-    } catch (error) {
-      accountingError = error;
-      closeReason += `; delegation completion could not be recorded: ${String(error)}`;
-    }
+    const record = (failure: string | undefined): void => {
+      closeReason = `${reason}${failure === undefined ? "" : `; ${failure}`}`;
+      if (failure !== undefined && settledAs === "reported") settledAs = "failed";
+      // Admission closes before release. Completion waits for observed async cleanup or bounded unknown.
+      try {
+        session.recordLoopEvent({ kind: "delegation-completed", childRunAs: identity.runAs,
+          childSessionId, packetId, settledAs, reason: closeReason });
+        writeDelegationEvidence(session, { settledAs, depth: identity.depth, packetId,
+          childRunAs: identity.runAs, childSessionId, governedAs: identity.governedAs,
+          ...(scopeClasses === undefined ? {} : { scopeDeclared: scopeClasses }), childText: latestText });
+      } catch (error) {
+        accountingError = error;
+        closeReason += `; delegation completion could not be recorded: ${String(error)}`;
+      }
+    };
+    const cleanup = release ? releaseResources() : undefined;
+    if (cleanup instanceof Promise) { accounting = cleanup.then(record); return accounting; }
+    record(cleanup);
+  };
+  const assertReleased = (): void => {
+    if (accountingError !== undefined) throw accountingError;
+    if (cleanupUnknown) throw new Error(releaseFailure ?? "TOOL_OUTCOME_UNKNOWN: child execution stop remains unconfirmed");
   };
   const requestStop = (reason: string): void => {
     if (closed || stopReason !== undefined) return;
@@ -410,44 +438,49 @@ export async function spawnSubagent(init: SpawnSubagentInit): Promise<SubagentOu
       reason: closed ? `child has been released: ${closeReason}` : stopReason };
     if (active) return { ok: false, text: "", reason: "child already has an active turn" };
     active = true;
-    lifetimeTimer?.ref?.();
-    turns += 1;
-    let running: Promise<SubagentRunResult>;
-    try { running = Promise.resolve(dispatch()); }
-    catch (error) { running = Promise.reject(error); }
-    const result = await settleWithin(running, controller.signal, graceMs, late => {
-      // After abandonment the executor may still own an active DB. Release it
-      // only after it returns, including an initial late continuation handle.
-      // The original unconfirmed settlement is never rewritten or duplicated.
-      releaseResources(late);
-    });
-    checkDeadline();
-    active = false;
-    lifetimeTimer?.unref?.();
-    if (result === ABANDONED) {
-      account("cancelled", `${stopReason ?? "delegation cancelled"}; child did not stop within the grace window and was abandoned; execution stop unconfirmed`, false);
-      return { ok: false, text: "", reason: closeReason };
-    }
-    if (result.continuation !== undefined) {
-      retained.add(result.continuation);
-      continuation = result.continuation;
-    }
-    latestText = result.text;
-    if (stopReason !== undefined) {
-      account("cancelled", `${stopReason}; runner returned${result.reason === undefined ? "" : `: ${result.reason}`}`);
-      return { ok: false, text: result.text, reason: closeReason };
-    }
-    if (!result.ok || result.text.trim().length === 0) {
-      account("failed", result.reason ?? (result.ok ? "child produced no output" : "child did not report a reason"));
-      return { ok: false, text: result.text, reason: closeReason };
-    }
-    if (limitReached() || continuation === undefined || request.continuable !== true) {
-      account("reported", limitReached() ? `max-turns:${stops.maxTurns} ceiling reached; child reported and was released` : "child reported");
-      if (accountingError !== undefined || closeReason.includes("child resource release failed:")) {
+    let settleActive!: () => void;
+    activeSettlement = new Promise<void>(resolve => { settleActive = resolve; });
+    try {
+      lifetimeTimer?.ref?.();
+      turns += 1;
+      let running: Promise<SubagentRunResult>;
+      try { running = Promise.resolve(dispatch()); }
+      catch (error) { running = Promise.reject(error); }
+      const result = await settleWithin(running, controller.signal, graceMs, late => {
+        // After abandonment the executor may still own an active DB. Release it
+        // only after it returns, including an initial late continuation handle.
+        // The original unconfirmed settlement is never rewritten or duplicated.
+        releaseResources(late);
+      });
+      checkDeadline();
+      active = false;
+      lifetimeTimer?.unref?.();
+      if (result === ABANDONED) {
+        cleanupUnknown = true;
+        await account("cancelled", `${stopReason ?? "delegation cancelled"}; child did not stop within the grace window and was abandoned; execution stop unconfirmed`, false);
+        return { ok: false, text: "", reason: closeReason };
+      }
+      if (result.continuation !== undefined) {
+        retained.add(result.continuation);
+        continuation = result.continuation;
+      }
+      latestText = result.text;
+      if (stopReason !== undefined) {
+        await account("cancelled", `${stopReason}; runner returned${result.reason === undefined ? "" : `: ${result.reason}`}`);
         return { ok: false, text: result.text, reason: closeReason };
       }
-    }
-    return publicResult(result);
+      if (!result.ok || result.text.trim().length === 0) {
+        await account("failed", result.reason ?? (result.ok ? "child produced no output" : "child did not report a reason"));
+        return { ok: false, text: result.text, reason: closeReason };
+      }
+      if (limitReached() || continuation === undefined || request.continuable !== true) {
+        await account("reported", limitReached() ? `max-turns:${stops.maxTurns} ceiling reached; child reported and was released` : "child reported");
+        if (accountingError !== undefined || closeReason.includes("child resource release failed:")) {
+          return { ok: false, text: result.text, reason: closeReason };
+        }
+      }
+      return publicResult(result);
+    } finally { settleActive(); }
   };
 
   parentSignal?.addEventListener("abort", onParentAbort, { once: true });
@@ -469,16 +502,17 @@ export async function spawnSubagent(init: SpawnSubagentInit): Promise<SubagentOu
     identity, childSessionId, packetId,
     continue: text => execute(() => continuation!.continue(text)),
     close: (settledAs, reason) => {
+      if (closing) return closing;
       checkDeadline();
-      if (closed) return;
+      if (closed) return accounting;
       if (active) {
-        // The active call owns bounded settlement and eventual disposal. Never
-        // close a runner's DB beneath its still-running continuation.
         requestStop(`child release requested during an active turn: ${reason}`);
-        return;
+        closing = activeSettlement!.then(assertReleased);
+        return closing;
       }
-      account(settledAs, reason);
-      if (accountingError !== undefined) throw accountingError;
+      const done = account(settledAs, reason);
+      if (done) { closing = done.then(assertReleased); return closing; }
+      assertReleased();
     }
   };
   return { ok: true, identity, packetId, childSessionId, childText: first.text, handle };

@@ -90,7 +90,20 @@ export interface TurnEndMeta {
  * order.
  */
 export function canonicalTurnCancelCause(cause: TurnCancelCause): TurnCancelCause {
-  return cause.kind === "hook" ? { kind: "hook", reason: cause.reason } : { kind: cause.kind };
+  return cause.kind === "hook" ? { kind: "hook", reason: boundedCancellationText(cause.reason) } : { kind: cause.kind };
+}
+
+/** Bound new cancellation metadata without invalidating historical signed rows. */
+export function boundedCancellationText(text: string): string {
+  let bytes = 0;
+  let bounded = "";
+  for (const character of text) {
+    const length = Buffer.byteLength(character, "utf8");
+    if (bytes + length > 512) break;
+    bytes += length;
+    bounded += character;
+  }
+  return bounded;
 }
 
 const TURN_END_REASONS: ReadonlySet<string> = new Set<TurnEndReason>([

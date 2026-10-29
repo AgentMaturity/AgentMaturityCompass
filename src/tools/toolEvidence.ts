@@ -159,6 +159,7 @@ export function toolEvidenceFor(execution: RecordedToolCall, outcome: ToolOutcom
     toolToken: execution.token,
     parentToken: execution.parentToken,
     callId: execution.callId,
+    ...(execution.ownerStep === undefined ? {} : { ownerStep: execution.ownerStep }),
     // The record this call ran (or was refused) under, on every row (P1-02).
     ...(execution.authorization === undefined ? {} : {
       authorizationId: execution.authorization.authorizationId,

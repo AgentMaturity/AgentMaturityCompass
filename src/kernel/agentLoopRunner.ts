@@ -40,7 +40,7 @@
 import { Context } from "./amcRuntime.js";
 import { createHash, randomUUID } from "node:crypto";
 import { gateToolCallsOnApproval, type ToolApprovalGateOptions } from "../agent/approvalGate.js";
-import type { AgentLoopConfig, AgentStatus, LoopHooks, LoopNotification } from "../agent/loopTypes.js";
+import type { AgentLoopConfig, AgentStatus, CancelOptions, LoopHooks, LoopNotification } from "../agent/loopTypes.js";
 import type { LoopRoute } from "../agent/stepRunner.js";
 import { EMPTY_TOOL_SEAM, type AgentToolSeam } from "../agent/toolSeam.js";
 import type { NativeShellReadiness } from "../sandbox/nativeShellGate.js";
@@ -133,7 +133,9 @@ export interface ComposedApprovalGate extends ToolApprovalGateOptions {
 export interface ComposedTurnHandle {
   readonly sessionId: string;
   /** Stop the turn. The cause rides inside the signed `turn/end`. */
-  cancel(cause: TurnCancelCause): void;
+  cancel(cause: TurnCancelCause, options?: CancelOptions): void;
+  /** Permanently close admission and bound the active driver drain. */
+  shutdown(): Promise<boolean>;
 }
 
 /** Narrow evidence capability for tools, bound to the actual selected session. */
@@ -505,6 +507,8 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
   let steerTimer: NodeJS.Timeout | null = null;
   /** Set once the loop (or schedule pass) is ready; until then a throw is a failed composition, never a completion. */
   let composed = false;
+  let hostShutdown = false;
+  let loopOwner: AgentLoopSeamService | undefined;
 
   try {
     // P2-12: interrupted calls follow their resume rules before this turn's first request; nothing is dispatched again.
@@ -698,11 +702,20 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
     fibers.push(loopFiber);
     composed = true;
 
-    const loop = serviceOn<AgentLoopSeamService>(ctx, AGENT_LOOP_SEAM.name);
+    const loop = loopOwner = serviceOn<AgentLoopSeamService>(ctx, AGENT_LOOP_SEAM.name);
+    let abandon!: (error: Error) => void;
+    const shutdownFailure = new Promise<never>((_resolve, reject) => { abandon = reject; });
+    void shutdownFailure.catch(() => undefined);
     options.onReady?.({
       sessionId,
-      cancel: (cause: TurnCancelCause) => {
-        loop.cancel(cause);
+      cancel: (cause: TurnCancelCause, options = {}) => {
+        loop.cancel(cause, options);
+      },
+      shutdown: async () => {
+        hostShutdown = true;
+        const confirmed = await loop.agent.dispose();
+        if (!confirmed) abandon(new Error("TOOL_OUTCOME_UNKNOWN: native driver did not drain within its shutdown grace."));
+        return confirmed;
       }
     });
     if (audioParts !== undefined) loop.agent.followupAudioParts(audioParts);
@@ -720,7 +733,7 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
         }
       }, steer.afterMs);
     }
-    await loop.whenIdle();
+    await Promise.race([loop.whenIdle(), shutdownFailure]);
     return {
       sessionId,
       status: loop.status,
@@ -736,35 +749,42 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
     if (steerTimer !== null) clearTimeout(steerTimer);
     // Reverse order: the loop lets go of the model seam before the model seam
     // lets go of the credentials it resolves per request.
-    let scheduleDisposalError: unknown;
+    let disposalError: unknown;
     for (const fiber of [...fibers].reverse()) {
       try { await fiber.dispose(); }
       catch (error) {
-        // oxlint-disable-next-line no-unsafe-finally -- Disposal failure must refuse successful ownership handover.
-        if (options.schedulePass === undefined) throw error;
-        scheduleDisposalError ??= error; // Try every remaining owner, including the parent session.
+        disposalError ??= error; // Try every owner, including the session writer, before reporting failure.
       }
     }
+    const driverConfirmed = await (loopOwner?.agent.dispose() ?? Promise.resolve(true));
+    let resourcesConfirmed = false;
+    try { resourcesConfirmed = await (options.tools?.shutdown?.() ?? Promise.resolve(true)); }
+    catch (error) { disposalError ??= error; }
     try {
-      if (options.keepOpen) {
+      if (!driverConfirmed || loopOwner?.status === "failed") session.disposeWithoutClosing();
+      else if (options.keepOpen) {
+        // oxlint-disable-next-line no-unsafe-finally -- Unknown cleanup must refuse ownership handover.
+        if (!resourcesConfirmed) throw new Error("Cannot hand over a session whose resource cleanup is unknown.");
         // Hand-over point: the turn is sealed, the session is not. A later
         // process resumes it through sessionResume.ts, which re-verifies first.
         session.releaseWithoutClosing();
       } else {
-        session.close({ reason: composed ? "completed" : COMPOSITION_FAILED });
+        session.close({ reason: !composed ? COMPOSITION_FAILED : !resourcesConfirmed ? "resource_outcome_unknown" : hostShutdown ? "shutdown" : "completed" });
       }
     } catch (error) {
       // A driver that entered `failed` left an open turn only recovery may
       // close, and the spine refuses a close over it. Swallowed HERE and only
       // here: the status returned above already reports it, and throwing from a
       // finally would replace the real failure with this one.
+      try { session.disposeWithoutClosing(); } catch { /* Preserve unsealed evidence after a refused close. */ }
       if (options.schedulePass !== undefined) {
-        try { session.disposeWithoutClosing(); } catch { /* preserve original closure failure */ }
         // oxlint-disable-next-line no-unsafe-finally -- A schedule owner cannot report released/closed on a refused seal.
         throw error;
       }
     }
     // oxlint-disable-next-line no-unsafe-finally -- Report failed disposal after attempting every schedule owner.
-    if (scheduleDisposalError !== undefined) throw scheduleDisposalError;
+    if (disposalError !== undefined) throw new Error("TOOL_OUTCOME_UNKNOWN: native service cleanup failed.", { cause: disposalError });
+    // oxlint-disable-next-line no-unsafe-finally -- A cleanup timeout cannot be reported as successful shutdown.
+    if (!driverConfirmed || !resourcesConfirmed) throw new Error("TOOL_OUTCOME_UNKNOWN: native resources did not confirm cleanup.");
   }
 }

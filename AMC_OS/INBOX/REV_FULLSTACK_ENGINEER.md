@@ -489,3 +489,92 @@ platform cases on a suitable host, and commit using
 `/Users/sid/AgentMaturityCompass-worktrees/s442cd919/work/codex-runs/wp19-commit-message.txt`.
 Installed-package/platform qualification remains deferred. Native scheduling stays
 hidden and experimental. No research, dependency files, or other worktrees changed.
+
+
+---
+
+# WP16 handoff — candidate for Claude review
+
+WP16 is implemented in an uncommitted candidate. Repository verification passed. Runtime qualification remains incomplete for the blocked host checks below.
+
+Tip: `dff352a3e42eda65d11fd3127f91d036208b2687`, branch `rtd/gap-wp16`, worktree `/Users/sid/AgentMaturityCompass-worktrees/s442cd919/work/amc-gap-wp16`. No commit, push or merge was made. Claude reviews, commits and merges.
+
+## Row status
+
+“Fixed” below means implemented and regression-tested in this candidate, not physical platform or release qualification.
+
+| Row | Status | Evidence and limits |
+| --- | --- | --- |
+| D36 | Fixed | The native toolset composes `terminalServices` with the shared `NativeTerminalTools` runtime through `nativeBackground.ts`. The existing Linux PTY host remains the execution boundary. Explicit host interactive authority and platform prerequisites are required. |
+| D37 | Fixed | The same composition mounts `jobServices` and `JobRegistry`. Jobs retain their starting session/turn/step/call, distinguish logical cancellation from observed cleanup, and keep unknown work reserved until cleanup is proven. Session and delegated cleanup run before sealing or handoff. |
+| DXA-11 | Fixed | CLI SIGTERM records parent cancellation with `requestedBy: "signal:SIGTERM"`, closes admission and awaits bounded shutdown. An uncooperative driver remains unknown and unsealed. |
+| DXA-22 | Fixed | `AgentDriver.dispose()` closes admission synchronously, memoizes bounded shutdown and rejects later followup/steer. Kernel service disposal invokes it even when idle or failed. |
+| DXA-24 | Already present | The current controller is the cancellation target; the first abort cause wins and inbox preservation is explicit. The candidate also snapshots bounded cause metadata before notifying abort listeners. |
+| DXA-25 | Fixed | New hook reasons and requestedBy values are capped at 512 UTF-8 bytes. Historical metadata readers remain compatible. |
+| DXB-16 | Already addressed in base, with documented limit | Exclusive create and publication checks are present. The final check/rename race with an external writer remains documented in `fsTools.ts`. WP34b-owned filesystem source was not edited. |
+| DXB-17 | Already addressed in base, with documented limit | Edits use captured bytes and snapshot-digest publication checks. The same external-writer race remains. |
+| DXB-18 | Already present | The existing `processTree` substrate distinguishes direct-child closure from proven process-range exit. Jobs reuse it through the existing confined bash/runProcess path; `processTree` was not edited. Missing tree proof remains unknown. |
+| DXC-04 | Fixed | `terminal_send` uses the same persistent shell, preserving cwd/state across calls. No second bash dialect was added. |
+| DXC-05 | Fixed | Governed open/list/read/send/signal/resize/close tools use NativeTerminalHost, bounded output and revision-bound byte pages. Input/resize retain synchronous authority checks and revocation. A bash approval cannot grant interactive input. |
+| DXC-06 | Fixed | Governed job_start/list/output/kill tools use the existing ToolPipeline. Waiting is finite and does not kill a running job. Stop requests report observed cleanup separately. |
+| PXB-35 | Fixed | A per-registry UUID isolates stale job IDs from later registry instances; owner checks remain mandatory. |
+| PXB-36 | Already addressed in base | Native search runs the walk/read/regex work in a worker with finite deadline/cancellation, awaited termination and explicit incomplete results. |
+| AXR-21 | Already present | Native and ToolHub adapters use the canonical approval engine. |
+| AXR-23 | Already present | Native and ToolHub calls share the action journal and authorization binding/recheck. |
+| AXR-24 | Already present | Native authorization, managed hooks, gateway and wire paths use the existing lease verifier. |
+
+## Implementation and boundaries
+
+`composeNativeAgent` reaches the existing toolset composition. A shared kernel job/terminal lifetime is mounted there, with every tool dispatched through the existing ToolPipeline and signed allowlist. Background commands re-enter that pipeline as confined bash calls with fresh policy/authorization checks. No default policy was widened. Every new tool result sets `ok` explicitly.
+
+Job output uses OutputCollector head/tail retention and absolute byte cursors with explicit dropped ranges. Active, retained, owner-namespace and waiter limits are finite. Unknown cleanup consumes active capacity. Logical settlement and completion notification remain exactly once; the existing wake budget is three and only trusted human input refills it. There is no autonomous completion-wake pump.
+
+Owned cleanup is awaited by ordinary sessions, failed composition, kernel runs and delegated/continued children. Cleanup failure cannot become a successful child result or a successful handoff. A still-running driver does not receive a false signed close. Read-only stop control (`job_kill`) is deliberate: it only cancels an already owned producer and must remain callable while that producer holds the pipeline write lock. Tool evidence and owner/policy fences still apply. Read/list tools also use READ_ONLY; terminal writes use WRITE_HIGH.
+
+The library-only labels were removed only from the now-consumed job and terminal service modules; the label test verifies their real production consumer. No package/lockfile, shared node_modules, research, MCP source, processTree, reserved filesystem/bash argument code or other worktree was edited. No dependency was installed, no freeze exception was added, and no tracked file was deleted. Two narrow dead-code acceptances preserve the existing exported TERMINAL_SEAM token and TerminalSeamService class for kernel extension compatibility. The plugin uses them internally; no production implementation is being excused as unreachable. Only the two stale unused-file entries for the now-composed job and terminal modules are removed. The exact pre-update delta is preserved in wp16-quality-delta.json.
+
+The PTY wiring uses the existing Linux Bubblewrap/system-Python backend; it needs no new npm/native addon. Actual Linux PTY execution was not qualified in this macOS sandbox. Default CLI/ACP composition provides no interactive host authorizer; programmatic `AgentSessionInit.nativeTerminal` supplies explicit authority. Unsupported platforms and missing grants refuse execution. No unconfined fallback, detach/reattach, new CLI command or Studio route was added. Bash's separate run_in_background argument remains refused; `job_start` is the admitted launch tool.
+
+## Tests and red/green evidence
+
+There are 66 added test cases: 46 in six new WP16 files, 18 added registry cases, one label-consumer case and one SIGTERM case. The existing kernel service disposal test also gained late-admission assertions.
+
+The final focused run passed 95/95 across ten files: `jobRegistry.test.ts` (30), `wp16JobTools.test.ts` (10), `wp16TerminalTools.test.ts` (12), `wp16Shutdown.test.ts` (5), `wp16NativeComposition.test.ts` (11), `unwiredContractsLabelled.test.ts` (14), `wp16KernelShutdown.test.ts` (1), `wp16SubagentLifecycle.test.ts` (7), plus the five existing kernel-runtime/barrel/SBOM cases across two files. See `wp16-final-focused.log`.
+
+The six-file existing core run passed 116/117: CLI loop (11), delegation flags (35), budgets (27), shell composition (17) and tool pool (7) all passed. Toolset wiring passed 19/20; its real Seatbelt shell launch failed. A minimal host probe independently returned `sandbox-exec: sandbox_apply: Operation not permitted`, exit 71. This is retained as an unqualified environment path, not a passing shell test. See `wp16-final-core.log` and `wp16-seatbelt-environment.log`.
+
+A separate delegated lifecycle run passed 64/64 across the new lifecycle file and existing `subagentContinuable`, `subagentStopConditions`, `subagentForeignContract` and `subagentCancellation` files. The earlier 110-file affected-test sweep was stopped after repeated socket-backed fixture refusals/timeouts; it has no aggregate pass result. Its manifest and log are preserved. The final 85-file rerun excludes 19 files containing socket-related code or references and the six core files; its exact manifest is `wp16-final-existing-files.txt`. Excluded fixtures are listed in `wp16-socket-fixture-files.txt`. Socket qualification remains blocked by `listen EPERM 127.0.0.1` in this sandbox; excluded files are not claimed passed.
+
+The 85-file run finished with 81 files passed and four files failed: 1,142 cases passed, five failed, plus one unhandled socket-fixture error. It had loaded the earlier MCP assertion; the corrected full MCP file subsequently passed 27/27 in `wp16-mcp-final.log`, and its final strict test types passed in `wp16-final-mcp-typecheck.log`. The four remaining failed cases are environmental: `toolsetConfinementProperty.test.ts` (11/13 passed; both failures are sandbox-exec sandbox_apply Operation not permitted, exit 71), `execProcessTree.test.ts` (12/13 passed; `spawnSync ps EPERM` during the PGID probe), and `piAi/piAiCli.test.ts` (2/3 passed; the loopback fixture throws `listen EPERM 127.0.0.1`, causing its test timeout and the unhandled error). This run is not claimed as an all-green qualification run. The verifier rebuild overlapped its final portion; no import/startup failures occurred, and production source did not change. The exact log is `wp16-final-existing.log`.
+
+Two existing assertions changed for correctness. The registry existence-oracle test now uses an actually generated foreign-owner ID rather than a nonexistent hard-coded `bash-1`. The native MCP cancellation test now expects TOOL_OUTCOME_UNKNOWN after a dispatched request explicitly reports uncertain remote effects; its mount reuse/disposal checks remain. The old CANCELLED expectation reproduced a real assertion failure in `wp16-mcp-cancel-red.log`. No MCP source was changed.
+
+Real red/green artifacts also cover stale-ID collision, premature kernel sealing, public asynchronous child cleanup, and unknown job-stop results being overwritten by turn cancellation. Guard mutation evidence covers 32 reversions across 13 isolated Vitest transform runs, with matching source hashes before/after and corresponding assertion failures for every planned reversion. These are grouped runs, not 32 independent executions. Receipts: `wp16-mutation-receipt.json`, `wp16-subagent-mutation-receipt.json`, `wp16-runner-mutation-receipt.json`, `wp16-mutant-stop-unknown-receipt.json`; the stale-ID probe log is `wp16-mutant-probe.log`. All production hashes still match the recorded restored source.
+
+Tests use Node 22.23.3, the original Vitest config with `--configLoader runner --cache=false --maxWorkers=2`, and external task-specific checkpoint directories. A 30-second fixture hook allowance avoids signing-fixture setup timeouts under concurrent load; behavior deadlines were not relaxed. The full repository test suite was not run.
+
+## Final verification result
+
+The exact required command `bash /Users/sid/AgentMaturityCompass-worktrees/s442cd919/work/verify-wt.sh /Users/sid/AgentMaturityCompass-worktrees/s442cd919/work/amc-gap-wp16 dff352a3e` **exited 0** on the final rerun. Build, source typecheck, test typecheck, lint, counts, docs drift, citations, architecture boundaries, threat model, API reference, schemas, gates, dead code, duplicates and freeze all passed. `git diff --check` also passed.
+
+The first full verifier run exited 1 only for the terminal export findings and two stale module entries. That failure is preserved in `wp16-verify-first-pass.log` and its exit-code file. The authorized narrow baseline update now has zero new and zero stale findings; it retains all prior acceptance values and their original ordering. No freeze exception or wholesale rebaseline was used.
+
+Git staging was refused by the sandbox before amendment, as expected. HEAD remains the base SHA above; nothing was committed, pushed or merged.
+
+Regeneration updates test-source inventory counts from 2,194 to 2,200 in ten documentation/site targets (`CONTRIBUTING.md`, `README.md`, the two content drafts, the two internal documents, three website files and the whitepaper). It also adds the patch release note in `docs/releases/2.0.0.md` (326 changesets). These are inventory counts, not passing-test claims.
+
+Final verifier output tail:
+
+```text
+check:api-ref ok
+check:schemas ok
+check:gates ok
+check:dead-code ok
+check:duplicates ok
+freeze ok
+```
+
+
+## Remaining qualification and review
+
+Claude must review this uncommitted candidate, run the 19 excluded files and the blocked socket/Seatbelt/process-inspection cases in a permitted host, and qualify real Linux PTYs before accepting physical PTY support. Commit and merge only after review and the required qualification. Existing external-writer limits and unproven process-tree outcomes remain explicit. Detach/reattach remains separately admitted scope. The conventional commit message is `wp16-commit-message.txt` and ends with the required Codex co-author trailer.

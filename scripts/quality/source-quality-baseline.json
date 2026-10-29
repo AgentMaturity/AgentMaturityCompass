@@ -1641,7 +1641,6 @@
     {"id":"3d802a20630f5cce3d5c0a52fbdd53dfcc39848aee214d0f301e8c5ea3146a26","file":"src/steer/index.ts","kind":"exports"},
     {"id":"3d903cc181de2437fede1ae63c4838493ccce6cec5fd0b88f9fa311cabdac536","file":"src/credentials/index.ts","kind":"types"},
     {"id":"3dd46e3b0a4b41bc3163d0b90c4b83dafbf2557e519216256c22980b94fcba1f","file":"src/org/orgSchema.ts","kind":"types"},
-    {"id":"3de4d1b366eaed94ca039523d95b33309aafeaad01461c7dae401631c0972752","file":"src/kernel/services/terminalServices.ts","kind":"files"},
     {"id":"3df41d74720a7a4a40cbd9302ddf677703b32f633cefbaad7e484eedab42e81c","file":"src/benchmarks/replayBenchmarkCorpus.ts","kind":"types"},
     {"id":"3e36cb3fa992d159f60bdb4e4ccaa5feacf0507779be311944051da9f03cdf9d","file":"src/incidents/index.ts","kind":"types"},
     {"id":"3e68d8cb3810e51d08be578cb14ade1067735d59a6233624ea87d1b9bdda9a85","file":"src/benchmarks/huggingFacePublisher.ts","kind":"types"},
@@ -2099,7 +2098,6 @@
     {"id":"6c2ffeb61a7e0eb27729f6ffee5f792b0accb3d9015798b1b7eb398df8845ab0","file":"src/incidents/index.ts","kind":"exports"},
     {"id":"6c6421558c6e075c9372b0804dd1d66a0d958ff761902681831b8246edd7c41c","file":"src/benchmarks/replayBenchmarkCorpus.ts","kind":"types"},
     {"id":"6c8c978276c1037bbea53f7326d35f29cd7304389ecd22a5d228e21730b57674","file":"src/cgx/cgxSchema.ts","kind":"exports"},
-    {"id":"6cbcde8f1b2fc030d114c3cf08a6fb375097b7bc4046c60e3fea21e761d6b267","file":"src/kernel/services/jobServices.ts","kind":"files"},
     {"id":"6cbf523fce1c1cbcc8d4615977cdd2bf4274f893a52695bc4b89769de8c10f91","file":"src/passport/passportSchema.ts","kind":"exports"},
     {"id":"6cbf703cc501f6bfb3b51f88b09937371c7b0ebdf8e6191f0175e14af903c55d","file":"src/steer/index.ts","kind":"types"},
     {"id":"6cc45bc09f901999dee7aa8c28ac48755bf43fd7e981b9dbc606e1d589e98c35","file":"src/benchmarks/replayBenchmarkCorpus.ts","kind":"types"},
@@ -3899,7 +3897,9 @@
     {"id":"3b8ef2e6fc35fe370238c15ba22e00552f579291d65a935d01b00097fbe0bb60","scan":"duplicates","reason":"AXE-27: retain existing synchronous and asynchronous faithfulness aggregation; nullable evidence fields changed clone fingerprints while both paths share finite ratios and regression coverage.","acceptedBy":"AgentMaturity","date":"2026-10-29"},
     {"id":"488147c468e15c28e5d717710f25b6ea0502988039d6afd47fbd55094caa8244","scan":"duplicates","reason":"AXE-27: retain existing lexical similarity helpers for failure grouping and session evaluation; documenting empty-set identity exposed this clone boundary without adding copied runtime logic.","acceptedBy":"AgentMaturity","date":"2026-10-29"},
     {"id":"91f40f87bc4e7638845ab4703788004cbcf470a15f195a3911ea6f147ebb1542","scan":"duplicates","reason":"AXE-27: retain existing synchronous and asynchronous faithfulness aggregation; nullable evidence fields changed clone fingerprints while both paths share finite ratios and regression coverage.","acceptedBy":"AgentMaturity","date":"2026-10-29"},
-    {"id":"ff4a97f6d72c856826f12e0797df9063bb4021049410ddd9927f17384d73965e","scan":"dead-code","reason":"AXE-27: preserve existing public probe and diagnostic contracts for external evaluators; new regression coverage exposed these prior exports to Knip without adding unused runtime logic.","acceptedBy":"AgentMaturity","date":"2026-10-29"}
+    {"id":"ff4a97f6d72c856826f12e0797df9063bb4021049410ddd9927f17384d73965e","scan":"dead-code","reason":"AXE-27: preserve existing public probe and diagnostic contracts for external evaluators; new regression coverage exposed these prior exports to Knip without adding unused runtime logic.","acceptedBy":"AgentMaturity","date":"2026-10-29"},
+    {"id":"9ddbcdb49b3c930ad0e54d2214edb625e823efea137db8baa9ed82308eb63689","scan":"dead-code","reason":"Retain the existing public terminal seam token for kernel extension compatibility; production mounts the facade through terminalServices.","acceptedBy":"AgentMaturity","date":"2026-10-29"},
+    {"id":"a87ae61acc0b46021cce3944069451cf306582ebcbcdcb5f514aa80cd1c2cc73","scan":"dead-code","reason":"Retain the existing public terminal service class for kernel extension compatibility; production instantiates it inside terminalServices.apply.","acceptedBy":"AgentMaturity","date":"2026-10-29"}
   ],
   "rebaselines": [
     {"scan":"duplicates","toolFrom":"","toolTo":"5.4.0","configFrom":"","configTo":"b0b0290eb79f02e99c8e4c3e0fea8182d56903f2e2512643a783307dac64e209","added":1254,"reason":"initial baseline (D-11)","rebaselinedBy":"AgentMaturity","date":"2026-10-11"},

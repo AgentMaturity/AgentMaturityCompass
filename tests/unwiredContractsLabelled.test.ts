@@ -97,6 +97,17 @@ describe("WP46 unwired contract labels", () => {
     if (labelled) expect(header).toMatch(/src\/[\w/]+\.ts/);
   });
 
+  test("WP16 job and terminal services have a real native composition consumer", () => {
+    for (const file of ["src/kernel/services/jobServices.ts", "src/kernel/services/terminalServices.ts"]) {
+      expect(productionConsumers(file, sources, parsed)).toContain("src/agent/nativeBackground.ts");
+      expect(sources.get(file)).not.toMatch(/library-only, not enforced/i);
+    }
+    const composition = sources.get("src/agent/nativeBackground.ts")!;
+    expect(composition).toContain("ctx.plugin(jobServices");
+    expect(composition).toContain("ctx.plugin(terminalServices");
+    expect(sources.get("src/agent/agentToolset.ts")).toContain("composeNativeBackground");
+  });
+
   test("marker detection is named honestly and the old export remains deprecated", () => {
     const marker = (approvalClient as unknown as Record<string, unknown>).hasApprovalTokenMarker;
     expect(typeof marker).toBe("function");

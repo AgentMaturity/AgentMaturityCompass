@@ -22,13 +22,9 @@ import { hostname } from "node:os";
  * tests. The packaged runtime bundles the kernel and its workspace dependencies
  * through src/kernel/amcRuntime.ts.
  *
- * HOW A TURN IS CANCELLED. With Ctrl-C, or with `--cancel-after`. There is no
- * `agent-loop cancel <session>` because there is no cross-process control
- * channel yet: a command that pretended to stop an agent in another process
- * would be a command that silently did nothing. What both supported paths do is
- * the real thing — `cancel({kind:"user"})`, which writes a signed `loop/cancel`
- * row and closes the turn `cancelled` with its cause inside the hashed
- * `turn/end`.
+ * HOW A TURN IS CANCELLED. Ctrl-C and `--cancel-after` name a user stop;
+ * SIGTERM names a parent stop requested by `signal:SIGTERM`. Each writes a
+ * signed `loop/cancel` and closes the turn `cancelled` with its cause in the hashed `turn/end`.
  */
 import type { Command } from "commander";
 import { resolveAgentId } from "./fleet/paths.js";
@@ -611,10 +607,11 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       }
       const timers: NodeJS.Timeout[] = [];
       let onSigint: (() => void) | null = null;
+      let onSigterm: (() => void) | null = null;
       const mcpMounts: MountedNativeMcpServer[] = [];
       const mcpAbort = new AbortController();
       const cancelMcp = () => mcpAbort.abort();
-      if (mcpServers.length) process.on("SIGINT", cancelMcp);
+      if (mcpServers.length) { process.on("SIGINT", cancelMcp); process.on("SIGTERM", cancelMcp); }
       breadth.armCancel();
 
       try {
@@ -749,7 +746,13 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
               io.error(chalk.yellow("\ncancelling the turn (cause: user)…"));
               handle.cancel({ kind: "user" });
             };
+            onSigterm = () => {
+              io.error(chalk.yellow("\ncancelling the turn (signal: SIGTERM)…"));
+              handle.cancel({ kind: "parent" }, { by: "signal:SIGTERM" });
+              void handle.shutdown();
+            };
             process.on("SIGINT", onSigint);
+            process.on("SIGTERM", onSigterm);
             if (cancelAfter > 0) {
               timers.push(setTimeout(() => handle.cancel({ kind: "user" }), cancelAfter));
             }
@@ -767,10 +770,12 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       } finally {
         for (const timer of timers) clearTimeout(timer);
         if (onSigint !== null) process.removeListener("SIGINT", onSigint);
+        if (onSigterm !== null) process.removeListener("SIGTERM", onSigterm);
         const closed = await Promise.allSettled(mcpMounts.map(mount => mount.close()));
         try { if (closed.some(result => result.status === "rejected")) { io.error("MCP cleanup failed; this mount must not be reused."); io.fail(); } }
         finally {
           process.removeListener("SIGINT", cancelMcp);
+          process.removeListener("SIGTERM", cancelMcp);
           breadth.dispose();
           workspaceToolset?.close();
         }

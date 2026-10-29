@@ -43,6 +43,7 @@ import { randomBytes } from "node:crypto";
 import type { SessionEventRef, SessionService } from "../session/sessionService.js";
 import type { TokenUsage, TurnCancelCause, TurnTrigger } from "../session/sessionTypes.js";
 import { isTurnCancelCause } from "../session/sessionTypes.js";
+import { canonicalTurnCancelCause } from "../session/turnLifecycleMeta.js";
 import { LoopInbox } from "./inbox.js";
 import type { NativeImageInput } from "../attachments/nativeImageInput.js";
 import { recordNativeImageMessage } from "./nativeImageMessage.js";
@@ -126,6 +127,8 @@ export class AgentDriver {
   private phase: Phase = { kind: "idle", lastTurn: 0 };
 
   private activityDone: Promise<void> = Promise.resolve();
+  private admissionClosed = false;
+  private disposal: Promise<boolean> | null = null;
 
   /** The last row this driver committed. Named by a `loop/cancel` as its observed head. */
   private head: SessionEventRef | null = null;
@@ -167,6 +170,9 @@ export class AgentDriver {
   get status(): AgentStatus {
     return this.phase.kind;
   }
+
+  /** Disposal closes admission before any asynchronous cleanup starts. */
+  get disposed(): boolean { return this.admissionClosed; }
 
   get sessionId(): string {
     return this.session.sessionId;
@@ -249,11 +255,12 @@ export class AgentDriver {
     if (!isTurnCancelCause(cause)) {
       throw new Error("AgentDriver.cancel: a cancellation must name its cause");
     }
+    const boundedCause = canonicalTurnCancelCause(cause);
     const keepInbox = options.keepInbox === true;
     try {
       this.head = this.session.recordLoopEvent({
         kind: "cancel",
-        cause,
+        cause: boundedCause,
         keepInbox,
         requestedBy: options.by ?? "local",
         observedHeadEventId: this.head?.eventId ?? null,
@@ -268,7 +275,7 @@ export class AgentDriver {
     }
     // The cause IS the abort reason, so the turn's catch reads back exactly what
     // the canceller named rather than re-deriving it from somewhere else.
-    if (this.phase.kind === "running") this.phase.abort.abort(cause);
+    if (this.phase.kind === "running") this.phase.abort.abort(boundedCause);
   }
 
   /**
@@ -286,7 +293,29 @@ export class AgentDriver {
     } while (activity !== this.activityDone);
   }
 
+  /**
+   * Close admission, request cancellation, and wait a bounded time for logical
+   * work to settle. False is unconfirmed cleanup; the host must not seal it as
+   * clean or reuse this driver. Producer cleanup belongs to its resource owner.
+   */
+  dispose(graceMs = Math.min(30_000, Math.max(1_000, this.config.toolAbandonGraceMs + 1_000))): Promise<boolean> {
+    if (this.disposal) return this.disposal;
+    if (!Number.isSafeInteger(graceMs) || graceMs < 0 || graceMs > 30_000) throw new RangeError("Driver disposal grace must be between 0 and 30000 ms.");
+    this.admissionClosed = true;
+    let settle!: (confirmed: boolean) => void;
+    // Reserve before cancellation emits any row or observer notification.
+    this.disposal = new Promise<boolean>(resolve => { settle = resolve; });
+    const timer = setTimeout(() => settle(false), graceMs);
+    if (this.phase.kind !== "failed" && (this.phase.kind === "running" || this.inbox.hasPending)) {
+      try { this.cancel({ kind: "disposed" }, { by: "host:dispose" }); }
+      catch { if (this.phase.kind === "running") this.phase.abort.abort({ kind: "disposed" }); }
+    }
+    void this.whenIdle().then(() => { clearTimeout(timer); settle(true); }, () => { clearTimeout(timer); settle(false); });
+    return this.disposal;
+  }
+
   private assertUsable(): void {
+    if (this.admissionClosed) throw new Error("AgentDriver is disposed: new work is refused");
     if (this.phase.kind === "failed") {
       throw new Error(
         "AgentDriver is in a terminal failed state: its session has an open turn that only recovery may close"
@@ -323,7 +352,7 @@ export class AgentDriver {
    * teardown must never wait on a model turn.
    */
   private wakeDriver(wakeAfterAbort = false): void {
-    if (this.phase.kind === "failed") return;
+    if (this.admissionClosed || this.phase.kind === "failed") return;
     if (this.phase.kind === "running") {
       const reason: unknown = this.phase.abort.signal.reason;
       const disposed = isTurnCancelCause(reason) && reason.kind === "disposed";

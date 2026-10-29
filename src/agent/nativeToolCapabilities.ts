@@ -27,7 +27,18 @@ export const NATIVE_BUILTIN_CAPABILITIES: readonly NativeToolCapability[] = Obje
   { name: "plan", actionClass: "READ_ONLY" },
   // DXC-29: loads an attributed skill body; denied until the signed tools policy lists it.
   { name: "skill.load", actionClass: "READ_ONLY" },
-  { name: "get_goal", actionClass: "READ_ONLY" }
+  { name: "get_goal", actionClass: "READ_ONLY" },
+  { name: "job_start", actionClass: "WRITE_HIGH" },
+  { name: "job_list", actionClass: "READ_ONLY" },
+  { name: "job_output", actionClass: "READ_ONLY" },
+  { name: "job_kill", actionClass: "READ_ONLY" },
+  { name: "terminal_open", actionClass: "WRITE_HIGH" },
+  { name: "terminal_list", actionClass: "READ_ONLY" },
+  { name: "terminal_read", actionClass: "READ_ONLY" },
+  { name: "terminal_send", actionClass: "WRITE_HIGH" },
+  { name: "terminal_signal", actionClass: "WRITE_HIGH" },
+  { name: "terminal_resize", actionClass: "WRITE_HIGH" },
+  { name: "terminal_close", actionClass: "WRITE_HIGH" }
 ].map(capability => Object.freeze(capability as NativeToolCapability)));
 
 /** These become executable only when a caller also supplies the delegation capability. */

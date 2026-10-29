@@ -146,6 +146,8 @@ export interface ToolPipelineInit {
 }
 
 export interface ToolCallInput {
+  /** Trusted native session step that owns any work this call starts. */
+  readonly ownerStep?: ToolExecution["ownerStep"];
   /** The turn's cancellation signal, for a body long enough to need one. */
   readonly signal?: AbortSignal;
   /** See `ToolExecution.onApprovalWait`. */
@@ -329,6 +331,7 @@ export class ToolPipeline {
         effectiveMode: input.requestedMode,
         arguments: freezeToolArguments(input.arguments),
         parentToken: input.parentToken ?? null,
+        ...(input.ownerStep === undefined ? {} : { ownerStep: Object.freeze({ ...input.ownerStep }) }),
         ...(input.signal === undefined ? {} : { signal: input.signal }),
         ...(input.onApprovalWait === undefined ? {} : { onApprovalWait: input.onApprovalWait })
       };

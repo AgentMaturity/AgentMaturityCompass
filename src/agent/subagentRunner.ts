@@ -240,6 +240,14 @@ export function createDriverRunner(init: DriverRunnerInit): SubagentRunner {
     const session = redactingSessionFor(new SessionService(init.workspace)); // P2-02: opt-in redaction before commit
     let toolset: ReturnType<typeof agentToolset> | undefined;
     let driver: AgentDriver | undefined;
+    let composed: ReturnType<typeof composeNativeAgent> | undefined;
+    let finalization: Promise<void> | undefined;
+    let releasing: Promise<void> | undefined;
+    let activeDone: Promise<void> = Promise.resolve();
+    let endActive: () => void = () => undefined;
+    let abandonDrain!: (error: unknown) => void;
+    const shutdownFailure = new Promise<never>((_resolve, reject) => { abandonDrain = reject; });
+    void shutdownFailure.catch(() => undefined);
     let opened = false;
     let sessionSettled = false;
     let active = false;
@@ -249,41 +257,70 @@ export function createDriverRunner(init: DriverRunnerInit): SubagentRunner {
     let parentCancelled = false;
     let releaseError: unknown;
 
-    const finalize = (): void => {
-      if (resourcesClosed || active) return;
+    const finalize = (): void | Promise<void> => {
+      if (resourcesClosed || active) return finalization;
+      const pending = (toolset?.hasOwnedWork() ?? false) || driver?.status === "running";
       resourcesClosed = true;
       ctx.signal?.removeEventListener("abort", onParentAbort);
-      try { toolset?.close(); } catch (error) { releaseError ??= error; }
-      try {
-        if (sessionSettled) { /* settled by the failed composition */ }
-        else if (opened) session.close({ reason: "completed" });
-        else session.disposeWithoutClosing();
-      } catch (error) {
-        // A failed writer remains visibly incomplete. Dispose its DB handle
-        // without claiming that a refused close was a successful seal.
-        releaseError ??= error;
-        try { session.disposeWithoutClosing(); } catch { /* preserve original close failure */ }
+      const seal = (confirmed: boolean, driverConfirmed = true): void => {
+        if (!confirmed) releaseError ??= new Error("TOOL_OUTCOME_UNKNOWN: delegated resource cleanup is unconfirmed.");
+        try {
+          if (sessionSettled) { /* settled by the failed composition */ }
+          else if (!driverConfirmed || driver?.status === "failed") session.disposeWithoutClosing();
+          else if (opened) session.close({ reason: confirmed ? "completed" : "resource_outcome_unknown" });
+          else session.disposeWithoutClosing();
+        } catch (error) {
+          releaseError ??= error;
+          try { session.disposeWithoutClosing(); } catch { /* preserve original close failure */ }
+        }
+        composed?.dispose();
+      };
+      const idle = driver?.dispose() ?? Promise.resolve(true);
+      const shutdown = composed?.shutdown() ?? toolset?.shutdown() ?? Promise.resolve(true);
+      if (pending) {
+        finalization = Promise.all([idle, shutdown]).then(async ([driverConfirmed, confirmed]) => {
+          try { await toolset?.close(); } catch (error) { releaseError ??= error; confirmed = false; }
+          seal(confirmed && driverConfirmed, driverConfirmed);
+        }, error => { releaseError ??= error; seal(false, false); });
+        return finalization;
       }
+      void shutdown.catch(error => { releaseError ??= error; });
+      try { void toolset?.close(); } catch (error) { releaseError ??= error; }
+      seal(true);
     };
-    const release = (): void => {
+    const release = (): void | Promise<void> => {
       releaseRequested = true;
       ctx.signal?.removeEventListener("abort", onParentAbort);
       if (active) {
-        driver?.cancel({ kind: "disposed" }, { by: "delegation-handle-close" });
-        return; // The active drain owns settlement and closes resources afterward.
+        if (releasing) return releasing;
+        let resolve!: () => void, reject!: (error: unknown) => void;
+        releasing = new Promise<void>((yes, no) => { resolve = yes; reject = no; });
+        // Legacy hosts may ignore close's return; a caller that awaits it still sees the rejection.
+        void releasing.catch(() => undefined);
+        try { driver?.cancel({ kind: "disposed" }, { by: "delegation-handle-close" }); }
+        catch (error) { releaseError ??= error; }
+        const stop = composed?.shutdown() ?? driver?.dispose() ?? Promise.resolve(true);
+        void stop.then(async confirmed => {
+          if (!confirmed) {
+            releaseError ??= new Error("TOOL_OUTCOME_UNKNOWN: delegated driver or resource cleanup is unconfirmed.");
+            abandonDrain(releaseError);
+          }
+          await activeDone;
+          if (releaseError !== undefined) reject(releaseError); else resolve();
+        }, error => { releaseError ??= error; abandonDrain(error); void activeDone.then(() => reject(error)); });
+        return releasing;
       }
-      finalize();
+      const done = finalize();
+      if (done) return done.then(() => { if (releaseError !== undefined) throw releaseError; });
       if (releaseError !== undefined) throw releaseError;
     };
     const onParentAbort = (): void => {
       if (parentCancelled || resourcesClosed) return;
       parentCancelled = true;
-      releaseRequested = true;
       try { driver?.cancel({ kind: "parent" }, { by: "parent-delegation" }); }
       catch (error) { releaseError ??= error; }
-      // Never close a DB underneath a live tool/approval turn. Idle continued
-      // children can close immediately; a running drain does so in its finally.
-      if (!active) finalize();
+      try { const closed = release(); if (closed) void closed.catch(error => { releaseError ??= error; }); }
+      catch (error) { releaseError ??= error; }
     };
 
     // P2-25: the parent's own lease is extended to this child (narrowing only, depth cap 3) before its session opens; a
@@ -306,7 +343,6 @@ export function createDriverRunner(init: DriverRunnerInit): SubagentRunner {
       // Inherited control, recorded before the driver exists so no turn can
       // precede the row that says what governed it. See `childHooks`.
       const { hooks, inherited } = childHooks(control);
-      let composed;
       try {
         composed = composeNativeAgent({
           session,
@@ -341,6 +377,8 @@ export function createDriverRunner(init: DriverRunnerInit): SubagentRunner {
               ...(gate.initiator === undefined ? {} : { initiator: gate.initiator }) });
             return approval === undefined || gate === undefined ? childTools.seam : gateToolCallsOnApproval(childTools.seam, approval, gate);
           },
+          cleanup: () => toolset?.shutdown() ?? Promise.resolve(true),
+          hasOwnedWork: () => toolset?.hasOwnedWork() ?? false,
           admit: () => recordHookControl({ session, ctx, inherited, gate, scope, descendantScope, descendantStops }),
           ...(config === undefined ? {} : { driver: { config } })
         });
@@ -362,9 +400,10 @@ export function createDriverRunner(init: DriverRunnerInit): SubagentRunner {
         }
         if (active) return { ok: false, text: "", reason: "child already has an active turn" };
         active = true;
+        activeDone = new Promise<void>(resolve => { endActive = resolve; });
         try {
           driver!.followup(text);
-          await driver!.whenIdle();
+          await Promise.race([driver!.whenIdle(), shutdownFailure]);
           const summary = readAgentRunSummary(init.workspace, ctx.childSessionId, driver!.status);
           const ending = summary.endings.at(-1);
           const stopped = parentCancelled || ctx.signal?.aborted
@@ -405,9 +444,11 @@ export function createDriverRunner(init: DriverRunnerInit): SubagentRunner {
           throw error;
         } finally {
           active = false;
-          if (releaseRequested) finalize();
-          // oxlint-disable-next-line no-unsafe-finally -- A child cannot report success after its writer release failed.
-          if (releaseError !== undefined) throw releaseError;
+          try {
+            if (releaseRequested) await finalize();
+            // oxlint-disable-next-line no-unsafe-finally -- A child cannot report success after its writer release failed.
+            if (releaseError !== undefined) throw releaseError;
+          } finally { endActive(); }
         }
       };
       const first = await drain(ctx.goal);
@@ -415,7 +456,9 @@ export function createDriverRunner(init: DriverRunnerInit): SubagentRunner {
       keepAlive = true;
       return { ...first, continuation: { continue: drain, close: release } };
     } finally {
-      if (!keepAlive) release();
+      if (!keepAlive) await release();
+      // oxlint-disable-next-line no-unsafe-finally -- A successful turn is not successful owned-resource cleanup.
+      if (!keepAlive && releaseError !== undefined) throw releaseError;
     }
   };
   // Declared, so `spawnSubagent` can tell a driver runner from one that says nothing about control.

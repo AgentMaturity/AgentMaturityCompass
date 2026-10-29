@@ -92,6 +92,7 @@ export interface AgentSessionInit {
   /** WP40 seam: a surface's signed ask_user answerer and operator-configured web_search provider, passed to the toolset. */
   readonly askUser?: AgentToolsetOptions["askUser"];
   readonly webSearchProvider?: AgentToolsetOptions["webSearchProvider"];
+  readonly nativeTerminal?: AgentToolsetOptions["nativeTerminal"];
   readonly maxSteps?: number;
   /** Automatic compaction; off unless `contextWindowTokens` is declared. */
   readonly compaction?: Partial<CompactionConfig>;
@@ -185,6 +186,7 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
       ...(init.unconfinedShell === undefined ? {} : { unconfinedShell: init.unconfinedShell }),
       ...(init.askUser === undefined ? {} : { askUser: init.askUser }),
       ...(init.webSearchProvider === undefined ? {} : { webSearchProvider: init.webSearchProvider }),
+      ...(init.nativeTerminal === undefined ? {} : { nativeTerminal: init.nativeTerminal }),
       ...lease,
       // Handing over the writer is what keeps the session ANCHORABLE. Pointing the
       // rows at the right session id was only half of it: written through the raw
@@ -209,23 +211,34 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
     let driver!: AgentDriver;
     let composed: NativeAgent | undefined;
     let composing = false;
-    const finish = (release: boolean): void => withWorkspaceScope(workspace, () => {
-      if (closed) return;
+    let closing: Promise<void> | undefined;
+    const finish = (release: boolean): void | Promise<void> => withWorkspaceScope(workspace, () => {
+      if (closed) return closing;
       if (running) throw new Error("Cancel and settle the active prompt before closing or releasing its session.");
-      try {
-        if (release) session.releaseWithoutClosing();
-        else {
-          if (driver?.status === "failed") throw new Error("Cannot seal a failed driver with incomplete evidence.");
-          session.close({ reason: "completed" });
+      const pending = toolset?.hasOwnedWork() ?? false;
+      closed = true; // Close admission before the first await, including duplicate close/release calls.
+      const seal = (confirmed: boolean): void => {
+        try {
+          if (release) {
+            if (!confirmed) throw new Error("Cannot release a session whose owned resource cleanup is unknown.");
+            session.releaseWithoutClosing();
+          } else {
+            if (driver?.status === "failed") throw new Error("Cannot seal a failed driver with incomplete evidence.");
+            session.close({ reason: confirmed ? "completed" : "resource_outcome_unknown" });
+          }
+        } catch (error) {
+          session.disposeWithoutClosing();
+          throw error;
+        } finally {
+          composed?.dispose();
+          void toolset?.close();
         }
-      } catch (error) {
-        session.disposeWithoutClosing();
-        throw error;
-      } finally {
-        closed = true;
-        composed?.dispose();
-        toolset?.close();
-      }
+      };
+      const shutdown = composed?.shutdown() ?? Promise.resolve(true);
+      if (pending) { closing = shutdown.then(seal); return closing; }
+      // Preserve the synchronous no-resource close contract. shutdown already closed idle driver admission.
+      void shutdown.catch(() => undefined);
+      seal(true);
     });
 
     try {
@@ -249,6 +262,8 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
           toolset = init.tools === "none" ? undefined : makeToolset();
           return init.bindTools?.({ session, toolset: toolset ?? null }) ?? toolset?.seam ?? EMPTY_TOOL_SEAM;
         },
+        cleanup: () => toolset?.shutdown() ?? Promise.resolve(true),
+        hasOwnedWork: () => toolset?.hasOwnedWork() ?? false,
         // P2-23 reassessment triggers and P2-26 change envelopes run on the composed tool surface, before the first turn;
         // an out-of-envelope change throws here and the session is settled as a failed composition.
         admit: ({ systemPrompt, tools }) => admitSessionAtOpen({ workspace, agentId: init.agentId, manifest: () => nativeSessionManifest({ workspace, agentId: init.agentId,

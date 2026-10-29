@@ -213,7 +213,10 @@ describe("native MCP pinned stdio integration", () => {
     const mountAbort = new AbortController(); await fixture.mount({ signal: mountAbort.signal });
     const controller = new AbortController(), running = fixture.call("lookup", { query: "wait" }, controller.signal);
     await vi.waitFor(() => expect(fixture.calls()).toHaveLength(1)); controller.abort();
-    expect((await running).outcome).toBe("CANCELLED");
+    // The request stopped after dispatch; cancellation cannot prove the remote effect did not happen.
+    const cancelled = await running;
+    expect(cancelled.outcome).toBe("TOOL_OUTCOME_UNKNOWN");
+    expect(String(cancelled.content)).toContain("remote tool may have executed");
     fixture.change({ tools: [tool()] });
     expect((await fixture.call("lookup", { query: "after request abort" })).outcome).toBe("OK"); expect(fixture.calls()).toHaveLength(2);
     mountAbort.abort();

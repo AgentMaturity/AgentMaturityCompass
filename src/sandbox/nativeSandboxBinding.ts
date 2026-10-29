@@ -70,6 +70,7 @@ export function nativeSandboxPermitMatches(permit: NativeSandboxValidationPermit
  */
 export function createNativeSandboxBash(options: {
   readonly workspace: string;
+  readonly onOutput?: (execution: ToolExecution, stream: "stdout" | "stderr", text: string) => void;
   readonly scrubValues?: readonly string[];
   readonly record: (execution: ToolExecution, outcome: SandboxOutcome) => void;
   /** Records each egress proxy decision; without it a signed egress allowlist refuses the call. */
@@ -100,6 +101,7 @@ export function createNativeSandboxBash(options: {
       if (execution.signal?.aborted) throw new Error("Native shell was cancelled before dispatch.");
       const policy = { ...nativeShellSandboxPolicy(workspace, timeoutMs, execution.signal, scrubValues, admission.policySha256),
         egressScope: { workspace, agentId: execution.agentId },
+        ...(options.onOutput ? { onOutput: (stream: "stdout" | "stderr", text: string) => options.onOutput!(execution, stream, text) } : {}),
         ...(recordEgress ? { onEgress: (row: ShellEgressRow) => recordEgress(execution, row) } : {}) };
       const backend = process.platform === "darwin" ? seatbeltNativeShell() : bwrapBackend();
       // Policy preparation awaits imports; a directory replaced during that time cannot escape the workspace.

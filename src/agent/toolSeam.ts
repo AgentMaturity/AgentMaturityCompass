@@ -68,6 +68,9 @@ export interface ToolCallOutcome {
 
 /** How the loop reaches a tool registry. */
 export interface AgentToolSeam {
+  /** Native resource cleanup before the owning writer closes or is handed off. */
+  shutdown?(): Promise<boolean>;
+  hasOwnedWork?(): boolean;
   /**
    * The tools to offer the model, or null for a request that offers none.
    *

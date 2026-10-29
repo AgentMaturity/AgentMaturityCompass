@@ -46,7 +46,7 @@
  * a step claims it — projecting it earlier would show the model a steer nobody
  * had yet decided to deliver.
  */
-import { canonicalTurnCancelCause } from "./turnLifecycleMeta.js";
+import { boundedCancellationText, canonicalTurnCancelCause } from "./turnLifecycleMeta.js";
 import { isTurnCancelCause, type TurnCancelCause } from "./sessionTypes.js";
 import type { EvidenceEventType } from "../types.js";
 
@@ -284,7 +284,7 @@ export function buildLoopEventRow(record: LoopEventRecord): LoopEventRow {
         meta: {
           cause: canonicalTurnCancelCause(assertCause(record.cause)),
           keepInbox: record.keepInbox,
-          requestedBy: record.requestedBy,
+          requestedBy: boundedCancellationText(record.requestedBy),
           observedHeadEventId: record.observedHeadEventId,
           phase: record.phase
         },

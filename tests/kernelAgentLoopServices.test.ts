@@ -167,6 +167,8 @@ describe("the agent loop on the composed tree", () => {
     const ending = readTurnEndMeta(rows.find((row) => row.event_type === "turn/end")!.meta_json);
     expect(ending?.reason).toBe("complete");
     expect(loop.status).toBe("idle");
+    expect(loop.agent.disposed).toBe(true);
+    expect(() => loop.followup("late after disposal")).toThrow(/disposed/);
     // Disposing an idle driver with an empty inbox stops nothing, so it must
     // write nothing. A `loop/cancel` on every clean shutdown would make the one
     // row an auditor scans for ("was this agent stopped?") worthless.

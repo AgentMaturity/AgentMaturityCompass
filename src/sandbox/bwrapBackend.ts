@@ -187,6 +187,7 @@ export function bwrapBackend(): SandboxBackend {
           env: { PATH: "/usr/bin:/bin", HOME: "/tmp", TMPDIR: "/tmp", LANG: "C.UTF-8" },
           stdin: "ignore", stdout: "capture", stderr: "capture", maxCaptureBytes: 64_000,
           scrubValues: policy.scrubValues ?? [], graceMs: 2_000, timeoutMs: policy.timeoutMs,
+          ...(policy.onOutput ? { onOutput: policy.onOutput } : {}),
           ...(policy.signal ? { signal: policy.signal } : {}), extraFds: descriptors }).done;
         const status = statSync(statusPath).size <= 64_000 ? bwrapCommandExit(readFileSync(statusPath, "utf8")) : null;
         const applied = status !== null && status === outcome.exitCode;
