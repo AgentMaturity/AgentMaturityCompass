@@ -11,7 +11,7 @@ import { createSessionProjections, type SessionProjections } from "./projection/
 import { SessionEventWriter } from "./sessionSpine.js";
 export { NATIVE_TRUST_TIER } from "./sessionSpine.js";
 
-import type { RequestHeaderMeta } from "./requestHeaderMeta.js";
+import { pinnedHeaderMetadata, type RequestHeaderMeta } from "./requestHeaderMeta.js";
 import { buildRequestOutcomeMeta, requestOutcomeEventType } from "./requestOutcomeMeta.js";
 import type { RequestOutcomeParams } from "./requestOutcomeMeta.js";
 import { assertToolSchemaCommitted } from "./toolSchemaCommitment.js";
@@ -324,7 +324,7 @@ export class SessionService extends SessionEventWriter {
       projectionCutoffEventId: params.projectionCutoffEventId,
       projectionDigest: params.projectionDigest,
       sourceEventIds: [...params.sourceEventIds],
-      requestDigest
+      requestDigest, ...pinnedHeaderMetadata(params)
     };
     const ref = this.appendSessionEvent({
       eventType: "request/header",

@@ -16,8 +16,7 @@ const contracts = [
   "src/kernel/services/jobServices.ts",
   "src/kernel/services/terminalServices.ts",
   "src/llm/providers/gatewayAdapter.ts",
-  "src/ops/otelExporter.ts",
-  "src/product/toolSemanticDocs.ts"
+  "src/ops/otelExporter.ts"
 ];
 
 // Re-exports publish a library API; only value imports count as production use.
@@ -95,6 +94,12 @@ describe("WP46 unwired contract labels", () => {
     const labelled = /library-only, not enforced/i.test(header);
     expect({ file, consumers, labelled }).toEqual({ file, consumers, labelled: consumers.length === 0 });
     if (labelled) expect(header).toMatch(/src\/[\w/]+\.ts/);
+  });
+
+  test("WP13 wires semantic search into native metadata discovery", () => {
+    const target = "src/product/toolSemanticDocs.ts";
+    expect(productionConsumers(target, sources, parsed)).toContain("src/tools/builtin/toolSearchTool.ts");
+    expect(sources.get(target)).not.toMatch(/library-only, not enforced/i);
   });
 
   test("marker detection is named honestly and the old export remains deprecated", () => {

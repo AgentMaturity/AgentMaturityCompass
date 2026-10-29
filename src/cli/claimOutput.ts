@@ -112,8 +112,8 @@ export function selfAnswerClaim(producer: string, answers: readonly number[], re
 }
 
 /** The control-surface scorers: a file found is a path-presence result, nothing found is not evaluated. */
-export function controlSurfaceClaim(producer: string, result: { score: number; level: number }, root = process.cwd()): ClaimEnvelope {
-  const found = result.score > 0;
+export function controlSurfaceClaim(producer: string, result: { score: number | null; level: number }, root = process.cwd()): ClaimEnvelope {
+  const found = result.score !== null && result.score > 0;
   return envelopeForPathPresence({ producer, found, level: result.level, evidenceRefs: found ? [root] : [], now: Date.now() });
 }
 

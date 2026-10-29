@@ -61,9 +61,10 @@ export const EVIDENCE_EMITTERS: readonly EmitterEntry[] = [
  * so a new audit type is classified before it can be scored. Being listed here can only keep a row from counting.
  */
 export const NON_MATURITY_AUDIT_MODULES: ReadonlyArray<{ module: string; why: string }> = [
+  { module: "src/setup/nativeInteractiveCommandAudit.ts", why: "operator chat command bookkeeping; handler settlement is not task success or maturity evidence" },
   { module: "src/a4/a4Store.ts", why: "A4 project transitions and gate decisions; governance bookkeeping, untagged, never maturity evidence" },
   { module: "src/actions/actionJournal.ts", why: "action receipt states and dropped-telemetry counts (P1-03); AMC enforcement bookkeeping, untagged, never maturity evidence" },
-  { module: "src/agent/agentToolset.ts", why: "native shell confinement settings; untagged, so they bind to no question" },
+  { module: "src/agent/agentToolset.ts", why: "native shell confinement and deferred schema activation bookkeeping; untagged, so they bind to no question" },
   { module: "src/agent/compaction/autoCompact.ts", why: "context compaction bookkeeping (P1-37); token counts before and after, not agent behaviour" },
   { module: "src/approvals/approvalStudioService.ts", why: "operator approval decisions about AMC actions, not the scored agent's behaviour" },
   { module: "src/autonomy/scheduleStore.ts", why: "operator authorization to close an interrupted schedule claim; operational bookkeeping, never goal quality or maturity evidence" },

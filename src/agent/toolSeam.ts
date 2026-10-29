@@ -72,6 +72,8 @@ export interface ToolCallOutcome {
 export interface AgentToolSeam {
   /** The seam enforces ToolCallRequest.beforeEffect after all approval waits, at the actual effect boundary. */
   readonly supportsEffectGuard?: true;
+  /** The entered step owns this admission through completion, failure and cancellation. */
+  prepareStep?(context: { readonly turn: number; readonly step: number; readonly signal: AbortSignal }): Promise<() => void>;
   /**
    * The tools to offer the model, or null for a request that offers none.
    *

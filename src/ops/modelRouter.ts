@@ -12,6 +12,7 @@
  */
 
 import { randomUUID } from 'node:crypto';
+import { MODEL_PRICING } from '../product/modelPricing.js';
 
 /* ── Types ──────────────────────────────────────────────────────── */
 
@@ -107,10 +108,13 @@ export interface RoutingStats {
 
 /* ── Built-in model catalog ──────────────────────────────────────── */
 
+// Shared records use the dated indicative product rates and limits, not live
+// provider billing data. Nonoverlapping legacy records remain indicative too.
+
 const DEFAULT_MODELS: ModelSpec[] = [
-  { id: 'gpt-4o', name: 'GPT-4o', provider: 'openai', inputCostPer1K: 0.005, outputCostPer1K: 0.015, maxContext: 128000, capabilities: ['text-generation', 'code-generation', 'function-calling', 'vision', 'json-mode', 'streaming', 'long-context'], avgLatencyMs: 800, qualityTier: 5 },
-  { id: 'gpt-4o-mini', name: 'GPT-4o Mini', provider: 'openai', inputCostPer1K: 0.00015, outputCostPer1K: 0.0006, maxContext: 128000, capabilities: ['text-generation', 'code-generation', 'function-calling', 'json-mode', 'streaming', 'long-context'], avgLatencyMs: 400, qualityTier: 3 },
-  { id: 'claude-sonnet-4-20250514', name: 'Claude Sonnet 4', provider: 'anthropic', inputCostPer1K: 0.003, outputCostPer1K: 0.015, maxContext: 200000, capabilities: ['text-generation', 'code-generation', 'function-calling', 'vision', 'json-mode', 'streaming', 'long-context'], avgLatencyMs: 700, qualityTier: 5 },
+  { id: 'gpt-4o', name: 'GPT-4o', provider: 'openai', inputCostPer1K: MODEL_PRICING['gpt-4o']!.inputPer1kTokens, outputCostPer1K: MODEL_PRICING['gpt-4o']!.outputPer1kTokens, maxContext: MODEL_PRICING['gpt-4o']!.contextWindow, capabilities: ['text-generation', 'code-generation', 'function-calling', 'vision', 'json-mode', 'streaming', 'long-context'], avgLatencyMs: 800, qualityTier: 5 },
+  { id: 'gpt-4o-mini', name: 'GPT-4o Mini', provider: 'openai', inputCostPer1K: MODEL_PRICING['gpt-4o-mini']!.inputPer1kTokens, outputCostPer1K: MODEL_PRICING['gpt-4o-mini']!.outputPer1kTokens, maxContext: MODEL_PRICING['gpt-4o-mini']!.contextWindow, capabilities: ['text-generation', 'code-generation', 'function-calling', 'json-mode', 'streaming', 'long-context'], avgLatencyMs: 400, qualityTier: 3 },
+  { id: 'claude-sonnet-4-20250514', name: 'Claude Sonnet 4', provider: 'anthropic', inputCostPer1K: MODEL_PRICING['claude-sonnet-4-20250514']!.inputPer1kTokens, outputCostPer1K: MODEL_PRICING['claude-sonnet-4-20250514']!.outputPer1kTokens, maxContext: MODEL_PRICING['claude-sonnet-4-20250514']!.contextWindow, capabilities: ['text-generation', 'code-generation', 'function-calling', 'vision', 'json-mode', 'streaming', 'long-context'], avgLatencyMs: 700, qualityTier: 5 },
   { id: 'claude-haiku-3.5', name: 'Claude 3.5 Haiku', provider: 'anthropic', inputCostPer1K: 0.0008, outputCostPer1K: 0.004, maxContext: 200000, capabilities: ['text-generation', 'code-generation', 'function-calling', 'json-mode', 'streaming', 'long-context'], avgLatencyMs: 300, qualityTier: 3 },
   { id: 'gemini-2.5-pro', name: 'Gemini 2.5 Pro', provider: 'google', inputCostPer1K: 0.00125, outputCostPer1K: 0.01, maxContext: 1000000, capabilities: ['text-generation', 'code-generation', 'function-calling', 'vision', 'json-mode', 'streaming', 'long-context'], avgLatencyMs: 600, qualityTier: 5 },
   { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash', provider: 'google', inputCostPer1K: 0.00015, outputCostPer1K: 0.0006, maxContext: 1000000, capabilities: ['text-generation', 'code-generation', 'function-calling', 'json-mode', 'streaming', 'long-context'], avgLatencyMs: 250, qualityTier: 3 },

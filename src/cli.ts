@@ -4940,6 +4940,7 @@ plugin
       approvalRequestId: opts.approvalRequest
     });
     console.log(chalk.green(`Plugin action executed: ${out.action}`));
+    console.log(`outcome: ${out.outcome}`);
     console.log(`plugin: ${out.pluginId}@${out.version ?? "removed"}`);
     console.log(`installed.lock: ${out.installedLockPath}`);
     console.log(`installed.lock.sig: ${out.installedLockSigPath}`);
@@ -13731,15 +13732,11 @@ casebook
       agentId: opts.agent ?? activeAgent(program),
       casebookId: opts.casebook
     });
-    if (out.valid) {
-      console.log(chalk.green("Casebook verification PASSED"));
-      return;
-    }
-    console.log(chalk.red("Casebook verification FAILED"));
-    for (const reason of out.reasons) {
+    console.log(out.valid ? chalk.green("Casebook verification PASSED") : chalk.red("Casebook verification FAILED"));
+    for (const reason of [...out.reasons, ...out.warnings.map((warning) => `warning: ${warning}`)]) {
       console.log(`- ${reason}`);
     }
-    process.exit(1);
+    if (!out.valid) process.exit(1);
   });
 
 experiment
@@ -13812,16 +13809,18 @@ experiment
 
 experiment
   .command("analyze")
-  .description("Analyze latest experiment run (exit 0 all candidate cases pass, 1 failure or error, 3 inconclusive)")
+  .description("Analyze latest experiment run or verified run history (exit 0 all candidate cases pass, 1 failure or error, 3 inconclusive)")
   .requiredOption("--experiment <id>", "experiment ID")
   .requiredOption("--out <path>", "output .md or .json")
+  .option("--all", "verify and tabulate all stored runs without executing trials")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
-  .action((opts: { experiment: string; out: string; agent?: string }) => {
+  .action((opts: { experiment: string; out: string; agent?: string; all?: boolean }) => {
     experimentAnalyzeCommandCli({
       workspace: process.cwd(),
       agentId: opts.agent ?? activeAgent(program),
       experimentId: opts.experiment,
-      outFile: resolve(process.cwd(), opts.out)
+      outFile: resolve(process.cwd(), opts.out),
+      all: opts.all
     }, normalizeCliErrorMessage);
   });
 
@@ -18783,18 +18782,15 @@ program
   .action(async (opts: { baseline: string; candidate: string }) => {
     const lab = await import("./lab/cognitionLab.js");
     const pairs = lab.compareExperiments(opts.baseline, opts.candidate, process.cwd());
-    if (pairs.length === 0) { console.log(chalk.yellow("No matching probes to compare.")); process.exitCode = 1; return; }
+    if (pairs.length === 0) { console.log(chalk.yellow("No probe results to compare.")); process.exitCode = 1; return; }
     const { EXAMPLE_BANNER, exampleEnvelope } = await import("./claims/eligibility/exampleMode.js");
     console.log(chalk.bold.yellow(EXAMPLE_BANNER));
     printClaimResult(exampleEnvelope("lab:simulate"), {});
     console.log(chalk.bold(`\nComparison: ${opts.baseline} vs ${opts.candidate}\n`));
-    for (const p of pairs) {
-      console.log(`  ${p.probeId}:`);
-      for (const [dim, delta] of Object.entries(p.deltas)) {
-        const color = delta > 0.05 ? chalk.green : delta < -0.05 ? chalk.red : chalk.white;
-        console.log(color(`    ${dim}: ${delta > 0 ? "+" : ""}${(delta * 100).toFixed(1)}%`));
-      }
-    }
+    const { printLabComparison } = await import("./lab/labComparisonCli.js");
+    printLabComparison(pairs);
+    // Unmatched rows are reported, but a comparison with no matched probe is not a successful comparison.
+    if (!pairs.some(pair => pair.status === "matched")) { console.log(chalk.yellow("No matching probes to compare.")); process.exitCode = 1; }
   });
 
 program
@@ -20233,11 +20229,12 @@ shield
                 };
               } catch (error) {
                 if (error instanceof EgressBlocked) throw error;
-                // Other invocation failures retain legacy reporting; reconciliation is separate.
+                // An invocation failure cannot be scored as a measured refusal.
                 return {
                   attackId: attack.payload.slice(0, 8),
                   succeeded: false,
                   response: `INCONCLUSIVE: ${error instanceof Error ? error.message : String(error)}`,
+                  outcome: "source_unavailable",
                   latencyMs: Date.now() - startedAt,
                   bypassedDefenses: [],
                   detectedBy: [],
@@ -20255,22 +20252,21 @@ shield
       console.log(chalk.gray("Rounds:"), rounds);
       if (opts.categories) console.log(chalk.gray("Categories:"), opts.categories);
       console.log(chalk.yellow("Running red team rounds..."));
-      let totalSuccesses = 0;
-      let totalAttacks = 0;
       const regressions: string[] = [];
       for (let i = 0; i < rounds; i++) {
         const roundResults = await rt.runAllTargets();
         for (const round of roundResults) {
-          totalAttacks += round.attacks.length;
-          totalSuccesses += round.attacks.filter((a) => a.result.succeeded).length;
           regressions.push(...round.regressions);
-          console.log(chalk.gray(`  Round ${i + 1}: attacks=${round.attacks.length} success_rate=${(round.successRate * 100).toFixed(1)}%`));
+          console.log(chalk.gray(`  Round ${i + 1}: attacks=${round.attacks.length} success_rate=${round.successRate === null ? "not evaluated" : `${(round.successRate * 100).toFixed(1)}%`}`));
         }
       }
-      const overallSuccessRate = totalAttacks > 0 ? (totalSuccesses / totalAttacks) * 100 : 0;
+      const report = rt.generateReport(targetId);
+      const overallSuccessRate = report.overallSuccessRate === null ? null : report.overallSuccessRate * 100;
       console.log(chalk.bold("\nSummary:"));
-      console.log(chalk.gray("Total attacks:"), totalAttacks);
-      console.log(chalk.gray("Overall success rate:"), totalAttacks === 0 ? chalk.yellow("not evaluated (no attacks ran)") : overallSuccessRate < 10 ? chalk.green(`${overallSuccessRate.toFixed(1)}%`) : chalk.red(`${overallSuccessRate.toFixed(1)}%`));
+      console.log(chalk.gray("Total attacks:"), report.totalAttacks);
+      console.log(chalk.gray("Measured attacks:"), report.measuredAttacks);
+      console.log(chalk.gray("Inconclusive attacks:"), report.inconclusiveCount);
+      console.log(chalk.gray("Overall success rate:"), overallSuccessRate === null ? chalk.yellow("not evaluated (no measured attacks)") : overallSuccessRate < 10 ? chalk.green(`${overallSuccessRate.toFixed(1)}%`) : chalk.red(`${overallSuccessRate.toFixed(1)}%`));
       console.log(chalk.gray("Regressions detected:"), regressions.length > 0 ? chalk.red(regressions.length.toString()) : chalk.green("none"));
       if (regressions.length > 0) {
         for (const r of regressions) console.log(chalk.red(`  ⚠ ${r}`));
@@ -22368,9 +22364,9 @@ score
         console.log(chalk.gray("  Score:"), `${lr.score} (${lr.status})`);
         console.log(chalk.gray("  Logistics events:"), lr.logisticsEventCount);
         console.log(chalk.gray("  Carriers:"), lr.carriers.join(", ") || "none");
-        console.log(chalk.gray("  Carrier on-time:"), `${Math.round(lr.carrierReliability.onTimeRate * 100)}%`);
-        console.log(chalk.gray("  SLA breach rate:"), `${Math.round(lr.slaPerformance.breachRate * 100)}%`);
-        console.log(chalk.gray("  Trace coverage:"), `${Math.round(lr.traceabilityCoverage.coverage * 100)}%`);
+        console.log(chalk.gray("  Carrier on-time:"), lr.carrierReliability.onTimeRate === null ? "not evaluated" : `${Math.round(lr.carrierReliability.onTimeRate * 100)}%`);
+        console.log(chalk.gray("  SLA breach rate:"), lr.slaPerformance.breachRate === null ? "not evaluated" : `${Math.round(lr.slaPerformance.breachRate * 100)}%`);
+        console.log(chalk.gray("  Trace coverage:"), lr.traceabilityCoverage.coverage === null ? "not evaluated" : `${Math.round(lr.traceabilityCoverage.coverage * 100)}%`);
         if (lr.gaps.length > 0) {
           console.log(chalk.yellow("  Gaps:"), lr.gaps.slice(0, 4).join("; "));
         }
@@ -22631,9 +22627,9 @@ score
       const { scanCalibrationInfrastructure } = await import("./score/calibrationGap.js");
       const result = scanCalibrationInfrastructure(process.cwd());
       if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n🎯  Calibration Gap Analysis"), result, controlSurfaceClaim("score:calibrationGap", result), opts)) return;
-      console.log(chalk.gray("ECE Score:"), result.expectedCalibrationError.toFixed(4));
-      console.log(chalk.gray("Overconfidence ratio:"), result.overconfidenceRatio.toFixed(2));
-      console.log(chalk.gray("Underconfidence ratio:"), result.underconfidenceRatio.toFixed(2));
+      console.log(chalk.gray("ECE Score:"), result.expectedCalibrationError?.toFixed(4) ?? "not evaluated");
+      console.log(chalk.gray("Overconfidence ratio:"), result.overconfidenceRatio?.toFixed(2) ?? "not evaluated");
+      console.log(chalk.gray("Underconfidence ratio:"), result.underconfidenceRatio?.toFixed(2) ?? "not evaluated");
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
 
@@ -22795,9 +22791,9 @@ score
       const { scorePauseQuality } = await import("./score/pauseQuality.js");
       const result = scorePauseQuality({ pauses: [], totalActions: 0, totalErrors: 0, errorsWithoutPriorPause: 0, taskDurationMs: 0 });
       if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n⏸️   Pause Quality"), result, unverifiedClaim("score:pauseQuality", 0), opts)) return;
-      console.log(chalk.gray("Score:"), result.overallScore.toFixed(2));
+      console.log(chalk.gray("Score:"), result.overallScore?.toFixed(2) ?? "not evaluated");
       console.log(chalk.gray("Total pauses:"), result.totalPauses);
-      console.log(chalk.gray("Pause rate:"), `${(result.pauseRate * 100).toFixed(1)}%`);
+      console.log(chalk.gray("Pause rate:"), result.pauseRate === null ? "not evaluated" : `${(result.pauseRate * 100).toFixed(1)}%`);
       if (result.totalPauses === 0) { console.log(chalk.yellow("\n💡 No pause events recorded. Instrument your agent to emit pause events when it stops to ask for help.")); }
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
@@ -22875,10 +22871,10 @@ score
       const { scoreInterpretability } = await import("./score/interpretability.js");
       const result = scoreInterpretability([]);
       if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n🔍  Interpretability"), result, unverifiedClaim("score:interpretability", 0), opts)) return;
-      console.log(chalk.gray("Score:"), result.overallScore.toFixed(2));
-      console.log(chalk.gray("Explanation coverage:"), `${(result.explanationCoverage * 100).toFixed(1)}%`);
-      console.log(chalk.gray("Faithfulness:"), result.faithfulnessScore.toFixed(2));
-      if (result.overallScore === 0) { console.log(chalk.yellow("\n💡 No decision traces provided. Add reasoning traces to your agent's outputs for interpretability scoring.")); }
+      console.log(chalk.gray("Score:"), result.overallScore?.toFixed(2) ?? "not evaluated");
+      console.log(chalk.gray("Explanation coverage:"), result.explanationCoverage === null ? "not evaluated" : `${(result.explanationCoverage * 100).toFixed(1)}%`);
+      console.log(chalk.gray("Faithfulness:"), result.faithfulnessScore?.toFixed(2) ?? "not evaluated");
+      if (result.overallScore === null) { console.log(chalk.yellow("\n💡 No decision traces provided. Add reasoning traces to your agent's outputs for interpretability scoring.")); }
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
 
@@ -22897,7 +22893,7 @@ score
         { overlapThreshold: opts.threshold },
       );
       if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n🎯  Faithfulness"), result, unverifiedClaim("score:faithfulness", result.totalClaims), opts)) return;
-      console.log(chalk.gray("Score:"), result.score.toFixed(3));
+      console.log(chalk.gray("Score:"), result.score?.toFixed(3) ?? "not evaluated");
       console.log(chalk.gray("Claims:"), `${result.supportedClaims}/${result.totalClaims} supported`);
       console.log(chalk.gray("Explanation:"), result.explanation);
       if (result.recommendations.length > 0) {
@@ -22984,10 +22980,10 @@ score
       const { scoreMemoryIntegrity } = await import("./score/memoryIntegrity.js");
       const result = scoreMemoryIntegrity({ events: [], sessionCount: 0, totalDurationMs: 0 });
       if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n🧠  Memory Integrity"), result, unverifiedClaim("score:memoryIntegrity", 0), opts)) return;
-      console.log(chalk.gray("Score:"), result.overallScore.toFixed(2));
-      console.log(chalk.gray("Consistency:"), result.consistencyScore.toFixed(2));
-      console.log(chalk.gray("Poisoning resistance:"), result.poisoningResistanceScore.toFixed(2));
-      if (result.overallScore === 0) { console.log(chalk.yellow("\n💡 No memory events provided. Run your agent with AMC instrumentation to collect memory data.")); }
+      console.log(chalk.gray("Score:"), result.overallScore?.toFixed(2) ?? "not evaluated");
+      console.log(chalk.gray("Consistency:"), result.consistencyScore?.toFixed(2) ?? "not evaluated");
+      console.log(chalk.gray("Poisoning resistance:"), result.poisoningResistanceScore?.toFixed(2) ?? "not evaluated");
+      if (result.overallScore === null) { console.log(chalk.yellow("\n💡 No memory events provided. Run your agent with AMC instrumentation to collect memory data.")); }
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
 
@@ -23004,13 +23000,13 @@ score
         : { events: [] };
       const result = scoreMemoryDepth(input as Parameters<typeof scoreMemoryDepth>[0]);
       if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n🗄️  Memory Depth"), result, unverifiedClaim("score:memoryDepth", input.events.length), opts)) return;
-      console.log(chalk.gray("Overall:"), result.overallScore.toFixed(2));
-      console.log(chalk.gray("Backend resilience:"), result.backendResilience.toFixed(2));
-      console.log(chalk.gray("Compression fidelity:"), result.compressionFidelity.toFixed(2));
-      console.log(chalk.gray("Cross-session consistency:"), result.crossSessionConsistency.toFixed(2));
-      console.log(chalk.gray("Poisoning resistance:"), result.poisoningResistance.toFixed(2));
-      console.log(chalk.gray("TTL compliance:"), result.ttlPolicyCompliance.toFixed(2));
-      console.log(chalk.gray("Capacity management:"), result.capacityManagement.toFixed(2));
+      console.log(chalk.gray("Overall:"), result.overallScore?.toFixed(2) ?? "not evaluated");
+      console.log(chalk.gray("Backend resilience:"), result.backendResilience?.toFixed(2) ?? "not evaluated");
+      console.log(chalk.gray("Compression fidelity:"), result.compressionFidelity?.toFixed(2) ?? "not evaluated");
+      console.log(chalk.gray("Cross-session consistency:"), result.crossSessionConsistency?.toFixed(2) ?? "not evaluated");
+      console.log(chalk.gray("Poisoning resistance:"), result.poisoningResistance?.toFixed(2) ?? "not evaluated");
+      console.log(chalk.gray("TTL compliance:"), result.ttlPolicyCompliance?.toFixed(2) ?? "not evaluated");
+      console.log(chalk.gray("Capacity management:"), result.capacityManagement?.toFixed(2) ?? "not evaluated");
       if (result.maturitySignals.length > 0) {
         console.log(chalk.green("\n✅ Maturity signals:"));
         for (const s of result.maturitySignals) console.log(chalk.green(`  - ${s}`));
@@ -23333,7 +23329,7 @@ score
             const previousScores = Object.fromEntries(dims.map((dim) => [dim, previousRaw]));
             const previousObserved = latestObservedEvidenceShare(process.cwd(), resolvedAgentId, previous.runId);
             const previousAdjusted = computeIndustryAdjustedScore(previousScores, industryId, previous.ts, previousObserved, nowTs);
-            deltaFromPrevious = Number((adjusted.adjustedScore - previousAdjusted.adjustedScore).toFixed(1));
+            deltaFromPrevious = adjusted.adjustedScore === null || previousAdjusted.adjustedScore === null ? null : Number((adjusted.adjustedScore - previousAdjusted.adjustedScore).toFixed(1));
           }
           return {
             runId: run.runId,
@@ -23365,7 +23361,7 @@ score
               ? "baseline"
               : `${row.deltaFromPrevious >= 0 ? "+" : ""}${row.deltaFromPrevious.toFixed(1)}`;
             const evidenceMix = `obs ${(row.evidenceMix.observed * 100).toFixed(0)}% / att ${(row.evidenceMix.attested * 100).toFixed(0)}% / self ${(row.evidenceMix.selfReported * 100).toFixed(0)}%`;
-            return `| ${row.runId} | ${row.scoredAt} | ${row.rawScore.toFixed(1)} | ${row.adjustedScore.toFixed(1)} | ${delta} | ${row.maturityLevel} | ${row.decayApplied.toFixed(1)} | ${evidenceMix} |`;
+            return `| ${row.runId} | ${row.scoredAt} | ${row.rawScore?.toFixed(1) ?? "not evaluated"} | ${row.adjustedScore?.toFixed(1) ?? "not evaluated"} | ${delta} | ${row.maturityLevel} | ${row.decayApplied?.toFixed(1) ?? "not evaluated"} | ${evidenceMix} |`;
           });
           return [
             "# Industry-Adjusted Comparison Report",
@@ -23462,18 +23458,18 @@ score
       if (opts.agent) console.log(chalk.gray("Agent:"), opts.agent);
       console.log(chalk.gray("Industry:"), `${model.name} (${industryId})`);
       console.log(chalk.gray("Raw score:"), result.rawScore);
-      console.log(chalk.gray("Adjusted score:"), chalk.bold(result.adjustedScore.toString()));
+      console.log(chalk.gray("Adjusted score:"), chalk.bold(result.adjustedScore?.toString() ?? "not evaluated"));
       console.log(chalk.gray("Maturity level:"), result.maturityLevel);
       console.log(chalk.gray("Decay applied:"), result.decayApplied);
-      const scoreDelta = result.adjustedScore - result.rawScore;
+      const scoreDelta = result.adjustedScore === null || result.rawScore === null ? null : result.adjustedScore - result.rawScore;
       const topWeights = Object.entries(model.dimensionWeights)
         .sort(([, a], [, b]) => b - a)
         .slice(0, 3)
         .map(([dimension, weight]) => `${dimension} x${weight}`)
         .join(", ");
       console.log(chalk.gray("Why adjusted score differs from raw:"));
-      if (Math.abs(scoreDelta) < 0.05) {
-        console.log(chalk.gray(`  - No score delta: the same raw score was applied to every ${industryId} dimension, so weighting preserves the average.`));
+      if (scoreDelta === null || Math.abs(scoreDelta) < 0.05) {
+        console.log(chalk.gray(scoreDelta === null ? "  - Industry score difference is not evaluated without measured dimensions." : `  - No score delta: the same raw score was applied to every ${industryId} dimension, so weighting preserves the average.`));
       } else {
         const direction = scoreDelta > 0 ? "up" : "down";
         console.log(chalk.gray(`  - Industry weighting moved the score ${direction} by ${Math.abs(scoreDelta).toFixed(1)} points.`));

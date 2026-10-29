@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { EvidenceOutcome } from "../types.js";
 
 export const FORECAST_SCOPE_TYPES = ["WORKSPACE", "NODE", "AGENT"] as const;
 export const FORECAST_STATUSES = ["OK", "INSUFFICIENT_EVIDENCE"] as const;
@@ -242,6 +243,10 @@ export const forecastArtifactSchema = z.object({
   drift: z.array(forecastDriftSchema).default([]),
   anomalies: z.array(forecastAnomalySchema).default([]),
   leadingIndicators: z.array(forecastLeadingIndicatorSchema).default([]),
+  transformPlanInput: z.object({
+    outcome: z.enum(["measured", "not_evaluated", "source_unavailable"] satisfies EvidenceOutcome[]),
+    reason: z.string().nullable()
+  }).optional(),
   etaToTarget: forecastEtaSchema,
   advisories: z.array(advisorySchema).default([])
 });

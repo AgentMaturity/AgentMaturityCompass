@@ -14,6 +14,7 @@ export const NATIVE_BUILTIN_CAPABILITIES: readonly NativeToolCapability[] = Obje
   { name: "fs.edit", actionClass: "WRITE_LOW" },
   { name: "glob", actionClass: "READ_ONLY" },
   { name: "grep", actionClass: "READ_ONLY" },
+  { name: "tool_search", actionClass: "READ_ONLY" },
   { name: "session.spill_read", actionClass: "READ_ONLY" },
   { name: "bash", actionClass: "WRITE_HIGH" },
   // P1-43 (AMC-1549). Listing here is identity, not permission: each is denied
@@ -26,7 +27,8 @@ export const NATIVE_BUILTIN_CAPABILITIES: readonly NativeToolCapability[] = Obje
   { name: "todo", actionClass: "READ_ONLY" },
   { name: "plan", actionClass: "READ_ONLY" },
   // DXC-29: loads an attributed skill body; denied until the signed tools policy lists it.
-  { name: "skill.load", actionClass: "READ_ONLY" }
+  { name: "skill.load", actionClass: "READ_ONLY" },
+  { name: "get_goal", actionClass: "READ_ONLY" }
 ].map(capability => Object.freeze(capability as NativeToolCapability)));
 
 /** These become executable only when a caller also supplies the delegation capability. */

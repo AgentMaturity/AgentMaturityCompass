@@ -1,3 +1,5 @@
+import type { EvidenceOutcome } from "../types.js";
+
 /**
  * Value Coherence Engine — type definitions
  * Part of AMC Innovation Thesis P0: Emergent Value Detection
@@ -35,10 +37,12 @@ export interface ValueDriftPoint {
 }
 
 export interface ValueCoherenceReport {
+  outcome: EvidenceOutcome;
+  sampleSize: number;
   agentId: string;
   windowStartTs: number;
   windowEndTs: number;
-  vci: number;
+  vci: number | null;
   preferenceCount: number;
   inversions: PreferenceInversion[];
   valueDrift: ValueDriftPoint[];

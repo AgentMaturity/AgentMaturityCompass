@@ -177,7 +177,7 @@ export function nativeMcpRecoverableStream(options: NativeMcpRecoverableStreamOp
                 }
                 terminal = true;
               }
-              else catalogChanged = message.method === "notifications/tools/list_changed";
+              else catalogChanged = (message.method === "notifications/tools/list_changed" || message.method === "notifications/resources/list_changed");
             }
             if (frame.id !== undefined) {
               if (frame.id === "") { cursor = undefined; resumable = false; }

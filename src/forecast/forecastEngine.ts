@@ -128,6 +128,9 @@ function evidenceGateFailures(policy: ForecastPolicy, signals: ForecastSignalBun
 }
 
 function computeEta(signal: ForecastSignalBundle): ForecastArtifact["etaToTarget"] {
+  if (signal.transformPlanInput.outcome === "source_unavailable") {
+    return { status: "UNKNOWN", reasons: [signal.transformPlanInput.reason ?? "Transform plan source_unavailable."] };
+  }
   const remainingEffort = Math.max(0, Number(signal.targetProgress.remainingEffort ?? 0));
   const throughput = [...signal.targetProgress.throughputHistoryPerDay].filter((value) => Number.isFinite(value) && value > 0);
   if (remainingEffort <= 0) {
@@ -430,6 +433,7 @@ export function calculateForecast(input: ForecastCreationParams) {
     drift,
     anomalies,
     leadingIndicators,
+    transformPlanInput: signals.transformPlanInput,
     etaToTarget: computeEta(signals),
     advisories
   };

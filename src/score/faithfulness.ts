@@ -20,6 +20,8 @@
  * A refusal propagates; it never falls back to simulated scoring.
  */
 
+import type { EvidenceOutcome } from '../types.js';
+import { ratioOrNull } from '../utils/ratio.js';
 import { checkScopedEgress, isEgressRefusal } from '../residency/checkEgress.js';
 
 /* ── Types ──────────────────────────────────────────────────────── */
@@ -41,7 +43,8 @@ export interface ClaimVerdict {
   /** Whether the claim is supported by the context */
   supported: boolean;
   /** 0-1 confidence in the verdict */
-  confidence: number;
+  confidence: number | null;
+  outcome: EvidenceOutcome;
   /** Explanation of why this claim is/isn't supported */
   reasoning: string;
   /** Which part of context supports it (if any) */
@@ -50,7 +53,10 @@ export interface ClaimVerdict {
 
 export interface FaithfulnessResult {
   /** Overall faithfulness score: 0 (completely unfaithful) to 1 (fully grounded) */
-  score: number;
+  score: number | null;
+  outcome: EvidenceOutcome;
+  sampleSize: number;
+  notEvaluatedClaims: number;
   /** Per-claim verdicts */
   claims: ClaimVerdict[];
   /** Total claims extracted from output */
@@ -138,7 +144,7 @@ export function extractClaimsSimulated(output: string): string[] {
  * Returns a ratio [0-1] representing how many content words in the claim
  * appear in the context.
  */
-export function computeOverlap(claim: string, context: string): number {
+export function computeOverlap(claim: string, context: string): number | null {
   const stopwords = new Set([
     'the', 'a', 'an', 'is', 'are', 'was', 'were', 'be', 'been', 'being',
     'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could',
@@ -157,12 +163,12 @@ export function computeOverlap(claim: string, context: string): number {
     text.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter(w => w.length > 1 && !stopwords.has(w));
 
   const claimTokens = tokenize(claim);
-  if (claimTokens.length === 0) return 1; // trivial claim
+  if (claimTokens.length === 0) return null;
 
   const contextTokens = new Set(tokenize(context));
   const matched = claimTokens.filter(t => contextTokens.has(t));
 
-  return matched.length / claimTokens.length;
+  return ratioOrNull(matched.length, claimTokens.length);
 }
 
 /**
@@ -175,7 +181,7 @@ function findEvidenceSpan(claim: string, context: string): string | undefined {
 
   for (const sentence of sentences) {
     const score = computeOverlap(claim, sentence);
-    if (score > bestScore) {
+    if (score !== null && score > bestScore) {
       bestScore = score;
       bestSpan = sentence.trim();
     }
@@ -189,14 +195,15 @@ function findEvidenceSpan(claim: string, context: string): string | undefined {
  */
 function verifyClaimSimulated(claim: string, context: string, threshold: number): ClaimVerdict {
   const overlap = computeOverlap(claim, context);
-  const supported = overlap >= threshold;
+  const supported = overlap !== null && overlap >= threshold;
   const evidenceSpan = findEvidenceSpan(claim, context);
 
   return {
     claim,
     supported,
-    confidence: Math.min(1, overlap * 1.2), // scale overlap to rough confidence
-    reasoning: supported
+    confidence: overlap === null ? null : Math.min(1, overlap * 1.2), // scale measured overlap to rough confidence
+    outcome: overlap === null ? "not_evaluated" : "measured",
+    reasoning: overlap === null ? "No content words are available to evaluate grounding." : supported
       ? `Claim has ${(overlap * 100).toFixed(0)}% content-word overlap with context (threshold: ${(threshold * 100).toFixed(0)}%).`
       : `Claim has only ${(overlap * 100).toFixed(0)}% content-word overlap with context — below ${(threshold * 100).toFixed(0)}% threshold.`,
     evidenceSpan,
@@ -219,7 +226,7 @@ export function scoreFaithfulness(
   const mode = config?.mode ?? 'simulated';
   const threshold = config?.overlapThreshold ?? 0.4;
 
-  // Empty output → perfect faithfulness (said nothing wrong)
+  // An empty output supplies no claims to evaluate.
   if (!input.output.trim()) {
     return emptyResult(mode, 'empty_output');
   }
@@ -242,18 +249,21 @@ export function scoreFaithfulness(
   );
 
   // Step 3: Aggregate
-  const supportedClaims = claims.filter(c => c.supported).length;
-  const unsupportedClaims = claims.length - supportedClaims;
-  const score = claims.length > 0 ? supportedClaims / claims.length : 0;
+  const measuredClaims = claims.filter(c => c.outcome === "measured");
+  const supportedClaims = measuredClaims.filter(c => c.supported).length;
+  const unsupportedClaims = measuredClaims.length - supportedClaims;
+  const score = ratioOrNull(supportedClaims, measuredClaims.length);
 
   // Step 4: Build explanation
-  const explanation = buildExplanation(score, claims.length, supportedClaims, unsupportedClaims);
+  const explanation = buildExplanation(score, measuredClaims.length, supportedClaims, unsupportedClaims);
 
   // Maturity signals and recommendations
   const maturitySignals: string[] = [];
   const recommendations: string[] = [];
 
-  if (score >= 0.9) {
+  if (score === null) {
+    recommendations.push("No claims contain evaluable grounding evidence.");
+  } else if (score >= 0.9) {
     maturitySignals.push('high_groundedness');
     maturitySignals.push('context_adherent');
   } else if (score >= 0.7) {
@@ -275,7 +285,10 @@ export function scoreFaithfulness(
   }
 
   return {
-    score: Math.round(score * 1000) / 1000,
+    score: score === null ? null : Math.round(score * 1000) / 1000,
+    outcome: score === null ? "not_evaluated" : "measured",
+    sampleSize: measuredClaims.length,
+    notEvaluatedClaims: claims.length - measuredClaims.length,
     claims,
     totalClaims: claims.length,
     supportedClaims,
@@ -323,15 +336,17 @@ export async function scoreFaithfulnessLLM(
     }
 
     // Step 3: Aggregate
-    const supportedClaims = claims.filter(c => c.supported).length;
-    const unsupportedClaims = claims.length - supportedClaims;
-    const score = claims.length > 0 ? supportedClaims / claims.length : 0;
-    const explanation = buildExplanation(score, claims.length, supportedClaims, unsupportedClaims);
+    const measuredClaims = claims.filter(c => c.outcome === "measured");
+    const supportedClaims = measuredClaims.filter(c => c.supported).length;
+    const unsupportedClaims = measuredClaims.length - supportedClaims;
+    const score = ratioOrNull(supportedClaims, measuredClaims.length);
+    const explanation = buildExplanation(score, measuredClaims.length, supportedClaims, unsupportedClaims);
 
     const maturitySignals: string[] = [];
     const recommendations: string[] = [];
 
-    if (score >= 0.9) maturitySignals.push('high_groundedness', 'context_adherent');
+    if (score === null) recommendations.push('No claims contain evaluable grounding evidence.');
+    else if (score >= 0.9) maturitySignals.push('high_groundedness', 'context_adherent');
     else if (score >= 0.7) {
       maturitySignals.push('moderate_groundedness');
       recommendations.push('Review unsupported claims — some output information lacks context support.');
@@ -341,7 +356,10 @@ export async function scoreFaithfulnessLLM(
     }
 
     return {
-      score: Math.round(score * 1000) / 1000,
+      score: score === null ? null : Math.round(score * 1000) / 1000,
+      outcome: score === null ? "not_evaluated" : "measured",
+      sampleSize: measuredClaims.length,
+      notEvaluatedClaims: claims.length - measuredClaims.length,
       claims,
       totalClaims: claims.length,
       supportedClaims,
@@ -439,6 +457,7 @@ async function callLLMForVerification(
       claim,
       supported: parsed.supported ?? false,
       confidence: parsed.confidence ?? 0.5,
+      outcome: "measured",
       reasoning: parsed.reasoning ?? 'No reasoning provided',
       evidenceSpan: parsed.evidenceSpan ?? undefined,
     };
@@ -451,12 +470,12 @@ async function callLLMForVerification(
 /* ── Helpers ──────────────────────────────────────────────────────── */
 
 function buildExplanation(
-  score: number,
+  score: number | null,
   total: number,
   supported: number,
   unsupported: number,
 ): string {
-  if (total === 0) return 'No verifiable claims found in the output.';
+  if (score === null || total === 0) return 'No verifiable grounding evidence found in the output.';
 
   const pct = (score * 100).toFixed(0);
   const label =
@@ -470,20 +489,23 @@ function buildExplanation(
 
 function emptyResult(mode: FaithfulnessMode, reason: 'empty_output' | 'empty_context' | 'no_claims'): FaithfulnessResult {
   const explanations: Record<string, string> = {
-    empty_output: 'No output to evaluate — vacuously faithful.',
+    empty_output: 'No output was provided; faithfulness was not evaluated.',
     empty_context: 'No context provided — faithfulness cannot be assessed.',
     no_claims: 'No verifiable claims could be extracted from the output.',
   };
 
   return {
-    score: reason === 'empty_output' ? 1 : 0,
+    score: null,
+    outcome: "not_evaluated",
+    sampleSize: 0,
+    notEvaluatedClaims: 0,
     claims: [],
     totalClaims: 0,
     supportedClaims: 0,
     unsupportedClaims: 0,
     explanation: explanations[reason] ?? '',
     mode,
-    maturitySignals: reason === 'empty_output' ? ['vacuously_faithful'] : ['no_context_grounding'],
+    maturitySignals: [],
     recommendations: reason === 'empty_context'
       ? ['Provide context documents for faithfulness evaluation.']
       : reason === 'no_claims'

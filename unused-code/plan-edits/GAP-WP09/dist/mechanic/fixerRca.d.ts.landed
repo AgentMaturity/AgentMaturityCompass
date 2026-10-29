@@ -1,0 +1,107 @@
+import { type EnforceResourceKind } from "../enforce/resourceManifest.js";
+import { type TraceFailureClass } from "../watch/traceFailureIndex.js";
+export type AgentCallValidatorId = "schema_conformance" | "tool_call_correctness" | "evidence_citation" | "policy_conformance" | "latency_timeout" | "refusal_overaction" | "output_quality";
+export interface AgentCallRecord {
+    callId: string;
+    runId: string;
+    episodeId: string | null;
+    agentId: string;
+    inputRef: string | null;
+    outputSnippet: string;
+    tool: string | null;
+    model: string | null;
+    durationMs: number | null;
+    policyDecision: string | null;
+    failureClass: TraceFailureClass;
+    evidenceRefs: string[];
+}
+export interface AgentCallValidation {
+    validatorId: AgentCallValidatorId;
+    status: "pass" | "warn" | "fail";
+    reason: string;
+    evidenceRefs: string[];
+}
+export interface FixerRootCause {
+    rootCauseId: string;
+    failureClass: TraceFailureClass;
+    likelyCause: string;
+    affectedResourceKind: EnforceResourceKind | "unknown";
+    affectedResourceId: string | null;
+    confidence: number;
+    evidenceRefs: string[];
+    suggestedRegressionTestId: string;
+}
+export interface FixerRegressionTest {
+    testId: string;
+    sourceClusterId: string;
+    failureClass: TraceFailureClass;
+    name: string;
+    inputRef: string;
+    expectedBehavior: string;
+    mustFailBeforeFix: boolean;
+    mustPassAfterFix: boolean;
+}
+export interface FixerPatchProposal {
+    proposalId: string;
+    rootCauseId: string;
+    status: "proposed" | "blocked";
+    blockedReason: string | null;
+    mutationSurface: "Enforce";
+    resourceKind: EnforceResourceKind | "unknown";
+    resourceId: string | null;
+    resourcePath: string | null;
+    rollbackPointer: string | null;
+    patchSummary: string;
+    expectedScoreImpact: number;
+    confidence: number;
+    regressionTestIds: string[];
+}
+export interface FixerValidationReceipt {
+    receiptId: string;
+    status: "passed" | "blocked";
+    createdAt: string;
+    gates: Array<{
+        id: string;
+        status: "passed" | "blocked";
+        reason: string;
+    }>;
+}
+export interface FixerRcaReport {
+    schemaVersion: "2026-05-22";
+    reportId: string;
+    workspace: string;
+    agentId: string;
+    runId: string;
+    episodeId: string | null;
+    traceIndexId: string;
+    createdAt: string;
+    callRecords: AgentCallRecord[];
+    validations: AgentCallValidation[];
+    rootCauses: FixerRootCause[];
+    regressionTests: FixerRegressionTest[];
+    proposals: FixerPatchProposal[];
+    validationReceipt: FixerValidationReceipt;
+    signaturePath: string | null;
+}
+export declare function writeFixerRcaReport(input: {
+    workspace: string;
+    agentId?: string;
+    selector: string;
+}): {
+    report: FixerRcaReport;
+    path: string;
+    signaturePath: string | null;
+};
+export declare function redactFixerRcaReport(report: FixerRcaReport): FixerRcaReport;
+export declare function listFixerRcaReports(input: {
+    workspace: string;
+    agentId?: string;
+    limit?: number;
+    redacted?: boolean;
+}): FixerRcaReport[];
+export declare function loadFixerRcaReport(input: {
+    workspace: string;
+    agentId?: string;
+    selector: string;
+    redacted?: boolean;
+}): FixerRcaReport;

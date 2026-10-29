@@ -14,9 +14,9 @@ describe("pause quality scoring", () => {
     ...overrides,
   });
 
-  it("returns zero score for no actions", () => {
+  it("reports no evaluation for no actions", () => {
     const result = scorePauseQuality({ pauses: [], totalActions: 0, totalErrors: 0, errorsWithoutPriorPause: 0, taskDurationMs: 0 });
-    expect(result.overallScore).toBe(0);
+    expect(result.overallScore).toBeNull();
   });
 
   it("scores well for ideal pause rate with relevant pauses", () => {

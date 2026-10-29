@@ -198,6 +198,8 @@ export type ApprovalAnswer = "allow" | "deny" | "unavailable";
  * one level up (see ./turnLifecycleMeta.ts).
  */
 export interface TokenUsage {
+  /** Output subset; absent on historical step metadata and never added to token totals. */
+  readonly reasoningTokens?: number | null;
   readonly inputTokens: number;
   readonly outputTokens: number;
   readonly cacheRead: number | null;
@@ -284,6 +286,37 @@ export function embedEnvelope(
   envelope: SessionEnvelope
 ): Record<string, unknown> {
   return { [SESSION_ENVELOPE_META_KEY]: envelope, ...meta };
+}
+
+export type SessionEnvelopeAdmission =
+  | { readonly ok: true; readonly envelope: SessionEnvelope | null }
+  | { readonly ok: false; readonly code: "TAMPERED" | "UNSUPPORTED_FORMAT"; readonly message: string };
+
+/** Distinguish true legacy rows from malformed or unsupported native evidence. */
+export function admitSessionEnvelope(metaJson: string, eventType: EvidenceEventType): SessionEnvelopeAdmission {
+  let metadata: unknown;
+  try { metadata = JSON.parse(metaJson); }
+  catch { return { ok: false, code: "TAMPERED", message: "A persisted event has malformed metadata." }; }
+  if (!metadata || typeof metadata !== "object" || Array.isArray(metadata)) {
+    return { ok: false, code: "TAMPERED", message: "A persisted event has malformed metadata." };
+  }
+  if (Object.hasOwn(metadata, SESSION_ENVELOPE_META_KEY)) {
+    const raw = (metadata as Record<string, unknown>)[SESSION_ENVELOPE_META_KEY];
+    if (!raw || typeof raw !== "object" || Array.isArray(raw)) {
+      return { ok: false, code: "TAMPERED", message: "Malformed native session envelope." };
+    }
+    if (!("v" in raw) || raw.v !== 1) {
+      return { ok: false, code: "UNSUPPORTED_FORMAT", message: "Unsupported session envelope version; signed rows are never migrated in place." };
+    }
+    if (!isSessionEnvelope(raw)) {
+      return { ok: false, code: "TAMPERED", message: "Malformed native session envelope." };
+    }
+    return { ok: true, envelope: raw };
+  }
+  if (SESSION_EVENT_TYPES.has(eventType) || eventType.includes("/")) {
+    return { ok: false, code: "UNSUPPORTED_FORMAT", message: "Native event has no supported session envelope; history cannot silently skip it." };
+  }
+  return { ok: true, envelope: null };
 }
 
 // Inverse of embedEnvelope. Returns null when the row carries no well-formed

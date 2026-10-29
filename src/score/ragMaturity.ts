@@ -1,3 +1,5 @@
+import type { EvidenceOutcome } from "../types.js";
+import { ratioOrNull, weightedMean } from "../utils/ratio.js";
 import { mean } from "../experiments/stats.js";
 /**
  * RAG Maturity Scoring
@@ -87,44 +89,49 @@ export interface RAGCapabilityProfile {
   indexTamperDetected: boolean;
 }
 
-export interface RetrievalQualityDiagnostics {
-  precision: number;
-  recall: number;
-  f1: number;
-  score: number; // 0-100
+interface MetricEvidence {
+  outcome: EvidenceOutcome;
+  metricOutcomes: Record<string, EvidenceOutcome>;
+}
+
+export interface RetrievalQualityDiagnostics extends MetricEvidence {
+  precision: number | null;
+  recall: number | null;
+  f1: number | null;
+  score: number | null; // 0-100
   sampleSize: number;
 }
 
-export interface MetadataQualityDiagnostics {
-  attributionRate: number;
-  verifiableSourceRate: number;
-  completenessRate: number;
-  score: number; // 0-100
+export interface MetadataQualityDiagnostics extends MetricEvidence {
+  attributionRate: number | null;
+  verifiableSourceRate: number | null;
+  completenessRate: number | null;
+  score: number | null; // 0-100
   sampleSize: number;
 }
 
-export interface RetrievalDriftDiagnostics {
+export interface RetrievalDriftDiagnostics extends MetricEvidence {
   driftDetected: boolean;
   trend: "improving" | "stable" | "degrading" | "insufficient_data";
-  deltaF1: number;
-  score: number; // 0-100 (higher is better)
+  deltaF1: number | null;
+  score: number | null; // 0-100 (higher is better)
   sampleSize: number;
 }
 
-export interface HallucinationRiskDiagnostics {
-  riskScore: number; // 0-100 (higher is riskier)
-  groundedClaimRate: number;
-  citationCoverageRate: number;
-  highConfidenceUnsupportedRate: number;
-  contradictionRate: number;
+export interface HallucinationRiskDiagnostics extends MetricEvidence {
+  riskScore: number | null; // 0-100 (higher is riskier)
+  groundedClaimRate: number | null;
+  citationCoverageRate: number | null;
+  highConfidenceUnsupportedRate: number | null;
+  contradictionRate: number | null;
   sampleSize: number;
 }
 
-export interface CitationIntegrityDiagnostics {
-  integrityScore: number; // 0-100
-  accuracyRate: number;
-  verifiabilityRate: number;
-  sourceValidityRate: number;
+export interface CitationIntegrityDiagnostics extends MetricEvidence {
+  integrityScore: number | null; // 0-100
+  accuracyRate: number | null;
+  verifiabilityRate: number | null;
+  sourceValidityRate: number | null;
   sampleSize: number;
 }
 
@@ -190,62 +197,45 @@ function parseTs(ts: number | string): number {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
+function metricEvidence(metrics: Record<string, number | null>): MetricEvidence {
+  return {
+    outcome: Object.values(metrics).some((value) => value !== null) ? "measured" : "not_evaluated",
+    metricOutcomes: Object.fromEntries(Object.entries(metrics).map(([key, value]) => [key, value === null ? "not_evaluated" : "measured"])),
+  };
+}
+
 function computeRetrievalQuality(profile: RAGCapabilityProfile): RetrievalQualityDiagnostics {
   const evaluations = profile.retrievalEvaluations ?? [];
-  if (evaluations.length === 0) {
-    const fallback = profile.retrievalAccuracyBenchmarked ? clamp01(profile.retrievalHitRate ?? 0.5) : 0;
-    return {
-      precision: fallback,
-      recall: fallback,
-      f1: fallback,
-      score: Math.round(fallback * 100),
-      sampleSize: 0
-    };
-  }
-
   const precisions: number[] = [];
   const recalls: number[] = [];
-
+  let sampleSize = 0;
   for (const sample of evaluations) {
     const retrieved = new Set(uniqueIds(sample.retrievedChunkIds));
     const relevant = new Set(uniqueIds(sample.relevantChunkIds));
     let truePositives = 0;
     for (const chunkId of retrieved) {
-      if (relevant.has(chunkId)) truePositives += 1;
+      if (relevant.has(chunkId)) truePositives++;
     }
-    const precision = retrieved.size > 0 ? truePositives / retrieved.size : 0;
-    const recall = relevant.size > 0 ? truePositives / relevant.size : 0;
-    precisions.push(clamp01(precision));
-    recalls.push(clamp01(recall));
+    const precision = ratioOrNull(truePositives, retrieved.size);
+    const recall = ratioOrNull(truePositives, relevant.size);
+    if (precision !== null) precisions.push(clamp01(precision));
+    if (recall !== null) recalls.push(clamp01(recall));
+    if (precision !== null || recall !== null) sampleSize++;
   }
-
-  const precision = average(precisions);
-  const recall = average(recalls);
-  const f1 = f1FromPrecisionRecall(precision, recall);
-  const score = Math.round(clamp100((f1 * 0.5 + precision * 0.25 + recall * 0.25) * 100));
-
-  return {
-    precision,
-    recall,
-    f1,
-    score,
-    sampleSize: evaluations.length
-  };
+  const precision = ratioOrNull(precisions.reduce((sum, value) => sum + value, 0), precisions.length);
+  const recall = ratioOrNull(recalls.reduce((sum, value) => sum + value, 0), recalls.length);
+  const f1 = precision === null || recall === null ? null : f1FromPrecisionRecall(precision, recall);
+  const scoreMean = weightedMean([[f1, 0.5], [precision, 0.25], [recall, 0.25]]);
+  const score = scoreMean === null ? null : Math.round(clamp100(scoreMean * 100));
+  return { ...metricEvidence({ precision, recall, f1, score }), precision, recall, f1, score, sampleSize };
 }
 
 function computeMetadataQuality(profile: RAGCapabilityProfile): MetadataQualityDiagnostics {
   const samples = profile.chunkMetadataSamples ?? [];
   if (samples.length === 0) {
-    const attributed = profile.metadataAttachedToChunks ? 1 : 0;
-    const verifiable = profile.metadataAttachedToChunks ? 0.75 : 0;
-    const completeness = profile.metadataAttachedToChunks ? 0.6 : 0;
-    const score = Math.round((attributed * 0.4 + verifiable * 0.35 + completeness * 0.25) * 100);
     return {
-      attributionRate: attributed,
-      verifiableSourceRate: verifiable,
-      completenessRate: completeness,
-      score,
-      sampleSize: 0
+      ...metricEvidence({ attributionRate: null, verifiableSourceRate: null, completenessRate: null, score: null }),
+      attributionRate: null, verifiableSourceRate: null, completenessRate: null, score: null, sampleSize: 0,
     };
   }
 
@@ -278,6 +268,7 @@ function computeMetadataQuality(profile: RAGCapabilityProfile): MetadataQualityD
   );
 
   return {
+    ...metricEvidence({ attributionRate, verifiableSourceRate, completenessRate, score }),
     attributionRate,
     verifiableSourceRate,
     completenessRate,
@@ -295,8 +286,9 @@ function computeRetrievalDrift(profile: RAGCapabilityProfile): RetrievalDriftDia
     return {
       driftDetected: false,
       trend: "insufficient_data",
-      deltaF1: 0,
-      score: 50,
+      ...metricEvidence({ deltaF1: null, score: null }),
+      deltaF1: null,
+      score: null,
       sampleSize: history.length
     };
   }
@@ -310,8 +302,9 @@ function computeRetrievalDrift(profile: RAGCapabilityProfile): RetrievalDriftDia
     return {
       driftDetected: false,
       trend: "insufficient_data",
-      deltaF1: 0,
-      score: 50,
+      ...metricEvidence({ deltaF1: null, score: null }),
+      deltaF1: null,
+      score: null,
       sampleSize: history.length
     };
   }
@@ -329,6 +322,7 @@ function computeRetrievalDrift(profile: RAGCapabilityProfile): RetrievalDriftDia
   const score = Math.round(clamp100(newerAvg * 100 - driftPenalty + driftBoost));
 
   return {
+    ...metricEvidence({ deltaF1, score }),
     driftDetected: trend === "degrading",
     trend,
     deltaF1,
@@ -338,77 +332,49 @@ function computeRetrievalDrift(profile: RAGCapabilityProfile): RetrievalDriftDia
 }
 
 function computeHallucinationRisk(profile: RAGCapabilityProfile): HallucinationRiskDiagnostics {
-  const samples = profile.ragOutputEvaluations ?? [];
-
-  let groundedClaimRate = 0;
-  let citationCoverageRate = 0;
-  let highConfidenceUnsupportedRate = 0;
-  let contradictionRate = 0;
-
-  if (samples.length > 0) {
-    const groundedRates: number[] = [];
-    const citationRates: number[] = [];
-    const highConfidenceUnsupportedRates: number[] = [];
-    const contradictionRates: number[] = [];
-
-    for (const sample of samples) {
-      const claims = Math.max(1, sample.claimCount);
-      const grounded = Math.max(0, Math.min(claims, sample.groundedClaimCount));
-      const unsupportedRate = 1 - grounded / claims;
-      const citationCoverage = clamp01(sample.citationCount / claims);
-      const contradiction = clamp01((sample.contradictingEvidenceCount ?? 0) / claims);
-      const confidence = clamp01(sample.confidence ?? 0.5);
-      const highConfidenceUnsupported = confidence >= 0.8 ? unsupportedRate : 0;
-
-      groundedRates.push(grounded / claims);
-      citationRates.push(citationCoverage);
-      highConfidenceUnsupportedRates.push(highConfidenceUnsupported);
-      contradictionRates.push(contradiction);
-    }
-
-    groundedClaimRate = average(groundedRates);
-    citationCoverageRate = average(citationRates);
-    highConfidenceUnsupportedRate = average(highConfidenceUnsupportedRates);
-    contradictionRate = average(contradictionRates);
-  } else {
-    groundedClaimRate = profile.groundingVerified ? 0.85 : 0.45;
-    citationCoverageRate = profile.sourceAttributionInAnswers ? 0.8 : 0.3;
-    highConfidenceUnsupportedRate = profile.confidenceScoresProvided ? 0.2 : 0.35;
-    contradictionRate = 0.1;
+  const samples = (profile.ragOutputEvaluations ?? []).filter((sample) => Number.isFinite(sample.claimCount) && sample.claimCount > 0);
+  if (samples.length === 0) {
+    return {
+      ...metricEvidence({ riskScore: null, groundedClaimRate: null, citationCoverageRate: null, highConfidenceUnsupportedRate: null, contradictionRate: null }),
+      riskScore: null, groundedClaimRate: null, citationCoverageRate: null,
+      highConfidenceUnsupportedRate: null, contradictionRate: null, sampleSize: 0,
+    };
   }
-
-  const unsupportedRate = 1 - groundedClaimRate;
-  const riskScore = Math.round(
-    clamp100(
-      clamp01(
-        unsupportedRate * 0.45 +
-          (1 - citationCoverageRate) * 0.25 +
-          highConfidenceUnsupportedRate * 0.2 +
-          contradictionRate * 0.1
-      ) * 100
-    )
-  );
-
+  const groundedRates: number[] = [];
+  const citationRates: number[] = [];
+  const highConfidenceUnsupportedRates: number[] = [];
+  const contradictionRates: number[] = [];
+  for (const sample of samples) {
+    const claims = sample.claimCount;
+    const grounded = Math.max(0, Math.min(claims, sample.groundedClaimCount));
+    const unsupportedRate = 1 - grounded / claims;
+    const confidence = clamp01(sample.confidence ?? 0.5);
+    groundedRates.push(grounded / claims);
+    citationRates.push(clamp01(sample.citationCount / claims));
+    highConfidenceUnsupportedRates.push(confidence >= 0.8 ? unsupportedRate : 0);
+    contradictionRates.push(clamp01((sample.contradictingEvidenceCount ?? 0) / claims));
+  }
+  const groundedClaimRate = average(groundedRates);
+  const citationCoverageRate = average(citationRates);
+  const highConfidenceUnsupportedRate = average(highConfidenceUnsupportedRates);
+  const contradictionRate = average(contradictionRates);
+  const riskScore = Math.round(clamp100(clamp01(
+    (1 - groundedClaimRate) * 0.45 + (1 - citationCoverageRate) * 0.25 +
+    highConfidenceUnsupportedRate * 0.2 + contradictionRate * 0.1
+  ) * 100));
   return {
-    riskScore,
-    groundedClaimRate,
-    citationCoverageRate,
-    highConfidenceUnsupportedRate,
-    contradictionRate,
-    sampleSize: samples.length
+    ...metricEvidence({ riskScore, groundedClaimRate, citationCoverageRate, highConfidenceUnsupportedRate, contradictionRate }),
+    riskScore, groundedClaimRate, citationCoverageRate, highConfidenceUnsupportedRate, contradictionRate,
+    sampleSize: samples.length,
   };
 }
 
 function computeCitationIntegrity(profile: RAGCapabilityProfile): CitationIntegrityDiagnostics {
   const samples = profile.citationEvaluations ?? [];
   if (samples.length === 0) {
-    const base = profile.sourceAttributionInAnswers ? 0.7 : 0;
     return {
-      integrityScore: Math.round(base * 100),
-      accuracyRate: base,
-      verifiabilityRate: base,
-      sourceValidityRate: base,
-      sampleSize: 0
+      ...metricEvidence({ integrityScore: null, accuracyRate: null, verifiabilityRate: null, sourceValidityRate: null }),
+      integrityScore: null, accuracyRate: null, verifiabilityRate: null, sourceValidityRate: null, sampleSize: 0,
     };
   }
 
@@ -420,6 +386,7 @@ function computeCitationIntegrity(profile: RAGCapabilityProfile): CitationIntegr
   );
 
   return {
+    ...metricEvidence({ integrityScore, accuracyRate, verifiabilityRate, sourceValidityRate }),
     integrityScore,
     accuracyRate,
     verifiabilityRate,
@@ -459,7 +426,7 @@ export function scoreRAGMaturity(profile: RAGCapabilityProfile): RAGMaturityResu
   }
   let retrieval = retrievalBase;
   if (profile.retrievalAccuracyBenchmarked || retrievalQuality.sampleSize > 0) {
-    retrieval = Math.round(clamp100(retrievalBase * 0.55 + retrievalQuality.score * 0.45));
+    retrieval = Math.round(clamp100(weightedMean([[retrievalBase, 0.55], [retrievalQuality.score, 0.45]])!));
   }
 
   // Dimension 2: Chunking Strategy (0-100)
@@ -478,7 +445,7 @@ export function scoreRAGMaturity(profile: RAGCapabilityProfile): RAGMaturityResu
     recommendations.push("Attach source id/version/URI metadata to every chunk at ingestion time.");
   }
   if (profile.chunkQualityValidated) chunkingBase = Math.min(100, chunkingBase + 10);
-  const chunking = Math.round(clamp100(chunkingBase * 0.7 + metadataQuality.score * 0.3));
+  const chunking = Math.round(clamp100(weightedMean([[chunkingBase, 0.7], [metadataQuality.score, 0.3]])!));
 
   // Dimension 3: Data Freshness (0-100)
   let freshness = 0;
@@ -500,7 +467,7 @@ export function scoreRAGMaturity(profile: RAGCapabilityProfile): RAGMaturityResu
     if ((profile.p99LatencyMs ?? 9_999) < 500) productionBase += 15;
   }
   if (profile.failoverConfigured) productionBase += 15;
-  const production = Math.round(clamp100(productionBase * 0.75 + retrievalDrift.score * 0.25));
+  const production = Math.round(clamp100(weightedMean([[productionBase, 0.75], [retrievalDrift.score, 0.25]])!));
 
   // Dimension 5: Evidence & Provenance (0-100)
   let evidenceBase = 0;
@@ -511,9 +478,9 @@ export function scoreRAGMaturity(profile: RAGCapabilityProfile): RAGMaturityResu
   }
   if (profile.confidenceScoresProvided) evidenceBase += 30;
   if (profile.groundingVerified) evidenceBase += 25;
-  const hallucinationQuality = 100 - hallucinationRisk.riskScore;
+  const hallucinationQuality = hallucinationRisk.riskScore === null ? null : 100 - hallucinationRisk.riskScore;
   const evidence = Math.round(
-    clamp100(evidenceBase * 0.45 + citationIntegrity.integrityScore * 0.3 + hallucinationQuality * 0.25)
+    clamp100(weightedMean([[evidenceBase, 0.45], [citationIntegrity.integrityScore, 0.3], [hallucinationQuality, 0.25]])!)
   );
 
   // Dimension 6: Security (0-100)
@@ -527,25 +494,25 @@ export function scoreRAGMaturity(profile: RAGCapabilityProfile): RAGMaturityResu
   else gaps.push("No PII filtering before indexing");
   if (profile.indexTamperDetected) security += 20;
 
-  if (retrievalQuality.sampleSize > 0 && (retrievalQuality.precision < 0.7 || retrievalQuality.recall < 0.7)) {
+  if (retrievalQuality.precision !== null && retrievalQuality.recall !== null && (retrievalQuality.precision < 0.7 || retrievalQuality.recall < 0.7)) {
     gaps.push(
       `Retrieval precision/recall below target (p=${retrievalQuality.precision.toFixed(2)}, r=${retrievalQuality.recall.toFixed(2)})`
     );
     recommendations.push("Tune query expansion, reranking, and index filters to raise precision/recall above 0.70.");
   }
-  if (metadataQuality.score < 70) {
+  if (metadataQuality.score !== null && metadataQuality.score < 70) {
     gaps.push("Chunk metadata quality is below production threshold");
     recommendations.push("Require source uri/id, title, version, and ingest timestamp for indexed chunks.");
   }
-  if (retrievalDrift.trend === "degrading") {
+  if (retrievalDrift.trend === "degrading" && retrievalDrift.deltaF1 !== null) {
     gaps.push(`Retrieval quality drift detected (deltaF1=${retrievalDrift.deltaF1.toFixed(2)})`);
     recommendations.push("Enable retrieval regression alerts and auto-investigate corpus/index changes.");
   }
-  if (hallucinationRisk.riskScore > 40) {
+  if (hallucinationRisk.riskScore !== null && hallucinationRisk.riskScore > 40) {
     gaps.push(`Hallucination risk is elevated (${hallucinationRisk.riskScore}/100)`);
     recommendations.push("Raise grounding checks and block unsupported high-confidence claims.");
   }
-  if (citationIntegrity.integrityScore < 75) {
+  if (citationIntegrity.integrityScore !== null && citationIntegrity.integrityScore < 75) {
     gaps.push(`Citation integrity is weak (${citationIntegrity.integrityScore}/100)`);
     recommendations.push("Validate citations against retrieved chunks and source registry before final answer release.");
   }
@@ -575,10 +542,10 @@ export function scoreRAGMaturity(profile: RAGCapabilityProfile): RAGMaturityResu
   const deploymentRisk: RAGMaturityResult["deploymentRisk"] =
     dimensionScores.security < 30 ||
     dimensionScores.productionReadiness < 20 ||
-    hallucinationRisk.riskScore >= 80 ||
-    citationIntegrity.integrityScore < 30
+    (hallucinationRisk.riskScore !== null && hallucinationRisk.riskScore >= 80) ||
+    (citationIntegrity.integrityScore !== null && citationIntegrity.integrityScore < 30)
       ? "critical"
-      : overallScore < 40 || hallucinationRisk.riskScore >= 60
+      : overallScore < 40 || hallucinationRisk.riskScore === null || citationIntegrity.integrityScore === null || hallucinationRisk.riskScore >= 60
         ? "high"
         : overallScore < 65 || retrievalDrift.trend === "degrading"
           ? "medium"

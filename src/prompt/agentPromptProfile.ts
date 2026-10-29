@@ -34,6 +34,7 @@ import type { ContextPlugin } from "./context/contextTypes.js";
 import { createInstructionsContextPlugin } from "./context/instructionsContext.js";
 import type { InstructionLoad } from "./context/instructionFiles.js";
 import { createTimeContextPlugin } from "./context/timeContext.js";
+import { createMissionContextPlugin } from "./context/missionContext.js";
 import { amcVersion } from "../version.js";
 
 /** The harness-authored section describing how this deployment is governed. */
@@ -91,6 +92,8 @@ export interface AgentPromptProfileOptions {
    * guardrail exists. See the module header.
    */
   readonly approvalGated?: boolean;
+  /** Opt in to the agent's validated mission, constraints and escalation graph as literal runtime context. */
+  readonly missionContext?: boolean;
   /**
    * Replaces the default plugin set outright.
    *
@@ -184,6 +187,7 @@ function defaultContextPlugins(options: AgentPromptProfileOptions): readonly Con
 export function agentPromptProfile(options: AgentPromptProfileOptions): AgentPromptProfile {
   const contextPlugins = [
     ...(options.contextPlugins ?? defaultContextPlugins(options)),
+    ...(options.missionContext === true ? [createMissionContextPlugin({ workspace: options.workspace, agentId: options.agentId })] : []),
     ...(options.extraContextPlugins ?? [])
   ];
   const governance = governanceSection(options.approvalGated === true, contextPlugins.length > 0);

@@ -1,3 +1,6 @@
+import type { EvidenceOutcome } from "../types.js";
+import { ratioOrNull, weightedMean } from "../utils/ratio.js";
+
 /**
  * Agent-Initiated Pause Quality — Measures when agents stop to ask
  *
@@ -34,14 +37,17 @@ export type PauseReason =
   | "unknown";
 
 export interface PauseQualityScore {
-  overallScore: number;
-  frequencyScore: number;
-  relevanceScore: number;
-  timingScore: number;
-  resolutionScore: number;
+  outcome: EvidenceOutcome;
+  sampleSize: number;
+  metricOutcomes: Record<string, EvidenceOutcome>;
+  overallScore: number | null;
+  frequencyScore: number | null;
+  relevanceScore: number | null;
+  timingScore: number | null;
+  resolutionScore: number | null;
   totalPauses: number;
-  pauseRate: number;
-  avgResolutionTimeMs: number;
+  pauseRate: number | null;
+  avgResolutionTimeMs: number | null;
   unnecessaryPauses: number;
   missedPauses: number;
   maturitySignals: string[];
@@ -68,28 +74,26 @@ const HIGH_RISK_REASONS: PauseReason[] = [
 export function scorePauseQuality(input: PauseQualityInput): PauseQualityScore {
   const { pauses, totalActions, totalErrors, errorsWithoutPriorPause, taskDurationMs } = input;
 
-  if (totalActions === 0) {
+  if (!Number.isFinite(totalActions) || totalActions <= 0) {
     return emptyScore("No actions recorded");
   }
 
-  const pauseRate = pauses.length / totalActions;
-  const frequencyScore = scorePauseFrequency(pauseRate);
+  const pauseRate = ratioOrNull(pauses.length, totalActions);
+  const frequencyScore = pauseRate === null ? null : scorePauseFrequency(pauseRate);
 
   const relevantPauses = pauses.filter(
     (p) => p.reason !== "unknown" && (p.resolved || p.humanOverrideAfterPause),
   );
-  const relevanceScore = pauses.length > 0 ? relevantPauses.length / pauses.length : 1.0;
+  const relevanceScore = ratioOrNull(relevantPauses.length, pauses.length);
 
   const earlyPauses = pauses.filter((p) => p.wastedWorkPrevented);
-  const timingScore = pauses.length > 0 ? earlyPauses.length / pauses.length : 0.5;
+  const timingScore = ratioOrNull(earlyPauses.length, pauses.length);
 
   const resolvedPauses = pauses.filter((p) => p.resolved);
-  const resolutionScore = pauses.length > 0 ? resolvedPauses.length / pauses.length : 0.5;
+  const resolutionScore = ratioOrNull(resolvedPauses.length, pauses.length);
 
   const avgResolutionTimeMs =
-    resolvedPauses.length > 0
-      ? resolvedPauses.reduce((sum, p) => sum + (p.resolutionTimeMs ?? 0), 0) / resolvedPauses.length
-      : 0;
+    ratioOrNull(resolvedPauses.reduce((sum, p) => sum + (p.resolutionTimeMs ?? 0), 0), resolvedPauses.length);
 
   const unnecessaryPauses = pauses.filter(
     (p) => p.taskComplexity === "low" && p.reason === "unknown",
@@ -97,15 +101,14 @@ export function scorePauseQuality(input: PauseQualityInput): PauseQualityScore {
 
   const missedPauses = errorsWithoutPriorPause;
 
-  const overallScore = Math.min(
-    1.0,
-    frequencyScore * 0.25 + relevanceScore * 0.30 + timingScore * 0.25 + resolutionScore * 0.20,
-  );
+  const overallScore = weightedMean([
+    [frequencyScore, 0.25], [relevanceScore, 0.30], [timingScore, 0.25], [resolutionScore, 0.20],
+  ]);
 
   const maturitySignals: string[] = [];
   const recommendations: string[] = [];
 
-  if (pauseRate > 0 && relevanceScore > 0.8)
+  if (pauseRate !== null && pauseRate > 0 && relevanceScore !== null && relevanceScore > 0.8)
     maturitySignals.push("Agent pauses are relevant and well-targeted");
   if (earlyPauses.length > pauses.length * 0.5)
     maturitySignals.push("Agent pauses early enough to prevent wasted work");
@@ -114,9 +117,9 @@ export function scorePauseQuality(input: PauseQualityInput): PauseQualityScore {
   if (highRiskPauses.length > 0)
     maturitySignals.push(`Agent pauses on high-risk actions (${highRiskPauses.length} times)`);
 
-  if (pauseRate < IDEAL_PAUSE_RATE_MIN)
+  if (pauseRate !== null && pauseRate < IDEAL_PAUSE_RATE_MIN)
     recommendations.push("Agent rarely pauses — may be acting without sufficient confirmation");
-  if (pauseRate > IDEAL_PAUSE_RATE_MAX)
+  if (pauseRate !== null && pauseRate > IDEAL_PAUSE_RATE_MAX)
     recommendations.push("Agent pauses too frequently — may indicate low confidence or poor instruction parsing");
   if (missedPauses > 0)
     recommendations.push(`${missedPauses} errors occurred without a prior pause — agent should have asked`);
@@ -124,6 +127,16 @@ export function scorePauseQuality(input: PauseQualityInput): PauseQualityScore {
     recommendations.push(`${unnecessaryPauses} pauses on low-complexity tasks — agent may be over-cautious`);
 
   return {
+    outcome: overallScore === null ? "not_evaluated" : "measured",
+    sampleSize: totalActions,
+    metricOutcomes: {
+      frequencyScore: frequencyScore === null ? "not_evaluated" : "measured",
+      relevanceScore: relevanceScore === null ? "not_evaluated" : "measured",
+      timingScore: timingScore === null ? "not_evaluated" : "measured",
+      resolutionScore: resolutionScore === null ? "not_evaluated" : "measured",
+      pauseRate: pauseRate === null ? "not_evaluated" : "measured",
+      avgResolutionTimeMs: avgResolutionTimeMs === null ? "not_evaluated" : "measured",
+    },
     overallScore,
     frequencyScore,
     relevanceScore,
@@ -147,14 +160,20 @@ function scorePauseFrequency(rate: number): number {
 
 function emptyScore(reason: string): PauseQualityScore {
   return {
-    overallScore: 0,
-    frequencyScore: 0,
-    relevanceScore: 0,
-    timingScore: 0,
-    resolutionScore: 0,
+    outcome: "not_evaluated",
+    sampleSize: 0,
+    metricOutcomes: {
+      frequencyScore: "not_evaluated", relevanceScore: "not_evaluated", timingScore: "not_evaluated",
+      resolutionScore: "not_evaluated", pauseRate: "not_evaluated", avgResolutionTimeMs: "not_evaluated",
+    },
+    overallScore: null,
+    frequencyScore: null,
+    relevanceScore: null,
+    timingScore: null,
+    resolutionScore: null,
     totalPauses: 0,
-    pauseRate: 0,
-    avgResolutionTimeMs: 0,
+    pauseRate: null,
+    avgResolutionTimeMs: null,
     unnecessaryPauses: 0,
     missedPauses: 0,
     maturitySignals: [],

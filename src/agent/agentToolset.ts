@@ -10,11 +10,15 @@ import { bashTool } from "../tools/builtin/bashTool.js";
 import { fsTools } from "../tools/builtin/fsTools.js";
 import { ReadBeforeEditLedger } from "../tools/builtin/readBeforeEdit.js";
 import { searchTools } from "../tools/builtin/searchTools.js";
+import { sha256Hex } from "../utils/hash.js";
+import { canonicalize } from "../utils/json.js";
+import { toolSearchTool } from "../tools/builtin/toolSearchTool.js";
 import { sessionSpillReadTool } from "../tools/builtin/sessionSpillReadTool.js";
 import { webFetchTool } from "../tools/builtin/webFetchTool.js";
 import { webSearchTool, type WebSearchProvider } from "../tools/builtin/webSearchTool.js";
 import { askUserTool, type AskUserAnswerer } from "../tools/builtin/askUserTool.js";
 import { todoTool } from "../tools/builtin/todoTool.js";
+import { goalTool } from "../autonomy/goalTool.js";
 import { planTool } from "../tools/builtin/planTool.js";
 import { skillLoadTool } from "../skills/skillLoadTool.js";
 import { workspaceSkillRoots } from "../skills/skillTurn.js";
@@ -33,7 +37,7 @@ import type { ActionClass } from "../types.js";
 import { ControlCheckpointRootInWorkspaceError, loadActiveCompiledPolicy } from "../catalog/compiler/activate.js";
 import { ACTION_CLASSES } from "../governor/actionCatalog.js";
 import { writeEffectivePolicyReceipt } from "../policy/effectivePolicyReceipt.js";
-import { ToolRegistry } from "../tools/toolRegistry.js";
+import { ToolRegistry, ToolLoadoutError } from "../tools/toolRegistry.js";
 import { openLedger } from "../ledger/ledger.js";
 import { openActionJournal, type ActionJournal } from "../actions/actionJournal.js";
 import { checkLease } from "../actions/authorize.js";
@@ -96,6 +100,8 @@ export interface AgentToolsetOptions {
   };
   /** Human answerer for `ask_user` (P1-43). Absent: every ask_user call refuses. */
   readonly askUser?: AskUserAnswerer;
+  /** Current goal progress supplied by the owning scheduled run. Absent means unavailable. */
+  readonly getGoal?: () => unknown;
   /** Search provider for `web_search` (P1-43). Absent: every web_search call is denied; there is no default. */
   readonly webSearchProvider?: WebSearchProvider;
   /** Skill roots `skill.load` advertises and loads from. Defaults to the workspace's own `.amc/skills`. */
@@ -308,6 +314,48 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
   const ledger = new ReadBeforeEditLedger();
   for (const tool of fsTools({ ledger })) registry.define(tool);
   for (const tool of searchTools()) registry.define(tool);
+  const admittedCatalog = (scope: string, snapshot = loadVerifiedToolsConfigSnapshot(workspace), strict = true) => {
+    if (scope !== agentId) throw new ToolLoadoutError("UNAUTHORIZED");
+    if (!snapshot.signatureValid || !snapshot.config || (options.expectedToolsDigest !== undefined
+      && snapshot.digestSha256 !== options.expectedToolsDigest)) {
+      registry.synchronizeLoadout(scope, `unavailable:${options.sessionId}`);
+      if (strict) throw new ToolLoadoutError("CATALOG_UNAVAILABLE");
+      return [];
+    }
+    const selected = new Map(selectSupportedNativeTools(snapshot, [
+      ...NATIVE_DELEGATION_CAPABILITIES, ...(options.additionalCapabilities ?? [])
+    ]).map(tool => [tool.name, tool]));
+    const visible = registry.visible(scope);
+    // Discovery and activation obey the same signed identity and compiled visibility as native schema admission.
+    const catalog = registry.catalog(scope).filter(schema => (!compiled || compiledPolicyShows(compiled, schema.name))
+      && selected.has(schema.name) && selected.get(schema.name)!.actionClass === visible.get(schema.name)?.actionClass)
+      .sort((a, b) => a.name.localeCompare(b.name));
+    const identity = sha256Hex(canonicalize({ sessionId: options.sessionId, policyDigest: snapshot.digestSha256, catalogDigest: registry.catalogDigest(scope) }));
+    registry.synchronizeLoadout(scope, identity);
+    return catalog;
+  };
+  registry.define(toolSearchTool({
+    catalog: scope => admittedCatalog(scope),
+    discovered: (scope, schemas) => { admittedCatalog(scope); registry.rememberDiscovery(scope, schemas); },
+    activate: (execution, request) => {
+      const catalog = admittedCatalog(execution.agentId);
+      if (!catalog.some(schema => schema.name === request.name
+        && sha256Hex(canonicalize(schema.parameters)) === request.schemaDigestSha256)) {
+        throw new ToolLoadoutError(catalog.some(schema => schema.name === request.name) ? "STALE_ACTIVATION" : "UNAUTHORIZED");
+      }
+      const catalogDigestSha256 = sha256Hex(canonicalize(catalog));
+      return registry.activate(execution.agentId, request, activation => {
+        const evidenceRef = recordAudit({ schemaVersion: "2026-09-08", auditType: "NATIVE_TOOL_ACTIVATED",
+          sessionId: options.sessionId, agentId: execution.agentId, toolName: activation.name,
+          schemaDigestSha256: activation.schemaDigestSha256, catalogDigestSha256, loadoutRevision: activation.revision,
+          callId: execution.callId, publication: "prepared" });
+        // A writer callback cannot change session, signed scope or catalog while committing this activation.
+        admittedCatalog(execution.agentId);
+        if (!evidenceRef) throw new ToolLoadoutError("EVIDENCE_UNAVAILABLE");
+        return evidenceRef;
+      }, execution.signal);
+    }
+  }));
   // Use the actual native session writer. An owned session refuses raw
   // ledger appends; a receipt write failure also prevents tool success.
   // Returns the row's evidence event id when the writer reports one.
@@ -423,6 +471,7 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
   registry.define(todoTool({ sessionId: currentSessionId, record: recordNative }));
   registry.define(planTool({ sessionId: currentSessionId, record: recordNative }));
   registry.define(skillLoadTool({ roots: options.skillRoots ?? workspaceSkillRoots(workspace), record: recordNative }));
+  registry.define(goalTool(options.getGoal));
   if (options.subagents !== undefined) {
     // Both tools, from one capability. `delegate` is one child; `workflow` is a
     // declared plan of them. Each is still gated a second time by the operator's
@@ -541,6 +590,7 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
     seam: { ...seam, schemas: () => {
       recordUnconfinedEnabled();
       const snapshot = loadVerifiedToolsConfigSnapshot(workspace);
+      admittedCatalog(agentId, snapshot, false);
       // The body guard runs after model/approval waits. It cannot stop a newer
       // signed policy from exposing unreviewed schemas to that earlier request.
       // Refuse before model preparation rather than silently switching to no tools.
@@ -560,6 +610,7 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
     pipeline,
     readiness,
     close: (): void => {
+      registry.synchronizeLoadout(agentId, "closed");
       ledgerHandle?.close();
       ledgerHandle = null;
       journal?.close();

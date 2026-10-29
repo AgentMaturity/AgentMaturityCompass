@@ -10,6 +10,7 @@ import { registerAgentCommands } from "../src/cli-agent-commands.js";
 import { registerNativeScheduleCommands } from "../src/cli-native-schedule-commands.js";
 import { buildCommandInventory } from "../src/cliUx.js";
 import { claimDueRun, readSchedules, saveSchedules, schedulesPath, scheduleStatus } from "../src/autonomy/scheduleStore.js";
+import { readObjective } from "../src/autonomy/objectiveStore.js";
 import { loadVerifiedToolsConfigSnapshot } from "../src/toolhub/toolhubValidators.js";
 import { stubProviderRoute, STUB_PROVIDER_ID, STUB_PROVIDER_MODEL } from "../src/agent/stubProvider.js";
 import { bodyFromChunks, type HttpTransport } from "../src/llm/adapter/transport.js";
@@ -178,5 +179,27 @@ describe("public due execution reaches the existing native composed lifecycle", 
     await expect(runComposedTurn({ ...base, approvalGate: { actionClass: "READ_ONLY", riskTier: "high" },
       delegation: { grant: () => {}, runner: async () => ({ ok: true, text: "must never execute" }) } })).rejects.toThrow(/signed approval gate/);
     expect(transport).not.toHaveBeenCalled(); expect(scheduleStatus(dir, 1_000_000).interrupted).toEqual([]);
+  });
+});
+
+
+describe("WP19 objective lifecycle flags on existing schedule commands", () => {
+  it("creates, pauses and resumes by signed revision without loading the runtime", async () => {
+    const dir = workspace();
+    const reviewed = { ...definition(true), objective: { version: 1, ownerPrincipal: "default",
+      completionCheck: { kind: "file-sha256", path: "done.txt", sha256: createHash("sha256").update("done").digest("hex") } } };
+    saveSchedules(dir, [reviewed]);
+    const input = join(dir, "objective.json"), bytes = JSON.stringify(reviewed); writeFileSync(input, bytes);
+    const command = cli(dir), inputHash = createHash("sha256").update(bytes).digest("hex");
+    const args = ["put", input, "--expect-input-sha256", inputHash, "--expect-digest", pins(dir).schedules];
+    await command.parse(...args, "--objective-action", "create", "--expect-objective-revision", "absent");
+    expect(readObjective(dir, "review")).toMatchObject({ revision: 1, status: "active" });
+    await command.parse(...args, "--objective-action", "pause", "--expect-objective-revision", "1");
+    expect(readObjective(dir, "review")).toMatchObject({ revision: 2, status: "paused" });
+    await command.parse(...args, "--objective-action", "resume", "--expect-objective-revision", "1");
+    expect(command.output.fail).toHaveBeenCalledTimes(1);
+    await command.parse(...args, "--objective-action", "resume", "--expect-objective-revision", "2");
+    expect(readObjective(dir, "review")).toMatchObject({ revision: 3, status: "active" });
+    expect(command.loadRuntime).not.toHaveBeenCalled();
   });
 });

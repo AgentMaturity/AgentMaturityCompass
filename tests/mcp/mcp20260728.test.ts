@@ -522,8 +522,9 @@ describe("P1-39 governed stateless MCP public flow", () => {
       expect(outcome).toMatchObject({ outcome: "ERROR", exitCode: 1, timedOut: false, denied: false });
       const recorded = assertRecordedPair(f, 0, outcome);
       expect(recorded.meta.outcome).toBe("ERROR");
-      expect(JSON.parse(String(outcome.content))).toEqual({
+      expect(JSON.parse(String(outcome.content))).toMatchObject({
         content: [{ type: "text", text: "Synthetic remote error: TOOL_OUTCOME_UNKNOWN" }],
+        amcProvenance: { serverId: SERVER_ID, catalogDigest: f.reviewed!.digest, trust: "untrusted-external" }, amcLosses: [],
         isError: true, resultType: "complete"
       });
       expect(f.requests.map(row => row.rpc)).toEqual(["server/discover", "tools/list", "server/discover", "tools/list", "tools/list", "tools/call"]);

@@ -19,6 +19,31 @@
  * whatever was actually written.
  */
 
+import { catalogProtocolForEncoder, createModelMetadataSnapshot, parseModelMetadataSnapshot, type ModelMetadataSnapshot } from "../llm/modelCatalog.js";
+import { sha256Hex } from "../utils/hash.js";
+import { canonicalize } from "../utils/json.js";
+import type { RequestHeaderParams } from "./sessionApiTypes.js";
+
+/** Separate from the wire digest, which remains SHA-256 of transmitted bytes. */
+function metadataIdentity(header: Pick<RequestHeaderMeta, "providerId" | "model" | "encoderId" | "encoderVersion" | "params" | "requestDigest">,
+  metadata: ModelMetadataSnapshot | null): string {
+  return sha256Hex(canonicalize({ providerId: header.providerId, model: header.model, encoderId: header.encoderId,
+    encoderVersion: header.encoderVersion, params: header.params, requestDigest: header.requestDigest, modelMetadataDigest: metadata?.digest ?? null }));
+}
+
+/** Capture metadata at the writer boundary; existing explicit routes still work without catalog records. */
+export function pinnedHeaderMetadata(params: RequestHeaderParams): Pick<RequestHeaderMeta, "modelMetadata" | "requestIdentityDigest"> {
+  const protocol = catalogProtocolForEncoder(params.encoderId);
+  const modelMetadata = params.modelMetadata === undefined
+    ? protocol === null ? null : createModelMetadataSnapshot(params.providerId, protocol, params.model)
+    : params.modelMetadata === null ? null : parseModelMetadataSnapshot(params.modelMetadata);
+  if ((params.modelMetadata != null && modelMetadata === null) || (modelMetadata !== null
+    && (modelMetadata.providerId !== params.providerId || modelMetadata.model !== params.model || modelMetadata.protocol !== protocol))) {
+    throw new Error("Request model metadata is invalid or incompatible with the selected provider, protocol or model");
+  }
+  return { modelMetadata, requestIdentityDigest: metadataIdentity({ ...params, requestDigest: sha256Hex(params.requestBytes) }, modelMetadata) };
+}
+
 /**
  * Everything a `request/header` row states about the request it authorised.
  *
@@ -28,6 +53,10 @@
  * than of anything a caller kept in memory.
  */
 export interface RequestHeaderMeta {
+  /** Absent on historical rows. This pin is indicative metadata, never observed endpoint support. */
+  readonly modelMetadata?: ModelMetadataSnapshot | null;
+  /** Metadata/selection identity; requestDigest below continues to identify wire bytes only. */
+  readonly requestIdentityDigest?: string;
   readonly model: string;
   readonly providerId: string;
   /**
@@ -111,7 +140,17 @@ export function parseRequestHeaderMeta(metaJson: string): RequestHeaderMeta | nu
   ) {
     return null;
   }
+  const modelMetadata = candidate.modelMetadata == null ? null : parseModelMetadataSnapshot(candidate.modelMetadata);
+  if ((candidate.modelMetadata !== undefined && candidate.modelMetadata !== null && modelMetadata === null)
+      || (modelMetadata !== null && (modelMetadata.providerId !== candidate.providerId || modelMetadata.model !== candidate.model
+        || modelMetadata.protocol !== catalogProtocolForEncoder(candidate.encoderId)))) return null;
+  try {
+    if (candidate.requestIdentityDigest !== undefined && (typeof candidate.requestIdentityDigest !== "string"
+      || candidate.requestIdentityDigest !== metadataIdentity(candidate as unknown as RequestHeaderMeta, modelMetadata))) return null;
+  } catch { return null; }
   return {
+    ...(candidate.modelMetadata === undefined ? {} : { modelMetadata }),
+    ...(candidate.requestIdentityDigest === undefined ? {} : { requestIdentityDigest: candidate.requestIdentityDigest }),
     model: candidate.model,
     providerId: candidate.providerId,
     params: candidate.params,

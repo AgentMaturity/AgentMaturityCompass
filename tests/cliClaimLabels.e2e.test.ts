@@ -426,7 +426,7 @@ describe.concurrent("actual strict CLI result labels in a signed, keyless privat
     completed(compared); expect(compared.status, compared.stderr).toBe(0);
     expect(compared.stdout).toMatch(/^Claim: Synthetic example/m);
     expect(compared.stdout).toContain(`Comparison: ${labBaselineId} vs ${labCandidateId}`);
-    expect(compared.stdout).toContain("ta-policy-focus:");
+    expect(compared.stdout).toContain("ta-policy-focus sample 1 (matched):");
     const otherKind = await createSimulatedLab("exact-lab-other-kind", "trace_memory");
     const disjoint = await invoke("exact-lab-compare-disjoint", ["lab-compare", "--baseline", labBaselineId, "--candidate", otherKind]);
     completed(disjoint); expect(disjoint.status, disjoint.stderr).toBe(1);

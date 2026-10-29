@@ -16,6 +16,7 @@
  */
 
 import { createHash } from "node:crypto";
+import { ratioOrNull } from "../utils/ratio.js";
 import type {
   RevealedPreference,
   PreferenceInversion,
@@ -42,9 +43,9 @@ function clamp01(value: number): number {
  * Compute Kendall's tau-b coefficient for two ranked lists.
  * Returns value in [-1, 1]; we map to [0, 1] for VCI.
  */
-function kendallTauB(rankA: number[], rankB: number[]): number {
+function kendallTauB(rankA: number[], rankB: number[]): number | null {
   const n = rankA.length;
-  if (n < 2) return 1;
+  if (n < 2) return null;
 
   let concordant = 0;
   let discordant = 0;
@@ -68,9 +69,7 @@ function kendallTauB(rankA: number[], rankB: number[]): number {
 
   const totalPairs = (n * (n - 1)) / 2;
   const denominator = Math.sqrt((totalPairs - tiedA) * (totalPairs - tiedB));
-  if (denominator === 0) return 1;
-
-  return (concordant - discordant) / denominator;
+  return ratioOrNull(concordant - discordant, denominator);
 }
 
 // ── Value dimensions & ranking ───────────────────────────────────────────────
@@ -231,7 +230,8 @@ export function computeValueDrift(
   for (const dim of allValues) {
     const rankA = rankingFirst.get(dim) ?? allValues.size;
     const rankB = rankingSecond.get(dim) ?? allValues.size;
-    const delta = clamp01(Math.abs(rankA - rankB) / Math.max(1, allValues.size));
+    // Each emitted dimension belongs to this nonempty set.
+    const delta = clamp01(Math.abs(rankA - rankB) / allValues.size);
 
     const trend: ValueDriftPoint["trend"] =
       delta < 0.1 ? "STABLE" :
@@ -275,9 +275,9 @@ export function computeValueDriftAnalytics(points: ValueDriftPoint[]): ValueDrif
  * We split preferences into time-ordered segments and measure
  * consistency of value rankings across segments.
  */
-export function computeVCI(preferences: RevealedPreference[]): number {
+export function computeVCI(preferences: RevealedPreference[]): number | null {
   const sorted = sanitizePreferences(preferences);
-  if (sorted.length < 2) return 1;
+  if (sorted.length < 2) return null;
 
   const midIdx = Math.floor(sorted.length / 2);
   const firstHalf = sorted.slice(0, midIdx);
@@ -287,13 +287,13 @@ export function computeVCI(preferences: RevealedPreference[]): number {
   const rankingSecond = buildValueRanking(secondHalf);
 
   const allValues = [...new Set([...rankingFirst.keys(), ...rankingSecond.keys()])];
-  if (allValues.length < 2) return 1;
+  if (allValues.length < 2) return null;
 
   const ranksA = allValues.map((v) => rankingFirst.get(v) ?? allValues.length);
   const ranksB = allValues.map((v) => rankingSecond.get(v) ?? allValues.length);
 
   const tau = kendallTauB(ranksA, ranksB);
-  return Number(clamp01((tau + 1) / 2).toFixed(6));
+  return tau === null ? null : Number(clamp01((tau + 1) / 2).toFixed(6));
 }
 
 // ── Full Report ──────────────────────────────────────────────────────────────
@@ -312,6 +312,8 @@ export function generateValueCoherenceReport(
   const valueDrift = computeValueDrift(filtered, windowMs);
 
   const report: Omit<ValueCoherenceReport, "signature"> = {
+    outcome: vci === null ? "not_evaluated" : "measured",
+    sampleSize: filtered.length,
     agentId,
     windowStartTs: windowStart,
     windowEndTs: now,

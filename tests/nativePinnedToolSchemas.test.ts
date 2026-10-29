@@ -5,6 +5,7 @@ import { afterEach, expect, test, vi } from "vitest";
 import { agentToolset } from "../src/agent/agentToolset.js";
 import { bashTool } from "../src/tools/builtin/bashTool.js";
 import { searchTools } from "../src/tools/builtin/searchTools.js";
+import { toolSearchTool } from "../src/tools/builtin/toolSearchTool.js";
 import { DEFAULT_AGENT_LOOP_CONFIG } from "../src/agent/loopTypes.js";
 import { DEFAULT_RETRY_RUNTIME } from "../src/agent/requestRetry.js";
 import { runStep, type LoopLlm } from "../src/agent/stepRunner.js";
@@ -222,4 +223,79 @@ test("the bash and search schemas pin the reviewed WP34b arguments", () => {
     .sort((a, b) => a.name.localeCompare(b.name));
   expect(offered.map(schema => schema.name)).toEqual(["bash", "glob", "grep"]);
   expect(sha256Hex(canonicalize(offered))).toBe(BASH_SEARCH_TOOL_SCHEMAS_SHA256);
+});
+
+// WP13b follows the canonical-schema review process above. Review the new explicit name/digest activation operation;
+// discovery remains separate, READ_ONLY, and bounded. Both operations are pinned with their exact description and schema.
+const TOOL_SEARCH_SCHEMA_SHA256 = "dc3d1d6289cbf3bee2f274c45c9e1bdd2f31b3c3308417779e65ef14268ce789";
+test("the tool_search schema pins separate bounded discovery and digest-bound activation operations", () => {
+  const tool = toolSearchTool({ catalog: () => [] });
+  expect(tool.actionClass).toBe("READ_ONLY");
+  const { name, description, parameters } = tool;
+  expect(parameters).toMatchObject({ type: "object", additionalProperties: false, properties: {
+    query: { type: "string", minLength: 1, maxLength: 1000, pattern: "\\S" },
+    limit: { type: "integer", minimum: 1, maximum: 20, default: 5 }
+  } });
+  expect(Object.keys(parameters!.properties as object).sort()).toEqual(["activate", "limit", "query"]);
+  expect(parameters!.properties).toMatchObject({ activate: { type: "object", additionalProperties: false,
+    required: ["name", "schemaDigestSha256"], properties: { name: { type: "string", minLength: 1, maxLength: 256 },
+      schemaDigestSha256: { type: "string", pattern: "^[a-f0-9]{64}$" } } } });
+  expect(parameters!.oneOf).toHaveLength(2);
+  expect(sha256Hex(canonicalize({ name, description, parameters }))).toBe(TOOL_SEARCH_SCHEMA_SHA256);
+});
+
+const discoveryGrant: ToolDefinition = { name: "tool_search", actionClass: "READ_ONLY" };
+test("native discovery returns signed capabilities while a permissive default cannot disclose ungranted built-ins", async () => {
+  const f = fixture({ grants: [discoveryGrant] });
+  expect(f.names()).toEqual(["fs.read", "tool_search"]);
+  const found = await f.call("tool_search", { query: "read" });
+  expect(found.outcome).toBe("OK");
+  const schemas = JSON.parse(String(found.content)).tools as Array<{ name: string; schemaDigestSha256: string; parameters: object }>;
+  const offeredRead = f.tools.seam.schemas()!.find(schema => schema.name === "fs.read")!;
+  expect(schemas).toContainEqual({ ...offeredRead, schemaDigestSha256: sha256Hex(canonicalize(offeredRead.parameters)) });
+  const writes = await f.call("tool_search", { query: "write" });
+  expect(writes.outcome).toBe("OK");
+  expect(JSON.parse(String(writes.content)).tools.map((schema: { name: string }) => schema.name)).not.toContain("fs.write");
+});
+
+test.each(["step end", "global denial", "scope denial"] as const)("native deferred discovery loses metadata after %s", async change => {
+  const f = fixture({ grants: [discoveryGrant], extension: true });
+  const body = vi.fn(() => ({ ok: true, output: "extension body must not run during discovery" }));
+  const parameters = { type: "object", properties: { needleArg: { type: "string" } }, additionalProperties: false };
+  f.tools.registry.define({ name: "reviewed_extension", actionClass: "READ_ONLY", description: "Conditional needlecatalog fixture",
+    parameters, exposure: "deferred", available: () => true, body }, "default");
+  const search = () => f.call("tool_search", { query: "needlecatalog" });
+  expect(JSON.parse(String((await search()).content)).tools).toEqual([]);
+  const dispose = await f.tools.registry.prepareStep({ agentId: "default", turn: 1, step: 1, signal: new AbortController().signal });
+  try {
+    expect(f.names()).not.toContain("reviewed_extension");
+    const found = await search(); expect(found.outcome).toBe("OK");
+    expect(JSON.parse(String(found.content)).tools).toEqual([{ name: "reviewed_extension", description: "Conditional needlecatalog fixture",
+      parameters, schemaDigestSha256: sha256Hex(canonicalize(parameters)) }]);
+    if (change === "step end") dispose();
+    else f.tools.registry.restrict({ deny: new Set(["reviewed_extension"]) }, change === "scope denial" ? "default" : undefined);
+    const revoked = await search(); expect(revoked.outcome).toBe("OK");
+    expect(JSON.parse(String(revoked.content)).tools).toEqual([]);
+    expect(body).not.toHaveBeenCalled();
+  } finally { dispose(); }
+});
+
+test.each(["changed pin", "invalid signature"] as const)("native discovery discloses no metadata after %s", async change => {
+  const f = fixture({ grants: [discoveryGrant] });
+  expect((await f.call("tool_search", { query: "read" })).outcome).toBe("OK");
+  if (change === "changed pin") { f.config.tools.allowedTools.push(write); initToolsConfig(f.workspace, f.config); }
+  else writeFileSync(toolsConfigSigPath(f.workspace), "{}");
+  const result = await f.call("tool_search", { query: "read" });
+  expect(result.outcome).toBe("DENIED");
+  expect(String(result.content)).not.toContain('"parameters"');
+  expect(String(result.content)).not.toContain('"schemaDigestSha256"');
+});
+
+test("native discovery excludes a signed extension whose live action class no longer matches", async () => {
+  const f = fixture({ grants: [discoveryGrant], extension: true });
+  f.tools.registry.define({ name: "reviewed_extension", actionClass: "WRITE_LOW", description: "Mismatchneedle fixture",
+    parameters: { type: "object", properties: {} }, body: () => ({ ok: true, output: "must not run" }) }, "default");
+  const result = await f.call("tool_search", { query: "mismatchneedle" });
+  expect(result.outcome).toBe("OK");
+  expect(JSON.parse(String(result.content)).tools).toEqual([]);
 });

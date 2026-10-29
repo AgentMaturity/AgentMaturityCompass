@@ -265,7 +265,7 @@ describe("running what is due", () => {
     expect(dueSchedules(dir, 1_000_001), "not due again straight away").toEqual([]);
   });
 
-  it("counts nonconverging goals as failures and stops at the consecutive-failure threshold", async () => {
+  it("counts nonconverging goals as exhausted and stops at the exhaustion threshold", async () => {
     const dir = workspace();
     saveSchedules(dir, [nightly({ maxRounds: 2 })]);
     const owned = base(dir);
@@ -277,7 +277,8 @@ describe("running what is due", () => {
       const results = await runDueSchedules({ ...owned, now, runner });
       expect(results[0]).toMatchObject({ ok: false, rounds: 2, stoppedBy: "max-rounds" });
       expect(scheduleStatus(dir, now).schedules[0]).toMatchObject({
-        consecutiveFailures: failure,
+        consecutiveFailures: 0,
+        consecutiveExhausted: failure,
         inFlightSince: null,
         lastOutcome: { ok: false, summary: "reached the 2-round ceiling" }
       });

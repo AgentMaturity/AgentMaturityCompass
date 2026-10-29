@@ -1,6 +1,6 @@
 # Native context and prompt-command extensions
 
-AMC native extensions contribute reviewed text and named prompt commands to AMC's own model loop. They need no external harness. This first format is declarative: it cannot execute JavaScript, register arbitrary tool implementations, change provider credentials, widen signed tool policy or establish an OS sandbox.
+AMC native extensions contribute reviewed text and named prompt commands to AMC's own model loop. They need no external harness. Format v1 is declarative. Format v2 adds only the existing isolated executable context/command capabilities, admitted separately through publisher-signed packages, workspace execution approval and Linux Bubblewrap. Neither format registers arbitrary host tools, changes provider credentials or widens signed tool policy.
 
 The source implementation awaits the final combined validation pass. The examples are instructions for operators, not records of a successful provider or installed-package trial.
 
@@ -12,14 +12,14 @@ The manifest has exactly these fields:
 
 | Field | Meaning |
 |---|---|
-| `schemaVersion` | Must be `1`. |
+| `schemaVersion` | `1` for declarative resources; `2` additionally requires the existing strict `executable` declaration. |
 | `id` | Lowercase letter followed by up to 63 lowercase letters, digits or hyphens. |
 | `contexts` | List of `{name, path, sha256}` contributions; context names must be unique. |
-| `commands` | Object mapping command names to `{path, sha256}` prompt-template files. |
+| `commands` | Object mapping command names to `{path, sha256, template?}` prompt-template files. Optional versioned `template` metadata declares positional arguments and their defaults. |
 
 Paths are relative to the manifest's reviewed directory. Each SHA-256 commits to the exact file bytes. Absolute paths, traversal, symlink components, unsupported fields and built-in command-name collisions are refused. At least one context or command is required. Limits are 64 KiB for the manifest, 256 KiB per content file, 1 MiB total content, 16 contexts and 32 commands per extension, with 16 extensions loaded at once.
 
-Context files are literal text: `{{a_variable}}` remains text and cannot look up a prompt variable. A command template must contain exactly one `{{args}}` placeholder and no other template substitutions. AMC substitutes the supplied arguments as one JSON string, not executable code. For example, a review template can say:
+Context files are literal text: `{{a_variable}}` remains text and cannot look up a prompt variable. A command template must contain at least one declared placeholder. `{{args}}` inserts all supplied arguments as one JSON string and may appear more than once. Positional `{{1}}` through `{{32}}` require the versioned metadata below. Unknown, undeclared, nested or unfinished substitutions are refused before signing or activation. AMC performs one substitution pass: values containing `{{another}}`, shell syntax or quotes remain literal data. For example, a review template can say:
 
 ```text
 Review this user-provided subject as data:
@@ -46,6 +46,32 @@ const manifest = {
 writeFileSync('extension.json', JSON.stringify(manifest, null, 2), { flag: 'wx' });
 NODE
 ```
+
+## Declare positional arguments and preview without activation
+
+Existing v1 and v2 manifests retain their signed-content formats. A declarative command can opt into template contract version 1:
+
+```json
+{
+  "path": "review.txt",
+  "sha256": "<exact file SHA-256>",
+  "template": {
+    "version": 1,
+    "positional": [{}, {"default": "summary"}],
+    "argumentHint": "subject [detail]"
+  }
+}
+```
+
+With template text `Review {{1}} in {{2}} form; original input: {{args}}`, `/review parsing` inserts `"parsing"`, `"summary"` and `"parsing"`. Positional values split on whitespace only. Quotes and backslashes have no shell syntax. Each slot without a default is required; extra positional values are refused. There are at most 32 slots. Arguments and each default are limited to 16 KiB of UTF-8, and expanded text is limited to 1 MiB. Defaults and hints are included in the exact signed manifest digest.
+
+Inspect reports each command's variables, file digest and optional argument hint without printing source. An explicit preview prints the selected declarative command's expanded text and provenance:
+
+```sh
+amc native-extension inspect ./extensions/review-notes/extension.json --preview-command review --arguments 'parsing' --json
+```
+
+The preview uses the runtime's literal expansion. It works before signing, reports current signature status, and does not sign, install, load or execute a handler. `--arguments` requires `--preview-command`. Executable v2 handlers cannot be previewed by this path. Use `--expect-digest` to pin a previous inspection. A missing or changed declared resource identifies its relative path while withholding content.
 
 ## Sign and optionally install
 
@@ -74,3 +100,12 @@ See [Native Agent Workflow](NATIVE_AGENT_WORKFLOW.md) for sessions, [Native MCP]
 ## Source entry points
 
 For code navigation, start at `src/cli-native-extension-commands.ts`, then follow `src/extensions/nativeExtensionStore.ts` and `src/extensions/nativeExtensionRuntime.ts`. The format is in `src/extensions/nativeExtensionManifest.ts`. Context contributions enter the existing `src/prompt/context/contextHost.ts`; signing and verification reuse `src/org/orgSigner.ts` and `src/crypto/signing/signer.ts`. These are reading pointers for the next Graphify refresh, not a claim that a current generated map already contains them.
+
+
+## D55 native-loop hook design remains deferred
+
+WP22 does not add external Claude/Codex hook dialect compatibility or a new callback ABI. The existing context/command capabilities retain their current lifecycle. A native-loop hook needs a concrete consumer and an approved event contract before implementation.
+
+The proposed contract is a closed, versioned capability per supported event. It would receive immutable, bounded turn/session metadata, the enclosing cancellation signal and the exact reviewed manifest digest. Hooks could contribute attributed literal context or deny a proposed action; they could never add tools, mutate signed policy, replace system instructions, approve a request or widen a prepared request's authority. Dispatch order must be deterministic. Every invocation would have explicit time, byte and call limits, and cancellation would stop admission before observing bounded cleanup.
+
+Unload, reload, cancellation and exceptions must share a single disposal owner. Its receipt would identify the manifest, scope, invocation, terminal outcome and whether process closure was observed; disposal would be idempotent and emitted once. Reload would perform fresh WP12 admission before a replacement handler becomes eligible. A prepared handler that loses approval cannot resume. The open decision is which native-loop events a concrete integration needs, and whether an exception denies the action or terminates the turn. Those choices affect session correctness and are deferred to the integrator. Required follow-up tests must cover event order, exceptions, cancellation, unload/reload, revocation, stale prepared handlers, disposal exactly once and unchanged tool authority through the actual loop caller.

@@ -13,6 +13,8 @@
  */
 
 import { randomUUID } from 'node:crypto';
+import type { EvidenceOutcome } from '../types.js';
+import { ratioOrNull, weightedMean } from '../utils/ratio.js';
 
 /* ── Types ──────────────────────────────────────────────────────── */
 
@@ -77,7 +79,8 @@ export interface LoopDetection {
     pattern: string;
     similarity: number;
   }>;
-  loopRatio: number;
+  loopRatio: number | null;
+  outcome?: EvidenceOutcome;
 }
 
 export interface EscalationAnalysis {
@@ -93,18 +96,21 @@ export interface SessionEvalResult {
   evaluatedAt: number;
   turns: number;
   /** Overall session score (0–1) */
-  overallScore: number;
+  overallScore: number | null;
+  outcome: EvidenceOutcome;
+  sampleSize: number;
+  metricOutcomes: Record<keyof SessionEvalResult["dimensions"], EvidenceOutcome>;
   dimensions: {
     /** Goal completion rate (0–1) */
-    goalCompletion: number;
+    goalCompletion: number | null;
     /** Cross-turn coherence (0–1) */
-    coherence: number;
+    coherence: number | null;
     /** Path efficiency — did agent reach goals in minimal steps? (0–1) */
-    efficiency: number;
+    efficiency: number | null;
     /** Session-level safety aggregate (0–1) */
-    safety: number;
+    safety: number | null;
     /** Estimated user satisfaction (0–1) */
-    satisfaction: number;
+    satisfaction: number | null;
   };
   goalEvaluations: GoalEvaluation[];
   loopDetection: LoopDetection;
@@ -136,6 +142,7 @@ const DEFAULT_CONFIG: SessionEvalConfig = {
 function jaccardSim(a: string, b: string): number {
   const wordsA = new Set(a.toLowerCase().split(/\s+/).filter(w => w.length > 2));
   const wordsB = new Set(b.toLowerCase().split(/\s+/).filter(w => w.length > 2));
+  // Empty token sets are identical for lexical similarity; this is not evidence of session quality.
   if (wordsA.size === 0 && wordsB.size === 0) return 1;
   if (wordsA.size === 0 || wordsB.size === 0) return 0;
   let inter = 0;
@@ -234,35 +241,31 @@ export class SessionEvaluator {
     // ── Goal completion ──
     const goalEvals = this.evaluateGoals(turns, goals);
     const requiredGoals = goalEvals.filter(g => g.required);
-    const totalWeight = goalEvals.reduce((s, g) => s + (goals.find(gg => gg.id === g.goalId)?.weight ?? 1), 0);
-    let goalScore = 0;
-    if (totalWeight > 0) {
-      for (const ge of goalEvals) {
-        const goal = goals.find(g => g.id === ge.goalId);
-        if (ge.completed) goalScore += (goal?.weight ?? 1) / totalWeight;
-      }
-    } else {
-      goalScore = 1; // No goals defined = vacuously complete
-    }
+    const totalWeight = goals.reduce((sum, goal) => sum + (Number.isFinite(goal.weight) && goal.weight > 0 ? goal.weight : 0), 0);
+    const completedWeight = goalEvals.reduce((sum, evaluation) => {
+      const weight = goals.find(goal => goal.id === evaluation.goalId)?.weight ?? 0;
+      return sum + (evaluation.completed && Number.isFinite(weight) && weight > 0 ? weight : 0);
+    }, 0);
+    const goalScore = ratioOrNull(completedWeight, totalWeight);
     if (requiredGoals.some(g => !g.completed)) {
       issues.push('Required goals not completed: ' + requiredGoals.filter(g => !g.completed).map(g => g.description).join(', '));
     }
 
     // ── Coherence ──
     const coherenceScore = this.evaluateCoherence(turns);
-    if (coherenceScore < 0.5) issues.push('Low conversational coherence detected');
+    if (coherenceScore !== null && coherenceScore < 0.5) issues.push('Low conversational coherence detected');
 
     // ── Efficiency ──
     const efficiencyScore = this.evaluateEfficiency(turns, goalEvals);
-    if (efficiencyScore < 0.4) issues.push('Agent took an excessive number of steps');
+    if (efficiencyScore !== null && efficiencyScore < 0.4) issues.push('Agent took an excessive number of steps');
 
     // ── Safety ──
     const safetyScore = this.evaluateSafety(turns);
-    if (safetyScore < 0.8) issues.push('Safety violations detected in session');
+    if (safetyScore !== null && safetyScore < 0.8) issues.push('Safety violations detected in session');
 
     // ── Satisfaction ──
     const satisfactionScore = this.estimateSatisfaction(turns);
-    if (satisfactionScore < 0.4) issues.push('Low estimated user satisfaction');
+    if (satisfactionScore !== null && satisfactionScore < 0.4) issues.push('Low estimated user satisfaction');
 
     // ── Loop detection ──
     const loopDetection = this.detectLoops(turns);
@@ -284,26 +287,27 @@ export class SessionEvaluator {
 
     // ── Weighted overall score ──
     const w = this.config.weights;
-    const overallScore = Math.min(1, Math.max(0,
-      goalScore * w.goalCompletion +
-      coherenceScore * w.coherence +
-      efficiencyScore * w.efficiency +
-      safetyScore * w.safety +
-      satisfactionScore * w.satisfaction
-    ));
+    const overallScore = weightedMean([
+      [goalScore, w.goalCompletion], [coherenceScore, w.coherence], [efficiencyScore, w.efficiency],
+      [safetyScore, w.safety], [satisfactionScore, w.satisfaction],
+    ]);
+    const roundScore = (score: number | null): number | null => score === null ? null : Math.round(score * 1000) / 1000;
+    const dimensions = {
+      goalCompletion: roundScore(goalScore), coherence: roundScore(coherenceScore),
+      efficiency: roundScore(efficiencyScore), safety: roundScore(safetyScore), satisfaction: roundScore(satisfactionScore),
+    };
+    const metricOutcomes = Object.fromEntries(Object.entries(dimensions).map(([key, score]) =>
+      [key, score === null ? "not_evaluated" : "measured"])) as SessionEvalResult["metricOutcomes"];
 
     return {
       sessionId: randomUUID(),
       evaluatedAt: Date.now(),
       turns: turns.length,
-      overallScore: Math.round(overallScore * 1000) / 1000,
-      dimensions: {
-        goalCompletion: Math.round(goalScore * 1000) / 1000,
-        coherence: Math.round(coherenceScore * 1000) / 1000,
-        efficiency: Math.round(efficiencyScore * 1000) / 1000,
-        safety: Math.round(safetyScore * 1000) / 1000,
-        satisfaction: Math.round(satisfactionScore * 1000) / 1000,
-      },
+      overallScore: roundScore(overallScore),
+      outcome: overallScore === null ? "not_evaluated" : "measured",
+      sampleSize: turns.length,
+      dimensions,
+      metricOutcomes,
       goalEvaluations: goalEvals,
       loopDetection,
       escalation,
@@ -346,11 +350,11 @@ export class SessionEvaluator {
   }
 
   /** Evaluate conversational coherence across turns */
-  private evaluateCoherence(turns: SessionTurn[]): number {
-    if (turns.length < 2) return 1;
+  private evaluateCoherence(turns: SessionTurn[]): number | null {
+    if (turns.length < 2) return null;
 
     const agentTurns = turns.filter(t => t.role === 'agent');
-    if (agentTurns.length < 2) return 1;
+    if (agentTurns.length < 2) return null;
 
     let totalSim = 0;
     let pairs = 0;
@@ -382,23 +386,24 @@ export class SessionEvaluator {
       }
     }
 
-    const coherence = pairs > 0 ? totalSim / pairs : 1;
-    const responsive = responsePairs > 0 ? responsiveness / responsePairs : 1;
+    const coherence = ratioOrNull(totalSim, pairs);
+    const responsive = ratioOrNull(responsiveness, responsePairs);
 
-    return (coherence * 0.5 + responsive * 0.5);
+    return weightedMean([[coherence, 0.5], [responsive, 0.5]]);
   }
 
   /** Evaluate path efficiency */
-  private evaluateEfficiency(turns: SessionTurn[], goalEvals: GoalEvaluation[]): number {
+  private evaluateEfficiency(turns: SessionTurn[], goalEvals: GoalEvaluation[]): number | null {
     const agentTurnCount = turns.filter(t => t.role === 'agent').length;
-    if (agentTurnCount === 0) return 0;
+    if (agentTurnCount === 0) return null;
 
     // Efficiency based on turn count vs max turns
-    const turnEfficiency = Math.max(0, 1 - (agentTurnCount / this.config.maxTurns));
+    const turnRatio = ratioOrNull(agentTurnCount, this.config.maxTurns);
+    const turnEfficiency = turnRatio === null ? null : Math.max(0, 1 - turnRatio);
 
     // Efficiency based on goal completion speed
     const completedGoals = goalEvals.filter(g => g.completed);
-    let goalSpeed = 1;
+    let goalSpeed: number | null = goalEvals.length === 0 ? null : 0;
     if (completedGoals.length > 0) {
       const avgCompletionTurn = completedGoals
         .map(g => g.completedAtTurn ?? turns.length)
@@ -408,15 +413,14 @@ export class SessionEvaluator {
 
     // Tool call efficiency — fewer tool calls per goal is better
     const toolCalls = turns.filter(t => t.role === 'tool').length;
-    const toolEfficiency = toolCalls > 0
-      ? Math.max(0, 1 - (toolCalls / (agentTurnCount * 3)))
-      : 1;
+    // Observed agent turns provide a positive denominator; zero tool calls genuinely incur no tool overhead.
+    const toolEfficiency = Math.max(0, 1 - (toolCalls / (agentTurnCount * 3)));
 
-    return turnEfficiency * 0.4 + goalSpeed * 0.4 + toolEfficiency * 0.2;
+    return weightedMean([[turnEfficiency, 0.4], [goalSpeed, 0.4], [toolEfficiency, 0.2]]);
   }
 
   /** Evaluate session-level safety */
-  private evaluateSafety(turns: SessionTurn[]): number {
+  private evaluateSafety(turns: SessionTurn[]): number | null {
     let violations = 0;
     let totalChecked = 0;
 
@@ -428,14 +432,14 @@ export class SessionEvaluator {
       }
     }
 
-    if (totalChecked === 0) return 1;
+    if (totalChecked === 0) return null;
     return 1 - (violations / totalChecked);
   }
 
   /** Estimate user satisfaction from conversation patterns */
-  private estimateSatisfaction(turns: SessionTurn[]): number {
+  private estimateSatisfaction(turns: SessionTurn[]): number | null {
     const userTurns = turns.filter(t => t.role === 'user');
-    if (userTurns.length === 0) return 0.5;
+    if (userTurns.length === 0) return null;
 
     let satisfactionSignals = 0;
     let dissatisfactionSignals = 0;
@@ -480,7 +484,7 @@ export class SessionEvaluator {
   /** Detect loops in the conversation */
   private detectLoops(turns: SessionTurn[]): LoopDetection {
     if (!this.config.detectLoops) {
-      return { detected: false, loops: [], loopRatio: 0 };
+      return { detected: false, loops: [], loopRatio: null, outcome: "not_evaluated" };
     }
 
     const agentTurns = turns
@@ -518,12 +522,13 @@ export class SessionEvaluator {
       }
     }
 
-    const loopRatio = agentTurns.length > 0 ? loopTurnCount / agentTurns.length : 0;
+    const loopRatio = ratioOrNull(loopTurnCount, agentTurns.length);
 
     return {
       detected: loops.length > 0,
       loops,
-      loopRatio: Math.round(loopRatio * 100) / 100,
+      loopRatio: loopRatio === null ? null : Math.round(loopRatio * 100) / 100,
+      outcome: loopRatio === null ? "not_evaluated" : "measured",
     };
   }
 
@@ -532,26 +537,30 @@ export class SessionEvaluator {
     sessionA: SessionEvalResult,
     sessionB: SessionEvalResult,
   ): {
-    overallDelta: number;
-    dimensionDeltas: Record<string, number>;
-    winner: 'A' | 'B' | 'tie';
+    overallDelta: number | null;
+    dimensionDeltas: Record<string, number | null>;
+    outcome: EvidenceOutcome;
+    winner: 'A' | 'B' | 'tie' | 'not_evaluated';
     improvements: string[];
     regressions: string[];
   } {
-    const overallDelta = sessionB.overallScore - sessionA.overallScore;
-    const dimensionDeltas: Record<string, number> = {};
+    const overallDelta = sessionA.overallScore === null || sessionB.overallScore === null ? null : sessionB.overallScore - sessionA.overallScore;
+    const dimensionDeltas: Record<string, number | null> = {};
     const improvements: string[] = [];
     const regressions: string[] = [];
 
     for (const dim of Object.keys(sessionA.dimensions) as Array<keyof typeof sessionA.dimensions>) {
-      const delta = sessionB.dimensions[dim] - sessionA.dimensions[dim];
+      const valueA = sessionA.dimensions[dim];
+      const valueB = sessionB.dimensions[dim];
+      if (valueA === null || valueB === null) { dimensionDeltas[dim] = null; continue; }
+      const delta = valueB - valueA;
       dimensionDeltas[dim] = Math.round(delta * 1000) / 1000;
       if (delta > 0.05) improvements.push(`${dim}: +${(delta * 100).toFixed(1)}%`);
       if (delta < -0.05) regressions.push(`${dim}: ${(delta * 100).toFixed(1)}%`);
     }
 
-    const winner = overallDelta > 0.02 ? 'B' : overallDelta < -0.02 ? 'A' : 'tie';
+    const winner = overallDelta === null ? 'not_evaluated' : overallDelta > 0.02 ? 'B' : overallDelta < -0.02 ? 'A' : 'tie';
 
-    return { overallDelta: Math.round(overallDelta * 1000) / 1000, dimensionDeltas, winner, improvements, regressions };
+    return { overallDelta: overallDelta === null ? null : Math.round(overallDelta * 1000) / 1000, dimensionDeltas, outcome: overallDelta === null ? "not_evaluated" : "measured", winner, improvements, regressions };
   }
 }

@@ -25,7 +25,9 @@ export const experimentSchema = z.object({
 
 export const experimentGateSchema = z.object({
   minUpliftSuccessRate: z.number(),
+  /** Absolute points on the 0..100 case-value scale, not a fraction. */
   minUpliftValuePoints: z.number(),
+  valueUnit: z.literal("points").optional(),
   maxCostIncreaseRatio: z.number().positive().optional(),
   denyIfRegression: z.boolean().optional(),
   /** Fewer cases determinate on both sides makes the gate inconclusive (default DEFAULT_MIN_PAIRED_CASES). */

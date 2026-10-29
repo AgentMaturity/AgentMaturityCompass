@@ -16,6 +16,12 @@ import { prepareSkillTurn, workspaceSkillRoots } from "../skills/skillTurn.js";
 import { buildSkillCatalog } from "../skills/skillCatalog.js";
 import { resolveNativeValidationSelection } from "./nativeValidationConfig.js";
 import { deepseekParams } from "../llm/providers/deepseekContract.js";
+import { NATIVE_INTERACTIVE_COMMANDS, nativeInteractiveCompleter } from "./nativeInteractiveCommands.js";
+import { listNativeInteractiveSessions, renderNativeInteractiveSession, assertNativeInteractiveSelection, type NativeInteractiveSessionSummary } from "./nativeInteractiveNavigation.js";
+import { runNativeInteractiveCommand } from "./nativeInteractiveCommandAudit.js";
+import { createNativeInteractiveMcpView } from "./nativeInteractiveMcp.js";
+import { renderNativeInteractiveToolResults } from "./nativeInteractiveResults.js";
+import { escapeTerminalControls } from "../tools/builtin/askUserTool.js";
 
 export interface NativeChatOptions extends NativeChatProfileOptions {
   readonly validationConfig?: string;
@@ -77,11 +83,16 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
   let extensions: NativeExtensionManager;
   try {
     extensions = loadNativeExtensions({ workspace: cwd, manifestPaths: options.extension, expectedDigests: options.extensionPin,
-      reservedCommands: [...skillNames()] });
+      reservedCommands: [...NATIVE_INTERACTIVE_COMMANDS.map(command => command.name), ...skillNames()] });
   } catch (error) {
     io.error(error instanceof Error ? error.message : "Native extensions could not be loaded."); io.fail(); return;
   }
-  const terminal = createInterface({ input: process.stdin, output: process.stdout, terminal: true });
+  const terminal = createInterface({ input: process.stdin, output: process.stdout, terminal: true, historySize: 50,
+    completer: (line: string) => {
+      try { return nativeInteractiveCompleter(line, [...skillNames(), ...extensions.prepareTurn().commands.map(command => command.name)]); }
+      catch { return nativeInteractiveCompleter(line); }
+    } });
+  let mcpView = createNativeInteractiveMcpView();
   let closed = false;
   let child: ChildProcess | null = null;
   let cancelActiveCommand: (() => void) | null = null;
@@ -135,6 +146,10 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
       });
     } catch { io.error("Could not start the AMC command."); resolveResult({ code: 1, stdout, truncated, cancelRequested }); return; }
     child = running;
+    if (display.stream) mcpView = createNativeInteractiveMcpView();
+    const currentMcpView = mcpView;
+    const onMcpReceipt = (value: unknown) => currentMcpView.accept(value);
+    if (display.stream) running.on("message", onMcpReceipt);
     const approvals = interactiveApprovals ? createNativeInteractiveApprovals({
       child: running, workspace: cwd, entry, agentId: selectedAgentId ?? "default", question, log: io.log, error: io.error
     }) : null;
@@ -167,6 +182,8 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
     running.once("close", code => {
       void (async () => {
         let finalCode = code;
+        running.removeListener("message", onMcpReceipt);
+        if (display.stream) currentMcpView.settled();
         askUser?.close();
         try { await approvals?.close(); }
         catch { io.error("Native approval cleanup did not complete cleanly; inspect the recorded request before continuing."); finalCode = 1; }
@@ -184,6 +201,7 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
   let forkFrom = options.forkFrom ?? null;
   let previousSummary: NativeChatChildSummary | null = null;
   let unresolvedOutcome = false;
+  let selectedHistory: NativeInteractiveSessionSummary | null = null;
   try {
     let provider = options.provider;
     if (provider === undefined) {
@@ -287,38 +305,69 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
       io.log(`Session: ${sessionId ?? "created on first task"}${forkFrom === null ? "" : `; next task forks ${forkFrom}`}`);
     };
     showScope();
-    if (forkFrom !== null) io.log("The fork starts a new conversation with verified parent lineage; it does not copy the parent conversation.");
-    io.log("Type a task. /inspect shows the session, /verify checks evidence, /compact summarizes a reviewed range, /fork queues a child (/fork cancel clears the queue), /extensions manages signed text and commands, /exit leaves. Ctrl-C cancels an active command or exits at the prompt.");
+    if (forkFrom !== null) io.log("The fork copies the verified parent conversation into a new signed session; unsupported history refuses before creating a child.");
+    io.log(process.env.TERM === "dumb"
+      ? "Type a task. /help lists commands. Ctrl-C requests cancellation during a command or exits at the prompt."
+      : "Type a task. /help lists commands; Tab completes them. Up/Down recalls input in this terminal only. Ctrl-C requests cancellation during a command or exits at the prompt.");
     if (options.session !== undefined) io.log("The first reply also displays prior recorded assistant text from the resumed session.");
-    while (!closed) {
-      const entered = await question("you> ");
-      if (entered === null) break;
-      const text = entered.trim();
-      if (text.length === 0) continue;
-      if (text === "/exit") break;
-      if (text === "/help") { showScope(); io.log("/inspect · /verify · /compact · /fork · /fork cancel · /extensions · /load · /unload · /exit. Built-in commands prompt for their inputs. Loaded extension commands accept text arguments."); continue; }
+    const handleBuiltin = async (text: string): Promise<boolean> => {
+      if (text === "/exit") return true;
+      if (text === "/help") {
+        showScope();
+        for (const command of NATIVE_INTERACTIVE_COMMANDS) io.log(`/${command.name} — ${command.description}`);
+        const available = extensions.prepareTurn().commands;
+        if (available.length) io.log("Signed extension commands: " + available.map(command => `/${command.name}`).join(", "));
+        const skills = [...skillNames()];
+        if (skills.length) io.log("Installed skill names (resolved on use): " + skills.map(name => `/${escapeTerminalControls(name)}`).join(", "));
+        return false;
+      }
+      if (text === "/mcp") { for (const line of mcpView.render()) io.log(line); return false; }
+      if (text === "/sessions" || text === "/resume") {
+        try {
+          const rows = listNativeInteractiveSessions(cwd, guide.agentId);
+          io.log("Recent sessions (metadata checked; payloads not read; no writer acquired):");
+          rows.forEach((row, at) => io.log(`${at + 1}. ${renderNativeInteractiveSession(row)}`));
+          if (!rows.length) { io.log("No recorded conversations are available."); return false; }
+          if (text === "/sessions") return false;
+          const choice = await question("Session number to inspect (blank cancels): ");
+          if (!choice?.trim()) { io.log("Session selection cancelled; no writer acquired."); return false; }
+          const selected = /^[1-9][0-9]*$/.test(choice.trim()) ? rows[Number(choice.trim()) - 1] : undefined;
+          if (!selected) { io.error("Choose a listed session number; no writer acquired."); return false; }
+          io.log(renderNativeInteractiveSession(selected));
+          const report = await execute(["session", "show", "--", selected.sessionId]);
+          if (report.stdout.trim()) io.log(escapeTerminalControls(report.stdout.trimEnd()));
+          if (report.code !== 0 || report.truncated || report.cancelRequested) { io.error("Session inspection did not settle completely; no selection was changed."); return false; }
+          assertNativeInteractiveSelection(cwd, guide.agentId, selected);
+          const confirm = await question("Type resume to select this session (blank cancels): ");
+          if (confirm !== "resume") { io.log("Session selection cancelled; no writer acquired."); return false; }
+          selectedHistory = assertNativeInteractiveSelection(cwd, guide.agentId, selected);
+          sessionId = selected.sessionId; forkFrom = null; previousSummary = null;
+          io.log(`Session selected: ${sessionId}. The next explicit task verifies history before acquiring its writer.`);
+        } catch (error) { io.error(escapeTerminalControls(error instanceof Error ? error.message : "Session navigation unavailable; no writer acquired.")); }
+        return false;
+      }
       if (text === "/extensions") {
         try { io.log(JSON.stringify({ loaded: extensions.inspect(), commands: extensions.listCommands() }, null, 2)); }
         catch (error) { io.error(error instanceof Error ? error.message : "An extension no longer verifies."); }
-        continue;
+        return false;
       }
       if (text === "/load") {
         const path = await question("Already signed extension manifest path (blank cancels): ");
-        if (!path?.trim()) continue;
+        if (!path?.trim()) return false;
         try {
           const loaded = extensions.load(resolve(cwd, path.trim()));
           io.log(`Loaded ${loaded.id}; pinned manifest ${loaded.manifestDigest}. Its context and commands apply to the next turn.`);
         } catch (error) { io.error(error instanceof Error ? error.message : "Extension load refused."); }
-        continue;
+        return false;
       }
       if (text === "/unload") {
         const id = await question("Loaded extension ID to unload (blank cancels): ");
-        if (!id?.trim()) continue;
+        if (!id?.trim()) return false;
         io.log(extensions.unload(id.trim()) ? "Extension unloaded for future turns. Existing conversation and evidence remain." : "No loaded extension has that ID.");
-        continue;
+        return false;
       }
       if (text === "/compact") {
-        if (sessionId === null || forkFrom !== null) { io.error("Run a task in the current session before compacting it."); continue; }
+        if (sessionId === null || forkFrom !== null) { io.error("Run a task in the current session before compacting it."); return false; }
         const listed = await execute(["session", "compact", sessionId, "--list", "--json"]);
         let head: string;
         try {
@@ -326,19 +375,19 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
           if (listed.code !== 0 || listed.truncated || plan.ok !== true || typeof plan.headEventHash !== "string" || !Array.isArray(plan.entries)) throw new Error("Invalid compaction listing");
           head = plan.headEventHash;
           io.log(JSON.stringify(plan.entries, null, 2));
-        } catch { io.error("Could not read a valid compaction plan. The session was not changed."); continue; }
+        } catch { io.error("Could not read a valid compaction plan. The session was not changed."); return false; }
         const origins = await question("Ordered origin event IDs to summarize (comma separated; blank cancels): ");
-        if (!origins?.trim()) continue;
+        if (!origins?.trim()) return false;
         const summary = await question("UTF-8 summary file path (blank cancels): ");
-        if (!summary?.trim()) continue;
+        if (!summary?.trim()) return false;
         const reason = await question("Reason for this compaction (blank cancels): ");
-        if (!reason?.trim()) continue;
+        if (!reason?.trim()) return false;
         const compacted = await execute(["session", "compact", sessionId, "--origins", origins.trim(),
           "--summary-file", resolve(cwd, summary.trim()), "--reason", reason.trim(), "--expect-head", head, "--json"]);
         if (compacted.stdout.trim()) io.log(compacted.stdout.trimEnd());
         if (compacted.code !== 0 || compacted.truncated) io.error("Compaction refused or did not return a complete receipt. Inspect the session before continuing.");
         else io.log("Compaction recorded; original evidence is retained. /verify checks reconstruction separately.");
-        continue;
+        return false;
       }
       if (text === "/fork cancel") {
         if (forkFrom === null) io.log("No fork is queued.");
@@ -347,16 +396,16 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
           io.log(sessionId === null ? "Queued fork cleared. The next task starts a new independent session; no existing history was changed."
             : `Queued fork cleared. The next task resumes ${sessionId}; no existing history was changed.`);
         }
-        continue;
+        return false;
       }
       if (text === "/fork") {
         if (sessionId === null) io.error("Run a task or resume a session before forking.");
-        else { forkFrom = sessionId; io.log(`Fork queued from ${sessionId}. Your next task creates a new conversation with verified parent lineage; prior conversation is not copied. No child has been created yet.`); }
-        continue;
+        else { forkFrom = sessionId; io.log(`Fork queued from ${sessionId}. Your next task copies the verified conversation into a new signed session; unsupported history refuses. No child has been created yet.`); }
+        return false;
       }
       if (text === "/inspect" || text === "/verify") {
         const target = sessionId ?? forkFrom;
-        if (target === null) { io.error("There is no recorded session yet."); continue; }
+        if (target === null) { io.error("There is no recorded session yet."); return false; }
         const report = await execute(text === "/inspect" ? ["session", "show", "--", target] : ["agent-loop", "verify", "--", target]);
         if (report.stdout.trim()) io.log(report.stdout.trimEnd());
         // /verify runs agent-loop verify with the operator's trust (AMC home trust list, AMC_EXPECTED_MONITOR_FINGERPRINT);
@@ -367,6 +416,24 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
             : "The inspection command failed or its output exceeded the display limit.");
           io.fail();
         }
+        return false;
+      }
+      return false;
+    };
+    while (!closed) {
+      const entered = await question("you> ");
+      if (entered === null) break;
+      const text = entered.trim();
+      if (text.length === 0) continue;
+      if (text.startsWith("/") && (entered[0] !== "/" || !/^\/[a-z][a-z0-9_-]{0,63}(?:[ \t]+[\s\S]*)?$/.test(text))) {
+        io.error("Slash commands must start at the first character and use lowercase names. /help lists commands."); continue;
+      }
+      const name = /^\/([^ \t]+)/.exec(text)?.[1];
+      if (NATIVE_INTERACTIVE_COMMANDS.some(command => command.name === name)) {
+        if (text !== `/${name}` && text !== "/fork cancel") { io.error(`/${name} prompts for its inputs; use /help.`); continue; }
+        try {
+          if (await runNativeInteractiveCommand({ workspace: cwd, command: name!, sessionId }, () => handleBuiltin(text))) break;
+        } catch (error) { io.error(escapeTerminalControls(error instanceof Error ? error.message : "Native command refused.")); io.fail(); }
         continue;
       }
       let prompt = entered;
@@ -390,6 +457,10 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
           }
         }
       } catch (error) { io.error(error instanceof Error ? error.message : "The selected native composition changed."); io.fail(); continue; }
+      if (selectedHistory !== null) {
+        try { assertNativeInteractiveSelection(cwd, guide.agentId, selectedHistory); }
+        catch (error) { io.error(escapeTerminalControls(error instanceof Error ? error.message : "Session selection changed; use /resume again.")); continue; }
+      }
       io.log(`Running ${provider}/${guide.model}; Ctrl-C requests cancellation.`);
       io.log("Live output is provisional until the recorded reply below; a preview is not proof of completion.");
       const priorSession = sessionId;
@@ -410,9 +481,11 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
       const previous = pendingFork === null && previousSummary?.sessionId === summary.sessionId ? previousSummary : null;
       const freshEndings = summary.endings.slice(previous?.endings.length ?? 0);
       sessionId = summary.sessionId;
+      selectedHistory = null;
       forkFrom = null;
+      for (const line of renderNativeInteractiveToolResults(cwd, sessionId)) io.log(line);
       io.log("Recorded reply:");
-      for (const block of summary.assistantText.slice(previous?.assistantText.length ?? 0)) io.log(block);
+      for (const block of summary.assistantText.slice(previous?.assistantText.length ?? 0)) io.log(escapeTerminalControls(block));
       previousSummary = summary;
       const ending = freshEndings.at(-1);
       io.log(`Session ${sessionId} · driver ${summary.driverStatus}${ending?.reason ? ` · recorded turn ending ${ending.reason}` : ""}. This summary is not an evidence-verification result.`);
