@@ -777,7 +777,7 @@ AMC provides 1,268 public CLI command paths in the live command inventory.
 | 758 | `amc mirofish stress` | Find governance breaking points for a scenario |
 | 759 | `amc mode` | Switch CLI role mode |
 | 760 | `amc mode agent` | Switch to agent mode (read-only / self-check commands) |
-| 761 | `amc mode owner` | Switch to owner mode (configuration + signing allowed) |
+| 761 | `amc mode owner` | Switch to owner mode (configuration + signing allowed); from agent mode asks for the vault passphrase |
 | 762 | `amc monitor` | Continuous production monitoring — real-time scoring, drift detection, and alerting |
 | 763 | `amc monitor check` | One-shot trust drift analysis (check for degradation without running continuously) |
 | 764 | `amc monitor events` | Show recent monitoring events |
