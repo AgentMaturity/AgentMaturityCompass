@@ -58,8 +58,7 @@ import {
   type ToolHubContextProjection
 } from "./toolContext.js";
 import { inCheckPass } from "../utils/checkPass.js";
-/** AXR-01: shared checks ToolHub decides itself, with its work order and its EXECUTE-only freeze. */
-const TOOLHUB_DECIDES = ["action-policy", "freeze"];
+const TOOLHUB_DECIDES = ["action-policy", "freeze"]; // AXR-01: shared checks ToolHub decides itself (work order, EXECUTE-only freeze)
 
 export interface ToolIntentRequest {
   agentId: string;

@@ -32,7 +32,7 @@ export interface ActionPolicyCall {
 }
 
 /** The Action Policy's verdict for one call, or null when it does not apply (not configured, or the Code Mode transport). */
-export function actionPolicyVerdict(workspace: string, call: ActionPolicyCall): { readonly denial: string | null; readonly mode: ToolMode } | null {
+function actionPolicyVerdict(workspace: string, call: ActionPolicyCall): { readonly denial: string | null; readonly mode: ToolMode } | null {
   // The transport is not a capability; each call it dispatches meets this verdict on its own name and class.
   if (call.name === RUN_CODE_TOOL) return null;
   const state = actionPolicyState(workspace);
