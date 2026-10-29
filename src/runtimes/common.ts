@@ -32,6 +32,7 @@ export interface HarnessOptions<T> {
 export interface HarnessResult<T> {
   value: T;
   attempts: number;
+  /** True when a human pasted the JSON after the runtime failed; the value is not runtime output. */
   usedFallback: boolean;
 }
 
@@ -107,6 +108,10 @@ export async function runHarnessWithRetries<T>(
     currentPrompt = `${prompt}\n\nReturn ONLY valid JSON that matches the schema. No markdown, no extra text.`;
   }
 
+  // The human paste fallback needs a person at a terminal. On a pipe or protocol stream it would block or eat frames.
+  if (!input.isTTY) {
+    throw new Error(`Harness output for ${runtimeName} was not valid JSON after ${attempts} attempts and stdin is not a terminal; refusing the interactive fallback.`);
+  }
   const rl = createInterface({ input, output });
   try {
     while (true) {

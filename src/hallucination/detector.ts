@@ -77,6 +77,7 @@ export async function detectHallucinations(
   }
 
   // Phase 2: LLM judge (optional)
+  const llmJudgeRan = Boolean(cfg.enableLlmJudge && cfg.llmJudgeFn);
   if (cfg.enableLlmJudge && cfg.llmJudgeFn) {
     detectorsUsed.push("llm_judge");
     const llmFindings = await runLlmJudge(input, cfg.llmJudgeFn);
@@ -98,10 +99,14 @@ export async function detectHallucinations(
     summary[t] = allFindings.filter(f => f.type === t).length;
   }
 
+  // Without grounding, deterministic checks can still fail a response but never certify it clean.
+  const evaluated = Boolean(input.context) || llmJudgeRan;
+  const overThreshold = score > cfg.threshold;
   return {
     findings: allFindings,
     score,
-    passed: score <= cfg.threshold,
+    passed: overThreshold ? false : evaluated ? true : null,
+    evaluated,
     summary,
     totalFindings: allFindings.length,
     detectorsUsed,

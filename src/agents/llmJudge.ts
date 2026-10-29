@@ -121,7 +121,11 @@ export interface JudgeConfig {
     temperature: number;
     template: JudgeTemplate;
     input: JudgeInput;
-  }) => Promise<{ rawScore: number; reasoning: string; model?: string }>;
+  }) => Promise<{
+    rawScore: number; reasoning: string; model?: string;
+    /** Required from the adapter for the pairwise template: the model's head-to-head verdict, scores on the 1-5 rubric. */
+    pairwise?: { winner: 'a' | 'b' | 'tie'; scoreA: number; scoreB: number };
+  }>;
 }
 
 /* ── Built-in rubrics ────────────────────────────────────────────── */
@@ -408,22 +412,12 @@ export class LLMJudge {
     let model = template.defaultModel;
 
     if (this.config.mode === 'llm') {
-      if (!this.config.apiEndpoint || !this.config.apiKey) {
-        throw new Error('llm mode unavailable: both an API endpoint and key must be configured');
+      const judged = await this.callAdapter(template, judgePrompt, input);
+      const scale = template.rubric.criteria.map(c => c.score);
+      if (typeof judged.rawScore !== 'number' || !Number.isFinite(judged.rawScore)
+        || judged.rawScore < Math.min(...scale) || judged.rawScore > Math.max(...scale)) {
+        throw new Error(`llm judge returned an invalid score for ${template.id}: ${String(judged.rawScore)}`);
       }
-      if (!this.config.judgeAdapter) {
-        throw new Error('llm mode requested but no judge adapter is configured');
-      }
-      const judged = await this.config.judgeAdapter({
-        endpoint: this.config.apiEndpoint,
-        apiKey: this.config.apiKey,
-        model: template.defaultModel,
-        systemPrompt: template.systemPrompt,
-        userPrompt: judgePrompt,
-        temperature: this.config.temperature,
-        template,
-        input,
-      });
       rawScore = judged.rawScore;
       reasoning = judged.reasoning;
       model = judged.model ?? template.defaultModel;
@@ -457,7 +451,27 @@ export class LLMJudge {
     return result;
   }
 
-  /** Pairwise comparison */
+  /** Fails closed: llm mode never falls back to the simulated heuristic. */
+  private async callAdapter(template: JudgeTemplate, judgePrompt: string, input: JudgeInput) {
+    if (!this.config.apiEndpoint || !this.config.apiKey) {
+      throw new Error('llm mode unavailable: both an API endpoint and key must be configured');
+    }
+    if (!this.config.judgeAdapter) {
+      throw new Error('llm mode requested but no judge adapter is configured');
+    }
+    return this.config.judgeAdapter({
+      endpoint: this.config.apiEndpoint,
+      apiKey: this.config.apiKey,
+      model: template.defaultModel,
+      systemPrompt: template.systemPrompt,
+      userPrompt: judgePrompt,
+      temperature: this.config.temperature,
+      template,
+      input,
+    });
+  }
+
+  /** Pairwise comparison: a real adapter call in llm mode, the labelled length heuristic only in simulated mode. */
   async comparePairwise(input: JudgeInput): Promise<PairwiseResult> {
     const template = this.templates.get('pairwise')!;
     const judgePrompt = renderTemplate(template.userPromptTemplate, {
@@ -465,6 +479,28 @@ export class LLMJudge {
       output: input.output,
       alternativeOutput: input.alternativeOutput,
     });
+
+    if (this.config.mode === 'llm') {
+      const judged = await this.callAdapter(template, judgePrompt, input);
+      const verdict = judged.pairwise;
+      const onScale = (n: unknown) => typeof n === 'number' && Number.isFinite(n) && n >= 1 && n <= 5;
+      if (!verdict || !['a', 'b', 'tie'].includes(verdict.winner) || !onScale(verdict.scoreA) || !onScale(verdict.scoreB)) {
+        throw new Error('llm judge returned no valid pairwise verdict (winner a|b|tie, scoreA and scoreB in 1-5)');
+      }
+      return {
+        regulatedEligible: false,
+        judgeId: randomUUID(),
+        templateId: 'pairwise',
+        winner: verdict.winner,
+        scoreA: verdict.scoreA / 5,
+        scoreB: verdict.scoreB / 5,
+        reasoning: judged.reasoning,
+        judgePrompt,
+        model: judged.model ?? template.defaultModel,
+        mode: 'llm',
+        timestamp: Date.now(),
+      };
+    }
 
     const sim = simulatePairwise(input);
 

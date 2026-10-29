@@ -450,7 +450,9 @@ describe("detectHallucinationsDeterministic", () => {
 describe("edge cases", () => {
   it("handles empty response", async () => {
     const result = await detectHallucinations({ response: "" });
-    expect(result.passed).toBe(true);
+    // GAP-WP11 (AXE-21): no grounding and no judge means not evaluated, not passed.
+    expect(result.passed).toBeNull();
+    expect(result.evaluated).toBe(false);
     expect(result.totalFindings).toBe(0);
   });
 
@@ -458,7 +460,8 @@ describe("edge cases", () => {
     const result = await detectHallucinations({
       response: "The sky is blue and water is wet.",
     });
-    expect(result.passed).toBe(true);
+    expect(result.passed).toBeNull();
+    expect(result.evaluated).toBe(false);
   });
 
   it("handles very long response", async () => {

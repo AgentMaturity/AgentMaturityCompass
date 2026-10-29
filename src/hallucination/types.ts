@@ -57,8 +57,14 @@ export interface HallucinationDetectionResult {
   findings: HallucinationFinding[];
   /** Overall hallucination score 0-1 (0 = no hallucination, 1 = fully hallucinated). */
   score: number;
-  /** Whether the response passes the hallucination check. */
-  passed: boolean;
+  /**
+   * Whether the response passes the hallucination check. null when it could not
+   * be judged clean: no grounding context and no LLM judge ran, so absence of
+   * findings is not evidence of absence.
+   */
+  passed: boolean | null;
+  /** True only when grounding context was supplied or the LLM judge ran. */
+  evaluated: boolean;
   /** Breakdown by type. */
   summary: Record<HallucinationType, number>;
   /** Total findings count. */

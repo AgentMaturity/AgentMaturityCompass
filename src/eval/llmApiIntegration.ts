@@ -73,6 +73,16 @@ export interface LLMResponse {
   responseTimeMs: number;
   /** Request ID */
   requestId: string;
+  /** Transport attempts this response took, including failed ones before it. */
+  attempts: number;
+}
+
+/** Thrown when every attempt failed; keeps how many were made (failed attempts report no provider usage). */
+export class LLMApiRequestError extends Error {
+  constructor(message: string, readonly attempts: number) {
+    super(message);
+    this.name = "LLMApiRequestError";
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -136,7 +146,8 @@ export class LLMApiClient {
         return {
           ...response,
           responseTimeMs,
-          requestId
+          requestId,
+          attempts: attempt + 1
         };
       } catch (error) {
         // A residency or kill-switch refusal sent nothing: it propagates typed and is never retried.
@@ -151,10 +162,10 @@ export class LLMApiClient {
       }
     }
 
-    throw new Error(`API request failed after ${this.config.maxRetries + 1} attempts: ${lastError?.message}`);
+    throw new LLMApiRequestError(`API request failed after ${this.config.maxRetries + 1} attempts: ${lastError?.message}`, this.config.maxRetries + 1);
   }
 
-  private async makeApiCall(request: LLMRequest, requestId: string): Promise<Omit<LLMResponse, 'responseTimeMs' | 'requestId'>> {
+  private async makeApiCall(request: LLMRequest, requestId: string): Promise<Omit<LLMResponse, 'responseTimeMs' | 'requestId' | 'attempts'>> {
     if (this.config.provider === 'openai') {
       return this.callOpenAI(request);
     } else if (this.config.provider === 'anthropic') {
@@ -164,7 +175,7 @@ export class LLMApiClient {
     }
   }
 
-  private async callOpenAI(request: LLMRequest): Promise<Omit<LLMResponse, 'responseTimeMs' | 'requestId'>> {
+  private async callOpenAI(request: LLMRequest): Promise<Omit<LLMResponse, 'responseTimeMs' | 'requestId' | 'attempts'>> {
     const url = `${this.config.baseUrl || 'https://api.openai.com/v1'}/chat/completions`;
     
     const messages = [];
@@ -193,7 +204,7 @@ export class LLMApiClient {
     };
   }
 
-  private async callAnthropic(request: LLMRequest): Promise<Omit<LLMResponse, 'responseTimeMs' | 'requestId'>> {
+  private async callAnthropic(request: LLMRequest): Promise<Omit<LLMResponse, 'responseTimeMs' | 'requestId' | 'attempts'>> {
     const url = `${this.config.baseUrl || 'https://api.anthropic.com'}/v1/messages`;
     
     const messages = [{ role: 'user', content: request.prompt }];
@@ -344,17 +355,31 @@ export class JudgeModelFactory {
 // Enhanced Judge Engine with Real API Integration
 // ---------------------------------------------------------------------------
 
+/** Judge request settings; each one omitted falls back to the documented default, never a supplied one. */
+export interface JudgeRequestSettings {
+  model: string;
+  temperature: number;
+  maxTokens: number;
+}
+
+export const DEFAULT_JUDGE_REQUEST_SETTINGS: Readonly<JudgeRequestSettings> = Object.freeze({ model: 'claude-3-sonnet', temperature: 0.1, maxTokens: 1000 });
+
 export class ProductionLLMJudgeEngine {
   private clients: Map<string, LLMApiClient> = new Map();
   private totalCost = 0;
   private totalRequests = 0;
+  private totalAttempts = 0;
+  private failedRequests = 0;
 
   constructor(
     private openaiApiKey?: string,
     private anthropicApiKey?: string
   ) {}
 
-  async callJudgeModel(prompt: string, model: string = 'claude-3-sonnet'): Promise<string> {
+  async callJudgeModel(prompt: string, settings: Partial<JudgeRequestSettings> = {}): Promise<string> {
+    const { model, temperature, maxTokens } = { ...DEFAULT_JUDGE_REQUEST_SETTINGS, ...definedOnly(settings) };
+    if (!Number.isFinite(temperature) || temperature < 0 || temperature > 2) throw new Error(`Invalid judge temperature: ${temperature}`);
+    if (!Number.isInteger(maxTokens) || maxTokens < 1) throw new Error(`Invalid judge maxTokens: ${maxTokens}`);
     const modelMapping = JudgeModelFactory.getModelMapping();
     const modelConfig = modelMapping[model];
     
@@ -367,16 +392,25 @@ export class ProductionLLMJudgeEngine {
     const request: LLMRequest = {
       model: modelConfig.model,
       prompt,
-      temperature: 0.1,
-      maxTokens: 1000,
+      temperature,
+      maxTokens,
       requestId: randomUUID()
     };
 
-    const response = await client.request(request);
-    
+    let response: LLMResponse;
+    try {
+      response = await client.request(request);
+    } catch (error) {
+      // Failed attempts are counted; they returned no usage, so no cost is invented for them.
+      this.failedRequests += 1;
+      if (error instanceof LLMApiRequestError) this.totalAttempts += error.attempts;
+      throw error;
+    }
+
     // Track usage
     this.totalCost += response.cost;
     this.totalRequests += 1;
+    this.totalAttempts += response.attempts;
 
     return response.text;
   }
@@ -411,11 +445,13 @@ export class ProductionLLMJudgeEngine {
   /**
    * Get usage statistics
    */
-  getUsageStats(): { totalCost: number; totalRequests: number; averageCostPerRequest: number } {
+  getUsageStats(): { totalCost: number; totalRequests: number; averageCostPerRequest: number; totalAttempts: number; failedRequests: number } {
     return {
       totalCost: this.totalCost,
       totalRequests: this.totalRequests,
-      averageCostPerRequest: this.totalRequests > 0 ? this.totalCost / this.totalRequests : 0
+      averageCostPerRequest: this.totalRequests > 0 ? this.totalCost / this.totalRequests : 0,
+      totalAttempts: this.totalAttempts,
+      failedRequests: this.failedRequests
     };
   }
 
@@ -425,5 +461,11 @@ export class ProductionLLMJudgeEngine {
   resetUsageStats(): void {
     this.totalCost = 0;
     this.totalRequests = 0;
+    this.totalAttempts = 0;
+    this.failedRequests = 0;
   }
+}
+
+function definedOnly<T extends object>(value: T): Partial<T> {
+  return Object.fromEntries(Object.entries(value).filter(([, v]) => v !== undefined)) as Partial<T>;
 }

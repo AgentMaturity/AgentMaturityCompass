@@ -120,7 +120,7 @@ export function buildJudgePrompt(input: HallucinationDetectorInput): string {
  * Parse the LLM judge response into findings.
  * Handles various response formats gracefully.
  */
-export function parseLlmJudgeResponse(raw: string): LlmJudgeResponse {
+export function parseLlmJudgeResponse(raw: string): LlmJudgeResponse & { valid: boolean } {
   // Extract JSON from potential markdown code blocks
   const jsonMatch = raw.match(/```(?:json)?\s*([\s\S]*?)```/) ?? raw.match(/(\{[\s\S]*\})/);
   const jsonStr = jsonMatch?.[1]?.trim() ?? raw.trim();
@@ -129,16 +129,16 @@ export function parseLlmJudgeResponse(raw: string): LlmJudgeResponse {
   try {
     parsed = JSON.parse(jsonStr);
   } catch {
-    // If JSON parsing fails, return empty findings
-    return { findings: [], overallAssessment: "Failed to parse LLM judge response." };
+    // valid:false — no verdict was parsed; runLlmJudge refuses it rather than reporting it clean.
+    return { valid: false, findings: [], overallAssessment: "Failed to parse LLM judge response." };
   }
 
-  if (typeof parsed !== "object" || parsed === null) {
-    return { findings: [], overallAssessment: "Invalid LLM judge response structure." };
+  if (typeof parsed !== "object" || parsed === null || !Array.isArray((parsed as Record<string, unknown>).findings)) {
+    return { valid: false, findings: [], overallAssessment: "Invalid LLM judge response structure." };
   }
 
   const obj = parsed as Record<string, unknown>;
-  const rawFindings = Array.isArray(obj.findings) ? obj.findings : [];
+  const rawFindings = obj.findings as unknown[];
   const overallAssessment = typeof obj.overallAssessment === "string"
     ? obj.overallAssessment
     : "No overall assessment provided.";
@@ -154,7 +154,7 @@ export function parseLlmJudgeResponse(raw: string): LlmJudgeResponse {
     }))
     .filter(f => f.span.length > 0);
 
-  return { findings, overallAssessment };
+  return { valid: true, findings, overallAssessment };
 }
 
 /** Raised when the judge model could not be consulted at all. */
@@ -167,20 +167,34 @@ export class LlmJudgeUnavailableError extends Error {
   }
 }
 
+/** Raised when the judge answered but its reply holds no parseable verdict; distinct from unavailable and from clean. */
+export class LlmJudgeInvalidResponseError extends Error {
+  readonly code = "LLM_JUDGE_INVALID_RESPONSE";
+
+  constructor(reason: string) {
+    super(`LLM hallucination judge returned an invalid response: ${reason}`);
+    this.name = "LlmJudgeInvalidResponseError";
+  }
+}
+
 /**
  * Builds a judge function backed by the real production judge client, so
  * callers do not have to hand-roll one (and cannot accidentally pass a stub).
+ * Settings are forwarded to the transport; only omitted ones take its defaults.
  */
-export async function createProductionJudgeFn(): Promise<LlmJudgeFn> {
+export async function createProductionJudgeFn(
+  settings: Partial<import("../eval/llmApiIntegration.js").JudgeRequestSettings> = {},
+): Promise<LlmJudgeFn> {
   const { ProductionLLMJudgeEngine } = await import("../eval/llmApiIntegration.js");
   const engine = new ProductionLLMJudgeEngine();
-  return (prompt: string) => engine.callJudgeModel(prompt);
+  return (prompt: string) => engine.callJudgeModel(prompt, settings);
 }
 
 /**
  * Run the LLM judge on the given input.
  *
  * @throws {LlmJudgeUnavailableError} when the judge model cannot be reached.
+ * @throws {LlmJudgeInvalidResponseError} when its reply holds no parseable verdict.
  */
 export async function runLlmJudge(
   input: HallucinationDetectorInput,
@@ -201,6 +215,7 @@ export async function runLlmJudge(
   }
 
   const parsed = parseLlmJudgeResponse(rawResponse);
+  if (!parsed.valid) throw new LlmJudgeInvalidResponseError(parsed.overallAssessment);
   const response = input.response;
 
   return parsed.findings.map(f => ({
