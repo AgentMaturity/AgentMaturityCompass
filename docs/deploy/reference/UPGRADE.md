@@ -9,4 +9,4 @@ Every upgrade has an outage: the chart uses `strategy: Recreate`, so the old pod
 5. Run `helm test` and `scripts/deploy-verify.mjs` again. (check UPG-1)
 6. If the new image never becomes Ready (for example a migration throws), the ledger file must be unchanged; run `helm rollback amc-rd <previous revision> --wait`. (check UPG-2)
 
-Chart 0.4.0 changes from 0.3.0: the PodDisruptionBudget defaults to `maxUnavailable: 1` (0.3.0 used `minAvailable: 1`, which blocked every drain), and `metrics.*` values are new and off by default.
+Chart 0.4.0 changes from 0.3.0: the PodDisruptionBudget defaults to `maxUnavailable: 1` (0.3.0 used `minAvailable: 1`, which blocked every drain), and `metrics.*`, `keyProvider.*` and `ledgerEncryption.*` values are new; their defaults render nothing new.

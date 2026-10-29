@@ -11,8 +11,8 @@ D-03 was decided on 2026-10-11 as option C: Helm, Compose, Railway and Vercel al
 | Kubernetes | kind node `kindest/node` v1.37.0 for kind runs; Sid records the D-03 cluster's version in its receipt | `qualification/<date>-P2-06/cluster/receipt.json` |
 | Replicas and strategy | 1 replica, `Recreate` (one SQLite writer on a `ReadWriteOnce` volume) | `templates/deployment.yaml` |
 | Disruption budget | `maxUnavailable: 1` by default (a drain evicts the pod, with an outage) | `values.yaml` `podDisruptionBudget` |
-| KeyProvider | the file provider inside the workspace volume. The chart has no setting for the P2-08 providers (PKCS#11, cloud KMS) yet. | not wired: INS-1 records this criterion as failed |
-| Ledger storage | SQLite (`.amc/evidence.sqlite`) on the workspace volume. Field encryption (P2-09a) and the Postgres HA option are not switched on by the chart. | not wired: INS-1 and CR-5 record it |
+| KeyProvider | the file provider inside the workspace volume, selected explicitly (`keyProvider.provider=file`). The chart can hand PKCS#11 or cloud KMS credentials to Studio from a Secret, but the repository image ships none of their SDKs. | `values.yaml` `keyProvider`; INS-1 |
+| Ledger storage | SQLite (`.amc/evidence.sqlite`) on the workspace volume, field encryption (P2-09a) on with `ledgerEncryption.enabled=true` and the data key wrapped by the file provider. The Postgres HA option is not switched on by the chart. | `values.yaml` `ledgerEncryption`; INS-1. HA: CR-5 |
 | WORM target | none in the chart; `amc evidence-stores worm-export` is run by an operator | OV-2 is not run |
 | Secrets | `amc-bootstrap` created out of band (five keys); the chart renders no Secret by default | `docs/KUBERNETES_HELM_DEPLOYMENT.md` |
 | Monitor key | pinned by `env.AMC_EXPECTED_MONITOR_FINGERPRINT`; kind runs pin it on first use, a real install pins it out of band | INS-1 |

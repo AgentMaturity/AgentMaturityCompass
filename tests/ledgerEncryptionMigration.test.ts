@@ -85,6 +85,24 @@ describe("ledger encryption migration (P2-09)", () => {
     expect(errors.some((error) => error.includes("needs the ledger key or a plaintext export"))).toBe(true);
   });
 
+  it("creates the first data key in a fresh process whose vault is locked, from AMC_VAULT_PASSPHRASE (P2-06 D5)", async () => {
+    // `amc evidence-stores encrypt` starts with a locked vault; the chart runs it with the passphrase in the environment.
+    const { workspace } = plaintextLedger();
+    setPolicy(workspace, true);
+    lockVault(workspace);
+    const { receipt } = await encryptExistingLedger(workspace);
+    expect(receipt).toMatchObject({ keyVersion: 1 });
+    expect(events(workspace).filter((row) => row.payload_inline !== null).every((row) => isEncryptedField(row.payload_inline))).toBe(true);
+  });
+
+  it("still refuses to create a data key with the vault locked and no passphrase", async () => {
+    const { workspace } = plaintextLedger();
+    setPolicy(workspace, true);
+    lockVault(workspace);
+    vi.stubEnv("AMC_VAULT_PASSPHRASE", "");
+    await expect(encryptExistingLedger(workspace)).rejects.toThrow(/Vault locked/);
+  });
+
   it("detects a forged receipt", async () => {
     const { workspace } = plaintextLedger();
     setPolicy(workspace, true);

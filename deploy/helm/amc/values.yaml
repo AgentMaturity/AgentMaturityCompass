@@ -80,6 +80,35 @@ bootstrap:
     name: amc-bootstrap
     key: vaultPassphrase
 
+# P2-08 KeyProvider (docs/KEY_PROVIDERS.md). The chart supplies the provider's credentials to Studio's environment, the
+# way P2-08 reads them; which key signs a purpose stays in the workspace's signed amc.config.yaml `keys` section and its
+# owner binding (`amc keys rotate --purpose ledger-row`), never in chart values. Default: file, the vault in the workspace
+# volume, as before. The repository image ships no provider SDK (nor the PKCS#11 wrapper and pkcs11js); any other provider
+# needs an image built with it, or it refuses with KEY_PROVIDER_NOT_INSTALLED.
+keyProvider:
+  # file | aws-kms | gcp-kms | azure-kv | pkcs11
+  provider: file
+  # Non-secret settings only; values.schema.json admits these names: AWS_REGION, AWS_PROFILE, AZURE_TENANT_ID,
+  # AZURE_CLIENT_ID, AMC_PKCS11_MODULE, AMC_PKCS11_PROTECTION.
+  env: {}
+  # The provider credential as a file from a Kubernetes Secret created out of band (never a value here), mounted at
+  # /run/secrets/amc_key_provider_credential and named by the provider's own variable: GOOGLE_APPLICATION_CREDENTIALS
+  # (gcp-kms), AWS_SHARED_CREDENTIALS_FILE (aws-kms), AZURE_CLIENT_CERTIFICATE_PATH (azure-kv), AMC_PKCS11_PIN_FILE
+  # (pkcs11, required). Empty for file, or for a cloud provider whose credentials come from the node.
+  credentialSecret:
+    name: ""
+    key: ""
+
+# P2-09 ledger field encryption (docs/EVIDENCE_STORAGE.md). Off by default. When enabled, a step before Studio starts
+# (files/ledger-encryption.sh) sets opsPolicy.encryption.ledgerEncryptionEnabled in the signed ops policy and, while the
+# workspace has no ledger data key, creates one wrapped at keyProvider.provider/keyRef and encrypts existing rows. It
+# stops the pod on any failure. Setting enabled back to false does not switch encryption off: that is an owner change to
+# the ops policy.
+ledgerEncryption:
+  enabled: false
+  # The wrapping key: a vault wrap-key name (file), KMS key ARN or name, Key Vault key URL or PKCS#11 URI.
+  keyRef: ledger-dek
+
 env:
   AMC_BIND: "0.0.0.0"
   AMC_STUDIO_PORT: "3212"

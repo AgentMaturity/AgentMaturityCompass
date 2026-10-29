@@ -231,14 +231,14 @@ export function restoreWarnings(ctx, { namespace = ctx.namespace, pod, target })
 }
 
 /**
- * helm install `image` by digest on ctx.release (bootstrap Secret created out of band first), waiting up to the
- * startup budget. Returns {secret, install, readyMs}; install is null when the Secret is missing.
+ * helm install `image` by digest on ctx.release (bootstrap Secret created out of band first), with any extra `values`
+ * arguments, waiting up to the startup budget. Returns {secret, install, readyMs}; install is null when the Secret is missing.
  */
-export function installRelease(ctx, image) {
+export function installRelease(ctx, image, values = []) {
   const secret = ensureBootstrapSecret(ctx);
   if (!secret) return { secret, install: null, readyMs: 0 };
   const started = Date.now();
-  const install = helm(ctx, ["install", ctx.release, ctx.chartDir, ...imageArgs(image), "--wait", "--timeout", `${STARTUP_BUDGET_SECONDS}s`]);
+  const install = helm(ctx, ["install", ctx.release, ctx.chartDir, ...imageArgs(image), ...values, "--wait", "--timeout", `${STARTUP_BUDGET_SECONDS}s`]);
   return { secret, install, readyMs: Date.now() - started };
 }
 
