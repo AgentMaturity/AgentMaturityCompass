@@ -118,6 +118,16 @@ describe("what it inherits from the substrate", () => {
       .toContain("bytes of output not shown");
   });
 
+  it("keeps the head and actual tail of a long command log", async () => {
+    const h = harness();
+    const outcome = await h.run({ command: "printf 'FIRST-LINE\\n'; yes AAAAAAAAAA | head -c 200000; printf '\\nFINAL-LINE\\n'" });
+    expect(outcome.ok).toBe(true);
+    expect(outcome.output).toContain("FIRST-LINE");
+    expect(outcome.output).toContain("FINAL-LINE");
+    expect(outcome.output).toContain("bytes of output not shown");
+    expect(Buffer.byteLength(outcome.output, "utf8")).toBeLessThan(65_000);
+  });
+
   it("scrubs a known secret out of the command's output", async () => {
     const secret = "lease-abcdef0123456789";
     const h = harness([secret]);

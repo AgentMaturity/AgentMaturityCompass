@@ -60,7 +60,7 @@ export const DEFAULT_SPILL_POLICY: SpillPolicyConfig = {
   previewHeadBytes: 4_096,
   previewTailBytes: 2_048,
   retrievalHint:
-    "read authenticated ranges with amc session spill-read <locator> --offset 0 --limit 4096; use --json for exact bytes"
+    "read authenticated ranges with session.spill_read using locator, offset 0, and limit 4096; offset and limit count bytes"
 };
 
 function requirePositiveInt(name: string, value: number): number {

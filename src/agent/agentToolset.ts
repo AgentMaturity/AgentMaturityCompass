@@ -10,6 +10,7 @@ import { bashTool } from "../tools/builtin/bashTool.js";
 import { fsTools } from "../tools/builtin/fsTools.js";
 import { ReadBeforeEditLedger } from "../tools/builtin/readBeforeEdit.js";
 import { searchTools } from "../tools/builtin/searchTools.js";
+import { sessionSpillReadTool } from "../tools/builtin/sessionSpillReadTool.js";
 import { webFetchTool } from "../tools/builtin/webFetchTool.js";
 import { webSearchTool, type WebSearchProvider } from "../tools/builtin/webSearchTool.js";
 import { askUserTool, type AskUserAnswerer } from "../tools/builtin/askUserTool.js";
@@ -411,6 +412,7 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
   // The session getter is rebound by fork/resume after construction, so these
   // read it per call rather than capturing it now.
   const currentSessionId = (): string => options.sessionId;
+  registry.define(sessionSpillReadTool({ workspace, agentId, sessionId: currentSessionId }));
   registry.define(webFetchTool({ record: recordNative }));
   registry.define(webSearchTool({ record: recordNative, ...(options.webSearchProvider ? { provider: options.webSearchProvider } : {}) }));
   registry.define(askUserTool({ sessionId: currentSessionId, record: recordNative, ...(options.askUser ? { answerer: options.askUser } : {}) }));

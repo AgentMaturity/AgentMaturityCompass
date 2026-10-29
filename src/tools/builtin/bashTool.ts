@@ -70,7 +70,7 @@ export function bashTool(deps: BashToolDeps = {}): ToolDefinition {
       if (deps.runConfined) {
         const outcome = await deps.runConfined(execution, args.command, args.timeoutMs);
         const sections = [outcome.stdout, outcome.stderr].filter(Boolean);
-        if (outcome.droppedBytes) sections.push(`[amc: ${outcome.droppedBytes} bytes of output not shown]`);
+        if (outcome.droppedBytes) sections.push(`[amc: ${outcome.droppedBytes} bytes of output not shown; head and tail retained]`);
         if (outcome.timedOut) sections.push(`[amc: killed after ${args.timeoutMs}ms]`);
         if (outcome.cancelled) sections.push("[amc: shell cancelled]");
         if (outcome.exitCode !== 0) sections.push(`[amc: exit ${outcome.exitCode ?? "unknown"}]`);
@@ -106,7 +106,7 @@ export function bashTool(deps: BashToolDeps = {}): ToolDefinition {
       if (outcome.stderr.text.length > 0) sections.push(outcome.stderr.text);
       const dropped = outcome.stdout.droppedBytes + outcome.stderr.droppedBytes;
       if (dropped > 0) {
-        sections.push(`[amc: ${dropped} bytes of output not shown; the cap is ${MAX_OUTPUT_BYTES} per stream]`);
+        sections.push(`[amc: ${dropped} bytes of output not shown; head and tail retained; the cap is ${MAX_OUTPUT_BYTES} per stream]`);
       }
       const timedOut = outcome.terminatedBy === "timeout";
       if (timedOut) {
