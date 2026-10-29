@@ -36,3 +36,12 @@ export class AMCNativeCancelledError extends AMCNativeProtocolError {
     super(message); this.name = "AMCNativeRefusedError";
   }
 }
+
+/** Live retention stopped; awaiting the same turn result can recover committed text. @public */
+export class AMCNativeResyncRequiredError extends Error {
+  readonly recoverable = true;
+  constructor(readonly sessionId: string, readonly resource: "turn-events" | "turn-bytes", readonly limit: number) {
+    super(`native update retention reached ${resource} (${limit}); await this turn's result for committed history resynchronization`);
+    this.name = "AMCNativeResyncRequiredError";
+  }
+}

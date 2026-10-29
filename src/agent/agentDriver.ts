@@ -180,20 +180,20 @@ export class AgentDriver {
    * classification is captured BEFORE the insertion so that a cancel triggered
    * re-entrantly by an observer of the insertion cannot reclassify it.
    */
-  send(text: string, target: InboxTarget, wakeup: boolean, images?: readonly NativeImageInput[]): InboxReceipt {
-    return this.enqueue(text, target, wakeup, images);
+  send(text: string, target: InboxTarget, wakeup: boolean, images?: readonly NativeImageInput[], clientRequestId?: string): InboxReceipt {
+    return this.enqueue(text, target, wakeup, images, undefined, undefined, clientRequestId);
   }
 
   /** Preserve the same lane, wake, abort-demotion and durable admission machinery. */
-  sendParts(parts: readonly NativeInputPart[], target: InboxTarget, wakeup: boolean): InboxReceipt {
-    return this.enqueue("", target, wakeup, undefined, parts);
+  sendParts(parts: readonly NativeInputPart[], target: InboxTarget, wakeup: boolean, clientRequestId?: string): InboxReceipt {
+    return this.enqueue("", target, wakeup, undefined, parts, undefined, clientRequestId);
   }
 
-  sendAudioParts(parts: readonly NativeAudioPart[], target: InboxTarget, wakeup: boolean): InboxReceipt {
-    return this.enqueue("", target, wakeup, undefined, undefined, parts);
+  sendAudioParts(parts: readonly NativeAudioPart[], target: InboxTarget, wakeup: boolean, clientRequestId?: string): InboxReceipt {
+    return this.enqueue("", target, wakeup, undefined, undefined, parts, clientRequestId);
   }
 
-  private enqueue(text: string, target: InboxTarget, wakeup: boolean, images?: readonly NativeImageInput[], parts?: readonly NativeInputPart[], audioParts?: readonly NativeAudioPart[]): InboxReceipt {
+  private enqueue(text: string, target: InboxTarget, wakeup: boolean, images?: readonly NativeImageInput[], parts?: readonly NativeInputPart[], audioParts?: readonly NativeAudioPart[], clientRequestId?: string): InboxReceipt {
     this.assertUsable();
     const wakingAfterAbort =
       wakeup && this.phase.kind === "running" && this.phase.abort.signal.aborted;
@@ -203,23 +203,31 @@ export class AgentDriver {
       demotedFrom: wakingAfterAbort ? target : null,
       ...(images === undefined ? {} : { images }),
       ...(parts === undefined ? {} : { parts }),
-      ...(audioParts === undefined ? {} : { audioParts })
+      ...(audioParts === undefined ? {} : { audioParts }),
+      ...(clientRequestId === undefined ? {} : { clientRequestId })
     });
-    if (wakeup) this.wakeDriver(wakingAfterAbort);
+    // A retry may wake its still-pending original admission, never an already consumed effect.
+    if (wakeup && (clientRequestId === undefined || [...this.inbox.nextTurn, ...this.inbox.nextStep].some(message => message.messageId === receipt.messageId))) this.wakeDriver(wakingAfterAbort);
     return receipt;
   }
 
   /** Queue a prompt that gets its own turn, and wake the driver. */
-  followup(text: string, images?: readonly NativeImageInput[]): InboxReceipt {
-    return this.send(text, "next-turn", true, images);
+  followup(text: string, images?: readonly NativeImageInput[], clientRequestId?: string): InboxReceipt {
+    return this.send(text, "next-turn", true, images, clientRequestId);
   }
 
-  followupParts(parts: readonly NativeInputPart[]): InboxReceipt {
-    return this.sendParts(parts, "next-turn", true);
+  followupParts(parts: readonly NativeInputPart[], clientRequestId?: string): InboxReceipt {
+    return this.sendParts(parts, "next-turn", true, clientRequestId);
   }
 
-  followupAudioParts(parts: readonly NativeAudioPart[]): InboxReceipt {
-    return this.sendAudioParts(parts, "next-turn", true);
+  followupAudioParts(parts: readonly NativeAudioPart[], clientRequestId?: string): InboxReceipt {
+    return this.sendAudioParts(parts, "next-turn", true, clientRequestId);
+  }
+
+  /** Remove one pending submission without cancelling the active turn or sibling inputs. */
+  withdraw(messageId: string): boolean {
+    this.assertUsable();
+    return this.inbox.withdraw(messageId);
   }
 
   /** Steer the nearest step boundary. An idle driver starts a turn for it. */

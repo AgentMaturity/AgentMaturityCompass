@@ -22,11 +22,13 @@ export {
 export { AMCAgent, createAMCAgent } from "./amcAgent.js";
 export { createA4Client, type A4Client, type A4Session, type A4ApiResponse, type A4MutationResult } from "./a4Client.js";
 export {
-  AMCNativeClient, AMCNativeSession, AMCNativeTurn, AMCNativeProtocolError, AMCNativeRefusedError,
-  type AMCNativeClientOptions, type AMCNativeRunResult, type AMCNativeUpdate, type AMCNativeReceipt
+  AMCNativeClient, AMCNativeSession, AMCNativeTurn, AMCNativeProtocolError, AMCNativeRefusedError, AMCNativeResyncRequiredError,
+  type AMCNativeClientOptions, type AMCNativeRunResult, type AMCNativeUpdate, type AMCNativeReceipt,
+  type AMCNativeSessionPage, type AMCNativeReadPageOptions
 } from "./nativeAgentClient.js";
+export { loadSessionEventPage, type SessionEventPage, type SessionEventPageOptions } from "./nativeAgentClient.js";
 export { NATIVE_ORDERED_INPUT_FORMAT, snapshotNativeInputParts, type NativeInputPart,
-  type OrderedAgentSession } from "./nativeAgentClient.js";
+  type OrderedAgentSession, type AgentPromptOptions } from "./nativeAgentClient.js";
 export { NATIVE_AUDIO_INPUT_FORMAT, snapshotNativeAudioParts, type NativeAudioInput, type NativeAudioPart, type NativeAudioMediaType,
   loadNativeAudioManifest, NATIVE_AUDIO_FILE_MANIFEST_FORMAT } from "./nativeAgentClient.js";
 export type { NativeValidationResult, NativeValidationCheckResult, NativeValidationStatus } from "../agent/nativeValidation.js";

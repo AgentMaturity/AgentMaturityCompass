@@ -25,11 +25,12 @@ import type { EvidenceEvent } from "../types.js";
 import { readEventPayload } from "../session/eventPayload.js";
 import { queuedInputPayloadRoute } from "../session/sessionPayloadCap.js";
 import { resolveSpilledInboxPayload } from "../session/spill/spillInput.js";
-import { readLoopInboxMeta } from "../session/loopEventMeta.js";
+import { readLoopInboxMeta, validClientRequestId } from "../session/loopEventMeta.js";
 import type { InboxOrigin, InboxSpliceOp, InboxTarget, LoopInboxMeta } from "../session/loopEventMeta.js";
 import type { SessionService } from "../session/sessionService.js";
 import { isolatedNotify, type InboxMessage, type InboxReceipt, type LoopNotification } from "./loopTypes.js";
 import { decodeNativeImageInput, encodeNativeImageInput, NATIVE_IMAGE_INPUT_FORMAT, snapshotNativeImages, type NativeImageInput } from "../attachments/nativeImageInput.js";
+import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
 import { decodeNativeOrderedInput, encodeNativeOrderedInput, NATIVE_ORDERED_INPUT_FORMAT,
   snapshotNativeInputParts, type NativeInputPart } from "../attachments/nativeOrderedInput.js";
@@ -38,6 +39,7 @@ import { decodeNativeAudioInput, encodeNativeAudioInput, NATIVE_AUDIO_INPUT_FORM
 
 /** How an insertion was routed, beyond the target itself. */
 export interface InsertOptions {
+  readonly clientRequestId?: string;
   readonly images?: readonly NativeImageInput[];
   readonly parts?: readonly NativeInputPart[];
   readonly audioParts?: readonly NativeAudioPart[];
@@ -53,6 +55,8 @@ export class LoopInbox {
   private readonly session: SessionService;
 
   private readonly notify: (notification: LoopNotification) => void;
+
+  private readonly requests = new Map<string, { readonly fingerprint: string; readonly receipt: InboxReceipt }>();
 
   private readonly state: Record<InboxTarget, InboxMessage[]> = { "next-turn": [], "next-step": [] };
 
@@ -76,12 +80,12 @@ export class LoopInbox {
 
   /** Queue one message at the end of a lane. */
   insert(target: InboxTarget, text: string, origin: InboxOrigin, options: InsertOptions): InboxReceipt {
+    if (options.clientRequestId !== undefined && !validClientRequestId(options.clientRequestId)) throw new Error("clientRequestId must be 1 through 128 visible ASCII characters.");
     if (options.audioParts !== undefined && (text !== "" || options.images !== undefined || options.parts !== undefined)) throw new Error("Audio input cannot be combined with legacy text/image input options.");
     const audioParts = options.audioParts === undefined ? undefined : snapshotNativeAudioParts(options.audioParts);
     if (options.parts !== undefined && (text !== "" || options.images !== undefined)) throw new Error("Ordered input cannot be combined with legacy text/images.");
     const parts = options.parts === undefined ? undefined : snapshotNativeInputParts(options.parts);
     const images = snapshotNativeImages(options.images);
-    const messageId = randomUUID();
     const list = this.state[target];
     const payloadText = audioParts !== undefined ? encodeNativeAudioInput(audioParts) : parts !== undefined ? encodeNativeOrderedInput(parts) : images.length === 0 ? text : encodeNativeImageInput(text, images);
     // The queued message becomes one signed row — or, above the per-event cap, a signed `loop/inbox` spill
@@ -89,6 +93,16 @@ export class LoopInbox {
     // spillInput.ts). Above the blob cap it is refused here, before anything is recorded, with the fix named —
     // not as a bare ledger error after the caller believes it was queued.
     const what = "The queued input (text plus encoded media)", encoded = Buffer.from(payloadText, "utf8");
+    const format = audioParts !== undefined ? NATIVE_AUDIO_INPUT_FORMAT : parts !== undefined ? NATIVE_ORDERED_INPUT_FORMAT : images.length ? NATIVE_IMAGE_INPUT_FORMAT : undefined;
+    const fingerprint = options.clientRequestId === undefined ? "" : requestFingerprint(target, origin, options.wake, options.demotedFrom, format, encoded);
+    if (options.clientRequestId !== undefined) {
+      const previous = this.requests.get(options.clientRequestId);
+      if (previous) {
+        if (previous.fingerprint !== fingerprint) throw new Error("clientRequestId already names a different submission.");
+        return previous.receipt;
+      }
+    }
+    const messageId = randomUUID();
     const route = queuedInputPayloadRoute(this.session.workspace, what, encoded.byteLength);
     const retained = route.spill ? this.session.retainOversizeInput(what, encoded, route.cap, { subject: "loop/inbox", messageId }) : null;
     const ref = this.session.recordLoopEvent({
@@ -102,20 +116,33 @@ export class LoopInbox {
       text: retained === null ? payloadText : retained.descriptor.toString("utf8"),
       ...(audioParts !== undefined ? { payloadFormat: NATIVE_AUDIO_INPUT_FORMAT } : parts !== undefined ? { payloadFormat: NATIVE_ORDERED_INPUT_FORMAT } : images.length === 0 ? {} : { payloadFormat: NATIVE_IMAGE_INPUT_FORMAT }),
       wake: options.wake,
-      demotedFrom: options.demotedFrom
+      demotedFrom: options.demotedFrom,
+      ...(options.clientRequestId === undefined ? {} : { clientRequestId: options.clientRequestId, clientRequestSha256: fingerprint })
     });
     const message: InboxMessage = Object.freeze({ messageId, text, origin,
       ...(audioParts === undefined ? {} : { audioParts, inputEventId: ref.eventId }),
       ...(parts === undefined ? {} : { parts, inputEventId: ref.eventId }),
       ...(images.length === 0 ? {} : { images, inputEventId: ref.eventId }) });
+    const receipt: InboxReceipt = Object.freeze({ eventId: ref.eventId, messageId, target, demotedFrom: options.demotedFrom });
+    if (options.clientRequestId !== undefined) this.requests.set(options.clientRequestId, { fingerprint, receipt });
     list.push(message);
     this.notify({ kind: "inbox", op: "insert", target, messageIds: [message.messageId] });
-    return {
-      eventId: ref.eventId,
-      messageId: message.messageId,
-      target,
-      demotedFrom: options.demotedFrom
-    };
+    return receipt;
+  }
+
+  /** The first durable admission, including messages already claimed or withdrawn. */
+  requestReceipt(clientRequestId: string): InboxReceipt | undefined {
+    return this.requests.get(clientRequestId)?.receipt;
+  }
+
+  /** Withdraw one still-pending message through the existing signed cancel splice. */
+  withdraw(messageId: string): boolean {
+    if (typeof messageId !== "string" || !messageId || messageId.length > 128 || /[\x00-\x20\x7f]/.test(messageId)) throw new Error("messageId must name one exact queued message.");
+    for (const target of TARGETS) {
+      const index = this.state[target].findIndex(message => message.messageId === messageId);
+      if (index >= 0) return this.splice(target, index, 1, "cancel").length === 1;
+    }
+    return false;
   }
 
   /**
@@ -201,6 +228,14 @@ export class LoopInbox {
     const inserted = meta.op === "insert" ? [this.replayMessage(meta, event, events)] : [];
     if (inserted.length > 0) {
       this.assertUnique(inserted[0]!.messageId, event);
+      if (meta.clientRequestId !== undefined) {
+        const bytes = readQueuedInputBytes(this.session.workspace, events, event, inserted[0]!.messageId,
+          { what: "agent inbox: request", consequence: "request identity cannot be replayed." });
+        const fingerprint = requestFingerprint(meta.target, meta.origin!, meta.wake === true, meta.demotedFrom ?? null, meta.payloadFormat, bytes);
+        if (this.requests.has(meta.clientRequestId) || fingerprint !== meta.clientRequestSha256) throw new Error("agent inbox: request identity fingerprint is invalid or duplicated.");
+        this.requests.set(meta.clientRequestId, { fingerprint, receipt: Object.freeze({ eventId: event.id,
+          messageId: inserted[0]!.messageId, target: meta.target, demotedFrom: meta.demotedFrom ?? null }) });
+      }
     }
     list.splice(meta.start, meta.removedCount, ...inserted);
   }
@@ -266,4 +301,10 @@ export function readQueuedInputBytes(
   if (spilled.status === "not-spilled") return payload.bytes;
   if (spilled.status !== "ok") throw new Error(`${describe.what} inbox payload is ${spilled.status}; ${describe.consequence} (${spilled.detail})`);
   return spilled.bytes;
+}
+
+/** Original payload bytes plus admission semantics bind a caller id to exactly one request. */
+function requestFingerprint(target: InboxTarget, origin: InboxOrigin, wake: boolean, demotedFrom: InboxTarget | null,
+  format: string | undefined, bytes: Buffer): string {
+  return sha256Hex(canonicalize({ target: demotedFrom ?? target, origin, wake, payloadFormat: format ?? null, payloadSha256: sha256Hex(bytes) }));
 }

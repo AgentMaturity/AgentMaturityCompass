@@ -7,6 +7,8 @@ import { sha256Hex } from "../utils/hash.js";
 import { projectAcpAttachment } from "./acpImageHistory.js";
 import { ACP_MAX_TURN_UPDATE_BYTES } from "./acpCommittedUpdates.js";
 import { ACP_ERROR, AcpFailure } from "./acpErrors.js";
+import { extractEnvelope } from "../session/sessionTypes.js";
+import { projectCurrentAcpPlan } from "./acpPlanProjection.js";
 import { NativeAudioProvenanceError, validateNativeAudioProvenance } from "../session/nativeAudioProvenance.js";
 
 /**
@@ -41,7 +43,16 @@ export interface AcpSessionUpdate {
   readonly [field: string]: unknown;
 }
 
+export interface AcpProjectedUpdate {
+  readonly seq: number;
+  readonly eventId: string;
+  readonly eventHash: string;
+  readonly update: AcpSessionUpdate;
+}
+
 export interface ProjectedUpdates {
+  /** Present only for callers requesting stable committed event identities. */
+  readonly entries?: readonly AcpProjectedUpdate[];
   readonly updates: readonly AcpSessionUpdate[];
   /** How many rows were skipped for having no signature. */
   readonly unsigned: number;
@@ -59,9 +70,19 @@ export function projectSessionUpdates(
   workspace: string,
   events: readonly EvidenceEvent[],
   from: number,
-  options: { readonly includeUser?: boolean } = {}
+  options: { readonly includeUser?: boolean; readonly to?: number; readonly includeEventIdentity?: boolean; readonly includeCurrentPlans?: boolean;
+    /** Local bounded collection only: no replay array is retained. Discard collected state if projection throws or returns unsigned rows. */
+    readonly collectUpdate?: (update: AcpSessionUpdate) => void } = {}
 ): ProjectedUpdates {
+  const to = options.to ?? events.length;
+  if (!Number.isSafeInteger(from) || !Number.isSafeInteger(to) || from < 0 || to < from || to > events.length) {
+    throw new AcpFailure(ACP_ERROR.invalidParams, "Invalid committed projection range.");
+  }
+  if (options.collectUpdate && (!options.includeUser || options.includeEventIdentity)) {
+    throw new AcpFailure(ACP_ERROR.invalidParams, "A local collector requires faithful user replay and cannot retain event identities.");
+  }
   const updates: AcpSessionUpdate[] = [];
+  const entries: AcpProjectedUpdate[] = [];
   let unsigned = 0;
   let historyBytes = 0;
   if (options.includeUser) {
@@ -72,7 +93,7 @@ export function projectSessionUpdates(
 
   // A compaction summary step's prompt and answer are context aids, not conversation.
   const inSummaryStep = compactionSummaryRows(events);
-  for (const event of events.slice(from)) {
+  for (const event of events.slice(from, to)) {
     // `UNSIGNED` is IMPORTED, not restated. This file declared its own
     // `"UNSIGNED"` while the ledger writes `"unsigned"`, so this comparison
     // matched nothing and the guard could not fire -- under the docstring above
@@ -88,26 +109,33 @@ export function projectSessionUpdates(
       && readEventPayload(workspace, event).status !== "ok") {
       throw new Error("Session history payload is unavailable; cannot faithfully replay the conversation.");
     }
-    const update = options.includeUser && event.event_type === "user/attachment"
+    const currentPlan = options.includeCurrentPlans ? projectCurrentAcpPlan(workspace, event, events) : null;
+    const update = currentPlan ?? (options.includeUser && event.event_type === "user/attachment"
       ? projectAcpAttachment(workspace, event, events)
       : options.includeUser && event.event_type === "user/message"
-        ? userUpdate(workspace, event) : updateFor(workspace, event);
+        ? userUpdate(workspace, event) : updateFor(workspace, event));
     if (update) {
       if (options.includeUser) {
-        // Preflight the complete replay before session/load emits ANY prefix.
-        // Incremental checking also bounds retained base64 across many images.
+        // The replay array is preflighted before session/load emits ANY prefix.
+        // Local collectors retain their own bounded state; each frame still passes the same check.
         const bytes = Buffer.byteLength(JSON.stringify({ sessionId: event.session_id, update }), "utf8");
-        if (bytes > 900_000 || historyBytes + bytes > ACP_MAX_TURN_UPDATE_BYTES) {
+        if (bytes > 900_000 || (!options.collectUpdate && historyBytes + bytes > ACP_MAX_TURN_UPDATE_BYTES)) {
           throw new AcpFailure(ACP_ERROR.internal,
             "Session history exceeds the ACP replay frame or aggregate bound; no partial replay is available.", { reason: "history-output-limit" });
         }
         historyBytes += bytes;
       }
-      updates.push(update);
+      if (options.collectUpdate) options.collectUpdate(update);
+      else updates.push(update);
+      if (options.includeEventIdentity) {
+        const envelope = extractEnvelope(event.meta_json);
+        if (!envelope) throw new AcpFailure(ACP_ERROR.internal, "Committed update has no session sequence identity.");
+        entries.push({ seq: envelope.seq, eventId: event.id, eventHash: event.event_hash, update });
+      }
     }
   }
 
-  return { updates, unsigned };
+  return { updates, unsigned, ...(options.includeEventIdentity ? { entries } : {}) };
 }
 
 function userUpdate(workspace: string, event: EvidenceEvent): AcpSessionUpdate | null {
@@ -151,6 +179,7 @@ function updateFor(workspace: string, event: EvidenceEvent): AcpSessionUpdate | 
       sessionUpdate: "tool_call_update",
       toolCallId,
       status: meta["outcome"] === "OK" ? "completed" : "failed",
+      ...(meta["outcome"] === "TOOL_OUTCOME_UNKNOWN" ? { _meta: { "dev.agentmaturity.amc": { outcome: "TOOL_OUTCOME_UNKNOWN" } } } : {}),
       ...(text === null ? {} : { content: [{ type: "content", content: { type: "text", text } }] })
     };
   }

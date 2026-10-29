@@ -1,5 +1,6 @@
 import type { DelegationChainView } from "../agent/delegationChain.js";
 import type { NativeValidationResult } from "../agent/nativeValidation.js";
+import type { AcpSessionUpdatePage } from "../acp/acpSessionUpdatePage.js";
 import type { ExecutionStatus } from "../execution/executionContract.js";
 
 /** Browser-safe contract. Workspace, credentials, process and grant selection stay server-owned. */
@@ -86,12 +87,18 @@ export interface NativeTaskApproval {
   readonly required: number; readonly received: number; readonly expiresTs: number;
 }
 export interface NativeTaskEvent {
+  /** Raw source sequence when NativeTaskPoll.page is present; legacy projected-update position otherwise. */
   readonly cursor: number; readonly kind: "user" | "assistant" | "tool" | "tool-update" | "plan";
   readonly text: string; readonly toolCallId?: string; readonly status?: string;
   /** Metadata derived from authenticated original payload bytes, not a draft or an upload receipt. */
   readonly attachment?: { readonly type: "image" | "audio"; readonly mimeType: string; readonly byteLength: number; readonly sha256: string };
   /** Output comes from the native authenticated committed-row projector; full verification is separate. */
   readonly evidence: "committed";
+}
+export type NativeTaskUsage = AcpSessionUpdatePage["state"]["usage"];
+export interface NativeTaskPlan {
+  readonly kind: "todo" | "plan"; readonly revision: number; readonly recordSha256: string; readonly text: string;
+  readonly evidence: "committed"; readonly scope: "current-record";
 }
 export interface NativeTaskHistory {
   readonly status: "not-started" | "authenticated" | "unavailable";
@@ -109,6 +116,9 @@ export interface NativeTaskView {
   readonly validationSelection: NativeTaskValidationSelection | null;
   readonly validation: NativeValidationResult;
   readonly validationOutputs: readonly NativeTaskValidationOutput[];
+  /** Latest authenticated standing lists, separate from historical transcript and approvals. */
+  readonly plans?: readonly NativeTaskPlan[];
+  readonly usage?: NativeTaskUsage;
   readonly maxSteps: number; readonly maxTokens: number;
   readonly state: NativeTaskState; readonly createdAt: number; readonly updatedAt: number;
   readonly archived: boolean;
@@ -129,14 +139,19 @@ export interface NativeTaskView {
   /** The signed delegation chain this process's runtime lease binds (P2-25); null when its lease is v1 or none was minted. */
   readonly delegation: DelegationChainView | null;
 }
-export interface NativeTaskPoll { readonly task: NativeTaskView; readonly events: readonly NativeTaskEvent[]; readonly truncated: boolean }
+interface NativeTaskPageOptions { readonly cursor?: string; readonly limit?: number }
+type NativeTaskPage = Omit<AcpSessionUpdatePage, "updates">;
+export interface NativeTaskPoll {
+  readonly task: NativeTaskView; readonly events: readonly NativeTaskEvent[]; readonly truncated: boolean;
+  readonly page?: NativeTaskPage;
+}
 export interface NativeTaskService {
   /** Studio's opt-in from its operator environment at start, as the child records it (--unsafe-unconfined-shell); absent means none (P0-06). */
   readonly shellOptIn?: "cli-flag" | null;
   configuration(actor: NativeTaskActor): Promise<NativeTaskConfiguration>;
   list(actor: NativeTaskActor, includeArchived?: boolean): readonly NativeTaskView[];
   start(actor: NativeTaskActor, input: NativeTaskStartRequest): Promise<NativeTaskView>;
-  poll(actor: NativeTaskActor, taskId: string, cursor?: number): NativeTaskPoll;
+  poll(actor: NativeTaskActor, taskId: string, cursor?: number | NativeTaskPageOptions): NativeTaskPoll;
   turn(actor: NativeTaskActor, taskId: string, input: NativeTaskTurn): Promise<NativeTaskView>;
   cancel(actor: NativeTaskActor, taskId: string, expectedRevision: number): NativeTaskView;
   release(actor: NativeTaskActor, taskId: string, expectedRevision: number): Promise<NativeTaskView>;

@@ -33,7 +33,8 @@ import { NATIVE_TASK_INITIATOR_ENV, NATIVE_TASK_LEASE_ENV, NATIVE_TASK_SYSTEM_PR
 import { loadNativeTaskContext } from "./nativeTaskContext.js";
 import { regulatedLeaseProfile } from "../leases/regulatedProfile.js";
 import { NativeTaskDescriptors, nativeTaskId, taskBodyHash, type NativeTaskDescriptor } from "./nativeTaskDescriptors.js";
-import { readNativeTaskProjection, type NativeTaskProjection } from "./nativeTaskProjection.js";
+import { readAcpSessionUpdatePage } from "../acp/acpSessionUpdatePage.js";
+import { readNativeTaskProjection, projectNativeTaskUpdate, type NativeTaskProjection } from "./nativeTaskProjection.js";
 import { inspectJsonlSessionRecovery } from "../session/jsonlContinuation.js";
 import { deriveExecutionStatus } from "../execution/executionContract.js";
 import { sessionReceipts } from "../execution/executionStatus.js";
@@ -327,7 +328,7 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
       lastClientRequestId: d.submissions[d.submissions.length - 1]!.clientRequestId, state: !entry.client && p?.closed ? "closed" : entry.state,
       createdAt: d.createdAt, updatedAt: d.updatedAt, archived: d.archivedAt !== undefined, turnEndReason: p?.ending ?? null, error: entry.projectionError ?? entry.error,
       validationSelection: d.validation ?? null,
-      validation, validationOutputs: (p?.validationOutputs ?? []).filter(output => validation.checks.some(check => check.outputEventId === output.outputEventId && check.id === output.checkId)),
+      validation, plans: p?.plans ?? [], usage: p?.usage, validationOutputs: (p?.validationOutputs ?? []).filter(output => validation.checks.some(check => check.outputEventId === output.outputEventId && check.id === output.checkId)),
       verification: entry.verification, verificationScope: entry.verification === "externally-anchored" || entry.verification === "anchored-prefix" ? entry.verificationScope ?? null : null, approvals: p?.approvals ?? [], approvalError: p?.approvalError ?? null,
       nextCursor: p?.nextCursor ?? 0, firstCursor: p?.firstCursor ?? 1, droppedEvents: p?.droppedEvents ?? 0,
       history, resumeBlockedReason, recovery: recovery ? { eligible: recovery.eligible, state: recovery.state, message: recovery.message } : null,
@@ -558,12 +559,37 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
       return view(entry);
     },
     poll(actor, taskId, cursor = 0) {
-      if (!Number.isSafeInteger(cursor) || cursor < 0) throw new NativeTaskServiceError("CURSOR_INVALID", 400, "Choose a nonnegative event cursor.");
-      const entry = owned(actor, taskId), task = view(entry, true);
-      if (task.history.status !== "unavailable" && cursor > task.nextCursor) throw new NativeTaskServiceError("CURSOR_AHEAD", 409, "The event cursor is ahead of authenticated history. Refresh from cursor zero.");
-      const events = entry.projection?.events.filter(e => e.cursor > cursor) ?? [];
+      // A cursor is a position reference only. Re-authenticate the descriptor's owner for every page/reconnect.
+      const entry = owned(actor, taskId);
+      if (typeof cursor === "object" && cursor !== null && !Array.isArray(cursor)) {
+        const task = view(entry, true), sessionId = entry.descriptor.sessionId;
+        if (!sessionId) return { task, events: [], truncated: false };
+        try {
+          const { updates, ...page } = readAcpSessionUpdatePage({ workspace, sessionId, agentId: actor.agentId,
+            consumerId: actor.principalId, ...(cursor.cursor === undefined ? {} : { cursor: cursor.cursor }),
+            ...(cursor.limit === undefined ? {} : { limit: cursor.limit }) });
+          if (task.history.status !== "authenticated") throw new NativeTaskServiceError("EVIDENCE_UNAVAILABLE", 409,
+            "Committed task state could not be authenticated. No partial event page was returned.");
+          const events = updates.flatMap(item => { const event = projectNativeTaskUpdate(item.update, item.seq); return event ? [event] : []; });
+          const response = { task, events, truncated: false, page };
+          if (Buffer.byteLength(JSON.stringify({ ok: true, data: response }), "utf8") > LIMITS.maxEventBytes) {
+            throw new NativeTaskServiceError("EVIDENCE_UNAVAILABLE", 409, "Native task state exceeds the page response bound. No partial event page or shortened task state was returned.");
+          }
+          return response;
+        } catch (error) {
+          if (error instanceof NativeTaskServiceError) throw error;
+          if (error instanceof SessionHistoryRefused && error.code === "INVALID_INPUT") throw new NativeTaskServiceError("CURSOR_INVALID", 400,
+            "The native history page selection is invalid. Refresh from the original task before reconnecting.");
+          throw new NativeTaskServiceError("EVIDENCE_UNAVAILABLE", 409,
+            "Committed task evidence or its cursor could not be authenticated. No partial event page was returned.");
+        } finally { if (!entry.client) { entry.projection = undefined; entry.projectionAt = 0; } }
+      }
+      if (!Number.isSafeInteger(cursor) || (cursor as number) < 0) throw new NativeTaskServiceError("CURSOR_INVALID", 400, "Choose a nonnegative event cursor.");
+      const task = view(entry, true);
+      if (task.history.status !== "unavailable" && (cursor as number) > task.nextCursor) throw new NativeTaskServiceError("CURSOR_AHEAD", 409, "The event cursor is ahead of authenticated history. Refresh from cursor zero.");
+      const events = entry.projection?.events.filter(e => e.cursor > (cursor as number)) ?? [];
       if (!entry.client) { entry.projection = undefined; entry.projectionAt = 0; }
-      return { task, events, truncated: task.history.status === "unavailable" || task.droppedEvents > 0 || cursor + 1 < task.firstCursor };
+      return { task, events, truncated: task.history.status === "unavailable" || task.droppedEvents > 0 || (cursor as number) + 1 < task.firstCursor };
     },
     async turn(actor, taskId, input) {
       const entry = owned(actor, taskId);

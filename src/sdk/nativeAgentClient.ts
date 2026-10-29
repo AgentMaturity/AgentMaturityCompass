@@ -5,7 +5,6 @@ import { resolve } from "node:path";
 import { TextDecoder } from "node:util";
 import type { AgentRunVerification } from "../agent/runReport.js";
 import type { NativeValidationResult } from "../agent/nativeValidation.js";
-import { parseNativeValidationResult } from "../agent/nativeValidationResult.js";
 import { deepseekParams } from "../llm/providers/deepseekContract.js";
 import { materializeAcpImages, nativeImagesToAcp, nativePartsToAcp, type AcpPromptBlock } from "../acp/acpPromptInput.js";
 import { NATIVE_ORDERED_INPUT_FORMAT, type NativeInputPart } from "../attachments/nativeOrderedInput.js";
@@ -14,8 +13,9 @@ import { NATIVE_AUDIO_INPUT_FORMAT, type NativeAudioPart } from "../attachments/
 import { advertisesNativeAudio, materializeAcpAudio, nativeAudioPartsToAcp } from "../acp/acpAudioInput.js";
 import { MAX_WIRE_LINE_BYTES } from "../wire/ndjsonFraming.js";
 import { forwardNativeShellWarnings } from "./nativeShellWarnings.js";
+import { validClientRequestId } from "../session/loopEventMeta.js";
 import { runtimeChildEnv } from "../utils/providerKeys.js";
-import { EXECUTION_API_VERSION, parseExecutionStatus, type ExecutionStatus } from "../execution/executionContract.js";
+import { EXECUTION_API_VERSION, type ExecutionStatus } from "../execution/executionContract.js";
 import { admitVerifierReport, approveThroughCli, pendingApprovals, reportedExecution, runPinnedCli, type AMCNativeApproval,
   type AMCNativePendingApproval, type PinnedCli } from "./nativeCli.js";
 export type { AMCNativeApproval, AMCNativePendingApproval } from "./nativeCli.js";
@@ -23,24 +23,30 @@ export { EXECUTION_API_VERSION, EXECUTION_PHASES, EXECUTION_VERBS, PHASE_STATES,
   type PhaseState } from "../execution/executionContract.js";
 export * as llm from "../llm/index.js";
 /** Native in-process and capability-negotiated subprocess image input. */
-export { openAgentSession, resumeAgentSession, type AgentSession, type OrderedAgentSession, type AgentSessionInit } from "../agent/agentSession.js";
+export { openAgentSession, resumeAgentSession, type AgentSession, type OrderedAgentSession, type AgentSessionInit, type AgentPromptOptions } from "../agent/agentSession.js";
 export { NATIVE_ORDERED_INPUT_FORMAT, snapshotNativeInputParts, type NativeInputPart } from "../attachments/nativeOrderedInput.js";
 export { snapshotNativeImages, type NativeImageInput, type NativeImageMediaType } from "../attachments/nativeImageInput.js";
 export { NATIVE_AUDIO_INPUT_FORMAT, snapshotNativeAudioParts, type NativeAudioInput, type NativeAudioPart, type NativeAudioMediaType } from "../attachments/nativeAudioInput.js";
 export { loadNativeAudioManifest, NATIVE_AUDIO_FILE_MANIFEST_FORMAT } from "../attachments/nativeAudioFiles.js";
 export { loadSessionEventHistory, SessionHistoryRefused, type SessionHistoryRefusal, type SessionEventHistory, type SessionEventHistoryOptions } from "../session/sessionEventHistory.js";
+export { loadSessionEventPage, type SessionEventPage, type SessionEventPageOptions } from "../session/sessionEventPage.js";
 export { inspectJsonlSessionRecovery, type JsonlSessionRecoveryReadiness } from "../session/jsonlContinuation.js";
 export type { NativeValidationResult, NativeValidationCheckResult, NativeValidationStatus } from "../agent/nativeValidation.js";
 
-import { AMC_NATIVE_EVENT_LIMITS, asError, assertSignal, eventLimits, freezeJson, MAX_FRAME_BYTES, MAX_WRITE_QUEUE_BYTES, MAX_WRITE_QUEUE_FRAMES,
-  object, STOP_REASONS, UPDATE_KINDS, type AMCNativeEventBufferOptions, type JsonObject } from "./nativeWire.js";
+import { asError, assertSignal, eventLimits, freezeJson, MAX_FRAME_BYTES, MAX_WRITE_QUEUE_BYTES, MAX_WRITE_QUEUE_FRAMES,
+  object, UPDATE_KINDS, validPlanUpdate, type AMCNativeEventBufferOptions, type JsonObject } from "./nativeWire.js";
 export { AMC_NATIVE_EVENT_LIMITS, type AMCNativeEventBufferOptions } from "./nativeWire.js";
+import { admitSessionUpdatePage, assertRecoveryPage, COMMITTED_TURN_FORMAT, committedTurnFromResult, iterateSessionPages, remainingTurnBudget, SESSION_PAGE_FORMAT, sessionPageParams, type AMCNativeReadPageOptions, type AMCNativeSessionPage } from "./nativeSessionPages.js";
+export type { AMCNativeReadPageOptions, AMCNativeSessionPage } from "./nativeSessionPages.js";
+
+import { AMCNativeTurn } from "./nativeAgentTurn.js";
+export { AMCNativeTurn } from "./nativeAgentTurn.js";
 
 import {
   AMCNativeCancelledError, AMCNativeInputError, AMCNativeLimitError, AMCNativeProcessError, AMCNativeProtocolError, AMCNativeRefusedError
 } from "./nativeAgentErrors.js";
 export {
-  AMCNativeCancelledError, AMCNativeInputError, AMCNativeLimitError, AMCNativeProcessError, AMCNativeProtocolError, AMCNativeRefusedError
+  AMCNativeCancelledError, AMCNativeInputError, AMCNativeLimitError, AMCNativeProcessError, AMCNativeProtocolError, AMCNativeRefusedError, AMCNativeResyncRequiredError
 } from "./nativeAgentErrors.js";
 
 /** @public */ export interface AMCNativeClientOptions {
@@ -88,6 +94,8 @@ export {
   readonly startupSignal?: AbortSignal;
   /** Bounded, lossless retained updates. Overflow fails the connection, never pauses replies behind a slow iterator. */
   readonly eventBuffer?: AMCNativeEventBufferOptions;
+  /** Opt in to committed-page text recovery when live retention overflows. Requires the negotiated paged reader. */
+  readonly resyncOnOverflow?: boolean;
 }
 
 /** @public */ export interface AMCNativeUpdate {
@@ -105,6 +113,9 @@ export {
   readonly updates: readonly AMCNativeUpdate[];
   readonly meta: Readonly<JsonObject>;
   readonly verification: "not-verified";
+  /** Present only after explicitly requested committed-page recovery; updates retain a bounded prefix. */
+  readonly resynced?: true;
+  readonly recovery?: { readonly cursor: string; readonly updatesComplete: false; readonly retainedUpdates: "bounded-prefix" };
   /** The execution phases the runtime reported for this turn (P2-13); evidence verification stays pending until verifySession. */
   readonly execution: ExecutionStatus | null;
   /** Public operator checks only; independent from turn completion and evidence verification. */
@@ -121,130 +132,6 @@ export {
 }
 
 
-/** One prompt in flight. Cancelling requests a stop; only the result establishes its outcome. @public */
-export class AMCNativeTurn implements AsyncIterable<AMCNativeUpdate> {
-  readonly result: Promise<AMCNativeRunResult>;
-  private resolveResult!: (value: AMCNativeRunResult) => void;
-  private rejectResult!: (error: Error) => void;
-  private readonly updates: AMCNativeUpdate[] = [];
-  private bytes = 0;
-  private wake: (() => void) | undefined;
-  private done = false;
-  private error: Error | undefined;
-  private iterated = false;
-  private cancelRequested = false;
-  private readonly limits: Required<AMCNativeEventBufferOptions>;
-  state: "submitted" | "receiving" | "cancel-requested" | "completed" | "failed" = "submitted";
-
-  /** @internal */ constructor(readonly sessionId: string, private readonly requestCancel: () => void, options: AMCNativeEventBufferOptions = {}) {
-    this.limits = eventLimits(options);
-    this.result = new Promise((resolve_, reject) => { this.resolveResult = resolve_; this.rejectResult = reject; });
-    // Consumers may read the stream before awaiting result. Keep rejection handled until then.
-    void this.result.catch(() => {});
-  }
-
-  cancel(): void {
-    if (this.done || this.cancelRequested) return;
-    this.cancelRequested = true;
-    this.state = "cancel-requested";
-    // AbortSignal listeners and iterator cleanup must not throw outside turn.result.
-    try { this.requestCancel(); } catch (error) { this.fail(asError(error)); }
-  }
-
-  /** @internal */
-  receive(update: AMCNativeUpdate): void {
-    if (this.done) throw new AMCNativeProtocolError("received an update after the prompt result");
-    const encoded = JSON.stringify(update), bytes = Buffer.byteLength(encoded);
-    const overflow = this.updates.length >= this.limits.maxEvents
-      ? new AMCNativeLimitError("turn-events", this.limits.maxEvents)
-      : this.bytes + bytes > this.limits.maxBytes ? new AMCNativeLimitError("turn-bytes", this.limits.maxBytes) : undefined;
-    if (overflow) { this.fail(overflow); throw overflow; }
-    this.bytes += bytes;
-    // Iteration cannot mutate the committed-block view later used to assemble result.text.
-    this.updates.push(freezeJson(JSON.parse(encoded) as AMCNativeUpdate));
-    if (!this.cancelRequested) this.state = "receiving";
-    this.wake?.();
-  }
-
-  /** @internal */
-  finish(value: JsonObject): void {
-    if (this.done) return;
-    if (typeof value.stopReason !== "string" || !STOP_REASONS.has(value.stopReason)) {
-      const error = new AMCNativeProtocolError("native prompt returned an invalid stop reason"); this.fail(error); throw error;
-    }
-    if (value._meta !== undefined && !object(value._meta)) {
-      const error = new AMCNativeProtocolError("native prompt returned invalid metadata"); this.fail(error); throw error;
-    }
-    const extension = object(value._meta) ? value._meta["dev.agentmaturity.amc"] : undefined;
-    if (extension !== undefined && !object(extension)) {
-      const error = new AMCNativeProtocolError("native prompt returned invalid AMC metadata"); this.fail(error); throw error;
-    }
-    const rawValidation = object(extension) ? extension.validation : undefined;
-    const execution = object(extension) && extension.execution !== undefined ? parseExecutionStatus(extension.execution) : null;
-    if (object(extension) && extension.execution !== undefined && (execution === null || execution.sessionId !== this.sessionId)) {
-      const error = new AMCNativeProtocolError("native prompt returned invalid execution metadata"); this.fail(error); throw error;
-    }
-    const validation = rawValidation === undefined
-      ? { status: "unavailable" as const, turn: null, configSha256: null, checks: [] }
-      : parseNativeValidationResult(rawValidation);
-    if (validation === null) {
-      const error = new AMCNativeProtocolError("native prompt returned invalid validation metadata"); this.fail(error); throw error;
-    }
-    const text = this.updates.flatMap(({ update }) => {
-      if (update.sessionUpdate !== "agent_message_chunk" || !object(update.content)) return [];
-      return update.content.type === "text" && typeof update.content.text === "string" ? [update.content.text] : [];
-    }).join("");
-    const result: AMCNativeRunResult = freezeJson({ sessionId: this.sessionId, state: "completed" as const, stopReason: value.stopReason,
-      text, updates: [...this.updates], meta: object(value._meta) ? JSON.parse(JSON.stringify(value._meta)) as JsonObject : {},
-      verification: "not-verified" as const, execution, validation });
-    this.done = true; this.state = "completed";
-    this.resolveResult(result);
-    this.wake?.();
-  }
-
-  /** @internal */
-  fail(error: Error): void {
-    if (this.done) return;
-    this.done = true; this.error = error; this.state = "failed"; this.rejectResult(error); this.wake?.();
-  }
-
-  [Symbol.asyncIterator](): AsyncIterableIterator<AMCNativeUpdate> {
-    if (this.iterated) throw new Error("A native turn supports one update iterator; its result retains every update.");
-    this.iterated = true;
-    let cursor = 0, returned = false;
-    let waiting: { resolve: (value: IteratorResult<AMCNativeUpdate>) => void; reject: (error: Error) => void } | undefined;
-    const pump = (): void => {
-      if (!waiting) return;
-      if (!returned && cursor >= this.updates.length && !this.done) return;
-      const reader = waiting; waiting = undefined;
-      if (this.wake === pump) this.wake = undefined;
-      if (returned) reader.resolve({ done: true, value: undefined });
-      else if (cursor < this.updates.length) reader.resolve({ done: false, value: this.updates[cursor++]! });
-      else if (this.error) reader.reject(this.error);
-      else reader.resolve({ done: true, value: undefined });
-    };
-    const stop = (): void => {
-      if (returned) return;
-      returned = true; pump();
-      if (this.wake === pump) this.wake = undefined;
-      if (!this.done) this.cancel();
-    };
-    // Unlike an async generator, return() can interrupt a pending next() even
-    // when the peer is silent. At most one outstanding read retains a waiter.
-    return {
-      [Symbol.asyncIterator]() { return this; },
-      next: () => {
-        if (waiting) return Promise.reject(new AMCNativeProtocolError("Only one native update read may be pending"));
-        return new Promise<IteratorResult<AMCNativeUpdate>>((resolve_, reject) => {
-          waiting = { resolve: resolve_, reject }; this.wake = pump; pump();
-        });
-      },
-      return: async () => { stop(); return { done: true, value: undefined }; },
-      throw: async (error?: unknown) => { stop(); throw error; }
-    };
-  }
-}
-
 /** @public */ export class AMCNativeSession {
   readonly state = "accepted" as const;
   private released = false;
@@ -259,18 +146,20 @@ export class AMCNativeTurn implements AsyncIterable<AMCNativeUpdate> {
     if (this.released) throw new AMCNativeInputError("This session handle has been released; use the handle returned by resumeSession");
     if (this.releasePromise) throw new AMCNativeInputError("Wait for writer release before starting another operation");
   }
-  prompt(text: string, options: { readonly signal?: AbortSignal; readonly images?: readonly NativeImageInput[] } = {}): AMCNativeTurn {
+  prompt(text: string, options: { readonly signal?: AbortSignal; readonly clientRequestId?: string; readonly images?: readonly NativeImageInput[] } = {}): AMCNativeTurn {
     this.assertUsable();
-    return this.client.promptSession(this.sessionId, text, options.signal, options.images);
+    return this.client.promptSession(this.sessionId, text, options.signal, options.images, options.clientRequestId);
   }
-  /** @experimental Ordered text and image parts (amc-image-input@2). */ promptParts(parts: readonly NativeInputPart[], options: { readonly signal?: AbortSignal } = {}): AMCNativeTurn {
+  /** @experimental Ordered text and image parts (amc-image-input@2). */ promptParts(parts: readonly NativeInputPart[], options: { readonly signal?: AbortSignal; readonly clientRequestId?: string } = {}): AMCNativeTurn {
     this.assertUsable();
-    return this.client.promptSessionParts(this.sessionId, parts, options.signal);
+    return this.client.promptSessionParts(this.sessionId, parts, options.signal, options.clientRequestId);
   }
-  /** @experimental Ordered audio parts (amc-audio-input@1). */ promptAudioParts(parts: readonly NativeAudioPart[], options: { readonly signal?: AbortSignal } = {}): AMCNativeTurn {
+  /** @experimental Ordered audio parts (amc-audio-input@1). */ promptAudioParts(parts: readonly NativeAudioPart[], options: { readonly signal?: AbortSignal; readonly clientRequestId?: string } = {}): AMCNativeTurn {
     this.assertUsable();
-    return this.client.promptSessionAudioParts(this.sessionId, parts, options.signal);
+    return this.client.promptSessionAudioParts(this.sessionId, parts, options.signal, options.clientRequestId);
   }
+  /** Withdraw one pending message without cancelling the active turn or clearing a queue. */
+  withdraw(messageId: string): Promise<boolean> { this.assertUsable(); return this.client.withdrawSubmission(this.sessionId, messageId); }
   /** Closing the owned agent seals all its sessions before a fresh verifier reads the ledger. */
   async closeAndVerify(): Promise<AMCNativeReceipt> {
     this.assertUsable();
@@ -309,6 +198,8 @@ export class AMCNativeClient {
   private readonly agentId: string;
   private readonly timeout: number;
   private readonly limits: Required<AMCNativeEventBufferOptions>;
+  private readonly resyncOnOverflow: boolean;
+  private readonly promptReplies = new Set<string>();
   private readonly pending = new Map<number, PendingRequest>();
   private readonly sessions = new Set<string>();
   private readonly turns = new Map<string, AMCNativeTurn>();
@@ -363,6 +254,8 @@ export class AMCNativeClient {
       throw new AMCNativeInputError("timeoutMs must be a positive integer no greater than 2147483647");
     }
     this.limits = eventLimits(options.eventBuffer);
+    if (options.resyncOnOverflow !== undefined && typeof options.resyncOnOverflow !== "boolean") throw new AMCNativeInputError("resyncOnOverflow must be a boolean");
+    this.resyncOnOverflow = options.resyncOnOverflow === true;
     for (const bound of [options.maxTokens, options.maxSteps]) {
       if (bound !== undefined && (!Number.isSafeInteger(bound) || bound <= 0)) throw new Error("Native token/step bounds must be positive integers");
     }
@@ -428,7 +321,7 @@ export class AMCNativeClient {
     const abort = () => client.fail(new AMCNativeCancelledError("native client startup was cancelled"));
     try {
       signal?.addEventListener("abort", abort, { once: true });
-      const result = await client.request("initialize", { protocolVersion: 1, clientCapabilities: {} });
+      const result = await client.request("initialize", { protocolVersion: 1, clientCapabilities: { _meta: { "dev.agentmaturity.amc": { currentPlanUpdates: "amc-current-plan-v1" } } } });
       if (result.protocolVersion !== 1 || !object(result.agentInfo) || result.agentInfo.name !== "agent-maturity-compass"
         || !object(result.agentCapabilities)) throw new AMCNativeProtocolError("unsupported native agent identity or protocol");
       const meta = result.agentCapabilities._meta, extension = object(meta) ? meta["dev.agentmaturity.amc"] : undefined;
@@ -437,6 +330,9 @@ export class AMCNativeClient {
       }
       if (signal?.aborted) throw new AMCNativeCancelledError("native client startup was cancelled");
       client.assertAvailable();
+      if (options.resyncOnOverflow === true && (extension.sessionEventPage !== SESSION_PAGE_FORMAT || extension.committedTurn !== COMMITTED_TURN_FORMAT)) {
+        throw new AMCNativeRefusedError(-32601, "Committed overflow recovery requires session pages and committed turn references");
+      }
       client.agentInfo = freezeJson(result.agentInfo);
       client.negotiatedCapabilities = freezeJson(result.agentCapabilities);
       client.capabilities = client.negotiatedCapabilities;
@@ -495,6 +391,35 @@ export class AMCNativeClient {
     } finally { this.loading.delete(sessionId); }
   }
 
+  /** Read signed committed history without loading, resuming or claiming its writer. */
+  readSessionPage(sessionId: string, options: AMCNativeReadPageOptions = {}): Promise<AMCNativeSessionPage> {
+    return this.readPage(sessionId, options);
+  }
+
+  private async readPage(sessionId: string, options: AMCNativeReadPageOptions = {}, timeoutMs = this.timeout): Promise<AMCNativeSessionPage> {
+    this.assertAvailable();
+    const params = sessionPageParams(sessionId, options);
+    if (this.extension().sessionEventPage !== SESSION_PAGE_FORMAT) throw new AMCNativeRefusedError(-32601,
+      "This installed runtime does not support committed session pages");
+    return admitSessionUpdatePage(await this.request("_amc/session/events", params, timeoutMs), sessionId, this.agentId);
+  }
+
+  /** Drain one fixed snapshot with bounded retention. Save resumeCursor to read later committed appends. */
+  readSessionPages(sessionId: string, options: AMCNativeReadPageOptions = {}): AsyncIterableIterator<AMCNativeSessionPage> {
+    return iterateSessionPages(page => this.readPage(sessionId, page), options);
+  }
+
+  /** Withdraw exactly one pending message in an owned session. */
+  async withdrawSubmission(sessionId: string, messageId: string): Promise<boolean> {
+    this.assertAvailable();
+    if (!validClientRequestId(messageId)) throw new AMCNativeInputError("messageId must name one exact queued message");
+    if (!this.sessions.has(sessionId) || this.releasing.has(sessionId)) throw new AMCNativeInputError("Submission withdrawal requires an owned usable session");
+    if (this.extension().withdrawSubmission !== true) throw new AMCNativeRefusedError(-32601, "This runtime does not support individual submission withdrawal");
+    const result = await this.request("_amc/session/withdraw", { sessionId, messageId });
+    if (typeof result.withdrawn !== "boolean") throw new AMCNativeProtocolError("native withdrawal returned an invalid outcome");
+    return result.withdrawn;
+  }
+
   /** @internal */
   async releaseSession(sessionId: string): Promise<void> {
     this.assertAvailable();
@@ -512,7 +437,7 @@ export class AMCNativeClient {
   }
 
   /** @internal */
-  promptSession(sessionId: string, text: string, signal?: AbortSignal, images?: readonly NativeImageInput[]): AMCNativeTurn {
+  promptSession(sessionId: string, text: string, signal?: AbortSignal, images?: readonly NativeImageInput[], clientRequestId?: string): AMCNativeTurn {
     this.assertPromptSlot(sessionId, signal);
     if (typeof text !== "string" || Buffer.from(text, "utf8").toString("utf8") !== text) {
       throw new AMCNativeInputError("Prompt text must be a losslessly representable UTF-8 string");
@@ -523,11 +448,11 @@ export class AMCNativeClient {
     if (imageBlocks.length && (!object(capabilities) || capabilities.image !== true)) {
       throw new AMCNativeRefusedError(-32602, "The selected ACP runtime does not advertise image input; choose a supported route or remove the images. No fallback was used.");
     }
-    return this.submitPrompt(sessionId, [{ type: "text", text }, ...imageBlocks], signal);
+    return this.submitPrompt(sessionId, [{ type: "text", text }, ...imageBlocks], signal, undefined, clientRequestId);
   }
 
   /** @internal */
-  promptSessionParts(sessionId: string, parts: readonly NativeInputPart[], signal?: AbortSignal): AMCNativeTurn {
+  promptSessionParts(sessionId: string, parts: readonly NativeInputPart[], signal?: AbortSignal, clientRequestId?: string): AMCNativeTurn {
     this.assertPromptSlot(sessionId, signal);
     const blocks = nativePartsToAcp(parts); // Synchronous original-byte snapshot.
     const meta = this.negotiatedCapabilities._meta;
@@ -537,7 +462,7 @@ export class AMCNativeClient {
         || !object(capabilities) || capabilities.image !== true) {
       throw new AMCNativeRefusedError(-32602, "The selected ACP runtime does not advertise amc-image-input@2; ordered content was not submitted or flattened.");
     }
-    return this.submitPrompt(sessionId, blocks, signal, NATIVE_ORDERED_INPUT_FORMAT);
+    return this.submitPrompt(sessionId, blocks, signal, NATIVE_ORDERED_INPUT_FORMAT, clientRequestId);
   }
 
   private assertPromptSlot(sessionId: string, signal?: AbortSignal): void {
@@ -550,7 +475,7 @@ export class AMCNativeClient {
   }
 
   /** @internal Exact version negotiation precedes submission; snapshot precedes async work. */
-  promptSessionAudioParts(sessionId: string, parts: readonly NativeAudioPart[], signal?: AbortSignal): AMCNativeTurn {
+  promptSessionAudioParts(sessionId: string, parts: readonly NativeAudioPart[], signal?: AbortSignal, clientRequestId?: string): AMCNativeTurn {
     this.assertPromptSlot(sessionId, signal);
     const blocks = nativeAudioPartsToAcp(parts);
     const capabilities = this.negotiatedCapabilities.promptCapabilities;
@@ -558,34 +483,84 @@ export class AMCNativeClient {
         && (!object(capabilities) || capabilities.image !== true))) {
       throw new AMCNativeRefusedError(-32602, "The selected ACP runtime does not advertise the exact amc-audio-input@1 Gemini v2/WAV contract; original content was not submitted, flattened or converted.");
     }
-    return this.submitPrompt(sessionId, blocks, signal, NATIVE_AUDIO_INPUT_FORMAT);
+    return this.submitPrompt(sessionId, blocks, signal, NATIVE_AUDIO_INPUT_FORMAT, clientRequestId);
   }
 
-  private submitPrompt(sessionId: string, prompt: readonly AcpPromptBlock[], signal?: AbortSignal, inputFormat?: typeof NATIVE_ORDERED_INPUT_FORMAT | typeof NATIVE_AUDIO_INPUT_FORMAT): AMCNativeTurn {
+  private submitPrompt(sessionId: string, prompt: readonly AcpPromptBlock[], signal?: AbortSignal, inputFormat?: typeof NATIVE_ORDERED_INPUT_FORMAT | typeof NATIVE_AUDIO_INPUT_FORMAT, clientRequestId?: string): AMCNativeTurn {
     if (signal?.aborted) throw new AMCNativeCancelledError("Prompt was cancelled before submission");
+    if (clientRequestId !== undefined) {
+      if (!validClientRequestId(clientRequestId)) throw new AMCNativeInputError("clientRequestId must be 1 through 128 visible ASCII characters");
+      if (this.extension().clientRequestIds !== true) throw new AMCNativeRefusedError(-32601, "This runtime does not support durable client request identities");
+    }
+    const extension = { ...(inputFormat === undefined ? {} : { inputFormat }), ...(clientRequestId === undefined ? {} : { clientRequestId }) };
+    const deadline = performance.now() + this.timeout;
+    let submitted = false, beforeCursor: string | undefined, beforeHead = -1, beforeTurn = 0;
+    let cancelBeforeSubmit = false, cancelRecovery = false;
     const turn: AMCNativeTurn = new AMCNativeTurn(sessionId, () => {
       // A reply may already have retired this turn while the caller is waking
       // from its final update. Do not cancel a subsequent turn with the same ID.
       if (this.turns.get(sessionId) !== turn) return;
+      if (!submitted) { cancelBeforeSubmit = true; return; }
+      if (this.promptReplies.has(sessionId)) { cancelRecovery = true; return; }
       try { this.notify("session/cancel", { sessionId }); }
       catch (error) { this.fail(asError(error)); throw error; }
-    }, this.limits);
+    }, this.limits, this.resyncOnOverflow);
     this.turns.set(sessionId, turn);
     const abort = () => turn.cancel();
     try { signal?.addEventListener("abort", abort, { once: true }); }
     catch (error) { this.turns.delete(sessionId); turn.fail(asError(error)); throw error; }
     const settle = () => {
       if (this.turns.get(sessionId) === turn) this.turns.delete(sessionId);
+      this.promptReplies.delete(sessionId);
       signal?.removeEventListener("abort", abort);
     };
-    void this.request("session/prompt", { sessionId, prompt,
-      ...(inputFormat === undefined ? {} : { _meta: { "dev.agentmaturity.amc": { inputFormat } } }) })
-      .then((result) => {
-        settle();
+    const budget = (preflight: boolean): number => remainingTurnBudget(deadline, preflight ? cancelBeforeSubmit : cancelRecovery);
+    const pages = (preflight: boolean, cursor?: string) => iterateSessionPages(async options => {
+      const page = await this.readPage(sessionId, options, budget(preflight));
+      budget(preflight); return page;
+    }, cursor === undefined ? {} : { cursor });
+    const dispatch = (): Promise<JsonObject> => {
+      if (signal?.aborted || turn.state === "cancel-requested") return Promise.reject(new AMCNativeCancelledError("Prompt was cancelled before submission"));
+      const timeoutMs = this.resyncOnOverflow ? budget(true) : this.timeout;
+      submitted = true;
+      return this.request("session/prompt", { sessionId, prompt,
+        ...(Object.keys(extension).length === 0 ? {} : { _meta: { "dev.agentmaturity.amc": extension } }) }, timeoutMs);
+    };
+    const prepare = async (): Promise<JsonObject> => {
+      for await (const page of pages(true)) {
+        beforeCursor = page.resumeCursor; beforeHead = page.headSeq; beforeTurn = page.state.turn.number ?? 0;
+      }
+      if (beforeCursor === undefined) throw new AMCNativeProtocolError("Committed recovery could not establish its pre-prompt cursor");
+      return dispatch();
+    };
+    void (this.resyncOnOverflow ? prepare() : dispatch()).then(async result => {
+      try {
         if (this.fatal) { turn.fail(this.fatal); return; }
-        try { turn.finish(result); }
-        catch (error) { const failure = asError(error); turn.fail(failure); this.fail(failure); }
-      }, (error: Error) => { settle(); turn.fail(error); });
+        const reference = this.resyncOnOverflow ? committedTurnFromResult(result, beforeHead, beforeTurn) : undefined;
+        let recovered: { text: string; cursor: string } | undefined;
+        if (turn.resyncRequired) {
+          if (beforeCursor === undefined || reference === undefined) throw new AMCNativeProtocolError("Committed recovery has no pre-prompt cursor or prompt seal");
+          let text = "", cursor = beforeCursor, bytes = 0, first = true;
+          for await (const page of pages(false, beforeCursor)) {
+            assertRecoveryPage(page, reference, beforeHead, first); first = false;
+            cursor = page.resumeCursor;
+            for (const { seq, update } of page.updates) {
+              if (seq > reference.seq) continue;
+              if (update.sessionUpdate !== "agent_message_chunk" || !object(update.content) || update.content.type !== "text") continue;
+              const chunk = update.content.text as string;
+              bytes += Buffer.byteLength(chunk);
+              if (bytes > this.limits.maxBytes) throw new AMCNativeLimitError("turn-bytes", this.limits.maxBytes);
+              text += chunk;
+            }
+          }
+          if (first || !text.startsWith(turn.retainedTextPrefix)) throw new AMCNativeProtocolError("Committed recovery does not match the retained live text prefix");
+          budget(false);
+          recovered = { text, cursor };
+        }
+        turn.finish(result, recovered);
+      } catch (error) { const failure = asError(error); turn.fail(failure); if (!(failure instanceof AMCNativeCancelledError)) this.fail(failure); }
+      finally { settle(); }
+    }, (error: Error) => { settle(); turn.fail(error); });
     return turn;
   }
 
@@ -621,11 +596,11 @@ export class AMCNativeClient {
     } catch { this.fail(new AMCNativeProtocolError("native agent input write failed")); }
   }
 
-  private request(method: string, params: JsonObject): Promise<JsonObject> {
+  private request(method: string, params: JsonObject, timeoutMs = this.timeout): Promise<JsonObject> {
     if (this.pending.size >= 32) return Promise.reject(new AMCNativeProtocolError("too many native requests are outstanding"));
     const id = this.nextId++;
     return new Promise((resolve_, reject) => {
-      const timer = setTimeout(() => this.fail(new AMCNativeProtocolError(`native request timed out: ${method}`)), this.timeout);
+      const timer = setTimeout(() => this.fail(new AMCNativeProtocolError(`native request timed out: ${method}`)), timeoutMs);
       this.pending.set(id, { resolve: resolve_, reject, timer,
         ...(method === "session/load" && typeof params.sessionId === "string" ? { loadingSessionId: params.sessionId } : {}),
         ...(method === "session/prompt" && typeof params.sessionId === "string" ? { promptSessionId: params.sessionId } : {}) });
@@ -653,11 +628,13 @@ export class AMCNativeClient {
         if (frame.method === "session/update" && frame.id === undefined) {
           if (!object(frame.params) || typeof frame.params.sessionId !== "string" || !object(frame.params.update)
             || typeof frame.params.update.sessionUpdate !== "string") throw new Error("invalid update");
-          const turn = this.turns.get(frame.params.sessionId);
+          const turn = this.promptReplies.has(frame.params.sessionId) ? undefined : this.turns.get(frame.params.sessionId);
           const loading = this.loading.get(frame.params.sessionId);
           if (!turn && !loading) throw new Error("unowned update");
           const update = frame.params.update;
           if (!UPDATE_KINDS.has(update.sessionUpdate as string)) throw new Error("unsupported update kind");
+          if (update.sessionUpdate === "plan" && this.extension().currentPlanUpdates !== "amc-current-plan-v1") throw new Error("unnegotiated current plan update");
+          if (update.sessionUpdate === "plan" && !validPlanUpdate(update)) throw new Error("invalid plan update");
           if (["agent_message_chunk", "user_message_chunk"].includes(update.sessionUpdate as string)) {
             if (!object(update.content)) throw new Error("invalid message update");
             if (loading && update.sessionUpdate === "user_message_chunk" && update.content.type === "image") {
@@ -693,11 +670,13 @@ export class AMCNativeClient {
         if (pending.loadingSessionId !== undefined) this.loading.delete(pending.loadingSessionId);
         // Likewise retire a prompt on the reader, on success AND refusal. A
         // same-chunk late update must never become output of this or a later turn.
-        if (pending.promptSessionId !== undefined) this.turns.delete(pending.promptSessionId);
+        if (pending.promptSessionId !== undefined) this.promptReplies.add(pending.promptSessionId);
         if (frame.error !== undefined) {
           if (!object(frame.error) || !Number.isInteger(frame.error.code) || typeof frame.error.message !== "string") throw new Error("invalid error");
           clearTimeout(pending.timer); this.pending.delete(frame.id);
-          pending.reject(new AMCNativeRefusedError(frame.error.code as number, frame.error.message, frame.error.data));
+          const refusal = new AMCNativeRefusedError(frame.error.code as number, frame.error.message, frame.error.data);
+          if (pending.promptSessionId !== undefined) this.turns.get(pending.promptSessionId)?.fail(refusal);
+          pending.reject(refusal);
         } else {
           if (!object(frame.result)) throw new Error("invalid result");
           clearTimeout(pending.timer); this.pending.delete(frame.id); pending.resolve(frame.result);
@@ -715,7 +694,7 @@ export class AMCNativeClient {
     for (const request of this.pending.values()) { clearTimeout(request.timer); request.reject(error); }
     this.pending.clear();
     for (const turn of this.turns.values()) turn.fail(error);
-    this.turns.clear(); this.loading.clear();
+    this.turns.clear(); this.promptReplies.clear(); this.loading.clear();
     this.outbound.length = 0; this.outboundBytes = 0; this.buffer = Buffer.alloc(0);
     this.child.stdin.destroy();
     if (!this.closed) this.child.kill("SIGTERM");

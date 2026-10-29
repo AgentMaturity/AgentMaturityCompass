@@ -18,7 +18,7 @@ import subprocess
 import threading
 import time
 from dataclasses import dataclass, field
-from typing import Any, Generator, Literal, Optional
+from typing import Any, Callable, Generator, Literal, Optional
 
 from .execution import (EXECUTION_API_VERSION, ExecutionStatus, PendingApproval, VerificationReceipt, admit_verification,
                         approval_args, parse_execution_status, parse_pending, run_cli)
@@ -27,7 +27,7 @@ __all__ = ["AmcAgent", "Session", "Turn", "SessionUpdate", "RunResult", "ToolCal
            "NativeValidationStatus", "NativeValidationCheckStatus", "NativeValidationCheckResult",
            "NativeValidationResult", "NativeImageInput", "NativeInputPart", "NATIVE_ORDERED_INPUT_FORMAT",
            "NativeAudioInput", "NativeAudioPart", "NATIVE_AUDIO_INPUT_FORMAT",
-           "AmcError", "AmcProtocolError", "AmcRefusedError", "AmcTimeoutError"]
+           "AmcError", "AmcProtocolError", "AmcRefusedError", "AmcTimeoutError", "SessionEventPage", "SessionPageUpdate", "AmcResyncRequiredError"]
 DEFAULT_TIMEOUT_SECONDS = 120.0
 MAX_FRAME_BYTES = 1024 * 1024
 # Matches native NdjsonFramer ingress; response frames have a separate bound.
@@ -39,9 +39,14 @@ NATIVE_ORDERED_INPUT_FORMAT = "amc-image-input@2"
 NATIVE_AUDIO_INPUT_FORMAT = "amc-audio-input@1"
 MAX_NATIVE_INPUT_PARTS = 256
 STOP_REASONS = {"end_turn", "max_tokens", "max_turn_requests", "refusal", "cancelled"}
-UPDATE_KINDS = {"agent_message_chunk", "user_message_chunk", "tool_call", "tool_call_update"}
+UPDATE_KINDS = {"agent_message_chunk", "user_message_chunk", "tool_call", "tool_call_update", "plan"}
+SESSION_PAGE_FORMAT = "amc-session-event-page-v1"
+MAX_SESSION_PAGE_SIZE = 256
 MAX_VALIDATION_CHECKS = 8
 MAX_VALIDATION_CONFIG_PATH_BYTES = 4096
+# This wrapper targets AMC 1.2.x; its Python package version is independent.
+COMPATIBLE_RUNTIME_MIN = (1, 2, 0)
+COMPATIBLE_RUNTIME_MAX = (1, 3, 0)
 _CHECK_ID = re.compile(r"[a-zA-Z0-9_-]{1,64}")
 _SHA256 = re.compile(r"[a-f0-9]{64}")
 # Match JavaScript String.trim, rather than Python's broader Unicode whitespace.
@@ -56,6 +61,14 @@ class AmcError(Exception):
 
 class AmcProtocolError(AmcError):
     """A malformed, uncorrelated, oversized or failed transport; never retry blindly."""
+
+
+class AmcResyncRequiredError(AmcProtocolError):
+    """Live retention stopped; await the same result for committed-page recovery."""
+    recoverable = True
+    def __init__(self, session_id: str) -> None:
+        super().__init__("native update retention overflowed; await this turn's result for committed history resynchronization")
+        self.session_id = session_id
 
 
 class AmcRefusedError(AmcError):
@@ -302,6 +315,36 @@ class SessionUpdate:
 
 
 @dataclass(frozen=True)
+class SessionPageUpdate:
+    """A committed update's exact session sequence and evidence identity."""
+    seq: int
+    event_id: str
+    event_hash: str
+    update: dict[str, Any]
+
+
+@dataclass(frozen=True)
+class SessionEventPage:
+    """Bounded native runtime-verified history; not an independent cold receipt."""
+    format: str
+    session_id: str
+    agent_id: str
+    committed: bool
+    backend: str
+    head_event_hash: str
+    head_seq: int
+    store_head_event_hash: str
+    first_seq: int
+    next_seq: int
+    next_cursor: Optional[str]
+    resume_cursor: str
+    sealed: bool
+    verification: dict[str, Any]
+    updates: tuple[SessionPageUpdate, ...]
+    state: dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
 class NativeValidationCheckResult:
     """One public check's reported outcome; its event identity is not a proof."""
     id: str
@@ -341,6 +384,8 @@ class RunResult:
     validation: NativeValidationResult = field(default_factory=_unavailable_validation)
     #: The execution phases the runtime reported for this turn (P2-13); evidence verification stays pending until verify_session.
     execution: Optional[ExecutionStatus] = None
+    resynced: bool = False
+    recovery: Optional[dict[str, Any]] = None
 
     @property
     def cancelled(self) -> bool:
@@ -464,15 +509,194 @@ def _prompt_execution(response: dict[str, Any], session_id: str) -> Optional[Exe
     return execution
 
 
+def _validate_session_update(update: dict[str, Any], capabilities: dict[str, Any]) -> None:
+    kind = update.get("sessionUpdate")
+    if not isinstance(kind, str):
+        raise AmcProtocolError("missing update kind")
+    if kind not in UPDATE_KINDS:
+        raise AmcProtocolError("unsupported native session update kind")
+    if kind in {"user_message_chunk", "agent_message_chunk"}:
+        content = update.get("content")
+        if not isinstance(content, dict):
+            raise AmcProtocolError("invalid message update")
+        if kind == "user_message_chunk" and content.get("type") == "image":
+            prompt_capabilities = capabilities.get("promptCapabilities")
+            if not isinstance(prompt_capabilities, dict) or prompt_capabilities.get("image") is not True:
+                raise AmcProtocolError("unnegotiated native image history")
+            _read_image_content(content)
+        elif kind == "user_message_chunk" and content.get("type") == "audio":
+            if not _advertises_audio(capabilities):
+                raise AmcProtocolError("unnegotiated native audio history")
+            _read_audio_content(content)
+        elif content.get("type") != "text" or not isinstance(content.get("text"), str):
+            raise AmcProtocolError("invalid text update")
+    if kind in {"tool_call", "tool_call_update"}:
+        if not _identity(update.get("toolCallId")) or update.get("status", "pending") not in {"pending", "in_progress", "completed", "failed"}:
+            raise AmcProtocolError("invalid tool update")
+        if "title" in update and not isinstance(update["title"], str):
+            raise AmcProtocolError("invalid tool title")
+        if "kind" in update and not isinstance(update["kind"], str):
+            raise AmcProtocolError("invalid tool kind")
+        if "_meta" in update and not isinstance(update["_meta"], dict):
+            raise AmcProtocolError("invalid tool metadata")
+        content = update.get("content", [])
+        if content is not None and (not isinstance(content, list) or any(not isinstance(item, dict) for item in content)):
+            raise AmcProtocolError("invalid tool content")
+        for item in content or []:
+            inner = item.get("content", {})
+            if not isinstance(inner, dict) or (inner.get("type") == "text" and not isinstance(inner.get("text"), str)):
+                raise AmcProtocolError("invalid tool text")
+    if kind == "plan":
+        entries = update.get("entries")
+        if not isinstance(entries, list) or len(entries) > 100 or any(
+                not isinstance(entry, dict) or not isinstance(entry.get("content"), str)
+                or len(entry["content"].encode("utf-8")) > 8192
+                or not isinstance(entry.get("priority"), str) or entry["priority"] not in {"low", "medium", "high"}
+                or not isinstance(entry.get("status"), str) or entry["status"] not in {"pending", "in_progress", "completed"} for entry in entries):
+            raise AmcProtocolError("invalid plan update")
+
+
+
+
+def _committed_turn_reference(value: Any) -> dict[str, Any]:
+    if (not isinstance(value, dict) or set(value) != {"turn", "seq", "eventId", "eventHash"}
+            or not _wire_integer(value.get("turn")) or value["turn"] < 1
+            or not _wire_integer(value.get("seq")) or value["seq"] < 0 or not _identity(value.get("eventId"))
+            or not isinstance(value.get("eventHash"), str) or _SHA256.fullmatch(value["eventHash"]) is None):
+        raise AmcProtocolError("native runtime returned a missing or invalid committed turn reference")
+    return dict(value)
+
+
+def _validate_page_state(state: Any) -> None:
+    def refuse() -> None:
+        raise AmcProtocolError("native runtime returned invalid committed session state")
+
+    def count(value: Any) -> bool:
+        return _wire_integer(value) and value >= 0
+
+    def nullable_count(value: Any) -> bool:
+        return value is None or count(value)
+
+    def ratio(value: Any) -> bool:
+        return value is None or (type(value) in (int, float) and math.isfinite(value) and 0 <= value <= 1)
+
+    if not isinstance(state, dict):
+        refuse()
+    _parse_native_validation_result(state.get("validation"))
+    usage = state.get("usage")
+    if (not isinstance(usage, dict) or usage.get("scope") != "recorded-session"
+            or usage.get("status") not in ("recorded", "partial", "unavailable", "invalid")
+            or not all(count(usage.get(key)) for key in ("requests", "syntheticRequests", "reportedRequests", "completeRequests", "unreportedRequests", "pendingRequests", "issueCount"))):
+        refuse()
+    totals, cache = usage.get("totals"), usage.get("cache")
+    if not isinstance(totals, dict) or not isinstance(cache, dict):
+        refuse()
+    for key in ("inputTokens", "outputTokens", "cacheReadTokens", "cacheWriteTokens", "reasoningTokens"):
+        metric = totals.get(key)
+        if (not isinstance(metric, dict) or "observedTokens" not in metric or not nullable_count(metric["observedTokens"])
+                or not count(metric.get("reportedRequests"))):
+            refuse()
+    if (cache.get("basis") != "reported-input-token-subtotal" or "readShare" not in cache or not ratio(cache["readShare"])
+            or not all(key in cache and nullable_count(cache[key]) for key in ("readTokens", "inputTokens"))
+            or not all(count(cache.get(key)) for key in ("eligibleRequests", "excludedRequests", "unreportedWriteRequests"))):
+        refuse()
+    if "requestCache" in usage:
+        request_cache = usage["requestCache"]
+        if (not isinstance(request_cache, dict) or request_cache.get("basis") != "completed-requests-with-reported-cache-read"
+                or "hitRate" not in request_cache or not ratio(request_cache["hitRate"])
+                or not all(count(request_cache.get(key)) for key in ("hitRequests", "eligibleRequests", "excludedRequests"))):
+            refuse()
+    turn, approvals, outcomes = state.get("turn"), state.get("approvals"), state.get("toolOutcomes")
+    if (not isinstance(turn, dict) or "number" not in turn or not (turn["number"] is None or (count(turn["number"]) and turn["number"] >= 1))
+            or "lastEnd" not in turn or "lastSeal" not in turn or type(turn.get("cancellationRequested")) is not bool
+            or not isinstance(approvals, dict) or not all(count(approvals.get(key)) for key in ("pending", "answered", "denied", "unavailable"))
+            or not isinstance(outcomes, dict) or not all(count(outcomes.get(key)) for key in ("unknown", "unavailable"))):
+        refuse()
+    if turn["lastSeal"] is not None:
+        _committed_turn_reference(turn["lastSeal"])
+    end = turn["lastEnd"]
+    if end is not None:
+        if (not isinstance(end, dict) or not count(end.get("turn")) or end["turn"] < 1
+                or end.get("reason") not in ("complete", "cancelled", "error", "interrupted", "max_steps", "max_tokens", "blocked")
+                or type(end.get("interrupted")) is not bool or end["interrupted"] != (end["reason"] == "interrupted")
+                or "cancelCause" not in end or (end["reason"] == "cancelled") != (end["cancelCause"] is not None)):
+            refuse()
+        cause = end["cancelCause"]
+        if cause is not None and (not isinstance(cause, dict) or not (cause.get("kind") in ("user", "parent", "disposed")
+                or (cause.get("kind") == "hook" and isinstance(cause.get("reason"), str)))):
+            refuse()
+
+
+def _valid_page_verification(value: Any) -> bool:
+    if not isinstance(value, dict):
+        return False
+    root = value.get("trustRoot")
+    return (value.get("metadata") == "hashes-signatures-global-and-session-chains"
+            and _wire_integer(value.get("checkedStoreEventCount")) and value["checkedStoreEventCount"] >= 1
+            and value.get("payloads") in ("not-read", "verified") and value.get("retainedOutput") == "not-read"
+            and value.get("completeness") == "all-available-events-in-requested-scope"
+            and value.get("rollbackProtection") in ("expected-head-matched", "no-external-head")
+            and isinstance(root, dict) and type(root.get("anchored")) is bool
+            and isinstance(root.get("monitorFingerprint"), str) and _SHA256.fullmatch(root["monitorFingerprint"]) is not None
+            and "expectedFingerprint" in root and (root["expectedFingerprint"] is None
+                or (isinstance(root["expectedFingerprint"], str) and _SHA256.fullmatch(root["expectedFingerprint"]) is not None))
+            and (not root["anchored"] or root["expectedFingerprint"] == root["monitorFingerprint"]))
+
+
+def _admit_session_page(value: dict[str, Any], session_id: str, agent_id: str,
+                        capabilities: dict[str, Any]) -> SessionEventPage:
+    def refuse() -> None:
+        raise AmcProtocolError("native runtime returned an inconsistent committed session page")
+
+    def digest(item: Any) -> bool:
+        return isinstance(item, str) and _SHA256.fullmatch(item) is not None
+
+    def cursor(item: Any) -> bool:
+        return isinstance(item, str) and 1 <= len(item) <= 2048
+
+    def sequence(item: Any) -> bool:
+        return _wire_integer(item) and item >= 0
+
+    if (value.get("format") != SESSION_PAGE_FORMAT or value.get("sessionId") != session_id or value.get("agentId") != agent_id
+            or value.get("committed") is not True or value.get("backend") not in ("sqlite", "jsonl", "postgres")
+            or not digest(value.get("headEventHash")) or not digest(value.get("storeHeadEventHash"))
+            or not sequence(value.get("headSeq")) or not sequence(value.get("firstSeq")) or not sequence(value.get("nextSeq"))
+            or value["firstSeq"] > value["nextSeq"] or value["nextSeq"] > value["headSeq"] + 1
+            or value["nextSeq"] - value["firstSeq"] > MAX_SESSION_PAGE_SIZE
+            or "nextCursor" not in value or not (value["nextCursor"] is None or cursor(value["nextCursor"]))
+            or (value["nextCursor"] is None) != (value["nextSeq"] == value["headSeq"] + 1) or not cursor(value.get("resumeCursor"))
+            or type(value.get("sealed")) is not bool or not _valid_page_verification(value.get("verification"))
+            or not isinstance(value.get("updates"), list) or len(value["updates"]) > MAX_SESSION_PAGE_SIZE
+            or not isinstance(value.get("state", {}), dict)):
+        refuse()
+    _validate_page_state(value.get("state"))
+    updates = []
+    previous = value["firstSeq"] - 1
+    for event in value["updates"]:
+        if (not isinstance(event, dict) or not sequence(event.get("seq")) or not previous < event["seq"] < value["nextSeq"]
+                or not _identity(event.get("eventId")) or not digest(event.get("eventHash")) or not isinstance(event.get("update"), dict)):
+            refuse()
+        _validate_session_update(event["update"], capabilities)
+        updates.append(SessionPageUpdate(int(event["seq"]), event["eventId"], event["eventHash"], copy.deepcopy(event["update"])))
+        previous = event["seq"]
+    return SessionEventPage(SESSION_PAGE_FORMAT, session_id, agent_id, True, value["backend"], value["headEventHash"],
+                            int(value["headSeq"]), value["storeHeadEventHash"], int(value["firstSeq"]), int(value["nextSeq"]),
+                            value.get("nextCursor"), value["resumeCursor"], value["sealed"], copy.deepcopy(value["verification"]),
+                            tuple(updates), copy.deepcopy(value.get("state", {})))
+
+
 class _Updates:
-    def __init__(self) -> None:
+    def __init__(self, max_events: Optional[int] = None, max_bytes: Optional[int] = None) -> None:
+        self.max_events = MAX_UPDATES if max_events is None else max_events
+        self.max_bytes = MAX_OUTPUT_BYTES if max_bytes is None else max_bytes
         self.items: list[SessionUpdate] = []
         self.bytes = 0
 
     def append(self, update: SessionUpdate) -> None:
-        self.bytes += len(json.dumps(update.update, ensure_ascii=False, allow_nan=False).encode("utf-8"))
-        if self.bytes > MAX_OUTPUT_BYTES or len(self.items) >= MAX_UPDATES:
+        size = len(json.dumps(update.update, ensure_ascii=False, allow_nan=False).encode("utf-8"))
+        if self.bytes + size > self.max_bytes or len(self.items) >= self.max_events:
             raise AmcProtocolError("native output exceeded the client limit")
+        self.bytes += size
         self.items.append(update)
 
 
@@ -487,7 +711,17 @@ class Turn:
     def __init__(self, agent: AmcAgent, session_id: str) -> None:
         self._agent, self.session_id = agent, session_id
         self._condition = threading.Condition()
-        self._updates = _Updates()
+        limits = getattr(agent, "_event_limits", {})
+        self._updates = _Updates(limits.get("max_events"), limits.get("max_bytes"))
+        self._allow_resync = getattr(agent, "_resync_on_overflow", False)
+        self._resync_error: Optional[AmcResyncRequiredError] = None
+        self._resume_cursor: Optional[str] = None
+        self._response_received = False
+        self._cancel_recovery = False
+        self._before_head_seq = -1
+        self._before_turn_number = 0
+        self._committed_reference: Optional[dict[str, Any]] = None
+        self._submitted = True
         self._done = False
         self._error: Optional[BaseException] = None
         self._result: Optional[RunResult] = None
@@ -497,18 +731,37 @@ class Turn:
 
     def _receive(self, update: SessionUpdate) -> None:
         with self._condition:
-            if self._done:
+            if self._done or self._response_received:
                 raise AmcProtocolError("received an update after the prompt result")
-            self._updates.append(update)
+            if self._resync_error is not None:
+                return
+            try:
+                self._updates.append(update)
+            except AmcProtocolError:
+                if not self._allow_resync:
+                    raise
+                self._resync_error = AmcResyncRequiredError(self.session_id)
             if self.state != "cancel-requested":
-                self.state = "receiving"
+                self.state = "resync-required" if self._resync_error is not None else "receiving"
             self._condition.notify_all()
 
-    def _finish(self, response: dict[str, Any]) -> None:
+    def _finish(self, response: dict[str, Any], recovered: Optional[tuple[str, str]] = None) -> None:
         validation = _prompt_validation(response)
         execution = _prompt_execution(response, self.session_id)
         with self._condition:
             if self._done:
+                return
+            if recovered is not None and self._cancel_recovery:
+                raise AmcError("committed recovery cancelled before result settlement")
+            self._response_received = True
+            if self._allow_resync and self._committed_reference is None:
+                extension = response.get("_meta", {}).get("dev.agentmaturity.amc", {})
+                reference = _committed_turn_reference(extension.get("committedTurn") if isinstance(extension, dict) else None)
+                if reference["seq"] <= self._before_head_seq or reference["turn"] <= self._before_turn_number:
+                    raise AmcProtocolError("native prompt did not commit a new current turn seal")
+                self._committed_reference = reference
+            if self._resync_error is not None and recovered is None:
+                self._condition.notify_all()
                 return
             chunks: list[str] = []
             tools: dict[str, ToolCall] = {}
@@ -534,11 +787,18 @@ class Turn:
                                           copy.deepcopy(update.get("rawInput", previous.raw_input if previous else None)),
                                           copy.deepcopy(update.get("rawOutput", previous.raw_output if previous else None)),
                                           content, copy.deepcopy(update.get("_meta", previous.meta if previous else {})))
-            self._result = RunResult(self.session_id, response["stopReason"], "".join(chunks),
+            self._result = RunResult(self.session_id, response["stopReason"], recovered[0] if recovered is not None else "".join(chunks),
                                      list(tools.values()), copy.deepcopy(response.get("_meta", {})),
-                                     copy.deepcopy(self._updates.items), validation=validation, execution=execution)
+                                     copy.deepcopy(self._updates.items), validation=validation, execution=execution,
+                                     resynced=recovered is not None,
+                                     recovery=None if recovered is None else {"cursor": recovered[1], "updatesComplete": False, "retainedUpdates": "bounded-prefix"})
             self._done, self.state = True, "completed"
             self._condition.notify_all()
+
+    def _retained_text_prefix(self) -> str:
+        with self._condition:
+            return "".join(event.update["content"]["text"] for event in self._updates.items
+                           if event.update["sessionUpdate"] == "agent_message_chunk")
 
     def _fail(self, error: BaseException) -> None:
         with self._condition:
@@ -610,16 +870,20 @@ class Turn:
             self._iterated = True
         cursor = 0
         failed = False
+        recovering = False
         try:
             while True:
                 with self._condition:
-                    ready = self._condition.wait_for(lambda: cursor < len(self._updates.items) or self._done,
+                    ready = self._condition.wait_for(lambda: cursor < len(self._updates.items) or self._done or self._resync_error is not None,
                                                     timeout=None if deadline is None else max(0.0, deadline - time.monotonic()))
                     if cursor < len(self._updates.items):
                         item = copy.deepcopy(self._updates.items[cursor])
                         cursor += 1
                     elif self._error:
                         raise self._error
+                    elif self._resync_error is not None:
+                        recovering = True
+                        raise self._resync_error
                     elif self._done:
                         return
                 if not ready:
@@ -631,7 +895,9 @@ class Turn:
             failed = True
             raise
         finally:
-            if not failed:
+            if recovering:
+                pass  # A recovery notice does not cancel the still-running prompt.
+            elif not failed:
                 # An explicit generator.close() must report a cancellation
                 # enqueue failure instead of silently leaving work active.
                 self.cancel()
@@ -677,8 +943,18 @@ class AmcAgent:
                  reasoning_effort: Optional[Literal["low", "high", "max"]] = None,
                  max_tokens: int = 512, max_steps: Optional[int] = None,
                  amc_bin: Optional[str | list[str]] = None, env: Optional[dict[str, str]] = None,
-                 timeout: float = DEFAULT_TIMEOUT_SECONDS) -> None:
+                 timeout: float = DEFAULT_TIMEOUT_SECONDS, resync_on_overflow: bool = False,
+                 event_buffer: Optional[dict[str, int]] = None) -> None:
         timeout = _timeout_seconds(timeout)
+        if type(resync_on_overflow) is not bool:
+            raise ValueError("resync_on_overflow must be a boolean")
+        if event_buffer is not None and (not isinstance(event_buffer, dict) or any(key not in ("max_events", "max_bytes") for key in event_buffer)):
+            raise ValueError("event_buffer accepts max_events and max_bytes only")
+        self._event_limits = dict(event_buffer or {})
+        for key, maximum in (("max_events", MAX_UPDATES), ("max_bytes", MAX_OUTPUT_BYTES)):
+            if key in self._event_limits and (type(self._event_limits[key]) is not int or not 1 <= self._event_limits[key] <= maximum):
+                raise ValueError(f"{key} must be an integer from 1 through {maximum}")
+        self._resync_on_overflow = resync_on_overflow
         if not isinstance(tools, str) or tools not in {"none", "workspace"}:
             raise ValueError("tools must be none or workspace")
         if type(max_tokens) is not int or not 1 <= max_tokens <= 1_000_000 or (max_steps is not None and (type(max_steps) is not int or not 1 <= max_steps <= 1024)):
@@ -789,12 +1065,17 @@ class AmcAgent:
         try:
             for thread in [self._writer, self._reader, self._errors]:
                 thread.start()
-            result = self._call("initialize", {"protocolVersion": 1, "clientCapabilities": {}})
+            result = self._call("initialize", {"protocolVersion": 1, "clientCapabilities": {"_meta": {"dev.agentmaturity.amc": {"currentPlanUpdates": "amc-current-plan-v1"}}}})
             if type(result.get("protocolVersion")) is not int or result["protocolVersion"] != 1:
                 raise AmcProtocolError("the native agent negotiated an unsupported protocol version")
             if not isinstance(result.get("agentCapabilities"), dict) or not isinstance(result.get("agentInfo", {}), dict):
                 raise AmcProtocolError("the native agent returned invalid capabilities")
             self.protocol_version, self.agent_info = 1, result.get("agentInfo", {})
+            runtime_version = self.agent_info.get("version")
+            match = re.fullmatch(r"(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?", runtime_version) if isinstance(runtime_version, str) and len(runtime_version) <= 128 else None
+            if match is None or not COMPATIBLE_RUNTIME_MIN <= tuple(map(int, match.groups())) < COMPATIBLE_RUNTIME_MAX:
+                raise AmcProtocolError("select a compatible runtime (AMC >=1.2.0,<1.3.0) with amc_bin or AMC_BIN; "
+                                       "the discovered executable is missing or reports an incompatible agentInfo.version")
             self._capabilities = copy.deepcopy(result["agentCapabilities"])
             if "loadSession" in self._capabilities and type(self._capabilities["loadSession"]) is not bool:
                 raise AmcProtocolError("the native agent returned an invalid load capability")
@@ -803,6 +1084,9 @@ class AmcAgent:
             if type(version) is not int or version != EXECUTION_API_VERSION:
                 raise AmcProtocolError(f"the selected AMC runtime does not speak execution API v{EXECUTION_API_VERSION}; "
                                        "install the amc CLI release this wrapper was built for")
+            if self._resync_on_overflow and (self._extension().get("sessionEventPage") != SESSION_PAGE_FORMAT
+                    or self._extension().get("committedTurn") != "amc-committed-turn-v1"):
+                raise AmcRefusedError(-32601, "committed overflow recovery requires session pages and committed turn references")
             with self._lock:
                 self._require_open_locked()
         except BaseException:
@@ -843,7 +1127,10 @@ class AmcAgent:
                 if turn._done:
                     return False
                 if turn.state != "cancel-requested":
-                    self._notify("session/cancel", {"sessionId": turn.session_id})
+                    if turn._response_received:
+                        turn._cancel_recovery = True
+                    if turn._submitted and not turn._response_received:
+                        self._notify("session/cancel", {"sessionId": turn.session_id})
                     turn._cancel_requested = True
                     turn.state = "cancel-requested"
                     turn._condition.notify_all()
@@ -899,42 +1186,10 @@ class AmcAgent:
             if not isinstance(params, dict) or not _identity(params.get("sessionId")) or not isinstance(params.get("update"), dict):
                 raise AmcProtocolError("invalid session update")
             update, session_id = params["update"], params["sessionId"]
-            kind = update.get("sessionUpdate")
-            if not isinstance(kind, str):
-                raise AmcProtocolError("missing update kind")
-            if kind not in UPDATE_KINDS:
-                raise AmcProtocolError("unsupported native session update kind")
-            if kind in {"user_message_chunk", "agent_message_chunk"}:
-                content = update.get("content")
-                if not isinstance(content, dict):
-                    raise AmcProtocolError("invalid message update")
-                if kind == "user_message_chunk" and content.get("type") == "image":
-                    prompt_capabilities = self._capabilities.get("promptCapabilities")
-                    if not isinstance(prompt_capabilities, dict) or prompt_capabilities.get("image") is not True:
-                        raise AmcProtocolError("unnegotiated native image history")
-                    _read_image_content(content)
-                elif kind == "user_message_chunk" and content.get("type") == "audio":
-                    if not _advertises_audio(self.capabilities):
-                        raise AmcProtocolError("unnegotiated native audio history")
-                    _read_audio_content(content)
-                elif content.get("type") != "text" or not isinstance(content.get("text"), str):
-                    raise AmcProtocolError("invalid text update")
-            if kind in {"tool_call", "tool_call_update"}:
-                if not _identity(update.get("toolCallId")) or update.get("status", "pending") not in {"pending", "in_progress", "completed", "failed"}:
-                    raise AmcProtocolError("invalid tool update")
-                if "title" in update and not isinstance(update["title"], str):
-                    raise AmcProtocolError("invalid tool title")
-                if "kind" in update and not isinstance(update["kind"], str):
-                    raise AmcProtocolError("invalid tool kind")
-                if "_meta" in update and not isinstance(update["_meta"], dict):
-                    raise AmcProtocolError("invalid tool metadata")
-                content = update.get("content", [])
-                if content is not None and (not isinstance(content, list) or any(not isinstance(item, dict) for item in content)):
-                    raise AmcProtocolError("invalid tool content")
-                for item in content or []:
-                    inner = item.get("content", {})
-                    if not isinstance(inner, dict) or (inner.get("type") == "text" and not isinstance(inner.get("text"), str)):
-                        raise AmcProtocolError("invalid tool text")
+            if update.get("sessionUpdate") == "plan" and self._extension().get("currentPlanUpdates") != "amc-current-plan-v1":
+                raise AmcProtocolError("unnegotiated current plan update")
+            _validate_session_update(update, self._capabilities)
+            kind = update["sessionUpdate"]
             event = SessionUpdate(session_id, update)
             with self._lock:
                 loading, turn = self._loading.get(session_id), self._turns.get(session_id)
@@ -987,7 +1242,8 @@ class AmcAgent:
                 else:
                     error = message["error"]
                     turn._fail(AmcRefusedError(error["code"], error["message"], error.get("data")))
-                self._turns.pop(session_id, None)
+                if turn.done:
+                    self._turns.pop(session_id, None)
             self._replies.pop(request_id, None)
             self._request_context.pop(request_id, None)
             waiter.put_nowait(message)
@@ -1150,6 +1406,58 @@ class AmcAgent:
                 self._loading.pop(session_id, None)
                 self._resuming.discard(session_id)
 
+    def read_session_page(self, session_id: str, *, cursor: Optional[str] = None,
+                          limit: int = 64, timeout: Optional[float] = None) -> SessionEventPage:
+        """Read committed history without loading, resuming or claiming a writer."""
+        if not _identity(session_id) or (cursor is not None and (not isinstance(cursor, str) or not 1 <= len(cursor) <= 2048)):
+            raise ValueError("session pages require an exact session ID and a bounded cursor")
+        if type(limit) is not int or not 1 <= limit <= MAX_SESSION_PAGE_SIZE:
+            raise ValueError("page limit must be an integer from 1 through 256")
+        if self._extension().get("sessionEventPage") != SESSION_PAGE_FORMAT:
+            raise AmcRefusedError(-32601, "the selected runtime does not support committed session pages")
+        params: dict[str, Any] = {"sessionId": session_id, "limit": limit}
+        if cursor is not None:
+            params["cursor"] = cursor
+        value = self._call("_amc/session/events", params, timeout=timeout)
+        return _admit_session_page(value, session_id, self._agent_id, self._capabilities)
+
+    def read_session_pages(self, session_id: str, *, cursor: Optional[str] = None,
+                           limit: int = 64, timeout: Optional[float] = None) -> Generator[SessionEventPage, None, None]:
+        """Drain one fixed snapshot. Save resume_cursor to read later committed appends."""
+        return self._read_session_pages(session_id, cursor=cursor, limit=limit, timeout=timeout)
+
+    def _read_session_pages(self, session_id: str, *, cursor: Optional[str] = None, limit: int = 64,
+                            timeout: Optional[float] = None, budget: Optional[Callable[[], float]] = None) -> Generator[SessionEventPage, None, None]:
+        previous: Optional[SessionEventPage] = None
+        while True:
+            page = self.read_session_page(session_id, cursor=cursor, limit=limit, timeout=budget() if budget else timeout)
+            if budget:
+                budget()
+            if previous is not None and (page.head_event_hash != previous.head_event_hash
+                    or page.head_seq != previous.head_seq or page.first_seq != previous.next_seq):
+                raise AmcProtocolError("native session snapshot changed during paged iteration")
+            if page.next_cursor is not None and (page.next_cursor == cursor or page.next_seq <= page.first_seq):
+                raise AmcProtocolError("native session page cursor did not advance")
+            yield page
+            if page.next_cursor is None:
+                return
+            previous, cursor = page, page.next_cursor
+
+    def withdraw_submission(self, session_id: str, message_id: str, *, timeout: Optional[float] = None) -> bool:
+        """Withdraw one pending message; never cancel the active turn or clear a queue."""
+        if not isinstance(message_id, str) or re.fullmatch(r"[!-~]{1,128}", message_id) is None:
+            raise ValueError("message_id must name one exact queued message")
+        with self._lock:
+            self._require_open_locked()
+            if session_id not in self._sessions or session_id in self._releasing:
+                raise AmcError("submission withdrawal requires an owned usable session")
+        if self._extension().get("withdrawSubmission") is not True:
+            raise AmcRefusedError(-32601, "the selected runtime does not support individual submission withdrawal")
+        result = self._call("_amc/session/withdraw", {"sessionId": session_id, "messageId": message_id}, timeout=timeout)
+        if type(result.get("withdrawn")) is not bool:
+            raise AmcProtocolError("native withdrawal returned an invalid outcome")
+        return result["withdrawn"]
+
     def _extension(self) -> dict[str, Any]:
         meta = self._capabilities.get("_meta")
         extension = meta.get("dev.agentmaturity.amc") if isinstance(meta, dict) else None
@@ -1213,17 +1521,17 @@ class AmcAgent:
             raise AmcProtocolError("a writer did not release cleanly; inspect its signed session before resuming it")
 
     def _prompt(self, session_id: str, text: str, images: Optional[list[NativeImageInput] | tuple[NativeImageInput, ...]] = None,
-                *, timeout: Optional[float] = None) -> Turn:
+                *, timeout: Optional[float] = None, client_request_id: Optional[str] = None, _handle: Optional[Session] = None) -> Turn:
         image_blocks = _image_blocks(images)
         if not isinstance(text, str) or (not text.strip(_JS_WHITESPACE) and not image_blocks):
             raise ValueError("a prompt must contain text or a supported image")
         capabilities = self.capabilities.get("promptCapabilities")
         if image_blocks and (not isinstance(capabilities, dict) or capabilities.get("image") is not True):
             raise AmcRefusedError(-32602, "the selected ACP runtime does not advertise image input; choose a supported route or remove the images. No fallback was used.")
-        return self._submit_prompt(session_id, [{"type": "text", "text": text}, *image_blocks], timeout=timeout)
+        return self._submit_prompt(session_id, [{"type": "text", "text": text}, *image_blocks], timeout=timeout, client_request_id=client_request_id, _handle=_handle)
 
     def _prompt_parts(self, session_id: str, parts: list[NativeInputPart] | tuple[NativeInputPart, ...],
-                      *, timeout: Optional[float] = None) -> Turn:
+                      *, timeout: Optional[float] = None, client_request_id: Optional[str] = None, _handle: Optional[Session] = None) -> Turn:
         blocks = _ordered_blocks(parts)
         meta = self.capabilities.get("_meta")
         extension = meta.get("dev.agentmaturity.amc") if isinstance(meta, dict) else None
@@ -1231,40 +1539,107 @@ class AmcAgent:
         if (not isinstance(extension, dict) or extension.get("orderedImageInput") != NATIVE_ORDERED_INPUT_FORMAT
                 or not isinstance(capabilities, dict) or capabilities.get("image") is not True):
             raise AmcRefusedError(-32602, "the selected ACP runtime does not advertise amc-image-input@2; ordered content was not submitted or flattened")
-        return self._submit_prompt(session_id, blocks, NATIVE_ORDERED_INPUT_FORMAT, timeout=timeout)
+        return self._submit_prompt(session_id, blocks, NATIVE_ORDERED_INPUT_FORMAT, timeout=timeout, client_request_id=client_request_id, _handle=_handle)
 
     def _prompt_audio_parts(self, session_id: str, parts: list[NativeAudioPart] | tuple[NativeAudioPart, ...],
-                            *, timeout: Optional[float] = None) -> Turn:
+                            *, timeout: Optional[float] = None, client_request_id: Optional[str] = None, _handle: Optional[Session] = None) -> Turn:
         blocks = _audio_blocks(parts)
         prompt = self.capabilities.get("promptCapabilities")
         if (not _advertises_audio(self.capabilities) or (any(block["type"] == "image" for block in blocks)
                 and (not isinstance(prompt, dict) or prompt.get("image") is not True))):
             raise AmcRefusedError(-32602, "the selected runtime does not advertise the exact amc-audio-input@1 Gemini v2/WAV contract; no submission, conversion or fallback was performed")
-        return self._submit_prompt(session_id, blocks, NATIVE_AUDIO_INPUT_FORMAT, timeout=timeout)
+        return self._submit_prompt(session_id, blocks, NATIVE_AUDIO_INPUT_FORMAT, timeout=timeout, client_request_id=client_request_id, _handle=_handle)
 
     def _submit_prompt(self, session_id: str, blocks: list[dict[str, str]], input_format: Optional[str] = None,
-                       *, timeout: Optional[float] = None) -> Turn:
+                       *, timeout: Optional[float] = None, client_request_id: Optional[str] = None, _handle: Optional[Session] = None) -> Turn:
         duration = _timeout_seconds(self.timeout if timeout is None else timeout)
-        with self._lock:
-            self._require_open_locked()
-            if session_id not in self._sessions or session_id in self._turns or session_id in self._releasing:
-                raise AmcError("session is not owned or already has an active prompt")
-            turn = Turn(self, session_id)
-            self._turns[session_id] = turn
-            try:
+        started = time.monotonic()
+        if client_request_id is not None:
+            if not isinstance(client_request_id, str) or re.fullmatch(r"[!-~]{1,128}", client_request_id) is None:
+                raise ValueError("client_request_id must be 1 through 128 visible ASCII characters")
+            if self._extension().get("clientRequestIds") is not True:
+                raise AmcRefusedError(-32601, "the selected runtime does not support durable client request identities")
+        with _handle._state_lock if _handle is not None else self._lock:
+            if _handle is not None:
+                _handle._require_usable()
+            with self._lock:
+                self._require_open_locked()
+                if session_id not in self._sessions or session_id in self._turns or session_id in self._releasing:
+                    raise AmcError("session is not owned or already has an active prompt")
+                turn = Turn(self, session_id)
+                turn._submitted = False
+                self._turns[session_id] = turn
+        deadline = started + duration
+        def budget(preflight: bool) -> float:
+            with turn._condition:
+                cancelled = turn._cancel_requested if preflight else turn._cancel_recovery
+            if cancelled:
+                raise AmcError("committed recovery cancelled before submission" if preflight else "committed recovery cancelled after the prompt reply")
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                raise AmcTimeoutError("committed recovery exceeded the total prompt deadline", operation="session/prompt", session_id=session_id)
+            return remaining
+        try:
+            if self._resync_on_overflow:
+                for page in self._read_session_pages(session_id, budget=lambda: budget(True)):
+                    turn._resume_cursor = page.resume_cursor
+                    turn._before_head_seq = page.head_seq
+                    turn._before_turn_number = page.state["turn"]["number"] or 0
+                if turn._resume_cursor is None:
+                    raise AmcProtocolError("committed recovery could not establish its pre-prompt cursor")
+            with self._lock:
+                self._require_open_locked()
+                if turn._cancel_requested:
+                    raise AmcError("prompt was cancelled before submission")
+                remaining = duration - (time.monotonic() - started)
+                if remaining <= 0:
+                    raise AmcTimeoutError("preparing committed recovery exceeded the prompt deadline", operation="session/prompt", session_id=session_id)
                 params: dict[str, Any] = {"sessionId": session_id, "prompt": blocks}
+                extension: dict[str, Any] = {}
                 if input_format is not None:
-                    params["_meta"] = {"dev.agentmaturity.amc": {"inputFormat": input_format}}
-                request_id, waiter = self._begin_call("session/prompt", params, timeout=duration)
-            except BaseException:
+                    extension["inputFormat"] = input_format
+                if client_request_id is not None:
+                    extension["clientRequestId"] = client_request_id
+                if extension:
+                    params["_meta"] = {"dev.agentmaturity.amc": extension}
+                request_id, waiter = self._begin_call("session/prompt", params, timeout=remaining)
+                turn._submitted = True
+        except BaseException:
+            with self._lock:
                 self._turns.pop(session_id, None)
-                raise
+            raise
+
         def work() -> None:
             try:
-                # The reader settles the Turn and closes its update window. This
-                # waiter enforces the original submission deadline, never a new
-                # timeout starting when the thread happens to be scheduled.
-                self._wait_call("session/prompt", request_id, waiter)
+                # The reader closes the live update window before this waiter recovers any overflow.
+                response = self._wait_call("session/prompt", request_id, waiter)
+                if turn._resync_error is not None:
+                    if turn._resume_cursor is None:
+                        raise AmcProtocolError("committed recovery has no pre-prompt cursor")
+                    reference = turn._committed_reference
+                    if reference is None:
+                        raise AmcProtocolError("committed recovery has no prompt seal reference")
+                    text, cursor, size, first = "", turn._resume_cursor, 0, True
+                    for page in self._read_session_pages(session_id, cursor=turn._resume_cursor, budget=lambda: budget(False)):
+                        ending = page.state["turn"]
+                        if (ending["lastSeal"] != reference or ending["number"] != reference["turn"]
+                                or ending["lastEnd"] is None or ending["lastEnd"]["turn"] != reference["turn"]
+                                or page.head_seq < reference["seq"] or (first and page.first_seq != turn._before_head_seq + 1)):
+                            raise AmcProtocolError("committed recovery does not contain this prompt's exact completed turn seal")
+                        first = False
+                        cursor = page.resume_cursor
+                        for event in page.updates:
+                            if event.seq > reference["seq"] or event.update["sessionUpdate"] != "agent_message_chunk":
+                                continue
+                            chunk = event.update["content"]["text"]
+                            size += len(chunk.encode("utf-8"))
+                            if size > turn._updates.max_bytes:
+                                raise AmcProtocolError("recovered committed text exceeded the client byte limit")
+                            text += chunk
+                    if first or not text.startswith(turn._retained_text_prefix()):
+                        raise AmcProtocolError("committed recovery does not match the retained live text prefix")
+                    budget(False)
+                    turn._finish(response, (text, cursor))
             except BaseException as error:
                 turn._fail(error)
                 if isinstance(error, AmcProtocolError):
@@ -1446,26 +1821,22 @@ class Session:
             self._agent._require_open_locked()
 
     def prompt(self, text: str, *, images: Optional[list[NativeImageInput] | tuple[NativeImageInput, ...]] = None,
-               timeout: Optional[float] = None) -> RunResult:
+               timeout: Optional[float] = None, client_request_id: Optional[str] = None) -> RunResult:
         """Await a turn with an optional per-request deadline, including queue time."""
-        return self.start_prompt(text, images=images, timeout=timeout).result()
+        return self.start_prompt(text, images=images, timeout=timeout, client_request_id=client_request_id).result()
 
     def start_prompt(self, text: str, *, images: Optional[list[NativeImageInput] | tuple[NativeImageInput, ...]] = None,
-                     timeout: Optional[float] = None) -> Turn:
-        with self._state_lock:
-            self._require_usable()
-            return self._agent._prompt(self.session_id, text, images, timeout=timeout)
+                     timeout: Optional[float] = None, client_request_id: Optional[str] = None) -> Turn:
+        return self._agent._prompt(self.session_id, text, images, timeout=timeout, client_request_id=client_request_id, _handle=self)
 
     def prompt_parts(self, parts: list[NativeInputPart] | tuple[NativeInputPart, ...],
-                     *, timeout: Optional[float] = None) -> RunResult:
+                     *, timeout: Optional[float] = None, client_request_id: Optional[str] = None) -> RunResult:
         """Submit an image-bearing original sequence, retaining empty/adjacent text parts."""
-        return self.start_prompt_parts(parts, timeout=timeout).result()
+        return self.start_prompt_parts(parts, timeout=timeout, client_request_id=client_request_id).result()
 
     def start_prompt_parts(self, parts: list[NativeInputPart] | tuple[NativeInputPart, ...],
-                           *, timeout: Optional[float] = None) -> Turn:
-        with self._state_lock:
-            self._require_usable()
-            return self._agent._prompt_parts(self.session_id, parts, timeout=timeout)
+                           *, timeout: Optional[float] = None, client_request_id: Optional[str] = None) -> Turn:
+        return self._agent._prompt_parts(self.session_id, parts, timeout=timeout, client_request_id=client_request_id, _handle=self)
 
     def cancel(self) -> None:
         with self._state_lock:
@@ -1479,15 +1850,18 @@ class Session:
                 turn.cancel()
 
     def prompt_audio_parts(self, parts: list[NativeAudioPart] | tuple[NativeAudioPart, ...],
-                           *, timeout: Optional[float] = None) -> RunResult:
+                           *, timeout: Optional[float] = None, client_request_id: Optional[str] = None) -> RunResult:
         """Preserve original audio/image bytes and every text boundary in caller order."""
-        return self.start_prompt_audio_parts(parts, timeout=timeout).result()
+        return self.start_prompt_audio_parts(parts, timeout=timeout, client_request_id=client_request_id).result()
 
     def start_prompt_audio_parts(self, parts: list[NativeAudioPart] | tuple[NativeAudioPart, ...],
-                                 *, timeout: Optional[float] = None) -> Turn:
+                                 *, timeout: Optional[float] = None, client_request_id: Optional[str] = None) -> Turn:
+        return self._agent._prompt_audio_parts(self.session_id, parts, timeout=timeout, client_request_id=client_request_id, _handle=self)
+
+    def withdraw(self, message_id: str, *, timeout: Optional[float] = None) -> bool:
         with self._state_lock:
             self._require_usable()
-            return self._agent._prompt_audio_parts(self.session_id, parts, timeout=timeout)
+            return self._agent.withdraw_submission(self.session_id, message_id, timeout=timeout)
 
     def release(self, *, timeout: Optional[float] = None) -> None:
         """Commit an explicit owner handoff. A fresh client may then verify and resume it."""

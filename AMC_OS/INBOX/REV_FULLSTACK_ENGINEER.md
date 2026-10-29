@@ -489,3 +489,19 @@ platform cases on a suitable host, and commit using
 `/Users/sid/AgentMaturityCompass-worktrees/s442cd919/work/codex-runs/wp19-commit-message.txt`.
 Installed-package/platform qualification remains deferred. Native scheduling stays
 hidden and experimental. No research, dependency files, or other worktrees changed.
+
+# WP20 handoff — 2026-10-30
+
+Role: REV_FULLSTACK_ENGINEER. Review/adoption owner: Claude integrator, session 3c2ecdb1.
+
+Worktree `amc-gap-wp20`, branch `rtd/gap-wp20`, tip/base `ae10d4f197102c2239c24eccf6b79606feef6192`. The finished diff remains uncommitted. No push or merge was performed. Existing handoff history is preserved above.
+
+The implementation reuses the verified session store for bounded snapshot/follow pages across ACP, TypeScript, Python, existing CLI inspection and Studio GET queries. Missing/tampered evidence refuses explicitly. SDK recovery is opt-in and pinned to the successful prompt's exact signed turn seal. Signed inbox identities prevent duplicate execution; withdrawal uses the existing single-message cancel splice. Current authenticated todo/plan intent persists until signed replacement and is HTML-escaped. A bounded collector lets Studio page valid histories beyond the default ACP aggregate replay cap while preserving that default cap, full provenance checks and per-frame bounds.
+
+Final verification: the exact required `verify-wt.sh` command against `ae10d4f19` exited 0, including build, both typechecks, lint, every supplied repository check and freeze. Git staging was refused by the sandbox; amend did not run. The final 18-file cohort passed 277/277 cases, including all 185 new TypeScript cases; 49 source/test hashes stayed unchanged. The checkpoint-only rerun passed 143/143 across ten existing files. The final CLI smoke paged four times, followed without replay and preserved selected store hashes. All applicable recorded guard mutants were killed and restored, including eight final collector mutations.
+
+The broader 104-file diagnostic was 1,273 passed / 170 failed; the isolated checkpoint rerun resolves 81 of those failures. Remaining cases require permitted loopback/confinement or fixture reconciliation. Python's isolated full run was 419 passed / 59 failed / 1 skipped; all 111 added Python cases pass. Remaining Python cases need protected peer/context fixture updates, loopback access or a preinstalled SDK interpreter. Full exact counts, classifications and logs are in the report.
+
+Remaining scope: PXB-30 progress checkpoint writing; structured shutdown results; interactive queued-input controls; WP30 tree/TUI navigation; optional SDK preview; fresh desktop/live qualification. No new transcript store, dependency, CLI command, Studio route or freeze exception was added. Composition factory/tool wiring and other lanes' owned sources/fixtures remain unchanged; AgentSession edits only bridge the public prompt/receipt/withdraw adapters and duplicate refusal. No research files changed.
+
+Review the diff and `/Users/sid/AgentMaturityCompass-worktrees/s442cd919/work/codex-runs/wp20-report.md`, with per-row source evidence in `wp20-row-report.md` and a source-hash receipt in `wp20-source-receipt.json`. The requested message is `wp20-commit-message.txt`. The two-version `wp20-owned-fixture-followup.patch` is review-only; actual Claude-owned fixtures were not edited. Claude should review, reconcile owned fixtures, rerun blocked integrations on a suitable host, then commit/merge through the integrator's process. Codex must not commit, push or merge.

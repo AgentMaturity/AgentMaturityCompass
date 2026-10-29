@@ -114,9 +114,19 @@ export async function handleNativeTasksRoute(
     if (!match) { apiError(res, 404, "Native task route not found."); return true; }
     const taskId = match[1]!;
     const action = match[2];
-    assertQuery(params, action === undefined && method === "GET" ? ["agentId", "cursor"] : ["agentId"]);
+    assertQuery(params, action === undefined && method === "GET" ? ["agentId", "cursor", "pageCursor", "limit"] : ["agentId"]);
     const actor = actorFor(context.workspace, native, params.get("agentId"));
     if (action === undefined && method === "GET") {
+      if (params.has("pageCursor") || params.has("limit")) {
+        const pageCursor = params.get("pageCursor"), rawLimit = params.get("limit");
+        if (params.has("cursor") || (pageCursor !== null && (pageCursor.length < 1 || pageCursor.length > 2048))
+          || (rawLimit !== null && (!/^[1-9][0-9]{0,2}$/.test(rawLimit) || Number(rawLimit) > 256))) {
+          throw new NativeTaskServiceError("CURSOR_INVALID", 400, "Choose one native history cursor mode and a page limit from 1 to 256.");
+        }
+        apiSuccess(res, await native.service.poll(actor, taskId, {
+          ...(pageCursor === null ? {} : { cursor: pageCursor }), ...(rawLimit === null ? {} : { limit: Number(rawLimit) }) }));
+        return true;
+      }
       const raw = params.get("cursor") ?? "0";
       if (!/^(0|[1-9][0-9]{0,14})$/.test(raw) || !Number.isSafeInteger(Number(raw))) {
         apiError(res, 400, "Choose a nonnegative event cursor."); return true;

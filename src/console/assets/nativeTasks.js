@@ -1,7 +1,7 @@
 import { apiNativeRequest, getAdminToken } from "./api.js";
 import { nativeTasksShell, providerLabel, renderTaskScope, renderTaskIdentity, renderTaskApprovals,
   renderTaskVerification, renderTaskValidationSetup, renderTaskValidation, renderTaskList, taskStateLabel, appendTaskEvent,
-  renderTaskAttachments, collectNativeTaskTools, renderTaskToolStatus, renderTaskUsage, nativeTaskErrorText } from "./nativeTasksView.js";
+  renderTaskAttachments, collectNativeTaskTools, renderTaskToolStatus, renderTaskUsage, renderTaskPlans, nativeTaskErrorText } from "./nativeTasksView.js";
 import { captureNativeSubmission, nativeSubmissionScopeMatches, nativeSubmissionAcknowledged,
   definiteNativeSubmissionRefusal, nativeSubmissionDraftMatches, readNativeTextAttachment,
   composeNativeTaskInput, nativeTaskMediaCapabilities, readNativeMediaAttachment,
@@ -20,12 +20,16 @@ function taskView(value) {
     || !integer(value.revision) || !integer(value.nextCursor) || !integer(value.firstCursor) || !integer(value.droppedEvents)
     || !object(value.validation) || !VALIDATION_STATES.has(value.validation.status) || !Array.isArray(value.validation.checks) || !Array.isArray(value.validationOutputs)
     || !object(value.history) || !["authenticated","unavailable","not-started"].includes(value.history.status)
-    || !["sqlite","jsonl",null].includes(value.history.backend) || !integer(value.history.eventCount)
+    || !["sqlite","jsonl","postgres",null].includes(value.history.backend) || !integer(value.history.eventCount)
     || typeof value.history.message !== "string"
     || (value.recovery != null && (!object(value.recovery) || typeof value.recovery.eligible !== "boolean"
       || !["ready","interrupted","blocked"].includes(value.recovery.state) || typeof value.recovery.message !== "string"
       || value.recovery.eligible !== (value.recovery.state !== "blocked")))
     || !(value.resumeBlockedReason === null || typeof value.resumeBlockedReason === "string")
+    || (value.plans !== undefined && (!Array.isArray(value.plans) || value.plans.length > 2 || value.plans.some(plan => !object(plan)
+      || !["todo","plan"].includes(plan.kind) || !integer(plan.revision) || plan.revision < 1 || plan.evidence !== "committed"
+      || plan.scope !== "current-record" || typeof plan.text !== "string" || plan.text.length > 100_000
+      || typeof plan.recordSha256 !== "string" || !/^[a-f0-9]{64}$/.test(plan.recordSha256))))
     || !Array.isArray(value.approvals) || typeof value.canResume !== "boolean" || typeof value.archived !== "boolean"
     || !["not-verified","workspace-key-consistency","externally-anchored","anchored-prefix","failed"].includes(value.verification)) {
     throw new Error("Studio returned an unsupported task state. Refresh this page after updating Studio.");
@@ -39,11 +43,22 @@ function taskView(value) {
  * @param {{taskId: string, agentId: string, revision: number}} current
  * @param {number} cursor
  * @param {{maxEvents?: number, maxEventBytes?: number}} [limits]
- * @returns {{task: Record<string, any>, events: Array<Record<string, any> & {cursor: number}>, truncated: boolean}}
+ * @returns {{task: Record<string, any>, events: Array<Record<string, any> & {cursor: number}>, truncated: boolean, page?: Record<string, any>}}
  */
 export function validateNativeTaskPoll(value, current, cursor, limits = {}) {
   if (!object(value) || !Array.isArray(value.events) || typeof value.truncated !== "boolean") throw new Error("Unsupported task event response. Refresh status before continuing.");
-  const view = taskView(value.task);
+  const view = taskView(value.task), page = value.page;
+  if (page !== undefined && (!object(page) || page.format !== "amc-session-event-page-v1" || page.committed !== true
+    || page.sessionId !== view.sessionId || page.agentId !== view.agentId || value.truncated
+    || !integer(page.headSeq) || !integer(page.firstSeq) || !integer(page.nextSeq) || page.firstSeq !== cursor + 1
+    || page.nextSeq < page.firstSeq || page.nextSeq > page.headSeq + 1
+    || typeof page.headEventHash !== "string" || !/^[a-f0-9]{64}$/.test(page.headEventHash)
+    || !(page.nextCursor === null || typeof page.nextCursor === "string" && page.nextCursor.length > 0 && page.nextCursor.length <= 2048)
+    || typeof page.resumeCursor !== "string" || !page.resumeCursor || page.resumeCursor.length > 2048
+    || (page.nextCursor === null ? page.nextSeq !== page.headSeq + 1 : page.nextSeq <= page.firstSeq || page.nextSeq > page.headSeq)
+    || view.history.status !== "authenticated")) {
+    throw new Error("The verified task page identity or sequence is invalid. No partial page was displayed.");
+  }
   if (view.taskId !== current.taskId || view.agentId !== current.agentId || view.revision < current.revision) {
     throw new Error("Task identity or revision changed unexpectedly. No updates were applied.");
   }
@@ -56,13 +71,13 @@ export function validateNativeTaskPoll(value, current, cursor, limits = {}) {
     if (value.events.length || view.approvals.length) throw new Error("Studio supplied activity without authenticated history. No activity was displayed.");
     return { task: view, events: [], truncated: value.truncated };
   }
-  if (view.nextCursor < cursor || view.firstCursor < 1 || view.firstCursor > view.nextCursor + 1) {
+  if (page === undefined && (view.nextCursor < cursor || view.firstCursor < 1 || view.firstCursor > view.nextCursor + 1)) {
     throw new Error("The committed event cursor moved backwards. Refresh status from cursor zero.");
   }
-  let previous = 0, observed = cursor;
+  let previous = page === undefined ? 0 : cursor, observed = cursor;
   for (const event of value.events) {
-    if (!object(event) || !integer(event.cursor) || event.cursor <= previous || event.cursor < view.firstCursor
-      || event.cursor > view.nextCursor || !EVENT_KINDS.has(event.kind) || event.evidence !== "committed" || typeof event.text !== "string"
+    if (!object(event) || !integer(event.cursor) || event.cursor <= previous || event.cursor < (page?.firstSeq ?? view.firstCursor)
+      || event.cursor >= (page?.nextSeq ?? view.nextCursor + 1) || !EVENT_KINDS.has(event.kind) || event.evidence !== "committed" || typeof event.text !== "string"
       || (event.toolCallId !== undefined && (typeof event.toolCallId !== "string" || !event.toolCallId || event.toolCallId.length > 256))
       || (event.status !== undefined && (typeof event.status !== "string" || event.status.length > 128))
       || (event.attachment !== undefined && (!object(event.attachment) || event.kind !== "user"
@@ -74,11 +89,11 @@ export function validateNativeTaskPoll(value, current, cursor, limits = {}) {
     }
     previous = event.cursor;
     if (event.cursor <= cursor) continue;
-    if (!value.truncated && event.cursor !== observed + 1) throw new Error("Task updates contain an unexplained cursor gap. Refresh the original history.");
+    if (page === undefined && !value.truncated && event.cursor !== observed + 1) throw new Error("Task updates contain an unexplained cursor gap. Refresh the original history.");
     observed = event.cursor;
   }
-  if (!value.truncated && observed !== view.nextCursor) throw new Error("Studio omitted updates without a retention notice. Refresh the original history.");
-  return { task: view, events: value.events.filter(event => event.cursor > cursor), truncated: value.truncated };
+  if (page === undefined && !value.truncated && observed !== view.nextCursor) throw new Error("Studio omitted updates without a retention notice. Refresh the original history.");
+  return { task: view, events: value.events.filter(event => event.cursor > cursor), truncated: value.truncated, ...(page === undefined ? {} : { page }) };
 }
 function configuration(value) {
   if (!object(value) || value.schemaVersion !== "2026-09-08" || typeof value.agentId !== "string"
@@ -96,7 +111,7 @@ function configuration(value) {
 export async function renderNativeTasksPage({ root, initialAgent = "default" }) {
   mounts.get(root)?.();
   const lifetime = new AbortController();
-  let disposed = false, config = null, task = null, tasks = [], cursor = 0, timer = null;
+  let disposed = false, config = null, task = null, tasks = [], cursor = -1, pageCursor = null, historyPending = false, timer = null;
   let polling = false, mutation = false, inspecting = false, pending = null, readGeneration = 0, setupGeneration = 0, readPaused = false;
   let retryReady = false, reconciling = false, stale = false;
   let pollJob = null, listGeneration = 0, lastObservedAt = null, operationAction = null;
@@ -143,7 +158,7 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
     readGeneration++; taskRead?.abort(); taskRead = null; pollJob = null; polling = false; clearTimer();
   }
   function clearActivity(message = "Recorded activity will appear after the next successful status read.") {
-    cursor = 0; observedTools = new Map(); lastObservedAt = null;
+    cursor = -1; pageCursor = null; historyPending = false; observedTools = new Map(); lastObservedAt = null;
     const empty = document.createElement("p"); empty.id = "nativeTaskEmpty"; empty.className = "muted"; empty.textContent = message;
     el("nativeTaskTranscript").replaceChildren(empty); el("nativeTaskNewMessages").hidden = true;
   }
@@ -285,10 +300,10 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
     // Preserve keyboard focus and expanded details when a poll has no visible change.
     for (const [id,html] of [["nativeTaskIdentity",renderTaskIdentity(task)], ["nativeTaskApprovals",renderTaskApprovals(task)],
       ["nativeTaskVerification",renderTaskVerification(task)], ["nativeTaskValidation",renderTaskValidation(task)], ["nativeTaskList",renderTaskList(tasks, task?.taskId)],
-      ["nativeTaskUsage",renderTaskUsage(task)], ["nativeTaskToolStatus",renderTaskToolStatus(observedTools, !stale && task?.history.status === "authenticated")]]) {
+      ["nativeTaskUsage",renderTaskUsage(task)], ["nativeTaskPlans",renderTaskPlans(task)], ["nativeTaskToolStatus",renderTaskToolStatus(observedTools, !stale && task?.history.status === "authenticated")]]) {
       const node=el(id); if(node.dataset.rendered !== html) { node.innerHTML=html; node.dataset.rendered=html; }
     }
-    if (stale) for (const id of ["nativeTaskVerification", "nativeTaskValidation", "nativeTaskApprovals", "nativeTaskUsage"]) {
+    if (stale) for (const id of ["nativeTaskVerification", "nativeTaskValidation", "nativeTaskApprovals", "nativeTaskUsage", "nativeTaskPlans"]) {
       const node = el(id);
       node.textContent = "Current status is unconfirmed. Refresh status to authenticate this view before acting; no previous result is presented as current.";
       delete node.dataset.rendered;
@@ -336,8 +351,8 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
   }
   function schedule() {
     clearTimer();
-    if (!disposed && !mutation && !inspecting && !reconciling && !readPaused && task && navigator.onLine && !["released","closed"].includes(task.state)) {
-      timer = setTimeout(()=>{ void poll().catch(showError); }, ACTIVE.has(task.state) ? 1000 : 4000);
+    if (!disposed && !mutation && !inspecting && !reconciling && !readPaused && task && navigator.onLine && (historyPending || !["released","closed"].includes(task.state))) {
+      timer = setTimeout(()=>{ void poll().catch(showError); }, historyPending ? 0 : ACTIVE.has(task.state) ? 1000 : 4000);
     }
   }
   function poll() {
@@ -351,7 +366,7 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
     taskRead = job.controller; polling = true; controls();
     job.promise = (async () => {
       try {
-        const raw = await request(`${endpoint(current.taskId)}&cursor=${startCursor}`, { signal: job.controller.signal });
+        const raw = await request(`${endpoint(current.taskId)}&limit=128${pageCursor === null ? "" : `&pageCursor=${encodeURIComponent(pageCursor)}`}`, { signal: job.controller.signal });
         if (!isCurrent()) return false;
         const value = validateNativeTaskPoll(raw, current, startCursor, config?.limits), view = value.task;
         if (view.history.status === "unavailable") {
@@ -363,7 +378,8 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
         const nearBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 180;
         for (const event of value.events) { el("nativeTaskEmpty")?.remove(); appendTaskEvent(transcript, event); }
         observedTools = collectNativeTaskTools(observedTools, value.events);
-        cursor = view.nextCursor; stale = false; lastObservedAt = Date.now();
+        if (value.page) { cursor = value.page.nextSeq - 1; pageCursor = value.page.nextCursor ?? value.page.resumeCursor; historyPending = value.page.nextCursor !== null; }
+        stale = false; lastObservedAt = Date.now();
         const limit = Math.max(1, Math.min(config?.limits.maxEvents || 500, 500));
         while (transcript.children.length > limit) transcript.firstElementChild.remove();
         receive(view);

@@ -9587,6 +9587,8 @@ Show a session's projected conversation and its event spine
 | Option | Description |
 |--------|-------------|
 | `--json` | - |
+| `--limit <rows>` | - |
+| `--cursor <cursor>` | - |
 
 #### `amc session spill-read`
 

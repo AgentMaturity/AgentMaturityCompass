@@ -16,8 +16,11 @@ import { acpSupportsImageInput, assertAcpRouteContent, flattenPrompt, orderedPro
 import { NATIVE_ORDERED_INPUT_FORMAT } from "../attachments/nativeOrderedInput.js";
 import { NATIVE_AUDIO_INPUT_FORMAT } from "../attachments/nativeAudioInput.js";
 import { acpSupportsAudioInput, audioPrompt } from "./acpAudioInput.js";
-import { ACP_MAX_UPDATE_PARAMS_BYTES, acpPromptInputFormat, assertAcpPromptFields, nativeAcpCapabilities, type AcpForkSessionFactory } from "./acpRuntimeContracts.js";
+import { ACP_MAX_UPDATE_PARAMS_BYTES, acpPromptInputFormat, acpPromptClientRequestId, assertAcpPromptFields, nativeAcpCapabilities, type AcpForkSessionFactory } from "./acpRuntimeContracts.js";
 import { prepareAcpHistory, assertAcpForkLineage } from "./acpHistoryContinuity.js";
+import { readAcpSessionUpdatePage } from "./acpSessionUpdatePage.js";
+import { SessionHistoryRefused } from "../session/sessionHistoryReader.js";
+import { projectAcpTurnState, type AcpCommittedTurn } from "./acpSessionPageState.js";
 import { executionStatusFor } from "../execution/executionStatus.js";
 import type { TurnEndReason } from "../session/sessionTypes.js";
 
@@ -93,6 +96,8 @@ interface Registered {
   /** Rows emitted or deliberately withheld, never output owned by a later prompt. */
   projected: number;
   projectedHash: string | null;
+  /** Only newly authenticated seal rows can update this completion reference. */
+  committedTurn?: AcpCommittedTurn | null;
   updateBytes: number;
   /** A failed projection cannot be retried under a later prompt's identity. */
   projectionFailed: boolean;
@@ -118,6 +123,7 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
   const sessions = new Map<string, Registered>();
   const cleanupPending = new Set<AgentSession>();
   let initialized = false;
+  let currentPlanUpdates = false;
   let initializing = false;
   let closing = false;
   let closePromise: Promise<void> | undefined;
@@ -192,10 +198,47 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
       case "session/fork": return forkSession(params, signal);
       case "_amc/session/fork": return forkSession(params, signal, true);
       case "_amc/session/release": return releaseSession(params);
+      case "_amc/session/events": return sessionEvents(params);
+      case "_amc/session/withdraw": return withdrawSubmission(params);
       case "session/prompt": return prompt(params, signal);
       default:
         throw new AcpFailure(ACP_ERROR.methodNotFound, `${method} is not implemented by this agent`);
     }
+  }
+
+  function sessionEvents(params: unknown): unknown {
+    if (!params || typeof params !== "object" || Array.isArray(params)
+      || Object.keys(params).some(key => !["sessionId", "cursor", "limit"].includes(key))) {
+      throw new AcpFailure(ACP_ERROR.invalidParams, "Session pages require sessionId and optional cursor/limit only.");
+    }
+    const request = params as { sessionId: string; cursor?: string; limit?: number };
+    try {
+      // Process-spawn authority remains workspace/agent-bound on EVERY read.
+      // Reading persisted history never invokes a native session factory.
+      return readAcpSessionUpdatePage({ workspace: init.workspace, agentId: init.agentId,
+        consumerId: init.agentId, sessionId: request.sessionId, cursor: request.cursor, limit: request.limit });
+    } catch (error) {
+      if (error instanceof SessionHistoryRefused) {
+        throw new AcpFailure(error.code === "INVALID_INPUT" || error.code === "IDENTITY_MISMATCH" ? ACP_ERROR.invalidParams : ACP_ERROR.internal,
+          "Verified session page was refused; inspect the original session evidence.", { reason: error.code });
+      }
+      throw error;
+    }
+  }
+
+  function withdrawSubmission(params: unknown): unknown {
+    if (!params || typeof params !== "object" || Array.isArray(params)
+      || Object.keys(params).some(key => key !== "sessionId" && key !== "messageId")) {
+      throw new AcpFailure(ACP_ERROR.invalidParams, "Withdrawal requires sessionId and messageId only.");
+    }
+    const request = params as { sessionId?: unknown; messageId?: unknown };
+    if (typeof request.sessionId !== "string" || typeof request.messageId !== "string" || !request.messageId
+      || request.messageId.length > 128 || /[\x00-\x20\x7f]/.test(request.messageId)) throw new AcpFailure(ACP_ERROR.invalidParams, "Withdrawal requires exact session and message identities.");
+    const entry = entryFor(params);
+    if (!entry || entry.releasing || entry.forking || entry.projectionFailed || !entry.session.withdraw) {
+      throw new AcpFailure(ACP_ERROR.invalidParams, "Submission withdrawal requires an owned usable native session.");
+    }
+    return { withdrawn: entry.session.withdraw(request.messageId) };
   }
 
   function handleNotification(method: string, params: unknown): void {
@@ -211,6 +254,9 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
     let protocolVersion: number;
     try {
       await require_("InitializeRequest", params);
+      const extension = (params as { clientCapabilities?: { _meta?: Record<string, unknown> } }).clientCapabilities?._meta?.["dev.agentmaturity.amc"];
+      currentPlanUpdates = extension !== null && typeof extension === "object" && !Array.isArray(extension)
+        && (extension as { currentPlanUpdates?: unknown }).currentPlanUpdates === "amc-current-plan-v1";
       protocolVersion = await acpProtocolVersion();
       if (closing) throw new AcpFailure(ACP_ERROR.internal, "the agent is shutting down");
       initialized = true;
@@ -417,6 +463,11 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
       assertAcpPromptFields(request.prompt);
       assertAcpRouteContent(init.promptRoute, request.prompt);
       const inputFormat = acpPromptInputFormat(request._meta);
+      const clientRequestId = acpPromptClientRequestId(request._meta);
+      if (clientRequestId !== undefined && !entry.session.submissionReceipt) {
+        throw new AcpFailure(ACP_ERROR.invalidParams, "This session factory does not implement durable client request identities; no prompt was admitted.");
+      }
+      const submissionOptions = clientRequestId === undefined ? undefined : { clientRequestId };
       const audio = inputFormat === NATIVE_AUDIO_INPUT_FORMAT || request.prompt.some(block => block.type === "audio");
       if (audio && (inputFormat === NATIVE_ORDERED_INPUT_FORMAT || !audioInput || !entry.session.promptAudioParts)) {
         throw new AcpFailure(ACP_ERROR.invalidParams, "Original audio requires negotiated amc-audio-input@1 and the native audio factory; no image-contract downgrade was used.");
@@ -430,6 +481,9 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
       const legacy = parts === undefined && audioParts === undefined ? flattenPrompt(request.prompt, imageInput) : undefined;
 
       if (closing || signal.aborted || slot.cancelled) return { stopReason: "cancelled" };
+      // Retire pre-prompt history under an authenticated baseline; it cannot become this prompt's completion pin.
+      flush(entry, request.sessionId, false);
+      const promptFrom = entry.projected;
       entry.updateBytes = 0;
       let streamFailed = false;
       const poll = (): void => {
@@ -446,8 +500,10 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
       let rejected: unknown;
       slot.started = true;
       try {
-        outcome = await (audioParts !== undefined ? entry.session.promptAudioParts!(audioParts) : parts !== undefined ? entry.session.promptParts!(parts)
-          : legacy!.images.length ? entry.session.prompt(legacy!.text, legacy!.images) : entry.session.prompt(legacy!.text));
+        outcome = await (audioParts !== undefined ? (submissionOptions ? entry.session.promptAudioParts!(audioParts, submissionOptions) : entry.session.promptAudioParts!(audioParts))
+          : parts !== undefined ? (submissionOptions ? entry.session.promptParts!(parts, submissionOptions) : entry.session.promptParts!(parts))
+          : submissionOptions !== undefined ? entry.session.prompt(legacy!.text, legacy!.images.length ? legacy!.images : undefined, submissionOptions)
+            : legacy!.images.length ? entry.session.prompt(legacy!.text, legacy!.images) : entry.session.prompt(legacy!.text));
       } catch (error) {
         rejected = error;
       }
@@ -460,9 +516,10 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
       if (slot.cancelled || signal.aborted) {
         flush(entry, request.sessionId);
         const execution = executionOf(request.sessionId, "cancelled");
-        return { stopReason: "cancelled", ...(init.nativeExecution?.taskValidation || execution ? {
+        const committedTurn = entry.committedTurn && entry.committedTurn.seq >= promptFrom ? entry.committedTurn : null;
+        return { stopReason: "cancelled", ...(init.nativeExecution?.taskValidation || execution || committedTurn ? {
           _meta: { "dev.agentmaturity.amc": { ...(init.nativeExecution?.taskValidation ? { validation: projectNativeValidation(init.workspace, entry.session.readEvents()) } : {}),
-            ...execution } }
+            ...(committedTurn ? { committedTurn } : {}), ...execution } }
         } : {}) };
       }
 
@@ -477,7 +534,8 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
       if (!outcome.ok) {
         flush(entry, request.sessionId, false);
         throw new AcpFailure(ACP_ERROR.internal, "the turn did not complete", { reason: outcome.reason,
-          ...(outcome.failureCodes?.length ? { failureCodes: [...outcome.failureCodes] } : {}), ...executionOf(request.sessionId, "error") });
+          ...(outcome.failureCodes?.length ? { failureCodes: [...outcome.failureCodes] } : {}),
+          ...(outcome.submission ? { submission: outcome.submission } : {}), ...executionOf(request.sessionId, "error") });
       }
 
       // `PromptResponse` has no content field, so anything not sent as a
@@ -492,13 +550,14 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
       }
       flush(entry, request.sessionId);
       const execution = executionOf(request.sessionId, reason);
+      const committedTurn = entry.committedTurn && entry.committedTurn.seq >= promptFrom ? entry.committedTurn : null;
       return {
         stopReason,
         // Turn completion, selected public checks and the execution phases are independent outcomes.
-        ...(stopReasonIsLossy(reason) || init.nativeExecution?.taskValidation || execution ? { _meta: { "dev.agentmaturity.amc": {
+        ...(stopReasonIsLossy(reason) || init.nativeExecution?.taskValidation || execution || committedTurn ? { _meta: { "dev.agentmaturity.amc": {
           ...(stopReasonIsLossy(reason) ? { turnEndReason: reason } : {}),
           ...(init.nativeExecution?.taskValidation ? { validation: outcome.validation } : {}),
-          ...execution
+          ...(committedTurn ? { committedTurn } : {}), ...execution
         } } } : {})
       };
     } finally {
@@ -552,9 +611,12 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
     try {
       const events = entry.session.readEvents();
       const head = validateAcpCommittedTail(init.workspace, sessionId, events, entry.projected, entry.projectedHash);
+      const turn = projectAcpTurnState(events);
+      if (turn.lastSeal === null) entry.committedTurn = null;
+      else if (turn.lastSeal.seq >= entry.projected) entry.committedTurn = turn.lastSeal;
       // Withheld output never reaches a client, so it needs no payload rendering.
       // Its row signatures, ownership and sequence still must authenticate.
-      const projected = emit ? projectSessionUpdates(init.workspace, events, entry.projected) : null;
+      const projected = emit ? projectSessionUpdates(init.workspace, events, entry.projected, { includeCurrentPlans: currentPlanUpdates }) : null;
       if (projected && projected.unsigned > 0) throw new Error("ACP refused an unsigned committed update.");
       entry.projected = events.length;
       entry.projectedHash = head;

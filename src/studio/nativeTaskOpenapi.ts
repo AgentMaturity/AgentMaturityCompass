@@ -13,8 +13,8 @@ const tools = { type: "string", enum: ["none", "workspace"] };
 const agent = { type: "string", minLength: 1, maxLength: 128, pattern: "^[a-z0-9][a-z0-9_-]*$" };
 const prompt = { type: "string", minLength: 1, maxLength: 16384,
   description: "Nonblank task text, at most 16 KiB UTF-8. Control characters other than tabs/newlines are rejected." };
-const object = (properties: Record<string, unknown>, required = Object.keys(properties)) =>
-  ({ type: "object", additionalProperties: false, required, properties });
+const object = (properties: Record<string, unknown>, required = Object.keys(properties), optional: readonly string[] = []) =>
+  ({ type: "object", additionalProperties: false, required: required.filter(key => !optional.includes(key)), properties });
 const envelope = (data: Record<string, unknown>) => object({ ok: { type: "boolean", const: true }, data });
 const json = (description: string, schema: Record<string, unknown>) =>
   ({ description, content: { "application/json": { schema } } });
@@ -65,7 +65,11 @@ export function nativeTaskEndpoints(): Record<string, Record<string, OpenApiOper
     },
     [`${prefix}/{taskId}`]: { get: operation("Read committed native updates and actual task state", "NativeTaskPollResponse", false, undefined, "200", [
       taskParameter, agentParameter, { name: "cursor", in: "query", required: false, schema: { ...integer, maximum: 999999999999999 },
-        description: "Exclusive event cursor. Retention may truncate earlier updates; this is not a complete evidence verification." }
+        description: "Legacy exclusive projected-update cursor. Do not combine with pageCursor or limit. Retention may truncate this legacy view." },
+      { name: "limit", in: "query", required: false, schema: { type: "integer", minimum: 1, maximum: 256, default: 64 },
+        description: "Negotiate verified native history pages on this route. Bounds delivered source rows, not total verification work." },
+      { name: "pageCursor", in: "query", required: false, schema: { type: "string", minLength: 1, maxLength: 2048 },
+        description: "Opaque verified-store position bound to session, agent and authenticated owner. nextCursor continues the fixed snapshot; resumeCursor follows after delivered rows. Omit for the first page. Cursor forgery, a chain gap or tampering fails the whole page. No control or tool is replayed." }
     ]) },
     [`${prefix}/{taskId}/turn`]: { post: operation("Admit a follow-up with an explicit revision and unique request ID", "NativeTaskResponse", true, "NativeTaskTurn", "202", [taskParameter, agentParameter]) },
     [`${prefix}/{taskId}/fork`]: { post: operation("Fork this task's session into a new owned task: a child whose signed open row names the verified parent (P2-13)", "NativeTaskResponse", true, "NativeTaskFork", "202", [taskParameter, agentParameter]) }
@@ -115,6 +119,8 @@ export function nativeTaskSchemas(): Record<string, unknown> {
       toolsDigest: { ...digest, type: ["string", "null"] },
       validationSelection: { oneOf: [{ type: "null" }, ref("NativeTaskValidationSelection")] }, validation: ref("NativeTaskValidationResult"),
       validationOutputs: { type: "array", maxItems: 8, items: ref("NativeTaskValidationOutput") },
+      plans: { type: "array", maxItems: 2, items: ref("NativeTaskPlan") },
+      usage: { type: "object", description: "Bounded NativeRunUsage recorded-session aggregates with issueCount, without per-request reports or issue arrays. Missing usage stays unavailable; it is never filled from configured limits." },
       maxSteps: integer, maxTokens: integer,
       state: { type: "string", enum: ["starting", "idle", "running", "cancel-requested", "releasing", "released", "failed", "verifying", "closed"] },
       createdAt: integer, updatedAt: integer, archived: bool, turnEndReason: nullableString, error: nullableString,
@@ -127,7 +133,7 @@ export function nativeTaskSchemas(): Record<string, unknown> {
       recovery: { oneOf: [{ type: "null" }, ref("NativeTaskRecovery")] },
       execution: { oneOf: [{ type: "null" }, ref("ExecutionStatus")] },
       delegation: { oneOf: [{ type: "null" }, ref("DelegationChain")] }
-    }),
+    }, undefined, ["plans", "usage"]),
     DelegationChain: { ...object({ chainDigest: digest, status: { type: "string", enum: ["verified", "refused", "unavailable"] }, reason: nullableString,
       links: { type: "array", items: object({ linkId: string, depth: integer, principal: string, delegate: string, scopes: strings, notAfter: integer }) } }),
       description: "The signed delegation chain the task runtime's v2 lease binds (P2-25, docs/AGENT_IDENTITY.md), from the human or declared service that authorized it to the runtime, re-verified on every read. Experimental." },
@@ -137,7 +143,7 @@ export function nativeTaskSchemas(): Record<string, unknown> {
     NativeTaskRecovery: { ...object({ eligible: bool, state: { type: "string", enum: ["ready", "interrupted", "blocked"] }, message: string }),
       description: "Read-only native JSONL recovery eligibility, not a writer grant. Resume rechecks original history, identity, settings, accounting and actual abandoned ownership under the writer mutex. An interrupted turn is acknowledged without replaying its effects; submit a new explicit turn. Closed or archived sessions remain non-resumable." },
     NativeTaskHistory: { ...object({ status: { type: "string", enum: ["not-started", "authenticated", "unavailable"] },
-      backend: { type: ["string", "null"], enum: ["sqlite", "jsonl", null] },
+      backend: { type: ["string", "null"], enum: ["sqlite", "jsonl", "postgres", null] },
       headEventHash: { ...digest, type: ["string", "null"] }, eventCount: integer, message: string }),
       description: "Actual selected-backend session metadata status; never a private payload access grant or JSONL writer-resume capability. When unavailable, withhold previous transcript/validation/verifier displays. eventCount zero then means unknown, not verified empty history." },
     NativeTaskApproval: object({ approvalRequestId: string, requestDigestSha256: digest, toolName: string,
@@ -156,7 +162,16 @@ export function nativeTaskSchemas(): Record<string, unknown> {
       status: { type: "string", enum: ["available", "unavailable", "pruned"] }, text: nullableString,
       truncated: bool, redacted: bool, bytes: { type: ["integer", "null"], minimum: 0 } }),
       description: "Text from the exact authenticated check-result payload after its complete bytes match payloadSha256. The display is redacted and capped at 16 KiB; payloadSha256 describes the original bytes, not transformed display text. Reads over 2 MiB are withheld." },
-    NativeTaskEvent: object({ cursor: integer, kind: { type: "string", enum: ["user", "assistant", "tool", "tool-update", "plan"] },
+    NativeTaskPlan: { ...object({ kind: { type: "string", enum: ["todo", "plan"] }, revision: { type: "integer", minimum: 1 },
+      recordSha256: digest, text: string, evidence: { type: "string", const: "committed" }, scope: { type: "string", const: "current-record" } }),
+      description: "Latest authenticated list state for the current turn, separate from durable transcript replay and approval authority. Model-written text must be HTML-escaped." },
+    NativeTaskPage: { ...object({ format: { type: "string", const: "amc-session-event-page-v1" }, sessionId: string, agentId: agent,
+      committed: { type: "boolean", const: true }, backend: { type: "string", enum: ["sqlite", "jsonl", "postgres"] },
+      headEventHash: digest, headSeq: integer, storeHeadEventHash: digest, firstSeq: integer, nextSeq: integer,
+      nextCursor: { ...nullableString, minLength: 1, maxLength: 2048 }, resumeCursor: { ...string, minLength: 1, maxLength: 2048 }, sealed: bool,
+      verification: { type: "object" }, state: { type: "object" } }),
+      description: "Shared verified-session snapshot metadata. Sequences are zero-based raw session rows, including rows without visible updates. nextSeq is exclusive. nextCursor null means this snapshot is exhausted. The complete success response, including current task state and page, is bounded to 2 MiB; oversized state refuses with 409 instead of truncating fields. The same-store page state carries validation, recorded usage, approvals, ending and unknown tool outcomes. Verification reads the complete selected store before slicing; it does not grant payload access or a writer." },
+    NativeTaskEvent: object({ cursor: { ...integer, description: "Raw source sequence in page mode; legacy projected-update position otherwise. Read page.nextSeq to advance over source rows without visible updates." }, kind: { type: "string", enum: ["user", "assistant", "tool", "tool-update", "plan"] },
       text: string, toolCallId: string, status: string, evidence: { type: "string", const: "committed" },
       attachment: object({ type: { type: "string", enum: ["image", "audio"] }, mimeType: string, byteLength: integer, sha256: digest })
     }, ["cursor", "kind", "text", "evidence"]),
@@ -183,6 +198,7 @@ export function nativeTaskSchemas(): Record<string, unknown> {
     NativeTaskResponse: envelope(ref("NativeTask")),
     NativeTaskOptionsResponse: envelope(ref("NativeTaskOptions")),
     NativeTaskListResponse: envelope(object({ tasks: { type: "array", items: ref("NativeTask") } })),
-    NativeTaskPollResponse: envelope(object({ task: ref("NativeTask"), events: { type: "array", items: ref("NativeTaskEvent") }, truncated: bool }))
+    NativeTaskPollResponse: envelope(object({ task: ref("NativeTask"), events: { type: "array", maxItems: 512, items: ref("NativeTaskEvent") }, truncated: bool,
+      page: ref("NativeTaskPage") }, ["task", "events", "truncated"]))
   };
 }

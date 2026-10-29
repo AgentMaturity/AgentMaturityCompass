@@ -12,7 +12,7 @@ import type { NativeToolCapability } from "./nativeToolCapabilities.js";
 import type { ExplicitShellOptIn } from "../sandbox/nativeShellGate.js";
 import type { NativeValidationPlan, NativeValidationResult } from "./nativeValidation.js";
 import { EMPTY_TOOL_SEAM, type AgentToolSeam } from "./toolSeam.js";
-import type { AgentStatus, CompactionConfig } from "./loopTypes.js";
+import type { AgentStatus, CompactionConfig, InboxReceipt } from "./loopTypes.js";
 import { resolveCompactionConfig } from "./compaction/promptPressure.js";
 import { readAgentRunSummary } from "./runReport.js";
 import type { LoopLlm, LoopRoute } from "./stepRunner.js";
@@ -100,6 +100,10 @@ export interface AgentSessionInit {
   readonly bindTools?: (context: { readonly session: SessionService; readonly toolset: AgentToolset | null }) => AgentToolSeam;
 }
 
+export interface AgentPromptOptions {
+  readonly clientRequestId?: string;
+}
+
 export type AgentPromptResult =
   | {
       readonly ok: true;
@@ -115,15 +119,20 @@ export type AgentPromptResult =
       readonly reason: string;
       /** Recorded failure codes of the failed turn (e.g. AMC_NATIVE_BUDGET_REFUSED), so a client can tell AMC's refusal from a provider's. */
       readonly failureCodes?: readonly string[];
+      /** Original durable admission when a caller retries an already admitted request id. */
+      readonly submission?: InboxReceipt;
     };
 
 export interface AgentSession {
   readonly sessionId: string;
   /** Run one prompt to completion. Rejects a second while one is in flight. */
-  prompt(text: string, images?: readonly NativeImageInput[]): Promise<AgentPromptResult>;
+  prompt(text: string, images?: readonly NativeImageInput[], options?: AgentPromptOptions): Promise<AgentPromptResult>;
   /** Optional on externally supplied legacy factories; native composition implements it. */
-  promptParts?(parts: readonly NativeInputPart[]): Promise<AgentPromptResult>;
-  promptAudioParts?(parts: readonly NativeAudioPart[]): Promise<AgentPromptResult>;
+  promptParts?(parts: readonly NativeInputPart[], options?: AgentPromptOptions): Promise<AgentPromptResult>;
+  promptAudioParts?(parts: readonly NativeAudioPart[], options?: AgentPromptOptions): Promise<AgentPromptResult>;
+  /** Presence attests that prompt options are admitted through the durable inbox identity fold. */
+  submissionReceipt?(clientRequestId: string): InboxReceipt | undefined;
+  withdraw?(messageId: string): boolean;
   cancel(cause: TurnCancelCause, by: string): void;
   /**
    * This session's committed rows.
@@ -140,8 +149,8 @@ export interface AgentSession {
 }
 
 export interface OrderedAgentSession extends AgentSession {
-  promptParts(parts: readonly NativeInputPart[]): Promise<AgentPromptResult>;
-  promptAudioParts(parts: readonly NativeAudioPart[]): Promise<AgentPromptResult>;
+  promptParts(parts: readonly NativeInputPart[], options?: AgentPromptOptions): Promise<AgentPromptResult>;
+  promptAudioParts(parts: readonly NativeAudioPart[], options?: AgentPromptOptions): Promise<AgentPromptResult>;
 }
 
 export function openAgentSession(init: AgentSessionInit): OrderedAgentSession {
@@ -269,7 +278,7 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
       throw error;
     }
 
-    const runPrompt = (enqueue: () => void): Promise<AgentPromptResult> =>
+    const runPrompt = (enqueue: () => InboxReceipt, clientRequestId?: string): Promise<AgentPromptResult> =>
       withWorkspaceScope(workspace, async (): Promise<AgentPromptResult> => {
         if (closed) return { ok: false, reason: "session is closed" };
         // Claimed before any await. Checking after one would let two callers both
@@ -277,7 +286,9 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
         if (running) return { ok: false, reason: "a prompt is already running on this session" };
         running = true;
         try {
-          enqueue();
+          const previous = clientRequestId === undefined ? undefined : driver.inbox.requestReceipt(clientRequestId);
+          const receipt = enqueue();
+          if (previous) return { ok: false, reason: "duplicate clientRequestId; the original submission is already admitted", submission: receipt };
           await driver.whenIdle();
 
           const status = driver.status;
@@ -322,9 +333,11 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
 
     return {
       sessionId,
-      prompt: (text, images) => runPrompt(() => { driver.followup(text, images); }),
-      promptParts: parts => runPrompt(() => { driver.followupParts(parts); }),
-      promptAudioParts: parts => runPrompt(() => { driver.followupAudioParts(parts); }),
+      prompt: (text, images, options) => runPrompt(() => driver.followup(text, images, options?.clientRequestId), options?.clientRequestId),
+      promptParts: (parts, options) => runPrompt(() => driver.followupParts(parts, options?.clientRequestId), options?.clientRequestId),
+      promptAudioParts: (parts, options) => runPrompt(() => driver.followupAudioParts(parts, options?.clientRequestId), options?.clientRequestId),
+      submissionReceipt: clientRequestId => withWorkspaceScope(workspace, () => driver.inbox.requestReceipt(clientRequestId)),
+      withdraw: messageId => withWorkspaceScope(workspace, () => { if (closed) throw new Error("Session is closed."); return driver.withdraw(messageId); }),
       readEvents: () => withWorkspaceScope(workspace, () => session.readEvents()),
 
       cancel(cause: TurnCancelCause, by: string): void {

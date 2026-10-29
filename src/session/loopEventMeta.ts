@@ -79,7 +79,14 @@ export type InboxSpliceOp =
  * so a second copy would be a field that can disagree with the row it sits in.
  * `loop/veto` is the exception, and says why below.
  */
+/** Caller identities are bounded visible ASCII, never filesystem paths or credentials. */
+export function validClientRequestId(value: unknown): value is string {
+  return typeof value === "string" && /^[\x21-\x7e]{1,128}$/.test(value);
+}
+
 export interface LoopInboxRecord {
+  readonly clientRequestId?: string;
+  readonly clientRequestSha256?: string;
   readonly kind: "inbox";
   readonly op: InboxSpliceOp;
   readonly target: InboxTarget;
@@ -348,6 +355,10 @@ function assertCause(cause: TurnCancelCause): TurnCancelCause {
 }
 
 function buildInboxRow(record: LoopInboxRecord): LoopEventRow {
+  if ((record.clientRequestId !== undefined || record.clientRequestSha256 !== undefined)
+    && (record.op !== "insert" || !validClientRequestId(record.clientRequestId)
+      || typeof record.clientRequestSha256 !== "string" || !/^[a-f0-9]{64}$/.test(record.clientRequestSha256)
+      || typeof record.wake !== "boolean")) throw new Error("loop/inbox: malformed clientRequestId or request fingerprint");
   if (record.payloadFormat !== undefined && (record.op !== "insert" || !["amc-image-input@1", "amc-image-input@2", "amc-audio-input@1"].includes(record.payloadFormat))) {
     throw new Error("loop/inbox: unsupported image payload format or format on a removal");
   }
@@ -375,7 +386,8 @@ function buildInboxRow(record: LoopInboxRecord): LoopEventRow {
       outcome: record.op === "cancel" ? "cancelled" : null,
       wake: record.wake,
       demotedFrom: record.demotedFrom,
-      ...(record.payloadFormat === undefined ? {} : { payloadFormat: record.payloadFormat })
+      ...(record.payloadFormat === undefined ? {} : { payloadFormat: record.payloadFormat }),
+      ...(record.clientRequestId === undefined ? {} : { clientRequestId: record.clientRequestId, clientRequestSha256: record.clientRequestSha256 })
     },
     payload: record.text
   };
@@ -383,6 +395,11 @@ function buildInboxRow(record: LoopInboxRecord): LoopEventRow {
 
 /** A `loop/inbox` row's meta, as read back out of the log. */
 export interface LoopInboxMeta {
+  readonly clientRequestId?: string;
+  readonly clientRequestSha256?: string;
+  /** Retained for request identity admission only; older rows keep their existing read shape. */
+  readonly wake?: boolean;
+  readonly demotedFrom?: InboxTarget | null;
   readonly payloadFormat?: "amc-image-input@1" | "amc-image-input@2" | "amc-audio-input@1";
   readonly op: InboxSpliceOp;
   readonly target: InboxTarget;
@@ -415,6 +432,11 @@ export function readLoopInboxMeta(metaJson: string): LoopInboxMeta | null {
   }
   const meta = parsed as Record<string, unknown>;
   const { op, target, start, removedCount, messageIds, origin } = meta;
+  const requestId = meta.clientRequestId;
+  if ((requestId !== undefined || meta.clientRequestSha256 !== undefined)
+    && (op !== "insert" || !validClientRequestId(requestId) || typeof meta.clientRequestSha256 !== "string"
+      || !/^[a-f0-9]{64}$/.test(meta.clientRequestSha256) || typeof meta.wake !== "boolean"
+      || (meta.demotedFrom !== null && meta.demotedFrom !== "next-turn" && meta.demotedFrom !== "next-step"))) return null;
   if (meta.payloadFormat !== undefined && (typeof meta.payloadFormat !== "string" || !["amc-image-input@1", "amc-image-input@2", "amc-audio-input@1"].includes(meta.payloadFormat) || op !== "insert")) return null;
   if (typeof op !== "string" || !INBOX_OPS.has(op)) return null;
   if (typeof target !== "string" || !INBOX_TARGETS.has(target)) return null;
@@ -429,6 +451,8 @@ export function readLoopInboxMeta(metaJson: string): LoopInboxMeta | null {
     removedCount: removedCount as number,
     messageIds: messageIds as readonly string[],
     origin: (origin as InboxOrigin | null) ?? null,
+    ...(requestId === undefined ? {} : { clientRequestId: requestId as string, clientRequestSha256: meta.clientRequestSha256 as string,
+      wake: meta.wake as boolean, demotedFrom: meta.demotedFrom as InboxTarget | null }),
     ...(meta.payloadFormat === undefined ? {} : { payloadFormat: meta.payloadFormat as "amc-image-input@1" | "amc-image-input@2" | "amc-audio-input@1" })
   };
 }
