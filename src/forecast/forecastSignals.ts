@@ -10,6 +10,8 @@ import { pathExists, readUtf8 } from "../utils/fs.js";
 import { computeFailureRiskIndices } from "../assurance/indices.js";
 import { loadTransformMap } from "../transformation/transformPlanner.js";
 import { canonicalize } from "../utils/json.js";
+import { loadForecastTransformPlan, type ForecastTransformPlanInput } from "./forecastTransformPlan.js";
+import type { TransformPlan } from "../transformation/transformTasks.js";
 import { FOUR_CS } from "../transformation/fourCs.js";
 import { listValueReports } from "../value/valueStore.js";
 import type { ValueReport } from "../value/valueSchema.js";
@@ -39,6 +41,7 @@ export interface ForecastSignalBundle {
     latestCorrelationRatio: number;
   };
   runRefs: string[];
+  transformPlanInput: ForecastTransformPlanInput;
   targetProgress: {
     gapPoints: number;
     remainingEffort: number;
@@ -277,7 +280,7 @@ function valueFromOutcome(report: OutcomeReport | null): Record<(typeof FORECAST
   };
 }
 
-function computeTargetProgress(workspace: string, agentId: string, runs: DiagnosticReport[]): {
+function computeTargetProgress(workspace: string, agentId: string, runs: DiagnosticReport[], latestPlan: TransformPlan | null): {
   gapPoints: number;
   remainingEffort: number;
   throughputHistoryPerDay: number[];
@@ -286,10 +289,6 @@ function computeTargetProgress(workspace: string, agentId: string, runs: Diagnos
   const gapPoints = latestRun
     ? Number(latestRun.targetDiff.reduce((sum, row) => sum + Math.max(0, row.gap), 0).toFixed(6))
     : 0;
-  const latestPlanPath = join(workspace, ".amc", "agents", agentId, "transform", "latest.json");
-  const latestPlan = parseJsonFile<{
-    tasks?: Array<{ effort: number; status: string }>;
-  }>(latestPlanPath);
   const remainingEffort = latestPlan?.tasks
     ? Number(
         latestPlan.tasks
@@ -349,6 +348,7 @@ function collectForecastSignalsAt(params: {
 }, selectionTs: number): ForecastSignalBundle {
   const lookbackDays = Math.max(14, params.lookbackDays ?? 90);
   const earliestTs = selectionTs - lookbackDays * 86_400_000;
+  const { plan: transformPlan, ...transformPlanInput } = loadForecastTransformPlan(params.workspace, params.scope);
   const points = zeroSeriesInput();
   const runRefs: string[] = [];
   let observedAccumulator = 0;
@@ -374,7 +374,7 @@ function collectForecastSignalsAt(params: {
     })
       .filter((report) => report.generatedTs >= earliestTs)
       .sort((a, b) => a.generatedTs - b.generatedTs);
-    targetProgress = computeTargetProgress(params.workspace, params.scope.id, runs);
+    targetProgress = computeTargetProgress(params.workspace, params.scope.id, runs, transformPlan);
 
     for (const run of runs) {
       const trustTier = runTrustTier(run);
@@ -580,6 +580,7 @@ function collectForecastSignalsAt(params: {
       latestCorrelationRatio: Number((latestCorrelationRatio ?? 0).toFixed(6))
     },
     runRefs: [...new Set(runRefs)],
+    transformPlanInput,
     targetProgress
   };
 }
