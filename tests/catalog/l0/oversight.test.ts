@@ -42,7 +42,7 @@ describe("L0-OVS-01, L0-OVS-02 and L1-WLT-US-02: a signed human approval bound t
       let bodyRuns = 0;
       const registry = new ToolRegistry();
       registry.define(defineTool({ name: s.tool, actionClass: s.actionClass, description: "fixture payment",
-        body: () => { bodyRuns += 1; return { output: "paid", effect: "applied" }; } }));
+        body: () => { bodyRuns += 1; return { ok: true, output: "paid", effect: "applied" }; } }));
       let journal: ActionJournal | undefined;
       const records: ReturnType<typeof toolEvidenceFor> = [];
       const pipeline = new ToolPipeline({ registry, workspace: ws, journal: () => (journal ??= openActionJournal(ws)),

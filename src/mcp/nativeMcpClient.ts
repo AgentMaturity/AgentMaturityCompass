@@ -333,7 +333,7 @@ export async function mountNativeMcpServer(options: {
         body: async (execution) => {
           if (!active || execution.agentId !== agentId || resolve(execution.workspace) !== workspace) throw new Error("MCP mount is unavailable in this execution scope");
           if (!validate(execution.arguments).valid) throw new Error("MCP arguments do not match the reviewed tool schema");
-          if (execution.effectiveMode !== "EXECUTE") return { output: "MCP call simulated; the remote tool was not invoked.", exitCode: 0 };
+          if (execution.effectiveMode !== "EXECUTE") return { ok: true, output: "MCP call simulated; the remote tool was not invoked.", exitCode: 0 };
           const signal = execution.signal;
           const abort = () => { void close().catch(() => {}); };
           if (signal?.aborted) throw new Error("MCP call cancelled before dispatch");

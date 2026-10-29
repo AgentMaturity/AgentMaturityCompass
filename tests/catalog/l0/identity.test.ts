@@ -53,7 +53,7 @@ function compose(ws: string, actionClass: ActionClass, leaseToken: () => string,
   const runs = { body: 0 };
   const registry = new ToolRegistry();
   registry.define(defineTool({ name: "fixture.write", actionClass, description: "fixture tool",
-    body: () => { runs.body += 1; return { output: "ran", effect: "applied" }; } }));
+    body: () => { runs.body += 1; return { ok: true, output: "ran", effect: "applied" }; } }));
   let journal: ActionJournal | undefined;
   const records: ReturnType<typeof toolEvidenceFor> = [];
   const pipeline = new ToolPipeline({ registry, workspace: ws, journal: () => (journal ??= openActionJournal(ws)),

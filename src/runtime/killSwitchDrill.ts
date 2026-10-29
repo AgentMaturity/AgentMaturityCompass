@@ -60,7 +60,7 @@ export async function runKillSwitchDrill(p: { workspace: string; actions?: numbe
   const systemOfRecord = join(dir, "system-of-record.jsonl");
   const registry = new ToolRegistry();
   registry.define(defineTool({ name: "drill.record_effect", description: "Appends one row to the drill's fixture system of record", actionClass: "WRITE_LOW",
-    body: (execution) => { appendFileSync(systemOfRecord, `${JSON.stringify({ ts: Date.now(), callId: execution.callId })}\n`); return { output: "effect", effect: "applied" }; } }));
+    body: (execution) => { appendFileSync(systemOfRecord, `${JSON.stringify({ ts: Date.now(), callId: execution.callId })}\n`); return { ok: true, output: "effect", effect: "applied" }; } }));
   const pipeline = new ToolPipeline({ registry, workspace: p.workspace });
   const attempt = () => pipeline.execute({ name: "drill.record_effect", agentId: "default", arguments: {}, requestedMode: "EXECUTE" });
   const effects = () => existsSync(systemOfRecord) ? readFileSync(systemOfRecord, "utf8").trim().split("\n").filter(Boolean).map((l) => JSON.parse(l) as unknown) : [];

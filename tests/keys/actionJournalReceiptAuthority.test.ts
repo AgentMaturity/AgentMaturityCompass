@@ -106,7 +106,7 @@ test("after actual body effect a late no-sign completion keeps started and incom
   const registry = new ToolRegistry(); const effect = join(f.root, "actual-effect.json");
   registry.define(defineTool({ name: PAYMENT_TOOL, description: "Owned actual effect", actionClass: "FINANCIAL", body: execution => {
     writeFileSync(effect, JSON.stringify({ executionId: execution.executionId, idempotencyKey: execution.idempotencyKey })); vi.stubEnv("AMC_NO_SIGN", "1");
-    return { output: "owned effect", effect: "applied" as const, externalRef: "owned:effect" };
+    return { ok: true, output: "owned effect", effect: "applied" as const, externalRef: "owned:effect" };
   } }));
   const pipeline = new ToolPipeline({ registry, workspace: f.workspace, journal: () => journal, authorizationContext: () => ({ sessionId: f.sessionId }) });
   const result = await pipeline.execute({ name: PAYMENT_TOOL, agentId: "default", requestedMode: "EXECUTE", arguments: { ...FAULT_ARGUMENTS[PAYMENT_TOOL] } });

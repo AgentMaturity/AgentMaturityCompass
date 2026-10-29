@@ -53,7 +53,9 @@ export interface ToolCallOutcome {
   readonly denied: boolean;
   /**
    * The tool asserts the turn is finished — a hand-back-to-the-user tool, for
-   * instance. The loop honours it instead of asking the model again.
+   * instance. The loop honours it instead of asking the model again only when
+   * every call in the step concludes: one tool cannot erase its siblings'
+   * continuation (PXA-23).
    */
   readonly concludesTurn?: boolean;
   /**

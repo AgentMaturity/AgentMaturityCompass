@@ -289,6 +289,7 @@ import { assignOwnership, createCommitmentPlan, learnQuestion } from "./eoc/flow
 import inquirer from "inquirer";
 import { assertOwnerMode, getMode, setMode, type AMCMode } from "./mode/mode.js";
 import { writeRuntimeFirewallPolicyAsync, migrateRuntimeFirewallPolicySignatureAsync } from "./runtime/firewallPolicyAsync.js";
+import { installFatalHandlers } from "./runtime/fatalDiagnostic.js";
 import { initVaultInteractive, lockVaultNow, unlockVaultInteractive, vaultStatusNow } from "./vault/vaultCli.js";
 import { forgetVaultPassphrase } from "./vault/passphraseStore.js";
 import { ensureUpVaultPassphrase, runFirstBaselineIfNeeded } from "./studio/oneCommandUp.js";
@@ -2013,15 +2014,8 @@ function normalizeCliErrorMessage(error: unknown): string {
   return [message, ...causes].join("\n");
 }
 
-// Global crash handlers — catch unhandled promise rejections and exceptions
-process.on("unhandledRejection", (reason) => {
-  console.error(chalk.red(`[AMC] Unhandled rejection: ${reason instanceof Error ? reason.message : String(reason)}`));
-  process.exit(1);
-});
-process.on("uncaughtException", (err) => {
-  console.error(chalk.red(`[AMC] Uncaught exception: ${err.message}`));
-  process.exit(1);
-});
+// Global crash handlers: a bounded diagnostic with the original stack and causes, then a nonzero exit (DXA-10).
+installFatalHandlers((line) => console.error(chalk.red(line)));
 
 const program = new Command();
 program

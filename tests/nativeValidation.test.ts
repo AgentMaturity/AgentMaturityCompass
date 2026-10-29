@@ -59,7 +59,7 @@ describe("native public validation is independent of model completion", () => {
     for (const [index, check] of summary.validation.checks.entries()) {
       const row = f.events().find(event => event.id === check.outputEventId)!;
       const payload = readEventPayload(f.dir, row); expect(payload.status).toBe("ok");
-      if (payload.status === "ok") expect(payload.bytes.toString("utf8")).toBe(index === 0 ? "public pass" : "public failure");
+      if (payload.status === "ok") expect(payload.bytes.toString("utf8")).toBe(index === 0 ? "public pass" : "public failure\n[amc: exit 7]");
       expect(extractEnvelope(row.meta_json)?.sessionId).toBe(f.sessionId); expect(row.writer_sig).not.toBe("unsigned");
     }
     // Operator checks are non-conversation evidence, never fabricated assistant/tool turns.

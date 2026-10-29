@@ -208,6 +208,25 @@ export interface LoopHooks {
  */
 export type LoopHookControl = Pick<LoopHooks, "preStep" | "turnStopping">;
 
+/**
+ * An observer that cannot change what the loop does (DXA-16). `notify` is emit-style: a listener that throws is
+ * reported on stderr and otherwise ignored, so it can never skip a `step/end`, a turn seal or a wake that follows it.
+ */
+export function isolatedNotify(notify: (notification: LoopNotification) => void): (notification: LoopNotification) => void {
+  return (notification) => {
+    try {
+      notify(notification);
+    } catch (error: unknown) {
+      try {
+        const message = error instanceof Error ? error.message : String(error);
+        process.stderr.write(`[amc] loop observer threw on ${notification.kind}: ${message.slice(0, 500)}\n`);
+      } catch {
+        // Reporting is best-effort; the loop's own evidence does not depend on it.
+      }
+    }
+  };
+}
+
 /** The hooks a driver runs under when nothing is registered. */
 export const NO_HOOKS: LoopHooks = Object.freeze({
   preStep: (_input: PreStepInput, next: () => Promise<PreStepDecision>): Promise<PreStepDecision> => next(),

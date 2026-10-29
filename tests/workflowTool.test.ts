@@ -212,7 +212,9 @@ describe("a plan the model got wrong is refused, not attempted", () => {
 
     const outcome = await toolset.seam.execute({ ...call(null), rawArguments: JSON.stringify({}) });
 
-    expect(String(outcome.content)).toContain("workflow refused");
+    // Refused by the published schema before the body (PXA-22), as a failed call.
+    expect(String(outcome.content)).toContain("must have required property 'plan'");
+    expect(outcome.outcome).toBe("ERROR");
     toolset.close();
   });
 });

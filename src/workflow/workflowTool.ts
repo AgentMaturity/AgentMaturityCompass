@@ -68,7 +68,7 @@ export function workflowTool(capability: SubagentCapability): ToolDefinition {
       // only moment at which nothing has been spent.
       const parsed = parseWorkflowPlan(raw);
       if (!parsed.ok) {
-        return { output: `[amc] workflow refused: ${parsed.reason}` };
+        return { ok: false, output: `[amc] workflow refused: ${parsed.reason}` };
       }
 
       const result = await runWorkflowPlan({
@@ -84,6 +84,8 @@ export function workflowTool(capability: SubagentCapability): ToolDefinition {
       });
 
       return {
+        // A plan with a failed or cancelled node did not do what was asked.
+        ok: result.failures.length === 0 && !result.cancelled,
         output: JSON.stringify({
           outputs: Object.fromEntries(result.outputs),
           failed: result.failures,

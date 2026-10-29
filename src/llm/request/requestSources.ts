@@ -295,6 +295,12 @@ export function resolveRequestSources(input: RequestSourceInput): RequestSourceR
     if (row === undefined) {
       return failure("unreconstructable", `surface entry names event ${entry.sourceEventId}, which is not in this session`, notes);
     }
+    // A tool call the assembler dropped (cut off at max_tokens, or by the stream ending) is signed as an
+    // `assistant/block` for the record, but it never ran and has no call id: it is not history a model can be
+    // sent. Projecting it made every later request in the session unassemblable (PXA-01).
+    if (row.event_type === "assistant/block" && entry.part.kind === "tool_use" && String(metaOf(row).stopReason ?? "").startsWith("dropped:")) {
+      continue;
+    }
     const bytes = readInto(row);
     if (!Buffer.isBuffer(bytes)) {
       return bytes;

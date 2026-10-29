@@ -69,11 +69,11 @@ export function toolhubPipelineTools(): readonly ToolDefinition[] {
       description: "Read a file from the workspace, capped at maxBytes.",
       body: (execution) => {
         const args = fsReadArgs.parse(execution.arguments);
-        return executeFsRead({
+        return { ok: true, ...executeFsRead({
           path: resolveToolPath(execution.workspace, args.path),
           maxBytes: args.maxBytes,
           simulate: simulated(execution)
-        });
+        }) };
       }
     }),
     defineTool({
@@ -82,11 +82,11 @@ export function toolhubPipelineTools(): readonly ToolDefinition[] {
       description: "Write a file into the workspace.",
       body: (execution) => {
         const args = fsWriteArgs.parse(execution.arguments);
-        return executeFsWrite({
+        return { ok: true, ...executeFsWrite({
           path: resolveToolPath(execution.workspace, args.path),
           content: args.content,
           simulate: simulated(execution)
-        });
+        }) };
       }
     }),
     ...(["status", "commit", "push"] as const).map((subcommand) =>
@@ -120,6 +120,7 @@ export function toolhubPipelineTools(): readonly ToolDefinition[] {
           ...(execution.idempotencyKey && execution.idempotencyHeader ? { idempotency: { header: execution.idempotencyHeader, key: execution.idempotencyKey } } : {}) });
         const output = sent === null ? response.body : sent.retokenize(response.body);
         return {
+          ok: response.status >= 200 && response.status < 300,
           output,
           // An HTTP status is not an exit code, and mapping it to one would
           // make a 404 read as a process that exited 404.

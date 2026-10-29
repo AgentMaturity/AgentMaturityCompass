@@ -64,7 +64,7 @@ export interface ToolCallsInput {
 
 /** What running a step's calls told the loop about the turn. */
 export interface ToolCallsResult {
-  /** A committed result asked the loop to finish the turn rather than ask again. */
+  /** Every call in the step committed a result that asks the loop to finish the turn (all-of, PXA-23). */
   readonly concluded: boolean;
   /** True when the run stopped because the step was cancelled. */
   readonly aborted: boolean;
@@ -158,7 +158,7 @@ export async function runToolCalls(input: ToolCallsInput): Promise<ToolCallsResu
     state.answerUnfinished();
     state.dispose();
   }
-  return { concluded: state.concluded, aborted: state.aborted };
+  return { concluded: state.concluded && state.allCommitted, aborted: state.aborted };
 }
 
 /** One tool call after the loop has decided how to describe it to the seam. */
@@ -193,6 +193,10 @@ class RunState {
 
   /** How far the contiguous, model-ordered commit has reached. */
   private committed = 0;
+
+  get allCommitted(): boolean {
+    return this.committed === this.input.calls.length;
+  }
 
   /** How many calls were handed to the seam. */
   private started = 0;
@@ -345,7 +349,8 @@ class RunState {
         content: outcome.content
       });
       for (const text of outcome.additionalContext ?? []) this.input.acceptContext(text);
-      this.concluded ||= outcome.concludesTurn === true;
+      // All-of: one concluding tool cannot end the turn over a sibling whose result the model has not yet read.
+      this.concluded = (this.committed === 0 || this.concluded) && outcome.concludesTurn === true;
       this.committed += 1;
     }
   }

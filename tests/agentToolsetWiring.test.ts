@@ -161,7 +161,7 @@ describe("the loop is offered the real tools", () => {
       name: "internal.only",
       actionClass: "READ_ONLY",
       description: "dispatched by other code, never by the model",
-      body: () => ({ output: "" })
+      body: () => ({ ok: true, output: "" })
     }));
 
     const names = (toolset.seam.schemas() ?? []).map((schema) => schema.name);

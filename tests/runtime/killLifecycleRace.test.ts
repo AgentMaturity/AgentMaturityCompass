@@ -36,7 +36,7 @@ test("a suspended agent's unbound call is denied even when the kill it saw is re
   suspendAgent(workspace, { agentId: AGENT, reason: "incident" });
   const effects: string[] = [];
   const registry = new ToolRegistry();
-  registry.define(defineTool({ name: "fixture.write", description: "fixture", actionClass: "WRITE_LOW", body: () => { effects.push("write"); return { output: "written" }; } }));
+  registry.define(defineTool({ name: "fixture.write", description: "fixture", actionClass: "WRITE_LOW", body: () => { effects.push("write"); return { ok: true, output: "written" }; } }));
   kill.remaining = 1;
   const outcome = await new ToolPipeline({ registry, workspace }).execute({ name: "fixture.write", agentId: AGENT, arguments: {}, requestedMode: "EXECUTE" });
   expect(outcome.denied).not.toBeNull();
@@ -51,7 +51,7 @@ test("a kill seen at intent is the one reason reported, and lifecycle admission 
   await activate(workspace, ownerActor(workspace));
   expect(lifecycleView(workspace, AGENT).state).toBe("active");
   const registry = new ToolRegistry();
-  registry.define(defineTool({ name: "fixture.write", description: "fixture", actionClass: "WRITE_LOW", body: () => ({ output: "written" }) }));
+  registry.define(defineTool({ name: "fixture.write", description: "fixture", actionClass: "WRITE_LOW", body: () => ({ ok: true, output: "written" }) }));
   vi.useFakeTimers({ toFake: ["Date"], now: Date.now() + 31 * 86_400_000 });
   kill.remaining = 2;
   const outcome = await new ToolPipeline({ registry, workspace }).execute({ name: "fixture.write", agentId: AGENT, arguments: {}, requestedMode: "EXECUTE" });

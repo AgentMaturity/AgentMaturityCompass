@@ -15,7 +15,7 @@ import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { digestField, type OutputDigest } from "../dataflow/tokenizer.js";
 import { outputDigestFor } from "../dataflow/tokenVault.js";
-import { freezeToolArguments } from "./toolArguments.js";
+import { argumentSchemaError, freezeToolArguments } from "./toolArguments.js";
 import type { ToolRegistry } from "./toolRegistry.js";
 import {
   DefiniteFailureError,
@@ -300,6 +300,9 @@ export class ToolPipeline {
         parentToken: input.parentToken ?? null,
         ...(input.signal === undefined ? {} : { signal: input.signal })
       };
+      // Before entry, approval and guards (PXA-22): an invalid call is a failed call, recorded, never one anyone is asked about.
+      const invalid = argumentSchemaError(definition.parameters, draft.arguments);
+      if (invalid !== null) return this.recordUnresolved(input, definition.actionClass, thrownOutcome(invalid));
 
       const gate = [...this.gates].reverse().find((candidate) => candidate.gates(draft.name));
       // A journaled sub-call must be admitted before its bound gate can ask. Other paths keep their existing entry order.
@@ -363,7 +366,10 @@ export class ToolPipeline {
    */
   private refuseUnresolved(input: ToolCallInput, actionClass: RecordedToolCall["actionClass"], reason: string,
     stage: "visibility" | "authorization" = "visibility"): ToolOutcome {
-    const outcome = denialOutcome({ stage, reason, guardLabel: null });
+    return this.recordUnresolved(input, actionClass, denialOutcome({ stage, reason, guardLabel: null }));
+  }
+
+  private recordUnresolved(input: ToolCallInput, actionClass: RecordedToolCall["actionClass"], outcome: ToolOutcome): ToolOutcome {
     const callId = input.callId ?? randomUUID();
     try {
       this.init.record?.({ token: `tok_${randomUUID()}`, callId, rootCallId: input.rootCallId ?? callId, name: input.name, agentId: input.agentId,
@@ -465,9 +471,11 @@ export class ToolPipeline {
 
   /** The body's result after the output filters. A filter may rewrite output and nothing else. */
   private bodyOutcome(execution: ToolExecution, result: ToolBodyResult): ToolOutcome {
+    // A body that states no result is a failed call, never a success by default (DXC-02).
+    if (typeof result.ok !== "boolean") throw new Error(`tool "${execution.name}" returned no ok status; recorded as a failed call`);
     const output = (this.init.filters ?? []).reduce((text, filter) => filter(text, execution), result.output);
     return {
-      ok: result.ok ?? true,
+      ok: result.ok,
       exitCode: result.exitCode ?? null,
       timedOut: result.timedOut ?? false,
       denied: null,

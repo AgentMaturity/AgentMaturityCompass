@@ -78,7 +78,7 @@ describe("L0-MON-01 drift alarms with a recorded response", () => {
         let bodyRuns = 0;
         const registry = new ToolRegistry();
         registry.define(defineTool({ name: s.thenCall.tool, actionClass: s.thenCall.actionClass, description: "fixture tool",
-          body: () => { bodyRuns += 1; return { output: "ran", effect: "applied" }; } }));
+          body: () => { bodyRuns += 1; return { ok: true, output: "ran", effect: "applied" }; } }));
         let journal: ActionJournal | undefined;
         const pipeline = new ToolPipeline({ registry, workspace: ws, journal: () => (journal ??= openActionJournal(ws)) });
         const outcome = await pipeline.execute({ name: s.thenCall.tool, agentId: "default", arguments: {}, requestedMode: "EXECUTE" });

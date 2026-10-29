@@ -43,6 +43,7 @@ describe("running a command", () => {
     const outcome = await h.run({ command: "echo hello" });
     expect(outcome.output).toContain("hello");
     expect(outcome.exitCode).toBe(0);
+    expect(outcome.ok).toBe(true);
   });
 
   it("returns stderr as well as stdout", async () => {
@@ -59,6 +60,18 @@ describe("running a command", () => {
     const outcome = await h.run({ command: "exit 42" });
     expect(outcome.exitCode).toBe(42);
     expect(outcome.denied).toBeNull();
+    // DXC-02/PXA-02: a failed command is a failed call, and the model reads its status.
+    expect(outcome.ok, "exit 42 is not a success").toBe(false);
+    expect(outcome.output).toContain("[amc: exit 42]");
+  });
+
+  it("refuses arguments outside the published schema before running anything (PXA-22)", async () => {
+    const h = harness();
+    const outcome = await h.run({ command: `touch ${JSON.stringify(join(h.workspace, "ran"))}`, timeoutMs: 600_001 });
+    expect(outcome.ok).toBe(false);
+    expect(outcome.denied).toBeNull();
+    expect(outcome.output).toMatch(/timeoutMs.*must be <= 600000/);
+    expect(existsSync(join(h.workspace, "ran"))).toBe(false);
   });
 
   it("runs in the workspace directory", async () => {
@@ -76,6 +89,7 @@ describe("what it inherits from the substrate", () => {
 
     expect(outcome.timedOut, "orthogonal to the exit code, as everywhere else").toBe(true);
     expect(outcome.output).toContain("killed after 300ms");
+    expect(outcome.ok, "a timed-out command is not a success").toBe(false);
   });
 
   it("kills the whole tree, not just the shell it started", async () => {

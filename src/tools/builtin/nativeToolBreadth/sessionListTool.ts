@@ -109,7 +109,7 @@ export function sessionListTool<P extends object>(spec: SessionListSpec<P>, sess
       const payload = spec.argsSchema.parse(execution.arguments);
       const rendered = spec.render(payload);
       if (execution.effectiveMode === "SIMULATE") {
-        return { output: `${rendered}\n[amc: SIMULATE ${spec.name}; not recorded]` };
+        return { ok: true, output: `${rendered}\n[amc: SIMULATE ${spec.name}; not recorded]` };
       }
       const sessionId = currentSession();
       const previous = readBoundList<object>(execution.workspace, sessionId, spec);
@@ -129,7 +129,7 @@ export function sessionListTool<P extends object>(spec: SessionListSpec<P>, sess
       const signed = signRecord(execution.workspace, { ...header, ...payload }, "monitor");
       allow({ recordSha256: signed.digestSha256, revision: header.revision });
       persistSignedRecord(sessionListPath(execution.workspace, sessionId, spec.fileName), signed);
-      return { output: `${rendered}\n[amc: ${spec.name} revision ${header.revision}, sha256 ${signed.digestSha256}]` };
+      return { ok: true, output: `${rendered}\n[amc: ${spec.name} revision ${header.revision}, sha256 ${signed.digestSha256}]` };
     })
   });
 }

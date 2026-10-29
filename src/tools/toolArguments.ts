@@ -1,3 +1,5 @@
+import { AjvJsonSchemaValidator } from "@modelcontextprotocol/sdk/validation/ajv";
+
 /**
  * Argument snapshotting for the tool pipeline.
  *
@@ -52,4 +54,28 @@ function deepFreeze<T>(value: T): T {
 export function freezeToolArguments(input: Record<string, unknown>): Readonly<Record<string, unknown>> {
   assertJsonSafe(input, "arguments");
   return deepFreeze(JSON.parse(JSON.stringify(input)) as Record<string, unknown>);
+}
+
+type SchemaValidator = ReturnType<AjvJsonSchemaValidator["getValidator"]>;
+/** One compiled validator per published schema, each in its own Ajv instance so one tool's `$id` never selects another's. */
+const validators = new WeakMap<object, SchemaValidator>();
+
+/**
+ * Why `args` do not satisfy a tool's published JSON schema, or null when they do (or no schema is published). Checked
+ * before any stage that spends something on the call (PXA-22): an approval for a call the body would reject is a
+ * question nobody should have been asked. A schema that does not compile fails closed.
+ */
+export function argumentSchemaError(schema: Record<string, unknown> | undefined, args: unknown): string | null {
+  if (schema === undefined) return null;
+  let validate = validators.get(schema);
+  if (validate === undefined) {
+    try {
+      validate = new AjvJsonSchemaValidator().getValidator(schema as Parameters<AjvJsonSchemaValidator["getValidator"]>[0]);
+    } catch (error: unknown) {
+      return `the published argument schema does not compile: ${error instanceof Error ? error.message : String(error)}`;
+    }
+    validators.set(schema, validate);
+  }
+  const result = validate(args);
+  return result.valid ? null : `arguments do not match the published schema: ${result.errorMessage ?? "invalid"}`;
 }

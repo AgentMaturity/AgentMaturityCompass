@@ -136,7 +136,7 @@ function httpPipeline(f: P104Fixture, endpoint: string, header: string, loseRepl
     if (reply.status !== 200) throw new Error(`Owned oracle HTTP status ${reply.status}`);
     const result = JSON.parse(reply.body) as { ref: string };
     if (loseReply) throw new Error("Owned provider applied payment before reply was lost");
-    return { output: reply.body, effect: "applied", externalRef: result.ref };
+    return { ok: true, output: reply.body, effect: "applied", externalRef: result.ref };
   });
   return { pipeline: p, executions };
 }
@@ -216,7 +216,7 @@ describe("P1-04 durable idempotency", () => {
         expect(execution.arguments.requestKey).toBe(key);
         const args = execution.arguments as typeof ARGS & { requestKey: string };
         const result = f.sor.pay(args.requestKey, { amount: args.amount, currency: args.currency, recipient: args.payee }, execution.executionId!);
-        return { output: result.ref ?? "", effect: "applied", externalRef: result.ref! };
+        return { ok: true, output: result.ref ?? "", effect: "applied", externalRef: result.ref! };
       });
       for (const args of [{ ...ARGS, requestKey: "model-one" }, { ...ARGS, requestKey: "model-two" }, { ...ARGS }, { ...ARGS, amount: "101" }]) {
         expect((await call(p, ARGUMENT_TOOL, args)).ok).toBe(true);

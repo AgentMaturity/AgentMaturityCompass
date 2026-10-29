@@ -84,7 +84,7 @@ export function searchTools(): readonly ToolDefinition[] {
         if (shown.length === 0 && !walked.truncated) {
           lines.push(`[amc: no files match ${args.pattern}]`);
         }
-        return { output: lines.join("\n") };
+        return { ok: true, output: lines.join("\n") };
       }
     }),
 
@@ -171,7 +171,7 @@ export function searchTools(): readonly ToolDefinition[] {
         if (lines.length === 0) {
           lines.push(`[amc: no matches for ${args.pattern}]`);
         }
-        return { output: lines.join("\n") };
+        return { ok: true, output: lines.join("\n") };
       }
     })
   ];

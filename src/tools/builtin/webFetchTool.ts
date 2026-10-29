@@ -59,7 +59,7 @@ export function webFetchTool(options: WebFetchToolOptions): ToolDefinition {
       const maxBytes = Math.min(args.maxBytes ?? policy.maxBytes, policy.maxBytes);
       if (execution.effectiveMode === "SIMULATE") {
         const url = admitUrl("web_fetch", args.url, policy);
-        return { output: `[amc: SIMULATE web_fetch ${url.href}; no request made]` };
+        return { ok: true, output: `[amc: SIMULATE web_fetch ${url.href}; no request made]` };
       }
       const response = await governedGet({
         tool: "web_fetch", url: args.url, policy, maxBytes,

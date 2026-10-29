@@ -151,7 +151,7 @@ export function askUserTool(options: AskUserToolOptions): ToolDefinition {
     },
     body: receiptedBody("NATIVE_ASK_USER", options.record, async (execution, allow) => {
       const args = argsSchema.parse(execution.arguments);
-      if (execution.effectiveMode === "SIMULATE") return { output: "[amc: SIMULATE ask_user; no question asked]" };
+      if (execution.effectiveMode === "SIMULATE") return { ok: true, output: "[amc: SIMULATE ask_user; no question asked]" };
       const answerer = options.answerer;
       if (!answerer) throw new NativeToolRefusal("ask_user", "no human answerer is composed for this session; ask_user never auto-answers");
 
@@ -192,7 +192,7 @@ export function askUserTool(options: AskUserToolOptions): ToolDefinition {
       writeFileAtomic(join(dir, `${record.questionId}.answer.json`), JSON.stringify({
         record: answer.record, digestSha256: answerSha256, signature: answer.signature, signer: "auditor"
       }, null, 2), 0o600);
-      return { output: `${answer.record.answer}\n[amc: signed answer to ${record.questionId}]` };
+      return { ok: true, output: `${answer.record.answer}\n[amc: signed answer to ${record.questionId}]` };
     })
   });
 }

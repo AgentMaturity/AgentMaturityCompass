@@ -207,7 +207,7 @@ export function fsTools(deps: FsToolDeps): readonly ToolDefinition[] {
         type: "object",
         properties: {
           path: { type: "string", description: "workspace-relative path" },
-          maxBytes: { type: "integer", description: "bytes to return before truncating" },
+          maxBytes: { type: "integer", minimum: 1, maximum: 10_000_000, description: "bytes to return before truncating" },
           offset: { type: "integer", minimum: 1, description: "1-based first line to return" },
           limit: { type: "integer", minimum: 1, maximum: 20000, description: "lines to return (default 2000)" }
         },
@@ -230,6 +230,7 @@ export function fsTools(deps: FsToolDeps): readonly ToolDefinition[] {
           ? `\n[amc: truncated at ${args.maxBytes} bytes; ${shown.length - slice.length} more]`
           : "";
         return {
+          ok: true,
           output: `${slice.toString("utf8")}${truncated}${lines === null ? "" : `\n${lines.trailer}`}`,
           bytes: slice.length
         };
@@ -258,7 +259,7 @@ export function fsTools(deps: FsToolDeps): readonly ToolDefinition[] {
         const after = Buffer.from(args.content, "utf8");
         const diff = before === null ? null : shownDiff(rel, before, after);
         if (simulated(execution)) {
-          return { output: withDiff(`SIMULATE fs.write ${args.path} (${after.length} bytes)`, diff?.text ?? ""), bytes: 0 };
+          return { ok: true, output: withDiff(`SIMULATE fs.write ${args.path} (${after.length} bytes)`, diff?.text ?? ""), bytes: 0 };
         }
         mkdirSync(dirname(full), { recursive: true });
         writeIfUnchanged(full, args.path, before, after);
@@ -270,7 +271,7 @@ export function fsTools(deps: FsToolDeps): readonly ToolDefinition[] {
           bytesBefore: before?.length ?? 0, bytesAfter: after.length, replacements: null,
           diffSha256: diff === null ? null : sha256Hex(diff.text), diffTruncated: diff?.truncated ?? false
         });
-        return { output: diff === null ? `created ${args.path}` : withDiff(`wrote ${args.path}`, diff.text), bytes: after.length };
+        return { ok: true, output: diff === null ? `created ${args.path}` : withDiff(`wrote ${args.path}`, diff.text), bytes: after.length };
       }
     }),
 
@@ -325,7 +326,7 @@ export function fsTools(deps: FsToolDeps): readonly ToolDefinition[] {
         const diff = shownDiff(rel, raw, after);
         const summary = `${plan.replacements} replacement${plan.replacements === 1 ? "" : "s"}`;
         if (simulated(execution)) {
-          return { output: withDiff(`SIMULATE fs.edit ${args.path} (${summary})`, diff.text), bytes: 0 };
+          return { ok: true, output: withDiff(`SIMULATE fs.edit ${args.path} (${summary})`, diff.text), bytes: 0 };
         }
         writeIfUnchanged(full, args.path, raw, after);
         ledger.recordRead(execution.agentId, full, after);
@@ -333,7 +334,7 @@ export function fsTools(deps: FsToolDeps): readonly ToolDefinition[] {
           path: rel, beforeSha256: sha256Hex(raw), afterSha256: sha256Hex(after), bytesBefore: raw.length,
           bytesAfter: after.length, replacements: plan.replacements, diffSha256: sha256Hex(diff.text), diffTruncated: diff.truncated
         });
-        return { output: withDiff(`edited ${args.path} (${summary})`, diff.text), bytes: after.length };
+        return { ok: true, output: withDiff(`edited ${args.path} (${summary})`, diff.text), bytes: after.length };
       }
     })
   ];

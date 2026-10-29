@@ -72,11 +72,11 @@ function pipelineWith(workspace: string, guards: "firewall" | "budget" | "both")
   const registry = new ToolRegistry();
   registry.define(defineTool({
     name: "deploy", actionClass: "DEPLOY", description: "deploys",
-    body: () => ({ output: "deployed" })
+    body: () => ({ ok: true, output: "deployed" })
   }));
   registry.define(defineTool({
     name: "read", actionClass: "READ_ONLY", description: "reads",
-    body: () => ({ output: "contents" })
+    body: () => ({ ok: true, output: "contents" })
   }));
   if (guards !== "budget") registry.guard("runtime-firewall", runtimeFirewallGuard(workspace));
   if (guards !== "firewall") registry.guard("budgets", budgetGuard(workspace));
