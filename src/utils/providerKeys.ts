@@ -31,7 +31,7 @@ const AMC_SECRET_ENV_PATTERN =
 const AGENT_FACING_AMC_ENV: readonly string[] = ["AMC_TOKEN"];
 
 /** Whether `name` is one of AMC's secret variables (AMC_TOKEN included: only a wrapped agent is meant to hold it). */
-export function isAmcSecretEnv(name: string): boolean {
+function isAmcSecretEnv(name: string): boolean {
   return AMC_SECRET_ENV_PATTERN.test(name);
 }
 
@@ -73,4 +73,19 @@ export function dummyProviderKeyEnv(): Record<string, string> {
     out[key] = "amc_dummy";
   }
   return out;
+}
+
+/**
+ * AMC secrets the runtime child itself needs: it signs its evidence with the workspace vault and reads AMC's credential
+ * store. The child is AMC, not a model command; its shells get an allow-listed environment without these.
+ */
+const RUNTIME_CHILD_AMC_SECRETS: readonly string[] = ["AMC_VAULT_PASSPHRASE", "AMC_VAULT_PASSPHRASE_FILE", "AMC_CREDENTIALS_FILE"];
+
+/** The SDK child's default environment (WP36, DXC-38): an allow-list, AMC's non-secret settings and the vault. */
+export function runtimeChildEnv(parent: NodeJS.ProcessEnv): NodeJS.ProcessEnv {
+  const env: NodeJS.ProcessEnv = commandEnv(parent);
+  for (const [key, value] of Object.entries(parent)) {
+    if (key.startsWith("AMC_") && value !== undefined && (!isAmcSecretEnv(key) || RUNTIME_CHILD_AMC_SECRETS.includes(key))) env[key] = value;
+  }
+  return env;
 }

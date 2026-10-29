@@ -14,7 +14,7 @@ import { NATIVE_AUDIO_INPUT_FORMAT, type NativeAudioPart } from "../attachments/
 import { advertisesNativeAudio, materializeAcpAudio, nativeAudioPartsToAcp } from "../acp/acpAudioInput.js";
 import { MAX_WIRE_LINE_BYTES } from "../wire/ndjsonFraming.js";
 import { forwardNativeShellWarnings } from "./nativeShellWarnings.js";
-import { commandEnv, isAmcSecretEnv } from "../utils/providerKeys.js";
+import { runtimeChildEnv } from "../utils/providerKeys.js";
 import { EXECUTION_API_VERSION, parseExecutionStatus, type ExecutionStatus } from "../execution/executionContract.js";
 import { admitVerifierReport, approveThroughCli, pendingApprovals, reportedExecution, runPinnedCli, type AMCNativeApproval,
   type AMCNativePendingApproval, type PinnedCli } from "./nativeCli.js";
@@ -78,8 +78,7 @@ export {
   /**
    * The child's environment beside a minimal base: PATH, HOME, user, locale and temp variables, the parent's non-secret
    * `AMC_*` settings (a monitor pin, AMC_HOME) and the vault passphrase and credential-file path the runtime needs.
-   * AMC_TOKEN and a parent lease are not inherited.
-   * Nothing else from the parent is inherited unless `inheritEnv` is true: pass a provider key here explicitly.
+   * Nothing else (AMC_TOKEN, a parent lease, a provider key) is inherited unless `inheritEnv` is true.
    */
   readonly env?: NodeJS.ProcessEnv;
   /** Opt in to merging the whole parent environment under `env` (the pre-WP36 default). */
@@ -297,21 +296,6 @@ interface PendingRequest {
   readonly timer: ReturnType<typeof setTimeout>;
 }
 
-/**
- * AMC secrets the runtime child itself needs: it signs its evidence with the workspace vault and reads AMC's credential
- * store. The child is AMC, not a model command; its shells get an allow-listed environment without these.
- */
-const RUNTIME_CHILD_AMC_SECRETS: readonly string[] = ["AMC_VAULT_PASSPHRASE", "AMC_VAULT_PASSPHRASE_FILE", "AMC_CREDENTIALS_FILE"];
-
-/** The SDK child's default environment (WP36, DXC-38): an allow-list, AMC's non-secret settings and the vault. */
-function runtimeChildEnv(): NodeJS.ProcessEnv {
-  const env: NodeJS.ProcessEnv = commandEnv(process.env);
-  for (const [key, value] of Object.entries(process.env)) {
-    if (key.startsWith("AMC_") && value !== undefined && (!isAmcSecretEnv(key) || RUNTIME_CHILD_AMC_SECRETS.includes(key))) env[key] = value;
-  }
-  return env;
-}
-
 /** Local operator client. This spawns the governed ACP runtime; it does not turn a bridge lease into execution authority. @public */
 export class AMCNativeClient {
   readonly workspace: string;
@@ -389,7 +373,7 @@ export class AMCNativeClient {
     }
     // The cold verifier must use the very same pinned executable, even if the caller edits its options array.
     this.command = Object.freeze([...command]) as readonly [string, ...string[]];
-    this.env = { ...(options.inheritEnv === true ? process.env : runtimeChildEnv()), ...options.env };
+    this.env = { ...(options.inheritEnv === true ? process.env : runtimeChildEnv(process.env)), ...options.env };
     this.agentId = options.agentId ?? "default";
     const args = [...this.command.slice(1), "acp", "--provider", options.provider];
     for (const [flag, value] of [["--model", options.model], ["--credential", options.credential],
