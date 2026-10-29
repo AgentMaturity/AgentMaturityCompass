@@ -6,7 +6,7 @@ import { LocalCredentialsService } from "../credentials/localCredentialsService.
 import { isActionClass } from "../governor/actionCatalog.js";
 import { loadVerifiedToolsConfigSnapshot } from "../toolhub/toolhubValidators.js";
 import type { NativeToolCapability } from "../agent/nativeToolCapabilities.js";
-import { discoverNativeMcpCatalog, nativeMcpToolName, type NativeMcpCatalog, type NativeMcpGrant, type NativeMcpServer } from "../mcp/nativeMcpClient.js";
+import { NATIVE_MCP_MAX_TOTAL_LIMIT_MS, discoverNativeMcpCatalog, nativeMcpToolName, type NativeMcpCatalog, type NativeMcpGrant, type NativeMcpServer } from "../mcp/nativeMcpClient.js";
 import type { ActionClass } from "../types.js";
 import { NativeMcpHttpRefused, nativeMcpHttpEndpoint, nativeMcpNotificationLifetime, validateNativeMcpHeaderNames } from "../mcp/nativeMcpHttpTransport.js";
 import { isNativeMcpProtocolVersion } from "../mcp/protocol/version.js";
@@ -26,6 +26,8 @@ interface StdioConfiguration {
   /** Child variable name -> AMC credential reference. Literal env is refused. */
   readonly envRefs?: Readonly<Record<string, string>>;
   readonly timeoutMs?: number;
+  /** Upper bound for one tools/call while server progress renews timeoutMs; pinned by the config digest. */
+  readonly maxTotalMs?: number;
   /** Exact protocol version; without it AMC probes server/discover and falls back to initialize. */
   readonly protocolVersion?: string;
 }
@@ -37,6 +39,7 @@ interface HttpConfiguration {
   /** Complete header value, such as a Bearer credential, resolved privately. */
   readonly headerRefs?: Readonly<Record<string, string>>;
   readonly timeoutMs?: number;
+  readonly maxTotalMs?: number;
   readonly notificationLifetimeMs?: number;
   readonly protocolVersion?: string;
   /** OAuth 2.1 per the MCP 2026-07-28 authorization spec; exclusive with headerRefs. */
@@ -91,12 +94,16 @@ export function loadNativeMcpConfiguration(path: string, expectedSha256?: string
   if (server.timeoutMs !== undefined && (typeof server.timeoutMs !== "number" || !Number.isSafeInteger(server.timeoutMs) || server.timeoutMs < 1 || server.timeoutMs > 300_000)) {
     return refuse("MCP server timeoutMs must be an integer from 1 through 300000.");
   }
+  if (server.maxTotalMs !== undefined && (typeof server.maxTotalMs !== "number" || !Number.isSafeInteger(server.maxTotalMs)
+    || server.maxTotalMs < ((server.timeoutMs as number | undefined) ?? 30_000) || server.maxTotalMs > NATIVE_MCP_MAX_TOTAL_LIMIT_MS)) {
+    return refuse("MCP server maxTotalMs must be an integer from timeoutMs (default 30000) through 3600000.");
+  }
   if (server.protocolVersion !== undefined && !isNativeMcpProtocolVersion(server.protocolVersion)) {
     return refuse("MCP server protocolVersion must be 2026-07-28 or a protocol version the installed MCP SDK supports.");
   }
   const http = server.transport === "streamable-http";
   if (http) {
-    if (!onlyKeys(server, ["transport", "id", "url", "origin", "headerRefs", "timeoutMs", "notificationLifetimeMs", "protocolVersion", "auth"]) || typeof server.url !== "string" || typeof server.origin !== "string") {
+    if (!onlyKeys(server, ["transport", "id", "url", "origin", "headerRefs", "timeoutMs", "maxTotalMs", "notificationLifetimeMs", "protocolVersion", "auth"]) || typeof server.url !== "string" || typeof server.origin !== "string") {
       return refuse("MCP HTTP requires explicit url and origin. Use headerRefs; literal headers and stdio fields are refused.");
     }
     try { nativeMcpHttpEndpoint(server.url, server.origin); }
@@ -108,7 +115,7 @@ export function loadNativeMcpConfiguration(path: string, expectedSha256?: string
     }
     if (server.auth !== undefined) validateOAuthConfiguration(server.auth, server.headerRefs);
   } else {
-    if ((server.transport !== undefined && server.transport !== "stdio") || !onlyKeys(server, ["transport", "id", "command", "args", "envRefs", "timeoutMs", "protocolVersion"])
+    if ((server.transport !== undefined && server.transport !== "stdio") || !onlyKeys(server, ["transport", "id", "command", "args", "envRefs", "timeoutMs", "maxTotalMs", "protocolVersion"])
       || typeof server.command !== "string" || !server.command.trim() || /[\x00-\x1f\x7f]/.test(server.command)) {
       return refuse("MCP server requires an id and executable. Use envRefs for credential references; literal env and unsupported server fields are refused.");
     }
@@ -198,6 +205,24 @@ export function requireReviewedNativeMcpGrants(loaded: LoadedNativeMcpConfigurat
   return { expectedCatalogDigest, grants, capabilities };
 }
 
+export interface ReviewedNativeMcpServer {
+  readonly config: LoadedNativeMcpConfiguration;
+  readonly review: ReturnType<typeof requireReviewedNativeMcpGrants>;
+}
+
+/** Several servers in one run, each with its own pinned bytes, digest and grants under the one signed allowlist and approval class. */
+export function reviewNativeMcpConfigurations(paths: readonly string[], pins: readonly string[] | undefined, workspace: string,
+  approvalClass: ActionClass): ReviewedNativeMcpServer[] {
+  if (pins !== undefined && pins.length !== paths.length) return refuse("Give one --mcp-config-sha256 per --mcp-config, in the same order.");
+  const reviewed: ReviewedNativeMcpServer[] = [];
+  for (const [index, path] of paths.entries()) {
+    const config = loadNativeMcpConfiguration(path, pins?.[index]);
+    if (reviewed.some(entry => entry.config.config.server.id === config.config.server.id)) return refuse("Each --mcp-config must name a distinct server id.");
+    reviewed.push({ config, review: requireReviewedNativeMcpGrants(config, workspace, approvalClass) });
+  }
+  return reviewed;
+}
+
 /** Values exist only in the private server launch object, never the config/receipt. */
 export async function resolveNativeMcpServer(config: NativeMcpConfiguration, options: {
   readonly workspace: string;
@@ -206,7 +231,8 @@ export async function resolveNativeMcpServer(config: NativeMcpConfiguration, opt
 }): Promise<NativeMcpServer> {
   const source = config.server;
   const references = source.transport === "streamable-http" ? source.headerRefs : source.envRefs;
-  const version = source.protocolVersion === undefined ? {} : { protocolVersion: source.protocolVersion };
+  const version = { ...(source.protocolVersion === undefined ? {} : { protocolVersion: source.protocolVersion }),
+    ...(source.maxTotalMs === undefined ? {} : { maxTotalMs: source.maxTotalMs }) };
   const server: NativeMcpServer = source.transport === "streamable-http"
     ? { transport: source.transport, id: source.id, url: source.url, origin: source.origin, ...version,
       ...(source.timeoutMs === undefined ? {} : { timeoutMs: source.timeoutMs }),
@@ -215,9 +241,12 @@ export async function resolveNativeMcpServer(config: NativeMcpConfiguration, opt
       ...(source.args === undefined ? {} : { args: source.args }), ...(source.timeoutMs === undefined ? {} : { timeoutMs: source.timeoutMs }) };
   if (server.transport === "streamable-http" && source.transport === "streamable-http" && source.auth) {
     try {
-      const { accessToken, receipt } = await resolveNativeMcpOAuth({ endpoint: nativeMcpHttpEndpoint(server.url, server.origin),
-        config: source.auth, store: oauthStore(options), timeoutMs: source.timeoutMs ?? 30_000, workspace: options.workspace });
-      return { ...server, headers: { Authorization: `Bearer ${accessToken}` }, auth: receipt };
+      const resolveToken = (signal?: AbortSignal) => resolveNativeMcpOAuth({ endpoint: nativeMcpHttpEndpoint(server.url, server.origin),
+        config: source.auth!, store: oauthStore(options), timeoutMs: source.timeoutMs ?? 30_000, workspace: options.workspace,
+        ...(signal ? { signal } : {}) });
+      const { accessToken, receipt } = await resolveToken();
+      // PXA-19: the transport renews a near-expiry bearer per request through the same issuer/resource-bound resolver.
+      return { ...server, headers: { Authorization: `Bearer ${accessToken}` }, auth: receipt, renewAuth: resolveToken };
     } catch (error) {
       if (isEgressRefusal(error)) throw error; // a typed preflight refusal, never an OAuth failure
       return refuse(oauthFailure(error));

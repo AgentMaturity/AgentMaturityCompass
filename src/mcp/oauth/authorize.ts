@@ -35,7 +35,10 @@ export interface NativeMcpOAuthReceipt {
 }
 
 const CALLBACK_TIMEOUT_MS = 5 * 60 * 1000;
-const REFRESH_MARGIN_MS = 60_000;
+/** A grant this close to expiry is refreshed before use, at mount and per request. */
+export const NATIVE_MCP_OAUTH_REFRESH_MARGIN_MS = 60_000;
+/** A peer refresher holds the credential lock for at most its token request; wait that long plus the normal lock wait. */
+const REFRESH_LOCK_SLACK_MS = 5_000;
 export const NATIVE_MCP_OAUTH_STEP_UPS = 2;
 
 const refuse = (message: string, code: "AUTH_REQUIRED" | "REFUSED" = "REFUSED"): never => { throw new NativeMcpOAuthRefused(message, code); };
@@ -187,23 +190,52 @@ export async function resolveNativeMcpOAuth(options: {
   readonly store: NativeMcpOAuthTokenStore;
   readonly timeoutMs: number;
   readonly workspace?: string;
+  /** Stops waiting only; a refresh already under way is still completed and stored. */
+  readonly signal?: AbortSignal;
 }): Promise<{ readonly accessToken: string; readonly receipt: NativeMcpOAuthReceipt }> {
   const { endpoint, config, store, timeoutMs } = options;
   const { resource, server, network } = await discover(endpoint, config, timeoutMs, options.workspace);
-  let grant = await store.load(server.issuer, resource.resource);
-  if (!grant || (config.clientId !== undefined && grant.clientId !== config.clientId)) {
-    return refuse(`MCP OAuth authorization is required (AUTH_REQUIRED). ${NATIVE_MCP_AUTHORIZE_HINT}`, "AUTH_REQUIRED");
-  }
-  if (grant.expiresAt !== undefined && Date.parse(grant.expiresAt) - REFRESH_MARGIN_MS <= Date.now()) {
-    if (!grant.refreshToken) return refuse(`MCP OAuth access token expired (AUTH_REQUIRED). ${NATIVE_MCP_AUTHORIZE_HINT}`, "AUTH_REQUIRED");
-    const token = await tokenRequest(server, { grant_type: "refresh_token", refresh_token: grant.refreshToken,
-      client_id: grant.clientId, resource: resource.resource }, network, timeoutMs);
-    // Refresh tokens rotate for public clients; keep the old one only when none was issued.
-    grant = { ...grant, accessToken: token.accessToken, scopes: token.scopes ?? grant.scopes,
-      ...(token.refreshToken ? { refreshToken: token.refreshToken } : {}), ...(token.expiresAt ? { expiresAt: token.expiresAt } : {}) };
-    await store.save(grant);
+  const usable = (grant: NativeMcpOAuthGrant | null): NativeMcpOAuthGrant => {
+    if (!grant || (config.clientId !== undefined && grant.clientId !== config.clientId)) {
+      return refuse(`MCP OAuth authorization is required (AUTH_REQUIRED). ${NATIVE_MCP_AUTHORIZE_HINT}`, "AUTH_REQUIRED");
+    }
+    return grant;
+  };
+  const due = (grant: NativeMcpOAuthGrant) => grant.expiresAt !== undefined
+    && Date.parse(grant.expiresAt) - NATIVE_MCP_OAUTH_REFRESH_MARGIN_MS <= Date.now();
+  let grant = usable(await store.load(server.issuer, resource.resource));
+  if (due(grant)) {
+    // PXA-18: double-checked under the store lock. A peer that refreshed first
+    // already advanced the grant, so its result is reused and the rotated-away
+    // refresh token is never redeemed twice. The work and its save run to
+    // completion even when the caller stops waiting: the authorization server
+    // may already have rotated the refresh token.
+    const refreshed = store.modify(server.issuer, resource.resource, async current => {
+      const latest = usable(current);
+      if (!due(latest)) return { result: latest };
+      if (!latest.refreshToken) return refuse(`MCP OAuth access token expired (AUTH_REQUIRED). ${NATIVE_MCP_AUTHORIZE_HINT}`, "AUTH_REQUIRED");
+      const token = await tokenRequest(server, { grant_type: "refresh_token", refresh_token: latest.refreshToken,
+        client_id: latest.clientId, resource: resource.resource }, network, timeoutMs);
+      // Refresh tokens rotate for public clients; keep the old one only when none was issued.
+      const next: NativeMcpOAuthGrant = { ...latest, accessToken: token.accessToken, scopes: token.scopes ?? latest.scopes,
+        ...(token.refreshToken ? { refreshToken: token.refreshToken } : {}), ...(token.expiresAt ? { expiresAt: token.expiresAt } : {}) };
+      return { grant: next, result: next };
+    }, timeoutMs + REFRESH_LOCK_SLACK_MS);
+    grant = await untilAborted(refreshed, options.signal);
   }
   return { accessToken: grant.accessToken, receipt: nativeMcpOAuthReceipt(grant) };
+}
+
+/** Stops waiting on abort without cancelling `work`, which keeps its own bounds. */
+function untilAborted<T>(work: Promise<T>, signal?: AbortSignal): Promise<T> {
+  if (!signal) return work;
+  work.catch(() => {});
+  return new Promise<T>((resolve, reject) => {
+    const abort = () => reject(new NativeMcpOAuthRefused("MCP OAuth refresh wait was cancelled; a completed refresh is still stored.", "AUTH_REQUIRED"));
+    if (signal.aborted) { abort(); return; }
+    signal.addEventListener("abort", abort, { once: true });
+    work.then(resolve, reject).finally(() => signal.removeEventListener("abort", abort));
+  });
 }
 
 /** authorization §Step-Up Authorization Flow: scope union, at most two re-authorizations, then a permanent failure. */
