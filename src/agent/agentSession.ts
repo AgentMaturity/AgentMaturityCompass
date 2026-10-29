@@ -98,6 +98,8 @@ export interface AgentSessionInit {
   readonly validation?: NativeValidationPlan;
   /** Bind approvals/extensions to the real owning session and its existing pipeline. */
   readonly bindTools?: (context: { readonly session: SessionService; readonly toolset: AgentToolset | null }) => AgentToolSeam;
+  /** Merged over every row of a new session (an experiment trial's case execution identity, GAP-WP04); refused on resume. */
+  readonly rowStamp?: Readonly<Record<string, unknown>>;
 }
 
 export type AgentPromptResult =
@@ -166,11 +168,14 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
       ...(init.leaseToken === undefined ? {} : { leaseToken: init.leaseToken }) });
     const sessionId = init.sessionId ?? randomUUID();
     // P2-02: in an opted-in workspace, messages and tool results are tokenized before any row is committed.
-    const session = redactingSessionFor(claimant === undefined ? new SessionService(workspace) : resumeSession({
+    if (init.rowStamp !== undefined && claimant !== undefined) throw new Error("A row stamp covers a whole new session; a resumed session cannot take one.");
+    const raw = claimant === undefined ? new SessionService(workspace) : resumeSession({
       workspace, sessionId, agentId: init.agentId,
       harnessVersion: init.harnessVersion, compositionDigest: init.compositionDigest,
       policyDigest: init.policyDigest, claimant
-    }).service);
+    }).service;
+    if (init.rowStamp !== undefined) raw.stampEveryRow(init.rowStamp);
+    const session = redactingSessionFor(raw);
     // The toolset writes its tool evidence into THIS session rather than into
     // `agentToolset`'s default `toolset-<agentId>`, which nothing ever starts --
     // so a run that actually called a tool left rows referencing a session with no

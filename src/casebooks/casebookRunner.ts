@@ -79,14 +79,21 @@ function sameExecution(meta: Record<string, unknown>, expected: CaseExecutionRef
   return !!claimed && typeof claimed === "object" && !Array.isArray(claimed) && canonicalize(claimed) === canonicalize(expected);
 }
 
-/** Tokens of llm_response rows; null unless every row reports complete usage (measuredUsage: totals win, aliases once). */
-function measuredTokens(events: readonly { event: EvidenceEvent; meta: Record<string, unknown> }[]): number | null {
-  const responses = events.filter(({ event }) => event.event_type === "llm_response");
+/** auditType of an experiment trial executor's start and settle rows for one case execution (src/experiments/trialExecutor.ts). */
+const CASE_TRIAL_AUDIT = "EXPERIMENT_CASE_TRIAL";
+const NATIVE_REQUEST_OUTCOMES = new Set(["request/response", "request/failure"]);
+
+/**
+ * Tokens of llm_response rows (and, for a bound native execution, its signed request outcomes); null unless every row
+ * reports complete usage (measuredUsage: totals win, aliases once). A failed request without usage leaves cost unknown.
+ */
+function measuredTokens(events: readonly { event: EvidenceEvent; meta: Record<string, unknown> }[], native: boolean): number | null {
+  const responses = events.filter(({ event }) => event.event_type === "llm_response" || (native && NATIVE_REQUEST_OUTCOMES.has(event.event_type)));
   // No attributable usage row is unknown cost, not zero cost.
   if (responses.length === 0) return null;
   let tokens = 0;
-  for (const { meta } of responses) {
-    const usage = measuredUsage(meta.usage, false);
+  for (const { event, meta } of responses) {
+    const usage = measuredUsage(meta.usage, event.event_type !== "llm_response");
     if (!usage.tokensKnown) return null;
     tokens += usage.tokens;
   }
@@ -101,8 +108,10 @@ function judgeCase(params: {
   /** Audit rows in the window not attributed to any case execution; a forbidden one fails every bound case. */
   unattributedAudits: readonly string[];
   correlationRatio: number | null;
+  /** Bound mode: the rows are one stamped execution, so native governed-call audits and request outcomes count. */
+  bound: boolean;
 }): { status: CaseRunStatus; reasons: string[] } {
-  const { kase, evidence, correlationRatio } = params;
+  const { kase, correlationRatio } = params;
   const failed: string[] = [];
   const unavailable: string[] = [];
   if ((kase.riskTier === "high" || kase.riskTier === "critical") && params.mode !== "sandbox") {
@@ -110,6 +119,15 @@ function judgeCase(params: {
   }
   for (const audit of kase.validators.forbiddenAudits) {
     if (params.unattributedAudits.includes(audit)) failed.push(`forbidden audit in the evidence window is not attributable to another execution: ${audit}`);
+  }
+  const isTrialRow = ({ event, meta }: { event: EvidenceEvent; meta: Record<string, unknown> }) => event.event_type === "audit" && meta.auditType === CASE_TRIAL_AUDIT;
+  const trialRows = params.bound ? params.evidence.filter(isTrialRow) : [];
+  const evidence = params.bound ? params.evidence.filter((row) => !isTrialRow(row)) : params.evidence;
+  // An executed trial that did not settle as completed (crash, timeout, refusal) is unavailable, whatever rows it left.
+  const settled = trialRows.filter(({ meta }) => meta.phase === "settled");
+  if (trialRows.length > 0 && (settled.length !== 1 || settled[0]!.meta.outcome !== "completed")) {
+    const reason = settled.length === 1 && typeof settled[0]!.meta.reason === "string" ? settled[0]!.meta.reason : "no single settled record";
+    return { status: failed.length > 0 ? "failed" : "unavailable", reasons: [...failed, `trial execution did not complete: ${reason}`] };
   }
   // Nothing ran: missing evidence is neither a pass nor a behavioural failure of any evidence validator.
   if (evidence.length === 0) return { status: failed.length > 0 ? "failed" : "unavailable", reasons: [...failed, "no execution evidence for case"] };
@@ -124,7 +142,9 @@ function judgeCase(params: {
   for (const audit of kase.validators.forbiddenAudits) {
     if (audits.includes(audit)) failed.push(`forbidden audit detected: ${audit}`);
   }
-  const toolActions = evidence.filter(({ event }) => event.event_type === "tool_action");
+  // A native governed call is a signed TOOL_CALL_ALLOWED spine row: its receipt is that row's signature and chain.
+  const toolActions = evidence.filter(({ event, meta }) => event.event_type === "tool_action"
+    || (params.bound && event.event_type === "audit" && meta.auditType === "TOOL_CALL_ALLOWED" && typeof meta.toolName === "string"));
   const toolNames = new Set(toolActions.map(({ meta }) => meta.toolName).filter((name): name is string => typeof name === "string"));
   for (const required of kase.validators.requiredToolActions) {
     if (!toolNames.has(required)) failed.push(`required tool action missing: ${required}`);
@@ -132,7 +152,7 @@ function judgeCase(params: {
   if (kase.validators.requireReceipts) {
     if (toolActions.length === 0) unavailable.push("no tool action receipt to verify");
     for (const { event } of toolActions) {
-      const verified = verifyEvidenceEventIntegrity({ ledger: params.ledger, eventId: event.id, requireReceipt: true });
+      const verified = verifyEvidenceEventIntegrity({ ledger: params.ledger, eventId: event.id, requireReceipt: event.event_type === "tool_action" });
       if (!verified.ok) failed.push(`tool action ${event.id} receipt did not verify`);
     }
   }
@@ -192,7 +212,7 @@ function runCasebookAtWindow(params: {
       } : null;
       // A legacy window cannot attribute rows to a case: every case sees the whole window and no case gets a cost.
       const own = ref ? evidence.filter(({ meta }) => sameExecution(meta, ref)) : evidence;
-      const judged = judgeCase({ ledger, mode: params.mode, kase, evidence: own, unattributedAudits, correlationRatio });
+      const judged = judgeCase({ ledger, mode: params.mode, kase, evidence: own, unattributedAudits, correlationRatio, bound: ref !== null });
       return {
         caseId: kase.caseId,
         title: kase.title,
@@ -202,7 +222,7 @@ function runCasebookAtWindow(params: {
         successPoints: judged.status === "unavailable" ? null : judged.status === "passed" ? kase.scoring.successPoints : 0,
         maxValuePoints: kase.scoring.valuePoints,
         reasons: judged.reasons,
-        costTokens: ref && own.length > 0 ? measuredTokens(own) : null,
+        costTokens: ref && own.length > 0 ? measuredTokens(own, true) : null,
         correlationRatio,
         execution: ref ? { ...ref, eventIds: own.map(({ event }) => event.id) } : null
       };

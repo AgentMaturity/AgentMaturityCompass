@@ -7779,15 +7779,16 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireRouteRoles(["OWNER", "OPERATOR"])) return;
         const experimentId = decodeURIComponent(experimentRunMatch[1] ?? "");
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
-        const parsed = (body ? JSON.parse(body) : {}) as { agentId?: unknown; mode?: unknown; candidateWindow?: unknown; candidateAgentId?: unknown } | null;
+        const parsed = (body ? JSON.parse(body) : {}) as { agentId?: unknown; mode?: unknown; candidateWindow?: unknown; candidateAgentId?: unknown; executeTrials?: { providerId?: unknown; model?: unknown; maxSteps?: unknown; limits?: unknown } } | null;
         if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) { json(res, 400, { error: "request body must be a JSON object" }); return; }
         if (parsed.agentId !== undefined && typeof parsed.agentId !== "string") { json(res, 400, { error: "agentId must be a string" }); return; }
-        if (typeof parsed.candidateWindow !== "string" || !parsed.candidateWindow.trim()) { json(res, 400, { error: "candidateWindow is required" }); return; }
+        const trials = parsed.executeTrials; if (trials !== undefined && (typeof trials !== "object" || trials === null || typeof trials.providerId !== "string" || (trials.model !== undefined && typeof trials.model !== "string") || (trials.maxSteps !== undefined && typeof trials.maxSteps !== "number") || (trials.limits !== undefined && (typeof trials.limits !== "object" || trials.limits === null)))) { json(res, 400, { error: "executeTrials must name a providerId (GAP-WP04); the runner validates model, steps and limits" }); return; }
+        if (trials === undefined && (typeof parsed.candidateWindow !== "string" || !parsed.candidateWindow.trim())) { json(res, 400, { error: "candidateWindow is required" }); return; }
         if (parsed.candidateAgentId !== undefined && (typeof parsed.candidateAgentId !== "string" || !parsed.candidateAgentId.trim())) { json(res, 400, { error: "candidateAgentId must be a non-empty string" }); return; }
         // The runner validates mode, window and candidate agent before any casebook work and throws ExperimentInputError.
         const out = await experimentRunCliAsync({ workspace: options.workspace, agentId: resolveAgentId(options.workspace, parsed.agentId ?? "default"),
-          experimentId, mode: (parsed.mode ?? "sandbox") as "supervise" | "sandbox", candidateWindow: parsed.candidateWindow, candidateAgentId: parsed.candidateAgentId
-        }, { beforePublish: signingAuthority(["OWNER", "OPERATOR"]) }).catch(error => {
+          experimentId, mode: (parsed.mode ?? "sandbox") as "supervise" | "sandbox", candidateWindow: parsed.candidateWindow as string | undefined, candidateAgentId: parsed.candidateAgentId,
+          ...(trials === undefined ? {} : { executeTrials: { providerId: trials.providerId as string, ...(trials.model === undefined ? {} : { model: trials.model as string }), ...(trials.maxSteps === undefined ? {} : { maxSteps: trials.maxSteps as number }), ...(trials.limits === undefined ? {} : { limits: trials.limits as Record<string, number> }) } }) }, { beforePublish: signingAuthority(["OWNER", "OPERATOR"]) }).catch(error => {
           if (res.headersSent) return null;
           if (error instanceof ExperimentInputError) { json(res, 400, { error: error.message, code: error.code }); return null; }
           if (respondReportSigningError(error, (status, result) => json(res, status, result))) return null; throw error;

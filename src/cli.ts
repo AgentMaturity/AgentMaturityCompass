@@ -13794,15 +13794,18 @@ experiment
   .description("Run deterministic experiment against signed casebook (exit 0 all candidate cases pass, 1 failure or error, 3 inconclusive)")
   .requiredOption("--experiment <id>", "experiment ID")
   .requiredOption("--mode <mode>", "supervise|sandbox")
-  .requiredOption("--candidate-window <window>", "evidence window covering the candidate's actual run")
+  .option("--candidate-window <window>", "evidence window covering the candidate's actual run (unless --execute-trials)")
   .option("--candidate-agent <agentId>", "candidate agent, if different from the baseline")
+  .option("--execute-trials", "execute the baseline and admitted candidate here over the held-out cases (native agent path)")
+  .option("--provider <id>", "trial provider for --execute-trials").option("--model <model>", "trial model").option("--max-steps <n>", "steps per trial", Number)
+  .option("--max-executions <n>", "trial executions bound", Number).option("--trial-timeout-ms <ms>", "time per trial", Number).option("--concurrency <n>", "concurrent trials", Number)
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
-  .action(async (opts: { experiment: string; mode: string; agent?: string; candidateWindow: string; candidateAgent?: string }) => {
-    await experimentRunCommandCli({
-      workspace: process.cwd(),
-      agentId: opts.agent ?? activeAgent(program),
-      experimentId: opts.experiment,
-      mode: opts.mode as "supervise" | "sandbox", /* the runner refuses any other mode; never coerced */ candidateWindow: opts.candidateWindow, candidateAgentId: opts.candidateAgent
+  .action(async (opts: { experiment: string; mode: string; agent?: string; candidateWindow?: string; candidateAgent?: string; executeTrials?: boolean; provider?: string; model?: string; maxSteps?: number; maxExecutions?: number; trialTimeoutMs?: number; concurrency?: number }) => {
+    const limits = { ...(opts.maxExecutions === undefined ? {} : { maxExecutions: opts.maxExecutions }), ...(opts.trialTimeoutMs === undefined ? {} : { trialTimeoutMs: opts.trialTimeoutMs }), ...(opts.concurrency === undefined ? {} : { concurrency: opts.concurrency }) };
+    if (opts.executeTrials && !opts.provider) throw new Error("--execute-trials requires --provider");
+    await experimentRunCommandCli({ workspace: process.cwd(), agentId: opts.agent ?? activeAgent(program), experimentId: opts.experiment,
+      mode: opts.mode as "supervise" | "sandbox", /* the runner refuses any other mode; never coerced */ candidateWindow: opts.candidateWindow, candidateAgentId: opts.candidateAgent,
+      ...(opts.executeTrials ? { executeTrials: { providerId: opts.provider!, ...(opts.model === undefined ? {} : { model: opts.model }), ...(opts.maxSteps === undefined ? {} : { maxSteps: opts.maxSteps }), limits } } : {})
     }, normalizeCliErrorMessage);
   });
 

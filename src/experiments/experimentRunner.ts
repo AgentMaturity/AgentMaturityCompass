@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { basename, join } from "node:path";
 import YAML from "yaml";
-import type { ExperimentReport } from "../types.js";
+import type { ExperimentExecution, ExperimentReport } from "../types.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import { getSigningKey, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
@@ -53,7 +53,7 @@ function experimentRunsDir(workspace: string, agentId: string, experimentId: str
   return join(experimentDir(workspace, agentId, experimentId), "runs");
 }
 
-function loadExperiment(workspace: string, agentId: string, experimentId: string): ExperimentFile {
+export function loadExperiment(workspace: string, agentId: string, experimentId: string): ExperimentFile {
   const file = experimentFilePath(workspace, agentId, experimentId);
   if (!pathExists(file)) {
     throw new Error(`experiment not found: ${file}`);
@@ -68,7 +68,7 @@ function saveExperiment(workspace: string, agentId: string, experiment: Experime
   return file;
 }
 
-function verifySignedCandidateFile(workspace: string, file: string): { valid: boolean; digestSha256: string; reason: string | null } {
+export function verifySignedCandidateFile(workspace: string, file: string): { valid: boolean; digestSha256: string; reason: string | null } {
   const sigPath = `${file}.sig`;
   if (!pathExists(file)) {
     return { valid: false, digestSha256: "", reason: "candidate file missing" };
@@ -243,18 +243,6 @@ export class ExperimentInputError extends Error {
   constructor(message: string) { super(message); this.name = "ExperimentInputError"; }
 }
 
-/**
- * Compares a baseline run against a candidate run.
- *
- * Both sides must be real: casebook results are computed from evidence in the
- * ledger, so the candidate configuration has to have actually run and produced
- * evidence. Previously the candidate was never executed — its outcomes were the
- * baseline's plus deterministic jitter — so every "candidate improves on
- * baseline by X%" figure was invented.
- *
- * @throws when no candidate evidence window is supplied, because AMC cannot
- * execute a candidate configuration itself.
- */
 const EXPERIMENT_METHOD_VERSION = "casebook-paired/2";
 
 type CasebookSide = ReturnType<typeof runCasebook>;
@@ -286,8 +274,8 @@ function costPerSuccess(costs: Array<number | null>, successes: number): number 
  * window starts so the two sides never read the same evidence. Rates and statistics use only paired cases (determinate
  * on both sides); excluded cases are counted, never scored.
  *
- * @throws when no candidate evidence window is supplied, because AMC cannot
- * execute a candidate configuration itself; when the casebook is empty; or when no case is determinate on both sides.
+ * @throws when no candidate evidence window is supplied (trials AMC executes itself, `--execute-trials`, supply their
+ * own); when the casebook is empty; or when no case is determinate on both sides.
  */
 function prepareExperimentReport(params: {
   workspace: string;
@@ -304,6 +292,8 @@ function prepareExperimentReport(params: {
   /** Bound trials: the trial identities stamped on each side's case execution rows. Both or neither. */
   baselineTrialId?: string;
   candidateTrialId?: string;
+  /** Provenance of trials AMC executed itself; sealed into the report. */
+  execution?: ExperimentExecution;
 }) {
   const agentId = resolveAgentId(params.workspace, params.agentId);
   const experiment = loadExperiment(params.workspace, agentId, params.experimentId);
@@ -317,9 +307,9 @@ function prepareExperimentReport(params: {
   }
   if (!params.candidateWindow) {
     throw new ExperimentInputError(
-      "Experiment requires a candidate evidence window (--candidate-window). " +
-        "AMC cannot execute a candidate configuration itself, so the candidate must " +
-        "have run and produced evidence; synthesizing its outcomes would fabricate the comparison."
+      "Experiment requires a candidate evidence window (--candidate-window), or --execute-trials to run both " +
+        "configurations here; the candidate must have run and produced evidence, and synthesizing its outcomes " +
+        "would fabricate the comparison."
     );
   }
   try { parseWindowToMs(params.candidateWindow); }
@@ -416,6 +406,7 @@ function prepareExperimentReport(params: {
   if (candidateSuccesses === 0) warnings.push("Candidate has zero successful cases; tokens per success are unavailable.");
   if (paired.some(row => row.baselineCost === null || row.candidateCost === null)) warnings.push("Token usage is missing for at least one paired case; cost per success is unavailable on the affected side.");
   if (!trials) warnings.push("Legacy window evidence is not bound to case, trial and configuration identities and cannot support promotion.");
+  if (params.execution) warnings.push(`Executed trials cover the ${params.execution.caseIds.length} held-out case(s) only; ${cases.length - params.execution.caseIds.length} search-split case(s) were not executed.`);
   if (candidateAgentId === agentId && Math.max(baselineRange.startedTs, candidateRange.startedTs) <= Math.min(baselineRange.endedTs, candidateRange.endedTs)) {
     warnings.push("Same-agent baseline and candidate windows overlap; comparability depends on distinct, correctly attributed trial identities.");
   }
@@ -434,6 +425,7 @@ function prepareExperimentReport(params: {
     costUnit: "tokens" as const,
     valueUnit: "points" as const,
     warnings,
+    ...(params.execution ? { execution: params.execution } : {}),
     experimentId: experiment.experiment.experimentId,
     agentId,
     ts: Date.now(),
@@ -539,6 +531,7 @@ export function runExperiment(params: {
   /** Bound trials (both or neither): see prepareExperimentReport. */
   baselineTrialId?: string;
   candidateTrialId?: string;
+  execution?: ExperimentExecution;
 }): { report: ExperimentReport; jsonPath: string; mdPath: string } {
   const prepared = prepareExperimentReport(params), { agentId, base, runsDir, jsonPath, mdPath } = prepared;
   const reportJsonSha256 = sha256Hex(canonicalize(base));
@@ -555,7 +548,7 @@ export function runExperiment(params: {
 export async function runExperimentAsync(params: Parameters<typeof runExperiment>[0], options: { beforePublish?: () => void } = {}): Promise<ReturnType<typeof runExperiment>> {
   const input = { workspace: params.workspace, agentId: params.agentId, experimentId: params.experimentId, mode: params.mode,
     candidateWindow: params.candidateWindow, candidateAgentId: params.candidateAgentId,
-    baselineTrialId: params.baselineTrialId, candidateTrialId: params.candidateTrialId }, beforePublish = options.beforePublish;
+    baselineTrialId: params.baselineTrialId, candidateTrialId: params.candidateTrialId, execution: params.execution }, beforePublish = options.beforePublish;
   beforePublish?.();
   // All original authorities precede the first await. Log policy does not choose or replace the raw report purpose.
   const captured = capturePurposePublication(input.workspace, "artifact-seal");

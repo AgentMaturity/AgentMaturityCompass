@@ -5048,6 +5048,13 @@ Run deterministic experiment against signed casebook (exit 0 all candidate cases
 | `--mode <mode>` | - |
 | `--candidate-window <window>` | - |
 | `--candidate-agent <agentId>` | - |
+| `--execute-trials` | - |
+| `--provider <id>` | - |
+| `--model <model>` | - |
+| `--max-steps <n>` | - |
+| `--max-executions <n>` | - |
+| `--trial-timeout-ms <ms>` | - |
+| `--concurrency <n>` | - |
 | `--agent <agentId>` | - |
 
 #### `amc experiment set-baseline`

@@ -105,6 +105,16 @@ export abstract class SessionEventWriter {
     return this.sessionIdValue;
   }
 
+  // Fields merged over every row this writer appends, after the row's own meta so no row can restate them (GAP-WP04:
+  // an experiment trial's case execution identity, which a bound casebook run matches exactly).
+  private rowStamp: Readonly<Record<string, unknown>> | null = null;
+
+  /** Stamp every row of this session. Set once, before `open()`: a stamp covering only part of a session is refused. */
+  stampEveryRow(stamp: Readonly<Record<string, unknown>>): void {
+    if (this.sessionIdValue !== null || this.rowStamp !== null) throw new Error("A session row stamp is set once, before the session opens.");
+    this.rowStamp = Object.freeze({ ...stamp });
+  }
+
   protected recordContent(spec: {
     readonly eventType: EvidenceEventType;
     readonly content: string | Buffer;
@@ -184,7 +194,7 @@ export abstract class SessionEventWriter {
     const released = spec.eventType === "session/release" || spec.eventType === "session/close";
     const claim = spec.eventType === "session/open" || spec.eventType === "session/resume";
     const writer = sessionWriterMeta({ ...this.writerOwner, epoch: this.epoch, leaseMs: DEFAULT_SESSION_LEASE_MS }, released);
-    const meta = embedEnvelope({ trustTier: NATIVE_TRUST_TIER, ...spec.typeMeta, [SESSION_WRITER_META]: writer }, envelope);
+    const meta = embedEnvelope({ trustTier: NATIVE_TRUST_TIER, ...spec.typeMeta, ...this.rowStamp, [SESSION_WRITER_META]: writer }, envelope);
     const input: SessionStoreAppendInput = {
       sessionId,
       runtime: this.runtime,
