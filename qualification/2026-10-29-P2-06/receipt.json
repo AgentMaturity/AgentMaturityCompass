@@ -68,6 +68,11 @@
       "cmd": "node scripts/check-freeze.mjs --base-ref cafe5751f (no new CLI command; the default origin/main base fails on other items' keys, pre-existing)",
       "exit": 0,
       "durationMs": 0
+    },
+    {
+      "cmd": "rerun at 58bbdff83: docker build N with the repository Dockerfile (no patch), N-1 545bfe98c with the two patches; node scripts/qualify-reference-deployment.mjs ... --out kind-rerun (no workaround)",
+      "exit": 1,
+      "durationMs": 1961358
     }
   ],
   "tests": {
@@ -184,6 +189,106 @@
     {
       "path": "kind-diagnostic/reference-deployment.json",
       "sha256": "ba6d01f1fe17855fbd75cf0e310080bd90bac29f85eeb23a8d5110d0a3195a44"
+    },
+    {
+      "path": "kind-rerun/checks/BR-1.json",
+      "sha256": "d64b73baaf39ffc27ded01f89b6c20d9d82f15fb8b042715a79f85e32c61bc4d"
+    },
+    {
+      "path": "kind-rerun/checks/BR-2.json",
+      "sha256": "9ab9d2d9c6604078227fd715e3b365e51c97db8e476e68d9864bd14ab6f60ebc"
+    },
+    {
+      "path": "kind-rerun/checks/BR-3.json",
+      "sha256": "dfd9daa48a33bd73dfcac8294cbdf8fbf636505a86b289404bfcc0ed9587fd15"
+    },
+    {
+      "path": "kind-rerun/checks/CR-1.json",
+      "sha256": "a5200073a81ebbb1afd13c0cbcca1a8ee9fd701f459f72d6294e42c0986b5b90"
+    },
+    {
+      "path": "kind-rerun/checks/CR-2.json",
+      "sha256": "8f771137ba934c60249c24b803e64483cbd78746208874f7852f19f926457a5b"
+    },
+    {
+      "path": "kind-rerun/checks/CR-3.json",
+      "sha256": "af662898b79a591c4e9432360cefb76c1f8d41da99c25acb4f4edd515e85a289"
+    },
+    {
+      "path": "kind-rerun/checks/CR-4.json",
+      "sha256": "5ec235c9d0b47de43176c4dc7a81240a86d5e7536bab543cddfe94e6a1ea6608"
+    },
+    {
+      "path": "kind-rerun/checks/CR-5.json",
+      "sha256": "81c22235d8c57e2aaef99bb0f09069bfc3a0717c6137912338040d39962d1323"
+    },
+    {
+      "path": "kind-rerun/checks/CR-6.json",
+      "sha256": "3f653b527b1984333ea78dcda43b3ae9d1690c54e210a17e9facefad67fbd1d3"
+    },
+    {
+      "path": "kind-rerun/checks/INS-1.json",
+      "sha256": "00401aae2f178c517be3f3d02e38704e3efeb101f1fe731c917d3aaad9c25f41"
+    },
+    {
+      "path": "kind-rerun/checks/INS-2.json",
+      "sha256": "e110d49f61e67bf46444db8c165640b450b498ad91e05bfad59bd5df802c1563"
+    },
+    {
+      "path": "kind-rerun/checks/OV-1.json",
+      "sha256": "8e5912bf9f396c92e5e0483760a1c779f4a21fd0482fbf19bbaf79470020e8db"
+    },
+    {
+      "path": "kind-rerun/checks/OV-2.json",
+      "sha256": "def74dae6672d322bdc0cb93b9b4f03cf2b5ba0d1a7a2391a3051e1acab5dd94"
+    },
+    {
+      "path": "kind-rerun/checks/RB-1.json",
+      "sha256": "e6a63991e708c97f4113cdd73be27bf6ef8fded2ddd8caee09234418a9766de3"
+    },
+    {
+      "path": "kind-rerun/checks/RB-2.json",
+      "sha256": "4bd8f7292052b9a67b4d57f6711186406c2acc129a9e4a79184ae1ad266d568b"
+    },
+    {
+      "path": "kind-rerun/checks/TS-1.json",
+      "sha256": "5c99a63063b98d4b1e1bc30017a569cb3071fb9d8ad0d7a22214d18cd958a460"
+    },
+    {
+      "path": "kind-rerun/checks/TS-2.json",
+      "sha256": "6476a610b59c49f5e1b2a063ea6e924efa4a6a0731cab047c9bd36b96de71a8e"
+    },
+    {
+      "path": "kind-rerun/checks/TS-3.json",
+      "sha256": "cefecee0eae43858ef725e1677bebcd79777df90e11d6568058c79a96272ddb8"
+    },
+    {
+      "path": "kind-rerun/checks/TS-4.json",
+      "sha256": "8412031b966ec70ad2090975abd1ab082face57ca29d6035ed20225f3b0909b9"
+    },
+    {
+      "path": "kind-rerun/checks/TS-5.json",
+      "sha256": "1252629a0edfaddb075380527fa959e8f90903fd8681840e2ff0becfea23ac31"
+    },
+    {
+      "path": "kind-rerun/checks/UPG-1.json",
+      "sha256": "cea86d043c21980f99840729ffdf55375b4db34d8d13d874de158287d097cda9"
+    },
+    {
+      "path": "kind-rerun/checks/UPG-2.json",
+      "sha256": "e93898efe185771a96f5932af19f2c2f889afbcb6e1408597f87b5d98c9a968d"
+    },
+    {
+      "path": "kind-rerun/commands.json",
+      "sha256": "599468eb401fece55ffb730cb078ce22c88679944bc4ef48412a3bb24007379c"
+    },
+    {
+      "path": "kind-rerun/receipt.json",
+      "sha256": "df79cec1c7f73a7445017622e7c50551be9982508e8a593f179eee023738bfca"
+    },
+    {
+      "path": "kind-rerun/reference-deployment.json",
+      "sha256": "cbdc7dc956b18830b090ed01f1f9cbdb3253813539f6e3f9e2db3aa58a79bc71"
     },
     {
       "path": "kind/checks/BR-1.json",
@@ -366,5 +471,5 @@
       "sha256": "6db5ebc791cda9ceaffe42b4ba7810baefa931fc9452ab05a43d977a84d638f2"
     }
   ],
-  "notes": "The reference deployment is not qualified. The image builds exit 1 on the repository Dockerfile (defects D1 and D3); the two harness runs exit 1 by design until every check passes: the qualification run passed 1 of 22 checks (D2 keeps Studio NotReady), the diagnostic run with an operator workaround for D2 passed 6 of 22. Recovery targets were an engineering placeholder, so BR-2 did not run. durationMs 0 means the duration was not recorded. See README.md."
+  "notes": "The reference deployment is not qualified. The image builds exit 1 on the repository Dockerfile (defects D1 and D3); the two harness runs exit 1 by design until every check passes: the qualification run passed 1 of 22 checks (D2 keeps Studio NotReady), the diagnostic run with an operator workaround for D2 passed 6 of 22. Recovery targets were an engineering placeholder, so BR-2 did not run. durationMs 0 means the duration was not recorded. See README.md. Rerun at 58bbdff83 (kind-rerun/): N built unpatched; same totals (1 of 22) because the harness installs N-1 first and runs restores with N-1 (harness defects H1, H2 in README.md)."
 }

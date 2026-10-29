@@ -56,3 +56,28 @@ UPG-2 (no failing-migration test image yet), BR-2 (targets not agreed), CR-1 (P1
 ## Mutations
 
 `mutations.json`: seven guard mutations (M1 to M7) and one red/green run (R1), each killed by at least one test.
+
+## Rerun after the D1-D4 fixes (base `58bbdff83`)
+
+Folder `kind-rerun/`, harness as committed at `58bbdff83`, no operator workaround, the same placeholder targets.
+
+- Image N: `58bbdff83` built with the repository Dockerfile and **no local patch**; the build passed, so D1 and D3 no longer need a patch. Digest `amc-studio@sha256:3ea4798c…` (containerd import).
+- Image N-1: still `545bfe98c` with the same two local patches as before (manifests copy, `chmod 0700`). Digest `amc-studio@sha256:8f1883f5…`.
+
+| Check | First run (`kind/`) | Rerun (`kind-rerun/`) |
+|---|---|---|
+| INS-1 | failed (not Ready, D2) | failed (not Ready: `VALUE_POLICY_UNTRUSTED: file missing`) |
+| INS-2 | passed | passed |
+| UPG-1, RB-1, BR-1, CR-2 | failed (Studio never Ready) | failed (same cause) |
+| BR-3 | failed (cross-tenant restore changed the tenant) | failed (same) |
+| RB-2 | not run (UPG-1 left no backup) | not run (same) |
+| other 14 | not run | not run (same reasons) |
+
+Totals are unchanged: 1 passed, 6 failed, 15 not run.
+
+The D2, D4 and D1/D3 fixes are not what this run measures. These are two harness defects, found by this rerun and not fixed here:
+
+- **H1, INS-1 installs N-1.** INS-1 installs `--image-a`, and N-1 (`545bfe98c`) predates the D2 fix. The fresh workspace is created by N-1, which never writes the value policy, so the cascade of the first run repeats. N's own fresh-install path (where D2 was fixed) is never exercised on a fresh volume: N only meets a volume N-1 created, and never reaches it because UPG-1's seeding fails first. Root cause: the matrix order "install N-1, then upgrade to N" makes N-1's defects gate every later check. To qualify N, either INS-1 installs N on its own release before the upgrade path, or N-1 must be a build that already contains the D2 fix.
+- **H2, restores run N-1 code.** `prepareRestoreNamespace` and RB-2 start their tool pods with `--image-a` (`checks/backup.mjs`, `checks/rollback.mjs`), so BR-1 and BR-3 run N-1's `amc backup restore`, which predates the D4 fix. The restored ledger shows schema migrations 1 to 14 (N-1's), confirming it. BR-3's `tenantChanged: true` therefore says nothing about N's D4 fix. Root cause: the tool-pod image is tied to the image the release runs after RB-2 (N-1), not to the image under qualification.
+
+Platform lanes were not rerun, so `docs/PLATFORM_MATRIX.md` is unchanged.
