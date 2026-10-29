@@ -11,6 +11,8 @@ import { assertOrgPairsCurrent, captureOrgPairs, orgPairBytes, prepareOrgPairsAs
 import { verifyAuditorSignatureBytes } from "../org/orgSignatureBytes.js";
 import { loadSessionEventHistory } from "../session/sessionEventHistory.js";
 import { assertSessionOwnerAvailable, readSessionWriter } from "../session/sessionOwnership.js";
+import { MAX_GOAL_ROUNDS } from "./goalRounds.js";
+import { calendarScheduleSchema, nextCalendarOccurrence } from "./scheduleCalendar.js";
 
 /**
  * Durable schedules (plan P6.1d).
@@ -42,6 +44,7 @@ import { assertSessionOwnerAvailable, readSessionWriter } from "../session/sessi
 
 /** Consecutive failures after which a schedule stops asking to run. */
 export const MAX_CONSECUTIVE_FAILURES = 3;
+const SCHEDULE_SCHEMA_VERSION = 2;
 
 const scheduleIdSchema = z.string().min(1).max(128).refine(
   value => !["__proto__", "prototype", "constructor"].includes(value), "reserved schedule id"
@@ -51,12 +54,25 @@ const scheduleSchema = z.object({
   runAs: z.string().min(1).max(128),
   goal: z.string().min(1).max(65_536),
   /** The ceiling for this schedule's goal-rounds driver. */
-  maxRounds: z.number().int().min(1).max(Number.MAX_SAFE_INTEGER),
+  maxRounds: z.number().int().min(1).max(MAX_GOAL_ROUNDS),
   /** Cadence. The soonest a schedule may run again after being claimed. */
-  everyMs: z.number().int().min(1_000).max(Number.MAX_SAFE_INTEGER),
+  everyMs: z.number().int().min(60_000).max(Number.MAX_SAFE_INTEGER).optional(),
+  calendar: calendarScheduleSchema.optional(),
+  title: z.string().trim().min(1).max(120).optional(),
+  maxConsecutiveExhausted: z.number().int().min(1).max(MAX_GOAL_ROUNDS).default(3),
+  objective: z.object({
+    version: z.literal(1),
+    ownerPrincipal: z.string().trim().min(1).max(128),
+    completionCheck: z.object({
+      kind: z.literal("file-sha256"),
+      path: z.string().min(1).max(4096).refine(value => value.split("/").every(part => /^(?!\.{1,2}$)[A-Za-z0-9._-]{1,255}$/.test(part)), "completion path must use plain relative workspace path segments"),
+      sha256: z.string().regex(/^[a-f0-9]{64}$/)
+    }).strict()
+  }).strict().optional(),
   enabled: z.boolean().default(true),
   scope: z.array(z.string()).optional()
-}).strict().refine(schedule => schedule.scope === undefined || parseDelegationScope(schedule.scope).ok,
+}).strict().refine(schedule => (schedule.everyMs === undefined) !== (schedule.calendar === undefined),
+  "exactly one of everyMs or calendar is required").refine(schedule => schedule.scope === undefined || parseDelegationScope(schedule.scope).ok,
   "scope must name a nonempty set of valid action classes");
 
 const schedulesSchema = z.array(scheduleSchema).max(256).refine(
@@ -65,6 +81,8 @@ const schedulesSchema = z.array(scheduleSchema).max(256).refine(
 );
 
 export type Schedule = z.infer<typeof scheduleSchema>;
+
+export function parseScheduleDefinition(input: unknown): Schedule { return scheduleSchema.parse(input); }
 
 const stateSchema = z.object({
   schedules: z.record(
@@ -76,8 +94,10 @@ const stateSchema = z.object({
       inFlightSince: z.number().int().min(0).max(Number.MAX_SAFE_INTEGER).nullable(),
       claimId: z.string().min(1).nullable().default(null),
       consecutiveFailures: z.number().int().min(0).max(Number.MAX_SAFE_INTEGER),
+      consecutiveExhausted: z.number().int().min(0).max(Number.MAX_SAFE_INTEGER).default(0),
       lastOutcome: z.object({ claimId: z.string(), ok: z.boolean(), summary: z.string(), sessionId: z.string().optional(),
-        reason: z.literal("interrupted").optional(), auditPath: z.string().optional() }).nullable().default(null)
+        reason: z.literal("interrupted").optional(), auditPath: z.string().optional(),
+        outcome: z.enum(["completed", "exhausted", "failed"]).optional() }).nullable().default(null)
     }).strict()
   )
 }).strict();
@@ -100,7 +120,7 @@ export function scheduleLockPath(workspace: string): string {
 
 class ScheduleStoreBusyError extends Error {}
 
-function withStoreLock<T>(workspace: string, operation: () => T): T {
+export function withStoreLock<T>(workspace: string, operation: () => T): T {
   ensureDir(join(workspace, ".amc"));
   let fd: number;
   try { fd = openSync(scheduleLockPath(workspace), "wx", 0o600); }
@@ -124,7 +144,7 @@ function assertClock(now: number): void {
 
 function writeSchedules(workspace: string, schedules: readonly unknown[]): void {
   const parsed = schedulesSchema.parse(schedules);
-  writeFileAtomic(schedulesPath(workspace), YAML.stringify({ schedules: parsed }), 0o644);
+  writeFileAtomic(schedulesPath(workspace), YAML.stringify({ version: SCHEDULE_SCHEMA_VERSION, schedules: parsed }), 0o644);
   signFileWithAuditor(workspace, schedulesPath(workspace));
 }
 
@@ -172,7 +192,7 @@ export function readSchedules(workspace: string): ReadSchedules {
       };
     }
     if (bytes !== readUtf8(path)) throw new Error("schedule configuration changed during verification");
-    const parsed = z.object({ schedules: schedulesSchema.default([]) }).strict()
+    const parsed = z.object({ version: z.literal(SCHEDULE_SCHEMA_VERSION).optional(), schedules: schedulesSchema.default([]) }).strict()
       .parse(YAML.parse(bytes) ?? {});
     return { ok: true, schedules: parsed.schedules, digest: createHash("sha256").update(bytes).digest("hex") };
   } catch (error) {
@@ -211,7 +231,30 @@ function writeState(workspace: string, state: ScheduleState): void {
 
 function entryFor(state: ScheduleState, id: string) {
   return Object.hasOwn(state.schedules, id) ? state.schedules[id]!
-    : { lastClaimedTs: null, inFlightSince: null, claimId: null, consecutiveFailures: 0, lastOutcome: null };
+    : { lastClaimedTs: null, inFlightSince: null, claimId: null, consecutiveFailures: 0, consecutiveExhausted: 0, lastOutcome: null };
+}
+
+/** Same claim and signed policy must still authorize each next round and terminal transition. */
+export function assertScheduleClaim(workspace: string, scheduleId: string, claimId: string, configDigest: string): Schedule {
+  assertScheduleOwner(workspace);
+  const read = readSchedules(workspace);
+  if (!read.ok) throw new Error(read.reason);
+  if (read.digest !== configDigest) throw new Error("Signed schedule authority changed during execution; no further round is authorized.");
+  const schedule = read.schedules.find(item => item.id === scheduleId);
+  const entry = entryFor(readState(workspace), scheduleId);
+  if (!schedule?.enabled || entry.inFlightSince === null || entry.claimId !== claimId) throw new Error("No matching enabled schedule claim authorizes this round.");
+  return schedule;
+}
+
+function calendarClockExceeded(schedule: Schedule, now: number): boolean {
+  return schedule.calendar !== undefined && !Number.isFinite(new Date(now).getTime());
+}
+
+function nextDue(schedule: Schedule, lastClaimedTs: number | null): number | null {
+  if (schedule.calendar !== undefined) return nextCalendarOccurrence(schedule.calendar,
+    lastClaimedTs ?? Date.parse(schedule.calendar.startAt) - 1);
+  const next = lastClaimedTs === null ? 0 : lastClaimedTs + schedule.everyMs!;
+  return Number.isSafeInteger(next) ? next : null;
 }
 
 /** The schedules that may be claimed now. Empty when the file does not verify. */
@@ -222,12 +265,13 @@ export function dueSchedules(workspace: string, now: number): readonly Schedule[
   const state = readState(workspace);
 
   return read.schedules.filter((schedule) => {
-    if (!schedule.enabled) return false;
+    if (!schedule.enabled || calendarClockExceeded(schedule, now)) return false;
     const entry = entryFor(state, schedule.id);
     if (entry.inFlightSince !== null) return false;
     if (entry.consecutiveFailures >= MAX_CONSECUTIVE_FAILURES) return false;
-    if (entry.lastClaimedTs === null) return true;
-    return now - entry.lastClaimedTs >= schedule.everyMs;
+    if (entry.consecutiveExhausted >= schedule.maxConsecutiveExhausted) return false;
+    const next = nextDue(schedule, entry.lastClaimedTs);
+    return next !== null && now >= next;
   });
 }
 
@@ -263,7 +307,8 @@ function claimLocked(workspace: string, scheduleId: string, now: number, expecte
   const schedule = read.schedules.find((one) => one.id === scheduleId);
   if (!schedule) return { ok: false, reason: `no schedule ${JSON.stringify(scheduleId)}` };
   if (!schedule.enabled) return { ok: false, reason: `schedule ${scheduleId} is disabled` };
-  if (!Number.isSafeInteger(now + schedule.everyMs)) return { ok: false, reason: "Schedule cadence exceeds the representable clock range; no claim was created." };
+  if (calendarClockExceeded(schedule, now)) return { ok: false, reason: "Calendar clock range exceeds representable dates; no claim was created." };
+  if (schedule.everyMs !== undefined && !Number.isSafeInteger(now + schedule.everyMs)) return { ok: false, reason: "Schedule cadence exceeds the representable clock range; no claim was created." };
 
   const state = readState(workspace);
   const entry = entryFor(state, scheduleId);
@@ -276,8 +321,12 @@ function claimLocked(workspace: string, scheduleId: string, now: number, expecte
       reason: `schedule ${scheduleId} stopped after ${entry.consecutiveFailures} consecutive failures; it will not run again until one succeeds or an operator resets it`
     };
   }
-  if (entry.lastClaimedTs !== null && now - entry.lastClaimedTs < schedule.everyMs) {
-    return { ok: false, reason: `schedule ${scheduleId} is not due until ${entry.lastClaimedTs + schedule.everyMs}` };
+  if (entry.consecutiveExhausted >= schedule.maxConsecutiveExhausted) {
+    return { ok: false, reason: `schedule ${scheduleId} stopped after ${entry.consecutiveExhausted} consecutive exhausted occurrences; explicit operator reset required` };
+  }
+  const next = nextDue(schedule, entry.lastClaimedTs);
+  if (next === null || now < next) {
+    return { ok: false, reason: `schedule ${scheduleId} is not due${next === null ? "; no remaining occurrence" : ` until ${next}`}` };
   }
 
   const claimId = randomUUID();
@@ -295,13 +344,14 @@ function claimLocked(workspace: string, scheduleId: string, now: number, expecte
 export function completeRun(
   workspace: string,
   scheduleId: string,
-  outcome: { readonly ok: boolean; readonly summary: string; readonly sessionId?: string; readonly reason?: "interrupted"; readonly auditPath?: string },
+  outcome: { readonly ok: boolean; readonly summary: string; readonly sessionId?: string; readonly reason?: "interrupted"; readonly auditPath?: string; readonly outcome?: "completed" | "exhausted" | "failed" },
   claimId: string
 ): void {
   withStoreLock(workspace, () => completeLocked(workspace, scheduleId, outcome, claimId));
 }
 
 function completeLocked(workspace: string, scheduleId: string, outcome: Parameters<typeof completeRun>[2], claimId: string): void {
+  if (outcome.outcome !== undefined && outcome.ok !== (outcome.outcome === "completed")) throw new Error("Schedule success must agree with its completed/exhausted/failed outcome.");
   const state = readState(workspace);
   const entry = entryFor(state, scheduleId);
   if (entry.inFlightSince === null || !claimId || entry.claimId !== claimId) {
@@ -314,9 +364,11 @@ function completeLocked(workspace: string, scheduleId: string, outcome: Paramete
     lastOutcome: { claimId, ok: outcome.ok, summary: outcome.summary.slice(0, 4096),
       ...(outcome.sessionId === undefined ? {} : { sessionId: outcome.sessionId }),
       ...(outcome.reason === undefined ? {} : { reason: outcome.reason }),
-      ...(outcome.auditPath === undefined ? {} : { auditPath: outcome.auditPath }) },
+      ...(outcome.auditPath === undefined ? {} : { auditPath: outcome.auditPath }),
+      ...(outcome.outcome === undefined ? {} : { outcome: outcome.outcome }) },
     // One success clears the count: suspension is for a schedule broken now.
-    consecutiveFailures: outcome.ok ? 0 : entry.consecutiveFailures + 1
+    consecutiveFailures: outcome.ok || outcome.outcome === "exhausted" ? 0 : entry.consecutiveFailures + 1,
+    consecutiveExhausted: outcome.outcome === "exhausted" ? entry.consecutiveExhausted + 1 : 0
   };
   writeState(workspace, state);
 }
@@ -451,7 +503,7 @@ export function manageSchedule(workspace: string, expectedDigest: string, change
     if (entry.inFlightSince !== null && change.kind !== "disable") throw new Error(`Schedule ${id} has an active or interrupted claim. No replacement, deletion, reset or enable was performed.`);
     const updated = updatedScheduleConfiguration(schedules, change, incoming, id);
     if (change.kind === "reset-failures") {
-      state.schedules[id] = { ...entry, consecutiveFailures: 0 };
+      state.schedules[id] = { ...entry, consecutiveFailures: 0, consecutiveExhausted: 0 };
       writeState(workspace, state); // Preserve cadence, claim history and last outcome.
       return;
     }
@@ -469,12 +521,13 @@ export function scheduleStatus(workspace: string, now: number) {
     configDigest: read.digest, now,
     schedules: read.schedules.map(schedule => {
       const entry = entryFor(state, schedule.id);
-      const nextDue = entry.lastClaimedTs === null ? null : entry.lastClaimedTs + schedule.everyMs;
-      const nextDueTs = nextDue === null || Number.isSafeInteger(nextDue) ? nextDue : null;
+      const nextDueTs = nextDue(schedule, entry.lastClaimedTs);
+      const clockRangeExceeded = calendarClockExceeded(schedule, now) || (schedule.everyMs !== undefined && entry.lastClaimedTs !== null
+        && !Number.isSafeInteger(entry.lastClaimedTs + schedule.everyMs));
       return { ...schedule, ...entry, nextDueTs,
-        clockRangeExceeded: nextDue !== null && !Number.isSafeInteger(nextDue),
-        due: schedule.enabled && entry.inFlightSince === null && entry.consecutiveFailures < MAX_CONSECUTIVE_FAILURES
-          && (entry.lastClaimedTs === null || now - entry.lastClaimedTs >= schedule.everyMs) };
+        clockRangeExceeded,
+        due: !clockRangeExceeded && schedule.enabled && entry.inFlightSince === null && entry.consecutiveFailures < MAX_CONSECUTIVE_FAILURES
+          && entry.consecutiveExhausted < schedule.maxConsecutiveExhausted && nextDueTs !== null && now >= nextDueTs };
     }),
     interrupted: interruptedClaims(workspace),
     boundary: "Operational state, not independent evidence verification. In-flight claims can be live or interrupted; no automatic retry or stale-owner takeover."
@@ -501,12 +554,12 @@ function capturedSchedules(workspace: string) {
       throw new Error("the captured schedule configuration is not admitted for BUNDLE");
   };
   assertAdmission();
-  const schedules = body === null ? [] : z.object({ schedules: schedulesSchema.default([]) }).strict().parse(YAML.parse(body.toString("utf8")) ?? {}).schedules;
+  const schedules = body === null ? [] : z.object({ version: z.literal(SCHEDULE_SCHEMA_VERSION).optional(), schedules: schedulesSchema.default([]) }).strict().parse(YAML.parse(body.toString("utf8")) ?? {}).schedules;
   return { previous, schedules, digest: body === null ? "absent" : createHash("sha256").update(body).digest("hex"), assertAdmission };
 }
 async function publishSchedulesAsync(workspace: string, selected: ReturnType<typeof capturedSchedules>, values: readonly unknown[],
   assertClaimsCurrent: () => void, options: SchedulePublicationOptions) {
-  const caller = options.beforePublish, bytes = Buffer.from(YAML.stringify({ schedules: schedulesSchema.parse(values) }));
+  const caller = options.beforePublish, bytes = Buffer.from(YAML.stringify({ version: SCHEDULE_SCHEMA_VERSION, schedules: schedulesSchema.parse(values) }));
   const stable = () => {
     assertScheduleSigningEnabled(); caller?.(); assertScheduleOwner(workspace); assertScheduleSigningEnabled();
     selected.assertAdmission(); assertClaimsCurrent();
