@@ -1,5 +1,5 @@
 import { spawnSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync } from "node:fs";
+import { chmodSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, symlinkSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -52,5 +52,48 @@ describe("fatal process diagnostics", () => {
       expect(parsed.error!.errorsOmitted).toBe(24);
     }
     expect(text).toContain("cause chain deeper than the bound");
+  });
+
+  describe("refuses a diagnostics directory someone else could have planted", () => {
+    const outsideWorkspace = () => { const dir = mkdtempSync(join(tmpdir(), "amc-fatal-cwd-")); dirs.push(dir); return dir; };
+    const tempBase = () => { const dir = mkdtempSync(join(tmpdir(), "amc-fatal-tmp-")); dirs.push(dir); return dir; };
+    const perUser = (base: string) => join(base, `amc-diagnostics-${process.getuid?.() ?? "user"}`);
+
+    it("uses a per-user 0700 temp directory outside a workspace", () => {
+      const base = tempBase();
+      const path = writeFatalDiagnostic("uncaughtException", new Error("x"), outsideWorkspace(), base)!;
+      expect(path.startsWith(perUser(base))).toBe(true);
+      expect(statSync(perUser(base)).mode & 0o777).toBe(0o700);
+    });
+
+    it("refuses a pre-planted symlink and writes nothing through it", () => {
+      const base = tempBase(), target = tempBase();
+      symlinkSync(target, perUser(base));
+      expect(writeFatalDiagnostic("uncaughtException", new Error("x"), outsideWorkspace(), base)).toBeNull();
+      expect(readdirSync(target)).toEqual([]);
+    });
+
+    it("refuses a symlinked workspace diagnostics directory", () => {
+      const cwd = workspace(), target = tempBase();
+      symlinkSync(target, join(cwd, ".amc", "diagnostics"));
+      expect(writeFatalDiagnostic("uncaughtException", new Error("x"), cwd)).toBeNull();
+      expect(readdirSync(target)).toEqual([]);
+    });
+
+    it.skipIf(process.getuid === undefined)("refuses a pre-created directory others can read or write", () => {
+      const base = tempBase();
+      mkdirSync(perUser(base));
+      chmodSync(perUser(base), 0o777);
+      expect(writeFatalDiagnostic("uncaughtException", new Error("x"), outsideWorkspace(), base)).toBeNull();
+      expect(readdirSync(perUser(base))).toEqual([]);
+    });
+  });
+
+  it("redacts secrets from messages and stacks before writing", () => {
+    const key = "sk-ant-" + "a".repeat(40);
+    const path = writeFatalDiagnostic("unhandledRejection", new Error(`provider refused ${key}`, { cause: new Error(`retry with ${key}`) }), workspace())!;
+    const text = readFileSync(path, "utf8");
+    expect(text).not.toContain(key);
+    expect(text).toContain("AMC_REDACTED");
   });
 });
