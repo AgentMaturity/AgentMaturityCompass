@@ -1,5 +1,6 @@
+import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
+import { ensureDir, writeFileAtomic } from "../utils/fs.js";
 
 export type AMCMode = "owner" | "agent";
 
@@ -7,16 +8,27 @@ function modeFile(workspace: string): string {
   return join(workspace, ".amc", "mode.json");
 }
 
+/**
+ * DXA-49: fails closed. Only a file that does not exist reads as owner: agent mode is opt-in, and a fresh workspace
+ * (before `amc init`, which agent mode blocks) and every workspace that never entered agent mode have no file. A file
+ * that exists but cannot be read, parsed or names no known mode is agent.
+ *
+ * mode.json is not signed. With an absent file meaning owner, anyone who can forge the file can delete it to the same
+ * effect, so a signature would add no protection; raw writes under .amc are the confinement layer's boundary.
+ * ponytail: deletion is the ceiling; a signed or ledger-anchored agent-mode marker is the upgrade if .amc is ever agent-writable.
+ */
 export function getMode(workspace: string): AMCMode {
-  const file = modeFile(workspace);
-  if (!pathExists(file)) {
-    return "owner";
+  let raw: string;
+  try {
+    raw = readFileSync(modeFile(workspace), "utf8");
+  } catch (error) {
+    return (error as NodeJS.ErrnoException | null)?.code === "ENOENT" ? "owner" : "agent";
   }
   try {
-    const parsed = JSON.parse(readUtf8(file)) as { mode?: unknown };
-    return parsed.mode === "agent" ? "agent" : "owner";
+    const parsed = JSON.parse(raw) as { mode?: unknown } | null;
+    return parsed?.mode === "owner" ? "owner" : "agent";
   } catch {
-    return "owner";
+    return "agent";
   }
 }
 
@@ -32,8 +44,27 @@ export function setMode(workspace: string, mode: AMCMode): void {
       null,
       2
     ),
-    0o644
+    0o600
   );
+}
+
+/**
+ * DXA-49: `amc mode owner` from agent mode needs owner proof, the vault passphrase. The caller supplies it from a prompt,
+ * never from AMC_VAULT_PASSPHRASE, which an agent process may share. A wrong passphrase or a workspace without a vault refuses.
+ */
+export async function leaveAgentMode(workspace: string, passphrase: string): Promise<void> {
+  if (getMode(workspace) === "agent") {
+    // Loaded here: the vault's key modules import this module.
+    const { unlockVault, vaultExists } = await import("../vault/vault.js");
+    if (!vaultExists(workspace)) throw new Error("Leaving agent mode needs the vault passphrase, and this workspace has no vault.");
+    if (passphrase.length === 0) throw new Error("Leaving agent mode needs the vault passphrase.");
+    try {
+      unlockVault(workspace, passphrase);
+    } catch {
+      throw new Error("Leaving agent mode refused: the vault passphrase did not unlock the vault.");
+    }
+  }
+  setMode(workspace, "owner");
 }
 
 export function assertOwnerMode(workspace: string, commandPath: string): void {

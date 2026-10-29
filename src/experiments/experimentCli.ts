@@ -1,8 +1,10 @@
 import {
   analyzeExperiment,
   createExperiment,
+  ExperimentInputError,
   gateExperiment,
   listExperiments,
+  loadLatestExperimentRun,
   runExperiment, runExperimentAsync,
   setExperimentBaseline,
   setExperimentCandidate
@@ -76,6 +78,12 @@ export function experimentGateCli(params: {
 
 export function experimentListCli(params: { workspace: string; agentId?: string }) {
   return listExperiments(params);
+}
+
+export { ExperimentInputError };
+
+export function experimentLatestRunCli(params: { workspace: string; agentId?: string; experimentId: string }) {
+  return loadLatestExperimentRun(params);
 }
 
 export function experimentOptimizeCli(params: {

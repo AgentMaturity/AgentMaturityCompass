@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { readdirSync, readFileSync, statSync } from "node:fs";
-import { join } from "node:path";
+import { basename, join } from "node:path";
 import YAML from "yaml";
 import type { ExperimentReport } from "../types.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
@@ -8,13 +8,13 @@ import { getSigningKey, getPublicKeyHistory, signHexDigest, verifyHexDigestAny }
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
+import { parseWindowToMs } from "../utils/time.js";
 import { appendTransparencyEntry, appendTransparencyEntryAsync } from "../transparency/logChain.js";
 import { TransparencyMerkleLagError } from "../transparency/merkleIndexState.js";
 import { dispatchIntegrationEvent } from "../integrations/integrationDispatcher.js";
 import { runCasebook, assertCasebookRunCurrent } from "../casebooks/casebookRunner.js";
 import { casebookContentSha256, loadCasebook } from "../casebooks/casebookStore.js";
 import { captureRunHashAuthority, runHashVerificationKeys } from "../ledger/runHashSignature.js";
-import { parseWindowToMs } from "../utils/time.js";
 import { openLedger, type Ledger } from "../ledger/ledger.js";
 import { describePolicySigner, assertPolicySignerCurrent } from "../crypto/signing/signer.js";
 import { loadTrustConfig } from "../trust/trustConfig.js";
@@ -39,6 +39,8 @@ function experimentsRoot(workspace: string, agentId: string): string {
 }
 
 function experimentDir(workspace: string, agentId: string, experimentId: string): string {
+  // An experiment ID names one directory under the experiments root, never a path.
+  if (!/^[A-Za-z0-9_-]+$/.test(experimentId)) throw new ExperimentInputError(`invalid experiment ID '${experimentId}'`);
   return join(experimentsRoot(workspace, agentId), experimentId);
 }
 
@@ -105,12 +107,49 @@ function listRunFiles(workspace: string, agentId: string, experimentId: string):
     .sort((a, b) => a.localeCompare(b));
 }
 
+/** Why a stored run report may not be read as this experiment's current result, or null when it may. */
+function experimentReportProblem(workspace: string, agentId: string, experiment: ExperimentFile, runId: string, report: ExperimentReport): string | null {
+  if (typeof report !== "object" || report === null || Array.isArray(report)) return "report is not an object";
+  const { reportJsonSha256, reportSealSig, ...base } = report;
+  if (typeof reportJsonSha256 !== "string" || sha256Hex(canonicalize(base)) !== reportJsonSha256) return "report hash does not match its contents";
+  let sealed = false;
+  try { sealed = typeof reportSealSig === "string" && verifyHexDigestAny(reportJsonSha256, reportSealSig, runHashVerificationKeys(workspace)); }
+  catch { sealed = false; }
+  if (!sealed) return "report seal does not verify";
+  const config = experiment.experiment;
+  if (report.runId !== runId || report.experimentId !== config.experimentId || report.agentId !== agentId) return "report belongs to another run, experiment or agent";
+  if (report.casebookId !== config.casebookId || report.baselineConfigId !== config.baselineConfig.id) return "experiment casebook or baseline changed since this run";
+  if (report.candidateConfigId !== config.candidateConfig?.id) return "experiment candidate changed since this run";
+  return null;
+}
+
+/** The newest run report, admitted only when its seal verifies and it describes the experiment's current configuration; null when there are no runs. */
+function latestRunOrNull(workspace: string, agentId: string, experimentId: string): ExperimentReport | null {
+  const experiment = loadExperiment(workspace, agentId, experimentId);
+  const file = listRunFiles(workspace, agentId, experimentId).at(-1);
+  if (!file) return null;
+  let report: ExperimentReport;
+  try { report = JSON.parse(readUtf8(file)) as ExperimentReport; }
+  catch { throw new Error(`latest experiment run ${basename(file)} is unreadable`); }
+  const problem = experimentReportProblem(workspace, agentId, experiment, basename(file, ".json"), report);
+  if (problem) throw new Error(`latest experiment run ${basename(file)} refused: ${problem}`);
+  return report;
+}
+
 function latestRun(workspace: string, agentId: string, experimentId: string): ExperimentReport {
-  const files = listRunFiles(workspace, agentId, experimentId);
-  if (files.length === 0) {
-    throw new Error(`no experiment runs for ${experimentId}`);
-  }
-  return JSON.parse(readUtf8(files[files.length - 1]!)) as ExperimentReport;
+  const report = latestRunOrNull(workspace, agentId, experimentId);
+  if (!report) throw new Error(`no experiment runs for ${experimentId}`);
+  return report;
+}
+
+/** experiment.yaml read-modify-write, serialized so concurrent set-baseline and set-candidate cannot drop each other's update. */
+function updateExperiment(workspace: string, agentId: string, experimentId: string, update: (experiment: ExperimentFile) => void): string {
+  loadExperiment(workspace, agentId, experimentId); // refuse an unknown experiment before the lock creates its directory
+  return withControlFileLock({ root: experimentDir(workspace, agentId, experimentId), name: "experiment-definition", operation: () => {
+    const experiment = loadExperiment(workspace, agentId, experimentId);
+    update(experiment);
+    return saveExperiment(workspace, agentId, experiment);
+  } });
 }
 
 const fixed = (value: number | null | undefined, digits: number): string =>
@@ -192,22 +231,11 @@ export function setExperimentBaseline(params: {
   config: "current" | { path: string };
 }): { path: string } {
   const agentId = resolveAgentId(params.workspace, params.agentId);
-  const experiment = loadExperiment(params.workspace, agentId, params.experimentId);
-  if (params.config === "current") {
-    experiment.experiment.baselineConfig = {
-      id: "current",
-      kind: "current",
-      path: null
-    };
-  } else {
-    experiment.experiment.baselineConfig = {
-      id: sha256Hex(readFileSync(params.config.path)).slice(0, 12),
-      kind: "file",
-      path: params.config.path
-    };
-  }
+  const baselineConfig = params.config === "current"
+    ? { id: "current", kind: "current" as const, path: null }
+    : { id: sha256Hex(readFileSync(params.config.path)).slice(0, 12), kind: "file" as const, path: params.config.path };
   return {
-    path: saveExperiment(params.workspace, agentId, experiment)
+    path: updateExperiment(params.workspace, agentId, params.experimentId, (experiment) => { experiment.experiment.baselineConfig = baselineConfig; })
   };
 }
 
@@ -222,18 +250,25 @@ export function setExperimentCandidate(params: {
   if (!verify.valid) {
     throw new Error(`candidate file verification failed: ${verify.reason ?? "unknown"}`);
   }
-  const experiment = loadExperiment(params.workspace, agentId, params.experimentId);
-  experiment.experiment.candidateConfig = {
-    id: verify.digestSha256.slice(0, 12),
-    kind: "overlay-file",
-    path: params.candidateFile,
-    digestSha256: verify.digestSha256,
-    signatureValid: true
-  };
+  const path = updateExperiment(params.workspace, agentId, params.experimentId, (experiment) => {
+    experiment.experiment.candidateConfig = {
+      id: verify.digestSha256.slice(0, 12),
+      kind: "overlay-file",
+      path: params.candidateFile,
+      digestSha256: verify.digestSha256,
+      signatureValid: true
+    };
+  });
   return {
-    path: saveExperiment(params.workspace, agentId, experiment),
+    path,
     digestSha256: verify.digestSha256
   };
+}
+
+/** Invalid experiment request input, refused before any casebook or report work. */
+export class ExperimentInputError extends Error {
+  readonly code = "EXPERIMENT_INPUT_INVALID";
+  constructor(message: string) { super(message); this.name = "ExperimentInputError"; }
 }
 
 /**
@@ -300,34 +335,42 @@ function prepareExperimentReport(params: {
 }) {
   const agentId = resolveAgentId(params.workspace, params.agentId);
   const experiment = loadExperiment(params.workspace, agentId, params.experimentId);
+  // Every input is checked before any casebook work, so invalid input cannot produce a partial comparison.
+  if (params.mode !== "supervise" && params.mode !== "sandbox") {
+    throw new ExperimentInputError(`invalid experiment mode '${String(params.mode)}'; expected supervise or sandbox`);
+  }
   const candidateConfig = experiment.experiment.candidateConfig;
   if (!candidateConfig || !candidateConfig.signatureValid) {
-    throw new Error("candidate config is missing or unsigned");
+    throw new ExperimentInputError("candidate config is missing or unsigned");
   }
   if (!params.candidateWindow) {
-    throw new Error(
+    throw new ExperimentInputError(
       "Experiment requires a candidate evidence window (--candidate-window). " +
         "AMC cannot execute a candidate configuration itself, so the candidate must " +
         "have run and produced evidence; synthesizing its outcomes would fabricate the comparison."
     );
   }
+  try { parseWindowToMs(params.candidateWindow); }
+  catch (error) { throw new ExperimentInputError(error instanceof Error ? error.message : String(error)); }
+  const candidateAgentId = params.candidateAgentId === undefined ? agentId : resolveAgentId(params.workspace, params.candidateAgentId);
+  try { loadCasebook(params.workspace, experiment.experiment.casebookId, candidateAgentId); }
+  catch { throw new ExperimentInputError(`candidate agent '${candidateAgentId}' has no casebook '${experiment.experiment.casebookId}'`); }
   if (loadCasebook(params.workspace, experiment.experiment.casebookId, agentId).casebook.caseIds.length === 0) {
-    throw new Error("experiment casebook has no cases; an empty task universe is not an experiment");
+    throw new ExperimentInputError("experiment casebook has no cases; an empty task universe is not an experiment");
   }
   const bound = params.baselineTrialId !== undefined || params.candidateTrialId !== undefined;
   let trials: { baseline: { trialId: string; configDigest: string }; candidate: { trialId: string; configDigest: string } } | null = null;
   if (bound) {
     const baselinePath = experiment.experiment.baselineConfig.kind === "file" ? experiment.experiment.baselineConfig.path : null;
-    if (!params.baselineTrialId || !params.candidateTrialId) throw new Error("bound experiment requires both baselineTrialId and candidateTrialId");
-    if (params.baselineTrialId === params.candidateTrialId) throw new Error("baseline and candidate trials must be distinct");
-    if (!baselinePath) throw new Error("bound experiment requires a pinned baseline configuration file");
-    if (!candidateConfig.digestSha256) throw new Error("bound experiment requires a candidate configuration digest");
+    if (!params.baselineTrialId || !params.candidateTrialId) throw new ExperimentInputError("bound experiment requires both baselineTrialId and candidateTrialId");
+    if (params.baselineTrialId === params.candidateTrialId) throw new ExperimentInputError("baseline and candidate trials must be distinct");
+    if (!baselinePath) throw new ExperimentInputError("bound experiment requires a pinned baseline configuration file");
+    if (!candidateConfig.digestSha256) throw new ExperimentInputError("bound experiment requires a candidate configuration digest");
     trials = {
       baseline: { trialId: params.baselineTrialId, configDigest: sha256Hex(readFileSync(baselinePath)) },
       candidate: { trialId: params.candidateTrialId, configDigest: candidateConfig.digestSha256 }
     };
   }
-  const candidateAgentId = resolveAgentId(params.workspace, params.candidateAgentId ?? agentId);
   const now = Date.now();
   const candidateRange = { startedTs: now - parseWindowToMs(params.candidateWindow), endedTs: now };
   // A legacy same-agent baseline must not read the candidate's evidence: it ends where the candidate window starts.
@@ -733,7 +776,8 @@ export function listExperiments(params: { workspace: string; agentId?: string })
     return [];
   }
   return readdirSync(root, { withFileTypes: true })
-    .filter((entry) => entry.isDirectory())
+    // Only directories holding an experiment.yaml are experiments; governed optimizer runs share this root.
+    .filter((entry) => entry.isDirectory() && pathExists(join(root, entry.name, "experiment.yaml")))
     .map((entry) => {
       const loaded = loadExperiment(params.workspace, agentId, entry.name);
       return {
@@ -746,7 +790,8 @@ export function listExperiments(params: { workspace: string; agentId?: string })
     .sort((a, b) => a.experimentId.localeCompare(b.experimentId));
 }
 
-export function loadLatestExperimentRun(params: { workspace: string; agentId?: string; experimentId: string }): ExperimentReport {
+/** The verified latest run, or null when the experiment has none; throws when the newest run is unreadable or refused. */
+export function loadLatestExperimentRun(params: { workspace: string; agentId?: string; experimentId: string }): ExperimentReport | null {
   const agentId = resolveAgentId(params.workspace, params.agentId);
-  return latestRun(params.workspace, agentId, params.experimentId);
+  return latestRunOrNull(params.workspace, agentId, params.experimentId);
 }

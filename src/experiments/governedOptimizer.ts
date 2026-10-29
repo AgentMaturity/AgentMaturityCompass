@@ -4,7 +4,7 @@ import { existsSync, readdirSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { type EnforceResourceKind } from "../enforce/resourceManifest.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
-import { trySignArtifactFile } from "../lifecycle/artifactSignature.js";
+import { readAndVerifyArtifactFileSignature, trySignArtifactFile } from "../lifecycle/artifactSignature.js";
 import {
   listFixerRcaReports,
   loadFixerRcaReport,
@@ -12,7 +12,7 @@ import {
   type FixerRcaReport,
   type FixerRegressionTest
 } from "../mechanic/fixerRca.js";
-import { ensureDir, readUtf8, writeFileAtomic } from "../utils/fs.js";
+import { ensureDir, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 
 export interface OptimizerSplit {
@@ -28,6 +28,7 @@ export interface OptimizerLeakageCheck {
   evidenceRefs: string[];
 }
 
+/** Arithmetic over Fixer proposal descriptors (expected impact, test counts, confidence); never an executed measurement. */
 export interface OptimizerCandidateMetrics {
   scoreGain: number;
   risk: number;
@@ -48,7 +49,14 @@ export interface GovernedOptimizerCandidate {
   patchSummary: string;
   split: OptimizerSplit;
   leakageChecks: OptimizerLeakageCheck[];
+  /** Estimates used only to rank proposals for probing. */
   metrics: OptimizerCandidateMetrics;
+  /** Provenance of `metrics`. Only an executor with trial receipts could produce measured values. */
+  metricSource: "estimated";
+  /** No executor has run the candidate, so it can never be a measured or promotable winner. */
+  evaluationState: "not-run";
+  /** Observed values stay absent until an executor produces receipts. */
+  observedMetrics: null;
   paretoFront: boolean;
   rank: number | null;
   decision: "accepted" | "rejected";
@@ -77,6 +85,9 @@ export interface OptimizerCandidateReceipt {
 
 export interface OptimizerValidationReceipt {
   receiptId: string;
+  /** Structural planning checks only: splits, leakage, workspaces and receipts. No candidate was executed. */
+  validationKind: "structural";
+  executedValidationRefs: [];
   status: "passed" | "blocked";
   createdAt: string;
   gates: Array<{
@@ -86,8 +97,9 @@ export interface OptimizerValidationReceipt {
   }>;
 }
 
+/** 2026-10-29 labels metrics as estimates; 2026-05-22 records are read through `admitOptimizerRun` with the same labels. */
 export interface GovernedOptimizerRun {
-  schemaVersion: "2026-05-22";
+  schemaVersion: "2026-05-22" | "2026-10-29";
   optimizerRunId: string;
   workspace: string;
   agentId: string;
@@ -323,7 +335,7 @@ function rankCandidates(candidates: GovernedOptimizerCandidate[]): GovernedOptim
         paretoFront,
         rank,
         decision: "accepted" as const,
-        decisionReason: "Accepted as the top Pareto candidate with a positive estimated gain over the baseline after held-out validation and leakage checks."
+        decisionReason: "Selected for probing: top Pareto candidate on estimated metrics with a positive estimated gain over the baseline after split and leakage checks. No candidate has been executed or measured."
       };
     }
     return {
@@ -333,7 +345,7 @@ function rankCandidates(candidates: GovernedOptimizerCandidate[]): GovernedOptim
       decision: "rejected" as const,
       decisionReason: abstainReason !== null && paretoFront ? abstainReason : paretoFront
         ? "Candidate is on the Pareto frontier but ranked behind the accepted candidate."
-        : "Candidate is dominated on score, risk, cost, latency, confidence, or regression impact."
+        : "Candidate is dominated on estimated score, risk, cost, latency, confidence, or regression impact."
     };
   });
 }
@@ -378,12 +390,12 @@ function buildValidationReceipt(input: {
       reason: "Optimizer records candidates and receipts without mutating live Enforce resources."
     },
     {
-      // Keeping the baseline is a decided outcome; only a run where no candidate could be validated is blocked.
+      // Keeping the baseline is a decided outcome; only a run where no candidate passed the structural gates is blocked.
       id: "selection-decided",
       status: accepted.length > 0 || validated.length > 0 ? "passed" as const : "blocked" as const,
-      reason: accepted.length > 0 ? "A candidate improved on the retained baseline and passed validation and Pareto ranking."
-        : validated.length > 0 ? "Baseline retained: no validated candidate improved on it."
-        : "No candidate passed validation and Pareto ranking."
+      reason: accepted.length > 0 ? "A candidate ranks first with a positive estimated gain over the retained baseline; it has not been executed or measured."
+        : validated.length > 0 ? "Baseline retained: no structurally valid candidate has a positive estimated gain over it."
+        : "No candidate passed the structural gates and estimated Pareto ranking."
     },
     {
       id: "candidate-receipts-created",
@@ -393,6 +405,8 @@ function buildValidationReceipt(input: {
   ];
   return {
     receiptId: `optrec_${sha256Hex(`${input.optimizerRunId}:${gates.map((gate) => gate.status).join(":")}`).slice(0, 16)}`,
+    validationKind: "structural",
+    executedValidationRefs: [],
     status: gates.every((gate) => gate.status === "passed") ? "passed" : "blocked",
     createdAt: input.createdAt,
     gates
@@ -454,6 +468,9 @@ export function writeGovernedOptimizerRun(input: {
       split,
       leakageChecks,
       metrics: metricsForProposal(proposal, split),
+      metricSource: "estimated",
+      evaluationState: "not-run",
+      observedMetrics: null,
       paretoFront: false,
       rank: null,
       decision: "rejected",
@@ -468,7 +485,7 @@ export function writeGovernedOptimizerRun(input: {
   }
   const receipts = ranked.map((candidate) => receiptForCandidate(candidate, createdAt));
   const run: GovernedOptimizerRun = {
-    schemaVersion: "2026-05-22",
+    schemaVersion: "2026-10-29",
     optimizerRunId,
     workspace,
     agentId,
@@ -516,30 +533,82 @@ function redactGovernedOptimizerRun(run: GovernedOptimizerRun): GovernedOptimize
   };
 }
 
+export interface GovernedOptimizerRunProblem {
+  optimizerRunId: string;
+  reason: string;
+}
+
+/** Run directory names carry their creation time; an unrecognised name sorts as newest so it can never be skipped. */
+function runOrderKey(name: string): number {
+  const match = /^optimizer-(\d+)-/.exec(name);
+  return match ? Number(match[1]) : Number.POSITIVE_INFINITY;
+}
+
+/**
+ * Admit one stored run: its signature must verify over the exact bytes read, it must describe this directory and
+ * agent, and no candidate may claim measured evaluation. 2026-05-22 records gain the estimate labels on read; their
+ * signed bytes are not rewritten.
+ */
+function admitOptimizerRun(workspace: string, agentId: string, root: string, name: string): GovernedOptimizerRun {
+  const verified = readAndVerifyArtifactFileSignature({ workspace, path: join(root, name, "optimizer-run.json"), artifactKind: "governed-optimizer-run" });
+  if (!verified.valid || !verified.artifactBytes) throw new Error(verified.reason ?? "signature verification failed");
+  const run = JSON.parse(verified.artifactBytes.toString("utf8")) as GovernedOptimizerRun;
+  if (typeof run !== "object" || run === null || !Array.isArray(run.candidates)) throw new Error("not an optimizer run record");
+  if (run.optimizerRunId !== name || run.agentId !== agentId) throw new Error("record names another run or agent");
+  if (run.schemaVersion === "2026-05-22") {
+    return {
+      ...run,
+      candidates: run.candidates.map((candidate) => ({ ...candidate, metricSource: "estimated", evaluationState: "not-run", observedMetrics: null })),
+      validationReceipt: { ...run.validationReceipt, validationKind: "structural", executedValidationRefs: [] }
+    };
+  }
+  if (run.schemaVersion !== "2026-10-29") throw new Error(`unknown schema version ${String(run.schemaVersion)}`);
+  const measured = run.candidates.find((candidate) =>
+    candidate.metricSource !== "estimated" || candidate.evaluationState !== "not-run" || candidate.observedMetrics !== null);
+  if (measured || run.validationReceipt?.validationKind !== "structural" || run.validationReceipt.executedValidationRefs?.length !== 0) {
+    throw new Error("record claims measured evaluation without executed trial receipts");
+  }
+  return run;
+}
+
+/** Every stored run, newest first: verified runs, plus a typed problem for each record that could not be admitted. */
+function scanGovernedOptimizerRuns(workspace: string, agentId: string): Array<{ name: string; run: GovernedOptimizerRun | null; problem: GovernedOptimizerRunProblem | null }> {
+  const root = optimizerRoot(workspace, agentId);
+  if (!existsSync(root)) return [];
+  return readdirSync(root, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+    .sort((a, b) => runOrderKey(b) - runOrderKey(a) || b.localeCompare(a))
+    .map((name) => {
+      try {
+        return { name, run: admitOptimizerRun(workspace, agentId, root, name), problem: null };
+      } catch (error) {
+        return { name, run: null, problem: { optimizerRunId: name, reason: error instanceof Error ? error.message : String(error) } };
+      }
+    });
+}
+
 export function listGovernedOptimizerRuns(input: {
   workspace: string;
   agentId?: string;
   limit?: number;
   redacted?: boolean;
-}): GovernedOptimizerRun[] {
+}): { runs: GovernedOptimizerRun[]; problems: GovernedOptimizerRunProblem[] } {
   const agentId = resolveAgentId(input.workspace, input.agentId ?? "default");
-  const root = optimizerRoot(input.workspace, agentId);
-  if (!existsSync(root)) return [];
-  return readdirSync(root, { withFileTypes: true })
-    .filter((entry) => entry.isDirectory())
-    .map((entry) => {
-      try {
-        return JSON.parse(readUtf8(join(root, entry.name, "optimizer-run.json"))) as GovernedOptimizerRun;
-      } catch {
-        return null;
-      }
-    })
-    .filter((run): run is GovernedOptimizerRun => run !== null)
-    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
-    .slice(0, input.limit ?? Number.POSITIVE_INFINITY)
-    .map((run) => input.redacted ? redactGovernedOptimizerRun(run) : run);
+  const scanned = scanGovernedOptimizerRuns(input.workspace, agentId);
+  return {
+    runs: scanned
+      .flatMap((entry) => entry.run ? [entry.run] : [])
+      .slice(0, input.limit ?? Number.POSITIVE_INFINITY)
+      .map((run) => input.redacted ? redactGovernedOptimizerRun(run) : run),
+    problems: scanned.flatMap((entry) => entry.problem ? [entry.problem] : [])
+  };
 }
 
+/**
+ * Resolve a selector to exactly one verified run. `latest` refuses when the newest record is unreadable; a run ID
+ * matches its own record; any other selector must match exactly one run and cannot be resolved past unreadable records.
+ */
 export function loadGovernedOptimizerRun(input: {
   workspace: string;
   agentId?: string;
@@ -547,25 +616,33 @@ export function loadGovernedOptimizerRun(input: {
   redacted?: boolean;
 }): GovernedOptimizerRun {
   const agentId = resolveAgentId(input.workspace, input.agentId ?? "default");
+  const scanned = scanGovernedOptimizerRuns(input.workspace, agentId);
+  const output = (run: GovernedOptimizerRun): GovernedOptimizerRun => input.redacted ? redactGovernedOptimizerRun(run) : run;
   if (input.selector === "latest") {
-    const latest = listGovernedOptimizerRuns({ workspace: input.workspace, agentId, limit: 1 })[0];
-    if (!latest) throw new Error("No governed optimizer run found.");
-    return input.redacted ? redactGovernedOptimizerRun(latest) : latest;
+    const newest = scanned[0];
+    if (!newest) throw new Error("No governed optimizer run found.");
+    if (newest.problem) throw new Error(`Newest governed optimizer run ${newest.name} is unreadable: ${newest.problem.reason}`);
+    return output(newest.run!);
   }
-  const directPath = optimizerRunPath(input.workspace, agentId, input.selector);
-  if (existsSync(directPath)) {
-    const run = JSON.parse(readUtf8(directPath)) as GovernedOptimizerRun;
-    return input.redacted ? redactGovernedOptimizerRun(run) : run;
+  const named = scanned.find((entry) => entry.name === input.selector);
+  if (named) {
+    if (named.problem) throw new Error(`Governed optimizer run ${named.name} is unreadable: ${named.problem.reason}`);
+    return output(named.run!);
   }
-  const found = listGovernedOptimizerRuns({ workspace: input.workspace, agentId })
-    .find((run) =>
-      run.optimizerRunId === input.selector ||
-      run.sourceRcaReportId === input.selector ||
-      run.sourceRunId === input.selector ||
-      run.acceptedCandidateId === input.selector
-    );
-  if (!found) {
+  const matches = scanned.flatMap((entry) => entry.run ? [entry.run] : []).filter((run) =>
+    run.sourceRcaReportId === input.selector ||
+    run.sourceRunId === input.selector ||
+    run.acceptedCandidateId === input.selector
+  );
+  const unreadable = scanned.filter((entry) => entry.problem).map((entry) => entry.name);
+  if (matches.length > 1) {
+    throw new Error(`Governed optimizer selector ${input.selector} is ambiguous; it matches ${matches.map((run) => run.optimizerRunId).join(", ")}`);
+  }
+  if (unreadable.length > 0) {
+    throw new Error(`Governed optimizer selector ${input.selector} cannot be resolved uniquely past unreadable run(s): ${unreadable.join(", ")}`);
+  }
+  if (matches.length === 0) {
     throw new Error(`Governed optimizer run not found: ${input.selector}`);
   }
-  return input.redacted ? redactGovernedOptimizerRun(found) : found;
+  return output(matches[0]!);
 }

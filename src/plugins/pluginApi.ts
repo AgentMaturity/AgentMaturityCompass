@@ -497,6 +497,19 @@ export function executePluginRequest(params: {
     throw new Error(`plugin action approval not executable: ${approvalCheck.error ?? approvalCheck.status ?? "unknown"}`);
   }
 
+  // DXA-19: the approval is consumed (single use) after every check and before any effect, so a replayed or concurrent
+  // execution is refused before it writes, and an effect that fails leaves a spent approval, never a reusable one.
+  const consumeApproval = (): void => {
+    const consume = consumeApprovedExecution({
+      workspace: params.workspace,
+      approvalId: pending.approvalRequestId,
+      expectedAgentId: pending.agentId,
+      executionId: pending.requestId
+    });
+    if (consume.replay) {
+      throw new Error("approval already consumed");
+    }
+  };
   const lock = loadInstalledPluginsLock(params.workspace);
   let artifactSha = sha256Hex(Buffer.from(JSON.stringify(pending), "utf8"));
   if (pending.action === "install" || pending.action === "upgrade") {
@@ -524,6 +537,7 @@ export function executePluginRequest(params: {
     if (!verified.ok) {
       throw new Error(`pending plugin package publisher not admitted: ${untrustedReasons(verified.report).join("; ")}`);
     }
+    consumeApproval();
     const installPath = writeInstalledPackage({
       workspace: params.workspace,
       pluginId: pending.pluginId,
@@ -542,6 +556,7 @@ export function executePluginRequest(params: {
     });
     lock.installed = retained.sort((a, b) => a.id.localeCompare(b.id) || a.version.localeCompare(b.version));
   } else {
+    consumeApproval();
     lock.installed = lock.installed.filter((row) => row.id !== pending.pluginId);
     const pluginDir = join(pluginsInstalledDir(params.workspace), pending.pluginId);
     if (pathExists(pluginDir)) {
@@ -551,15 +566,6 @@ export function executePluginRequest(params: {
   lock.updatedTs = Date.now();
   lock.policySnapshot = lockPolicySnapshot(params.workspace);
   const saved = saveInstalledPluginsLock(params.workspace, lock);
-  const consume = consumeApprovedExecution({
-    workspace: params.workspace,
-    approvalId: pending.approvalRequestId,
-    expectedAgentId: pending.agentId,
-    executionId: pending.requestId
-  });
-  if (consume.replay) {
-    throw new Error("approval already consumed");
-  }
   const transparency = appendTransparencyEntry({
     workspace: params.workspace,
     type:
