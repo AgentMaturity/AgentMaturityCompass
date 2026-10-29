@@ -1,6 +1,6 @@
 // BR-1, BR-2 and BR-3 (docs/deploy/reference/BACKUP_RESTORE.md).
 import { spawn } from "node:child_process";
-import { createBackup, criterion, isPrefix, kubectl, ledgerSnapshot, notRun, pair, restoreInPod, restoreNamespace, restoreWarnings,
+import { createBackup, criterion, isRestoredPrefix, kubectl, ledgerSnapshot, notRun, pair, restoreInPod, restoreNamespace, restoreWarnings,
   startToolPod, summary, verdict } from "./lib.mjs";
 
 /** The restore namespace with its own volume and the bootstrap Secret copied in (created out of band, as at install). */
@@ -54,7 +54,7 @@ async function br1(ctx) {
   const copy = ledgerSnapshot(ctx, { namespace, pod: "restore", container: "tool", db: "/data/amc/br1/.amc/evidence.sqlite" });
   criteria.push(criterion("restored ledger verifies (chain links, integrity_check, no restore warning beyond open-session seals)",
     copy?.linked === true && copy.integrity === "ok" && warnings.unexpected.length === 0, { ...summary(copy), unexpected: warnings.unexpected }));
-  criteria.push(criterion("restored head is a prefix of the source chain", isPrefix(copy, source), { restored: copy?.count ?? null, source: source?.count ?? null }));
+  criteria.push(criterion("restored head is a prefix of the source chain (beyond the restore's own audit rows)", isRestoredPrefix(copy, source), { restored: copy?.count ?? null, source: source?.count ?? null }));
   return verdict(criteria);
 }
 

@@ -86,12 +86,12 @@ export function pinMonitor(ctx) {
 const SNAPSHOT_SCRIPT = `
 const Database = require("/opt/amc/node_modules/better-sqlite3");
 const db = new Database(process.argv[1], { readonly: true, fileMustExist: true });
-const rows = db.prepare("SELECT event_hash, prev_event_hash FROM evidence_events ORDER BY rowid").all();
+const rows = db.prepare("SELECT event_hash, prev_event_hash, session_id FROM evidence_events ORDER BY rowid").all();
 let linked = true;
 for (let i = 1; i < rows.length; i += 1) if (rows[i].prev_event_hash !== rows[i - 1].event_hash) linked = false;
 const migrations = db.prepare("SELECT version FROM schema_migrations ORDER BY version").all().map((row) => row.version);
 const integrity = db.prepare("PRAGMA integrity_check").all().map((row) => Object.values(row)[0]).join(";");
-process.stdout.write(JSON.stringify({ count: rows.length, head: rows.at(-1)?.event_hash ?? null, hashes: rows.map((row) => row.event_hash), linked, migrations, integrity }));
+process.stdout.write(JSON.stringify({ count: rows.length, head: rows.at(-1)?.event_hash ?? null, hashes: rows.map((row) => row.event_hash), sessions: rows.map((row) => row.session_id), linked, migrations, integrity }));
 `;
 
 /** Ledger head, event count, chain links, applied migrations and PRAGMA integrity_check, read in the pod. */
@@ -108,6 +108,17 @@ export const summary = (snapshot) => snapshot && { count: snapshot.count, head: 
 export function isPrefix(before, after) {
   if (!before || !after || after.hashes.length < before.hashes.length) return false;
   return before.hashes.every((hash, index) => after.hashes[index] === hash);
+}
+
+/**
+ * True when the restored chain is a prefix of `source` except for the trailing rows `amc backup restore` itself appends
+ * to the restored workspace (its BACKUP_RESTORED ops audit sessions).
+ */
+export function isRestoredPrefix(restored, source) {
+  if (!restored || !source) return false;
+  let common = 0;
+  while (common < restored.hashes.length && restored.hashes[common] === source.hashes[common]) common += 1;
+  return common > 0 && restored.sessions.slice(common).every((session) => session.startsWith("ops-backup_restored-"));
 }
 
 export function waitRollout(ctx, timeoutSeconds = STARTUP_BUDGET_SECONDS) {

@@ -54,7 +54,7 @@ async function rb2(ctx) {
   const snapshot = ledgerSnapshot(ctx);
   criteria.push(criterion("N-1 serves the restored workspace", back.ready, { readyMs: back.ms }));
   criteria.push(criterion("PRAGMA integrity_check returns ok", snapshot?.integrity === "ok" && snapshot.linked, summary(snapshot)));
-  criteria.push(criterion("restored chain is the pre-upgrade chain", isPrefix(ctx.state.preUpgradeSnapshot, snapshot)));
+  criteria.push(criterion("restored chain starts with the pre-upgrade chain", isPrefix(ctx.state.preUpgradeSnapshot, snapshot)));
   const turn = governedTurn(ctx);
   criteria.push(criterion("governed turn passes on the restored N-1", turn.ok, turn));
   return verdict(criteria);

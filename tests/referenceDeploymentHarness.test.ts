@@ -5,6 +5,7 @@ import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { describe, expect, it } from "vitest";
 import { validateQualificationDir } from "../scripts/check-qualification-receipts.mjs";
+import { isPrefix, isRestoredPrefix } from "../qualification/reference-deployment/checks/lib.mjs";
 import { buildReceipt, evaluateResults, loadMatrix, main, MATRIX_DIR, parseArgs, runChecks, targetProblems } from "../scripts/qualify-reference-deployment.mjs";
 
 // The 22 checks P2-06 names, in its order.
@@ -89,6 +90,22 @@ describe("receipt verdict", () => {
     } finally {
       rmSync(root, { recursive: true, force: true });
     }
+  });
+});
+
+describe("chain comparisons", () => {
+  const chain = (hashes: string[], sessions = hashes.map(() => "s1")) => ({ hashes, sessions });
+  it("isPrefix: byte-identical leading event hashes only", () => {
+    expect(isPrefix(chain(["a", "b"]), chain(["a", "b", "c"]))).toBe(true);
+    expect(isPrefix(chain(["a", "x"]), chain(["a", "b", "c"]))).toBe(false);
+    expect(isPrefix(chain(["a", "b", "c"]), chain(["a", "b"]))).toBe(false);
+  });
+
+  it("isRestoredPrefix allows only the restore's own trailing audit rows beyond the shared prefix", () => {
+    const source = chain(["a", "b", "c"]);
+    expect(isRestoredPrefix(chain(["a", "b", "r"], ["s1", "s1", "ops-backup_restored-1-x"]), source)).toBe(true);
+    expect(isRestoredPrefix(chain(["a", "b", "f"], ["s1", "s1", "gateway-session"]), source)).toBe(false);
+    expect(isRestoredPrefix(chain(["z"], ["ops-backup_restored-1-x"]), source)).toBe(false);
   });
 });
 
