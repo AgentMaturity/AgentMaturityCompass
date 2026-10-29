@@ -12,6 +12,7 @@ import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import type { ActionClass } from "../types.js";
 import { casebookCaseSchema, casebookSchema, type CasebookCase, type CasebookFile } from "./casebookSchema.js";
+import { measurementLanguageWarnings } from "../experiments/measurementLanguage.js";
 
 interface SignedDigest {
   digestSha256: string;
@@ -156,6 +157,12 @@ export function loadCase(workspace: string, casebookId: string, caseId: string, 
     throw new Error(`case file not found: ${file}`);
   }
   return casebookCaseSchema.parse(JSON.parse(readUtf8(file)) as unknown);
+}
+
+/** Warning-level lint of every case prompt for measurement language (H2X-29); never refuses. */
+export function casebookMeasurementWarnings(workspace: string, casebookId: string, agentId?: string): string[] {
+  return loadCasebook(workspace, casebookId, agentId).casebook.caseIds
+    .flatMap((caseId) => measurementLanguageWarnings(`${caseId} prompt`, loadCase(workspace, casebookId, caseId, agentId).inputs.prompt));
 }
 
 /** sha256 of one case file's bytes, as signed. */
@@ -317,8 +324,11 @@ export async function addCaseToCasebookAsync(supplied: Parameters<typeof addCase
 export function verifyCasebook(workspace: string, casebookId: string, agentId?: string): {
   valid: boolean;
   reasons: string[];
+  /** Advisory findings that do not fail verification. */
+  warnings: string[];
 } {
   const reasons: string[] = [];
+  const warnings: string[] = [];
   const casebookPath = casebookYamlPath(workspace, casebookId, agentId);
   const casebookSig = verifyFile(workspace, casebookPath);
   if (!casebookSig.valid) {
@@ -332,7 +342,8 @@ export function verifyCasebook(workspace: string, casebookId: string, agentId?: 
     reasons.push(`casebook parse error: ${String(error)}`);
     return {
       valid: false,
-      reasons
+      reasons,
+      warnings
     };
   }
 
@@ -344,7 +355,7 @@ export function verifyCasebook(workspace: string, casebookId: string, agentId?: 
       continue;
     }
     try {
-      loadCase(workspace, casebookId, caseId, agentId);
+      warnings.push(...measurementLanguageWarnings(`${caseId} prompt`, loadCase(workspace, casebookId, caseId, agentId).inputs.prompt));
     } catch (error) {
       reasons.push(`${caseId}: parse error ${String(error)}`);
     }
@@ -352,6 +363,7 @@ export function verifyCasebook(workspace: string, casebookId: string, agentId?: 
 
   return {
     valid: reasons.length === 0,
-    reasons
+    reasons,
+    warnings
   };
 }

@@ -8,6 +8,7 @@ import { HARNESS_COMPARISON_VERSION, comparisonObservationsSchema, comparisonOra
 import { comparisonSha256, readComparisonFile, redactComparisonText, redactComparisonValue, resolveComparisonPin, writeComparisonArtifact,
   type ComparisonArtifact } from "./harnessComparisonArtifacts.js";
 import { renderHarnessComparisonReport, summarizeHarnessComparison } from "./harnessComparisonReport.js";
+import { measurementLanguageWarnings } from "../experiments/measurementLanguage.js";
 
 export interface HarnessComparisonTrial {
   id: string; targetId: string; taskId: string; laneId: string; repetition: number;
@@ -28,6 +29,8 @@ export interface HarnessComparisonTrial {
   oracle: ComparisonOracle | null;
   observations: ComparisonObservations | null;
   budgetStatus: "not-applicable" | "unknown" | "within-recorded-bounds" | "exceeded";
+  /** Distinct executor (target) and judge (oracle) identities and wall-time budgets; optional on historical reports. */
+  authority?: { executor: { identity: string; timeoutMs: number }; judge: { identity: string; timeoutMs: number } };
   artifacts: ComparisonArtifact[];
 }
 
@@ -159,8 +162,10 @@ export function checkHarnessComparison(options: Pick<HarnessComparisonOptions, "
   const trials = Array.from({ length: manifest.repetitions }, (_, repetition) => manifest.tasks.flatMap(task =>
     [...manifest.targets.slice(repetition % manifest.targets.length), ...manifest.targets.slice(0, repetition % manifest.targets.length)]
       .map(target => ({ targetId: target.id, taskId: task.id, laneId: task.laneId, repetition: repetition + 1 })))).flat();
+  // Advisory only: task descriptions are written into the target's context, so measurement terms reach the solver.
+  const warnings = manifest.tasks.flatMap(task => measurementLanguageWarnings(`task ${task.id} description`, task.description));
   return { comparisonId: manifest.id, manifestSha256: comparisonSha256(bytes), ready: problems.length === 0,
-    environmentMatches, missingSecretEnv, problems, trials };
+    environmentMatches, missingSecretEnv, problems, warnings, trials };
 }
 
 /** Runs only operator-selected, pinned local commands; never fabricates a trial or a score. */
@@ -188,6 +193,7 @@ export async function runHarnessComparison(options: HarnessComparisonOptions): P
       "Automated conformance is not a human usability study or a coding-performance ranking.",
       "Shared manifest settings match requested conditions; effective model, permission and token/spend enforcement remain the pinned adapter's responsibility.",
       "The runner enforces wall time, isolated HOME/work directories, bounded capture and process-group termination; it is not an OS filesystem/network sandbox.",
+      "Evaluation is public, not hidden: the target's context names the oracle only by an opaque digest and the oracle runs with its own fresh HOME and temporary directory, but without an OS sandbox the target could still read oracle files on the host.",
       "Source commits are declared provenance. Determinate trials require artifact, executable, fixture, adapter and oracle file digests to match before and after execution; this does not attest a build-to-source relationship or every dynamic dependency.",
       "Latency is complete target-command wall time including adapter startup and process-group wait, not model-only latency. Failed and inconclusive executions retain their timing.",
       "Token/cache/cost/action counters remain attributed observations; missing values are unknown, and token/spend comparisons are retrospective rather than a substitute for live budget enforcement.",
@@ -223,6 +229,7 @@ export async function runHarnessComparison(options: HarnessComparisonOptions): P
         if (trial.reason) continue;
 
         let work: string | undefined;
+        let judgeRoot: string | undefined;
         let failureKind: NonNullable<HarnessComparisonTrial["failureKind"]> = "pin-mismatch";
         try {
           const artifact = resolveComparisonPin(target.artifact, base);
@@ -236,8 +243,13 @@ export async function runHarnessComparison(options: HarnessComparisonOptions): P
           const contextPath = join(workspace, "comparison-context.json");
           const observationsPath = join(workspace, "observations.json");
           writeFileSync(fixturePath, fixture, { mode: 0o400, flag: "wx" });
+          // The target (executor) gets the task without the oracle command; the judge is named by an opaque digest.
+          const { oracle: _oracle, ...executorTask } = task;
+          const judgeIdentity = `oracle:${comparisonSha256(JSON.stringify(task.oracle)).slice(0, 16)}`;
+          const judgeTimeoutMs = Math.min(lane.budgets.timeoutMs, 60_000);
+          trial.authority = { executor: { identity: `target:${target.id}`, timeoutMs: lane.budgets.timeoutMs }, judge: { identity: judgeIdentity, timeoutMs: judgeTimeoutMs } };
           writeFileSync(contextPath, JSON.stringify({ schemaVersion: HARNESS_COMPARISON_VERSION, trialId: trial.id,
-            task, lane, target: { id: target.id, source: target.source, artifact: target.artifact },
+            task: { ...executorTask, judgeId: judgeIdentity }, lane, target: { id: target.id, source: target.source, artifact: target.artifact },
             observationsPath, fixturePath }), { mode: 0o400, flag: "wx" });
           const variables = { workspace, fixture: fixturePath, context: contextPath, artifact, observations: observationsPath };
           failureKind = "pin-mismatch";
@@ -285,9 +297,16 @@ export async function runHarnessComparison(options: HarnessComparisonOptions): P
             observations: trial.observations, fixtureSha256: task.fixture.sha256 });
           // The oracle sees the bounded original captures through stdin, before
           // publication redaction. Otherwise runner redaction could fake a pass.
-          const oracleRun = runProcess({ argv: oracleArgv, cwd: workspace, env: publicEnv, stdin: "pipe", stdout: "capture", stderr: "capture",
+          // Created only after the target's process group has exited, outside its TMPDIR, so the target cannot seed the
+          // judge's HOME, configuration or temporary files.
+          judgeRoot = mkdtempSync(join(tmpdir(), "amc-harness-judge-"));
+          const judgeHome = join(judgeRoot, "home");
+          mkdirSync(judgeHome, { mode: 0o700 });
+          const judgeEnv = { ...publicEnv, HOME: judgeHome, USERPROFILE: judgeHome, XDG_CONFIG_HOME: join(judgeHome, ".config"),
+            XDG_CACHE_HOME: join(judgeHome, ".cache"), TMPDIR: judgeRoot };
+          const oracleRun = runProcess({ argv: oracleArgv, cwd: workspace, env: judgeEnv, stdin: "pipe", stdout: "capture", stderr: "capture",
             maxCaptureBytes: manifest.captureBytesPerStream, scrubValues: [], graceMs: 2000,
-            timeoutMs: Math.min(lane.budgets.timeoutMs, 60_000), ...(options.signal ? { signal: options.signal } : {}) });
+            timeoutMs: judgeTimeoutMs, ...(options.signal ? { signal: options.signal } : {}) });
           const delivered = await oracleRun.write(Buffer.from(oracleInput)); oracleRun.endStdin();
           const oracleOutcome = await oracleRun.done;
           await settleProcessGroup(oracleRun, oracleOutcome);
@@ -327,8 +346,9 @@ export async function runHarnessComparison(options: HarnessComparisonOptions): P
           trial.verdict = null;
           trial.reason = "A pin, input, process or observation contract could not be established; no outcome was fabricated.";
         } finally {
-          if (work) {
-            try { rmSync(work, { recursive: true, force: true }); }
+          for (const dir of [work, judgeRoot]) {
+            if (!dir) continue;
+            try { rmSync(dir, { recursive: true, force: true }); }
             catch (error) { trial.status = "inconclusive"; trial.verdict = null; trial.failureKind = "io";
               trial.failureMessage = redactComparisonText(error instanceof Error ? error.message : String(error), secrets).slice(0, 1024);
               trial.reason = "The trial's temporary workspace could not be removed."; }

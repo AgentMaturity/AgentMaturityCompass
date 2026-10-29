@@ -3659,6 +3659,8 @@ export interface ExperimentReport {
   methodVersion?: string;
   /** sha256 over the signed casebook index and case files the report was computed from. */
   casebookSha256?: string;
+  /** Advisory lint of agent-facing case prompts (e.g. measurement language); recorded, never a refusal. */
+  inputWarnings?: string[];
   candidateConfigDigest?: string | null;
   baseline?: ExperimentSideIdentity;
   candidate?: ExperimentSideIdentity;
