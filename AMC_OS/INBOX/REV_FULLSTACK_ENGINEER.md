@@ -418,3 +418,18 @@ Sandbox limits: the default home checkpoint path is unwritable, so the offline r
 Next owner actions: review the diff and test receipts, commit using `../codex-runs/wp13a-commit-message.txt`, and merge through Claude's integration lane. The sandbox cannot write git metadata; verify-wt.sh's attempted staging/amend is expected to fail, while its checks still run. Do not infer runtime/provider or release qualification beyond the recorded local checks.
 
 Final local validation: 1,597 cases passed (1,567 in 88 fully passing files, plus 30 in two partial files). The final verify-wt.sh command against `5d939a8a3` exited 0; all checks including freeze passed. Full per-row status, red/green and mutation evidence, per-file counts, sandbox limitations, and the interrupted empty-manifest discovery deviation are recorded in `../codex-runs/wp13a-report.md` and `wp13a-receipt.json`. No missing or empty test-report entry was counted as coverage.
+
+
+---
+
+# REV_FULLSTACK_ENGINEER handoff — 2026-10-30
+
+WP21 source candidate on `rtd/gap-wp21`, tip `5e090c6061a4748754bcd3f97c3d903156c780eb`, remains uncommitted for Claude review.
+
+The candidate adds governed MCP resource list/read, pinned resource templates and complete instruction identity, deferred metadata discovery, and bounded typed provenance/loss. Documentation and a patch changeset describe the behavior.
+
+Validation: 237 baseline cases passed across 9 files; 37/37 guard mutations were killed and source restored. Required verify-wt.sh exited 0 against `5e090c606`. Git metadata staging was refused by the sandbox; no commit was made.
+
+Native provider schema activation remains a WP13a follow-up. Live HTTP qualification is blocked by `listen EPERM: operation not permitted 127.0.0.1`; eight new cases and the related existing socket suites need an unrestricted runner. Binary bytes are deliberately omitted with digests/loss records. These limits constrain native onboarding and release claims.
+
+Claude's next actions: review the activation dependency and source, run the live suites, and commit the accepted change using the prepared message. Full row status, commands, evidence and remaining work are in `/Users/sid/AgentMaturityCompass-worktrees/s442cd919/work/codex-runs/wp21-report.md`.

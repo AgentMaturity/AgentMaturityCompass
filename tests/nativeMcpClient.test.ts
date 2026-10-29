@@ -88,11 +88,12 @@ function setup(state: FixtureState, permitted = state.tools.map(remote => remote
   initBudgets(workspace, "default"); writeRuntimeFirewallPolicy({ workspace, mode: "observe" });
   const config = loadToolsConfig(workspace);
   initToolsConfig(workspace, { ...config, tools: { ...config.tools, allowedTools: [...config.tools.allowedTools,
-    ...permitted.map(name => ({ name: nativeMcpToolName("fixture", name), actionClass }))] } });
+    { name: "tool_search", actionClass: "READ_ONLY" as const }, ...permitted.map(name => ({ name: nativeMcpToolName("fixture", name), actionClass }))] } });
   const session = new SessionService(workspace);
   session.open({ sessionId: "native-mcp-fixture", agentId: "default", harnessVersion: "fixture", compositionDigest: "fixture", policyDigest: "fixture" });
   session.startTurn({ trigger: "user" }); session.startStep();
-  const tools = agentToolset({ workspace, agentId: "default", sessionId: session.sessionId, recorder: session });
+  const tools = agentToolset({ workspace, agentId: "default", sessionId: session.sessionId, recorder: session,
+    additionalCapabilities: permitted.map(name => ({ name: nativeMcpToolName("fixture", name), actionClass })) });
   const mounts: MountedNativeMcpServer[] = [];
   cleanups.push(async () => {
     try { for (const mount of mounts) await mount.close(); }
@@ -353,21 +354,25 @@ describe("WP41 native MCP mount lifecycle", () => {
 });
 
 describe("native MCP configuration admission", () => {
-  test("a reviewed MCP-only policy is ready and late mounting still exposes and executes its pinned tool", async () => {
+  test("a reviewed MCP policy offers discovery and keeps the mounted tool deferred but executable", async () => {
     const fixture = setup({ tools: [tool()] });
     const config = loadToolsConfig(fixture.workspace);
-    config.tools.allowedTools = config.tools.allowedTools.filter(entry => entry.name === nativeMcpToolName("fixture", "lookup"));
+    config.tools.allowedTools = config.tools.allowedTools.filter(entry => entry.name === nativeMcpToolName("fixture", "lookup") || entry.name === "tool_search");
     initToolsConfig(fixture.workspace, config);
     const discovered = await discoverNativeMcpCatalog(fixture.server, fixture.workspace);
     const path = join(fixture.workspace, "mcp-only.json");
     writeFileSync(path, JSON.stringify({ schemaVersion: 1, server: fixture.server, expectedCatalogDigest: discovered.digest,
       grants: [{ name: "lookup", actionClass: "READ_ONLY" }] }));
     const review = requireReviewedNativeMcpGrants(loadNativeMcpConfiguration(path), fixture.workspace, "READ_ONLY");
-    expect(checkToolsetReadiness(fixture.workspace).ready).toBe(false);
+    expect(checkToolsetReadiness(fixture.workspace).ready).toBe(true);
     expect(checkToolsetReadiness(fixture.workspace, { additionalCapabilities: review.capabilities }).ready).toBe(true);
-    expect(fixture.tools.seam.schemas()).toBeNull();
+    expect(fixture.tools.seam.schemas()?.map(schema => schema.name)).toEqual(["tool_search"]);
     await fixture.mount();
-    expect(fixture.tools.seam.schemas()?.map(schema => schema.name)).toEqual([nativeMcpToolName("fixture", "lookup")]);
+    expect(fixture.tools.seam.schemas()?.map(schema => schema.name)).toEqual(["tool_search"]);
+    expect(fixture.tools.registry.catalog("default").map(schema => schema.name)).toContain(nativeMcpToolName("fixture", "lookup"));
+    const discovery = await fixture.tools.pipeline.execute({ name: "tool_search", agentId: "default", arguments: { query: "lookup" }, requestedMode: "EXECUTE" });
+    expect(discovery.ok).toBe(true);
+    expect(JSON.parse(discovery.output).tools.map((entry: { name: string }) => entry.name)).toContain(nativeMcpToolName("fixture", "lookup"));
     expect((await fixture.call("lookup", { query: "only reviewed remote capability" })).outcome).toBe("OK");
     expect(fixture.calls()).toHaveLength(1);
   });
