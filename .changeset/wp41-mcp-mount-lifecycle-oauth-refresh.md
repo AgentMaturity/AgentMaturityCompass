@@ -1,0 +1,5 @@
+---
+"agent-maturity-compass": patch
+---
+
+Harden the native MCP mount lifecycle and OAuth refresh. A stdio call's own timeout or cancellation now cancels only that request, so sibling tools stay usable; progress notifications renew the call timeout up to a new bounded `maxTotalMs`. Stdio servers run in their own process group and closing a mount terminates the whole tree. `mcp-catalog --diagnostics` prints a scrubbed, bounded server stderr and logging tail on failure. MCP OAuth refresh re-reads the grant under the credential store's cross-process lock, so a rotating refresh token is redeemed once across concurrent refreshers, and the rotated grant is stored even if the caller stops waiting; mounted HTTP servers renew a near-expiry bearer per request. Image, audio and blob results stay typed with their digest instead of base64 text, server instructions are exposed as typed bounded data, and `agent-loop run` accepts several reviewed `--mcp-config` files. Catalog drift refusal and egress pinning are unchanged.

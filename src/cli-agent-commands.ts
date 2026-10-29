@@ -190,8 +190,8 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--credential <ref>", "credential REFERENCE (never a value) the route authenticates with")
     .option("--credentials-home <dir>", "home directory the credentials store reads from")
     .option("--credentials-file <path>", "explicit credentials file, overriding the home layout")
-    .option("--mcp-config <path>", "reviewed MCP JSON; requires --tools workspace and --approve-tools")
-    .option("--mcp-config-sha256 <digest>", "refuse an MCP config changed from these exact reviewed bytes")
+    .option("--mcp-config <path>", "reviewed MCP JSON; repeat to mount more servers under the same signed allowlist and approval class; requires --tools workspace and --approve-tools", collectOption)
+    .option("--mcp-config-sha256 <digest>", "refuse an MCP config changed from these exact reviewed bytes; one per --mcp-config, in the same order", collectOption)
     .option("--max-tokens <n>", "provider max_tokens for each request")
     .option("--thinking <mode>", "DeepSeek only: enabled (default) or disabled")
     .option("--reasoning-effort <effort>", "DeepSeek only: exact low, high (default), or max with enabled thinking")
@@ -400,6 +400,9 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       if (opts.mcpConfigSha256 !== undefined && opts.mcpConfig === undefined) {
         io.error("--mcp-config-sha256 requires --mcp-config."); io.fail(); return;
       }
+      if (opts.mcpConfigSha256 !== undefined && opts.mcpConfigSha256.length !== opts.mcpConfig!.length) {
+        io.error("Give one --mcp-config-sha256 per --mcp-config, in the same order."); io.fail(); return;
+      }
       if (opts.mcpConfig !== undefined && opts.approvalException !== undefined) {
         io.error("MCP tools require the actual signed approval gate; approval exceptions are not accepted."); io.fail(); return;
       }
@@ -408,23 +411,28 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       if (opts.interactiveApprovals && gate === undefined) {
         io.error("--interactive-approvals requires --approve-tools to raise actual signed requests."); io.fail(); return;
       }
-      let mcpConfig: LoadedNativeMcpConfiguration | null = null;
-      let mcpReview: { expectedCatalogDigest: string; grants: readonly NativeMcpGrant[]; capabilities: readonly NativeToolCapability[] } | null = null;
+      // Every server passes the same review: its own pinned config, catalog digest and grants, the one signed allowlist and approval class.
+      const mcpServers: { config: LoadedNativeMcpConfiguration; review: { expectedCatalogDigest: string; grants: readonly NativeMcpGrant[]; capabilities: readonly NativeToolCapability[] } }[] = [];
       if (opts.mcpConfig !== undefined) {
         if (opts.tools !== "workspace" || gate === undefined) {
           io.error("--mcp-config requires explicit --tools workspace and --approve-tools with matching grant action classes."); io.fail(); return;
         }
         try {
           const { loadNativeMcpConfiguration, requireReviewedNativeMcpGrants } = await import("./setup/nativeMcpConfig.js");
-          mcpConfig = loadNativeMcpConfiguration(opts.mcpConfig, opts.mcpConfigSha256);
-          mcpReview = requireReviewedNativeMcpGrants(mcpConfig, process.cwd(), gate.actionClass);
+          for (const [index, path] of opts.mcpConfig.entries()) {
+            const config = loadNativeMcpConfiguration(path, opts.mcpConfigSha256?.[index]);
+            if (mcpServers.some(entry => entry.config.config.server.id === config.config.server.id)) {
+              throw new NativeMcpConfigError("Each --mcp-config must name a distinct server id.");
+            }
+            mcpServers.push({ config, review: requireReviewedNativeMcpGrants(config, process.cwd(), gate.actionClass) });
+          }
         } catch (error) {
           io.error(error instanceof NativeMcpConfigError ? error.message : "MCP preflight refused. Review the config digest, catalog pin, explicit grants, matching signed allowlist and approval class; no server was started.");
           io.fail(); return;
         }
       }
       if (opts.takeoverExpiredWriter !== undefined && opts.session === undefined) { io.error("--takeover-expired-writer requires --session <id>."); io.fail(); return; }
-      if (opts.session !== undefined && mcpConfig !== null) {
+      if (opts.session !== undefined && mcpServers.length) {
         // Mounting can execute a process or contact a server. Check the signed
         // identity first; resumeSession repeats admission before taking ownership.
         const { assertSessionResumeAgent } = await import("./session/sessionResume.js");
@@ -490,7 +498,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
         const toolset = workspaceToolset = agentToolset({
           workspace: process.cwd(),
           agentId,
-          additionalCapabilities: [...(mcpReview?.capabilities ?? []), ...(wantsDelegation ? [{ name: "delegate", actionClass: "READ_ONLY" as const }] : [])],
+          additionalCapabilities: [...mcpServers.flatMap(entry => entry.review.capabilities), ...(wantsDelegation ? [{ name: "delegate", actionClass: "READ_ONLY" as const }] : [])],
           // Fork chooses a different ID; resume chooses the existing writer.
           get sessionId() { return actualSession().sessionId; },
           recorder: { recordProjectedEvidence: (row) => actualSession().recordProjectedEvidence(row), assertWritable: () => actualSession().assertWritable() },
@@ -609,19 +617,22 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       }
       const timers: NodeJS.Timeout[] = [];
       let onSigint: (() => void) | null = null;
-      let mcpMount: MountedNativeMcpServer | null = null;
+      const mcpMounts: MountedNativeMcpServer[] = [];
       const mcpAbort = new AbortController();
       const cancelMcp = () => mcpAbort.abort();
-      if (mcpConfig !== null) process.on("SIGINT", cancelMcp);
+      if (mcpServers.length) process.on("SIGINT", cancelMcp);
 
       try {
-        if (mcpConfig !== null && mcpReview !== null && workspaceToolset !== null) {
+        if (mcpServers.length && workspaceToolset !== null) {
           const { resolveNativeMcpServer } = await import("./setup/nativeMcpConfig.js");
           const { mountNativeMcpServer } = await import("./mcp/nativeMcpClient.js");
-          const server = await resolveNativeMcpServer(mcpConfig.config, { ...opts, workspace: process.cwd() });
-          mcpMount = await mountNativeMcpServer({ server, workspace: process.cwd(), agentId,
-            toolset: workspaceToolset, ...mcpReview, signal: mcpAbort.signal });
-          progress(`Mounted reviewed MCP tools for this run: ${mcpMount.toolNames.join(", ")}. Signed allowlist, approval gate and budgets remain in force.`);
+          for (const { config, review } of mcpServers) {
+            const server = await resolveNativeMcpServer(config.config, { ...opts, workspace: process.cwd() });
+            const mount = await mountNativeMcpServer({ server, workspace: process.cwd(), agentId,
+              toolset: workspaceToolset, ...review, signal: mcpAbort.signal });
+            mcpMounts.push(mount);
+            progress(`Mounted reviewed MCP tools for this run: ${mount.toolNames.join(", ")}. Signed allowlist, approval gate and budgets remain in force.`);
+          }
         }
         let previewRequest: string | null = null;
         let priorTurnEndings = 0;
@@ -770,8 +781,8 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       } finally {
         for (const timer of timers) clearTimeout(timer);
         if (onSigint !== null) process.removeListener("SIGINT", onSigint);
-        try { await mcpMount?.close(); }
-        catch { io.error("MCP cleanup failed; this mount must not be reused."); io.fail(); }
+        const closed = await Promise.allSettled(mcpMounts.map(mount => mount.close()));
+        try { if (closed.some(result => result.status === "rejected")) { io.error("MCP cleanup failed; this mount must not be reused."); io.fail(); } }
         finally {
           process.removeListener("SIGINT", cancelMcp);
           workspaceToolset?.close();
