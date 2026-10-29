@@ -1,11 +1,11 @@
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 
-export const HOLDOUT_PARTITION_METHOD = "seeded-stratified-v1" as const;
-export const DEFAULT_HOLDOUT_SEED = "42";
-export const DEFAULT_VALIDATION_FRACTION = 0.5;
+const HOLDOUT_PARTITION_METHOD = "seeded-stratified-v1" as const;
+const DEFAULT_HOLDOUT_SEED = "42";
+const DEFAULT_VALIDATION_FRACTION = 0.5;
 
-export interface HoldoutStratum {
+interface HoldoutStratum {
   /** The domain the cases share (a Fixer failure class). */
   stratum: string;
   searchIds: string[];

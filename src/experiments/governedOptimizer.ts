@@ -17,7 +17,7 @@ import { sha256Hex } from "../utils/hash.js";
 import { buildHoldoutPartition, holdoutPartitionProblems, type HoldoutPartition } from "./holdoutPartition.js";
 
 /** Upstream BenchSpec refuses observation caps below this many characters. */
-export const MIN_OBSERVATION_CAP_CHARS = 10_000;
+const MIN_OBSERVATION_CAP_CHARS = 10_000;
 const MAX_OBSERVATION_CAP_CHARS = 1_000_000;
 
 export interface OptimizerSplit {
