@@ -34,6 +34,7 @@ export { getBuiltInRedactionRules, applyRedaction, runRedactionTests };
 import {
   saveWorkspaceRecord,
   loadWorkspaceRecords,
+  verifyWorkspaceRecords,
   prepareWorkspaceRecordAsync,
   withWorkspaceRecordPublicationLock
 } from "../storage/workspaceRecordStore.js";
@@ -620,6 +621,15 @@ export function generateResidencyReport(
 
   if (redactionSuite && redactionSuite.failCount > 0) {
     violations.push(`[MEDIUM] ${redactionSuite.failCount} redaction test(s) failed.`);
+  }
+
+  // A tampered, unsigned or missing residency record must not vanish from the report (WP37).
+  if (workspace) {
+    for (const at of [POLICIES_AT, TENANTS_AT]) {
+      for (const finding of verifyWorkspaceRecords(workspace, at).findings) {
+        violations.push(`[HIGH] Residency record integrity (${at.kind}): ${finding.code} ${finding.file}: ${finding.detail}`);
+      }
+    }
   }
 
   return {

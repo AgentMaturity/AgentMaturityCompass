@@ -11,7 +11,7 @@ export function renderBenchPercentileTable(root, percentiles) {
   if (!root) return;
   const rows = Object.entries(percentiles || {})
     .sort((a, b) => a[0].localeCompare(b[0]))
-    .map(([key, value]) => `<tr><td>${esc(key)}</td><td>${Number(value).toFixed(2)}</td></tr>`)
+    .map(([key, value]) => `<tr><td>${esc(key)}</td><td>${value === null ? "n/a" : Number(value).toFixed(2)}</td></tr>`)
     .join("");
   root.innerHTML = `
     <table>

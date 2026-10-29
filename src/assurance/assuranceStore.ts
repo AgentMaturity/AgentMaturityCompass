@@ -36,7 +36,8 @@ export function assuranceRunSummary(workspace: string, runId: string): {
   };
 }
 
-export function latestAssuranceCertificateSummary(workspace: string):
+/** The latest certificate as found, verified or not: for readiness gates and inspection that must see an invalid one. */
+export function inspectLatestAssuranceCertificate(workspace: string):
   | {
       file: string;
       sha256: string;
@@ -58,6 +59,12 @@ export function latestAssuranceCertificateSummary(workspace: string):
     cert: assuranceCertSchema.parse(verify.cert),
     verify
   };
+}
+
+/** The latest certificate only when it verifies (WP37): binders and passports must not embed an unverified status. */
+export function latestAssuranceCertificateSummary(workspace: string): ReturnType<typeof inspectLatestAssuranceCertificate> {
+  const latest = inspectLatestAssuranceCertificate(workspace);
+  return latest?.verify.ok ? latest : null;
 }
 
 export function assuranceWaiverStatus(workspace: string, nowTs = Date.now()): {

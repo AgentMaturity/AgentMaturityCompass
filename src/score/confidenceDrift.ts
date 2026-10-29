@@ -1,3 +1,5 @@
+import type { EvidenceOutcome } from "../types.js";
+
 export interface ConfidencePrediction {
   id: string;
   timestamp: string;
@@ -11,7 +13,9 @@ export interface ConfidencePrediction {
 export interface ConfidenceDriftProfile {
   agentId: string;
   predictions: ConfidencePrediction[];
-  calibrationScore: number;
+  /** null when no prediction was resolved: calibration was not evaluated, never a perfect 1 (WP37). */
+  calibrationScore: number | null;
+  outcome: EvidenceOutcome;
   citationlessHighConfidenceRate: number;
   driftTrend: 'improving' | 'stable' | 'degrading';
   overconfidencePenalty: number;
@@ -20,7 +24,7 @@ export interface ConfidenceDriftProfile {
 
 export function trackConfidenceDrift(predictions: ConfidencePrediction[]): ConfidenceDriftProfile {
   const resolved = predictions.filter(p => p.wasCorrect !== undefined);
-  let calibrationScore = 1;
+  let calibrationScore: number | null = null;
 
   if (resolved.length > 0) {
     const bins = [0.2, 0.4, 0.6, 0.8, 1.0];
@@ -34,7 +38,7 @@ export function trackConfidenceDrift(predictions: ConfidencePrediction[]): Confi
       totalError += Math.abs(avgConf - accuracy);
       binCount++;
     }
-    calibrationScore = binCount > 0 ? Math.max(0, 1 - totalError / binCount) : 1;
+    calibrationScore = binCount > 0 ? Math.max(0, 1 - totalError / binCount) : null;
   }
 
   const highConf = predictions.filter(p => p.confidenceLevel >= 0.8);
@@ -63,6 +67,7 @@ export function trackConfidenceDrift(predictions: ConfidencePrediction[]): Confi
     agentId: 'unknown',
     predictions,
     calibrationScore,
+    outcome: calibrationScore === null ? "not_evaluated" : "measured",
     citationlessHighConfidenceRate,
     driftTrend,
     overconfidencePenalty,

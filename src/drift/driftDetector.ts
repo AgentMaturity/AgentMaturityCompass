@@ -2,6 +2,8 @@ import { randomUUID } from "node:crypto";
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { latestAssuranceByPack } from "../assurance/assuranceRunner.js";
+import { sealedRunReportVerifies } from "../diagnostic/reportSeal.js";
+import { refusedRunsBlocking, scanVerifiedRuns } from "../diagnostic/runReportResolution.js";
 import { openLedger } from "../ledger/ledger.js";
 import type { DiagnosticReport } from "../types.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
@@ -11,11 +13,13 @@ import { createFreezeIncident, createFreezeIncidentForSnapshot, createFreezeInci
 import { dispatchAlert, captureVerifiedAlertsConfig } from "./alerts.js";
 import { evaluateDriftRules } from "./driftRules.js";
 
+/** Sealed runs only (WP37): an edited run must neither trigger nor suppress a signed freeze. Bytes are kept for the TOCTOU re-check. */
 function loadRunRows(workspace: string, agentId: string): Array<{ path: string; bytes: Buffer; run: DiagnosticReport }> {
   const runsDir = getAgentPaths(workspace, agentId).runsDir;
   if (!pathExists(runsDir)) return [];
   return readdirSync(runsDir).filter(name => name.endsWith(".json")).flatMap(name => {
-    try { const path = join(runsDir, name), bytes = readFileSync(path), run = JSON.parse(bytes.toString("utf8")) as DiagnosticReport | null; return run === null ? [] : [{ path, bytes, run }]; }
+    try { const path = join(runsDir, name), bytes = readFileSync(path), run = JSON.parse(bytes.toString("utf8")) as DiagnosticReport | null;
+      return run !== null && sealedRunReportVerifies(workspace, run as unknown as Record<string, unknown>) ? [{ path, bytes, run }] : []; }
     catch { return []; }
   }).sort((a, b) => a.run.ts - b.run.ts);
 }
@@ -44,6 +48,9 @@ function prepareDriftDecision(input: DriftCheckParams): { result: DriftCheckResu
     const previous = values.filter(row => row.run.ts < current.run.ts).at(-1)!; return { current, previous };
   };
   const selected = select(rows), { current, previous } = { current: selected.current.run, previous: selected.previous.run };
+  // A tampered, unreadable or newer unsealed run means the selected pair may be stale: report it, never decide on it (WP37).
+  const blocking = refusedRunsBlocking(scanVerifiedRuns(params.workspace, agentId).refused, current.ts);
+  if (blocking.length > 0) return empty([`INSUFFICIENT_EVIDENCE: unverifiable diagnostic run(s) ${blocking.map(row => row.file).join(", ")}; drift not evaluated`], previous.runId, current.runId);
   let alerts: ReturnType<typeof captureVerifiedAlertsConfig>;
   try { alerts = captureVerifiedAlertsConfig(params.workspace); }
   catch (error) { return empty([`alerts config invalid: ${error instanceof Error ? error.message : "unknown"}`], previous.runId, current.runId); }

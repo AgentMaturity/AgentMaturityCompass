@@ -50,6 +50,8 @@ import { installedPluginTrust, pluginKeygen, pluginPack, verifyPluginPackage } f
 import { initPluginRegistry, publishPluginToRegistry } from "../../src/plugins/pluginRegistry.js";
 import { browseRegistry, resolveRegistryPackage } from "../../src/plugins/pluginRegistryClient.js";
 import { operatorTrustHome, pinnedTrust } from "../helpers/trustContext.js";
+import { writeSealedReport } from "../helpers/sealedRun.js";
+import { getAgentPaths } from "../../src/fleet/paths.js";
 
 /**
  * P0-09 forgery suite: one describe per verifier in the PR 2 and PR 3 rows of the issue table. Each builds a real
@@ -498,8 +500,8 @@ describe("verifyTrustCertificateEnvelope (amc cert verify, trust-certificate JSO
     initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
     const auditorPub = join(dir("amc-forgery-records-"), "auditor.pub");
     writeFileSync(auditorPub, readFileSync(join(workspace, ".amc", "keys", "auditor_ed25519.pub")));
-    mkdirSync(join(workspace, ".amc", "agents", "default", "runs"), { recursive: true });
-    writeJson(join(workspace, ".amc", "agents", "default", "runs", "run-1.json"), { runId: "run-1", ts: Date.now(), integrityIndex: 0.4 });
+    // Sealed: since WP37 a trust certificate is signed only from a run whose seal verifies.
+    writeSealedReport(workspace, getAgentPaths(workspace, "default").runsDir, "run-1", { runId: "run-1", ts: Date.now(), integrityIndex: 0.4 });
     const file = generateTrustCertificate({ workspace, agentId: "default", outputPath: "trust.json" }).outputPath;
     fixture = { workspace, file, auditorPub };
   }, 60_000);

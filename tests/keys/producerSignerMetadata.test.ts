@@ -22,6 +22,8 @@ import { canonicalize } from "../../src/utils/json.js";
 import { sha256Hex } from "../../src/utils/hash.js";
 import { lockVault } from "../../src/vault/vault.js";
 import { workspaceKeyPem, workspaceKeyTrust } from "../helpers/trustContext.js";
+import { writeSealedReport } from "../helpers/sealedRun.js";
+import { getAgentPaths } from "../../src/fleet/paths.js";
 
 // Replace only the production policy signer's synchronous HTTP bridge. All key generation, provider-description
 // checks, NotarySigner, signatures, signed trust config/history, descriptor resolution, producers and verifiers are real.
@@ -41,7 +43,9 @@ vi.mock("node:child_process", async importOriginal => {
 });
 const roots: string[] = [];
 const fresh = () => { const root = mkdtempSync(join(tmpdir(), "amc-producer-signer-")); roots.push(root); return root; };
-const workspace = () => { const root = fresh(); initWorkspace({ workspacePath: root, trustBoundaryMode: "isolated" }); return root; };
+/** Since WP37 a trust certificate is signed only from a sealed run; seed one sealed with the workspace's own key. */
+const seedSealedRun = (root: string) => { writeSealedReport(root, getAgentPaths(root, "default").runsDir, "seed-run", { runId: "seed-run", ts: 1, integrityIndex: 0.5 }); return root; };
+const workspace = () => { const root = fresh(); initWorkspace({ workspacePath: root, trustBoundaryMode: "isolated" }); return seedSealedRun(root); };
 afterEach(() => { transport.handler = null; transport.requests = []; vi.unstubAllEnvs();
   for (const root of roots.splice(0)) { lockVault(root); rmSync(root, { recursive: true, force: true }); } });
 

@@ -19,7 +19,7 @@ import {
 import { issueAssuranceCertificate } from "./assuranceCertificates.js";
 import { verifyAssuranceCertificateFile } from "./assuranceVerifier.js";
 import type { TrustContext } from "../trust/trustContext.js";
-import { latestAssuranceCertificateSummary } from "./assuranceStore.js";
+import { inspectLatestAssuranceCertificate } from "./assuranceStore.js";
 import {
   assuranceSchedulerRunNow,
   assuranceSchedulerSetEnabled, assuranceSchedulerSetEnabledAsync,
@@ -28,6 +28,7 @@ import {
 import { assuranceWaiverSchema } from "./assuranceSchema.js";
 import { loadAssuranceReport, latestAssuranceReports, listAssuranceHistory, runAssurance } from "./assuranceRunner.js";
 import { listAssurancePacks } from "./packs/index.js";
+import { assuranceRunRecord, severityForScore } from "./assuranceArtifactPersistence.js";
 import { captureOrgPairs, captureOrgFiles, assertOrgPairsCurrent, captureOrgPairsAuthority, orgPairBytes, type OrgPairsOptions } from "../org/preparedOrgPairs.js";
 import { verifyAuditorSignatureBytes } from "../org/orgSignatureBytes.js";
 import { getAuthenticatedKeyHistory } from "../crypto/keys.js";
@@ -85,27 +86,16 @@ function runStatusFromReport(report: {
   return report.overallScore0to100 >= minRiskAssuranceScore ? "PASS" : "FAIL";
 }
 
-function findingCountsFromReport(report: { packResults: Array<{ scenarioResults: Array<{ pass: boolean }> }> }) {
-  const failedCount = report.packResults.reduce(
-    (sum, pack) => sum + pack.scenarioResults.filter((scenario) => !scenario.pass).length,
-    0
-  );
-  return {
-    critical: 0,
-    high: failedCount,
-    medium: 0,
-    low: 0,
-    info: 0
-  };
-}
-
+/** Studio/API view of a report, from the runner's own run record (WP37): no fabricated evidence gates or severities. */
 function legacyProjectionForReport(params: {
   scopeType: "WORKSPACE" | "NODE" | "AGENT";
   scopeId?: string;
   minRiskAssuranceScore: number;
 }, report: Awaited<ReturnType<typeof runAssurance>>) {
-  const status = runStatusFromReport(report, params.minRiskAssuranceScore);
-  const findingCounts = findingCountsFromReport(report);
+  const record = assuranceRunRecord(report);
+  const status: "PASS" | "FAIL" | "ERROR" | "INSUFFICIENT_EVIDENCE" = report.status !== "VALID" ? "ERROR"
+    : record.score.status === "INSUFFICIENT_EVIDENCE" ? "INSUFFICIENT_EVIDENCE"
+      : runStatusFromReport(report, params.minRiskAssuranceScore);
   return {
     runId: report.assuranceRunId,
     generatedTs: report.ts,
@@ -117,14 +107,10 @@ function legacyProjectionForReport(params: {
       status,
       pass: status === "PASS",
       riskAssuranceScore: report.overallScore0to100,
-      findingCounts
+      findingCounts: record.score.findingCounts
     },
     selectedPacks: report.packResults.map((pack) => pack.packId),
-    evidenceGates: {
-      integrityIndex: report.integrityIndex,
-      correlationRatio: 1,
-      observedShare: 1
-    }
+    evidenceGates: record.evidenceGates
   };
 }
 
@@ -135,12 +121,13 @@ function findingsProjectionForReport(report: Awaited<ReturnType<typeof runAssura
     generatedTs: report.ts,
     findings: report.packResults.flatMap((pack) =>
       pack.scenarioResults
-        .filter((scenario) => !scenario.pass)
+        // Same rule as the runner's record: an inconclusive row is not a finding, and severity follows its score.
+        .filter((scenario) => !scenario.pass && !scenario.inconclusive)
         .map((scenario) => ({
           findingId: `${pack.packId}:${scenario.scenarioId}`,
           scenarioId: scenario.scenarioId,
           category: scenario.category,
-          severity: "HIGH",
+          severity: severityForScore(scenario.score0to100),
           descriptionTemplateId: `${pack.packId.toUpperCase()}_${scenario.scenarioId}`,
           evidenceRefs: {
             runId: report.assuranceRunId,
@@ -224,7 +211,7 @@ export function assuranceRunsForApi(workspace: string) {
     runId: string;
     generatedTs: number;
     scope: { type: "WORKSPACE" | "NODE" | "AGENT"; id: string };
-    status: "PASS" | "FAIL" | "ERROR";
+    status: "PASS" | "FAIL" | "ERROR" | "INSUFFICIENT_EVIDENCE";
     pass: boolean;
     score: number;
     findingCounts: {
@@ -301,7 +288,7 @@ export async function assuranceCertIssueForApi(params: {
 }
 
 export function assuranceCertLatestForApi(workspace: string) {
-  const latest = latestAssuranceCertificateSummary(workspace);
+  const latest = inspectLatestAssuranceCertificate(workspace);
   return {
     latest,
     waiver: activeAssuranceWaiver(workspace)
@@ -378,7 +365,7 @@ function readinessProjection(workspace: string, policy: ReturnType<typeof loadAs
     }
   }
 
-  const latestCert = latestAssuranceCertificateSummary(workspace);
+  const latestCert = inspectLatestAssuranceCertificate(workspace);
   if (latestCert && !latestCert.verify.ok) {
     reasons.push("ASSURANCE_CERT_INVALID");
   }
@@ -519,7 +506,7 @@ export function assuranceWaiverRequestForApi(params: {
   const requestId = `wvrreq_${randomUUID().replace(/-/g, "")}`;
   const intentId = `assurance-waiver-${requestId}`;
   const policySha = sha256Hex(Buffer.from(readUtf8(assurancePolicyPath(params.workspace)), "utf8"));
-  const latestCert = latestAssuranceCertificateSummary(params.workspace);
+  const latestCert = inspectLatestAssuranceCertificate(params.workspace);
   const lastCertSha256 = latestCert?.sha256 ?? "0".repeat(64);
 
   const approval = createApprovalForIntent({

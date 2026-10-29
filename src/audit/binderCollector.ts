@@ -12,8 +12,7 @@ import { verifyBudgetsConfigSignature } from "../budgets/budgets.js";
 import { canonPath } from "../canon/canonLoader.js";
 import { cgxLatestGraphPath, cgxLatestPackPath } from "../cgx/cgxStore.js";
 import { diagnosticBankPath } from "../diagnostic/bank/bankLoader.js";
-import { loadRunReport } from "../diagnostic/runner.js";
-import { latestRunId } from "../diagnostic/runReportResolution.js";
+import { latestVerifiedRun } from "../diagnostic/runReportResolution.js";
 import { resolveAgentId } from "../fleet/paths.js";
 import { verifyLedgerIntegrity, openLedger } from "../ledger/ledger.js";
 import { mechanicTargetsPath } from "../mechanic/targetsStore.js";
@@ -699,9 +698,9 @@ export function collectAuditBinderLocalData(params: AuditBinderCollectionInput, 
   let runCount = 0;
 
   if (scope.type === "AGENT") {
-    const runId = latestRunId(params.workspace, scope.id);
-    if (runId) {
-      const run = loadRunReport(params.workspace, runId, scope.id);
+    // Sealed runs only (WP37); a tampered or newer unverifiable run blocks it rather than rolling back to an older one.
+    const { run, blocking } = latestVerifiedRun(params.workspace, scope.id);
+    if (run) {
       assertNotExample(run, "included in an audit binder");
       maturityOverall = Number((run.layerScores.reduce((sum, row) => sum + row.avgFinalLevel, 0) / Math.max(1, run.layerScores.length)).toFixed(6));
       maturityByDim = byDimensionFromRun(run);
@@ -716,7 +715,7 @@ export function collectAuditBinderLocalData(params: AuditBinderCollectionInput, 
       maturityRefs = dedupeSorted([sha256Hex(Buffer.from(run.runId, "utf8"))]);
       maturityNotes = dedupeSorted(run.evidenceToCollectNext.slice(0, 6));
     } else {
-      maturityNotes = ["No agent diagnostic runs were found."];
+      maturityNotes = [blocking.length > 0 ? `Unverifiable agent diagnostic runs block the latest result: ${blocking.length}.` : "No sealed agent diagnostic runs were found."];
     }
   } else {
     const scorecard = loadLatestOrgScorecard(params.workspace);
@@ -1051,7 +1050,7 @@ export function collectAuditBinderLocalData(params: AuditBinderCollectionInput, 
       recurrence: {
         diagnosticCadence: {
           configuredHours: tuning?.diagnosticCadenceHours ?? null,
-          lastRunTs: scope.type === "AGENT" ? (latestRunId(params.workspace, scope.id) ? loadRunReport(params.workspace, latestRunId(params.workspace, scope.id)!, scope.id).ts : null) : (loadLatestOrgScorecard(params.workspace)?.computedAt ?? null),
+          lastRunTs: scope.type === "AGENT" ? (latestVerifiedRun(params.workspace, scope.id).run?.ts ?? null) : (loadLatestOrgScorecard(params.workspace)?.computedAt ?? null),
           nextRunTs: tuning?.diagnosticCadenceHours && maturityOverall !== null
             ? nowTs + tuning.diagnosticCadenceHours * 60 * 60 * 1000
             : null,

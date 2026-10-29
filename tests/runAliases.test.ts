@@ -91,10 +91,11 @@ describe("diagnostic run aliases", () => {
     const binderNotes = async () => JSON.stringify((await collectAuditBinderData({ workspace: ws,
       scope: { type: "AGENT", id: "default" }, policy: loadAuditPolicy(ws), map: loadAuditMapActive(ws), nowTs: Date.now() })).binder);
     expect(generateL5DeltaReport({ workspace: ws, agentId: "default" }).runId).toBeNull();
-    expect(await binderNotes()).toContain("No agent diagnostic runs were found.");
+    expect(await binderNotes()).toContain("No sealed agent diagnostic runs were found.");
+    // Signed: since WP37 the binder reads only sealed runs, so an unsigned run is (correctly) still "none found".
     const report = await runDiagnostic({ workspace: ws, agentId: "default", window: "14d", targetName: "default",
-      claimMode: "auto", noSign: true });
+      claimMode: "auto" });
     expect(generateL5DeltaReport({ workspace: ws, agentId: "default" }).runId).toBe(report.runId);
-    expect(await binderNotes()).not.toContain("No agent diagnostic runs were found.");
+    expect(await binderNotes()).not.toContain("No sealed agent diagnostic runs were found.");
   });
 });

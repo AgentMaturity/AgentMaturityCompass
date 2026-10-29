@@ -15,6 +15,7 @@ import { startStudioApiServer } from "../src/studio/studioServer.js";
 import { readTransparencyEntries } from "../src/transparency/logChain.js";
 import { currentTransparencyMerkleRoot, verifyTransparencyMerkle } from "../src/transparency/merkleIndexStore.js";
 import { pathExists } from "../src/utils/fs.js";
+import { writeSealedReport } from "./helpers/sealedRun.js";
 
 const roots: string[] = [];
 
@@ -119,7 +120,8 @@ function writeRunFixture(params: {
     runSealSig: "fixture",
     reportJsonSha256: "fixture"
   };
-  writeFileSync(join(paths.runsDir, `${params.runId}.json`), JSON.stringify(run, null, 2));
+  // Sealed: since WP37 org scoring reads only runs whose seal verifies.
+  writeSealedReport(params.workspace, paths.runsDir, params.runId, run);
 }
 
 async function pickFreePort(): Promise<number> {

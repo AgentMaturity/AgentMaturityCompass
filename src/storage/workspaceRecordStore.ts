@@ -1,4 +1,3 @@
-import { captureRunHashAuthority } from "../ledger/runHashSignature.js";
 /**
  * Durable, signed, hash-chained record store scoped to a workspace.
  *
@@ -26,7 +25,8 @@ import { readFileSync, readdirSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
-import { signHexDigest, getSigningKey } from "../crypto/keys.js";
+import { signHexDigest, getSigningKey, verifyHexDigestAny } from "../crypto/keys.js";
+import { captureRunHashAuthority, runHashVerificationKeys } from "../ledger/runHashSignature.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { withControlFileLock } from "../lifecycle/controlFileLock.js";
 import { assertPurposePublicationCurrent, capturePurposePublication } from "../keys/purposePublication.js";
@@ -70,6 +70,65 @@ export function loadWorkspaceRecords<T>(workspace: string, at: RecordLocation): 
     }
   }
   return out;
+}
+
+/** Superseded versions kept by an update, so the chain a later record links to still resolves (WP37). */
+const REVISIONS_DIR = "revisions";
+
+function genesisHashes(at: RecordLocation): Set<string> {
+  return new Set([`GENESIS_${at.kind.toUpperCase().replace(/-/g, "_")}`, "GENESIS"]);
+}
+
+/** Keeps the bytes an update is about to replace; called under the publication lock, before the overwrite. */
+function keepRevision(workspace: string, at: RecordLocation, id: string, previous: Buffer | null): void {
+  if (previous === null) return;
+  writeFileAtomic(join(recordDir(workspace, at), REVISIONS_DIR, `${id}.${sha256Hex(previous).slice(0, 16)}.json`), previous, 0o644);
+}
+
+export interface WorkspaceRecordFinding {
+  file: string;
+  code: "UNREADABLE" | "HASH_MISMATCH" | "UNSIGNED" | "SIGNATURE_INVALID" | "CHAIN_GAP";
+  detail: string;
+}
+
+/**
+ * The verifying reader (WP37): every record of one kind with the integrity findings `loadWorkspaceRecords` hides.
+ * Recomputes record_hash over body + prev link, checks the artifact-seal signature, and requires every prev link to
+ * name genesis or a stored record (current or a kept revision), so a deleted or corrupted middle record is a finding
+ * rather than a silent omission. A deleted newest record leaves no successor to notice it: that needs an external head.
+ */
+export function verifyWorkspaceRecords<T>(workspace: string, at: RecordLocation): { records: T[]; findings: WorkspaceRecordFinding[] } {
+  const dir = recordDir(workspace, at);
+  const findings: WorkspaceRecordFinding[] = [];
+  const read = (folder: string): Array<{ file: string; record: RecordEnvelope & Record<string, unknown> }> =>
+    !pathExists(folder) ? [] : readdirSync(folder).filter((name) => name.endsWith(".json")).flatMap((name) => {
+      const file = join(folder, name);
+      try {
+        return [{ file, record: JSON.parse(readUtf8(file)) as RecordEnvelope & Record<string, unknown> }];
+      } catch (error) {
+        findings.push({ file, code: "UNREADABLE", detail: error instanceof Error ? error.message : String(error) });
+        return [];
+      }
+    });
+  const current = read(dir), all = [...current, ...read(join(dir, REVISIONS_DIR))];
+  let keys: string[] = [];
+  try { keys = runHashVerificationKeys(workspace); } catch { /* no verification keys: every signature below is unverifiable */ }
+  const known = new Set([...genesisHashes(at), ...all.map((row) => row.record.record_hash)]);
+  for (const { file, record } of all) {
+    const { prev_record_hash: prev, record_hash: hash, signature, storedTs: _storedTs, ...body } = record;
+    if (sha256Hex(canonicalize({ ...body, prev_record_hash: prev })) !== hash) {
+      findings.push({ file, code: "HASH_MISMATCH", detail: "record_hash does not match the record body and prev link" });
+    }
+    if (typeof signature !== "string" || signature === "unsigned") {
+      findings.push({ file, code: "UNSIGNED", detail: "record carries no signature" });
+    } else if (!verifyHexDigestAny(hash, signature, keys)) {
+      findings.push({ file, code: "SIGNATURE_INVALID", detail: "signature does not verify under the workspace artifact-seal keys" });
+    }
+    if (!known.has(prev)) {
+      findings.push({ file, code: "CHAIN_GAP", detail: `prev_record_hash ${String(prev).slice(0, 16)}… names no stored record` });
+    }
+  }
+  return { records: current.map((row) => row.record as unknown as T), findings };
 }
 
 function lastRecordHash(workspace: string, at: RecordLocation): string {
@@ -135,12 +194,13 @@ export function saveWorkspaceRecord<T extends Record<string, unknown>>(
   return withWorkspaceRecordPublicationLock(workspace, location, () => {
     assertPredecessorCurrent(workspace, location, id, before);
     ensureDir(recordDir(workspace, location));
+    keepRevision(workspace, location, id, before.target);
     writeFileAtomic(before.file, bytes, 0o644);
     return record;
   });
 }
 
-/** Replaces a stored record in place, keeping its id. Used for hold release. */
+/** Replaces a stored record, keeping its id; the superseded version is kept under revisions/ (WP37). Used for hold release. */
 export function updateWorkspaceRecord<T extends Record<string, unknown>>(
   workspace: string,
   at: RecordLocation,
@@ -183,6 +243,7 @@ export async function prepareWorkspaceRecordAsync<T extends Record<string, unkno
     assertCurrent();
     assertPredecessorCurrent(root, location, ownId, before);
     ensureDir(recordDir(root, location));
+    keepRevision(root, location, ownId, before.target);
     writeFileAtomic(before.file, bytes, 0o644);
     return record;
   } });

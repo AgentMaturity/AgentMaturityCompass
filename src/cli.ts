@@ -6295,7 +6295,7 @@ withTrustFlags(verifyCmd
       }
       process.exit(1);
     }
-    if (out.status !== "PASS") {
+    if (out.status === "FAIL") {
       process.exit(1);
     }
     verifyAllExit(out, trust);
@@ -7468,7 +7468,7 @@ withTrustFlags(evidence
         }
       }
     }
-    if (out.status !== "PASS") {
+    if (out.status === "FAIL") {
       process.exit(1);
     }
     verifyAllExit(out, trust);
@@ -20272,7 +20272,7 @@ shield
       const overallSuccessRate = totalAttacks > 0 ? (totalSuccesses / totalAttacks) * 100 : 0;
       console.log(chalk.bold("\nSummary:"));
       console.log(chalk.gray("Total attacks:"), totalAttacks);
-      console.log(chalk.gray("Overall success rate:"), overallSuccessRate < 10 ? chalk.green(`${overallSuccessRate.toFixed(1)}%`) : chalk.red(`${overallSuccessRate.toFixed(1)}%`));
+      console.log(chalk.gray("Overall success rate:"), totalAttacks === 0 ? chalk.yellow("not evaluated (no attacks ran)") : overallSuccessRate < 10 ? chalk.green(`${overallSuccessRate.toFixed(1)}%`) : chalk.red(`${overallSuccessRate.toFixed(1)}%`));
       console.log(chalk.gray("Regressions detected:"), regressions.length > 0 ? chalk.red(regressions.length.toString()) : chalk.green("none"));
       if (regressions.length > 0) {
         for (const r of regressions) console.log(chalk.red(`  ⚠ ${r}`));
@@ -23206,7 +23206,7 @@ const confidence = program.command("confidence").description("Confidence drift t
 confidence.command("calibration").description("Show calibration report").option("--json", "JSON output").action(async (opts: { json?: boolean }) => {
   const { trackConfidenceDrift } = await import("./score/confidenceDrift.js");
   const result = trackConfidenceDrift([]);
-  if (opts.json) { console.log(JSON.stringify(result, null, 2)); } else { console.log(chalk.bold("Confidence Calibration")); console.log(`  Calibration: ${(result.calibrationScore * 100).toFixed(0)}%`); console.log(`  Drift trend: ${result.driftTrend}`); console.log(`  Overconfidence penalty: ${result.overconfidencePenalty.toFixed(1)}`); }
+  if (opts.json) { console.log(JSON.stringify(result, null, 2)); } else { console.log(chalk.bold("Confidence Calibration")); console.log(`  Calibration: ${result.calibrationScore === null ? "not_evaluated (no resolved predictions)" : `${(result.calibrationScore * 100).toFixed(0)}%`}`); console.log(`  Drift trend: ${result.driftTrend}`); console.log(`  Overconfidence penalty: ${result.overconfidencePenalty.toFixed(1)}`); }
 });
 confidence.command("drift").description("Show drift trend").option("--json", "JSON output").action(async (opts: { json?: boolean }) => {
   const { trackConfidenceDrift } = await import("./score/confidenceDrift.js");

@@ -4,6 +4,7 @@
  * Defines the taxonomy of hallucination categories and the result
  * structures returned by both deterministic and LLM-judge detectors.
  */
+import type { EvidenceOutcome } from "../types.js";
 
 /** Categories of hallucination we detect. */
 export type HallucinationType =
@@ -57,8 +58,13 @@ export interface HallucinationDetectionResult {
   findings: HallucinationFinding[];
   /** Overall hallucination score 0-1 (0 = no hallucination, 1 = fully hallucinated). */
   score: number;
-  /** Whether the response passes the hallucination check. */
-  passed: boolean;
+  /** Whether the response passes the hallucination check; null when nothing could be judged (outcome not_evaluated). */
+  passed: boolean | null;
+  /**
+   * not_evaluated when there was no grounding (no context, no known facts), no LLM judge ran and nothing was found:
+   * an empty result then means "could not judge", never "nothing fabricated" (WP37).
+   */
+  outcome: EvidenceOutcome;
   /** Breakdown by type. */
   summary: Record<HallucinationType, number>;
   /** Total findings count. */
