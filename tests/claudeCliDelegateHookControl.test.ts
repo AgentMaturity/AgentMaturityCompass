@@ -16,6 +16,7 @@ import { agentId, claudeWorkspace, recorded } from "./helpers/claudeCodeHookFixt
 import { controlledWorkspace, freePort, removeFixtureWorkspaces } from "./helpers/piHookFixtures.js";
 
 const priorPath = process.env.PATH;
+const priorConfigDir = process.env.CLAUDE_CONFIG_DIR;
 let workspace = "";
 let close: () => Promise<void> = async () => {};
 
@@ -24,11 +25,16 @@ beforeAll(async () => {
   workspace = claudeWorkspace({ bridgeBase: `http://127.0.0.1:${port}`, register: false });
   const bridge = await startBridgeServer({ workspace, host: "127.0.0.1", port, gatewayBaseUrl: "http://127.0.0.1:1" });
   close = () => bridge.close();
+  // This machine's own Claude Code settings are not the fixture's.
+  process.env.CLAUDE_CONFIG_DIR = join(workspace, ".fixture-home", ".claude");
+  mkdirSync(process.env.CLAUDE_CONFIG_DIR, { recursive: true });
 });
 afterEach(() => {
   process.env.PATH = priorPath;
 });
 afterAll(async () => {
+  if (priorConfigDir === undefined) delete process.env.CLAUDE_CONFIG_DIR;
+  else process.env.CLAUDE_CONFIG_DIR = priorConfigDir;
   await close();
   removeFixtureWorkspaces();
 });
@@ -78,10 +84,19 @@ const ctx = (over: Partial<SubagentRunContext> = {}): SubagentRunContext => ({
   ...over
 });
 
-const runner = (dir: string, observeOnly?: boolean) => claudeCliForeignRunner({
+const runner = (dir: string, observeOnly?: boolean, managedSettingsDir: string | null = null) => claudeCliForeignRunner({
   workspace: dir, gatewayBase: "http://127.0.0.1:3210", providerRoute: "/anthropic", model: "claude-opus-4-6", timeoutMs: 60_000,
-  ...(observeOnly === undefined ? {} : { observeOnly })
+  managedSettingsDir, ...(observeOnly === undefined ? {} : { observeOnly })
 });
+
+/** Spawning is refused, naming `pattern`, and nothing is started. */
+async function refusedWith(pattern: RegExp, managedSettingsDir: string | null = null): Promise<void> {
+  const { sawFile } = fakeClaude(workspace);
+  rmSync(sawFile, { force: true });
+  const result = await runner(workspace, undefined, managedSettingsDir)(ctx());
+  expect(result.ok ? "" : result.reason).toMatch(pattern);
+  expect(existsSync(sawFile), "nothing was started").toBe(false);
+}
 
 describe("a delegated Claude Code child under AMC's hook control", () => {
   test("its denied Bash call is blocked by the control hook, and the decision is in the ledger", async () => {
@@ -125,4 +140,35 @@ describe("a delegated Claude Code child under AMC's hook control", () => {
     await runner(bare, true)(ctx());
     expect(existsSync(sawFile), "the child was started").toBe(true);
   }, 60_000);
+
+  describe("Claude Code settings that keep AMC's control hook from running refuse the spawn", () => {
+    const projectSettings = () => join(workspace, ".claude", "settings.json");
+    afterEach(() => rmSync(projectSettings(), { force: true }));
+
+    test("disableAllHooks in the project settings", async () => {
+      writeFileSync(projectSettings(), JSON.stringify({ disableAllHooks: true }));
+      await refusedWith(/disableAllHooks is true/);
+    }, 60_000);
+
+    test("allowManagedHooksOnly without managed settings delivering AMC's hook", async () => {
+      const managed = join(workspace, ".fixture-managed");
+      mkdirSync(managed, { recursive: true });
+      writeFileSync(join(managed, "managed-settings.json"), JSON.stringify({ allowManagedHooksOnly: true }));
+      try {
+        await refusedWith(/allowManagedHooksOnly is true/, managed);
+      } finally {
+        rmSync(managed, { recursive: true, force: true });
+      }
+    }, 60_000);
+
+    test("a foreign PreToolUse hook", async () => {
+      writeFileSync(projectSettings(), JSON.stringify({ hooks: { PreToolUse: [{ matcher: "*", hooks: [{ type: "command", command: "/bin/true" }] }] } }));
+      await refusedWith(/PreToolUse hook .* that is not AMC's/);
+    }, 60_000);
+
+    test("an enabled plugin", async () => {
+      writeFileSync(projectSettings(), JSON.stringify({ enabledPlugins: { "some-plugin@market": true } }));
+      await refusedWith(/enabled plugin/);
+    }, 60_000);
+  });
 });

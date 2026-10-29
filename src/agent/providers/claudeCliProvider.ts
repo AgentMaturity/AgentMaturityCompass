@@ -1,5 +1,10 @@
 import { claudeCliAdapter } from "../../adapters/builtins/claudeCli.js";
+import { readFileSync } from "node:fs";
+import { homedir } from "node:os";
+import { join } from "node:path";
+import { claudeHookSettingsFindings } from "../../adapters/claudeHookProbe.js";
 import { getHookIntegrationStatus } from "../../adapters/hookIntegration.js";
+import { CLAUDE_MANAGED_SETTINGS_DIRS, scanClaudeHookSettings, type ClaudeHookBinding } from "../../adapters/hookProviders/claudeCode.js";
 import { verifyManagedLease } from "../../adapters/managedHookLease.js";
 import { detectAdapter } from "../../adapters/adapterDetection.js";
 import { assembleAdapterEnv } from "../../adapters/envAssembler.js";
@@ -68,6 +73,8 @@ export interface ClaudeCliForeignRunnerInit {
    * without this the runner refuses to spawn unless the workspace's signed control hook is installed and admitted.
    */
   readonly observeOnly?: boolean;
+  /** Claude Code's file-based managed settings directory; defaults to the platform's. Overridable for tests. */
+  readonly managedSettingsDir?: string | null;
 }
 
 /**
@@ -79,7 +86,7 @@ export interface ClaudeCliForeignRunnerInit {
  * AMC's forwarder accepts only the installation's lease, and AMC refuses to govern a session started with `--settings`
  * (it can add hooks AMC did not install), so a per-child lease or settings file would leave every call denied.
  */
-function claudeControlHookRefusal(workspace: string, agentId: string): string | null {
+function claudeControlHookRefusal(workspace: string, agentId: string, managedDir: string | null): string | null {
   const install = "install it with: amc connect hooks install --provider claude-code --mode control --agent " + agentId + ", or delegate observe-only";
   let status: ReturnType<typeof getHookIntegrationStatus>;
   try {
@@ -95,7 +102,35 @@ function claudeControlHookRefusal(workspace: string, agentId: string): string | 
   if (!lease.valid || lease.payload?.leaseId !== status.leaseId) {
     return `AMC's Claude Code control hook is not admitted: ${lease.error ?? "its lease is not the installation's"}; ${install}`;
   }
-  return null;
+  const settings = claudeSettingsRefusal(workspace, status.files.manifest, managedDir);
+  return settings === null ? null : `Claude Code's settings would keep AMC's control hook from deciding its calls: ${settings}`;
+}
+
+/**
+ * Why Claude Code's settings layers would keep the installed control hook from deciding the child's calls, or null:
+ * hooks disabled anywhere, managed-hooks-only without managed delivery, an enabled plugin, a foreign PreToolUse (or
+ * other call-changing) hook, or an AMC hook this installation did not write. Read as the registration reads them.
+ */
+function claudeSettingsRefusal(workspace: string, manifestPath: string, managedDir: string | null): string | null {
+  const configDir = process.env.CLAUDE_CONFIG_DIR ?? join(homedir(), ".claude");
+  const findings = claudeHookSettingsFindings({ workspace, home: join(configDir, ".."), managedDir });
+  if (findings.blockers.length > 0) return findings.blockers.join("; ");
+  // The findings read <home>/.claude/settings.json; a CLAUDE_CONFIG_DIR with another name is read here.
+  try {
+    if ((JSON.parse(readFileSync(join(configDir, "settings.json"), "utf8")) as { disableAllHooks?: unknown }).disableAllHooks === true) {
+      return `disableAllHooks is true in ${join(configDir, "settings.json")}`;
+    }
+  } catch {
+    // Absent is fine; an unreadable file is refused by the scan below.
+  }
+  let bindings: ClaudeHookBinding[];
+  try {
+    const manifest = JSON.parse(readFileSync(manifestPath, "utf8")) as { handlers?: Array<{ eventName: string; handlerSha256: string }> };
+    bindings = (manifest.handlers ?? []).map(({ eventName, handlerSha256 }) => ({ eventName, handlerSha256 }));
+  } catch (error) {
+    return `the control installation manifest cannot be read (${error instanceof Error ? error.message : String(error)})`;
+  }
+  return scanClaudeHookSettings({ workspace, userSettingsPath: join(configDir, "settings.json"), managedDir, bindings }).problem;
 }
 
 export function claudeCliForeignRunner(init: ClaudeCliForeignRunnerInit): SubagentRunner {
@@ -116,7 +151,8 @@ export function claudeCliForeignRunner(init: ClaudeCliForeignRunnerInit): Subage
     }
 
     // AXR-10: the child's own tool calls meet AMC's hook control, or it is not started.
-    const refusal = init.observeOnly === true ? null : claudeControlHookRefusal(init.workspace, ctx.toolsetAgentId);
+    const refusal = init.observeOnly === true ? null : claudeControlHookRefusal(init.workspace, ctx.toolsetAgentId,
+      init.managedSettingsDir === undefined ? CLAUDE_MANAGED_SETTINGS_DIRS[process.platform] ?? null : init.managedSettingsDir);
     if (refusal !== null) return { ok: false, text: "", reason: `refusing to delegate to Claude Code: ${refusal}` };
 
     const runner = createForeignRunner({
