@@ -31,7 +31,10 @@ describe("ordered image input through public ACP (unexecuted)", () => {
     const parts = decodeNativeOrderedInput(payload.bytes);
     expect(parts.map(part => part.type)).toEqual(orderedBlocks().map(part => part.type));
     expect(parts.filter(part => part.type === "text").map(part => part.text)).toEqual(["  before\n", "", "after first", "after second  "]);
-    const projected = rows.filter(row => ["user/message", "user/attachment"].includes(row.event_type));
+    // GAP-WP39: one further user/message, the runtime-context snapshot, carries no source input.
+    const userRows = rows.filter(row => ["user/message", "user/attachment"].includes(row.event_type));
+    const projected = userRows.filter(row => JSON.parse(row.meta_json).sourceContentIndex !== undefined);
+    expect(userRows.length - projected.length).toBe(1);
     expect(projected.map(row => JSON.parse(row.meta_json).sourceContentIndex)).toEqual([0, 1, 2, 3, 4, 5]);
     for (const row of projected) {
       expect(JSON.parse(row.meta_json)).toMatchObject({ sourceInputEventId: input.id, sourceInputFormat: NATIVE_ORDERED_INPUT_FORMAT });

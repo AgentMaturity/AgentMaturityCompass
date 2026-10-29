@@ -71,17 +71,22 @@ export function expectedImageWire(provider: Provider, blocks = orderedBlocks()):
       : provider === "openai-responses" ? { type: "input_image", image_url: `data:${part.mimeType};base64,${part.data}`, detail: "auto" }
         : { type: "image_url", image_url: { url: `data:${part.mimeType};base64,${part.data}`, detail: "auto" } });
 }
-export function firstUserWire(provider: Provider, bytes: Buffer): Record<string, unknown>[] {
+/**
+ * The first user message's content parts. `composed` (the default: every native surface) requires and strips the trailing
+ * runtime-context snapshot GAP-WP39 composition appends; a direct LlmRuntime fixture composes no context and passes false.
+ */
+export function firstUserWire(provider: Provider, bytes: Buffer, composed = true): Record<string, unknown>[] {
   const body = JSON.parse(bytes.toString("utf8"));
   const items = provider === "openai-responses" ? body.input : body.messages;
   const content = items.find((item: { role?: string }) => item.role === "user")?.content;
   if (!Array.isArray(content)) throw new Error("Missing explicit provider user-content array");
-  return withoutContextSnapshot(content.map((part: Record<string, unknown>) => {
+  const parts = content.map((part: Record<string, unknown>) => {
     if (provider !== "anthropic") return part;
     const { cache_control, ...rest } = part;
     if (cache_control !== undefined) expect(cache_control).toEqual({ type: "ephemeral" });
     return rest;
-  }));
+  });
+  return composed ? withoutContextSnapshot(parts) : parts;
 }
 export function orderedCold(root: string, sessionId: string, env: NodeJS.ProcessEnv = {}) {
   const child = spawnSync(process.execPath, ["--import", import.meta.resolve("tsx"),
