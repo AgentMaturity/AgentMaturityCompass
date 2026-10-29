@@ -489,3 +489,13 @@ platform cases on a suitable host, and commit using
 `/Users/sid/AgentMaturityCompass-worktrees/s442cd919/work/codex-runs/wp19-commit-message.txt`.
 Installed-package/platform qualification remains deferred. Native scheduling stays
 hidden and experimental. No research, dependency files, or other worktrees changed.
+
+## REV_FULLSTACK_ENGINEER — 2026-10-30 WP30 native chat
+
+Scope: the bounded native interactive ergonomics slice on `rtd/gap-wp30`, based on `cfd71bbac`. The candidate is uncommitted; Claude integrator session 3c2ecdb1 owns review, commit and merge.
+
+Deliverables: described slash commands and completion, explicit read-only session inspection/resume selection, signed mutating-command audit, bounded escaped recorded tool results, and read-only actual MCP mount receipts. The existing approvals, questions, todo/plan escaping, runtime and CLI command paths remain in use. `src/cli-agent-commands.ts` has one changed hook line and remains at 794 lines.
+
+Evidence: 96 helper/composition tests passed; 16 targeted guard mutations failed their regressions, and all source hashes were restored exactly. The related suite has 404 passing cases after using the supported private external control-checkpoint directory. Three socket-dependent cases fail with sandbox `listen EPERM`; a socket-dependent setup hook skips 29 tool-breadth cases. The full measured-task results and final verifier status are recorded in `AMC_OS/INBOX/WP30-native-interactive-report.md`; detailed logs and the requested commit message are in the sibling `codex-runs/wp30-*` artifacts.
+
+Remaining scope: entry bookmarks/custom names/full tree annotations, demand-gated file mentions, and context reset/handoff. AMC-1512 is extended through its existing workflow, without a duplicate issue or runtime. Automated action counts and timings do not establish human usability. Claude should review the candidate, rerun the socket-dependent cases in an environment allowing local listeners, and use `wp30-commit-message.txt` when committing. No push, merge, full-suite or release qualification was performed.

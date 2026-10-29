@@ -626,7 +626,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
             const mount = await mountNativeMcpServer({ server, workspace: process.cwd(), agentId,
               toolset: workspaceToolset, ...review, signal: mcpAbort.signal });
             mcpMounts.push(mount);
-            progress(`Mounted reviewed MCP tools for this run: ${mount.toolNames.join(", ")}. Signed allowlist, approval gate and budgets remain in force.`);
+            (await import("./setup/nativeInteractiveMcp.js")).reportNativeInteractiveMcpMount(mount, progress);
           }
         }
         let previewRequest: string | null = null;
