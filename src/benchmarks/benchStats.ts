@@ -1,13 +1,9 @@
+import { percentileRank } from "../experiments/stats.js";
 import { listImportedBenchmarks } from "./benchStore.js";
 import type { BenchmarkArtifact } from "./benchSchema.js";
 
 function percentile(values: number[], value: number): number {
-  if (values.length === 0) {
-    return 0;
-  }
-  const sorted = [...values].sort((a, b) => a - b);
-  const rank = sorted.filter((item) => item <= value).length;
-  return Number(((rank / sorted.length) * 100).toFixed(2));
+  return Number(percentileRank(values, value).toFixed(2));
 }
 
 export function benchmarkStats(params: {
@@ -59,6 +55,7 @@ export function benchmarkStats(params: {
     groups: [...groups.entries()].map(([key, arr]) => {
       const sortedOverall = arr.map((item) => item.run.overall).sort((a, b) => a - b);
       const sortedIntegrity = arr.map((item) => item.run.integrityIndex).sort((a, b) => a - b);
+      // Upper order statistic for even groups, unlike the midpoint median in experiments/stats.ts.
       const mid = Math.floor(arr.length / 2);
       return {
         key,

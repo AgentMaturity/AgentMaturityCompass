@@ -23,6 +23,9 @@ import { skillLoadTool } from "../src/skills/skillLoadTool.js";
 import { workspaceSkillRoots } from "../src/skills/skillTurn.js";
 import { createNativeInteractiveAskUser, parseAskUserInput } from "../src/setup/nativeInteractiveAskUser.js";
 import { Command } from "commander";
+import { createAcpConnection } from "../src/acp/acpConnection.js";
+import { ACP_ASK_USER_METHOD, acpAskUserAnswerer } from "../src/acp/acpAskUser.js";
+import { startAcpStdio } from "../src/acp/acpStdioMain.js";
 import { initBudgets } from "../src/budgets/budgets.js";
 import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
 import { registerAgentCommands, type AgentLoopCliIo } from "../src/cli-agent-commands.js";
@@ -220,6 +223,61 @@ describe("ask_user in native chat", () => {
     bridge.close();
     expect(result.ok).toBe(true);
     expect(result.output.split("\n")[0]).toBe("yes");
+  });
+});
+
+describe("ask_user over ACP (DXC-24)", () => {
+  const frames: Record<string, unknown>[] = [];
+  const connection = createAcpConnection({ write: (frame) => { frames.push(JSON.parse(frame.toString("utf8")) as Record<string, unknown>); },
+    handlers: { request: async () => null, notification: () => undefined } });
+  const reply = (id: unknown, body: Record<string, unknown>): void => connection.ingest(Buffer.from(`${JSON.stringify({ jsonrpc: "2.0", id, ...body })}\n`));
+
+  it("correlates a client response to its outbound request and ignores a repeat or a late answer", async () => {
+    const pending = connection.request("_amc/ping", { a: 1 });
+    const sent = frames.at(-1)!;
+    expect(sent).toMatchObject({ method: "_amc/ping", params: { a: 1 } });
+    reply(sent.id, { result: { ok: 1 } });
+    await expect(pending).resolves.toEqual({ ok: 1 });
+    reply(sent.id, { result: { ok: 2 } });
+    const controller = new AbortController();
+    const aborted = connection.request("_amc/ping", {}, controller.signal);
+    controller.abort();
+    await expect(aborted).rejects.toThrow(/cancelled/);
+    reply(frames.at(-1)!.id, { result: { late: true } });
+    const failed = connection.request("_amc/ping", {});
+    reply(frames.at(-1)!.id, { error: { code: -32601, message: "\u001b[2Jno such method" } });
+    await expect(failed).rejects.toThrow("the client answered error -32601");
+  });
+
+  const answerVia = (client: (params: Record<string, unknown>) => unknown) => askUserTool({ sessionId: SESSION, record: receiptsTo(workspace).record, timeoutMs: 5_000,
+    answerer: acpAskUserAnswerer({ workspace, request: async (method, params) => { expect(method).toBe(ACP_ASK_USER_METHOD); return client(params as Record<string, unknown>); } }) });
+
+  it("returns the client's answer, signed host-side, through the tool's own checks", async () => {
+    let asked: Record<string, unknown> | undefined;
+    const result = await answerVia((params) => { asked = params; return { outcome: "answered", answers: [["blue"]] }; })
+      .body(exec("ask_user", { question: "Colour?", choices: ["red", "blue"] }));
+    expect(result.ok).toBe(true);
+    expect(result.output.split("\n")[0]).toBe("blue");
+    expect(asked).toMatchObject({ sessionId: SESSION, questions: [{ question: "Colour?", choices: ["red", "blue"] }] });
+    expect(String(asked?.questionSha256)).toMatch(/^[a-f0-9]{64}$/);
+  });
+
+  it("amc acp refuses --ask-user and --web-search-searxng without workspace tools", () => {
+    const base = { workspace, agentId: "default", providerId: "stub", systemPrompt: "x", tools: "none" as const };
+    expect(() => startAcpStdio({ ...base, askUser: true })).toThrow(/add --tools workspace/);
+    expect(() => startAcpStdio({ ...base, webSearchSearxng: "https://search.example.org" })).toThrow(/add --tools workspace/);
+  });
+
+  it("fails the call with a fail receipt when the client cancels, and refuses an off-choice answer", async () => {
+    const { record, receipts } = receiptsTo(workspace);
+    const tool = askUserTool({ sessionId: SESSION, record, timeoutMs: 5_000,
+      answerer: acpAskUserAnswerer({ workspace, request: async () => ({ outcome: "cancelled" }) }) });
+    await expect(tool.body(exec("ask_user", { question: "Go?" }))).rejects.toThrow(/no answer was given/);
+    expect(receipts.at(-1)).toMatchObject({ auditType: "NATIVE_ASK_USER", decision: "fail" });
+    await expect(answerVia(() => ({ outcome: "answered", answers: [["green"]] })).body(exec("ask_user", { question: "Colour?", choices: ["red", "blue"] })))
+      .rejects.toThrow(/not one of the offered choices/);
+    await expect(answerVia(() => ({ outcome: "answered", answers: "blue" })).body(exec("ask_user", { question: "Colour?" })))
+      .rejects.toThrow(/no answer was given/);
   });
 });
 

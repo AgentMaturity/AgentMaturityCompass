@@ -1,3 +1,4 @@
+import { mean } from "../experiments/stats.js";
 import { randomUUID } from "node:crypto";
 import { resolve } from "node:path";
 import { effectiveTrustTier, readerTrustFor } from "../claims/evidenceProvenance.js";
@@ -879,10 +880,7 @@ export function parseOpenAIEvalResults(input: unknown): ParsedEvalImport {
 }
 
 function average(values: number[]): number | null {
-  if (values.length === 0) {
-    return null;
-  }
-  return values.reduce((sum, value) => sum + value, 0) / values.length;
+  return values.length === 0 ? null : mean(values);
 }
 
 function numericValuesFromRecord(record: Record<string, unknown>): number[] {

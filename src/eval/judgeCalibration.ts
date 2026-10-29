@@ -1,3 +1,4 @@
+import { mean as statsMean, populationVariance } from "../experiments/stats.js";
 import type { QuestionScoreSignedEvidenceRef } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
@@ -420,14 +421,13 @@ function round(value: number, places = 6): number {
 }
 
 function mean(values: number[]): number {
-  if (values.length === 0) return 0;
-  return round(values.reduce((sum, value) => sum + value, 0) / values.length);
+  return round(statsMean(values));
 }
 
 function variance(values: number[]): number {
   if (values.length < 2) return 0;
-  const avg = mean(values);
-  return round(values.reduce((sum, value) => sum + (value - avg) ** 2, 0) / values.length);
+  // Calibration centers at its six-decimal mean; stats.ts otherwise uses the raw mean.
+  return round(populationVariance(values, mean(values)));
 }
 
 function unique(values: string[]): string[] {

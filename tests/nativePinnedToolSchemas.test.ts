@@ -3,12 +3,15 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, expect, test, vi } from "vitest";
 import { agentToolset } from "../src/agent/agentToolset.js";
+import { bashTool } from "../src/tools/builtin/bashTool.js";
+import { searchTools } from "../src/tools/builtin/searchTools.js";
 import { DEFAULT_AGENT_LOOP_CONFIG } from "../src/agent/loopTypes.js";
 import { DEFAULT_RETRY_RUNTIME } from "../src/agent/requestRetry.js";
 import { runStep, type LoopLlm } from "../src/agent/stepRunner.js";
 import { initBudgets } from "../src/budgets/budgets.js";
 import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
 import { SessionService } from "../src/session/sessionService.js";
+import { extractSpillRef } from "../src/session/spill/spillTypes.js";
 import { extractEnvelope } from "../src/session/sessionTypes.js";
 import { defaultToolsConfig, type ToolDefinition } from "../src/toolhub/toolsSchema.js";
 import { initToolsConfig, loadVerifiedToolsConfigSnapshot, toolsConfigPath, toolsConfigSigPath } from "../src/toolhub/toolhubValidators.js";
@@ -143,7 +146,8 @@ test("an already cancelled native step remains cancelled before schema admission
 // `toolSchemaSha256` without touching any policy pin, so this digest makes that change a reviewed test change.
 // P1-36: fs.read gained `offset`/`limit`; fs.edit gained `replaceAll` and `edits`, and `required` is now `["path"]`.
 // WP33 (PXA-22): fs.read `maxBytes` states the body's bounds (minimum 1, maximum 10,000,000), now enforced before approval.
-const FS_TOOL_SCHEMAS_SHA256 = "14375c373669587d83fa227346f65fc18dd5a9f37935ec30674612f1d7f7e57c";
+// WP34a: fs.read now documents regular-file admission and UTF-8-safe bounded output; arguments remain unchanged.
+const FS_TOOL_SCHEMAS_SHA256 = "e4afe883083c1c347c9ce9ffb00be4fe6c701a6f642d32b3a6290457dd047bc3";
 const edit: ToolDefinition = { name: "fs.edit", actionClass: "WRITE_LOW", allow: { paths: ["./workspace/**"] } };
 
 test("the offered fs tool schemas are pinned by digest and keep one top-level path argument (P1-36)", () => {
@@ -170,4 +174,52 @@ test("signed path globs still deny line-range reads and multi-edits outside the 
   expect([deniedRead.outcome, deniedEdit.outcome]).toEqual(["DENIED", "DENIED"]);
   expect(String(deniedEdit.content)).toContain("not in allowlist");
   expect(readFileSync(join(f.workspace, "outside.txt"), "utf8")).toBe("a\n");
+});
+
+// WP34a uses the same canonical-schema review process as the fs pin above.
+const SPILL_READ_TOOL_SCHEMA_SHA256 = "ef96e1c0bd8cea81d5ae476c6d8853ad22241d3e4c2b3920d5d2ba411f9a4137";
+const spillRead: ToolDefinition = { name: "session.spill_read", actionClass: "READ_ONLY" };
+
+test("the signed native spill reader schema is pinned and reads only its own session locators", async () => {
+  const f = fixture({ grants: [spillRead] });
+  const offered = f.tools.seam.schemas()!.filter(schema => schema.name === "session.spill_read");
+  expect(offered).toHaveLength(1);
+  expect(sha256Hex(canonicalize(offered))).toBe(SPILL_READ_TOOL_SCHEMA_SHA256);
+  f.session.recordToolCall({ toolCallId: "long-log", toolName: "grep", args: "{}", dispatch: "native", parentToken: null });
+  const spilled = f.session.recordToolResult({ toolCallId: "long-log", outcome: "OK", exitCode: null, timedOut: false,
+    denied: false, content: "FIRST-LINE\n" + "log detail\n".repeat(5_000) + "FINAL-LINE\n" });
+  const locator = extractSpillRef(f.session.readEvents().find(event => event.id === spilled.eventId)!.meta_json)!.locator;
+  expect(locator).toBeTypeOf("string");
+  const read = await f.call("session.spill_read", { locator, offset: 0, limit: 11 });
+  expect(read.outcome).toBe("OK");
+  expect(JSON.parse(String(read.content))).toMatchObject({ content: "FIRST-LINE\n", encoding: "utf8", sessionIds: [f.session.sessionId] });
+  const other = new SessionService(f.workspace);
+  cleanups.push(() => other.disposeWithoutClosing());
+  other.open({ agentId: "default", harnessVersion: "spill-boundary-fixture", compositionDigest: "fixture", policyDigest: f.pin });
+  other.startTurn({ trigger: "user" }); other.startStep();
+  other.recordToolCall({ toolCallId: "foreign-log", toolName: "grep", args: "{}", dispatch: "native", parentToken: null });
+  const foreign = other.recordToolResult({ toolCallId: "foreign-log", outcome: "OK", exitCode: null, timedOut: false,
+    denied: false, content: "foreign private log\n".repeat(5_000) });
+  const foreignLocator = extractSpillRef(other.readEvents().find(event => event.id === foreign.eventId)!.meta_json)!.locator;
+  expect(foreignLocator).toBeTypeOf("string");
+  const refused = await f.call("session.spill_read", { locator: foreignLocator, limit: 10 });
+  expect(refused.outcome).toBe("ERROR");
+  expect(String(refused.content)).toContain("current session");
+  expect(String(refused.content)).not.toContain("foreign private log");
+});
+
+test("a native session without a signed spill reader grant cannot invoke it", async () => {
+  const f = fixture();
+  expect(f.names()).not.toContain("session.spill_read");
+  expect((await f.call("session.spill_read", { locator: "amc-spill:invalid" })).outcome).toBe("DENIED");
+});
+
+// WP34b follows the canonical-schema review process above. The fs schema digest is unchanged.
+// Review optional bash workdir/description and search path through one explicit digest change.
+const BASH_SEARCH_TOOL_SCHEMAS_SHA256 = "f82eccbf1763c16bcf3652d24f7950cddef0043fa66ab9ea395903104784168c";
+test("the bash and search schemas pin the reviewed WP34b arguments", () => {
+  const offered = [bashTool(), ...searchTools()].map(({ name, description, parameters }) => ({ name, description, parameters }))
+    .sort((a, b) => a.name.localeCompare(b.name));
+  expect(offered.map(schema => schema.name)).toEqual(["bash", "glob", "grep"]);
+  expect(sha256Hex(canonicalize(offered))).toBe(BASH_SEARCH_TOOL_SCHEMAS_SHA256);
 });

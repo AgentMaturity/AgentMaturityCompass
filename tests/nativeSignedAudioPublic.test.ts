@@ -1,4 +1,5 @@
 /** AUTHORED UNEXECUTED. Actual public ACP, registered CLI, TS client and local HTTP. */
+import { withoutContextSnapshot } from "./helpers/contextSnapshot.js";
 import { LoopInbox } from "../src/agent/inbox.js";
 import { recordNativeAudioMessage } from "../src/agent/nativeAudioMessage.js";
 import { outgrowSession, OUTGROW_ROWS } from "./helpers/outgrowSession.js";
@@ -84,10 +85,11 @@ describe("native audio public paths (unexecuted)", () => {
       _meta: { "dev.agentmaturity.amc": { audioInput: ACP_NATIVE_AUDIO_CONTRACT } } } });
     const pending = h.begin("session/prompt", audioRequest(sessionId)); pending.bytes.fill(0);
     expect((await pending.result).error).toBeUndefined(); expect(h.sent).toHaveLength(1);
-    expect(JSON.parse(h.sent[0]!.body.toString()).contents[0].parts).toEqual(expectedAudioWire());
+    expect(withoutContextSnapshot(JSON.parse(h.sent[0]!.body.toString()).contents[0].parts)).toEqual(expectedAudioWire());
     const rows = h.sessions.get(sessionId)!.readEvents(), source = rows.find(row => row.event_type === "loop/inbox" && JSON.parse(row.meta_json).payloadFormat === NATIVE_AUDIO_INPUT_FORMAT)!;
     expect(source).toBeDefined();
-    expect(rows.filter(row => ["user/message", "user/attachment"].includes(row.event_type)).map(row => JSON.parse(row.meta_json).sourceContentIndex)).toEqual([0, 1, 2, 3, 4, 5, 6]);
+    // GAP-WP39: the trailing runtime-context snapshot is a user/message with no source input.
+    expect(rows.filter(row => ["user/message", "user/attachment"].includes(row.event_type)).map(row => JSON.parse(row.meta_json).sourceContentIndex)).toEqual([0, 1, 2, 3, 4, 5, 6, undefined]);
     await h.call("_amc/session/release", { sessionId }); await h.close();
     const next = audioHarness(root); await next.call("initialize", { protocolVersion: 1, clientCapabilities: {} });
     expect((await next.call("session/load", { sessionId, cwd: root, mcpServers: [] })).error).toBeUndefined();
@@ -154,7 +156,7 @@ describe("native audio public paths (unexecuted)", () => {
       expect((await loaded.prompt("Continue").result).text).toBe("Original audio fixture answer"); await second.close(); expect(second.processClosed).toBe(true);
       expect(server.errors).toEqual([]); expect(server.sent).toHaveLength(2);
       for (const request of server.sent) { expect(request.url).toBe("/v1beta/models/fixture-model:streamGenerateContent?alt=sse");
-        expect(request.key).toBe("disposable-not-a-provider-key"); expect(JSON.parse(request.body.toString()).contents[0].parts).toEqual(expectedAudioWire()); }
+        expect(request.key).toBe("disposable-not-a-provider-key"); expect(withoutContextSnapshot(JSON.parse(request.body.toString()).contents[0].parts)).toEqual(expectedAudioWire()); }
       expect(audioCold(root, session.sessionId).map(row => row.bytes)).toEqual(server.sent.map(request => request.body.toString("base64")));
     } finally { for (const client of clients) await client.close(); await server.close(); }
   }, 120_000);

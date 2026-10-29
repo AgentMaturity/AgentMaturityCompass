@@ -1,14 +1,16 @@
 import { existsSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { Command } from "commander";
 import { afterEach, describe, expect, test, vi } from "vitest";
+import { registerAgentCommands } from "../src/cli-agent-commands.js";
 import { initWorkspace } from "../src/workspace.js";
 import { initBudgets } from "../src/budgets/budgets.js";
 import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
 import { agentToolset, checkToolsetReadiness } from "../src/agent/agentToolset.js";
 import { SessionService } from "../src/session/sessionService.js";
 import { initToolsConfig, loadToolsConfig } from "../src/toolhub/toolhubValidators.js";
-import { discoverNativeMcpCatalog, mountNativeMcpServer, nativeMcpToolName, type MountedNativeMcpServer } from "../src/mcp/nativeMcpClient.js";
+import { NATIVE_MCP_DIAGNOSTICS_BYTES, discoverNativeMcpCatalog, mountNativeMcpServer, nativeMcpFailureDiagnostics, nativeMcpToolName, type MountedNativeMcpServer } from "../src/mcp/nativeMcpClient.js";
 import { loadNativeMcpConfiguration, requireReviewedNativeMcpGrants, resolveNativeMcpServer } from "../src/setup/nativeMcpConfig.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import { openActionJournal } from "../src/actions/actionJournal.js";
@@ -22,20 +24,42 @@ const readline = require('node:readline');
 const [statePath, logPath, pidPath] = process.argv.slice(1);
 fs.writeFileSync(pidPath, String(process.pid));
 const send = value => process.stdout.write(JSON.stringify(value) + '\n');
-readline.createInterface({ input: process.stdin }).on('line', line => {
+const boot = JSON.parse(fs.readFileSync(statePath, 'utf8'));
+if (boot.stderrAndExit) process.stderr.write(boot.stderrAndExit, () => process.exit(3));
+if (boot.grandchildPidPath) {
+  // Not detached: the grandchild joins the server's own process group, as a wrapper's child would.
+  const child = require('node:child_process').spawn(process.execPath, ['-e', 'setInterval(() => {}, 1000)'], { stdio: 'ignore' });
+  fs.writeFileSync(boot.grandchildPidPath, String(child.pid));
+}
+if (!boot.stderrAndExit) readline.createInterface({ input: process.stdin }).on('line', line => {
   const request = JSON.parse(line);
   if (request.id === undefined) return;
   const state = JSON.parse(fs.readFileSync(statePath, 'utf8'));
   fs.appendFileSync(logPath, JSON.stringify({method:request.method,name:request.params?.name,args:request.params?.arguments})+'\n');
   let result;
-  if (request.method === 'initialize') result = { protocolVersion: request.params.protocolVersion, capabilities: {tools:{listChanged:true}}, serverInfo:{name:'fixture',version:'1'} };
+  if (request.method === 'initialize') result = { protocolVersion: request.params.protocolVersion, capabilities: {tools:{listChanged:true}}, serverInfo:{name:'fixture',version:'1'}, ...(state.instructions ? {instructions: state.instructions} : {}) };
   else if (request.method === 'tools/list') {
     const cursor = Number(request.params?.cursor || 0);
     const pageSize = state.pageSize || state.tools.length;
     result = {tools:state.tools.slice(cursor,cursor+pageSize), ...(cursor+pageSize<state.tools.length ? {nextCursor:String(cursor+pageSize)} : {})};
   } else if (request.method === 'tools/call') {
     if (state.notifyOnCall) send({jsonrpc:'2.0',method:'notifications/tools/list_changed'});
-    if (state.waitOnCall) return;
+    if (state.waitOnCall || state.waitFor === request.params.name) return;
+    if (state.lateFor === request.params.name) {
+      const token = request.params._meta && request.params._meta.progressToken;
+      setTimeout(() => { send({jsonrpc:'2.0',method:'notifications/progress',params:{progressToken:token,progress:1}});
+        send({jsonrpc:'2.0',id:request.id,result:{content:[{type:'text',text:'late'}]}}); }, state.lateMs);
+      return;
+    }
+    if (state.progress) {
+      const token = request.params._meta && request.params._meta.progressToken;
+      let sent = 0;
+      const timer = setInterval(() => {
+        if (sent < state.progress.count) { send({jsonrpc:'2.0',method:'notifications/progress',params:{progressToken:token,progress:++sent}}); return; }
+        clearInterval(timer); send({jsonrpc:'2.0',id:request.id,result:{content:[{type:'text',text:'long result'}]}});
+      }, state.progress.intervalMs);
+      return;
+    }
     if (state.echoEnv) {
       const secret=process.env.AMC_FIXTURE_SECRET;
       process.stderr.write(secret+'\n');
@@ -47,7 +71,8 @@ readline.createInterface({ input: process.stdin }).on('line', line => {
 `;
 
 interface RemoteTool { name: string; description?: string; inputSchema: Record<string, unknown>; outputSchema?: Record<string, unknown>; execution?: { taskSupport: "required" | "optional" | "forbidden" } }
-interface FixtureState { tools: RemoteTool[]; pageSize?: number; result?: Record<string, unknown>; notifyOnCall?: boolean; echoEnv?: boolean; waitOnCall?: boolean }
+interface FixtureState { tools: RemoteTool[]; pageSize?: number; result?: Record<string, unknown>; notifyOnCall?: boolean; echoEnv?: boolean; waitOnCall?: boolean;
+  waitFor?: string; lateFor?: string; lateMs?: number; progress?: { count: number; intervalMs: number }; stderrAndExit?: string; grandchildPidPath?: string; instructions?: string }
 const input = { type: "object", properties: { query: { type: "string", minLength: 1 } }, required: ["query"], additionalProperties: false };
 const tool = (name = "lookup"): RemoteTool => ({ name, description: "Synthetic lookup", inputSchema: input });
 const cleanups: (() => Promise<void>)[] = [];
@@ -159,7 +184,9 @@ describe("native MCP pinned stdio integration", () => {
     fixture.change({ tools: [tool()], waitOnCall: true });
     const timedOut = await fixture.call("lookup", { query: "wait" });
     expect(timedOut).toMatchObject({ outcome: "TOOL_OUTCOME_UNKNOWN", exitCode: 1, timedOut: true });
-    expect(fixture.tools.registry.visible("default").has(nativeMcpToolName("fixture", "lookup"))).toBe(false);
+    expect(String(timedOut.content)).toContain("may have executed");
+    // PXB-02: a request timeout cancels that request only; the reviewed mount stays.
+    expect(fixture.tools.registry.visible("default").has(nativeMcpToolName("fixture", "lookup"))).toBe(true);
   });
   test("required task execution is explicitly refused instead of dispatching a synchronous call", async () => {
     const fixture = setup({ tools: [{ ...tool(), execution: { taskSupport: "required" } }] });
@@ -181,12 +208,17 @@ describe("native MCP pinned stdio integration", () => {
     fixture.change({ tools: [{ ...tool(), description: secret }] });
     await expect(discoverNativeMcpCatalog(server, fixture.workspace)).rejects.toThrow(/discovery failed/);
   });
-  test("cancellation disposes the connection and prevents later calls", async () => {
-    const fixture = setup({ tools: [tool()], waitOnCall: true }); await fixture.mount();
+  test("a call's cancellation ends that request only; the mount signal disposes the connection and prevents later calls", async () => {
+    const fixture = setup({ tools: [tool()], waitOnCall: true });
+    const mountAbort = new AbortController(); await fixture.mount({ signal: mountAbort.signal });
     const controller = new AbortController(), running = fixture.call("lookup", { query: "wait" }, controller.signal);
     await vi.waitFor(() => expect(fixture.calls()).toHaveLength(1)); controller.abort();
     expect((await running).outcome).toBe("CANCELLED");
-    expect((await fixture.call("lookup", { query: "after abort" })).outcome).toBe("DENIED"); expect(fixture.calls()).toHaveLength(1);
+    fixture.change({ tools: [tool()] });
+    expect((await fixture.call("lookup", { query: "after request abort" })).outcome).toBe("OK"); expect(fixture.calls()).toHaveLength(2);
+    mountAbort.abort();
+    await vi.waitFor(() => expect(fixture.tools.registry.visible("default").has(nativeMcpToolName("fixture", "lookup"))).toBe(false));
+    expect((await fixture.call("lookup", { query: "after mount abort" })).outcome).toBe("DENIED"); expect(fixture.calls()).toHaveLength(2);
   });
   test.each([
     ["a tools/call that never answers", { waitOnCall: true }],
@@ -203,9 +235,9 @@ describe("native MCP pinned stdio integration", () => {
       blocking = journal.blockingExecutions({ workspaceId: journal.workspaceId, agentId: "default" });
       expect(blocking.map(id => journal.get(id)?.state)).toEqual(["outcome_unknown"]);
     } finally { journal.close(); }
-    // The failure disposed the grant; a fresh reviewed mount must still not dispatch the same call again. The unknown
-    // execution blocks this agent's journaled calls first (blocked_by_unreconciled), ahead of the duplicate check.
-    await fixture.mount();
+    // A timeout keeps the mount (PXB-02); a discarded result disposed it, so mount afresh. Either way the same call must
+    // not dispatch again: the unknown execution blocks this agent's journaled calls first (blocked_by_unreconciled).
+    if (!fixture.tools.registry.visible("default").has(nativeMcpToolName("fixture", "lookup"))) await fixture.mount();
     const second = await fixture.call("lookup", { query: "fixture" });
     expect(second.outcome).toBe("DENIED"); expect(String(second.content)).toContain(`blocked_by_unreconciled:${blocking[0]}`);
     expect(fixture.calls()).toHaveLength(1);
@@ -233,6 +265,90 @@ describe("native MCP pinned stdio integration", () => {
     await fixture.mount({ server: { ...fixture.server, env: { AMC_FIXTURE_SECRET: secret } } });
     const result = await fixture.call("lookup", { query: "fixture" });
     expect(result.outcome).toBe("OK"); expect(JSON.parse(String(result.content)).structuredContent.token).toBe("[REDACTED]");
+  });
+});
+
+describe("WP41 native MCP mount lifecycle", () => {
+  test("PXB-01: progress notifications renew the inactivity timeout so a call longer than timeoutMs completes", async () => {
+    const fixture = setup({ tools: [tool()], progress: { count: 6, intervalMs: 300 } });
+    const server = { ...fixture.server, timeoutMs: 800 };
+    const reviewed = await discoverNativeMcpCatalog(server, fixture.workspace);
+    await fixture.mount({ server, expectedCatalogDigest: reviewed.digest });
+    const started = Date.now();
+    const outcome = await fixture.call("lookup", { query: "long" });
+    expect(Date.now() - started).toBeGreaterThan(800);
+    expect(outcome).toMatchObject({ outcome: "OK", timedOut: false });
+    expect(JSON.parse(String(outcome.content))).toMatchObject({ content: [{ type: "text", text: "long result" }], amcProgressNotifications: 6 });
+  });
+  test("PXB-01: maxTotalMs still bounds a call that keeps reporting progress", async () => {
+    const fixture = setup({ tools: [tool()], progress: { count: 20, intervalMs: 200 } });
+    const server = { ...fixture.server, timeoutMs: 500, maxTotalMs: 1_000 };
+    const reviewed = await discoverNativeMcpCatalog(server, fixture.workspace);
+    await fixture.mount({ server, expectedCatalogDigest: reviewed.digest });
+    expect(await fixture.call("lookup", { query: "long" })).toMatchObject({ outcome: "TOOL_OUTCOME_UNKNOWN", timedOut: true });
+  });
+  test("PXB-02: a timed-out call leaves sibling tools on the same mount usable", async () => {
+    const fixture = setup({ tools: [tool("slow"), tool("fast")], waitFor: "slow" });
+    const server = { ...fixture.server, timeoutMs: 500 };
+    const reviewed = await discoverNativeMcpCatalog(server, fixture.workspace);
+    const mounted = await fixture.mount({ server, expectedCatalogDigest: reviewed.digest });
+    const pid = Number(readFileSync(fixture.pidPath, "utf8"));
+    const slow = await fixture.call("slow", { query: "wait" });
+    expect(slow).toMatchObject({ outcome: "TOOL_OUTCOME_UNKNOWN", timedOut: true });
+    expect(String(slow.content)).toContain("mount remains active");
+    expect(String(slow.content)).toContain("may have executed");
+    expect(await fixture.call("fast", { query: "sibling" })).toMatchObject({ outcome: "OK" });
+    expect(fixture.calls().map(call => call.name)).toEqual(["slow", "fast"]);
+    expect(mounted.toolNames.every(name => fixture.tools.registry.visible("default").has(name))).toBe(true);
+    expect(() => process.kill(pid, 0)).not.toThrow();
+  });
+  test("PXB-02: a late response and progress for a cancelled request do not tear down the mount", async () => {
+    const fixture = setup({ tools: [tool("slow"), tool("fast")], lateFor: "slow", lateMs: 900 });
+    const server = { ...fixture.server, timeoutMs: 400, maxTotalMs: 400 };
+    const reviewed = await discoverNativeMcpCatalog(server, fixture.workspace);
+    await fixture.mount({ server, expectedCatalogDigest: reviewed.digest });
+    expect(await fixture.call("slow", { query: "late" })).toMatchObject({ outcome: "TOOL_OUTCOME_UNKNOWN", timedOut: true });
+    await new Promise(resolve => setTimeout(resolve, 900));
+    expect(fixture.tools.registry.visible("default").has(nativeMcpToolName("fixture", "fast"))).toBe(true);
+    expect(await fixture.call("fast", { query: "after late echo" })).toMatchObject({ outcome: "OK" });
+  });
+  test.skipIf(process.platform === "win32")("PXB-03: closing a stdio mount terminates the server's grandchild", async () => {
+    const fixture = setup({ tools: [tool()] });
+    const grandchildPidPath = join(fixture.workspace, "grandchild-pid");
+    fixture.change({ tools: [tool()], grandchildPidPath });
+    const mounted = await fixture.mount();
+    await vi.waitFor(() => expect(existsSync(grandchildPidPath)).toBe(true));
+    const grandchild = Number(readFileSync(grandchildPidPath, "utf8"));
+    expect(() => process.kill(grandchild, 0)).not.toThrow();
+    await mounted.close();
+    expect(() => process.kill(grandchild, 0)).toThrow();
+  });
+  test("PXB-04: a failing server's stderr tail is available to the operator, redacted and bounded; the refusal is unchanged", async () => {
+    const secret = "synthetic-mcp-stderr-secret-77c1d0";
+    const fixture = setup({ tools: [tool()], stderrAndExit: "x".repeat(40 * 1024) + "\nboot failed with " + secret + "\n" });
+    const server = { ...fixture.server, env: { AMC_FIXTURE_SECRET: secret } };
+    const failure = await discoverNativeMcpCatalog(server, fixture.workspace).then(() => null, (error: unknown) => error);
+    expect(failure).toBeInstanceOf(Error);
+    expect((failure as Error).message).toBe("MCP catalog discovery failed; no tool grant was created");
+    const tail = nativeMcpFailureDiagnostics(failure);
+    expect(tail).toContain("boot failed with [REDACTED]");
+    expect(tail).not.toContain(secret);
+    expect(Buffer.byteLength(tail ?? "")).toBeLessThanOrEqual(NATIVE_MCP_DIAGNOSTICS_BYTES);
+    expect(JSON.stringify(failure)).not.toContain("boot failed");
+  });
+  test("PI-044: image content stays typed with its digest instead of base64 text; instructions are typed and bounded", async () => {
+    const image = Buffer.from("synthetic-png-bytes").toString("base64");
+    const secret = "synthetic-mcp-instruction-secret-31aa";
+    const fixture = setup({ tools: [tool()], instructions: "Use lookup carefully. " + secret,
+      result: { content: [{ type: "text", text: "caption" }, { type: "image", data: image, mimeType: "image/png" }] } });
+    const mounted = await fixture.mount({ server: { ...fixture.server, env: { AMC_FIXTURE_SECRET: secret } } });
+    expect(mounted.serverInstructions).toEqual({ kind: "mcp-server-instructions", serverId: "fixture",
+      text: "Use lookup carefully. [REDACTED]", truncated: false });
+    const outcome = await fixture.call("lookup", { query: "picture" });
+    expect(outcome.outcome).toBe("OK");
+    expect(String(outcome.content)).not.toContain(image);
+    expect(JSON.parse(String(outcome.content)).content).toEqual([{ type: "text", text: "caption" },
+      { type: "image", mimeType: "image/png", byteLength: 19, sha256: sha256Hex(Buffer.from("synthetic-png-bytes")), dataOmitted: true }]);
   });
 });
 
@@ -266,6 +382,41 @@ describe("native MCP configuration admission", () => {
     initToolsConfig(fixture.workspace, config);
     expect(() => requireReviewedNativeMcpGrants(loadNativeMcpConfiguration(path), fixture.workspace, "READ_ONLY")).toThrow(/context must match/);
     expect(fixture.calls()).toEqual([]);
+  });
+  test("agent-loop run takes several reviewed MCP configs only with distinct server ids and one pin per config", async () => {
+    const fixture = setup({ tools: [tool()] });
+    const path = join(fixture.workspace, "mcp-a.json"), twin = join(fixture.workspace, "mcp-b.json");
+    const config = { schemaVersion: 1, server: { id: "fixture", command: process.execPath }, expectedCatalogDigest: "a".repeat(64), grants: [{ name: "lookup", actionClass: "READ_ONLY" }] };
+    writeFileSync(path, JSON.stringify(config)); writeFileSync(twin, JSON.stringify(config));
+    const runCli = async (argv: string[]) => {
+      const errors: string[] = [], failures: number[] = [];
+      const program = new Command(); program.exitOverride();
+      registerAgentCommands(program, { log: () => {}, error: line => errors.push(line), fail: () => failures.push(1) });
+      const cwd = process.cwd(); process.chdir(fixture.workspace);
+      try { await program.parseAsync(["agent-loop", "run", "hello", "--tools", "workspace", "--approve-tools", "READ_ONLY", ...argv], { from: "user" }); }
+      finally { process.chdir(cwd); }
+      return { errors, failures };
+    };
+    const mismatched = await runCli(["--mcp-config", path, "--mcp-config", twin, "--mcp-config-sha256", sha256Hex(readFileSync(path))]);
+    expect(mismatched.errors).toEqual(["Give one --mcp-config-sha256 per --mcp-config, in the same order."]);
+    const duplicate = await runCli(["--mcp-config", path, "--mcp-config", twin]);
+    expect(duplicate.errors).toEqual(["Each --mcp-config must name a distinct server id."]);
+    expect(fixture.calls()).toEqual([]);
+  });
+  test("two reviewed servers mount into one toolset and each keeps its own grants", async () => {
+    const fixture = setup({ tools: [tool()] });
+    const config = loadToolsConfig(fixture.workspace);
+    initToolsConfig(fixture.workspace, { ...config, tools: { ...config.tools, allowedTools: [...config.tools.allowedTools,
+      { name: nativeMcpToolName("second", "lookup"), actionClass: "READ_ONLY" }] } });
+    await fixture.mount();
+    const second = { ...fixture.server, id: "second" };
+    const reviewed = await discoverNativeMcpCatalog(second, fixture.workspace);
+    const mounted = await mountNativeMcpServer({ server: second, workspace: fixture.workspace, agentId: "default", toolset: fixture.tools,
+      expectedCatalogDigest: reviewed.digest, grants: [{ name: "lookup", actionClass: "READ_ONLY" }] });
+    expect((await fixture.call("lookup", { query: "first" })).outcome).toBe("OK");
+    await mounted.close();
+    expect(fixture.tools.registry.visible("default").has(nativeMcpToolName("second", "lookup"))).toBe(false);
+    expect((await fixture.call("lookup", { query: "first again" })).outcome).toBe("OK");
   });
   test("pins exact config bytes, refuses literal secrets and checks the signed grant class", async () => {
     const fixture = setup({ tools: [tool()] });

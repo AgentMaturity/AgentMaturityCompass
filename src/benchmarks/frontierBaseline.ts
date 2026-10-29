@@ -174,6 +174,8 @@ export function compareAgainstBaselines(
 
 /**
  * Calculate the agent's percentile among frontier baselines.
+ * Unlike stats.ts percentileRank, count only strictly lower scores (ties excluded),
+ * round to an integer, and retain NaN when there is no comparison population.
  */
 export function calculatePercentile(
   agentComposite: number,

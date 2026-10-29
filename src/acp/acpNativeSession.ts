@@ -31,6 +31,8 @@ export async function prepareAcpNativeSession(options: {
   const init: AgentSessionInit & { sessionId: string } = {
     ...options.session,
     ...(grants ? { additionalCapabilities: grants.capabilities } : {}),
+    // bindTools below gates every call (EMPTY_TOOL_SEAM included) whenever an approval is configured, so the prompt may say so.
+    approvalGated: options.approval !== undefined,
     bindTools: context => {
       binding.value = context;
       const inner = context.toolset?.seam ?? EMPTY_TOOL_SEAM;

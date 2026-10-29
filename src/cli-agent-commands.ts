@@ -40,16 +40,13 @@ import {
 } from "./agent/stubProvider.js";
 import type { LoopNotification } from "./agent/loopTypes.js";
 import { echoToolSeam } from "./agent/echoTool.js";
-import { ipcAskUserAnswerer } from "./setup/nativeInteractiveAskUser.js";
-import { searxngSearchProvider } from "./tools/builtin/webSearchProviders.js";
-import { renderSessionLists } from "./tools/builtin/todoTool.js";
-import type { WebSearchProvider } from "./tools/builtin/webSearchTool.js";
+import { WEB_SEARCH_SEARXNG_HELP, resolveBreadthRun, withBreadthRunOptions } from "./cli/agentLoopBreadthOptions.js";
 import { agentToolset, type AgentToolset } from "./agent/agentToolset.js";
 import { runLease } from "./leases/runLease.js";
-import { selectSupportedNativeTools, type NativeToolCapability } from "./agent/nativeToolCapabilities.js";
-import type { MountedNativeMcpServer, NativeMcpGrant } from "./mcp/nativeMcpClient.js";
+import { selectSupportedNativeTools } from "./agent/nativeToolCapabilities.js";
+import type { MountedNativeMcpServer } from "./mcp/nativeMcpClient.js";
 import { resolveNativeValidationSelection } from "./setup/nativeValidationConfig.js";
-import { NativeMcpConfigError, type LoadedNativeMcpConfiguration } from "./setup/nativeMcpConfig.js";
+import { NativeMcpConfigError, type ReviewedNativeMcpServer } from "./setup/nativeMcpConfig.js";
 import { delegateTool } from "./agent/delegateTool.js";
 import { DEFAULT_MAX_DELEGATION_DEPTH } from "./agent/delegationIdentity.js";
 import { parseDelegationScope } from "./agent/delegationScope.js";
@@ -64,13 +61,12 @@ import { loadVerifiedToolsConfigSnapshot } from "./toolhub/toolhubValidators.js"
 import type { AgentToolSeam } from "./agent/toolSeam.js";
 import type { SubagentCapability } from "./agent/delegateTool.js";
 import type { ComposedToolSession } from "./kernel/agentLoopRunner.js";
-import { readAgentRunSummary, renderRunSummary, renderVerifyReport, verifyAgentRun } from "./agent/runReport.js";
-import { executionStatusFor, recordedExecutionStatus } from "./execution/executionStatus.js";
+import { readAgentRunSummary, renderVerifyReport, verifyAgentRun } from "./agent/runReport.js";
+import { recordedExecutionStatus } from "./execution/executionStatus.js";
 import { ledgerExitCode, trustFromFlags, withTrustFlags, type TrustFlags } from "./cli-trust-flags.js";
 import { registerPromptCommands } from "./cli-prompt-commands.js";
 import { registerNativeScheduleCommands } from "./cli-native-schedule-commands.js";
 import { registerAgentGuideCommands, selectedAgentOption } from "./cli-agent-guide-commands.js";
-import { renderNativeGuideCommand } from "./setup/nativeFirstUseGuide.js";
 import { nativeApprovalInstructions } from "./setup/nativeApprovalInstructions.js";
 import { applyNativeDelegationPreset } from "./setup/nativePresetDelegation.js";
 import type { ActionClass } from "./types.js";
@@ -161,7 +157,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--approve-risk <tier>", "approval risk tier (default high)")
     .option("--tools <mode>", "none, echo, or explicitly enabled workspace tools; existing policy still applies")
     .option("--unsafe-unconfined-shell", "macOS without Seatbelt only: offer the native shell UNCONFINED, with your full user rights; ignored where Seatbelt or Bubblewrap confines it, refused on Windows")
-    .option("--web-search-searxng <origin>", "opt-in web_search provider for workspace tools: a SearXNG JSON origin, also granted in the signed tools policy")
+    .option("--web-search-searxng <origin>", WEB_SEARCH_SEARXNG_HELP)
     .option("--max-tokens <n>", "output-token limit per request (default 512)")
     .option("--thinking <mode>", "DeepSeek only: enabled or disabled; tools-free chat requires explicit disabled")
     .option("--reasoning-effort <effort>", "DeepSeek only: exact low, high, or max with enabled thinking")
@@ -176,7 +172,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       await runNativeInteractiveSession({ ...opts, agentId: selectedAgentOption(command), workspace: process.cwd() }, io);
     });
 
-  group
+  withBreadthRunOptions(group
     .command("run")
     .option("--agent <id>", "agent identity; defaults to AMC_AGENT_ID, the current agent, then default")
     .description("Run one agent turn and report what the signed log recorded")
@@ -195,8 +191,8 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--credential <ref>", "credential REFERENCE (never a value) the route authenticates with")
     .option("--credentials-home <dir>", "home directory the credentials store reads from")
     .option("--credentials-file <path>", "explicit credentials file, overriding the home layout")
-    .option("--mcp-config <path>", "reviewed MCP JSON; requires --tools workspace and --approve-tools")
-    .option("--mcp-config-sha256 <digest>", "refuse an MCP config changed from these exact reviewed bytes")
+    .option("--mcp-config <path>", "reviewed MCP JSON; repeat to mount more servers under the same signed allowlist and approval class; requires --tools workspace and --approve-tools", collectOption)
+    .option("--mcp-config-sha256 <digest>", "refuse an MCP config changed from these exact reviewed bytes; one per --mcp-config, in the same order", collectOption)
     .option("--max-tokens <n>", "provider max_tokens for each request")
     .option("--thinking <mode>", "DeepSeek only: enabled (default) or disabled")
     .option("--reasoning-effort <effort>", "DeepSeek only: exact low, high (default), or max with enabled thinking")
@@ -248,10 +244,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       "require a signed human approval before every tool call, decided under this action class"
     )
     .option("--approve-risk <tier>", "risk tier the approval is raised at (default high)")
-    .option("--interactive-approvals", "send actual queued approval IDs to the native chat parent over dedicated Node IPC")
-    .option("--interactive-ask-user", "answer ask_user through the native chat parent over dedicated Node IPC; answers are auditor-signed")
-    .option("--web-search-searxng <origin>", "opt-in web_search provider: a SearXNG JSON origin, also granted under web_search in the signed tools policy")
-    .option("--goal-rounds <n>", "run the prompt as a goal for up to N rounds of in-process delegated children (requires --delegate and --tools workspace)")
+    .option("--interactive-approvals", "send actual queued approval IDs to the native chat parent over dedicated Node IPC"))
     .option(
       "--approval-exception <file>",
       "ADR-5 exception note (JSON) that auto-allows the classes it names until it expires"
@@ -265,12 +258,6 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       if (opts.interactiveApprovals && (typeof process.send !== "function" || !process.connected)) {
         io.error("--interactive-approvals requires an AMC parent with a dedicated IPC channel. Use native chat or the ordinary approvals CLI."); io.fail(); return;
       }
-      if (opts.interactiveAskUser && (typeof process.send !== "function" || !process.connected)) {
-        io.error("--interactive-ask-user requires an AMC parent with a dedicated IPC channel. Use native chat."); io.fail(); return;
-      }
-      let webSearchProvider: WebSearchProvider | undefined;
-      try { webSearchProvider = opts.webSearchSearxng === undefined ? undefined : searxngSearchProvider(opts.webSearchSearxng); }
-      catch (error) { io.error(error instanceof Error ? error.message : "Invalid web search provider."); io.fail(); return; }
       if (opts.interactiveApprovals && opts.approvalException !== undefined) {
         io.error("Interactive approvals require the signed approval engine; approval exceptions cannot be combined with this mode."); io.fail(); return;
       }
@@ -422,23 +409,21 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       if (opts.interactiveApprovals && gate === undefined) {
         io.error("--interactive-approvals requires --approve-tools to raise actual signed requests."); io.fail(); return;
       }
-      let mcpConfig: LoadedNativeMcpConfiguration | null = null;
-      let mcpReview: { expectedCatalogDigest: string; grants: readonly NativeMcpGrant[]; capabilities: readonly NativeToolCapability[] } | null = null;
+      let mcpServers: readonly ReviewedNativeMcpServer[] = [];
       if (opts.mcpConfig !== undefined) {
         if (opts.tools !== "workspace" || gate === undefined) {
           io.error("--mcp-config requires explicit --tools workspace and --approve-tools with matching grant action classes."); io.fail(); return;
         }
         try {
-          const { loadNativeMcpConfiguration, requireReviewedNativeMcpGrants } = await import("./setup/nativeMcpConfig.js");
-          mcpConfig = loadNativeMcpConfiguration(opts.mcpConfig, opts.mcpConfigSha256);
-          mcpReview = requireReviewedNativeMcpGrants(mcpConfig, process.cwd(), gate.actionClass);
+          const { reviewNativeMcpConfigurations } = await import("./setup/nativeMcpConfig.js");
+          mcpServers = reviewNativeMcpConfigurations(opts.mcpConfig, opts.mcpConfigSha256, process.cwd(), gate.actionClass);
         } catch (error) {
           io.error(error instanceof NativeMcpConfigError ? error.message : "MCP preflight refused. Review the config digest, catalog pin, explicit grants, matching signed allowlist and approval class; no server was started.");
           io.fail(); return;
         }
       }
       if (opts.takeoverExpiredWriter !== undefined && opts.session === undefined) { io.error("--takeover-expired-writer requires --session <id>."); io.fail(); return; }
-      if (opts.session !== undefined && mcpConfig !== null) {
+      if (opts.session !== undefined && mcpServers.length) {
         // Mounting can execute a process or contact a server. Check the signed
         // identity first; resumeSession repeats admission before taking ownership.
         const { assertSessionResumeAgent } = await import("./session/sessionResume.js");
@@ -459,18 +444,8 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       // echo tool exists precisely to make a multi-step turn observable.
       const toolMode = opts.tools ?? preset?.tools ?? (providerId === STUB_PROVIDER_ID ? "echo" : "none");
       const wantsDelegation = opts.delegate === true;
-      if ((opts.interactiveAskUser || webSearchProvider !== undefined) && toolMode !== "workspace") {
-        io.error(chalk.red("--interactive-ask-user and --web-search-searxng configure workspace tools; add --tools workspace.")); io.fail(); return;
-      }
-      const goalRounds = opts.goalRounds === undefined ? undefined : integerOption(io, "--goal-rounds", opts.goalRounds, 0);
-      if (goalRounds === null) return;
-      if (goalRounds !== undefined && (goalRounds < 1 || goalRounds > 100)) {
-        io.error(chalk.red("--goal-rounds must be an integer from 1 through 100; it is the hard ceiling.")); io.fail(); return;
-      }
-      if (goalRounds !== undefined && (!wantsDelegation || toolMode !== "workspace" || opts.delegateProvider !== undefined)) {
-        io.error(chalk.red("--goal-rounds runs each round as an in-process child: it needs --delegate and --tools workspace, without --delegate-provider."));
-        io.fail(); return;
-      }
+      const breadth = resolveBreadthRun(io, opts, { toolMode, wantsDelegation });
+      if (breadth === null) return;
       if (!wantsDelegation && opts.delegateStop !== undefined) {
         io.error(chalk.red("--delegate-stop and --no-delegate-stop require --delegate or delegate.enabled in the signed preset."));
         io.fail(); return;
@@ -516,15 +491,13 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
         const toolset = workspaceToolset = agentToolset({
           workspace: process.cwd(),
           agentId,
-          additionalCapabilities: [...(mcpReview?.capabilities ?? []), ...(wantsDelegation ? [{ name: "delegate", actionClass: "READ_ONLY" as const }] : [])],
+          additionalCapabilities: [...mcpServers.flatMap(entry => entry.review.capabilities), ...(wantsDelegation ? [{ name: "delegate", actionClass: "READ_ONLY" as const }] : [])],
           // Fork chooses a different ID; resume chooses the existing writer.
           get sessionId() { return actualSession().sessionId; },
           recorder: { recordProjectedEvidence: (row) => actualSession().recordProjectedEvidence(row), assertWritable: () => actualSession().assertWritable() },
           ...lease,
           ...(dispatchMode === "code" ? { mode: dispatchMode } : {}),
-          ...(opts.interactiveAskUser ? { askUser: ipcAskUserAnswerer() } : {}),
-          ...(webSearchProvider === undefined ? {} : { webSearchProvider }),
-          skillRoots: workspaceSkillRoots(process.cwd(), opts.credentialsHome),
+          ...breadth.toolset,
           ...shellOptIn
         });
         bindToolSession = (session) => { boundSession = session; };
@@ -638,23 +611,23 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       }
       const timers: NodeJS.Timeout[] = [];
       let onSigint: (() => void) | null = null;
-      let mcpMount: MountedNativeMcpServer | null = null;
+      const mcpMounts: MountedNativeMcpServer[] = [];
       const mcpAbort = new AbortController();
       const cancelMcp = () => mcpAbort.abort();
-      if (mcpConfig !== null) process.on("SIGINT", cancelMcp);
-      // Goal rounds run no root turn, so onReady never installs the turn's Ctrl-C; this stops the rounds instead.
-      const goalAbort = new AbortController();
-      const cancelGoal = () => { io.error(chalk.yellow("\ncancelling the goal rounds (cause: user)…")); goalAbort.abort(); };
-      if (goalRounds !== undefined) process.on("SIGINT", cancelGoal);
+      if (mcpServers.length) process.on("SIGINT", cancelMcp);
+      breadth.armCancel();
 
       try {
-        if (mcpConfig !== null && mcpReview !== null && workspaceToolset !== null) {
+        if (mcpServers.length && workspaceToolset !== null) {
           const { resolveNativeMcpServer } = await import("./setup/nativeMcpConfig.js");
           const { mountNativeMcpServer } = await import("./mcp/nativeMcpClient.js");
-          const server = await resolveNativeMcpServer(mcpConfig.config, { ...opts, workspace: process.cwd() });
-          mcpMount = await mountNativeMcpServer({ server, workspace: process.cwd(), agentId,
-            toolset: workspaceToolset, ...mcpReview, signal: mcpAbort.signal });
-          progress(`Mounted reviewed MCP tools for this run: ${mcpMount.toolNames.join(", ")}. Signed allowlist, approval gate and budgets remain in force.`);
+          for (const { config, review } of mcpServers) {
+            const server = await resolveNativeMcpServer(config.config, { ...opts, workspace: process.cwd() });
+            const mount = await mountNativeMcpServer({ server, workspace: process.cwd(), agentId,
+              toolset: workspaceToolset, ...review, signal: mcpAbort.signal });
+            mcpMounts.push(mount);
+            progress(`Mounted reviewed MCP tools for this run: ${mount.toolNames.join(", ")}. Signed allowlist, approval gate and budgets remain in force.`);
+          }
         }
         let previewRequest: string | null = null;
         let priorTurnEndings = 0;
@@ -750,7 +723,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
               }),
           config: { maxStepsPerTurn: maxSteps, ...(compaction === undefined ? {} : { compaction }) },
           ...(validation === undefined ? {} : { validation }),
-          ...(goalRounds === undefined ? {} : { goalRounds: { maxRounds: goalRounds, signal: goalAbort.signal } }),
+          ...breadth.turn,
           credentials: {
             // Watching is for a long-lived process picking up a rotation; a
             // single-turn command would only be opening and closing a watcher.
@@ -790,32 +763,15 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
               })
         });
 
-        const summary = readAgentRunSummary(process.cwd(), outcome.sessionId, outcome.status);
-        const ending = summary.endings.length > priorTurnEndings ? summary.endings.at(-1) : undefined;
-        // P2-13: the four execution phases; evidence verification stays pending until `agent-loop verify`.
-        io.log(opts.json ? JSON.stringify({ ...summary, ...(outcome.goalRounds === undefined ? {} : { goalRounds: outcome.goalRounds }),
-          execution: executionStatusFor(process.cwd(), { sessionId: summary.sessionId, admission: "admitted",
-          turn: ending?.reason ?? (summary.driverStatus === "failed" ? "error" : null), verified: null }) }, null, 2) : renderRunSummary(summary));
-        if (!opts.json && outcome.goalRounds !== undefined) {
-          io.log(`Goal rounds: ${outcome.goalRounds.rounds} run, stopped by ${outcome.goalRounds.stoppedBy} (${outcome.goalRounds.reason}). Each round is a delegated child session in this session's log.`);
-          if (outcome.goalRounds.lastText) io.log(outcome.goalRounds.lastText);
-        }
-        if (!opts.json && toolMode === "workspace") for (const line of renderSessionLists(process.cwd(), summary.sessionId)) io.log(line);
-        if (!opts.json) {
-          io.log("Verify the recorded evidence (this does not evaluate answer quality):\n  " +
-            renderNativeGuideCommand({ cwd: process.cwd(), argv: ["amc", "agent-loop", "verify", summary.sessionId] }));
-        }
-        if (summary.driverStatus === "failed" || ending?.reason === "error"
-          || (validation !== undefined && summary.validation.status !== "passed")
-          || (outcome.goalRounds !== undefined && ["failed", "refused", "cancelled"].includes(outcome.goalRounds.stoppedBy))) io.fail();
+        breadth.reportRun(outcome, priorTurnEndings, validation !== undefined);
       } finally {
         for (const timer of timers) clearTimeout(timer);
         if (onSigint !== null) process.removeListener("SIGINT", onSigint);
-        try { await mcpMount?.close(); }
-        catch { io.error("MCP cleanup failed; this mount must not be reused."); io.fail(); }
+        const closed = await Promise.allSettled(mcpMounts.map(mount => mount.close()));
+        try { if (closed.some(result => result.status === "rejected")) { io.error("MCP cleanup failed; this mount must not be reused."); io.fail(); } }
         finally {
           process.removeListener("SIGINT", cancelMcp);
-          process.removeListener("SIGINT", cancelGoal);
+          breadth.dispose();
           workspaceToolset?.close();
         }
       }

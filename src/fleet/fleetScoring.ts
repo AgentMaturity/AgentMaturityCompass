@@ -1,3 +1,4 @@
+import { mean as statsMean, median as statsMedian, standardDeviation } from "../experiments/stats.js";
 /**
  * Fleet Scoring — Multi-Agent Evaluation
  *
@@ -150,24 +151,15 @@ export interface FleetAgentScoreFailure {
 /* ── Helpers ───────────────────────────────────────── */
 
 function mean(values: number[]): number {
-  if (values.length === 0) return 0;
-  return values.reduce((s, v) => s + v, 0) / values.length;
+  return statsMean(values);
 }
 
 function median(values: number[]): number {
-  if (values.length === 0) return 0;
-  const sorted = [...values].sort((a, b) => a - b);
-  const mid = Math.floor(sorted.length / 2);
-  return sorted.length % 2 === 0
-    ? (sorted[mid - 1]! + sorted[mid]!) / 2
-    : sorted[mid]!;
+  return statsMedian(values);
 }
 
 function stdDev(values: number[]): number {
-  if (values.length < 2) return 0;
-  const avg = mean(values);
-  const squaredDiffs = values.map((v) => (v - avg) ** 2);
-  return Math.sqrt(squaredDiffs.reduce((s, v) => s + v, 0) / values.length);
+  return standardDeviation(values, false);
 }
 
 function overallFromLayers(layerScores: LayerScore[]): number {

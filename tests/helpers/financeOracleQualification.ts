@@ -158,7 +158,7 @@ try {
           const dispatchedBody = c.mode === "body-mismatch" ? { ...body, amountMinor: 12001 } : body;
           const paid = await adapter.dispatch({ executionId: execution.executionId, idempotencyKey: execution.idempotencyKey, args: dispatchedBody }, execution.signal);
           assert.equal(paid.kind, "completed");
-          return { output: JSON.stringify({ paymentId: paid.payment.paymentId }), effect: "applied", externalRef: paid.payment.paymentId };
+          return { ok: true, output: JSON.stringify({ paymentId: paid.payment.paymentId }), effect: "applied", externalRef: paid.payment.paymentId };
         } }));
       registry.guard("signed finance allowlist", toolhubAllowlistGuard(c.workspace, execution => registry.visible(execution.agentId).get(execution.name)));
       registry.guard("refreshed finance resource", execution => refreshed.get(execution) === true ? undefined : "finance resource refresh unavailable");

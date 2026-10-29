@@ -1,3 +1,4 @@
+import { percentileRank } from "../experiments/stats.js";
 /**
  * Benchmark runner — executes a standard benchmark suite against an agent
  * and compares results across categories.
@@ -56,9 +57,8 @@ export interface BenchCompareResult {
 
 function percentile(values: number[], value: number): number {
   if (values.length === 0) return 50;
-  const sorted = [...values].sort((a, b) => a - b);
-  const rank = sorted.filter((v) => v <= value).length;
-  return Number(((rank / sorted.length) * 100).toFixed(2));
+  // Legacy empty populations use rank 50 here; stats.ts percentileRank uses zero.
+  return Number(percentileRank(values, value).toFixed(2));
 }
 
 /**

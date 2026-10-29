@@ -1,9 +1,11 @@
 import { randomUUID } from "node:crypto";
-import { accessSync, closeSync, constants, fchmodSync, fsyncSync, openSync, renameSync, statSync, unlinkSync, writeFileSync } from "node:fs";
+import { accessSync, closeSync, constants, fchmodSync, fstatSync, fsyncSync, lstatSync, openSync, renameSync, statSync, unlinkSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 
 /**
  * Replace a file so a reader sees the old bytes or the new bytes, never a mix.
+ * With createOnly, reserve the destination using O_EXCL instead: a late arrival is never replaced.
+ * beforeCommit runs after staging, immediately before each publication attempt.
  *
  * The temp file sits in the target's own directory because `rename` is only
  * atomic within one filesystem (`EXDEV` otherwise). It is fsync'd before the
@@ -20,8 +22,30 @@ import { dirname, join } from "node:path";
  * Callers pass a resolved path: renaming over a symlink replaces the link, not
  * the file it points to.
  */
-export function writeFileAtomicSync(path: string, data: string | Buffer, opts?: { encoding?: BufferEncoding }): void {
+export function writeFileAtomicSync(path: string, data: string | Buffer, opts?: { encoding?: BufferEncoding; createOnly?: boolean; beforeCommit?: () => void }): void {
   const directory = dirname(path);
+  // Absence is a condition of this operation, not permission to replace a late arrival.
+  if (opts?.createOnly) {
+    opts.beforeCommit?.();
+    const fd = openSync(path, "wx");
+    try {
+      writeFileSync(fd, data, { encoding: opts.encoding ?? "utf8" });
+      fsyncSync(fd);
+    } catch (error) {
+      // A failed create may leave partial bytes. Remove only the inode we opened,
+      // preserving a replacement another writer published while the write failed.
+      try {
+        const created = fstatSync(fd);
+        const current = lstatSync(path, { throwIfNoEntry: false });
+        if (current?.dev === created.dev && current.ino === created.ino) unlinkSync(path);
+      } catch { /* preserve the write error if cleanup cannot be proved safe */ }
+      throw error;
+    } finally {
+      closeSync(fd);
+    }
+    syncDirectory(directory);
+    return;
+  }
   const temporary = join(directory, `.amc-tmp-${process.pid}-${randomUUID()}`);
   const mode = existingMode(path);
   if (mode !== undefined) accessSync(path, constants.W_OK);
@@ -35,7 +59,7 @@ export function writeFileAtomicSync(path: string, data: string | Buffer, opts?: 
     } finally {
       closeSync(fd);
     }
-    renameWithRetry(temporary, path);
+    renameWithRetry(temporary, path, opts?.beforeCommit);
     renamed = true;
   } finally {
     if (!renamed) {
@@ -54,8 +78,9 @@ function existingMode(path: string): number | undefined {
 }
 
 /** Windows refuses a rename over a file another process holds open with EPERM; that clears quickly. */
-function renameWithRetry(from: string, to: string): void {
+function renameWithRetry(from: string, to: string, beforeCommit?: () => void): void {
   for (let attempt = 0; ; attempt++) {
+    beforeCommit?.();
     try {
       renameSync(from, to);
       return;

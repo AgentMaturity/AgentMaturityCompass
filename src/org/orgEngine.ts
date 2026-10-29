@@ -1,3 +1,4 @@
+import { percentileRank } from "../experiments/stats.js";
 import { readdirSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
 import { listAgents, verifyAgentConfigSignature, verifyFleetConfigSignature } from "../fleet/registry.js";
@@ -468,8 +469,8 @@ function ecosystemRollupFromBenchmarks(
 
   const percentile = (value: number, rows: number[]): number => {
     if (rows.length === 0) return 100;
-    const lowerOrEqual = rows.filter((row) => row <= value).length;
-    return Number(((lowerOrEqual / rows.length) * 100).toFixed(2));
+    // Empty peer populations retain rank 100 here; stats.ts percentileRank uses zero.
+    return Number(percentileRank(rows, value).toFixed(2));
   };
 
   const overallRows = peers.map((row) => row.bench.run.overall);

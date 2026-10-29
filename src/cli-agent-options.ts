@@ -48,8 +48,8 @@ export interface RunOptions {
   validate?: string[];
   extension?: string[];
   extensionPin?: string[];
-  mcpConfig?: string;
-  mcpConfigSha256?: string;
+  mcpConfig?: string[];
+  mcpConfigSha256?: string[];
   delegate?: boolean;
   maxDelegationDepth?: string;
   delegateScope?: string;
