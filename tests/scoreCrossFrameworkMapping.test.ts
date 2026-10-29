@@ -43,16 +43,6 @@ describe("score crossFrameworkMapping", () => {
     expect(report.targetMet).toBe(false);
   });
 
-  test("GDPR Article 5 accountability is represented and coverable", () => {
-    const report = generateFrameworkReport("GDPR", {
-      passedQIDs: ["AMC-1.7"],
-      activeModules: []
-    });
-
-    expect(report.coveredControls).toContain("GDPR-5.2");
-    expect(report.automatedControls).toContain("GDPR-5.2");
-  });
-
   test("MITRE ATLAS has technique-level controls and zero coverage with no evidence", () => {
     const report = generateFrameworkReport("MITRE_ATLAS", { passedQIDs: [], activeModules: [] });
     expect(report.coveragePercent).toBe(0);
@@ -67,26 +57,6 @@ describe("score crossFrameworkMapping", () => {
     expect(report.targetMet).toBe(false);
   });
 
-  test("MITRE ATLAS coverage via prompt injection question", () => {
-    const report = generateFrameworkReport("MITRE_ATLAS", {
-      passedQIDs: ["AMC-3.3.1"],
-      activeModules: []
-    });
-    // P0-24: ATLAS AML.T0051 is LLM Prompt Injection and AML.T0054 is LLM Jailbreak (ATLAS v2026.09 data).
-    expect(report.coveredControls).toContain("AML.T0051");
-    expect(report.coveredControls).toContain("AML.T0054");
-    expect(report.coveredControls).not.toContain("AML.T0048");
-  });
-
-  test("OWASP API coverage via security question", () => {
-    const report = generateFrameworkReport("OWASP_API_TOP10", {
-      passedQIDs: ["AMC-1.5"],
-      activeModules: []
-    });
-    expect(report.coveredControls).toContain("OWASP-API1");
-    expect(report.coveredControls).toContain("OWASP-API8");
-  });
-
   test("NIST report with no evidence has zero coverage and all controls as gaps", () => {
     const report = generateFrameworkReport("NIST_AI_RMF", { passedQIDs: [], activeModules: [] });
     expect(report.coveragePercent).toBe(0);
@@ -95,92 +65,34 @@ describe("score crossFrameworkMapping", () => {
     expect(report.targetMet).toBe(false);
   });
 
-  test("NIST coverage can be satisfied by AMC question IDs", () => {
-    const report = generateFrameworkReport("NIST_AI_RMF", {
-      passedQIDs: ["AMC-1.2"],
-      activeModules: []
-    });
-    expect(report.coveredControls).toEqual(["GOVERN-1.2"]);
-    expect(report.automatedControls).toEqual(["GOVERN-1.2"]);
-  });
-
-  test("NIST coverage can also be satisfied by active modules", () => {
-    const report = generateFrameworkReport("NIST_AI_RMF", {
-      passedQIDs: [],
-      activeModules: ["watch"]
-    });
-    expect(report.coveredControls).toContain("MEASURE-2.5");
-  });
-
-  test("NIST non-automatable controls are placed in manualControls", () => {
-    const report = generateFrameworkReport("NIST_AI_RMF", {
-      passedQIDs: ["AMC-3.4.1"],
-      activeModules: []
-    });
-    expect(report.coveredControls).toContain("MEASURE-2.8");
-    expect(report.manualControls).toContain("MEASURE-2.8");
-    expect(report.automatedControls).not.toContain("MEASURE-2.8");
-  });
-
-  test("coveragePercent uses rounded integer percent", () => {
-    const report = generateFrameworkReport("NIST_AI_RMF", {
-      passedQIDs: ["AMC-1.2"], // 1/12 controls
-      activeModules: []
-    });
-    expect(report.coveragePercent).toBe(8);
-  });
-
-  test("NIST coverage target is met when coverage threshold is fully met", () => {
-    const report = generateFrameworkReport("NIST_AI_RMF", {
-      passedQIDs: [
-        "AMC-1.1",
-        "AMC-1.2",
-        "AMC-1.3",
-        "AMC-1.4",
-        "AMC-1.5",
-        "AMC-1.6",
-        "AMC-2.1",
-        "AMC-2.2",
-        "AMC-3.1",
-        "AMC-3.2",
-        "AMC-3.4",
-        "AMC-4.1",
-        "AMC-4.2",
-        "AMC-4.3",
-        "AMC-4.5"
-      ],
-      activeModules: []
-    });
-    expect(report.coveragePercent).toBeGreaterThanOrEqual(80);
-    expect(report.gapControls.length).toBeLessThanOrEqual(2);
-    expect(report.targetMet).toBe(true);
-  });
-
-  test("NIST coverage target stays unmet for low coverage", () => {
-    const report = generateFrameworkReport("NIST_AI_RMF", {
-      passedQIDs: ["AMC-1.2", "AMC-1.4"],
-      activeModules: []
-    });
-    expect(report.coveragePercent).toBeLessThan(80);
+  // P1-53: the tests below used to assert that a passed question or an active module covers a control, that coverage
+  // counts toward a target, and that covered controls split into automated and manual. That encoded the wrong behaviour:
+  // neither is evidence a control is met. Every control is now not_evaluated whatever the input.
+  test.each([
+    ["GDPR", ["AMC-1.7"], []],
+    ["MITRE_ATLAS", ["AMC-3.3.1"], []],
+    ["OWASP_API_TOP10", ["AMC-1.5"], []],
+    ["NIST_AI_RMF", ["AMC-1.2", "AMC-1.2"], ["watch"]],
+    ["NIST_AI_RMF", ["AMC-1.1", "AMC-1.2", "AMC-1.3", "AMC-1.4", "AMC-1.5", "AMC-1.6", "AMC-2.1", "AMC-2.2", "AMC-3.1", "AMC-3.2",
+      "AMC-3.4", "AMC-3.4.1", "AMC-4.1", "AMC-4.2", "AMC-4.3", "AMC-4.5"], []],
+    ["EU_AI_ACT", ["AMC-2.11"], ["ledger"]],
+    ["ISO_42001", ["AMC-2.12"], []]
+  ] as const)("%s ignores passed questions %j and active modules %j", (framework, passedQIDs, activeModules) => {
+    const report = generateFrameworkReport(framework, { passedQIDs: [...passedQIDs], activeModules: [...activeModules] });
+    expect(report.coveragePercent).toBe(0);
+    expect(report.coveredControls).toEqual([]);
+    expect(report.automatedControls).toEqual([]);
+    expect(report.manualControls).toEqual([]);
     expect(report.targetMet).toBe(false);
+    expect(report.controls.every((c) => c.status === "not_evaluated")).toBe(true);
+    expect(report.gapControls).toHaveLength(report.controls.length);
   });
 
-  test("EU AI Act manual controls include EU-61 when AMC-2.11 is covered", () => {
-    const report = generateFrameworkReport("EU_AI_ACT", {
-      passedQIDs: ["AMC-2.11"],
-      activeModules: []
-    });
-    expect(report.coveredControls).toContain("EU-61");
-    expect(report.manualControls).toContain("EU-61");
-  });
-
-  test("ISO 42001 manual controls include ISO-8.4 when AMC-2.12 is covered", () => {
-    const report = generateFrameworkReport("ISO_42001", {
-      passedQIDs: ["AMC-2.12"],
-      activeModules: []
-    });
-    expect(report.coveredControls).toContain("ISO-8.4");
-    expect(report.manualControls).toContain("ISO-8.4");
+  test("P0-24 ATLAS ids stay listed: AML.T0051 prompt injection and AML.T0054 jailbreak, never AML.T0048", () => {
+    const ids = generateFrameworkReport("MITRE_ATLAS", { passedQIDs: [], activeModules: [] }).controls.map((c) => c.id);
+    expect(ids).toContain("AML.T0051");
+    expect(ids).toContain("AML.T0054");
+    expect(ids).not.toContain("AML.T0048");
   });
 
   test("gap control entries include both control id and control name", () => {
@@ -207,19 +119,4 @@ describe("score crossFrameworkMapping", () => {
     }
   });
 
-  test("duplicate QIDs in input do not duplicate control IDs in output", () => {
-    const report = generateFrameworkReport("NIST_AI_RMF", {
-      passedQIDs: ["AMC-1.2", "AMC-1.2", "AMC-1.2"],
-      activeModules: []
-    });
-    expect(new Set(report.coveredControls).size).toBe(report.coveredControls.length);
-  });
-
-  test("control coverage uses OR logic between QIDs and modules", () => {
-    const report = generateFrameworkReport("EU_AI_ACT", {
-      passedQIDs: [],
-      activeModules: ["ledger"]
-    });
-    expect(report.coveredControls).toContain("EU-12");
-  });
 });

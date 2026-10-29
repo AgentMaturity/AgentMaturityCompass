@@ -24,6 +24,11 @@ import { DEEP_TECHNOLOGY_QUESTIONS } from "./deep/technology.js";
 
 export type { DeepIndustryQuestion } from "./deep/shared.js";
 
+/**
+ * @deprecated 47 of these questions are generated from a template, not written for one provision (P1-53). Only the
+ * hand-written health questions (P1-42: HEALTHCARE_HAND_WRITTEN in src/domains/deep/health.ts) remain supported.
+ * Removal is P2-29's.
+ */
 export const DEEP_HEALTHCARE_QUESTIONS: DeepIndustryQuestion[] = [
   ...HEALTHCARE_HAND_WRITTEN,
   ...Array.from({ length: 47 }, (_, i) => {
@@ -56,6 +61,11 @@ export const DEEP_HEALTHCARE_QUESTIONS: DeepIndustryQuestion[] = [
   }),
 ];
 
+/**
+ * @deprecated 48 of these questions are generated from a template, not written for one provision (P1-53). Only the
+ * hand-written wealth questions (P1-42: FINANCE_HAND_WRITTEN in src/domains/deep/wealth.ts) remain supported.
+ * Removal is P2-29's.
+ */
 export const DEEP_FINANCE_QUESTIONS: DeepIndustryQuestion[] = [
   ...FINANCE_HAND_WRITTEN,
   ...Array.from({ length: 48 }, (_, i) => {
@@ -88,6 +98,11 @@ export const DEEP_FINANCE_QUESTIONS: DeepIndustryQuestion[] = [
   }),
 ];
 
+/**
+ * @deprecated 49 of these questions are generated from a template, not written for one provision (P1-53). Only the
+ * hand-written governance questions (P1-42: GOVERNMENT_HAND_WRITTEN in src/domains/deep/governance.ts) remain supported.
+ * Removal is P2-29's.
+ */
 export const DEEP_GOVERNMENT_QUESTIONS: DeepIndustryQuestion[] = [
   ...GOVERNMENT_HAND_WRITTEN,
   ...Array.from({ length: 49 }, (_, i) => {

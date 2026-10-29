@@ -93,7 +93,7 @@ export async function collectFindings() {
   }
   for (const { pack } of rubric.listDomainPacks()) {
     for (const q of rubric.getDomainPackQuestions(pack)) {
-      textRefs.push({ file: "src/score/domainPacks.ts", location: `rubric ${pack} question ${q.id}`, text: q.regulatoryRef, mustResolve: true });
+      textRefs.push({ file: "catalog/questionnaires/domain-rubrics.yaml", location: `rubric ${pack} question ${q.id}`, text: q.regulatoryRef, mustResolve: true });
     }
   }
   for (const [domain, meta] of Object.entries(registry.DOMAIN_REGISTRY)) {

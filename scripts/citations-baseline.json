@@ -31,7 +31,7 @@
         "src/domains/packs/catalogueEu.ts": 97,
         "src/domains/packs/catalogueIntl.ts": 151,
         "src/domains/packs/catalogueUs.ts": 76,
-        "src/score/domainPacks.ts": 29
+        "catalog/questionnaires/domain-rubrics.yaml": 29
       }
     },
     "CIT005": {

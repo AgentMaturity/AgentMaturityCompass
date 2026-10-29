@@ -94,6 +94,8 @@ const REVIEWED_RUNTIME_OR_NON_EVIDENCE = new Set([
   // P2-34 (src/a4/a4RuntimeLifecycle.ts): which runtime record a TUNE came from (a P2-23 reassessment or a P2-26
   // envelope log entry) and how the package's version manifest was resolved. A4 record labels, never a ledger meta.source.
   "envelope", "lifecycle_bound", "not_governed", "reassessment",
+  // Origin of a catalog questionnaire item (P1-53, src/catalog/types.ts QuestionnaireItem.source), never a ledger meta.source.
+  "domain_rubric",
 ]);
 
 function sourceFiles(dir: string): string[] {
