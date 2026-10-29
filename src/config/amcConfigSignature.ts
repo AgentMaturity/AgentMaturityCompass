@@ -4,10 +4,9 @@ import { pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import {
   getSigningKey,
-  signHexDigest,
-  verifyHexDigestAny
+  signHexDigest
 } from "../crypto/keys.js";
-import { getPurposeKeyHistory } from "../keys/signingKeys.js";
+import { verifyCurrentPurposeCredentialSignature } from "../keys/purposeCredentialSignature.js";
 import { assertKeysetComplete } from "../keys/keyset.js";
 import { withAmcConfigPublicationLock } from "./configPublicationLock.js";
 
@@ -69,7 +68,8 @@ export function verifyAmcConfigSignature(workspace: string): {
       return { valid: false, signatureExists: true, reason: "config digest mismatch" };
     }
     assertKeysetComplete(workspace);
-    const ok = verifyHexDigestAny(digest, payload.signature, getPurposeKeyHistory(workspace, "config-signature"));
+    // Revocation-aware: a signature by a revoked or distrusted config-signature key never verifies.
+    const ok = verifyCurrentPurposeCredentialSignature(workspace, "config-signature", Buffer.from(digest, "hex"), Buffer.from(payload.signature, "base64"));
     return { valid: ok, signatureExists: true, reason: ok ? null : "signature invalid" };
   } catch (error) {
     return {
@@ -82,16 +82,17 @@ export function verifyAmcConfigSignature(workspace: string): {
 
 /**
  * Verifier for the declarative composition's `.sig` sidecar, injected into
- * `@amc/core` (which cannot depend on this package). It uses the same
- * config-signature key history as amc.config.yaml, so a nonempty signature
- * string with a correct digest is not enough: it must verify against an
- * admitted key. Any failure, including an incomplete keyset, is unverified.
+ * `@amc/core` (which cannot depend on this package). The signature must cover
+ * the domain-separated composition attestation digest and verify against a
+ * current, unrevoked config-signature key, so a nonempty string with a correct
+ * file digest, or a config-signature signature made for another artifact, is
+ * not enough. Any failure, including an incomplete keyset, is unverified.
  */
-export function createCompositionSignatureVerifier(workspace: string): (input: { sha256: string; signature: string }) => boolean {
-  return ({ sha256, signature }) => {
+export function createCompositionSignatureVerifier(workspace: string): (input: { attestationSha256: string; signature: string }) => boolean {
+  return ({ attestationSha256, signature }) => {
     try {
       assertKeysetComplete(workspace);
-      return verifyHexDigestAny(sha256, signature, getPurposeKeyHistory(workspace, "config-signature"));
+      return verifyCurrentPurposeCredentialSignature(workspace, "config-signature", Buffer.from(attestationSha256, "hex"), Buffer.from(signature, "base64"));
     } catch {
       return false;
     }

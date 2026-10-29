@@ -4,15 +4,17 @@
  * plus a nonempty signature string is integrity, not attestation. The exact
  * bytes Include parses are admitted at boot and at every reload.
  */
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
-import { boot, loadComposition, CompositionError, type BootResult } from "@amc/core";
+import { boot, loadComposition, compositionAttestationDigest, CompositionError, type BootResult } from "@amc/core";
 import { initWorkspace } from "../../src/workspace.js";
-import { getSigningKey, signHexDigest } from "../../src/crypto/keys.js";
-import { createCompositionSignatureVerifier } from "../../src/config/amcConfigSignature.js";
+import { getSigningKey, getSigningPublicKeyPem, signHexDigest } from "../../src/crypto/keys.js";
+import { createCompositionSignatureVerifier, verifyAmcConfigSignature } from "../../src/config/amcConfigSignature.js";
+import { revokeKey, rotatePurposeKeys } from "../../src/keys/purposeKeys.js";
+import { signingKeyId } from "../../src/keys/algorithmPolicy.js";
 
 const roots: string[] = [];
 const newWorkspace = (): string => {
@@ -41,9 +43,10 @@ const compose = (names: string[]): string => {
   writeFileSync(compositionPath(), text);
   return text;
 };
-const sidecar = (text: string, signature: string): void =>
-  writeFileSync(`${compositionPath()}.sig`, JSON.stringify({ configSha256: sha(text), signature, signedTs: 1, signer: "auditor" }));
-const signWith = (keyWorkspace: string, text: string): void => sidecar(text, signHexDigest(sha(text), getSigningKey(keyWorkspace, "config-signature")));
+const sidecar = (text: string, signature: string, scheme: string | null = "amc-composition-v1"): void =>
+  writeFileSync(`${compositionPath()}.sig`, JSON.stringify({ ...(scheme === null ? {} : { scheme }), configSha256: sha(text), signature, signedTs: 1, signer: "auditor" }));
+const attest = (text: string, rel = "amc.cordis.yml"): string => compositionAttestationDigest(rel, Buffer.from(text, "utf8"));
+const signWith = (keyWorkspace: string, text: string): void => sidecar(text, signHexDigest(attest(text), getSigningKey(keyWorkspace, "config-signature")));
 
 describe("composition signature status", () => {
   it("a correct digest with an arbitrary nonempty signature is not verified and fails a required signature", async () => {
@@ -76,6 +79,52 @@ describe("composition signature status", () => {
     writeFileSync(compositionPath(), "[]\n# edited\n");
     expect(loadComposition({ workspace, verifySignature }).signature).toMatchObject({ digestMatched: false, signatureVerified: false });
   });
+
+  it("a config-signature signature made for another artifact or another path is refused", () => {
+    const verifySignature = createCompositionSignatureVerifier(workspace);
+    const text = compose([]);
+    const key = getSigningKey(workspace, "config-signature");
+    // How amc.config.yaml, policies and tickets are signed: over the raw file digest.
+    sidecar(text, signHexDigest(sha(text), key));
+    expect(loadComposition({ workspace, verifySignature }).signature).toMatchObject({ digestMatched: true, signatureVerified: false });
+    sidecar(text, signHexDigest(attest(text, "other/amc.cordis.yml"), key));
+    expect(() => loadComposition({ workspace, verifySignature, requireSignature: true })).toThrow(CompositionError);
+  });
+
+  it("a sidecar without the composition scheme is refused with a re-sign instruction, never accepted silently", () => {
+    const verifySignature = createCompositionSignatureVerifier(workspace);
+    const text = compose([]);
+    sidecar(text, signHexDigest(sha(text), getSigningKey(workspace, "config-signature")), null);
+    const status = loadComposition({ workspace, verifySignature }).signature;
+    expect(status).toMatchObject({ digestMatched: true, signatureVerified: false, valid: false });
+    expect(status.reason).toMatch(/re-sign required/);
+    expect(() => loadComposition({ workspace, verifySignature, requireSignature: true })).toThrow(/re-sign required/);
+  });
+
+  it("a signature by a revoked config-signature key is refused, for the composition and for amc.config.yaml", () => {
+    const revoked = newWorkspace();
+    const oldKey = getSigningKey(revoked, "config-signature");
+    const oldKeyId = signingKeyId(getSigningPublicKeyPem(revoked, "config-signature"))!;
+    const text = "[]\n";
+    writeFileSync(join(revoked, "amc.cordis.yml"), text);
+    const writeOldSidecars = (): void => {
+      writeFileSync(join(revoked, "amc.cordis.yml.sig"), JSON.stringify({ scheme: "amc-composition-v1", configSha256: sha(text),
+        signature: signHexDigest(attest(text), oldKey), signer: "auditor" }));
+      const configPath = join(revoked, ".amc", "amc.config.yaml"), digest = sha(readFileSync(configPath, "utf8"));
+      writeFileSync(`${configPath}.sig`, JSON.stringify({ configSha256: digest, signature: signHexDigest(digest, oldKey), signer: "auditor" }));
+    };
+    const verifySignature = createCompositionSignatureVerifier(revoked);
+    // The fresh keyset shares this key with artifact-seal and revocation-list; all must move before it can be revoked.
+    rotatePurposeKeys({ workspace: revoked, purposes: ["config-signature", "artifact-seal", "revocation-list"] });
+    writeOldSidecars();
+    // Rotation alone keeps the old key in the admitted history.
+    expect(loadComposition({ workspace: revoked, verifySignature }).signature.signatureVerified).toBe(true);
+    expect(verifyAmcConfigSignature(revoked).valid).toBe(true);
+    revokeKey(revoked, "config-signature", oldKeyId, "key-compromise");
+    writeOldSidecars();
+    expect(loadComposition({ workspace: revoked, verifySignature }).signature).toMatchObject({ digestMatched: true, signatureVerified: false });
+    expect(verifyAmcConfigSignature(revoked).valid).toBe(false);
+  }, 60_000);
 });
 
 describe("admission at boot and reload", () => {
@@ -86,7 +135,7 @@ describe("admission at boot and reload", () => {
     signWith(workspace, text);
     const real = createCompositionSignatureVerifier(workspace);
     let swapped = false;
-    const verifySignature = (input: { sha256: string; signature: string }): boolean => {
+    const verifySignature = (input: { attestationSha256: string; signature: string }): boolean => {
       const ok = real(input);
       // After the boot-time check passes, the file changes under the old sidecar before Include reads it.
       if (!swapped) { swapped = true; writeFileSync(compositionPath(), `- id: "0"\n  name: "./plugins/alpha.js"\n`); }

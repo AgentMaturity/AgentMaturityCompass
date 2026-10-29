@@ -30,14 +30,25 @@ export interface CompositionSignatureStatus {
     reason: string | null;
 }
 /**
- * Authenticates a sidecar signature over a sha256 hex digest. The main AMC
- * package builds it from its admitted key history; without one, no signature
- * is ever reported as verified.
+ * Authenticates a sidecar signature over the composition attestation digest
+ * (see compositionAttestationDigest). The main AMC package builds it from its
+ * admitted, revocation-aware key history; without one, no signature is ever
+ * reported as verified.
  */
 export type CompositionSignatureVerifier = (input: {
-    sha256: string;
+    attestationSha256: string;
     signature: string;
 }) => boolean;
+/** Sidecar `scheme` for domain-separated composition signatures. A sidecar without it must be re-signed. */
+export declare const COMPOSITION_SIGNATURE_SCHEME = "amc-composition-v1";
+/**
+ * The digest a composition signature covers: sha256 over the scheme, the
+ * workspace-relative path (POSIX separators) and the exact bytes, NUL-separated.
+ * The config-signature key also signs other artifacts over their raw digests;
+ * this prefix keeps those signatures, or one made for another path, from
+ * verifying as a composition signature.
+ */
+export declare function compositionAttestationDigest(workspaceRelativePath: string, bytes: Uint8Array): string;
 export interface LoadCompositionOptions {
     workspace: string;
     configPath?: string;
@@ -53,7 +64,7 @@ export declare class CompositionError extends Error {
  * signature status, refusing when a signature is required and not verified.
  * Boot and every reload run this over the bytes actually parsed.
  */
-export declare function admitCompositionBytes(path: string, bytes: Uint8Array, options: Pick<LoadCompositionOptions, "requireSignature" | "verifySignature">): {
+export declare function admitCompositionBytes(path: string, workspaceRelativePath: string, bytes: Uint8Array, options: Pick<LoadCompositionOptions, "requireSignature" | "verifySignature">): {
     sha256: string;
     signature: CompositionSignatureStatus;
 };

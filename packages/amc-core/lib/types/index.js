@@ -6,7 +6,7 @@
  * grows beside it.
  */
 export { boot, BootError } from "./boot.js";
-export { loadComposition, admitCompositionBytes, CompositionError, DEFAULT_COMPOSITION_FILE } from "./composition.js";
+export { loadComposition, admitCompositionBytes, compositionAttestationDigest, COMPOSITION_SIGNATURE_SCHEME, CompositionError, DEFAULT_COMPOSITION_FILE } from "./composition.js";
 export { dumpComposition, renderCompositionDump } from "./dumpConfig.js";
 export { watchFibers, describeUnsettled } from "./bootAudit.js";
 export { SettingsStore, SettingsConflictError, SettingsPathError } from "./settings.js";

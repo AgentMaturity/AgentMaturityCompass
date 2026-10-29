@@ -26,7 +26,7 @@
 
 export { detectHallucinations, detectHallucinationsDeterministic } from "./detector.js";
 export { runAllDeterministicDetectors, resetFindingCounter } from "./deterministicDetectors.js";
-export { runLlmJudge, buildJudgePrompt, parseLlmJudgeResponse, resetLlmFindingCounter, LlmJudgeInvalidResponseError } from "./llmJudge.js";
+export { runLlmJudge, buildJudgePrompt, parseLlmJudgeResponse, resetLlmFindingCounter } from "./llmJudge.js";
 
 export type {
   HallucinationType,

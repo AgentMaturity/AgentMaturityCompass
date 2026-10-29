@@ -65,12 +65,12 @@ describe("amc-core boot", () => {
     const digest = createHash("sha256").update("[]\n").digest("hex");
     writeFileSync(
       `${path}.sig`,
-      JSON.stringify({ configSha256: digest, signature: "sig", signer: "auditor" })
+      JSON.stringify({ scheme: "amc-composition-v1", configSha256: digest, signature: "sig", signer: "auditor" })
     );
     // GAP-WP12: a digest match is integrity, not attestation. Without a verifier
     // the nonempty "sig" string must not count as a valid signature.
     expect(loadComposition({ workspace }).signature).toMatchObject({ digestMatched: true, signatureVerified: false, valid: false });
-    const verifySignature = ({ signature }: { sha256: string; signature: string }) => signature === "sig";
+    const verifySignature = ({ signature }: { attestationSha256: string; signature: string }) => signature === "sig";
     expect(loadComposition({ workspace, verifySignature }).signature.valid).toBe(true);
 
     // Editing the composition after signing must invalidate it: the file

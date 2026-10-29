@@ -114,7 +114,7 @@ export async function boot(options) {
             carrier.read = async (forced) => {
                 const candidate = await read.call(include, forced);
                 if (candidate) {
-                    const { sha256, signature } = admitCompositionBytes(composition.path, Buffer.from(candidate.content, "utf8"), admission);
+                    const { sha256, signature } = admitCompositionBytes(composition.path, composition.relativePath, Buffer.from(candidate.content, "utf8"), admission);
                     pending = { ...composition, sha256, signature };
                 }
                 return candidate;

@@ -362,7 +362,7 @@ export interface JudgeRequestSettings {
   maxTokens: number;
 }
 
-export const DEFAULT_JUDGE_REQUEST_SETTINGS: Readonly<JudgeRequestSettings> = Object.freeze({ model: 'claude-3-sonnet', temperature: 0.1, maxTokens: 1000 });
+const DEFAULT_JUDGE_REQUEST_SETTINGS: Readonly<JudgeRequestSettings> = Object.freeze({ model: 'claude-3-sonnet', temperature: 0.1, maxTokens: 1000 });
 
 export class ProductionLLMJudgeEngine {
   private clients: Map<string, LLMApiClient> = new Map();
