@@ -54,9 +54,15 @@ export function evaluateDriftRules(params: {
 }): DriftEvaluation {
   const baseline = params.baselineRuns ?? [params.previousRun];
   assertComparable(baseline, params.currentRun);
-  const significantDrop = (values: number[], current: number, metric: string): boolean => baseline.length === 1
-    || bootstrapDifferenceCI({ baseline: values, candidate: [current],
-      seed: deterministicSeed([...baseline.map(run => run.runId), params.currentRun.runId, metric]) })[1] < 0;
+  let insufficientInterval = false;
+  const significantDrop = (values: number[], current: number, metric: string): boolean => {
+    if (baseline.length === 1) return true;
+    const interval = bootstrapDifferenceCI({ baseline: values, candidate: [current],
+      seed: deterministicSeed([...baseline.map(run => run.runId), params.currentRun.runId, metric]) });
+    // An interval that could not be estimated neither confirms nor hides the drop: keep it, mark the result unconfirmed.
+    if (!Array.isArray(interval)) { insufficientInterval = true; return true; }
+    return interval[1] < 0;
+  };
   const overallValues = baseline.map(overall), integrityValues = baseline.map(run => run.integrityIndex);
   const overallDrop = Number((median(overallValues) - overall(params.currentRun)).toFixed(4));
   const integrityDrop = Number((median(integrityValues) - params.currentRun.integrityIndex).toFixed(4));
@@ -94,8 +100,9 @@ export function evaluateDriftRules(params: {
       }
     }
     if (reasons.length > 0) {
+      if (insufficientInterval) reasons.push("drift interval insufficient (INSUFFICIENT_EVIDENCE)");
       const confirmation = baseline.length === 1 || reasons.some(reason => reason.includes("INSUFFICIENT_EVIDENCE")) ? "unconfirmed" : "confirmed";
-      if (confirmation === "unconfirmed") reasons.unshift("unconfirmed: single-run comparison or unavailable assurance evidence");
+      if (confirmation === "unconfirmed") reasons.unshift("unconfirmed: single-run comparison, insufficient interval or unavailable assurance evidence");
       return {
         triggered: true,
         confirmation,
@@ -113,7 +120,7 @@ export function evaluateDriftRules(params: {
 
   return {
     triggered: false,
-    confirmation: baseline.length === 1 ? "unconfirmed" : "confirmed",
+    confirmation: baseline.length === 1 || insufficientInterval ? "unconfirmed" : "confirmed",
     ruleId: null,
     reasons: [],
     deltas: {

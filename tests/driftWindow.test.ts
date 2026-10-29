@@ -1,5 +1,5 @@
 import { readFileSync, writeFileSync } from "node:fs";
-import { expect, test } from "vitest";
+import { expect, test, vi } from "vitest";
 import { loadAlertsConfig, signAlertsConfig } from "../src/drift/alerts.js";
 import { runDriftCheck, runDriftCheckAsync } from "../src/drift/driftDetector.js";
 import { activeFreezeStatus, listIncidents, verifyIncidentSignature } from "../src/drift/freezeEngine.js";
@@ -97,4 +97,22 @@ test("AXE-09: an explicitly empty baseline cannot fall back to fabricated compar
   expect(() => evaluateDriftRules({ config: loadAlertsConfig(f.workspace),
     previousRun: JSON.parse(readFileSync(files[0]!, "utf8")), currentRun: JSON.parse(readFileSync(files[1]!, "utf8")),
     baselineRuns: [], assuranceByPack: new Map() })).toThrow("INSUFFICIENT_EVIDENCE");
+});
+
+test("AXE-09: an interval the bootstrap cannot estimate keeps the drop but never confirms it", async () => {
+  const { f, files } = inputs([5, 5, 5, 4]);
+  vi.resetModules();
+  vi.doMock("../src/experiments/stats.js", async original => ({ ...(await original<typeof import("../src/experiments/stats.js")>()),
+    bootstrapDifferenceCI: () => ({ status: "insufficient", interval: null, reason: "test" }) }));
+  try {
+    const { evaluateDriftRules } = await import("../src/drift/driftRules.js");
+    const [a, b, c, current] = files.map(file => JSON.parse(readFileSync(file, "utf8")));
+    const result = evaluateDriftRules({ config: loadAlertsConfig(f.workspace), previousRun: c, baselineRuns: [a, b, c],
+      currentRun: current, assuranceByPack: new Map() });
+    expect(result).toMatchObject({ triggered: true, confirmation: "unconfirmed", deltas: { overallDrop: 1 } });
+    expect(result.reasons.join("; ")).toContain("drift interval insufficient (INSUFFICIENT_EVIDENCE)");
+    const quiet = evaluateDriftRules({ config: loadAlertsConfig(f.workspace), previousRun: c, baselineRuns: [a, b, c],
+      currentRun: c, assuranceByPack: new Map() });
+    expect(quiet).toMatchObject({ triggered: false, confirmation: "unconfirmed" });
+  } finally { vi.doUnmock("../src/experiments/stats.js"); vi.resetModules(); }
 });
