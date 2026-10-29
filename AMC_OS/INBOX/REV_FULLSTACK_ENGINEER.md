@@ -564,3 +564,13 @@ Remaining qualification: thirteen TCP-dependent files cannot bind loopback in th
 Full report, exact commands, per-file counts, original failures, mutation logs, source hashes and manifests are under `/Users/sid/AgentMaturityCompass-worktrees/s442cd919/work/codex-runs/wp13b-report.md`, `wp13b-receipt.json` and `wp13b-evidence/`. The prepared conventional message is `wp13b-commit-message.txt` in the same directory.
 
 Next owner actions: review source and receipts, run the blocked TCP/launcher cases in a suitable environment, then commit and merge through Claude. Do not infer runtime/provider or release qualification beyond these local checks. Prior handoff bytes are preserved above.
+
+## REV_FULLSTACK_ENGINEER — 2026-10-30 WP30 native chat
+
+Scope: the bounded native interactive ergonomics slice on `rtd/gap-wp30`, based on `cfd71bbac`. The candidate is uncommitted; Claude integrator session 3c2ecdb1 owns review, commit and merge.
+
+Deliverables: described slash commands and completion, explicit read-only session inspection/resume selection, signed mutating-command audit, bounded escaped recorded tool results, and read-only actual MCP mount receipts. The existing approvals, questions, todo/plan escaping, runtime and CLI command paths remain in use. `src/cli-agent-commands.ts` has one changed hook line and remains at 794 lines.
+
+Evidence: 96 helper/composition tests passed; 16 targeted guard mutations failed their regressions, and all source hashes were restored exactly. The related suite has 404 passing cases after using the supported private external control-checkpoint directory. Three socket-dependent cases fail with sandbox `listen EPERM`; a socket-dependent setup hook skips 29 tool-breadth cases. The full measured-task results and final verifier status are recorded in `AMC_OS/INBOX/WP30-native-interactive-report.md`; detailed logs and the requested commit message are in the sibling `codex-runs/wp30-*` artifacts.
+
+Remaining scope: entry bookmarks/custom names/full tree annotations, demand-gated file mentions, and context reset/handoff. AMC-1512 is extended through its existing workflow, without a duplicate issue or runtime. Automated action counts and timings do not establish human usability. Claude should review the candidate, rerun the socket-dependent cases in an environment allowing local listeners, and use `wp30-commit-message.txt` when committing. No push, merge, full-suite or release qualification was performed.

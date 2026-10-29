@@ -4,13 +4,19 @@ import { parseNativeChatResult, type NativeChatChildSummary } from "../src/setup
 import { runNativeInteractiveSession, type NativeChatOptions } from "../src/setup/nativeInteractiveSession.js";
 import * as usage from "../src/agent/nativeRunUsage.js";
 
-// Authored, UNEXECUTED. Synthetic readline, child and setup seams exercise chat
-// composition without a real terminal, credentials, signed session or provider.
+// Synthetic readline, child and setup seams exercise chat composition without
+// a real terminal, credentials, signed session or provider. The separate measured
+// terminal suite covers public CLI workflows.
+// Operational command audit has its own signed-publication regression suite.
+vi.mock("../src/setup/nativeInteractiveCommandAudit.js", () => ({
+  runNativeInteractiveCommand: async (_input: unknown, run: () => Promise<unknown>) => run()
+}));
+
 const seam = vi.hoisted(() => ({
   answers: [] as string[], commands: [] as string[][], results: [] as { body: unknown; code: number }[],
   signals: [] as unknown[], cancelWhileApproving: false, abortedAtKill: false,
   questionSignal: undefined as AbortSignal | undefined,
-  cancelApproval: vi.fn(), closeApproval: vi.fn(), preview: ""
+  cancelApproval: vi.fn(), closeApproval: vi.fn(), preview: "", selectionChecks: 0, changedSelectionAt: 0
 }));
 
 vi.mock("node:readline", async importOriginal => {
@@ -84,6 +90,18 @@ vi.mock("../src/extensions/nativeExtensionRuntime.js", () => ({
   loadNativeExtensions: () => ({ list: () => [], prepareTurn: () => ({ commands: [] }), unloadAll: () => {} }),
   nativeExtensionRunArgv: () => []
 }));
+vi.mock("../src/setup/nativeInteractiveNavigation.js", () => {
+  const row = { sessionId: "known-session", source: "native", state: "released", canResume: true, agentId: "reviewer",
+    parentSessionId: null, headEventId: "head", headEventHash: "a".repeat(64), updatedAt: 1, turns: 1 };
+  return {
+    listNativeInteractiveSessions: () => [row], renderNativeInteractiveSession: () => "Session known-session · released",
+    assertNativeInteractiveSelection: () => {
+      seam.selectionChecks++;
+      if (seam.changedSelectionAt === seam.selectionChecks) throw new Error("Session changed since selection. Use /resume again; no task was sent.");
+      return row;
+    }
+  };
+});
 vi.mock("../src/skills/skillTurn.js", () => ({ workspaceSkillRoots: () => [], prepareSkillTurn: () => ({ ok: false, reason: "No synthetic skill" }) }));
 vi.mock("../src/skills/skillCatalog.js", () => ({ buildSkillCatalog: () => ({ skills: [], problems: [] }) }));
 
@@ -138,13 +156,14 @@ describe("P01 connected native chat behavior", () => {
   let logs: string[], errors: string[], streams: string[], sequence: string[];
   const fail = vi.fn();
   beforeEach(() => {
+    vi.stubEnv("TERM", "xterm-256color");
     inputTTY = Object.getOwnPropertyDescriptor(process.stdin, "isTTY");
     outputTTY = Object.getOwnPropertyDescriptor(process.stdout, "isTTY");
     Object.defineProperty(process.stdin, "isTTY", { configurable: true, value: true });
     Object.defineProperty(process.stdout, "isTTY", { configurable: true, value: true });
     seam.answers = []; seam.commands = []; seam.results = []; seam.signals = [];
     seam.cancelWhileApproving = false; seam.abortedAtKill = false; seam.questionSignal = undefined;
-    seam.preview = ""; seam.cancelApproval.mockClear(); seam.closeApproval.mockClear();
+    seam.preview = ""; seam.selectionChecks = 0; seam.changedSelectionAt = 0; seam.cancelApproval.mockClear(); seam.closeApproval.mockClear();
     logs = []; errors = []; streams = []; sequence = []; fail.mockReset();
     vi.spyOn(process.stderr, "write").mockImplementation(chunk => {
       streams.push(String(chunk)); sequence.push(`stream:${String(chunk)}`); return true;
@@ -153,7 +172,7 @@ describe("P01 connected native chat behavior", () => {
   afterEach(() => {
     if (inputTTY) Object.defineProperty(process.stdin, "isTTY", inputTTY); else Reflect.deleteProperty(process.stdin, "isTTY");
     if (outputTTY) Object.defineProperty(process.stdout, "isTTY", outputTTY); else Reflect.deleteProperty(process.stdout, "isTTY");
-    vi.restoreAllMocks();
+    vi.restoreAllMocks(); vi.unstubAllEnvs();
   });
   const option = (args: readonly string[], flag: string) => { const at = args.indexOf(flag); return at < 0 ? undefined : args[at + 1]; };
   async function run(extra: Partial<NativeChatOptions> = {}) {
@@ -161,6 +180,50 @@ describe("P01 connected native chat behavior", () => {
       log: line => { logs.push(line); sequence.push(`log:${line}`); }, error: line => errors.push(line), fail
     });
   }
+
+  it("rechecks selected history before task dispatch and refuses a newly stale session", async () => {
+    seam.answers = ["/resume", "1", "resume", "explicit task", "/exit"];
+    seam.changedSelectionAt = 3;
+    seam.results = [{ code: 0, body: { inspected: true } }];
+    await run();
+    expect(seam.selectionChecks).toBe(3);
+    expect(seam.commands).toHaveLength(1);
+    expect(seam.commands[0]).toEqual(expect.arrayContaining(["session", "show", "--", "known-session"]));
+    expect(errors.join("\n")).toContain("Session changed since selection");
+    expect(logs.join("\n")).not.toContain("Running stub/");
+  });
+
+  it("keeps plain terminal help honest about unsupported completion and history keys", async () => {
+    vi.stubEnv("TERM", "dumb"); seam.answers = ["/exit"];
+    await run();
+    expect(logs.join("\n")).toContain("/help lists commands");
+    expect(logs.join("\n")).not.toContain("Tab completes");
+    expect(logs.join("\n")).not.toContain("Up/Down");
+  });
+
+  it("lists described built-ins without sending help to the model", async () => {
+    seam.answers = ["/help", "/exit"];
+    await run();
+    expect(seam.commands).toEqual([]);
+    expect(logs.join("\n")).toContain("/resume — Inspect and select");
+    expect(logs.join("\n")).toContain("Tab completes");
+    expect(fail).not.toHaveBeenCalled();
+  });
+
+  it.each([" /exit", "/EXIT", "/help extra"])("refuses noncanonical slash input before dispatch: %s", async input => {
+    seam.answers = [input, "/exit"];
+    await run();
+    expect(seam.commands).toEqual([]);
+    expect(errors.length).toBeGreaterThan(0);
+  });
+
+  it("refuses non-terminal input before provider setup or child execution", async () => {
+    Object.defineProperty(process.stdin, "isTTY", { configurable: true, value: false });
+    await run();
+    expect(seam.commands).toEqual([]);
+    expect(errors.join("\n")).toContain("Interactive chat requires a terminal");
+    expect(fail).toHaveBeenCalledTimes(1);
+  });
 
   it("stops approval input before the cancellation signal, drains the reply and does not retry", async () => {
     seam.cancelWhileApproving = true; seam.answers = ["task", "/exit"];

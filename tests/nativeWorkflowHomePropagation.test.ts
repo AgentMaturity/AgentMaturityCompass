@@ -9,6 +9,11 @@ import { prepareSkillTurn } from "../src/skills/skillTurn.js";
 // This is a composition regression, not a real PTY, provider or signed-session
 // acceptance. The child is simulated; its actual emitted argv selects the real
 // filesystem skill resolver so dropping --credentials-home is observable.
+// Operational command audit has its own signed-publication regression suite.
+vi.mock("../src/setup/nativeInteractiveCommandAudit.js", () => ({
+  runNativeInteractiveCommand: async (_input: unknown, run: () => Promise<unknown>) => run()
+}));
+
 const seam = vi.hoisted(() => ({
   answers: [] as string[],
   commands: [] as { executable: string; argv: string[]; cwd: string; shell: boolean }[],
