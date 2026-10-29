@@ -1,3 +1,4 @@
+import { nearestRank } from "../experiments/stats.js";
 /**
  * Policy Canary Mode & Rollback Packs
  *
@@ -514,10 +515,7 @@ export function recordSLOMeasurement(
 }
 
 function percentile(values: number[], p: number): number {
-  if (values.length === 0) return 0;
-  const sorted = [...values].sort((a, b) => a - b);
-  const index = Math.ceil((p / 100) * sorted.length) - 1;
-  return sorted[Math.max(0, index)] ?? 0;
+  return nearestRank(values, p / 100);
 }
 
 export function computeGovernanceSLO(windowMs?: number): GovernanceSLO {

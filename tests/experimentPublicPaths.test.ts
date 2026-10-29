@@ -84,9 +84,9 @@ function runFiles(runsDir: string): string[] {
   return existsSync(runsDir) ? readdirSync(runsDir) : [];
 }
 
-function cli(ws: string, args: string[]): { status: number | null; stdout: string; stderr: string } {
+function cli(ws: string, args: string[], env: NodeJS.ProcessEnv = {}): { status: number | null; stdout: string; stderr: string } {
   const run = spawnSync(process.execPath, [resolve("dist/cli.js"), ...args], {
-    cwd: ws, encoding: "utf8", env: { ...process.env, NO_COLOR: "1", AMC_VAULT_PASSPHRASE: PASSPHRASE }, timeout: 90_000
+    cwd: ws, encoding: "utf8", env: { ...process.env, ...env, NO_COLOR: "1", AMC_VAULT_PASSPHRASE: PASSPHRASE }, timeout: 90_000
   });
   return { status: run.status, stdout: run.stdout, stderr: run.stderr };
 }
@@ -130,7 +130,7 @@ describe("experiment public paths", () => {
     expect((JSON.parse(listed.stdout) as Array<{ experimentId: string }>).map((row) => row.experimentId)).toEqual([experimentId]);
 
     const badMode = cli(ws, ["experiment", "run", "--experiment", experimentId, "--mode", "yolo", "--candidate-window", "7d"]);
-    expect(badMode.status).not.toBe(0);
+    expect(badMode.status).toBe(1);
     expect(`${badMode.stdout}${badMode.stderr}`).toContain("invalid experiment mode 'yolo'");
     const badWindow = cli(ws, ["experiment", "run", "--experiment", experimentId, "--mode", "sandbox", "--candidate-window", "7x"]);
     expect(badWindow.status).not.toBe(0);
@@ -141,9 +141,56 @@ describe("experiment public paths", () => {
     expect(runFiles(runsDir)).toEqual([]);
 
     const ok = cli(ws, ["experiment", "run", "--experiment", experimentId, "--mode", "supervise", "--candidate-window", "7d", "--candidate-agent", "default"]);
-    expect(ok.status, ok.stderr).toBe(0);
+    expect(ok.status, ok.stderr).toBe(1);
+    expect(ok.stdout).toContain("Experiment run FAILED");
     const report = JSON.parse(readFileSync(/json=(.*)/.exec(ok.stdout)![1]!.trim(), "utf8")) as { mode: string };
     expect(report.mode).toBe("supervise");
+    expect(badMode.stderr).toContain("Experiment run ERROR:");
+  }, 300_000);
+
+  test("compiled CLI: architecture comparison is inconclusive without a measured runner, including explicit simulation", () => {
+    const ws = mkdtempSync(join(tmpdir(), "amc-architecture-exit-"));
+    roots.push(ws);
+    const baseline = join(ws, "baseline.txt"), candidate = join(ws, "candidate.txt");
+    writeFileSync(baseline, "baseline");
+    writeFileSync(candidate, "candidate");
+    const args = ["experiment-architecture", "--name", "exit-taxonomy", "--model", "test-model", "--baseline-file", baseline, "--candidate-file", candidate];
+    const unavailable = cli(ws, args, { AMC_ARCHITECTURE_ALLOW_SIMULATED: undefined });
+    expect(unavailable.status, unavailable.stderr).toBe(3);
+    expect(unavailable.stderr).toContain("Architecture comparison INCONCLUSIVE");
+    const simulated = cli(ws, args, { AMC_ARCHITECTURE_ALLOW_SIMULATED: "1" });
+    expect(simulated.status, simulated.stderr).toBe(3);
+    expect(simulated.stdout).toContain("Architecture comparison INCONCLUSIVE: simulated outcomes are not measured task results.");
+  }, 120_000);
+
+  test("compiled CLI: analysis separates all-pass, failed, unavailable and empty reports", () => {
+    const { ws, experimentId, runsDir } = fixture();
+    const caseResult = (candidateStatus: "passed" | "failed" | "unavailable", baselineStatus: "passed" | "unavailable" = "passed") => ({
+      caseId: "case_1", title: "exit taxonomy", baselineSuccess: baselineStatus === "passed", candidateSuccess: candidateStatus === "passed",
+      baselineValuePoints: 0, candidateValuePoints: 0, baselineCost: null, candidateCost: null, reasons: [], baselineStatus, candidateStatus,
+      paired: baselineStatus !== "unavailable" && candidateStatus !== "unavailable"
+    });
+    const scenarios = [
+      { cases: [caseResult("failed")], status: 1, label: "FAILED" },
+      { cases: [caseResult("passed")], status: 0, label: "PASSED" },
+      { cases: [{ ...caseResult("failed"), candidateStatus: undefined }], status: 1, label: "FAILED" },
+      { cases: [caseResult("unavailable")], status: 3, label: "INCONCLUSIVE" },
+      { cases: [{ ...caseResult("passed"), candidateSuccess: undefined }], status: 3, label: "INCONCLUSIVE" },
+      { cases: [caseResult("passed", "unavailable")], status: 3, label: "INCONCLUSIVE" },
+      { cases: [], status: 3, label: "INCONCLUSIVE" },
+      { cases: [caseResult("unavailable"), caseResult("failed")], status: 1, label: "FAILED" }
+    ];
+    for (const scenario of scenarios) {
+      writeSealedReport(ws, runsDir, experimentId, scenario.cases);
+      const analyzed = cli(ws, ["experiment", "analyze", "--experiment", experimentId, "--out", join(ws, "analysis.json")]);
+      expect(analyzed.status, `${scenario.label}: ${analyzed.stderr}`).toBe(scenario.status);
+      expect(analyzed.stdout).toContain(`Experiment analysis ${scenario.label}`);
+      expect(existsSync(join(ws, "analysis.json"))).toBe(true);
+    }
+    const invalid = cli(ws, ["experiment", "analyze", "--experiment", "missing", "--out", join(ws, "missing.json")]);
+    expect(invalid.status).toBe(1);
+    expect(invalid.stderr).toContain("Experiment analysis ERROR:");
+    expect(existsSync(join(ws, "missing.json"))).toBe(false);
   }, 300_000);
 
   test("compiled CLI: gate exits 3 when inconclusive, 1 when failed", () => {

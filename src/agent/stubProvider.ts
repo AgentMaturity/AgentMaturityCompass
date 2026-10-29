@@ -48,6 +48,7 @@ import type { LlmRouteConfig } from "../llm/adapter/adapterRegistry.js";
 import { bodyFromChunks, readBodyText } from "../llm/adapter/transport.js";
 import type { HttpResponse, HttpTransport } from "../llm/adapter/transport.js";
 import { toolCallId } from "../llm/streamChunk.js";
+import { isContextSnapshot } from "../prompt/assembly/interpolate.js";
 import type { StreamChunk } from "../llm/streamChunk.js";
 
 export const STUB_PROVIDER_ID = "stub";
@@ -166,7 +167,8 @@ function lastUserText(request: EchoedRequest): string {
     const message = request.messages[index];
     if (message === undefined || message.role !== "user") continue;
     for (const block of [...message.content].reverse()) {
-      if (block?.type === "text" && typeof block.text === "string") return block.text;
+      // What the USER said: the runtime-context snapshot every native surface now appends is skipped (GAP-WP39).
+      if (block?.type === "text" && typeof block.text === "string" && !isContextSnapshot(block.text)) return block.text;
     }
   }
   return "";

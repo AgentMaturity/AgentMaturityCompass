@@ -1,3 +1,4 @@
+import { mean, sampleVariance } from "../experiments/stats.js";
 /**
  * runHistory.ts — Persists harness run results for regression tracking and A/B comparison.
  *
@@ -342,14 +343,12 @@ export class RunHistoryStore {
     }));
 
     const scores = points.map(p => p.score);
-    const avgScore = scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
+    const avgScore = mean(scores);
     const minScore = scores.length > 0 ? Math.min(...scores) : 0;
     const maxScore = scores.length > 0 ? Math.max(...scores) : 0;
 
     // Compute volatility (standard deviation)
-    const variance = scores.length > 1
-      ? scores.reduce((sum, s) => sum + Math.pow(s - avgScore, 2), 0) / (scores.length - 1)
-      : 0;
+    const variance = sampleVariance(scores, avgScore);
     const volatility = Math.sqrt(variance);
 
     // Compute trend slope (simple linear regression)

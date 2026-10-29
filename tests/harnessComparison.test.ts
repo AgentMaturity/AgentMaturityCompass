@@ -1,10 +1,11 @@
+import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { existsSync, mkdtempSync, readFileSync, readdirSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, test } from "vitest";
-import { runHarnessComparison } from "../src/benchmarks/harnessComparison.js";
-import { summarizeHarnessComparison } from "../src/benchmarks/harnessComparisonReport.js";
+import { checkHarnessComparison, runHarnessComparison } from "../src/benchmarks/harnessComparison.js";
+import { renderHarnessComparisonReport, summarizeHarnessComparison } from "../src/benchmarks/harnessComparisonReport.js";
 import { comparisonOracleSchema, harnessComparisonManifestSchema, type ComparisonObservations, type HarnessComparisonManifest } from "../src/benchmarks/harnessComparisonSchema.js";
 
 // Authored for the final validation batch; these fixtures execute real local
@@ -64,6 +65,19 @@ fs.writeFileSync(process.env.AMC_COMPARISON_OBSERVATIONS,${JSON.stringify(JSON.s
   context.manifest.targets[0]!.bindings[0]!.supportsBoundedLiveExecution = true;
   return context;
 }
+
+test("AXE-30 comparison summaries keep finite observations, midpoint medians and unknown cost", async () => {
+  const report = await fixture().run();
+  const trial = report.trials[0]!;
+  report.trials = [1, 3, 5, 7, -1, Number.NaN].map((durationMs, index) => ({
+    ...trial, id: `distribution-${index}`, process: { ...trial.process!, durationMs },
+  }));
+  const summary = summarizeHarnessComparison(report).groups[0]!;
+  expect(summary.latencyMsIncludingFailedAndInconclusiveExecutions).toMatchObject({
+    samples: 4, mean: 4, median: 4, p95: 7,
+  });
+  expect(summary.costUsd).toMatchObject({ samples: 0, mean: null, median: null, p95: null });
+}, 20_000);
 
 describe("matched harness execution receipts", () => {
   test("records an actual oracle pass while missing timing-independent metrics remain unknown", async () => {
@@ -294,4 +308,168 @@ console.log(JSON.stringify({schemaVersion:'2026-09-08',verdict:'pass',checks:[{i
     const paid = localProviderFixture(); paid.manifest.lanes[0]!.kind = "live-provider";
     expect(harnessComparisonManifestSchema.safeParse(paid.manifest).success).toBe(false);
   });
+});
+
+
+function comparisonCli(context: ReturnType<typeof fixture>, args: string[] = []) {
+  context.save();
+  return spawnSync(process.execPath, ["dist/cli.js", "bench", "harness-compare", "--manifest", context.manifestPath, ...args],
+    { encoding: "utf8", timeout: 20_000, env: { ...process.env, AMC_H2XR_MISSING_API_KEY: undefined } });
+}
+
+describe("comparison reporting gap regressions", () => {
+  test.each(["--check", "--dry-run"])("%s previews pinned trials without executing or consuming output", flag => {
+    const context = fixture("throw new Error('Readiness must never execute this adapter')");
+    context.manifest.repetitions = 2;
+    const result = comparisonCli(context, [flag, "--out", context.outputDir, "--allow-adapter-execution"]);
+    expect(result.stderr).toBe(""); expect(result.status).toBe(0);
+    const preview = JSON.parse(result.stdout);
+    expect(preview).toMatchObject({ ready: true, environmentMatches: true, problems: [], trials: [
+      { targetId: "fixture", taskId: "success", laneId: "keyless", repetition: 1 },
+      { targetId: "fixture", taskId: "success", laneId: "keyless", repetition: 2 }
+    ] });
+    expect(existsSync(context.outputDir)).toBe(false);
+    expect(readdirSync(context.root).sort()).toEqual(["fixture.txt", "manifest.json", "oracle.mjs", "target.mjs"]);
+  }, 30_000);
+
+  test("check needs no output flag and refuses mismatched pins before execution", () => {
+    const context = fixture("throw new Error('must not execute')");
+    context.manifest.targets[0]!.artifact.sha256 = "0".repeat(64);
+    const result = comparisonCli(context, ["--check"]);
+    expect(result.status).toBe(1);
+    expect(result.stdout).toContain("Pinned artifact digest did not match");
+    expect(existsSync(context.outputDir)).toBe(false);
+  }, 30_000);
+
+  test("check detects environment mismatch and missing named secrets without leaking values", () => {
+    const context = fixture(); context.manifest.environment.nodeVersion = "0.0.0";
+    Object.assign(context.manifest.lanes[0]!, { kind: "live-provider", provider: "fixture", model: "fixture",
+      budgets: { timeoutMs: 1000, maxTokens: 5, maxCostUsd: 0.01 }, requiredSecretEnv: ["AMC_H2XR_MISSING_API_KEY"] });
+    context.manifest.targets[0]!.bindings[0]!.supportsBoundedLiveExecution = true;
+    const result = comparisonCli(context, ["--dry-run"]);
+    expect(result.status).toBe(1);
+    const preview = JSON.parse(result.stdout);
+    expect(preview).toMatchObject({ ready: false, environmentMatches: false, missingSecretEnv: ["AMC_H2XR_MISSING_API_KEY"] });
+    expect(existsSync(context.outputDir)).toBe(false);
+  }, 30_000);
+
+  test("check validates adapter placeholders without spawning", () => {
+    const context = fixture(); context.manifest.targets[0]!.bindings[0]!.command!.args.push("{{unknown}}");
+    const result = comparisonCli(context, ["--check"]);
+    expect(result.status).toBe(1); expect(result.stdout).toContain("Unknown comparison command placeholder");
+    expect(existsSync(context.outputDir)).toBe(false);
+  }, 30_000);
+
+  test.each([
+    ["pass", "console.log('task-done')", true, 0],
+    ["qualified failure", "console.log('wrong')", true, 1],
+    ["unavailable", "console.log('task-done')", false, 3]
+  ] as const)("CLI returns taxonomy for %s", (_name, source, enabled, status) => {
+    const context = fixture(source);
+    const result = comparisonCli(context, ["--out", context.outputDir, ...(enabled ? ["--allow-adapter-execution"] : [])]);
+    expect(result.stderr).toBe(""); expect(result.status).toBe(status);
+    expect(JSON.parse(result.stdout).groups).toHaveLength(1);
+  }, 30_000);
+
+  test("CLI failure takes precedence over an unavailable trial", () => {
+    const context = fixture("console.log('wrong')");
+    context.manifest.targets.push({ ...context.manifest.targets[0]!, id: "missing", bindings: [] });
+    expect(comparisonCli(context, ["--out", context.outputDir, "--allow-adapter-execution"]).status).toBe(1);
+  }, 30_000);
+
+  test("CLI pass mixed with unavailable and oracle-inconclusive alone each exit 3", () => {
+    const mixed = fixture(); mixed.manifest.targets.push({ ...mixed.manifest.targets[0]!, id: "missing", bindings: [] });
+    expect(comparisonCli(mixed, ["--out", mixed.outputDir, "--allow-adapter-execution"]).status).toBe(3);
+    const inconclusive = fixture(undefined, `console.log(JSON.stringify({schemaVersion:'2026-09-08',verdict:'inconclusive',checks:[{id:'unknown',passed:null,evidence:'Unknown outcome.'}]}));`);
+    expect(comparisonCli(inconclusive, ["--out", inconclusive.outputDir, "--allow-adapter-execution"]).status).toBe(3);
+  }, 30_000);
+
+  test("fatal CLI setup errors are labeled separately from trial outcomes", () => {
+    const context = fixture(); context.manifest.description = "";
+    const result = comparisonCli(context, ["--out", context.outputDir]);
+    expect(result.status).toBe(1); expect(result.stderr).toContain("Harness comparison ERROR:");
+    expect(result.stdout).toBe(""); expect(existsSync(context.outputDir)).toBe(false);
+  }, 30_000);
+
+  test("partial check credit and complete trial pass rate stay separate, excluding null checks", async () => {
+    const context = fixture(undefined, `console.log(JSON.stringify({schemaVersion:'2026-09-08',verdict:'fail',checks:[true,true,true,false,null].map((passed,i)=>({id:'check-'+i,passed,evidence:'Synthetic independent criterion.'}))}));`);
+    const report = await context.run();
+    expect(summarizeHarnessComparison(report).groups[0]).toMatchObject({ checkPassFraction: 0.75, checksPassed: 3, checksDeterminate: 4, oraclePassRate: 0 });
+    expect(renderHarnessComparisonReport(report)).toContain("Check pass fraction");
+    expect(renderHarnessComparisonReport(report)).toContain("0.75");
+  }, 20_000);
+
+  test("unavailable checks have null partial credit and post-pin failures do not contribute", async () => {
+    const unavailable = await fixture().run({ allowAdapterExecution: false });
+    expect(summarizeHarnessComparison(unavailable).groups[0]).toMatchObject({ checkPassFraction: null, checksDeterminate: 0 });
+    const changed = fixture(undefined, `import fs from 'node:fs';fs.appendFileSync(process.argv[2], '\\n// changed');console.log(JSON.stringify({schemaVersion:'2026-09-08',verdict:'pass',checks:[{id:'pass',passed:true,evidence:'Before integrity recheck.'}]}));`);
+    changed.manifest.tasks[0]!.oracle.args.push("{{artifact}}");
+    const report = await changed.run();
+    expect(report.trials[0]).toMatchObject({ status: "inconclusive", failureKind: "pin-mismatch" });
+    expect(summarizeHarnessComparison(report).groups[0]).toMatchObject({ checkPassFraction: null, checksDeterminate: 0 });
+  }, 20_000);
+
+  test.each([
+    ["observations-invalid", `import fs from 'node:fs';fs.writeFileSync(process.env.AMC_COMPARISON_OBSERVATIONS, '{invalid');console.log('task-done');`, undefined],
+    ["oracle-invalid", "console.log('task-done')", "console.log('invalid oracle')"],
+    ["fixture-changed", `import fs from 'node:fs';const {fixturePath}=JSON.parse(fs.readFileSync(process.env.AMC_COMPARISON_CONTEXT,'utf8'));fs.chmodSync(fixturePath,0o600);fs.writeFileSync(fixturePath,'changed');console.log('task-done');`, undefined]
+  ])("contract failures preserve bounded class %s", async (failureKind, source, oracle) => {
+    const report = await fixture(source, oracle).run();
+    expect(report.trials[0]).toMatchObject({ status: "inconclusive", verdict: null, failureKind });
+    expect(report.trials[0]?.failureMessage?.length).toBeGreaterThan(0);
+    expect(report.trials[0]?.failureMessage?.length).toBeLessThanOrEqual(1024);
+  }, 20_000);
+});
+
+
+test("readiness checks all declared pins, placeholders, environment, credentials and missing bindings without writes", () => {
+  const valid = fixture(); valid.save();
+  const preview = () => { valid.save(); return checkHarnessComparison({ manifestPath: valid.manifestPath }); };
+  expect(preview().ready).toBe(true);
+  const original = valid.manifest.environment.nodeVersion;
+  valid.manifest.environment.nodeVersion = "0.0.0";
+  expect(preview()).toMatchObject({ ready: false, environmentMatches: false });
+  valid.manifest.environment.nodeVersion = original;
+  const pins = [valid.manifest.tasks[0]!.fixture, valid.manifest.tasks[0]!.oracle.executable,
+    valid.manifest.tasks[0]!.oracle.inputs[0]!, valid.manifest.targets[0]!.artifact,
+    valid.manifest.targets[0]!.bindings[0]!.command!.inputs[0]!];
+  for (const pin of pins) {
+    const sha256 = pin.sha256; pin.sha256 = "0".repeat(64);
+    expect(preview().ready).toBe(false); pin.sha256 = sha256;
+  }
+  valid.manifest.targets[0]!.bindings[0]!.command!.args.push("{{invalid}}");
+  expect(preview().ready).toBe(false); valid.manifest.targets[0]!.bindings[0]!.command!.args.pop();
+  valid.manifest.targets[0]!.bindings = [];
+  expect(preview().ready).toBe(false);
+  expect(existsSync(valid.outputDir)).toBe(false);
+
+  const live = fixture(); Object.assign(live.manifest.lanes[0]!, { kind: "live-provider", provider: "fixture", model: "fixture",
+    budgets: { timeoutMs: 1000, maxTokens: 5, maxCostUsd: 0.01 }, requiredSecretEnv: ["H2XR_API_KEY"] });
+  live.manifest.targets[0]!.bindings[0]!.supportsBoundedLiveExecution = true; live.save();
+  expect(checkHarnessComparison({ manifestPath: live.manifestPath })).toMatchObject({ ready: false, missingSecretEnv: ["H2XR_API_KEY"] });
+  expect(checkHarnessComparison({ manifestPath: live.manifestPath, secretEnv: { H2XR_API_KEY: "fixture-credential" } }).ready).toBe(true);
+  live.manifest.targets[0]!.bindings[0]!.supportsBoundedLiveExecution = false; live.save();
+  expect(checkHarnessComparison({ manifestPath: live.manifestPath, secretEnv: { H2XR_API_KEY: "fixture-credential" } }).ready).toBe(false);
+  expect(existsSync(live.outputDir)).toBe(false);
+});
+
+
+test.each(["observations", "oracle"])("failure messages omit secret prefixes from malformed %s JSON", async kind => {
+  const canary = "h2xr-private-value-288011";
+  const context = kind === "observations"
+    ? fixture(`import fs from 'node:fs';fs.writeFileSync(process.env.AMC_COMPARISON_OBSERVATIONS, ${JSON.stringify(canary)});console.log('task-done');`)
+    : fixture(undefined, `console.log(${JSON.stringify(canary)});`);
+  const report = await context.run({ redactValues: [canary] });
+  expect(report.trials[0]).toMatchObject({ failureKind: kind === "observations" ? "observations-invalid" : "oracle-invalid", status: "inconclusive" });
+  expect(report.trials[0]?.failureMessage?.length).toBeLessThanOrEqual(1024);
+  expect(JSON.stringify(report)).not.toContain(canary.slice(0, 10));
+  for (const file of readdirSync(context.outputDir)) expect(readFileSync(join(context.outputDir, file), "utf8")).not.toContain(canary.slice(0, 10));
+}, 20_000);
+
+test("readiness refuses a pinned fixture that exceeds execution's bounded input limit", () => {
+  const context = fixture(); const path = context.manifest.tasks[0]!.fixture.path;
+  writeFileSync(path, Buffer.alloc(1_048_577, 120)); context.manifest.tasks[0]!.fixture = pin(path); context.save();
+  const preview = checkHarnessComparison({ manifestPath: context.manifestPath });
+  expect(preview.ready).toBe(false); expect(preview.problems.join(" ")).toContain("oversized");
+  expect(existsSync(context.outputDir)).toBe(false);
 });

@@ -118,7 +118,9 @@ describe("ACP signed images: public wire and lifecycle (not executed)", () => {
     const encoded = JSON.parse(h.sent[0]!.body.toString("utf8"));
     expect(encoded.messages[0].content).toEqual([
       { type: "text", text: "Describe\n[linked resource: https://never-fetch.invalid/info]" },
-      { type: "image", source: { type: "base64", media_type: "image/png", data: IMAGE_PNG_BASE64 }, cache_control: { type: "ephemeral" } }
+      // GAP-WP39: the runtime-context snapshot follows the user's input, and carries the cache breakpoint.
+      { type: "image", source: { type: "base64", media_type: "image/png", data: IMAGE_PNG_BASE64 } },
+      { type: "text", text: expect.stringMatching(/^Current runtime context\. /), cache_control: { type: "ephemeral" } }
     ]);
     const rows = h.sessions.get(sessionId)!.readEvents();
     const queued = rows.find(row => row.event_type === "loop/inbox" && JSON.parse(row.meta_json).payloadFormat === NATIVE_IMAGE_INPUT_FORMAT)!;
@@ -137,7 +139,8 @@ describe("ACP signed images: public wire and lifecycle (not executed)", () => {
     const { h, sessionId } = await opened();
     expect((await h.call("session/prompt", prompt(sessionId))).error).toBeUndefined();
     expect(JSON.parse(h.sent[0]!.body.toString("utf8")).messages[0].content).toEqual([
-      { type: "image", source: { type: "base64", media_type: "image/png", data: IMAGE_PNG_BASE64 }, cache_control: { type: "ephemeral" } }
+      { type: "image", source: { type: "base64", media_type: "image/png", data: IMAGE_PNG_BASE64 } },
+      { type: "text", text: expect.stringMatching(/^Current runtime context\. /), cache_control: { type: "ephemeral" } }
     ]);
     expect((await h.call("session/prompt", prompt(sessionId, [{ type: "text", text: "Continue" }]))).error).toBeUndefined();
     expect(h.sent).toHaveLength(2); expect(h.sent[1]!.body.toString("utf8")).toContain(IMAGE_PNG_BASE64);

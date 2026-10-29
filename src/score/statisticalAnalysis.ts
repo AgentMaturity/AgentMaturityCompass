@@ -1,3 +1,4 @@
+import { mean as statsMean, sampleVariance } from "../experiments/stats.js";
 /**
  * Statistical Analysis Module — Confidence Intervals for AMC Scores
  *
@@ -95,21 +96,15 @@ export interface ScoreSample {
 /*  Math utilities (no external deps)                                  */
 /* ------------------------------------------------------------------ */
 
+// Legacy for-of arithmetic observes sparse entries as undefined; materialize them before stats.ts reduce arithmetic.
 /** Mean of an array */
 function mean(xs: number[]): number {
-  if (xs.length === 0) return 0;
-  let s = 0;
-  for (const x of xs) s += x;
-  return s / xs.length;
+  return statsMean(Array.from(xs));
 }
 
 /** Variance (Bessel-corrected, sample variance) */
 function variance(xs: number[]): number {
-  if (xs.length < 2) return 0;
-  const m = mean(xs);
-  let ss = 0;
-  for (const x of xs) ss += (x - m) ** 2;
-  return ss / (xs.length - 1);
+  return sampleVariance(Array.from(xs));
 }
 
 /** Standard deviation */
@@ -203,6 +198,7 @@ function tInvCDF(p: number, df: number): number {
 /**
  * Welch–Satterthwaite degrees of freedom for unequal-variance t-test.
  */
+// Unlike bootstrap intervals in experiments/stats.ts, Welch inference uses unequal group variances and t degrees of freedom.
 function welchDF(n1: number, s1sq: number, n2: number, s2sq: number): number {
   const se1 = s1sq / n1;
   const se2 = s2sq / n2;
@@ -301,7 +297,7 @@ export function compareScores(
   // Two-sided p-value
   const pValue = seDiff > 0 ? 2 * (1 - tCDF(Math.abs(t), df)) : 1.0;
 
-  // Cohen's d (pooled SD as denominator)
+  // Unlike stats.ts cohensD (A-B with squared sample SDs), preserve B-A and direct variance pooling without round-trip square roots.
   const pooledSD = Math.sqrt(((nA - 1) * sA2 + (nB - 1) * sB2) / (nA + nB - 2));
   const effectSize = pooledSD > 0 ? diff / pooledSD : 0;
 

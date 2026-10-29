@@ -1,3 +1,4 @@
+import { nearestRank } from "../experiments/stats.js";
 import { mean, mean as numericMean, round } from "./driftMath.js";
 import {
   agentSecurityEvidenceFields,
@@ -1757,10 +1758,7 @@ function rate(rows: LiveDriftSampleRow[], key: "passed" | "refused" | "errored")
 }
 
 function percentile(values: number[], percentile0to100: number): number {
-  if (values.length === 0) return 0;
-  const sorted = [...values].sort((a, b) => a - b);
-  const idx = Math.ceil((percentile0to100 / 100) * sorted.length) - 1;
-  return round(sorted[Math.max(0, Math.min(sorted.length - 1, idx))] ?? 0);
+  return round(nearestRank(values, percentile0to100 / 100));
 }
 
 function ratioIncrease(after: number, before: number): number {

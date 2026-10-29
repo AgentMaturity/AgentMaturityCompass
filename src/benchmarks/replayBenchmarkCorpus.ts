@@ -1,3 +1,4 @@
+import { mean } from "../experiments/stats.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import type { AMCSurfaceName } from "../types.js";
@@ -11663,9 +11664,7 @@ function buildPawBenchEvaluationSummary(
     openEnvironmentRowCount: pawBenchRows.filter((row) => row.pawBenchEvaluation?.environment === "open").length,
     savedWorkspaceRowCount: pawBenchRows.filter((row) => Boolean(row.pawBenchEvaluation?.savedWorkspaceHash)).length,
     savedDockerImageRowCount: pawBenchRows.filter((row) => Boolean(row.pawBenchEvaluation?.savedDockerImageHash)).length,
-    averageScore0to1: scores.length === 0
-      ? null
-      : round(scores.reduce((sum, value) => sum + value, 0) / scores.length),
+    averageScore0to1: scores.length === 0 ? null : round(mean(scores)),
     averageHarnessGapDelta0to1: harnessGaps.length === 0
       ? null
       : round(harnessGaps.reduce((sum, value) => sum + value, 0) / harnessGaps.length),
@@ -20844,7 +20843,7 @@ function isDeepMathAgentReplayFailure(row: ReplayBenchmarkCorpusManifestRow): bo
 
 function averageNullable(values: Array<number | null>): number | null {
   const numeric = values.filter((value): value is number => value !== null);
-  return numeric.length === 0 ? null : round(numeric.reduce((sum, value) => sum + value, 0) / numeric.length);
+  return numeric.length === 0 ? null : round(mean(numeric));
 }
 
 function buildDeepMathAgentReplaySummary(

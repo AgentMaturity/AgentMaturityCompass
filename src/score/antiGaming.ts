@@ -1,3 +1,4 @@
+import { mean as statsMean, populationVariance } from "../experiments/stats.js";
 /**
  * Anti-Gaming & Goodhart's Law Resistance — MF-16
  *
@@ -207,8 +208,8 @@ export function analyzeSessionFingerprints(
   // 2. Response timing anomaly — suspiciously consistent timing across questions
   for (const fp of fingerprints) {
     if (fp.responseLatencyMs.length < 5) continue;
-    const mean = fp.responseLatencyMs.reduce((s, v) => s + v, 0) / fp.responseLatencyMs.length;
-    const variance = fp.responseLatencyMs.reduce((s, v) => s + (v - mean) ** 2, 0) / fp.responseLatencyMs.length;
+    const mean = statsMean(fp.responseLatencyMs);
+    const variance = populationVariance(fp.responseLatencyMs);
     const cv = Math.sqrt(variance) / (mean || 1);
     // Very low coefficient of variation = unnaturally consistent timing
     if (cv < 0.1 && mean < 500) {
@@ -343,13 +344,13 @@ export function stabilizeScores(
     weightedSum += trimmed[i]! * weight;
     totalWeight += weight;
   }
-  const stabilizedScore = totalWeight > 0 ? weightedSum / totalWeight : trimmed.reduce((s, v) => s + v, 0) / trimmed.length;
+  const stabilizedScore = totalWeight > 0 ? weightedSum / totalWeight : statsMean(trimmed);
 
   // Variance
-  const mean = trimmed.reduce((s, v) => s + v, 0) / trimmed.length;
-  const variance = trimmed.reduce((s, v) => s + (v - mean) ** 2, 0) / trimmed.length;
+  const variance = populationVariance(trimmed);
   const stdDev = Math.sqrt(variance);
 
+  // Unlike resampled mean deltas in experiments/stats.ts, this normal interval uses trimmed population variance around a confidence-weighted center.
   // 95% confidence interval
   const marginOfError = 1.96 * stdDev / Math.sqrt(trimmed.length);
   const lower = Math.max(0, stabilizedScore - marginOfError);

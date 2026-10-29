@@ -1,3 +1,4 @@
+import { mean as statsMean, standardDeviation } from "../experiments/stats.js";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
@@ -154,15 +155,12 @@ function clamp01(value: number): number {
 }
 
 function mean(values: number[]): number {
-  if (values.length === 0) return 0;
-  return values.reduce((sum, value) => sum + value, 0) / values.length;
+  return statsMean(values);
 }
 
 function stdDev(values: number[]): number {
   if (values.length < 2) return 0;
-  const avg = mean(values);
-  const variance = values.reduce((sum, value) => sum + (value - avg) ** 2, 0) / values.length;
-  return Math.sqrt(variance);
+  return standardDeviation(values, false);
 }
 
 function normalizeText(text: string): string {

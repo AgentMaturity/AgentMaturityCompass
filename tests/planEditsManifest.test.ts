@@ -84,6 +84,8 @@ describe("committed plan-edits manifest (D-15)", () => {
     expect(validatePlanEdits(manifest([entry()]))).toEqual([entry()]);
     const axe = entry({ issue: "AXE-23", archivePath: "unused-code/plan-edits/AXE-23/src/a.ts.landed" });
     expect(validatePlanEdits(manifest([axe]))).toEqual([axe]);
+    const gap = entry({ issue: "GAP-WP38", archivePath: "unused-code/plan-edits/GAP-WP38/src/a.ts.landed" });
+    expect(validatePlanEdits(manifest([gap]))).toEqual([gap]);
     const bad: Array<[unknown, string]> = [
       [{ ...manifest([]), schemaVersion: 2 }, "header"],
       [{ ...manifest([]), decision: "D-14" }, "header"],
@@ -96,6 +98,7 @@ describe("committed plan-edits manifest (D-15)", () => {
       [manifest([entry({ sha256: "B".repeat(64) })]), "sha256"],
       [manifest([entry({ issue: "P9-01", archivePath: "unused-code/plan-edits/P9-01/src/a.ts.landed" })]), "issue"],
       [manifest([entry({ issue: "AXE-22", archivePath: "unused-code/plan-edits/AXE-22/src/a.ts.landed" })]), "issue"],
+      [manifest([entry({ issue: "GAP-WP3", archivePath: "unused-code/plan-edits/GAP-WP3/src/a.ts.landed" })]), "issue"],
       [manifest([entry({ path: "../outside.ts", archivePath: "unused-code/plan-edits/P0-06/../outside.ts.landed" })]), "path"],
       [manifest([entry({ path: "src\\a.ts", archivePath: "unused-code/plan-edits/P0-06/src\\a.ts.landed" })]), "path"],
     ];
@@ -197,6 +200,7 @@ describe("scripts/snapshot-plan-edit.mjs", () => {
       [["--issue", "P0-6", "--base", "HEAD", "src/a.ts"], "Issue key"],
       [["--issue", "P4-01", "--base", "HEAD", "src/a.ts"], "Issue key"],
       [["--issue", "AXE-22", "--base", "HEAD", "src/a.ts"], "Issue key"],
+      [["--issue", "GAP-38", "--base", "HEAD", "src/a.ts"], "Issue key"],
       [["--issue", "P0-06", "--base", "HEAD", "../outside.ts"], "outside the repository"],
       [["--issue", "P0-06", "--base", "HEAD", "src/missing.ts"], "not present at HEAD"],
       [["--issue", "P0-06", "--base", "HEAD", "src"], "not present at HEAD"],

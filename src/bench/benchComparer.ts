@@ -1,7 +1,7 @@
 export { createBenchComparisonAsync } from "./benchComparisonAsync.js";
-import { readFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { pathExists, readUtf8 } from "../utils/fs.js";
 import { appendTransparencyEntry } from "../transparency/logChain.js";
 import { sha256Hex } from "../utils/hash.js";
 import { resolveAgentId } from "../fleet/paths.js";
@@ -9,7 +9,12 @@ import { collectBenchData } from "./benchCollector.js";
 import { loadBenchPolicy, saveBenchComparison } from "./benchPolicyStore.js";
 import { benchArtifactSchema, benchComparisonSchema, type BenchArtifact, type BenchComparison } from "./benchSchema.js";
 import { flattenBenchMetrics, kMedoidsPeerGroup, percentileTable } from "./benchPercentiles.js";
-import { listImportedBenchArtifacts } from "./benchRegistryClient.js";
+import { authenticatedImportedBenchVersion } from "./benchRegistryClient.js";
+import { importedBenchPath, listImportedBenches } from "./benchRegistryStore.js";
+import { verifyBenchArtifactFile } from "./benchVerifier.js";
+import { loadTrustContext, untrustedReasons, withPins } from "../trust/index.js";
+import { canonicalize } from "../utils/json.js";
+import { captureBenchImportFiles } from "./benchImportPublication.js";
 
 function localBenchFromScope(params: {
   workspace: string;
@@ -35,26 +40,29 @@ function localBenchFromScope(params: {
 }
 
 export function loadImportedBenchObjects(workspace: string): Array<{ bench: BenchArtifact; registryId: string }> {
-  const imports = listImportedBenchArtifacts(workspace);
+  const imports = listImportedBenches(workspace, { strict: true });
   const out: Array<{ bench: BenchArtifact; registryId: string }> = [];
   for (const row of imports) {
-    const artifactPath = join(workspace, ".amc", "bench", "imports", "benches", row.benchId, row.version, "bench.amcbench");
-    if (!pathExists(artifactPath)) {
-      continue;
-    }
-    // Best-effort read of extracted bench.json is not guaranteed; fallback to parsing bundle not required for comparer.
-    const extractedBenchPath = join(workspace, ".amc", "bench", "imports", "benches", row.benchId, row.version, "bench.json");
-    if (!pathExists(extractedBenchPath)) {
-      continue;
-    }
+    const paths = importedBenchPath(workspace, row.benchId, row.version);
+    const operator = loadTrustContext();
+    const selected = authenticatedImportedBenchVersion(workspace, row, operator);
+    const members = captureBenchImportFiles(workspace, [paths.artifactPath, paths.benchJsonPath]);
+    const archive = members[0]!.bytes, extracted = members[1]!.bytes;
+    if (archive === null || extracted === null) throw new Error(`bench import artifact or extracted JSON missing: ${row.benchId}@${row.version}`);
+    // Verify a private byte snapshot: the imported path is workspace-writable while tar verification runs.
+    const stage = mkdtempSync(join(tmpdir(), "amc-bench-compare-"));
     try {
-      const bench = benchArtifactSchema.parse(JSON.parse(readUtf8(extractedBenchPath)) as unknown);
-      out.push({
-        bench,
-        registryId: row.registryId
-      });
-    } catch {
-      // skip malformed imports
+      const file = join(stage, "candidate.amcbench");
+      writeFileSync(file, archive, { mode: 0o600 });
+      const trust = withPins(operator, [{ keyId: selected.signerFingerprint, purposes: ["artifact-seal"], origin: "signed bench registry index" }]);
+      const verified = verifyBenchArtifactFile({ file, trust });
+      if (!verified.ok || !verified.bench) throw new Error(`bench artifact verify failed: ${untrustedReasons(verified.report).join("; ")}`);
+      if (verified.fileSha256 !== selected.sha256 || verified.bench.benchId !== row.benchId) throw new Error("verified bench does not match the selected signed registry item");
+      const bench = benchArtifactSchema.parse(JSON.parse(extracted.toString("utf8")) as unknown);
+      if (canonicalize(bench) !== canonicalize(verified.bench)) throw new Error("extracted bench JSON does not match verified artifact");
+      out.push({ bench: verified.bench, registryId: row.registryId });
+    } finally {
+      rmSync(stage, { recursive: true, force: true });
     }
   }
   return out;

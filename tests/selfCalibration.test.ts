@@ -58,6 +58,7 @@ describe("self calibration", () => {
     );
 
     expect(report.weightedSampleSize).toBe(8);
+    expect(report.sharpness).toBe(0.3); // Weighted population SD; the unweighted rows have a different spread.
     expect(report.brierScore).toBeCloseTo(0.115, 6);
 
     const md = renderConfidenceQualityMarkdown(report);

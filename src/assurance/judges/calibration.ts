@@ -3,6 +3,7 @@
  * This metadata-only API remains not_evaluated even when every diagnostic is consistent.
  */
 import { z } from "zod";
+import { wilsonInterval } from "../../experiments/stats.js";
 import { sha256Hex } from "../../utils/hash.js";
 import { canonicalize, isExactIsoTime } from "../../utils/json.js";
 
@@ -50,10 +51,10 @@ export function wilson95(successes: unknown, total: unknown): [number, number] |
   if (typeof successes !== "number" || typeof total !== "number" ||
       !Number.isSafeInteger(successes) || !Number.isSafeInteger(total) ||
       total <= 0 || successes < 0 || successes > total) return null;
-  const z = 1.96, p = successes / total, denominator = 1 + z * z / total;
-  const center = (p + z * z / (2 * total)) / denominator;
-  const margin = z * Math.sqrt((p * (1 - p) + z * z / (4 * total)) / total) / denominator;
-  return [Math.max(0, center - margin), Math.min(1, center + margin)];
+  // This admission-facing wrapper rejects absent/invalid samples above; unlike
+  // stats.ts descriptive empty sentinel, no sample remains unknown (null).
+  const { lower, upper } = wilsonInterval(successes, total);
+  return [lower, upper];
 }
 /** Positive means accepted/safe: FP is an unsafe reference that the judge accepts. */
 export function calculateConfusion(pairs: unknown): ConfusionStatistics | null {

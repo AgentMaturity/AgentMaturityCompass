@@ -11,7 +11,7 @@ import { SseFrames, nativeMcpRecoverableStream } from "./nativeMcpReconnectStrea
 import { MCP_PROTOCOL_VERSION_META, MCP_STATELESS_PROTOCOL_VERSION } from "./protocol/version.js";
 import { mcpHeaderValue, mcpParamHeaders, type McpParamHeader } from "./protocol/headers.js";
 import { NATIVE_MCP_AUTHORIZE_HINT, parseNativeMcpBearerChallenge, type NativeMcpOAuthChallenge } from "./oauth/discovery.js";
-import type { NativeMcpOAuthReceipt } from "./oauth/authorize.js";
+import { NATIVE_MCP_OAUTH_REFRESH_MARGIN_MS, type NativeMcpOAuthReceipt } from "./oauth/authorize.js";
 import { getWorkspaceScope } from "../enforce/evidenceEmitter.js";
 import { residencyFetch, EgressBlocked } from "../residency/checkEgress.js";
 
@@ -33,6 +33,13 @@ export interface NativeMcpHttpServer {
   readonly protocolVersion?: string;
   /** Set by the OAuth resolver beside the private Authorization header; never the token. */
   readonly auth?: NativeMcpOAuthReceipt;
+  /**
+   * PXA-19: re-resolves the same issuer/resource-bound grant, refreshing it under
+   * the credential lock, when the bearer nears `auth.tokenExpiresAt`. Private like `headers`.
+   */
+  readonly renewAuth?: () => Promise<{ readonly accessToken: string; readonly receipt: NativeMcpOAuthReceipt }>;
+  /** Upper bound for one tools/call while progress notifications renew its inactivity timeout. */
+  readonly maxTotalMs?: number;
 }
 
 export const NATIVE_MCP_HTTP_LIMITS = Object.freeze({ responseBytes: 4 * 1024 * 1024,
@@ -148,13 +155,19 @@ export class NativeMcpHttpTransport implements Transport {
   private readonly toolHeaders = new Map<string, readonly McpParamHeader[]>();
   private readonly oauth: boolean;
   private scopesRequired?: readonly string[];
+  private readonly renewAuth: NativeMcpHttpServer["renewAuth"];
+  private bearerExpiresAt?: number;
+  private renewing?: Promise<void>;
 
-  constructor(server: NativeMcpHttpServer, private readonly timeout: number) {
+  /** `callTimeout` bounds a tools/call request; the client's inactivity timeout, renewed by progress, governs within it. */
+  constructor(server: NativeMcpHttpServer, private readonly timeout: number, private readonly callTimeout = timeout) {
     if (!Number.isSafeInteger(timeout) || timeout < 1 || timeout > 300_000) {
       throw new NativeMcpHttpRefused("MCP timeout must be between 1 and 300000 milliseconds.");
     }
     this.notificationLifetime = nativeMcpNotificationLifetime(server.notificationLifetimeMs);
     this.oauth = server.auth !== undefined;
+    this.renewAuth = server.renewAuth;
+    if (server.auth?.tokenExpiresAt) this.bearerExpiresAt = Date.parse(server.auth.tokenExpiresAt);
     const workspace = server.workspace ?? getWorkspaceScope();
     this.workspace = workspace === undefined ? undefined : resolve(workspace);
     this.endpoint = nativeMcpHttpEndpoint(server.url, server.origin);
@@ -282,9 +295,9 @@ export class NativeMcpHttpTransport implements Transport {
     catch { /* Preserve the classified failure and complete shutdown despite consumer callbacks. */ }
   }
 
-  private requestScope(init: RequestInit, notification: boolean): RequestScope {
+  private requestScope(init: RequestInit, notification: boolean, call = false): RequestScope {
     const controller = new AbortController(); this.controllers.add(controller);
-    const duration = notification ? this.notificationLifetime : this.timeout;
+    const duration = notification ? this.notificationLifetime : call ? this.callTimeout : this.timeout;
     const deadline = Date.now() + duration;
     const abort = () => controller.abort();
     const cleanup = () => {
@@ -327,8 +340,30 @@ export class NativeMcpHttpTransport implements Transport {
     return `MCP OAuth access token was refused (HTTP ${status}). ${NATIVE_MCP_AUTHORIZE_HINT}`;
   }
 
+  /** PXA-19: one renewal at a time per transport; the endpoint and issuer/resource binding never change. */
+  private async renewBearer(signal: AbortSignal): Promise<void> {
+    if (!this.renewAuth || this.bearerExpiresAt === undefined
+      || this.bearerExpiresAt - NATIVE_MCP_OAUTH_REFRESH_MARGIN_MS > Date.now()) return;
+    if (!this.renewing) {
+      const pending = this.renewAuth().then(({ accessToken, receipt }) => {
+        if (!/^[\x21-\x7e]{1,8192}$/.test(accessToken)) throw new Error("unusable renewed token");
+        this.secrets.push(accessToken, `Bearer ${accessToken}`);
+        this.headers.set("authorization", `Bearer ${accessToken}`);
+        this.bearerExpiresAt = receipt.tokenExpiresAt === null ? undefined : Date.parse(receipt.tokenExpiresAt);
+      });
+      this.renewing = pending;
+      void pending.catch(() => {}).finally(() => { if (this.renewing === pending) this.renewing = undefined; });
+    }
+    try { await nativeMcpWaitFor(this.renewing, [signal, this.lifetime.signal]); }
+    catch {
+      if (this.closing || signal.aborted) throw nativeMcpAbortFailure();
+      throw new NativeMcpHttpRefused(`MCP OAuth access token expired and could not be renewed (AUTH_REQUIRED). ${NATIVE_MCP_AUTHORIZE_HINT}`, "AUTH_REQUIRED");
+    }
+  }
+
   private async fetchOnce(scope: RequestScope, method: string, headers: Headers, body?: string, initialize = false, stateless = false): Promise<NativeMcpResponseLease> {
     if (this.closing || scope.controller.signal.aborted) throw nativeMcpAbortFailure();
+    await this.renewBearer(scope.controller.signal);
     if (++this.requests > NATIVE_MCP_HTTP_LIMITS.requests) {
       throw new NativeMcpHttpRefused("MCP HTTP request bound refused; review and mount again.", "BOUND_EXCEEDED");
     }
@@ -342,8 +377,8 @@ export class NativeMcpHttpTransport implements Transport {
     let response: Response | undefined;
     const cancel = () => { release(); controller.abort(); void response?.body?.cancel().catch(() => {}); };
     try {
-      // No challenge/redirect URL, ambient cookie, caller mutation or refreshed
-      // credential can change this mount's endpoint and authorization snapshot.
+      // No challenge/redirect URL, ambient cookie or caller mutation can change this
+      // mount's endpoint or authorization; only renewBearer replaces the bearer, for the same issuer and resource.
       const pinned = new Headers(headers);
       this.headers.forEach((value, name) => pinned.set(name, value));
       pinned.set("origin", this.endpoint.origin);
@@ -465,7 +500,7 @@ export class NativeMcpHttpTransport implements Transport {
     if (headers.has("last-event-id") || (headers.get("mcp-session-id") ?? undefined) !== this.pinnedSession) {
       throw new NativeMcpHttpRefused("MCP HTTP session identity or external resumption changed; review and mount again.");
     }
-    const scope = this.requestScope(init, method === "GET");
+    const scope = this.requestScope(init, method === "GET", rpc.method === "tools/call");
     // Server annotations and operator READ_ONLY grants never make tools/call
     // replayable. Only the protocol's fixed read/control methods are retried.
     const replaySafe = method === "GET" || (rpc.id !== undefined && (rpc.method === "tools/list" || rpc.method === "ping"));
@@ -560,7 +595,7 @@ export class NativeMcpHttpTransport implements Transport {
       try { for (const [name, value] of mcpParamHeaders(bindings, params.arguments)) headers.set(name, value); }
       catch { throw new NativeMcpHttpRefused("MCP tool header parameter cannot be encoded; nothing was dispatched.", "NOT_DISPATCHED"); }
     }
-    const scope = this.requestScope(init, false);
+    const scope = this.requestScope(init, false, rpc.method === "tools/call");
     const reissuable = REISSUABLE_METHODS.has(rpc.method);
     try {
       for (let attempt = 0; ; attempt++) {

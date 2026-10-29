@@ -207,6 +207,7 @@ describe("paired statistics (WP05)", () => {
     expect(first.interval![0]).toBeGreaterThanOrEqual(1);
     expect(first.interval![1]).toBeLessThanOrEqual(3);
     const unpaired = bootstrapDifferenceCI({ baseline: pairs.map((p) => p[0]), candidate: pairs.map((p) => p[1]), seed: 7 });
+    if (!Array.isArray(unpaired)) throw new Error(unpaired.reason);
     expect(first.interval![1] - first.interval![0]).toBeLessThan(unpaired[1] - unpaired[0]);
     expect(pairedBootstrapCI({ pairs: [[1, 2]], seed: 7 })).toMatchObject({ status: "insufficient", interval: null, pairs: 1 });
     expect(() => pairedBootstrapCI({ pairs: [[1, Number.NaN], [1, 2]], seed: 7 })).toThrow(/finite/);
