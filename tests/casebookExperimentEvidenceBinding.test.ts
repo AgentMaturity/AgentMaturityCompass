@@ -1,16 +1,23 @@
+import { execFileSync } from "node:child_process";
 import { mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import YAML from "yaml";
 import { afterEach, describe, expect, test } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
-import { initBudgets, openLedger, runDiagnostic, exportEvidenceBundle, runBundleGate, writeSignedGatePolicy } from "../src/index.js";
+import { initBudgets } from "../src/budgets/budgets.js";
+import { openLedger } from "../src/ledger/ledger.js";
+import { runDiagnostic } from "../src/diagnostic/runner.js";
+import { exportEvidenceBundle } from "../src/bundles/bundle.js";
+import { runBundleGate } from "../src/ci/gate.js";
+import { writeSignedGatePolicy } from "../src/ci/gatePolicyPublication.js";
 import { appendToolEvidenceWithReceipt } from "../src/toolhub/toolhubReceipts.js";
 import { getPrivateKeyPem, getSigningKey, signHexDigest } from "../src/crypto/keys.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import { initCasebook } from "../src/casebooks/casebookStore.js";
 import { runCasebook, type CaseExecutionRef } from "../src/casebooks/casebookRunner.js";
 import {
+  analyzeExperiment,
   createExperiment,
   gateExperiment,
   runExperiment,
@@ -49,7 +56,7 @@ function signAuditor(ws: string, file: string): void {
 }
 
 /** A signed casebook of tool-requiring cases (no correlation requirement unless asked). */
-function writeCasebook(ws: string, id: string, caseIds: string[], minCorrelationRatio = 0): void {
+function writeCasebook(ws: string, id: string, caseIds: string[], minCorrelationRatio = 0, successPoints = 60): void {
   initCasebook(ws, "default", id);
   const dir = casebookDir(ws, id);
   const index = YAML.parse(readFileSync(join(dir, "casebook.yaml"), "utf8")) as { casebook: { caseIds: string[] } };
@@ -62,7 +69,7 @@ function writeCasebook(ws: string, id: string, caseIds: string[], minCorrelation
       v: 1, caseId, title: `Case ${caseId}`, description: "reads a file", riskTier: "low", requestedMode: "SIMULATE",
       allowedActionClasses: ["READ_ONLY"], inputs: { prompt: "read" },
       validators: { requiredToolActions: ["fs.read"], forbiddenAudits: [], minCorrelationRatio, requireReceipts: true },
-      scoring: { successPoints: 60, valuePoints: 100 }
+      scoring: { successPoints, valuePoints: 100 }
     }, null, 2));
     signConfig(ws, file);
   }
@@ -94,7 +101,7 @@ const DIGEST_A = "a".repeat(64);
 describe("casebook results are bound to case, trial and configuration identity (WP03)", () => {
   test("unrelated same-agent and other-case events cannot satisfy a case; usage counts once and only for its case", () => {
     const ws = newWorkspace();
-    writeCasebook(ws, "bound", ["case_a", "case_b"]);
+    writeCasebook(ws, "bound", ["case_a", "case_b"], 0, 17);
     execute(ws, ref(ws, "bound", "case_a", "trial-1", DIGEST_A));
     execute(ws, null); // same agent, same window, no identity
     execute(ws, ref(ws, "bound", "case_b", "trial-other", DIGEST_A)); // other trial
@@ -103,11 +110,14 @@ describe("casebook results are bound to case, trial and configuration identity (
     const run = runCasebook({ workspace: ws, agentId: "default", casebookId: "bound", mode: "sandbox", window: "1d", trial: { trialId: "trial-1", configDigest: DIGEST_A } });
     const [a, b] = run.results;
     expect(a!.status).toBe("passed");
-    expect(a!.costTokens).toBe(100); // total wins over components and aliases
+    expect(a!.costTokens).toBe(100);
+    expect(a!.successPoints).toBe(17); // total wins over components and aliases
     expect(a!.execution?.eventIds).toHaveLength(2);
     expect(b!.status).toBe("unavailable");
     expect(b!.success).toBe(false);
     expect(b!.costTokens).toBeNull();
+    expect(b!.successPoints).toBeNull();
+    expect(b!.valuePoints).toBeNull();
     expect(b!.reasons).toContain("no execution evidence for case");
   });
 
@@ -229,10 +239,17 @@ describe("paired statistics (WP05)", () => {
 });
 
 describe("experiment promotion verifies its inputs and keeps the baseline eligible (WP07)", () => {
-  function setup(candidateWins: boolean) {
+  function setup(candidateWins: boolean, caseCount = 4, options: { excludeLast?: boolean; partialUsage?: boolean; varyValues?: boolean; baselineAllFail?: boolean } = {}) {
     const ws = newWorkspace();
-    const caseIds = ["case_a", "case_b", "case_c", "case_d"];
+    const caseIds = ["case_a", "case_b", "case_c", "case_d"].slice(0, caseCount);
     writeCasebook(ws, "exp", caseIds);
+    if (options.varyValues) {
+      const file = join(casebookDir(ws, "exp"), "cases", `${caseIds.at(-1)!}.json`);
+      const kase = JSON.parse(readFileSync(file, "utf8")) as { scoring: { valuePoints: number } };
+      kase.scoring.valuePoints = 25;
+      writeFileSync(file, JSON.stringify(kase));
+      signConfig(ws, file);
+    }
     const created = createExperiment({ workspace: ws, agentId: "default", name: "bound", casebookId: "exp" });
     const baselineFile = join(ws, "baseline.yaml");
     writeFileSync(baselineFile, "baseline: true\n");
@@ -243,9 +260,10 @@ describe("experiment promotion verifies its inputs and keeps the baseline eligib
     const candidateDigest = setExperimentCandidate({ workspace: ws, agentId: "default", experimentId: created.experimentId, candidateFile }).digestSha256;
     const baselineDigest = sha256Hex(readFileSync(baselineFile));
     caseIds.forEach((caseId, index) => {
+      if (options.excludeLast && index === caseIds.length - 1) return;
       const strong = { tool: "fs.read" }, weak = { tool: candidateWins && index === 0 ? "fs.read" : "fs.write" };
-      execute(ws, ref(ws, "exp", caseId, "base-1", baselineDigest), candidateWins ? weak : strong);
-      execute(ws, ref(ws, "exp", caseId, "cand-1", candidateDigest), candidateWins ? strong : weak);
+      execute(ws, ref(ws, "exp", caseId, "base-1", baselineDigest), options.baselineAllFail ? { tool: "fs.write" } : candidateWins ? weak : strong);
+      execute(ws, ref(ws, "exp", caseId, "cand-1", candidateDigest), { ...(candidateWins ? strong : weak), ...(options.partialUsage ? { usage: { input_tokens: 5 } } : {}) });
     });
     const policyPath = join(ws, "policy.json");
     writeFileSync(policyPath, JSON.stringify({ minUpliftSuccessRate: 0.1, minUpliftValuePoints: 1, maxCostIncreaseRatio: 1.5, denyIfRegression: true }));
@@ -253,6 +271,70 @@ describe("experiment promotion verifies its inputs and keeps the baseline eligib
       candidateWindow: "1d", baselineTrialId: "base-1", candidateTrialId: "cand-1" });
     return { ws, created, run, policyPath, candidateFile, gate: () => gateExperiment({ workspace: ws, agentId: "default", experimentId: created.experimentId, policyPath }) };
   }
+
+  test("partial evidence preserves null scores and records every exclusion and unit limitation", () => {
+    const { run } = setup(false, 4, { excludeLast: true, partialUsage: true, varyValues: true, baselineAllFail: true });
+    expect(run.report.counts).toMatchObject({ cases: 4, pairedCases: 3, excludedCases: 1 });
+    expect(run.report.cases.at(-1)).toMatchObject({ baselineValuePoints: null, candidateValuePoints: null, paired: false });
+    expect(run.report.candidateCostPerSuccess).toBeNull();
+    const warnings = run.report.warnings?.join("\n");
+    expect(warnings).toMatch(/1 case.*excluded/i);
+    expect(warnings).toMatch(/token usage is missing/i);
+    expect(warnings).toMatch(/maxima differ/i);
+    expect(warnings).toMatch(/baseline has zero successful cases/i);
+  });
+
+  test("small samples carry an explicit comparability warning", () => {
+    const { run } = setup(false, 1);
+    expect(run.report.warnings?.join("\n")).toMatch(/1 paired case.*at least 3/i);
+  });
+
+  test("comparability warnings survive sealed analysis", () => {
+    const { ws, created, run } = setup(false);
+    expect(run.report.valueUnit).toBe("points");
+    expect(run.report.warnings?.join("\n")).toMatch(/zero successful cases/i);
+    expect(run.report.warnings?.join("\n")).toMatch(/same.agent.*overlap/i);
+    expect(readFileSync(run.mdPath, "utf8")).toContain("## Comparability warnings");
+    expect(analyzeExperiment({ workspace: ws, experimentId: created.experimentId }).report.warnings).toEqual(run.report.warnings);
+  });
+
+  test("all-run analysis verifies every seal and never writes run files", () => {
+    const { ws, created, run } = setup(false);
+    const second = runExperiment({ workspace: ws, experimentId: created.experimentId, mode: "sandbox",
+      candidateWindow: "1d", baselineTrialId: "base-1", candidateTrialId: "cand-1" });
+    const dir = join(ws, ".amc", "experiments", created.experimentId, "runs");
+    const snapshot = () => readdirSync(dir).sort().map(name => [name, sha256Hex(readFileSync(join(dir, name)))]);
+    const before = snapshot();
+    const all = analyzeExperiment({ workspace: ws, experimentId: created.experimentId, all: true });
+    expect(all.reports.map(report => report.runId).sort()).toEqual([run.report.runId, second.report.runId].sort());
+    const outFile = join(ws, "analysis.md");
+    analyzeExperiment({ workspace: ws, experimentId: created.experimentId, all: true, outFile });
+    const text = readFileSync(outFile, "utf8");
+    expect(text).toContain(run.report.runId);
+    expect(text).toContain(second.report.runId);
+    expect(text).toContain("verified");
+    expect(text).toContain("excluded");
+    expect(snapshot()).toEqual(before);
+    const nextCandidate = join(ws, "next-candidate.yaml");
+    writeFileSync(nextCandidate, "candidate: next\n");
+    signAuditor(ws, nextCandidate);
+    setExperimentCandidate({ workspace: ws, experimentId: created.experimentId, candidateFile: nextCandidate });
+    expect(analyzeExperiment({ workspace: ws, experimentId: created.experimentId, all: true }).reports).toHaveLength(2);
+    expect(() => analyzeExperiment({ workspace: ws, experimentId: created.experimentId })).toThrow(/candidate changed/);
+    const original = readFileSync(run.jsonPath, "utf8");
+    writeFileSync(run.jsonPath, original.replace('"upliftValuePoints": -100', '"upliftValuePoints": -99'));
+    expect(() => analyzeExperiment({ workspace: ws, experimentId: created.experimentId, all: true })).toThrow(/hash/);
+  });
+
+  test("analyze --all CLI exposes verified history without executing trials", () => {
+    const { ws, created, run } = setup(false, 1);
+    const outFile = join(ws, "cli-history.json");
+    const before = readdirSync(join(ws, ".amc", "experiments", created.experimentId, "runs")).sort();
+    execFileSync(process.execPath, [join(process.cwd(), "dist/cli.js"), "experiment", "analyze", "--experiment", created.experimentId, "--all", "--out", outFile], { cwd: ws });
+    const history = JSON.parse(readFileSync(outFile, "utf8")) as { reports: Array<{ runId: string }> };
+    expect(history.reports.map(report => report.runId)).toEqual([run.report.runId]);
+    expect(readdirSync(join(ws, ".amc", "experiments", created.experimentId, "runs")).sort()).toEqual(before);
+  });
 
   test("a verified, bound, improving report promotes; tampering, stale candidate or casebook changes abstain", () => {
     const { ws, run, gate, candidateFile } = setup(true);

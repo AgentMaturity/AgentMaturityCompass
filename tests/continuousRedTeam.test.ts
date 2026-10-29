@@ -10,6 +10,8 @@ import {
   type RedTeamReport,
   type RedTeamTarget,
 } from "../src/shield/continuousRedTeam.js";
+import { aggregatePackScore } from "../src/assurance/scorers.js";
+import { emitGuardEvent } from "../src/enforce/evidenceEmitter.js";
 
 vi.mock("../src/enforce/evidenceEmitter.js", () => ({ emitGuardEvent: vi.fn() }));
 
@@ -158,9 +160,88 @@ describe("independent attack evidence", () => {
       expect(round.attacks[0].result.succeeded).toBe(true);
     }
   });
+
+  it("does not breed an attack whose apparent bypass was not evaluated", async () => {
+    vi.spyOn(Math, "random").mockReturnValue(0);
+    const rt = new ContinuousRedTeam(makeMinimalConfig({
+      attacksPerRound: 1, independentRatio: 1, maxEvolutionDepth: 1, mutationRate: 0, crossoverRate: 1,
+    }));
+    const evaluator = vi.fn(async (attack: Parameters<RedTeamTarget["evaluator"]>[0]) => ({
+      attackId: attack.id, succeeded: true, response: "ungraded", latencyMs: 1,
+      bypassedDefenses: [], detectedBy: [], bypassConfidence: 1, outcome: "not_evaluated" as const,
+    }));
+    const assessedTarget = { id: "ungraded", name: "Ungraded", systemPurpose: "No measured bypass", evaluator };
+    await rt.runRound(assessedTarget);
+    const second = await rt.runRound(assessedTarget);
+    expect(evaluator).toHaveBeenCalledTimes(2);
+    expect(second.sourceBreakdown.evolved).toBe(0);
+    expect(second.newVulnerabilities).toEqual([]);
+  });
 });
 
 describe("generateReport", () => {
+  it("scores the same measured scenarios as assurance and retains unavailable evaluator results", async () => {
+    const rt = new ContinuousRedTeam(makeMinimalConfig({ attacksPerRound: 4, independentRatio: 1, maxEvolutionDepth: 0 }));
+    let attempt = 0;
+    const round = await rt.runRound({
+      id: "shared-score", name: "Shared score", systemPurpose: "Check attack scoring parity",
+      evaluator: async (attack) => {
+        attempt++;
+        if (attempt === 3) throw new Error("evaluator unavailable");
+        return {
+          attackId: attack.id, succeeded: attempt === 1, response: "observed", latencyMs: 1,
+          bypassedDefenses: [], detectedBy: [], bypassConfidence: 1,
+          ...(attempt === 4 ? { outcome: "not_evaluated" as const } : {}),
+        };
+      },
+    });
+    const score = aggregatePackScore(round.scenarioResults);
+    expect(score).toEqual({ passCount: 1, failCount: 1, score0to100: 50, inconclusiveCount: 2 });
+    expect(round.score0to100).toBe(score.score0to100);
+    expect(round.successRate).toBe(0.5);
+    expect(round.attacks).toHaveLength(4);
+    expect(rt.generateReport()).toMatchObject({
+      totalAttacks: 4, measuredAttacks: 2, inconclusiveCount: 2,
+      score0to100: score.score0to100, overallSuccessRate: 0.5, evidenceStatus: "MEASURED", outcome: "measured",
+    });
+  });
+
+  it.each([0, 2])("does not allow or score an unmeasured round with %s generated attacks", async (attacksPerRound) => {
+    const rt = new ContinuousRedTeam(makeMinimalConfig({ attacksPerRound, independentRatio: 1, maxEvolutionDepth: 0 }));
+    const round = await rt.runRound({
+      id: "unmeasured", name: "Unmeasured", systemPurpose: "No measured outcomes",
+      evaluator: async () => { throw new Error("offline"); },
+    });
+    expect(round.successRate).toBeNull();
+    expect(round.score0to100).toBeNull();
+    expect(round.outcome).toBe(attacksPerRound === 0 ? "not_evaluated" : "source_unavailable");
+    expect(rt.generateReport()).toMatchObject({
+      totalAttacks: attacksPerRound, measuredAttacks: 0, inconclusiveCount: attacksPerRound,
+      overallSuccessRate: null, score0to100: null, evidenceStatus: "INSUFFICIENT_EVIDENCE", recommendedRemediations: [],
+    });
+    expect(vi.mocked(emitGuardEvent).mock.calls.at(-1)?.[0].decision).not.toBe("allow");
+  });
+
+  it("aggregates scenario rows across rounds with unequal measured sample sizes", async () => {
+    vi.spyOn(Math, "random").mockReturnValue(0);
+    const rt = new ContinuousRedTeam(makeMinimalConfig({ attacksPerRound: 4, independentRatio: 1, maxEvolutionDepth: 0 }));
+    let attempt = 0;
+    const target: RedTeamTarget = {
+      id: "weighted", name: "Weighted", systemPurpose: "Preserve measured denominators across rounds",
+      evaluator: async (attack) => ({
+        attackId: attack.id, succeeded: ++attempt <= 4, response: "result", latencyMs: 1,
+        bypassedDefenses: [], detectedBy: [], bypassConfidence: 1,
+        ...(attempt < 4 ? { outcome: "not_evaluated" as const } : {}),
+      }),
+    };
+    const rounds = [await rt.runRound(target), await rt.runRound(target)];
+    const score = aggregatePackScore(rounds.flatMap((round) => round.scenarioResults));
+    expect(rounds[0].newVulnerabilities).toHaveLength(1);
+    expect(score.score0to100).toBe(80);
+    expect(rt.generateReport()).toMatchObject({ score0to100: score.score0to100, overallSuccessRate: 0.2, measuredAttacks: 5, inconclusiveCount: 3 });
+    expect(rt.generateReport().evolutionInsights).toEqual(["prompt_injection: 20.0% success (5 attempts)"]);
+  });
+
   it("should return a RedTeamReport with all required fields", () => {
     const rt = new ContinuousRedTeam(makeMinimalConfig());
     const report: RedTeamReport = rt.generateReport();
@@ -185,11 +266,10 @@ describe("generateReport", () => {
     expect(r1.id).not.toBe(r2.id);
   });
 
-  it("overallSuccessRate should be between 0 and 1", () => {
+  it("overallSuccessRate is unavailable when no attacks ran", () => {
     const rt = new ContinuousRedTeam(makeMinimalConfig());
     const report = rt.generateReport();
-    expect(report.overallSuccessRate).toBeGreaterThanOrEqual(0);
-    expect(report.overallSuccessRate).toBeLessThanOrEqual(1);
+    expect(report.overallSuccessRate).toBeNull();
   });
 
   it("trendDirection should be one of improving/stable/degrading", () => {

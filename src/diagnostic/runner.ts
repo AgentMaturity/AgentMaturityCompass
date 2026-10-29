@@ -1,5 +1,6 @@
 import { captureRunHashAuthority, type RunHashPublicationOptions } from "../ledger/runHashSignature.js";
 import { publishDiagnosticReport } from "./runReportPublication.js";
+import { formatDualityCompliance } from "./dualityCompliance.js";
 import { captureInstantDiagnosticSnapshot, type InstantDiagnosticSnapshot } from "./instantDiagnosticSnapshot.js";
 import { randomUUID } from "node:crypto";
 import { readdirSync } from "node:fs";
@@ -1234,7 +1235,7 @@ async function runDiagnosticCore(input: RunDiagnosticInput, outputMarkdownPath?:
     const executeWithValidTicket = toolActionEvents.filter(
       (event) => event.meta.requestedMode === "EXECUTE" && event.meta.execTicketValid === true && event.meta.effectiveMode === "EXECUTE"
     ).length;
-    const dualityComplianceRatio = executeAttempted > 0 ? executeWithValidTicket / executeAttempted : 1;
+    const dualityComplianceRatio = executeAttempted > 0 ? executeWithValidTicket / executeAttempted : null;
 
     const approvalsInWindow = listApprovalInbox({
       workspace,
@@ -1351,7 +1352,7 @@ async function runDiagnosticCore(input: RunDiagnosticInput, outputMarkdownPath?:
       dualityCompliance: {
         executeWithValidTicket,
         executeAttempted,
-        ratio: Number(dualityComplianceRatio.toFixed(4))
+        ratio: dualityComplianceRatio === null ? null : Number(dualityComplianceRatio.toFixed(4))
       },
       toolHubUsage: {
         toolActionCount: toolActionEvents.length,
@@ -1466,11 +1467,7 @@ export function generateReport(report: DiagnosticReport, format: "md" | "json", 
     selfReported: 0
   };
   const autonomyAllowanceIndex = report.autonomyAllowanceIndex ?? 0;
-  const duality = report.dualityCompliance ?? {
-    executeWithValidTicket: 0,
-    executeAttempted: 0,
-    ratio: 0
-  };
+  const dualityComplianceLine = formatDualityCompliance(report);
   const toolHub = report.toolHubUsage ?? {
     toolActionCount: 0,
     toolResultCount: 0,
@@ -1772,7 +1769,7 @@ export function generateReport(report: DiagnosticReport, format: "md" | "json", 
     `- Methodology Versioning Receipt Hash: ${methodologyVersioning?.receiptHash ?? "unavailable"}`,
     `- Industry Pack Weighting: ${domainPackWeightingLine}`,
     `- AutonomyAllowanceIndex: ${autonomyAllowanceIndex}`,
-    `- DualityCompliance: ${duality.executeWithValidTicket}/${duality.executeAttempted} (${(duality.ratio * 100).toFixed(1)}%)`,
+    `- DualityCompliance: ${dualityComplianceLine}`,
     `- ToolHub Usage: actions=${toolHub.toolActionCount}, results=${toolHub.toolResultCount}, denied=${toolHub.deniedActionCount}`,
     `- Approval Hygiene: requested=${approval.requested}, approved=${approval.approved}, denied=${approval.denied}, expired=${approval.expired}, consumed=${approval.consumed}, replay=${approval.replayAttempts}`,
     `- What-If Readiness: activeTarget=${readiness.activeTargetProfileId ?? "none"}, lastChanged=${readiness.lastTargetUpdatedTs ? new Date(readiness.lastTargetUpdatedTs).toISOString() : "n/a"}, signer=${readiness.signerFingerprint ?? "n/a"}`,

@@ -13815,16 +13815,18 @@ experiment
 
 experiment
   .command("analyze")
-  .description("Analyze latest experiment run")
+  .description("Analyze latest experiment run or verified run history")
   .requiredOption("--experiment <id>", "experiment ID")
   .requiredOption("--out <path>", "output .md or .json")
+  .option("--all", "verify and tabulate all stored runs without executing trials")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
-  .action((opts: { experiment: string; out: string; agent?: string }) => {
+  .action((opts: { experiment: string; out: string; agent?: string; all?: boolean }) => {
     const out = experimentAnalyzeCli({
       workspace: process.cwd(),
       agentId: opts.agent ?? activeAgent(program),
       experimentId: opts.experiment,
-      outFile: resolve(process.cwd(), opts.out)
+      outFile: resolve(process.cwd(), opts.out),
+      all: opts.all
     });
     console.log(chalk.green(`Experiment analysis written: ${out.outFile ?? "none"}`));
   });
@@ -18785,18 +18787,13 @@ program
   .action(async (opts: { baseline: string; candidate: string }) => {
     const lab = await import("./lab/cognitionLab.js");
     const pairs = lab.compareExperiments(opts.baseline, opts.candidate, process.cwd());
-    if (pairs.length === 0) { console.log(chalk.yellow("No matching probes to compare.")); process.exitCode = 1; return; }
+    if (pairs.length === 0) { console.log(chalk.yellow("No probe results to compare.")); process.exitCode = 1; return; }
     const { EXAMPLE_BANNER, exampleEnvelope } = await import("./claims/eligibility/exampleMode.js");
     console.log(chalk.bold.yellow(EXAMPLE_BANNER));
     printClaimResult(exampleEnvelope("lab:simulate"), {});
     console.log(chalk.bold(`\nComparison: ${opts.baseline} vs ${opts.candidate}\n`));
-    for (const p of pairs) {
-      console.log(`  ${p.probeId}:`);
-      for (const [dim, delta] of Object.entries(p.deltas)) {
-        const color = delta > 0.05 ? chalk.green : delta < -0.05 ? chalk.red : chalk.white;
-        console.log(color(`    ${dim}: ${delta > 0 ? "+" : ""}${(delta * 100).toFixed(1)}%`));
-      }
-    }
+    const { printLabComparison } = await import("./lab/labComparisonCli.js");
+    printLabComparison(pairs);
   });
 
 program
@@ -20235,11 +20232,12 @@ shield
                 };
               } catch (error) {
                 if (error instanceof EgressBlocked) throw error;
-                // Other invocation failures retain legacy reporting; reconciliation is separate.
+                // An invocation failure cannot be scored as a measured refusal.
                 return {
                   attackId: attack.payload.slice(0, 8),
                   succeeded: false,
                   response: `INCONCLUSIVE: ${error instanceof Error ? error.message : String(error)}`,
+                  outcome: "source_unavailable",
                   latencyMs: Date.now() - startedAt,
                   bypassedDefenses: [],
                   detectedBy: [],
@@ -20257,22 +20255,21 @@ shield
       console.log(chalk.gray("Rounds:"), rounds);
       if (opts.categories) console.log(chalk.gray("Categories:"), opts.categories);
       console.log(chalk.yellow("Running red team rounds..."));
-      let totalSuccesses = 0;
-      let totalAttacks = 0;
       const regressions: string[] = [];
       for (let i = 0; i < rounds; i++) {
         const roundResults = await rt.runAllTargets();
         for (const round of roundResults) {
-          totalAttacks += round.attacks.length;
-          totalSuccesses += round.attacks.filter((a) => a.result.succeeded).length;
           regressions.push(...round.regressions);
-          console.log(chalk.gray(`  Round ${i + 1}: attacks=${round.attacks.length} success_rate=${(round.successRate * 100).toFixed(1)}%`));
+          console.log(chalk.gray(`  Round ${i + 1}: attacks=${round.attacks.length} success_rate=${round.successRate === null ? "not evaluated" : `${(round.successRate * 100).toFixed(1)}%`}`));
         }
       }
-      const overallSuccessRate = totalAttacks > 0 ? (totalSuccesses / totalAttacks) * 100 : 0;
+      const report = rt.generateReport(targetId);
+      const overallSuccessRate = report.overallSuccessRate === null ? null : report.overallSuccessRate * 100;
       console.log(chalk.bold("\nSummary:"));
-      console.log(chalk.gray("Total attacks:"), totalAttacks);
-      console.log(chalk.gray("Overall success rate:"), totalAttacks === 0 ? chalk.yellow("not evaluated (no attacks ran)") : overallSuccessRate < 10 ? chalk.green(`${overallSuccessRate.toFixed(1)}%`) : chalk.red(`${overallSuccessRate.toFixed(1)}%`));
+      console.log(chalk.gray("Total attacks:"), report.totalAttacks);
+      console.log(chalk.gray("Measured attacks:"), report.measuredAttacks);
+      console.log(chalk.gray("Inconclusive attacks:"), report.inconclusiveCount);
+      console.log(chalk.gray("Overall success rate:"), overallSuccessRate === null ? chalk.yellow("not evaluated (no measured attacks)") : overallSuccessRate < 10 ? chalk.green(`${overallSuccessRate.toFixed(1)}%`) : chalk.red(`${overallSuccessRate.toFixed(1)}%`));
       console.log(chalk.gray("Regressions detected:"), regressions.length > 0 ? chalk.red(regressions.length.toString()) : chalk.green("none"));
       if (regressions.length > 0) {
         for (const r of regressions) console.log(chalk.red(`  ⚠ ${r}`));
