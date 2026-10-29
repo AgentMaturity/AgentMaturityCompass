@@ -48,6 +48,7 @@
  * Evidence first: AMC does not take an action it cannot record.
  */
 import { recordProviderOutage } from "../actions/actionRecovery.js";
+import type { PreparedCall } from "../llm/adapter/llmRuntime.js";
 import type { SettledStream } from "../llm/adapter/streamRecorder.js";
 import { isLlmError } from "../llm/llmFailure.js";
 import type { LlmFailure } from "../llm/llmFailure.js";
@@ -233,6 +234,9 @@ export async function dispatchStepRequest(
   step: number,
   signal: AbortSignal
 ): Promise<SettledStream> {
+  // Pinned once per STEP (D11): a retry re-sends on the adapter the step's first attempt pinned, so a route replaced or
+  // removed during the backoff cannot change which adapter answers this step.
+  let pinned: PreparedCall["route"] | undefined;
   for (let attempt = 1; ; attempt += 1) {
     signal.throwIfAborted();
     const call = init.llm.prepare({
@@ -241,8 +245,10 @@ export async function dispatchStepRequest(
       params: init.route.params,
       systemPromptEventId: init.systemPromptEventId,
       tools: init.tools,
-      signal
+      signal,
+      ...(pinned === undefined ? {} : { pinned })
     });
+    pinned ??= call.route;
 
     try {
       // The chunks are folded and recorded inside the seam; the loop pulls them

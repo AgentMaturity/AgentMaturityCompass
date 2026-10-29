@@ -250,12 +250,10 @@ describe("a governed agent turn: identity, context, and a human in the loop", ()
 
     const toolResult = rowsOf(rows, "tool/result")[0];
     expect(JSON.parse(toolResult!.meta_json).outcome).toBe("OK");
-    // The echo repeats the LAST model-visible user text, which is the context
-    // snapshot — the snapshot goes after the user's own words on purpose (see
-    // contextPreStep.ts), and the stub route picks the last one. Asserting on it
-    // therefore proves the same thing twice: the tool ran, and what it ran on is
-    // exactly what the signed `user/message` rows say the model was shown.
-    expect(payloadText(toolResult!)).toContain("Never force-push to main.");
+    // The echo repeats the user's own words: the stub route skips the trailing
+    // runtime-context snapshot (GAP-WP39), whose content is asserted on the
+    // signed `user/message` rows above.
+    expect(payloadText(toolResult!)).toContain("tidy the changelog");
 
     const report = await verifyAgentRun(workspace, outcome.sessionId);
     expect(report.unsignedRowIds).toEqual([]);

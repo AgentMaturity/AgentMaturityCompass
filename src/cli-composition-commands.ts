@@ -26,12 +26,14 @@ export function registerCompositionCommands(program: Command): void {
         const { createCompositionSignatureVerifier } = await import("./config/amcConfigSignature.js");
         const options = { workspace: process.cwd(), configPath: opts.config, verifySignature: createCompositionSignatureVerifier(process.cwd()) };
         const source = loadComposition(options);
-        const dump = dumpComposition(source);
+        // GAP-WP39: boot() is library-only (packages/amc-core/src/boot.ts). No native surface boots this file, and the
+        // dump says so rather than letting an operator assume the inspected composition is what runs.
+        const dump = { ...dumpComposition(source), bootedBy: [] as string[] };
         if (opts.json) {
           console.log(JSON.stringify(dump, null, 2));
           return;
         }
-        console.log(renderCompositionDump(dump));
+        console.log(`${renderCompositionDump(dump)}\n  booted by: no native surface (boot() is library-only)`);
       } catch (error: unknown) {
         console.error(chalk.red(error instanceof Error ? error.message : String(error)));
         process.exit(1);

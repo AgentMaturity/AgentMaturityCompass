@@ -34,6 +34,8 @@ describe("composition inspection through the bundled runtime seam", () => {
     expect(dump.composition).toEqual({ path, sha256: createHash("sha256").update(source).digest("hex"),
       signed: false, signatureReason: "no signature sidecar" });
     expect(dump.entries).toEqual([{ id: "inspection", name: "./not-installed.mjs", disabled: true, source: path }]);
+    // GAP-WP39: boot() is library-only, so no native surface boots this file and the dump says so.
+    expect(dump.bootedBy).toEqual([]);
     expect(process.exit).not.toHaveBeenCalled();
   });
 

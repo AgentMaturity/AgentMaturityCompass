@@ -58,6 +58,8 @@ import type { AgentToolSeam } from "./toolSeam.js";
  */
 export interface LoopLlm {
   prepare(spec: LlmCallSpec): PreparedCall;
+  /** Resolve a route without logging anything. Where the seam offers it, composition refuses an unknown route up front. */
+  pin?(input: { readonly providerId: string; readonly model: string }): unknown;
 }
 
 /** The provider route one loop instance sends on. */
