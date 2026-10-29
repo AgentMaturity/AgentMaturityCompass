@@ -1,3 +1,4 @@
+import type { LessonTransferRequest } from "../learning/lessonProvenance.js";
 import YAML from "yaml";
 import { join } from "node:path";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
@@ -26,8 +27,8 @@ export function promptCompilerInputPaths(workspace: string, agentId: string): st
     join(workspace, ".amc", "bridge.yaml"), join(workspace, ".amc", "tools.yaml"), canonPath(workspace), diagnosticBankPath(workspace), mechanicTargetsPath(workspace)].flatMap(path => [path, `${path}.sig`]);
 }
 /** Internal actual builder preparation, with original authority before either cold signing prerequisite. */
-export async function prepareCompiledPromptPackAsync(params: { workspace: string; agentId?: string }, options: OrgPairsOptions = {}) {
-  const input = { workspace: params.workspace, agentId: resolveAgentId(params.workspace, params.agentId ?? "default") };
+export async function prepareCompiledPromptPackAsync(params: { workspace: string; agentId?: string; lessons?: LessonTransferRequest }, options: OrgPairsOptions = {}) {
+  const input = { workspace: params.workspace, agentId: resolveAgentId(params.workspace, params.agentId ?? "default"), lessons: params.lessons === undefined ? undefined : structuredClone(params.lessons) };
   const original = captureOrgPairsAuthority(input.workspace, options.beforePublish), assertInputs = options.assertInputsCurrent;
   const policyPath = promptPolicyPath(input.workspace), cgxPath = cgxLatestPackPath(input.workspace, input.agentId);
   const initialPolicy = captureOrgPairs([policyPath]), initialCgx = captureOrgPairs([cgxPath]);
@@ -37,10 +38,10 @@ export async function prepareCompiledPromptPackAsync(params: { workspace: string
   const agentConfig = getAgentPaths(input.workspace, input.agentId).agentConfig;
   const sources = captureOrgPairs([agentConfig, join(input.workspace, ".amc", "bridge.yaml"),
     join(input.workspace, ".amc", "tools.yaml"), canonPath(input.workspace), diagnosticBankPath(input.workspace), mechanicTargetsPath(input.workspace)]);
-  const facts = capturePromptCompilerFacts(input.workspace, input.agentId), selected = canonicalize(facts), completedPrerequisites: string[] = [];
+  const facts = capturePromptCompilerFacts(input.workspace, input.agentId, input.lessons), selected = canonicalize(facts), completedPrerequisites: string[] = [];
   const stable = () => { assertInputs?.(); original();
     if (getAgentPaths(input.workspace, input.agentId).agentConfig !== agentConfig) throw new Error("selected prompt agent configuration path changed while preparing");
-    if (canonicalize(capturePromptCompilerFacts(input.workspace, input.agentId)) !== selected) throw new Error("selected prompt compiler facts changed while preparing");
+    if (canonicalize(capturePromptCompilerFacts(input.workspace, input.agentId, input.lessons)) !== selected) throw new Error("selected prompt compiler facts changed while preparing");
     assertOrgPairsCurrent(sources); };
   try {
     let policyBytes = policyBefore;

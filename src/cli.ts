@@ -8672,12 +8672,16 @@ promptPack
   .description("Build and sign .amcprompt for an agent")
   .option("--agent <agentId>", "agent id", "default")
   .option("--out <file>", "output .amcprompt file")
-  .action(async (opts: { agent: string; out?: string }) => {
+  .option("--lessons <file>", "opt in to verified chronological lessons using a JSON run context")
+  .action(async (opts: { agent: string; out?: string; lessons?: string }) => {
     assertPromptCliOwnerMode(process.cwd(), "prompt pack build");
+    const { lessonTransferRequestSchema } = await import("./learning/lessonProvenance.js");
+    const lessons = opts.lessons ? lessonTransferRequestSchema.parse(JSON.parse(readFileSync(resolve(opts.lessons), "utf8"))) : undefined;
     const out = await promptPackBuildCli({
       workspace: process.cwd(),
       agentId: opts.agent,
-      outFile: opts.out
+      outFile: opts.out,
+      lessons
     }, { beforePublish: () => assertPromptCliOwnerMode(process.cwd(), "prompt pack build") });
     console.log(chalk.green("Prompt pack created"));
     console.log(`agent=${out.agentId}`);
@@ -16117,16 +16121,13 @@ program
   .description("Extract lessons from verified effective corrections")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
   .option("--min-effectiveness <n>", "min effectiveness score (0-1)", "0.3")
-  .action(async (opts: { agent?: string; minEffectiveness: string }) => {
-    const { initLessonTables, extractLessonsFromCorrections } = await import("./learning/correctionMemory.js");
-    const ledger = openLedger(process.cwd());
-    const db = ledger.db;
-    initLessonTables(db);
-    const agentId = opts.agent ?? activeAgent(program) ?? "default";
-    const lessons = extractLessonsFromCorrections(db, agentId, process.cwd(), {
-      minEffectivenessForLesson: parseFloat(opts.minEffectiveness),
+  .option("--provenance <file>", "bind JSON lesson scope, source task prefix and evidence metadata")
+  .action(async (opts: { agent?: string; minEffectiveness: string; provenance?: string }) => {
+    const { extractCorrectionLessonsCli } = await import("./learning/correctionMemoryCli.js");
+    const lessons = extractCorrectionLessonsCli({
+      workspace: process.cwd(), agentId: opts.agent ?? activeAgent(program) ?? "default",
+      minEffectiveness: parseFloat(opts.minEffectiveness), provenanceFile: opts.provenance
     });
-    ledger.close();
     if (lessons.length === 0) {
       console.log("No new lessons to extract. Ensure corrections are verified effective first.");
       return;

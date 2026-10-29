@@ -4,6 +4,7 @@ import { buildVerifierReport, checkDigestSignature, envelopePublicKey, workspace
 import { fileSha256 } from "../trust/signatureCheck.js";
 import { pathExists, readUtf8 } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
+import { canonicalize } from "../utils/json.js";
 import { inspectPromptPackArtifact } from "./promptPackArtifact.js";
 import { digestPromptPack } from "./promptPackSigner.js";
 
@@ -43,6 +44,10 @@ export function verifyPromptPackFile(params: {
   }
   try {
     const inspected = inspectPromptPackArtifact(params.file);
+    if (inspected.pack.checkpoints.lessonTransfer
+      && inspected.pack.bindings.providerFilesSha256 !== sha256Hex(canonicalize(inspected.providerFiles))) {
+      errors.push("lesson prompt provider files do not match the signed binding");
+    }
     const candidates = [params.publicKeyPath ? readUtf8(params.publicKeyPath) : null, inspected.signerPub, envelopePublicKey(inspected.signature.envelope)];
     const digest = digestPromptPack(inspected.pack);
     const check = checkDigestSignature({ signature: "pack.sig", purpose: "artifact-seal", digestHex: digest, signatureB64: inspected.signature.signature, envelope: inspected.signature.envelope,

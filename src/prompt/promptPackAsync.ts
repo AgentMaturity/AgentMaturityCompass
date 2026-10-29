@@ -1,3 +1,5 @@
+import type { LessonTransferRequest } from "../learning/lessonProvenance.js";
+import { assertPromptLessonOutputs, assertPromptLessonsCurrent, commitPromptLessons } from "./promptLessonTransfer.js";
 import { mkdtempSync, rmSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { tmpdir } from "node:os";
@@ -56,11 +58,12 @@ class PromptBuildPublicationError extends Error {
   }
 }
 /** Actual managed pack producer; no remote work or await is inside the final prompt publication lock. */
-export async function buildPromptPackForApiAsync(params: { workspace: string; agentId?: string; outFile?: string }, options: OrgPairsOptions = {}) {
-  const input = { workspace: params.workspace, agentId: resolveAgentId(params.workspace, params.agentId ?? "default"), outFile: params.outFile };
+export async function buildPromptPackForApiAsync(params: { workspace: string; agentId?: string; outFile?: string; lessons?: LessonTransferRequest }, options: OrgPairsOptions = {}) {
+  const input = { workspace: params.workspace, agentId: resolveAgentId(params.workspace, params.agentId ?? "default"), outFile: params.outFile, lessons: params.lessons === undefined ? undefined : structuredClone(params.lessons) };
   const original = capturePromptPackAuthority(input.workspace, options.beforePublish, true), assertInputs = options.assertInputsCurrent;
   const ownedTemp = input.outFile ? null : mkdtempSync(join(tmpdir(), "amc-prompt-build-"));
   const outFile = input.outFile ? resolve(input.workspace, input.outFile) : join(ownedTemp!, `${input.agentId}.amcprompt`);
+  assertPromptLessonOutputs(input.workspace, [outFile], input.lessons !== undefined);
   const latestPath = promptLatestPackPath(input.workspace, input.agentId), latestShaPath = promptLatestPackShaPath(input.workspace, input.agentId), lintPath = promptLatestLintPath(input.workspace, input.agentId);
   let prerequisites: readonly string[] = [], published: PromptFiles = [], logs: string[] = [], failure: unknown;
   let completedPaths: readonly string[] = [];
@@ -78,12 +81,15 @@ export async function buildPromptPackForApiAsync(params: { workspace: string; ag
     const beforeLintSign = () => { assertInputs?.(); original.assertCurrent(); prepared.assertCurrent(); assertTargets(); };
     const latestLint = await prepareFileSignatureWithAuditor(input.workspace, lintPath, lintBytes, "BUNDLE", beforeLintSign);
     beforeLintSign();
-    const assertCurrent = () => { assertInputs?.(); original.assertCurrent(); prepared.assertCurrent(); latestLint.assertCurrent(); };
+    const assertCurrent = () => { assertInputs?.(); original.assertCurrent(); prepared.assertCurrent(); latestLint.assertCurrent();
+      assertPromptLessonOutputs(input.workspace, allBefore.map(row => row.path), input.lessons !== undefined);
+      assertPromptLessonsCurrent(input.workspace, input.agentId, compiled.compiled.pack.checkpoints.lessonTransfer); };
     assertCurrent(); const sha256 = sha256Hex(prepared.bytes), checksum = Buffer.from(`${sha256}\n`);
     published = publishPromptFiles(input.workspace, allBefore, [{ path: outFile, bytes: prepared.bytes }, { path: latestPath, bytes: prepared.bytes },
       { path: snapshotPath, bytes: prepared.bytes }, { path: latestShaPath, bytes: checksum }, { path: snapshotShaPath, bytes: checksum },
       { path: lintPath, bytes: lintBytes }, { path: `${lintPath}.sig`, bytes: Buffer.from(latestLint.signatureBytes) }], assertCurrent);
     completedPaths = published.map(row => row.path);
+    commitPromptLessons(input.workspace, input.agentId, compiled.compiled.pack.packId, compiled.compiled.pack.checkpoints.lessonTransfer);
     const afterPublication = () => { assertCurrent(); assertPromptFilesCurrent(published); };
     afterPublication();
     const created = await appendTransparencyEntryAsync({ workspace: input.workspace, type: "PROMPT_PACK_CREATED", agentId: input.agentId,

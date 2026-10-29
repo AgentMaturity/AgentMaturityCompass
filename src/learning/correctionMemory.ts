@@ -21,6 +21,8 @@ import { canonicalize } from "../utils/json.js";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
 import { signHexDigest, getSigningKey, verifyHexDigestAny } from "../crypto/keys.js";
 import { getPurposeKeyHistory } from "../keys/signingKeys.js";
+import { workspaceScope } from "../keys/highWater.js";
+import { lessonProvenanceSchema, lessonTransferMetadataSchema, lessonSourceVerifies, type LessonProvenance, type LessonTransferMetadata } from "./lessonProvenance.js";
 import { appendLessonStatus, lessonStatusLogExtendable, verifiedLessonStatuses } from "./lessonStatusLog.js";
 import type { DiagnosticReport } from "../types.js";
 import type { CorrectionEvent, CorrectionEffectivenessReport } from "../corrections/correctionTypes.js";
@@ -58,6 +60,7 @@ export interface CorrectionLesson {
   prev_lesson_hash: string;
   lesson_hash: string;
   signature: string;
+  provenance?: LessonProvenance;
 }
 
 export interface LessonInjectionPayload {
@@ -138,6 +141,7 @@ export function initLessonTables(db: Database.Database): void {
       prev_lesson_hash TEXT NOT NULL,
       lesson_hash TEXT NOT NULL,
       signature TEXT NOT NULL,
+      provenance_json TEXT,
       CHECK (expiry_ts >= created_ts)
     );
 
@@ -160,7 +164,19 @@ export function initLessonTables(db: Database.Database): void {
     );
 
     CREATE INDEX IF NOT EXISTS idx_lesson_status_log_agent ON correction_lesson_status_log(agent_id, seq);
+
+    CREATE TABLE IF NOT EXISTS correction_lesson_consumptions (
+      pack_id TEXT NOT NULL,
+      lesson_id TEXT NOT NULL,
+      lesson_hash TEXT NOT NULL,
+      target_agent_id TEXT NOT NULL,
+      request_sha256 TEXT NOT NULL,
+      consumed_ts INTEGER NOT NULL,
+      PRIMARY KEY (pack_id, lesson_id)
+    );
   `);
+  const columns = db.prepare("PRAGMA table_info(correction_lessons)").all() as Array<{ name: string }>;
+  if (!columns.some((column) => column.name === "provenance_json")) db.exec("ALTER TABLE correction_lessons ADD COLUMN provenance_json TEXT");
 }
 
 function rowToLesson(row: Record<string, unknown>): CorrectionLesson {
@@ -183,6 +199,7 @@ function rowToLesson(row: Record<string, unknown>): CorrectionLesson {
     prev_lesson_hash: row.prev_lesson_hash as string,
     lesson_hash: row.lesson_hash as string,
     signature: row.signature as string,
+    ...(row.provenance_json == null ? {} : { provenance: lessonProvenanceSchema.parse(JSON.parse(row.provenance_json as string)) }),
   };
 }
 
@@ -194,8 +211,8 @@ export function insertLesson(db: Database.Database, lesson: CorrectionLesson): v
       created_ts, expiry_ts, status, injection_count,
       last_injected_ts, post_injection_run_ids_json,
       avg_improvement_post_injection, drift_detected,
-      prev_lesson_hash, lesson_hash, signature
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      prev_lesson_hash, lesson_hash, signature, provenance_json
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `);
 
   stmt.run(
@@ -217,6 +234,7 @@ export function insertLesson(db: Database.Database, lesson: CorrectionLesson): v
     lesson.prev_lesson_hash,
     lesson.lesson_hash,
     lesson.signature,
+    lesson.provenance ? canonicalize(lessonProvenanceSchema.parse(lesson.provenance)) : null,
   );
 }
 
@@ -258,10 +276,10 @@ const LESSON_HASHED_LIFECYCLE = {
 } as const;
 
 function lessonHash(lesson: Pick<CorrectionLesson, "lessonId" | "agentId" | "correctionId" | "questionIds" | "lessonText" |
-  "advisorySeverity" | "advisoryCategory" | "createdTs" | "expiryTs">, prevHash: string): string {
+  "advisorySeverity" | "advisoryCategory" | "createdTs" | "expiryTs" | "provenance">, prevHash: string): string {
   const { lessonId, agentId, correctionId, questionIds, lessonText, advisorySeverity, advisoryCategory, createdTs, expiryTs } = lesson;
   return sha256Hex(canonicalize({ lessonId, agentId, correctionId, questionIds, lessonText, advisorySeverity, advisoryCategory,
-    createdTs, expiryTs, ...LESSON_HASHED_LIFECYCLE, prev_lesson_hash: prevHash }));
+    createdTs, expiryTs, ...(lesson.provenance ? { provenance: lesson.provenance } : {}), ...LESSON_HASHED_LIFECYCLE, prev_lesson_hash: prevHash }));
 }
 
 export interface LessonVerificationProblem {
@@ -424,26 +442,31 @@ export function extractLessonsFromCorrections(
   agentId: string,
   workspace: string,
   config?: Partial<CorrectionMemoryConfig>,
+  transferMetadata?: LessonTransferMetadata,
 ): CorrectionLesson[] {
   const cfg = { ...defaultCorrectionMemoryConfig(), ...config };
+  const metadata = transferMetadata === undefined ? undefined : lessonTransferMetadataSchema.parse(transferMetadata);
   const verified = getVerifiedCorrections(db, agentId);
   const effectiveCorrections = verified.filter(
     (c) =>
       c.status === "VERIFIED_EFFECTIVE" &&
       c.effectivenessScore !== null &&
-      c.effectivenessScore >= cfg.minEffectivenessForLesson,
+      c.effectivenessScore >= cfg.minEffectivenessForLesson &&
+      (metadata === undefined || lessonSourceVerifies(c, workspace)),
   );
 
-  // Check which corrections already have lessons
-  const existingLessonCorrectionIds = new Set(
-    getAllLessons(db, agentId).map((l) => l.correctionId),
-  );
+  // Explicit owner metadata may enroll a verified legacy lesson by minting a new signed version, preserving the original.
+  const now = Date.now();
+  const existingLessons = getAllLessons(db, agentId);
+  const existingLessonCorrectionIds = new Set(existingLessons.map((l) => l.correctionId));
+  const scopedCorrectionIds = new Set(existingLessons.filter((l) => l.provenance).map((l) => l.correctionId));
+  const legacy = new Map((metadata ? verifyAgentLessons(db, agentId, workspace).verified : [])
+    .filter((l) => !l.provenance && l.status === "ACTIVE" && !l.driftDetected && l.expiryTs > now).map((l) => [l.correctionId, l]));
 
   const newCorrections = effectiveCorrections.filter(
-    (c) => !existingLessonCorrectionIds.has(c.correctionId),
+    (c) => !existingLessonCorrectionIds.has(c.correctionId) || (metadata && !scopedCorrectionIds.has(c.correctionId) && legacy.has(c.correctionId)),
   );
 
-  const now = Date.now();
   const ttlMs = cfg.lessonTtlDays * 24 * 60 * 60 * 1000;
   const created: CorrectionLesson[] = [];
 
@@ -454,6 +477,12 @@ export function extractLessonsFromCorrections(
       break;
     }
 
+    // Missing verification lineage cannot mint a transferable claim. Legacy lessons remain readable.
+    if (metadata && (correction.verifiedTs === null || correction.verificationRunId === null || correction.verifiedTs > now)) continue;
+    const prior = legacy.get(correction.correctionId);
+    const provenance = metadata ? lessonProvenanceSchema.parse({ ...metadata, ...(prior ? { priorLessonId: prior.lessonId, priorLessonHash: prior.lesson_hash } : {}), workspaceScope: workspaceScope(workspace),
+      outcome: "VERIFIED_EFFECTIVE", verifiedTs: correction.verifiedTs, baselineRunId: correction.baselineRunId,
+      verificationRunId: correction.verificationRunId, recheckRequired: true }) : undefined;
     const prevHash = getLastLessonHash(db, agentId);
     const lessonId = `lsn_${randomUUID().slice(0, 12)}`;
     const lessonText = correctionToLessonText(correction);
@@ -474,6 +503,7 @@ export function extractLessonsFromCorrections(
       postInjectionRunIds: [],
       avgImprovementPostInjection: null,
       driftDetected: false,
+      ...(provenance ? { provenance } : {}),
     };
 
     const hash = lessonHash(lessonBody, prevHash);
@@ -511,7 +541,7 @@ export function extractLessonsFromCorrections(
 
 /**
  * Build advisory payloads from active lessons for injection into prompt packs. Only lessons whose hash, chain link
- * and signature verify are injected; `workspace` supplies the verification keys and is required.
+ * and signature verify are returned; `workspace` supplies the verification keys and is required. Preview never records consumption.
  */
 export function buildLessonAdvisories(
   db: Database.Database,
@@ -527,7 +557,7 @@ export function buildLessonAdvisories(
 
   // Sort by severity (CRITICAL first), then by creation time (newest first)
   const prioritySorted = activeLessons
-    .filter((l) => l.expiryTs > now) // exclude stale
+    .filter((l) => l.expiryTs > now && (l.provenance?.scope !== "workspace" || l.provenance.workspaceScope === workspaceScope(workspace))) // exclude stale and foreign workspace facts
     .sort((a, b) => {
       const severityOrder = { CRITICAL: 0, WARN: 1, INFO: 2 };
       const aOrder = severityOrder[a.advisorySeverity] ?? 3;
@@ -546,9 +576,6 @@ export function buildLessonAdvisories(
       category: lesson.advisoryCategory,
       summary: lesson.lessonText,
     });
-
-    // Track injection
-    updateLessonInjection(db, lesson.lessonId, now);
   }
 
   return advisories;

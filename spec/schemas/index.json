@@ -103,7 +103,7 @@
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/amcprompt.schema.json",
       "name": "amcprompt.schema.json",
-      "sha256": "ac9ea37f606dc1c49190865b3d990af6b0137712afc790593a2497fa6e272a4e"
+      "sha256": "802c951c53034a967eb8b31b9db85481db1948e4f039b0af2b892afcd4542e73"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/amcproof.schema.json",

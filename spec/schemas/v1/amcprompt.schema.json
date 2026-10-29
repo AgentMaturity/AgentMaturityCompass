@@ -125,6 +125,10 @@
           "minLength": 64,
           "type": "string"
         },
+        "providerFilesSha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
         "trustMode": {
           "enum": [
             "LOCAL_VAULT",
@@ -177,6 +181,248 @@
             "type": "object"
           },
           "type": "array"
+        },
+        "lessonTransfer": {
+          "additionalProperties": false,
+          "properties": {
+            "lessons": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "category": {
+                    "maxLength": 128,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "correctionId": {
+                    "maxLength": 128,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "lessonHash": {
+                    "pattern": "^[a-f0-9]{64}$",
+                    "type": "string"
+                  },
+                  "lessonId": {
+                    "maxLength": 128,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "provenance": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "baselineRunId": {
+                        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                        "type": "string"
+                      },
+                      "candidateSha256": {
+                        "pattern": "^[a-f0-9]{64}$",
+                        "type": "string"
+                      },
+                      "cue": {
+                        "maxLength": 500,
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "domain": {
+                        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                        "type": "string"
+                      },
+                      "experimentalMode": {
+                        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                        "type": "string"
+                      },
+                      "libraryVersion": {
+                        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                        "type": "string"
+                      },
+                      "outcome": {
+                        "const": "VERIFIED_EFFECTIVE",
+                        "type": "string"
+                      },
+                      "partition": {
+                        "enum": [
+                          "train",
+                          "public",
+                          "heldout"
+                        ],
+                        "type": "string"
+                      },
+                      "priorLessonHash": {
+                        "pattern": "^[a-f0-9]{64}$",
+                        "type": "string"
+                      },
+                      "priorLessonId": {
+                        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                        "type": "string"
+                      },
+                      "recheckRequired": {
+                        "const": true,
+                        "type": "boolean"
+                      },
+                      "resourceSha256": {
+                        "pattern": "^[a-f0-9]{64}$",
+                        "type": "string"
+                      },
+                      "scope": {
+                        "enum": [
+                          "workspace",
+                          "transferable"
+                        ],
+                        "type": "string"
+                      },
+                      "sourceFixtureIds": {
+                        "items": {
+                          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                          "type": "string"
+                        },
+                        "maxItems": 32,
+                        "type": "array"
+                      },
+                      "sourceTaskIndex": {
+                        "maximum": 9007199254740991,
+                        "minimum": -9007199254740991,
+                        "type": "integer"
+                      },
+                      "verificationRunId": {
+                        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                        "type": "string"
+                      },
+                      "verifiedTs": {
+                        "maximum": 9007199254740991,
+                        "minimum": -9007199254740991,
+                        "type": "integer"
+                      },
+                      "workspaceScope": {
+                        "pattern": "^[a-f0-9]{16}$",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "cue",
+                      "scope",
+                      "domain",
+                      "libraryVersion",
+                      "experimentalMode",
+                      "sourceTaskIndex",
+                      "partition",
+                      "workspaceScope",
+                      "outcome",
+                      "verifiedTs",
+                      "baselineRunId",
+                      "verificationRunId",
+                      "recheckRequired"
+                    ],
+                    "type": "object"
+                  },
+                  "severity": {
+                    "enum": [
+                      "INFO",
+                      "WARN",
+                      "CRITICAL"
+                    ],
+                    "type": "string"
+                  },
+                  "sourceAgentId": {
+                    "maxLength": 128,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "summary": {
+                    "maxLength": 4000,
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "lessonId",
+                  "lessonHash",
+                  "sourceAgentId",
+                  "correctionId",
+                  "provenance",
+                  "summary",
+                  "severity",
+                  "category"
+                ],
+                "type": "object"
+              },
+              "maxItems": 10,
+              "type": "array"
+            },
+            "libraryDigestSha256": {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            "request": {
+              "additionalProperties": false,
+              "properties": {
+                "domain": {
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                  "type": "string"
+                },
+                "experimentalMode": {
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                  "type": "string"
+                },
+                "libraryVersion": {
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                  "type": "string"
+                },
+                "maxLessons": {
+                  "default": 10,
+                  "maximum": 10,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "runId": {
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                  "type": "string"
+                },
+                "runStartTs": {
+                  "maximum": 9007199254740991,
+                  "minimum": -9007199254740991,
+                  "type": "integer"
+                },
+                "sourceAgentIds": {
+                  "items": {
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+                    "type": "string"
+                  },
+                  "maxItems": 16,
+                  "minItems": 1,
+                  "type": "array"
+                },
+                "taskIndex": {
+                  "maximum": 9007199254740991,
+                  "minimum": -9007199254740991,
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "runId",
+                "runStartTs",
+                "taskIndex",
+                "domain",
+                "libraryVersion",
+                "experimentalMode"
+              ],
+              "type": "object"
+            },
+            "status": {
+              "enum": [
+                "SELECTED",
+                "NO_ENTRY"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "status",
+            "request",
+            "libraryDigestSha256",
+            "lessons"
+          ],
+          "type": "object"
         },
         "topTransformTasks": {
           "items": {

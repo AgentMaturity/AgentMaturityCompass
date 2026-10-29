@@ -21,6 +21,8 @@ export function promptArchiveBytes(compiled: CompiledPromptPack, signature: Prom
       writeFileAtomic(join(root, "meta", `${name}.sha256`), `${hash}\n`, 0o644);
     for (const provider of ["openai", "anthropic", "gemini", "xai", "openrouter"] as const)
       writeFileAtomic(join(root, "provider", `${provider}.json`), `${canonicalize(compiled.providerFiles[provider])}\n`, 0o644);
+    if (compiled.pack.checkpoints.lessonTransfer)
+      writeFileAtomic(join(root, "provider", "generic.json"), `${canonicalize(compiled.providerFiles.generic)}\n`, 0o644);
     writeFileAtomic(join(root, "lint", "lint.json"), `${canonicalize(promptLintSchema.parse(compiled.lint))}\n`, 0o644);
     writeFileAtomic(join(root, "lint", "lint.json.sig"), lintSignatureBytes, 0o644);
     writeFileAtomic(join(root, "lint", "lint.sig"), lintSignatureBytes, 0o644);

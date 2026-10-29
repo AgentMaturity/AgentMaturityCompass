@@ -1,3 +1,4 @@
+import { lessonProvenanceSchema, lessonTransferRequestSchema } from "../learning/lessonProvenance.js";
 import { signatureEnvelopeSchema } from "../crypto/signing/signatureEnvelope.js";
 import { z } from "zod";
 
@@ -15,6 +16,22 @@ export const promptPackAgentTypeSchema = z.enum([
 
 export const promptPackRiskTierSchema = z.enum(["LOW", "MEDIUM", "HIGH"]);
 
+const promptLessonTransferSchema = z.strictObject({
+  status: z.enum(["SELECTED", "NO_ENTRY"]),
+  request: lessonTransferRequestSchema,
+  libraryDigestSha256: z.string().regex(/^[a-f0-9]{64}$/),
+  lessons: z.array(z.strictObject({
+    lessonId: z.string().min(1).max(128),
+    lessonHash: z.string().regex(/^[a-f0-9]{64}$/),
+    sourceAgentId: z.string().min(1).max(128),
+    correctionId: z.string().min(1).max(128),
+    provenance: lessonProvenanceSchema,
+    summary: z.string().min(1).max(4000),
+    severity: z.enum(["INFO", "WARN", "CRITICAL"]),
+    category: z.string().min(1).max(128)
+  })).max(10)
+});
+
 export const promptPackSchema = z.object({
   v: z.literal(1),
   packId: z.string().regex(/^pp_[a-zA-Z0-9_-]{8,}$/),
@@ -28,6 +45,7 @@ export const promptPackSchema = z.object({
   }),
   bindings: z.object({
     cgxPackSha256: z.string().length(64),
+    providerFilesSha256: z.string().regex(/^[a-f0-9]{64}$/).optional(),
     promptPolicySha256: z.string().length(64),
     canonSha256: z.string().length(64),
     bankSha256: z.string().length(64),
@@ -70,6 +88,7 @@ export const promptPackSchema = z.object({
     highRiskTools: z.array(z.string().min(1))
   }),
   checkpoints: z.object({
+    lessonTransfer: promptLessonTransferSchema.optional(),
     topTransformTasks: z.array(
       z.object({
         taskId: z.string().min(1),

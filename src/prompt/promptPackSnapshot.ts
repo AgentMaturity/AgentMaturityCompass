@@ -1,3 +1,4 @@
+import type { LessonTransferRequest } from "../learning/lessonProvenance.js";
 /**
  * The agent's latest prompt pack (Score's signed `.amcprompt`) from one read of its bytes: verifyWorkspacePromptPack
  * runs over a private copy of exactly those bytes and their `.sha256` sidecar, and the system texts are taken from the
@@ -11,6 +12,7 @@ import { sha256Hex } from "../utils/hash.js";
 import { inspectPromptPackArtifact } from "./promptPackArtifact.js";
 import { verifyWorkspacePromptPack } from "./promptPackVerifier.js";
 import { promptLatestPackPath } from "./promptPolicyStore.js";
+import { assertPromptLessonRun } from "./promptLessonTransfer.js";
 
 interface PromptPackSystemTexts { readonly openai: string; readonly anthropic: string; readonly gemini: string }
 export type PromptPackSnapshot =
@@ -19,7 +21,7 @@ export type PromptPackSnapshot =
     /** Only when verified: the provider system texts of the verified bytes. */
     readonly system: PromptPackSystemTexts | null };
 
-export function readPromptPackSnapshot(workspace: string, agentId: string): PromptPackSnapshot {
+export function readPromptPackSnapshot(workspace: string, agentId: string, lessonRun?: LessonTransferRequest): PromptPackSnapshot {
   const path = promptLatestPackPath(workspace, agentId);
   let bytes: Buffer;
   try {
@@ -43,7 +45,10 @@ export function readPromptPackSnapshot(workspace: string, agentId: string): Prom
     const checked = verifyWorkspacePromptPack(workspace, file);
     let system: PromptPackSystemTexts | null = null;
     if (checked.ok) {
-      const files = inspectPromptPackArtifact(file).providerFiles;
+      const inspected = inspectPromptPackArtifact(file);
+      try { assertPromptLessonRun(workspace, agentId, inspected.pack.checkpoints.lessonTransfer, lessonRun, inspected.pack.agent); }
+      catch { return { present: true, sha256: sha256Hex(bytes), packId: checked.packId, verified: false, problems: checked.errors.length + 1, system: null }; }
+      const files = inspected.providerFiles;
       system = { openai: files.openai.systemMessage, anthropic: files.anthropic.system, gemini: files.gemini.systemInstruction };
     }
     return { present: true, sha256: sha256Hex(bytes), packId: checked.packId, verified: checked.ok, problems: checked.errors.length, system };
