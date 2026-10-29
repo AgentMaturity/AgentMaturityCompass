@@ -130,7 +130,8 @@ export function makeRunner(log) {
     const stderr = binary ? run.stderr?.toString("utf8") : run.stderr;
     const result = { status: run.status ?? 1, stdout: run.stdout ?? (binary ? Buffer.alloc(0) : ""), stderr: stderr ?? String(run.error?.message ?? ""),
       durationMs: Date.now() - started };
-    log.push({ cmd: [cmd, ...args].join(" "), exit: result.status, durationMs: result.durationMs,
+    // Repository-relative paths only: receipts are committed and must not carry the operator's checkout path.
+    log.push({ cmd: [cmd, ...args].join(" ").replaceAll(ROOT, "<repo>"), exit: result.status, durationMs: result.durationMs,
       ...(quiet ? {} : { stderr: result.stderr.slice(-2000) }) });
     return result;
   };

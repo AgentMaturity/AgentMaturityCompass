@@ -1,0 +1,10 @@
+{
+  "id": "BR-2",
+  "scenario": "RPO and RTO",
+  "status": "not_run",
+  "reason": "recovery targets are \"engineering-placeholder\", not partner-agreed: RPO and RTO cannot be judged",
+  "blockedBy": [
+    "Sid + P2-03 partner"
+  ],
+  "durationMs": 0
+}

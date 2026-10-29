@@ -1,0 +1,62 @@
+{
+  "kind": "amc.p206-mutations/1",
+  "commit": "7f38251c4 (mutations applied to the working tree before the commit, each restored after its run)",
+  "mutations": [
+    {
+      "id": "M1",
+      "guard": "evaluateResults: a not_run check counts as a failure",
+      "mutation": "not_run checks skipped (counted as passed)",
+      "test": "tests/referenceDeploymentHarness.test.ts",
+      "result": "killed: 2 tests failed"
+    },
+    {
+      "id": "M2",
+      "guard": "laneStatus: only receipts for the same commit count",
+      "mutation": "receipts from any commit accepted",
+      "test": "tests/platformMatrixGenerator.test.ts",
+      "result": "killed: 'a receipt from another commit is not run' failed (the docs/PLATFORM_MATRIX.md test also failed because that file did not exist yet)"
+    },
+    {
+      "id": "M3",
+      "guard": "main: empty recovery targets exit 2",
+      "mutation": "target problems ignored",
+      "test": "tests/referenceDeploymentHarness.test.ts",
+      "result": "killed: 1 test failed"
+    },
+    {
+      "id": "M4",
+      "guard": "laneStatus: doctor native-modules must PASS",
+      "mutation": "native-modules check ignored",
+      "test": "tests/platformMatrixGenerator.test.ts",
+      "result": "killed: native-modules test failed (plus the then-missing docs/PLATFORM_MATRIX.md test)"
+    },
+    {
+      "id": "M5",
+      "guard": "runChecks: HA-only checks are not run without --ha",
+      "mutation": "haOnly ignored",
+      "test": "tests/referenceDeploymentHarness.test.ts",
+      "result": "killed: 1 test failed"
+    },
+    {
+      "id": "M6",
+      "guard": "networkpolicy.yaml: metrics admitted only from metrics.namespaceSelector",
+      "mutation": "namespaceSelector replaced by {} (any namespace)",
+      "test": "tests/helmChartMetrics.test.ts",
+      "result": "killed: 1 test failed"
+    },
+    {
+      "id": "R1",
+      "guard": "check-qualification-receipts.mjs skips only the reference-deployment definition folder",
+      "mutation": "red run: the new test against the pre-change checker",
+      "test": "tests/qualificationReceipts.test.ts",
+      "result": "red before the change (1 failed), green after (20 passed)"
+    },
+    {
+      "id": "M7",
+      "guard": "isRestoredPrefix: beyond the shared prefix only the restore's own BACKUP_RESTORED audit rows are allowed",
+      "mutation": "any trailing rows accepted",
+      "test": "tests/referenceDeploymentHarness.test.ts",
+      "result": "killed: 1 test failed"
+    }
+  ]
+}

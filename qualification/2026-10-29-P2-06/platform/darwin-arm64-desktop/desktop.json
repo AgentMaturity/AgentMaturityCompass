@@ -1,0 +1,11 @@
+{
+  "status": "passed",
+  "manifest": "<scratch>/installers/manifest.json (outside the repository; AMC_DESKTOP_PACKAGE_OUT)",
+  "packageVersion": "1.2.0",
+  "packageCount": 3,
+  "platforms": [
+    "macos-universal",
+    "linux-x64",
+    "windows-x64"
+  ]
+}

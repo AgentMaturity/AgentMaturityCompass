@@ -1,0 +1,35 @@
+{
+  "id": "INS-2",
+  "scenario": "Install refusals",
+  "status": "passed",
+  "criteria": [
+    {
+      "name": "change-me bootstrap value",
+      "ok": true,
+      "detail": {
+        "exit": 1,
+        "namedReason": true,
+        "message": "- at '/bootstrap/values/vaultPassphrase': 'not' failed"
+      }
+    },
+    {
+      "name": "requireDigest without a digest",
+      "ok": true,
+      "detail": {
+        "exit": 1,
+        "namedReason": true,
+        "message": "- at '/image/digest': '' does not match pattern '^sha256:[a-f0-9]{64}$'"
+      }
+    },
+    {
+      "name": "replicaCount=2",
+      "ok": true,
+      "detail": {
+        "exit": 1,
+        "namedReason": true,
+        "message": "- at '/replicaCount': value must be 1"
+      }
+    }
+  ],
+  "durationMs": 493
+}
