@@ -367,7 +367,7 @@ export class LlmRuntime {
       throw settle(recorder.fail({ failure: { message: "request cancelled before budget admission", code: LLM_FAILURE_CODE.ABORTED }, kind: "aborted", httpStatus: null, cause: "aborted_before_dispatch" }));
     }
     try {
-      reserveNativeModelBudget(this.init.session, prepared.headerEventId);
+      reserveNativeModelBudget(this.init.session, prepared.headerEventId, request);
     } catch (error) {
       // AMC's own admission refused before dispatch; no provider was contacted, so this is never provider QUOTA (P0-59).
       // Evidence that fails verification is not a budget decision either: label it so an operator checks the ledger.

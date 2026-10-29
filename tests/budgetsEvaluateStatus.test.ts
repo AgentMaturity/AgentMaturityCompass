@@ -111,7 +111,11 @@ describe("evaluateBudgetStatus denies", () => {
 
   it("denies when daily cost is exceeded, reading cost from the response meta", () => {
     withWorkspace((workspace) => {
-      // Default daily.maxCostUsd is 50.
+      // A USD ceiling is explicit; new default policies are token/count only.
+      const config = defaultBudgets();
+      config.budgets.perAgent.default!.daily.maxCostUsd = 50;
+      writeFileSync(budgetsPath(workspace), YAML.stringify(config));
+      signBudgetsConfig(workspace);
       append(workspace, "llm_response", 1, { meta: { usage: { cost_usd: 50.01 } } });
       const status = evaluateBudgetStatus(workspace, AGENT);
       expect(status.ok).toBe(false);

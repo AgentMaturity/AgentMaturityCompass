@@ -10,7 +10,7 @@ export function predictBudgetPressure(params: {
   daily: {
     llmRequests: { used: number; limit: number; ratio: number };
     llmTokens: { used: number; limit: number; ratio: number };
-    llmCostUsd: { used: number; limit: number; ratio: number };
+    llmCostUsd: { used: number; limit: number | null; ratio: number | null };
   };
   perMinute: {
     llmRequests: { used: number; limit: number; ratio: number };
@@ -24,7 +24,7 @@ export function predictBudgetPressure(params: {
   let budgetConfigured = false;
   let dailyRequestsLimit = 0;
   let dailyTokensLimit = 0;
-  let dailyCostLimit = 0;
+  let dailyCostLimit: number | null = null;
   let minuteRequestsLimit = 0;
   let minuteTokensLimit = 0;
   try {
@@ -34,7 +34,7 @@ export function predictBudgetPressure(params: {
       budgetConfigured = true;
       dailyRequestsLimit = budget.daily.maxLlmRequests;
       dailyTokensLimit = budget.daily.maxLlmTokens;
-      dailyCostLimit = budget.daily.maxCostUsd;
+      dailyCostLimit = budget.daily.maxCostUsd ?? null;
       minuteRequestsLimit = budget.perMinute.maxLlmRequests;
       minuteTokensLimit = budget.perMinute.maxLlmTokens;
     }
@@ -60,7 +60,7 @@ export function predictBudgetPressure(params: {
       llmCostUsd: {
         used: status.usage.daily.llmCostUsd,
         limit: dailyCostLimit,
-        ratio: ratio(status.usage.daily.llmCostUsd, dailyCostLimit)
+        ratio: dailyCostLimit === null ? null : ratio(status.usage.daily.llmCostUsd, dailyCostLimit)
       }
     },
     perMinute: {
