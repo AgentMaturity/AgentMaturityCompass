@@ -7,7 +7,7 @@ import { agentPromptProfile } from "../prompt/agentPromptProfile.js";
 import type { NativeImageInput } from "../attachments/nativeImageInput.js";
 import type { NativeInputPart } from "../attachments/nativeOrderedInput.js";
 import type { NativeAudioPart } from "../attachments/nativeAudioInput.js";
-import { agentToolset, type AgentToolset } from "./agentToolset.js";
+import { agentToolset, type AgentToolset, type AgentToolsetOptions } from "./agentToolset.js";
 import type { NativeToolCapability } from "./nativeToolCapabilities.js";
 import type { ExplicitShellOptIn } from "../sandbox/nativeShellGate.js";
 import type { NativeValidationPlan, NativeValidationResult } from "./nativeValidation.js";
@@ -89,6 +89,9 @@ export interface AgentSessionInit {
   readonly leaseToken?: string;
   /** Server-composed, reviewed mounts; not a browser or wire-provided capability grant. */
   readonly additionalCapabilities?: readonly NativeToolCapability[];
+  /** WP40 seam: a surface's signed ask_user answerer and operator-configured web_search provider, passed to the toolset. */
+  readonly askUser?: AgentToolsetOptions["askUser"];
+  readonly webSearchProvider?: AgentToolsetOptions["webSearchProvider"];
   readonly maxSteps?: number;
   /** Automatic compaction; off unless `contextWindowTokens` is declared. */
   readonly compaction?: Partial<CompactionConfig>;
@@ -180,6 +183,8 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
       ...(init.additionalCapabilities === undefined ? {} : { additionalCapabilities: init.additionalCapabilities }),
       ...(init.expectedToolsDigest === undefined ? {} : { expectedToolsDigest: init.expectedToolsDigest }),
       ...(init.unconfinedShell === undefined ? {} : { unconfinedShell: init.unconfinedShell }),
+      ...(init.askUser === undefined ? {} : { askUser: init.askUser }),
+      ...(init.webSearchProvider === undefined ? {} : { webSearchProvider: init.webSearchProvider }),
       ...lease,
       // Handing over the writer is what keeps the session ANCHORABLE. Pointing the
       // rows at the right session id was only half of it: written through the raw

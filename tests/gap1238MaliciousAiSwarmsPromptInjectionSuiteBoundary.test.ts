@@ -49,7 +49,7 @@ describe("GAP-1238 malicious AI swarms prompt-injection suite boundary", () => {
     expect(doc).toContain("No paper importer");
   });
 
-  it("builds a fail-closed prompt injection regression suite across required vectors", () => {
+  it("fails closed on unresolved prompt injection fixture metadata across required vectors", () => {
     const receipt = buildPromptInjectionRegressionSuiteReceipt({
       suiteId: "prompt-injection-regression-suite-v1",
       suiteVersion: "2026.06.25",
@@ -119,17 +119,21 @@ describe("GAP-1238 malicious AI swarms prompt-injection suite boundary", () => {
       ],
     });
 
-    expect(receipt.status).toBe("pass");
+    expect(receipt.status).toBe("fail_closed");
+    expect(receipt.failClosedReasons).toContain("ledger workspace missing");
     expect(receipt.coverage.requiredVectors).toEqual(["direct", "indirect", "multimodal", "retrieved_content"]);
     expect(receipt.coverage.presentVectors).toEqual(["direct", "indirect", "multimodal", "retrieved_content"]);
     expect(receipt.coverage.missingVectors).toEqual([]);
-    expect(receipt.rows.every((row) => row.status === "passed")).toBe(true);
+    expect(receipt.rows.every((row) => row.status === "missing_evidence")).toBe(true);
     expect(receipt.rows.every((row) => row.rowHash.length === 64)).toBe(true);
-    expect(verifyPromptInjectionRegressionSuiteReceipt(receipt)).toEqual({ valid: true, failClosedReasons: [] });
+    expect(verifyPromptInjectionRegressionSuiteReceipt(receipt)).toEqual({
+      valid: false,
+      failClosedReasons: expect.arrayContaining(["ledger workspace missing"]),
+    });
 
     const markdown = renderPromptInjectionRegressionSuiteMarkdown(receipt);
     expect(markdown).toContain("Prompt Injection Regression Suite");
-    expect(markdown).toContain("Status: pass");
+    expect(markdown).toContain("Status: fail_closed");
     expect(markdown).toContain("Required Vectors: direct, indirect, multimodal, retrieved_content");
     expect(markdown).toContain("gap-1238-retrieved-content-fixture");
   });
@@ -182,7 +186,7 @@ describe("GAP-1238 malicious AI swarms prompt-injection suite boundary", () => {
     expect(verifyPromptInjectionRegressionSuiteReceipt(receipt).valid).toBe(false);
   });
 
-  it("blocks regressions when observed decision diverges from mapped policy", () => {
+  it("retains decision mismatch findings while unresolved evidence blocks regression classification", () => {
     const receipt = buildPromptInjectionRegressionSuiteReceipt({
       suiteId: "decision-mismatch-suite",
       suiteVersion: "2026.06.25",
@@ -210,10 +214,11 @@ describe("GAP-1238 malicious AI swarms prompt-injection suite boundary", () => {
       ],
     });
 
-    expect(receipt.status).toBe("regressed");
+    expect(receipt.status).toBe("fail_closed");
+    expect(receipt.failClosedReasons).toContain("ledger workspace missing");
     expect(receipt.rows[0]).toMatchObject({
       fixtureId: "direct-mismatch",
-      status: "regressed",
+      status: "missing_evidence",
     });
     expect(receipt.failClosedReasons).toEqual(expect.arrayContaining([
       "direct-mismatch observed decision does not match expected decision",

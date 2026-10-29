@@ -176,3 +176,12 @@ export async function prepareFileSignatureWithAuditor(workspace: string, path: s
     }
   } });
 }
+
+/** Async counterpart to signSerializedPayloadWithAuditor, with the checked provider publication boundary. */
+export async function signSerializedPayloadWithAuditorAsync(
+  workspace: string, serialized: string
+): Promise<ReturnType<typeof signSerializedPayloadWithAuditor>> {
+  const prepared = await prepareFileSignatureWithAuditor(workspace, "receipt.json", Buffer.from(serialized, "utf8"), "BUNDLE");
+  prepared.assertCurrent();
+  return orgSignatureSchema.parse(JSON.parse(prepared.signatureBytes));
+}

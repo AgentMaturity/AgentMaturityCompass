@@ -9,6 +9,8 @@ import { loadNativeMcpConfiguration, requireReviewedNativeMcpGrants, NativeMcpCo
 import { inspectNativeFirstUse, renderNativeFirstUseGuide, renderNativeGuideCommand } from "./nativeFirstUseGuide.js";
 import { resolveNativeChatProfile, nativeChatProfileArgv, assertNativeChatProfileCurrent, type NativeChatProfileOptions } from "./nativeChatProfile.js";
 import { createNativeInteractiveApprovals } from "./nativeInteractiveApprovals.js";
+import { createNativeInteractiveAskUser } from "./nativeInteractiveAskUser.js";
+import { renderSessionLists } from "../tools/builtin/todoTool.js";
 import { loadNativeExtensions, nativeExtensionRunArgv, type NativeExtensionManager } from "../extensions/nativeExtensionRuntime.js";
 import { prepareSkillTurn, workspaceSkillRoots } from "../skills/skillTurn.js";
 import { buildSkillCatalog } from "../skills/skillCatalog.js";
@@ -27,6 +29,7 @@ export interface NativeChatOptions extends NativeChatProfileOptions {
   readonly approveRisk?: string;
   readonly tools?: string;
   readonly unsafeUnconfinedShell?: boolean;
+  readonly webSearchSearxng?: string;
   readonly maxTokens?: string;
   readonly thinking?: string;
   readonly reasoningEffort?: string;
@@ -116,23 +119,25 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
 
   // The child sees exactly the same installed/source CLI, environment and cwd.
   // No shell, alternate runner, approval bypass, or background session writer.
-  const execute = (args: readonly string[], display: { interactiveApprovals?: boolean; stream?: boolean } = {}): Promise<{ code: number | null; stdout: string; truncated: boolean; cancelRequested: boolean }> => new Promise(resolveResult => {
+  const execute = (args: readonly string[], display: { interactiveApprovals?: boolean; askUser?: boolean; stream?: boolean } = {}): Promise<{ code: number | null; stdout: string; truncated: boolean; cancelRequested: boolean }> => new Promise(resolveResult => {
     let stdout = "";
     let truncated = false;
     let cancelRequested = false;
     let previewOpen = false;
     const interactiveApprovals = display.interactiveApprovals === true;
+    const ipc = interactiveApprovals || display.askUser === true;
     let running: ChildProcess;
     try {
       running = spawn(process.execPath, [...process.execArgv, resolve(entry), ...(selectedAgentId === null ? [] : ["--agent", selectedAgentId]), ...args], {
         cwd, env: process.env, shell: false,
-        stdio: interactiveApprovals ? ["ignore", "pipe", "pipe", "ipc"] : ["ignore", "pipe", "pipe"]
+        stdio: ipc ? ["ignore", "pipe", "pipe", "ipc"] : ["ignore", "pipe", "pipe"]
       });
     } catch { io.error("Could not start the AMC command."); resolveResult({ code: 1, stdout, truncated, cancelRequested }); return; }
     child = running;
     const approvals = interactiveApprovals ? createNativeInteractiveApprovals({
       child: running, workspace: cwd, entry, agentId: selectedAgentId ?? "default", question, log: io.log, error: io.error
     }) : null;
+    const askUser = display.askUser === true ? createNativeInteractiveAskUser({ child: running, workspace: cwd, question, log: io.log, error: io.error }) : null;
     const requestCancel = () => {
       if (cancelRequested) return;
       cancelRequested = true;
@@ -161,6 +166,7 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
     running.once("close", code => {
       void (async () => {
         let finalCode = code;
+        askUser?.close();
         try { await approvals?.close(); }
         catch { io.error("Native approval cleanup did not complete cleanly; inspect the recorded request before continuing."); finalCode = 1; }
         finally {
@@ -249,6 +255,7 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
       ...(options.credentialsHome === undefined ? [] : ["--credentials-home", options.credentialsHome]), "--credentials-file", credentialFile,
       ...(guide.credential === null ? [] : ["--credential", guide.credential.ref]),
       "--tools", tools, "--max-steps", maxSteps, "--max-tokens", maxTokens, ...(options.unsafeUnconfinedShell === true ? ["--unsafe-unconfined-shell"] : []),
+      ...(options.webSearchSearxng === undefined ? [] : ["--web-search-searxng", options.webSearchSearxng]),
       ...(options.thinking === undefined ? [] : ["--thinking", options.thinking]),
       ...(options.reasoningEffort === undefined ? [] : ["--reasoning-effort", options.reasoningEffort]),
       // Each turn's child run validates these; they are forwarded verbatim, never defaulted here.
@@ -386,9 +393,10 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
       const priorSession = sessionId;
       const pendingFork = forkFrom;
       const outcome = await execute(["agent-loop", "run", ...routeArgs, ...nativeExtensionRunArgv(extensions),
-        ...(approvalClass === undefined ? [] : ["--interactive-approvals"]), "--keep-open", "--json", "--stream",
+        ...(approvalClass === undefined ? [] : ["--interactive-approvals"]), ...(tools === "workspace" ? ["--interactive-ask-user"] : []),
+        "--keep-open", "--json", "--stream",
         ...(forkFrom !== null ? ["--fork-from", forkFrom] : sessionId === null ? [] : ["--session", sessionId]), "--", prompt],
-        { interactiveApprovals: approvalClass !== undefined, stream: true });
+        { interactiveApprovals: approvalClass !== undefined, askUser: tools === "workspace", stream: true });
       const result = parseNativeChatResult({ stdout: outcome.stdout, truncated: outcome.truncated,
         requestedSessionId: priorSession, forkFrom: pendingFork, previousSummary });
       if (!result.ok) {
@@ -409,6 +417,7 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
       io.log(renderNativeRunUsage(summary.usage, { requestWindow: "latest" }));
       io.log(renderNativeRunDiagnostics(summary.diagnostics));
       io.log(`Public task validation: ${summary.validation?.status ?? "unavailable"}. Passing selected checks does not guarantee correctness.`);
+      if (tools === "workspace") for (const line of renderSessionLists(cwd, sessionId)) io.log(line);
       if (outcome.code !== 0 || outcome.truncated || summary.driverStatus === "failed") {
         io.error("The turn failed or was interrupted. No successful task completion is claimed; /inspect and /verify show what was recorded.");
         io.fail();

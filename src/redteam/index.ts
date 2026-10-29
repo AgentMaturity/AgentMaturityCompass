@@ -85,6 +85,8 @@ export type {
 export {
   PROMPT_INJECTION_REGRESSION_SUITE_SCHEMA_VERSION,
   buildPromptInjectionRegressionSuiteReceipt,
+  promptInjectionRegressionEvidencePayload,
+  signPromptInjectionRegressionSuiteReceipt,
   renderPromptInjectionRegressionSuiteMarkdown,
   verifyPromptInjectionRegressionSuiteReceipt,
 } from "./promptInjectionRegressionSuite.js";
