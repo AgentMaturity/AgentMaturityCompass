@@ -290,7 +290,9 @@ describe("native deferred-schema activation", () => {
     expect(f.names(fresh)).toEqual(["tool_search"]);
     expect((await f.activate(found, fresh)).outcome).not.toBe("OK");
     const fork = forkSession({ workspace: f.workspace, parentSessionId: f.session.sessionId,
-      claimant: { pid: process.pid, hostId: "activation-fixture", bootId: "activation-fixture", startedAt: Date.now() }, ...f.identity });
+      claimant: { pid: process.pid, hostId: "activation-fixture", bootId: "activation-fixture", startedAt: Date.now() }, ...f.identity,
+      // Loadout non-inheritance needs no copied conversation; WP17 forks of a conversation require a sealed parent turn.
+      inheritConversation: false });
     cleanups.push(() => fork.service.disposeWithoutClosing());
     fork.service.startTurn({ trigger: "user" }); fork.service.startStep();
     const child = f.compose(fork.service);
@@ -340,7 +342,8 @@ describe("native deferred-schema activation", () => {
     const remembered = await search(definitions[1]!.name);
     expect(remembered).toBeDefined(); expect(f.names(tools)).toContain(active.name);
     const fork = forkSession({ workspace: f.workspace, parentSessionId: f.session.sessionId,
-      claimant: { pid: process.pid, hostId: "activation-dynamic-fixture", bootId: "activation-dynamic-fixture", startedAt: Date.now() }, ...f.identity });
+      claimant: { pid: process.pid, hostId: "activation-dynamic-fixture", bootId: "activation-dynamic-fixture", startedAt: Date.now() }, ...f.identity,
+      inheritConversation: false });
     cleanups.push(() => fork.service.disposeWithoutClosing());
     current = fork.service; current.startTurn({ trigger: "user" }); current.startStep();
     expect(f.names(tools)).toEqual(["tool_search"]);
