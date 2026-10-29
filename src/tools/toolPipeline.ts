@@ -260,6 +260,7 @@ function denialOutcome(denied: ToolDenial): ToolOutcome {
 // The selected body must remain distinguishable from a later scoped override
 // while approval is awaited. Callers cannot assign this binding through argv.
 const selectedDefinitions = new WeakMap<ToolExecution, ToolDefinition>();
+const selectedAvailability = new WeakMap<ToolExecution, () => boolean>();
 export function selectedToolDefinitionFor(execution: ToolExecution): ToolDefinition | undefined {
   return selectedDefinitions.get(execution);
 }
@@ -316,6 +317,7 @@ export class ToolPipeline {
         return this.refuseUnresolved(input, null, `unknown tool "${input.name}"`);
       }
 
+      const available = this.init.registry.admissionCheck(input.name, input.agentId);
       const callId = input.callId ?? randomUUID();
       const draft: ToolExecution = {
         token: `tok_${randomUUID()}`,
@@ -344,6 +346,7 @@ export class ToolPipeline {
       const bound = authorization?.bound;
       let execution: ToolExecution = bound?.ok ? boundExecution(draft, bound) : draft;
       selectedDefinitions.set(execution, definition);
+      selectedAvailability.set(execution, available);
       const release = await this.writeTurn(definition.actionClass, draft.signal);
       let outcome: ToolOutcome;
       try {
@@ -352,13 +355,16 @@ export class ToolPipeline {
           ? await this.runJournaled(this.init.journal, execution, definition.body, authorization,
             () => this.enter(draft, input.authority, gate), (fresh) => {
               selectedDefinitions.delete(execution);
+              selectedAvailability.delete(execution);
               execution = fresh;
               selectedDefinitions.set(execution, definition);
+              selectedAvailability.set(execution, available);
             })
           : await this.runStages(execution, definition.body, authorization!);
       } finally {
         release?.();
         selectedDefinitions.delete(execution);
+        selectedAvailability.delete(execution);
       }
       try {
         if (this.init.record !== undefined) {
@@ -559,6 +565,9 @@ export class ToolPipeline {
       return denialOutcome({ stage: "guard", reason: denied.reason, guardLabel: denied.label });
     }
 
+    if (selectedAvailability.get(execution)?.() !== true) {
+      return denialOutcome({ stage: "visibility", reason: "tool registration or step availability was revoked", guardLabel: null });
+    }
     const unauthorized = this.authorizationDenial(execution, authorization);
     if (unauthorized !== null) return denialOutcome({ stage: "authorization", reason: unauthorized, guardLabel: null });
     // Read again after the approval wait: a call cancelled while it waited (a timed-out program's sub-call) never runs.
@@ -649,6 +658,9 @@ export class ToolPipeline {
     if (approval?.denied) return deny(approval.denied, "approval_denied");
     const guard = this.init.registry.guardReason(execution);
     if (guard) return deny({ stage: "guard", reason: guard.reason, guardLabel: guard.label }, `guard_denied:${guard.label}`);
+    if (selectedAvailability.get(execution)?.() !== true) {
+      return deny({ stage: "visibility", reason: "tool registration or step availability was revoked", guardLabel: null }, "tool_availability_revoked");
+    }
     const binding = this.bindingDenial(authorization);
     if (binding !== null || bound === null || !bound.ok || authorization.context === null) {
       return deny({ stage: "authorization", reason: binding?.reason ?? "authorization record missing", guardLabel: null },

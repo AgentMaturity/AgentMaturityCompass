@@ -10,6 +10,7 @@ import { bashTool } from "../tools/builtin/bashTool.js";
 import { fsTools } from "../tools/builtin/fsTools.js";
 import { ReadBeforeEditLedger } from "../tools/builtin/readBeforeEdit.js";
 import { searchTools } from "../tools/builtin/searchTools.js";
+import { toolSearchTool } from "../tools/builtin/toolSearchTool.js";
 import { sessionSpillReadTool } from "../tools/builtin/sessionSpillReadTool.js";
 import { webFetchTool } from "../tools/builtin/webFetchTool.js";
 import { webSearchTool, type WebSearchProvider } from "../tools/builtin/webSearchTool.js";
@@ -311,6 +312,19 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
   const ledger = new ReadBeforeEditLedger();
   for (const tool of fsTools({ ledger })) registry.define(tool);
   for (const tool of searchTools()) registry.define(tool);
+  registry.define(toolSearchTool({ catalog: scope => {
+    if (scope !== agentId) throw new Error("Tool discovery belongs to another session scope");
+    const snapshot = loadVerifiedToolsConfigSnapshot(workspace);
+    if (!snapshot.signatureValid || !snapshot.config || (options.expectedToolsDigest !== undefined
+      && snapshot.digestSha256 !== options.expectedToolsDigest)) throw new Error("Tool discovery policy is unavailable or changed");
+    const selected = new Map(selectSupportedNativeTools(snapshot, [
+      ...NATIVE_DELEGATION_CAPABILITIES, ...(options.additionalCapabilities ?? [])
+    ]).map(tool => [tool.name, tool]));
+    const visible = registry.visible(scope);
+    // Discovery obeys the same signed identity and compiled visibility boundaries as native schema admission.
+    return registry.catalog(scope).filter(schema => (!compiled || compiledPolicyShows(compiled, schema.name))
+      && selected.has(schema.name) && selected.get(schema.name)!.actionClass === visible.get(schema.name)?.actionClass);
+  } }));
   // Use the actual native session writer. An owned session refuses raw
   // ledger appends; a receipt write failure also prevents tool success.
   // Returns the row's evidence event id when the writer reports one.

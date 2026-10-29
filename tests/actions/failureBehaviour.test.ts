@@ -832,3 +832,61 @@ describe("P1-03 genuine granted bound-gate identity and fresh binding", () => {
     expect(verifyLedgerIntegrity(h.f.workspace).chain.ok).toBe(true);
   });
 });
+
+// WP13 extends the actual signed journal/bound-gate fixture. Conditional admission owns no external resources yet.
+test.each(["step end", "new step", "restriction", "guard restriction"] as const)(
+  "WP13 %s revokes a journaled call across a genuine signed approval wait", async change => {
+    const f = fixture();
+    const auditor = getPublicKeyPem(f.workspace, "auditor");
+    const registry = new ToolRegistry();
+    const payment = faultTools(f.sor).find(definition => definition.name === PAYMENT_TOOL)!;
+    const body = vi.fn(payment.body);
+    registry.define({ ...payment, available: () => true, body });
+    const dispose = await registry.prepareStep({ agentId: "default", turn: 1, step: 1, signal: new AbortController().signal });
+    let next: (() => void) | undefined;
+    const pipeline = new ToolPipeline({ workspace: f.workspace, registry, journal: () => f.journal,
+      authorizationContext: () => ({ sessionId: f.sessionId }) });
+    let entered!: () => void;
+    let resume!: () => void;
+    const entry = new Promise<void>(resolve => { entered = resolve; });
+    const resumed = new Promise<void>(resolve => { resume = resolve; });
+    const errors: unknown[] = [];
+    let grant: ReturnType<typeof genuineGateGrant> | undefined;
+    pipeline.bindApprovalGate({ gates: name => name === PAYMENT_TOOL, ask: async (_execution, intent) => {
+      entered();
+      await resumed;
+      try { grant = genuineGateGrant(f, intent, auditor); return grant.authority; }
+      catch (error) { errors.push(error); return null; }
+    } });
+    const callId = `wp13-journaled-${randomUUID()}`;
+    const pending = pipeline.execute({ name: PAYMENT_TOOL, agentId: "default", arguments: { ...FAULT_ARGUMENTS[PAYMENT_TOOL] },
+      requestedMode: "EXECUTE", callId, parentToken: "wp13-owned-granted-parent" });
+    let outcome!: ToolOutcome;
+    try {
+      await Promise.race([entry, pending.then(() => { throw new Error("WP13 call finished before its bound approval gate"); })]);
+      const rows = f.ledger.db.prepare("SELECT execution_id FROM action_executions WHERE call_id = ?").all(callId) as Array<{ execution_id: string }>;
+      expect(rows).toHaveLength(1);
+      expect(chain(f, rows[0]!.execution_id).map(receipt => receipt.state)).toEqual(["requested"]);
+      if (change === "step end" || change === "new step") dispose();
+      if (change === "new step") next = await registry.prepareStep({ agentId: "default", turn: 1, step: 2, signal: new AbortController().signal });
+      if (change === "restriction") registry.restrict({ deny: new Set([PAYMENT_TOOL]) });
+      if (change === "guard restriction") registry.guard("WP13 late scope narrowing", () => {
+        registry.restrict({ deny: new Set([PAYMENT_TOOL]) }, "default"); return undefined;
+      });
+    } finally {
+      resume();
+      outcome = await pending;
+      dispose(); next?.();
+    }
+    if (errors.length) throw new AggregateError(errors, "WP13 genuine signed gate fixture failed");
+    expect(grant).toBeDefined();
+    expect(outcome).toMatchObject({ ok: false, denied: { stage: "visibility" }, action: { state: "denied", evidenceComplete: true } });
+    expect(body).not.toHaveBeenCalled();
+    expect(f.sor.effects).toHaveLength(0);
+    const receipts = chain(f, outcome.action!.executionId);
+    expect(receipts.map(receipt => receipt.state)).not.toContain("started");
+    expect(receipts.at(-1)).toMatchObject({ state: "denied", reasonCode: "tool_availability_revoked" });
+    expect(loadApprovalConsumed({ workspace: f.workspace, agentId: "default", approvalRequestId: grant!.id })).toBeNull();
+    expect(verifyLedgerIntegrity(f.workspace).chain.ok).toBe(true);
+  }
+);

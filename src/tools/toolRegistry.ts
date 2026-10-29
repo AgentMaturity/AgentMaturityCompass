@@ -4,7 +4,8 @@ import type {
   ToolDefinition,
   ToolExecution,
   ToolGuard,
-  ToolRestriction
+  ToolRestriction,
+  ToolStepContext
 } from "./toolTypes.js";
 
 /**
@@ -28,8 +29,18 @@ export interface GuardDenial {
 }
 
 /** One scope's contribution. Absent scope key means the global layer. */
+interface ToolRegistration {
+  readonly definition: ToolDefinition;
+  readonly available: ToolDefinition["available"];
+}
+
+interface StepAvailability {
+  readonly admitted: Set<ToolRegistration>;
+  ready: boolean;
+}
+
 interface ToolLayer {
-  readonly tools: Map<string, ToolDefinition>;
+  readonly tools: Map<string, ToolRegistration>;
   readonly restrictions: ToolRestriction[];
   readonly guards: LabelledToolGuard[];
 }
@@ -53,6 +64,7 @@ export class ToolRegistry {
   private readonly global = emptyLayer();
   private readonly scopes = new Map<string, ToolLayer>();
   private transportRegistered = false;
+  private readonly steps = new Map<string, StepAvailability>();
 
   private layerFor(scope: string | undefined): ToolLayer {
     if (scope === undefined) return this.global;
@@ -86,9 +98,11 @@ export class ToolRegistry {
           : `tool "${tool.name}" is already registered in scope "${scope}"`
       );
     }
-    layer.tools.set(tool.name, tool);
+    // The registration object is a generation: re-registering even the same definition cannot reuse an old admission.
+    const registration = { definition: tool, available: tool.available };
+    layer.tools.set(tool.name, registration);
     return () => {
-      if (layer.tools.get(tool.name) === tool) layer.tools.delete(tool.name);
+      if (layer.tools.get(tool.name) === registration) layer.tools.delete(tool.name);
     };
   }
 
@@ -151,8 +165,8 @@ export class ToolRegistry {
    * in the chain applied. A scoped tool shadows a global one of the same name,
    * which is how a per-agent variant replaces the default.
    */
-  visible(scope?: string): ReadonlyMap<string, ToolDefinition> {
-    const merged = new Map<string, ToolDefinition>(this.global.tools);
+  private permitted(scope?: string): ReadonlyMap<string, ToolRegistration> {
+    const merged = new Map(this.global.tools);
     const scopeLayer = scope === undefined ? undefined : this.scopes.get(scope);
     if (scopeLayer) {
       for (const [name, tool] of scopeLayer.tools) merged.set(name, tool);
@@ -160,12 +174,76 @@ export class ToolRegistry {
     let names = new Set(merged.keys());
     for (const restriction of this.global.restrictions) names = narrow(names, restriction);
     for (const restriction of scopeLayer?.restrictions ?? []) names = narrow(names, restriction);
-    const out = new Map<string, ToolDefinition>();
+    const out = new Map<string, ToolRegistration>();
     for (const name of names) {
       const tool = merged.get(name);
       if (tool) out.set(name, tool);
     }
     return out;
+  }
+
+  /** Execution eligibility, always narrowed by current policy, including after asynchronous admission. */
+  visible(scope?: string): ReadonlyMap<string, ToolDefinition> {
+    const state = scope === undefined ? undefined : this.steps.get(scope);
+    return new Map([...this.permitted(scope)].filter(([, registration]) =>
+      registration.available === undefined || (state?.ready === true && state.admitted.has(registration)))
+      .map(([name, registration]) => [name, registration.definition]));
+  }
+
+  /** Directly offered schemas. Deferred and hidden tools cannot inflate the model's initial tool list. */
+  offered(scope?: string): ReadonlyMap<string, ToolDefinition> {
+    return new Map([...this.visible(scope)].filter(([, tool]) => tool.exposure === undefined || tool.exposure === "direct"));
+  }
+
+  /** Finite metadata only; this view contains neither dispatch functions nor hidden/code-only schemas. */
+  catalog(scope?: string): readonly { name: string; description: string; parameters: Record<string, unknown> }[] {
+    return [...this.visible(scope).values()]
+      .filter(tool => tool.exposure !== "hidden" && tool.parameters !== undefined)
+      .map(tool => ({ name: tool.name, description: tool.description, parameters: structuredClone(tool.parameters!) }));
+  }
+
+  /** Capture both registration and step identity before a call crosses any await. */
+  admissionCheck(name: string, scope: string): () => boolean {
+    const registration = this.permitted(scope).get(name);
+    const state = this.steps.get(scope);
+    return () => registration !== undefined && this.permitted(scope).get(name) === registration
+      && this.visible(scope).get(name) === registration.definition
+      && (registration.available === undefined || this.steps.get(scope) === state);
+  }
+
+  /** Admit conditions once, atomically. A failed, cancelled or disposed preparation publishes no authority. */
+  async prepareStep(input: ToolStepContext): Promise<() => void> {
+    const context = Object.freeze({ ...input });
+    context.signal.throwIfAborted();
+    if (this.steps.has(context.agentId)) throw new Error(`tool step already active for "${context.agentId}"`);
+    const state: StepAvailability = { admitted: new Set(), ready: false };
+    this.steps.set(context.agentId, state);
+    const dispose = (): void => {
+      if (this.steps.get(context.agentId) === state) this.steps.delete(context.agentId);
+      context.signal.removeEventListener("abort", onAbort);
+    };
+    let onAbort = (): void => {};
+    try {
+      const cancelled = new Promise<never>((_resolve, reject) => {
+        onAbort = (): void => { dispose(); reject(context.signal.reason); };
+        context.signal.addEventListener("abort", onAbort, { once: true });
+      });
+      // Capture registrations before callbacks run; a reload cannot inherit another generation's condition result.
+      const conditional = [...this.permitted(context.agentId).values()].filter(tool => tool.available !== undefined);
+      const results = await Promise.race([Promise.all(conditional.map(async registration => {
+        // A user callback must not receive the private registration as its `this` receiver.
+        const available = registration.available!;
+        return { registration, admitted: await available(context) };
+      })), cancelled]);
+      context.signal.throwIfAborted();
+      if (this.steps.get(context.agentId) !== state) throw new Error("tool step admission is stale");
+      for (const result of results) if (result.admitted === true) state.admitted.add(result.registration);
+      state.ready = true;
+      return dispose;
+    } catch (error) {
+      dispose();
+      throw error;
+    }
   }
 
   /**
