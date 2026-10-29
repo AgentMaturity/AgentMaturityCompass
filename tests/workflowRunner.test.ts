@@ -2,6 +2,7 @@ import { mkdtempSync, rmSync, realpathSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
+import { SessionService } from "../src/session/sessionService.js";
 import { initWorkspace } from "../src/workspace.js";
 import { rootIdentity } from "../src/agent/delegationIdentity.js";
 import { listHandoffPackets } from "../src/fleet/handoffPacket.js";
@@ -21,8 +22,10 @@ import type { LoopEventRecord } from "../src/session/loopEventMeta.js";
  */
 const PASS = "workflow-runner-test-passphrase";
 const dirs: string[] = [];
+const sessions: SessionService[] = [];
 
 afterEach(() => {
+  for (const session of sessions.splice(0)) session.disposeWithoutClosing();
   while (dirs.length > 0) {
     const dir = dirs.pop();
     if (dir) rmSync(dir, { recursive: true, force: true });
@@ -45,6 +48,16 @@ const plan = (raw: unknown): WorkflowNode => {
 
 const agent = (id: string, goal = `goal-${id}`) => ({ kind: "agent", id, runAs: "researcher", goal });
 
+function recorder(dir: string, rows: LoopEventRecord[]) {
+  const session = new SessionService(dir);
+  sessions.push(session);
+  session.open({ sessionId: `workflow-${sessions.length}`, agentId: "payments-agent", harnessVersion: "test",
+    compositionDigest: "composition", policyDigest: "policy" });
+  const record = session.recordLoopEvent.bind(session);
+  session.recordLoopEvent = r => { rows.push(r); return record(r); };
+  return session;
+}
+
 function harness(dir: string, answer: (ctx: SubagentRunContext) => string = (c) => `answered ${c.goal}`) {
   const rows: LoopEventRecord[] = [];
   const seen: SubagentRunContext[] = [];
@@ -57,8 +70,7 @@ function harness(dir: string, answer: (ctx: SubagentRunContext) => string = (c) 
         workspace: dir,
         plan: node,
         parent: rootIdentity("payments-agent"),
-        session: { recordLoopEvent: (r) => { rows.push(r); return null; },
-    recordProjectedEvidence: () => null },
+        session: recorder(dir, rows),
         runner: async (ctx) => { seen.push(ctx); return { ok: true, text: answer(ctx) }; },
         mintSessionId: () => `child-${(n += 1)}`,
         ...over
@@ -106,8 +118,7 @@ describe("parallel and pipeline mean what they say", () => {
       workspace: dir,
       plan: plan({ kind: "parallel", id: "root", children: [agent("a"), agent("b"), agent("c")] }),
       parent: rootIdentity("payments-agent"),
-      session: { recordLoopEvent: (r) => { rows.push(r); return null; },
-    recordProjectedEvidence: () => null },
+      session: recorder(dir, rows),
       runner: async () => {
         live += 1;
         peak = Math.max(peak, live);
@@ -146,8 +157,7 @@ describe("parallel and pipeline mean what they say", () => {
       workspace: dir,
       plan: plan({ kind: "pipeline", id: "root", stages: [agent("a"), agent("b")] }),
       parent: rootIdentity("payments-agent"),
-      session: { recordLoopEvent: (r) => { rows.push(r); return null; },
-    recordProjectedEvidence: () => null },
+      session: recorder(dir, rows),
       runner: async (ctx) => {
         seen.push(ctx);
         return { ok: false, text: "", reason: "the first stage failed" };
@@ -171,8 +181,7 @@ describe("parallel and pipeline mean what they say", () => {
       workspace: dir,
       plan: plan({ kind: "parallel", id: "root", children: [agent("a"), agent("b"), agent("c")] }),
       parent: rootIdentity("payments-agent"),
-      session: { recordLoopEvent: (r) => { rows.push(r); return null; },
-    recordProjectedEvidence: () => null },
+      session: recorder(dir, rows),
       runner: async (ctx) =>
         ctx.goal === "goal-b"
           ? { ok: false, text: "", reason: "b failed" }
@@ -203,8 +212,7 @@ describe("a plan can be given up on", () => {
         stages: [agent("a"), agent("b"), agent("c")]
       }),
       parent: rootIdentity("payments-agent"),
-      session: { recordLoopEvent: (r) => { rows.push(r); return null; },
-    recordProjectedEvidence: () => null },
+      session: recorder(dir, rows),
       // SUCCEEDS, deliberately. An earlier version returned `ok: false` here and
       // the test passed for the wrong reason: a pipeline stops at its first
       // failure anyway, so removing the abort check entirely left it green.
@@ -242,8 +250,7 @@ describe("a plan can be given up on", () => {
       workspace: dir,
       plan: plan(agent("only")),
       parent: rootIdentity("payments-agent"),
-      session: { recordLoopEvent: (r) => { rows.push(r); return null; },
-    recordProjectedEvidence: () => null },
+      session: recorder(dir, rows),
       runner: async () => {
         controller.abort();
         return { ok: true, text: "finished anyway" };

@@ -2,6 +2,7 @@ import { mkdtempSync, rmSync, realpathSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
+import { SessionService } from "../src/session/sessionService.js";
 import { initWorkspace } from "../src/workspace.js";
 import { openLedger } from "../src/ledger/ledger.js";
 import { initBudgets } from "../src/budgets/budgets.js";
@@ -10,7 +11,6 @@ import { agentToolset } from "../src/agent/agentToolset.js";
 import { initToolsConfig, loadToolsConfig } from "../src/toolhub/toolhubValidators.js";
 import { rootIdentity } from "../src/agent/delegationIdentity.js";
 import { MAX_PLAN_NODES } from "../src/workflow/workflowPlan.js";
-import type { LoopEventRecord } from "../src/session/loopEventMeta.js";
 import type { SubagentRunContext, SubagentRunResult } from "../src/agent/subagentSpawn.js";
 
 /**
@@ -25,8 +25,10 @@ import type { SubagentRunContext, SubagentRunResult } from "../src/agent/subagen
  */
 const PASS = "workflow-tool-test-passphrase";
 const dirs: string[] = [];
+const sessions: SessionService[] = [];
 
 afterEach(() => {
+  for (const session of sessions.splice(0)) session.disposeWithoutClosing();
   while (dirs.length > 0) {
     const dir = dirs.pop();
     if (dir) rmSync(dir, { recursive: true, force: true });
@@ -58,18 +60,20 @@ function allow(dir: string, name: string): void {
   });
 }
 
-const recorder = () => {
-  const rows: LoopEventRecord[] = [];
-  return { rows, recordLoopEvent: (r: LoopEventRecord) => { rows.push(r); return null; },
-    recordProjectedEvidence: () => null };
-};
+function recorder(dir: string): SessionService {
+  const session = new SessionService(dir);
+  sessions.push(session);
+  session.open({ sessionId: "workflow-parent", agentId: "payments-agent", harnessVersion: "test",
+    compositionDigest: "composition", policyDigest: "policy" });
+  return session;
+}
 
 function toolsetWith(dir: string, runner: (ctx: SubagentRunContext) => Promise<SubagentRunResult>) {
   return agentToolset({
     workspace: dir,
     agentId: "payments-agent",
     sessionId: "toolset-test-session",
-    subagents: { identity: rootIdentity("payments-agent"), runner, session: recorder() }
+    subagents: { identity: rootIdentity("payments-agent"), runner, session: recorder(dir) }
   });
 }
 
@@ -145,6 +149,23 @@ describe("the model gets its own structure back, labelled by its own ids", () =>
     toolset.close();
   });
 
+  it("resumes through the existing workflow tool without repeating a proven node", async () => {
+    const dir = workspace();
+    allow(dir, "workflow");
+    let effects = 0;
+    const toolset = toolsetWith(dir, async ctx => { effects++; return okRunner(ctx); });
+    try {
+      const first = await toolset.seam.execute(call(agent("a")));
+      const run = JSON.parse(String(first.content)) as { runId: string };
+      expect(typeof run.runId).toBe("string");
+      const second = await toolset.seam.execute({ ...call(agent("a")), callId: "resume-2",
+        rawArguments: JSON.stringify({ plan: agent("a"), runId: run.runId }) });
+      expect(second.outcome).toBe("OK");
+      expect(JSON.parse(String(second.content)).agentsRun).toBe(0);
+      expect(effects).toBe(1);
+    } finally { toolset.close(); }
+  });
+
   it("keeps answers and failures apart instead of concatenating them", async () => {
     // `delegate`'s rule, carried over: the runtime's account is never presented
     // as something an agent said. With several children the two are structurally
@@ -187,6 +208,7 @@ describe("a plan the model got wrong is refused, not attempted", () => {
     expect(String(outcome.content)).toContain("workflow refused");
     expect(String(outcome.content), "and says what was wrong").toContain("would run nothing");
     expect(spawned, "nothing ran").toBe(0);
+    expect(outcome.outcome).toBe("ERROR");
     toolset.close();
   });
 
