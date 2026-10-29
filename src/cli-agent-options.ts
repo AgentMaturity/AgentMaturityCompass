@@ -87,6 +87,8 @@ export interface RunOptions {
   takeoverExpiredWriter?: string;
   steerAfter?: string;
   persona?: string;
+  missionContext?: boolean;
+  listSkills?: boolean | string;
   approveTools?: string;
   approveRisk?: string;
   approvalException?: string;

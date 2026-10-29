@@ -8,7 +8,7 @@ import { afterEach, describe, expect, test } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
 import { extractPluginPackage, printPluginPackage, pluginKeygen, pluginPack, verifyPluginPackage } from "../src/plugins/pluginPackage.js";
 import { initPluginRegistry, publishPluginToRegistry, servePluginRegistry, verifyPluginRegistry } from "../src/plugins/pluginRegistry.js";
-import { browsePluginRegistryForWorkspace, initPluginWorkspace, requestPluginInstall, executePluginRequest } from "../src/plugins/pluginApi.js";
+import { browsePluginRegistryForWorkspace, initPluginWorkspace, requestPluginInstall, requestPluginRemove, executePluginRequest } from "../src/plugins/pluginApi.js";
 import { savePluginRegistriesConfig, defaultInstalledPluginsLock, pendingActionPath, pluginInstalledPackagePath, saveInstalledPluginsLock, verifyInstalledPluginsLock, savePluginOverrides } from "../src/plugins/pluginStore.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import { canonicalize } from "../src/utils/json.js";
@@ -301,7 +301,7 @@ describe("plugin marketplace", () => {
     await expect(browsePluginRegistryForWorkspace({ workspace: ws, registryId: "local" })).rejects.toThrow("plugin registries signature invalid");
   });
 
-  test("workspace install is dual-control and tamper breaks readiness", async () => {
+  test.each(["reports application outcome", "tamper breaks readiness"])("workspace install is dual-control and %s", async (check) => {
     const ws = workspace();
     initPluginWorkspace({ workspace: ws });
     const keys = pluginKeygen({ outDir: join(ws, "keys") });
@@ -381,7 +381,22 @@ describe("plugin marketplace", () => {
       approvalRequestId: requested.approvalRequestId
     });
     expect(executed.action).toBe("install");
+    expect(executed).toMatchObject({ outcome: "installed-not-loaded" });
     expect(verifyInstalledPluginsLock(ws).valid).toBe(true);
+
+    const removal = requestPluginRemove({
+      initiator: "test-operator", workspace: ws, agentId: "default", pluginId: executed.pluginId
+    });
+    for (const role of ["OWNER", "AUDITOR"] as const) {
+      decideApprovalForIntent({
+        workspace: ws, agentId: "default", approvalId: removal.approvalRequestId,
+        decision: "APPROVED", mode: "EXECUTE", reason: "reviewed removal",
+        userId: `${role}-remove`, username: `${role}-remove`, userRoles: [role]
+      });
+    }
+    expect(executePluginRequest({ workspace: ws, approvalRequestId: removal.approvalRequestId }))
+      .toMatchObject({ action: "remove", outcome: "restart-required" });
+    if (check === "reports application outcome") return;
 
     const lockPath = join(ws, ".amc", "plugins", "installed.lock.json");
     writeFileSync(lockPath, `${readFileSync(lockPath, "utf8")}\n# tampered`);

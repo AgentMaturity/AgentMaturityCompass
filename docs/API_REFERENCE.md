@@ -1894,6 +1894,7 @@ Run one agent turn and report what the signed log recorded
 | `--steer <text>` | - |
 | `--steer-after <ms>` | - |
 | `--persona <text>` | - |
+| `--mission-context` | - |
 | `--approve-tools <actionClass>` | - |
 | `--approve-risk <tier>` | - |
 | `--interactive-approvals` | - |
@@ -1902,6 +1903,7 @@ Run one agent turn and report what the signed log recorded
 | `--goal-rounds <n>` | - |
 | `--approval-exception <file>` | - |
 | `--json` | - |
+| `--list-skills [name]` | - |
 
 #### `amc agent-loop verify`
 
@@ -7253,6 +7255,8 @@ Read manifest/content hashes and workspace signature status without loading or w
 | Option | Description |
 |--------|-------------|
 | `--expect-digest <sha256>` | - |
+| `--preview-command <name>` | - |
+| `--arguments <text>` | - |
 | `--json` | - |
 
 #### `amc native-extension install`

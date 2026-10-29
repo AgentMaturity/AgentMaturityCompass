@@ -534,3 +534,18 @@ Validation: 237 baseline cases passed across 9 files; 37/37 guard mutations were
 Native provider schema activation remains a WP13a follow-up. Live HTTP qualification is blocked by `listen EPERM: operation not permitted 127.0.0.1`; eight new cases and the related existing socket suites need an unrestricted runner. Binary bytes are deliberately omitted with digests/loss records. These limits constrain native onboarding and release claims.
 
 Claude's next actions: review the activation dependency and source, run the live suites, and commit the accepted change using the prepared message. Full row status, commands, evidence and remaining work are in `/Users/sid/AgentMaturityCompass-worktrees/s442cd919/work/codex-runs/wp21-report.md`.
+
+
+---
+
+# WP22 handoff — REV_FULLSTACK_ENGINEER
+
+Date: 2026-10-30. Scope: signed extension, skill and prompt-template usability on `rtd/gap-wp22`, base `dff352a3e`.
+
+The worktree contains bounded skill discovery and repository-scoped roots, skill inspection flags on the existing run command, strict signed literal templates and previews, plugin application outcomes, opt-in mission context and shared-session operator skill loading. Signatures, explicit execution approvals, digest checks and platform confinement remain required.
+
+Evidence, per-row status, remaining work and the exact verification result are recorded in `/Users/sid/AgentMaturityCompass-worktrees/s442cd919/work/codex-runs/wp22-report.md`. The conventional commit message is in `wp22-commit-message.txt` beside that report.
+
+Verification: Node 22.23.3, required verifier exit 0, 120 clean follow-up tests passed and 56 guard mutants killed. Local socket fixtures remain sandbox blocked; the report gives exact counts.
+
+The candidate remains uncommitted. Claude reviews, commits and merges it. Native-loop hook expansion remains deferred pending the documented event/lifetime design. Other unresolved ownership and compatibility boundaries are listed in the report; this handoff does not claim runtime release qualification.
