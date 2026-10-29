@@ -71,10 +71,15 @@ export function recordSignedPostgresHead(workspace: string, chainId: string, hea
     existing = null; // a malformed file is replaced by a valid one; verification reported it already
   }
   if (existing !== null && existing.chainId === chainId && existing.headSeq >= headSeq) return;
+  const record = signPostgresHead(workspace, chainId, headHash, headSeq, stream);
+  writeFileAtomic(headPath(workspace, stream), `${JSON.stringify(record, null, 2)}\n`, 0o644);
+}
+
+/** The signed head record, in memory: migration checks a copy against the floor it will sign before it writes anything. */
+export function signPostgresHead(workspace: string, chainId: string, headHash: string, headSeq: number, stream: PostgresHeadStream = "events"): SignedHead {
   const digest = headDigest(chainId, headHash, headSeq, stream);
   const sig = process.env.AMC_NO_SIGN === "1" ? "unsigned" : signHexDigestWith(cachedSigningKey(workspace, "ledger-row")(), digest);
-  const record: SignedHead = { v: 1, chainId, headHash, headSeq, sig };
-  writeFileAtomic(headPath(workspace, stream), `${JSON.stringify(record, null, 2)}\n`, 0o644);
+  return { v: 1, chainId, headHash, headSeq, sig };
 }
 
 /** Read the signed head before the database snapshot, so any head it names was committed before the snapshot began. */

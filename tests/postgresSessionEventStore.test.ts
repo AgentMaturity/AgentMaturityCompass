@@ -1,4 +1,4 @@
-import { chmodSync, mkdirSync, mkdtempSync, rmSync, unlinkSync, writeFileSync } from "node:fs";
+import { chmodSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, unlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -10,8 +10,8 @@ import { migrateSqliteToPostgres } from "../src/persistence/postgres/postgresMig
 import { verifySignedMigrationReceipt } from "../src/ledger/signedMigrationReceipt.js";
 import { verifyLedgerIntegrity } from "../src/ledger/ledgerVerification.js";
 import { ensurePostgresChainId, PostgresSessionEventStore } from "../src/persistence/postgres/postgresSessionEventStore.js";
-import { POSTGRES_MIRROR_TABLES } from "../src/persistence/postgres/postgresSchema.js";
-import { POSTGRES_URL_FILE_ENV, setDefaultPostgresDriver } from "../src/persistence/postgres/syncPgClient.js";
+import { ensurePostgresSchema, POSTGRES_MIRROR_TABLES } from "../src/persistence/postgres/postgresSchema.js";
+import { POSTGRES_URL_FILE_ENV, readPostgresUrl, setDefaultPostgresDriver, SyncPgClient } from "../src/persistence/postgres/syncPgClient.js";
 import type { SessionEventStore } from "../src/persistence/sessionEventStore.js";
 import { verifyAlternateBackendEvidence } from "../src/ledger/alternateBackendVerification.js";
 import { verifyAgentRun } from "../src/agent/runReport.js";
@@ -372,6 +372,126 @@ describe("amc evidence-stores migrate --to postgres", () => {
     db.close();
     expect(() => migrateSqliteToPostgres(ws, { pg: { driverModule: FAKE_PG } })).toThrow(/SQLite history failed authentication; nothing was copied/);
     expect(readSessionStoreMarker(ws)).toBe("sqlite");
+  }, TIMEOUT_MS);
+
+  /** Every file under `.amc`, by content, but SQLite's shared-memory index, which any reader may rewrite. */
+  function amcBytes(ws: string): Record<string, string> {
+    const root = join(ws, ".amc");
+    return Object.fromEntries((readdirSync(root, { recursive: true }) as string[]).sort()
+      .filter((path) => statSync(join(root, path)).isFile() && !path.endsWith("-shm")).map((path) => [path, sha256Hex(readFileSync(join(root, path)))]));
+  }
+
+  /** Every row the fake server holds under `chainId`, the mirror head row with it. */
+  function chainRows(ws: string, chainId: string): Record<string, unknown[]> {
+    const db = new Database(dbFile(ws), { readonly: true });
+    try {
+      return Object.fromEntries([...POSTGRES_MIRROR_TABLES.map((table) => table.name), "amc_ledger_mirror_log", "amc_chain_heads"].map((table) =>
+        [table, db.prepare(`SELECT * FROM ${table} WHERE chain_id IN (?, ?) ORDER BY 1, 2`).all(chainId, `${chainId}/ledger-mirror`)]));
+    } finally {
+      db.close();
+    }
+  }
+
+  /** The copy's rows anywhere on the server: s-old is only ever written by the copy. */
+  function copiedRows(ws: string): number {
+    const db = new Database(dbFile(ws), { readonly: true });
+    try {
+      return ["evidence_events", "sessions"].reduce((sum, table) => sum + (db.prepare(`SELECT count(*) AS n FROM ${table} WHERE session_id = 's-old'`).get() as { n: number }).n, 0);
+    } finally {
+      db.close();
+    }
+  }
+
+  function withSchema(ws: string, run: (db: Database.Database) => void): void {
+    const client = new SyncPgClient(readPostgresUrl(), { driverModule: FAKE_PG });
+    try { ensurePostgresSchema(client); } finally { client.close(); }
+    const db = new Database(dbFile(ws));
+    try { run(db); } finally { db.close(); }
+  }
+
+  it.each([false, true])("a copy that does not read back as written rolls back whole (chain id recorded beforehand: %s), and the run after the fault is fixed succeeds", (recorded) => {
+    const ws = sqliteWorkspace();
+    const chainId = recorded ? ensurePostgresChainId(ws) : null;
+    withSchema(ws, (db) => db.exec(`CREATE TRIGGER skew AFTER INSERT ON evidence_events WHEN NEW.session_id = 's-old'
+      BEGIN UPDATE evidence_events SET ts = ts + 1 WHERE chain_id = NEW.chain_id AND id = NEW.id; END`));
+    const before = amcBytes(ws);
+    const rowsBefore = chainId === null ? null : chainRows(ws, chainId);
+    expect(() => migrateSqliteToPostgres(ws, { pg: { driverModule: FAKE_PG } })).toThrow(/rows differ from the SQLite rows/);
+    expect(amcBytes(ws)).toEqual(before);
+    expect(copiedRows(ws)).toBe(0);
+    if (chainId !== null) expect(chainRows(ws, chainId)).toEqual(rowsBefore);
+    expect(readSessionStoreMarker(ws)).toBe("sqlite");
+
+    withSchema(ws, (db) => db.exec("DROP TRIGGER skew"));
+    const result = migrateSqliteToPostgres(ws, { pg: { driverModule: FAKE_PG } });
+    if (chainId !== null) expect(result.receipt.chainId).toBe(chainId);
+    expect(readSessionStoreMarker(ws)).toBe("postgres");
+  }, TIMEOUT_MS);
+
+  it("a refused merge leaves the workspace's .amc bytes and the chain it found unchanged", () => {
+    const ws = sqliteWorkspace();
+    const chainId = ensurePostgresChainId(ws);
+    const store = openPg(ws);
+    store.startSession({ sessionId: "s-pg", runtime: "amc", binaryPath: "pg-test", binarySha256: sha256Hex("pg") });
+    append(store, "s-pg", 0, SESSION_GENESIS);
+    store.close();
+    const before = amcBytes(ws);
+    const rowsBefore = chainRows(ws, chainId);
+    expect(() => migrateSqliteToPostgres(ws, { pg: { driverModule: FAKE_PG } })).toThrow(/never merges chains/);
+    expect(amcBytes(ws)).toEqual(before);
+    expect(chainRows(ws, chainId)).toEqual(rowsBefore);
+  }, TIMEOUT_MS);
+
+  it("a committed copy whose chain head row was rewound since is not resumed: refused as a merge, nothing written", () => {
+    const ws = sqliteWorkspace();
+    const chainId = ensurePostgresChainId(ws);
+    const head = join(ws, ".amc", "postgres-store-head.json");
+    mkdirSync(head);
+    expect(() => migrateSqliteToPostgres(ws, { pg: { driverModule: FAKE_PG } })).toThrow();
+    rmSync(head, { recursive: true });
+    const db = new Database(dbFile(ws));
+    db.prepare("UPDATE amc_chain_heads SET head_seq = head_seq - 1 WHERE chain_id = ?").run(chainId);
+    db.close();
+    const before = amcBytes(ws);
+    const rowsBefore = chainRows(ws, chainId);
+    expect(() => migrateSqliteToPostgres(ws, { pg: { driverModule: FAKE_PG } })).toThrow(/never merges chains: the Postgres chain head differs/);
+    expect(amcBytes(ws)).toEqual(before);
+    expect(chainRows(ws, chainId)).toEqual(rowsBefore);
+    expect(readSessionStoreMarker(ws)).toBe("sqlite");
+  }, TIMEOUT_MS);
+
+  /** A local write that fails after COMMIT: the signed head's path is a directory, so the atomic rename onto it fails. */
+  it.each([
+    ["no chain id recorded beforehand", false, false],
+    ["a chain id recorded beforehand (the committed copy is proved and kept)", true, false],
+    ["SQLite written between the failure and the retry", false, true]
+  ])("a local write that fails after COMMIT leaves a state the next run finishes: %s", (_name, recorded, sqliteMoves) => {
+    const ws = sqliteWorkspace();
+    const chainId = recorded ? ensurePostgresChainId(ws) : null;
+    const head = join(ws, ".amc", "postgres-store-head.json");
+    mkdirSync(head);
+    expect(() => migrateSqliteToPostgres(ws, { pg: { driverModule: FAKE_PG } })).toThrow();
+    expect(copiedRows(ws)).toBeGreaterThan(0); // the copy committed
+    expect(readSessionStoreMarker(ws)).toBe("sqlite");
+    rmSync(head, { recursive: true });
+    if (sqliteMoves) {
+      const sqlite = openSessionEventStore(ws, "sqlite");
+      sqlite.startSession({ sessionId: "s-between", runtime: "amc", binaryPath: "pg-test", binarySha256: sha256Hex("between") });
+      append(sqlite, "s-between", 0, SESSION_GENESIS);
+      sqlite.close();
+    }
+
+    const result = migrateSqliteToPostgres(ws, { pg: { driverModule: FAKE_PG } });
+    if (chainId !== null) expect(result.receipt.chainId).toBe(chainId);
+    expect(readSessionStoreMarker(ws)).toBe("postgres");
+    // A writable open authenticates the chain against the workspace's signed floor.
+    const store = startedStore(ws, "s-new");
+    const next = append(store, "s-new", 0, SESSION_GENESIS);
+    const rows = store.readAllEvents();
+    expect(rows.find((row) => row.id === next.id)?.prev_event_hash).toBe(result.receipt.sqliteChainHead);
+    expect(rows.some((row) => row.session_id === "s-between")).toBe(sqliteMoves);
+    expect(verifyStoredSessionEvents(ws, rows).errors).toEqual([]);
+    store.close();
   }, TIMEOUT_MS);
 
   it("verify reports a Postgres store it cannot read as an error, never as a pass", () => {

@@ -1,0 +1,9 @@
+
+ RUN  v4.1.11 /Users/sid/AgentMaturityCompass-worktrees/s442cd919/work/amc-w7-pg-migrate
+
+
+ Test Files  4 passed (4)
+      Tests  66 passed (66)
+   Start at  11:56:46
+   Duration  157.60s (transform 5.50s, setup 85ms, import 8.58s, tests 278.55s, environment 0ms)
+
