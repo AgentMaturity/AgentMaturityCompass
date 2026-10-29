@@ -27,7 +27,7 @@
 import type { EvidenceEvent, SessionRecord } from "../types.js";
 import { canonicalMetadataForHash } from "../ledger/eventHash.js";
 import { getPublicKeyPem, verifyHexDigestAny } from "../crypto/keys.js";
-import { extractEnvelope, SESSION_GENESIS } from "../session/sessionTypes.js";
+import { admitSessionEnvelope, SESSION_GENESIS } from "../session/sessionTypes.js";
 import { loadBlobPlaintext } from "../storage/blobs/blobStore.js";
 import { pathExists } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -213,7 +213,12 @@ function verifySessionEnvelopeChains(rows: readonly EvidenceEvent[], errors: str
   const expectedSeq = new Map<string, number>();
   const expectedPrevHash = new Map<string, string>();
   for (const event of rows) {
-    const envelope = extractEnvelope(event.meta_json);
+    const admission = admitSessionEnvelope(event.meta_json, event.event_type);
+    if (!admission.ok) {
+      errors.push(`Event ${event.id} ${admission.message}`);
+      continue;
+    }
+    const envelope = admission.envelope;
     if (envelope === null) {
       continue;
     }

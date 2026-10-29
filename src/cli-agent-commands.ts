@@ -204,7 +204,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--unsafe-unconfined-shell", "macOS without Seatbelt only: offer the native shell UNCONFINED, with your full user rights; ignored where Seatbelt or Bubblewrap confines it, refused on Windows")
     .option("--session <id>", "resume this existing, unsealed session as its next writer (verified before dispatch)")
     .option("--takeover-expired-writer <reason>", "with --session: claim a remote or unresponsive writer whose lease lapsed one lease ago; the reason is recorded")
-    .option("--fork-from <id>", "open a new session whose lineage names this parent's verified final row")
+    .option("--fork-from <id>", "copy this verified parent conversation into a new signed session")
     .option("--keep-open", "leave the session unsealed at exit so a later process can --session it")
     .option(
       "--delegate",

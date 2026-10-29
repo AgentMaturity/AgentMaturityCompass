@@ -43,9 +43,12 @@ import { AntiRollbackError } from "../keys/highWater.js";
 import type { InterruptedCallOutcome } from "./resumeRules.js";
 import { assertSessionJournalCurrent, markSessionJournal } from "./writerFence.js";
 import { extractEnvelope, SESSION_ENVELOPE_META_KEY, SESSION_GENESIS } from "./sessionTypes.js";
-import { openHistoryReader } from "./sessionHistoryReader.js";
+import { openHistoryReader, SessionHistoryRefused } from "./sessionHistoryReader.js";
+import { selectForkPrefix, prepareForkConversation, copyForkConversation } from "./forkConversation.js";
+import { redactingSessionFor } from "../dataflow/redactingSession.js";
 import { authenticateJsonlContinuation, type AuthenticatedJsonlContinuation } from "./jsonlContinuation.js";
 import { realpathSync } from "node:fs";
+import { canonicalize } from "../utils/json.js";
 import { loadSessionEventHistory } from "./sessionEventHistory.js";
 import { assertSessionContinuationConfiguration, assertSessionContinuationControls, SessionContinuationControlRefused, type ContinuationControlRefusal } from "./sessionContinuationControls.js";
 
@@ -95,6 +98,10 @@ export interface ResumeReport {
 export interface ForkSessionParams extends OpenIdentity {
   readonly workspace: string;
   readonly parentSessionId: string;
+  /** Inclusive sealed parent turn; omit to snapshot its latest complete conversation. */
+  readonly forkTurn?: number;
+  /** Explicit legacy operation: record lineage without inheriting model context. */
+  readonly inheritConversation?: boolean;
   readonly claimant: RecoveryClaimant;
   readonly store?: SessionEventStore;
 }
@@ -310,23 +317,44 @@ export function resumeSession(params: ResumeSessionParams): { service: SessionSe
   }
 }
 
-/**
- * A new session whose `session/open` row names the parent's VERIFIED final row.
- * The parent may be sealed or live; it is read, never written.
- */
+/** A fresh signed conversation snapshot at a verified parent prefix. Parent rows are never written. */
 export function forkSession(params: ForkSessionParams): { service: SessionService; parent: SessionLineage } {
-  const rows = withReadOnlyStore(params, (store) => verifiedRows({ workspace: params.workspace, sessionId: params.parentSessionId, store }, true));
-  const last = rows[rows.length - 1]!;
-  const parent: SessionLineage = { sessionId: params.parentSessionId, finalEventHash: last.event_hash, seq: extractEnvelope(last.meta_json)!.seq };
+  const prepared = (() => {
+    try {
+      return withReadOnlyStore(params, store => {
+        const all = verifiedRows({ workspace: params.workspace, sessionId: params.parentSessionId, store }, true);
+        // Authenticate the actual selected rows too: a supplied store is not authority to change their roles or metadata.
+        const persisted = loadSessionEventHistory({ workspace: params.workspace, sessionId: params.parentSessionId }).events
+          .filter(row => extractEnvelope(row.meta_json) !== null);
+        if (canonicalize(all) !== canonicalize(persisted)) {
+          throw new SessionResumeRefused("TAMPERED", "the supplied parent rows differ from authenticated persisted history");
+        }
+        if (params.inheritConversation !== undefined && typeof params.inheritConversation !== "boolean") {
+          throw new SessionResumeRefused("UNSUPPORTED_FORMAT", "inheritConversation must be a boolean");
+        }
+        const selected = params.inheritConversation === false ? { rows: all, forkTurn: undefined } : selectForkPrefix(all, params.forkTurn);
+        const parts = params.inheritConversation === false ? [] : prepareForkConversation(params.workspace, selected.rows);
+        const last = selected.rows.at(-1)!;
+        const parent: SessionLineage = { sessionId: params.parentSessionId, finalEventHash: last.event_hash,
+          seq: extractEnvelope(last.meta_json)!.seq, ...(selected.forkTurn === undefined ? {} : { forkTurn: selected.forkTurn }) };
+        return { parent, parts };
+      });
+    } catch (error) {
+      if (error instanceof SessionHistoryRefused) throw new SessionResumeRefused(
+        error.code === "UNSUPPORTED_FORMAT" || error.code === "MISSING" ? error.code : error.code === "UNSEALED" ? "UNRECOVERED" : "TAMPERED", error.message);
+      throw error;
+    }
+  })();
   const store = params.store ?? openSessionEventStore(params.workspace);
   const service = new SessionService(params.workspace, store);
-  service.open({
-    runtime: params.runtime,
-    agentId: params.agentId,
-    harnessVersion: params.harnessVersion,
-    compositionDigest: params.compositionDigest,
-    policyDigest: params.policyDigest,
-    parent
-  });
-  return { service, parent };
+  try {
+    service.open({ runtime: params.runtime, agentId: params.agentId, harnessVersion: params.harnessVersion,
+      compositionDigest: params.compositionDigest, policyDigest: params.policyDigest, parent: prepared.parent });
+    copyForkConversation(redactingSessionFor(service), prepared.parts);
+    return { service, parent: prepared.parent };
+  } catch (error) {
+    // Retain failed child evidence without returning a partially copied context.
+    try { service.close({ reason: "fork_failed" }); } catch { service.disposeWithoutClosing(); }
+    throw error;
+  }
 }

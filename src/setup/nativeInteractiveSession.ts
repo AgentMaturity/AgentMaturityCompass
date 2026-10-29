@@ -278,7 +278,7 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
       io.log(`Session: ${sessionId ?? "created on first task"}${forkFrom === null ? "" : `; next task forks ${forkFrom}`}`);
     };
     showScope();
-    if (forkFrom !== null) io.log("The fork starts a new conversation with verified parent lineage; it does not copy the parent conversation.");
+    if (forkFrom !== null) io.log("The fork copies the verified parent conversation into a new signed session; unsupported history refuses before creating a child.");
     io.log("Type a task. /inspect shows the session, /verify checks evidence, /compact summarizes a reviewed range, /fork queues a child (/fork cancel clears the queue), /extensions manages signed text and commands, /exit leaves. Ctrl-C cancels an active command or exits at the prompt.");
     if (options.session !== undefined) io.log("The first reply also displays prior recorded assistant text from the resumed session.");
     while (!closed) {
@@ -342,7 +342,7 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
       }
       if (text === "/fork") {
         if (sessionId === null) io.error("Run a task or resume a session before forking.");
-        else { forkFrom = sessionId; io.log(`Fork queued from ${sessionId}. Your next task creates a new conversation with verified parent lineage; prior conversation is not copied. No child has been created yet.`); }
+        else { forkFrom = sessionId; io.log(`Fork queued from ${sessionId}. Your next task copies the verified conversation into a new signed session; unsupported history refuses. No child has been created yet.`); }
         continue;
       }
       if (text === "/inspect" || text === "/verify") {

@@ -80,6 +80,8 @@ export interface SessionLineage {
   readonly sessionId: string;
   readonly finalEventHash: string;
   readonly seq: number;
+  /** Inclusive parent turn selected for a conversation fork (0 before its first turn). */
+  readonly forkTurn?: number;
 }
 
 /** Re-open an existing, unsealed session from another process (AMC-1511). */
