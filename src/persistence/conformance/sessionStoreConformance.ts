@@ -599,16 +599,18 @@ export interface BackendParityReport {
  * real assertion instead of a flaky one.
  */
 export function compareBackendDeterminism(
-  backends: readonly ConformanceBackend[]
+  backends: readonly ConformanceBackend[],
+  /** Per-run event ids, the same for every backend. A shared database (Postgres) refuses an id another chain holds. */
+  eventIds: readonly [string, string, string] = ["00000000-0000-4000-8000-000000000001", "00000000-0000-4000-8000-000000000002", "00000000-0000-4000-8000-000000000003"]
 ): BackendParityReport {
   const errors: string[] = [];
   const eventHashes: Record<string, readonly string[]> = {};
   // Pinned ids and timestamps: the hash pre-image includes both, so leaving
   // them to randomUUID/Date.now would make any comparison meaningless.
   const pinned = [
-    { id: "00000000-0000-4000-8000-000000000001", ts: 1_700_000_000_000, eventType: "session/open" as const },
-    { id: "00000000-0000-4000-8000-000000000002", ts: 1_700_000_000_001, eventType: "turn/start" as const },
-    { id: "00000000-0000-4000-8000-000000000003", ts: 1_700_000_000_002, eventType: "session/close" as const }
+    { id: eventIds[0], ts: 1_700_000_000_000, eventType: "session/open" as const },
+    { id: eventIds[1], ts: 1_700_000_000_001, eventType: "turn/start" as const },
+    { id: eventIds[2], ts: 1_700_000_000_002, eventType: "session/close" as const }
   ];
   const sessionId = "00000000-0000-4000-8000-0000000000ff";
 

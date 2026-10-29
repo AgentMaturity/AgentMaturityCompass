@@ -52,7 +52,7 @@ export class LedgerMirrorError extends Error {
 
 const scopeText = (scope: MirrorScope): string => `${scope.kind}:${scope.id}`;
 const tablesOf = (scope: MirrorScope): readonly LedgerSideTable[] => LEDGER_SIDE_TABLES.filter((table) => table.scope === scope.kind);
-const mirrorHeadId = (chainId: string): string => `${chainId}/ledger-mirror`;
+export const mirrorHeadId = (chainId: string): string => `${chainId}/ledger-mirror`;
 
 /** A row as both databases agree on it: ints as numbers (`pg` returns BIGINT as text), text as strings. */
 function normalize(table: LedgerSideTable, raw: Record<string, unknown>, withLiveness: boolean): Row {
@@ -198,7 +198,7 @@ export class LedgerMirror {
       client.query("BEGIN");
       try {
         const pg = pgScopeRows(client, chainId, scope);
-        const problems = [...this.logProblems(client, chainId, scope, pg, signed), ...divergence(scope, pg, sqlite)];
+        const problems = [...logProblems(client, this.workspace, chainId, scope, pg, signed), ...divergence(scope, pg, sqlite)];
         if (problems.length > 0) throw new LedgerMirrorError("LEDGER_MIRROR_DIVERGED", problems);
         upsertScope(client, chainId, scope, sqlite, pg);
         if (scopeDigest(scope, pgScopeRows(client, chainId, scope)) !== digest) {
@@ -230,56 +230,26 @@ export class LedgerMirror {
     }
   }
 
-  /** The scope's Postgres rows against its last log entry, and the log against the workspace's signed head. */
-  private logProblems(client: SyncPgClient, chainId: string, scope: MirrorScope, pg: ScopeRows,
-    signed: ReturnType<typeof readSignedPostgresHeadForCheck>): string[] {
-    const problems = signed.error === null ? [] : [`LEDGER_MIRROR_DIVERGED: ${signed.error}`];
-    const head = client.query("SELECT head_seq FROM amc_chain_heads WHERE chain_id = $1", [mirrorHeadId(chainId)]).rows[0];
-    const hashAt = (seq: number): string | null => {
-      const row = client.query("SELECT entry_hash FROM amc_ledger_mirror_log WHERE chain_id = $1 AND mirror_seq = $2", [chainId, seq]).rows[0];
-      return row === undefined ? null : String(row.entry_hash);
-    };
-    problems.push(...signedFloorProblems(this.workspace, "ledger-mirror", chainId, signed.head, Number(head?.head_seq ?? 0) > 0, hashAt)
-      .map((problem) => `LEDGER_MIRROR_DIVERGED: ${problem}`));
-    const last = client.query("SELECT scope_digest FROM amc_ledger_mirror_log WHERE chain_id = $1 AND scope = $2 ORDER BY mirror_seq DESC LIMIT 1",
-      [chainId, scopeText(scope)]).rows[0];
-    const logged = last === undefined ? scopeDigest(scope, new Map()) : String(last.scope_digest);
-    if (scopeDigest(scope, pg) !== logged) problems.push(`LEDGER_MIRROR_DIVERGED: Postgres rows of ${scopeText(scope)} differ from the mirror log: changed outside AMC`);
-    return problems;
-  }
-
   /**
    * Parity of one scope, read in one Postgres snapshot: the checks `write()` makes, plus the SQLite rows' digest equal
    * to the last logged one. With `walk`, the whole mirror log is re-hashed and linked to its head as well. Never throws.
    */
   problems(db: Database.Database, scope: MirrorScope, options: { walk?: boolean } = {}): string[] {
     if (!this.active()) return [];
-    const sqlite = sqliteScopeRows(db, scope);
-    const empty = scopeDigest(scope, new Map());
     let chainId: string | null;
     try {
       chainId = readPostgresChainId(this.workspace);
     } catch (error) {
       return [`LEDGER_MIRROR_UNAVAILABLE: ${error instanceof Error ? error.message : String(error)}`];
     }
-    if (chainId === null) return scopeDigest(scope, sqlite) === empty ? [] : [`LEDGER_MIRROR_BEHIND: ${scopeText(scope)} is not mirrored to Postgres`];
+    if (chainId === null) return sqliteScopeDigest(db, scope) === scopeDigest(scope, new Map()) ? [] : [`LEDGER_MIRROR_BEHIND: ${scopeText(scope)} is not mirrored to Postgres`];
     const signed = readSignedPostgresHeadForCheck(this.workspace, "ledger-mirror");
     const client = (() => { try { return this.client(); } catch (error) { return asMirrorError(error); } })();
     if (client instanceof LedgerMirrorError) return [...client.problems.map((problem) => `LEDGER_MIRROR_UNAVAILABLE: ${problem}`)];
     try {
       client.query("BEGIN ISOLATION LEVEL REPEATABLE READ");
       try {
-        const pg = pgScopeRows(client, chainId, scope);
-        const problems = [...this.logProblems(client, chainId, scope, pg, signed), ...divergence(scope, pg, sqlite)];
-        const last = client.query("SELECT scope_digest FROM amc_ledger_mirror_log WHERE chain_id = $1 AND scope = $2 ORDER BY mirror_seq DESC LIMIT 1",
-          [chainId, scopeText(scope)]).rows[0];
-        const sqliteDigest = scopeDigest(scope, sqlite);
-        if (last === undefined ? sqliteDigest !== empty : String(last.scope_digest) !== sqliteDigest) {
-          problems.push(last === undefined ? `LEDGER_MIRROR_BEHIND: ${scopeText(scope)} is not mirrored to Postgres`
-            : `LEDGER_MIRROR_DIVERGED: the mirror log's digest of ${scopeText(scope)} differs from the SQLite ledger`);
-        }
-        if (options.walk) problems.push(...walkProblems(client, chainId));
-        return [...new Set(problems)];
+        return mirrorScopeProblems(client, this.workspace, chainId, db, scope, signed, options.walk === true);
       } finally {
         try { client.query("COMMIT"); } catch { /* a read-only snapshot; nothing to keep */ }
       }
@@ -292,6 +262,45 @@ export class LedgerMirror {
     this.pg?.close();
     this.pg = null;
   }
+}
+
+/** The scope's Postgres rows against its last log entry, and the log against the workspace's signed head. */
+function logProblems(client: SyncPgClient, workspace: string, chainId: string, scope: MirrorScope, pg: ScopeRows,
+  signed: ReturnType<typeof readSignedPostgresHeadForCheck>): string[] {
+  const problems = signed.error === null ? [] : [`LEDGER_MIRROR_DIVERGED: ${signed.error}`];
+  const head = client.query("SELECT head_seq FROM amc_chain_heads WHERE chain_id = $1", [mirrorHeadId(chainId)]).rows[0];
+  const hashAt = (seq: number): string | null => {
+    const row = client.query("SELECT entry_hash FROM amc_ledger_mirror_log WHERE chain_id = $1 AND mirror_seq = $2", [chainId, seq]).rows[0];
+    return row === undefined ? null : String(row.entry_hash);
+  };
+  problems.push(...signedFloorProblems(workspace, "ledger-mirror", chainId, signed.head, Number(head?.head_seq ?? 0) > 0, hashAt)
+    .map((problem) => `LEDGER_MIRROR_DIVERGED: ${problem}`));
+  const last = client.query("SELECT scope_digest FROM amc_ledger_mirror_log WHERE chain_id = $1 AND scope = $2 ORDER BY mirror_seq DESC LIMIT 1",
+    [chainId, scopeText(scope)]).rows[0];
+  const logged = last === undefined ? scopeDigest(scope, new Map()) : String(last.scope_digest);
+  if (scopeDigest(scope, pg) !== logged) problems.push(`LEDGER_MIRROR_DIVERGED: Postgres rows of ${scopeText(scope)} differ from the mirror log: changed outside AMC`);
+  return problems;
+}
+
+/**
+ * One scope's parity inside the caller's Postgres transaction: `write()`'s checks plus the SQLite rows' digest equal
+ * to the last logged one; with `walk`, the whole log too. `signed` is the floor to hold the log to: the workspace's
+ * file, or (migration, before it writes anything) the head it is about to sign.
+ */
+export function mirrorScopeProblems(client: SyncPgClient, workspace: string, chainId: string, db: Database.Database, scope: MirrorScope,
+  signed: ReturnType<typeof readSignedPostgresHeadForCheck>, walk: boolean): string[] {
+  const sqlite = sqliteScopeRows(db, scope);
+  const pg = pgScopeRows(client, chainId, scope);
+  const problems = [...logProblems(client, workspace, chainId, scope, pg, signed), ...divergence(scope, pg, sqlite)];
+  const last = client.query("SELECT scope_digest FROM amc_ledger_mirror_log WHERE chain_id = $1 AND scope = $2 ORDER BY mirror_seq DESC LIMIT 1",
+    [chainId, scopeText(scope)]).rows[0];
+  const sqliteDigest = scopeDigest(scope, sqlite);
+  if (last === undefined ? sqliteDigest !== scopeDigest(scope, new Map()) : String(last.scope_digest) !== sqliteDigest) {
+    problems.push(last === undefined ? `LEDGER_MIRROR_BEHIND: ${scopeText(scope)} is not mirrored to Postgres`
+      : `LEDGER_MIRROR_DIVERGED: the mirror log's digest of ${scopeText(scope)} differs from the SQLite ledger`);
+  }
+  if (walk) problems.push(...walkProblems(client, chainId));
+  return [...new Set(problems)];
 }
 
 /** The whole log: contiguous from 1, each entry hashing to itself and naming the previous, ending at the head row. */

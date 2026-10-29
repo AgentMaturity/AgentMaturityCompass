@@ -78,10 +78,10 @@ export function readPostgresChainId(workspace: string): string | null {
   return parsed.chainId;
 }
 
-export function ensurePostgresChainId(workspace: string): string {
+/** The recorded chain id, or `chainId` recorded now (migration passes the id it committed under). */
+export function ensurePostgresChainId(workspace: string, chainId: string = randomUUID()): string {
   const existing = readPostgresChainId(workspace);
   if (existing !== null) return existing;
-  const chainId = randomUUID();
   ensureDir(join(workspace, ".amc"));
   writeFileAtomic(chainIdPath(workspace), `${JSON.stringify({ v: 1, chainId }, null, 2)}\n`, 0o644);
   return chainId;

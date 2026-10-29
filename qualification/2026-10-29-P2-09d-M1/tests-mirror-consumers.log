@@ -1,0 +1,19 @@
+
+ RUN  v4.1.11 /Users/sid/AgentMaturityCompass-worktrees/s442cd919/work/amc-w7-pg-migrate
+
+{"ts":"2026-10-29T06:36:59.909Z","level":"warn","requestId":"0118decc-00ac-459f-be36-40038a757c21","method":"unknown","path":"unknown","status":403,"durationMs":1,"error":"Current authority no longer permits this operation"}
+{"ts":"2026-10-29T06:37:00.954Z","level":"warn","requestId":"53d41524-c979-471b-9d32-1de6a9302f20","method":"unknown","path":"unknown","status":403,"durationMs":0,"error":"Current authority no longer permits this operation"}
+{"ts":"2026-10-29T06:37:01.967Z","level":"warn","requestId":"dc96e4d8-88b9-4adb-9f3d-f346127a72a5","method":"unknown","path":"unknown","status":403,"durationMs":0,"error":"Current authority no longer permits this operation"}
+{"ts":"2026-10-29T06:37:02.946Z","level":"warn","requestId":"703074c0-d1e8-4ce2-8cb0-138cf096cfc7","method":"unknown","path":"unknown","status":403,"durationMs":0,"error":"Current authority no longer permits this operation"}
+ping
+OPENAI_BASE_URL=http://127.0.0.1:3210/openai
+OPENAI_API_BASE=http://127.0.0.1:3210/openai
+AMC_LLM_BASE_URL=http://127.0.0.1:3210/openai
+OPENAI_API_HOST=http://127.0.0.1:3210/openai
+CUSTOM_SUPERVISE_FLAG=enabled
+
+ Test Files  105 passed (105)
+      Tests  1260 passed (1260)
+   Start at  11:59:30
+   Duration  779.30s (transform 12.21s, setup 1.53s, import 99.56s, tests 1446.31s, environment 5ms)
+

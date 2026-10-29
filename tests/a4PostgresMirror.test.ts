@@ -4,7 +4,7 @@
  * contract tests do. Real-Postgres behaviour is the drill in docs/runbooks/POSTGRES_FAILOVER.md.
  */
 import { randomUUID } from "node:crypto";
-import { existsSync, mkdirSync, unlinkSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, unlinkSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import Database from "better-sqlite3";
@@ -23,7 +23,9 @@ import { openLedger } from "../src/ledger/ledger.js";
 import { mirrorEntryHash, scopeDigest } from "../src/persistence/postgres/postgresLedgerMirror.js";
 import { LEDGER_SIDE_TABLES } from "../src/persistence/postgres/postgresLedgerSideTables.js";
 import { migrateSqliteToPostgres } from "../src/persistence/postgres/postgresMigration.js";
-import { POSTGRES_URL_FILE_ENV, setDefaultPostgresDriver } from "../src/persistence/postgres/syncPgClient.js";
+import { ensurePostgresSchema } from "../src/persistence/postgres/postgresSchema.js";
+import { POSTGRES_URL_FILE_ENV, readPostgresUrl, setDefaultPostgresDriver, SyncPgClient } from "../src/persistence/postgres/syncPgClient.js";
+import { sha256Hex } from "../src/utils/hash.js";
 import { AGENT, cleanupGovernanceFixtures, governanceFixture } from "./governor/governanceFixture.js";
 
 vi.setConfig({ testTimeout: 120_000 });
@@ -252,6 +254,31 @@ describe("A4 on the Postgres ledger backend (P2-36)", () => {
     } finally {
       refused.close();
     }
+  });
+
+  test("migrate --to postgres refuses a mirror log that does not verify inside the copy's transaction: nothing written, and the run after the fix succeeds", () => {
+    const { workspace } = governanceFixture();
+    const { store, projectId } = project(workspace);
+    usePostgres(workspace, false);
+    const client = new SyncPgClient(readPostgresUrl(), { driverModule: FAKE_PG });
+    try { ensurePostgresSchema(client); } finally { client.close(); }
+    pgSql(workspace, (db) => db.exec(`CREATE TRIGGER skew AFTER INSERT ON amc_ledger_mirror_log
+      BEGIN UPDATE amc_ledger_mirror_log SET scope_digest = 'skewed' WHERE chain_id = NEW.chain_id AND mirror_seq = NEW.mirror_seq; END`));
+    const amc = join(workspace, ".amc");
+    // Every file but SQLite's shared-memory index, which any reader rewrites while the A4 store holds the ledger open.
+    const bytes = () => Object.fromEntries((readdirSync(amc, { recursive: true }) as string[]).sort()
+      .filter((path) => statSync(join(amc, path)).isFile() && !path.endsWith("-shm")).map((path) => [path, sha256Hex(readFileSync(join(amc, path)))]));
+    const before = bytes();
+    expect(() => migrateSqliteToPostgres(workspace, { pg: { driverModule: FAKE_PG } })).toThrow(/LEDGER_MIRROR_DIVERGED/);
+    expect(bytes()).toEqual(before);
+    expect(pgSql(workspace, (db) => ["a4_projects", "a4_transitions", "amc_ledger_mirror_log"]
+      .map((table) => (db.prepare(`SELECT count(*) AS n FROM ${table}`).get() as { n: number }).n))).toEqual([0, 0, 0]);
+
+    pgSql(workspace, (db) => db.exec("DROP TRIGGER skew"));
+    migrateSqliteToPostgres(workspace, { pg: { driverModule: FAKE_PG } });
+    const sides = bothSides(workspace, store, projectId);
+    expect(sides.pg).toEqual(sides.sqlite);
+    expect(verified(workspace, projectId)).toEqual([]);
   });
 
   test("migrate --to postgres carries existing A4 rows, compared row by row, and A4 keeps writing after the switch", () => {
