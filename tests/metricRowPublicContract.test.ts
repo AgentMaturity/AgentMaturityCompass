@@ -114,7 +114,7 @@ describe("metric validation input public TypeScript contracts", () => {
         target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ES2022, removeComments: true
       } }).outputText;
       const qualifiedSource = file === "src/score/metricValidity.ts"
-        ? reverseDeclaredMetricProjectionSharing(reverseDeclaredMetricStatisticsSharing(currentSource)) : currentSource;
+        ? reverseDeclaredMetricProjectionSharing(currentSource) : currentSource;
       expect(emit(qualifiedSource)).toBe(emit(originalSource));
     });
   }
@@ -151,41 +151,6 @@ function reverseDeclaredMetricProjectionSharing(source: string): string {
   walk(ast);
   expect(seen.size).toBe(74);
   expect(seen.size).toBe(map.projectionExpressions.length);
-  let restored = source;
-  for (const edit of replacements.sort((a, b) => b.start - a.start)) {
-    restored = restored.slice(0, edit.start) + edit.text + restored.slice(edit.end);
-  }
-  return restored;
-}
-
-
-// AXE-30 admits exactly the shared arithmetic import and these two delegation wrappers.
-// Restore their archived bodies only after checking the emitted wrappers, so every
-// unrelated runtime statement still participates in the whole-module equality above.
-function reverseDeclaredMetricStatisticsSharing(source: string): string {
-  const ast = ts.createSourceFile("metricValidity.ts", source, ts.ScriptTarget.ES2022, true);
-  const imports = ast.statements.filter((node): node is ts.ImportDeclaration =>
-    ts.isImportDeclaration(node) && ts.isStringLiteral(node.moduleSpecifier)
-      && node.moduleSpecifier.text === "../experiments/stats.js");
-  expect(imports).toHaveLength(1);
-  expect(imports[0].getText(ast)).toBe('import { mean as statsMean, standardDeviation } from "../experiments/stats.js";');
-  const emit = (text: string) => ts.transpileModule(text, { compilerOptions: {
-    target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ES2022, removeComments: true
-  } }).outputText;
-  const replacements = [{ start: imports[0].getStart(ast), end: imports[0].end, text: "" }];
-  for (const [name, delegatedCall] of [["mean", "statsMean(values)"], ["stdDev", "standardDeviation(values)"]] as const) {
-    const matches = ast.statements.filter((node): node is ts.FunctionDeclaration =>
-      ts.isFunctionDeclaration(node) && node.name?.text === name);
-    expect(matches).toHaveLength(1);
-    const helper = matches[0];
-    expect(emit(helper.getText(ast))).toBe(emit(`function ${name}(values: number[]): number {
-  return ${delegatedCall};
-}`));
-    const archived = inputOriginalAst.statements.find((node): node is ts.FunctionDeclaration =>
-      ts.isFunctionDeclaration(node) && node.name?.text === name);
-    if (!archived) throw new Error(`Missing archived metric statistic: ${name}`);
-    replacements.push({ start: helper.getStart(ast), end: helper.end, text: archived.getText(inputOriginalAst) });
-  }
   let restored = source;
   for (const edit of replacements.sort((a, b) => b.start - a.start)) {
     restored = restored.slice(0, edit.start) + edit.text + restored.slice(edit.end);

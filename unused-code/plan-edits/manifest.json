@@ -45,6 +45,20 @@
       "sha256": "d82e2dea74dd01a0c4a5a07c6b65387b3048226e7687db8607e8979298fec825"
     },
     {
+      "path": "dist/score/metricValidity.d.ts",
+      "issue": "GAP-WP05",
+      "baseCommit": "c71c28e2c10cad64c72600e042a2121b07b9b38e",
+      "archivePath": "unused-code/plan-edits/GAP-WP05/dist/score/metricValidity.d.ts.landed",
+      "sha256": "79f5e7444e26cd28a6b8cfecc257b87e980d22f16b918407f1cfae766b484b4c"
+    },
+    {
+      "path": "dist/score/metricValidity.js",
+      "issue": "GAP-WP05",
+      "baseCommit": "c71c28e2c10cad64c72600e042a2121b07b9b38e",
+      "archivePath": "unused-code/plan-edits/GAP-WP05/dist/score/metricValidity.js.landed",
+      "sha256": "a4dbfed9efbf5ecb84afb56734d297a03f3a2744ffb217d7fdb04885ae7284d9"
+    },
+    {
       "path": "dist/sdk/nativeAgentClient.d.ts",
       "issue": "P0-06",
       "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
@@ -239,6 +253,13 @@
       "baseCommit": "0b818f4f866dbd25226d5690cdf3f2e8f6837101",
       "archivePath": "unused-code/plan-edits/P0-09/src/bench/benchRegistryStore.ts.landed",
       "sha256": "404dd08ae477aa2ba6ff866170e69d853b4dc998e2a7e5a8327b187869d0401c"
+    },
+    {
+      "path": "src/benchmarks/replayBenchmarkCorpus.ts",
+      "issue": "GAP-WP05",
+      "baseCommit": "c71c28e2c10cad64c72600e042a2121b07b9b38e",
+      "archivePath": "unused-code/plan-edits/GAP-WP05/src/benchmarks/replayBenchmarkCorpus.ts.landed",
+      "sha256": "13ab83892c0d46f22e6594688102a16a2f4ed9a4d2ff7e75bd7ed5de4561e3ce"
     },
     {
       "path": "src/bom/bomVerifier.ts",
@@ -549,6 +570,13 @@
       "sha256": "fe408e7383b4fd9fe46d30b0018cc387b6241ef16817ec6876e6e2ba9606c404"
     },
     {
+      "path": "src/ops/governanceSlo.ts",
+      "issue": "GAP-WP05",
+      "baseCommit": "c71c28e2c10cad64c72600e042a2121b07b9b38e",
+      "archivePath": "unused-code/plan-edits/GAP-WP05/src/ops/governanceSlo.ts.landed",
+      "sha256": "7a8882ec1bb07b4492a37ee9bcd05db1e8bc1ad3dd2ce39ca02a2829cf7896b1"
+    },
+    {
       "path": "src/ops/policy.ts",
       "issue": "P1-15",
       "baseCommit": "cd04963e99c096e7114734304524be6dae3470e8",
@@ -561,6 +589,13 @@
       "baseCommit": "42dfa8375817abd903bb4357c2ffcc0ce3b7ac74",
       "archivePath": "unused-code/plan-edits/P1-08/src/ops/retention/retentionArchive.ts.landed",
       "sha256": "5b0f86069ea1a4efe7f0810274ee9701c91f1a4d664da490caf82d308a423445"
+    },
+    {
+      "path": "src/org/orgAggregation.ts",
+      "issue": "GAP-WP05",
+      "baseCommit": "c71c28e2c10cad64c72600e042a2121b07b9b38e",
+      "archivePath": "unused-code/plan-edits/GAP-WP05/src/org/orgAggregation.ts.landed",
+      "sha256": "46bb1c70c55eda2a2f503e6ffaee003873880409c981f7f09477a397a14f3ab1"
     },
     {
       "path": "src/org/orgRun.ts",
@@ -724,6 +759,20 @@
       "sha256": "c34cdc21c3e05fa1be379e0d6b18b1b886c4508288065fcd51d8cc98bd83705e"
     },
     {
+      "path": "src/score/metricValidity.ts",
+      "issue": "GAP-WP05",
+      "baseCommit": "c71c28e2c10cad64c72600e042a2121b07b9b38e",
+      "archivePath": "unused-code/plan-edits/GAP-WP05/src/score/metricValidity.ts.landed",
+      "sha256": "69cdaaf21ca0f89cb225c3c7866f6705c77eec85a7ba4e835e69886ee9ea1082"
+    },
+    {
+      "path": "src/score/outputAttestation.ts",
+      "issue": "GAP-WP37",
+      "baseCommit": "7828ff53343de5ce2bef89bdad6b743ccf8a47b9",
+      "archivePath": "unused-code/plan-edits/GAP-WP37/src/score/outputAttestation.ts.landed",
+      "sha256": "1db61d14b575c1d73497c7eec18e807621081887bfa98ec39ba60bd65bb4e071"
+    },
+    {
       "path": "src/sdk/nativeAgentClient.ts",
       "issue": "P0-06",
       "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
@@ -743,6 +792,13 @@
       "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
       "archivePath": "unused-code/plan-edits/P2-08/src/setup/setupWizard.ts.landed",
       "sha256": "519a773d0a2b418ab62a063504fe6e640d45071f0ffc342e50782b3a85f2734a"
+    },
+    {
+      "path": "src/skills/skillPrompt.ts",
+      "issue": "GAP-WP40",
+      "baseCommit": "81a625bd4c1d53153c9757c97096d3ca01312e04",
+      "archivePath": "unused-code/plan-edits/GAP-WP40/src/skills/skillPrompt.ts.landed",
+      "sha256": "e0605cc537cebbc7fb87298acb9cf8e64a621057eea7f3bdc7abd6bc9678d8c5"
     },
     {
       "path": "src/standard/externalEvidenceProfile.ts",
@@ -792,6 +848,13 @@
       "baseCommit": "cd04963e99c096e7114734304524be6dae3470e8",
       "archivePath": "unused-code/plan-edits/P1-05/src/toolhub/toolhubValidators.ts.landed",
       "sha256": "3f3d55b71ab48147ea436d7b9b165ac75cbe8e7f2a40b6f95af40d7f5dfeb176"
+    },
+    {
+      "path": "src/tools/builtin/readBeforeEdit.ts",
+      "issue": "GAP-WP34",
+      "baseCommit": "7828ff53343de5ce2bef89bdad6b743ccf8a47b9",
+      "archivePath": "unused-code/plan-edits/GAP-WP34/src/tools/builtin/readBeforeEdit.ts.landed",
+      "sha256": "a776895cb04b874555caf063ede3f63450aa2e639f5a544e0144ecc53e21dda8"
     },
     {
       "path": "src/transformation/transformAttestations.ts",
