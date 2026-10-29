@@ -42,10 +42,10 @@ import type { LoopNotification } from "./agent/loopTypes.js";
 import { echoToolSeam } from "./agent/echoTool.js";
 import { agentToolset, type AgentToolset } from "./agent/agentToolset.js";
 import { runLease } from "./leases/runLease.js";
-import { selectSupportedNativeTools, type NativeToolCapability } from "./agent/nativeToolCapabilities.js";
-import type { MountedNativeMcpServer, NativeMcpGrant } from "./mcp/nativeMcpClient.js";
+import { selectSupportedNativeTools } from "./agent/nativeToolCapabilities.js";
+import type { MountedNativeMcpServer } from "./mcp/nativeMcpClient.js";
 import { resolveNativeValidationSelection } from "./setup/nativeValidationConfig.js";
-import { NativeMcpConfigError, type LoadedNativeMcpConfiguration } from "./setup/nativeMcpConfig.js";
+import { NativeMcpConfigError, type ReviewedNativeMcpServer } from "./setup/nativeMcpConfig.js";
 import { delegateTool } from "./agent/delegateTool.js";
 import { DEFAULT_MAX_DELEGATION_DEPTH } from "./agent/delegationIdentity.js";
 import { parseDelegationScope } from "./agent/delegationScope.js";
@@ -400,9 +400,6 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       if (opts.mcpConfigSha256 !== undefined && opts.mcpConfig === undefined) {
         io.error("--mcp-config-sha256 requires --mcp-config."); io.fail(); return;
       }
-      if (opts.mcpConfigSha256 !== undefined && opts.mcpConfigSha256.length !== opts.mcpConfig!.length) {
-        io.error("Give one --mcp-config-sha256 per --mcp-config, in the same order."); io.fail(); return;
-      }
       if (opts.mcpConfig !== undefined && opts.approvalException !== undefined) {
         io.error("MCP tools require the actual signed approval gate; approval exceptions are not accepted."); io.fail(); return;
       }
@@ -411,21 +408,14 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       if (opts.interactiveApprovals && gate === undefined) {
         io.error("--interactive-approvals requires --approve-tools to raise actual signed requests."); io.fail(); return;
       }
-      // Every server passes the same review: its own pinned config, catalog digest and grants, the one signed allowlist and approval class.
-      const mcpServers: { config: LoadedNativeMcpConfiguration; review: { expectedCatalogDigest: string; grants: readonly NativeMcpGrant[]; capabilities: readonly NativeToolCapability[] } }[] = [];
+      let mcpServers: readonly ReviewedNativeMcpServer[] = [];
       if (opts.mcpConfig !== undefined) {
         if (opts.tools !== "workspace" || gate === undefined) {
           io.error("--mcp-config requires explicit --tools workspace and --approve-tools with matching grant action classes."); io.fail(); return;
         }
         try {
-          const { loadNativeMcpConfiguration, requireReviewedNativeMcpGrants } = await import("./setup/nativeMcpConfig.js");
-          for (const [index, path] of opts.mcpConfig.entries()) {
-            const config = loadNativeMcpConfiguration(path, opts.mcpConfigSha256?.[index]);
-            if (mcpServers.some(entry => entry.config.config.server.id === config.config.server.id)) {
-              throw new NativeMcpConfigError("Each --mcp-config must name a distinct server id.");
-            }
-            mcpServers.push({ config, review: requireReviewedNativeMcpGrants(config, process.cwd(), gate.actionClass) });
-          }
+          const { reviewNativeMcpConfigurations } = await import("./setup/nativeMcpConfig.js");
+          mcpServers = reviewNativeMcpConfigurations(opts.mcpConfig, opts.mcpConfigSha256, process.cwd(), gate.actionClass);
         } catch (error) {
           io.error(error instanceof NativeMcpConfigError ? error.message : "MCP preflight refused. Review the config digest, catalog pin, explicit grants, matching signed allowlist and approval class; no server was started.");
           io.fail(); return;

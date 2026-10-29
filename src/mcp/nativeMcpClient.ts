@@ -122,7 +122,7 @@ function connectionFailure(transport: Transport, error: unknown, fallback: strin
 }
 
 /** PXB-01: without maxTotalMs, progress may extend one call to this bound (never below timeoutMs). */
-export const NATIVE_MCP_DEFAULT_MAX_TOTAL_MS = 300_000;
+const NATIVE_MCP_DEFAULT_MAX_TOTAL_MS = 300_000;
 export const NATIVE_MCP_MAX_TOTAL_LIMIT_MS = 3_600_000;
 /** PXB-04: retained server stderr and logging notifications, per connection. */
 export const NATIVE_MCP_DIAGNOSTICS_BYTES = 16 * 1024;
@@ -316,7 +316,7 @@ export async function discoverNativeMcpCatalog(server: NativeMcpServer, workspac
 }
 
 /** Server-provided guidance, kept as labelled typed data: never system authority, model context or part of the digest. */
-export interface NativeMcpServerInstructions {
+interface NativeMcpServerInstructions {
   readonly kind: "mcp-server-instructions";
   readonly serverId: string;
   readonly text: string;

@@ -205,6 +205,24 @@ export function requireReviewedNativeMcpGrants(loaded: LoadedNativeMcpConfigurat
   return { expectedCatalogDigest, grants, capabilities };
 }
 
+export interface ReviewedNativeMcpServer {
+  readonly config: LoadedNativeMcpConfiguration;
+  readonly review: ReturnType<typeof requireReviewedNativeMcpGrants>;
+}
+
+/** Several servers in one run, each with its own pinned bytes, digest and grants under the one signed allowlist and approval class. */
+export function reviewNativeMcpConfigurations(paths: readonly string[], pins: readonly string[] | undefined, workspace: string,
+  approvalClass: ActionClass): ReviewedNativeMcpServer[] {
+  if (pins !== undefined && pins.length !== paths.length) return refuse("Give one --mcp-config-sha256 per --mcp-config, in the same order.");
+  const reviewed: ReviewedNativeMcpServer[] = [];
+  for (const [index, path] of paths.entries()) {
+    const config = loadNativeMcpConfiguration(path, pins?.[index]);
+    if (reviewed.some(entry => entry.config.config.server.id === config.config.server.id)) return refuse("Each --mcp-config must name a distinct server id.");
+    reviewed.push({ config, review: requireReviewedNativeMcpGrants(config, workspace, approvalClass) });
+  }
+  return reviewed;
+}
+
 /** Values exist only in the private server launch object, never the config/receipt. */
 export async function resolveNativeMcpServer(config: NativeMcpConfiguration, options: {
   readonly workspace: string;
