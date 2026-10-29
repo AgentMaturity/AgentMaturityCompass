@@ -4,6 +4,7 @@ import inquirer from "inquirer";
 import YAML from "yaml";
 import { detectAllRuntimes } from "./runtimes/index.js";
 import { ensureSigningKeys, getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "./crypto/keys.js";
+import { stripProviderKeys } from "./utils/providerKeys.js";
 import type { AMCConfig, AMCConfigProfileName, RiskTier } from "./types.js";
 import { questionIds } from "./diagnostic/questionBank.js";
 import { createSignedTargetProfile, defaultTargetMapping, saveTargetProfile } from "./targets/targetProfile.js";
@@ -442,7 +443,7 @@ export function runDoctor(workspace = process.cwd()): {
     if (detection.available) {
       available.push(detection.name);
       lines.push(`OK ${detection.name}: ${detection.resolvedPath}`);
-      const versionAttempt = spawnSync(detection.command, ["--version"], { encoding: "utf8" });
+      const versionAttempt = spawnSync(detection.command, ["--version"], { encoding: "utf8", env: stripProviderKeys(process.env) });
       if (versionAttempt.status === 0) {
         const version = `${versionAttempt.stdout ?? ""}${versionAttempt.stderr ?? ""}`.trim() || "version output empty";
         lines.push(`  wrap-check: PASS (--version) -> ${version}`);

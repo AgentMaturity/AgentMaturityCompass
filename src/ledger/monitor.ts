@@ -276,8 +276,8 @@ async function spawnMonitoredProcess(params: {
     ledger.sealSession(sessionId);
     // The exit code goes BACK to the caller, not only into the ledger. It was
     // always recorded as `runtime_exit_code`; discarding it here is why
-    // `runAdapterCommand`'s SANDBOX branch could return a hardcoded `exitCode: 0`
-    // and report a crashed foreign agent as a success.
+    // `runAdapterCommand`'s SANDBOX branch once returned a hardcoded `exitCode: 0`
+    // and reported a crashed foreign agent as a success (fixed in WP36, AXR-05).
     return { sessionId, exitCode: outcome.exitCode ?? 1, terminatedBy: outcome.terminatedBy ?? null };
   } finally {
     ledger.close();
@@ -310,7 +310,12 @@ export async function wrapRuntime(
   })).sessionId;
 }
 
-export async function wrapAny(
+export async function wrapAny(...params: Parameters<typeof wrapAnyOutcome>): Promise<string> {
+  return (await wrapAnyOutcome(...params)).sessionId;
+}
+
+/** `wrapAny` that also returns the process's exit code, for callers that report it (a sandboxed run, AXR-05). */
+export async function wrapAnyOutcome(
   command: string,
   args: string[],
   opts: {
@@ -323,9 +328,9 @@ export async function wrapAny(
     /** Values to scrub from the recorded argv and output: a lease handed to the process, above all. */
     scrubValues?: readonly string[];
   }
-): Promise<string> {
+): Promise<{ sessionId: string; exitCode: number; terminatedBy: string | null }> {
   const agentId = resolveAgentId(opts.workspace, opts.agentId);
-  return (await spawnMonitoredProcess({
+  return spawnMonitoredProcess({
     workspace: opts.workspace,
     runtime: "any",
     command,
@@ -339,7 +344,7 @@ export async function wrapAny(
       agentId,
       trustTier: "OBSERVED"
     }
-  })).sessionId;
+  });
 }
 
 /**
@@ -347,8 +352,8 @@ export async function wrapAny(
  *
  * The narrow entry point P6.1b needs, and deliberately not `runAdapterCommand`:
  * that requires AMC Studio to be running, mints its own session id, returns only
- * an exit code with no child text, and hardcodes `exitCode: 0` on its SANDBOX
- * branch. This composes the same primitives at the level a subagent runner
+ * an exit code with no child text (its SANDBOX branch hardcoded `exitCode: 0`
+ * until WP36). This composes the same primitives at the level a subagent runner
  * actually needs.
  *
  * Differences from `superviseProcess`, each load-bearing:

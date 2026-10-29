@@ -222,7 +222,8 @@ export async function runAdapterCommand(input: AdapterRunInput): Promise<Adapter
     providerRoute: routePrefix,
     model,
     workOrderId: input.workOrderId ?? null,
-    includeProxyEnv: runtimeConfig.supervise.includeProxyEnv
+    includeProxyEnv: runtimeConfig.supervise.includeProxyEnv,
+    inheritHostEnv: mode !== "SANDBOX"
   });
   env.AMC_REQUESTED_MODE = forcedSimulate ? "SIMULATE" : "EXECUTE";
   env.AMC_ADAPTER_ROUTE = routePrefix;
@@ -243,8 +244,8 @@ export async function runAdapterCommand(input: AdapterRunInput): Promise<Adapter
   }
 
   if (mode === "SANDBOX") {
-    // The environment (the lease, the vault passphrase, operator secrets) reaches the container by name (`docker run -e
-    // NAME`), never in argv, which the sandbox attestation and the process_start row record.
+    // Only the adapter's variables (the lease among them) reach the container, by name (`docker run -e NAME`, the value
+    // from docker's own environment), never in argv, which the sandbox attestation and the process_start row record.
     const cmd = [shellQuote(executable), ...args.map((arg) => shellQuote(arg))].join(" ");
       assertLaunch();
       const sandbox = await runSandboxCommand({
@@ -254,6 +255,7 @@ export async function runAdapterCommand(input: AdapterRunInput): Promise<Adapter
         args: ["-lc", `exec ${cmd}`],
         env: Object.fromEntries(Object.entries(env).filter((row): row is [string, string] => typeof row[1] === "string")),
         scrubValues: [lease.token],
+        leaseId: lease.payload.leaseId,
         gatewayRoute: routeUrl,
         gatewayProxyUrl: activeProxyBase
       }, assertLaunch);
@@ -268,7 +270,8 @@ export async function runAdapterCommand(input: AdapterRunInput): Promise<Adapter
       leaseExpiresTs: lease.payload.expiresTs,
       forcedSimulate,
       dashboardUrl: status.state ? `http://${status.state.host}:${status.state.dashboardPort}` : null,
-      exitCode: 0
+      // docker run's status is the container's (AXR-05); a run that never reported one is already 1, never 0.
+      exitCode: sandbox.exitCode
     };
   }
 

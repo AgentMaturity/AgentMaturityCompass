@@ -434,7 +434,6 @@
     {"id":"658621aeb8df3e2e0dcaa5f90829e9bdad92ab08722fc7aededf8be6bbfbb77b","paths":["diagnostic/questionScoreExplainability.ts","diagnostic/questionScoreExplainability.ts"],"format":"typescript"},
     {"id":"65ec5a5b12f1928b60ebf9185607e3abc03fe1896cb48693c253c6dda8f38e2f","paths":["adapters/builtins/autogenCli.ts","adapters/builtins/crewaiCli.ts"],"format":"typescript"},
     {"id":"65f460c51914f0bc396c9427a1b3e47c6708ad7c43463b04e5cd346ae36bffa9","paths":["assurance/packs/advancedThreatsPack.ts","assurance/packs/timingSideChannelPack.ts"],"format":"typescript"},
-    {"id":"65f82ab79a319257d4d1289a608fa8d20ea42491ef0828a6b8e55896b0f975d7","paths":["ledger/monitor.ts","tools/builtin/bashTool.ts"],"format":"typescript"},
     {"id":"661076b297714d166e650d2f4e9e691855660e117ee23d6aa5e982af7da43a89","paths":["score/factSimulationBoundary.ts","score/simulationValidity.ts"],"format":"typescript"},
     {"id":"6652cd3d99028d4cbcb62bdf8ba4657a123e3cd0971f395a8ebfcd4b2066ea8a","paths":["lifecycle/decisionReceipt.ts","lifecycle/lifecycleRunArtifact.ts"],"format":"typescript"},
     {"id":"66a56b48ac4fdeaa6828dcb0e60ddec2742cbd89a3145abdf31199e4d69e9a8d","paths":["benchmarks/helmProviderDrift.ts","benchmarks/patronusProviderDrift.ts"],"format":"typescript"},

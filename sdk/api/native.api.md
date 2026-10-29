@@ -85,6 +85,7 @@ export interface AMCNativeClientOptions {
         ...string[]
     ];
     readonly env?: NodeJS.ProcessEnv;
+    readonly inheritEnv?: boolean;
     readonly timeoutMs?: number;
     readonly startupSignal?: AbortSignal;
     readonly eventBuffer?: AMCNativeEventBufferOptions;

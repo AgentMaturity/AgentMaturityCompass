@@ -14,6 +14,7 @@ import { NATIVE_AUDIO_INPUT_FORMAT, type NativeAudioPart } from "../attachments/
 import { advertisesNativeAudio, materializeAcpAudio, nativeAudioPartsToAcp } from "../acp/acpAudioInput.js";
 import { MAX_WIRE_LINE_BYTES } from "../wire/ndjsonFraming.js";
 import { forwardNativeShellWarnings } from "./nativeShellWarnings.js";
+import { runtimeChildEnv } from "../utils/providerKeys.js";
 import { EXECUTION_API_VERSION, parseExecutionStatus, type ExecutionStatus } from "../execution/executionContract.js";
 import { admitVerifierReport, approveThroughCli, pendingApprovals, reportedExecution, runPinnedCli, type AMCNativeApproval,
   type AMCNativePendingApproval, type PinnedCli } from "./nativeCli.js";
@@ -74,7 +75,14 @@ export {
   readonly maxSteps?: number;
   /** Defaults to the CLI shipped in this same installed package. Never resolves another AMC from PATH. */
   readonly command?: readonly [string, ...string[]];
+  /**
+   * The child's environment beside a minimal base: PATH, HOME, user, locale and temp variables, the parent's non-secret
+   * `AMC_*` settings (a monitor pin, AMC_HOME) and the vault passphrase and credential-file path the runtime needs.
+   * Nothing else (AMC_TOKEN, a parent lease, a provider key) is inherited unless `inheritEnv` is true.
+   */
   readonly env?: NodeJS.ProcessEnv;
+  /** Opt in to merging the whole parent environment under `env` (the pre-WP36 default). */
+  readonly inheritEnv?: boolean;
   readonly timeoutMs?: number;
   /** Cancel process initialization before it has returned a usable client. */
   readonly startupSignal?: AbortSignal;
@@ -365,7 +373,7 @@ export class AMCNativeClient {
     }
     // The cold verifier must use the very same pinned executable, even if the caller edits its options array.
     this.command = Object.freeze([...command]) as readonly [string, ...string[]];
-    this.env = { ...process.env, ...options.env };
+    this.env = { ...(options.inheritEnv === true ? process.env : runtimeChildEnv(process.env)), ...options.env };
     this.agentId = options.agentId ?? "default";
     const args = [...this.command.slice(1), "acp", "--provider", options.provider];
     for (const [flag, value] of [["--model", options.model], ["--credential", options.credential],

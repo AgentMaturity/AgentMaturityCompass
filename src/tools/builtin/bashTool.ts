@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { runProcess } from "../../exec/runProcess.js";
-import { stripProviderKeys } from "../../utils/providerKeys.js";
+import { commandEnv } from "../../utils/providerKeys.js";
 import { defineTool } from "../toolRegistry.js";
 import { DefiniteFailureError, type ToolDefinition, type ToolExecution } from "../toolTypes.js";
 import type { SandboxOutcome } from "../../sandbox/sandboxTypes.js";
@@ -86,10 +86,10 @@ export function bashTool(deps: BashToolDeps = {}): ToolDefinition {
       const running = runProcess({
         argv: ["/bin/sh", "-c", args.command],
         cwd: execution.workspace,
-        // The provider keys AMC holds are stripped, exactly as the wrap path
-        // does. A shell that can echo $ANTHROPIC_API_KEY into model context is
-        // a credential disclosure with extra steps.
-        env: definedEnv(stripProviderKeys(process.env)),
+        // An allow-list, as the confined shells use: a shell that can echo
+        // $ANTHROPIC_API_KEY or $AMC_VAULT_PASSPHRASE into model context is a
+        // credential disclosure with extra steps (WP36, DXB-14).
+        env: commandEnv(process.env),
         stdin: "ignore",
         stdout: "capture",
         stderr: "capture",
@@ -126,12 +126,4 @@ export function bashTool(deps: BashToolDeps = {}): ToolDefinition {
       };
     }
   });
-}
-
-function definedEnv(env: NodeJS.ProcessEnv): Record<string, string> {
-  const out: Record<string, string> = {};
-  for (const [key, value] of Object.entries(env)) {
-    if (typeof value === "string") out[key] = value;
-  }
-  return out;
 }
