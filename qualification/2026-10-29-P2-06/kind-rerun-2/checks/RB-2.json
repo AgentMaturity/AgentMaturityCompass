@@ -1,0 +1,10 @@
+{
+  "id": "RB-2",
+  "scenario": "Rollback across a migration",
+  "status": "not_run",
+  "reason": "UPG-1 did not record a pre-upgrade revision and backup",
+  "blockedBy": [
+    "UPG-1"
+  ],
+  "durationMs": 0
+}

@@ -81,3 +81,37 @@ The D2, D4 and D1/D3 fixes are not what this run measures. These are two harness
 - **H2, restores run N-1 code.** `prepareRestoreNamespace` and RB-2 start their tool pods with `--image-a` (`checks/backup.mjs`, `checks/rollback.mjs`), so BR-1 and BR-3 run N-1's `amc backup restore`, which predates the D4 fix. The restored ledger shows schema migrations 1 to 14 (N-1's), confirming it. BR-3's `tenantChanged: true` therefore says nothing about N's D4 fix. Root cause: the tool-pod image is tied to the image the release runs after RB-2 (N-1), not to the image under qualification.
 
 Platform lanes were not rerun, so `docs/PLATFORM_MATRIX.md` is unchanged.
+
+## Rerun 2 after fixing H1 and H2 (`49151b1ff`)
+
+Folder `kind-rerun-2/`, harness at `49151b1ff`, no operator workaround, the same placeholder targets.
+
+- **Images:**
+  - N is `58bbdff83`, built with the repository Dockerfile and no patch: `amc-studio@sha256:bb3cbb75…`.
+  - N-1 is `545bfe98c` with the same two local patches as before: `amc-studio@sha256:6a0ab624…`.
+- **Harness changes:**
+  - INS-1 and every check that needs a running release now qualify N on `amc-rd`.
+  - UPG-* and RB-* start from N-1 on a second release, `amc-rd-upg`.
+  - BR restore pods run N; the restored ledger now shows migrations 1 to 16, which are N's.
+  - RB-2 still restores with N-1 on purpose, because that check is N-1 restoring its own pre-upgrade backup.
+
+| Check | `kind/` | `kind-rerun/` | `kind-rerun-2/` |
+|---|---|---|---|
+| INS-1 | failed: not Ready (D2) | failed: not Ready (N-1 installed) | failed **only** on "KeyProvider and ledger encryption on" (D5). N was Ready in 16.8 s, `helm test` verified, and deploy-verify passed all five checks: **the D2 fix holds** |
+| INS-2 | passed | passed | passed |
+| UPG-1 | failed | failed | failed: N-1 not Ready within 300 s |
+| RB-1 | failed | failed | failed (UPG-1 left no running N-1 release) |
+| RB-2 | not run | not run | not run (UPG-1 left no backup) |
+| BR-1 | failed | failed | **passed** (backup during a turn, restored by N into a new namespace and volume, prefix and integrity ok) |
+| BR-3 | failed: tenant changed (D4) | failed (restore ran N-1) | **passed**: a flipped byte, a withheld key and a cross-tenant `--force` restore are all refused, with the tenant unchanged. **The D4 fix holds** |
+| CR-2 | failed | failed | **passed** (drain evicted the pod, Ready again in 10.6 s, chain intact, governed turn verified) |
+| The other 14 | not run | not run | not run (same reasons) |
+
+Totals: 4 passed (INS-2, BR-1, BR-3, CR-2), 3 failed (INS-1, UPG-1, RB-1), 15 not run. The receipt counts not-run as failed, so 4 of 22 passed.
+
+No new product defect. The two remaining causes:
+
+- **UPG-1 and RB-1: N-1 is `545bfe98c`, which predates the D2 fix.** A fresh N-1 install never becomes Ready (`VALUE_POLICY_UNTRUSTED: file missing`, as recorded in `kind-rerun/checks/INS-1.json` with the same image). The upgrade path can pass only with an N-1 that contains the D2 fix (`69b45298b` or later) and an older ledger schema than N's. No such build exists yet: N-1 and N would have to differ by a migration after `69b45298b`.
+- **INS-1: D5.** The chart cannot select a KeyProvider or switch on ledger encryption (P2-08, P2-09).
+
+**Harness fix found during this rerun.** `kind load docker-image A B` loads both images from one archive, and the second image gets no digest in containerd, so `kind-image-digest.mjs` failed for it. `reference-deployment.yml` now loads each image separately. Locally, image N was reloaded on its own.
