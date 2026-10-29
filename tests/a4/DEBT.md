@@ -34,10 +34,10 @@ marked **pending** has no test yet; the reason is given. Nothing here is skipped
 | 7 | Unsupported integrations | covered | `scenario07UnsupportedIntegrations.test.ts` | UNSUPPORTED_INTEGRATION, PATH:other, STATUS:preview, OWNER_ACKNOWLEDGED, A4_NOT_ACKNOWLEDGEABLE |
 | 8 | Failed deployment | covered | `scenario08FailedDeployment.test.ts` | DEPLOYMENT_UNCHECKED, RECEIPT_NOT_SUCCEEDED, READYZ_FAILED, REDIRECT_REFUSED, DESTINATION_MISMATCH, PACKAGE_DIGEST_MISMATCH, DEPLOYMENT_IDENTITY_NOT_EVALUATED |
 | 9 | Rollback | covered (freeze-first for high/critical pending) | `scenario09Rollback.test.ts` | EFFECT_QUORUM_INSUFFICIENT, SOD_VIOLATION, RELEASE_ROLLED_BACK, PACKAGE_DIGEST_MISMATCH |
-| 10 | Hold / freeze / kill switch | covered (freeze and kill switch pending) | `scenario10HoldFreeze.test.ts` | ON_HOLD, NOT_ON_HOLD |
+| 10 | Hold / freeze / kill switch | covered (freeze and kill switch pending) | `scenario10HoldFreeze.test.ts` | A4_ON_HOLD (ON_HOLD), NOT_ON_HOLD |
 | 11 | Single-user workspace | covered (hosted rows pending) | `scenario11SingleUser.test.ts`, `scenario15AcknowledgedBlocker.test.ts`, `guards.test.ts` | SOD_DEGRADED_SINGLE_USER (selfApproved), SOD_VIOLATION after the ratchet, SOD_DEGRADED_SELF_PROVISIONED |
 | 12 | Vault locked / no-sign | covered | `scenario12VaultLocked.test.ts` | A4_VAULT_LOCKED (423), VAULT_LOCKED, UNSIGNED_STORE |
-| 13 | Tampered record | covered | `scenario13TamperedRecord.test.ts`, `recordFixtures.test.ts` | A4_SIDE_ROW_MISMATCH, A4_CHAIN_INVALID, A4_INTEGRITY_FAILED |
+| 13 | Tampered record | covered | `scenario13TamperedRecord.test.ts`, `recordFixtures.test.ts` | A4_SIDE_ROW_MISMATCH, A4_CHAIN_INVALID, A4_INTEGRITY_FAILED (readiness BLOCKED) |
 | 14 | `outcome_unknown` lockout | covered | `scenario14OutcomeUnknown.test.ts` | OUTCOME_UNKNOWN_OPEN, EXECUTION:<id>, A4_NOT_READY, SOD_VIOLATION |
 | 15 | Acknowledged blocker | covered | `scenario15AcknowledgedBlocker.test.ts`, `scenario07…`, `guards.test.ts` | SOD_DEGRADED_SELF_PROVISIONED, OWNER_ACKNOWLEDGED (bound, never READY, expires after 90 days), A4_GATE_STALE |
 | 16 | Effect drift and crash | covered | `scenario16EffectDriftCrash.test.ts` | EFFECT_QUORUM_INSUFFICIENT, SOD_VIOLATION, EFFECT_FAILED (RESOURCE_DRIFTED signedConfigs.tools, process_lost), EFFECT_RUNNING / EFFECT_NOT_RETRYABLE |
@@ -146,15 +146,25 @@ processes of `twoProcessRace.test.ts` run `dist/`, so the store dedupe they exer
 Notes: at the router, `priorReplay` answers a recorded request before the store runs, so the store's dedupe (D1 to D3)
 is reachable directly (`storeDedupe.test.ts`) and by two processes that both pass the router check.
 
-## Follow-ups found (not fixed here; no security or fail-open defect was found)
+## Follow-ups found (no security or fail-open defect was found)
 
-- **Proposed P2-41 · A4 hold refusal code.** Design §17 names `409 A4_ON_HOLD` for every mutation on a held project;
-  the routes answer `409 A4_NOT_READY` with `reasonCodes: ["ON_HOLD"]`, a second hold included (the `A4_ON_HOLD`
-  throw in `autoHold` is reached only by the automatic hold). Fail-closed either way; only the code differs from the
-  design.
-- **Proposed P2-41 (same item) · tampered readiness.** Design §17 says readiness reads BLOCKED on a tampered record;
-  `GET …/readiness` answers `409 A4_INTEGRITY_FAILED` instead (no body to read BLOCKED from). Fail-closed; the
-  wording or the route should be aligned.
+- **Closed by P2-41 · A4 hold refusal code.** Design §17 names `409 A4_ON_HOLD` for every mutation on a held project;
+  the routes answered `409 A4_NOT_READY` with `reasonCodes: ["ON_HOLD"]`, a second hold included. `assertAllowed`
+  (src/a4/a4Gates.ts) now answers `409 A4_ON_HOLD` whenever the action's reason codes name `ON_HOLD`, with the same
+  `detail` (`reasonCodes`, `items`); 403 role refusals and `FREEZE_ACTIVE` still come first, and a rollback still
+  settles `ON_HOLD`. `scenario10HoldFreeze.test.ts` asserts it for a stage write, a gate request and a second hold.
+- **Closed by P2-41 (same item) · tampered readiness.** Design §17 says readiness reads BLOCKED on a tampered record;
+  `GET …/readiness` answered `409 A4_INTEGRITY_FAILED` whose `detail` listed the failed rows (table and key, member
+  principal keys included) before membership was checked. It now answers `409 A4_INTEGRITY_FAILED` with the fixed
+  `detail: { status: "BLOCKED", reasonCodes: ["A4_INTEGRITY_FAILED"] }` and no row named. The status stays 409, not a
+  200 readiness document: no readiness can be evaluated over rows that fail verification, and the member rows that
+  decide who may read the project are among them, so the answer stays a fail-closed refusal (design text in
+  docs/A4_FORGE.md "The journey"). `scenario13TamperedRecord.test.ts` asserts the verdict and that the body names no
+  table, principal or problem. Other project routes still return the store's problem list in `detail` (see below).
+- **Follow-up (P2-41 found) · integrity problems before membership.** Every project route but readiness answers a
+  record that fails verification with the store's problem list in `detail`, which names side-row keys (member
+  principal keys included), and does so before `assertVisible`. Only someone who could alter the database file causes
+  it, and the 409 itself is fail-closed; a later item may move the list behind membership or to `GET …/verify` only.
 - **Closed by P2-42 · Adapt cannot propose on the shipped catalog.** With the shipped admitted catalog, Adapt carried
   the compiled plan (about 140 to 150 KiB: the catalog lock, the evidence plan, the requirements) twice, in
   Understand's facts and in the proposal, so every proposal exceeded `SPEC_ROOM_FOR_BUILD` (240 KiB) and

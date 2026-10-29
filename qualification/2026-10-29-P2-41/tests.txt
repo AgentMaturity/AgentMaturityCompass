@@ -1,0 +1,25 @@
+
+ RUN  v4.1.11 /Users/sid/AgentMaturityCompass-worktrees/s442cd919/work/amc-w6-p2-41
+
+{"agentId":"default","amc_trace_v":1,"event":"llm_call","note":"race fan-out to 1 candidates","providerId":"unknown","ts":1793244373316}
+{"agentId":"default","amc_trace_v":1,"event":"llm_call","note":"http://127.0.0.1:52312/v1","providerId":"unknown","ts":1793244374273}
+{"agentId":"default","amc_trace_v":1,"event":"llm_result","note":"status=201;attempt=1","providerId":"unknown","ts":1793244374286}
+{"agentId":"default","amc_trace_v":1,"event":"llm_call","note":"http://127.0.0.1:52324/v1","providerId":"unknown","ts":1793244375291}
+{"agentId":"default","amc_trace_v":1,"event":"llm_call","note":"http://127.0.0.1:52328/v1","providerId":"unknown","ts":1793244376112}
+{"agentId":"default","amc_trace_v":1,"event":"llm_call","note":"http://127.0.0.1:52331/v1","providerId":"unknown","ts":1793244376897}
+{"agentId":"default","amc_trace_v":1,"event":"llm_call","note":"race fan-out to 1 candidates","providerId":"unknown","ts":1793244377876}
+{"agentId":"default","amc_trace_v":1,"event":"llm_call","note":"http://127.0.0.1:52346/v1","providerId":"unknown","ts":1793244380705}
+{"agentId":"default","amc_trace_v":1,"event":"llm_result","note":"status=302;attempt=1","providerId":"unknown","ts":1793244380711}
+{"agentId":"default","amc_trace_v":1,"event":"llm_call","note":"race fan-out to 1 candidates","providerId":"unknown","ts":1793244384129}
+{"agentId":"default","amc_trace_v":1,"event":"llm_result","note":"race winner=a;score=0.962;candidates=1","providerId":"unknown","ts":1793244384133}
+{"ts":"2026-10-29T03:29:24.434Z","level":"warn","requestId":"724faf17-9c42-4aad-ab80-89a2223d7881","method":"unknown","path":"unknown","status":400,"durationMs":1,"error":"bad request"}
+{"ts":"2026-10-29T03:29:24.436Z","level":"error","requestId":"5d04ddb5-b46b-40a4-b87d-1b7b05e721a6","method":"unknown","path":"unknown","status":500,"durationMs":0,"error":"Internal server error","detail":{"message":"boom"}}
+{"ts":"2026-10-29T03:29:24.799Z","level":"warn","requestId":"e96f7496-6638-42a0-b4af-df0671c88229","method":"unknown","path":"unknown","status":405,"durationMs":0,"error":"Method DELETE not allowed, expected GET"}
+{"ts":"2026-10-29T03:29:24.806Z","level":"warn","requestId":"19bcb656-611a-4a5c-92d1-6f2895d62ba5","method":"unknown","path":"unknown","status":401,"durationMs":0,"error":"Missing or invalid admin token"}
+
+ Test Files  42 passed (42)
+      Tests  567 passed (567)
+   Start at  08:49:16
+   Duration  610.56s (transform 14.32s, setup 837ms, import 52.44s, tests 1162.48s, environment 2ms)
+
+exit=0

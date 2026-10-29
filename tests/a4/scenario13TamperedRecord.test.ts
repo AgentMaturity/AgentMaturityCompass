@@ -1,7 +1,7 @@
 /**
  * P2-35 · design §17 "Tampered record". Reason codes: A4_SIDE_ROW_MISMATCH (a deleted or altered side row is detected
- * from the transition body although no transition was touched), A4_CHAIN_INVALID, and the readiness read
- * refused (409 A4_INTEGRITY_FAILED). The append-only triggers are dropped first: the attacker here has the database file.
+ * from the transition body although no transition was touched), A4_CHAIN_INVALID, and readiness reading BLOCKED
+ * (P2-41: 409 A4_INTEGRITY_FAILED whose detail is the fixed verdict, naming no row; the problems are in GET …/verify). The append-only triggers are dropped first: the attacker here has the database file.
  */
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { openA4Store } from "../../src/a4/a4Store.js";
@@ -63,8 +63,11 @@ describe("scenario: tampered record", () => {
     const verify = await p.get(alice, "/verify");
     expect(verify.status).toBe(200);
     expect(codesOf(verify.body.data!.report)).toMatch(/A4_SIDE_ROW_MISMATCH|A4_CHAIN_INVALID/);
-    // Readiness is not evaluated over rows that fail verification: the read itself answers the integrity failure.
-    expect(refusal(await p.get(alice, "/readiness"))).toEqual([409, "A4_INTEGRITY_FAILED"]);
+    // Readiness is not evaluated over rows that fail verification: it reads BLOCKED, as a refusal naming no row.
+    const readiness = await p.get(alice, "/readiness");
+    expect(refusal(readiness)).toEqual([409, "A4_INTEGRITY_FAILED"]);
+    expect(readiness.body.detail).toEqual({ status: "BLOCKED", reasonCodes: ["A4_INTEGRITY_FAILED"] });
+    expect(JSON.stringify(readiness.body)).not.toMatch(/a4_|LOCAL_USER|SIDE_ROW|CHAIN_INVALID|spec/);
     // A write against the tampered project is refused rather than built on it.
     const write = await p.post(alice, "/hold", { reason: "on tampered rows" });
     expect(write.status).toBeGreaterThanOrEqual(400);

@@ -541,8 +541,28 @@ const flatSpec = (value: unknown, prefix = ""): Record<string, string> => value 
   ? { [prefix || "."]: canonicalize(value ?? null) }
   : Object.fromEntries(Object.entries(value as Record<string, unknown>).flatMap(([key, child]) => Object.entries(flatSpec(child, `${prefix}${prefix ? "." : ""}${key}`))));
 
+/**
+ * Readiness over records that fail verification reads BLOCKED (design §17) as a refusal: no readiness is evaluated
+ * over them, and the answer names no failed row, since the member rows that decide who may read the project are among
+ * what failed (GET …/verify reports the problems).
+ */
+function readinessBlocked(error: unknown): unknown {
+  return (error instanceof A4StoreError && error.code === "A4_INTEGRITY_FAILED") || error instanceof ZodError
+    ? a4Fail(409, "A4_INTEGRITY_FAILED", "The project's records fail verification; readiness is BLOCKED.", { status: "BLOCKED", reasonCodes: ["A4_INTEGRITY_FAILED"] })
+    : error;
+}
+
 /** Project-scoped GETs. Returns false when none matches. */
 function projectRead(route: A4Route, projectId: string, rest: string): boolean {
+  if (rest !== "/readiness") return projectReadOf(route, projectId, rest);
+  try {
+    return projectReadOf(route, projectId, rest);
+  } catch (error) {
+    throw readinessBlocked(error);
+  }
+}
+
+function projectReadOf(route: A4Route, projectId: string, rest: string): boolean {
   const { store, params } = route;
   if (rest === "/verify") return verifyRead(route, projectId);
   const now = Date.now();

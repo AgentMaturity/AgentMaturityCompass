@@ -20,7 +20,12 @@ them, confirmed by a person), **explained** (choices at the reader's level), **p
 specification), **direction approved** (the direction gate), **built**, **reviewed**, and **completion approved** (the
 completion gate, which moves the project to the next stage). A change of specification is a new revision; any open
 gate on the old one goes stale. An owner can hold, resume, reopen an earlier stage, tune a released agent or retire the
-project; each is a transition in the chain.
+project; each is a transition in the chain. While a project is held, every write but comments, members, `RESUME` and
+a rollback is refused with `409 A4_ON_HOLD` naming `ON_HOLD`, a second hold included; under an incident freeze the
+code is `409 FREEZE_ACTIVE`. When a project's records fail verification its readiness reads BLOCKED: `GET …/readiness`
+answers `409 A4_INTEGRITY_FAILED` with `detail: { status: "BLOCKED", reasonCodes: ["A4_INTEGRITY_FAILED"] }` and
+names no row, because no readiness is evaluated over those records and the member rows that decide who may read the
+project are among what failed. `GET …/verify` reports the problems.
 
 ## Glossary
 
