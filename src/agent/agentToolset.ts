@@ -14,6 +14,7 @@ import { webFetchTool } from "../tools/builtin/webFetchTool.js";
 import { webSearchTool, type WebSearchProvider } from "../tools/builtin/webSearchTool.js";
 import { askUserTool, type AskUserAnswerer } from "../tools/builtin/askUserTool.js";
 import { todoTool } from "../tools/builtin/todoTool.js";
+import { goalTool } from "../autonomy/goalTool.js";
 import { planTool } from "../tools/builtin/planTool.js";
 import type { NativeReceiptRecorder } from "../tools/builtin/nativeToolBreadth/nativeReceipt.js";
 import type { ToolExecution } from "../tools/toolTypes.js";
@@ -93,6 +94,8 @@ export interface AgentToolsetOptions {
   };
   /** Human answerer for `ask_user` (P1-43). Absent: every ask_user call refuses. */
   readonly askUser?: AskUserAnswerer;
+  /** Current goal progress supplied by the owning scheduled run. Absent means unavailable. */
+  readonly getGoal?: () => unknown;
   /** Search provider for `web_search` (P1-43). Absent: every web_search call is denied; there is no default. */
   readonly webSearchProvider?: WebSearchProvider;
   /** Session the evidence rows belong to. Defaults to a per-agent bucket. */
@@ -416,6 +419,7 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
   registry.define(askUserTool({ sessionId: currentSessionId, record: recordNative, ...(options.askUser ? { answerer: options.askUser } : {}) }));
   registry.define(todoTool({ sessionId: currentSessionId, record: recordNative }));
   registry.define(planTool({ sessionId: currentSessionId, record: recordNative }));
+  registry.define(goalTool(options.getGoal));
   if (options.subagents !== undefined) {
     // Both tools, from one capability. `delegate` is one child; `workflow` is a
     // declared plan of them. Each is still gated a second time by the operator's

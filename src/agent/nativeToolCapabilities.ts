@@ -23,7 +23,8 @@ export const NATIVE_BUILTIN_CAPABILITIES: readonly NativeToolCapability[] = Obje
   { name: "web_search", actionClass: "NETWORK_EXTERNAL" },
   { name: "ask_user", actionClass: "READ_ONLY" },
   { name: "todo", actionClass: "READ_ONLY" },
-  { name: "plan", actionClass: "READ_ONLY" }
+  { name: "plan", actionClass: "READ_ONLY" },
+  { name: "get_goal", actionClass: "READ_ONLY" }
 ].map(capability => Object.freeze(capability as NativeToolCapability)));
 
 /** These become executable only when a caller also supplies the delegation capability. */

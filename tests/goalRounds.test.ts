@@ -1,10 +1,12 @@
+import { createHash } from "node:crypto";
 import { mkdtempSync, rmSync, realpathSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
 import { rootIdentity } from "../src/agent/delegationIdentity.js";
-import { runGoalRounds } from "../src/autonomy/goalRounds.js";
+import { MAX_GOAL_ROUNDS, runGoalRounds } from "../src/autonomy/goalRounds.js";
+import type { GoalRoundsInit, RoundIdentity, RoundSummary } from "../src/autonomy/goalRounds.js";
 import type { LoopEventRecord } from "../src/session/loopEventMeta.js";
 import type { SubagentRunContext, SubagentRunResult } from "../src/agent/subagentSpawn.js";
 
@@ -69,7 +71,7 @@ describe("the round cap is mechanical, and nothing can extend it", () => {
 
     const result = await runGoalRounds({
       ...h.base,
-      runner: h.spy(() => ({ ok: true, text: "still going" })),
+      runner: h.spy((i) => ({ ok: true, text: `still going ${i}` })),
       maxRounds: 3
     });
 
@@ -144,7 +146,7 @@ describe("a round yields to human input, or it does not claim to", () => {
 
     const result = await runGoalRounds({
       ...h.base,
-      runner: h.spy(() => ({ ok: true, text: "working" })),
+      runner: h.spy((i) => ({ ok: true, text: `working ${i}` })),
       maxRounds: 4,
       checkpointEvery: 2,
       checkpoint: async (summary) => { asked.push(summary.round); return "continue"; }
@@ -251,5 +253,218 @@ describe("each round is a governed delegation", () => {
 
     expect(result.rounds).toBe(1);
     expect(result.stoppedBy).toBe("cancelled");
+  });
+});
+
+
+describe("the unattended ceiling cannot exceed 256 rounds", () => {
+  it.each([257, 1_000_000, Number.MAX_SAFE_INTEGER, Number.NaN, Number.POSITIVE_INFINITY, 1.5])(
+    "refuses maxRounds %s before any round effect", async (maxRounds) => {
+      const h = harness(join(tmpdir(), "amc-rounds-must-not-be-opened"));
+      const admitted: RoundIdentity[] = [];
+      const result = await runGoalRounds({ ...h.base, maxRounds,
+        beforeRound: (identity) => { admitted.push(identity); },
+        runner: h.spy(() => ({ ok: false, text: "", reason: "unexpected dispatch" })) });
+
+      expect(MAX_GOAL_ROUNDS).toBe(256);
+      expect(result).toMatchObject({ rounds: 0, stoppedBy: "refused", answerHashes: [], completionVerified: false });
+      expect(result.reason).toContain("256");
+      expect(admitted).toEqual([]);
+      expect(h.rows).toEqual([]);
+      expect(h.seen).toEqual([]);
+    }
+  );
+
+  it("allows exactly the hard ceiling", async () => {
+    const dir = workspace();
+    const h = harness(dir);
+    const result = await runGoalRounds({ ...h.base, maxRounds: 256,
+      runner: h.spy((i) => ({ ok: true, text: `progress ${i}` })) });
+
+    expect(result).toMatchObject({ rounds: 256, stoppedBy: "max-rounds", completionVerified: false });
+    expect(result.answerHashes).toHaveLength(256);
+    expect(h.seen).toHaveLength(256);
+  });
+
+  it("pins the admitted ceiling across asynchronous round hooks", async () => {
+    const dir = workspace();
+    const h = harness(dir);
+    const init: GoalRoundsInit = { ...h.base, maxRounds: 2,
+      runner: h.spy((i) => ({ ok: true, text: `progress ${i}` })),
+      beforeRound: () => { Object.assign(init, { maxRounds: 3 }); } };
+    const result = await runGoalRounds(init);
+
+    expect(result).toMatchObject({ rounds: 2, stoppedBy: "max-rounds" });
+    expect(h.seen).toHaveLength(2);
+  });
+});
+
+describe("three identical normalized answers mechanically stop a blocked goal", () => {
+  it("records every hash and stops on the third repeated answer", async () => {
+    const dir = workspace();
+    const h = harness(dir);
+    const answers = [" waiting  for owner ", "waiting\nfor\towner", "waiting for owner"];
+    const checked: RoundSummary[] = [];
+    const result = await runGoalRounds({ ...h.base, maxRounds: 10,
+      runner: h.spy((i) => ({ ok: true, text: answers[Math.min(i - 1, answers.length - 1)]! })),
+      afterRound: (summary) => { checked.push(summary); return "continue"; } });
+    const hash = createHash("sha256").update("waiting for owner").digest("hex");
+
+    expect(result).toMatchObject({ rounds: 3, stoppedBy: "blocked", lastText: answers[2],
+      answerHashes: [hash, hash, hash], completionVerified: false, lastRound: { round: 3, sessionId: "child-3" } });
+    expect(checked.map((summary) => summary.answerHash)).toEqual([hash, hash, hash]);
+    expect(h.seen).toHaveLength(3);
+  });
+
+  it("resets consecutive blocking evidence after progress", async () => {
+    const dir = workspace();
+    const h = harness(dir);
+    const answers = ["waiting", "waiting", "progress", "waiting", "waiting", "waiting"];
+    const result = await runGoalRounds({ ...h.base, maxRounds: 10,
+      runner: h.spy((i) => ({ ok: true, text: answers[Math.min(i - 1, answers.length - 1)]! })) });
+
+    expect(result).toMatchObject({ rounds: 6, stoppedBy: "blocked" });
+    expect(result.answerHashes).toHaveLength(6);
+    expect(result.answerHashes[2]).not.toBe(result.answerHashes[1]);
+    expect(result.answerHashes[3]).toBe(result.answerHashes[1]);
+    expect(h.seen).toHaveLength(6);
+  });
+
+  it("does not mistake two repeated answers for a blocked goal", async () => {
+    const dir = workspace();
+    const h = harness(dir);
+    const result = await runGoalRounds({ ...h.base, maxRounds: 2,
+      runner: h.spy(() => ({ ok: true, text: "waiting" })) });
+
+    expect(result).toMatchObject({ rounds: 2, stoppedBy: "max-rounds", completionVerified: false });
+    expect(result.answerHashes).toHaveLength(2);
+  });
+});
+
+describe("durable round authority precedes effects and trusted checks govern completion", () => {
+  it("persists the exact round/session identity before the delegation starts", async () => {
+    const dir = workspace();
+    const h = harness(dir);
+    const admitted: RoundIdentity[] = [];
+    const checked: RoundSummary[] = [];
+    const result = await runGoalRounds({ ...h.base, maxRounds: 2,
+      beforeRound: async (identity) => {
+        expect(h.rows.filter((row) => row.kind === "delegation-started")).toHaveLength(identity.round - 1);
+        expect(h.seen).toHaveLength(identity.round - 1);
+        admitted.push(identity);
+      },
+      runner: h.spy((i) => {
+        expect(admitted.at(-1)).toEqual({ round: i, sessionId: h.seen.at(-1)!.childSessionId });
+        return { ok: true, text: `answer ${i}` };
+      }),
+      afterRound: (summary) => {
+        expect(h.rows.filter((row) => row.kind === "delegation-completed")).toHaveLength(summary.round);
+        checked.push(summary);
+        return summary.round === 2 ? "complete" : "continue";
+      } });
+
+    expect(admitted).toEqual([{ round: 1, sessionId: "child-1" }, { round: 2, sessionId: "child-2" }]);
+    expect(checked.map(({ round, sessionId, text }) => ({ round, sessionId, text }))).toEqual([
+      { round: 1, sessionId: "child-1", text: "answer 1" }, { round: 2, sessionId: "child-2", text: "answer 2" }
+    ]);
+    expect(result).toMatchObject({ rounds: 2, stoppedBy: "done", completionVerified: true,
+      lastRound: { round: 2, sessionId: "child-2" } });
+  });
+
+  it("refuses before any delegation effect when authority persistence fails", async () => {
+    const dir = workspace();
+    const h = harness(dir);
+    const result = await runGoalRounds({ ...h.base, maxRounds: 4,
+      beforeRound: () => { throw new Error("objective authority revoked"); },
+      runner: h.spy(() => ({ ok: true, text: "work" })) });
+
+    expect(result).toMatchObject({ rounds: 0, stoppedBy: "refused", answerHashes: [], completionVerified: false });
+    expect(result.reason).toContain("objective authority revoked");
+    expect(h.rows).toEqual([]);
+    expect(h.seen).toEqual([]);
+  });
+
+  it("does not mint or admit a round after prior cancellation", async () => {
+    const h = harness(join(tmpdir(), "amc-rounds-must-not-be-opened"));
+    const controller = new AbortController();
+    controller.abort();
+    const admitted: RoundIdentity[] = [];
+    const result = await runGoalRounds({ ...h.base, maxRounds: 4, signal: controller.signal,
+      mintSessionId: () => { throw new Error("must not mint a cancelled round"); },
+      beforeRound: (identity) => { admitted.push(identity); },
+      runner: h.spy(() => ({ ok: true, text: "work" })) });
+
+    expect(result).toMatchObject({ rounds: 0, stoppedBy: "cancelled", answerHashes: [], completionVerified: false });
+    expect(result.lastRound).toBeUndefined();
+    expect(admitted).toEqual([]);
+    expect(h.rows).toEqual([]);
+    expect(h.seen).toEqual([]);
+  });
+
+  it("checks cancellation again after awaiting round admission", async () => {
+    const dir = workspace();
+    const h = harness(dir);
+    const controller = new AbortController();
+    const result = await runGoalRounds({ ...h.base, maxRounds: 4, signal: controller.signal,
+      beforeRound: async () => { await Promise.resolve(); controller.abort(); },
+      runner: h.spy(() => ({ ok: true, text: "work" })) });
+
+    expect(result).toMatchObject({ rounds: 0, stoppedBy: "cancelled", completionVerified: false });
+    expect(h.rows).toEqual([]);
+    expect(h.seen).toEqual([]);
+  });
+
+  it.each(["failed", "unavailable"] as const)("distinguishes a %s configured check from completion", async (status) => {
+    const dir = workspace();
+    const h = harness(dir);
+    const result = await runGoalRounds({ ...h.base, maxRounds: 4,
+      runner: h.spy(() => ({ ok: true, text: "DONE" })), afterRound: () => status, isDone: () => true });
+
+    expect(result).toMatchObject({ rounds: 1, stoppedBy: `check-${status}`, completionVerified: false });
+    expect(h.seen).toHaveLength(1);
+  });
+
+  it("treats a thrown check as unavailable without accepting the agent claim", async () => {
+    const dir = workspace();
+    const h = harness(dir);
+    const result = await runGoalRounds({ ...h.base, maxRounds: 4,
+      runner: h.spy(() => ({ ok: true, text: "DONE" })), isDone: () => true,
+      afterRound: () => { throw new Error("trusted check offline"); } });
+
+    expect(result).toMatchObject({ rounds: 1, stoppedBy: "check-unavailable", completionVerified: false });
+    expect(result.reason).toContain("trusted check offline");
+    expect(h.seen).toHaveLength(1);
+  });
+
+  it("treats an unknown check answer as unavailable", async () => {
+    const dir = workspace();
+    const h = harness(dir);
+    const result = await runGoalRounds({ ...h.base, maxRounds: 4,
+      runner: h.spy(() => ({ ok: true, text: "DONE" })), isDone: () => true,
+      afterRound: () => undefined as never });
+
+    expect(result).toMatchObject({ rounds: 1, stoppedBy: "check-unavailable", completionVerified: false });
+    expect(h.seen).toHaveLength(1);
+  });
+
+  it("does not promote a judged agent claim into verified completion", async () => {
+    const dir = workspace();
+    const h = harness(dir);
+    const result = await runGoalRounds({ ...h.base, maxRounds: 4,
+      runner: h.spy(() => ({ ok: true, text: "DONE" })), afterRound: () => "continue", isDone: () => true });
+
+    expect(result).toMatchObject({ rounds: 1, stoppedBy: "done", completionVerified: false });
+  });
+
+  it("runs the configured check before the third-answer blocked stop", async () => {
+    const dir = workspace();
+    const h = harness(dir);
+    const checked: number[] = [];
+    const result = await runGoalRounds({ ...h.base, maxRounds: 10,
+      runner: h.spy(() => ({ ok: true, text: "unchanged" })),
+      afterRound: ({ round }) => { checked.push(round); return round === 3 ? "complete" : "continue"; } });
+
+    expect(checked).toEqual([1, 2, 3]);
+    expect(result).toMatchObject({ rounds: 3, stoppedBy: "done", completionVerified: true });
   });
 });

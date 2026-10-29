@@ -55,6 +55,8 @@ export interface SubagentRunContext {
   readonly identity: DelegationIdentity;
   /** The child's own session. A child is never a second writer on the parent's. */
   readonly childSessionId: string;
+  /** Current goal progress supplied by the owning schedule runner; never read from model arguments. */
+  readonly getGoal?: () => unknown;
   readonly goal: string;
   /** The signed delegation packet that authorized this child; its authorization records name it as their parent. */
   readonly packetId?: string;

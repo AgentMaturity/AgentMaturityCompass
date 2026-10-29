@@ -305,6 +305,7 @@ export function createDriverRunner(init: DriverRunnerInit): SubagentRunner {
       opened = true;
       toolset = agentToolset({ workspace: init.workspace, sessionId: ctx.childSessionId,
         recorder: session, agentId: ctx.toolsetAgentId,
+        ...(ctx.getGoal === undefined ? {} : { getGoal: ctx.getGoal }),
         parentShell: init.parentShell ?? null,
         ...(childLease === undefined ? {} : { leaseToken: childLease }),
         delegation: { runAs: ctx.identity.runAs, depth: ctx.identity.depth, parentExecutionId: ctx.packetId ?? null,
