@@ -110,7 +110,7 @@ describe("Darwin Godel Machine live drift", () => {
     expect(result.receipt.failClosed).toBe(false);
 
     // CHARACTERIZATION PIN (ADR-0025, cluster collapse): the whole result.
-    expect(sha256Hex(canonicalize(result))).toBe("0686d866e6d8e70907adddfe4b5945806faa6f0359713ce2b8a5c4fa93c679f5");
+    expect(sha256Hex(canonicalize(result))).toBe("ba1a4658336f66ed71801ad08f3d2318b0b8ab2236127c02f84f16267d4ff8bf");
     expect(result.receipt.recommendation).toBe("approve");
     expect(result.receipt.sourceRefs).toContain("https://github.com/lemoz/darwin-godel-machine");
     expect(result.liveDistribution.evidenceCoverage0to1).toBe(1);

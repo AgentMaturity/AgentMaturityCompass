@@ -82,6 +82,8 @@ describe("committed plan-edits manifest (D-15)", () => {
   it("rejects malformed manifests", () => {
     expect(validatePlanEdits(manifest([]))).toEqual([]);
     expect(validatePlanEdits(manifest([entry()]))).toEqual([entry()]);
+    const axe = entry({ issue: "AXE-23", archivePath: "unused-code/plan-edits/AXE-23/src/a.ts.landed" });
+    expect(validatePlanEdits(manifest([axe]))).toEqual([axe]);
     const bad: Array<[unknown, string]> = [
       [{ ...manifest([]), schemaVersion: 2 }, "header"],
       [{ ...manifest([]), decision: "D-14" }, "header"],
@@ -93,6 +95,7 @@ describe("committed plan-edits manifest (D-15)", () => {
       [manifest([entry({ baseCommit: "abc123" })]), "baseCommit"],
       [manifest([entry({ sha256: "B".repeat(64) })]), "sha256"],
       [manifest([entry({ issue: "P9-01", archivePath: "unused-code/plan-edits/P9-01/src/a.ts.landed" })]), "issue"],
+      [manifest([entry({ issue: "AXE-22", archivePath: "unused-code/plan-edits/AXE-22/src/a.ts.landed" })]), "issue"],
       [manifest([entry({ path: "../outside.ts", archivePath: "unused-code/plan-edits/P0-06/../outside.ts.landed" })]), "path"],
       [manifest([entry({ path: "src\\a.ts", archivePath: "unused-code/plan-edits/P0-06/src\\a.ts.landed" })]), "path"],
     ];
@@ -165,6 +168,18 @@ describe("scripts/snapshot-plan-edit.mjs", () => {
     expect(landedSourceAt(root).landedText("src/a.ts")).toBe("a at base\n");
   });
 
+  it("archives AXE-23 base bytes without changing the existing plan-issue contract", () => {
+    const { root, base } = repo();
+    const result = snapshot(root, "--issue", "AXE-23", "--base", "HEAD", "src/a.ts");
+    expect(result.stderr).toBe("");
+    expect(result.status).toBe(0);
+    expect(read(root).files).toEqual([
+      { path: "src/a.ts", issue: "AXE-23", baseCommit: base,
+        archivePath: "unused-code/plan-edits/AXE-23/src/a.ts.landed", sha256: sha256("a at base\n") },
+    ]);
+    expect(landedSourceAt(root).landedText("src/a.ts")).toBe("a at base\n");
+  });
+
   it("refuses a path that is already registered and prints the existing entry", () => {
     const { root } = repo();
     expect(snapshot(root, "--issue", "P0-06", "--base", "HEAD", "src/a.ts").status).toBe(0);
@@ -181,6 +196,7 @@ describe("scripts/snapshot-plan-edit.mjs", () => {
     for (const [args, message] of [
       [["--issue", "P0-6", "--base", "HEAD", "src/a.ts"], "Issue key"],
       [["--issue", "P4-01", "--base", "HEAD", "src/a.ts"], "Issue key"],
+      [["--issue", "AXE-22", "--base", "HEAD", "src/a.ts"], "Issue key"],
       [["--issue", "P0-06", "--base", "HEAD", "../outside.ts"], "outside the repository"],
       [["--issue", "P0-06", "--base", "HEAD", "src/missing.ts"], "not present at HEAD"],
       [["--issue", "P0-06", "--base", "HEAD", "src"], "not present at HEAD"],

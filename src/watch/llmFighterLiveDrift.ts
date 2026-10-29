@@ -8,9 +8,11 @@
  * from, authenticates to, or verifies anything with that vendor, so a receipt
  * attests only to the data the caller provided.
  */
+import type { EvidenceOutcome } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import {
+  guardedDrop,
   runLiveScoreBehaviorDrift,
   type LiveDriftAlert,
   type LiveDriftMetricId,
@@ -121,6 +123,7 @@ export interface RunLlmFighterLiveDriftInput {
 
 export interface LlmFighterDistribution {
   rowCount: number;
+  evidenceOutcome: EvidenceOutcome;
   scoreMean0to1: number;
   winRate0to1: number;
   drawRate0to1: number;
@@ -129,7 +132,7 @@ export interface LlmFighterDistribution {
   combatStabilityMean0to1: number;
   traceCoverage0to1: number;
   exportCoverage0to1: number;
-  evidenceCoverage0to1: number;
+  evidenceCoverage0to1: number | null;
   turnCountMean: number;
   latencyP95Ms: number;
   costUsdMean: number;
@@ -147,7 +150,7 @@ export interface LlmFighterScoreDrift {
   combatStabilityDrop0to1: number;
   traceCoverageDrop0to1: number;
   exportCoverageDrop0to1: number;
-  evidenceCoverageDrop0to1: number;
+  evidenceCoverageDrop0to1: number | null;
   turnCountShiftRatio: number;
   latencyP95IncreaseRatio: number;
   costIncreaseRatio: number;
@@ -331,7 +334,7 @@ function distribution(rows: LlmFighterReceiptRow[]): LlmFighterDistribution {
     combatStabilityMean0to1: mean(rows.map((row) => row.combatStability0to1)),
     traceCoverage0to1: boolMean(rows.map((row) => nonEmpty(row.combatLogHash))),
     exportCoverage0to1: boolMean(rows.map((row) => nonEmpty(row.exportedLogHash))),
-    evidenceCoverage0to1: mean(rows.map((row) => row.evidenceCoverage0to1), rows.length === 0 ? 1 : 0),
+    evidenceCoverage0to1: mean(rows.map((row) => row.evidenceCoverage0to1), null),
     turnCountMean: mean(rows.map((row) => row.turnCount)),
     latencyP95Ms: percentile(rows.map((row) => row.latencyMs), 95),
     costUsdMean: mean(rows.map((row) => row.costUsd)),
@@ -339,6 +342,7 @@ function distribution(rows: LlmFighterReceiptRow[]): LlmFighterDistribution {
     modelRosterDistribution: labelDistribution(rows, (row) => row.modelRosterHash || "unknown"),
     rulesetDistribution: labelDistribution(rows, (row) => row.rulesetId || "unknown"),
     contextDistribution: labelDistribution(rows, contextLabel),
+    evidenceOutcome: rows.length > 0 ? "measured" : "not_evaluated",
   };
 }
 
@@ -362,7 +366,7 @@ export function runLlmFighterLiveDrift(input: RunLlmFighterLiveDriftInput): LlmF
     combatStabilityDrop0to1: round(Math.max(0, baselineDistribution.combatStabilityMean0to1 - liveDistribution.combatStabilityMean0to1)),
     traceCoverageDrop0to1: round(Math.max(0, baselineDistribution.traceCoverage0to1 - liveDistribution.traceCoverage0to1)),
     exportCoverageDrop0to1: round(Math.max(0, baselineDistribution.exportCoverage0to1 - liveDistribution.exportCoverage0to1)),
-    evidenceCoverageDrop0to1: round(Math.max(0, baselineDistribution.evidenceCoverage0to1 - liveDistribution.evidenceCoverage0to1)),
+    evidenceCoverageDrop0to1: guardedDrop(true, baselineDistribution.evidenceCoverage0to1, liveDistribution.evidenceCoverage0to1),
     turnCountShiftRatio: ratioShift(baselineDistribution.turnCountMean, liveDistribution.turnCountMean),
     latencyP95IncreaseRatio: ratioIncrease(baselineDistribution.latencyP95Ms, liveDistribution.latencyP95Ms),
     costIncreaseRatio: ratioIncrease(baselineDistribution.costUsdMean, liveDistribution.costUsdMean),
@@ -392,8 +396,8 @@ export function runLlmFighterLiveDrift(input: RunLlmFighterLiveDriftInput): LlmF
   if (liveDistribution.exportCoverage0to1 < thresholds.minExportCoverage0to1) {
     additionalAlerts.push(buildAlert(input, "llmFighterExportCoverage0to1", liveDistribution.exportCoverage0to1, thresholds.minExportCoverage0to1, "Live LLM Fighter exported-log coverage dropped below threshold.", "critical"));
   }
-  if (liveDistribution.evidenceCoverage0to1 < thresholds.minEvidenceCoverage0to1) {
-    additionalAlerts.push(buildAlert(input, "llmFighterEvidenceCoverage0to1", liveDistribution.evidenceCoverage0to1, thresholds.minEvidenceCoverage0to1, "Live LLM Fighter rows are missing source snapshot, MIT license, homepage, README, API/UI tree, game-result endpoint, schema, engine, runner, LLM adapter, YAML export, UI component, baseline/live result, drift statistic, alert receipt, combat log, exported log, evidence, or signed evidence proof.", "critical"));
+  if (liveDistribution.evidenceCoverage0to1 === null || liveDistribution.evidenceCoverage0to1 < thresholds.minEvidenceCoverage0to1) {
+    additionalAlerts.push(buildAlert(input, "llmFighterEvidenceCoverage0to1", liveDistribution.evidenceCoverage0to1, thresholds.minEvidenceCoverage0to1, liveDistribution.evidenceCoverage0to1 === null ? "Live evidence missing; coverage is not evaluated." : "Live LLM Fighter rows are missing source snapshot, MIT license, homepage, README, API/UI tree, game-result endpoint, schema, engine, runner, LLM adapter, YAML export, UI component, baseline/live result, drift statistic, alert receipt, combat log, exported log, evidence, or signed evidence proof.", "critical"));
   }
   if (behaviorDrift.arenaDivergence0to1 > thresholds.maxArenaDivergence0to1) {
     additionalAlerts.push(buildAlert(input, "llmFighterArenaDistribution", behaviorDrift.arenaDivergence0to1, thresholds.maxArenaDivergence0to1, "Live LLM Fighter arena distribution diverged beyond threshold.", "medium"));

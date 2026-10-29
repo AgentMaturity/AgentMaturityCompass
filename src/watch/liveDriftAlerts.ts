@@ -1,3 +1,4 @@
+import { mean, mean as numericMean, round } from "./driftMath.js";
 import {
   agentSecurityEvidenceFields,
   agentTestingEvidenceFields,
@@ -20,6 +21,7 @@ import { canonicalize } from "../utils/json.js";
 import {
   hasNonBlankEvidenceRef,
   normalizeEvidenceRefs,
+  normalizeEvidenceRefs as unique,
 } from "./evidenceRefs.js";
 
 // The type layer moved to ./liveDriftTypes.ts (P5.2b step 1). Re-exported
@@ -538,11 +540,6 @@ function safeNonNegative(value: number | undefined): number {
   return Math.max(0, value);
 }
 
-function round(value: number, places = 6): number {
-  const factor = 10 ** places;
-  return Math.round(value * factor) / factor;
-}
-
 /**
  * A guarded divergence: the distance between two label distributions, or 0 when
  * the domain contributed no rows to either window.
@@ -575,7 +572,10 @@ export function guardedDivergence(
  * distinction into the helper would silently invert 
  * half of them.
  */
-export function guardedDrop(present: boolean, from: number, to: number): number {
+export function guardedDrop(present: boolean, from: number, to: number): number;
+export function guardedDrop(present: boolean, from: number | null, to: number | null): number | null;
+export function guardedDrop(present: boolean, from: number | null, to: number | null): number | null {
+  if (from === null || to === null) return null;
   return present ? round(Math.max(0, from - to)) : 0;
 }
 
@@ -586,7 +586,10 @@ export function guardedDrop(present: boolean, from: number, to: number): number 
  * VPIP percentage), so clamping them at zero would erase the direction the
  * metric exists to convey.
  */
-export function guardedDelta(present: boolean, from: number, to: number): number {
+export function guardedDelta(present: boolean, from: number, to: number): number;
+export function guardedDelta(present: boolean, from: number | null, to: number | null): number | null;
+export function guardedDelta(present: boolean, from: number | null, to: number | null): number | null {
+  if (from === null || to === null) return null;
   return present ? round(from - to) : 0;
 }
 
@@ -610,10 +613,6 @@ export function guardedDelta(present: boolean, from: number, to: number): number
  */
 export function guardedRatio(present: boolean, after: number, before: number): number {
   return present ? ratioIncrease(after, before) : 0;
-}
-
-function unique(values: unknown): string[] {
-  return normalizeEvidenceRefs(values);
 }
 
 const dataScienceLifecycleStages = new Set<DataScienceLifecycleStage>([
@@ -1750,11 +1749,6 @@ function normalizeStabilityScores(scores: Record<string, number> | undefined): R
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([key, value]) => [key, clamp01(value)] as const);
   return Object.fromEntries(entries);
-}
-
-function mean(values: number[]): number {
-  if (values.length === 0) return 0;
-  return round(values.reduce((sum, value) => sum + value, 0) / values.length);
 }
 
 function rate(rows: LiveDriftSampleRow[], key: "passed" | "refused" | "errored"): number {
@@ -3751,11 +3745,11 @@ function ollamaMetricsDistributionStats(rows: LiveDriftSampleRow[]): OllamaMetri
     ollamaMetricsTimePerTokenSeconds: numericMean(timePerTokens, 0),
     ollamaMetricsLoadedModelCountMean: numericMean(loadedModelCounts, 0),
     ollamaMetricsModelLoadedRate0to1: rows.length === 0
-      ? 1
+      ? null
       : round(rows.filter((row) => row.ollamaMetricsModelLoaded === true).length / rows.length),
     ollamaMetricsModelRamMbMean: numericMean(modelRamValues, 0),
     ollamaMetricsRequestErrorRate0to1: numericMean(errorRates, 0),
-    ollamaMetricsEvidenceCoverage0to1: numericMean(evidenceCoverage, rows.length === 0 ? 1 : 0),
+    ollamaMetricsEvidenceCoverage0to1: numericMean(evidenceCoverage, rows.length === 0 ? null : 0),
     ollamaMetricsModelDistribution: labelDistribution(rows, ollamaMetricsModelLabel),
     ollamaMetricsDeploymentDistribution: labelDistribution(rows, (row) =>
       normalizeOllamaMetricsDeploymentMode(row.ollamaMetricsDeploymentMode)
@@ -4285,10 +4279,6 @@ function tradingContextLabel(row: LiveDriftSampleRow): string {
     normalizeContextId(row.tradingNewsContextHash) ?? "unknown-news",
     normalizeContextId(row.tradingPaperLedgerHash) ?? "unknown-paper-ledger",
   ].join("/");
-}
-
-function numericMean(values: number[], defaultValue: number): number {
-  return values.length > 0 ? mean(values) : defaultValue;
 }
 
 function stabilityStats(rows: LiveDriftSampleRow[]): Pick<
@@ -5026,7 +5016,7 @@ function distribution(rows: LiveDriftSampleRow[]): LiveDriftDistribution {
   const tradingProviderFallbackRates = tradingRows
     .map((row) => normalizeRate(row.tradingProviderFallbackRate0to1))
     .filter((value): value is number => value !== null);
-  return {
+  const result = {
     sampleSize: rows.length,
     scoreMean0to1: mean(rows.map((row) => clamp01(row.score0to1))),
     passRate0to1: rate(rows, "passed"),
@@ -5050,7 +5040,7 @@ function distribution(rows: LiveDriftSampleRow[]): LiveDriftDistribution {
     credenceEngineExpectedUtilityGainMean0to1: numericMean(credenceEngineExpectedUtilityGainScores, 0),
     credenceEngineEvidenceCoverage0to1: numericMean(
       credenceEngineEvidenceCoverageScores,
-      credenceEngineRows.length === 0 ? 1 : 0,
+      credenceEngineRows.length === 0 ? null : 0,
     ),
     credenceEngineContextDistribution: labelDistribution(credenceEngineRows, credenceEngineContextLabel),
     tradingRowCount: tradingRows.length,
@@ -5106,7 +5096,7 @@ function distribution(rows: LiveDriftSampleRow[]): LiveDriftDistribution {
     redTeamComplianceMean0to1: numericMean(redTeamComplianceScores, 1),
     redTeamGuardScoreMean0to1: numericMean(redTeamGuardScores, 1),
     redTeamDatasetCoverage0to1: redTeamRows.length === 0
-      ? 1
+      ? null
       : round(redTeamRows.filter((row) =>
           normalizeContextId(row.redTeamBenchmarkId) !== null &&
           normalizeContextId(row.redTeamDatasetHash) !== null &&
@@ -5115,20 +5105,20 @@ function distribution(rows: LiveDriftSampleRow[]): LiveDriftDistribution {
           normalizeContextId(row.redTeamResponseHash) !== null
         ).length / redTeamRows.length),
     redTeamTaxonomyCoverage0to1: redTeamRows.length === 0
-      ? 1
+      ? null
       : round(redTeamRows.filter((row) =>
           normalizeContextId(row.redTeamTaxonomyHash) !== null &&
           normalizeContextId(row.redTeamRiskCategory) !== null
         ).length / redTeamRows.length),
     redTeamAttackCoverage0to1: redTeamRows.length === 0
-      ? 1
+      ? null
       : round(redTeamRows.filter((row) => {
           const subset = normalizeRedTeamSubset(row.redTeamSubset);
           if (subset === "standard") return true;
           return subset !== "unknown" && normalizeContextId(row.redTeamAttackType) !== null;
         }).length / redTeamRows.length),
     redTeamGuardCoverage0to1: redTeamRows.length === 0
-      ? 1
+      ? null
       : round(redTeamRows.filter((row) =>
           normalizeContextId(row.redTeamGuardModelId) !== null &&
           normalizeRedTeamGuardLabel(row.redTeamGuardLabel) !== "unknown" &&
@@ -5142,11 +5132,11 @@ function distribution(rows: LiveDriftSampleRow[]): LiveDriftDistribution {
     redTeamGuardLabelDistribution: labelDistribution(redTeamRows, redTeamGuardLabel),
     piArenaRowCount: piArenaRows.length,
     piArenaAttackSuccessRate0to1: numericMean(piArenaAttackSuccessValues, 0),
-    piArenaDefenseBlockRate0to1: numericMean(piArenaDefenseBlockedValues, piArenaRows.length === 0 ? 1 : 0),
+    piArenaDefenseBlockRate0to1: numericMean(piArenaDefenseBlockedValues, piArenaRows.length === 0 ? null : 0),
     piArenaFalsePositiveRate0to1: numericMean(piArenaFalsePositiveValues, 0),
-    piArenaAgentTaskSuccessRate0to1: numericMean(piArenaAgentTaskSuccessValues, piArenaRows.length === 0 ? 1 : 0),
-    piArenaToolCallSuccessRateMean0to1: numericMean(piArenaToolCallSuccessScores, piArenaRows.length === 0 ? 1 : 0),
-    piArenaEvidenceCoverage0to1: numericMean(piArenaEvidenceCoverageScores, piArenaRows.length === 0 ? 1 : 0),
+    piArenaAgentTaskSuccessRate0to1: numericMean(piArenaAgentTaskSuccessValues, piArenaRows.length === 0 ? null : 0),
+    piArenaToolCallSuccessRateMean0to1: numericMean(piArenaToolCallSuccessScores, piArenaRows.length === 0 ? null : 0),
+    piArenaEvidenceCoverage0to1: numericMean(piArenaEvidenceCoverageScores, piArenaRows.length === 0 ? null : 0),
     piArenaAttackDistribution: labelDistribution(piArenaRows, piArenaAttackLabel),
     piArenaDefenseDistribution: labelDistribution(piArenaRows, piArenaDefenseLabel),
     piArenaDatasetDistribution: labelDistribution(piArenaRows, piArenaDatasetLabel),
@@ -5155,17 +5145,17 @@ function distribution(rows: LiveDriftSampleRow[]): LiveDriftDistribution {
     backdoorAgentAttackSuccessRate0to1: numericMean(backdoorAgentAttackSuccessValues, 0),
     backdoorAgentCleanAccuracy0to1: numericMean(
       backdoorAgentCleanTaskSuccessValues,
-      backdoorAgentRows.length === 0 ? 1 : 0,
+      backdoorAgentRows.length === 0 ? null : 0,
     ),
     backdoorAgentTriggerPersistenceRate0to1: numericMean(backdoorAgentTriggerPersistenceValues, 0),
     backdoorAgentTriggerPropagationRate0to1: numericMean(backdoorAgentTriggerPropagationValues, 0),
     backdoorAgentTrajectoryCoverage0to1: numericMean(
       backdoorAgentTrajectoryCoverageValues,
-      backdoorAgentRows.length === 0 ? 1 : 0,
+      backdoorAgentRows.length === 0 ? null : 0,
     ),
     backdoorAgentEvidenceCoverage0to1: numericMean(
       backdoorAgentEvidenceCoverageScores,
-      backdoorAgentRows.length === 0 ? 1 : 0,
+      backdoorAgentRows.length === 0 ? null : 0,
     ),
     backdoorAgentStageDistribution: labelDistribution(backdoorAgentRows, (row) =>
       normalizeBackdoorAgentStage(row.backdoorAgentStage)
@@ -5179,109 +5169,109 @@ function distribution(rows: LiveDriftSampleRow[]): LiveDriftDistribution {
     agentSecurityRowCount: agentSecurityRows.length,
     agentSecuritySourceOriginCoverage0to1: numericMean(
       agentSecuritySourceOriginCoverageScores,
-      agentSecurityRows.length === 0 ? 1 : 0,
+      agentSecurityRows.length === 0 ? null : 0,
     ),
     agentSecurityTaintPropagationCoverage0to1: numericMean(
       agentSecurityTaintPropagationCoverageScores,
-      agentSecurityRows.length === 0 ? 1 : 0,
+      agentSecurityRows.length === 0 ? null : 0,
     ),
     agentSecurityPolicyDecisionAccuracyMean0to1: numericMean(
       agentSecurityPolicyDecisionAccuracyScores,
-      agentSecurityRows.length === 0 ? 1 : 0,
+      agentSecurityRows.length === 0 ? null : 0,
     ),
     agentSecuritySecretScrubRate0to1: numericMean(
       agentSecuritySecretScrubRates,
-      agentSecurityRows.length === 0 ? 1 : 0,
+      agentSecurityRows.length === 0 ? null : 0,
     ),
     agentSecurityAuditTrailIntegrity0to1: numericMean(
       agentSecurityAuditTrailIntegrityScores,
-      agentSecurityRows.length === 0 ? 1 : 0,
+      agentSecurityRows.length === 0 ? null : 0,
     ),
     agentSecurityAttackEffectivenessRate0to1: numericMean(agentSecurityAttackEffectivenessRates, 0),
     agentSecurityFalsePositiveRate0to1: numericMean(agentSecurityFalsePositiveRates, 0),
     agentSecurityEvidenceCoverage0to1: agentSecurityRows.length === 0
-      ? 1
+      ? null
       : round(agentSecurityRows.filter(hasCompleteAgentSecurityEvidence).length / agentSecurityRows.length),
     agentSecurityLatencyP95Ms: percentile(agentSecurityLatencyP95Values, 95),
     agentSecurityContextDistribution: labelDistribution(agentSecurityRows, agentSecurityContextLabel),
     agentTestingRowCount: agentTestingRows.length,
     agentTestingMethodologyCoverage0to1: numericMean(
       agentTestingMethodologyCoverageScores,
-      agentTestingRows.length === 0 ? 1 : 0,
+      agentTestingRows.length === 0 ? null : 0,
     ),
     agentTestingScenarioCoverage0to1: numericMean(
       agentTestingScenarioCoverageScores,
-      agentTestingRows.length === 0 ? 1 : 0,
+      agentTestingRows.length === 0 ? null : 0,
     ),
     agentTestingFaultInjectionCoverage0to1: numericMean(
       agentTestingFaultInjectionCoverageScores,
-      agentTestingRows.length === 0 ? 1 : 0,
+      agentTestingRows.length === 0 ? null : 0,
     ),
     agentTestingResiliencePassRate0to1: numericMean(
       agentTestingResiliencePassRates,
-      agentTestingRows.length === 0 ? 1 : 0,
+      agentTestingRows.length === 0 ? null : 0,
     ),
     agentTestingSafetyRegressionRate0to1: numericMean(agentTestingSafetyRegressionRates, 0),
     agentTestingObservabilitySignalCoverage0to1: numericMean(
       agentTestingObservabilitySignalCoverageScores,
-      agentTestingRows.length === 0 ? 1 : 0,
+      agentTestingRows.length === 0 ? null : 0,
     ),
     agentTestingEvidenceCoverage0to1: agentTestingRows.length === 0
-      ? 1
+      ? null
       : round(agentTestingRows.filter(hasCompleteAgentTestingEvidence).length / agentTestingRows.length),
     agentTestingContextDistribution: labelDistribution(agentTestingRows, agentTestingContextLabel),
     chaosRowCount: chaosRows.length,
     chaosProductionReliabilityMean0to1: numericMean(
       chaosProductionReliabilityScores,
-      chaosRows.length === 0 ? 1 : 0,
+      chaosRows.length === 0 ? null : 0,
     ),
     chaosResilienceScoreMean0to1: numericMean(
       chaosResilienceScores,
-      chaosRows.length === 0 ? 1 : 0,
+      chaosRows.length === 0 ? null : 0,
     ),
     chaosDropMean0to1: numericMean(chaosDrops, 0),
     chaosRecoveryPassRate0to1: numericMean(
       chaosRecoveryPassRates,
-      chaosRows.length === 0 ? 1 : 0,
+      chaosRows.length === 0 ? null : 0,
     ),
     chaosFailureTraceCoverage0to1: numericMean(
       chaosFailureTraceCoverageScores,
-      chaosRows.length === 0 ? 1 : 0,
+      chaosRows.length === 0 ? null : 0,
     ),
     chaosImprovementEvalCoverage0to1: chaosRows.length === 0
-      ? 1
+      ? null
       : round(chaosRows.filter((row) => normalizeContextId(row.chaosImprovementEvalHash) !== null).length / chaosRows.length),
     chaosEvidenceCoverage0to1: chaosRows.length === 0
-      ? 1
+      ? null
       : round(chaosRows.filter(hasCompleteChaosEvidence).length / chaosRows.length),
     chaosContextDistribution: labelDistribution(chaosRows, chaosContextLabel),
     recoveryBenchRowCount: recoveryBenchRows.length,
     recoveryBenchRecoverySuccessRate0to1: numericMean(
       recoveryBenchRecoverySuccessValues,
-      recoveryBenchRows.length === 0 ? 1 : 0,
+      recoveryBenchRows.length === 0 ? null : 0,
     ),
     recoveryBenchRecoveryRewardMean0to1: numericMean(
       recoveryBenchRecoveryRewards,
-      recoveryBenchRows.length === 0 ? 1 : 0,
+      recoveryBenchRows.length === 0 ? null : 0,
     ),
     recoveryBenchReplayIntegrityRate0to1: numericMean(
       recoveryBenchReplayIntegrityValues,
-      recoveryBenchRows.length === 0 ? 1 : 0,
+      recoveryBenchRows.length === 0 ? null : 0,
     ),
     recoveryBenchFailureTraceCoverage0to1: numericMean(
       recoveryBenchFailureTraceCoverageScores,
-      recoveryBenchRows.length === 0 ? 1 : 0,
+      recoveryBenchRows.length === 0 ? null : 0,
     ),
     recoveryBenchCorruptedEnvironmentCoverage0to1: numericMean(
       recoveryBenchCorruptedEnvironmentCoverageScores,
-      recoveryBenchRows.length === 0 ? 1 : 0,
+      recoveryBenchRows.length === 0 ? null : 0,
     ),
     recoveryBenchContextCoverage0to1: numericMean(
       recoveryBenchContextCoverageScores,
-      recoveryBenchRows.length === 0 ? 1 : 0,
+      recoveryBenchRows.length === 0 ? null : 0,
     ),
     recoveryBenchEvidenceCoverage0to1: recoveryBenchRows.length === 0
-      ? 1
+      ? null
       : round(recoveryBenchRows.filter(hasCompleteRecoveryBenchEvidence).length / recoveryBenchRows.length),
     recoveryBenchMessageModeDistribution: labelDistribution(recoveryBenchRows, (row) =>
       normalizeRecoveryBenchMessageMode(row.recoveryBenchMessageMode)
@@ -5293,57 +5283,57 @@ function distribution(rows: LiveDriftSampleRow[]): LiveDriftDistribution {
     adkRowCount: adkRows.length,
     adkEvalPassRate0to1: numericMean(
       adkEvalPassRates,
-      adkRows.length === 0 ? 1 : 0,
+      adkRows.length === 0 ? null : 0,
     ),
     adkToolCallSuccessRate0to1: numericMean(
       adkToolCallSuccessRates,
-      adkRows.length === 0 ? 1 : 0,
+      adkRows.length === 0 ? null : 0,
     ),
     adkGraphCoverage0to1: numericMean(
       adkGraphCoverageScores,
-      adkRows.length === 0 ? 1 : 0,
+      adkRows.length === 0 ? null : 0,
     ),
     adkStreamingStability0to1: numericMean(
       adkStreamingStabilityScores,
-      adkRows.length === 0 ? 1 : 0,
+      adkRows.length === 0 ? null : 0,
     ),
     adkDeploymentReadiness0to1: numericMean(
       adkDeploymentReadinessScores,
-      adkRows.length === 0 ? 1 : 0,
+      adkRows.length === 0 ? null : 0,
     ),
     adkEvidenceCoverage0to1: adkRows.length === 0
-      ? 1
+      ? null
       : round(adkRows.filter(hasCompleteAdkEvidence).length / adkRows.length),
     adkRuntimeContextDistribution: labelDistribution(adkRows, adkRuntimeContextLabel),
     physicianBenchRowCount: physicianBenchRows.length,
     physicianBenchTaskSuccessRate0to1: numericMean(
       physicianBenchTaskSuccessValues,
-      physicianBenchRows.length === 0 ? 1 : 0,
+      physicianBenchRows.length === 0 ? null : 0,
     ),
     physicianBenchCheckpointPassRate0to1: numericMean(
       physicianBenchCheckpointPassRates,
-      physicianBenchRows.length === 0 ? 1 : 0,
+      physicianBenchRows.length === 0 ? null : 0,
     ),
     physicianBenchFhirDataAccessAccuracy0to1: numericMean(
       physicianBenchFhirDataAccessAccuracyScores,
-      physicianBenchRows.length === 0 ? 1 : 0,
+      physicianBenchRows.length === 0 ? null : 0,
     ),
     physicianBenchClinicalActionSafetyRate0to1: numericMean(
       physicianBenchClinicalActionSafetyScores,
-      physicianBenchRows.length === 0 ? 1 : 0,
+      physicianBenchRows.length === 0 ? null : 0,
     ),
     physicianBenchDocumentationQualityMean0to1: numericMean(
       physicianBenchDocumentationQualityScores,
-      physicianBenchRows.length === 0 ? 1 : 0,
+      physicianBenchRows.length === 0 ? null : 0,
     ),
     physicianBenchTrajectoryCoverage0to1: physicianBenchRows.length === 0
-      ? 1
+      ? null
       : round(physicianBenchRows.filter((row) => row.physicianBenchTrajectoryCaptured === true).length / physicianBenchRows.length),
     physicianBenchArtifactCoverage0to1: physicianBenchRows.length === 0
-      ? 1
+      ? null
       : round(physicianBenchRows.filter((row) => row.physicianBenchArtifactBundleComplete === true).length / physicianBenchRows.length),
     physicianBenchEvidenceCoverage0to1: physicianBenchRows.length === 0
-      ? 1
+      ? null
       : round(physicianBenchRows.filter(hasCompletePhysicianBenchEvidence).length / physicianBenchRows.length),
     physicianBenchSpecialtyDistribution: labelDistribution(physicianBenchRows, physicianBenchSpecialtyLabel),
     physicianBenchTaskTypeDistribution: labelDistribution(physicianBenchRows, (row) =>
@@ -5359,7 +5349,7 @@ function distribution(rows: LiveDriftSampleRow[]): LiveDriftDistribution {
       ? 0
       : round(ctfRows.filter((row) => row.ctfIndependenceViolated === true || normalizeContextId(row.ctfAgentInstanceId) === null).length / ctfRows.length),
     ctfFirstCorrectFlagForwardingRate0to1: ctfRows.length === 0
-      ? 1
+      ? null
       : round(ctfRows.filter((row) => row.ctfFirstCorrectFlagForwarded === true).length / ctfRows.length),
     ctfSubmissionMean: numericMean(ctfSubmissionCounts, 0),
     ctfTimeToFlagMsP95: percentile(ctfTimeToFlagValues, 95),
@@ -5368,7 +5358,7 @@ function distribution(rows: LiveDriftSampleRow[]): LiveDriftDistribution {
     ctfCheckpointCompletionMean0to1: numericMean(ctfCheckpointCompletionScores, 0),
     ctfPartialCreditScoreMean0to1: numericMean(ctfPartialCreditScores, 0),
     ctfTraceCoverageRate0to1: ctfPartialCreditRows.length === 0
-      ? 1
+      ? null
       : round(ctfPartialCreditRows.filter((row) => normalizeContextId(row.ctfExecutionTraceHash) !== null).length / ctfPartialCreditRows.length),
     ctfIsolationViolationRate0to1: ctfPartialCreditRows.length === 0
       ? 0
@@ -5382,19 +5372,19 @@ function distribution(rows: LiveDriftSampleRow[]): LiveDriftDistribution {
     ragHallucinationRateMean0to1: numericMean(ragHallucinationRates, 0),
     ragRetrievalTopKMean: numericMean(ragRetrievalTopKs, 0),
     ragGeneratedDataFinalCoverage0to1: ragRows.length === 0
-      ? 1
+      ? null
       : round(ragRows.filter((row) => row.ragGeneratedDataFinalized === true).length / ragRows.length),
     ragDatasetBuilderRowCount: ragDatasetBuilderRows.length,
-    ragPassageGroundingCoverage0to1: numericMean(ragPassageGroundingCoverageScores, 1),
-    ragHumanVerificationCoverage0to1: numericMean(ragHumanVerificationCoverageScores, 1),
-    ragCitationCoverage0to1: numericMean(ragCitationCoverageScores, 1),
-    ragAnswerSupportCoverage0to1: numericMean(ragAnswerSupportCoverageScores, 1),
+    ragPassageGroundingCoverage0to1: numericMean(ragPassageGroundingCoverageScores, ragDatasetBuilderRows.length === 0 ? null : 1),
+    ragHumanVerificationCoverage0to1: numericMean(ragHumanVerificationCoverageScores, ragDatasetBuilderRows.length === 0 ? null : 1),
+    ragCitationCoverage0to1: numericMean(ragCitationCoverageScores, ragDatasetBuilderRows.length === 0 ? null : 1),
+    ragAnswerSupportCoverage0to1: numericMean(ragAnswerSupportCoverageScores, ragDatasetBuilderRows.length === 0 ? null : 1),
     ragDatasetBuilderEvidenceCoverage0to1: ragDatasetBuilderRows.length === 0
-      ? 1
+      ? null
       : round(ragDatasetBuilderRows.filter(hasCompleteRagDatasetBuilderEvidence).length / ragDatasetBuilderRows.length),
     ragStrategyRowCount: ragStrategyRows.length,
     ragStrategyEvidenceCoverage0to1: ragStrategyRows.length === 0
-      ? 1
+      ? null
       : round(ragStrategyRows.filter(hasCompleteRagStrategyEvidence).length / ragStrategyRows.length),
     ragQuestionCountMean: numericMean(ragQuestionCounts, 0),
     ragSourceDocumentCountMean: numericMean(ragSourceDocumentCounts, 0),
@@ -5414,7 +5404,7 @@ function distribution(rows: LiveDriftSampleRow[]): LiveDriftDistribution {
     kiteRowCount: kiteRows.length,
     kiteGradeMean0to10: numericMean(kiteGrades0to10, 0),
     kiteNormalizedGradeMean0to1: numericMean(kiteNormalizedGrades, 0),
-    kiteEvidenceCoverage0to1: numericMean(kiteEvidenceCoverageScores, kiteRows.length === 0 ? 1 : 0),
+    kiteEvidenceCoverage0to1: numericMean(kiteEvidenceCoverageScores, kiteRows.length === 0 ? null : 0),
     kiteQuestionCountMean: numericMean(kiteQuestionCounts, 0),
     kiteDocumentCountMean: numericMean(kiteDocumentCounts, 0),
     kiteSmallSampleWarningRate0to1: kiteRows.length === 0
@@ -5429,7 +5419,7 @@ function distribution(rows: LiveDriftSampleRow[]): LiveDriftDistribution {
     pokerEvalEvBbPer100Mean: numericMean(pokerEvalEvBbPer100Scores, 0),
     pokerEvalVpipRate0to1: numericMean(pokerEvalVpipRates, 0),
     pokerEvalHandCountMean: numericMean(pokerEvalHandCounts, 0),
-    pokerEvalEvidenceCoverage0to1: numericMean(pokerEvalEvidenceCoverageScores, pokerEvalRows.length === 0 ? 1 : 0),
+    pokerEvalEvidenceCoverage0to1: numericMean(pokerEvalEvidenceCoverageScores, pokerEvalRows.length === 0 ? null : 0),
     pokerEvalGameTypeDistribution: labelDistribution(
       pokerEvalRows,
       (row) => normalizePokerEvalGameType(row.pokerEvalGameType),
@@ -5441,22 +5431,22 @@ function distribution(rows: LiveDriftSampleRow[]): LiveDriftDistribution {
     llmRagBiasRiskMean0to1: numericMean(llmRagBiasRiskScores, 0),
     llmRagHallucinationRateMean0to1: numericMean(llmRagHallucinationRates, 0),
     llmRagEvalSuiteEvidenceCoverage0to1: llmRagEvalSuiteRows.length === 0
-      ? 1
+      ? null
       : round(llmRagEvalSuiteRows.filter(hasCompleteLlmRagEvalSuiteEvidence).length / llmRagEvalSuiteRows.length),
     llmRagEvalSuiteContextDistribution: labelDistribution(llmRagEvalSuiteRows, llmRagEvalSuiteContextLabel),
     noMiraclRowCount: noMiraclRows.length,
     noMiraclRelevanceAccuracyMean0to1: numericMean(noMiraclRelevanceAccuracyScores, 0),
-    noMiraclAbstentionAccuracyMean0to1: numericMean(noMiraclAbstentionAccuracyScores, noMiraclRows.length === 0 ? 1 : 0),
+    noMiraclAbstentionAccuracyMean0to1: numericMean(noMiraclAbstentionAccuracyScores, noMiraclRows.length === 0 ? null : 0),
     noMiraclHallucinationRateMean0to1: numericMean(noMiraclHallucinationRates, 0),
     noMiraclErrorRateMean0to1: numericMean(noMiraclErrorRates, 0),
     noMiraclLanguageCoverage0to1: noMiraclRows.length === 0
-      ? 1
+      ? null
       : round(noMiraclRows.filter((row) =>
           normalizeNoMiraclLanguage(row.noMiraclLanguage) !== null &&
           normalizeContextId(row.noMiraclLanguageManifestHash) !== null
         ).length / noMiraclRows.length),
     noMiraclSubsetCoverage0to1: noMiraclRows.length === 0
-      ? 1
+      ? null
       : round((
           noMiraclRows.filter((row) => normalizeNoMiraclSubset(row.noMiraclSubset) !== "unknown").length / noMiraclRows.length +
           (new Set(noMiraclRows.map((row) => normalizeNoMiraclSubset(row.noMiraclSubset))).has("relevant") ? 0.5 : 0) +
@@ -5464,7 +5454,7 @@ function distribution(rows: LiveDriftSampleRow[]): LiveDriftDistribution {
         ) / 2),
     noMiraclEvidenceCoverage0to1: numericMean(
       noMiraclEvidenceCoverageScores,
-      noMiraclRows.length === 0 ? 1 : 0,
+      noMiraclRows.length === 0 ? null : 0,
     ),
     noMiraclLanguageDistribution: labelDistribution(noMiraclRows, noMiraclLanguageLabel),
     noMiraclSubsetDistribution: labelDistribution(noMiraclRows, (row) => normalizeNoMiraclSubset(row.noMiraclSubset)),
@@ -5474,7 +5464,7 @@ function distribution(rows: LiveDriftSampleRow[]): LiveDriftDistribution {
     scalingLawDiscoveryNmseMean: numericMean(scalingLawNmseScores, 0),
     scalingLawDiscoveryNmaeMean: numericMean(scalingLawNmaeScores, 0),
     scalingLawDiscoveryEvidenceCoverage0to1: scalingLawDiscoveryRows.length === 0
-      ? 1
+      ? null
       : round(scalingLawDiscoveryRows.filter(hasCompleteScalingLawDiscoveryEvidence).length / scalingLawDiscoveryRows.length),
     scalingLawDiscoveryTaskTypeDistribution: labelDistribution(scalingLawDiscoveryRows, (row) =>
       normalizeScalingLawTaskType(row.scalingLawTaskType)
@@ -5485,20 +5475,20 @@ function distribution(rows: LiveDriftSampleRow[]): LiveDriftDistribution {
     genomicsPreprocessingQualityMean0to1: numericMean(genomicsPreprocessingQualityScores, 0),
     genomicsStatisticalAnalysisAccuracyMean0to1: numericMean(genomicsStatisticalAnalysisAccuracyScores, 0),
     genomicsReferenceCoverage0to1: genomicsRows.length === 0
-      ? 1
+      ? null
       : round(genomicsRows.filter((row) =>
           normalizeContextId(row.genomicsReferenceDatasetHash) !== null &&
           normalizeContextId(row.genomicsPredictionDatasetHash) !== null &&
           normalizeContextId(row.genomicsMetadataHash) !== null
         ).length / genomicsRows.length),
     genomicsFormatConformanceRate0to1: genomicsRows.length === 0
-      ? 1
+      ? null
       : round(genomicsRows.filter((row) =>
           row.genomicsFormatConformant === true &&
           (normalizeNonNegative(row.genomicsFormatErrorCount) ?? 0) === 0
         ).length / genomicsRows.length),
     genomicsExpertCurationCoverage0to1: genomicsRows.length === 0
-      ? 1
+      ? null
       : round(genomicsRows.filter((row) => normalizeContextId(row.genomicsExpertAnnotationHash) !== null).length / genomicsRows.length),
     genomicsStageDistribution: labelDistribution(genomicsRows, (row) => normalizeGenomicsTaskStage(row.genomicsTaskStage)),
     genomicsContextDistribution: labelDistribution(genomicsRows, genomicsContextLabel),
@@ -5507,9 +5497,9 @@ function distribution(rows: LiveDriftSampleRow[]): LiveDriftDistribution {
     agenticSearchQueryDecompositionScoreMean0to1: numericMean(agenticSearchQueryDecompositionScores, 0),
     agenticSearchRelevanceScoreMean0to1: numericMean(agenticSearchRelevanceScores, 0),
     agenticSearchSynthesisScoreMean0to1: numericMean(agenticSearchSynthesisScores, 0),
-    agenticSearchCitationCoverage0to1: numericMean(agenticSearchCitationCoverageScores, agenticSearchRows.length === 0 ? 1 : 0),
+    agenticSearchCitationCoverage0to1: numericMean(agenticSearchCitationCoverageScores, agenticSearchRows.length === 0 ? null : 0),
     agenticSearchTraceCoverage0to1: agenticSearchRows.length === 0
-      ? 1
+      ? null
       : round(agenticSearchRows.filter(hasCompleteAgenticSearchTrace).length / agenticSearchRows.length),
     agenticSearchDatasetFamilyDistribution: labelDistribution(agenticSearchRows, (row) =>
       normalizeAgenticSearchDatasetFamily(row.agenticSearchDatasetFamily)
@@ -5522,10 +5512,10 @@ function distribution(rows: LiveDriftSampleRow[]): LiveDriftDistribution {
     documentDatasetQaAccuracyMean0to1: numericMean(documentDatasetQaAccuracyScores, 0),
     documentDatasetSummaryQualityMean0to1: numericMean(documentDatasetSummaryQualityScores, 0),
     documentDatasetRagFaithfulnessMean0to1: numericMean(documentDatasetRagFaithfulnessScores, 0),
-    documentDatasetNumGuardCoverage0to1: numericMean(documentDatasetNumGuardCoverageScores, documentDatasetRows.length === 0 ? 1 : 0),
+    documentDatasetNumGuardCoverage0to1: numericMean(documentDatasetNumGuardCoverageScores, documentDatasetRows.length === 0 ? null : 0),
     documentDatasetNumericMismatchRate0to1: numericMean(documentDatasetNumericMismatchRates, 0),
     documentDatasetEvidenceCoverage0to1: documentDatasetRows.length === 0
-      ? 1
+      ? null
       : round(documentDatasetRows.filter(hasCompleteDocumentDatasetEvidence).length / documentDatasetRows.length),
     documentDatasetTokenSavingsRatio: numericMean(documentDatasetTokenSavingsRatios, 0),
     documentDatasetThroughputDocsPerSec: numericMean(documentDatasetThroughputDocsPerSec, 0),
@@ -5553,7 +5543,7 @@ function distribution(rows: LiveDriftSampleRow[]): LiveDriftDistribution {
     cpuAgenticFrameworkOverheadShareMean0to1: numericMean(cpuAgenticFrameworkOverheadShares, 0),
     cpuAgenticEvidenceCoverage0to1: numericMean(
       cpuAgenticEvidenceCoverageScores,
-      cpuAgenticRows.length === 0 ? 1 : 0,
+      cpuAgenticRows.length === 0 ? null : 0,
     ),
     cpuAgenticWorkloadDistribution: labelDistribution(cpuAgenticRows, (row) =>
       normalizeCpuAgenticWorkloadFamily(row.cpuAgenticWorkloadFamily)
@@ -5580,11 +5570,11 @@ function distribution(rows: LiveDriftSampleRow[]): LiveDriftDistribution {
     evalTechniqueSimulationGoalCompletionMean0to1: numericMean(evalTechniqueSimulationGoalCompletionScores, 0),
     evalTechniqueAlgorithmicFeedbackCoverage0to1: numericMean(
       evalTechniqueAlgorithmicFeedbackCoverageScores,
-      evalTechniqueRows.length === 0 ? 1 : 0,
+      evalTechniqueRows.length === 0 ? null : 0,
     ),
     evalTechniqueEvidenceCoverage0to1: numericMean(
       evalTechniqueEvidenceCoverageScores,
-      evalTechniqueRows.length === 0 ? 1 : 0,
+      evalTechniqueRows.length === 0 ? null : 0,
     ),
     evalTechniqueDistribution: labelDistribution(evalTechniqueRows, (row) =>
       normalizeEvalTechnique(row.evalTechniqueTechnique)
@@ -5593,19 +5583,19 @@ function distribution(rows: LiveDriftSampleRow[]): LiveDriftDistribution {
     sapAgentEvalRowCount: sapAgentEvalRows.length,
     sapAgentEvalObjectiveCoverage0to1: numericMean(
       sapAgentEvalObjectiveCoverageScores,
-      sapAgentEvalRows.length === 0 ? 1 : 0,
+      sapAgentEvalRows.length === 0 ? null : 0,
     ),
     sapAgentEvalProcessCoverage0to1: numericMean(
       sapAgentEvalProcessCoverageScores,
-      sapAgentEvalRows.length === 0 ? 1 : 0,
+      sapAgentEvalRows.length === 0 ? null : 0,
     ),
     sapAgentEvalEnterpriseContextCoverage0to1: numericMean(
       sapAgentEvalEnterpriseContextCoverageScores,
-      sapAgentEvalRows.length === 0 ? 1 : 0,
+      sapAgentEvalRows.length === 0 ? null : 0,
     ),
     sapAgentEvalEvidenceCoverage0to1: numericMean(
       sapAgentEvalEvidenceCoverageScores,
-      sapAgentEvalRows.length === 0 ? 1 : 0,
+      sapAgentEvalRows.length === 0 ? null : 0,
     ),
     sapAgentEvalObjectiveDistribution: labelDistribution(
       sapAgentEvalRows,
@@ -5622,15 +5612,15 @@ function distribution(rows: LiveDriftSampleRow[]): LiveDriftDistribution {
     agentEvalObservabilityRowCount: agentEvalObservabilityRows.length,
     agentEvalObservabilityConfigCoverage0to1: numericMean(
       agentEvalObservabilityConfigCoverageScores,
-      agentEvalObservabilityRows.length === 0 ? 1 : 0,
+      agentEvalObservabilityRows.length === 0 ? null : 0,
     ),
     agentEvalObservabilityTelemetryCoverage0to1: numericMean(
       agentEvalObservabilityTelemetryCoverageScores,
-      agentEvalObservabilityRows.length === 0 ? 1 : 0,
+      agentEvalObservabilityRows.length === 0 ? null : 0,
     ),
     agentEvalObservabilityEvidenceCoverage0to1: numericMean(
       agentEvalObservabilityEvidenceCoverageScores,
-      agentEvalObservabilityRows.length === 0 ? 1 : 0,
+      agentEvalObservabilityRows.length === 0 ? null : 0,
     ),
     agentEvalObservabilityMetricSetDistribution: labelDistribution(
       agentEvalObservabilityRows,
@@ -5646,11 +5636,11 @@ function distribution(rows: LiveDriftSampleRow[]): LiveDriftDistribution {
     hedraRagResourceMemoryGbMean: numericMean(hedraRagMemoryValues, 0),
     hedraRagReplayPassRate0to1: numericMean(
       hedraRagReplayPassRates,
-      hedraRagRows.length === 0 ? 1 : 0,
+      hedraRagRows.length === 0 ? null : 0,
     ),
     hedraRagEvidenceCoverage0to1: numericMean(
       hedraRagEvidenceCoverageScores,
-      hedraRagRows.length === 0 ? 1 : 0,
+      hedraRagRows.length === 0 ? null : 0,
     ),
     hedraRagWorkflowDistribution: labelDistribution(hedraRagRows, (row) =>
       normalizeHedraRagWorkflow(row.hedraRagWorkflow)
@@ -5662,18 +5652,18 @@ function distribution(rows: LiveDriftSampleRow[]): LiveDriftDistribution {
     agentEvalHarnessRowCount: agentEvalHarnessRows.length,
     agentEvalHarnessToolSuccessRate0to1: numericMean(
       agentEvalHarnessToolSuccessRates,
-      agentEvalHarnessRows.length === 0 ? 1 : 0,
+      agentEvalHarnessRows.length === 0 ? null : 0,
     ),
     agentEvalHarnessHallucinationRate0to1: numericMean(agentEvalHarnessHallucinationRates, 0),
     agentEvalHarnessLatencyP95Ms: percentile(agentEvalHarnessLatencyP95Values, 95),
     agentEvalHarnessCostUsdMean: numericMean(agentEvalHarnessCostValues, 0),
     agentEvalHarnessTraceCoverage0to1: numericMean(
       agentEvalHarnessTraceCoverageScores,
-      agentEvalHarnessRows.length === 0 ? 1 : 0,
+      agentEvalHarnessRows.length === 0 ? null : 0,
     ),
     agentEvalHarnessEvidenceCoverage0to1: numericMean(
       agentEvalHarnessEvidenceCoverageScores,
-      agentEvalHarnessRows.length === 0 ? 1 : 0,
+      agentEvalHarnessRows.length === 0 ? null : 0,
     ),
     agentEvalHarnessFrameworkDistribution: labelDistribution(agentEvalHarnessRows, (row) =>
       normalizeAgentEvalHarnessFramework(row.agentEvalHarnessFramework)
@@ -5687,23 +5677,23 @@ function distribution(rows: LiveDriftSampleRow[]): LiveDriftDistribution {
     strandsBenchmarkHarnessRowCount: strandsBenchmarkHarnessRows.length,
     strandsBenchmarkHarnessTaskSuccessRate0to1: numericMean(
       strandsBenchmarkHarnessTaskSuccessRates,
-      strandsBenchmarkHarnessRows.length === 0 ? 1 : 0,
+      strandsBenchmarkHarnessRows.length === 0 ? null : 0,
     ),
     strandsBenchmarkHarnessPatchApplyRate0to1: numericMean(
       strandsBenchmarkHarnessPatchApplyRates,
-      strandsBenchmarkHarnessRows.length === 0 ? 1 : 0,
+      strandsBenchmarkHarnessRows.length === 0 ? null : 0,
     ),
     strandsBenchmarkHarnessTestPassRate0to1: numericMean(
       strandsBenchmarkHarnessTestPassRates,
-      strandsBenchmarkHarnessRows.length === 0 ? 1 : 0,
+      strandsBenchmarkHarnessRows.length === 0 ? null : 0,
     ),
     strandsBenchmarkHarnessTrajectoryCoverage0to1: numericMean(
       strandsBenchmarkHarnessTrajectoryCoverageScores,
-      strandsBenchmarkHarnessRows.length === 0 ? 1 : 0,
+      strandsBenchmarkHarnessRows.length === 0 ? null : 0,
     ),
     strandsBenchmarkHarnessEvidenceCoverage0to1: numericMean(
       strandsBenchmarkHarnessEvidenceCoverageScores,
-      strandsBenchmarkHarnessRows.length === 0 ? 1 : 0,
+      strandsBenchmarkHarnessRows.length === 0 ? null : 0,
     ),
     strandsBenchmarkHarnessLatencyP95Ms: percentile(strandsBenchmarkHarnessLatencyP95Values, 95),
     strandsBenchmarkHarnessCostUsdMean: numericMean(strandsBenchmarkHarnessCostValues, 0),
@@ -5725,7 +5715,7 @@ function distribution(rows: LiveDriftSampleRow[]): LiveDriftDistribution {
     privacyWebModalLeakageDeltaMean0to1: numericMean(privacyWebModalLeakageDeltaScores, 0),
     privacyWebEvidenceCoverage0to1: numericMean(
       privacyWebEvidenceCoverageScores,
-      privacyWebRows.length === 0 ? 1 : 0,
+      privacyWebRows.length === 0 ? null : 0,
     ),
     privacyWebEnvironmentDistribution: labelDistribution(privacyWebRows, (row) =>
       normalizePrivacyWebEnvironment(row.privacyWebEnvironment)
@@ -5740,18 +5730,18 @@ function distribution(rows: LiveDriftSampleRow[]): LiveDriftDistribution {
       ? 0
       : round(localSystemRows.filter((row) => row.localSystemVoltageSpcAnomaly === true).length / localSystemRows.length),
     localSystemProcessIdentityCoverage0to1: localSystemRows.length === 0
-      ? 1
+      ? null
       : round(localSystemRows.filter((row) => row.localSystemProcessIdentityMatched === true).length / localSystemRows.length),
     localSystemGhostDriverDetectionCoverage0to1: localSystemRows.length === 0
-      ? 1
+      ? null
       : round(localSystemRows.filter((row) =>
           row.localSystemGhostDriverDetected === false || row.localSystemGhostDriverHandled === true
         ).length / localSystemRows.length),
     localSystemProactiveAlertCoverage0to1: localSystemRows.length === 0
-      ? 1
+      ? null
       : round(localSystemRows.filter((row) => row.localSystemProactiveAlertDelivered === true).length / localSystemRows.length),
     localSystemLocalOnlyPrivacyCoverage0to1: localSystemRows.length === 0
-      ? 1
+      ? null
       : round(localSystemRows.filter((row) =>
           row.localSystemOfflineMode === true &&
           row.localSystemCloudDisabled === true &&
@@ -5759,7 +5749,7 @@ function distribution(rows: LiveDriftSampleRow[]): LiveDriftDistribution {
           row.localSystemLocalDataOnly === true
         ).length / localSystemRows.length),
     localSystemEvidenceCoverage0to1: localSystemRows.length === 0
-      ? 1
+      ? null
       : round(localSystemRows.filter(hasCompleteLocalSystemEvidence).length / localSystemRows.length),
     localSystemWorkloadContextDistribution: labelDistribution(localSystemRows, (row) =>
       normalizeLocalSystemWorkloadContext(row.localSystemWorkloadContext)
@@ -5769,18 +5759,18 @@ function distribution(rows: LiveDriftSampleRow[]): LiveDriftDistribution {
     observabilityResolutionScoreMean0to1: numericMean(observabilityResolutionScores, 0),
     observabilityEvidenceCoverage0to1: numericMean(
       observabilityEvidenceCoverageScores,
-      observabilityRows.length === 0 ? 1 : 0,
+      observabilityRows.length === 0 ? null : 0,
     ),
     observabilityDeterministicCheckPassRate0to1: numericMean(observabilityDeterministicCheckPassRates, 0),
     observabilityRubricScoreMean0to1: numericMean(observabilityRubricScores, 0),
     observabilityTraceCoverage0to1: observabilityRows.length === 0
-      ? 1
+      ? null
       : round(observabilityRows.filter(observabilityTraceCovered).length / observabilityRows.length),
     observabilityReportCoverage0to1: observabilityRows.length === 0
-      ? 1
+      ? null
       : round(observabilityRows.filter(observabilityReportCovered).length / observabilityRows.length),
     observabilityScenarioClockAlignmentRate0to1: observabilityRows.length === 0
-      ? 1
+      ? null
       : round(observabilityRows.filter((row) => row.observabilityScenarioClockAligned === true).length / observabilityRows.length),
     observabilityIncidentContextDistribution: labelDistribution(observabilityRows, observabilityIncidentContextLabel),
     observabilityTaskTypeDistribution: labelDistribution(observabilityRows, (row) =>
@@ -5814,7 +5804,7 @@ function distribution(rows: LiveDriftSampleRow[]): LiveDriftDistribution {
         ).length / webOperatorRows.length),
     webOperatorTaskReliabilityMean0to1: numericMean(webOperatorTaskReliabilityScores, 0),
     webOperatorReplayCoverage0to1: webOperatorRows.length === 0
-      ? 1
+      ? null
       : round(webOperatorRows.filter(webOperatorReplayCovered).length / webOperatorRows.length),
     webOperatorTaskTimeMeanMs: numericMean(webOperatorTaskTimes, 0),
     webOperatorStepLimitViolationRate0to1: webOperatorRows.length === 0
@@ -5837,12 +5827,12 @@ function distribution(rows: LiveDriftSampleRow[]): LiveDriftDistribution {
     naviBenchExcludingCrashedScoreMean0to1: numericMean(naviBenchExcludingCrashedScores, 0),
     naviBenchUpperBoundScoreMean0to1: numericMean(naviBenchUpperBoundScores, 0),
     naviBenchTrajectoryCoverage0to1: naviBenchRows.length === 0
-      ? 1
+      ? null
       : round(naviBenchRows.filter(naviBenchTrajectoryCovered).length / naviBenchRows.length),
     naviBenchVisualizationCoverage0to1: naviBenchRows.length === 0
-      ? 1
+      ? null
       : round(naviBenchRows.filter(naviBenchVisualizationCovered).length / naviBenchRows.length),
-    naviBenchEvidenceCoverage0to1: numericMean(naviBenchEvidenceCoverageScores, naviBenchRows.length === 0 ? 1 : 0),
+    naviBenchEvidenceCoverage0to1: numericMean(naviBenchEvidenceCoverageScores, naviBenchRows.length === 0 ? null : 0),
     naviBenchStepCountMean: numericMean(naviBenchStepCounts, 0),
     naviBenchStepLimitViolationRate0to1: naviBenchRows.length === 0
       ? 0
@@ -5866,11 +5856,11 @@ function distribution(rows: LiveDriftSampleRow[]): LiveDriftDistribution {
     legalAgentToolUseAccuracyMean0to1: numericMean(legalAgentToolUseAccuracyScores, 0),
     legalAgentCitationCoverage0to1: numericMean(
       legalAgentCitationCoverageScores,
-      legalAgentRows.length === 0 ? 1 : 0,
+      legalAgentRows.length === 0 ? null : 0,
     ),
     legalAgentEvidenceCoverage0to1: numericMean(
       legalAgentEvidenceCoverageScores,
-      legalAgentRows.length === 0 ? 1 : 0,
+      legalAgentRows.length === 0 ? null : 0,
     ),
     legalAgentTokenCostMean: numericMean(legalAgentTokenCosts, 0),
     legalAgentCorpusDistribution: labelDistribution(legalAgentRows, legalAgentCorpusLabel),
@@ -5886,10 +5876,10 @@ function distribution(rows: LiveDriftSampleRow[]): LiveDriftDistribution {
     researchGymSubtaskCompletionRate0to1: numericMean(researchGymSubtaskCompletionScores, 0),
     researchGymArtifactCoverage0to1: numericMean(
       researchGymArtifactCoverageScores,
-      researchGymRows.length === 0 ? 1 : 0,
+      researchGymRows.length === 0 ? null : 0,
     ),
     researchGymInspectionPassRate0to1: researchGymRows.length === 0
-      ? 1
+      ? null
       : round(researchGymRows.filter((row) => row.researchGymInspectionPassed === true).length / researchGymRows.length),
     researchGymBudgetOverrunRate0to1: researchGymRows.length === 0
       ? 0
@@ -5915,7 +5905,7 @@ function distribution(rows: LiveDriftSampleRow[]): LiveDriftDistribution {
     osUniverseValidationErrorRate0to1: numericMean(osUniverseValidationErrorRates, 0),
     osUniverseEvidenceCoverage0to1: numericMean(
       osUniverseEvidenceCoverageScores,
-      osUniverseRows.length === 0 ? 1 : 0,
+      osUniverseRows.length === 0 ? null : 0,
     ),
     osUniverseStepCountMean: numericMean(osUniverseStepCounts, 0),
     osUniverseStepLimitViolationRate0to1: osUniverseRows.length === 0
@@ -5930,6 +5920,7 @@ function distribution(rows: LiveDriftSampleRow[]): LiveDriftDistribution {
     osUniverseRuntimeContextDistribution: labelDistribution(osUniverseRows, osUniverseRuntimeContextLabel),
     ...stability,
   };
+  return { ...result, evidenceOutcome: result.sampleSize > 0 ? "measured" : "not_evaluated" };
 }
 
 function receiptRows(rows: LiveDriftSampleRow[]): LiveDriftReceiptRow[] {
@@ -6891,8 +6882,12 @@ function expectedRowHash(row: LiveDriftReceiptRow): string {
   return sha256Hex(canonicalize(payload));
 }
 
-function driftStatistic(parts: number[]): number {
-  const positive = parts.map((part) => Math.max(0, Number.isFinite(part) ? part : 0));
+function driftContribution(value: number | null, threshold: number): number | null {
+  return value === null ? null : value / threshold;
+}
+
+function driftStatistic(parts: Array<number | null>): number {
+  const positive = parts.map((part) => Math.max(0, part !== null && Number.isFinite(part) ? part : 0));
   if (positive.length === 0) return 0;
   return round(Math.sqrt(positive.reduce((sum, part) => sum + part ** 2, 0) / positive.length));
 }
@@ -7003,12 +6998,16 @@ function severity(metricId: LiveDriftMetricId, observed: number, threshold: numb
   return "low";
 }
 
+function minimumCoverage(baseline: number | null, live: number | null): number | null {
+  return baseline === null || live === null ? null : Math.min(baseline, live);
+}
+
 function makeAlert(
   agentId: string,
   baselineWindowId: string,
   liveWindowId: string,
   metricId: LiveDriftMetricId,
-  observed: number,
+  observed: number | null,
   threshold: number,
   message: string,
   evidenceRefs: string[],
@@ -7017,10 +7016,10 @@ function makeAlert(
   return {
     alertId: `live-drift:${agentId}:${baselineWindowId}:${liveWindowId}:${metricId}`,
     metricId,
-    severity: severity(metricId, observed, threshold),
-    message,
+    severity: observed === null ? "high" : severity(metricId, observed, threshold),
+    message: observed === null ? `Live drift evidence missing for ${metricId}; not evaluated. ${message}` : message,
     threshold: round(threshold),
-    observed: round(observed),
+    observed: observed === null ? null : round(observed),
     evidenceRefs,
     signedEvidenceRefs,
   };
@@ -7202,10 +7201,10 @@ export function runLiveScoreBehaviorDrift(input: RunLiveScoreBehaviorDriftInput)
     ctfContaminationRiskIncrease0to1: hasCtfEvidence ? round(liveDistribution.ctfContaminationRiskMean0to1 - baselineDistribution.ctfContaminationRiskMean0to1) : 0,
     ctfCompetitionImpactIncrease0to1: hasCtfEvidence ? round(liveDistribution.ctfCompetitionImpactMean0to1 - baselineDistribution.ctfCompetitionImpactMean0to1) : 0,
     ctfIndependenceViolationRate0to1: hasCtfEvidence ? liveDistribution.ctfIndependenceViolationRate0to1 : 0,
-    ctfFirstCorrectFlagForwardingRateDrop0to1: hasCtfEvidence ? round(baselineDistribution.ctfFirstCorrectFlagForwardingRate0to1 - liveDistribution.ctfFirstCorrectFlagForwardingRate0to1) : 0,
+    ctfFirstCorrectFlagForwardingRateDrop0to1: guardedDelta(hasCtfEvidence, baselineDistribution.ctfFirstCorrectFlagForwardingRate0to1, liveDistribution.ctfFirstCorrectFlagForwardingRate0to1),
     ctfCheckpointCompletionDrop0to1: hasCtfPartialCreditEvidence ? round(baselineDistribution.ctfCheckpointCompletionMean0to1 - liveDistribution.ctfCheckpointCompletionMean0to1) : 0,
     ctfPartialCreditScoreDrop0to1: hasCtfPartialCreditEvidence ? round(baselineDistribution.ctfPartialCreditScoreMean0to1 - liveDistribution.ctfPartialCreditScoreMean0to1) : 0,
-    ctfTraceCoverageRateDrop0to1: hasCtfPartialCreditEvidence ? round(baselineDistribution.ctfTraceCoverageRate0to1 - liveDistribution.ctfTraceCoverageRate0to1) : 0,
+    ctfTraceCoverageRateDrop0to1: guardedDelta(hasCtfPartialCreditEvidence, baselineDistribution.ctfTraceCoverageRate0to1, liveDistribution.ctfTraceCoverageRate0to1),
     ctfIsolationViolationRate0to1: hasCtfPartialCreditEvidence ? liveDistribution.ctfIsolationViolationRate0to1 : 0,
     ragAccuracyDrop0to1: hasRagEvidence ? round(baselineDistribution.ragAccuracyMean0to1 - liveDistribution.ragAccuracyMean0to1) : 0,
     ragCompletenessDrop0to1: hasRagEvidence ? round(baselineDistribution.ragCompletenessMean0to1 - liveDistribution.ragCompletenessMean0to1) : 0,
@@ -7213,19 +7212,19 @@ export function runLiveScoreBehaviorDrift(input: RunLiveScoreBehaviorDriftInput)
     ragNumericalAccuracyDrop0to1: hasRagEvidence ? round(baselineDistribution.ragNumericalAccuracyMean0to1 - liveDistribution.ragNumericalAccuracyMean0to1) : 0,
     ragHallucinationRateIncrease0to1: hasRagEvidence ? round(liveDistribution.ragHallucinationRateMean0to1 - baselineDistribution.ragHallucinationRateMean0to1) : 0,
     ragRetrievalTopKMeanShiftRatio: hasRagEvidence ? ratioShift(liveDistribution.ragRetrievalTopKMean, baselineDistribution.ragRetrievalTopKMean) : 0,
-    ragGeneratedDataFinalCoverageDrop0to1: hasRagEvidence ? round(Math.max(0, baselineDistribution.ragGeneratedDataFinalCoverage0to1 - liveDistribution.ragGeneratedDataFinalCoverage0to1)) : 0,
-    ragPassageGroundingCoverageDrop0to1: hasRagDatasetBuilderEvidence ? round(Math.max(0, baselineDistribution.ragPassageGroundingCoverage0to1 - liveDistribution.ragPassageGroundingCoverage0to1)) : 0,
-    ragHumanVerificationCoverageDrop0to1: hasRagDatasetBuilderEvidence ? round(Math.max(0, baselineDistribution.ragHumanVerificationCoverage0to1 - liveDistribution.ragHumanVerificationCoverage0to1)) : 0,
-    ragCitationCoverageDrop0to1: hasRagDatasetBuilderEvidence ? round(Math.max(0, baselineDistribution.ragCitationCoverage0to1 - liveDistribution.ragCitationCoverage0to1)) : 0,
-    ragAnswerSupportCoverageDrop0to1: hasRagDatasetBuilderEvidence ? round(Math.max(0, baselineDistribution.ragAnswerSupportCoverage0to1 - liveDistribution.ragAnswerSupportCoverage0to1)) : 0,
-    ragDatasetBuilderEvidenceCoverageDrop0to1: hasRagDatasetBuilderEvidence ? round(Math.max(0, baselineDistribution.ragDatasetBuilderEvidenceCoverage0to1 - liveDistribution.ragDatasetBuilderEvidenceCoverage0to1)) : 0,
-    ragStrategyEvidenceCoverageDrop0to1: hasRagStrategyEvidence ? round(Math.max(0, baselineDistribution.ragStrategyEvidenceCoverage0to1 - liveDistribution.ragStrategyEvidenceCoverage0to1)) : 0,
+    ragGeneratedDataFinalCoverageDrop0to1: guardedDrop(hasRagEvidence, baselineDistribution.ragGeneratedDataFinalCoverage0to1, liveDistribution.ragGeneratedDataFinalCoverage0to1),
+    ragPassageGroundingCoverageDrop0to1: guardedDrop(hasRagDatasetBuilderEvidence, baselineDistribution.ragPassageGroundingCoverage0to1, liveDistribution.ragPassageGroundingCoverage0to1),
+    ragHumanVerificationCoverageDrop0to1: guardedDrop(hasRagDatasetBuilderEvidence, baselineDistribution.ragHumanVerificationCoverage0to1, liveDistribution.ragHumanVerificationCoverage0to1),
+    ragCitationCoverageDrop0to1: guardedDrop(hasRagDatasetBuilderEvidence, baselineDistribution.ragCitationCoverage0to1, liveDistribution.ragCitationCoverage0to1),
+    ragAnswerSupportCoverageDrop0to1: guardedDrop(hasRagDatasetBuilderEvidence, baselineDistribution.ragAnswerSupportCoverage0to1, liveDistribution.ragAnswerSupportCoverage0to1),
+    ragDatasetBuilderEvidenceCoverageDrop0to1: guardedDrop(hasRagDatasetBuilderEvidence, baselineDistribution.ragDatasetBuilderEvidenceCoverage0to1, liveDistribution.ragDatasetBuilderEvidenceCoverage0to1),
+    ragStrategyEvidenceCoverageDrop0to1: guardedDrop(hasRagStrategyEvidence, baselineDistribution.ragStrategyEvidenceCoverage0to1, liveDistribution.ragStrategyEvidenceCoverage0to1),
     ragGenerationCostIncreaseRatio: hasRagDatasetBuilderEvidence ? ratioIncrease(liveDistribution.ragGenerationCostUsdMean, baselineDistribution.ragGenerationCostUsdMean) : 0,
     ragQuestionCountDropRatio: hasRagDatasetBuilderEvidence ? ratioDrop(liveDistribution.ragQuestionCountMean, baselineDistribution.ragQuestionCountMean) : 0,
     ragSourceDocumentCountDropRatio: hasRagDatasetBuilderEvidence ? ratioDrop(liveDistribution.ragSourceDocumentCountMean, baselineDistribution.ragSourceDocumentCountMean) : 0,
     kiteGradeDrop0to10: hasKiteEvidence ? round(Math.max(0, baselineDistribution.kiteGradeMean0to10 - liveDistribution.kiteGradeMean0to10)) : 0,
     kiteNormalizedGradeDrop0to1: hasKiteEvidence ? round(Math.max(0, baselineDistribution.kiteNormalizedGradeMean0to1 - liveDistribution.kiteNormalizedGradeMean0to1)) : 0,
-    kiteEvidenceCoverageDrop0to1: hasKiteEvidence ? round(Math.max(0, baselineDistribution.kiteEvidenceCoverage0to1 - liveDistribution.kiteEvidenceCoverage0to1)) : 0,
+    kiteEvidenceCoverageDrop0to1: guardedDrop(hasKiteEvidence, baselineDistribution.kiteEvidenceCoverage0to1, liveDistribution.kiteEvidenceCoverage0to1),
     kiteQuestionCountDropRatio: hasKiteEvidence ? ratioDrop(liveDistribution.kiteQuestionCountMean, baselineDistribution.kiteQuestionCountMean) : 0,
     kiteDocumentCountDropRatio: hasKiteEvidence ? ratioDrop(liveDistribution.kiteDocumentCountMean, baselineDistribution.kiteDocumentCountMean) : 0,
     pokerEvalBbPer100Drop: hasPokerEvalEvidence ? round(Math.max(0, baselineDistribution.pokerEvalBbPer100Mean - liveDistribution.pokerEvalBbPer100Mean)) : 0,
@@ -7233,40 +7232,40 @@ export function runLiveScoreBehaviorDrift(input: RunLiveScoreBehaviorDriftInput)
     pokerEvalEvBbPer100Drop: hasPokerEvalEvidence ? round(Math.max(0, baselineDistribution.pokerEvalEvBbPer100Mean - liveDistribution.pokerEvalEvBbPer100Mean)) : 0,
     pokerEvalVpipShift0to1: hasPokerEvalEvidence ? round(Math.abs(liveDistribution.pokerEvalVpipRate0to1 - baselineDistribution.pokerEvalVpipRate0to1)) : 0,
     pokerEvalHandCountDropRatio: hasPokerEvalEvidence ? ratioDrop(liveDistribution.pokerEvalHandCountMean, baselineDistribution.pokerEvalHandCountMean) : 0,
-    pokerEvalEvidenceCoverageDrop0to1: hasPokerEvalEvidence ? round(Math.max(0, baselineDistribution.pokerEvalEvidenceCoverage0to1 - liveDistribution.pokerEvalEvidenceCoverage0to1)) : 0,
+    pokerEvalEvidenceCoverageDrop0to1: guardedDrop(hasPokerEvalEvidence, baselineDistribution.pokerEvalEvidenceCoverage0to1, liveDistribution.pokerEvalEvidenceCoverage0to1),
     llmRagSemanticSimilarityDrop0to1: hasLlmRagEvalSuiteEvidence ? round(baselineDistribution.llmRagSemanticSimilarityMean0to1 - liveDistribution.llmRagSemanticSimilarityMean0to1) : 0,
     llmRagBiasRiskIncrease0to1: hasLlmRagEvalSuiteEvidence ? round(liveDistribution.llmRagBiasRiskMean0to1 - baselineDistribution.llmRagBiasRiskMean0to1) : 0,
     llmRagHallucinationRateIncrease0to1: hasLlmRagEvalSuiteEvidence ? round(liveDistribution.llmRagHallucinationRateMean0to1 - baselineDistribution.llmRagHallucinationRateMean0to1) : 0,
-    llmRagEvalSuiteEvidenceCoverageDrop0to1: hasLlmRagEvalSuiteEvidence ? round(Math.max(0, baselineDistribution.llmRagEvalSuiteEvidenceCoverage0to1 - liveDistribution.llmRagEvalSuiteEvidenceCoverage0to1)) : 0,
+    llmRagEvalSuiteEvidenceCoverageDrop0to1: guardedDrop(hasLlmRagEvalSuiteEvidence, baselineDistribution.llmRagEvalSuiteEvidenceCoverage0to1, liveDistribution.llmRagEvalSuiteEvidenceCoverage0to1),
     noMiraclRelevanceAccuracyDrop0to1: hasNoMiraclEvidence ? round(baselineDistribution.noMiraclRelevanceAccuracyMean0to1 - liveDistribution.noMiraclRelevanceAccuracyMean0to1) : 0,
-    noMiraclAbstentionAccuracyDrop0to1: hasNoMiraclEvidence ? round(baselineDistribution.noMiraclAbstentionAccuracyMean0to1 - liveDistribution.noMiraclAbstentionAccuracyMean0to1) : 0,
+    noMiraclAbstentionAccuracyDrop0to1: guardedDelta(hasNoMiraclEvidence, baselineDistribution.noMiraclAbstentionAccuracyMean0to1, liveDistribution.noMiraclAbstentionAccuracyMean0to1),
     noMiraclHallucinationRateIncrease0to1: hasNoMiraclEvidence ? round(liveDistribution.noMiraclHallucinationRateMean0to1 - baselineDistribution.noMiraclHallucinationRateMean0to1) : 0,
     noMiraclErrorRateIncrease0to1: hasNoMiraclEvidence ? round(liveDistribution.noMiraclErrorRateMean0to1 - baselineDistribution.noMiraclErrorRateMean0to1) : 0,
-    noMiraclLanguageCoverageDrop0to1: hasNoMiraclEvidence ? round(Math.max(0, baselineDistribution.noMiraclLanguageCoverage0to1 - liveDistribution.noMiraclLanguageCoverage0to1)) : 0,
-    noMiraclSubsetCoverageDrop0to1: hasNoMiraclEvidence ? round(Math.max(0, baselineDistribution.noMiraclSubsetCoverage0to1 - liveDistribution.noMiraclSubsetCoverage0to1)) : 0,
-    noMiraclEvidenceCoverageDrop0to1: hasNoMiraclEvidence ? round(Math.max(0, baselineDistribution.noMiraclEvidenceCoverage0to1 - liveDistribution.noMiraclEvidenceCoverage0to1)) : 0,
+    noMiraclLanguageCoverageDrop0to1: guardedDrop(hasNoMiraclEvidence, baselineDistribution.noMiraclLanguageCoverage0to1, liveDistribution.noMiraclLanguageCoverage0to1),
+    noMiraclSubsetCoverageDrop0to1: guardedDrop(hasNoMiraclEvidence, baselineDistribution.noMiraclSubsetCoverage0to1, liveDistribution.noMiraclSubsetCoverage0to1),
+    noMiraclEvidenceCoverageDrop0to1: guardedDrop(hasNoMiraclEvidence, baselineDistribution.noMiraclEvidenceCoverage0to1, liveDistribution.noMiraclEvidenceCoverage0to1),
     scalingLawR2Drop: hasScalingLawDiscoveryEvidence ? round(baselineDistribution.scalingLawDiscoveryR2Mean - liveDistribution.scalingLawDiscoveryR2Mean) : 0,
     scalingLawNmseIncrease: hasScalingLawDiscoveryEvidence ? round(liveDistribution.scalingLawDiscoveryNmseMean - baselineDistribution.scalingLawDiscoveryNmseMean) : 0,
     scalingLawNmaeIncrease: hasScalingLawDiscoveryEvidence ? round(liveDistribution.scalingLawDiscoveryNmaeMean - baselineDistribution.scalingLawDiscoveryNmaeMean) : 0,
-    scalingLawEvidenceCoverageDrop0to1: hasScalingLawDiscoveryEvidence ? round(Math.max(0, baselineDistribution.scalingLawDiscoveryEvidenceCoverage0to1 - liveDistribution.scalingLawDiscoveryEvidenceCoverage0to1)) : 0,
+    scalingLawEvidenceCoverageDrop0to1: guardedDrop(hasScalingLawDiscoveryEvidence, baselineDistribution.scalingLawDiscoveryEvidenceCoverage0to1, liveDistribution.scalingLawDiscoveryEvidenceCoverage0to1),
     genomicsSelectionAccuracyDrop0to1: hasGenomicsEvidence ? round(baselineDistribution.genomicsSelectionAccuracyMean0to1 - liveDistribution.genomicsSelectionAccuracyMean0to1) : 0,
     genomicsPreprocessingQualityDrop0to1: hasGenomicsEvidence ? round(baselineDistribution.genomicsPreprocessingQualityMean0to1 - liveDistribution.genomicsPreprocessingQualityMean0to1) : 0,
     genomicsStatisticalAnalysisAccuracyDrop0to1: hasGenomicsEvidence ? round(baselineDistribution.genomicsStatisticalAnalysisAccuracyMean0to1 - liveDistribution.genomicsStatisticalAnalysisAccuracyMean0to1) : 0,
-    genomicsReferenceCoverageDrop0to1: hasGenomicsEvidence ? round(Math.max(0, baselineDistribution.genomicsReferenceCoverage0to1 - liveDistribution.genomicsReferenceCoverage0to1)) : 0,
-    genomicsFormatConformanceRateDrop0to1: hasGenomicsEvidence ? round(Math.max(0, baselineDistribution.genomicsFormatConformanceRate0to1 - liveDistribution.genomicsFormatConformanceRate0to1)) : 0,
-    genomicsExpertCurationCoverageDrop0to1: hasGenomicsEvidence ? round(Math.max(0, baselineDistribution.genomicsExpertCurationCoverage0to1 - liveDistribution.genomicsExpertCurationCoverage0to1)) : 0,
+    genomicsReferenceCoverageDrop0to1: guardedDrop(hasGenomicsEvidence, baselineDistribution.genomicsReferenceCoverage0to1, liveDistribution.genomicsReferenceCoverage0to1),
+    genomicsFormatConformanceRateDrop0to1: guardedDrop(hasGenomicsEvidence, baselineDistribution.genomicsFormatConformanceRate0to1, liveDistribution.genomicsFormatConformanceRate0to1),
+    genomicsExpertCurationCoverageDrop0to1: guardedDrop(hasGenomicsEvidence, baselineDistribution.genomicsExpertCurationCoverage0to1, liveDistribution.genomicsExpertCurationCoverage0to1),
     agenticSearchPlanningScoreDrop0to1: hasAgenticSearchEvidence ? round(baselineDistribution.agenticSearchPlanningScoreMean0to1 - liveDistribution.agenticSearchPlanningScoreMean0to1) : 0,
     agenticSearchQueryDecompositionDrop0to1: hasAgenticSearchEvidence ? round(baselineDistribution.agenticSearchQueryDecompositionScoreMean0to1 - liveDistribution.agenticSearchQueryDecompositionScoreMean0to1) : 0,
     agenticSearchRelevanceDrop0to1: hasAgenticSearchEvidence ? round(baselineDistribution.agenticSearchRelevanceScoreMean0to1 - liveDistribution.agenticSearchRelevanceScoreMean0to1) : 0,
     agenticSearchSynthesisDrop0to1: hasAgenticSearchEvidence ? round(baselineDistribution.agenticSearchSynthesisScoreMean0to1 - liveDistribution.agenticSearchSynthesisScoreMean0to1) : 0,
-    agenticSearchCitationCoverageDrop0to1: hasAgenticSearchEvidence ? round(Math.max(0, baselineDistribution.agenticSearchCitationCoverage0to1 - liveDistribution.agenticSearchCitationCoverage0to1)) : 0,
-    agenticSearchTraceCoverageDrop0to1: hasAgenticSearchEvidence ? round(Math.max(0, baselineDistribution.agenticSearchTraceCoverage0to1 - liveDistribution.agenticSearchTraceCoverage0to1)) : 0,
+    agenticSearchCitationCoverageDrop0to1: guardedDrop(hasAgenticSearchEvidence, baselineDistribution.agenticSearchCitationCoverage0to1, liveDistribution.agenticSearchCitationCoverage0to1),
+    agenticSearchTraceCoverageDrop0to1: guardedDrop(hasAgenticSearchEvidence, baselineDistribution.agenticSearchTraceCoverage0to1, liveDistribution.agenticSearchTraceCoverage0to1),
     documentDatasetQaAccuracyDrop0to1: hasDocumentDatasetEvidence ? round(baselineDistribution.documentDatasetQaAccuracyMean0to1 - liveDistribution.documentDatasetQaAccuracyMean0to1) : 0,
     documentDatasetSummaryQualityDrop0to1: hasDocumentDatasetEvidence ? round(baselineDistribution.documentDatasetSummaryQualityMean0to1 - liveDistribution.documentDatasetSummaryQualityMean0to1) : 0,
     documentDatasetRagFaithfulnessDrop0to1: hasDocumentDatasetEvidence ? round(baselineDistribution.documentDatasetRagFaithfulnessMean0to1 - liveDistribution.documentDatasetRagFaithfulnessMean0to1) : 0,
-    documentDatasetNumGuardCoverageDrop0to1: hasDocumentDatasetEvidence ? round(Math.max(0, baselineDistribution.documentDatasetNumGuardCoverage0to1 - liveDistribution.documentDatasetNumGuardCoverage0to1)) : 0,
+    documentDatasetNumGuardCoverageDrop0to1: guardedDrop(hasDocumentDatasetEvidence, baselineDistribution.documentDatasetNumGuardCoverage0to1, liveDistribution.documentDatasetNumGuardCoverage0to1),
     documentDatasetNumericMismatchRateIncrease0to1: hasDocumentDatasetEvidence ? round(liveDistribution.documentDatasetNumericMismatchRate0to1 - baselineDistribution.documentDatasetNumericMismatchRate0to1) : 0,
-    documentDatasetEvidenceCoverageDrop0to1: hasDocumentDatasetEvidence ? round(Math.max(0, baselineDistribution.documentDatasetEvidenceCoverage0to1 - liveDistribution.documentDatasetEvidenceCoverage0to1)) : 0,
+    documentDatasetEvidenceCoverageDrop0to1: guardedDrop(hasDocumentDatasetEvidence, baselineDistribution.documentDatasetEvidenceCoverage0to1, liveDistribution.documentDatasetEvidenceCoverage0to1),
     documentDatasetTokenSavingsDropRatio: hasDocumentDatasetEvidence ? ratioDrop(liveDistribution.documentDatasetTokenSavingsRatio, baselineDistribution.documentDatasetTokenSavingsRatio) : 0,
     documentDatasetThroughputDropRatio: hasDocumentDatasetEvidence ? ratioDrop(liveDistribution.documentDatasetThroughputDocsPerSec, baselineDistribution.documentDatasetThroughputDocsPerSec) : 0,
     documentDatasetMemoryIncreaseRatio: hasDocumentDatasetEvidence ? ratioIncrease(liveDistribution.documentDatasetMemoryRssMb, baselineDistribution.documentDatasetMemoryRssMb) : 0,
@@ -7280,7 +7279,7 @@ export function runLiveScoreBehaviorDrift(input: RunLiveScoreBehaviorDriftInput)
     cpuAgenticToolExecutionShareIncrease0to1: hasCpuAgenticEvidence ? round(liveDistribution.cpuAgenticToolExecutionShareMean0to1 - baselineDistribution.cpuAgenticToolExecutionShareMean0to1) : 0,
     cpuAgenticLlmInferenceShareShift0to1: hasCpuAgenticEvidence ? round(Math.abs(liveDistribution.cpuAgenticLlmInferenceShareMean0to1 - baselineDistribution.cpuAgenticLlmInferenceShareMean0to1)) : 0,
     cpuAgenticFrameworkOverheadShareIncrease0to1: hasCpuAgenticEvidence ? round(liveDistribution.cpuAgenticFrameworkOverheadShareMean0to1 - baselineDistribution.cpuAgenticFrameworkOverheadShareMean0to1) : 0,
-    cpuAgenticEvidenceCoverageDrop0to1: hasCpuAgenticEvidence ? round(Math.max(0, baselineDistribution.cpuAgenticEvidenceCoverage0to1 - liveDistribution.cpuAgenticEvidenceCoverage0to1)) : 0,
+    cpuAgenticEvidenceCoverageDrop0to1: guardedDrop(hasCpuAgenticEvidence, baselineDistribution.cpuAgenticEvidenceCoverage0to1, liveDistribution.cpuAgenticEvidenceCoverage0to1),
     evalTechniqueExactMatchAccuracyDrop0to1: hasEvalTechniqueEvidence ? round(baselineDistribution.evalTechniqueExactMatchAccuracyMean0to1 - liveDistribution.evalTechniqueExactMatchAccuracyMean0to1) : 0,
     evalTechniqueLlmJudgeAgreementDrop0to1: hasEvalTechniqueEvidence ? round(baselineDistribution.evalTechniqueLlmJudgeAgreementMean0to1 - liveDistribution.evalTechniqueLlmJudgeAgreementMean0to1) : 0,
     evalTechniqueStructuredValidationDrop0to1: hasEvalTechniqueEvidence ? round(baselineDistribution.evalTechniqueStructuredValidationMean0to1 - liveDistribution.evalTechniqueStructuredValidationMean0to1) : 0,
@@ -7293,20 +7292,20 @@ export function runLiveScoreBehaviorDrift(input: RunLiveScoreBehaviorDriftInput)
     evalTechniqueRealtimeFeedbackDrop0to1: hasEvalTechniqueEvidence ? round(baselineDistribution.evalTechniqueRealtimeFeedbackMean0to1 - liveDistribution.evalTechniqueRealtimeFeedbackMean0to1) : 0,
     evalTechniquePairwiseWinRateDrop0to1: hasEvalTechniqueEvidence ? round(baselineDistribution.evalTechniquePairwiseWinRate0to1 - liveDistribution.evalTechniquePairwiseWinRate0to1) : 0,
     evalTechniqueSimulationGoalCompletionDrop0to1: hasEvalTechniqueEvidence ? round(baselineDistribution.evalTechniqueSimulationGoalCompletionMean0to1 - liveDistribution.evalTechniqueSimulationGoalCompletionMean0to1) : 0,
-    evalTechniqueAlgorithmicFeedbackCoverageDrop0to1: hasEvalTechniqueEvidence ? round(Math.max(0, baselineDistribution.evalTechniqueAlgorithmicFeedbackCoverage0to1 - liveDistribution.evalTechniqueAlgorithmicFeedbackCoverage0to1)) : 0,
-    evalTechniqueEvidenceCoverageDrop0to1: hasEvalTechniqueEvidence ? round(Math.max(0, baselineDistribution.evalTechniqueEvidenceCoverage0to1 - liveDistribution.evalTechniqueEvidenceCoverage0to1)) : 0,
-    sapAgentEvalObjectiveCoverageDrop0to1: hasSapAgentEvalEvidence ? round(Math.max(0, baselineDistribution.sapAgentEvalObjectiveCoverage0to1 - liveDistribution.sapAgentEvalObjectiveCoverage0to1)) : 0,
-    sapAgentEvalProcessCoverageDrop0to1: hasSapAgentEvalEvidence ? round(Math.max(0, baselineDistribution.sapAgentEvalProcessCoverage0to1 - liveDistribution.sapAgentEvalProcessCoverage0to1)) : 0,
-    sapAgentEvalEnterpriseContextCoverageDrop0to1: hasSapAgentEvalEvidence ? round(Math.max(0, baselineDistribution.sapAgentEvalEnterpriseContextCoverage0to1 - liveDistribution.sapAgentEvalEnterpriseContextCoverage0to1)) : 0,
-    sapAgentEvalEvidenceCoverageDrop0to1: hasSapAgentEvalEvidence ? round(Math.max(0, baselineDistribution.sapAgentEvalEvidenceCoverage0to1 - liveDistribution.sapAgentEvalEvidenceCoverage0to1)) : 0,
-    agentEvalObservabilityConfigCoverageDrop0to1: hasAgentEvalObservabilityEvidence ? round(Math.max(0, baselineDistribution.agentEvalObservabilityConfigCoverage0to1 - liveDistribution.agentEvalObservabilityConfigCoverage0to1)) : 0,
-    agentEvalObservabilityTelemetryCoverageDrop0to1: hasAgentEvalObservabilityEvidence ? round(Math.max(0, baselineDistribution.agentEvalObservabilityTelemetryCoverage0to1 - liveDistribution.agentEvalObservabilityTelemetryCoverage0to1)) : 0,
-    agentEvalObservabilityEvidenceCoverageDrop0to1: hasAgentEvalObservabilityEvidence ? round(Math.max(0, baselineDistribution.agentEvalObservabilityEvidenceCoverage0to1 - liveDistribution.agentEvalObservabilityEvidenceCoverage0to1)) : 0,
+    evalTechniqueAlgorithmicFeedbackCoverageDrop0to1: guardedDrop(hasEvalTechniqueEvidence, baselineDistribution.evalTechniqueAlgorithmicFeedbackCoverage0to1, liveDistribution.evalTechniqueAlgorithmicFeedbackCoverage0to1),
+    evalTechniqueEvidenceCoverageDrop0to1: guardedDrop(hasEvalTechniqueEvidence, baselineDistribution.evalTechniqueEvidenceCoverage0to1, liveDistribution.evalTechniqueEvidenceCoverage0to1),
+    sapAgentEvalObjectiveCoverageDrop0to1: guardedDrop(hasSapAgentEvalEvidence, baselineDistribution.sapAgentEvalObjectiveCoverage0to1, liveDistribution.sapAgentEvalObjectiveCoverage0to1),
+    sapAgentEvalProcessCoverageDrop0to1: guardedDrop(hasSapAgentEvalEvidence, baselineDistribution.sapAgentEvalProcessCoverage0to1, liveDistribution.sapAgentEvalProcessCoverage0to1),
+    sapAgentEvalEnterpriseContextCoverageDrop0to1: guardedDrop(hasSapAgentEvalEvidence, baselineDistribution.sapAgentEvalEnterpriseContextCoverage0to1, liveDistribution.sapAgentEvalEnterpriseContextCoverage0to1),
+    sapAgentEvalEvidenceCoverageDrop0to1: guardedDrop(hasSapAgentEvalEvidence, baselineDistribution.sapAgentEvalEvidenceCoverage0to1, liveDistribution.sapAgentEvalEvidenceCoverage0to1),
+    agentEvalObservabilityConfigCoverageDrop0to1: guardedDrop(hasAgentEvalObservabilityEvidence, baselineDistribution.agentEvalObservabilityConfigCoverage0to1, liveDistribution.agentEvalObservabilityConfigCoverage0to1),
+    agentEvalObservabilityTelemetryCoverageDrop0to1: guardedDrop(hasAgentEvalObservabilityEvidence, baselineDistribution.agentEvalObservabilityTelemetryCoverage0to1, liveDistribution.agentEvalObservabilityTelemetryCoverage0to1),
+    agentEvalObservabilityEvidenceCoverageDrop0to1: guardedDrop(hasAgentEvalObservabilityEvidence, baselineDistribution.agentEvalObservabilityEvidenceCoverage0to1, liveDistribution.agentEvalObservabilityEvidenceCoverage0to1),
     hedraRagLatencyP95IncreaseRatio: hasHedraRagEvidence ? ratioIncrease(liveDistribution.hedraRagLatencyP95Ms, baselineDistribution.hedraRagLatencyP95Ms) : 0,
     hedraRagThroughputDropRatio: hasHedraRagEvidence ? ratioDrop(liveDistribution.hedraRagThroughputRequestsPerSec, baselineDistribution.hedraRagThroughputRequestsPerSec) : 0,
     hedraRagMemoryIncreaseRatio: hasHedraRagEvidence ? ratioIncrease(liveDistribution.hedraRagResourceMemoryGbMean, baselineDistribution.hedraRagResourceMemoryGbMean) : 0,
-    hedraRagReplayPassRateDrop0to1: hasHedraRagEvidence ? round(Math.max(0, baselineDistribution.hedraRagReplayPassRate0to1 - liveDistribution.hedraRagReplayPassRate0to1)) : 0,
-    hedraRagEvidenceCoverageDrop0to1: hasHedraRagEvidence ? round(Math.max(0, baselineDistribution.hedraRagEvidenceCoverage0to1 - liveDistribution.hedraRagEvidenceCoverage0to1)) : 0,
+    hedraRagReplayPassRateDrop0to1: guardedDrop(hasHedraRagEvidence, baselineDistribution.hedraRagReplayPassRate0to1, liveDistribution.hedraRagReplayPassRate0to1),
+    hedraRagEvidenceCoverageDrop0to1: guardedDrop(hasHedraRagEvidence, baselineDistribution.hedraRagEvidenceCoverage0to1, liveDistribution.hedraRagEvidenceCoverage0to1),
     agentEvalHarnessToolSuccessDrop0to1: guardedDrop(hasAgentEvalHarnessEvidence, baselineDistribution.agentEvalHarnessToolSuccessRate0to1, liveDistribution.agentEvalHarnessToolSuccessRate0to1),
     agentEvalHarnessHallucinationIncrease0to1: guardedDrop(hasAgentEvalHarnessEvidence, liveDistribution.agentEvalHarnessHallucinationRate0to1, baselineDistribution.agentEvalHarnessHallucinationRate0to1),
     agentEvalHarnessLatencyP95IncreaseRatio: guardedRatio(hasAgentEvalHarnessEvidence, liveDistribution.agentEvalHarnessLatencyP95Ms, baselineDistribution.agentEvalHarnessLatencyP95Ms),
@@ -7326,60 +7325,60 @@ export function runLiveScoreBehaviorDrift(input: RunLiveScoreBehaviorDriftInput)
     privacyWebSensitiveFieldExposureIncreaseRatio: hasPrivacyWebEvidence ? ratioIncrease(liveDistribution.privacyWebSensitiveFieldExposureMean, baselineDistribution.privacyWebSensitiveFieldExposureMean) : 0,
     privacyWebTaskSuccessRateDrop0to1: hasPrivacyWebEvidence ? round(baselineDistribution.privacyWebTaskSuccessRate0to1 - liveDistribution.privacyWebTaskSuccessRate0to1) : 0,
     privacyWebModalLeakageDeltaIncrease0to1: hasPrivacyWebEvidence ? round(liveDistribution.privacyWebModalLeakageDeltaMean0to1 - baselineDistribution.privacyWebModalLeakageDeltaMean0to1) : 0,
-    privacyWebEvidenceCoverageDrop0to1: hasPrivacyWebEvidence ? round(Math.max(0, baselineDistribution.privacyWebEvidenceCoverage0to1 - liveDistribution.privacyWebEvidenceCoverage0to1)) : 0,
+    privacyWebEvidenceCoverageDrop0to1: guardedDrop(hasPrivacyWebEvidence, baselineDistribution.privacyWebEvidenceCoverage0to1, liveDistribution.privacyWebEvidenceCoverage0to1),
     localSystemThermalBaselineDeviationIncrease0to1: hasLocalSystemEvidence ? round(liveDistribution.localSystemThermalBaselineDeviationMean0to1 - baselineDistribution.localSystemThermalBaselineDeviationMean0to1) : 0,
     localSystemVoltageSpcAnomalyRateIncrease0to1: hasLocalSystemEvidence ? round(liveDistribution.localSystemVoltageSpcAnomalyRate0to1 - baselineDistribution.localSystemVoltageSpcAnomalyRate0to1) : 0,
-    localSystemProcessIdentityCoverageDrop0to1: hasLocalSystemEvidence ? round(Math.max(0, baselineDistribution.localSystemProcessIdentityCoverage0to1 - liveDistribution.localSystemProcessIdentityCoverage0to1)) : 0,
-    localSystemGhostDriverDetectionCoverageDrop0to1: hasLocalSystemEvidence ? round(Math.max(0, baselineDistribution.localSystemGhostDriverDetectionCoverage0to1 - liveDistribution.localSystemGhostDriverDetectionCoverage0to1)) : 0,
-    localSystemProactiveAlertCoverageDrop0to1: hasLocalSystemEvidence ? round(Math.max(0, baselineDistribution.localSystemProactiveAlertCoverage0to1 - liveDistribution.localSystemProactiveAlertCoverage0to1)) : 0,
-    localSystemLocalOnlyPrivacyCoverageDrop0to1: hasLocalSystemEvidence ? round(Math.max(0, baselineDistribution.localSystemLocalOnlyPrivacyCoverage0to1 - liveDistribution.localSystemLocalOnlyPrivacyCoverage0to1)) : 0,
-    localSystemEvidenceCoverageDrop0to1: hasLocalSystemEvidence ? round(Math.max(0, baselineDistribution.localSystemEvidenceCoverage0to1 - liveDistribution.localSystemEvidenceCoverage0to1)) : 0,
+    localSystemProcessIdentityCoverageDrop0to1: guardedDrop(hasLocalSystemEvidence, baselineDistribution.localSystemProcessIdentityCoverage0to1, liveDistribution.localSystemProcessIdentityCoverage0to1),
+    localSystemGhostDriverDetectionCoverageDrop0to1: guardedDrop(hasLocalSystemEvidence, baselineDistribution.localSystemGhostDriverDetectionCoverage0to1, liveDistribution.localSystemGhostDriverDetectionCoverage0to1),
+    localSystemProactiveAlertCoverageDrop0to1: guardedDrop(hasLocalSystemEvidence, baselineDistribution.localSystemProactiveAlertCoverage0to1, liveDistribution.localSystemProactiveAlertCoverage0to1),
+    localSystemLocalOnlyPrivacyCoverageDrop0to1: guardedDrop(hasLocalSystemEvidence, baselineDistribution.localSystemLocalOnlyPrivacyCoverage0to1, liveDistribution.localSystemLocalOnlyPrivacyCoverage0to1),
+    localSystemEvidenceCoverageDrop0to1: guardedDrop(hasLocalSystemEvidence, baselineDistribution.localSystemEvidenceCoverage0to1, liveDistribution.localSystemEvidenceCoverage0to1),
     observabilityResolutionScoreDrop0to1: hasObservabilityEvidence ? round(baselineDistribution.observabilityResolutionScoreMean0to1 - liveDistribution.observabilityResolutionScoreMean0to1) : 0,
     observabilityDeterministicCheckPassRateDrop0to1: hasObservabilityEvidence ? round(baselineDistribution.observabilityDeterministicCheckPassRate0to1 - liveDistribution.observabilityDeterministicCheckPassRate0to1) : 0,
     observabilityRubricScoreDrop0to1: hasObservabilityEvidence ? round(baselineDistribution.observabilityRubricScoreMean0to1 - liveDistribution.observabilityRubricScoreMean0to1) : 0,
-    observabilityEvidenceCoverageDrop0to1: hasObservabilityEvidence ? round(Math.max(0, baselineDistribution.observabilityEvidenceCoverage0to1 - liveDistribution.observabilityEvidenceCoverage0to1)) : 0,
-    observabilityTraceCoverageDrop0to1: hasObservabilityEvidence ? round(Math.max(0, baselineDistribution.observabilityTraceCoverage0to1 - liveDistribution.observabilityTraceCoverage0to1)) : 0,
-    observabilityReportCoverageDrop0to1: hasObservabilityEvidence ? round(Math.max(0, baselineDistribution.observabilityReportCoverage0to1 - liveDistribution.observabilityReportCoverage0to1)) : 0,
-    observabilityScenarioClockAlignmentRateDrop0to1: hasObservabilityEvidence ? round(Math.max(0, baselineDistribution.observabilityScenarioClockAlignmentRate0to1 - liveDistribution.observabilityScenarioClockAlignmentRate0to1)) : 0,
+    observabilityEvidenceCoverageDrop0to1: guardedDrop(hasObservabilityEvidence, baselineDistribution.observabilityEvidenceCoverage0to1, liveDistribution.observabilityEvidenceCoverage0to1),
+    observabilityTraceCoverageDrop0to1: guardedDrop(hasObservabilityEvidence, baselineDistribution.observabilityTraceCoverage0to1, liveDistribution.observabilityTraceCoverage0to1),
+    observabilityReportCoverageDrop0to1: guardedDrop(hasObservabilityEvidence, baselineDistribution.observabilityReportCoverage0to1, liveDistribution.observabilityReportCoverage0to1),
+    observabilityScenarioClockAlignmentRateDrop0to1: guardedDrop(hasObservabilityEvidence, baselineDistribution.observabilityScenarioClockAlignmentRate0to1, liveDistribution.observabilityScenarioClockAlignmentRate0to1),
     ollamaMetricsRequestDurationP95IncreaseRatio: hasOllamaMetricsEvidence ? ratioIncrease(liveDistribution.ollamaMetricsRequestDurationP95Seconds, baselineDistribution.ollamaMetricsRequestDurationP95Seconds) : 0,
     ollamaMetricsTimePerTokenIncreaseRatio: hasOllamaMetricsEvidence ? ratioIncrease(liveDistribution.ollamaMetricsTimePerTokenSeconds, baselineDistribution.ollamaMetricsTimePerTokenSeconds) : 0,
     ollamaMetricsLoadedModelCountDropRatio: hasOllamaMetricsEvidence ? ratioDrop(liveDistribution.ollamaMetricsLoadedModelCountMean, baselineDistribution.ollamaMetricsLoadedModelCountMean) : 0,
-    ollamaMetricsModelLoadedRateDrop0to1: hasOllamaMetricsEvidence ? round(Math.max(0, baselineDistribution.ollamaMetricsModelLoadedRate0to1 - liveDistribution.ollamaMetricsModelLoadedRate0to1)) : 0,
+    ollamaMetricsModelLoadedRateDrop0to1: guardedDrop(hasOllamaMetricsEvidence, baselineDistribution.ollamaMetricsModelLoadedRate0to1, liveDistribution.ollamaMetricsModelLoadedRate0to1),
     ollamaMetricsModelRamIncreaseRatio: hasOllamaMetricsEvidence ? ratioIncrease(liveDistribution.ollamaMetricsModelRamMbMean, baselineDistribution.ollamaMetricsModelRamMbMean) : 0,
     ollamaMetricsRequestErrorRateIncrease0to1: hasOllamaMetricsEvidence ? round(Math.max(0, liveDistribution.ollamaMetricsRequestErrorRate0to1 - baselineDistribution.ollamaMetricsRequestErrorRate0to1)) : 0,
-    ollamaMetricsEvidenceCoverageDrop0to1: hasOllamaMetricsEvidence ? round(Math.max(0, baselineDistribution.ollamaMetricsEvidenceCoverage0to1 - liveDistribution.ollamaMetricsEvidenceCoverage0to1)) : 0,
+    ollamaMetricsEvidenceCoverageDrop0to1: guardedDrop(hasOllamaMetricsEvidence, baselineDistribution.ollamaMetricsEvidenceCoverage0to1, liveDistribution.ollamaMetricsEvidenceCoverage0to1),
     webOperatorLlmEvaluationDrop0to1: hasWebOperatorEvidence ? round(baselineDistribution.webOperatorLlmEvaluationSuccessRate0to1 - liveDistribution.webOperatorLlmEvaluationSuccessRate0to1) : 0,
     webOperatorSelfReportOverclaimIncrease0to1: hasWebOperatorEvidence ? round(liveDistribution.webOperatorSelfReportOverclaimRate0to1 - baselineDistribution.webOperatorSelfReportOverclaimRate0to1) : 0,
     webOperatorMismatchRateIncrease0to1: hasWebOperatorEvidence ? round(liveDistribution.webOperatorMismatchRate0to1 - baselineDistribution.webOperatorMismatchRate0to1) : 0,
     webOperatorTaskReliabilityDrop0to1: hasWebOperatorEvidence ? round(baselineDistribution.webOperatorTaskReliabilityMean0to1 - liveDistribution.webOperatorTaskReliabilityMean0to1) : 0,
-    webOperatorReplayCoverageDrop0to1: hasWebOperatorEvidence ? round(Math.max(0, baselineDistribution.webOperatorReplayCoverage0to1 - liveDistribution.webOperatorReplayCoverage0to1)) : 0,
+    webOperatorReplayCoverageDrop0to1: guardedDrop(hasWebOperatorEvidence, baselineDistribution.webOperatorReplayCoverage0to1, liveDistribution.webOperatorReplayCoverage0to1),
     webOperatorTaskTimeIncreaseRatio: hasWebOperatorEvidence ? ratioIncrease(liveDistribution.webOperatorTaskTimeMeanMs, baselineDistribution.webOperatorTaskTimeMeanMs) : 0,
     webOperatorStepLimitViolationRateIncrease0to1: hasWebOperatorEvidence ? round(liveDistribution.webOperatorStepLimitViolationRate0to1 - baselineDistribution.webOperatorStepLimitViolationRate0to1) : 0,
     naviBenchTaskSuccessDrop0to1: hasNaviBenchEvidence ? round(Math.max(0, baselineDistribution.naviBenchTaskSuccessRate0to1 - liveDistribution.naviBenchTaskSuccessRate0to1)) : 0,
     naviBenchCrashRateIncrease0to1: hasNaviBenchEvidence ? round(Math.max(0, liveDistribution.naviBenchCrashRate0to1 - baselineDistribution.naviBenchCrashRate0to1)) : 0,
     naviBenchLowerBoundScoreDrop0to1: hasNaviBenchEvidence ? round(Math.max(0, baselineDistribution.naviBenchLowerBoundScoreMean0to1 - liveDistribution.naviBenchLowerBoundScoreMean0to1)) : 0,
     naviBenchExcludingCrashedScoreDrop0to1: hasNaviBenchEvidence ? round(Math.max(0, baselineDistribution.naviBenchExcludingCrashedScoreMean0to1 - liveDistribution.naviBenchExcludingCrashedScoreMean0to1)) : 0,
-    naviBenchTrajectoryCoverageDrop0to1: hasNaviBenchEvidence ? round(Math.max(0, baselineDistribution.naviBenchTrajectoryCoverage0to1 - liveDistribution.naviBenchTrajectoryCoverage0to1)) : 0,
-    naviBenchVisualizationCoverageDrop0to1: hasNaviBenchEvidence ? round(Math.max(0, baselineDistribution.naviBenchVisualizationCoverage0to1 - liveDistribution.naviBenchVisualizationCoverage0to1)) : 0,
-    naviBenchEvidenceCoverageDrop0to1: hasNaviBenchEvidence ? round(Math.max(0, baselineDistribution.naviBenchEvidenceCoverage0to1 - liveDistribution.naviBenchEvidenceCoverage0to1)) : 0,
+    naviBenchTrajectoryCoverageDrop0to1: guardedDrop(hasNaviBenchEvidence, baselineDistribution.naviBenchTrajectoryCoverage0to1, liveDistribution.naviBenchTrajectoryCoverage0to1),
+    naviBenchVisualizationCoverageDrop0to1: guardedDrop(hasNaviBenchEvidence, baselineDistribution.naviBenchVisualizationCoverage0to1, liveDistribution.naviBenchVisualizationCoverage0to1),
+    naviBenchEvidenceCoverageDrop0to1: guardedDrop(hasNaviBenchEvidence, baselineDistribution.naviBenchEvidenceCoverage0to1, liveDistribution.naviBenchEvidenceCoverage0to1),
     naviBenchStepCountIncreaseRatio: hasNaviBenchEvidence ? ratioIncrease(liveDistribution.naviBenchStepCountMean, baselineDistribution.naviBenchStepCountMean) : 0,
     naviBenchStepLimitViolationRateIncrease0to1: hasNaviBenchEvidence ? round(Math.max(0, liveDistribution.naviBenchStepLimitViolationRate0to1 - baselineDistribution.naviBenchStepLimitViolationRate0to1)) : 0,
     legalAgentFinalSuccessDrop0to1: hasLegalAgentEvidence ? round(baselineDistribution.legalAgentFinalSuccessRate0to1 - liveDistribution.legalAgentFinalSuccessRate0to1) : 0,
     legalAgentProcessRateDrop0to1: hasLegalAgentEvidence ? round(baselineDistribution.legalAgentProcessRateMean0to1 - liveDistribution.legalAgentProcessRateMean0to1) : 0,
     legalAgentToolUseAccuracyDrop0to1: hasLegalAgentEvidence ? round(baselineDistribution.legalAgentToolUseAccuracyMean0to1 - liveDistribution.legalAgentToolUseAccuracyMean0to1) : 0,
-    legalAgentCitationCoverageDrop0to1: hasLegalAgentEvidence ? round(Math.max(0, baselineDistribution.legalAgentCitationCoverage0to1 - liveDistribution.legalAgentCitationCoverage0to1)) : 0,
-    legalAgentEvidenceCoverageDrop0to1: hasLegalAgentEvidence ? round(Math.max(0, baselineDistribution.legalAgentEvidenceCoverage0to1 - liveDistribution.legalAgentEvidenceCoverage0to1)) : 0,
+    legalAgentCitationCoverageDrop0to1: guardedDrop(hasLegalAgentEvidence, baselineDistribution.legalAgentCitationCoverage0to1, liveDistribution.legalAgentCitationCoverage0to1),
+    legalAgentEvidenceCoverageDrop0to1: guardedDrop(hasLegalAgentEvidence, baselineDistribution.legalAgentEvidenceCoverage0to1, liveDistribution.legalAgentEvidenceCoverage0to1),
     legalAgentTokenCostIncreaseRatio: hasLegalAgentEvidence ? ratioIncrease(liveDistribution.legalAgentTokenCostMean, baselineDistribution.legalAgentTokenCostMean) : 0,
     researchGymScoreImprovementDrop0to1: hasResearchGymEvidence ? round(Math.max(0, baselineDistribution.researchGymScoreImprovementMean0to1 - liveDistribution.researchGymScoreImprovementMean0to1)) : 0,
     researchGymSubtaskCompletionDrop0to1: hasResearchGymEvidence ? round(Math.max(0, baselineDistribution.researchGymSubtaskCompletionRate0to1 - liveDistribution.researchGymSubtaskCompletionRate0to1)) : 0,
-    researchGymArtifactCoverageDrop0to1: hasResearchGymEvidence ? round(Math.max(0, baselineDistribution.researchGymArtifactCoverage0to1 - liveDistribution.researchGymArtifactCoverage0to1)) : 0,
-    researchGymInspectionPassRateDrop0to1: hasResearchGymEvidence ? round(Math.max(0, baselineDistribution.researchGymInspectionPassRate0to1 - liveDistribution.researchGymInspectionPassRate0to1)) : 0,
+    researchGymArtifactCoverageDrop0to1: guardedDrop(hasResearchGymEvidence, baselineDistribution.researchGymArtifactCoverage0to1, liveDistribution.researchGymArtifactCoverage0to1),
+    researchGymInspectionPassRateDrop0to1: guardedDrop(hasResearchGymEvidence, baselineDistribution.researchGymInspectionPassRate0to1, liveDistribution.researchGymInspectionPassRate0to1),
     researchGymBudgetOverrunRateIncrease0to1: hasResearchGymEvidence ? round(Math.max(0, liveDistribution.researchGymBudgetOverrunRate0to1 - baselineDistribution.researchGymBudgetOverrunRate0to1)) : 0,
     researchGymViolationRateIncrease0to1: hasResearchGymEvidence ? round(Math.max(0, liveDistribution.researchGymViolationRate0to1 - baselineDistribution.researchGymViolationRate0to1)) : 0,
     osUniverseTaskSuccessDrop0to1: hasOsUniverseEvidence ? round(Math.max(0, baselineDistribution.osUniverseTaskSuccessRate0to1 - liveDistribution.osUniverseTaskSuccessRate0to1)) : 0,
     osUniverseAutoValidationPassDrop0to1: hasOsUniverseEvidence ? round(Math.max(0, baselineDistribution.osUniverseAutoValidationPassRate0to1 - liveDistribution.osUniverseAutoValidationPassRate0to1)) : 0,
     osUniverseValidationErrorRateIncrease0to1: hasOsUniverseEvidence ? round(Math.max(0, liveDistribution.osUniverseValidationErrorRate0to1 - baselineDistribution.osUniverseValidationErrorRate0to1)) : 0,
-    osUniverseEvidenceCoverageDrop0to1: hasOsUniverseEvidence ? round(Math.max(0, baselineDistribution.osUniverseEvidenceCoverage0to1 - liveDistribution.osUniverseEvidenceCoverage0to1)) : 0,
+    osUniverseEvidenceCoverageDrop0to1: guardedDrop(hasOsUniverseEvidence, baselineDistribution.osUniverseEvidenceCoverage0to1, liveDistribution.osUniverseEvidenceCoverage0to1),
     osUniverseStepCountIncreaseRatio: hasOsUniverseEvidence ? ratioIncrease(liveDistribution.osUniverseStepCountMean, baselineDistribution.osUniverseStepCountMean) : 0,
     osUniverseStepLimitViolationRateIncrease0to1: hasOsUniverseEvidence ? round(Math.max(0, liveDistribution.osUniverseStepLimitViolationRate0to1 - baselineDistribution.osUniverseStepLimitViolationRate0to1)) : 0,
     driftStatistic: 0,
@@ -7977,66 +7976,66 @@ export function runLiveScoreBehaviorDrift(input: RunLiveScoreBehaviorDriftInput)
     scoreDrift.redTeamUnsafeResponseRateIncrease0to1 / thresholds.maxRedTeamUnsafeResponseRateIncrease0to1,
     scoreDrift.redTeamComplianceDrop0to1 / thresholds.maxRedTeamComplianceDrop0to1,
     scoreDrift.redTeamGuardScoreDrop0to1 / thresholds.maxRedTeamGuardScoreDrop0to1,
-    scoreDrift.redTeamDatasetCoverageDrop0to1 / redTeamDatasetCoverageDropThreshold,
-    scoreDrift.redTeamTaxonomyCoverageDrop0to1 / redTeamTaxonomyCoverageDropThreshold,
-    scoreDrift.redTeamAttackCoverageDrop0to1 / redTeamAttackCoverageDropThreshold,
-    scoreDrift.redTeamGuardCoverageDrop0to1 / redTeamGuardCoverageDropThreshold,
+    driftContribution(scoreDrift.redTeamDatasetCoverageDrop0to1, redTeamDatasetCoverageDropThreshold),
+    driftContribution(scoreDrift.redTeamTaxonomyCoverageDrop0to1, redTeamTaxonomyCoverageDropThreshold),
+    driftContribution(scoreDrift.redTeamAttackCoverageDrop0to1, redTeamAttackCoverageDropThreshold),
+    driftContribution(scoreDrift.redTeamGuardCoverageDrop0to1, redTeamGuardCoverageDropThreshold),
     scoreDrift.piArenaAttackSuccessRateIncrease0to1 / thresholds.maxPiArenaAttackSuccessRateIncrease0to1,
-    scoreDrift.piArenaDefenseBlockRateDrop0to1 / thresholds.maxPiArenaDefenseBlockRateDrop0to1,
+    driftContribution(scoreDrift.piArenaDefenseBlockRateDrop0to1, thresholds.maxPiArenaDefenseBlockRateDrop0to1),
     scoreDrift.piArenaFalsePositiveRateIncrease0to1 / thresholds.maxPiArenaFalsePositiveRateIncrease0to1,
-    scoreDrift.piArenaAgentTaskSuccessRateDrop0to1 / thresholds.maxPiArenaAgentTaskSuccessRateDrop0to1,
-    scoreDrift.piArenaToolCallSuccessRateDrop0to1 / thresholds.maxPiArenaToolCallSuccessRateDrop0to1,
-    scoreDrift.piArenaEvidenceCoverageDrop0to1 / piArenaEvidenceCoverageDropThreshold,
+    driftContribution(scoreDrift.piArenaAgentTaskSuccessRateDrop0to1, thresholds.maxPiArenaAgentTaskSuccessRateDrop0to1),
+    driftContribution(scoreDrift.piArenaToolCallSuccessRateDrop0to1, thresholds.maxPiArenaToolCallSuccessRateDrop0to1),
+    driftContribution(scoreDrift.piArenaEvidenceCoverageDrop0to1, piArenaEvidenceCoverageDropThreshold),
     scoreDrift.backdoorAgentAttackSuccessRateIncrease0to1 / thresholds.maxBackdoorAgentAttackSuccessRateIncrease0to1,
-    scoreDrift.backdoorAgentCleanAccuracyDrop0to1 / thresholds.maxBackdoorAgentCleanAccuracyDrop0to1,
+    driftContribution(scoreDrift.backdoorAgentCleanAccuracyDrop0to1, thresholds.maxBackdoorAgentCleanAccuracyDrop0to1),
     scoreDrift.backdoorAgentTriggerPersistenceIncrease0to1 / thresholds.maxBackdoorAgentTriggerPersistenceIncrease0to1,
     scoreDrift.backdoorAgentTriggerPropagationIncrease0to1 / thresholds.maxBackdoorAgentTriggerPropagationIncrease0to1,
-    scoreDrift.backdoorAgentTrajectoryCoverageDrop0to1 / backdoorAgentTrajectoryCoverageDropThreshold,
-    scoreDrift.backdoorAgentEvidenceCoverageDrop0to1 / backdoorAgentEvidenceCoverageDropThreshold,
-    scoreDrift.agentSecuritySourceOriginCoverageDrop0to1 / agentSecuritySourceOriginCoverageDropThreshold,
-    scoreDrift.agentSecurityTaintPropagationCoverageDrop0to1 / agentSecurityTaintPropagationCoverageDropThreshold,
-    scoreDrift.agentSecurityPolicyDecisionAccuracyDrop0to1 / thresholds.maxAgentSecurityPolicyDecisionAccuracyDrop0to1,
-    scoreDrift.agentSecuritySecretScrubRateDrop0to1 / agentSecuritySecretScrubRateDropThreshold,
-    scoreDrift.agentSecurityAuditTrailIntegrityDrop0to1 / agentSecurityAuditTrailIntegrityDropThreshold,
+    driftContribution(scoreDrift.backdoorAgentTrajectoryCoverageDrop0to1, backdoorAgentTrajectoryCoverageDropThreshold),
+    driftContribution(scoreDrift.backdoorAgentEvidenceCoverageDrop0to1, backdoorAgentEvidenceCoverageDropThreshold),
+    driftContribution(scoreDrift.agentSecuritySourceOriginCoverageDrop0to1, agentSecuritySourceOriginCoverageDropThreshold),
+    driftContribution(scoreDrift.agentSecurityTaintPropagationCoverageDrop0to1, agentSecurityTaintPropagationCoverageDropThreshold),
+    driftContribution(scoreDrift.agentSecurityPolicyDecisionAccuracyDrop0to1, thresholds.maxAgentSecurityPolicyDecisionAccuracyDrop0to1),
+    driftContribution(scoreDrift.agentSecuritySecretScrubRateDrop0to1, agentSecuritySecretScrubRateDropThreshold),
+    driftContribution(scoreDrift.agentSecurityAuditTrailIntegrityDrop0to1, agentSecurityAuditTrailIntegrityDropThreshold),
     scoreDrift.agentSecurityAttackEffectivenessIncrease0to1 / thresholds.maxAgentSecurityAttackEffectivenessIncrease0to1,
     scoreDrift.agentSecurityFalsePositiveRateIncrease0to1 / thresholds.maxAgentSecurityFalsePositiveRateIncrease0to1,
-    scoreDrift.agentSecurityEvidenceCoverageDrop0to1 / agentSecurityEvidenceCoverageDropThreshold,
+    driftContribution(scoreDrift.agentSecurityEvidenceCoverageDrop0to1, agentSecurityEvidenceCoverageDropThreshold),
     scoreDrift.agentSecurityLatencyP95IncreaseRatio / thresholds.maxAgentSecurityLatencyP95IncreaseRatio,
-    scoreDrift.agentTestingMethodologyCoverageDrop0to1 / agentTestingMethodologyCoverageDropThreshold,
-    scoreDrift.agentTestingScenarioCoverageDrop0to1 / agentTestingScenarioCoverageDropThreshold,
-    scoreDrift.agentTestingFaultInjectionCoverageDrop0to1 / agentTestingFaultInjectionCoverageDropThreshold,
-    scoreDrift.agentTestingResiliencePassRateDrop0to1 / agentTestingResiliencePassRateDropThreshold,
+    driftContribution(scoreDrift.agentTestingMethodologyCoverageDrop0to1, agentTestingMethodologyCoverageDropThreshold),
+    driftContribution(scoreDrift.agentTestingScenarioCoverageDrop0to1, agentTestingScenarioCoverageDropThreshold),
+    driftContribution(scoreDrift.agentTestingFaultInjectionCoverageDrop0to1, agentTestingFaultInjectionCoverageDropThreshold),
+    driftContribution(scoreDrift.agentTestingResiliencePassRateDrop0to1, agentTestingResiliencePassRateDropThreshold),
     scoreDrift.agentTestingSafetyRegressionRateIncrease0to1 / thresholds.maxAgentTestingSafetyRegressionRateIncrease0to1,
-    scoreDrift.agentTestingObservabilitySignalCoverageDrop0to1 / agentTestingObservabilitySignalCoverageDropThreshold,
-    scoreDrift.agentTestingEvidenceCoverageDrop0to1 / agentTestingEvidenceCoverageDropThreshold,
-    scoreDrift.chaosProductionReliabilityDrop0to1 / chaosProductionReliabilityDropThreshold,
-    scoreDrift.chaosResilienceScoreDrop0to1 / chaosResilienceScoreDropThreshold,
+    driftContribution(scoreDrift.agentTestingObservabilitySignalCoverageDrop0to1, agentTestingObservabilitySignalCoverageDropThreshold),
+    driftContribution(scoreDrift.agentTestingEvidenceCoverageDrop0to1, agentTestingEvidenceCoverageDropThreshold),
+    driftContribution(scoreDrift.chaosProductionReliabilityDrop0to1, chaosProductionReliabilityDropThreshold),
+    driftContribution(scoreDrift.chaosResilienceScoreDrop0to1, chaosResilienceScoreDropThreshold),
     scoreDrift.chaosDropIncrease0to1 / thresholds.maxChaosDropIncrease0to1,
-    scoreDrift.chaosRecoveryPassRateDrop0to1 / chaosRecoveryPassRateDropThreshold,
-    scoreDrift.chaosFailureTraceCoverageDrop0to1 / chaosFailureTraceCoverageDropThreshold,
-    scoreDrift.chaosImprovementEvalCoverageDrop0to1 / chaosImprovementEvalCoverageDropThreshold,
-    scoreDrift.chaosEvidenceCoverageDrop0to1 / chaosEvidenceCoverageDropThreshold,
-    scoreDrift.recoveryBenchRecoverySuccessRateDrop0to1 / thresholds.maxRecoveryBenchRecoverySuccessRateDrop0to1,
-    scoreDrift.recoveryBenchRecoveryRewardDrop0to1 / thresholds.maxRecoveryBenchRecoveryRewardDrop0to1,
-    scoreDrift.recoveryBenchReplayIntegrityRateDrop0to1 / recoveryBenchReplayIntegrityDropThreshold,
-    scoreDrift.recoveryBenchFailureTraceCoverageDrop0to1 / recoveryBenchFailureTraceCoverageDropThreshold,
-    scoreDrift.recoveryBenchCorruptedEnvironmentCoverageDrop0to1 / recoveryBenchCorruptedEnvironmentCoverageDropThreshold,
-    scoreDrift.recoveryBenchContextCoverageDrop0to1 / recoveryBenchContextCoverageDropThreshold,
-    scoreDrift.recoveryBenchEvidenceCoverageDrop0to1 / recoveryBenchEvidenceCoverageDropThreshold,
-    scoreDrift.adkEvalPassRateDrop0to1 / adkEvalPassRateDropThreshold,
-    scoreDrift.adkToolCallSuccessRateDrop0to1 / adkToolCallSuccessRateDropThreshold,
-    scoreDrift.adkGraphCoverageDrop0to1 / adkGraphCoverageDropThreshold,
-    scoreDrift.adkStreamingStabilityDrop0to1 / adkStreamingStabilityDropThreshold,
-    scoreDrift.adkDeploymentReadinessDrop0to1 / adkDeploymentReadinessDropThreshold,
-    scoreDrift.adkEvidenceCoverageDrop0to1 / adkEvidenceCoverageDropThreshold,
-    scoreDrift.physicianBenchTaskSuccessRateDrop0to1 / physicianBenchTaskSuccessDropThreshold,
-    scoreDrift.physicianBenchCheckpointPassRateDrop0to1 / physicianBenchCheckpointPassDropThreshold,
-    scoreDrift.physicianBenchFhirDataAccessAccuracyDrop0to1 / physicianBenchFhirDataAccessDropThreshold,
-    scoreDrift.physicianBenchClinicalActionSafetyDrop0to1 / physicianBenchClinicalActionSafetyDropThreshold,
-    scoreDrift.physicianBenchDocumentationQualityDrop0to1 / physicianBenchDocumentationQualityDropThreshold,
-    scoreDrift.physicianBenchTrajectoryCoverageDrop0to1 / physicianBenchTrajectoryCoverageDropThreshold,
-    scoreDrift.physicianBenchArtifactCoverageDrop0to1 / physicianBenchArtifactCoverageDropThreshold,
-    scoreDrift.physicianBenchEvidenceCoverageDrop0to1 / physicianBenchEvidenceCoverageDropThreshold,
+    driftContribution(scoreDrift.chaosRecoveryPassRateDrop0to1, chaosRecoveryPassRateDropThreshold),
+    driftContribution(scoreDrift.chaosFailureTraceCoverageDrop0to1, chaosFailureTraceCoverageDropThreshold),
+    driftContribution(scoreDrift.chaosImprovementEvalCoverageDrop0to1, chaosImprovementEvalCoverageDropThreshold),
+    driftContribution(scoreDrift.chaosEvidenceCoverageDrop0to1, chaosEvidenceCoverageDropThreshold),
+    driftContribution(scoreDrift.recoveryBenchRecoverySuccessRateDrop0to1, thresholds.maxRecoveryBenchRecoverySuccessRateDrop0to1),
+    driftContribution(scoreDrift.recoveryBenchRecoveryRewardDrop0to1, thresholds.maxRecoveryBenchRecoveryRewardDrop0to1),
+    driftContribution(scoreDrift.recoveryBenchReplayIntegrityRateDrop0to1, recoveryBenchReplayIntegrityDropThreshold),
+    driftContribution(scoreDrift.recoveryBenchFailureTraceCoverageDrop0to1, recoveryBenchFailureTraceCoverageDropThreshold),
+    driftContribution(scoreDrift.recoveryBenchCorruptedEnvironmentCoverageDrop0to1, recoveryBenchCorruptedEnvironmentCoverageDropThreshold),
+    driftContribution(scoreDrift.recoveryBenchContextCoverageDrop0to1, recoveryBenchContextCoverageDropThreshold),
+    driftContribution(scoreDrift.recoveryBenchEvidenceCoverageDrop0to1, recoveryBenchEvidenceCoverageDropThreshold),
+    driftContribution(scoreDrift.adkEvalPassRateDrop0to1, adkEvalPassRateDropThreshold),
+    driftContribution(scoreDrift.adkToolCallSuccessRateDrop0to1, adkToolCallSuccessRateDropThreshold),
+    driftContribution(scoreDrift.adkGraphCoverageDrop0to1, adkGraphCoverageDropThreshold),
+    driftContribution(scoreDrift.adkStreamingStabilityDrop0to1, adkStreamingStabilityDropThreshold),
+    driftContribution(scoreDrift.adkDeploymentReadinessDrop0to1, adkDeploymentReadinessDropThreshold),
+    driftContribution(scoreDrift.adkEvidenceCoverageDrop0to1, adkEvidenceCoverageDropThreshold),
+    driftContribution(scoreDrift.physicianBenchTaskSuccessRateDrop0to1, physicianBenchTaskSuccessDropThreshold),
+    driftContribution(scoreDrift.physicianBenchCheckpointPassRateDrop0to1, physicianBenchCheckpointPassDropThreshold),
+    driftContribution(scoreDrift.physicianBenchFhirDataAccessAccuracyDrop0to1, physicianBenchFhirDataAccessDropThreshold),
+    driftContribution(scoreDrift.physicianBenchClinicalActionSafetyDrop0to1, physicianBenchClinicalActionSafetyDropThreshold),
+    driftContribution(scoreDrift.physicianBenchDocumentationQualityDrop0to1, physicianBenchDocumentationQualityDropThreshold),
+    driftContribution(scoreDrift.physicianBenchTrajectoryCoverageDrop0to1, physicianBenchTrajectoryCoverageDropThreshold),
+    driftContribution(scoreDrift.physicianBenchArtifactCoverageDrop0to1, physicianBenchArtifactCoverageDropThreshold),
+    driftContribution(scoreDrift.physicianBenchEvidenceCoverageDrop0to1, physicianBenchEvidenceCoverageDropThreshold),
     scoreDrift.interactionTurnMeanShiftRatio / thresholds.maxInteractionTurnMeanShiftRatio,
     scoreDrift.invalidActionRateIncrease0to1 / thresholds.maxInvalidActionRateIncrease0to1,
     scoreDrift.errorAttributionRateIncrease0to1 / thresholds.maxErrorAttributionRateIncrease0to1,
@@ -8069,10 +8068,10 @@ export function runLiveScoreBehaviorDrift(input: RunLiveScoreBehaviorDriftInput)
     scoreDrift.ctfContaminationRiskIncrease0to1 / thresholds.maxCtfContaminationRiskIncrease0to1,
     scoreDrift.ctfCompetitionImpactIncrease0to1 / thresholds.maxCtfCompetitionImpactIncrease0to1,
     scoreDrift.ctfIndependenceViolationRate0to1 / ctfIndependenceThreshold,
-    scoreDrift.ctfFirstCorrectFlagForwardingRateDrop0to1 / ctfFirstFlagForwardingDropThreshold,
+    driftContribution(scoreDrift.ctfFirstCorrectFlagForwardingRateDrop0to1, ctfFirstFlagForwardingDropThreshold),
     scoreDrift.ctfCheckpointCompletionDrop0to1 / thresholds.maxCtfCheckpointCompletionDrop0to1,
     scoreDrift.ctfPartialCreditScoreDrop0to1 / thresholds.maxCtfPartialCreditScoreDrop0to1,
-    scoreDrift.ctfTraceCoverageRateDrop0to1 / ctfTraceCoverageDropThreshold,
+    driftContribution(scoreDrift.ctfTraceCoverageRateDrop0to1, ctfTraceCoverageDropThreshold),
     scoreDrift.ctfIsolationViolationRate0to1 / ctfIsolationThreshold,
     scoreDrift.ragAccuracyDrop0to1 / thresholds.maxRagAccuracyDrop0to1,
     scoreDrift.ragCompletenessDrop0to1 / thresholds.maxRagCompletenessDrop0to1,
@@ -8080,19 +8079,19 @@ export function runLiveScoreBehaviorDrift(input: RunLiveScoreBehaviorDriftInput)
     scoreDrift.ragNumericalAccuracyDrop0to1 / thresholds.maxRagNumericalAccuracyDrop0to1,
     scoreDrift.ragHallucinationRateIncrease0to1 / thresholds.maxRagHallucinationRateIncrease0to1,
     scoreDrift.ragRetrievalTopKMeanShiftRatio / thresholds.maxRagRetrievalTopKMeanShiftRatio,
-    scoreDrift.ragGeneratedDataFinalCoverageDrop0to1 / ragGeneratedDataFinalCoverageDropThreshold,
-    scoreDrift.ragPassageGroundingCoverageDrop0to1 / ragPassageGroundingCoverageDropThreshold,
-    scoreDrift.ragHumanVerificationCoverageDrop0to1 / ragHumanVerificationCoverageDropThreshold,
-    scoreDrift.ragCitationCoverageDrop0to1 / ragCitationCoverageDropThreshold,
-    scoreDrift.ragAnswerSupportCoverageDrop0to1 / ragAnswerSupportCoverageDropThreshold,
-    scoreDrift.ragDatasetBuilderEvidenceCoverageDrop0to1 / ragDatasetBuilderEvidenceCoverageDropThreshold,
-    scoreDrift.ragStrategyEvidenceCoverageDrop0to1 / ragStrategyEvidenceCoverageDropThreshold,
+    driftContribution(scoreDrift.ragGeneratedDataFinalCoverageDrop0to1, ragGeneratedDataFinalCoverageDropThreshold),
+    driftContribution(scoreDrift.ragPassageGroundingCoverageDrop0to1, ragPassageGroundingCoverageDropThreshold),
+    driftContribution(scoreDrift.ragHumanVerificationCoverageDrop0to1, ragHumanVerificationCoverageDropThreshold),
+    driftContribution(scoreDrift.ragCitationCoverageDrop0to1, ragCitationCoverageDropThreshold),
+    driftContribution(scoreDrift.ragAnswerSupportCoverageDrop0to1, ragAnswerSupportCoverageDropThreshold),
+    driftContribution(scoreDrift.ragDatasetBuilderEvidenceCoverageDrop0to1, ragDatasetBuilderEvidenceCoverageDropThreshold),
+    driftContribution(scoreDrift.ragStrategyEvidenceCoverageDrop0to1, ragStrategyEvidenceCoverageDropThreshold),
     scoreDrift.ragGenerationCostIncreaseRatio / thresholds.maxRagGenerationCostIncreaseRatio,
     scoreDrift.ragQuestionCountDropRatio / thresholds.maxRagQuestionCountDropRatio,
     scoreDrift.ragSourceDocumentCountDropRatio / thresholds.maxRagSourceDocumentCountDropRatio,
     scoreDrift.kiteGradeDrop0to10 / thresholds.maxKiteGradeDrop0to10,
     scoreDrift.kiteNormalizedGradeDrop0to1 / thresholds.maxKiteNormalizedGradeDrop0to1,
-    scoreDrift.kiteEvidenceCoverageDrop0to1 / kiteEvidenceCoverageDropThreshold,
+    driftContribution(scoreDrift.kiteEvidenceCoverageDrop0to1, kiteEvidenceCoverageDropThreshold),
     scoreDrift.kiteQuestionCountDropRatio / thresholds.maxKiteQuestionCountDropRatio,
     scoreDrift.kiteDocumentCountDropRatio / thresholds.maxKiteDocumentCountDropRatio,
     scoreDrift.pokerEvalBbPer100Drop / thresholds.maxPokerEvalBbPer100Drop,
@@ -8100,40 +8099,40 @@ export function runLiveScoreBehaviorDrift(input: RunLiveScoreBehaviorDriftInput)
     scoreDrift.pokerEvalEvBbPer100Drop / thresholds.maxPokerEvalEvBbPer100Drop,
     scoreDrift.pokerEvalVpipShift0to1 / thresholds.maxPokerEvalVpipShift0to1,
     scoreDrift.pokerEvalHandCountDropRatio / thresholds.maxPokerEvalHandCountDropRatio,
-    scoreDrift.pokerEvalEvidenceCoverageDrop0to1 / pokerEvalEvidenceCoverageDropThreshold,
+    driftContribution(scoreDrift.pokerEvalEvidenceCoverageDrop0to1, pokerEvalEvidenceCoverageDropThreshold),
     scoreDrift.llmRagSemanticSimilarityDrop0to1 / thresholds.maxLlmRagSemanticSimilarityDrop0to1,
     scoreDrift.llmRagBiasRiskIncrease0to1 / thresholds.maxLlmRagBiasRiskIncrease0to1,
     scoreDrift.llmRagHallucinationRateIncrease0to1 / thresholds.maxLlmRagHallucinationRateIncrease0to1,
-    scoreDrift.llmRagEvalSuiteEvidenceCoverageDrop0to1 / llmRagEvalSuiteEvidenceCoverageDropThreshold,
+    driftContribution(scoreDrift.llmRagEvalSuiteEvidenceCoverageDrop0to1, llmRagEvalSuiteEvidenceCoverageDropThreshold),
     scoreDrift.noMiraclRelevanceAccuracyDrop0to1 / thresholds.maxNoMiraclRelevanceAccuracyDrop0to1,
-    scoreDrift.noMiraclAbstentionAccuracyDrop0to1 / thresholds.maxNoMiraclAbstentionAccuracyDrop0to1,
+    driftContribution(scoreDrift.noMiraclAbstentionAccuracyDrop0to1, thresholds.maxNoMiraclAbstentionAccuracyDrop0to1),
     scoreDrift.noMiraclHallucinationRateIncrease0to1 / thresholds.maxNoMiraclHallucinationRateIncrease0to1,
     scoreDrift.noMiraclErrorRateIncrease0to1 / thresholds.maxNoMiraclErrorRateIncrease0to1,
-    scoreDrift.noMiraclLanguageCoverageDrop0to1 / noMiraclLanguageCoverageDropThreshold,
-    scoreDrift.noMiraclSubsetCoverageDrop0to1 / noMiraclSubsetCoverageDropThreshold,
-    scoreDrift.noMiraclEvidenceCoverageDrop0to1 / noMiraclEvidenceCoverageDropThreshold,
+    driftContribution(scoreDrift.noMiraclLanguageCoverageDrop0to1, noMiraclLanguageCoverageDropThreshold),
+    driftContribution(scoreDrift.noMiraclSubsetCoverageDrop0to1, noMiraclSubsetCoverageDropThreshold),
+    driftContribution(scoreDrift.noMiraclEvidenceCoverageDrop0to1, noMiraclEvidenceCoverageDropThreshold),
     scoreDrift.scalingLawR2Drop / thresholds.maxScalingLawR2Drop,
     scoreDrift.scalingLawNmseIncrease / thresholds.maxScalingLawNmseIncrease,
     scoreDrift.scalingLawNmaeIncrease / thresholds.maxScalingLawNmaeIncrease,
-    scoreDrift.scalingLawEvidenceCoverageDrop0to1 / scalingLawEvidenceCoverageDropThreshold,
+    driftContribution(scoreDrift.scalingLawEvidenceCoverageDrop0to1, scalingLawEvidenceCoverageDropThreshold),
     scoreDrift.genomicsSelectionAccuracyDrop0to1 / thresholds.maxGenomicsSelectionAccuracyDrop0to1,
     scoreDrift.genomicsPreprocessingQualityDrop0to1 / thresholds.maxGenomicsPreprocessingQualityDrop0to1,
     scoreDrift.genomicsStatisticalAnalysisAccuracyDrop0to1 / thresholds.maxGenomicsStatisticalAnalysisAccuracyDrop0to1,
-    scoreDrift.genomicsReferenceCoverageDrop0to1 / genomicsReferenceCoverageDropThreshold,
-    scoreDrift.genomicsFormatConformanceRateDrop0to1 / genomicsFormatConformanceDropThreshold,
-    scoreDrift.genomicsExpertCurationCoverageDrop0to1 / genomicsExpertCurationDropThreshold,
+    driftContribution(scoreDrift.genomicsReferenceCoverageDrop0to1, genomicsReferenceCoverageDropThreshold),
+    driftContribution(scoreDrift.genomicsFormatConformanceRateDrop0to1, genomicsFormatConformanceDropThreshold),
+    driftContribution(scoreDrift.genomicsExpertCurationCoverageDrop0to1, genomicsExpertCurationDropThreshold),
     scoreDrift.agenticSearchPlanningScoreDrop0to1 / thresholds.maxAgenticSearchPlanningScoreDrop0to1,
     scoreDrift.agenticSearchQueryDecompositionDrop0to1 / thresholds.maxAgenticSearchQueryDecompositionDrop0to1,
     scoreDrift.agenticSearchRelevanceDrop0to1 / thresholds.maxAgenticSearchRelevanceDrop0to1,
     scoreDrift.agenticSearchSynthesisDrop0to1 / thresholds.maxAgenticSearchSynthesisDrop0to1,
-    scoreDrift.agenticSearchCitationCoverageDrop0to1 / agenticSearchCitationCoverageDropThreshold,
-    scoreDrift.agenticSearchTraceCoverageDrop0to1 / agenticSearchTraceCoverageDropThreshold,
+    driftContribution(scoreDrift.agenticSearchCitationCoverageDrop0to1, agenticSearchCitationCoverageDropThreshold),
+    driftContribution(scoreDrift.agenticSearchTraceCoverageDrop0to1, agenticSearchTraceCoverageDropThreshold),
     scoreDrift.documentDatasetQaAccuracyDrop0to1 / thresholds.maxDocumentDatasetQaAccuracyDrop0to1,
     scoreDrift.documentDatasetSummaryQualityDrop0to1 / thresholds.maxDocumentDatasetSummaryQualityDrop0to1,
     scoreDrift.documentDatasetRagFaithfulnessDrop0to1 / thresholds.maxDocumentDatasetRagFaithfulnessDrop0to1,
-    scoreDrift.documentDatasetNumGuardCoverageDrop0to1 / Math.max(1 - thresholds.minDocumentDatasetNumGuardCoverage0to1, 0.000001),
+    (scoreDrift.documentDatasetNumGuardCoverageDrop0to1 === null ? null : scoreDrift.documentDatasetNumGuardCoverageDrop0to1 / Math.max(1 - thresholds.minDocumentDatasetNumGuardCoverage0to1, 0.000001)),
     scoreDrift.documentDatasetNumericMismatchRateIncrease0to1 / thresholds.maxDocumentDatasetNumericMismatchRateIncrease0to1,
-    scoreDrift.documentDatasetEvidenceCoverageDrop0to1 / Math.max(1 - thresholds.minDocumentDatasetEvidenceCoverage0to1, 0.000001),
+    (scoreDrift.documentDatasetEvidenceCoverageDrop0to1 === null ? null : scoreDrift.documentDatasetEvidenceCoverageDrop0to1 / Math.max(1 - thresholds.minDocumentDatasetEvidenceCoverage0to1, 0.000001)),
     scoreDrift.documentDatasetTokenSavingsDropRatio / thresholds.maxDocumentDatasetTokenSavingsDropRatio,
     scoreDrift.documentDatasetThroughputDropRatio / thresholds.maxDocumentDatasetThroughputDropRatio,
     scoreDrift.documentDatasetMemoryIncreaseRatio / thresholds.maxDocumentDatasetMemoryIncreaseRatio,
@@ -8147,7 +8146,7 @@ export function runLiveScoreBehaviorDrift(input: RunLiveScoreBehaviorDriftInput)
     scoreDrift.cpuAgenticToolExecutionShareIncrease0to1 / thresholds.maxCpuAgenticToolExecutionShareIncrease0to1,
     scoreDrift.cpuAgenticLlmInferenceShareShift0to1 / thresholds.maxCpuAgenticLlmInferenceShareShift0to1,
     scoreDrift.cpuAgenticFrameworkOverheadShareIncrease0to1 / thresholds.maxCpuAgenticFrameworkOverheadShareIncrease0to1,
-    scoreDrift.cpuAgenticEvidenceCoverageDrop0to1 / cpuAgenticEvidenceCoverageDropThreshold,
+    driftContribution(scoreDrift.cpuAgenticEvidenceCoverageDrop0to1, cpuAgenticEvidenceCoverageDropThreshold),
     scoreDrift.evalTechniqueExactMatchAccuracyDrop0to1 / thresholds.maxEvalTechniqueExactMatchAccuracyDrop0to1,
     scoreDrift.evalTechniqueLlmJudgeAgreementDrop0to1 / thresholds.maxEvalTechniqueLlmJudgeAgreementDrop0to1,
     scoreDrift.evalTechniqueStructuredValidationDrop0to1 / thresholds.maxEvalTechniqueStructuredValidationDrop0to1,
@@ -8160,31 +8159,31 @@ export function runLiveScoreBehaviorDrift(input: RunLiveScoreBehaviorDriftInput)
     scoreDrift.evalTechniqueRealtimeFeedbackDrop0to1 / thresholds.maxEvalTechniqueRealtimeFeedbackDrop0to1,
     scoreDrift.evalTechniquePairwiseWinRateDrop0to1 / thresholds.maxEvalTechniquePairwiseWinRateDrop0to1,
     scoreDrift.evalTechniqueSimulationGoalCompletionDrop0to1 / thresholds.maxEvalTechniqueSimulationGoalCompletionDrop0to1,
-    scoreDrift.evalTechniqueAlgorithmicFeedbackCoverageDrop0to1 / evalTechniqueAlgorithmicFeedbackCoverageDropThreshold,
-    scoreDrift.evalTechniqueEvidenceCoverageDrop0to1 / evalTechniqueEvidenceCoverageDropThreshold,
-    scoreDrift.sapAgentEvalObjectiveCoverageDrop0to1 / sapAgentEvalObjectiveCoverageDropThreshold,
-    scoreDrift.sapAgentEvalProcessCoverageDrop0to1 / sapAgentEvalProcessCoverageDropThreshold,
-    scoreDrift.sapAgentEvalEnterpriseContextCoverageDrop0to1 / sapAgentEvalEnterpriseContextCoverageDropThreshold,
-    scoreDrift.sapAgentEvalEvidenceCoverageDrop0to1 / sapAgentEvalEvidenceCoverageDropThreshold,
-    scoreDrift.agentEvalObservabilityConfigCoverageDrop0to1 / agentEvalObservabilityConfigCoverageDropThreshold,
-    scoreDrift.agentEvalObservabilityTelemetryCoverageDrop0to1 / agentEvalObservabilityTelemetryCoverageDropThreshold,
-    scoreDrift.agentEvalObservabilityEvidenceCoverageDrop0to1 / agentEvalObservabilityEvidenceCoverageDropThreshold,
+    driftContribution(scoreDrift.evalTechniqueAlgorithmicFeedbackCoverageDrop0to1, evalTechniqueAlgorithmicFeedbackCoverageDropThreshold),
+    driftContribution(scoreDrift.evalTechniqueEvidenceCoverageDrop0to1, evalTechniqueEvidenceCoverageDropThreshold),
+    driftContribution(scoreDrift.sapAgentEvalObjectiveCoverageDrop0to1, sapAgentEvalObjectiveCoverageDropThreshold),
+    driftContribution(scoreDrift.sapAgentEvalProcessCoverageDrop0to1, sapAgentEvalProcessCoverageDropThreshold),
+    driftContribution(scoreDrift.sapAgentEvalEnterpriseContextCoverageDrop0to1, sapAgentEvalEnterpriseContextCoverageDropThreshold),
+    driftContribution(scoreDrift.sapAgentEvalEvidenceCoverageDrop0to1, sapAgentEvalEvidenceCoverageDropThreshold),
+    driftContribution(scoreDrift.agentEvalObservabilityConfigCoverageDrop0to1, agentEvalObservabilityConfigCoverageDropThreshold),
+    driftContribution(scoreDrift.agentEvalObservabilityTelemetryCoverageDrop0to1, agentEvalObservabilityTelemetryCoverageDropThreshold),
+    driftContribution(scoreDrift.agentEvalObservabilityEvidenceCoverageDrop0to1, agentEvalObservabilityEvidenceCoverageDropThreshold),
     scoreDrift.hedraRagLatencyP95IncreaseRatio / thresholds.maxHedraRagLatencyP95IncreaseRatio,
     scoreDrift.hedraRagThroughputDropRatio / thresholds.maxHedraRagThroughputDropRatio,
     scoreDrift.hedraRagMemoryIncreaseRatio / thresholds.maxHedraRagMemoryIncreaseRatio,
-    scoreDrift.hedraRagReplayPassRateDrop0to1 / hedraRagReplayPassRateDropThreshold,
-    scoreDrift.hedraRagEvidenceCoverageDrop0to1 / hedraRagEvidenceCoverageDropThreshold,
-    scoreDrift.agentEvalHarnessToolSuccessDrop0to1 / thresholds.maxAgentEvalHarnessToolSuccessDrop0to1,
+    driftContribution(scoreDrift.hedraRagReplayPassRateDrop0to1, hedraRagReplayPassRateDropThreshold),
+    driftContribution(scoreDrift.hedraRagEvidenceCoverageDrop0to1, hedraRagEvidenceCoverageDropThreshold),
+    driftContribution(scoreDrift.agentEvalHarnessToolSuccessDrop0to1, thresholds.maxAgentEvalHarnessToolSuccessDrop0to1),
     scoreDrift.agentEvalHarnessHallucinationIncrease0to1 / thresholds.maxAgentEvalHarnessHallucinationIncrease0to1,
     scoreDrift.agentEvalHarnessLatencyP95IncreaseRatio / thresholds.maxAgentEvalHarnessLatencyP95IncreaseRatio,
     scoreDrift.agentEvalHarnessCostIncreaseRatio / thresholds.maxAgentEvalHarnessCostIncreaseRatio,
-    scoreDrift.agentEvalHarnessTraceCoverageDrop0to1 / agentEvalHarnessTraceCoverageDropThreshold,
-    scoreDrift.agentEvalHarnessEvidenceCoverageDrop0to1 / agentEvalHarnessEvidenceCoverageDropThreshold,
-    scoreDrift.strandsBenchmarkHarnessTaskSuccessDrop0to1 / thresholds.maxStrandsBenchmarkHarnessTaskSuccessDrop0to1,
-    scoreDrift.strandsBenchmarkHarnessPatchApplyRateDrop0to1 / thresholds.maxStrandsBenchmarkHarnessPatchApplyRateDrop0to1,
-    scoreDrift.strandsBenchmarkHarnessTestPassRateDrop0to1 / thresholds.maxStrandsBenchmarkHarnessTestPassRateDrop0to1,
-    scoreDrift.strandsBenchmarkHarnessTrajectoryCoverageDrop0to1 / strandsBenchmarkHarnessTrajectoryCoverageDropThreshold,
-    scoreDrift.strandsBenchmarkHarnessEvidenceCoverageDrop0to1 / strandsBenchmarkHarnessEvidenceCoverageDropThreshold,
+    driftContribution(scoreDrift.agentEvalHarnessTraceCoverageDrop0to1, agentEvalHarnessTraceCoverageDropThreshold),
+    driftContribution(scoreDrift.agentEvalHarnessEvidenceCoverageDrop0to1, agentEvalHarnessEvidenceCoverageDropThreshold),
+    driftContribution(scoreDrift.strandsBenchmarkHarnessTaskSuccessDrop0to1, thresholds.maxStrandsBenchmarkHarnessTaskSuccessDrop0to1),
+    driftContribution(scoreDrift.strandsBenchmarkHarnessPatchApplyRateDrop0to1, thresholds.maxStrandsBenchmarkHarnessPatchApplyRateDrop0to1),
+    driftContribution(scoreDrift.strandsBenchmarkHarnessTestPassRateDrop0to1, thresholds.maxStrandsBenchmarkHarnessTestPassRateDrop0to1),
+    driftContribution(scoreDrift.strandsBenchmarkHarnessTrajectoryCoverageDrop0to1, strandsBenchmarkHarnessTrajectoryCoverageDropThreshold),
+    driftContribution(scoreDrift.strandsBenchmarkHarnessEvidenceCoverageDrop0to1, strandsBenchmarkHarnessEvidenceCoverageDropThreshold),
     scoreDrift.strandsBenchmarkHarnessLatencyP95IncreaseRatio / thresholds.maxStrandsBenchmarkHarnessLatencyP95IncreaseRatio,
     scoreDrift.strandsBenchmarkHarnessCostIncreaseRatio / thresholds.maxStrandsBenchmarkHarnessCostIncreaseRatio,
     scoreDrift.privacyWebDataMinimizationPassRateDrop0to1 / thresholds.maxPrivacyWebDataMinimizationPassRateDrop0to1,
@@ -8193,60 +8192,60 @@ export function runLiveScoreBehaviorDrift(input: RunLiveScoreBehaviorDriftInput)
     scoreDrift.privacyWebSensitiveFieldExposureIncreaseRatio / thresholds.maxPrivacyWebSensitiveFieldExposureIncreaseRatio,
     scoreDrift.privacyWebTaskSuccessRateDrop0to1 / thresholds.maxPrivacyWebTaskSuccessRateDrop0to1,
     scoreDrift.privacyWebModalLeakageDeltaIncrease0to1 / thresholds.maxPrivacyWebModalLeakageDeltaIncrease0to1,
-    scoreDrift.privacyWebEvidenceCoverageDrop0to1 / privacyWebEvidenceCoverageDropThreshold,
+    driftContribution(scoreDrift.privacyWebEvidenceCoverageDrop0to1, privacyWebEvidenceCoverageDropThreshold),
     scoreDrift.localSystemThermalBaselineDeviationIncrease0to1 / thresholds.maxLocalSystemThermalBaselineDeviationIncrease0to1,
     scoreDrift.localSystemVoltageSpcAnomalyRateIncrease0to1 / thresholds.maxLocalSystemVoltageSpcAnomalyRateIncrease0to1,
-    scoreDrift.localSystemProcessIdentityCoverageDrop0to1 / Math.max(1 - thresholds.minLocalSystemProcessIdentityCoverage0to1, 0.000001),
-    scoreDrift.localSystemGhostDriverDetectionCoverageDrop0to1 / Math.max(1 - thresholds.minLocalSystemGhostDriverDetectionCoverage0to1, 0.000001),
-    scoreDrift.localSystemProactiveAlertCoverageDrop0to1 / Math.max(1 - thresholds.minLocalSystemProactiveAlertCoverage0to1, 0.000001),
-    scoreDrift.localSystemLocalOnlyPrivacyCoverageDrop0to1 / Math.max(1 - thresholds.minLocalSystemLocalOnlyPrivacyCoverage0to1, 0.000001),
-    scoreDrift.localSystemEvidenceCoverageDrop0to1 / Math.max(1 - thresholds.minLocalSystemEvidenceCoverage0to1, 0.000001),
+    (scoreDrift.localSystemProcessIdentityCoverageDrop0to1 === null ? null : scoreDrift.localSystemProcessIdentityCoverageDrop0to1 / Math.max(1 - thresholds.minLocalSystemProcessIdentityCoverage0to1, 0.000001)),
+    (scoreDrift.localSystemGhostDriverDetectionCoverageDrop0to1 === null ? null : scoreDrift.localSystemGhostDriverDetectionCoverageDrop0to1 / Math.max(1 - thresholds.minLocalSystemGhostDriverDetectionCoverage0to1, 0.000001)),
+    (scoreDrift.localSystemProactiveAlertCoverageDrop0to1 === null ? null : scoreDrift.localSystemProactiveAlertCoverageDrop0to1 / Math.max(1 - thresholds.minLocalSystemProactiveAlertCoverage0to1, 0.000001)),
+    (scoreDrift.localSystemLocalOnlyPrivacyCoverageDrop0to1 === null ? null : scoreDrift.localSystemLocalOnlyPrivacyCoverageDrop0to1 / Math.max(1 - thresholds.minLocalSystemLocalOnlyPrivacyCoverage0to1, 0.000001)),
+    (scoreDrift.localSystemEvidenceCoverageDrop0to1 === null ? null : scoreDrift.localSystemEvidenceCoverageDrop0to1 / Math.max(1 - thresholds.minLocalSystemEvidenceCoverage0to1, 0.000001)),
     scoreDrift.observabilityResolutionScoreDrop0to1 / thresholds.maxObservabilityResolutionScoreDrop0to1,
     scoreDrift.observabilityDeterministicCheckPassRateDrop0to1 / thresholds.maxObservabilityDeterministicCheckDrop0to1,
     scoreDrift.observabilityRubricScoreDrop0to1 / thresholds.maxObservabilityRubricScoreDrop0to1,
-    scoreDrift.observabilityEvidenceCoverageDrop0to1 / observabilityEvidenceCoverageDropThreshold,
-    scoreDrift.observabilityTraceCoverageDrop0to1 / observabilityTraceCoverageDropThreshold,
-    scoreDrift.observabilityReportCoverageDrop0to1 / observabilityReportCoverageDropThreshold,
-    scoreDrift.observabilityScenarioClockAlignmentRateDrop0to1 / observabilityScenarioClockAlignmentDropThreshold,
+    driftContribution(scoreDrift.observabilityEvidenceCoverageDrop0to1, observabilityEvidenceCoverageDropThreshold),
+    driftContribution(scoreDrift.observabilityTraceCoverageDrop0to1, observabilityTraceCoverageDropThreshold),
+    driftContribution(scoreDrift.observabilityReportCoverageDrop0to1, observabilityReportCoverageDropThreshold),
+    driftContribution(scoreDrift.observabilityScenarioClockAlignmentRateDrop0to1, observabilityScenarioClockAlignmentDropThreshold),
     scoreDrift.ollamaMetricsRequestDurationP95IncreaseRatio / thresholds.maxOllamaMetricsRequestDurationP95IncreaseRatio,
     scoreDrift.ollamaMetricsTimePerTokenIncreaseRatio / thresholds.maxOllamaMetricsTimePerTokenIncreaseRatio,
     scoreDrift.ollamaMetricsLoadedModelCountDropRatio / thresholds.maxOllamaMetricsLoadedModelCountDropRatio,
-    scoreDrift.ollamaMetricsModelLoadedRateDrop0to1 / ollamaMetricsModelLoadedRateDropThreshold,
+    driftContribution(scoreDrift.ollamaMetricsModelLoadedRateDrop0to1, ollamaMetricsModelLoadedRateDropThreshold),
     scoreDrift.ollamaMetricsModelRamIncreaseRatio / thresholds.maxOllamaMetricsModelRamIncreaseRatio,
     scoreDrift.ollamaMetricsRequestErrorRateIncrease0to1 / thresholds.maxOllamaMetricsRequestErrorRateIncrease0to1,
-    scoreDrift.ollamaMetricsEvidenceCoverageDrop0to1 / ollamaMetricsEvidenceCoverageDropThreshold,
+    driftContribution(scoreDrift.ollamaMetricsEvidenceCoverageDrop0to1, ollamaMetricsEvidenceCoverageDropThreshold),
     scoreDrift.webOperatorLlmEvaluationDrop0to1 / thresholds.maxWebOperatorLlmEvaluationDrop0to1,
     scoreDrift.webOperatorSelfReportOverclaimIncrease0to1 / thresholds.maxWebOperatorSelfReportOverclaimIncrease0to1,
     scoreDrift.webOperatorMismatchRateIncrease0to1 / thresholds.maxWebOperatorMismatchRateIncrease0to1,
     scoreDrift.webOperatorTaskReliabilityDrop0to1 / thresholds.maxWebOperatorTaskReliabilityDrop0to1,
-    scoreDrift.webOperatorReplayCoverageDrop0to1 / webOperatorReplayCoverageDropThreshold,
+    driftContribution(scoreDrift.webOperatorReplayCoverageDrop0to1, webOperatorReplayCoverageDropThreshold),
     scoreDrift.webOperatorTaskTimeIncreaseRatio / thresholds.maxWebOperatorTaskTimeIncreaseRatio,
     scoreDrift.webOperatorStepLimitViolationRateIncrease0to1 / thresholds.maxWebOperatorStepLimitViolationRateIncrease0to1,
     scoreDrift.naviBenchTaskSuccessDrop0to1 / thresholds.maxNaviBenchTaskSuccessDrop0to1,
     scoreDrift.naviBenchCrashRateIncrease0to1 / thresholds.maxNaviBenchCrashRateIncrease0to1,
     scoreDrift.naviBenchLowerBoundScoreDrop0to1 / thresholds.maxNaviBenchLowerBoundScoreDrop0to1,
     scoreDrift.naviBenchExcludingCrashedScoreDrop0to1 / thresholds.maxNaviBenchExcludingCrashedScoreDrop0to1,
-    scoreDrift.naviBenchTrajectoryCoverageDrop0to1 / naviBenchTrajectoryCoverageDropThreshold,
-    scoreDrift.naviBenchVisualizationCoverageDrop0to1 / naviBenchVisualizationCoverageDropThreshold,
-    scoreDrift.naviBenchEvidenceCoverageDrop0to1 / naviBenchEvidenceCoverageDropThreshold,
+    driftContribution(scoreDrift.naviBenchTrajectoryCoverageDrop0to1, naviBenchTrajectoryCoverageDropThreshold),
+    driftContribution(scoreDrift.naviBenchVisualizationCoverageDrop0to1, naviBenchVisualizationCoverageDropThreshold),
+    driftContribution(scoreDrift.naviBenchEvidenceCoverageDrop0to1, naviBenchEvidenceCoverageDropThreshold),
     scoreDrift.naviBenchStepCountIncreaseRatio / thresholds.maxNaviBenchStepCountIncreaseRatio,
     scoreDrift.naviBenchStepLimitViolationRateIncrease0to1 / thresholds.maxNaviBenchStepLimitViolationRateIncrease0to1,
     scoreDrift.legalAgentFinalSuccessDrop0to1 / thresholds.maxLegalAgentFinalSuccessDrop0to1,
     scoreDrift.legalAgentProcessRateDrop0to1 / thresholds.maxLegalAgentProcessRateDrop0to1,
     scoreDrift.legalAgentToolUseAccuracyDrop0to1 / thresholds.maxLegalAgentToolUseAccuracyDrop0to1,
-    scoreDrift.legalAgentCitationCoverageDrop0to1 / legalAgentCitationCoverageDropThreshold,
-    scoreDrift.legalAgentEvidenceCoverageDrop0to1 / legalAgentEvidenceCoverageDropThreshold,
+    driftContribution(scoreDrift.legalAgentCitationCoverageDrop0to1, legalAgentCitationCoverageDropThreshold),
+    driftContribution(scoreDrift.legalAgentEvidenceCoverageDrop0to1, legalAgentEvidenceCoverageDropThreshold),
     scoreDrift.legalAgentTokenCostIncreaseRatio / thresholds.maxLegalAgentTokenCostIncreaseRatio,
     scoreDrift.researchGymScoreImprovementDrop0to1 / thresholds.maxResearchGymScoreImprovementDrop0to1,
     scoreDrift.researchGymSubtaskCompletionDrop0to1 / thresholds.maxResearchGymSubtaskCompletionDrop0to1,
-    scoreDrift.researchGymArtifactCoverageDrop0to1 / researchGymArtifactCoverageDropThreshold,
-    scoreDrift.researchGymInspectionPassRateDrop0to1 / researchGymInspectionPassDropThreshold,
+    driftContribution(scoreDrift.researchGymArtifactCoverageDrop0to1, researchGymArtifactCoverageDropThreshold),
+    driftContribution(scoreDrift.researchGymInspectionPassRateDrop0to1, researchGymInspectionPassDropThreshold),
     scoreDrift.researchGymBudgetOverrunRateIncrease0to1 / researchGymBudgetOverrunThreshold,
     scoreDrift.researchGymViolationRateIncrease0to1 / researchGymViolationThreshold,
     scoreDrift.osUniverseTaskSuccessDrop0to1 / thresholds.maxOsUniverseTaskSuccessDrop0to1,
     scoreDrift.osUniverseAutoValidationPassDrop0to1 / thresholds.maxOsUniverseAutoValidationPassDrop0to1,
     scoreDrift.osUniverseValidationErrorRateIncrease0to1 / thresholds.maxOsUniverseValidationErrorRateIncrease0to1,
-    scoreDrift.osUniverseEvidenceCoverageDrop0to1 / osUniverseEvidenceCoverageDropThreshold,
+    driftContribution(scoreDrift.osUniverseEvidenceCoverageDrop0to1, osUniverseEvidenceCoverageDropThreshold),
     scoreDrift.osUniverseStepCountIncreaseRatio / thresholds.maxOsUniverseStepCountIncreaseRatio,
     scoreDrift.osUniverseStepLimitViolationRateIncrease0to1 / thresholds.maxOsUniverseStepLimitViolationRateIncrease0to1,
     behaviorDrift.behaviorDivergence0to1 / thresholds.maxBehaviorDivergence0to1,
@@ -8366,79 +8365,79 @@ export function runLiveScoreBehaviorDrift(input: RunLiveScoreBehaviorDriftInput)
   const alertEvidenceRefs = unique(liveRows.flatMap((row) => row.evidenceRefs));
   const alertSignedRefs = unique(liveRows.flatMap((row) => row.signedEvidenceRefs));
   const alerts: LiveDriftAlert[] = [];
-  const llmRagEvalSuiteEvidenceCoverage = Math.min(
+  const llmRagEvalSuiteEvidenceCoverage = minimumCoverage(
     baselineDistribution.llmRagEvalSuiteEvidenceCoverage0to1,
     liveDistribution.llmRagEvalSuiteEvidenceCoverage0to1,
   );
-  const noMiraclLanguageCoverage = Math.min(
+  const noMiraclLanguageCoverage = minimumCoverage(
     baselineDistribution.noMiraclLanguageCoverage0to1,
     liveDistribution.noMiraclLanguageCoverage0to1,
   );
-  const noMiraclSubsetCoverage = Math.min(
+  const noMiraclSubsetCoverage = minimumCoverage(
     baselineDistribution.noMiraclSubsetCoverage0to1,
     liveDistribution.noMiraclSubsetCoverage0to1,
   );
-  const noMiraclEvidenceCoverage = Math.min(
+  const noMiraclEvidenceCoverage = minimumCoverage(
     baselineDistribution.noMiraclEvidenceCoverage0to1,
     liveDistribution.noMiraclEvidenceCoverage0to1,
   );
-  const scalingLawEvidenceCoverage = Math.min(
+  const scalingLawEvidenceCoverage = minimumCoverage(
     baselineDistribution.scalingLawDiscoveryEvidenceCoverage0to1,
     liveDistribution.scalingLawDiscoveryEvidenceCoverage0to1,
   );
-  const hedraRagReplayPassRate = Math.min(
+  const hedraRagReplayPassRate = minimumCoverage(
     baselineDistribution.hedraRagReplayPassRate0to1,
     liveDistribution.hedraRagReplayPassRate0to1,
   );
-  const hedraRagEvidenceCoverage = Math.min(
+  const hedraRagEvidenceCoverage = minimumCoverage(
     baselineDistribution.hedraRagEvidenceCoverage0to1,
     liveDistribution.hedraRagEvidenceCoverage0to1,
   );
-  const agentEvalHarnessTraceCoverage = Math.min(
+  const agentEvalHarnessTraceCoverage = minimumCoverage(
     baselineDistribution.agentEvalHarnessTraceCoverage0to1,
     liveDistribution.agentEvalHarnessTraceCoverage0to1,
   );
-  const agentEvalHarnessEvidenceCoverage = Math.min(
+  const agentEvalHarnessEvidenceCoverage = minimumCoverage(
     baselineDistribution.agentEvalHarnessEvidenceCoverage0to1,
     liveDistribution.agentEvalHarnessEvidenceCoverage0to1,
   );
-  const strandsBenchmarkHarnessTrajectoryCoverage = Math.min(
+  const strandsBenchmarkHarnessTrajectoryCoverage = minimumCoverage(
     baselineDistribution.strandsBenchmarkHarnessTrajectoryCoverage0to1,
     liveDistribution.strandsBenchmarkHarnessTrajectoryCoverage0to1,
   );
-  const strandsBenchmarkHarnessEvidenceCoverage = Math.min(
+  const strandsBenchmarkHarnessEvidenceCoverage = minimumCoverage(
     baselineDistribution.strandsBenchmarkHarnessEvidenceCoverage0to1,
     liveDistribution.strandsBenchmarkHarnessEvidenceCoverage0to1,
   );
-  const ollamaMetricsModelLoadedRate = Math.min(
+  const ollamaMetricsModelLoadedRate = minimumCoverage(
     baselineDistribution.ollamaMetricsModelLoadedRate0to1,
     liveDistribution.ollamaMetricsModelLoadedRate0to1,
   );
-  const ollamaMetricsEvidenceCoverage = Math.min(
+  const ollamaMetricsEvidenceCoverage = minimumCoverage(
     baselineDistribution.ollamaMetricsEvidenceCoverage0to1,
     liveDistribution.ollamaMetricsEvidenceCoverage0to1,
   );
 
-  if (baselineDistribution.sampleSize < thresholds.minBaselineSampleSize) {
+  if (baselineDistribution.sampleSize === 0 || baselineDistribution.sampleSize < thresholds.minBaselineSampleSize) {
     alerts.push(makeAlert(
       input.agentId,
       input.baselineWindow.windowId,
       input.liveWindow.windowId,
       "sampleSize",
-      baselineDistribution.sampleSize,
+      baselineDistribution.sampleSize === 0 ? null : baselineDistribution.sampleSize,
       thresholds.minBaselineSampleSize,
       "Baseline evaluation distribution sample size is below the minimum.",
       evidenceRefs,
       signedEvidenceRefs,
     ));
   }
-  if (liveDistribution.sampleSize < thresholds.minLiveSampleSize) {
+  if (liveDistribution.sampleSize === 0 || liveDistribution.sampleSize < thresholds.minLiveSampleSize) {
     alerts.push(makeAlert(
       input.agentId,
       input.baselineWindow.windowId,
       input.liveWindow.windowId,
       "sampleSize",
-      liveDistribution.sampleSize,
+      liveDistribution.sampleSize === 0 ? null : liveDistribution.sampleSize,
       thresholds.minLiveSampleSize,
       "Live production sample size is below the minimum.",
       alertEvidenceRefs,
@@ -8605,34 +8604,34 @@ export function runLiveScoreBehaviorDrift(input: RunLiveScoreBehaviorDriftInput)
   if (hasRedTeamEvidence && scoreDrift.redTeamGuardScoreDrop0to1 > thresholds.maxRedTeamGuardScoreDrop0to1) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "redTeamGuardScoreMean0to1", scoreDrift.redTeamGuardScoreDrop0to1, thresholds.maxRedTeamGuardScoreDrop0to1, "Live safety red-team guard score mean dropped beyond threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasRedTeamEvidence && liveDistribution.redTeamDatasetCoverage0to1 < thresholds.minRedTeamDatasetCoverage0to1) {
+  if (hasRedTeamEvidence && (liveDistribution.redTeamDatasetCoverage0to1 === null || liveDistribution.redTeamDatasetCoverage0to1 < thresholds.minRedTeamDatasetCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "redTeamDatasetCoverage0to1", liveDistribution.redTeamDatasetCoverage0to1, thresholds.minRedTeamDatasetCoverage0to1, "Live safety red-team rows are missing benchmark, dataset, prompt, or response evidence hashes.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasRedTeamEvidence && liveDistribution.redTeamTaxonomyCoverage0to1 < thresholds.minRedTeamTaxonomyCoverage0to1) {
+  if (hasRedTeamEvidence && (liveDistribution.redTeamTaxonomyCoverage0to1 === null || liveDistribution.redTeamTaxonomyCoverage0to1 < thresholds.minRedTeamTaxonomyCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "redTeamTaxonomyCoverage0to1", liveDistribution.redTeamTaxonomyCoverage0to1, thresholds.minRedTeamTaxonomyCoverage0to1, "Live safety red-team rows are missing taxonomy or risk-category evidence.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasRedTeamEvidence && liveDistribution.redTeamAttackCoverage0to1 < thresholds.minRedTeamAttackCoverage0to1) {
+  if (hasRedTeamEvidence && (liveDistribution.redTeamAttackCoverage0to1 === null || liveDistribution.redTeamAttackCoverage0to1 < thresholds.minRedTeamAttackCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "redTeamAttackCoverage0to1", liveDistribution.redTeamAttackCoverage0to1, thresholds.minRedTeamAttackCoverage0to1, "Live safety red-team rows are missing adversarial subset or attack-type evidence.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasRedTeamEvidence && liveDistribution.redTeamGuardCoverage0to1 < thresholds.minRedTeamGuardCoverage0to1) {
+  if (hasRedTeamEvidence && (liveDistribution.redTeamGuardCoverage0to1 === null || liveDistribution.redTeamGuardCoverage0to1 < thresholds.minRedTeamGuardCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "redTeamGuardCoverage0to1", liveDistribution.redTeamGuardCoverage0to1, thresholds.minRedTeamGuardCoverage0to1, "Live safety red-team rows are missing guard model, label, or score evidence.", alertEvidenceRefs, alertSignedRefs));
   }
   if (hasPiArenaEvidence && scoreDrift.piArenaAttackSuccessRateIncrease0to1 > thresholds.maxPiArenaAttackSuccessRateIncrease0to1) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "piArenaAttackSuccessRate0to1", scoreDrift.piArenaAttackSuccessRateIncrease0to1, thresholds.maxPiArenaAttackSuccessRateIncrease0to1, "Live PIArena-style prompt-injection attack success rate increased beyond threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasPiArenaEvidence && scoreDrift.piArenaDefenseBlockRateDrop0to1 > thresholds.maxPiArenaDefenseBlockRateDrop0to1) {
+  if (hasPiArenaEvidence && (scoreDrift.piArenaDefenseBlockRateDrop0to1 !== null && scoreDrift.piArenaDefenseBlockRateDrop0to1 > thresholds.maxPiArenaDefenseBlockRateDrop0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "piArenaDefenseBlockRate0to1", scoreDrift.piArenaDefenseBlockRateDrop0to1, thresholds.maxPiArenaDefenseBlockRateDrop0to1, "Live PIArena-style defense block rate dropped beyond threshold.", alertEvidenceRefs, alertSignedRefs));
   }
   if (hasPiArenaEvidence && scoreDrift.piArenaFalsePositiveRateIncrease0to1 > thresholds.maxPiArenaFalsePositiveRateIncrease0to1) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "piArenaFalsePositiveRate0to1", scoreDrift.piArenaFalsePositiveRateIncrease0to1, thresholds.maxPiArenaFalsePositiveRateIncrease0to1, "Live PIArena-style defense false-positive rate increased beyond threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasPiArenaEvidence && scoreDrift.piArenaAgentTaskSuccessRateDrop0to1 > thresholds.maxPiArenaAgentTaskSuccessRateDrop0to1) {
+  if (hasPiArenaEvidence && (scoreDrift.piArenaAgentTaskSuccessRateDrop0to1 !== null && scoreDrift.piArenaAgentTaskSuccessRateDrop0to1 > thresholds.maxPiArenaAgentTaskSuccessRateDrop0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "piArenaAgentTaskSuccessRate0to1", scoreDrift.piArenaAgentTaskSuccessRateDrop0to1, thresholds.maxPiArenaAgentTaskSuccessRateDrop0to1, "Live PIArena-style agent task success rate dropped beyond threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasPiArenaEvidence && scoreDrift.piArenaToolCallSuccessRateDrop0to1 > thresholds.maxPiArenaToolCallSuccessRateDrop0to1) {
+  if (hasPiArenaEvidence && (scoreDrift.piArenaToolCallSuccessRateDrop0to1 !== null && scoreDrift.piArenaToolCallSuccessRateDrop0to1 > thresholds.maxPiArenaToolCallSuccessRateDrop0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "piArenaToolCallSuccessRateMean0to1", scoreDrift.piArenaToolCallSuccessRateDrop0to1, thresholds.maxPiArenaToolCallSuccessRateDrop0to1, "Live PIArena-style tool-call success rate dropped beyond threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasPiArenaEvidence && liveDistribution.piArenaEvidenceCoverage0to1 < thresholds.minPiArenaEvidenceCoverage0to1) {
+  if (hasPiArenaEvidence && (liveDistribution.piArenaEvidenceCoverage0to1 === null || liveDistribution.piArenaEvidenceCoverage0to1 < thresholds.minPiArenaEvidenceCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "piArenaEvidenceCoverage0to1", liveDistribution.piArenaEvidenceCoverage0to1, thresholds.minPiArenaEvidenceCoverage0to1, "Live PIArena-style rows are missing benchmark, dataset, attack, defense, injected-prompt, model, eval, result, or agent-suite evidence.", alertEvidenceRefs, alertSignedRefs));
   }
   if (hasPiArenaEvidence && behaviorDrift.piArenaAttackDivergence0to1 > thresholds.maxPiArenaAttackDivergence0to1) {
@@ -8650,7 +8649,7 @@ export function runLiveScoreBehaviorDrift(input: RunLiveScoreBehaviorDriftInput)
   if (hasBackdoorAgentEvidence && scoreDrift.backdoorAgentAttackSuccessRateIncrease0to1 > thresholds.maxBackdoorAgentAttackSuccessRateIncrease0to1) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "backdoorAgentAttackSuccessRate0to1", scoreDrift.backdoorAgentAttackSuccessRateIncrease0to1, thresholds.maxBackdoorAgentAttackSuccessRateIncrease0to1, "Live BackdoorAgent-style attack success rate increased beyond threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasBackdoorAgentEvidence && scoreDrift.backdoorAgentCleanAccuracyDrop0to1 > thresholds.maxBackdoorAgentCleanAccuracyDrop0to1) {
+  if (hasBackdoorAgentEvidence && (scoreDrift.backdoorAgentCleanAccuracyDrop0to1 !== null && scoreDrift.backdoorAgentCleanAccuracyDrop0to1 > thresholds.maxBackdoorAgentCleanAccuracyDrop0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "backdoorAgentCleanAccuracy0to1", scoreDrift.backdoorAgentCleanAccuracyDrop0to1, thresholds.maxBackdoorAgentCleanAccuracyDrop0to1, "Live BackdoorAgent-style clean task accuracy dropped beyond threshold.", alertEvidenceRefs, alertSignedRefs));
   }
   if (hasBackdoorAgentEvidence && scoreDrift.backdoorAgentTriggerPersistenceIncrease0to1 > thresholds.maxBackdoorAgentTriggerPersistenceIncrease0to1) {
@@ -8659,10 +8658,10 @@ export function runLiveScoreBehaviorDrift(input: RunLiveScoreBehaviorDriftInput)
   if (hasBackdoorAgentEvidence && scoreDrift.backdoorAgentTriggerPropagationIncrease0to1 > thresholds.maxBackdoorAgentTriggerPropagationIncrease0to1) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "backdoorAgentTriggerPropagationRate0to1", scoreDrift.backdoorAgentTriggerPropagationIncrease0to1, thresholds.maxBackdoorAgentTriggerPropagationIncrease0to1, "Live BackdoorAgent-style trigger propagation rate increased beyond threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasBackdoorAgentEvidence && liveDistribution.backdoorAgentTrajectoryCoverage0to1 < thresholds.minBackdoorAgentTrajectoryCoverage0to1) {
+  if (hasBackdoorAgentEvidence && (liveDistribution.backdoorAgentTrajectoryCoverage0to1 === null || liveDistribution.backdoorAgentTrajectoryCoverage0to1 < thresholds.minBackdoorAgentTrajectoryCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "backdoorAgentTrajectoryCoverage0to1", liveDistribution.backdoorAgentTrajectoryCoverage0to1, thresholds.minBackdoorAgentTrajectoryCoverage0to1, "Live BackdoorAgent-style rows are missing trajectory capture proof.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasBackdoorAgentEvidence && liveDistribution.backdoorAgentEvidenceCoverage0to1 < thresholds.minBackdoorAgentEvidenceCoverage0to1) {
+  if (hasBackdoorAgentEvidence && (liveDistribution.backdoorAgentEvidenceCoverage0to1 === null || liveDistribution.backdoorAgentEvidenceCoverage0to1 < thresholds.minBackdoorAgentEvidenceCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "backdoorAgentEvidenceCoverage0to1", liveDistribution.backdoorAgentEvidenceCoverage0to1, thresholds.minBackdoorAgentEvidenceCoverage0to1, "Live BackdoorAgent-style rows are missing benchmark, dataset, task, stage, attack, trigger, poison, model, agent, run, trace, or result evidence.", alertEvidenceRefs, alertSignedRefs));
   }
   if (hasBackdoorAgentEvidence && behaviorDrift.backdoorAgentStageDivergence0to1 > thresholds.maxBackdoorAgentStageDivergence0to1) {
@@ -8674,19 +8673,19 @@ export function runLiveScoreBehaviorDrift(input: RunLiveScoreBehaviorDriftInput)
   if (hasBackdoorAgentEvidence && behaviorDrift.backdoorAgentAttackFamilyDivergence0to1 > thresholds.maxBackdoorAgentAttackFamilyDivergence0to1) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "backdoorAgentAttackFamilyDistribution", behaviorDrift.backdoorAgentAttackFamilyDivergence0to1, thresholds.maxBackdoorAgentAttackFamilyDivergence0to1, "Live BackdoorAgent-style attack-family distribution diverged beyond threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasAgentSecurityEvidence && liveDistribution.agentSecuritySourceOriginCoverage0to1 < thresholds.minAgentSecuritySourceOriginCoverage0to1) {
+  if (hasAgentSecurityEvidence && (liveDistribution.agentSecuritySourceOriginCoverage0to1 === null || liveDistribution.agentSecuritySourceOriginCoverage0to1 < thresholds.minAgentSecuritySourceOriginCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "agentSecuritySourceOriginCoverage0to1", liveDistribution.agentSecuritySourceOriginCoverage0to1, thresholds.minAgentSecuritySourceOriginCoverage0to1, "Live agent-security source-origin coverage dropped below threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasAgentSecurityEvidence && liveDistribution.agentSecurityTaintPropagationCoverage0to1 < thresholds.minAgentSecurityTaintPropagationCoverage0to1) {
+  if (hasAgentSecurityEvidence && (liveDistribution.agentSecurityTaintPropagationCoverage0to1 === null || liveDistribution.agentSecurityTaintPropagationCoverage0to1 < thresholds.minAgentSecurityTaintPropagationCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "agentSecurityTaintPropagationCoverage0to1", liveDistribution.agentSecurityTaintPropagationCoverage0to1, thresholds.minAgentSecurityTaintPropagationCoverage0to1, "Live agent-security taint propagation coverage dropped below threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasAgentSecurityEvidence && scoreDrift.agentSecurityPolicyDecisionAccuracyDrop0to1 > thresholds.maxAgentSecurityPolicyDecisionAccuracyDrop0to1) {
+  if (hasAgentSecurityEvidence && (scoreDrift.agentSecurityPolicyDecisionAccuracyDrop0to1 !== null && scoreDrift.agentSecurityPolicyDecisionAccuracyDrop0to1 > thresholds.maxAgentSecurityPolicyDecisionAccuracyDrop0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "agentSecurityPolicyDecisionAccuracyMean0to1", scoreDrift.agentSecurityPolicyDecisionAccuracyDrop0to1, thresholds.maxAgentSecurityPolicyDecisionAccuracyDrop0to1, "Live agent-security policy decision accuracy dropped beyond threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasAgentSecurityEvidence && liveDistribution.agentSecuritySecretScrubRate0to1 < thresholds.minAgentSecuritySecretScrubRate0to1) {
+  if (hasAgentSecurityEvidence && (liveDistribution.agentSecuritySecretScrubRate0to1 === null || liveDistribution.agentSecuritySecretScrubRate0to1 < thresholds.minAgentSecuritySecretScrubRate0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "agentSecuritySecretScrubRate0to1", liveDistribution.agentSecuritySecretScrubRate0to1, thresholds.minAgentSecuritySecretScrubRate0to1, "Live agent-security secret scrubbing rate dropped below threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasAgentSecurityEvidence && liveDistribution.agentSecurityAuditTrailIntegrity0to1 < thresholds.minAgentSecurityAuditTrailIntegrity0to1) {
+  if (hasAgentSecurityEvidence && (liveDistribution.agentSecurityAuditTrailIntegrity0to1 === null || liveDistribution.agentSecurityAuditTrailIntegrity0to1 < thresholds.minAgentSecurityAuditTrailIntegrity0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "agentSecurityAuditTrailIntegrity0to1", liveDistribution.agentSecurityAuditTrailIntegrity0to1, thresholds.minAgentSecurityAuditTrailIntegrity0to1, "Live agent-security audit trail integrity dropped below threshold.", alertEvidenceRefs, alertSignedRefs));
   }
   if (hasAgentSecurityEvidence && scoreDrift.agentSecurityAttackEffectivenessIncrease0to1 > thresholds.maxAgentSecurityAttackEffectivenessIncrease0to1) {
@@ -8695,7 +8694,7 @@ export function runLiveScoreBehaviorDrift(input: RunLiveScoreBehaviorDriftInput)
   if (hasAgentSecurityEvidence && scoreDrift.agentSecurityFalsePositiveRateIncrease0to1 > thresholds.maxAgentSecurityFalsePositiveRateIncrease0to1) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "agentSecurityFalsePositiveRate0to1", scoreDrift.agentSecurityFalsePositiveRateIncrease0to1, thresholds.maxAgentSecurityFalsePositiveRateIncrease0to1, "Live agent-security false-positive rate increased beyond threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasAgentSecurityEvidence && liveDistribution.agentSecurityEvidenceCoverage0to1 < thresholds.minAgentSecurityEvidenceCoverage0to1) {
+  if (hasAgentSecurityEvidence && (liveDistribution.agentSecurityEvidenceCoverage0to1 === null || liveDistribution.agentSecurityEvidenceCoverage0to1 < thresholds.minAgentSecurityEvidenceCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "agentSecurityEvidenceCoverage0to1", liveDistribution.agentSecurityEvidenceCoverage0to1, thresholds.minAgentSecurityEvidenceCoverage0to1, "Live agent-security rows are missing guard, policy, taint, proxy, audit, telemetry, eval-pack, or classifier evidence.", alertEvidenceRefs, alertSignedRefs));
   }
   if (hasAgentSecurityEvidence && scoreDrift.agentSecurityLatencyP95IncreaseRatio > thresholds.maxAgentSecurityLatencyP95IncreaseRatio) {
@@ -8704,73 +8703,73 @@ export function runLiveScoreBehaviorDrift(input: RunLiveScoreBehaviorDriftInput)
   if (hasAgentSecurityEvidence && behaviorDrift.agentSecurityContextDivergence0to1 > thresholds.maxAgentSecurityContextDivergence0to1) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "agentSecurityContextDistribution", behaviorDrift.agentSecurityContextDivergence0to1, thresholds.maxAgentSecurityContextDivergence0to1, "Live agent-security guard, policy, classifier, or eval-pack context diverged beyond threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasAgentTestingEvidence && liveDistribution.agentTestingMethodologyCoverage0to1 < thresholds.minAgentTestingMethodologyCoverage0to1) {
+  if (hasAgentTestingEvidence && (liveDistribution.agentTestingMethodologyCoverage0to1 === null || liveDistribution.agentTestingMethodologyCoverage0to1 < thresholds.minAgentTestingMethodologyCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "agentTestingMethodologyCoverage0to1", liveDistribution.agentTestingMethodologyCoverage0to1, thresholds.minAgentTestingMethodologyCoverage0to1, "Live agent-testing methodology coverage dropped below threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasAgentTestingEvidence && liveDistribution.agentTestingScenarioCoverage0to1 < thresholds.minAgentTestingScenarioCoverage0to1) {
+  if (hasAgentTestingEvidence && (liveDistribution.agentTestingScenarioCoverage0to1 === null || liveDistribution.agentTestingScenarioCoverage0to1 < thresholds.minAgentTestingScenarioCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "agentTestingScenarioCoverage0to1", liveDistribution.agentTestingScenarioCoverage0to1, thresholds.minAgentTestingScenarioCoverage0to1, "Live agent-testing scenario coverage dropped below threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasAgentTestingEvidence && liveDistribution.agentTestingFaultInjectionCoverage0to1 < thresholds.minAgentTestingFaultInjectionCoverage0to1) {
+  if (hasAgentTestingEvidence && (liveDistribution.agentTestingFaultInjectionCoverage0to1 === null || liveDistribution.agentTestingFaultInjectionCoverage0to1 < thresholds.minAgentTestingFaultInjectionCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "agentTestingFaultInjectionCoverage0to1", liveDistribution.agentTestingFaultInjectionCoverage0to1, thresholds.minAgentTestingFaultInjectionCoverage0to1, "Live agent-testing fault-injection coverage dropped below threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasAgentTestingEvidence && liveDistribution.agentTestingResiliencePassRate0to1 < thresholds.minAgentTestingResiliencePassRate0to1) {
+  if (hasAgentTestingEvidence && (liveDistribution.agentTestingResiliencePassRate0to1 === null || liveDistribution.agentTestingResiliencePassRate0to1 < thresholds.minAgentTestingResiliencePassRate0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "agentTestingResiliencePassRate0to1", liveDistribution.agentTestingResiliencePassRate0to1, thresholds.minAgentTestingResiliencePassRate0to1, "Live agent-testing resilience pass rate dropped below threshold.", alertEvidenceRefs, alertSignedRefs));
   }
   if (hasAgentTestingEvidence && scoreDrift.agentTestingSafetyRegressionRateIncrease0to1 > thresholds.maxAgentTestingSafetyRegressionRateIncrease0to1) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "agentTestingSafetyRegressionRate0to1", scoreDrift.agentTestingSafetyRegressionRateIncrease0to1, thresholds.maxAgentTestingSafetyRegressionRateIncrease0to1, "Live agent-testing safety regression rate increased beyond threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasAgentTestingEvidence && liveDistribution.agentTestingObservabilitySignalCoverage0to1 < thresholds.minAgentTestingObservabilitySignalCoverage0to1) {
+  if (hasAgentTestingEvidence && (liveDistribution.agentTestingObservabilitySignalCoverage0to1 === null || liveDistribution.agentTestingObservabilitySignalCoverage0to1 < thresholds.minAgentTestingObservabilitySignalCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "agentTestingObservabilitySignalCoverage0to1", liveDistribution.agentTestingObservabilitySignalCoverage0to1, thresholds.minAgentTestingObservabilitySignalCoverage0to1, "Live agent-testing observability signal coverage dropped below threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasAgentTestingEvidence && liveDistribution.agentTestingEvidenceCoverage0to1 < thresholds.minAgentTestingEvidenceCoverage0to1) {
+  if (hasAgentTestingEvidence && (liveDistribution.agentTestingEvidenceCoverage0to1 === null || liveDistribution.agentTestingEvidenceCoverage0to1 < thresholds.minAgentTestingEvidenceCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "agentTestingEvidenceCoverage0to1", liveDistribution.agentTestingEvidenceCoverage0to1, thresholds.minAgentTestingEvidenceCoverage0to1, "Live agent-testing rows are missing taxonomy, methodology, scenario, fault-injection, observability, safety, or standards evidence hashes.", alertEvidenceRefs, alertSignedRefs));
   }
   if (hasAgentTestingEvidence && behaviorDrift.agentTestingContextDivergence0to1 > thresholds.maxAgentTestingContextDivergence0to1) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "agentTestingContextDistribution", behaviorDrift.agentTestingContextDivergence0to1, thresholds.maxAgentTestingContextDivergence0to1, "Live agent-testing category, approach, fault-model, or benchmark-family context diverged beyond threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasChaosEvidence && liveDistribution.chaosProductionReliabilityMean0to1 < thresholds.minChaosProductionReliability0to1) {
+  if (hasChaosEvidence && (liveDistribution.chaosProductionReliabilityMean0to1 === null || liveDistribution.chaosProductionReliabilityMean0to1 < thresholds.minChaosProductionReliability0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "chaosProductionReliabilityMean0to1", liveDistribution.chaosProductionReliabilityMean0to1, thresholds.minChaosProductionReliability0to1, "Live chaos production reliability dropped below threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasChaosEvidence && liveDistribution.chaosResilienceScoreMean0to1 < thresholds.minChaosResilienceScore0to1) {
+  if (hasChaosEvidence && (liveDistribution.chaosResilienceScoreMean0to1 === null || liveDistribution.chaosResilienceScoreMean0to1 < thresholds.minChaosResilienceScore0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "chaosResilienceScoreMean0to1", liveDistribution.chaosResilienceScoreMean0to1, thresholds.minChaosResilienceScore0to1, "Live chaos resilience score dropped below threshold.", alertEvidenceRefs, alertSignedRefs));
   }
   if (hasChaosEvidence && scoreDrift.chaosDropIncrease0to1 > thresholds.maxChaosDropIncrease0to1) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "chaosDropMean0to1", scoreDrift.chaosDropIncrease0to1, thresholds.maxChaosDropIncrease0to1, "Live chaos score drop increased beyond threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasChaosEvidence && liveDistribution.chaosRecoveryPassRate0to1 < thresholds.minChaosRecoveryPassRate0to1) {
+  if (hasChaosEvidence && (liveDistribution.chaosRecoveryPassRate0to1 === null || liveDistribution.chaosRecoveryPassRate0to1 < thresholds.minChaosRecoveryPassRate0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "chaosRecoveryPassRate0to1", liveDistribution.chaosRecoveryPassRate0to1, thresholds.minChaosRecoveryPassRate0to1, "Live chaos recovery pass rate dropped below threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasChaosEvidence && liveDistribution.chaosFailureTraceCoverage0to1 < thresholds.minChaosFailureTraceCoverage0to1) {
+  if (hasChaosEvidence && (liveDistribution.chaosFailureTraceCoverage0to1 === null || liveDistribution.chaosFailureTraceCoverage0to1 < thresholds.minChaosFailureTraceCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "chaosFailureTraceCoverage0to1", liveDistribution.chaosFailureTraceCoverage0to1, thresholds.minChaosFailureTraceCoverage0to1, "Live chaos rows are missing failure-trace coverage.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasChaosEvidence && liveDistribution.chaosImprovementEvalCoverage0to1 < thresholds.minChaosImprovementEvalCoverage0to1) {
+  if (hasChaosEvidence && (liveDistribution.chaosImprovementEvalCoverage0to1 === null || liveDistribution.chaosImprovementEvalCoverage0to1 < thresholds.minChaosImprovementEvalCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "chaosImprovementEvalCoverage0to1", liveDistribution.chaosImprovementEvalCoverage0to1, thresholds.minChaosImprovementEvalCoverage0to1, "Live chaos rows are missing improvement-eval artifact coverage.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasChaosEvidence && liveDistribution.chaosEvidenceCoverage0to1 < thresholds.minChaosEvidenceCoverage0to1) {
+  if (hasChaosEvidence && (liveDistribution.chaosEvidenceCoverage0to1 === null || liveDistribution.chaosEvidenceCoverage0to1 < thresholds.minChaosEvidenceCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "chaosEvidenceCoverage0to1", liveDistribution.chaosEvidenceCoverage0to1, thresholds.minChaosEvidenceCoverage0to1, "Live chaos rows are missing benchmark, scenario, profile, injection, mutation, endpoint, judge, trace, score-ledger, agent-card, or improvement-eval evidence.", alertEvidenceRefs, alertSignedRefs));
   }
   if (hasChaosEvidence && behaviorDrift.chaosContextDivergence0to1 > thresholds.maxChaosContextDivergence0to1) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "chaosContextDistribution", behaviorDrift.chaosContextDivergence0to1, thresholds.maxChaosContextDivergence0to1, "Live chaos framework, modality, benchmark-family, or profile context diverged beyond threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasRecoveryBenchEvidence && scoreDrift.recoveryBenchRecoverySuccessRateDrop0to1 > thresholds.maxRecoveryBenchRecoverySuccessRateDrop0to1) {
+  if (hasRecoveryBenchEvidence && (scoreDrift.recoveryBenchRecoverySuccessRateDrop0to1 !== null && scoreDrift.recoveryBenchRecoverySuccessRateDrop0to1 > thresholds.maxRecoveryBenchRecoverySuccessRateDrop0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "recoveryBenchRecoverySuccessRate0to1", scoreDrift.recoveryBenchRecoverySuccessRateDrop0to1, thresholds.maxRecoveryBenchRecoverySuccessRateDrop0to1, "Live Recovery-Bench-style recovery success rate dropped beyond threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasRecoveryBenchEvidence && scoreDrift.recoveryBenchRecoveryRewardDrop0to1 > thresholds.maxRecoveryBenchRecoveryRewardDrop0to1) {
+  if (hasRecoveryBenchEvidence && (scoreDrift.recoveryBenchRecoveryRewardDrop0to1 !== null && scoreDrift.recoveryBenchRecoveryRewardDrop0to1 > thresholds.maxRecoveryBenchRecoveryRewardDrop0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "recoveryBenchRecoveryRewardMean0to1", scoreDrift.recoveryBenchRecoveryRewardDrop0to1, thresholds.maxRecoveryBenchRecoveryRewardDrop0to1, "Live Recovery-Bench-style recovery reward dropped beyond threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasRecoveryBenchEvidence && liveDistribution.recoveryBenchReplayIntegrityRate0to1 < thresholds.minRecoveryBenchReplayIntegrityRate0to1) {
+  if (hasRecoveryBenchEvidence && (liveDistribution.recoveryBenchReplayIntegrityRate0to1 === null || liveDistribution.recoveryBenchReplayIntegrityRate0to1 < thresholds.minRecoveryBenchReplayIntegrityRate0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "recoveryBenchReplayIntegrityRate0to1", liveDistribution.recoveryBenchReplayIntegrityRate0to1, thresholds.minRecoveryBenchReplayIntegrityRate0to1, "Live Recovery-Bench-style rows are missing successful replay proof.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasRecoveryBenchEvidence && liveDistribution.recoveryBenchFailureTraceCoverage0to1 < thresholds.minRecoveryBenchFailureTraceCoverage0to1) {
+  if (hasRecoveryBenchEvidence && (liveDistribution.recoveryBenchFailureTraceCoverage0to1 === null || liveDistribution.recoveryBenchFailureTraceCoverage0to1 < thresholds.minRecoveryBenchFailureTraceCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "recoveryBenchFailureTraceCoverage0to1", liveDistribution.recoveryBenchFailureTraceCoverage0to1, thresholds.minRecoveryBenchFailureTraceCoverage0to1, "Live Recovery-Bench-style rows are missing failed initial trajectory proof.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasRecoveryBenchEvidence && liveDistribution.recoveryBenchCorruptedEnvironmentCoverage0to1 < thresholds.minRecoveryBenchCorruptedEnvironmentCoverage0to1) {
+  if (hasRecoveryBenchEvidence && (liveDistribution.recoveryBenchCorruptedEnvironmentCoverage0to1 === null || liveDistribution.recoveryBenchCorruptedEnvironmentCoverage0to1 < thresholds.minRecoveryBenchCorruptedEnvironmentCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "recoveryBenchCorruptedEnvironmentCoverage0to1", liveDistribution.recoveryBenchCorruptedEnvironmentCoverage0to1, thresholds.minRecoveryBenchCorruptedEnvironmentCoverage0to1, "Live Recovery-Bench-style rows are missing replayed corrupted-environment proof.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasRecoveryBenchEvidence && liveDistribution.recoveryBenchContextCoverage0to1 < thresholds.minRecoveryBenchContextCoverage0to1) {
+  if (hasRecoveryBenchEvidence && (liveDistribution.recoveryBenchContextCoverage0to1 === null || liveDistribution.recoveryBenchContextCoverage0to1 < thresholds.minRecoveryBenchContextCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "recoveryBenchContextCoverage0to1", liveDistribution.recoveryBenchContextCoverage0to1, thresholds.minRecoveryBenchContextCoverage0to1, "Live Recovery-Bench-style rows are missing recovery message-mode or context proof.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasRecoveryBenchEvidence && liveDistribution.recoveryBenchEvidenceCoverage0to1 < thresholds.minRecoveryBenchEvidenceCoverage0to1) {
+  if (hasRecoveryBenchEvidence && (liveDistribution.recoveryBenchEvidenceCoverage0to1 === null || liveDistribution.recoveryBenchEvidenceCoverage0to1 < thresholds.minRecoveryBenchEvidenceCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "recoveryBenchEvidenceCoverage0to1", liveDistribution.recoveryBenchEvidenceCoverage0to1, thresholds.minRecoveryBenchEvidenceCoverage0to1, "Live Recovery-Bench-style rows are missing benchmark, source, license, trace, replay, recovery, result, score-report, or row-hash evidence.", alertEvidenceRefs, alertSignedRefs));
   }
   if (hasRecoveryBenchEvidence && behaviorDrift.recoveryBenchMessageModeDivergence0to1 > thresholds.maxRecoveryBenchMessageModeDivergence0to1) {
@@ -8782,49 +8781,49 @@ export function runLiveScoreBehaviorDrift(input: RunLiveScoreBehaviorDriftInput)
   if (hasRecoveryBenchEvidence && behaviorDrift.recoveryBenchTaskDivergence0to1 > thresholds.maxRecoveryBenchTaskDivergence0to1) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "recoveryBenchTaskDistribution", behaviorDrift.recoveryBenchTaskDivergence0to1, thresholds.maxRecoveryBenchTaskDivergence0to1, "Live Recovery-Bench-style task distribution diverged beyond threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasAdkEvidence && liveDistribution.adkEvalPassRate0to1 < thresholds.minAdkEvalPassRate0to1) {
+  if (hasAdkEvidence && (liveDistribution.adkEvalPassRate0to1 === null || liveDistribution.adkEvalPassRate0to1 < thresholds.minAdkEvalPassRate0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "adkEvalPassRate0to1", liveDistribution.adkEvalPassRate0to1, thresholds.minAdkEvalPassRate0to1, "Live ADK eval pass rate dropped below threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasAdkEvidence && liveDistribution.adkToolCallSuccessRate0to1 < thresholds.minAdkToolCallSuccessRate0to1) {
+  if (hasAdkEvidence && (liveDistribution.adkToolCallSuccessRate0to1 === null || liveDistribution.adkToolCallSuccessRate0to1 < thresholds.minAdkToolCallSuccessRate0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "adkToolCallSuccessRate0to1", liveDistribution.adkToolCallSuccessRate0to1, thresholds.minAdkToolCallSuccessRate0to1, "Live ADK tool-call success rate dropped below threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasAdkEvidence && liveDistribution.adkGraphCoverage0to1 < thresholds.minAdkGraphCoverage0to1) {
+  if (hasAdkEvidence && (liveDistribution.adkGraphCoverage0to1 === null || liveDistribution.adkGraphCoverage0to1 < thresholds.minAdkGraphCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "adkGraphCoverage0to1", liveDistribution.adkGraphCoverage0to1, thresholds.minAdkGraphCoverage0to1, "Live ADK agent graph coverage dropped below threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasAdkEvidence && liveDistribution.adkStreamingStability0to1 < thresholds.minAdkStreamingStability0to1) {
+  if (hasAdkEvidence && (liveDistribution.adkStreamingStability0to1 === null || liveDistribution.adkStreamingStability0to1 < thresholds.minAdkStreamingStability0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "adkStreamingStability0to1", liveDistribution.adkStreamingStability0to1, thresholds.minAdkStreamingStability0to1, "Live ADK streaming stability dropped below threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasAdkEvidence && liveDistribution.adkDeploymentReadiness0to1 < thresholds.minAdkDeploymentReadiness0to1) {
+  if (hasAdkEvidence && (liveDistribution.adkDeploymentReadiness0to1 === null || liveDistribution.adkDeploymentReadiness0to1 < thresholds.minAdkDeploymentReadiness0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "adkDeploymentReadiness0to1", liveDistribution.adkDeploymentReadiness0to1, thresholds.minAdkDeploymentReadiness0to1, "Live ADK deployment readiness dropped below threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasAdkEvidence && liveDistribution.adkEvidenceCoverage0to1 < thresholds.minAdkEvidenceCoverage0to1) {
+  if (hasAdkEvidence && (liveDistribution.adkEvidenceCoverage0to1 === null || liveDistribution.adkEvidenceCoverage0to1 < thresholds.minAdkEvidenceCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "adkEvidenceCoverage0to1", liveDistribution.adkEvidenceCoverage0to1, thresholds.minAdkEvidenceCoverage0to1, "Live ADK rows are missing runtime, framework, graph, tool registry, eval dataset/case, runner config, session, route, queue, API, or deployment evidence.", alertEvidenceRefs, alertSignedRefs));
   }
   if (hasAdkEvidence && behaviorDrift.adkRuntimeContextDivergence0to1 > thresholds.maxAdkRuntimeContextDivergence0to1) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "adkRuntimeContextDistribution", behaviorDrift.adkRuntimeContextDivergence0to1, thresholds.maxAdkRuntimeContextDivergence0to1, "Live ADK framework, graph, tool registry, model route, execution mode, or deployment target context diverged beyond threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasPhysicianBenchEvidence && liveDistribution.physicianBenchTaskSuccessRate0to1 < thresholds.minPhysicianBenchTaskSuccessRate0to1) {
+  if (hasPhysicianBenchEvidence && (liveDistribution.physicianBenchTaskSuccessRate0to1 === null || liveDistribution.physicianBenchTaskSuccessRate0to1 < thresholds.minPhysicianBenchTaskSuccessRate0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "physicianBenchTaskSuccessRate0to1", liveDistribution.physicianBenchTaskSuccessRate0to1, thresholds.minPhysicianBenchTaskSuccessRate0to1, "Live PhysicianBench-style clinical task success rate dropped below threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasPhysicianBenchEvidence && liveDistribution.physicianBenchCheckpointPassRate0to1 < thresholds.minPhysicianBenchCheckpointPassRate0to1) {
+  if (hasPhysicianBenchEvidence && (liveDistribution.physicianBenchCheckpointPassRate0to1 === null || liveDistribution.physicianBenchCheckpointPassRate0to1 < thresholds.minPhysicianBenchCheckpointPassRate0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "physicianBenchCheckpointPassRate0to1", liveDistribution.physicianBenchCheckpointPassRate0to1, thresholds.minPhysicianBenchCheckpointPassRate0to1, "Live PhysicianBench-style checkpoint pass rate dropped below threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasPhysicianBenchEvidence && liveDistribution.physicianBenchFhirDataAccessAccuracy0to1 < thresholds.minPhysicianBenchFhirDataAccessAccuracy0to1) {
+  if (hasPhysicianBenchEvidence && (liveDistribution.physicianBenchFhirDataAccessAccuracy0to1 === null || liveDistribution.physicianBenchFhirDataAccessAccuracy0to1 < thresholds.minPhysicianBenchFhirDataAccessAccuracy0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "physicianBenchFhirDataAccessAccuracy0to1", liveDistribution.physicianBenchFhirDataAccessAccuracy0to1, thresholds.minPhysicianBenchFhirDataAccessAccuracy0to1, "Live PhysicianBench-style FHIR data access accuracy dropped below threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasPhysicianBenchEvidence && liveDistribution.physicianBenchClinicalActionSafetyRate0to1 < thresholds.minPhysicianBenchClinicalActionSafetyRate0to1) {
+  if (hasPhysicianBenchEvidence && (liveDistribution.physicianBenchClinicalActionSafetyRate0to1 === null || liveDistribution.physicianBenchClinicalActionSafetyRate0to1 < thresholds.minPhysicianBenchClinicalActionSafetyRate0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "physicianBenchClinicalActionSafetyRate0to1", liveDistribution.physicianBenchClinicalActionSafetyRate0to1, thresholds.minPhysicianBenchClinicalActionSafetyRate0to1, "Live PhysicianBench-style clinical action safety dropped below threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasPhysicianBenchEvidence && liveDistribution.physicianBenchDocumentationQualityMean0to1 < thresholds.minPhysicianBenchDocumentationQuality0to1) {
+  if (hasPhysicianBenchEvidence && (liveDistribution.physicianBenchDocumentationQualityMean0to1 === null || liveDistribution.physicianBenchDocumentationQualityMean0to1 < thresholds.minPhysicianBenchDocumentationQuality0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "physicianBenchDocumentationQualityMean0to1", liveDistribution.physicianBenchDocumentationQualityMean0to1, thresholds.minPhysicianBenchDocumentationQuality0to1, "Live PhysicianBench-style clinical documentation quality dropped below threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasPhysicianBenchEvidence && liveDistribution.physicianBenchTrajectoryCoverage0to1 < thresholds.minPhysicianBenchTrajectoryCoverage0to1) {
+  if (hasPhysicianBenchEvidence && (liveDistribution.physicianBenchTrajectoryCoverage0to1 === null || liveDistribution.physicianBenchTrajectoryCoverage0to1 < thresholds.minPhysicianBenchTrajectoryCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "physicianBenchTrajectoryCoverage0to1", liveDistribution.physicianBenchTrajectoryCoverage0to1, thresholds.minPhysicianBenchTrajectoryCoverage0to1, "Live PhysicianBench-style rows are missing trajectory evidence.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasPhysicianBenchEvidence && liveDistribution.physicianBenchArtifactCoverage0to1 < thresholds.minPhysicianBenchArtifactCoverage0to1) {
+  if (hasPhysicianBenchEvidence && (liveDistribution.physicianBenchArtifactCoverage0to1 === null || liveDistribution.physicianBenchArtifactCoverage0to1 < thresholds.minPhysicianBenchArtifactCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "physicianBenchArtifactCoverage0to1", liveDistribution.physicianBenchArtifactCoverage0to1, thresholds.minPhysicianBenchArtifactCoverage0to1, "Live PhysicianBench-style rows are missing workspace, eval-log, metadata, or artifact-bundle evidence.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasPhysicianBenchEvidence && liveDistribution.physicianBenchEvidenceCoverage0to1 < thresholds.minPhysicianBenchEvidenceCoverage0to1) {
+  if (hasPhysicianBenchEvidence && (liveDistribution.physicianBenchEvidenceCoverage0to1 === null || liveDistribution.physicianBenchEvidenceCoverage0to1 < thresholds.minPhysicianBenchEvidenceCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "physicianBenchEvidenceCoverage0to1", liveDistribution.physicianBenchEvidenceCoverage0to1, thresholds.minPhysicianBenchEvidenceCoverage0to1, "Live PhysicianBench-style rows are missing benchmark, task, specialty, FHIR, patient-record, checkpoint, trajectory, artifact, model, tool, or run-config evidence.", alertEvidenceRefs, alertSignedRefs));
   }
   if (hasPhysicianBenchEvidence && behaviorDrift.physicianBenchSpecialtyDivergence0to1 > thresholds.maxPhysicianBenchSpecialtyDivergence0to1) {
@@ -8854,25 +8853,25 @@ export function runLiveScoreBehaviorDrift(input: RunLiveScoreBehaviorDriftInput)
   if (hasRagEvidence && scoreDrift.ragRetrievalTopKMeanShiftRatio > thresholds.maxRagRetrievalTopKMeanShiftRatio) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "ragRetrievalTopKMean", scoreDrift.ragRetrievalTopKMeanShiftRatio, thresholds.maxRagRetrievalTopKMeanShiftRatio, "Live RAG retrieval top-k mean shifted beyond threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasRagEvidence && liveDistribution.ragGeneratedDataFinalCoverage0to1 < thresholds.minRagGeneratedDataFinalCoverage0to1) {
+  if (hasRagEvidence && (liveDistribution.ragGeneratedDataFinalCoverage0to1 === null || liveDistribution.ragGeneratedDataFinalCoverage0to1 < thresholds.minRagGeneratedDataFinalCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "ragGeneratedDataFinalCoverage0to1", liveDistribution.ragGeneratedDataFinalCoverage0to1, thresholds.minRagGeneratedDataFinalCoverage0to1, "Live RAG generated evaluation data finalization coverage dropped below threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasRagDatasetBuilderEvidence && liveDistribution.ragPassageGroundingCoverage0to1 < thresholds.minRagPassageGroundingCoverage0to1) {
+  if (hasRagDatasetBuilderEvidence && (liveDistribution.ragPassageGroundingCoverage0to1 === null || liveDistribution.ragPassageGroundingCoverage0to1 < thresholds.minRagPassageGroundingCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "ragPassageGroundingCoverage0to1", liveDistribution.ragPassageGroundingCoverage0to1, thresholds.minRagPassageGroundingCoverage0to1, "Live RAG dataset-builder passage grounding coverage dropped below threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasRagDatasetBuilderEvidence && liveDistribution.ragHumanVerificationCoverage0to1 < thresholds.minRagHumanVerificationCoverage0to1) {
+  if (hasRagDatasetBuilderEvidence && (liveDistribution.ragHumanVerificationCoverage0to1 === null || liveDistribution.ragHumanVerificationCoverage0to1 < thresholds.minRagHumanVerificationCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "ragHumanVerificationCoverage0to1", liveDistribution.ragHumanVerificationCoverage0to1, thresholds.minRagHumanVerificationCoverage0to1, "Live RAG dataset-builder human-verification coverage dropped below threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasRagDatasetBuilderEvidence && liveDistribution.ragCitationCoverage0to1 < thresholds.minRagCitationCoverage0to1) {
+  if (hasRagDatasetBuilderEvidence && (liveDistribution.ragCitationCoverage0to1 === null || liveDistribution.ragCitationCoverage0to1 < thresholds.minRagCitationCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "ragCitationCoverage0to1", liveDistribution.ragCitationCoverage0to1, thresholds.minRagCitationCoverage0to1, "Live RAG dataset-builder citation coverage dropped below threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasRagDatasetBuilderEvidence && liveDistribution.ragAnswerSupportCoverage0to1 < thresholds.minRagAnswerSupportCoverage0to1) {
+  if (hasRagDatasetBuilderEvidence && (liveDistribution.ragAnswerSupportCoverage0to1 === null || liveDistribution.ragAnswerSupportCoverage0to1 < thresholds.minRagAnswerSupportCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "ragAnswerSupportCoverage0to1", liveDistribution.ragAnswerSupportCoverage0to1, thresholds.minRagAnswerSupportCoverage0to1, "Live RAG dataset-builder answer-support coverage dropped below threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasRagDatasetBuilderEvidence && liveDistribution.ragDatasetBuilderEvidenceCoverage0to1 < thresholds.minRagDatasetBuilderEvidenceCoverage0to1) {
+  if (hasRagDatasetBuilderEvidence && (liveDistribution.ragDatasetBuilderEvidenceCoverage0to1 === null || liveDistribution.ragDatasetBuilderEvidenceCoverage0to1 < thresholds.minRagDatasetBuilderEvidenceCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "ragDatasetBuilderEvidenceCoverage0to1", liveDistribution.ragDatasetBuilderEvidenceCoverage0to1, thresholds.minRagDatasetBuilderEvidenceCoverage0to1, "Live RAG dataset-builder rows are missing source, license, QA, passage, config, tier, type, or stage evidence.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasRagStrategyEvidence && liveDistribution.ragStrategyEvidenceCoverage0to1 < thresholds.minRagStrategyEvidenceCoverage0to1) {
+  if (hasRagStrategyEvidence && (liveDistribution.ragStrategyEvidenceCoverage0to1 === null || liveDistribution.ragStrategyEvidenceCoverage0to1 < thresholds.minRagStrategyEvidenceCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "ragStrategyEvidenceCoverage0to1", liveDistribution.ragStrategyEvidenceCoverage0to1, thresholds.minRagStrategyEvidenceCoverage0to1, "Live EDD RAG strategy rows are missing comparison, run, strategy, index, query-set, reference-answer, evaluator, model, or result proof.", alertEvidenceRefs, alertSignedRefs));
   }
   if (hasRagDatasetBuilderEvidence && scoreDrift.ragGenerationCostIncreaseRatio > thresholds.maxRagGenerationCostIncreaseRatio) {
@@ -8890,7 +8889,7 @@ export function runLiveScoreBehaviorDrift(input: RunLiveScoreBehaviorDriftInput)
   if (hasKiteEvidence && scoreDrift.kiteNormalizedGradeDrop0to1 > thresholds.maxKiteNormalizedGradeDrop0to1) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "kiteNormalizedGradeMean0to1", scoreDrift.kiteNormalizedGradeDrop0to1, thresholds.maxKiteNormalizedGradeDrop0to1, "Live KITE-style normalized RAG benchmark grade dropped beyond threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasKiteEvidence && liveDistribution.kiteEvidenceCoverage0to1 < thresholds.minKiteEvidenceCoverage0to1) {
+  if (hasKiteEvidence && (liveDistribution.kiteEvidenceCoverage0to1 === null || liveDistribution.kiteEvidenceCoverage0to1 < thresholds.minKiteEvidenceCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "kiteEvidenceCoverage0to1", liveDistribution.kiteEvidenceCoverage0to1, thresholds.minKiteEvidenceCoverage0to1, "Live KITE-style rows are missing source, repository, license, corpus, document-set, query, answer, rubric, pipeline, response, result, judge, grading-scale, dataset-family, configuration, sample-count, or small-sample evidence.", alertEvidenceRefs, alertSignedRefs));
   }
   if (hasKiteEvidence && scoreDrift.kiteQuestionCountDropRatio > thresholds.maxKiteQuestionCountDropRatio) {
@@ -8911,7 +8910,7 @@ export function runLiveScoreBehaviorDrift(input: RunLiveScoreBehaviorDriftInput)
   if (hasPokerEvalEvidence && scoreDrift.pokerEvalVpipShift0to1 > thresholds.maxPokerEvalVpipShift0to1) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "pokerEvalVpipRate0to1", scoreDrift.pokerEvalVpipShift0to1, thresholds.maxPokerEvalVpipShift0to1, "Live PokerEval-style VPIP shifted beyond threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasPokerEvalEvidence && liveDistribution.pokerEvalEvidenceCoverage0to1 < thresholds.minPokerEvalEvidenceCoverage0to1) {
+  if (hasPokerEvalEvidence && (liveDistribution.pokerEvalEvidenceCoverage0to1 === null || liveDistribution.pokerEvalEvidenceCoverage0to1 < thresholds.minPokerEvalEvidenceCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "pokerEvalEvidenceCoverage0to1", liveDistribution.pokerEvalEvidenceCoverage0to1, thresholds.minPokerEvalEvidenceCoverage0to1, "Live PokerEval-style rows are missing source, repository, package, citation, simulation config, agent config, opponent pool, run manifest, hand-history manifest, metric report, game type, table, blind, hand-count, BB/100, all-in adjusted BB/100, EV, or VPIP evidence.", alertEvidenceRefs, alertSignedRefs));
   }
   if (hasPokerEvalEvidence && scoreDrift.pokerEvalHandCountDropRatio > thresholds.maxPokerEvalHandCountDropRatio) {
@@ -8926,13 +8925,13 @@ export function runLiveScoreBehaviorDrift(input: RunLiveScoreBehaviorDriftInput)
   if (hasLlmRagEvalSuiteEvidence && scoreDrift.llmRagHallucinationRateIncrease0to1 > thresholds.maxLlmRagHallucinationRateIncrease0to1) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "llmRagHallucinationRate0to1", scoreDrift.llmRagHallucinationRateIncrease0to1, thresholds.maxLlmRagHallucinationRateIncrease0to1, "Live LLM/RAG hallucination or faithfulness risk increased beyond threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasLlmRagEvalSuiteEvidence && llmRagEvalSuiteEvidenceCoverage < thresholds.minLlmRagEvalSuiteEvidenceCoverage0to1) {
+  if (hasLlmRagEvalSuiteEvidence && (llmRagEvalSuiteEvidenceCoverage === null || llmRagEvalSuiteEvidenceCoverage < thresholds.minLlmRagEvalSuiteEvidenceCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "llmRagEvalSuiteEvidenceCoverage0to1", llmRagEvalSuiteEvidenceCoverage, thresholds.minLlmRagEvalSuiteEvidenceCoverage0to1, "Baseline or live LLM/RAG eval-suite rows are missing suite, run, candidate/reference, metric-suite, semantic, bias, hallucination, judge, report, or metric evidence.", alertEvidenceRefs, alertSignedRefs));
   }
   if (hasNoMiraclEvidence && scoreDrift.noMiraclRelevanceAccuracyDrop0to1 > thresholds.maxNoMiraclRelevanceAccuracyDrop0to1) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "noMiraclRelevanceAccuracyMean0to1", scoreDrift.noMiraclRelevanceAccuracyDrop0to1, thresholds.maxNoMiraclRelevanceAccuracyDrop0to1, "Live NoMIRACL-style relevance decision accuracy dropped beyond threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasNoMiraclEvidence && scoreDrift.noMiraclAbstentionAccuracyDrop0to1 > thresholds.maxNoMiraclAbstentionAccuracyDrop0to1) {
+  if (hasNoMiraclEvidence && (scoreDrift.noMiraclAbstentionAccuracyDrop0to1 !== null && scoreDrift.noMiraclAbstentionAccuracyDrop0to1 > thresholds.maxNoMiraclAbstentionAccuracyDrop0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "noMiraclAbstentionAccuracyMean0to1", scoreDrift.noMiraclAbstentionAccuracyDrop0to1, thresholds.maxNoMiraclAbstentionAccuracyDrop0to1, "Live NoMIRACL-style abstention accuracy on unanswerable retrieved passages dropped beyond threshold.", alertEvidenceRefs, alertSignedRefs));
   }
   if (hasNoMiraclEvidence && scoreDrift.noMiraclHallucinationRateIncrease0to1 > thresholds.maxNoMiraclHallucinationRateIncrease0to1) {
@@ -8941,13 +8940,13 @@ export function runLiveScoreBehaviorDrift(input: RunLiveScoreBehaviorDriftInput)
   if (hasNoMiraclEvidence && scoreDrift.noMiraclErrorRateIncrease0to1 > thresholds.maxNoMiraclErrorRateIncrease0to1) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "noMiraclErrorRate0to1", scoreDrift.noMiraclErrorRateIncrease0to1, thresholds.maxNoMiraclErrorRateIncrease0to1, "Live NoMIRACL-style error rate on answerable retrieved passages increased beyond threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasNoMiraclEvidence && noMiraclLanguageCoverage < thresholds.minNoMiraclLanguageCoverage0to1) {
+  if (hasNoMiraclEvidence && (noMiraclLanguageCoverage === null || noMiraclLanguageCoverage < thresholds.minNoMiraclLanguageCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "noMiraclLanguageCoverage0to1", noMiraclLanguageCoverage, thresholds.minNoMiraclLanguageCoverage0to1, "Baseline or live NoMIRACL-style rows are missing language identity or language-manifest evidence.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasNoMiraclEvidence && noMiraclSubsetCoverage < thresholds.minNoMiraclSubsetCoverage0to1) {
+  if (hasNoMiraclEvidence && (noMiraclSubsetCoverage === null || noMiraclSubsetCoverage < thresholds.minNoMiraclSubsetCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "noMiraclSubsetCoverage0to1", noMiraclSubsetCoverage, thresholds.minNoMiraclSubsetCoverage0to1, "Baseline or live NoMIRACL-style rows do not cover both relevant and non-relevant subsets with typed subset evidence.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasNoMiraclEvidence && noMiraclEvidenceCoverage < thresholds.minNoMiraclEvidenceCoverage0to1) {
+  if (hasNoMiraclEvidence && (noMiraclEvidenceCoverage === null || noMiraclEvidenceCoverage < thresholds.minNoMiraclEvidenceCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "noMiraclEvidenceCoverage0to1", noMiraclEvidenceCoverage, thresholds.minNoMiraclEvidenceCoverage0to1, "Baseline or live NoMIRACL-style rows are missing source, repository, license, dataset, language, qrels, passage, retrieval, model, generation, evaluation, baseline/live, alert-policy, judgment, or metric evidence.", alertEvidenceRefs, alertSignedRefs));
   }
   if (hasScalingLawDiscoveryEvidence && scoreDrift.scalingLawR2Drop > thresholds.maxScalingLawR2Drop) {
@@ -8959,7 +8958,7 @@ export function runLiveScoreBehaviorDrift(input: RunLiveScoreBehaviorDriftInput)
   if (hasScalingLawDiscoveryEvidence && scoreDrift.scalingLawNmaeIncrease > thresholds.maxScalingLawNmaeIncrease) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "scalingLawDiscoveryNmaeMean", scoreDrift.scalingLawNmaeIncrease, thresholds.maxScalingLawNmaeIncrease, "Live scaling-law discovery NMAE increased beyond threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasScalingLawDiscoveryEvidence && scalingLawEvidenceCoverage < thresholds.minScalingLawEvidenceCoverage0to1) {
+  if (hasScalingLawDiscoveryEvidence && (scalingLawEvidenceCoverage === null || scalingLawEvidenceCoverage < thresholds.minScalingLawEvidenceCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "scalingLawDiscoveryEvidenceCoverage0to1", scalingLawEvidenceCoverage, thresholds.minScalingLawEvidenceCoverage0to1, "Baseline or live scaling-law discovery rows are missing benchmark, paper, run, task, split, source experiment, config, model-route, program, checkpoint, result, formula, extrapolation, R2, NMSE, or NMAE evidence.", alertEvidenceRefs, alertSignedRefs));
   }
   if (hasGenomicsEvidence && scoreDrift.genomicsSelectionAccuracyDrop0to1 > thresholds.maxGenomicsSelectionAccuracyDrop0to1) {
@@ -8971,13 +8970,13 @@ export function runLiveScoreBehaviorDrift(input: RunLiveScoreBehaviorDriftInput)
   if (hasGenomicsEvidence && scoreDrift.genomicsStatisticalAnalysisAccuracyDrop0to1 > thresholds.maxGenomicsStatisticalAnalysisAccuracyDrop0to1) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "genomicsStatisticalAnalysisAccuracyMean0to1", scoreDrift.genomicsStatisticalAnalysisAccuracyDrop0to1, thresholds.maxGenomicsStatisticalAnalysisAccuracyDrop0to1, "Live genomics statistical-analysis accuracy dropped beyond threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasGenomicsEvidence && liveDistribution.genomicsReferenceCoverage0to1 < thresholds.minGenomicsReferenceCoverage0to1) {
+  if (hasGenomicsEvidence && (liveDistribution.genomicsReferenceCoverage0to1 === null || liveDistribution.genomicsReferenceCoverage0to1 < thresholds.minGenomicsReferenceCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "genomicsReferenceCoverage0to1", liveDistribution.genomicsReferenceCoverage0to1, thresholds.minGenomicsReferenceCoverage0to1, "Live genomics rows are missing reference, prediction, or metadata hashes.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasGenomicsEvidence && liveDistribution.genomicsFormatConformanceRate0to1 < thresholds.minGenomicsFormatConformanceRate0to1) {
+  if (hasGenomicsEvidence && (liveDistribution.genomicsFormatConformanceRate0to1 === null || liveDistribution.genomicsFormatConformanceRate0to1 < thresholds.minGenomicsFormatConformanceRate0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "genomicsFormatConformanceRate0to1", liveDistribution.genomicsFormatConformanceRate0to1, thresholds.minGenomicsFormatConformanceRate0to1, "Live genomics output format conformance dropped below threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasGenomicsEvidence && liveDistribution.genomicsExpertCurationCoverage0to1 < thresholds.minGenomicsExpertCurationCoverage0to1) {
+  if (hasGenomicsEvidence && (liveDistribution.genomicsExpertCurationCoverage0to1 === null || liveDistribution.genomicsExpertCurationCoverage0to1 < thresholds.minGenomicsExpertCurationCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "genomicsExpertCurationCoverage0to1", liveDistribution.genomicsExpertCurationCoverage0to1, thresholds.minGenomicsExpertCurationCoverage0to1, "Live genomics rows are missing expert-curation evidence hashes.", alertEvidenceRefs, alertSignedRefs));
   }
   if (hasAgenticSearchEvidence && scoreDrift.agenticSearchPlanningScoreDrop0to1 > thresholds.maxAgenticSearchPlanningScoreDrop0to1) {
@@ -8992,10 +8991,10 @@ export function runLiveScoreBehaviorDrift(input: RunLiveScoreBehaviorDriftInput)
   if (hasAgenticSearchEvidence && scoreDrift.agenticSearchSynthesisDrop0to1 > thresholds.maxAgenticSearchSynthesisDrop0to1) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "agenticSearchSynthesisScoreMean0to1", scoreDrift.agenticSearchSynthesisDrop0to1, thresholds.maxAgenticSearchSynthesisDrop0to1, "Live agentic-search synthesis score dropped beyond threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasAgenticSearchEvidence && liveDistribution.agenticSearchCitationCoverage0to1 < thresholds.minAgenticSearchCitationCoverage0to1) {
+  if (hasAgenticSearchEvidence && (liveDistribution.agenticSearchCitationCoverage0to1 === null || liveDistribution.agenticSearchCitationCoverage0to1 < thresholds.minAgenticSearchCitationCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "agenticSearchCitationCoverage0to1", liveDistribution.agenticSearchCitationCoverage0to1, thresholds.minAgenticSearchCitationCoverage0to1, "Live agentic-search citation coverage dropped below threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasAgenticSearchEvidence && liveDistribution.agenticSearchTraceCoverage0to1 < thresholds.minAgenticSearchTraceCoverage0to1) {
+  if (hasAgenticSearchEvidence && (liveDistribution.agenticSearchTraceCoverage0to1 === null || liveDistribution.agenticSearchTraceCoverage0to1 < thresholds.minAgenticSearchTraceCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "agenticSearchTraceCoverage0to1", liveDistribution.agenticSearchTraceCoverage0to1, thresholds.minAgenticSearchTraceCoverage0to1, "Live agentic-search rows are missing planner, search, citation, synthesis, result, source, or tool-config trace evidence.", alertEvidenceRefs, alertSignedRefs));
   }
   if (hasDocumentDatasetEvidence && scoreDrift.documentDatasetQaAccuracyDrop0to1 > thresholds.maxDocumentDatasetQaAccuracyDrop0to1) {
@@ -9007,13 +9006,13 @@ export function runLiveScoreBehaviorDrift(input: RunLiveScoreBehaviorDriftInput)
   if (hasDocumentDatasetEvidence && scoreDrift.documentDatasetRagFaithfulnessDrop0to1 > thresholds.maxDocumentDatasetRagFaithfulnessDrop0to1) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "documentDatasetRagFaithfulnessMean0to1", scoreDrift.documentDatasetRagFaithfulnessDrop0to1, thresholds.maxDocumentDatasetRagFaithfulnessDrop0to1, "Live document-to-dataset RAG faithfulness dropped beyond threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasDocumentDatasetEvidence && liveDistribution.documentDatasetNumGuardCoverage0to1 < thresholds.minDocumentDatasetNumGuardCoverage0to1) {
+  if (hasDocumentDatasetEvidence && (liveDistribution.documentDatasetNumGuardCoverage0to1 === null || liveDistribution.documentDatasetNumGuardCoverage0to1 < thresholds.minDocumentDatasetNumGuardCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "documentDatasetNumGuardCoverage0to1", liveDistribution.documentDatasetNumGuardCoverage0to1, thresholds.minDocumentDatasetNumGuardCoverage0to1, "Live document-to-dataset numeric guard coverage dropped below threshold.", alertEvidenceRefs, alertSignedRefs));
   }
   if (hasDocumentDatasetEvidence && scoreDrift.documentDatasetNumericMismatchRateIncrease0to1 > thresholds.maxDocumentDatasetNumericMismatchRateIncrease0to1) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "documentDatasetNumericMismatchRate0to1", scoreDrift.documentDatasetNumericMismatchRateIncrease0to1, thresholds.maxDocumentDatasetNumericMismatchRateIncrease0to1, "Live document-to-dataset numeric mismatch rate increased beyond threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasDocumentDatasetEvidence && liveDistribution.documentDatasetEvidenceCoverage0to1 < thresholds.minDocumentDatasetEvidenceCoverage0to1) {
+  if (hasDocumentDatasetEvidence && (liveDistribution.documentDatasetEvidenceCoverage0to1 === null || liveDistribution.documentDatasetEvidenceCoverage0to1 < thresholds.minDocumentDatasetEvidenceCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "documentDatasetEvidenceCoverage0to1", liveDistribution.documentDatasetEvidenceCoverage0to1, thresholds.minDocumentDatasetEvidenceCoverage0to1, "Live document-to-dataset rows are missing corpus, index, document/page/cell, sample, export, bench, or report evidence.", alertEvidenceRefs, alertSignedRefs));
   }
   if (hasDocumentDatasetEvidence && scoreDrift.documentDatasetTokenSavingsDropRatio > thresholds.maxDocumentDatasetTokenSavingsDropRatio) {
@@ -9055,7 +9054,7 @@ export function runLiveScoreBehaviorDrift(input: RunLiveScoreBehaviorDriftInput)
   if (hasCpuAgenticEvidence && scoreDrift.cpuAgenticFrameworkOverheadShareIncrease0to1 > thresholds.maxCpuAgenticFrameworkOverheadShareIncrease0to1) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "cpuAgenticFrameworkOverheadShareMean0to1", scoreDrift.cpuAgenticFrameworkOverheadShareIncrease0to1, thresholds.maxCpuAgenticFrameworkOverheadShareIncrease0to1, "Live CPU-agentic framework overhead share increased beyond threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasCpuAgenticEvidence && liveDistribution.cpuAgenticEvidenceCoverage0to1 < thresholds.minCpuAgenticEvidenceCoverage0to1) {
+  if (hasCpuAgenticEvidence && (liveDistribution.cpuAgenticEvidenceCoverage0to1 === null || liveDistribution.cpuAgenticEvidenceCoverage0to1 < thresholds.minCpuAgenticEvidenceCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "cpuAgenticEvidenceCoverage0to1", liveDistribution.cpuAgenticEvidenceCoverage0to1, thresholds.minCpuAgenticEvidenceCoverage0to1, "Live CPU-agentic benchmark evidence coverage dropped below threshold.", alertEvidenceRefs, alertSignedRefs));
   }
   if (hasEvalTechniqueEvidence && scoreDrift.evalTechniqueExactMatchAccuracyDrop0to1 > thresholds.maxEvalTechniqueExactMatchAccuracyDrop0to1) {
@@ -9094,31 +9093,31 @@ export function runLiveScoreBehaviorDrift(input: RunLiveScoreBehaviorDriftInput)
   if (hasEvalTechniqueEvidence && scoreDrift.evalTechniqueSimulationGoalCompletionDrop0to1 > thresholds.maxEvalTechniqueSimulationGoalCompletionDrop0to1) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "evalTechniqueSimulationGoalCompletionMean0to1", scoreDrift.evalTechniqueSimulationGoalCompletionDrop0to1, thresholds.maxEvalTechniqueSimulationGoalCompletionDrop0to1, "Live simulation-benchmarking goal completion dropped beyond threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasEvalTechniqueEvidence && liveDistribution.evalTechniqueAlgorithmicFeedbackCoverage0to1 < thresholds.minEvalTechniqueAlgorithmicFeedbackCoverage0to1) {
+  if (hasEvalTechniqueEvidence && (liveDistribution.evalTechniqueAlgorithmicFeedbackCoverage0to1 === null || liveDistribution.evalTechniqueAlgorithmicFeedbackCoverage0to1 < thresholds.minEvalTechniqueAlgorithmicFeedbackCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "evalTechniqueAlgorithmicFeedbackCoverage0to1", liveDistribution.evalTechniqueAlgorithmicFeedbackCoverage0to1, thresholds.minEvalTechniqueAlgorithmicFeedbackCoverage0to1, "Live algorithmic-feedback pipeline coverage dropped below threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasEvalTechniqueEvidence && liveDistribution.evalTechniqueEvidenceCoverage0to1 < thresholds.minEvalTechniqueEvidenceCoverage0to1) {
+  if (hasEvalTechniqueEvidence && (liveDistribution.evalTechniqueEvidenceCoverage0to1 === null || liveDistribution.evalTechniqueEvidenceCoverage0to1 < thresholds.minEvalTechniqueEvidenceCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "evalTechniqueEvidenceCoverage0to1", liveDistribution.evalTechniqueEvidenceCoverage0to1, thresholds.minEvalTechniqueEvidenceCoverage0to1, "Live eval-technique rows are missing suite, notebook, dataset, framework, reference, judge, ground-truth, trajectory, tool, RAG, callback, or batch evidence.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasSapAgentEvalEvidence && liveDistribution.sapAgentEvalObjectiveCoverage0to1 < thresholds.minSapAgentEvalObjectiveCoverage0to1) {
+  if (hasSapAgentEvalEvidence && (liveDistribution.sapAgentEvalObjectiveCoverage0to1 === null || liveDistribution.sapAgentEvalObjectiveCoverage0to1 < thresholds.minSapAgentEvalObjectiveCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "sapAgentEvalObjectiveCoverage0to1", liveDistribution.sapAgentEvalObjectiveCoverage0to1, thresholds.minSapAgentEvalObjectiveCoverage0to1, "Live SAP agent-evaluation tutorial rows are missing objective taxonomy coverage.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasSapAgentEvalEvidence && liveDistribution.sapAgentEvalProcessCoverage0to1 < thresholds.minSapAgentEvalProcessCoverage0to1) {
+  if (hasSapAgentEvalEvidence && (liveDistribution.sapAgentEvalProcessCoverage0to1 === null || liveDistribution.sapAgentEvalProcessCoverage0to1 < thresholds.minSapAgentEvalProcessCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "sapAgentEvalProcessCoverage0to1", liveDistribution.sapAgentEvalProcessCoverage0to1, thresholds.minSapAgentEvalProcessCoverage0to1, "Live SAP agent-evaluation tutorial rows are missing evaluation-process taxonomy coverage.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasSapAgentEvalEvidence && liveDistribution.sapAgentEvalEnterpriseContextCoverage0to1 < thresholds.minSapAgentEvalEnterpriseContextCoverage0to1) {
+  if (hasSapAgentEvalEvidence && (liveDistribution.sapAgentEvalEnterpriseContextCoverage0to1 === null || liveDistribution.sapAgentEvalEnterpriseContextCoverage0to1 < thresholds.minSapAgentEvalEnterpriseContextCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "sapAgentEvalEnterpriseContextCoverage0to1", liveDistribution.sapAgentEvalEnterpriseContextCoverage0to1, thresholds.minSapAgentEvalEnterpriseContextCoverage0to1, "Live SAP agent-evaluation tutorial rows are missing enterprise context coverage.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasSapAgentEvalEvidence && liveDistribution.sapAgentEvalEvidenceCoverage0to1 < thresholds.minSapAgentEvalEvidenceCoverage0to1) {
+  if (hasSapAgentEvalEvidence && (liveDistribution.sapAgentEvalEvidenceCoverage0to1 === null || liveDistribution.sapAgentEvalEvidenceCoverage0to1 < thresholds.minSapAgentEvalEvidenceCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "sapAgentEvalEvidenceCoverage0to1", liveDistribution.sapAgentEvalEvidenceCoverage0to1, thresholds.minSapAgentEvalEvidenceCoverage0to1, "Live SAP agent-evaluation tutorial rows are missing source, repository, license, notebook, dataset, baseline log, live sample, metric, tooling, policy, alert receipt, or signed evidence proof.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasAgentEvalObservabilityEvidence && liveDistribution.agentEvalObservabilityConfigCoverage0to1 < thresholds.minAgentEvalObservabilityConfigCoverage0to1) {
+  if (hasAgentEvalObservabilityEvidence && (liveDistribution.agentEvalObservabilityConfigCoverage0to1 === null || liveDistribution.agentEvalObservabilityConfigCoverage0to1 < thresholds.minAgentEvalObservabilityConfigCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "agentEvalObservabilityConfigCoverage0to1", liveDistribution.agentEvalObservabilityConfigCoverage0to1, thresholds.minAgentEvalObservabilityConfigCoverage0to1, "Live agent-evaluation observability rows are missing source, repository, license, agent config, eval dataset, prompt variant, model config, RAG index, metric config, or metric-set proof.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasAgentEvalObservabilityEvidence && liveDistribution.agentEvalObservabilityTelemetryCoverage0to1 < thresholds.minAgentEvalObservabilityTelemetryCoverage0to1) {
+  if (hasAgentEvalObservabilityEvidence && (liveDistribution.agentEvalObservabilityTelemetryCoverage0to1 === null || liveDistribution.agentEvalObservabilityTelemetryCoverage0to1 < thresholds.minAgentEvalObservabilityTelemetryCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "agentEvalObservabilityTelemetryCoverage0to1", liveDistribution.agentEvalObservabilityTelemetryCoverage0to1, thresholds.minAgentEvalObservabilityTelemetryCoverage0to1, "Live agent-evaluation observability rows are missing baseline result, live result, OpenTelemetry, Application Insights, Event Hub, Kusto policy, Fabric dashboard, alert receipt, or telemetry-mode proof.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasAgentEvalObservabilityEvidence && liveDistribution.agentEvalObservabilityEvidenceCoverage0to1 < thresholds.minAgentEvalObservabilityEvidenceCoverage0to1) {
+  if (hasAgentEvalObservabilityEvidence && (liveDistribution.agentEvalObservabilityEvidenceCoverage0to1 === null || liveDistribution.agentEvalObservabilityEvidenceCoverage0to1 < thresholds.minAgentEvalObservabilityEvidenceCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "agentEvalObservabilityEvidenceCoverage0to1", liveDistribution.agentEvalObservabilityEvidenceCoverage0to1, thresholds.minAgentEvalObservabilityEvidenceCoverage0to1, "Live agent-evaluation observability rows are missing config, telemetry, or signed evidence proof.", alertEvidenceRefs, alertSignedRefs));
   }
   if (hasHedraRagEvidence && scoreDrift.hedraRagLatencyP95IncreaseRatio > thresholds.maxHedraRagLatencyP95IncreaseRatio) {
@@ -9130,13 +9129,13 @@ export function runLiveScoreBehaviorDrift(input: RunLiveScoreBehaviorDriftInput)
   if (hasHedraRagEvidence && scoreDrift.hedraRagMemoryIncreaseRatio > thresholds.maxHedraRagMemoryIncreaseRatio) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "hedraRagResourceMemoryGbMean", scoreDrift.hedraRagMemoryIncreaseRatio, thresholds.maxHedraRagMemoryIncreaseRatio, "Live HedraRAG artifact-eval resource memory usage increased beyond threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasHedraRagEvidence && hedraRagReplayPassRate < thresholds.minHedraRagReplayPassRate0to1) {
+  if (hasHedraRagEvidence && (hedraRagReplayPassRate === null || hedraRagReplayPassRate < thresholds.minHedraRagReplayPassRate0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "hedraRagReplayPassRate0to1", hedraRagReplayPassRate, thresholds.minHedraRagReplayPassRate0to1, "Baseline or live HedraRAG artifact-eval replay pass rate dropped below threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasHedraRagEvidence && hedraRagEvidenceCoverage < thresholds.minHedraRagEvidenceCoverage0to1) {
+  if (hasHedraRagEvidence && (hedraRagEvidenceCoverage === null || hedraRagEvidenceCoverage < thresholds.minHedraRagEvidenceCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "hedraRagEvidenceCoverage0to1", hedraRagEvidenceCoverage, thresholds.minHedraRagEvidenceCoverage0to1, "Baseline or live HedraRAG artifact-eval rows are missing source, repository snapshot, license-status or license-review proof, paper, artifact README, dataset, corpus, index, dependency, environment, run-script, result CSV, plot, baseline result, live result, alert policy, resource profile, GPU profile, metric, replay, taxonomy, or signed evidence proof.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasAgentEvalHarnessEvidence && scoreDrift.agentEvalHarnessToolSuccessDrop0to1 > thresholds.maxAgentEvalHarnessToolSuccessDrop0to1) {
+  if (hasAgentEvalHarnessEvidence && (scoreDrift.agentEvalHarnessToolSuccessDrop0to1 !== null && scoreDrift.agentEvalHarnessToolSuccessDrop0to1 > thresholds.maxAgentEvalHarnessToolSuccessDrop0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "agentEvalHarnessToolSuccessRate0to1", scoreDrift.agentEvalHarnessToolSuccessDrop0to1, thresholds.maxAgentEvalHarnessToolSuccessDrop0to1, "Live agent-eval-harness tool success rate dropped beyond threshold.", alertEvidenceRefs, alertSignedRefs));
   }
   if (hasAgentEvalHarnessEvidence && scoreDrift.agentEvalHarnessHallucinationIncrease0to1 > thresholds.maxAgentEvalHarnessHallucinationIncrease0to1) {
@@ -9148,25 +9147,25 @@ export function runLiveScoreBehaviorDrift(input: RunLiveScoreBehaviorDriftInput)
   if (hasAgentEvalHarnessEvidence && scoreDrift.agentEvalHarnessCostIncreaseRatio > thresholds.maxAgentEvalHarnessCostIncreaseRatio) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "agentEvalHarnessCostUsdMean", scoreDrift.agentEvalHarnessCostIncreaseRatio, thresholds.maxAgentEvalHarnessCostIncreaseRatio, "Live agent-eval-harness mean cost increased beyond threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasAgentEvalHarnessEvidence && agentEvalHarnessTraceCoverage < thresholds.minAgentEvalHarnessTraceCoverage0to1) {
+  if (hasAgentEvalHarnessEvidence && (agentEvalHarnessTraceCoverage === null || agentEvalHarnessTraceCoverage < thresholds.minAgentEvalHarnessTraceCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "agentEvalHarnessTraceCoverage0to1", agentEvalHarnessTraceCoverage, thresholds.minAgentEvalHarnessTraceCoverage0to1, "Baseline or live agent-eval-harness rows are missing trace schema, collector, writer, manifest, baseline run, or live run proof.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasAgentEvalHarnessEvidence && agentEvalHarnessEvidenceCoverage < thresholds.minAgentEvalHarnessEvidenceCoverage0to1) {
+  if (hasAgentEvalHarnessEvidence && (agentEvalHarnessEvidenceCoverage === null || agentEvalHarnessEvidenceCoverage < thresholds.minAgentEvalHarnessEvidenceCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "agentEvalHarnessEvidenceCoverage0to1", agentEvalHarnessEvidenceCoverage, thresholds.minAgentEvalHarnessEvidenceCoverage0to1, "Baseline or live agent-eval-harness rows are missing source, repository snapshot, license, trace, adapter, dataset, task, tool schema, metric config, result, dashboard, local-storage policy, alert policy, reproducibility command, taxonomy, metric, or signed evidence proof.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasStrandsBenchmarkHarnessEvidence && scoreDrift.strandsBenchmarkHarnessTaskSuccessDrop0to1 > thresholds.maxStrandsBenchmarkHarnessTaskSuccessDrop0to1) {
+  if (hasStrandsBenchmarkHarnessEvidence && (scoreDrift.strandsBenchmarkHarnessTaskSuccessDrop0to1 !== null && scoreDrift.strandsBenchmarkHarnessTaskSuccessDrop0to1 > thresholds.maxStrandsBenchmarkHarnessTaskSuccessDrop0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "strandsBenchmarkHarnessTaskSuccessRate0to1", scoreDrift.strandsBenchmarkHarnessTaskSuccessDrop0to1, thresholds.maxStrandsBenchmarkHarnessTaskSuccessDrop0to1, "Live Strands benchmark-harness task success rate dropped beyond threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasStrandsBenchmarkHarnessEvidence && scoreDrift.strandsBenchmarkHarnessPatchApplyRateDrop0to1 > thresholds.maxStrandsBenchmarkHarnessPatchApplyRateDrop0to1) {
+  if (hasStrandsBenchmarkHarnessEvidence && (scoreDrift.strandsBenchmarkHarnessPatchApplyRateDrop0to1 !== null && scoreDrift.strandsBenchmarkHarnessPatchApplyRateDrop0to1 > thresholds.maxStrandsBenchmarkHarnessPatchApplyRateDrop0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "strandsBenchmarkHarnessPatchApplyRate0to1", scoreDrift.strandsBenchmarkHarnessPatchApplyRateDrop0to1, thresholds.maxStrandsBenchmarkHarnessPatchApplyRateDrop0to1, "Live Strands benchmark-harness patch-apply rate dropped beyond threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasStrandsBenchmarkHarnessEvidence && scoreDrift.strandsBenchmarkHarnessTestPassRateDrop0to1 > thresholds.maxStrandsBenchmarkHarnessTestPassRateDrop0to1) {
+  if (hasStrandsBenchmarkHarnessEvidence && (scoreDrift.strandsBenchmarkHarnessTestPassRateDrop0to1 !== null && scoreDrift.strandsBenchmarkHarnessTestPassRateDrop0to1 > thresholds.maxStrandsBenchmarkHarnessTestPassRateDrop0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "strandsBenchmarkHarnessTestPassRate0to1", scoreDrift.strandsBenchmarkHarnessTestPassRateDrop0to1, thresholds.maxStrandsBenchmarkHarnessTestPassRateDrop0to1, "Live Strands benchmark-harness test pass rate dropped beyond threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasStrandsBenchmarkHarnessEvidence && strandsBenchmarkHarnessTrajectoryCoverage < thresholds.minStrandsBenchmarkHarnessTrajectoryCoverage0to1) {
+  if (hasStrandsBenchmarkHarnessEvidence && (strandsBenchmarkHarnessTrajectoryCoverage === null || strandsBenchmarkHarnessTrajectoryCoverage < thresholds.minStrandsBenchmarkHarnessTrajectoryCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "strandsBenchmarkHarnessTrajectoryCoverage0to1", strandsBenchmarkHarnessTrajectoryCoverage, thresholds.minStrandsBenchmarkHarnessTrajectoryCoverage0to1, "Baseline or live Strands benchmark-harness rows are missing trajectory, patch, test-report, result, baseline-run, or live-run proof.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasStrandsBenchmarkHarnessEvidence && strandsBenchmarkHarnessEvidenceCoverage < thresholds.minStrandsBenchmarkHarnessEvidenceCoverage0to1) {
+  if (hasStrandsBenchmarkHarnessEvidence && (strandsBenchmarkHarnessEvidenceCoverage === null || strandsBenchmarkHarnessEvidenceCoverage < thresholds.minStrandsBenchmarkHarnessEvidenceCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "strandsBenchmarkHarnessEvidenceCoverage0to1", strandsBenchmarkHarnessEvidenceCoverage, thresholds.minStrandsBenchmarkHarnessEvidenceCoverage0to1, "Baseline or live Strands benchmark-harness rows are missing source, repository snapshot, license, agent package, config, model route, prompt template, benchmark suite, runtime, task family, task, dataset, Docker image, environment setup, tool policy, trajectory, patch, test report, result, upload, safety isolation, baseline run, live run, alert policy, metric, or signed evidence proof.", alertEvidenceRefs, alertSignedRefs));
   }
   if (hasStrandsBenchmarkHarnessEvidence && scoreDrift.strandsBenchmarkHarnessLatencyP95IncreaseRatio > thresholds.maxStrandsBenchmarkHarnessLatencyP95IncreaseRatio) {
@@ -9193,7 +9192,7 @@ export function runLiveScoreBehaviorDrift(input: RunLiveScoreBehaviorDriftInput)
   if (hasPrivacyWebEvidence && scoreDrift.privacyWebModalLeakageDeltaIncrease0to1 > thresholds.maxPrivacyWebModalLeakageDeltaIncrease0to1) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "privacyWebModalLeakageDeltaMean0to1", scoreDrift.privacyWebModalLeakageDeltaIncrease0to1, thresholds.maxPrivacyWebModalLeakageDeltaIncrease0to1, "Live web-agent modal leakage delta increased beyond threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasPrivacyWebEvidence && liveDistribution.privacyWebEvidenceCoverage0to1 < thresholds.minPrivacyWebEvidenceCoverage0to1) {
+  if (hasPrivacyWebEvidence && (liveDistribution.privacyWebEvidenceCoverage0to1 === null || liveDistribution.privacyWebEvidenceCoverage0to1 < thresholds.minPrivacyWebEvidenceCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "privacyWebEvidenceCoverage0to1", liveDistribution.privacyWebEvidenceCoverage0to1, thresholds.minPrivacyWebEvidenceCoverage0to1, "Live web-agent privacy rows are missing benchmark, dataset, task, browser state, reset, minimization policy, allowed/sensitive manifests, trajectory, result, judge, model route, captioning, or typed metric evidence.", alertEvidenceRefs, alertSignedRefs));
   }
   if (hasLocalSystemEvidence && scoreDrift.localSystemThermalBaselineDeviationIncrease0to1 > thresholds.maxLocalSystemThermalBaselineDeviationIncrease0to1) {
@@ -9202,19 +9201,19 @@ export function runLiveScoreBehaviorDrift(input: RunLiveScoreBehaviorDriftInput)
   if (hasLocalSystemEvidence && scoreDrift.localSystemVoltageSpcAnomalyRateIncrease0to1 > thresholds.maxLocalSystemVoltageSpcAnomalyRateIncrease0to1) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "localSystemVoltageSpcAnomalyRate0to1", scoreDrift.localSystemVoltageSpcAnomalyRateIncrease0to1, thresholds.maxLocalSystemVoltageSpcAnomalyRateIncrease0to1, "Live local-system voltage SPC anomaly rate increased beyond threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasLocalSystemEvidence && liveDistribution.localSystemProcessIdentityCoverage0to1 < thresholds.minLocalSystemProcessIdentityCoverage0to1) {
+  if (hasLocalSystemEvidence && (liveDistribution.localSystemProcessIdentityCoverage0to1 === null || liveDistribution.localSystemProcessIdentityCoverage0to1 < thresholds.minLocalSystemProcessIdentityCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "localSystemProcessIdentityCoverage0to1", liveDistribution.localSystemProcessIdentityCoverage0to1, thresholds.minLocalSystemProcessIdentityCoverage0to1, "Live local-system process identity coverage dropped below threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasLocalSystemEvidence && liveDistribution.localSystemGhostDriverDetectionCoverage0to1 < thresholds.minLocalSystemGhostDriverDetectionCoverage0to1) {
+  if (hasLocalSystemEvidence && (liveDistribution.localSystemGhostDriverDetectionCoverage0to1 === null || liveDistribution.localSystemGhostDriverDetectionCoverage0to1 < thresholds.minLocalSystemGhostDriverDetectionCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "localSystemGhostDriverDetectionCoverage0to1", liveDistribution.localSystemGhostDriverDetectionCoverage0to1, thresholds.minLocalSystemGhostDriverDetectionCoverage0to1, "Live local-system ghost-driver handling coverage dropped below threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasLocalSystemEvidence && liveDistribution.localSystemProactiveAlertCoverage0to1 < thresholds.minLocalSystemProactiveAlertCoverage0to1) {
+  if (hasLocalSystemEvidence && (liveDistribution.localSystemProactiveAlertCoverage0to1 === null || liveDistribution.localSystemProactiveAlertCoverage0to1 < thresholds.minLocalSystemProactiveAlertCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "localSystemProactiveAlertCoverage0to1", liveDistribution.localSystemProactiveAlertCoverage0to1, thresholds.minLocalSystemProactiveAlertCoverage0to1, "Live local-system proactive alert coverage dropped below threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasLocalSystemEvidence && liveDistribution.localSystemLocalOnlyPrivacyCoverage0to1 < thresholds.minLocalSystemLocalOnlyPrivacyCoverage0to1) {
+  if (hasLocalSystemEvidence && (liveDistribution.localSystemLocalOnlyPrivacyCoverage0to1 === null || liveDistribution.localSystemLocalOnlyPrivacyCoverage0to1 < thresholds.minLocalSystemLocalOnlyPrivacyCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "localSystemLocalOnlyPrivacyCoverage0to1", liveDistribution.localSystemLocalOnlyPrivacyCoverage0to1, thresholds.minLocalSystemLocalOnlyPrivacyCoverage0to1, "Live local-system local-only privacy coverage dropped below threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasLocalSystemEvidence && liveDistribution.localSystemEvidenceCoverage0to1 < thresholds.minLocalSystemEvidenceCoverage0to1) {
+  if (hasLocalSystemEvidence && (liveDistribution.localSystemEvidenceCoverage0to1 === null || liveDistribution.localSystemEvidenceCoverage0to1 < thresholds.minLocalSystemEvidenceCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "localSystemEvidenceCoverage0to1", liveDistribution.localSystemEvidenceCoverage0to1, thresholds.minLocalSystemEvidenceCoverage0to1, "Live local-system monitor evidence coverage dropped below threshold.", alertEvidenceRefs, alertSignedRefs));
   }
   if (hasObservabilityEvidence && scoreDrift.observabilityResolutionScoreDrop0to1 > thresholds.maxObservabilityResolutionScoreDrop0to1) {
@@ -9226,16 +9225,16 @@ export function runLiveScoreBehaviorDrift(input: RunLiveScoreBehaviorDriftInput)
   if (hasObservabilityEvidence && scoreDrift.observabilityRubricScoreDrop0to1 > thresholds.maxObservabilityRubricScoreDrop0to1) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "observabilityRubricScoreMean0to1", scoreDrift.observabilityRubricScoreDrop0to1, thresholds.maxObservabilityRubricScoreDrop0to1, "Live observability rubric score dropped beyond threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasObservabilityEvidence && liveDistribution.observabilityEvidenceCoverage0to1 < thresholds.minObservabilityEvidenceCoverage0to1) {
+  if (hasObservabilityEvidence && (liveDistribution.observabilityEvidenceCoverage0to1 === null || liveDistribution.observabilityEvidenceCoverage0to1 < thresholds.minObservabilityEvidenceCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "observabilityEvidenceCoverage0to1", liveDistribution.observabilityEvidenceCoverage0to1, thresholds.minObservabilityEvidenceCoverage0to1, "Live observability rows are missing task spec, environment, clock, trajectory, grading, reward, result, or report evidence.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasObservabilityEvidence && liveDistribution.observabilityTraceCoverage0to1 < thresholds.minObservabilityTraceCoverage0to1) {
+  if (hasObservabilityEvidence && (liveDistribution.observabilityTraceCoverage0to1 === null || liveDistribution.observabilityTraceCoverage0to1 < thresholds.minObservabilityTraceCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "observabilityTraceCoverage0to1", liveDistribution.observabilityTraceCoverage0to1, thresholds.minObservabilityTraceCoverage0to1, "Live observability rows are missing trajectory, command stdout, or grading details evidence.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasObservabilityEvidence && liveDistribution.observabilityReportCoverage0to1 < thresholds.minObservabilityReportCoverage0to1) {
+  if (hasObservabilityEvidence && (liveDistribution.observabilityReportCoverage0to1 === null || liveDistribution.observabilityReportCoverage0to1 < thresholds.minObservabilityReportCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "observabilityReportCoverage0to1", liveDistribution.observabilityReportCoverage0to1, thresholds.minObservabilityReportCoverage0to1, "Live observability rows are missing reward, result JSON, or HTML report evidence.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasObservabilityEvidence && liveDistribution.observabilityScenarioClockAlignmentRate0to1 < thresholds.minObservabilityScenarioClockAlignmentRate0to1) {
+  if (hasObservabilityEvidence && (liveDistribution.observabilityScenarioClockAlignmentRate0to1 === null || liveDistribution.observabilityScenarioClockAlignmentRate0to1 < thresholds.minObservabilityScenarioClockAlignmentRate0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "observabilityScenarioClockAlignmentRate0to1", liveDistribution.observabilityScenarioClockAlignmentRate0to1, thresholds.minObservabilityScenarioClockAlignmentRate0to1, "Live observability scenario clock alignment dropped below threshold.", alertEvidenceRefs, alertSignedRefs));
   }
   if (hasOllamaMetricsEvidence && scoreDrift.ollamaMetricsRequestDurationP95IncreaseRatio > thresholds.maxOllamaMetricsRequestDurationP95IncreaseRatio) {
@@ -9247,7 +9246,7 @@ export function runLiveScoreBehaviorDrift(input: RunLiveScoreBehaviorDriftInput)
   if (hasOllamaMetricsEvidence && scoreDrift.ollamaMetricsLoadedModelCountDropRatio > thresholds.maxOllamaMetricsLoadedModelCountDropRatio) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "ollamaMetricsLoadedModelCountMean", scoreDrift.ollamaMetricsLoadedModelCountDropRatio, thresholds.maxOllamaMetricsLoadedModelCountDropRatio, "Live Ollama metrics loaded-model count dropped beyond threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasOllamaMetricsEvidence && ollamaMetricsModelLoadedRate < thresholds.minOllamaMetricsModelLoadedRate0to1) {
+  if (hasOllamaMetricsEvidence && (ollamaMetricsModelLoadedRate === null || ollamaMetricsModelLoadedRate < thresholds.minOllamaMetricsModelLoadedRate0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "ollamaMetricsModelLoadedRate0to1", ollamaMetricsModelLoadedRate, thresholds.minOllamaMetricsModelLoadedRate0to1, "Live Ollama metrics model-loaded rate dropped below threshold.", alertEvidenceRefs, alertSignedRefs));
   }
   if (hasOllamaMetricsEvidence && scoreDrift.ollamaMetricsModelRamIncreaseRatio > thresholds.maxOllamaMetricsModelRamIncreaseRatio) {
@@ -9256,7 +9255,7 @@ export function runLiveScoreBehaviorDrift(input: RunLiveScoreBehaviorDriftInput)
   if (hasOllamaMetricsEvidence && scoreDrift.ollamaMetricsRequestErrorRateIncrease0to1 > thresholds.maxOllamaMetricsRequestErrorRateIncrease0to1) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "ollamaMetricsRequestErrorRate0to1", scoreDrift.ollamaMetricsRequestErrorRateIncrease0to1, thresholds.maxOllamaMetricsRequestErrorRateIncrease0to1, "Live Ollama metrics request error rate increased beyond threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasOllamaMetricsEvidence && ollamaMetricsEvidenceCoverage < thresholds.minOllamaMetricsEvidenceCoverage0to1) {
+  if (hasOllamaMetricsEvidence && (ollamaMetricsEvidenceCoverage === null || ollamaMetricsEvidenceCoverage < thresholds.minOllamaMetricsEvidenceCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "ollamaMetricsEvidenceCoverage0to1", ollamaMetricsEvidenceCoverage, thresholds.minOllamaMetricsEvidenceCoverage0to1, "Baseline or live Ollama metrics sidecar rows are missing source, repository, license, proxy, Ollama host, Prometheus scrape, endpoint, baseline/live snapshot, alert-policy, model, deployment, token, duration, time-per-token, loaded-model, RAM, or error-rate evidence.", alertEvidenceRefs, alertSignedRefs));
   }
   if (hasWebOperatorEvidence && scoreDrift.webOperatorLlmEvaluationDrop0to1 > thresholds.maxWebOperatorLlmEvaluationDrop0to1) {
@@ -9271,7 +9270,7 @@ export function runLiveScoreBehaviorDrift(input: RunLiveScoreBehaviorDriftInput)
   if (hasWebOperatorEvidence && scoreDrift.webOperatorTaskReliabilityDrop0to1 > thresholds.maxWebOperatorTaskReliabilityDrop0to1) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "webOperatorTaskReliabilityMean0to1", scoreDrift.webOperatorTaskReliabilityDrop0to1, thresholds.maxWebOperatorTaskReliabilityDrop0to1, "Live web-operator task reliability dropped beyond threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasWebOperatorEvidence && liveDistribution.webOperatorReplayCoverage0to1 < thresholds.minWebOperatorReplayCoverage0to1) {
+  if (hasWebOperatorEvidence && (liveDistribution.webOperatorReplayCoverage0to1 === null || liveDistribution.webOperatorReplayCoverage0to1 < thresholds.minWebOperatorReplayCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "webOperatorReplayCoverage0to1", liveDistribution.webOperatorReplayCoverage0to1, thresholds.minWebOperatorReplayCoverage0to1, "Live web-operator rows are missing config, replay, result, screenshot, or trajectory artifacts.", alertEvidenceRefs, alertSignedRefs));
   }
   if (hasWebOperatorEvidence && scoreDrift.webOperatorTaskTimeIncreaseRatio > thresholds.maxWebOperatorTaskTimeIncreaseRatio) {
@@ -9292,13 +9291,13 @@ export function runLiveScoreBehaviorDrift(input: RunLiveScoreBehaviorDriftInput)
   if (hasNaviBenchEvidence && scoreDrift.naviBenchExcludingCrashedScoreDrop0to1 > thresholds.maxNaviBenchExcludingCrashedScoreDrop0to1) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "naviBenchExcludingCrashedScoreMean0to1", scoreDrift.naviBenchExcludingCrashedScoreDrop0to1, thresholds.maxNaviBenchExcludingCrashedScoreDrop0to1, "Live Navi-Bench excluding-crashed score dropped beyond threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasNaviBenchEvidence && liveDistribution.naviBenchTrajectoryCoverage0to1 < thresholds.minNaviBenchTrajectoryCoverage0to1) {
+  if (hasNaviBenchEvidence && (liveDistribution.naviBenchTrajectoryCoverage0to1 === null || liveDistribution.naviBenchTrajectoryCoverage0to1 < thresholds.minNaviBenchTrajectoryCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "naviBenchTrajectoryCoverage0to1", liveDistribution.naviBenchTrajectoryCoverage0to1, thresholds.minNaviBenchTrajectoryCoverage0to1, "Live Navi-Bench rows are missing saved trajectory, screenshot trace, or result artifacts.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasNaviBenchEvidence && liveDistribution.naviBenchVisualizationCoverage0to1 < thresholds.minNaviBenchVisualizationCoverage0to1) {
+  if (hasNaviBenchEvidence && (liveDistribution.naviBenchVisualizationCoverage0to1 === null || liveDistribution.naviBenchVisualizationCoverage0to1 < thresholds.minNaviBenchVisualizationCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "naviBenchVisualizationCoverage0to1", liveDistribution.naviBenchVisualizationCoverage0to1, thresholds.minNaviBenchVisualizationCoverage0to1, "Live Navi-Bench rows are missing per-task visualization artifacts.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasNaviBenchEvidence && liveDistribution.naviBenchEvidenceCoverage0to1 < thresholds.minNaviBenchEvidenceCoverage0to1) {
+  if (hasNaviBenchEvidence && (liveDistribution.naviBenchEvidenceCoverage0to1 === null || liveDistribution.naviBenchEvidenceCoverage0to1 < thresholds.minNaviBenchEvidenceCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "naviBenchEvidenceCoverage0to1", liveDistribution.naviBenchEvidenceCoverage0to1, thresholds.minNaviBenchEvidenceCoverage0to1, "Live Navi-Bench rows are missing source, repository, license, dataset, task-config, evaluator, browser, result, trajectory, visualization, score-bound, alert, evidence, or signed-evidence proof.", alertEvidenceRefs, alertSignedRefs));
   }
   if (hasNaviBenchEvidence && scoreDrift.naviBenchStepCountIncreaseRatio > thresholds.maxNaviBenchStepCountIncreaseRatio) {
@@ -9316,10 +9315,10 @@ export function runLiveScoreBehaviorDrift(input: RunLiveScoreBehaviorDriftInput)
   if (hasLegalAgentEvidence && scoreDrift.legalAgentToolUseAccuracyDrop0to1 > thresholds.maxLegalAgentToolUseAccuracyDrop0to1) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "legalAgentToolUseAccuracyMean0to1", scoreDrift.legalAgentToolUseAccuracyDrop0to1, thresholds.maxLegalAgentToolUseAccuracyDrop0to1, "Live legal-agent legal-tool use accuracy dropped beyond threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasLegalAgentEvidence && liveDistribution.legalAgentCitationCoverage0to1 < thresholds.minLegalAgentCitationCoverage0to1) {
+  if (hasLegalAgentEvidence && (liveDistribution.legalAgentCitationCoverage0to1 === null || liveDistribution.legalAgentCitationCoverage0to1 < thresholds.minLegalAgentCitationCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "legalAgentCitationCoverage0to1", liveDistribution.legalAgentCitationCoverage0to1, thresholds.minLegalAgentCitationCoverage0to1, "Live legal-agent citation coverage dropped below threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasLegalAgentEvidence && liveDistribution.legalAgentEvidenceCoverage0to1 < thresholds.minLegalAgentEvidenceCoverage0to1) {
+  if (hasLegalAgentEvidence && (liveDistribution.legalAgentEvidenceCoverage0to1 === null || liveDistribution.legalAgentEvidenceCoverage0to1 < thresholds.minLegalAgentEvidenceCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "legalAgentEvidenceCoverage0to1", liveDistribution.legalAgentEvidenceCoverage0to1, thresholds.minLegalAgentEvidenceCoverage0to1, "Live legal-agent rows are missing benchmark, dataset, corpus, task, planning-tree, tool, trace, intermediate-step, output, reference-answer, or evaluation evidence.", alertEvidenceRefs, alertSignedRefs));
   }
   if (hasLegalAgentEvidence && scoreDrift.legalAgentTokenCostIncreaseRatio > thresholds.maxLegalAgentTokenCostIncreaseRatio) {
@@ -9331,10 +9330,10 @@ export function runLiveScoreBehaviorDrift(input: RunLiveScoreBehaviorDriftInput)
   if (hasResearchGymEvidence && scoreDrift.researchGymSubtaskCompletionDrop0to1 > thresholds.maxResearchGymSubtaskCompletionDrop0to1) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "researchGymSubtaskCompletionRate0to1", scoreDrift.researchGymSubtaskCompletionDrop0to1, thresholds.maxResearchGymSubtaskCompletionDrop0to1, "Live ResearchGym-style subtask completion dropped beyond threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasResearchGymEvidence && liveDistribution.researchGymArtifactCoverage0to1 < thresholds.minResearchGymArtifactCoverage0to1) {
+  if (hasResearchGymEvidence && (liveDistribution.researchGymArtifactCoverage0to1 === null || liveDistribution.researchGymArtifactCoverage0to1 < thresholds.minResearchGymArtifactCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "researchGymArtifactCoverage0to1", liveDistribution.researchGymArtifactCoverage0to1, thresholds.minResearchGymArtifactCoverage0to1, "Live ResearchGym-style rows are missing task, pruned-repo, dataset, harness, grading, run, workspace, transcript, cost, status, plan, inspection, or violation artifacts.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasResearchGymEvidence && liveDistribution.researchGymInspectionPassRate0to1 < thresholds.minResearchGymInspectionPassRate0to1) {
+  if (hasResearchGymEvidence && (liveDistribution.researchGymInspectionPassRate0to1 === null || liveDistribution.researchGymInspectionPassRate0to1 < thresholds.minResearchGymInspectionPassRate0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "researchGymInspectionPassRate0to1", liveDistribution.researchGymInspectionPassRate0to1, thresholds.minResearchGymInspectionPassRate0to1, "Live ResearchGym-style inspection pass rate dropped below threshold.", alertEvidenceRefs, alertSignedRefs));
   }
   if (hasResearchGymEvidence && liveDistribution.researchGymBudgetOverrunRate0to1 > thresholds.maxResearchGymBudgetOverrunRate0to1) {
@@ -9352,7 +9351,7 @@ export function runLiveScoreBehaviorDrift(input: RunLiveScoreBehaviorDriftInput)
   if (hasOsUniverseEvidence && scoreDrift.osUniverseValidationErrorRateIncrease0to1 > thresholds.maxOsUniverseValidationErrorRateIncrease0to1) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "osUniverseValidationErrorRate0to1", scoreDrift.osUniverseValidationErrorRateIncrease0to1, thresholds.maxOsUniverseValidationErrorRateIncrease0to1, "Live OSUniverse-style validation error rate increased beyond threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasOsUniverseEvidence && liveDistribution.osUniverseEvidenceCoverage0to1 < thresholds.minOsUniverseEvidenceCoverage0to1) {
+  if (hasOsUniverseEvidence && (liveDistribution.osUniverseEvidenceCoverage0to1 === null || liveDistribution.osUniverseEvidenceCoverage0to1 < thresholds.minOsUniverseEvidenceCoverage0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "osUniverseEvidenceCoverage0to1", liveDistribution.osUniverseEvidenceCoverage0to1, thresholds.minOsUniverseEvidenceCoverage0to1, "Live OSUniverse-style rows are missing source, repository, license, paper, testcase, agent, runner, dependency, validator, result, viewer, trajectory, screenshot, or runtime evidence.", alertEvidenceRefs, alertSignedRefs));
   }
   if (hasOsUniverseEvidence && scoreDrift.osUniverseStepCountIncreaseRatio > thresholds.maxOsUniverseStepCountIncreaseRatio) {
@@ -9376,7 +9375,7 @@ export function runLiveScoreBehaviorDrift(input: RunLiveScoreBehaviorDriftInput)
   if (hasCtfEvidence && liveDistribution.ctfIndependenceViolationRate0to1 > thresholds.maxCtfIndependenceViolationRate0to1) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "ctfIndependenceViolationRate0to1", liveDistribution.ctfIndependenceViolationRate0to1, thresholds.maxCtfIndependenceViolationRate0to1, "Live CTF per-agent independence violations exceeded threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasCtfEvidence && liveDistribution.ctfFirstCorrectFlagForwardingRate0to1 < thresholds.minCtfFirstCorrectFlagForwardingRate0to1) {
+  if (hasCtfEvidence && (liveDistribution.ctfFirstCorrectFlagForwardingRate0to1 === null || liveDistribution.ctfFirstCorrectFlagForwardingRate0to1 < thresholds.minCtfFirstCorrectFlagForwardingRate0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "ctfFirstFlagForwardingRate0to1", liveDistribution.ctfFirstCorrectFlagForwardingRate0to1, thresholds.minCtfFirstCorrectFlagForwardingRate0to1, "Live CTF first-correct-flag forwarding coverage dropped below threshold.", alertEvidenceRefs, alertSignedRefs));
   }
   if (hasCtfPartialCreditEvidence && scoreDrift.ctfCheckpointCompletionDrop0to1 > thresholds.maxCtfCheckpointCompletionDrop0to1) {
@@ -9385,7 +9384,7 @@ export function runLiveScoreBehaviorDrift(input: RunLiveScoreBehaviorDriftInput)
   if (hasCtfPartialCreditEvidence && scoreDrift.ctfPartialCreditScoreDrop0to1 > thresholds.maxCtfPartialCreditScoreDrop0to1) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "ctfPartialCreditScoreMean0to1", scoreDrift.ctfPartialCreditScoreDrop0to1, thresholds.maxCtfPartialCreditScoreDrop0to1, "Live CTF partial-credit score mean dropped beyond threshold.", alertEvidenceRefs, alertSignedRefs));
   }
-  if (hasCtfPartialCreditEvidence && liveDistribution.ctfTraceCoverageRate0to1 < thresholds.minCtfTraceCoverageRate0to1) {
+  if (hasCtfPartialCreditEvidence && (liveDistribution.ctfTraceCoverageRate0to1 === null || liveDistribution.ctfTraceCoverageRate0to1 < thresholds.minCtfTraceCoverageRate0to1)) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "ctfTraceCoverageRate0to1", liveDistribution.ctfTraceCoverageRate0to1, thresholds.minCtfTraceCoverageRate0to1, "Live CTF execution trace coverage dropped below threshold.", alertEvidenceRefs, alertSignedRefs));
   }
   if (hasCtfPartialCreditEvidence && liveDistribution.ctfIsolationViolationRate0to1 > thresholds.maxCtfIsolationViolationRate0to1) {
@@ -9471,7 +9470,7 @@ export function runLiveScoreBehaviorDrift(input: RunLiveScoreBehaviorDriftInput)
   }
   if (
     hasCredenceEngineEvidence &&
-    liveDistribution.credenceEngineEvidenceCoverage0to1 < thresholds.minCredenceEngineEvidenceCoverage0to1
+    (liveDistribution.credenceEngineEvidenceCoverage0to1 === null || liveDistribution.credenceEngineEvidenceCoverage0to1 < thresholds.minCredenceEngineEvidenceCoverage0to1)
   ) {
     alerts.push(makeAlert(input.agentId, input.baselineWindow.windowId, input.liveWindow.windowId, "credenceEngineEvidenceCoverage0to1", liveDistribution.credenceEngineEvidenceCoverage0to1, thresholds.minCredenceEngineEvidenceCoverage0to1, "Live Credence Engine-style Bayesian decision rows are missing source, AGPL license, archive, README/spec/package/lock/results, experiment, benchmark harness, test suite, posterior, VOI, expected-utility, baseline/live result, drift statistic, alert receipt, signed evidence, or row-hash proof.", alertEvidenceRefs, alertSignedRefs));
   }

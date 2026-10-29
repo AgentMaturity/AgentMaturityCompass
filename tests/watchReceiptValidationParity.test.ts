@@ -16,6 +16,7 @@ import * as json from "../src/utils/json.js";
 import * as refs from "../src/watch/evidenceRefs.js";
 import * as math from "../src/watch/driftMath.js";
 import * as proofStats from "../src/watch/proofStats.js";
+import { migrateLegacyCoreExpectations, migrateLegacySatelliteExpectations } from "./helpers/liveDriftEmptyExpectations.js";
 import type { LiveDriftReceipt, RunLiveScoreBehaviorDriftInput } from "../src/watch/liveDriftTypes.js";
 
 const archive = "unused-code/2026-10-02-native/watch-receipts";
@@ -57,7 +58,7 @@ const unchangedDependencies: Module = {
   "./driftMath.js": math, "./proofStats.js": proofStats,
 };
 // The old metadata runners use the FULL old engine, not an extracted facsimile or the new engine.
-const oldCore = evaluate(originalSource("liveDriftAlerts"), unchangedDependencies);
+const oldCore = evaluate(migrateLegacyCoreExpectations(originalSource("liveDriftAlerts")), unchangedDependencies);
 const dependencies = { ...unchangedDependencies, "./liveDriftAlerts.js": oldCore };
 const corpus = ts.createSourceFile("corpus.ts", read("tests/liveDriftAlerts.test.ts"), ts.ScriptTarget.ES2022, true);
 const fixtureNames = new Set(["baselineRows", "stableLiveRows", "awesomeMemoryCategories", "awesomeMemoryTasks", "agentReadingFailureModes", "agentReadingDeliveryModes"]);
@@ -156,7 +157,7 @@ const familyDomains: Array<[string, Module, string]> = [
   ["agentReadingTestLiveDrift", reading, "readingRow"], ["awesomeAgentMemoryLiveDrift", memory, "memoryRow"],
 ];
 for (const [name, actual, fixture] of familyDomains) {
-  const original = evaluate(originalSource(name), dependencies);
+  const original = evaluate(migrateLegacySatelliteExpectations(originalSource(name)), dependencies);
   const runnerName = Object.keys(actual).find(key => key.startsWith("run"))!;
   const input = windows([0, 1, 2].map(i => invoke(fixtures[fixture], (fixtures.baselineRows as Row[])[i], i, "baseline") as Row),
     [0, 1, 2].map(i => invoke(fixtures[fixture], (fixtures.liveRows as Row[])[i], i, "live") as Row));
