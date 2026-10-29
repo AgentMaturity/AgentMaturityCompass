@@ -268,6 +268,7 @@ export interface AgentSessionInit {
     readonly makeLlm: (session: SessionService) => LoopLlm;
     readonly route: LoopRoute;
     readonly systemPrompt: string;
+    readonly approvalGated?: boolean;
     readonly harnessVersion: string;
     readonly compositionDigest: string;
     readonly policyDigest: string;
