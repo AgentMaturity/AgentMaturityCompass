@@ -1,0 +1,2 @@
+Lint contract passed: three unsafe patterns rejected; safe counterparts accepted.
+check-no-fabrication: passed; allowlisted findings R1 0, R2 0, R3 304, R4 21; 16 random marker(s); 0 pending entries.

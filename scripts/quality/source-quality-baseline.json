@@ -1459,7 +1459,6 @@
     {"id":"28a50bc455621f63ba7c1d3e1f826674fd172498635a7ba4b43c60c6904e8b5a","file":"src/runtime/index.ts","kind":"exports"},
     {"id":"28ab273a3c4a7ef9c12e023ad22f6c0852da530e9f1f81952a21f7b50df34804","file":"src/canon/canonSchema.ts","kind":"exports"},
     {"id":"28e68b830480097d2d02451210f211e84ff0ea828f78268cd6ec957ddac9646a","file":"src/product/index.ts","kind":"types"},
-    {"id":"28f4ccab9e9b2e5e6404b56b3d3065ff064aa64c574ae832aa5030b63049a5d2","file":"src/value/valueStore.ts","kind":"exports"},
     {"id":"28faa4bd30cb164198f98fcf5a244158b9399e2f30b71c3a583f2bcbd46282c1","file":"src/eval/judgeCalibration.ts","kind":"types"},
     {"id":"290ecf4d044946cb8fcb077071724d11f79eac9f98807b6b9c21896aa0de2b6c","file":"src/redteam/jailbreak/index.ts","kind":"types"},
     {"id":"29705336ee227576586700b5b2890f5de6095497590e7c8eddf3bd4732e27f28","file":"src/runtime/index.ts","kind":"types"},
