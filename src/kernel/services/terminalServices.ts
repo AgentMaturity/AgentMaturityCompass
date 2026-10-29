@@ -1,4 +1,9 @@
 /**
+ * library-only, not enforced by the native runtime: no production host composes
+ * this service. WP16 should reuse this seam and src/terminal/nativeTerminal.ts
+ * when wiring interactive terminals. Current shell tool execution lives in
+ * src/tools/builtin/bashTool.ts; this service does not expose a native PTY tool.
+ *
  * Interactive terminals as a composed service (P4.2).
  *
  * `ctx.amcTerminal` opens shell sessions and owns their disposal. A plugin

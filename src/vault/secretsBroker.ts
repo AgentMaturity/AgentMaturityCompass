@@ -1,3 +1,9 @@
+/**
+ * library-only, not enforced by production credential resolution. This in-memory
+ * store has no production caller. Use the canonical CredentialsService contract
+ * in src/credentials/credentialsService.ts and its LocalCredentialsService
+ * implementation in src/credentials/localCredentialsService.ts.
+ */
 import { createCipheriv, createDecipheriv, randomBytes, randomUUID } from 'node:crypto';
 
 interface StoredSecret {
@@ -17,6 +23,11 @@ export interface SecretStoreResult { stored: boolean; name: string; }
 export interface SecretRetrieveResult { value: string; accessedBy: string; accessedAt: string; }
 export interface SecretListItem { name: string; createdAt: string; lastAccessed?: string; }
 
+/**
+ * @deprecated Library-only store; use CredentialsService in
+ * src/credentials/credentialsService.ts and LocalCredentialsService in
+ * src/credentials/localCredentialsService.ts for production credentials.
+ */
 export class SecretsBroker {
   private readonly masterKey: Buffer;
   private readonly secrets = new Map<string, StoredSecret>();
