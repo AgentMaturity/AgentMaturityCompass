@@ -1,7 +1,7 @@
 // WP36 (AXR-04, AXR-05, DXB-14, DXC-38): AMC-held secrets never reach a launched process's argv, a model-run shell,
 // the SDK child or stored evidence, and a sandboxed run reports the container's real exit status.
 // Studio liveness is the only stubbed seam for the adapter run; docker is a fake binary on PATH that records what it got.
-import { chmodSync, existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync, mkdirSync } from "node:fs";
+import { chmodSync, existsSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync, mkdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, test, vi } from "vitest";
@@ -159,5 +159,55 @@ describe("DXC-38: the SDK child gets an explicit environment by default", () => 
     vi.stubEnv("WP36_PARENT_ONLY", "inherited");
     const env = await childEnv({ inheritEnv: true });
     expect(env.WP36_PARENT_ONLY).toBe("inherited");
+  });
+});
+
+describe("every secret-looking AMC_* variable the source reads stays out of model commands and the SDK child", () => {
+  // Found independently of AMC's own pattern: a name that looks like a credential, less protocol tags, digests,
+  // public keys, diagnostic codes and redaction markers, which are not environment variables.
+  const looksSecret = /PASSPHRASE|PASSWORD|SECRET|PRIVATE_KEY|SIGNING_KEY|API_KEY|LICENSE_KEY|TOKEN|AUTH_|CREDENTIALS_FILE|LEASE$/;
+  const notEnv = /_V\d+(_|$)|SHA256|PUBLIC_KEY|PUBKEY|REDACTED|^AMC_CREDENTIAL_|^AMC_SECRET_ENV_PATTERN$|_$/;
+  const sourceNames = (): string[] => {
+    const names = new Set<string>();
+    const walk = (dir: string): void => {
+      for (const entry of readdirSync(dir, { withFileTypes: true })) {
+        const path = join(dir, entry.name);
+        if (entry.isDirectory()) walk(path);
+        else if (entry.name.endsWith(".ts")) for (const match of readFileSync(path, "utf8").matchAll(/\bAMC_[A-Z0-9_]+/g)) names.add(match[0]);
+      }
+    };
+    walk(join(import.meta.dirname, "..", "src"));
+    return [...names].filter((name) => looksSecret.test(name) && !notEnv.test(name)).sort();
+  };
+  // The SDK child is the AMC runtime: it signs with the vault and reads the credential store (documented exemption).
+  const RUNTIME_CHILD_EXEMPT = ["AMC_CREDENTIALS_FILE", "AMC_VAULT_PASSPHRASE", "AMC_VAULT_PASSPHRASE_FILE"];
+
+  test("the scan finds AMC's secrets, and wrapped agents keep only the agent-facing AMC_TOKEN", () => {
+    const names = sourceNames();
+    expect(names.length).toBeGreaterThanOrEqual(30);
+    for (const name of ["AMC_VAULT_PASSPHRASE", "AMC_RELEASE_SIGNING_KEY", "AMC_INDUSTRY_PACKS_LICENSE_PRIVATE_KEY", "AMC_DD_API_KEY", "AMC_A4_SESSION_TOKEN_FILE"]) {
+      expect(names).toContain(name);
+    }
+    const kept = Object.keys(stripProviderKeys(Object.fromEntries(names.map((name) => [name, "v"]))));
+    expect(kept).toEqual(["AMC_TOKEN"]);
+  });
+
+  test("none reaches an unconfined bash command; only the runtime's own vault and credential path reach the SDK child", async () => {
+    const names = sourceNames();
+    const value = (name: string): string => `wp36-scan-${name.toLowerCase()}`;
+    for (const name of names) vi.stubEnv(name, value(name));
+    const workspace = tempDir("amc-wp36-scan-");
+    const registry = new ToolRegistry();
+    registry.define(bashTool());
+    const outcome = await new ToolPipeline({ registry, workspace }).execute({ name: "bash", agentId: "alice", arguments: { command: "env" }, requestedMode: "EXECUTE" });
+    for (const name of names) expect(outcome.output, name).not.toContain(value(name));
+
+    const dir = tempDir("amc-wp36-scan-sdk-");
+    const dump = join(dir, "env.json"), script = join(dir, "child.mjs");
+    writeFileSync(script, `import { writeFileSync } from "node:fs"; writeFileSync(${JSON.stringify(dump)}, JSON.stringify(process.env)); process.exit(0);\n`);
+    await expect(AMCNativeClient.start({ workspace: dir, provider: "stub", command: [process.execPath, script], timeoutMs: 5_000 } as never)).rejects.toThrow();
+    const childEnv = JSON.parse(readFileSync(dump, "utf8")) as Record<string, string>;
+    const reached = names.filter((name) => childEnv[name] !== undefined);
+    expect(reached).toEqual(RUNTIME_CHILD_EXEMPT.filter((name) => names.includes(name)));
   });
 });

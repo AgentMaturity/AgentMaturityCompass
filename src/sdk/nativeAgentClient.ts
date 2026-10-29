@@ -14,7 +14,7 @@ import { NATIVE_AUDIO_INPUT_FORMAT, type NativeAudioPart } from "../attachments/
 import { advertisesNativeAudio, materializeAcpAudio, nativeAudioPartsToAcp } from "../acp/acpAudioInput.js";
 import { MAX_WIRE_LINE_BYTES } from "../wire/ndjsonFraming.js";
 import { forwardNativeShellWarnings } from "./nativeShellWarnings.js";
-import { commandEnv } from "../utils/providerKeys.js";
+import { commandEnv, isAmcSecretEnv } from "../utils/providerKeys.js";
 import { EXECUTION_API_VERSION, parseExecutionStatus, type ExecutionStatus } from "../execution/executionContract.js";
 import { admitVerifierReport, approveThroughCli, pendingApprovals, reportedExecution, runPinnedCli, type AMCNativeApproval,
   type AMCNativePendingApproval, type PinnedCli } from "./nativeCli.js";
@@ -76,8 +76,9 @@ export {
   /** Defaults to the CLI shipped in this same installed package. Never resolves another AMC from PATH. */
   readonly command?: readonly [string, ...string[]];
   /**
-   * The child's environment beside a minimal base: PATH, HOME, user, locale and temp variables (COMMAND_ENV_ALLOW) and
-   * the parent's own `AMC_*` settings (the vault passphrase, a monitor pin, AMC_HOME), which the runtime child needs.
+   * The child's environment beside a minimal base: PATH, HOME, user, locale and temp variables, the parent's non-secret
+   * `AMC_*` settings (a monitor pin, AMC_HOME) and the vault passphrase and credential-file path the runtime needs.
+   * AMC_TOKEN and a parent lease are not inherited.
    * Nothing else from the parent is inherited unless `inheritEnv` is true: pass a provider key here explicitly.
    */
   readonly env?: NodeJS.ProcessEnv;
@@ -296,10 +297,18 @@ interface PendingRequest {
   readonly timer: ReturnType<typeof setTimeout>;
 }
 
-/** The SDK child's default environment (WP36, DXC-38): it is AMC itself, so AMC's settings, and no other parent secret. */
+/**
+ * AMC secrets the runtime child itself needs: it signs its evidence with the workspace vault and reads AMC's credential
+ * store. The child is AMC, not a model command; its shells get an allow-listed environment without these.
+ */
+const RUNTIME_CHILD_AMC_SECRETS: readonly string[] = ["AMC_VAULT_PASSPHRASE", "AMC_VAULT_PASSPHRASE_FILE", "AMC_CREDENTIALS_FILE"];
+
+/** The SDK child's default environment (WP36, DXC-38): an allow-list, AMC's non-secret settings and the vault. */
 function runtimeChildEnv(): NodeJS.ProcessEnv {
   const env: NodeJS.ProcessEnv = commandEnv(process.env);
-  for (const [key, value] of Object.entries(process.env)) if (key.startsWith("AMC_") && value !== undefined) env[key] = value;
+  for (const [key, value] of Object.entries(process.env)) {
+    if (key.startsWith("AMC_") && value !== undefined && (!isAmcSecretEnv(key) || RUNTIME_CHILD_AMC_SECRETS.includes(key))) env[key] = value;
+  }
   return env;
 }
 

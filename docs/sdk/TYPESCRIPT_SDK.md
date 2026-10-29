@@ -51,7 +51,9 @@ installed package and bin and records its wall time.
 ## The runtime child's environment
 
 `AMCNativeClient` starts its `amc acp` child with `PATH`, `HOME`, user, shell, locale, temp and timezone variables, the
-parent's `AMC_*` settings (the vault passphrase, a monitor pin, `AMC_HOME`) and whatever you pass in `env`. Nothing else
+parent's non-secret `AMC_*` settings (a monitor pin, `AMC_HOME`), `AMC_VAULT_PASSPHRASE`, `AMC_VAULT_PASSPHRASE_FILE`
+and `AMC_CREDENTIALS_FILE` (the runtime signs with the vault and reads the credential store), and whatever you pass in
+`env`. Other AMC secrets (notary, backup and release keys, license and admin tokens, a parent lease) are not passed. Nothing else
 from your process is inherited, so a cloud token or a provider key in your environment does not reach the runtime by
 accident: pass the one it should use explicitly, for example `env: { OPENAI_API_KEY: process.env.OPENAI_API_KEY }`, or
 keep it in AMC's credential file. `inheritEnv: true` restores the earlier behaviour of merging your whole environment
