@@ -216,6 +216,9 @@ describe("paired statistics (WP05)", () => {
     const { schemaVersion: _drop, ...legacy } = bound;
     expect(evaluateExperimentGate(legacy, policy).status).toBe("inconclusive");
     expect(evaluateExperimentGate({ ...bound, counts: { pairedCases: 2 } }, policy).status).toBe("inconclusive");
+    // No paired case: below-threshold numbers computed from nothing are inconclusive, not a failure.
+    expect(evaluateExperimentGate({ ...legacy, counts: undefined, cases: [], upliftSuccessRate: 0 }, { ...policy, minUpliftSuccessRate: 0.5 }).status).toBe("inconclusive");
+    expect(evaluateExperimentGate({ ...legacy, counts: undefined, cases: [{}], upliftSuccessRate: 0 }, { ...policy, minUpliftSuccessRate: 0.5 }).status).toBe("fail");
     expect(evaluateExperimentGate({ ...bound, candidate: { trialId: "b" } }, policy).status).toBe("inconclusive");
     expect(evaluateExperimentGate({ ...bound, candidateCostPerSuccess: null }, policy).reasons).toContain("cost evidence unavailable");
     expect(evaluateExperimentGate({ ...bound, baselineCostPerSuccess: 0 }, policy).status).toBe("fail");
@@ -263,8 +266,8 @@ describe("experiment promotion verifies its inputs and keeps the baseline eligib
 
     const original = readFileSync(run.jsonPath, "utf8");
     writeFileSync(run.jsonPath, original.replace('"upliftValuePoints": 75', '"upliftValuePoints": 76'));
-    expect(gate()).toMatchObject({ pass: false, decision: "abstain" });
-    expect(gate().reasons).toContain("report admission: report hash does not match its content");
+    // The latest-run reader (WP38) refuses a tampered report before the gate can decide anything.
+    expect(gate).toThrow(/report hash does not match/);
     writeFileSync(run.jsonPath, original);
     expect(gate().decision).toBe("promote-candidate");
 

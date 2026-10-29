@@ -17,6 +17,7 @@ import {
   setExperimentCandidate
 } from "../src/experiments/experimentRunner.js";
 import { getAgentPaths } from "../src/fleet/paths.js";
+import { openLedger } from "../src/ledger/ledger.js";
 import { getPrivateKeyPem, getSigningKey, signHexDigest } from "../src/crypto/keys.js";
 import { startStudioApiServer } from "../src/studio/studioServer.js";
 import { sha256Hex } from "../src/utils/hash.js";
@@ -46,11 +47,31 @@ function fixture(): { ws: string; experimentId: string; runsDir: string } {
   writeFileSync(candidateFile, "candidate:\n  mode: safe\n", "utf8");
   signAuditorFile(ws, candidateFile);
   setExperimentCandidate({ workspace: ws, agentId: "default", experimentId, candidateFile });
+  seedForbiddenAudits(ws);
   // The on-disk layout `amc experiment optimize` writes under the experiments root.
   const optimizerRun = join(getAgentPaths(ws, "default").rootDir, "experiments", "optimizer", "optimizer-1-abcd1234");
   mkdirSync(optimizerRun, { recursive: true });
   writeFileSync(join(optimizerRun, "optimizer-run.json"), "{}\n");
   return { ws, experimentId, runsDir: join(getAgentPaths(ws, "default").rootDir, "experiments", experimentId, "runs") };
+}
+
+/**
+ * Case evidence on both sides of a same-agent legacy experiment (GAP WP03/WP05): a run with no determinate case on
+ * both sides is refused, and the baseline window ends where the candidate window starts. A forbidden audit 20 days
+ * ago (baseline window for 7d or 14d candidate windows) and one now (candidate window) make case_1 failed on both.
+ */
+function seedForbiddenAudits(ws: string): void {
+  const ledger = openLedger(ws);
+  try {
+    ledger.startSession({ sessionId: "seed-audits", runtime: "unknown", binaryPath: "vitest", binarySha256: "vitest" });
+    for (const ts of [Date.now() - 20 * 86_400_000, Date.now()]) {
+      ledger.appendEvidence({ sessionId: "seed-audits", runtime: "unknown", eventType: "audit", payload: "{}", payloadExt: "json", inline: true, ts,
+        meta: { agentId: "default", trustTier: "OBSERVED", auditType: "EXECUTE_WITHOUT_TICKET_ATTEMPTED" } });
+    }
+    ledger.sealSession("seed-audits");
+  } finally {
+    ledger.close();
+  }
 }
 
 function signAuditorFile(ws: string, file: string): void {
@@ -194,7 +215,8 @@ describe("experiment latest-run admission", () => {
     expect(() => analyzeExperiment({ workspace: ws, agentId: "default", experimentId })).toThrow(/seal does not verify/);
 
     writeFileSync(jsonPath, original);
-    expect(gateExperiment({ workspace: ws, agentId: "default", experimentId, policyPath: policy }).status).toBe("pass");
+    // A legacy window report verifies but is never promotion-eligible (GAP WP03/WP07): inconclusive, not pass.
+    expect(gateExperiment({ workspace: ws, agentId: "default", experimentId, policyPath: policy })).toMatchObject({ status: "inconclusive", decision: "abstain" });
     const nextCandidate = join(ws, "candidate-2.yaml");
     writeFileSync(nextCandidate, "candidate:\n  mode: bolder\n", "utf8");
     signAuditorFile(ws, nextCandidate);

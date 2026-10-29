@@ -66,7 +66,8 @@ export function evaluateExperimentGate(
     failed.push(`candidate configuration digest ${String(report.candidateConfigDigest ?? "missing")} does not match ${policy.candidateConfigDigest}`);
   }
   const counts = side(report.counts);
-  const paired = finite(counts.pairedCases) ?? 0;
+  // Legacy reports carry no counts: every listed case was scored.
+  const paired = finite(counts.pairedCases) ?? (Array.isArray(report.cases) ? report.cases.length : 0);
   const minPaired = policy.minPairedCases ?? DEFAULT_MIN_PAIRED_CASES;
   if (paired < minPaired) inconclusive.push(`${paired} paired case(s); at least ${minPaired} required`);
   const upliftSuccess = finite(report.upliftSuccessRate), upliftValue = finite(report.upliftValuePoints);
@@ -94,7 +95,9 @@ export function evaluateExperimentGate(
   } else if (policy.requireIntervalAboveZero && !(interval !== null && (interval[0] ?? 0) > 0)) {
     inconclusive.push("paired 95% interval of the value-point difference does not exclude zero");
   }
-  return { status: failed.length > 0 ? "fail" : inconclusive.length > 0 ? "inconclusive" : "pass", reasons: [...failed, ...inconclusive] };
+  // With no paired case the thresholds were computed from nothing, so they cannot show a failure either.
+  const status = paired === 0 ? "inconclusive" : failed.length > 0 ? "fail" : inconclusive.length > 0 ? "inconclusive" : "pass";
+  return { status, reasons: [...failed, ...inconclusive] };
 }
 
 export function experimentGateComparisonRows(report: ExperimentReport, policy: ExperimentGatePolicy): string[] {
