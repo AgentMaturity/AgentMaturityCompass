@@ -2561,7 +2561,7 @@ async function renderExperiments() {
         <button id="optimizerRunBtn">Generate Optimizer</button>
         <button id="optimizerRefreshBtn" class="secondary">Refresh</button>
       </div>
-      <div class="scroll"><table><thead><tr><th>Run</th><th>Accepted</th><th>Status</th><th>Candidates</th><th>Top Reason</th><th>Actions</th></tr></thead><tbody id="optimizerRows"></tbody></table></div>
+      <div class="scroll"><table><thead><tr><th>Run</th><th>Selected for probing (estimated metrics, not executed)</th><th>Structural status</th><th>Candidates</th><th>Top Reason</th><th>Actions</th></tr></thead><tbody id="optimizerRows"></tbody></table></div>
     `)}
     ${card("Experiment Registry", `<pre class="scroll">${JSON.stringify(listed.experiments || listed, null, 2)}</pre>`)}
   `;
@@ -2575,7 +2575,7 @@ async function renderExperiments() {
       const baselineCost = Number(latest.baselineCostPerSuccess || 0);
       const candidateCost = Number(latest.candidateCostPerSuccess || 0);
       const costRatio = baselineCost > 0 ? candidateCost / baselineCost : 0;
-      const verdict = upliftSuccess > 0 && upliftValue > 0 ? "READY" : "NOT READY";
+      const verdict = row.latestRunProblem ? "REFUSED" : !row.latestRun ? "NO RUN" : upliftSuccess > 0 && upliftValue > 0 ? "READY" : "NOT READY";
       return `<tr>
         <td>${htmlEscape(row.experimentId)}</td>
         <td>${htmlEscape(row.name)}</td>
@@ -2583,7 +2583,7 @@ async function renderExperiments() {
         <td>${upliftSuccess.toFixed(4)}</td>
         <td>${upliftValue.toFixed(4)}</td>
         <td>${costRatio.toFixed(4)}</td>
-        <td><strong>${verdict}</strong></td>
+        <td><strong title="${htmlEscape(row.latestRunProblem || "")}">${verdict}</strong></td>
         <td>
           <div class="row">
             <button data-run="${row.experimentId}">Run</button>
@@ -2640,7 +2640,10 @@ async function renderExperiments() {
     button.addEventListener("click", async () => {
       const id = button.getAttribute("data-run");
       const mode = window.prompt("Mode (sandbox|supervise):", "sandbox") || "sandbox";
-      const run = await apiPost(`/experiments/${encodeURIComponent(id)}/run`, { agentId, mode });
+      const candidateWindow = window.prompt("Candidate evidence window (e.g. 7d):", "");
+      if (!candidateWindow) return;
+      const candidateAgentId = window.prompt("Candidate agent (blank = same agent):", "") || undefined;
+      const run = await apiPost(`/experiments/${encodeURIComponent(id)}/run`, { agentId, mode, candidateWindow, candidateAgentId });
       out.textContent = JSON.stringify(run, null, 2);
       await renderExperiments();
     });

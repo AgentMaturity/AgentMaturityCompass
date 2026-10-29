@@ -233,7 +233,9 @@ import {
   experimentOptimizerShowCli,
   experimentRunCliAsync,
   experimentSetBaselineCli,
-  experimentSetCandidateCli
+  experimentSetCandidateCli,
+  experimentLatestRunCli,
+  ExperimentInputError
 } from "../experiments/experimentCli.js";
 import {
   addOrgNodeAsync,
@@ -1117,51 +1119,20 @@ function listExperimentHistory(workspace: string, agentId: string): Array<{
   name: string;
   casebookId: string;
   latestRun: Record<string, unknown> | null;
+  /** Why the newest run was not shown: unreadable, unsealed, or for another candidate. */
+  latestRunProblem: string | null;
 }> {
-  const root = join(getAgentPaths(workspace, agentId).rootDir, "experiments");
-  if (!pathExists(root)) {
-    return [];
-  }
-  return readdirSync(root, { withFileTypes: true })
-    .filter((entry) => entry.isDirectory())
-    .map((entry) => {
-      const experimentId = entry.name;
-      const experimentYaml = join(root, experimentId, "experiment.yaml");
-      let name = experimentId;
-      let casebookId = "unknown";
-      if (pathExists(experimentYaml)) {
-        try {
-          const parsed = parseYaml(readUtf8(experimentYaml)) as {
-            experiment?: { name?: string; casebookId?: string };
-          };
-          name = parsed.experiment?.name ?? name;
-          casebookId = parsed.experiment?.casebookId ?? casebookId;
-        } catch {
-          // ignore
-        }
-      }
-      const runsDir = join(root, experimentId, "runs");
-      let latestRun: Record<string, unknown> | null = null;
-      if (pathExists(runsDir)) {
-        const runs = readdirSync(runsDir)
-          .filter((file) => file.endsWith(".json"))
-          .sort((a, b) => a.localeCompare(b));
-        if (runs.length > 0) {
-          try {
-            latestRun = JSON.parse(readUtf8(join(runsDir, runs[runs.length - 1]!))) as Record<string, unknown>;
-          } catch {
-            latestRun = null;
-          }
-        }
-      }
-      return {
-        experimentId,
-        name,
-        casebookId,
-        latestRun
-      };
-    })
-    .sort((a, b) => a.experimentId.localeCompare(b.experimentId));
+  // Reads go through the experiment store: only real experiments, and only a verified latest run.
+  return experimentListCli({ workspace, agentId }).map((row) => {
+    let latestRun: Record<string, unknown> | null = null;
+    let latestRunProblem: string | null = null;
+    try {
+      latestRun = experimentLatestRunCli({ workspace, agentId, experimentId: row.experimentId }) as unknown as Record<string, unknown> | null;
+    } catch (error) {
+      latestRunProblem = error instanceof Error ? error.message : String(error);
+    }
+    return { experimentId: row.experimentId, name: row.name, casebookId: row.casebookId, latestRun, latestRunProblem };
+  });
 }
 
 function parseComplianceFramework(raw: string | null): ComplianceFramework | null {
@@ -7692,15 +7663,13 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         }
         const agentId = resolveAgentId(options.workspace, url.searchParams.get("agentId") ?? "default");
         const limit = Math.max(1, Number(url.searchParams.get("limit") ?? "10") || 10);
-        json(res, 200, {
+        const listed = experimentOptimizerListCli({
+          workspace: options.workspace,
           agentId,
-          rows: experimentOptimizerListCli({
-            workspace: options.workspace,
-            agentId,
-            limit,
-            redacted: true
-          })
+          limit,
+          redacted: true
         });
+        json(res, 200, { agentId, rows: listed.runs, problems: listed.problems });
         return;
       }
 
@@ -7810,13 +7779,18 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (!requireRouteRoles(["OWNER", "OPERATOR"])) return;
         const experimentId = decodeURIComponent(experimentRunMatch[1] ?? "");
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
-        const parsed = body ? (JSON.parse(body) as { agentId?: string; mode?: "supervise" | "sandbox"; candidateWindow?: string; candidateAgentId?: string }) : {};
+        const parsed = (body ? JSON.parse(body) : {}) as { agentId?: unknown; mode?: unknown; candidateWindow?: unknown; candidateAgentId?: unknown } | null;
+        if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) { json(res, 400, { error: "request body must be a JSON object" }); return; }
+        if (parsed.agentId !== undefined && typeof parsed.agentId !== "string") { json(res, 400, { error: "agentId must be a string" }); return; }
         if (typeof parsed.candidateWindow !== "string" || !parsed.candidateWindow.trim()) { json(res, 400, { error: "candidateWindow is required" }); return; }
         if (parsed.candidateAgentId !== undefined && (typeof parsed.candidateAgentId !== "string" || !parsed.candidateAgentId.trim())) { json(res, 400, { error: "candidateAgentId must be a non-empty string" }); return; }
+        // The runner validates mode, window and candidate agent before any casebook work and throws ExperimentInputError.
         const out = await experimentRunCliAsync({ workspace: options.workspace, agentId: resolveAgentId(options.workspace, parsed.agentId ?? "default"),
-          experimentId, mode: parsed.mode ?? "sandbox", candidateWindow: parsed.candidateWindow, candidateAgentId: parsed.candidateAgentId
+          experimentId, mode: (parsed.mode ?? "sandbox") as "supervise" | "sandbox", candidateWindow: parsed.candidateWindow, candidateAgentId: parsed.candidateAgentId
         }, { beforePublish: signingAuthority(["OWNER", "OPERATOR"]) }).catch(error => {
-          if (res.headersSent || respondReportSigningError(error, (status, result) => json(res, status, result))) return null; throw error;
+          if (res.headersSent) return null;
+          if (error instanceof ExperimentInputError) { json(res, 400, { error: error.message, code: error.code }); return null; }
+          if (respondReportSigningError(error, (status, result) => json(res, status, result))) return null; throw error;
         });
         if (out) json(res, 200, out);
         return;

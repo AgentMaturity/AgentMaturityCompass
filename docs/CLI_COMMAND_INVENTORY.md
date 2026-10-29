@@ -459,7 +459,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc experiment` | Deterministic baseline vs candidate experiments | - | - |
 | `amc experiment analyze` | Analyze latest experiment run | `--experiment <id>`<br>`--out <path>`<br>`--agent <agentId>` | - |
 | `amc experiment create` | Create an experiment | `--name <name>`<br>`--casebook <id>`<br>`--agent <agentId>` | - |
-| `amc experiment gate` | Evaluate latest experiment run against gate policy | `--experiment <id>`<br>`--policy <path>`<br>`--agent <agentId>` | - |
+| `amc experiment gate` | Evaluate latest experiment run against gate policy (exit 0 pass, 1 fail or error, 3 inconclusive) | `--experiment <id>`<br>`--policy <path>`<br>`--agent <agentId>` | - |
 | `amc experiment gate-template` | Write an experiment gate policy template | `--out <path>`<br>`--preset <preset>` | - |
 | `amc experiment list` | List experiments | `--agent <agentId>` | - |
 | `amc experiment optimize` | Create governed optimizer candidates from a Fixer RCA report | `--rca <selector>`<br>`--agent <agentId>`<br>`--json` | - |
