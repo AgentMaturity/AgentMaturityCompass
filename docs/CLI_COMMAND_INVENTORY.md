@@ -764,7 +764,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc mirofish stress` | Find governance breaking points for a scenario | `--seed <n>` | - |
 | `amc mode` | Switch CLI role mode | - | - |
 | `amc mode agent` | Switch to agent mode (read-only / self-check commands) | - | - |
-| `amc mode owner` | Switch to owner mode (configuration + signing allowed) | - | - |
+| `amc mode owner` | Switch to owner mode (configuration + signing allowed); from agent mode asks for the vault passphrase | - | - |
 | `amc monitor` | Continuous production monitoring — real-time scoring, drift detection, and alerting | `--runtime <name>`<br>`--stdin` | - |
 | `amc monitor check` | One-shot trust drift analysis (check for degradation without running continuously) | `--agent <agentId>`<br>`--alert-threshold <n>` | - |
 | `amc monitor events` | Show recent monitoring events | `--limit <n>`<br>`--json` | - |

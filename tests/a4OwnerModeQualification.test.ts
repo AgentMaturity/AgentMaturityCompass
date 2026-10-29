@@ -107,7 +107,7 @@ describe("P0-54 actual owner-mode helper contracts", () => {
       setMode(workspace, mode);
       const file = join(workspace, ".amc", "mode.json"), value = JSON.parse(readFileSync(file, "utf8")) as { mode: unknown; updatedTs: unknown };
       expect(value.mode).toBe(mode); expect(Number.isInteger(value.updatedTs)).toBe(true);
-      expect(lstatSync(file).mode & 0o777).toBe(0o644);
+      expect(lstatSync(file).mode & 0o777).toBe(0o600); // DXA-49: was 0o644
       expect(getMode(workspace)).toBe(mode);
     }
   });
@@ -128,10 +128,11 @@ describe("P0-54 actual owner-mode helper contracts", () => {
     expect(snapshot(workspace)).toEqual(before);
   });
 
-  test.each(["not JSON", "null", '{"mode":"unknown"}'])("preserves the existing owner fallback for mode bytes %j", bytes => {
+  // DXA-49: a mode file that exists but is not a known mode fails closed to agent (it used to fall back to owner).
+  test.each(["not JSON", "null", '{"mode":"unknown"}'])("fails closed to agent for mode bytes %j", bytes => {
     const workspace = fixture(); writeFileSync(join(workspace, ".amc", "mode.json"), bytes);
     const before = snapshot(workspace);
-    expect(getMode(workspace)).toBe("owner"); expect(() => assertOwnerMode(workspace, "a4 approve")).not.toThrow();
+    expect(getMode(workspace)).toBe("agent"); expect(() => assertOwnerMode(workspace, "a4 approve")).toThrow("blocked in agent mode");
     expect(snapshot(workspace)).toEqual(before);
   });
 });

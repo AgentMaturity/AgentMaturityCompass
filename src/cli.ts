@@ -287,9 +287,9 @@ import { buildDashboard } from "./dashboard/build.js";
 import { serveDashboard } from "./dashboard/serve.js";
 import { assignOwnership, createCommitmentPlan, learnQuestion } from "./eoc/flows.js";
 import inquirer from "inquirer";
-import { assertOwnerMode, getMode, setMode, type AMCMode } from "./mode/mode.js";
+import { assertOwnerMode, getMode, leaveAgentMode, setMode, type AMCMode } from "./mode/mode.js";
 import { writeRuntimeFirewallPolicyAsync, migrateRuntimeFirewallPolicySignatureAsync } from "./runtime/firewallPolicyAsync.js";
-import { initVaultInteractive, lockVaultNow, unlockVaultInteractive, vaultStatusNow } from "./vault/vaultCli.js";
+import { initVaultInteractive, lockVaultNow, promptPassphrase, unlockVaultInteractive, vaultStatusNow } from "./vault/vaultCli.js";
 import { forgetVaultPassphrase } from "./vault/passphraseStore.js";
 import { ensureUpVaultPassphrase, runFirstBaselineIfNeeded } from "./studio/oneCommandUp.js";
 import { agentRunFiles, latestRunSummary } from "./diagnostic/runReportResolution.js";
@@ -11911,9 +11911,9 @@ trust
 
 mode
   .command("owner")
-  .description("Switch to owner mode (configuration + signing allowed)")
-  .action(() => {
-    setMode(process.cwd(), "owner");
+  .description("Switch to owner mode (configuration + signing allowed); from agent mode asks for the vault passphrase")
+  .action(async () => {
+    await leaveAgentMode(process.cwd(), getMode(process.cwd()) === "agent" ? await promptPassphrase("Vault passphrase to leave agent mode:") : ""); // DXA-49: prompted, never from env
     console.log(chalk.green("Mode set to owner"));
   });
 

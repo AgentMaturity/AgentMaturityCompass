@@ -29,6 +29,7 @@ import {
   type RecordedToolCall
 } from "./toolTypes.js";
 import { killSwitchDenial } from "../runtime/killSwitch.js";
+import { activeFreezeStatus } from "../drift/freezeEngine.js";
 
 /**
  * The tool execution pipeline (P4.1, ADR-4).
@@ -458,7 +459,9 @@ export class ToolPipeline {
     const binding = this.bindingDenial(authorization);
     if (binding !== null) return binding.reason;
     const { bound, context } = authorization;
-    if (bound === null || context === null || !bound.ok) return null;
+    // AXR-03: an unbound class (a read or low-impact write) meets the freezes here; the recheck covers bound ones.
+    if (bound === null) return unboundFreezeDenial(execution);
+    if (context === null || !bound.ok) return null;
     const recheck = recheckAuthorization(bound.record, execution, context);
     return recheck.ok ? null : recheck.failures.join(", ");
   }
@@ -673,5 +676,16 @@ export class ToolPipeline {
       reason: answer === "deny" ? "approval denied" : "approval unavailable",
       guardLabel: null
     });
+  }
+}
+
+/** A drift or integrity freeze holding this call's class, as ToolHub refuses it. A freeze that cannot be read denies. */
+function unboundFreezeDenial(execution: ToolExecution): string | null {
+  try {
+    const freeze = activeFreezeStatus(execution.workspace, execution.agentId);
+    return freeze.active && (freeze.actionClasses as readonly string[]).includes(execution.actionClass)
+      ? `action_class_frozen: incidents ${freeze.incidentIds.join(", ")}` : null;
+  } catch (error) {
+    return `action_class_frozen: the freeze state could not be read: ${String(error)}`;
   }
 }
