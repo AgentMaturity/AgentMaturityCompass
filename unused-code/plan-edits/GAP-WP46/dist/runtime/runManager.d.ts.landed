@@ -1,0 +1,207 @@
+export type RuntimeRunSource = "cli" | "studio" | "api" | "gateway" | "bridge" | "sdk" | "watch" | "fleet" | "firewall";
+export type RuntimeRunSeverity = "info" | "low" | "medium" | "high" | "critical";
+export type RuntimeRunStatus = "running" | "degraded" | "canceled" | "completed";
+export type RuntimeRunEventType = "run.started" | "stage.changed" | "trace.received" | "score.updated" | "policy.decision" | "alert.raised" | "receipt.written" | "candidate.proposed" | "commit.applied" | "rollback.applied" | "run.resumed" | "run.degraded" | "run.canceled" | "run.completed";
+export interface RuntimeRunEventLinks {
+    receiptId: string | null;
+    decisionId: string | null;
+    policyDecisionId: string | null;
+    traceId: string | null;
+    candidateId: string | null;
+    commitId: string | null;
+    rollbackId: string | null;
+}
+export interface RuntimeRunEvent {
+    schemaVersion: "2026-05-22";
+    eventId: string;
+    runId: string;
+    agentId: string;
+    episodeId: string | null;
+    lifecycleRunId: string | null;
+    source: RuntimeRunSource;
+    type: RuntimeRunEventType;
+    stage: string | null;
+    severity: RuntimeRunSeverity;
+    createdAt: string;
+    message: string;
+    payloadRef: string | null;
+    payloadSha256: string | null;
+    payloadPreview: string | null;
+    redacted: boolean;
+    links: RuntimeRunEventLinks;
+    eventPath: string | null;
+    signaturePath: string | null;
+}
+export interface RuntimeManagedRun {
+    schemaVersion: "2026-05-22";
+    runId: string;
+    agentId: string;
+    episodeId: string | null;
+    lifecycleRunId: string | null;
+    source: RuntimeRunSource;
+    status: RuntimeRunStatus;
+    currentStage: string;
+    severity: RuntimeRunSeverity;
+    createdAt: string;
+    updatedAt: string;
+    startedAt: string;
+    resumedAt: string | null;
+    completedAt: string | null;
+    canceledAt: string | null;
+    degradedAt: string | null;
+    cancelReason: string | null;
+    degradedReason: string | null;
+    completionReason: string | null;
+    eventCount: number;
+    alertCount: number;
+    policyDecisionCount: number;
+    receiptCount: number;
+    candidateCount: number;
+    redactedEventCount: number;
+    lastEventId: string | null;
+    lastEventAt: string | null;
+    resumeToken: string;
+    statePath: string | null;
+    signaturePath: string | null;
+    eventsDir: string | null;
+}
+export interface RuntimeRunLifecycleSummary {
+    runId: string;
+    agentId: string;
+    status: RuntimeRunStatus;
+    currentStage: string;
+    eventCount: number;
+    alertCount: number;
+    policyDecisionCount: number;
+    receiptCount: number;
+    latestEventAt: string | null;
+    path: string;
+}
+export interface RuntimeRunInspection {
+    run: RuntimeManagedRun;
+    events: RuntimeRunEvent[];
+}
+export interface RuntimeRunWriteResult {
+    run: RuntimeManagedRun;
+    event: RuntimeRunEvent;
+    statePath: string;
+    eventPath: string;
+    signaturePath: string | null;
+}
+export interface RuntimeRunExportResult {
+    outputPath: string;
+    format: "json" | "jsonl";
+    redacted: boolean;
+    count: number;
+}
+export interface RuntimeRunAppendInput {
+    workspace: string;
+    runId: string;
+    agentId?: string | null;
+    episodeId?: string | null;
+    lifecycleRunId?: string | null;
+    source: RuntimeRunSource;
+    type: RuntimeRunEventType;
+    stage?: string | null;
+    severity?: RuntimeRunSeverity;
+    message?: string;
+    payload?: unknown;
+    payloadRef?: string | null;
+    links?: Partial<RuntimeRunEventLinks>;
+    createIfMissing?: boolean;
+}
+export declare function runtimeRunStatePath(workspace: string, agentId: string, runId: string): string;
+export declare function runtimeRunEventsDir(workspace: string, agentId: string, runId: string): string;
+export declare function createRuntimeRun(input: {
+    workspace: string;
+    agentId?: string | null;
+    runId?: string;
+    episodeId?: string | null;
+    lifecycleRunId?: string | null;
+    source?: RuntimeRunSource;
+    stage?: string;
+    message?: string;
+}): RuntimeRunWriteResult;
+export declare function loadRuntimeRun(input: {
+    workspace: string;
+    runId: string;
+    agentId?: string | null;
+}): RuntimeManagedRun;
+export declare function listRuntimeRuns(input: {
+    workspace: string;
+    agentId?: string | null;
+    limit?: number;
+    redacted?: boolean;
+}): RuntimeManagedRun[];
+export declare function listRuntimeRunEvents(input: {
+    workspace: string;
+    runId: string;
+    agentId?: string | null;
+    limit?: number;
+    stage?: string | null;
+    receiptId?: string | null;
+    redacted?: boolean;
+}): RuntimeRunEvent[];
+export declare function appendRuntimeRunEvent(input: RuntimeRunAppendInput): RuntimeRunWriteResult;
+export declare function resumeRuntimeRun(input: {
+    workspace: string;
+    runId: string;
+    agentId?: string | null;
+    source?: RuntimeRunSource;
+    stage?: string;
+    message?: string;
+}): RuntimeRunWriteResult;
+export declare function cancelRuntimeRun(input: {
+    workspace: string;
+    runId: string;
+    agentId?: string | null;
+    source?: RuntimeRunSource;
+    reason?: string;
+}): RuntimeRunWriteResult;
+export declare function markRuntimeRunDegraded(input: {
+    workspace: string;
+    runId: string;
+    agentId?: string | null;
+    source?: RuntimeRunSource;
+    reason?: string;
+}): RuntimeRunWriteResult;
+export declare function completeRuntimeRun(input: {
+    workspace: string;
+    runId: string;
+    agentId?: string | null;
+    source?: RuntimeRunSource;
+    reason?: string;
+}): RuntimeRunWriteResult;
+export declare function inspectRuntimeRun(input: {
+    workspace: string;
+    runId: string;
+    agentId?: string | null;
+    includeEvents?: boolean;
+    limit?: number;
+    redacted?: boolean;
+}): RuntimeRunInspection;
+export declare function exportRuntimeRunEvents(input: {
+    workspace: string;
+    runId: string;
+    agentId?: string | null;
+    outputPath: string;
+    format?: "json" | "jsonl";
+    redacted?: boolean;
+    limit?: number;
+    stage?: string | null;
+    receiptId?: string | null;
+}): RuntimeRunExportResult;
+export declare function runtimeRunSummaryForLifecycle(input: {
+    workspace: string;
+    agentId?: string | null;
+    runId: string;
+}): RuntimeRunLifecycleSummary[];
+export declare function runtimeRunStatus(workspace: string, agentId?: string | null): {
+    agentId: string;
+    total: number;
+    running: number;
+    degraded: number;
+    canceled: number;
+    completed: number;
+    latest: RuntimeManagedRun | null;
+};
