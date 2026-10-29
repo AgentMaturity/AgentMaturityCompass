@@ -294,7 +294,7 @@ Use the shortest lifetime that works (5 to 60 minutes). When the session expires
 
 **Never give the MCP server `AMC_VAULT_PASSPHRASE` or `AMC_VAULT_PASSPHRASE_FILE`.** The passphrase, or the file holding it, opens the vault, which holds the auditor key that signs users.yaml. Anything in the MCP config's `env`, or in the shell that starts the agent host, is readable by the agent host, which could then add itself as an `OWNER`, log in and decide gates. The MCP server never signs an A4 record, so it never needs the vault: while either variable is set in its environment, every A4 tool refuses with 403 `A4_SIGNING_KEY_IN_AGENT_HOST`. Only Studio's process needs the vault.
 
-A refused call reads `<tool> refused (<status>): <CODE>: <message>` and carries `{ status, code }` as `structuredContent`, so a client can key on codes such as `A4_SESSION_REQUIRED`, `A4_SESSION_TOO_PRIVILEGED`, `A4_NOT_A_MEMBER` and `NATIVE_READ_ONLY`. A stored A4 record that no longer parses is 409 `A4_INTEGRITY_FAILED`, as the API reports it, and an unexpected failure is 500 `A4_INTERNAL` without its raw message.
+A refused call reads `<tool> refused (<status>): <CODE>: <message>` and carries `{ status, code }` as `structuredContent`, so a client can key on codes such as `A4_SESSION_REQUIRED`, `A4_SESSION_TOO_PRIVILEGED`, `A4_NOT_A_MEMBER` and `NATIVE_READ_ONLY`. A stored A4 record that no longer parses is 409 `A4_INTEGRITY_FAILED` with a fixed message (never its parse issue), as the API reports it, and an unexpected failure is 500 `A4_INTERNAL` without its raw message.
 
 ---
 

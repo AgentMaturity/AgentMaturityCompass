@@ -20,7 +20,12 @@ them, confirmed by a person), **explained** (choices at the reader's level), **p
 specification), **direction approved** (the direction gate), **built**, **reviewed**, and **completion approved** (the
 completion gate, which moves the project to the next stage). A change of specification is a new revision; any open
 gate on the old one goes stale. An owner can hold, resume, reopen an earlier stage, tune a released agent or retire the
-project; each is a transition in the chain.
+project; each is a transition in the chain. While a project is held, every write but comments, members, `RESUME` and
+a rollback is refused with `409 A4_ON_HOLD` naming `ON_HOLD`, a second hold included; under an incident freeze the
+code is `409 FREEZE_ACTIVE`. When a project's records fail verification it reads BLOCKED: every route that loads it,
+readiness included, answers `409 A4_INTEGRITY_FAILED` with `detail: { status: "BLOCKED", reasonCodes:
+["A4_INTEGRITY_FAILED"] }` and names no row, because no readiness is evaluated over those records and the member rows
+that decide who may read the project can be among what failed. Only `GET …/verify` reports the problems.
 
 ## Glossary
 
@@ -880,7 +885,9 @@ residency or retention.
 
 - **Verify in place.** `GET /api/v1/a4/projects/:id/verify` returns a `VerifierReportV1` under the server operator's
   trust list. It takes no query parameter and no body: `?trustList=` is 400 `QUERY_INVALID`, and any trust a request
-  names is refused. The report is the same for every reader allowed to see it. `amc verify all` runs the same check
+  names is refused. The report is the same for every reader allowed to see it: a workspace OWNER or AUDITOR, the admin
+  token, or a member proven by member rows that verify. When the member rows themselves fail, any other reader gets
+  `409 A4_INTEGRITY_FAILED` with the fixed BLOCKED detail. `amc verify all` runs the same check
   (`a4-projects`) for every project.
 - **Export.** With `AMC_A4_PREVIEW=1`, `amc bundle export` adds each A4 project of the run's agent to the `.amcbundle`
   as an `amc.a4-record/v1` file, `a4/<projectId>.json`: the project rows as stored and the ledger rows they name.

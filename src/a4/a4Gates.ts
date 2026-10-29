@@ -288,7 +288,7 @@ export function livePrincipal(store: A4Store, call: A4Call): A4Principal {
   return { ...call.principal, roles };
 }
 
-/** 403 for who-may-act refusals, 409 for everything readiness says is not ready, naming the items. `ignore` drops codes a caller has settled. */
+/** 403 for who-may-act refusals, 409 for everything readiness says is not ready, naming the items (A4_ON_HOLD on a held project, design §17). `ignore` drops codes a caller has settled. */
 export function assertAllowed(readiness: A4ReadinessV1, action: A4Action, ignore: readonly string[] = []): void {
   const codes = (readiness.allowed[action]?.reasonCodes ?? ["UNKNOWN_ACTION"]).filter((code) => !ignore.includes(code));
   if (codes.length === 0) return;
@@ -299,9 +299,11 @@ export function assertAllowed(readiness: A4ReadinessV1, action: A4Action, ignore
     throw fail(403, code, `refused: ${codes.join(", ")}`, codes);
   }
   if (codes.includes("FREEZE_ACTIVE")) throw fail(409, "FREEZE_ACTIVE", "An incident freeze is active for this agent.", codes);
+  const named = { reasonCodes: codes, items: readiness.items.filter((entry) => codes.includes(entry.id)) };
+  if (codes.includes("ON_HOLD")) throw fail(409, "A4_ON_HOLD", "The project is on hold; an owner resumes it.", named);
   if (codes.includes("A4_STEP_ORDER")) throw fail(409, "A4_STEP_ORDER", "The project is not at that stage; reload it.", { reasonCodes: codes });
   if (codes.includes("PRINCIPAL_UNRESOLVED")) throw fail(409, "PRINCIPAL_UNRESOLVED", "The active plan requires a principal: an active local users.yaml user runs this effect. Nothing was consumed.", { reasonCodes: codes });
-  throw fail(409, "A4_NOT_READY", `not ready: ${codes.join(", ")}`, { reasonCodes: codes, items: readiness.items.filter((entry) => codes.includes(entry.id)) });
+  throw fail(409, "A4_NOT_READY", `not ready: ${codes.join(", ")}`, named);
 }
 
 /**

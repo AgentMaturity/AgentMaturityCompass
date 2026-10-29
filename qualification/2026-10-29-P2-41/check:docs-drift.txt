@@ -1,0 +1,1 @@
+Docs drift check passed (342 files scanned; truth claims and commands checked in 264 public files; 5 logged exceptions).

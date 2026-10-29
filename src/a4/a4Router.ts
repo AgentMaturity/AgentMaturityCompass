@@ -237,19 +237,25 @@ export function precheck(route: A4Route, projectId: string, action: A4Action, ex
   return state;
 }
 
+/**
+ * Every A4 integrity failure's detail (design §17: the project reads BLOCKED). The problems name failed rows, member
+ * principal keys included, and are answered before membership is decided, so they reach only `GET …/verify`.
+ */
+const A4_INTEGRITY_VERDICT = { status: "BLOCKED", reasonCodes: ["A4_INTEGRITY_FAILED"] } as const;
+/** A stored row or record that does not parse; its parse issue can quote the stored value, so it is never answered. */
+export const A4_UNPARSED_RECORD = "A stored A4 record does not parse.";
+
 /** Every A4 route error as the API answers it; an egress refusal (nothing was sent) is a definite 403 by name, never A4_INTERNAL. */
 export function sendA4Error(res: ServerResponse, error: unknown, projectId: string | null): void {
   if (isRequestBodyError(error)) return apiError(res, error.statusCode, error.message);
   const send = (status: number, code: string, message: string, extra: Record<string, unknown> = {}): void => {
     if (res.headersSent) return;
+    const detail = code === "A4_INTEGRITY_FAILED" ? { detail: A4_INTEGRITY_VERDICT } : extra;
     res.writeHead(status, { "Content-Type": "application/json", "cache-control": "no-store" });
-    res.end(JSON.stringify({ ok: false, error: message, code, ...extra }));
+    res.end(JSON.stringify({ ok: false, error: message, code, ...detail }));
   };
-  if (error instanceof ZodError) {
-    // Client input is parsed through parseInput (400); a ZodError here is a stored row or record that does not parse.
-    const issue = error.issues[0];
-    return send(409, "A4_INTEGRITY_FAILED", `A stored A4 record does not parse${issue ? ` (${issue.path.join(".") || "row"}: ${issue.message})` : ""}.`);
-  }
+  // Client input is parsed through parseInput (400); a ZodError here is a stored row or record that does not parse.
+  if (error instanceof ZodError) return send(409, "A4_INTEGRITY_FAILED", A4_UNPARSED_RECORD);
   if (isEgressRefusal(error)) return send(403, error instanceof EgressBlocked ? "AMC_RESIDENCY_EGRESS_BLOCKED" : error.code, error.message);
   if (error instanceof A4TransitionPublicationError) return send(error.status, error.code, error.message, { detail: error.detail });
   if (error instanceof A4StoreError) {
@@ -684,8 +690,8 @@ function projectRead(route: A4Route, projectId: string, rest: string): boolean {
 /**
  * GET …/verify, before any verified snapshot: it exists to show a failing chain. No query parameters at all (trust
  * comes from the server operator's trust list only; `?trustList=` is 400). Workspace OWNERs, AUDITORs and the admin
- * token read every project; anyone else proves membership through the verified chain, so a chain that fails to verify
- * is 403 for them rather than a report hidden from privileged readers.
+ * token read every project; anyone else proves membership through the verified member rows, so member rows that fail
+ * to verify refuse them with the integrity verdict rather than hide the report from privileged readers.
  */
 function verifyRead(route: A4Route, projectId: string): true {
   const { store, principal } = route;
@@ -707,7 +713,7 @@ function verifyRead(route: A4Route, projectId: string): true {
     try {
       members = store.membersOf(projectId);
     } catch {
-      throw a4Fail(403, "A4_NOT_A_MEMBER", "Membership cannot be read from a chain that fails verification; a workspace OWNER or AUDITOR can read the report.");
+      throw a4Fail(409, "A4_INTEGRITY_FAILED", "Membership cannot be read from records that fail verification; a workspace OWNER or AUDITOR can read the report.");
     }
     assertVisible(route, members);
   }

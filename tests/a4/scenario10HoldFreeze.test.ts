@@ -1,6 +1,6 @@
 /**
- * P2-35 · design §17 "Hold / freeze / kill switch". Reason codes: ON_HOLD (409 A4_NOT_READY naming it; the design names
- * `A4_ON_HOLD`, which the HTTP routes never answer, see the DEBT.md follow-up), NOT_ON_HOLD, `hold.none` WAITING.
+ * P2-35 · design §17 "Hold / freeze / kill switch". Reason codes: ON_HOLD (409 A4_ON_HOLD naming it, a second hold
+ * included, since P2-41), NOT_ON_HOLD (409 A4_NOT_READY), `hold.none` WAITING.
  * Every mutation but comments, members and RESUME is refused while held; resume needs an owner.
  */
 import { afterEach, describe, expect, test, vi } from "vitest";
@@ -24,11 +24,11 @@ describe("scenario: hold", () => {
     expect(items.find((entry) => entry.id === "hold.none")).toMatchObject({ status: "WAITING", reasonCodes: ["ON_HOLD"] });
 
     const answer = await p.post(alice, "/stages/aspire/answers", { answers: aspireAnswers() });
-    expect(refusal(answer)).toEqual([409, "A4_NOT_READY"]);
+    expect(refusal(answer)).toEqual([409, "A4_ON_HOLD"]);
     expect(answer.body.detail).toMatchObject({ reasonCodes: ["ON_HOLD"] });
-    expect(refusal(await p.post(alice, "/stages/aspire/gates/direction/request"))[0]).toBe(409);
+    expect(refusal(await p.post(alice, "/stages/aspire/gates/direction/request"))).toEqual([409, "A4_ON_HOLD"]);
     const again = await p.post(alice, "/hold", { reason: "again" });
-    expect(refusal(again)).toEqual([409, "A4_NOT_READY"]);
+    expect(refusal(again)).toEqual([409, "A4_ON_HOLD"]);
     expect(again.body.detail).toMatchObject({ reasonCodes: ["ON_HOLD"] });
 
     expect((await p.post(bob, "/comments", { body: "noted", cardId: "aspire.brief", expectedHeadSeq: undefined })).status).toBe(201);

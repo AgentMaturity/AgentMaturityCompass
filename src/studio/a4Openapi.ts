@@ -43,7 +43,7 @@ function operation(summary: string, response: string, options: { write?: boolean
       "401": json("No authenticated Studio session (A4 routes are served only through native Studio admission).", ref("A4Error")),
       "403": json("DEMO_REFUSED, ADMIN_TOKEN_REFUSED (the admin token reads only), NATIVE_READ_ONLY, role class or project membership refused.", ref("A4Error")),
       "404": json("A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.", ref("A4Error")),
-      "409": json("A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items, RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.", ref("A4Error")),
+      "409": json("A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items, RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status: BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems).", ref("A4Error")),
       "423": json("A4_VAULT_LOCKED: unlock the vault to record this.", ref("A4Error")),
       "500": json("The outcome is uncertain; reload the project before retrying.", ref("A4Error"))
     }
