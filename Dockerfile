@@ -22,6 +22,14 @@ RUN pnpm install --frozen-lockfile
 COPY src/ src/
 COPY api/ api/
 COPY fixtures/policy/ fixtures/policy/
+# Build inputs read by scripts/copy-build-assets.mjs: the adapter claim manifests and the receipts they name.
+COPY docs/adapters/manifests/ docs/adapters/manifests/
+COPY qualification/2026-10-18-P1-22/pi-conformance.json qualification/2026-10-18-P1-22/receipt.json qualification/2026-10-18-P1-22/
+COPY qualification/2026-10-18-P1-23/claude-code-conformance.json qualification/2026-10-18-P1-23/receipt.json qualification/2026-10-18-P1-23/
+# Non-dist entries of package.json "files": npm pack silently omits any that are not in the context.
+COPY catalog/ catalog/
+COPY deploy/apparmor/ deploy/apparmor/
+COPY docs/NATIVE_SANDBOX_UBUNTU.md docs/
 RUN pnpm run build
 # The separate release/prepack gate is NOT exercised by this source image build.
 # This packs the actual publish file set, including bundled kernel + notices.
@@ -53,7 +61,8 @@ RUN ln -s /opt/amc/node_modules/.bin/amc /usr/local/bin/amc \
     && groupadd --gid 10001 amc \
     && useradd --uid 10001 --gid 10001 --create-home --shell /bin/bash amc \
     && mkdir -p /workspace /data/amc /data/notary /home/amc/.config/amc/state \
-    && chown -R 10001:10001 /workspace /data/amc /data/notary /home/amc
+    && chown -R 10001:10001 /workspace /data/amc /data/notary /home/amc \
+    && chmod 0700 /home/amc/.config/amc /home/amc/.config/amc/state
 ENV NODE_ENV=production HOME=/home/amc
 USER 10001:10001
 WORKDIR /workspace
