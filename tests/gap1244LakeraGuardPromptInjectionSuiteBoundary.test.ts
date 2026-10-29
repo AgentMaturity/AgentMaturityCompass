@@ -53,7 +53,7 @@ describe("GAP-1244 Lakera Guard prompt-injection suite boundary", () => {
     expect(doc).toContain("No Lakera Guard adapter");
   });
 
-  it("reuses generic prompt-injection suite receipts for Lakera Guard context", () => {
+  it("fails closed on unresolved Lakera Guard fixture metadata", () => {
     const receipt = buildPromptInjectionRegressionSuiteReceipt({
       suiteId: "lakera-guard-style-prompt-injection-suite",
       suiteVersion: "2026.06.25",
@@ -123,9 +123,15 @@ describe("GAP-1244 Lakera Guard prompt-injection suite boundary", () => {
       ],
     });
 
-    expect(receipt.status).toBe("pass");
+    expect(receipt.status).toBe("fail_closed");
+    expect(receipt.failClosedReasons).toContain("ledger workspace missing");
     expect(receipt.coverage.presentVectors).toEqual(["direct", "indirect", "multimodal", "retrieved_content"]);
-    expect(verifyPromptInjectionRegressionSuiteReceipt(receipt)).toEqual({ valid: true, failClosedReasons: [] });
+    expect(receipt.rows.every((row) => row.status === "missing_evidence")).toBe(true);
+    expect(verifyPromptInjectionRegressionSuiteReceipt(receipt)).toEqual({
+      valid: false,
+      failClosedReasons: expect.arrayContaining(["ledger workspace missing"]),
+    });
+    expect(renderPromptInjectionRegressionSuiteMarkdown(receipt)).toContain("Status: fail_closed");
     expect(renderPromptInjectionRegressionSuiteMarkdown(receipt)).toContain("lakera-retrieved-content-fixture");
   });
 
