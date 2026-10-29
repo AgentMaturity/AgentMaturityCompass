@@ -4940,6 +4940,7 @@ plugin
       approvalRequestId: opts.approvalRequest
     });
     console.log(chalk.green(`Plugin action executed: ${out.action}`));
+    console.log(`outcome: ${out.outcome}`);
     console.log(`plugin: ${out.pluginId}@${out.version ?? "removed"}`);
     console.log(`installed.lock: ${out.installedLockPath}`);
     console.log(`installed.lock.sig: ${out.installedLockSigPath}`);

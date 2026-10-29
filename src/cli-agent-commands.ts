@@ -1,3 +1,4 @@
+import { showSkillCatalogSelection } from "./cli/skillCatalogOptions.js";
 import { randomUUID } from "node:crypto";
 import { hostname } from "node:os";
 /**
@@ -239,6 +240,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--steer <text>", "send a steering message mid-turn")
     .option("--steer-after <ms>", "when to send --steer (default 0)")
     .option("--persona <text>", "deployment persona assembled into the system prompt")
+    .option("--mission-context", "include the agent's validated mission and constraints as attributed runtime context")
     .option(
       "--approve-tools <actionClass>",
       "require a signed human approval before every tool call, decided under this action class"
@@ -250,7 +252,9 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       "ADR-5 exception note (JSON) that auto-allows the classes it names until it expires"
     )
     .option("--json", "Output as JSON")
+    .option("--list-skills [name]", "list skill discovery, sources and digests; pass a name to inspect its literal body")
     .action(async (promptParts: string[], opts: RunOptions, command: Command) => {
+      if (showSkillCatalogSelection(opts, io)) return;
       const agentId = resolveAgentId(process.cwd(), selectedAgentOption(command));
       let validation: ReturnType<typeof resolveNativeValidationSelection>;
       try { validation = resolveNativeValidationSelection(opts); }
@@ -656,6 +660,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           // CLAUDE.md in as runtime context. A hardcoded string here — what this
           // command sent before P3.3 — was an agent with no idea where it was.
           promptProfile: {
+            ...(opts.missionContext === true ? { missionContext: true } : {}),
             ...((opts.persona ?? preset?.persona) === undefined
               ? {}
               : { persona: (opts.persona ?? preset?.persona) as string }),

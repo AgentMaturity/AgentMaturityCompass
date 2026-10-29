@@ -3,7 +3,7 @@ import { nativeExecutableDeclarationSchema } from "../plugins/nativeExecutableSc
 
 export const NATIVE_EXTENSION_LIMITS = Object.freeze({
   manifestBytes: 65_536, fileBytes: 262_144, totalBytes: 1_048_576,
-  contexts: 16, commands: 32, loaded: 16, argumentBytes: 16_384
+  contexts: 16, commands: 32, loaded: 16, argumentBytes: 16_384, positionalArguments: 32, expansionBytes: 1_048_576
 });
 export const NATIVE_EXTENSION_RESERVED_COMMANDS = Object.freeze([
   "help", "inspect", "verify", "compact", "fork", "exit", "extension", "extensions", "load", "unload"
@@ -14,11 +14,22 @@ const relativePath = z.string().min(1).max(512).refine(value =>
   && value.split("/").every(part => part !== "" && part !== "." && part !== ".."),
 "Use a relative path with no traversal, empty segments or control characters");
 const content = z.object({ path: relativePath, sha256: z.string().regex(/^[a-f0-9]{64}$/) }).strict();
+const argumentDefault = z.string().max(NATIVE_EXTENSION_LIMITS.argumentBytes)
+  .refine(value => !value.includes("\0") && Buffer.byteLength(value) <= NATIVE_EXTENSION_LIMITS.argumentBytes);
+const commandContent = content.extend({
+  template: z.object({
+    version: z.literal(1),
+    positional: z.array(z.object({ default: argumentDefault.optional() }).strict()).min(1).max(NATIVE_EXTENSION_LIMITS.positionalArguments),
+    argumentHint: z.string().min(1).max(256).regex(/^[^\x00-\x1f\x7f]*$/).optional()
+  }).strict().optional()
+}).strict();
+export type NativeExtensionCommand = z.infer<typeof commandContent>;
+
 const declarativeManifest = z.object({
   schemaVersion: z.literal(1),
   id: name,
   contexts: z.array(content.extend({ name })).max(NATIVE_EXTENSION_LIMITS.contexts),
-  commands: z.record(name, content).refine(value => Object.keys(value).length <= NATIVE_EXTENSION_LIMITS.commands)
+  commands: z.record(name, commandContent).refine(value => Object.keys(value).length <= NATIVE_EXTENSION_LIMITS.commands)
 }).strict();
 const executableManifest = declarativeManifest.extend({
   schemaVersion: z.literal(2),

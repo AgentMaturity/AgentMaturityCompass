@@ -7,6 +7,7 @@ import { verifyAuditorSignatureBytes } from "../org/orgSignatureBytes.js";
 import { withControlFileLock } from "../lifecycle/controlFileLock.js";
 import { sha256Hex } from "../utils/hash.js";
 import { NATIVE_EXTENSION_LIMITS, NativeExtensionError, parseNativeExtensionManifest, type NativeExtensionManifest } from "./nativeExtensionManifest.js";
+import { nativeExtensionTemplateVariables } from "./nativeExtensionTemplate.js";
 
 export interface NativeExtensionSnapshot {
   readonly workspace: string;
@@ -98,8 +99,14 @@ export function readNativeExtension(options: {
     for (const entry of [...manifest.contexts, ...Object.values(manifest.commands)]) {
       const path = resolve(root, entry.path);
       if (path === manifestPath || path === `${manifestPath}.sig`) refused("SOURCE_RESERVED", "Manifest and signature files cannot be model context or command templates.");
-      const bytes = readBounded(root, path, NATIVE_EXTENSION_LIMITS.fileBytes);
-      if (sha256Hex(bytes) !== entry.sha256) refused("CONTENT_CHANGED", "An extension content hash differs from its reviewed manifest.");
+      let bytes: Buffer;
+      try { bytes = readBounded(root, path, NATIVE_EXTENSION_LIMITS.fileBytes); }
+      catch (error) {
+        if ((error as NodeJS.ErrnoException).code === "ENOENT")
+          refused("RESOURCE_MISSING", `Declared extension resource ${JSON.stringify(entry.path)} is missing. Restore the reviewed file and inspect again.`);
+        throw error;
+      }
+      if (sha256Hex(bytes) !== entry.sha256) refused("CONTENT_CHANGED", `Declared extension resource ${JSON.stringify(entry.path)} has a content hash different from its reviewed manifest. Review the file and its manifest pin before signing again.`);
       if (!contents.has(entry.path)) totalContentBytes += bytes.length;
       if (totalContentBytes > NATIVE_EXTENSION_LIMITS.totalBytes) refused("CONTENT_LIMIT", "Extension content exceeds the total size limit.");
       let text: string;
@@ -109,10 +116,7 @@ export function readNativeExtension(options: {
       contents.set(entry.path, text);
     }
     for (const command of Object.values(manifest.commands)) {
-      const template = contents.get(command.path)!;
-      if ((template.match(/\{\{args\}\}/g) ?? []).length !== 1 || /\{\{[^{}]*\}\}/.test(template.replace("{{args}}", ""))) {
-        refused("TEMPLATE_INVALID", "Each command template must contain exactly one {{args}} placeholder and no other template substitutions.");
-      }
+      nativeExtensionTemplateVariables(contents.get(command.path)!, command);
     }
     let signatureBytes: Buffer | null = null;
     try { signatureBytes = readBounded(root, `${manifestPath}.sig`, NATIVE_EXTENSION_LIMITS.manifestBytes); }
@@ -133,7 +137,8 @@ export function describeNativeExtension(snapshot: NativeExtensionSnapshot) {
     schemaVersion: snapshot.manifest.schemaVersion, id: snapshot.manifest.id, manifestPath: snapshot.manifestPath,
     manifestDigest: snapshot.manifestDigest, signatureValid: snapshot.signatureValid,
     contexts: snapshot.manifest.contexts.map(entry => ({ ...entry })),
-    commands: Object.entries(snapshot.manifest.commands).map(([name, entry]) => ({ name, ...entry })),
+    commands: Object.entries(snapshot.manifest.commands).map(([name, entry]) => ({ name, ...entry,
+      variables: nativeExtensionTemplateVariables(snapshot.contents.get(entry.path)!, entry) })),
     totalContentBytes: snapshot.totalContentBytes,
     ...(snapshot.manifest.schemaVersion === 2 ? { executable: JSON.parse(JSON.stringify(snapshot.manifest.executable)) as typeof snapshot.manifest.executable } : {}),
     boundary: snapshot.manifest.schemaVersion === 1

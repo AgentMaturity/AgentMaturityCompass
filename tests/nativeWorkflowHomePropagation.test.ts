@@ -1,4 +1,4 @@
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
+import { mkdtempSync, mkdirSync, writeFileSync, rmSync, realpathSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -83,7 +83,7 @@ describe("AMC-1512 native home propagation through the chat composition seam", (
       credentialsFile: file, env: {}, userEnvPath: join(root, "absent-user.env"), ...extra };
   }
   beforeEach(() => {
-    root = mkdtempSync(join(tmpdir(), "amc-native-home-propagation-"));
+    root = realpathSync(mkdtempSync(join(tmpdir(), "amc-native-home-propagation-")));
     workspace = join(root, "workspace");
     home = join(root, "shared home with 'quote'");
     const secrets = join(root, "independent credential store");
