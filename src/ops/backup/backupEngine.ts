@@ -1,4 +1,4 @@
-import { lstatSync, mkdtempSync, readdirSync, readFileSync, renameSync, rmSync, statSync } from "node:fs";
+import { lstatSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync } from "node:fs";
 import YAML from "yaml";
 import { copyFileSync } from "node:fs";
 import { join, dirname, relative, resolve } from "node:path";
@@ -12,6 +12,7 @@ import { loadOpsPolicy, opsPolicyPath, opsPolicySigPath, opsPolicySchema, verify
 import { currentTransparencyMerkleRoot, verifyTransparencyMerkle } from "../../transparency/merkleIndexStore.js";
 import { transparencySealSigPath, verifyTransparencyLog, appendTransparencyEntry, appendTransparencyEntryAsync } from "../../transparency/logChain.js";
 import { verifyLedgerIntegrity } from "../../ledger/ledger.js";
+import { commitRestore } from "./restoreCommit.js";
 import { snapshotSqliteFiles, withoutSqliteSidecars } from "./sqliteSnapshot.js";
 import { backupManifestSchema, backupManifestSigSchema, type BackupManifest, type BackupManifestSig } from "./backupSchema.js";
 import { decryptBackupPayload, encryptBackupPayload, type BackupEncryptionEnvelope } from "./backupCrypto.js";
@@ -778,38 +779,4 @@ async function sealRestore(stage: string, target: string, report: VerifierReport
     artifact: { kind: "policy", id: manifest.backupId, sha256: manifest.payload.payloadSha256 }
   });
   return warnings;
-}
-
-/**
- * Moves the staged workspace into place. A new target is one rename. Over an existing one (--force, the same workspace),
- * each staged top-level entry replaces its namesake, which is kept in `<target>/.amc-pre-restore-*` (returned), never
- * deleted; a failed rename puts back everything already moved.
- */
-function commitRestore(stage: string, target: string, existed: boolean): string | null {
-  if (!existed) {
-    renameSync(stage, target);
-    return null;
-  }
-  let aside: string | null = null;
-  const moved: Array<[from: string, to: string]> = [];
-  try {
-    for (const name of readdirSync(stage)) {
-      const live = join(target, name);
-      if (lstatSync(live, { throwIfNoEntry: false }) !== undefined) {
-        aside ??= mkdtempSync(join(target, ".amc-pre-restore-"));
-        renameSync(live, join(aside, name));
-        moved.push([join(aside, name), live]);
-      }
-      renameSync(join(stage, name), live);
-      moved.push([live, join(stage, name)]);
-    }
-  } catch (error) {
-    try {
-      for (const [from, to] of moved.reverse()) renameSync(from, to);
-    } catch (rollback) {
-      throw new Error(`restore commit failed (${String(error)}) and could not be rolled back (${String(rollback)}); the previous state is in ${aside ?? "place"}`);
-    }
-    throw error;
-  }
-  return aside;
 }

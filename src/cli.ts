@@ -9314,8 +9314,7 @@ withTrustFlags(backup
       pubkeyPath: opts.pubkey,
       trust: trustFromFlags(opts, ["artifact-seal"])
     });
-    console.log(chalk.green(`Backup restored to ${restored.restoredTo}`));
-    if (restored.replacedTo) console.log(`The replaced workspace files are kept in ${restored.replacedTo}`);
+    console.log(chalk.green(`Backup restored to ${restored.restoredTo}`) + (restored.replacedTo ? `\nThe replaced workspace files are kept in ${restored.replacedTo}` : ""));
     if (!restored.trusted) {
       console.log(chalk.yellow("Restore completed with warnings:"));
       for (const warning of restored.warnings) {
