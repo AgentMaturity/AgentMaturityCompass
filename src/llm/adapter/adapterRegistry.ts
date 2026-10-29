@@ -25,6 +25,7 @@
 import type { CredentialRef } from "../../credentials/credentialRef.js";
 import type { ResolvedRetryPolicy, RetryPolicyConfig } from "../retryPolicy.js";
 import { resolveRetryPolicy } from "../retryPolicy.js";
+import { resolveStreamTimeouts, type LlmStreamTimeouts } from "./streamTimeouts.js";
 import type { LlmAdapter } from "./adapterTypes.js";
 import { snapshotCapabilities, type ProviderCapabilities } from "./providerCapabilities.js";
 
@@ -40,7 +41,7 @@ export class LlmRouteError extends Error {
 }
 
 /** One provider, as an operator configures it. */
-export interface LlmRouteConfig {
+export interface LlmRouteConfig extends Partial<LlmStreamTimeouts> {
   /** Stable provider id. Recorded verbatim in every `request/header` row. */
   readonly providerId: string;
   readonly adapter: LlmAdapter;
@@ -88,6 +89,7 @@ export interface PinnedRoute {
   readonly baseUrl: string;
   readonly credentialRef: CredentialRef | null;
   /** Frozen when the route registered, so a policy edit cannot reach this call. */
+  readonly timeouts: LlmStreamTimeouts;
   readonly retryPolicy: ResolvedRetryPolicy;
   readonly headers: Readonly<Record<string, string>>;
   /** Registry generation at pin time. */
@@ -108,6 +110,7 @@ interface Registration {
   readonly registrationId: string;
   readonly config: LlmRouteConfig;
   readonly baseUrl: string;
+  readonly timeouts: LlmStreamTimeouts;
   readonly retryPolicy: ResolvedRetryPolicy;
   readonly headers: Readonly<Record<string, string>>;
 }
@@ -236,6 +239,7 @@ export class AdapterRegistry {
       encoderVersion: adapter.encoderVersion,
       baseUrl: registration.baseUrl,
       credentialRef: registration.config.credentialRef,
+      timeouts: registration.timeouts,
       retryPolicy: registration.retryPolicy,
       headers: registration.headers,
       generation: this.generationCounter
@@ -252,6 +256,10 @@ export class AdapterRegistry {
         `route ${config.providerId} declares an empty model list; use null to serve any model`
       );
     }
+    let timeouts: LlmStreamTimeouts;
+    try { timeouts = resolveStreamTimeouts(config); } catch (error) {
+      throw new LlmRouteError("AMC_LLM_ROUTE_INVALID", `route ${config.providerId}: ${error instanceof Error ? error.message : "invalid stream timeouts"}`);
+    }
     this.registrationCounter += 1;
     this.generationCounter += 1;
     const registrationId = `${config.providerId}#${this.registrationCounter}`;
@@ -263,6 +271,7 @@ export class AdapterRegistry {
       // Resolved and frozen HERE, not at dispatch: an in-flight failure must be
       // judged by the policy in force when its request was sent, not by whatever
       // a later edit put in the registry.
+      timeouts,
       retryPolicy: resolveRetryPolicy(config.retry, `llm.routes.${config.providerId}.retry`),
       headers: normalizeHeaders(config.headers)
     });

@@ -1,0 +1,1034 @@
+{
+  "version": 1,
+  "kind": "synthetic-primary-protocol-shaped-fixtures",
+  "captured": false,
+  "reviewedAt": "2026-10-29",
+  "liveQualification": "not-probed; no credentials, provider calls, account or remote model qualification",
+  "notes": [
+    "Every byte cut uses CRLF wire framing and UTF-8 content.",
+    "Gateway delegates its inner decoder; pi-ai is an optional external stream interface, not a native HTTP decoder.",
+    "Interleaved argument fragments apply to Chat, Messages, DeepSeek and Responses. Gemini and Ollama send complete native call objects.",
+    "Exact adapter and encoder pins are source contracts, never a model support claim."
+  ],
+  "cases": [
+    {
+      "key": "openai-chat",
+      "adapterId": "openai-chat",
+      "adapterVersion": 4,
+      "encoderId": "openai-chat",
+      "encoderVersion": 4,
+      "model": "fixture-model",
+      "modelSupport": "not-probed",
+      "protocol": "Chat Completions SSE",
+      "protocolSources": [
+        "https://platform.openai.com/docs/api-reference/chat/streaming"
+      ],
+      "frames": [
+        {
+          "data": {
+            "choices": [
+              {
+                "index": 0,
+                "delta": {
+                  "content": "Read α🙂"
+                },
+                "finish_reason": null
+              }
+            ]
+          }
+        },
+        {
+          "data": {
+            "choices": [
+              {
+                "index": 0,
+                "delta": {
+                  "tool_calls": [
+                    {
+                      "index": 0,
+                      "id": "call_0",
+                      "type": "function",
+                      "function": {
+                        "name": "read",
+                        "arguments": "{\"pat"
+                      }
+                    },
+                    {
+                      "index": 1,
+                      "id": "call_1",
+                      "type": "function",
+                      "function": {
+                        "name": "count",
+                        "arguments": "{\"n\":"
+                      }
+                    }
+                  ]
+                },
+                "finish_reason": null
+              }
+            ]
+          }
+        },
+        {
+          "data": {
+            "choices": [
+              {
+                "index": 0,
+                "delta": {
+                  "tool_calls": [
+                    {
+                      "index": 1,
+                      "function": {
+                        "arguments": "2}"
+                      }
+                    }
+                  ]
+                },
+                "finish_reason": null
+              }
+            ]
+          }
+        },
+        {
+          "data": {
+            "choices": [
+              {
+                "index": 0,
+                "delta": {
+                  "tool_calls": [
+                    {
+                      "index": 0,
+                      "function": {
+                        "arguments": "h\":\"α🙂.txt\"}"
+                      }
+                    }
+                  ]
+                },
+                "finish_reason": null
+              }
+            ]
+          }
+        },
+        {
+          "data": {
+            "choices": [
+              {
+                "index": 0,
+                "delta": {},
+                "finish_reason": "tool_calls"
+              }
+            ]
+          }
+        },
+        {
+          "data": {
+            "choices": [],
+            "usage": {
+              "prompt_tokens": 12,
+              "completion_tokens": 4,
+              "prompt_tokens_details": {
+                "cached_tokens": 5
+              }
+            }
+          }
+        },
+        {
+          "data": "[DONE]"
+        }
+      ],
+      "errorFrames": [
+        {
+          "data": {
+            "error": {
+              "message": "Fixture unavailable",
+              "type": "server_error"
+            }
+          }
+        }
+      ],
+      "expectedUsage": {
+        "inputTokens": 7,
+        "outputTokens": 4,
+        "cacheReadTokens": 5
+      },
+      "expectedTools": [
+        {
+          "name": "read",
+          "arguments": "{\"path\":\"α🙂.txt\"}"
+        },
+        {
+          "name": "count",
+          "arguments": "{\"n\":2}"
+        }
+      ],
+      "terminalFrames": 3
+    },
+    {
+      "key": "anthropic",
+      "adapterId": "anthropic-messages",
+      "adapterVersion": 4,
+      "encoderId": "anthropic-messages",
+      "encoderVersion": 4,
+      "model": "fixture-model",
+      "modelSupport": "not-probed",
+      "protocol": "Messages SSE; anthropic-version=2023-06-01",
+      "protocolSources": [
+        "https://docs.anthropic.com/en/api/messages-streaming"
+      ],
+      "frames": [
+        {
+          "data": {
+            "type": "message_start",
+            "message": {
+              "usage": {
+                "input_tokens": 7,
+                "cache_read_input_tokens": 5
+              }
+            }
+          },
+          "event": "message_start"
+        },
+        {
+          "data": {
+            "type": "content_block_start",
+            "index": 0,
+            "content_block": {
+              "type": "text",
+              "text": "Read α🙂"
+            }
+          },
+          "event": "content_block_start"
+        },
+        {
+          "data": {
+            "type": "content_block_stop",
+            "index": 0
+          },
+          "event": "content_block_stop"
+        },
+        {
+          "data": {
+            "type": "content_block_start",
+            "index": 1,
+            "content_block": {
+              "type": "tool_use",
+              "id": "call_0",
+              "name": "read",
+              "input": {}
+            }
+          },
+          "event": "content_block_start"
+        },
+        {
+          "data": {
+            "type": "content_block_start",
+            "index": 2,
+            "content_block": {
+              "type": "tool_use",
+              "id": "call_1",
+              "name": "count",
+              "input": {}
+            }
+          },
+          "event": "content_block_start"
+        },
+        {
+          "data": {
+            "type": "content_block_delta",
+            "index": 1,
+            "delta": {
+              "type": "input_json_delta",
+              "partial_json": "{\"pat"
+            }
+          },
+          "event": "content_block_delta"
+        },
+        {
+          "data": {
+            "type": "content_block_delta",
+            "index": 2,
+            "delta": {
+              "type": "input_json_delta",
+              "partial_json": "{\"n\":"
+            }
+          },
+          "event": "content_block_delta"
+        },
+        {
+          "data": {
+            "type": "content_block_delta",
+            "index": 2,
+            "delta": {
+              "type": "input_json_delta",
+              "partial_json": "2}"
+            }
+          },
+          "event": "content_block_delta"
+        },
+        {
+          "data": {
+            "type": "content_block_delta",
+            "index": 1,
+            "delta": {
+              "type": "input_json_delta",
+              "partial_json": "h\":\"α🙂.txt\"}"
+            }
+          },
+          "event": "content_block_delta"
+        },
+        {
+          "data": {
+            "type": "content_block_stop",
+            "index": 1
+          },
+          "event": "content_block_stop"
+        },
+        {
+          "data": {
+            "type": "content_block_stop",
+            "index": 2
+          },
+          "event": "content_block_stop"
+        },
+        {
+          "data": {
+            "type": "message_delta",
+            "delta": {
+              "stop_reason": "tool_use"
+            },
+            "usage": {
+              "output_tokens": 4
+            }
+          },
+          "event": "message_delta"
+        },
+        {
+          "data": {
+            "type": "message_delta",
+            "delta": {},
+            "usage": {
+              "output_tokens": 4
+            }
+          },
+          "event": "message_delta"
+        },
+        {
+          "data": {
+            "type": "message_stop"
+          },
+          "event": "message_stop"
+        }
+      ],
+      "errorFrames": [
+        {
+          "data": {
+            "type": "error",
+            "error": {
+              "type": "overloaded_error",
+              "message": "Fixture unavailable"
+            }
+          },
+          "event": "error"
+        }
+      ],
+      "expectedUsage": {
+        "inputTokens": 7,
+        "outputTokens": 4,
+        "cacheReadTokens": 5
+      },
+      "expectedTools": [
+        {
+          "name": "read",
+          "arguments": "{\"path\":\"α🙂.txt\"}"
+        },
+        {
+          "name": "count",
+          "arguments": "{\"n\":2}"
+        }
+      ],
+      "terminalFrames": 5
+    },
+    {
+      "key": "deepseek",
+      "adapterId": "deepseek-chat",
+      "adapterVersion": 1,
+      "encoderId": "deepseek-chat",
+      "encoderVersion": 1,
+      "model": "fixture-model",
+      "modelSupport": "not-probed",
+      "protocol": "DeepSeek Chat SSE; usage on final single-choice finish frame",
+      "protocolSources": [
+        "https://api-docs.deepseek.com/api/create-chat-completion/"
+      ],
+      "frames": [
+        {
+          "data": {
+            "id": "fixture-response",
+            "model": "fixture-model",
+            "object": "chat.completion.chunk",
+            "choices": [
+              {
+                "index": 0,
+                "delta": {
+                  "content": "Read α🙂"
+                },
+                "finish_reason": null
+              }
+            ]
+          }
+        },
+        {
+          "data": {
+            "id": "fixture-response",
+            "model": "fixture-model",
+            "object": "chat.completion.chunk",
+            "choices": [
+              {
+                "index": 0,
+                "delta": {
+                  "tool_calls": [
+                    {
+                      "index": 0,
+                      "id": "call_0",
+                      "type": "function",
+                      "function": {
+                        "name": "read",
+                        "arguments": "{\"pat"
+                      }
+                    },
+                    {
+                      "index": 1,
+                      "id": "call_1",
+                      "type": "function",
+                      "function": {
+                        "name": "count",
+                        "arguments": "{\"n\":"
+                      }
+                    }
+                  ]
+                },
+                "finish_reason": null
+              }
+            ]
+          }
+        },
+        {
+          "data": {
+            "id": "fixture-response",
+            "model": "fixture-model",
+            "object": "chat.completion.chunk",
+            "choices": [
+              {
+                "index": 0,
+                "delta": {
+                  "tool_calls": [
+                    {
+                      "index": 1,
+                      "function": {
+                        "arguments": "2}"
+                      }
+                    }
+                  ]
+                },
+                "finish_reason": null
+              }
+            ]
+          }
+        },
+        {
+          "data": {
+            "id": "fixture-response",
+            "model": "fixture-model",
+            "object": "chat.completion.chunk",
+            "choices": [
+              {
+                "index": 0,
+                "delta": {
+                  "tool_calls": [
+                    {
+                      "index": 0,
+                      "function": {
+                        "arguments": "h\":\"α🙂.txt\"}"
+                      }
+                    }
+                  ]
+                },
+                "finish_reason": null
+              }
+            ]
+          }
+        },
+        {
+          "data": {
+            "id": "fixture-response",
+            "model": "fixture-model",
+            "object": "chat.completion.chunk",
+            "choices": [
+              {
+                "index": 0,
+                "delta": {},
+                "finish_reason": "tool_calls"
+              }
+            ],
+            "usage": {
+              "prompt_tokens": 12,
+              "completion_tokens": 4,
+              "prompt_cache_hit_tokens": 5,
+              "prompt_cache_miss_tokens": 7,
+              "total_tokens": 16
+            }
+          }
+        },
+        {
+          "data": "[DONE]"
+        }
+      ],
+      "errorFrames": [
+        {
+          "data": {
+            "error": {
+              "message": "Fixture unavailable"
+            }
+          }
+        }
+      ],
+      "expectedUsage": {
+        "inputTokens": 7,
+        "outputTokens": 4,
+        "cacheReadTokens": 5
+      },
+      "expectedTools": [
+        {
+          "name": "read",
+          "arguments": "{\"path\":\"α🙂.txt\"}"
+        },
+        {
+          "name": "count",
+          "arguments": "{\"n\":2}"
+        }
+      ],
+      "terminalFrames": 2,
+      "usageOnlyFramePolicy": "refused; provider does not emit a separate usage-only chunk"
+    },
+    {
+      "key": "openai-responses",
+      "adapterId": "openai-responses",
+      "adapterVersion": 3,
+      "encoderId": "openai-responses",
+      "encoderVersion": 3,
+      "model": "fixture-model",
+      "modelSupport": "not-probed",
+      "protocol": "Responses SSE; terminal response includes usage",
+      "protocolSources": [
+        "https://platform.openai.com/docs/guides/streaming-responses"
+      ],
+      "frames": [
+        {
+          "data": {
+            "type": "response.created",
+            "response": {
+              "id": "fixture-response"
+            }
+          },
+          "event": "response.created"
+        },
+        {
+          "data": {
+            "type": "response.output_item.added",
+            "output_index": 0,
+            "item": {
+              "id": "item_0",
+              "type": "function_call",
+              "call_id": "call_0",
+              "name": "read",
+              "arguments": "",
+              "status": "in_progress"
+            }
+          },
+          "event": "response.output_item.added"
+        },
+        {
+          "data": {
+            "type": "response.output_item.added",
+            "output_index": 1,
+            "item": {
+              "id": "item_1",
+              "type": "function_call",
+              "call_id": "call_1",
+              "name": "count",
+              "arguments": "",
+              "status": "in_progress"
+            }
+          },
+          "event": "response.output_item.added"
+        },
+        {
+          "data": {
+            "type": "response.function_call_arguments.delta",
+            "output_index": 0,
+            "item_id": "item_0",
+            "delta": "{\"pat"
+          },
+          "event": "response.function_call_arguments.delta"
+        },
+        {
+          "data": {
+            "type": "response.function_call_arguments.delta",
+            "output_index": 1,
+            "item_id": "item_1",
+            "delta": "{\"n\":"
+          },
+          "event": "response.function_call_arguments.delta"
+        },
+        {
+          "data": {
+            "type": "response.function_call_arguments.delta",
+            "output_index": 1,
+            "item_id": "item_1",
+            "delta": "2}"
+          },
+          "event": "response.function_call_arguments.delta"
+        },
+        {
+          "data": {
+            "type": "response.function_call_arguments.delta",
+            "output_index": 0,
+            "item_id": "item_0",
+            "delta": "h\":\"α🙂.txt\"}"
+          },
+          "event": "response.function_call_arguments.delta"
+        },
+        {
+          "data": {
+            "type": "response.function_call_arguments.done",
+            "output_index": 0,
+            "arguments": "{\"path\":\"α🙂.txt\"}"
+          },
+          "event": "response.function_call_arguments.done"
+        },
+        {
+          "data": {
+            "type": "response.output_item.done",
+            "output_index": 0,
+            "item": {
+              "id": "item_0",
+              "type": "function_call",
+              "call_id": "call_0",
+              "name": "read",
+              "arguments": "{\"path\":\"α🙂.txt\"}",
+              "status": "completed"
+            }
+          },
+          "event": "response.output_item.done"
+        },
+        {
+          "data": {
+            "type": "response.function_call_arguments.done",
+            "output_index": 1,
+            "arguments": "{\"n\":2}"
+          },
+          "event": "response.function_call_arguments.done"
+        },
+        {
+          "data": {
+            "type": "response.output_item.done",
+            "output_index": 1,
+            "item": {
+              "id": "item_1",
+              "type": "function_call",
+              "call_id": "call_1",
+              "name": "count",
+              "arguments": "{\"n\":2}",
+              "status": "completed"
+            }
+          },
+          "event": "response.output_item.done"
+        },
+        {
+          "data": {
+            "type": "response.completed",
+            "response": {
+              "id": "fixture-response",
+              "status": "completed",
+              "output": [
+                {
+                  "id": "item_0",
+                  "type": "function_call",
+                  "call_id": "call_0",
+                  "name": "read",
+                  "arguments": "{\"path\":\"α🙂.txt\"}",
+                  "status": "completed"
+                },
+                {
+                  "id": "item_1",
+                  "type": "function_call",
+                  "call_id": "call_1",
+                  "name": "count",
+                  "arguments": "{\"n\":2}",
+                  "status": "completed"
+                }
+              ],
+              "usage": {
+                "input_tokens": 12,
+                "output_tokens": 4,
+                "input_tokens_details": {
+                  "cached_tokens": 5
+                }
+              }
+            }
+          },
+          "event": "response.completed"
+        }
+      ],
+      "errorFrames": [
+        {
+          "data": {
+            "type": "error",
+            "message": "Fixture unavailable"
+          },
+          "event": "error"
+        }
+      ],
+      "expectedUsage": {
+        "inputTokens": 7,
+        "outputTokens": 4,
+        "cacheReadTokens": 5
+      },
+      "expectedTools": [
+        {
+          "name": "read",
+          "arguments": "{\"path\":\"α🙂.txt\"}"
+        },
+        {
+          "name": "count",
+          "arguments": "{\"n\":2}"
+        }
+      ],
+      "terminalFrames": 5
+    },
+    {
+      "key": "gemini-v1",
+      "adapterId": "gemini-generate-content",
+      "adapterVersion": 1,
+      "encoderId": "gemini-generate-content",
+      "encoderVersion": 1,
+      "model": "fixture-model",
+      "modelSupport": "not-probed",
+      "protocol": "GenerateContent SSE; complete function-call parts, terminal usage-only frame",
+      "protocolSources": [
+        "https://ai.google.dev/api/generate-content#v1beta.models.streamGenerateContent"
+      ],
+      "frames": [
+        {
+          "data": {
+            "responseId": "fixture-response",
+            "modelVersion": "fixture-model",
+            "candidates": [
+              {
+                "index": 0,
+                "content": {
+                  "role": "model",
+                  "parts": [
+                    {
+                      "text": "Reason α🙂",
+                      "thought": true,
+                      "thoughtSignature": "YQ=="
+                    },
+                    {
+                      "text": "Read α🙂"
+                    },
+                    {
+                      "functionCall": {
+                        "id": "call_0",
+                        "name": "read",
+                        "args": {
+                          "path": "α🙂.txt"
+                        }
+                      },
+                      "thoughtSignature": "Yg=="
+                    },
+                    {
+                      "functionCall": {
+                        "id": "call_1",
+                        "name": "count",
+                        "args": {
+                          "n": 2
+                        }
+                      },
+                      "thoughtSignature": "Yg=="
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "data": {
+            "candidates": [
+              {
+                "index": 0,
+                "finishReason": "STOP"
+              }
+            ]
+          }
+        },
+        {
+          "data": {
+            "usageMetadata": {
+              "promptTokenCount": 12,
+              "cachedContentTokenCount": 5,
+              "candidatesTokenCount": 4,
+              "totalTokenCount": 16
+            }
+          }
+        }
+      ],
+      "errorFrames": [
+        {
+          "data": {
+            "error": {
+              "code": 503,
+              "message": "Fixture unavailable",
+              "status": "UNAVAILABLE"
+            }
+          }
+        }
+      ],
+      "expectedUsage": {
+        "inputTokens": 7,
+        "outputTokens": 4,
+        "cacheReadTokens": 5
+      },
+      "expectedTools": [
+        {
+          "name": "read",
+          "arguments": "{\"path\":\"α🙂.txt\"}"
+        },
+        {
+          "name": "count",
+          "arguments": "{\"n\":2}"
+        }
+      ],
+      "terminalFrames": 2
+    },
+    {
+      "key": "gemini-v2",
+      "adapterId": "gemini-generate-content",
+      "adapterVersion": 2,
+      "encoderId": "gemini-generate-content",
+      "encoderVersion": 2,
+      "model": "fixture-model",
+      "modelSupport": "not-probed",
+      "protocol": "GenerateContent SSE; complete function-call parts, terminal usage-only frame",
+      "protocolSources": [
+        "https://ai.google.dev/api/generate-content#v1beta.models.streamGenerateContent"
+      ],
+      "frames": [
+        {
+          "data": {
+            "responseId": "fixture-response",
+            "modelVersion": "fixture-model",
+            "candidates": [
+              {
+                "index": 0,
+                "content": {
+                  "role": "model",
+                  "parts": [
+                    {
+                      "text": "Reason α🙂",
+                      "thought": true,
+                      "thoughtSignature": "YQ=="
+                    },
+                    {
+                      "text": "Read α🙂"
+                    },
+                    {
+                      "functionCall": {
+                        "id": "call_0",
+                        "name": "read",
+                        "args": {
+                          "path": "α🙂.txt"
+                        }
+                      },
+                      "thoughtSignature": "Yg=="
+                    },
+                    {
+                      "functionCall": {
+                        "id": "call_1",
+                        "name": "count",
+                        "args": {
+                          "n": 2
+                        }
+                      },
+                      "thoughtSignature": "Yg=="
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "data": {
+            "candidates": [
+              {
+                "index": 0,
+                "finishReason": "STOP"
+              }
+            ]
+          }
+        },
+        {
+          "data": {
+            "usageMetadata": {
+              "promptTokenCount": 12,
+              "cachedContentTokenCount": 5,
+              "candidatesTokenCount": 4,
+              "totalTokenCount": 16
+            }
+          }
+        }
+      ],
+      "errorFrames": [
+        {
+          "data": {
+            "error": {
+              "code": 503,
+              "message": "Fixture unavailable",
+              "status": "UNAVAILABLE"
+            }
+          }
+        }
+      ],
+      "expectedUsage": {
+        "inputTokens": 7,
+        "outputTokens": 4,
+        "cacheReadTokens": 5
+      },
+      "expectedTools": [
+        {
+          "name": "read",
+          "arguments": "{\"path\":\"α🙂.txt\"}"
+        },
+        {
+          "name": "count",
+          "arguments": "{\"n\":2}"
+        }
+      ],
+      "terminalFrames": 2
+    },
+    {
+      "key": "ollama",
+      "adapterId": "ollama-chat",
+      "adapterVersion": 1,
+      "encoderId": "ollama-chat",
+      "encoderVersion": 1,
+      "model": "fixture-model",
+      "modelSupport": "not-probed",
+      "protocol": "Ollama NDJSON; complete tool objects and done:true metrics",
+      "protocolSources": [
+        "https://docs.ollama.com/api/chat"
+      ],
+      "frames": [
+        {
+          "data": {
+            "model": "fixture-model",
+            "created_at": "2026-10-29T00:00:00Z",
+            "message": {
+              "role": "assistant",
+              "content": "Read α🙂"
+            },
+            "done": false
+          }
+        },
+        {
+          "data": {
+            "model": "fixture-model",
+            "created_at": "2026-10-29T00:00:00Z",
+            "message": {
+              "role": "assistant",
+              "content": "",
+              "tool_calls": [
+                {
+                  "id": "call_0",
+                  "type": "function",
+                  "function": {
+                    "index": 0,
+                    "name": "read",
+                    "arguments": {
+                      "path": "α🙂.txt"
+                    }
+                  }
+                }
+              ]
+            },
+            "done": false
+          }
+        },
+        {
+          "data": {
+            "model": "fixture-model",
+            "created_at": "2026-10-29T00:00:00Z",
+            "message": {
+              "role": "assistant",
+              "content": "",
+              "tool_calls": [
+                {
+                  "id": "call_1",
+                  "type": "function",
+                  "function": {
+                    "index": 1,
+                    "name": "count",
+                    "arguments": {
+                      "n": 2
+                    }
+                  }
+                }
+              ]
+            },
+            "done": false
+          }
+        },
+        {
+          "data": {
+            "model": "fixture-model",
+            "created_at": "2026-10-29T00:00:00Z",
+            "message": {
+              "role": "assistant",
+              "content": ""
+            },
+            "done": true,
+            "done_reason": "stop",
+            "prompt_eval_count": 12,
+            "prompt_eval_cached_count": 5,
+            "eval_count": 4
+          }
+        }
+      ],
+      "errorFrames": [
+        {
+          "data": {
+            "error": "Fixture unavailable"
+          }
+        }
+      ],
+      "expectedUsage": {
+        "inputTokens": 7,
+        "outputTokens": 4,
+        "cacheReadTokens": 5
+      },
+      "expectedTools": [
+        {
+          "name": "read",
+          "arguments": "{\"path\":\"α🙂.txt\"}"
+        },
+        {
+          "name": "count",
+          "arguments": "{\"n\":2}"
+        }
+      ],
+      "terminalFrames": 1
+    }
+  ]
+}
