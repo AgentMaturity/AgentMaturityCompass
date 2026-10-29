@@ -1,14 +1,16 @@
+import { mean, median, nearestRank } from "../experiments/stats.js";
 import type { HarnessComparisonReport, HarnessComparisonTrial } from "./harnessComparison.js";
 import { COMPARISON_SCENARIOS } from "./harnessComparisonSchema.js";
 
 function distribution(values: readonly number[]): { samples: number; mean: number | null; median: number | null; p95: number | null } {
+  // Admit finite nonnegative observations first; unlike stats.ts descriptive
+  // empty sentinels, missing report observations remain null below.
   const sorted = values.filter(value => Number.isFinite(value) && value >= 0).sort((a, b) => a - b);
-  const middle = Math.floor(sorted.length / 2);
   return {
     samples: sorted.length,
-    mean: sorted.length ? sorted.reduce((sum, value) => sum + value, 0) / sorted.length : null,
-    median: sorted.length ? (sorted.length % 2 ? sorted[middle]! : (sorted[middle - 1]! + sorted[middle]!) / 2) : null,
-    p95: sorted.length ? sorted[Math.ceil(sorted.length * 0.95) - 1]! : null
+    mean: sorted.length ? mean(sorted) : null,
+    median: sorted.length ? median(sorted) : null,
+    p95: sorted.length ? nearestRank(sorted, 0.95) : null
   };
 }
 

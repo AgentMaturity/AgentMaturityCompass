@@ -1,3 +1,4 @@
+import { mean as arithmeticMean, nearestRank } from "../experiments/stats.js";
 import {
   agentSecurityEvidenceFields,
   agentTestingEvidenceFields,
@@ -1752,9 +1753,9 @@ function normalizeStabilityScores(scores: Record<string, number> | undefined): R
   return Object.fromEntries(entries);
 }
 
+// Receipt means keep their six-place rounding around experiments/stats.ts mean.
 function mean(values: number[]): number {
-  if (values.length === 0) return 0;
-  return round(values.reduce((sum, value) => sum + value, 0) / values.length);
+  return round(arithmeticMean(values));
 }
 
 function rate(rows: LiveDriftSampleRow[], key: "passed" | "refused" | "errored"): number {
@@ -1763,10 +1764,7 @@ function rate(rows: LiveDriftSampleRow[], key: "passed" | "refused" | "errored")
 }
 
 function percentile(values: number[], percentile0to100: number): number {
-  if (values.length === 0) return 0;
-  const sorted = [...values].sort((a, b) => a - b);
-  const idx = Math.ceil((percentile0to100 / 100) * sorted.length) - 1;
-  return round(sorted[Math.max(0, Math.min(sorted.length - 1, idx))] ?? 0);
+  return round(nearestRank(values, percentile0to100 / 100));
 }
 
 function ratioIncrease(after: number, before: number): number {

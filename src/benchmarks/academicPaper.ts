@@ -2,6 +2,7 @@
  * Academic Paper Builder (AMC-447)
  */
 
+import { mean as statsMean, sampleVariance as statsSampleVariance } from "../experiments/stats.js";
 import type { EvalReport, EvalTrial } from "./evalHarness.js";
 
 export interface AcademicPaperOptions {
@@ -37,17 +38,11 @@ function round(value: number): number {
 }
 
 function mean(values: number[]): number {
-  if (values.length === 0) {
-    return 0;
-  }
-  return values.reduce((sum, value) => sum + value, 0) / values.length;
+  return statsMean(values);
 }
 
 function sampleVariance(values: number[], avg: number): number {
-  if (values.length <= 1) {
-    return 0;
-  }
-  return values.reduce((sum, value) => sum + (value - avg) ** 2, 0) / (values.length - 1);
+  return statsSampleVariance(values, avg);
 }
 
 function getMetricValuesByCondition(report: EvalReport, metric: string): [number[], number[]] {
@@ -71,6 +66,8 @@ export function computePaperStatistics(report: EvalReport, metric: string): Pape
   const meanB = mean(groupB);
   const varianceA = sampleVariance(groupA, meanA);
   const varianceB = sampleVariance(groupB, meanB);
+  // Unlike stats.ts bootstrap intervals, this legacy paper uses a normal 1.96 margin,
+  // variance-weighted pooling and clamped denominators for sparse groups.
   const pooledVariance = ((groupA.length - 1) * varianceA + (groupB.length - 1) * varianceB) / Math.max(1, groupA.length + groupB.length - 2);
   const pooledStd = Math.sqrt(Math.max(0, pooledVariance));
   const meanDifference = meanA - meanB;

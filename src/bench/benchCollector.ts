@@ -1,3 +1,4 @@
+import { median as arithmeticMedian } from "../experiments/stats.js";
 import { countBenchAuditRows, countReadonlyBenchAuditEvents, latestReadonlyBenchAssuranceByPack } from "./benchReadOnlyInputs.js";
 import { readdirSync } from "node:fs";
 import { join } from "node:path";
@@ -169,16 +170,9 @@ function countAuditEvents(params: {
   }
 }
 
+// Bench artifacts retain six-decimal serialization around experiments/stats.ts midpoint median.
 function median(values: number[]): number {
-  if (values.length === 0) {
-    return 0;
-  }
-  const sorted = values.slice().sort((a, b) => a - b);
-  const mid = Math.floor(sorted.length / 2);
-  if (sorted.length % 2 === 0) {
-    return Number((((sorted[mid - 1] ?? 0) + (sorted[mid] ?? 0)) / 2).toFixed(6));
-  }
-  return Number((sorted[mid] ?? 0).toFixed(6));
+  return Number(arithmeticMedian(values).toFixed(6));
 }
 
 function resolveWindow(windowDays: number): { startTs: number; endTs: number; days: number } {

@@ -1,3 +1,4 @@
+import { mean } from "../experiments/stats.js";
 import { randomUUID } from "node:crypto";
 import { join } from "node:path";
 import { readdirSync } from "node:fs";
@@ -119,10 +120,7 @@ export function verifyTransformMap(workspace: string): ReturnType<typeof verifyS
 }
 
 function average(values: number[]): number {
-  if (values.length === 0) {
-    return 0;
-  }
-  return values.reduce((sum, value) => sum + value, 0) / values.length;
+  return mean(values);
 }
 
 function loadLatestOutcomeSummary(workspace: string, agentId: string): {

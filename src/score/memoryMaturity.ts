@@ -1,3 +1,4 @@
+import { mean, standardDeviation } from "../experiments/stats.js";
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
 
@@ -179,10 +180,7 @@ function looksLikeMemoryMaturityInput(
 }
 
 function average(values: number[]): number {
-  if (values.length === 0) {
-    return 0;
-  }
-  return values.reduce((sum, value) => sum + value, 0) / values.length;
+  return mean(values);
 }
 
 export function verifyMemoryPersistence(probes: MemoryPersistenceProbe[]): MemoryPersistenceAssessment {
@@ -345,12 +343,8 @@ const POISON_PATTERNS: Array<{ pattern: RegExp; signal: string; weight: number }
 ];
 
 function stdDev(values: number[]): number {
-  if (values.length <= 1) {
-    return 0;
-  }
-  const mu = average(values);
-  const variance = average(values.map((value) => (value - mu) ** 2));
-  return Math.sqrt(variance);
+  if (values.length <= 1) return 0;
+  return standardDeviation(values, false);
 }
 
 function nonAlphaNumericRatio(value: string): number {

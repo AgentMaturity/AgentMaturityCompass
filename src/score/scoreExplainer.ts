@@ -244,6 +244,7 @@ function generateExplanation(
 // Confidence intervals
 // ---------------------------------------------------------------------------
 
+// Unlike resampled intervals in experiments/stats.ts, this heuristic uses evidence count and reported confidence on a 0..5 scale.
 export function computeConfidenceInterval(
   question: QuestionScore,
   confidenceLevel: number = 0.95,
@@ -283,6 +284,7 @@ export function computeBenchmarkComparison(
   const stats = benchmarkStats ?? { mean: 2.5, median: 2.4, stdDev: 0.8 };
   const score = question.finalLevel;
   const zScore = stats.stdDev > 0 ? (score - stats.mean) / stats.stdDev : 0;
+  // Unlike experiments/stats.ts percentileRank, this is a heuristic z-score projection, not an empirical CDF.
   const percentile = Math.max(1, Math.min(99, Math.round(50 + zScore * 30)));
 
   let category: BenchmarkComparison["category"];

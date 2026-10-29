@@ -1,3 +1,4 @@
+import { mean as statsMean, populationVariance } from "../experiments/stats.js";
 /**
  * Continuous Drift Monitor — MF-02
  *
@@ -151,8 +152,8 @@ function detectAnomalies(
     };
   }
 
-  const mean = metricPoints.reduce((s, v) => s + v, 0) / metricPoints.length;
-  const variance = metricPoints.reduce((s, v) => s + (v - mean) ** 2, 0) / metricPoints.length;
+  const mean = statsMean(metricPoints);
+  const variance = populationVariance(metricPoints, mean);
   const std = Math.sqrt(variance);
 
   const zScore = std > 0 ? (currentValue - mean) / std : 0;
