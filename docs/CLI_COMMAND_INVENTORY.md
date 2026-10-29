@@ -1001,7 +1001,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc run-alias remove` | Remove a diagnostic run alias | - | `rm`, `run-name remove` |
 | `amc run-alias set` | Assign a reusable alias to a diagnostic run | - | `run-name set` |
 | `amc runtime` | Runtime run manager for connected agents | - | - |
-| `amc runtime cancel` | Cancel a runtime run cleanly | `--agent <agentId>`<br>`--reason <text>`<br>`--json` | - |
+| `amc runtime cancel` | Record a runtime run cancellation (record-only; does not cancel native execution) | `--agent <agentId>`<br>`--reason <text>`<br>`--json` | - |
 | `amc runtime complete` | Complete a runtime run | `--agent <agentId>`<br>`--reason <text>`<br>`--json` | - |
 | `amc runtime create` | Create a persisted connected-agent runtime run | `--run <runId>`<br>`--agent <agentId>`<br>`--source <source>`<br>`--stage <stage>`<br>`--episode <episodeId>`<br>`--lifecycle-run <id>`<br>`--message <text>`<br>`--json` | - |
 | `amc runtime degrade` | Mark a runtime run degraded | `--agent <agentId>`<br>`--reason <text>`<br>`--json` | - |
@@ -1009,7 +1009,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc runtime export` | Export runtime run events as JSON or JSONL | `--out <path>`<br>`--agent <agentId>`<br>`--format <format>`<br>`--limit <n>`<br>`--stage <stage>`<br>`--receipt <receiptId>`<br>`--redacted`<br>`--json` | - |
 | `amc runtime inspect` | Inspect a runtime run and its event stream | `--agent <agentId>`<br>`--limit <n>`<br>`--no-events`<br>`--redacted`<br>`--json` | - |
 | `amc runtime list` | List persisted runtime runs | `--agent <agentId>`<br>`--limit <n>`<br>`--redacted`<br>`--json` | - |
-| `amc runtime resume` | Resume a running or degraded runtime run from persisted state | `--agent <agentId>`<br>`--stage <stage>`<br>`--message <text>`<br>`--json` | - |
+| `amc runtime resume` | Record a runtime run resume (record-only; does not resume native execution) | `--agent <agentId>`<br>`--stage <stage>`<br>`--message <text>`<br>`--json` | - |
 | `amc runtime status` | Show persisted runtime run-manager status | `--agent <agentId>`<br>`--json` | - |
 | `amc sandbox` | Hardened sandbox execution | - | - |
 | `amc sandbox run` | Run agent command in hardened Docker sandbox | `--agent <agentId>`<br>`--route <route>`<br>`--proxy <proxy>`<br>`--image <image>` | - |

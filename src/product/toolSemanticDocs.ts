@@ -1,4 +1,9 @@
 /**
+ * library-only, not enforced by native tool discovery: no production caller uses
+ * this TF-IDF catalog. Canonical tool definitions and admission live in
+ * src/tools/toolRegistry.ts and src/agent/agentToolset.ts. WP13 should reuse this
+ * search implementation when wiring step-owned deferred discovery.
+ *
  * toolSemanticDocs.ts — Semantic tool documentation with TF-IDF search,
  * pre-computed index, and related tool suggestions.
  */

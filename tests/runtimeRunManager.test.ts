@@ -124,6 +124,19 @@ afterAll(() => {
 });
 
 describe("runtime run manager", () => {
+  test("reports cancel and resume as record-only operations", () => {
+    const ws = workspace();
+    createRuntimeRun({ workspace: ws, runId: "observed-only", agentId: "agent-runtime" });
+
+    const resumed = resumeRuntimeRun({ workspace: ws, runId: "observed-only", agentId: "agent-runtime" });
+    expect(resumed).toMatchObject({ executionEffect: "record-only", run: { status: "running" } });
+    expect(resumed.event.message).toContain("no process or native session was resumed");
+
+    const canceled = cancelRuntimeRun({ workspace: ws, runId: "observed-only", agentId: "agent-runtime" });
+    expect(canceled).toMatchObject({ executionEffect: "record-only", run: { status: "canceled" } });
+    expect(canceled.event.message).toContain("no process or native session was canceled");
+  });
+
   test("persists resumable run state, redacts event payloads, exports events, and handles degraded/completed states", () => {
     const ws = workspace();
     const created = createRuntimeRun({

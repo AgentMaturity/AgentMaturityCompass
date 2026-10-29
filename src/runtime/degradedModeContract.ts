@@ -1,3 +1,9 @@
+/**
+ * library-only, not enforced by the native runtime. These receipt contracts have
+ * no production caller and do not select providers or change retry behavior.
+ * Canonical native retry execution lives in src/agent/requestRetry.ts, using
+ * src/llm/retryPolicy.ts.
+ */
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 
@@ -248,6 +254,8 @@ export function verifyDegradedModeBehaviorReceipt(
 export function renderDegradedModeBehaviorMarkdown(receipt: DegradedModeBehaviorReceipt): string {
   const lines: string[] = [];
   lines.push("# AMC Degraded-Mode Behavior Receipt");
+  lines.push("");
+  lines.push("> library-only, not enforced by the native runtime; this receipt does not select a provider or change retry behavior. See src/agent/requestRetry.ts and src/llm/retryPolicy.ts.");
   lines.push("");
   lines.push(`- Receipt: \`${receipt.receiptId}\``);
   lines.push(`- Generated: \`${receipt.generatedAt}\``);

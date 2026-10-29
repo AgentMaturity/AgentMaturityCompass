@@ -1,4 +1,9 @@
 /**
+ * library-only, not enforced by the native runtime: no production host composes
+ * this service. WP16 should reuse this seam and src/jobs/jobRegistry.ts when
+ * wiring governed background jobs. Current native turn ownership lives in
+ * src/agent/agentSession.ts; this module does not make jobs reachable there.
+ *
  * Background jobs as a composed service (P4.2).
  *
  * `ctx.amcJobs` is where work outlives the turn that started it. A plugin that
