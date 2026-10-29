@@ -100,7 +100,7 @@ afterAll(() => {
 });
 
 /** A lesson hashed, chained and signed the way extractLessonsFromCorrections writes one. */
-function makeSignedLesson(db: Database.Database, overrides: Partial<CorrectionLesson> = {}): CorrectionLesson {
+function makeSignedLesson(db: Database.Database, overrides: Partial<CorrectionLesson> = {}, signStatus = true): CorrectionLesson {
   const ws = lessonWorkspace();
   const now = Date.now();
   const content = {
@@ -126,6 +126,7 @@ function makeSignedLesson(db: Database.Database, overrides: Partial<CorrectionLe
   const lesson: CorrectionLesson = { ...body, prev_lesson_hash: prev, lesson_hash: hash,
     signature: signHexDigest(hash, getSigningKey(ws, "ledger-row")) };
   insertLesson(db, lesson);
+  if (signStatus) updateLessonStatus(db, lesson.lessonId, "ACTIVE", ws); // signs its status into the anchored log, as the writer does
   return lesson;
 }
 
@@ -666,12 +667,46 @@ describe("buildLessonAdvisories", () => {
     db.close();
   });
 
+  test("deleting the anchor and every status row reinstates nothing", () => {
+    const { db } = freshDb();
+    const ws = lessonWorkspace();
+    makeSignedLesson(db, { lessonId: "lsn_keep2" });
+    makeSignedLesson(db, { lessonId: "lsn_rev2" });
+    updateLessonStatus(db, "lsn_rev2", "REVOKED", ws);
+    rmSync(join(process.env.AMC_HOME!, "state", "high-water.json"));
+    db.prepare("DELETE FROM correction_lesson_status_log").run();
+    db.prepare("UPDATE correction_lessons SET status = 'ACTIVE' WHERE lesson_id = ?").run("lsn_rev2");
+    expect(buildLessonAdvisories(db, "agent-1", undefined, ws)).toEqual([]);
+    // The missing anchor itself is distrusted, not read as an empty log.
+    expect(new Set(verifyAgentLessons(db, "agent-1", ws).problems.map((p) => p.reason)))
+      .toEqual(new Set(["lesson status log does not verify or does not end at its anchored head"]));
+    db.close();
+  });
+
+  test("a lost anchor or a pre-log lesson stays out until the owner re-signs its status", () => {
+    const { db } = freshDb();
+    const ws = lessonWorkspace();
+    makeSignedLesson(db, { lessonId: "lsn_anchored" });
+    rmSync(join(process.env.AMC_HOME!, "state", "high-water.json"));
+    expect(buildLessonAdvisories(db, "agent-1", undefined, ws)).toEqual([]);
+    updateLessonStatus(db, "lsn_anchored", "ACTIVE", ws); // owner re-anchor path
+    expect(buildLessonAdvisories(db, "agent-1", undefined, ws).map((a) => a.advisoryId)).toEqual(["lsn_anchored"]);
+
+    // A lesson stored before the status log existed: hash and signature verify, but no status entry.
+    makeSignedLesson(db, { lessonId: "lsn_prelog" }, false);
+    expect(verifyAgentLessons(db, "agent-1", ws).problems)
+      .toEqual([{ lessonId: "lsn_prelog", reason: "lesson status is not signed into the status log" }]);
+    updateLessonStatus(db, "lsn_prelog", "ACTIVE", ws);
+    expect(buildLessonAdvisories(db, "agent-1", undefined, ws).map((a) => a.advisoryId).sort()).toEqual(["lsn_anchored", "lsn_prelog"]);
+    db.close();
+  });
+
   test("a status change whose transition cannot be signed leaves the column unchanged and throws", () => {
     const { db, dir } = freshDb(); // dir is not an initialised workspace: there is no signing key
     makeSignedLesson(db, { lessonId: "lsn_nosign" });
     expect(() => updateLessonStatus(db, "lsn_nosign", "REVOKED", dir)).toThrow();
     expect(getLessonById(db, "lsn_nosign")!.status).toBe("ACTIVE");
-    expect(db.prepare("SELECT COUNT(*) AS n FROM correction_lesson_status_log").get()).toEqual({ n: 0 });
+    expect(db.prepare("SELECT COUNT(*) AS n FROM correction_lesson_status_log").get()).toEqual({ n: 1 }); // only its creation entry
     expect(() => updateLessonStatus(db, "lsn_nosign", "REVOKED", "" as string)).toThrow(/requires the workspace/);
     db.close();
   });

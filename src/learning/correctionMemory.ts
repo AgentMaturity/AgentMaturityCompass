@@ -296,7 +296,8 @@ export function verifyAgentLessons(db: Database.Database, agentId: string, works
       else if (lessonHash(lesson, lesson.prev_lesson_hash) !== stored) reason = "lesson content does not match its hash";
       else if (lesson.signature === "unsigned" || !verifyHexDigestAny(stored, lesson.signature, keys)) reason = "lesson signature does not verify";
       else if (!statuses.trusted) reason = "lesson status log does not verify or does not end at its anchored head";
-      else if (`${stored}:${lesson.status}` !== (statuses.status.get(lessonId) ?? `${stored}:ACTIVE`)) reason = "lesson status does not match its signed transitions";
+      else if (!statuses.status.has(lessonId)) reason = "lesson status is not signed into the status log";
+      else if (`${stored}:${lesson.status}` !== statuses.status.get(lessonId)) reason = "lesson status does not match its signed transitions";
       else verified.push(lesson);
     } catch {
       reason = "lesson record is unreadable";
@@ -325,10 +326,33 @@ function lessonStatusAnchorKey(workspace: string, agentId: string): string {
   return highWaterKey("lesson-status", `${agentId}@${workspaceScope(workspace)}`);
 }
 
+/** Append a signed status entry for `lesson` and raise the agent's anchored log head. Callers run it in their transaction. */
+function appendLessonStatus(db: Database.Database, lesson: Pick<CorrectionLesson, "lessonId" | "agentId" | "lesson_hash">,
+  status: LessonStatus, workspace: string): void {
+  const head = db
+    .prepare("SELECT entry_hash, (SELECT COUNT(*) FROM correction_lesson_status_log WHERE agent_id = ?) AS count FROM correction_lesson_status_log WHERE agent_id = ? ORDER BY seq DESC LIMIT 1")
+    .get(lesson.agentId, lesson.agentId) as { entry_hash: string; count: number } | undefined;
+  const entry = { agentId: lesson.agentId, lessonId: lesson.lessonId, lessonHash: lesson.lesson_hash, status, ts: Date.now(),
+    prev: head?.entry_hash ?? LESSON_STATUS_GENESIS_HASH };
+  const entryHash = lessonStatusEntryHash(entry);
+  const signature = signHexDigest(entryHash, getSigningKey(workspace, "ledger-row"));
+  db.prepare(`INSERT INTO correction_lesson_status_log
+    (agent_id, lesson_id, lesson_hash, status, ts, prev_entry_hash, entry_hash, signature) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`)
+    .run(entry.agentId, entry.lessonId, entry.lessonHash, status, entry.ts, entry.prev, entryHash, signature);
+  if (!recordHighWater(lessonStatusAnchorKey(workspace, lesson.agentId), (head?.count ?? 0) + 1, entryHash)) {
+    throw new Error("the lesson status log head could not be anchored in AMC home; the status change was not made");
+  }
+}
+
 /**
  * Set a lesson's status. The column change, a signed and chained status transition, and the raised log-head anchor
  * (entry count and head hash, kept outside the workspace) commit together: if signing or anchoring fails the column
  * change is rolled back and the error is thrown, so no status change is ever left unsigned.
+ *
+ * This is also the owner's re-anchor path. A lesson is injectable only once its current status is signed into the
+ * log, so a lesson created before the status log existed, or every lesson of an agent whose anchor was lost (a new
+ * machine, or a removed AMC home), stays out of injection until the owner re-signs its current status here. Re-signing
+ * appends to the log and moves the anchor to the new head, so the owner should first review the lessons' statuses.
  */
 export function updateLessonStatus(
   db: Database.Database,
@@ -341,19 +365,7 @@ export function updateLessonStatus(
     const lesson = getLessonById(db, lessonId);
     if (!lesson) return;
     db.prepare("UPDATE correction_lessons SET status = ? WHERE lesson_id = ?").run(status, lessonId);
-    const head = db
-      .prepare("SELECT entry_hash, (SELECT COUNT(*) FROM correction_lesson_status_log WHERE agent_id = ?) AS count FROM correction_lesson_status_log WHERE agent_id = ? ORDER BY seq DESC LIMIT 1")
-      .get(lesson.agentId, lesson.agentId) as { entry_hash: string; count: number } | undefined;
-    const entry = { agentId: lesson.agentId, lessonId, lessonHash: lesson.lesson_hash, status, ts: Date.now(),
-      prev: head?.entry_hash ?? LESSON_STATUS_GENESIS_HASH };
-    const entryHash = lessonStatusEntryHash(entry);
-    const signature = signHexDigest(entryHash, getSigningKey(workspace, "ledger-row"));
-    db.prepare(`INSERT INTO correction_lesson_status_log
-      (agent_id, lesson_id, lesson_hash, status, ts, prev_entry_hash, entry_hash, signature) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`)
-      .run(entry.agentId, lessonId, entry.lessonHash, status, entry.ts, entry.prev, entryHash, signature);
-    if (!recordHighWater(lessonStatusAnchorKey(workspace, lesson.agentId), (head?.count ?? 0) + 1, entryHash)) {
-      throw new Error("the lesson status log head could not be anchored in AMC home; the status change was not made");
-    }
+    appendLessonStatus(db, lesson, status, workspace);
   })();
 }
 
@@ -380,7 +392,8 @@ function verifiedLessonStatuses(db: Database.Database, agentId: string, workspac
   }
   let anchor: { sequence: number; sha256: string } | null;
   try { anchor = readHighWater(lessonStatusAnchorKey(workspace, agentId)); } catch { return { trusted: false, status }; }
-  const endsAtAnchor = anchor === null ? rows.length === 0 : anchor.sequence === rows.length && anchor.sha256 === previous;
+  // A missing anchor is never proof of an empty log: deleting the anchor and every row would otherwise erase history.
+  const endsAtAnchor = anchor !== null && anchor.sequence === rows.length && anchor.sha256 === previous;
   return { trusted: endsAtAnchor, status };
 }
 
@@ -533,7 +546,12 @@ export function extractLessonsFromCorrections(
       signature,
     };
 
-    insertLesson(db, lesson);
+    // A signed lesson is born with its ACTIVE status signed into the anchored log, in the same transaction. An unsigned
+    // lesson gets no entry: it is never injectable, so there is no status to protect.
+    db.transaction(() => {
+      insertLesson(db, lesson);
+      if (signature !== "unsigned") appendLessonStatus(db, lesson, "ACTIVE", workspace);
+    })();
     created.push(lesson);
   }
 
