@@ -60,6 +60,8 @@ function validationRun(overrides: Partial<IncidentRegressionValidationRun> = {})
     runId: "validation-gap3758",
     testId: "regression-gap3758-tool-timeout",
     status: "passed",
+    phase: "post_fix",
+    buildRef: "fixed-build",
     validatedAt: "2026-06-26T02:30:00.000Z",
     evidenceRefs: ["validation-run-receipt", "ci-run-hash"],
     ...overrides,
@@ -127,6 +129,10 @@ describe("GAP-3758 Arthur incident-to-regression boundary", () => {
         }),
       ],
       validationRuns: [
+        validationRun({ runId: "validation-gap3758-pre", phase: "pre_fix", buildRef: "broken-build", status: "failed",
+          validatedAt: "2026-06-26T02:10:00.000Z" }),
+        validationRun({ runId: "validation-gap3758-policy-pre", testId: "regression-gap3758-policy-gap",
+          phase: "pre_fix", buildRef: "broken-build", status: "failed", validatedAt: "2026-06-26T02:10:00.000Z" }),
         validationRun(),
         validationRun({
           runId: "validation-gap3758-policy",
@@ -168,6 +174,8 @@ describe("GAP-3758 Arthur incident-to-regression boundary", () => {
       "regression-gap3758-tool-timeout",
     ]);
     expect(receipt.validationRuns.map((run) => run.runId)).toEqual([
+      "validation-gap3758-policy-pre",
+      "validation-gap3758-pre",
       "validation-gap3758",
       "validation-gap3758-policy",
     ]);
@@ -227,6 +235,145 @@ describe("GAP-3758 Arthur incident-to-regression boundary", () => {
       blockedIncidentIds: ["incident-gap3758"],
       missingValidationTestIds: ["regression-gap3758-tool-timeout"],
     });
+  });
+
+  it("fails closed when a passing regression has no failing pre-fix run", () => {
+    const receipt = buildIncidentRegressionReceipt({
+      traces: [trace()], generatedTests: [generatedTest()],
+      validationRuns: [validationRun({ phase: "post_fix", buildRef: "fix-build" })],
+      closureEvidenceRefs: ["closure-receipt"],
+    });
+    expect(receipt.status).toBe("fail_closed");
+    expect(receipt.failClosedReasons).toContain("test:regression-gap3758-tool-timeout:pre_fix:missing_evidence");
+    expect(receipt.closureStatus).toMatchObject({
+      status: "blocked", readyIncidentIds: [],
+      missingValidationTestIds: ["regression-gap3758-tool-timeout"],
+    });
+  });
+
+  it.each([
+    ["same build", { buildRef: "fix-build" }],
+    ["same run", { runId: "post-fix" }],
+    ["later pre-fix", { validatedAt: "2026-06-26T03:00:00.000Z" }],
+    ["passing pre-fix", { status: "passed" }],
+    ["missing build", { buildRef: undefined }],
+    ["skipped pre-fix", { status: "skipped" }],
+    ["pending pre-fix", { status: "pending" }],
+  ] as const)("blocks invalid validation pair: %s", (_label, override) => {
+    const receipt = buildIncidentRegressionReceipt({
+      traces: [trace()], generatedTests: [generatedTest()],
+      validationRuns: [
+        validationRun({ runId: "pre-fix", phase: "pre_fix", buildRef: "broken-build", status: "failed",
+          validatedAt: "2026-06-26T02:00:00.000Z", ...override }),
+        validationRun({ runId: "post-fix", phase: "post_fix", buildRef: "fix-build" }),
+      ], closureEvidenceRefs: ["closure-receipt"],
+    });
+    expect(receipt.status).toBe("fail_closed");
+    expect(receipt.closureStatus.status).toBe("blocked");
+  });
+
+  it("requires the post-fix arm to pass", () => {
+    const receipt = buildIncidentRegressionReceipt({
+      traces: [trace()], generatedTests: [generatedTest()],
+      validationRuns: [
+        validationRun({ runId: "pre-fix", phase: "pre_fix", buildRef: "broken-build", status: "failed",
+          validatedAt: "2026-06-26T02:00:00.000Z" }),
+        validationRun({ runId: "post-fix", phase: "post_fix", buildRef: "fix-build", status: "failed" }),
+      ], closureEvidenceRefs: ["closure-receipt"],
+    });
+    expect(receipt.status).toBe("fail_closed");
+    expect(receipt.closureStatus.status).toBe("blocked");
+  });
+
+  it("blocks duplicate validation arms instead of selecting a favorable pair", () => {
+    const receipt = buildIncidentRegressionReceipt({
+      traces: [trace()], generatedTests: [generatedTest()],
+      validationRuns: [
+        validationRun({ runId: "pre-fix", phase: "pre_fix", buildRef: "broken-build", status: "failed",
+          validatedAt: "2026-06-26T02:00:00.000Z" }),
+        validationRun({ runId: "post-fix", phase: "post_fix", buildRef: "fix-build" }),
+        validationRun({ runId: "post-fix-duplicate", phase: "post_fix", buildRef: "fix-build" }),
+      ], closureEvidenceRefs: ["closure-receipt"],
+    });
+    expect(receipt.status).toBe("fail_closed");
+    expect(receipt.closureStatus.status).toBe("blocked");
+  });
+
+  it("rejects duplicate generated test identities consuming one validation pair", () => {
+    const receipt = buildIncidentRegressionReceipt({
+      traces: [trace()], generatedTests: [generatedTest(), generatedTest({ assertion: "A different test" })],
+      validationRuns: [
+        validationRun({ runId: "pre-fix", phase: "pre_fix", buildRef: "broken-build", status: "failed",
+          validatedAt: "2026-06-26T02:00:00.000Z" }),
+        validationRun({ runId: "post-fix", phase: "post_fix", buildRef: "fix-build" }),
+      ], closureEvidenceRefs: ["closure-receipt"],
+    });
+    expect(receipt.status).toBe("fail_closed");
+    expect(receipt.failClosedReasons).toContain("test:regression-gap3758-tool-timeout:testId:duplicate");
+    expect(receipt.closureStatus.status).toBe("blocked");
+  });
+
+  it("rejects duplicate validation run identities across different tests", () => {
+    const secondTest = "regression-second";
+    const receipt = buildIncidentRegressionReceipt({
+      traces: [trace()], generatedTests: [generatedTest(), generatedTest({ testId: secondTest })],
+      validationRuns: [
+        validationRun({ runId: "pre-fix", phase: "pre_fix", buildRef: "broken-build", status: "failed",
+          validatedAt: "2026-06-26T02:00:00.000Z" }),
+        validationRun({ runId: "post-fix", phase: "post_fix", buildRef: "fix-build" }),
+        validationRun({ runId: "pre-fix", testId: secondTest, phase: "pre_fix", buildRef: "broken-build", status: "failed",
+          validatedAt: "2026-06-26T02:00:00.000Z" }),
+        validationRun({ runId: "post-fix-second", testId: secondTest, phase: "post_fix", buildRef: "fix-build" }),
+      ], closureEvidenceRefs: ["closure-receipt"],
+    });
+    expect(receipt.status).toBe("fail_closed");
+    expect(receipt.failClosedReasons).toContain("validation:pre-fix:runId:duplicate");
+    expect(receipt.closureStatus.status).toBe("blocked");
+  });
+
+  it("binds each generated test to its trace's actual incident", () => {
+    const receipt = buildIncidentRegressionReceipt({
+      traces: [trace(), trace({ traceId: "other-trace", incidentId: "other-incident" })],
+      generatedTests: [generatedTest({ sourceTraceId: "other-trace" })],
+      validationRuns: [
+        validationRun({ runId: "pre-fix", phase: "pre_fix", buildRef: "broken-build", status: "failed",
+          validatedAt: "2026-06-26T02:00:00.000Z" }),
+        validationRun({ runId: "post-fix", phase: "post_fix", buildRef: "fix-build" }),
+      ], closureEvidenceRefs: ["closure-receipt"],
+    });
+    expect(receipt.status).toBe("fail_closed");
+    expect(receipt.failClosedReasons).toContain("test:regression-gap3758-tool-timeout:sourceIncident:mismatch");
+    expect(receipt.closureStatus.readyIncidentIds).toEqual([]);
+  });
+
+  it("blocks duplicate normalized trace identities", () => {
+    const receipt = buildIncidentRegressionReceipt({
+      traces: [trace(), trace({ traceId: " trace-gap3758 " })], generatedTests: [generatedTest()],
+      validationRuns: [
+        validationRun({ runId: "pre-fix", phase: "pre_fix", buildRef: "broken-build", status: "failed",
+          validatedAt: "2026-06-26T02:00:00.000Z" }),
+        validationRun({ runId: "post-fix", phase: "post_fix", buildRef: "fix-build" }),
+      ], closureEvidenceRefs: ["closure-receipt"],
+    });
+    expect(receipt.status).toBe("fail_closed");
+    expect(receipt.failClosedReasons.some((reason) => reason.endsWith(":traceId:duplicate"))).toBe(true);
+    expect(receipt.closureStatus.readyIncidentIds).toEqual([]);
+  });
+
+  it("requires generated tests for every incident in the receipt", () => {
+    const receipt = buildIncidentRegressionReceipt({
+      traces: [trace(), trace({ traceId: "other-trace", incidentId: "other-incident" })],
+      generatedTests: [generatedTest()],
+      validationRuns: [
+        validationRun({ runId: "pre-fix", phase: "pre_fix", buildRef: "broken-build", status: "failed",
+          validatedAt: "2026-06-26T02:00:00.000Z" }),
+        validationRun({ runId: "post-fix", phase: "post_fix", buildRef: "fix-build" }),
+      ], closureEvidenceRefs: ["closure-receipt"],
+    });
+    expect(receipt.status).toBe("fail_closed");
+    expect(receipt.failClosedReasons).toContain("incident:other-incident:generatedRegressionTests:missing");
+    expect(receipt.closureStatus.status).toBe("blocked");
+    expect(receipt.closureStatus.readyIncidentIds).toEqual([]);
   });
 
   it("does not add Arthur-specific identifiers to generic incident regression implementation modules", () => {

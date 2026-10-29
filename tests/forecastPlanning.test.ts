@@ -106,6 +106,7 @@ function writeRunFixture(params: {
     runSealSig: "fixture",
     reportJsonSha256: "fixture"
   };
+  // Forecasts read sealed runs only (GAP-WP37), so the fixture seals each run the way the runner does.
   writeSealedReport(params.workspace, paths.runsDir, params.runId, run);
 }
 

@@ -1,4 +1,5 @@
 /** AUTHORED UNEXECUTED. Real native ACP/runtime and an HTTP edge, not core mocks. */
+import { withoutContextSnapshot } from "../helpers/contextSnapshot.js";
 import { spawnSync } from "node:child_process";
 import { mkdtempSync, realpathSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -75,12 +76,12 @@ export function firstUserWire(provider: Provider, bytes: Buffer): Record<string,
   const items = provider === "openai-responses" ? body.input : body.messages;
   const content = items.find((item: { role?: string }) => item.role === "user")?.content;
   if (!Array.isArray(content)) throw new Error("Missing explicit provider user-content array");
-  return content.map((part: Record<string, unknown>) => {
+  return withoutContextSnapshot(content.map((part: Record<string, unknown>) => {
     if (provider !== "anthropic") return part;
     const { cache_control, ...rest } = part;
     if (cache_control !== undefined) expect(cache_control).toEqual({ type: "ephemeral" });
     return rest;
-  });
+  }));
 }
 export function orderedCold(root: string, sessionId: string, env: NodeJS.ProcessEnv = {}) {
   const child = spawnSync(process.execPath, ["--import", import.meta.resolve("tsx"),

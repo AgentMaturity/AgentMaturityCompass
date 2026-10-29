@@ -12,7 +12,7 @@
  * moment of writing rather than at the moment of asking.
  */
 import { readFileSync } from "node:fs";
-import { withControlFileLock } from "../lifecycle/controlFileLock.js";
+import { withControlFileLock, withControlFileLockAsync } from "../lifecycle/controlFileLock.js";
 import { type CredentialRef, credentialRef, credentialRefName } from "./credentialRef.js";
 import { describeCredentialLayers, resolveCredentialLayers } from "./credentialResolution.js";
 import type { CredentialDescription, CredentialSource } from "./credentialSources.js";
@@ -43,6 +43,20 @@ const CREDENTIALS_LOCK_NAME = "credentials";
 
 const DEFAULT_DEBOUNCE_MS = 100;
 const DEFAULT_LOCK_TIMEOUT_MS = 5_000;
+
+/**
+ * One turn at the credentials lock per home, shared by every instance in this
+ * process. `modify` holds the cross-process lock across an await; a second
+ * instance's synchronous lock wait would then block the event loop the holder
+ * needs to finish, so every in-process lock user queues here first.
+ * ponytail: one entry per credential home for the process lifetime; homes are few.
+ */
+const lockTurns = new Map<string, SerialWriteQueue>();
+function lockTurn(root: string): SerialWriteQueue {
+  let turn = lockTurns.get(root);
+  if (!turn) { turn = new SerialWriteQueue(); lockTurns.set(root, turn); }
+  return turn;
+}
 
 /** Why the in-memory snapshot changed. Carries no values, by construction. */
 export type CredentialsUpdateCause = "boot" | "watch" | "reload" | "write";
@@ -201,6 +215,42 @@ export class LocalCredentialsService implements CredentialsService {
   }
 
   /**
+   * Read-compute-write under the store's cross-process lock (PXA-18). `compute`
+   * receives the value as it stands on disk after the lock is held and returns
+   * the value to store, or `undefined` to leave it unchanged. Its awaited work,
+   * a token refresh for example, happens inside the lock, so a concurrent
+   * modifier in this or another process sees its result instead of repeating it.
+   * The write completes even if the caller stops waiting.
+   */
+  async modify<T>(ref: CredentialRef, compute: (current: string | null) => Promise<{ readonly value?: string; readonly result: T }>,
+    options: { readonly lockTimeoutMs?: number } = {}): Promise<T> {
+    const name = credentialRefName(ref);
+    assertUnshadowedWrite(ref, this.sourceOf(name));
+    ensureCredentialsDirectory(this.paths.homeDir);
+    return this.queue.run(() => lockTurn(this.paths.homeDir).run(() => withControlFileLockAsync({
+      root: this.paths.homeDir,
+      name: CREDENTIALS_LOCK_NAME,
+      timeoutMs: options.lockTimeoutMs ?? this.lockTimeoutMs,
+      operation: async () => {
+        this.applySnapshot(loadCredentialsSnapshot(this.paths, this.includeDotenv), "reload");
+        assertUnshadowedWrite(ref, this.sourceOf(name));
+        const { value, result } = await compute(this.resolve(ref));
+        if (value === undefined) return result;
+        const normalized = assertSettableCredentialValue(ref, value);
+        // Re-judged after the awaited work, as in writeUnderLock.
+        this.applySnapshot(loadCredentialsSnapshot(this.paths, this.includeDotenv), "reload");
+        assertUnshadowedWrite(ref, this.sourceOf(name));
+        const patched = patchCredentialsFile({ path: this.paths.file, raw: this.readRaw(), name, value: normalized });
+        if (patched.changed) {
+          writeCredentialsFileAtomic(this.paths.file, patched.text);
+          this.applySnapshot(loadCredentialsSnapshot(this.paths, this.includeDotenv), "write");
+        }
+        return result;
+      }
+    })));
+  }
+
+  /**
    * Re-reads every file-backed layer.
    *
    * Throws on failure, and leaves the previous snapshot in place when it does:
@@ -272,9 +322,9 @@ export class LocalCredentialsService implements CredentialsService {
    * patch must go through the document rather than a re-serialised object, so a
    * concurrent addition of a different key survives this write.
    */
-  private writeUnderLock(ref: CredentialRef, name: string, value: string | null): boolean {
+  private writeUnderLock(ref: CredentialRef, name: string, value: string | null): Promise<boolean> {
     ensureCredentialsDirectory(this.paths.homeDir);
-    return withControlFileLock({
+    return lockTurn(this.paths.homeDir).run(() => withControlFileLock({
       root: this.paths.homeDir,
       name: CREDENTIALS_LOCK_NAME,
       timeoutMs: this.lockTimeoutMs,
@@ -301,6 +351,6 @@ export class LocalCredentialsService implements CredentialsService {
         this.applySnapshot(loadCredentialsSnapshot(this.paths, this.includeDotenv), "write");
         return true;
       }
-    });
+    }));
   }
 }

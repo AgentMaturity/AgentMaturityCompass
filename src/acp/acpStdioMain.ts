@@ -27,6 +27,8 @@ import { forkSession } from "../session/sessionResume.js";
 import { redactingSessionFor } from "../dataflow/redactingSession.js";
 import { ACP_MAX_TURN_UPDATE_BYTES } from "./acpCommittedUpdates.js";
 import type { AcpSink } from "./acpConnection.js";
+import { acpAskUserAnswerer } from "./acpAskUser.js";
+import { searxngSearchProvider } from "../tools/builtin/webSearchProviders.js";
 
 /**
  * Running the ACP agent on stdio (plan P7.1a).
@@ -105,6 +107,10 @@ export interface AcpStdioInit {
   readonly tools?: "none" | "workspace";
   /** `--unsafe-unconfined-shell`: macOS only, see `AgentToolsetOptions.unconfinedShell`. */
   readonly unconfinedShell?: boolean;
+  /** `--ask-user`: ask_user goes to the client as `_amc/ask_user`, answers signed host-side (WP40). Workspace tools only. */
+  readonly askUser?: boolean;
+  /** `--web-search-searxng`: the opt-in web_search provider origin (WP40). Workspace tools only. */
+  readonly webSearchSearxng?: string;
   readonly expectedToolsDigest?: string;
   /** A lease the spawning composer minted for this process (P1-67, Studio native tasks); see `AgentToolsetOptions.leaseToken`. */
   readonly leaseToken?: string;
@@ -179,6 +185,8 @@ export function startAcpStdio(init: AcpStdioInit): AcpStdioHandle {
   if (mcp && (tools !== "workspace" || !approval)) throw new Error("ACP MCP requires --tools workspace and --approve-tools.");
   const mcpReview = mcp && approval ? requireReviewedNativeMcpGrants(mcp, init.workspace, approval.actionClass) : undefined;
   const shellOptIn = init.unconfinedShell === true ? { unconfinedShell: "cli-flag" as const } : {};
+  if ((init.askUser === true || init.webSearchSearxng !== undefined) && tools !== "workspace") throw new Error("--ask-user and --web-search-searxng configure workspace tools; add --tools workspace.");
+  const webSearchProvider = init.webSearchSearxng === undefined ? undefined : searxngSearchProvider(init.webSearchSearxng);
   let shellRefusal: string | null = null;
   if (tools === "workspace") {
     const snapshot = loadVerifiedToolsConfigSnapshot(init.workspace);
@@ -237,6 +245,7 @@ export function startAcpStdio(init: AcpStdioInit): AcpStdioHandle {
       systemPrompt: init.systemPrompt,
       harnessVersion: amcVersion,
       compositionDigest: sha256Hex(JSON.stringify({ surface: "acp-native", provider: route.providerId, model: route.models?.[0], tools, maxTokens, maxSteps, approval, mcp: mcp?.sha256 ?? null,
+        ...(init.askUser === true ? { askUser: "acp-client" } : {}), ...(webSearchProvider === undefined ? {} : { webSearch: webSearchProvider.origin }),
         ...(route.providerId === "deepseek" ? { params: requestParams } : {}),
         ...(validation === undefined ? {} : { validation }), ...(compaction === undefined ? {} : { compaction }),
         ...(init.expectedToolsDigest === undefined ? {} : { expectedToolsDigest: init.expectedToolsDigest }) })),
@@ -244,7 +253,10 @@ export function startAcpStdio(init: AcpStdioInit): AcpStdioHandle {
         ...(validation === undefined ? {} : { validation }),
         ...(init.expectedToolsDigest === undefined ? {} : { expectedToolsDigest: init.expectedToolsDigest }) })),
       tools, maxSteps, ...shellOptIn, ...(compaction === undefined ? {} : { compaction }), ...(init.expectedToolsDigest === undefined ? {} : { expectedToolsDigest: init.expectedToolsDigest }),
-      ...(validation === undefined ? {} : { validation }), ...lease
+      ...(validation === undefined ? {} : { validation }), ...lease,
+      // `agent` exists by the time any session is composed; its connection carries the client request.
+      ...(init.askUser === true ? { askUser: acpAskUserAnswerer({ workspace: params.workspace, request: (method, body, signal) => agent.connection.request(method, body, signal) }) } : {}),
+      ...(webSearchProvider === undefined ? {} : { webSearchProvider })
     });
 
   const claimant = { pid: process.pid, hostId: hostname(), bootId: randomUUID(), startedAt: Date.now() };

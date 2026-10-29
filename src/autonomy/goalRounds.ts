@@ -49,6 +49,8 @@ export interface GoalRoundsInit {
   /** The hard ceiling. Nothing extends it. */
   readonly maxRounds: number;
   readonly scope?: readonly ActionClass[];
+  /** The operator's signed child stop conditions, applied to every round's delegation. */
+  readonly stopConditions?: readonly string[];
   readonly maxDepth?: number;
   /** Ask a human every N rounds. Requires `checkpoint`. */
   readonly checkpointEvery?: number;
@@ -105,7 +107,8 @@ export async function runGoalRounds(init: GoalRoundsInit): Promise<GoalRoundsRes
         goal: round === 1
           ? init.goal
           : `${init.goal}\n\nWhat the previous round produced:\n${lastText}`,
-        ...(init.scope === undefined ? {} : { delegationScope: init.scope })
+        ...(init.scope === undefined ? {} : { delegationScope: init.scope }),
+        ...(init.stopConditions === undefined ? {} : { stopConditions: init.stopConditions })
       },
       session: init.session,
       runner: init.runner,

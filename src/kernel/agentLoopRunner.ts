@@ -70,12 +70,14 @@ import type { SubagentRunContext, SubagentRunner } from "../agent/subagentSpawn.
 import { parseSubagentStopConditions } from "../agent/subagentStopConditions.js";
 import type { ActionClass } from "../types.js";
 import { createDriverRunner } from "../agent/subagentRunner.js";
+import { COMPOSITION_FAILED } from "../agent/nativeAgentComposition.js";
 import { LeasePrincipalRefused } from "../leases/leasePrincipal.js";
 import { planRequiresPrincipal } from "../tools/guards/compiledPolicyGuard.js";
 import { refuseRetired } from "../lifecycle/reassessment.js";
 import { admitSessionAtOpen } from "../runtime/changeEnvelope.js";
 import { nativeSessionManifest } from "../lifecycle/versionManifest.js";
 import { runDueSchedules, type ScheduleRunResult } from "../autonomy/scheduleRunner.js";
+import { runGoalRounds, type GoalRoundsResult } from "../autonomy/goalRounds.js";
 import { assertNativeScheduleAdmission } from "../autonomy/scheduleService.js";
 import type { SubagentCapability } from "../agent/delegateTool.js";
 import type { TurnCancelCause } from "../session/sessionTypes.js";
@@ -288,6 +290,12 @@ export interface ComposedTurnOptions {
    * steering works has to be demonstrating the mechanism users have.
    */
   readonly onSteer?: { readonly afterMs: number; readonly text: string };
+  /**
+   * Run the prompt as a goal for bounded rounds (D45) instead of one turn: each round is one in-process delegated child
+   * under this run's delegation grant, seeing the previous round's answer, through `runGoalRounds`. Requires in-process
+   * delegation; `maxRounds` is the hard ceiling and nothing extends it.
+   */
+  readonly goalRounds?: { readonly maxRounds: number; readonly signal?: AbortSignal };
 }
 
 export interface ComposedTurnOutcome {
@@ -296,6 +304,8 @@ export interface ComposedTurnOutcome {
   readonly status: AgentStatus;
   /** Mechanical schedule outcomes, never goal-quality or cold-verification claims. */
   readonly scheduleResults?: readonly ScheduleRunResult[];
+  /** How a goal-rounds run stopped; mechanical, never a goal-quality claim. */
+  readonly goalRounds?: GoalRoundsResult;
   readonly validation: NativeValidationResult;
   /**
    * The `system/prompt` row every request in this run cites.
@@ -438,6 +448,14 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
     assertNativeScheduleAdmission({ workspace: options.workspace, ...options.schedulePass,
       approvalClass: options.approvalGate.actionClass });
   }
+  if (options.goalRounds !== undefined) {
+    const { maxRounds } = options.goalRounds;
+    if (options.delegation === undefined || options.delegation.runner !== undefined || options.schedulePass !== undefined
+      || options.audioParts !== undefined || images.length > 0 || options.prompt.trim() === "") {
+      throw new Error("Goal rounds need a text goal and in-process delegation (--delegate with workspace tools); schedules, audio, images and foreign delegates are not goal rounds.");
+    }
+    if (!Number.isSafeInteger(maxRounds) || maxRounds < 1 || maxRounds > 100) throw new Error("Goal rounds must be an integer from 1 through 100.");
+  }
   // P1-79: no in-process child may run without the run's principal; refused before any session row, spawn or lease.
   if ((options.schedulePass !== undefined || (options.delegation !== undefined && options.delegation.runner === undefined))
     && options.leaseToken === undefined && planRequiresPrincipal(options.workspace)) {
@@ -485,6 +503,8 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
   const ctx = new Context();
   const fibers: { dispose(): Promise<void> }[] = [];
   let steerTimer: NodeJS.Timeout | null = null;
+  /** Set once the loop (or schedule pass) is ready; until then a throw is a failed composition, never a completion. */
+  let composed = false;
 
   try {
     // P2-12: interrupted calls follow their resume rules before this turn's first request; nothing is dispatched again.
@@ -511,6 +531,8 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
     });
     await llmFiber.await();
     fibers.push(llmFiber);
+    // An unknown route fails composition here, before any prompt row or request (DXA-13).
+    serviceOn<LlmSeamService>(ctx, LLM_SEAM.name).pin({ providerId: options.route.providerId, model: options.route.model });
 
     const promptFiber = ctx.plugin(promptServices, { profile, sessionId });
     await promptFiber.await();
@@ -611,6 +633,7 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
         Object.assign(runNative, { hookControl: runner.hookControl });
       }
       if (options.schedulePass !== undefined) {
+        composed = true;
         const pass = options.schedulePass;
         const nativeRunner = runner;
         const scheduleResults = await runDueSchedules({
@@ -627,6 +650,20 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
           ...(pass.signal === undefined ? {} : { signal: pass.signal })
         });
         return { sessionId, status: "idle", scheduleResults,
+          validation: projectNativeValidation(options.workspace, session.readEvents()),
+          systemPromptEventId: systemPromptRef.eventId,
+          promptSections: prompt.assemble().sections.map(section => section.name) };
+      }
+      if (options.goalRounds !== undefined) {
+        const goalRounds = await runGoalRounds({
+          workspace: options.workspace, parent: rootIdentity(options.agentId), session, runner,
+          mintSessionId: randomUUID, runAs: "goal-round", goal: options.prompt, maxRounds: options.goalRounds.maxRounds,
+          ...(options.delegation!.scope === undefined ? {} : { scope: options.delegation!.scope }),
+          ...(options.delegation!.stopConditions === undefined ? {} : { stopConditions: options.delegation!.stopConditions }),
+          ...(options.delegation!.maxDepth === undefined ? {} : { maxDepth: options.delegation!.maxDepth }),
+          ...(options.goalRounds.signal === undefined ? {} : { signal: options.goalRounds.signal })
+        });
+        return { sessionId, status: "idle", goalRounds,
           validation: projectNativeValidation(options.workspace, session.readEvents()),
           systemPromptEventId: systemPromptRef.eventId,
           promptSections: prompt.assemble().sections.map(section => section.name) };
@@ -659,6 +696,7 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
     });
     await loopFiber.await();
     fibers.push(loopFiber);
+    composed = true;
 
     const loop = serviceOn<AgentLoopSeamService>(ctx, AGENT_LOOP_SEAM.name);
     options.onReady?.({
@@ -713,7 +751,7 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
         // process resumes it through sessionResume.ts, which re-verifies first.
         session.releaseWithoutClosing();
       } else {
-        session.close({ reason: "completed" });
+        session.close({ reason: composed ? "completed" : COMPOSITION_FAILED });
       }
     } catch (error) {
       // A driver that entered `failed` left an open turn only recovery may

@@ -1,3 +1,5 @@
+import { statSync } from "node:fs";
+import { insideWorkspace } from "../tools/builtin/fsTools.js";
 import type { ToolDefinition as SignedToolDefinition } from "../toolhub/toolsSchema.js";
 import { selectedToolDefinitionFor } from "../tools/toolPipeline.js";
 import { bashTool } from "../tools/builtin/bashTool.js";
@@ -76,7 +78,7 @@ export function createNativeSandboxBash(options: {
   const { workspace, record, recordEgress } = options;
   const scrubValues = Object.freeze([...(options.scrubValues ?? [])]);
   const admissions = new WeakMap<ToolExecution, NativeSandboxValidationPermit>();
-  const tool: ToolDefinition = Object.freeze(bashTool({ scrubValues, runConfined: async (execution, command, timeoutMs) => {
+  const tool: ToolDefinition = Object.freeze(bashTool({ scrubValues, runConfined: async (execution, command, timeoutMs, cwd) => {
     const permit = admissions.get(execution);
     admissions.delete(execution);
     const admission = permit && permits.get(permit);
@@ -100,7 +102,14 @@ export function createNativeSandboxBash(options: {
         egressScope: { workspace, agentId: execution.agentId },
         ...(recordEgress ? { onEgress: (row: ShellEgressRow) => recordEgress(execution, row) } : {}) };
       const backend = process.platform === "darwin" ? seatbeltNativeShell() : bwrapBackend();
-      outcome = await new SandboxRunner({ backends: [backend] }).run(["/bin/sh", "-c", command], workspace, policy);
+      // Policy preparation awaits imports; a directory replaced during that time cannot escape the workspace.
+      if (insideWorkspace(workspace, cwd).full !== cwd || !statSync(cwd).isDirectory()) {
+        throw new Error("Shell workdir changed during admission; review and retry the call.");
+      }
+      // Backends use their cwd as the mount root. Keep that root and change only the command's directory.
+      // Exit on a failed cd before any part of the original shell script can run.
+      const script = execution.arguments.workdir === undefined ? command : `cd '${cwd.replaceAll("'", "'\\''")}' || exit\n${command}`;
+      outcome = await new SandboxRunner({ backends: [backend] }).run(["/bin/sh", "-c", script], workspace, policy);
     } catch (error) {
       outcome = { confined: false, backend: "none", failure: { kind: "runner-failure",
         reason: error instanceof Error ? error.message : "The native shell policy or launcher did not finish; execution and confinement are unconfirmed." },

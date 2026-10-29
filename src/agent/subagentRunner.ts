@@ -9,7 +9,8 @@ import { NO_HOOKS, type AgentLoopConfig, type LoopHookControl, type LoopHooks } 
 import type { ActionClass } from "../types.js";
 import { agentToolset } from "./agentToolset.js";
 import type { NativeShellReadiness } from "../sandbox/nativeShellGate.js";
-import { AgentDriver } from "./agentDriver.js";
+import type { AgentDriver } from "./agentDriver.js";
+import { composeNativeAgent } from "./nativeAgentComposition.js";
 import { readAgentRunSummary } from "./runReport.js";
 import { compactionSummaryRows } from "./compaction/summaryPrompt.js";
 import type { LoopLlm, LoopRoute } from "./stepRunner.js";
@@ -240,6 +241,7 @@ export function createDriverRunner(init: DriverRunnerInit): SubagentRunner {
     let toolset: ReturnType<typeof agentToolset> | undefined;
     let driver: AgentDriver | undefined;
     let opened = false;
+    let sessionSettled = false;
     let active = false;
     let keepAlive = false;
     let releaseRequested = false;
@@ -253,7 +255,8 @@ export function createDriverRunner(init: DriverRunnerInit): SubagentRunner {
       ctx.signal?.removeEventListener("abort", onParentAbort);
       try { toolset?.close(); } catch (error) { releaseError ??= error; }
       try {
-        if (opened) session.close({ reason: "completed" });
+        if (sessionSettled) { /* settled by the failed composition */ }
+        else if (opened) session.close({ reason: "completed" });
         else session.disposeWithoutClosing();
       } catch (error) {
         // A failed writer remains visibly incomplete. Dispose its DB handle
@@ -300,38 +303,52 @@ export function createDriverRunner(init: DriverRunnerInit): SubagentRunner {
       return { ok: false, text: "", reason: error instanceof Error ? error.message : String(error) };
     }
     try {
-      session.open({ sessionId: ctx.childSessionId, agentId: ctx.toolsetAgentId,
-        harnessVersion: init.harnessVersion, compositionDigest: init.compositionDigest, policyDigest: init.policyDigest });
-      opened = true;
-      toolset = agentToolset({ workspace: init.workspace, sessionId: ctx.childSessionId,
-        recorder: session, agentId: ctx.toolsetAgentId,
-        parentShell: init.parentShell ?? null,
-        ...(childLease === undefined ? {} : { leaseToken: childLease }),
-        delegation: { runAs: ctx.identity.runAs, depth: ctx.identity.depth, parentExecutionId: ctx.packetId ?? null,
-          ...(scope === undefined ? {} : { allowedActionClasses: scope }) },
-        ...(grant === undefined ? {} : { subagents: {
-          identity: ctx.identity, runner: grant.runner, session,
-          ...(childLease === undefined ? {} : { parentLeaseToken: childLease }),
-          ...(grant.maxDepth === undefined ? {} : { maxDepth: grant.maxDepth }),
-          ...(grant.mintSessionId === undefined ? {} : { mintSessionId: grant.mintSessionId }),
-          ...(descendantScope === undefined ? {} : { delegationScope: descendantScope }),
-          ...(descendantStops === undefined ? {} : { stopConditions: descendantStops })
-        } }) });
-      if (scope !== undefined) toolset.registry.restrict({ deny: new Set(deniedToolNamesForScope(toolset.registry, scope)) });
-      const systemPromptEventId = session.recordSystemPrompt(init.systemPrompt).eventId;
-      const approval = gate === undefined ? undefined : new ApprovalSeam({ session, workspace: init.workspace,
-        agentId: ctx.toolsetAgentId,
-        ...(gate.answerers === undefined ? {} : { answerers: gate.answerers }),
-        ...(gate.onRaised === undefined ? {} : { onRaised: gate.onRaised }),
-        ...(gate.initiator === undefined ? {} : { initiator: gate.initiator }) });
       // Inherited control, recorded before the driver exists so no turn can
       // precede the row that says what governed it. See `childHooks`.
       const { hooks, inherited } = childHooks(control);
-      recordHookControl({ session, ctx, inherited, gate, scope, descendantScope, descendantStops });
-      driver = new AgentDriver({ session, llm: init.makeLlm(session), route: init.route, systemPromptEventId,
-        tools: approval === undefined || gate === undefined ? toolset.seam : gateToolCallsOnApproval(toolset.seam, approval, gate),
-        hooks,
-        ...(config === undefined ? {} : { config }) });
+      let composed;
+      try {
+        composed = composeNativeAgent({
+          session,
+          open: { sessionId: ctx.childSessionId, agentId: ctx.toolsetAgentId,
+            harnessVersion: init.harnessVersion, compositionDigest: init.compositionDigest, policyDigest: init.policyDigest },
+          // The parent's rendered prompt and its control: a child is not a second root with its own context plugins.
+          prompt: { text: init.systemPrompt, hooks },
+          makeLlm: init.makeLlm,
+          route: init.route,
+          tools: () => {
+            const childTools = agentToolset({ workspace: init.workspace, sessionId: ctx.childSessionId,
+              recorder: session, agentId: ctx.toolsetAgentId,
+              parentShell: init.parentShell ?? null,
+              ...(childLease === undefined ? {} : { leaseToken: childLease }),
+              delegation: { runAs: ctx.identity.runAs, depth: ctx.identity.depth, parentExecutionId: ctx.packetId ?? null,
+                ...(scope === undefined ? {} : { allowedActionClasses: scope }) },
+              ...(grant === undefined ? {} : { subagents: {
+                identity: ctx.identity, runner: grant.runner, session,
+                ...(childLease === undefined ? {} : { parentLeaseToken: childLease }),
+                ...(grant.maxDepth === undefined ? {} : { maxDepth: grant.maxDepth }),
+                ...(grant.mintSessionId === undefined ? {} : { mintSessionId: grant.mintSessionId }),
+                ...(descendantScope === undefined ? {} : { delegationScope: descendantScope }),
+                ...(descendantStops === undefined ? {} : { stopConditions: descendantStops })
+              } }) });
+            toolset = childTools;
+            if (scope !== undefined) childTools.registry.restrict({ deny: new Set(deniedToolNamesForScope(childTools.registry, scope)) });
+            const approval = gate === undefined ? undefined : new ApprovalSeam({ session, workspace: init.workspace,
+              agentId: ctx.toolsetAgentId,
+              ...(gate.answerers === undefined ? {} : { answerers: gate.answerers }),
+              ...(gate.onRaised === undefined ? {} : { onRaised: gate.onRaised }),
+              ...(gate.initiator === undefined ? {} : { initiator: gate.initiator }) });
+            return approval === undefined || gate === undefined ? childTools.seam : gateToolCallsOnApproval(childTools.seam, approval, gate);
+          },
+          admit: () => recordHookControl({ session, ctx, inherited, gate, scope, descendantScope, descendantStops }),
+          ...(config === undefined ? {} : { driver: { config } })
+        });
+      } catch (error) {
+        sessionSettled = true; // composeNativeAgent closed it as a failed composition, never `completed`
+        throw error;
+      }
+      opened = true;
+      driver = composed.driver;
       // Keep this subscription for the entire continuation lifetime, not just
       // the first turn. A parent's abort permanently prevents further followups.
       ctx.signal?.addEventListener("abort", onParentAbort, { once: true });

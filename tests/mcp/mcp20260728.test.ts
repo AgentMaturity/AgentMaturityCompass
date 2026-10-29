@@ -307,7 +307,8 @@ function assertStatelessWire(f: Fixture): void {
     expect(row).toMatchObject({ httpMethod: "POST", path: "/mcp", originMatches: true,
       protocolHeader: MODERN, methodHeader: row.rpc, requestSessionPresent: false, lastEventIdPresent: false,
       acceptJson: true, acceptSse: true });
-    expect(row.meta).toEqual(EXPECTED_META);
+    // WP41 PXB-01: tools/call also carries the SDK's progress token so progress can renew its timeout.
+    expect(row.meta).toEqual(row.rpc === "tools/call" ? { ...EXPECTED_META, progressToken: expect.any(Number) } : EXPECTED_META);
     if (row.rpc === "tools/call") {
       expect(row).toMatchObject({ nameHeader: TOOL.name, query: QUERY,
         paramHeader: `=?base64?${Buffer.from(QUERY, "utf8").toString("base64")}?=` });

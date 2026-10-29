@@ -1,4 +1,5 @@
 /** AUTHORED UNEXECUTED. Actual public ACP/CLI/TS and HTTP, cold and hostile inputs. */
+import { withoutContextSnapshot } from "./helpers/contextSnapshot.js";
 import { spawn } from "node:child_process";
 import { writeFileSync } from "node:fs";
 import { createServer, type ServerResponse } from "node:http";
@@ -58,11 +59,14 @@ describe("native Gemini public seams (unexecuted)", () => {
       _meta: { "dev.agentmaturity.amc": { orderedImageInput: NATIVE_ORDERED_INPUT_FORMAT } } } });
     const request = h.begin("session/prompt", orderedRequest(sessionId, geminiInputBlocks())); request.bytes.fill(0);
     expect((await request.result).error).toBeUndefined();
-    expect(JSON.parse(h.sent[0]!.body.toString()).contents[0].parts).toEqual(GEMINI_EXPECTED_INPUT);
+    expect(withoutContextSnapshot(JSON.parse(h.sent[0]!.body.toString()).contents[0].parts)).toEqual(GEMINI_EXPECTED_INPUT);
     const rows = h.sessions.get(sessionId)!.readEvents();
     const inbox = rows.find(row => row.event_type === "loop/inbox" && JSON.parse(row.meta_json).payloadFormat === NATIVE_ORDERED_INPUT_FORMAT)!;
     expect(inbox).toBeDefined();
-    const projected = rows.filter(row => ["user/message", "user/attachment"].includes(row.event_type));
+    // GAP-WP39: one further user/message, the runtime-context snapshot, carries no source input.
+    const userRows = rows.filter(row => ["user/message", "user/attachment"].includes(row.event_type));
+    const projected = userRows.filter(row => JSON.parse(row.meta_json).sourceContentIndex !== undefined);
+    expect(userRows.length - projected.length).toBe(1);
     expect(projected.map(row => JSON.parse(row.meta_json).sourceContentIndex)).toEqual([0, 1, 2, 3]);
     expect(projected.every(row => JSON.parse(row.meta_json).sourceInputEventId === inbox.id)).toBe(true);
     for (const row of projected) { const payload = readEventPayload(root, row); if (payload.status !== "ok") throw new Error("missing source"); expect(sha256Hex(payload.bytes)).toBe(row.payload_sha256); }
@@ -113,7 +117,7 @@ describe("native Gemini public seams (unexecuted)", () => {
       expect(server.errors).toEqual([]); expect(server.sent).toHaveLength(2);
       for (const request of server.sent) {
         expect(request.url).toBe("/v1beta/models/fixture-model:streamGenerateContent?alt=sse"); expect(request.key).toBe("disposable-not-a-provider-key");
-        const body = JSON.parse(request.body.toString()); expect(body.contents[0].parts).toEqual(GEMINI_EXPECTED_INPUT); expect(body.generationConfig).toEqual({ maxOutputTokens: 64 });
+        const body = JSON.parse(request.body.toString()); expect(withoutContextSnapshot(body.contents[0].parts)).toEqual(GEMINI_EXPECTED_INPUT); expect(body.generationConfig).toEqual({ maxOutputTokens: 64 });
       }
       expect(orderedCold(root, session.sessionId).map(row => row.bytes)).toEqual(server.sent.map(request => request.body.toString("base64")));
     } finally { for (const client of clients) await client.close(); await server.close(); }

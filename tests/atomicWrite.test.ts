@@ -111,3 +111,54 @@ describe("writeFileAtomicSync", () => {
     expect(leftovers(dir)).toEqual([]);
   });
 });
+
+// Windows retries must revalidate after their wait; an earlier verdict cannot authorize a later rename.
+it("rechecks the commit guard before every rename retry", () => {
+  const dir = workspace();
+  const target = join(dir, "a.txt");
+  writeFileSync(target, "original");
+  const platform = Object.getOwnPropertyDescriptor(process, "platform")!;
+  const rename = fs.renameSync;
+  let attempts = 0;
+  let checks = 0;
+  vi.spyOn(fs, "renameSync").mockImplementation((from, to) => {
+    if (++attempts === 1) {
+      writeFileSync(target, "concurrent write");
+      throw Object.assign(new Error("temporarily busy"), { code: "EPERM" });
+    }
+    rename(from, to);
+  });
+  try {
+    Object.defineProperty(process, "platform", { value: "win32" });
+    expect(() => writeFileAtomicSync(target, "replacement", { beforeCommit: () => {
+      checks++;
+      if (readFileSync(target, "utf8") !== "original") throw new Error("changed before commit");
+    } })).toThrow("changed before commit");
+  } finally {
+    Object.defineProperty(process, "platform", platform);
+  }
+  expect(checks).toBe(2);
+  expect(attempts).toBe(1);
+  expect(readFileSync(target, "utf8")).toBe("concurrent write");
+  expect(leftovers(dir)).toEqual([]);
+});
+
+it.each([false, true])("cleans up only its own failed exclusive create (competing replacement: %s)", replaced => {
+  const dir = workspace();
+  const target = join(dir, "new.txt");
+  const write = fs.writeFileSync;
+  vi.spyOn(fs, "writeFileSync").mockImplementation((file, data, options) => {
+    if (typeof file === "number") {
+      if (replaced) {
+        fs.unlinkSync(target);
+        write(target, "competing replacement");
+      }
+      throw new Error("create write failed");
+    }
+    write(file, data, options);
+  });
+  expect(() => writeFileAtomicSync(target, "replacement", { createOnly: true })).toThrow("create write failed");
+  expect(fs.existsSync(target)).toBe(replaced);
+  if (replaced) expect(readFileSync(target, "utf8")).toBe("competing replacement");
+  expect(leftovers(dir)).toEqual([]);
+});

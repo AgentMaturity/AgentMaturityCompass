@@ -1,4 +1,5 @@
-import { mkdirSync, mkdtempSync, realpathSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import { execFileSync } from "node:child_process";
+import { mkdirSync, mkdtempSync, realpathSync, renameSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -7,6 +8,7 @@ import { defaultToolsConfig, toolsConfigSchema, type ToolDefinition as SignedToo
 import { initToolsConfig, loadVerifiedToolsConfigSnapshot, validateToolRequest } from "../src/toolhub/toolhubValidators.js";
 import { createNativeSandboxBash, type NativeSandboxValidationPermit } from "../src/sandbox/nativeSandboxBinding.js";
 import { nativeShellSandboxPolicy } from "../src/sandbox/nativeSandboxPolicy.js";
+import * as sandboxPolicy from "../src/sandbox/nativeSandboxPolicy.js";
 import type { SandboxOutcome, SandboxPolicy } from "../src/sandbox/sandboxTypes.js";
 import { ToolRegistry } from "../src/tools/toolRegistry.js";
 import { ToolPipeline, selectedToolDefinitionFor } from "../src/tools/toolPipeline.js";
@@ -73,6 +75,48 @@ describe("signed native shell mount policy", () => {
     expect(composed.receipts[0].enforcement?.sourcePolicySha256).toBe(loadVerifiedToolsConfigSnapshot(root).digestSha256);
     expect(Object.isFrozen(composed.tool)).toBe(true);
     expect(() => Object.defineProperty(composed.tool, "body", { value: () => ({ output: "replacement" }) })).toThrow();
+  });
+
+  it("changes the command directory without changing the sandbox workspace or mount grants (DXC-01)", async () => {
+    const root = setup(); sign(root);
+    const path = "workspace/dir'quoted";
+    const directory = join(root, path);
+    mkdirSync(directory);
+    const composed = compose(root);
+    const result = await composed.pipeline.execute({ ...call("pwd"), arguments: { command: "pwd", workdir: path,
+      description: "Inspect the selected directory" } });
+    expect(result.ok).toBe(true);
+    expect(backend.run.mock.calls[0]).toEqual([["/bin/sh", "-c", `cd '${directory.replaceAll("'", "'\\''")}' || exit\npwd`], root,
+      expect.objectContaining({ writableRoots: [join(root, "workspace", "allowed")] })]);
+    // Execute only the generated cwd wrapper: this proves shell quoting, not OS confinement.
+    const argv = backend.run.mock.calls[0][0];
+    expect(execFileSync(argv[0]!, argv.slice(1), { cwd: root, encoding: "utf8" }).trim()).toBe(directory);
+  });
+
+  it("refuses an escaping workdir before the confined backend runs (DXC-01)", async () => {
+    const root = setup(); sign(root);
+    symlinkSync(tmpdir(), join(root, "outside"));
+    const result = await compose(root).pipeline.execute({ ...call(), arguments: { command: "printf reviewed", workdir: "outside" } });
+    expect(result.ok).toBe(false);
+    expect(backend.run).not.toHaveBeenCalled();
+  });
+
+  it("rechecks a workdir changed during sandbox policy preparation (DXC-01)", async () => {
+    const root = setup(); sign(root);
+    const directory = join(root, "workspace", "sub");
+    mkdirSync(directory);
+    const original = sandboxPolicy.nativeShellSandboxPolicy;
+    const policy = vi.spyOn(sandboxPolicy, "nativeShellSandboxPolicy").mockImplementation((...args) => {
+      const value = original(...args);
+      renameSync(directory, `${directory}-moved`);
+      symlinkSync(tmpdir(), directory);
+      return value;
+    });
+    try {
+      const result = await compose(root).pipeline.execute({ ...call(), arguments: { command: "printf reviewed", workdir: "workspace/sub" } });
+      expect(result.ok).toBe(false);
+      expect(backend.run).not.toHaveBeenCalled();
+    } finally { policy.mockRestore(); }
   });
 
   it("retains a read-only native shell when no mount field is declared", async () => {

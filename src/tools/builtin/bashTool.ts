@@ -1,9 +1,11 @@
+import { statSync } from "node:fs";
 import { z } from "zod";
 import { runProcess } from "../../exec/runProcess.js";
 import { commandEnv } from "../../utils/providerKeys.js";
 import { defineTool } from "../toolRegistry.js";
 import { DefiniteFailureError, type ToolDefinition, type ToolExecution } from "../toolTypes.js";
 import type { SandboxOutcome } from "../../sandbox/sandboxTypes.js";
+import { insideWorkspace } from "./fsTools.js";
 
 /**
  * The one-shot shell tool (P4.3).
@@ -29,6 +31,10 @@ import type { SandboxOutcome } from "../../sandbox/sandboxTypes.js";
 
 const bashArgs = z.object({
   command: z.string().min(1),
+  workdir: z.string().min(1).optional(),
+  description: z.string().min(1).max(200).optional(),
+  // Background execution requires the governed job tools, not an ignored flag.
+  run_in_background: z.never().optional(),
   timeoutMs: z.number().int().positive().max(600_000).default(120_000)
 });
 
@@ -42,7 +48,7 @@ export interface BashToolDeps {
   /** Values removed from output before anyone sees them, e.g. a live lease. */
   readonly scrubValues?: readonly string[];
   /** Native Linux composition supplies a fail-closed, receipt-recording launcher. */
-  readonly runConfined?: (execution: ToolExecution, command: string, timeoutMs: number) => Promise<SandboxOutcome>;
+  readonly runConfined?: (execution: ToolExecution, command: string, timeoutMs: number, cwd: string) => Promise<SandboxOutcome>;
 }
 
 export function bashTool(deps: BashToolDeps = {}): ToolDefinition {
@@ -54,6 +60,8 @@ export function bashTool(deps: BashToolDeps = {}): ToolDefinition {
       type: "object",
       properties: {
         command: { type: "string", minLength: 1, description: "the shell command" },
+        workdir: { type: "string", minLength: 1, description: "existing directory inside the workspace; defaults to the workspace" },
+        description: { type: "string", minLength: 1, maxLength: 200, description: "short human-readable purpose of this command" },
         timeoutMs: { type: "integer", minimum: 1, maximum: 600_000, description: "milliseconds before the process tree is killed" }
       },
       required: ["command"]
@@ -63,12 +71,19 @@ export function bashTool(deps: BashToolDeps = {}): ToolDefinition {
       const parsed = bashArgs.safeParse(execution.arguments);
       if (!parsed.success) throw new DefiniteFailureError(parsed.error.message, { cause: parsed.error });
       const args = parsed.data;
+      let cwd: string;
+      try {
+        cwd = insideWorkspace(execution.workspace, args.workdir ?? ".").full;
+        if (!statSync(cwd).isDirectory()) throw new Error(`workdir is not a directory: ${args.workdir}`);
+      } catch (error) {
+        throw new DefiniteFailureError(error instanceof Error ? error.message : "Invalid shell workdir", { cause: error });
+      }
       if (execution.effectiveMode === "SIMULATE") {
-        return { ok: true, output: `SIMULATE bash: ${args.command}`, exitCode: null };
+        return { ok: true, output: `SIMULATE bash in ${cwd}${args.description ? ` (${args.description})` : ""}: ${args.command}`, exitCode: null };
       }
 
       if (deps.runConfined) {
-        const outcome = await deps.runConfined(execution, args.command, args.timeoutMs);
+        const outcome = await deps.runConfined(execution, args.command, args.timeoutMs, cwd);
         const sections = [outcome.stdout, outcome.stderr].filter(Boolean);
         if (outcome.droppedBytes) sections.push(`[amc: ${outcome.droppedBytes} bytes of output not shown; head and tail retained]`);
         if (outcome.timedOut) sections.push(`[amc: killed after ${args.timeoutMs}ms]`);
@@ -85,7 +100,7 @@ export function bashTool(deps: BashToolDeps = {}): ToolDefinition {
 
       const running = runProcess({
         argv: ["/bin/sh", "-c", args.command],
-        cwd: execution.workspace,
+        cwd,
         // An allow-list, as the confined shells use: a shell that can echo
         // $ANTHROPIC_API_KEY or $AMC_VAULT_PASSPHRASE into model context is a
         // credential disclosure with extra steps (WP36, DXB-14).

@@ -16,6 +16,8 @@ import { webSearchTool, type WebSearchProvider } from "../tools/builtin/webSearc
 import { askUserTool, type AskUserAnswerer } from "../tools/builtin/askUserTool.js";
 import { todoTool } from "../tools/builtin/todoTool.js";
 import { planTool } from "../tools/builtin/planTool.js";
+import { skillLoadTool } from "../skills/skillLoadTool.js";
+import { workspaceSkillRoots } from "../skills/skillTurn.js";
 import type { NativeReceiptRecorder } from "../tools/builtin/nativeToolBreadth/nativeReceipt.js";
 import type { ToolExecution } from "../tools/toolTypes.js";
 import {
@@ -96,6 +98,8 @@ export interface AgentToolsetOptions {
   readonly askUser?: AskUserAnswerer;
   /** Search provider for `web_search` (P1-43). Absent: every web_search call is denied; there is no default. */
   readonly webSearchProvider?: WebSearchProvider;
+  /** Skill roots `skill.load` advertises and loads from. Defaults to the workspace's own `.amc/skills`. */
+  readonly skillRoots?: readonly string[];
   /** Session the evidence rows belong to. Defaults to a per-agent bucket. */
   /**
    * The session tool evidence belongs to. REQUIRED, and deliberately so.
@@ -418,6 +422,7 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
   registry.define(askUserTool({ sessionId: currentSessionId, record: recordNative, ...(options.askUser ? { answerer: options.askUser } : {}) }));
   registry.define(todoTool({ sessionId: currentSessionId, record: recordNative }));
   registry.define(planTool({ sessionId: currentSessionId, record: recordNative }));
+  registry.define(skillLoadTool({ roots: options.skillRoots ?? workspaceSkillRoots(workspace), record: recordNative }));
   if (options.subagents !== undefined) {
     // Both tools, from one capability. `delegate` is one child; `workflow` is a
     // declared plan of them. Each is still gated a second time by the operator's
