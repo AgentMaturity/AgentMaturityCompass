@@ -15,6 +15,7 @@
  */
 
 import { randomUUID } from 'node:crypto';
+import { ratioOrNull } from '../utils/ratio.js';
 import { MetricRegistry, type MetricInput, type MetricGroupResult } from './metricTemplates.js';
 
 /* ── Types ──────────────────────────────────────────────────────── */
@@ -76,11 +77,11 @@ export interface IngestionStats {
   totalFlagged: number;
   totalTestcasesGenerated: number;
   totalErrors: number;
-  avgScoreOverall: number;
+  avgScoreOverall: number | null;
   /** Lifetime mean of finite nonnegative measured samples, or null when none exist. */
   avgLatencyMs: number | null;
   tracesByAgent: Record<string, number>;
-  flagRate: number;
+  flagRate: number | null;
 }
 
 export interface GeneratedTestcase {
@@ -123,10 +124,10 @@ export class TraceIngestionPipeline {
       totalFlagged: 0,
       totalTestcasesGenerated: 0,
       totalErrors: 0,
-      avgScoreOverall: 0,
+      avgScoreOverall: null,
       avgLatencyMs: null,
       tracesByAgent: {},
-      flagRate: 0,
+      flagRate: null,
     };
   }
 
@@ -207,30 +208,32 @@ export class TraceIngestionPipeline {
     this.stats.totalScored++;
 
     // Check if flagged
-    const flagged = metrics.overallScore < this.config.flagThreshold;
+    const flagged = metrics.overallScore === null || metrics.overallScore < this.config.flagThreshold;
     const flagReasons: string[] = [];
     if (flagged) {
       this.stats.totalFlagged++;
       if (metrics.failedMetrics.length > 0) {
         flagReasons.push(`Failed metrics: ${metrics.failedMetrics.join(', ')}`);
       }
-      if (metrics.overallScore < this.config.flagThreshold) {
+      if (metrics.overallScore === null) flagReasons.push("Metric evidence was not evaluated");
+      if (metrics.overallScore !== null && metrics.overallScore < this.config.flagThreshold) {
         flagReasons.push(`Score ${(metrics.overallScore * 100).toFixed(1)}% below threshold ${(this.config.flagThreshold * 100).toFixed(1)}%`);
       }
     }
 
     // Auto-generate testcase from flagged trace
     let testcaseGenerated = false;
-    if (flagged && this.config.autoGenerateTestcases) {
+    if (flagged && metrics.overallScore !== null && this.config.autoGenerateTestcases) {
       this.generateTestcase(trace, metrics.overallScore, flagReasons.join('; '));
       testcaseGenerated = true;
       this.stats.totalTestcasesGenerated++;
     }
 
     // Update running averages
-    const totalScores = this.scoredTraces.reduce((s, t) => s + t.metrics.overallScore, 0) + metrics.overallScore;
-    this.stats.avgScoreOverall = totalScores / (this.stats.totalScored);
-    this.stats.flagRate = this.stats.totalFlagged / Math.max(this.stats.totalScored, 1);
+    const measuredScores = [...this.scoredTraces.map(t => t.metrics.overallScore), metrics.overallScore]
+      .filter((score): score is number => score !== null);
+    this.stats.avgScoreOverall = ratioOrNull(measuredScores.reduce((sum, score) => sum + score, 0), measuredScores.length);
+    this.stats.flagRate = ratioOrNull(this.stats.totalFlagged, this.stats.totalScored);
 
     const result: ScoredTrace = {
       trace,

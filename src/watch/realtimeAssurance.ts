@@ -1,3 +1,5 @@
+import type { EvidenceOutcome } from "../types.js";
+import { ratioOrNull, weightedMean } from "../utils/ratio.js";
 import { mean, populationVariance } from "../experiments/stats.js";
 /**
  * Real-Time Assurance Engine
@@ -41,7 +43,9 @@ export interface RealtimeAssuranceResult {
   checksRun: number;
   violations: RealtimeAssuranceViolation[];
   passedChecks: string[];
-  score: number; // 0-100, percentage of checks passed
+  score: number | null; // 0-100, null when no checks ran
+  outcome: EvidenceOutcome;
+  sampleSize: number;
   durationMs: number;
 }
 
@@ -544,7 +548,9 @@ export class RealtimeAssuranceEngine extends EventEmitter {
       checksRun: this.checks.length,
       violations: allViolations,
       passedChecks,
-      score: this.checks.length > 0 ? (passedChecks.length / this.checks.length) * 100 : 100,
+      score: ratioOrNull(passedChecks.length * 100, this.checks.length),
+      outcome: this.checks.length > 0 ? "measured" : "not_evaluated",
+      sampleSize: this.checks.length,
       durationMs: Date.now() - startTime,
     };
 
@@ -596,7 +602,9 @@ export class RealtimeAssuranceEngine extends EventEmitter {
     totalChecks: number;
     totalResults: number;
     totalViolations: number;
-    avgScore: number;
+    avgScore: number | null;
+    outcome: EvidenceOutcome;
+    sampleSize: number;
     violationsBySeverity: Record<AssuranceCheckSeverity, number>;
     violationsByCheck: Record<string, number>;
   } {
@@ -608,15 +616,16 @@ export class RealtimeAssuranceEngine extends EventEmitter {
       byCheck[v.checkId] = (byCheck[v.checkId] ?? 0) + 1;
     }
 
-    const avgScore = this.results.length > 0
-      ? this.results.reduce((sum, r) => sum + r.score, 0) / this.results.length
-      : 100;
+    const measured = this.results.filter(result => result.score !== null);
+    const avgScore = weightedMean(measured.map(result => [result.score, 1]));
 
     return {
       totalChecks: this.checks.length,
       totalResults: this.results.length,
       totalViolations: this.violations.length,
       avgScore,
+      outcome: avgScore === null ? "not_evaluated" : "measured",
+      sampleSize: measured.length,
       violationsBySeverity: bySeverity,
       violationsByCheck: byCheck,
     };

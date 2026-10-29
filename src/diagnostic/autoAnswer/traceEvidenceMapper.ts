@@ -1,3 +1,5 @@
+import type { EvidenceOutcome } from "../../types.js";
+import { ratioOrNull } from "../../utils/ratio.js";
 import { nearestRank } from "../../experiments/stats.js";
 /**
  * Trace Evidence Mapper — Gap 4
@@ -51,7 +53,8 @@ export interface TraceMetrics {
   avgTokensPerTrace: number;
   uniqueModels: string[];
   uniqueTools: string[];
-  toolSuccessRate: number;
+  toolSuccessRate: number | null;
+  metricOutcomes: { toolSuccessRate: EvidenceOutcome };
   llmCallCount: number;
   toolCallCount: number;
   guardCallCount: number;
@@ -147,7 +150,8 @@ function computeMetrics(traces: NormalizedTrace[]): TraceMetrics {
     avgTokensPerTrace: tokens.reduce((a, b) => a + b, 0) / tokens.length,
     uniqueModels: Array.from(models),
     uniqueTools: Array.from(tools),
-    toolSuccessRate: toolSpans.length > 0 ? toolSuccesses.length / toolSpans.length : 1,
+    toolSuccessRate: ratioOrNull(toolSuccesses.length, toolSpans.length),
+    metricOutcomes: { toolSuccessRate: toolSpans.length === 0 ? "not_evaluated" : "measured" },
     llmCallCount: llmSpans.length,
     toolCallCount: toolSpans.length,
     guardCallCount: guardSpans.length,
@@ -216,7 +220,7 @@ function deriveAnswers(traces: NormalizedTrace[], metrics: TraceMetrics): TraceE
   });
 
   // Tool reliability
-  if (metrics.toolCallCount > 0) {
+  if (metrics.toolCallCount > 0 && metrics.toolSuccessRate !== null) {
     answers.push({
       questionId: "AMC-2.3",
       answer: metrics.toolSuccessRate > 0.95 ? 5 : metrics.toolSuccessRate > 0.85 ? 4 : metrics.toolSuccessRate > 0.7 ? 3 : metrics.toolSuccessRate > 0.5 ? 2 : 1,
@@ -297,7 +301,8 @@ function emptyMetrics(): TraceMetrics {
   return {
     avgLatencyMs: 0, p95LatencyMs: 0, p99LatencyMs: 0, errorRate: 0,
     totalCostUsd: 0, avgCostPerTrace: 0, totalTokens: 0, avgTokensPerTrace: 0,
-    uniqueModels: [], uniqueTools: [], toolSuccessRate: 1,
+    uniqueModels: [], uniqueTools: [], toolSuccessRate: null,
+    metricOutcomes: { toolSuccessRate: "not_evaluated" },
     llmCallCount: 0, toolCallCount: 0, guardCallCount: 0, retrievalCallCount: 0,
     hasRetrieval: false, hasGuards: false, hasCostTracking: false, hasSessionTracking: false,
     modelDiversity: 0, avgSpansPerTrace: 0, longestTrace: null, costliestTrace: null,

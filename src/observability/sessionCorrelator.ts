@@ -9,6 +9,8 @@ import { mean, nearestRank, populationVariance } from "../experiments/stats.js";
 
 import { randomUUID } from "node:crypto";
 import { join } from "node:path";
+import type { EvidenceOutcome } from "../types.js";
+import { ratioOrNull, weightedMean } from "../utils/ratio.js";
 import type { NormalizedTrace } from "../watch/observabilityBridge.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 
@@ -33,6 +35,8 @@ export interface SessionSummary {
   llmCallCount: number;
   qualityScore: number; // 0-100
   qualityFactors: SessionQualityFactors;
+  metricOutcomes: Record<keyof SessionQualityFactors, EvidenceOutcome>;
+  sampleSize: number;
   anomalies: string[];
 }
 
@@ -40,7 +44,7 @@ export interface SessionQualityFactors {
   errorFreeRate: number; // % of traces without errors
   latencyScore: number; // 0-100 based on p95
   costEfficiencyScore: number; // 0-100 based on cost per trace
-  toolReliabilityScore: number; // 0-100 based on tool success rate
+  toolReliabilityScore: number | null; // 0-100 based on tool success rate
   completionRate: number; // % of traces that completed (not cancelled/timeout)
   consistencyScore: number; // 0-100 based on latency variance
 }
@@ -430,18 +434,21 @@ function computeSessionSummary(sessionId: string, agentId: string, traces: Norma
   }
 
   // Quality factors
-  const errorFreeRate = traces.length > 0 ? (traces.length - errorCount) / traces.length : 1;
+  // getSession rejects empty trace groups before calling this function.
+  const errorFreeRate = (traces.length - errorCount) / traces.length;
   const p95 = percentile(latencies, 0.95);
   const latencyScore = p95 < 3000 ? 100 : p95 < 10000 ? 80 : p95 < 30000 ? 50 : p95 < 60000 ? 25 : 10;
   const avgCost = traces.length > 0 ? totalCost / traces.length : 0;
   const costEfficiencyScore = avgCost < 0.005 ? 100 : avgCost < 0.02 ? 80 : avgCost < 0.10 ? 60 : avgCost < 0.50 ? 30 : 10;
-  const toolReliabilityScore = toolSpans.length > 0 ? (toolSuccess.length / toolSpans.length) * 100 : 100;
+  const toolSuccessRate = ratioOrNull(toolSuccess.length, toolSpans.length);
+  const toolReliabilityScore = toolSuccessRate === null ? null : toolSuccessRate * 100;
   const completedTraces = traces.filter((t) => t.status !== "cancelled" && t.status !== "timeout");
-  const completionRate = traces.length > 0 ? completedTraces.length / traces.length : 1;
+  const completionRate = completedTraces.length / traces.length;
 
   // Consistency: low variance in latency = high consistency
   const avgLatency = mean(latencies);
   const variance = populationVariance(latencies, avgLatency);
+  // Observed zero-duration traces are identical, so their latency dispersion is zero.
   const cv = avgLatency > 0 ? Math.sqrt(variance) / avgLatency : 0;
   const consistencyScore = cv < 0.3 ? 100 : cv < 0.6 ? 75 : cv < 1.0 ? 50 : 25;
 
@@ -455,20 +462,18 @@ function computeSessionSummary(sessionId: string, agentId: string, traces: Norma
   };
 
   // Weighted quality score
-  const qualityScore = Math.round(
-    errorFreeRate * 30 +
-    (latencyScore / 100) * 20 +
-    (costEfficiencyScore / 100) * 10 +
-    (toolReliabilityScore / 100) * 15 +
-    completionRate * 15 +
-    (consistencyScore / 100) * 10
-  );
+  const qualityScore = Math.round(weightedMean([
+    [errorFreeRate * 100, 30], [latencyScore, 20], [costEfficiencyScore, 10],
+    [toolReliabilityScore, 15], [completionRate * 100, 15], [consistencyScore, 10],
+  ])!); // Nonempty traces always supply the other five factors.
+  const metricOutcomes = Object.fromEntries(Object.entries(qualityFactors).map(([key, score]) =>
+    [key, score === null ? "not_evaluated" : "measured"])) as SessionSummary["metricOutcomes"];
 
   // Anomalies
   const anomalies: string[] = [];
   if (errorFreeRate < 0.5) anomalies.push("High error rate");
   if (p95 > 30000) anomalies.push("High latency");
-  if (toolReliabilityScore < 50) anomalies.push("Tool failures");
+  if (toolReliabilityScore !== null && toolReliabilityScore < 50) anomalies.push("Tool failures");
   if (cv > 1.0) anomalies.push("Inconsistent performance");
 
   return {
@@ -490,6 +495,8 @@ function computeSessionSummary(sessionId: string, agentId: string, traces: Norma
     llmCallCount: allSpans.filter((s) => s.kind === "llm_call").length,
     qualityScore,
     qualityFactors,
+    metricOutcomes,
+    sampleSize: traces.length,
     anomalies,
   };
 }

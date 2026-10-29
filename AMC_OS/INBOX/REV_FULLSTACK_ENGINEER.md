@@ -395,3 +395,97 @@ Validation: Node `v22.23.3`; 154 tests passed across 10 affected files, includin
 Required repository verification completed successfully: build, typecheck, test typecheck, lint, counts, documentation drift, citations, architecture boundaries, threat model, API reference, schemas, gates, dead code, duplicates and freeze against `c71c28e2c` all passed. The required `verify-wt.sh` exited 0; its output is preserved in `/Users/sid/AgentMaturityCompass-worktrees/s442cd919/work/codex-runs/wp42-verify.log`. Generated count/document updates are retained. Git metadata writes are refused by the sandbox as expected; no commit, push or merge was performed. Native schedule commands retain their experimental qualification boundary.
 
 Next owner action: review the worktree and evidence, then commit using `/Users/sid/AgentMaturityCompass-worktrees/s442cd919/work/codex-runs/wp42-commit-message.txt`. Claude owns commit, verification and merge. No new command path or freeze exception was introduced.
+
+
+# WP19 handoff — 2026-10-29
+
+Role: REV_FULLSTACK_ENGINEER. Next owner: Claude integrator, session 3c2ecdb1.
+
+The implementation is uncommitted and unstaged on `rtd/gap-wp19` in
+`/Users/sid/AgentMaturityCompass-worktrees/s442cd919/work/amc-gap-wp19`.
+Base: `d3d541c2f`. Unchanged tip: `c4e626fcc6e6ea85825b437a6ea0bbd583168b7f`,
+which already includes WP42. Codex did not commit, push, or merge.
+
+The existing schedule store now supports versioned at/daily/weekly calendars,
+explicit timezone database provenance, skipped gaps, earlier-only folds, and
+claim-before-effect missed-run handling. Signed, receipt-bound objective CAS adds
+human create/edit/pause/resume, lifetime round budgets, exact round/session
+transitions, configured completion checks, and read-only scheduled `get_goal`.
+Unresolved rounds require authenticated closure before edit/resume; unsigned
+claim absence and bare operational completion cannot authorize recovery.
+
+| Row | Result |
+| --- | --- |
+| D45 | Fixed: bounded driver extensions and trusted stop checks. |
+| D46 | Fixed: durable signed objective lifecycle and authenticated recovery. |
+| D47 | Already fixed: existing claims, locks, and WP42 recovery retained and tested. |
+| D48 | Fixed: explicit versioned calendar subset with timezone/DST policies. |
+| DXB-23 | Fixed: blocked after three consecutive normalized answer hashes. |
+| DXB-24 | Fixed: 256-round maximum in driver and signed schema. |
+| DXB-25 | Fixed: completed/exhausted/failed outcomes and separate exhaustion suspension. |
+| DXB-26 | Fixed: 60,000 ms interval floor and optional 120-character title. |
+| DXC-17 | Fixed: read-only current-round context through actual native child tools. |
+| DXC-18 | Already fixed: intentional human-only schedule authority preserved. |
+| PXB-22 | Already fixed: no automatic crash retry; failure suspension preserved. |
+| PXB-23 | Already fixed: injected clocks and serial externally driven passes preserved. |
+
+Verification used Node 22.23.3, tzdb 2026a, and Vitest 4.1.11. The focused final
+run passed **241/241 tests across 10 files**, including 150 added cases and 91
+existing cases. Files: `goalRounds`, `goalTool`, `scheduleCalendar`, `objectiveStore`,
+`objectiveCompletion`, `scheduleWp19`, `scheduleStore`, `nativeScheduleLifecycle`,
+`nativeScheduleCli`, and `nativeScheduleRecovery` under `tests/*.test.ts`.
+Log: `/private/tmp/wp19-supported-final-tests.log`.
+
+The exact required verifier exited **0**:
+
+```sh
+bash /Users/sid/AgentMaturityCompass-worktrees/s442cd919/work/verify-wt.sh /Users/sid/AgentMaturityCompass-worktrees/s442cd919/work/amc-gap-wp19 d3d541c2f
+```
+
+Build, typecheck, typecheck:tests, lint, counts, documentation drift, citations,
+architecture boundaries, threat model, API reference, schemas, gates, both quality
+ratchets, and freeze passed. Git staging/amend failed with the expected sandbox
+`index.lock` refusal; the remaining checks ran. Log and exit record:
+`/private/tmp/wp19-verify-wt-final.log` and `/private/tmp/wp19-verify-wt-final.rc`.
+
+Red/green evidence includes failing cap/cadence/revocation/outcome tests, absent
+calendar/objective modules, unknown objective CLI flags, missing native getter
+wiring, and four unresolved-round recovery cases that incorrectly succeeded
+before the closure gate. All **82 final guard mutations were killed** and restored.
+Late mutations used temporary source overlays to keep verification source stable.
+The independent frozen-source security review found no actionable defects.
+
+Existing fixtures were adjusted to use valid 60-second cadence cutoffs and
+progressing answers in cap/checkpoint tests. The old schedule exhaustion assertion
+now checks its separate counter. The newly authored bare-closer recovery assertion
+was corrected because it encoded the unsigned-state recovery defect. No shell or
+confinement assertion was weakened.
+
+The initial 53-file diagnostic attempt completed with 453 passed and 269 failed
+(722 cases), including default `~/.amc/control-checkpoints` write refusals. A broad
+retry with external checkpoints exposed Seatbelt admission/launch
+`TOOL_OUTCOME_UNKNOWN`, denied `127.0.0.1` listening, and profile timeouts, and was
+stopped after those platform limits were confirmed. These runs do not establish
+platform qualification. The focused final run used fresh external
+`AMC_CONTROL_CHECKPOINT_DIR` storage. Vitest used `--configLoader runner` because
+the default loader writes into the shared node_modules symlink. Related-file list:
+`/private/tmp/wp19-final-test-files.txt`; diagnostic logs:
+`/private/tmp/wp19-related-tests.log`, `/private/tmp/wp19-related-tests-corrected.log`,
+`/private/tmp/wp19-bash-wiring-diagnosis.log`, and
+`/private/tmp/wp19-mcp20260728-diagnosis.log`.
+
+Deliberate limits: calendar support is at/daily/weekly, with no cron or RRULE
+parser or new dependency. Existing command paths gained flags; no new CLI path,
+Studio route, or freeze exception was added. Two quality acceptances retain the
+installed FIFO fixture utility and intentional goal/workflow delegation overlap;
+two unused new exports were made internal and stale quality entries were removed.
+The pre-existing P0-23 API remained unchanged and needs no retained acceptance.
+Graphify was absent locally and installed 0.9.74 differs from the reviewed 0.9.56
+pin, so source inspection was used. Coordinated authenticated-store rollback still
+requires an external trusted head, as in the existing native record stores.
+
+Next action: review the complete diff and generated artifacts, rerun the blocked
+platform cases on a suitable host, and commit using
+`/Users/sid/AgentMaturityCompass-worktrees/s442cd919/work/codex-runs/wp19-commit-message.txt`.
+Installed-package/platform qualification remains deferred. Native scheduling stays
+hidden and experimental. No research, dependency files, or other worktrees changed.

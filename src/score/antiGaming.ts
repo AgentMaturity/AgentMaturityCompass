@@ -1,3 +1,4 @@
+import { ratioOrNull } from "../utils/ratio.js";
 import { mean as statsMean, populationVariance } from "../experiments/stats.js";
 /**
  * Anti-Gaming & Goodhart's Law Resistance — MF-16
@@ -12,12 +13,18 @@ import { mean as statsMean, populationVariance } from "../experiments/stats.js";
  */
 
 import { sha256Hex } from "../utils/hash.js";
-import type { DiagnosticReport, QuestionScore } from "../types.js";
+import type { DiagnosticReport, EvidenceOutcome, QuestionScore } from "../types.js";
 
-export interface GamingDetectionResult {
-  gamingScore: number; // 0-100, higher = more suspicious
+interface EvaluationEvidence {
+  outcome: EvidenceOutcome;
+  sampleSize: number;
+  metricOutcomes: Record<string, EvidenceOutcome>;
+}
+
+export interface GamingDetectionResult extends EvaluationEvidence {
+  gamingScore: number | null; // 0-100, higher = more suspicious
   indicators: GamingIndicator[];
-  verdict: "clean" | "suspicious" | "likely-gaming";
+  verdict: "clean" | "suspicious" | "likely-gaming" | "not_evaluated";
   recommendation: string;
 }
 
@@ -33,7 +40,13 @@ export function detectGaming(report: DiagnosticReport): GamingDetectionResult {
 
   // 1. Suspiciously perfect scores
   const perfectScores = report.questionScores.filter(q => q.finalLevel >= 4.9);
-  const perfectRatio = report.questionScores.length === 0 ? 0 : perfectScores.length / report.questionScores.length;
+  const perfectRatio = ratioOrNull(perfectScores.length, report.questionScores.length);
+  if (perfectRatio === null) {
+    return {
+      outcome: "not_evaluated", sampleSize: 0, metricOutcomes: { perfectRatio: "not_evaluated", gamingScore: "not_evaluated" },
+      gamingScore: null, indicators, verdict: "not_evaluated", recommendation: "No question scores were available for gaming analysis.",
+    };
+  }
   if (perfectRatio > 0.8) {
     indicators.push({
       type: "perfect_score_pattern",
@@ -108,6 +121,7 @@ export function detectGaming(report: DiagnosticReport): GamingDetectionResult {
   else if (score >= 25) verdict = "suspicious";
 
   return {
+    outcome: "measured", sampleSize: report.questionScores.length, metricOutcomes: { perfectRatio: "measured", gamingScore: "measured" },
     gamingScore: score,
     indicators,
     verdict,
@@ -149,12 +163,12 @@ export interface SessionFingerprint {
   questionOrder: string[];
 }
 
-export interface CrossSessionAnalysis {
+export interface CrossSessionAnalysis extends EvaluationEvidence {
   sessionsAnalyzed: number;
   suspiciousPatterns: SuspiciousPattern[];
-  adaptationScore: number; // 0-100, higher = more suspicious
+  adaptationScore: number | null; // 0-100, higher = more suspicious
   collusionIndicators: CollusionIndicator[];
-  overallVerdict: "clean" | "suspicious" | "likely-gaming";
+  overallVerdict: "clean" | "suspicious" | "likely-gaming" | "not_evaluated";
 }
 
 export interface SuspiciousPattern {
@@ -176,21 +190,26 @@ export function analyzeSessionFingerprints(
   const patterns: SuspiciousPattern[] = [];
   const collusionIndicators: CollusionIndicator[] = [];
 
+  const metricOutcomes: Record<string, EvidenceOutcome> = {};
+  const scoresBySession = fingerprints.flatMap((fp) => {
+    const avg = ratioOrNull(fp.scoreDistribution.reduce((sum, value) => sum + value, 0), fp.scoreDistribution.length);
+    metricOutcomes[`${fp.sessionId}.scoreMean`] = avg === null ? "not_evaluated" : "measured";
+    metricOutcomes[`${fp.sessionId}.timingCoefficientOfVariation`] = "not_evaluated";
+    return avg === null ? [] : [{ sessionId: fp.sessionId, avg, ts: fp.ts }];
+  }).sort((a, b) => a.ts - b.ts);
+
   if (fingerprints.length < 2) {
     return {
+      outcome: "not_evaluated", sampleSize: fingerprints.length, metricOutcomes,
       sessionsAnalyzed: fingerprints.length,
       suspiciousPatterns: [],
-      adaptationScore: 0,
+      adaptationScore: null,
       collusionIndicators: [],
-      overallVerdict: "clean",
+      overallVerdict: "not_evaluated",
     };
   }
 
-  // 1. Score convergence — scores improving suspiciously toward perfect across sessions
-  const scoresBySession = fingerprints.map((f) => {
-    const avg = f.scoreDistribution.reduce((s, v) => s + v, 0) / (f.scoreDistribution.length || 1);
-    return { sessionId: f.sessionId, avg, ts: f.ts };
-  }).sort((a, b) => a.ts - b.ts);
+  // Missing score distributions do not act as zero-score sessions in convergence checks.
 
   if (scoresBySession.length >= 3) {
     const firstAvg = scoresBySession[0]!.avg;
@@ -206,11 +225,15 @@ export function analyzeSessionFingerprints(
   }
 
   // 2. Response timing anomaly — suspiciously consistent timing across questions
+  let measuredTimingSessions = 0;
   for (const fp of fingerprints) {
     if (fp.responseLatencyMs.length < 5) continue;
     const mean = statsMean(fp.responseLatencyMs);
     const variance = populationVariance(fp.responseLatencyMs);
-    const cv = Math.sqrt(variance) / (mean || 1);
+    const cv = ratioOrNull(Math.sqrt(variance), mean);
+    metricOutcomes[`${fp.sessionId}.timingCoefficientOfVariation`] = cv === null ? "not_evaluated" : "measured";
+    if (cv === null) continue;
+    measuredTimingSessions += 1;
     // Very low coefficient of variation = unnaturally consistent timing
     if (cv < 0.1 && mean < 500) {
       patterns.push({
@@ -254,7 +277,9 @@ export function analyzeSessionFingerprints(
       const aEvidence = new Set(aFps.flatMap((f) => f.evidencePatterns));
       const bEvidence = new Set(bFps.flatMap((f) => f.evidencePatterns));
       const overlap = [...aEvidence].filter((e) => bEvidence.has(e));
-      const similarity = overlap.length / Math.max(aEvidence.size, bEvidence.size, 1);
+      const similarity = ratioOrNull(overlap.length, Math.max(aEvidence.size, bEvidence.size));
+      metricOutcomes[`evidenceSimilarity:${agents[i]}:${agents[j]}`] = similarity === null ? "not_evaluated" : "measured";
+      if (similarity === null) continue;
       if (similarity > 0.8) {
         collusionIndicators.push({
           agents: [agents[i]!, agents[j]!],
@@ -289,12 +314,14 @@ export function analyzeSessionFingerprints(
   if (adaptationScore >= 60) verdict = "likely-gaming";
   else if (adaptationScore >= 25) verdict = "suspicious";
 
+  const measured = scoresBySession.length >= 2 || measuredTimingSessions > 0 || fingerprints.some(fp => fp.evidencePatterns.length > 0);
   return {
+    outcome: measured ? "measured" : "not_evaluated", sampleSize: fingerprints.length, metricOutcomes,
     sessionsAnalyzed: fingerprints.length,
     suspiciousPatterns: patterns,
-    adaptationScore,
+    adaptationScore: measured ? adaptationScore : null,
     collusionIndicators,
-    overallVerdict: verdict,
+    overallVerdict: measured ? verdict : "not_evaluated",
   };
 }
 
@@ -302,11 +329,11 @@ export function analyzeSessionFingerprints(
 // R3-03: Quickscore variance stabilization
 // ---------------------------------------------------------------------------
 
-export interface StabilizedScore {
+export interface StabilizedScore extends EvaluationEvidence {
   rawScores: number[];
-  stabilizedScore: number;
-  confidenceInterval: { lower: number; upper: number };
-  variance: number;
+  stabilizedScore: number | null;
+  confidenceInterval: { lower: number | null; upper: number | null };
+  variance: number | null;
   stability: "stable" | "moderate" | "unstable";
   runsRequired: number;
 }
@@ -320,12 +347,23 @@ export function stabilizeScores(
   confidences: number[] = [],
 ): StabilizedScore {
   if (scores.length === 0) {
-    return { rawScores: [], stabilizedScore: 0, confidenceInterval: { lower: 0, upper: 0 }, variance: 0, stability: "unstable", runsRequired: 3 };
+    return {
+      outcome: "not_evaluated", sampleSize: 0, metricOutcomes: { stabilizedScore: "not_evaluated", variance: "not_evaluated" },
+      rawScores: [], stabilizedScore: null, confidenceInterval: { lower: null, upper: null }, variance: null, stability: "unstable", runsRequired: 3,
+    };
   }
 
   if (scores.length === 1) {
-    const s = scores[0]!;
-    return { rawScores: scores, stabilizedScore: s, confidenceInterval: { lower: Math.max(0, s - 0.5), upper: Math.min(5, s + 0.5) }, variance: 0, stability: "moderate", runsRequired: 2 };
+    // One observed value has zero population variance; retain the existing ±0.5 interval convention.
+    const weight = confidences[0] ?? 0.5;
+    const s = ratioOrNull(scores[0]! * weight, weight);
+    return {
+      outcome: s === null ? "not_evaluated" : "measured", sampleSize: 1,
+      metricOutcomes: { stabilizedScore: s === null ? "not_evaluated" : "measured", variance: "measured" },
+      rawScores: scores, stabilizedScore: s,
+      confidenceInterval: s === null ? { lower: null, upper: null } : { lower: Math.max(0, s - 0.5), upper: Math.min(5, s + 0.5) },
+      variance: 0, stability: s === null ? "unstable" : "moderate", runsRequired: 2,
+    };
   }
 
   // Trimmed mean: remove top and bottom if enough data points
@@ -341,10 +379,11 @@ export function stabilizeScores(
   let totalWeight = 0;
   for (let i = 0; i < trimmed.length; i++) {
     const weight = trimmedPairs[i]!.c;
+    if (!Number.isFinite(weight) || weight <= 0) continue;
     weightedSum += trimmed[i]! * weight;
     totalWeight += weight;
   }
-  const stabilizedScore = totalWeight > 0 ? weightedSum / totalWeight : statsMean(trimmed);
+  const stabilizedScore = ratioOrNull(weightedSum, totalWeight);
 
   // Variance
   const variance = populationVariance(trimmed);
@@ -353,22 +392,24 @@ export function stabilizeScores(
   // Unlike resampled mean deltas in experiments/stats.ts, this normal interval uses trimmed population variance around a confidence-weighted center.
   // 95% confidence interval
   const marginOfError = 1.96 * stdDev / Math.sqrt(trimmed.length);
-  const lower = Math.max(0, stabilizedScore - marginOfError);
-  const upper = Math.min(5, stabilizedScore + marginOfError);
+  const lower = stabilizedScore === null ? null : Math.max(0, stabilizedScore - marginOfError);
+  const upper = stabilizedScore === null ? null : Math.min(5, stabilizedScore + marginOfError);
 
   // Stability classification
-  let stability: StabilizedScore["stability"] = "stable";
+  let stability: StabilizedScore["stability"] = stabilizedScore === null ? "unstable" : "stable";
   if (stdDev > 0.5) stability = "unstable";
-  else if (stdDev > 0.2) stability = "moderate";
+  else if (stdDev > 0.2 && stabilizedScore !== null) stability = "moderate";
 
   // How many more runs needed for ±0.5 stability
   const targetMargin = 0.25;
   const runsRequired = stdDev > 0 ? Math.ceil((1.96 * stdDev / targetMargin) ** 2) : 0;
 
   return {
+    outcome: stabilizedScore === null ? "not_evaluated" : "measured", sampleSize: scores.length,
+    metricOutcomes: { stabilizedScore: stabilizedScore === null ? "not_evaluated" : "measured", variance: "measured" },
     rawScores: scores,
-    stabilizedScore: Number(stabilizedScore.toFixed(4)),
-    confidenceInterval: { lower: Number(lower.toFixed(4)), upper: Number(upper.toFixed(4)) },
+    stabilizedScore: stabilizedScore === null ? null : Number(stabilizedScore.toFixed(4)),
+    confidenceInterval: { lower: lower === null ? null : Number(lower.toFixed(4)), upper: upper === null ? null : Number(upper.toFixed(4)) },
     variance: Number(variance.toFixed(6)),
     stability,
     runsRequired: Math.max(0, runsRequired - scores.length),

@@ -1,3 +1,5 @@
+import type { JudgeCalibrationStabilitySummary } from "./judgeCalibrationStabilityTypes.js";
+export type { JudgeCalibrationStabilitySummary } from "./judgeCalibrationStabilityTypes.js";
 import { mean as statsMean, populationVariance } from "../experiments/stats.js";
 import type { QuestionScoreSignedEvidenceRef } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -297,15 +299,6 @@ export interface JudgeCalibrationDisagreement {
   itemSummaries: JudgeCalibrationItemSummary[];
 }
 
-export interface JudgeCalibrationStabilitySummary {
-  checkCount: number;
-  failedItemIds: string[];
-  meanRankingStability0to1: number;
-  meanDataQuality0to1: number;
-  meanOcrReadability0to1: number;
-  maxTailFailureRate0to1: number;
-  stageDistribution: Record<string, number>;
-}
 
 export interface JudgeCalibrationCiGate {
   mode: JudgeCalibrationMode;
@@ -628,10 +621,10 @@ function buildStabilityCheck(
   if ((rowWithoutHash.tailFailureRate0to1 ?? 0) > thresholds.maxTailFailureRate0to1) {
     failedReasons.push(`tail failure rate ${rowWithoutHash.tailFailureRate0to1} exceeds ${thresholds.maxTailFailureRate0to1}`);
   }
-  if ((rowWithoutHash.dataQuality0to1 ?? 1) < thresholds.minDataQuality0to1) {
+  if (rowWithoutHash.dataQuality0to1 !== null && rowWithoutHash.dataQuality0to1 < thresholds.minDataQuality0to1) {
     failedReasons.push(`data quality ${rowWithoutHash.dataQuality0to1} below ${thresholds.minDataQuality0to1}`);
   }
-  if ((rowWithoutHash.ocrReadability0to1 ?? 1) < thresholds.minOcrReadability0to1) {
+  if (rowWithoutHash.ocrReadability0to1 !== null && rowWithoutHash.ocrReadability0to1 < thresholds.minOcrReadability0to1) {
     failedReasons.push(`ocr readability ${rowWithoutHash.ocrReadability0to1} below ${thresholds.minOcrReadability0to1}`);
   }
   return {
@@ -663,10 +656,16 @@ function buildStabilitySummary(checks: JudgeCalibrationStabilityCheck[]): JudgeC
   return {
     checkCount: checks.length,
     failedItemIds: unique(checks.filter((check) => check.failed).map((check) => check.itemId)),
-    meanRankingStability0to1: mean(checks.map((check) => check.rankingStability0to1)),
-    meanDataQuality0to1: dataQualityScores.length === 0 ? 1 : mean(dataQualityScores),
-    meanOcrReadability0to1: ocrScores.length === 0 ? 1 : mean(ocrScores),
-    maxTailFailureRate0to1: tailFailureRates.length === 0 ? 0 : round(Math.max(...tailFailureRates)),
+    meanRankingStability0to1: checks.length === 0 ? null : mean(checks.map((check) => check.rankingStability0to1)),
+    meanDataQuality0to1: dataQualityScores.length === 0 ? null : mean(dataQualityScores),
+    meanOcrReadability0to1: ocrScores.length === 0 ? null : mean(ocrScores),
+    maxTailFailureRate0to1: tailFailureRates.length === 0 ? null : round(Math.max(...tailFailureRates)),
+    metricOutcomes: {
+      meanRankingStability0to1: checks.length === 0 ? "not_evaluated" : "measured",
+      meanDataQuality0to1: dataQualityScores.length === 0 ? "not_evaluated" : "measured",
+      meanOcrReadability0to1: ocrScores.length === 0 ? "not_evaluated" : "measured",
+      maxTailFailureRate0to1: tailFailureRates.length === 0 ? "not_evaluated" : "measured",
+    },
     stageDistribution: distribution(checks.map((check) => check.stage)),
   };
 }

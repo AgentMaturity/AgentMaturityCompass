@@ -185,8 +185,9 @@ function computeAutonomyPreservation(params: {
     }
   ];
 
+  // The three metrics above are always constructed, so this denominator cannot be zero.
   const autonomyPreservationIndex = Number(
-    (metrics.reduce((sum, metric) => sum + metric.score0to100, 0) / Math.max(1, metrics.length)).toFixed(2)
+    (metrics.reduce((sum, metric) => sum + metric.score0to100, 0) / metrics.length).toFixed(2)
   );
 
   const alerts: AutonomyPreservationAlert[] = [];

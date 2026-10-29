@@ -21,7 +21,7 @@ import { pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
 
 const MANIFEST = "unused-code/plan-edits/manifest.json";
-const ISSUE_KEY = /^(?:P[0-3]-[0-9]{2}|AXE-23|GAP-WP[0-9]{2})$/;
+const ISSUE_KEY = /^(?:P[0-3]-[0-9]{2}|AXE-23|AXE-27|GAP-WP[0-9]{2})$/;
 const USAGE = "Usage: node scripts/snapshot-plan-edit.mjs --issue <KEY> --base <rev> <path>...";
 const EMPTY = { schemaVersion: 1, decision: "D-15", files: [] };
 // package.json is archived like any other frozen file: the P0-01 package-entries pin reads its landed bytes.

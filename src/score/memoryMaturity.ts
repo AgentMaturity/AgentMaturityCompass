@@ -1,3 +1,5 @@
+import type { EvidenceOutcome } from "../types.js";
+import { ratioOrNull, weightedMean } from "../utils/ratio.js";
 import { mean, standardDeviation } from "../experiments/stats.js";
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -39,20 +41,26 @@ export interface MemoryPoisoningOptions {
 }
 
 export interface MemoryPersistenceAssessment {
+  outcome: EvidenceOutcome;
+  sampleSize: number;
+  metricOutcomes: Record<string, EvidenceOutcome>;
   verified: boolean;
   probeCount: number;
-  retainedRatio: number;
-  restartSurvivalScore: number;
+  retainedRatio: number | null;
+  restartSurvivalScore: number | null;
   failedProbeIds: string[];
 }
 
 export interface MemoryHashChainAssessment {
+  outcome: EvidenceOutcome;
+  sampleSize: number;
+  metricOutcomes: Record<string, EvidenceOutcome>;
   valid: boolean;
   checkedEntries: number;
   validEntries: number;
   brokenLinks: number;
   tamperedEntryIds: string[];
-  integrityScore: number;
+  integrityScore: number | null;
 }
 
 export interface MemoryPoisoningAnomaly {
@@ -62,21 +70,27 @@ export interface MemoryPoisoningAnomaly {
 }
 
 export interface MemoryPoisoningAssessment {
+  outcome: EvidenceOutcome;
+  sampleSize: number;
+  metricOutcomes: Record<string, EvidenceOutcome>;
   flaggedEntryIds: string[];
-  anomalyRate: number;
+  anomalyRate: number | null;
   anomalies: MemoryPoisoningAnomaly[];
-  precision?: number;
-  recall?: number;
-  poisoningScore: number;
+  precision?: number | null;
+  recall?: number | null;
+  poisoningScore: number | null;
 }
 
 export interface MemoryContinuityAssessment {
+  outcome: EvidenceOutcome;
+  sampleSize: number;
+  metricOutcomes: Record<string, EvidenceOutcome>;
   stable: boolean;
   checkpointCount: number;
-  averageCoherence: number;
-  averageDrift: number;
+  averageCoherence: number | null;
+  averageDrift: number | null;
   weakCheckpointIds: string[];
-  continuityScore: number;
+  continuityScore: number | null;
 }
 
 export interface MemoryMaturityInput {
@@ -89,14 +103,17 @@ export interface MemoryMaturityInput {
 }
 
 export interface MemoryMaturityProfile {
+  outcome: EvidenceOutcome;
+  sampleSize: number;
+  metricOutcomes: Record<string, EvidenceOutcome>;
   agentId: string;
   persistenceLevel: MemoryLevel;
   continuityLevel: MemoryLevel;
   integrityLevel: MemoryLevel;
-  overallScore: number;
+  overallScore: number | null;
   retrievalAccuracy?: number;
-  continuityScore?: number;
-  memoryIntegrityScore?: number;
+  continuityScore?: number | null;
+  memoryIntegrityScore?: number | null;
   tamperEvidence: boolean;
   persistenceVerification: MemoryPersistenceAssessment;
   antiTampering: MemoryHashChainAssessment;
@@ -156,8 +173,8 @@ function extractLevel(scores: Record<string, number>, keys: string[]): { level: 
   return { level: 0, present: false };
 }
 
-function mergeLevel(base: MemoryLevel, basePresent: boolean, derivedPercent?: number): MemoryLevel {
-  if (derivedPercent === undefined) {
+function mergeLevel(base: MemoryLevel, basePresent: boolean, derivedPercent?: number | null): MemoryLevel {
+  if (derivedPercent === undefined || derivedPercent === null) {
     return base;
   }
   const derived = levelFromPercent(derivedPercent);
@@ -184,16 +201,6 @@ function average(values: number[]): number {
 }
 
 export function verifyMemoryPersistence(probes: MemoryPersistenceProbe[]): MemoryPersistenceAssessment {
-  if (probes.length === 0) {
-    return {
-      verified: false,
-      probeCount: 0,
-      retainedRatio: 0,
-      restartSurvivalScore: 0,
-      failedProbeIds: []
-    };
-  }
-
   const retainedRatios: number[] = [];
   const adjustedRatios: number[] = [];
   const failedProbeIds: string[] = [];
@@ -201,37 +208,30 @@ export function verifyMemoryPersistence(probes: MemoryPersistenceProbe[]): Memor
   for (const probe of probes) {
     const expected = new Set(probe.expectedKeys.map(normalizeToken).filter((value) => value.length > 0));
     const recalled = new Set(probe.recalledKeys.map(normalizeToken).filter((value) => value.length > 0));
-
-    let retained = 0;
-    if (expected.size === 0) {
-      retained = recalled.size === 0 ? 1 : 0;
-    } else {
-      let matched = 0;
-      for (const key of expected) {
-        if (recalled.has(key)) {
-          matched++;
-        }
-      }
-      retained = matched / expected.size;
+    let matched = 0;
+    for (const key of expected) {
+      if (recalled.has(key)) matched++;
     }
+    const retained = ratioOrNull(matched, expected.size);
+    if (retained === null) continue;
 
     const adjusted = clamp(retained - latencyPenaltyMs(probe.restoredWithinMs), 0, 1);
     retainedRatios.push(retained);
     adjustedRatios.push(adjusted);
-
-    if (adjusted < 0.6) {
-      failedProbeIds.push(probe.probeId);
-    }
+    if (adjusted < 0.6) failedProbeIds.push(probe.probeId);
   }
 
-  const retainedRatio = average(retainedRatios);
-  const restartSurvivalScore = Math.round(average(adjustedRatios) * 100);
-  const verified = failedProbeIds.length === 0 && restartSurvivalScore >= 70;
-
+  const retainedRatio = ratioOrNull(retainedRatios.reduce((sum, value) => sum + value, 0), retainedRatios.length);
+  const adjustedRatio = ratioOrNull(adjustedRatios.reduce((sum, value) => sum + value, 0), adjustedRatios.length);
+  const restartSurvivalScore = adjustedRatio === null ? null : Math.round(adjustedRatio * 100);
+  const outcome = retainedRatio === null ? "not_evaluated" : "measured";
   return {
-    verified,
+    outcome,
+    sampleSize: retainedRatios.length,
+    metricOutcomes: { retainedRatio: outcome, restartSurvivalScore: outcome },
+    verified: restartSurvivalScore !== null && failedProbeIds.length === 0 && restartSurvivalScore >= 70,
     probeCount: probes.length,
-    retainedRatio: Number(retainedRatio.toFixed(3)),
+    retainedRatio: retainedRatio === null ? null : Number(retainedRatio.toFixed(3)),
     restartSurvivalScore,
     failedProbeIds
   };
@@ -260,7 +260,10 @@ export function verifyMemoryHashChain(entries: MemoryHashChainEntry[]): MemoryHa
       validEntries: 0,
       brokenLinks: 0,
       tamperedEntryIds: [],
-      integrityScore: 0
+      outcome: "not_evaluated",
+      sampleSize: 0,
+      metricOutcomes: { integrityScore: "not_evaluated" },
+      integrityScore: null
     };
   }
 
@@ -305,6 +308,9 @@ export function verifyMemoryHashChain(entries: MemoryHashChainEntry[]): MemoryHa
   const integrityScore = Math.round((validEntries / ordered.length) * 100);
 
   return {
+    outcome: "measured",
+    sampleSize: ordered.length,
+    metricOutcomes: { integrityScore: "measured" },
     valid: tampered.size === 0,
     checkedEntries: ordered.length,
     validEntries,
@@ -409,9 +415,14 @@ export function detectMemoryPoisoning(
   if (entries.length === 0) {
     return {
       flaggedEntryIds: [],
-      anomalyRate: 0,
+      anomalyRate: null,
       anomalies: [],
-      poisoningScore: 0
+      precision: null,
+      recall: null,
+      poisoningScore: null,
+      outcome: "not_evaluated",
+      sampleSize: 0,
+      metricOutcomes: { anomalyRate: "not_evaluated", precision: "not_evaluated", recall: "not_evaluated", poisoningScore: "not_evaluated" }
     };
   }
 
@@ -429,8 +440,8 @@ export function detectMemoryPoisoning(
   const anomalyRate = flaggedEntryIds.length / entries.length;
 
   const labelledEntries = entries.filter((entry) => typeof entry.knownPoisoned === "boolean");
-  let precision: number | undefined;
-  let recall: number | undefined;
+  let precision: number | null = null;
+  let recall: number | null = null;
 
   if (labelledEntries.length > 0) {
     const flagged = new Set(flaggedEntryIds);
@@ -440,40 +451,40 @@ export function detectMemoryPoisoning(
     const predictedPositives = truePositives + falsePositives;
     const actualPositives = truePositives + falseNegatives;
 
-    precision = predictedPositives === 0 ? 1 : truePositives / predictedPositives;
-    recall = actualPositives === 0 ? 1 : truePositives / actualPositives;
+    precision = ratioOrNull(truePositives, predictedPositives);
+    recall = ratioOrNull(truePositives, actualPositives);
   }
 
-  let poisoningScore: number;
-  if (precision !== undefined && recall !== undefined) {
+  let poisoningScore: number | null;
+  if (precision !== null && recall !== null) {
+    // Nonempty predicted/actual positive universes with no true positives are measured failure.
     const f1 = precision + recall === 0 ? 0 : (2 * precision * recall) / (precision + recall);
     poisoningScore = Math.round(clamp(f1 * 100 - anomalyRate * 10, 0, 100));
-  } else {
+  } else if (labelledEntries.length === 0) {
     poisoningScore = Math.round(clamp(100 - anomalyRate * 160, 0, 100));
+  } else {
+    poisoningScore = null;
   }
 
   return {
+    outcome: poisoningScore === null ? "not_evaluated" : "measured",
+    sampleSize: entries.length,
+    metricOutcomes: {
+      anomalyRate: "measured",
+      precision: precision === null ? "not_evaluated" : "measured",
+      recall: recall === null ? "not_evaluated" : "measured",
+      poisoningScore: poisoningScore === null ? "not_evaluated" : "measured",
+    },
     flaggedEntryIds,
     anomalyRate: Number(anomalyRate.toFixed(3)),
     anomalies,
-    precision: precision === undefined ? undefined : Number(precision.toFixed(3)),
-    recall: recall === undefined ? undefined : Number(recall.toFixed(3)),
+    precision: precision === null ? null : Number(precision.toFixed(3)),
+    recall: recall === null ? null : Number(recall.toFixed(3)),
     poisoningScore
   };
 }
 
 export function scoreMemoryContinuity(checkpoints: MemoryContinuityCheckpoint[]): MemoryContinuityAssessment {
-  if (checkpoints.length === 0) {
-    return {
-      stable: false,
-      checkpointCount: 0,
-      averageCoherence: 0,
-      averageDrift: 0,
-      weakCheckpointIds: [],
-      continuityScore: 0
-    };
-  }
-
   const coherences: number[] = [];
   const drifts: number[] = [];
   const weakCheckpointIds: string[] = [];
@@ -481,38 +492,33 @@ export function scoreMemoryContinuity(checkpoints: MemoryContinuityCheckpoint[])
   for (const checkpoint of checkpoints) {
     const expected = new Set(checkpoint.expectedFacts.map(normalizeToken).filter((row) => row.length > 0));
     const recalled = new Set(checkpoint.recalledFacts.map(normalizeToken).filter((row) => row.length > 0));
-
-    let overlap = 0;
-    if (expected.size === 0) {
-      overlap = recalled.size === 0 ? 1 : 0;
-    } else {
-      let matched = 0;
-      for (const fact of expected) {
-        if (recalled.has(fact)) {
-          matched++;
-        }
-      }
-      overlap = matched / expected.size;
+    let matched = 0;
+    for (const fact of expected) {
+      if (recalled.has(fact)) matched++;
     }
+    const overlap = ratioOrNull(matched, expected.size);
+    if (overlap === null) continue;
 
     const drift = clamp(checkpoint.semanticDrift ?? 0, 0, 1);
     const coherence = clamp(overlap - drift * 0.35, 0, 1);
     coherences.push(coherence);
     drifts.push(drift);
-    if (coherence < 0.65) {
-      weakCheckpointIds.push(checkpoint.checkpointId);
-    }
+    if (coherence < 0.65) weakCheckpointIds.push(checkpoint.checkpointId);
   }
 
-  const averageCoherence = average(coherences);
-  const averageDrift = average(drifts);
-  const continuityScore = Math.round(clamp(averageCoherence * 100 - averageDrift * 20, 0, 100));
-
+  const averageCoherence = ratioOrNull(coherences.reduce((sum, value) => sum + value, 0), coherences.length);
+  const averageDrift = ratioOrNull(drifts.reduce((sum, value) => sum + value, 0), drifts.length);
+  const continuityScore = averageCoherence === null || averageDrift === null
+    ? null : Math.round(clamp(averageCoherence * 100 - averageDrift * 20, 0, 100));
+  const outcome = continuityScore === null ? "not_evaluated" : "measured";
   return {
-    stable: weakCheckpointIds.length === 0 && continuityScore >= 70,
+    outcome,
+    sampleSize: coherences.length,
+    metricOutcomes: { averageCoherence: outcome, averageDrift: outcome, continuityScore: outcome },
+    stable: continuityScore !== null && weakCheckpointIds.length === 0 && continuityScore >= 70,
     checkpointCount: checkpoints.length,
-    averageCoherence: Number(averageCoherence.toFixed(3)),
-    averageDrift: Number(averageDrift.toFixed(3)),
+    averageCoherence: averageCoherence === null ? null : Number(averageCoherence.toFixed(3)),
+    averageDrift: averageDrift === null ? null : Number(averageDrift.toFixed(3)),
     weakCheckpointIds,
     continuityScore
   };
@@ -547,9 +553,8 @@ export function assessMemoryMaturity(
   const hasContinuityChecks = continuityChecks.length > 0;
   const hasMemoryEntries = memoryEntries.length > 0;
 
-  const memoryIntegrityScore = hasMemoryEntries
-    ? Math.round(antiTampering.integrityScore * 0.7 + poisoningDetection.poisoningScore * 0.3)
-    : undefined;
+  const integrityMean = weightedMean([[antiTampering.integrityScore, 0.7], [poisoningDetection.poisoningScore, 0.3]]);
+  const memoryIntegrityScore = hasMemoryEntries && integrityMean !== null ? Math.round(integrityMean) : undefined;
 
   const persistenceLevel = mergeLevel(
     persistenceBase.level,
@@ -563,7 +568,12 @@ export function assessMemoryMaturity(
   );
   const integrityLevel = mergeLevel(integrityBase.level, integrityBase.present, memoryIntegrityScore);
 
-  const overallScore = Math.round(((persistenceLevel + continuityLevel + integrityLevel) / 15) * 100);
+  const overallMean = weightedMean([
+    [persistenceBase.present || persistenceAssessment.restartSurvivalScore !== null ? persistenceLevel : null, 1],
+    [continuityBase.present || continuityAssessment.continuityScore !== null ? continuityLevel : null, 1],
+    [integrityBase.present || memoryIntegrityScore !== undefined ? integrityLevel : null, 1],
+  ]);
+  const overallScore = overallMean === null ? null : Math.round(overallMean * 20);
   const gaps: string[] = [];
   const recommendations: string[] = [];
 
@@ -610,6 +620,14 @@ export function assessMemoryMaturity(
   const explicitContinuityScore = readOptionalScore(questionScores, "continuityScore");
 
   return {
+    outcome: overallScore === null ? "not_evaluated" : "measured",
+    sampleSize: persistenceAssessment.sampleSize + antiTampering.sampleSize + continuityAssessment.sampleSize
+      + Number(persistenceBase.present) + Number(continuityBase.present) + Number(integrityBase.present),
+    metricOutcomes: {
+      persistence: persistenceBase.present ? "measured" : persistenceAssessment.outcome,
+      continuity: continuityBase.present ? "measured" : continuityAssessment.outcome,
+      integrity: integrityBase.present || memoryIntegrityScore !== undefined ? "measured" : "not_evaluated",
+    },
     agentId,
     persistenceLevel,
     continuityLevel,

@@ -1107,7 +1107,8 @@ describe('SessionEvaluator', () => {
 
     const happyResult = evaluator.evaluate(happyTurns);
     const sadResult = evaluator.evaluate(sadTurns);
-    expect(happyResult.dimensions.satisfaction).toBeGreaterThan(sadResult.dimensions.satisfaction);
+    expect(sadResult.dimensions.satisfaction).not.toBeNull();
+    expect(happyResult.dimensions.satisfaction).toBeGreaterThan(sadResult.dimensions.satisfaction!);
   });
 
   it('should detect escalation', () => {
