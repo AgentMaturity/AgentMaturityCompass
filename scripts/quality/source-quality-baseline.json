@@ -1918,7 +1918,6 @@
     {"id":"5985f70493fc56b00bdbe0d730fcbdffd90266da9e290ef191079e994457e36f","file":"src/agent/providers/delegationProviders.ts","kind":"exports"},
     {"id":"59b45efa4b8448554bc64bb11851d67ed3632930026b1c6e8d3c4a6217ace81e","file":"src/business/fairScenario.ts","kind":"types"},
     {"id":"59c3b2ff400f207595b74260737a48cc7327c0c8d10651ee096f2a8225fa6845","file":"src/runtime/lifecycleGraph.ts","kind":"types"},
-    {"id":"59ca6177b69dc3dbc787dd1711210dc98cd18292cfab1dcabe8cd56528a176e1","file":"src/types.ts","kind":"types"},
     {"id":"59dfef1f7860d42ccc78b45816baa0381577d6fca87d372bf37191132f791290","file":"src/product/index.ts","kind":"types"},
     {"id":"59ef3afd031a58285435c2c19a710bc7a742758481275be9065f40f495351446","file":"src/prompt/assembly/index.ts","kind":"types"},
     {"id":"5a2e2b2e544576c2b1f7b950a14e862cab55212abc1dbe08180d0a3fab4e4ab4","file":"src/product/index.ts","kind":"exports"},

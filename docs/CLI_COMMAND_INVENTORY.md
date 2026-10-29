@@ -164,7 +164,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc bench compare` | Compute local vs imported ecosystem comparison | `--scope <scope>`<br>`--id <id>`<br>`--against <mode>` | - |
 | `amc bench comparison-latest` | Read latest bench comparison artifact | - | - |
 | `amc bench create` | Create deterministic signed .amcbench artifact | `--scope <scope>`<br>`--out <file.amcbench>`<br>`--id <id>`<br>`--window-days <n>`<br>`--named`<br>`--industry <value>`<br>`--agent-type <value>`<br>`--deployment <value>` | - |
-| `amc bench harness-compare` | Run pinned comparison adapters and independent oracles; unavailable measurements remain N/A | `--manifest <path>`<br>`--out <directory>`<br>`--allow-adapter-execution`<br>`--live` | - |
+| `amc bench harness-compare` | Run pinned comparison adapters and independent oracles; exits 0 pass, 1 qualified failure/fatal error, 3 unavailable/inconclusive | `--manifest <path>`<br>`--out <directory>`<br>`--check`<br>`--dry-run`<br>`--allow-adapter-execution`<br>`--live` | - |
 | `amc bench import` | Import one bench artifact from allowlisted registry | `--registry-id <id>`<br>`--bench <benchId@version|benchId@latest>` | - |
 | `amc bench init` | Initialize signed bench policy | - | - |
 | `amc bench list-exports` | List locally exported bench artifacts | - | - |
@@ -457,7 +457,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc executive` | Executive and board-ready AMC artifacts | - | - |
 | `amc executive brief` | Generate a board-ready one-page executive brief from a diagnostic run | `--agent <agentId>`<br>`--run <runId>`<br>`--out <path>`<br>`--format <format>`<br>`--title <title>` | - |
 | `amc experiment` | Deterministic baseline vs candidate experiments | - | - |
-| `amc experiment analyze` | Analyze latest experiment run | `--experiment <id>`<br>`--out <path>`<br>`--agent <agentId>` | - |
+| `amc experiment analyze` | Analyze latest experiment run (exit 0 all candidate cases pass, 1 failure or error, 3 inconclusive) | `--experiment <id>`<br>`--out <path>`<br>`--agent <agentId>` | - |
 | `amc experiment create` | Create an experiment | `--name <name>`<br>`--casebook <id>`<br>`--agent <agentId>` | - |
 | `amc experiment gate` | Evaluate latest experiment run against gate policy (exit 0 pass, 1 fail or error, 3 inconclusive) | `--experiment <id>`<br>`--policy <path>`<br>`--agent <agentId>` | - |
 | `amc experiment gate-template` | Write an experiment gate policy template | `--out <path>`<br>`--preset <preset>` | - |
@@ -465,10 +465,10 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc experiment optimize` | Create governed optimizer candidates from a Fixer RCA report | `--rca <selector>`<br>`--agent <agentId>`<br>`--json` | - |
 | `amc experiment optimizer-list` | List governed optimizer runs | `--agent <agentId>`<br>`--limit <n>`<br>`--json` | - |
 | `amc experiment optimizer-show` | Show a governed optimizer run | `--agent <agentId>`<br>`--json` | - |
-| `amc experiment run` | Run deterministic experiment against signed casebook | `--experiment <id>`<br>`--mode <mode>`<br>`--candidate-window <window>`<br>`--candidate-agent <agentId>`<br>`--agent <agentId>` | - |
+| `amc experiment run` | Run deterministic experiment against signed casebook (exit 0 all candidate cases pass, 1 failure or error, 3 inconclusive) | `--experiment <id>`<br>`--mode <mode>`<br>`--candidate-window <window>`<br>`--candidate-agent <agentId>`<br>`--agent <agentId>` | - |
 | `amc experiment set-baseline` | Set experiment baseline config | `--experiment <id>`<br>`--config <current|path>`<br>`--agent <agentId>` | - |
 | `amc experiment set-candidate` | Set experiment candidate signed config overlay | `--experiment <id>`<br>`--candidate-file <path>`<br>`--agent <agentId>` | - |
-| `amc experiment-architecture` | Run a controlled architecture comparison experiment | `--name <name>`<br>`--model <modelId>`<br>`--baseline-file <path>`<br>`--candidate-file <path>`<br>`--baseline-kind <kind>`<br>`--candidate-kind <kind>` | - |
+| `amc experiment-architecture` | Run a controlled architecture comparison experiment (exit 0 measured pass, 1 failure or error, 3 inconclusive or simulated) | `--name <name>`<br>`--model <modelId>`<br>`--baseline-file <path>`<br>`--candidate-file <path>`<br>`--baseline-kind <kind>`<br>`--candidate-kind <kind>` | - |
 | `amc experiment-architecture-probes` | List the standard probe set for architecture experiments | - | - |
 | `amc explain` | Plain-English explanation for a diagnostic question (example: AMC-2.1) | `--json` | - |
 | `amc export` | Export policy packs and badges | - | - |
