@@ -1161,6 +1161,16 @@
       "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
     },
     {
+      "siteId": "src/ops/backup/backupEngine.ts:732:1",
+      "path": "src/ops/backup/backupEngine.ts",
+      "line": 732,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(stage, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "P2-06-D4 restore staging: removes only the .amc-restore-* directory this restore created next to its target, after a commit moved its entries out or a failure before the commit. It never held workspace data a hold could name, and the target may not be a workspace to audit into, so it is not gated; the replaced workspace entries are kept, never deleted."
+    },
+    {
       "siteId": "src/ops/maintenance/cachePrune.ts:27:1",
       "path": "src/ops/maintenance/cachePrune.ts",
       "line": 27,

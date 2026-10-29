@@ -14,7 +14,7 @@
  * forward when every staged file is intact, else rolls back from `.amc/keys/rotations/gen-<N>/`, which holds the bytes
  * of every file the generation replaced; what the generation had written is kept in `gen-<N>/discarded/`, never deleted.
  */
-import { mkdirSync, statSync } from "node:fs";
+import { lstatSync, mkdirSync, statSync } from "node:fs";
 import { join, relative, sep } from "node:path";
 import { z } from "zod";
 import { resolveAmcHome } from "../credentials/credentialsPaths.js";
@@ -276,6 +276,32 @@ export const boundKeyset = inCheckPass((workspace: string, opts: { allowUnboundF
 export function keysetIdentity(workspace: string): { generation: number; sha256: string } | null {
   const keyset = readKeysetFile(workspace, KEYSET_REL);
   return keyset === null ? null : { generation: keyset.generation, sha256: sha256Hex(canonicalize(keyset)) };
+}
+
+/**
+ * P2-06-D4: decides, before a restore writes anything, whether the key set found under `incoming` (an extracted backup)
+ * may be put at `target`. A target that already holds a workspace must hold one with the same keys (the backup's own
+ * workspace), and the incoming key set must pass this machine's committed and adopted marks for the target path, the
+ * same comparison `boundKeyset` makes later, so a restore never reaches a write that the anti-rollback check refuses.
+ */
+export function assertKeysetRestorable(target: string, incoming: string): void {
+  const next = readKeysetFile(incoming, KEYSET_REL);
+  if (lstatSync(join(target, ".amc"), { throwIfNoEntry: false }) !== undefined) {
+    const current = readKeysetFile(target, KEYSET_REL);
+    if (current === null || next === null || canonicalize(current.keys) !== canonicalize(next.keys)) {
+      throw new Error(`restore target ${target} holds another workspace: its key set is not the backup's (another tenant, or this workspace after a key rotation); `
+        + "restore into a new directory");
+    }
+  }
+  for (const key of [markKey(target), adoptedKey(target)]) {
+    const mark = readHighWater(key);
+    if (mark === null) continue;
+    if (next === null || next.generation > mark.sequence) {
+      throw new AntiRollbackError(next === null ? "ROLLBACK_DETECTED" : "FORK_DETECTED", `${key}: this machine accepted generation ${mark.sequence} at ${target}; `
+        + `the backup's key set ${next === null ? "is missing" : `generation ${next.generation} was never accepted here`}. Restore into a new directory`);
+    }
+    compareHighWater(key, mark, next.generation, sha256Hex(canonicalize(next)));
+  }
 }
 
 /** Opens a vault envelope with the owner's passphrase and returns its key ids, or null when it does not open. */

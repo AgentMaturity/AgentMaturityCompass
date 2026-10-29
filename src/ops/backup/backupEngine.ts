@@ -1,4 +1,4 @@
-import { lstatSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync } from "node:fs";
+import { lstatSync, mkdtempSync, readdirSync, readFileSync, renameSync, rmSync, statSync } from "node:fs";
 import YAML from "yaml";
 import { copyFileSync } from "node:fs";
 import { join, dirname, relative, resolve } from "node:path";
@@ -31,7 +31,7 @@ import { extractValidatedTarGzipArchive, type TarArchiveLimits } from "../../sec
 
 import { captureOrgFiles } from "../../org/preparedOrgPairs.js";
 import { capturePurposePublication, assertPurposePublicationCurrent } from "../../keys/purposePublication.js";
-import { assertKeysetComplete, boundProviderKey, keysetPaths, keysetFileRel } from "../../keys/keyset.js";
+import { assertKeysetComplete, assertKeysetRestorable, boundProviderKey, keysetPaths, keysetFileRel } from "../../keys/keyset.js";
 import { keyPolicy, loadKeysConfig, CONFIG_REL } from "../../keys/keysConfig.js";
 import { assertSigningKeyUsable, getSigningKey } from "../../keys/signingKeys.js";
 import { publicKeyFromPrivate } from "../../crypto/keyHistoryEnvelope.js";
@@ -683,6 +683,8 @@ export async function restoreBackup(params: {
   trust: TrustContext;
 }): Promise<{
   restoredTo: string;
+  /** Over an existing workspace (--force): where the entries the restore replaced were kept; null for a new target. */
+  replacedTo: string | null;
   trusted: boolean;
   warnings: string[];
   report: VerifierReportV1;
@@ -696,6 +698,11 @@ export async function restoreBackup(params: {
   if (verdictExitCode(verify.report) === 1 || !verify.manifest) {
     throw new Error(`backup verify failed: ${untrustedReasons(verify.report).join("; ")}`);
   }
+  // P2-06-D4: every refusal is decided before anything is written to the target or next to it.
+  const target = resolve(params.toDir);
+  if (pathExists(target) && !params.force) {
+    throw new Error(`restore target already exists: ${target} (use --force)`);
+  }
   const { root, cleanup } = loadBundle(params.backupFile);
   try {
     const payloadPath = join(root, "payload", "workspace.tar.gz.enc");
@@ -708,67 +715,101 @@ export async function restoreBackup(params: {
     try {
       const payloadTar = join(temp, "workspace.tar.gz");
       writeFileAtomic(payloadTar, decrypted, 0o600);
-      const target = resolve(params.toDir);
-      if (pathExists(target) && !params.force) {
-        throw new Error(`restore target already exists: ${target} (use --force)`);
+      const extract = join(temp, "extract");
+      ensureDir(extract);
+      tarExtract(payloadTar, extract);
+      assertKeysetRestorable(target, extract);
+      // Staged on the target's filesystem and committed by rename: a failure before the commit leaves the target as it was.
+      const existed = pathExists(target);
+      if (!existed) ensureDir(dirname(target));
+      const stage = mkdtempSync(join(existed ? target : dirname(target), ".amc-restore-"));
+      try {
+        tarExtract(payloadTar, stage);
+        const warnings = await sealRestore(stage, target, verify.report, verify.manifest, params.backupFile);
+        const replacedTo = commitRestore(stage, target, existed);
+        return { restoredTo: target, replacedTo, trusted: warnings.length === 0, warnings, report: verify.report };
+      } finally {
+        rmSync(stage, { recursive: true, force: true });
       }
-      ensureDir(target);
-      tarExtract(payloadTar, target);
-      const warnings = verify.report.trusted ? [] : untrustedReasons(verify.report).map((reason) => `UNTRUSTED (--allow-unpinned): ${reason}`);
-      const opsSig = verifyOpsPolicySignature(target);
-      if (!opsSig.valid) {
-        warnings.push(`ops policy invalid after restore: ${opsSig.reason ?? "unknown"}`);
-      }
-      const tlog = verifyTransparencyLog(target);
-      if (!tlog.ok) {
-        warnings.push(...tlog.errors.map((row) => `transparency: ${row}`));
-      }
-      const merkle = verifyTransparencyMerkle(target);
-      if (!merkle.ok) {
-        warnings.push(...merkle.errors.map((row) => `merkle: ${row}`));
-      }
-      const ledger = await verifyLedgerIntegrity(target);
-      if (!ledger.ok) {
-        warnings.push(...ledger.errors.map((row) => `ledger: ${row}`));
-      }
-      if (warnings.length > 0) {
-        writeFileAtomic(
-          join(target, ".amc", "RESTORE_WARNING.txt"),
-          ["Workspace restored but verification warnings were found:", ...warnings].join("\n"),
-          0o644
-        );
-      }
-      appendOpsAuditEvent({
-        workspace: target,
-        auditType: "BACKUP_RESTORED",
-        payload: {
-          backupId: verify.manifest.backupId,
-          source: params.backupFile,
-          target,
-          warnings: warnings.length
-        },
-        severity: warnings.length > 0 ? "HIGH" : "LOW"
-      });
-      appendTransparencyEntry({
-        workspace: target,
-        type: "BACKUP_RESTORED",
-        agentId: "system",
-        artifact: {
-          kind: "policy",
-          id: verify.manifest.backupId,
-          sha256: verify.manifest.payload.payloadSha256
-        }
-      });
-      return {
-        restoredTo: target,
-        trusted: warnings.length === 0,
-        warnings,
-        report: verify.report
-      };
     } finally {
       rmSync(temp, { recursive: true, force: true });
     }
   } finally {
     cleanup();
   }
+}
+
+/** Verifies the staged workspace and writes its restore warning, audit row and transparency entry, all inside `stage`. */
+async function sealRestore(stage: string, target: string, report: VerifierReportV1, manifest: BackupManifest, source: string): Promise<string[]> {
+  const warnings = report.trusted ? [] : untrustedReasons(report).map((reason) => `UNTRUSTED (--allow-unpinned): ${reason}`);
+  const opsSig = verifyOpsPolicySignature(stage);
+  if (!opsSig.valid) {
+    warnings.push(`ops policy invalid after restore: ${opsSig.reason ?? "unknown"}`);
+  }
+  const tlog = verifyTransparencyLog(stage);
+  if (!tlog.ok) {
+    warnings.push(...tlog.errors.map((row) => `transparency: ${row}`));
+  }
+  const merkle = verifyTransparencyMerkle(stage);
+  if (!merkle.ok) {
+    warnings.push(...merkle.errors.map((row) => `merkle: ${row}`));
+  }
+  const ledger = await verifyLedgerIntegrity(stage);
+  if (!ledger.ok) {
+    warnings.push(...ledger.errors.map((row) => `ledger: ${row}`));
+  }
+  if (warnings.length > 0) {
+    writeFileAtomic(
+      join(stage, ".amc", "RESTORE_WARNING.txt"),
+      ["Workspace restored but verification warnings were found:", ...warnings].join("\n"),
+      0o644
+    );
+  }
+  appendOpsAuditEvent({
+    workspace: stage,
+    auditType: "BACKUP_RESTORED",
+    payload: { backupId: manifest.backupId, source, target, warnings: warnings.length },
+    severity: warnings.length > 0 ? "HIGH" : "LOW"
+  });
+  appendTransparencyEntry({
+    workspace: stage,
+    type: "BACKUP_RESTORED",
+    agentId: "system",
+    artifact: { kind: "policy", id: manifest.backupId, sha256: manifest.payload.payloadSha256 }
+  });
+  return warnings;
+}
+
+/**
+ * Moves the staged workspace into place. A new target is one rename. Over an existing one (--force, the same workspace),
+ * each staged top-level entry replaces its namesake, which is kept in `<target>/.amc-pre-restore-*` (returned), never
+ * deleted; a failed rename puts back everything already moved.
+ */
+function commitRestore(stage: string, target: string, existed: boolean): string | null {
+  if (!existed) {
+    renameSync(stage, target);
+    return null;
+  }
+  let aside: string | null = null;
+  const moved: Array<[from: string, to: string]> = [];
+  try {
+    for (const name of readdirSync(stage)) {
+      const live = join(target, name);
+      if (lstatSync(live, { throwIfNoEntry: false }) !== undefined) {
+        aside ??= mkdtempSync(join(target, ".amc-pre-restore-"));
+        renameSync(live, join(aside, name));
+        moved.push([join(aside, name), live]);
+      }
+      renameSync(join(stage, name), live);
+      moved.push([live, join(stage, name)]);
+    }
+  } catch (error) {
+    try {
+      for (const [from, to] of moved.reverse()) renameSync(from, to);
+    } catch (rollback) {
+      throw new Error(`restore commit failed (${String(error)}) and could not be rolled back (${String(rollback)}); the previous state is in ${aside ?? "place"}`);
+    }
+    throw error;
+  }
+  return aside;
 }
