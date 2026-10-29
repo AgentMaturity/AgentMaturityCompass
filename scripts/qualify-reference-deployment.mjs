@@ -52,7 +52,8 @@ export function targetProblems(targets) {
 }
 
 export function parseArgs(argv) {
-  const opts = { namespace: "default", targets: join(MATRIX_DIR, "targets.json"), ephemeralSecrets: false, ha: false, keep: false };
+  const opts = { namespace: "default", targets: join(MATRIX_DIR, "targets.json"), ephemeralSecrets: false, ha: false, keep: false,
+    only: /** @type {string[] | undefined} */ (undefined) };
   const flags = { "--kube-context": "kubeContext", "--release": "release", "--image-a": "imageA", "--image-b": "imageB",
     "--out": "out", "--namespace": "namespace", "--targets": "targets", "--only": "only" };
   for (let i = 0; i < argv.length; i += 1) {
@@ -75,7 +76,7 @@ export function parseArgs(argv) {
   }
   if (!/^[a-z0-9]([-a-z0-9]*[a-z0-9])?$/.test(opts.release)) throw new UsageError("--release must be a DNS label");
   if (opts.only !== undefined) {
-    opts.only = opts.only.split(",");
+    opts.only = String(opts.only).split(",");
     const ids = new Set(loadMatrix().checks.map((check) => check.id));
     const unknown = opts.only.filter((id) => !ids.has(id));
     if (unknown.length > 0) throw new UsageError(`--only names checks that are not in the matrix: ${unknown.join(", ")}`);
