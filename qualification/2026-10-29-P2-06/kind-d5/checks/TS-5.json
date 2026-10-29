@@ -1,0 +1,7 @@
+{
+  "id": "TS-5",
+  "scenario": "Guard events and streams",
+  "status": "not_run",
+  "reason": "not selected (--only)",
+  "durationMs": 0
+}

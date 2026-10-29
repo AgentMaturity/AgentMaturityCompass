@@ -1,0 +1,7 @@
+{
+  "id": "BR-2",
+  "scenario": "RPO and RTO",
+  "status": "not_run",
+  "reason": "not selected (--only)",
+  "durationMs": 0
+}

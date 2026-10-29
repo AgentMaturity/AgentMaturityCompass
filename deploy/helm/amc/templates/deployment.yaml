@@ -41,6 +41,9 @@ spec:
               if [ "${AMC_BOOTSTRAP:-1}" = "1" ]; then
                 amc bootstrap --workspace {{ .Values.workspace.mountPath }};
               fi;
+              {{- if .Values.ledgerEncryption.enabled }}
+              sh /opt/amc-chart/ledger-encryption.sh {{ .Values.workspace.mountPath }} {{ .Values.keyProvider.provider }} {{ .Values.ledgerEncryption.keyRef | squote }} || exit 1;
+              {{- end }}
               exec amc studio start --workspace {{ .Values.workspace.mountPath }} --bind ${AMC_BIND:-0.0.0.0} --port ${AMC_STUDIO_PORT:-3212}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
@@ -59,6 +62,14 @@ spec:
             {{- if .Values.notary.enabled }}
             - name: AMC_NOTARY_AUTH_SECRET_FILE
               value: /run/secrets/amc_notary_auth_secret
+            {{- end }}
+            {{- if .Values.keyProvider.credentialSecret.name }}
+            - name: {{ include "amc.keyProviderCredentialEnv" . }}
+              value: /run/secrets/amc_key_provider_credential
+            {{- end }}
+            {{- range $name, $value := .Values.keyProvider.env }}
+            - name: {{ $name }}
+              value: {{ $value | quote }}
             {{- end }}
           ports:
             - name: studio
@@ -105,6 +116,11 @@ spec:
               readOnly: true
             - name: tmp
               mountPath: /tmp
+            {{- if .Values.ledgerEncryption.enabled }}
+            - name: ledger-encryption
+              mountPath: /opt/amc-chart
+              readOnly: true
+            {{- end }}
       {{- if .Values.notary.enabled }}
         - name: amc-notary
           image: "{{- if .Values.image.digest }}{{ .Values.image.repository }}@{{ .Values.image.digest }}{{- else }}{{ .Values.image.repository }}:{{ .Values.image.tag }}{{- end }}"
@@ -172,6 +188,9 @@ spec:
               {{- if .Values.notary.enabled }}
               {{- $refs = concat $refs (list (list .Values.notary.passphraseSecret "amc_notary_passphrase") (list .Values.notary.authSecret "amc_notary_auth_secret")) }}
               {{- end }}
+              {{- if .Values.keyProvider.credentialSecret.name }}
+              {{- $refs = append $refs (list .Values.keyProvider.credentialSecret "amc_key_provider_credential") }}
+              {{- end }}
               {{- range $refs }}
               - secret:
                   name: {{ (index . 0).name }}
@@ -190,3 +209,8 @@ spec:
         {{- end }}
         - name: tmp
           emptyDir: {}
+        {{- if .Values.ledgerEncryption.enabled }}
+        - name: ledger-encryption
+          configMap:
+            name: {{ include "amc.fullname" . }}-ledger-encryption
+        {{- end }}

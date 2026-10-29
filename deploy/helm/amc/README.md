@@ -68,6 +68,7 @@ helm template amc ./deploy/helm/amc -f ./deploy/helm/amc/examples/values-persist
 - TLS ingress support
 - NetworkPolicy with ingress-controller-only ingress and DNS/upstream egress controls
 - PDB + ServiceAccount templates
+- P2-08 KeyProvider credentials from a Secret (`keyProvider.*`) and P2-09 ledger field encryption (`ledgerEncryption.enabled`), both off by default; see `docs/KUBERNETES_HELM_DEPLOYMENT.md` "KeyProvider and ledger encryption"
 
 ## Terraform
 

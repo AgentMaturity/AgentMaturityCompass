@@ -1,0 +1,7 @@
+{
+  "id": "RB-2",
+  "scenario": "Rollback across a migration",
+  "status": "not_run",
+  "reason": "not selected (--only)",
+  "durationMs": 0
+}

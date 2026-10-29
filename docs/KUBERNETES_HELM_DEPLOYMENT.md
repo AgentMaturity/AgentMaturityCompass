@@ -140,6 +140,43 @@ helm upgrade --install amc deploy/helm/amc \
   --set image.tag=latest
 ```
 
+### KeyProvider and ledger encryption
+
+Both are off by default, so an existing install renders exactly as before: the vault in the workspace volume (the `file` provider) holds every key, and the ledger stores inline payloads in clear.
+
+`keyProvider.*` hands a P2-08 provider ([KEY_PROVIDERS.md](KEY_PROVIDERS.md)) its credentials the way P2-08 reads them, from Studio's environment. Which key signs a purpose is not a chart value: it stays in the workspace's signed `.amc/amc.config.yaml` `keys` section and its owner binding (`amc keys rotate --purpose ledger-row` in the pod), because binding commits a key-set generation that an unattended restart must not make.
+
+| Value | Meaning |
+|---|---|
+| `keyProvider.provider` | `file` (default), `aws-kms`, `gcp-kms`, `azure-kv` or `pkcs11` |
+| `keyProvider.credentialSecret.name`, `.key` | A Secret you create out of band, and the key holding the credential file. It is mounted at `/run/secrets/amc_key_provider_credential` and named by the provider's own variable: `GOOGLE_APPLICATION_CREDENTIALS`, `AWS_SHARED_CREDENTIALS_FILE`, `AZURE_CLIENT_CERTIFICATE_PATH` or `AMC_PKCS11_PIN_FILE`. Required for `pkcs11`; refused for `file`; both or neither. |
+| `keyProvider.env` | Non-secret settings only. The schema admits `AWS_REGION`, `AWS_PROFILE`, `AZURE_TENANT_ID`, `AZURE_CLIENT_ID`, `AMC_PKCS11_MODULE` and `AMC_PKCS11_PROTECTION`, so a PIN or key cannot be passed as a literal. |
+| `ledgerEncryption.enabled` | P2-09 field encryption ([EVIDENCE_STORAGE.md](EVIDENCE_STORAGE.md)). `true` runs `files/ledger-encryption.sh` before Studio starts. |
+| `ledgerEncryption.keyRef` | The wrapping key at `keyProvider.provider`: a vault wrap-key name (`ledger-dek`, the default, for `file`), a KMS key ARN or name, a Key Vault key URL or a PKCS#11 URI. |
+
+With `ledgerEncryption.enabled=true` the start step refuses unless the signed ops policy verifies, sets `opsPolicy.encryption.ledgerEncryptionEnabled: true` and re-signs it when it is not on yet, and, while the workspace has no `.amc/keys/ledger-dek.json`, runs `amc evidence-stores encrypt --key-provider <provider> --key-ref <keyRef>`. Any failure stops the container before Studio, so Studio never runs with encryption on and no data key. Setting `enabled` back to `false` does not switch encryption off; that is an owner change to the ops policy.
+
+```bash
+# File provider on kind or a single node (INS-1 uses this):
+helm upgrade --install amc deploy/helm/amc ... \
+  --set keyProvider.provider=file --set ledgerEncryption.enabled=true
+
+# PKCS#11: PIN from a Secret, module path as a setting (needs an image with the wrapper and pkcs11js):
+kubectl -n amc-system create secret generic amc-hsm-pin --from-file=pin=./pin.txt
+helm upgrade --install amc deploy/helm/amc ... \
+  --set keyProvider.provider=pkcs11 \
+  --set keyProvider.credentialSecret.name=amc-hsm-pin --set keyProvider.credentialSecret.key=pin \
+  --set keyProvider.env.AMC_PKCS11_MODULE=/usr/lib/softhsm/libsofthsm2.so \
+  --set ledgerEncryption.enabled=true --set-string ledgerEncryption.keyRef='pkcs11:token=amc;object=ledger-wrap'
+```
+
+Limits:
+
+- The repository image ships no provider SDK, PKCS#11 wrapper or pkcs11js. Any provider other than `file` needs an image built with it, or it refuses with `KEY_PROVIDER_NOT_INSTALLED`.
+- Workload identity (IRSA, GKE or Azure workload identity) is not wired: the chart sets no ServiceAccount annotations, and the injected token paths sit under the read-only `/run/secrets` mount. Use a credential Secret, or credentials from the node.
+- A cloud KMS needs egress on 443 to its endpoint: add it to `networkPolicy.allowedEgressCidrs`.
+- Nothing in the regulated profile requires a non-file provider or ledger encryption today; turn them on as your own controls require.
+
 ## Verify Runtime
 
 ```bash
@@ -277,7 +314,7 @@ node scripts/deploy/rollback-drill.mjs --image-a amc-studio:s1-a --image-b amc-s
 
 ### Upgrading to chart 0.4.0
 
-Chart 0.4.0 (P2-06) changes the `PodDisruptionBudget` default from `minAvailable: 1` to `maxUnavailable: 1`, so node drains no longer block on the single pod. To keep the old behaviour, set `podDisruptionBudget.minAvailable=1` and `podDisruptionBudget.maxUnavailable=null`; setting both, or neither, fails the render. It also adds `metrics.*` values, off by default: `metrics.enabled=true` exposes Prometheus metrics on port 9464 inside the cluster, admitted by the NetworkPolicy from the monitoring namespace only, with optional ServiceMonitor and PrometheusRule objects ([deploy/reference/MONITORING.md](deploy/reference/MONITORING.md)). The reference deployment runbooks are in [deploy/reference/](deploy/reference/TOPOLOGY.md).
+Chart 0.4.0 (P2-06) changes the `PodDisruptionBudget` default from `minAvailable: 1` to `maxUnavailable: 1`, so node drains no longer block on the single pod. To keep the old behaviour, set `podDisruptionBudget.minAvailable=1` and `podDisruptionBudget.maxUnavailable=null`; setting both, or neither, fails the render. It also adds `metrics.*` values, off by default: `metrics.enabled=true` exposes Prometheus metrics on port 9464 inside the cluster, admitted by the NetworkPolicy from the monitoring namespace only, with optional ServiceMonitor and PrometheusRule objects ([deploy/reference/MONITORING.md](deploy/reference/MONITORING.md)). It adds `keyProvider.*` and `ledgerEncryption.*` values whose defaults render nothing new ([KeyProvider and ledger encryption](#keyprovider-and-ledger-encryption)). The reference deployment runbooks are in [deploy/reference/](deploy/reference/TOPOLOGY.md).
 
 ### Upgrading to chart 0.3.0
 

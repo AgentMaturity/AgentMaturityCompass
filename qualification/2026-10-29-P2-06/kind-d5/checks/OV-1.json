@@ -1,0 +1,7 @@
+{
+  "id": "OV-1",
+  "scenario": "Offline bundle check",
+  "status": "not_run",
+  "reason": "not selected (--only)",
+  "durationMs": 0
+}

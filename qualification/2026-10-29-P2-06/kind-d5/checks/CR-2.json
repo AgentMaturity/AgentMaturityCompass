@@ -1,0 +1,7 @@
+{
+  "id": "CR-2",
+  "scenario": "Node drain",
+  "status": "not_run",
+  "reason": "not selected (--only)",
+  "durationMs": 0
+}

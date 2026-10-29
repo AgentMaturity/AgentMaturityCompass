@@ -56,3 +56,10 @@ Usage: include "amc.bootstrapValue" (list "<values key>" <value>)
 {{- end -}}
 {{- $value | quote -}}
 {{- end -}}
+
+{{/*
+The variable through which the P2-08 provider reads its credential file (docs/KEY_PROVIDERS.md). The file provider has none.
+*/}}
+{{- define "amc.keyProviderCredentialEnv" -}}
+{{- get (dict "gcp-kms" "GOOGLE_APPLICATION_CREDENTIALS" "aws-kms" "AWS_SHARED_CREDENTIALS_FILE" "azure-kv" "AZURE_CLIENT_CERTIFICATE_PATH" "pkcs11" "AMC_PKCS11_PIN_FILE") .Values.keyProvider.provider -}}
+{{- end -}}

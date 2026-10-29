@@ -69,6 +69,52 @@
           }
         }
       }
+    },
+    "keyProvider": {
+      "type": "object",
+      "description": "P2-08 provider credentials for Studio's environment. Secrets only by Secret reference; env holds non-secret names only.",
+      "additionalProperties": false,
+      "required": ["provider"],
+      "properties": {
+        "provider": { "enum": ["file", "aws-kms", "gcp-kms", "azure-kv", "pkcs11"] },
+        "env": {
+          "type": "object",
+          "propertyNames": { "enum": ["AWS_REGION", "AWS_PROFILE", "AZURE_TENANT_ID", "AZURE_CLIENT_ID", "AMC_PKCS11_MODULE", "AMC_PKCS11_PROTECTION"] },
+          "additionalProperties": { "type": "string", "minLength": 1 }
+        },
+        "credentialSecret": {
+          "type": "object",
+          "description": "A Secret created out of band and one of its keys; both set or both empty.",
+          "additionalProperties": false,
+          "properties": {
+            "name": { "type": "string", "pattern": "^([a-z0-9]([-a-z0-9.]*[a-z0-9])?)?$", "maxLength": 253 },
+            "key": { "type": "string", "pattern": "^[-._a-zA-Z0-9]*$", "maxLength": 253 }
+          },
+          "if": { "required": ["name"], "properties": { "name": { "minLength": 1 } } },
+          "then": { "required": ["key"], "properties": { "key": { "minLength": 1 } } },
+          "else": { "properties": { "key": { "maxLength": 0 } } }
+        }
+      },
+      "allOf": [
+        {
+          "description": "The PKCS#11 user PIN comes only from a Secret (AMC_PKCS11_PIN_FILE).",
+          "if": { "properties": { "provider": { "const": "pkcs11" } } },
+          "then": { "required": ["credentialSecret"], "properties": { "credentialSecret": { "required": ["name"], "properties": { "name": { "minLength": 1 } } } } }
+        },
+        {
+          "description": "The file provider (the vault) reads no provider credential or setting.",
+          "if": { "properties": { "provider": { "const": "file" } } },
+          "then": { "properties": { "credentialSecret": { "properties": { "name": { "maxLength": 0 } } }, "env": { "maxProperties": 0 } } }
+        }
+      ]
+    },
+    "ledgerEncryption": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "keyRef": { "type": "string", "description": "Rendered single-quoted into the start command, so no quote or whitespace.", "pattern": "^[^'\\s]+$", "maxLength": 2048 }
+      }
     }
   }
 }

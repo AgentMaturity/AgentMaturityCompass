@@ -1,0 +1,231 @@
+[
+  {
+    "cmd": "helm version --short",
+    "exit": 0,
+    "durationMs": 120
+  },
+  {
+    "cmd": "kubectl version --client -o json",
+    "exit": 0,
+    "durationMs": 122
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n default get secret amc-bootstrap -o name",
+    "exit": 1,
+    "durationMs": 56
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n default apply -f -",
+    "exit": 0,
+    "durationMs": 81
+  },
+  {
+    "cmd": "helm --kube-context kind-amc-p206 -n default install amc-rd <repo>/deploy/helm/amc --set image.repository=amc-studio --set image.digest=sha256:53d81cb1be147ee3fa4a74d302313696b5ebf5b86731534acda9d8acbb659b8f --set image.requireDigest=true --set keyProvider.provider=file --set ledgerEncryption.enabled=true --set ledgerEncryption.keyRef=ledger-dek --wait --timeout 300s",
+    "exit": 0,
+    "durationMs": 24788,
+    "stderr": ""
+  },
+  {
+    "cmd": "helm --kube-context kind-amc-p206 -n default get manifest amc-rd",
+    "exit": 0,
+    "durationMs": 46
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n default exec deploy/amc-rd-amc -c amc-studio -- sh -c cat /data/amc/.amc/keys/monitor_ed25519.pub",
+    "exit": 0,
+    "durationMs": 184
+  },
+  {
+    "cmd": "helm --kube-context kind-amc-p206 -n default upgrade amc-rd <repo>/deploy/helm/amc --reuse-values --set env.AMC_EXPECTED_MONITOR_FINGERPRINT=73cbb2ea9baaa6a74ecd0e58d2d5f84a45480809a4d400486a9a4110927167f1 --wait --timeout 10m",
+    "exit": 0,
+    "durationMs": 12615,
+    "stderr": ""
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n default exec deploy/amc-rd-amc -c amc-studio -- sh -c cd /data/amc && AMC_VAULT_PASSPHRASE=\"$(cat \"$AMC_VAULT_PASSPHRASE_FILE\")\" amc pair create --ttl 10m",
+    "exit": 0,
+    "durationMs": 1427
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n default apply -f -",
+    "exit": 0,
+    "durationMs": 79
+  },
+  {
+    "cmd": "helm --kube-context kind-amc-p206 -n default test amc-rd --logs --timeout 10m",
+    "exit": 0,
+    "durationMs": 5699,
+    "stderr": ""
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n default exec deploy/amc-rd-amc -c amc-studio -- sh -c cd /data/amc && amc ops verify >/dev/null && amc ops print | node -e '\nconst fs = require(\"fs\");\nconst Database = require(\"/opt/amc/node_modules/better-sqlite3\");\nconst policy = JSON.parse(fs.readFileSync(0, \"utf8\"));\nconst dek = JSON.parse(fs.readFileSync(\".amc/keys/ledger-dek.json\", \"utf8\"));\nconst db = new Database(\".amc/evidence.sqlite\", { readonly: true, fileMustExist: true });\nconst inline = db.prepare(\"SELECT payload_inline AS p FROM evidence_events WHERE payload_inline IS NOT NULL\").all();\nconst encryptedRows = inline.filter((row) => row.p.startsWith(\"amcenc:v1:\")).length;\nprocess.stdout.write(JSON.stringify({ ledgerEncryptionEnabled: policy.opsPolicy.encryption.ledgerEncryptionEnabled === true,\n  wrapProvider: dek.keys.find((key) => key.keyVersion === dek.activeVersion)?.providerId ?? null,\n  encryptedRows, plaintextRows: inline.length - encryptedRows }));'",
+    "exit": 0,
+    "durationMs": 2638
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n default exec deploy/amc-rd-amc -c amc-studio -- sh -c cd /data/amc && AMC_VAULT_PASSPHRASE=\"$(cat \"$AMC_VAULT_PASSPHRASE_FILE\")\" amc lease issue --agent default --ttl 15m --scopes gateway:llm --routes /local --models gpt-test",
+    "exit": 0,
+    "durationMs": 1334
+  },
+  {
+    "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node <repo>/scripts/deploy-verify.mjs --target http://127.0.0.1:20548 --gateway http://127.0.0.1:20549 --monitor-pubkey /var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p206-verify-zCxr2m/monitor.pub --route /local --model gpt-test --lease-file /var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p206-verify-zCxr2m/lease --out <repo>/qualification/2026-10-29-P2-06/kind-d5/checks/INS-1-deploy-verify.json",
+    "exit": 0,
+    "durationMs": 560,
+    "stderr": ""
+  },
+  {
+    "cmd": "helm --kube-context kind-amc-p206 -n default install amc-rd-ins2-0 <repo>/deploy/helm/amc --set bootstrap.createSecret=true --set bootstrap.values.vaultPassphrase=change-me-x --set bootstrap.values.ownerUsername=u --set bootstrap.values.ownerPassword=p --set bootstrap.values.notaryPassphrase=n --set bootstrap.values.notaryAuthSecret=a",
+    "exit": 1,
+    "durationMs": 53,
+    "stderr": "Error: INSTALLATION FAILED: values don't meet the specifications of the schema(s) in the following chart(s):\namc:\n- at '/bootstrap/values/vaultPassphrase': 'not' failed\n\n"
+  },
+  {
+    "cmd": "helm --kube-context kind-amc-p206 -n default status amc-rd-ins2-0",
+    "exit": 1,
+    "durationMs": 38
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n default get all,pvc,secret,configmap -l app.kubernetes.io/instance=amc-rd-ins2-0 -o name",
+    "exit": 0,
+    "durationMs": 95
+  },
+  {
+    "cmd": "helm --kube-context kind-amc-p206 -n default install amc-rd-ins2-1 <repo>/deploy/helm/amc --set image.requireDigest=true",
+    "exit": 1,
+    "durationMs": 47,
+    "stderr": "Error: INSTALLATION FAILED: values don't meet the specifications of the schema(s) in the following chart(s):\namc:\n- at '/image/digest': '' does not match pattern '^sha256:[a-f0-9]{64}$'\n\n"
+  },
+  {
+    "cmd": "helm --kube-context kind-amc-p206 -n default status amc-rd-ins2-1",
+    "exit": 1,
+    "durationMs": 34
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n default get all,pvc,secret,configmap -l app.kubernetes.io/instance=amc-rd-ins2-1 -o name",
+    "exit": 0,
+    "durationMs": 71
+  },
+  {
+    "cmd": "helm --kube-context kind-amc-p206 -n default install amc-rd-ins2-2 <repo>/deploy/helm/amc --set replicaCount=2",
+    "exit": 1,
+    "durationMs": 46,
+    "stderr": "Error: INSTALLATION FAILED: values don't meet the specifications of the schema(s) in the following chart(s):\namc:\n- at '/replicaCount': value must be 1\n\n"
+  },
+  {
+    "cmd": "helm --kube-context kind-amc-p206 -n default status amc-rd-ins2-2",
+    "exit": 1,
+    "durationMs": 35
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n default get all,pvc,secret,configmap -l app.kubernetes.io/instance=amc-rd-ins2-2 -o name",
+    "exit": 0,
+    "durationMs": 74
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n default exec deploy/amc-rd-amc -c amc-studio -- sh -c cd /data/amc && AMC_VAULT_PASSPHRASE=\"$(cat \"$AMC_VAULT_PASSPHRASE_FILE\")\" amc pair create --ttl 10m",
+    "exit": 0,
+    "durationMs": 1328
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n default apply -f -",
+    "exit": 0,
+    "durationMs": 110
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n default exec deploy/amc-rd-amc -c amc-studio -- sh -c cd /data/amc && rm -f /tmp/p206-under-load.amcbackup && AMC_VAULT_PASSPHRASE=\"$(cat \"$AMC_VAULT_PASSPHRASE_FILE\")\" AMC_BACKUP_PASSPHRASE_FILE=\"$AMC_VAULT_PASSPHRASE_FILE\" amc backup create --out /tmp/p206-under-load.amcbackup",
+    "exit": 0,
+    "durationMs": 2007,
+    "stderr": ""
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n default exec deploy/amc-rd-amc -c amc-studio -- sh -c cat /tmp/p206-under-load.amcbackup",
+    "exit": 0,
+    "durationMs": 67
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n default exec deploy/amc-rd-amc -c amc-studio -- sh -c cat /data/amc/.amc/keys/auditor_ed25519.pub",
+    "exit": 0,
+    "durationMs": 52
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n default exec deploy/amc-rd-amc -c amc-studio -- node -e \nconst Database = require(\"/opt/amc/node_modules/better-sqlite3\");\nconst db = new Database(process.argv[1], { readonly: true, fileMustExist: true });\nconst rows = db.prepare(\"SELECT event_hash, prev_event_hash, session_id FROM evidence_events ORDER BY rowid\").all();\nlet linked = true;\nfor (let i = 1; i < rows.length; i += 1) if (rows[i].prev_event_hash !== rows[i - 1].event_hash) linked = false;\nconst migrations = db.prepare(\"SELECT version FROM schema_migrations ORDER BY version\").all().map((row) => row.version);\nconst integrity = db.prepare(\"PRAGMA integrity_check\").all().map((row) => Object.values(row)[0]).join(\";\");\nprocess.stdout.write(JSON.stringify({ count: rows.length, head: rows.at(-1)?.event_hash ?? null, hashes: rows.map((row) => row.event_hash), sessions: rows.map((row) => row.session_id), linked, migrations, integrity }));\n /data/amc/.amc/evidence.sqlite",
+    "exit": 0,
+    "durationMs": 153
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n amc-rd-restore create namespace amc-rd-restore",
+    "exit": 0,
+    "durationMs": 43,
+    "stderr": ""
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n default get secret amc-bootstrap -o json",
+    "exit": 0,
+    "durationMs": 40
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n amc-rd-restore apply -f -",
+    "exit": 0,
+    "durationMs": 65
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n amc-rd-restore apply -f -",
+    "exit": 0,
+    "durationMs": 64,
+    "stderr": ""
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n amc-rd-restore apply -f -",
+    "exit": 0,
+    "durationMs": 63,
+    "stderr": ""
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n amc-rd-restore wait --for=condition=Ready pod/restore --timeout=180s",
+    "exit": 0,
+    "durationMs": 4491,
+    "stderr": ""
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n amc-rd-restore exec -i restore -- sh -c cat > /tmp/verify.amcbackup",
+    "exit": 0,
+    "durationMs": 74
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n amc-rd-restore exec -i restore -- sh -c cat > /tmp/auditor.pub",
+    "exit": 0,
+    "durationMs": 57
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n amc-rd-restore exec restore -- sh -c AMC_BACKUP_PASSPHRASE_FILE=\"$AMC_VAULT_PASSPHRASE_FILE\" amc backup verify /tmp/verify.amcbackup --pubkey /tmp/auditor.pub --json",
+    "exit": 0,
+    "durationMs": 1012,
+    "stderr": ""
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n amc-rd-restore exec -i restore -- sh -c cat > /tmp/restore.amcbackup",
+    "exit": 0,
+    "durationMs": 92
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n amc-rd-restore exec -i restore -- sh -c cat > /tmp/auditor.pub",
+    "exit": 0,
+    "durationMs": 54
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n amc-rd-restore exec restore -- sh -c cd /tmp && AMC_VAULT_PASSPHRASE=\"$(cat \"$AMC_VAULT_PASSPHRASE_FILE\")\" AMC_BACKUP_PASSPHRASE_FILE=\"$AMC_VAULT_PASSPHRASE_FILE\" amc backup restore /tmp/restore.amcbackup --to /data/amc/br1 --pubkey /tmp/auditor.pub",
+    "exit": 0,
+    "durationMs": 1193,
+    "stderr": "[amc] key set generation 1 of /data/amc/.amc-restore-xWk6O8 adopted unanchored (trust on first use): this machine never committed it, so a workspace writer could have replaced it. Pin keys (a trust list, --pubkey, --expect-monitor) for a verdict that must not depend on it.\n"
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n amc-rd-restore exec restore -- sh -c cat /data/amc/br1/.amc/RESTORE_WARNING.txt 2>/dev/null || true",
+    "exit": 0,
+    "durationMs": 66
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n amc-rd-restore exec restore -c tool -- node -e \nconst Database = require(\"/opt/amc/node_modules/better-sqlite3\");\nconst db = new Database(process.argv[1], { readonly: true, fileMustExist: true });\nconst rows = db.prepare(\"SELECT event_hash, prev_event_hash, session_id FROM evidence_events ORDER BY rowid\").all();\nlet linked = true;\nfor (let i = 1; i < rows.length; i += 1) if (rows[i].prev_event_hash !== rows[i - 1].event_hash) linked = false;\nconst migrations = db.prepare(\"SELECT version FROM schema_migrations ORDER BY version\").all().map((row) => row.version);\nconst integrity = db.prepare(\"PRAGMA integrity_check\").all().map((row) => Object.values(row)[0]).join(\";\");\nprocess.stdout.write(JSON.stringify({ count: rows.length, head: rows.at(-1)?.event_hash ?? null, hashes: rows.map((row) => row.event_hash), sessions: rows.map((row) => row.session_id), linked, migrations, integrity }));\n /data/amc/br1/.amc/evidence.sqlite",
+    "exit": 0,
+    "durationMs": 69
+  }
+]

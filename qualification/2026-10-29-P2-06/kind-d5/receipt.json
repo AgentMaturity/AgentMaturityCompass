@@ -1,0 +1,232 @@
+{
+  "schemaVersion": 1,
+  "key": "P2-06",
+  "date": "2026-10-29",
+  "commit": "2866b1ec621e84bae3969eacb9fde57018ba9f23",
+  "branch": "rtd/w7-d5-chart",
+  "node": "v22.23.3",
+  "pnpm": "10.33.0",
+  "os": "darwin 25.6.0",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "INS-1 Install by digest",
+      "exit": 0,
+      "durationMs": 50528
+    },
+    {
+      "cmd": "INS-2 Install refusals",
+      "exit": 0,
+      "durationMs": 493
+    },
+    {
+      "cmd": "UPG-1 Upgrade with data",
+      "exit": 1,
+      "durationMs": 0
+    },
+    {
+      "cmd": "UPG-2 Failed upgrade",
+      "exit": 1,
+      "durationMs": 0
+    },
+    {
+      "cmd": "RB-1 Helm rollback",
+      "exit": 1,
+      "durationMs": 0
+    },
+    {
+      "cmd": "RB-2 Rollback across a migration",
+      "exit": 1,
+      "durationMs": 0
+    },
+    {
+      "cmd": "BR-1 Backup under load",
+      "exit": 0,
+      "durationMs": 14459
+    },
+    {
+      "cmd": "BR-2 RPO and RTO",
+      "exit": 1,
+      "durationMs": 0
+    },
+    {
+      "cmd": "BR-3 Bad restores",
+      "exit": 1,
+      "durationMs": 0
+    },
+    {
+      "cmd": "CR-1 Pod killed mid-action",
+      "exit": 1,
+      "durationMs": 0
+    },
+    {
+      "cmd": "CR-2 Node drain",
+      "exit": 1,
+      "durationMs": 0
+    },
+    {
+      "cmd": "CR-3 Disk full",
+      "exit": 1,
+      "durationMs": 0
+    },
+    {
+      "cmd": "CR-4 KeyProvider outage",
+      "exit": 1,
+      "durationMs": 0
+    },
+    {
+      "cmd": "CR-5 Database failover",
+      "exit": 1,
+      "durationMs": 0
+    },
+    {
+      "cmd": "CR-6 Telemetry outage",
+      "exit": 1,
+      "durationMs": 0
+    },
+    {
+      "cmd": "OV-1 Offline bundle check",
+      "exit": 1,
+      "durationMs": 0
+    },
+    {
+      "cmd": "OV-2 Offline WORM check",
+      "exit": 1,
+      "durationMs": 0
+    },
+    {
+      "cmd": "TS-1 API isolation",
+      "exit": 1,
+      "durationMs": 0
+    },
+    {
+      "cmd": "TS-2 Credential isolation",
+      "exit": 1,
+      "durationMs": 0
+    },
+    {
+      "cmd": "TS-3 Evidence isolation",
+      "exit": 1,
+      "durationMs": 0
+    },
+    {
+      "cmd": "TS-4 Storage and network",
+      "exit": 1,
+      "durationMs": 0
+    },
+    {
+      "cmd": "TS-5 Guard events and streams",
+      "exit": 1,
+      "durationMs": 0
+    }
+  ],
+  "tests": {
+    "total": 22,
+    "passed": 3,
+    "failed": 19,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "checks/BR-1.json",
+      "sha256": "e325963d6f4a7ed52d9974d7a1502ee0e4167cc07669225baadd4a4496ac329b"
+    },
+    {
+      "path": "checks/BR-2.json",
+      "sha256": "8f8ee132be276d119c0b9c87d1a67393bc8070e0ad8fbd4a78a56d60a60eed7c"
+    },
+    {
+      "path": "checks/BR-3.json",
+      "sha256": "c8f27192ba3611ac0646c9e0c4c4089f38059f92ca6f847b029c7a3b119184ad"
+    },
+    {
+      "path": "checks/CR-1.json",
+      "sha256": "ab5a3b157802e405ee958a580e1f4f088de77c5dd768b71b316ba0f174f00d89"
+    },
+    {
+      "path": "checks/CR-2.json",
+      "sha256": "fd3590149351bfc2571b50dc19e0c13dfce5a407af02ac7d2adedd8da007272e"
+    },
+    {
+      "path": "checks/CR-3.json",
+      "sha256": "fa6852c1c0f9423e83c03e9eebc90add687aec33a857afa814017a9584ff86b1"
+    },
+    {
+      "path": "checks/CR-4.json",
+      "sha256": "5d4d40e2a5cca84a7d805931b391b3ab88fb1094b03e2cff7c1828ad64792444"
+    },
+    {
+      "path": "checks/CR-5.json",
+      "sha256": "1fe39d066fa9902860f31a74ae67655662f44ab716e597c6777a0ff3af501ddc"
+    },
+    {
+      "path": "checks/CR-6.json",
+      "sha256": "2e767bf9402180d5f0d09d83ae4d0ba79dd2134f65552f6a1ca772af74083138"
+    },
+    {
+      "path": "checks/INS-1-deploy-verify.json",
+      "sha256": "4d7dbf796da9a625a44c47b66a2f2bc3c5cb2a1e8f0d1913d5b44661ed4a419c"
+    },
+    {
+      "path": "checks/INS-1.json",
+      "sha256": "7156677327584ae842793e896cb4c1d55ce9e3073cc49e503582ef2e2ba3ec14"
+    },
+    {
+      "path": "checks/INS-2.json",
+      "sha256": "bb948f6d9e40c0aee6c44bcfbe40bb5c2c6e0a53a3b8efa94e59b18276a869e5"
+    },
+    {
+      "path": "checks/OV-1.json",
+      "sha256": "458bf2ce6f7db58285579d88f0eda112640cdb892f3854066fa490806409ffc3"
+    },
+    {
+      "path": "checks/OV-2.json",
+      "sha256": "a445950e1aae9bd2f7e88e67388b981ffa248073ccf3a60edd26e8b3a4dd0ef3"
+    },
+    {
+      "path": "checks/RB-1.json",
+      "sha256": "bbf547e21011b5d272d278e71a24a0da50db16084291ab04d23f955dc41e8b13"
+    },
+    {
+      "path": "checks/RB-2.json",
+      "sha256": "aa2fe96ac1dd152c6d58d00dd7c83267837a84bb65ce9c47eef0b92d13bee3a5"
+    },
+    {
+      "path": "checks/TS-1.json",
+      "sha256": "2c206422a69e24ef423e8fdfdad1f0a0969ce66250d112e9c08d2be40ffc3e04"
+    },
+    {
+      "path": "checks/TS-2.json",
+      "sha256": "1e8a25f3d8a9658e491452bca748f53a56b92824dd7a1e4c4def430198d361db"
+    },
+    {
+      "path": "checks/TS-3.json",
+      "sha256": "a57b117e69627a9aa88fa664061124c9e63f90118ae9c733d569b865d7d2986c"
+    },
+    {
+      "path": "checks/TS-4.json",
+      "sha256": "7b82950a967cb4b77ba3920f6f868f95b8e4fe1aa3668560090fc512d5c81a8e"
+    },
+    {
+      "path": "checks/TS-5.json",
+      "sha256": "1afd5382c61ea6a1be2761db0bc3f87c29b91125f77e86253c7eb5b206931f0a"
+    },
+    {
+      "path": "checks/UPG-1.json",
+      "sha256": "4f056cc9b2cb01f3fa313d6aeb79a3bc7b0c4c5d0868d42c710ae97cb85aa6aa"
+    },
+    {
+      "path": "checks/UPG-2.json",
+      "sha256": "36f9a897e19bba55d160133683e19e8fc3645f84414b3e76f6aa52425464958d"
+    },
+    {
+      "path": "commands.json",
+      "sha256": "1c9029f913e7702fe5a344de04540db295e6b7c32258ba1e8af74e77db52e9c9"
+    },
+    {
+      "path": "reference-deployment.json",
+      "sha256": "7182d36dc59261e50589a13a3b15f718e6bc32a5338bbd9bb7b13ae2e2fde142"
+    }
+  ],
+  "notes": "Failed: none. Not run (counted as failed): UPG-1, UPG-2, RB-1, RB-2, BR-2, BR-3, CR-1, CR-2, CR-3, CR-4, CR-5, CR-6, OV-1, OV-2, TS-1, TS-2, TS-3, TS-4, TS-5. kube context kind-amc-p206; recovery targets status engineering-placeholder."
+}

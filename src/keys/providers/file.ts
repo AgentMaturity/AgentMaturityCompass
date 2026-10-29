@@ -6,7 +6,7 @@
 import { createCipheriv, createDecipheriv, randomBytes, sign } from "node:crypto";
 import { getSigningKey, getSigningPublicKeyPem } from "../signingKeys.js";
 import { assertOwnerMode } from "../../mode/mode.js";
-import { getVaultSecret, getVaultSecretReadOnly, setVaultSecret } from "../../vault/vault.js";
+import { getVaultSecret, getVaultSecretReadOnly, setVaultSecret, unlockVault, vaultStatus } from "../../vault/vault.js";
 import { isLocalPurpose, type LocalPurpose } from "../../vault/vaultPayload.js";
 import { signingKeyId } from "../algorithmPolicy.js";
 import { KeyProviderError, type KeyProvider, type KeyRef } from "../provider.js";
@@ -21,6 +21,10 @@ function purposeOf(ref: KeyRef): LocalPurpose {
 function wrapSecret(workspace: string, ref: KeyRef, create: boolean): Buffer {
   const name = `amc.key-provider.file.wrap:${ref.id}`;
   // Unwrapping only reads: an unlocked session or AMC_VAULT_PASSPHRASE, as blob keys are read (P2-09 ledger keys).
+  // Wrapping may create the key, which needs an unlocked session: a fresh CLI process opens it from AMC_VAULT_PASSPHRASE,
+  // as signing does; with no passphrase the vault stays locked and getVaultSecret refuses.
+  const passphrase = process.env.AMC_VAULT_PASSPHRASE;
+  if (create && passphrase && !vaultStatus(workspace).unlocked) unlockVault(workspace, passphrase);
   let value = create ? getVaultSecret(workspace, name) : getVaultSecretReadOnly(workspace, name);
   if (value === null) {
     if (!create) throw new KeyProviderError("KEY_PROVIDER_KEY_REFUSED", "file", "the vault holds no wrap key of that name");

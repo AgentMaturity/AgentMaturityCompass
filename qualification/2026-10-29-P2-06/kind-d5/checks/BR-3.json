@@ -1,0 +1,7 @@
+{
+  "id": "BR-3",
+  "scenario": "Bad restores",
+  "status": "not_run",
+  "reason": "not selected (--only)",
+  "durationMs": 0
+}

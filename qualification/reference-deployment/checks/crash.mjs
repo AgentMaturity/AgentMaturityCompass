@@ -34,7 +34,7 @@ export const checks = {
   "CR-1": async () => notRun("needs a consequential fixture action with a system of record (P1-19 finance fixture) and the P1-03/P2-12 resume semantics wired into this harness", ["P1-19", "P1-03", "P2-12"]),
   "CR-2": cr2,
   "CR-3": async () => notRun("filling the volume needs a size-limited storage class; kind's local-path volumes share the node disk", ["P2-06 follow-up"]),
-  "CR-4": async () => notRun("the chart runs the file KeyProvider; blocking a networked KeyProvider (SoftHSM or a KMS) is not wired into the chart", ["P2-08"]),
+  "CR-4": async () => notRun("the chart can select a networked KeyProvider (keyProvider.*), but the repository image ships no provider SDK, PKCS#11 wrapper or pkcs11js, so there is none on kind to block", ["P2-08"]),
   "CR-5": async () => notRun("the reference topology runs SQLite on one volume; the Postgres HA option is not part of it", ["P2-09"]),
   "CR-6": async () => notRun("no scraper or OTLP endpoint is deployed by this harness, so an outage cannot be staged yet", ["P2-06 follow-up"])
 };

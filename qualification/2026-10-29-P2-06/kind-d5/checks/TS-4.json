@@ -1,0 +1,7 @@
+{
+  "id": "TS-4",
+  "scenario": "Storage and network",
+  "status": "not_run",
+  "reason": "not selected (--only)",
+  "durationMs": 0
+}

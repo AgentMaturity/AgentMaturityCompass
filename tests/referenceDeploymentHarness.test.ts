@@ -6,7 +6,7 @@ import { pathToFileURL } from "node:url";
 import { describe, expect, it } from "vitest";
 import { validateQualificationDir } from "../scripts/check-qualification-receipts.mjs";
 import { checks as backupChecks } from "../qualification/reference-deployment/checks/backup.mjs";
-import { checks as installChecks } from "../qualification/reference-deployment/checks/install.mjs";
+import { checks as installChecks, keyedState } from "../qualification/reference-deployment/checks/install.mjs";
 import { isPrefix, isRestoredPrefix } from "../qualification/reference-deployment/checks/lib.mjs";
 import { checks as rollbackChecks } from "../qualification/reference-deployment/checks/rollback.mjs";
 import { checks as upgradeChecks } from "../qualification/reference-deployment/checks/upgrade.mjs";
@@ -76,6 +76,16 @@ describe("receipt verdict", () => {
     expect(results.find((result: { id: string }) => result.id === "CR-5").reason).toMatch(/HA mode/);
   });
 
+  it("--only runs the named checks and records every other one as not run, so a partial rerun never passes", async () => {
+    expect(parseArgs([...ARGS, "--out", "x", "--only", "INS-1,BR-1"]).only).toEqual(["INS-1", "BR-1"]);
+    expect(() => parseArgs([...ARGS, "--out", "x", "--only", "INS-1,XX-9"])).toThrow(/XX-9/);
+    const registry = new Map(IDS.map((id) => [id, async () => ({ status: "passed" })]));
+    const results = await silenced(() => runChecks({ matrix, registry, ctx: { ha: true, only: ["INS-1", "BR-1"] } }));
+    expect(results.filter((result: { status: string }) => result.status === "passed").map((result: { id: string }) => result.id)).toEqual(["INS-1", "BR-1"]);
+    expect(results.find((result: { id: string }) => result.id === "INS-2").reason).toBe("not selected (--only)");
+    expect(evaluateResults(matrix, results).pass).toBe(false);
+  });
+
   it("writes a contract receipt that check:qualification accepts, with not-run checks counted as failed", () => {
     const root = mkdtempSync(join(tmpdir(), "amc-p206-receipt-"));
     try {
@@ -116,7 +126,9 @@ function fakeCluster() {
   const podImages = () => calls.filter((call) => call.input.includes('"kind":"Pod"')).map((call) => JSON.parse(call.input).spec.containers[0].image);
   const podClaims = () => calls.filter((call) => call.input.includes('"kind":"Pod"'))
     .map((call) => JSON.parse(call.input).spec.volumes[0].persistentVolumeClaim.claimName);
-  return { ctx, installs, podImages, podClaims };
+  const installArgs = () => calls.filter((call) => call.args[0] === "helm" && call.args.includes("install") && !call.args.some((arg) => arg.includes("-ins2-")))
+    .map((call) => call.args);
+  return { ctx, installs, installArgs, podImages, podClaims };
 }
 const digestOf = (ref: string) => ref.split("@")[1];
 
@@ -125,6 +137,16 @@ describe("which image each check qualifies (H1, H2)", () => {
     const cluster = fakeCluster();
     await silenced(() => installChecks["INS-1"](cluster.ctx));
     expect(cluster.installs()).toEqual([{ release: "amc-rd", digest: digestOf(B) }]);
+  });
+
+  it("INS-1 switches on the file KeyProvider and ledger encryption; UPG-1 keeps the chart defaults (P2-06 D5)", async () => {
+    const keyed = ["keyProvider.provider=file", "ledgerEncryption.enabled=true"];
+    const fresh = fakeCluster();
+    await silenced(() => installChecks["INS-1"](fresh.ctx));
+    expect(fresh.installArgs().flat()).toEqual(expect.arrayContaining(keyed));
+    const upgrade = fakeCluster();
+    await silenced(() => upgradeChecks["UPG-1"](upgrade.ctx));
+    expect(upgrade.installArgs().flat().filter((arg) => /keyProvider|ledgerEncryption/.test(arg))).toEqual([]);
   });
 
   it("UPG-1 starts from N-1 on its own release", async () => {
@@ -146,6 +168,21 @@ describe("which image each check qualifies (H1, H2)", () => {
     await silenced(() => rollbackChecks["RB-2"](cluster.ctx));
     expect(cluster.podImages()).toEqual([A]);
     expect(cluster.podClaims()).toEqual(["amc-rd-upg-amc"]);
+  });
+});
+
+describe("INS-1 KeyProvider and ledger encryption criterion (P2-06 D5)", () => {
+  const answer = (state: object | null, status = 0) => keyedState({ ...fakeCluster().ctx,
+    run: () => ({ status, stdout: state === null ? "not json" : JSON.stringify(state), stderr: "", durationMs: 0 }) });
+  const on = { ledgerEncryptionEnabled: true, wrapProvider: "file", encryptedRows: 3, plaintextRows: 0 };
+  it("holds only when the workspace's signed policy, data key and rows all say so", () => {
+    expect(answer(on).on).toBe(true);
+    expect(answer({ ...on, ledgerEncryptionEnabled: false }).on).toBe(false);
+    expect(answer({ ...on, wrapProvider: "aws-kms" }).on).toBe(false);
+    expect(answer({ ...on, encryptedRows: 0 }).on).toBe(false);
+    expect(answer({ ...on, plaintextRows: 1 }).on).toBe(false);
+    expect(answer(on, 1).on).toBe(false);
+    expect(answer(null).on).toBe(false);
   });
 });
 
