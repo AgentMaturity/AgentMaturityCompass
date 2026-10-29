@@ -24344,9 +24344,12 @@ agent
     });
     console.log(chalk.bold(`Running harness for ${opts.type} agent (target: ${opts.target}, max: ${opts.iterations} iterations)...`));
     const result = await runner.run();
+    // Only the initial probe is measured; later scores come from simulated module integration and are labelled so.
+    const simulated = result.scoreKind === "simulated" ? " (simulated, not executed)" : "";
     console.log(chalk.bold(`\nResult:`));
-    console.log(`  Final score: ${result.finalScore}`);
-    console.log(`  Total improvement: +${result.totalImprovement}`);
+    console.log(`  Measured probe score: ${result.measuredScore}`);
+    console.log(`  Projected final score${simulated}: ${result.finalScore}`);
+    console.log(`  Projected improvement${simulated}: +${result.totalImprovement}`);
     console.log(`  Iterations: ${result.iterations.length}`);
     console.log(`  Converged: ${result.converged ? chalk.green("yes") : chalk.yellow("no")}`);
     console.log(`  Duration: ${result.durationMs}ms`);

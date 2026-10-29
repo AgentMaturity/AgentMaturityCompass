@@ -7,7 +7,7 @@
  * Issue: AMC-48 — BUILD: LLM-as-Judge Metrics
  */
 
-import { randomUUID } from "node:crypto";
+import { sha256Hex } from "../utils/hash.js";
 
 // ---------------------------------------------------------------------------
 // Core Types
@@ -28,17 +28,39 @@ export interface JudgeContext {
   metadata?: Record<string, unknown>;
 }
 
+/** The judge settings a request was sent with; recorded on every result. */
+export interface JudgeModelSettings {
+  model: JudgeConfig['model'];
+  temperature: number;
+  maxTokens: number;
+}
+
+/**
+ * `scored`: the judge returned a well-formed score. `invalid`: its output was
+ * malformed, out of range or missing a score, so no score exists. A transport
+ * failure is neither: evaluateMetric rejects.
+ */
+export type JudgeResultStatus = 'scored' | 'invalid';
+
 export interface JudgeResult {
   /** Metric name */
   metric: string;
-  /** Score (0-1 scale) */
-  score: number;
+  status: JudgeResultStatus;
+  /** Score (0-1 scale); null when status is `invalid`, never a stand-in zero. */
+  score: number | null;
   /** Explanation of the score */
   explanation: string;
-  /** Confidence in the judgment (0-1) */
-  confidence: number;
+  /** Confidence the judge reported (0-1); null when it reported none or the result is invalid. */
+  confidence: number | null;
   /** Raw judge response for debugging */
   rawResponse?: string;
+  /** The model and settings this judgment was requested with. */
+  judge: JudgeModelSettings;
+}
+
+/** Only results the judge actually scored; invalid ones carry no score to average. */
+export function scoredJudgeResults(results: readonly JudgeResult[]): Array<JudgeResult & { score: number }> {
+  return results.filter((r): r is JudgeResult & { score: number } => r.status === 'scored' && r.score !== null);
 }
 
 export interface JudgeConfig {
@@ -262,8 +284,10 @@ export class LLMJudgeEngine {
     metric: keyof typeof JUDGE_PROMPTS,
     context: JudgeContext
   ): Promise<JudgeResult> {
-    const cacheKey = this.getCacheKey(metric, context);
-    
+    const prompt = this.buildPrompt(metric, context);
+    const settings = this.judgeSettings();
+    const cacheKey = this.getCacheKey(metric, settings, prompt);
+
     if (this.config.enableCache) {
       this.cacheLookups += 1;
       if (this.cache.has(cacheKey)) {
@@ -272,11 +296,11 @@ export class LLMJudgeEngine {
       }
     }
 
-    const prompt = this.buildPrompt(metric, context);
-    const response = await this.callJudgeModel(prompt);
+    const response = await this.callJudgeModel(prompt, settings);
     const result = this.parseJudgeResponse(metric, response);
 
-    if (this.config.enableCache) {
+    // An invalid judgment is never cached: a transient malformed reply must not be served for the engine's lifetime.
+    if (this.config.enableCache && result.status === 'scored') {
       this.cache.set(cacheKey, result);
     }
 
@@ -358,36 +382,57 @@ export class LLMJudgeEngine {
    * deterministic behaviour in tests should inject a judge via that override
    * rather than relying on a built-in mock, because none exists.
    */
-  protected async callJudgeModel(prompt: string): Promise<string> {
+  protected async callJudgeModel(prompt: string, settings: JudgeModelSettings = this.judgeSettings()): Promise<string> {
     const { ProductionLLMJudgeEngine } = await import("./llmApiIntegration.js");
     this.productionEngine ??= new ProductionLLMJudgeEngine();
-    return this.productionEngine.callJudgeModel(prompt);
+    return this.productionEngine.callJudgeModel(prompt, settings);
   }
 
+  /** The configured model, temperature and token cap, forwarded on every judge request. */
+  protected judgeSettings(): JudgeModelSettings {
+    return { model: this.config.model, temperature: this.config.temperature, maxTokens: this.config.maxTokens };
+  }
+
+  /** Transport usage of the production judge client, or null when this engine never used it. */
+  getUsageStats(): ReturnType<import("./llmApiIntegration.js").ProductionLLMJudgeEngine["getUsageStats"]> | null {
+    return this.productionEngine?.getUsageStats() ?? null;
+  }
+
+  /**
+   * Strict parse: a score must be a finite number in [0, 1]. Malformed JSON, a
+   * missing/out-of-range score or an out-of-range confidence is an `invalid`
+   * result with no score, never a measured zero. A missing confidence stays
+   * null; an explicit 0 stays 0.
+   */
   protected parseJudgeResponse(metric: string, response: string): JudgeResult {
+    const judge = this.judgeSettings();
+    const invalid = (reason: string): JudgeResult =>
+      ({ metric, status: 'invalid', score: null, explanation: `Invalid judge response: ${reason}`, confidence: null, rawResponse: response, judge });
+    let parsed: unknown;
     try {
-      const parsed = JSON.parse(response);
-      return {
-        metric,
-        score: Math.max(0, Math.min(1, parsed.score || 0)),
-        explanation: parsed.explanation || 'No explanation provided',
-        confidence: parsed.confidence || 0.8,
-        rawResponse: response
-      };
+      parsed = JSON.parse(response);
     } catch (error) {
-      return {
-        metric,
-        score: 0,
-        explanation: `Failed to parse judge response: ${error}`,
-        confidence: 0,
-        rawResponse: response
-      };
+      return invalid(`not JSON (${error instanceof Error ? error.message : String(error)})`);
     }
+    if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) return invalid('not a JSON object');
+    const { score, confidence, explanation } = parsed as Record<string, unknown>;
+    if (!isUnitInterval(score)) return invalid('score must be a number between 0 and 1');
+    const reportedConfidence = confidence ?? null;
+    if (reportedConfidence !== null && !isUnitInterval(reportedConfidence)) return invalid('confidence must be a number between 0 and 1');
+    return {
+      metric,
+      status: 'scored',
+      score,
+      explanation: typeof explanation === 'string' && explanation.length > 0 ? explanation : 'No explanation provided',
+      confidence: reportedConfidence,
+      rawResponse: response,
+      judge
+    };
   }
 
-  private getCacheKey(metric: string, context: JudgeContext): string {
-    const key = JSON.stringify({ metric, context });
-    return Buffer.from(key).toString('base64');
+  /** Keyed by judge identity as well as the rendered prompt, so a different model or setting never reuses a judgment. */
+  private getCacheKey(metric: string, settings: JudgeModelSettings, prompt: string): string {
+    return sha256Hex(JSON.stringify({ metric, settings, prompt }));
   }
 
   /**
@@ -408,4 +453,8 @@ export class LLMJudgeEngine {
       hitRate: this.cacheLookups === 0 ? 0 : Number((this.cacheHits / this.cacheLookups).toFixed(4))
     };
   }
+}
+
+function isUnitInterval(value: unknown): value is number {
+  return typeof value === 'number' && Number.isFinite(value) && value >= 0 && value <= 1;
 }

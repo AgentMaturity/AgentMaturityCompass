@@ -58,12 +58,14 @@ export interface HallucinationDetectionResult {
   findings: HallucinationFinding[];
   /** Overall hallucination score 0-1 (0 = no hallucination, 1 = fully hallucinated). */
   score: number;
-  /** Whether the response passes the hallucination check; null when nothing could be judged (outcome not_evaluated). */
-  passed: boolean | null;
   /**
-   * not_evaluated when there was no grounding (no context, no known facts), no LLM judge ran and nothing was found:
-   * an empty result then means "could not judge", never "nothing fabricated" (WP37).
+   * Whether the response passes the hallucination check. null when it could not be judged clean: no grounding
+   * (no context, no known facts) and no LLM judge ran, so absence of findings is not evidence of absence (WP11, WP37).
    */
+  passed: boolean | null;
+  /** True only when grounding (context or known facts) was supplied or the LLM judge ran. */
+  evaluated: boolean;
+  /** not_evaluated when nothing could be judged (not evaluated and no findings); measured otherwise (WP37). */
   outcome: EvidenceOutcome;
   /** Breakdown by type. */
   summary: Record<HallucinationType, number>;

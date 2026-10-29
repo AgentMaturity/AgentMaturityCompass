@@ -99,13 +99,16 @@ export async function detectHallucinations(
     summary[t] = allFindings.filter(f => f.type === t).length;
   }
 
+  // Without grounding, deterministic checks can still fail a response but never certify it clean.
   const grounded = Boolean(input.context?.trim()) || Object.keys(input.knownFacts ?? {}).length > 0;
-  const notEvaluated = !grounded && !judgeRan && allFindings.length === 0;
+  const evaluated = grounded || judgeRan;
+  const overThreshold = score > cfg.threshold;
   return {
     findings: allFindings,
     score,
-    passed: notEvaluated ? null : score <= cfg.threshold,
-    outcome: notEvaluated ? "not_evaluated" : "measured",
+    passed: overThreshold ? false : evaluated ? true : null,
+    evaluated,
+    outcome: !evaluated && allFindings.length === 0 ? "not_evaluated" : "measured",
     summary,
     totalFindings: allFindings.length,
     detectorsUsed,

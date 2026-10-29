@@ -118,9 +118,9 @@ async function getClaimedLevels(params: {
   config: ReturnType<typeof loadAMCConfig>;
   contextSummary: string;
   questions: Array<{ id: string; title: string; promptTemplate: string }>;
-}): Promise<Record<string, number>> {
+}): Promise<{ levels: Record<string, number>; humanPasted: boolean }> {
   if (params.mode === "auto") {
-    return {};
+    return { levels: {}, humanPasted: false };
   }
 
   if (params.mode === "owner") {
@@ -137,7 +137,7 @@ async function getClaimedLevels(params: {
       ]);
       out[question.id] = answer.level;
     }
-    return out;
+    return { levels: out, humanPasted: false };
   }
 
   const runtime = params.runtimeForHarness ?? "claude";
@@ -156,8 +156,7 @@ async function getClaimedLevels(params: {
     schema: claimsSchema,
     maxRetries: 2
   });
-
-  return harness.value.claimedLevels;
+  return { levels: harness.value.claimedLevels, humanPasted: harness.usedFallback }; // usedFallback: a person pasted the claims
 }
 
 function extractAuditType(event: ParsedEvidenceEvent): string {
@@ -658,7 +657,7 @@ async function runDiagnosticCore(input: RunDiagnosticInput, outputMarkdownPath?:
     }
 
     const claimMode = input.claimMode ?? "auto";
-    const claimedLevels = await getClaimedLevels({
+    const { levels: claimedLevels, humanPasted: claimsHumanPasted } = await getClaimedLevels({
       mode: claimMode,
       runtimeForHarness: input.runtimeForHarness,
       config,
@@ -956,6 +955,7 @@ async function runDiagnosticCore(input: RunDiagnosticInput, outputMarkdownPath?:
           questionId: question.id
         });
       }
+      if (claimsHumanPasted && typeof rawClaimedLevel === "number") flags.push("FLAG_CLAIM_HUMAN_PASTED");
       if (!verification.ok) {
         flags.push("FLAG_LEDGER_INVALID");
       }
