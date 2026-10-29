@@ -160,11 +160,19 @@ is reachable directly (`storeDedupe.test.ts`) and by two processes that both pas
   200 readiness document: no readiness can be evaluated over rows that fail verification, and the member rows that
   decide who may read the project are among them, so the answer stays a fail-closed refusal (design text in
   docs/A4_FORGE.md "The journey"). `scenario13TamperedRecord.test.ts` asserts the verdict and that the body names no
-  table, principal or problem. Other project routes still return the store's problem list in `detail` (see below).
-- **Follow-up (P2-41 found) · integrity problems before membership.** Every project route but readiness answers a
-  record that fails verification with the store's problem list in `detail`, which names side-row keys (member
-  principal keys included), and does so before `assertVisible`. Only someone who could alter the database file causes
-  it, and the 409 itself is fail-closed; a later item may move the list behind membership or to `GET …/verify` only.
+  table, principal or problem.
+- **Closed by P2-41 (follow-up) · integrity problems before membership.** Every other project route answered a record
+  that fails verification with the store's problem list in `detail` (side-row keys, member principal keys included)
+  before `assertVisible`, and a stored row that did not parse with its parse issue in the message. `sendA4Error` now
+  gives every `A4_INTEGRITY_FAILED` it sends the fixed `detail` above, and a row that does not parse the fixed message
+  `A stored A4 record does not parse.` (the MCP tools' refusal too); the readiness-only wrapper is gone. Only
+  `GET …/verify` returns the problems: to a workspace OWNER or AUDITOR, the admin token, or a member proven by member
+  rows that verify. When the member rows fail, any other reader now gets `409 A4_INTEGRITY_FAILED` with the fixed
+  detail (it was `403 A4_NOT_A_MEMBER`). `scenario13TamperedRecord.test.ts` covers the project, transitions, readiness
+  and hold routes on each tamper, a head row that does not parse, a VIEWER member reading the report, a non-member
+  refused with 403, and both refused with the verdict when the member rows fail. Kept: workspace OWNERs, AUDITORs and the
+  admin token still read the report without membership, since it exists to show a failing chain. Not changed:
+  `amc bundle export` still names up to three problems in its refusal; it is an operator export, not a project route.
 - **Closed by P2-42 · Adapt cannot propose on the shipped catalog.** With the shipped admitted catalog, Adapt carried
   the compiled plan (about 140 to 150 KiB: the catalog lock, the evidence plan, the requirements) twice, in
   Understand's facts and in the proposal, so every proposal exceeded `SPEC_ROOM_FOR_BUILD` (240 KiB) and

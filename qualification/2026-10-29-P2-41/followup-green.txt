@@ -1,0 +1,9 @@
+
+ RUN  v4.1.11 /Users/sid/AgentMaturityCompass-worktrees/s442cd919/work/amc-w6-p2-41
+
+
+ Test Files  1 passed (1)
+      Tests  9 passed (9)
+   Start at  09:11:45
+   Duration  20.32s (transform 4.56s, setup 29ms, import 5.80s, tests 14.35s, environment 0ms)
+

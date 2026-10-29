@@ -43,7 +43,7 @@ function operation(summary: string, response: string, options: { write?: boolean
       "401": json("No authenticated Studio session (A4 routes are served only through native Studio admission).", ref("A4Error")),
       "403": json("DEMO_REFUSED, ADMIN_TOKEN_REFUSED (the admin token reads only), NATIVE_READ_ONLY, role class or project membership refused.", ref("A4Error")),
       "404": json("A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.", ref("A4Error")),
-      "409": json("A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items, RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.", ref("A4Error")),
+      "409": json("A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items, RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status: BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems).", ref("A4Error")),
       "423": json("A4_VAULT_LOCKED: unlock the vault to record this.", ref("A4Error")),
       "500": json("The outcome is uncertain; reload the project before retrying.", ref("A4Error"))
     }
@@ -66,7 +66,7 @@ export function a4Endpoints(): Record<string, Record<string, OpenApiOperation>> 
         { write: true, body: "A4CreateProject", status: "201" })
     },
     [p]: { get: read("Project head, members, current revision summary, gates and readiness (amc.a4-project/v1)") },
-    [`${p}/readiness`]: { get: read("The one readiness evaluation for this principal (amc.a4-readiness/v1); on records that fail verification, 409 A4_INTEGRITY_FAILED with detail {status: BLOCKED} and no row named", [query("stage", stage, "Defaults to the head stage.")]) },
+    [`${p}/readiness`]: { get: read("The one readiness evaluation for this principal (amc.a4-readiness/v1)", [query("stage", stage, "Defaults to the head stage.")]) },
     [`${p}/events`]: { get: read("Poll: events folded from the chain, the head and presence", [
       query("cursor", integer, "The next seq to read (0 for all)."), query("card", string, "Only events on this card.")]) },
     [`${p}/revisions`]: { get: read("Revision summaries") },

@@ -24,7 +24,7 @@ import { z, ZodError } from "zod";
 import { A4BlobError } from "../a4/a4Blobs.js";
 import { conformanceView } from "../a4/a4Conformance.js";
 import { evaluateFor, loadA4State } from "../a4/a4Gates.js";
-import { A4_API_PREFIX, headStage, projectView } from "../a4/a4Router.js";
+import { A4_API_PREFIX, A4_UNPARSED_RECORD, headStage, projectView } from "../a4/a4Router.js";
 import { A4_STAGES, a4PreviewEnabled, type A4Member, type A4Principal, type A4Stage } from "../a4/a4Schema.js";
 import { A4StoreError, openA4Store, type A4Store } from "../a4/a4Store.js";
 import { resolveApiRolePolicy } from "../api/accessPolicy.js";
@@ -92,10 +92,7 @@ function refusal(name: string, status: number, code: string, message: string): R
 
 /** The router's sendError classification, so a stored row that no longer parses is an integrity failure and nothing else leaks raw. */
 function refusalFor(name: string, error: unknown): Refusal {
-  if (error instanceof ZodError) {
-    const issue = error.issues[0];
-    return refusal(name, 409, "A4_INTEGRITY_FAILED", `A stored A4 record does not parse${issue ? ` (${issue.path.join(".") || "row"}: ${issue.message})` : ""}.`);
-  }
+  if (error instanceof ZodError) return refusal(name, 409, "A4_INTEGRITY_FAILED", A4_UNPARSED_RECORD);
   if (error instanceof A4BlobError) return refusal(name, error.code === "VAULT_LOCKED" ? 423 : error.code === "SECRET_SCAN_REFUSED" ? 400 : 409, error.code, error.message);
   const tagged = error as { status?: unknown; code?: unknown } | null;
   if (error instanceof Error && typeof tagged?.status === "number" && typeof tagged.code === "string") return refusal(name, tagged.status, tagged.code, error.message);
