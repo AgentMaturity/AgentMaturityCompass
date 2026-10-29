@@ -18,7 +18,7 @@ import { pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { verifyBenchArtifactFile } from "./benchVerifier.js";
 import { admitKey, loadTrustContext, untrustedReasons, withPins, type TrustContext } from "../trust/index.js";
 import { benchRegistryCachePath, importedBenchPath, listImportedBenches, type ImportedBenchMeta } from "./benchRegistryStore.js";
-import { benchImportsCacheDir, benchImportsRegistriesPath, loadBenchRegistriesConfig, loadBenchRegistriesConfigAsync, verifyBenchRegistriesSignature } from "./benchPolicyStore.js";
+import { benchImportsRegistriesPath, loadBenchRegistriesConfig, loadBenchRegistriesConfigAsync, verifyBenchRegistriesSignature } from "./benchPolicyStore.js";
 
 function isHttp(base: string): boolean {
   return /^https?:\/\//i.test(base);
@@ -91,6 +91,19 @@ function compareVersions(a: string, b: string): number {
   return a.localeCompare(b);
 }
 
+function verifiedBenchRegistryIndex(indexRaw: string, sigRaw: string, pubRaw: string) {
+  const index = benchRegistryIndexSchema.parse(JSON.parse(indexRaw) as unknown);
+  const checked = verifyIndexSignature({ index, sigRaw, registryPub: pubRaw });
+  if (!checked.ok) {
+    throw new Error(`registry signature invalid: ${checked.reason ?? "unknown"}`);
+  }
+  const registryFingerprint = sha256Hex(Buffer.from(pubRaw, "utf8"));
+  if (index.registry.issuerFingerprint !== registryFingerprint) {
+    throw new Error("registry fingerprint mismatch");
+  }
+  return { index, registryFingerprint };
+}
+
 async function fetchBenchRegistryIndex(baseRaw: string, workspace?: string): Promise<{
   base: string;
   indexRaw: string;
@@ -105,15 +118,7 @@ async function fetchBenchRegistryIndex(baseRaw: string, workspace?: string): Pro
     readText(base, "index.sig", workspace),
     readText(base, "registry.pub", workspace)
   ]);
-  const index = benchRegistryIndexSchema.parse(JSON.parse(indexRaw) as unknown);
-  const checked = verifyIndexSignature({ index, sigRaw, registryPub: pubRaw });
-  if (!checked.ok) {
-    throw new Error(`registry signature invalid: ${checked.reason ?? "unknown"}`);
-  }
-  const registryFingerprint = sha256Hex(Buffer.from(pubRaw, "utf8"));
-  if (index.registry.issuerFingerprint !== registryFingerprint) {
-    throw new Error("registry fingerprint mismatch");
-  }
+  const { index, registryFingerprint } = verifiedBenchRegistryIndex(indexRaw, sigRaw, pubRaw);
   return {
     base,
     indexRaw,
@@ -183,18 +188,24 @@ function admitRegistryKey(pubRaw: string, pinnedFingerprint: string, base: Trust
 }
 
 /**
- * The signer an imported bench was admitted for, re-read from the cached index the pinned registry signed, never from
+ * The version an imported bench was admitted for, re-read from the cached index the pinned registry signed, never from
  * the unsigned meta.json (P0-09). Throws when the signed config, the cache, its signature or the pin does not hold.
  */
-export async function importedBenchSigner(workspace: string, meta: ImportedBenchMeta, trust: TrustContext): Promise<string> {
+export function authenticatedImportedBenchVersion(workspace: string, meta: ImportedBenchMeta, trust: TrustContext) {
   if (!verifyBenchRegistriesSignature(workspace).signatureExists) throw new Error("bench registries config is not signed");
   const registry = signedBenchRegistry(workspace, meta.registryId);
-  const cached = await fetchBenchRegistryIndex(join(benchImportsCacheDir(workspace), meta.registryId));
+  const paths = benchRegistryCachePath(workspace, meta.registryId);
+  const pubRaw = readUtf8(paths.pubPath);
+  const cached = verifiedBenchRegistryIndex(readUtf8(paths.indexPath), readUtf8(paths.sigPath), pubRaw);
   if (cached.registryFingerprint !== registry.pinnedRegistryFingerprint) throw new Error("cached registry index is not from the pinned registry");
-  admitRegistryKey(cached.pubRaw, registry.pinnedRegistryFingerprint, trust);
-  const signer = cached.index.benches.find((row) => row.benchId === meta.benchId)?.versions.find((row) => row.version === meta.version)?.signerFingerprint;
-  if (!signer) throw new Error(`the signed registry index names no signer for ${meta.benchId}@${meta.version}`);
-  return signer;
+  admitRegistryKey(pubRaw, registry.pinnedRegistryFingerprint, trust);
+  const selected = cached.index.benches.find((row) => row.benchId === meta.benchId)?.versions.find((row) => row.version === meta.version);
+  if (!selected) throw new Error(`the signed registry index names no signer for ${meta.benchId}@${meta.version}`);
+  return selected;
+}
+
+export async function importedBenchSigner(workspace: string, meta: ImportedBenchMeta, trust: TrustContext): Promise<string> {
+  return authenticatedImportedBenchVersion(workspace, meta, trust).signerFingerprint;
 }
 
 export async function importBenchFromRegistry(params: { workspace: string; registryId: string; benchRef: string }, options: OrgPairsOptions = {}) {

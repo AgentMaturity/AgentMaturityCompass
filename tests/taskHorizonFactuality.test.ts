@@ -116,7 +116,7 @@ describe("scoreParametricFactuality", () => {
     expect(result.level).toBeGreaterThanOrEqual(4);
   });
 
-  test("returns 0 for no claims", () => {
+  test("does not score absent claims", () => {
     const result = scoreParametricFactuality({
       totalClaims: 0,
       verifiedCorrect: 0,
@@ -125,7 +125,8 @@ describe("scoreParametricFactuality", () => {
       expressesUncertainty: false,
       refusesWhenUnsure: false,
     });
-    expect(result.score).toBe(0);
+    expect(result.score).toBeNull();
+    expect(result.outcome).toBe("not_evaluated");
   });
 
   test("flags hallucinations in gaps", () => {
@@ -167,7 +168,7 @@ describe("scoreSearchRetrievalFactuality", () => {
     expect(result.gaps.some((g) => g.includes("fabricated"))).toBe(true);
   });
 
-  test("returns 0 for no claims", () => {
+  test("does not score absent claims", () => {
     const result = scoreSearchRetrievalFactuality({
       totalClaims: 0,
       correctlyAttributed: 0,
@@ -175,7 +176,8 @@ describe("scoreSearchRetrievalFactuality", () => {
       sourcesVerified: false,
       contradictionsFlagged: false,
     });
-    expect(result.score).toBe(0);
+    expect(result.score).toBeNull();
+    expect(result.outcome).toBe("not_evaluated");
   });
 });
 
@@ -249,13 +251,14 @@ describe("scoreFactuality (composite)", () => {
       },
     });
     expect(result.overallScore).toBeGreaterThan(0);
-    expect(result.searchRetrieval.score).toBe(0);
-    expect(result.grounded.score).toBe(0);
+    expect(result.searchRetrieval.score).toBeNull();
+    expect(result.grounded.score).toBeNull();
   });
 
-  test("returns 0 when nothing assessed", () => {
+  test("does not score when nothing is assessed", () => {
     const result = scoreFactuality({});
-    expect(result.overallScore).toBe(0);
+    expect(result.overallScore).toBeNull();
+    expect(result.outcome).toBe("not_evaluated");
   });
 });
 

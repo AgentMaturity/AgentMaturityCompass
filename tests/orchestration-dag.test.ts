@@ -95,11 +95,11 @@ describe("scoreDAGGovernance", () => {
     expect(result.score).toBeLessThanOrEqual(100);
   });
 
-  it("level is a non-empty string", () => {
-    const dag = captureDAG([]);
+  it("populated DAG level is a non-empty string", () => {
+    const dag = captureDAG([makeNode("a")]);
     const result = scoreDAGGovernance(dag);
     expect(typeof result.level).toBe("string");
-    expect(result.level.length).toBeGreaterThan(0);
+    expect(result.level?.length).toBeGreaterThan(0);
   });
 
   it("cyclic DAG scores lower than acyclic DAG", () => {
@@ -115,7 +115,8 @@ describe("scoreDAGGovernance", () => {
     const acyclic = captureDAG(acyclicNodes);
     const cyclicScore = scoreDAGGovernance(cyclic);
     const acyclicScore = scoreDAGGovernance(acyclic);
-    expect(cyclicScore.score).toBeLessThanOrEqual(acyclicScore.score);
+    expect(acyclicScore.outcome).toBe("measured");
+    expect(cyclicScore.score).toBeLessThanOrEqual(acyclicScore.score!);
   });
 
   it("high trust boundary count reduces score", () => {
