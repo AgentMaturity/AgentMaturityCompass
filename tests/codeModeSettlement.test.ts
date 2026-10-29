@@ -1,6 +1,7 @@
 import { mkdtempSync, rmSync, realpathSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { Worker } from "node:worker_threads";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ToolRegistry, defineTool } from "../src/tools/toolRegistry.js";
 import { ToolPipeline, RUN_CODE_TOOL, type ToolPipelineInit } from "../src/tools/toolPipeline.js";
@@ -209,11 +210,11 @@ describe("approval waits do not consume the execution budget (DXB-20)", () => {
     const ran = { count: 0 };
     const h = harness({
       tools: [write(ran)],
-      limits: { wallMs: 2_000, maxResultBytes: 20_000, maxToolCalls: 10, maxApprovalWaitMs: 300 },
+      limits: { wallMs: 200, maxResultBytes: 20_000, maxToolCalls: 10, maxApprovalWaitMs: 300 },
       pipeline: { approvalRequiredFor: new Set(["WRITE_LOW"]), approve: async () => { await sleep(800); return "allow"; } }
     });
     const outcome = await h.run("return await tools.write({});");
-    expect(outcome.output).toContain("waited on approvals");
+    expect(outcome.output).toContain("hard cap");
     await sleep(1_000);
     expect(ran.count, "the grant arrived after the program's verdict: the body must not run").toBe(0);
   });
@@ -223,7 +224,7 @@ describe("approval waits do not consume the execution budget (DXB-20)", () => {
     let gateSawAbort = false;
     const h = harness({
       tools: [write(ran)],
-      limits: { wallMs: 2_000, maxResultBytes: 20_000, maxToolCalls: 10, maxApprovalWaitMs: 300 },
+      limits: { wallMs: 200, maxResultBytes: 20_000, maxToolCalls: 10, maxApprovalWaitMs: 300 },
       // The answerer ignores cancellation and grants late: the pipeline must still refuse to dispatch.
       pipeline: { approvalRequiredFor: new Set(["WRITE_LOW"]), approve: async () => { await sleep(800); return "allow"; } }
     });
@@ -371,4 +372,57 @@ describe("a large valid result is returned rather than failed (PXB-16)", () => {
     expect(outcome.ok).toBe(true);
     expect(String(outcome.value)).toHaveLength(1_000_000);
   });
+});
+
+describe("approval waits cannot stretch a program without bound (security review)", () => {
+  it("a program spinning behind an approval that never resolves still stops at the hard cap", async () => {
+    const runner = new CodeModeRunner({
+      confined: true,
+      limits: { wallMs: 200, maxResultBytes: 1_000, maxToolCalls: 5, maxApprovalWaitMs: 300 },
+      abandonGraceMs: 50,
+      dispatch: (_call, context) => { context.onApprovalWait(true); return new Promise<CodeToolResult>(() => undefined); }
+    });
+    const started = Date.now();
+    const outcome = await runner.run("void tools.pay({}); await new Promise((r) => setTimeout(r, 20)); while (true) {}");
+    expect(outcome.failure).toBe("timeout");
+    expect(outcome.message).toContain("hard cap of 500ms");
+    expect(Date.now() - started).toBeLessThan(2_000);
+    expect(outcome.calls.map((call) => call.status), "the in-flight sub-call is unknown").toEqual(["unknown"]);
+  });
+});
+
+describe("worker slots are bounded and always reclaimed (security review)", () => {
+  it("refuses cleanly when no slot frees up before the acquire deadline", async () => {
+    const busy = new CodeModeRunner({ confined: true, limits: { wallMs: 1_500, maxResultBytes: 1_000, maxToolCalls: 1 },
+      dispatch: async () => ({ ok: true, value: null }) });
+    const holders = Array.from({ length: 4 }, () => busy.run("while (true) {}"));
+    await sleep(100);
+    const late = new CodeModeRunner({ confined: true, slotWaitMs: 100, dispatch: async () => ({ ok: true, value: null }) });
+    const started = Date.now();
+    const refusedRun = await late.run("return 1;");
+    expect(refusedRun.failure).toBe("worker-capacity");
+    expect(refusedRun.workerStarted).toBe(false);
+    expect(Date.now() - started).toBeLessThan(1_000);
+    await Promise.all(holders);
+  });
+
+  it("frees the slot when terminate fails and the exit is never observed", async () => {
+    const realTerminate = Worker.prototype.terminate;
+    const spy = vi.spyOn(Worker.prototype, "terminate").mockImplementation(function (this: Worker) {
+      setTimeout(() => { void realTerminate.call(this); }, 2_000);
+      return Promise.reject(new Error("terminate failed"));
+    });
+    try {
+      const runner = new CodeModeRunner({ confined: true, abandonGraceMs: 50, slotWaitMs: 5_000,
+        limits: { wallMs: 100, maxResultBytes: 1_000, maxToolCalls: 1 }, dispatch: async () => ({ ok: true, value: null }) });
+      const started = Date.now();
+      const outcomes = await Promise.all(Array.from({ length: 5 }, () => runner.run("await new Promise((r) => setTimeout(r, 100000));")));
+      expect(outcomes.map((outcome) => outcome.failure)).toEqual(Array(5).fill("timeout"));
+      expect(outcomes.every((outcome) => outcome.workerExitMs === null), "a failed terminate is never an observed exit").toBe(true);
+      expect(Date.now() - started, "the fifth program must not wait for the real exits").toBeLessThan(1_500);
+    } finally {
+      spy.mockRestore();
+      await sleep(2_200);
+    }
+  }, 15_000);
 });

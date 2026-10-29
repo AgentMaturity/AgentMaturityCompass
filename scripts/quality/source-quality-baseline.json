@@ -1755,7 +1755,6 @@
     {"id":"449c701387d6962490b51e84aeb0c647a2b09192683833b5acec371db2817eb1","file":"src/runtime/index.ts","kind":"exports"},
     {"id":"44ea8d81d44c67b74f8cd4caa2f2afe77c4cb71c84bbb201cb06afa7cd91f149","file":"src/release/releaseUtils.ts","kind":"exports"},
     {"id":"44ed06eb923735bbcb4f4ca25dfc8d107e916ac64f55f0bc1e06566d10c8cff4","file":"src/benchmarks/replayBenchmarkCorpus.ts","kind":"types"},
-    {"id":"44f71f7d69ca4dceb36da213247719358597f704d6e9fe4ab9559af75b443c5f","file":"src/codemode/codeModeRunner.ts","kind":"exports"},
     {"id":"45177958b1e8f8d24394cfb311f79d8429fdf9243bb786c54aac11c374d3f42a","file":"src/product/syncConnector.ts","kind":"types"},
     {"id":"4520415c05b13fd4f1ae5679f1c711804086fae3efad83ec461be4a8bcd9e0f9","file":"src/domains/industryPackEntitlement.ts","kind":"exports"},
     {"id":"45266a872ebe3c07c06a649aa43de868803e2daae32fe74f39549b9131b65fc3","file":"src/prompt/agentPromptProfile.ts","kind":"exports"},

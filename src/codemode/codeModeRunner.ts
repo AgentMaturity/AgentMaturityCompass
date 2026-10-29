@@ -53,7 +53,7 @@ export interface CodeToolResult {
 }
 
 /** What a dispatched sub-call is given by the program run that admitted it. */
-export interface CodeDispatchContext {
+interface CodeDispatchContext {
   /** Aborted the moment the program reaches any verdict, and when the enclosing call is cancelled. */
   readonly signal: AbortSignal;
   /** Called with true when the sub-call starts waiting on an approval and false when the wait ends. */
@@ -74,8 +74,9 @@ export interface CodeModeLimits {
   /** How many tool calls one program may make. */
   readonly maxToolCalls: number;
   /**
-   * How long the paused wall clock may stay paused on approval waits in total (DXB-20). An approval does not spend
-   * `wallMs`, but a program cannot hold its worker forever behind one either.
+   * The approval allowance (DXB-20). Approval waits pause the `wallMs` clock, but the program also has a hard cap that
+   * never pauses: `wallMs` plus this allowance from the worker's start. A worker cannot stretch its wall time by
+   * keeping a sub-call "waiting" while it computes.
    */
   readonly maxApprovalWaitMs?: number;
 }
@@ -84,7 +85,7 @@ export const DEFAULT_CODE_LIMITS: CodeModeLimits = {
   wallMs: 30_000,
   maxResultBytes: 16 * 1024 * 1024,
   maxToolCalls: 200,
-  maxApprovalWaitMs: 600_000
+  maxApprovalWaitMs: 120_000
 };
 
 export type CodeRunFailure =
@@ -93,9 +94,10 @@ export type CodeRunFailure =
   | "result-too-large"
   | "program-error"
   | "cancelled"
+  | "worker-capacity"
   | "unconfined";
 
-export interface CodeCallRecord {
+interface CodeCallRecord {
   readonly name: string;
   readonly ok: boolean;
   readonly status: CodeCallStatus;
@@ -131,41 +133,54 @@ export interface CodeModeRunnerInit {
   readonly confined: boolean;
   /** How long a stopping program waits for its worker and sub-calls. Defaults to the loop's abandon grace. */
   readonly abandonGraceMs?: number;
+  /** How long a program may wait for a worker slot before it is refused. Defaults to 10 s. */
+  readonly slotWaitMs?: number;
 }
 
 /** Console bytes kept per program; the rest are counted, not kept. */
 const CONSOLE_LIMIT_BYTES = 64 * 1024;
 
-// ponytail: one process-wide count; per-session pools if programs from different sessions must not queue on each other.
+// ponytail: one process-wide count with a bounded wait; a per-session share if one session's programs crowd others out.
 const WORKER_CAPACITY = 4;
+const DEFAULT_SLOT_WAIT_MS = 10_000;
 let workersLive = 0;
 const slotWaiters: Array<() => void> = [];
 
-/** A worker slot, held until the worker emits `exit` (PXB-18). False when `signal` aborts first. */
-function acquireWorkerSlot(signal: AbortSignal | undefined): Promise<boolean> {
+/**
+ * A worker slot (PXB-18): a release function to call once, or why none was granted. Waiting is bounded, so a busy
+ * process refuses a program instead of queueing it behind other sessions without end.
+ */
+function acquireWorkerSlot(signal: AbortSignal | undefined, waitMs: number): Promise<(() => void) | "cancelled" | "expired"> {
+  let released = false;
+  const release = (): void => {
+    if (released) return;
+    released = true;
+    workersLive -= 1;
+    slotWaiters.shift()?.();
+  };
   if (workersLive < WORKER_CAPACITY) {
     workersLive += 1;
-    return Promise.resolve(true);
+    return Promise.resolve(release);
   }
   return new Promise((resolve) => {
-    const onAbort = (): void => {
+    const give = (answer: "cancelled" | "expired"): void => {
       const index = slotWaiters.indexOf(grant);
       if (index >= 0) slotWaiters.splice(index, 1);
-      resolve(false);
+      clearTimeout(timer);
+      signal?.removeEventListener("abort", onAbort);
+      resolve(answer);
     };
+    const onAbort = (): void => give("cancelled");
+    const timer = setTimeout(() => give("expired"), Math.max(0, waitMs));
     const grant = (): void => {
+      clearTimeout(timer);
       signal?.removeEventListener("abort", onAbort);
       workersLive += 1;
-      resolve(true);
+      resolve(release);
     };
     slotWaiters.push(grant);
     signal?.addEventListener("abort", onAbort, { once: true });
   });
-}
-
-function releaseWorkerSlot(): void {
-  workersLive -= 1;
-  slotWaiters.shift()?.();
 }
 
 /** `work`'s value, or `fallback` once `deadline` passes. */
@@ -199,7 +214,11 @@ export class CodeModeRunner {
     }
     const cancelled = "the enclosing call was cancelled before the program started";
     if (signal?.aborted) return refused("cancelled", cancelled);
-    if (!await acquireWorkerSlot(signal)) return refused("cancelled", cancelled);
+    const slot = await acquireWorkerSlot(signal, this.init.slotWaitMs ?? DEFAULT_SLOT_WAIT_MS);
+    if (slot === "cancelled") return refused("cancelled", cancelled);
+    if (slot === "expired") {
+      return refused("worker-capacity", `all ${WORKER_CAPACITY} Code Mode workers stayed busy for ${this.init.slotWaitMs ?? DEFAULT_SLOT_WAIT_MS}ms`);
+    }
     let worker: Worker;
     try {
       worker = new Worker(WORKER_BOOTSTRAP, {
@@ -215,11 +234,11 @@ export class CodeModeRunner {
         resourceLimits: { maxOldGenerationSizeMb: 128 }
       });
     } catch (error) {
-      releaseWorkerSlot();
+      slot();
       return refused("program-error", error instanceof Error ? error.message : String(error));
     }
-    worker.once("exit", releaseWorkerSlot);
-    return new ProgramRun(worker, this.limits, this.init, signal).settled;
+    worker.once("exit", slot);
+    return new ProgramRun(worker, this.limits, this.init, signal, slot).settled;
   }
 }
 
@@ -240,15 +259,16 @@ class ProgramRun {
   private consoleBytes = 0;
   private consoleDropped = 0;
   private timer: ReturnType<typeof setTimeout> | undefined;
+  /** Wall time since start plus the approval allowance; never paused. */
+  private readonly hardCap: ReturnType<typeof setTimeout>;
   private budgetMs: number;
   private since = Date.now();
   private approvalWaits = 0;
-  private pausedMs = 0;
-  private pausedSince = 0;
   private readonly onOuterAbort = (): void => this.stop(failed("cancelled", "the enclosing call was cancelled"));
 
   constructor(private readonly worker: Worker, private readonly limits: CodeModeLimits,
-    private readonly init: CodeModeRunnerInit, private readonly outer: AbortSignal | undefined) {
+    private readonly init: CodeModeRunnerInit, private readonly outer: AbortSignal | undefined,
+    private readonly releaseSlot: () => void) {
     this.settled = new Promise((resolve) => { this.publish = resolve; });
     this.budgetMs = limits.wallMs;
     worker.stdout.on("data", (chunk: Buffer | string) => this.capture(chunk));
@@ -259,6 +279,9 @@ class ProgramRun {
     // died with whatever the caller's default was.
     worker.on("exit", () => this.stop(failed("program-error", "the program ended without returning a result")));
     outer?.addEventListener("abort", this.onOuterAbort, { once: true });
+    const capMs = limits.wallMs + (limits.maxApprovalWaitMs ?? DEFAULT_CODE_LIMITS.maxApprovalWaitMs!);
+    this.hardCap = setTimeout(() => this.stop(failed("timeout",
+      `program reached its hard cap of ${capMs}ms (the ${limits.wallMs}ms budget plus the approval allowance)`)), capMs);
     this.arm();
   }
 
@@ -267,6 +290,7 @@ class ProgramRun {
     if (!this.running) return;
     this.running = false;
     clearTimeout(this.timer);
+    clearTimeout(this.hardCap);
     this.outer?.removeEventListener("abort", this.onOuterAbort);
     this.stopSubCalls.abort();
     void this.settle(verdict);
@@ -278,6 +302,9 @@ class ProgramRun {
     // A terminate that rejects or outlives the grace is not an observed exit, and never a clean cleanup verdict.
     const exited = await byDeadline(this.worker.terminate().then(() => true, () => false), deadline, false);
     const workerExitMs = exited ? Date.now() - stoppedAt : null;
+    // Normally freed by `exit`; a worker whose exit was not observed must not hold its slot for ever. Its effects are
+    // already reported unknown (see runCodeTool).
+    if (!exited) this.releaseSlot();
     await byDeadline(Promise.all(this.pending), deadline, undefined);
     this.publish(Object.freeze({
       ...verdict,
@@ -289,14 +316,12 @@ class ProgramRun {
     }));
   }
 
-  /** (Re)start the wall clock, or the approval ceiling while any sub-call waits on an approval (DXB-20). */
+  /** (Re)start the wall clock with what is left of the budget; stopped while any sub-call waits on an approval (DXB-20). */
   private arm(): void {
     clearTimeout(this.timer);
-    const paused = this.approvalWaits > 0;
-    const ceiling = this.limits.maxApprovalWaitMs ?? DEFAULT_CODE_LIMITS.maxApprovalWaitMs!;
-    this.timer = setTimeout(() => this.stop(failed("timeout", paused
-      ? `program waited on approvals for more than ${ceiling}ms`
-      : `program exceeded its ${this.limits.wallMs}ms budget`)), Math.max(0, paused ? ceiling - this.pausedMs : this.budgetMs));
+    if (this.approvalWaits > 0) return; // The hard cap still runs.
+    this.timer = setTimeout(() => this.stop(failed("timeout", `program exceeded its ${this.limits.wallMs}ms budget`)),
+      Math.max(0, this.budgetMs));
   }
 
   private approvalWait(waiting: boolean): void {
@@ -305,10 +330,8 @@ class ProgramRun {
     if (waiting) {
       if (this.approvalWaits++ > 0) return;
       this.budgetMs -= now - this.since;
-      this.pausedSince = now;
       this.arm();
     } else if (this.approvalWaits > 0 && --this.approvalWaits === 0) {
-      this.pausedMs += now - this.pausedSince;
       this.since = now;
       this.arm();
     }
