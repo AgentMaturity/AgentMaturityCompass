@@ -329,6 +329,8 @@ export function forkSession(params: ForkSessionParams): { service: SessionServic
         if (canonicalize(all) !== canonicalize(persisted)) {
           throw new SessionResumeRefused("TAMPERED", "the supplied parent rows differ from authenticated persisted history");
         }
+        // A fork inherits the parent's conversation and lineage: only the agent that opened the parent may fork it.
+        assertResumeAgent(all, params.agentId);
         if (params.inheritConversation !== undefined && typeof params.inheritConversation !== "boolean") {
           throw new SessionResumeRefused("UNSUPPORTED_FORMAT", "inheritConversation must be a boolean");
         }

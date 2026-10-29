@@ -181,6 +181,17 @@ describe.each(["sqlite", "jsonl"] as const)("verified conversation fork (%s)", b
     for (const forkTurn of [-1, 1.5, 3]) refusesBeforeChild(root, () => fork(root, parent.sessionId, { forkTurn }));
   });
 
+  test("refuses a fork by a different agent before copying any parent row", () => {
+    const root = workspace(backend);
+    const parentSessionId = twoTurns(root).sessionId;
+    const before = stored(root).length;
+    for (const inheritConversation of [true, false]) {
+      expect(() => forkSession({ workspace: root, parentSessionId, claimant, ...identity, agentId: "intruder", inheritConversation }))
+        .toThrow(/agent recorded in session\/open/);
+    }
+    expect(stored(root)).toHaveLength(before);
+  });
+
   test("refuses a missing inherited payload before creating a child", () => {
     const root = workspace(backend), parent = twoTurns(root), source = parent.rows.find(row => row.event_type === "user/message")!;
     const path = source.payload_path ?? source.canonical_payload_path;
