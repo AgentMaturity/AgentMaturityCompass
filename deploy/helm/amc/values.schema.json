@@ -27,6 +27,33 @@
         "properties": { "digest": { "pattern": "^sha256:[a-f0-9]{64}$" } }
       }
     },
+    "podDisruptionBudget": {
+      "type": "object",
+      "description": "Exactly one of minAvailable and maxUnavailable is set, the other null (templates/poddisruptionbudget.yaml).",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "minAvailable": { "type": ["integer", "string", "null"] },
+        "maxUnavailable": { "type": ["integer", "string", "null"] }
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "port": { "type": "integer", "minimum": 1, "maximum": 65535 },
+        "namespaceSelector": { "type": "object" },
+        "podSelector": { "type": "object" },
+        "serviceMonitor": { "type": "object", "properties": { "enabled": { "type": "boolean" }, "interval": { "type": "string" } } },
+        "prometheusRule": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "dbSizeBytesWarning": { "type": "integer", "minimum": 1 },
+            "gatewayFailureRateWarning": { "type": "number", "exclusiveMinimum": 0 }
+          }
+        }
+      }
+    },
     "bootstrap": {
       "type": "object",
       "properties": {

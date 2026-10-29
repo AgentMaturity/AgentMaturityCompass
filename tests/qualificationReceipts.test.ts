@@ -67,6 +67,16 @@ describe("P0-01 qualification receipts", () => {
     expect(validateQualificationDir(root)).toEqual({ ok: true, receipts: [], errors: [] });
   });
 
+  test("the P2-06 harness definition folder is not a receipt, but its files still face the secret and size rules", () => {
+    write("reference-deployment/matrix.json", "{}\n");
+    expect(validateQualificationDir(root)).toEqual({ ok: true, receipts: [], errors: [] });
+    write("reference-deployment/checks/leak.pem", "x");
+    expect(errorsFor()).toContain("leak.pem");
+    rmSync(join(root, "reference-deployment"), { recursive: true });
+    write("other-definitions/matrix.json", "{}\n");
+    expect(errorsFor()).toContain("folder name must be <YYYY-MM-DD>-<KEY>");
+  });
+
   test("a missing README fails", () => {
     write(`${folder}/receipt.json`, JSON.stringify(receipt()));
     expect(errorsFor()).toContain("README.md");

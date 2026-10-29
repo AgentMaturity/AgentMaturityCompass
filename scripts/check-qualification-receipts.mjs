@@ -21,6 +21,8 @@ const FORBIDDEN_NAME = /(\.pem|\.key|\.p12|\.amcvault)$|^\.env/;
 const FOLDER = /^(\d{4}-\d{2}-\d{2})-(.+)$/;
 /** A second receipt for the same key and day keeps the key and adds a lowercase variant: 2026-10-15-P0-27-node-runtime. */
 const VARIANT = /^-[a-z0-9]+(?:-[a-z0-9]+)*$/;
+/** Tracked harness definitions that live beside the receipts and are not receipts themselves (P2-06). */
+const DEFINITION_FOLDERS = new Set(["reference-deployment"]);
 
 let validateSchema;
 function schemaValidator() {
@@ -130,7 +132,7 @@ export function validateQualificationDir(dir) {
   if (!existsSync(dir)) return { ok: true, receipts, errors };
   checkFiles(dir, errors);
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
-    if (!entry.isDirectory()) continue;
+    if (!entry.isDirectory() || DEFINITION_FOLDERS.has(entry.name)) continue;
     const receipt = checkReceipt(dir, entry.name, errors);
     if (receipt) receipts.push(receipt);
   }
