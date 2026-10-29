@@ -5,7 +5,7 @@ import { listAgents, verifyAgentConfigSignature, verifyFleetConfigSignature } fr
 import { listVerifiedRuns } from "../diagnostic/runReportResolution.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import { parseWindowToMs } from "../utils/time.js";
-import type { DiagnosticReport, TrustTier } from "../types.js";
+import type { DiagnosticReport, EvidenceOutcome, TrustTier } from "../types.js";
 import { pathExists, readUtf8 } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
@@ -172,6 +172,8 @@ function buildAgentSnapshots(params: {
     const freeze = activeFreezeStatus(params.workspace, agentId);
     const agentSig = verifyAgentConfigSignature(params.workspace, agentId);
     const hasConfigIssue = !agentSig.valid || !fleetSig.valid;
+    // One preserves the existing weight when no freeze/configuration penalty applies.
+    // One preserves the existing weight when no freeze/configuration penalty applies.
     const penaltyWeight = freeze.active || hasConfigIssue ? 0.8 : 1.0;
 
     const outcome = latestOutcomeValuesInWindow(params.workspace, agentId, params.windowStartTs, params.windowEndTs);
@@ -453,23 +455,8 @@ function ecosystemRollupFromBenchmarks(
     return null;
   }
   const peers = listImportedBenchmarks(workspace);
-  if (peers.length === 0) {
-    return {
-      peerCount: 0,
-      localEnterpriseOverall: enterpriseRollup.headline.median,
-      localEnterpriseIntegrity: enterpriseRollup.integrityIndex,
-      localEnterpriseValue: enterpriseRollup.valueScore,
-      percentiles: {
-        overall: 100,
-        integrity: 100,
-        value: enterpriseRollup.valueScore === null ? null : 100
-      }
-    };
-  }
-
-  const percentile = (value: number, rows: number[]): number => {
-    if (rows.length === 0) return 100;
-    // Empty peer populations retain rank 100 here; stats.ts percentileRank uses zero.
+  const percentile = (value: number, rows: number[]): number | null => {
+    if (rows.length === 0) return null;
     return Number(percentileRank(rows, value).toFixed(2));
   };
 
@@ -482,19 +469,25 @@ function ecosystemRollupFromBenchmarks(
     })
     .filter((row): row is number => row !== null);
 
+  const percentiles = {
+    overall: percentile(enterpriseRollup.headline.median, overallRows),
+    integrity: percentile(enterpriseRollup.integrityIndex, integrityRows),
+    value: enterpriseRollup.valueScore === null ? null : percentile(enterpriseRollup.valueScore, valueRows),
+  };
+  const metricOutcomes: Record<"overall" | "integrity" | "value", EvidenceOutcome> = {
+    overall: percentiles.overall === null ? "not_evaluated" : "measured",
+    integrity: percentiles.integrity === null ? "not_evaluated" : "measured",
+    value: percentiles.value === null ? "not_evaluated" : "measured",
+  };
   return {
+    outcome: Object.values(percentiles).some(value => value !== null) ? "measured" : "not_evaluated",
+    sampleSize: peers.length,
+    metricOutcomes,
     peerCount: peers.length,
     localEnterpriseOverall: enterpriseRollup.headline.median,
     localEnterpriseIntegrity: enterpriseRollup.integrityIndex,
     localEnterpriseValue: enterpriseRollup.valueScore,
-    percentiles: {
-      overall: percentile(enterpriseRollup.headline.median, overallRows),
-      integrity: percentile(enterpriseRollup.integrityIndex, integrityRows),
-      value:
-        enterpriseRollup.valueScore === null || valueRows.length === 0
-          ? null
-          : percentile(enterpriseRollup.valueScore, valueRows)
-    }
+    percentiles,
   };
 }
 

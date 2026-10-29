@@ -23,18 +23,18 @@ describe("advanced scoring modules", () => {
     const result = scoreOperationalIndependence("agent-1", 30);
 
     expect(result).toMatchObject({
-      score: expect.any(Number),
+      score: null,
+      outcome: "not_evaluated",
+      sampleSize: 0,
       longestRunDays: expect.any(Number),
-      escalationRate: expect.any(Number),
+      escalationRate: null,
       driftEvents: expect.any(Number),
       qualityHeld: expect.any(Boolean)
     });
 
-    expect(result.score).toBeGreaterThanOrEqual(0);
-    expect(result.score).toBeLessThanOrEqual(100);
+    expect(result.score).toBeNull();
     expect(result.longestRunDays).toBeGreaterThanOrEqual(0);
-    expect(result.escalationRate).toBeGreaterThanOrEqual(0);
-    expect(result.escalationRate).toBeLessThanOrEqual(100);
+    expect(result.escalationRate).toBeNull();
     expect(result.driftEvents).toBeGreaterThanOrEqual(0);
   });
 

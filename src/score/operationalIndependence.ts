@@ -1,3 +1,35 @@
+import type {
+  MetricEvidence,
+  ExternalDependencyKind,
+  ExternalDependencyInventoryEntry,
+  ExternalDependencyInventory,
+  DependencyDriftSignal,
+  DependencyDriftReport,
+  GracefulDegradationScore,
+  VendorLockInRiskScore,
+  OperationalIndependenceDomainContext,
+  LogisticsReliabilityMetric,
+  LogisticsReliabilityScore,
+  OperationalIndependenceOptions,
+  OperationalIndependenceScore,
+  GuardEventLike,
+} from "./operationalIndependenceTypes.js";
+export type {
+  ExternalDependencyKind,
+  ExternalDependencyInventoryEntry,
+  ExternalDependencyInventory,
+  DependencyDriftSignal,
+  DependencyDriftReport,
+  GracefulDegradationScore,
+  VendorLockInRiskScore,
+  OperationalIndependenceDomainContext,
+  LogisticsReliabilityMetric,
+  LogisticsReliabilityScore,
+  OperationalIndependenceOptions,
+  OperationalIndependenceScore,
+  GuardEventLike,
+} from "./operationalIndependenceTypes.js";
+import { ratioOrNull, weightedMean } from "../utils/ratio.js";
 import { mean, nearestRank } from "../experiments/stats.js";
 /**
  * Operational Independence Score from guard-events telemetry.
@@ -5,156 +37,13 @@ import { mean, nearestRank } from "../experiments/stats.js";
 
 import { readGuardEvents } from "../enforce/evidenceEmitter.js";
 
-export type ExternalDependencyKind =
-  | "llm_api"
-  | "database"
-  | "vector_store"
-  | "storage"
-  | "queue"
-  | "webhook"
-  | "automation_platform"
-  | "identity"
-  | "payment"
-  | "observability"
-  | "unknown";
-
-export interface ExternalDependencyInventoryEntry {
-  dependencyId: string;
-  kind: ExternalDependencyKind;
-  providers: string[];
-  versions: string[];
-  usageEvents: number;
-  failureEvents: number;
-  failureRate: number; // 0-1
-  avgLatencyMs: number | null;
-  p95LatencyMs: number | null;
-  supportsFallback: boolean;
-  lastSeenAt: string;
-}
-
-export interface ExternalDependencyInventory {
-  totalDependencies: number;
-  externalEventCount: number;
-  dependencyCoverage: number; // 0-1 share of guard events tied to external deps
-  singlePointsOfFailure: string[];
-  dependencies: ExternalDependencyInventoryEntry[];
-}
-
-export interface DependencyDriftSignal {
-  dependencyId: string;
-  driftType: "version" | "error_rate" | "sla_latency";
-  severity: "low" | "medium" | "high" | "critical";
-  summary: string;
-  baseline: number | string | null;
-  current: number | string | null;
-  delta: number | null;
-}
-
-export interface DependencyDriftReport {
-  score: number; // 0-100 (higher = more stable)
-  status: "stable" | "watch" | "degrading" | "critical";
-  driftEvents: number;
-  versionDriftCount: number;
-  slaDegradationCount: number;
-  signals: DependencyDriftSignal[];
-}
-
-export interface GracefulDegradationScore {
-  score: number; // 0-100
-  failureEvents: number;
-  recoveredWithFallback: number;
-  degradedModeActivations: number;
-  hardFailures: number;
-  recoveryRate: number; // 0-1
-  notes: string[];
-}
-
-export interface VendorLockInRiskScore {
-  score: number; // 0-100 (higher = higher lock-in risk)
-  riskLevel: "low" | "medium" | "high" | "critical";
-  primaryVendors: string[];
-  multiVendorCoverage: number; // 0-1
-  portableDependencies: number;
-  nonPortableDependencies: number;
-  lockInDrivers: string[];
-  recommendations: string[];
-}
-
-export type OperationalIndependenceDomainContext = "generic" | "logistics";
-
-export interface LogisticsReliabilityMetric {
-  score: number;
-  evidenceEvents: number;
-  notes: string[];
-}
-
-export interface LogisticsReliabilityScore {
-  score: number;
-  status: "ready" | "watch" | "degrading" | "critical";
-  logisticsEventCount: number;
-  telemetryConfidence: number;
-  carriers: string[];
-  carrierReliability: LogisticsReliabilityMetric & {
-    shipmentEvents: number;
-    failedShipmentEvents: number;
-    onTimeRate: number;
+function metricEvidence(sampleSize: number, metrics: Record<string, number | null>): MetricEvidence {
+  return {
+    sampleSize,
+    outcome: Object.values(metrics).some(value => value !== null) ? "measured" : "not_evaluated",
+    metricOutcomes: Object.fromEntries(Object.entries(metrics).map(([key, value]) =>
+      [key, value === null ? "not_evaluated" : "measured"])),
   };
-  exceptionManagement: LogisticsReliabilityMetric & {
-    exceptionEvents: number;
-    resolvedExceptions: number;
-    unresolvedExceptions: number;
-    avgResolutionHours: number | null;
-  };
-  warehouseIntegrity: LogisticsReliabilityMetric & {
-    warehouseEvents: number;
-    errorEvents: number;
-    inventoryAccuracy: number | null;
-  };
-  slaPerformance: LogisticsReliabilityMetric & {
-    slaEvents: number;
-    breachEvents: number;
-    breachRate: number;
-  };
-  traceabilityCoverage: LogisticsReliabilityMetric & {
-    traceableEvents: number;
-    coverage: number;
-  };
-  coldChainIntegrity: LogisticsReliabilityMetric & {
-    monitoredEvents: number;
-    excursionEvents: number;
-    excursionRate: number;
-  };
-  gaps: string[];
-  recommendedActions: string[];
-}
-
-export interface OperationalIndependenceOptions {
-  domain?: string;
-}
-
-export interface OperationalIndependenceScore {
-  score: number; // 0-100
-  context: OperationalIndependenceDomainContext;
-  longestRunDays: number;
-  escalationRate: number; // percent
-  driftEvents: number;
-  qualityHeld: boolean;
-  telemetryConfidence: number; // 0-1
-  reducedExternalAccessScore: number; // 0-100
-  externalDependencyInventory: ExternalDependencyInventory;
-  dependencyDrift: DependencyDriftReport;
-  gracefulDegradation: GracefulDegradationScore;
-  vendorLockInRisk: VendorLockInRiskScore;
-  logisticsReliability?: LogisticsReliabilityScore;
-}
-
-export interface GuardEventLike {
-  created_at: string;
-  module_code: string;
-  decision: string;
-  reason: string;
-  severity: string;
-  meta_json: string | null;
 }
 
 interface DayFlags {
@@ -600,7 +489,8 @@ function avgOrNull(values: number[]): number | null {
 
 function metricNoEvidence(label: string): LogisticsReliabilityMetric {
   return {
-    score: 0,
+    ...metricEvidence(0, { score: null }),
+    score: null,
     evidenceEvents: 0,
     notes: [`No ${label} evidence was observed in logistics telemetry.`]
   };
@@ -620,15 +510,16 @@ export function scoreLogisticsOperationalReliabilityFromEvents(events: GuardEven
 
   const shipmentEvents = logisticsEvents.filter(({ event, meta }) => isShipmentEvent(event, meta));
   const failedShipmentEvents = shipmentEvents.filter(({ event, meta }) => isFailedShipmentEvent(event, meta));
-  const onTimeRate = shipmentEvents.length > 0 ? (shipmentEvents.length - failedShipmentEvents.length) / shipmentEvents.length : 0;
+  const onTimeRate = ratioOrNull(shipmentEvents.length - failedShipmentEvents.length, shipmentEvents.length);
   const carrierReliability: LogisticsReliabilityScore["carrierReliability"] = shipmentEvents.length === 0
-    ? { ...metricNoEvidence("carrier shipment"), shipmentEvents: 0, failedShipmentEvents: 0, onTimeRate: 0 }
+    ? { ...metricNoEvidence("carrier shipment"), shipmentEvents: 0, failedShipmentEvents: 0, onTimeRate: null, metricOutcomes: { score: "not_evaluated", onTimeRate: "not_evaluated" } }
     : {
-      score: boundedScore(onTimeRate * 100),
+      ...metricEvidence(shipmentEvents.length, { score: onTimeRate, onTimeRate }),
+      score: onTimeRate === null ? null : boundedScore(onTimeRate * 100),
       evidenceEvents: shipmentEvents.length,
       shipmentEvents: shipmentEvents.length,
       failedShipmentEvents: failedShipmentEvents.length,
-      onTimeRate: Number(onTimeRate.toFixed(4)),
+      onTimeRate: onTimeRate === null ? null : Number(onTimeRate.toFixed(4)),
       notes: failedShipmentEvents.length === 0
         ? ["Carrier shipment evidence shows no late, missed, damaged, or lost shipment signal."]
         : [`${failedShipmentEvents.length} of ${shipmentEvents.length} carrier shipment event(s) indicate late, missed, damaged, lost, or failed execution.`]
@@ -640,13 +531,15 @@ export function scoreLogisticsOperationalReliabilityFromEvents(events: GuardEven
   const resolutionHours = exceptionEvents
     .map(({ meta }) => firstNumber(meta, ["resolutionHours", "timeToResolveHours", "exceptionAgeHours"]))
     .filter((value): value is number => typeof value === "number" && Number.isFinite(value) && value >= 0);
-  const exceptionResolutionRate = exceptionEvents.length > 0 ? resolvedExceptions.length / exceptionEvents.length : 1;
+  const exceptionResolutionRate = ratioOrNull(resolvedExceptions.length, exceptionEvents.length);
   const avgResolutionHours = avgOrNull(resolutionHours);
   const resolutionTimeBonus = avgResolutionHours === null ? 15 : avgResolutionHours <= 4 ? 30 : avgResolutionHours <= 24 ? 20 : 5;
   const exceptionManagement: LogisticsReliabilityScore["exceptionManagement"] = exceptionEvents.length === 0
     ? {
-      score: logisticsEvents.length > 0 ? 100 : 0,
+      ...metricEvidence(0, { score: null, exceptionResolutionRate: null }),
+      score: null,
       evidenceEvents: 0,
+      exceptionResolutionRate,
       exceptionEvents: 0,
       resolvedExceptions: 0,
       unresolvedExceptions: 0,
@@ -656,7 +549,9 @@ export function scoreLogisticsOperationalReliabilityFromEvents(events: GuardEven
         : ["No exception evidence was observed in logistics telemetry."]
     }
     : {
-      score: boundedScore(exceptionResolutionRate * 70 + resolutionTimeBonus),
+      ...metricEvidence(exceptionEvents.length, { score: exceptionResolutionRate, exceptionResolutionRate }),
+      score: exceptionResolutionRate === null ? null : boundedScore(exceptionResolutionRate * 70 + resolutionTimeBonus),
+      exceptionResolutionRate,
       evidenceEvents: exceptionEvents.length,
       exceptionEvents: exceptionEvents.length,
       resolvedExceptions: resolvedExceptions.length,
@@ -683,6 +578,7 @@ export function scoreLogisticsOperationalReliabilityFromEvents(events: GuardEven
   const warehouseIntegrity: LogisticsReliabilityScore["warehouseIntegrity"] = warehouseEvents.length === 0
     ? { ...metricNoEvidence("warehouse/WMS"), warehouseEvents: 0, errorEvents: 0, inventoryAccuracy: null }
     : {
+      ...metricEvidence(warehouseEvents.length, { score: warehouseScore, inventoryAccuracy }),
       score: boundedScore(warehouseScore),
       evidenceEvents: warehouseEvents.length,
       warehouseEvents: warehouseEvents.length,
@@ -695,70 +591,72 @@ export function scoreLogisticsOperationalReliabilityFromEvents(events: GuardEven
 
   const slaEvents = logisticsEvents.filter(({ event, meta }) => isSlaEvent(event, meta));
   const breachEvents = slaEvents.filter(({ event, meta }) => isSlaBreach(event, meta));
-  const breachRate = slaEvents.length > 0 ? breachEvents.length / slaEvents.length : 0;
+  const breachRate = ratioOrNull(breachEvents.length, slaEvents.length);
   const slaPerformance: LogisticsReliabilityScore["slaPerformance"] = slaEvents.length === 0
-    ? { ...metricNoEvidence("SLA/OTIF"), slaEvents: 0, breachEvents: 0, breachRate: 0 }
+    ? { ...metricNoEvidence("SLA/OTIF"), slaEvents: 0, breachEvents: 0, breachRate: null, metricOutcomes: { score: "not_evaluated", breachRate: "not_evaluated" } }
     : {
-      score: boundedScore((1 - breachRate) * 100),
+      ...metricEvidence(slaEvents.length, { score: breachRate, breachRate }),
+      score: breachRate === null ? null : boundedScore((1 - breachRate) * 100),
       evidenceEvents: slaEvents.length,
       slaEvents: slaEvents.length,
       breachEvents: breachEvents.length,
-      breachRate: Number(breachRate.toFixed(4)),
+      breachRate: breachRate === null ? null : Number(breachRate.toFixed(4)),
       notes: breachEvents.length === 0
         ? ["SLA/OTIF evidence shows no breach signal."]
         : [`${breachEvents.length} of ${slaEvents.length} SLA/OTIF event(s) breached target.`]
     };
 
   const traceableEvents = logisticsEvents.filter(({ meta }) => isTraceableLogisticsEvent(meta));
-  const traceCoverage = logisticsEvents.length > 0 ? traceableEvents.length / logisticsEvents.length : 0;
+  const traceCoverage = ratioOrNull(traceableEvents.length, logisticsEvents.length);
   const traceabilityCoverage: LogisticsReliabilityScore["traceabilityCoverage"] = logisticsEvents.length === 0
-    ? { ...metricNoEvidence("GS1/EPCIS or custody traceability"), traceableEvents: 0, coverage: 0 }
+    ? { ...metricNoEvidence("GS1/EPCIS or custody traceability"), traceableEvents: 0, coverage: null, metricOutcomes: { score: "not_evaluated", coverage: "not_evaluated" } }
     : {
-      score: boundedScore(traceCoverage * 100),
+      ...metricEvidence(logisticsEvents.length, { score: traceCoverage, coverage: traceCoverage }),
+      score: traceCoverage === null ? null : boundedScore(traceCoverage * 100),
       evidenceEvents: logisticsEvents.length,
       traceableEvents: traceableEvents.length,
-      coverage: Number(traceCoverage.toFixed(4)),
-      notes: traceCoverage >= 0.9
+      coverage: traceCoverage === null ? null : Number(traceCoverage.toFixed(4)),
+      notes: traceCoverage !== null && traceCoverage >= 0.9
         ? ["Most logistics events carry trace, custody, SSCC, lot, EPCIS, or receipt identifiers."]
         : [`${logisticsEvents.length - traceableEvents.length} logistics event(s) lack trace/custody identifiers.`]
     };
 
   const coldChainEvents = logisticsEvents.filter(({ event, meta }) => isColdChainEvent(event, meta));
   const excursionEvents = coldChainEvents.filter(({ event, meta }) => isColdChainExcursion(event, meta));
-  const excursionRate = coldChainEvents.length > 0 ? excursionEvents.length / coldChainEvents.length : 0;
+  const excursionRate = ratioOrNull(excursionEvents.length, coldChainEvents.length);
   const coldChainIntegrity: LogisticsReliabilityScore["coldChainIntegrity"] = coldChainEvents.length === 0
     ? {
-      score: logisticsEvents.length > 0 ? 100 : 0,
+      ...metricEvidence(0, { score: null, excursionRate: null }),
+      score: null,
       evidenceEvents: 0,
       monitoredEvents: 0,
       excursionEvents: 0,
-      excursionRate: 0,
+      excursionRate: null,
       notes: logisticsEvents.length > 0
-        ? ["No cold-chain or condition-sensitive freight evidence was observed; this component is neutral for non-cold-chain windows."]
+        ? ["No cold-chain or condition-sensitive freight evidence was observed; this component was not evaluated."]
         : ["No cold-chain evidence was observed in logistics telemetry."]
     }
     : {
-      score: boundedScore((1 - excursionRate) * 100),
+      ...metricEvidence(coldChainEvents.length, { score: excursionRate, excursionRate }),
+      score: excursionRate === null ? null : boundedScore((1 - excursionRate) * 100),
       evidenceEvents: coldChainEvents.length,
       monitoredEvents: coldChainEvents.length,
       excursionEvents: excursionEvents.length,
-      excursionRate: Number(excursionRate.toFixed(4)),
+      excursionRate: excursionRate === null ? null : Number(excursionRate.toFixed(4)),
       notes: excursionEvents.length === 0
         ? ["Condition-sensitive freight evidence shows no excursion signal."]
         : [`${excursionEvents.length} condition-sensitive freight event(s) indicate excursion or custody breach.`]
     };
 
-  const score = boundedScore(
-    carrierReliability.score * 0.22 +
-    exceptionManagement.score * 0.18 +
-    warehouseIntegrity.score * 0.18 +
-    slaPerformance.score * 0.18 +
-    traceabilityCoverage.score * 0.14 +
-    coldChainIntegrity.score * 0.10
-  );
+  const measuredScore = weightedMean([
+    [carrierReliability.score, 0.22], [exceptionManagement.score, 0.18],
+    [warehouseIntegrity.score, 0.18], [slaPerformance.score, 0.18],
+    [traceabilityCoverage.score, 0.14], [coldChainIntegrity.score, 0.10],
+  ]);
+  const score = measuredScore === null ? null : boundedScore(measuredScore);
   const telemetryConfidence = Number(Math.min(1, 0.25 + logisticsEvents.length / 40).toFixed(4));
   const status: LogisticsReliabilityScore["status"] =
-    score >= 85 && telemetryConfidence >= 0.7 ? "ready" : score >= 70 ? "watch" : score >= 45 ? "degrading" : "critical";
+    score === null ? "not_evaluated" : score >= 85 && telemetryConfidence >= 0.7 ? "ready" : score >= 70 ? "watch" : score >= 45 ? "degrading" : "critical";
 
   const gaps: string[] = [];
   const recommendedActions: string[] = [];
@@ -771,8 +669,8 @@ export function scoreLogisticsOperationalReliabilityFromEvents(events: GuardEven
     ["cold-chain integrity", coldChainIntegrity, "Gate condition-sensitive freight on excursion telemetry and release/quarantine evidence."]
   ];
   for (const [label, metric, action] of components) {
-    if (metric.score < 70) {
-      gaps.push(`${label}: ${metric.score}/100`);
+    if (metric.score === null || metric.score < 70) {
+      gaps.push(`${label}: ${metric.score === null ? "not_evaluated" : `${metric.score}/100`}`);
       recommendedActions.push(action);
     }
   }
@@ -782,6 +680,7 @@ export function scoreLogisticsOperationalReliabilityFromEvents(events: GuardEven
   }
 
   return {
+    ...metricEvidence(logisticsEvents.length, { score }),
     score,
     status,
     logisticsEventCount: logisticsEvents.length,
@@ -866,7 +765,8 @@ export function buildExternalDependencyInventory(
 
   const dependencies: ExternalDependencyInventoryEntry[] = Array.from(byDependency.entries())
     .map(([dependencyId, row]) => {
-      const failureRate = row.usageEvents > 0 ? row.failureEvents / row.usageEvents : 0;
+      // Each inventory bucket is created by a usage sample, so its denominator is positive.
+      const failureRate = row.failureEvents / row.usageEvents;
       const avgLatencyMs =
         row.latencies.length > 0 ? Math.round(row.latencies.reduce((sum, value) => sum + value, 0) / row.latencies.length) : null;
       const p95LatencyMs = row.latencies.length > 0 ? Math.round(percentile(row.latencies, 95)) : null;
@@ -890,10 +790,12 @@ export function buildExternalDependencyInventory(
     .filter((dep) => dep.usageEvents >= 3 && dep.providers.length <= 1 && !dep.supportsFallback && dep.failureRate >= 0.05)
     .map((dep) => dep.dependencyId);
 
+  const dependencyCoverage = ratioOrNull(samples.length, events.length);
   return {
+    ...metricEvidence(events.length, { dependencyCoverage }),
     totalDependencies: dependencies.length,
     externalEventCount: samples.length,
-    dependencyCoverage: events.length > 0 ? samples.length / events.length : 0,
+    dependencyCoverage,
     singlePointsOfFailure,
     dependencies
   };
@@ -906,9 +808,8 @@ function driftSeverityWeight(severity: DependencyDriftSignal["severity"]): numbe
   return 5;
 }
 
-function errorRate(samples: DependencySample[]): number {
-  if (samples.length === 0) return 0;
-  return samples.filter((row) => row.failure).length / samples.length;
+function errorRate(samples: DependencySample[]): number | null {
+  return ratioOrNull(samples.filter((row) => row.failure).length, samples.length);
 }
 
 function average(values: number[]): number {
@@ -930,10 +831,12 @@ export function detectDependencyDrift(
   const signals: DependencyDriftSignal[] = [];
   let versionDriftCount = 0;
   let slaDegradationCount = 0;
+  let evaluatedDependencies = 0;
 
   for (const dep of inventory.dependencies) {
     const depSamples = (byDependency.get(dep.dependencyId) ?? []).sort((a, b) => a.ts - b.ts);
     if (depSamples.length < 2) continue;
+    evaluatedDependencies += 1;
 
     const versions = [...new Set(depSamples.map((row) => row.version).filter((row): row is string => typeof row === "string" && row.length > 0))];
     if (versions.length > 1) {
@@ -956,6 +859,7 @@ export function detectDependencyDrift(
 
     const earlyErrorRate = errorRate(early);
     const lateErrorRate = errorRate(late);
+    if (earlyErrorRate === null || lateErrorRate === null) continue;
     const errorDelta = lateErrorRate - earlyErrorRate;
     if (errorDelta >= 0.15 && lateErrorRate >= 0.2) {
       slaDegradationCount += 1;
@@ -992,11 +896,12 @@ export function detectDependencyDrift(
   }
 
   const penalty = signals.reduce((sum, signal) => sum + driftSeverityWeight(signal.severity), 0);
-  const score = Math.max(0, Math.min(100, 100 - penalty));
+  const score = evaluatedDependencies === 0 ? null : Math.max(0, Math.min(100, 100 - penalty));
   const status: DependencyDriftReport["status"] =
-    score >= 80 ? "stable" : score >= 60 ? "watch" : score >= 35 ? "degrading" : "critical";
+    score === null ? "not_evaluated" : score >= 80 ? "stable" : score >= 60 ? "watch" : score >= 35 ? "degrading" : "critical";
 
   return {
+    ...metricEvidence(evaluatedDependencies, { score }),
     score,
     status,
     driftEvents: signals.length,
@@ -1015,12 +920,13 @@ export function scoreGracefulDegradation(
 
   if (failureSamples.length === 0) {
     return {
-      score: 100,
+      ...metricEvidence(0, { score: null, recoveryRate: null }),
+      score: null,
       failureEvents: 0,
       recoveredWithFallback: 0,
       degradedModeActivations,
       hardFailures: 0,
-      recoveryRate: 1,
+      recoveryRate: null,
       notes: ["No dependency failures observed in this window."]
     };
   }
@@ -1058,6 +964,7 @@ export function scoreGracefulDegradation(
   if (notes.length === 0) notes.push("Fallback and degraded execution patterns are visible during dependency failures.");
 
   return {
+    ...metricEvidence(failureSamples.length, { score, recoveryRate }),
     score,
     failureEvents: failureSamples.length,
     recoveredWithFallback,
@@ -1073,10 +980,11 @@ export function scoreVendorLockInRisk(
 ): VendorLockInRiskScore {
   if (inventory.totalDependencies === 0) {
     return {
-      score: 0,
-      riskLevel: "low",
+      ...metricEvidence(0, { score: null, multiVendorCoverage: null }),
+      score: null,
+      riskLevel: "not_evaluated",
       primaryVendors: [],
-      multiVendorCoverage: 1,
+      multiVendorCoverage: null,
       portableDependencies: 0,
       nonPortableDependencies: 0,
       lockInDrivers: [],
@@ -1105,8 +1013,9 @@ export function scoreVendorLockInRisk(
     }
   }
 
-  const multiVendorCoverage = inventory.totalDependencies > 0 ? portableDependencies / inventory.totalDependencies : 1;
-  const nonPortableRatio = inventory.totalDependencies > 0 ? nonPortableDependencies / inventory.totalDependencies : 0;
+  // The empty inventory returned above; both denominators are positive here.
+  const multiVendorCoverage = portableDependencies / inventory.totalDependencies;
+  const nonPortableRatio = nonPortableDependencies / inventory.totalDependencies;
 
   let score = Math.round(nonPortableRatio * 60);
   score += Math.min(25, llmSingleVendor * 15);
@@ -1140,6 +1049,7 @@ export function scoreVendorLockInRisk(
   if (recommendations.length === 0) recommendations.push("Keep periodic portability drills to preserve low lock-in risk.");
 
   return {
+    ...metricEvidence(inventory.totalDependencies, { score, multiVendorCoverage }),
     score,
     riskLevel,
     primaryVendors,
@@ -1156,24 +1066,21 @@ function scoreReducedExternalAccess(
   graceful: GracefulDegradationScore,
   drift: DependencyDriftReport,
   lockIn: VendorLockInRiskScore
-): number {
-  if (inventory.totalDependencies === 0) return 100;
-  const fallbackCoverage =
-    inventory.totalDependencies > 0 ? inventory.dependencies.filter((dep) => dep.supportsFallback).length / inventory.totalDependencies : 0;
-  const portability = inventory.totalDependencies > 0 ? lockIn.portableDependencies / inventory.totalDependencies : 0;
-  const stability = drift.score / 100;
-  const recovery = graceful.recoveryRate;
-  return Math.max(
-    0,
-    Math.min(100, Math.round((fallbackCoverage * 0.45 + portability * 0.25 + recovery * 0.2 + stability * 0.1) * 100))
-  );
+): number | null {
+  const fallbackCoverage = ratioOrNull(inventory.dependencies.filter((dep) => dep.supportsFallback).length, inventory.totalDependencies);
+  const portability = ratioOrNull(lockIn.portableDependencies, inventory.totalDependencies);
+  const stability = drift.score === null ? null : drift.score / 100;
+  const measuredScore = weightedMean([
+    [fallbackCoverage, 0.45], [portability, 0.25], [graceful.recoveryRate, 0.2], [stability, 0.1],
+  ]);
+  return measuredScore === null ? null : boundedScore(measuredScore * 100);
 }
 
 function computeAutonomyRunStats(
   events: GuardEventLike[]
 ): {
   longestRunDays: number;
-  escalationRate: number;
+  escalationRate: number | null;
   driftEvents: number;
   qualityHeld: boolean;
 } {
@@ -1205,7 +1112,8 @@ function computeAutonomyRunStats(
   }
 
   const escalated = events.filter((e) => e.decision === "stepup" || e.decision === "warn").length;
-  const escalationRate = events.length === 0 ? 100 : Math.round((escalated / events.length) * 100);
+  const escalationRatio = ratioOrNull(escalated, events.length);
+  const escalationRate = escalationRatio === null ? null : Math.round(escalationRatio * 100);
 
   const hasCritical = events.some((e) => String(e.severity).toLowerCase() === "critical");
   const driftInWindow = driftEvents > 0;
@@ -1241,26 +1149,25 @@ export function scoreOperationalIndependenceFromEvents(
     vendorLockInRisk
   );
 
-  const runComponent = Math.min(30, (base.longestRunDays / Math.max(windowDays, 1)) * 30);
-  const escalationComponent = Math.max(0, 20 - base.escalationRate * 0.2);
-  const qualityComponent = base.qualityHeld ? 10 : 0;
-  const dependencyDriftComponent = (dependencyDrift.score / 100) * 15;
-  const gracefulDegradationComponent = (gracefulDegradation.score / 100) * 15;
-  const portabilityComponent = ((100 - vendorLockInRisk.score) / 100) * 10;
-  const reducedExternalAccessComponent = (reducedExternalAccessScore / 100) * 20;
-
-  const rawScore =
-    runComponent +
-    escalationComponent +
-    qualityComponent +
-    dependencyDriftComponent +
-    gracefulDegradationComponent +
-    portabilityComponent +
-    reducedExternalAccessComponent;
-  const telemetryConfidence = sortedEvents.length === 0 ? 0.35 : Math.min(1, 0.35 + sortedEvents.length / 60);
-  const score = Math.max(0, Math.min(100, Math.round(rawScore * telemetryConfidence)));
+  const runRatio = sortedEvents.length === 0 ? null : ratioOrNull(base.longestRunDays, windowDays);
+  const runComponent = runRatio === null ? null : Math.min(100, runRatio * 100);
+  const escalationComponent = base.escalationRate === null ? null : Math.max(0, 100 - base.escalationRate);
+  const qualityComponent = sortedEvents.length === 0 ? null : base.qualityHeld ? 100 : 0;
+  const portabilityComponent = vendorLockInRisk.score === null ? null : 100 - vendorLockInRisk.score;
+  const rawScore = weightedMean([
+    [runComponent, 30], [escalationComponent, 20], [qualityComponent, 10],
+    [dependencyDrift.score, 15], [gracefulDegradation.score, 15], [portabilityComponent, 10],
+    [reducedExternalAccessScore, 20],
+  ]);
+  const telemetryConfidence = sortedEvents.length === 0 ? 0 : Math.min(1, 0.35 + sortedEvents.length / 60);
+  const score = rawScore === null ? null : boundedScore(rawScore * telemetryConfidence);
 
   return {
+    ...metricEvidence(sortedEvents.length, {
+      score, escalationRate: base.escalationRate, reducedExternalAccessScore, runComponent,
+      dependencyDrift: dependencyDrift.score, gracefulDegradation: gracefulDegradation.score,
+      vendorLockInRisk: vendorLockInRisk.score,
+    }),
     score,
     context,
     longestRunDays: base.longestRunDays,

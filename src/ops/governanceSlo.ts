@@ -1,3 +1,5 @@
+import type { EvidenceOutcome } from "../types.js";
+import { ratioOrNull } from "../utils/ratio.js";
 import { nearestRank } from "../experiments/stats.js";
 /**
  * Governance SLOs
@@ -14,7 +16,7 @@ import { generateOverheadReport, type OverheadFeature } from "./overheadAccounti
 // Types
 // ---------------------------------------------------------------------------
 
-export type SloStatus = "HEALTHY" | "DEGRADED" | "VIOLATED";
+export type SloStatus = "HEALTHY" | "DEGRADED" | "VIOLATED" | "NO_DATA";
 
 export type SloMetricName =
   | "POLICY_DECISION_LATENCY"
@@ -42,9 +44,10 @@ export interface SloMetricSummary {
   metric: SloMetricName;
   status: SloStatus;
   count: number;
-  p50: number;
-  p95: number;
-  p99: number;
+  p50: number | null;
+  p95: number | null;
+  p99: number | null;
+  outcome: EvidenceOutcome;
   target: number;
   degradedThreshold: number;
 }
@@ -72,7 +75,8 @@ export interface GovernanceSloDefinitionSummary {
   mode: GovernanceSloDefinitionMode;
   status: SloStatus;
   sampleSize: number;
-  observedValue: number;
+  observedValue: number | null;
+  outcome: EvidenceOutcome;
   targetValue: number;
   degradedThreshold: number;
   percentile: 50 | 90 | 95 | 99;
@@ -89,7 +93,8 @@ export interface SloComplianceSnapshot {
     id: string;
     status: SloStatus;
     sampleSize: number;
-    observedValue: number;
+    observedValue: number | null;
+  outcome: EvidenceOutcome;
     targetValue: number;
   }>;
 }
@@ -303,13 +308,14 @@ function computeMetricStatus(p95: number, target: SloTarget): SloStatus {
 }
 
 function statusOrder(status: SloStatus): number {
+  if (status === "NO_DATA") return -1;
   if (status === "HEALTHY") return 0;
   if (status === "DEGRADED") return 1;
   return 2;
 }
 
 function computeOverallStatus(statuses: SloStatus[]): SloStatus {
-  if (statuses.length === 0) return "HEALTHY";
+  if (statuses.every(status => status === "NO_DATA")) return "NO_DATA";
   let worst: SloStatus = "HEALTHY";
   for (const status of statuses) {
     if (statusOrder(status) > statusOrder(worst)) {
@@ -423,15 +429,16 @@ function buildMetricSummaries(recent: SloMeasurement[]): SloMetricSummary[] {
 
   for (const target of targets) {
     const values = recent.filter((measurement) => measurement.metric === target.metric).map((measurement) => measurement.value);
-    const p50 = percentile(values, 50);
-    const p95 = percentile(values, 95);
-    const p99 = percentile(values, 99);
-    const status = values.length > 0 ? computeMetricStatus(p95, target) : "HEALTHY";
+    const p50 = values.length > 0 ? percentile(values, 50) : null;
+    const p95 = values.length > 0 ? percentile(values, 95) : null;
+    const p99 = values.length > 0 ? percentile(values, 99) : null;
+    const status = p95 === null ? "NO_DATA" : computeMetricStatus(p95, target);
 
     summaries.push({
       metric: target.metric,
       status,
       count: values.length,
+      outcome: values.length > 0 ? "measured" : "not_evaluated",
       p50,
       p95,
       p99,
@@ -454,32 +461,15 @@ function buildDefinitionSummary(
   );
   const values = filtered.map((measurement) => measurement.value);
 
-  let observedValue = 0;
-  let status: SloStatus = "HEALTHY";
-
-  if (definition.mode === "P95_LTE") {
-    observedValue = percentile(values, definition.percentile ?? 95);
-    status =
-      values.length === 0
-        ? "HEALTHY"
-        : observedValue <= definition.targetValue
-          ? "HEALTHY"
-          : observedValue <= definition.degradedThreshold
-            ? "DEGRADED"
-            : "VIOLATED";
-  } else {
-    const threshold = definition.thresholdValue ?? 0;
-    const compliantCount = values.filter((value) => value <= threshold).length;
-    observedValue = values.length === 0 ? 1 : compliantCount / values.length;
-    status =
-      values.length === 0
-        ? "HEALTHY"
-        : observedValue >= definition.targetValue
-          ? "HEALTHY"
-          : observedValue >= definition.degradedThreshold
-            ? "DEGRADED"
-            : "VIOLATED";
-  }
+  const observedValue = values.length === 0 ? null
+    : definition.mode === "P95_LTE" ? percentile(values, definition.percentile ?? 95)
+    : ratioOrNull(values.filter(value => value <= (definition.thresholdValue ?? 0)).length, values.length);
+  const status: SloStatus = observedValue === null ? "NO_DATA"
+    : definition.mode === "P95_LTE"
+      ? observedValue <= definition.targetValue ? "HEALTHY"
+        : observedValue <= definition.degradedThreshold ? "DEGRADED" : "VIOLATED"
+      : observedValue >= definition.targetValue ? "HEALTHY"
+        : observedValue >= definition.degradedThreshold ? "DEGRADED" : "VIOLATED";
 
   return {
     id: definition.id,
@@ -490,6 +480,7 @@ function buildDefinitionSummary(
     status,
     sampleSize: values.length,
     observedValue,
+    outcome: observedValue === null ? "not_evaluated" : "measured",
     targetValue: definition.targetValue,
     degradedThreshold: definition.degradedThreshold,
     percentile: definition.percentile ?? 95,
@@ -513,6 +504,7 @@ function appendComplianceSnapshot(report: SloReport): SloComplianceSnapshot {
       status: definition.status,
       sampleSize: definition.sampleSize,
       observedValue: definition.observedValue,
+      outcome: definition.outcome,
       targetValue: definition.targetValue,
     })),
   };
@@ -800,7 +792,7 @@ export function generateSloReport(windowMs = DEFAULT_WINDOW_MS): SloReport {
     metrics: metricSummaries,
     definitions: definitionSummaries,
     activeViolations: definitionSummaries
-      .filter((definition) => definition.status !== "HEALTHY")
+      .filter((definition) => definition.status === "DEGRADED" || definition.status === "VIOLATED")
       .map((definition) => ({
         id: definition.id,
         status: definition.status,
@@ -846,7 +838,7 @@ export function evaluateSloAlerts(windowMs = DEFAULT_WINDOW_MS): SloAlert[] {
           status: definition.status,
           summary: `${definition.id} changed ${previousStatus ?? "n/a"} -> ${definition.status}`,
         });
-      } else if (previousStatus && previousStatus !== "HEALTHY") {
+      } else if (definition.status === "HEALTHY" && previousStatus && previousStatus !== "HEALTHY" && previousStatus !== "NO_DATA") {
         emitted.push({
           alertId: `sloa_${randomUUID().slice(0, 12)}`,
           ts: Date.now(),
@@ -890,28 +882,28 @@ export function renderSloPrometheus(windowMs = DEFAULT_WINDOW_MS): string {
     const name = metric.metric.toLowerCase();
     lines.push(`# HELP amc_governance_slo_${name}_p95 P95 for ${metric.metric}`);
     lines.push(`# TYPE amc_governance_slo_${name}_p95 gauge`);
-    lines.push(`amc_governance_slo_${name}_p95 ${metric.p95}`);
-    lines.push(`# HELP amc_governance_slo_${name}_status SLO status (0=healthy,1=degraded,2=violated)`);
+    lines.push(`amc_governance_slo_${name}_p95 ${metric.p95 ?? "NaN"}`);
+    lines.push(`# HELP amc_governance_slo_${name}_status SLO status (0=healthy,1=degraded,2=violated,3=no_data)`);
     lines.push(`# TYPE amc_governance_slo_${name}_status gauge`);
     lines.push(
-      `amc_governance_slo_${name}_status ${metric.status === "HEALTHY" ? 0 : metric.status === "DEGRADED" ? 1 : 2}`,
+      `amc_governance_slo_${name}_status ${metric.status === "HEALTHY" ? 0 : metric.status === "DEGRADED" ? 1 : metric.status === "NO_DATA" ? 3 : 2}`,
     );
   }
 
   for (const definition of report.definitions) {
     const safeId = prometheusSafe(definition.id);
     lines.push(
-      `# HELP amc_governance_slo_definition_${safeId}_status Governance definition status (0=healthy,1=degraded,2=violated)`,
+      `# HELP amc_governance_slo_definition_${safeId}_status Governance definition status (0=healthy,1=degraded,2=violated,3=no_data)`,
     );
     lines.push(`# TYPE amc_governance_slo_definition_${safeId}_status gauge`);
     lines.push(
       `amc_governance_slo_definition_${safeId}_status ${
-        definition.status === "HEALTHY" ? 0 : definition.status === "DEGRADED" ? 1 : 2
+        definition.status === "HEALTHY" ? 0 : definition.status === "DEGRADED" ? 1 : definition.status === "NO_DATA" ? 3 : 2
       }`,
     );
     lines.push(`# HELP amc_governance_slo_definition_${safeId}_observed Observed value`);
     lines.push(`# TYPE amc_governance_slo_definition_${safeId}_observed gauge`);
-    lines.push(`amc_governance_slo_definition_${safeId}_observed ${definition.observedValue}`);
+    lines.push(`amc_governance_slo_definition_${safeId}_observed ${definition.observedValue ?? "NaN"}`);
     lines.push(`# HELP amc_governance_slo_definition_${safeId}_target Target value`);
     lines.push(`# TYPE amc_governance_slo_definition_${safeId}_target gauge`);
     lines.push(`amc_governance_slo_definition_${safeId}_target ${definition.targetValue}`);
@@ -924,7 +916,8 @@ export function renderSloPrometheus(windowMs = DEFAULT_WINDOW_MS): string {
 // Rendering
 // ---------------------------------------------------------------------------
 
-function formatMetricValue(metric: SloMetricName, value: number): string {
+function formatMetricValue(metric: SloMetricName, value: number | null): string {
+  if (value === null) return "not evaluated";
   if (metric.includes("RATE")) {
     return `${(value * 100).toFixed(1)}%`;
   }
@@ -932,6 +925,7 @@ function formatMetricValue(metric: SloMetricName, value: number): string {
 }
 
 function formatDefinitionObserved(definition: GovernanceSloDefinitionSummary): string {
+  if (definition.observedValue === null) return "not evaluated";
   if (definition.mode === "COMPLIANCE_GTE") {
     return `${(definition.observedValue * 100).toFixed(1)}%`;
   }

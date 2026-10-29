@@ -42,6 +42,7 @@ export function diffOutputs(a: string, b: string): DiffResult {
   let intersection = 0;
   for (const w of aWords) { if (bWords.has(w)) intersection++; }
   const union = new Set([...aWords, ...bWords]).size;
+  // Identical empty token sets have similarity 1; this is set equality, not evaluated evidence coverage.
   const similarity = union === 0 ? 1 : intersection / union;
 
   return { similarity: Math.round(similarity * 1000) / 1000, added, removed, changed };

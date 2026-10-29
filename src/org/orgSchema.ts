@@ -1,3 +1,4 @@
+import type { EvidenceOutcome } from "../types.js";
 import { signatureEnvelopeSchema } from "../crypto/signing/signatureEnvelope.js";
 import { z } from "zod";
 
@@ -142,13 +143,16 @@ export interface OrgNodeScorecard {
 }
 
 export interface EcosystemRollup {
+  outcome: EvidenceOutcome;
+  sampleSize: number;
+  metricOutcomes: Record<"overall" | "integrity" | "value", EvidenceOutcome>;
   peerCount: number;
   localEnterpriseOverall: number;
   localEnterpriseIntegrity: number;
   localEnterpriseValue: number | null;
   percentiles: {
-    overall: number;
-    integrity: number;
+    overall: number | null;
+    integrity: number | null;
     value: number | null;
   };
 }

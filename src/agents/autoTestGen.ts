@@ -115,6 +115,7 @@ const DEFAULT_CONFIG: TestGenConfig = {
 function jaccardSimilarity(a: string, b: string): number {
   const wordsA = new Set(a.toLowerCase().split(/\s+/).filter(w => w.length > 2));
   const wordsB = new Set(b.toLowerCase().split(/\s+/).filter(w => w.length > 2));
+  // Identical empty token sets have similarity 1; this is set equality, not evaluated evidence coverage.
   if (wordsA.size === 0 && wordsB.size === 0) return 1;
   if (wordsA.size === 0 || wordsB.size === 0) return 0;
   let intersection = 0;

@@ -15,6 +15,8 @@ import { mean, sampleVariance } from "../experiments/stats.js";
  */
 
 import { randomUUID } from 'node:crypto';
+import type { EvidenceOutcome } from '../types.js';
+import { ratioOrNull } from '../utils/ratio.js';
 import type { HarnessResult, CapabilityProbe } from './harnessRunner.js';
 import type { SimResult, SimBatchResult } from './simAgent.js';
 import type { MetricGroupResult } from './metricTemplates.js';
@@ -34,7 +36,8 @@ export interface RunRecord {
   /** Metric evaluation result */
   metricResult?: MetricGroupResult;
   /** Overall score for this run (normalized 0-100) */
-  score: number;
+  score: number | null;
+  outcome?: EvidenceOutcome;
   /** Tags for filtering */
   tags: string[];
   /** Arbitrary metadata */
@@ -44,14 +47,15 @@ export interface RunRecord {
 export interface ABComparison {
   runA: RunRecord;
   runB: RunRecord;
-  scoreDelta: number;
-  scoreImproved: boolean;
+  scoreDelta: number | null;
+  scoreImproved: boolean | null;
+  outcome: EvidenceOutcome;
   /** Capabilities gained between A and B */
   capabilitiesGained: string[];
   /** Capabilities lost between A and B */
   capabilitiesLost: string[];
   /** Metric changes */
-  metricDeltas: Array<{ metric: string; deltaA: number; deltaB: number; improved: boolean }>;
+  metricDeltas: Array<{ metric: string; deltaA: number | null; deltaB: number | null; improved: boolean | null }>;
   summary: string;
 }
 
@@ -71,7 +75,7 @@ export interface RegressionAlert {
 export interface TrendPoint {
   runId: string;
   timestamp: number;
-  score: number;
+  score: number | null;
   maturityLevel?: string;
   runType: string;
 }
@@ -79,12 +83,14 @@ export interface TrendPoint {
 export interface TrendAnalysis {
   agentType: string;
   points: TrendPoint[];
-  trend: 'improving' | 'stable' | 'declining';
-  avgScore: number;
-  minScore: number;
-  maxScore: number;
-  volatility: number;
-  trendSlope: number;
+  trend: 'improving' | 'stable' | 'declining' | 'not_evaluated';
+  outcome: EvidenceOutcome;
+  sampleSize: number;
+  avgScore: number | null;
+  minScore: number | null;
+  maxScore: number | null;
+  volatility: number | null;
+  trendSlope: number | null;
 }
 
 /* ── Testcase management ─────────────────────────────────────────── */
@@ -114,8 +120,10 @@ export interface TestsetResult {
     score: number;
     details: string;
   }>;
-  passRate: number;
-  avgScore: number;
+  passRate: number | null;
+  avgScore: number | null;
+  outcome: EvidenceOutcome;
+  sampleSize: number;
 }
 
 /* ── RunHistoryStore ─────────────────────────────────────────────── */
@@ -173,7 +181,7 @@ export class RunHistoryStore {
 
   /** Record a metric evaluation run */
   recordMetricRun(agentType: string, result: MetricGroupResult, options?: { agentVersion?: string; tags?: string[]; metadata?: Record<string, unknown> }): RunRecord {
-    const score = result.overallScore * 100;
+    const score = result.overallScore === null ? null : result.overallScore * 100;
     const record: RunRecord = {
       runId: randomUUID(),
       agentType,
@@ -182,6 +190,7 @@ export class RunHistoryStore {
       timestamp: Date.now(),
       metricResult: result,
       score,
+      outcome: score === null ? 'not_evaluated' : 'measured',
       tags: options?.tags ?? [],
       metadata: options?.metadata ?? {},
     };
@@ -239,8 +248,8 @@ export class RunHistoryStore {
     const runB = this.runs.get(runIdB);
     if (!runA || !runB) return undefined;
 
-    const scoreDelta = runB.score - runA.score;
-    const scoreImproved = scoreDelta > 0;
+    const scoreDelta = runA.score === null || runB.score === null ? null : runB.score - runA.score;
+    const scoreImproved = scoreDelta === null ? null : scoreDelta > 0;
 
     // Compare capabilities (if harness runs)
     const capsA = new Set((runA.harnessResult?.capabilityReport ?? []).filter(p => p.present).map(p => p.capability));
@@ -254,30 +263,31 @@ export class RunHistoryStore {
     if (runA.metricResult && runB.metricResult) {
       const metricsA = new Map(runA.metricResult.results.map(r => [r.metricId, r.score]));
       for (const result of runB.metricResult.results) {
-        const scoreA = metricsA.get(result.metricId) ?? 0;
+        const scoreA = metricsA.get(result.metricId) ?? null;
         metricDeltas.push({
           metric: result.metricId,
           deltaA: scoreA,
           deltaB: result.score,
-          improved: result.score > scoreA,
+          improved: scoreA === null || result.score === null ? null : result.score > scoreA,
         });
       }
     }
 
-    const summary = scoreImproved
+    const summary = scoreDelta === null ? 'Not evaluated: one or both runs have no measured metric score.' : scoreImproved
       ? `Run B improved by ${scoreDelta.toFixed(1)} points. ${capabilitiesGained.length} capabilities gained.`
       : scoreDelta === 0
         ? 'No score change between runs.'
         : `Run B regressed by ${Math.abs(scoreDelta).toFixed(1)} points. ${capabilitiesLost.length} capabilities lost.`;
 
-    return { runA, runB, scoreDelta, scoreImproved, capabilitiesGained, capabilitiesLost, metricDeltas, summary };
+    return { runA, runB, scoreDelta, scoreImproved, outcome: scoreDelta === null ? "not_evaluated" : "measured", capabilitiesGained, capabilitiesLost, metricDeltas, summary };
   }
 
   /* ── Regression detection ────────────────────────────────────── */
 
   private checkForRegression(record: RunRecord): void {
+    if (record.score === null) return;
     const previousRuns = this.getRunsByAgent(record.agentType)
-      .filter(r => r.runId !== record.runId && r.runType === record.runType);
+      .filter((r): r is RunRecord & { score: number } => r.runId !== record.runId && r.runType === record.runType && r.score !== null);
 
     if (previousRuns.length === 0) return;
 
@@ -342,22 +352,18 @@ export class RunHistoryStore {
       runType: r.runType,
     }));
 
-    const scores = points.map(p => p.score);
-    const avgScore = mean(scores);
-    const minScore = scores.length > 0 ? Math.min(...scores) : 0;
-    const maxScore = scores.length > 0 ? Math.max(...scores) : 0;
+    const scores = points.map(p => p.score).filter((score): score is number => score !== null);
+    const avgScore = scores.length === 0 ? null : mean(scores);
+    const minScore = scores.length === 0 ? null : Math.min(...scores);
+    const maxScore = scores.length === 0 ? null : Math.max(...scores);
+    const volatility = scores.length < 2 || avgScore === null ? null : Math.sqrt(sampleVariance(scores, avgScore));
+    const trendSlope = scores.length < 2 ? null : computeSlope(scores);
+    const trend: TrendAnalysis['trend'] = trendSlope === null ? 'not_evaluated'
+      : trendSlope > 0.5 ? 'improving' : trendSlope < -0.5 ? 'declining' : 'stable';
+    const rounded = (value: number | null): number | null => value === null ? null : round2(value);
 
-    // Compute volatility (standard deviation)
-    const variance = sampleVariance(scores, avgScore);
-    const volatility = Math.sqrt(variance);
-
-    // Compute trend slope (simple linear regression)
-    const trendSlope = computeSlope(scores);
-    const trend: TrendAnalysis['trend'] =
-      trendSlope > 0.5 ? 'improving' :
-      trendSlope < -0.5 ? 'declining' : 'stable';
-
-    return { agentType, points, trend, avgScore: round2(avgScore), minScore: round2(minScore), maxScore: round2(maxScore), volatility: round2(volatility), trendSlope: round2(trendSlope) };
+    return { agentType, points, trend, outcome: scores.length === 0 ? "not_evaluated" : "measured", sampleSize: scores.length,
+      avgScore: rounded(avgScore), minScore: rounded(minScore), maxScore: rounded(maxScore), volatility: rounded(volatility), trendSlope: rounded(trendSlope) };
   }
 
   /* ── Testcase management ─────────────────────────────────────── */
@@ -484,8 +490,10 @@ export class RunHistoryStore {
     return {
       testsetName: `${agentType}-testset`,
       testcases: results,
-      passRate: results.length > 0 ? passCount / results.length : 0,
-      avgScore: results.length > 0 ? results.reduce((s, r) => s + r.score, 0) / results.length : 0,
+      passRate: ratioOrNull(passCount, results.length),
+      avgScore: ratioOrNull(results.reduce((s, r) => s + r.score, 0), results.length),
+      outcome: results.length === 0 ? "not_evaluated" : "measured",
+      sampleSize: results.length,
     };
   }
 

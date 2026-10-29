@@ -1,3 +1,5 @@
+import type { EvidenceOutcome } from "../types.js";
+import { ratioOrNull } from "../utils/ratio.js";
 /**
  * fixGenerator.ts — Reasons from gaps to module-based fixes with
  * expanded MODULE_MAP covering all AMC domains and FixPlan with coverage stats.
@@ -28,7 +30,9 @@ export interface Fix {
 export interface FixPlan {
   gaps: Gap[];
   fixes: Fix[];
-  coverage: number;
+  coverage: number | null;
+  outcome: EvidenceOutcome;
+  sampleSize: number;
   unfixed: Gap[];
   effortSummary: { low: number; medium: number; high: number };
 }
@@ -135,9 +139,9 @@ export function generateFixPlan(gaps: Gap[], availableModules: string[]): FixPla
     if (fix) fixes.push(fix); else unfixed.push(gap);
   }
 
-  const coverage = gaps.length > 0 ? fixes.length / gaps.length : 1;
+  const coverage = ratioOrNull(fixes.length, gaps.length);
   const effortSummary = { low: 0, medium: 0, high: 0 };
   for (const f of fixes) effortSummary[f.effort]++;
 
-  return { gaps, fixes, coverage, unfixed, effortSummary };
+  return { gaps, fixes, coverage, outcome: coverage === null ? "not_evaluated" : "measured", sampleSize: gaps.length, unfixed, effortSummary };
 }

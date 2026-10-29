@@ -1,129 +1,33 @@
+import type {
+  ValidityPredictionEntry,
+  CalibrationBin,
+  CalibrationScore,
+  InterRaterScore,
+  InterRaterTargetAgreement,
+  InterRaterReliabilityReport,
+  ScoreObservation,
+  ScoreStabilityReport,
+  LongitudinalDriftReport,
+  PredictionLogAnalysis,
+  PredictionLogTrackingReport,
+} from "./predictiveValidityTypes.js";
+export type {
+  ValidityPredictionEntry,
+  CalibrationBin,
+  CalibrationScore,
+  InterRaterScore,
+  InterRaterTargetAgreement,
+  InterRaterReliabilityReport,
+  ScoreObservation,
+  ScoreStabilityReport,
+  LongitudinalDriftReport,
+  PredictionLogAnalysis,
+  PredictionLogTrackingReport,
+} from "./predictiveValidityTypes.js";
+import { ratioOrNull } from "../utils/ratio.js";
 import { mean as statsMean, standardDeviation } from "../experiments/stats.js";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-
-export interface ValidityPredictionEntry {
-  predictionId: string;
-  timestamp: Date;
-  agentId: string;
-  predictedOutcome: string;
-  confidence: number; // 0..1
-  actualOutcome?: string;
-  wasCorrect?: boolean;
-  evaluatorId?: string;
-  runId?: string;
-  score?: number; // 0..100 (optional run/evaluator score)
-}
-
-export interface CalibrationBin {
-  index: number;
-  minConfidence: number;
-  maxConfidence: number;
-  sampleCount: number;
-  avgConfidence: number;
-  accuracy: number;
-  gap: number; // avgConfidence - accuracy
-}
-
-export interface CalibrationScore {
-  totalPredictions: number;
-  resolvedPredictions: number;
-  unresolvedPredictions: number;
-  expectedCalibrationError: number; // ECE
-  maximumCalibrationError: number; // MCE
-  brierScore: number;
-  calibrationBias: number;
-  overconfidenceRate: number;
-  underconfidenceRate: number;
-  bins: CalibrationBin[];
-  quality: "excellent" | "good" | "fair" | "poor" | "insufficient-data";
-}
-
-export interface InterRaterScore {
-  agentId: string;
-  evaluatorId: string;
-  score: number;
-  runId?: string;
-}
-
-export interface InterRaterTargetAgreement {
-  targetId: string;
-  raterCount: number;
-  minScore: number;
-  maxScore: number;
-  scoreRange: number;
-  stdDeviation: number;
-}
-
-export interface InterRaterReliabilityReport {
-  totalRatings: number;
-  totalTargets: number;
-  targetsWithMultipleRaters: number;
-  totalRaters: number;
-  averageRatersPerTarget: number;
-  multiRaterCoverage: number;
-  averagePairwiseDifference: number;
-  agreementScore: number; // 0..1
-  intraclassCorrelation: number; // -1..1
-  quality: "excellent" | "good" | "moderate" | "poor" | "insufficient-data";
-  perTargetAgreement: InterRaterTargetAgreement[];
-}
-
-export interface ScoreObservation {
-  agentId: string;
-  score: number; // 0..100
-  timestamp: Date | string | number;
-  runId?: string;
-  evaluatorId?: string;
-}
-
-export interface ScoreStabilityReport {
-  agentId: string;
-  sampleSize: number;
-  meanScore: number;
-  standardDeviation: number;
-  coefficientOfVariation: number;
-  meanAbsoluteDelta: number;
-  maxDelta: number;
-  stabilityIndex: number; // 0..1
-  stabilityBand: "high" | "medium" | "low" | "insufficient-data";
-}
-
-export interface LongitudinalDriftReport {
-  agentId: string;
-  sampleSize: number;
-  baselineMean: number;
-  recentMean: number;
-  delta: number;
-  deltaPercent: number;
-  slopePerDay: number;
-  slopePer30Days: number;
-  predictedScore30Days: number;
-  recentVolatility: number;
-  direction: "improving" | "degrading" | "stable" | "insufficient-data";
-  severity: "none" | "low" | "medium" | "high";
-}
-
-export interface PredictionLogAnalysis {
-  totalEntries: number;
-  resolvedEntries: number;
-  unresolvedEntries: number;
-  resolutionRate: number;
-  calibration: CalibrationScore;
-  interRaterReliability: InterRaterReliabilityReport;
-  stabilityByAgent: Record<string, ScoreStabilityReport>;
-  driftByAgent: Record<string, LongitudinalDriftReport>;
-  improvingAgents: string[];
-  degradingAgents: string[];
-}
-
-export interface PredictionLogTrackingReport {
-  sourcePath: string;
-  fileFound: boolean;
-  entries: ValidityPredictionEntry[];
-  analysis: PredictionLogAnalysis;
-  warnings: string[];
-}
 
 interface ResolvedPrediction {
   confidence: number;
@@ -561,14 +465,17 @@ function toTargetKey(row: InterRaterScore): string {
 export function computeInterRaterReliability(rows: InterRaterScore[]): InterRaterReliabilityReport {
   if (rows.length === 0) {
     return {
+      outcome: "not_evaluated", sampleSize: 0,
+      metricOutcomes: { averagePairwiseDifference: "not_evaluated", agreementScore: "not_evaluated",
+        averageRatersPerTarget: "not_evaluated", multiRaterCoverage: "not_evaluated" },
       totalRatings: 0,
       totalTargets: 0,
       targetsWithMultipleRaters: 0,
       totalRaters: 0,
-      averageRatersPerTarget: 0,
-      multiRaterCoverage: 0,
-      averagePairwiseDifference: 0,
-      agreementScore: 0,
+      averageRatersPerTarget: null,
+      multiRaterCoverage: null,
+      averagePairwiseDifference: null,
+      agreementScore: null,
       intraclassCorrelation: 0,
       quality: "insufficient-data",
       perTargetAgreement: [],
@@ -623,8 +530,8 @@ export function computeInterRaterReliability(rows: InterRaterScore[]): InterRate
     }
   }
 
-  const averagePairwiseDifference = pairCount > 0 ? pairDiffSum / pairCount : 0;
-  const agreementScore = clamp01(1 - averagePairwiseDifference / 100);
+  const averagePairwiseDifference = ratioOrNull(pairDiffSum, pairCount);
+  const agreementScore = averagePairwiseDifference === null ? null : clamp01(1 - averagePairwiseDifference / 100);
 
   // ICC(1,1) approximation for uneven rater counts using k-bar.
   let intraclassCorrelation = 0;
@@ -666,14 +573,21 @@ export function computeInterRaterReliability(rows: InterRaterScore[]): InterRate
             : "poor";
 
   return {
+    outcome: pairCount === 0 ? "not_evaluated" : "measured", sampleSize: pairCount,
+    metricOutcomes: {
+      averagePairwiseDifference: averagePairwiseDifference === null ? "not_evaluated" : "measured",
+      agreementScore: agreementScore === null ? "not_evaluated" : "measured",
+      averageRatersPerTarget: "measured", multiRaterCoverage: "measured",
+    },
     totalRatings: rows.length,
     totalTargets: byTarget.size,
     targetsWithMultipleRaters,
     totalRaters: raters.size,
-    averageRatersPerTarget: Number((totalCollapsedRatings / Math.max(byTarget.size, 1)).toFixed(6)),
-    multiRaterCoverage: Number((targetsWithMultipleRaters / Math.max(byTarget.size, 1)).toFixed(6)),
-    averagePairwiseDifference: Number(averagePairwiseDifference.toFixed(6)),
-    agreementScore: Number(agreementScore.toFixed(6)),
+    // Every nonempty row creates a target bucket; the empty case returned above.
+    averageRatersPerTarget: Number((totalCollapsedRatings / byTarget.size).toFixed(6)),
+    multiRaterCoverage: Number((targetsWithMultipleRaters / byTarget.size).toFixed(6)),
+    averagePairwiseDifference: averagePairwiseDifference === null ? null : Number(averagePairwiseDifference.toFixed(6)),
+    agreementScore: agreementScore === null ? null : Number(agreementScore.toFixed(6)),
     intraclassCorrelation: Number(intraclassCorrelation.toFixed(6)),
     quality,
     perTargetAgreement: perTargetAgreement.sort((a, b) => b.scoreRange - a.scoreRange),
@@ -690,14 +604,17 @@ function toTimestampMs(value: Date | string | number): number {
 export function computeScoreStability(observations: ScoreObservation[]): ScoreStabilityReport {
   if (observations.length === 0) {
     return {
+      outcome: "not_evaluated",
+      metricOutcomes: { meanScore: "not_evaluated", standardDeviation: "not_evaluated",
+        coefficientOfVariation: "not_evaluated", meanAbsoluteDelta: "not_evaluated", maxDelta: "not_evaluated", stabilityIndex: "not_evaluated" },
       agentId: "unknown-agent",
       sampleSize: 0,
-      meanScore: 0,
-      standardDeviation: 0,
-      coefficientOfVariation: 0,
-      meanAbsoluteDelta: 0,
-      maxDelta: 0,
-      stabilityIndex: 0,
+      meanScore: null,
+      standardDeviation: null,
+      coefficientOfVariation: null,
+      meanAbsoluteDelta: null,
+      maxDelta: null,
+      stabilityIndex: null,
       stabilityBand: "insufficient-data",
     };
   }
@@ -711,15 +628,17 @@ export function computeScoreStability(observations: ScoreObservation[]): ScoreSt
     deltas.push(Math.abs((scores[i] ?? 0) - (scores[i - 1] ?? 0)));
   }
 
-  const meanAbsoluteDelta = mean(deltas);
-  const maxDelta = deltas.length > 0 ? Math.max(...deltas) : 0;
+  const meanAbsoluteDelta = ratioOrNull(deltas.reduce((sum, value) => sum + value, 0), deltas.length);
+  const maxDelta = deltas.length > 0 ? Math.max(...deltas) : null;
+  const coefficientOfVariation = ratioOrNull(scoreStdDev, scoreMean);
 
   const normalizedStd = Math.min(1, scoreStdDev / 15);
-  const normalizedMad = Math.min(1, meanAbsoluteDelta / 12);
-  const normalizedMax = Math.min(1, maxDelta / 25);
-  const stabilityIndex = clamp01(1 - (0.5 * normalizedStd + 0.3 * normalizedMad + 0.2 * normalizedMax));
+  const normalizedMad = meanAbsoluteDelta === null ? null : Math.min(1, meanAbsoluteDelta / 12);
+  const normalizedMax = maxDelta === null ? null : Math.min(1, maxDelta / 25);
+  const stabilityIndex = normalizedMad === null || normalizedMax === null
+    ? null : clamp01(1 - (0.5 * normalizedStd + 0.3 * normalizedMad + 0.2 * normalizedMax));
   const stabilityBand =
-    scores.length < 3
+    scores.length < 3 || stabilityIndex === null
       ? "insufficient-data"
       : stabilityIndex >= 0.85
         ? "high"
@@ -728,14 +647,22 @@ export function computeScoreStability(observations: ScoreObservation[]): ScoreSt
           : "low";
 
   return {
+    outcome: stabilityIndex === null ? "not_evaluated" : "measured",
+    metricOutcomes: {
+      meanScore: "measured", standardDeviation: "measured",
+      coefficientOfVariation: coefficientOfVariation === null ? "not_evaluated" : "measured",
+      meanAbsoluteDelta: meanAbsoluteDelta === null ? "not_evaluated" : "measured",
+      maxDelta: maxDelta === null ? "not_evaluated" : "measured",
+      stabilityIndex: stabilityIndex === null ? "not_evaluated" : "measured",
+    },
     agentId: sorted[0]?.agentId ?? "unknown-agent",
     sampleSize: scores.length,
     meanScore: Number(scoreMean.toFixed(6)),
     standardDeviation: Number(scoreStdDev.toFixed(6)),
-    coefficientOfVariation: Number((scoreMean > 0 ? scoreStdDev / scoreMean : 0).toFixed(6)),
-    meanAbsoluteDelta: Number(meanAbsoluteDelta.toFixed(6)),
-    maxDelta: Number(maxDelta.toFixed(6)),
-    stabilityIndex: Number(stabilityIndex.toFixed(6)),
+    coefficientOfVariation: coefficientOfVariation === null ? null : Number(coefficientOfVariation.toFixed(6)),
+    meanAbsoluteDelta: meanAbsoluteDelta === null ? null : Number(meanAbsoluteDelta.toFixed(6)),
+    maxDelta: maxDelta === null ? null : Number(maxDelta.toFixed(6)),
+    stabilityIndex: stabilityIndex === null ? null : Number(stabilityIndex.toFixed(6)),
     stabilityBand,
   };
 }

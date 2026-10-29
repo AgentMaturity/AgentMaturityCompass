@@ -829,7 +829,7 @@ describe('ProductionMonitor', () => {
 
       const dashboard = monitor.getDashboard();
       expect(dashboard.monitors.length).toBe(2);
-      expect(['healthy', 'warning', 'critical']).toContain(dashboard.overallHealth);
+      expect(dashboard.overallHealth).toBe('not_evaluated');
     });
   });
 

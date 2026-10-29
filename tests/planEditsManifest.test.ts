@@ -171,14 +171,14 @@ describe("scripts/snapshot-plan-edit.mjs", () => {
     expect(landedSourceAt(root).landedText("src/a.ts")).toBe("a at base\n");
   });
 
-  it("archives AXE-23 base bytes without changing the existing plan-issue contract", () => {
+  it.each(["AXE-23", "AXE-27"])("archives %s base bytes without changing the existing plan-issue contract", (issue) => {
     const { root, base } = repo();
-    const result = snapshot(root, "--issue", "AXE-23", "--base", "HEAD", "src/a.ts");
+    const result = snapshot(root, "--issue", issue, "--base", "HEAD", "src/a.ts");
     expect(result.stderr).toBe("");
     expect(result.status).toBe(0);
     expect(read(root).files).toEqual([
-      { path: "src/a.ts", issue: "AXE-23", baseCommit: base,
-        archivePath: "unused-code/plan-edits/AXE-23/src/a.ts.landed", sha256: sha256("a at base\n") },
+      { path: "src/a.ts", issue, baseCommit: base,
+        archivePath: `unused-code/plan-edits/${issue}/src/a.ts.landed`, sha256: sha256("a at base\n") },
     ]);
     expect(landedSourceAt(root).landedText("src/a.ts")).toBe("a at base\n");
   });
