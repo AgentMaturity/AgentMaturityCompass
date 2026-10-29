@@ -59,6 +59,7 @@ export {
   /** Operator-owned file and explicit check IDs; ACP prompts cannot supply commands. */
   readonly validationConfig?: string;
   readonly validationConfigSha256?: string;
+  readonly validationRepair?: string;
   readonly validate?: readonly string[];
   readonly approveTools?: string;
   readonly approveRisk?: "low" | "medium" | "high" | "critical";
@@ -380,6 +381,7 @@ export class AMCNativeClient {
       ["--base-url", options.baseUrl], ["--agent-id", options.agentId], ["--tools", options.tools],
       ["--expected-tools-digest", options.expectedToolsDigest],
       ["--validation-config", options.validationConfig], ["--validation-config-sha256", options.validationConfigSha256],
+      ["--validation-repair", options.validationRepair],
       ["--approve-tools", options.approveTools], ["--approve-risk", options.approveRisk],
       ["--mcp-config", options.mcpConfig], ["--mcp-config-sha256", options.mcpConfigSha256],
       ["--credentials-home", options.credentialsHome], ["--credentials-file", options.credentialsFile],
@@ -395,7 +397,7 @@ export class AMCNativeClient {
         || options.validate.some(id => typeof id !== "string" || !/^[a-zA-Z0-9_-]{1,64}$/.test(id))) throw new AMCNativeInputError("Select one through eight distinct public validation check IDs.");
       for (const id of options.validate) args.push("--validate", id);
     }
-    if ((options.validate !== undefined || options.validationConfigSha256 !== undefined) && !options.validationConfig)
+    if ((options.validate !== undefined || options.validationConfigSha256 !== undefined || options.validationRepair !== undefined) && !options.validationConfig)
       throw new Error("Public validation requires an explicit operator config file.");
     this.child = spawn(this.command[0], args, { cwd: this.workspace, env: this.env, stdio: "pipe", shell: false });
     this.childClosed = new Promise((resolve_) => {
