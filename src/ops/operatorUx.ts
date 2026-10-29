@@ -250,13 +250,6 @@ const FLAG_DETAILS: Record<string, { label: string; description: string; unlockA
     effort: "low",
     riskReduction: 0.9,
   },
-  FLAG_CLAIM_HUMAN_PASTED: {
-    label: "Claim pasted by a human",
-    description: "The runtime never returned valid claimed levels, so a person pasted them at the harness prompt.",
-    unlockAction: "Fix the runtime so it returns the claimed-levels JSON itself, then rerun the diagnostic.",
-    effort: "low",
-    riskReduction: 0.3,
-  },
   FLAG_LEDGER_INVALID: {
     label: "Ledger integrity failed",
     description: "The evidence ledger hash chain verification failed.",
