@@ -1,6 +1,6 @@
 import { Ajv } from "ajv";
 import { spawnSync } from "node:child_process";
-import { appendFileSync, chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { appendFileSync, chmodSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
@@ -121,10 +121,13 @@ describe("files/ledger-encryption.sh against a real workspace (P2-06 D5)", () =>
     const dek = JSON.parse(readFileSync(join(workspace(), ".amc/keys/ledger-dek.json"), "utf8"));
     expect(dek.keys.map((key: { providerId: string; keyRef: string }) => [key.providerId, key.keyRef])).toEqual([["file", "ledger-dek"]]);
     const before = readFileSync(join(workspace(), ".amc/ops-policy.yaml.sig"), "utf8");
+    const receipts = readdirSync(join(workspace(), ".amc/ledger-encryption"));
+    expect(receipts).toHaveLength(1);
     const second = step();
     expect(second.status, second.stderr).toBe(0);
     expect(readFileSync(join(workspace(), ".amc/ops-policy.yaml.sig"), "utf8")).toBe(before);
     expect(JSON.parse(readFileSync(join(workspace(), ".amc/keys/ledger-dek.json"), "utf8"))).toEqual(dek);
+    expect(readdirSync(join(workspace(), ".amc/ledger-encryption"))).toEqual(receipts);
   }, 180_000);
 
   it("refuses, and re-signs nothing, when the ops policy was edited without a signature", () => {
