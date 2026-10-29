@@ -32,7 +32,10 @@ interface CaseRunResult {
   status: CaseRunStatus;
   /** Kept for existing readers: true only when status is `passed`. */
   success: boolean;
-  valuePoints: number;
+  valuePoints: number | null;
+  /** Configured success points earned; null when the case could not be evaluated. */
+  successPoints: number | null;
+  maxValuePoints: number;
   reasons: string[];
   /** Measured tokens of the case's own llm_response rows; null when no attributable complete usage exists. */
   costTokens: number | null;
@@ -195,7 +198,9 @@ function runCasebookAtWindow(params: {
         title: kase.title,
         status: judged.status,
         success: judged.status === "passed",
-        valuePoints: judged.status === "passed" ? kase.scoring.valuePoints : 0,
+        valuePoints: judged.status === "unavailable" ? null : judged.status === "passed" ? kase.scoring.valuePoints : 0,
+        successPoints: judged.status === "unavailable" ? null : judged.status === "passed" ? kase.scoring.successPoints : 0,
+        maxValuePoints: kase.scoring.valuePoints,
         reasons: judged.reasons,
         costTokens: ref && own.length > 0 ? measuredTokens(own) : null,
         correlationRatio,

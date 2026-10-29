@@ -457,7 +457,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc executive` | Executive and board-ready AMC artifacts | - | - |
 | `amc executive brief` | Generate a board-ready one-page executive brief from a diagnostic run | `--agent <agentId>`<br>`--run <runId>`<br>`--out <path>`<br>`--format <format>`<br>`--title <title>` | - |
 | `amc experiment` | Deterministic baseline vs candidate experiments | - | - |
-| `amc experiment analyze` | Analyze latest experiment run (exit 0 all candidate cases pass, 1 failure or error, 3 inconclusive) | `--experiment <id>`<br>`--out <path>`<br>`--agent <agentId>` | - |
+| `amc experiment analyze` | Analyze latest experiment run or verified run history (exit 0 all candidate cases pass, 1 failure or error, 3 inconclusive) | `--experiment <id>`<br>`--out <path>`<br>`--all`<br>`--agent <agentId>` | - |
 | `amc experiment create` | Create an experiment | `--name <name>`<br>`--casebook <id>`<br>`--agent <agentId>` | - |
 | `amc experiment gate` | Evaluate latest experiment run against gate policy (exit 0 pass, 1 fail or error, 3 inconclusive) | `--experiment <id>`<br>`--policy <path>`<br>`--agent <agentId>` | - |
 | `amc experiment gate-template` | Write an experiment gate policy template | `--out <path>`<br>`--preset <preset>` | - |

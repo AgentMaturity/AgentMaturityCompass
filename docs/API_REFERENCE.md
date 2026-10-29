@@ -470,7 +470,7 @@ AMC provides 1,268 public CLI command paths in the live command inventory.
 | 451 | `amc executive` | Executive and board-ready AMC artifacts |
 | 452 | `amc executive brief` | Generate a board-ready one-page executive brief from a diagnostic run |
 | 453 | `amc experiment` | Deterministic baseline vs candidate experiments |
-| 454 | `amc experiment analyze` | Analyze latest experiment run (exit 0 all candidate cases pass, 1 failure or error, 3 inconclusive) |
+| 454 | `amc experiment analyze` | Analyze latest experiment run or verified run history (exit 0 all candidate cases pass, 1 failure or error, 3 inconclusive) |
 | 455 | `amc experiment create` | Create an experiment |
 | 456 | `amc experiment gate` | Evaluate latest experiment run against gate policy (exit 0 pass, 1 fail or error, 3 inconclusive) |
 | 457 | `amc experiment gate-template` | Write an experiment gate policy template |
@@ -4954,13 +4954,14 @@ Generate a board-ready one-page executive brief from a diagnostic run
 
 #### `amc experiment analyze`
 
-Analyze latest experiment run (exit 0 all candidate cases pass, 1 failure or error, 3 inconclusive)
+Analyze latest experiment run or verified run history (exit 0 all candidate cases pass, 1 failure or error, 3 inconclusive)
 
 
 | Option | Description |
 |--------|-------------|
 | `--experiment <id>` | - |
 | `--out <path>` | - |
+| `--all` | - |
 | `--agent <agentId>` | - |
 
 #### `amc experiment create`

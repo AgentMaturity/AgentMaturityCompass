@@ -105,6 +105,7 @@ export function experimentAnalyzeCli(params: {
   agentId?: string;
   experimentId: string;
   outFile?: string;
+  all?: boolean;
 }) {
   return analyzeExperiment(params);
 }

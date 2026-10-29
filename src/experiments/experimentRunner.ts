@@ -24,7 +24,8 @@ import { capturePurposePublication, assertPurposePublicationCurrent } from "../k
 import { withControlFileLock } from "../lifecycle/controlFileLock.js";
 import { experimentGateSchema, experimentSchema, type ExperimentFile, type ExperimentGatePolicy } from "./experimentSchema.js";
 import { deterministicSeed, meanDifference, pairedBootstrapCI, pairedStandardizedEffect } from "./stats.js";
-import { evaluateExperimentGate, type ExperimentGateStatus } from "./experimentGatePolicy.js";
+import { DEFAULT_MIN_PAIRED_CASES, evaluateExperimentGate, type ExperimentGateStatus } from "./experimentGatePolicy.js";
+import { listExperimentRunFiles, readExperimentRun } from "./experimentHistory.js";
 
 interface SignedDigest {
   digestSha256: string;
@@ -96,44 +97,11 @@ function verifySignedCandidateFile(workspace: string, file: string): { valid: bo
   }
 }
 
-function listRunFiles(workspace: string, agentId: string, experimentId: string): string[] {
-  const dir = experimentRunsDir(workspace, agentId, experimentId);
-  if (!pathExists(dir)) {
-    return [];
-  }
-  return readdirSync(dir)
-    .filter((name) => name.endsWith(".json"))
-    .map((name) => join(dir, name))
-    .sort((a, b) => a.localeCompare(b));
-}
-
-/** Why a stored run report may not be read as this experiment's current result, or null when it may. */
-function experimentReportProblem(workspace: string, agentId: string, experiment: ExperimentFile, runId: string, report: ExperimentReport): string | null {
-  if (typeof report !== "object" || report === null || Array.isArray(report)) return "report is not an object";
-  const { reportJsonSha256, reportSealSig, ...base } = report;
-  if (typeof reportJsonSha256 !== "string" || sha256Hex(canonicalize(base)) !== reportJsonSha256) return "report hash does not match its contents";
-  let sealed = false;
-  try { sealed = typeof reportSealSig === "string" && verifyHexDigestAny(reportJsonSha256, reportSealSig, runHashVerificationKeys(workspace)); }
-  catch { sealed = false; }
-  if (!sealed) return "report seal does not verify";
-  const config = experiment.experiment;
-  if (report.runId !== runId || report.experimentId !== config.experimentId || report.agentId !== agentId) return "report belongs to another run, experiment or agent";
-  if (report.casebookId !== config.casebookId || report.baselineConfigId !== config.baselineConfig.id) return "experiment casebook or baseline changed since this run";
-  if (report.candidateConfigId !== config.candidateConfig?.id) return "experiment candidate changed since this run";
-  return null;
-}
-
-/** The newest run report, admitted only when its seal verifies and it describes the experiment's current configuration; null when there are no runs. */
+/** The newest run, admitted against the current configuration; null when there are no runs. */
 function latestRunOrNull(workspace: string, agentId: string, experimentId: string): ExperimentReport | null {
   const experiment = loadExperiment(workspace, agentId, experimentId);
-  const file = listRunFiles(workspace, agentId, experimentId).at(-1);
-  if (!file) return null;
-  let report: ExperimentReport;
-  try { report = JSON.parse(readUtf8(file)) as ExperimentReport; }
-  catch { throw new Error(`latest experiment run ${basename(file)} is unreadable`); }
-  const problem = experimentReportProblem(workspace, agentId, experiment, basename(file, ".json"), report);
-  if (problem) throw new Error(`latest experiment run ${basename(file)} refused: ${problem}`);
-  return report;
+  const file = listExperimentRunFiles(experimentRunsDir(workspace, agentId, experimentId)).at(-1);
+  return file ? readExperimentRun(workspace, agentId, experiment, file) : null;
 }
 
 function latestRun(workspace: string, agentId: string, experimentId: string): ExperimentReport {
@@ -161,7 +129,8 @@ function toMarkdown(report: ExperimentReport): string {
       (row) =>
         `- ${row.caseId}: baseline=${row.baselineStatus ?? String(row.baselineSuccess)} candidate=${row.candidateStatus ?? String(row.candidateSuccess)} ` +
         `paired=${row.paired ?? "legacy"} baselineValue=${fixed(row.baselineValuePoints, 2)} candidateValue=${fixed(row.candidateValuePoints, 2)} ` +
-        `baselineTokens=${fixed(row.baselineCost, 4)} candidateTokens=${fixed(row.candidateCost, 4)}`
+        `baselineTokens=${fixed(row.baselineCost, 4)} candidateTokens=${fixed(row.candidateCost, 4)} ` +
+        `baselineSuccessPoints=${fixed(row.baselineSuccessPoints, 2)} candidateSuccessPoints=${fixed(row.candidateSuccessPoints, 2)}`
     )
     .join("\n");
   const counts = report.counts;
@@ -176,14 +145,17 @@ function toMarkdown(report: ExperimentReport): string {
     `- Baseline success rate: ${report.baselineSuccessRate.toFixed(4)}`,
     `- Candidate success rate: ${report.candidateSuccessRate.toFixed(4)}`,
     `- Uplift success rate: ${report.upliftSuccessRate.toFixed(4)}`,
-    `- Baseline value avg: ${report.baselineValuePointsAvg.toFixed(4)}`,
-    `- Candidate value avg: ${report.candidateValuePointsAvg.toFixed(4)}`,
+    `- Baseline value avg (points, 0..100 scale): ${report.baselineValuePointsAvg.toFixed(4)}`,
+    `- Candidate value avg (points, 0..100 scale): ${report.candidateValuePointsAvg.toFixed(4)}`,
     `- Uplift value points: ${report.upliftValuePoints.toFixed(4)}`,
     `- Baseline tokens/success: ${fixed(report.baselineCostPerSuccess, 6)}`,
     `- Candidate tokens/success: ${fixed(report.candidateCostPerSuccess, 6)}`,
-    `- 95% CI (paired value-point difference): ${report.confidenceInterval95 ? `[${report.confidenceInterval95[0].toFixed(6)}, ${report.confidenceInterval95[1].toFixed(6)}]` : "unavailable (insufficient sample)"}`,
+    `- 95% CI (${report.schemaVersion === 2 ? "paired" : "legacy unpaired"} value-point difference): ${report.confidenceInterval95 ? `[${report.confidenceInterval95[0].toFixed(6)}, ${report.confidenceInterval95[1].toFixed(6)}]` : "unavailable (insufficient sample)"}`,
     ...(report.meanDifference !== undefined ? [`- Mean difference: ${report.meanDifference.toFixed(6)}`] : []),
     `- ${report.schemaVersion === 2 ? "Standardized paired effect (d_z)" : "Effect size (legacy: raw mean difference)"}: ${fixed(report.effectSize, 6)}`,
+    "",
+    "## Comparability warnings",
+    ...(report.warnings ?? ["Comparability warnings were not recorded for this legacy report."]).map(warning => `- ${warning}`),
     "",
     "## Cases",
     rows,
@@ -401,7 +373,9 @@ function prepareExperimentReport(params: {
       baselineSuccess: row.success,
       candidateSuccess: candidate.success,
       baselineValuePoints: row.valuePoints,
-      candidateValuePoints: Number(candidate.valuePoints.toFixed(4)),
+      candidateValuePoints: candidate.valuePoints === null ? null : Number(candidate.valuePoints.toFixed(4)),
+      baselineSuccessPoints: row.successPoints,
+      candidateSuccessPoints: candidate.successPoints,
       baselineCost: row.costTokens,
       candidateCost: candidate.costTokens === null ? null : Number(candidate.costTokens.toFixed(6)),
       reasons: row.reasons,
@@ -413,7 +387,8 @@ function prepareExperimentReport(params: {
       candidateExecution: executionOf(candidate)
     };
   });
-  const paired = cases.filter((row) => row.paired);
+  const paired = cases.filter((row): row is typeof row & { baselineValuePoints: number; candidateValuePoints: number } =>
+    row.paired && row.baselineValuePoints !== null && row.candidateValuePoints !== null);
   if (paired.length === 0) {
     throw new Error("No case has determinate evidence on both sides; the experiment cannot compare missing evidence.");
   }
@@ -434,6 +409,17 @@ function prepareExperimentReport(params: {
   const bootstrapSeed = deterministicSeed([experiment.experiment.experimentId, candidateConfig.digestSha256 ?? "candidate"]);
   const interval = pairedBootstrapCI({ pairs, seed: bootstrapSeed });
 
+  const warnings: string[] = ["Value scores use points on a 0..100 scale; success rates use fractions and cost uses tokens, not currency."];
+  if (paired.length < DEFAULT_MIN_PAIRED_CASES) warnings.push(`${paired.length} paired case(s); at least ${DEFAULT_MIN_PAIRED_CASES} required by the default gate. Small samples do not establish a reliable uplift.`);
+  if (paired.length < cases.length) warnings.push(`${cases.length - paired.length} case(s) excluded because evidence was unavailable on one or both sides; conditional averages cover only ${paired.length} paired cases.`);
+  if (baselineSuccesses === 0) warnings.push("Baseline has zero successful cases; tokens per success are unavailable.");
+  if (candidateSuccesses === 0) warnings.push("Candidate has zero successful cases; tokens per success are unavailable.");
+  if (paired.some(row => row.baselineCost === null || row.candidateCost === null)) warnings.push("Token usage is missing for at least one paired case; cost per success is unavailable on the affected side.");
+  if (!trials) warnings.push("Legacy window evidence is not bound to case, trial and configuration identities and cannot support promotion.");
+  if (candidateAgentId === agentId && Math.max(baselineRange.startedTs, candidateRange.startedTs) <= Math.min(baselineRange.endedTs, candidateRange.endedTs)) {
+    warnings.push("Same-agent baseline and candidate windows overlap; comparability depends on distinct, correctly attributed trial identities.");
+  }
+  if (new Set([...baselineRun.results, ...candidateRun.results].map(row => row.maxValuePoints)).size > 1) warnings.push("Case value-point maxima differ; averages are unnormalized points and reflect those configured weights.");
   const runId = `exp_run_${Date.now()}_${randomUUID().slice(0, 8)}`;
   const base = {
     schemaVersion: 2 as const,
@@ -445,6 +431,8 @@ function prepareExperimentReport(params: {
     pairing: "paired-cases" as const,
     counts: { cases: cases.length, pairedCases: paired.length, excludedCases: cases.length - paired.length, baselineSuccesses, candidateSuccesses },
     costUnit: "tokens" as const,
+    valueUnit: "points" as const,
+    warnings,
     experimentId: experiment.experiment.experimentId,
     agentId,
     ts: Date.now(),
@@ -659,21 +647,31 @@ export function analyzeExperiment(params: {
   agentId?: string;
   experimentId: string;
   outFile?: string;
-}): { report: ExperimentReport; outFile: string | null } {
+  /** Verify and tabulate every stored run without executing casebooks, solvers or judges. */
+  all?: boolean;
+}): { report: ExperimentReport; reports: ExperimentReport[]; outFile: string | null } {
   const agentId = resolveAgentId(params.workspace, params.agentId);
-  const report = latestRun(params.workspace, agentId, params.experimentId);
-  if (!params.outFile) {
-    return {
-      report,
-      outFile: null
-    };
+  const experiment = loadExperiment(params.workspace, agentId, params.experimentId);
+  const reports = params.all
+    ? listExperimentRunFiles(experimentRunsDir(params.workspace, agentId, params.experimentId)).map(file => readExperimentRun(params.workspace, agentId, experiment, file, false))
+    : [latestRun(params.workspace, agentId, params.experimentId)];
+  const report = reports.at(-1);
+  if (!report) throw new Error(`no experiment runs for ${params.experimentId}`);
+  if (params.outFile) {
+    const history = [
+      `# Experiment ${params.experimentId} history`, "",
+      "Read-only analysis. Every listed report seal and run identity verified. Historical configurations remain separate; these rows do not authorize promotion.", "",
+      "| Run | Candidate | Seal | Cases | Paired | Missing / excluded | Value unit | Warnings |",
+      "| --- | --- | --- | ---: | ---: | ---: | --- | ---: |",
+      ...reports.map(row => `| ${row.runId} | ${row.candidateConfigId} | verified | ${row.counts?.cases ?? row.cases.length} | ${row.counts?.pairedCases ?? "unavailable"} | ${row.counts?.excludedCases ?? "unavailable"} | ${row.valueUnit ?? "legacy implicit points"} | ${row.warnings?.length ?? "not recorded"} |`),
+      "", ...reports.map(toMarkdown)
+    ].join("\n");
+    const output = params.outFile.endsWith(".json")
+      ? JSON.stringify(params.all ? { experimentId: params.experimentId, reports } : report, null, 2)
+      : params.all ? history : toMarkdown(report);
+    writeFileAtomic(params.outFile, output, 0o644);
   }
-  const output = params.outFile.endsWith(".json") ? JSON.stringify(report, null, 2) : toMarkdown(report);
-  writeFileAtomic(params.outFile, output, 0o644);
-  return {
-    report,
-    outFile: params.outFile
-  };
+  return { report, reports, outFile: params.outFile ?? null };
 }
 
 /**

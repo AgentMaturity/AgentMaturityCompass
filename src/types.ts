@@ -3301,7 +3301,7 @@ export interface DiagnosticReport {
   dualityCompliance?: {
     executeWithValidTicket: number;
     executeAttempted: number;
-    ratio: number;
+    ratio: number | null;
   };
   toolHubUsage?: {
     toolActionCount: number;
@@ -3629,8 +3629,10 @@ export interface CasebookRunCaseResult {
   title: string;
   baselineSuccess: boolean;
   candidateSuccess: boolean;
-  baselineValuePoints: number;
-  candidateValuePoints: number;
+  baselineValuePoints: number | null;
+  candidateValuePoints: number | null;
+  baselineSuccessPoints?: number | null;
+  candidateSuccessPoints?: number | null;
   /** Measured tokens (not currency); null when the case's usage is not attributable or incomplete. */
   baselineCost: number | null;
   candidateCost: number | null;
@@ -3666,6 +3668,10 @@ export interface ExperimentReport {
   pairing?: "paired-cases";
   counts?: { cases: number; pairedCases: number; excludedCases: number; baselineSuccesses: number; candidateSuccesses: number };
   costUnit?: "tokens";
+  /** Absolute case-value points on a 0..100 scale; success rates remain fractions. */
+  valueUnit?: "points";
+  /** Recorded at execution time and covered by the report seal. Absent on legacy reports. */
+  warnings?: string[];
   experimentId: string;
   agentId: string;
   ts: number;
