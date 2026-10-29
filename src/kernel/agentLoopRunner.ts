@@ -70,6 +70,7 @@ import type { SubagentRunContext, SubagentRunner } from "../agent/subagentSpawn.
 import { parseSubagentStopConditions } from "../agent/subagentStopConditions.js";
 import type { ActionClass } from "../types.js";
 import { createDriverRunner } from "../agent/subagentRunner.js";
+import { COMPOSITION_FAILED } from "../agent/nativeAgentComposition.js";
 import { LeasePrincipalRefused } from "../leases/leasePrincipal.js";
 import { planRequiresPrincipal } from "../tools/guards/compiledPolicyGuard.js";
 import { refuseRetired } from "../lifecycle/reassessment.js";
@@ -485,6 +486,8 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
   const ctx = new Context();
   const fibers: { dispose(): Promise<void> }[] = [];
   let steerTimer: NodeJS.Timeout | null = null;
+  /** Set once the loop (or schedule pass) is ready; until then a throw is a failed composition, never a completion. */
+  let composed = false;
 
   try {
     // P2-12: interrupted calls follow their resume rules before this turn's first request; nothing is dispatched again.
@@ -511,6 +514,8 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
     });
     await llmFiber.await();
     fibers.push(llmFiber);
+    // An unknown route fails composition here, before any prompt row or request (DXA-13).
+    serviceOn<LlmSeamService>(ctx, LLM_SEAM.name).pin({ providerId: options.route.providerId, model: options.route.model });
 
     const promptFiber = ctx.plugin(promptServices, { profile, sessionId });
     await promptFiber.await();
@@ -611,6 +616,7 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
         Object.assign(runNative, { hookControl: runner.hookControl });
       }
       if (options.schedulePass !== undefined) {
+        composed = true;
         const pass = options.schedulePass;
         const nativeRunner = runner;
         const scheduleResults = await runDueSchedules({
@@ -659,6 +665,7 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
     });
     await loopFiber.await();
     fibers.push(loopFiber);
+    composed = true;
 
     const loop = serviceOn<AgentLoopSeamService>(ctx, AGENT_LOOP_SEAM.name);
     options.onReady?.({
@@ -713,7 +720,7 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
         // process resumes it through sessionResume.ts, which re-verifies first.
         session.releaseWithoutClosing();
       } else {
-        session.close({ reason: "completed" });
+        session.close({ reason: composed ? "completed" : COMPOSITION_FAILED });
       }
     } catch (error) {
       // A driver that entered `failed` left an open turn only recovery may
