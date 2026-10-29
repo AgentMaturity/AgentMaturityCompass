@@ -2,7 +2,7 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import Database from "better-sqlite3";
-import { afterAll, afterEach, describe, expect, test } from "vitest";
+import { afterAll, afterEach, beforeEach, describe, expect, test } from "vitest";
 import {
   initLessonTables,
   insertLesson,
@@ -86,6 +86,17 @@ function lessonWorkspace(): string {
 
 afterAll(() => {
   if (signingWorkspace) rmSync(signingWorkspace, { recursive: true, force: true });
+});
+
+// Status-log heads are anchored in AMC home; each test gets its own so anchors never leak between tests or to the user.
+const priorAmcHome = process.env.AMC_HOME;
+beforeEach(() => {
+  const home = mkdtempSync(join(tmpdir(), "amc-corrmem-home-"));
+  roots.push(home);
+  process.env.AMC_HOME = home;
+});
+afterAll(() => {
+  if (priorAmcHome === undefined) delete process.env.AMC_HOME; else process.env.AMC_HOME = priorAmcHome;
 });
 
 /** A lesson hashed, chained and signed the way extractLessonsFromCorrections writes one. */
@@ -307,7 +318,7 @@ describe("lesson update operations", () => {
   test("updateLessonStatus changes status", () => {
     const { db } = freshDb();
     makeLesson(db, { lessonId: "lsn_upd1" });
-    updateLessonStatus(db, "lsn_upd1", "STALE");
+    updateLessonStatus(db, "lsn_upd1", "STALE", lessonWorkspace());
     const lesson = getLessonById(db, "lsn_upd1");
     expect(lesson!.status).toBe("STALE");
     db.close();
@@ -625,26 +636,43 @@ describe("buildLessonAdvisories", () => {
     db.close();
   });
 
-  test("an unsigned re-activation, a forged transition or a removed transition keeps the lesson out", () => {
+  test("a tampered middle status entry makes every lesson of the agent non-injectable", () => {
     const { db } = freshDb();
     const ws = lessonWorkspace();
-    makeSignedLesson(db, { lessonId: "lsn_unsigned" });
-    makeSignedLesson(db, { lessonId: "lsn_forged" });
-    makeSignedLesson(db, { lessonId: "lsn_gap" });
-    updateLessonStatus(db, "lsn_unsigned", "STALE", ws);
-    updateLessonStatus(db, "lsn_unsigned", "ACTIVE"); // no workspace: column only
-    updateLessonStatus(db, "lsn_forged", "REVOKED", ws);
-    db.prepare("UPDATE correction_lesson_status_log SET status = 'ACTIVE' WHERE lesson_id = ?").run("lsn_forged");
-    db.prepare("UPDATE correction_lessons SET status = 'ACTIVE' WHERE lesson_id = ?").run("lsn_forged");
-    updateLessonStatus(db, "lsn_gap", "REVOKED", ws);
-    updateLessonStatus(db, "lsn_gap", "ACTIVE", ws);
-    db.prepare("DELETE FROM correction_lesson_status_log WHERE lesson_id = ? AND status = 'REVOKED'").run("lsn_gap");
+    makeSignedLesson(db, { lessonId: "lsn_a" });
+    makeSignedLesson(db, { lessonId: "lsn_b" });
+    makeSignedLesson(db, { lessonId: "lsn_untouched" });
+    updateLessonStatus(db, "lsn_a", "STALE", ws);
+    updateLessonStatus(db, "lsn_b", "REVOKED", ws);
+    updateLessonStatus(db, "lsn_a", "ACTIVE", ws);
+    expect(buildLessonAdvisories(db, "agent-1", undefined, ws).map((a) => a.advisoryId).sort()).toEqual(["lsn_a", "lsn_untouched"]);
+    db.prepare("UPDATE correction_lesson_status_log SET status = 'ACTIVE' WHERE lesson_id = ?").run("lsn_b");
+    db.prepare("UPDATE correction_lessons SET status = 'ACTIVE' WHERE lesson_id = ?").run("lsn_b");
     expect(buildLessonAdvisories(db, "agent-1", undefined, ws)).toEqual([]);
-    expect(Object.fromEntries(verifyAgentLessons(db, "agent-1", ws).problems.map((p) => [p.lessonId, p.reason]))).toEqual({
-      lsn_unsigned: "lesson status does not match its signed transitions",
-      lsn_forged: "lesson status transition does not verify",
-      lsn_gap: "lesson status transition does not verify",
-    });
+    expect(new Set(verifyAgentLessons(db, "agent-1", ws).problems.map((p) => p.reason)))
+      .toEqual(new Set(["lesson status log does not verify or does not end at its anchored head"]));
+    db.close();
+  });
+
+  test("deleting the tail REVOKED entry and setting the column ACTIVE is caught by the anchored head", () => {
+    const { db } = freshDb();
+    const ws = lessonWorkspace();
+    makeSignedLesson(db, { lessonId: "lsn_other" });
+    makeSignedLesson(db, { lessonId: "lsn_tail" });
+    updateLessonStatus(db, "lsn_tail", "REVOKED", ws);
+    db.prepare("DELETE FROM correction_lesson_status_log WHERE lesson_id = ?").run("lsn_tail");
+    db.prepare("UPDATE correction_lessons SET status = 'ACTIVE' WHERE lesson_id = ?").run("lsn_tail");
+    expect(buildLessonAdvisories(db, "agent-1", undefined, ws)).toEqual([]);
+    db.close();
+  });
+
+  test("a status change whose transition cannot be signed leaves the column unchanged and throws", () => {
+    const { db, dir } = freshDb(); // dir is not an initialised workspace: there is no signing key
+    makeSignedLesson(db, { lessonId: "lsn_nosign" });
+    expect(() => updateLessonStatus(db, "lsn_nosign", "REVOKED", dir)).toThrow();
+    expect(getLessonById(db, "lsn_nosign")!.status).toBe("ACTIVE");
+    expect(db.prepare("SELECT COUNT(*) AS n FROM correction_lesson_status_log").get()).toEqual({ n: 0 });
+    expect(() => updateLessonStatus(db, "lsn_nosign", "REVOKED", "" as string)).toThrow(/requires the workspace/);
     db.close();
   });
 
@@ -678,7 +706,7 @@ describe("expireStaleLessons", () => {
     makeLesson(db, { lessonId: "lsn_stale1", createdTs: pastExpiry - 1000, expiryTs: pastExpiry });
     makeLesson(db, { lessonId: "lsn_active1", expiryTs: Date.now() + 999999 });
 
-    const expired = expireStaleLessons(db, "agent-1");
+    const expired = expireStaleLessons(db, "agent-1", lessonWorkspace());
     expect(expired).toEqual(["lsn_stale1"]);
 
     const staleLesson = getLessonById(db, "lsn_stale1");
@@ -692,7 +720,7 @@ describe("expireStaleLessons", () => {
   test("returns empty array when nothing to expire", () => {
     const { db } = freshDb();
     makeLesson(db, { lessonId: "lsn_fresh1", expiryTs: Date.now() + 999999 });
-    const expired = expireStaleLessons(db, "agent-1");
+    const expired = expireStaleLessons(db, "agent-1", lessonWorkspace());
     expect(expired).toEqual([]);
     db.close();
   });

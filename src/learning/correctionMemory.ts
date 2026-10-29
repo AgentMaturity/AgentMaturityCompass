@@ -21,6 +21,7 @@ import { canonicalize } from "../utils/json.js";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
 import { signHexDigest, getSigningKey, verifyHexDigestAny } from "../crypto/keys.js";
 import { getPurposeKeyHistory } from "../keys/signingKeys.js";
+import { highWaterKey, readHighWater, recordHighWater, workspaceScope } from "../keys/highWater.js";
 import type { DiagnosticReport } from "../types.js";
 import type { CorrectionEvent, CorrectionEffectivenessReport } from "../corrections/correctionTypes.js";
 import {
@@ -281,7 +282,7 @@ export function verifyAgentLessons(db: Database.Database, agentId: string, works
     .all(agentId) as Array<Record<string, unknown>>;
   let keys: string[] = [];
   try { keys = getPurposeKeyHistory(workspace, "ledger-row"); } catch { keys = []; }
-  const statuses = verifiedLessonStatuses(db, agentId, keys);
+  const statuses = verifiedLessonStatuses(db, agentId, workspace, keys);
   const verified: CorrectionLesson[] = [];
   const problems: LessonVerificationProblem[] = [];
   let previous = LESSON_GENESIS_HASH;
@@ -294,7 +295,7 @@ export function verifyAgentLessons(db: Database.Database, agentId: string, works
       if (lesson.prev_lesson_hash !== previous) reason = "lesson hash chain is broken";
       else if (lessonHash(lesson, lesson.prev_lesson_hash) !== stored) reason = "lesson content does not match its hash";
       else if (lesson.signature === "unsigned" || !verifyHexDigestAny(stored, lesson.signature, keys)) reason = "lesson signature does not verify";
-      else if (statuses.broken.has(lessonId)) reason = "lesson status transition does not verify";
+      else if (!statuses.trusted) reason = "lesson status log does not verify or does not end at its anchored head";
       else if (`${stored}:${lesson.status}` !== (statuses.status.get(lessonId) ?? `${stored}:ACTIVE`)) reason = "lesson status does not match its signed transitions";
       else verified.push(lesson);
     } catch {
@@ -319,57 +320,68 @@ function lessonStatusEntryHash(entry: { agentId: string; lessonId: string; lesso
   return sha256Hex(canonicalize({ ...entry, kind: "correction-lesson-status" }));
 }
 
+/** The status log head for one agent, anchored in this machine's high-water file outside the workspace. */
+function lessonStatusAnchorKey(workspace: string, agentId: string): string {
+  return highWaterKey("lesson-status", `${agentId}@${workspaceScope(workspace)}`);
+}
+
 /**
- * Set a lesson's status. With `workspace`, the transition is also appended to the signed, chained status log that
- * verifyAgentLessons reads; a lesson whose status column disagrees with its latest signed transition (creation counts
- * as ACTIVE) is never injected. Without a workspace, or when no signing key is available, only the column changes,
- * which leaves the lesson non-injectable: an unsigned change can retire a lesson but never re-activate one.
+ * Set a lesson's status. The column change, a signed and chained status transition, and the raised log-head anchor
+ * (entry count and head hash, kept outside the workspace) commit together: if signing or anchoring fails the column
+ * change is rolled back and the error is thrown, so no status change is ever left unsigned.
  */
 export function updateLessonStatus(
   db: Database.Database,
   lessonId: string,
   status: LessonStatus,
-  workspace?: string,
+  workspace: string,
 ): void {
-  db.prepare("UPDATE correction_lessons SET status = ? WHERE lesson_id = ?").run(status, lessonId);
-  const lesson = workspace ? getLessonById(db, lessonId) : null;
-  if (!workspace || !lesson) return;
-  const last = db
-    .prepare("SELECT entry_hash FROM correction_lesson_status_log WHERE agent_id = ? ORDER BY seq DESC LIMIT 1")
-    .get(lesson.agentId) as { entry_hash: string } | undefined;
-  const entry = { agentId: lesson.agentId, lessonId, lessonHash: lesson.lesson_hash, status, ts: Date.now(),
-    prev: last?.entry_hash ?? LESSON_STATUS_GENESIS_HASH };
-  const entryHash = lessonStatusEntryHash(entry);
-  let signature: string;
-  try { signature = signHexDigest(entryHash, getSigningKey(workspace, "ledger-row")); }
-  catch { return; } // fail closed: the unsigned column change keeps the lesson out of injection
-  db.prepare(`INSERT INTO correction_lesson_status_log
-    (agent_id, lesson_id, lesson_hash, status, ts, prev_entry_hash, entry_hash, signature) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`)
-    .run(entry.agentId, lessonId, entry.lessonHash, status, entry.ts, entry.prev, entryHash, signature);
+  if (!workspace) throw new Error("updateLessonStatus requires the workspace to sign the status transition");
+  db.transaction(() => {
+    const lesson = getLessonById(db, lessonId);
+    if (!lesson) return;
+    db.prepare("UPDATE correction_lessons SET status = ? WHERE lesson_id = ?").run(status, lessonId);
+    const head = db
+      .prepare("SELECT entry_hash, (SELECT COUNT(*) FROM correction_lesson_status_log WHERE agent_id = ?) AS count FROM correction_lesson_status_log WHERE agent_id = ? ORDER BY seq DESC LIMIT 1")
+      .get(lesson.agentId, lesson.agentId) as { entry_hash: string; count: number } | undefined;
+    const entry = { agentId: lesson.agentId, lessonId, lessonHash: lesson.lesson_hash, status, ts: Date.now(),
+      prev: head?.entry_hash ?? LESSON_STATUS_GENESIS_HASH };
+    const entryHash = lessonStatusEntryHash(entry);
+    const signature = signHexDigest(entryHash, getSigningKey(workspace, "ledger-row"));
+    db.prepare(`INSERT INTO correction_lesson_status_log
+      (agent_id, lesson_id, lesson_hash, status, ts, prev_entry_hash, entry_hash, signature) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`)
+      .run(entry.agentId, lessonId, entry.lessonHash, status, entry.ts, entry.prev, entryHash, signature);
+    if (!recordHighWater(lessonStatusAnchorKey(workspace, lesson.agentId), (head?.count ?? 0) + 1, entryHash)) {
+      throw new Error("the lesson status log head could not be anchored in AMC home; the status change was not made");
+    }
+  })();
 }
 
 /**
- * The latest signed status per lesson, and the lessons with a transition that fails its chain link or signature.
- * ponytail: the log's newest entry has no external anchor, so deleting the tail entry is not detected; anchor the
- * head in the transparency log if that matters.
+ * The latest signed status per lesson, or `trusted: false` when the agent's status log cannot be trusted as a whole:
+ * any entry fails its chain link or signature, or the log does not end exactly at the anchored head (count and hash),
+ * which catches a deleted tail entry.
  */
-function verifiedLessonStatuses(db: Database.Database, agentId: string, keys: string[]): { status: Map<string, string>; broken: Set<string> } {
+function verifiedLessonStatuses(db: Database.Database, agentId: string, workspace: string, keys: string[]): { trusted: boolean; status: Map<string, string> } {
   const rows = db
     .prepare("SELECT * FROM correction_lesson_status_log WHERE agent_id = ? ORDER BY seq ASC")
     .all(agentId) as Array<Record<string, unknown>>;
   const status = new Map<string, string>();
-  const broken = new Set<string>();
   let previous = LESSON_STATUS_GENESIS_HASH;
   for (const row of rows) {
     const entry = { agentId, lessonId: String(row.lesson_id), lessonHash: String(row.lesson_hash), status: String(row.status),
       ts: Number(row.ts), prev: String(row.prev_entry_hash) };
     const stored = String(row.entry_hash);
-    const valid = entry.prev === previous && lessonStatusEntryHash(entry) === stored && verifyHexDigestAny(stored, String(row.signature), keys);
-    if (valid) status.set(entry.lessonId, `${entry.lessonHash}:${entry.status}`);
-    else broken.add(entry.lessonId);
+    if (entry.prev !== previous || lessonStatusEntryHash(entry) !== stored || !verifyHexDigestAny(stored, String(row.signature), keys)) {
+      return { trusted: false, status };
+    }
+    status.set(entry.lessonId, `${entry.lessonHash}:${entry.status}`);
     previous = stored;
   }
-  return { status, broken };
+  let anchor: { sequence: number; sha256: string } | null;
+  try { anchor = readHighWater(lessonStatusAnchorKey(workspace, agentId)); } catch { return { trusted: false, status }; }
+  const endsAtAnchor = anchor === null ? rows.length === 0 : anchor.sequence === rows.length && anchor.sha256 === previous;
+  return { trusted: endsAtAnchor, status };
 }
 
 export function updateLessonInjection(
@@ -584,7 +596,7 @@ export function buildLessonAdvisories(
 /**
  * Auto-expire lessons past their TTL.
  */
-export function expireStaleLessons(db: Database.Database, agentId: string, workspace?: string): string[] {
+export function expireStaleLessons(db: Database.Database, agentId: string, workspace: string): string[] {
   const now = Date.now();
   const active = getActiveLessons(db, agentId);
   const expired: string[] = [];
