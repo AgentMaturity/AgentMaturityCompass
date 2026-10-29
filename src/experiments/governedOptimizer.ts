@@ -96,6 +96,8 @@ export interface GovernedOptimizerRun {
   createdAt: string;
   candidateCount: number;
   acceptedCandidateId: string | null;
+  /** "baseline": no candidate is selected and the unchanged baseline stays in place. */
+  selection: "candidate" | "baseline";
   candidates: GovernedOptimizerCandidate[];
   receipts: OptimizerCandidateReceipt[];
   validationReceipt: OptimizerValidationReceipt;
@@ -269,6 +271,8 @@ function dominates(a: GovernedOptimizerCandidate, b: GovernedOptimizerCandidate)
   return betterOrEqual && strictlyBetter;
 }
 
+const canonicalMetrics = (candidate: GovernedOptimizerCandidate): string => JSON.stringify(candidate.metrics);
+
 function rankCandidates(candidates: GovernedOptimizerCandidate[]): GovernedOptimizerCandidate[] {
   const valid = candidates.filter(checksPassed);
   const ranked = [...valid].sort((a, b) => {
@@ -291,7 +295,15 @@ function rankCandidates(candidates: GovernedOptimizerCandidate[]): GovernedOptim
       !valid.some((other) => other.candidateId !== candidate.candidateId && dominates(other, candidate))
     ])
   );
-  const winner = ranked.find((candidate) => paretoById.get(candidate.candidateId)) ?? null;
+  // The unchanged baseline (gain 0) is always eligible: a candidate wins only with a positive gain and a unique top
+  // position. A tie or no gain abstains instead of forcing a winner. Gains are estimates; promotion still needs a
+  // measured experiment gate.
+  const top = ranked.find((candidate) => paretoById.get(candidate.candidateId)) ?? null;
+  const tied = top !== null && ranked.some((other) => other.candidateId !== top.candidateId && canonicalMetrics(other) === canonicalMetrics(top));
+  const winner = top !== null && top.metrics.scoreGain > 0 && !tied ? top : null;
+  const abstainReason = top === null ? null
+    : tied ? "Baseline retained: the top candidates tie, so no candidate is selected."
+    : top.metrics.scoreGain > 0 ? null : "Baseline retained: no candidate shows a positive estimated gain over the unchanged baseline.";
   return candidates.map((candidate) => {
     const paretoFront = paretoById.get(candidate.candidateId) ?? false;
     const rank = rankById.get(candidate.candidateId) ?? null;
@@ -311,7 +323,7 @@ function rankCandidates(candidates: GovernedOptimizerCandidate[]): GovernedOptim
         paretoFront,
         rank,
         decision: "accepted" as const,
-        decisionReason: "Accepted as the top Pareto candidate after held-out validation and leakage checks."
+        decisionReason: "Accepted as the top Pareto candidate with a positive estimated gain over the baseline after held-out validation and leakage checks."
       };
     }
     return {
@@ -319,7 +331,7 @@ function rankCandidates(candidates: GovernedOptimizerCandidate[]): GovernedOptim
       paretoFront,
       rank,
       decision: "rejected" as const,
-      decisionReason: paretoFront
+      decisionReason: abstainReason !== null && paretoFront ? abstainReason : paretoFront
         ? "Candidate is on the Pareto frontier but ranked behind the accepted candidate."
         : "Candidate is dominated on score, risk, cost, latency, confidence, or regression impact."
     };
@@ -353,6 +365,7 @@ function buildValidationReceipt(input: {
   createdAt: string;
 }): OptimizerValidationReceipt {
   const accepted = input.candidates.filter((candidate) => candidate.decision === "accepted");
+  const validated = input.candidates.filter(checksPassed);
   const gates = [
     {
       id: "candidate-workspaces-created",
@@ -365,9 +378,12 @@ function buildValidationReceipt(input: {
       reason: "Optimizer records candidates and receipts without mutating live Enforce resources."
     },
     {
-      id: "accepted-candidate-present",
-      status: accepted.length > 0 ? "passed" as const : "blocked" as const,
-      reason: accepted.length > 0 ? "At least one candidate passed validation and Pareto ranking." : "No candidate passed validation and Pareto ranking."
+      // Keeping the baseline is a decided outcome; only a run where no candidate could be validated is blocked.
+      id: "selection-decided",
+      status: accepted.length > 0 || validated.length > 0 ? "passed" as const : "blocked" as const,
+      reason: accepted.length > 0 ? "A candidate improved on the retained baseline and passed validation and Pareto ranking."
+        : validated.length > 0 ? "Baseline retained: no validated candidate improved on it."
+        : "No candidate passed validation and Pareto ranking."
     },
     {
       id: "candidate-receipts-created",
@@ -461,6 +477,7 @@ export function writeGovernedOptimizerRun(input: {
     createdAt,
     candidateCount: ranked.length,
     acceptedCandidateId: ranked.find((candidate) => candidate.decision === "accepted")?.candidateId ?? null,
+    selection: ranked.some((candidate) => candidate.decision === "accepted") ? "candidate" : "baseline",
     candidates: ranked,
     receipts,
     validationReceipt: buildValidationReceipt({ optimizerRunId, candidates: ranked, receipts, createdAt }),

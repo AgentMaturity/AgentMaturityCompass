@@ -702,7 +702,7 @@ export {
   gateExperiment,
   listExperiments
 } from "./experiments/experimentRunner.js";
-export { bootstrapDifferenceCI, effectSizeDifference, deterministicSeed } from "./experiments/stats.js";
+export { bootstrapDifferenceCI, effectSizeDifference, meanDifference, pairedBootstrapCI, pairedStandardizedEffect, deterministicSeed } from "./experiments/stats.js";
 export {
   initComplianceMaps, initComplianceMapsAsync, ComplianceMapsPublicationError,
   loadComplianceMaps,

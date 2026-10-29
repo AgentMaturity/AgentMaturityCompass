@@ -1,4 +1,3 @@
-import { captureRunHashAuthority } from "../ledger/runHashSignature.js";
 import { randomUUID } from "node:crypto";
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
@@ -13,7 +12,9 @@ import { appendTransparencyEntry, appendTransparencyEntryAsync } from "../transp
 import { TransparencyMerkleLagError } from "../transparency/merkleIndexState.js";
 import { dispatchIntegrationEvent } from "../integrations/integrationDispatcher.js";
 import { runCasebook, assertCasebookRunCurrent } from "../casebooks/casebookRunner.js";
-import { loadCasebook } from "../casebooks/casebookStore.js";
+import { casebookContentSha256, loadCasebook } from "../casebooks/casebookStore.js";
+import { captureRunHashAuthority, runHashVerificationKeys } from "../ledger/runHashSignature.js";
+import { parseWindowToMs } from "../utils/time.js";
 import { openLedger, type Ledger } from "../ledger/ledger.js";
 import { describePolicySigner, assertPolicySignerCurrent } from "../crypto/signing/signer.js";
 import { loadTrustConfig } from "../trust/trustConfig.js";
@@ -22,7 +23,8 @@ import { signWithPurposeKey } from "../keys/purposeProviders.js";
 import { capturePurposePublication, assertPurposePublicationCurrent } from "../keys/purposePublication.js";
 import { withControlFileLock } from "../lifecycle/controlFileLock.js";
 import { experimentGateSchema, experimentSchema, type ExperimentFile, type ExperimentGatePolicy } from "./experimentSchema.js";
-import { bootstrapDifferenceCI, deterministicSeed, effectSizeDifference } from "./stats.js";
+import { deterministicSeed, meanDifference, pairedBootstrapCI, pairedStandardizedEffect } from "./stats.js";
+import { evaluateExperimentGate, type ExperimentGateStatus } from "./experimentGatePolicy.js";
 
 interface SignedDigest {
   digestSha256: string;
@@ -111,33 +113,38 @@ function latestRun(workspace: string, agentId: string, experimentId: string): Ex
   return JSON.parse(readUtf8(files[files.length - 1]!)) as ExperimentReport;
 }
 
+const fixed = (value: number | null | undefined, digits: number): string =>
+  typeof value === "number" && Number.isFinite(value) ? value.toFixed(digits) : "unavailable";
+
 function toMarkdown(report: ExperimentReport): string {
   const rows = report.cases
     .map(
       (row) =>
-        `- ${row.caseId}: baselineSuccess=${row.baselineSuccess} candidateSuccess=${row.candidateSuccess} baselineValue=${row.baselineValuePoints.toFixed(
-          2
-        )} candidateValue=${row.candidateValuePoints.toFixed(2)} baselineCost=${row.baselineCost.toFixed(4)} candidateCost=${row.candidateCost.toFixed(
-          4
-        )}`
+        `- ${row.caseId}: baseline=${row.baselineStatus ?? String(row.baselineSuccess)} candidate=${row.candidateStatus ?? String(row.candidateSuccess)} ` +
+        `paired=${row.paired ?? "legacy"} baselineValue=${fixed(row.baselineValuePoints, 2)} candidateValue=${fixed(row.candidateValuePoints, 2)} ` +
+        `baselineTokens=${fixed(row.baselineCost, 4)} candidateTokens=${fixed(row.candidateCost, 4)}`
     )
     .join("\n");
+  const counts = report.counts;
   return [
     `# Experiment ${report.experimentId}`,
     "",
     `- Agent: ${report.agentId}`,
     `- Mode: ${report.mode}`,
     `- Casebook: ${report.casebookId}`,
+    `- Schema: ${report.schemaVersion === 2 ? `v2 (${report.methodVersion ?? "unknown method"})` : "legacy (not promotion-eligible)"}`,
+    ...(counts ? [`- Cases: ${counts.cases} (paired ${counts.pairedCases}, excluded ${counts.excludedCases})`] : []),
     `- Baseline success rate: ${report.baselineSuccessRate.toFixed(4)}`,
     `- Candidate success rate: ${report.candidateSuccessRate.toFixed(4)}`,
     `- Uplift success rate: ${report.upliftSuccessRate.toFixed(4)}`,
     `- Baseline value avg: ${report.baselineValuePointsAvg.toFixed(4)}`,
     `- Candidate value avg: ${report.candidateValuePointsAvg.toFixed(4)}`,
     `- Uplift value points: ${report.upliftValuePoints.toFixed(4)}`,
-    `- Baseline cost/success: ${report.baselineCostPerSuccess.toFixed(6)}`,
-    `- Candidate cost/success: ${report.candidateCostPerSuccess.toFixed(6)}`,
-    `- 95% CI: [${report.confidenceInterval95[0].toFixed(6)}, ${report.confidenceInterval95[1].toFixed(6)}]`,
-    `- Effect size: ${report.effectSize.toFixed(6)}`,
+    `- Baseline tokens/success: ${fixed(report.baselineCostPerSuccess, 6)}`,
+    `- Candidate tokens/success: ${fixed(report.candidateCostPerSuccess, 6)}`,
+    `- 95% CI (paired value-point difference): ${report.confidenceInterval95 ? `[${report.confidenceInterval95[0].toFixed(6)}, ${report.confidenceInterval95[1].toFixed(6)}]` : "unavailable (insufficient sample)"}`,
+    ...(report.meanDifference !== undefined ? [`- Mean difference: ${report.meanDifference.toFixed(6)}`] : []),
+    `- ${report.schemaVersion === 2 ? "Standardized paired effect (d_z)" : "Effect size (legacy: raw mean difference)"}: ${fixed(report.effectSize, 6)}`,
     "",
     "## Cases",
     rows,
@@ -241,6 +248,40 @@ export function setExperimentCandidate(params: {
  * @throws when no candidate evidence window is supplied, because AMC cannot
  * execute a candidate configuration itself.
  */
+export const EXPERIMENT_METHOD_VERSION = "casebook-paired/2";
+
+type CasebookSide = ReturnType<typeof runCasebook>;
+const executionOf = (row: CasebookSide["results"][number]) =>
+  row.execution ? { trialId: row.execution.trialId, configDigest: row.execution.configDigest, caseSha256: row.execution.caseSha256, eventIds: row.execution.eventIds } : null;
+
+function sideIdentity(run: CasebookSide) {
+  return { agentId: run.agentId, startedTs: run.startedTs, endedTs: run.endedTs,
+    trialId: run.trial?.trialId ?? null, configDigest: run.trial?.configDigest ?? null };
+}
+
+/** Tokens per success over paired cases; null with no success or any paired case lacking measured usage. */
+function costPerSuccess(costs: Array<number | null>, successes: number): number | null {
+  if (successes === 0 || costs.some((cost) => cost === null)) return null;
+  return Number(((costs as number[]).reduce((sum, cost) => sum + cost, 0) / successes).toFixed(6));
+}
+
+/**
+ * Compares a baseline run against a candidate run.
+ *
+ * Both sides must be real: casebook results are computed from evidence in the
+ * ledger, so the candidate configuration has to have actually run and produced
+ * evidence. Previously the candidate was never executed — its outcomes were the
+ * baseline's plus deterministic jitter — so every "candidate improves on
+ * baseline by X%" figure was invented.
+ *
+ * Two evidence designs: bound trials (baselineTrialId/candidateTrialId), where each case counts only rows stamped with
+ * its own case execution identity; or legacy windows, where a same-agent baseline window ends where the candidate
+ * window starts so the two sides never read the same evidence. Rates and statistics use only paired cases (determinate
+ * on both sides); excluded cases are counted, never scored.
+ *
+ * @throws when no candidate evidence window is supplied, because AMC cannot
+ * execute a candidate configuration itself; when the casebook is empty; or when no case is determinate on both sides.
+ */
 function prepareExperimentReport(params: {
   workspace: string;
   agentId?: string;
@@ -253,21 +294,16 @@ function prepareExperimentReport(params: {
   candidateWindow?: string;
   /** Agent id the candidate ran under, when it differs from the baseline. */
   candidateAgentId?: string;
+  /** Bound trials: the trial identities stamped on each side's case execution rows. Both or neither. */
+  baselineTrialId?: string;
+  candidateTrialId?: string;
 }) {
   const agentId = resolveAgentId(params.workspace, params.agentId);
   const experiment = loadExperiment(params.workspace, agentId, params.experimentId);
-  if (!experiment.experiment.candidateConfig || !experiment.experiment.candidateConfig.signatureValid) {
+  const candidateConfig = experiment.experiment.candidateConfig;
+  if (!candidateConfig || !candidateConfig.signatureValid) {
     throw new Error("candidate config is missing or unsigned");
   }
-
-  const baselineRun = runCasebook({
-    workspace: params.workspace,
-    agentId,
-    casebookId: experiment.experiment.casebookId,
-    mode: params.mode,
-    window: "14d"
-  });
-
   if (!params.candidateWindow) {
     throw new Error(
       "Experiment requires a candidate evidence window (--candidate-window). " +
@@ -275,16 +311,34 @@ function prepareExperimentReport(params: {
         "have run and produced evidence; synthesizing its outcomes would fabricate the comparison."
     );
   }
+  if (loadCasebook(params.workspace, experiment.experiment.casebookId, agentId).casebook.caseIds.length === 0) {
+    throw new Error("experiment casebook has no cases; an empty task universe is not an experiment");
+  }
+  const bound = params.baselineTrialId !== undefined || params.candidateTrialId !== undefined;
+  let trials: { baseline: { trialId: string; configDigest: string }; candidate: { trialId: string; configDigest: string } } | null = null;
+  if (bound) {
+    const baselinePath = experiment.experiment.baselineConfig.kind === "file" ? experiment.experiment.baselineConfig.path : null;
+    if (!params.baselineTrialId || !params.candidateTrialId) throw new Error("bound experiment requires both baselineTrialId and candidateTrialId");
+    if (params.baselineTrialId === params.candidateTrialId) throw new Error("baseline and candidate trials must be distinct");
+    if (!baselinePath) throw new Error("bound experiment requires a pinned baseline configuration file");
+    if (!candidateConfig.digestSha256) throw new Error("bound experiment requires a candidate configuration digest");
+    trials = {
+      baseline: { trialId: params.baselineTrialId, configDigest: sha256Hex(readFileSync(baselinePath)) },
+      candidate: { trialId: params.candidateTrialId, configDigest: candidateConfig.digestSha256 }
+    };
+  }
+  const candidateAgentId = resolveAgentId(params.workspace, params.candidateAgentId ?? agentId);
+  const now = Date.now();
+  const candidateRange = { startedTs: now - parseWindowToMs(params.candidateWindow), endedTs: now };
+  // A legacy same-agent baseline must not read the candidate's evidence: it ends where the candidate window starts.
+  const baselineEnd = !trials && candidateAgentId === agentId ? candidateRange.startedTs - 1 : now;
+  const baselineRange = { startedTs: baselineEnd - parseWindowToMs("14d"), endedTs: baselineEnd };
 
-  // The candidate side is a second real casebook run over the candidate's own
-  // evidence window.
-  const candidateRun = runCasebook({
-    workspace: params.workspace,
-    agentId: params.candidateAgentId ?? agentId,
-    casebookId: experiment.experiment.casebookId,
-    mode: params.mode,
-    window: params.candidateWindow
-  });
+  const baselineRun = runCasebook({ workspace: params.workspace, agentId, casebookId: experiment.experiment.casebookId,
+    mode: params.mode, range: baselineRange, trial: trials?.baseline });
+  // The candidate side is a second real casebook run over the candidate's own evidence.
+  const candidateRun = runCasebook({ workspace: params.workspace, agentId: candidateAgentId, casebookId: experiment.experiment.casebookId,
+    mode: params.mode, range: candidateRange, trial: trials?.candidate });
   const candidateById = new Map(candidateRun.results.map((row) => [row.caseId, row]));
 
   const cases = baselineRun.results.map((row) => {
@@ -295,83 +349,80 @@ function prepareExperimentReport(params: {
           "Both sides of an experiment must cover the same cases."
       );
     }
-    const candidateSuccess = candidate.success;
-    const baselineValuePoints = row.valuePoints;
-    const candidateValuePoints = Number(candidate.valuePoints.toFixed(4));
-    const baselineCost = row.costTokens;
-    const candidateCost = Number(candidate.costTokens.toFixed(6));
+    if (trials && row.execution?.caseSha256 !== candidate.execution?.caseSha256) {
+      throw new Error(`Case '${row.caseId}' differs between the baseline and candidate casebooks.`);
+    }
     return {
       caseId: row.caseId,
       title: row.title,
       baselineSuccess: row.success,
-      candidateSuccess,
-      baselineValuePoints,
-      candidateValuePoints,
-      baselineCost,
-      candidateCost,
-      reasons: row.reasons
+      candidateSuccess: candidate.success,
+      baselineValuePoints: row.valuePoints,
+      candidateValuePoints: Number(candidate.valuePoints.toFixed(4)),
+      baselineCost: row.costTokens,
+      candidateCost: candidate.costTokens === null ? null : Number(candidate.costTokens.toFixed(6)),
+      reasons: row.reasons,
+      baselineStatus: row.status,
+      candidateStatus: candidate.status,
+      candidateReasons: candidate.reasons,
+      paired: row.status !== "unavailable" && candidate.status !== "unavailable",
+      baselineExecution: executionOf(row),
+      candidateExecution: executionOf(candidate)
     };
   });
+  const paired = cases.filter((row) => row.paired);
+  if (paired.length === 0) {
+    throw new Error("No case has determinate evidence on both sides; the experiment cannot compare missing evidence.");
+  }
 
-  const baselineSuccessRate =
-    cases.length > 0 ? cases.filter((row) => row.baselineSuccess).length / cases.length : 0;
-  const candidateSuccessRate =
-    cases.length > 0 ? cases.filter((row) => row.candidateSuccess).length / cases.length : 0;
-  const upliftSuccessRate = candidateSuccessRate - baselineSuccessRate;
-
-  const baselineValues = cases.map((row) => row.baselineValuePoints);
-  const candidateValues = cases.map((row) => row.candidateValuePoints);
-  const baselineValuePointsAvg =
-    baselineValues.length > 0
-      ? baselineValues.reduce((sum, value) => sum + value, 0) / baselineValues.length
-      : 0;
-  const candidateValuePointsAvg =
-    candidateValues.length > 0
-      ? candidateValues.reduce((sum, value) => sum + value, 0) / candidateValues.length
-      : 0;
-  const upliftValuePoints = candidateValuePointsAvg - baselineValuePointsAvg;
-
-  const baselineCostSum = cases.reduce((sum, row) => sum + row.baselineCost, 0);
-  const candidateCostSum = cases.reduce((sum, row) => sum + row.candidateCost, 0);
-  const baselineSuccessCount = Math.max(1, cases.filter((row) => row.baselineSuccess).length);
-  const candidateSuccessCount = Math.max(1, cases.filter((row) => row.candidateSuccess).length);
-  const baselineCostPerSuccess = baselineCostSum / baselineSuccessCount;
-  const candidateCostPerSuccess = candidateCostSum / candidateSuccessCount;
+  const rate = (count: number) => count / paired.length;
+  const baselineSuccesses = paired.filter((row) => row.baselineSuccess).length;
+  const candidateSuccesses = paired.filter((row) => row.candidateSuccess).length;
+  const baselineSuccessRate = rate(baselineSuccesses);
+  const candidateSuccessRate = rate(candidateSuccesses);
+  const baselineValues = paired.map((row) => row.baselineValuePoints);
+  const candidateValues = paired.map((row) => row.candidateValuePoints);
+  const baselineValuePointsAvg = baselineValues.reduce((sum, value) => sum + value, 0) / paired.length;
+  const candidateValuePointsAvg = candidateValues.reduce((sum, value) => sum + value, 0) / paired.length;
+  const pairs = paired.map((row) => [row.baselineValuePoints, row.candidateValuePoints] as const);
 
   // Bootstrap resampling is seeded deterministically so the CI is reproducible
   // for a given experiment; the underlying values are real measurements.
-  const bootstrapSeed = deterministicSeed([
-    experiment.experiment.experimentId,
-    experiment.experiment.candidateConfig.digestSha256 ?? "candidate"
-  ]);
-  const confidenceInterval95 = bootstrapDifferenceCI({
-    baseline: baselineValues,
-    candidate: candidateValues,
-    seed: bootstrapSeed
-  });
-  const effectSize = effectSizeDifference(baselineValues, candidateValues);
+  const bootstrapSeed = deterministicSeed([experiment.experiment.experimentId, candidateConfig.digestSha256 ?? "candidate"]);
+  const interval = pairedBootstrapCI({ pairs, seed: bootstrapSeed });
 
   const runId = `exp_run_${Date.now()}_${randomUUID().slice(0, 8)}`;
   const base = {
+    schemaVersion: 2 as const,
+    methodVersion: EXPERIMENT_METHOD_VERSION,
+    casebookSha256: casebookContentSha256(params.workspace, experiment.experiment.casebookId, agentId),
+    candidateConfigDigest: candidateConfig.digestSha256 ?? null,
+    baseline: sideIdentity(baselineRun),
+    candidate: sideIdentity(candidateRun),
+    pairing: "paired-cases" as const,
+    counts: { cases: cases.length, pairedCases: paired.length, excludedCases: cases.length - paired.length, baselineSuccesses, candidateSuccesses },
+    costUnit: "tokens" as const,
     experimentId: experiment.experiment.experimentId,
     agentId,
     ts: Date.now(),
     mode: params.mode,
     casebookId: experiment.experiment.casebookId,
     baselineConfigId: experiment.experiment.baselineConfig.id,
-    candidateConfigId: experiment.experiment.candidateConfig.id,
+    candidateConfigId: candidateConfig.id,
     runId,
     cases,
     baselineSuccessRate: Number(baselineSuccessRate.toFixed(6)),
     candidateSuccessRate: Number(candidateSuccessRate.toFixed(6)),
-    upliftSuccessRate: Number(upliftSuccessRate.toFixed(6)),
+    upliftSuccessRate: Number((candidateSuccessRate - baselineSuccessRate).toFixed(6)),
     baselineValuePointsAvg: Number(baselineValuePointsAvg.toFixed(6)),
     candidateValuePointsAvg: Number(candidateValuePointsAvg.toFixed(6)),
-    upliftValuePoints: Number(upliftValuePoints.toFixed(6)),
-    baselineCostPerSuccess: Number(baselineCostPerSuccess.toFixed(6)),
-    candidateCostPerSuccess: Number(candidateCostPerSuccess.toFixed(6)),
-    confidenceInterval95,
-    effectSize: Number(effectSize.toFixed(6))
+    upliftValuePoints: Number((candidateValuePointsAvg - baselineValuePointsAvg).toFixed(6)),
+    baselineCostPerSuccess: costPerSuccess(paired.map((row) => row.baselineCost), baselineSuccesses),
+    candidateCostPerSuccess: costPerSuccess(paired.map((row) => row.candidateCost), candidateSuccesses),
+    confidenceInterval95: interval.interval,
+    confidenceStatus: interval.status,
+    meanDifference: meanDifference(baselineValues, candidateValues),
+    effectSize: pairedStandardizedEffect(pairs)
   } satisfies Omit<ExperimentReport, "reportJsonSha256" | "reportSealSig">;
 
   const runsDir = experimentRunsDir(params.workspace, agentId, params.experimentId);
@@ -453,6 +504,9 @@ export function runExperiment(params: {
   candidateWindow?: string;
   /** Agent id the candidate ran under, when it differs from the baseline. */
   candidateAgentId?: string;
+  /** Bound trials (both or neither): see prepareExperimentReport. */
+  baselineTrialId?: string;
+  candidateTrialId?: string;
 }): { report: ExperimentReport; jsonPath: string; mdPath: string } {
   const prepared = prepareExperimentReport(params), { agentId, base, runsDir, jsonPath, mdPath } = prepared;
   const reportJsonSha256 = sha256Hex(canonicalize(base));
@@ -468,7 +522,8 @@ export function runExperiment(params: {
 /** Maintained async producer; raw artifact-seal report, then the actual awaitable workspace transparency append. */
 export async function runExperimentAsync(params: Parameters<typeof runExperiment>[0], options: { beforePublish?: () => void } = {}): Promise<ReturnType<typeof runExperiment>> {
   const input = { workspace: params.workspace, agentId: params.agentId, experimentId: params.experimentId, mode: params.mode,
-    candidateWindow: params.candidateWindow, candidateAgentId: params.candidateAgentId }, beforePublish = options.beforePublish;
+    candidateWindow: params.candidateWindow, candidateAgentId: params.candidateAgentId,
+    baselineTrialId: params.baselineTrialId, candidateTrialId: params.candidateTrialId }, beforePublish = options.beforePublish;
   beforePublish?.();
   // All original authorities precede the first await. Log policy does not choose or replace the raw report purpose.
   const captured = capturePurposePublication(input.workspace, "artifact-seal");
@@ -578,6 +633,47 @@ export function analyzeExperiment(params: {
   };
 }
 
+/**
+ * Read-side admission for promotion: the report must be the bytes its writer sealed, about this experiment and this
+ * casebook as it is now, for the candidate configuration that is admitted now. Problems are reasons; none is skipped.
+ */
+function experimentReportAdmissionProblems(workspace: string, agentId: string, experiment: ExperimentFile, report: ExperimentReport): string[] {
+  const problems: string[] = [];
+  try {
+    const { reportJsonSha256, reportSealSig, ...payload } = report;
+    if (typeof reportJsonSha256 !== "string" || sha256Hex(canonicalize(payload)) !== reportJsonSha256) problems.push("report hash does not match its content");
+    else if (typeof reportSealSig !== "string" || !verifyHexDigestAny(reportJsonSha256, reportSealSig, runHashVerificationKeys(workspace))) {
+      problems.push("report seal does not verify against the artifact-seal key history");
+    }
+  } catch {
+    problems.push("report seal could not be verified");
+  }
+  const config = experiment.experiment;
+  if (report.experimentId !== config.experimentId || report.agentId !== agentId || report.casebookId !== config.casebookId) {
+    problems.push("report does not belong to this experiment, agent and casebook");
+  }
+  try {
+    if (report.casebookSha256 !== undefined && report.casebookSha256 !== casebookContentSha256(workspace, config.casebookId, agentId)) {
+      problems.push("casebook changed since the report was computed");
+    }
+  } catch {
+    problems.push("casebook could not be read");
+  }
+  const candidate = config.candidateConfig;
+  if (!candidate?.path || !candidate.digestSha256) problems.push("experiment has no admitted candidate configuration");
+  else {
+    const current = verifySignedCandidateFile(workspace, candidate.path);
+    if (!current.valid || current.digestSha256 !== candidate.digestSha256) problems.push(`candidate configuration is no longer admitted: ${current.reason ?? "digest changed"}`);
+    if (report.candidateConfigId !== candidate.id) problems.push("report was computed for a different candidate configuration");
+  }
+  return problems;
+}
+
+/**
+ * Promotion decision for the latest run. The unchanged baseline is always eligible: `promote-candidate` only on a
+ * verified report that passes every policy check; `keep-baseline` when the candidate fails policy; `abstain` when the
+ * report cannot be admitted or the evidence cannot decide.
+ */
 export function gateExperiment(params: {
   workspace: string;
   agentId?: string;
@@ -585,47 +681,41 @@ export function gateExperiment(params: {
   policyPath: string;
 }): {
   pass: boolean;
+  status: ExperimentGateStatus;
+  decision: "promote-candidate" | "keep-baseline" | "abstain";
   reasons: string[];
   report: ExperimentReport;
 } {
   const agentId = resolveAgentId(params.workspace, params.agentId);
+  const experiment = loadExperiment(params.workspace, agentId, params.experimentId);
   const report = latestRun(params.workspace, agentId, params.experimentId);
   const policy = experimentGateSchema.parse(JSON.parse(readUtf8(params.policyPath)) as unknown);
-  const reasons: string[] = [];
-
-  if (report.upliftSuccessRate < policy.minUpliftSuccessRate) {
-    reasons.push(`upliftSuccessRate ${report.upliftSuccessRate.toFixed(4)} is below ${policy.minUpliftSuccessRate.toFixed(4)}`);
-  }
-  if (report.upliftValuePoints < policy.minUpliftValuePoints) {
-    reasons.push(`upliftValuePoints ${report.upliftValuePoints.toFixed(4)} is below ${policy.minUpliftValuePoints.toFixed(4)}`);
-  }
-  if (policy.maxCostIncreaseRatio && report.baselineCostPerSuccess > 0) {
-    const ratio = report.candidateCostPerSuccess / report.baselineCostPerSuccess;
-    if (ratio > policy.maxCostIncreaseRatio) {
-      reasons.push(`cost increase ratio ${ratio.toFixed(4)} exceeds ${policy.maxCostIncreaseRatio.toFixed(4)}`);
-    }
-  }
-  if (policy.denyIfRegression && (report.upliftSuccessRate < 0 || report.upliftValuePoints < 0)) {
-    reasons.push("regression detected while denyIfRegression=true");
-  }
-
-  const pass = reasons.length === 0;
+  const admission = experimentReportAdmissionProblems(params.workspace, agentId, experiment, report);
+  const evaluated = evaluateExperimentGate(report, { ...policy, candidateConfigDigest: experiment.experiment.candidateConfig?.digestSha256 ?? undefined });
+  const status: ExperimentGateStatus = admission.length > 0 ? "inconclusive" : evaluated.status;
+  const reasons = [...admission.map((problem) => `report admission: ${problem}`), ...evaluated.reasons];
+  const pass = status === "pass";
+  const decision = pass ? "promote-candidate" : status === "fail" ? "keep-baseline" : "abstain";
   void dispatchIntegrationEvent({
     workspace: params.workspace,
     eventName: pass ? "EXPERIMENT_PASSED" : "EXPERIMENT_FAILED",
     agentId,
     summary: pass
       ? `Experiment ${params.experimentId} passed gate policy`
-      : `Experiment ${params.experimentId} failed gate policy`,
+      : `Experiment ${params.experimentId} did not pass gate policy (${decision})`,
     details: {
       experimentId: params.experimentId,
       runId: report.runId,
+      status,
+      decision,
       reasons
     }
   }).catch(() => undefined);
 
   return {
     pass,
+    status,
+    decision,
     reasons,
     report
   };

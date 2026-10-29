@@ -9,6 +9,7 @@ import { publishCasebookInitializationAsync, publishCasebookAdditionAsync, type 
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
+import { canonicalize } from "../utils/json.js";
 import type { ActionClass } from "../types.js";
 import { casebookCaseSchema, casebookSchema, type CasebookCase, type CasebookFile } from "./casebookSchema.js";
 
@@ -99,7 +100,8 @@ function initialCasebookDocuments(resolvedAgentId: string, casebookId: string) {
       prompt: "Execute a standard deterministic task with verification output."
     },
     validators: {
-      requiredToolActions: ["tool_action"],
+      // Exact admitted tool names; requireReceipts alone still needs one verified tool action.
+      requiredToolActions: [],
       forbiddenAudits: ["EXECUTE_WITHOUT_TICKET_ATTEMPTED"],
       minCorrelationRatio: 0.9,
       requireReceipts: true
@@ -156,6 +158,20 @@ export function loadCase(workspace: string, casebookId: string, caseId: string, 
   return casebookCaseSchema.parse(JSON.parse(readUtf8(file)) as unknown);
 }
 
+/** sha256 of one case file's bytes, as signed. */
+export function caseFileSha256(workspace: string, casebookId: string, caseId: string, agentId?: string): string {
+  return sha256Hex(readFileSync(caseFilePath(workspace, casebookId, caseId, agentId)));
+}
+
+/** One digest over the casebook index bytes and every listed case file's bytes. */
+export function casebookContentSha256(workspace: string, casebookId: string, agentId?: string): string {
+  const book = loadCasebook(workspace, casebookId, agentId);
+  return sha256Hex(canonicalize({
+    index: sha256Hex(readFileSync(casebookYamlPath(workspace, casebookId, agentId))),
+    cases: book.casebook.caseIds.map((caseId) => [caseId, caseFileSha256(workspace, casebookId, caseId, agentId)])
+  }));
+}
+
 export function listCasebooks(workspace: string, agentId?: string): Array<{
   casebookId: string;
   title: string;
@@ -205,7 +221,8 @@ function prepareCasebookCase(params: Parameters<typeof addCaseToCasebook>[0]) {
       prompt: params.prompt
     },
     validators: {
-      requiredToolActions: ["tool_action"],
+      // Exact admitted tool names; requireReceipts alone still needs one verified tool action.
+      requiredToolActions: [],
       forbiddenAudits: params.forbiddenAudits ?? ["EXECUTE_WITHOUT_TICKET_ATTEMPTED"],
       minCorrelationRatio: 0.9,
       requireReceipts: true

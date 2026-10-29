@@ -3421,6 +3421,9 @@ export interface GatePolicy {
     experimentId: string;
     minUpliftSuccessRate: number;
     minUpliftValuePoints: number;
+    denyIfRegression?: boolean;
+    candidateConfigDigest?: string;
+    minPairedCases?: number;
   };
 }
 
@@ -3621,12 +3624,41 @@ export interface CasebookRunCaseResult {
   candidateSuccess: boolean;
   baselineValuePoints: number;
   candidateValuePoints: number;
-  baselineCost: number;
-  candidateCost: number;
+  /** Measured tokens (not currency); null when the case's usage is not attributable or incomplete. */
+  baselineCost: number | null;
+  candidateCost: number | null;
   reasons: string[];
+  /** v2: per-side case status; a case is paired only when both sides are `passed` or `failed`. */
+  baselineStatus?: "passed" | "failed" | "unavailable";
+  candidateStatus?: "passed" | "failed" | "unavailable";
+  candidateReasons?: string[];
+  paired?: boolean;
+  baselineExecution?: { trialId: string; configDigest: string; caseSha256: string; eventIds: string[] } | null;
+  candidateExecution?: { trialId: string; configDigest: string; caseSha256: string; eventIds: string[] } | null;
+}
+
+/** One side of a v2 experiment: whose evidence, which closed range, and which bound trial (null: legacy window). */
+export interface ExperimentSideIdentity {
+  agentId: string;
+  startedTs: number;
+  endedTs: number;
+  trialId: string | null;
+  configDigest: string | null;
 }
 
 export interface ExperimentReport {
+  /** 2 for evidence-bound reports; absent on legacy reports, which stay readable but never promotion-eligible. */
+  schemaVersion?: 2;
+  methodVersion?: string;
+  /** sha256 over the signed casebook index and case files the report was computed from. */
+  casebookSha256?: string;
+  candidateConfigDigest?: string | null;
+  baseline?: ExperimentSideIdentity;
+  candidate?: ExperimentSideIdentity;
+  /** "paired-cases": rates and statistics use only cases determinate on both sides. */
+  pairing?: "paired-cases";
+  counts?: { cases: number; pairedCases: number; excludedCases: number; baselineSuccesses: number; candidateSuccesses: number };
+  costUnit?: "tokens";
   experimentId: string;
   agentId: string;
   ts: number;
@@ -3642,10 +3674,16 @@ export interface ExperimentReport {
   baselineValuePointsAvg: number;
   candidateValuePointsAvg: number;
   upliftValuePoints: number;
-  baselineCostPerSuccess: number;
-  candidateCostPerSuccess: number;
-  confidenceInterval95: [number, number];
-  effectSize: number;
+  /** Tokens per successful case; null when there is no success or cost evidence is incomplete. */
+  baselineCostPerSuccess: number | null;
+  candidateCostPerSuccess: number | null;
+  /** Paired bootstrap interval of the value-point difference; null when the sample is insufficient. */
+  confidenceInterval95: [number, number] | null;
+  confidenceStatus?: "estimated" | "insufficient";
+  /** v2: raw mean difference of value points (candidate - baseline). */
+  meanDifference?: number;
+  /** v2: standardized paired effect (Cohen's d_z), null when undefined. Legacy reports stored the raw difference here. */
+  effectSize: number | null;
   reportJsonSha256: string;
   reportSealSig: string;
 }
