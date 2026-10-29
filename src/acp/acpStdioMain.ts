@@ -268,14 +268,15 @@ export function startAcpStdio(init: AcpStdioInit): AcpStdioHandle {
     initiator: init.initiator ?? cliInitiator(),
     onApprovalRaised: event => { stderr.write(`amc acp: signed approval pending: ${event.approvalRequestId}\n`); } });
   /**
-   * `_amc/session/fork` (P2-13), the CLI's --fork-from: the lease first (P1-79, refused before any row), then the child's
-   * signed open row naming the verified parent's final row, written through the redaction wrapper (P2-02) and handed over
-   * at once, then this runtime takes the child through the same verified resume gates as session/load.
+   * Both fork operations acquire the lease before opening a child. Standard fork
+   * inherits supported verified context; the explicit legacy operation records
+   * lineage only. Release the child, then use the same resume and native
+   * composition gates as session/load.
    */
-  const lineageFork = (params: AcpForkSessionParams): ReturnType<typeof nativeSession> => {
+  const forkNative = (params: AcpForkSessionParams, inheritConversation: boolean): ReturnType<typeof nativeSession> => {
     const lease = sessionLease();
     const identity = sessionOptions({ ...params, sessionId: params.parentSessionId }, lease);
-    const { service } = forkSession({ workspace: params.workspace, parentSessionId: params.parentSessionId, claimant, agentId: params.agentId,
+    const { service } = forkSession({ workspace: params.workspace, parentSessionId: params.parentSessionId, claimant, agentId: params.agentId, inheritConversation,
       harnessVersion: identity.harnessVersion, compositionDigest: identity.compositionDigest, policyDigest: identity.policyDigest });
     const forked = redactingSessionFor(service);
     try { forked.releaseWithoutClosing(); } catch (error) { forked.disposeWithoutClosing(); throw error; }
@@ -289,8 +290,9 @@ export function startAcpStdio(init: AcpStdioInit): AcpStdioHandle {
     promptRoute: registry.pin({ providerId: route.providerId, model: route.models?.[0] ?? "" }),
     orderedImageInput: true,
     audioInput: true,
-    ...(init.forkSessionFactory === undefined ? {} : { forkSessionFactory: params => init.forkSessionFactory!({ ...params, ...sessionLease() }) }),
-    lineageForkFactory: lineageFork,
+    forkSessionFactory: params => init.forkSessionFactory === undefined
+      ? forkNative(params, true) : init.forkSessionFactory({ ...params, ...sessionLease() }),
+    lineageForkFactory: params => forkNative(params, false),
     write: createAcpStdioSink(stdout),
     sessionFactory: params => nativeSession(sessionOptions(params), params.signal, false),
     resumeSessionFactory: params => nativeSession(sessionOptions(params), params.signal, true),

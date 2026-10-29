@@ -200,7 +200,7 @@ describe("AMC-1511 — fork with verified lineage", () => {
     const { service: child, parent } = forkSession({ workspace: dir, parentSessionId: parentId, claimant: B, ...OPEN });
     expect(parent.finalEventHash).toBe(rows[rows.length - 1]!.event_hash);
     const open = child.readEvents().find((r) => r.event_type === "session/open")!;
-    expect(JSON.parse(open.meta_json).parentSession).toEqual({ sessionId: parentId, finalEventHash: parent.finalEventHash, seq: parent.seq });
+    expect(JSON.parse(open.meta_json).parentSession).toEqual({ sessionId: parentId, finalEventHash: parent.finalEventHash, seq: parent.seq, forkTurn: 1 });
     turnWithTool(child, "forked", "call-f"); child.close({ reason: "completed" });
     expect(rowsOf(dir, parentId)).toHaveLength(rows.length);
     expect(verifyLedgerIntegrity(dir).errors).toEqual([]);
