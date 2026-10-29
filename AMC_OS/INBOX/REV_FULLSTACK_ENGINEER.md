@@ -395,3 +395,26 @@ Validation: Node `v22.23.3`; 154 tests passed across 10 affected files, includin
 Required repository verification completed successfully: build, typecheck, test typecheck, lint, counts, documentation drift, citations, architecture boundaries, threat model, API reference, schemas, gates, dead code, duplicates and freeze against `c71c28e2c` all passed. The required `verify-wt.sh` exited 0; its output is preserved in `/Users/sid/AgentMaturityCompass-worktrees/s442cd919/work/codex-runs/wp42-verify.log`. Generated count/document updates are retained. Git metadata writes are refused by the sandbox as expected; no commit, push or merge was performed. Native schedule commands retain their experimental qualification boundary.
 
 Next owner action: review the worktree and evidence, then commit using `/Users/sid/AgentMaturityCompass-worktrees/s442cd919/work/codex-runs/wp42-commit-message.txt`. Claude owns commit, verification and merge. No new command path or freeze exception was introduced.
+
+
+# WP13 part A handoff
+
+Role: REV_FULLSTACK_ENGINEER. Date: 2026-10-30. Integrator: Claude, session 3c2ecdb1.
+
+Scope: deferred metadata discovery and step-owned conditional tool availability. Branch `rtd/gap-wp13a` remains uncommitted at base `5d939a8a3699be08d6e5d6de3a562056a61f88a6`. No merge or push was performed.
+
+`tool_search` is a read-only native capability requiring a signed tool-policy grant. It searches the existing TF-IDF index over the session's current authorized names, descriptions, schemas, and schema digests. Definitions may set `exposure: "deferred"` to omit their initial model schema. Discovery changes neither execution authority nor availability.
+
+Definitions may supply an `available(step)` boolean or asynchronous condition. The registry captures that condition at registration, admits it once for its owning step, and revokes it on completion, error, or cancellation. The existing ToolPipeline rechecks registration generation, step identity, and current restrictions after approval and guard evaluation. The signed journal path refuses revoked work before consuming approval or starting an effect.
+
+Regression coverage includes native signed-policy discovery, hidden and deferred metadata, scope narrowing, asynchronous preparation failure/cancellation, stale registration and step generations, retry schema identity, and real signed approval/journal races. The 100 core cases pass, including all 52 added cases. Final current-source verification passed all checks and freeze against `5d939a8a3`; final fresh-build verification and the test manifests are recorded under `/Users/sid/AgentMaturityCompass-worktrees/s442cd919/work/codex-runs/`.
+
+Sixteen guard mutations were detected and restored, including mutable-definition and callback-receiver bypasses. The WP46 helper-only label was retired because the index now has a production consumer. The new schema pin follows the canonical review process in `tests/nativePinnedToolSchemas.test.ts`; existing pins are unchanged.
+
+Beyond this slice: governed activation and persisted loadouts, fork/resume identity, resource-bearing conditional preparation/disposal, immutable catalog generations, coordinated MCP reload, and Code Mode structured declarations/results. Deferred and hidden exposure are presentation choices, not capability grants.
+
+Sandbox limits: the default home checkpoint path is unwritable, so the offline rerun uses the existing `AMC_CONTROL_CHECKPOINT_DIR` setting with a private external temporary directory. Loopback listeners fail with `listen EPERM`; twelve related files containing socket cases and three cases across two macOS-dependent files remain for Claude to rerun outside this sandbox. Their manifest and the interrupted broad-run log are preserved under `codex-runs/`. No affected MCP or networking source was changed.
+
+Next owner actions: review the diff and test receipts, commit using `../codex-runs/wp13a-commit-message.txt`, and merge through Claude's integration lane. The sandbox cannot write git metadata; verify-wt.sh's attempted staging/amend is expected to fail, while its checks still run. Do not infer runtime/provider or release qualification beyond the recorded local checks.
+
+Final local validation: 1,597 cases passed (1,567 in 88 fully passing files, plus 30 in two partial files). The final verify-wt.sh command against `5d939a8a3` exited 0; all checks including freeze passed. Full per-row status, red/green and mutation evidence, per-file counts, sandbox limitations, and the interrupted empty-manifest discovery deviation are recorded in `../codex-runs/wp13a-report.md` and `wp13a-receipt.json`. No missing or empty test-report entry was counted as coverage.

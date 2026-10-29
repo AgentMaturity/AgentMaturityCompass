@@ -146,68 +146,75 @@ export async function runStep(
   signal.throwIfAborted();
   // P2-12: a writer a newer claim replaced dispatches nothing, checked before the model request and again before tools.
   init.session.assertDispatchFence();
-  const settled = await dispatchStepRequest(
-    {
+  const dispose = await init.tools.prepareStep?.({ turn, step, signal });
+  try {
+    // Conditional admission may await; ownership must still hold before preparing a model request.
+    init.session.assertDispatchFence();
+    const settled = await dispatchStepRequest(
+      {
+        session: init.session,
+        llm: init.llm,
+        route: init.route,
+        systemPromptEventId: init.systemPromptEventId,
+        // Read per STEP, so a registry change between steps reaches the next
+        // request and shows up in the log as a new `request/tools` row — and so a
+        // retry within this step re-sends what this step was offering.
+        tools: init.tools.schemas(),
+        retry: init.retryRuntime,
+        notify: init.notify
+      },
+      turn,
+      step,
+      signal
+    );
+
+    const assembly = settled.assembly;
+    const usage = stepUsage(assembly.usage);
+    const stopReason = assembly.finishReason?.kind ?? "aborted";
+
+    if (assembly.finishReason?.kind === "max_tokens") {
+      // The response was truncated. Every tool call in it was dropped by the
+      // assembler, so there is nothing to dispatch and nothing to answer. The
+      // model is still told, through the signed inbox, which calls never ran, so a
+      // cut-off call is never a silent end of turn (PXA-01). The notice lands on
+      // the next-step lane, so the turn continues (within maxStepsPerTurn) and
+      // the model can reissue complete calls; the turn still ends `max_tokens`.
+      const notice = truncationNotice(assembly);
+      if (notice !== null) init.acceptContext(notice);
+      return { ending: { reason: "max_tokens" }, stopReason, usage };
+    }
+
+    const calls = toolCallsOf(assembly);
+    if (calls.length === 0) {
+      return { ending: { reason: "complete" }, stopReason, usage };
+    }
+
+    init.session.assertDispatchFence();
+    const outcome = await runToolCalls({
       session: init.session,
-      llm: init.llm,
-      route: init.route,
-      systemPromptEventId: init.systemPromptEventId,
-      // Read per STEP, so a registry change between steps reaches the next
-      // request and shows up in the log as a new `request/tools` row — and so a
-      // retry within this step re-sends what this step was offering.
-      tools: init.tools.schemas(),
-      retry: init.retryRuntime,
-      notify: init.notify
-    },
-    turn,
-    step,
-    signal
-  );
+      tools: init.tools,
+      turn,
+      step,
+      signal,
+      maxParallel: init.config.maxParallelToolCalls,
+      abandonGraceMs: init.config.toolAbandonGraceMs,
+      // Native dispatch: a code-mode sub-call (P4.5) is issued from inside a
+      // running program and never decoded from a provider stream, so there is no
+      // parent token to carry here and none is guessed.
+      parentToken: null,
+      acceptContext: init.acceptContext,
+      calls
+    });
 
-  const assembly = settled.assembly;
-  const usage = stepUsage(assembly.usage);
-  const stopReason = assembly.finishReason?.kind ?? "aborted";
-
-  if (assembly.finishReason?.kind === "max_tokens") {
-    // The response was truncated. Every tool call in it was dropped by the
-    // assembler, so there is nothing to dispatch and nothing to answer. The
-    // model is still told, through the signed inbox, which calls never ran, so a
-    // cut-off call is never a silent end of turn (PXA-01). The notice lands on
-    // the next-step lane, so the turn continues (within maxStepsPerTurn) and
-    // the model can reissue complete calls; the turn still ends `max_tokens`.
-    const notice = truncationNotice(assembly);
-    if (notice !== null) init.acceptContext(notice);
-    return { ending: { reason: "max_tokens" }, stopReason, usage };
+    // A cancelled tool run leaves the step's ending to the turn machine: the abort
+    // it observed is the same signal the turn is about to see.
+    if (outcome.aborted) {
+      signal.throwIfAborted();
+    }
+    return { ending: outcome.concluded ? { reason: "complete" } : null, stopReason, usage };
+  } finally {
+    dispose?.();
   }
-
-  const calls = toolCallsOf(assembly);
-  if (calls.length === 0) {
-    return { ending: { reason: "complete" }, stopReason, usage };
-  }
-
-  init.session.assertDispatchFence();
-  const outcome = await runToolCalls({
-    session: init.session,
-    tools: init.tools,
-    turn,
-    step,
-    signal,
-    maxParallel: init.config.maxParallelToolCalls,
-    abandonGraceMs: init.config.toolAbandonGraceMs,
-    // Native dispatch: a code-mode sub-call (P4.5) is issued from inside a
-    // running program and never decoded from a provider stream, so there is no
-    // parent token to carry here and none is guessed.
-    parentToken: null,
-    acceptContext: init.acceptContext,
-    calls
-  });
-
-  // A cancelled tool run leaves the step's ending to the turn machine: the abort
-  // it observed is the same signal the turn is about to see.
-  if (outcome.aborted) {
-    signal.throwIfAborted();
-  }
-  return { ending: outcome.concluded ? { reason: "complete" } : null, stopReason, usage };
 }
 
 /** What the model is told about tool calls a `max_tokens` finish cut off, or null when none was. */

@@ -87,6 +87,8 @@ function parseArguments(rawArguments: string): Record<string, unknown> {
 
 export function pipelineToolSeam(init: PipelineToolSeamInit): AgentToolSeam {
   return {
+    prepareStep: context => init.registry.prepareStep({ ...context, agentId: init.agentId }),
+
     authorizationIntent(request: ToolCallRequest) {
       let args: Record<string, unknown>;
       try {
@@ -102,7 +104,7 @@ export function pipelineToolSeam(init: PipelineToolSeamInit): AgentToolSeam {
     },
 
     schemas(): readonly ToolSchema[] | null {
-      const visible = [...init.registry.visible(init.agentId).values()];
+      const visible = [...init.registry.offered(init.agentId).values()];
       const offered = visible
         // A tool with no published schema cannot be called correctly, so it is
         // omitted rather than advertised uncallably. Registering without one is
