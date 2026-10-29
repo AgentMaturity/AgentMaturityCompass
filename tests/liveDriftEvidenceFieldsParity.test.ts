@@ -10,6 +10,7 @@ import * as refs from "../src/watch/evidenceRefs.js";
 import * as math from "../src/watch/driftMath.js";
 import * as receipts from "../src/watch/liveDriftReceiptValidation.js";
 import { withBlankEvidenceRefs } from "./helpers/liveDriftEvidence.js";
+import { migrateLegacyCoreExpectations } from "./helpers/liveDriftEmptyExpectations.js";
 import type { LiveDriftReceipt, RunLiveScoreBehaviorDriftInput } from "../src/watch/liveDriftTypes.js";
 
 const archive = "unused-code/2026-10-02-native/live-drift-evidence-fields";
@@ -44,7 +45,7 @@ function evaluate(source: string, dependencies: Module, globals: Module = {}): M
   return exports;
 }
 // Compile the FULL complete original module once. Its unchanged dependencies are the real modules.
-const original = evaluate(originalSource, {
+const original = evaluate(migrateLegacyCoreExpectations(originalSource), {
   "../utils/hash.js": hashes, "../utils/json.js": json, "./evidenceRefs.js": refs,
   "./driftMath.js": math, "./liveDriftReceiptValidation.js": receipts,
 });

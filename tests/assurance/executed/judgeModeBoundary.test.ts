@@ -12,13 +12,16 @@ describe("P2-27 actual judge execution mode", () => {
     expect(judge.getResults()).toEqual([]);
   });
 
-  test("the always simulated pairwise path reports simulated even when llm is configured", async () => {
-    const adapter = vi.fn();
+  // GAP-WP11 (H2X-08): llm mode pairwise is a real adapter call, never the length heuristic.
+  test("llm pairwise calls the adapter and reports llm; simulated mode keeps the labelled heuristic", async () => {
+    const adapter = vi.fn(async () => ({ rawScore: 0, reasoning: "A is clearer", pairwise: { winner: "a" as const, scoreA: 4, scoreB: 2 } }));
     const judge = new LLMJudge({ mode: "llm", apiEndpoint: "http://unused.invalid", apiKey: "synthetic-fixture-only", judgeAdapter: adapter });
     const result = await judge.comparePairwise({ output: "First synthetic answer.", alternativeOutput: "Second synthetic answer." });
-    expect(adapter).not.toHaveBeenCalled();
-    expect(result.mode).toBe("simulated");
-    expect(result.reasoning).toMatch(/^Simulated/);
+    expect(adapter).toHaveBeenCalledTimes(1);
+    expect(result).toMatchObject({ mode: "llm", winner: "a", reasoning: "A is clearer" });
+    const simulated = await new LLMJudge({ mode: "simulated" }).comparePairwise({ output: "First synthetic answer.", alternativeOutput: "Second synthetic answer." });
+    expect(simulated.mode).toBe("simulated");
+    expect(simulated.reasoning).toMatch(/^Simulated/);
   });
 
   test("an explicitly simulated evaluation stays labelled simulated", async () => {

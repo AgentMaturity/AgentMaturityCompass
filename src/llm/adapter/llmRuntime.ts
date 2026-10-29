@@ -49,7 +49,7 @@ import type { StreamChunk } from "../streamChunk.js";
 import { prepareRequest } from "../request/prepareRequest.js";
 import type { RequestEncoderRegistry } from "../request/requestEncoder.js";
 import type { ToolSchema } from "../request/requestSpec.js";
-import type { AdapterRegistry, PinnedRoute } from "./adapterRegistry.js";
+import { LlmRouteError, type AdapterRegistry, type PinnedRoute } from "./adapterRegistry.js";
 import { classifyResponseFailure } from "./responseFailure.js";
 import { StreamRecorder } from "./streamRecorder.js";
 import type { SettledStream } from "./streamRecorder.js";
@@ -81,6 +81,11 @@ export interface LlmCallSpec {
   /** Tools to offer, or null. Committed to the log before the header is written. */
   readonly tools: readonly ToolSchema[] | null;
   readonly signal?: AbortSignal;
+  /**
+   * The route an earlier attempt of the same step pinned, reused instead of re-pinned (D11): a registry replaced or
+   * emptied during a retry backoff does not change the adapter a step sends on. Must name this spec's provider and model.
+   */
+  readonly pinned?: PinnedRoute;
 }
 
 /** How the runtime is wired. */
@@ -180,6 +185,11 @@ export class LlmRuntime {
     this.now = init.now ?? Date.now;
   }
 
+  /** Resolve a route without logging or sending anything. */
+  pin(input: { readonly providerId: string; readonly model: string }): PinnedRoute {
+    return this.init.registry.pin(input);
+  }
+
   /** Which providers this runtime can reach right now. */
   providers(): readonly string[] {
     return this.init.registry.list();
@@ -200,7 +210,10 @@ export class LlmRuntime {
    * prepared and abandoned is a fact worth having.
    */
   prepare(spec: LlmCallSpec): PreparedCall {
-    const route = this.init.registry.pin({ providerId: spec.providerId, model: spec.model });
+    if (spec.pinned !== undefined && (spec.pinned.providerId !== spec.providerId || spec.pinned.model !== spec.model)) {
+      throw new LlmRouteError("AMC_LLM_ROUTE_UNKNOWN", `the step pinned ${spec.pinned.providerId}/${spec.pinned.model}, not ${spec.providerId}/${spec.model}`);
+    }
+    const route = spec.pinned ?? this.init.registry.pin({ providerId: spec.providerId, model: spec.model });
     assertRequiredCapabilities(route.capabilities, spec.requiredCapabilities);
     if (spec.requiredProtocol !== undefined && route.capabilities?.protocol !== spec.requiredProtocol) {
       throw new LlmCapabilityError("required-protocol", route.capabilities === null ? "unknown" : "unsupported");

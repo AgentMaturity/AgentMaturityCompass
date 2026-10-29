@@ -137,6 +137,7 @@ export function computeConfidenceQuality(
   const maeCalibration =
     normalized.reduce((sum, row) => sum + Math.abs(row.confidence - row.y) * row.weight, 0) / totalWeight;
 
+  // Unlike the unweighted variance in experiments/stats.ts, calibration weights each observation by its declared reliability.
   const variance =
     normalized.reduce((sum, row) => {
       const diff = row.confidence - weightedMeanConfidence;

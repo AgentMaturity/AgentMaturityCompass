@@ -238,3 +238,14 @@ describe("GAP-3758 Arthur incident-to-regression boundary", () => {
     }
   });
 });
+
+
+it("retains rounded nearest-rank latency in incident regression receipts", () => {
+  const receipt = buildIncidentRegressionReceipt({
+    traces: [trace({ traceId: "stats-1", latencyMs: 1 }), trace({ traceId: "stats-2", latencyMs: 9.12345678 })],
+    generatedTests: [],
+    validationRuns: [],
+    closureEvidenceRefs: [],
+  });
+  expect(receipt.liveTrends.p95LatencyMs).toBe(9.123457);
+});

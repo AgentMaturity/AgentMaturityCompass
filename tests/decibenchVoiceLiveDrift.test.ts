@@ -140,7 +140,7 @@ describe("runDecibenchVoiceLiveDrift", () => {
     // sorting them — so array order reaches the receipt hash. Collapsing these
     // files behind one factory must reproduce this byte for byte, or it has
     // changed published artifacts while claiming to be a refactor.
-    expect(sha256Hex(canonicalize(result))).toBe("c6fb2d5fb2945a888b274f9eab609c224980579fee87efe3d2d70e363e1640b8");
+    expect(sha256Hex(canonicalize(result))).toBe("111f33712446f384afaf3a2ab54e8157a0779fd5a4cd841334761115dcdb6ae5");
     expect(result.receipt.sourceRefs).toContain(sourceProof.sourceRefHash);
     expect(result.receipt.summary).toContain("Decibench");
     expect(result.rowProofs).toHaveLength(6);

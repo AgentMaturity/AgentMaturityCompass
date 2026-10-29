@@ -1,3 +1,4 @@
+import { mean as arithmeticMean, standardDeviation } from "../experiments/stats.js";
 import type { TrustTier } from "../types.js";
 import { classifyTrustTierRank } from "./otelExporter.js";
 
@@ -87,15 +88,12 @@ function sortByTs<T extends { ts: number }>(points: T[]): T[] {
 }
 
 function mean(values: number[]): number {
-  if (values.length === 0) return 0;
-  return values.reduce((sum, value) => sum + value, 0) / values.length;
+  return arithmeticMean(values);
 }
 
+// Anomaly z-scores use population SD (divide by n), not experiments/stats.ts sample-SD default.
 function stddev(values: number[]): number {
-  if (values.length < 2) return 0;
-  const center = mean(values);
-  const variance = mean(values.map((value) => (value - center) ** 2));
-  return Math.sqrt(variance);
+  return values.length < 2 ? 0 : standardDeviation(values, false);
 }
 
 function severityRank(severity: ObservabilityAnomalySeverity): number {

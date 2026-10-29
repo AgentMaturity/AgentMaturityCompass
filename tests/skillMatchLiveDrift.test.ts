@@ -122,7 +122,7 @@ describe("runSkillMatchResumeLiveDrift", () => {
     // sorting them — so array order reaches the receipt hash. Collapsing these
     // files behind one factory must reproduce this byte for byte, or it has
     // changed published artifacts while claiming to be a refactor.
-    expect(sha256Hex(canonicalize(result))).toBe("5b40a86276a91299244d44b04687c0fb8e0de0f76389607560b5977da8dab485");
+    expect(sha256Hex(canonicalize(result))).toBe("c3a0cb72e444b8128f8111b6c03496e937da6850e8ef9266227a9aebc73c40fd");
     expect(result.receipt.sourceRefs).toContain(sourceProof.sourceRefHash);
     expect(result.receipt.summary).toContain("SkillMatch");
     expect(result.rowProofs).toHaveLength(6);

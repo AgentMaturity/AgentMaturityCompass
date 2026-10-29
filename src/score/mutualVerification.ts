@@ -12,6 +12,7 @@
  */
 
 import { createHash, createHmac, randomBytes } from "node:crypto";
+import type { EvidenceOutcome } from "../types.js";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -54,8 +55,9 @@ export interface MutualTrustResult {
 }
 
 export interface MutualVerificationReport {
-  score: number;
-  level: number;
+  outcome: EvidenceOutcome;
+  score: number | null;
+  level: number | null;
   hasChallengeResponse: boolean;
   hasNonceVerification: boolean;
   hasProtocolVersionCheck: boolean;
@@ -64,7 +66,7 @@ export interface MutualVerificationReport {
   hasBidirectionalAttestation: boolean;
   hasWeakestLinkEnforcement: boolean;
   verificationsCompleted: number;
-  avgMutualTrust: number;
+  avgMutualTrust: number | null;
 }
 
 // ── Constants ────────────────────────────────────────────────────────────────
@@ -228,7 +230,7 @@ export function scoreMutualVerification(input: {
 
   const avgMutualTrust = verified.length > 0
     ? verified.reduce((sum, v) => sum + v.effectiveMutualTrust, 0) / verified.length
-    : 0;
+    : null;
 
   let score = 0;
   if (hasChallengeResponse) score += 15;
@@ -239,11 +241,13 @@ export function scoreMutualVerification(input: {
   if (hasBidirectionalAttestation) score += 15;
   if (hasWeakestLinkEnforcement) score += 15;
 
+  const hasEvidence = vers.length > 0;
   const level = score >= 85 ? 5 : score >= 65 ? 4 : score >= 45 ? 3 : score >= 25 ? 2 : score > 0 ? 1 : 0;
 
   return {
-    score,
-    level,
+    outcome: hasEvidence ? "measured" : "not_evaluated",
+    score: hasEvidence ? score : null,
+    level: hasEvidence ? level : null,
     hasChallengeResponse,
     hasNonceVerification,
     hasProtocolVersionCheck,

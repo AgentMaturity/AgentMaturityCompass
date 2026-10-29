@@ -1,7 +1,9 @@
 import { randomUUID } from "node:crypto";
 import { resolve } from "node:path";
 import { withWorkspaceScope } from "../enforce/evidenceEmitter.js";
-import { AgentDriver } from "./agentDriver.js";
+import type { AgentDriver } from "./agentDriver.js";
+import { composeNativeAgent, settleFailedComposition, type NativeAgent } from "./nativeAgentComposition.js";
+import { agentPromptProfile } from "../prompt/agentPromptProfile.js";
 import type { NativeImageInput } from "../attachments/nativeImageInput.js";
 import type { NativeInputPart } from "../attachments/nativeOrderedInput.js";
 import type { NativeAudioPart } from "../attachments/nativeAudioInput.js";
@@ -50,10 +52,11 @@ import { admitSessionAtOpen } from "../runtime/changeEnvelope.js";
  * be handed the other's work. The slot is claimed synchronously, before the
  * first await, so two callers racing cannot both find it free.
  *
- * MODELLED ON `createDriverRunner` (./subagentRunner.ts), which already does all
- * of this for delegated children. The shape here is the same minus the delegation
- * accounting: same composition, same fresh-text cursor, same refusal to hand back
- * unsigned output.
+ * COMPOSED THROUGH `composeNativeAgent` (./nativeAgentComposition.ts), like
+ * `createDriverRunner`'s delegated children, with the same prompt profile and
+ * context pre-step as `amc agent-loop` (GAP-WP39). The shape here is the runner's
+ * minus the delegation accounting: same fresh-text cursor, same refusal to hand
+ * back unsigned output.
  */
 
 export interface AgentSessionInit {
@@ -63,7 +66,13 @@ export interface AgentSessionInit {
   readonly agentId: string;
   readonly makeLlm: (session: SessionService) => LoopLlm;
   readonly route: LoopRoute;
+  /** The deployment's persona; assembled with the harness identity, governance section and runtime context (GAP-WP39). */
   readonly systemPrompt: string;
+  /**
+   * True ONLY when `bindTools` gates every tool call on a signed approval: it decides whether the model is told a
+   * guardrail exists (see agentPromptProfile).
+   */
+  readonly approvalGated?: boolean;
   readonly harnessVersion: string;
   readonly compositionDigest: string;
   readonly policyDigest: string;
@@ -192,6 +201,9 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
     let reported = 0;
     let reportedEndings = 0;
 
+    let driver!: AgentDriver;
+    let composed: NativeAgent | undefined;
+    let composing = false;
     const finish = (release: boolean): void => withWorkspaceScope(workspace, () => {
       if (closed) return;
       if (running) throw new Error("Cancel and settle the active prompt before closing or releasing its session.");
@@ -206,46 +218,49 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
         throw error;
       } finally {
         closed = true;
+        composed?.dispose();
         toolset?.close();
       }
     });
 
-    let driver!: AgentDriver;
     try {
       if (claimant !== undefined) {
         const history = readAgentRunSummary(workspace, sessionId, "idle");
         reported = history.assistantText.length;
         reportedEndings = history.endings.length;
       }
-      if (claimant === undefined) session.open({
-        sessionId,
-        agentId: init.agentId,
-        harnessVersion: init.harnessVersion,
-        compositionDigest: init.compositionDigest,
-        policyDigest: init.policyDigest
-      });
-      toolset = init.tools === "none" ? undefined : makeToolset();
-      const tools = init.bindTools?.({ session, toolset: toolset ?? null }) ?? toolset?.seam ?? EMPTY_TOOL_SEAM;
-      const systemPromptEventId = session.recordSystemPrompt(init.systemPrompt).eventId;
-      // P2-23 reassessment triggers and P2-26 change envelopes run on the composed tool surface, before the first turn;
-      // an out-of-envelope change throws here and the session is closed below.
-      admitSessionAtOpen({ workspace, agentId: init.agentId, manifest: () => nativeSessionManifest({ workspace, agentId: init.agentId,
-        providerId: init.route.providerId, model: init.route.model, systemPrompt: init.systemPrompt, harnessVersion: init.harnessVersion,
-        compositionDigest: init.compositionDigest, tools: init.tools ?? "workspace", surface: tools,
-        ...(init.additionalCapabilities === undefined ? {} : { additionalCapabilities: init.additionalCapabilities }) }) });
-      driver = new AgentDriver({
+      // GAP-WP39: the same prompt profile and context pre-step as `amc agent-loop` -- workspace instruction files, time
+      // and governance reach this session too. The caller's system prompt is the deployment's persona.
+      const profile = agentPromptProfile({ workspace, agentId: init.agentId, persona: init.systemPrompt, approvalGated: init.approvalGated === true });
+      composing = true;
+      composed = composeNativeAgent({
         session,
-        llm: init.makeLlm(session),
+        ...(claimant === undefined ? { open: { sessionId, agentId: init.agentId, harnessVersion: init.harnessVersion,
+          compositionDigest: init.compositionDigest, policyDigest: init.policyDigest } } : {}),
+        prompt: { profile },
+        makeLlm: init.makeLlm,
         route: init.route,
-        systemPromptEventId,
-        tools,
-        ...(init.validation === undefined ? {} : { validation: init.validation }),
-        config: { ...(init.maxSteps === undefined ? {} : { maxStepsPerTurn: init.maxSteps }), ...(compaction === undefined ? {} : { compaction }) }
+        tools: () => {
+          toolset = init.tools === "none" ? undefined : makeToolset();
+          return init.bindTools?.({ session, toolset: toolset ?? null }) ?? toolset?.seam ?? EMPTY_TOOL_SEAM;
+        },
+        // P2-23 reassessment triggers and P2-26 change envelopes run on the composed tool surface, before the first turn;
+        // an out-of-envelope change throws here and the session is settled as a failed composition.
+        admit: ({ systemPrompt, tools }) => admitSessionAtOpen({ workspace, agentId: init.agentId, manifest: () => nativeSessionManifest({ workspace, agentId: init.agentId,
+          providerId: init.route.providerId, model: init.route.model, systemPrompt, harnessVersion: init.harnessVersion,
+          compositionDigest: init.compositionDigest, tools: init.tools ?? "workspace", surface: tools,
+          ...(init.additionalCapabilities === undefined ? {} : { additionalCapabilities: init.additionalCapabilities }) }) }),
+        driver: {
+          ...(init.validation === undefined ? {} : { validation: init.validation }),
+          config: { ...(init.maxSteps === undefined ? {} : { maxStepsPerTurn: init.maxSteps }), ...(compaction === undefined ? {} : { compaction }) }
+        }
       });
+      driver = composed.driver;
     } catch (error) {
-      // A half-composed session would otherwise be left open and unsealed, which
-      // verification reports as an interrupted run that never actually started.
-      try { finish(claimant !== undefined); } catch { /* retain the original composition error; evidence stays unsealed on failure */ }
+      // composeNativeAgent settled the session (never as `completed`); before it ran, nothing was opened here.
+      closed = true;
+      if (!composing) settleFailedComposition(session, claimant === undefined ? "dispose" : "release");
+      try { toolset?.close(); } catch { /* retain the original composition error */ }
       throw error;
     }
 

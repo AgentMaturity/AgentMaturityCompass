@@ -1,3 +1,4 @@
+import { mean } from "../experiments/stats.js";
 import { randomUUID } from "node:crypto";
 import {
   FORECAST_INDEX_IDS,
@@ -97,11 +98,9 @@ function forecastOrLatest(series: ForecastSeries | undefined): number {
   return series.forecast.short?.value ?? latestOrZero(series);
 }
 
+// Unlike experiments/stats.ts mean, forecast serialization rounds finite means to six places and maps non-finite values to zero.
 function avg(values: number[]): number {
-  if (values.length === 0) {
-    return 0;
-  }
-  return ensureNumber(values.reduce((sum, value) => sum + value, 0) / values.length);
+  return ensureNumber(mean(values));
 }
 
 function evidenceGateFailures(policy: ForecastPolicy, signals: ForecastSignalBundle): string[] {

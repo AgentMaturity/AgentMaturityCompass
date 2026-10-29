@@ -16,6 +16,7 @@
  * Uses online learning (no training phase) — builds profile incrementally.
  */
 
+import { nearestRank } from "../experiments/stats.js";
 import { EventEmitter } from "node:events";
 import { randomUUID } from "node:crypto";
 import { toDisplayScore } from "../score/scoringScale.js";
@@ -82,6 +83,8 @@ export interface BehavioralProfilerConfig {
 
 // ── Online Statistics ──────────────────────────────────────────────────────
 
+// Unlike experiments/stats.ts batch moments, Welford moments retain the full history in O(1) space;
+// only percentile observations slide over the latest 1000 values. Preserve this distinct population.
 class OnlineStats {
   private n = 0;
   private mean_ = 0;
@@ -105,10 +108,7 @@ class OnlineStats {
   get count(): number { return this.n; }
 
   percentile(p: number): number {
-    if (this.values.length === 0) return 0;
-    const sorted = [...this.values].sort((a, b) => a - b);
-    const idx = Math.ceil((p / 100) * sorted.length) - 1;
-    return sorted[Math.max(0, idx)]!;
+    return nearestRank(this.values, p / 100);
   }
 
   zScore(x: number): number {
@@ -332,8 +332,6 @@ export class BehavioralProfiler extends EventEmitter {
     }
 
     latencies.sort((a, b) => a - b);
-    const p95Idx = Math.ceil(0.95 * latencies.length) - 1;
-    const p99Idx = Math.ceil(0.99 * latencies.length) - 1;
 
     this.profiles.set(agentId, {
       agentId,
@@ -342,8 +340,8 @@ export class BehavioralProfiler extends EventEmitter {
       toolUsageDistribution: toolUsage,
       toolSequenceFrequency: toolSeq,
       avgLatencyMs: latencyCount > 0 ? totalLatency / latencyCount : 0,
-      p95LatencyMs: latencies[Math.max(0, p95Idx)] ?? 0,
-      p99LatencyMs: latencies[Math.max(0, p99Idx)] ?? 0,
+      p95LatencyMs: nearestRank(latencies, 0.95),
+      p99LatencyMs: nearestRank(latencies, 0.99),
       decisionDistribution: decisions,
       errorRate: events.length > 0 ? errors / events.length : 0,
       escalationRate: events.length > 0 ? escalations / events.length : 0,

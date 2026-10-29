@@ -9,9 +9,11 @@ import { withLiveDriftRowHash } from "./liveDriftReceiptValidation.js";
  * from, authenticates to, or verifies anything with that vendor, so a receipt
  * attests only to the data the caller provided.
  */
+import type { EvidenceOutcome } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import {
+  guardedDrop,
   runLiveScoreBehaviorDrift,
   type LiveDriftAlert,
   type LiveDriftMetricId,
@@ -118,11 +120,12 @@ export interface RunAwesomeAgentMemoryLiveDriftInput {
 
 export interface AwesomeAgentMemoryDistribution {
   rowCount: number;
+  evidenceOutcome: EvidenceOutcome;
   retrievalScoreMean0to1: number;
   persistenceScoreMean0to1: number;
   forgettingScoreMean0to1: number;
   hallucinationRate0to1: number;
-  evidenceCoverage0to1: number;
+  evidenceCoverage0to1: number | null;
   taxonomyDistribution: Record<string, number>;
   evaluationTaskDistribution: Record<string, number>;
   contextDistribution: Record<string, number>;
@@ -133,7 +136,7 @@ export interface AwesomeAgentMemoryScoreDrift {
   persistenceScoreDrop0to1: number;
   forgettingScoreDrop0to1: number;
   hallucinationRateIncrease0to1: number;
-  evidenceCoverageDrop0to1: number;
+  evidenceCoverageDrop0to1: number | null;
 }
 
 export interface AwesomeAgentMemoryBehaviorDrift {
@@ -266,10 +269,11 @@ function distribution(rows: AwesomeAgentMemoryReceiptRow[]): AwesomeAgentMemoryD
     persistenceScoreMean0to1: mean(rows.map((row) => row.persistenceScore0to1)),
     forgettingScoreMean0to1: mean(rows.map((row) => row.forgettingScore0to1)),
     hallucinationRate0to1: mean(rows.map((row) => row.hallucinationRate0to1)),
-    evidenceCoverage0to1: mean(rows.map((row) => row.evidenceCoverage0to1), rows.length === 0 ? 1 : 0),
+    evidenceCoverage0to1: mean(rows.map((row) => row.evidenceCoverage0to1), null),
     taxonomyDistribution: labelDistribution(rows, (row) => row.memoryCategory),
     evaluationTaskDistribution: labelDistribution(rows, (row) => row.evaluationTask),
     contextDistribution: labelDistribution(rows, contextLabel),
+    evidenceOutcome: rows.length > 0 ? "measured" : "not_evaluated",
   };
 }
 
@@ -290,7 +294,7 @@ export function runAwesomeAgentMemoryLiveDrift(input: RunAwesomeAgentMemoryLiveD
     persistenceScoreDrop0to1: round(Math.max(0, baselineDistribution.persistenceScoreMean0to1 - liveDistribution.persistenceScoreMean0to1)),
     forgettingScoreDrop0to1: round(Math.max(0, baselineDistribution.forgettingScoreMean0to1 - liveDistribution.forgettingScoreMean0to1)),
     hallucinationRateIncrease0to1: round(Math.max(0, liveDistribution.hallucinationRate0to1 - baselineDistribution.hallucinationRate0to1)),
-    evidenceCoverageDrop0to1: round(Math.max(0, baselineDistribution.evidenceCoverage0to1 - liveDistribution.evidenceCoverage0to1)),
+    evidenceCoverageDrop0to1: guardedDrop(true, baselineDistribution.evidenceCoverage0to1, liveDistribution.evidenceCoverage0to1),
   };
   const behaviorDrift: AwesomeAgentMemoryBehaviorDrift = {
     taxonomyDivergence0to1: totalVariationDistance(baselineDistribution.taxonomyDistribution, liveDistribution.taxonomyDistribution),
@@ -310,8 +314,8 @@ export function runAwesomeAgentMemoryLiveDrift(input: RunAwesomeAgentMemoryLiveD
   if (scoreDrift.hallucinationRateIncrease0to1 > thresholds.maxHallucinationRateIncrease0to1) {
     additionalAlerts.push(buildAlert(input, "awesomeAgentMemoryHallucinationRate0to1", scoreDrift.hallucinationRateIncrease0to1, thresholds.maxHallucinationRateIncrease0to1, "Live Awesome-Agent-Memory-style memory hallucination rate increased beyond threshold.", "critical"));
   }
-  if (liveDistribution.evidenceCoverage0to1 < thresholds.minEvidenceCoverage0to1) {
-    additionalAlerts.push(buildAlert(input, "awesomeAgentMemoryEvidenceCoverage0to1", liveDistribution.evidenceCoverage0to1, thresholds.minEvidenceCoverage0to1, "Live Awesome-Agent-Memory-style rows are missing source snapshot, no-license boundary, README blob, catalog snapshot, entry source, taxonomy, benchmark manifest, eval dataset, result, drift statistic, alert receipt, evidence, or signed evidence proof.", "critical"));
+  if (liveDistribution.evidenceCoverage0to1 === null || liveDistribution.evidenceCoverage0to1 < thresholds.minEvidenceCoverage0to1) {
+    additionalAlerts.push(buildAlert(input, "awesomeAgentMemoryEvidenceCoverage0to1", liveDistribution.evidenceCoverage0to1, thresholds.minEvidenceCoverage0to1, liveDistribution.evidenceCoverage0to1 === null ? "Live evidence missing; coverage is not evaluated." : "Live Awesome-Agent-Memory-style rows are missing source snapshot, no-license boundary, README blob, catalog snapshot, entry source, taxonomy, benchmark manifest, eval dataset, result, drift statistic, alert receipt, evidence, or signed evidence proof.", "critical"));
   }
   if (behaviorDrift.taxonomyDivergence0to1 > thresholds.maxTaxonomyDivergence0to1) {
     additionalAlerts.push(buildAlert(input, "awesomeAgentMemoryTaxonomyDistribution", behaviorDrift.taxonomyDivergence0to1, thresholds.maxTaxonomyDivergence0to1, "Live Awesome-Agent-Memory-style memory taxonomy distribution diverged beyond threshold.", "medium"));

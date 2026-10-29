@@ -1,3 +1,4 @@
+import { mean } from "../experiments/stats.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 
@@ -285,7 +286,7 @@ function averageScoreDelta(rows: EffectAutoAgentReplayRow[]): number | null {
   if (deltas.length === 0) {
     return null;
   }
-  return Number((deltas.reduce((sum, value) => sum + value, 0) / deltas.length).toFixed(6));
+  return Number(mean(deltas).toFixed(6));
 }
 
 function buildFixtureHash(rows: EffectAutoAgentReplayRow[]): string {

@@ -12,7 +12,7 @@ import { fileURLToPath } from "node:url";
 export type PlanEdit = { path: string; issue: string; baseCommit: string; archivePath: string; sha256: string };
 
 const PLAN_EDITS_MANIFEST = "unused-code/plan-edits/manifest.json";
-const ISSUE_KEY = /^P[0-3]-[0-9]{2}$/;
+const ISSUE_KEY = /^(?:P[0-3]-[0-9]{2}|AXE-23|GAP-WP[0-9]{2})$/;
 const sha256 = (bytes: Buffer) => createHash("sha256").update(bytes).digest("hex");
 // package.json was refused here while only P0-01's package-entries pin froze it. P0-09 must change its
 // exports and files, so it is snapshotted like any other frozen file and the entries pin reads landed bytes.

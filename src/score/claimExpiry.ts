@@ -1,3 +1,5 @@
+import type { EvidenceOutcome } from "../types.js";
+
 export interface ClaimExpiryProfile {
   claimId: string;
   claimType: string;
@@ -24,7 +26,8 @@ export function checkClaimExpiry(claims: ClaimExpiryProfile[]): {
   expired: ClaimExpiryProfile[];
   stale: ClaimExpiryProfile[];
   fresh: ClaimExpiryProfile[];
-  certificationBlocked: boolean;
+  certificationBlocked: boolean | null;
+  outcome: EvidenceOutcome;
 } {
   const now = Date.now();
   const expired: ClaimExpiryProfile[] = [];
@@ -49,6 +52,6 @@ export function checkClaimExpiry(claims: ClaimExpiryProfile[]): {
   }
 
   const criticalTypes = ['security-audit', 'compliance-certification', 'production-readiness'];
-  const certificationBlocked = expired.some(c => criticalTypes.includes(c.claimType));
-  return { expired, stale, fresh, certificationBlocked };
+  const certificationBlocked = claims.length > 0 ? expired.some(c => criticalTypes.includes(c.claimType)) : null;
+  return { expired, stale, fresh, certificationBlocked, outcome: claims.length > 0 ? "measured" : "not_evaluated" };
 }

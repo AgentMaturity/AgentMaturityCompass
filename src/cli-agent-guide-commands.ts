@@ -38,7 +38,8 @@ export function registerAgentGuideCommands(group: Command, io: AgentLoopCliIo): 
     .option("--credentials-file <path>", "explicit credential file used to resolve server credential references")
     .option("--json", "Output the discovered catalog and exact generated allowlist names")
     .option("--authorize", "interactively authorize an OAuth (auth.kind oauth2) HTTP server: prints the authorization URL, stores the grant, then reads the catalog")
-    .action(async (opts: { config: string; credentialsHome?: string; credentialsFile?: string; json?: boolean; authorize?: boolean }) => {
+    .option("--diagnostics", "on failure, print the server's scrubbed, bounded stderr and logging tail to stderr (operator use only)")
+    .action(async (opts: { config: string; credentialsHome?: string; credentialsFile?: string; json?: boolean; authorize?: boolean; diagnostics?: boolean }) => {
       const controller = new AbortController();
       const cancel = () => controller.abort();
       process.on("SIGINT", cancel);
@@ -69,6 +70,11 @@ export function registerAgentGuideCommands(group: Command, io: AgentLoopCliIo): 
         // These classes carry fixed local diagnostics only, never server or network text.
         const fixed = error instanceof NativeMcpConfigError || (error instanceof Error && ["NativeMcpHttpRefused", "NativeMcpProtocolRefused"].includes(error.name));
         io.error(fixed ? (error as Error).message : "MCP discovery failed or was cancelled. Check the explicit config and credential references; no catalog or grant is accepted.");
+        if (opts.diagnostics) {
+          const { nativeMcpFailureDiagnostics } = await import("./mcp/nativeMcpClient.js");
+          const tail = nativeMcpFailureDiagnostics(error);
+          io.error(tail ? `MCP server diagnostics (scrubbed, last 16 KiB):\n${tail}` : "MCP server produced no diagnostics.");
+        }
         io.fail();
       } finally { process.removeListener("SIGINT", cancel); }
     });

@@ -7,8 +7,8 @@
  * Issue: AMC-48 — BUILD: LLM-as-Judge Metrics (Test Integration)
  */
 
-import { ExtendedLLMJudgeEngine, MetricSummary, aggregateMetricsByCategory } from './extendedLLMJudge.js';
-import type { JudgeContext, JudgeResult } from './llmJudgeEngine.js';
+import { ExtendedLLMJudgeEngine, MetricSummary, aggregateMetricsByCategory, calculateOverallScore } from './extendedLLMJudge.js';
+import { scoredJudgeResults, type JudgeContext, type JudgeResult } from './llmJudgeEngine.js';
 import { incCounter, setGauge, observeHistogram } from '../ops/metrics/metricsRegistry.js';
 import { evaluateRegulatedJudgment, type RegulatedJudgeEvaluation } from "../assurance/judges/regulatedJudgeEvaluation.js";
 
@@ -42,8 +42,10 @@ export interface JudgeTestResult {
   judgeResults: JudgeResult[];
   /** Category summaries */
   categorySummaries: MetricSummary[];
-  /** Overall score */
-  overallScore: number;
+  /** Mean of scored metrics; null when nothing was scored. */
+  overallScore: number | null;
+  /** Metrics whose judge output was invalid; any invalid metric fails the test rather than being averaged as zero. */
+  invalidMetrics: string[];
   /** Pass/fail status */
   passed: boolean;
   /** Execution time */
@@ -147,8 +149,9 @@ export class AMCJudgeTestRunner {
       judgeResults = this.deduplicateResults(judgeResults);
 
       const categorySummaries = aggregateMetricsByCategory(judgeResults);
-      const overallScore = judgeResults.reduce((sum, r) => sum + r.score, 0) / judgeResults.length;
-      const passed = overallScore >= this.config.minScoreThreshold;
+      const overallScore = calculateOverallScore(judgeResults);
+      const invalidMetrics = judgeResults.filter(r => r.status === 'invalid').map(r => r.metric);
+      const passed = overallScore !== null && invalidMetrics.length === 0 && overallScore >= this.config.minScoreThreshold;
 
       // Record metrics
       this.recordMetrics(testContext.testId, judgeResults, overallScore, passed);
@@ -161,6 +164,7 @@ export class AMCJudgeTestRunner {
         judgeResults,
         categorySummaries,
         overallScore,
+        invalidMetrics,
         passed,
         executionTimeMs
       };
@@ -209,7 +213,8 @@ export class AMCJudgeTestRunner {
 
     const passedTests = results.filter(r => r.passed).length;
     const failedTests = results.length - passedTests;
-    const averageScore = results.reduce((sum, r) => sum + r.overallScore, 0) / results.length;
+    const scoredTests = results.filter((r): r is JudgeTestResult & { overallScore: number } => r.overallScore !== null);
+    const averageScore = scoredTests.length === 0 ? null : scoredTests.reduce((sum, r) => sum + r.overallScore, 0) / scoredTests.length;
     const averageExecutionTime = results.reduce((sum, r) => sum + r.executionTimeMs, 0) / results.length;
 
     let report = `LLM-as-Judge Evaluation Report\n`;
@@ -217,7 +222,7 @@ export class AMCJudgeTestRunner {
     report += `Total Tests: ${results.length}\n`;
     report += `Passed: ${passedTests} (${(passedTests / results.length * 100).toFixed(1)}%)\n`;
     report += `Failed: ${failedTests} (${(failedTests / results.length * 100).toFixed(1)}%)\n`;
-    report += `Average Score: ${averageScore.toFixed(3)}\n`;
+    report += `Average Score: ${averageScore === null ? 'n/a (nothing scored)' : averageScore.toFixed(3)}\n`;
     report += `Average Execution Time: ${averageExecutionTime.toFixed(0)}ms\n`;
     report += `Score Threshold: ${this.config.minScoreThreshold}\n\n`;
 
@@ -226,6 +231,7 @@ export class AMCJudgeTestRunner {
     const categoryMap = new Map<string, number[]>();
     
     for (const summary of allCategorySummaries) {
+      if (summary.averageScore === null) continue;
       if (!categoryMap.has(summary.category)) {
         categoryMap.set(summary.category, []);
       }
@@ -243,10 +249,11 @@ export class AMCJudgeTestRunner {
     if (failedTestResults.length > 0) {
       report += `\nFailed Tests:\n`;
       for (const result of failedTestResults.slice(0, 10)) { // Show first 10
-        report += `  ${result.testId}: ${result.overallScore.toFixed(3)}\n`;
+        report += `  ${result.testId}: ${result.overallScore === null ? 'not scored' : result.overallScore.toFixed(3)}\n`;
+        if (result.invalidMetrics.length > 0) report += `    invalid judge output: ${result.invalidMetrics.join(', ')}\n`;
         
         // Show lowest scoring metrics
-        const lowestMetrics = result.judgeResults
+        const lowestMetrics = scoredJudgeResults(result.judgeResults)
           .sort((a, b) => a.score - b.score)
           .slice(0, 3);
         
@@ -275,19 +282,21 @@ export class AMCJudgeTestRunner {
     });
   }
 
-  private recordMetrics(testId: string, results: JudgeResult[], overallScore: number, passed: boolean): void {
+  private recordMetrics(testId: string, results: JudgeResult[], overallScore: number | null, passed: boolean): void {
     // Record overall metrics
     incCounter('amc_judge_evaluations_total', 'Total judge evaluations', {
       test_id: testId,
       passed: passed.toString()
     });
 
-    setGauge('amc_judge_overall_score', 'Overall judge score', {
-      test_id: testId
-    }, overallScore);
+    if (overallScore !== null) {
+      setGauge('amc_judge_overall_score', 'Overall judge score', {
+        test_id: testId
+      }, overallScore);
+    }
 
-    // Record individual metric scores
-    for (const result of results) {
+    // Record individual metric scores; invalid judgments have no score to record.
+    for (const result of scoredJudgeResults(results)) {
       setGauge('amc_judge_metric_score', 'Individual metric score', {
         test_id: testId,
         metric: result.metric
@@ -305,7 +314,8 @@ export class AMCJudgeTestRunner {
       testId,
       judgeResults: [],
       categorySummaries: [],
-      overallScore: 0,
+      overallScore: null,
+      invalidMetrics: [],
       passed: false,
       executionTimeMs: Date.now() - startTime
     };

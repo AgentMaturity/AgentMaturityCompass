@@ -1,3 +1,4 @@
+import { mean, percentileRank } from "../experiments/stats.js";
 /**
  * Multi-Tenant Federated Scoring — R4-02
  *
@@ -102,10 +103,8 @@ export class TenantManager {
     if (!tenant?.settings.allowAnonymizedBenchmarking) return null;
     if (allScores.length < 5) return null; // Minimum sample for anonymity
 
-    const sorted = [...allScores].sort((a, b) => a - b);
-    const rank = sorted.filter((s) => s <= tenantScore).length;
-    const percentile = (rank / sorted.length) * 100;
-    const avg = allScores.reduce((s, v) => s + v, 0) / allScores.length;
+    const percentile = percentileRank(allScores, tenantScore);
+    const avg = mean(allScores);
 
     return {
       benchmarkId: `bench-${randomUUID().slice(0, 8)}`,

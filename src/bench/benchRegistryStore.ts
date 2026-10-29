@@ -79,7 +79,7 @@ export function buildImportedBenchMeta(params: { registryId: string; registryFin
   });
 }
 
-export function listImportedBenches(workspace: string): ImportedBenchMeta[] {
+export function listImportedBenches(workspace: string, options: { strict?: boolean } = {}): ImportedBenchMeta[] {
   const root = benchImportsBenchesDir(workspace);
   if (!pathExists(root)) {
     return [];
@@ -91,11 +91,19 @@ export function listImportedBenches(workspace: string): ImportedBenchMeta[] {
     for (const versionEntry of readdirSync(benchDir, { withFileTypes: true })) {
       if (!versionEntry.isDirectory()) continue;
       const metaPath = join(benchDir, versionEntry.name, "meta.json");
-      if (!pathExists(metaPath)) continue;
+      if (!pathExists(metaPath)) {
+        if (options.strict) throw new Error(`bench import metadata missing: ${metaPath}`);
+        continue;
+      }
       try {
-        out.push(importedBenchMetaSchema.parse(JSON.parse(readUtf8(metaPath)) as unknown));
-      } catch {
-        // skip malformed import metadata
+        const meta = importedBenchMetaSchema.parse(JSON.parse(readUtf8(metaPath)) as unknown);
+        if (options.strict && (meta.benchId !== benchIdEntry.name || meta.version !== versionEntry.name)) {
+          throw new Error("import metadata does not match its directory");
+        }
+        out.push(meta);
+      } catch (cause) {
+        if (options.strict) throw new Error(`invalid bench import metadata: ${metaPath}`, { cause });
+        // Legacy listing remains best effort; scoring uses strict admission.
       }
     }
   }

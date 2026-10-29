@@ -20,6 +20,9 @@ export interface HarnessComparisonTrial {
   /** Reported by the pinned adapter; null means unknown, never inferred from process exit. */
   modelCalled: boolean | null;
   reason: string | null;
+  /** Optional on historical reports; errors are bounded and redacted before publication. */
+  failureKind?: "pin-mismatch" | "fixture-changed" | "observations-invalid" | "oracle-invalid" | "io" | null;
+  failureMessage?: string | null;
   laneConfigurationSha256: string;
   process: Pick<ProcessOutcome, "exitCode" | "signal" | "terminatedBy" | "treeExitProven" | "durationMs"> | null;
   oracle: ComparisonOracle | null;
@@ -99,8 +102,7 @@ function budgetStatus(lane: HarnessComparisonManifest["lanes"][number], observat
   return "within-recorded-bounds";
 }
 
-/** Runs only operator-selected, pinned local commands; never fabricates a trial or a score. */
-export async function runHarnessComparison(options: HarnessComparisonOptions): Promise<HarnessComparisonReport> {
+function readHarnessComparisonInput(options: Pick<HarnessComparisonOptions, "manifestPath" | "secretEnv" | "redactValues">) {
   const bytes = readComparisonFile(resolve(options.manifestPath));
   let parsed: unknown;
   try { parsed = JSON.parse(bytes.toString("utf8")); } catch { throw new Error("The comparison manifest is not valid JSON."); }
@@ -116,6 +118,54 @@ export async function runHarnessComparison(options: HarnessComparisonOptions): P
     }
   }
   const base = dirname(resolve(options.manifestPath));
+  return { bytes, manifest, secrets, base };
+}
+
+function matchesComparisonEnvironment(manifest: HarnessComparisonManifest): boolean {
+  return process.platform === manifest.environment.platform && process.arch === manifest.environment.arch &&
+    process.version.replace(/^v/, "") === manifest.environment.nodeVersion.replace(/^v/, "");
+}
+
+/** Read-only readiness: validates inputs and previews order without creating a trial or spawning any command. */
+export function checkHarnessComparison(options: Pick<HarnessComparisonOptions, "manifestPath" | "secretEnv" | "redactValues">) {
+  const { bytes, manifest, secrets, base } = readHarnessComparisonInput(options);
+  const environmentMatches = matchesComparisonEnvironment(manifest);
+  const problems: string[] = [];
+  if (!environmentMatches) problems.push("The actual platform, architecture or Node version does not match the manifest.");
+  const missingSecretEnv = [...new Set(manifest.lanes.flatMap(lane => lane.requiredSecretEnv))].filter(name => !options.secretEnv?.[name]);
+  if (missingSecretEnv.length) problems.push("Required named live credentials are unavailable.");
+  // Placeholder values are only for argument validation; no filesystem path is created.
+  const variables = { workspace: "<workspace>", fixture: "<fixture>", context: "<context>", artifact: "<artifact>", observations: "<observations>" };
+  const inspect = (read: () => unknown) => {
+    try { read(); }
+    catch (error) { problems.push(redactComparisonText(error instanceof Error ? error.message : String(error), secrets).slice(0, 1024)); }
+  };
+  for (const task of manifest.tasks) {
+    inspect(() => readComparisonFile(resolveComparisonPin(task.fixture, base)));
+    inspect(() => commandArguments(task.oracle, base, variables));
+  }
+  for (const target of manifest.targets) {
+    inspect(() => resolveComparisonPin(target.artifact, base));
+    for (const task of manifest.tasks) {
+      const binding = target.bindings.find(row => row.taskId === task.id);
+      const lane = manifest.lanes.find(row => row.id === task.laneId)!;
+      if (!binding?.command) problems.push(`No executable binding for ${target.id}/${task.id}.`);
+      else {
+        inspect(() => commandArguments(binding.command!, base, variables));
+        if (lane.kind !== "keyless-conformance" && !binding.supportsBoundedLiveExecution) problems.push(`Bounded live execution is unavailable for ${target.id}/${task.id}.`);
+      }
+    }
+  }
+  const trials = Array.from({ length: manifest.repetitions }, (_, repetition) => manifest.tasks.flatMap(task =>
+    [...manifest.targets.slice(repetition % manifest.targets.length), ...manifest.targets.slice(0, repetition % manifest.targets.length)]
+      .map(target => ({ targetId: target.id, taskId: task.id, laneId: task.laneId, repetition: repetition + 1 })))).flat();
+  return { comparisonId: manifest.id, manifestSha256: comparisonSha256(bytes), ready: problems.length === 0,
+    environmentMatches, missingSecretEnv, problems, trials };
+}
+
+/** Runs only operator-selected, pinned local commands; never fabricates a trial or a score. */
+export async function runHarnessComparison(options: HarnessComparisonOptions): Promise<HarnessComparisonReport> {
+  const { bytes, manifest, secrets, base } = readHarnessComparisonInput(options);
   const output = resolve(options.outputDir);
   // Create ancestors separately; only a successful nonrecursive leaf creation
   // owns this run's output. An exists-then-recursive-mkdir check is race-prone.
@@ -147,7 +197,7 @@ export async function runHarnessComparison(options: HarnessComparisonOptions): P
     ], manifest, trials: [], artifacts: []
   };
   report.artifacts.push(writeComparisonArtifact(output, "manifest.redacted.json", manifest, secrets));
-  const environmentMatches = process.platform === manifest.environment.platform && process.arch === manifest.environment.arch && process.version.replace(/^v/, "") === manifest.environment.nodeVersion.replace(/^v/, "");
+  const environmentMatches = matchesComparisonEnvironment(manifest);
 
   for (let repetition = 0; repetition < manifest.repetitions; repetition += 1) {
     for (const task of manifest.tasks) {
@@ -158,7 +208,7 @@ export async function runHarnessComparison(options: HarnessComparisonOptions): P
         const trial: HarnessComparisonTrial = {
           id: `t${report.trials.length + 1}-${target.id}-${task.id}-r${repetition + 1}`, targetId: target.id, taskId: task.id, laneId: lane.id,
           repetition: repetition + 1, laneKind: lane.kind, scenario: task.scenario,
-          status: "unavailable", verdict: null, observedOutcome: null, modelCalled: null, reason: null, laneConfigurationSha256: comparisonSha256(JSON.stringify(lane)),
+          status: "unavailable", verdict: null, observedOutcome: null, modelCalled: null, reason: null, failureKind: null, failureMessage: null, laneConfigurationSha256: comparisonSha256(JSON.stringify(lane)),
           process: null, oracle: null, observations: null, budgetStatus: "unknown", artifacts: []
         };
         report.trials.push(trial);
@@ -173,9 +223,11 @@ export async function runHarnessComparison(options: HarnessComparisonOptions): P
         if (trial.reason) continue;
 
         let work: string | undefined;
+        let failureKind: NonNullable<HarnessComparisonTrial["failureKind"]> = "pin-mismatch";
         try {
           const artifact = resolveComparisonPin(target.artifact, base);
           const fixture = readComparisonFile(resolveComparisonPin(task.fixture, base));
+          failureKind = "io";
           work = mkdtempSync(join(tmpdir(), "amc-harness-comparison-"));
           const home = join(work, "home");
           const workspace = join(work, "workspace");
@@ -188,12 +240,14 @@ export async function runHarnessComparison(options: HarnessComparisonOptions): P
             task, lane, target: { id: target.id, source: target.source, artifact: target.artifact },
             observationsPath, fixturePath }), { mode: 0o400, flag: "wx" });
           const variables = { workspace, fixture: fixturePath, context: contextPath, artifact, observations: observationsPath };
+          failureKind = "pin-mismatch";
           const argv = commandArguments(binding!.command!, base, variables);
           const oracleArgv = commandArguments(task.oracle, base, variables);
           const publicEnv = { ...manifest.environment.variables, HOME: home, USERPROFILE: home,
             XDG_CONFIG_HOME: join(home, ".config"), XDG_CACHE_HOME: join(home, ".cache"), TMPDIR: work,
             AMC_COMPARISON_CONTEXT: contextPath, AMC_COMPARISON_OBSERVATIONS: observationsPath };
           const env = { ...publicEnv, ...Object.fromEntries(lane.requiredSecretEnv.map(name => [name, options.secretEnv![name]!])) };
+          failureKind = "io";
           const running = runProcess({ argv, cwd: workspace, env, stdin: "ignore", stdout: "capture", stderr: "capture",
             maxCaptureBytes: manifest.captureBytesPerStream, scrubValues: [], graceMs: 2000,
             timeoutMs: lane.budgets.timeoutMs, ...(options.signal ? { signal: options.signal } : {}) });
@@ -210,9 +264,13 @@ export async function runHarnessComparison(options: HarnessComparisonOptions): P
           if (outcome.stdout.droppedBytes || outcome.stderr.droppedBytes) { trial.reason = "Target capture was truncated; the oracle does not receive an apparently complete transcript."; continue; }
           if (!outcome.treeExitProven || outcome.terminatedBy !== null) { trial.reason = "Target execution was interrupted or process-group cleanup was not proven."; continue; }
           if (existsSync(observationsPath)) {
+            failureKind = "observations-invalid";
             const raw = readComparisonFile(observationsPath).toString("utf8");
             trial.artifacts.push(writeComparisonArtifact(output, `${trial.id}.observations.txt`, raw, secrets, true));
-            const observations = comparisonObservationsSchema.parse(JSON.parse(raw));
+            let observations: ComparisonObservations;
+            try { observations = comparisonObservationsSchema.parse(JSON.parse(raw)); }
+            // Parser/schema diagnostics can quote truncated secret prefixes that exact-value redaction cannot recognize.
+            catch { throw new Error("Comparison observations are not valid JSON or violate the observation contract."); }
             if (lane.kind === "local-provider" && observations.cost !== undefined) {
               trial.reason = "Local-provider monetary observations are not admitted; the raw adapter claim is retained without becoming a cost measurement.";
               continue;
@@ -220,6 +278,7 @@ export async function runHarnessComparison(options: HarnessComparisonOptions): P
             trial.observations = observations;
             trial.modelCalled = observations.modelExecution?.modelCalled ?? null;
           }
+          failureKind = "io";
           trial.budgetStatus = budgetStatus(lane, trial.observations);
           const oracleInput = JSON.stringify({ schemaVersion: HARNESS_COMPARISON_VERSION, trialId: trial.id,
             targetId: target.id, taskId: task.id, lane, process: trial.process, stdout: outcome.stdout.text, stderr: outcome.stderr.text,
@@ -241,10 +300,14 @@ export async function runHarnessComparison(options: HarnessComparisonOptions): P
           if (!delivered || !oracleOutcome.treeExitProven || oracleOutcome.terminatedBy !== null || oracleOutcome.exitCode !== 0 || oracleOutcome.stdout.droppedBytes || oracleOutcome.stderr.droppedBytes) {
             trial.reason = "The independent oracle did not complete with an intact result."; continue;
           }
-          trial.oracle = comparisonOracleSchema.parse(JSON.parse(oracleOutcome.stdout.text));
+          failureKind = "oracle-invalid";
+          try { trial.oracle = comparisonOracleSchema.parse(JSON.parse(oracleOutcome.stdout.text)); }
+          catch { throw new Error("The independent oracle result is not valid JSON or violates the oracle contract."); }
           // Detect changed inputs rather than claiming a repeatable pinned run.
+          failureKind = "pin-mismatch";
           resolveComparisonPin(target.artifact, base); resolveComparisonPin(task.fixture, base);
           commandArguments(binding!.command!, base, variables); commandArguments(task.oracle, base, variables);
+          failureKind = "fixture-changed";
           if (comparisonSha256(readComparisonFile(fixturePath)) !== task.fixture.sha256) throw new Error("The trial fixture changed.");
           if (trial.oracle.verdict === "unsupported") { trial.reason = "The executed oracle identified an unsupported capability."; continue; }
           if (trial.oracle.verdict === "inconclusive") { trial.reason = "The independent oracle could not determine the scenario outcome."; continue; }
@@ -257,14 +320,18 @@ export async function runHarnessComparison(options: HarnessComparisonOptions): P
           trial.status = "executed";
           trial.verdict = trial.budgetStatus === "exceeded" ? "fail" : trial.oracle.verdict;
           trial.reason = trial.budgetStatus === "exceeded" ? "Recorded usage exceeded a declared limit." : null;
-        } catch {
+        } catch (error) {
+          trial.failureKind = failureKind;
+          trial.failureMessage = redactComparisonText(error instanceof Error ? error.message : String(error), secrets).slice(0, 1024);
           trial.status = trial.process ? "inconclusive" : "unavailable";
           trial.verdict = null;
           trial.reason = "A pin, input, process or observation contract could not be established; no outcome was fabricated.";
         } finally {
           if (work) {
             try { rmSync(work, { recursive: true, force: true }); }
-            catch { trial.status = "inconclusive"; trial.verdict = null; trial.reason = "The trial's temporary workspace could not be removed."; }
+            catch (error) { trial.status = "inconclusive"; trial.verdict = null; trial.failureKind = "io";
+              trial.failureMessage = redactComparisonText(error instanceof Error ? error.message : String(error), secrets).slice(0, 1024);
+              trial.reason = "The trial's temporary workspace could not be removed."; }
           }
           trial.artifacts.push(writeComparisonArtifact(output, `${trial.id}.receipt.json`, trial, secrets));
         }

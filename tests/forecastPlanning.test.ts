@@ -12,6 +12,7 @@ import { forecastScopeLatestPath } from "../src/forecast/forecastStore.js";
 import { verifyLatestForecast } from "../src/forecast/forecastVerifier.js";
 import { detectSuspiciousMaturityJump } from "../src/forecast/anomalyDetector.js";
 import { startStudioApiServer } from "../src/studio/studioServer.js";
+import { writeSealedReport } from "./helpers/sealedRun.js";
 
 afterEach(() => { vi.useRealTimers(); });
 
@@ -95,7 +96,8 @@ function writeRunFixture(params: {
     runSealSig: "fixture",
     reportJsonSha256: "fixture"
   };
-  writeFileSync(join(paths.runsDir, `${params.runId}.json`), JSON.stringify(run, null, 2));
+  // Forecasts read sealed runs only (GAP-WP37), so the fixture seals each run the way the runner does.
+  writeSealedReport(params.workspace, paths.runsDir, params.runId, run);
 }
 
 function writeTransformHistory(workspace: string, agentId: string): void {

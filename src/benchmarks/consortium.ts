@@ -1,3 +1,4 @@
+import { mean as statsMean, populationVariance } from "../experiments/stats.js";
 /**
  * Consortium Benchmarking (AMC-434)
  *
@@ -160,6 +161,7 @@ export function submitContribution(
 
 // ── Aggregate statistics ───────────────────────────────────────────────────
 
+// Unlike stats.ts quantile, preserve add-difference interpolation and the already sorted input.
 function percentile(sorted: number[], p: number): number {
   if (sorted.length === 0) return 0;
   const index = (p / 100) * (sorted.length - 1);
@@ -171,9 +173,7 @@ function percentile(sorted: number[], p: number): number {
 
 function stdDev(values: number[], mean: number): number {
   if (values.length <= 1) return 0;
-  const variance =
-    values.reduce((sum, v) => sum + (v - mean) ** 2, 0) / values.length;
-  return Math.round(Math.sqrt(variance) * 1000) / 1000;
+  return Math.round(Math.sqrt(populationVariance(values, mean)) * 1000) / 1000;
 }
 
 export function computeAggregateStats(
@@ -187,7 +187,7 @@ export function computeAggregateStats(
   const mean =
     scores.length > 0
       ? Math.round(
-          (scores.reduce((a, b) => a + b, 0) / scores.length) * 1000,
+          statsMean(scores) * 1000,
         ) / 1000
       : 0;
 
@@ -215,7 +215,7 @@ export function computeAggregateStats(
     const layerMean =
       layerScores.length > 0
         ? Math.round(
-            (layerScores.reduce((a, b) => a + b, 0) / layerScores.length) *
+            statsMean(layerScores) *
               1000,
           ) / 1000
         : 0;
@@ -247,8 +247,7 @@ export function computeAggregateStats(
 }
 
 function mean(values: number[]): number {
-  if (values.length === 0) return 0;
-  return values.reduce((a, b) => a + b, 0) / values.length;
+  return statsMean(values);
 }
 
 export function synthesizeConsortiumInsights(

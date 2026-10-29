@@ -13,6 +13,7 @@
  *   a per-question, per-dimension density visualization
  */
 
+import { populationVariance } from "../experiments/stats.js";
 import { existsSync, readFileSync, readdirSync } from "fs";
 import { join } from "path";
 import { evidencePathExists } from "./controlSurfaceScope.js";
@@ -125,13 +126,7 @@ export function buildDensityMap(
 
   // Cluster analysis
   const dimCoverages = dimensions.map((d) => d.coverageRatio);
-  const coverageVariance =
-    dimCoverages.length > 1
-      ? dimCoverages.reduce((sum, c) => {
-          const mean = dimCoverages.reduce((s, v) => s + v, 0) / dimCoverages.length;
-          return sum + Math.pow(c - mean, 2);
-        }, 0) / dimCoverages.length
-      : 0;
+  const coverageVariance = populationVariance(dimCoverages);
 
   let clusterPattern: "random" | "dimensional" | "difficulty" | "unknown";
   if (coverageVariance > 0.1) {

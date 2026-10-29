@@ -544,10 +544,3 @@ export function validateToolRequest(input: {
 
   return { ok: true };
 }
-
-export function resolveToolPath(workspace: string, value: string): string {
-  if (isAbsolute(value)) {
-    return normalize(value);
-  }
-  return normalize(resolve(workspace, value));
-}

@@ -8,9 +8,11 @@
  * from, authenticates to, or verifies anything with that vendor, so a receipt
  * attests only to the data the caller provided.
  */
+import type { EvidenceOutcome } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import {
+  guardedDrop,
   runLiveScoreBehaviorDrift,
   type LiveDriftAlert,
   type LiveDriftMetricId,
@@ -157,6 +159,7 @@ export interface RunRailScoreLiveDriftInput {
 
 export interface RailScoreDistribution {
   rowCount: number;
+  evidenceOutcome: EvidenceOutcome;
   scoreMean0to1: number;
   guardrailPassRate0to1: number;
   safeRegenerationRate0to1: number;
@@ -164,7 +167,7 @@ export interface RailScoreDistribution {
   compliancePassRate0to1: number;
   telemetryCoverage0to1: number;
   promptInjectionBlockRate0to1: number;
-  evidenceCoverage0to1: number;
+  evidenceCoverage0to1: number | null;
   latencyP95Ms: number;
   costUsdMean: number;
   evaluationDimensionDistribution: Record<string, number>;
@@ -181,7 +184,7 @@ export interface RailScoreScoreDrift {
   compliancePassRateDrop0to1: number;
   telemetryCoverageDrop0to1: number;
   promptInjectionBlockRateDrop0to1: number;
-  evidenceCoverageDrop0to1: number;
+  evidenceCoverageDrop0to1: number | null;
   latencyP95IncreaseRatio: number;
   costIncreaseRatio: number;
 }
@@ -374,13 +377,14 @@ function distribution(rows: RailScoreReceiptRow[]): RailScoreDistribution {
     compliancePassRate0to1: mean(rows.map((row) => row.compliancePassRate0to1)),
     telemetryCoverage0to1: mean(rows.map((row) => row.telemetryCoverage0to1)),
     promptInjectionBlockRate0to1: mean(rows.map((row) => row.promptInjectionBlockRate0to1)),
-    evidenceCoverage0to1: mean(rows.map((row) => row.evidenceCoverage0to1), rows.length === 0 ? 1 : 0),
+    evidenceCoverage0to1: mean(rows.map((row) => row.evidenceCoverage0to1), null),
     latencyP95Ms: percentile(rows.map((row) => row.latencyMs), 95),
     costUsdMean: mean(rows.map((row) => row.costUsd)),
     evaluationDimensionDistribution: labelDistribution(rows, (row) => row.evaluationDimension),
     guardrailModeDistribution: labelDistribution(rows, (row) => row.guardrailMode),
     complianceFrameworkDistribution: labelDistribution(rows, (row) => row.complianceFramework),
     contextDistribution: labelDistribution(rows, contextLabel),
+    evidenceOutcome: rows.length > 0 ? "measured" : "not_evaluated",
   };
 }
 
@@ -404,7 +408,7 @@ export function runRailScoreLiveDrift(input: RunRailScoreLiveDriftInput): RailSc
     compliancePassRateDrop0to1: round(Math.max(0, baselineDistribution.compliancePassRate0to1 - liveDistribution.compliancePassRate0to1)),
     telemetryCoverageDrop0to1: round(Math.max(0, baselineDistribution.telemetryCoverage0to1 - liveDistribution.telemetryCoverage0to1)),
     promptInjectionBlockRateDrop0to1: round(Math.max(0, baselineDistribution.promptInjectionBlockRate0to1 - liveDistribution.promptInjectionBlockRate0to1)),
-    evidenceCoverageDrop0to1: round(Math.max(0, baselineDistribution.evidenceCoverage0to1 - liveDistribution.evidenceCoverage0to1)),
+    evidenceCoverageDrop0to1: guardedDrop(true, baselineDistribution.evidenceCoverage0to1, liveDistribution.evidenceCoverage0to1),
     latencyP95IncreaseRatio: ratioIncrease(baselineDistribution.latencyP95Ms, liveDistribution.latencyP95Ms),
     costIncreaseRatio: ratioIncrease(baselineDistribution.costUsdMean, liveDistribution.costUsdMean),
   };
@@ -436,8 +440,8 @@ export function runRailScoreLiveDrift(input: RunRailScoreLiveDriftInput): RailSc
   if (scoreDrift.promptInjectionBlockRateDrop0to1 > thresholds.maxPromptInjectionBlockRateDrop0to1) {
     additionalAlerts.push(buildAlert(input, "railPromptInjectionBlockRate0to1", scoreDrift.promptInjectionBlockRateDrop0to1, thresholds.maxPromptInjectionBlockRateDrop0to1, "Live RAIL Score prompt-injection block rate dropped beyond threshold.", "critical"));
   }
-  if (liveDistribution.evidenceCoverage0to1 < thresholds.minEvidenceCoverage0to1) {
-    additionalAlerts.push(buildAlert(input, "railEvidenceCoverage0to1", liveDistribution.evidenceCoverage0to1, thresholds.minEvidenceCoverage0to1, "Live RAIL Score rows are missing source, MIT license, GitHub release, PyPI package, README, pyproject, workflow, client, model, policy, session, middleware, telemetry, compliance, agent, integration, baseline/live result, drift statistic, alert receipt, evidence, signed evidence, or row-hash proof.", "critical"));
+  if (liveDistribution.evidenceCoverage0to1 === null || liveDistribution.evidenceCoverage0to1 < thresholds.minEvidenceCoverage0to1) {
+    additionalAlerts.push(buildAlert(input, "railEvidenceCoverage0to1", liveDistribution.evidenceCoverage0to1, thresholds.minEvidenceCoverage0to1, liveDistribution.evidenceCoverage0to1 === null ? "Live evidence missing; coverage is not evaluated." : "Live RAIL Score rows are missing source, MIT license, GitHub release, PyPI package, README, pyproject, workflow, client, model, policy, session, middleware, telemetry, compliance, agent, integration, baseline/live result, drift statistic, alert receipt, evidence, signed evidence, or row-hash proof.", "critical"));
   }
   if (behaviorDrift.evaluationDimensionDivergence0to1 > thresholds.maxEvaluationDimensionDivergence0to1) {
     additionalAlerts.push(buildAlert(input, "railEvaluationDimensionDistribution", behaviorDrift.evaluationDimensionDivergence0to1, thresholds.maxEvaluationDimensionDivergence0to1, "Live RAIL Score evaluation-dimension distribution diverged beyond threshold.", "medium"));

@@ -3,6 +3,13 @@
   "decision": "D-15",
   "files": [
     {
+      "path": "dist/experiments/governedOptimizer.d.ts",
+      "issue": "GAP-WP38",
+      "baseCommit": "2eb8d7e2fbffa3487c51bf0d961167829bfa0a18",
+      "archivePath": "unused-code/plan-edits/GAP-WP38/dist/experiments/governedOptimizer.d.ts.landed",
+      "sha256": "e2a36efef0396fbe6198a1ea2ce2953bded4707830d29ee7c3f0b9175ed59341"
+    },
+    {
       "path": "dist/index.d.ts",
       "issue": "P0-08",
       "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
@@ -22,6 +29,13 @@
       "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
       "archivePath": "unused-code/plan-edits/P2-08/dist/runtime/firewall.d.ts.landed",
       "sha256": "b9d0d6ea421896588b78b7b7dc5c6afe3529209d06b0a7031642f7875e162527"
+    },
+    {
+      "path": "dist/runtime/runManager.d.ts",
+      "issue": "GAP-WP46",
+      "baseCommit": "2eb8d7e2fbffa3487c51bf0d961167829bfa0a18",
+      "archivePath": "unused-code/plan-edits/GAP-WP46/dist/runtime/runManager.d.ts.landed",
+      "sha256": "d82e2dea74dd01a0c4a5a07c6b65387b3048226e7687db8607e8979298fec825"
     },
     {
       "path": "dist/sdk/nativeAgentClient.d.ts",
@@ -374,6 +388,13 @@
       "sha256": "7cd20318c92def5052ec57cb8d0e28d3aec62c0a1eb54d1a1a9304faeebe647a"
     },
     {
+      "path": "src/experiments/governedOptimizer.ts",
+      "issue": "GAP-WP38",
+      "baseCommit": "2eb8d7e2fbffa3487c51bf0d961167829bfa0a18",
+      "archivePath": "unused-code/plan-edits/GAP-WP38/src/experiments/governedOptimizer.ts.landed",
+      "sha256": "0e8527f1d7deeefb3f08b8939567163bda80b9c5bdc100fec54115389ed602f1"
+    },
+    {
       "path": "src/federation/federationStore.ts",
       "issue": "P0-52",
       "baseCommit": "201c76b659d8afe2c556e951764d401cec60e6a5",
@@ -654,11 +675,39 @@
       "sha256": "535a626d6e1802003214e31dc98f61fedfa94f0e448205f43b446e3c011a0c7a"
     },
     {
+      "path": "src/runtime/autonomyBoundary.ts",
+      "issue": "GAP-WP46",
+      "baseCommit": "2eb8d7e2fbffa3487c51bf0d961167829bfa0a18",
+      "archivePath": "unused-code/plan-edits/GAP-WP46/src/runtime/autonomyBoundary.ts.landed",
+      "sha256": "c0be8a3f5c3d172c92d78d6381bc696f819d678dd6c44ccd486942bed26d8529"
+    },
+    {
       "path": "src/runtime/firewall.ts",
       "issue": "P2-08",
       "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
       "archivePath": "unused-code/plan-edits/P2-08/src/runtime/firewall.ts.landed",
       "sha256": "922b0b6891478e7e234bc65eab67acf50d806f76d10ace5c560dbbd3cbd9fe05"
+    },
+    {
+      "path": "src/runtime/index.ts",
+      "issue": "GAP-WP46",
+      "baseCommit": "2eb8d7e2fbffa3487c51bf0d961167829bfa0a18",
+      "archivePath": "unused-code/plan-edits/GAP-WP46/src/runtime/index.ts.landed",
+      "sha256": "1ae6cde65db819929710dddc0c1a095c2ea112440f448f2a32c436655c3b5b50"
+    },
+    {
+      "path": "src/runtime/runManager.ts",
+      "issue": "GAP-WP46",
+      "baseCommit": "2eb8d7e2fbffa3487c51bf0d961167829bfa0a18",
+      "archivePath": "unused-code/plan-edits/GAP-WP46/src/runtime/runManager.ts.landed",
+      "sha256": "c73e94bb51e07e6f3fd2ace0e2bea154cc544d4c2bdbeb7d049650d4a0387236"
+    },
+    {
+      "path": "src/runtime/stateCheckpoint.ts",
+      "issue": "GAP-WP46",
+      "baseCommit": "2eb8d7e2fbffa3487c51bf0d961167829bfa0a18",
+      "archivePath": "unused-code/plan-edits/GAP-WP46/src/runtime/stateCheckpoint.ts.landed",
+      "sha256": "c34cdc21c3e05fa1be379e0d6b18b1b886c4508288065fcd51d8cc98bd83705e"
     },
     {
       "path": "src/sdk/nativeAgentClient.ts",
@@ -764,6 +813,83 @@
       "baseCommit": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
       "archivePath": "unused-code/plan-edits/P2-08/src/value/valueStore.ts.landed",
       "sha256": "09811069c8c7f07f7011f9987ce6f777f37da28b2c3c0488d807d9b5beb0f40a"
+    },
+    {
+      "path": "src/watch/agentReadingTestLiveDrift.ts",
+      "issue": "AXE-23",
+      "baseCommit": "c71c28e2c10cad64c72600e042a2121b07b9b38e",
+      "archivePath": "unused-code/plan-edits/AXE-23/src/watch/agentReadingTestLiveDrift.ts.landed",
+      "sha256": "016ca52bb9325880177109033caa75e70cbc7194485857e47d1553b00d2d6e0c"
+    },
+    {
+      "path": "src/watch/aiReputationClaudeLiveDrift.ts",
+      "issue": "AXE-23",
+      "baseCommit": "c71c28e2c10cad64c72600e042a2121b07b9b38e",
+      "archivePath": "unused-code/plan-edits/AXE-23/src/watch/aiReputationClaudeLiveDrift.ts.landed",
+      "sha256": "13cfce44b753d8ed474ee3a1418fbc833edc663f3226608594005e929b6254df"
+    },
+    {
+      "path": "src/watch/awesomeAgentMemoryLiveDrift.ts",
+      "issue": "AXE-23",
+      "baseCommit": "c71c28e2c10cad64c72600e042a2121b07b9b38e",
+      "archivePath": "unused-code/plan-edits/AXE-23/src/watch/awesomeAgentMemoryLiveDrift.ts.landed",
+      "sha256": "0c1860b7274a88c499f3770eb742c2add5501b8183f50ead4622ad7f7d872d68"
+    },
+    {
+      "path": "src/watch/ctfAgentBenchmarkLiveDrift.ts",
+      "issue": "AXE-23",
+      "baseCommit": "c71c28e2c10cad64c72600e042a2121b07b9b38e",
+      "archivePath": "unused-code/plan-edits/AXE-23/src/watch/ctfAgentBenchmarkLiveDrift.ts.landed",
+      "sha256": "6fe1411d922dd58119d13a09be1628f7ee60fc689e958353d490d39fc9c3416b"
+    },
+    {
+      "path": "src/watch/darwinGodelMachineLiveDrift.ts",
+      "issue": "AXE-23",
+      "baseCommit": "c71c28e2c10cad64c72600e042a2121b07b9b38e",
+      "archivePath": "unused-code/plan-edits/AXE-23/src/watch/darwinGodelMachineLiveDrift.ts.landed",
+      "sha256": "aa193cbd3003b604aee8a38a279e6e0199fa788ca50a23939edeea396a962fea"
+    },
+    {
+      "path": "src/watch/driftMath.ts",
+      "issue": "AXE-23",
+      "baseCommit": "c71c28e2c10cad64c72600e042a2121b07b9b38e",
+      "archivePath": "unused-code/plan-edits/AXE-23/src/watch/driftMath.ts.landed",
+      "sha256": "645eb29d295ae3dd0e86b20e79b7fbde9f59da4807a56bb82668ef15a667c954"
+    },
+    {
+      "path": "src/watch/garageLiveDrift.ts",
+      "issue": "AXE-23",
+      "baseCommit": "c71c28e2c10cad64c72600e042a2121b07b9b38e",
+      "archivePath": "unused-code/plan-edits/AXE-23/src/watch/garageLiveDrift.ts.landed",
+      "sha256": "49cfc0e8e9ccea50fe8fec146f7586606309fcd849d8500dd76120568b269432"
+    },
+    {
+      "path": "src/watch/liveDriftAlerts.ts",
+      "issue": "AXE-23",
+      "baseCommit": "c71c28e2c10cad64c72600e042a2121b07b9b38e",
+      "archivePath": "unused-code/plan-edits/AXE-23/src/watch/liveDriftAlerts.ts.landed",
+      "sha256": "1ea774644363df1f4145408e19768dd05e96f2be74dc27ce73fcced80f45935b"
+    },
+    {
+      "path": "src/watch/liveDriftTypes.ts",
+      "issue": "AXE-23",
+      "baseCommit": "c71c28e2c10cad64c72600e042a2121b07b9b38e",
+      "archivePath": "unused-code/plan-edits/AXE-23/src/watch/liveDriftTypes.ts.landed",
+      "sha256": "58c67a8c97f02e279603aa333118b5ae15bea462844909535e91f34e083db5d6"
+    },
+    {
+      "path": "src/watch/llmFighterLiveDrift.ts",
+      "issue": "AXE-23",
+      "baseCommit": "c71c28e2c10cad64c72600e042a2121b07b9b38e",
+      "archivePath": "unused-code/plan-edits/AXE-23/src/watch/llmFighterLiveDrift.ts.landed",
+      "sha256": "476f353b9f9abdc11b9856b56082ebf622a8196fc58d579db604f882af2e0b02"
+    },
+    {
+      "path": "src/watch/railScoreLiveDrift.ts",
+      "issue": "AXE-23",
+      "baseCommit": "c71c28e2c10cad64c72600e042a2121b07b9b38e",
+      "archivePath": "unused-code/plan-edits/AXE-23/src/watch/railScoreLiveDrift.ts.landed",
+      "sha256": "479aa2bf8299a4e3951c85d95c4490d39be3616f6cd68a80ba5f818b82911282"
     },
     {
       "path": "src/workorders/workorderEngine.ts",

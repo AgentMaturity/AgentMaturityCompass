@@ -295,7 +295,8 @@ describe("P2-27 artifact-bound calibration authority (synthetic contracts)", () 
     expect((await agentsJudge.evaluateRegulated(input)).state).toBe("admitted"); expect(adapter).not.toHaveBeenCalled();
     expect(await new LLMJudge({ mode: "simulated" }).evaluateRegulated(input)).toMatchObject({ state: "not_evaluated", claimKind: "synthetic_example" });
     const aggregate = vi.spyOn(ExtendedLLMJudgeEngine.prototype, "evaluateComprehensive").mockResolvedValue([
-      { metric: "fixture", score: 1, explanation: "synthetic metric only", confidence: 1, rawResponse: "fixture" }
+      { metric: "fixture", status: "scored", score: 1, explanation: "synthetic metric only", confidence: 1, rawResponse: "fixture",
+        judge: { model: "claude-3-sonnet", temperature: 0.1, maxTokens: 1000 } }
     ]);
     const runner = new AMCJudgeTestRunner({ metrics: [], categories: [] });
     const legacy = await runner.evaluateTest({ testId: "fixture", description: "fixture", input: "fixture", output: "fixture" });

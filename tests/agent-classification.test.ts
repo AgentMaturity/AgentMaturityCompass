@@ -50,8 +50,9 @@ describe("classifyAgentVsWorkflow", () => {
     expect(result.marketingLabel.length).toBeGreaterThan(0);
   });
 
-  it("empty input defaults to workflow", () => {
+  it("empty input has no classification", () => {
     const result = classifyAgentVsWorkflow({});
-    expect(result.classification).toBe("workflow");
+    expect(result.classification).toBeNull();
+    expect(result.outcome).toBe("not_evaluated");
   });
 });

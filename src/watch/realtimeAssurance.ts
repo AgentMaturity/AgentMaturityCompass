@@ -1,3 +1,4 @@
+import { mean, populationVariance } from "../experiments/stats.js";
 /**
  * Real-Time Assurance Engine
  *
@@ -91,8 +92,8 @@ const costSpikeCheck: RealtimeAssuranceCheck = {
     const recentCosts = ctx.recentTraces.map((t) => t.totalCostUsd).filter((c) => c > 0);
     if (recentCosts.length === 0) return violations;
 
-    const avgCost = recentCosts.reduce((a, b) => a + b, 0) / recentCosts.length;
-    const stdDev = Math.sqrt(recentCosts.reduce((sum, c) => sum + Math.pow(c - avgCost, 2), 0) / recentCosts.length);
+    const avgCost = mean(recentCosts);
+    const stdDev = Math.sqrt(populationVariance(recentCosts, avgCost));
     const threshold = avgCost + 3 * Math.max(stdDev, avgCost * 0.5);
 
     if (trace.totalCostUsd > threshold && trace.totalCostUsd > 0.01) {

@@ -8,6 +8,8 @@
  * Designed for offline eval, not live traffic.
  */
 
+import { mean, populationVariance } from "../experiments/stats.js";
+
 // ── Types ──────────────────────────────────────────────────────────────────
 
 export interface ParameterRange {
@@ -115,21 +117,16 @@ export function analyzeParameterSensitivity(
     }
 
     // Calculate variance across value groups
-    const groupMeans = Object.values(scoresByValue).map((scores) => {
-      const sum = scores.reduce((a, b) => a + b, 0);
-      return sum / scores.length;
-    });
+    const groupMeans = Object.values(scoresByValue).map((scores) => mean(scores));
 
     if (groupMeans.length < 2) {
       sensitivity[range.name] = 0;
       continue;
     }
 
-    const overallMean =
-      groupMeans.reduce((a, b) => a + b, 0) / groupMeans.length;
-    const variance =
-      groupMeans.reduce((sum, m) => sum + (m - overallMean) ** 2, 0) /
-      groupMeans.length;
+    // Sensitivity is population variance of equally weighted group means, not
+    // sample variance or variance weighted by the number of runs in each group.
+    const variance = populationVariance(groupMeans);
     sensitivity[range.name] = Math.round(variance * 10000) / 10000;
   }
 
@@ -165,7 +162,7 @@ export function buildMatrixReport(
   const averageScore =
     scores.length > 0
       ? Math.round(
-          (scores.reduce((a, b) => a + b, 0) / scores.length) * 1000,
+          mean(scores) * 1000,
         ) / 1000
       : 0;
 

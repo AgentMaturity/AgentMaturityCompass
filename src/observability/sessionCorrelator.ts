@@ -1,3 +1,4 @@
+import { mean, nearestRank, populationVariance } from "../experiments/stats.js";
 /**
  * Session Correlator — Gap 7
  *
@@ -439,8 +440,8 @@ function computeSessionSummary(sessionId: string, agentId: string, traces: Norma
   const completionRate = traces.length > 0 ? completedTraces.length / traces.length : 1;
 
   // Consistency: low variance in latency = high consistency
-  const avgLatency = latencies.reduce((a, b) => a + b, 0) / latencies.length;
-  const variance = latencies.reduce((s, l) => s + Math.pow(l - avgLatency, 2), 0) / latencies.length;
+  const avgLatency = mean(latencies);
+  const variance = populationVariance(latencies, avgLatency);
   const cv = avgLatency > 0 ? Math.sqrt(variance) / avgLatency : 0;
   const consistencyScore = cv < 0.3 ? 100 : cv < 0.6 ? 75 : cv < 1.0 ? 50 : 25;
 
@@ -494,7 +495,5 @@ function computeSessionSummary(sessionId: string, agentId: string, traces: Norma
 }
 
 function percentile(sorted: number[], p: number): number {
-  if (sorted.length === 0) return 0;
-  const idx = Math.ceil(sorted.length * p) - 1;
-  return sorted[Math.max(0, Math.min(idx, sorted.length - 1))]!;
+  return nearestRank(sorted, p);
 }

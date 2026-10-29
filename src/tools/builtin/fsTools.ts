@@ -1,4 +1,4 @@
-import { readFileSync, mkdirSync, realpathSync } from "node:fs";
+import { mkdirSync, realpathSync } from "node:fs";
 import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { z } from "zod";
 import { redactSecrets } from "../../shield/redaction/redactSecrets.js";
@@ -10,6 +10,7 @@ import type { ReadBeforeEditLedger } from "./readBeforeEdit.js";
 import { writeFileAtomicSync } from "./atomicWrite.js";
 import { planLiteralEdits, type LiteralEdit } from "./fsEditPlan.js";
 import { unifiedDiff } from "./lineDiff.js";
+import { readRegularFile, scanRegularFile } from "./fsRegularFile.js";
 
 /**
  * Filesystem tools (P4.3).
@@ -100,7 +101,7 @@ function realPathOfNearestExisting(target: string): string {
  * filesystem will actually open. Both sides are realpath'd, because the
  * workspace root is itself often a link (`/var` to `/private/var` on macOS).
  */
-function insideWorkspace(workspace: string, path: string): { readonly full: string; readonly rel: string } {
+export function insideWorkspace(workspace: string, path: string): { readonly full: string; readonly rel: string } {
   const root = realPathOfNearestExisting(resolve(workspace));
   const requested = isAbsolute(path) ? resolve(path) : resolve(root, path);
   const real = realPathOfNearestExisting(requested);
@@ -119,7 +120,7 @@ function insideWorkspace(workspace: string, path: string): { readonly full: stri
 /** The file's bytes, or null when it does not exist. Any other failure (a directory, no permission) is thrown. */
 function readIfExists(full: string): Buffer | null {
   try {
-    return readFileSync(full);
+    return readRegularFile(full);
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === "ENOENT") return null;
     throw error;
@@ -138,18 +139,68 @@ function utf8(raw: Buffer): string | null {
 /** Text fit to show as lines: valid UTF-8 with no NUL byte, which marks binary content. */
 const displayText = (raw: Buffer): string | null => (raw.includes(0) ? null : utf8(raw));
 
-/** Lines `offset` to `offset + limit - 1`, each `String(n).padStart(6)` + tab + text; a final newline ends the last line. */
-function numberedLines(raw: Buffer, path: string, offset: number, limit: number): { readonly body: string; readonly trailer: string } {
-  const text = displayText(raw);
-  if (text === null) {
-    throw new Error(`"${path}" is not UTF-8 text (binary or another encoding); read it without offset and limit`);
+/** Stream the full observation while retaining only a capped raw prefix or numbered line range. */
+function readPresentation(full: string, path: string, maxBytes: number, range: { offset: number; limit: number } | null) {
+  const chunks: Buffer[] = [];
+  let retained = 0;
+  let shownBytes = 0;
+  const append = (chunk: Buffer): void => {
+    shownBytes += chunk.length;
+    // Up to four lookahead bytes let the final cut keep a whole UTF-8 character.
+    const count = Math.min(chunk.length, maxBytes + 4 - retained);
+    if (count > 0) {
+      chunks.push(Buffer.from(chunk.subarray(0, count)));
+      retained += count;
+    }
+  };
+  const decoder = range === null ? null : new TextDecoder("utf-8", { fatal: true, ignoreBOM: true });
+  let line = 1;
+  let lineStarted = false;
+  let selectedLines = 0;
+  let endsWithNewline = true;
+  const notText = () => new Error(`"${path}" is not UTF-8 text (binary or another encoding); read it without offset and limit`);
+  const observation = scanRegularFile(full, chunk => {
+    if (range === null) { append(chunk); return; }
+    try {
+      if (chunk.includes(0)) throw notText();
+      decoder!.decode(chunk, { stream: true });
+    } catch { throw notText(); }
+    let start = 0;
+    while (start < chunk.length) {
+      const newline = chunk.indexOf(10, start);
+      const end = newline === -1 ? chunk.length : newline;
+      if (line >= range.offset && line - range.offset < range.limit) {
+        if (!lineStarted) {
+          append(Buffer.from(`${selectedLines === 0 ? "" : "\n"}${String(line).padStart(6)}\t`, "utf8"));
+          selectedLines++;
+          lineStarted = true;
+        }
+        append(chunk.subarray(start, end));
+      }
+      endsWithNewline = newline !== -1;
+      if (newline === -1) break;
+      line++;
+      lineStarted = false;
+      start = newline + 1;
+    }
+  });
+  if (decoder !== null) {
+    try { decoder.decode(); } catch { throw notText(); }
   }
-  const lines = text.split("\n");
-  if (lines[lines.length - 1] === "") lines.pop();
-  if (offset > lines.length) throw new Error(`offset ${offset} is past the end of the file (${lines.length} lines)`);
-  const to = Math.min(lines.length, offset + limit - 1);
-  const body = lines.slice(offset - 1, to).map((line, index) => `${String(offset + index).padStart(6)}\t${line}`).join("\n");
-  return { body, trailer: `[amc: lines ${offset}-${to} of ${lines.length}]` };
+  const totalLines = line - (endsWithNewline ? 1 : 0);
+  if (range !== null && range.offset > totalLines) {
+    throw new Error(`offset ${range.offset} is past the end of the file (${totalLines} lines)`);
+  }
+  const shown = Buffer.concat(chunks, retained);
+  let end = Math.min(shown.length, maxBytes);
+  // A cut before a continuation byte falls inside its character: omit that character.
+  while (end > 0 && end < shown.length && (shown[end]! & 0xc0) === 0x80) end--;
+  const slice = shown.subarray(0, end);
+  const truncated = shownBytes > slice.length
+    ? `\n[amc: truncated at ${maxBytes} bytes; ${shownBytes - slice.length} more]`
+    : "";
+  const trailer = range === null ? "" : `\n[amc: lines ${range.offset}-${Math.min(totalLines, range.offset + range.limit - 1)} of ${totalLines}]`;
+  return { ...observation, retainedBytes: slice.length, output: `${slice.toString("utf8")}${truncated}${trailer}` };
 }
 
 /**
@@ -166,17 +217,26 @@ function shownDiff(rel: string, before: Buffer, after: Buffer): { readonly text:
 }
 
 /**
- * Write `after` only while the file still holds the bytes this call read and planned against.
+ * Validate the planning snapshot and observation at publication, after staging has finished.
  *
- * ponytail: a re-read just before the rename, so a writer racing the call is refused rather than overwritten; the
- * window between this check and the rename remains, as it does for any unlocked write.
+ * These synchronous bodies cannot interleave within one JavaScript thread. Portable Node has no digest-CAS
+ * against external writers: an uncooperative process can still race the final check and rename.
  */
-function writeIfUnchanged(full: string, path: string, before: Buffer | null, after: Buffer): void {
-  const current = readIfExists(full);
-  if ((current === null ? null : sha256Hex(current)) !== (before === null ? null : sha256Hex(before))) {
-    throw new Error(`"${path}" changed while this call ran — read it again, then retry`);
-  }
-  writeFileAtomicSync(full, after);
+function writeIfUnchanged(execution: ToolExecution, ledger: ReadBeforeEditLedger, full: string, path: string,
+  before: Buffer | null, after: Buffer): void {
+  const snapshotDigest = before === null ? undefined : sha256Hex(before);
+  writeFileAtomicSync(full, after, {
+    createOnly: before === null,
+    beforeCommit: () => {
+      if (insideWorkspace(execution.workspace, path).full !== full) {
+        throw new Error(`"${path}" changed location while this call ran — read it again, then retry`);
+      }
+      const verdict = before === null
+        ? ledger.mayWrite(execution.agentId, full)
+        : ledger.mayEdit(execution.agentId, full, snapshotDigest);
+      if (!verdict.ok) throw new Error(`"${path}" changed while this call ran — ${verdict.reason}`);
+    }
+  });
 }
 
 function editsOf(args: z.infer<typeof editArgs>): LiteralEdit[] {
@@ -200,7 +260,8 @@ export function fsTools(deps: FsToolDeps): readonly ToolDefinition[] {
       name: "fs.read",
       actionClass: "READ_ONLY",
       description:
-        "Read a UTF-8 file from the workspace. With offset or limit, returns numbered lines: each line is its number " +
+        "Read a regular file from the workspace, with file content capped at maxBytes on UTF-8 character boundaries. " +
+        "With offset or limit, returns numbered UTF-8 lines: each line is its number " +
         "right-aligned in 6 columns, a tab, then the text. The number and tab are not part of the file; leave them out " +
         "of fs.edit find text.",
       parameters: {
@@ -216,24 +277,13 @@ export function fsTools(deps: FsToolDeps): readonly ToolDefinition[] {
       body: (execution) => {
         const args = readArgs.parse(execution.arguments);
         const { full } = insideWorkspace(execution.workspace, args.path);
-        const raw = readFileSync(full);
-        const lines = args.offset === undefined && args.limit === undefined
+        const range = args.offset === undefined && args.limit === undefined
           ? null
-          : numberedLines(raw, args.path, args.offset ?? 1, args.limit ?? DEFAULT_LINE_LIMIT);
-        // Record the FULL contents, not the truncated slice or the line range:
-        // the policy asks whether the file changed, and a digest over a part
-        // would miss every change outside it.
-        ledger.recordRead(execution.agentId, full, raw);
-        const shown = lines === null ? raw : Buffer.from(lines.body, "utf8");
-        const slice = shown.subarray(0, Math.min(shown.length, args.maxBytes));
-        const truncated = shown.length > slice.length
-          ? `\n[amc: truncated at ${args.maxBytes} bytes; ${shown.length - slice.length} more]`
-          : "";
-        return {
-          ok: true,
-          output: `${slice.toString("utf8")}${truncated}${lines === null ? "" : `\n${lines.trailer}`}`,
-          bytes: slice.length
-        };
+          : { offset: args.offset ?? 1, limit: args.limit ?? DEFAULT_LINE_LIMIT };
+        const shown = readPresentation(full, args.path, args.maxBytes, range);
+        // The streamed digest covers bytes outside the retained prefix/range too.
+        ledger.recordReadDigest(execution.agentId, full, shown.digest);
+        return { ok: true, output: shown.output, bytes: shown.retainedBytes };
       }
     }),
 
@@ -254,7 +304,7 @@ export function fsTools(deps: FsToolDeps): readonly ToolDefinition[] {
         const args = writeArgs.parse(execution.arguments);
         const { full, rel } = insideWorkspace(execution.workspace, args.path);
         const before = readIfExists(full);
-        const verdict = ledger.mayWrite(execution.agentId, full);
+        const verdict = ledger.mayWrite(execution.agentId, full, before === null ? undefined : sha256Hex(before));
         if (!verdict.ok) throw new Error(verdict.reason);
         const after = Buffer.from(args.content, "utf8");
         const diff = before === null ? null : shownDiff(rel, before, after);
@@ -262,7 +312,7 @@ export function fsTools(deps: FsToolDeps): readonly ToolDefinition[] {
           return { ok: true, output: withDiff(`SIMULATE fs.write ${args.path} (${after.length} bytes)`, diff?.text ?? ""), bytes: 0 };
         }
         mkdirSync(dirname(full), { recursive: true });
-        writeIfUnchanged(full, args.path, before, after);
+        writeIfUnchanged(execution, ledger, full, args.path, before, after);
         // Refresh: the agent now knows this file's contents, because it just
         // produced them.
         ledger.recordRead(execution.agentId, full, after);
@@ -314,7 +364,7 @@ export function fsTools(deps: FsToolDeps): readonly ToolDefinition[] {
         // Read before the policy check, and write only if the file still holds
         // these bytes: the plan, the diff and the evidence all describe them.
         const raw = readIfExists(full);
-        const verdict = ledger.mayEdit(execution.agentId, full);
+        const verdict = ledger.mayEdit(execution.agentId, full, raw === null ? undefined : sha256Hex(raw));
         if (!verdict.ok) throw new Error(verdict.reason);
         if (raw === null) throw new Error(`"${args.path}" changed while this call ran — read it again, then retry`);
         const before = utf8(raw);
@@ -328,7 +378,7 @@ export function fsTools(deps: FsToolDeps): readonly ToolDefinition[] {
         if (simulated(execution)) {
           return { ok: true, output: withDiff(`SIMULATE fs.edit ${args.path} (${summary})`, diff.text), bytes: 0 };
         }
-        writeIfUnchanged(full, args.path, raw, after);
+        writeIfUnchanged(execution, ledger, full, args.path, raw, after);
         ledger.recordRead(execution.agentId, full, after);
         noteFileChange(execution.token, {
           path: rel, beforeSha256: sha256Hex(raw), afterSha256: sha256Hex(after), bytesBefore: raw.length,

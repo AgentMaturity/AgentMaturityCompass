@@ -1,3 +1,4 @@
+import { mean } from "../experiments/stats.js";
 import { randomUUID } from "node:crypto";
 import { sha256Hex } from "../utils/hash.js";
 import { openLedger } from "../ledger/ledger.js";
@@ -28,10 +29,7 @@ function numeric(value: unknown): number | null {
 }
 
 function average(values: number[]): number | null {
-  if (values.length === 0) {
-    return null;
-  }
-  return Number((values.reduce((sum, value) => sum + value, 0) / values.length).toFixed(6));
+  return values.length === 0 ? null : Number(mean(values).toFixed(6));
 }
 
 function trustScopeIdHash(scopeType: "WORKSPACE" | "NODE" | "AGENT", scopeId: string): string {
