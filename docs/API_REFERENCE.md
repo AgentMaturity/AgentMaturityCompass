@@ -177,7 +177,7 @@ AMC provides 1,268 public CLI command paths in the live command inventory.
 | 158 | `amc bench compare` | Compute local vs imported ecosystem comparison |
 | 159 | `amc bench comparison-latest` | Read latest bench comparison artifact |
 | 160 | `amc bench create` | Create deterministic signed .amcbench artifact |
-| 161 | `amc bench harness-compare` | Run pinned comparison adapters and independent oracles; unavailable measurements remain N/A |
+| 161 | `amc bench harness-compare` | Run pinned comparison adapters and independent oracles; exits 0 pass, 1 qualified failure/fatal error, 3 unavailable/inconclusive |
 | 162 | `amc bench import` | Import one bench artifact from allowlisted registry |
 | 163 | `amc bench init` | Initialize signed bench policy |
 | 164 | `amc bench list-exports` | List locally exported bench artifacts |
@@ -470,7 +470,7 @@ AMC provides 1,268 public CLI command paths in the live command inventory.
 | 451 | `amc executive` | Executive and board-ready AMC artifacts |
 | 452 | `amc executive brief` | Generate a board-ready one-page executive brief from a diagnostic run |
 | 453 | `amc experiment` | Deterministic baseline vs candidate experiments |
-| 454 | `amc experiment analyze` | Analyze latest experiment run |
+| 454 | `amc experiment analyze` | Analyze latest experiment run (exit 0 all candidate cases pass, 1 failure or error, 3 inconclusive) |
 | 455 | `amc experiment create` | Create an experiment |
 | 456 | `amc experiment gate` | Evaluate latest experiment run against gate policy (exit 0 pass, 1 fail or error, 3 inconclusive) |
 | 457 | `amc experiment gate-template` | Write an experiment gate policy template |
@@ -478,10 +478,10 @@ AMC provides 1,268 public CLI command paths in the live command inventory.
 | 459 | `amc experiment optimize` | Create governed optimizer candidates from a Fixer RCA report |
 | 460 | `amc experiment optimizer-list` | List governed optimizer runs |
 | 461 | `amc experiment optimizer-show` | Show a governed optimizer run |
-| 462 | `amc experiment run` | Run deterministic experiment against signed casebook |
+| 462 | `amc experiment run` | Run deterministic experiment against signed casebook (exit 0 all candidate cases pass, 1 failure or error, 3 inconclusive) |
 | 463 | `amc experiment set-baseline` | Set experiment baseline config |
 | 464 | `amc experiment set-candidate` | Set experiment candidate signed config overlay |
-| 465 | `amc experiment-architecture` | Run a controlled architecture comparison experiment |
+| 465 | `amc experiment-architecture` | Run a controlled architecture comparison experiment (exit 0 measured pass, 1 failure or error, 3 inconclusive or simulated) |
 | 466 | `amc experiment-architecture-probes` | List the standard probe set for architecture experiments |
 | 467 | `amc explain` | Plain-English explanation for a diagnostic question (example: AMC-2.1) |
 | 468 | `amc export` | Export policy packs and badges |
@@ -2457,13 +2457,15 @@ Create deterministic signed .amcbench artifact
 
 #### `amc bench harness-compare`
 
-Run pinned comparison adapters and independent oracles; unavailable measurements remain N/A
+Run pinned comparison adapters and independent oracles; exits 0 pass, 1 qualified failure/fatal error, 3 unavailable/inconclusive
 
 
 | Option | Description |
 |--------|-------------|
 | `--manifest <path>` | - |
 | `--out <directory>` | - |
+| `--check` | - |
+| `--dry-run` | - |
 | `--allow-adapter-execution` | - |
 | `--live` | - |
 
@@ -4945,7 +4947,7 @@ Generate a board-ready one-page executive brief from a diagnostic run
 
 #### `amc experiment analyze`
 
-Analyze latest experiment run
+Analyze latest experiment run (exit 0 all candidate cases pass, 1 failure or error, 3 inconclusive)
 
 
 | Option | Description |
@@ -5029,7 +5031,7 @@ Show a governed optimizer run
 
 #### `amc experiment run`
 
-Run deterministic experiment against signed casebook
+Run deterministic experiment against signed casebook (exit 0 all candidate cases pass, 1 failure or error, 3 inconclusive)
 
 
 | Option | Description |
@@ -5064,7 +5066,7 @@ Set experiment candidate signed config overlay
 
 #### `amc experiment-architecture`
 
-Run a controlled architecture comparison experiment
+Run a controlled architecture comparison experiment (exit 0 measured pass, 1 failure or error, 3 inconclusive or simulated)
 
 
 | Option | Description |
