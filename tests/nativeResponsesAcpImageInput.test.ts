@@ -1,6 +1,7 @@
 /** AUTHORED UNEXECUTED. Actual ACP/native session/driver/Responses runtime.
  * These disposable fixtures are not public-provider or installed-client proof.
  */
+import { withoutContextSnapshot } from "./helpers/contextSnapshot.js";
 import { spawnSync } from "node:child_process";
 import { mkdtempSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -80,9 +81,12 @@ describe("Responses images through the real public ACP path (not executed)", () 
     const reply = await call.result; expect(reply.error).toBeUndefined();
     expect(await checkAcpDefinition("PromptResponse", reply.result)).toEqual({ ok: true });
     expect(h.sent).toHaveLength(1);
-    expect(JSON.parse(h.sent[0]!.body.toString("utf8")).input).toEqual([{ role: "user", content: [
+    const input = JSON.parse(h.sent[0]!.body.toString("utf8")).input;
+    expect(input).toEqual([{ role: "user", content: expect.any(Array) }]);
+    // GAP-WP39: the runtime-context snapshot follows the user's image.
+    expect(withoutContextSnapshot(input[0].content)).toEqual([
       { type: "input_image", image_url: `data:image/png;base64,${IMAGE_PNG_BASE64}`, detail: "auto" }
-    ] }]);
+    ]);
     const rows = h.sessions.get(sessionId)!.readEvents();
     const inbox = rows.find(row => row.event_type === "loop/inbox" && JSON.parse(row.meta_json).payloadFormat === NATIVE_IMAGE_INPUT_FORMAT)!;
     const payload = readEventPayload(root, inbox); expect(payload.status).toBe("ok");
@@ -109,7 +113,7 @@ describe("Responses images through the real public ACP path (not executed)", () 
     const gif = { type: "image", mimeType: "image/gif", data: "R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" };
     const blocks = [{ type: "text", text: "Compare" }, { type: "resource_link", name: "reference", uri: "https://not-fetched.invalid" }, image(), gif];
     expect((await h.call("session/prompt", prompt(sessionId, blocks))).error).toBeUndefined();
-    expect(JSON.parse(h.sent[0]!.body.toString("utf8")).input[0].content).toEqual([
+    expect(withoutContextSnapshot(JSON.parse(h.sent[0]!.body.toString("utf8")).input[0].content)).toEqual([
       { type: "input_text", text: "Compare\n[linked resource: https://not-fetched.invalid]" },
       { type: "input_image", image_url: `data:image/png;base64,${IMAGE_PNG_BASE64}`, detail: "auto" },
       { type: "input_image", image_url: `data:image/gif;base64,${gif.data}`, detail: "auto" }
