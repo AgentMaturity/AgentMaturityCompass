@@ -1,3 +1,4 @@
+import { populationVariance } from "../experiments/stats.js";
 /**
  * scoreHistory.ts — Score History & Regression Detection for AMC
  *
@@ -476,8 +477,7 @@ export class ScoreHistoryStore {
       const delta = endScore - startScore;
 
       // Calculate volatility (standard deviation)
-      const mean = dataPoints.reduce((sum, p) => sum + p.score, 0) / dataPoints.length;
-      const variance = dataPoints.reduce((sum, p) => sum + Math.pow(p.score - mean, 2), 0) / dataPoints.length;
+      const variance = populationVariance(dataPoints.map((point) => point.score));
       const volatility = Math.sqrt(variance);
 
       // Determine trend

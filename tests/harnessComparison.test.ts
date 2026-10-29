@@ -65,6 +65,19 @@ fs.writeFileSync(process.env.AMC_COMPARISON_OBSERVATIONS,${JSON.stringify(JSON.s
   return context;
 }
 
+test("AXE-30 comparison summaries keep finite observations, midpoint medians and unknown cost", async () => {
+  const report = await fixture().run();
+  const trial = report.trials[0]!;
+  report.trials = [1, 3, 5, 7, -1, Number.NaN].map((durationMs, index) => ({
+    ...trial, id: `distribution-${index}`, process: { ...trial.process!, durationMs },
+  }));
+  const summary = summarizeHarnessComparison(report).groups[0]!;
+  expect(summary.latencyMsIncludingFailedAndInconclusiveExecutions).toMatchObject({
+    samples: 4, mean: 4, median: 4, p95: 7,
+  });
+  expect(summary.costUsd).toMatchObject({ samples: 0, mean: null, median: null, p95: null });
+}, 20_000);
+
 describe("matched harness execution receipts", () => {
   test("records an actual oracle pass while missing timing-independent metrics remain unknown", async () => {
     const context = fixture(); const report = await context.run(); const trial = report.trials[0]!;

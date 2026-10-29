@@ -1,3 +1,4 @@
+import { mean } from "../experiments/stats.js";
 /**
  * RAG Maturity Scoring
  *
@@ -167,8 +168,7 @@ function clamp100(value: number): number {
 }
 
 function average(values: number[]): number {
-  if (values.length === 0) return 0;
-  return values.reduce((sum, value) => sum + value, 0) / values.length;
+  return mean(values);
 }
 
 function uniqueIds(ids: string[]): string[] {

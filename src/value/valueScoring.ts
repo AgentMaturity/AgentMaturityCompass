@@ -1,3 +1,4 @@
+import { mean } from "../experiments/stats.js";
 import type { ValueContract } from "./valueContracts.js";
 import type { ValuePolicy } from "./valuePolicySchema.js";
 import type { ValueEvent } from "./valueEventSchema.js";
@@ -44,10 +45,7 @@ function clamp100(value: number): number {
 }
 
 function average(values: number[]): number | null {
-  if (values.length === 0) {
-    return null;
-  }
-  return Number((values.reduce((sum, value) => sum + value, 0) / values.length).toFixed(6));
+  return values.length === 0 ? null : Number(mean(values).toFixed(6));
 }
 
 function normalizeScore(params: {

@@ -9,6 +9,7 @@
  * - Regression detection with statistical significance testing
  */
 
+import { mean, sampleVariance } from "../experiments/stats.js";
 import { EventEmitter } from "node:events";
 import { createHash, randomUUID, randomBytes } from "node:crypto";
 import { dynamicAttackGenerator, type AttackContext, type GeneratedAttack } from "./dynamicAttackGenerator.js";
@@ -538,7 +539,7 @@ export class ContinuousRedTeam extends EventEmitter {
 
     const recentRounds = history.slice(-10, -1);
     const recentRates = recentRounds.map(r => r.successRate);
-    const avgSuccessRate = recentRates.reduce((s, r) => s + r, 0) / recentRates.length;
+    const avgSuccessRate = mean(recentRates);
     const increase = currentRound.successRate - avgSuccessRate;
 
     if (increase >= this.config.regressionAlertThreshold) {
@@ -570,8 +571,9 @@ export class ContinuousRedTeam extends EventEmitter {
 // ── Statistical Utilities ──────────────────────────────────────────────────
 
 /**
- * Simple Welch's t-test for trend detection.
- * Returns direction and p-value.
+ * Normal-approximation trend test; unlike a Welch Student-t test, it uses a
+ * normal CDF and estimates a singleton candidate's variance from the baseline.
+ * This differs from stats.ts paired bootstrap and preserves the historical trend output.
  */
 function trendTest(
   group1: number[],
@@ -581,12 +583,12 @@ function trendTest(
     return { direction: "stable", pValue: 1.0 };
   }
 
-  const mean1 = group1.reduce((a, b) => a + b, 0) / group1.length;
-  const mean2 = group2.reduce((a, b) => a + b, 0) / group2.length;
+  const mean1 = mean(group1);
+  const mean2 = mean(group2);
 
-  const var1 = group1.reduce((sum, x) => sum + (x - mean1) ** 2, 0) / (group1.length - 1);
+  const var1 = sampleVariance(group1);
   const var2 = group2.length > 1
-    ? group2.reduce((sum, x) => sum + (x - mean2) ** 2, 0) / (group2.length - 1)
+    ? sampleVariance(group2)
     : var1; // Use group1 variance as estimate for single-sample group2
 
   const se = Math.sqrt(var1 / group1.length + var2 / Math.max(1, group2.length));

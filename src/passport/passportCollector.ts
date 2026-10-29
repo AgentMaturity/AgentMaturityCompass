@@ -1,3 +1,4 @@
+import { mean } from "../experiments/stats.js";
 import { join } from "node:path";
 import YAML from "yaml";
 import { defaultPromptPolicy, promptPolicySchema } from "../prompt/promptPolicySchema.js";
@@ -93,11 +94,7 @@ function readLayerValue(layers: LayerScore[] | undefined, key: "strategicOps" | 
 
 function avg(values: Array<number | null>): number | null {
   const filtered = values.filter((row): row is number => typeof row === "number" && Number.isFinite(row));
-  if (filtered.length === 0) {
-    return null;
-  }
-  const total = filtered.reduce((sum, row) => sum + row, 0);
-  return Number((total / filtered.length).toFixed(4));
+  return filtered.length === 0 ? null : Number(mean(filtered).toFixed(4));
 }
 
 function latestForecastRisk(

@@ -1,3 +1,4 @@
+import { mean } from "../experiments/stats.js";
 import type {
   DiagnosticConfidenceSummary,
   QuestionConfidenceControls,
@@ -98,7 +99,7 @@ export function summarizeConfidenceControls(
 ): DiagnosticConfidenceSummary {
   const controls = scores.map(controlsForScore);
   const avg = (values: number[]): number =>
-    values.length > 0 ? round(values.reduce((sum, value) => sum + value, 0) / values.length) : 0;
+    values.length > 0 ? round(mean(values)) : 0;
   return {
     lowConfidenceFindings: scores.filter((score) => score.confidence < 0.5).length,
     highUncertaintyFindings: controls.filter((control) => control.uncertaintyLevel === "high").length,

@@ -1,3 +1,4 @@
+import { nearestRank } from "../experiments/stats.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 
@@ -176,11 +177,9 @@ function parseTime(value: string): number {
   return Number.isFinite(parsed) ? parsed : Number.NaN;
 }
 
+// Receipt percentiles filter invalid/negative observations and round experiments/stats.ts nearest rank.
 function percentile(values: number[], p: number): number {
-  const sorted = values.filter(finiteNonNegative).sort((a, b) => a - b);
-  if (sorted.length === 0) return 0;
-  const index = Math.min(sorted.length - 1, Math.max(0, Math.ceil(sorted.length * p) - 1));
-  return round(sorted[index] ?? 0);
+  return round(nearestRank(values.filter(finiteNonNegative), p));
 }
 
 function countBy(values: string[]): Record<string, number> {

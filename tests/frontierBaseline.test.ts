@@ -47,6 +47,12 @@ describe("compareAgainstBaselines", () => {
 });
 
 describe("calculatePercentile", () => {
+  test("keeps strict-lower rank semantics for ties and an undefined empty-population rank", () => {
+    const baselines = [1, 2, 2].map((compositeScore) => ({ ...FRONTIER_BASELINES[0]!, compositeScore }));
+    expect(calculatePercentile(2, baselines)).toBe(33);
+    expect(calculatePercentile(2, [])).toBeNaN();
+  });
+
   test("high scorer gets high percentile", () => {
     const percentile = calculatePercentile(95);
     expect(percentile).toBe(100); // above all baselines

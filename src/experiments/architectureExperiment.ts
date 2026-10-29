@@ -17,7 +17,7 @@ import { randomUUID } from "node:crypto";
 import { z } from "zod";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
-import { bootstrapDifferenceCI, effectSizeDifference, deterministicSeed } from "./stats.js";
+import { bootstrapDifferenceCI, effectSizeDifference, deterministicSeed, mean } from "./stats.js";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -511,6 +511,7 @@ export function analyzeArchitectureExperiment(
     const ci = data.baseline.length >= 2 && data.candidate.length >= 2
       ? bootstrapDifferenceCI({ baseline: data.baseline, candidate: data.candidate, seed })
       : [0, 0] as [number, number];
+    if (!Array.isArray(ci)) throw new Error(ci.reason);
     const es = effectSizeDifference(data.baseline, data.candidate);
     const bAvg = data.baseline.reduce((a, b) => a + b, 0) / data.baseline.length;
     const cAvg = data.candidate.reduce((a, b) => a + b, 0) / data.candidate.length;
@@ -527,10 +528,8 @@ export function analyzeArchitectureExperiment(
   }
 
   // --- Aggregate metrics ---
-  const avgMetric = (outcomes: ProbeOutcome[], fn: (o: ProbeOutcome) => number): number => {
-    if (outcomes.length === 0) return 0;
-    return Number((outcomes.reduce((sum, o) => sum + fn(o), 0) / outcomes.length).toFixed(2));
-  };
+  const avgMetric = (outcomes: ProbeOutcome[], fn: (o: ProbeOutcome) => number): number =>
+    Number(mean(outcomes.map(fn)).toFixed(2));
 
   const avgToolCallBaseline = avgMetric(baselineOutcomes, (o) => o.toolCallCount);
   const avgToolCallCandidate = avgMetric(candidateOutcomes, (o) => o.toolCallCount);
@@ -553,6 +552,7 @@ export function analyzeArchitectureExperiment(
   const overallCi = allBaselineScores.length >= 2 && allCandidateScores.length >= 2
     ? bootstrapDifferenceCI({ baseline: allBaselineScores, candidate: allCandidateScores, seed })
     : [0, 0] as [number, number];
+  if (!Array.isArray(overallCi)) throw new Error(overallCi.reason);
   const overallEs = effectSizeDifference(allBaselineScores, allCandidateScores);
 
   // --- Recommendations ---

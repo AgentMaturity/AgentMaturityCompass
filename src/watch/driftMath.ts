@@ -1,3 +1,4 @@
+import { mean as arithmeticMean, nearestRank } from "../experiments/stats.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { normalizeEvidenceRefs } from "./evidenceRefs.js";
@@ -42,10 +43,11 @@ export function round(value: number, places = 6): number {
   return Math.round(value * factor) / factor;
 }
 
+// Unlike the experiments/stats.ts mean, drift receipts preserve a caller fallback and six-place rounding.
 export function mean(values: number[], fallback?: number): number;
 export function mean(values: number[], fallback: number | null): number | null;
 export function mean(values: number[], fallback: number | null = 0): number | null {
-  return values.length === 0 ? fallback : round(values.reduce((sum, value) => sum + value, 0) / values.length);
+  return values.length === 0 ? fallback : round(arithmeticMean(values));
 }
 
 export function nonEmpty(value: string | undefined): boolean {
@@ -63,10 +65,10 @@ export function boolMean(values: boolean[]): number {
 
 /** Nearest-rank percentile over the finite values, zero for an empty window. */
 export function percentile(values: number[], p: number): number {
-  const finite = values.filter(Number.isFinite).sort((left, right) => left - right);
+  const finite = values.filter(Number.isFinite);
   if (finite.length === 0) return 0;
-  const index = Math.min(finite.length - 1, Math.max(0, Math.ceil((p / 100) * finite.length) - 1));
-  return round(finite[index]!);
+  // Unlike experiments/stats.ts nearestRank, an unknown percentile remains NaN in this public helper.
+  return Number.isNaN(p) ? Number.NaN : round(nearestRank(finite, p / 100));
 }
 
 /**
