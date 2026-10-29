@@ -42,7 +42,9 @@ export function round(value: number, places = 6): number {
   return Math.round(value * factor) / factor;
 }
 
-export function mean(values: number[], fallback = 0): number {
+export function mean(values: number[], fallback?: number): number;
+export function mean(values: number[], fallback: number | null): number | null;
+export function mean(values: number[], fallback: number | null = 0): number | null {
   return values.length === 0 ? fallback : round(values.reduce((sum, value) => sum + value, 0) / values.length);
 }
 
@@ -140,7 +142,7 @@ export function createDriftAlertBuilder(alertPrefix: string, defaultRefs: readon
   return function buildAlert(
     input: DriftAlertSource,
     metricId: LiveDriftMetricId,
-    observed: number,
+    observed: number | null,
     threshold: number,
     message: string,
     severity: LiveDriftSeverity,
@@ -161,7 +163,7 @@ export function createDriftAlertBuilder(alertPrefix: string, defaultRefs: readon
       severity,
       message,
       threshold,
-      observed: round(observed),
+      observed: observed === null ? null : round(observed),
       evidenceRefs,
       signedEvidenceRefs,
     };

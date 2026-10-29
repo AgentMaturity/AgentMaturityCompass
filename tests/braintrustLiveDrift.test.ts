@@ -113,7 +113,7 @@ describe("runBraintrustLiveDrift", () => {
     // sorting them — so array order reaches the receipt hash. Collapsing these
     // files behind one factory must reproduce this byte for byte, or it has
     // changed published artifacts while claiming to be a refactor.
-    expect(sha256Hex(canonicalize(result))).toBe("7e10f8402e19fca3007da93d0d4191f1b10cb2263e04370c41969f3ba8f3480f");
+    expect(sha256Hex(canonicalize(result))).toBe("d48e01cdab340811837910c3c697ef2f807842e047634c95d1d9fb08a41e0d68");
     expect(result.receipt.sourceRefs).toContain(sourceProof.llmsTxtHash);
     expect(result.receipt.summary).toContain("braintrust evidence coverage=1");
     expect(result.rowProofs).toHaveLength(6);

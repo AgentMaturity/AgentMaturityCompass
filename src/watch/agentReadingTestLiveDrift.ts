@@ -9,9 +9,11 @@ import { withLiveDriftRowHash } from "./liveDriftReceiptValidation.js";
  * from, authenticates to, or verifies anything with that vendor, so a receipt
  * attests only to the data the caller provided.
  */
+import type { EvidenceOutcome } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import {
+  guardedDrop,
   runLiveScoreBehaviorDrift,
   type LiveDriftAlert,
   type LiveDriftMetricId,
@@ -120,10 +122,11 @@ export interface RunAgentReadingTestLiveDriftInput {
 
 export interface AgentReadingTestDistribution {
   rowCount: number;
+  evidenceOutcome: EvidenceOutcome;
   readingScoreMean0to1: number;
   canaryRecallMean0to1: number;
   taskCompletionRate0to1: number;
-  evidenceCoverage0to1: number;
+  evidenceCoverage0to1: number | null;
   failureModeDistribution: Record<string, number>;
   contentDeliveryDistribution: Record<string, number>;
   contextDistribution: Record<string, number>;
@@ -133,7 +136,7 @@ export interface AgentReadingTestScoreDrift {
   readingScoreDrop0to1: number;
   canaryRecallDrop0to1: number;
   taskCompletionDrop0to1: number;
-  evidenceCoverageDrop0to1: number;
+  evidenceCoverageDrop0to1: number | null;
 }
 
 export interface AgentReadingTestBehaviorDrift {
@@ -275,10 +278,11 @@ function distribution(rows: AgentReadingTestReceiptRow[]): AgentReadingTestDistr
     readingScoreMean0to1: mean(rows.map((row) => row.normalizedScore0to1)),
     canaryRecallMean0to1: mean(rows.map((row) => row.canaryRecall0to1)),
     taskCompletionRate0to1: mean(rows.map((row) => row.taskCompletion0to1)),
-    evidenceCoverage0to1: mean(rows.map((row) => row.evidenceCoverage0to1), rows.length === 0 ? 1 : 0),
+    evidenceCoverage0to1: mean(rows.map((row) => row.evidenceCoverage0to1), null),
     failureModeDistribution: labelDistribution(rows, (row) => row.failureMode),
     contentDeliveryDistribution: labelDistribution(rows, (row) => row.contentDeliveryMode),
     contextDistribution: labelDistribution(rows, contextLabel),
+    evidenceOutcome: rows.length > 0 ? "measured" : "not_evaluated",
   };
 }
 
@@ -298,7 +302,7 @@ export function runAgentReadingTestLiveDrift(input: RunAgentReadingTestLiveDrift
     readingScoreDrop0to1: round(Math.max(0, baselineDistribution.readingScoreMean0to1 - liveDistribution.readingScoreMean0to1)),
     canaryRecallDrop0to1: round(Math.max(0, baselineDistribution.canaryRecallMean0to1 - liveDistribution.canaryRecallMean0to1)),
     taskCompletionDrop0to1: round(Math.max(0, baselineDistribution.taskCompletionRate0to1 - liveDistribution.taskCompletionRate0to1)),
-    evidenceCoverageDrop0to1: round(Math.max(0, baselineDistribution.evidenceCoverage0to1 - liveDistribution.evidenceCoverage0to1)),
+    evidenceCoverageDrop0to1: guardedDrop(true, baselineDistribution.evidenceCoverage0to1, liveDistribution.evidenceCoverage0to1),
   };
   const behaviorDrift: AgentReadingTestBehaviorDrift = {
     failureModeDivergence0to1: totalVariationDistance(baselineDistribution.failureModeDistribution, liveDistribution.failureModeDistribution),
@@ -315,8 +319,8 @@ export function runAgentReadingTestLiveDrift(input: RunAgentReadingTestLiveDrift
   if (scoreDrift.taskCompletionDrop0to1 > thresholds.maxTaskCompletionDrop0to1) {
     additionalAlerts.push(buildAlert(input, "agentReadingTestTaskCompletionRate0to1", scoreDrift.taskCompletionDrop0to1, thresholds.maxTaskCompletionDrop0to1, "Live Agent Reading Test task completion dropped beyond threshold.", "high"));
   }
-  if (liveDistribution.evidenceCoverage0to1 < thresholds.minEvidenceCoverage0to1) {
-    additionalAlerts.push(buildAlert(input, "agentReadingTestEvidenceCoverage0to1", liveDistribution.evidenceCoverage0to1, thresholds.minEvidenceCoverage0to1, "Live Agent Reading Test rows are missing source snapshot, license, homepage, README blob, answer key, task manifest, score form, live-site snapshot, raw content, canary, result, drift statistic, alert receipt, evidence, or signed evidence proof.", "critical"));
+  if (liveDistribution.evidenceCoverage0to1 === null || liveDistribution.evidenceCoverage0to1 < thresholds.minEvidenceCoverage0to1) {
+    additionalAlerts.push(buildAlert(input, "agentReadingTestEvidenceCoverage0to1", liveDistribution.evidenceCoverage0to1, thresholds.minEvidenceCoverage0to1, liveDistribution.evidenceCoverage0to1 === null ? "Live evidence missing; coverage is not evaluated." : "Live Agent Reading Test rows are missing source snapshot, license, homepage, README blob, answer key, task manifest, score form, live-site snapshot, raw content, canary, result, drift statistic, alert receipt, evidence, or signed evidence proof.", "critical"));
   }
   if (behaviorDrift.failureModeDivergence0to1 > thresholds.maxFailureModeDivergence0to1) {
     additionalAlerts.push(buildAlert(input, "agentReadingTestFailureModeDistribution", behaviorDrift.failureModeDivergence0to1, thresholds.maxFailureModeDivergence0to1, "Live Agent Reading Test failure-mode distribution diverged beyond threshold.", "medium"));

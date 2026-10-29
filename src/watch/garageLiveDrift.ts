@@ -8,9 +8,11 @@
  * from, authenticates to, or verifies anything with that vendor, so a receipt
  * attests only to the data the caller provided.
  */
+import type { EvidenceOutcome } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import {
+  guardedDrop,
   runLiveScoreBehaviorDrift,
   type LiveDriftAlert,
   type LiveDriftMetricId,
@@ -137,6 +139,7 @@ export interface RunGarageLiveDriftInput {
 
 export interface GarageDistribution {
   rowCount: number;
+  evidenceOutcome: EvidenceOutcome;
   receiptScoreMean0to1: number;
   groundingPrecisionMean0to1: number;
   groundingRecallMean0to1: number;
@@ -144,7 +147,7 @@ export interface GarageDistribution {
   deflectionAccuracyMean0to1: number;
   answerFaithfulnessMean0to1: number;
   validationCoverage0to1: number;
-  evidenceCoverage0to1: number;
+  evidenceCoverage0to1: number | null;
   groundingPassageCountMean: number;
   relevantPassageCountMean: number;
   citedPassageCountMean: number;
@@ -164,7 +167,7 @@ export interface GarageScoreDrift {
   deflectionAccuracyDrop0to1: number;
   answerFaithfulnessDrop0to1: number;
   validationCoverageDrop0to1: number;
-  evidenceCoverageDrop0to1: number;
+  evidenceCoverageDrop0to1: number | null;
   latencyP95IncreaseRatio: number;
   costIncreaseRatio: number;
 }
@@ -349,7 +352,7 @@ function distribution(rows: GarageReceiptRow[]): GarageDistribution {
     deflectionAccuracyMean0to1: mean(rows.map((row) => row.deflectionAccuracy0to1)),
     answerFaithfulnessMean0to1: mean(rows.map((row) => row.answerFaithfulness0to1)),
     validationCoverage0to1: boolMean(rows.map((row) => row.answerValidated)),
-    evidenceCoverage0to1: mean(rows.map((row) => row.evidenceCoverage0to1), rows.length === 0 ? 1 : 0),
+    evidenceCoverage0to1: mean(rows.map((row) => row.evidenceCoverage0to1), null),
     groundingPassageCountMean: mean(rows.map((row) => row.groundingPassageCount)),
     relevantPassageCountMean: mean(rows.map((row) => row.relevantPassageCount)),
     citedPassageCountMean: mean(rows.map((row) => row.citedPassageCount)),
@@ -360,6 +363,7 @@ function distribution(rows: GarageReceiptRow[]): GarageDistribution {
     categoryDistribution: labelDistribution(rows, (row) => row.questionCategory || "unknown"),
     sourceDistribution: labelDistribution(rows, sourceLabel),
     contextDistribution: labelDistribution(rows, contextLabel),
+    evidenceOutcome: rows.length > 0 ? "measured" : "not_evaluated",
   };
 }
 
@@ -382,7 +386,7 @@ export function runGarageLiveDrift(input: RunGarageLiveDriftInput): GarageLiveDr
     deflectionAccuracyDrop0to1: round(Math.max(0, baselineDistribution.deflectionAccuracyMean0to1 - liveDistribution.deflectionAccuracyMean0to1)),
     answerFaithfulnessDrop0to1: round(Math.max(0, baselineDistribution.answerFaithfulnessMean0to1 - liveDistribution.answerFaithfulnessMean0to1)),
     validationCoverageDrop0to1: round(Math.max(0, baselineDistribution.validationCoverage0to1 - liveDistribution.validationCoverage0to1)),
-    evidenceCoverageDrop0to1: round(Math.max(0, baselineDistribution.evidenceCoverage0to1 - liveDistribution.evidenceCoverage0to1)),
+    evidenceCoverageDrop0to1: guardedDrop(true, baselineDistribution.evidenceCoverage0to1, liveDistribution.evidenceCoverage0to1),
     latencyP95IncreaseRatio: ratioIncrease(baselineDistribution.latencyP95Ms, liveDistribution.latencyP95Ms),
     costIncreaseRatio: ratioIncrease(baselineDistribution.costUsdMean, liveDistribution.costUsdMean),
   };
@@ -412,8 +416,8 @@ export function runGarageLiveDrift(input: RunGarageLiveDriftInput): GarageLiveDr
   if (liveDistribution.validationCoverage0to1 < thresholds.minValidationCoverage0to1) {
     additionalAlerts.push(buildAlert(input, "garageValidationCoverage0to1", liveDistribution.validationCoverage0to1, thresholds.minValidationCoverage0to1, "Live GaRAGe rows are missing answer-validation coverage.", "high"));
   }
-  if (liveDistribution.evidenceCoverage0to1 < thresholds.minEvidenceCoverage0to1) {
-    additionalAlerts.push(buildAlert(input, "garageEvidenceCoverage0to1", liveDistribution.evidenceCoverage0to1, thresholds.minEvidenceCoverage0to1, "Live GaRAGe rows are missing source, license, README, benchmark dataset, manifest, paper, grounding annotation schema, retrieval corpus, prompt, evaluator, baseline/live result, drift statistic, alert receipt, evidence, signed evidence, or row-hash proof.", "critical"));
+  if (liveDistribution.evidenceCoverage0to1 === null || liveDistribution.evidenceCoverage0to1 < thresholds.minEvidenceCoverage0to1) {
+    additionalAlerts.push(buildAlert(input, "garageEvidenceCoverage0to1", liveDistribution.evidenceCoverage0to1, thresholds.minEvidenceCoverage0to1, liveDistribution.evidenceCoverage0to1 === null ? "Live evidence missing; coverage is not evaluated." : "Live GaRAGe rows are missing source, license, README, benchmark dataset, manifest, paper, grounding annotation schema, retrieval corpus, prompt, evaluator, baseline/live result, drift statistic, alert receipt, evidence, signed evidence, or row-hash proof.", "critical"));
   }
   if (behaviorDrift.questionTypeDivergence0to1 > thresholds.maxQuestionTypeDivergence0to1) {
     additionalAlerts.push(buildAlert(input, "garageQuestionTypeDistribution", behaviorDrift.questionTypeDivergence0to1, thresholds.maxQuestionTypeDivergence0to1, "Live GaRAGe question-type distribution diverged beyond threshold.", "medium"));
