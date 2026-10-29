@@ -574,3 +574,20 @@ Deliverables: described slash commands and completion, explicit read-only sessio
 Evidence: 96 helper/composition tests passed; 16 targeted guard mutations failed their regressions, and all source hashes were restored exactly. The related suite has 404 passing cases after using the supported private external control-checkpoint directory. Three socket-dependent cases fail with sandbox `listen EPERM`; a socket-dependent setup hook skips 29 tool-breadth cases. The full measured-task results and final verifier status are recorded in `AMC_OS/INBOX/WP30-native-interactive-report.md`; detailed logs and the requested commit message are in the sibling `codex-runs/wp30-*` artifacts.
 
 Remaining scope: entry bookmarks/custom names/full tree annotations, demand-gated file mentions, and context reset/handoff. AMC-1512 is extended through its existing workflow, without a duplicate issue or runtime. Automated action counts and timings do not establish human usability. Claude should review the candidate, rerun the socket-dependent cases in an environment allowing local listeners, and use `wp30-commit-message.txt` when committing. No push, merge, full-suite or release qualification was performed.
+
+
+---
+
+# WP26 part A handoff — 2026-10-30
+
+Role: REV_FULLSTACK_ENGINEER. Owner after review: Claude integrator, session 3c2ecdb1.
+
+Candidate: `rtd/gap-wp26a`, unchanged tip `dff352a3e42eda65d11fd3127f91d036208b2687`. All changes remain uncommitted, with nothing staged. No push or merge occurred. Sibling `codex-runs/wp26a-report.md` contains the row report, complete test inventory and exact evidence; `wp26a-commit-message.txt` contains the conventional message and required Codex trailer.
+
+DXB-10 adds a separate pinned DSH v4 mapper with bounded checksummed Zstandard, native tool-role failures, inherited cuts, surface/source repairs, child references and explicit losses. Historical v2 schema/decoder files stay unchanged. PI-062/063/064 add an explicit current Pi profile, bounded links, typed operational attributes, exact callback settlement, honest unsupported metrics/propagation and offline upstream kits. Span/watch recording and acquisition stop after closure while acquired source cleanup remains retryable. PI-068 was already present and is preserved: SELF_REPORTED, unsigned, NOT_EVALUATED, no inferred maturity or missing timing.
+
+Final qualification: normal verify-wt.sh against dff352a3e exited 0, including build, both typechecks, lint, all ten repository check bodies and freeze. All 22 affected files passed 219/219: 103 new cases in nine files and 116 existing cases in thirteen files. Guard mutations caught 58/58. Five optional upstream metric/propagation cases return early because those capabilities are unsupported. No full repository suite, installed tarball, actual provider or live harness qualification is claimed.
+
+Two existing Pi cycle probes initially timed out because TSX startup exceeded their unchanged 1,800 ms budget. Only subprocess loading changed to fresh built JavaScript; fixtures/assertions/timeout remain unchanged. The final full run passed them at 1,487/1,422 ms. The DSH unsupported-version table uses v5 instead of newly supported v4; historical v2 still refuses v4. Source-quality exceptions and the initial dist cleanup issue are documented in the detailed report; the final verifier used normal cleanup and no bypass.
+
+PI-065 full Durable snapshots/deltas/revision continuity and signed native lifecycle-to-Watch wiring remain deferred. This slice binds watch metadata only and declares content/revision losses. OTel exporter source and library-only label remain unchanged. No dependency, package/lockfile, CLI/Studio route, freeze exception, research edit or foreign worktree change was made. Generated counts/docs are included for review. Final before/after hashes match for 5,474 source/fixture/config files; no tracked files were deleted. This appendix preserves the original handoff history exactly.
