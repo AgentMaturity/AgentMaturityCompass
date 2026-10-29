@@ -2821,7 +2821,6 @@
     {"id":"b1efdd77e217e174e9c153a11d3ab23fb31ea8d6ce5f4d16077ab602cf6be77c","file":"src/product/index.ts","kind":"types"},
     {"id":"b20e016835a94b3e3a387d069bee36d51bc6773e72f40affe5401c23b0d93b64","file":"src/steer/index.ts","kind":"types"},
     {"id":"b22410ce8072648a3d2fb844527db94e324ce189b8b9e1dab89d30b398041df6","file":"src/product/index.ts","kind":"types"},
-    {"id":"b22440271f21e614526274b081354af3d4af15a9d42f00b8526456e2c68b10c1","file":"src/providers/providerTemplates.ts","kind":"types"},
     {"id":"b230ead9e6fe1c590d8d78dc04c88a427f2f5bed5b6734a4eccdaa9bf53e40aa","file":"src/benchmarks/benchStore.ts","kind":"exports"},
     {"id":"b250597c7e5c294f61af7a8fb47190e8985d4682ae123311a54f4435a20d903d","file":"src/domainProof/sourceRuleManifestSchema.ts","kind":"exports"},
     {"id":"b257fee442b2d85f3a7571efcc39677c69eaff77f6c895d7b3d09e1277c5f3f8","file":"src/domains/conformance/index.ts","kind":"types"},

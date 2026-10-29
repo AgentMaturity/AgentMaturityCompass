@@ -111,7 +111,8 @@ export function stepUsage(usage: StreamTokenUsage | null): TokenUsage | null {
     inputTokens: usage.inputTokens,
     outputTokens: usage.outputTokens,
     cacheRead: usage.cacheReadTokens ?? null,
-    cacheWrite: usage.cacheWriteTokens ?? null
+    cacheWrite: usage.cacheWriteTokens ?? null,
+    reasoningTokens: usage.reasoningTokens ?? null
   };
 }
 

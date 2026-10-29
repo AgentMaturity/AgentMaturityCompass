@@ -198,6 +198,8 @@ export type ApprovalAnswer = "allow" | "deny" | "unavailable";
  * one level up (see ./turnLifecycleMeta.ts).
  */
 export interface TokenUsage {
+  /** Output subset; absent on historical step metadata and never added to token totals. */
+  readonly reasoningTokens?: number | null;
   readonly inputTokens: number;
   readonly outputTokens: number;
   readonly cacheRead: number | null;
