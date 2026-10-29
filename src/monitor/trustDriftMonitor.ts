@@ -1,7 +1,7 @@
 import { join } from "node:path";
 import { resolveAgentId } from "../fleet/paths.js";
 import { refusedRunsBlocking, scanVerifiedRuns } from "../diagnostic/runReportResolution.js";
-import { deriveIntegrityIndex } from "../cert/trustCertificate.js";
+import { clamp01, deriveIntegrityIndex, round2 } from "../cert/trustCertificate.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 
@@ -59,17 +59,6 @@ export interface TrustDriftMonitorResult {
 }
 
 const MAX_STORED_ALERTS = 300;
-
-function clamp01(value: number): number {
-  if (!Number.isFinite(value)) {
-    return 0;
-  }
-  return Math.max(0, Math.min(1, value));
-}
-
-function round2(value: number): number {
-  return Math.round(value * 100) / 100;
-}
 
 function normalizeThreshold(value: number): number {
   if (!Number.isFinite(value)) {

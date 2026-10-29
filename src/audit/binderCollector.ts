@@ -698,8 +698,7 @@ export function collectAuditBinderLocalData(params: AuditBinderCollectionInput, 
   let runCount = 0;
 
   if (scope.type === "AGENT") {
-    // Only a sealed run feeds a signed binder (WP37); a tampered or newer unverifiable run blocks the selection
-    // (insufficient evidence) rather than rolling back to an older sealed run.
+    // Sealed runs only (WP37); a tampered or newer unverifiable run blocks it rather than rolling back to an older one.
     const { run, blocking } = latestVerifiedRun(params.workspace, scope.id);
     if (run) {
       assertNotExample(run, "included in an audit binder");
@@ -716,8 +715,7 @@ export function collectAuditBinderLocalData(params: AuditBinderCollectionInput, 
       maturityRefs = dedupeSorted([sha256Hex(Buffer.from(run.runId, "utf8"))]);
       maturityNotes = dedupeSorted(run.evidenceToCollectNext.slice(0, 6));
     } else {
-      maturityNotes = blocking.length > 0 ? [`Unverifiable agent diagnostic runs block the latest result: ${blocking.length}.`]
-        : ["No sealed agent diagnostic runs were found."];
+      maturityNotes = [blocking.length > 0 ? `Unverifiable agent diagnostic runs block the latest result: ${blocking.length}.` : "No sealed agent diagnostic runs were found."];
     }
   } else {
     const scorecard = loadLatestOrgScorecard(params.workspace);

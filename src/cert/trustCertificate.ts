@@ -96,14 +96,14 @@ interface RunSnapshot {
   score0to100: number;
 }
 
-function clamp01(value: number): number {
+export function clamp01(value: number): number {
   if (!Number.isFinite(value)) {
     return 0;
   }
   return Math.max(0, Math.min(1, value));
 }
 
-function round2(value: number): number {
+export function round2(value: number): number {
   return Math.round(value * 100) / 100;
 }
 
