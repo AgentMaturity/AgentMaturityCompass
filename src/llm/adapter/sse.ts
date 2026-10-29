@@ -14,6 +14,8 @@
  * a provider's protocol lives.
  */
 
+import { LLM_FAILURE_CODE, LlmError } from "../llmFailure.js";
+
 /** One framed event. `event` is null when the stream used only `data:` lines. */
 export interface SseEvent {
   readonly event: string | null;
@@ -23,8 +25,8 @@ export interface SseEvent {
 /**
  * Where one event ends.
  *
- * The spec separates events with a blank line, and a blank line is `\n\n` or
- * `\r\n\r\n` depending on the intermediary. Normalising CRLF up front means the
+ * The spec separates events with a blank line. Normalising LF, CRLF and bare CR
+ * across byte boundaries means the
  * scan below has one terminator to look for instead of two overlapping ones.
  */
 const EVENT_SEPARATOR = "\n\n";
@@ -42,12 +44,18 @@ const EVENT_SEPARATOR = "\n\n";
  * grammar check (a missing terminal `finish`) is what reports the truncation.
  */
 export async function* sseEvents(body: AsyncIterable<Uint8Array>): AsyncIterable<SseEvent> {
-  const decoder = new TextDecoder("utf-8");
-  let buffer = "";
-  for await (const chunk of body) {
-    // `stream: true` keeps a multi-byte character split across chunks intact;
-    // without it a token containing an emoji decodes to a replacement char.
-    buffer += decoder.decode(chunk, { stream: true }).replace(/\r\n/g, "\n");
+  const decoder = new TextDecoder("utf-8", { fatal: true });
+  let buffer = "", held = "";
+  function decode(bytes?: Uint8Array, stream = false): string {
+    try { return decoder.decode(bytes, { stream }); }
+    catch { throw new LlmError("SSE stream contains malformed or truncated UTF-8", LLM_FAILURE_CODE.TRANSPORT); }
+  }
+  function* append(decoded: string, final = false): Generator<SseEvent> {
+    const combined = held + decoded;
+    // A CR may be the first byte of CRLF in the next network chunk. Hold it
+    // until its partner is known; bare CR is also a valid SSE line ending.
+    held = !final && combined.endsWith("\r") ? "\r" : "";
+    buffer += (held ? combined.slice(0, -1) : combined).replace(/\r\n|\r/g, "\n");
     let separator = buffer.indexOf(EVENT_SEPARATOR);
     while (separator !== -1) {
       const frame = buffer.slice(0, separator);
@@ -57,6 +65,9 @@ export async function* sseEvents(body: AsyncIterable<Uint8Array>): AsyncIterable
       separator = buffer.indexOf(EVENT_SEPARATOR);
     }
   }
+  for await (const chunk of body) yield* append(decode(chunk, true));
+  // Flush the incremental decoder so a truncated UTF-8 suffix cannot vanish.
+  yield* append(decode(), true);
 }
 
 /**

@@ -1438,7 +1438,6 @@
     {"id":"2aed9fba6195e664c8f5ad3eff34c09e0f071f40bc1bb2f0db648bb1b5e6c002","file":"src/redteam/index.ts","kind":"exports"},
     {"id":"2b12002d5d60e471a2c6c67d2ccafbcb3f192dcb111371c10be90733f863d5bb","file":"src/api/index.ts","kind":"types"},
     {"id":"2b1770e690c8a53a07ee6d703eece479a602470fcfaf81c34d7b5dc58c80f0ac","file":"src/benchmarks/replayBenchmarkCorpus.ts","kind":"types"},
-    {"id":"2b19e713a6b7ea64be8d8e6fb187df72733323a68f5890b646c7840711413708","file":"tests/helpers/llmStubUpstream.ts","kind":"exports"},
     {"id":"2b2dc5eca16f8e686e6815f0e8ab0c591d3b7b752a95312e4015eb7a48fe0cef","file":"src/transparency/merkleFrontier.ts","kind":"types"},
     {"id":"2b3e58a3d29633ab533711372494d6e786fc745d3bce27faaf97c666c380638e","file":"src/storage/blobs/blobStore.ts","kind":"exports"},
     {"id":"2b42bced45248c0ef3f2aff06fa6589f572244ddac73ed4e25d61ef39126ccef","file":"src/product/index.ts","kind":"types"},

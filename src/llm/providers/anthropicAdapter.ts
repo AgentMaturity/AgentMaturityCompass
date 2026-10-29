@@ -18,10 +18,10 @@
  *
  *  2. Usage arrives in TWO frames — input counts on `message_start`, output
  *     counts on `message_delta`. AMC's grammar allows exactly one `usage` chunk
- *     and requires it before a successful finish. So counts accumulate and are
- *     emitted as a single chunk at `message_stop`, immediately before `finish`.
- *     Deferring to the end-of-stream marker is also what makes a trailing
- *     usage-only frame incapable of violating the ordering.
+ *     and requires it before a successful finish. Counts in message_delta are
+ *     cumulative, so accumulate every update and emit once at message_stop.
+ *     If the stream fails first, emit its latest known counts on failure.
+ *     Explicit start counts are retained only as a lower bound on failure.
  *
  *  3. Anthropic reports cached input SEPARATELY from `input_tokens`, which is
  *     exactly AMC's disjoint model, so the counts map across unchanged. No
@@ -166,14 +166,24 @@ async function* decodeAnthropic(response: HttpResponse): AsyncIterable<StreamChu
     cacheWrite: undefined as number | undefined
   };
   let stopReason: string | null = null;
-  let terminated = false;
+  let terminated = false, usagePublished = false;
+  let prefixOutput: number | undefined;
+  function* failureUsage(): Generator<StreamChunk> {
+    // message_start may explicitly report a lower bound, including zero. It
+    // cannot admit success without terminal output usage, but remains evidence
+    // on a failed stream. An absent prefix count stays unknown.
+    const reported = usageChunk({ ...counts, output: counts.output ?? prefixOutput });
+    if (!usagePublished && reported !== null) { usagePublished = true; yield reported; }
+  }
 
+  try {
   for await (const event of sseEvents(response.body)) {
     if (event.event === "ping") continue;
     const frame = parseFrame(event.data);
     const type = typeof frame.type === "string" ? frame.type : (event.event ?? "");
 
     if (type === "error") {
+      yield* failureUsage();
       const error = record(frame.error);
       const errorType = text(error?.type);
       // An in-band error is a TERMINAL FINISH, not a throw: the stream reached a
@@ -196,9 +206,10 @@ async function* decodeAnthropic(response: HttpResponse): AsyncIterable<StreamChu
     if (type === "message_start") {
       const usage = record(record(frame.message)?.usage);
       counts.input = reportedInteger(usage?.input_tokens);
-      // Start usage is a prefix, not the final output count. Only the terminal
-      // message_delta can establish what the whole response consumed.
+      // Start output is a prefix, not the required message_delta output count.
+      // It remains separate so it cannot admit successful completion.
       counts.output = undefined;
+      prefixOutput = reportedInteger(usage?.output_tokens);
       counts.cacheRead = reportedInteger(usage?.cache_read_input_tokens);
       counts.cacheWrite = reportedInteger(usage?.cache_creation_input_tokens);
       continue;
@@ -292,7 +303,12 @@ async function* decodeAnthropic(response: HttpResponse): AsyncIterable<StreamChu
       const delta = record(frame.delta);
       const usage = record(frame.usage);
       stopReason = typeof delta?.stop_reason === "string" ? delta.stop_reason : stopReason;
+      // Each reported value replaces the cumulative total; it is never added.
+      // A stop_reason does not freeze later usage-only message_delta updates.
+      counts.input = reportedInteger(usage?.input_tokens ?? undefined) ?? counts.input;
       counts.output = reportedInteger(usage?.output_tokens) ?? counts.output;
+      counts.cacheRead = reportedInteger(usage?.cache_read_input_tokens ?? undefined) ?? counts.cacheRead;
+      counts.cacheWrite = reportedInteger(usage?.cache_creation_input_tokens ?? undefined) ?? counts.cacheWrite;
       continue;
     }
 
@@ -308,14 +324,16 @@ async function* decodeAnthropic(response: HttpResponse): AsyncIterable<StreamChu
         );
       }
       const reported = usageChunk(counts);
-      if (reported !== null) yield reported;
+      if (!usagePublished && reported !== null) { usagePublished = true; yield reported; }
       yield { type: "finish", reason: { kind } };
       terminated = true;
       return;
     }
   }
 
+  } catch (error) { yield* failureUsage(); throw error; }
   if (!terminated) {
+    yield* failureUsage();
     // The socket ended before `message_stop`. That is a transport failure — and
     // classifying it as one matters, because a transport failure is retryable
     // while an AMC protocol violation deliberately is not.
