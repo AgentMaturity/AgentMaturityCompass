@@ -1,10 +1,13 @@
 import { mkdtempSync, rmSync, writeFileSync, mkdirSync, symlinkSync } from "node:fs";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
+import { fileURLToPath } from "node:url";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-import { ToolRegistry } from "../src/tools/toolRegistry.js";
-import { ToolPipeline } from "../src/tools/toolPipeline.js";
-import { searchTools } from "../src/tools/builtin/searchTools.js";
+import { ToolRegistry } from "../dist/tools/toolRegistry.js";
+import { ToolPipeline } from "../dist/tools/toolPipeline.js";
+import { searchTools } from "../dist/tools/builtin/searchTools.js";
 
 /**
  * Search is capped, and every cap says what it dropped.
@@ -46,6 +49,40 @@ function write(workspace: string, relative: string, content: string): void {
   const full = join(workspace, relative);
   mkdirSync(join(full, ".."), { recursive: true });
   writeFileSync(full, content);
+}
+
+const execFileAsync = promisify(execFile);
+
+/** A broken regex or missing worker termination must fail without hanging Vitest. */
+async function isolatedSearch(workspace: string, args: Record<string, unknown>, cancelAfterMs?: number, name = "grep"): Promise<{
+  result: { ok: boolean; output: string; timedOut?: boolean };
+  ticks: number;
+  elapsed: number;
+}> {
+  const modulePath = fileURLToPath(new URL("../dist/tools/builtin/searchTools.js", import.meta.url));
+  const source = `
+    import { pathToFileURL } from "node:url";
+    const { searchTools } = await import(pathToFileURL(${JSON.stringify(modulePath)}).href);
+    const controller = new AbortController();
+    let ticks = 0;
+    const heartbeat = setInterval(() => { ticks += 1; }, 5);
+    const cancelAfterMs = ${JSON.stringify(cancelAfterMs ?? null)};
+    if (cancelAfterMs === -1) controller.abort();
+    const cancellation = cancelAfterMs !== null && cancelAfterMs >= 0
+      ? setTimeout(() => controller.abort(), cancelAfterMs) : undefined;
+    const started = performance.now();
+    const result = await searchTools().find(tool => tool.name === ${JSON.stringify(name)}).body({
+      workspace: ${JSON.stringify(workspace)}, arguments: ${JSON.stringify(args)}, signal: controller.signal
+    });
+    clearInterval(heartbeat);
+    clearTimeout(cancellation);
+    console.log(JSON.stringify({ result, ticks, elapsed: performance.now() - started }));
+  `;
+  const child = await execFileAsync(process.execPath, ["--input-type=module", "--eval", source], {
+    timeout: 3_000,
+    maxBuffer: 100_000
+  });
+  return JSON.parse(child.stdout) as { result: { ok: boolean; output: string; timedOut?: boolean }; ticks: number; elapsed: number };
 }
 
 describe("glob", () => {
@@ -106,6 +143,56 @@ describe("grep", () => {
     const outcome = await h.run("grep", { pattern: "NEEDLE", include: "*.ts" });
     expect(outcome.output).toContain("a.ts");
     expect(outcome.output).not.toContain("b.md");
+  });
+
+  it("times out catastrophic regexes while the main event loop stays responsive", async () => {
+    const h = harness();
+    write(h.workspace, "slow.txt", `${"a".repeat(50_000)}b`);
+
+    const outcome = await isolatedSearch(h.workspace, { pattern: "(a+)+$", timeoutMs: 150 });
+    expect(outcome.result.ok).toBe(false);
+    expect(outcome.result.output).toContain("search exceeded 150 ms; results incomplete");
+    expect(outcome.result.timedOut).toBe(true);
+    expect(outcome.elapsed).toBeLessThan(1_500);
+    expect(outcome.ticks).toBeGreaterThan(2);
+  });
+
+  it("cancels and terminates a worker blocked inside a regex", async () => {
+    const h = harness();
+    write(h.workspace, "slow.txt", `${"a".repeat(50_000)}b`);
+
+    const outcome = await isolatedSearch(h.workspace, { pattern: "(a+)+$", timeoutMs: 2_000 }, 150);
+    expect(outcome.result.ok).toBe(false);
+    expect(outcome.result.output).toContain("search cancelled; results incomplete");
+    expect(outcome.elapsed).toBeLessThan(1_500);
+    expect(outcome.ticks).toBeGreaterThan(2);
+  });
+
+  it("refuses an already cancelled search", async () => {
+    const h = harness();
+    write(h.workspace, "a.txt", "NEEDLE");
+    const outcome = await isolatedSearch(h.workspace, { pattern: "NEEDLE" }, -1);
+    expect(outcome.result.ok).toBe(false);
+    expect(outcome.result.output).toContain("search cancelled; results incomplete");
+    expect(outcome.result.output).not.toContain("a.txt:1:NEEDLE");
+  });
+
+  it("caps total input bytes even when there are no matches", async () => {
+    const h = harness();
+    write(h.workspace, "a.txt", "x".repeat(60));
+    write(h.workspace, "b.txt", "x".repeat(60));
+    write(h.workspace, "c.txt", "NEEDLE");
+    const outcome = await h.run("grep", { pattern: "NEEDLE", maxScannedBytes: 100 });
+    expect(outcome.output).toContain("stopped at 100 bytes scanned; results incomplete");
+    expect(outcome.output).not.toContain("c.txt:1:NEEDLE");
+    expect(outcome.output).not.toContain("no matches");
+  });
+
+  it("honours an explicit case-insensitive flag", async () => {
+    const h = harness();
+    write(h.workspace, "upper.txt", "NEEDLE");
+    expect((await h.run("grep", { pattern: "needle" })).output).toContain("no matches");
+    expect((await h.run("grep", { pattern: "needle", caseInsensitive: true })).output).toContain("upper.txt:1:NEEDLE");
   });
 
   it("stops at the match cap and says more exist", async () => {
@@ -216,5 +303,173 @@ describe("the walk stays inside the workspace", () => {
     expect(outcome.output).toContain("src/real.ts");
     expect(outcome.output).not.toContain("node_modules");
     expect(outcome.output).not.toContain(".git");
+  });
+});
+
+describe("repository ignore files", () => {
+  it.each(["glob", "grep"])("refuses unsupported POSIX named classes instead of silently bypassing ignore rules in %s", async (name) => {
+    const h = harness();
+    write(h.workspace, ".gitignore", "[[:digit:]].txt\n");
+    write(h.workspace, "7.txt", "NEEDLE");
+    const outcome = await h.run(name, { pattern: name === "glob" ? "**/*" : "NEEDLE" });
+    expect(outcome.ok).toBe(false);
+    expect(outcome.output).toContain("unsupported POSIX named character classes");
+    expect(outcome.output).toContain("results incomplete");
+    expect(outcome.output).not.toContain("7.txt");
+    expect(outcome.output).not.toContain("NEEDLE");
+  });
+
+  it("times out a catastrophic ignore rule during glob while the main event loop stays responsive", async () => {
+    const h = harness();
+    write(h.workspace, ".gitignore", `${"*a".repeat(20)}*b\n`);
+    write(h.workspace, `${"a".repeat(200)}.txt`, "NEEDLE");
+    const outcome = await isolatedSearch(h.workspace, { pattern: "**/*", timeoutMs: 150 }, undefined, "glob");
+    expect(outcome.result.ok).toBe(false);
+    expect(outcome.result.output).toContain("search exceeded 150 ms; results incomplete");
+    expect(outcome.result.timedOut).toBe(true);
+    expect(outcome.elapsed).toBeLessThan(1_500);
+    expect(outcome.ticks).toBeGreaterThan(2);
+  });
+
+  it.each(["glob", "grep"])("refuses oversized ignore files instead of leaking excluded files through %s", async (name) => {
+    const h = harness();
+    write(h.workspace, ".gitignore", `${"# comment\n".repeat(8_000)}hidden.txt\n`);
+    write(h.workspace, "hidden.txt", "NEEDLE");
+    const outcome = await h.run(name, { pattern: name === "glob" ? "**/*" : "NEEDLE" });
+    expect(outcome.ok).toBe(false);
+    expect(outcome.output).toContain("ignore file .gitignore exceeded 64000 bytes or changed during reading; results incomplete");
+    expect(outcome.output).not.toContain("hidden.txt");
+    expect(outcome.output).not.toContain("NEEDLE");
+  });
+
+  it("honours ignore character classes, escapes and significant spaces without changing glob syntax", async () => {
+    const h = harness();
+    write(h.workspace, ".gitignore", [
+      "# a comment", "letter[0-9].txt", "negated[!a-c].txt", "\\#literal.txt", "\\!literal.txt",
+      "space\\ name.txt", "trailing.txt   ", "trailing-space\\ ", " leading.txt", "cache/**/generated[0-9].js", "priority.txt"
+    ].join("\n"));
+    write(h.workspace, ".ignore", "!priority.txt\n");
+    const excluded = ["letter7.txt", "negatedz.txt", "#literal.txt", "!literal.txt", "space name.txt", "trailing.txt", "trailing-space ", " leading.txt", "cache/generated1.js", "cache/deep/generated2.js"];
+    const included = ["letterx.txt", "negatedb.txt", "ordinary.txt", "trailing-space", "priority.txt", "literal[ab].txt", "literala.txt"];
+    for (const path of [...excluded, ...included]) write(h.workspace, path, "NEEDLE");
+    for (const name of ["glob", "grep"]) {
+      const outcome = await h.run(name, { pattern: name === "glob" ? "**/*" : "NEEDLE" });
+      const paths = outcome.output.split("\n").map(line => name === "grep" ? line.split(":1:")[0] : line);
+      for (const path of excluded) expect(paths).not.toContain(path);
+      for (const path of included) expect(paths).toContain(path);
+    }
+    const literalGlob = await h.run("glob", { pattern: "literal[ab].txt" });
+    expect(literalGlob.output).toBe("literal[ab].txt");
+  });
+
+  it("applies root and nested rules, negation and explicit includeIgnored to both searches", async () => {
+    const h = harness();
+    write(h.workspace, ".gitignore", "build/\n*.log\n!keep.log\n/root-only.txt\n");
+    write(h.workspace, "src/.gitignore", "local.txt\n");
+    write(h.workspace, ".ignore", "custom.txt\n");
+    for (const path of ["build/out.js", "src/drop.log", "keep.log", "root-only.txt", "src/root-only.txt", "src/local.txt", "src/real.js", "custom.txt"]) {
+      write(h.workspace, path, "NEEDLE");
+    }
+    for (const name of ["glob", "grep"]) {
+      const args = name === "glob" ? { pattern: "**/*" } : { pattern: "NEEDLE" };
+      const outcome = await h.run(name, args);
+      expect(outcome.output).toContain("keep.log");
+      expect(outcome.output).toContain("src/root-only.txt");
+      expect(outcome.output).toContain("src/real.js");
+      expect(outcome.output).not.toContain("build/out.js");
+      expect(outcome.output).not.toContain("src/drop.log");
+      expect(outcome.output).not.toContain("src/local.txt");
+      expect(outcome.output).not.toContain("custom.txt");
+      expect(outcome.output.split("\n").some(line => line.startsWith("root-only.txt"))).toBe(false);
+      const explicit = await h.run(name, { ...args, includeIgnored: true });
+      expect(explicit.output).toContain("build/out.js");
+      expect(explicit.output).toContain("src/local.txt");
+      expect(explicit.output).toContain("custom.txt");
+    }
+  });
+});
+
+describe("safe search file opens", () => {
+  it("bounds a read before allocating and does not call a capped prefix a complete file", async () => {
+    const h = harness();
+    write(h.workspace, "wide.txt", "0123456789");
+    const { readWorkspaceFile } = await import("../dist/tools/builtin/workspaceWalk.js");
+    const prefix = readWorkspaceFile(h.workspace, "wide.txt", 4, 20);
+    expect(prefix?.bytes.toString()).toBe("0123");
+    expect(prefix?.complete).toBe(false);
+    const oversized = readWorkspaceFile(h.workspace, "wide.txt", 100, 4);
+    expect(oversized?.bytes.length).toBe(0);
+    expect(oversized?.complete).toBe(false);
+  });
+
+  it("does not call a file complete if it grew during the read", async () => {
+    const h = harness();
+    write(h.workspace, "growing.txt", "NEEDLE");
+    const modulePath = fileURLToPath(new URL("../dist/tools/builtin/workspaceWalk.js", import.meta.url));
+    const source = `
+      import fs from "node:fs";
+      import { syncBuiltinESMExports } from "node:module";
+      import { pathToFileURL } from "node:url";
+      const { readWorkspaceFile } = await import(pathToFileURL(${JSON.stringify(modulePath)}).href);
+      const original = fs.readSync;
+      let grew = false;
+      fs.readSync = (...args) => {
+        const count = original(...args);
+        if (!grew) { grew = true; fs.appendFileSync(${JSON.stringify(join(h.workspace, "growing.txt"))}, "-GROWN"); }
+        return count;
+      };
+      syncBuiltinESMExports();
+      const result = readWorkspaceFile(${JSON.stringify(h.workspace)}, "growing.txt", 100);
+      console.log(JSON.stringify({ complete: result?.complete, grew }));
+    `;
+    const child = await execFileAsync(process.execPath, ["--input-type=module", "--eval", source], { timeout: 3_000 });
+    expect(JSON.parse(child.stdout)).toEqual({ complete: false, grew: true });
+  });
+
+  it.each(["fifo", "symlink", "parent-symlink", "file-replaced"])("refuses a %s substituted immediately before open", async (replacement) => {
+    const h = harness();
+    const outside = mkdtempSync(join(tmpdir(), "amc-search-outside-"));
+    dirs.push(outside);
+    write(outside, "target.txt", "OUTSIDE-SECRET");
+    write(h.workspace, "folder/target.txt", "INSIDE");
+    const modulePath = fileURLToPath(new URL("../dist/tools/builtin/workspaceWalk.js", import.meta.url));
+    const source = `
+      import fs from "node:fs";
+      import { syncBuiltinESMExports } from "node:module";
+      import { execFileSync } from "node:child_process";
+      import { pathToFileURL } from "node:url";
+      import { join } from "node:path";
+      const { readWorkspaceFile } = await import(pathToFileURL(${JSON.stringify(modulePath)}).href);
+      const workspace = fs.realpathSync(${JSON.stringify(h.workspace)});
+      const outside = ${JSON.stringify(outside)};
+      const target = join(workspace, "folder/target.txt");
+      const original = fs.openSync;
+      let swapped = false;
+      fs.openSync = (path, ...args) => {
+        if (String(path) === target && !swapped) {
+          swapped = true;
+          if (${JSON.stringify(replacement)} === "file-replaced") {
+            const descriptor = original(path, ...args);
+            fs.renameSync(target, join(workspace, "original.txt"));
+            fs.writeFileSync(target, "REPLACEMENT");
+            return descriptor;
+          }
+          if (${JSON.stringify(replacement)} === "parent-symlink") {
+            fs.renameSync(join(workspace, "folder"), join(workspace, "held"));
+            fs.symlinkSync(outside, join(workspace, "folder"));
+          } else {
+            fs.unlinkSync(target);
+            if (${JSON.stringify(replacement)} === "fifo") execFileSync("mkfifo", [target]);
+            else fs.symlinkSync(join(outside, "target.txt"), target);
+          }
+        }
+        return original(path, ...args);
+      };
+      syncBuiltinESMExports();
+      const result = readWorkspaceFile(workspace, "folder/target.txt", 100);
+      console.log(JSON.stringify({ refused: result === null, swapped }));
+    `;
+    const child = await execFileAsync(process.execPath, ["--input-type=module", "--eval", source], { timeout: 3_000 });
+    expect(JSON.parse(child.stdout)).toEqual({ refused: true, swapped: true });
   });
 });

@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
-import { readFileSync, realpathSync } from "node:fs";
+import { realpathSync } from "node:fs";
+import { regularFileStat, scanRegularFile } from "./fsRegularFile.js";
 
 /**
  * The read-before-edit policy (P4.3).
@@ -61,8 +62,13 @@ export class ReadBeforeEditLedger {
 
   /** Record that `agentId` has seen the current contents of `path`. */
   recordRead(agentId: string, path: string, bytes: Buffer): void {
+    this.recordReadDigest(agentId, path, digestOf(bytes));
+  }
+
+  /** Record a full-file digest obtained by a streamed read. */
+  recordReadDigest(agentId: string, path: string, digest: string): void {
     const perAgent = this.reads.get(agentId) ?? new Map<string, ReadRecord>();
-    perAgent.set(canonicalKey(path), { digest: digestOf(bytes), readAt: Date.now() });
+    perAgent.set(canonicalKey(path), { digest, readAt: Date.now() });
     this.reads.set(agentId, perAgent);
   }
 
@@ -73,17 +79,21 @@ export class ReadBeforeEditLedger {
    * question is whether the file changed and only the file can answer that.
    */
   mayEdit(agentId: string, path: string): EditVerdict {
-    const record = this.reads.get(agentId)?.get(canonicalKey(path));
+    const key = canonicalKey(path);
+    const record = this.reads.get(agentId)?.get(key);
     if (!record) {
       return { ok: false, reason: `edit requires reading "${path}" first — read the file, then retry` };
     }
-    let current: Buffer;
+    let current: string;
     try {
-      current = readFileSync(path);
-    } catch {
-      return { ok: false, reason: `"${path}" no longer exists — read it again, then retry` };
+      current = scanRegularFile(key).digest;
+    } catch (error) {
+      const reason = (error as NodeJS.ErrnoException).code === "ENOENT"
+        ? `"${path}" no longer exists — read it again, then retry`
+        : (error as Error).message;
+      return { ok: false, reason };
     }
-    if (digestOf(current) !== record.digest) {
+    if (current !== record.digest) {
       return { ok: false, reason: `"${path}" changed since you read it — read it again, then retry` };
     }
     return { ok: true };
@@ -99,13 +109,11 @@ export class ReadBeforeEditLedger {
    * point of the policy is that it cannot happen by accident.
    */
   mayWrite(agentId: string, path: string): EditVerdict {
-    let exists = true;
     try {
-      readFileSync(path);
-    } catch {
-      exists = false;
+      if (regularFileStat(path) === null) return { ok: true };
+    } catch (error) {
+      return { ok: false, reason: (error as Error).message };
     }
-    if (!exists) return { ok: true };
     return this.mayEdit(agentId, path);
   }
 
