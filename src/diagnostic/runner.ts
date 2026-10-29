@@ -156,7 +156,7 @@ async function getClaimedLevels(params: {
     schema: claimsSchema,
     maxRetries: 2
   });
-  return { levels: harness.value.claimedLevels, humanPasted: harness.usedFallback };
+  return { levels: harness.value.claimedLevels, humanPasted: harness.usedFallback }; // usedFallback: a person pasted the claims
 }
 
 function extractAuditType(event: ParsedEvidenceEvent): string {
@@ -955,7 +955,6 @@ async function runDiagnosticCore(input: RunDiagnosticInput, outputMarkdownPath?:
           questionId: question.id
         });
       }
-      // usedFallback: the runtime never produced valid claims and a person pasted them; keep that provenance.
       if (claimsHumanPasted && typeof rawClaimedLevel === "number") flags.push("FLAG_CLAIM_HUMAN_PASTED");
       if (!verification.ok) {
         flags.push("FLAG_LEDGER_INVALID");
