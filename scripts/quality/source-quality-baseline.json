@@ -2071,7 +2071,6 @@
     {"id":"69a6082a07ca805bd51162b3c10f4766c9711fec5a43460df8cba321efd09bc2","file":"src/shield/shieldGuardOrchestrator.ts","kind":"types"},
     {"id":"69d3fdbc27eb0aa69561d1008b66ac970b9122b0f95538577ed2b7fb733e5f95","file":"src/console/assets/api.js","kind":"exports"},
     {"id":"69ec9f859de8c2e22dcd02f33a55725da48d327209637750fb47f99ae220417c","file":"src/scanner/index.ts","kind":"types"},
-    {"id":"69ecd29b1288b24c3f968b4c0b6e8512fcdfbbc55f3f53a9361ea5ff1c8f604d","file":"src/acp/acpEnvelope.ts","kind":"exports"},
     {"id":"6a023c54ea74dd93a26186ba822f638f7868c418fd3c2231afaf11e09fe1dd6f","file":"src/credentials/index.ts","kind":"types"},
     {"id":"6a2d04fd9e438e5bf22faac71ee9557438ce880f759a3932a51acb0ebd86d6d3","file":"src/steer/thermostatCLI.ts","kind":"types"},
     {"id":"6a433da3ec0530ce3a4c571ededcf2c596467be560ab276f6bca62bb0b45d39d","file":"src/runtime/lifecycleGraph.ts","kind":"exports"},
