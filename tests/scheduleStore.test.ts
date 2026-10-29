@@ -14,7 +14,8 @@ import {
   interruptedClaims,
   readSchedules,
   saveSchedules,
-  schedulesPath
+  schedulesPath,
+  scheduleStatus
 } from "../src/autonomy/scheduleStore.js";
 
 /**
@@ -255,13 +256,38 @@ describe("running what is due", () => {
     });
 
     expect(results.map((r) => r.scheduleId)).toEqual(["nightly"]);
-    expect(results[0]?.ok).toBe(true);
+    expect(results[0]).toMatchObject({ ok: false, stoppedBy: "max-rounds" });
     expect(rounds, "the driver's ceiling applied").toBe(2);
     expect(interruptedClaims(dir), "the claim was closed").toEqual([]);
     // The cadence really advanced. Without this a runner that never CLAIMED
     // would pass everything above -- the claim it never took cannot be left in
     // flight, and the run it never registered still completes.
     expect(dueSchedules(dir, 1_000_001), "not due again straight away").toEqual([]);
+  });
+
+  it("counts nonconverging goals as failures and stops at the consecutive-failure threshold", async () => {
+    const dir = workspace();
+    saveSchedules(dir, [nightly({ maxRounds: 2 })]);
+    const owned = base(dir);
+    let calls = 0;
+    const runner = async () => { calls += 1; return { ok: true, text: "still working" }; };
+    let now = 1_000_000;
+
+    for (let failure = 1; failure <= MAX_CONSECUTIVE_FAILURES; failure += 1) {
+      const results = await runDueSchedules({ ...owned, now, runner });
+      expect(results[0]).toMatchObject({ ok: false, rounds: 2, stoppedBy: "max-rounds" });
+      expect(scheduleStatus(dir, now).schedules[0]).toMatchObject({
+        consecutiveFailures: failure,
+        inFlightSince: null,
+        lastOutcome: { ok: false, summary: "reached the 2-round ceiling" }
+      });
+      expect(interruptedClaims(dir)).toEqual([]);
+      now += 60_001;
+    }
+
+    expect(await runDueSchedules({ ...owned, now, runner }), "suspended without another delegation").toEqual([]);
+    expect(calls).toBe(MAX_CONSECUTIVE_FAILURES * 2);
+    expect(scheduleStatus(dir, now).schedules[0]?.due).toBe(false);
   });
 
   it("closes the claim when the agent fails, rather than leaving it in flight", async () => {

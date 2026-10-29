@@ -442,10 +442,11 @@ describe("a native-schedule pass under an activated identity-binding plan (P1-79
     });
     await program.parseAsync(["native-schedule", "run-due", "--agent", "default", "--provider", "stub", "--approve-tools", "WRITE_LOW",
       "--expect-digest", pin.schedules, "--expect-tools-digest", pin.tools, "--credentials-home", home], { from: "user" });
-    expect(failed, errors.join("\n")).toBe(false);
+    // Exhausting scheduled rounds is an incomplete goal even when its governed tool calls succeed.
+    expect(failed, errors.join("\n")).toBe(true);
     const pass = JSON.parse(output.at(-1)!) as { scheduleResults: { ok: boolean; childSessionIds: string[] }[] };
     expect(pass.scheduleResults).toHaveLength(1);
-    expect(pass.scheduleResults[0]!.ok).toBe(true);
+    expect(pass.scheduleResults[0]!.ok).toBe(false);
     // P2-25: one lease for the pass and one delegated lease for its child, descending from it.
     expect(minted, "the pass's lease and its child's").toHaveBeenCalledTimes(2);
     expect(minted.mock.results[1]!.value.payload.ancestorLeaseIds).toEqual([minted.mock.results[0]!.value.payload.leaseId]);

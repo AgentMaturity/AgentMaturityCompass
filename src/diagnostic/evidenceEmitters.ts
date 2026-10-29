@@ -66,6 +66,7 @@ export const NON_MATURITY_AUDIT_MODULES: ReadonlyArray<{ module: string; why: st
   { module: "src/agent/agentToolset.ts", why: "native shell confinement settings; untagged, so they bind to no question" },
   { module: "src/agent/compaction/autoCompact.ts", why: "context compaction bookkeeping (P1-37); token counts before and after, not agent behaviour" },
   { module: "src/approvals/approvalStudioService.ts", why: "operator approval decisions about AMC actions, not the scored agent's behaviour" },
+  { module: "src/autonomy/scheduleStore.ts", why: "operator authorization to close an interrupted schedule claim; operational bookkeeping, never goal quality or maturity evidence" },
   { module: "src/archetypes/index.ts", why: "operator applied an archetype to AMC configuration" },
   { module: "src/assurance/assurancePackExecution.ts", why: "extracted assurance inconclusive-run bookkeeping; untagged and never positive maturity evidence" },
   { module: "src/assurance/assuranceRunner.ts", why: "assurance run bookkeeping; scenario results are `test` rows, untagged" },

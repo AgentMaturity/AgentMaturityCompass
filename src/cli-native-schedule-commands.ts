@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { readFileSync, statSync } from "node:fs";
 import type { Command } from "commander";
-import { assertScheduleOwner, manageScheduleAsync as manageSchedule, scheduleStatus } from "./autonomy/scheduleStore.js";
+import { assertScheduleOwner, closeInterruptedClaim, manageScheduleAsync as manageSchedule, scheduleStatus } from "./autonomy/scheduleStore.js";
 import { resolve } from "node:path";
 import { assertNativeScheduleAdmission, startNativeScheduleService } from "./autonomy/scheduleService.js";
 import { approvalGateFor, integerOption, paramsFor, routeFor, type AgentLoopCliIo, type RunOptions } from "./cli-agent-options.js";
@@ -73,12 +73,17 @@ export function registerNativeScheduleCommands(program: Command, io: AgentLoopCl
       } catch (error) { failed(error); }
     });
   for (const kind of ["enable", "disable", "remove", "reset-failures"] as const) {
-    group.command(`${kind} <id>`)
+    const command = group.command(`${kind} <id>`)
       .description(kind === "disable" ? "Prevent future claims; does not pretend to cancel an already running owner" : `Explicitly ${kind} a schedule without discarding its cadence or claim history`)
-      .requiredOption("--expect-digest <digest>", "current signed schedule configuration digest from list")
-      .action(async (id: string, opts: { expectDigest: string }) => {
+      .requiredOption("--expect-digest <digest>", "current signed schedule configuration digest from list");
+    if (kind === "reset-failures") command.option("--close-interrupted <claim-id>", "close this exact dead native owner as an audited interrupted failure instead of resetting failures; never re-runs the goal");
+    command.action(async (id: string, opts: { expectDigest: string; closeInterrupted?: string }) => {
         const root = resolve(workspace());
-        try { await manageSchedule(root, opts.expectDigest, { kind, id }); report(scheduleStatus(root, now())); }
+        try {
+          if (opts.closeInterrupted !== undefined) await closeInterruptedClaim(root, id, opts.closeInterrupted, opts.expectDigest);
+          else await manageSchedule(root, opts.expectDigest, { kind, id });
+          report(scheduleStatus(root, now()));
+        }
         catch (error) { failed(error); }
       });
   }
