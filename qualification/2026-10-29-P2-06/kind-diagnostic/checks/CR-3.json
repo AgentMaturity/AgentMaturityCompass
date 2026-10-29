@@ -1,0 +1,10 @@
+{
+  "id": "CR-3",
+  "scenario": "Disk full",
+  "status": "not_run",
+  "reason": "filling the volume needs a size-limited storage class; kind's local-path volumes share the node disk",
+  "blockedBy": [
+    "P2-06 follow-up"
+  ],
+  "durationMs": 0
+}

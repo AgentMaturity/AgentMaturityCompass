@@ -1,0 +1,11 @@
+{
+  "id": "TS-5",
+  "scenario": "Guard events and streams",
+  "status": "not_run",
+  "reason": "needs a second tenant release (one release per namespace) and per-tenant fixtures; guard-event and stream scoping",
+  "blockedBy": [
+    "P2-01",
+    "P2-06 follow-up"
+  ],
+  "durationMs": 0
+}

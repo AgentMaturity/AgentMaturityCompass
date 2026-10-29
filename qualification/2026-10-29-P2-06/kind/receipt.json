@@ -1,0 +1,228 @@
+{
+  "schemaVersion": 1,
+  "key": "P2-06",
+  "date": "2026-10-29",
+  "commit": "16a9ab68f96c260d1cf2e460bbec87c55c200970",
+  "branch": "rtd/w6-p2-06",
+  "node": "v22.23.3",
+  "pnpm": "10.33.0",
+  "os": "darwin 25.6.0",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "INS-1 Install by digest",
+      "exit": 1,
+      "durationMs": 300296
+    },
+    {
+      "cmd": "INS-2 Install refusals",
+      "exit": 0,
+      "durationMs": 563
+    },
+    {
+      "cmd": "UPG-1 Upgrade with data",
+      "exit": 1,
+      "durationMs": 64657
+    },
+    {
+      "cmd": "UPG-2 Failed upgrade",
+      "exit": 1,
+      "durationMs": 0
+    },
+    {
+      "cmd": "RB-1 Helm rollback",
+      "exit": 1,
+      "durationMs": 1264847
+    },
+    {
+      "cmd": "RB-2 Rollback across a migration",
+      "exit": 1,
+      "durationMs": 1
+    },
+    {
+      "cmd": "BR-1 Backup under load",
+      "exit": 1,
+      "durationMs": 72302
+    },
+    {
+      "cmd": "BR-2 RPO and RTO",
+      "exit": 1,
+      "durationMs": 0
+    },
+    {
+      "cmd": "BR-3 Bad restores",
+      "exit": 1,
+      "durationMs": 4211
+    },
+    {
+      "cmd": "CR-1 Pod killed mid-action",
+      "exit": 1,
+      "durationMs": 0
+    },
+    {
+      "cmd": "CR-2 Node drain",
+      "exit": 1,
+      "durationMs": 245787
+    },
+    {
+      "cmd": "CR-3 Disk full",
+      "exit": 1,
+      "durationMs": 0
+    },
+    {
+      "cmd": "CR-4 KeyProvider outage",
+      "exit": 1,
+      "durationMs": 0
+    },
+    {
+      "cmd": "CR-5 Database failover",
+      "exit": 1,
+      "durationMs": 0
+    },
+    {
+      "cmd": "CR-6 Telemetry outage",
+      "exit": 1,
+      "durationMs": 0
+    },
+    {
+      "cmd": "OV-1 Offline bundle check",
+      "exit": 1,
+      "durationMs": 1
+    },
+    {
+      "cmd": "OV-2 Offline WORM check",
+      "exit": 1,
+      "durationMs": 0
+    },
+    {
+      "cmd": "TS-1 API isolation",
+      "exit": 1,
+      "durationMs": 0
+    },
+    {
+      "cmd": "TS-2 Credential isolation",
+      "exit": 1,
+      "durationMs": 0
+    },
+    {
+      "cmd": "TS-3 Evidence isolation",
+      "exit": 1,
+      "durationMs": 0
+    },
+    {
+      "cmd": "TS-4 Storage and network",
+      "exit": 1,
+      "durationMs": 0
+    },
+    {
+      "cmd": "TS-5 Guard events and streams",
+      "exit": 1,
+      "durationMs": 0
+    }
+  ],
+  "tests": {
+    "total": 22,
+    "passed": 1,
+    "failed": 21,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "checks/BR-1.json",
+      "sha256": "76f9d7cd6b2f25e7784a1e77a91d43d0fec76a8e4c47d646dc93f80b9d9798de"
+    },
+    {
+      "path": "checks/BR-2.json",
+      "sha256": "9ab9d2d9c6604078227fd715e3b365e51c97db8e476e68d9864bd14ab6f60ebc"
+    },
+    {
+      "path": "checks/BR-3.json",
+      "sha256": "10a497fb34b9cc64d83a4544558d889a0afa825f6e266d70ff2366dd87f22054"
+    },
+    {
+      "path": "checks/CR-1.json",
+      "sha256": "a5200073a81ebbb1afd13c0cbcca1a8ee9fd701f459f72d6294e42c0986b5b90"
+    },
+    {
+      "path": "checks/CR-2.json",
+      "sha256": "b13980391528ca59d942f8b0614cee3d599b997b5a49a82181020e0407c4447f"
+    },
+    {
+      "path": "checks/CR-3.json",
+      "sha256": "fa334802f28c47d90c7f4764b596cc119ec9e508fb77031f9028dc11050e8ac2"
+    },
+    {
+      "path": "checks/CR-4.json",
+      "sha256": "5ec235c9d0b47de43176c4dc7a81240a86d5e7536bab543cddfe94e6a1ea6608"
+    },
+    {
+      "path": "checks/CR-5.json",
+      "sha256": "81c22235d8c57e2aaef99bb0f09069bfc3a0717c6137912338040d39962d1323"
+    },
+    {
+      "path": "checks/CR-6.json",
+      "sha256": "3f653b527b1984333ea78dcda43b3ae9d1690c54e210a17e9facefad67fbd1d3"
+    },
+    {
+      "path": "checks/INS-1.json",
+      "sha256": "bf2051142f3ab831e0c4ab71535aea511f375e36b090f0af38c5789b9de98a9b"
+    },
+    {
+      "path": "checks/INS-2.json",
+      "sha256": "1d167eb0b3f2e3720b3e864f693e6c6609163b23273276bf60ed2b1f2fb41aef"
+    },
+    {
+      "path": "checks/OV-1.json",
+      "sha256": "ca2267d2bbde66b8c55a87dba6bad24f46784153f194fbdc751d456b94a69b7c"
+    },
+    {
+      "path": "checks/OV-2.json",
+      "sha256": "def74dae6672d322bdc0cb93b9b4f03cf2b5ba0d1a7a2391a3051e1acab5dd94"
+    },
+    {
+      "path": "checks/RB-1.json",
+      "sha256": "56530dc4674a2263d6be5705a0c336e6bd720f461e04c54aadcf7c603f8b851c"
+    },
+    {
+      "path": "checks/RB-2.json",
+      "sha256": "e35e6a0d7769510dfbf0091787a1370dd3e9b7a6249f42808a1878331ab2e55b"
+    },
+    {
+      "path": "checks/TS-1.json",
+      "sha256": "5c99a63063b98d4b1e1bc30017a569cb3071fb9d8ad0d7a22214d18cd958a460"
+    },
+    {
+      "path": "checks/TS-2.json",
+      "sha256": "6476a610b59c49f5e1b2a063ea6e924efa4a6a0731cab047c9bd36b96de71a8e"
+    },
+    {
+      "path": "checks/TS-3.json",
+      "sha256": "cefecee0eae43858ef725e1677bebcd79777df90e11d6568058c79a96272ddb8"
+    },
+    {
+      "path": "checks/TS-4.json",
+      "sha256": "8412031b966ec70ad2090975abd1ab082face57ca29d6035ed20225f3b0909b9"
+    },
+    {
+      "path": "checks/TS-5.json",
+      "sha256": "1252629a0edfaddb075380527fa959e8f90903fd8681840e2ff0becfea23ac31"
+    },
+    {
+      "path": "checks/UPG-1.json",
+      "sha256": "2e7315b25da32e5431add3c60bd74bd923472c0e59cf1f3222dce974e82a93ce"
+    },
+    {
+      "path": "checks/UPG-2.json",
+      "sha256": "e93898efe185771a96f5932af19f2c2f889afbcb6e1408597f87b5d98c9a968d"
+    },
+    {
+      "path": "commands.json",
+      "sha256": "d5dc3f1a29b84fb3c86fe7cd796fbd05a4ca47b4231eb837209ca4665df4aaee"
+    },
+    {
+      "path": "reference-deployment.json",
+      "sha256": "cbd7c96770d7a0121eb501344637cd9b5b7bb3dbb6263ac402a7d87e268a4a06"
+    }
+  ],
+  "notes": "Failed: INS-1, UPG-1, RB-1, BR-1, BR-3, CR-2. Not run (counted as failed): UPG-2, RB-2, BR-2, CR-1, CR-3, CR-4, CR-5, CR-6, OV-1, OV-2, TS-1, TS-2, TS-3, TS-4, TS-5. kube context kind-amc-p206; recovery targets status engineering-placeholder. After the run, the absolute checkout path in commands.json was replaced by <repo> and its sha256 above recomputed (receipts must not carry local paths); nothing else was changed."
+}

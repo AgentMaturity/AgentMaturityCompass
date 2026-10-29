@@ -59,7 +59,7 @@ These probes do not run a governed turn. `helm test` does: see [Verify Runtime](
 
 ### Single writer
 
-The workspace is a SQLite ledger and files on a `ReadWriteOnce` volume, and Studio takes no cross-process workspace lock. The chart therefore refuses any `replicaCount` other than 1. Both the chart and the raw manifests use `strategy: Recreate`, so an update never runs two pods against one workspace. An update has a short outage while the old pod stops and the new one passes readiness. The `PodDisruptionBudget` (`minAvailable: 1`) also blocks voluntary eviction of the single pod, so a node drain waits until you scale to 0 or delete the pod deliberately.
+The workspace is a SQLite ledger and files on a `ReadWriteOnce` volume, and Studio takes no cross-process workspace lock. The chart therefore refuses any `replicaCount` other than 1. Both the chart and the raw manifests use `strategy: Recreate`, so an update never runs two pods against one workspace. An update has a short outage while the old pod stops and the new one passes readiness. The `PodDisruptionBudget` defaults to `maxUnavailable: 1` (chart 0.4.0), so a node drain evicts the single pod and Studio is down until it is Ready again on a node that can attach its volume. Set `podDisruptionBudget.minAvailable=1` and `podDisruptionBudget.maxUnavailable=null` to block voluntary eviction instead; a drain then waits until you scale to 0 or delete the pod deliberately.
 
 ## Create Bootstrap Secret
 
@@ -274,6 +274,10 @@ helm test amc --namespace amc-system --logs
 node scripts/deploy/rollback-drill.mjs --image-a amc-studio:s1-a --image-b amc-studio:s1-b \
   --secrets-dir ./drill-secrets --out ./rollback-receipt.json
 ```
+
+### Upgrading to chart 0.4.0
+
+Chart 0.4.0 (P2-06) changes the `PodDisruptionBudget` default from `minAvailable: 1` to `maxUnavailable: 1`, so node drains no longer block on the single pod. To keep the old behaviour, set `podDisruptionBudget.minAvailable=1` and `podDisruptionBudget.maxUnavailable=null`; setting both, or neither, fails the render. It also adds `metrics.*` values, off by default: `metrics.enabled=true` exposes Prometheus metrics on port 9464 inside the cluster, admitted by the NetworkPolicy from the monitoring namespace only, with optional ServiceMonitor and PrometheusRule objects ([deploy/reference/MONITORING.md](deploy/reference/MONITORING.md)). The reference deployment runbooks are in [deploy/reference/](deploy/reference/TOPOLOGY.md).
 
 ### Upgrading to chart 0.3.0
 

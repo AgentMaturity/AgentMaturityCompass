@@ -1,0 +1,416 @@
+[
+  {
+    "cmd": "helm version --short",
+    "exit": 0,
+    "durationMs": 38
+  },
+  {
+    "cmd": "kubectl version --client -o json",
+    "exit": 0,
+    "durationMs": 35
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n default get secret amc-bootstrap -o name",
+    "exit": 1,
+    "durationMs": 43
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n default apply -f -",
+    "exit": 0,
+    "durationMs": 65
+  },
+  {
+    "cmd": "helm --kube-context kind-amc-p206 -n default install amc-rd <repo>/deploy/helm/amc --set image.repository=amc-studio --set image.digest=sha256:9fd815115d9a97a51f805bf777a3abd49fdc8df624a0ab54126d1de935756716 --set image.requireDigest=true --wait --timeout 300s",
+    "exit": 1,
+    "durationMs": 300186,
+    "stderr": "Error: INSTALLATION FAILED: resource Deployment/default/amc-rd-amc not ready. status: InProgress, message: Available: 0/1\ncontext deadline exceeded\n"
+  },
+  {
+    "cmd": "helm --kube-context kind-amc-p206 -n default install amc-rd-ins2-0 <repo>/deploy/helm/amc --set bootstrap.createSecret=true --set bootstrap.values.vaultPassphrase=change-me-x --set bootstrap.values.ownerUsername=u --set bootstrap.values.ownerPassword=p --set bootstrap.values.notaryPassphrase=n --set bootstrap.values.notaryAuthSecret=a",
+    "exit": 1,
+    "durationMs": 77,
+    "stderr": "Error: INSTALLATION FAILED: values don't meet the specifications of the schema(s) in the following chart(s):\namc:\n- at '/bootstrap/values/vaultPassphrase': 'not' failed\n\n"
+  },
+  {
+    "cmd": "helm --kube-context kind-amc-p206 -n default status amc-rd-ins2-0",
+    "exit": 1,
+    "durationMs": 53
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n default get all,pvc,secret,configmap -l app.kubernetes.io/instance=amc-rd-ins2-0 -o name",
+    "exit": 0,
+    "durationMs": 115
+  },
+  {
+    "cmd": "helm --kube-context kind-amc-p206 -n default install amc-rd-ins2-1 <repo>/deploy/helm/amc --set image.requireDigest=true",
+    "exit": 1,
+    "durationMs": 51,
+    "stderr": "Error: INSTALLATION FAILED: values don't meet the specifications of the schema(s) in the following chart(s):\namc:\n- at '/image/digest': '' does not match pattern '^sha256:[a-f0-9]{64}$'\n\n"
+  },
+  {
+    "cmd": "helm --kube-context kind-amc-p206 -n default status amc-rd-ins2-1",
+    "exit": 1,
+    "durationMs": 39
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n default get all,pvc,secret,configmap -l app.kubernetes.io/instance=amc-rd-ins2-1 -o name",
+    "exit": 0,
+    "durationMs": 73
+  },
+  {
+    "cmd": "helm --kube-context kind-amc-p206 -n default install amc-rd-ins2-2 <repo>/deploy/helm/amc --set replicaCount=2",
+    "exit": 1,
+    "durationMs": 49,
+    "stderr": "Error: INSTALLATION FAILED: values don't meet the specifications of the schema(s) in the following chart(s):\namc:\n- at '/replicaCount': value must be 1\n\n"
+  },
+  {
+    "cmd": "helm --kube-context kind-amc-p206 -n default status amc-rd-ins2-2",
+    "exit": 1,
+    "durationMs": 34
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n default get all,pvc,secret,configmap -l app.kubernetes.io/instance=amc-rd-ins2-2 -o name",
+    "exit": 0,
+    "durationMs": 70
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n default exec deploy/amc-rd-amc -c amc-studio -- sh -c cd /data/amc && AMC_VAULT_PASSPHRASE=\"$(cat \"$AMC_VAULT_PASSPHRASE_FILE\")\" amc pair create --ttl 10m",
+    "exit": 0,
+    "durationMs": 1249
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n default apply -f -",
+    "exit": 0,
+    "durationMs": 67
+  },
+  {
+    "cmd": "helm --kube-context kind-amc-p206 -n default test amc-rd --logs --timeout 10m",
+    "exit": 1,
+    "durationMs": 63231,
+    "stderr": "Error: resource Pod/default/amc-rd-amc-governed-turn not ready. status: Failed, message: pod amc-rd-amc-governed-turn failed\n"
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n default exec deploy/amc-rd-amc -c amc-studio -- node -e \nconst Database = require(\"/opt/amc/node_modules/better-sqlite3\");\nconst db = new Database(process.argv[1], { readonly: true, fileMustExist: true });\nconst rows = db.prepare(\"SELECT event_hash, prev_event_hash, session_id FROM evidence_events ORDER BY rowid\").all();\nlet linked = true;\nfor (let i = 1; i < rows.length; i += 1) if (rows[i].prev_event_hash !== rows[i - 1].event_hash) linked = false;\nconst migrations = db.prepare(\"SELECT version FROM schema_migrations ORDER BY version\").all().map((row) => row.version);\nconst integrity = db.prepare(\"PRAGMA integrity_check\").all().map((row) => Object.values(row)[0]).join(\";\");\nprocess.stdout.write(JSON.stringify({ count: rows.length, head: rows.at(-1)?.event_hash ?? null, hashes: rows.map((row) => row.event_hash), sessions: rows.map((row) => row.session_id), linked, migrations, integrity }));\n /data/amc/.amc/evidence.sqlite",
+    "exit": 0,
+    "durationMs": 107
+  },
+  {
+    "cmd": "helm --kube-context kind-amc-p206 -n default history amc-rd -o json",
+    "exit": 0,
+    "durationMs": 40
+  },
+  {
+    "cmd": "helm --kube-context kind-amc-p206 -n default upgrade amc-rd <repo>/deploy/helm/amc --reuse-values --set resources.requests.cpu=250m --wait --timeout 10m",
+    "exit": 1,
+    "durationMs": 600017,
+    "stderr": ""
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n default exec deploy/amc-rd-amc -c amc-studio -- node -e \nconst Database = require(\"/opt/amc/node_modules/better-sqlite3\");\nconst db = new Database(process.argv[1], { readonly: true, fileMustExist: true });\nconst rows = db.prepare(\"SELECT event_hash, prev_event_hash, session_id FROM evidence_events ORDER BY rowid\").all();\nlet linked = true;\nfor (let i = 1; i < rows.length; i += 1) if (rows[i].prev_event_hash !== rows[i - 1].event_hash) linked = false;\nconst migrations = db.prepare(\"SELECT version FROM schema_migrations ORDER BY version\").all().map((row) => row.version);\nconst integrity = db.prepare(\"PRAGMA integrity_check\").all().map((row) => Object.values(row)[0]).join(\";\");\nprocess.stdout.write(JSON.stringify({ count: rows.length, head: rows.at(-1)?.event_hash ?? null, hashes: rows.map((row) => row.event_hash), sessions: rows.map((row) => row.session_id), linked, migrations, integrity }));\n /data/amc/.amc/evidence.sqlite",
+    "exit": 0,
+    "durationMs": 154
+  },
+  {
+    "cmd": "helm --kube-context kind-amc-p206 -n default rollback amc-rd 1 --wait --timeout 10m",
+    "exit": 1,
+    "durationMs": 599982,
+    "stderr": ""
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n default exec deploy/amc-rd-amc -c amc-studio -- sh -c cd /data/amc && AMC_VAULT_PASSPHRASE=\"$(cat \"$AMC_VAULT_PASSPHRASE_FILE\")\" amc pair create --ttl 10m",
+    "exit": 0,
+    "durationMs": 1378
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n default apply -f -",
+    "exit": 0,
+    "durationMs": 99
+  },
+  {
+    "cmd": "helm --kube-context kind-amc-p206 -n default test amc-rd --logs --timeout 10m",
+    "exit": 1,
+    "durationMs": 63066,
+    "stderr": "Error: resource Pod/default/amc-rd-amc-governed-turn not ready. status: Failed, message: pod amc-rd-amc-governed-turn failed\n"
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n default exec deploy/amc-rd-amc -c amc-studio -- node -e \nconst Database = require(\"/opt/amc/node_modules/better-sqlite3\");\nconst db = new Database(process.argv[1], { readonly: true, fileMustExist: true });\nconst rows = db.prepare(\"SELECT event_hash, prev_event_hash, session_id FROM evidence_events ORDER BY rowid\").all();\nlet linked = true;\nfor (let i = 1; i < rows.length; i += 1) if (rows[i].prev_event_hash !== rows[i - 1].event_hash) linked = false;\nconst migrations = db.prepare(\"SELECT version FROM schema_migrations ORDER BY version\").all().map((row) => row.version);\nconst integrity = db.prepare(\"PRAGMA integrity_check\").all().map((row) => Object.values(row)[0]).join(\";\");\nprocess.stdout.write(JSON.stringify({ count: rows.length, head: rows.at(-1)?.event_hash ?? null, hashes: rows.map((row) => row.event_hash), sessions: rows.map((row) => row.session_id), linked, migrations, integrity }));\n /data/amc/.amc/evidence.sqlite",
+    "exit": 0,
+    "durationMs": 111
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n default exec deploy/amc-rd-amc -c amc-studio -- sh -c cd /data/amc && AMC_VAULT_PASSPHRASE=\"$(cat \"$AMC_VAULT_PASSPHRASE_FILE\")\" amc pair create --ttl 10m",
+    "exit": 0,
+    "durationMs": 1430
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n default apply -f -",
+    "exit": 0,
+    "durationMs": 107
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n default exec deploy/amc-rd-amc -c amc-studio -- sh -c cd /data/amc && rm -f /tmp/p206-under-load.amcbackup && AMC_VAULT_PASSPHRASE=\"$(cat \"$AMC_VAULT_PASSPHRASE_FILE\")\" AMC_BACKUP_PASSPHRASE_FILE=\"$AMC_VAULT_PASSPHRASE_FILE\" amc backup create --out /tmp/p206-under-load.amcbackup",
+    "exit": 0,
+    "durationMs": 1804,
+    "stderr": ""
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n default exec deploy/amc-rd-amc -c amc-studio -- sh -c cat /tmp/p206-under-load.amcbackup",
+    "exit": 0,
+    "durationMs": 60
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n default exec deploy/amc-rd-amc -c amc-studio -- sh -c cat /data/amc/.amc/keys/auditor_ed25519.pub",
+    "exit": 0,
+    "durationMs": 51
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n default exec deploy/amc-rd-amc -c amc-studio -- node -e \nconst Database = require(\"/opt/amc/node_modules/better-sqlite3\");\nconst db = new Database(process.argv[1], { readonly: true, fileMustExist: true });\nconst rows = db.prepare(\"SELECT event_hash, prev_event_hash, session_id FROM evidence_events ORDER BY rowid\").all();\nlet linked = true;\nfor (let i = 1; i < rows.length; i += 1) if (rows[i].prev_event_hash !== rows[i - 1].event_hash) linked = false;\nconst migrations = db.prepare(\"SELECT version FROM schema_migrations ORDER BY version\").all().map((row) => row.version);\nconst integrity = db.prepare(\"PRAGMA integrity_check\").all().map((row) => Object.values(row)[0]).join(\";\");\nprocess.stdout.write(JSON.stringify({ count: rows.length, head: rows.at(-1)?.event_hash ?? null, hashes: rows.map((row) => row.event_hash), sessions: rows.map((row) => row.session_id), linked, migrations, integrity }));\n /data/amc/.amc/evidence.sqlite",
+    "exit": 0,
+    "durationMs": 114
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n amc-rd-restore create namespace amc-rd-restore",
+    "exit": 0,
+    "durationMs": 43,
+    "stderr": ""
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n default get secret amc-bootstrap -o json",
+    "exit": 0,
+    "durationMs": 40
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n amc-rd-restore apply -f -",
+    "exit": 0,
+    "durationMs": 68
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n amc-rd-restore apply -f -",
+    "exit": 0,
+    "durationMs": 70,
+    "stderr": ""
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n amc-rd-restore apply -f -",
+    "exit": 0,
+    "durationMs": 70,
+    "stderr": ""
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n amc-rd-restore wait --for=condition=Ready pod/restore --timeout=180s",
+    "exit": 0,
+    "durationMs": 4463,
+    "stderr": ""
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n amc-rd-restore exec -i restore -- sh -c cat > /tmp/verify.amcbackup",
+    "exit": 0,
+    "durationMs": 59
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n amc-rd-restore exec -i restore -- sh -c cat > /tmp/auditor.pub",
+    "exit": 0,
+    "durationMs": 50
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n amc-rd-restore exec restore -- sh -c AMC_BACKUP_PASSPHRASE_FILE=\"$AMC_VAULT_PASSPHRASE_FILE\" amc backup verify /tmp/verify.amcbackup --pubkey /tmp/auditor.pub --json",
+    "exit": 0,
+    "durationMs": 918,
+    "stderr": ""
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n amc-rd-restore exec -i restore -- sh -c cat > /tmp/restore.amcbackup",
+    "exit": 0,
+    "durationMs": 63
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n amc-rd-restore exec -i restore -- sh -c cat > /tmp/auditor.pub",
+    "exit": 0,
+    "durationMs": 52
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n amc-rd-restore exec restore -- sh -c cd /tmp && AMC_VAULT_PASSPHRASE=\"$(cat \"$AMC_VAULT_PASSPHRASE_FILE\")\" AMC_BACKUP_PASSPHRASE_FILE=\"$AMC_VAULT_PASSPHRASE_FILE\" amc backup restore /tmp/restore.amcbackup --to /data/amc/br1 --pubkey /tmp/auditor.pub",
+    "exit": 0,
+    "durationMs": 1027,
+    "stderr": "[amc] key set generation 1 of /data/amc/br1 adopted unanchored (trust on first use): this machine never committed it, so a workspace writer could have replaced it. Pin keys (a trust list, --pubkey, --expect-monitor) for a verdict that must not depend on it.\n"
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n amc-rd-restore exec restore -- sh -c cat /data/amc/br1/.amc/RESTORE_WARNING.txt 2>/dev/null || true",
+    "exit": 0,
+    "durationMs": 59
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n amc-rd-restore exec restore -c tool -- node -e \nconst Database = require(\"/opt/amc/node_modules/better-sqlite3\");\nconst db = new Database(process.argv[1], { readonly: true, fileMustExist: true });\nconst rows = db.prepare(\"SELECT event_hash, prev_event_hash, session_id FROM evidence_events ORDER BY rowid\").all();\nlet linked = true;\nfor (let i = 1; i < rows.length; i += 1) if (rows[i].prev_event_hash !== rows[i - 1].event_hash) linked = false;\nconst migrations = db.prepare(\"SELECT version FROM schema_migrations ORDER BY version\").all().map((row) => row.version);\nconst integrity = db.prepare(\"PRAGMA integrity_check\").all().map((row) => Object.values(row)[0]).join(\";\");\nprocess.stdout.write(JSON.stringify({ count: rows.length, head: rows.at(-1)?.event_hash ?? null, hashes: rows.map((row) => row.event_hash), sessions: rows.map((row) => row.session_id), linked, migrations, integrity }));\n /data/amc/br1/.amc/evidence.sqlite",
+    "exit": 0,
+    "durationMs": 66
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n amc-rd-restore exec -i restore -- sh -c cat > /tmp/restore.amcbackup",
+    "exit": 0,
+    "durationMs": 52
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n amc-rd-restore exec -i restore -- sh -c cat > /tmp/auditor.pub",
+    "exit": 0,
+    "durationMs": 50
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n amc-rd-restore exec restore -- sh -c cd /tmp && AMC_VAULT_PASSPHRASE=\"$(cat \"$AMC_VAULT_PASSPHRASE_FILE\")\" AMC_BACKUP_PASSPHRASE_FILE=\"$AMC_VAULT_PASSPHRASE_FILE\" amc backup restore /tmp/restore.amcbackup --to /data/amc/br3-tampered --pubkey /tmp/auditor.pub",
+    "exit": 1,
+    "durationMs": 770,
+    "stderr": "backup verify failed: backup bundle extract failed: Error: failed to list archive: ./\n./payload/\n./payload/workspace.tar.gz.enc\n./payload.sha256\n./keys/\n./keys/auditor.pub\n./manifest.sig\n./manifest.json\n\ngzip: stdin: invalid compressed data--crc error\ntar: Child returned status 1\ntar: Error is not recoverable: exiting now\ncommand terminated with exit code 1\n"
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n amc-rd-restore exec restore -- sh -c ls -A /data/amc/br3-tampered 2>/dev/null | sort; test -d /data/amc/br3-tampered || echo ABSENT",
+    "exit": 0,
+    "durationMs": 57
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n amc-rd-restore exec -i restore -- sh -c cat > /tmp/restore.amcbackup",
+    "exit": 0,
+    "durationMs": 50
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n amc-rd-restore exec -i restore -- sh -c cat > /tmp/auditor.pub",
+    "exit": 0,
+    "durationMs": 50
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n amc-rd-restore exec restore -- sh -c cd /tmp && AMC_VAULT_PASSPHRASE=\"$(cat \"$AMC_VAULT_PASSPHRASE_FILE\")\" amc backup restore /tmp/restore.amcbackup --to /data/amc/br3-keyless --pubkey /tmp/auditor.pub",
+    "exit": 1,
+    "durationMs": 792,
+    "stderr": "backup verify failed: backup passphrase required for full verification\ncommand terminated with exit code 1\n"
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n amc-rd-restore exec restore -- sh -c ls -A /data/amc/br3-keyless 2>/dev/null | sort; test -d /data/amc/br3-keyless || echo ABSENT",
+    "exit": 0,
+    "durationMs": 53
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n amc-rd-restore exec restore -- sh -c mkdir -p /data/amc/tenant-b && cd /data/amc/tenant-b && AMC_VAULT_PASSPHRASE=\"$(cat \"$AMC_VAULT_PASSPHRASE_FILE\")\" amc init --trust-boundary isolated",
+    "exit": 0,
+    "durationMs": 1200,
+    "stderr": ""
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n amc-rd-restore exec restore -- sh -c ls -A /data/amc/tenant-b/.amc 2>/dev/null | sort; test -d /data/amc/tenant-b/.amc || echo ABSENT",
+    "exit": 0,
+    "durationMs": 57
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n amc-rd-restore exec -i restore -- sh -c cat > /tmp/restore.amcbackup",
+    "exit": 0,
+    "durationMs": 49
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n amc-rd-restore exec -i restore -- sh -c cat > /tmp/auditor.pub",
+    "exit": 0,
+    "durationMs": 47
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n amc-rd-restore exec restore -- sh -c cd /tmp && AMC_VAULT_PASSPHRASE=\"$(cat \"$AMC_VAULT_PASSPHRASE_FILE\")\" AMC_BACKUP_PASSPHRASE_FILE=\"$AMC_VAULT_PASSPHRASE_FILE\" amc backup restore /tmp/restore.amcbackup --to /data/amc/tenant-b --pubkey /tmp/auditor.pub --force",
+    "exit": 1,
+    "durationMs": 919,
+    "stderr": "ROLLBACK_DETECTED: keyset:91d6b72f31368f61 sequence 1 is older than the accepted sequence 2\ncommand terminated with exit code 1\n"
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n amc-rd-restore exec restore -- sh -c ls -A /data/amc/tenant-b/.amc 2>/dev/null | sort; test -d /data/amc/tenant-b/.amc || echo ABSENT",
+    "exit": 0,
+    "durationMs": 65
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n default get pod -l app.kubernetes.io/instance=amc-rd -o jsonpath={.items[0].spec.nodeName}",
+    "exit": 0,
+    "durationMs": 36
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n default get nodes -o name",
+    "exit": 0,
+    "durationMs": 32
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n default exec deploy/amc-rd-amc -c amc-studio -- node -e \nconst Database = require(\"/opt/amc/node_modules/better-sqlite3\");\nconst db = new Database(process.argv[1], { readonly: true, fileMustExist: true });\nconst rows = db.prepare(\"SELECT event_hash, prev_event_hash, session_id FROM evidence_events ORDER BY rowid\").all();\nlet linked = true;\nfor (let i = 1; i < rows.length; i += 1) if (rows[i].prev_event_hash !== rows[i - 1].event_hash) linked = false;\nconst migrations = db.prepare(\"SELECT version FROM schema_migrations ORDER BY version\").all().map((row) => row.version);\nconst integrity = db.prepare(\"PRAGMA integrity_check\").all().map((row) => Object.values(row)[0]).join(\";\");\nprocess.stdout.write(JSON.stringify({ count: rows.length, head: rows.at(-1)?.event_hash ?? null, hashes: rows.map((row) => row.event_hash), sessions: rows.map((row) => row.session_id), linked, migrations, integrity }));\n /data/amc/.amc/evidence.sqlite",
+    "exit": 0,
+    "durationMs": 72
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n default cordon amc-p206-control-plane",
+    "exit": 0,
+    "durationMs": 36,
+    "stderr": ""
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n default drain amc-p206-control-plane --ignore-daemonsets --delete-emptydir-data --pod-selector app.kubernetes.io/instance=amc-rd --timeout=180s",
+    "exit": 1,
+    "durationMs": 180718,
+    "stderr": "he pod's disruption budget.\nerror when evicting pods/\"amc-rd-amc-7cbf548454-lhkt2\" -n \"default\" (will retry after 5s): Cannot evict pod as it would violate the pod's disruption budget.\nerror when evicting pods/\"amc-rd-amc-7cbf548454-lhkt2\" -n \"default\" (will retry after 5s): Cannot evict pod as it would violate the pod's disruption budget.\nerror when evicting pods/\"amc-rd-amc-7cbf548454-lhkt2\" -n \"default\" (will retry after 5s): Cannot evict pod as it would violate the pod's disruption budget.\nerror when evicting pods/\"amc-rd-amc-7cbf548454-lhkt2\" -n \"default\" (will retry after 5s): Cannot evict pod as it would violate the pod's disruption budget.\nerror when evicting pods/\"amc-rd-amc-7cbf548454-lhkt2\" -n \"default\" (will retry after 5s): Cannot evict pod as it would violate the pod's disruption budget.\nerror when evicting pods/\"amc-rd-amc-7cbf548454-lhkt2\" -n \"default\" (will retry after 5s): Cannot evict pod as it would violate the pod's disruption budget.\nerror when evicting pods/\"amc-rd-amc-7cbf548454-lhkt2\" -n \"default\" (will retry after 5s): Cannot evict pod as it would violate the pod's disruption budget.\nerror when evicting pods/\"amc-rd-amc-7cbf548454-lhkt2\" -n \"default\" (will retry after 5s): Cannot evict pod as it would violate the pod's disruption budget.\nerror when evicting pods/\"amc-rd-amc-7cbf548454-lhkt2\" -n \"default\" (will retry after 5s): Cannot evict pod as it would violate the pod's disruption budget.\nThere are pending pods in node \"amc-p206-control-plane\" when an error occurred: error when evicting pods/\"amc-rd-amc-7cbf548454-lhkt2\" -n \"default\": global timeout reached: 3m0s\npod/amc-rd-amc-7cbf548454-lhkt2\nerror: unable to drain node \"amc-p206-control-plane\" due to error: error when evicting pods/\"amc-rd-amc-7cbf548454-lhkt2\" -n \"default\": global timeout reached: 3m0s, continuing command...\nThere are pending nodes to be drained:\n amc-p206-control-plane\nerror when evicting pods/\"amc-rd-amc-7cbf548454-lhkt2\" -n \"default\": global timeout reached: 3m0s\n"
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n default uncordon amc-p206-control-plane",
+    "exit": 0,
+    "durationMs": 73,
+    "stderr": ""
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n default rollout status deploy/amc-rd-amc --timeout=300s",
+    "exit": 1,
+    "durationMs": 57,
+    "stderr": "error: deployment \"amc-rd-amc\" exceeded its progress deadline\n"
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n default get pod -l app.kubernetes.io/instance=amc-rd -o jsonpath={.items[0].spec.nodeName}",
+    "exit": 0,
+    "durationMs": 48
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n default exec deploy/amc-rd-amc -c amc-studio -- node -e \nconst Database = require(\"/opt/amc/node_modules/better-sqlite3\");\nconst db = new Database(process.argv[1], { readonly: true, fileMustExist: true });\nconst rows = db.prepare(\"SELECT event_hash, prev_event_hash, session_id FROM evidence_events ORDER BY rowid\").all();\nlet linked = true;\nfor (let i = 1; i < rows.length; i += 1) if (rows[i].prev_event_hash !== rows[i - 1].event_hash) linked = false;\nconst migrations = db.prepare(\"SELECT version FROM schema_migrations ORDER BY version\").all().map((row) => row.version);\nconst integrity = db.prepare(\"PRAGMA integrity_check\").all().map((row) => Object.values(row)[0]).join(\";\");\nprocess.stdout.write(JSON.stringify({ count: rows.length, head: rows.at(-1)?.event_hash ?? null, hashes: rows.map((row) => row.event_hash), sessions: rows.map((row) => row.session_id), linked, migrations, integrity }));\n /data/amc/.amc/evidence.sqlite",
+    "exit": 0,
+    "durationMs": 119
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n default exec deploy/amc-rd-amc -c amc-studio -- sh -c cd /data/amc && AMC_VAULT_PASSPHRASE=\"$(cat \"$AMC_VAULT_PASSPHRASE_FILE\")\" amc pair create --ttl 10m",
+    "exit": 0,
+    "durationMs": 1227
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n default apply -f -",
+    "exit": 0,
+    "durationMs": 104
+  },
+  {
+    "cmd": "helm --kube-context kind-amc-p206 -n default test amc-rd --logs --timeout 10m",
+    "exit": 1,
+    "durationMs": 63264,
+    "stderr": "Error: resource Pod/default/amc-rd-amc-governed-turn not ready. status: Failed, message: pod amc-rd-amc-governed-turn failed\n"
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n default delete pod -l app.kubernetes.io/component=p206-tool --ignore-not-found --wait=true",
+    "exit": 0,
+    "durationMs": 58
+  },
+  {
+    "cmd": "helm --kube-context kind-amc-p206 -n default uninstall amc-rd --wait",
+    "exit": 0,
+    "durationMs": 791
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n default delete pvc -l app.kubernetes.io/instance=amc-rd --wait=true",
+    "exit": 0,
+    "durationMs": 47
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n default delete secret amc-rd-amc-test-pairing --ignore-not-found",
+    "exit": 0,
+    "durationMs": 45
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n default delete namespace amc-rd-restore --ignore-not-found --wait=true",
+    "exit": 0,
+    "durationMs": 47318
+  },
+  {
+    "cmd": "kubectl --context kind-amc-p206 -n default delete secret amc-bootstrap --ignore-not-found",
+    "exit": 0,
+    "durationMs": 46
+  }
+]

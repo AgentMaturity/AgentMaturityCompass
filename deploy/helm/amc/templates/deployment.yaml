@@ -67,6 +67,10 @@ spec:
               containerPort: {{ .Values.service.gatewayPort }}
             - name: proxy
               containerPort: {{ .Values.service.proxyPort }}
+            {{- if .Values.metrics.enabled }}
+            - name: metrics
+              containerPort: {{ .Values.metrics.port }}
+            {{- end }}
           # startup covers `amc bootstrap`; readiness gates traffic on signed-policy
           # trust and ledger reachability; liveness only checks the process answers.
           startupProbe:

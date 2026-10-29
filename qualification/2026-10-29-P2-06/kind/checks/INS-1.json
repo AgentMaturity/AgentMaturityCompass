@@ -1,0 +1,22 @@
+{
+  "id": "INS-1",
+  "scenario": "Install by digest",
+  "status": "failed",
+  "reason": "failed criteria: Ready within the 300 s startup budget",
+  "criteria": [
+    {
+      "name": "bootstrap secrets created out of band",
+      "ok": true,
+      "detail": "amc-bootstrap exists before install"
+    },
+    {
+      "name": "Ready within the 300 s startup budget",
+      "ok": false,
+      "detail": {
+        "readyMs": 300186,
+        "exit": 1
+      }
+    }
+  ],
+  "durationMs": 300296
+}

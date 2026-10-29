@@ -1,0 +1,46 @@
+{
+  "id": "RB-1",
+  "scenario": "Helm rollback",
+  "status": "passed",
+  "criteria": [
+    {
+      "name": "values-only upgrade to revision N",
+      "ok": true,
+      "detail": {
+        "from": 3,
+        "exit": 0
+      }
+    },
+    {
+      "name": "helm rollback from N to N-1",
+      "ok": true,
+      "detail": {
+        "to": 3,
+        "exit": 0
+      }
+    },
+    {
+      "name": "governed turn passes after the rollback",
+      "ok": true,
+      "detail": {
+        "ok": true,
+        "status": "verified-prefix",
+        "taskId": "0988ca1da862bec9450716f72e8171536ec51ed9d41b387653375b7f6064df17",
+        "exit": 0
+      }
+    },
+    {
+      "name": "events behind receipts issued before the rollback unchanged (chain prefix)",
+      "ok": true,
+      "detail": {
+        "receipts": [
+          "a0d1d630381a53f3c2c150bcec019529dedf1d0eb3c12aad0f4d7e8c3f5768cb",
+          "92645179bda8db3c7943d0687fbc10754ec6c26677d1ac2ed0bae3bf87b92ea7"
+        ],
+        "before": 80,
+        "after": 104
+      }
+    }
+  ],
+  "durationMs": 30589
+}

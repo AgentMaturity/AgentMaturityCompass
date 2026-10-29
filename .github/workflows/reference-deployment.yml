@@ -1,0 +1,90 @@
+name: Reference deployment
+
+# P2-06: runs scripts/qualify-reference-deployment.mjs (the 22-check matrix) on a kind cluster with ephemeral
+# secrets. Image A is built from the previous release tag's commit (N-1), image B from this commit (N).
+# CI holds no real credentials. Sid runs the same harness once on the D-03 cluster (docs/PLATFORM_QUALIFICATION.md).
+# The run fails until the recovery targets are agreed (exit 2) and every check passes; the receipt is uploaded either way.
+#
+# TODO(P2-06 follow-up): pin every `uses:` to a full commit SHA and the tool archives to literal sha256 values, as in
+# deploy-pack.yml. TODO(P2-06 follow-up): a SoftHSM-backed KeyProvider once the chart can select one (P2-08).
+
+on:
+  workflow_dispatch:
+    inputs:
+      image_a_ref:
+        description: "git ref for image A (N-1)"
+        required: true
+        default: "main"
+  schedule:
+    - cron: '41 3 * * *'
+
+permissions:
+  contents: read
+
+env:
+  HELM_VERSION: v4.3.0
+  KIND_VERSION: v0.33.0
+  KUBECTL_VERSION: v1.37.1
+  KIND_CLUSTER: amc-rd
+  OUT: tmp/reference-deployment
+
+jobs:
+  kind:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+
+      - id: install-tools
+        name: Install helm, kind and kubectl (checksum-verified)
+        shell: bash
+        run: |
+          set -euo pipefail
+          bin="$RUNNER_TEMP/bin"; dl="$RUNNER_TEMP/dl"; mkdir -p "$bin" "$dl"; cd "$dl"
+          check() { want=$(awk -v f="$1" 'NF==1 || $2==f || $2=="*"f {print $1; exit}' "$2"); test -n "$want"; echo "$want  $1" | sha256sum -c -; }
+          get() { curl -fsSLo "$(basename "$1")" "$1"; curl -fsSLo "$(basename "$1").sum" "$2"; check "$(basename "$1")" "$(basename "$1").sum"; }
+          get "https://get.helm.sh/helm-${HELM_VERSION}-linux-amd64.tar.gz" "https://get.helm.sh/helm-${HELM_VERSION}-linux-amd64.tar.gz.sha256sum"
+          tar -xzf "helm-${HELM_VERSION}-linux-amd64.tar.gz" -C "$bin" --strip-components=1 linux-amd64/helm
+          get "https://github.com/kubernetes-sigs/kind/releases/download/${KIND_VERSION}/kind-linux-amd64" "https://github.com/kubernetes-sigs/kind/releases/download/${KIND_VERSION}/kind-linux-amd64.sha256sum"
+          install -m 0755 kind-linux-amd64 "$bin/kind"
+          get "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl" "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl.sha256"
+          install -m 0755 kubectl "$bin/kubectl"
+          echo "$bin" >> "$GITHUB_PATH"
+
+      - id: images
+        name: Build image A (N-1) and image B (this commit), load them into kind by digest
+        shell: bash
+        env:
+          IMAGE_A_REF: ${{ inputs.image_a_ref || 'main' }}
+        run: |
+          set -euo pipefail
+          kind create cluster --name "$KIND_CLUSTER" --wait 180s
+          git worktree add --detach "$RUNNER_TEMP/base" "$IMAGE_A_REF"
+          docker build -t amc-studio:rd-a "$RUNNER_TEMP/base"
+          docker build -t amc-studio:rd-b .
+          kind load docker-image amc-studio:rd-a amc-studio:rd-b --name "$KIND_CLUSTER"
+          echo "a=$(node scripts/deploy/kind-image-digest.mjs --cluster "$KIND_CLUSTER" --image amc-studio:rd-a)" >> "$GITHUB_OUTPUT"
+          echo "b=$(node scripts/deploy/kind-image-digest.mjs --cluster "$KIND_CLUSTER" --image amc-studio:rd-b)" >> "$GITHUB_OUTPUT"
+
+      - id: harness
+        name: Reference deployment harness (22 checks)
+        shell: bash
+        env:
+          IMAGE_A: ${{ steps.images.outputs.a }}
+          IMAGE_B: ${{ steps.images.outputs.b }}
+        run: |
+          node scripts/qualify-reference-deployment.mjs --kube-context "kind-$KIND_CLUSTER" --release amc-rd \
+            --image-a "$IMAGE_A" --image-b "$IMAGE_B" --ephemeral-secrets --out "$OUT/kind"
+
+      - if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: reference-deployment-kind
+          path: tmp/reference-deployment/
+          if-no-files-found: warn

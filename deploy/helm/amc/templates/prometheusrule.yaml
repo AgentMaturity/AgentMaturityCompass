@@ -1,0 +1,43 @@
+{{- if and .Values.metrics.enabled .Values.metrics.prometheusRule.enabled }}
+{{- $job := include "amc.fullname" . }}
+# Alert rules (P2-06). Thresholds are proposals for Sid to confirm. Alerts for ledger verification failures, open
+# outcome_unknown receipts, the last good backup's age and KeyProvider errors need metrics AMC does not export yet;
+# docs/deploy/reference/MONITORING.md lists them as follow-ups instead of alerting on a proxy.
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ include "amc.fullname" . }}
+  labels:
+    {{- include "amc.labels" . | nindent 4 }}
+    {{- with .Values.metrics.prometheusRule.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  groups:
+    - name: {{ include "amc.fullname" . }}
+      rules:
+        - alert: AMCStudioDown
+          expr: up{job="{{ $job }}",namespace="{{ .Release.Namespace }}"} == 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: AMC Studio metrics endpoint is down or the pod is not ready
+            runbook: docs/runbooks/amc-service-down.md
+        - alert: AMCLedgerVolumeFilling
+          expr: amc_db_size_bytes{job="{{ $job }}",namespace="{{ .Release.Namespace }}"} > {{ .Values.metrics.prometheusRule.dbSizeBytesWarning }}
+          for: 15m
+          labels:
+            severity: warning
+          annotations:
+            summary: AMC evidence database is above the proposed size threshold
+            runbook: docs/deploy/reference/BACKUP_RESTORE.md
+        - alert: AMCGatewayFailures
+          expr: sum(rate(amc_gateway_failures_total{job="{{ $job }}",namespace="{{ .Release.Namespace }}"}[5m])) > {{ .Values.metrics.prometheusRule.gatewayFailureRateWarning }}
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: AMC gateway failures above the proposed rate
+            runbook: docs/runbooks/amc-service-down.md
+{{- end }}

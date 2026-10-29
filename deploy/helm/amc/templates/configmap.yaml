@@ -21,3 +21,7 @@ data:
   AMC_NOTARY_BASE_URL: {{ .Values.env.AMC_NOTARY_BASE_URL | quote }}
   AMC_NOTARY_REQUIRED_ATTESTATION: {{ .Values.env.AMC_NOTARY_REQUIRED_ATTESTATION | quote }}
   AMC_EXPECTED_MONITOR_FINGERPRINT: {{ .Values.env.AMC_EXPECTED_MONITOR_FINGERPRINT | quote }}
+  {{- if .Values.metrics.enabled }}
+  AMC_METRICS_BIND: "0.0.0.0"
+  AMC_METRICS_PORT: {{ .Values.metrics.port | quote }}
+  {{- end }}

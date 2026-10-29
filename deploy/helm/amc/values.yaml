@@ -159,6 +159,33 @@ networkPolicy:
     - 443
     - 80
 
+# One replica (Recreate, a single SQLite writer). maxUnavailable: 1 lets `kubectl drain` evict the pod, with an outage
+# until it is Ready again (P2-06 CR-2). To block voluntary eviction instead, set minAvailable: 1 and maxUnavailable: null;
+# a drain then waits until an operator scales to 0 or deletes the pod (docs/deploy/reference/CRASH_RECOVERY.md).
+# Exactly one of the two must be set.
 podDisruptionBudget:
   enabled: true
-  minAvailable: 1
+  maxUnavailable: 1
+  minAvailable: null
+
+# Prometheus metrics (P2-06). Off by default. When enabled, Studio binds its metrics server on metrics.port on all pod
+# interfaces (it refuses that without signed LAN mode), the Service exposes the port inside the cluster only, and the
+# NetworkPolicy admits it from the monitoring namespace alone. Alert thresholds are proposals for Sid to confirm.
+metrics:
+  enabled: false
+  port: 9464
+  namespaceSelector:
+    matchLabels:
+      kubernetes.io/metadata.name: monitoring
+  podSelector: {}
+  serviceMonitor:
+    enabled: false
+    interval: 30s
+    labels: {}
+  prometheusRule:
+    enabled: false
+    labels: {}
+    # 80% of the default 10 Gi workspace volume.
+    dbSizeBytesWarning: 8589934592
+    # Gateway failures per second over 5 minutes.
+    gatewayFailureRateWarning: 0.1
