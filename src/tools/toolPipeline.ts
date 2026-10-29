@@ -90,6 +90,16 @@ export const RUN_CODE_TOOL = "run_code";
  */
 export type ToolDispatchMode = "native" | "code";
 
+/**
+ * Classes whose calls must not overlap.
+ *
+ * A read can run beside anything. Two writes to the same workspace cannot: read-before-edit would see one of them land
+ * between another's check and its write, and the resulting file is neither of the edits asked for. The native seam runs
+ * these as step barriers; the pipeline also serializes their bodies, so a Code Mode sub-call (whose `run_code` is a
+ * parallel read) meets the same invariant (PXB-15).
+ */
+export const EXCLUSIVE_CLASSES: ReadonlySet<string> = new Set(["WRITE_LOW", "WRITE_HIGH", "DEPLOY", "SECURITY", "FINANCIAL", "IDENTITY"]);
+
 /** Classes bound to an authorization record by default: every class except reads and low-impact writes. */
 export const DEFAULT_AUTHORIZE_CLASSES: ReadonlySet<string> = new Set(
   ACTION_CLASSES.filter((actionClass) => actionClass !== "READ_ONLY" && actionClass !== "WRITE_LOW"));
@@ -138,6 +148,8 @@ export interface ToolPipelineInit {
 export interface ToolCallInput {
   /** The turn's cancellation signal, for a body long enough to need one. */
   readonly signal?: AbortSignal;
+  /** See `ToolExecution.onApprovalWait`. */
+  readonly onApprovalWait?: (waiting: boolean) => void;
   readonly name: string;
   readonly agentId: string;
   readonly arguments: Record<string, unknown>;
@@ -215,6 +227,22 @@ function thrownOutcome(error: unknown): ToolOutcome {
   return { ok: false, exitCode: null, timedOut: false, denied: null, output: error instanceof Error ? error.message : String(error), bytes: 0 };
 }
 
+/** A call cancelled before its body ran: not a denial (policy did not refuse it) and not a body failure. */
+function notDispatched(): ToolOutcome {
+  const output = "[amc] not dispatched: the call was cancelled before its body ran";
+  return { ok: false, exitCode: null, timedOut: false, denied: null, output, bytes: Buffer.byteLength(output, "utf8") };
+}
+
+/** Bracket an approval wait for the caller's clock. The bracket closes however the wait ends. */
+async function waitingOnApproval<T>(execution: ToolExecution, wait: () => Promise<T>): Promise<T> {
+  execution.onApprovalWait?.(true);
+  try {
+    return await wait();
+  } finally {
+    execution.onApprovalWait?.(false);
+  }
+}
+
 function denialOutcome(denied: ToolDenial): ToolOutcome {
   return {
     ok: false,
@@ -242,6 +270,8 @@ const lostEvidence = (error: unknown): string =>
 
 export class ToolPipeline {
   private readonly gates: BoundApprovalGate[] = [];
+  /** Settles when the last queued exclusive-class body has finished (see `writeTurn`). */
+  private writeTail: Promise<void> = Promise.resolve();
   /** Set by the first failed record (P1-78); from then on every call is refused before any stage runs. */
   private recorderFailure: string | null = null;
 
@@ -299,7 +329,8 @@ export class ToolPipeline {
         effectiveMode: input.requestedMode,
         arguments: freezeToolArguments(input.arguments),
         parentToken: input.parentToken ?? null,
-        ...(input.signal === undefined ? {} : { signal: input.signal })
+        ...(input.signal === undefined ? {} : { signal: input.signal }),
+        ...(input.onApprovalWait === undefined ? {} : { onApprovalWait: input.onApprovalWait })
       };
       // Before entry, approval and guards (PXA-22): an invalid call is a failed call, recorded, never one anyone is asked about.
       const invalid = argumentSchemaError(definition.parameters, draft.arguments);
@@ -313,9 +344,11 @@ export class ToolPipeline {
       const bound = authorization?.bound;
       let execution: ToolExecution = bound?.ok ? boundExecution(draft, bound) : draft;
       selectedDefinitions.set(execution, definition);
+      const release = await this.writeTurn(definition.actionClass, draft.signal);
       let outcome: ToolOutcome;
       try {
-        outcome = this.init.journal !== undefined && this.authorizes(definition.actionClass)
+        outcome = release === null ? notDispatched()
+          : this.init.journal !== undefined && this.authorizes(definition.actionClass)
           ? await this.runJournaled(this.init.journal, execution, definition.body, authorization,
             () => this.enter(draft, input.authority, gate), (fresh) => {
               selectedDefinitions.delete(execution);
@@ -324,6 +357,7 @@ export class ToolPipeline {
             })
           : await this.runStages(execution, definition.body, authorization!);
       } finally {
+        release?.();
         selectedDefinitions.delete(execution);
       }
       try {
@@ -359,6 +393,33 @@ export class ToolPipeline {
       }
       return outcome;
     });
+  }
+
+  /**
+   * This pipeline's write turn for an exclusive class (PXB-15): a release function, or null when `signal` aborted while
+   * waiting. Turns are granted in arrival order; an abandoned wait passes its place on. Other classes never wait.
+   */
+  private async writeTurn(actionClass: string, signal: AbortSignal | undefined): Promise<(() => void) | null> {
+    if (!EXCLUSIVE_CLASSES.has(actionClass)) return () => undefined;
+    const previous = this.writeTail;
+    let release!: () => void;
+    const mine = new Promise<void>((resolve) => { release = resolve; });
+    this.writeTail = previous.then(() => mine);
+    if (signal === undefined) {
+      await previous;
+      return release;
+    }
+    let onAbort: (() => void) | undefined;
+    const aborted = new Promise<true>((resolve) => {
+      onAbort = () => resolve(true);
+      if (signal.aborted) resolve(true);
+      else signal.addEventListener("abort", onAbort, { once: true });
+    });
+    const gaveUp = await Promise.race([previous.then(() => false), aborted]);
+    signal.removeEventListener("abort", onAbort!);
+    if (!gaveUp) return release;
+    release();
+    return null;
   }
 
   /**
@@ -407,7 +468,7 @@ export class ToolPipeline {
     if (gate !== undefined && draft.parentToken !== null) {
       const intent = authorizes ? authorizationIntentFor(draft, this.init.authorizationContext?.()) : null;
       // An intent that cannot bind is not put to a human; the authorization stage denies it after the guards.
-      const granted = intent?.ok === false ? undefined : await gate.ask(draft, intent).catch((): null => null);
+      const granted = intent?.ok === false ? undefined : await waitingOnApproval(draft, () => gate.ask(draft, intent)).catch((): null => null);
       if (granted === null) {
         return { refused: { stage: "approval", reason: "approval not granted for this sub-call", guardLabel: null },
           context: null, bound: null, required: false };
@@ -500,6 +561,8 @@ export class ToolPipeline {
 
     const unauthorized = this.authorizationDenial(execution, authorization);
     if (unauthorized !== null) return denialOutcome({ stage: "authorization", reason: unauthorized, guardLabel: null });
+    // Read again after the approval wait: a call cancelled while it waited (a timed-out program's sub-call) never runs.
+    if (execution.signal?.aborted) return notDispatched();
 
     try {
       return this.bodyOutcome(execution, await body(execution));
@@ -677,7 +740,8 @@ export class ToolPipeline {
         guardLabel: null
       });
     }
-    const answer = await this.init.approve(execution).catch((): ToolApprovalAnswer => "unavailable");
+    const approve = this.init.approve;
+    const answer = await waitingOnApproval(execution, () => approve(execution)).catch((): ToolApprovalAnswer => "unavailable");
     if (answer === "allow") return null;
     return denialOutcome({
       stage: "approval",

@@ -32,7 +32,23 @@ const capturedStringify = JSON.stringify;
 const capturedParse = JSON.parse;
 const CapturedPromise = Promise;
 const CapturedMap = Map;
+const CapturedError = Error;
 const post = parentPort.postMessage.bind(parentPort);
+const capturedSetTimeout = setTimeout;
+const consoleWrites = [process.stdout, process.stderr].map((stream) => stream.write.bind(stream));
+
+/**
+ * The console reaches the host asynchronously and terminate() drops what is still queued, so the verdict waits for
+ * both streams to drain first (PXB-14) -- bounded, because the program can break its own streams.
+ */
+function flushConsole() {
+  return CapturedPromise.race([
+    CapturedPromise.all(consoleWrites.map((write) => new CapturedPromise((resolve) => {
+      try { write("", () => resolve()); } catch { resolve(); }
+    }))),
+    new CapturedPromise((resolve) => capturedSetTimeout(resolve, 500))
+  ]);
+}
 
 const pending = new CapturedMap();
 let nextCallId = 0;
@@ -42,8 +58,16 @@ parentPort.on("message", (message) => {
   const settle = pending.get(message.id);
   if (!settle) return;
   pending.delete(message.id);
-  if (message.ok) settle.resolve(message.value);
-  else settle.reject(new Error(message.error));
+  if (message.ok) {
+    settle.resolve(message.value);
+    return;
+  }
+  // Structured, so a program can branch on an exit code or a denial instead of parsing text.
+  const error = new CapturedError(message.error);
+  error.status = message.status;
+  error.exitCode = message.exitCode;
+  error.timedOut = message.timedOut;
+  settle.reject(error);
 });
 
 /**
@@ -88,9 +112,13 @@ const tools = new Proxy({}, {
     // contained by this file.
     const run = new Function("tools", '"use strict";\nreturn (async () => {' + workerData.source + "\n})();");
     const value = await run(tools);
-    post({ kind: "done", value: value === undefined ? null : capturedParse(capturedStringify(value)) });
+    const result = value === undefined ? null : capturedParse(capturedStringify(value));
+    await flushConsole();
+    post({ kind: "done", value: result });
   } catch (error) {
-    post({ kind: "failed", message: error && error.message ? String(error.message) : String(error) });
+    const message = error && error.message ? String(error.message) : String(error);
+    await flushConsole();
+    post({ kind: "failed", message });
   }
 })();
 `;
