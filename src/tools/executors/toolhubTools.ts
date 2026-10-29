@@ -1,20 +1,20 @@
 import { z } from "zod";
 import { detokenize } from "../../dataflow/detokenizeGate.js";
-import { executeFsRead, executeFsWrite } from "../../toolhub/toolhubExecutors/fs.js";
 import { executeGit } from "../../toolhub/toolhubExecutors/git.js";
 import { executeHttpFetch } from "../../toolhub/toolhubExecutors/http.js";
 import { executeProcessSpawn } from "../../toolhub/toolhubExecutors/process.js";
-import { resolveToolPath } from "../../toolhub/toolhubValidators.js";
 import { defineTool } from "../toolRegistry.js";
+import { fsTools } from "../builtin/fsTools.js";
+import { ReadBeforeEditLedger } from "../builtin/readBeforeEdit.js";
 import { DefiniteFailureError, type ToolDefinition, type ToolExecution } from "../toolTypes.js";
 
 /**
  * Toolhub's executors, as pipeline tools (P4.1).
  *
- * Delegation, not reimplementation. Each body validates its arguments and
- * calls the SAME executor the toolhub server calls, so there is one
- * implementation of "write this file" and it cannot drift into two that
- * disagree about what they did.
+ * Filesystem definitions reuse the native fsTools bodies and one observation
+ * ledger for this composition, so limits, paging and read-before-write policy
+ * cannot drift between same-named pipeline tools. Other bodies delegate to the
+ * same executor the toolhub server calls.
  *
  * The names match the signed `tools.yaml` entries exactly, because
  * `toolhubAllowlistGuard` resolves a definition by name — a rename here would
@@ -27,8 +27,6 @@ import { DefiniteFailureError, type ToolDefinition, type ToolExecution } from ".
  * and reporting it as a denial would credit policy with catching a typo.
  */
 
-const fsReadArgs = z.object({ path: z.string().min(1), maxBytes: z.number().int().positive().max(20_000_000).default(200_000) });
-const fsWriteArgs = z.object({ path: z.string().min(1), content: z.string() });
 const gitArgs = z.object({ args: z.array(z.string()).default([]), cwd: z.string().optional() });
 const httpArgs = z.object({
   url: z.string().url(),
@@ -62,33 +60,9 @@ function processOutcome(result: ReturnType<typeof executeProcessSpawn>): {
 }
 
 export function toolhubPipelineTools(): readonly ToolDefinition[] {
+  const ledger = new ReadBeforeEditLedger();
   return [
-    defineTool({
-      name: "fs.read",
-      actionClass: "READ_ONLY",
-      description: "Read a file from the workspace, capped at maxBytes.",
-      body: (execution) => {
-        const args = fsReadArgs.parse(execution.arguments);
-        return { ok: true, ...executeFsRead({
-          path: resolveToolPath(execution.workspace, args.path),
-          maxBytes: args.maxBytes,
-          simulate: simulated(execution)
-        }) };
-      }
-    }),
-    defineTool({
-      name: "fs.write",
-      actionClass: "WRITE_LOW",
-      description: "Write a file into the workspace.",
-      body: (execution) => {
-        const args = fsWriteArgs.parse(execution.arguments);
-        return { ok: true, ...executeFsWrite({
-          path: resolveToolPath(execution.workspace, args.path),
-          content: args.content,
-          simulate: simulated(execution)
-        }) };
-      }
-    }),
+    ...fsTools({ ledger }).filter(tool => tool.name === "fs.read" || tool.name === "fs.write"),
     ...(["status", "commit", "push"] as const).map((subcommand) =>
       defineTool({
         name: `git.${subcommand}`,

@@ -9,6 +9,8 @@ import { ToolRegistry } from "../src/tools/toolRegistry.js";
 import { ToolPipeline } from "../src/tools/toolPipeline.js";
 import { toolhubAllowlistGuard } from "../src/tools/guards/policyGuards.js";
 import { toolhubPipelineTools } from "../src/tools/executors/toolhubTools.js";
+import { fsTools } from "../src/tools/builtin/fsTools.js";
+import { ReadBeforeEditLedger } from "../src/tools/builtin/readBeforeEdit.js";
 import { defineTool } from "../src/tools/toolRegistry.js";
 import type { RecordedToolCall, ToolOutcome } from "../src/tools/toolTypes.js";
 import { createWorkspaceRedactor, type DeclaredFields } from "../src/dataflow/redactingSession.js";
@@ -98,6 +100,37 @@ describe("ported toolhub executors keep their allowlist", () => {
       expect(outcome.ok).toBe(true);
       expect(readFileSync(join(workspace, "workspace", "output", "report.txt"), "utf8")).toBe("generated");
     });
+  });
+
+  it("shares the native file schemas, paging and read-before-write policy", async () => {
+    const native = fsTools({ ledger: new ReadBeforeEditLedger() });
+    const ported = toolhubPipelineTools();
+    for (const name of ["fs.read", "fs.write"]) {
+      expect(ported.find(tool => tool.name === name)?.parameters).toEqual(native.find(tool => tool.name === name)?.parameters);
+    }
+    await withWorkspace(async (workspace) => {
+      const path = "workspace/output/existing.txt";
+      writeFileSync(join(workspace, path), "first\nsecond\nthird\n");
+      const pipeline = pipelineFor(workspace);
+      const unread = await pipeline.execute(call("fs.write", { path, content: "blind overwrite" }));
+      expect(unread.ok).toBe(false);
+      expect(unread.output).toContain("requires reading");
+      expect(readFileSync(join(workspace, path), "utf8")).toBe("first\nsecond\nthird\n");
+      const read = await pipeline.execute(call("fs.read", { path, offset: 2, limit: 1 }));
+      expect(read.ok).toBe(true);
+      expect(read.output).toContain("2\tsecond");
+      expect(read.output).not.toContain("first");
+      expect((await pipeline.execute(call("fs.write", { path, content: "observed overwrite" }))).ok).toBe(true);
+      expect(readFileSync(join(workspace, path), "utf8")).toBe("observed overwrite");
+    });
+  });
+
+  it("refuses duplicate native and toolhub file registrations", () => {
+    const registry = new ToolRegistry();
+    for (const tool of fsTools({ ledger: new ReadBeforeEditLedger() })) registry.define(tool);
+    for (const tool of toolhubPipelineTools().filter(tool => tool.name.startsWith("fs."))) {
+      expect(() => registry.define(tool)).toThrow(`tool "${tool.name}" is already registered globally`);
+    }
   });
 
   it("denies a binary outside the signed allowlist", async () => {
