@@ -14,7 +14,7 @@ import { ensureContainedDir, readContainedOrNull, writeContained } from "../util
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize, parseCanonicalJson } from "../utils/json.js";
 
-export type HighWaterKind = "trust-list" | "trust-list-version" | "trust-list-threshold" | "trust-root-set" | "revocation-list" | "key-history" | "rotation" | "keyset" | "keyset-adopted" | "delegation-use" | "ledger-dek";
+export type HighWaterKind = "trust-list" | "trust-list-version" | "trust-list-threshold" | "trust-root-set" | "revocation-list" | "key-history" | "rotation" | "keyset" | "keyset-adopted" | "delegation-use" | "ledger-dek" | "lesson-status";
 export type AntiRollbackCode = "ROLLBACK_DETECTED" | "FORK_DETECTED";
 
 export class AntiRollbackError extends Error {
