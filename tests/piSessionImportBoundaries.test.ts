@@ -34,14 +34,14 @@ test.each([
   { entries: [{ ...failure, parentId: "b" }, { type: "custom", id: "b", parentId: "a" }] }
 ])("cyclic ancestry is refused within a bounded subprocess", ({ entries }) => {
   const options = fixture([header, ...entries]);
-  const code = `import {parsePiSession,piSessionTraces} from ${JSON.stringify(join(process.cwd(), "src/importers/piSessionImport.ts"))};
-    import {validateNeutralImport,runNeutralImport} from ${JSON.stringify(join(process.cwd(), "src/importers/neutralImporter.ts"))};
+  const code = `import {parsePiSession,piSessionTraces} from ${JSON.stringify(join(process.cwd(), "dist/importers/piSessionImport.js"))};
+    import {validateNeutralImport,runNeutralImport} from ${JSON.stringify(join(process.cwd(), "dist/importers/neutralImporter.js"))};
     try { const p=parsePiSession(${JSON.stringify([header, ...entries].map((row) => JSON.stringify(row)).join("\n"))});
       piSessionTraces(p.rows,p.format,{agentId:'default',source:'fixture'}); console.log('accepted');
     } catch (error) { console.log(error.message); }
     console.log(JSON.stringify(validateNeutralImport(${JSON.stringify(options)})));
     try {runNeutralImport({...${JSON.stringify(options)},mode:'import'}); console.log('accepted');} catch(error) {console.log(error.message);}`;
-  const output = execFileSync(process.execPath, ["--import", "tsx", "--input-type=module", "-e", code], { encoding: "utf8", timeout: 1800 });
+  const output = execFileSync(process.execPath, ["--input-type=module", "-e", code], { encoding: "utf8", timeout: 1800 });
   expect(output).toMatch(/cyclic|cycle/i);
   expect(output).toContain('"status":"unsupported"');
   expect(output).not.toContain("accepted");

@@ -1,0 +1,28 @@
+{
+  "revision": "22ddee3792402c3e70ec5f86a63c3e3e895a2f60",
+  "license": "MIT, Copyright (c) 2026 DeepSeek",
+  "sources": [
+    {
+      "path": "packages/session/session-persistence-jsonl/src/zstd.ts",
+      "sha256": "fb5a0a148b0723fba4083670d6ba654794f40a30815593e99a47694df6945cd8"
+    },
+    {
+      "path": "packages/session/session-persistence-jsonl/src/format.ts",
+      "sha256": "87d536ead041fb953f866e0191a79b4dbbbc510aee1461706f9cdc2e4c46a038"
+    },
+    {
+      "path": "packages/session/session-persistence-jsonl/tests/zstd.compat.spec.ts",
+      "sha256": "6fe718b3eed1c314a30dc934c7c3bec210afd1318c10bd1d54df0dd65ec4230d"
+    },
+    {
+      "path": "packages/session/session-persistence-jsonl/tests/zstd.spec.ts",
+      "sha256": "a14b91009b72b47463487a515b4c43b2343750e28d554f03a9e2f0a4081772c7"
+    }
+  ],
+  "fixture": {
+    "path": "frame-concatenated.jsonl.zstd",
+    "sha256": "c4fec6d9c9eae6031d120c3355524498f09291bc976b5b960710253231f1b240",
+    "encoding": "Two independently checksummed zstd frames, separate header and event batch, generated with Node v22.23.3 native zstd from synthetic v4 JSONL."
+  },
+  "cases": "Adapted offline structural cases from zstd.compat.spec.ts and zstd.spec.ts. The unchanged upstream compatibility source is retained as frame-upstream-zstd.compat.spec.ts.txt; tests do not execute the upstream persistence runtime. Offline import refuses torn tails instead of recovering a prefix."
+}

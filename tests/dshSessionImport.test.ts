@@ -9,7 +9,7 @@ import { SourceFormatError } from "../src/importers/sourceFormatError.js";
 
 // Synthetic physical records, not recordings from DSH or proof of an upload.
 // Header/event shapes follow c389f96b; both c389 and strategy 5bad use these
-// physical header fields. DSH v4 is refused, never presented as qualified.
+// physical header fields. The pinned v2 decoder refuses v4; the neutral importer dispatches v4 separately.
 const REVISION = "c389f96bf3a9b6807cb71ed6bdad5849be0df6d8";
 const header = { type: "session", version: 2, id: "synthetic-dsh-v2", createdAt: 1000, isSeeded: false, delegationDepth: 0 };
 const completed = [
@@ -76,7 +76,7 @@ describe("P1-24 explicit DSH session contracts", () => {
     });
   });
 
-  test.each([0, 1, 3, 4])("refuses DSH v%i with its typed, pinned public plan message and no generic fallback", version => {
+  test.each([0, 1, 3, 5])("refuses DSH v%i with its typed, pinned public plan message and no generic fallback", version => {
     const text = jsonl([{ ...header, version }, ...completed]);
     const message = `DSH session format v${version} is not supported; AMC imports DSH v2 (revision c389f96b). No migration is attempted.`;
     expect(formatError(text)).toMatchObject({ code: "DSH_SESSION_VERSION_UNSUPPORTED", format: "dsh-session", detectedVersion: version, supported: "dsh-session v2", sourceRevision: REVISION, message });

@@ -53,7 +53,8 @@ export function readImportSource(path: string, format: string, genericLimit: num
   }
 }
 
-export function importMediaType(format: NeutralImportCandidate["format"]): string {
+export function importMediaType(format: NeutralImportCandidate["format"], sourcePath = ""): string {
+  if (/\.jsonl\.(?:zstd|zst)$/i.test(sourcePath)) return "application/zstd";
   return format === "jsonl" ? "application/x-ndjson" : format === "yaml" ? "application/yaml" : "application/json";
 }
 
@@ -124,7 +125,7 @@ export function retainImportOriginal(workspace: string, raw: Buffer, source: Imp
 export function retainImportOriginals(workspace: string, candidates: Array<{ raw: Buffer; candidate: NeutralImportCandidate }>, retain: boolean): ImportOriginalRef[] {
   if (retain) for (const { raw } of candidates) assertRetainable(workspace, raw.byteLength);
   return candidates.map(({ raw, candidate }) => retain
-    ? retainImportOriginal(workspace, raw, importOriginalSource(candidate), importMediaType(candidate.format))
-    : { sha256: sha256Hex(raw), bytes: raw.byteLength, mediaType: importMediaType(candidate.format), source: importOriginalSource(candidate),
+    ? retainImportOriginal(workspace, raw, importOriginalSource(candidate), importMediaType(candidate.format, candidate.path))
+    : { sha256: sha256Hex(raw), bytes: raw.byteLength, mediaType: importMediaType(candidate.format, candidate.path), source: importOriginalSource(candidate),
       storage: { kind: "not-retained", reason: "operator-opt-out" } });
 }

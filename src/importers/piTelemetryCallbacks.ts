@@ -73,3 +73,7 @@ export function createPiTelemetryBridge(options: CallbackCaptureOptions = {}) {
   };
   return { telemetryContext: capture, capture, onEvent, bindWatch };
 }
+
+/** Explicit current ABI; the default pinned bridge above remains unchanged. */
+export { createCurrentPiTelemetryBridge, PI_CURRENT_TELEMETRY_CONTRACT } from "./piTelemetryCurrent.js";
+export type { CurrentPiTelemetryContext, CurrentPiTelemetrySpan, CurrentPiSpanOptions, CurrentPiSpanLink } from "./piTelemetryCurrent.js";
