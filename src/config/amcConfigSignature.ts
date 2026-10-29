@@ -79,3 +79,21 @@ export function verifyAmcConfigSignature(workspace: string): {
     };
   }
 }
+
+/**
+ * Verifier for the declarative composition's `.sig` sidecar, injected into
+ * `@amc/core` (which cannot depend on this package). It uses the same
+ * config-signature key history as amc.config.yaml, so a nonempty signature
+ * string with a correct digest is not enough: it must verify against an
+ * admitted key. Any failure, including an incomplete keyset, is unverified.
+ */
+export function createCompositionSignatureVerifier(workspace: string): (input: { sha256: string; signature: string }) => boolean {
+  return ({ sha256, signature }) => {
+    try {
+      assertKeysetComplete(workspace);
+      return verifyHexDigestAny(sha256, signature, getPurposeKeyHistory(workspace, "config-signature"));
+    } catch {
+      return false;
+    }
+  };
+}

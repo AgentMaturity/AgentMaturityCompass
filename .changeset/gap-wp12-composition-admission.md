@@ -1,0 +1,5 @@
+---
+"agent-maturity-compass": patch
+---
+
+A composition signature now has to be authenticated before it counts (GAP-WP12). `loadComposition` used to mark `amc.cordis.yml` validly signed when its `.sig` sidecar had any nonempty signature string and a matching digest. Its status now reports `digestMatched` separately from `signatureVerified` and `signer`, and `valid` means `signatureVerified`. A signature verifies only through an injected verifier. `createCompositionSignatureVerifier(workspace)` builds that verifier from the workspace's admitted config-signature key history. `amc composition` uses it, so a forged or foreign-key sidecar shows as unsigned. `boot()` and `admitCompositionBytes` admit the exact text the composition loader parses, both at mount and on every reload. A file changed after the boot check is refused, and so is a reload whose signature does not verify when one is required. The previously admitted tree then stays active, and `BootResult.composition` reports the last admitted bytes. `boot()` still defaults to not requiring a signature because it has no production caller yet. Its status no longer overstates an unverified signature.

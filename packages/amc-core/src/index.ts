@@ -8,10 +8,12 @@
 export { boot, BootError, type BootOptions, type BootResult } from "./boot.ts";
 export {
   loadComposition,
+  admitCompositionBytes,
   CompositionError,
   DEFAULT_COMPOSITION_FILE,
   type CompositionSource,
-  type CompositionSignatureStatus
+  type CompositionSignatureStatus,
+  type CompositionSignatureVerifier
 } from "./composition.ts";
 export {
   dumpComposition,

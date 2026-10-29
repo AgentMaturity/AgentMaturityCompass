@@ -9,7 +9,9 @@
  *
  * The signature reuses the same auditor key and detached-sidecar shape as
  * `.amc/amc.config.yaml.sig`, so an operator has one signing story rather than
- * two.
+ * two. Authenticating the signer needs the workspace key history, which lives
+ * in the main AMC package; this package takes it as an injected verifier rather
+ * than depending on that package.
  */
 import { readFileSync, existsSync, realpathSync } from "node:fs";
 import { createHash } from "node:crypto";
@@ -39,15 +41,30 @@ export interface CompositionSource {
 export interface CompositionSignatureStatus {
   /** False when no `.sig` sidecar exists. */
   present: boolean;
-  /** True only when a sidecar exists and its digest matches the file. */
+  /** The sidecar's digest equals these exact bytes. Integrity only: anyone can write a digest. */
+  digestMatched: boolean;
+  /** The injected verifier authenticated the signature over that digest with an admitted key. */
+  signatureVerified: boolean;
+  /** Signer the sidecar names; null unless signatureVerified. */
+  signer: string | null;
+  /** Same as signatureVerified: a digest match plus a nonempty signature string is not a valid signature. */
   valid: boolean;
   reason: string | null;
 }
 
+/**
+ * Authenticates a sidecar signature over a sha256 hex digest. The main AMC
+ * package builds it from its admitted key history; without one, no signature
+ * is ever reported as verified.
+ */
+export type CompositionSignatureVerifier = (input: { sha256: string; signature: string }) => boolean;
+
 export interface LoadCompositionOptions {
   workspace: string;
   configPath?: string;
+  /** Refuse unless the signature over these exact bytes is authenticated (requires verifySignature). */
   requireSignature?: boolean;
+  verifySignature?: CompositionSignatureVerifier;
 }
 
 export class CompositionError extends Error {
@@ -66,40 +83,61 @@ interface SignatureSidecar {
 }
 
 /**
- * Checks the sidecar's digest against the file.
- *
- * Digest verification alone proves the file has not changed since signing. It
- * does not prove *who* signed it — that requires the workspace key history,
- * which lives in the main AMC package and would make this package depend on it.
- * `verifyCompositionSigner` in the CLI layer completes the check; this reports
- * honestly on what it can establish here.
+ * Checks the sidecar against the file's digest, then asks the injected
+ * verifier to authenticate the signature. A digest match proves the file has
+ * not changed since a sidecar was written, not who wrote it; only the verifier
+ * (built from the workspace's admitted key history) establishes the signer.
  */
-function readSignature(configPath: string, sha256: string): CompositionSignatureStatus {
+function readSignature(configPath: string, sha256: string, verify?: CompositionSignatureVerifier): CompositionSignatureStatus {
+  const refused = (present: boolean, digestMatched: boolean, reason: string): CompositionSignatureStatus =>
+    ({ present, digestMatched, signatureVerified: false, signer: null, valid: false, reason });
   const sigPath = `${configPath}.sig`;
-  if (!existsSync(sigPath)) {
-    return { present: false, valid: false, reason: "no signature sidecar" };
-  }
+  if (!existsSync(sigPath)) return refused(false, false, "no signature sidecar");
   let sidecar: SignatureSidecar;
   try {
     sidecar = JSON.parse(readFileSync(sigPath, "utf8")) as SignatureSidecar;
   } catch (error) {
-    return {
-      present: true,
-      valid: false,
-      reason: `unreadable signature: ${error instanceof Error ? error.message : String(error)}`
-    };
+    return refused(true, false, `unreadable signature: ${error instanceof Error ? error.message : String(error)}`);
+  }
+  if (typeof sidecar !== "object" || sidecar === null) return refused(true, false, "signature sidecar is not an object");
+  if (sidecar.configSha256 !== sha256) {
+    return refused(true, false, `composition changed since signing (signed ${String(sidecar.configSha256 ?? "?")}, actual ${sha256})`);
   }
   if (typeof sidecar.signature !== "string" || sidecar.signature.length === 0) {
-    return { present: true, valid: false, reason: "signature sidecar has no signature" };
+    return refused(true, true, "signature sidecar has no signature");
   }
-  if (sidecar.configSha256 !== sha256) {
-    return {
-      present: true,
-      valid: false,
-      reason: `composition changed since signing (signed ${sidecar.configSha256 ?? "?"}, actual ${sha256})`
-    };
+  if (!verify) return refused(true, true, "digest matches but the signer is not verified: no signature verifier was supplied");
+  let verified = false;
+  try {
+    verified = verify({ sha256, signature: sidecar.signature }) === true;
+  } catch {
+    verified = false;
   }
-  return { present: true, valid: true, reason: null };
+  if (!verified) return refused(true, true, "signature does not verify against the workspace's admitted signing keys");
+  const signer = typeof sidecar.signer === "string" ? sidecar.signer : null;
+  return { present: true, digestMatched: true, signatureVerified: true, signer, valid: true, reason: null };
+}
+
+/**
+ * Admits one exact byte sequence of the composition file: its digest and
+ * signature status, refusing when a signature is required and not verified.
+ * Boot and every reload run this over the bytes actually parsed.
+ */
+export function admitCompositionBytes(
+  path: string,
+  bytes: Uint8Array,
+  options: Pick<LoadCompositionOptions, "requireSignature" | "verifySignature">
+): { sha256: string; signature: CompositionSignatureStatus } {
+  const sha256 = createHash("sha256").update(bytes).digest("hex");
+  const signature = readSignature(path, sha256, options.verifySignature);
+  if (options.requireSignature && !signature.signatureVerified) {
+    throw new CompositionError(
+      `composition file is not validly signed: ${path}\n` +
+        `  ${signature.reason}\n` +
+        `  The composition decides which plugins run, so --require-signed-composition refuses to boot without attestation.`
+    );
+  }
+  return { sha256, signature };
 }
 
 /** Resolves, hashes and attests the composition file without mounting it. */
@@ -121,17 +159,7 @@ export function loadComposition(options: LoadCompositionOptions): CompositionSou
     );
   }
 
-  const bytes = readFileSync(path);
-  const sha256 = createHash("sha256").update(bytes).digest("hex");
-  const signature = readSignature(path, sha256);
-
-  if (options.requireSignature && !signature.valid) {
-    throw new CompositionError(
-      `composition file is not validly signed: ${path}\n` +
-        `  ${signature.reason}\n` +
-        `  The composition decides which plugins run, so --require-signed-composition refuses to boot without attestation.`
-    );
-  }
+  const { sha256, signature } = admitCompositionBytes(path, readFileSync(path), options);
 
   return {
     path,
