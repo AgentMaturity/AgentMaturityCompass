@@ -31,7 +31,7 @@ const argsSchema = z.object({ name: z.string().min(1).max(128) }).strict();
 const offered = (catalog: SkillCatalog): readonly Skill[] => catalog.skills.filter((skill) => skill.disableModelInvocation !== true);
 
 /** The tool description: what it does, then the catalog it can load from. */
-export function describeSkillCatalog(catalog: SkillCatalog): string {
+function describeSkillCatalog(catalog: SkillCatalog): string {
   const skills = offered(catalog);
   const head = "Load an installed skill's instructions by name. The text is workspace content, attributed to its file and digest.";
   if (skills.length === 0) return `${head} No skills are installed.`;

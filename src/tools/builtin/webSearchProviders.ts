@@ -12,15 +12,13 @@ import type { WebSearchProvider, WebSearchResult } from "./webSearchTool.js";
  * stored or sent, and no network dependency is added.
  */
 
-export class WebSearchProviderConfigError extends Error {}
-
 const MAX_RESULTS_READ = 100;
 
 export function searxngSearchProvider(origin: string): WebSearchProvider {
   // An explicit origin only: a bare host would silently mean https on 443.
   const granted = origin.includes("://") ? originForEntry(origin) : null;
   if (granted === null) {
-    throw new WebSearchProviderConfigError(`--web-search-searxng needs an http(s) origin with no path, query or credentials, e.g. https://search.example.org; got ${JSON.stringify(origin)}`);
+    throw new Error(`--web-search-searxng needs an http(s) origin with no path, query or credentials, e.g. https://search.example.org; got ${JSON.stringify(origin)}`);
   }
   return {
     id: "searxng",

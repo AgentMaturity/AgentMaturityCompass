@@ -1,6 +1,6 @@
 import type { ChildProcess } from "node:child_process";
 import { join, resolve } from "node:path";
-import { signAskUserAnswer, type AskUserAnswerer, type AskUserItem, type AskUserQuestion, type AskUserQuestionRecord, type SignedAskUserAnswer } from "../tools/builtin/askUserTool.js";
+import { escapeTerminalControls, signAskUserAnswer, type AskUserAnswerer, type AskUserItem, type AskUserQuestion, type AskUserQuestionRecord, type SignedAskUserAnswer } from "../tools/builtin/askUserTool.js";
 import { readSignedRecord, sessionRecordDir } from "../tools/builtin/nativeToolBreadth/signedSessionRecords.js";
 
 /**
@@ -107,8 +107,9 @@ export function createNativeInteractiveAskUser(options: NativeAskUserPromptOptio
     options.log(`The agent asks (${question.questionId}, signed question sha256 ${question.questionSha256}):`);
     const answers: string[][] = [];
     for (const [index, item] of question.questions.entries()) {
-      options.log(`${question.questions.length === 1 ? "" : `${index + 1}/${question.questions.length} `}${item.question}`);
-      item.choices?.forEach((choice, at) => options.log(`  ${at + 1}. ${choice}`));
+      // Escaped again here: the signed record is the tool's, but the terminal must never interpret what the model wrote.
+      options.log(`${question.questions.length === 1 ? "" : `${index + 1}/${question.questions.length} `}${escapeTerminalControls(item.question)}`);
+      item.choices?.forEach((choice, at) => options.log(`  ${at + 1}. ${escapeTerminalControls(choice)}`));
       const hint = item.choices === null ? "your answer" : `${item.multiSelect ? "numbers separated by commas" : "a number"}${item.allowOther ? " or your own text" : ""}`;
       for (;;) {
         const typed = await options.question(`Answer with ${hint} (blank gives no answer): `, signal);

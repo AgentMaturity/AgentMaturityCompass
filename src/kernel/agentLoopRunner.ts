@@ -653,6 +653,7 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
           workspace: options.workspace, parent: rootIdentity(options.agentId), session, runner,
           mintSessionId: randomUUID, runAs: "goal-round", goal: options.prompt, maxRounds: options.goalRounds.maxRounds,
           ...(options.delegation!.scope === undefined ? {} : { scope: options.delegation!.scope }),
+          ...(options.delegation!.stopConditions === undefined ? {} : { stopConditions: options.delegation!.stopConditions }),
           ...(options.delegation!.maxDepth === undefined ? {} : { maxDepth: options.delegation!.maxDepth }),
           ...(options.goalRounds.signal === undefined ? {} : { signal: options.goalRounds.signal })
         });

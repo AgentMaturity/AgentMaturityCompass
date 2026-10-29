@@ -3,6 +3,7 @@ import type { ToolDefinition } from "../toolTypes.js";
 import type { NativeReceiptRecorder } from "./nativeToolBreadth/nativeReceipt.js";
 import { readSessionList, sessionListTool, type SessionListHeader, type SessionListStore } from "./nativeToolBreadth/sessionListTool.js";
 import { readSessionPlan, renderPlan } from "./planTool.js";
+import { escapeTerminalControls } from "./askUserTool.js";
 import type { SessionIdSource } from "./nativeToolBreadth/signedSessionRecords.js";
 
 /**
@@ -30,7 +31,7 @@ const todoArgs = z.object({
 export type TodoPayload = z.infer<typeof todoArgs>;
 export type TodoRecord = SessionListHeader & TodoPayload;
 
-export function renderTodo(payload: TodoPayload): string {
+function renderTodo(payload: TodoPayload): string {
   return payload.items.length === 0 ? "[amc: todo list is empty]" : payload.items.map((item) => `${MARK[item.status]} ${item.content}`).join("\n");
 }
 
@@ -80,9 +81,10 @@ export function renderSessionLists(workspace: string, sessionId: string): string
   const show = (name: string, read: () => string | null): void => {
     try {
       const rendered = read();
-      if (rendered !== null) lines.push(`Agent ${name} (signed, ledger-bound):`, rendered);
+      // Model-written text on the operator's terminal: escaped, never interpreted.
+      if (rendered !== null) lines.push(`Agent ${name} (signed, ledger-bound):`, escapeTerminalControls(rendered));
     } catch (error) {
-      lines.push(`Agent ${name} not shown: ${error instanceof Error ? error.message : "it does not verify"}.`);
+      lines.push(`Agent ${name} not shown: ${escapeTerminalControls(error instanceof Error ? error.message : "it does not verify")}.`);
     }
   };
   show("todo", () => { const todo = readSessionTodo(workspace, sessionId); return todo && renderTodo(todo); });

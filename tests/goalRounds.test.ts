@@ -253,3 +253,25 @@ describe("each round is a governed delegation", () => {
     expect(result.stoppedBy).toBe("cancelled");
   });
 });
+
+describe("signed child stop conditions bind every goal round (WP40 review)", () => {
+  it("forwards the stop conditions and a lifetime stop halts the rounds", async () => {
+    const dir = workspace();
+    const h = harness(dir);
+    const result = await runGoalRounds({
+      ...h.base,
+      runner: async (ctx: SubagentRunContext): Promise<SubagentRunResult> => {
+        h.seen.push(ctx);
+        await new Promise<void>((resolve) => { const t = setTimeout(resolve, 2_000); ctx.signal?.addEventListener("abort", () => { clearTimeout(t); resolve(); }, { once: true }); });
+        return { ok: true, text: "slow" };
+      },
+      maxRounds: 3,
+      stopConditions: ["timeout-ms:50"],
+      cancelGraceMs: 0
+    });
+    expect(h.seen[0]?.stopConditions).toEqual(["timeout-ms:50"]);
+    expect(result.rounds).toBe(1);
+    expect(result.stoppedBy).toBe("failed");
+    expect(result.reason).toContain("timeout-ms:50");
+  });
+});

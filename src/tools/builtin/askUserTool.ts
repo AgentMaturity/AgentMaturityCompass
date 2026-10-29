@@ -46,9 +46,20 @@ const MAX_ANSWER_CHARS = 10_000;
 
 const MAX_QUESTIONS = 4;
 
+/** C0 (except tab and newline), DEL and C1: what a terminal reads as cursor and colour control. */
+const TERMINAL_CONTROLS = /[\x00-\x08\x0b-\x1f\x7f-\x9f]/;
+
+/** Shown, never interpreted: each control character as a visible `\uXXXX`. */
+export function escapeTerminalControls(text: string): string {
+  return text.replace(new RegExp(TERMINAL_CONTROLS.source, "g"), (c) => `\\u${c.charCodeAt(0).toString(16).padStart(4, "0")}`);
+}
+
+// A question is shown to a person on a terminal; control characters could draw a fake prompt or signed decision there.
+const shown = (max: number) => z.string().min(1).max(max).refine((text) => !TERMINAL_CONTROLS.test(text), "must not contain terminal control characters");
+
 const itemSchema = z.object({
-  question: z.string().min(1).max(2_000),
-  choices: z.array(z.string().min(1).max(200)).min(2).max(10).optional(),
+  question: shown(2_000),
+  choices: z.array(shown(200)).min(2).max(10).optional(),
   allowOther: z.boolean().optional(),
   multiSelect: z.boolean().optional()
 }).strict();

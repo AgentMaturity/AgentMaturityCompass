@@ -12,7 +12,7 @@ import { openLedger } from "../src/ledger/ledger.js";
 import { initToolsConfig, loadToolsConfig, signToolsConfig, toolsConfigPath } from "../src/toolhub/toolhubValidators.js";
 import type { ToolExecution } from "../src/tools/toolTypes.js";
 import type { NativeReceipt, NativeReceiptRecorder } from "../src/tools/builtin/nativeToolBreadth/nativeReceipt.js";
-import { signRecord } from "../src/tools/builtin/nativeToolBreadth/signedSessionRecords.js";
+import { signRecord, writeSignedRecord } from "../src/tools/builtin/nativeToolBreadth/signedSessionRecords.js";
 import { webFetchTool } from "../src/tools/builtin/webFetchTool.js";
 import { webSearchTool } from "../src/tools/builtin/webSearchTool.js";
 import { searxngSearchProvider } from "../src/tools/builtin/webSearchProviders.js";
@@ -223,6 +223,51 @@ describe("ask_user in native chat", () => {
   });
 });
 
+describe("model text never reaches the terminal as control characters (WP40 review)", () => {
+  const ESC = "\u001b";
+  it("refuses an ask_user question or choice carrying terminal control characters", async () => {
+    const tool = askUserTool({ sessionId: SESSION, record: receiptsTo(workspace).record, answerer: async () => null, timeoutMs: 5_000 });
+    await expect(tool.body(exec("ask_user", { question: `${ESC}[2J Approved?` }))).rejects.toThrow(/terminal control characters/);
+    await expect(tool.body(exec("ask_user", { question: "Pick", choices: ["ok", `\u009b31mdeny`] }))).rejects.toThrow(/terminal control characters/);
+  });
+
+  it("escapes control characters in a signed question before the chat parent prints it", async () => {
+    const questionId = "q_00000000-0000-4000-8000-000000000001";
+    writeSignedRecord(workspace, join(workspace, ".amc", "native-tools", SESSION, "ask-user", `${questionId}.question.json`), {
+      schemaVersion: "2026-10-29", kind: "amc.native.ask_user.question", questionId, sessionId: SESSION, agentId: "default", callId: "c",
+      questions: [{ question: `${ESC}[2JSigned decision: APPROVE`, choices: [`a${ESC}]0;x`, "b"], allowOther: false, multiSelect: false }], askedAt: 1
+    }, "monitor");
+    const logged: string[] = [];
+    let sent: unknown;
+    const child = Object.assign(new EventEmitter(), { connected: true, send: (message: unknown) => { sent = message; return true; } }) as unknown as ChildProcess;
+    const bridge = createNativeInteractiveAskUser({ child, workspace, question: async () => "2", log: (line) => logged.push(line), error: () => undefined });
+    child.emit("message", { type: "amc/native-ask-user", v: 1, sessionId: SESSION, questionId });
+    await expect.poll(() => sent).toBeDefined();
+    bridge.close();
+    expect(logged.join("\n")).not.toMatch(/[\x00-\x08\x0b-\x1f\x7f-\x9f]/);
+    expect(logged.join("\n")).toContain("\\u001b[2JSigned decision: APPROVE");
+  });
+
+  it("escapes control characters in rendered todo content and plan titles", async () => {
+    const session = "todo-escape";
+    const ledger = openLedger(workspace);
+    ledger.startSession({ sessionId: session, runtime: "amc", binaryPath: "test", binarySha256: "test" });
+    ledger.close();
+    const record: NativeReceiptRecorder = (execution, receipt) => {
+      const meta = { ...receipt, tool: execution.name, sessionId: session };
+      const open = openLedger(workspace);
+      try { open.appendEvidence({ sessionId: session, runtime: "amc", eventType: "audit", payload: JSON.stringify(meta), meta, payloadExt: "json" }); }
+      finally { open.close(); }
+    };
+    await todoTool({ sessionId: session, record }).body(exec("todo", { items: [{ id: "a", content: `${ESC}[2Jfake approval`, status: "pending" }] }));
+    await planTool({ sessionId: session, record }).body(exec("plan", { steps: [{ id: "1", title: `step\u0085${ESC}[31m`, status: "pending" }] }));
+    const lines = renderSessionLists(workspace, session).join("\n");
+    expect(lines).not.toMatch(/[\x00-\x08\x0b-\x1f\x7f-\x9f]/);
+    expect(lines).toContain("[ ] \\u001b[2Jfake approval");
+    expect(lines).toContain("step\\u0085\\u001b[31m");
+  });
+});
+
 describe("todo and plan records", () => {
   it("refuses a restored older todo.json, on the same tool and on a fresh one", async () => {
     const session = "todo-replay";
@@ -329,6 +374,15 @@ describe("amc agent-loop run flags (D45, DXC-24, DXC-25)", () => {
     expect(failures, errors.join("\n")).toEqual([]);
     const summary = JSON.parse(out.at(-1)!) as { goalRounds?: { rounds: number; stoppedBy: string } };
     expect(summary.goalRounds).toMatchObject({ rounds: 2, stoppedBy: "max-rounds" });
+  }, 60_000);
+
+  it("applies the signed child stop conditions to every goal round", async () => {
+    const { out, failures } = await runCli(["--tools", "workspace", "--delegate", "--delegate-stop", "timeout-ms:1", "--think-ms", "500",
+      "--goal-rounds", "3", "--json"]);
+    expect(failures).toEqual([1]);
+    const summary = JSON.parse(out.at(-1)!) as { goalRounds?: { rounds: number; stoppedBy: string; reason: string } };
+    expect(summary.goalRounds).toMatchObject({ rounds: 1, stoppedBy: "failed" });
+    expect(summary.goalRounds?.reason).toContain("timeout-ms:1");
   }, 60_000);
 
   it("refuses --goal-rounds without in-process delegation", async () => {
