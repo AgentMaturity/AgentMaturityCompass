@@ -21,7 +21,7 @@ import { canonicalize } from "../utils/json.js";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
 import { signHexDigest, getSigningKey, verifyHexDigestAny } from "../crypto/keys.js";
 import { getPurposeKeyHistory } from "../keys/signingKeys.js";
-import { highWaterKey, readHighWater, recordHighWater, workspaceScope } from "../keys/highWater.js";
+import { appendLessonStatus, lessonStatusLogExtendable, verifiedLessonStatuses } from "./lessonStatusLog.js";
 import type { DiagnosticReport } from "../types.js";
 import type { CorrectionEvent, CorrectionEffectivenessReport } from "../corrections/correctionTypes.js";
 import {
@@ -296,7 +296,8 @@ export function verifyAgentLessons(db: Database.Database, agentId: string, works
       else if (lessonHash(lesson, lesson.prev_lesson_hash) !== stored) reason = "lesson content does not match its hash";
       else if (lesson.signature === "unsigned" || !verifyHexDigestAny(stored, lesson.signature, keys)) reason = "lesson signature does not verify";
       else if (!statuses.trusted) reason = "lesson status log does not verify or does not end at its anchored head";
-      else if (`${stored}:${lesson.status}` !== (statuses.status.get(lessonId) ?? `${stored}:ACTIVE`)) reason = "lesson status does not match its signed transitions";
+      else if (!statuses.status.has(lessonId)) reason = "lesson status is not signed into the status log";
+      else if (`${stored}:${lesson.status}` !== statuses.status.get(lessonId)) reason = "lesson status does not match its signed transitions";
       else verified.push(lesson);
     } catch {
       reason = "lesson record is unreadable";
@@ -314,74 +315,31 @@ export function getLastLessonHash(db: Database.Database, agentId: string): strin
   return row?.lesson_hash ?? LESSON_GENESIS_HASH;
 }
 
-const LESSON_STATUS_GENESIS_HASH = "GENESIS_LESSON_STATUS";
-
-function lessonStatusEntryHash(entry: { agentId: string; lessonId: string; lessonHash: string; status: string; ts: number; prev: string }): string {
-  return sha256Hex(canonicalize({ ...entry, kind: "correction-lesson-status" }));
-}
-
-/** The status log head for one agent, anchored in this machine's high-water file outside the workspace. */
-function lessonStatusAnchorKey(workspace: string, agentId: string): string {
-  return highWaterKey("lesson-status", `${agentId}@${workspaceScope(workspace)}`);
-}
-
 /**
  * Set a lesson's status. The column change, a signed and chained status transition, and the raised log-head anchor
  * (entry count and head hash, kept outside the workspace) commit together: if signing or anchoring fails the column
  * change is rolled back and the error is thrown, so no status change is ever left unsigned.
+ *
+ * This is also the owner's re-anchor path. A lesson is injectable only once its current status is signed into the
+ * log, so a lesson created before the status log existed, or every lesson of an agent whose anchor was lost (a new
+ * machine, or a removed AMC home), stays out of injection until the owner re-signs its current status here. Re-signing
+ * appends to the log; when the log does not end at a valid anchor it is refused unless the owner, after reviewing the
+ * lessons' statuses, passes `{ reanchor: true }`, which anchors the log as it now stands.
  */
 export function updateLessonStatus(
   db: Database.Database,
   lessonId: string,
   status: LessonStatus,
   workspace: string,
+  options: { reanchor?: boolean } = {},
 ): void {
   if (!workspace) throw new Error("updateLessonStatus requires the workspace to sign the status transition");
   db.transaction(() => {
     const lesson = getLessonById(db, lessonId);
     if (!lesson) return;
     db.prepare("UPDATE correction_lessons SET status = ? WHERE lesson_id = ?").run(status, lessonId);
-    const head = db
-      .prepare("SELECT entry_hash, (SELECT COUNT(*) FROM correction_lesson_status_log WHERE agent_id = ?) AS count FROM correction_lesson_status_log WHERE agent_id = ? ORDER BY seq DESC LIMIT 1")
-      .get(lesson.agentId, lesson.agentId) as { entry_hash: string; count: number } | undefined;
-    const entry = { agentId: lesson.agentId, lessonId, lessonHash: lesson.lesson_hash, status, ts: Date.now(),
-      prev: head?.entry_hash ?? LESSON_STATUS_GENESIS_HASH };
-    const entryHash = lessonStatusEntryHash(entry);
-    const signature = signHexDigest(entryHash, getSigningKey(workspace, "ledger-row"));
-    db.prepare(`INSERT INTO correction_lesson_status_log
-      (agent_id, lesson_id, lesson_hash, status, ts, prev_entry_hash, entry_hash, signature) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`)
-      .run(entry.agentId, lessonId, entry.lessonHash, status, entry.ts, entry.prev, entryHash, signature);
-    if (!recordHighWater(lessonStatusAnchorKey(workspace, lesson.agentId), (head?.count ?? 0) + 1, entryHash)) {
-      throw new Error("the lesson status log head could not be anchored in AMC home; the status change was not made");
-    }
+    appendLessonStatus(db, lesson, status, workspace, options.reanchor === true);
   })();
-}
-
-/**
- * The latest signed status per lesson, or `trusted: false` when the agent's status log cannot be trusted as a whole:
- * any entry fails its chain link or signature, or the log does not end exactly at the anchored head (count and hash),
- * which catches a deleted tail entry.
- */
-function verifiedLessonStatuses(db: Database.Database, agentId: string, workspace: string, keys: string[]): { trusted: boolean; status: Map<string, string> } {
-  const rows = db
-    .prepare("SELECT * FROM correction_lesson_status_log WHERE agent_id = ? ORDER BY seq ASC")
-    .all(agentId) as Array<Record<string, unknown>>;
-  const status = new Map<string, string>();
-  let previous = LESSON_STATUS_GENESIS_HASH;
-  for (const row of rows) {
-    const entry = { agentId, lessonId: String(row.lesson_id), lessonHash: String(row.lesson_hash), status: String(row.status),
-      ts: Number(row.ts), prev: String(row.prev_entry_hash) };
-    const stored = String(row.entry_hash);
-    if (entry.prev !== previous || lessonStatusEntryHash(entry) !== stored || !verifyHexDigestAny(stored, String(row.signature), keys)) {
-      return { trusted: false, status };
-    }
-    status.set(entry.lessonId, `${entry.lessonHash}:${entry.status}`);
-    previous = stored;
-  }
-  let anchor: { sequence: number; sha256: string } | null;
-  try { anchor = readHighWater(lessonStatusAnchorKey(workspace, agentId)); } catch { return { trusted: false, status }; }
-  const endsAtAnchor = anchor === null ? rows.length === 0 : anchor.sequence === rows.length && anchor.sha256 === previous;
-  return { trusted: endsAtAnchor, status };
 }
 
 export function updateLessonInjection(
@@ -533,7 +491,14 @@ export function extractLessonsFromCorrections(
       signature,
     };
 
-    insertLesson(db, lesson);
+    // A signed lesson is born with its ACTIVE status signed into the anchored log, in the same transaction. An unsigned
+    // lesson gets no entry: it is never injectable, so there is no status to protect.
+    db.transaction(() => {
+      insertLesson(db, lesson);
+      // Extraction never re-anchors: when the log does not end at its anchor, the lesson is stored without a status
+      // entry (non-injectable) and only the owner's updateLessonStatus(..., { reanchor: true }) can admit it.
+      if (signature !== "unsigned" && lessonStatusLogExtendable(db, agentId, workspace, lessonId)) appendLessonStatus(db, lesson, "ACTIVE", workspace);
+    })();
     created.push(lesson);
   }
 
