@@ -40,6 +40,7 @@ import {
 } from "./agent/stubProvider.js";
 import type { LoopNotification } from "./agent/loopTypes.js";
 import { echoToolSeam } from "./agent/echoTool.js";
+import { WEB_SEARCH_SEARXNG_HELP, resolveBreadthRun, withBreadthRunOptions } from "./cli/agentLoopBreadthOptions.js";
 import { agentToolset, type AgentToolset } from "./agent/agentToolset.js";
 import { runLease } from "./leases/runLease.js";
 import { selectSupportedNativeTools } from "./agent/nativeToolCapabilities.js";
@@ -60,13 +61,12 @@ import { loadVerifiedToolsConfigSnapshot } from "./toolhub/toolhubValidators.js"
 import type { AgentToolSeam } from "./agent/toolSeam.js";
 import type { SubagentCapability } from "./agent/delegateTool.js";
 import type { ComposedToolSession } from "./kernel/agentLoopRunner.js";
-import { readAgentRunSummary, renderRunSummary, renderVerifyReport, verifyAgentRun } from "./agent/runReport.js";
-import { executionStatusFor, recordedExecutionStatus } from "./execution/executionStatus.js";
+import { readAgentRunSummary, renderVerifyReport, verifyAgentRun } from "./agent/runReport.js";
+import { recordedExecutionStatus } from "./execution/executionStatus.js";
 import { ledgerExitCode, trustFromFlags, withTrustFlags, type TrustFlags } from "./cli-trust-flags.js";
 import { registerPromptCommands } from "./cli-prompt-commands.js";
 import { registerNativeScheduleCommands } from "./cli-native-schedule-commands.js";
 import { registerAgentGuideCommands, selectedAgentOption } from "./cli-agent-guide-commands.js";
-import { renderNativeGuideCommand } from "./setup/nativeFirstUseGuide.js";
 import { nativeApprovalInstructions } from "./setup/nativeApprovalInstructions.js";
 import { applyNativeDelegationPreset } from "./setup/nativePresetDelegation.js";
 import type { ActionClass } from "./types.js";
@@ -157,6 +157,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--approve-risk <tier>", "approval risk tier (default high)")
     .option("--tools <mode>", "none, echo, or explicitly enabled workspace tools; existing policy still applies")
     .option("--unsafe-unconfined-shell", "macOS without Seatbelt only: offer the native shell UNCONFINED, with your full user rights; ignored where Seatbelt or Bubblewrap confines it, refused on Windows")
+    .option("--web-search-searxng <origin>", WEB_SEARCH_SEARXNG_HELP)
     .option("--max-tokens <n>", "output-token limit per request (default 512)")
     .option("--thinking <mode>", "DeepSeek only: enabled or disabled; tools-free chat requires explicit disabled")
     .option("--reasoning-effort <effort>", "DeepSeek only: exact low, high, or max with enabled thinking")
@@ -171,7 +172,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       await runNativeInteractiveSession({ ...opts, agentId: selectedAgentOption(command), workspace: process.cwd() }, io);
     });
 
-  group
+  withBreadthRunOptions(group
     .command("run")
     .option("--agent <id>", "agent identity; defaults to AMC_AGENT_ID, the current agent, then default")
     .description("Run one agent turn and report what the signed log recorded")
@@ -243,7 +244,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       "require a signed human approval before every tool call, decided under this action class"
     )
     .option("--approve-risk <tier>", "risk tier the approval is raised at (default high)")
-    .option("--interactive-approvals", "send actual queued approval IDs to the native chat parent over dedicated Node IPC")
+    .option("--interactive-approvals", "send actual queued approval IDs to the native chat parent over dedicated Node IPC"))
     .option(
       "--approval-exception <file>",
       "ADR-5 exception note (JSON) that auto-allows the classes it names until it expires"
@@ -443,6 +444,8 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       // echo tool exists precisely to make a multi-step turn observable.
       const toolMode = opts.tools ?? preset?.tools ?? (providerId === STUB_PROVIDER_ID ? "echo" : "none");
       const wantsDelegation = opts.delegate === true;
+      const breadth = resolveBreadthRun(io, opts, { toolMode, wantsDelegation });
+      if (breadth === null) return;
       if (!wantsDelegation && opts.delegateStop !== undefined) {
         io.error(chalk.red("--delegate-stop and --no-delegate-stop require --delegate or delegate.enabled in the signed preset."));
         io.fail(); return;
@@ -494,6 +497,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           recorder: { recordProjectedEvidence: (row) => actualSession().recordProjectedEvidence(row), assertWritable: () => actualSession().assertWritable() },
           ...lease,
           ...(dispatchMode === "code" ? { mode: dispatchMode } : {}),
+          ...breadth.toolset,
           ...shellOptIn
         });
         bindToolSession = (session) => { boundSession = session; };
@@ -611,6 +615,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       const mcpAbort = new AbortController();
       const cancelMcp = () => mcpAbort.abort();
       if (mcpServers.length) process.on("SIGINT", cancelMcp);
+      breadth.armCancel();
 
       try {
         if (mcpServers.length && workspaceToolset !== null) {
@@ -718,6 +723,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
               }),
           config: { maxStepsPerTurn: maxSteps, ...(compaction === undefined ? {} : { compaction }) },
           ...(validation === undefined ? {} : { validation }),
+          ...breadth.turn,
           credentials: {
             // Watching is for a long-lived process picking up a rotation; a
             // single-turn command would only be opening and closing a watcher.
@@ -757,17 +763,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
               })
         });
 
-        const summary = readAgentRunSummary(process.cwd(), outcome.sessionId, outcome.status);
-        const ending = summary.endings.length > priorTurnEndings ? summary.endings.at(-1) : undefined;
-        // P2-13: the four execution phases; evidence verification stays pending until `agent-loop verify`.
-        io.log(opts.json ? JSON.stringify({ ...summary, execution: executionStatusFor(process.cwd(), { sessionId: summary.sessionId, admission: "admitted",
-          turn: ending?.reason ?? (summary.driverStatus === "failed" ? "error" : null), verified: null }) }, null, 2) : renderRunSummary(summary));
-        if (!opts.json) {
-          io.log("Verify the recorded evidence (this does not evaluate answer quality):\n  " +
-            renderNativeGuideCommand({ cwd: process.cwd(), argv: ["amc", "agent-loop", "verify", summary.sessionId] }));
-        }
-        if (summary.driverStatus === "failed" || ending?.reason === "error"
-          || (validation !== undefined && summary.validation.status !== "passed")) io.fail();
+        breadth.reportRun(outcome, priorTurnEndings, validation !== undefined);
       } finally {
         for (const timer of timers) clearTimeout(timer);
         if (onSigint !== null) process.removeListener("SIGINT", onSigint);
@@ -775,6 +771,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
         try { if (closed.some(result => result.status === "rejected")) { io.error("MCP cleanup failed; this mount must not be reused."); io.fail(); } }
         finally {
           process.removeListener("SIGINT", cancelMcp);
+          breadth.dispose();
           workspaceToolset?.close();
         }
       }

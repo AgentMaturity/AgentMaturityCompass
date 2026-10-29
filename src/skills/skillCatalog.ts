@@ -39,6 +39,8 @@ export interface Skill {
   readonly sourcePath: string;
   /** sha256 of the file's full contents. */
   readonly digest: string;
+  /** `disable-model-invocation: true`: loads on `/name` only, never advertised to or loaded by the model. */
+  readonly disableModelInvocation?: true;
 }
 
 export interface SkillProblem {
@@ -93,7 +95,8 @@ function parseSkill(dirName: string, sourcePath: string, raw: string): Skill | S
     return { name: dirName, sourcePath, reason: "frontmatter has no description" };
   }
 
-  return { name, description, body, sourcePath, digest: sha256Hex(raw) };
+  return { name, description, body, sourcePath, digest: sha256Hex(raw),
+    ...(fields.get("disable-model-invocation") === "true" ? { disableModelInvocation: true as const } : {}) };
 }
 
 /**

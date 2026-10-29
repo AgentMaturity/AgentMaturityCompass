@@ -77,6 +77,7 @@ import { refuseRetired } from "../lifecycle/reassessment.js";
 import { admitSessionAtOpen } from "../runtime/changeEnvelope.js";
 import { nativeSessionManifest } from "../lifecycle/versionManifest.js";
 import { runDueSchedules, type ScheduleRunResult } from "../autonomy/scheduleRunner.js";
+import { runGoalRounds, type GoalRoundsResult } from "../autonomy/goalRounds.js";
 import { assertNativeScheduleAdmission } from "../autonomy/scheduleService.js";
 import type { SubagentCapability } from "../agent/delegateTool.js";
 import type { TurnCancelCause } from "../session/sessionTypes.js";
@@ -289,6 +290,12 @@ export interface ComposedTurnOptions {
    * steering works has to be demonstrating the mechanism users have.
    */
   readonly onSteer?: { readonly afterMs: number; readonly text: string };
+  /**
+   * Run the prompt as a goal for bounded rounds (D45) instead of one turn: each round is one in-process delegated child
+   * under this run's delegation grant, seeing the previous round's answer, through `runGoalRounds`. Requires in-process
+   * delegation; `maxRounds` is the hard ceiling and nothing extends it.
+   */
+  readonly goalRounds?: { readonly maxRounds: number; readonly signal?: AbortSignal };
 }
 
 export interface ComposedTurnOutcome {
@@ -297,6 +304,8 @@ export interface ComposedTurnOutcome {
   readonly status: AgentStatus;
   /** Mechanical schedule outcomes, never goal-quality or cold-verification claims. */
   readonly scheduleResults?: readonly ScheduleRunResult[];
+  /** How a goal-rounds run stopped; mechanical, never a goal-quality claim. */
+  readonly goalRounds?: GoalRoundsResult;
   readonly validation: NativeValidationResult;
   /**
    * The `system/prompt` row every request in this run cites.
@@ -438,6 +447,14 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
     if (options.schedulePass.signal?.aborted) throw new Error("Native schedule pass cancelled before composition.");
     assertNativeScheduleAdmission({ workspace: options.workspace, ...options.schedulePass,
       approvalClass: options.approvalGate.actionClass });
+  }
+  if (options.goalRounds !== undefined) {
+    const { maxRounds } = options.goalRounds;
+    if (options.delegation === undefined || options.delegation.runner !== undefined || options.schedulePass !== undefined
+      || options.audioParts !== undefined || images.length > 0 || options.prompt.trim() === "") {
+      throw new Error("Goal rounds need a text goal and in-process delegation (--delegate with workspace tools); schedules, audio, images and foreign delegates are not goal rounds.");
+    }
+    if (!Number.isSafeInteger(maxRounds) || maxRounds < 1 || maxRounds > 100) throw new Error("Goal rounds must be an integer from 1 through 100.");
   }
   // P1-79: no in-process child may run without the run's principal; refused before any session row, spawn or lease.
   if ((options.schedulePass !== undefined || (options.delegation !== undefined && options.delegation.runner === undefined))
@@ -633,6 +650,20 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
           ...(pass.signal === undefined ? {} : { signal: pass.signal })
         });
         return { sessionId, status: "idle", scheduleResults,
+          validation: projectNativeValidation(options.workspace, session.readEvents()),
+          systemPromptEventId: systemPromptRef.eventId,
+          promptSections: prompt.assemble().sections.map(section => section.name) };
+      }
+      if (options.goalRounds !== undefined) {
+        const goalRounds = await runGoalRounds({
+          workspace: options.workspace, parent: rootIdentity(options.agentId), session, runner,
+          mintSessionId: randomUUID, runAs: "goal-round", goal: options.prompt, maxRounds: options.goalRounds.maxRounds,
+          ...(options.delegation!.scope === undefined ? {} : { scope: options.delegation!.scope }),
+          ...(options.delegation!.stopConditions === undefined ? {} : { stopConditions: options.delegation!.stopConditions }),
+          ...(options.delegation!.maxDepth === undefined ? {} : { maxDepth: options.delegation!.maxDepth }),
+          ...(options.goalRounds.signal === undefined ? {} : { signal: options.goalRounds.signal })
+        });
+        return { sessionId, status: "idle", goalRounds,
           validation: projectNativeValidation(options.workspace, session.readEvents()),
           systemPromptEventId: systemPromptRef.eventId,
           promptSections: prompt.assemble().sections.map(section => section.name) };

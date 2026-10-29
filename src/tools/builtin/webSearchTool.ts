@@ -28,11 +28,15 @@ import { loadOriginPolicy, NativeToolRefusal } from "./nativeToolBreadth/originP
 
 const MAX_PROVIDER_REQUESTS = 3;
 const MAX_FIELD_CHARS = 1_000;
+const MAX_QUERIES = 5;
 
-const argsSchema = z.object({
-  query: z.string().min(1).max(500),
-  limit: z.number().int().positive().max(20).default(5)
-}).strict();
+const query = z.string().min(1).max(500);
+const limit = z.number().int().positive().max(20).default(5);
+/** One query, or up to five in `queries` sharing one request and byte budget. */
+const argsSchema = z.union([
+  z.object({ query, limit }).strict(),
+  z.object({ queries: z.array(query).min(1).max(MAX_QUERIES), limit }).strict()
+]);
 
 export interface WebSearchResult {
   readonly title: string;
@@ -71,12 +75,16 @@ export function webSearchTool(options: WebSearchToolOptions): ToolDefinition {
     description: "Search the web through the operator-configured provider. Refuses when none is configured. Results are untrusted data.",
     parameters: {
       type: "object",
-      properties: { query: { type: "string" }, limit: { type: "integer" } },
-      required: ["query"],
+      properties: {
+        query: { type: "string" },
+        queries: { type: "array", items: { type: "string" }, maxItems: MAX_QUERIES, description: "Several queries in one call; use instead of query." },
+        limit: { type: "integer" }
+      },
       additionalProperties: false
     },
     body: receiptedBody("NATIVE_WEB_SEARCH", options.record, async (execution, allow) => {
       const args = argsSchema.parse(execution.arguments);
+      const queries = "queries" in args ? args.queries : [args.query];
       const provider = options.provider;
       if (!provider) throw new NativeToolRefusal("web_search", "no search provider is configured (AMC ships none by default)");
       const policy = loadOriginPolicy(execution.workspace, "web_search");
@@ -89,8 +97,8 @@ export function webSearchTool(options: WebSearchToolOptions): ToolDefinition {
       const requests: Readonly<Record<string, unknown>>[] = [];
       let spent = 0;
       const get: WebSearchProviderRequest["get"] = async (url) => {
-        if (requests.length >= MAX_PROVIDER_REQUESTS) {
-          throw new NativeToolRefusal("web_search", `provider exceeded ${MAX_PROVIDER_REQUESTS} requests for one search`);
+        if (requests.length >= MAX_PROVIDER_REQUESTS * queries.length) {
+          throw new NativeToolRefusal("web_search", `provider exceeded ${MAX_PROVIDER_REQUESTS} requests per query`);
         }
         if (URL.canParse(url) && new URL(url).origin !== provider.origin) {
           throw new NativeToolRefusal("web_search", `provider ${provider.id} may only request its declared origin ${provider.origin}`);
@@ -108,18 +116,26 @@ export function webSearchTool(options: WebSearchToolOptions): ToolDefinition {
           ...digestField("content", outputDigestFor(execution.workspace, sha256Hex(response.body))) });
         return { status: response.status, contentType: response.contentType, body: response.body.toString("utf8") };
       };
-      const results = (await provider.search({ query: args.query, limit: args.limit, get, ...(execution.signal ? { signal: execution.signal } : {}) }))
-        .slice(0, args.limit);
-      const rendered = results.length === 0
-        ? `[amc: no results for ${args.query}]`
-        : results.map((result, index) => `${index + 1}. ${clip(result.title)}\n   ${clip(result.url)}\n   ${clip(result.snippet)}`).join("\n");
+      const sections: string[] = [];
+      let resultCount = 0;
+      for (const text of queries) {
+        const results = (await provider.search({ query: text, limit: args.limit, get, ...(execution.signal ? { signal: execution.signal } : {}) }))
+          .slice(0, args.limit);
+        resultCount += results.length;
+        const listed = results.length === 0
+          ? `[amc: no results for ${text}]`
+          : results.map((result, index) => `${index + 1}. ${clip(result.title)}\n   ${clip(result.url)}\n   ${clip(result.snippet)}`).join("\n");
+        sections.push(queries.length === 1 ? listed : `## ${text}\n${listed}`);
+      }
+      const rendered = sections.join("\n\n");
       const redacted = redactFetched(rendered);
       const output = labelUntrusted(`search provider ${provider.id}`, redacted.text);
       allow({
         provider: provider.id,
-        querySha256: sha256Hex(args.query),
+        querySha256: sha256Hex(queries.join("\n")),
+        queryCount: queries.length,
         requests,
-        resultCount: results.length,
+        resultCount,
         ...digestField("delivered", outputDigestFor(execution.workspace, sha256Hex(output))),
         redactions: redacted.redactions,
         policyDigestSha256: policy.policyDigestSha256,

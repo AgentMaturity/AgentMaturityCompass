@@ -268,6 +268,7 @@ export interface AgentSessionInit {
     readonly makeLlm: (session: SessionService) => LoopLlm;
     readonly route: LoopRoute;
     readonly systemPrompt: string;
+    readonly approvalGated?: boolean;
     readonly harnessVersion: string;
     readonly compositionDigest: string;
     readonly policyDigest: string;
@@ -276,6 +277,8 @@ export interface AgentSessionInit {
     readonly unconfinedShell?: ExplicitShellOptIn;
     readonly leaseToken?: string;
     readonly additionalCapabilities?: readonly NativeToolCapability[];
+    readonly askUser?: AgentToolsetOptions["askUser"];
+    readonly webSearchProvider?: AgentToolsetOptions["webSearchProvider"];
     readonly maxSteps?: number;
     readonly compaction?: Partial<CompactionConfig>;
     readonly validation?: NativeValidationPlan;
