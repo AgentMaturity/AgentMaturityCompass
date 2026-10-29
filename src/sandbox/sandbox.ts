@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { spawnSync } from "node:child_process";
 import { URL } from "node:url";
 import { hashBinaryOrPath, openLedger } from "../ledger/ledger.js";
-import { wrapAny } from "../ledger/monitor.js";
+import { wrapAnyOutcome } from "../ledger/monitor.js";
 import { recordedArgv } from "../bridge/bridgeRedaction.js";
 import { resolveAgentId } from "../fleet/paths.js";
 
@@ -22,6 +22,8 @@ export interface SandboxRunOptions {
   env?: Readonly<Record<string, string>>;
   /** Values to scrub from the recorded argv and output (a lease in `env`). */
   scrubValues?: readonly string[];
+  /** The id of a lease carried in `env`; the attestation records it and the `env` names, never a value. */
+  leaseId?: string;
 }
 
 function dockerAvailable(): { ok: boolean; version: string } {
@@ -106,6 +108,8 @@ function recordSandboxAttestation(params: {
   gatewayRoute?: string;
   gatewayProxyUrl?: string;
   scrubValues?: readonly string[];
+  envKeys: string[];
+  leaseId: string | null;
 }): void {
   // P0-55: under AMC_NO_SIGN=1 the attestation shares the unsigned store with the docker session wrapAny records.
   const ledger = openLedger(params.workspace, process.env.AMC_NO_SIGN === "1" ? { store: "unsigned" } : {});
@@ -140,6 +144,8 @@ function recordSandboxAttestation(params: {
       imageHash,
       command: argv.command,
       args: argv.args,
+      envKeys: params.envKeys,
+      leaseId: params.leaseId,
       networkMode: params.networkName ? "internal_bridge" : "none",
       networkName: params.networkName ?? null,
       gatewayRoute: params.gatewayRoute ?? null,
@@ -162,6 +168,8 @@ function recordSandboxAttestation(params: {
 
 export async function runSandboxCommand(opts: SandboxRunOptions, beforeLaunch?: () => void): Promise<{
   sessionId: string;
+  /** docker run's exit status: the container's, or docker's own failure; 1 when none was observed. */
+  exitCode: number;
   dockerArgs: string[];
   image: string;
   networkName: string;
@@ -203,19 +211,23 @@ export async function runSandboxCommand(opts: SandboxRunOptions, beforeLaunch?: 
     networkName,
     gatewayRoute: maybeContainerEndpoint(opts.gatewayRoute),
     gatewayProxyUrl: maybeContainerEndpoint(opts.gatewayProxyUrl),
-    ...(opts.scrubValues ? { scrubValues: opts.scrubValues } : {})
+    ...(opts.scrubValues ? { scrubValues: opts.scrubValues } : {}),
+    envKeys: Object.keys(opts.env ?? {}).sort(),
+    leaseId: opts.leaseId ?? null
   });
 
     beforeLaunch?.();
-    sessionId = await wrapAny("docker", dockerArgs, {
+    const outcome = await wrapAnyOutcome("docker", dockerArgs, {
       workspace: opts.workspace,
       agentId,
       ...(opts.env ? { envExtras: { ...opts.env } } : {}),
       ...(opts.scrubValues ? { scrubValues: opts.scrubValues } : {}),
       ...(beforeLaunch ? { beforeLaunch } : {})
     });
+    sessionId = outcome.sessionId;
     return {
       sessionId,
+      exitCode: outcome.exitCode,
       dockerArgs,
       image,
       networkName

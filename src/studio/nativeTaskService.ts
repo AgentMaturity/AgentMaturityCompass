@@ -338,7 +338,8 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
     return result;
   }
   function childEnvironment(provider: NativeTaskDescriptor["provider"]): NodeJS.ProcessEnv {
-    // SDK merges env by default: explicitly erase every ambient key before the fixed allowlist.
+    // Erase every ambient key before the fixed allowlist: this is also the credential store's environment, and an
+    // inheritEnv SDK launch would otherwise merge them back.
     const env: NodeJS.ProcessEnv = Object.fromEntries(Object.keys(process.env).map(key => [key, undefined]));
     const permitted = ["HOME", "USERPROFILE", "SystemRoot", "WINDIR", "PATH", "TMPDIR", "TEMP", "TMP", "LANG", "LC_ALL",
       "AMC_VAULT_PASSPHRASE", "AMC_VAULT_PASSPHRASE_FILE", "AMC_EXPECTED_MONITOR_FINGERPRINT", "AMC_CONTROL_CHECKPOINT_DIR"];

@@ -48,6 +48,15 @@ report, each line labelled `[synthetic]`. The `fs.write` call passes through the
 budgets and evidence log a real provider's call does. `npm run check:packed-install` runs this quickstart against the
 installed package and bin and records its wall time.
 
+## The runtime child's environment
+
+`AMCNativeClient` starts its `amc acp` child with `PATH`, `HOME`, user, shell, locale, temp and timezone variables, the
+parent's `AMC_*` settings (the vault passphrase, a monitor pin, `AMC_HOME`) and whatever you pass in `env`. Nothing else
+from your process is inherited, so a cloud token or a provider key in your environment does not reach the runtime by
+accident: pass the one it should use explicitly, for example `env: { OPENAI_API_KEY: process.env.OPENAI_API_KEY }`, or
+keep it in AMC's credential file. `inheritEnv: true` restores the earlier behaviour of merging your whole environment
+under `env`.
+
 ## How verification works
 
 `session.closeAndVerify()` closes the client, which ends the runtime child and seals its sessions, then runs a fresh

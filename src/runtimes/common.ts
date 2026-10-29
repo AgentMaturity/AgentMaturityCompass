@@ -3,6 +3,7 @@ import { createInterface } from "node:readline/promises";
 import { stdin as input, stdout as output } from "node:process";
 import { z } from "zod";
 import type { AMCConfig, RuntimeName } from "../types.js";
+import { stripAmcSecrets } from "../utils/providerKeys.js";
 
 export interface RuntimeCapabilities {
   supportsVersion: boolean;
@@ -131,6 +132,8 @@ export async function runHarnessWithRetries<T>(
 export function spawnCollect(command: string, args: string[], stdinPayload: string | null): Promise<{ code: number; stdout: string; stderr: string }> {
   return new Promise((resolve) => {
     const child = spawn(command, args, {
+      // The runtime under diagnosis may use its own provider key; it never gets AMC's secrets (WP36).
+      env: stripAmcSecrets(process.env),
       stdio: ["pipe", "pipe", "pipe"]
     });
 

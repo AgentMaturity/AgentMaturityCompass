@@ -27,8 +27,9 @@ On macOS, AMC confines the shell with Seatbelt (see
 the shell refused, and only then does an opt-in apply. An unconfined shell runs
 `/bin/sh` as you: it can read files outside the workspace, including `~/.ssh`,
 and it can reach the network. AMC's policy guards still evaluate each call and
-provider keys are stripped from its environment, but nothing confines the
-process. To accept that risk, use one of these opt-ins:
+the command gets an allow-listed environment (`PATH`, `HOME`, user, shell,
+terminal, temp, locale and timezone variables; no provider keys, `AMC_*`
+secrets or other tokens), but nothing confines the process. To accept that risk, use one of these opt-ins:
 
 - `--unsafe-unconfined-shell` on `amc agent-loop run`, `amc agent-loop chat` or
   `amc acp`.
@@ -279,6 +280,9 @@ amc sandbox run --agent salesbot \
 - agentId
 - image name/hash (best effort)
 - command and args
+- `envKeys`: the names of the variables passed into the container (never their values) and, for `amc adapters run --mode SANDBOX`, the `leaseId` of the lease among them
+
+The container receives only the variables named in `envKeys` plus the gateway route variables; values reach docker through its inherited environment, never its argv. `amc adapters run --mode SANDBOX` exits with the container's exit code.
 
 ## Network Behavior
 

@@ -12,6 +12,7 @@ import YAML from "yaml";
 import { z } from "zod";
 import { sha256Hex } from "../../utils/hash.js";
 import { canonicalize } from "../../utils/json.js";
+import { stripProviderKeys } from "../../utils/providerKeys.js";
 import { cachedFileSha256 } from "../pi/piInstall.js";
 import { inWorkspace, realLocation } from "../pi/piPaths.js";
 import { CLAUDE_HOOK_SCHEMAS } from "./claudeCodePayloads.js";
@@ -249,7 +250,7 @@ export function measureClaudeCode(binaryPath: string): ClaudeCodeInstall | null 
     const real = realpathSync(binaryPath);
     const sha256 = cachedFileSha256(real);
     const out = execFileSync(real, ["--version"], { encoding: "utf8", timeout: 10_000, stdio: ["ignore", "pipe", "ignore"],
-      env: { ...process.env, DISABLE_AUTOUPDATER: "1", CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC: "1" } });
+      env: { ...stripProviderKeys(process.env), DISABLE_AUTOUPDATER: "1", CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC: "1" } });
     const version = /^(\d+\.\d+\.\d+) \(Claude Code\)\s*$/.exec(out)?.[1];
     return sha256 && version ? { binaryPath: real, version, sha256 } : null;
   } catch {
