@@ -5,11 +5,16 @@ import { LocalCredentialsService } from "../credentials/localCredentialsService.
 import { AdapterRegistry } from "../llm/adapter/adapterRegistry.js";
 import { LlmRuntime } from "../llm/adapter/llmRuntime.js";
 import { amcVersion } from "../version.js";
+import { EMPTY_TOOL_SEAM } from "../agent/toolSeam.js";
+import { RUN_CODE_TOOL } from "../tools/toolPipeline.js";
 import type { LoopLlm, LoopRoute } from "../agent/stepRunner.js";
 import type { SessionService } from "../session/sessionService.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import type { ExecutorCaseView, TrialRunner } from "./trialExecutor.js";
+
+/** Label of the guard that confines a trial's tool calls to its case's allowed action classes. */
+export const CASE_SCOPE_GUARD = "experiment-case-scope";
 
 export interface NativeTrialRunnerOptions {
   readonly workspace: string;
@@ -42,6 +47,7 @@ export function nativeTrialRunner(options: NativeTrialRunnerOptions): TrialRunne
   const tools = options.tools ?? "workspace";
   return async ({ view, config, stamp, signal }) => {
     const configDigest = stamp.caseExecution.configDigest;
+    const allowed = new Set(view.allowedActionClasses);
     const session = openAgentSession({
       workspace: options.workspace,
       agentId: options.agentId,
@@ -54,7 +60,16 @@ export function nativeTrialRunner(options: NativeTrialRunnerOptions): TrialRunne
       policyDigest: sha256Hex(canonicalize({ surface: "experiment-trial", tools })),
       tools,
       ...(options.maxSteps === undefined ? {} : { maxSteps: options.maxSteps }),
-      rowStamp: stamp
+      rowStamp: stamp,
+      // The case's allowed action classes bound the toolset: other tools are hidden, and a guessed call is denied.
+      bindTools: ({ toolset }) => {
+        if (toolset === null) return EMPTY_TOOL_SEAM;
+        const outside = [...toolset.registry.visible(options.agentId).values()].filter((tool) => !allowed.has(tool.actionClass) && tool.name !== RUN_CODE_TOOL);
+        toolset.registry.restrict({ deny: new Set(outside.map((tool) => tool.name)) });
+        toolset.registry.guard(CASE_SCOPE_GUARD, (execution) => allowed.has(execution.actionClass) ? undefined
+          : `experiment case ${view.caseId} allows only ${[...allowed].join(", ")}; ${execution.actionClass} is outside its scope`);
+        return toolset.seam;
+      }
     });
     const cancel = (): void => { session.cancel({ kind: "hook", reason: "experiment trial aborted" }, "experiment-executor"); };
     signal.addEventListener("abort", cancel, { once: true });

@@ -3,7 +3,7 @@ import { resolveAgentId } from "../fleet/paths.js";
 import { casebookContentSha256, loadCasebook } from "../casebooks/casebookStore.js";
 import { sha256Hex } from "../utils/hash.js";
 import type { ExperimentExecution } from "../types.js";
-import { ExperimentInputError, loadExperiment, runExperimentAsync, verifySignedCandidateFile } from "./experimentRunner.js";
+import { ExperimentInputError, loadExperiment, runExperimentAsync, verifySignedCandidateFile, workspaceConfigFile } from "./experimentRunner.js";
 import { buildHoldoutPartition } from "./holdoutPartition.js";
 import { executeCaseTrials, type TrialBudgetHook, type TrialLimits, type TrialRunner } from "./trialExecutor.js";
 
@@ -26,11 +26,15 @@ function admittedArms(workspace: string, experiment: ReturnType<typeof loadExper
   if (!admission.valid || admission.digestSha256 !== candidateConfig.digestSha256) {
     throw new ExperimentInputError(`candidate artifact is no longer the admitted one: ${admission.reason ?? "digest changed after admission"}`);
   }
-  if (baselineConfig.kind !== "file" || !baselineConfig.path) throw new ExperimentInputError("executed trials require a pinned baseline configuration file");
-  const baselineDigest = sha256Hex(readFileSync(baselineConfig.path));
-  if (!baselineDigest.startsWith(baselineConfig.id)) throw new ExperimentInputError("baseline configuration changed after it was set");
-  return [{ side: "baseline" as const, configPath: baselineConfig.path, configDigest: baselineDigest },
-    { side: "candidate" as const, configPath: candidateConfig.path, configDigest: candidateConfig.digestSha256 }] as const;
+  // Both arms' bytes reach the trial (and its model provider): each must be a workspace file outside .amc, by full digest.
+  const candidatePath = workspaceConfigFile(workspace, candidateConfig.path);
+  if (baselineConfig.kind !== "file" || !baselineConfig.path || !baselineConfig.digestSha256) {
+    throw new ExperimentInputError("executed trials require a baseline configuration file pinned by its full digest (set it again with set-baseline)");
+  }
+  const baselinePath = workspaceConfigFile(workspace, baselineConfig.path);
+  if (sha256Hex(readFileSync(baselinePath)) !== baselineConfig.digestSha256) throw new ExperimentInputError("baseline configuration changed after it was set");
+  return [{ side: "baseline" as const, configPath: baselinePath, configDigest: baselineConfig.digestSha256 },
+    { side: "candidate" as const, configPath: candidatePath, configDigest: candidateConfig.digestSha256 }] as const;
 }
 
 /**
@@ -57,7 +61,7 @@ export async function runExecutedExperimentAsync(params: {
   const judgeIdentity = `casebook-validators:${casebookContentSha256(params.workspace, casebookId, agentId).slice(0, 16)}`;
   if (!params.trials.executorIdentity.trim() || params.trials.executorIdentity === judgeIdentity) throw new ExperimentInputError("the trial executor needs an identity distinct from the judge");
 
-  const executed = await executeCaseTrials({ workspace: params.workspace, agentId, casebookId, caseIds: heldOut, arms,
+  const executed = await executeCaseTrials({ workspace: params.workspace, agentId, casebookId, caseIds: heldOut, mode: params.mode, arms,
     runTrial: params.trials.runTrial, ...(params.trials.limits === undefined ? {} : { limits: params.trials.limits }),
     ...(params.trials.budget === undefined ? {} : { budget: params.trials.budget }) });
   const execution: ExperimentExecution = {

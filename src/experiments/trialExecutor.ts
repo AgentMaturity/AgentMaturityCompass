@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import { openLedger } from "../ledger/ledger.js";
 import { resolveAgentId } from "../fleet/paths.js";
 import { sha256Hex } from "../utils/hash.js";
+import { nativeShellReadiness } from "../sandbox/nativeShellGate.js";
 import { caseFileSha256, loadCase, loadCasebook, verifyCasebook } from "../casebooks/casebookStore.js";
 import type { CaseExecutionRef } from "../casebooks/casebookRunner.js";
 
@@ -39,6 +40,8 @@ export interface TrialRunInput {
   readonly config: Buffer;
   /** Fields to merge over every row the execution writes. */
   readonly stamp: { readonly agentId: string; readonly caseExecution: CaseExecutionRef };
+  /** The experiment mode; `sandbox` was admitted only with an enforced OS-confined shell backend. */
+  readonly mode: "supervise" | "sandbox";
   readonly signal: AbortSignal;
 }
 
@@ -137,7 +140,7 @@ async function runBounded(runner: TrialRunner, input: Omit<TrialRunInput, "signa
 /**
  * Run each arm over each case, bounded in executions, time per execution and concurrency.
  *
- * @throws before any execution when the casebook does not verify, a case is unknown, a configuration's bytes no longer
+ * @throws before any execution when sandbox mode has no enforced confinement backend, the casebook does not verify, a case is unknown, a configuration's bytes no longer
  * match its admitted digest, the plan exceeds its limits or the budget hook refuses it; and after the in-flight
  * executions settle when a configuration changes during the run (nothing from that run may be reported).
  */
@@ -146,6 +149,7 @@ export async function executeCaseTrials(params: {
   agentId?: string;
   casebookId: string;
   caseIds: readonly string[];
+  mode: "supervise" | "sandbox";
   arms: readonly [TrialArm, TrialArm];
   runTrial: TrialRunner;
   limits?: Partial<TrialLimits>;
@@ -153,6 +157,14 @@ export async function executeCaseTrials(params: {
 }): Promise<ExecutedTrials> {
   const agentId = resolveAgentId(params.workspace, params.agentId);
   const limits = resolveLimits(params.limits);
+  if (params.mode !== "supervise" && params.mode !== "sandbox") throw new Error(`invalid experiment mode '${String(params.mode)}'`);
+  if (params.mode === "sandbox") {
+    // The same check that decides whether the native shell is confined: sandbox trials need an enforced backend.
+    const shell = nativeShellReadiness(params.workspace);
+    if (shell.decision !== "confined" || shell.enforcement !== "enforced") {
+      throw new Error(`sandbox trials require an enforced OS-confined backend: ${shell.reason ?? "none is available"}`);
+    }
+  }
   const [baselineArm, candidateArm] = params.arms;
   if (baselineArm.side !== "baseline" || candidateArm.side !== "candidate") throw new Error("Trial arms are a baseline and a candidate, in that order.");
   const verified = verifyCasebook(params.workspace, params.casebookId, agentId);
@@ -182,7 +194,7 @@ export async function executeCaseTrials(params: {
     const sessionId = `${trialId}-${kase.view.caseId}`;
     writeTrialRow(params.workspace, sessionId, stamp, { phase: "started", side: arm.side }, false);
     const began = Date.now();
-    const result = await runBounded(params.runTrial, { view: kase.view, config: configs[armIndex]!, stamp }, limits.trialTimeoutMs);
+    const result = await runBounded(params.runTrial, { view: kase.view, config: configs[armIndex]!, stamp, mode: params.mode }, limits.trialTimeoutMs);
     const record: CaseExecutionRecord = { side: arm.side, trialId, caseId: kase.view.caseId, outcome: result.ok ? "completed" : "unavailable",
       reason: result.ok ? null : result.reason, durationMs: Date.now() - began };
     writeTrialRow(params.workspace, sessionId, stamp, { phase: "settled", side: arm.side, outcome: record.outcome, reason: record.reason, durationMs: record.durationMs }, true);

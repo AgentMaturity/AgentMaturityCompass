@@ -1,8 +1,17 @@
-import { mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, realpathSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import YAML from "yaml";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+
+/** Off: the real shell readiness check. On: no confinement backend, as on a machine without bwrap or seatbelt. */
+const noBackend = vi.hoisted(() => ({ on: false }));
+vi.mock("../src/sandbox/nativeShellGate.js", async (importOriginal) => {
+  const original = await importOriginal<typeof import("../src/sandbox/nativeShellGate.js")>();
+  return { ...original, nativeShellReadiness: (...args: Parameters<typeof original.nativeShellReadiness>) => noBackend.on
+    ? { offered: false, decision: "refused", enforcement: "none", boundary: null, reason: "no sandbox backend (test)", optInSource: null }
+    : original.nativeShellReadiness(...args) };
+});
 import { initWorkspace } from "../src/workspace.js";
 import { initBudgets } from "../src/budgets/budgets.js";
 import { initApprovalPolicy } from "../src/approvals/approvalPolicyEngine.js";
@@ -30,6 +39,7 @@ import { FixedCredentials, LOOP_MODEL, LOOP_PROVIDER, silentTransport, textStep,
 vi.setConfig({ testTimeout: 120_000 });
 const SENTINEL = "HELDOUT_SENTINEL_AUDIT";
 const READ_ARGS = JSON.stringify({ path: "workspace/n.txt" });
+const WRITE_ARGS = JSON.stringify({ path: "workspace/out.txt", content: "written" });
 const CASE_IDS = ["case_1", "case_2", "case_3", "case_4", "case_5", "case_6"];
 let ws: string;
 const bodies: string[] = [];
@@ -44,6 +54,7 @@ beforeEach(() => {
   mkdirSync(join(ws, "workspace"), { recursive: true });
   writeFileSync(join(ws, "workspace", "n.txt"), "fixture");
   bodies.length = 0;
+  noBackend.on = false;
 }, 120_000);
 afterEach(() => {
   vi.unstubAllEnvs();
@@ -61,7 +72,7 @@ function signAuditor(file: string): void {
 }
 
 /** Six signed cases that pass only when the agent actually reads the note; the forbidden audit is the held-out answer. */
-function writeCasebook(): void {
+function writeCasebook(allowedActionClasses: string[] = ["READ_ONLY"]): void {
   initCasebook(ws, "default", "book");
   const dir = join(ws, ".amc", "casebooks", "book");
   const index = YAML.parse(readFileSync(join(dir, "casebook.yaml"), "utf8")) as { casebook: { caseIds: string[] } };
@@ -71,7 +82,7 @@ function writeCasebook(): void {
   for (const caseId of CASE_IDS) {
     const file = join(dir, "cases", `${caseId}.json`);
     writeFileSync(file, JSON.stringify({ v: 1, caseId, title: `Case ${caseId}`, description: "read the note", riskTier: "low", requestedMode: "SIMULATE",
-      allowedActionClasses: ["READ_ONLY"], inputs: { prompt: `Report what workspace/n.txt says (${caseId}).` },
+      allowedActionClasses, inputs: { prompt: `Report what workspace/n.txt says (${caseId}).` },
       validators: { requiredToolActions: ["fs.read"], forbiddenAudits: [SENTINEL], minCorrelationRatio: 0, requireReceipts: true },
       scoring: { successPoints: 60, valuePoints: 100 } }));
     signConfig(file);
@@ -86,7 +97,8 @@ function fixtureRunner(): TrialRunner {
     envelope: (input) => { body = typeof input.body === "string" ? input.body : Buffer.from(input.body).toString("utf8"); bodies.push(body);
       return { url: `${input.baseUrl}/v1/messages`, method: "POST", headers: { ...input.extraHeaders }, body: input.body }; },
     decode: async function* decode() {
-      const script = body.includes("USE-TOOL") && !body.includes("tool_result") ? toolStep("read_1", "fs.read", READ_ARGS) : textStep("done");
+      const script = body.includes("tool_result") ? textStep("done") : body.includes("USE-TOOL") ? toolStep("read_1", "fs.read", READ_ARGS)
+        : body.includes("WRITE-NOTE") ? toolStep("write_1", "fs.write", WRITE_ARGS) : textStep("done");
       for (const chunk of script) yield chunk;
     }
   };
@@ -113,7 +125,7 @@ function experimentFixture(): { experimentId: string; candidateFile: string } {
 describe("executed baseline and candidate trials (GAP-WP04)", () => {
   test("an executed run yields bound held-out case results and a decided gate, not inconclusive", async () => {
     const { experimentId } = experimentFixture();
-    const { report } = await runExecutedExperimentAsync({ workspace: ws, agentId: "default", experimentId, mode: "sandbox",
+    const { report } = await runExecutedExperimentAsync({ workspace: ws, agentId: "default", experimentId, mode: "supervise",
       trials: { runTrial: fixtureRunner(), executorIdentity: `native:${LOOP_PROVIDER}/${LOOP_MODEL}` } });
     const execution = report.execution!;
     expect(execution.caseIds).toHaveLength(3);
@@ -146,7 +158,7 @@ describe("executed baseline and candidate trials (GAP-WP04)", () => {
     writeCasebook();
     const config = join(ws, "candidate.txt");
     writeFileSync(config, "USE-TOOL");
-    const executed = await executeCaseTrials({ workspace: ws, casebookId: "book", caseIds: ["case_1"], runTrial: fixtureRunner(),
+    const executed = await executeCaseTrials({ workspace: ws, casebookId: "book", caseIds: ["case_1"], mode: "supervise", runTrial: fixtureRunner(),
       arms: [{ side: "baseline", configPath: config, configDigest: sha256Hex(readFileSync(config)) }, { side: "candidate", configPath: config, configDigest: sha256Hex(readFileSync(config)) }] });
     const ledger = openLedger(ws);
     try {
@@ -162,13 +174,13 @@ describe("executed baseline and candidate trials (GAP-WP04)", () => {
     const calls: TrialRunInput[] = [];
     const recording: TrialRunner = async (input) => { calls.push(input); return { ok: true }; };
     writeFileSync(candidateFile, "USE-TOOL: a different candidate.");
-    await expect(runExecutedExperimentAsync({ workspace: ws, agentId: "default", experimentId, mode: "sandbox",
+    await expect(runExecutedExperimentAsync({ workspace: ws, agentId: "default", experimentId, mode: "supervise",
       trials: { runTrial: recording, executorIdentity: "native:fixture" } })).rejects.toThrow(ExperimentInputError);
     expect(calls).toHaveLength(0);
 
     const admitted = sha256Hex(readFileSync(candidateFile));
     const tampering: TrialRunner = async (input) => { calls.push(input); writeFileSync(candidateFile, "swapped mid-run"); return { ok: true }; };
-    await expect(executeCaseTrials({ workspace: ws, casebookId: "book", caseIds: ["case_1", "case_2"], runTrial: tampering,
+    await expect(executeCaseTrials({ workspace: ws, casebookId: "book", caseIds: ["case_1", "case_2"], mode: "supervise", runTrial: tampering,
       arms: [{ side: "baseline", configPath: join(ws, "baseline.txt"), configDigest: sha256Hex(readFileSync(join(ws, "baseline.txt"))) },
         { side: "candidate", configPath: candidateFile, configDigest: admitted }] })).rejects.toThrow(/changed after admission/);
     expect(calls.length).toBeLessThan(4);
@@ -178,7 +190,7 @@ describe("executed baseline and candidate trials (GAP-WP04)", () => {
     const { experimentId } = experimentFixture();
     const seen: TrialRunInput[] = [];
     const inner = fixtureRunner();
-    await runExecutedExperimentAsync({ workspace: ws, agentId: "default", experimentId, mode: "sandbox",
+    await runExecutedExperimentAsync({ workspace: ws, agentId: "default", experimentId, mode: "supervise",
       trials: { runTrial: async (input) => { seen.push(input); return await inner(input); }, executorIdentity: "native:fixture" } });
     expect(seen).toHaveLength(6);
     for (const input of seen) {
@@ -206,7 +218,7 @@ describe("executed baseline and candidate trials (GAP-WP04)", () => {
       if (calls === 2) return await new Promise<never>(() => undefined); // never settles
       return await inner(input);
     };
-    const executed = await executeCaseTrials({ workspace: ws, casebookId: "book", caseIds: ["case_1", "case_2", "case_3"], runTrial: flaky,
+    const executed = await executeCaseTrials({ workspace: ws, casebookId: "book", caseIds: ["case_1", "case_2", "case_3"], mode: "supervise", runTrial: flaky,
       limits: { trialTimeoutMs: 200 },
       arms: [{ side: "baseline", configPath: config, configDigest: digest }, { side: "candidate", configPath: config, configDigest: digest }] });
     expect(executed.executions.map((row) => row.outcome)).toEqual(["unavailable", "unavailable", "completed", "completed", "completed", "completed"]);
@@ -219,5 +231,92 @@ describe("executed baseline and candidate trials (GAP-WP04)", () => {
     expect(byId.get("case_1")!.reasons.join("; ")).toMatch(/trial execution did not complete: trial crashed: boom/);
     expect(byId.get("case_2")!.status).toBe("unavailable");
     expect(byId.get("case_3")!.status).toBe("passed");
+  });
+
+  test("a baseline outside the workspace, under .amc or reached through a symlink into .amc is refused at set-baseline", () => {
+    writeCasebook();
+    const { experimentId } = createExperiment({ workspace: ws, agentId: "default", name: "confined", casebookId: "book" });
+    const set = (path: string) => () => setExperimentBaseline({ workspace: ws, agentId: "default", experimentId, config: { path } });
+    const outside = realpathSync(mkdtempSync(join(tmpdir(), "amc-exec-outside-")));
+    try {
+      writeFileSync(join(outside, "baseline.txt"), "outside");
+      expect(set(join(outside, "baseline.txt"))).toThrow(ExperimentInputError);
+    } finally { rmSync(outside, { recursive: true, force: true }); }
+    const keyFile = join(ws, ".amc", "keys", readdirSync(join(ws, ".amc", "keys"))[0]!);
+    expect(existsSync(keyFile)).toBe(true);
+    expect(set(keyFile)).toThrow(ExperimentInputError);
+    symlinkSync(keyFile, join(ws, "innocent.txt"));
+    expect(set(join(ws, "innocent.txt"))).toThrow(ExperimentInputError);
+  });
+
+  test("executed trials refuse a baseline pinned only by its 12-character id prefix", async () => {
+    const { experimentId } = experimentFixture();
+    const file = join(ws, ".amc", "agents", "default", "experiments", experimentId, "experiment.yaml");
+    const path = existsSync(file) ? file : join(ws, ".amc", "experiments", experimentId, "experiment.yaml");
+    const doc = YAML.parse(readFileSync(path, "utf8")) as { experiment: { baselineConfig: { digestSha256?: string } } };
+    const full = doc.experiment.baselineConfig.digestSha256!;
+    const calls: TrialRunInput[] = [];
+    const run = () => runExecutedExperimentAsync({ workspace: ws, agentId: "default", experimentId, mode: "supervise",
+      trials: { runTrial: async (input) => { calls.push(input); return { ok: true }; }, executorIdentity: "native:fixture" } });
+    // A recorded digest that shares only the 12-character id prefix with the file is a mismatch.
+    doc.experiment.baselineConfig.digestSha256 = `${full.slice(0, 12)}${"0".repeat(52)}`;
+    writeFileSync(path, YAML.stringify(doc));
+    await expect(run()).rejects.toThrow(ExperimentInputError); // refused at admission, not after the executor starts
+    delete doc.experiment.baselineConfig.digestSha256; // a record written before full digests: only the id prefix remains
+    writeFileSync(path, YAML.stringify(doc));
+    await expect(run()).rejects.toThrow(/full digest/);
+    expect(calls).toHaveLength(0);
+  });
+
+  test("sandbox trials are refused before any execution when no confinement backend is enforced", async () => {
+    writeCasebook();
+    const config = join(ws, "candidate.txt");
+    writeFileSync(config, "USE-TOOL");
+    const digest = sha256Hex(readFileSync(config));
+    const calls: TrialRunInput[] = [];
+    noBackend.on = true;
+    await expect(executeCaseTrials({ workspace: ws, casebookId: "book", caseIds: ["case_1"], mode: "sandbox",
+      runTrial: async (input) => { calls.push(input); return { ok: true }; },
+      arms: [{ side: "baseline", configPath: config, configDigest: digest }, { side: "candidate", configPath: config, configDigest: digest }] }))
+      .rejects.toThrow(/sandbox trials require an enforced OS-confined backend/);
+    expect(calls).toHaveLength(0);
+  });
+
+  test("a READ_ONLY case's trial cannot call a write tool: it is not offered and a guessed call is denied", async () => {
+    writeCasebook();
+    const config = join(ws, "writer.txt");
+    writeFileSync(config, "WRITE-NOTE: write the answer to a file.");
+    const digest = sha256Hex(readFileSync(config));
+    await executeCaseTrials({ workspace: ws, casebookId: "book", caseIds: ["case_1"], mode: "supervise", runTrial: fixtureRunner(),
+      arms: [{ side: "baseline", configPath: config, configDigest: digest }, { side: "candidate", configPath: config, configDigest: digest }] });
+    expect(existsSync(join(ws, "workspace", "out.txt"))).toBe(false);
+    const offered = bodies.flatMap((body) => ((JSON.parse(body) as { tools?: { name: string }[] }).tools ?? []).map((tool) => tool.name));
+    expect(offered).toContain("fs.read");
+    expect(offered).not.toContain("fs.write"); // never offered to the model
+    const ledger = openLedger(ws);
+    try {
+      const denied = (ledger.db.prepare("SELECT meta_json FROM evidence_events WHERE event_type = 'audit'").all() as { meta_json: string }[])
+        .map((row) => JSON.parse(row.meta_json) as Record<string, unknown>)
+        .filter((meta) => meta.auditType === "TOOL_CALL_DENIED" && meta.toolName === "fs.write");
+      expect(denied.length).toBe(2);
+    } finally { ledger.close(); }
+  });
+
+  test("a trial's tools are confined to its case's action classes: an out-of-scope read is neither offered nor run", async () => {
+    writeCasebook(["WRITE_LOW"]);
+    const config = join(ws, "reader.txt");
+    writeFileSync(config, "USE-TOOL: read the named file before answering.");
+    const digest = sha256Hex(readFileSync(config));
+    await executeCaseTrials({ workspace: ws, casebookId: "book", caseIds: ["case_1"], mode: "supervise", runTrial: fixtureRunner(),
+      arms: [{ side: "baseline", configPath: config, configDigest: digest }, { side: "candidate", configPath: config, configDigest: digest }] });
+    const offered = bodies.flatMap((body) => ((JSON.parse(body) as { tools?: { name: string }[] }).tools ?? []).map((tool) => tool.name));
+    expect(offered).not.toContain("fs.read");
+    const ledger = openLedger(ws);
+    try {
+      const reads = (ledger.db.prepare("SELECT meta_json FROM evidence_events WHERE event_type = 'audit'").all() as { meta_json: string }[])
+        .map((row) => JSON.parse(row.meta_json) as Record<string, unknown>).filter((meta) => meta.toolName === "fs.read");
+      expect(reads.filter((meta) => meta.auditType === "TOOL_CALL_ALLOWED")).toEqual([]);
+      expect(reads.filter((meta) => meta.auditType === "TOOL_CALL_DENIED")).toHaveLength(2);
+    } finally { ledger.close(); }
   });
 });

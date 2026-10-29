@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
-import { readdirSync, readFileSync, statSync } from "node:fs";
-import { basename, join } from "node:path";
+import { readdirSync, readFileSync, realpathSync, statSync } from "node:fs";
+import { basename, join, resolve, sep } from "node:path";
 import YAML from "yaml";
 import type { ExperimentExecution, ExperimentReport } from "../types.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
@@ -196,6 +196,21 @@ export function createExperiment(params: {
   };
 }
 
+/**
+ * A configuration file an experiment may read and hand to a trial: a regular file inside the workspace, outside its
+ * `.amc` authority tree (keys, vault, signed policy), resolved through symlinks. Returns the real path.
+ */
+export function workspaceConfigFile(workspace: string, path: string): string {
+  let real: string, root: string;
+  try { root = realpathSync(workspace); real = realpathSync(resolve(workspace, path)); }
+  catch { throw new ExperimentInputError(`configuration file not found: ${path}`); }
+  const within = (dir: string) => real.startsWith(`${dir}${sep}`);
+  if (!within(root) || within(join(root, ".amc")) || !statSync(real).isFile()) {
+    throw new ExperimentInputError("a configuration file must be a regular file inside the workspace and outside .amc");
+  }
+  return real;
+}
+
 export function setExperimentBaseline(params: {
   workspace: string;
   agentId?: string;
@@ -205,7 +220,10 @@ export function setExperimentBaseline(params: {
   const agentId = resolveAgentId(params.workspace, params.agentId);
   const baselineConfig = params.config === "current"
     ? { id: "current", kind: "current" as const, path: null }
-    : { id: sha256Hex(readFileSync(params.config.path)).slice(0, 12), kind: "file" as const, path: params.config.path };
+    : (() => {
+      const path = workspaceConfigFile(params.workspace, params.config.path), digestSha256 = sha256Hex(readFileSync(path));
+      return { id: digestSha256.slice(0, 12), kind: "file" as const, path, digestSha256 };
+    })();
   return {
     path: updateExperiment(params.workspace, agentId, params.experimentId, (experiment) => { experiment.experiment.baselineConfig = baselineConfig; })
   };
