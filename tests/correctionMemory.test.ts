@@ -606,10 +606,45 @@ describe("buildLessonAdvisories", () => {
     makeSignedLesson(db, { lessonId: "lsn_life" });
     buildLessonAdvisories(db, "agent-1", undefined, lessonWorkspace());
     updateLessonPostInjectionRun(db, "lsn_life", "run-9", 0.2, false);
-    updateLessonStatus(db, "lsn_life", "STALE");
-    updateLessonStatus(db, "lsn_life", "ACTIVE");
+    updateLessonStatus(db, "lsn_life", "STALE", lessonWorkspace());
+    updateLessonStatus(db, "lsn_life", "ACTIVE", lessonWorkspace());
     expect(getLessonById(db, "lsn_life")!.injectionCount).toBe(1);
     expect(buildLessonAdvisories(db, "agent-1", undefined, lessonWorkspace()).map((a) => a.advisoryId)).toEqual(["lsn_life"]);
+    db.close();
+  });
+
+  test("a revoked lesson flipped back to ACTIVE in SQLite is not injected", () => {
+    const { db } = freshDb();
+    makeSignedLesson(db, { lessonId: "lsn_keep" });
+    makeSignedLesson(db, { lessonId: "lsn_revoked" });
+    updateLessonStatus(db, "lsn_revoked", "REVOKED", lessonWorkspace());
+    db.prepare("UPDATE correction_lessons SET status = 'ACTIVE' WHERE lesson_id = ?").run("lsn_revoked");
+    expect(buildLessonAdvisories(db, "agent-1", undefined, lessonWorkspace()).map((a) => a.advisoryId)).toEqual(["lsn_keep"]);
+    expect(verifyAgentLessons(db, "agent-1", lessonWorkspace()).problems)
+      .toEqual([{ lessonId: "lsn_revoked", reason: "lesson status does not match its signed transitions" }]);
+    db.close();
+  });
+
+  test("an unsigned re-activation, a forged transition or a removed transition keeps the lesson out", () => {
+    const { db } = freshDb();
+    const ws = lessonWorkspace();
+    makeSignedLesson(db, { lessonId: "lsn_unsigned" });
+    makeSignedLesson(db, { lessonId: "lsn_forged" });
+    makeSignedLesson(db, { lessonId: "lsn_gap" });
+    updateLessonStatus(db, "lsn_unsigned", "STALE", ws);
+    updateLessonStatus(db, "lsn_unsigned", "ACTIVE"); // no workspace: column only
+    updateLessonStatus(db, "lsn_forged", "REVOKED", ws);
+    db.prepare("UPDATE correction_lesson_status_log SET status = 'ACTIVE' WHERE lesson_id = ?").run("lsn_forged");
+    db.prepare("UPDATE correction_lessons SET status = 'ACTIVE' WHERE lesson_id = ?").run("lsn_forged");
+    updateLessonStatus(db, "lsn_gap", "REVOKED", ws);
+    updateLessonStatus(db, "lsn_gap", "ACTIVE", ws);
+    db.prepare("DELETE FROM correction_lesson_status_log WHERE lesson_id = ? AND status = 'REVOKED'").run("lsn_gap");
+    expect(buildLessonAdvisories(db, "agent-1", undefined, ws)).toEqual([]);
+    expect(Object.fromEntries(verifyAgentLessons(db, "agent-1", ws).problems.map((p) => [p.lessonId, p.reason]))).toEqual({
+      lsn_unsigned: "lesson status does not match its signed transitions",
+      lsn_forged: "lesson status transition does not verify",
+      lsn_gap: "lesson status transition does not verify",
+    });
     db.close();
   });
 

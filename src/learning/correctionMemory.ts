@@ -145,6 +145,20 @@ export function initLessonTables(db: Database.Database): void {
     CREATE INDEX IF NOT EXISTS idx_lessons_expiry ON correction_lessons(expiry_ts);
     CREATE INDEX IF NOT EXISTS idx_lessons_agent_status_expiry ON correction_lessons(agent_id, status, expiry_ts);
     CREATE INDEX IF NOT EXISTS idx_lessons_correction ON correction_lessons(correction_id);
+
+    CREATE TABLE IF NOT EXISTS correction_lesson_status_log (
+      seq INTEGER PRIMARY KEY AUTOINCREMENT,
+      agent_id TEXT NOT NULL,
+      lesson_id TEXT NOT NULL,
+      lesson_hash TEXT NOT NULL,
+      status TEXT NOT NULL,
+      ts INTEGER NOT NULL,
+      prev_entry_hash TEXT NOT NULL,
+      entry_hash TEXT NOT NULL,
+      signature TEXT NOT NULL
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_lesson_status_log_agent ON correction_lesson_status_log(agent_id, seq);
   `);
 }
 
@@ -267,6 +281,7 @@ export function verifyAgentLessons(db: Database.Database, agentId: string, works
     .all(agentId) as Array<Record<string, unknown>>;
   let keys: string[] = [];
   try { keys = getPurposeKeyHistory(workspace, "ledger-row"); } catch { keys = []; }
+  const statuses = verifiedLessonStatuses(db, agentId, keys);
   const verified: CorrectionLesson[] = [];
   const problems: LessonVerificationProblem[] = [];
   let previous = LESSON_GENESIS_HASH;
@@ -279,6 +294,8 @@ export function verifyAgentLessons(db: Database.Database, agentId: string, works
       if (lesson.prev_lesson_hash !== previous) reason = "lesson hash chain is broken";
       else if (lessonHash(lesson, lesson.prev_lesson_hash) !== stored) reason = "lesson content does not match its hash";
       else if (lesson.signature === "unsigned" || !verifyHexDigestAny(stored, lesson.signature, keys)) reason = "lesson signature does not verify";
+      else if (statuses.broken.has(lessonId)) reason = "lesson status transition does not verify";
+      else if (`${stored}:${lesson.status}` !== (statuses.status.get(lessonId) ?? `${stored}:ACTIVE`)) reason = "lesson status does not match its signed transitions";
       else verified.push(lesson);
     } catch {
       reason = "lesson record is unreadable";
@@ -296,12 +313,63 @@ export function getLastLessonHash(db: Database.Database, agentId: string): strin
   return row?.lesson_hash ?? LESSON_GENESIS_HASH;
 }
 
+const LESSON_STATUS_GENESIS_HASH = "GENESIS_LESSON_STATUS";
+
+function lessonStatusEntryHash(entry: { agentId: string; lessonId: string; lessonHash: string; status: string; ts: number; prev: string }): string {
+  return sha256Hex(canonicalize({ ...entry, kind: "correction-lesson-status" }));
+}
+
+/**
+ * Set a lesson's status. With `workspace`, the transition is also appended to the signed, chained status log that
+ * verifyAgentLessons reads; a lesson whose status column disagrees with its latest signed transition (creation counts
+ * as ACTIVE) is never injected. Without a workspace, or when no signing key is available, only the column changes,
+ * which leaves the lesson non-injectable: an unsigned change can retire a lesson but never re-activate one.
+ */
 export function updateLessonStatus(
   db: Database.Database,
   lessonId: string,
   status: LessonStatus,
+  workspace?: string,
 ): void {
   db.prepare("UPDATE correction_lessons SET status = ? WHERE lesson_id = ?").run(status, lessonId);
+  const lesson = workspace ? getLessonById(db, lessonId) : null;
+  if (!workspace || !lesson) return;
+  const last = db
+    .prepare("SELECT entry_hash FROM correction_lesson_status_log WHERE agent_id = ? ORDER BY seq DESC LIMIT 1")
+    .get(lesson.agentId) as { entry_hash: string } | undefined;
+  const entry = { agentId: lesson.agentId, lessonId, lessonHash: lesson.lesson_hash, status, ts: Date.now(),
+    prev: last?.entry_hash ?? LESSON_STATUS_GENESIS_HASH };
+  const entryHash = lessonStatusEntryHash(entry);
+  let signature: string;
+  try { signature = signHexDigest(entryHash, getSigningKey(workspace, "ledger-row")); }
+  catch { return; } // fail closed: the unsigned column change keeps the lesson out of injection
+  db.prepare(`INSERT INTO correction_lesson_status_log
+    (agent_id, lesson_id, lesson_hash, status, ts, prev_entry_hash, entry_hash, signature) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`)
+    .run(entry.agentId, lessonId, entry.lessonHash, status, entry.ts, entry.prev, entryHash, signature);
+}
+
+/**
+ * The latest signed status per lesson, and the lessons with a transition that fails its chain link or signature.
+ * ponytail: the log's newest entry has no external anchor, so deleting the tail entry is not detected; anchor the
+ * head in the transparency log if that matters.
+ */
+function verifiedLessonStatuses(db: Database.Database, agentId: string, keys: string[]): { status: Map<string, string>; broken: Set<string> } {
+  const rows = db
+    .prepare("SELECT * FROM correction_lesson_status_log WHERE agent_id = ? ORDER BY seq ASC")
+    .all(agentId) as Array<Record<string, unknown>>;
+  const status = new Map<string, string>();
+  const broken = new Set<string>();
+  let previous = LESSON_STATUS_GENESIS_HASH;
+  for (const row of rows) {
+    const entry = { agentId, lessonId: String(row.lesson_id), lessonHash: String(row.lesson_hash), status: String(row.status),
+      ts: Number(row.ts), prev: String(row.prev_entry_hash) };
+    const stored = String(row.entry_hash);
+    const valid = entry.prev === previous && lessonStatusEntryHash(entry) === stored && verifyHexDigestAny(stored, String(row.signature), keys);
+    if (valid) status.set(entry.lessonId, `${entry.lessonHash}:${entry.status}`);
+    else broken.add(entry.lessonId);
+    previous = stored;
+  }
+  return { status, broken };
 }
 
 export function updateLessonInjection(
@@ -516,14 +584,14 @@ export function buildLessonAdvisories(
 /**
  * Auto-expire lessons past their TTL.
  */
-export function expireStaleLessons(db: Database.Database, agentId: string): string[] {
+export function expireStaleLessons(db: Database.Database, agentId: string, workspace?: string): string[] {
   const now = Date.now();
   const active = getActiveLessons(db, agentId);
   const expired: string[] = [];
 
   for (const lesson of active) {
     if (lesson.expiryTs <= now) {
-      updateLessonStatus(db, lesson.lessonId, "STALE");
+      updateLessonStatus(db, lesson.lessonId, "STALE", workspace);
       expired.push(lesson.lessonId);
     }
   }

@@ -250,7 +250,7 @@ export async function handleMemoryRoute(
       try {
         const db = ledger.db;
         initLessonTables(db);
-        const expired = expireStaleLessons(db, agentId);
+        const expired = expireStaleLessons(db, agentId, workspace);
         apiSuccess(res, { agentId, expired, total: expired.length });
       } finally {
         ledger.close();

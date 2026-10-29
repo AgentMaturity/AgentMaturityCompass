@@ -13812,8 +13812,7 @@ experiment
       workspace: process.cwd(),
       agentId: opts.agent ?? activeAgent(program),
       experimentId: opts.experiment,
-      // The runner refuses any other mode before casebook work; it is never coerced.
-      mode: opts.mode as "supervise" | "sandbox", candidateWindow: opts.candidateWindow, candidateAgentId: opts.candidateAgent
+      mode: opts.mode as "supervise" | "sandbox", /* the runner refuses any other mode; never coerced */ candidateWindow: opts.candidateWindow, candidateAgentId: opts.candidateAgent
     });
     console.log(chalk.green(`Experiment run recorded: ${out.report.runId}`));
     console.log(`json=${out.jsonPath}`);
@@ -13851,13 +13850,8 @@ experiment
       experimentId: opts.experiment,
       policyPath
     });
-    if (out.status === "pass") {
-      console.log(chalk.green("Experiment gate PASSED"));
-    } else if (out.status === "inconclusive") {
-      console.log(chalk.yellow("Experiment gate INCONCLUSIVE"));
-    } else {
-      console.log(chalk.red("Experiment gate FAILED"));
-    }
+    const verdict = { pass: chalk.green("Experiment gate PASSED"), inconclusive: chalk.yellow("Experiment gate INCONCLUSIVE"), fail: chalk.red("Experiment gate FAILED") };
+    console.log(verdict[out.status]);
     console.log("Threshold checks:");
     for (const row of experimentGateComparisonRows(out.report, policy)) {
       console.log(row);
@@ -13937,9 +13931,7 @@ experiment
     for (const run of out.runs) {
       console.log(`${run.optimizerRunId} accepted=${run.acceptedCandidateId ?? "none"} status=${run.validationReceipt.status} metrics=estimated`);
     }
-    for (const problem of out.problems) {
-      console.error(chalk.red(`${problem.optimizerRunId} unreadable: ${problem.reason}`));
-    }
+    for (const problem of out.problems) console.error(chalk.red(`${problem.optimizerRunId} unreadable: ${problem.reason}`));
   });
 
 experiment
@@ -13963,8 +13955,7 @@ experiment
     console.log(`accepted=${out.acceptedCandidateId ?? "none"} (selected for probing on estimated metrics; no candidate was executed)`);
     for (const candidate of out.candidates) {
       const m = candidate.metrics;
-      console.log(`- ${candidate.candidateId}: ${candidate.decision} rank=${candidate.rank ?? "-"} pareto=${candidate.paretoFront} evaluation=${candidate.evaluationState} reason=${candidate.decisionReason}`);
-      console.log(`  estimated: scoreGain=${m.scoreGain} risk=${m.risk} cost=${m.cost} latencyMs=${m.latencyMs} confidence=${m.confidence}; observed: none`);
+      console.log(`- ${candidate.candidateId}: ${candidate.decision} rank=${candidate.rank ?? "-"} pareto=${candidate.paretoFront} evaluation=${candidate.evaluationState} reason=${candidate.decisionReason}\n  estimated: scoreGain=${m.scoreGain} risk=${m.risk} cost=${m.cost} latencyMs=${m.latencyMs} confidence=${m.confidence}; observed: none`);
     }
   });
 
@@ -16199,7 +16190,7 @@ program
     const db = ledger.db;
     initLessonTables(db);
     const agentId = opts.agent ?? activeAgent(program) ?? "default";
-    const expired = expireStaleLessons(db, agentId);
+    const expired = expireStaleLessons(db, agentId, process.cwd());
     ledger.close();
     if (expired.length === 0) {
       console.log("No stale lessons found.");
