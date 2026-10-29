@@ -85,11 +85,11 @@ export function faultTools(sor: FakeSystemOfRecord, faults: BodyFaults = {}): To
       const reply = dispatch(() => sor.pay(execution.idempotencyKey!, { amount: args.amount, currency: args.currency, recipient: args.payee },
         execution.executionId ?? null));
       if (reply.status === 409) throw new DefiniteFailureError("idempotency key reused with another body");
-      return { output: `paid ${reply.ref}`, effect: "applied", externalRef: reply.ref! };
+      return { ok: true, output: `paid ${reply.ref}`, effect: "applied", externalRef: reply.ref! };
     } }),
     defineTool({ name: DELETION_TOOL, actionClass: "DATA_EXPORT", description: "Delete a record.", body: (execution) => {
       const reply = dispatch(() => sor.deleteResource(String(execution.arguments.resourceId), execution.executionId ?? null));
-      return { output: `deleted ${reply.ref}`, effect: "applied", externalRef: reply.ref };
+      return { ok: true, output: `deleted ${reply.ref}`, effect: "applied", externalRef: reply.ref };
     } })
   ];
 }

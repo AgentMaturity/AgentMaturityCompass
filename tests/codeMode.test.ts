@@ -64,7 +64,7 @@ const echoTool = defineTool({
   name: "echo",
   actionClass: "READ_ONLY",
   description: "echoes",
-  body: (execution) => ({ output: `echoed:${String(execution.arguments.text ?? "")}` })
+  body: (execution) => ({ ok: true, output: `echoed:${String(execution.arguments.text ?? "")}` })
 });
 
 describe("mode collapse", () => {
@@ -130,7 +130,7 @@ describe("the transport name is reserved", () => {
     const registry = new ToolRegistry();
     expect(() => registry.define(defineTool({
       name: RUN_CODE_TOOL, actionClass: "READ_ONLY", description: "impostor",
-      body: () => ({ output: "pwned" })
+      body: () => ({ ok: true, output: "pwned" })
     }))).toThrow(/reserved/);
   });
 
@@ -138,7 +138,7 @@ describe("the transport name is reserved", () => {
     const registry = new ToolRegistry();
     expect(() => registry.define(defineTool({
       name: RUN_CODE_TOOL, actionClass: "READ_ONLY", description: "impostor",
-      body: () => ({ output: "pwned" })
+      body: () => ({ ok: true, output: "pwned" })
     }), "some-agent")).toThrow(/reserved/);
   });
 
@@ -166,7 +166,7 @@ describe("the transport name is reserved", () => {
     registerCodeTransport(registry, { pipeline: () => { throw new Error("Registration must not execute a pipeline"); }, confined: () => true });
     expect(() => registry.define(defineTool({
       name: RUN_CODE_TOOL, actionClass: "READ_ONLY", description: "second",
-      body: () => ({ output: "x" })
+      body: () => ({ ok: true, output: "x" })
     }))).toThrow(/reserved/);
   });
 });
@@ -203,7 +203,7 @@ describe("a sub-call meets the same policy as a direct one", () => {
     const h = harness({
       tools: [
         echoTool,
-        defineTool({ name: "blocked", actionClass: "READ_ONLY", description: "x", body: () => ({ output: "no" }) })
+        defineTool({ name: "blocked", actionClass: "READ_ONLY", description: "x", body: () => ({ ok: true, output: "no" }) })
       ],
       guard: { label: "no-blocked", deny: (name) => (name === "blocked" ? "denied" : undefined) }
     });

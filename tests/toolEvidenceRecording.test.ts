@@ -211,7 +211,7 @@ describe("recording never breaks the call", () => {
     const registry = new ToolRegistry();
     registry.define(defineTool({
       name: "echo", actionClass: "READ_ONLY", description: "echo",
-      body: () => ({ output: "real output" })
+      body: () => ({ ok: true, output: "real output" })
     }));
     let recorderCalled = false;
     const pipeline = new ToolPipeline({
@@ -332,11 +332,11 @@ it("keeps a real journaled effect when recording fails, signs the gap and refuse
     registry.define(defineTool({ name: financial, description: "Append to the owned effect file", actionClass: "FINANCIAL", body: execution => {
       financialCalls++;
       appendFileSync(effectPath, `${JSON.stringify({ callId: execution.callId, authorizationId: execution.authorization?.authorizationId })}\n`, { mode: 0o600 });
-      return { output: "real owned effect", effect: "applied", externalRef: "owned-effect-1" };
+      return { ok: true, output: "real owned effect", effect: "applied", externalRef: "owned-effect-1" };
     } }));
     registry.define(defineTool({ name: readOnly, description: "Read the owned effect file", actionClass: "READ_ONLY", body: () => {
       readCalls++;
-      return { output: readFileSync(effectPath, "utf8") };
+      return { ok: true, output: readFileSync(effectPath, "utf8") };
     } }));
     const pipeline = new ToolPipeline({ workspace, registry, journal: () => activeJournal,
       boundApprovalRequiredFor: new Set(["FINANCIAL"]), record(execution, outcome) {

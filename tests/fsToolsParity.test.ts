@@ -300,3 +300,16 @@ describe("diffs and evidence", () => {
     expect(h.audits().find(row => row.tool === "fs.edit")).not.toHaveProperty("fileChange");
   });
 });
+
+describe("the published schema states the bounds the body enforces (PXA-22)", () => {
+  it("declares fs.read maxBytes between 1 and 10,000,000 and refuses a larger one before reading", async () => {
+    const read = fsTools({ ledger: new ReadBeforeEditLedger() }).find(tool => tool.name === "fs.read")!;
+    expect((read.parameters as { properties: Record<string, unknown> }).properties.maxBytes)
+      .toMatchObject({ type: "integer", minimum: 1, maximum: 10_000_000 });
+    const h = harness();
+    h.put("f.txt", "x");
+    const outcome = await h.run("fs.read", { path: "f.txt", maxBytes: 10_000_001 });
+    expect(outcome.ok).toBe(false);
+    expect(outcome.output).toContain("/maxBytes must be <= 10000000");
+  });
+});

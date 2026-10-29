@@ -91,7 +91,7 @@ export function governanceFixture(plan: ActiveCompiledPolicy = planWithControl()
   const registry = new ToolRegistry();
   const bodies: ToolExecution[] = [];
   for (const name of [REFUND, TRANSFER]) registry.define(defineTool({ name, description: "Records the call in memory only", actionClass: "FINANCIAL",
-    body: (execution) => { bodies.push(execution); return { output: "fixture effect recorded", effect: "applied" }; } }));
+    body: (execution) => { bodies.push(execution); return { ok: true, output: "fixture effect recorded", effect: "applied" }; } }));
   registry.guard("compiled-policy", (execution) => compiledPolicyDenial(plan, workspace, execution));
   const pipeline = new ToolPipeline({ registry, workspace, authorizationContext: () => ({ sessionId, compiledPolicy: compiledPolicyFacts(plan) }),
     record: (execution, outcome) => {

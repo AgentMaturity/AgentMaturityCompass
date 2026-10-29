@@ -53,7 +53,7 @@ export function runCodeTool(deps: RunCodeToolDeps): ToolDefinition {
       const args = runCodeArgs.parse(execution.arguments);
 
       if (execution.effectiveMode === "SIMULATE") {
-        return { output: `SIMULATE ${RUN_CODE_TOOL}: ${args.source.length} characters, not executed` };
+        return { ok: true, output: `SIMULATE ${RUN_CODE_TOOL}: ${args.source.length} characters, not executed` };
       }
 
       const runner = new CodeModeRunner({
@@ -100,6 +100,7 @@ export function runCodeTool(deps: RunCodeToolDeps): ToolDefinition {
 
       const value = typeof result.value === "string" ? result.value : JSON.stringify(result.value);
       return {
+        ok: true,
         output: dispatched.length > 0 ? `${value}\ntool calls made:\n${dispatched}` : value
       };
     }

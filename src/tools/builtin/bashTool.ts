@@ -53,8 +53,8 @@ export function bashTool(deps: BashToolDeps = {}): ToolDefinition {
     parameters: {
       type: "object",
       properties: {
-        command: { type: "string", description: "the shell command" },
-        timeoutMs: { type: "integer", description: "milliseconds before the process tree is killed" }
+        command: { type: "string", minLength: 1, description: "the shell command" },
+        timeoutMs: { type: "integer", minimum: 1, maximum: 600_000, description: "milliseconds before the process tree is killed" }
       },
       required: ["command"]
     },
@@ -64,7 +64,7 @@ export function bashTool(deps: BashToolDeps = {}): ToolDefinition {
       if (!parsed.success) throw new DefiniteFailureError(parsed.error.message, { cause: parsed.error });
       const args = parsed.data;
       if (execution.effectiveMode === "SIMULATE") {
-        return { output: `SIMULATE bash: ${args.command}`, exitCode: null };
+        return { ok: true, output: `SIMULATE bash: ${args.command}`, exitCode: null };
       }
 
       if (deps.runConfined) {
@@ -73,6 +73,7 @@ export function bashTool(deps: BashToolDeps = {}): ToolDefinition {
         if (outcome.droppedBytes) sections.push(`[amc: ${outcome.droppedBytes} bytes of output not shown]`);
         if (outcome.timedOut) sections.push(`[amc: killed after ${args.timeoutMs}ms]`);
         if (outcome.cancelled) sections.push("[amc: shell cancelled]");
+        if (outcome.exitCode !== 0) sections.push(`[amc: exit ${outcome.exitCode ?? "unknown"}]`);
         // No trustworthy command exit exists on refusal, cancellation or
         // incomplete cleanup. Proven command exits retain their orthogonal
         // exit/timeout facts; ok:false keeps nonzero exits on the failure path.
@@ -107,16 +108,21 @@ export function bashTool(deps: BashToolDeps = {}): ToolDefinition {
       if (dropped > 0) {
         sections.push(`[amc: ${dropped} bytes of output not shown; the cap is ${MAX_OUTPUT_BYTES} per stream]`);
       }
-      if (outcome.terminatedBy === "timeout") {
+      const timedOut = outcome.terminatedBy === "timeout";
+      if (timedOut) {
         sections.push(`[amc: killed after ${args.timeoutMs}ms]`);
       }
+      // The status reaches the model in the text too, not only in the error flag.
+      if (outcome.exitCode !== 0) sections.push(`[amc: exit ${outcome.exitCode ?? "unknown"}]`);
 
       return {
+        // A nonzero, unknown or timed-out exit is a failed call, as on the confined path (DXC-02, PXA-02).
+        ok: outcome.exitCode === 0 && !timedOut,
         output: sections.join("\n"),
         // Orthogonal, as everywhere else: a killed process reports the timeout
         // AND whatever status the kernel gave it.
         exitCode: outcome.exitCode,
-        timedOut: outcome.terminatedBy === "timeout"
+        timedOut
       };
     }
   });

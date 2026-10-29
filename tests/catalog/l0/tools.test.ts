@@ -54,7 +54,7 @@ async function run(f: L0Fixture, ws: string, guardLabel: string, guard: ReturnTy
   let bodyRuns = 0;
   const registry = new ToolRegistry();
   registry.define(defineTool({ name: tool.name, actionClass: tool.actionClass, description: "fixture tool",
-    body: () => { bodyRuns += 1; return { output: "ran", effect: "applied" }; } }));
+    body: () => { bodyRuns += 1; return { ok: true, output: "ran", effect: "applied" }; } }));
   registry.guard(guardLabel, guard);
   let journal: ActionJournal | undefined;
   const records: ReturnType<typeof toolEvidenceFor> = [];

@@ -137,7 +137,7 @@ export function delegateTool(capability: SubagentCapability): ToolDefinition {
     body: async (execution: ToolExecution) => {
       const parsed = readArgs(execution.arguments);
       if (!parsed.ok) {
-        return { output: `[amc] delegation refused: ${parsed.detail}` };
+        return { ok: false, output: `[amc] delegation refused: ${parsed.detail}` };
       }
 
       const outcome = await spawnSubagent({
@@ -163,12 +163,12 @@ export function delegateTool(capability: SubagentCapability): ToolDefinition {
       if (!outcome.ok) {
         // The runtime's account, alone. Nothing the child said is mixed in,
         // because on this path the child said nothing.
-        return { output: `[amc] delegation refused: ${outcome.reason}` };
+        return { ok: false, output: `[amc] delegation refused: ${outcome.reason}` };
       }
 
       // The child's own words, alone. The runtime's account of this delegation
       // is in the `agent_delegation_completed` row, not in front of the model.
-      return { output: outcome.childText };
+      return { ok: true, output: outcome.childText };
     }
   });
 }

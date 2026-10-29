@@ -137,7 +137,7 @@ function fixture(options: { bindingFields?: boolean; mode?: "native" | "code" } 
       bodies.push(execution);
       appendFileSync(effectPath, `${JSON.stringify({ callId: execution.callId, arguments: execution.arguments,
         authorizationId: execution.authorization?.authorizationId, digest: execution.authorization?.digest })}\n`, { mode: 0o600 });
-      return { output: "owned effect recorded", effect: "applied" };
+      return { ok: true, output: "owned effect recorded", effect: "applied" };
     }
   }));
   let result: Fixture;

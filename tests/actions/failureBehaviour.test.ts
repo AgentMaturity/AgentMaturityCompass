@@ -102,7 +102,7 @@ function fixture(options: {
   let f: Fixture;
   registry.define(defineTool({ name: "fs.read", actionClass: "READ_ONLY", description: "Read the owned effect log", body: () => {
     f.reads += 1;
-    return { output: readFileSync(oracleFile, "utf8") };
+    return { ok: true, output: readFileSync(oracleFile, "utf8") };
   } }));
   const sessionId = `p103-session-${randomUUID()}`;
   const pipeline = new ToolPipeline({ registry, workspace, journal: () => f.journal,
@@ -212,7 +212,7 @@ describe("P1-03 failure row 1: admission must be durable before dispatch", () =>
         authorizationDigest: execution.authorization?.digest, callId: execution.callId, owner: { pid: process.pid } });
       expect(chain(f, execution.executionId!).map(row => row.state)).toEqual(["requested", "authorized", "started"]);
       const effect = f.sor.deleteResource("durable-before-effect", execution.executionId!);
-      return { output: effect.ref, effect: "applied", externalRef: effect.ref };
+      return { ok: true, output: effect.ref, effect: "applied", externalRef: effect.ref };
     } });
     const result = await execute(f, CUSTOM);
     expect(result.ok).toBe(true);
@@ -329,10 +329,10 @@ describe("P1-03 effect classification", () => {
   ] as const)("$label", async row => {
     const f = fixture({ actionClass: row.actionClass, body: (execution, sor) => {
       if (row.kind === "definite") throw new DefiniteFailureError("owned adapter proved no request left");
-      if (row.kind === "not_applied") return { output: "not sent", effect: "not_applied" };
+      if (row.kind === "not_applied") return { ok: true, output: "not sent", effect: "not_applied" };
       const effect = sor.deleteResource(String(execution.arguments.resourceId), execution.executionId!);
       if (row.kind === "ambiguous") throw new Error("owned adapter lost the acknowledgement");
-      return { output: effect.ref, ...(row.kind === "undeclared" ? {} : { effect: row.kind }), externalRef: effect.ref };
+      return { ok: true, output: effect.ref, ...(row.kind === "undeclared" ? {} : { effect: row.kind }), externalRef: effect.ref };
     } });
     const result = await execute(f, CUSTOM);
     expect(result.denied).toBeNull();
@@ -370,7 +370,7 @@ describe("P1-03 the actual loop seam reports the receipt after cancellation", ()
       const effect = sor.deleteResource("owned-late-abort", execution.executionId!);
       controller.abort();
       if (ambiguous) throw new Error("acknowledgement lost after abort");
-      return { output: effect.ref, effect: "applied" };
+      return { ok: true, output: effect.ref, effect: "applied" };
     } });
     const seam = pipelineToolSeam({ registry: f.registry, pipeline: f.pipeline, agentId: "default" });
     const result = await seam.execute(seamRequest(f, CUSTOM, controller));
@@ -499,7 +499,7 @@ describe("P1-03 failure row 7: the real loop records its final provider failure"
       parameters: { type: "object", properties: { resourceId: { type: "string" } }, required: ["resourceId"], additionalProperties: false },
       body: execution => {
         const effect = f.sor.deleteResource(String(execution.arguments.resourceId), execution.executionId!);
-        return { output: effect.ref, effect: "applied", externalRef: effect.ref };
+        return { ok: true, output: effect.ref, effect: "applied", externalRef: effect.ref };
       } }));
     const store = openSessionEventStore(f.workspace, "sqlite");
     let storeClosed = false;
@@ -586,7 +586,7 @@ describe("P1-03 failure row 8: actual exporter rejection preserves the journaled
       const effect = f.sor.deleteResource(`owned-exporter-${flushes.length}`, execution.executionId!);
       withWorkspaceScope(f.workspace, () => exporter.recordEvidenceEvent(event!));
       flushes.push(await exporter.flush());
-      return { output: effect.ref, effect: "applied", externalRef: effect.ref };
+      return { ok: true, output: effect.ref, effect: "applied", externalRef: effect.ref };
     } });
     let clock = Date.now();
     const firstTs = clock;

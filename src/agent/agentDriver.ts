@@ -54,6 +54,7 @@ import { DEFAULT_RETRY_RUNTIME } from "./requestRetry.js";
 import {
   DEFAULT_AGENT_LOOP_CONFIG,
   NO_HOOKS,
+  isolatedNotify,
   toTurnEndParams,
   type AgentLoopConfig,
   type AgentStatus,
@@ -132,7 +133,10 @@ export class AgentDriver {
   constructor(init: AgentDriverInit) {
     this.session = init.session;
     this.validation = init.validation === undefined ? undefined : freezeNativeValidationPlan(init.validation);
-    this.hooks = init.hooks ?? NO_HOOKS;
+    const hooks = init.hooks ?? NO_HOOKS;
+    // Wrapped once, here: every notify site below is an observer that cannot affect the evidence (DXA-16).
+    this.hooks = { preStep: (input, next) => hooks.preStep(input, next), turnStopping: (input) => hooks.turnStopping(input),
+      notify: isolatedNotify((notification) => hooks.notify(notification)) };
     const compaction = init.config?.compaction === undefined ? undefined : resolveCompactionConfig(init.config.compaction);
     this.config = { ...DEFAULT_AGENT_LOOP_CONFIG, ...init.config, ...(compaction === undefined ? {} : { compaction }) };
     this.inbox = new LoopInbox(init.session, (notification) => {

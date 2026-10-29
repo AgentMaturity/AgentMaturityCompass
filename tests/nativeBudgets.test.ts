@@ -61,7 +61,7 @@ function limits(edit: (config: ReturnType<typeof loadBudgetsConfig>) => void) {
 function pipeline(value: SessionService, record = true) {
   let executed = 0;
   const registry = new ToolRegistry();
-  registry.define(defineTool({ name: "read", actionClass: "READ_ONLY", description: "fixture read", body: () => { executed++; return { output: "read" }; } }));
+  registry.define(defineTool({ name: "read", actionClass: "READ_ONLY", description: "fixture read", body: () => { executed++; return { ok: true, output: "read" }; } }));
   registry.define(defineTool({ name: "failed", actionClass: "WRITE_LOW", description: "fixture failure", body: () => { executed++; throw new Error("body failed"); } }));
   registry.guard("budgets", budgetGuard(workspace, value.sessionId));
   registry.guard("fixture-deny", execution => execution.arguments.deny ? "fixture denied" : undefined);

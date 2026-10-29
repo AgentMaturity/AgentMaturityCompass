@@ -34,7 +34,7 @@ async function admissionFixture(options: { lifecycleControl: boolean; suspend: b
   active.plan = options.lifecycleControl ? { digest: `sha256:${"5".repeat(64)}`, requirements: [{ controlId: "L0-CHG-01", applicability: "applicable", mandatory: true }],
     evidencePlan: { tests: [], evidenceRequests: [], manualDuties: [], releaseGates: [] } } : null;
   f.registry.define(defineTool({ name: READ, description: "Reads nothing; records the call in memory", actionClass: "READ_ONLY",
-    body: (execution) => { f.bodies.push(execution); return { output: "read", effect: "not_applied" }; } }));
+    body: (execution) => { f.bodies.push(execution); return { ok: true, output: "read", effect: "not_applied" }; } }));
   if (options.proposedOnly) transitionAgent({ workspace: f.workspace, agentId: AGENT, to: "proposed", actor: ownerActor(f.workspace) });
   else await activate(f.workspace, ownerActor(f.workspace));
   if (options.suspend) suspendAgent(f.workspace, { agentId: AGENT, reason: "manual", actor: ownerActor(f.workspace, "second-owner") });

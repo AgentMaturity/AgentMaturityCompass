@@ -81,7 +81,7 @@ describe("the pipeline's authorization stage", () => {
   function pipeline(effects: string[]) {
     const registry = new ToolRegistry();
     for (const [name, actionClass] of [["fixture.read", "READ_ONLY"], ["fixture.write", "WRITE_LOW"]] as const) {
-      registry.define(defineTool({ name, description: "fixture", actionClass, body: () => { effects.push(name); return { output: name }; } }));
+      registry.define(defineTool({ name, description: "fixture", actionClass, body: () => { effects.push(name); return { ok: true, output: name }; } }));
     }
     return new ToolPipeline({ registry, workspace });
   }

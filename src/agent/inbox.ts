@@ -28,7 +28,7 @@ import { resolveSpilledInboxPayload } from "../session/spill/spillInput.js";
 import { readLoopInboxMeta } from "../session/loopEventMeta.js";
 import type { InboxOrigin, InboxSpliceOp, InboxTarget, LoopInboxMeta } from "../session/loopEventMeta.js";
 import type { SessionService } from "../session/sessionService.js";
-import type { InboxMessage, InboxReceipt, LoopNotification } from "./loopTypes.js";
+import { isolatedNotify, type InboxMessage, type InboxReceipt, type LoopNotification } from "./loopTypes.js";
 import { decodeNativeImageInput, encodeNativeImageInput, NATIVE_IMAGE_INPUT_FORMAT, snapshotNativeImages, type NativeImageInput } from "../attachments/nativeImageInput.js";
 import { sha256Hex } from "../utils/hash.js";
 import { decodeNativeOrderedInput, encodeNativeOrderedInput, NATIVE_ORDERED_INPUT_FORMAT,
@@ -58,7 +58,7 @@ export class LoopInbox {
 
   constructor(session: SessionService, notify: (notification: LoopNotification) => void) {
     this.session = session;
-    this.notify = notify;
+    this.notify = isolatedNotify(notify);
     this.replay();
   }
 

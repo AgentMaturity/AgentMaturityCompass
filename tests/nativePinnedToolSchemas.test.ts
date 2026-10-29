@@ -55,7 +55,7 @@ function fixture(options: { pinned?: boolean; code?: boolean; extension?: boolea
   cleanups.push(() => tools.close());
   if (options.extension) tools.registry.define({ name: extension.name, actionClass: extension.actionClass,
     description: "Explicit synthetic extension; no remote transport is started",
-    parameters: { type: "object", properties: {} }, body: () => ({ output: "extension fixture" }) });
+    parameters: { type: "object", properties: {} }, body: () => ({ ok: true, output: "extension fixture" }) });
   const prepare = vi.fn((_spec: Parameters<LoopLlm["prepare"]>[0]) => { throw new Error("Unexpected model preparation in refusal fixture"); });
   const step = (signal = new AbortController().signal) => runStep({ session, tools: tools.seam, llm: { prepare },
     route: { providerId: "schema-fixture", model: "schema-fixture", params: {} }, systemPromptEventId,
@@ -142,7 +142,8 @@ test("an already cancelled native step remains cancelled before schema admission
 // old session from those recorded bytes. Changing a native fs schema therefore changes every new request's
 // `toolSchemaSha256` without touching any policy pin, so this digest makes that change a reviewed test change.
 // P1-36: fs.read gained `offset`/`limit`; fs.edit gained `replaceAll` and `edits`, and `required` is now `["path"]`.
-const FS_TOOL_SCHEMAS_SHA256 = "7507bbeaefaf87cbf0d4c901cdcd8a9ec97cb79c9846e5bb23902fbb7765bb65";
+// WP33 (PXA-22): fs.read `maxBytes` states the body's bounds (minimum 1, maximum 10,000,000), now enforced before approval.
+const FS_TOOL_SCHEMAS_SHA256 = "14375c373669587d83fa227346f65fc18dd5a9f37935ec30674612f1d7f7e57c";
 const edit: ToolDefinition = { name: "fs.edit", actionClass: "WRITE_LOW", allow: { paths: ["./workspace/**"] } };
 
 test("the offered fs tool schemas are pinned by digest and keep one top-level path argument (P1-36)", () => {

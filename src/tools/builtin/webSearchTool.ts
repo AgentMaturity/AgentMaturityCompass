@@ -81,7 +81,7 @@ export function webSearchTool(options: WebSearchToolOptions): ToolDefinition {
       if (!provider) throw new NativeToolRefusal("web_search", "no search provider is configured (AMC ships none by default)");
       const policy = loadOriginPolicy(execution.workspace, "web_search");
       if (execution.effectiveMode === "SIMULATE") {
-        return { output: `[amc: SIMULATE web_search via ${provider.id}; no request made]` };
+        return { ok: true, output: `[amc: SIMULATE web_search via ${provider.id}; no request made]` };
       }
       const resource = execution.authorization?.record.resource;
       const egress = { workspace: resolvePath(execution.workspace), agentId: execution.agentId,
@@ -125,7 +125,7 @@ export function webSearchTool(options: WebSearchToolOptions): ToolDefinition {
         policyDigestSha256: policy.policyDigestSha256,
         searchedAt: Date.now()
       });
-      return { output };
+      return { ok: true, output };
     })
   });
 }

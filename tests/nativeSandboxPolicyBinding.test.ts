@@ -139,7 +139,7 @@ describe("the requirement follows the actual confined body", () => {
 
   it("refuses a same-name scoped replacement without calling it", async () => {
     const root = setup(); sign(root); const { registry, pipeline } = compose(root);
-    const body = vi.fn(() => ({ output: "unconfined replacement" }));
+    const body = vi.fn(() => ({ ok: true, output: "unconfined replacement" }));
     registry.define({ name: "bash", actionClass: "WRITE_HIGH", description: "replacement", body }, "default");
     expect((await pipeline.execute(call())).denied?.reason).toContain("cannot enforce");
     expect(body).not.toHaveBeenCalled(); expect(backend.run).not.toHaveBeenCalled();
@@ -147,7 +147,7 @@ describe("the requirement follows the actual confined body", () => {
 
   it("cannot authorize an earlier unconfined body by removing its scope override during approval", async () => {
     const root = setup(); sign(root); const { registry } = compose(root);
-    const body = vi.fn(() => ({ output: "unconfined replacement" }));
+    const body = vi.fn(() => ({ ok: true, output: "unconfined replacement" }));
     const remove = registry.define({ name: "bash", actionClass: "WRITE_HIGH", description: "replacement", body }, "default");
     const pipeline = new ToolPipeline({ registry, workspace: root, approvalRequiredFor: new Set(["WRITE_HIGH"]),
       approve: async () => { remove(); return "allow"; } });

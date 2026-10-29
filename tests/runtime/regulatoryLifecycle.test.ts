@@ -109,7 +109,7 @@ describe("kill switch and lifecycle", () => {
     mode, reason: "incident drill", incidentId: "inc-1" });
   const lowWrite = async (): Promise<unknown> => {
     const registry = new ToolRegistry();
-    registry.define(defineTool({ name: "fixture.write", description: "fixture", actionClass: "WRITE_LOW", body: () => ({ output: "written" }) }));
+    registry.define(defineTool({ name: "fixture.write", description: "fixture", actionClass: "WRITE_LOW", body: () => ({ ok: true, output: "written" }) }));
     return (await new ToolPipeline({ registry, workspace: f.workspace }).execute({ name: "fixture.write", agentId: AGENT, arguments: {}, requestedMode: "EXECUTE" })).denied;
   };
 

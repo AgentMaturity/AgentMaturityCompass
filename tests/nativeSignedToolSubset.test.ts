@@ -103,7 +103,7 @@ test("schema projection and dispatch reject live revocation, class changes and i
 test("late delegation/workflow registrations remain signed per tool and code transport stays reserved", () => {
   const f = fixture([read, { name: "delegate", actionClass: "READ_ONLY" }], "code");
   const define = (name: string) => f.tools.registry.define({ name, actionClass: "READ_ONLY", description: "Synthetic registered capability",
-    parameters: { type: "object", properties: {} }, body: () => ({ output: "fixture" }) });
+    parameters: { type: "object", properties: {} }, body: () => ({ ok: true, output: "fixture" }) });
   define("delegate"); define("workflow");
   expect(f.names()).toEqual(["delegate", "fs.read", "run_code"]);
   f.config.tools.allowedTools.push({ name: "workflow", actionClass: "READ_ONLY" }); initToolsConfig(f.workspace, f.config);

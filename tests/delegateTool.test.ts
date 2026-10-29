@@ -191,6 +191,7 @@ describe("depth is read from the identity, not from agentId", () => {
 
     expect(String(outcome.content)).toContain("delegation refused");
     expect(String(outcome.content)).toContain("exceeds maxDepth");
+    expect(outcome.outcome, "a refused delegation is a failed call (DXC-14)").toBe("ERROR");
     expect(spy.seen, "the child never ran").toHaveLength(0);
     expect(session.rows, "and nothing was announced").toEqual([]);
     toolset.close();
@@ -265,6 +266,7 @@ describe("the model's arguments are not trusted", () => {
     const outcome = await toolset.seam.execute(call({ runAs: "researcher", goal: "   " }));
 
     expect(String(outcome.content)).toContain("goal must be a non-empty string");
+    expect(outcome.outcome, "a refused delegation is a failed call (DXC-14)").toBe("ERROR");
     expect(spy.seen).toHaveLength(0);
     expect(session.rows).toEqual([]);
     toolset.close();
@@ -283,7 +285,9 @@ describe("the model's arguments are not trusted", () => {
 
     const outcome = await toolset.seam.execute(call({ goal: "do a thing" }));
 
-    expect(String(outcome.content)).toContain("runAs must be a non-empty string");
+    // Refused by the published schema before the body runs (PXA-22), and recorded as a failed call.
+    expect(String(outcome.content)).toContain("must have required property 'runAs'");
+    expect(outcome.outcome).toBe("ERROR");
     expect(spy.seen).toHaveLength(0);
     toolset.close();
   });

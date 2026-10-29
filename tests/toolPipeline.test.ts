@@ -19,7 +19,7 @@ function echoTool(overrides: Partial<Parameters<typeof defineTool>[0]> = {}) {
     name: "echo",
     actionClass: "READ_ONLY",
     description: "returns its argument",
-    body: (execution) => ({ output: String(execution.arguments.text ?? "") }),
+    body: (execution) => ({ ok: true, output: String(execution.arguments.text ?? "") }),
     ...overrides
   });
 }
@@ -102,7 +102,7 @@ describe("a call traverses the full pipeline", () => {
     let bodies = 0;
     let failing = true;
     const registry = new ToolRegistry();
-    registry.define(echoTool({ body: () => { bodies += 1; return { output: "ran" }; } }));
+    registry.define(echoTool({ body: () => { bodies += 1; return { ok: true, output: "ran" }; } }));
     const recorded: string[] = [];
     const pipeline = new ToolPipeline({ registry, workspace: WORKSPACE, record: (execution, outcome) => {
       if (failing) throw new Error("ledger down");
@@ -226,7 +226,7 @@ describe("outcome fields are orthogonal", () => {
       name: "slow",
       actionClass: "READ_ONLY",
       description: "times out",
-      body: () => ({ output: "partial", exitCode: 143, timedOut: true })
+      body: () => ({ ok: false, output: "partial", exitCode: 143, timedOut: true })
     }));
     const pipeline = new ToolPipeline({ registry, workspace: WORKSPACE });
 
@@ -277,7 +277,7 @@ describe("arguments are frozen", () => {
       name: "echo", actionClass: "READ_ONLY", description: "echo",
       body: (execution) => {
         seenByBody = String(execution.arguments.path ?? "");
-        return { output: seenByBody };
+        return { ok: true, output: seenByBody };
       }
     }));
 
@@ -322,7 +322,7 @@ describe("arguments are frozen", () => {
       name: "peek", actionClass: "READ_ONLY", description: "peek",
       body: (execution) => {
         nestedFrozen = Object.isFrozen((execution.arguments as { nested: unknown }).nested);
-        return { output: "" };
+        return { ok: true, output: "" };
       }
     }));
     const pipeline = new ToolPipeline({ registry, workspace: WORKSPACE });
@@ -384,5 +384,53 @@ describe("restrictions narrow, never widen", () => {
     registry.restrict({ allow: new Set(["echo", "write"]) }, "greedy");
 
     expect([...registry.visible("greedy").keys()]).toEqual(["echo"]);
+  });
+});
+
+describe("a body's result is never success by default (DXC-02)", () => {
+  it("records a body that omits ok as a failed call", async () => {
+    const registry = new ToolRegistry();
+    registry.define(defineTool({
+      name: "silent", actionClass: "READ_ONLY", description: "omits ok",
+      // An untyped body (a plugin, a JS adapter) can still omit it.
+      body: (() => ({ output: "looks fine" })) as unknown as Parameters<typeof defineTool>[0]["body"]
+    }));
+    const pipeline = new ToolPipeline({ registry, workspace: WORKSPACE });
+    const outcome = await pipeline.execute({ name: "silent", agentId: "a", arguments: {}, requestedMode: "EXECUTE" });
+    expect(outcome.ok).toBe(false);
+    expect(outcome.denied).toBeNull();
+    expect(outcome.output).toContain("returned no ok status");
+  });
+});
+
+describe("arguments are validated against the published schema before anything is spent (PXA-22)", () => {
+  const strictTool = (body: () => void) => defineTool({
+    name: "deploy", actionClass: "WRITE_HIGH", description: "schema-checked",
+    parameters: { type: "object", properties: { target: { type: "string" } }, required: ["target"], additionalProperties: false },
+    body: () => { body(); return { ok: true, output: "deployed" }; }
+  });
+
+  it("never asks the approval gate, runs guards or the body for a schema-invalid WRITE_HIGH call", async () => {
+    const registry = new ToolRegistry();
+    let bodies = 0, approvals = 0, guards = 0;
+    registry.define(strictTool(() => { bodies += 1; }));
+    registry.guard("counting", () => { guards += 1; return undefined; });
+    const recorded: { ok: boolean; denied: unknown }[] = [];
+    const pipeline = new ToolPipeline({
+      registry, workspace: WORKSPACE, approvalRequiredFor: new Set(["WRITE_HIGH"]), authorizeClasses: new Set(),
+      approve: async () => { approvals += 1; return "allow"; },
+      record: (_execution, outcome) => { recorded.push({ ok: outcome.ok, denied: outcome.denied }); }
+    });
+    const outcome = await pipeline.execute({ name: "deploy", agentId: "a", arguments: { target: 7 }, requestedMode: "EXECUTE" });
+    expect(outcome.ok).toBe(false);
+    expect(outcome.denied, "an invalid call is an error, not a policy denial").toBeNull();
+    expect(outcome.output).toContain("/target must be string");
+    expect({ approvals, guards, bodies }).toEqual({ approvals: 0, guards: 0, bodies: 0 });
+    expect(recorded, "the refusal is still recorded").toEqual([{ ok: false, denied: null }]);
+
+    const valid = await pipeline.execute({ name: "deploy", agentId: "a", arguments: { target: "prod" }, requestedMode: "EXECUTE" });
+    expect(valid.denied).toBeNull();
+    expect(valid.ok).toBe(true);
+    expect({ approvals, bodies }).toEqual({ approvals: 1, bodies: 1 });
   });
 });

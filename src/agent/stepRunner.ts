@@ -33,7 +33,7 @@
  * here into a number no single request corresponds to.
  */
 import type { LlmCallSpec, PreparedCall } from "../llm/adapter/llmRuntime.js";
-import type { StreamAssembly } from "../llm/blockAssembler.js";
+import { droppedBlocks, type StreamAssembly } from "../llm/blockAssembler.js";
 import type { StreamTokenUsage, ToolUseContentBlock } from "../llm/streamChunk.js";
 import type { SessionService } from "../session/sessionService.js";
 import type { TokenUsage } from "../session/sessionTypes.js";
@@ -168,7 +168,13 @@ export async function runStep(
 
   if (assembly.finishReason?.kind === "max_tokens") {
     // The response was truncated. Every tool call in it was dropped by the
-    // assembler, so there is nothing to dispatch and nothing to answer.
+    // assembler, so there is nothing to dispatch and nothing to answer. The
+    // model is still told, through the signed inbox, which calls never ran, so a
+    // cut-off call is never a silent end of turn (PXA-01). The notice lands on
+    // the next-step lane, so the turn continues (within maxStepsPerTurn) and
+    // the model can reissue complete calls; the turn still ends `max_tokens`.
+    const notice = truncationNotice(assembly);
+    if (notice !== null) init.acceptContext(notice);
     return { ending: { reason: "max_tokens" }, stopReason, usage };
   }
 
@@ -200,4 +206,14 @@ export async function runStep(
     signal.throwIfAborted();
   }
   return { ending: outcome.concluded ? { reason: "complete" } : null, stopReason, usage };
+}
+
+/** What the model is told about tool calls a `max_tokens` finish cut off, or null when none was. */
+function truncationNotice(assembly: StreamAssembly): string | null {
+  const names = droppedBlocks(assembly)
+    .filter((record) => record.outcome.status === "dropped" && record.outcome.reason === "max_tokens_truncated")
+    .map((record) => record.block?.kind === "tool_use" && record.block.name !== "" ? JSON.stringify(record.block.name.slice(0, 64)) : "(unnamed)");
+  if (names.length === 0) return null;
+  return `[amc] Your previous response reached the output-token limit, so ${names.length === 1 ? "this tool call was" : "these tool calls were"} `
+    + `cut off and NOT run: ${names.join(", ")}. Nothing was executed. Reissue any call you still need, complete and shorter.`;
 }
