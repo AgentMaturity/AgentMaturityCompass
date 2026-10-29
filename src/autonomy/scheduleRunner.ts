@@ -105,7 +105,7 @@ export async function runDueSchedules(init: RunDueSchedulesInit): Promise<Schedu
         ...(init.cancelGraceMs === undefined ? {} : { cancelGraceMs: init.cancelGraceMs })
       });
 
-      const ok = outcome.stoppedBy === "done" || outcome.stoppedBy === "max-rounds";
+      const ok = outcome.stoppedBy === "done";
       result = {
         scheduleId: schedule.id,
         ok,
