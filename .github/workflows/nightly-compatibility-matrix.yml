@@ -13,6 +13,41 @@ permissions:
   contents: read
 
 jobs:
+  dependency-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Build
+        run: npm run build
+      - name: Install the packed production artifact for signature verification
+        id: packed-install
+        shell: bash
+        run: |
+          audit_dir="${RUNNER_TEMP}/amc-supply-chain"
+          mkdir -p "$audit_dir/consumer"
+          npm pack --ignore-scripts --pack-destination "$audit_dir" --json > "$audit_dir/pack.json"
+          tarball="$(node -e 'process.stdout.write(JSON.parse(require("node:fs").readFileSync(process.argv[1], "utf8"))[0].filename)' "$audit_dir/pack.json")"
+          npm install --prefix "$audit_dir/consumer" --ignore-scripts --omit=dev --no-audit --no-fund "$audit_dir/$tarball"
+      # Audit the repository lockfile; signatures below cover npm's packed-consumer resolution.
+      - name: Audit production dependencies (moderate or higher)
+        run: npm run audit:runtime
+      - name: Verify production dependency registry signatures
+        if: ${{ !cancelled() && steps.packed-install.outcome == 'success' }}
+        working-directory: ${{ runner.temp }}/amc-supply-chain/consumer
+        run: npm audit signatures
+
   compatibility-matrix:
     runs-on: ${{ matrix.os }}
     strategy:
