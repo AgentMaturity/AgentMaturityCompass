@@ -14,6 +14,7 @@
  * second module could mint would have converted a structural property into a
  * convention — the exact trade this codebase keeps refusing.
  */
+import type { ModelMetadataSnapshot } from "../llm/modelCatalog.js";
 import type { RuntimeName } from "../types.js";
 import type { RecordedGeminiPart } from "./geminiPartMeta.js";
 import type { WriterTakeover } from "./sessionOwnership.js";
@@ -136,6 +137,8 @@ export interface StepEndParams {
 }
 
 export interface RequestHeaderParams {
+  /** Omit to capture the reviewed catalog; null explicitly selects no catalog. */
+  readonly modelMetadata?: ModelMetadataSnapshot | null;
   readonly model: string;
   readonly providerId: string;
   readonly params: Record<string, unknown>;
