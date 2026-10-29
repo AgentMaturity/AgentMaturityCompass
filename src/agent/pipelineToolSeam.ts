@@ -1,5 +1,5 @@
 import type { ToolSchema } from "../llm/request/requestSpec.js";
-import type { ToolPipeline } from "../tools/toolPipeline.js";
+import { EXCLUSIVE_CLASSES, type ToolPipeline } from "../tools/toolPipeline.js";
 import type { ToolRegistry } from "../tools/toolRegistry.js";
 import type { ToolOutcome as PipelineOutcome } from "../tools/toolTypes.js";
 import type { AgentToolSeam, ToolCallOutcome, ToolCallRequest } from "./toolSeam.js";
@@ -19,16 +19,6 @@ import type { AgentToolSeam, ToolCallOutcome, ToolCallRequest } from "./toolSeam
  * `ToolCallRequest` already carries `parentToken` for a Code Mode sub-call. So
  * there is nothing to reshape here, only to connect.
  */
-
-/**
- * Classes whose calls must not overlap.
- *
- * A read can run beside anything. Two writes to the same workspace in the same
- * step cannot: the model does not know they are concurrent, read-before-edit
- * would see one of them land between another's check and its write, and the
- * resulting file is neither of the edits the model asked for.
- */
-const EXCLUSIVE_CLASSES = new Set(["WRITE_LOW", "WRITE_HIGH", "DEPLOY", "SECURITY", "FINANCIAL", "IDENTITY"]);
 
 export interface PipelineToolSeamInit {
   readonly registry: ToolRegistry;

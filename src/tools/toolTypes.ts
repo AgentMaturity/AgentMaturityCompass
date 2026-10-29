@@ -63,6 +63,8 @@ export interface ToolExecution {
    * unreachable from the only surface that fans out.
    */
   readonly signal?: AbortSignal;
+  /** Told when this call starts (true) and stops (false) waiting on an approval; Code Mode pauses its wall clock (DXB-20). */
+  readonly onApprovalWait?: (waiting: boolean) => void;
   /**
    * The authorization record bound for this call (P1-02), present for an authorized class once it binds. Rechecked
    * after the guards; the body and the recorder see the same record, its id and its digest.
