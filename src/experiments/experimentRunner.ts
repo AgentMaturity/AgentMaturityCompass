@@ -13,7 +13,7 @@ import { appendTransparencyEntry, appendTransparencyEntryAsync } from "../transp
 import { TransparencyMerkleLagError } from "../transparency/merkleIndexState.js";
 import { dispatchIntegrationEvent } from "../integrations/integrationDispatcher.js";
 import { runCasebook, assertCasebookRunCurrent } from "../casebooks/casebookRunner.js";
-import { casebookContentSha256, loadCasebook } from "../casebooks/casebookStore.js";
+import { casebookContentSha256, casebookMeasurementWarnings, loadCasebook } from "../casebooks/casebookStore.js";
 import { captureRunHashAuthority, runHashVerificationKeys } from "../ledger/runHashSignature.js";
 import { openLedger, type Ledger } from "../ledger/ledger.js";
 import { describePolicySigner, assertPolicySignerCurrent } from "../crypto/signing/signer.js";
@@ -425,6 +425,7 @@ function prepareExperimentReport(params: {
     schemaVersion: 2 as const,
     methodVersion: EXPERIMENT_METHOD_VERSION,
     casebookSha256: casebookContentSha256(params.workspace, experiment.experiment.casebookId, agentId),
+    inputWarnings: casebookMeasurementWarnings(params.workspace, experiment.experiment.casebookId, agentId),
     candidateConfigDigest: candidateConfig.digestSha256 ?? null,
     baseline: sideIdentity(baselineRun),
     candidate: sideIdentity(candidateRun),

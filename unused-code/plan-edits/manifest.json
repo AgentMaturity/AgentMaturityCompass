@@ -17,6 +17,13 @@
       "sha256": "9aa3559ae0aa5ab9e73bd3f5f335e46bd2b249541dcfc326be2ac71ee8528b47"
     },
     {
+      "path": "dist/mechanic/fixerRca.d.ts",
+      "issue": "GAP-WP09",
+      "baseCommit": "dff352a3e42eda65d11fd3127f91d036208b2687",
+      "archivePath": "unused-code/plan-edits/GAP-WP09/dist/mechanic/fixerRca.d.ts.landed",
+      "sha256": "b753d5afaddd2bbb667f14fcc3ae6d01cb28a5e14e6755d22f2648171294080e"
+    },
+    {
       "path": "dist/org/orgRun.d.ts",
       "issue": "P0-37",
       "baseCommit": "ee0afc9bc6099ffbd57e4929b67dc81acdff1741",
@@ -491,6 +498,13 @@
       "baseCommit": "201c76b659d8afe2c556e951764d401cec60e6a5",
       "archivePath": "unused-code/plan-edits/P0-27/src/lifecycle/signedControlJournal.ts.landed",
       "sha256": "4eef636358fb607e4ada186a19aee5e187b9c8e9022c5d04b77467c5b46bbe17"
+    },
+    {
+      "path": "src/mechanic/fixerRca.ts",
+      "issue": "GAP-WP09",
+      "baseCommit": "dff352a3e42eda65d11fd3127f91d036208b2687",
+      "archivePath": "unused-code/plan-edits/GAP-WP09/src/mechanic/fixerRca.ts.landed",
+      "sha256": "8710ade39145e1f0146016ab128926511a8bbde846346e008e9f348947c990e2"
     },
     {
       "path": "src/mechanic/planStore.ts",

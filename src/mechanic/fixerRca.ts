@@ -253,8 +253,9 @@ function buildFixerRcaReport(input: {
       suggestedRegressionTestId: test.testId
     } satisfies FixerRootCause;
   });
-  const proposals = rootCauses.map((cause) => {
-    const cluster = input.traceIndex.clusters.find((row) => row.failureClass === cause.failureClass)!;
+  const proposals = rootCauses.map((cause, index) => {
+    // Root causes are built one per cluster, in order; another cluster of the same class must not lend its impact.
+    const cluster = input.traceIndex.clusters[index]!;
     const resource = cause.affectedResourceId ? resources.find((row) => row.id === cause.affectedResourceId) ?? null : null;
     const testIds = regressionTests.filter((row) => row.failureClass === cause.failureClass).map((row) => row.testId);
     const blockedReason = !resource

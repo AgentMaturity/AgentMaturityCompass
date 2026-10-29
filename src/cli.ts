@@ -13731,15 +13731,11 @@ casebook
       agentId: opts.agent ?? activeAgent(program),
       casebookId: opts.casebook
     });
-    if (out.valid) {
-      console.log(chalk.green("Casebook verification PASSED"));
-      return;
-    }
-    console.log(chalk.red("Casebook verification FAILED"));
-    for (const reason of out.reasons) {
+    console.log(out.valid ? chalk.green("Casebook verification PASSED") : chalk.red("Casebook verification FAILED"));
+    for (const reason of [...out.reasons, ...out.warnings.map((warning) => `warning: ${warning}`)]) {
       console.log(`- ${reason}`);
     }
-    process.exit(1);
+    if (!out.valid) process.exit(1);
   });
 
 experiment
