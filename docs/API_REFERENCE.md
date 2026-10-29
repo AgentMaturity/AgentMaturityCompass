@@ -1788,6 +1788,7 @@ Interactive native tasks over the existing governed run/resume path for the sele
 | `--approve-risk <tier>` | - |
 | `--tools <mode>` | - |
 | `--unsafe-unconfined-shell` | - |
+| `--web-search-searxng <origin>` | - |
 | `--max-tokens <n>` | - |
 | `--thinking <mode>` | - |
 | `--reasoning-effort <effort>` | - |
@@ -1893,6 +1894,9 @@ Run one agent turn and report what the signed log recorded
 | `--approve-tools <actionClass>` | - |
 | `--approve-risk <tier>` | - |
 | `--interactive-approvals` | - |
+| `--interactive-ask-user` | - |
+| `--web-search-searxng <origin>` | - |
+| `--goal-rounds <n>` | - |
 | `--approval-exception <file>` | - |
 | `--json` | - |
 

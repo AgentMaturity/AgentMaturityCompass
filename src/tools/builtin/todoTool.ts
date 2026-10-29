@@ -2,6 +2,7 @@ import { z } from "zod";
 import type { ToolDefinition } from "../toolTypes.js";
 import type { NativeReceiptRecorder } from "./nativeToolBreadth/nativeReceipt.js";
 import { readSessionList, sessionListTool, type SessionListHeader, type SessionListStore } from "./nativeToolBreadth/sessionListTool.js";
+import { readSessionPlan, renderPlan } from "./planTool.js";
 import type { SessionIdSource } from "./nativeToolBreadth/signedSessionRecords.js";
 
 /**
@@ -9,9 +10,10 @@ import type { SessionIdSource } from "./nativeToolBreadth/signedSessionRecords.j
  * (AMC-1549). Whole-list replace, like a single source of truth the model
  * rewrites each time; see `sessionListTool` for signing and binding.
  *
- * Studio visibility: file-backed under `.amc/native-tools/<sessionId>/todo.json`
- * and readable with `readSessionTodo`. No session event carries it, because no
- * todo event type exists and `src/session/**` is outside this change.
+ * Visibility: file-backed under `.amc/native-tools/<sessionId>/todo.json`,
+ * readable with `readSessionTodo`, and shown after each CLI turn through
+ * `renderSessionLists`. No session event carries it, because no todo event
+ * type exists.
  */
 
 const STATUSES = ["pending", "in_progress", "completed"] as const;
@@ -27,6 +29,10 @@ const todoArgs = z.object({
 
 export type TodoPayload = z.infer<typeof todoArgs>;
 export type TodoRecord = SessionListHeader & TodoPayload;
+
+export function renderTodo(payload: TodoPayload): string {
+  return payload.items.length === 0 ? "[amc: todo list is empty]" : payload.items.map((item) => `${MARK[item.status]} ${item.content}`).join("\n");
+}
 
 const STORE: SessionListStore = { name: "todo", kind: "amc.native.todo", fileName: "todo.json", auditType: "NATIVE_TODO" };
 
@@ -55,13 +61,31 @@ export function todoTool(options: { readonly sessionId: SessionIdSource; readonl
       additionalProperties: false
     },
     argsSchema: todoArgs,
-    render: (payload) => payload.items.length === 0
-      ? "[amc: todo list is empty]"
-      : payload.items.map((item) => `${MARK[item.status]} ${item.content}`).join("\n")
+    render: renderTodo
   }, options.sessionId, options.record);
 }
 
 /** The verified current todo record, or null. Throws when the file is not trustworthy or not the one the session ledger names. */
 export function readSessionTodo(workspace: string, sessionId: string): TodoRecord | null {
   return readSessionList<TodoPayload>(workspace, sessionId, STORE);
+}
+
+/**
+ * The session's verified todo and plan, rendered for a terminal. A record that
+ * does not verify or does not match the ledger is shown as refused, never as
+ * its contents; an absent record is not mentioned.
+ */
+export function renderSessionLists(workspace: string, sessionId: string): string[] {
+  const lines: string[] = [];
+  const show = (name: string, read: () => string | null): void => {
+    try {
+      const rendered = read();
+      if (rendered !== null) lines.push(`Agent ${name} (signed, ledger-bound):`, rendered);
+    } catch (error) {
+      lines.push(`Agent ${name} not shown: ${error instanceof Error ? error.message : "it does not verify"}.`);
+    }
+  };
+  show("todo", () => { const todo = readSessionTodo(workspace, sessionId); return todo && renderTodo(todo); });
+  show("plan", () => { const plan = readSessionPlan(workspace, sessionId); return plan && renderPlan(plan); });
+  return lines;
 }

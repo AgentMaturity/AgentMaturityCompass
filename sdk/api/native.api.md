@@ -276,6 +276,8 @@ export interface AgentSessionInit {
     readonly unconfinedShell?: ExplicitShellOptIn;
     readonly leaseToken?: string;
     readonly additionalCapabilities?: readonly NativeToolCapability[];
+    readonly askUser?: AgentToolsetOptions["askUser"];
+    readonly webSearchProvider?: AgentToolsetOptions["webSearchProvider"];
     readonly maxSteps?: number;
     readonly compaction?: Partial<CompactionConfig>;
     readonly validation?: NativeValidationPlan;

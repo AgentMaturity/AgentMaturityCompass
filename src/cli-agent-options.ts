@@ -89,6 +89,9 @@ export interface RunOptions {
   approveRisk?: string;
   approvalException?: string;
   interactiveApprovals?: boolean;
+  interactiveAskUser?: boolean;
+  webSearchSearxng?: string;
+  goalRounds?: string;
   json?: boolean;
   stream?: boolean;
 }

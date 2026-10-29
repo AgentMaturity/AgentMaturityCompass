@@ -40,6 +40,10 @@ import {
 } from "./agent/stubProvider.js";
 import type { LoopNotification } from "./agent/loopTypes.js";
 import { echoToolSeam } from "./agent/echoTool.js";
+import { ipcAskUserAnswerer } from "./setup/nativeInteractiveAskUser.js";
+import { searxngSearchProvider } from "./tools/builtin/webSearchProviders.js";
+import { renderSessionLists } from "./tools/builtin/todoTool.js";
+import type { WebSearchProvider } from "./tools/builtin/webSearchTool.js";
 import { agentToolset, type AgentToolset } from "./agent/agentToolset.js";
 import { runLease } from "./leases/runLease.js";
 import { selectSupportedNativeTools, type NativeToolCapability } from "./agent/nativeToolCapabilities.js";
@@ -157,6 +161,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--approve-risk <tier>", "approval risk tier (default high)")
     .option("--tools <mode>", "none, echo, or explicitly enabled workspace tools; existing policy still applies")
     .option("--unsafe-unconfined-shell", "macOS without Seatbelt only: offer the native shell UNCONFINED, with your full user rights; ignored where Seatbelt or Bubblewrap confines it, refused on Windows")
+    .option("--web-search-searxng <origin>", "opt-in web_search provider for workspace tools: a SearXNG JSON origin, also granted in the signed tools policy")
     .option("--max-tokens <n>", "output-token limit per request (default 512)")
     .option("--thinking <mode>", "DeepSeek only: enabled or disabled; tools-free chat requires explicit disabled")
     .option("--reasoning-effort <effort>", "DeepSeek only: exact low, high, or max with enabled thinking")
@@ -244,6 +249,9 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     )
     .option("--approve-risk <tier>", "risk tier the approval is raised at (default high)")
     .option("--interactive-approvals", "send actual queued approval IDs to the native chat parent over dedicated Node IPC")
+    .option("--interactive-ask-user", "answer ask_user through the native chat parent over dedicated Node IPC; answers are auditor-signed")
+    .option("--web-search-searxng <origin>", "opt-in web_search provider: a SearXNG JSON origin, also granted under web_search in the signed tools policy")
+    .option("--goal-rounds <n>", "run the prompt as a goal for up to N rounds of in-process delegated children (requires --delegate and --tools workspace)")
     .option(
       "--approval-exception <file>",
       "ADR-5 exception note (JSON) that auto-allows the classes it names until it expires"
@@ -257,6 +265,12 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       if (opts.interactiveApprovals && (typeof process.send !== "function" || !process.connected)) {
         io.error("--interactive-approvals requires an AMC parent with a dedicated IPC channel. Use native chat or the ordinary approvals CLI."); io.fail(); return;
       }
+      if (opts.interactiveAskUser && (typeof process.send !== "function" || !process.connected)) {
+        io.error("--interactive-ask-user requires an AMC parent with a dedicated IPC channel. Use native chat."); io.fail(); return;
+      }
+      let webSearchProvider: WebSearchProvider | undefined;
+      try { webSearchProvider = opts.webSearchSearxng === undefined ? undefined : searxngSearchProvider(opts.webSearchSearxng); }
+      catch (error) { io.error(error instanceof Error ? error.message : "Invalid web search provider."); io.fail(); return; }
       if (opts.interactiveApprovals && opts.approvalException !== undefined) {
         io.error("Interactive approvals require the signed approval engine; approval exceptions cannot be combined with this mode."); io.fail(); return;
       }
@@ -445,6 +459,18 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       // echo tool exists precisely to make a multi-step turn observable.
       const toolMode = opts.tools ?? preset?.tools ?? (providerId === STUB_PROVIDER_ID ? "echo" : "none");
       const wantsDelegation = opts.delegate === true;
+      if ((opts.interactiveAskUser || webSearchProvider !== undefined) && toolMode !== "workspace") {
+        io.error(chalk.red("--interactive-ask-user and --web-search-searxng configure workspace tools; add --tools workspace.")); io.fail(); return;
+      }
+      const goalRounds = opts.goalRounds === undefined ? undefined : integerOption(io, "--goal-rounds", opts.goalRounds, 0);
+      if (goalRounds === null) return;
+      if (goalRounds !== undefined && (goalRounds < 1 || goalRounds > 100)) {
+        io.error(chalk.red("--goal-rounds must be an integer from 1 through 100; it is the hard ceiling.")); io.fail(); return;
+      }
+      if (goalRounds !== undefined && (!wantsDelegation || toolMode !== "workspace" || opts.delegateProvider !== undefined)) {
+        io.error(chalk.red("--goal-rounds runs each round as an in-process child: it needs --delegate and --tools workspace, without --delegate-provider."));
+        io.fail(); return;
+      }
       if (!wantsDelegation && opts.delegateStop !== undefined) {
         io.error(chalk.red("--delegate-stop and --no-delegate-stop require --delegate or delegate.enabled in the signed preset."));
         io.fail(); return;
@@ -496,6 +522,9 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           recorder: { recordProjectedEvidence: (row) => actualSession().recordProjectedEvidence(row), assertWritable: () => actualSession().assertWritable() },
           ...lease,
           ...(dispatchMode === "code" ? { mode: dispatchMode } : {}),
+          ...(opts.interactiveAskUser ? { askUser: ipcAskUserAnswerer() } : {}),
+          ...(webSearchProvider === undefined ? {} : { webSearchProvider }),
+          skillRoots: workspaceSkillRoots(process.cwd(), opts.credentialsHome),
           ...shellOptIn
         });
         bindToolSession = (session) => { boundSession = session; };
@@ -613,6 +642,10 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       const mcpAbort = new AbortController();
       const cancelMcp = () => mcpAbort.abort();
       if (mcpConfig !== null) process.on("SIGINT", cancelMcp);
+      // Goal rounds run no root turn, so onReady never installs the turn's Ctrl-C; this stops the rounds instead.
+      const goalAbort = new AbortController();
+      const cancelGoal = () => { io.error(chalk.yellow("\ncancelling the goal rounds (cause: user)…")); goalAbort.abort(); };
+      if (goalRounds !== undefined) process.on("SIGINT", cancelGoal);
 
       try {
         if (mcpConfig !== null && mcpReview !== null && workspaceToolset !== null) {
@@ -717,6 +750,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
               }),
           config: { maxStepsPerTurn: maxSteps, ...(compaction === undefined ? {} : { compaction }) },
           ...(validation === undefined ? {} : { validation }),
+          ...(goalRounds === undefined ? {} : { goalRounds: { maxRounds: goalRounds, signal: goalAbort.signal } }),
           credentials: {
             // Watching is for a long-lived process picking up a rotation; a
             // single-turn command would only be opening and closing a watcher.
@@ -759,14 +793,21 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
         const summary = readAgentRunSummary(process.cwd(), outcome.sessionId, outcome.status);
         const ending = summary.endings.length > priorTurnEndings ? summary.endings.at(-1) : undefined;
         // P2-13: the four execution phases; evidence verification stays pending until `agent-loop verify`.
-        io.log(opts.json ? JSON.stringify({ ...summary, execution: executionStatusFor(process.cwd(), { sessionId: summary.sessionId, admission: "admitted",
+        io.log(opts.json ? JSON.stringify({ ...summary, ...(outcome.goalRounds === undefined ? {} : { goalRounds: outcome.goalRounds }),
+          execution: executionStatusFor(process.cwd(), { sessionId: summary.sessionId, admission: "admitted",
           turn: ending?.reason ?? (summary.driverStatus === "failed" ? "error" : null), verified: null }) }, null, 2) : renderRunSummary(summary));
+        if (!opts.json && outcome.goalRounds !== undefined) {
+          io.log(`Goal rounds: ${outcome.goalRounds.rounds} run, stopped by ${outcome.goalRounds.stoppedBy} (${outcome.goalRounds.reason}). Each round is a delegated child session in this session's log.`);
+          if (outcome.goalRounds.lastText) io.log(outcome.goalRounds.lastText);
+        }
+        if (!opts.json && toolMode === "workspace") for (const line of renderSessionLists(process.cwd(), summary.sessionId)) io.log(line);
         if (!opts.json) {
           io.log("Verify the recorded evidence (this does not evaluate answer quality):\n  " +
             renderNativeGuideCommand({ cwd: process.cwd(), argv: ["amc", "agent-loop", "verify", summary.sessionId] }));
         }
         if (summary.driverStatus === "failed" || ending?.reason === "error"
-          || (validation !== undefined && summary.validation.status !== "passed")) io.fail();
+          || (validation !== undefined && summary.validation.status !== "passed")
+          || (outcome.goalRounds !== undefined && ["failed", "refused", "cancelled"].includes(outcome.goalRounds.stoppedBy))) io.fail();
       } finally {
         for (const timer of timers) clearTimeout(timer);
         if (onSigint !== null) process.removeListener("SIGINT", onSigint);
@@ -774,6 +815,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
         catch { io.error("MCP cleanup failed; this mount must not be reused."); io.fail(); }
         finally {
           process.removeListener("SIGINT", cancelMcp);
+          process.removeListener("SIGINT", cancelGoal);
           workspaceToolset?.close();
         }
       }
