@@ -37,6 +37,8 @@ A workspace pinned to the Postgres session store (see [EVIDENCE_STORAGE.md](EVID
 
 ## Restore Behavior
 - Restore verifies bundle before extraction.
+- Every refusal is decided before anything is written: a bad signature or hash, an existing target without `--force`, and a target that holds another workspace. With `--force` the target must be the backup's own workspace (the same key set), and the backup's key set must pass this machine's anti-rollback marks for the target path; another tenant's workspace, or this one after a key rotation, is refused, so restore into a new directory instead.
+- The restore is staged next to the target on the same filesystem and moved into place by rename, so a failure leaves the target as it was. Over an existing workspace, the entries it replaced (normally `.amc`) are kept in `<target>/.amc-pre-restore-*` and never deleted; remove that directory once the restored workspace checks out.
 - After restore, AMC runs ops/transparency verification checks.
 - If checks fail, restore still completes but workspace is marked untrusted and warning artifacts are written.
 
