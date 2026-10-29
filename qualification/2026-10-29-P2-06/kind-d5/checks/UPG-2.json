@@ -1,0 +1,7 @@
+{
+  "id": "UPG-2",
+  "scenario": "Failed upgrade",
+  "status": "not_run",
+  "reason": "not selected (--only)",
+  "durationMs": 0
+}

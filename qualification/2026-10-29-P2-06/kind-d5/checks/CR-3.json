@@ -1,0 +1,7 @@
+{
+  "id": "CR-3",
+  "scenario": "Disk full",
+  "status": "not_run",
+  "reason": "not selected (--only)",
+  "durationMs": 0
+}

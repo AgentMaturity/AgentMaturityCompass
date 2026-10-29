@@ -1,0 +1,7 @@
+{
+  "id": "TS-1",
+  "scenario": "API isolation",
+  "status": "not_run",
+  "reason": "not selected (--only)",
+  "durationMs": 0
+}

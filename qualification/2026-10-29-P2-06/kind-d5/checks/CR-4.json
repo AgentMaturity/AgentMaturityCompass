@@ -1,0 +1,7 @@
+{
+  "id": "CR-4",
+  "scenario": "KeyProvider outage",
+  "status": "not_run",
+  "reason": "not selected (--only)",
+  "durationMs": 0
+}

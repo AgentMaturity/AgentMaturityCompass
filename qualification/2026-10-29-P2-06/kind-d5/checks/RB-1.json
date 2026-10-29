@@ -1,0 +1,7 @@
+{
+  "id": "RB-1",
+  "scenario": "Helm rollback",
+  "status": "not_run",
+  "reason": "not selected (--only)",
+  "durationMs": 0
+}

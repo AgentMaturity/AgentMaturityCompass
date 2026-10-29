@@ -1,0 +1,7 @@
+{
+  "id": "CR-1",
+  "scenario": "Pod killed mid-action",
+  "status": "not_run",
+  "reason": "not selected (--only)",
+  "durationMs": 0
+}

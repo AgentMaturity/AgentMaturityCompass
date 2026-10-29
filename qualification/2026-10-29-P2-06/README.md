@@ -115,3 +115,23 @@ No new product defect. The two remaining causes:
 - **INS-1: D5.** The chart cannot select a KeyProvider or switch on ledger encryption (P2-08, P2-09).
 
 **Harness fix found during this rerun.** `kind load docker-image A B` loads both images from one archive, and the second image gets no digest in containerd, so `kind-image-digest.mjs` failed for it. `reference-deployment.yml` now loads each image separately. Locally, image N was reloaded on its own.
+
+## Rerun 3 after the D5 fix (`2866b1ec6`)
+
+Folder `kind-d5/`. The harness ran at `2866b1ec6` with `--only INS-1,INS-2,BR-1`, so the other 19 checks are recorded as not run and count as failed. There was no operator workaround, and the recovery targets were the same placeholder.
+
+- **Image:** N is `2866b1ec6`, built with the repository Dockerfile and no patch: `amc-studio@sha256:53d81cb1…`. It was passed as both `--image-a` and `--image-b`; no selected check uses N-1.
+- **What changed (details in `qualification/2026-10-29-P2-06-D5/`):**
+  - The chart has `keyProvider.*` and `ledgerEncryption.*` values.
+  - INS-1 installs with `keyProvider.provider=file` and `ledgerEncryption.enabled=true`. After the governed turn it checks the running workspace, not only the values.
+
+| Check | `kind-rerun-2/` | `kind-d5/` |
+|---|---|---|
+| INS-1 | failed only on "KeyProvider and ledger encryption on" (D5) | **passed**: all 8 criteria. Ready in 24.8 s. The signed ops policy has encryption on, and the active data key is wrapped by the file provider. 10 inline payloads are encrypted and none are in clear. `helm test` verified-prefix; deploy-verify passed all five checks. |
+| INS-2 | passed | passed |
+| BR-1 | passed | passed, now with an encrypted ledger: backed up during a turn, restored by N into a new namespace and volume, prefix and integrity ok |
+
+**D5 is fixed for the file provider.**
+
+- The PKCS#11 (SoftHSM) variant and CR-4 stay pending. The repository image has no PKCS#11 wrapper or pkcs11js, and adding them is a new dependency.
+- UPG-1 and RB-1 still need an N-1 that contains the D2 fix (see rerun 2).

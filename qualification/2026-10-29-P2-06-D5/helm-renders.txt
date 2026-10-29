@@ -1,0 +1,95 @@
+# helm v4.3.0+gbec5b06 renders, chart deploy/helm/amc at e2d913412, base 282541250
+
+## Default values: byte-identical to the base chart
+base sha256 a2b7bad17d966537c2e3b527a9b1eb877563c4d47dc9aec7b8facc04c0a7cbd3
+tip  sha256 a2b7bad17d966537c2e3b527a9b1eb877563c4d47dc9aec7b8facc04c0a7cbd3
+identical: yes
+
+## --set keyProvider.provider=file --set ledgerEncryption.enabled=true (INS-1's values): full diff against the base render
+91a92,136
+> # Source: amc/templates/configmap-ledger-encryption.yaml
+> apiVersion: v1
+> kind: ConfigMap
+> metadata:
+>   name: amc-rd-amc-ledger-encryption
+>   labels:
+>     helm.sh/chart: amc-0.4.0
+>     app.kubernetes.io/name: amc
+>     app.kubernetes.io/instance: amc-rd
+>     app.kubernetes.io/version: 1.2.0
+>     app.kubernetes.io/managed-by: Helm
+> data:
+>   ledger-encryption.sh: |-
+>     #!/bin/sh
+>     # P2-09 ledger field encryption, switched on by the chart (ledgerEncryption.enabled) before Studio starts.
+>     # It runs the owner steps of docs/EVIDENCE_STORAGE.md "Ledger encryption" and nothing else:
+>     #   1. refuse unless the signed ops policy verifies (an edited, unsigned policy is never re-signed here);
+>     #   2. set opsPolicy.encryption.ledgerEncryptionEnabled: true and re-sign, when it is not on yet;
+>     #   3. create data key version 1, wrapped at <provider>/<key ref>, and encrypt existing rows, when there is no data key.
+>     # Any failure exits non-zero, so the container stops before Studio: Studio never runs with the policy on and no data key.
+>     # A key file that was deleted is not quietly replaced: the P1-08 high-water mark refuses a new sequence 1.
+>     # Usage: ledger-encryption.sh <workspace> <provider> <key ref>
+>     set -eu
+>     workspace=$1
+>     provider=$2
+>     ref=$3
+>     cd "$workspace"
+>     AMC_VAULT_PASSPHRASE=$(cat "$AMC_VAULT_PASSPHRASE_FILE")
+>     export AMC_VAULT_PASSPHRASE
+>     amc ops verify
+>     if ! amc ops print | node -e 'process.exit(JSON.parse(require("fs").readFileSync(0, "utf8")).opsPolicy.encryption.ledgerEncryptionEnabled === true ? 0 : 1)'; then
+>       # JSON is YAML: `amc ops sign` signs these bytes and loadOpsPolicy parses them.
+>       amc ops print | node -e '
+>         const fs = require("fs");
+>         const policy = JSON.parse(fs.readFileSync(0, "utf8"));
+>         policy.opsPolicy.encryption.ledgerEncryptionEnabled = true;
+>         fs.writeFileSync(".amc/ops-policy.yaml", JSON.stringify(policy, null, 2) + "\n");'
+>       amc ops sign
+>     fi
+>     if [ ! -e .amc/keys/ledger-dek.json ]; then
+>       amc evidence-stores encrypt --key-provider "$provider" --key-ref "$ref"
+>     fi
+>     
+> 
+> ---
+233a279
+>               sh /opt/amc-chart/ledger-encryption.sh /data/amc file 'ledger-dek' || exit 1;
+301a348,350
+>             - name: ledger-encryption
+>               mountPath: /opt/amc-chart
+>               readOnly: true
+331a381,383
+>         - name: ledger-encryption
+>           configMap:
+>             name: amc-rd-amc-ledger-encryption
+
+## pkcs11 with a PIN Secret: the Deployment's provider env and projection
+            - name: AMC_PKCS11_PIN_FILE
+              value: /run/secrets/amc_key_provider_credential
+            - name: AMC_PKCS11_MODULE
+              value: "/usr/lib/softhsm/libsofthsm2.so"
+--
+                  name: amc-hsm-pin
+                  items:
+
+## Refusals (exit status, then helm's message)
+--set keyProvider.provider=pkcs11
+exit 1
+- at '/keyProvider': 'allOf' failed
+  - at '/keyProvider/credentialSecret/name': minLength: got 0, want 1
+--set keyProvider.provider=gcp-kms,keyProvider.credentialSecret.name=amc-gcp
+exit 1
+- at '/keyProvider/credentialSecret/key': minLength: got 0, want 1
+--set keyProvider.credentialSecret.name=amc-hsm,keyProvider.credentialSecret.key=pin
+exit 1
+- at '/keyProvider': 'allOf' failed
+  - at '/keyProvider/credentialSecret/name': maxLength: got 7, want 0
+--set keyProvider.provider=aws-kms,keyProvider.env.AWS_SECRET_ACCESS_KEY=x
+exit 1
+- at '/bootstrap/values': invalid propertyName 'AWS_SECRET_ACCESS_KEY'
+  - at '': value must be one of 'AWS_REGION', 'AWS_PROFILE', 'AZURE_TENANT_ID', 'AZURE_CLIENT_ID', 'AMC_PKCS11_MODULE', 'AMC_PKCS11_PROTECTION'
+--set keyProvider.provider=vault
+exit 1
+- at '/keyProvider/provider': value must be one of 'file', 'aws-kms', 'gcp-kms', 'azure-kv', 'pkcs11'
+
+1 chart(s) linted, 0 chart(s) failed

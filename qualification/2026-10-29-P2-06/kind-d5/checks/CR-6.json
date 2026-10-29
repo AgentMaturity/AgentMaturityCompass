@@ -1,0 +1,7 @@
+{
+  "id": "CR-6",
+  "scenario": "Telemetry outage",
+  "status": "not_run",
+  "reason": "not selected (--only)",
+  "durationMs": 0
+}

@@ -1,0 +1,7 @@
+{
+  "id": "OV-2",
+  "scenario": "Offline WORM check",
+  "status": "not_run",
+  "reason": "not selected (--only)",
+  "durationMs": 0
+}
