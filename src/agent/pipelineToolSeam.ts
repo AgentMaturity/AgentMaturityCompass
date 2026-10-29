@@ -96,7 +96,7 @@ export function pipelineToolSeam(init: PipelineToolSeamInit): AgentToolSeam {
       } catch {
         return null; // `execute` answers unparseable arguments with an ERROR; there is nothing to approve.
       }
-      return init.pipeline.authorizationIntent({ name: request.toolName, agentId: init.agentId, arguments: args, requestedMode: "EXECUTE" });
+      return init.pipeline.authorizationIntent({ name: request.toolName, agentId: init.agentId, arguments: args, requestedMode: "EXECUTE", parentToken: request.parentToken });
     },
 
     bindApprovalGate(gate) {

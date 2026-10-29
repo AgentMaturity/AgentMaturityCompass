@@ -433,3 +433,22 @@ Validation: 237 baseline cases passed across 9 files; 37/37 guard mutations were
 Native provider schema activation remains a WP13a follow-up. Live HTTP qualification is blocked by `listen EPERM: operation not permitted 127.0.0.1`; eight new cases and the related existing socket suites need an unrestricted runner. Binary bytes are deliberately omitted with digests/loss records. These limits constrain native onboarding and release claims.
 
 Claude's next actions: review the activation dependency and source, run the live suites, and commit the accepted change using the prepared message. Full row status, commands, evidence and remaining work are in `/Users/sid/AgentMaturityCompass-worktrees/s442cd919/work/codex-runs/wp21-report.md`.
+
+
+---
+
+# REV_FULLSTACK_ENGINEER handoff — 2026-10-30
+
+Scope: WP13 part B, PI-045 and PI-046, branch `rtd/gap-wp13b`, base `d6441c858c0af002b40d699c8c85fd61fd170253`. The change remains uncommitted for Claude integrator session `3c2ecdb1`; no push or merge was made.
+
+The native Enforce/tool path supports a separate `tool_search` activation operation bound to a discovered name and exact schema digest. Signed preparation evidence precedes publication; subsequent request rows commit the offered schema bytes. Loadouts admit at most 20 schemas in memory and revoke stale session, policy, catalog, registration, schema and conditional admissions. Global and scoped direct, deferred, model-only, code-only and hidden restrictions compose monotonically. All effect-time policies, approvals, budgets and guards remain in force. Safe refusal codes distinguish unauthorized targets, unavailable catalogs, stale activation, full loadouts and missing evidence. Empty searches remain successful empty results.
+
+Deliverables include source, regression tests, native MCP documentation, the reviewed tool-search schema pin and a patch changeset. Persisted loadout restoration remains disabled; new compositions, forks and resumes start empty. This slice does not close PI-049 or the full DSH-W02/PIM-03 dossiers.
+
+Current-source validation: 1,750 unique cases passed, including 91 new cases. There are 1,720 passes across 95 complete files and 30 runnable passes across two partial files. The first 97-file run had one 30,000ms timeout; all 41 OSCAL cases then passed in isolation with unchanged assertions and deadline. Counts replace that file's earlier result without double-counting. All 27 guard/boundary mutants were caught and restored. The mandatory verifier exited 0 against `d6441c858`, including build, both typechecks, lint, all generated-document checks, quality checks and freeze. Git metadata staging/amendment was refused as expected.
+
+Remaining qualification: thirteen TCP-dependent files cannot bind loopback in this sandbox. Three fresh launcher probes remain unqualified: two fail `sandbox_apply: Operation not permitted`; the shell probe reports outcome unknown with no unconfined fallback. These cases are not counted as coverage. Source assertions and guards were not weakened. Tests use the supported external checkpoint setting and Vite runner config loader to respect filesystem permissions.
+
+Full report, exact commands, per-file counts, original failures, mutation logs, source hashes and manifests are under `/Users/sid/AgentMaturityCompass-worktrees/s442cd919/work/codex-runs/wp13b-report.md`, `wp13b-receipt.json` and `wp13b-evidence/`. The prepared conventional message is `wp13b-commit-message.txt` in the same directory.
+
+Next owner actions: review source and receipts, run the blocked TCP/launcher cases in a suitable environment, then commit and merge through Claude. Do not infer runtime/provider or release qualification beyond these local checks. Prior handoff bytes are preserved above.
