@@ -11913,9 +11913,7 @@ mode
   .command("owner")
   .description("Switch to owner mode (configuration + signing allowed); from agent mode asks for the vault passphrase")
   .action(async () => {
-    const workspace = process.cwd();
-    // DXA-49: the passphrase is prompted, never read from AMC_VAULT_PASSPHRASE, which an agent may share.
-    await leaveAgentMode(workspace, getMode(workspace) === "agent" ? await promptPassphrase("Vault passphrase to leave agent mode:") : "");
+    await leaveAgentMode(process.cwd(), getMode(process.cwd()) === "agent" ? await promptPassphrase("Vault passphrase to leave agent mode:") : ""); // DXA-49: prompted, never from env
     console.log(chalk.green("Mode set to owner"));
   });
 
