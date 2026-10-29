@@ -31,6 +31,7 @@ import type { DiagnosticReport } from "../src/types.js";
 import { initWorkspace } from "../src/workspace.js";
 import { claudeWorkspace, controlRequest, decide, recorded } from "./helpers/claudeCodeHookFixtures.js";
 import { removeFixtureWorkspaces } from "./helpers/piHookFixtures.js";
+import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
 
 const roots: string[] = [];
 
@@ -39,6 +40,7 @@ function newWorkspace(): string {
   roots.push(workspace);
   process.env.AMC_VAULT_PASSPHRASE = "amc-1483-compound-command-test";
   initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
+  writeRuntimeFirewallPolicy({ workspace: workspace, mode: "observe" }); // AXR-01: ToolHub and hook control apply the runtime firewall as the native pipeline does; unsigned, it blocks every call.
   return workspace;
 }
 

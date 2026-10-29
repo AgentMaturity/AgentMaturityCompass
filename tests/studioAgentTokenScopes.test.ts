@@ -29,6 +29,7 @@ import {
 import type { ToolIntentResponse } from "../src/toolhub/toolhubServer.js";
 import type { DiagnosticReport } from "../src/types.js";
 import type { ActionClass } from "../src/types.js";
+import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
 
 // IMPL-2: agent bearer tokens carry only what the signed action policy (or an
 // issuing lease) grants, and the execute grant is per action class. Loopback
@@ -69,6 +70,7 @@ function workspaceFixture(policy: ActionPolicy) {
   const workspace = realpathSync(mkdtempSync(join(tmpdir(), "amc-agent-token-scopes-")));
   roots.push(workspace);
   initWorkspace({ workspacePath: workspace, agentId: A, trustBoundaryMode: "isolated" });
+  writeRuntimeFirewallPolicy({ workspace: workspace, mode: "observe" }); // AXR-01: ToolHub and hook control apply the runtime firewall as the native pipeline does; unsigned, it blocks every call.
   initFleet(workspace, { orgName: "Token scope fixture" });
   for (const agentId of [A, C]) {
     scaffoldAgent(workspace, buildAgentConfig({

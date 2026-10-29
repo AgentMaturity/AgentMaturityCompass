@@ -57,6 +57,7 @@ import {
 import { loadIntegrationDeliveryJournal } from "../src/integrations/integrationDeliveryStore.js";
 import { loadIntegrationDeadLetters } from "../src/integrations/integrationDeadLetters.js";
 import { drainDueIntegrationDeliveries } from "../src/integrations/integrationDispatcher.js";
+import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
 
 const roots: string[] = [];
 
@@ -65,6 +66,7 @@ function newWorkspace(withIntegrations = true): string {
   roots.push(workspace);
   process.env.AMC_VAULT_PASSPHRASE = "amc-1471-test-passphrase";
   initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
+  writeRuntimeFirewallPolicy({ workspace: workspace, mode: "observe" }); // AXR-01: ToolHub and hook control apply the runtime firewall as the native pipeline does; unsigned, it blocks every call.
   initActionPolicy(workspace);
   initToolsConfig(workspace);
   initBudgets(workspace, "default");

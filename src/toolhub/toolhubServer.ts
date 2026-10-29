@@ -39,6 +39,7 @@ import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { evaluateBudgetStatus } from "../budgets/budgets.js";
 import { activeFreezeStatus } from "../drift/freezeEngine.js";
+import { governedCallDenial, withGovernedCallDenial } from "../tools/guards/governedCallDecision.js";
 import {
   approvalStatusPayload,
   consumeApprovedExecution,
@@ -57,6 +58,8 @@ import {
   type ToolHubContextProjection
 } from "./toolContext.js";
 import { inCheckPass } from "../utils/checkPass.js";
+/** AXR-01: shared checks ToolHub decides itself, with its work order and its EXECUTE-only freeze. */
+const TOOLHUB_DECIDES = ["action-policy", "freeze"];
 
 export interface ToolIntentRequest {
   agentId: string;
@@ -421,7 +424,8 @@ export class ToolHubService {
       };
     }
 
-    const decision = evaluateActionPermission({
+    // AXR-01: the checks every governed plane shares; this plane decides the Action Policy and freezes with its own context.
+    const decision = withGovernedCallDenial(evaluateActionPermission({
       agentId: input.agentId,
       actionClass: normalizeActionClass(tool.actionClass),
       riskTier: workOrderContext?.riskTier ?? "med",
@@ -439,8 +443,8 @@ export class ToolHubService {
       budgetStatus: evaluateBudgetStatus(this.workspace, input.agentId, Date.now(), { trust: workspaceSelfTrust(this.workspace) }),
       policy: loadActionPolicy(this.workspace),
       policySignatureValid: actionPolicySig.valid
-    });
-
+    }), governedCallDenial(this.workspace, { name: tool.name, agentId: input.agentId, actionClass: normalizeActionClass(tool.actionClass),
+      arguments: input.args, requestedMode: normalizeMode(input.requestedMode) }, TOOLHUB_DECIDES));
     return { tool, configTrusted, decision, workOrderContext };
   }
 
@@ -681,17 +685,14 @@ export class ToolHubService {
       );
     }
 
+    const governed = governedCallDenial(this.workspace, { name: tool.name, agentId: intent.request.agentId, actionClass: intent.actionClass,
+      arguments: intent.request.args, requestedMode }, TOOLHUB_DECIDES); // AXR-01, re-read at execution
+    if (governed !== null) return this.auditDenied(intent, "TOOLHUB_GOVERNED_CALL_DENIED", `${governed.label}: ${governed.reason}`,
+      { executeAttempted: requestedMode === "EXECUTE", executeWithoutTicketAttempted: false });
     const freeze = activeFreezeStatus(this.workspace, intent.request.agentId);
     if (requestedMode === "EXECUTE" && freeze.active && freeze.actionClasses.includes(intent.actionClass)) {
-      return this.auditDenied(
-        intent,
-        "EXECUTE_FROZEN_ACTIVE",
-        `Execute is currently frozen for action class ${intent.actionClass}.`,
-        {
-          executeAttempted: true,
-          executeWithoutTicketAttempted: true
-        }
-      );
+      return this.auditDenied(intent, "EXECUTE_FROZEN_ACTIVE", `Execute is currently frozen for action class ${intent.actionClass}.`,
+        { executeAttempted: true, executeWithoutTicketAttempted: true });
     }
 
     const budget = evaluateBudgetStatus(this.workspace, intent.request.agentId, Date.now(), { trust: workspaceSelfTrust(this.workspace) });
