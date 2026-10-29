@@ -1,0 +1,118 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-36",
+  "date": "2026-10-29",
+  "commit": "cafe5751fe0eff9c54f0b547118a627c1d45ced9",
+  "branch": "rtd/w6-p0-36",
+  "node": "v22.23.3",
+  "pnpm": "10.33.0",
+  "os": "darwin 25.6.0",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "node qualification/2026-10-29-P0-36/check-advisory-facts.mjs --keys",
+      "exit": 0,
+      "durationMs": 900
+    },
+    {
+      "cmd": "sh qualification/2026-10-29-P0-36/tar-traversal-probe.sh",
+      "exit": 0,
+      "durationMs": 600
+    },
+    {
+      "cmd": "npm run -s build",
+      "exit": 0,
+      "durationMs": 52000
+    },
+    {
+      "cmd": "npx vitest run --maxWorkers=2 tests/assuranceAgentResponder.test.ts tests/redteamRealExecution.test.ts tests/security/jailbreak.test.ts tests/storage/blobKeyNoVault.test.ts tests/trust/embeddedKeyForgery.test.ts tests/ledgerTrustRootAnchor.test.ts tests/ledgerTrustRootAnchorCli.test.ts tests/vaultPassphraseSource.test.ts tests/evalImportTrust.test.ts tests/trustTierWriteGuard.test.ts tests/noFabricatedDomainResults.test.ts tests/domainExampleMode.test.ts tests/tarTraversalGuard.test.ts tests/trust/builtInDistrust.test.ts",
+      "exit": 0,
+      "durationMs": 140490
+    },
+    {
+      "cmd": "npm run -s typecheck",
+      "exit": 0,
+      "durationMs": 52076
+    },
+    {
+      "cmd": "npm run -s typecheck:tests",
+      "exit": 0,
+      "durationMs": 85719
+    },
+    {
+      "cmd": "npm run -s lint",
+      "exit": 0,
+      "durationMs": 4140
+    },
+    {
+      "cmd": "npm run -s check:gates",
+      "exit": 0,
+      "durationMs": 394
+    },
+    {
+      "cmd": "npm run -s check:dead-code",
+      "exit": 0,
+      "durationMs": 5758
+    },
+    {
+      "cmd": "npm run -s check:duplicates",
+      "exit": 0,
+      "durationMs": 1174
+    },
+    {
+      "cmd": "node scripts/gen-counts.mjs --write && npm run -s check:counts",
+      "exit": 0,
+      "durationMs": 1214
+    },
+    {
+      "cmd": "npm run -s gen:api-ref && npm run -s check:api-ref",
+      "exit": 0,
+      "durationMs": 334
+    },
+    {
+      "cmd": "npm run -s check:docs-drift",
+      "exit": 0,
+      "durationMs": 568
+    },
+    {
+      "cmd": "npm run -s check:changelog-page",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:no-fabrication",
+      "exit": 0,
+      "durationMs": 3369
+    },
+    {
+      "cmd": "npm run -s check:freeze",
+      "exit": 1,
+      "durationMs": 2791
+    }
+  ],
+  "tests": {
+    "total": 279,
+    "passed": 279,
+    "failed": 0,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "check-advisory-facts.mjs",
+      "sha256": "062764a0d393863ddd7d15440391cccd32f3bd910735dee91a279a4d28174971"
+    },
+    {
+      "path": "advisory-facts.txt",
+      "sha256": "a370f53d206dcfdf57cde5c24f2e1c65bf17dd7c40f828f946fba5413ec8a3fe"
+    },
+    {
+      "path": "tar-traversal-probe.sh",
+      "sha256": "142ece49982629f95cc4b3a1c2d940e0a660d5ab6ed8308ef35500c5e1d13ec5"
+    },
+    {
+      "path": "tar-probe-darwin-bsdtar.txt",
+      "sha256": "54a342c95e3017095b2fe9e40399623167dccca8ceb5411314a58c55b2eeb015"
+    }
+  ],
+  "notes": "Draft only: no GitHub advisory was created and no gh write call was made. commit is the measured base; facts were checked there. Durations for the first two commands and check:changelog-page are approximate (not timed). check:freeze exits 1 on the base for twelve freeze-exception keys (P0-37, P1-32, P1-33, P1-65, P2-09, P2-09d, P2-23, P2-25, P2-30, P3-14) missing from the base baseline's allowedExceptionKeys, which the integrator lands; P0-36 adds no command path and no freeze exception. Pending: reproduction on npm 1.1.1 and on the 2.0.0 release candidate, the archive probe on GNU tar and Alpine tar, P0-37's distrust entries for issue 4, and Sid's severity, CWE, split, CVE and publication decisions (see README.md)."
+}
