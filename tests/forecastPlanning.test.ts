@@ -13,7 +13,8 @@ import { forecastScopeLatestPath } from "../src/forecast/forecastStore.js";
 import { verifyLatestForecast } from "../src/forecast/forecastVerifier.js";
 import { detectSuspiciousMaturityJump } from "../src/forecast/anomalyDetector.js";
 import { createTransformPlan } from "../src/transformation/transformPlanner.js";
-import { writeSignedTransformPlan } from "../src/transformation/transformTasks.js";
+import { writeSignedTransformPlan, type TransformPlan } from "../src/transformation/transformTasks.js";
+import { appendTransparencyEntry } from "../src/transparency/logChain.js";
 import type { ForecastArtifact } from "../src/forecast/forecastSchema.js";
 import { rotatePurposeKeys } from "../src/keys/purposeKeys.js";
 import { getSigningKey, signHexDigest } from "../src/crypto/keys.js";
@@ -172,6 +173,14 @@ function validPlanFixture(workspace: string) {
   return createTransformPlan({ workspace, scope: { type: "AGENT", agentId: "default" }, to: "excellence", preview: true }).plan;
 }
 
+/** Writes the signed plan and its transparency record, as `transform plan` and `transform track` do. */
+function recordTransformPlan(workspace: string, plan: TransformPlan, type = "TRANSFORM_PLAN_CREATED") {
+  const written = writeSignedTransformPlan(workspace, plan);
+  appendTransparencyEntry({ workspace, type, agentId: plan.scope.type === "AGENT" ? plan.scope.agentId! : `node:${plan.scope.nodeId!}`,
+    artifact: { kind: "policy", sha256: sha256Hex(readFileSync(written.planPath)), id: plan.planId } });
+  return written;
+}
+
 async function pickPort(): Promise<number> {
   const server = createServer();
   await new Promise<void>((resolvePromise) => server.listen(0, "127.0.0.1", () => resolvePromise()));
@@ -240,7 +249,7 @@ describe("forecast planning", () => {
   test.each(["unsigned", "tampered", "malformed signature"])("refresh rejects an unverifiable %s transform plan", (kind) => {
     const workspace = newWorkspace();
     const plan = validPlanFixture(workspace);
-    const written = writeSignedTransformPlan(workspace, plan);
+    const written = recordTransformPlan(workspace, plan);
     if (kind === "unsigned") {
       rmSync(written.latestSigPath);
     } else if (kind === "malformed signature") {
@@ -261,7 +270,7 @@ describe("forecast planning", () => {
 
   test("a config-purpose signature cannot authenticate the latest transform plan", () => {
     const workspace = newWorkspace();
-    const written = writeSignedTransformPlan(workspace, validPlanFixture(workspace));
+    const written = recordTransformPlan(workspace, validPlanFixture(workspace));
     rotatePurposeKeys({ workspace, purposes: ["config-signature"], passphrase: "forecast-test-passphrase" });
     const digestSha256 = sha256Hex(readFileSync(written.latestPath));
     writeFileSync(written.latestSigPath, JSON.stringify({ digestSha256,
@@ -287,7 +296,7 @@ describe("forecast planning", () => {
   test("a transform plan signed for another agent is not used for this one", () => {
     const workspace = newWorkspace();
     const other = { ...validPlanFixture(workspace), scope: { type: "AGENT" as const, agentId: "other-agent" } };
-    const written = writeSignedTransformPlan(workspace, other);
+    const written = recordTransformPlan(workspace, other);
     const dir = join(workspace, ".amc", "agents", "default", "transform");
     mkdirSync(dir, { recursive: true });
     writeFileSync(join(dir, "latest.json"), readFileSync(written.latestPath));
@@ -300,20 +309,59 @@ describe("forecast planning", () => {
   test("an older signed latest.json restored over a newer plan is a rollback", () => {
     const workspace = newWorkspace();
     const older = validPlanFixture(workspace);
-    const first = writeSignedTransformPlan(workspace, older);
+    const first = recordTransformPlan(workspace, older);
     const savedPlan = readFileSync(first.latestPath), savedSig = readFileSync(first.latestSigPath);
-    writeSignedTransformPlan(workspace, { ...older, planId: `${older.planId}-newer`, createdTs: older.createdTs + 60_000 });
+    recordTransformPlan(workspace, { ...older, planId: `${older.planId}-newer`, createdTs: older.createdTs + 60_000 });
     writeFileSync(first.latestPath, savedPlan);
     writeFileSync(first.latestSigPath, savedSig);
     const out = forecastRefreshCli({ workspace, scope: "agent", targetId: "default" });
     const latest = JSON.parse(readFileSync(out.latestPath!, "utf8")) as ForecastArtifact;
-    expect(latest.transformPlanInput).toEqual({ outcome: "source_unavailable", reason: "A newer signed transform plan exists; latest.json was rolled back." });
+    expect(latest.transformPlanInput).toEqual({ outcome: "source_unavailable", reason: "Transform plan is not the latest recorded plan; latest.json was rolled back." });
     expect(latest.etaToTarget.status).toBe("UNKNOWN");
+  });
+
+  test("an older revision of the same planId restored with its archive copy is a rollback", () => {
+    const workspace = newWorkspace();
+    const plan = validPlanFixture(workspace);
+    const first = recordTransformPlan(workspace, plan);
+    const saved = [first.latestPath, first.latestSigPath, first.planPath, first.sigPath].map(path => [path, readFileSync(path)] as const);
+    recordTransformPlan(workspace, { ...plan, tasks: plan.tasks.map(task => ({ ...task, status: "DONE" as const })) }, "TRANSFORM_PLAN_UPDATED");
+    for (const [path, bytes] of saved) writeFileSync(path, bytes);
+    const out = forecastRefreshCli({ workspace, scope: "agent", targetId: "default" });
+    const latest = JSON.parse(readFileSync(out.latestPath!, "utf8")) as ForecastArtifact;
+    expect(latest.transformPlanInput).toEqual({ outcome: "source_unavailable", reason: "Transform plan is not the latest recorded plan; latest.json was rolled back." });
+  });
+
+  test.each(["unrecorded", "log tampered"])("a transform plan with %s freshness is unavailable", kind => {
+    const workspace = newWorkspace();
+    if (kind === "unrecorded") writeSignedTransformPlan(workspace, validPlanFixture(workspace));
+    else {
+      recordTransformPlan(workspace, validPlanFixture(workspace));
+      const logPath = join(workspace, ".amc", "transparency", "log.jsonl");
+      const lines = readFileSync(logPath, "utf8").trimEnd().split("\n");
+      writeFileSync(logPath, `${lines.slice(0, -1).join("\n")}\n`);
+    }
+    const out = forecastRefreshCli({ workspace, scope: "agent", targetId: "default" });
+    const latest = JSON.parse(readFileSync(out.latestPath!, "utf8")) as ForecastArtifact;
+    expect(latest.transformPlanInput).toEqual({ outcome: "source_unavailable", reason: kind === "unrecorded"
+      ? "Transform plan has no transparency record." : "Transform plan freshness is unverifiable: the transparency log does not verify." });
+  });
+
+  test.each(["bad signature", "missing signature"])("an archive entry with a %s is tampering, not skipped", kind => {
+    const workspace = newWorkspace();
+    const plan = validPlanFixture(workspace);
+    const written = recordTransformPlan(workspace, plan);
+    const forged = join(written.planPath, "..", "tp_forged.json");
+    writeFileSync(forged, JSON.stringify({ ...plan, planId: "tp_forged", createdTs: plan.createdTs + 60_000 }, null, 2));
+    if (kind === "bad signature") writeFileSync(`${forged}.sig`, readFileSync(written.sigPath));
+    const out = forecastRefreshCli({ workspace, scope: "agent", targetId: "default" });
+    const latest = JSON.parse(readFileSync(out.latestPath!, "utf8")) as ForecastArtifact;
+    expect(latest.transformPlanInput).toEqual({ outcome: "source_unavailable", reason: "Transform plan archive entry tp_forged.json does not verify." });
   });
 
   test("transform plan changes still invalidate a captured forecast before signing", () => {
     const workspace = newWorkspace();
-    const written = writeSignedTransformPlan(workspace, validPlanFixture(workspace));
+    const written = recordTransformPlan(workspace, validPlanFixture(workspace));
     const selected = calculateForecast({ workspace, scope: { type: "AGENT", id: "default" } });
     selected.assertInputsCurrent();
     writeFileSync(written.latestPath, '{"tasks":{}}');
@@ -323,7 +371,7 @@ describe("forecast planning", () => {
   test("a verified transform plan supplies task recommendations", () => {
     const workspace = newWorkspace();
     const plan = validPlanFixture(workspace);
-    writeSignedTransformPlan(workspace, plan);
+    recordTransformPlan(workspace, plan);
     const out = forecastRefreshCli({ workspace, scope: "agent", targetId: "default" });
     const latest = JSON.parse(readFileSync(out.latestPath!, "utf8")) as ForecastArtifact;
     expect(latest.transformPlanInput).toEqual({ outcome: "measured", reason: null });
@@ -370,7 +418,7 @@ describe("forecast planning", () => {
       { ...plan.tasks[0]!, taskId: "t4", effort: 3, status: "NOT_STARTED" },
       { ...plan.tasks[0]!, taskId: "t5", effort: 2, status: "IN_PROGRESS" }
     ];
-    writeSignedTransformPlan(workspace, plan);
+    recordTransformPlan(workspace, plan);
     vi.useFakeTimers();
     vi.setSystemTime(new Date(Date.UTC(2026, 1, 1)));
 

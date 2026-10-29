@@ -2,6 +2,9 @@ import { readdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import type { EvidenceOutcome } from "../types.js";
 import { verifyAuditorSignatureBytes } from "../org/orgSignatureBytes.js";
+import { readTransparencyEntries, transparencyLogPath, verifyTransparencyLog } from "../transparency/logChain.js";
+import { pathExists } from "../utils/fs.js";
+import { sha256Hex } from "../utils/hash.js";
 import { transformPlanSchema, type TransformPlan } from "../transformation/transformTasks.js";
 import type { ForecastScope } from "./forecastSchema.js";
 
@@ -29,7 +32,7 @@ export function loadForecastTransformPlan(workspace: string, scope: ForecastScop
     if (plan.scope.type !== scope.type || boundId !== scope.id) {
       return { plan: null, outcome: "source_unavailable", reason: "Transform plan is signed for a different scope." };
     }
-    const rollback = transformPlanRollbackProblem(workspace, dirname(path), plan, bytes);
+    const rollback = transformPlanAnchorProblem(workspace, scope, plan, bytes) ?? transformPlanRollbackProblem(workspace, dirname(path), plan, bytes);
     if (rollback) return { plan: null, outcome: "source_unavailable", reason: rollback };
     return { plan, outcome: "measured", reason: null };
   } catch (error) {
@@ -41,7 +44,29 @@ export function loadForecastTransformPlan(workspace: string, scope: ForecastScop
   }
 }
 
-/** latest.json must be the archived signed plan with the newest createdTs; an older signed plan copied over it is a rollback. */
+/**
+ * Freshness is anchored in the sealed transparency log, which the workspace cannot rewrite without the auditor key:
+ * the newest TRANSFORM_PLAN_CREATED/UPDATED entry for this scope must name latest.json's planId and exact bytes.
+ * ponytail: reads and verifies the whole log on each refresh; a restored older log+seal pair is caught only by the
+ * log's own anchors (src/keys/highWater.ts names it the second floor), not here.
+ */
+function transformPlanAnchorProblem(workspace: string, scope: ForecastScope, plan: TransformPlan, latestBytes: Buffer): string | null {
+  if (!pathExists(transparencyLogPath(workspace))) return "Transform plan has no transparency record.";
+  const log = verifyTransparencyLog(workspace);
+  if (!log.ok) return "Transform plan freshness is unverifiable: the transparency log does not verify.";
+  const entries = readTransparencyEntries(workspace);
+  if ((entries.at(-1)?.hash ?? "") !== log.lastHash) return "Transform plan freshness is unverifiable: the transparency log changed while reading.";
+  const agentId = scope.type === "AGENT" ? scope.id : `node:${scope.id}`;
+  const anchor = entries.filter((entry) => entry.agentId === agentId
+    && (entry.type === "TRANSFORM_PLAN_CREATED" || entry.type === "TRANSFORM_PLAN_UPDATED")).at(-1);
+  if (!anchor) return "Transform plan has no transparency record.";
+  if (anchor.artifact.id !== plan.planId || anchor.artifact.sha256 !== sha256Hex(latestBytes)) {
+    return "Transform plan is not the latest recorded plan; latest.json was rolled back.";
+  }
+  return null;
+}
+
+/** latest.json must be the archived signed plan with the newest createdTs; an unverifiable archive entry is tampering. */
 function transformPlanRollbackProblem(workspace: string, root: string, plan: TransformPlan, latestBytes: Buffer): string | null {
   const plansDir = join(root, "plans");
   let archived: Buffer;
@@ -49,13 +74,15 @@ function transformPlanRollbackProblem(workspace: string, root: string, plan: Tra
   catch { return "Transform plan is not in the signed plan archive."; }
   if (!archived.equals(latestBytes)) return "Transform plan differs from its archived signed copy.";
   for (const name of readdirSync(plansDir).filter((file) => file.endsWith(".json") && file !== `${plan.planId}.json`)) {
+    let other: TransformPlan;
     try {
       const bytes = readFileSync(join(plansDir, name));
-      if (!verifyAuditorSignatureBytes(workspace, "TRANSFORM_PLAN", bytes, readFileSync(join(plansDir, `${name}.sig`))).valid) continue;
-      if (transformPlanSchema.parse(JSON.parse(bytes.toString("utf8")) as unknown).createdTs > plan.createdTs) {
-        return "A newer signed transform plan exists; latest.json was rolled back.";
+      if (!verifyAuditorSignatureBytes(workspace, "TRANSFORM_PLAN", bytes, readFileSync(join(plansDir, `${name}.sig`))).valid) {
+        return `Transform plan archive entry ${name} does not verify.`;
       }
-    } catch { continue; }
+      other = transformPlanSchema.parse(JSON.parse(bytes.toString("utf8")) as unknown);
+    } catch { return `Transform plan archive entry ${name} does not verify.`; }
+    if (other.createdTs > plan.createdTs) return "A newer signed transform plan exists; latest.json was rolled back.";
   }
   return null;
 }
