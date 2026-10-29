@@ -1,0 +1,34 @@
+{
+  "id": "BR-3",
+  "scenario": "Bad restores",
+  "status": "passed",
+  "criteria": [
+    {
+      "name": "one flipped byte: refused with an error, no partial workspace",
+      "ok": true,
+      "detail": {
+        "exit": 1,
+        "message": "command terminated with exit code 1"
+      }
+    },
+    {
+      "name": "backup key withheld: refused with an error, no partial workspace",
+      "ok": true,
+      "detail": {
+        "exit": 1,
+        "message": "command terminated with exit code 1",
+        "note": "backup passphrase withheld; KeyProvider-wrapped backup keys are not implemented (P2-08)"
+      }
+    },
+    {
+      "name": "restore into another tenant's workspace: refused with an error, tenant unchanged",
+      "ok": true,
+      "detail": {
+        "exit": 1,
+        "message": "command terminated with exit code 1",
+        "tenantChanged": false
+      }
+    }
+  ],
+  "durationMs": 4541
+}

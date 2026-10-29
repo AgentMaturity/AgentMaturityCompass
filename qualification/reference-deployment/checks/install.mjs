@@ -1,5 +1,5 @@
 // INS-1 and INS-2 (docs/deploy/reference/INSTALL.md).
-import { STARTUP_BUDGET_SECONDS, criterion, deployVerify, ensureBootstrapSecret, governedTurn, helm, imageArgs, kubectl, pinMonitor,
+import { STARTUP_BUDGET_SECONDS, criterion, deployVerify, governedTurn, helm, imageUnderTest, installRelease, kubectl, pinMonitor,
   verdict } from "./lib.mjs";
 
 // Each refusal names the chart's own message (templates/deployment.yaml, _helpers.tpl, values.schema.json).
@@ -29,16 +29,15 @@ async function ins2(ctx) {
 
 async function ins1(ctx) {
   const criteria = [];
-  const secret = ensureBootstrapSecret(ctx);
+  // A fresh install qualifies N, the image under test, on its own release (UPG-* and RB-* start from N-1 elsewhere).
+  const image = imageUnderTest(ctx);
+  const { secret, install, readyMs } = installRelease(ctx, image);
   criteria.push(criterion("bootstrap secrets created out of band", secret, secret ? "amc-bootstrap exists before install" : "amc-bootstrap missing; create it first"));
-  if (!secret) return verdict(criteria);
-  const started = Date.now();
-  const install = helm(ctx, ["install", ctx.release, ctx.chartDir, ...imageArgs(ctx.imageA), "--wait", "--timeout", `${STARTUP_BUDGET_SECONDS}s`]);
-  const readyMs = Date.now() - started;
+  if (!install) return verdict(criteria);
   criteria.push(criterion(`Ready within the ${STARTUP_BUDGET_SECONDS} s startup budget`, install.status === 0, { readyMs, exit: install.status }));
   if (install.status !== 0) return verdict(criteria);
   const manifest = helm(ctx, ["get", "manifest", ctx.release], { quiet: true }).stdout;
-  criteria.push(criterion("manifests contain @sha256: and no change-me", manifest.includes(`@${ctx.imageA.split("@")[1]}`) && !/change-me/i.test(manifest)));
+  criteria.push(criterion("manifests contain @sha256: and no change-me", manifest.includes(`@${image.split("@")[1]}`) && !/change-me/i.test(manifest)));
   criteria.push(criterion("the chart renders no Secret (created out of band)", !/^kind:\s*Secret\s*$/m.test(manifest)));
   // Not verified: the chart has no KeyProvider or ledger-encryption values yet, so this run cannot switch them on.
   const keyed = /AMC_KEY_PROVIDER|keys\.provider|AMC_LEDGER_ENCRYPT/.test(manifest);

@@ -1,0 +1,73 @@
+{
+  "schema": "amc-deploy-verify/v1",
+  "pass": true,
+  "target": "http://127.0.0.1:33620",
+  "gateway": "http://127.0.0.1:33621",
+  "route": "/local",
+  "model": "gpt-test",
+  "agentId": "default",
+  "verifierCommit": "49151b1ff1e907a38e332637475850d950e85ecf",
+  "verifierTreeDirty": true,
+  "targetReportedVersion": "1.2.0",
+  "environment": {
+    "node": "v22.23.3",
+    "platform": "darwin",
+    "arch": "arm64"
+  },
+  "startedAt": "2026-10-29T07:21:51.336Z",
+  "finishedAt": "2026-10-29T07:21:51.488Z",
+  "durationMs": 152,
+  "receipt": {
+    "receiptId": "927daded-68fa-47f5-8ec5-5002e0dfadd8",
+    "kind": "llm_response",
+    "ts": 1793258511526,
+    "sessionId": "a1d0eaa4-38aa-428a-b49b-c4266810c36c",
+    "eventHash": "fc5979e50d03c2b0335998a59be878ec2c8383ef9761c7ed4413ab28f5c4bc05",
+    "receiptSha256": "a8947e4a83b8476275483a4447ba9d5555a876c80654bac5669794065479481a"
+  },
+  "requiredChecks": [
+    "health",
+    "readiness",
+    "governed-turn",
+    "receipt-signature",
+    "receipt-binding"
+  ],
+  "missingChecks": [],
+  "checks": [
+    {
+      "name": "health",
+      "status": "PASS",
+      "durationMs": 37,
+      "detail": "/healthz 200 status=ok version=1.2.0"
+    },
+    {
+      "name": "readiness",
+      "status": "PASS",
+      "durationMs": 71,
+      "detail": "/readyz 200 READY"
+    },
+    {
+      "name": "governed-turn",
+      "status": "PASS",
+      "durationMs": 42,
+      "detail": "gateway 200 with x-amc-receipt"
+    },
+    {
+      "name": "receipt-signature",
+      "status": "PASS",
+      "durationMs": 1,
+      "detail": "Ed25519 signature verifies against pinned key; receipt_id=927daded-68fa-47f5-8ec5-5002e0dfadd8"
+    },
+    {
+      "name": "receipt-binding",
+      "status": "PASS",
+      "durationMs": 0,
+      "detail": "llm_response receipt commits to the 263 response bytes received for agent default"
+    }
+  ],
+  "notExercised": [
+    "the receipt's event_hash is not anchored to the target's ledger (needs ledger access, not an HTTP probe)",
+    "the deployed commit is not reported by the target; targetReportedVersion is the package version only",
+    "tool execution, streaming responses and approvals are not exercised"
+  ]
+}

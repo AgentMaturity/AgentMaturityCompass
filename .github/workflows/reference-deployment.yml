@@ -68,7 +68,9 @@ jobs:
           git worktree add --detach "$RUNNER_TEMP/base" "$IMAGE_A_REF"
           docker build -t amc-studio:rd-a "$RUNNER_TEMP/base"
           docker build -t amc-studio:rd-b .
-          kind load docker-image amc-studio:rd-a amc-studio:rd-b --name "$KIND_CLUSTER"
+          # One image per load: a multi-image archive leaves the second image without a digest in containerd.
+          kind load docker-image amc-studio:rd-a --name "$KIND_CLUSTER"
+          kind load docker-image amc-studio:rd-b --name "$KIND_CLUSTER"
           echo "a=$(node scripts/deploy/kind-image-digest.mjs --cluster "$KIND_CLUSTER" --image amc-studio:rd-a)" >> "$GITHUB_OUTPUT"
           echo "b=$(node scripts/deploy/kind-image-digest.mjs --cluster "$KIND_CLUSTER" --image amc-studio:rd-b)" >> "$GITHUB_OUTPUT"
 

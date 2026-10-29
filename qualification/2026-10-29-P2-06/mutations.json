@@ -57,6 +57,41 @@
       "mutation": "any trailing rows accepted",
       "test": "tests/referenceDeploymentHarness.test.ts",
       "result": "killed: 1 test failed"
+    },
+    {
+      "id": "M8",
+      "guard": "imageUnderTest is N (--image-b)",
+      "mutation": "imageUnderTest returns N-1",
+      "test": "tests/referenceDeploymentHarness.test.ts",
+      "result": "killed: INS-1 and BR image tests failed (H1/H2 fix, branch rtd/w7-p2-06-rerun)"
+    },
+    {
+      "id": "M9",
+      "guard": "INS-1 installs N",
+      "mutation": "INS-1 installs --image-a",
+      "test": "tests/referenceDeploymentHarness.test.ts",
+      "result": "killed: INS-1 image test failed (H1/H2 fix, branch rtd/w7-p2-06-rerun)"
+    },
+    {
+      "id": "M10",
+      "guard": "BR restore pods run N",
+      "mutation": "restore pod uses --image-a",
+      "test": "tests/referenceDeploymentHarness.test.ts",
+      "result": "killed: BR restore pod test failed (H1/H2 fix, branch rtd/w7-p2-06-rerun)"
+    },
+    {
+      "id": "M11",
+      "guard": "UPG-1 runs on its own <release>-upg release",
+      "mutation": "UPG-1 on the main release",
+      "test": "tests/referenceDeploymentHarness.test.ts",
+      "result": "killed: UPG-1 release test failed (H1/H2 fix, branch rtd/w7-p2-06-rerun)"
+    },
+    {
+      "id": "M12",
+      "guard": "RB-2 continues the upgrade release",
+      "mutation": "RB-2 on the main release",
+      "test": "tests/referenceDeploymentHarness.test.ts",
+      "result": "killed: RB-2 test failed (H1/H2 fix, branch rtd/w7-p2-06-rerun)"
     }
   ]
 }

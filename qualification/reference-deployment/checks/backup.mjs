@@ -1,6 +1,6 @@
 // BR-1, BR-2 and BR-3 (docs/deploy/reference/BACKUP_RESTORE.md).
 import { spawn } from "node:child_process";
-import { createBackup, criterion, isRestoredPrefix, kubectl, ledgerSnapshot, notRun, pair, restoreInPod, restoreNamespace, restoreWarnings,
+import { createBackup, criterion, imageUnderTest, isRestoredPrefix, kubectl, ledgerSnapshot, notRun, pair, restoreInPod, restoreNamespace, restoreWarnings,
   startToolPod, summary, verdict } from "./lib.mjs";
 
 /** The restore namespace with its own volume and the bootstrap Secret copied in (created out of band, as at install). */
@@ -16,7 +16,7 @@ function prepareRestoreNamespace(ctx) {
   const claim = { apiVersion: "v1", kind: "PersistentVolumeClaim", metadata: { name: "restore", namespace },
     spec: { accessModes: ["ReadWriteOnce"], resources: { requests: { storage: "2Gi" } } } };
   if (kubectl(ctx, ["apply", "-f", "-"], { namespace, input: JSON.stringify(claim) }).status !== 0) return null;
-  if (!startToolPod(ctx, { namespace, name: "restore", claim: "restore", image: ctx.imageA })) return null;
+  if (!startToolPod(ctx, { namespace, name: "restore", claim: "restore", image: imageUnderTest(ctx) })) return null;
   ctx.state.restoreNamespaceReady = true;
   return namespace;
 }

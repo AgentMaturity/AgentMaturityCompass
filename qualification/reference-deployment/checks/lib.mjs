@@ -11,6 +11,12 @@ const PROBE_PASSES = new Set(["verified", "verified-prefix"]);
 export const BOOTSTRAP_KEYS = ["vaultPassphrase", "ownerUsername", "ownerPassword", "notaryPassphrase", "notaryAuthSecret"];
 
 export const fullname = (ctx) => `${ctx.release}-amc`;
+/** N, the image under qualification: fresh installs, checks on the running release and every restore pod use it. */
+export const imageUnderTest = (ctx) => ctx.imageB;
+/** N-1: only the upgrade and rollback path (UPG-*, RB-*) starts from it. */
+export const imageBase = (ctx) => ctx.imageA;
+/** The upgrade and rollback path runs on its own release, so N-1's defects never gate the fresh-install checks. */
+export const upgradeCtx = (ctx) => ({ ...ctx, release: `${ctx.release}-upg` });
 export const restoreNamespace = (ctx) => `${ctx.namespace === "default" ? ctx.release : ctx.namespace}-restore`;
 export const kubectl = (ctx, args, opts) => ctx.run("kubectl", ["--context", ctx.kubeContext, "-n", opts?.namespace ?? ctx.namespace, ...args], opts);
 export const helm = (ctx, args, opts) => ctx.run("helm", ["--kube-context", ctx.kubeContext, "-n", opts?.namespace ?? ctx.namespace, ...args], opts);
@@ -224,8 +230,25 @@ export function restoreWarnings(ctx, { namespace = ctx.namespace, pod, target })
   return { all: lines, unexpected: lines.filter((line) => !/missing seal/i.test(line)) };
 }
 
-/** Remove what the harness created: the release, its volumes, the restore namespace and ephemeral secrets. */
+/**
+ * helm install `image` by digest on ctx.release (bootstrap Secret created out of band first), waiting up to the
+ * startup budget. Returns {secret, install, readyMs}; install is null when the Secret is missing.
+ */
+export function installRelease(ctx, image) {
+  const secret = ensureBootstrapSecret(ctx);
+  if (!secret) return { secret, install: null, readyMs: 0 };
+  const started = Date.now();
+  const install = helm(ctx, ["install", ctx.release, ctx.chartDir, ...imageArgs(image), "--wait", "--timeout", `${STARTUP_BUDGET_SECONDS}s`]);
+  return { secret, install, readyMs: Date.now() - started };
+}
+
+/** Remove what the harness created: both releases, their volumes, the restore namespace and ephemeral secrets. */
 export function cleanup(ctx) {
+  cleanupRelease(upgradeCtx(ctx));
+  cleanupRelease(ctx);
+}
+
+function cleanupRelease(ctx) {
   if (ctx.state.scratch) rmSync(ctx.state.scratch, { recursive: true, force: true });
   kubectl(ctx, ["delete", "pod", "-l", "app.kubernetes.io/component=p206-tool", "--ignore-not-found", "--wait=true"], { quiet: true });
   helm(ctx, ["uninstall", ctx.release, "--wait"], { quiet: true });

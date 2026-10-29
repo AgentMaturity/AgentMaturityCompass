@@ -1,0 +1,48 @@
+{
+  "id": "CR-2",
+  "scenario": "Node drain",
+  "status": "passed",
+  "criteria": [
+    {
+      "name": "node running Studio found",
+      "ok": true,
+      "detail": {
+        "node": "amc-p206-control-plane",
+        "nodes": 1
+      }
+    },
+    {
+      "name": "drain evicts Studio within 180 s (PodDisruptionBudget allows it)",
+      "ok": true,
+      "detail": {
+        "exit": 0,
+        "message": ""
+      }
+    },
+    {
+      "name": "Ready again after uncordon (single-node procedure)",
+      "ok": true,
+      "detail": {
+        "node": "amc-p206-control-plane",
+        "readyMs": 10618
+      }
+    },
+    {
+      "name": "chain intact across the drain",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "governed turn passes after the drain",
+      "ok": true,
+      "detail": {
+        "ok": true,
+        "status": "verified-prefix",
+        "taskId": "4887e0939d0cd2f0e827a7c811e311f44ecda14db8930895c79db37e0150d553",
+        "exit": 0
+      }
+    }
+  ],
+  "podName": "amc-rd-amc",
+  "durationMs": 19149
+}
