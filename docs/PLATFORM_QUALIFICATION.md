@@ -61,11 +61,11 @@ node scripts/gen-platform-matrix.mjs --receipts <dir> --commit <sha>
 
 Statuses: `qualified` (a passing receipt for this commit), `not qualified`, `inconclusive (unsupported Node)`, `not run` (no receipt, or a receipt from another commit) and `refused by design` (the native shell on Windows until P2-14). Nothing in the matrix is typed by hand; `--check` fails when the committed file differs from what the receipts produce.
 
-GUI launcher runs are manual: Sid follows [deploy/reference/GUI_CHECKLIST.md](deploy/reference/GUI_CHECKLIST.md) and records a `gui` lane receipt.
+GUI launcher runs are manual: Sid follows `docs/deploy/reference/GUI_CHECKLIST.md` and records a `gui` lane receipt.
 
 ### Reference deployment
 
-`scripts/qualify-reference-deployment.mjs` runs the 22 checks in `qualification/reference-deployment/matrix.json` against one Helm release (topology: [deploy/reference/TOPOLOGY.md](deploy/reference/TOPOLOGY.md)). It exits 0 only when every check passed; a check that did not run is a failure; it exits 2 on a usage error, a missing tool, or recovery targets that are not filled in.
+`scripts/qualify-reference-deployment.mjs` runs the 22 checks in `qualification/reference-deployment/matrix.json` against one Helm release (topology: `docs/deploy/reference/TOPOLOGY.md`). It exits 0 only when every check passed; a check that did not run is a failure; it exits 2 on a usage error, a missing tool, or recovery targets that are not filled in.
 
 - On kind: `.github/workflows/reference-deployment.yml` (manual and nightly) with ephemeral secrets.
 - On the D-03 cluster: Sid runs the same command with his credentials and `--out qualification/<date>-P2-06/cluster`, then gives the release gate a staging URL through `AMC_RELEASE_GATE_LIVE_URL`.
