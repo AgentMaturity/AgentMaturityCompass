@@ -101,6 +101,28 @@ describe("governor run trust", () => {
     expect(check(dir).effectiveMode).toBe("SIMULATE");
   });
 
+  it("deleting the newest run file does not roll the gate back to an older passing run", async () => {
+    const dir = workspace();
+    permitAgentActions(dir, "default");
+    const failing = { ...observedRunReport("default"), runId: "run_newer_failing", ts: Date.now() + 1000, integrityIndex: 0.1, trustLabel: "LOW TRUST" };
+    writeSealedRun(dir, failing);
+    expect(check(dir).effectiveMode).toBe("SIMULATE");
+    rmSync(runPath(dir, "default", "run_newer_failing"));
+    expect(latestTrustedRun(dir, "default")).toEqual({ run: null, refusal: expect.stringMatching(/newer run run_newer_failing with no matching run file/) });
+    const decision = check(dir);
+    expect(decision.effectiveMode).toBe("SIMULATE");
+    expect(decision.reasons.join("\n")).toMatch(/UNTRUSTED RUN: .*run_newer_failing/);
+    expect(await nativeWrite(dir)).toBe(false);
+  });
+
+  it("another agent's newer run does not block this agent's newest run", () => {
+    const dir = workspace();
+    permitAgentActions(dir, "default");
+    writeSealedRun(dir, { ...observedRunReport("other-agent"), runId: "run_other_agent", ts: Date.now() + 1000 });
+    expect(latestTrustedRun(dir, "default")).toMatchObject({ refusal: null, run: { runId: "run_action_policy_fixture" } });
+    expect(check(dir).effectiveMode).toBe("EXECUTE");
+  });
+
   it("an honest run written by the runner verifies and is the run the governor uses", async () => {
     const dir = workspace();
     const report = await runDiagnostic({ workspace: dir, agentId: "default", window: "14d", targetName: "default", claimMode: "auto" });

@@ -6,12 +6,15 @@ import {
   type DiagnosticReport,
   type ExecutionMode,
   type RiskTier,
+  type RunRecord,
   type TargetProfile,
   type TrustTier
 } from "../types.js";
 import { pathExists, readUtf8 } from "../utils/fs.js";
 import type { ActionPolicy, ActionPolicyRule, TrustTierAtLeast } from "./actionPolicySchema.js";
-import { getAgentPaths } from "../fleet/paths.js";
+import { fleetAgentsDir, fleetRoot, getAgentPaths } from "../fleet/paths.js";
+import { sha256Hex } from "../utils/hash.js";
+import { canonicalize } from "../utils/json.js";
 import { latestVerifiedRun } from "../diagnostic/runReportResolution.js";
 import { defaultActionPolicy } from "./actionPolicyStore.js";
 export { ACTION_POLICY_WRITER_LOCK, actionPolicyWriterPendingPath, assertActionPolicyWriterReady,
@@ -663,11 +666,13 @@ export function deriveTrustSummaryFromRun(workspace: string, agentId: string, ru
 }
 
 /**
- * The run a gate may act on (governor, ToolHub, the native Action Policy guard, transformation planning, what-if): the
- * newest run whose seal verifies under the workspace run-hash keys (`latestVerifiedRun`), that names this agent, and that
- * the ledger `runs` table anchors with the same hash, seal and status. Anything else is refused with the reason, and a
- * newer unverifiable or tampered file blocks rather than rolling back to an older sealed run. Display callers that may
- * show an unverified run use `latestDisplayRun` and label it.
+ * The run a gate or signer may act on (governor, ToolHub, the native Action Policy guard, transformation planning,
+ * what-if, certificate, passport, binder): the newest run whose seal verifies under the workspace run-hash keys
+ * (`latestVerifiedRun`), that names this agent, that the ledger `runs` table anchors with the same hash, seal and status,
+ * and that is the agent's newest ledger run. Anything else is refused with the reason: a newer unverifiable or tampered
+ * file blocks, and so does a newer ledger run of this agent (or one no file on disk can attribute to another agent), so
+ * deleting the newest run file cannot roll the gate back to an older sealed run. Display callers that may show an
+ * unverified run use `latestDisplayRun` and label it.
  */
 export function latestTrustedRun(workspace: string, agentId: string): { run: DiagnosticReport | null; refusal: string | null } {
   const { run, blocking } = latestVerifiedRun(workspace, agentId);
@@ -678,19 +683,56 @@ export function latestTrustedRun(workspace: string, agentId: string): { run: Dia
   if (run.agentId !== agentId) {
     return { run: null, refusal: `diagnostic run ${run.runId} is sealed for agent ${String(run.agentId)}, not ${agentId}` };
   }
-  let anchored = false;
+  let refusal: string | null = `diagnostic run ${run.runId} is not anchored in the ledger`;
   try {
     const ledger = openLedger(workspace);
     try {
       const row = ledger.getRun(run.runId);
-      anchored = row !== null && row.report_json_sha256 === run.reportJsonSha256 && row.run_seal_sig === run.runSealSig && row.status === run.status;
+      if (row !== null && row.report_json_sha256 === run.reportJsonSha256 && row.run_seal_sig === run.runSealSig && row.status === run.status) {
+        refusal = newerLedgerRunRefusal(workspace, agentId, row, ledger.listRuns());
+      }
     } finally {
       ledger.close();
     }
   } catch {
-    anchored = false;
+    // refusal stays "not anchored": an unreadable ledger never vouches for a run.
   }
-  return anchored ? { run, refusal: null } : { run: null, refusal: `diagnostic run ${run.runId} is not anchored in the ledger` };
+  return refusal === null ? { run, refusal: null } : { run: null, refusal };
+}
+
+/**
+ * Rollback guard: a ledger run recorded at or after `selected` (ties count as newer) that is this agent's, or that no
+ * run file on disk with the row's hash attributes to another agent, means the selected file is not the agent's newest.
+ * `rows` is `listRuns()`, newest first.
+ */
+function newerLedgerRunRefusal(workspace: string, agentId: string, selected: RunRecord, rows: readonly RunRecord[]): string | null {
+  for (const row of rows) {
+    if (row.ts < selected.ts) break;
+    if (row.run_id === selected.run_id) continue;
+    const owner = ledgerRunOwner(workspace, row);
+    if (owner === agentId) return `the ledger records newer run ${row.run_id} for ${agentId}, not ${selected.run_id}`;
+    if (owner === null) return `the ledger records newer run ${row.run_id} with no matching run file on disk`;
+  }
+  return null;
+}
+
+/** The agentId of the run file whose content hashes to the ledger row's hash, searched across every agent's runs dir. */
+function ledgerRunOwner(workspace: string, row: RunRecord): string | null {
+  const agentsDir = fleetAgentsDir(workspace);
+  const dirs = [join(fleetRoot(workspace), "runs"),
+    ...(pathExists(agentsDir) ? readdirSync(agentsDir).map((id) => join(agentsDir, id, "runs")) : [])];
+  for (const dir of dirs) {
+    const file = join(dir, `${row.run_id}.json`);
+    if (!pathExists(file)) continue;
+    try {
+      const parsed = JSON.parse(readUtf8(file)) as Record<string, unknown>;
+      if (typeof parsed.agentId === "string"
+        && sha256Hex(canonicalize({ ...parsed, reportJsonSha256: "", runSealSig: "" })) === row.report_json_sha256) return parsed.agentId;
+    } catch {
+      // unreadable: not attributable
+    }
+  }
+  return null;
 }
 
 /** `latestTrustedRun` without the reason. */
