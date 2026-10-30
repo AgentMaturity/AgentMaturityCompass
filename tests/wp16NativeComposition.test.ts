@@ -279,7 +279,7 @@ describe("WP16 pre-seal owned-resource cleanup", () => {
       const rows = readRows();
       const confinement = rows.findIndex(row => row.event_type === "audit" && (JSON.parse(row.meta_json) as { auditType?: string }).auditType === "NATIVE_SHELL_CONFINEMENT");
       const closed = rows.findIndex(row => row.event_type === "session/close");
-      expect(confinement).toBeGreaterThanOrEqual(0);
+      expect(confinement).not.toBe(-1);
       expect(closed).toBeGreaterThan(confinement);
       expect(closed).toBe(rows.length - 1);
       expect(JSON.parse(rows[closed]!.meta_json)).toMatchObject({ reason: "completed" });

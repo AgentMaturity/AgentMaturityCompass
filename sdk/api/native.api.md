@@ -333,6 +333,7 @@ export interface AgentPromptOptions {
 ```ts
 export interface AgentSession {
     readonly sessionId: string;
+    resourceStatus?(): NativeResourceStatus;
     prompt(text: string, images?: readonly NativeImageInput[], options?: AgentPromptOptions): Promise<AgentPromptResult>;
     promptParts?(parts: readonly NativeInputPart[], options?: AgentPromptOptions): Promise<AgentPromptResult>;
     promptAudioParts?(parts: readonly NativeAudioPart[], options?: AgentPromptOptions): Promise<AgentPromptResult>;
@@ -371,9 +372,12 @@ export interface AgentSessionInit {
     readonly additionalCapabilities?: readonly NativeToolCapability[];
     readonly askUser?: AgentToolsetOptions["askUser"];
     readonly webSearchProvider?: AgentToolsetOptions["webSearchProvider"];
+    readonly nativeTerminal?: AgentToolsetOptions["nativeTerminal"];
     readonly maxSteps?: number;
     readonly compaction?: Partial<CompactionConfig>;
     readonly validation?: NativeValidationPlan;
+    readonly resourceStatus?: () => NativeResourceStatus;
+    readonly compositionSources?: readonly CompositionSource[];
     readonly bindTools?: (context: {
         readonly session: SessionService;
         readonly toolset: AgentToolset | null;

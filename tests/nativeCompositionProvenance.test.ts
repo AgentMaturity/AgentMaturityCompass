@@ -258,7 +258,7 @@ describe("native composition records signed provenance", () => {
       const included = contexts.find(context => context.text.includes(rule));
       expect(included).toBeDefined();
       const callIndex = events.findIndex(event => event.event_type === "tool/call");
-      expect(callIndex).toBeGreaterThanOrEqual(0);
+      expect(callIndex).not.toBe(-1);
       expect(events.findIndex(event => event.id === included!.id)).toBeGreaterThan(callIndex);
       const requests = events.filter(event => event.event_type === "request/header");
       expect(events.findIndex(event => event.id === included!.id)).toBeLessThan(events.findIndex(event => event.id === requests[1]!.id));
