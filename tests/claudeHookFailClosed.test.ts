@@ -256,7 +256,7 @@ describe("Claude Code control hook fails closed with exit code 2", () => {
     expect(run.stderr).toContain("AMC hook control unavailable; action denied.");
   }, 60_000);
 
-  // P1-23: control decides only for a registered session, and answers allow or deny; an ask is denied (exit 2).
+  // P1-23: control decides only for a registered session, and answers allow or deny; an ask is denied (exit 2) pending AMC approval.
   test("a policy deny and an ask exit 2 and an allow exits 0 with the matching native JSON", async () => {
     const workspace = newWorkspace();
     const agentId = "policy-agent";
@@ -306,7 +306,10 @@ describe("Claude Code control hook fails closed with exit code 2", () => {
     expect(JSON.parse(asked.stdout)).toEqual({
       hookSpecificOutput: expect.objectContaining({ hookEventName: "PreToolUse", permissionDecision: "deny" }),
     });
-    expect(asked.stderr).toContain("A Claude Code ask is not AMC approval");
+    // WP35d (846617db1): an ask goes to AMC's signed approval engine, which records a pending request and still denies
+    // (exit 2) until an AMC approver grants this exact call; Claude Code's own ask is never the approval.
+    expect(asked.stderr).toMatch(/AMC approval pending: apprreq_\w+\. Approve through amc approvals/);
+    expect(asked.stderr).not.toContain("PRIVATE");
   }, 90_000);
 
   test("empty stdin and malformed JSON are denied with exit 2", async () => {
