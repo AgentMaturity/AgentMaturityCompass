@@ -10,6 +10,13 @@
       "sha256": "e2a36efef0396fbe6198a1ea2ce2953bded4707830d29ee7c3f0b9175ed59341"
     },
     {
+      "path": "dist/importers/piTelemetryCallbacks.d.ts",
+      "issue": "GAP-WP26",
+      "baseCommit": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+      "archivePath": "unused-code/plan-edits/GAP-WP26/dist/importers/piTelemetryCallbacks.d.ts.landed",
+      "sha256": "5db8ab813511f831a7c5c3a9808702b7c5f32e4db5182f8cd367fc9a0cd163b7"
+    },
+    {
       "path": "dist/index.d.ts",
       "issue": "P0-08",
       "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
@@ -113,6 +120,13 @@
       "baseCommit": "e263c5718df833f7e35d63012a9999faa949f607",
       "archivePath": "unused-code/plan-edits/P1-43/src/agent/nativeToolCapabilities.ts.landed",
       "sha256": "d0a8f4c55a8f01db62a0c1c31807bf28ad8c553b98f71ce66817cacf71bed4f0"
+    },
+    {
+      "path": "src/agent/providers/delegationProviders.ts",
+      "issue": "GAP-WP35",
+      "baseCommit": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+      "archivePath": "unused-code/plan-edits/GAP-WP35/src/agent/providers/delegationProviders.ts.landed",
+      "sha256": "dca765aa0061e5dc01c54b0df5c56acdeb6dce3675082866e5c4ecb00fe8ea00"
     },
     {
       "path": "src/api/benchmarkRouter.ts",
@@ -472,6 +486,13 @@
       "sha256": "c5fd2a3203db0848bb9b745a27d13d6533fb8581fde99be8f7d529ce085956b4"
     },
     {
+      "path": "src/importers/piTelemetryCallbacks.ts",
+      "issue": "GAP-WP26",
+      "baseCommit": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+      "archivePath": "unused-code/plan-edits/GAP-WP26/src/importers/piTelemetryCallbacks.ts.landed",
+      "sha256": "165eeaef049f34d247768a86948d06ab17f4eb956936a2b37ceec793098d5333"
+    },
+    {
       "path": "src/index.ts",
       "issue": "P0-08",
       "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
@@ -724,6 +745,13 @@
       "sha256": "535a626d6e1802003214e31dc98f61fedfa94f0e448205f43b446e3c011a0c7a"
     },
     {
+      "path": "src/receipts/receiptChain.ts",
+      "issue": "GAP-WP43",
+      "baseCommit": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+      "archivePath": "unused-code/plan-edits/GAP-WP43/src/receipts/receiptChain.ts.landed",
+      "sha256": "1e97a48511bfb7da0f7b0cfb885d1d25fec40bbf004138421fced0a609371cb9"
+    },
+    {
       "path": "src/runtime/autonomyBoundary.ts",
       "issue": "GAP-WP46",
       "baseCommit": "2eb8d7e2fbffa3487c51bf0d961167829bfa0a18",
@@ -967,6 +995,13 @@
       "baseCommit": "c71c28e2c10cad64c72600e042a2121b07b9b38e",
       "archivePath": "unused-code/plan-edits/AXE-23/src/watch/railScoreLiveDrift.ts.landed",
       "sha256": "479aa2bf8299a4e3951c85d95c4490d39be3616f6cd68a80ba5f818b82911282"
+    },
+    {
+      "path": "src/wire/wireListener.ts",
+      "issue": "GAP-WP43",
+      "baseCommit": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+      "archivePath": "unused-code/plan-edits/GAP-WP43/src/wire/wireListener.ts.landed",
+      "sha256": "23973858e390e6edc4d669a9083a8d56cc2403b346a4432880d8a02878d4bc06"
     },
     {
       "path": "src/workorders/workorderEngine.ts",

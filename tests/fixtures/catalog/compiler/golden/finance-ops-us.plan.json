@@ -448,7 +448,7 @@
               "daily": {
                 "maxLlmRequests": 500,
                 "maxLlmTokens": 5000000,
-                "maxCostUsd": 50,
+                "maxCostUsd": null,
                 "maxToolExecutes": {
                   "READ_ONLY": 500,
                   "WRITE_LOW": 50,
@@ -889,7 +889,7 @@
         }
       }
     },
-    "policyDigest": "sha256:99464ec208750f3f5faf4cbca66c7bf19ed84b4f0281260f869f74f9e91db54e"
+    "policyDigest": "sha256:04efab5bef4d2a1478259209aa75a5b7cebed90d54a67504cce1ec4a0ba5b3c7"
   },
   "evidencePlan": {
     "tests": [
@@ -1032,5 +1032,5 @@
       }
     ]
   },
-  "digest": "sha256:5c82312e160085ce34a9db4339506a5633cf290ff6969e3a079910522987cf34"
+  "digest": "sha256:3aa5cc96b3c302ccf253c12731ff3b3b3dd2146daf664539a2982f55131630ae"
 }
