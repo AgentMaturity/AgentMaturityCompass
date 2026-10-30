@@ -8,7 +8,7 @@ const runbook = readFileSync(join(root, "docs/RELEASE_RUNBOOK.md"), "utf8");
 /** Text from a `### ` heading up to the next `##`/`###` heading. */
 function section(heading: string): string {
   const start = runbook.indexOf(`${heading}\n`);
-  expect(start, `missing heading: ${heading}`).toBeGreaterThanOrEqual(0);
+  expect(start, `missing heading: ${heading}`).not.toBe(-1);
   const rest = runbook.slice(start + heading.length + 1);
   const next = rest.search(/^#{2,3} /m);
   return next === -1 ? rest : rest.slice(0, next);

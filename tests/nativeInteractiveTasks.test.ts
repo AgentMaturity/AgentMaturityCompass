@@ -77,7 +77,7 @@ async function terminal(root: string, args: string[], actions: Action[], options
 }
 function measured(task: string, result: TerminalResult, expectedSteps: number, scope: MeasurementScope = "scripted-chat-cli-pty"): void {
   expect(result.steps).toBe(expectedSteps);
-  expect(result.elapsedMs).toBeGreaterThanOrEqual(0);
+  expect(Number.isFinite(result.elapsedMs) && result.elapsedMs >= 0, `elapsedMs ${result.elapsedMs}`).toBe(true);
   measurements.push({ task, steps: result.steps, elapsedMs: result.elapsedMs, scope });
   const file = resolve("tmp/native-interactive-task-metrics.json"); mkdirSync(dirname(file), { recursive: true });
   writeFileSync(file, JSON.stringify({ schemaVersion: 1, humanUsability: "not-measured", tasks: measurements }, null, 2) + "\n");

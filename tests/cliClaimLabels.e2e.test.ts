@@ -271,7 +271,7 @@ function jsonDocument(stdout: string): unknown {
   const trimmed = stdout.trim();
   if (trimmed.startsWith("{") || trimmed.startsWith("[")) return JSON.parse(trimmed);
   const start = trimmed.search(/^[\[{]/m);
-  expect(start, `No JSON document on stdout: ${trimmed.slice(0, 300)}`).toBeGreaterThanOrEqual(0);
+  expect(start, `No JSON document on stdout: ${trimmed.slice(0, 300)}`).not.toBe(-1);
   return JSON.parse(trimmed.slice(start));
 }
 

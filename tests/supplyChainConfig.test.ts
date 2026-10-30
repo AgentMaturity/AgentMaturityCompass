@@ -45,7 +45,7 @@ describe("dependency supply-chain configuration", () => {
     expect(install?.run).toContain('audit_dir="${RUNNER_TEMP}/amc-supply-chain"');
     expect(install?.run).toContain('npm pack --ignore-scripts --pack-destination "$audit_dir" --json');
     expect(install?.run).toContain('npm install --prefix "$audit_dir/consumer" --ignore-scripts --omit=dev --no-audit --no-fund "$audit_dir/$tarball"');
-    expect(steps.findIndex(step => step.run === "npm run build")).toBeGreaterThanOrEqual(0);
+    expect(steps.some(step => step.run === "npm run build")).toBe(true);
     expect(steps.findIndex(step => step.run === "npm run build")).toBeLessThan(steps.indexOf(install!));
     expect(install?.["continue-on-error"]).not.toBe(true);
   });
