@@ -30,10 +30,11 @@ function policy(bounds: unknown[] = [bound()], cap: number | null = 1) {
   Object.assign(agent, { nativeUsdBounds: bounds });
   writeFileSync(budgetsPath(workspace), YAML.stringify(config)); signBudgetsConfig(workspace);
 }
-function request(extra: Record<string, unknown> = {}, wireExtra: Record<string, unknown> = {}) {
-  const params = { max_tokens: 20, ...extra };
-  const body = Buffer.from(JSON.stringify({ model: "gpt-4o", messages: [{ role: "user", content: "hi" }], stream: true, ...params, ...wireExtra }));
-  const prepared = session.recordRequestHeader({ providerId: "openai", model: "gpt-4o", encoderId: "openai-chat", encoderVersion: 3,
+function request(extra: Record<string, unknown> = {}, wireExtra: Record<string, unknown> = {}, encoderId = "openai-chat") {
+  const params = { [encoderId === "openai-responses" ? "max_output_tokens" : "max_tokens"]: 20, ...extra };
+  const messages = [{ role: "user", content: "hi" }];
+  const body = Buffer.from(JSON.stringify({ model: "gpt-4o", [encoderId === "openai-responses" ? "input" : "messages"]: messages, stream: true, ...params, ...wireExtra }));
+  const prepared = session.recordRequestHeader({ providerId: "openai", model: "gpt-4o", encoderId, encoderVersion: 3,
     params, systemPromptEventId: "prompt", toolSchema: null, projectionCutoffEventId: "message", projectionDigest: "projection",
     sourceEventIds: [], requestBytes: body });
   return { header: prepared.headerEventId, dispatch: { url: endpoint, body } };
@@ -90,6 +91,85 @@ describe("signed native prospective USD admission", () => {
   it.each(["image", "document", "input_audio", "video"])("refuses a typed %s media block", type => {
     policy();
     expect(() => reserve(request({}, { messages: [{ role: "user", content: [{ type, source: { type: "base64", data: "YQ==" } }] }] }))).toThrow(/media/i);
+  });
+  it.each(["openai-chat", "openai-responses", "anthropic-messages"].flatMap(encoderId =>
+    ["unknown type", "x_url", "nested source"].map(kind => ({ encoderId, kind }))
+  ))("refuses $kind under a hard USD ceiling for $encoderId", ({ encoderId, kind }) => {
+    policy([{ ...bound(), encoderId }]);
+    const field = encoderId === "openai-responses" ? "input" : "messages";
+    const type = encoderId === "openai-responses" ? "input_text" : "text";
+    const part = kind === "unknown type" ? { type: "future_media", text: "hi", payload: "YQ==" }
+      : kind === "x_url" ? { type, text: "hi", x_url: "https://media.invalid/asset" }
+      : { type, text: "hi", metadata: { layers: [{ source: "YQ==" }] } };
+    expect(() => reserve(request({}, { [field]: [{ role: "user", content: [part] }] }, encoderId))).toThrow(/media/i);
+    expect(budgetUsageSnapshot(workspace, "default").daily.llmRequests).toBe(0);
+  });
+  it.each(["x_url", "file", "profile", "source", "resource"])("refuses a nested %s suffix even with an empty value", key => {
+    policy();
+    expect(() => reserve(request({}, { messages: [{ role: "user", content: [{ type: "text", text: "hi", nested: [{ [key]: null }] }] }] }))).toThrow(/media/i);
+    expect(budgetUsageSnapshot(workspace, "default").daily.llmRequests).toBe(0);
+  });
+  it.each([
+    ["openai-chat", "input_text"], ["openai-chat", "tool_result"],
+    ["openai-responses", "text"], ["anthropic-messages", "output_text"]
+  ])("refuses a %s part outside that encoder's text allowlist: %s", (encoderId, type) => {
+    policy([{ ...bound(), encoderId }]);
+    const field = encoderId === "openai-responses" ? "input" : "messages";
+    expect(() => reserve(request({}, { [field]: [{ role: "user", content: [{ type, text: "hi", content: "hi" }] }] }, encoderId))).toThrow(/media/i);
+  });
+  it.each([
+    ["openai-chat", { messages: [{ role: "user", content: [{ type: "text", text: "hi" }] },
+      { role: "assistant", content: null, tool_calls: [{ type: "function", id: "c1", function: { name: "echo", arguments: "{}" } }] }],
+      tools: [{ type: "function", function: { name: "echo", parameters: { type: "object", properties: { content: { type: "string" } } } } }] }],
+    ["openai-responses", { input: [{ role: "user", content: [{ type: "input_text", text: "hi" }] },
+      { role: "assistant", content: [{ type: "output_text", text: "done" }] },
+      { type: "function_call", call_id: "c1", name: "echo", arguments: "{}" },
+      { type: "function_call_output", call_id: "c1", output: "done" }] }],
+    ["anthropic-messages", { system: [{ type: "text", text: "system", cache_control: { type: "ephemeral" } }],
+      messages: [{ role: "assistant", content: [{ type: "tool_use", id: "c1", name: "echo", input: { text: "hi" } }] },
+        { role: "user", content: [{ type: "tool_result", tool_use_id: "c1", content: [{ type: "text", text: "done" }], cache_control: { type: "ephemeral" } }] }],
+      tools: [{ name: "echo", input_schema: { type: "object", properties: { text: { type: "string" } } } }] }]
+  ])("admits covered text and function structures for %s", (encoderId, wire) => {
+    policy([{ ...bound(), encoderId }]); reserve(request({}, wire, encoderId));
+    expect(budgetUsageSnapshot(workspace, "default").daily).toMatchObject({ llmRequests: 1, llmReservedCostUsd: 0.6 });
+  });
+  it.each([
+    { type: "text", text: 17 },
+    { text: "untyped" },
+    { type: "tool_result", tool_use_id: "c1", content: [{ type: "future_media", payload: "YQ==" }] },
+    { type: "tool_use", id: "c1", name: "echo", input: { nested: { type: "future_media", payload: "YQ==" } } },
+    { type: "tool_result", tool_use_id: "c1", content: [{ type: "tool_use", id: "c2", name: "echo", input: {} }] },
+    { type: "text", text: "hi", cache_control: { type: "future_media" } },
+    { type: "text", text: "hi", cache_control: { type: "ephemeral", ttl: "1h" } }
+  ])("refuses non-text or nested unknown Anthropic content %j", part => {
+    policy([{ ...bound(), encoderId: "anthropic-messages" }]);
+    expect(() => reserve(request({}, { messages: [{ role: "user", content: [part] }] }, "anthropic-messages"))).toThrow(/media/i);
+  });
+  it.each([
+    { type: "future_media", content: "hi", payload: "YQ==" },
+    { type: "function_call", call_id: "c1", name: "echo", arguments: "{}", content: [{ type: "future_media", text: "hi" }] },
+    { type: "function_call_output", call_id: "c1", output: "done", content: [{ type: "future_media", text: "hi" }] }
+  ])("refuses unknown Responses input envelopes or added media %j", item => {
+    policy([{ ...bound(), encoderId: "openai-responses" }]);
+    expect(() => reserve(request({}, { input: [item] }, "openai-responses"))).toThrow(/media/i);
+  });
+  it("refuses non-text Responses instructions", () => {
+    policy([{ ...bound(), encoderId: "openai-responses" }]);
+    expect(() => reserve(request({}, { instructions: { type: "future_media", text: "hi" } }, "openai-responses"))).toThrow(/media/i);
+  });
+  it("refuses a malformed content type instead of coercing it to text", () => {
+    policy();
+    expect(() => reserve(request({}, { messages: [{ role: "user", content: [{ type: ["text"], text: "hi" }] }] }))).toThrow(/media/i);
+  });
+  it("refuses unmodeled Anthropic tool cache settings", () => {
+    policy([{ ...bound(), encoderId: "anthropic-messages" }]);
+    expect(() => reserve(request({}, { tools: [{ name: "echo", input_schema: { type: "object" },
+      cache_control: { type: "ephemeral", ttl: "1h" } }] }, "anthropic-messages"))).toThrow(/hosted tools/i);
+  });
+  it("leaves text-only validation disabled for a token-only budget", () => {
+    policy([], null);
+    reserve(request({}, { messages: [{ role: "user", content: [{ type: "future_media", x_url: "https://media.invalid/asset" }] }] }));
+    expect(budgetUsageSnapshot(workspace, "default").daily).toMatchObject({ llmRequests: 1, llmReservedCostUsd: 0 });
   });
   it("refuses hosted tools under a standard text request ceiling", () => {
     policy(); expect(() => reserve(request({}, { tools: [{ type: "web_search" }] }))).toThrow(/hosted tools/i);
