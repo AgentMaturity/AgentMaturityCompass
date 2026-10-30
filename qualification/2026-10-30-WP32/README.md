@@ -61,3 +61,13 @@ node scripts/gen-platform-matrix.mjs --receipts qualification/2026-10-30-WP32/pl
 The failed crash-and-restart outcome above stands. A follow-up updated `scripts/installed-crash-recovery-check.mjs` for deferred MCP discovery. It signs native `tool_search` (READ_ONLY) beside the fixture grant. It then runs a real discovery turn through the stub provider's `{"tool","arguments"}` directives: a search, an activation of the discovered schema digest, and then the fixture tool. The owner approves each call through `amc approvals`.
 
 On a fresh packed install (darwin-arm64, Node 22), the runner now gets past the mount refusal, and the search returns the granted tool. It still fails, now at activation, with `SIMULATE tool activation: loadout unchanged.`. The default signed Action Policy (AXR-02, `1549fabbd`) runs a new agent's EXECUTE calls as SIMULATE until the agent has a trusted diagnostic run. With no run, the governor treats the configuration as untrusted whatever the policy says. A SIMULATE activation leaves the MCP tool unoffered, and a SIMULATE `WRITE_LOW` call would not reach the fixture either. So this lane remains **failed**, now blocked on AXR-02 rather than harness drift. It needs a decision on how an acceptance workspace earns EXECUTE without planting diagnostic evidence.
+
+## Note added 2026-10-30 (first EXECUTE path, `rtd/gap-firstexec`)
+
+The failed outcome above stands, and so does the follow-up note. A search for an honest operator path by which a fresh agent earns EXECUTE under the default signed Action Policy found none, so the runner was not changed.
+
+- The governor treats an agent's configuration as untrusted until its latest sealed run reaches integrity 0.6 (HIGH TRUST). That check comes before any policy rule, so no owner-signed rule can lift it.
+- Integrity is the share of the 244 active legacy questions that have accepted evidence, less penalties. The registered observed emitters bind governed tool-call and delegation rows to only 10 questions. `amc evidence collect --first-run` rows carry no question tag. On a fresh workspace driven by the built CLI, `amc run --score-only` after a first-run capture still reports integrity 0.
+- The default `READ_ONLY` rule also needs AMC-1.7 and AMC-3.3.1 at level 2, which no evidence map evaluates yet.
+
+The crash runner needs signed approvals, and those need a signed Action Policy. It therefore cannot use the "not configured" state either. This lane stays **failed** until there is a decision on the trust gate. The governor's reasons now name the actual cause on a fresh workspace (`UNTRUSTED RUN: agent default has no trusted diagnostic run`) instead of a signature failure. `docs/GOVERNOR.md` ("Reaching EXECUTE") records the state.

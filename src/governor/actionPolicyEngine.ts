@@ -40,6 +40,8 @@ export interface GovernorTrustSummary {
   correlationRatio: number;
   /** Why the latest run file was not used (seal, agent or ledger anchor failed); absent when there was none to refuse. */
   runRefusal?: string;
+  /** Why the trusted run (or its absence) leaves the config untrusted; absent when the run vouches for it. */
+  runTrustGap?: string;
 }
 
 export interface GovernorWorkOrderContext {
@@ -355,9 +357,13 @@ export function evaluateActionPermission(input: GovernorDecisionInput): Governor
   if (!trustedConfig) {
     decision.allowed = true;
     decision.effectiveMode = "SIMULATE";
-    decision.reasons.push("UNTRUSTED CONFIG: signed policy/config verification failed. EXECUTE is denied.");
-    if (input.trustSummary.runRefusal) decision.reasons.push(`UNTRUSTED RUN: ${input.trustSummary.runRefusal}.`);
-    decision.requiredEvidence.push("Re-sign policy/config files and rerun amc verify.");
+    // Name the cause: a fresh agent's config is untrusted for want of a trusted run, not for a bad signature.
+    const runCause = input.trustSummary.runRefusal ?? input.trustSummary.runTrustGap;
+    decision.reasons.push("UNTRUSTED CONFIG: the policy/config signatures or the agent's trusted run do not vouch for it. EXECUTE is denied.");
+    if (!policySignatureValid) decision.reasons.push("UNTRUSTED CONFIG: Action Policy signature verification failed.");
+    if (runCause) decision.reasons.push(`UNTRUSTED RUN: ${runCause}.`);
+    if (!policySignatureValid || !runCause) decision.requiredEvidence.push("Re-sign policy/config files and rerun amc verify.");
+    if (runCause) decision.requiredEvidence.push(`A sealed amc run for this agent with integrity >= ${TRUSTED_RUN_MIN_INTEGRITY} (HIGH TRUST); see docs/GOVERNOR.md "Reaching EXECUTE".`);
     return decision;
   }
 
@@ -610,13 +616,17 @@ export function summarizeAssuranceForWindow(workspace: string, agentId: string, 
   return summary;
 }
 
+/** The integrity a trusted run needs before the governor treats the agent's config as trusted (unless HIGH TRUST). */
+const TRUSTED_RUN_MIN_INTEGRITY = 0.6;
+
 export function deriveTrustSummaryFromRun(workspace: string, agentId: string, run: DiagnosticReport | null): GovernorTrustSummary {
   if (!run) {
     return {
       trustTier: "SELF_REPORTED",
       sandboxEvidence: false,
       untrustedConfig: true,
-      correlationRatio: 0
+      correlationRatio: 0,
+      runTrustGap: `agent ${agentId} has no trusted diagnostic run`
     };
   }
 
@@ -655,11 +665,15 @@ export function deriveTrustSummaryFromRun(workspace: string, agentId: string, ru
     trustTier = "OBSERVED_HARDENED";
   }
 
+  const untrustedConfig = run.trustLabel !== "HIGH TRUST" && run.integrityIndex < TRUSTED_RUN_MIN_INTEGRITY;
   return {
     trustTier,
     sandboxEvidence,
-    untrustedConfig: run.trustLabel !== "HIGH TRUST" && run.integrityIndex < 0.6,
-    correlationRatio: run.correlationRatio
+    untrustedConfig,
+    correlationRatio: run.correlationRatio,
+    ...(untrustedConfig
+      ? { runTrustGap: `latest trusted run ${run.runId} has integrity ${run.integrityIndex.toFixed(3)} (${run.trustLabel}), below ${TRUSTED_RUN_MIN_INTEGRITY}` }
+      : {})
   };
 }
 

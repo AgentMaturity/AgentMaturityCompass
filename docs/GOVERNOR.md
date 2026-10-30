@@ -15,7 +15,7 @@ Action policy file:
 - `.amc/action-policy.yaml`
 - `.amc/action-policy.yaml.sig`
 
-If signature verification fails, Governor denies `EXECUTE` and returns `SIMULATE` with `UNTRUSTED CONFIG` reasons.
+If signature verification fails, Governor denies `EXECUTE` and returns `SIMULATE` with `UNTRUSTED CONFIG` reasons. The same happens when the agent has no trusted diagnostic run, or its latest one is below integrity 0.6; the reasons then include an `UNTRUSTED RUN:` line that names the run and its integrity (see [Reaching EXECUTE](#reaching-execute)).
 
 ## Action Classes
 
@@ -53,6 +53,26 @@ amc governor report --agent <id> --window 14d --out .amc/agents/<id>/reports/gov
 - `SIMULATE` is allowed whenever policy allows planning and safety analysis.
 - `EXECUTE` is allowed only if every policy precondition is satisfied.
 - If execute is requested but requirements fail, Governor downgrades to `SIMULATE` and returns deterministic reasons + required evidence.
+
+## Reaching EXECUTE
+
+`amc governor check --action <class> --mode execute` returns `EXECUTE` only when both of these hold:
+
+1. **A trusted run.** The agent's latest diagnostic run is sealed, anchored in the ledger, and HIGH TRUST (integrity index at least 0.6). Until then the governor treats the configuration as untrusted, whatever the signed policy says. No policy rule can lift this condition, because it is checked before any rule. The integrity index is the share of the question set's active questions that have accepted evidence, less penalties (see [SCORING_METHODOLOGY.md](SCORING_METHODOLOGY.md)).
+2. **The class's rule.** The rule's minimum effective question levels, trust tier, assurance packs, sandbox and execution ticket are all met.
+
+As of 2026-10-30, no command sequence gets a fresh workspace there on observed evidence:
+
+- `amc evidence collect --first-run` seals an observed session, but its rows carry no question tag, so they evidence no question.
+- The registered observed emitters (`src/diagnostic/evidenceEmitters.ts`) bind governed tool-call and delegation rows to only 10 of the 244 legacy questions. A run over observed evidence alone therefore stays near integrity 0.04.
+- The default policy's `READ_ONLY` rule also needs AMC-1.7 and AMC-3.3.1 at level 2, which no evidence map evaluates yet. It also needs the `injection` assurance pack, which needs a configured model.
+
+Importing self-reported evaluation results tagged to many questions can raise the integrity index. AMC does not document that as a path to EXECUTE: it is the agent's claim, not observed behaviour.
+
+An owner has two honest choices today:
+
+- Keep the signed policy and accept `SIMULATE`. This is the default after `amc init`.
+- Remove both `.amc/action-policy.yaml` and `.amc/action-policy.yaml.sig`. Native calls are then not checked against the Action Policy, and `amc agent run`, setup and `amc doctor` report `action policy: not configured`. Signed approvals (`--approve-tools`, `amc approvals`) bind the signed policy's hash, so they cannot be used in this state.
 
 ## Decision Inputs
 
