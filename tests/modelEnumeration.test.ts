@@ -71,6 +71,43 @@ describe("operator-invoked advisory model enumeration", () => {
     expect(credentials.resolve).toHaveBeenCalledWith("OPERATOR_KEY");
   });
 
+  it.each(["https://api.openai.com/", "https://API.OPENAI.COM:443/"])("uses the default credential for the same normalized origin %s", async baseUrl => {
+    const fetch = reply();
+    await enumerateRemoteModels({ ...input(), baseUrl });
+    expect(credentials.resolve).toHaveBeenCalledWith("OPENAI_API_KEY");
+    expect(fetch).toHaveBeenCalledWith("https://api.openai.com/v1/models", expect.objectContaining({
+      headers: { accept: "application/json", authorization: "Bearer secret-value" }
+    }));
+  });
+
+  it.each(["https://operator.example", "https://api.openai.com.operator.example", "https://sub.api.openai.com", "https://api.openai.com:8443", "https://api.openai.com.", "http://127.0.0.1:8080"])(
+    "requires an explicit credential reference for a custom origin %s before resolving or sending", async baseUrl => {
+      const fetch = reply();
+      await expect(enumerateRemoteModels({ ...input(), baseUrl })).rejects.toThrow(/credential is unavailable/);
+      expect(credentials.resolve).not.toHaveBeenCalled();
+      expect(fetch).not.toHaveBeenCalled();
+    }
+  );
+
+  it.each(["http://operator.example", "http://api.openai.com", "http://192.168.1.1", "http://169.254.169.254", "http://127.0.0.1.example", "http://localhost:8080", "http://[::]", "http://[::ffff:127.0.0.1]"])(
+    "refuses non-loopback HTTP %s even with an explicit credential reference", async baseUrl => {
+      const fetch = reply();
+      await expect(enumerateRemoteModels({ ...input(), baseUrl, credentialRef: credentialRef("OPERATOR_KEY") })).rejects.toThrow(/credential-free HTTP\(S\) origin/);
+      expect(credentials.resolve).not.toHaveBeenCalled();
+      expect(fetch).not.toHaveBeenCalled();
+    }
+  );
+
+  it.each(["http://127.0.0.1:8080", "http://127.23.45.67:8080", "http://[::1]:8080"])("allows literal loopback HTTP %s with an explicit credential reference", async baseUrl => {
+    const fetch = reply();
+    const result = await enumerateRemoteModels({ ...input(), baseUrl, credentialRef: credentialRef("OPERATOR_KEY") });
+    expect(credentials.resolve).toHaveBeenCalledWith("OPERATOR_KEY");
+    expect(result.source).toBe(`${baseUrl}/v1/models`);
+    expect(fetch).toHaveBeenCalledWith(result.source, expect.objectContaining({
+      headers: { accept: "application/json", authorization: "Bearer secret-value" }
+    }));
+  });
+
   it.each([["unknown", protocol], ["openai", "anthropic-messages"], ["anthropic", "anthropic-messages"], ["openai-responses", protocol]])(
     "refuses unsupported provider/protocol %s/%s before resolving credentials or sending", async (providerId, selectedProtocol) => {
       const fetch = reply();

@@ -59,7 +59,8 @@ function endpoint(baseUrl: string, path: string): string {
   try {
     const url = new URL(baseUrl);
     if (baseUrl.length > 4096 || !/^https?:\/\/[^/?#\\]+\/?$/i.test(baseUrl) || url.username || url.password
-      || !["http:", "https:"].includes(url.protocol)) throw new Error();
+      || !["http:", "https:"].includes(url.protocol)
+      || (url.protocol === "http:" && url.hostname !== "[::1]" && !/^127(?:\.\d{1,3}){3}$/.test(url.hostname))) throw new Error();
     return `${url.origin}${path}`;
   } catch { throw new Error("Model enumeration requires a credential-free HTTP(S) origin"); }
 }
@@ -95,7 +96,8 @@ export async function enumerateRemoteModels(input: ModelEnumerationInput): Promi
   const path = modelsPath(input.providerId, input.protocol);
   const provider = lookupProviderCatalog(input.providerId);
   const url = endpoint(input.baseUrl ?? provider?.defaultBaseUrl ?? "", path);
-  const ref = input.credentialRef === undefined && provider?.defaultCredentialRef !== null && provider?.defaultCredentialRef !== undefined
+  const ref = input.credentialRef === undefined && provider?.defaultBaseUrl != null
+    && new URL(url).origin === new URL(provider.defaultBaseUrl).origin && provider.defaultCredentialRef !== null
     ? credentialRef(provider.defaultCredentialRef) : input.credentialRef;
   const secret = ref == null ? null : normalizeCredentialValue(input.credentials.resolve(ref));
   if (secret === null) throw new Error("Model enumeration credential is unavailable");
