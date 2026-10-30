@@ -15,6 +15,7 @@ import { spawnSubagent, type SubagentRunContext } from "../src/agent/subagentSpa
 import { rootIdentity } from "../src/agent/delegationIdentity.js";
 import type { LoopEventRecord } from "../src/session/loopEventMeta.js";
 import { FixedCredentials, LOOP_MODEL, LOOP_PROVIDER, scriptedAdapter, silentTransport, textStep } from "./helpers/agentLoopHarness.js";
+import { removeActionPolicy } from "./helpers/actionPolicyFixtures.js";
 
 const resourceState = vi.hoisted(() => ({ unknown: false, toolsets: [] as import("../src/agent/agentToolset.js").AgentToolset[] }));
 vi.mock("../src/agent/agentToolset.js", async importOriginal => {
@@ -46,6 +47,7 @@ function workspace(): string {
   const dir = realpathSync(mkdtempSync(join(tmpdir(), "amc-wp16-child-")));
   dirs.push(dir);
   initWorkspace({ workspacePath: dir, agentId: "default", trustBoundaryMode: "isolated" });
+  removeActionPolicy(dir); // Not about the Action Policy: run in its "not configured" state (WP35b).
   initBudgets(dir, "default");
   writeRuntimeFirewallPolicy({ workspace: dir, mode: "observe" });
   return dir;
@@ -82,7 +84,7 @@ function recorder() {
 }
 
 describe("WP16 delegated cleanup", () => {
-  it("awaits bounded active continuation shutdown and never seals a noncooperative child", async () => {
+  it("awaits bounded active continuation shutdown and never seals a child with unconfirmed cleanup as completed", async () => {
     const dir = workspace(), entered = deferred<void>();
     let requests = 0, signal: AbortSignal | undefined;
     const runner = runnerFor(dir, request => {
@@ -93,6 +95,10 @@ describe("WP16 delegated cleanup", () => {
     });
     const first = await runner(context(true));
     if (!first.ok || !first.continuation) throw new Error(`Expected a continued child: ${JSON.stringify(first)}`);
+    // Since aa5963795 the stalled request is aborted at cancellation instead of awaited, so the noncooperative part
+    // is the child's owned work: its cleanup never confirms.
+    const child = resourceState.toolsets.at(-1)!;
+    child.hasOwnedWork = () => true; child.shutdown = () => Promise.resolve(false);
     const active = first.continuation.continue("second task").then(value => ({ value }), error => ({ error }));
     await entered.promise;
     const stoppedAt = Date.now();
@@ -109,7 +115,9 @@ describe("WP16 delegated cleanup", () => {
     const result = await active;
     expect("error" in result || result.value.ok === false).toBe(true);
     expect(Date.now() - stoppedAt).toBeLessThan(5_000);
-    expect(rows(dir).filter(event => event.event_type === "session/close" || event.event_type === "session/release")).toEqual([]);
+    // The driver stopped, so the child is sealed as resource_outcome_unknown, never as completed.
+    expect(rows(dir).filter(event => event.event_type === "session/close")
+      .map(event => (JSON.parse(event.meta_json) as { reason: string }).reason)).toEqual(["resource_outcome_unknown"]);
     expect(() => writers[0]!.assertWritable()).toThrow();
   }, 15_000);
 

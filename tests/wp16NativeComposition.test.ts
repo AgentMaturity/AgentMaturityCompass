@@ -19,6 +19,7 @@ import type { ToolCallRequest } from "../src/agent/toolSeam.js";
 import type { SessionService } from "../src/session/sessionService.js";
 import type { EvidenceEvent } from "../src/types.js";
 import { FixedCredentials, LOOP_MODEL, LOOP_PROVIDER, scriptedAdapter, silentTransport, textStep } from "./helpers/agentLoopHarness.js";
+import { removeActionPolicy } from "./helpers/actionPolicyFixtures.js";
 
 // Pin only the operating-system launcher. The signed policy, private native
 // bash binding, authorization, journal and ToolPipeline remain the real path.
@@ -63,6 +64,7 @@ function workspace(): string {
   const dir = realpathSync(mkdtempSync(join(tmpdir(), "amc-wp16-native-")));
   dirs.push(dir);
   initWorkspace({ workspacePath: dir, agentId: "default", trustBoundaryMode: "isolated" });
+  removeActionPolicy(dir); // Not about the Action Policy: run in its "not configured" state (WP35b).
   initBudgets(dir, "default");
   writeRuntimeFirewallPolicy({ workspace: dir, mode: "observe" });
   mkdirSync(join(dir, "workspace", "output"), { recursive: true });
