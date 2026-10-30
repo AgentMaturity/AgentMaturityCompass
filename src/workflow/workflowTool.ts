@@ -53,6 +53,7 @@ const WORKFLOW_PARAMETERS = Object.freeze({
 
 /** Build the `workflow` tool for one caller. */
 export function workflowTool(capability: SubagentCapability): ToolDefinition {
+  const maxActiveChildren = capability.maxActiveChildren;
   return defineTool({
     name: "workflow",
     actionClass: "READ_ONLY",
@@ -84,6 +85,7 @@ export function workflowTool(capability: SubagentCapability): ToolDefinition {
         runner: capability.runner,
         mintSessionId: capability.mintSessionId ?? (() => `child-${crypto.randomUUID().slice(0, 12)}`),
         ...(capability.maxDepth === undefined ? {} : { maxDepth: capability.maxDepth }),
+        ...(maxActiveChildren === undefined ? {} : { maxActiveChildren }),
         ...(capability.delegationScope === undefined ? {} : { delegationScope: capability.delegationScope }),
         ...(capability.stopConditions === undefined ? {} : { stopConditions: capability.stopConditions }),
         ...(capability.parentLeaseToken === undefined ? {} : { parentLeaseToken: capability.parentLeaseToken }),

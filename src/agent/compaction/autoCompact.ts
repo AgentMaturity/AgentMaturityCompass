@@ -114,14 +114,16 @@ export class AutoCompactor {
       notify("the provider reported no usage for this step, so prompt size was not measured and automatic compaction did not run");
       return 0;
     }
-    if (pressure.ratio < this.config.threshold) return 0;
+    const reserve = this.config.reserveTokens;
+    if (reserve == null ? pressure.ratio < this.config.threshold : pressure.promptTokens < window - reserve) return 0;
     const measured = `prompt measured ${pressure.promptTokens} of ${window} declared tokens`;
     if (this.count >= this.config.maxPerTurn) {
       notify(`${measured}, but this turn already compacted ${this.count} time(s); no further automatic compaction`);
       return 0;
     }
     const trigger: Trigger = { kind: "automatic", promptTokens: pressure.promptTokens, contextWindowTokens: window,
-      threshold: this.config.threshold, ratio: pressure.ratio, measuredAtEventId, formula: pressure.formula };
+      threshold: this.config.threshold, ratio: pressure.ratio, measuredAtEventId, formula: pressure.formula,
+      ...(reserve == null ? {} : { reserveTokens: reserve }) };
     const pruned = this.prune(trigger);
     // Summarize when pruning found nothing, or when an earlier boundary of this turn already compacted and pressure is still high.
     const summarized = this.config.summarize && (pruned.length === 0 || this.count > 0) ? await this.summarize(turn, trigger, signal, notify) : NOTHING;

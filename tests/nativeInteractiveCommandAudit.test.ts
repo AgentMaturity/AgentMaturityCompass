@@ -11,6 +11,16 @@ afterEach(() => { vi.restoreAllMocks(); for (const root of roots.splice(0)) rmSy
 const selection = { workspace: "/synthetic/wp30-audit", command: "fork", sessionId: "native-session" };
 
 describe("native command operational audit", () => {
+  it("audits bookmark creation and refuses dispatch if its signed start cannot publish", async () => {
+    const publish = vi.spyOn(humanAudit, "appendHumanActionEventAsync").mockResolvedValue({} as humanAudit.HumanLogEntry);
+    const handler = vi.fn(async () => "bookmarked");
+    await expect(runNativeInteractiveCommand({ ...selection, command: "bookmark" }, handler)).resolves.toBe("bookmarked");
+    expect(publish.mock.calls.map(([input]) => input.payload?.phase)).toEqual(["started", "settled"]);
+    publish.mockRejectedValue(new Error("signing unavailable")); handler.mockClear();
+    await expect(runNativeInteractiveCommand({ ...selection, command: "bookmark" }, handler)).rejects.toThrow("signing unavailable");
+    expect(handler).not.toHaveBeenCalled();
+  });
+
   it("records start before dispatch and settled after a handler returns, preserving its result", async () => {
     const sequence: string[] = [];
     const publish = vi.spyOn(humanAudit, "appendHumanActionEventAsync").mockImplementation(async input => {
@@ -59,7 +69,7 @@ describe("native command operational audit", () => {
     expect(publish).toHaveBeenCalledTimes(2);
   });
 
-  it.each(["sessions", "resume", "inspect", "help", "verify", "mcp", "extensions", "exit"])("keeps /%s read-only", async command => {
+  it.each(["sessions", "resume", "bookmarks", "inspect", "help", "verify", "mcp", "extensions", "exit"])("keeps /%s read-only", async command => {
     const publish = vi.spyOn(humanAudit, "appendHumanActionEventAsync");
     await expect(runNativeInteractiveCommand({ ...selection, command }, async () => "read only")).resolves.toBe("read only");
     expect(publish).not.toHaveBeenCalled();

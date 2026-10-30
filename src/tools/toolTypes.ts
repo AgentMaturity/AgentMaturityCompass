@@ -189,6 +189,8 @@ export interface ToolStepContext {
 
 export interface ToolDefinition {
   readonly name: string;
+  /** Operator-declared provider name; registry identity and authorization remain canonical. */
+  readonly modelAlias?: string;
   readonly actionClass: ActionClass;
   readonly description: string;
   /**

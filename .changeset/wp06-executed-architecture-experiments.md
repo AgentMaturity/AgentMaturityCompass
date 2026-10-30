@@ -1,0 +1,7 @@
+---
+"agent-maturity-compass": patch
+---
+
+`amc experiment-architecture --execute-trials --casebook <id> --provider <id>` now runs a measured architecture comparison. Both architecture artifacts are pinned by digest when the command starts. They run on the declared `--model` through the same trial executor as `amc experiment run --execute-trials`, over the casebook's held-out cases. The result is the ordinary bound, sealed experiment report with paired statistics. The command prints the new experiment id, and `amc experiment gate` decides promotion. The candidate artifact must carry an auditor signature. An artifact whose bytes change before or during the run is refused. A trial route that runs a model other than the declared one is also refused.
+
+Without `--execute-trials` the command still refuses and exits 3. The simulation now runs only when `AMC_ARCHITECTURE_ALLOW_SIMULATED` is exactly `1`. A value such as `0` is no longer read as consent. Its report is marked `evidence: "simulated"` and its Markdown begins with a SIMULATED banner. Reports built from caller-supplied synchronous outcomes are marked `unbound`. Neither kind can pass an experiment gate. A missing artifact file or an unknown `--baseline-kind`/`--candidate-kind` is now an error (exit 1). Before this change the command silently substituted `{}` or `POLICY_FRAME`. `analyzeArchitectureExperiment` now refuses outcomes that are missing, duplicated, extra, attributed to the wrong spec, scored outside 0..1 or carrying negative counters, instead of scoring them.

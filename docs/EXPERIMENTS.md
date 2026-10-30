@@ -38,6 +38,14 @@ Two evidence designs exist:
 
 An empty casebook, or a run in which no case is determinate on both sides, is refused instead of sealed.
 
+## Executed Trial Budgets and Receipts
+
+The programmatic `trials.budget` seam accepts `createExperimentBudget` from `src/budgets/experimentBudget.ts`. Set `maxCostUsd`, baseline/candidate `maxRequestsPerExecution`, and whole-experiment `auxiliaryRequests` for proposer/judge work. Admission multiplies the full request plan by the largest valid auditor-signed `nativeUsdBounds` ceiling and refuses an unaffordable plan before any trial. Every native dispatch rechecks the exact request bytes, route, output bound and admitted bound digest. Catalog prices never authorize spend. Auxiliary model work must run through `budget.runStage("proposer", callback)` or `budget.runStage("judge", callback)` in the same process. Ordinary signed daily budgets continue to apply.
+
+This envelope covers native requests in the current process. Completed callbacks without admitted native requests are refused; external transports and subprocess billing have no spend attestation. Reservations remain conservative after settlement, and only final provider-reported costs from closed verified sessions become measured spend. `budget.snapshot()` exposes per-stage and per-role costs with estimates separate and missing amounts left `null`.
+
+Each executed trial's `resources` and `roleCosts` persist in the signed settlement and report. Receipts bind the exact case execution to recorded provider/model, encoder/adapter versions, parameter/catalog digests, actual system/tool commitments and dispatch state. Request-level signed stage reservations keep proposer, executor and judge costs separate, including mixed roles in one session. Endpoint identity remains explicitly unavailable; `configurationComplete` concerns system/tool commitments only. A prepared header does not establish dispatch or remote model identity.
+
 ## Stats Method
 
 Experiment analysis is deterministic and reproducible. Rates, value points and statistics use only paired cases (determinate on both sides); the report counts cases, paired cases and excluded cases.

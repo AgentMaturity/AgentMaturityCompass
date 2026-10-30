@@ -143,6 +143,11 @@ export function projectNativeCost(events: readonly EvidenceEvent[], sessionId: s
   }
   const requests: NativeRequestCost[] = [...reports.values()].map(report => invalid ? { ...report, estimatedCostUsd: null,
     reportedCostUsd: null, attributedCostUsd: null, estimateComplete: false, costBasis: "unavailable", missingComponents: ["invalid-evidence"] } : report);
+  return foldNativeRequestCosts(requests, invalid);
+}
+
+/** Coverage and subtotals over request rows; invalid evidence yields no subtotal. */
+export function foldNativeRequestCosts(requests: readonly NativeRequestCost[], invalid = false): NativeCostProjection {
   const subtotal = (field: "reportedCostUsd" | "estimatedCostUsd" | "attributedCostUsd"): number | null => {
     const values = requests.map(value => value[field]).filter((value): value is number => value !== null);
     const sum = values.reduce((a, b) => a + b, 0);
@@ -156,7 +161,7 @@ export function projectNativeCost(events: readonly EvidenceEvent[], sessionId: s
       : completeRequests + partialRequests > 0 ? "partial" : "unavailable",
     reportedSubtotalUsd: subtotal("reportedCostUsd"), estimatedSubtotalUsd: subtotal("estimatedCostUsd"),
     attributedSubtotalUsd: subtotal("attributedCostUsd"), completeRequests, partialRequests,
-    unknownRequests: requests.length - completeRequests - partialRequests, requests };
+    unknownRequests: requests.length - completeRequests - partialRequests, requests: [...requests] };
 }
 
 /** Render only self-consistent serialized views; old or malformed summaries stay unavailable. */

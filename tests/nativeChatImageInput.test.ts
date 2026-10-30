@@ -266,7 +266,7 @@ describe("native Chat signed-image encoder and runtime (not executed)", () => {
       expect(surface.DEFAULT_REQUEST_ENCODERS.get("openai-chat", 4)).toBe(openaiChatEncoderV4);
     }
     expect(publicLlm.OPENAI_CHAT_TEXT_CAPABILITIES.features["image-input"]).toBe("unsupported");
-    expect(usesProviderToolNames("openai-chat", 4)).toBe(true); expect(usesProviderToolNames("openai-chat", 5)).toBe(false);
+    expect(usesProviderToolNames("openai-chat", 4)).toBe(true); expect(usesProviderToolNames("openai-chat", 5)).toBe(true); expect(usesProviderToolNames("openai-chat", 6)).toBe(false);
   });
   test("image-only and ordered signed content cannot shift adjacent empty, assistant or multiple keyed-result messages", () => {
     const request: EncodableRequest = { ...input(), messages: [
@@ -292,7 +292,7 @@ describe("native Chat signed-image encoder and runtime (not executed)", () => {
     const pinned = registry.pin({ providerId: "openai", model: "fixture-model" });
     expect(pinned).toMatchObject({ encoderId: "openai-chat", encoderVersion: 4, capabilities: { modelSupport: "not-probed" } });
     expect(acpSupportsImageInput(pinned)).toBe(true);
-    for (const version of [0, 1, 2, 3, 5]) expect(acpSupportsImageInput({ ...pinned, encoderVersion: version })).toBe(false);
+    for (const version of [0, 1, 2, 3, 6]) expect(acpSupportsImageInput({ ...pinned, encoderVersion: version })).toBe(false);
     expect(acpSupportsImageInput({ ...pinned, capabilities: null })).toBe(false);
     expect(acpSupportsImageInput({ ...pinned, encoderId: "unknown" })).toBe(false);
     expect(acpSupportsImageInput({ ...pinned, capabilities: { ...pinned.capabilities!, protocol: "deepseek-chat-completions" } })).toBe(false);

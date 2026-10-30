@@ -194,7 +194,7 @@ describe("AMC-1534 native budget admissions and signed accounting", () => {
     limits(config => { config.budgets.perAgent.default!.unknownTokenUsage = "ALLOW_WITH_WARNING"; });
     await drain(runtime(value, upstream).stream(spec));
     expect(upstream.sent).toHaveLength(2);
-    expect(evaluateBudgetStatus(workspace, "default").nativeAdmissionPolicy).toMatchObject({ unknownTokenUsage: "ALLOW_WITH_WARNING", costLimit: "known-subtotal-threshold" });
+    expect(evaluateBudgetStatus(workspace, "default").nativeAdmissionPolicy).toMatchObject({ unknownTokenUsage: "ALLOW_WITH_WARNING", costLimit: "disabled" });
     expect(budgetUsageSnapshot(workspace, "default").daily.llmTokenUsageComplete).toBe(false);
   });
 

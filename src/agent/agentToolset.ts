@@ -49,6 +49,7 @@ import { delegateTool, type SubagentCapability } from "./delegateTool.js";
 import { workflowTool } from "../workflow/workflowTool.js";
 import { pipelineToolSeam } from "./pipelineToolSeam.js";
 import type { AgentToolSeam } from "./toolSeam.js";
+import type { NativeExtensionHooks } from "../extensions/nativeExtensionHooks.js";
 import { NATIVE_BUILTIN_CAPABILITIES, NATIVE_DELEGATION_CAPABILITIES, selectSupportedNativeTools, type NativeToolCapability } from "./nativeToolCapabilities.js";
 
 /**
@@ -64,6 +65,7 @@ import { NATIVE_BUILTIN_CAPABILITIES, NATIVE_DELEGATION_CAPABILITIES, selectSupp
 export interface AgentToolsetOptions {
   /** Explicit interactive authority; an argv-bound bash approval cannot supply this grant. */
   readonly nativeTerminal?: NativeTerminalHostOptions;
+  readonly extensionHooks?: NativeExtensionHooks;
   readonly workspace: string;
   readonly agentId: string;
   /** Immutable reviewed tool scope, enforced on the execution guard's exact signed snapshot. */
@@ -537,6 +539,7 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
   // AXR-02: the governor's signed Action Policy, as ToolHub decides it; not configured, it does not apply. After the
   // budgets guard, so an exhausted budget is named by it; its SIMULATE downgrade is applied at entry (narrowMode).
   registry.guard("action-policy", actionPolicyGuard(workspace));
+  if (options.extensionHooks) registry.guard("native-extensions", options.extensionHooks.guard);
   // web_search's destination is its composed provider's declared origin, never
   // a url the model passes; both host checks read that. Unconfigured, it names
   // no url and network-egress denies it.
@@ -555,6 +558,7 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
 
   const facts = compiled ? compiledPolicyFacts(compiled) : null;
   pipeline = new ToolPipeline({
+    prepareGuards: options.extensionHooks?.prepare,
     registry,
     workspace,
     ...(options.mode ? { mode: options.mode } : {}),
@@ -616,7 +620,7 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
   const seam = pipelineToolSeam({ registry, pipeline, agentId });
   const closeHandles = (): void => { ledgerHandle?.close(); ledgerHandle = null; journal?.close(); journal = null; };
   return {
-    seam: { ...seam, shutdown: () => background.shutdown(), hasOwnedWork: () => background.hasOwnedWork(), schemas: () => {
+    seam: { ...seam, extensionHooks: options.extensionHooks, shutdown: () => background.shutdown(), hasOwnedWork: () => background.hasOwnedWork(), schemas: () => {
       recordUnconfinedEnabled();
       const snapshot = loadVerifiedToolsConfigSnapshot(workspace);
       admittedCatalog(agentId, snapshot, false);

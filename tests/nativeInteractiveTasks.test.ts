@@ -193,3 +193,27 @@ describe.skipIf(process.platform === "win32")("WP30 measured native interactive 
     measured("interrupt-native-run-no-retry", result, 1, "scripted-native-run-cli-pty");
   }, 110_000);
 });
+
+
+test.skipIf(process.platform === "win32")("creates and navigates a signed bookmark through chat without changing its session", async () => {
+  const root = workspace();
+  const id = seedSession(root);
+  const before = readNativeSessionEvents(root, id);
+  const result = await terminal(root, [...route(root), "--session", id], [
+    { waitFor: "you> ", send: "/bookmark\r" },
+    { waitFor: "Bookmark name", send: "daily checkpoint\r" },
+    { waitFor: "Sealed turn number", send: "\r" },
+    { waitFor: "Bookmark saved" },
+    { waitFor: "you> ", send: "/bookmarks\r" },
+    { waitFor: "daily checkpoint" },
+    { waitFor: "Bookmark number", send: "1\r" },
+    { waitFor: "Verified bookmark" },
+    { waitFor: "turn/seal" },
+    { waitFor: "you> ", send: "/exit\r" }
+  ]);
+  expect(result.code, result.output).toBe(0);
+  expect(result.output).toContain("daily checkpoint");
+  expect(result.output).toContain("no writer acquired");
+  expect(result.output).not.toContain("Running stub/");
+  expect(readNativeSessionEvents(root, id)).toEqual(before);
+}, 110_000);

@@ -1,0 +1,250 @@
+import { spawnSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import YAML from "yaml";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { loadDeclarativeConfig } from "../dist/config/amcConfigLoader.js";
+import { runFromConfig } from "../dist/config/amcConfigRunner.js";
+import { captureRawConfigPairForAsync } from "../dist/config/configSignaturePair.js";
+import { initWorkspace } from "../dist/workspace.js";
+import { lockVault } from "../dist/vault/vault.js";
+import { sha256Hex } from "../dist/utils/hash.js";
+import { amcDeclarativeConfigSchema } from "../dist/config/amcConfigSchema.js";
+
+const roots: string[] = [];
+function workspace() {
+  const root = mkdtempSync(join(tmpdir(), "amc-overlays-"));
+  roots.push(root);
+  return root;
+}
+function write(root: string, name: string, value: unknown) {
+  const file = join(root, name);
+  writeFileSync(file, YAML.stringify(value));
+  return file;
+}
+async function sign(root: string, file: string) {
+  const prepared = await captureRawConfigPairForAsync(root, file).prepare();
+  prepared.publish();
+}
+afterEach(() => {
+  vi.restoreAllMocks();
+  for (const root of roots.splice(0)) {
+    lockVault(root);
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+describe("declarative config overlays", () => {
+  it("orders defaults < workspace < user and records each final leaf's exact file digest", () => {
+    const root = workspace();
+    const base = write(root, "amcconfig.yaml", {
+      agents: [{ id: "base" }], thresholds: { minOverallLevel: 3 },
+      diagnostic: { window: "7d" }, env: { BASE: "yes", SAME: "same", "a/b~c": "escaped" },
+    });
+    const user = write(root, "user.yaml", { diagnostic: { window: "14d" }, env: { SAME: "same", USER: "yes" }, output: { formats: ["json"] } });
+    const result = loadDeclarativeConfig(undefined, root, { userConfig: user });
+    expect(result.config.diagnostic?.window).toBe("14d");
+    expect(result.config.thresholds?.minOverallLevel).toBe(3);
+    expect(result.config.thresholds?.minIntegrityIndex).toBe(0.5);
+    expect(result.config.output?.formats).toEqual(["json"]);
+    expect(result.config.env).toEqual({ BASE: "yes", SAME: "same", USER: "yes", "a/b~c": "escaped" });
+    for (const [pointer, layer, path] of [
+      ["/diagnostic/window", "user", user], ["/thresholds/minOverallLevel", "workspace", base],
+      ["/env/SAME", "user", user], ["/env/a~1b~0c", "workspace", base],
+    ] as const) {
+      expect(result.provenance[pointer]).toEqual({ layer, path, sha256: sha256Hex(readFileSync(path)) });
+    }
+    expect(result.provenance["/thresholds/minIntegrityIndex"]).toEqual({ layer: "default", path: null, sha256: null });
+    expect(result.provenance["/agents/0/runtime"]).toEqual({ layer: "default", path: null, sha256: null });
+  });
+
+  it("--config replaces the workspace file as before WP39b; an opted-in user layer sits below it", () => {
+    const root = workspace();
+    write(root, "amcconfig.yaml", { agents: [{ id: "base" }], thresholds: { minOverallLevel: 4 }, env: { BASE: "yes" } });
+    const explicit = write(root, "ci.yaml", { agents: [{ id: "ci" }], diagnostic: { window: "2d" } });
+    const alone = loadDeclarativeConfig(explicit, root);
+    expect(alone.configPath).toBe(explicit);
+    expect(alone.config).toEqual(amcDeclarativeConfigSchema.parse(YAML.parse(readFileSync(explicit, "utf8"))));
+    expect(alone.config.thresholds).toBeUndefined();
+    expect(alone.config.env).toBeUndefined();
+    expect(Object.values(alone.provenance).some(source => source.layer === "workspace")).toBe(false);
+    const user = write(root, "user.yaml", { diagnostic: { window: "9d" }, thresholds: { minOverallLevel: 1 } });
+    const layered = loadDeclarativeConfig(explicit, root, { userConfig: user });
+    expect(layered.config.diagnostic?.window).toBe("2d");
+    expect(layered.config.thresholds?.minOverallLevel).toBe(1);
+    expect(layered.provenance["/diagnostic/window"]).toEqual({ layer: "explicit", path: explicit, sha256: sha256Hex(readFileSync(explicit)) });
+    expect(layered.provenance["/thresholds/minOverallLevel"]?.layer).toBe("user");
+  });
+
+  it("replaces arrays and retains explicit false/zero/empty values", () => {
+    const root = workspace();
+    write(root, "amcconfig.yaml", { agents: [{ id: "a" }, { id: "b" }], thresholds: { minOverallLevel: 3, denyIfLowTrust: true } });
+    const user = write(root, "user.yaml", {
+      agents: [{ id: "c" }], thresholds: { minOverallLevel: 0, denyIfLowTrust: false }, env: {},
+    });
+    const result = loadDeclarativeConfig(undefined, root, { userConfig: user });
+    expect(result.config.agents.map(agent => agent.id)).toEqual(["c"]);
+    expect(result.config.thresholds?.minOverallLevel).toBe(0);
+    expect(result.config.thresholds?.denyIfLowTrust).toBe(false);
+    expect(result.provenance["/agents/1/id"]).toBeUndefined();
+  });
+
+  it("validates partial layers before a later override can hide a malformed value", () => {
+    const root = workspace();
+    write(root, "amcconfig.yaml", { agents: [{ id: "a" }], thresholds: { minOverallLevel: "bad" } });
+    const user = write(root, "override.yaml", { thresholds: { minOverallLevel: 2 } });
+    expect(() => loadDeclarativeConfig(undefined, root, { userConfig: user })).toThrow(/Invalid.*layer/i);
+  });
+
+  it("requires a valid complete effective config and refuses empty files and cyclic YAML aliases", () => {
+    const root = workspace();
+    const base = write(root, "amcconfig.yaml", { description: "no agents" });
+    expect(() => loadDeclarativeConfig(undefined, root, { userConfig: false })).toThrow();
+    writeFileSync(base, "");
+    expect(() => loadDeclarativeConfig(undefined, root, { userConfig: false })).toThrow(/empty/i);
+    writeFileSync(base, "agents: [{ id: a }]\nunknown: &cycle { self: *cycle }\n");
+    expect(() => loadDeclarativeConfig(undefined, root, { userConfig: false })).toThrow(/circular|cyclic/i);
+  });
+
+  it("preserves ordinary YAML aliases and attributes each resolved value to its file", () => {
+    const root = workspace();
+    const file = join(root, "amcconfig.yaml");
+    writeFileSync(file, "agents: [{ id: a }]\ncommon: &vars { VALUE: data }\nenv: *vars\n");
+    const result = loadDeclarativeConfig(undefined, root, { userConfig: false });
+    expect(result.config.env).toEqual({ VALUE: "data" });
+    expect(result.provenance["/env/VALUE"]).toEqual({ layer: "workspace", path: file, sha256: sha256Hex(readFileSync(file)) });
+  });
+
+  it("refuses explicitly empty or missing user and explicit file paths", () => {
+    const root = workspace();
+    write(root, "amcconfig.yaml", { agents: [{ id: "a" }] });
+    expect(() => loadDeclarativeConfig("", root, { userConfig: false })).toThrow(root);
+    expect(() => loadDeclarativeConfig(undefined, root, { userConfig: "" })).toThrow(root);
+    expect(() => loadDeclarativeConfig(undefined, root, { userConfig: "missing.yaml" })).toThrow("not found");
+  });
+
+  it("exposes provenance and final invocation overrides in config run dry-run", async () => {
+    const root = workspace();
+    write(root, "amcconfig.yaml", { agents: [{ id: "a" }] });
+    vi.spyOn(console, "log").mockImplementation(() => {});
+    const result = await runFromConfig({ workspace: root, userConfig: false, window: "4d", dryRun: true });
+    expect(result.provenance["/diagnostic/window"]).toEqual({ layer: "flag", path: null, sha256: null });
+  });
+
+  it("prints effective config and provenance through the existing validate command", () => {
+    const root = workspace();
+    write(root, "amcconfig.yaml", { agents: [{ id: "a" }] });
+    const user = write(root, "user.yaml", { thresholds: { minOverallLevel: 3 } });
+    const explicit = write(root, "override.yaml", { agents: [{ id: "ci" }], diagnostic: { window: "2d" } });
+    const cli = fileURLToPath(new URL("../dist/cli.js", import.meta.url));
+    const child = spawnSync(process.execPath, [cli, "config", "validate", "--config", explicit, "--user-config", user, "--json"], {
+      cwd: root, encoding: "utf8", env: { ...process.env, AMC_NO_AUTO_REBUILD: "1", NO_COLOR: "1" },
+    });
+    expect(child.status, child.stderr).toBe(0);
+    const output = JSON.parse(child.stdout);
+    expect(output.config.thresholds.minOverallLevel).toBe(3);
+    expect(output.config.agents.map((agent: { id: string }) => agent.id)).toEqual(["ci"]);
+    expect(output.config.diagnostic.window).toBe("2d");
+    expect(output.provenance["/diagnostic/window"]).toEqual({ layer: "explicit", path: explicit, sha256: sha256Hex(readFileSync(explicit)) });
+  });
+
+  it("resolves a pre-WP39b workspace config, including .amc/amc.config.yaml, to identical values", () => {
+    // Pre-WP39b loading at 3dcdf61a9 was exactly: discover one file, YAML.parse it, amcDeclarativeConfigSchema.parse it.
+    const legacy = (file: string) => amcDeclarativeConfigSchema.parse(YAML.parse(readFileSync(file, "utf8")));
+    const fixtures = [
+      { agents: [{ id: "a" }] },
+      { agents: [{ id: "a", runtime: "claude" }, { id: "b" }], thresholds: { minOverallLevel: 4 }, diagnostic: { window: "7d" }, env: { K: "v" } },
+    ];
+    for (const location of ["amcconfig.yaml", ".amc/amc.config.yaml"]) for (const fixture of fixtures) {
+      const root = workspace(); mkdirSync(join(root, ".amc"));
+      const file = write(root, location, fixture);
+      const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+      const result = loadDeclarativeConfig(undefined, root);
+      expect(result.configPath).toBe(file);
+      expect(result.config).toEqual(legacy(file));
+      expect(warn.mock.calls.flat().join(" ")).toMatch(location === "amcconfig.yaml" ? /^$/ : /Deprecated: .*amc\.config\.yaml.*Move it to .*amcconfig\.yaml/);
+      warn.mockRestore();
+    }
+  });
+
+  it("ignores ~/.amc/amcconfig.yaml unless the operator opts in, then applies it with provenance", () => {
+    const home = workspace(), root = workspace(); mkdirSync(join(home, ".amc"));
+    vi.stubEnv("HOME", home);
+    const base = write(root, "amcconfig.yaml", { agents: [{ id: "a" }], diagnostic: { window: "7d" } });
+    const user = write(home, ".amc/amcconfig.yaml", { diagnostic: { window: "1d" } });
+    for (const userConfig of [undefined, false] as const) {
+      const result = loadDeclarativeConfig(undefined, root, userConfig === undefined ? {} : { userConfig });
+      expect(result.config).toEqual(amcDeclarativeConfigSchema.parse(YAML.parse(readFileSync(base, "utf8"))));
+      expect(result.provenance["/diagnostic/window"]).toEqual({ layer: "workspace", path: base, sha256: sha256Hex(readFileSync(base)) });
+    }
+    const opted = loadDeclarativeConfig(undefined, root, { userConfig: true });
+    expect(opted.config.diagnostic?.window).toBe("1d");
+    expect(opted.provenance["/diagnostic/window"]).toEqual({ layer: "user", path: user, sha256: sha256Hex(readFileSync(user)) });
+    const cli = fileURLToPath(new URL("../dist/cli.js", import.meta.url));
+    const run = (...flags: string[]) => spawnSync(process.execPath, [cli, "config", "validate", ...flags, "--json"], {
+      cwd: root, encoding: "utf8", env: { ...process.env, HOME: home, AMC_NO_AUTO_REBUILD: "1", NO_COLOR: "1" } });
+    for (const [flags, window] of [[[], "7d"], [["--no-user-config"], "7d"], [["--user-config"], "1d"]] as const) {
+      const child = run(...flags);
+      expect(child.status, child.stderr).toBe(0);
+      expect(JSON.parse(child.stdout).config.diagnostic.window).toBe(window);
+    }
+    vi.unstubAllEnvs();
+  });
+
+  it("authenticates signed base and overlays through the current config purpose", async () => {
+    const root = workspace();
+    initWorkspace({ workspacePath: root, trustBoundaryMode: "isolated" });
+    const base = write(root, "amcconfig.yaml", { agents: [{ id: "a" }] });
+    const user = write(root, "override.yaml", { thresholds: { minOverallLevel: 4 } });
+    await sign(root, base);
+    await sign(root, user);
+    const result = loadDeclarativeConfig(undefined, root, { userConfig: user });
+    expect(result.config.thresholds?.minOverallLevel).toBe(4);
+    expect(result.provenance["/thresholds/minOverallLevel"]?.sha256).toBe(sha256Hex(readFileSync(user)));
+    writeFileSync(user, "thresholds: { minOverallLevel: 0 }\n");
+    expect(() => loadDeclarativeConfig(undefined, root, { userConfig: user })).toThrow(/signature|digest/i);
+  });
+
+  it("refuses an unsigned user file or invocation value over a signed base; an unsigned --config replaces it as before", async () => {
+    const root = workspace();
+    initWorkspace({ workspacePath: root, trustBoundaryMode: "isolated" });
+    const base = write(root, "amcconfig.yaml", { agents: [{ id: "a" }] });
+    const overlay = write(root, "override.yaml", { agents: [{ id: "ci" }] });
+    await sign(root, base);
+    expect(() => loadDeclarativeConfig(undefined, root, { userConfig: overlay })).toThrow(/unsigned.*user/i);
+    expect(loadDeclarativeConfig(overlay, root).config.agents.map(agent => agent.id)).toEqual(["ci"]);
+    vi.spyOn(console, "log").mockImplementation(() => {});
+    await expect(runFromConfig({ workspace: root, window: "4d", dryRun: true })).rejects.toThrow(/unsigned.*flag/i);
+    await expect(runFromConfig({ workspace: root, configPath: overlay, window: "4d", dryRun: true })).resolves.toBeDefined();
+  });
+
+  it("refuses a tampered signed --config file even when the workspace file is unsigned", async () => {
+    const root = workspace();
+    initWorkspace({ workspacePath: root, trustBoundaryMode: "isolated" });
+    write(root, "amcconfig.yaml", { agents: [{ id: "a" }] });
+    const explicit = write(root, "ci.yaml", { agents: [{ id: "ci" }] });
+    await sign(root, explicit);
+    expect(loadDeclarativeConfig(explicit, root).config.agents[0]?.id).toBe("ci");
+    writeFileSync(explicit, "agents: [{ id: tampered }]\n");
+    expect(() => loadDeclarativeConfig(explicit, root)).toThrow(/signature|digest/i);
+  });
+
+  it("refuses tampered base bytes and a forged signature even with a matching digest", async () => {
+    const root = workspace();
+    initWorkspace({ workspacePath: root, trustBoundaryMode: "isolated" });
+    const base = write(root, "amcconfig.yaml", { agents: [{ id: "a" }] });
+    await sign(root, base);
+    writeFileSync(base, "agents: [{ id: tampered }]\n");
+    expect(() => loadDeclarativeConfig(undefined, root, { userConfig: false })).toThrow(/signature|digest/i);
+    const digest = sha256Hex(readFileSync(base));
+    writeFileSync(`${base}.sig`, JSON.stringify({ digestSha256: digest, signature: Buffer.alloc(64).toString("base64") }));
+    expect(() => loadDeclarativeConfig(undefined, root, { userConfig: false })).toThrow(/signature/i);
+    await sign(root, base);
+    const sidecar = JSON.parse(readFileSync(`${base}.sig`, "utf8"));
+    sidecar.digestSha256 = "0".repeat(64);
+    writeFileSync(`${base}.sig`, JSON.stringify(sidecar));
+    expect(() => loadDeclarativeConfig(undefined, root, { userConfig: false })).toThrow(/signature|digest/i);
+  });
+});

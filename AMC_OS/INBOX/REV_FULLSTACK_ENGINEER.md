@@ -680,3 +680,12 @@ Final qualification: normal verify-wt.sh against dff352a3e exited 0, including b
 Two existing Pi cycle probes initially timed out because TSX startup exceeded their unchanged 1,800 ms budget. Only subprocess loading changed to fresh built JavaScript; fixtures/assertions/timeout remain unchanged. The final full run passed them at 1,487/1,422 ms. The DSH unsupported-version table uses v5 instead of newly supported v4; historical v2 still refuses v4. Source-quality exceptions and the initial dist cleanup issue are documented in the detailed report; the final verifier used normal cleanup and no bypass.
 
 PI-065 full Durable snapshots/deltas/revision continuity and signed native lifecycle-to-Watch wiring remain deferred. This slice binds watch metadata only and declares content/revision losses. OTel exporter source and library-only label remain unchanged. No dependency, package/lockfile, CLI/Studio route, freeze exception, research edit or foreign worktree change was made. Generated counts/docs are included for review. Final before/after hashes match for 5,474 source/fixture/config files; no tracked files were deleted. This appendix preserves the original handoff history exactly.
+
+
+## WP22 part C - 2026-10-30
+
+Scope: D55 / PI-024 signed native-loop observer and deny-only pre-tool hooks. Source, regression tests, native wiring, documentation and a patch changeset are in `amc-gap-wp22c` on `rtd/gap-wp22c`, based on `3dcdf61a9`.
+
+Fifteen guard and evidence-head mutants were killed and source was restored. Claude took the lane over after the Codex usage limit, re-ran two mutants (guard registration, deny decision), 20 related test files (297 tests) and verify-wt.sh against 3dcdf61a9. Observer metadata is frozen and redacted; deny hooks retain all policy, approval and authority checks.
+
+Committed by Claude on `rtd/gap-wp22c`; not pushed or merged. Detailed evidence and the conventional commit message are under `/Users/sid/AgentMaturityCompass-worktrees/s442cd919/work/codex-runs/wp22c-*`.

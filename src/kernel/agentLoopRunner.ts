@@ -72,7 +72,8 @@ import type { ActionClass } from "../types.js";
 import { createDriverRunner } from "../agent/subagentRunner.js";
 import { COMPOSITION_FAILED } from "../agent/nativeAgentComposition.js";
 import { LeasePrincipalRefused } from "../leases/leasePrincipal.js";
-import { planRequiresPrincipal } from "../tools/guards/compiledPolicyGuard.js";
+import { planRequiresAgentLease, planRequiresPrincipal } from "../tools/guards/compiledPolicyGuard.js";
+import { loadActiveCompiledPolicy } from "../catalog/compiler/activate.js";
 import { refuseRetired } from "../lifecycle/reassessment.js";
 import { admitSessionAtOpen } from "../runtime/changeEnvelope.js";
 import { nativeSessionManifest } from "../lifecycle/versionManifest.js";
@@ -281,6 +282,7 @@ export interface ComposedTurnOptions {
      */
     readonly runner?: SubagentRunner;
     readonly maxDepth?: number;
+    readonly maxActiveChildren?: number;
     /** Receives the composed capability. Called once, before the first turn. */
     grant(capability: SubagentCapability): void;
   };
@@ -412,6 +414,7 @@ function compositionDigestOf(options: ComposedTurnOptions, profile: AgentPromptP
             actionClass: gate.actionClass,
             riskTier: gate.riskTier,
             toolNames: gate.toolNames ?? null,
+            ...(gate.reviewedActionClasses === undefined ? {} : { reviewedActionClasses: gate.reviewedActionClasses }),
             answerers: (gate.answerers ?? []).map((answerer) => answerer.name)
           },
     version: amcVersion
@@ -451,6 +454,9 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
       approvalClass: options.approvalGate.actionClass });
   }
   if (options.goalRounds !== undefined) {
+    if (options.delegation?.maxActiveChildren !== undefined) {
+      throw new Error("Configured --max-active-children root child limits are not supported for --goal-rounds; no execution occurred.");
+    }
     const { maxRounds } = options.goalRounds;
     if (options.delegation === undefined || options.delegation.runner !== undefined || options.schedulePass !== undefined
       || options.audioParts !== undefined || images.length > 0 || options.prompt.trim() === "") {
@@ -462,6 +468,10 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
   if ((options.schedulePass !== undefined || (options.delegation !== undefined && options.delegation.runner === undefined))
     && options.leaseToken === undefined && planRequiresPrincipal(options.workspace)) {
     throw new LeasePrincipalRefused("the active plan requires a principal for every tool call, and this run holds no lease for its in-process children to inherit; no session was opened");
+  }
+  // AXR-20: refuse a lease-less run with root tools once, before any session row, instead of denying every governed call.
+  if (options.tools !== undefined && options.leaseToken === undefined && planRequiresAgentLease(loadActiveCompiledPolicy(options.workspace))) {
+    throw new Error("IDENTITY_UNRESOLVED: the active plan's identity-binding requires a verified agent lease for every tool call, and this run holds none; no session was opened. Start the task from Studio, or issue a lease with `amc lease issue` and pass it with --lease-file <path> (a private 0600 file).");
   }
   if (options.delegation !== undefined) {
     // An in-process child opens a second session writer; a foreign runner's process opens none here.
@@ -629,6 +639,7 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
           ...(options.leaseToken === undefined ? {} : { leaseToken: options.leaseToken }),
           ...(options.delegation === undefined ? {} : { grantDelegation: { runner: runNative,
             ...(options.delegation.maxDepth === undefined ? {} : { maxDepth: options.delegation.maxDepth }),
+            ...(options.delegation.maxActiveChildren === undefined ? {} : { maxActiveChildren: options.delegation.maxActiveChildren }),
             ...(options.delegation.scope === undefined ? {} : { delegationScope: options.delegation.scope }),
             ...(options.delegation.stopConditions === undefined ? {} : { stopConditions: options.delegation.stopConditions }) } })
         });
@@ -673,6 +684,7 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
           promptSections: prompt.assemble().sections.map(section => section.name) };
       }
       options.delegation!.grant({
+        ...(options.delegation!.maxActiveChildren === undefined ? {} : { maxActiveChildren: options.delegation!.maxActiveChildren }),
         identity: rootIdentity(options.agentId),
         session,
         runner,

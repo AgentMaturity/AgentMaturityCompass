@@ -62,6 +62,8 @@ export interface ToolApprovalGateOptions {
   /** Selects the signed policy rule: how many approvers, which roles, what TTL. */
   readonly actionClass: ActionClass;
   readonly riskTier: ApprovalRiskTier;
+  /** Canonical tool names and classes supplied by reviewed MCP composition; native tools retain the configured fallback. */
+  readonly reviewedActionClasses?: Readonly<Record<string, ActionClass>>;
   /**
    * Which tools are gated. OMITTED MEANS ALL OF THEM.
    *
@@ -93,11 +95,13 @@ async function ask(approval: ToolApprovalSeam, options: ToolApprovalGateOptions,
   readonly intent: AuthorizationIntentResult | null; readonly legacyPayload: Record<string, unknown>;
 }): Promise<ApprovalDecision> {
   const intent = call.intent?.ok === true ? call.intent : null;
+  const reviewed = options.reviewedActionClasses;
+  const reviewedClass = reviewed && Object.hasOwn(reviewed, call.toolName) ? reviewed[call.toolName] : undefined;
   return approval.request({
     toolCallId: call.callId,
     toolName: call.toolName,
     // An authorized class is approved under its own signed rule; a grant under another class never matches it.
-    actionClass: intent?.payload.actionClass ?? options.actionClass,
+    actionClass: intent?.payload.actionClass ?? reviewedClass ?? options.actionClass,
     riskTier: options.riskTier,
     question: intent === null ? `The agent wants to call "${call.toolName}" ${call.where}.` : `${intent.question} ${call.where}.`,
     // Hashed into the engine request's `intentHash`, so the grant is bound to THESE facts and a later call with
@@ -132,6 +136,7 @@ export function gateToolCallsOnApproval(
     }
   });
   return {
+    ...(inner.extensionHooks === undefined ? {} : { extensionHooks: inner.extensionHooks }),
     ...(inner.supportsEffectGuard === true ? { supportsEffectGuard: true as const } : {}),
     ...(inner.shutdown === undefined ? {} : { shutdown: () => inner.shutdown!() }),
     ...(inner.hasOwnedWork === undefined ? {} : { hasOwnedWork: () => inner.hasOwnedWork!() }),

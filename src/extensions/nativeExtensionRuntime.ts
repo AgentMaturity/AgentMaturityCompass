@@ -1,3 +1,4 @@
+import { NativeExtensionHooks } from "./nativeExtensionHooks.js";
 import type { ContextPlugin } from "../prompt/context/contextTypes.js";
 import { NativeExecutableRunner } from "../plugins/nativeExecutableRunner.js";
 import { invokeNativeExecutableCommand, nativeExecutableContextPlugins, nativeExecutableExtensionError } from "./nativeExecutableExtension.js";
@@ -11,6 +12,7 @@ export interface NativeExtensionPin {
   readonly manifestDigest: string;
 }
 export interface NativeExtensionTurn {
+  readonly hooks?: NativeExtensionHooks;
   readonly contextPlugins: readonly ContextPlugin[];
   readonly pins: readonly NativeExtensionPin[];
   readonly commands: readonly { readonly name: string; readonly extensionId: string }[];
@@ -40,6 +42,7 @@ export class NativeExtensionManager {
   private readonly loaded = new Map<string, NativeExtensionSnapshot>();
   private readonly executable = new Map<string, NativeExecutableRunner>();
   private readonly reserved: ReadonlySet<string>;
+  readonly hooks = new NativeExtensionHooks(() => [...this.executable.values()]);
   constructor(readonly workspace: string, reservedCommands: readonly string[] = []) {
     this.reserved = new Set([...NATIVE_EXTENSION_RESERVED_COMMANDS, ...reservedCommands]);
   }
@@ -117,7 +120,7 @@ export class NativeExtensionManager {
       }
     } satisfies ContextPlugin));
     return { contextPlugins: [...contextPlugins, ...[...this.executable.values()].flatMap(nativeExecutableContextPlugins)],
-      pins: snapshots.map(pin), commands: this.listCommands() };
+      pins: snapshots.map(pin), commands: this.listCommands(), ...(this.hooks.active ? { hooks: this.hooks } : {}) };
   }
 
   /** Expands only loaded named commands. Arguments are a JSON string, never evaluated or re-interpolated. */

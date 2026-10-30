@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { EventEmitter } from "node:events";
-import { mkdirSync, mkdtempSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import { chmodSync, mkdirSync, mkdtempSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { hostname, tmpdir, userInfo } from "node:os";
 import { join } from "node:path";
 import { Command } from "commander";
@@ -33,6 +33,7 @@ import { signPlan } from "../src/catalog/compiler/sign.js";
 import { registerAgentCommands } from "../src/cli-agent-commands.js";
 import { registerNativeScheduleCommands } from "../src/cli-native-schedule-commands.js";
 import { runComposedTurn } from "../src/kernel/agentLoopRunner.js";
+import { agentToolset } from "../src/agent/agentToolset.js";
 import { openLedger } from "../src/ledger/ledger.js";
 import { issueLeaseForPrincipal, LeasePrincipalRefused } from "../src/leases/leasePrincipal.js";
 import { issueLeaseToken } from "../src/leases/leaseSigner.js";
@@ -46,6 +47,7 @@ import { readNativeSessionEvents } from "../src/session/readNativeSessionEvents.
 import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
 import { loadVerifiedToolsConfigSnapshot } from "../src/toolhub/toolhubValidators.js";
 import { initWorkspace } from "../src/workspace.js";
+import { workspaceIdFromDirectory } from "../src/workspaces/workspaceId.js";
 import { catalog } from "./catalog/l0/harness.js";
 import { FixedCredentials, LOOP_MODEL, LOOP_PROVIDER, scriptedAdapter, silentTransport, textStep, toolStep, type ScriptedStream } from "./helpers/agentLoopHarness.js";
 
@@ -127,13 +129,13 @@ function activatePlan(owner: string): string {
   return user.userId;
 }
 
-async function cliRun(): Promise<AgentRunSummary> {
+async function cliRun(extra: string[] = []): Promise<AgentRunSummary> {
   const output: string[] = [];
   const errors: string[] = [];
   let failed = false;
   const program = new Command().exitOverride();
   registerAgentCommands(program, { log: (line) => output.push(line), error: (line) => errors.push(line), fail: () => { failed = true; } });
-  await program.parseAsync(["agent-loop", "run", READ, "--provider", "stub", "--tools", "workspace", "--credentials-home", home, "--json"],
+  await program.parseAsync(["agent-loop", "run", READ, "--provider", "stub", "--tools", "workspace", "--credentials-home", home, "--json", ...extra],
     { from: "user" });
   expect(failed, errors.join("\n")).toBe(false);
   return JSON.parse(output.at(-1)!) as AgentRunSummary;
@@ -240,6 +242,54 @@ function approveAsTester(approvalRequestId: string): void {
 }
 
 describe("CLI and ACP native runs under an activated identity-binding plan (P1-79)", () => {
+  it("refuses a root turn without a required lease once, with Studio and lease-file recovery, before any request or session", async () => {
+    activatePlan(OS_USER);
+    const before = ledgerState();
+    const transport = vi.fn(stubProviderTransport());
+    const toolset = agentToolset({ workspace, agentId: "default", sessionId: "lease-less-root" });
+    try {
+      await expect(runComposedTurn({ workspace, agentId: "default", prompt: READ, tools: toolset.seam,
+        route: { providerId: STUB_PROVIDER_ID, model: STUB_PROVIDER_MODEL, params: { max_tokens: 128 } },
+        routes: [stubProviderRoute()], transport })).rejects.toThrow(/^IDENTITY_UNRESOLVED: .*identity-binding.*Studio.*amc lease issue.*--lease-file/s);
+    } finally { toolset.close(); }
+    expect(transport).not.toHaveBeenCalled();
+    expect(ledgerState()).toEqual(before);
+  });
+
+  it("--lease-file binds an issued lease instead of minting an OS-user lease and never logs its token", async () => {
+    const ownerId = activatePlan(`not-${OS_USER}`);
+    const issued = issueLeaseForPrincipal({ workspace, workspaceId: workspaceIdFromDirectory(workspace), agentId: "default",
+      principalKey: `LOCAL_USER:${ownerId}`, ttlMs: 60_000, scopes: ["toolhub:execute"], routeAllowlist: ["/native-run"],
+      modelAllowlist: [STUB_PROVIDER_MODEL], maxTokensPerMinute: 1, maxRequestsPerMinute: 1, maxCostUsdPerDay: null });
+    const file = join(home, "lease.token");
+    writeFileSync(file, issued.token + "\n", { mode: 0o600 });
+    minted.mockClear();
+    const summary = await cliRun(["--lease-file", file]);
+    const { allowed, denied, records } = governed(summary.sessionId);
+    expect(denied, "no governed call was denied").toEqual([]);
+    expect(allowed, "the fs.read call ran").toBeGreaterThan(0);
+    expect(records.length).toBeGreaterThan(0);
+    for (const record of records) {
+      expect(record.principal).toEqual({ principalId: ownerId, kind: "human", authenticatedVia: "lease" });
+      expect(record.delegation.leaseId).toBe(issued.payload.leaseId);
+    }
+    expect(minted).not.toHaveBeenCalled();
+    expect(JSON.stringify(readNativeSessionEvents(workspace, summary.sessionId))).not.toContain(issued.token);
+  });
+
+  it("--lease-file refuses a shared file or an invalid lease before any session row or lease", async () => {
+    activatePlan(`not-${OS_USER}`);
+    const before = ledgerState();
+    const file = join(home, "lease.token");
+    writeFileSync(file, "not.a-lease\n", { mode: 0o644 });
+    chmodSync(file, 0o644);
+    await expect(cliRun(["--lease-file", file])).rejects.toThrow(/private to its owner \(0600\)/);
+    chmodSync(file, 0o600);
+    await expect(cliRun(["--lease-file", file])).rejects.toThrow(/--lease-file holds no valid lease/);
+    expect(minted).not.toHaveBeenCalled();
+    expect(ledgerState()).toEqual(before);
+  });
+
   it("amc agent-loop run mints a lease naming the OS user's users.yaml user, and the ledger rows carry it", async () => {
     const ownerId = activatePlan(OS_USER);
     const summary = await cliRun();
