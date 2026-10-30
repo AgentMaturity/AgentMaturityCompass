@@ -192,3 +192,23 @@ describe("verified-artifact registry (AXE-35)", () => {
     expect(readVerified("trust-me", { file, trust })).toMatchObject({ status: "refused", label: "UNKNOWN_KIND" });
   }, 120_000);
 });
+
+describe("signature downgrade (WP37 review)", () => {
+  test("in a keyed workspace a record whose signature was stripped is refused, not read as unsigned", () => {
+    const ws = keyed("amc-wp37r-strip-");
+    saveWorkspaceRecord(ws, AT, "a", { tenantId: "a" }, 1);
+    saveWorkspaceRecord(ws, AT, "b", { tenantId: "b" }, 2);
+    editJson(recordFile(ws, "b"), (row) => { row.signature = "unsigned"; });
+    const read = readTrustedWorkspaceRecords<{ tenantId: string }>(ws, AT);
+    expect(read.records.map((row) => row.tenantId)).toEqual(["a"]);
+    expect(read.unverified.some((line) => line.includes("UNSIGNED"))).toBe(true);
+  });
+
+  test("a keyless workspace still reads its unsigned records and reports them", () => {
+    const ws = scratch("amc-wp37r-keyless-");
+    saveWorkspaceRecord(ws, AT, "a", { tenantId: "a" }, 1);
+    const read = readTrustedWorkspaceRecords<{ tenantId: string }>(ws, AT);
+    expect(read.records.map((row) => row.tenantId)).toEqual(["a"]);
+    expect(read.unverified.some((line) => line.includes("UNSIGNED"))).toBe(true);
+  });
+});

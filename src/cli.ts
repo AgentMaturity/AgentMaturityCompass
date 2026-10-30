@@ -18891,10 +18891,7 @@ program
       status: opts.status as "open" | "confirmed" | "rejected" | undefined,
     }, process.cwd());
     for (const line of fp.fpReportEvidence(process.cwd()).unverifiedRecords) console.log(chalk.yellow(line));
-    if (reports.length === 0) {
-      console.log(chalk.green("No false positive reports found."));
-      return;
-    }
+    if (reports.length === 0) { console.log(chalk.green("No false positive reports found.")); return; }
     for (const r of reports) {
       const color = r.status === "confirmed" ? chalk.yellow : r.status === "rejected" ? chalk.dim : chalk.white;
       console.log(color(`  [${r.status.toUpperCase()}] ${r.reportId} — ${r.packId}/${r.scenarioId}`));
@@ -18910,10 +18907,7 @@ program
     const fp = await import("./assurance/falsePositiveTracker.js");
     const summaries = fp.computeFPCostSummary(opts.pack, process.cwd()), evidence = fp.fpReportEvidence(process.cwd());
     for (const line of evidence.unverifiedRecords) console.log(chalk.yellow(line));
-    if (summaries.length === 0) {
-      console.log(chalk.green("No FP cost data available."));
-      return;
-    }
+    if (summaries.length === 0) { console.log(chalk.green("No FP cost data available.")); return; }
     console.log(chalk.bold("\nFalse Positive Cost Summary:\n"));
     for (const s of summaries) {
       console.log(`  ${chalk.bold(s.packId)} — ${s.confirmedFPs} confirmed FPs, $${s.totalCostUsd.toFixed(2)} total cost, ${s.outcome === "measured" ? `${(s.fpRate * 100).toFixed(1)}% FP rate` : "FP rate not evaluated (no resolved reports)"}`);

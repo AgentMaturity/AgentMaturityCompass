@@ -208,12 +208,14 @@ const RECORD_REFUSALS: ReadonlySet<WorkspaceRecordFinding["code"]> = new Set(["H
  * The history read for reports and aggregates (DXB-11), the workspace-record counterpart of `scanTrustedRuns`: a
  * record whose hash or signature fails is left out, and every finding is returned as an UNVERIFIED line. A report must
  * not read as clean while `unverified` is non-empty.
- * ponytail: unsigned records stay in (keyless workspaces write nothing else) and are only reported; refuse them once
- * every workspace that writes records has an artifact-seal key.
+ * An unsigned record stays in only where the workspace has no artifact-seal verification key (a keyless workspace
+ * writes nothing else); with a key, a stripped signature must not downgrade a record to "reported but kept".
  */
 export function readTrustedWorkspaceRecords<T>(workspace: string, at: RecordLocation): { records: T[]; unverified: string[] } {
   const { findings } = verifyWorkspaceRecords<RecordEnvelope>(workspace, at);
-  const refused = new Set(findings.filter((row) => RECORD_REFUSALS.has(row.code)).map((row) => row.file));
+  let keyed = false;
+  try { keyed = runHashVerificationKeys(workspace).length > 0; } catch { /* keyless workspace */ }
+  const refused = new Set(findings.filter((row) => RECORD_REFUSALS.has(row.code) || (keyed && row.code === "UNSIGNED")).map((row) => row.file));
   const dir = recordDir(workspace, at);
   const records = !pathExists(dir) ? [] : readdirSync(dir).filter((name) => name.endsWith(".json") && !refused.has(join(dir, name)))
     .flatMap((name) => {
