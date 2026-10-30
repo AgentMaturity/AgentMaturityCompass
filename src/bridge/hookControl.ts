@@ -2,84 +2,38 @@ import { canonicalize } from "../utils/json.js";
 import { z } from "zod";
 import YAML from "yaml";
 import { getPurposeKeyHistory } from "../keys/signingKeys.js";
-import { verifyBudgetsConfigSignature } from "../budgets/budgets.js";
-import {
-  loadApprovalPolicy,
-  verifyApprovalPolicySignature,
-} from "../approvals/approvalPolicyEngine.js";
-import { runGovernorCheck } from "../governor/governorCli.js";
-import { governedCallDenial } from "../tools/guards/governedCallDecision.js";
 import {
   openLedger,
   hashBinaryOrPath,
   verifyEvidenceEventIntegrity,
 } from "../ledger/ledger.js";
 import { verifyReceipt } from "../receipts/receipt.js";
-import {
-  findToolDefinition,
-  loadToolsConfig,
-  validateToolRequest,
-  verifyToolsConfigSignature,
-} from "../toolhub/toolhubValidators.js";
-import type { ActionClass, RiskTier } from "../types.js";
+import type { ActionClass } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
 import { redactBridgeText } from "./bridgeRedaction.js";
-import { verifyActionPolicySignature } from "../governor/actionPolicyEngine.js";
 import { ACTION_CLASSES } from "../governor/actionCatalog.js";
 import { resolveProviderHookRequestIdentity } from "./hookActionIdentity.js";
-import type { ShellCommandConnector, ShellCommandPlan } from "../enforce/shellCommandPlan.js";
 import {
-  canonicalToolRequests, CONTROL_HOOK_EVENTS, controlDecisionSchema, refineControlMapping, HookControlError, hookCall, hookCallRefusal, openHookEnvelope,
+  canonicalToolRequests, CONTROL_HOOK_EVENTS, controlDecisionSchema, refineControlMapping, HookControlError, hookCall, openHookEnvelope,
   materializeProviderDecision, parseProvider, providerSchema, runtimeFor, serializeProviderControlResponse, validateProviderControlResponse,
-  type CanonicalToolRequest, type HookCall, type HookControlDecision, type HookControlOutcome, type HookControlProviderMapping,
+  type HookControlDecision, type HookControlOutcome, type HookControlProviderMapping,
   type HookProvider, type ProviderControlResponse,
 } from "./hookProviders.js";
 // Still exported here for importers of hookControl.js, the archived HTTP parity module among them.
 export { HookControlError } from "./hookProviders.js";
-import { authorizeHookDecision, boundDecisionFacts, hookDecisionReceipt, type AuthorizationTarget, type HookLease } from "./hookAuthorization.js";
+import { authorizeHookDecision, boundDecisionFacts, hookDecisionReceipt, type HookLease } from "./hookAuthorization.js";
+import { requestedControlDecision, type CompoundCommandBlastRadiusReview, type NormalizedProviderToolRequest } from "./hookControlPolicy.js";
+export type { CompoundCommandBlastRadiusReasonCode, CompoundCommandBlastRadiusStep, CompoundCommandBlastRadiusReview } from "./hookControlPolicy.js";
+import { runHookControl, runHookControlAsync, hookApprovalAttemptSuffix, hookApprovalIntentHash, type HookApprovalPhase,
+  type HookApprovalOperation, type HookApprovalOperationResult, type HookApprovalResolution } from "./hookApproval.js";
+import { revokedLeaseIdSet } from "../leases/leaseStore.js";
+import { verifyLeaseToken } from "../leases/leaseVerifier.js";
+import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
 import { hookAuditLatchState, HookWriterFault, latchedMessage } from "./hookAuditLatch.js";
 
 export const CONTROL_HOOK_PATH = "/bridge/hooks/control/v1";
 export const CONTROL_HOOK_ROUTE = "/hooks/control/v1";
 export const MAX_CONTROL_HOOK_BODY_BYTES = 262_144;
-
-
-export type CompoundCommandBlastRadiusReasonCode =
-  | "SIGNED_AUTHORITY_UNTRUSTED"
-  | "COMMAND_PLAN_INVALID"
-  | "TOOL_NOT_ALLOWED"
-  | "TOOL_ARGUMENTS_REJECTED"
-  | "ACTION_POLICY_DENIED"
-  | "APPROVAL_QUORUM_UNSUPPORTED"
-  | "APPROVAL_REQUIRED"
-  | "POLICY_ALLOW"
-  | "CONTROL_EVALUATION_FAILED";
-
-export interface CompoundCommandBlastRadiusStep {
-  index: number;
-  connector: ShellCommandConnector;
-  canonicalToolName: string;
-  actionClass: ActionClass | null;
-  outcome: HookControlOutcome;
-  reasonCode: CompoundCommandBlastRadiusReasonCode;
-}
-
-export interface CompoundCommandBlastRadiusReview {
-  schemaVersion: "2026-07-13";
-  parseStatus: "parsed" | "invalid";
-  trustStatus: "verified" | "untrusted";
-  completeEvaluation: boolean;
-  compound: boolean;
-  segmentCount: number;
-  highestActionClass: ActionClass | null;
-  aggregateOutcome: HookControlOutcome;
-  decisiveStepIndex: number | null;
-  outcomeCounts: Record<HookControlOutcome, number>;
-  steps: CompoundCommandBlastRadiusStep[];
-  reasonCodes: string[];
-  rawCommandStored: false;
-  argumentValuesStored: false;
-}
 
 
 export interface ProviderHookControlResult {
@@ -102,18 +56,6 @@ export interface ProviderHookControlResult {
   receipt: string;
   receiptId: string;
   receiptSha256: string;
-}
-
-interface NormalizedProviderToolRequest {
-  provider: HookProvider;
-  actionId: string;
-  providerToolName: string;
-  canonicalToolName: string | null;
-  canonicalRequests: CanonicalToolRequest[];
-  commandPlan: ShellCommandPlan | null;
-  rawInputSha256: string;
-  call: HookCall | null;
-  toolInput: Record<string, unknown>;
 }
 
 const SAFE_ID = /^[A-Za-z0-9][A-Za-z0-9._:-]*$/;
@@ -193,7 +135,7 @@ const storedControlMetaV1Schema = z.object({
   receipt_sha256: z.string().regex(/^[a-f0-9]{64}$/),
 }).passthrough();
 
-const storedControlMetaV2Schema = z.object({
+const storedControlMetaV2BaseSchema = z.object({
   trustTier: z.literal("OBSERVED"),
   controlSchemaVersion: z.literal(2),
   agentId: z.string().min(1),
@@ -214,11 +156,15 @@ const storedControlMetaV2Schema = z.object({
   receipt: z.string().min(1),
   receipt_id: z.string().min(1),
   receipt_sha256: z.string().regex(/^[a-f0-9]{64}$/),
-}).passthrough().superRefine(refineControlMapping);
+}).passthrough();
+const storedControlMetaV2Schema = storedControlMetaV2BaseSchema.superRefine(refineControlMapping);
 
-const storedControlMetaSchema = z.discriminatedUnion("controlSchemaVersion", [
+const storedControlMetaSchema = z.union([
   storedControlMetaV1Schema,
   storedControlMetaV2Schema,
+  // A pending/refused retry is not a second final action decision (hookActionLifecycle).
+  storedControlMetaV2BaseSchema.omit({ controlSchemaVersion: true }).extend({ approvalControlSchemaVersion: z.literal(1) }).superRefine(refineControlMapping)
+    .transform(value => ({ ...value, controlSchemaVersion: 2 as const })),
 ]);
 
 const providerHookControlResultV1Schema = z.object({
@@ -351,308 +297,6 @@ function normalizeProviderRequest(input: {
     call,
     toolInput: parsed.tool_input,
   };
-}
-
-function riskTierFor(actionClass: ActionClass): RiskTier {
-  if (actionClass === "READ_ONLY") return "low";
-  if (actionClass === "WRITE_LOW") return "med";
-  if (actionClass === "WRITE_HIGH" || actionClass === "NETWORK_EXTERNAL") return "high";
-  return "critical";
-}
-
-const OUTCOME_RANK: Record<HookControlOutcome, number> = {
-  allow: 0,
-  ask: 1,
-  steer: 2,
-  deny: 3,
-};
-
-const ACTION_CLASS_RANK: Record<ActionClass, number> = {
-  READ_ONLY: 0,
-  WRITE_LOW: 1,
-  WRITE_HIGH: 2,
-  NETWORK_EXTERNAL: 2,
-  DATA_EXPORT: 3,
-  DEPLOY: 3,
-  SECURITY: 4,
-  FINANCIAL: 4,
-  IDENTITY: 4,
-};
-
-interface EvaluatedControlStep {
-  request: CanonicalToolRequest;
-  actionClass: ActionClass | null;
-  outcome: HookControlOutcome;
-  reason: string;
-  reasonCode: CompoundCommandBlastRadiusReasonCode;
-}
-
-function emptyOutcomeCounts(): Record<HookControlOutcome, number> {
-  return { allow: 0, deny: 0, ask: 0, steer: 0 };
-}
-
-function incompleteCommandReview(input: {
-  plan: ShellCommandPlan;
-  trustStatus: "verified" | "untrusted";
-  reasonCodes: string[];
-}): CompoundCommandBlastRadiusReview {
-  return {
-    schemaVersion: "2026-07-13",
-    parseStatus: input.plan.status,
-    trustStatus: input.trustStatus,
-    completeEvaluation: false,
-    compound: input.plan.compound,
-    segmentCount: input.plan.segments.length,
-    highestActionClass: null,
-    aggregateOutcome: "deny",
-    decisiveStepIndex: null,
-    outcomeCounts: emptyOutcomeCounts(),
-    steps: [],
-    reasonCodes: input.reasonCodes,
-    rawCommandStored: false,
-    argumentValuesStored: false,
-  };
-}
-
-function evaluateCanonicalRequest(input: {
-  workspace: string;
-  agentId: string;
-  request: CanonicalToolRequest;
-  tools: ReturnType<typeof loadToolsConfig>;
-  approvalPolicy: ReturnType<typeof loadApprovalPolicy>;
-}): EvaluatedControlStep {
-  const tool = findToolDefinition(input.tools, input.request.name);
-  if (!tool) {
-    return {
-      request: input.request,
-      actionClass: null,
-      outcome: "deny",
-      reason: `Canonical tool ${input.request.name} is not allowed by signed ToolHub config.`,
-      reasonCode: "TOOL_NOT_ALLOWED",
-    };
-  }
-  const minimum = input.request.minimumActionClass;
-  if (minimum && ACTION_CLASS_RANK[tool.actionClass] < ACTION_CLASS_RANK[minimum]) {
-    return { request: input.request, actionClass: tool.actionClass, outcome: "deny", reasonCode: "TOOL_NOT_ALLOWED",
-      reason: `Signed ToolHub config gives ${tool.name} ${tool.actionClass}, below the ${minimum} the Pi mapping requires.` };
-  }
-  if (!input.request.argumentsReviewable) {
-    return {
-      request: input.request,
-      actionClass: tool.actionClass,
-      outcome: "steer",
-      reason: `Signed ToolHub policy cannot verify the current ${tool.name} argument context.`,
-      reasonCode: "TOOL_ARGUMENTS_REJECTED",
-    };
-  }
-  if (!validateToolRequest({ workspace: input.workspace, tool, args: input.request.args }).ok) {
-    return { request: input.request, actionClass: tool.actionClass, outcome: "steer", reasonCode: "TOOL_ARGUMENTS_REJECTED",
-      reason: `Signed ToolHub policy rejected the current ${tool.name} arguments.` };
-  }
-  // AXR-01: the checks every governed plane shares, so this call is denied here wherever the native or ToolHub plane denies it.
-  const governed = governedCallDenial(input.workspace, { name: tool.name, agentId: input.agentId, actionClass: tool.actionClass, arguments: input.request.args, requestedMode: "EXECUTE" });
-  if (governed !== null) {
-    return { request: input.request, actionClass: tool.actionClass, outcome: "deny", reasonCode: "ACTION_POLICY_DENIED",
-      reason: `Signed AMC policy denied this call (${governed.label}): ${governed.reason}` };
-  }
-
-  const governor = runGovernorCheck({
-    workspace: input.workspace,
-    agentId: input.agentId,
-    actionClass: tool.actionClass,
-    riskTier: riskTierFor(tool.actionClass),
-    mode: "EXECUTE",
-  });
-  if (!governor.allowed || governor.effectiveMode !== "EXECUTE") {
-    return {
-      request: input.request,
-      actionClass: tool.actionClass,
-      outcome: "deny",
-      reason: governor.reasons.length > 0
-        ? `Signed Action Policy denied native execution: ${governor.reasons.join(" ")}`
-        : "Signed Action Policy denied native execution.",
-      reasonCode: "ACTION_POLICY_DENIED",
-    };
-  }
-
-  const approvalRule = input.approvalPolicy.approvalPolicy.actionClasses[tool.actionClass];
-  const requiredApprovals = approvalRule?.requiredApprovals ?? 0;
-  if (requiredApprovals > 0) {
-    if (requiredApprovals !== 1 || approvalRule?.requireDistinctUsers === true) {
-      return {
-        request: input.request,
-        actionClass: tool.actionClass,
-        outcome: "deny",
-        reason: `Signed Approval Policy requires ${requiredApprovals} distinct or multi-user approvals and cannot be reduced to one provider-local ask.`,
-        reasonCode: "APPROVAL_QUORUM_UNSUPPORTED",
-      };
-    }
-    return {
-      request: input.request,
-      actionClass: tool.actionClass,
-      outcome: "ask",
-      reason: `Signed Approval Policy requires ${requiredApprovals} human approval before ${tool.actionClass}.`,
-      reasonCode: "APPROVAL_REQUIRED",
-    };
-  }
-  return {
-    request: input.request,
-    actionClass: tool.actionClass,
-    outcome: "allow",
-    reason: `Signed AMC policies allow ${tool.actionClass} through ${tool.name}.`,
-    reasonCode: "POLICY_ALLOW",
-  };
-}
-
-function completeCommandReview(
-  plan: ShellCommandPlan,
-  evaluations: EvaluatedControlStep[],
-): CompoundCommandBlastRadiusReview {
-  const outcomeCounts = emptyOutcomeCounts();
-  for (const evaluation of evaluations) outcomeCounts[evaluation.outcome] += 1;
-  const aggregateOutcome = evaluations.reduce<HookControlOutcome>(
-    (current, evaluation) => OUTCOME_RANK[evaluation.outcome] > OUTCOME_RANK[current]
-      ? evaluation.outcome
-      : current,
-    "allow",
-  );
-  const decisiveStepIndex = evaluations.findIndex(
-    (evaluation) => evaluation.outcome === aggregateOutcome,
-  );
-  const actionClasses = evaluations
-    .map((evaluation) => evaluation.actionClass)
-    .filter((actionClass): actionClass is ActionClass => actionClass !== null);
-  const highestActionClass = actionClasses.reduce<ActionClass | null>(
-    (current, actionClass) => current === null
-      || ACTION_CLASS_RANK[actionClass] > ACTION_CLASS_RANK[current]
-      ? actionClass
-      : current,
-    null,
-  );
-  return {
-    schemaVersion: "2026-07-13",
-    parseStatus: "parsed",
-    trustStatus: "verified",
-    completeEvaluation: true,
-    compound: plan.compound,
-    segmentCount: plan.segments.length,
-    highestActionClass,
-    aggregateOutcome,
-    decisiveStepIndex: decisiveStepIndex >= 0 ? decisiveStepIndex : null,
-    outcomeCounts,
-    steps: evaluations.map((evaluation, index) => ({
-      index,
-      connector: evaluation.request.segment?.connector ?? null,
-      canonicalToolName: evaluation.request.name,
-      actionClass: evaluation.actionClass,
-      outcome: evaluation.outcome,
-      reasonCode: evaluation.reasonCode,
-    })),
-    reasonCodes: [...new Set(evaluations.map((evaluation) => evaluation.reasonCode))],
-    rawCommandStored: false,
-    argumentValuesStored: false,
-  };
-}
-
-interface RequestedControlDecision {
-  decision: HookControlOutcome;
-  reason: string;
-  commandBlastRadius: CompoundCommandBlastRadiusReview | null;
-  /** The highest-class canonical tool evaluated: what an authorization record for this call names. */
-  target?: AuthorizationTarget | null;
-}
-
-function requestedControlDecision(input: {
-  workspace: string;
-  agentId: string;
-  request: NormalizedProviderToolRequest;
-}): RequestedControlDecision {
-  const versionRefusal = input.request.call ? hookCallRefusal(input.request.call, input.workspace, input.request.providerToolName, input.request.toolInput) : null;
-  if (versionRefusal) return { decision: "deny", reason: versionRefusal, commandBlastRadius: null };
-  const signatureChecks = [
-    ["action policy", verifyActionPolicySignature(input.workspace)],
-    ["approval policy", verifyApprovalPolicySignature(input.workspace)],
-    ["ToolHub config", verifyToolsConfigSignature(input.workspace)],
-    ["budget policy", verifyBudgetsConfigSignature(input.workspace)],
-  ] as const;
-  for (const [label, check] of signatureChecks) {
-    if (!check.valid) {
-      return {
-        decision: "deny",
-        reason: `${label} signature invalid; control fails closed.`,
-        commandBlastRadius: input.request.commandPlan
-          ? incompleteCommandReview({
-              plan: input.request.commandPlan,
-              trustStatus: "untrusted",
-              reasonCodes: ["SIGNED_AUTHORITY_UNTRUSTED"],
-            })
-          : null,
-      };
-    }
-  }
-
-  if (input.request.commandPlan?.status === "invalid") {
-    return {
-      decision: "deny",
-      reason: `Provider command syntax is unsupported or invalid: ${input.request.commandPlan.reasonCodes[0] ?? "COMMAND_PLAN_INVALID"}.`,
-      commandBlastRadius: incompleteCommandReview({
-        plan: input.request.commandPlan,
-        trustStatus: "verified",
-        reasonCodes: ["COMMAND_PLAN_INVALID", ...input.request.commandPlan.reasonCodes],
-      }),
-    };
-  }
-  if (input.request.canonicalRequests.length === 0) {
-    return {
-      decision: "deny",
-      reason: `${input.request.provider === "pi" ? "Pi" : "Provider"} tool ${input.request.providerToolName} is not mapped to an allowed ToolHub tool.`,
-      commandBlastRadius: null,
-    };
-  }
-
-  try {
-    const tools = loadToolsConfig(input.workspace);
-    const approvalPolicy = loadApprovalPolicy(input.workspace);
-    const evaluations = input.request.canonicalRequests.map((request) => evaluateCanonicalRequest({
-      workspace: input.workspace,
-      agentId: input.agentId,
-      request,
-      tools,
-      approvalPolicy,
-    }));
-    if (!input.request.commandPlan) {
-      const evaluation = evaluations[0];
-      if (!evaluation) throw new Error("control evaluation produced no result");
-      return {
-        decision: evaluation.outcome,
-        reason: evaluation.reason,
-        commandBlastRadius: null,
-        target: evaluation.actionClass ? { toolName: evaluation.request.name, actionClass: evaluation.actionClass } : null,
-      };
-    }
-    const review = completeCommandReview(input.request.commandPlan, evaluations);
-    const decisive = review.decisiveStepIndex === null
-      ? null
-      : evaluations[review.decisiveStepIndex] ?? null;
-    const reason = review.compound
-      ? `Compound command review: ${review.segmentCount} steps; highest action class ${review.highestActionClass ?? "UNKNOWN"}; step ${(review.decisiveStepIndex ?? 0) + 1} requires ${review.aggregateOutcome}.`
-      : decisive?.reason ?? "AMC control evaluation failed closed.";
-    const top = evaluations.find((evaluation) => evaluation.actionClass === review.highestActionClass);
-    const target = top?.actionClass ? { toolName: top.request.name, actionClass: top.actionClass } : null;
-    return { decision: review.aggregateOutcome, reason, commandBlastRadius: review, target };
-  } catch {
-    return {
-      decision: "deny",
-      reason: "AMC control evaluation failed closed.",
-      commandBlastRadius: input.request.commandPlan
-        ? incompleteCommandReview({
-            plan: input.request.commandPlan,
-            trustStatus: "verified",
-            reasonCodes: ["CONTROL_EVALUATION_FAILED"],
-          })
-        : null,
-    };
-  }
 }
 
 export function deterministicEventId(agentId: string, provider: HookProvider, actionId: string): string {
@@ -875,8 +519,13 @@ export function verifyProviderHookControlResult(input: {
       provider: input.provider,
       rawInput: input.rawInput,
     });
-    const eventId = deterministicEventId(input.authenticatedAgentId, input.provider, request.actionId);
-    const sessionId = deterministicSessionId(input.authenticatedAgentId, input.provider, request.actionId);
+    const baseEventId = deterministicEventId(input.authenticatedAgentId, input.provider, request.actionId);
+    const baseSessionId = deterministicSessionId(input.authenticatedAgentId, input.provider, request.actionId);
+    const attempt = (["pending", "blocked", "replay"] as const).find(phase =>
+      suppliedResult.eventId === baseEventId + hookApprovalAttemptSuffix(phase, request.rawInputSha256));
+    const suffix = attempt ? hookApprovalAttemptSuffix(attempt, request.rawInputSha256) : "";
+    const eventId = baseEventId + suffix, sessionId = baseSessionId + suffix;
+    if (attempt && suppliedResult.decision !== "deny") return { ok: false, error: "approval attempt cannot authorize execution" };
     if (
       suppliedResult.actionId !== request.actionId
       || suppliedResult.eventId !== eventId
@@ -910,15 +559,28 @@ export function verifyProviderHookControlResult(input: {
   }
 }
 
-export function evaluateProviderHookControl(input: {
+export type HookControlInput = {
   workspace: string;
   authenticatedAgentId: string;
   provider: HookProvider;
   rawInput: string;
   /** The hook lease the Bridge verified; it names the principal of a bound authorization record. */
   lease?: HookLease;
+  /** Original broker credential, reverified after asynchronous signing; never persisted. */
+  leaseToken?: string;
   now?: number;
-}): ProviderHookControlResult {
+};
+export function evaluateProviderHookControl(input: HookControlInput): ProviderHookControlResult {
+  return runHookControl(evaluateHookControl(input));
+}
+
+/** Bridge uses the provider-backed publishers; synchronous callers retain their existing API. */
+export function evaluateProviderHookControlAsync(input: HookControlInput): Promise<ProviderHookControlResult> {
+  return runHookControlAsync(evaluateHookControl(input));
+}
+
+function* evaluateHookControl(input: HookControlInput): Generator<HookApprovalOperation, ProviderHookControlResult, HookApprovalOperationResult> {
+  input = structuredClone(input);
   const provider = parseProvider(input.provider);
   const latch = hookAuditLatchState(input.workspace);
   if (latch.latched) throw new HookControlError("HOOK_CONTROL_LEDGER_UNAVAILABLE", 503, latchedMessage(latch.reason));
@@ -930,12 +592,13 @@ export function evaluateProviderHookControl(input: {
     provider,
     rawInput: input.rawInput,
   });
-  const eventId = deterministicEventId(input.authenticatedAgentId, provider, request.actionId);
-  const sessionId = deterministicSessionId(input.authenticatedAgentId, provider, request.actionId);
+  let eventId = deterministicEventId(input.authenticatedAgentId, provider, request.actionId);
+  let sessionId = deterministicSessionId(input.authenticatedAgentId, provider, request.actionId);
   const now = input.now ?? Date.now();
   let ledger: ReturnType<typeof openLedger> | null = null;
   /** Whether the decision row being written serves a session with a verified registration: only then does its writer's fault latch. */
   let underRegistration = false;
+  let signedApprovalExecution = false;
   try {
     ledger = openLedger(input.workspace);
     const recovered = recoverControlResult({
@@ -945,30 +608,67 @@ export function evaluateProviderHookControl(input: {
       request,
       agentId: input.authenticatedAgentId,
     });
-    if (recovered) return recovered;
+    const approvalBacked = recovered && (JSON.parse((ledger.db.prepare("SELECT meta_json FROM evidence_events WHERE id = ?").get(eventId) as { meta_json: string }).meta_json) as { approvalRequestIds?: string[] }).approvalRequestIds?.length;
+    if (recovered && !approvalBacked) return recovered;
 
-    const sessionState = ensureControlSession({ ledger, sessionId, provider });
-    if (sessionState === "event-present") {
-      const recoveredAfterSessionRead = recoverControlResult({
-        ledger,
-        eventId,
-        sessionId,
-        request,
-        agentId: input.authenticatedAgentId,
-      });
-      if (recoveredAfterSessionRead) return recoveredAfterSessionRead;
-      throw new HookControlError(
-        "HOOK_CONTROL_LEDGER_UNAVAILABLE",
-        503,
-        "existing hook control session contains an unrelated event",
-      );
-    }
-    // Pi and Claude Code decisions that let an effect proceed bind P1-02's authorization record.
-    const { requested, authorization, enforced, version } = authorizeHookDecision({
-      workspace: input.workspace, agentId: input.authenticatedAgentId, lease: input.lease, provider, actionId: request.actionId,
-      call: request.call, toolInput: request.toolInput, ledger, now,
-      requested: requestedControlDecision({ workspace: input.workspace, agentId: input.authenticatedAgentId, request }),
+    const authorizationInput = { workspace: input.workspace, agentId: input.authenticatedAgentId, lease: input.lease,
+      provider, actionId: request.actionId, call: request.call, toolInput: request.toolInput, ledger, now };
+    let { requested, authorization, enforced, version } = authorizeHookDecision({ ...authorizationInput,
+      requested: approvalBacked ? { decision: "deny" as HookControlOutcome, reason: "AMC signed approval already consumed; hook replay denied.", commandBlastRadius: null, approvals: [], target: null }
+        : requestedControlDecision({ workspace: input.workspace, agentId: input.authenticatedAgentId, request }),
     });
+    let approvalPhase: HookApprovalPhase | null = approvalBacked ? "replay" : null;
+    let approvalRequestIds: string[] = [];
+    if (requested.decision === "ask" && (provider === "claude-code" || provider === "gemini-cli")) {
+      const resolved = (yield { kind: "prepare", input: { workspace: input.workspace, agentId: input.authenticatedAgentId,
+        request, targets: requested.approvals ?? [], lease: input.lease } }) as HookApprovalResolution;
+      approvalRequestIds = resolved.grants.map(grant => grant.approvalId);
+      approvalPhase = resolved.phase;
+      const authorized = authorizeHookDecision({ ...authorizationInput, approvalRequestIds,
+        requested: { ...requested, decision: resolved.phase ? "deny" as const : "allow" as const, reason: `${requested.reason} ${resolved.reason}` } });
+      ({ requested, authorization, enforced, version } = authorized);
+      if (requested.decision === "allow") {
+        signedApprovalExecution = true;
+        const assertCurrent = () => {
+          if (Date.now() >= (resolved.expiresTs ?? 0)) throw new Error("hook approval expired during signing");
+          if (hookAuditLatchState(input.workspace).latched) throw new Error("hook audit latch changed during signing");
+          if (authorization?.ok && Date.parse(authorization.record.expiresAt) <= Date.now()) throw new Error("hook authorization expired during signing");
+          const current = normalizeProviderRequest({ workspace: input.workspace, provider, rawInput: input.rawInput });
+          const contextHash = hookApprovalIntentHash({ workspace: input.workspace, agentId: input.authenticatedAgentId,
+            request: current, targets: requested.approvals ?? [], lease: input.lease });
+          if (resolved.grants.some(grant => grant.expectedIntentHash !== contextHash)) throw new Error("hook approval context changed during signing");
+          if (canonicalize(current.canonicalRequests) !== canonicalize(request.canonicalRequests)) throw new Error("hook targets changed during approval");
+          const checked = authorizeHookDecision({ ...authorizationInput,
+            requested: requestedControlDecision({ workspace: input.workspace, agentId: input.authenticatedAgentId, request: current }) });
+          if (checked.requested.decision !== "ask") throw new Error("hook policy or session changed during approval");
+          // The engine owns its multipart grant publication; recheck only external hook authority here.
+          const rebound = authorizeHookDecision({ ...authorizationInput,
+            requested: { ...checked.requested, decision: "allow" as const } });
+          if (rebound.requested.decision !== "allow") throw new Error("hook authorization changed during approval");
+          if (input.leaseToken !== undefined) {
+            const checkedLease = verifyLeaseToken({ workspace: input.workspace, token: input.leaseToken,
+              expectedWorkspaceId: workspaceIdFromDirectory(input.workspace), expectedAgentId: input.authenticatedAgentId,
+              requiredScope: "hook:control", routePath: CONTROL_HOOK_ROUTE, revokedLeaseIds: revokedLeaseIdSet(input.workspace) });
+            if (!checkedLease.ok || checkedLease.payload?.leaseId !== input.lease?.leaseId) throw new Error("hook broker credential no longer verifies");
+          }
+          if (input.lease && (input.lease.expiresTs <= Date.now() || revokedLeaseIdSet(input.workspace).has(input.lease.leaseId)
+            || resolved.grants.some(grant => input.lease?.executeActionClasses && !input.lease.executeActionClasses.includes(grant.expectedActionClass))))
+            throw new Error("hook lease expired, revoked or outside scope");
+        };
+        let refusal = (yield { kind: "consume", grants: resolved.grants, executionId: request.actionId, assertCurrent }) as string | null;
+        if (!refusal) try { assertCurrent(); } catch { refusal = "AMC hook context changed during approval consumption; hook call denied."; }
+        if (refusal) { requested = { ...requested, decision: "deny", reason: refusal }; authorization = null; approvalPhase = "blocked"; }
+      } else approvalPhase ??= "blocked";
+    }
+    if (approvalPhase) {
+      const suffix = hookApprovalAttemptSuffix(approvalPhase, request.rawInputSha256);
+      eventId += suffix;
+      sessionId += suffix;
+      const attempt = recoverControlResult({ ledger, eventId, sessionId, request, agentId: input.authenticatedAgentId });
+      if (attempt) return attempt;
+    }
+    const sessionState = ensureControlSession({ ledger, sessionId, provider });
+    if (sessionState === "event-present") throw new HookControlError("HOOK_CONTROL_LEDGER_UNAVAILABLE", 503, "existing hook control session contains an unrelated event");
     const materialized = materializeProviderDecision({
       provider,
       requestSha256: request.rawInputSha256,
@@ -977,7 +677,8 @@ export function evaluateProviderHookControl(input: {
     });
     const bound = request.call ? boundDecisionFacts(request.call, { version, authorization, lease: input.lease, targets: request.canonicalRequests }) : {};
     const payload = {
-      kind: "hook_control_decision",
+      kind: approvalPhase ? "hook_approval_attempt" : "hook_control_decision",
+      approvalRequestIds,
       version: 2,
       agentId: input.authenticatedAgentId,
       provider,
@@ -1007,7 +708,8 @@ export function evaluateProviderHookControl(input: {
       inline: false,
       meta: {
         trustTier: "OBSERVED",
-        controlSchemaVersion: 2,
+        ...(approvalPhase ? { approvalControlSchemaVersion: 1 } : { controlSchemaVersion: 2 }),
+        approvalRequestIds,
         agentId: input.authenticatedAgentId,
         provider,
         actionId: request.actionId,
@@ -1071,6 +773,9 @@ export function evaluateProviderHookControl(input: {
         request,
         agentId: input.authenticatedAgentId,
       });
+      if (recovered && signedApprovalExecution && recovered.decision === "allow") {
+        throw new HookControlError("HOOK_CONTROL_REPLAY_CONFLICT", 409, "signed approval already consumed; hook replay denied");
+      }
       if (recovered) return recovered;
     }
     throw new HookWriterFault("hook control receipt could not be recorded", underRegistration);

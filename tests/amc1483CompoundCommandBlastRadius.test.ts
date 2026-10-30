@@ -17,6 +17,7 @@ import {
   evaluateProviderHookControl,
   verifyProviderHookControlResult,
 } from "../src/bridge/hookControl.js";
+import { listApprovalRequests } from "../src/approvals/approvalChainStore.js";
 import { questionBank } from "../src/diagnostic/questionBank.js";
 import { checkExec } from "../src/enforce/execGuard.js";
 import { parseShellCommandPlan } from "../src/enforce/shellCommandPlan.js";
@@ -260,7 +261,7 @@ describe("AMC-1483 compound-command blast radius", () => {
     });
   });
 
-  test("preserves existing git action classes and asks on the decisive deploy step", () => {
+  test("preserves git action classes and raises signed approval for the decisive deploy step", () => {
     const { workspace, agentId } = prepareControlledWorkspace({ deployApprovals: 1 });
     const rawInput = providerInput("gemini-cli", "git status && git push origin main", "toolu_amc_1483_deploy");
     const result = evaluateProviderHookControl({
@@ -269,13 +270,13 @@ describe("AMC-1483 compound-command blast radius", () => {
       provider: "gemini-cli",
       rawInput,
     });
-    // Gemini CLI has no native ask, so the decisive ask is a capability-lossy deny; the review is the same.
+    // The policy review still asks; the provider is denied with an AMC request until its signed grant is consumed.
     expect(result).toMatchObject({
       canonicalToolName: null,
-      requestedDecision: "ask",
+      requestedDecision: "deny",
       decision: "deny",
       effectiveOutcome: "deny",
-      providerMapping: "fail_closed_deny",
+      providerMapping: "native",
     });
     expect(result.commandBlastRadius).toMatchObject({
       schemaVersion: "2026-07-13",
@@ -306,6 +307,10 @@ describe("AMC-1483 compound-command blast radius", () => {
         outcome: "ask",
       }),
     ]);
+    const approval = listApprovalRequests({ workspace, agentId });
+    expect(approval).toHaveLength(1);
+    expect(approval[0]).toMatchObject({ toolName: "git.push", actionClass: "DEPLOY", requiredApprovals: 1 });
+    expect(result.reason).toContain(approval[0]!.approvalRequestId);
     expect(result.reason).toContain("2 steps");
     expect(result.reason).toContain("DEPLOY");
     expect(result.reason).toContain("step 2");
@@ -372,7 +377,9 @@ describe("AMC-1483 compound-command blast radius", () => {
         "toolu_amc_1483_git_alias",
       ),
     });
-    expect(aliasResult.requestedDecision).toBe("ask");
+    expect(aliasResult.requestedDecision).toBe("deny");
+    expect(aliasResult.reason).toContain("AMC approval pending:");
+    expect(listApprovalRequests({ workspace: alias.workspace, agentId: alias.agentId })).toHaveLength(1);
     expect(aliasResult.commandBlastRadius?.steps[0]).toMatchObject({
       canonicalToolName: "git.push",
       actionClass: "DEPLOY",
