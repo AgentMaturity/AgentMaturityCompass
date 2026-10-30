@@ -7,6 +7,7 @@ import { budgetForAgent, loadVerifiedBudgetsConfig } from "./budgets.js";
 import { budgetSessionAgent, NATIVE_BUDGET_RESERVATION, projectBudgetUsage, readBudgetEvents } from "./nativeBudgetUsage.js";
 import { workspaceSelfTrust } from "../trust/trustContext.js";
 import { nativeUsdReservation, type NativeBudgetDispatch } from "./nativeUsdReservation.js";
+import { reserveExperimentModelRequest } from "./experimentBudget.js";
 import { nativeUsdUnits } from "./nativeUsdAmount.js";
 
 export class NativeBudgetRefusal extends Error {
@@ -35,6 +36,7 @@ function reserve(workspace: string, spend: Spend, agentId?: string, dispatch?: N
       // exists, a forged tool agent cannot move its spend to a fresh account.
       if (rows.some(row => row.session_id === spend.nativeSessionId && row.event_type === "session/open") &&
           budgetSessionAgent(rows, spend.nativeSessionId) !== owner) throw new NativeBudgetRefusal("native budget identity differs from the session owner");
+      const header = spend.kind === "llm" ? rows.find(row => row.id === spend.headerEventId && row.session_id === spend.nativeSessionId && row.event_type === "request/header") : undefined;
       const budget = budgetForAgent(config, owner);
       if (!budget) throw new NativeBudgetRefusal("no signed budget applies to this native agent");
       const now = Date.now();
@@ -57,7 +59,6 @@ function reserve(workspace: string, spend: Spend, agentId?: string, dispatch?: N
         }
         if (budget.daily.maxCostUsd !== null) {
           if (usage.daily.llmUnreservedCostRequests > 0) throw new NativeBudgetRefusal("USD exposure is unknown for a prior dispatch without a price reservation");
-          const header = rows.find(row => row.id === spend.headerEventId && row.session_id === spend.nativeSessionId && row.event_type === "request/header");
           if (!header) throw new NativeBudgetRefusal("USD reservation has no matching request header");
           try { usd = nativeUsdReservation(budget, header.meta_json, dispatch, now); }
           catch (error) { throw new NativeBudgetRefusal(error instanceof Error ? error.message : "USD request bound is unavailable"); }
@@ -67,7 +68,9 @@ function reserve(workspace: string, spend: Spend, agentId?: string, dispatch?: N
       const sessionId = `native-budget-${randomUUID()}`;
       const reservationKey = spend.kind === "llm" ? `llm:${spend.nativeSessionId}:${spend.headerEventId}` : `tool:${spend.nativeSessionId}:${spend.toolToken}`;
       if (rows.some(row => row.event_type === "audit" && JSON.parse(row.meta_json).reservationKey === reservationKey)) throw new NativeBudgetRefusal("native dispatch was already reserved");
-      const meta = { auditType: NATIVE_BUDGET_RESERVATION, agentId: owner, trustTier: "OBSERVED", reservationKey, ...spend, ...usd };
+      const experiment = spend.kind === "llm" ? reserveExperimentModelRequest(workspace, owner, budget, header?.meta_json ?? "",
+        dispatch, now, spend.headerEventId, spend.nativeSessionId) : undefined;
+      const meta = { auditType: NATIVE_BUDGET_RESERVATION, agentId: owner, trustTier: "OBSERVED", reservationKey, ...spend, ...usd, ...experiment };
       ledger.startSession({ sessionId, runtime: "amc", binaryPath: "amc-native-budget-admission", binarySha256: sha256Hex("amc-native-budget-admission-v1") });
       // Inline, like the other audit rows: the small reservation record stays verifiable without the vault's blob key.
       ledger.appendEvidence({ sessionId, runtime: "amc", eventType: "audit", payload: JSON.stringify(meta), payloadExt: "json", inline: true, meta });

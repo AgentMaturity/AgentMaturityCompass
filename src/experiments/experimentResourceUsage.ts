@@ -2,7 +2,7 @@ import { realpathSync } from "node:fs";
 import { z } from "zod";
 import { projectNativeRunUsage, type NativeRunUsage } from "../agent/nativeRunUsage.js";
 import { budgetSessionAgent, measuredUsage, readBudgetEvents } from "../budgets/nativeBudgetUsage.js";
-import { renderNativeCost, type NativeCostProjection } from "../budgets/nativeCostProjection.js";
+import { foldNativeRequestCosts, renderNativeCost, type NativeCostProjection } from "../budgets/nativeCostProjection.js";
 import { displayEvidenceIdentifier } from "../session/evidenceIdentifier.js";
 import type { ArchitectureExperiment, ArchitectureProbe, ArchitectureSpec, ProbeOutcome } from "./architectureExperiment.js";
 import { deterministicSeed } from "./stats.js";
@@ -21,11 +21,100 @@ export type ArchitectureBudget = z.infer<typeof budgetSchema>;
 interface ExperimentUsageEvidence { workspace: string; sessionId: string }
 type ArchitectureProbeRun = ProbeOutcome[] | { outcomes: ProbeOutcome[]; usageEvidence: ExperimentUsageEvidence };
 export type ArchitectureProbeRunner = (spec: ArchitectureSpec, probes: ArchitectureProbe[], seed: number) => ArchitectureProbeRun;
+type ExperimentResourceRole = "proposer" | "executor" | "judge" | "repair" | "selector" | "reflection";
+type ExperimentResourceState = "not-run" | "started" | "settled" | "unknown";
+export interface ExperimentCostStage {
+  readonly stage: string;
+  readonly role: ExperimentResourceRole;
+  readonly state: ExperimentResourceState;
+  /** Native request projection, never a descriptor/formula-derived optimizer metric. */
+  readonly cost: NativeCostProjection | null;
+}
+interface ExperimentCostTotals {
+  readonly cost: NativeCostProjection | null;
+  /** Final attributed USD only when every declared stage settled with complete request cost coverage. */
+  readonly totalCostUsd: number | null;
+  readonly complete: boolean;
+  /** Stages without a native request projection; their missing cost is not zero. */
+  readonly unavailableStages: number;
+}
+export interface ExperimentRoleCostSummary {
+  readonly schemaVersion: 1;
+  readonly evidenceBasis: "native-request-cost-projections-with-caller-selected-roles";
+  readonly stages: readonly (ExperimentCostStage & ExperimentCostTotals)[];
+  readonly roles: readonly (ExperimentCostTotals & { readonly role: ExperimentResourceRole })[];
+  readonly total: ExperimentCostTotals;
+}
+const RESOURCE_ROLES: readonly ExperimentResourceRole[] = ["proposer", "executor", "judge", "repair", "selector", "reflection"];
+
+/** Fold existing request-level USD semantics without repricing history or adding reported amounts to estimates. */
+function mergeExperimentCosts(costs: readonly NativeCostProjection[]): NativeCostProjection | null {
+  if (costs.length === 0) return null;
+  const requests = costs.flatMap(cost => cost.requests);
+  for (const field of ["reportedCostUsd", "estimatedCostUsd", "attributedCostUsd"] as const) {
+    const values = requests.map(request => request[field]).filter((value): value is number => value !== null);
+    if (values.some(value => !Number.isFinite(value) || value < 0)) throw new Error("Invalid native cost projection amount");
+    if (!Number.isFinite(values.reduce((sum, value) => sum + value, 0))) throw new Error("Experiment cost subtotal overflow");
+  }
+  return foldNativeRequestCosts(requests);
+}
+
+/** Caller assigns roles; each observed native request may supply cost to exactly one experiment stage. */
+export function summarizeExperimentRoleCosts(stages: readonly ExperimentCostStage[]): ExperimentRoleCostSummary {
+  const names = new Set<string>(), requests = new Set<string>();
+  for (const stage of stages) {
+    if (!stage.stage || names.has(stage.stage)) throw new Error("Experiment cost attribution requires distinct stage names");
+    names.add(stage.stage);
+    if (!RESOURCE_ROLES.includes(stage.role) || !["not-run", "started", "settled", "unknown"].includes(stage.state)) {
+      throw new Error("Invalid experiment cost role or stage state");
+    }
+    if (stage.state === "not-run" && stage.cost !== null) throw new Error("A not-run stage cannot carry native cost evidence");
+    if (stage.cost === null) continue;
+    const projection = stage.cost;
+    const folded = mergeExperimentCosts([projection])!;
+    const fields = ["schemaVersion", "basis", "status", "reportedSubtotalUsd", "estimatedSubtotalUsd", "attributedSubtotalUsd",
+      "completeRequests", "partialRequests", "unknownRequests"] as const;
+    if (fields.some(field => projection[field] !== folded[field])) throw new Error("Invalid native cost projection coverage or subtotal");
+    for (const request of projection.requests) {
+      if (request.headerEventId === null || displayEvidenceIdentifier(request.headerEventId) !== request.headerEventId
+        || typeof request.estimateComplete !== "boolean" || !["current", "stale", "unknown"].includes(request.freshness)
+        || (request.outcomeEventId !== null && (typeof request.outcomeEventId !== "string"
+          || displayEvidenceIdentifier(request.outcomeEventId) !== request.outcomeEventId))
+        || (request.outcomeEventId === null && (request.reportedCostUsd !== null || request.estimatedCostUsd !== null
+          || request.attributedCostUsd !== null || request.estimateComplete))
+        || (request.estimateComplete && (request.estimatedCostUsd === null || request.costBasis === "unavailable"))
+        || (request.costBasis === "provider-reported" && (request.reportedCostUsd === null || request.attributedCostUsd !== request.reportedCostUsd))
+        || (request.costBasis === "catalog-estimate" && (!request.estimateComplete || request.reportedCostUsd !== null
+          || request.estimatedCostUsd === null || request.attributedCostUsd !== request.estimatedCostUsd))
+        || (request.costBasis === "unavailable" && request.attributedCostUsd !== null)
+        || !["provider-reported", "catalog-estimate", "unavailable"].includes(request.costBasis)) {
+        throw new Error("Invalid native cost projection request provenance");
+      }
+      if (requests.has(request.headerEventId) || (request.outcomeEventId !== null
+        && (requests.has(request.outcomeEventId) || request.outcomeEventId === request.headerEventId))) {
+        throw new Error("A native request cannot be attributed to multiple experiment stages");
+      }
+      requests.add(request.headerEventId);
+      if (request.outcomeEventId !== null) requests.add(request.outcomeEventId);
+    }
+  }
+  const summarize = (rows: readonly ExperimentCostStage[]): ExperimentCostTotals => {
+    const cost = mergeExperimentCosts(rows.flatMap(stage => stage.cost === null ? [] : [stage.cost]));
+    const complete = rows.length > 0 && rows.every(stage => stage.state === "settled" && stage.cost?.status === "complete");
+    return { cost, complete, totalCostUsd: complete ? cost?.attributedSubtotalUsd ?? null : null,
+      unavailableStages: rows.filter(stage => stage.cost === null).length };
+  };
+  return structuredClone({ schemaVersion: 1, evidenceBasis: "native-request-cost-projections-with-caller-selected-roles",
+    stages: stages.map(stage => ({ ...stage, ...summarize([stage]) })),
+    roles: RESOURCE_ROLES.map(role => ({ role, ...summarize(stages.filter(stage => stage.role === role)) })),
+    total: summarize(stages) });
+}
+
 type StageName = "baseline" | "candidate" | "proposer" | "repair" | "selector" | "judge" | "reflection";
 interface ExperimentResourceStage {
   stage: StageName;
-  role: "executor" | "proposer" | "repair" | "selector" | "judge" | "reflection";
-  state: "not-run" | "started" | "settled" | "unknown";
+  role: ExperimentResourceRole;
+  state: ExperimentResourceState;
   /** Only a verified native session selected by the caller; this does not attest its experimental role. */
   sessionId: string | null;
   observedTokens: number | null;
@@ -46,6 +135,7 @@ export interface ExperimentResourceUsage {
   startedStages: number;
   settledStages: number;
   stages: ExperimentResourceStage[];
+  roleCosts?: ExperimentRoleCostSummary;
 }
 
 /** Tracks only the two existing architecture runner callbacks; no new model or judging execution path. */
@@ -69,7 +159,7 @@ function architectureResourceTracker(input?: ArchitectureBudget) {
   const snapshot = (): ExperimentResourceUsage => structuredClone({ schemaVersion: 1, scope: "caller-bound-experiment",
     evidenceBasis: "verified-native-sessions-with-caller-selected-roles", enforcementState: budget ? "between-stage-admission" : "not-enforced",
     hardCeilingEnforced: false, budget, startedStages: stages.filter(stage => stage.state !== "not-run").length,
-    settledStages: stages.filter(stage => stage.state === "settled").length, stages });
+    settledStages: stages.filter(stage => stage.state === "settled").length, stages, roleCosts: summarizeExperimentRoleCosts(stages) });
   const check = (next?: "baseline" | "candidate") => {
     if (!budget) return;
     if (Date.now() - startedTs >= budget.timeoutMs) throw new Error("Experiment deadline exhausted before the next stage");
