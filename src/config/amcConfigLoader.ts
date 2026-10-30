@@ -75,7 +75,8 @@ export function loadDeclarativeConfig(
   const ws = resolve(workspace ?? process.cwd());
   const warnings: string[] = [];
   const files: Array<{ layer: "workspace" | "user" | "explicit"; path: string }> = [];
-  const discovered = discoverConfigFile(ws);
+  // As before overlays existed, an explicit --config file replaces the discovered workspace file.
+  const discovered = explicitPath === undefined ? discoverConfigFile(ws) : null;
   if (discovered) files.push({ layer: "workspace", path: discovered });
   if (discovered && dirname(discovered) === join(ws, ".amc") && /^amc\.config\.ya?ml$/.test(basename(discovered))) {
     // Read exactly as before WP39b; this name is also the workspace runtime policy, so evaluation config should move.
