@@ -35,7 +35,7 @@
  */
 import { AmcSeam, defineSeam } from "../amcRuntime.js";
 import type { Context } from "../amcRuntime.js";
-import { AgentDriver } from "../../agent/agentDriver.js";
+import { AgentDriver, type AgentShutdownResult } from "../../agent/agentDriver.js";
 import type { NativeImageInput } from "../../attachments/nativeImageInput.js";
 import type {
   AgentLoopConfig,
@@ -115,7 +115,8 @@ export class AgentLoopSeamService extends AmcSeam {
     // unloaded while a turn is still mid-unwind with its `turn/end` unwritten.
     this.ctx.effect(
       () => async () => {
-        await this.shutdown();
+        const result = await this.shutdown();
+        if (result.state !== "settled") throw new Error(`Native driver shutdown incomplete: ${result.errors.join("; ") || "pending work remains"}`);
       },
       "amcAgentLoop driver"
     );
@@ -179,11 +180,8 @@ export class AgentLoopSeamService extends AmcSeam {
    * An idle driver with PENDING work is cancelled: that work is really being
    * abandoned, and the row is what says so.
    */
-  private async shutdown(): Promise<void> {
-    if (this.driver.status === "failed") return;
-    if (this.driver.status !== "running" && !this.driver.inbox.hasPending) return;
-    this.driver.cancel({ kind: "disposed" });
-    await this.driver.whenIdle();
+  shutdown(options: { readonly timeoutMs?: number } = {}): Promise<AgentShutdownResult> {
+    return this.driver.shutdown(options);
   }
 }
 

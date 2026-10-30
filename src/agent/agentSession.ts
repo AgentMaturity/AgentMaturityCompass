@@ -1,7 +1,8 @@
 import { randomUUID } from "node:crypto";
 import { resolve } from "node:path";
 import { withWorkspaceScope } from "../enforce/evidenceEmitter.js";
-import type { AgentDriver } from "./agentDriver.js";
+import type { AgentDriver, AgentShutdownResult } from "./agentDriver.js";
+import { shutdownTimeoutMs } from "./agentShutdown.js";
 import { composeNativeAgent, settleFailedComposition, type NativeAgent } from "./nativeAgentComposition.js";
 import { agentPromptProfile } from "../prompt/agentPromptProfile.js";
 import type { NativeImageInput } from "../attachments/nativeImageInput.js";
@@ -123,6 +124,12 @@ export type AgentPromptResult =
       readonly submission?: InboxReceipt;
     };
 
+/** Shutdown reports sealing separately from local driver settlement and tool effects. */
+export interface AgentSessionShutdownResult extends AgentShutdownResult {
+  /** True only after session.close returned successfully; false does not rule out a partial close. */
+  readonly sessionClosed: boolean;
+}
+
 export interface AgentSession {
   readonly sessionId: string;
   /** Run one prompt to completion. Rejects a second while one is in flight. */
@@ -144,11 +151,14 @@ export interface AgentSession {
   readEvents(): readonly EvidenceEvent[];
   /** Seals the session. Safe to call more than once. */
   close(): void | Promise<void>;
+  /** Native composition implements bounded, typed shutdown; optional for legacy factories. */
+  shutdown?(options?: { readonly timeoutMs?: number }): Promise<AgentSessionShutdownResult>;
   /** Explicit signed handoff at an idle boundary; ordinary close still seals. */
   release?(): void | Promise<void>;
 }
 
 export interface OrderedAgentSession extends AgentSession {
+  shutdown(options?: { readonly timeoutMs?: number }): Promise<AgentSessionShutdownResult>;
   promptParts(parts: readonly NativeInputPart[], options?: AgentPromptOptions): Promise<AgentPromptResult>;
   promptAudioParts(parts: readonly NativeAudioPart[], options?: AgentPromptOptions): Promise<AgentPromptResult>;
 }
@@ -204,6 +214,9 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
 
     let closed = false;
     let running = false;
+    let sessionClosed = false;
+    let shutdownPromise: Promise<AgentSessionShutdownResult> | undefined;
+    let shutdownPending = false;
     let toolset: ReturnType<typeof agentToolset> | undefined;
     /**
      * How much assistant text the caller has already been told.
@@ -221,20 +234,25 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
     const finish = (release: boolean): void => withWorkspaceScope(workspace, () => {
       if (closed) return;
       if (running) throw new Error("Cancel and settle the active prompt before closing or releasing its session.");
+      const errors: unknown[] = [];
       try {
         if (release) session.releaseWithoutClosing();
         else {
           if (driver?.status === "failed") throw new Error("Cannot seal a failed driver with incomplete evidence.");
           session.close({ reason: "completed" });
+          sessionClosed = true;
         }
       } catch (error) {
-        session.disposeWithoutClosing();
-        throw error;
+        errors.push(error);
+        try { session.disposeWithoutClosing(); } catch (error) { errors.push(error); }
       } finally {
         closed = true;
-        composed?.dispose();
-        toolset?.close();
+        for (const cleanup of [() => composed?.dispose(), () => toolset?.close()]) {
+          try { cleanup(); } catch (error) { errors.push(error); }
+        }
       }
+      if (errors.length) throw new AggregateError(errors, errors.map(error => error instanceof Error ? error.message : String(error)).join("; "));
+
     });
 
     try {
@@ -280,7 +298,7 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
 
     const runPrompt = (enqueue: () => InboxReceipt, clientRequestId?: string): Promise<AgentPromptResult> =>
       withWorkspaceScope(workspace, async (): Promise<AgentPromptResult> => {
-        if (closed) return { ok: false, reason: "session is closed" };
+        if (closed || shutdownPromise) return { ok: false, reason: "session is closed or shutting down" };
         // Claimed before any await. Checking after one would let two callers both
         // pass the check and then interleave on a serial driver.
         if (running) return { ok: false, reason: "a prompt is already running on this session" };
@@ -346,8 +364,25 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
         withWorkspaceScope(workspace, () => driver.cancel(cause, { by, keepInbox: true }));
       },
 
-      close: () => finish(false),
-      release: () => finish(true)
+      shutdown(options = {}) {
+        if (shutdownPromise) return shutdownPromise;
+        const timeoutMs = shutdownTimeoutMs(options.timeoutMs);
+        shutdownPending = true;
+        // Publish the local admission stop before driver cancellation can notify observers.
+        shutdownPromise = Promise.resolve().then(() => withWorkspaceScope(workspace, async () => {
+          const result = await driver.shutdown({ timeoutMs });
+          if (result.state !== "settled") return Object.freeze({ ...result, sessionClosed });
+          try { finish(false); }
+          catch (error) {
+            return Object.freeze({ ...result, state: "incomplete" as const, sessionClosed,
+              errors: Object.freeze([...result.errors, error instanceof Error ? error.message : String(error)]) });
+          }
+          return Object.freeze({ ...result, sessionClosed });
+        })).finally(() => { shutdownPending = false; });
+        return shutdownPromise;
+      },
+      close: () => { if (shutdownPending && !closed) throw new Error("Wait for native shutdown before closing the session."); finish(false); },
+      release: () => { if (shutdownPending && !closed) throw new Error("Wait for native shutdown before releasing the session."); finish(true); }
     };
   });
 }

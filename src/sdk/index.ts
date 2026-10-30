@@ -27,6 +27,8 @@ export {
   type AMCNativeSessionPage, type AMCNativeReadPageOptions
 } from "./nativeAgentClient.js";
 export { loadSessionEventPage, type SessionEventPage, type SessionEventPageOptions } from "./nativeAgentClient.js";
+export { previewNativePrompt, type AMCNativePromptPreview, type AMCNativePromptPreviewInput,
+  type AgentShutdownResult, type AgentSessionShutdownResult } from "./nativeAgentClient.js";
 export { NATIVE_ORDERED_INPUT_FORMAT, snapshotNativeInputParts, type NativeInputPart,
   type OrderedAgentSession, type AgentPromptOptions } from "./nativeAgentClient.js";
 export { NATIVE_AUDIO_INPUT_FORMAT, snapshotNativeAudioParts, type NativeAudioInput, type NativeAudioPart, type NativeAudioMediaType,

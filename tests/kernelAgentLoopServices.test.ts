@@ -1,7 +1,7 @@
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Context } from "@amc/cordis";
 import { initWorkspace } from "../src/workspace.js";
 import { openLedger } from "../src/ledger/ledger.js";
@@ -84,6 +84,7 @@ describe("the agent loop on the composed tree", () => {
   });
 
   afterEach(() => {
+    vi.restoreAllMocks();
     try {
       session.close({ reason: "completed" });
     } catch {
@@ -259,6 +260,31 @@ describe("the agent loop on the composed tree", () => {
       .map((row) => JSON.parse(row.meta_json) as { op: string; outcome: string | null })
       .find((inbox) => inbox.op === "cancel");
     expect(drop?.outcome).toBe("cancelled");
+  });
+
+  it("returns the driver's typed shutdown result through the composed service", async () => {
+    const ctx = new Context();
+    const fiber = ctx.plugin(agentLoopServices, { session, llm: runtimeOver(stubProviderTransport()), route, systemPromptEventId });
+    await fiber.await();
+    const loop = serviceOn(ctx);
+    const queued = loop.inject("pending");
+    const result = await loop.shutdown();
+    expect(result).toMatchObject({ state: "settled", sessionId: session.sessionId, cancelledMessageIds: [queued.messageId], unknown: [] });
+    expect(() => loop.followup("late")).toThrow(/shut/i);
+    await fiber.dispose();
+  });
+
+  it("reports incomplete shutdown through the composed disposal error channel", async () => {
+    const ctx = new Context();
+    const fiber = ctx.plugin(agentLoopServices, { session, llm: runtimeOver(stubProviderTransport()), route, systemPromptEventId });
+    await fiber.await();
+    const loop = serviceOn(ctx);
+    const result = await loop.shutdown();
+    vi.spyOn(loop, "shutdown").mockResolvedValue({ ...result, state: "incomplete", errors: ["owned work is still running"] });
+    await fiber.dispose();
+    // Cordis records effect-disposal errors in its public logger rather than rejecting fiber.dispose().
+    const errors = ctx.logger.buffer.filter(message => message.type === "error").flatMap(message => message.args).map(String).join("\n");
+    expect(errors).toContain("Native driver shutdown incomplete: owned work is still running");
   });
 
   it("refuses a cancellation that names no cause", async () => {

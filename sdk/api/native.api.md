@@ -45,6 +45,9 @@ export declare class AMCNativeClient {
     newSession(): Promise<AMCNativeSession>;
     forkSession(parentSessionId: string): Promise<AMCNativeSession>;
     resumeSession(sessionId: string): Promise<AMCNativeSession>;
+    readSessionPage(sessionId: string, options?: AMCNativeReadPageOptions): Promise<AMCNativeSessionPage>;
+    readSessionPages(sessionId: string, options?: AMCNativeReadPageOptions): AsyncIterableIterator<AMCNativeSessionPage>;
+    withdrawSubmission(sessionId: string, messageId: string): Promise<boolean>;
     close(): Promise<void>;
     verifySession(sessionId: string): Promise<AMCNativeReceipt>;
     pendingApprovals(): Promise<readonly AMCNativePendingApproval[]>;
@@ -89,6 +92,7 @@ export interface AMCNativeClientOptions {
     readonly timeoutMs?: number;
     readonly startupSignal?: AbortSignal;
     readonly eventBuffer?: AMCNativeEventBufferOptions;
+    readonly resyncOnOverflow?: boolean;
 }
 ```
 
@@ -140,11 +144,54 @@ export declare class AMCNativeProcessError extends AMCNativeProtocolError {
 }
 ```
 
+## AMCNativePromptPreview (experimental)
+
+```ts
+export interface AMCNativePromptPreview {
+    readonly state: "preview";
+    readonly dispatched: false;
+    readonly spend: "none";
+    readonly admission: "not-evaluated";
+    readonly request: {
+        readonly method: "session/prompt";
+        readonly params: {
+            readonly sessionId: string;
+            readonly prompt: readonly AcpPromptBlock[];
+            readonly _meta?: {
+                readonly "dev.agentmaturity.amc": {
+                    readonly clientRequestId: string;
+                };
+            };
+        };
+    };
+}
+```
+
+## AMCNativePromptPreviewInput (experimental)
+
+```ts
+export interface AMCNativePromptPreviewInput {
+    readonly sessionId: string;
+    readonly text: string;
+    readonly images?: readonly NativeImageInput[];
+    readonly clientRequestId?: string;
+}
+```
+
 ## AMCNativeProtocolError (public)
 
 ```ts
 export declare class AMCNativeProtocolError extends Error {
     constructor(message: string);
+}
+```
+
+## AMCNativeReadPageOptions (public)
+
+```ts
+export interface AMCNativeReadPageOptions {
+    readonly cursor?: string;
+    readonly limit?: number;
 }
 ```
 
@@ -170,6 +217,18 @@ export declare class AMCNativeRefusedError extends Error {
 }
 ```
 
+## AMCNativeResyncRequiredError (public)
+
+```ts
+export declare class AMCNativeResyncRequiredError extends Error {
+    readonly sessionId: string;
+    readonly resource: "turn-events" | "turn-bytes";
+    readonly limit: number;
+    readonly recoverable = true;
+    constructor(sessionId: string, resource: "turn-events" | "turn-bytes", limit: number);
+}
+```
+
 ## AMCNativeRunResult (public)
 
 ```ts
@@ -181,6 +240,12 @@ export interface AMCNativeRunResult {
     readonly updates: readonly AMCNativeUpdate[];
     readonly meta: Readonly<JsonObject>;
     readonly verification: "not-verified";
+    readonly resynced?: true;
+    readonly recovery?: {
+        readonly cursor: string;
+        readonly updatesComplete: false;
+        readonly retainedUpdates: "bounded-prefix";
+    };
     readonly execution: ExecutionStatus | null;
     readonly validation: NativeValidationResult;
 }
@@ -198,17 +263,27 @@ export declare class AMCNativeSession {
     get lifecycle(): "accepted" | "releasing" | "released" | "closed";
     prompt(text: string, options?: {
         readonly signal?: AbortSignal;
+        readonly clientRequestId?: string;
         readonly images?: readonly NativeImageInput[];
     }): AMCNativeTurn;
     promptParts(parts: readonly NativeInputPart[], options?: {
         readonly signal?: AbortSignal;
+        readonly clientRequestId?: string;
     }): AMCNativeTurn;
     promptAudioParts(parts: readonly NativeAudioPart[], options?: {
         readonly signal?: AbortSignal;
+        readonly clientRequestId?: string;
     }): AMCNativeTurn;
+    withdraw(messageId: string): Promise<boolean>;
     closeAndVerify(): Promise<AMCNativeReceipt>;
     release(): Promise<void>;
 }
+```
+
+## AMCNativeSessionPage (public)
+
+```ts
+export type AMCNativeSessionPage = AcpSessionUpdatePage;
 ```
 
 ## AMCNativeTurn (public)
@@ -217,7 +292,8 @@ export declare class AMCNativeSession {
 export declare class AMCNativeTurn implements AsyncIterable<AMCNativeUpdate> {
     readonly sessionId: string;
     readonly result: Promise<AMCNativeRunResult>;
-    state: "submitted" | "receiving" | "cancel-requested" | "completed" | "failed";
+    get resyncRequired(): boolean;
+    state: "submitted" | "receiving" | "resync-required" | "cancel-requested" | "completed" | "failed";
     cancel(): void;
     [Symbol.asyncIterator](): AsyncIterableIterator<AMCNativeUpdate>;
 }
@@ -243,17 +319,30 @@ export declare const AMC_NATIVE_EVENT_LIMITS: Readonly<{
 }>;
 ```
 
+## AgentPromptOptions (experimental)
+
+```ts
+export interface AgentPromptOptions {
+    readonly clientRequestId?: string;
+}
+```
+
 ## AgentSession (experimental)
 
 ```ts
 export interface AgentSession {
     readonly sessionId: string;
-    prompt(text: string, images?: readonly NativeImageInput[]): Promise<AgentPromptResult>;
-    promptParts?(parts: readonly NativeInputPart[]): Promise<AgentPromptResult>;
-    promptAudioParts?(parts: readonly NativeAudioPart[]): Promise<AgentPromptResult>;
+    prompt(text: string, images?: readonly NativeImageInput[], options?: AgentPromptOptions): Promise<AgentPromptResult>;
+    promptParts?(parts: readonly NativeInputPart[], options?: AgentPromptOptions): Promise<AgentPromptResult>;
+    promptAudioParts?(parts: readonly NativeAudioPart[], options?: AgentPromptOptions): Promise<AgentPromptResult>;
+    submissionReceipt?(clientRequestId: string): InboxReceipt | undefined;
+    withdraw?(messageId: string): boolean;
     cancel(cause: TurnCancelCause, by: string): void;
     readEvents(): readonly EvidenceEvent[];
     close(): void | Promise<void>;
+    shutdown?(options?: {
+        readonly timeoutMs?: number;
+    }): Promise<AgentSessionShutdownResult>;
     release?(): void | Promise<void>;
 }
 ```
@@ -286,6 +375,33 @@ export interface AgentSessionInit {
         readonly session: SessionService;
         readonly toolset: AgentToolset | null;
     }) => AgentToolSeam;
+}
+```
+
+## AgentSessionShutdownResult (experimental)
+
+```ts
+export interface AgentSessionShutdownResult extends AgentShutdownResult {
+    readonly sessionClosed: boolean;
+}
+```
+
+## AgentShutdownResult (experimental)
+
+```ts
+export interface AgentShutdownResult {
+    readonly sessionId: string;
+    readonly state: "settled" | "incomplete";
+    readonly driverStatus: AgentStatus;
+    readonly turn: number | null;
+    readonly timedOut: boolean;
+    readonly settled: readonly AgentShutdownToolResult[];
+    readonly cancelled: readonly AgentShutdownToolResult[];
+    readonly unknown: readonly AgentShutdownToolResult[];
+    readonly cancelledMessageIds: readonly string[];
+    readonly pendingMessageIds: readonly string[];
+    readonly errors: readonly string[];
+    readonly verification: "not-verified";
 }
 ```
 
@@ -468,8 +584,11 @@ export type NativeValidationStatus = "not-requested" | "pending" | "passed" | "f
 
 ```ts
 export interface OrderedAgentSession extends AgentSession {
-    promptParts(parts: readonly NativeInputPart[]): Promise<AgentPromptResult>;
-    promptAudioParts(parts: readonly NativeAudioPart[]): Promise<AgentPromptResult>;
+    shutdown(options?: {
+        readonly timeoutMs?: number;
+    }): Promise<AgentSessionShutdownResult>;
+    promptParts(parts: readonly NativeInputPart[], options?: AgentPromptOptions): Promise<AgentPromptResult>;
+    promptAudioParts(parts: readonly NativeAudioPart[], options?: AgentPromptOptions): Promise<AgentPromptResult>;
 }
 ```
 
@@ -532,6 +651,39 @@ export interface SessionEventHistoryOptions {
 }
 ```
 
+## SessionEventPage (experimental)
+
+```ts
+export interface SessionEventPage {
+    readonly format: "amc-session-event-page-v1";
+    readonly sessionId: string;
+    readonly agentId: string;
+    readonly committed: true;
+    readonly backend: SessionEventHistory["backend"];
+    readonly headEventHash: string;
+    readonly headSeq: number;
+    readonly storeHeadEventHash: string;
+    readonly firstSeq: number;
+    readonly nextSeq: number;
+    readonly events: readonly Readonly<EvidenceEvent>[];
+    readonly nextCursor: string | null;
+    readonly resumeCursor: string;
+    readonly sealed: boolean;
+    readonly verification: SessionEventHistory["verification"];
+}
+```
+
+## SessionEventPageOptions (experimental)
+
+```ts
+export interface SessionEventPageOptions extends Omit<SessionEventHistoryOptions, "sessionId"> {
+    readonly sessionId: string;
+    readonly consumerId?: string;
+    readonly cursor?: string;
+    readonly limit?: number;
+}
+```
+
 ## SessionHistoryRefusal (experimental)
 
 ```ts
@@ -571,10 +723,22 @@ export declare function loadNativeAudioManifest(path: string): readonly NativeAu
 export declare function loadSessionEventHistory(options: SessionEventHistoryOptions): SessionEventHistory;
 ```
 
+## loadSessionEventPage (experimental)
+
+```ts
+export declare function loadSessionEventPage(options: SessionEventPageOptions): SessionEventPage;
+```
+
 ## openAgentSession (experimental)
 
 ```ts
 export declare function openAgentSession(init: AgentSessionInit): OrderedAgentSession;
+```
+
+## previewNativePrompt (experimental)
+
+```ts
+export declare function previewNativePrompt(input: AMCNativePromptPreviewInput): AMCNativePromptPreview;
 ```
 
 ## resumeAgentSession (experimental)

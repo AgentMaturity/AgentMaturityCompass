@@ -32,6 +32,9 @@ export { loadSessionEventHistory, SessionHistoryRefused, type SessionHistoryRefu
 export { loadSessionEventPage, type SessionEventPage, type SessionEventPageOptions } from "../session/sessionEventPage.js";
 export { inspectJsonlSessionRecovery, type JsonlSessionRecoveryReadiness } from "../session/jsonlContinuation.js";
 export type { NativeValidationResult, NativeValidationCheckResult, NativeValidationStatus } from "../agent/nativeValidation.js";
+export { previewNativePrompt, type AMCNativePromptPreview, type AMCNativePromptPreviewInput } from "./nativeRequestPreview.js";
+export type { AgentShutdownResult } from "../agent/agentDriver.js";
+export type { AgentSessionShutdownResult } from "../agent/agentSession.js";
 
 import { asError, assertSignal, eventLimits, freezeJson, MAX_FRAME_BYTES, MAX_WRITE_QUEUE_BYTES, MAX_WRITE_QUEUE_FRAMES,
   object, UPDATE_KINDS, validPlanUpdate, type AMCNativeEventBufferOptions, type JsonObject } from "./nativeWire.js";

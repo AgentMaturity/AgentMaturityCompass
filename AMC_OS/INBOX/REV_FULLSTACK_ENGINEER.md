@@ -505,3 +505,18 @@ The broader 104-file diagnostic was 1,273 passed / 170 failed; the isolated chec
 Remaining scope: PXB-30 progress checkpoint writing; structured shutdown results; interactive queued-input controls; WP30 tree/TUI navigation; optional SDK preview; fresh desktop/live qualification. No new transcript store, dependency, CLI command, Studio route or freeze exception was added. Composition factory/tool wiring and other lanes' owned sources/fixtures remain unchanged; AgentSession edits only bridge the public prompt/receipt/withdraw adapters and duplicate refusal. No research files changed.
 
 Review the diff and `/Users/sid/AgentMaturityCompass-worktrees/s442cd919/work/codex-runs/wp20-report.md`, with per-row source evidence in `wp20-row-report.md` and a source-hash receipt in `wp20-source-receipt.json`. The requested message is `wp20-commit-message.txt`. The two-version `wp20-owned-fixture-followup.patch` is review-only; actual Claude-owned fixtures were not edited. Claude should review, reconcile owned fixtures, rerun blocked integrations on a suitable host, then commit/merge through the integrator's process. Codex must not commit, push or merge.
+
+
+# WP20 part B handoff
+
+Role: REV_FULLSTACK_ENGINEER. Date: 30 October 2026.
+
+Scope: DXA-12 native shutdown results and PI-035 TypeScript request preview on branch `rtd/gap-wp20b`, based on `75eaea680`. The change is uncommitted for the Claude integrator to review and commit.
+
+Deliverables: bounded driver, composed-loop and in-process session shutdown results; a pure SDK request preview; lifecycle and preview regressions; SDK documentation, generated API snapshot and a patch changeset.
+
+Final `verify-wt.sh` exited 0; all 50 new cases passed and all 38 mutants were killed. Runtime integration still has 37 blocked/unresolved cases. Exact counts, limitations and command output are recorded in `../codex-runs/wp20b-report.md` relative to the worktree. The conventional commit message is `../codex-runs/wp20b-commit-message.txt`.
+
+PXB-25 interactive wiring remains deferred because this base has no WP30 command registry or long-lived chat session handle. Native/SDK withdrawal already exists. PXB-30 remains deferred because producer/checkpoint and budget-consumer semantics cross this lane's ownership. ACP/Studio host shutdown aggregation remains outside this native slice.
+
+Next owner: Claude reviews the diff, reconciles the reported test results, commits and merges. No push or merge was performed by Codex.

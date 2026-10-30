@@ -3534,7 +3534,6 @@
     {"id":"fc636502e032eb7b0bf932db87bdcd28797a22a74a1885d2a7c10ab90cee8bdf","file":"src/session/loopEventMeta.ts","kind":"types"},
     {"id":"fcb7cd724bbedc010219de73d6b13d9996fa586e7ea7baa31fa93df6976b69d4","file":"src/enterprise/tiers.ts","kind":"exports"},
     {"id":"fccb06251cbdcce37cf41c3b3c1f099f499ae3d14876a2efbd0f03a5ce5bc7fe","file":"src/domains/conformance/conformanceEvidence.ts","kind":"exports"},
-    {"id":"fcd9ecba095b22d484989accd1941b7ae8da9394bdd040ec9cc178ec17037078","file":"src/enforce/evidenceEmitter.ts","kind":"exports"},
     {"id":"fd08a4973f3cfafe757dad50fe212e8e77529c557336851ff19e32c637a10ef8","file":"src/domains/conformance/conformanceSchema.ts","kind":"types"},
     {"id":"fd09c0731f2b352588b90a35e18bea0b24e59bb829c616d7fa90c5a22075370f","file":"src/product/index.ts","kind":"types"},
     {"id":"fd3f24765f3c03b0c4c4f30757c71cbec19b0b3dd3b49eb2544b895c78f08173","file":"src/score/scoringScale.ts","kind":"types"},
