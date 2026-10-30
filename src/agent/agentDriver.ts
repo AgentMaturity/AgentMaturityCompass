@@ -399,8 +399,8 @@ export class AgentDriver {
   }
 
   private assertUsable(): void {
-    if (this.shutdownPromise) throw new Error("AgentDriver is shut down; admission is stopped.");
     if (this.admissionClosed) throw new Error("AgentDriver is disposed: new work is refused");
+    if (this.shutdownPromise) throw new Error("AgentDriver is shut down; admission is stopped.");
     if (this.phase.kind === "failed") {
       throw new Error(
         "AgentDriver is in a terminal failed state: session evidence or pending context requires operator recovery"
