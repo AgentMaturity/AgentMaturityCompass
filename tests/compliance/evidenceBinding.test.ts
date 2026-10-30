@@ -65,7 +65,7 @@ const REVIEWED_RUNTIME_OR_NON_EVIDENCE = new Set([
   "diagnostic-eval-replay-corpus-boundary", "env", "eoc", "eval-replay-corpus", "eval.run.layer", "eval.run.question",
   "events", "failed-evaluation", "file", "filesystem", "firewall", "fleet", "forecast", "gateway", "hook", "hook_control",
   "host", "identity", "incident-regression", "inference-strategy-comparison", "judge-calibration", "ledger", "leases",
-  "linked-recorded-request-outcomes", "live-score-behavior-drift", "local", "native", "none", "ops", "ops.blobs",
+  "linked-recorded-request-outcomes", "live-score-behavior-drift", "local", "model", "native", "none", "ops", "ops.blobs",
   "override-near-miss-analytics", "plugin", "plugins", "policy", "project-env", "provider", "provider-drift-benchmark",
   "redteam", "registry", "release", "replay-benchmark-corpus", "reports", "request-failure", "retention.auto",
   "risk-cost-latency-slo", "roles", "sdk", "settings", "shield.exploit_confirmation", "stdin_pipe", "studio",

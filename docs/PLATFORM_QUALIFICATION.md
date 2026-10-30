@@ -41,7 +41,7 @@ matrix above separately exercises real fresh-output qualification runs.
 
 ## WP32 — this host's lanes, without fallback
 
-On October 30, 2026, GAP-WP32 qualified the lanes one local Mac can run, at source commit `3e56038be`: macOS 26.6.2 on arm64 with Node 22, a fresh packed install, and the macOS Seatbelt boundary that AMC declares for the native shell. The receipt is [`qualification/2026-10-30-WP32/`](../qualification/2026-10-30-WP32/README.md), and `docs/PLATFORM_MATRIX.md` is generated from it.
+On October 30, 2026, GAP-WP32 qualified the lanes one local Mac can run, at source commit `3e56038be`: macOS 26.6.2 on arm64 with Node 22, a fresh packed install, and the macOS Seatbelt boundary that AMC declares for the native shell. The receipt is in `qualification/2026-10-30-WP32/` in the repository, and `docs/PLATFORM_MATRIX.md` is generated from it.
 
 - Passed: the packed install and its keyless governed CLI turn, cold-verified from new processes; installed `native-modules`; the real-kernel Seatbelt escape, path, network and process-tree suite (run with `AMC_REQUIRE_REAL_SANDBOX=1`); and cancellation and restart through the owned-process lifecycle helpers, with no process or listener left behind.
 - Refused, with no unconfined fallback: every Linux-only backend requested on macOS. Bubblewrap, the only backend for executable extensions, returns `unavailable` with nothing run, and the native PTY refuses before launch. The generic write-only Seatbelt backend now also refuses a requested network, read or process boundary instead of reporting the run as confined.
