@@ -9,7 +9,7 @@ import type { EvidenceEvent } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 
-export interface TrialRequestReceipt {
+interface TrialRequestReceipt {
   readonly headerEventId: string | null;
   readonly outcomeEventId: string | null;
   readonly dispatchAttempted: boolean | null;
@@ -36,7 +36,7 @@ export interface TrialRequestReceipt {
   readonly endpointIdentity: "unavailable";
 }
 
-export interface TrialSessionReceipt {
+interface TrialSessionReceipt {
   readonly sessionId: string | null;
   readonly closed: boolean;
   readonly effectiveConfigDigests: readonly string[];

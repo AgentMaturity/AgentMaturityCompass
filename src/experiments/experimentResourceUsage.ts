@@ -2,7 +2,7 @@ import { realpathSync } from "node:fs";
 import { z } from "zod";
 import { projectNativeRunUsage, type NativeRunUsage } from "../agent/nativeRunUsage.js";
 import { budgetSessionAgent, measuredUsage, readBudgetEvents } from "../budgets/nativeBudgetUsage.js";
-import { renderNativeCost, type NativeCostProjection } from "../budgets/nativeCostProjection.js";
+import { foldNativeRequestCosts, renderNativeCost, type NativeCostProjection } from "../budgets/nativeCostProjection.js";
 import { displayEvidenceIdentifier } from "../session/evidenceIdentifier.js";
 import type { ArchitectureExperiment, ArchitectureProbe, ArchitectureSpec, ProbeOutcome } from "./architectureExperiment.js";
 import { deterministicSeed } from "./stats.js";
@@ -21,8 +21,8 @@ export type ArchitectureBudget = z.infer<typeof budgetSchema>;
 interface ExperimentUsageEvidence { workspace: string; sessionId: string }
 type ArchitectureProbeRun = ProbeOutcome[] | { outcomes: ProbeOutcome[]; usageEvidence: ExperimentUsageEvidence };
 export type ArchitectureProbeRunner = (spec: ArchitectureSpec, probes: ArchitectureProbe[], seed: number) => ArchitectureProbeRun;
-export type ExperimentResourceRole = "proposer" | "executor" | "judge" | "repair" | "selector" | "reflection";
-export type ExperimentResourceState = "not-run" | "started" | "settled" | "unknown";
+type ExperimentResourceRole = "proposer" | "executor" | "judge" | "repair" | "selector" | "reflection";
+type ExperimentResourceState = "not-run" | "started" | "settled" | "unknown";
 export interface ExperimentCostStage {
   readonly stage: string;
   readonly role: ExperimentResourceRole;
@@ -30,7 +30,7 @@ export interface ExperimentCostStage {
   /** Native request projection, never a descriptor/formula-derived optimizer metric. */
   readonly cost: NativeCostProjection | null;
 }
-export interface ExperimentCostTotals {
+interface ExperimentCostTotals {
   readonly cost: NativeCostProjection | null;
   /** Final attributed USD only when every declared stage settled with complete request cost coverage. */
   readonly totalCostUsd: number | null;
@@ -51,22 +51,12 @@ const RESOURCE_ROLES: readonly ExperimentResourceRole[] = ["proposer", "executor
 function mergeExperimentCosts(costs: readonly NativeCostProjection[]): NativeCostProjection | null {
   if (costs.length === 0) return null;
   const requests = costs.flatMap(cost => cost.requests);
-  const subtotal = (field: "reportedCostUsd" | "estimatedCostUsd" | "attributedCostUsd"): number | null => {
+  for (const field of ["reportedCostUsd", "estimatedCostUsd", "attributedCostUsd"] as const) {
     const values = requests.map(request => request[field]).filter((value): value is number => value !== null);
     if (values.some(value => !Number.isFinite(value) || value < 0)) throw new Error("Invalid native cost projection amount");
-    const total = values.reduce((sum, value) => sum + value, 0);
-    if (!Number.isFinite(total)) throw new Error("Experiment cost subtotal overflow");
-    return values.length === 0 ? null : total;
-  };
-  const completeRequests = requests.filter(request => request.attributedCostUsd !== null).length;
-  const partialRequests = requests.filter(request => request.attributedCostUsd === null
-    && (request.reportedCostUsd !== null || request.estimatedCostUsd !== null)).length;
-  return { schemaVersion: 1, basis: "pinned-catalog-estimates-and-reported-cost",
-    status: requests.length > 0 && completeRequests === requests.length ? "complete"
-      : completeRequests + partialRequests > 0 ? "partial" : "unavailable",
-    reportedSubtotalUsd: subtotal("reportedCostUsd"), estimatedSubtotalUsd: subtotal("estimatedCostUsd"),
-    attributedSubtotalUsd: subtotal("attributedCostUsd"), completeRequests, partialRequests,
-    unknownRequests: requests.length - completeRequests - partialRequests, requests };
+    if (!Number.isFinite(values.reduce((sum, value) => sum + value, 0))) throw new Error("Experiment cost subtotal overflow");
+  }
+  return foldNativeRequestCosts(requests);
 }
 
 /** Caller assigns roles; each observed native request may supply cost to exactly one experiment stage. */
