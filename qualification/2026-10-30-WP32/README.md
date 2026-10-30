@@ -55,3 +55,9 @@ node scripts/gen-platform-matrix.mjs --receipts qualification/2026-10-30-WP32/pl
 ```
 
 `docs/PLATFORM_MATRIX.md` is generated from `platform/` for commit `3e56038be`. Paths under the home directory are written as `~`, scratch paths as `<scratch>` and temporary paths as `<tmp>`.
+
+## Note added 2026-10-30 (gap follow-ups, `rtd/gap-followups`)
+
+The failed crash-and-restart outcome above stands. A follow-up updated `scripts/installed-crash-recovery-check.mjs` for deferred MCP discovery. It signs native `tool_search` (READ_ONLY) beside the fixture grant. It then runs a real discovery turn through the stub provider's `{"tool","arguments"}` directives: a search, an activation of the discovered schema digest, and then the fixture tool. The owner approves each call through `amc approvals`.
+
+On a fresh packed install (darwin-arm64, Node 22), the runner now gets past the mount refusal, and the search returns the granted tool. It still fails, now at activation, with `SIMULATE tool activation: loadout unchanged.`. The default signed Action Policy (AXR-02, `1549fabbd`) runs a new agent's EXECUTE calls as SIMULATE until the agent has a trusted diagnostic run. With no run, the governor treats the configuration as untrusted whatever the policy says. A SIMULATE activation leaves the MCP tool unoffered, and a SIMULATE `WRITE_LOW` call would not reach the fixture either. So this lane remains **failed**, now blocked on AXR-02 rather than harness drift. It needs a decision on how an acceptance workspace earns EXECUTE without planting diagnostic evidence.
