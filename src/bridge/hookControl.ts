@@ -739,6 +739,12 @@ function recoverControlResult(input: {
   sessionId: string;
   request: NormalizedProviderToolRequest;
   agentId: string;
+  /**
+   * WP35c: the forwarder's check, in a delegated child without the vault passphrase. Everything returned comes from the
+   * signed metadata (chain, writer signature, receipt, seal: public keys), so a payload blob whose key is out of reach
+   * there is not evaluated rather than failing. The Bridge, which holds the vault, checks the blob too.
+   */
+  blobKeyOptional?: boolean;
 }): ProviderHookControlResult | null {
   const existing = input.ledger.db.prepare(
     "SELECT id, session_id, event_type, meta_json FROM evidence_events WHERE id = ? LIMIT 1",
@@ -791,6 +797,7 @@ function recoverControlResult(input: {
     eventId: input.eventId,
     requireReceipt: true,
     requireSealedSession: true,
+    blobKeyOptional: input.blobKeyOptional === true,
   });
   const receipt = verifyReceipt(stored.receipt, getPurposeKeyHistory(input.ledger.workspace, "receipt"));
   const receiptKind = input.request.call ? "action_state" : "guard_check";
@@ -892,6 +899,7 @@ export function verifyProviderHookControlResult(input: {
       sessionId,
       request,
       agentId: input.authenticatedAgentId,
+      blobKeyOptional: true,
     });
     if (!recovered) {
       return { ok: false, error: "hook control response has no matching sealed ledger event" };

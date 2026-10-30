@@ -11,7 +11,8 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { pathExists } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
-import { loadBlobPlaintext } from "../storage/blobs/blobStore.js";
+import { loadBlobMetadata, loadBlobPlaintext } from "../storage/blobs/blobStore.js";
+import { readBlobKeyMaterial } from "../storage/blobs/blobKeys.js";
 import type { RetentionProofIndex } from "../ops/retention/retentionArchive.js";
 import type { EvidenceEvent } from "../types.js";
 import { inlinePlaintextOrNull } from "./encryption/ledgerCipher.js";
@@ -23,7 +24,13 @@ export function verifyEvidencePayload(
   externallyAuthenticatedPayloads?: ReadonlyMap<string, string>,
   retentionProofs?: RetentionProofIndex,
   /** Rows whose payload could not be checked here (key out of reach): reported, never counted as verified. */
-  notEvaluated?: string[]
+  notEvaluated?: string[],
+  /**
+   * WP35c: an encrypted blob whose key is out of reach here (vault locked) is listed in `notEvaluated` instead of failing,
+   * as an encrypted inline payload always is. For a reader of the signed metadata only (a delegated child's hook
+   * forwarder, which never holds the vault passphrase); a blob that does not open under a reachable key still fails.
+   */
+  blobKeyOptional = false
 ): void {
   verifyEventRetentionState(event, workspace, errors, retentionProofs);
   if (event.payload_inline !== null) {
@@ -78,7 +85,29 @@ export function verifyEvidencePayload(
       const actualStoredDigest = sha256Hex(readFileSync(join(workspace, payloadPath)));
       if (actualStoredDigest === expectedStoredDigest) return;
     }
+    if (blobKeyOptional && blobKeyOutOfReach(workspace, payloadPath, event.payload_sha256)) {
+      notEvaluated?.push(`Event ${event.id} payload not evaluated: the blob key is unavailable here`);
+      return;
+    }
     errors.push(`Event ${event.id} payload authentication failed`);
+  }
+}
+
+/** Whether `payloadPath` is an encrypted blob naming `payloadSha256` whose key cannot be read here (vault locked or absent). */
+function blobKeyOutOfReach(workspace: string, payloadPath: string, payloadSha256: string): boolean {
+  let keyVersion: number;
+  try {
+    const meta = loadBlobMetadata(workspace, payloadPath);
+    if (meta.keyVersion === null || meta.payloadSha256 !== payloadSha256) return false;
+    keyVersion = meta.keyVersion;
+  } catch {
+    return false;
+  }
+  try {
+    readBlobKeyMaterial(workspace, keyVersion);
+    return false;
+  } catch {
+    return true;
   }
 }
 
