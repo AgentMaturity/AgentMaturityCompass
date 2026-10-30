@@ -12,11 +12,11 @@ import { runHookForward } from "../src/adapters/hookIntegrationCli.js";
 import { initApprovalPolicy } from "../src/approvals/approvalPolicyEngine.js";
 import { startBridgeServer } from "../src/bridge/bridgeServer.js";
 import { questionBank } from "../src/diagnostic/questionBank.js";
-import { getAgentPaths } from "../src/fleet/paths.js";
 import { defaultActionPolicy, initActionPolicy } from "../src/governor/actionPolicyEngine.js";
 import type { DiagnosticReport } from "../src/types.js";
 import { initWorkspace } from "../src/workspace.js";
 import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
+import { writeSealedRun } from "./helpers/actionPolicyFixtures.js";
 
 const cliPath = fileURLToPath(new URL("../dist/cli.js", import.meta.url));
 const PASSPHRASE = "claude-hook-fail-closed-passphrase";
@@ -82,9 +82,7 @@ function installObservedRun(workspace: string, agentId: string): void {
     runSealSig: "fixture",
     reportJsonSha256: "fixture",
   };
-  const paths = getAgentPaths(workspace, agentId);
-  mkdirSync(paths.runsDir, { recursive: true });
-  writeFileSync(join(paths.runsDir, `${report.runId}.json`), JSON.stringify(report, null, 2));
+  writeSealedRun(workspace, report); // the governor reads only sealed, ledger-anchored runs
 }
 
 function permitReadAndWrite(workspace: string): void {

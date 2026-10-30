@@ -5,7 +5,7 @@ import { readdirSync } from "node:fs";
 import YAML from "yaml";
 import { questionBank, questionIds } from "../diagnostic/questionBank.js";
 import { notEvaluatedLevel } from "../diagnostic/levelSemantics.js";
-import { latestRunForAgent } from "../governor/actionPolicyEngine.js";
+import { latestTrustedRun } from "../governor/actionPolicyEngine.js";
 import { computeOrgScorecard } from "../org/orgEngine.js";
 import { loadTargetProfile } from "../targets/targetProfile.js";
 import { loadContextGraph } from "../context/contextGraph.js";
@@ -161,9 +161,11 @@ function loadLatestOutcomeSummary(workspace: string, agentId: string): {
 }
 
 function deriveAgentBaseline(workspace: string, agentId: string): AgentBaseline {
-  const run = latestRunForAgent(workspace, agentId);
+  const { run, refusal } = latestTrustedRun(workspace, agentId);
   if (!run) {
-    throw new Error(`No diagnostic run found for agent '${agentId}'. Run 'amc run --agent ${agentId} --window 14d' first.`);
+    throw new Error(refusal
+      ? `No verified diagnostic run for agent '${agentId}': ${refusal}. Run 'amc run --agent ${agentId} --window 14d' to record a sealed one.`
+      : `No diagnostic run found for agent '${agentId}'. Run 'amc run --agent ${agentId} --window 14d' first.`);
   }
   const layerMap: Record<string, number> = {};
   for (const layer of run.layerScores) {

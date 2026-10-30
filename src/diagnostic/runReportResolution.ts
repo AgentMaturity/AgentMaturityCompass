@@ -227,3 +227,18 @@ export function loadVerifiedRunReport(workspace: string, runId: string, agentId?
     return null;
   }
 }
+
+/**
+ * The newest run for display only (dashboards, `unknowns`, `meta-confidence`, rollup claim lines): the permissive
+ * `latest` selection plus whether its seal verifies, so the caller labels an unverified run. Never feed it to a gate or
+ * a signer; those use `latestTrustedRun` (governor) or `latestVerifiedRun`.
+ */
+export function latestDisplayRun(workspace: string, agentId: string): { report: DiagnosticReport; verified: boolean } | null {
+  let report: DiagnosticReport;
+  try {
+    report = resolveRunReport(workspace, "latest", agentId).report;
+  } catch {
+    return null;
+  }
+  return { report, verified: sealedRunReportVerifies(workspace, report as unknown as Record<string, unknown>) };
+}

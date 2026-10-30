@@ -25,7 +25,7 @@ import { signBomFile, verifyBomSignature } from "../src/bom/bomVerifier.js";
 import { pinnedTrust, workspaceKeyTrust } from "./helpers/trustContext.js";
 import { openLedger } from "../src/ledger/ledger.js";
 import { questionBank } from "../src/diagnostic/questionBank.js";
-import { writeSealedReport } from "./helpers/sealedRun.js";
+import { writeAnchoredRun } from "./helpers/sealedRun.js";
 import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
 
 const roots: string[] = [];
@@ -152,7 +152,7 @@ function writeRunFixture(params: {
     reportJsonSha256: "hash"
   };
   // Sealed: since WP37 the drift detector reads only runs whose seal verifies.
-  writeSealedReport(params.workspace, paths.runsDir, params.runId, report);
+  writeAnchoredRun(params.workspace, paths.runsDir, report);
 }
 
 function writeHighMaturityRunForGovernor(workspace: string, runId: string): void {
@@ -202,7 +202,7 @@ function writeHighMaturityRunForGovernor(workspace: string, runId: string): void
     runSealSig: "sig",
     reportJsonSha256: "hash"
   };
-  writeSealedReport(workspace, paths.runsDir, runId, report);
+  writeAnchoredRun(workspace, paths.runsDir, report);
 }
 
 describe("zero-key, leases, budgets, drift, and BOM", () => {

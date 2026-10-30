@@ -36,6 +36,7 @@ import { handleHookControlRequest, handleHookControlRequestAsync } from "../src/
 import { getPurposeKeyHistory } from "../src/keys/signingKeys.js";
 import { boundClaudeCode } from "./helpers/claudeCodeHookFixtures.js";
 import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
+import { writeSealedRun } from "./helpers/actionPolicyFixtures.js";
 
 const roots: string[] = [];
 const actualClaudeHookSources = claudeProcess.claudeSessionHookSources;
@@ -90,9 +91,7 @@ function installObservedRun(workspace: string, agentId: string): void {
     runSealSig: "fixture",
     reportJsonSha256: "fixture",
   };
-  const paths = getAgentPaths(workspace, agentId);
-  mkdirSync(paths.runsDir, { recursive: true });
-  writeFileSync(join(paths.runsDir, `${report.runId}.json`), JSON.stringify(report, null, 2));
+  writeSealedRun(workspace, report); // the governor reads only sealed, ledger-anchored runs
 }
 
 function permitReadAndWrite(workspace: string): void {
