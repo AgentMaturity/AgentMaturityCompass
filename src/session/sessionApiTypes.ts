@@ -74,6 +74,8 @@ export interface SessionOpenParams {
    * in the `session/open` row so lineage is a signed claim, not a filename.
    */
   readonly parent?: SessionLineage;
+  /** Owner-consumed wire work: committed in the first native row, not inferred from a filename. */
+  readonly acceptedWork?: { readonly eventId: string; readonly receipt: string; readonly claimId: string; readonly leaseId: string };
 }
 
 /** A verified pointer at another session's last enveloped row. */

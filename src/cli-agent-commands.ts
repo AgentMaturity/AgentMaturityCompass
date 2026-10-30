@@ -75,7 +75,7 @@ import { loadNativeAudioManifest } from "./attachments/nativeAudioFiles.js";
 import type { NativeAudioPart } from "./attachments/nativeAudioInput.js";
 
 import {
-  approvalGateFor, collectOption, collectDelegateStop, compactionOption, resetDelegateStops, integerOption, paramsFor, piAiRouteSelection, renderNotification, routeFor,
+  activeChildLimitOption, approvalGateFor, collectOption, collectDelegateStop, compactionOption, resetDelegateStops, integerOption, paramsFor, piAiRouteSelection, renderNotification, routeFor,
   type AgentLoopCliIo, type RunOptions
 } from "./cli-agent-options.js";
 export type { AgentLoopCliIo, RunOptions } from "./cli-agent-options.js";
@@ -142,6 +142,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--delegate", "enable governed in-process child agents; requires workspace tools")
     .option("--no-delegate", "disable child delegation even when a signed preset enables it")
     .option("--max-delegation-depth <n>", "maximum native child depth")
+    .option("--max-active-children <n>", "root-wide active child cap including descendants (default 8; 0 disables children)")
     .option("--delegate-scope <classes>", "explicit comma-separated child action classes")
     .option("--delegate-stop <condition>", "repeatable child stop: max-turns:N (initial executor turn plus continuations) or timeout-ms:N (whole child lifetime including idle)", collectDelegateStop)
     .option("--no-delegate-stop", "explicitly clear extra child stops from a preset; budgets, depth and approvals still apply", resetDelegateStops)
@@ -215,6 +216,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     )
     .option("--no-delegate", "disable child delegation even when a signed preset enables it")
     .option("--max-delegation-depth <n>", "how deep a delegation chain may go (default 3)")
+    .option("--max-active-children <n>", "root-wide active child cap including descendants (default 8; 0 disables children)")
     .option(
       "--delegate-provider <id>",
       "who executes a delegation: \"in-process\" (default) or a foreign CLI such as "
@@ -446,6 +448,8 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       const wantsDelegation = opts.delegate === true;
       const breadth = resolveBreadthRun(io, opts, { toolMode, wantsDelegation });
       if (breadth === null) return;
+      const maxActiveChildren = activeChildLimitOption(io, opts.maxActiveChildren, wantsDelegation && toolMode === "workspace");
+      if (maxActiveChildren === null) return;
       if (!wantsDelegation && opts.delegateStop !== undefined) {
         io.error(chalk.red("--delegate-stop and --no-delegate-stop require --delegate or delegate.enabled in the signed preset."));
         io.fail(); return;
@@ -590,7 +594,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           // the operator's value and used the default would say so here.
           //
           progress(chalk.dim(
-            `delegation is offered, chains bounded at depth ${maxDelegationDepth}`
+            `delegation is offered, chains bounded at depth ${maxDelegationDepth}; root-wide active children capped at ${maxActiveChildren}`
             + (foreignRunner === null ? "; native children inherit approval, cancellation, limits and narrowed scopes" : "")
           ));
           // Named either way. The unscoped case is the one an operator is most
@@ -716,6 +720,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
                 delegation: delegationTurnOptions({
                   grant: grantDelegation,
                   maxDepth: maxDelegationDepth,
+                  ...(opts.maxActiveChildren === undefined ? {} : { maxActiveChildren }),
                   scope: delegateScope,
                   ...(opts.delegateStop === undefined ? {} : { stopConditions: delegateStops.conditions }),
                   runner: foreignRunner

@@ -1,6 +1,6 @@
 # AMC API Reference
 
-> Auto-generated from source on 2026-10-29
+> Auto-generated from source on 2026-10-30
 
 ## Table of Contents
 
@@ -1276,7 +1276,7 @@ AMC provides 1,268 public CLI command paths in the live command inventory.
 | 1257 | `amc whatif equalizer` | - |
 | 1258 | `amc whatif targets` | - |
 | 1259 | `amc why-capped` | Show why each question is capped at its current level |
-| 1260 | `amc wire` | Serve the NDJSON JSON-RPC wire on a unix socket (accepts work; does not run it) |
+| 1260 | `amc wire` | Serve the NDJSON JSON-RPC wire; optionally execute accepted work through an owner-configured native route |
 | 1261 | `amc wiring-status` | Show in-process production wiring counters (cannot observe other processes) |
 | 1262 | `amc workorder` | Signed work order operations |
 | 1263 | `amc workorder create` | Create and sign a work order |
@@ -1775,6 +1775,7 @@ Interactive native tasks over the existing governed run/resume path for the sele
 | `--delegate` | - |
 | `--no-delegate` | - |
 | `--max-delegation-depth <n>` | - |
+| `--max-active-children <n>` | - |
 | `--delegate-scope <classes>` | - |
 | `--delegate-stop <condition>` | - |
 | `--no-delegate-stop` | - |
@@ -1882,6 +1883,7 @@ Run one agent turn and report what the signed log recorded
 | `--delegate` | - |
 | `--no-delegate` | - |
 | `--max-delegation-depth <n>` | - |
+| `--max-active-children <n>` | - |
 | `--delegate-provider <id>` | - |
 | `--delegate-timeout <ms>` | - |
 | `--delegate-stop <condition>` | - |
@@ -10911,7 +10913,7 @@ Show why each question is capped at its current level
 
 #### `amc wire`
 
-Serve the NDJSON JSON-RPC wire on a unix socket (accepts work; does not run it)
+Serve the NDJSON JSON-RPC wire; optionally execute accepted work through an owner-configured native route
 
 
 | Option | Description |
@@ -10919,6 +10921,13 @@ Serve the NDJSON JSON-RPC wire on a unix socket (accepts work; does not run it)
 | `--socket <path>` | - |
 | `--max-connections <n>` | - |
 | `--idle-timeout <ms>` | - |
+| `--execute-accepted` | - |
+| `--provider <id>` | - |
+| `--model <model>` | - |
+| `--base-url <origin>` | - |
+| `--credential <ref>` | - |
+| `--max-steps <n>` | - |
+| `--max-tokens <n>` | - |
 | `--json` | - |
 
 #### `amc wiring-status`

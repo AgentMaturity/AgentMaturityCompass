@@ -101,12 +101,14 @@ export function resolveForeignRunner(params: {
 export function delegationTurnOptions(params: {
   readonly grant: (capability: SubagentCapability) => void;
   readonly maxDepth: number;
+  readonly maxActiveChildren?: number;
   readonly scope?: readonly ActionClass[] | undefined;
   readonly stopConditions?: readonly string[] | undefined;
   readonly runner?: SubagentRunner | null;
 }): {
   readonly grant: (capability: SubagentCapability) => void;
   readonly maxDepth: number;
+  readonly maxActiveChildren?: number;
   readonly scope?: readonly ActionClass[];
   readonly stopConditions?: readonly string[];
   readonly runner?: SubagentRunner;
@@ -114,6 +116,7 @@ export function delegationTurnOptions(params: {
   return {
     grant: params.grant,
     maxDepth: params.maxDepth,
+    ...(params.maxActiveChildren === undefined ? {} : { maxActiveChildren: params.maxActiveChildren }),
     ...(params.scope === undefined ? {} : { scope: params.scope }),
     ...(params.stopConditions === undefined ? {} : { stopConditions: Object.freeze([...params.stopConditions]) }),
     ...(params.runner === null || params.runner === undefined ? {} : { runner: params.runner })

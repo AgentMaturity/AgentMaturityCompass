@@ -1,3 +1,5 @@
+import { sha256Hex } from "../utils/hash.js";
+import type { AcceptedWork } from "./workAcceptance.js";
 import { verifyLeaseToken } from "../leases/leaseVerifier.js";
 import { readRevokedLeaseIds } from "../leases/leaseStore.js";
 import type { Ledger } from "../ledger/ledger.js";
@@ -48,6 +50,8 @@ export interface WireDispatcherInit {
   readonly intakeSessionId: string;
   readonly monitorPublicKeys: readonly string[];
   readonly workspaceId?: string;
+  /** Owner callback only. Token stays in memory and is re-verified before native execution. */
+  readonly onAccepted?: (accepted: AcceptedWork, leaseToken: string) => void;
 }
 
 export interface DispatchResult {
@@ -167,6 +171,11 @@ function answer(init: WireDispatcherInit, bytes: Buffer, ordinal: number): Buffe
     intakeSessionId: init.intakeSessionId,
     // Straight from the verified payload. Nothing the peer wrote reaches this.
     agentId: lease.payload.agentId,
+    authority: { leaseId: lease.payload.leaseId, tokenSha256: sha256Hex(request.lease) },
+    ...(init.onAccepted === undefined ? {} : { onAccepted: (accepted: AcceptedWork) => {
+      // Receipt delivery survives a consumer scheduling error. The accepted item stays visibly unconsumed.
+      try { init.onAccepted?.(accepted, request.lease); } catch { /* no native claim implies no execution */ }
+    } }),
     monitorPublicKeys: init.monitorPublicKeys
   };
 

@@ -10,6 +10,7 @@ export interface NativeChatProfileOptions extends NativeFirstUseOptions {
   readonly persona?: string;
   readonly delegate?: boolean;
   readonly maxDelegationDepth?: string;
+  readonly maxActiveChildren?: string;
   readonly delegateScope?: string;
   /** False explicitly clears a signed preset's extra stops. Effective values are arrays. */
   readonly delegateStop?: readonly string[] | false;
@@ -36,12 +37,12 @@ export class NativeChatProfileError extends Error {
   constructor(message: string) { super(message); this.name = "NativeChatProfileError"; }
 }
 
-function positiveOption(name: string, explicit: string | undefined, fromPreset: number | undefined): string | undefined {
+function integerOption(name: string, explicit: string | undefined, fromPreset: number | undefined, minimum = 1): string | undefined {
   const raw = explicit ?? (fromPreset === undefined ? undefined : String(fromPreset));
   if (raw === undefined) return undefined;
   const value = Number(raw);
-  if (!Number.isSafeInteger(value) || value <= 0 || raw.trim() === "") {
-    throw new NativeChatProfileError(`${name} must be a positive integer for interactive chat.`);
+  if (!Number.isSafeInteger(value) || value < minimum || raw.trim() === "") {
+    throw new NativeChatProfileError(`${name} must be ${minimum === 0 ? "a non-negative safe integer" : "a positive integer"} for interactive chat.`);
   }
   return String(value);
 }
@@ -90,16 +91,19 @@ export function resolveNativeChatProfile(options: NativeChatProfileOptions): Nat
   if (delegate && preset?.delegate?.timeoutMs !== undefined) {
     throw new NativeChatProfileError("This preset sets a foreign-process delegation timeout. Remove that unused setting from the native preset instead of silently ignoring it.");
   }
-  if (!delegate && (options.maxDelegationDepth !== undefined || options.delegateScope !== undefined || options.delegateStop !== undefined)) {
+  if (!delegate && (options.maxDelegationDepth !== undefined || options.maxActiveChildren !== undefined || options.delegateScope !== undefined || options.delegateStop !== undefined)) {
     throw new NativeChatProfileError("Delegation bounds require --delegate or delegate.enabled in the signed preset.");
   }
   const rawStops = !delegate ? undefined : options.delegateStop === false ? [] : options.delegateStop ?? preset?.delegate?.stopConditions;
   const stopConditions = parseSubagentStopConditions(rawStops);
   if (!stopConditions.ok) throw new NativeChatProfileError(`--delegate-stop: ${stopConditions.reason}`);
-  const maxTokens = positiveOption("--max-tokens", options.maxTokens, preset?.maxTokens);
-  const maxSteps = positiveOption("--max-steps", options.maxSteps, preset?.maxSteps);
+  const maxTokens = integerOption("--max-tokens", options.maxTokens, preset?.maxTokens);
+  const maxSteps = integerOption("--max-steps", options.maxSteps, preset?.maxSteps);
   const maxDelegationDepth = delegate
-    ? positiveOption("--max-delegation-depth", options.maxDelegationDepth, preset?.delegate?.maxDepth)
+    ? integerOption("--max-delegation-depth", options.maxDelegationDepth, preset?.delegate?.maxDepth)
+    : undefined;
+  const maxActiveChildren = delegate
+    ? integerOption("--max-active-children", options.maxActiveChildren, preset?.delegate?.maxActiveChildren, 0)
     : undefined;
   const scope = options.delegateScope === undefined
     ? preset?.delegate?.scope
@@ -139,6 +143,7 @@ export function resolveNativeChatProfile(options: NativeChatProfileOptions): Nat
     ...(maxTokens === undefined ? {} : { maxTokens }),
     ...(maxSteps === undefined ? {} : { maxSteps }),
     ...(maxDelegationDepth === undefined ? {} : { maxDelegationDepth }),
+    ...(maxActiveChildren === undefined ? {} : { maxActiveChildren }),
     ...(delegateScope === undefined ? {} : { delegateScope }),
     ...(rawStops === undefined ? {} : { delegateStop: stopConditions.conditions }),
     ...(approveTools === undefined ? {} : { approveTools }),
@@ -160,6 +165,7 @@ export function nativeChatProfileArgv(profile: NativeChatProfile, surface: "run"
     ...(surface === "run" ? ["--tool-mode=native"] : []),
     ...(options.delegate ? ["--delegate", ...(surface === "run" ? ["--delegate-provider=in-process"] : []),
       ...(options.maxDelegationDepth === undefined ? [] : [`--max-delegation-depth=${options.maxDelegationDepth}`]),
+      ...(options.maxActiveChildren === undefined ? [] : [`--max-active-children=${options.maxActiveChildren}`]),
       ...(options.delegateScope === undefined ? [] : [`--delegate-scope=${options.delegateScope}`]),
       ...(options.delegateStop === undefined ? [] : options.delegateStop === false || options.delegateStop.length === 0
         ? ["--no-delegate-stop"] : options.delegateStop.map(condition => `--delegate-stop=${condition}`))] : ["--no-delegate"])

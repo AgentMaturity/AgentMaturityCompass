@@ -39,6 +39,7 @@ const delegateSchema = z
     enabled: z.boolean().default(false),
     scope: z.array(z.enum(DELEGATION_SCOPE_TOKENS as unknown as [string, ...string[]])).optional(),
     maxDepth: z.number().int().min(1).optional(),
+    maxActiveChildren: z.number().int().min(0).max(Number.MAX_SAFE_INTEGER).optional(),
     provider: z.string().min(1).optional(),
     /** Foreign process timeout; distinct from the whole-child stop below. */
     timeoutMs: z.number().int().min(1_000).optional(),
