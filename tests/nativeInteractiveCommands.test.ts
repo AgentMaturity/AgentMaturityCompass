@@ -4,7 +4,7 @@ import { NATIVE_INTERACTIVE_COMMANDS, nativeInteractiveCompleter } from "../src/
 describe("native interactive command discovery", () => {
   it("shares canonical built-ins and descriptions for help and reservation", () => {
     const names = NATIVE_INTERACTIVE_COMMANDS.map(command => command.name);
-    expect(names).toEqual(["help", "inspect", "verify", "compact", "fork", "sessions", "resume", "mcp", "extensions", "load", "unload", "exit"]);
+    expect(names).toEqual(["help", "inspect", "verify", "compact", "fork", "sessions", "resume", "bookmark", "bookmarks", "mcp", "extensions", "load", "unload", "exit"]);
     expect(new Set(names).size).toBe(names.length);
     expect(NATIVE_INTERACTIVE_COMMANDS.every(command => command.description.length > 0)).toBe(true);
   });

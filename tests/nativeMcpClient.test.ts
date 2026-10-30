@@ -11,9 +11,11 @@ import { agentToolset, checkToolsetReadiness } from "../src/agent/agentToolset.j
 import { SessionService } from "../src/session/sessionService.js";
 import { initToolsConfig, loadToolsConfig } from "../src/toolhub/toolhubValidators.js";
 import { NATIVE_MCP_DIAGNOSTICS_BYTES, discoverNativeMcpCatalog, mountNativeMcpServer, nativeMcpFailureDiagnostics, nativeMcpToolName, type MountedNativeMcpServer } from "../src/mcp/nativeMcpClient.js";
-import { loadNativeMcpConfiguration, requireReviewedNativeMcpGrants, resolveNativeMcpServer } from "../src/setup/nativeMcpConfig.js";
+import { loadNativeMcpConfiguration, requireReviewedNativeMcpGrants, reviewNativeMcpConfigurations, resolveNativeMcpServer } from "../src/setup/nativeMcpConfig.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import { openActionJournal } from "../src/actions/actionJournal.js";
+import { prepareFileSignatureWithAuditor } from "../src/org/orgSigner.js";
+import { gateToolCallsOnApproval } from "../src/agent/approvalGate.js";
 import { initProcessorRegistry } from "../src/dataflow/processorRegistry.js";
 import { removeActionPolicy } from "./helpers/actionPolicyFixtures.js";
 
@@ -425,6 +427,108 @@ describe("native MCP configuration admission", () => {
     expect(fixture.tools.registry.visible("default").has(nativeMcpToolName("second", "lookup"))).toBe(false);
     expect((await fixture.call("lookup", { query: "first again" })).outcome).toBe("OK");
   });
+  test("mixed reviewed servers retain their own approval classes and changed second bytes refuse all review", async () => {
+    const fixture = setup({ tools: [tool()] });
+    const secondName = nativeMcpToolName("second", "lookup");
+    const config = loadToolsConfig(fixture.workspace);
+    initToolsConfig(fixture.workspace, { ...config, tools: { ...config.tools, allowedTools: [...config.tools.allowedTools,
+      { name: secondName, actionClass: "WRITE_LOW" }] } });
+    const reviewed = await discoverNativeMcpCatalog(fixture.server, fixture.workspace);
+    const paths = ["first", "second"].map(name => join(fixture.workspace, `${name}.json`));
+    for (const [index, path] of paths.entries()) writeFileSync(path, JSON.stringify({ schemaVersion: 1,
+      server: { ...fixture.server, id: index === 0 ? "fixture" : "second" }, expectedCatalogDigest: reviewed.digest,
+      grants: [{ name: "lookup", actionClass: index === 0 ? "READ_ONLY" : "WRITE_LOW" }] }));
+    const pins = paths.map(path => sha256Hex(readFileSync(path)));
+    const reviews = reviewNativeMcpConfigurations(paths, pins, fixture.workspace, "SECURITY");
+    expect(reviews.map(entry => entry.review.capabilities[0]!.actionClass)).toEqual(["READ_ONLY", "WRITE_LOW"]);
+    const mounts: MountedNativeMcpServer[] = [];
+    try {
+      for (const entry of reviews) mounts.push(await mountNativeMcpServer({ server: await resolveNativeMcpServer(entry.config.config,
+        { workspace: fixture.workspace }), workspace: fixture.workspace, agentId: "default", toolset: fixture.tools, ...entry.review }));
+      const asked: string[] = [];
+      const gate = gateToolCallsOnApproval(fixture.tools.seam, { request: async ask => {
+        asked.push(ask.actionClass);
+        return { approvalId: "fixture-approval", answer: "allow", proceed: true, answeredBy: "fixture", reason: "test", approvalRequestId: null, requestEventId: "fixture-request", answerEventId: "fixture-answer" };
+      } }, { actionClass: "SECURITY", riskTier: "low", reviewedActionClasses: Object.freeze(Object.fromEntries(
+        reviews.flatMap(entry => entry.review.capabilities.map(({ name, actionClass }) => [name, actionClass])))) });
+      for (const name of [nativeMcpToolName("fixture", "lookup"), secondName]) {
+        const call = { callId: name, toolName: name, rawArguments: JSON.stringify({ query: name }), sessionId: "native-mcp-fixture",
+          turn: 1, step: 1, parentToken: null, dispatch: "native" as const, signal: new AbortController().signal };
+        expect(gate.executionMode(call)).toBe(name === secondName ? "exclusive" : "parallel");
+        expect((await gate.execute(call)).outcome).toBe("OK");
+      }
+      expect(asked).toEqual(["READ_ONLY", "WRITE_LOW"]);
+      expect(fixture.calls()).toHaveLength(2);
+    } finally { for (const mount of mounts.reverse()) await mount.close(); }
+    writeFileSync(paths[1]!, readFileSync(paths[1]!, "utf8") + "\n");
+    expect(() => reviewNativeMcpConfigurations(paths, pins, fixture.workspace, "SECURITY")).toThrow(/changed/);
+  });
+  test("operator alias retains canonical identity, remote provenance, and exact-byte pin", async () => {
+    const fixture = setup({ tools: [tool()] });
+    const grant = { name: "lookup", actionClass: "READ_ONLY" as const, alias: "mcp_fixture_lookup" };
+    const path = join(fixture.workspace, "alias.json");
+    const catalog = await discoverNativeMcpCatalog(fixture.server, fixture.workspace);
+    writeFileSync(path, JSON.stringify({ schemaVersion: 1, server: fixture.server, expectedCatalogDigest: catalog.digest, grants: [grant] }));
+    const signed = await prepareFileSignatureWithAuditor(fixture.workspace, path, readFileSync(path), "BUNDLE");
+    signed.assertCurrent(); writeFileSync(`${path}.sig`, signed.signatureBytes);
+    const pin = sha256Hex(readFileSync(path));
+    const review = requireReviewedNativeMcpGrants(loadNativeMcpConfiguration(path, pin), fixture.workspace, "SECURITY");
+    expect(review.grants).toEqual([grant]);
+    const mount = await fixture.mount(review);
+    const canonicalName = nativeMcpToolName("fixture", "lookup");
+    expect(mount.toolNames).toEqual([canonicalName]);
+    expect(fixture.tools.registry.visible("default").get(canonicalName)).toMatchObject({ name: canonicalName, modelAlias: grant.alias });
+    const outcome = await fixture.call("lookup", { query: "alias" });
+    expect(outcome.outcome).toBe("OK");
+    expect(JSON.parse(String(outcome.content)).amcProvenance).toMatchObject({ serverId: "fixture", remoteToolName: "lookup", toolName: canonicalName, alias: grant.alias });
+    expect(fixture.calls()[0]!.name).toBe("lookup");
+    writeFileSync(path, readFileSync(path, "utf8").replace(grant.alias, "changed_alias"));
+    expect(() => loadNativeMcpConfiguration(path, pin)).toThrow(/changed/);
+  });
+  test.each([null, 12, "", "fs.read", "run_code", "tool_search", "amc_reserved", "a".repeat(65), "space name", "line\nname"])("refuses invalid or reserved alias %j before launch", alias => {
+    const fixture = setup({ tools: [tool()] });
+    const path = join(fixture.workspace, "invalid-alias.json");
+    writeFileSync(path, JSON.stringify({ schemaVersion: 1, server: fixture.server, expectedCatalogDigest: "a".repeat(64),
+      grants: [{ name: "lookup", actionClass: "READ_ONLY", alias }] }));
+    expect(() => requireReviewedNativeMcpGrants(loadNativeMcpConfiguration(path), fixture.workspace, "READ_ONLY")).toThrow(/alias/i);
+    expect(fixture.calls()).toEqual([]);
+  });
+  test("aliases cannot collide with another server alias or any canonical signed capability", async () => {
+    const fixture = setup({ tools: [tool()] });
+    const config = loadToolsConfig(fixture.workspace);
+    initToolsConfig(fixture.workspace, { ...config, tools: { ...config.tools, allowedTools: [...config.tools.allowedTools,
+      { name: nativeMcpToolName("second", "lookup"), actionClass: "READ_ONLY" }] } });
+    const paths = ["fixture", "second"].map(id => {
+      const path = join(fixture.workspace, `${id}.json`);
+      writeFileSync(path, JSON.stringify({ schemaVersion: 1, server: { id, command: process.execPath }, expectedCatalogDigest: "a".repeat(64),
+        grants: [{ name: "lookup", actionClass: "READ_ONLY", alias: "same_alias" }] }));
+      return path;
+    });
+    for (const path of paths) {
+      const signed = await prepareFileSignatureWithAuditor(fixture.workspace, path, readFileSync(path), "BUNDLE");
+      signed.assertCurrent(); writeFileSync(`${path}.sig`, signed.signatureBytes);
+    }
+    expect(() => reviewNativeMcpConfigurations(paths, undefined, fixture.workspace, "READ_ONLY")).toThrow(/alias.*collid/i);
+    const path = paths[0]!;
+    writeFileSync(path, readFileSync(path, "utf8").replace("same_alias", nativeMcpToolName("second", "lookup")));
+    const signed = await prepareFileSignatureWithAuditor(fixture.workspace, path, readFileSync(path), "BUNDLE");
+    signed.assertCurrent(); writeFileSync(`${path}.sig`, signed.signatureBytes);
+    expect(() => reviewNativeMcpConfigurations([path], undefined, fixture.workspace, "READ_ONLY")).toThrow(/alias.*collid/i);
+  });
+  test("direct mounts refuse aliases that shadow mounted aliases or canonical identities", async () => {
+    const fixture = setup({ tools: [tool()] });
+    await fixture.mount({ grants: [{ name: "lookup", actionClass: "READ_ONLY", alias: "taken_alias" }] });
+    const second = { ...fixture.server, id: "second" };
+    const reviewed = await discoverNativeMcpCatalog(second, fixture.workspace);
+    for (const alias of ["taken_alias", nativeMcpToolName("fixture", "lookup"), "run_code"]) {
+      await expect(mountNativeMcpServer({ server: second, workspace: fixture.workspace, agentId: "default", toolset: fixture.tools,
+        expectedCatalogDigest: reviewed.digest, grants: [{ name: "lookup", actionClass: "READ_ONLY", alias }] })).rejects.toThrow(/alias/i);
+    }
+    await fixture.mount({ server: { ...fixture.server, id: "third" }, grants: [{ name: "lookup", actionClass: "READ_ONLY", alias: nativeMcpToolName("fourth", "lookup") }] });
+    await expect(mountNativeMcpServer({ server: { ...fixture.server, id: "fourth" }, workspace: fixture.workspace, agentId: "default", toolset: fixture.tools,
+      expectedCatalogDigest: reviewed.digest, grants: [{ name: "lookup", actionClass: "READ_ONLY" }] })).rejects.toThrow(/collides with a mounted alias/);
+    expect(fixture.calls()).toEqual([]);
+  });
   test("pins exact config bytes, refuses literal secrets and checks the signed grant class", async () => {
     const fixture = setup({ tools: [tool()] });
     const path = join(fixture.workspace, "mcp-config.json");
@@ -432,7 +536,9 @@ describe("native MCP configuration admission", () => {
     writeFileSync(path, JSON.stringify(config)); const digest = sha256Hex(readFileSync(path));
     const loaded = loadNativeMcpConfiguration(path, digest);
     expect(requireReviewedNativeMcpGrants(loaded, fixture.workspace, "READ_ONLY").grants).toHaveLength(1);
-    expect(() => requireReviewedNativeMcpGrants(loaded, fixture.workspace, "WRITE_LOW")).toThrow(/match --approve-tools/);
+    expect(requireReviewedNativeMcpGrants(loaded, fixture.workspace, "WRITE_LOW").grants).toHaveLength(1);
+    const mismatched = { ...loaded, config: { ...loaded.config, grants: [{ name: "lookup", actionClass: "WRITE_LOW" as const }] } };
+    expect(() => requireReviewedNativeMcpGrants(mismatched, fixture.workspace, "WRITE_LOW")).toThrow(/action class/);
     writeFileSync(path, JSON.stringify(config) + "\n"); expect(() => loadNativeMcpConfiguration(path, digest)).toThrow(/changed/);
     writeFileSync(path, JSON.stringify({ ...config, server: { ...config.server, env: { TOKEN: "must-be-refused" } } }));
     expect(() => loadNativeMcpConfiguration(path)).toThrow(/literal env/);

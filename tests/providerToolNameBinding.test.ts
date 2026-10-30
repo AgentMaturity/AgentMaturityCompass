@@ -14,7 +14,9 @@ import type { LlmAdapter } from "../src/llm/adapter/adapterTypes.js";
 import { openaiAdapter } from "../src/llm/providers/openaiAdapter.js";
 import { openaiResponsesAdapter } from "../src/llm/providers/openaiResponsesAdapter.js";
 import { anthropicAdapter } from "../src/llm/providers/anthropicAdapter.js";
-import { deriveSessionRequests } from "../src/llm/request/deriveRequest.js";
+import { resolveRequestSources } from "../src/llm/request/requestSources.js";
+import { parseRequestHeaderMeta } from "../src/session/requestHeaderMeta.js";
+import { DEFAULT_REQUEST_ENCODERS, deriveSessionRequests } from "../src/llm/request/deriveRequest.js";
 import { bindProviderToolNames, providerToolWireName } from "../src/llm/request/providerToolNames.js";
 import type { ToolSchema } from "../src/llm/request/requestSpec.js";
 import { toolCallId, type StreamChunk } from "../src/llm/streamChunk.js";
@@ -151,6 +153,81 @@ describe("provider tool names retain signed internal identity", () => {
     h.close();
     expect(verifyLedgerIntegrity(h.workspace).chain.ok).toBe(true);
     expect(deriveSessionRequests({ workspace: h.workspace, sessionId: h.session.sessionId })[0]).toMatchObject({ status: "reconstructed", bytes: sent[0] });
+  });
+
+  test.each(protocols)("$id alias calls retain canonical evidence and reconstruct after alias revocation", async protocol => {
+    const canonical = nativeMcpToolName("reviewed", "remote.read"), alias = "read_reviewed";
+    const sent: Buffer[] = [];
+    const h = harness(protocol, async request => {
+      sent.push(Buffer.from(request.body));
+      return response(protocol, sent.length === 1 ? [alias] : []);
+    });
+    const first = h.runtime.prepare(h.spec([{ ...tool(canonical), modelAlias: alias }]));
+    const blocks = calls(await drain(first.stream()));
+    expect(blocks).toMatchObject([{ name: canonical, providerWireName: alias }]);
+    const row = h.session.readEvents().find(row => row.event_type === "tool/call")!;
+    expect(JSON.parse(row.meta_json)).toMatchObject({ toolName: canonical, providerName: { wireName: alias } });
+    h.session.recordToolResult({ toolCallId: "call_0", outcome: "OK", exitCode: 0, timedOut: false, denied: false, content: "read" });
+    h.session.endStep({ stopReason: "tool_use", usage: null }); h.session.startStep();
+    await drain(h.runtime.stream(h.spec(null)));
+    const replay = sent[1]!.toString();
+    expect(replay).toContain(alias); expect(replay).not.toContain(providerToolWireName(canonical));
+    h.close();
+    const derived = deriveSessionRequests({ workspace: h.workspace, sessionId: h.session.sessionId });
+    expect(derived.map(row => row.status)).toEqual(["reconstructed", "reconstructed"]);
+    expect(derived.map(row => row.bytes)).toEqual(sent);
+  });
+
+  test.each(["header", "version", "wire", "default-wire", "missing-wire", "null-provider", "canonical"])("historical alias rejects forged %s provenance", async attack => {
+    const canonical = nativeMcpToolName("reviewed", "remote.read"), alias = "read_reviewed";
+    const h = harness(protocols[0], async () => response(protocols[0], [alias]));
+    const first = h.runtime.prepare(h.spec([{ ...tool(canonical), modelAlias: alias }])); await drain(first.stream());
+    h.session.recordToolResult({ toolCallId: "call_0", outcome: "OK", exitCode: 0, timedOut: false, denied: false, content: "read" });
+    h.session.endStep({ stopReason: "tool_use", usage: null }); h.session.startStep();
+    const second = h.runtime.prepare(h.spec(null));
+    const events = h.session.readEvents().map(row => {
+      if (row.event_type !== "tool/call") return row;
+      const meta = JSON.parse(row.meta_json);
+      if (attack === "header") meta.providerName.headerEventId = "missing-header";
+      if (attack === "version") meta.providerName.version = 2;
+      if (attack === "wire") meta.providerName.wireName = "unoffered_alias";
+      if (attack === "default-wire") meta.providerName.wireName = providerToolWireName(meta.toolName);
+      if (attack === "canonical") meta.toolName = "other-canonical";
+      if (attack === "missing-wire") delete meta.providerName.wireName;
+      if (attack === "null-provider") meta.providerName = null;
+      return { ...row, meta_json: JSON.stringify(meta) };
+    });
+    const header = parseRequestHeaderMeta(events.find(row => row.id === second.headerEventId)!.meta_json)!;
+    const result = resolveRequestSources({ workspace: h.workspace, events, model: header.model, params: header.params,
+      systemPromptEventId: header.systemPromptEventId, toolSchemaEventId: header.toolSchemaEventId,
+      toolSchemaSha256: header.toolSchemaSha256, projectionCutoffEventId: header.projectionCutoffEventId });
+    expect(result.failure).toMatchObject({ kind: "evidence-inconsistent" });
+    expect(result.request).toBeNull();
+  });
+
+  test.each(protocols)("$id nonalias provenance validation preserves bytes and historical dependencies", async protocol => {
+    const sent: Buffer[] = [];
+    const h = harness(protocol, async request => {
+      sent.push(Buffer.from(request.body));
+      return response(protocol, offered(protocol, request));
+    });
+    const first = h.runtime.prepare(h.spec([tool("fs.read")])); await drain(first.stream());
+    h.session.recordToolResult({ toolCallId: "call_0", outcome: "OK", exitCode: 0, timedOut: false, denied: false, content: "read" });
+    h.session.endStep({ stopReason: "tool_use", usage: null }); h.session.startStep();
+    const second = h.runtime.prepare(h.spec(null)), events = h.session.readEvents();
+    const header = parseRequestHeaderMeta(events.find(row => row.id === second.headerEventId)!.meta_json)!;
+    const result = resolveRequestSources({ workspace: h.workspace, events, model: header.model, params: header.params,
+      systemPromptEventId: header.systemPromptEventId, toolSchemaEventId: header.toolSchemaEventId,
+      toolSchemaSha256: header.toolSchemaSha256, projectionCutoffEventId: header.projectionCutoffEventId });
+    expect(result.failure).toBeNull();
+    expect(result.sourceEventIds).toEqual([header.systemPromptEventId,
+      ...events.filter(row => ["user/message", "tool/call", "tool/result"].includes(row.event_type)).map(row => row.id)]);
+    const history = result.request!.messages.flatMap(message => message.parts).find(part => part.kind === "tool_use");
+    expect(history).not.toHaveProperty("providerWireName");
+    const bytes = DEFAULT_REQUEST_ENCODERS.get(header.encoderId, header.encoderVersion)!.encode(result.request!);
+    expect(result.sourceEventIds).toEqual(header.sourceEventIds);
+    await drain(second.stream());
+    expect(sent[1]).toEqual(bytes);
   });
 
   test.each(protocols)("$id replays a removed historical tool but never reauthorizes its returned alias", async protocol => {

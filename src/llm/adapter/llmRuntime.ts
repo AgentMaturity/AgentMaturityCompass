@@ -49,7 +49,7 @@ import type { StreamChunk } from "../streamChunk.js";
 import { prepareRequest } from "../request/prepareRequest.js";
 import type { RequestEncoderRegistry } from "../request/requestEncoder.js";
 import type { ToolSchema } from "../request/requestSpec.js";
-import { LlmRouteError, type AdapterRegistry, type PinnedRoute } from "./adapterRegistry.js";
+import { LlmRouteError, type AdapterRegistry, type PinnedRoute, type VirtualRouteSelection } from "./adapterRegistry.js";
 import { classifyResponseFailure } from "./responseFailure.js";
 import { StreamRecorder } from "./streamRecorder.js";
 import type { SettledStream } from "./streamRecorder.js";
@@ -191,6 +191,11 @@ export class LlmRuntime {
     return this.init.registry.pin(input);
   }
 
+  /** Apply an existing router decision explicitly, before a signed request exists. */
+  pinVirtual(selection: VirtualRouteSelection): PinnedRoute {
+    return this.init.registry.pinVirtual(selection);
+  }
+
   /** Which providers this runtime can reach right now. */
   providers(): readonly string[] {
     return this.init.registry.list();
@@ -231,6 +236,9 @@ export class LlmRuntime {
     const toolNames = usesProviderToolNames(route.encoderId, route.encoderVersion)
       ? bindProviderToolNames(spec.tools ?? []) : null;
     const prepared = prepareRequest(this.init.session, {
+      modelMetadata: route.modelMetadata,
+      physicalRoute: route.physicalRoute,
+      routingDecision: route.routingDecision,
       model: spec.model,
       providerId: route.providerId,
       // The ENCODER comes from the pinned adapter, never from the caller: an

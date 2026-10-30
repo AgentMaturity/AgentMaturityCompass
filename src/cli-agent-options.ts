@@ -32,6 +32,7 @@ import {
   parseApprovalExceptionNote
 } from "./approvals/seam/devProfileException.js";
 import { loadActiveCompiledPolicy } from "./catalog/compiler/activate.js";
+import { DEFAULT_MAX_ACTIVE_CHILDREN } from "./agent/subagentSpawn.js";
 import { createScopedExceptionAnswerer } from "./governor/scopedExceptions.js";
 
 /** The side-effecting edges, injectable so the wiring itself is testable. */
@@ -55,6 +56,7 @@ export interface RunOptions {
   mcpConfigSha256?: string[];
   delegate?: boolean;
   maxDelegationDepth?: string;
+  maxActiveChildren?: string;
   delegateScope?: string;
   /** False is the explicit operator --no-delegate-stop reset, never a model argument. */
   delegateStop?: string[] | false;
@@ -241,9 +243,22 @@ export function integerOption(io: AgentLoopCliIo, flag: string, raw: string | un
   return value;
 }
 
-/** Automatic compaction from the run flags; undefined when off, null after a reported error. */
-export function compactionOption(io: AgentLoopCliIo, options: Pick<RunOptions, "contextWindow" | "compactThreshold" | "autoSummary">): CompactionConfig | undefined | null {
-  try { return compactionFromFlags(options); }
+/** Parse the root cap and refuse explicit configuration when no child capability is offered. */
+export function activeChildLimitOption(io: AgentLoopCliIo, raw: string | undefined, enabled: boolean): number | null {
+  if (raw !== undefined && raw.trim() === "") {
+    io.error(chalk.red("--max-active-children must be a non-negative integer")); io.fail(); return null;
+  }
+  const limit = integerOption(io, "--max-active-children", raw, DEFAULT_MAX_ACTIVE_CHILDREN);
+  if (limit !== null && raw !== undefined && !enabled) {
+    io.error(chalk.red("--max-active-children requires --delegate and --tools workspace, or an enabled signed preset.")); io.fail(); return null;
+  }
+  return limit;
+}
+
+/** Explicit compaction settings; undefined leaves reviewed route defaults to the driver, null reports an error. */
+export function compactionOption(io: AgentLoopCliIo, options: Pick<RunOptions, "contextWindow" | "compactThreshold" | "autoSummary">,
+  preset?: Partial<CompactionConfig>, route?: { readonly providerId: string; readonly model: string }): Partial<CompactionConfig> | undefined | null {
+  try { return compactionFromFlags(options, preset, route); }
   catch (error) {
     io.error(chalk.red(error instanceof Error ? error.message : "Automatic compaction options were refused."));
     io.fail();

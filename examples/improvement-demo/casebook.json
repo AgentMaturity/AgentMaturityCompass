@@ -1,0 +1,12 @@
+{
+  "demoOnly": true,
+  "casebookId": "demo-only-read-note-v1",
+  "cases": [
+    { "caseId": "demo-only-1", "filename": "note-1.txt", "content": "DEMO ONLY: amber\n" },
+    { "caseId": "demo-only-2", "filename": "note-2.txt", "content": "DEMO ONLY: birch\n" },
+    { "caseId": "demo-only-3", "filename": "note-3.txt", "content": "DEMO ONLY: coral\n" },
+    { "caseId": "demo-only-4", "filename": "note-4.txt", "content": "DEMO ONLY: dune\n" },
+    { "caseId": "demo-only-5", "filename": "note-5.txt", "content": "DEMO ONLY: elm\n" },
+    { "caseId": "demo-only-6", "filename": "note-6.txt", "content": "DEMO ONLY: fern\n" }
+  ]
+}

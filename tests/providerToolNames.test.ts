@@ -9,6 +9,16 @@ import { openaiChatEncoderV2 } from "../src/llm/request/openaiChatEncoderV2.js";
 import { openaiChatEncoderV3 } from "../src/llm/request/openaiChatEncoderV3.js";
 import { openaiResponsesEncoder } from "../src/llm/request/openaiResponsesEncoder.js";
 import { openaiResponsesEncoderV2 } from "../src/llm/request/openaiResponsesEncoderV2.js";
+import { geminiContentEncoder } from "../src/llm/request/geminiContentEncoder.js";
+import { geminiContentEncoderV2 } from "../src/llm/request/geminiContentEncoderV2.js";
+import { ollamaChatEncoder } from "../src/llm/request/ollamaChatEncoder.js";
+import { deepseekChatEncoder } from "../src/llm/request/deepseekChatEncoder.js";
+import { createPiAiEncoder } from "../src/llm/providers/piAi/piAiEncoder.js";
+import { wavBytes } from "./fixtures/nativeSignedAudio.js";
+import { ToolRegistry } from "../src/tools/toolRegistry.js";
+import { ToolPipeline } from "../src/tools/toolPipeline.js";
+import { pipelineToolSeam } from "../src/agent/pipelineToolSeam.js";
+import { loadPiAi } from "../src/llm/providers/piAi/piAiLoader.js";
 import { BUILT_IN_REQUEST_ENCODERS } from "../src/llm/request/builtInEncoders.js";
 
 const schema = (name: string): ToolSchema => ({ name, description: "read", parameters: { type: "object" } });
@@ -177,5 +187,108 @@ describe("historical bytes and exact new version recognition", () => {
       ["gemini-generate-content", 3], ["stub", 3], ["OPENAI-CHAT", 3]] as const) {
       expect(usesProviderToolNames(id, version)).toBe(false);
     }
+  });
+});
+
+
+describe("operator-declared provider aliases", () => {
+  const canonical = "mcp:reviewed:files/read", alias = "read_reviewed_file";
+  const aliased = () => ({ ...schema(canonical), modelAlias: alias });
+
+  test("pipeline schemas preserve canonical registry identity and the optional alias", () => {
+    const registry = new ToolRegistry();
+    registry.define({ name: canonical, modelAlias: alias, actionClass: "READ_ONLY", description: "Read", parameters: { type: "object" }, body: () => ({ ok: true, output: "read" }) });
+    const seam = pipelineToolSeam({ registry, pipeline: new ToolPipeline({ registry, workspace: "/tmp/amc-wp21b-alias" }), agentId: "default" });
+    expect(seam.schemas()).toEqual([{ name: canonical, modelAlias: alias, description: "Read", parameters: { type: "object" } }]);
+    expect(registry.visible("default").has(alias)).toBe(false);
+  });
+
+  test("only the declared alias grants reverse lookup to the exact canonical identity", () => {
+    const bindings = bindProviderToolNames([aliased()]);
+    expect([...bindings]).toEqual([[alias, canonical]]);
+    expect(bindings.has(providerToolWireName(canonical))).toBe(false);
+    expect(bindings.has(canonical)).toBe(false);
+  });
+
+  test.each(["", "bad.alias", "a".repeat(65), "amc_reserved", "read\n", 12, null])("invalid alias %j refuses", modelAlias => {
+    expect(() => bindProviderToolNames([{ ...schema(canonical), modelAlias } as ToolSchema])).toThrow(RequestEncodingError);
+  });
+
+  test.each([false, true])("canonical and alias collisions refuse independent of order (reverse=%s)", reverse => {
+    for (const tools of [
+      [aliased(), schema(alias)],
+      [aliased(), { ...schema(alias), modelAlias: "other_alias" }],
+      [aliased(), { ...schema("other"), modelAlias: alias }],
+      [{ ...schema("safe"), modelAlias: "safe" }],
+      [{ ...schema(canonical), modelAlias: providerToolWireName("fs.read") }, schema("fs.read")]
+    ]) expect(() => bindProviderToolNames(reverse ? tools.reverse() : tools)).toThrow(RequestEncodingError);
+  });
+
+  test.each([
+    { id: "openai-chat" as const, encoder: openaiChatEncoderV3, choice: { type: "function", function: { name: canonical } } },
+    { id: "openai-responses" as const, encoder: openaiResponsesEncoderV2, choice: { type: "function", name: canonical } },
+    { id: "anthropic-messages" as const, encoder: anthropicMessagesEncoderV3, choice: { type: "tool", name: canonical } },
+    { id: "deepseek-chat" as const, encoder: deepseekChatEncoder, choice: { type: "function", function: { name: canonical } } }
+  ])("$id uses the alias consistently in schema, history and tool_choice", ({ id, encoder, choice }) => {
+    const input: EncodableRequest = { ...request(), params: { ...(id === "openai-responses" ? { max_output_tokens: 64 } : { max_tokens: 64 }),
+      ...(id === "deepseek-chat" ? { thinking: { type: "disabled" } } : {}), tool_choice: choice }, tools: [aliased()], messages: [
+      { role: "user", parts: [{ kind: "text", text: "Read" }] },
+      { role: "assistant", parts: [{ kind: "tool_use", toolCallId: "alias_call", toolName: canonical, argumentsJson: "{}" }] },
+      { role: "tool", parts: [{ kind: "tool_result", toolCallId: "alias_call", isError: false, text: "read" }] }
+    ] };
+    const before = JSON.stringify(input), mapped = encodeProviderToolNames(input, id);
+    expect(mapped.tools![0]!.name).toBe(alias);
+    expect(mapped.messages[1]!.parts[0]).toMatchObject({ toolName: alias });
+    expect(JSON.stringify(mapped.params.tool_choice)).toContain(alias);
+    const bytes = encoder.encode(input).toString();
+    expect(bytes).toContain(alias); expect(bytes).not.toContain(canonical); expect(bytes).not.toContain("modelAlias");
+    expect(JSON.stringify(input)).toBe(before);
+  });
+
+  test("introducing an alias does not rewrite a proved original generated history name", () => {
+    const original = providerToolWireName(canonical);
+    const input: EncodableRequest = { ...request(), tools: [aliased()], messages: [{ role: "assistant", parts: [{
+      kind: "tool_use", toolCallId: "pre-alias-call", toolName: canonical, providerWireName: original, argumentsJson: "{}"
+    }] }] };
+    const mapped = encodeProviderToolNames(input, "openai-chat");
+    expect(mapped.tools![0]!.name).toBe(alias);
+    expect(mapped.messages[0]!.parts[0]).toMatchObject({ toolName: original });
+  });
+
+  test.each([geminiContentEncoder, geminiContentEncoderV2])("$id@$version declares aliases and maps allowedFunctionNames", encoder => {
+    const input: EncodableRequest = { ...request(), params: { generationConfig: { maxOutputTokens: 64 },
+      toolConfig: { functionCallingConfig: { mode: "ANY", allowedFunctionNames: [canonical] } } }, tools: [aliased()],
+      messages: [{ role: "user", parts: [{ kind: "text", text: "read" }] }] };
+    const before = JSON.stringify(input), body = JSON.parse(encoder.encode(input).toString());
+    expect(body.tools[0].functionDeclarations[0].name).toBe(alias);
+    expect(body.toolConfig.functionCallingConfig.allowedFunctionNames).toEqual([alias]);
+    expect(JSON.stringify(input)).toBe(before);
+  });
+
+  test("Gemini audio encoder applies aliases on its independent v2 path", () => {
+    const bytes = wavBytes();
+    const input: EncodableRequest = { ...request(), params: { generationConfig: { maxOutputTokens: 64 },
+      toolConfig: { functionCallingConfig: { mode: "ANY", allowedFunctionNames: [canonical] } } }, tools: [aliased()],
+      messages: [{ role: "user", parts: [{ kind: "audio", mediaType: "audio/wav", bytes,
+        sha256: createHash("sha256").update(bytes).digest("hex") }] }] };
+    const body = JSON.parse(geminiContentEncoderV2.encode(input).toString());
+    expect(body.tools[0].functionDeclarations[0].name).toBe(alias);
+    expect(body.toolConfig.functionCallingConfig.allowedFunctionNames).toEqual([alias]);
+    expect(body.contents[0].parts[0].inlineData.mimeType).toBe("audio/wav");
+  });
+
+  test("Ollama exposes the declared alias without leaking schema metadata", () => {
+    const body = JSON.parse(ollamaChatEncoder.encode({ ...request(), params: { max_tokens: 64 }, system: null, tools: [aliased()],
+      messages: [{ role: "user", parts: [{ kind: "text", text: "read" }] }] }).toString());
+    expect(body.tools[0].function.name).toBe(alias);
+    expect(JSON.stringify(body)).not.toContain("modelAlias");
+  });
+
+  test("pi-ai uses the shared alias projection", async () => {
+    const encoder = createPiAiEncoder(await loadPiAi(), "groq");
+    const body = JSON.parse(encoder.encode({ ...request(), model: "llama-3.3-70b-versatile", params: { max_tokens: 64 }, tools: [aliased()],
+      messages: [{ role: "user", parts: [{ kind: "text", text: "read" }] }] }).toString());
+    expect(body.tools[0].function.name).toBe(alias);
+    expect(JSON.stringify(body)).not.toContain("modelAlias");
   });
 });

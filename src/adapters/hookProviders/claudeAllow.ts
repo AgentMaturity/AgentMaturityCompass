@@ -70,7 +70,7 @@ export function claudeAllow(input: { workspace: string; agentId: string; payload
   try {
     if (hookAuditLatchState(input.workspace).latched) return null;
     if (!verifyProviderHookControlResult({ workspace: input.workspace, authenticatedAgentId: input.agentId, provider: "claude-code",
-      rawInput: input.envelope, result: input.result }).ok) return null;
+      rawInput: input.envelope, result: input.result, blobKeyOptional: true }).ok) return null;
     const actionId = claudeActionId(input.sessionId, input.toolUseId);
     const payloadSha256 = sha256(input.payloadBytes);
     const row = allowRowSchema.safeParse(decisionRow(input.workspace, deterministicEventId(input.agentId, "claude-code", actionId)));

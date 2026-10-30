@@ -5,6 +5,7 @@
  * `claude` behaves as Claude Code does for one Bash call: it runs the installed SessionStart and PreToolUse hooks and
  * runs the command only if the PreToolUse hook lets it.
  */
+import { randomUUID } from "node:crypto";
 import { chmodSync, existsSync, mkdirSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterAll, afterEach, beforeAll, describe, expect, test } from "vitest";
@@ -39,21 +40,30 @@ afterAll(async () => {
   removeFixtureWorkspaces();
 });
 
-/** A stand-in `claude` (run by this Node, the binary the installation bound) that makes one Bash call under the installed hooks. */
-function fakeClaude(dir: string): { readonly sawFile: string } {
+/**
+ * A stand-in `claude` (run by this Node, the binary the installation bound) that makes one tool call under the installed
+ * hooks (SessionStart, UserPromptSubmit, then PreToolUse): the recorded Bash call, or a Read of `readPath` (its own tool_use_id). It records its working directory,
+ * arguments and environment, and runs the call only if the PreToolUse hook lets it.
+ */
+function fakeClaude(dir: string, readPath?: string): { readonly sawFile: string } {
   const bin = join(dir, ".fake-bin");
   mkdirSync(bin, { recursive: true });
   const configDir = join(dir, ".fixture-home", ".claude");
   mkdirSync(configDir, { recursive: true });
   const payloads = join(bin, "payloads.json");
-  writeFileSync(payloads, JSON.stringify({ configDir, sessionStart: recorded("SessionStart-startup", dir), preToolUse: recorded("PreToolUse-bash", dir) }));
+  // Each run is a new turn of the session: its own prompt_id.
+  const turn = { prompt_id: randomUUID() };
+  const preToolUse = readPath === undefined ? { ...recorded("PreToolUse-bash", dir), ...turn }
+    : { ...recorded("PreToolUse-read", dir), ...turn, tool_input: { file_path: readPath }, tool_use_id: `toolu_01AmcScriptedRead${Date.now()}` };
+  writeFileSync(payloads, JSON.stringify({ configDir, sessionStart: recorded("SessionStart-startup", dir),
+    prompt: { ...recorded("UserPromptSubmit-prompt", dir), ...turn }, preToolUse }));
   const sawFile = join(bin, "saw.txt");
   const script = join(bin, "claude");
   writeFileSync(script, `#!${process.execPath}
 const fs = require("node:fs"), path = require("node:path"), cp = require("node:child_process");
 if (process.argv[2] === "--version") { console.log("2.1.296 (Claude Code)"); process.exit(0); }
 const ws = process.cwd();
-fs.writeFileSync(${JSON.stringify(sawFile)}, JSON.stringify({ cwd: ws, argv: process.argv.slice(2) }));
+fs.writeFileSync(${JSON.stringify(sawFile)}, JSON.stringify({ cwd: ws, argv: process.argv.slice(2), env: process.env }));
 const settings = JSON.parse(fs.readFileSync(path.join(ws, ".claude", "settings.local.json"), "utf8"));
 const fixtures = JSON.parse(fs.readFileSync(${JSON.stringify(payloads)}, "utf8"));
 const env = { ...process.env, CLAUDE_PID: String(process.pid), CLAUDE_CONFIG_DIR: fixtures.configDir, CLAUDE_PROJECT_DIR: ws };
@@ -62,12 +72,17 @@ const run = (event, payload) => {
   return cp.spawnSync(handler.command, handler.args, { input: JSON.stringify(payload), env, cwd: ws, encoding: "utf8" });
 };
 run("SessionStart", fixtures.sessionStart);
+const prompt = run("UserPromptSubmit", fixtures.prompt);
+if (prompt.status !== 0) {
+  console.log("PROMPT BLOCKED " + (prompt.stdout + prompt.stderr).replace(/\\s+/g, " ").trim());
+  process.exit(0);
+}
 const pre = run("PreToolUse", fixtures.preToolUse);
 if (pre.status === 2 || /"permissionDecision"\\s*:\\s*"deny"/.test(pre.stdout)) {
   console.log("BLOCKED " + (pre.stdout + pre.stderr).replace(/\\s+/g, " ").trim());
 } else {
-  cp.execSync(fixtures.preToolUse.tool_input.command, { cwd: ws });
-  console.log("RAN");
+  const input = fixtures.preToolUse.tool_input;
+  console.log("RAN " + (input.file_path ? fs.readFileSync(input.file_path, "utf8") : cp.execSync(input.command, { cwd: ws, encoding: "utf8" })).trim());
 }
 `);
   chmodSync(script, 0o755);
@@ -105,6 +120,8 @@ describe("a delegated Claude Code child under AMC's hook control", () => {
     const result = await runner(workspace)(ctx());
     expect(result.ok, result.ok ? "" : result.reason).toBe(true);
     expect(result.ok && result.text).toMatch(/^BLOCKED /);
+    // AMC's verified deny, not the fail-closed deny of a forwarder that could not verify the Bridge's answer (WP35c).
+    expect(result.ok && result.text).toMatch(/AMC policy denied the action: AMC allows a Claude Code Bash command only in its pure form/);
     expect(existsSync(join(workspace, "out.txt")), "the command never ran").toBe(false);
     expect(JSON.parse(readFileSync(sawFile, "utf8")).cwd, "started in the workspace, where the hook is installed").toBe(realpathSync(workspace));
     const ledger = openLedger(workspace);
@@ -115,6 +132,20 @@ describe("a delegated Claude Code child under AMC's hook control", () => {
     } finally {
       ledger.close();
     }
+  }, 120_000);
+
+  test("its allowed call runs, verified without the vault passphrase, which never reaches the child", async () => {
+    // WP35c: the forwarder in the child checks the Bridge's signed decision with public keys only; the parent holds the vault.
+    expect(process.env.AMC_VAULT_PASSPHRASE, "the parent holds the vault passphrase").toBeTruthy();
+    const { sawFile } = fakeClaude(workspace, join(realpathSync(workspace), "workspace", "public.txt"));
+    const result = await runner(workspace)(ctx());
+    expect(result.ok, result.ok ? "" : result.reason).toBe(true);
+    expect(result.ok && result.text.trim(), "the allowed call ran").toBe("RAN public fixture");
+    const childEnv = (JSON.parse(readFileSync(sawFile, "utf8")) as { env: Record<string, string> }).env;
+    for (const secret of ["AMC_VAULT_PASSPHRASE", "AMC_VAULT_PASSPHRASE_FILE", "AMC_CREDENTIALS_FILE"]) {
+      expect(childEnv[secret], `${secret} is not in the child's environment`).toBeUndefined();
+    }
+    expect(Object.values(childEnv), "the passphrase is under no other name").not.toContain(process.env.AMC_VAULT_PASSPHRASE);
   }, 120_000);
 
   test("without an installed control hook, the child is not spawned", async () => {

@@ -4031,33 +4031,33 @@ configCmd
 configCmd
   .command("validate")
   .description("Validate amcconfig.yaml without running anything")
-  .option("--config <path>", "config file path")
-  .action(async (opts: { config?: string }) => {
+  .option("--config <path>", "explicit config overlay path (highest file precedence)")
+  .option("--user-config [path]", "opt in to a user config overlay (default path ~/.amc/amcconfig.yaml)").option("--no-user-config", "no user config overlay (the default; kept as an alias)")
+  .option("--json", "emit resolved declarative config and provenance as JSON", false).option("--schema [name]", "dump boot-free JSON Schema (declarative|agent) without loading config")
+  .action(async (opts: { config?: string; userConfig?: string | boolean; json: boolean; schema?: string | boolean }) => {
     try {
       const { configValidate } = await import("./config/amcConfigCli.js");
-      configValidate({ workspace: process.cwd(), config: opts.config });
+      configValidate({ workspace: process.cwd(), ...opts });
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
 
 configCmd
   .command("run")
   .description("Run the evaluation pipeline declared in amcconfig.yaml")
-  .option("--config <path>", "config file path")
+  .option("--config <path>", "explicit config overlay path (highest file precedence)")
+  .option("--user-config [path]", "opt in to a user config overlay (default path ~/.amc/amcconfig.yaml)").option("--no-user-config", "no user config overlay (the default; kept as an alias)")
   .option("--window <window>", "evidence window override")
   .option("--format <format>", "json|html|terminal|markdown")
   .option("--output <path>", "report output path")
   .option("--dry-run", "resolve and report without executing", false)
   .option("--verbose", "print the resolved configuration", false)
   .option("--json", "emit the machine-readable result", false)
-  .action(async (opts: {
-    config?: string; window?: string; format?: string; output?: string;
-    dryRun: boolean; verbose: boolean; json: boolean;
-  }) => {
+  .action(async (opts: { config?: string; userConfig?: string | boolean; window?: string; format?: string; output?: string; dryRun: boolean; verbose: boolean; json: boolean }) => {
     try {
       const { runFromConfig } = await import("./config/amcConfigRunner.js");
       const result = await runFromConfig({
         workspace: process.cwd(),
-        configPath: opts.config,
+        configPath: opts.config, userConfig: opts.userConfig,
         window: opts.window,
         format: opts.format as "json" | "html" | "terminal" | "markdown" | undefined,
         outputPath: opts.output,
@@ -15788,64 +15788,16 @@ program
   .requiredOption("--name <name>", "experiment name")
   .requiredOption("--model <modelId>", "model ID (must be same for both)")
   .requiredOption("--baseline-file <path>", "path to baseline architecture artifact")
-  .requiredOption("--candidate-file <path>", "path to candidate architecture artifact")
+  .requiredOption("--candidate-file <path>", "path to candidate architecture artifact (signed, for --execute-trials)")
   .option("--baseline-kind <kind>", "architecture kind", "POLICY_FRAME")
   .option("--candidate-kind <kind>", "architecture kind", "POLICY_FRAME")
-  .action(async (opts: {
-    name: string;
-    model: string;
-    baselineFile: string;
-    candidateFile: string;
-    baselineKind: string;
-    candidateKind: string;
-  }) => {
-    const { quickArchitectureComparison, simulateProbeOutcomes } = await import(
-      "./experiments/architectureExperiment.js"
-    );
-    // Architecture comparison needs a probe runner that invokes the real model.
-    // Until one is wired, refuse rather than reporting LCG-generated scores as
-    // a measured comparison.
-    if (!process.env.AMC_ARCHITECTURE_ALLOW_SIMULATED) {
-      console.error(
-        chalk.yellow("Architecture comparison INCONCLUSIVE — no real probe runner is configured.")
-      );
-      console.error(
-        chalk.gray(
-          "This command previously reported deterministic pseudo-random scores, tokens and latencies as a measured comparison."
-        )
-      );
-      console.error(
-        chalk.cyan(
-          "Set AMC_ARCHITECTURE_ALLOW_SIMULATED=1 to run it explicitly as a simulation for pipeline testing."
-        )
-      );
-      process.exitCode = 3;
-      return;
-    }
-    const fs = await import("node:fs");
-    let baselineContent = "{}";
-    let candidateContent = "{}";
-    try { baselineContent = fs.readFileSync(opts.baselineFile, "utf-8"); } catch { /* use default */ }
-    try { candidateContent = fs.readFileSync(opts.candidateFile, "utf-8"); } catch { /* use default */ }
-    const validKinds = ["POLICY_FRAME", "PROMPT_STRUCTURE", "IDENTITY_DOC", "GUARDRAIL_SET", "TOOL_PERMISSION_SET", "CUSTOM"] as const;
-    const baselineKind = (validKinds as readonly string[]).includes(opts.baselineKind) ? opts.baselineKind as typeof validKinds[number] : "POLICY_FRAME";
-    const candidateKind = (validKinds as readonly string[]).includes(opts.candidateKind) ? opts.candidateKind as typeof validKinds[number] : "POLICY_FRAME";
-    const { markdown } = quickArchitectureComparison({
-      name: opts.name,
-      modelId: opts.model,
-      baselineName: `Baseline (${opts.baselineFile})`,
-      baselineKind,
-      baselineContent,
-      baselineDescription: `Loaded from ${opts.baselineFile}`,
-      candidateName: `Candidate (${opts.candidateFile})`,
-      candidateKind,
-      candidateContent,
-      probeRunner: simulateProbeOutcomes,
-      candidateDescription: `Loaded from ${opts.candidateFile}`,
-    });
-    console.log(markdown);
-    console.log(chalk.yellow("Architecture comparison INCONCLUSIVE: simulated outcomes are not measured task results."));
-    process.exitCode = 3;
+  .option("--execute-trials", "execute both artifacts on the model over the casebook's held-out cases (measured, bound report)")
+  .option("--casebook <id>", "signed casebook for --execute-trials").option("--provider <id>", "trial provider for --execute-trials")
+  .option("--mode <mode>", "supervise|sandbox for --execute-trials", "supervise").option("--max-steps <n>", "steps per trial", Number)
+  .option("--agent <agentId>", "agent ID (overrides global --agent)")
+  .action(async (opts: import("./experiments/architectureCli.js").ArchitectureCommandOptions) => {
+    const { architectureCommandCli } = await import("./experiments/architectureCli.js");
+    await architectureCommandCli({ ...opts, workspace: process.cwd(), agentId: opts.agent ?? activeAgent(program) }, normalizeCliErrorMessage);
   });
 
 program

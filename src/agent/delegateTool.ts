@@ -47,6 +47,8 @@ export interface SubagentCapability {
   /** Where the delegation rows are written: the CALLER's session. */
   readonly session: DelegationRecorder;
   readonly maxDepth?: number;
+  /** Operator-selected root-wide child cap; never read from model arguments. */
+  readonly maxActiveChildren?: number;
   /**
    * The action classes a delegate may invoke. Set by whoever composes the
    * toolset, never by the model.
@@ -122,6 +124,7 @@ function readArgs(raw: unknown): { ok: true; args: DelegateArgs } | { ok: false;
  */
 export function delegateTool(capability: SubagentCapability): ToolDefinition {
   const maxDepth = capability.maxDepth ?? DEFAULT_MAX_DELEGATION_DEPTH;
+  const maxActiveChildren = capability.maxActiveChildren;
   const mintSessionId = capability.mintSessionId ?? (() => `child-${randomUUID().slice(0, 12)}`);
   const stopConditions = capability.stopConditions === undefined
     ? undefined : Object.freeze([...capability.stopConditions]);
@@ -157,6 +160,7 @@ export function delegateTool(capability: SubagentCapability): ToolDefinition {
         mintSessionId,
         ...(capability.parentLeaseToken === undefined ? {} : { parentLeaseToken: capability.parentLeaseToken }),
         maxDepth,
+        ...(maxActiveChildren === undefined ? {} : { maxActiveChildren }),
         ...(execution.signal === undefined ? {} : { signal: execution.signal })
       });
 

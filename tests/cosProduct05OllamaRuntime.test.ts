@@ -109,6 +109,20 @@ function assertCold(h: ReturnType<typeof harness>, prepared: readonly PreparedCa
 }
 
 describe("P05 Ollama signed lifecycle (unexecuted)", () => {
+  test("operator alias keeps canonical dispatch and original replay after revocation", async () => {
+    const canonical = "mcp:reviewed:files/read", alias = "read_reviewed";
+    const h = harness([response([nativeCall(alias, 0)]), response()]);
+    const first = h.runtime.prepare(h.spec([{ ...schema(canonical), modelAlias: alias }]));
+    const returned = calls(await drain(first.stream()));
+    expect(returned).toMatchObject([{ name: canonical, providerWireName: alias }]);
+    expect(JSON.parse(h.sent[0]!.body.toString()).tools[0].function.name).toBe(alias);
+    result(h.writer, returned[0]!); h.finishStep(first); h.writer.startStep();
+    const second = h.runtime.prepare(h.spec(null)); await drain(second.stream()); h.finishStep(second);
+    const replay = JSON.parse(h.sent[1]!.body.toString());
+    expect(replay.messages.find((message: { tool_calls?: unknown }) => message.tool_calls).tool_calls[0].function.name).toBe(alias);
+    expect(replay.messages.find((message: { role: string }) => message.role === "tool").tool_name).toBe(alias);
+    h.close(); assertCold(h, [first, second]);
+  });
   test.each(["sqlite", "jsonl"])("%s ordered originals -> native calls -> keyed failure -> tools-free reasoning -> exact cold requests", async backend => {
     const alias = providerToolWireName("fs.read");
     const h = harness([response([nativeCall(alias, 0), nativeCall("fs_read", 1, "upstream-second")]), response(), response()], backend, true);

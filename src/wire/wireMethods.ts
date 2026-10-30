@@ -1,7 +1,7 @@
 import type { LeaseScope } from "../leases/leaseSchema.js";
 import type { Ledger } from "../ledger/ledger.js";
 import { decodeParams } from "./wireCodecs.js";
-import { acceptWork, describeAcceptedWork } from "./workAcceptance.js";
+import { acceptWork, describeAcceptedWork, type AcceptedWork, type WorkAuthority } from "./workAcceptance.js";
 import { WIRE_ERROR, type WireErrorCode } from "./wireRpc.js";
 
 /**
@@ -21,10 +21,9 @@ import { WIRE_ERROR, type WireErrorCode } from "./wireRpc.js";
  * Studio's /cli/exec came to let an agent token start another agent. The
  * safeguard is that such a method does not exist here, not that it is guarded.
  *
- * Both methods below terminate at the acceptance layer. Accepting work and
- * reporting on it are complete, checkable acts that need no detached execution,
- * which `runComposedTurn` cannot currently offer anyway: it opens and closes a
- * session per call.
+ * Both methods terminate at acceptance. An explicitly configured owner consumer
+ * may observe the committed acceptance; the lease peer cannot configure execution.
+ * Submission authority is recorded as a lease ID and token digest, never a bearer token.
  */
 
 export interface WireMethodContext {
@@ -39,6 +38,8 @@ export interface WireMethodContext {
    */
   readonly agentId: string;
   readonly monitorPublicKeys: readonly string[];
+  readonly authority?: WorkAuthority;
+  readonly onAccepted?: (accepted: AcceptedWork) => void;
 }
 
 export type WireMethodResult =
@@ -83,6 +84,7 @@ export const WIRE_METHODS: readonly WireMethod[] = [
       const accepted = acceptWork({
         ledger: ctx.ledger,
         intakeSessionId: ctx.intakeSessionId,
+        ...(ctx.authority === undefined ? {} : { authority: ctx.authority }),
         request: {
           prompt: decoded.value.prompt,
           agentId: ctx.agentId,
@@ -90,6 +92,7 @@ export const WIRE_METHODS: readonly WireMethod[] = [
           model: decoded.value.model ?? null
         }
       });
+      ctx.onAccepted?.(accepted);
       return {
         ok: true,
         result: {

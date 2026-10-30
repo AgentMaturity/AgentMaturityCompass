@@ -19,7 +19,7 @@ function string(value: unknown, label: string, nonempty = false): string {
 }
 const PART_KEYS: Readonly<Record<EncodablePart["kind"], readonly string[]>> = {
   text: ["kind", "text"], thinking: ["kind", "text"],
-  tool_use: ["kind", "toolCallId", "toolName", "argumentsJson"],
+  tool_use: ["kind", "toolCallId", "toolName", "providerWireName", "argumentsJson"],
   tool_result: ["kind", "toolCallId", "isError", "text"], image: ["kind", "sha256"], audio: ["kind"]
 };
 
@@ -50,7 +50,7 @@ function validateRequest(request: EncodableRequest): void {
     }
     for (const tool of request.tools) {
       if (!deepseekObject(tool)) fail("invalid function schema");
-      assertDeepseekKeys(tool, ["name", "description", "parameters"], "tool");
+      assertDeepseekKeys(tool, ["name", "description", "parameters", "modelAlias"], "tool");
       string(tool.name, "tool name", true); string(tool.description, "tool description");
       if (!deepseekObject(tool.parameters)) fail("function parameters require a JSON Schema object");
     }

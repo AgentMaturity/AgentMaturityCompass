@@ -336,7 +336,8 @@ export async function handleCryptoRoute(
       const { getPublicKeyHistory } = await import('../crypto/keys.js');
       let publicKeys: string[] = [];
       try {
-        publicKeys = getPublicKeyHistory(workspace, 'monitor');
+        const { getPurposeKeyHistory } = await import('../keys/signingKeys.js');
+        publicKeys = [...getPurposeKeyHistory(workspace, 'receipt'), ...getPublicKeyHistory(workspace, 'monitor')];
       } catch { /* no keys available */ }
       const result = verifyDelegationChain(receiptId, publicKeys, workspace);
       apiSuccess(res, result);
