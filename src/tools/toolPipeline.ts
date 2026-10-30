@@ -9,6 +9,7 @@ import {
 } from "../actions/authorize.js";
 import { ActionBlocked, blockReason, type BlockCode, type EffectState, type ReceiptState } from "../actions/receiptStates.js";
 import { ACTION_CLASSES } from "../governor/actionCatalog.js";
+import type { ActionClass } from "../types.js";
 import { lifecycleAdmission } from "../lifecycle/reassessment.js";
 import { withWorkspaceScope } from "../enforce/evidenceEmitter.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -16,6 +17,7 @@ import { canonicalize } from "../utils/json.js";
 import { digestField, type OutputDigest } from "../dataflow/tokenizer.js";
 import { outputDigestFor } from "../dataflow/tokenVault.js";
 import { argumentSchemaError, freezeToolArguments } from "./toolArguments.js";
+import { denialOutcome, effectGuardDenial, effectVerdict, notDispatched, thrownOutcome } from "./toolOutcomes.js";
 import type { ToolRegistry } from "./toolRegistry.js";
 import {
   DefiniteFailureError,
@@ -143,6 +145,8 @@ export interface ToolPipelineInit {
    * the authorized classes are journaled. A journal that cannot be read or opened denies the call `journal_unavailable`.
    */
   readonly journal?: () => ActionJournal;
+  /** The mode a call enters with (AXR-02: the signed Action Policy's downgrade). It can only turn EXECUTE into SIMULATE. */
+  readonly narrowMode?: (call: { readonly name: string; readonly agentId: string; readonly actionClass: ActionClass; readonly requestedMode: ToolMode }) => ToolMode;
 }
 
 export interface ToolCallInput {
@@ -175,27 +179,6 @@ interface CallAuthorization {
 
 /** How often a running journaled body refreshes its heartbeat, for recovery on another host. */
 const HEARTBEAT_MS = 10_000;
-/** Undeclared effects of these classes are `outcome_unknown`: the effect is too costly to assume either way. */
-const EFFECT_MUST_BE_DECLARED: ReadonlySet<string> = new Set(["FINANCIAL", "DATA_EXPORT", "IDENTITY"]);
-
-type EffectVerdict =
-  | { readonly state: "completed"; readonly effect: EffectState | null; readonly reasonCode: string }
-  | { readonly state: "outcome_unknown"; readonly reasonCode: string };
-
-/** Effect classification (P1-03) for a body that returned, or one that threw. */
-function effectVerdict(actionClass: string, settled: { readonly result: ToolBodyResult } | { readonly error: unknown }): EffectVerdict {
-  if ("error" in settled) {
-    return settled.error instanceof DefiniteFailureError ? { state: "completed", effect: "not_applied", reasonCode: "definite_failure" }
-      : { state: "outcome_unknown", reasonCode: "body_threw_ambiguous" };
-  }
-  const effect: unknown = settled.result.effect;
-  if (effect === "applied" || effect === "not_applied") return { state: "completed", effect, reasonCode: `effect_declared:${effect}` };
-  if (effect === "unknown") return { state: "outcome_unknown", reasonCode: "effect_declared_unknown" };
-  // A declaration nobody defined is not a declaration: fail toward unknown, never toward "applied".
-  if (effect !== undefined) return { state: "outcome_unknown", reasonCode: "effect_declaration_invalid" };
-  return EFFECT_MUST_BE_DECLARED.has(actionClass) ? { state: "outcome_unknown", reasonCode: "effect_not_declared" }
-    : { state: "completed", effect: null, reasonCode: "completed" };
-}
 
 /**
  * What a receipt binds about an outcome: its facts and the output's digest, never the output. The digest's form is part
@@ -223,17 +206,6 @@ function boundExecution(draft: ToolExecution, bound: Extract<BindResult, { ok: t
     ...(carrier?.carrier === "argument" ? { arguments: freezeToolArguments({ ...draft.arguments, [carrier.name]: key }) } : {}) };
 }
 
-function thrownOutcome(error: unknown): ToolOutcome {
-  // A thrown tool is a failed call, not a denied one. Reporting it as a
-  // denial would credit policy with stopping something policy allowed.
-  return { ok: false, exitCode: null, timedOut: false, denied: null, output: error instanceof Error ? error.message : String(error), bytes: 0 };
-}
-
-/** A call cancelled before its body ran: not a denial (policy did not refuse it) and not a body failure. */
-function notDispatched(): ToolOutcome {
-  const output = "[amc] not dispatched: the call was cancelled before its body ran";
-  return { ok: false, exitCode: null, timedOut: false, denied: null, output, bytes: Buffer.byteLength(output, "utf8") };
-}
 
 /** Bracket an approval wait for the caller's clock. The bracket closes however the wait ends. */
 async function waitingOnApproval<T>(execution: ToolExecution, wait: () => Promise<T>): Promise<T> {
@@ -245,29 +217,7 @@ async function waitingOnApproval<T>(execution: ToolExecution, wait: () => Promis
   }
 }
 
-function denialOutcome(denied: ToolDenial): ToolOutcome {
-  return {
-    ok: false,
-    // Not an exit code. A call that never ran has no exit status, and using a
-    // sentinel here would make "denied" indistinguishable from "the tool
-    // exited 126" in six-month-old evidence.
-    exitCode: null,
-    timedOut: false,
-    denied,
-    output: "",
-    bytes: 0
-  };
-}
 
-/** A missing guard keeps existing behavior; malformed or throwing guards never grant an effect. */
-function effectGuardDenial(beforeEffect: ToolCallInput["beforeEffect"]): ToolDenial | null {
-  if (beforeEffect === undefined) return null;
-  let reason: unknown;
-  try { reason = beforeEffect(); }
-  catch { reason = "Trusted effect guard could not be verified."; }
-  return reason === null ? null : { stage: "guard", guardLabel: "trusted-before-effect",
-    reason: typeof reason === "string" ? reason : "Trusted effect guard returned no valid decision." };
-}
 // The selected body must remain distinguishable from a later scoped override
 // while approval is awaited. Callers cannot assign this binding through argv.
 const selectedDefinitions = new WeakMap<ToolExecution, ToolDefinition>();
@@ -301,7 +251,12 @@ export class ToolPipeline {
     const definition = this.init.registry.visible(input.agentId).get(input.name);
     if (!definition || !this.authorizes(definition.actionClass)) return null;
     return authorizationIntentFor({ workspace: this.init.workspace, name: definition.name, actionClass: definition.actionClass,
-      effectiveMode: input.requestedMode, arguments: input.arguments }, this.init.authorizationContext?.());
+      effectiveMode: this.entryMode(definition.name, definition.actionClass, input), arguments: input.arguments }, this.init.authorizationContext?.());
+  }
+
+  private entryMode(name: string, actionClass: ActionClass, input: Pick<ToolCallInput, "agentId" | "requestedMode">): ToolMode {
+    return input.requestedMode === "EXECUTE" && this.init.narrowMode?.({ name, agentId: input.agentId, actionClass, requestedMode: "EXECUTE" }) === "SIMULATE"
+      ? "SIMULATE" : input.requestedMode;
   }
 
   private authorizes(actionClass: string): boolean {
@@ -345,7 +300,7 @@ export class ToolPipeline {
         workspace: this.init.workspace,
         actionClass: definition.actionClass,
         requestedMode: input.requestedMode,
-        effectiveMode: input.requestedMode,
+        effectiveMode: this.entryMode(definition.name, definition.actionClass, input),
         arguments: freezeToolArguments(input.arguments),
         parentToken: input.parentToken ?? null,
         ...(input.signal === undefined ? {} : { signal: input.signal }),

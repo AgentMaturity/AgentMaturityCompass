@@ -26,6 +26,7 @@ import { claudeEnvelope } from "../src/adapters/hookProviders/claudeCodePayloads
 import { handleHookControlRequest } from "../src/bridge/hookControlRoute.js";
 import { getPurposeKeyHistory } from "../src/keys/signingKeys.js";
 import { boundClaudeCode } from "./helpers/claudeCodeHookFixtures.js";
+import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
 
 const roots: string[] = [];
 
@@ -34,6 +35,7 @@ function newWorkspace(): string {
   roots.push(workspace);
   process.env.AMC_VAULT_PASSPHRASE = "hook-control-test-passphrase";
   initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
+  writeRuntimeFirewallPolicy({ workspace: workspace, mode: "observe" }); // AXR-01: ToolHub and hook control apply the runtime firewall as the native pipeline does; unsigned, it blocks every call.
   initApprovalPolicy(workspace);
   return workspace;
 }

@@ -27,8 +27,9 @@ const receiptFields = {
 /** v2 = automatic: the measurement that fired it and, for a summary, the signed request that wrote it. */
 const automaticFields = {
   trigger: z.object({ kind: z.literal("automatic"), promptTokens: count, contextWindowTokens: z.number().int().positive().safe(),
-    threshold: z.number().min(0.5).max(0.95), ratio: z.number().nonnegative(), measuredAtEventId: z.string().min(1),
-    formula: z.literal(PROMPT_TOKENS_FORMULA) }).strict(),
+    reserveTokens: count.optional(), threshold: z.number().min(0.5).max(0.95), ratio: z.number().nonnegative(), measuredAtEventId: z.string().min(1),
+    formula: z.literal(PROMPT_TOKENS_FORMULA) }).strict()
+    .refine(trigger => trigger.reserveTokens === undefined || trigger.reserveTokens < trigger.contextWindowTokens),
   summarizer: z.object({ requestHeaderEventId: z.string().min(1), promptVersion: z.number().int().positive().safe(),
     model: z.string().min(1), claimKind: z.literal(SUMMARY_CLAIM_KIND), role: z.enum(["user", "assistant"]) }).strict().optional()
 };
@@ -121,7 +122,9 @@ export function assertAutomaticProvenance(receipt: SurfaceCompactionReceipt, pri
   const usage = meta && (meta.usageVersion === undefined || meta.usageVersion === 2)
     ? usageSchema.safeParse(meta.usage) : null;
   if (!usage?.success || promptTokensFor(usage.data) !== trigger.promptTokens
-    || trigger.ratio !== trigger.promptTokens / trigger.contextWindowTokens || trigger.ratio < trigger.threshold) {
+    || trigger.ratio !== trigger.promptTokens / trigger.contextWindowTokens
+    || (trigger.reserveTokens === undefined ? trigger.ratio < trigger.threshold
+      : trigger.promptTokens < trigger.contextWindowTokens - trigger.reserveTokens)) {
     throw new Error("automatic compaction trigger disagrees with the signed step usage it cites");
   }
   if (summarizer === undefined) return;

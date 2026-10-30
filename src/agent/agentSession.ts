@@ -98,7 +98,7 @@ export interface AgentSessionInit {
   readonly askUser?: AgentToolsetOptions["askUser"];
   readonly webSearchProvider?: AgentToolsetOptions["webSearchProvider"];
   readonly maxSteps?: number;
-  /** Automatic compaction; off unless `contextWindowTokens` is declared. */
+  /** Automatic compaction defaults to reviewed route metadata; an explicit null window disables it. */
   readonly compaction?: Partial<CompactionConfig>;
   readonly validation?: NativeValidationPlan;
   /** Bind approvals/extensions to the real owning session and its existing pipeline. */
@@ -166,7 +166,8 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
     if (init.tools !== undefined && init.tools !== "none" && init.tools !== "workspace") throw new Error("Unknown native tool mode.");
     if (init.expectedToolsDigest !== undefined && (init.tools !== "workspace" || !/^[a-f0-9]{64}$/.test(init.expectedToolsDigest))) throw new Error("A native tool policy pin requires explicit workspace tools and a SHA-256 digest.");
     if (init.maxSteps !== undefined && (!Number.isSafeInteger(init.maxSteps) || init.maxSteps < 1 || init.maxSteps > 1024)) throw new Error("Native maxSteps must be an integer from 1 through 1024.");
-    const compaction = init.compaction === undefined ? undefined : resolveCompactionConfig(init.compaction);
+    if (init.compaction !== undefined) resolveCompactionConfig(init.compaction);
+    const compaction = init.compaction;
     refuseRetired(workspace, init.agentId); // P2-23: a retired agent opens no session
     // P1-79: the caller's lease, or the run's (LeasePrincipalRefused before any session row or recovery).
     const lease = runLease({ workspace, agentId: init.agentId, model: init.route.model || init.route.providerId, tools: init.tools ?? "workspace",

@@ -15,6 +15,7 @@
  * convention — the exact trade this codebase keeps refusing.
  */
 import type { ModelMetadataSnapshot } from "../llm/modelCatalog.js";
+import type { PhysicalRouteIdentity, VirtualRoutingDecision } from "../llm/request/routeIdentity.js";
 import type { RuntimeName } from "../types.js";
 import type { RecordedGeminiPart } from "./geminiPartMeta.js";
 import type { WriterTakeover } from "./sessionOwnership.js";
@@ -137,6 +138,8 @@ export interface StepEndParams {
 }
 
 export interface RequestHeaderParams {
+  readonly physicalRoute?: PhysicalRouteIdentity;
+  readonly routingDecision?: VirtualRoutingDecision | null;
   /** Omit to capture the reviewed catalog; null explicitly selects no catalog. */
   readonly modelMetadata?: ModelMetadataSnapshot | null;
   readonly model: string;

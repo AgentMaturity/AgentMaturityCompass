@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "demoOnly": true,
+  "maturityEvidence": false,
+  "label": "DEMO ONLY - synthetic fixture; never maturity evidence",
+  "experimentId": "exp_demo_only_read_note_v1",
+  "files": {
+    "baseline.json": "504aadb5cb1f22e470fd20f5edc84d2576786630b069e247ba4a55a4867b8912",
+    "candidate.json": "2322dbe8c04aeab160be8d4804550c4ac5c4b712ebcf5b2f6e8f8c135fa7d6dc",
+    "casebook.json": "7f50e2cdc080786afd4ff28c74634852e6ec06b5e7b1a84b31648552f3dfb9a7",
+    "oracle.mjs": "f5a29b3e24dd15548da209439ef13df3ccc2885f1df740406c6a4c5b2495edbc",
+    "run.mjs": "cac0937e178c10ba598682ee825e0e4b22c8b380219d193b95e77b530197de29"
+  },
+  "gate": {
+    "minUpliftSuccessRate": 0.5,
+    "minUpliftValuePoints": 50,
+    "valueUnit": "points",
+    "minPairedCases": 3,
+    "denyIfRegression": true,
+    "requireIntervalAboveZero": true
+  }
+}

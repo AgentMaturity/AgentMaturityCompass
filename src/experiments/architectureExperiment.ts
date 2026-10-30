@@ -18,6 +18,8 @@ import { z } from "zod";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { bootstrapDifferenceCI, effectSizeDifference, deterministicSeed, mean } from "./stats.js";
+import { runArchitectureProbeStages, renderExperimentResourceUsage, type ArchitectureBudget, type ArchitectureProbeRunner,
+  type ExperimentResourceUsage } from "./experimentResourceUsage.js";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -90,6 +92,8 @@ export interface ArchitectureExperiment {
   probes: ArchitectureProbe[];
   createdTs: number;
   status: "CREATED" | "RUNNING" | "COMPLETED" | "FAILED";
+  /** Native resource observations and caller-bound admission, including failures and missing roles. */
+  resourceUsage?: ExperimentResourceUsage;
 }
 
 export interface DimensionComparison {
@@ -164,6 +168,7 @@ export interface ArchitectureComparisonReport {
 
   /** Recommendations */
   recommendations: string[];
+  resourceUsage?: ExperimentResourceUsage;
 }
 
 // ---------------------------------------------------------------------------
@@ -416,33 +421,17 @@ export function runArchitectureExperiment(
      * no default, because defaulting to a simulator fabricated comparisons.
      * Tests may pass simulateProbeOutcomes explicitly.
      */
-    probeRunner: (spec: ArchitectureSpec, probes: ArchitectureProbe[], seed: number) => ProbeOutcome[];
+    probeRunner: ArchitectureProbeRunner;
+    /** Between-callback admission only; arbitrary runner code cannot promise a hard spend ceiling. */
+    budget?: ArchitectureBudget;
   },
 ): {
   experiment: ArchitectureExperiment;
   baselineOutcomes: ProbeOutcome[];
   candidateOutcomes: ProbeOutcome[];
+  resourceUsage: ExperimentResourceUsage;
 } {
-  const runner = options.probeRunner;
-
-  experiment.status = "RUNNING";
-
-  const seed = deterministicSeed([
-    experiment.experimentId,
-    experiment.baselineSpec.artifactSha256,
-    experiment.candidateSpec.artifactSha256,
-  ]);
-
-  try {
-    const baselineOutcomes = runner(experiment.baselineSpec, experiment.probes, seed);
-    const candidateOutcomes = runner(experiment.candidateSpec, experiment.probes, seed);
-
-    experiment.status = "COMPLETED";
-    return { experiment, baselineOutcomes, candidateOutcomes };
-  } catch (e) {
-    experiment.status = "FAILED";
-    throw e;
-  }
+  return runArchitectureProbeStages(experiment, options);
 }
 
 // ---------------------------------------------------------------------------
@@ -676,6 +665,7 @@ export function analyzeArchitectureExperiment(
     overallScoreEffectSize: Number(overallEs.toFixed(4)),
     deterministicSeed: seed,
     recommendations,
+    ...(experiment.resourceUsage ? { resourceUsage: structuredClone(experiment.resourceUsage) } : {}),
   };
 
   const reportSha256 = sha256Hex(canonicalize(reportBody));
@@ -771,6 +761,7 @@ export function renderArchitectureComparisonMarkdown(
   }
 
   // Reproducibility
+  if (report.resourceUsage) lines.push(...renderExperimentResourceUsage(report.resourceUsage));
   lines.push("## Reproducibility");
   lines.push("");
   lines.push(`- Deterministic seed: ${report.deterministicSeed}`);
@@ -804,7 +795,8 @@ export function quickArchitectureComparison(params: {
    * Runs probes against a spec and returns real outcomes. Required: without it
    * the comparison would be fabricated.
    */
-  probeRunner: (spec: ArchitectureSpec, probes: ArchitectureProbe[], seed: number) => ProbeOutcome[];
+  probeRunner: ArchitectureProbeRunner;
+  budget?: ArchitectureBudget;
 }): {
   experiment: ArchitectureExperiment;
   report: ArchitectureComparisonReport;
@@ -834,7 +826,8 @@ export function quickArchitectureComparison(params: {
   });
 
   const { baselineOutcomes, candidateOutcomes } = runArchitectureExperiment(experiment, {
-    probeRunner: params.probeRunner
+    probeRunner: params.probeRunner,
+    budget: params.budget
   });
   const report = analyzeArchitectureExperiment(experiment, baselineOutcomes, candidateOutcomes);
   const markdown = renderArchitectureComparisonMarkdown(report);
