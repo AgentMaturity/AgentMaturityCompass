@@ -25,6 +25,16 @@ PNG = base64.b64decode(PNG64)
 EXPECTED = [{"text": "  before\n"}, {"inlineData": {"mimeType": "image/png", "data": PNG64}}, {"text": ""}, {"text": "after α  "}]
 BLOCKS = [{"type": "text", "text": "  before\n"}, {"type": "image", "mimeType": "image/png", "data": PNG64},
           {"type": "text", "text": ""}, {"type": "text", "text": "after α  "}]
+# GAP-WP39 (151461143): every native surface appends the runtime-context snapshot after the user's input on each step.
+CONTEXT_SNAPSHOT_PREFIX = "Current runtime context. This snapshot supersedes earlier runtime-context snapshots.\n\n"
+
+
+def without_context_snapshot(parts):
+    """Twin of tests/helpers/contextSnapshot.ts: require the snapshot last, return the user's own parts."""
+    last = parts[-1] if parts else None
+    assert isinstance(last, dict) and isinstance(last.get("text"), str) and last["text"].startswith(CONTEXT_SNAPSHOT_PREFIX), \
+        "the runtime-context snapshot follows the user's input"
+    return parts[:-1]
 
 
 @pytest.fixture
@@ -150,7 +160,7 @@ def test_canonical_python_native_gemini_ordered_http_resume_and_cold(tmp_path, n
             assert request["path"] == "/v1beta/models/fixture-model:streamGenerateContent?alt=sse"
             assert request["key"] == "disposable-not-a-provider-key"
             body = json.loads(request["body"])
-            assert body["contents"][0]["parts"] == EXPECTED
+            assert without_context_snapshot(body["contents"][0]["parts"]) == EXPECTED
             assert body["generationConfig"] == {"maxOutputTokens": 64}
             assert not {"messages", "model", "stream"}.intersection(body)
         cold = subprocess.run([*native_command[:3], str(COLD), str(root), session_id], cwd=root,
