@@ -268,7 +268,6 @@ function effectGuardDenial(beforeEffect: ToolCallInput["beforeEffect"]): ToolDen
   return reason === null ? null : { stage: "guard", guardLabel: "trusted-before-effect",
     reason: typeof reason === "string" ? reason : "Trusted effect guard returned no valid decision." };
 }
-
 // The selected body must remain distinguishable from a later scoped override
 // while approval is awaited. Callers cannot assign this binding through argv.
 const selectedDefinitions = new WeakMap<ToolExecution, ToolDefinition>();

@@ -41,7 +41,7 @@ import {
 } from "./agent/stubProvider.js";
 import type { LoopNotification } from "./agent/loopTypes.js";
 import { echoToolSeam } from "./agent/echoTool.js";
-import { WEB_SEARCH_SEARXNG_HELP, resolveBreadthRun, withBreadthRunOptions } from "./cli/agentLoopBreadthOptions.js";
+import { VALIDATION_REPAIR_HELP, WEB_SEARCH_SEARXNG_HELP, resolveBreadthRun, withBreadthRunOptions } from "./cli/agentLoopBreadthOptions.js";
 import { agentToolset, type AgentToolset } from "./agent/agentToolset.js";
 import { runLease } from "./leases/runLease.js";
 import { selectSupportedNativeTools } from "./agent/nativeToolCapabilities.js";
@@ -134,8 +134,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--agent <id>", "agent identity; defaults to AMC_AGENT_ID, the current agent, then default")
     .description("Interactive native tasks over the existing governed run/resume path for the selected agent")
     .option("--validation-config <path>", "operator JSON containing named public checks")
-    .option("--validation-config-sha256 <digest>", "pin exact reviewed validation config bytes")
-    .option("--validation-repair <json>", "explicit bounded repair policy for selected public checks, including allowed edit paths")
+    .option("--validation-config-sha256 <digest>", "pin exact reviewed validation config bytes").option("--validation-repair <json>", VALIDATION_REPAIR_HELP)
     .option("--validate <id>", "run this public check after each completed turn; repeat to select more", collectOption)
     .option("--extension <manifest>", "load this signed native extension; repeat for multiple manifests", collectOption)
     .option("--extension-pin <sha256>", "exact reviewed digest for each extension in the same order", collectOption)
@@ -180,7 +179,6 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .description("Run one agent turn and report what the signed log recorded")
     .option("--validation-config <path>", "operator JSON containing named public checks")
     .option("--validation-config-sha256 <digest>", "pin exact reviewed validation config bytes")
-    .option("--validation-repair <json>", "explicit bounded repair policy for selected public checks, including allowed edit paths")
     .option("--validate <id>", "run this public check after the turn completes; repeat to select more", collectOption)
     .option("--extension <manifest>", "load this signed native extension; repeat for multiple manifests", collectOption)
     .option("--extension-pin <sha256>", "exact reviewed digest for each extension in the same order", collectOption)
