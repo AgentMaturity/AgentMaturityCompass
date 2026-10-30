@@ -23,8 +23,11 @@ interface RunOutcome { readonly sessionId: string; readonly status: AgentStatus;
 
 export const WEB_SEARCH_SEARXNG_HELP = "opt-in web_search provider for workspace tools: a SearXNG JSON origin, also granted under web_search in the signed tools policy";
 
+export const VALIDATION_REPAIR_HELP = "explicit bounded repair policy for selected public checks, including allowed edit paths";
+
 export function withBreadthRunOptions(command: Command): Command {
   return command
+    .option("--validation-repair <json>", VALIDATION_REPAIR_HELP)
     .option("--interactive-ask-user", "answer ask_user through the native chat parent over dedicated Node IPC; answers are auditor-signed")
     .option("--web-search-searxng <origin>", WEB_SEARCH_SEARXNG_HELP)
     .option("--goal-rounds <n>", "run the prompt as a goal for up to N rounds of in-process delegated children (requires --delegate and --tools workspace)");

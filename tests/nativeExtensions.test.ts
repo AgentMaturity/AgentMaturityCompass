@@ -10,7 +10,7 @@ import { ContextPluginHost } from "../src/prompt/context/contextHost.js";
 import { PromptAssemblyRegistry, renderContextSnapshot } from "../src/prompt/assembly/index.js";
 import { registerNativeExtensionCommands } from "../src/cli-native-extension-commands.js";
 import { NativeExtensionManager, loadNativeExtensions, nativeExtensionRunArgv } from "../src/extensions/nativeExtensionRuntime.js";
-import { installNativeExtension, readNativeExtension, signNativeExtension } from "../src/extensions/nativeExtensionStore.js";
+import { describeNativeExtension, installNativeExtension, readNativeExtension, signNativeExtension } from "../src/extensions/nativeExtensionStore.js";
 import { parseNativeExtensionManifest } from "../src/extensions/nativeExtensionManifest.js";
 
 const directories: string[] = [];
@@ -172,5 +172,123 @@ describe("native extension declaration is closed and bounded", () => {
     { ...declaration, commands: { review: { path: "review.txt", sha256: digest, execute: true } } }
   ])("refuses unsupported or escaping declarations %#", value => {
     expect(() => parseNativeExtensionManifest(Buffer.from(JSON.stringify(value)))).toThrow(/strict v1/i);
+  });
+});
+
+
+describe("WP22 signed template usability", () => {
+  function templateFixture(template: string, metadata?: unknown) {
+    const f = fixture();
+    writeFileSync(join(f.root, "review.txt"), template);
+    const manifest = { ...f.manifest, commands: { review: { path: "review.txt", sha256: sha256Hex(Buffer.from(template)),
+      ...(metadata === undefined ? {} : { template: metadata }) } } };
+    writeFileSync(f.path, JSON.stringify(manifest));
+    return { ...f, manifest, digest: sha256Hex(readFileSync(f.path)) };
+  }
+
+  it("expands repeated all-argument and declared positional variables once as JSON data", () => {
+    const f = templateFixture("All {{args}}. Again {{args}}. First {{1}}. Second {{2}}.",
+      { version: 1, positional: [{}, { default: "{{literal}} $(touch never)" }], argumentHint: "subject [detail]" });
+    sign(f);
+    const manager = loadNativeExtensions({ workspace: f.workspace, manifestPaths: [f.path] });
+    const expanded = manager.expandCommand("/review subject")!;
+    expect(expanded.prompt).toContain('All "subject". Again "subject". First "subject". Second "{{literal}} $(touch never)".');
+    expect(expanded.prompt).toContain("review.txt");
+    expect(expanded.prompt).toContain(`Template sha256: ${f.manifest.commands.review.sha256}`);
+    expect(describeNativeExtension(readNativeExtension({ workspace: f.workspace, manifestPath: f.path })).commands[0])
+      .toMatchObject({ variables: ["args", "1", "2"], template: { version: 1, argumentHint: "subject [detail]" } });
+    expect(existsSync(join(f.workspace, "never"))).toBe(false);
+  });
+
+  it("keeps shell quotes literal when splitting positional arguments on whitespace", () => {
+    const f = templateFixture("First {{1}}, second {{2}}, all {{args}}", { version: 1, positional: [{}, {}] });
+    sign(f);
+    const manager = loadNativeExtensions({ workspace: f.workspace, manifestPaths: [f.path] });
+    expect(manager.expandCommand('/review "one two"')?.prompt)
+      .toContain(`First ${JSON.stringify('"one')}, second ${JSON.stringify('two"')}, all ${JSON.stringify('"one two"')}`);
+  });
+
+  it.each(["{{args}} {{unknown}}", "{{args}} {{unfinished", "{{args}} unmatched }}", "{{{args}}}", "{{args}} {{0}}", "{{args}} {{2}}", "No placeholders here"])
+    ("refuses invalid or undeclared variables before signing: %s", text => {
+      const f = templateFixture(text);
+      expect(() => sign(f)).toThrow(/template/i);
+      expect(existsSync(`${f.path}.sig`)).toBe(false);
+    });
+
+  it.each([
+    { version: 2, positional: [{}] },
+    { version: 1, positional: [{}], execute: true },
+    { version: 1, positional: [] },
+    { version: 1, positional: [{ execute: true }] },
+    { version: 1, positional: [{}], argumentHint: "bad\nhint" },
+    { version: 1, positional: Array.from({ length: 33 }, () => ({})) },
+    { version: 1, positional: [{ default: "bad\0value" }] },
+    { version: 1, positional: [{ default: "é".repeat(9_000) }] }
+  ])("rejects unsupported or unbounded template metadata %#", metadata => {
+    const f = templateFixture("{{1}}", metadata);
+    expect(() => readNativeExtension({ workspace: f.workspace, manifestPath: f.path, requireSignature: false })).toThrow(/strict v1/i);
+  });
+
+  it("refuses missing and extra positional arguments rather than silently dropping data", () => {
+    const f = templateFixture("{{1}} {{2}}", { version: 1, positional: [{}, {}] });
+    sign(f);
+    const manager = loadNativeExtensions({ workspace: f.workspace, manifestPaths: [f.path] });
+    expect(() => manager.expandCommand("/review one")).toThrow(/argument 2.*required/i);
+    expect(() => manager.expandCommand("/review one two three")).toThrow(/at most 2/i);
+  });
+
+  it("bounds repeated expansion before producing an oversized prompt", () => {
+    const f = templateFixture("{{args}}".repeat(100));
+    sign(f);
+    const manager = loadNativeExtensions({ workspace: f.workspace, manifestPaths: [f.path] });
+    expect(() => manager.expandCommand(`/review ${"x".repeat(16_384)}`)).toThrow(/expanded.*limit/i);
+  });
+
+  it("previews unsigned literal templates through inspect without signing, loading or shell execution", async () => {
+    const f = templateFixture("All {{args}} first {{1}}", { version: 1, positional: [{}] });
+    const logs: string[] = [];
+    vi.spyOn(console, "log").mockImplementation(value => { logs.push(String(value)); });
+    const program = new Command().exitOverride(); registerNativeExtensionCommands(program);
+    const args = "$(touch-never)";
+    await program.parseAsync(["native-extension", "inspect", f.path, "--preview-command", "review", "--arguments", args, "--json"], { from: "user" });
+    const result = JSON.parse(logs.join("\n"));
+    expect(result).toMatchObject({ ok: true, signatureValid: false, preview: { command: "review", extensionId: "reviewer", manifestDigest: f.digest } });
+    expect(result.preview.prompt).toContain(JSON.stringify(args));
+    expect(existsSync(`${f.path}.sig`)).toBe(false);
+  });
+
+  it("refuses to preview an executable handler, even when its declaration is valid", async () => {
+    const f = fixture();
+    const manifest = { ...f.manifest, schemaVersion: 2, executable: {
+      apiVersion: 1, pluginId: "fixture", version: "1.0.0", packageSha256: "a".repeat(64), publisherFingerprint: "b".repeat(64),
+      entrypoint: "content/extensions/fixture.mjs", capabilities: ["command.invoke"], contexts: [], commands: { compute: { export: "compute" } },
+      limits: { timeoutMs: 100, maxOutputBytes: 100, maxCalls: 1, maxLifetimeMs: 1_000 }
+    } };
+    writeFileSync(f.path, JSON.stringify(manifest));
+    const logs: string[] = [];
+    vi.spyOn(console, "log").mockImplementation(value => { logs.push(String(value)); });
+    const program = new Command().exitOverride(); registerNativeExtensionCommands(program);
+    await program.parseAsync(["native-extension", "inspect", f.path, "--preview-command", "compute", "--json"], { from: "user" });
+    expect(JSON.parse(logs.join("\n"))).toMatchObject({ ok: false, code: "EXECUTABLE_PREVIEW" });
+    expect(process.exitCode).toBe(1);
+  });
+
+  it("does not accept preview arguments without an explicitly selected command", async () => {
+    const f = fixture();
+    const logs: string[] = [];
+    vi.spyOn(console, "log").mockImplementation(value => { logs.push(String(value)); });
+    const program = new Command().exitOverride(); registerNativeExtensionCommands(program);
+    await program.parseAsync(["native-extension", "inspect", f.path, "--arguments", "data", "--json"], { from: "user" });
+    expect(JSON.parse(logs.join("\n"))).toMatchObject({ ok: false, code: "PREVIEW_COMMAND_REQUIRED" });
+    expect(process.exitCode).toBe(1);
+  });
+
+  it("names missing and changed resources without printing their contents", () => {
+    const f = fixture();
+    const resource = join(f.root, "context.md");
+    writeFileSync(resource, "private-source-marker");
+    expect(() => readNativeExtension({ workspace: f.workspace, manifestPath: f.path, requireSignature: false })).toThrow(/context.md.*hash/i);
+    rmSync(resource);
+    expect(() => readNativeExtension({ workspace: f.workspace, manifestPath: f.path, requireSignature: false })).toThrow(/context.md.*missing/i);
   });
 });

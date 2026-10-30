@@ -67,6 +67,9 @@ export function renderForecastMarkdown(forecast: ForecastArtifact): string {
       : ["- none"]),
     "",
     "## ETA To Target",
+    ...(forecast.transformPlanInput ? [
+      `- Transform plan input: ${forecast.transformPlanInput.outcome}${forecast.transformPlanInput.reason ? ` (${forecast.transformPlanInput.reason})` : ""}`
+    ] : []),
     `- Status: ${forecast.etaToTarget.status}`,
     ...(forecast.etaToTarget.status === "OK"
       ? [

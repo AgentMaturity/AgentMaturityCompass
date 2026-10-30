@@ -483,6 +483,8 @@ export function executePluginRequest(params: {
   installedLockPath: string;
   installedLockSigPath: string;
   transparencyHash: string;
+  /** Disk publication only; this operation never reloads or stops a running plugin consumer. */
+  outcome: "installed-not-loaded" | "restart-required";
 } {
   const pending = loadPendingAction(params.workspace, params.approvalRequestId);
   const approvalCheck = verifyApprovalForExecution({
@@ -588,7 +590,10 @@ export function executePluginRequest(params: {
     version: pending.version,
     installedLockPath: saved.path,
     installedLockSigPath: saved.sigPath,
-    transparencyHash: transparency.hash
+    transparencyHash: transparency.hash,
+    // Existing consumers may retain a previous snapshot after an upgrade/removal.
+    // No process-wide live-host registry exists, so never claim that runtime changed.
+    outcome: pending.action === "install" ? "installed-not-loaded" : "restart-required"
   };
 }
 

@@ -1,3 +1,4 @@
+import { showSkillCatalogSelection } from "./cli/skillCatalogOptions.js";
 import { randomUUID } from "node:crypto";
 import { hostname } from "node:os";
 /**
@@ -36,7 +37,7 @@ import {
 } from "./agent/stubProvider.js";
 import type { LoopNotification } from "./agent/loopTypes.js";
 import { echoToolSeam } from "./agent/echoTool.js";
-import { WEB_SEARCH_SEARXNG_HELP, resolveBreadthRun, withBreadthRunOptions } from "./cli/agentLoopBreadthOptions.js";
+import { VALIDATION_REPAIR_HELP, WEB_SEARCH_SEARXNG_HELP, resolveBreadthRun, withBreadthRunOptions } from "./cli/agentLoopBreadthOptions.js";
 import { agentToolset, type AgentToolset } from "./agent/agentToolset.js";
 import { runLease } from "./leases/runLease.js";
 import { selectSupportedNativeTools } from "./agent/nativeToolCapabilities.js";
@@ -71,7 +72,7 @@ import { loadNativeAudioManifest } from "./attachments/nativeAudioFiles.js";
 import type { NativeAudioPart } from "./attachments/nativeAudioInput.js";
 
 import {
-  approvalGateFor, collectOption, collectDelegateStop, compactionOption, resetDelegateStops, integerOption, paramsFor, piAiRouteSelection, renderNotification, routeFor,
+  approvalGateFor, armTurnSignals, collectOption, collectDelegateStop, compactionOption, resetDelegateStops, integerOption, paramsFor, piAiRouteSelection, renderNotification, routeFor,
   type AgentLoopCliIo, type RunOptions
 } from "./cli-agent-options.js";
 export type { AgentLoopCliIo, RunOptions } from "./cli-agent-options.js";
@@ -129,7 +130,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--agent <id>", "agent identity; defaults to AMC_AGENT_ID, the current agent, then default")
     .description("Interactive native tasks over the existing governed run/resume path for the selected agent")
     .option("--validation-config <path>", "operator JSON containing named public checks")
-    .option("--validation-config-sha256 <digest>", "pin exact reviewed validation config bytes")
+    .option("--validation-config-sha256 <digest>", "pin exact reviewed validation config bytes").option("--validation-repair <json>", VALIDATION_REPAIR_HELP)
     .option("--validate <id>", "run this public check after each completed turn; repeat to select more", collectOption)
     .option("--extension <manifest>", "load this signed native extension; repeat for multiple manifests", collectOption)
     .option("--extension-pin <sha256>", "exact reviewed digest for each extension in the same order", collectOption)
@@ -201,7 +202,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--unsafe-unconfined-shell", "macOS without Seatbelt only: offer the native shell UNCONFINED, with your full user rights; ignored where Seatbelt or Bubblewrap confines it, refused on Windows")
     .option("--session <id>", "resume this existing, unsealed session as its next writer (verified before dispatch)")
     .option("--takeover-expired-writer <reason>", "with --session: claim a remote or unresponsive writer whose lease lapsed one lease ago; the reason is recorded")
-    .option("--fork-from <id>", "open a new session whose lineage names this parent's verified final row")
+    .option("--fork-from <id>", "copy this verified parent conversation into a new signed session")
     .option("--keep-open", "leave the session unsealed at exit so a later process can --session it")
     .option(
       "--delegate",
@@ -235,6 +236,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--steer <text>", "send a steering message mid-turn")
     .option("--steer-after <ms>", "when to send --steer (default 0)")
     .option("--persona <text>", "deployment persona assembled into the system prompt")
+    .option("--mission-context", "include the agent's validated mission and constraints as attributed runtime context")
     .option(
       "--approve-tools <actionClass>",
       "require a signed human approval before every tool call, decided under this action class"
@@ -246,7 +248,9 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       "ADR-5 exception note (JSON) that auto-allows the classes it names until it expires"
     )
     .option("--json", "Output as JSON")
+    .option("--list-skills [name]", "list skill discovery, sources and digests; pass a name to inspect its literal body")
     .action(async (promptParts: string[], opts: RunOptions, command: Command) => {
+      if (showSkillCatalogSelection(opts, io)) return;
       const agentId = resolveAgentId(process.cwd(), selectedAgentOption(command));
       let validation: ReturnType<typeof resolveNativeValidationSelection>;
       try { validation = resolveNativeValidationSelection(opts); }
@@ -528,7 +532,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           `tool writes are scoped to: ${
             toolset.readiness.writeScope.length > 0 ? toolset.readiness.writeScope.join(", ") : "(nothing)"
           }`
-        ));
+        )); progress(chalk.dim(`action policy: ${toolset.readiness.actionPolicy}`));
         if (!toolset.readiness.confined) {
           // A warning, not a refusal: an unconfined fs.read is still governed
           // by the allowlist and the firewall. Code Mode is the part that
@@ -606,8 +610,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
         toolSeam = echoToolSeam();
       }
       const timers: NodeJS.Timeout[] = [];
-      let onSigint: (() => void) | null = null;
-      let onSigterm: (() => void) | null = null;
+      let disarmSignals = (): void => undefined;
       const mcpMounts: MountedNativeMcpServer[] = [];
       const mcpAbort = new AbortController();
       const cancelMcp = () => mcpAbort.abort();
@@ -623,7 +626,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
             const mount = await mountNativeMcpServer({ server, workspace: process.cwd(), agentId,
               toolset: workspaceToolset, ...review, signal: mcpAbort.signal });
             mcpMounts.push(mount);
-            progress(`Mounted reviewed MCP tools for this run: ${mount.toolNames.join(", ")}. Signed allowlist, approval gate and budgets remain in force.`);
+            (await import("./setup/nativeInteractiveMcp.js")).reportNativeInteractiveMcpMount(mount, progress);
           }
         }
         let previewRequest: string | null = null;
@@ -653,6 +656,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           // CLAUDE.md in as runtime context. A hardcoded string here — what this
           // command sent before P3.3 — was an agent with no idea where it was.
           promptProfile: {
+            ...(opts.missionContext === true ? { missionContext: true } : {}),
             ...((opts.persona ?? preset?.persona) === undefined
               ? {}
               : { persona: (opts.persona ?? preset?.persona) as string }),
@@ -739,20 +743,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
             // invocation reports only its newly recorded ending as its exit
             // outcome; the driver's idle state means it can accept more work.
             priorTurnEndings = readAgentRunSummary(process.cwd(), handle.sessionId, "idle").endings.length;
-            // Ctrl-C is the operator's stop button, and it must produce the same
-            // signed cancellation `--cancel-after` does — not a killed process
-            // whose turn a later recovery has to close as `interrupted`.
-            onSigint = () => {
-              io.error(chalk.yellow("\ncancelling the turn (cause: user)…"));
-              handle.cancel({ kind: "user" });
-            };
-            onSigterm = () => {
-              io.error(chalk.yellow("\ncancelling the turn (signal: SIGTERM)…"));
-              handle.cancel({ kind: "parent" }, { by: "signal:SIGTERM" });
-              void handle.shutdown();
-            };
-            process.on("SIGINT", onSigint);
-            process.on("SIGTERM", onSigterm);
+            disarmSignals = armTurnSignals(handle, io);
             if (cancelAfter > 0) {
               timers.push(setTimeout(() => handle.cancel({ kind: "user" }), cancelAfter));
             }
@@ -769,8 +760,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
         breadth.reportRun(outcome, priorTurnEndings, validation !== undefined);
       } finally {
         for (const timer of timers) clearTimeout(timer);
-        if (onSigint !== null) process.removeListener("SIGINT", onSigint);
-        if (onSigterm !== null) process.removeListener("SIGTERM", onSigterm);
+        disarmSignals();
         const closed = await Promise.allSettled(mcpMounts.map(mount => mount.close()));
         try { if (closed.some(result => result.status === "rejected")) { io.error("MCP cleanup failed; this mount must not be reused."); io.fail(); } }
         finally {

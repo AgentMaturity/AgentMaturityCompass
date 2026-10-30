@@ -154,6 +154,8 @@ export {
 } from "./adapter/transport.js";
 export { type SseEvent, sseEvents } from "./adapter/sse.js";
 
+export { DEFAULT_STREAM_TIMEOUTS, type LlmStreamTimeouts } from "./adapter/streamTimeouts.js";
+
 // ── Adapters: what a provider implementation is allowed to decide ────────
 export {
   type AdapterEnvelopeInput,

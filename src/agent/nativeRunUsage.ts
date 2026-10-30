@@ -1,3 +1,5 @@
+import { displayEvidenceIdentifier as displayIdentifier } from "../session/evidenceIdentifier.js";
+import { projectNativeCost, renderNativeCost, type NativeCostProjection } from "../budgets/nativeCostProjection.js";
 import { parseRequestHeaderMeta, type RequestHeaderMeta } from "../session/requestHeaderMeta.js";
 import type { EvidenceEvent } from "../types.js";
 
@@ -33,6 +35,8 @@ export interface NativeRequestCache {
   readonly hitRate: number | null;
 }
 export interface NativeRunUsage {
+  /** Optional on historical summaries; estimates remain separate from observed tokens and budgets. */
+  readonly cost?: NativeCostProjection;
   readonly scope: "recorded-session";
   readonly status: "recorded" | "partial" | "unavailable" | "invalid";
   readonly requests: number;
@@ -64,11 +68,6 @@ function object(value: unknown): Record<string, unknown> | null {
 }
 function count(value: unknown): number | null {
   return typeof value === "number" && Number.isSafeInteger(value) && value >= 0 ? value : null;
-}
-/** Bounded identifier labels only. Unsafe/URL-shaped labels are withheld, never truncated into another identity. */
-function displayIdentifier(value: unknown): string | null {
-  return typeof value === "string" && /^[A-Za-z0-9][A-Za-z0-9._:/-]{0,199}$/.test(value)
-    && !value.includes("//") && !/^(?:https?:|file:|sk[-_])/i.test(value) ? value : null;
 }
 function version(value: unknown): number | null {
   const parsed = count(value);
@@ -179,6 +178,7 @@ export function projectNativeRunUsage(events: readonly EvidenceEvent[], sessionI
   const invalid = issues.length > 0;
   if (invalid) for (const key of TOKEN_FIELDS) { totals[key].observedTokens = null; totals[key].reportedRequests = 0; }
   return {
+    cost: projectNativeCost(events, sessionId),
     scope: "recorded-session",
     status: invalid ? "invalid" : reportedRequests === 0 ? "unavailable" : completeRequests < providerRequests ? "partial" : "recorded",
     requests, syntheticRequests, reportedRequests, completeRequests,
@@ -336,5 +336,6 @@ export function renderNativeRunUsage(value: unknown, options: NativeUsageDisplay
   else lines.push("  Token-rate coverage: unavailable (serialized request counts disagree); no all-request probability or cost estimate is inferred.");
   if (usage.syntheticRequests > 0) lines.push(`  ${usage.syntheticRequests} local demonstration requests excluded from provider/cache measurements.`);
   lines.push(...renderRequestReports(usage, options));
+  lines.push(renderNativeCost(usage.cost));
   return lines.join("\n");
 }

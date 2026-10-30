@@ -87,7 +87,7 @@ const templates: ProviderTemplate[] = [
   {
     id: "gemini",
     displayName: "Google Gemini",
-    defaultBaseUrl: "",
+    defaultBaseUrl: "https://generativelanguage.googleapis.com",
     routePrefix: "/gemini",
     authStrategies: ["query_env", "header_env"],
     defaultAuthStrategy: "query_env",
@@ -239,7 +239,7 @@ const templates: ProviderTemplate[] = [
   {
     id: "deepseek",
     displayName: "DeepSeek (OpenAI-compatible)",
-    defaultBaseUrl: "",
+    defaultBaseUrl: "https://api.deepseek.com",
     routePrefix: "/deepseek",
     authStrategies: ["bearer_env", "none"],
     defaultAuthStrategy: "bearer_env",

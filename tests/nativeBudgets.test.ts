@@ -25,6 +25,7 @@ import { toolEvidenceFor } from "../src/tools/toolEvidence.js";
 import { agentToolset } from "../src/agent/agentToolset.js";
 import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
 import { liveNativeFailureGuidance, projectNativeRunDiagnostics } from "../src/agent/nativeFailureGuidance.js";
+import { removeActionPolicy } from "./helpers/actionPolicyFixtures.js";
 
 let workspace: string;
 const sessions: SessionService[] = [];
@@ -35,6 +36,7 @@ const credentials: CredentialsService = {
 beforeEach(() => {
   workspace = mkdtempSync(join(tmpdir(), "amc-native-budgets-"));
   initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
+  removeActionPolicy(workspace); // AXR-02: no Action Policy configured, as before; this file is not about it (amc init signs one).
 });
 afterEach(() => {
   for (const session of sessions.splice(0)) { try { session.close({ reason: "completed" }); } catch { /* fixture teardown */ } }

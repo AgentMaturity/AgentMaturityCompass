@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { closeSync, constants, fstatSync, lstatSync, openSync, readSync, type Stats } from "node:fs";
 import { resolve } from "node:path";
-import type { NativeValidationPlan } from "../agent/nativeValidation.js";
+import { freezeNativeValidationRepairPolicy, type NativeValidationPlan, type NativeValidationRepairPolicy } from "../agent/nativeValidation.js";
 
 export interface LoadedNativeValidationConfiguration {
   readonly path: string;
@@ -17,7 +17,7 @@ const sameFile = (a: Stats, b: Stats) =>
 const LIMIT = 32 * 1024;
 
 /** JSON.parse has checked grammar; reject ambiguous members before shape admission. */
-function refuseDuplicateMembers(text: string): void {
+function refuseDuplicateMembers(text: string, message = "Validation config contains duplicate JSON object members. File content is withheld."): void {
   const stack: Array<{ keys: Set<string> | null; expectingKey: boolean }> = [];
   for (const [token] of text.matchAll(/"(?:\\[\s\S]|[^"\\])*"|[{}\[\],:]/g)) {
     const frame = stack[stack.length - 1];
@@ -27,7 +27,7 @@ function refuseDuplicateMembers(text: string): void {
     else if (token === "," && frame?.keys) frame.expectingKey = true;
     else if (token.startsWith('"') && frame?.keys && frame.expectingKey) {
       const key: string = JSON.parse(token);
-      if (frame.keys.has(key)) return refuse("Validation config contains duplicate JSON object members. File content is withheld.");
+      if (frame.keys.has(key)) return refuse(message);
       frame.keys.add(key);
       frame.expectingKey = false;
     }
@@ -98,13 +98,26 @@ export function selectNativeValidationChecks(loaded: LoadedNativeValidationConfi
   return Object.freeze({ configSha256: loaded.sha256, checks: Object.freeze(checks) });
 }
 
+function parseNativeValidationRepairPolicy(text: string): NativeValidationRepairPolicy {
+  let value: unknown;
+  try {
+    if (typeof text !== "string") return refuse("Validation repair policy must contain valid JSON. Policy content is withheld.");
+    value = JSON.parse(text);
+  } catch { return refuse("Validation repair policy must contain valid JSON. Policy content is withheld."); }
+  refuseDuplicateMembers(text, "Validation repair policy contains duplicate JSON object members. Policy content is withheld.");
+  try { return freezeNativeValidationRepairPolicy(value as NativeValidationRepairPolicy); }
+  catch { return refuse("Invalid native validation repair policy. Provide explicit bounded rounds, requests, tokens, time and allowed edit paths; unsupported fields are refused."); }
+}
+
 export function resolveNativeValidationSelection(options: {
   readonly validationConfig?: string; readonly validationConfigSha256?: string; readonly validate?: readonly string[];
+  readonly validationRepair?: string;
 }): NativeValidationPlan | undefined {
   if (options.validationConfig === undefined) {
-    if (options.validationConfigSha256 !== undefined || options.validate !== undefined)
-      return refuse("Validation check selection and digest pins require an explicit validation config file.");
+    if (options.validationConfigSha256 !== undefined || options.validate !== undefined || options.validationRepair !== undefined)
+      return refuse("Validation check selection, digest pins and repair require an explicit validation config file.");
     return undefined;
   }
-  return selectNativeValidationChecks(loadNativeValidationConfiguration(options.validationConfig, options.validationConfigSha256), options.validate ?? []);
+  const plan = selectNativeValidationChecks(loadNativeValidationConfiguration(options.validationConfig, options.validationConfigSha256), options.validate ?? []);
+  return options.validationRepair === undefined ? plan : Object.freeze({ ...plan, repair: parseNativeValidationRepairPolicy(options.validationRepair) });
 }

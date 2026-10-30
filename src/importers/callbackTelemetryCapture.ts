@@ -35,6 +35,7 @@ function clone<T>(value: T): T { return JSON.parse(JSON.stringify(value)) as T; 
 export class CallbackTelemetryCapture implements CallbackTelemetryContext {
   readonly captureId = randomUUID();
   private readonly entries = new Map<string, Entry>();
+  private readonly identities = new WeakMap<CallbackTelemetrySpan, string>();
   private readonly allowed: Set<string>;
   private readonly maxSpans: number;
   private readonly maxBytes: number;
@@ -81,6 +82,8 @@ export class CallbackTelemetryCapture implements CallbackTelemetryContext {
     }
     return { value, filtered };
   }
+  /** Reuse the capture privacy boundary when admitting an explicit newer profile. */
+  admitAttributes(input?: CallbackAttributes): { value: CallbackSpanRecord["attributes"]; filtered: number } { return this.attributes(input); }
   private status(value: CallbackSpanStatus): CallbackSpanStatus {
     if (value.status === "ok") return { status: "ok" };
     if (value.status !== "error") throw new Error("unsupported status");
@@ -136,6 +139,7 @@ export class CallbackTelemetryCapture implements CallbackTelemetryContext {
       setStatus: (status: CallbackSpanStatus) => recordCall(() => this.commit(entry,
         { ...entry.record, status: this.status(status), explicitStatus: true }))
     });
+    this.identities.set(span, entry.record.id);
     const settle = (failed: boolean, error?: unknown): void => {
       if (this.closed || entry.ended) return;
       let status = entry.record.status;
@@ -164,6 +168,8 @@ export class CallbackTelemetryCapture implements CallbackTelemetryContext {
   startSpan<T>(options: CallbackSpanOptions, callback: (span: CallbackTelemetrySpan) => T | Promise<T>): Promise<T> {
     return this.start(null, options, callback);
   }
+  /** Adapter-owned identity only; arbitrary context objects are never inspected. */
+  spanIdentity(span: CallbackTelemetrySpan): string | undefined { return this.identities.get(span); }
   /** Snapshot time is capture metadata. It never supplies an absent source timestamp. */
   snapshot(): CallbackTelemetryDocument {
     return { format: "amc-callback-telemetry", version: 1, captureId: this.captureId, recordedAt: new Date().toISOString(),

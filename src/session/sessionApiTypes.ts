@@ -14,6 +14,7 @@
  * second module could mint would have converted a structural property into a
  * convention — the exact trade this codebase keeps refusing.
  */
+import type { ModelMetadataSnapshot } from "../llm/modelCatalog.js";
 import type { RuntimeName } from "../types.js";
 import type { RecordedGeminiPart } from "./geminiPartMeta.js";
 import type { WriterTakeover } from "./sessionOwnership.js";
@@ -80,6 +81,8 @@ export interface SessionLineage {
   readonly sessionId: string;
   readonly finalEventHash: string;
   readonly seq: number;
+  /** Inclusive parent turn selected for a conversation fork (0 before its first turn). */
+  readonly forkTurn?: number;
 }
 
 /** Re-open an existing, unsealed session from another process (AMC-1511). */
@@ -134,6 +137,8 @@ export interface StepEndParams {
 }
 
 export interface RequestHeaderParams {
+  /** Omit to capture the reviewed catalog; null explicitly selects no catalog. */
+  readonly modelMetadata?: ModelMetadataSnapshot | null;
   readonly model: string;
   readonly providerId: string;
   readonly params: Record<string, unknown>;

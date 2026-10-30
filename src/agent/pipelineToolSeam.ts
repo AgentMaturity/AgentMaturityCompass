@@ -88,6 +88,9 @@ function parseArguments(rawArguments: string): Record<string, unknown> {
 
 export function pipelineToolSeam(init: PipelineToolSeamInit): AgentToolSeam {
   return {
+    supportsEffectGuard: true,
+    prepareStep: context => init.registry.prepareStep({ ...context, agentId: init.agentId }),
+
     authorizationIntent(request: ToolCallRequest) {
       let args: Record<string, unknown>;
       try {
@@ -95,7 +98,7 @@ export function pipelineToolSeam(init: PipelineToolSeamInit): AgentToolSeam {
       } catch {
         return null; // `execute` answers unparseable arguments with an ERROR; there is nothing to approve.
       }
-      return init.pipeline.authorizationIntent({ name: request.toolName, agentId: init.agentId, arguments: args, requestedMode: "EXECUTE" });
+      return init.pipeline.authorizationIntent({ name: request.toolName, agentId: init.agentId, arguments: args, requestedMode: "EXECUTE", parentToken: request.parentToken });
     },
 
     bindApprovalGate(gate) {
@@ -103,7 +106,7 @@ export function pipelineToolSeam(init: PipelineToolSeamInit): AgentToolSeam {
     },
 
     schemas(): readonly ToolSchema[] | null {
-      const visible = [...init.registry.visible(init.agentId).values()];
+      const visible = [...init.registry.offered(init.agentId).values()];
       const offered = visible
         // A tool with no published schema cannot be called correctly, so it is
         // omitted rather than advertised uncallably. Registering without one is
@@ -158,6 +161,7 @@ export function pipelineToolSeam(init: PipelineToolSeamInit): AgentToolSeam {
           parentToken: request.parentToken,
           signal: request.signal,
           ownerStep: { sessionId: request.sessionId, turn: request.turn, step: request.step, callId: request.callId },
+          ...(request.beforeEffect === undefined ? {} : { beforeEffect: request.beforeEffect }),
           ...(request.authority === undefined ? {} : { authority: request.authority })
         });
         return toLoopOutcome(outcome, request.signal.aborted);

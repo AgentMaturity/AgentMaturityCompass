@@ -34,6 +34,10 @@ import type { ToolDefinition, ToolExecution } from "../tools/toolTypes.js";
 const WORKFLOW_PARAMETERS = Object.freeze({
   type: "object",
   properties: {
+    runId: {
+      type: "string", minLength: 1, maxLength: 256,
+      description: "An existing workflow runId to resume in this same session with the exact original plan. Interrupted effects require operator reconciliation; this never retries an uncertain node."
+    },
     plan: {
       type: "object",
       description:
@@ -74,19 +78,24 @@ export function workflowTool(capability: SubagentCapability): ToolDefinition {
       const result = await runWorkflowPlan({
         workspace: execution.workspace,
         plan: parsed.plan,
+        runId: typeof args["runId"] === "string" ? args["runId"] : execution.token,
         parent: capability.identity,
         session: capability.session,
         runner: capability.runner,
         mintSessionId: capability.mintSessionId ?? (() => `child-${crypto.randomUUID().slice(0, 12)}`),
         ...(capability.maxDepth === undefined ? {} : { maxDepth: capability.maxDepth }),
+        ...(capability.delegationScope === undefined ? {} : { delegationScope: capability.delegationScope }),
+        ...(capability.stopConditions === undefined ? {} : { stopConditions: capability.stopConditions }),
         ...(capability.parentLeaseToken === undefined ? {} : { parentLeaseToken: capability.parentLeaseToken }),
         ...(execution.signal === undefined ? {} : { signal: execution.signal })
       });
 
       return {
         // A plan with a failed or cancelled node did not do what was asked.
-        ok: result.failures.length === 0 && !result.cancelled,
+        ok: result.ok,
+        ...(result.failures.some(failure => failure.reason.includes("TOOL_OUTCOME_UNKNOWN")) ? { effect: "unknown" as const } : {}),
         output: JSON.stringify({
+          runId: result.runId,
           outputs: Object.fromEntries(result.outputs),
           failed: result.failures,
           cancelled: result.cancelled,

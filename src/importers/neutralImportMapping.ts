@@ -82,8 +82,8 @@ function fieldProjection(row: Record<string, unknown>, flavor: string): { projec
   } else if (flavor === "dsh-session") {
     for (const key of ["seq", "type", "time", "surfaceOp", "sourceEventSeqs"]) projected.add(key);
     partial.add("data");
-  } else if (flavor === "callback-telemetry") {
-    for (const key of ["id", "parentId", "name", "timestamp", "durationMs", "attributes", "events", "status", "explicitStatus", "settlement", "rejectionKind", "endSequence"]) projected.add(key);
+  } else if (["callback-telemetry", "pi-callback-telemetry"].includes(flavor)) {
+    for (const key of ["id", "parentId", "name", "timestamp", "durationMs", "attributes", "events", "status", "explicitStatus", "settlement", "rejectionKind", "endSequence", "sourceIdentity", "links"]) projected.add(key);
   } else {
     for (const aliases of Object.values(GENERIC_ALIASES)) {
       const key = aliases.find(key => row[key] !== null && row[key] !== undefined);
@@ -130,7 +130,7 @@ export function buildNeutralRecordMapping(input: {
     const mappedByIdentity = new Map<string, number[]>();
     candidate.traces.forEach((trace, index) => {
       const meta = metadata(trace), callback = record(meta.callbackTelemetry) ? meta.callbackTelemetry : {};
-      const id = format === "callback-telemetry" ? callback.spanId : meta.entryId;
+      const id = ["callback-telemetry", "pi-callback-telemetry"].includes(format) ? callback.spanId : meta.entryId;
       if (id !== undefined && id !== null) {
         const key = String(id); mappedByIdentity.set(key, [...(mappedByIdentity.get(key) ?? []), index]);
       }

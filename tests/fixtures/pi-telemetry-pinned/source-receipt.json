@@ -1,0 +1,34 @@
+{
+  "repository": "https://github.com/earendil-works/pi",
+  "revision": "b2602be77cb7b0de45dd616407fd210daa48aa75",
+  "files": [
+    {
+      "path": "LICENSE",
+      "sha256": "0457f5bcec3b3b211605dfb5d1a49042fd638f3686a410fe099c24a25af13c48"
+    },
+    {
+      "path": "src/noop.ts",
+      "sha256": "b75fb8d4dd0eff94c4641f51ce9e0c22bd992c582a947050068985d48628fad8"
+    },
+    {
+      "path": "src/memory.ts",
+      "sha256": "d5d72e1a97ee1190c3a8e05ebff10a62568e3762ab8ace5095f966d50e0ef7e7"
+    },
+    {
+      "path": "src/index.ts",
+      "sha256": "2f75b09f0e5b4bbb61f9ceae8411f9fccb1e08d7d94ed9ce2e4e296caac4047e"
+    },
+    {
+      "path": "src/testing/conformance.ts",
+      "sha256": "04a3ed06d5903d2a834590513fadb5435fe82938fba227e10e677847c8e50d8d"
+    },
+    {
+      "path": "src/testing/types.ts",
+      "sha256": "ffcee78e5c20fb295e982a829c12fa856c4e809742453e4de63a8b0b5632d9ed"
+    },
+    {
+      "path": "src/testing/index.ts",
+      "sha256": "5e00ef0c4f11a91a60794aab46ecb55ff1dccd49ee2692ec83bc5b5b5518544e"
+    }
+  ]
+}

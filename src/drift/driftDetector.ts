@@ -34,9 +34,12 @@ export interface DriftCheckResult {
   incidentId: string | null;
 }
 
+// A complete repeated baseline is required for inference; shorter histories retain the unconfirmed single-run guard.
+const BASELINE_WINDOW_SIZE = 5;
+
 interface DriftCheckParams { workspace: string; agentId?: string; currentRunId?: string }
 type ReadyDrift = { agentId: string; previous: DiagnosticReport; current: DiagnosticReport; rule: ReturnType<typeof captureVerifiedAlertsConfig>["config"]["alerts"]["rules"][number];
-  evaluated: ReturnType<typeof evaluateDriftRules>; assertInputsCurrent(): void };
+  evaluated: ReturnType<typeof evaluateDriftRules>; comparisonWindow: NonNullable<FreezeIncident["comparisonWindow"]>; assertInputsCurrent(): void };
 
 function prepareDriftDecision(input: DriftCheckParams): { result: DriftCheckResult } | ReadyDrift {
   const params = { ...input }, agentId = resolveAgentId(params.workspace, params.agentId), rows = loadRunRows(params.workspace, agentId), runs = rows.map(row => row.run);
@@ -45,9 +48,13 @@ function prepareDriftDecision(input: DriftCheckParams): { result: DriftCheckResu
   if (runs.length < 2) return empty(["not enough runs for drift comparison"], null, runs.at(-1)?.runId ?? null);
   const select = (values: ReturnType<typeof loadRunRows>) => {
     const current = (params.currentRunId ? values.find(row => row.run.runId === params.currentRunId) : values.at(-1)) ?? values.at(-1)!;
-    const previous = values.filter(row => row.run.ts < current.run.ts).at(-1)!; return { current, previous };
+    const prior = values.filter(row => row.run.ts < current.run.ts);
+    const baseline = prior.length >= BASELINE_WINDOW_SIZE ? prior.slice(-BASELINE_WINDOW_SIZE) : prior.slice(-1);
+    return { current, previous: prior.at(-1), baseline };
   };
-  const selected = select(rows), { current, previous } = { current: selected.current.run, previous: selected.previous.run };
+  const selected = select(rows);
+  if (!selected.previous) return empty(["not enough previous runs for drift comparison"], null, selected.current.run.runId);
+  const { current, previous } = { current: selected.current.run, previous: selected.previous.run };
   // A tampered, unreadable or newer unsealed run means the selected pair may be stale: report it, never decide on it (WP37).
   const blocking = refusedRunsBlocking(scanVerifiedRuns(params.workspace, agentId).refused, current.ts);
   if (blocking.length > 0) return empty([`INSUFFICIENT_EVIDENCE: unverifiable diagnostic run(s) ${blocking.map(row => row.file).join(", ")}; drift not evaluated`], previous.runId, current.runId);
@@ -55,27 +62,37 @@ function prepareDriftDecision(input: DriftCheckParams): { result: DriftCheckResu
   try { alerts = captureVerifiedAlertsConfig(params.workspace); }
   catch (error) { return empty([`alerts config invalid: ${error instanceof Error ? error.message : "unknown"}`], previous.runId, current.runId); }
   const assurance = () => latestAssuranceByPack({ workspace: params.workspace, agentId, windowStartTs: current.windowStartTs, windowEndTs: current.windowEndTs });
-  const assuranceByPack = assurance(), evaluated = evaluateDriftRules({ config: alerts.config, previousRun: previous, currentRun: current, assuranceByPack });
+  const baseline = selected.baseline.map(row => row.run);
+  const assuranceByPack = assurance();
+  let evaluated: ReturnType<typeof evaluateDriftRules>;
+  try { evaluated = evaluateDriftRules({ config: alerts.config, previousRun: previous, baselineRuns: baseline, currentRun: current, assuranceByPack }); }
+  catch (error) {
+    if (error instanceof Error && error.message.startsWith("INSUFFICIENT_EVIDENCE:")) return empty([error.message], previous.runId, current.runId);
+    throw error;
+  }
   if (!evaluated.triggered || !evaluated.ruleId) return empty(evaluated.reasons, previous.runId, current.runId);
   const rule = alerts.config.alerts.rules.find(item => item.id === evaluated.ruleId)!;
   const used = new Set<string>();
   for (const row of alerts.config.alerts.rules) { for (const id of Object.keys(row.when.assuranceDropBelow)) used.add(id); if (row === rule) break; }
   const projection = (values: typeof assuranceByPack) => JSON.stringify([...used].map(id => [id, values.get(id)?.score0to100 ?? null]));
   const assuranceInput = projection(assuranceByPack);
-  return { agentId, current, previous, rule, evaluated, assertInputsCurrent() {
+  return { agentId, current, previous, rule, evaluated, comparisonWindow: {
+    requestedSize: BASELINE_WINDOW_SIZE, runIds: baseline.map(run => run.runId), startTs: baseline[0]!.ts, endTs: baseline.at(-1)!.ts,
+    confirmation: evaluated.confirmation, method: baseline.length === 1 ? "single-run" : "median-bootstrap-95"
+  }, assertInputsCurrent() {
     alerts.assertCurrent();
     let now: ReturnType<typeof select>;
     try { now = select(loadRunRows(params.workspace, agentId)); }
     catch (cause) { throw new Error("selected drift decision inputs changed while freeze signing was prepared", { cause }); }
-    if (now.current?.path !== selected.current.path || now.previous?.path !== selected.previous.path
-      || !now.current.bytes.equals(selected.current.bytes) || !now.previous.bytes.equals(selected.previous.bytes)
+    if (now.current?.path !== selected.current.path || !now.current.bytes.equals(selected.current.bytes)
+      || now.baseline.length !== selected.baseline.length || now.baseline.some((row, index) => row.path !== selected.baseline[index]!.path || !row.bytes.equals(selected.baseline[index]!.bytes))
       || projection(assurance()) !== assuranceInput) throw new Error("selected drift decision inputs changed while freeze signing was prepared");
   } };
 }
 
 function incidentInput(params: DriftCheckParams, ready: ReadyDrift): Parameters<typeof createFreezeIncident>[0] {
   return { workspace: params.workspace, agentId: ready.agentId, ruleId: ready.evaluated.ruleId!, previousRunId: ready.previous.runId,
-    currentRunId: ready.current.runId, deltas: ready.evaluated.deltas,
+    currentRunId: ready.current.runId, deltas: ready.evaluated.deltas, comparisonWindow: ready.comparisonWindow,
     actionClasses: ready.rule.actions.includes("FREEZE_EXECUTE") ? ready.rule.freezeActionClasses ?? ["DEPLOY", "WRITE_HIGH", "SECURITY"] : [],
     reason: ready.evaluated.reasons.join("; ") };
 }

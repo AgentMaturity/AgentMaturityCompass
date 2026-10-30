@@ -54,7 +54,8 @@ import { classifyResponseFailure } from "./responseFailure.js";
 import { StreamRecorder } from "./streamRecorder.js";
 import type { SettledStream } from "./streamRecorder.js";
 import { fetchTransport, readBodyText } from "./transport.js";
-import type { HttpResponse, HttpTransport } from "./transport.js";
+import { dispatchWithTimeouts } from "./streamTimeouts.js";
+import type { HttpTransport } from "./transport.js";
 import { assertRequestCapabilities, assertRequiredCapabilities, LlmCapabilityError } from "./providerCapabilities.js";
 import { LiveTextPreview, type LiveTextPreviewEvent } from "./liveTextPreview.js";
 import { reserveNativeModelBudget } from "../../budgets/nativeBudgetAdmission.js";
@@ -374,82 +375,98 @@ export class LlmRuntime {
       throw settle(recorder.fail({ failure: { message: error instanceof Error ? error.message : "native budget admission failed", code: integrity ? "AMC_EVIDENCE_INTEGRITY" : "AMC_NATIVE_BUDGET_REFUSED" }, kind: "error", httpStatus: null, cause: integrity ? "budget_evidence_invalid" : "budget_refused" }));
     }
 
-    let response: HttpResponse;
+    let response: Awaited<ReturnType<typeof dispatchWithTimeouts>> | undefined;
     try {
-      // The same gate covers injected transports and fetch, before either can transmit the pinned bytes. checkEgress
-      // resolves the session's workspace itself and refuses a missing one as workspace_scope_required.
-      checkEgress({ workspace: this.init.session.workspace, channel: "provider", url: request.url, providerId: route.providerId });
-      dispatchAttempted = true;
-      response = await this.transport({ ...request, redirect: "error" });
-    } catch (error: unknown) {
-      throw settle(recorder.fail(this.transportFailure(error, spec.signal)));
-    }
-
-    if (response.status < 200 || response.status >= 300) {
-      const bodyText = await readBodyText(response.body);
-      throw settle(
-        recorder.fail({
-          failure: classifyResponseFailure({ adapter: route.adapter, response, bodyText, now: this.now })
-            .failure,
-          kind: "error",
-          httpStatus: response.status,
-          cause: `http_${response.status}`
-        })
-      );
-    }
-
-    // One settlement per dispatch, and the flag is what enforces it across three
-    // exits: a clean finish, a throw, and the consumer walking away mid-stream.
-    let recorded = false;
-    const preview = new LiveTextPreview({ sessionId: this.init.session.sessionId, headerEventId: prepared.headerEventId,
-      secret, notify: this.init.onLiveText });
-    const binding = toolNames === null ? null : new ProviderToolBinding(toolNames);
-    try {
-      for await (const decoded of route.adapter.decode(response)) {
-        const chunk = binding?.bind(decoded) ?? decoded;
-        // Folded and grammar-checked BEFORE the consumer sees it: a chunk that
-        // breaks the contract must not reach a caller who might act on it.
-        recorder.push(chunk);
-        preview.push(chunk);
-        yield chunk;
+      try {
+        // The same gate covers injected transports and fetch, before either can transmit the pinned bytes. checkEgress
+        // resolves the session's workspace itself and refuses a missing one as workspace_scope_required.
+        checkEgress({ workspace: this.init.session.workspace, channel: "provider", url: request.url, providerId: route.providerId });
+        dispatchAttempted = true;
+        response = await dispatchWithTimeouts(this.transport, { ...request, redirect: "error",
+          ...(spec.signal === undefined ? {} : { signal: spec.signal }) }, route.timeouts);
+      } catch (error: unknown) {
+        throw settle(recorder.fail(this.transportFailure(error, spec.signal)));
       }
-      const settled = recorder.complete(response.status);
-      recorded = true;
-      // An in-band terminal error — the adapter decoded a provider error event
-      // into `finish {kind: "error"}` — is a failure and surfaces as one. The
-      // finish chunk has already been yielded, so a consumer that inspects it
-      // sees the same facts the throw carries.
-      if (settled.failure !== null) throw settle(settled);
-      onSettled(settled);
-    } catch (error: unknown) {
-      if (recorded) throw error;
-      recorded = true;
-      const settled = recorder.fail(this.decodeFailure(error, spec.signal));
-      // A protocol violation is OUR bug, not the provider's, and it is rethrown
-      // as itself so `instanceof` still tells the two apart. The row is written
-      // either way.
-      if (isLlmStreamProtocolError(error)) {
-        onSettled(settled);
-        throw error;
-      }
-      throw settle(settled);
-    } finally {
-      preview.finish();
-      if (!recorded) {
-        // The consumer stopped pulling — a `break`, a `return`, an outer throw.
-        // Generators are closed by injecting a return, which no `catch` sees, so
-        // without this the header would sit forever unsettled and the log would
-        // say a request was sent and never answered.
-        recorded = true;
-        onSettled(
+
+      if (response.status < 200 || response.status >= 300) {
+        let bodyText: string;
+        try {
+          bodyText = await readBodyText(response.body);
+          response.assertActive();
+        } catch (error) {
+          throw settle(recorder.fail({ ...this.decodeFailure(error, spec.signal), httpStatus: response.status }));
+        }
+        throw settle(
           recorder.fail({
-            failure: { message: "stream abandoned by the consumer", code: LLM_FAILURE_CODE.ABORTED },
-            kind: "aborted",
+            failure: classifyResponseFailure({ adapter: route.adapter, response, bodyText, now: this.now })
+              .failure,
+            kind: "error",
             httpStatus: response.status,
-            cause: "abandoned"
+            cause: `http_${response.status}`
           })
         );
       }
+
+      // One settlement per dispatch, and the flag is what enforces it across three
+      // exits: a clean finish, a throw, and the consumer walking away mid-stream.
+      let recorded = false;
+      const preview = new LiveTextPreview({ sessionId: this.init.session.sessionId, headerEventId: prepared.headerEventId,
+        secret, notify: this.init.onLiveText });
+      const binding = toolNames === null ? null : new ProviderToolBinding(toolNames);
+      try {
+        for await (const decoded of route.adapter.decode(response)) {
+          // A decoder may salvage already reported usage while unwinding a
+          // failed read. Retain that subtotal, but publish no content after abort.
+          if (decoded.type !== "usage") response.assertActive();
+          const chunk = binding?.bind(decoded) ?? decoded;
+          // Folded and grammar-checked BEFORE the consumer sees it: a chunk that
+          // breaks the contract must not reach a caller who might act on it.
+          recorder.push(chunk);
+          response.assertActive();
+          preview.push(chunk);
+          yield chunk;
+        }
+        response.assertActive();
+        const settled = recorder.complete(response.status);
+        recorded = true;
+        // An in-band terminal error — the adapter decoded a provider error event
+        // into `finish {kind: "error"}` — is a failure and surfaces as one. The
+        // finish chunk has already been yielded, so a consumer that inspects it
+        // sees the same facts the throw carries.
+        if (settled.failure !== null) throw settle(settled);
+        onSettled(settled);
+      } catch (error: unknown) {
+        if (recorded) throw error;
+        recorded = true;
+        const settled = recorder.fail({ ...this.decodeFailure(error, spec.signal), httpStatus: response.status });
+        // A protocol violation is OUR bug, not the provider's, and it is rethrown
+        // as itself so `instanceof` still tells the two apart. The row is written
+        // either way.
+        if (isLlmStreamProtocolError(error)) {
+          onSettled(settled);
+          throw error;
+        }
+        throw settle(settled);
+      } finally {
+        preview.finish();
+        if (!recorded) {
+          // The consumer stopped pulling — a `break`, a `return`, an outer throw.
+          // Generators are closed by injecting a return, which no `catch` sees, so
+          // without this the header would sit forever unsettled and the log would
+          // say a request was sent and never answered.
+          recorded = true;
+          onSettled(
+            recorder.fail({
+              failure: { message: "stream abandoned by the consumer", code: LLM_FAILURE_CODE.ABORTED },
+              kind: "aborted",
+              httpStatus: response.status,
+              cause: "abandoned"
+            })
+          );
+        }
+      }
+    } finally {
+      await response?.close?.();
     }
   }
 

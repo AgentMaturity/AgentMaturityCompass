@@ -473,3 +473,35 @@ test("readiness refuses a pinned fixture that exceeds execution's bounded input 
   expect(preview.ready).toBe(false); expect(preview.problems.join(" ")).toContain("oversized");
   expect(existsSync(context.outputDir)).toBe(false);
 });
+
+test("WP09: the executor never sees the oracle and cannot seed the judge's HOME or TMPDIR", async () => {
+  const target = `import fs from 'node:fs'; import path from 'node:path';
+const raw = fs.readFileSync(process.env.AMC_COMPARISON_CONTEXT, 'utf8'); const context = JSON.parse(raw);
+for (const dir of [process.env.HOME, process.env.TMPDIR]) fs.writeFileSync(path.join(dir, 'planted.txt'), 'judge-canary');
+console.error(JSON.stringify({ home: process.env.HOME, tmp: process.env.TMPDIR }));
+console.log(!('oracle' in context.task) && !raw.includes('oracle.mjs') && /^oracle:[0-9a-f]{16}$/.test(context.task.judgeId) ? 'task-done' : 'oracle-leaked');`;
+  const oracle = `import fs from 'node:fs'; import path from 'node:path';
+let text=''; for await (const chunk of process.stdin) text+=chunk; const input=JSON.parse(text); const seen=JSON.parse(input.stderr);
+const separate = process.env.HOME !== seen.home && process.env.TMPDIR !== seen.tmp && !fs.existsSync(path.join(process.env.HOME, 'planted.txt')) && !fs.existsSync(path.join(process.env.TMPDIR, 'planted.txt'));
+const hidden = input.stdout.trim() === 'task-done';
+console.log(JSON.stringify({schemaVersion:'2026-09-08',verdict:separate&&hidden?'pass':'fail',checks:[{id:'oracle-hidden',passed:hidden,evidence:'Target context omits the oracle.'},{id:'judge-home-separate',passed:separate,evidence:'Judge HOME and TMPDIR are fresh.'}]}));`;
+  const report = await fixture(target, oracle).run();
+  const trial = report.trials[0]!;
+  expect(trial.oracle?.checks).toEqual([
+    { id: "oracle-hidden", passed: true, evidence: "Target context omits the oracle." },
+    { id: "judge-home-separate", passed: true, evidence: "Judge HOME and TMPDIR are fresh." }
+  ]);
+  expect(trial).toMatchObject({ status: "executed", verdict: "pass" });
+  expect(trial.authority?.executor).toEqual({ identity: "target:fixture", timeoutMs: 10_000 });
+  expect(trial.authority?.judge.identity).toMatch(/^oracle:[0-9a-f]{16}$/);
+  expect(report.limitations.join(" ")).toMatch(/Evaluation is public, not hidden/);
+}, 20_000);
+
+test("H2X-29: readiness warns about measurement language in task descriptions without refusing", () => {
+  const context = fixture();
+  context.manifest.tasks[0]!.description = "Fix the parser; your answer will be scored by a hidden rubric.";
+  context.save();
+  const preview = checkHarnessComparison({ manifestPath: context.manifestPath });
+  expect(preview.ready).toBe(true);
+  expect(preview.warnings).toEqual(["task success description: agent-facing text uses measurement language (rubric, scored); the solver may learn it is being evaluated."]);
+});

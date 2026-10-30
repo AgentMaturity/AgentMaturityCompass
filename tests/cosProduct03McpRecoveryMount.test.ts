@@ -12,6 +12,7 @@ import { agentToolset } from "../src/agent/agentToolset.js";
 import { SessionService } from "../src/session/sessionService.js";
 import { discoverNativeMcpCatalog, mountNativeMcpServer, nativeMcpToolName, type MountedNativeMcpServer } from "../src/mcp/nativeMcpClient.js";
 import type { NativeMcpHttpServer } from "../src/mcp/nativeMcpHttpTransport.js";
+import { removeActionPolicy } from "./helpers/actionPolicyFixtures.js";
 
 // Loopback-only executable regression fixtures. Authoring these tests does not
 // execute them, initialize a workspace, resolve credentials or start a server.
@@ -36,6 +37,7 @@ async function fixture() {
   vi.stubEnv("AMC_VAULT_PASSPHRASE", "p03-synthetic-test-vault-passphrase");
   const workspace = mkdtempSync(join(tmpdir(), "amc-p03-mcp-recovery-"));
   initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
+  removeActionPolicy(workspace); // AXR-02: no Action Policy configured, as before; this file is not about it (amc init signs one).
   initBudgets(workspace); writeRuntimeFirewallPolicy({ workspace, mode: "observe" });
   const name = nativeMcpToolName("p03", "mutate"), config = loadToolsConfig(workspace);
   initToolsConfig(workspace, { ...config, tools: { ...config.tools,

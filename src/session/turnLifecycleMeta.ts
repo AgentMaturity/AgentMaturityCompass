@@ -259,6 +259,7 @@ export function buildStepEndMeta(params: StepEndMetaParams): Record<string, unkn
     turn: params.turn,
     step: params.step,
     stopReason: params.stopReason,
+    ...(params.usage?.reasoningTokens === undefined ? {} : { usageVersion: 2 }),
     usage:
       params.usage === null
         ? null
@@ -266,7 +267,8 @@ export function buildStepEndMeta(params: StepEndMetaParams): Record<string, unkn
             inputTokens: params.usage.inputTokens,
             outputTokens: params.usage.outputTokens,
             cacheRead: params.usage.cacheRead,
-            cacheWrite: params.usage.cacheWrite
+            cacheWrite: params.usage.cacheWrite,
+            ...(params.usage.reasoningTokens === undefined ? {} : { reasoningTokens: params.usage.reasoningTokens })
           },
     ...(params.recoveredBy === null ? {} : { recoveredBy: params.recoveredBy })
   };
