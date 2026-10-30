@@ -14,6 +14,7 @@ import type { loadOpsPolicy } from "../ops/policy.js";
 import { storeEncryptedBlob } from "../storage/blobs/blobStore.js";
 import { pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
+import { admitSessionEnvelope } from "../session/sessionTypes.js";
 import type { SessionStoreAppendInput } from "./sessionEventStore.js";
 
 /** Sentinel head of the global chain, identical to the ledger's. */
@@ -62,6 +63,15 @@ export function storeSessionPayload(
   }
   const blob = storeEncryptedBlob(workspace, bytes);
   return { path: blob.path, sha: blob.payloadSha256, blobRef: blob.blobId };
+}
+
+/**
+ * Refuse, before anything is written, a row the history verifiers would refuse on read. Once such a row is
+ * appended, the writer can no longer authenticate the history and refuses to reopen it.
+ */
+export function assertAdmittedSessionRow(input: SessionStoreAppendInput): void {
+  const admission = admitSessionEnvelope(JSON.stringify(input.meta), input.eventType);
+  if (!admission.ok) throw new Error(`session event refused (${admission.code}): ${admission.message}`);
 }
 
 /** The full row for one session event, hashed over the ledger's pre-image and signed by `sign`. */

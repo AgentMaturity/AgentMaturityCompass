@@ -371,6 +371,39 @@ describe("JSONL single-writer and backend pinning", () => {
   });
 });
 
+describe("JSONL write-time envelope admission", () => {
+  const raw = (eventType: EvidenceEvent["event_type"]) =>
+    ({ sessionId: "raw-session", runtime: "amc" as const, eventType, meta: {} });
+  const start = { sessionId: "raw-session", runtime: "amc" as const, binaryPath: "test", binarySha256: sha256Hex("test") };
+
+  it("refuses an envelope-less native row at append and leaves the history writable", () => {
+    const store = openSessionEventStore(workspace, "jsonl");
+    try {
+      store.startSession(start);
+      expect(() => store.appendSessionEvent(raw("user/message"))).toThrow(/no supported session envelope/);
+    } finally {
+      store.close();
+    }
+    const reopened = openSessionEventStore(workspace, "jsonl");
+    expect(reopened.readSessionEvents("raw-session")).toHaveLength(0);
+    reopened.close();
+  });
+
+  it("still appends the non-session types work/accepted and time/checkpoint without an envelope", () => {
+    const store = openSessionEventStore(workspace, "jsonl");
+    try {
+      store.startSession(start);
+      store.appendSessionEvent(raw("work/accepted"));
+      store.appendSessionEvent(raw("time/checkpoint"));
+    } finally {
+      store.close();
+    }
+    const reopened = openSessionEventStore(workspace, "jsonl");
+    expect(reopened.readSessionEvents("raw-session").map((row) => row.event_type)).toEqual(["work/accepted", "time/checkpoint"]);
+    reopened.close();
+  });
+});
+
 describe("JSONL verification rules, one broken property at a time", () => {
   it("catches a corrupted writer signature", () => {
     const sessionId = runSession("jsonl");
