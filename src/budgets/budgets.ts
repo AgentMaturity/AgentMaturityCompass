@@ -21,6 +21,7 @@ import { sha256Hex } from "../utils/hash.js";
 import type { ActionClass } from "../types.js";
 import { projectBudgetUsage, readBudgetEvents, type BudgetUsage } from "./nativeBudgetUsage.js";
 import type { TrustContext } from "../trust/trustContext.js";
+import { nativeUsdUnits } from "./nativeUsdAmount.js";
 
 const actionClassSchema = z.enum([
   "READ_ONLY",
@@ -43,9 +44,17 @@ export const budgetsSchema = z.object({
         daily: z.object({
           maxLlmRequests: z.number().int().positive(),
           maxLlmTokens: z.number().int().positive(),
-          maxCostUsd: z.number().positive(),
+          // Omission explicitly selects token/count budgets without a hard USD envelope.
+          maxCostUsd: z.number().finite().positive().nullable().default(null),
           maxToolExecutes: z.partialRecord(actionClassSchema, z.number().int().min(0))
         }),
+        /** Auditor-attested worst-case price for the entire bounded request, not an indicative catalog estimate. */
+        nativeUsdBounds: z.array(z.object({
+          providerId: z.string().min(1), model: z.string().min(1), encoderId: z.string().min(1), encoderVersion: z.number().int().positive(),
+          endpoint: z.url().refine(value => { const url = new URL(value); return url.protocol === "https:" && !url.username && !url.password && !url.hash; }),
+          maxRequestBytes: z.number().int().positive().max(32 * 1024 * 1024), maxOutputTokens: z.number().int().positive(),
+          maxCostUsd: z.number().finite().positive(), source: z.string().min(1), expiresAt: z.iso.datetime()
+        })).optional(),
         perMinute: z.object({
           maxLlmRequests: z.number().int().positive(),
           maxLlmTokens: z.number().int().positive()
@@ -89,7 +98,6 @@ export function defaultBudgets(agentId = "default"): BudgetsConfig {
           daily: {
             maxLlmRequests: 500,
             maxLlmTokens: 5_000_000,
-            maxCostUsd: 50,
             maxToolExecutes: {
               READ_ONLY: 500,
               WRITE_LOW: 50,
@@ -295,9 +303,9 @@ export function evaluateBudgetStatus(workspace: string, agentId: string, now = D
   exceededActionClasses: ActionClass[];
   usage: ReturnType<typeof budgetUsageSnapshot>;
   budgetConfigValid: boolean;
-  nativeAdmissionPolicy: { unknownTokenUsage: "BLOCK" | "ALLOW_WITH_WARNING"; tokenLimit: "between-dispatch-threshold"; costLimit: "known-subtotal-threshold" };
+  nativeAdmissionPolicy: { unknownTokenUsage: "BLOCK" | "ALLOW_WITH_WARNING"; tokenLimit: "between-dispatch-threshold"; costLimit: "signed-request-reservations" | "disabled" };
 } {
-  const nativeAdmissionPolicy = (unknownTokenUsage: "BLOCK" | "ALLOW_WITH_WARNING" = "BLOCK") => ({ unknownTokenUsage, tokenLimit: "between-dispatch-threshold" as const, costLimit: "known-subtotal-threshold" as const });
+  const nativeAdmissionPolicy = (unknownTokenUsage: "BLOCK" | "ALLOW_WITH_WARNING" = "BLOCK", usd = true) => ({ unknownTokenUsage, tokenLimit: "between-dispatch-threshold" as const, costLimit: usd ? "signed-request-reservations" as const : "disabled" as const });
   let policyBytes: Buffer | undefined;
   try { policyBytes = readFileSync(budgetsPath(workspace)); } catch { /* Preserve the existing invalid/missing policy status branch. */ }
   const signature = policyBytes === undefined ? { valid: false } : verifyBudgetsConfigSignature(workspace, policyBytes);
@@ -327,6 +335,9 @@ export function evaluateBudgetStatus(workspace: string, agentId: string, now = D
   const usage = budgetUsageSnapshot(workspace, agentId, now, options);
   const reasons: string[] = [];
   const exceededActionClasses: ActionClass[] = [];
+  if (budget.daily.maxCostUsd !== null && usage.daily.llmUnreservedCostRequests > 0) {
+    reasons.push("USD exposure is unknown for prior dispatches without request reservations");
+  }
 
   if (usage.minute.llmRequests > budget.perMinute.maxLlmRequests) {
     reasons.push(`per-minute llm requests exceeded (${usage.minute.llmRequests} > ${budget.perMinute.maxLlmRequests})`);
@@ -340,8 +351,8 @@ export function evaluateBudgetStatus(workspace: string, agentId: string, now = D
   if (usage.daily.llmTokens > budget.daily.maxLlmTokens) {
     reasons.push(`daily llm tokens exceeded (${usage.daily.llmTokens} > ${budget.daily.maxLlmTokens})`);
   }
-  if (usage.daily.llmCostUsd > budget.daily.maxCostUsd) {
-    reasons.push(`daily llm cost exceeded (${usage.daily.llmCostUsd} > ${budget.daily.maxCostUsd})`);
+  if (budget.daily.maxCostUsd !== null && BigInt(usage.daily.llmBudgetCostUnits) > nativeUsdUnits(budget.daily.maxCostUsd, false)) {
+    reasons.push(`daily llm cost exceeded including reserved exposure (${usage.daily.llmBudgetCostUsd} > ${budget.daily.maxCostUsd})`);
   }
   for (const [actionClass, max] of Object.entries(budget.daily.maxToolExecutes) as Array<[ActionClass, number]>) {
     const actual = usage.daily.toolExecutes[actionClass] ?? 0;
@@ -357,7 +368,7 @@ export function evaluateBudgetStatus(workspace: string, agentId: string, now = D
     exceededActionClasses: [...new Set(exceededActionClasses)],
     usage,
     budgetConfigValid: true,
-    nativeAdmissionPolicy: nativeAdmissionPolicy(budget.unknownTokenUsage)
+    nativeAdmissionPolicy: nativeAdmissionPolicy(budget.unknownTokenUsage, budget.daily.maxCostUsd !== null)
   };
 }
 

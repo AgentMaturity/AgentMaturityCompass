@@ -136,6 +136,12 @@ export class LoopInbox {
     return claimed;
   }
 
+  /** Cancel only context owned by the ending turn; preserve other queued operator work. */
+  cancelNextStep(messageId: string): void {
+    const index = this.state["next-step"].findIndex(message => message.messageId === messageId);
+    if (index >= 0) this.splice("next-step", index, 1, "cancel");
+  }
+
   /**
    * Drop every pending message, `next-step` before `next-turn`.
    *

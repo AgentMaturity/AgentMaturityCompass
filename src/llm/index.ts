@@ -154,6 +154,8 @@ export {
 } from "./adapter/transport.js";
 export { type SseEvent, sseEvents } from "./adapter/sse.js";
 
+export { DEFAULT_STREAM_TIMEOUTS, type LlmStreamTimeouts } from "./adapter/streamTimeouts.js";
+
 // ── Adapters: what a provider implementation is allowed to decide ────────
 export {
   type AdapterEnvelopeInput,
@@ -166,6 +168,7 @@ export {
   type LlmRouteConfig,
   LlmRouteError,
   type PinnedRoute,
+  type VirtualRouteSelection,
   type ProviderDescription
 } from "./adapter/adapterRegistry.js";
 export { classifyResponseFailure } from "./adapter/responseFailure.js";
@@ -220,3 +223,13 @@ export {
   LlmCapabilityError, assertRequestCapabilities, assertRequiredCapabilities, snapshotCapabilities,
   type ProviderCapability, type CapabilitySupport, type ProviderCapabilities
 } from "./adapter/providerCapabilities.js";
+
+// Reviewed catalog and operator-invoked advisory enumeration.
+export {
+  catalogProtocolForEncoder, createModelMetadataSnapshot, createReviewedModelMetadataSnapshot,
+  listModelMetadata, parseModelMetadataSnapshot, type ModelMetadataSnapshot
+} from "./modelCatalog.js";
+export {
+  enumerateRemoteModels, parseModelDiscoveryResult, pinDiscoveredModel,
+  type DiscoveredModelReview, type ModelDiscoveryResult, type ModelEnumerationInput
+} from "./modelEnumeration.js";

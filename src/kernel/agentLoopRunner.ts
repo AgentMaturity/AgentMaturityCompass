@@ -279,6 +279,7 @@ export interface ComposedTurnOptions {
      */
     readonly runner?: SubagentRunner;
     readonly maxDepth?: number;
+    readonly maxActiveChildren?: number;
     /** Receives the composed capability. Called once, before the first turn. */
     grant(capability: SubagentCapability): void;
   };
@@ -410,6 +411,7 @@ function compositionDigestOf(options: ComposedTurnOptions, profile: AgentPromptP
             actionClass: gate.actionClass,
             riskTier: gate.riskTier,
             toolNames: gate.toolNames ?? null,
+            ...(gate.reviewedActionClasses === undefined ? {} : { reviewedActionClasses: gate.reviewedActionClasses }),
             answerers: (gate.answerers ?? []).map((answerer) => answerer.name)
           },
     version: amcVersion
@@ -449,6 +451,9 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
       approvalClass: options.approvalGate.actionClass });
   }
   if (options.goalRounds !== undefined) {
+    if (options.delegation?.maxActiveChildren !== undefined) {
+      throw new Error("Configured --max-active-children root child limits are not supported for --goal-rounds; no execution occurred.");
+    }
     const { maxRounds } = options.goalRounds;
     if (options.delegation === undefined || options.delegation.runner !== undefined || options.schedulePass !== undefined
       || options.audioParts !== undefined || images.length > 0 || options.prompt.trim() === "") {
@@ -625,6 +630,7 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
           ...(options.leaseToken === undefined ? {} : { leaseToken: options.leaseToken }),
           ...(options.delegation === undefined ? {} : { grantDelegation: { runner: runNative,
             ...(options.delegation.maxDepth === undefined ? {} : { maxDepth: options.delegation.maxDepth }),
+            ...(options.delegation.maxActiveChildren === undefined ? {} : { maxActiveChildren: options.delegation.maxActiveChildren }),
             ...(options.delegation.scope === undefined ? {} : { delegationScope: options.delegation.scope }),
             ...(options.delegation.stopConditions === undefined ? {} : { stopConditions: options.delegation.stopConditions }) } })
         });
@@ -669,6 +675,7 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
           promptSections: prompt.assemble().sections.map(section => section.name) };
       }
       options.delegation!.grant({
+        ...(options.delegation!.maxActiveChildren === undefined ? {} : { maxActiveChildren: options.delegation!.maxActiveChildren }),
         identity: rootIdentity(options.agentId),
         session,
         runner,

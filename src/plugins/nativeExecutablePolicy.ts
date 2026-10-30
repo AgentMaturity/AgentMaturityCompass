@@ -18,7 +18,7 @@ export const nativeExecutablePolicySchema = z.object({
   schemaVersion: z.literal(1),
   grants: z.array(z.object({
     manifestDigest: nativeExecutableDigestSchema,
-    capabilities: z.array(nativeExecutableCapabilitySchema).min(1).max(2),
+    capabilities: z.array(nativeExecutableCapabilitySchema).min(1).max(4),
     approvedAt: z.number().int().nonnegative(),
     expiresAt: z.number().int().positive()
   }).strict().refine(grant => new Set(grant.capabilities).size === grant.capabilities.length

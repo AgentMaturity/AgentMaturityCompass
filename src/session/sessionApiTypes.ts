@@ -14,6 +14,8 @@
  * second module could mint would have converted a structural property into a
  * convention — the exact trade this codebase keeps refusing.
  */
+import type { ModelMetadataSnapshot } from "../llm/modelCatalog.js";
+import type { PhysicalRouteIdentity, VirtualRoutingDecision } from "../llm/request/routeIdentity.js";
 import type { RuntimeName } from "../types.js";
 import type { RecordedGeminiPart } from "./geminiPartMeta.js";
 import type { WriterTakeover } from "./sessionOwnership.js";
@@ -73,6 +75,8 @@ export interface SessionOpenParams {
    * in the `session/open` row so lineage is a signed claim, not a filename.
    */
   readonly parent?: SessionLineage;
+  /** Owner-consumed wire work: committed in the first native row, not inferred from a filename. */
+  readonly acceptedWork?: { readonly eventId: string; readonly receipt: string; readonly claimId: string; readonly leaseId: string };
 }
 
 /** A verified pointer at another session's last enveloped row. */
@@ -80,6 +84,8 @@ export interface SessionLineage {
   readonly sessionId: string;
   readonly finalEventHash: string;
   readonly seq: number;
+  /** Inclusive parent turn selected for a conversation fork (0 before its first turn). */
+  readonly forkTurn?: number;
 }
 
 /** Re-open an existing, unsealed session from another process (AMC-1511). */
@@ -134,6 +140,10 @@ export interface StepEndParams {
 }
 
 export interface RequestHeaderParams {
+  readonly physicalRoute?: PhysicalRouteIdentity;
+  readonly routingDecision?: VirtualRoutingDecision | null;
+  /** Omit to capture the reviewed catalog; null explicitly selects no catalog. */
+  readonly modelMetadata?: ModelMetadataSnapshot | null;
   readonly model: string;
   readonly providerId: string;
   readonly params: Record<string, unknown>;

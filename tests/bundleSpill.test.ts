@@ -125,7 +125,7 @@ describe("portable evidence bundles retain encrypted spill commitments and expli
     const ledger = openLedger(workspace);
     try {
       ledger.startSession({ sessionId, runtime: "unknown", binaryPath: "historical-fixture", binarySha256: sha256Hex("historical-fixture") });
-      ledger.appendEvidence({ sessionId, runtime: "unknown", eventType: "tool/result",
+      ledger.appendEvidence({ sessionId, runtime: "unknown", eventType: "tool_result",
         meta: { spilled: ref, outcome: "OK", trustTier: "OBSERVED", agentId: "default" } });
       ledger.sealSession(sessionId);
     } finally { ledger.close(); }

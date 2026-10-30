@@ -470,7 +470,7 @@ AMC provides 1,268 public CLI command paths in the live command inventory.
 | 451 | `amc executive` | Executive and board-ready AMC artifacts |
 | 452 | `amc executive brief` | Generate a board-ready one-page executive brief from a diagnostic run |
 | 453 | `amc experiment` | Deterministic baseline vs candidate experiments |
-| 454 | `amc experiment analyze` | Analyze latest experiment run (exit 0 all candidate cases pass, 1 failure or error, 3 inconclusive) |
+| 454 | `amc experiment analyze` | Analyze latest experiment run or verified run history (exit 0 all candidate cases pass, 1 failure or error, 3 inconclusive) |
 | 455 | `amc experiment create` | Create an experiment |
 | 456 | `amc experiment gate` | Evaluate latest experiment run against gate policy (exit 0 pass, 1 fail or error, 3 inconclusive) |
 | 457 | `amc experiment gate-template` | Write an experiment gate policy template |
@@ -1276,7 +1276,7 @@ AMC provides 1,268 public CLI command paths in the live command inventory.
 | 1257 | `amc whatif equalizer` | - |
 | 1258 | `amc whatif targets` | - |
 | 1259 | `amc why-capped` | Show why each question is capped at its current level |
-| 1260 | `amc wire` | Serve the NDJSON JSON-RPC wire on a unix socket (accepts work; does not run it) |
+| 1260 | `amc wire` | Serve the NDJSON JSON-RPC wire; optionally execute accepted work through an owner-configured native route |
 | 1261 | `amc wiring-status` | Show in-process production wiring counters (cannot observe other processes) |
 | 1262 | `amc workorder` | Signed work order operations |
 | 1263 | `amc workorder create` | Create and sign a work order |
@@ -1600,6 +1600,7 @@ Serve the Agent Client Protocol on stdio (for editors; prints nothing but frames
 | `--expected-tools-digest <sha256>` | - |
 | `--validation-config <path>` | - |
 | `--validation-config-sha256 <digest>` | - |
+| `--validation-repair <json>` | - |
 | `--validate <id>` | - |
 | `--approve-tools <actionClass>` | - |
 | `--approve-risk <tier>` | - |
@@ -1767,6 +1768,7 @@ Interactive native tasks over the existing governed run/resume path for the sele
 | `--agent <id>` | - |
 | `--validation-config <path>` | - |
 | `--validation-config-sha256 <digest>` | - |
+| `--validation-repair <json>` | - |
 | `--validate <id>` | - |
 | `--extension <manifest>` | - |
 | `--extension-pin <sha256>` | - |
@@ -1775,6 +1777,7 @@ Interactive native tasks over the existing governed run/resume path for the sele
 | `--delegate` | - |
 | `--no-delegate` | - |
 | `--max-delegation-depth <n>` | - |
+| `--max-active-children <n>` | - |
 | `--delegate-scope <classes>` | - |
 | `--delegate-stop <condition>` | - |
 | `--no-delegate-stop` | - |
@@ -1882,6 +1885,7 @@ Run one agent turn and report what the signed log recorded
 | `--delegate` | - |
 | `--no-delegate` | - |
 | `--max-delegation-depth <n>` | - |
+| `--max-active-children <n>` | - |
 | `--delegate-provider <id>` | - |
 | `--delegate-timeout <ms>` | - |
 | `--delegate-stop <condition>` | - |
@@ -1894,14 +1898,17 @@ Run one agent turn and report what the signed log recorded
 | `--steer <text>` | - |
 | `--steer-after <ms>` | - |
 | `--persona <text>` | - |
+| `--mission-context` | - |
 | `--approve-tools <actionClass>` | - |
 | `--approve-risk <tier>` | - |
 | `--interactive-approvals` | - |
+| `--validation-repair <json>` | - |
 | `--interactive-ask-user` | - |
 | `--web-search-searxng <origin>` | - |
 | `--goal-rounds <n>` | - |
 | `--approval-exception <file>` | - |
 | `--json` | - |
+| `--list-skills [name]` | - |
 
 #### `amc agent-loop verify`
 
@@ -3583,6 +3590,8 @@ Run the evaluation pipeline declared in amcconfig.yaml
 | Option | Description |
 |--------|-------------|
 | `--config <path>` | - |
+| `--user-config [path]` | - |
+| `--no-user-config` | - |
 | `--window <window>` | - |
 | `--format <format>` | - |
 | `--output <path>` | - |
@@ -3598,6 +3607,10 @@ Validate amcconfig.yaml without running anything
 | Option | Description |
 |--------|-------------|
 | `--config <path>` | - |
+| `--user-config [path]` | - |
+| `--no-user-config` | - |
+| `--json` | - |
+| `--schema [name]` | - |
 
 #### `amc connect`
 
@@ -4954,13 +4967,14 @@ Generate a board-ready one-page executive brief from a diagnostic run
 
 #### `amc experiment analyze`
 
-Analyze latest experiment run (exit 0 all candidate cases pass, 1 failure or error, 3 inconclusive)
+Analyze latest experiment run or verified run history (exit 0 all candidate cases pass, 1 failure or error, 3 inconclusive)
 
 
 | Option | Description |
 |--------|-------------|
 | `--experiment <id>` | - |
 | `--out <path>` | - |
+| `--all` | - |
 | `--agent <agentId>` | - |
 
 #### `amc experiment create`
@@ -5047,6 +5061,13 @@ Run deterministic experiment against signed casebook (exit 0 all candidate cases
 | `--mode <mode>` | - |
 | `--candidate-window <window>` | - |
 | `--candidate-agent <agentId>` | - |
+| `--execute-trials` | - |
+| `--provider <id>` | - |
+| `--model <model>` | - |
+| `--max-steps <n>` | - |
+| `--max-executions <n>` | - |
+| `--trial-timeout-ms <ms>` | - |
+| `--concurrency <n>` | - |
 | `--agent <agentId>` | - |
 
 #### `amc experiment set-baseline`
@@ -5084,6 +5105,12 @@ Run a controlled architecture comparison experiment (exit 0 measured pass, 1 fai
 | `--candidate-file <path>` | - |
 | `--baseline-kind <kind>` | - |
 | `--candidate-kind <kind>` | - |
+| `--execute-trials` | - |
+| `--casebook <id>` | - |
+| `--provider <id>` | - |
+| `--mode <mode>` | - |
+| `--max-steps <n>` | - |
+| `--agent <agentId>` | - |
 
 #### `amc explain`
 
@@ -7252,6 +7279,8 @@ Read manifest/content hashes and workspace signature status without loading or w
 | Option | Description |
 |--------|-------------|
 | `--expect-digest <sha256>` | - |
+| `--preview-command <name>` | - |
+| `--arguments <text>` | - |
 | `--json` | - |
 
 #### `amc native-extension install`
@@ -10910,7 +10939,7 @@ Show why each question is capped at its current level
 
 #### `amc wire`
 
-Serve the NDJSON JSON-RPC wire on a unix socket (accepts work; does not run it)
+Serve the NDJSON JSON-RPC wire; optionally execute accepted work through an owner-configured native route
 
 
 | Option | Description |
@@ -10918,6 +10947,13 @@ Serve the NDJSON JSON-RPC wire on a unix socket (accepts work; does not run it)
 | `--socket <path>` | - |
 | `--max-connections <n>` | - |
 | `--idle-timeout <ms>` | - |
+| `--execute-accepted` | - |
+| `--provider <id>` | - |
+| `--model <model>` | - |
+| `--base-url <origin>` | - |
+| `--credential <ref>` | - |
+| `--max-steps <n>` | - |
+| `--max-tokens <n>` | - |
 | `--json` | - |
 
 #### `amc wiring-status`

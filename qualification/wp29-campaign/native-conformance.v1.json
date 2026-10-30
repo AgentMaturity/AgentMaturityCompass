@@ -1,0 +1,156 @@
+{
+  "schemaVersion": "comparison-campaign/1",
+  "id": "wp29-native-conformance",
+  "description": "Preregistered preparation only. No model has been called and no results, superiority or release acceptance are claimed.",
+  "cohort": "native-task-execution",
+  "evidenceClass": "scripted-conformance",
+  "executor": "runHarnessComparison",
+  "targets": [
+    "amc",
+    "dsh",
+    "pi"
+  ],
+  "repetitions": 6,
+  "order": "rotate-targets-by-repetition",
+  "tasks": [
+    {
+      "id": "no-tools",
+      "scenario": "success"
+    },
+    {
+      "id": "success",
+      "scenario": "success"
+    },
+    {
+      "id": "refusal",
+      "scenario": "refusal"
+    },
+    {
+      "id": "injection",
+      "scenario": "injection"
+    },
+    {
+      "id": "redaction",
+      "scenario": "redaction"
+    },
+    {
+      "id": "budget",
+      "scenario": "budget-exhaustion"
+    },
+    {
+      "id": "cancel",
+      "scenario": "cancellation"
+    },
+    {
+      "id": "crash",
+      "scenario": "crash-recovery"
+    },
+    {
+      "id": "tool-error",
+      "scenario": "tool-error-attribution"
+    },
+    {
+      "id": "resume",
+      "scenario": "resume"
+    },
+    {
+      "id": "tamper",
+      "scenario": "tampering"
+    },
+    {
+      "id": "child",
+      "scenario": "child-identity"
+    },
+    {
+      "id": "unsupported",
+      "scenario": "unsupported-capability"
+    }
+  ],
+  "manifest": null,
+  "preparationInputs": [
+    {
+      "path": "../../qualification/wp29-campaign/reviewed-sources.v1.json",
+      "sha256": "f82a6490a648100423d2607b140b2ed890052b9724d423c428644eec49610666"
+    },
+    {
+      "path": "../../src/experiments/stats.ts",
+      "sha256": "e7d641654d78e9eb5e62115c08b8436c0d19c816fc6b780f070c80812a6c9e73"
+    },
+    {
+      "path": "../../src/experiments/experimentGatePolicy.ts",
+      "sha256": "706285587f286ad86d555cf0ddd23aa2a054c170f3484d1e51604815be351d08"
+    },
+    {
+      "path": "../../examples/harness-comparison/nativeMaterialize.mjs",
+      "sha256": "206cc0a5e3e1dc817afcc6cf51bf93f558219600abac83cfc60868a2f72280b2"
+    },
+    {
+      "path": "../../examples/harness-comparison/nativeCases.json",
+      "sha256": "64a2bff64c5158d9c4d0d2efd051dded381b25aa7a77793fc2a50d8bd427b0c2"
+    },
+    {
+      "path": "../../examples/harness-comparison/manifest.example.json",
+      "sha256": "70e133afed5007eff176e992db113634b28db524e81ac20e32d56d01b5b194ab"
+    },
+    {
+      "path": "../../src/benchmarks/comparisonCampaign.ts",
+      "sha256": "aa99f6d94f8e6bada0f50fab9c53fef04c82aa9b88beee976a0e4eb1e2789c72"
+    },
+    {
+      "path": "../../src/benchmarks/comparisonCampaignAnalysis.ts",
+      "sha256": "ea9bb0bb557859a7e3c185a2e9463b500e931987b4bbc312f140763b00a38e88"
+    },
+    {
+      "path": "../../src/benchmarks/comparisonCampaignEvidence.ts",
+      "sha256": "a6dd9e9449e096bbfcbe5b888b67cf16a226fea829ce6f345b14dbb363f3435d"
+    },
+    {
+      "path": "../../src/benchmarks/harnessComparison.ts",
+      "sha256": "f9f37d60484e0497624df73a7ecf0343bee9402d1c6478d52ac6a0720ca71114"
+    },
+    {
+      "path": "../../src/benchmarks/harnessComparisonSchema.ts",
+      "sha256": "c89ba633e5afbf2090db3a272519a3a23b9eebfcef518ee335102216f89ac7ea"
+    },
+    {
+      "path": "../../src/benchmarks/harnessComparisonReport.ts",
+      "sha256": "bd1e3054b9241301114a82d21c5ac4d47eea47815d8ff2905cf059bdea5fd322"
+    }
+  ],
+  "blockers": [
+    "No installed AMC/DSH/Pi artifact cohort has been materialized for these exact scenarios. Native AMC-only fixtures do not establish comparator coverage.",
+    "Injection, redaction, tool-error attribution and unsupported-capability require real implementation bindings and independent oracle fixtures; a scenario label is not a completed trial."
+  ],
+  "workspaceTaskIds": [],
+  "requireComponentsUsed": true,
+  "behavioralGate": {
+    "minRepetitions": 3,
+    "minPassRateLowerBound": 0.5
+  },
+  "comparisons": [
+    {
+      "baseline": "amc",
+      "candidate": "dsh",
+      "policy": {
+        "minUpliftSuccessRate": 0,
+        "minUpliftValuePoints": 0,
+        "valueUnit": "points",
+        "denyIfRegression": true,
+        "minPairedCases": 3,
+        "requireIntervalAboveZero": false
+      }
+    },
+    {
+      "baseline": "amc",
+      "candidate": "pi",
+      "policy": {
+        "minUpliftSuccessRate": 0,
+        "minUpliftValuePoints": 0,
+        "valueUnit": "points",
+        "denyIfRegression": true,
+        "minPairedCases": 3,
+        "requireIntervalAboveZero": false
+      }
+    }
+  ]
+}

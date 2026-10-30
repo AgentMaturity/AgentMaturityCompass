@@ -33,6 +33,7 @@ import type { PromptAssemblyRegistry } from "../prompt/assembly/promptRegistry.j
 import { renderPrompt } from "../prompt/assembly/interpolate.js";
 import { ContextPluginHost } from "../prompt/context/contextHost.js";
 import { createContextPreStep } from "../prompt/context/contextPreStep.js";
+import { LlmRouteError } from "../llm/adapter/adapterRegistry.js";
 
 /** The `session/close` reason of a session whose composition threw: it never became ready, so it did not complete. */
 export const COMPOSITION_FAILED = "composition_failed";
@@ -118,10 +119,14 @@ export function composeNativeAgent(init: NativeAgentInit): NativeAgent {
     }
     const llm = init.makeLlm(session);
     // An unknown route is a composition failure, not a turn that errors at its first request.
-    llm.pin?.({ providerId: init.route.providerId, model: init.route.model });
+    const pinned = init.route.pinned ?? llm.pin?.({ providerId: init.route.providerId, model: init.route.model });
+    if (pinned !== undefined && (pinned.providerId !== init.route.providerId || pinned.model !== init.route.model)) {
+      throw new LlmRouteError("AMC_LLM_ROUTE_INVALID", "the pinned route does not match the selected provider/model");
+    }
+    const route = pinned === undefined ? init.route : { ...init.route, pinned };
     const systemPromptEventId = session.recordSystemPrompt(systemPrompt).eventId;
     init.admit?.({ systemPrompt, tools });
-    const driver = new AgentDriver({ session, llm, route: init.route, systemPromptEventId, tools, hooks,
+    const driver = new AgentDriver({ session, llm, route, systemPromptEventId, tools, hooks,
       ...(init.driver?.validation === undefined ? {} : { validation: init.driver.validation }),
       ...(init.driver?.config === undefined ? {} : { config: init.driver.config }) });
     const composedPrompt = prompt;

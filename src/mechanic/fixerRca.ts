@@ -81,6 +81,23 @@ export interface FixerPatchProposal {
   expectedScoreImpact: number;
   confidence: number;
   regressionTestIds: string[];
+  /**
+   * What grounds the proposal, strongest first: a passing sibling run of the failure ("contrast"), the failure repeated
+   * across occurrences, or one occurrence. Absent on reports written before contrasts were recorded.
+   */
+  evidenceClass?: FixerEvidenceClass;
+  /** The passing run and its evidence refs, for a contrast proposal. */
+  contrastEvidenceRefs?: string[];
+}
+
+export type FixerEvidenceClass = "contrast" | "repeated-failure" | "single-failure";
+const EVIDENCE_CLASS_ORDER: readonly FixerEvidenceClass[] = ["contrast", "repeated-failure", "single-failure"];
+
+/** A run of the same task that did not show the failure class; the caller vouches for "same task". */
+export interface FixerContrastEvidence {
+  failureClass: TraceFailureClass;
+  passingRunId: string;
+  evidenceRefs: string[];
 }
 
 export interface FixerValidationReceipt {
@@ -228,6 +245,7 @@ function buildFixerRcaReport(input: {
   agentId?: string;
   traceIndex: TraceFailureIndex;
   episode?: EpisodeRecord | null;
+  contrasts?: readonly FixerContrastEvidence[];
 }): FixerRcaReport {
   const workspace = resolve(input.workspace);
   const agentId = input.agentId ?? input.traceIndex.agentId;
@@ -253,13 +271,17 @@ function buildFixerRcaReport(input: {
       suggestedRegressionTestId: test.testId
     } satisfies FixerRootCause;
   });
-  const proposals = rootCauses.map((cause) => {
-    const cluster = input.traceIndex.clusters.find((row) => row.failureClass === cause.failureClass)!;
+  const proposals = rootCauses.map((cause, index) => {
+    // Root causes are built one per cluster, in order; another cluster of the same class must not lend its impact.
+    const cluster = input.traceIndex.clusters[index]!;
     const resource = cause.affectedResourceId ? resources.find((row) => row.id === cause.affectedResourceId) ?? null : null;
     const testIds = regressionTests.filter((row) => row.failureClass === cause.failureClass).map((row) => row.testId);
     const blockedReason = !resource
       ? `Unsupported or missing mutable resource for ${cause.failureClass}.`
       : null;
+    // A run in which this cluster failed cannot be its passing sibling.
+    const contrast = (input.contrasts ?? []).find((row) => row.failureClass === cluster.failureClass && !cluster.runs.includes(row.passingRunId));
+    const evidenceClass: FixerEvidenceClass = contrast ? "contrast" : cluster.count > 1 ? "repeated-failure" : "single-failure";
     return {
       proposalId: `fix_${sha256Hex(`${cause.rootCauseId}:${resource?.id ?? "blocked"}`).slice(0, 12)}`,
       rootCauseId: cause.rootCauseId,
@@ -275,9 +297,11 @@ function buildFixerRcaReport(input: {
         : `Update ${resource!.kind} resource ${resource!.id} to address ${cause.failureClass}.`,
       expectedScoreImpact: cluster.scoreImpact,
       confidence: cause.confidence,
-      regressionTestIds: testIds
+      regressionTestIds: testIds,
+      evidenceClass,
+      ...(contrast ? { contrastEvidenceRefs: [contrast.passingRunId, ...contrast.evidenceRefs] } : {})
     } satisfies FixerPatchProposal;
-  });
+  }).sort((a, b) => EVIDENCE_CLASS_ORDER.indexOf(a.evidenceClass) - EVIDENCE_CLASS_ORDER.indexOf(b.evidenceClass));
   const gates = [
     {
       id: "allowed-mutation-surface",
@@ -328,7 +352,7 @@ function fixerRcaPath(workspace: string, agentId: string | undefined, runId: str
   return join(fixerRcaDir(workspace, agentId), `${runId}.json`);
 }
 
-export function writeFixerRcaReport(input: { workspace: string; agentId?: string; selector: string }): { report: FixerRcaReport; path: string; signaturePath: string | null } {
+export function writeFixerRcaReport(input: { workspace: string; agentId?: string; selector: string; contrasts?: readonly FixerContrastEvidence[] }): { report: FixerRcaReport; path: string; signaturePath: string | null } {
   const traceIndex = loadTraceFailureIndex({
     workspace: input.workspace,
     agentId: input.agentId,
@@ -342,7 +366,8 @@ export function writeFixerRcaReport(input: { workspace: string; agentId?: string
       episode = null;
     }
   }
-  const report = buildFixerRcaReport({ workspace: input.workspace, agentId: input.agentId ?? traceIndex.agentId, traceIndex, episode });
+  const report = buildFixerRcaReport({ workspace: input.workspace, agentId: input.agentId ?? traceIndex.agentId, traceIndex, episode,
+    ...(input.contrasts === undefined ? {} : { contrasts: input.contrasts }) });
   const path = fixerRcaPath(input.workspace, report.agentId, report.runId);
   writeFileAtomic(path, `${JSON.stringify(report, null, 2)}\n`, 0o644);
   const signed = trySignArtifactFile({ workspace: input.workspace, path, artifactKind: "fixer-rca-report" });

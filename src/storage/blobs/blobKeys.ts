@@ -217,6 +217,17 @@ export function rotateBlobKey(workspace: string): BlobKeyCurrent {
   return next;
 }
 
+/**
+ * WP35c: a vaulted blob key cannot be read here because the vault is locked in this process and no passphrase is set:
+ * the one key failure a vaultless reader may report as "not evaluated". Every other key failure is an authentication failure.
+ */
+export class VaultLockedError extends Error {
+  constructor(keyVersion: number) {
+    super(`blob key version ${keyVersion} is held by a locked vault`);
+    this.name = "VaultLockedError";
+  }
+}
+
 export function readBlobKeyMaterial(workspace: string, keyVersion: number): Buffer {
   // Version 0 is issued only by this code path, so it unambiguously means a
   // real random key held beside the blobs.
@@ -239,6 +250,7 @@ export function readBlobKeyMaterial(workspace: string, keyVersion: number): Buff
     // only key that can still open it. Read-only; nothing writes it again.
     return LEGACY_NO_SIGN_KEY;
   }
+  if (!process.env.AMC_VAULT_PASSPHRASE && !vaultStatus(workspace).unlocked) throw new VaultLockedError(keyVersion);
   const value = getVaultSecretReadOnly(workspace, blobKeySecretName(keyVersion));
   if (!value) {
     throw new Error(`blob key material missing for version ${keyVersion}`);

@@ -4031,33 +4031,33 @@ configCmd
 configCmd
   .command("validate")
   .description("Validate amcconfig.yaml without running anything")
-  .option("--config <path>", "config file path")
-  .action(async (opts: { config?: string }) => {
+  .option("--config <path>", "explicit config overlay path (highest file precedence)")
+  .option("--user-config [path]", "opt in to a user config overlay (default path ~/.amc/amcconfig.yaml)").option("--no-user-config", "no user config overlay (the default; kept as an alias)")
+  .option("--json", "emit resolved declarative config and provenance as JSON", false).option("--schema [name]", "dump boot-free JSON Schema (declarative|agent) without loading config")
+  .action(async (opts: { config?: string; userConfig?: string | boolean; json: boolean; schema?: string | boolean }) => {
     try {
       const { configValidate } = await import("./config/amcConfigCli.js");
-      configValidate({ workspace: process.cwd(), config: opts.config });
+      configValidate({ workspace: process.cwd(), ...opts });
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
 
 configCmd
   .command("run")
   .description("Run the evaluation pipeline declared in amcconfig.yaml")
-  .option("--config <path>", "config file path")
+  .option("--config <path>", "explicit config overlay path (highest file precedence)")
+  .option("--user-config [path]", "opt in to a user config overlay (default path ~/.amc/amcconfig.yaml)").option("--no-user-config", "no user config overlay (the default; kept as an alias)")
   .option("--window <window>", "evidence window override")
   .option("--format <format>", "json|html|terminal|markdown")
   .option("--output <path>", "report output path")
   .option("--dry-run", "resolve and report without executing", false)
   .option("--verbose", "print the resolved configuration", false)
   .option("--json", "emit the machine-readable result", false)
-  .action(async (opts: {
-    config?: string; window?: string; format?: string; output?: string;
-    dryRun: boolean; verbose: boolean; json: boolean;
-  }) => {
+  .action(async (opts: { config?: string; userConfig?: string | boolean; window?: string; format?: string; output?: string; dryRun: boolean; verbose: boolean; json: boolean }) => {
     try {
       const { runFromConfig } = await import("./config/amcConfigRunner.js");
       const result = await runFromConfig({
         workspace: process.cwd(),
-        configPath: opts.config,
+        configPath: opts.config, userConfig: opts.userConfig,
         window: opts.window,
         format: opts.format as "json" | "html" | "terminal" | "markdown" | undefined,
         outputPath: opts.output,
@@ -4940,6 +4940,7 @@ plugin
       approvalRequestId: opts.approvalRequest
     });
     console.log(chalk.green(`Plugin action executed: ${out.action}`));
+    console.log(`outcome: ${out.outcome}`);
     console.log(`plugin: ${out.pluginId}@${out.version ?? "removed"}`);
     console.log(`installed.lock: ${out.installedLockPath}`);
     console.log(`installed.lock.sig: ${out.installedLockSigPath}`);
@@ -13731,15 +13732,11 @@ casebook
       agentId: opts.agent ?? activeAgent(program),
       casebookId: opts.casebook
     });
-    if (out.valid) {
-      console.log(chalk.green("Casebook verification PASSED"));
-      return;
-    }
-    console.log(chalk.red("Casebook verification FAILED"));
-    for (const reason of out.reasons) {
+    console.log(out.valid ? chalk.green("Casebook verification PASSED") : chalk.red("Casebook verification FAILED"));
+    for (const reason of [...out.reasons, ...out.warnings.map((warning) => `warning: ${warning}`)]) {
       console.log(`- ${reason}`);
     }
-    process.exit(1);
+    if (!out.valid) process.exit(1);
   });
 
 experiment
@@ -13798,30 +13795,35 @@ experiment
   .description("Run deterministic experiment against signed casebook (exit 0 all candidate cases pass, 1 failure or error, 3 inconclusive)")
   .requiredOption("--experiment <id>", "experiment ID")
   .requiredOption("--mode <mode>", "supervise|sandbox")
-  .requiredOption("--candidate-window <window>", "evidence window covering the candidate's actual run")
+  .option("--candidate-window <window>", "evidence window covering the candidate's actual run (unless --execute-trials)")
   .option("--candidate-agent <agentId>", "candidate agent, if different from the baseline")
+  .option("--execute-trials", "execute the baseline and admitted candidate here over the held-out cases (native agent path)")
+  .option("--provider <id>", "trial provider for --execute-trials").option("--model <model>", "trial model").option("--max-steps <n>", "steps per trial", Number)
+  .option("--max-executions <n>", "trial executions bound", Number).option("--trial-timeout-ms <ms>", "time per trial", Number).option("--concurrency <n>", "concurrent trials", Number)
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
-  .action(async (opts: { experiment: string; mode: string; agent?: string; candidateWindow: string; candidateAgent?: string }) => {
-    await experimentRunCommandCli({
-      workspace: process.cwd(),
-      agentId: opts.agent ?? activeAgent(program),
-      experimentId: opts.experiment,
-      mode: opts.mode as "supervise" | "sandbox", /* the runner refuses any other mode; never coerced */ candidateWindow: opts.candidateWindow, candidateAgentId: opts.candidateAgent
+  .action(async (opts: { experiment: string; mode: string; agent?: string; candidateWindow?: string; candidateAgent?: string; executeTrials?: boolean; provider?: string; model?: string; maxSteps?: number; maxExecutions?: number; trialTimeoutMs?: number; concurrency?: number }) => {
+    const limits = { ...(opts.maxExecutions === undefined ? {} : { maxExecutions: opts.maxExecutions }), ...(opts.trialTimeoutMs === undefined ? {} : { trialTimeoutMs: opts.trialTimeoutMs }), ...(opts.concurrency === undefined ? {} : { concurrency: opts.concurrency }) };
+    if (opts.executeTrials && !opts.provider) throw new Error("--execute-trials requires --provider");
+    await experimentRunCommandCli({ workspace: process.cwd(), agentId: opts.agent ?? activeAgent(program), experimentId: opts.experiment,
+      mode: opts.mode as "supervise" | "sandbox", /* the runner refuses any other mode; never coerced */ candidateWindow: opts.candidateWindow, candidateAgentId: opts.candidateAgent,
+      ...(opts.executeTrials ? { executeTrials: { providerId: opts.provider!, ...(opts.model === undefined ? {} : { model: opts.model }), ...(opts.maxSteps === undefined ? {} : { maxSteps: opts.maxSteps }), limits } } : {})
     }, normalizeCliErrorMessage);
   });
 
 experiment
   .command("analyze")
-  .description("Analyze latest experiment run (exit 0 all candidate cases pass, 1 failure or error, 3 inconclusive)")
+  .description("Analyze latest experiment run or verified run history (exit 0 all candidate cases pass, 1 failure or error, 3 inconclusive)")
   .requiredOption("--experiment <id>", "experiment ID")
   .requiredOption("--out <path>", "output .md or .json")
+  .option("--all", "verify and tabulate all stored runs without executing trials")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
-  .action((opts: { experiment: string; out: string; agent?: string }) => {
+  .action((opts: { experiment: string; out: string; agent?: string; all?: boolean }) => {
     experimentAnalyzeCommandCli({
       workspace: process.cwd(),
       agentId: opts.agent ?? activeAgent(program),
       experimentId: opts.experiment,
-      outFile: resolve(process.cwd(), opts.out)
+      outFile: resolve(process.cwd(), opts.out),
+      all: opts.all
     }, normalizeCliErrorMessage);
   });
 
@@ -15786,64 +15788,16 @@ program
   .requiredOption("--name <name>", "experiment name")
   .requiredOption("--model <modelId>", "model ID (must be same for both)")
   .requiredOption("--baseline-file <path>", "path to baseline architecture artifact")
-  .requiredOption("--candidate-file <path>", "path to candidate architecture artifact")
+  .requiredOption("--candidate-file <path>", "path to candidate architecture artifact (signed, for --execute-trials)")
   .option("--baseline-kind <kind>", "architecture kind", "POLICY_FRAME")
   .option("--candidate-kind <kind>", "architecture kind", "POLICY_FRAME")
-  .action(async (opts: {
-    name: string;
-    model: string;
-    baselineFile: string;
-    candidateFile: string;
-    baselineKind: string;
-    candidateKind: string;
-  }) => {
-    const { quickArchitectureComparison, simulateProbeOutcomes } = await import(
-      "./experiments/architectureExperiment.js"
-    );
-    // Architecture comparison needs a probe runner that invokes the real model.
-    // Until one is wired, refuse rather than reporting LCG-generated scores as
-    // a measured comparison.
-    if (!process.env.AMC_ARCHITECTURE_ALLOW_SIMULATED) {
-      console.error(
-        chalk.yellow("Architecture comparison INCONCLUSIVE — no real probe runner is configured.")
-      );
-      console.error(
-        chalk.gray(
-          "This command previously reported deterministic pseudo-random scores, tokens and latencies as a measured comparison."
-        )
-      );
-      console.error(
-        chalk.cyan(
-          "Set AMC_ARCHITECTURE_ALLOW_SIMULATED=1 to run it explicitly as a simulation for pipeline testing."
-        )
-      );
-      process.exitCode = 3;
-      return;
-    }
-    const fs = await import("node:fs");
-    let baselineContent = "{}";
-    let candidateContent = "{}";
-    try { baselineContent = fs.readFileSync(opts.baselineFile, "utf-8"); } catch { /* use default */ }
-    try { candidateContent = fs.readFileSync(opts.candidateFile, "utf-8"); } catch { /* use default */ }
-    const validKinds = ["POLICY_FRAME", "PROMPT_STRUCTURE", "IDENTITY_DOC", "GUARDRAIL_SET", "TOOL_PERMISSION_SET", "CUSTOM"] as const;
-    const baselineKind = (validKinds as readonly string[]).includes(opts.baselineKind) ? opts.baselineKind as typeof validKinds[number] : "POLICY_FRAME";
-    const candidateKind = (validKinds as readonly string[]).includes(opts.candidateKind) ? opts.candidateKind as typeof validKinds[number] : "POLICY_FRAME";
-    const { markdown } = quickArchitectureComparison({
-      name: opts.name,
-      modelId: opts.model,
-      baselineName: `Baseline (${opts.baselineFile})`,
-      baselineKind,
-      baselineContent,
-      baselineDescription: `Loaded from ${opts.baselineFile}`,
-      candidateName: `Candidate (${opts.candidateFile})`,
-      candidateKind,
-      candidateContent,
-      probeRunner: simulateProbeOutcomes,
-      candidateDescription: `Loaded from ${opts.candidateFile}`,
-    });
-    console.log(markdown);
-    console.log(chalk.yellow("Architecture comparison INCONCLUSIVE: simulated outcomes are not measured task results."));
-    process.exitCode = 3;
+  .option("--execute-trials", "execute both artifacts on the model over the casebook's held-out cases (measured, bound report)")
+  .option("--casebook <id>", "signed casebook for --execute-trials").option("--provider <id>", "trial provider for --execute-trials")
+  .option("--mode <mode>", "supervise|sandbox for --execute-trials", "supervise").option("--max-steps <n>", "steps per trial", Number)
+  .option("--agent <agentId>", "agent ID (overrides global --agent)")
+  .action(async (opts: import("./experiments/architectureCli.js").ArchitectureCommandOptions) => {
+    const { architectureCommandCli } = await import("./experiments/architectureCli.js");
+    await architectureCommandCli({ ...opts, workspace: process.cwd(), agentId: opts.agent ?? activeAgent(program) }, normalizeCliErrorMessage);
   });
 
 program
@@ -18783,18 +18737,15 @@ program
   .action(async (opts: { baseline: string; candidate: string }) => {
     const lab = await import("./lab/cognitionLab.js");
     const pairs = lab.compareExperiments(opts.baseline, opts.candidate, process.cwd());
-    if (pairs.length === 0) { console.log(chalk.yellow("No matching probes to compare.")); process.exitCode = 1; return; }
+    if (pairs.length === 0) { console.log(chalk.yellow("No probe results to compare.")); process.exitCode = 1; return; }
     const { EXAMPLE_BANNER, exampleEnvelope } = await import("./claims/eligibility/exampleMode.js");
     console.log(chalk.bold.yellow(EXAMPLE_BANNER));
     printClaimResult(exampleEnvelope("lab:simulate"), {});
     console.log(chalk.bold(`\nComparison: ${opts.baseline} vs ${opts.candidate}\n`));
-    for (const p of pairs) {
-      console.log(`  ${p.probeId}:`);
-      for (const [dim, delta] of Object.entries(p.deltas)) {
-        const color = delta > 0.05 ? chalk.green : delta < -0.05 ? chalk.red : chalk.white;
-        console.log(color(`    ${dim}: ${delta > 0 ? "+" : ""}${(delta * 100).toFixed(1)}%`));
-      }
-    }
+    const { printLabComparison } = await import("./lab/labComparisonCli.js");
+    printLabComparison(pairs);
+    // Unmatched rows are reported, but a comparison with no matched probe is not a successful comparison.
+    if (!pairs.some(pair => pair.status === "matched")) { console.log(chalk.yellow("No matching probes to compare.")); process.exitCode = 1; }
   });
 
 program
@@ -20233,11 +20184,12 @@ shield
                 };
               } catch (error) {
                 if (error instanceof EgressBlocked) throw error;
-                // Other invocation failures retain legacy reporting; reconciliation is separate.
+                // An invocation failure cannot be scored as a measured refusal.
                 return {
                   attackId: attack.payload.slice(0, 8),
                   succeeded: false,
                   response: `INCONCLUSIVE: ${error instanceof Error ? error.message : String(error)}`,
+                  outcome: "source_unavailable",
                   latencyMs: Date.now() - startedAt,
                   bypassedDefenses: [],
                   detectedBy: [],
@@ -20255,22 +20207,21 @@ shield
       console.log(chalk.gray("Rounds:"), rounds);
       if (opts.categories) console.log(chalk.gray("Categories:"), opts.categories);
       console.log(chalk.yellow("Running red team rounds..."));
-      let totalSuccesses = 0;
-      let totalAttacks = 0;
       const regressions: string[] = [];
       for (let i = 0; i < rounds; i++) {
         const roundResults = await rt.runAllTargets();
         for (const round of roundResults) {
-          totalAttacks += round.attacks.length;
-          totalSuccesses += round.attacks.filter((a) => a.result.succeeded).length;
           regressions.push(...round.regressions);
-          console.log(chalk.gray(`  Round ${i + 1}: attacks=${round.attacks.length} success_rate=${(round.successRate * 100).toFixed(1)}%`));
+          console.log(chalk.gray(`  Round ${i + 1}: attacks=${round.attacks.length} success_rate=${round.successRate === null ? "not evaluated" : `${(round.successRate * 100).toFixed(1)}%`}`));
         }
       }
-      const overallSuccessRate = totalAttacks > 0 ? (totalSuccesses / totalAttacks) * 100 : 0;
+      const report = rt.generateReport(targetId);
+      const overallSuccessRate = report.overallSuccessRate === null ? null : report.overallSuccessRate * 100;
       console.log(chalk.bold("\nSummary:"));
-      console.log(chalk.gray("Total attacks:"), totalAttacks);
-      console.log(chalk.gray("Overall success rate:"), totalAttacks === 0 ? chalk.yellow("not evaluated (no attacks ran)") : overallSuccessRate < 10 ? chalk.green(`${overallSuccessRate.toFixed(1)}%`) : chalk.red(`${overallSuccessRate.toFixed(1)}%`));
+      console.log(chalk.gray("Total attacks:"), report.totalAttacks);
+      console.log(chalk.gray("Measured attacks:"), report.measuredAttacks);
+      console.log(chalk.gray("Inconclusive attacks:"), report.inconclusiveCount);
+      console.log(chalk.gray("Overall success rate:"), overallSuccessRate === null ? chalk.yellow("not evaluated (no measured attacks)") : overallSuccessRate < 10 ? chalk.green(`${overallSuccessRate.toFixed(1)}%`) : chalk.red(`${overallSuccessRate.toFixed(1)}%`));
       console.log(chalk.gray("Regressions detected:"), regressions.length > 0 ? chalk.red(regressions.length.toString()) : chalk.green("none"));
       if (regressions.length > 0) {
         for (const r of regressions) console.log(chalk.red(`  ⚠ ${r}`));

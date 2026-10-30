@@ -121,6 +121,7 @@ export interface DriverRunnerInit {
     /** Each descendant inherits the narrower declared per-delegation limits. */
     readonly stopConditions?: readonly string[];
     readonly maxDepth?: number;
+    readonly maxActiveChildren?: number;
     readonly mintSessionId?: () => string;
   };
 }
@@ -328,6 +329,7 @@ export function createDriverRunner(init: DriverRunnerInit): SubagentRunner {
                 identity: ctx.identity, runner: grant.runner, session,
                 ...(childLease === undefined ? {} : { parentLeaseToken: childLease }),
                 ...(grant.maxDepth === undefined ? {} : { maxDepth: grant.maxDepth }),
+                ...(grant.maxActiveChildren === undefined ? {} : { maxActiveChildren: grant.maxActiveChildren }),
                 ...(grant.mintSessionId === undefined ? {} : { mintSessionId: grant.mintSessionId }),
                 ...(descendantScope === undefined ? {} : { delegationScope: descendantScope }),
                 ...(descendantStops === undefined ? {} : { stopConditions: descendantStops })

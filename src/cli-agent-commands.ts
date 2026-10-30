@@ -1,3 +1,4 @@
+import { showSkillCatalogSelection } from "./cli/skillCatalogOptions.js";
 import { randomUUID } from "node:crypto";
 import { hostname } from "node:os";
 /**
@@ -40,13 +41,13 @@ import {
 } from "./agent/stubProvider.js";
 import type { LoopNotification } from "./agent/loopTypes.js";
 import { echoToolSeam } from "./agent/echoTool.js";
-import { WEB_SEARCH_SEARXNG_HELP, resolveBreadthRun, withBreadthRunOptions } from "./cli/agentLoopBreadthOptions.js";
+import { MAX_ACTIVE_CHILDREN_HELP, NO_DELEGATE_STOP_HELP, VALIDATION_REPAIR_HELP, WEB_SEARCH_SEARXNG_HELP, resolveBreadthRun, withBreadthRunOptions } from "./cli/agentLoopBreadthOptions.js";
 import { agentToolset, type AgentToolset } from "./agent/agentToolset.js";
 import { runLease } from "./leases/runLease.js";
 import { selectSupportedNativeTools } from "./agent/nativeToolCapabilities.js";
 import type { MountedNativeMcpServer } from "./mcp/nativeMcpClient.js";
 import { resolveNativeValidationSelection } from "./setup/nativeValidationConfig.js";
-import { NativeMcpConfigError, type ReviewedNativeMcpServer } from "./setup/nativeMcpConfig.js";
+import { NativeMcpConfigError, reviewedNativeMcpApprovalOptions, type ReviewedNativeMcpServer } from "./setup/nativeMcpConfig.js";
 import { delegateTool } from "./agent/delegateTool.js";
 import { DEFAULT_MAX_DELEGATION_DEPTH } from "./agent/delegationIdentity.js";
 import { parseDelegationScope } from "./agent/delegationScope.js";
@@ -58,7 +59,7 @@ import { resolvePreset, type AgentPreset } from "./presets/agentPresets.js";
 import { IN_PROCESS_PROVIDER, delegationTurnOptions, resolveForeignRunner } from "./agent/providers/delegationProviders.js";
 import type { SubagentRunner } from "./agent/subagentSpawn.js";
 import { loadVerifiedToolsConfigSnapshot } from "./toolhub/toolhubValidators.js";
-import type { AgentToolSeam } from "./agent/toolSeam.js";
+import { EMPTY_TOOL_SEAM, type AgentToolSeam } from "./agent/toolSeam.js";
 import type { SubagentCapability } from "./agent/delegateTool.js";
 import type { ComposedToolSession } from "./kernel/agentLoopRunner.js";
 import { readAgentRunSummary, renderVerifyReport, verifyAgentRun } from "./agent/runReport.js";
@@ -75,7 +76,7 @@ import { loadNativeAudioManifest } from "./attachments/nativeAudioFiles.js";
 import type { NativeAudioPart } from "./attachments/nativeAudioInput.js";
 
 import {
-  approvalGateFor, collectOption, collectDelegateStop, compactionOption, resetDelegateStops, integerOption, paramsFor, piAiRouteSelection, renderNotification, routeFor,
+  activeChildLimitOption, approvalGateFor, collectOption, collectDelegateStop, compactionOption, resetDelegateStops, integerOption, paramsFor, piAiRouteSelection, renderNotification, routeFor,
   type AgentLoopCliIo, type RunOptions
 } from "./cli-agent-options.js";
 export type { AgentLoopCliIo, RunOptions } from "./cli-agent-options.js";
@@ -133,7 +134,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--agent <id>", "agent identity; defaults to AMC_AGENT_ID, the current agent, then default")
     .description("Interactive native tasks over the existing governed run/resume path for the selected agent")
     .option("--validation-config <path>", "operator JSON containing named public checks")
-    .option("--validation-config-sha256 <digest>", "pin exact reviewed validation config bytes")
+    .option("--validation-config-sha256 <digest>", "pin exact reviewed validation config bytes").option("--validation-repair <json>", VALIDATION_REPAIR_HELP)
     .option("--validate <id>", "run this public check after each completed turn; repeat to select more", collectOption)
     .option("--extension <manifest>", "load this signed native extension; repeat for multiple manifests", collectOption)
     .option("--extension-pin <sha256>", "exact reviewed digest for each extension in the same order", collectOption)
@@ -141,10 +142,9 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--persona <text>", "explicit native persona override")
     .option("--delegate", "enable governed in-process child agents; requires workspace tools")
     .option("--no-delegate", "disable child delegation even when a signed preset enables it")
-    .option("--max-delegation-depth <n>", "maximum native child depth")
+    .option("--max-delegation-depth <n>", "maximum native child depth").option("--max-active-children <n>", MAX_ACTIVE_CHILDREN_HELP)
     .option("--delegate-scope <classes>", "explicit comma-separated child action classes")
-    .option("--delegate-stop <condition>", "repeatable child stop: max-turns:N (initial executor turn plus continuations) or timeout-ms:N (whole child lifetime including idle)", collectDelegateStop)
-    .option("--no-delegate-stop", "explicitly clear extra child stops from a preset; budgets, depth and approvals still apply", resetDelegateStops)
+    .option("--delegate-stop <condition>", "repeatable child stop: max-turns:N (initial executor turn plus continuations) or timeout-ms:N (whole child lifetime including idle)", collectDelegateStop).option("--no-delegate-stop", NO_DELEGATE_STOP_HELP, resetDelegateStops)
     .option("--provider <id>", "explicit provider; asks in a terminal when omitted")
     .option("--model <model>", "your model ID; asks for a real provider when omitted")
     .option("--base-url <origin>", "explicit HTTP(S) provider origin; retained for every turn and resume command")
@@ -162,8 +162,8 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--thinking <mode>", "DeepSeek only: enabled or disabled; tools-free chat requires explicit disabled")
     .option("--reasoning-effort <effort>", "DeepSeek only: exact low, high, or max with enabled thinking")
     .option("--max-steps <n>", "model steps per turn (default 8, or 2 for stub)")
-    .option("--context-window <tokens>", "declared model context window; enables automatic compaction between steps")
-    .option("--compact-threshold <fraction>", "measured prompt share of --context-window that triggers compaction (0.5-0.95, default 0.8)")
+    .option("--context-window <tokens>", "override the reviewed model context window for automatic compaction")
+    .option("--compact-threshold <fraction>", "use ratio trigger instead of the catalog token reserve (0.5-0.95; requires --context-window)")
     .option("--no-auto-summary", "prune old tool output only; never run a model-written summary step")
     .option("--session <id>", "resume this unsealed session; each turn verifies before acquiring its writer")
     .option("--fork-from <id>", "create a child of this verified parent on the first task")
@@ -191,21 +191,21 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--credential <ref>", "credential REFERENCE (never a value) the route authenticates with")
     .option("--credentials-home <dir>", "home directory the credentials store reads from")
     .option("--credentials-file <path>", "explicit credentials file, overriding the home layout")
-    .option("--mcp-config <path>", "reviewed MCP JSON; repeat to mount more servers under the same signed allowlist and approval class; requires --tools workspace and --approve-tools", collectOption)
+    .option("--mcp-config <path>", "reviewed MCP JSON; repeat to mount more servers under the same signed allowlist; each grant keeps its reviewed action class; requires --tools workspace and --approve-tools", collectOption)
     .option("--mcp-config-sha256 <digest>", "refuse an MCP config changed from these exact reviewed bytes; one per --mcp-config, in the same order", collectOption)
     .option("--max-tokens <n>", "provider max_tokens for each request")
     .option("--thinking <mode>", "DeepSeek only: enabled (default) or disabled")
     .option("--reasoning-effort <effort>", "DeepSeek only: exact low, high (default), or max with enabled thinking")
     .option("--max-steps <n>", "how many model steps one turn may take")
-    .option("--context-window <tokens>", "declared model context window; enables automatic compaction between steps")
-    .option("--compact-threshold <fraction>", "measured prompt share of --context-window that triggers compaction (0.5-0.95, default 0.8)")
+    .option("--context-window <tokens>", "override the reviewed model context window for automatic compaction")
+    .option("--compact-threshold <fraction>", "use ratio trigger instead of the catalog token reserve (0.5-0.95; requires --context-window)")
     .option("--no-auto-summary", "prune old tool output only; never run a model-written summary step")
     .option("--tools <mode>", 'tool seam: "workspace" (the governed built-ins), "echo", or "none"')
     .option("--tool-mode <mode>", '"native" (one call per step) or "code" (dispatch from a program)')
     .option("--unsafe-unconfined-shell", "macOS without Seatbelt only: offer the native shell UNCONFINED, with your full user rights; ignored where Seatbelt or Bubblewrap confines it, refused on Windows")
     .option("--session <id>", "resume this existing, unsealed session as its next writer (verified before dispatch)")
     .option("--takeover-expired-writer <reason>", "with --session: claim a remote or unresponsive writer whose lease lapsed one lease ago; the reason is recorded")
-    .option("--fork-from <id>", "open a new session whose lineage names this parent's verified final row")
+    .option("--fork-from <id>", "copy this verified parent conversation into a new signed session")
     .option("--keep-open", "leave the session unsealed at exit so a later process can --session it")
     .option(
       "--delegate",
@@ -214,7 +214,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       + "Requires \"delegate\" in the signed tool allowlist."
     )
     .option("--no-delegate", "disable child delegation even when a signed preset enables it")
-    .option("--max-delegation-depth <n>", "how deep a delegation chain may go (default 3)")
+    .option("--max-delegation-depth <n>", "how deep a delegation chain may go (default 3)").option("--max-active-children <n>", MAX_ACTIVE_CHILDREN_HELP)
     .option(
       "--delegate-provider <id>",
       "who executes a delegation: \"in-process\" (default) or a foreign CLI such as "
@@ -222,8 +222,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       + "requires AMC Studio to be running."
     )
     .option("--delegate-timeout <ms>", "how long a foreign delegate may run before it is killed")
-    .option("--delegate-stop <condition>", "repeatable child stop: max-turns:N (initial executor turn plus continuations) or timeout-ms:N (whole child lifetime including idle); applies to native and foreign children", collectDelegateStop)
-    .option("--no-delegate-stop", "explicitly clear extra child stops from a preset; budgets, depth and approvals still apply", resetDelegateStops)
+    .option("--delegate-stop <condition>", "repeatable child stop: max-turns:N (initial executor turn plus continuations) or timeout-ms:N (whole child lifetime including idle); applies to native and foreign children", collectDelegateStop).option("--no-delegate-stop", NO_DELEGATE_STOP_HELP, resetDelegateStops)
     .option(
       "--preset <id>",
       "compose this run from a signed preset in .amc/agents.yaml. Explicit flags override it."
@@ -239,6 +238,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--steer <text>", "send a steering message mid-turn")
     .option("--steer-after <ms>", "when to send --steer (default 0)")
     .option("--persona <text>", "deployment persona assembled into the system prompt")
+    .option("--mission-context", "include the agent's validated mission and constraints as attributed runtime context")
     .option(
       "--approve-tools <actionClass>",
       "require a signed human approval before every tool call, decided under this action class"
@@ -250,7 +250,9 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       "ADR-5 exception note (JSON) that auto-allows the classes it names until it expires"
     )
     .option("--json", "Output as JSON")
+    .option("--list-skills [name]", "list skill discovery, sources and digests; pass a name to inspect its literal body")
     .action(async (promptParts: string[], opts: RunOptions, command: Command) => {
+      if (showSkillCatalogSelection(opts, io)) return;
       const agentId = resolveAgentId(process.cwd(), selectedAgentOption(command));
       let validation: ReturnType<typeof resolveNativeValidationSelection>;
       try { validation = resolveNativeValidationSelection(opts); }
@@ -374,8 +376,6 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       ) {
         return;
       }
-      const compaction = compactionOption(io, opts);
-      if (compaction === null) return;
       const piRoute = await piAiRouteSelection(io, providerId, opts, opts.model ?? preset?.model);
       if (piRoute === null) return;
       const route = piRoute?.route ?? routeFor(io, providerId, opts, opts.model ?? preset?.model);
@@ -412,7 +412,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       let mcpServers: readonly ReviewedNativeMcpServer[] = [];
       if (opts.mcpConfig !== undefined) {
         if (opts.tools !== "workspace" || gate === undefined) {
-          io.error("--mcp-config requires explicit --tools workspace and --approve-tools with matching grant action classes."); io.fail(); return;
+          io.error("--mcp-config requires explicit --tools workspace and --approve-tools; each MCP grant keeps its reviewed action class."); io.fail(); return;
         }
         try {
           const { reviewNativeMcpConfigurations } = await import("./setup/nativeMcpConfig.js");
@@ -436,6 +436,8 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       // decided which model this route serves (and refused when none was named),
       // so a second derivation here is a second chance to disagree with it.
       const model = route.models?.[0] ?? STUB_PROVIDER_MODEL;
+      const compaction = compactionOption(io, opts, preset?.compaction, { providerId: route.providerId, model });
+      if (compaction === null) return;
       // The echo tool is offered by default only on the stub route: handing a
       // real provider a demonstration tool would spend the operator's money on
       // exercising a stub.
@@ -446,6 +448,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       const wantsDelegation = opts.delegate === true;
       const breadth = resolveBreadthRun(io, opts, { toolMode, wantsDelegation });
       if (breadth === null) return;
+      const maxActiveChildren = activeChildLimitOption(io, opts.maxActiveChildren, wantsDelegation && toolMode === "workspace"); if (maxActiveChildren === null) return;
       if (!wantsDelegation && opts.delegateStop !== undefined) {
         io.error(chalk.red("--delegate-stop and --no-delegate-stop require --delegate or delegate.enabled in the signed preset."));
         io.fail(); return;
@@ -489,7 +492,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           return boundSession;
         };
         const toolset = workspaceToolset = agentToolset({
-          workspace: process.cwd(),
+          workspace: process.cwd(), extensionHooks: extensionTurn.hooks,
           agentId,
           additionalCapabilities: [...mcpServers.flatMap(entry => entry.review.capabilities), ...(wantsDelegation ? [{ name: "delegate", actionClass: "READ_ONLY" as const }] : [])],
           // Fork chooses a different ID; resume chooses the existing writer.
@@ -532,8 +535,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           `tool writes are scoped to: ${
             toolset.readiness.writeScope.length > 0 ? toolset.readiness.writeScope.join(", ") : "(nothing)"
           }`
-        ));
-        progress(chalk.dim(`action policy: ${toolset.readiness.actionPolicy}`));
+        )); progress(chalk.dim(`action policy: ${toolset.readiness.actionPolicy}`));
         if (!toolset.readiness.confined) {
           // A warning, not a refusal: an unconfined fs.read is still governed
           // by the allowlist and the firewall. Code Mode is the part that
@@ -591,7 +593,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           // the operator's value and used the default would say so here.
           //
           progress(chalk.dim(
-            `delegation is offered, chains bounded at depth ${maxDelegationDepth}`
+            `delegation is offered, chains bounded at depth ${maxDelegationDepth}; root-wide active children capped at ${maxActiveChildren}`
             + (foreignRunner === null ? "; native children inherit approval, cancellation, limits and narrowed scopes" : "")
           ));
           // Named either way. The unscoped case is the one an operator is most
@@ -627,7 +629,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
             const mount = await mountNativeMcpServer({ server, workspace: process.cwd(), agentId,
               toolset: workspaceToolset, ...review, signal: mcpAbort.signal });
             mcpMounts.push(mount);
-            progress(`Mounted reviewed MCP tools for this run: ${mount.toolNames.join(", ")}. Signed allowlist, approval gate and budgets remain in force.`);
+            (await import("./setup/nativeInteractiveMcp.js")).reportNativeInteractiveMcpMount(mount, progress);
           }
         }
         let previewRequest: string | null = null;
@@ -657,6 +659,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           // CLAUDE.md in as runtime context. A hardcoded string here — what this
           // command sent before P3.3 — was an agent with no idea where it was.
           promptProfile: {
+            ...(opts.missionContext === true ? { missionContext: true } : {}),
             ...((opts.persona ?? preset?.persona) === undefined
               ? {}
               : { persona: (opts.persona ?? preset?.persona) as string }),
@@ -675,7 +678,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           ...(gate === undefined
             ? {}
             : {
-                approvalGate: {
+                approvalGate: { ...reviewedNativeMcpApprovalOptions(mcpServers),
                   actionClass: gate.actionClass,
                   riskTier: gate.riskTier,
                   answerers: gate.answerers,
@@ -709,7 +712,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           ...(providerId === STUB_PROVIDER_ID
             ? { transport: stubProviderTransport({ failFirst, thinkMs, retryAfterSeconds: 1 }) }
             : {}),
-          ...(toolSeam === null ? {} : { tools: toolSeam }),
+          ...(toolSeam === null && !extensionTurn.hooks ? {} : { tools: { ...(toolSeam ?? EMPTY_TOOL_SEAM), extensionHooks: extensionTurn.hooks } }),
           ...(bindToolSession === undefined ? {} : { bindToolSession }),
           ...(grantDelegation === null
             ? {}
@@ -717,6 +720,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
                 delegation: delegationTurnOptions({
                   grant: grantDelegation,
                   maxDepth: maxDelegationDepth,
+                  ...(opts.maxActiveChildren === undefined ? {} : { maxActiveChildren }),
                   scope: delegateScope,
                   ...(opts.delegateStop === undefined ? {} : { stopConditions: delegateStops.conditions }),
                   runner: foreignRunner

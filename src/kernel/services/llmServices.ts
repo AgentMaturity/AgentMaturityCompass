@@ -30,7 +30,7 @@ import type { Context } from "../amcRuntime.js";
 import type { CredentialsService } from "../../credentials/credentialsService.js";
 import type { SessionService } from "../../session/sessionService.js";
 import { AdapterRegistry } from "../../llm/adapter/adapterRegistry.js";
-import type { LlmRouteConfig, PinnedRoute } from "../../llm/adapter/adapterRegistry.js";
+import type { LlmRouteConfig, PinnedRoute, VirtualRouteSelection } from "../../llm/adapter/adapterRegistry.js";
 import { LlmRuntime } from "../../llm/adapter/llmRuntime.js";
 import type { LlmCallSpec, PreparedCall } from "../../llm/adapter/llmRuntime.js";
 import type { RequestEncoderRegistry } from "../../llm/request/requestEncoder.js";
@@ -160,6 +160,11 @@ export class LlmSeamService extends AmcSeam {
   /** Resolve a route without dispatching — for diagnostics and doctor output. */
   pin(input: { readonly providerId: string; readonly model: string }): PinnedRoute {
     return this.registry.pin(input);
+  }
+
+  /** Select an existing router decision deliberately, with a durable per-request receipt. */
+  pinVirtual(selection: VirtualRouteSelection): PinnedRoute {
+    return this.runtime.pinVirtual(selection);
   }
 }
 

@@ -133,7 +133,8 @@ describe("ordered native image input (unexecuted)", () => {
       writer.recordToolResult({ toolCallId: "image-read", outcome: "ERROR", exitCode: 1, timedOut: false, denied: false, content: "Denied by fixture policy" });
       writer.endStep({ stopReason: "tool_calls", usage: null }); writer.startStep();
       for await (const _chunk of runtime.prepare({ ...spec, tools: [] }).stream()) { /* actual recorder */ }
-      for (const bytes of sent) expect(firstUserWire(provider, bytes)).toEqual(expectedImageWire(provider));
+      // A direct LlmRuntime: no native composition, so no runtime-context snapshot.
+      for (const bytes of sent) expect(firstUserWire(provider, bytes, false)).toEqual(expectedImageWire(provider));
       const body = JSON.parse(sent[1]!.toString("utf8"));
       if (provider === "openai") {
         expect(body.messages.find((item: { role: string }) => item.role === "assistant").tool_calls[0].function.arguments).toBe(raw);

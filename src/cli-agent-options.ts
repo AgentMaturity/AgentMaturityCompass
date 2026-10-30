@@ -5,6 +5,8 @@ import { readFileSync } from "node:fs";
 import type { LlmRouteConfig, ProviderDescription } from "./llm/adapter/adapterRegistry.js";
 import type { LlmAdapter } from "./llm/adapter/adapterTypes.js";
 import { snapshotCapabilities } from "./llm/adapter/providerCapabilities.js";
+import { lookupProviderCatalog } from "./llm/providerCatalog.js";
+import { listModelMetadata, type ModelMetadataSnapshot } from "./llm/modelCatalog.js";
 import { anthropicAdapter } from "./llm/providers/anthropicAdapter.js";
 import { openaiAdapter } from "./llm/providers/openaiAdapter.js";
 import { openaiResponsesAdapter } from "./llm/providers/openaiResponsesAdapter.js";
@@ -30,6 +32,7 @@ import {
   parseApprovalExceptionNote
 } from "./approvals/seam/devProfileException.js";
 import { loadActiveCompiledPolicy } from "./catalog/compiler/activate.js";
+import { DEFAULT_MAX_ACTIVE_CHILDREN } from "./agent/subagentSpawn.js";
 import { createScopedExceptionAnswerer } from "./governor/scopedExceptions.js";
 
 /** The side-effecting edges, injectable so the wiring itself is testable. */
@@ -45,6 +48,7 @@ export interface RunOptions {
   audioInput?: string;
   validationConfig?: string;
   validationConfigSha256?: string;
+  validationRepair?: string;
   validate?: string[];
   extension?: string[];
   extensionPin?: string[];
@@ -52,6 +56,7 @@ export interface RunOptions {
   mcpConfigSha256?: string[];
   delegate?: boolean;
   maxDelegationDepth?: string;
+  maxActiveChildren?: string;
   delegateScope?: string;
   /** False is the explicit operator --no-delegate-stop reset, never a model argument. */
   delegateStop?: string[] | false;
@@ -85,6 +90,8 @@ export interface RunOptions {
   takeoverExpiredWriter?: string;
   steerAfter?: string;
   persona?: string;
+  missionContext?: boolean;
+  listSkills?: boolean | string;
   approveTools?: string;
   approveRisk?: string;
   approvalException?: string;
@@ -234,9 +241,22 @@ export function integerOption(io: AgentLoopCliIo, flag: string, raw: string | un
   return value;
 }
 
-/** Automatic compaction from the run flags; undefined when off, null after a reported error. */
-export function compactionOption(io: AgentLoopCliIo, options: Pick<RunOptions, "contextWindow" | "compactThreshold" | "autoSummary">): CompactionConfig | undefined | null {
-  try { return compactionFromFlags(options); }
+/** Parse the root cap and refuse explicit configuration when no child capability is offered. */
+export function activeChildLimitOption(io: AgentLoopCliIo, raw: string | undefined, enabled: boolean): number | null {
+  if (raw !== undefined && raw.trim() === "") {
+    io.error(chalk.red("--max-active-children must be a non-negative integer")); io.fail(); return null;
+  }
+  const limit = integerOption(io, "--max-active-children", raw, DEFAULT_MAX_ACTIVE_CHILDREN);
+  if (limit !== null && raw !== undefined && !enabled) {
+    io.error(chalk.red("--max-active-children requires --delegate and --tools workspace, or an enabled signed preset.")); io.fail(); return null;
+  }
+  return limit;
+}
+
+/** Explicit compaction settings; undefined leaves reviewed route defaults to the driver, null reports an error. */
+export function compactionOption(io: AgentLoopCliIo, options: Pick<RunOptions, "contextWindow" | "compactThreshold" | "autoSummary">,
+  preset?: Partial<CompactionConfig>, route?: { readonly providerId: string; readonly model: string }): Partial<CompactionConfig> | undefined | null {
+  try { return compactionFromFlags(options, preset, route); }
   catch (error) {
     io.error(chalk.red(error instanceof Error ? error.message : "Automatic compaction options were refused."));
     io.fail();
@@ -276,24 +296,6 @@ export function paramsFor(providerId: string, maxTokens: number, options: Pick<R
       return { max_tokens: maxTokens, stream: true };
   }
 }
-
-const DEFAULT_BASE_URLS: Readonly<Record<string, string>> = Object.freeze({
-  "gemini-audio": "https://generativelanguage.googleapis.com",
-  gemini: "https://generativelanguage.googleapis.com",
-  deepseek: "https://api.deepseek.com",
-  anthropic: "https://api.anthropic.com",
-  openai: "https://api.openai.com",
-  "openai-responses": "https://api.openai.com"
-});
-
-const DEFAULT_CREDENTIAL_REFS: Readonly<Record<string, string>> = Object.freeze({
-  "gemini-audio": "GEMINI_API_KEY",
-  gemini: "GEMINI_API_KEY",
-  deepseek: "DEEPSEEK_API_KEY",
-  anthropic: "ANTHROPIC_API_KEY",
-  openai: "OPENAI_API_KEY",
-  "openai-responses": "OPENAI_API_KEY"
-});
 
 /** One inventory for executable CLI/ACP selection and local adapter discovery.
  * Gateway templates are deliberately not native adapters. Looking up entries in
@@ -339,10 +341,13 @@ export function nativeRouteFor(
       // retained for an operator-configured authenticated origin, never guessed.
       ...(options.credential === undefined ? {} : { credentialRef: credentialRef(options.credential) }) });
   }
-  const baseUrl = options.baseUrl ?? DEFAULT_BASE_URLS[providerId];
-  if (baseUrl === undefined) throw new Error(`--base-url is required for provider ${providerId}`);
+  const defaults = lookupProviderCatalog(providerId);
+  const baseUrl = options.baseUrl ?? defaults?.defaultBaseUrl;
+  if (baseUrl === undefined || baseUrl === null) throw new Error(`--base-url is required for provider ${providerId}`);
+  const credential = options.credential ?? defaults?.defaultCredentialRef;
+  if (credential === undefined || credential === null) throw new Error(`--credential is required for provider ${providerId}`);
   return { providerId, adapter, baseUrl,
-    credentialRef: credentialRef(options.credential ?? DEFAULT_CREDENTIAL_REFS[providerId] ?? "AMC_LLM_API_KEY"),
+    credentialRef: credentialRef(credential),
     models: [model] };
 }
 
@@ -369,6 +374,8 @@ export interface NativeProviderDescription extends Omit<ProviderDescription, "mo
   /** Discovery only, not a route allowlist: null means models were not enumerated. */
   readonly models: readonly string[] | null;
   readonly modelSelection: "explicit-required" | "fixed-synthetic";
+  /** Reviewed catalog assertions, not a model probe or route allowlist. */
+  readonly reviewedCatalog?: readonly ModelMetadataSnapshot[];
 }
 
 /** Snapshot the same adapter contracts the route registry captures. Real model
@@ -384,6 +391,7 @@ export function discoverNativeProviders(providerId?: string) {
       encoderId: adapter.encoderId, encoderVersion: adapter.encoderVersion,
       models: id === STUB_PROVIDER_ID ? Object.freeze([STUB_PROVIDER_MODEL]) : null,
       modelSelection: id === STUB_PROVIDER_ID ? "fixed-synthetic" as const : "explicit-required" as const,
+      reviewedCatalog: adapter.capabilities === undefined ? Object.freeze([]) : listModelMetadata(id, adapter.capabilities.protocol),
       capabilities: snapshotCapabilities(adapter.capabilities)
     })));
   return Object.freeze({ schemaVersion: 1 as const, scope: "bundled-native-adapters" as const,

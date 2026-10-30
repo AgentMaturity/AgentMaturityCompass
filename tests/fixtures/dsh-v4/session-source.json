@@ -1,0 +1,37 @@
+{
+  "sourceRevision": "22ddee3792402c3e70ec5f86a63c3e3e895a2f60",
+  "sourceUrl": "https://github.com/deepseek-ai/deepseek-harness/tree/22ddee3792402c3e70ec5f86a63c3e3e895a2f60",
+  "files": [
+    {
+      "path": "packages/session/session-format-v3-to-v4/tests/codec.spec.ts",
+      "sha256": "2f1fb9e3872fa3a86b77c837fea78d568ea2aeb03982944fcdfbc0038b4543f1"
+    },
+    {
+      "path": "packages/session/session-format-v3-to-v4/tests/tool-role.spec.ts",
+      "sha256": "32b6b73cc56acd0433e8b3db2c7bf83fad2fc648a4fad6f4db50b9072c4a9e6d"
+    }
+  ],
+  "adaptation": "session.jsonl combines pinned physical-header, inherited-prefix and native firstClassMessage cases with synthetic nested failure/child catalog records; no DSH runtime executed. The upstream source tests are retained as offline reference, not executed in AMC.",
+  "contractSources": [
+    {
+      "path": "packages/core/session/src/types.ts",
+      "sha256": "e0f0c064295404ce33d69936fa940f9e6d024803bbf66337ff2d3c71acb80df1"
+    },
+    {
+      "path": "packages/core/session/src/known-event-types.ts",
+      "sha256": "862acc917dc2dd5e185640640c0747735e8b84c3fa65939738bac9a1d45e106b"
+    },
+    {
+      "path": "packages/session/session-format-v3-to-v4/src/codec.ts",
+      "sha256": "2e82811f3a805c3985b6ad56ab5129a3c656a2712357e02da1e9653679f384f0"
+    },
+    {
+      "path": "packages/session/session-format-v3-to-v4/src/tool-role.ts",
+      "sha256": "867aded1027588ffa65439efc2eb18748db5255370b65552b1c05130ecb6fa9d"
+    },
+    {
+      "path": "packages/session/session-format-v3-to-v4/src/validation.ts",
+      "sha256": "c29501b7a76c51d591858862610dbdfea29f14c3cc1016c364e04b696f858d2f"
+    }
+  ]
+}

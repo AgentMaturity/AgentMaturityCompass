@@ -699,9 +699,9 @@ export {
   setExperimentCandidate,
   runExperiment,
   analyzeExperiment,
-  gateExperiment,
-  listExperiments
+  gateExperiment, listExperiments
 } from "./experiments/experimentRunner.js";
+export { runImprovementLoop, editorRouteSchema, type EditorRoute, type ImprovementEditor, type ImprovementProposal } from "./experiments/improvementLoop.js";
 export { bootstrapDifferenceCI, effectSizeDifference, meanDifference, pairedBootstrapCI, pairedStandardizedEffect, deterministicSeed } from "./experiments/stats.js";
 export {
   initComplianceMaps, initComplianceMapsAsync, ComplianceMapsPublicationError,
@@ -1985,7 +1985,7 @@ export type {
   NewRelicOptions,
   PlatformName,
 } from "./observability/platformConfigs.js";
-
+export * from "./llm/modelEnumeration.js";
 // ── Multi-provider model routing ─────────────────────────────────
 export { ModelRouter } from "./ops/modelRouter.js";
 export type {

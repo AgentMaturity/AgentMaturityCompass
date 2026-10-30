@@ -3,16 +3,26 @@ import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "nod
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { afterEach, describe, expect, test, vi } from "vitest";
+import { writeSealedReport } from "./helpers/sealedRun.js";
 import { initWorkspace } from "../src/workspace.js";
 import { getAgentPaths } from "../src/fleet/paths.js";
 import { questionBank } from "../src/diagnostic/questionBank.js";
 import type { DiagnosticReport } from "../src/types.js";
-import { forecastInitCli, forecastRefreshCli, forecastSchedulerRunNowCli } from "../src/forecast/forecastCli.js";
+import { forecastInitCli, forecastRefreshCli, forecastSchedulerRunNowCli, forecastSchedulerRunNowCliAsync, forecastPolicyApplyCli, forecastPolicyDefaultCli } from "../src/forecast/forecastCli.js";
 import { forecastScopeLatestPath } from "../src/forecast/forecastStore.js";
 import { verifyLatestForecast } from "../src/forecast/forecastVerifier.js";
 import { detectSuspiciousMaturityJump } from "../src/forecast/anomalyDetector.js";
+import { createTransformPlan } from "../src/transformation/transformPlanner.js";
+import { writeSignedTransformPlan, type TransformPlan } from "../src/transformation/transformTasks.js";
+import { appendTransparencyEntry } from "../src/transparency/logChain.js";
+import type { ForecastArtifact } from "../src/forecast/forecastSchema.js";
+import { rotatePurposeKeys } from "../src/keys/purposeKeys.js";
+import { getSigningKey, signHexDigest } from "../src/crypto/keys.js";
+import { sha256Hex } from "../src/utils/hash.js";
+import { verifySignedFileWithAuditor } from "../src/org/orgSigner.js";
+import { calculateForecast } from "../src/forecast/forecastEngine.js";
+import { renderForecastMarkdown } from "../src/forecast/forecastReports.js";
 import { startStudioApiServer } from "../src/studio/studioServer.js";
-import { writeSealedReport } from "./helpers/sealedRun.js";
 
 afterEach(() => { vi.useRealTimers(); });
 
@@ -158,6 +168,20 @@ function writeTransformHistory(workspace: string, agentId: string): void {
   );
 }
 
+function validPlanFixture(workspace: string) {
+  writeRunFixture({ workspace, runId: "plan-baseline", ts: Date.now(), overall: 2, integrity: 0.95,
+    observed: 0.95, attested: 0.03, selfReported: 0.02, correlation: 0.96 });
+  return createTransformPlan({ workspace, scope: { type: "AGENT", agentId: "default" }, to: "excellence", preview: true }).plan;
+}
+
+/** Writes the signed plan and its transparency record, as `transform plan` and `transform track` do. */
+function recordTransformPlan(workspace: string, plan: TransformPlan, type = "TRANSFORM_PLAN_CREATED") {
+  const written = writeSignedTransformPlan(workspace, plan);
+  appendTransparencyEntry({ workspace, type, agentId: plan.scope.type === "AGENT" ? plan.scope.agentId! : `node:${plan.scope.nodeId!}`,
+    artifact: { kind: "policy", sha256: sha256Hex(readFileSync(written.planPath)), id: plan.planId } });
+  return written;
+}
+
 async function pickPort(): Promise<number> {
   const server = createServer();
   await new Promise<void>((resolvePromise) => server.listen(0, "127.0.0.1", () => resolvePromise()));
@@ -189,6 +213,189 @@ async function httpGet(url: string, token?: string): Promise<{ status: number; b
 }
 
 describe("forecast planning", () => {
+  test.each([
+    ["incomplete fixture", null, "ZodError"],
+    ["invalid JSON", "{", "SyntaxError"],
+    ["non-array tasks", '{"tasks":{}}', "ZodError"],
+    ["null task", '{"tasks":[null]}', "ZodError"]
+  ])("refresh survives a malformed transform plan: %s", (_name, contents, problem) => {
+    const workspace = newWorkspace();
+    writeTransformHistory(workspace, "default");
+    if (contents !== null) {
+      writeFileSync(join(workspace, ".amc", "agents", "default", "transform", "latest.json"), contents);
+    }
+    const out = forecastRefreshCli({ workspace, scope: "agent", targetId: "default" });
+    const latest = JSON.parse(readFileSync(out.latestPath!, "utf8")) as ForecastArtifact;
+    expect(latest.transformPlanInput).toEqual({ outcome: "source_unavailable", reason: expect.stringContaining(problem) });
+    expect(latest.etaToTarget.status).toBe("UNKNOWN");
+    expect(latest.etaToTarget.expectedDays).toBeUndefined();
+    expect(latest.etaToTarget.reasons).toContain(latest.transformPlanInput!.reason);
+    expect(latest.advisories.flatMap(row => row.recommendedNextSteps).some(step => step.startsWith("Task "))).toBe(false);
+    expect(renderForecastMarkdown(latest)).toContain("source_unavailable");
+    expect(renderForecastMarkdown(latest)).toContain(problem);
+    expect(verifyLatestForecast(workspace, latest.scope).file.valid).toBe(true);
+  });
+
+  test("async workspace refresh continues past a malformed transform plan", async () => {
+    const workspace = newWorkspace();
+    writeTransformHistory(workspace, "default");
+    const result = await forecastSchedulerRunNowCliAsync({ workspace });
+    expect(result.generated.map(row => row.scope)).toContainEqual({ type: "AGENT", id: "default" });
+    const latest = JSON.parse(readFileSync(forecastScopeLatestPath(workspace, { type: "AGENT", id: "default" }), "utf8")) as ForecastArtifact;
+    expect(latest.transformPlanInput?.outcome).toBe("source_unavailable");
+    expect(latest.transformPlanInput?.reason).toContain("ZodError");
+    expect(verifyLatestForecast(workspace, latest.scope).file.valid).toBe(true);
+  });
+
+  test.each(["unsigned", "tampered", "malformed signature"])("refresh rejects an unverifiable %s transform plan", (kind) => {
+    const workspace = newWorkspace();
+    const plan = validPlanFixture(workspace);
+    const written = recordTransformPlan(workspace, plan);
+    if (kind === "unsigned") {
+      rmSync(written.latestSigPath);
+    } else if (kind === "malformed signature") {
+      writeFileSync(written.latestSigPath, "{");
+    } else {
+      plan.tasks[0]!.title = "untrusted recommendation";
+      writeFileSync(written.latestPath, JSON.stringify(plan));
+    }
+    const out = forecastRefreshCli({ workspace, scope: "agent", targetId: "default" });
+    const latest = JSON.parse(readFileSync(out.latestPath!, "utf8")) as ForecastArtifact;
+    expect(latest.transformPlanInput).toEqual({
+      outcome: "source_unavailable",
+      reason: expect.stringContaining(kind === "unsigned" ? "ENOENT" : kind === "tampered" ? "digest mismatch" : "invalid file signature")
+    });
+    expect(latest.etaToTarget.status).toBe("UNKNOWN");
+    expect(latest.advisories.flatMap(row => row.recommendedNextSteps).some(step => step.startsWith("Task "))).toBe(false);
+  });
+
+  test("a config-purpose signature cannot authenticate the latest transform plan", () => {
+    const workspace = newWorkspace();
+    const written = recordTransformPlan(workspace, validPlanFixture(workspace));
+    rotatePurposeKeys({ workspace, purposes: ["config-signature"], passphrase: "forecast-test-passphrase" });
+    const digestSha256 = sha256Hex(readFileSync(written.latestPath));
+    writeFileSync(written.latestSigPath, JSON.stringify({ digestSha256,
+      signature: signHexDigest(digestSha256, getSigningKey(workspace, "config-signature")), signedTs: Date.now(), signer: "auditor" }));
+    expect(verifySignedFileWithAuditor(workspace, written.latestPath).valid).toBe(true);
+    const out = forecastRefreshCli({ workspace, scope: "agent", targetId: "default" });
+    const latest = JSON.parse(readFileSync(out.latestPath!, "utf8")) as ForecastArtifact;
+    expect(latest.transformPlanInput?.outcome).toBe("source_unavailable");
+    expect(latest.transformPlanInput?.reason).toContain("signature verification failed");
+    expect(latest.etaToTarget.status).toBe("UNKNOWN");
+  });
+
+  test("an unreadable transform plan is disclosed without aborting refresh", () => {
+    const workspace = newWorkspace();
+    mkdirSync(join(workspace, ".amc", "agents", "default", "transform", "latest.json"), { recursive: true });
+    const out = forecastRefreshCli({ workspace, scope: "agent", targetId: "default" });
+    const latest = JSON.parse(readFileSync(out.latestPath!, "utf8")) as ForecastArtifact;
+    expect(latest.transformPlanInput?.outcome).toBe("source_unavailable");
+    expect(latest.transformPlanInput?.reason).toContain("EISDIR");
+    expect(latest.etaToTarget.status).toBe("UNKNOWN");
+  });
+
+  test("a transform plan signed for another agent is not used for this one", () => {
+    const workspace = newWorkspace();
+    const other = { ...validPlanFixture(workspace), scope: { type: "AGENT" as const, agentId: "other-agent" } };
+    const written = recordTransformPlan(workspace, other);
+    const dir = join(workspace, ".amc", "agents", "default", "transform");
+    mkdirSync(dir, { recursive: true });
+    writeFileSync(join(dir, "latest.json"), readFileSync(written.latestPath));
+    writeFileSync(join(dir, "latest.json.sig"), readFileSync(written.latestSigPath));
+    const out = forecastRefreshCli({ workspace, scope: "agent", targetId: "default" });
+    const latest = JSON.parse(readFileSync(out.latestPath!, "utf8")) as ForecastArtifact;
+    expect(latest.transformPlanInput).toEqual({ outcome: "source_unavailable", reason: "Transform plan is signed for a different scope." });
+  });
+
+  test("an older signed latest.json restored over a newer plan is a rollback", () => {
+    const workspace = newWorkspace();
+    const older = validPlanFixture(workspace);
+    const first = recordTransformPlan(workspace, older);
+    const savedPlan = readFileSync(first.latestPath), savedSig = readFileSync(first.latestSigPath);
+    recordTransformPlan(workspace, { ...older, planId: `${older.planId}-newer`, createdTs: older.createdTs + 60_000 });
+    writeFileSync(first.latestPath, savedPlan);
+    writeFileSync(first.latestSigPath, savedSig);
+    const out = forecastRefreshCli({ workspace, scope: "agent", targetId: "default" });
+    const latest = JSON.parse(readFileSync(out.latestPath!, "utf8")) as ForecastArtifact;
+    expect(latest.transformPlanInput).toEqual({ outcome: "source_unavailable", reason: "Transform plan is not the latest recorded plan; latest.json was rolled back." });
+    expect(latest.etaToTarget.status).toBe("UNKNOWN");
+  });
+
+  test("an older revision of the same planId restored with its archive copy is a rollback", () => {
+    const workspace = newWorkspace();
+    const plan = validPlanFixture(workspace);
+    const first = recordTransformPlan(workspace, plan);
+    const saved = [first.latestPath, first.latestSigPath, first.planPath, first.sigPath].map(path => [path, readFileSync(path)] as const);
+    recordTransformPlan(workspace, { ...plan, tasks: plan.tasks.map(task => ({ ...task, status: "DONE" as const })) }, "TRANSFORM_PLAN_UPDATED");
+    for (const [path, bytes] of saved) writeFileSync(path, bytes);
+    const out = forecastRefreshCli({ workspace, scope: "agent", targetId: "default" });
+    const latest = JSON.parse(readFileSync(out.latestPath!, "utf8")) as ForecastArtifact;
+    expect(latest.transformPlanInput).toEqual({ outcome: "source_unavailable", reason: "Transform plan is not the latest recorded plan; latest.json was rolled back." });
+  });
+
+  test.each(["unrecorded", "log tampered"])("a transform plan with %s freshness is unavailable", kind => {
+    const workspace = newWorkspace();
+    if (kind === "unrecorded") writeSignedTransformPlan(workspace, validPlanFixture(workspace));
+    else {
+      recordTransformPlan(workspace, validPlanFixture(workspace));
+      const logPath = join(workspace, ".amc", "transparency", "log.jsonl");
+      const lines = readFileSync(logPath, "utf8").trimEnd().split("\n");
+      writeFileSync(logPath, `${lines.slice(0, -1).join("\n")}\n`);
+    }
+    const out = forecastRefreshCli({ workspace, scope: "agent", targetId: "default" });
+    const latest = JSON.parse(readFileSync(out.latestPath!, "utf8")) as ForecastArtifact;
+    expect(latest.transformPlanInput).toEqual({ outcome: "source_unavailable", reason: kind === "unrecorded"
+      ? "Transform plan has no transparency record." : "Transform plan freshness is unverifiable: the transparency log does not verify." });
+  });
+
+  test.each(["bad signature", "missing signature"])("an archive entry with a %s is tampering, not skipped", kind => {
+    const workspace = newWorkspace();
+    const plan = validPlanFixture(workspace);
+    const written = recordTransformPlan(workspace, plan);
+    const forged = join(written.planPath, "..", "tp_forged.json");
+    writeFileSync(forged, JSON.stringify({ ...plan, planId: "tp_forged", createdTs: plan.createdTs + 60_000 }, null, 2));
+    if (kind === "bad signature") writeFileSync(`${forged}.sig`, readFileSync(written.sigPath));
+    const out = forecastRefreshCli({ workspace, scope: "agent", targetId: "default" });
+    const latest = JSON.parse(readFileSync(out.latestPath!, "utf8")) as ForecastArtifact;
+    expect(latest.transformPlanInput).toEqual({ outcome: "source_unavailable", reason: "Transform plan archive entry tp_forged.json does not verify." });
+  });
+
+  test("transform plan changes still invalidate a captured forecast before signing", () => {
+    const workspace = newWorkspace();
+    const written = recordTransformPlan(workspace, validPlanFixture(workspace));
+    const selected = calculateForecast({ workspace, scope: { type: "AGENT", id: "default" } });
+    selected.assertInputsCurrent();
+    writeFileSync(written.latestPath, '{"tasks":{}}');
+    expect(() => selected.assertInputsCurrent()).toThrow("selected forecast signal inputs changed while signing");
+  });
+
+  test("a verified transform plan supplies task recommendations", () => {
+    const workspace = newWorkspace();
+    const plan = validPlanFixture(workspace);
+    recordTransformPlan(workspace, plan);
+    const out = forecastRefreshCli({ workspace, scope: "agent", targetId: "default" });
+    const latest = JSON.parse(readFileSync(out.latestPath!, "utf8")) as ForecastArtifact;
+    expect(latest.transformPlanInput).toEqual({ outcome: "measured", reason: null });
+    expect(latest.advisories.flatMap(row => row.recommendedNextSteps).some(step => step.startsWith("Task "))).toBe(true);
+    expect(latest.etaToTarget.reasons).toContain("insufficient completion history");
+  });
+
+  test("node plan failure is disclosed with advisories disabled", () => {
+    const workspace = newWorkspace();
+    const policy = forecastPolicyDefaultCli();
+    policy.forecastPolicy.advisories.enable = false;
+    forecastPolicyApplyCli({ workspace, policy });
+    const dir = join(workspace, ".amc", "org", "transform", "enterprise");
+    mkdirSync(dir, { recursive: true });
+    writeFileSync(join(dir, "latest.json"), '{"tasks":[]}');
+    const out = forecastRefreshCli({ workspace, scope: "node", targetId: "enterprise" });
+    const latest = JSON.parse(readFileSync(out.latestPath!, "utf8")) as ForecastArtifact;
+    expect(latest.transformPlanInput?.outcome).toBe("source_unavailable");
+    expect(latest.transformPlanInput?.reason).toContain("ZodError");
+    expect(latest.advisories).toEqual([]);
+    expect(latest.etaToTarget.status).toBe("UNKNOWN");
+  });
+
   test("deterministic forecast output for fixed fixture", () => {
     const workspace = newWorkspace();
     forecastInitCli(workspace);
@@ -207,6 +414,12 @@ describe("forecast planning", () => {
       });
     }
     writeTransformHistory(workspace, "default");
+    const { plan } = createTransformPlan({ workspace, scope: { type: "AGENT", agentId: "default" }, to: "excellence", preview: true });
+    plan.tasks = [
+      { ...plan.tasks[0]!, taskId: "t4", effort: 3, status: "NOT_STARTED" },
+      { ...plan.tasks[0]!, taskId: "t5", effort: 2, status: "IN_PROGRESS" }
+    ];
+    recordTransformPlan(workspace, plan);
     vi.useFakeTimers();
     vi.setSystemTime(new Date(Date.UTC(2026, 1, 1)));
 
@@ -224,7 +437,11 @@ describe("forecast planning", () => {
       targetId: "default"
     });
     const secondBytes = readFileSync(latestPath, "utf8");
-    expect(secondBytes).toBe(firstBytes);
+    const deterministic = (bytes: string) => {
+      const forecast = JSON.parse(bytes) as ForecastArtifact;
+      return { ...forecast, advisories: forecast.advisories.map(row => ({ ...row, advisoryId: "random" })) };
+    };
+    expect(deterministic(secondBytes)).toEqual(deterministic(firstBytes));
 
     const parsed = JSON.parse(firstBytes) as { status: string; etaToTarget?: { status?: string } };
     expect(parsed.status).toBe("OK");
@@ -256,7 +473,8 @@ describe("forecast planning", () => {
     expect(out.status).toBe("INSUFFICIENT_EVIDENCE");
     const latest = JSON.parse(
       readFileSync(forecastScopeLatestPath(workspace, { type: "AGENT", id: "default" }), "utf8")
-    ) as { reasons: string[]; series: { maturityOverall: { forecast: { short: unknown } } } };
+    ) as ForecastArtifact;
+    expect(latest.transformPlanInput?.outcome).toBe("not_evaluated");
     expect(latest.reasons.some((reason) => reason.includes("INTEGRITY_BELOW_MIN"))).toBe(true);
     expect(latest.series.maturityOverall.forecast.short).toBeNull();
   });
@@ -279,6 +497,7 @@ describe("forecast planning", () => {
         correlation: 0.97
       });
     }
+    writeTransformHistory(workspace, "default");
     const out = forecastRefreshCli({
       workspace,
       scope: "agent",
@@ -287,7 +506,10 @@ describe("forecast planning", () => {
     expect(out.advisories).toBeGreaterThan(0);
     const latest = JSON.parse(
       readFileSync(forecastScopeLatestPath(workspace, { type: "AGENT", id: "default" }), "utf8")
-    ) as { advisories: Array<{ category: string; severity: string }>; drift: Array<{ severity: string }> };
+    ) as ForecastArtifact;
+    expect(latest.status).toBe("OK");
+    expect(latest.series.maturityOverall.forecast.short).not.toBeNull();
+    expect(latest.transformPlanInput?.outcome).toBe("source_unavailable");
     expect(latest.drift.some((row) => row.severity === "CRITICAL")).toBe(true);
     expect(latest.advisories.some((row) => row.category === "DRIFT")).toBe(true);
   });

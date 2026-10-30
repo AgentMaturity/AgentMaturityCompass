@@ -1,0 +1,120 @@
+{
+  "schemaVersion": "comparison-campaign/1",
+  "id": "wp29-native-model-quality",
+  "description": "Preregistered preparation only. No model has been called and no results, superiority or release acceptance are claimed.",
+  "cohort": "native-task-execution",
+  "evidenceClass": "model-quality",
+  "executor": "runHarnessComparison",
+  "targets": [
+    "amc",
+    "dsh",
+    "pi"
+  ],
+  "repetitions": 6,
+  "order": "rotate-targets-by-repetition",
+  "tasks": [
+    {
+      "id": "coding-range-normalization",
+      "scenario": "success"
+    },
+    {
+      "id": "coding-quoted-csv",
+      "scenario": "success"
+    },
+    {
+      "id": "coding-stable-dependencies",
+      "scenario": "success"
+    }
+  ],
+  "manifest": null,
+  "preparationInputs": [
+    {
+      "path": "../../qualification/wp29-campaign/reviewed-sources.v1.json",
+      "sha256": "f82a6490a648100423d2607b140b2ed890052b9724d423c428644eec49610666"
+    },
+    {
+      "path": "../../src/experiments/stats.ts",
+      "sha256": "e7d641654d78e9eb5e62115c08b8436c0d19c816fc6b780f070c80812a6c9e73"
+    },
+    {
+      "path": "../../src/experiments/experimentGatePolicy.ts",
+      "sha256": "706285587f286ad86d555cf0ddd23aa2a054c170f3484d1e51604815be351d08"
+    },
+    {
+      "path": "../../examples/harness-comparison/codingMaterialize.mjs",
+      "sha256": "1ac279cdc8bc32cbd6ee2594c871ee0d0108b07060eac21bfbaeee61062b221d"
+    },
+    {
+      "path": "../../examples/harness-comparison/codingCases.json",
+      "sha256": "189d9cafb86c991d75b173f9e14b3883b1bc9d3fb3ee2103b63b35679d9dcbd0"
+    },
+    {
+      "path": "../../examples/harness-comparison/codingOracle.mjs",
+      "sha256": "92cfaa4f17396b0ea8465d08c2cd41b34cd8f3e17676349adb0dc2d2ac411af1"
+    },
+    {
+      "path": "../../src/benchmarks/comparisonCampaign.ts",
+      "sha256": "aa99f6d94f8e6bada0f50fab9c53fef04c82aa9b88beee976a0e4eb1e2789c72"
+    },
+    {
+      "path": "../../src/benchmarks/comparisonCampaignAnalysis.ts",
+      "sha256": "ea9bb0bb557859a7e3c185a2e9463b500e931987b4bbc312f140763b00a38e88"
+    },
+    {
+      "path": "../../src/benchmarks/comparisonCampaignEvidence.ts",
+      "sha256": "a6dd9e9449e096bbfcbe5b888b67cf16a226fea829ce6f345b14dbb363f3435d"
+    },
+    {
+      "path": "../../src/benchmarks/harnessComparison.ts",
+      "sha256": "f9f37d60484e0497624df73a7ecf0343bee9402d1c6478d52ac6a0720ca71114"
+    },
+    {
+      "path": "../../src/benchmarks/harnessComparisonSchema.ts",
+      "sha256": "c89ba633e5afbf2090db3a272519a3a23b9eebfcef518ee335102216f89ac7ea"
+    },
+    {
+      "path": "../../src/benchmarks/harnessComparisonReport.ts",
+      "sha256": "bd1e3054b9241301114a82d21c5ac4d47eea47815d8ff2905cf059bdea5fd322"
+    }
+  ],
+  "blockers": [
+    "Use the existing coding materializer with independently installed AMC, DSH and Pi, a pinned container and actual shared model/runtime/weights. No artifact, dependency, container or serving identity is assumed available.",
+    "Live and local-model trials require separate execution authorization and budget. This package performs preparation and offline analysis only."
+  ],
+  "workspaceTaskIds": [
+    "coding-range-normalization",
+    "coding-quoted-csv",
+    "coding-stable-dependencies"
+  ],
+  "requireComponentsUsed": true,
+  "behavioralGate": {
+    "minRepetitions": 3,
+    "minPassRateLowerBound": 0.5
+  },
+  "comparisons": [
+    {
+      "baseline": "amc",
+      "candidate": "dsh",
+      "policy": {
+        "minUpliftSuccessRate": 0,
+        "minUpliftValuePoints": 0,
+        "valueUnit": "points",
+        "denyIfRegression": true,
+        "minPairedCases": 3,
+        "requireIntervalAboveZero": false
+      }
+    },
+    {
+      "baseline": "amc",
+      "candidate": "pi",
+      "policy": {
+        "minUpliftSuccessRate": 0,
+        "minUpliftValuePoints": 0,
+        "valueUnit": "points",
+        "denyIfRegression": true,
+        "minPairedCases": 3,
+        "requireIntervalAboveZero": false
+      }
+    }
+  ]
+}
