@@ -22,6 +22,7 @@ import { readAcpSessionUpdatePage } from "./acpSessionUpdatePage.js";
 import { SessionHistoryRefused } from "../session/sessionHistoryReader.js";
 import { projectAcpTurnState, type AcpCommittedTurn } from "./acpSessionPageState.js";
 import { executionStatusFor } from "../execution/executionStatus.js";
+import { projectNativeMcpStatus } from "../mcp/nativeMcpStatus.js";
 import type { TurnEndReason } from "../session/sessionTypes.js";
 
 /**
@@ -200,6 +201,7 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
       case "_amc/session/release": return releaseSession(params);
       case "_amc/session/events": return sessionEvents(params);
       case "_amc/session/withdraw": return withdrawSubmission(params);
+      case "_amc/session/mcp": return mcpStatus(params);
       case "session/prompt": return prompt(params, signal);
       default:
         throw new AcpFailure(ACP_ERROR.methodNotFound, `${method} is not implemented by this agent`);
@@ -239,6 +241,16 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
       throw new AcpFailure(ACP_ERROR.invalidParams, "Submission withdrawal requires an owned usable native session.");
     }
     return { withdrawn: entry.session.withdraw(request.messageId) };
+  }
+
+  /** Read-only: the bound per-mount status through the `/mcp` projection; never probes, admits or closes a server. */
+  function mcpStatus(params: unknown): unknown {
+    if (!params || typeof params !== "object" || Array.isArray(params) || Object.keys(params).some(key => key !== "sessionId")) {
+      throw new AcpFailure(ACP_ERROR.invalidParams, "MCP status requires sessionId only.");
+    }
+    const entry = entryFor(params);
+    if (!entry || entry.releasing || !entry.session.resourceStatus) throw new AcpFailure(ACP_ERROR.invalidParams, "MCP status requires an owned native session.");
+    return projectNativeMcpStatus(entry.session.resourceStatus().mcp);
   }
 
   function handleNotification(method: string, params: unknown): void {

@@ -207,6 +207,17 @@ approval gate, reviewed config/catalog digests and existing matching signed
 grants. No discovery or policy mutation happens automatically. Client-supplied
 ACP `mcpServers` remain refused; use the reviewed startup configuration.
 
+`mcp_config` and `mcp_config_sha256` also take lists: one reviewed config per
+server and, when pinning, one SHA-256 per config in the same order. An unpaired
+or malformed entry raises `ValueError` before anything is spawned.
+`agent.mcp_status(session_id)` returns each mounted server's status through the
+same projection chat's `/mcp` shows (server id, catalog digest, protocol, auth
+issuer/scopes/expiry, granted tool names, `state` and
+`execution: "not-evaluated"`); env values, headers, tokens and config content
+are never included. A refused startup (unreviewed, tampered, duplicate or
+unpaired config, or a grant class mismatch) raises `AmcStartupRefusedError`
+with the runtime's stable `reason` code and fixed message.
+
 `Session.start_prompt()` returns an iterable `Turn`. It now receives committed
 assistant/tool updates while the native prompt is still running, in completed
 response-block units. These are authenticated session rows, not raw provisional

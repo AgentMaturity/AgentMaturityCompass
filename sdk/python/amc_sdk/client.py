@@ -22,12 +22,14 @@ from typing import Any, Callable, Generator, Literal, Optional
 
 from .execution import (EXECUTION_API_VERSION, ExecutionStatus, PendingApproval, VerificationReceipt, admit_verification,
                         approval_args, parse_execution_status, parse_pending, run_cli)
+from .mcp_status import MCP_STATUS_FORMAT, admit_mcp_status, mcp_config_argv
 
 __all__ = ["AmcAgent", "Session", "Turn", "SessionUpdate", "RunResult", "ToolCall",
            "NativeValidationStatus", "NativeValidationCheckStatus", "NativeValidationCheckResult",
            "NativeValidationResult", "NativeImageInput", "NativeInputPart", "NATIVE_ORDERED_INPUT_FORMAT",
            "NativeAudioInput", "NativeAudioPart", "NATIVE_AUDIO_INPUT_FORMAT",
-           "AmcError", "AmcProtocolError", "AmcRefusedError", "AmcTimeoutError", "SessionEventPage", "SessionPageUpdate", "AmcResyncRequiredError"]
+           "AmcError", "AmcProtocolError", "AmcRefusedError", "AmcTimeoutError", "SessionEventPage", "SessionPageUpdate", "AmcResyncRequiredError",
+           "AmcStartupRefusedError", "MCP_STATUS_FORMAT"]
 DEFAULT_TIMEOUT_SECONDS = 120.0
 MAX_FRAME_BYTES = 1024 * 1024
 # Matches native NdjsonFramer ingress; response frames have a separate bound.
@@ -75,6 +77,28 @@ class AmcRefusedError(AmcError):
     def __init__(self, code: int, message: str, data: Any = None) -> None:
         super().__init__(f"[{code}] {message}")
         self.code, self.message, self.data = code, message, data
+
+
+class AmcStartupRefusedError(AmcRefusedError):
+    """``amc acp`` refused its own launch configuration before serving any session.
+
+    ``reason`` is the runtime's stable code (mcp-config-tampered, mcp-config-unreviewed,
+    mcp-config-duplicate, mcp-config-unpaired, mcp-grant-class-mismatch, mcp-config-invalid,
+    or startup-refused for any other failure); the message is its fixed, secret-free text.
+    """
+    def __init__(self, reason: str, message: str) -> None:
+        super().__init__(_STARTUP_REFUSED, message, {"reason": reason})
+        self.reason = reason
+
+
+_STARTUP_REFUSED = -32003
+
+
+def _startup_refusal(error: AmcRefusedError) -> AmcRefusedError:
+    reason = error.data.get("reason") if error.code == _STARTUP_REFUSED and isinstance(error.data, dict) else None
+    if isinstance(reason, str) and re.fullmatch(r"[a-z][a-z-]{0,63}", reason):
+        return AmcStartupRefusedError(reason, error.message)
+    return error
 
 
 class AmcTimeoutError(AmcProtocolError):
@@ -933,7 +957,7 @@ class AmcAgent:
     def __init__(self, workspace: str = ".", *, provider: str = "stub", model: Optional[str] = None,
                  credential: Optional[str] = None, base_url: Optional[str] = None, agent_id: str = "default",
                  tools: str = "none", approve_tools: Optional[str] = None, approve_risk: Optional[str] = None,
-                 mcp_config: Optional[str] = None, mcp_config_sha256: Optional[str] = None,
+                 mcp_config: Optional[str | list[str]] = None, mcp_config_sha256: Optional[str | list[str]] = None,
                  expected_tools_digest: Optional[str] = None,
                  validation_config: Optional[str] = None, validation_config_sha256: Optional[str] = None,
                  validate: Optional[list[str]] = None,
@@ -968,8 +992,8 @@ class AmcAgent:
             raise ValueError("approve_risk requires an approval action class and a valid risk tier")
         if mcp_config is not None and (tools != "workspace" or approve_tools is None):
             raise ValueError("reviewed MCP requires workspace tools and signed approvals")
-        if mcp_config_sha256 is not None and (mcp_config is None or not isinstance(mcp_config_sha256, str) or _SHA256.fullmatch(mcp_config_sha256) is None):
-            raise ValueError("MCP digest requires an explicit config and lowercase SHA-256")
+        # One reviewed config per server, each paired with its pin; refused before anything is spawned.
+        mcp_argv = mcp_config_argv(mcp_config, mcp_config_sha256)
         if expected_tools_digest is not None and (tools != "workspace" or not isinstance(expected_tools_digest, str) or _SHA256.fullmatch(expected_tools_digest) is None):
             raise ValueError("a tool policy pin requires workspace tools and an exact lowercase SHA-256 digest")
         if validation_config is not None:
@@ -1021,7 +1045,6 @@ class AmcAgent:
         argv = [*self._bin, "acp", "--provider", provider, "--agent-id", agent_id, "--tools", tools, "--max-tokens", str(max_tokens)]
         for flag, value in [("--model", model), ("--credential", credential), ("--base-url", base_url),
                             ("--approve-tools", approve_tools), ("--approve-risk", approve_risk),
-                            ("--mcp-config", mcp_config), ("--mcp-config-sha256", mcp_config_sha256),
                             ("--expected-tools-digest", expected_tools_digest),
                             ("--validation-config", validation_config), ("--validation-config-sha256", validation_config_sha256),
                             ("--credentials-home", credentials_home), ("--credentials-file", credentials_file),
@@ -1032,6 +1055,7 @@ class AmcAgent:
                 if not isinstance(value, str) or not value or "\0" in value:
                     raise ValueError("native launch options must be nonempty strings without NUL bytes")
                 argv.extend([flag, value])
+        argv.extend(mcp_argv)
         for check_id in validate or []:
             argv.extend(["--validate", check_id])
         self._lock = threading.RLock()
@@ -1065,7 +1089,10 @@ class AmcAgent:
         try:
             for thread in [self._writer, self._reader, self._errors]:
                 thread.start()
-            result = self._call("initialize", {"protocolVersion": 1, "clientCapabilities": {"_meta": {"dev.agentmaturity.amc": {"currentPlanUpdates": "amc-current-plan-v1"}}}})
+            try:
+                result = self._call("initialize", {"protocolVersion": 1, "clientCapabilities": {"_meta": {"dev.agentmaturity.amc": {"currentPlanUpdates": "amc-current-plan-v1"}}}})
+            except AmcRefusedError as error:
+                raise _startup_refusal(error) from None
             if type(result.get("protocolVersion")) is not int or result["protocolVersion"] != 1:
                 raise AmcProtocolError("the native agent negotiated an unsupported protocol version")
             if not isinstance(result.get("agentCapabilities"), dict) or not isinstance(result.get("agentInfo", {}), dict):
@@ -1457,6 +1484,24 @@ class AmcAgent:
         if type(result.get("withdrawn")) is not bool:
             raise AmcProtocolError("native withdrawal returned an invalid outcome")
         return result["withdrawn"]
+
+    def mcp_status(self, session_id: str, *, timeout: Optional[float] = None) -> dict[str, Any]:
+        """Read-only per-mount status of an owned session's reviewed MCP servers, the ``/mcp`` projection.
+
+        Returns ``{"format", "servers", "refused"}``; each server carries serverId, catalogDigest, protocol,
+        auth (issuer, scopes, expiry; never a token), toolNames, state and ``execution: "not-evaluated"``.
+        ``state`` is local grant registration, not remote health. ``servers`` is None without an MCP binding.
+        """
+        with self._lock:
+            self._require_open_locked()
+            if session_id not in self._sessions or session_id in self._releasing:
+                raise AmcError("MCP status requires an owned usable session")
+        if self._extension().get("mcpStatus") != MCP_STATUS_FORMAT:
+            raise AmcRefusedError(-32601, "the selected runtime does not report per-mount MCP status")
+        try:
+            return admit_mcp_status(self._call("_amc/session/mcp", {"sessionId": session_id}, timeout=timeout))
+        except ValueError as error:
+            raise AmcProtocolError("native MCP status returned an invalid projection") from error
 
     def _extension(self) -> dict[str, Any]:
         meta = self._capabilities.get("_meta")

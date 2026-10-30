@@ -8,6 +8,7 @@ import { acpSupportsImageInput, type AcpPromptBlock, type AcpPromptRoute } from 
 import { ACP_NATIVE_AUDIO_CONTRACT, acpSupportsAudioInput } from "./acpAudioInput.js";
 import { validClientRequestId } from "../session/loopEventMeta.js";
 import { EXECUTION_API_VERSION } from "../execution/executionContract.js";
+import { NATIVE_MCP_STATUS_FORMAT } from "../mcp/nativeMcpStatus.js";
 
 /** Shared wire contract for SDKs. None of these declarations is a cold-verifier verdict. */
 export const ACP_RUNTIME_META_KEY = "dev.agentmaturity.amc";
@@ -68,7 +69,7 @@ export function nativeAcpCapabilities(options: {
       committedTurn: "amc-committed-turn-v1" as const,
       currentPlanUpdates: "amc-current-plan-v1" as const,
       sessionEventPage: "amc-session-event-page-v1" as const,
-      ...(options.nativeExecution ? { clientRequestIds: true, withdrawSubmission: true } : {}),
+      ...(options.nativeExecution ? { clientRequestIds: true, withdrawSubmission: true, mcpStatus: NATIVE_MCP_STATUS_FORMAT } : {}),
       verification: "not-verified" as const,
       cancellation: "prompt-scoped" as const,
       limits: ACP_RUNTIME_LIMITS,

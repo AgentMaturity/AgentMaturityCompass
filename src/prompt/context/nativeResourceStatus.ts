@@ -1,7 +1,7 @@
 import type { NativeExtensionManager } from "../../extensions/nativeExtensionRuntime.js";
 import { NativeExtensionError } from "../../extensions/nativeExtensionManifest.js";
 import { readNativeExtension } from "../../extensions/nativeExtensionStore.js";
-import type { MountedNativeMcpServer } from "../../mcp/nativeMcpClient.js";
+import type { MountedNativeMcpServer, NativeMcpMountReceipt } from "../../mcp/nativeMcpClient.js";
 import { buildSkillCatalog, skillCatalogDigest } from "../../skills/skillCatalog.js";
 import type { ToolRegistry } from "../../tools/toolRegistry.js";
 
@@ -17,6 +17,9 @@ interface NativeExtensionResourceStatus {
 interface NativeMcpResourceStatus {
   readonly serverId: string;
   readonly catalogDigest: string;
+  /** The mount receipt as recorded at mount time; `_amc/session/mcp` re-projects it like `/mcp`. */
+  readonly protocol: NativeMcpMountReceipt["protocol"];
+  readonly auth: NativeMcpMountReceipt["auth"];
   readonly toolNames: readonly string[];
   readonly state: "registered" | "unavailable";
   readonly execution: "not-evaluated";
@@ -57,10 +60,10 @@ export interface NativeResourceStatus {
  * This observes local grants, not remote transport health or execution approval.
  */
 export function bindNativeMcpResourceStatus(mount: MountedNativeMcpServer, registry: ToolRegistry, agentId: string): NativeMcpResourceSource {
-  const serverId = mount.receipt.serverId, catalogDigest = mount.receipt.catalogDigest;
+  const { serverId, catalogDigest, protocol, auth } = mount.receipt;
   const toolNames = [...mount.toolNames];
   const current = toolNames.map(name => registry.admissionCheck(name, agentId));
-  return () => ({ serverId, catalogDigest, toolNames: [...toolNames],
+  return () => ({ serverId, catalogDigest, protocol, auth, toolNames: [...toolNames],
     state: current.length > 0 && current.every(check => check()) ? "registered" : "unavailable", execution: "not-evaluated" });
 }
 

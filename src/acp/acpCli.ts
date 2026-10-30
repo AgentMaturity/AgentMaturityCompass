@@ -1,5 +1,6 @@
 import type { Command } from "commander";
 import { startAcpStdio } from "./acpStdioMain.js";
+import { serveAcpStartupRefusal } from "./acpStartupRefusal.js";
 import { NATIVE_TASK_INITIATOR_ENV, NATIVE_TASK_LEASE_ENV, NATIVE_TASK_SYSTEM_PROMPT_ENV } from "./acpRuntimeContracts.js";
 import { compactionFromFlags } from "../agent/compaction/promptPressure.js";
 
@@ -126,10 +127,12 @@ export function registerAcpCommands(program: Command): void {
           ...(opts.credential === undefined ? {} : { credential: opts.credential })
         });
       } catch (error) {
-        // To stderr and a non-zero exit. A misconfiguration reported as a frame
-        // would be read by the client as a protocol message.
+        // To stderr and a non-zero exit. Never an unsolicited frame: the client would
+        // read it as a protocol message. Only a correlated reply carries the refusal.
         process.stderr.write(`amc acp: ${error instanceof Error ? error.message : String(error)}\n`);
-        process.exit(2);
+        // A spawning client (the SDKs) still gets the coded refusal as the reply to its first request.
+        void serveAcpStartupRefusal(error, { stdin: process.stdin, stdout: process.stdout }).finally(() => process.exit(2));
+        return;
       }
       for (const signal of ["SIGINT", "SIGTERM"] as const) {
         process.on(signal, () => {

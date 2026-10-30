@@ -60,8 +60,13 @@ export interface LoadedNativeMcpConfiguration {
   readonly sha256: string;
   readonly config: NativeMcpConfiguration;
 }
-export class NativeMcpConfigError extends Error {}
-const refuse = (message: string): never => { throw new NativeMcpConfigError(message); };
+/** Stable refusal reasons; every message is a fixed string that never echoes config bytes, env values or secrets. */
+export type NativeMcpRefusalCode = "mcp-config-invalid" | "mcp-config-tampered" | "mcp-config-unpaired" | "mcp-config-duplicate"
+  | "mcp-config-unreviewed" | "mcp-grant-class-mismatch";
+export class NativeMcpConfigError extends Error {
+  constructor(message: string, readonly code: NativeMcpRefusalCode = "mcp-config-invalid") { super(message); }
+}
+const refuse = (message: string, code?: NativeMcpRefusalCode): never => { throw new NativeMcpConfigError(message, code); };
 function object(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }
@@ -102,7 +107,7 @@ export function loadNativeMcpConfiguration(path: string, expectedSha256?: string
   }
   const sha256 = createHash("sha256").update(bytes).digest("hex");
   if (expectedSha256 !== undefined && (!/^[a-f0-9]{64}$/.test(expectedSha256) || expectedSha256 !== sha256)) {
-    return refuse("MCP configuration changed from its pinned digest. Review it explicitly before starting another run.");
+    return refuse("MCP configuration changed from its pinned digest. Review it explicitly before starting another run.", "mcp-config-tampered");
   }
   let value: unknown;
   try { value = JSON.parse(bytes.toString("utf8")); }
@@ -210,16 +215,16 @@ export function requireReviewedNativeMcpGrants(loaded: LoadedNativeMcpConfigurat
   readonly capabilities: readonly NativeToolCapability[];
 } {
   const { expectedCatalogDigest, grants } = loaded.config;
-  if (!expectedCatalogDigest || !grants?.length) return refuse("Discover and review the MCP catalog, then add its expectedCatalogDigest and explicit grants before running tools.");
+  if (!expectedCatalogDigest || !grants?.length) return refuse("Discover and review the MCP catalog, then add its expectedCatalogDigest and explicit grants before running tools.", "mcp-config-unreviewed");
   if (grants.some(grant => grant.alias !== undefined)) {
     try {
       const bytes = configurationBytes.get(loaded);
       const signature = readConfigurationBytes(`${loaded.path}.sig`);
       if (!bytes || !verifyAuditorSignatureBytes(workspace, "BUNDLE", bytes, signature).valid) throw new Error("Invalid alias configuration signature");
-    } catch { return refuse("MCP aliases require a valid BUNDLE signature over the exact config bytes in <config>.sig; review and sign with the existing AMC signing provider."); }
+    } catch { return refuse("MCP aliases require a valid BUNDLE signature over the exact config bytes in <config>.sig; review and sign with the existing AMC signing provider.", "mcp-config-unreviewed"); }
   }
   const snapshot = loadVerifiedToolsConfigSnapshot(workspace);
-  if (!snapshot.signatureValid || !snapshot.config) return refuse("MCP mounting requires a verifiable signed tool allowlist; no policy was changed.");
+  if (!snapshot.signatureValid || !snapshot.config) return refuse("MCP mounting requires a verifiable signed tool allowlist; no policy was changed.", "mcp-config-unreviewed");
   try { validateNativeMcpToolAliases(grants, snapshot.config.tools.allowedTools.map(tool => tool.name)); }
   catch { return refuse("MCP tool alias is invalid, reserved or collides with another capability."); }
   const capabilities: NativeToolCapability[] = [];
@@ -227,17 +232,18 @@ export function requireReviewedNativeMcpGrants(loaded: LoadedNativeMcpConfigurat
     const name = nativeMcpToolName(loaded.config.server.id, grant.name);
     const matches = snapshot.config.tools.allowedTools.filter(tool => tool.name === name);
     const allowed = matches.length === 1 ? matches[0] : undefined;
-    if (!allowed || allowed.actionClass !== grant.actionClass) return refuse("Each granted MCP tool must already appear under its exact generated name and action class in the signed allowlist. Review mcp-catalog output and update policy explicitly.");
+    if (!allowed || allowed.actionClass !== grant.actionClass) return refuse("Each granted MCP tool must already appear under its exact generated name and action class in the signed allowlist. Review mcp-catalog output and update policy explicitly.",
+      allowed ? "mcp-grant-class-mismatch" : "mcp-config-unreviewed");
     // Older reviewed MCP grants omitted context. Preserve that format, but an
     // explicit identity must describe this server and transport, never native.
     if (allowed.context && (allowed.context.kind !== "mcp" || allowed.context.server.id !== loaded.config.server.id
       || (allowed.context.server.transport !== undefined && allowed.context.server.transport !== (loaded.config.server.transport ?? "stdio")))) {
-      return refuse("The signed MCP context must match the reviewed server identity and transport.");
+      return refuse("The signed MCP context must match the reviewed server identity and transport.", "mcp-config-unreviewed");
     }
     capabilities.push({ name, actionClass: grant.actionClass, ...(allowed.context ? { context: allowed.context } : {}) });
   }
   if (!selectSupportedNativeTools(snapshot).some(tool => tool.name === "tool_search")) {
-    return refuse("Deferred MCP tools require native tool_search as READ_ONLY in the signed allowlist. Review and sign discovery separately; no policy was changed.");
+    return refuse("Deferred MCP tools require native tool_search as READ_ONLY in the signed allowlist. Review and sign discovery separately; no policy was changed.", "mcp-config-unreviewed");
   }
   return { expectedCatalogDigest, grants, capabilities };
 }
@@ -250,11 +256,11 @@ export interface ReviewedNativeMcpServer {
 /** Several servers in one run, each with its own pinned bytes, digest and grants under the one signed allowlist. Each grant keeps its reviewed action class. */
 export function reviewNativeMcpConfigurations(paths: readonly string[], pins: readonly string[] | undefined, workspace: string,
   approvalClass: ActionClass): ReviewedNativeMcpServer[] {
-  if (pins !== undefined && pins.length !== paths.length) return refuse("Give one --mcp-config-sha256 per --mcp-config, in the same order.");
+  if (pins !== undefined && pins.length !== paths.length) return refuse("Give one --mcp-config-sha256 per --mcp-config, in the same order.", "mcp-config-unpaired");
   const reviewed: ReviewedNativeMcpServer[] = [];
   for (const [index, path] of paths.entries()) {
     const config = loadNativeMcpConfiguration(path, pins?.[index]);
-    if (reviewed.some(entry => entry.config.config.server.id === config.config.server.id)) return refuse("Each --mcp-config must name a distinct server id.");
+    if (reviewed.some(entry => entry.config.config.server.id === config.config.server.id)) return refuse("Each --mcp-config must name a distinct server id.", "mcp-config-duplicate");
     reviewed.push({ config, review: requireReviewedNativeMcpGrants(config, workspace, approvalClass) });
   }
   try { validateNativeMcpToolAliases(reviewed.flatMap(entry => entry.review.grants),
