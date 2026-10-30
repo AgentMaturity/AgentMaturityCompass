@@ -11,6 +11,10 @@ import {
   setExperimentBaseline,
   setExperimentCandidate
 } from "./experimentRunner.js";
+import { resolveAgentId } from "../fleet/paths.js";
+import { runExecutedExperimentAsync } from "./executedExperiment.js";
+import { providerTrialRunner, type TrialProviderSelection } from "./nativeTrialRunner.js";
+import type { TrialLimits } from "./trialExecutor.js";
 import {
   listGovernedOptimizerRuns,
   loadGovernedOptimizerRun,
@@ -96,8 +100,18 @@ export function experimentRunCli(params: {
   return runExperiment(params);
 }
 
-export async function experimentRunCliAsync(params: Parameters<typeof experimentRunCli>[0], options: { beforePublish?: () => void } = {}): Promise<ReturnType<typeof experimentRunCli>> {
-  return await runExperimentAsync(params, options);
+/** `executeTrials`: run both configurations here over the held-out cases (GAP-WP04) instead of reading a candidate window. */
+export async function experimentRunCliAsync(params: Parameters<typeof experimentRunCli>[0] & { executeTrials?: TrialProviderSelection & { limits?: Partial<TrialLimits> } },
+  options: { beforePublish?: () => void } = {}): Promise<ReturnType<typeof experimentRunCli>> {
+  const { executeTrials, ...run } = params;
+  if (executeTrials === undefined) return await runExperimentAsync(run, options);
+  if (run.candidateWindow !== undefined || run.candidateAgentId !== undefined) throw new ExperimentInputError("executed trials read their own evidence; omit the candidate window and agent");
+  const agentId = resolveAgentId(run.workspace, run.agentId);
+  let runner: ReturnType<typeof providerTrialRunner>;
+  try { runner = providerTrialRunner(run.workspace, agentId, executeTrials); }
+  catch (error) { throw new ExperimentInputError(error instanceof Error ? error.message : String(error)); }
+  return await runExecutedExperimentAsync({ workspace: run.workspace, agentId, experimentId: run.experimentId, mode: run.mode,
+    trials: { ...runner, ...(executeTrials.limits === undefined ? {} : { limits: executeTrials.limits }) } }, options);
 }
 
 export function experimentAnalyzeCli(params: {
