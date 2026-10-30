@@ -29,6 +29,14 @@ const incidentSchema = z.object({
     correlationDrop: z.number(),
     maxLayerDrop: z.number()
   }),
+  comparisonWindow: z.object({
+    requestedSize: z.number().int().min(1),
+    runIds: z.array(z.string().min(1)).min(1),
+    startTs: z.number(),
+    endTs: z.number(),
+    confirmation: z.enum(["confirmed", "unconfirmed"]),
+    method: z.enum(["single-run", "median-bootstrap-95"])
+  }).optional(),
   remediation: z.object({
     concept: z.array(z.string()),
     culture: z.array(z.string()),
@@ -127,6 +135,7 @@ export function verifyIncidentSignature(workspace: string, incident: FreezeIncid
     previousRunId: incident.previousRunId,
     currentRunId: incident.currentRunId,
     deltas: incident.deltas,
+    ...(incident.comparisonWindow === undefined ? {} : { comparisonWindow: incident.comparisonWindow }),
     remediation: incident.remediation,
     freeze: incident.freeze
   };
@@ -149,10 +158,12 @@ interface CreateFreezeIncidentParams {
   actionClasses: ActionClass[];
   reason: string;
   remediation?: FreezeIncident["remediation"];
+  comparisonWindow?: FreezeIncident["comparisonWindow"];
 }
 
 function prepareIncident(input: CreateFreezeIncidentParams) {
   const params = { ...input, deltas: { ...input.deltas }, actionClasses: [...input.actionClasses],
+    ...(input.comparisonWindow === undefined ? {} : { comparisonWindow: { ...input.comparisonWindow, runIds: [...input.comparisonWindow.runIds] } }),
     ...(input.remediation === undefined ? {} : { remediation: { concept: [...input.remediation.concept], culture: [...input.remediation.culture],
       capabilities: [...input.remediation.capabilities], configuration: [...input.remediation.configuration] } }) };
   const agentId = resolveAgentId(params.workspace, params.agentId);
@@ -165,6 +176,7 @@ function prepareIncident(input: CreateFreezeIncidentParams) {
     previousRunId: params.previousRunId,
     currentRunId: params.currentRunId,
     deltas: params.deltas,
+    ...(params.comparisonWindow === undefined ? {} : { comparisonWindow: params.comparisonWindow }),
     remediation: params.remediation ?? {
       concept: ["Clarify mission constraints and target posture for affected questions."],
       culture: ["Reinforce truth protocol and governance refusal behavior."],

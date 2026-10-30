@@ -124,6 +124,13 @@ export interface LabComparisonPair {
   baselineScores: Record<string, number>;
   candidateScores: Record<string, number>;
   deltas: Record<string, number>;
+  /** Comparison metadata below is absent from legacy saved rows. */
+  comparisonMode?: "single_sample";
+  /** One-based occurrence of this probe, ordered by result timestamp on each side. */
+  sampleIndex?: number;
+  status?: "matched" | "missing_baseline" | "missing_candidate";
+  missingDimensions?: { baseline: string[]; candidate: string[] };
+  /** @deprecated Single-sample descriptive differences do not establish statistical significance. */
   significantDimensions: string[];
 }
 
@@ -461,12 +468,14 @@ export async function simulateExperimentAsync(experimentId: string, workspace?: 
 /**
  * Compare two experiments' probe results. With a workspace, both sides are read from its store
  * (the CLI passes its working directory); without one, the call stays memory-only.
+ * Repeated probe results are paired by timestamp-ordered occurrence, not by an inferred trial/seed identity.
+ * Each row describes a single sample per side and never establishes statistical significance.
  */
 export function compareExperiments(
   baselineId: string,
   candidateId: string,
   workspace?: string,
-): LabComparisonPair[] {
+): Required<LabComparisonPair>[] {
   const resolvedWorkspace = experimentWorkspace(workspace);
   const resultsFor = (experimentId: string): LabProbeResult[] => resolvedWorkspace
     ? storedProbeResults(resolvedWorkspace, experimentId)
@@ -474,40 +483,50 @@ export function compareExperiments(
   const baselineResults = resultsFor(baselineId);
   const candidateResults = resultsFor(candidateId);
 
-  const baselineMap = new Map(baselineResults.map((r) => [r.probeId, r]));
-  const pairs: LabComparisonPair[] = [];
-
-  for (const candidateResult of candidateResults) {
-    const baselineResult = baselineMap.get(candidateResult.probeId);
-    if (!baselineResult) continue;
-
-    const deltas: Record<string, number> = {};
-    const significantDimensions: string[] = [];
-    const allDimensions = new Set([
-      ...Object.keys(baselineResult.scores),
-      ...Object.keys(candidateResult.scores),
-    ]);
-
-    for (const dim of allDimensions) {
-      const baseScore = baselineResult.scores[dim] ?? 0;
-      const candScore = candidateResult.scores[dim] ?? 0;
-      const delta = candScore - baseScore;
-      deltas[dim] = parseFloat(delta.toFixed(4));
-      if (Math.abs(delta) > 0.05) {
-        significantDimensions.push(dim);
-      }
+  const byProbe = (results: LabProbeResult[]): Map<string, LabProbeResult[]> => {
+    const grouped = new Map<string, LabProbeResult[]>();
+    for (const result of [...results].sort((a, b) => a.ts - b.ts)) {
+      const samples = grouped.get(result.probeId) ?? [];
+      samples.push(result);
+      grouped.set(result.probeId, samples);
     }
+    return grouped;
+  };
+  const baselineMap = byProbe(baselineResults);
+  const candidateMap = byProbe(candidateResults);
+  const pairs: Required<LabComparisonPair>[] = [];
 
-    pairs.push({
-      pairId: `pair_${randomUUID().slice(0, 8)}`,
-      baselineExperimentId: baselineId,
-      candidateExperimentId: candidateId,
-      probeId: candidateResult.probeId,
-      baselineScores: baselineResult.scores,
-      candidateScores: candidateResult.scores,
-      deltas,
-      significantDimensions,
-    });
+  for (const probeId of new Set([...baselineMap.keys(), ...candidateMap.keys()])) {
+    const baselineSamples = baselineMap.get(probeId) ?? [];
+    const candidateSamples = candidateMap.get(probeId) ?? [];
+    for (let index = 0; index < Math.max(baselineSamples.length, candidateSamples.length); index++) {
+      const baselineResult = baselineSamples[index];
+      const candidateResult = candidateSamples[index];
+      const baselineScores = baselineResult?.scores ?? {};
+      const candidateScores = candidateResult?.scores ?? {};
+      const missingDimensions = {
+        baseline: Object.keys(candidateScores).filter((dim) => !Object.hasOwn(baselineScores, dim)),
+        candidate: Object.keys(baselineScores).filter((dim) => !Object.hasOwn(candidateScores, dim)),
+      };
+      const deltas = Object.fromEntries(Object.keys(baselineScores)
+        .filter((dim) => Object.hasOwn(candidateScores, dim))
+        .map((dim) => [dim, parseFloat((candidateScores[dim]! - baselineScores[dim]!).toFixed(4))]));
+
+      pairs.push({
+        pairId: `pair_${randomUUID().slice(0, 8)}`,
+        baselineExperimentId: baselineId,
+        candidateExperimentId: candidateId,
+        probeId,
+        baselineScores,
+        candidateScores,
+        deltas,
+        comparisonMode: "single_sample",
+        sampleIndex: index + 1,
+        status: !baselineResult ? "missing_baseline" : !candidateResult ? "missing_candidate" : "matched",
+        missingDimensions,
+        significantDimensions: [],
+      });
+    }
   }
 
   return pairs;
@@ -677,9 +696,8 @@ export function renderLabReportMarkdown(report: LabExperimentReport): string {
     lines.push("| Probe | Latency | Tokens | Primary Score |");
     lines.push("|-------|---------|--------|---------------|");
     for (const r of report.probeResults) {
-      const primaryDim = Object.keys(r.scores)[0] ?? "—";
-      const primaryScore = r.scores[primaryDim] ?? 0;
-      lines.push(`| ${r.probeId} | ${r.latencyMs}ms | ${r.tokenCount} | ${(primaryScore * 100).toFixed(1)}% |`);
+      const primaryScore = Object.values(r.scores)[0];
+      lines.push(`| ${r.probeId} | ${r.latencyMs}ms | ${r.tokenCount} | ${primaryScore === undefined ? "—" : `${(primaryScore * 100).toFixed(1)}%`} |`);
     }
     lines.push("");
   }
@@ -687,11 +705,14 @@ export function renderLabReportMarkdown(report: LabExperimentReport): string {
   // Comparisons
   if (report.comparisons.length > 0) {
     lines.push("## Comparisons");
-    lines.push("| Probe | Significant Dimensions | Largest Delta |");
-    lines.push("|-------|----------------------|---------------|");
+    lines.push("Single-sample descriptive comparisons; statistical significance is not assessed.");
+    lines.push("| Probe | Sample | Status | Missing Dimensions | Largest Delta |");
+    lines.push("|-------|--------|--------|--------------------|---------------|");
     for (const c of report.comparisons) {
       const largest = Object.entries(c.deltas).sort(([, a], [, b]) => Math.abs(b) - Math.abs(a))[0];
-      lines.push(`| ${c.probeId} | ${c.significantDimensions.join(", ") || "none"} | ${largest ? `${largest[0]}: ${(largest[1] * 100).toFixed(1)}%` : "—"} |`);
+      const missing = c.missingDimensions ? Object.entries(c.missingDimensions).filter(([, dimensions]) => dimensions.length > 0)
+        .map(([side, dimensions]) => `${side}: ${dimensions.join(", ")}`).join("; ") : "unavailable (legacy metadata)";
+      lines.push(`| ${c.probeId} | ${c.sampleIndex ?? "unavailable"} | ${c.status ?? "legacy descriptive"} | ${missing || "none"} | ${largest ? `${largest[0]}: ${(largest[1] * 100).toFixed(1)}%` : "—"} |`);
     }
     lines.push("");
   }

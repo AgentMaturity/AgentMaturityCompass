@@ -114,6 +114,10 @@ Use repeatable `--delegate-stop` conditions to bound each delegation's lifetime,
 
 For reusable context files and named prompt commands, see [Native Extensions](NATIVE_EXTENSIONS.md). Inspect and explicitly sign the manifest with AMC's existing workspace authority, then select its path with `--extension` or chat `/load`. Loading pins both manifest and content; it cannot load executable hooks, select credentials or grant tools. `/unload` removes future contributions while preserving signed history.
 
+Include the selected agent's mission, constraints, forbidden actions and escalation rules with `agent-loop run --mission-context`. The existing system prompt preview supports the same opt-in with its `--context` and `--json` flags. Direct `AgentSessionInit` callers can opt in with `missionContext: true`.
+
+The graph is attributed workspace data in the signed runtime snapshot. Its SHA-256 names the exact validated file bytes, and request reconstruction verifies the snapshot was included. It cannot replace harness identity or grant tools. AMC refreshes it before each step; an absent graph contributes nothing, while an invalid, oversized, linked or unreadable graph refuses the step. UTF-8 decoding is strict; the existing JSON loader's refusal of a leading BOM is preserved. The limit is 65,536 bytes.
+
 ## Enable workspace and MCP tools deliberately
 
 Use `--tools workspace` only after reviewing the signed firewall and `.amc/tools.yaml` allowlist, including permitted paths and write scope. Missing setup is reported before a task starts. `amc firewall enable` and `amc tools init` initialize their policies; `tools init` can overwrite an existing tools file, so inspect existing policy first. After intentional edits, re-sign with `amc tools sign`, then inspect the result with `amc tools list`. Signing validates the existing YAML and preserves its bytes and grants; it does not initialize defaults. `--json` returns signature metadata or a refused result. Review `.amc/budgets.yaml` separately and use `amc budgets sign` to sign its existing limits without replacing them. See [ToolHub](TOOLHUB.md) for policy structure.

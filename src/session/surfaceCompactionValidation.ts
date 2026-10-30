@@ -104,7 +104,9 @@ export function compactionReceipt(event: EvidenceEvent): SurfaceCompactionReceip
   return parseCompactionReceipt(raw);
 }
 
-const usageSchema = z.object({ inputTokens: count, outputTokens: count, cacheRead: count.nullable(), cacheWrite: count.nullable() }).strict();
+const usageSchema = z.object({ inputTokens: count, outputTokens: count, cacheRead: count.nullable(), cacheWrite: count.nullable(),
+  reasoningTokens: count.nullable().optional() }).strict()
+  .refine(usage => usage.reasoningTokens == null || usage.reasoningTokens <= usage.outputTokens);
 /**
  * A v2 receipt's provenance is re-derived from earlier signed rows of the same
  * session, never taken on the receipt's word: its trigger must equal the usage
@@ -114,8 +116,10 @@ const usageSchema = z.object({ inputTokens: count, outputTokens: count, cacheRea
 export function assertAutomaticProvenance(receipt: SurfaceCompactionReceipt, prior: ReadonlyMap<string, EvidenceEvent>, sessionId: string): void {
   if (receipt.v !== 2) return;
   const { trigger, summarizer } = receipt, measured = prior.get(trigger.measuredAtEventId);
-  const usage = measured?.event_type === "step/end" && measured.session_id === sessionId
-    ? usageSchema.safeParse((JSON.parse(measured.meta_json) as { usage?: unknown }).usage) : null;
+  const meta = measured?.event_type === "step/end" && measured.session_id === sessionId
+    ? JSON.parse(measured.meta_json) as { usage?: unknown; usageVersion?: unknown } : null;
+  const usage = meta && (meta.usageVersion === undefined || meta.usageVersion === 2)
+    ? usageSchema.safeParse(meta.usage) : null;
   if (!usage?.success || promptTokensFor(usage.data) !== trigger.promptTokens
     || trigger.ratio !== trigger.promptTokens / trigger.contextWindowTokens || trigger.ratio < trigger.threshold) {
     throw new Error("automatic compaction trigger disagrees with the signed step usage it cites");

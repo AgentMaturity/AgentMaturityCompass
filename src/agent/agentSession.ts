@@ -5,8 +5,8 @@ import type { AgentDriver } from "./agentDriver.js";
 import { composeNativeAgent, settleFailedComposition, type NativeAgent } from "./nativeAgentComposition.js";
 import { agentPromptProfile } from "../prompt/agentPromptProfile.js";
 import type { NativeImageInput } from "../attachments/nativeImageInput.js";
-import type { NativeInputPart } from "../attachments/nativeOrderedInput.js";
-import type { NativeAudioPart } from "../attachments/nativeAudioInput.js";
+import { materializeNativeInputParts, snapshotNativeInputParts, type NativeInputPart } from "../attachments/nativeOrderedInput.js";
+import { materializeNativeAudioParts, snapshotNativeAudioParts, type NativeAudioPart } from "../attachments/nativeAudioInput.js";
 import { agentToolset, type AgentToolset, type AgentToolsetOptions } from "./agentToolset.js";
 import type { NativeToolCapability } from "./nativeToolCapabilities.js";
 import type { ExplicitShellOptIn } from "../sandbox/nativeShellGate.js";
@@ -26,6 +26,9 @@ import { refuseRetired } from "../lifecycle/reassessment.js";
 import { nativeSessionManifest } from "../lifecycle/versionManifest.js";
 import type { RecoveryClaimant } from "../session/sessionRecovery.js";
 import { admitSessionAtOpen } from "../runtime/changeEnvelope.js";
+import { prepareSkillTurn } from "../skills/skillTurn.js";
+import type { Skill } from "../skills/skillCatalog.js";
+import { renderSkillContext, SKILL_CONTEXT_ORDER } from "../skills/skillPrompt.js";
 
 /**
  * One AMC session, many prompts (plan P7.1a).
@@ -73,6 +76,8 @@ export interface AgentSessionInit {
    * guardrail exists (see agentPromptProfile).
    */
   readonly approvalGated?: boolean;
+  /** Include the agent's validated mission and constraints as attributed runtime context. */
+  readonly missionContext?: boolean;
   readonly harnessVersion: string;
   readonly compositionDigest: string;
   readonly policyDigest: string;
@@ -98,6 +103,8 @@ export interface AgentSessionInit {
   readonly validation?: NativeValidationPlan;
   /** Bind approvals/extensions to the real owning session and its existing pipeline. */
   readonly bindTools?: (context: { readonly session: SessionService; readonly toolset: AgentToolset | null }) => AgentToolSeam;
+  /** Merged over every row of a new session (an experiment trial's case execution identity, GAP-WP04); refused on resume. */
+  readonly rowStamp?: Readonly<Record<string, unknown>>;
 }
 
 export type AgentPromptResult =
@@ -166,11 +173,14 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
       ...(init.leaseToken === undefined ? {} : { leaseToken: init.leaseToken }) });
     const sessionId = init.sessionId ?? randomUUID();
     // P2-02: in an opted-in workspace, messages and tool results are tokenized before any row is committed.
-    const session = redactingSessionFor(claimant === undefined ? new SessionService(workspace) : resumeSession({
+    if (init.rowStamp !== undefined && claimant !== undefined) throw new Error("A row stamp covers a whole new session; a resumed session cannot take one.");
+    const raw = claimant === undefined ? new SessionService(workspace) : resumeSession({
       workspace, sessionId, agentId: init.agentId,
       harnessVersion: init.harnessVersion, compositionDigest: init.compositionDigest,
       policyDigest: init.policyDigest, claimant
-    }).service);
+    }).service;
+    if (init.rowStamp !== undefined) raw.stampEveryRow(init.rowStamp);
+    const session = redactingSessionFor(raw);
     // The toolset writes its tool evidence into THIS session rather than into
     // `agentToolset`'s default `toolset-<agentId>`, which nothing ever starts --
     // so a run that actually called a tool left rows referencing a session with no
@@ -195,6 +205,7 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
 
     let closed = false;
     let running = false;
+    let activeSkill: Skill | undefined;
     let toolset: ReturnType<typeof agentToolset> | undefined;
     /**
      * How much assistant text the caller has already been told.
@@ -236,7 +247,10 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
       }
       // GAP-WP39: the same prompt profile and context pre-step as `amc agent-loop` -- workspace instruction files, time
       // and governance reach this session too. The caller's system prompt is the deployment's persona.
-      const profile = agentPromptProfile({ workspace, agentId: init.agentId, persona: init.systemPrompt, approvalGated: init.approvalGated === true });
+      const profile = agentPromptProfile({ workspace, agentId: init.agentId, persona: init.systemPrompt, approvalGated: init.approvalGated === true,
+        ...(init.missionContext === true ? { missionContext: true } : {}),
+        extraContextPlugins: [{ name: "context:operator-skill", order: SKILL_CONTEXT_ORDER,
+          collect: async () => activeSkill === undefined ? "" : renderSkillContext(activeSkill) }] });
       composing = true;
       composed = composeNativeAgent({
         session,
@@ -269,7 +283,15 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
       throw error;
     }
 
-    const runPrompt = (enqueue: () => void): Promise<AgentPromptResult> =>
+    const queueSkill = (text: string, enqueue: (prompt: string) => void): string | undefined => {
+      const prepared = prepareSkillTurn({ workspace, prompt: text });
+      if (!prepared.ok) return prepared.reason;
+      activeSkill = prepared.loaded;
+      enqueue(prepared.prompt);
+      return undefined;
+    };
+
+    const runPrompt = (enqueue: () => string | undefined): Promise<AgentPromptResult> =>
       withWorkspaceScope(workspace, async (): Promise<AgentPromptResult> => {
         if (closed) return { ok: false, reason: "session is closed" };
         // Claimed before any await. Checking after one would let two callers both
@@ -277,7 +299,8 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
         if (running) return { ok: false, reason: "a prompt is already running on this session" };
         running = true;
         try {
-          enqueue();
+          const refusal = enqueue();
+          if (refusal !== undefined) return { ok: false, reason: refusal };
           await driver.whenIdle();
 
           const status = driver.status;
@@ -316,15 +339,28 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
           if (turnEndReason === undefined) return { ok: false, reason: "the prompt produced no recorded turn ending" };
           return { ok: true, text: fresh.join("\n"), status, turnEndReason, validation: summary.validation };
         } finally {
+          activeSkill = undefined;
           running = false;
         }
       });
 
     return {
       sessionId,
-      prompt: (text, images) => runPrompt(() => { driver.followup(text, images); }),
-      promptParts: parts => runPrompt(() => { driver.followupParts(parts); }),
-      promptAudioParts: parts => runPrompt(() => { driver.followupAudioParts(parts); }),
+      prompt: (text, images) => runPrompt(() => queueSkill(text, prompt => { driver.followup(prompt, images); })),
+      promptParts: parts => runPrompt(() => {
+        // Validate and snapshot before changing the leading command. Media,
+        // suffix text, empty parts and their relative order remain exact.
+        const stable = materializeNativeInputParts(snapshotNativeInputParts(parts));
+        const first = stable[0];
+        if (first?.type !== "text") { driver.followupParts(stable); return undefined; }
+        return queueSkill(first.text, text => { driver.followupParts([{ type: "text", text }, ...stable.slice(1)]); });
+      }),
+      promptAudioParts: parts => runPrompt(() => {
+        const stable = materializeNativeAudioParts(snapshotNativeAudioParts(parts));
+        const first = stable[0];
+        if (first?.type !== "text") { driver.followupAudioParts(stable); return undefined; }
+        return queueSkill(first.text, text => { driver.followupAudioParts([{ type: "text", text }, ...stable.slice(1)]); });
+      }),
       readEvents: () => withWorkspaceScope(workspace, () => session.readEvents()),
 
       cancel(cause: TurnCancelCause, by: string): void {
