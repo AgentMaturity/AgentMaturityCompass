@@ -1,0 +1,23 @@
+/**
+ * Bindable listeners for Pi's pinned passive EventListener/WatchHandle contract.
+ * b2602be7 still throws SliceNotImplemented from watchSession(); the binding is
+ * usable with a supplied implemented handle or events.on(), not a claim otherwise.
+ */
+import { CallbackTelemetryCapture, type CallbackCaptureOptions } from "./callbackTelemetryCapture.js";
+export interface PiCallbackWatchHandle {
+    start(listener: (event: unknown, context: unknown) => void): void;
+    unsubscribe(): void;
+}
+export interface PiCallbackWatchBinding {
+    attached: boolean;
+    readonly cleanupPending: boolean;
+    unsubscribe(): {
+        ok: boolean;
+    };
+}
+export declare function createPiTelemetryBridge(options?: CallbackCaptureOptions): {
+    telemetryContext: CallbackTelemetryCapture;
+    capture: CallbackTelemetryCapture;
+    onEvent: (event: unknown, _context?: unknown) => void;
+    bindWatch: (handle: PiCallbackWatchHandle) => PiCallbackWatchBinding;
+};
