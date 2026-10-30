@@ -96,6 +96,8 @@ export interface RunOptions {
   interactiveApprovals?: boolean;
   interactiveAskUser?: boolean;
   webSearchSearxng?: string;
+  /** AXR-20: issued agent lease file, verified before use and never logged. */
+  leaseFile?: string;
   goalRounds?: string;
   json?: boolean;
   stream?: boolean;

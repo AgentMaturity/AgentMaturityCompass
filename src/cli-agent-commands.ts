@@ -42,6 +42,7 @@ import {
 import type { LoopNotification } from "./agent/loopTypes.js";
 import { echoToolSeam } from "./agent/echoTool.js";
 import { VALIDATION_REPAIR_HELP, WEB_SEARCH_SEARXNG_HELP, resolveBreadthRun, withBreadthRunOptions } from "./cli/agentLoopBreadthOptions.js";
+import { leaseFileToken, withLeaseFileOption } from "./cli/agentLoopLeaseFile.js";
 import { agentToolset, type AgentToolset } from "./agent/agentToolset.js";
 import { runLease } from "./leases/runLease.js";
 import { selectSupportedNativeTools } from "./agent/nativeToolCapabilities.js";
@@ -129,7 +130,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
 
   registerAgentGuideCommands(group, io);
 
-  group
+  withLeaseFileOption(group
     .command("chat")
     .option("--agent <id>", "agent identity; defaults to AMC_AGENT_ID, the current agent, then default")
     .description("Interactive native tasks over the existing governed run/resume path for the selected agent")
@@ -150,8 +151,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--model <model>", "your model ID; asks for a real provider when omitted")
     .option("--base-url <origin>", "explicit HTTP(S) provider origin; retained for every turn and resume command")
     .option("--credential <ref>", "credential reference name, never a key value")
-    .option("--credentials-home <dir>", "same credential home as agent-loop run")
-    .option("--credentials-file <path>", "same explicit credential file as agent-loop run")
+    .option("--credentials-home <dir>", "same credential home as agent-loop run").option("--credentials-file <path>", "same explicit credential file as agent-loop run")
     .option("--mcp-config <path>", "reviewed MCP JSON; requires --tools workspace and --approve-tools")
     .option("--mcp-config-sha256 <digest>", "require these exact reviewed MCP config bytes")
     .option("--approve-tools <actionClass>", "require the signed approval gate before each tool call")
@@ -171,9 +171,9 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .action(async (opts: import("./setup/nativeInteractiveSession.js").NativeChatOptions, command: Command) => {
       const { runNativeInteractiveSession } = await import("./setup/nativeInteractiveSession.js");
       await runNativeInteractiveSession({ ...opts, agentId: selectedAgentOption(command), workspace: process.cwd() }, io);
-    });
+    }));
 
-  withBreadthRunOptions(group
+  withLeaseFileOption(withBreadthRunOptions(group
     .command("run")
     .option("--agent <id>", "agent identity; defaults to AMC_AGENT_ID, the current agent, then default")
     .description("Run one agent turn and report what the signed log recorded")
@@ -246,7 +246,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       "require a signed human approval before every tool call, decided under this action class"
     )
     .option("--approve-risk <tier>", "risk tier the approval is raised at (default high)")
-    .option("--interactive-approvals", "send actual queued approval IDs to the native chat parent over dedicated Node IPC"))
+    .option("--interactive-approvals", "send actual queued approval IDs to the native chat parent over dedicated Node IPC")))
     .option(
       "--approval-exception <file>",
       "ADR-5 exception note (JSON) that auto-allows the classes it names until it expires"
@@ -485,7 +485,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       let foreignRunner: SubagentRunner | null = null;
       let foreignRunnerDescription = "";
       // P1-79: under an identity-binding plan, a lease naming the OS user's users.yaml user, or PRINCIPAL_UNRESOLVED before any session row.
-      const lease = runLease({ workspace: process.cwd(), agentId, model, tools: toolMode }); // In-process children inherit it.
+      const lease = runLease({ workspace: process.cwd(), agentId, model, tools: toolMode, ...leaseFileToken(process.cwd(), agentId, opts.leaseFile) }); // In-process children inherit it.
       if (toolMode === "workspace") {
         let boundSession: ComposedToolSession | null = null;
         const actualSession = (): ComposedToolSession => {

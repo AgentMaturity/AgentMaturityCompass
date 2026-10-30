@@ -19,6 +19,8 @@ export interface NativeChatProfileOptions extends NativeFirstUseOptions {
   readonly maxSteps?: string;
   readonly approveTools?: string;
   readonly approveRisk?: string;
+  /** Forwarded unchanged to each child run (AXR-20); the run verifies it. */
+  readonly leaseFile?: string;
 }
 
 export interface NativeChatProfile {
@@ -142,7 +144,8 @@ export function resolveNativeChatProfile(options: NativeChatProfileOptions): Nat
     ...(delegateScope === undefined ? {} : { delegateScope }),
     ...(rawStops === undefined ? {} : { delegateStop: stopConditions.conditions }),
     ...(approveTools === undefined ? {} : { approveTools }),
-    ...(approveRisk === undefined ? {} : { approveRisk })
+    ...(approveRisk === undefined ? {} : { approveRisk }),
+    ...(options.leaseFile === undefined ? {} : { leaseFile: options.leaseFile })
   };
   return { guideOptions, effectiveOptions, presetId: preset?.id ?? null, presetSnapshot: preset };
 }
@@ -158,6 +161,7 @@ export function nativeChatProfileArgv(profile: NativeChatProfile, surface: "run"
     ...(profile.presetId === null ? [] : [`--preset=${profile.presetId}`]),
     ...(options.persona === undefined ? [] : [`--persona=${options.persona}`]),
     ...(surface === "run" ? ["--tool-mode=native"] : []),
+    ...(options.leaseFile === undefined ? [] : [`--lease-file=${options.leaseFile}`]),
     ...(options.delegate ? ["--delegate", ...(surface === "run" ? ["--delegate-provider=in-process"] : []),
       ...(options.maxDelegationDepth === undefined ? [] : [`--max-delegation-depth=${options.maxDelegationDepth}`]),
       ...(options.delegateScope === undefined ? [] : [`--delegate-scope=${options.delegateScope}`]),
