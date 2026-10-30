@@ -2,6 +2,8 @@ import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSy
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, test, vi } from "vitest";
+import { sha256Hex } from "../src/utils/hash.js";
+import { canonicalize } from "../src/utils/json.js";
 import {
   getLabTemplates,
   getLabTemplate,
@@ -431,6 +433,12 @@ describe("lab report generation", () => {
 });
 
 describe("durable probe record validation", () => {
+  /** Recomputes record_hash so an edited record reaches shape validation; integrity refusal is covered in wp37Remainders. */
+  function reseal<T extends Record<string, unknown>>(row: T): T {
+    const { record_hash: _hash, signature: _signature, storedTs: _storedTs, ...body } = row;
+    return { ...row, record_hash: sha256Hex(canonicalize(body)) };
+  }
+
   function fixture() {
     const workspace = mkdtempSync(join(tmpdir(), "amc-cognition-lab-record-"));
     workspaces.push(workspace);
@@ -466,7 +474,7 @@ describe("durable probe record validation", () => {
 
   test("allows an empty score object without changing synthetic metadata or stored wrapper fields", () => {
     const { workspace, experiment, path, record, results } = fixture();
-    const emptyScores = { ...record, scores: {} };
+    const emptyScores = reseal({ ...record, scores: {} });
     writeFileSync(path, JSON.stringify(emptyScores));
     const report = generateLabReport(experiment.experimentId, workspace);
     expect(report?.probeResults).toHaveLength(results.length);
@@ -480,7 +488,7 @@ describe("durable probe record validation", () => {
     const metadata = { ...record.metadata as Record<string, unknown>, ...ownKeys };
     expect(Object.hasOwn(metadata, "__proto__")).toBe(true);
     expect(Object.getPrototypeOf(metadata)).toBe(Object.prototype);
-    const stored = { ...record, metadata };
+    const stored = reseal({ ...record, metadata });
     writeFileSync(path, JSON.stringify(stored));
 
     const report = generateLabReport(experiment.experimentId, workspace);
@@ -502,7 +510,7 @@ describe("durable probe record validation", () => {
     for (const name of readdirSync(records)) {
       const path = join(records, name);
       const stored = JSON.parse(readFileSync(path, "utf8"));
-      writeFileSync(path, JSON.stringify({ ...stored, scores }));
+      writeFileSync(path, JSON.stringify(reseal({ ...stored, scores })));
     }
     const report = generateLabReport(experiment.experimentId, workspace);
     expect(report?.probeResults).toHaveLength(results.length);

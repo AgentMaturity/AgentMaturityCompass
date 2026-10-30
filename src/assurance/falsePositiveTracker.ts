@@ -16,9 +16,12 @@ import { randomUUID } from "node:crypto";
 import { resolve } from "node:path";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
+import type { EvidenceOutcome } from "../types.js";
+import { envelopeForUnverifiedResult } from "../claims/eligibility/adapters/results.js";
+import { formatClaimLabel, renderClaimLabel } from "../claims/eligibility/render.js";
 import {
   saveWorkspaceRecord,
-  loadWorkspaceRecords,
+  readTrustedWorkspaceRecords,
   updateWorkspaceRecord,
   captureWorkspaceRecordPredecessor,
   prepareWorkspaceRecordAsync,
@@ -74,6 +77,8 @@ export interface FPCostSummary {
   totalDevMinutes: number;
   /** Cost per scenario (avg across confirmed FPs in this pack) */
   avgCostPerFP: number;
+  /** not_evaluated while no report is resolved: fpRate 0 then means no data, not no false positives. */
+  outcome: EvidenceOutcome;
 }
 
 export interface TuningRecommendation {
@@ -96,6 +101,11 @@ export interface FPTuningReport {
   totalCostUsd: number;
   packSummaries: FPCostSummary[];
   recommendations: TuningRecommendation[];
+  /** measured only when some pack has a resolved report. */
+  outcome: EvidenceOutcome;
+  /** INSUFFICIENT_EVIDENCE when a stored report was refused or the register is not whole (`unverifiedRecords`). */
+  evidenceStatus: "MEASURED" | "INSUFFICIENT_EVIDENCE";
+  unverifiedRecords: string[];
   reportHash: string;
 }
 
@@ -239,12 +249,25 @@ export async function resolveFPReportAsync(reportId: string, resolution: Paramet
   });
 }
 
-/** Live reports plus any persisted by an earlier process, deduped by id. */
-function allFPReports(workspace?: string): FalsePositiveReport[] {
-  if (!workspace) return [...fpReports];
-  const stored = loadWorkspaceRecords<FalsePositiveReport>(workspace, FP_REPORTS_AT);
+/**
+ * Live reports plus any persisted by an earlier process, deduped by id. Stored reports are read through
+ * `readTrustedWorkspaceRecords`: a tampered report is left out and reported, never counted.
+ */
+function scanFPReports(workspace?: string): { reports: FalsePositiveReport[]; unverified: string[] } {
+  if (!workspace) return { reports: [...fpReports], unverified: [] };
+  const { records, unverified } = readTrustedWorkspaceRecords<FalsePositiveReport>(workspace, FP_REPORTS_AT);
   const seen = new Set(fpReports.map((r) => r.reportId));
-  return [...fpReports, ...stored.filter((r) => !seen.has(r.reportId))];
+  return { reports: [...fpReports, ...records.filter((r) => !seen.has(r.reportId))], unverified };
+}
+
+function allFPReports(workspace?: string): FalsePositiveReport[] {
+  return scanFPReports(workspace).reports;
+}
+
+/** The evidence label for FP outputs read from `workspace`: what was refused or is missing from the register. */
+export function fpReportEvidence(workspace?: string): Pick<FPTuningReport, "evidenceStatus" | "unverifiedRecords"> {
+  const { unverified } = scanFPReports(workspace);
+  return { evidenceStatus: unverified.length > 0 ? "INSUFFICIENT_EVIDENCE" : "MEASURED", unverifiedRecords: unverified };
 }
 
 export function getFPReport(reportId: string, workspace?: string): FalsePositiveReport | null {
@@ -305,6 +328,7 @@ export function computeFPCostSummary(packId?: string, workspace?: string): FPCos
       totalCostUsd: Number(totalCostUsd.toFixed(2)),
       totalDevMinutes,
       avgCostPerFP: confirmed > 0 ? Number((totalCostUsd / confirmed).toFixed(2)) : 0,
+      outcome: resolved > 0 ? "measured" : "not_evaluated",
     });
   }
 
@@ -318,13 +342,13 @@ export function computeFPCostSummary(packId?: string, workspace?: string): FPCos
 export function generateTuningRecommendations(opts?: {
   fpRateThreshold?: number;
   minReportsForRecommendation?: number;
-}): TuningRecommendation[] {
+}, workspace?: string): TuningRecommendation[] {
   const fpRateThreshold = opts?.fpRateThreshold ?? 0.3;
   const minReports = opts?.minReportsForRecommendation ?? 3;
 
   // Group by (packId, scenarioId)
   const byScenario = new Map<string, FalsePositiveReport[]>();
-  for (const report of fpReports) {
+  for (const report of allFPReports(workspace)) {
     const key = `${report.packId}:${report.scenarioId}`;
     const existing = byScenario.get(key) ?? [];
     existing.push(report);
@@ -387,16 +411,17 @@ export function generateFPTuningReport(opts?: {
   windowStartTs?: number;
   windowEndTs?: number;
   fpRateThreshold?: number;
-}): FPTuningReport {
+}, workspace?: string): FPTuningReport {
   const windowEndTs = opts?.windowEndTs ?? Date.now();
   const windowStartTs = opts?.windowStartTs ?? windowEndTs - 30 * 24 * 60 * 60 * 1000; // 30 days
 
-  const summaries = computeFPCostSummary();
+  const { reports, unverified } = scanFPReports(workspace);
+  const summaries = computeFPCostSummary(undefined, workspace);
   const recommendations = generateTuningRecommendations({
     fpRateThreshold: opts?.fpRateThreshold,
-  });
+  }, workspace);
 
-  const windowReports = fpReports.filter(
+  const windowReports = reports.filter(
     (r) => r.ts >= windowStartTs && r.ts <= windowEndTs
   );
   const totalConfirmed = windowReports.filter((r) => r.status === "confirmed").length;
@@ -413,6 +438,9 @@ export function generateFPTuningReport(opts?: {
     totalCostUsd: Number((totalConfirmed * costPerFP).toFixed(2)),
     packSummaries: summaries,
     recommendations,
+    outcome: summaries.some((s) => s.outcome === "measured") ? "measured" : "not_evaluated",
+    evidenceStatus: unverified.length > 0 ? "INSUFFICIENT_EVIDENCE" : "MEASURED",
+    unverifiedRecords: unverified,
     reportHash: "",
   };
 
@@ -424,10 +452,16 @@ export function generateFPTuningReport(opts?: {
 // Markdown rendering
 // ---------------------------------------------------------------------------
 
+/** Developer-filed reports AMC did not observe: self-reported, and never a pass or fail of its own. */
+function fpTuningReportClaim(report: FPTuningReport): ReturnType<typeof envelopeForUnverifiedResult> {
+  return envelopeForUnverifiedResult({ producer: "assurance:false-positives", recordCount: report.totalFPReports, now: report.ts });
+}
+
 export function renderFPTuningReportMarkdown(report: FPTuningReport): string {
   const lines: string[] = [];
 
   lines.push("# False Positive Tuning Report");
+  lines.push(formatClaimLabel(renderClaimLabel(fpTuningReportClaim(report)), "report"));
   lines.push("");
   lines.push(`**Report ID:** ${report.reportId}`);
   lines.push(`**Generated:** ${new Date(report.ts).toISOString()}`);
@@ -437,6 +471,9 @@ export function renderFPTuningReportMarkdown(report: FPTuningReport): string {
   lines.push(`**Total FP Reports:** ${report.totalFPReports}`);
   lines.push(`**Confirmed FPs:** ${report.totalConfirmed}`);
   lines.push(`**Estimated Total Cost:** $${report.totalCostUsd.toFixed(2)}`);
+  lines.push(`**Outcome:** ${report.outcome}`);
+  lines.push(`**Evidence:** ${report.evidenceStatus}`);
+  for (const line of report.unverifiedRecords) lines.push(`- ${line}`);
   lines.push("");
 
   // Pack summaries

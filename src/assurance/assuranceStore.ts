@@ -13,6 +13,7 @@ import { pathExists } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { verifyAssuranceCertificateFile } from "./assuranceVerifier.js";
 import { workspaceSelfTrust } from "../trust/trustContext.js";
+import { readVerified } from "../crypto/signing/verifiedArtifacts.js";
 
 function listAssuranceRuns(workspace: string): AssuranceRun[] {
   return listAssuranceRunIds(workspace)
@@ -61,10 +62,15 @@ export function inspectLatestAssuranceCertificate(workspace: string):
   };
 }
 
-/** The latest certificate only when it verifies (WP37): binders and passports must not embed an unverified status. */
+/**
+ * The latest certificate only when it verifies (WP37), read through the verified-artifact registry (AXE-35): binders
+ * and passports must not embed an unverified status.
+ */
 export function latestAssuranceCertificateSummary(workspace: string): ReturnType<typeof inspectLatestAssuranceCertificate> {
-  const latest = inspectLatestAssuranceCertificate(workspace);
-  return latest?.verify.ok ? latest : null;
+  const file = assuranceLatestCertificatePath(workspace);
+  if (!pathExists(file)) return null;
+  const read = readVerified("assurance-certificate", { file, trust: workspaceSelfTrust(workspace) });
+  return read.status === "verified" ? { file, sha256: read.fileSha256, cert: assuranceCertSchema.parse(read.artifact), verify: read.verification } : null;
 }
 
 export function assuranceWaiverStatus(workspace: string, nowTs = Date.now()): {

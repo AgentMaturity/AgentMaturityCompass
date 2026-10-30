@@ -1,7 +1,7 @@
 import { listContainedDir, readContainedOrNull, writeContained } from "../utils/containedFs.js";
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
-import { workspaceRecordHead, withWorkspaceRecordPublicationLock } from "../storage/workspaceRecordStore.js";
+import { anchorWorkspaceRecordHead, workspaceRecordHead, withWorkspaceRecordPublicationLock } from "../storage/workspaceRecordStore.js";
 import { assertPurposePublicationCurrent, capturePurposePublication } from "../keys/purposePublication.js";
 import { signWithPurposeKey } from "../keys/purposeProviders.js";
 import { KeyProviderError } from "../keys/provider.js";
@@ -61,6 +61,7 @@ export async function publishCanaryOverride(workspace: string, override: Emergen
     // Byte-for-byte legacy record construction, including the inner signature's existing field position.
     const record = { ...body, prev_record_hash: predecessor.head, record_hash: hash, signature: signed.signature.toString("base64"), storedTs: publishedAt };
     writeContained(workspace, rel, JSON.stringify(record, null, 2), 0o644);
+    anchorWorkspaceRecordHead(workspace, AT, hash);
     return own;
   });
 }

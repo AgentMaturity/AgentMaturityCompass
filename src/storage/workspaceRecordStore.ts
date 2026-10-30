@@ -22,7 +22,7 @@
  * are modelled on.
  */
 import { readFileSync, readdirSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { basename, join, resolve } from "node:path";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { signHexDigest, getSigningKey, verifyHexDigestAny } from "../crypto/keys.js";
@@ -74,6 +74,52 @@ export function loadWorkspaceRecords<T>(workspace: string, at: RecordLocation): 
 
 /** Superseded versions kept by an update, so the chain a later record links to still resolves (WP37). */
 const REVISIONS_DIR = "revisions";
+/**
+ * The newest record_hash, rewritten under the publication lock after every record write. Records name their
+ * predecessor, so only this anchor notices a deleted or rolled-back newest record (WP37). `lost` carries forward every
+ * anchored head that was already missing when a later record was written, so the next write does not hide it.
+ */
+const UNREADABLE_ANCHOR = "unreadable";
+interface HeadAnchor { head: string; lost: string[] }
+
+/** Beside the record directory, never in it: strict readers of a record directory refuse any non-record entry. */
+function headAnchorPath(workspace: string, at: RecordLocation): string {
+  return join(workspace, ".amc", ...at.area, `${at.kind}.head.json`);
+}
+
+/** The anchor; "absent" for a store written before anchoring, "unreadable" when it is corrupt. */
+function readHeadAnchor(workspace: string, at: RecordLocation): HeadAnchor | "absent" | typeof UNREADABLE_ANCHOR {
+  const file = headAnchorPath(workspace, at);
+  if (!pathExists(file)) return "absent";
+  try {
+    const row = JSON.parse(readUtf8(file)) as { record_hash?: unknown; lost?: unknown };
+    const lost = row.lost ?? [];
+    return typeof row.record_hash === "string" && row.record_hash.length > 0 && Array.isArray(lost) && lost.every((item) => typeof item === "string")
+      ? { head: row.record_hash, lost: lost as string[] } : UNREADABLE_ANCHOR;
+  } catch {
+    return UNREADABLE_ANCHOR;
+  }
+}
+
+/** record_hash of every stored record of one kind, current and kept revisions; unreadable files are skipped. */
+function storedRecordHashes(workspace: string, at: RecordLocation): Set<string> {
+  const dir = recordDir(workspace, at);
+  return new Set([dir, join(dir, REVISIONS_DIR)].flatMap((folder) => !pathExists(folder) ? []
+    : readdirSync(folder).filter((name) => name.endsWith(".json")).flatMap((name) => {
+      try { return [String((JSON.parse(readUtf8(join(folder, name))) as RecordEnvelope).record_hash)]; } catch { return []; }
+    })));
+}
+
+/**
+ * Records `recordHash` as the newest record of one kind. Every publisher calls it right after its record write, under
+ * that store's publication lock; a previous head that is no longer stored is carried forward in `lost`.
+ */
+export function anchorWorkspaceRecordHead(workspace: string, at: RecordLocation, recordHash: string): void {
+  const prior = readHeadAnchor(workspace, at);
+  const lost = prior === "absent" ? [] : prior === UNREADABLE_ANCHOR ? [UNREADABLE_ANCHOR] : [...prior.lost];
+  if (typeof prior === "object" && !storedRecordHashes(workspace, at).has(prior.head)) lost.push(prior.head);
+  writeFileAtomic(headAnchorPath(workspace, at), JSON.stringify({ record_hash: recordHash, lost }, null, 2), 0o644);
+}
 
 function genesisHashes(at: RecordLocation): Set<string> {
   return new Set([`GENESIS_${at.kind.toUpperCase().replace(/-/g, "_")}`, "GENESIS"]);
@@ -87,7 +133,7 @@ function keepRevision(workspace: string, at: RecordLocation, id: string, previou
 
 export interface WorkspaceRecordFinding {
   file: string;
-  code: "UNREADABLE" | "HASH_MISMATCH" | "UNSIGNED" | "SIGNATURE_INVALID" | "CHAIN_GAP";
+  code: "UNREADABLE" | "HASH_MISMATCH" | "UNSIGNED" | "SIGNATURE_INVALID" | "CHAIN_GAP" | "HEAD_MISSING" | "HEAD_UNANCHORED";
   detail: string;
 }
 
@@ -95,7 +141,11 @@ export interface WorkspaceRecordFinding {
  * The verifying reader (WP37): every record of one kind with the integrity findings `loadWorkspaceRecords` hides.
  * Recomputes record_hash over body + prev link, checks the artifact-seal signature, and requires every prev link to
  * name genesis or a stored record (current or a kept revision), so a deleted or corrupted middle record is a finding
- * rather than a silent omission. A deleted newest record leaves no successor to notice it: that needs an external head.
+ * rather than a silent omission. The head anchor covers the newest record, which no successor names: an anchored hash
+ * that is not a current record means the newest record was deleted or rolled back (HEAD_MISSING), and records with
+ * no anchor (a store written before anchoring, or an anchor deleted with the record) are HEAD_UNANCHORED.
+ * ponytail: the anchor is unsigned (the async publishers sign exactly once), so a writer who rewrites head.anchor to
+ * the previous hash along with the deletion is not caught; anchor heads in the transparency log if that matters.
  */
 export function verifyWorkspaceRecords<T>(workspace: string, at: RecordLocation): { records: T[]; findings: WorkspaceRecordFinding[] } {
   const dir = recordDir(workspace, at);
@@ -104,19 +154,25 @@ export function verifyWorkspaceRecords<T>(workspace: string, at: RecordLocation)
     !pathExists(folder) ? [] : readdirSync(folder).filter((name) => name.endsWith(".json")).flatMap((name) => {
       const file = join(folder, name);
       try {
-        return [{ file, record: JSON.parse(readUtf8(file)) as RecordEnvelope & Record<string, unknown> }];
+        const record = JSON.parse(readUtf8(file)) as unknown;
+        if (record === null || typeof record !== "object" || Array.isArray(record)) throw new Error("record is not a JSON object");
+        return [{ file, record: record as RecordEnvelope & Record<string, unknown> }];
       } catch (error) {
         findings.push({ file, code: "UNREADABLE", detail: error instanceof Error ? error.message : String(error) });
         return [];
       }
     });
-  const current = read(dir), all = [...current, ...read(join(dir, REVISIONS_DIR))];
+  const current = read(dir), revisions = read(join(dir, REVISIONS_DIR)), all = [...current, ...revisions];
   let keys: string[] = [];
   try { keys = runHashVerificationKeys(workspace); } catch { /* no verification keys: every signature below is unverifiable */ }
   const known = new Set([...genesisHashes(at), ...all.map((row) => row.record.record_hash)]);
   for (const { file, record } of all) {
     const { prev_record_hash: prev, record_hash: hash, signature, storedTs: _storedTs, ...body } = record;
-    if (sha256Hex(canonicalize({ ...body, prev_record_hash: prev })) !== hash) {
+    const preimage = (envelope: Partial<RecordEnvelope>) => sha256Hex(canonicalize({ ...body, ...envelope, prev_record_hash: prev }));
+    // An update hashes the loaded record it replaces, envelope included: that preimage is the kept revision's envelope.
+    const replaced = revisions.filter((row) => row.file !== file && basename(row.file).startsWith(`${basename(file).replace(/\.[0-9a-f]{16}\.json$|\.json$/, "")}.`));
+    if (preimage({}) !== hash && !replaced.some(({ record: old }) =>
+      preimage({ record_hash: old.record_hash, signature: old.signature, storedTs: old.storedTs }) === hash)) {
       findings.push({ file, code: "HASH_MISMATCH", detail: "record_hash does not match the record body and prev link" });
     }
     if (typeof signature !== "string" || signature === "unsigned") {
@@ -128,7 +184,42 @@ export function verifyWorkspaceRecords<T>(workspace: string, at: RecordLocation)
       findings.push({ file, code: "CHAIN_GAP", detail: `prev_record_hash ${String(prev).slice(0, 16)}… names no stored record` });
     }
   }
+  const anchor = readHeadAnchor(workspace, at), headFile = headAnchorPath(workspace, at);
+  if (anchor === UNREADABLE_ANCHOR) {
+    findings.push({ file: headFile, code: "UNREADABLE", detail: "the head anchor cannot be read" });
+  } else if (anchor === "absent") {
+    if (current.length > 0) findings.push({ file: headFile, code: "HEAD_UNANCHORED", detail: "no head anchor: a deleted newest record cannot be ruled out" });
+  } else {
+    if (!current.some((row) => row.record.record_hash === anchor.head)) {
+      findings.push({ file: headFile, code: "HEAD_MISSING", detail: `the newest record ${anchor.head.slice(0, 16)}… is missing: deleted or rolled back` });
+    }
+    for (const lost of anchor.lost) {
+      findings.push({ file: headFile, code: "HEAD_MISSING", detail: lost === UNREADABLE_ANCHOR ? "an earlier head anchor could not be read when a later record was written"
+        : `an earlier newest record ${lost.slice(0, 16)}… was already missing when a later record was written` });
+    }
+  }
   return { records: current.map((row) => row.record as unknown as T), findings };
+}
+
+/** Findings that make a record itself untrusted; the others describe the store around it. */
+const RECORD_REFUSALS: ReadonlySet<WorkspaceRecordFinding["code"]> = new Set(["HASH_MISMATCH", "SIGNATURE_INVALID"]);
+
+/**
+ * The history read for reports and aggregates (DXB-11), the workspace-record counterpart of `scanTrustedRuns`: a
+ * record whose hash or signature fails is left out, and every finding is returned as an UNVERIFIED line. A report must
+ * not read as clean while `unverified` is non-empty.
+ * ponytail: unsigned records stay in (keyless workspaces write nothing else) and are only reported; refuse them once
+ * every workspace that writes records has an artifact-seal key.
+ */
+export function readTrustedWorkspaceRecords<T>(workspace: string, at: RecordLocation): { records: T[]; unverified: string[] } {
+  const { findings } = verifyWorkspaceRecords<RecordEnvelope>(workspace, at);
+  const refused = new Set(findings.filter((row) => RECORD_REFUSALS.has(row.code)).map((row) => row.file));
+  const dir = recordDir(workspace, at);
+  const records = !pathExists(dir) ? [] : readdirSync(dir).filter((name) => name.endsWith(".json") && !refused.has(join(dir, name)))
+    .flatMap((name) => {
+      try { return [JSON.parse(readUtf8(join(dir, name))) as T]; } catch { return []; }
+    });
+  return { records, unverified: findings.map((row) => `UNVERIFIED: ${at.kind} ${row.code} ${basename(row.file)}: ${row.detail}`) };
 }
 
 function lastRecordHash(workspace: string, at: RecordLocation): string {
@@ -196,6 +287,7 @@ export function saveWorkspaceRecord<T extends Record<string, unknown>>(
     ensureDir(recordDir(workspace, location));
     keepRevision(workspace, location, id, before.target);
     writeFileAtomic(before.file, bytes, 0o644);
+    anchorWorkspaceRecordHead(workspace, location, hash);
     return record;
   });
 }
@@ -245,6 +337,7 @@ export async function prepareWorkspaceRecordAsync<T extends Record<string, unkno
     ensureDir(recordDir(root, location));
     keepRevision(root, location, ownId, before.target);
     writeFileAtomic(before.file, bytes, 0o644);
+    anchorWorkspaceRecordHead(root, location, hash);
     return record;
   } });
 }
