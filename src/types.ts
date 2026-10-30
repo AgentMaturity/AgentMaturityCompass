@@ -3665,7 +3665,9 @@ export interface ExperimentExecution {
   executor: { identity: string };
   judge: { identity: string };
   limits: { maxExecutions: number; trialTimeoutMs: number; concurrency: number };
-  executions: Array<{ side: "baseline" | "candidate"; trialId: string; caseId: string; outcome: "completed" | "unavailable"; reason: string | null; durationMs: number }>;
+  executions: Array<{ side: "baseline" | "candidate"; trialId: string; caseId: string; outcome: "completed" | "unavailable"; reason: string | null; durationMs: number;
+    resources?: import("./experiments/trialReceipts.js").TrialResourceReceipt;
+    roleCosts?: import("./experiments/experimentResourceUsage.js").ExperimentRoleCostSummary }>;
 }
 
 export interface ExperimentReport {

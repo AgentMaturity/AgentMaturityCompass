@@ -1,3 +1,6 @@
+import { withTrialBudget } from "../budgets/experimentBudget.js";
+import { collectTrialReceipts, type TrialResourceReceipt } from "./trialReceipts.js";
+import { summarizeExperimentRoleCosts, type ExperimentRoleCostSummary, type ExperimentCostStage } from "./experimentResourceUsage.js";
 import { randomUUID } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { openLedger } from "../ledger/ledger.js";
@@ -61,21 +64,28 @@ const MAX_TRIAL_TIMEOUT_MS = 3_600_000;
 /** How long a timed-out execution may take to settle after its abort before the executor moves on. */
 const ABORT_GRACE_MS = 5_000;
 
-interface CaseExecutionRecord {
+export interface CaseExecutionRecord {
   readonly side: "baseline" | "candidate";
   readonly trialId: string;
   readonly caseId: string;
   readonly outcome: "completed" | "unavailable";
   readonly reason: string | null;
   readonly durationMs: number;
+  readonly resources?: TrialResourceReceipt;
+  readonly roleCosts?: ExperimentRoleCostSummary;
 }
 
 /**
  * Whole-experiment budget seam (owned by WP28b): `admit` sees the full plan before any execution and may refuse it by
  * throwing; `settle` sees each execution as it ends, failed ones included.
  */
+export interface TrialBudgetPlan {
+  readonly executions: number;
+  readonly caseIds: readonly string[];
+  readonly arms: readonly { readonly side: "baseline" | "candidate"; readonly configDigest: string; readonly trialId: string }[];
+}
 export interface TrialBudgetHook {
-  admit(plan: { readonly executions: number; readonly caseIds: readonly string[]; readonly arms: readonly { side: string; configDigest: string }[] }): void;
+  admit(plan: TrialBudgetPlan): void;
   settle?(execution: CaseExecutionRecord): void;
 }
 
@@ -176,11 +186,11 @@ export async function executeCaseTrials(params: {
   const configs = params.arms.map(readAdmitted);
   const executions = params.arms.length * params.caseIds.length;
   if (executions > limits.maxExecutions) throw new Error(`The trial plan has ${executions} executions; the limit is ${limits.maxExecutions}.`);
-  params.budget?.admit({ executions, caseIds: [...params.caseIds], arms: params.arms.map(({ side, configDigest }) => ({ side, configDigest })) });
+  const trialIds = params.arms.map(() => `trial_${randomUUID().replace(/-/g, "")}`);
+  params.budget?.admit({ executions, caseIds: [...params.caseIds], arms: params.arms.map(({ side, configDigest }, index) => ({ side, configDigest, trialId: trialIds[index]! })) });
 
   const cases = params.caseIds.map((caseId) => ({ view: executorCaseView(loadCase(params.workspace, params.casebookId, caseId, agentId)),
     caseSha256: caseFileSha256(params.workspace, params.casebookId, caseId, agentId) }));
-  const trialIds = params.arms.map(() => `trial_${randomUUID().replace(/-/g, "")}`);
   const tasks = params.arms.flatMap((arm, armIndex) => cases.map((kase) => ({ arm, armIndex, kase })));
   const records: CaseExecutionRecord[] = [];
   let changed: Error | null = null;
@@ -194,17 +204,28 @@ export async function executeCaseTrials(params: {
     const sessionId = `${trialId}-${kase.view.caseId}`;
     writeTrialRow(params.workspace, sessionId, stamp, { phase: "started", side: arm.side }, false);
     const began = Date.now();
-    const result = await runBounded(params.runTrial, { view: kase.view, config: configs[armIndex]!, stamp, mode: params.mode }, limits.trialTimeoutMs);
+    const result = await withTrialBudget(params.budget, stamp, () => runBounded(params.runTrial, { view: kase.view, config: configs[armIndex]!, stamp, mode: params.mode }, limits.trialTimeoutMs));
+    const resources = collectTrialReceipts(params.workspace, stamp);
+    const stages: ExperimentCostStage[] = resources.sessions.flatMap((session, index) => session.costStages.map(stage => ({ ...stage,
+      stage: `${arm.side}:${kase.view.caseId}:${index}:${stage.stage}` })));
+    if (stages.length === 0) stages.push({ stage: `${arm.side}:${kase.view.caseId}`, role: "executor", state: "unknown", cost: null });
+    for (const role of ["proposer", "judge"] as const) {
+      if (!stages.some(stage => stage.role === role)) stages.push({ stage: role, role, state: "not-run", cost: null });
+    }
+    const roleCosts = summarizeExperimentRoleCosts(stages);
     const record: CaseExecutionRecord = { side: arm.side, trialId, caseId: kase.view.caseId, outcome: result.ok ? "completed" : "unavailable",
-      reason: result.ok ? null : result.reason, durationMs: Date.now() - began };
-    writeTrialRow(params.workspace, sessionId, stamp, { phase: "settled", side: arm.side, outcome: record.outcome, reason: record.reason, durationMs: record.durationMs }, true);
+      reason: result.ok ? null : result.reason, durationMs: Date.now() - began, resources, roleCosts };
+    writeTrialRow(params.workspace, sessionId, stamp, { phase: "settled", side: arm.side, outcome: record.outcome, reason: record.reason, durationMs: record.durationMs, resources: record.resources, roleCosts: record.roleCosts }, true);
     records.push(record);
     params.budget?.settle?.(record);
   };
 
   let next = 0;
   const worker = async (): Promise<void> => {
-    while (changed === null && next < tasks.length) await runTask(tasks[next++]!);
+    while (changed === null && next < tasks.length) {
+      try { await runTask(tasks[next++]!); }
+      catch (error) { changed ??= error instanceof Error ? error : new Error(String(error)); }
+    }
   };
   await Promise.all(Array.from({ length: Math.min(limits.concurrency, tasks.length) }, worker));
   if (changed !== null) throw changed;
