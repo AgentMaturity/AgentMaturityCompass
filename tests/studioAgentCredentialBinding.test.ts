@@ -1,3 +1,4 @@
+import { writeAnchoredRun } from "./helpers/sealedRun.js";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { request as httpRequest } from "node:http";
 import { tmpdir } from "node:os";
@@ -138,7 +139,7 @@ function syntheticGovernorControlInput(f: Fixture, agentId: string): void {
   };
   const runsDir = getAgentPaths(f.workspace, agentId).runsDir;
   mkdirSync(runsDir, { recursive: true });
-  writeFileSync(join(runsDir, "synthetic-credential-binding-control.json"), JSON.stringify(report), "utf8");
+  writeAnchoredRun(f.workspace, runsDir, { ...report, runId: report.runId!, windowStartTs: report.windowStartTs!, windowEndTs: report.windowEndTs!, status: "VALID" as const });
 }
 async function approvedWrite(f: Fixture, agentId = B) {
   syntheticGovernorControlInput(f, agentId);
