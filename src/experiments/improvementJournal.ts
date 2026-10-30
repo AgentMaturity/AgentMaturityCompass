@@ -12,9 +12,9 @@ import { canonicalize, parseCanonicalJson } from "../utils/json.js";
  * descendant keyed on its output with it. Only a completed stage whose recorded payload verifies is reused; a stage
  * that started and never completed is unknown and is never replayed.
  */
-type ImprovementStage = "setup" | "edit" | "probe" | "select";
+type ImprovementStage = "setup" | "plan" | "edit" | "probe" | "select";
 /** Stages without effects outside AMC records, journalled by their completion only. */
-const COMPLETION_ONLY = new Set<unknown>(["setup", "select"]);
+const COMPLETION_ONLY = new Set<unknown>(["setup", "plan", "select"]);
 type JournalSession = Pick<SessionService, "workspace" | "sessionId" | "readEvents" | "assertDispatchFence" | "recordProjectedEvidence">;
 const KIND = "improvement/stage";
 

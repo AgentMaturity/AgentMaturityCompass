@@ -4,14 +4,14 @@ import { join, sep } from "node:path";
 import YAML from "yaml";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
-import { initBudgets } from "../src/budgets/budgets.js";
+import { budgetsPath, initBudgets, signBudgetsConfig } from "../src/budgets/budgets.js";
 import { initApprovalPolicy } from "../src/approvals/approvalPolicyEngine.js";
 import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
 import { getSigningKey, signHexDigest } from "../src/crypto/keys.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import { initCasebook } from "../src/casebooks/casebookStore.js";
-import { createExperiment, gateExperiment, listExperiments, setExperimentBaseline, setExperimentCandidate, verifySignedCandidateFile } from "../src/experiments/experimentRunner.js";
-import { runExecutedExperimentAsync } from "../src/experiments/executedExperiment.js";
+import { createExperiment, gateExperiment, listExperiments, loadExperiment, setExperimentBaseline, setExperimentCandidate, verifySignedCandidateFile } from "../src/experiments/experimentRunner.js";
+import { experimentHoldout, runExecutedExperimentAsync } from "../src/experiments/executedExperiment.js";
 import { nativeTrialRunner } from "../src/experiments/nativeTrialRunner.js";
 import type { TrialRunner } from "../src/experiments/trialExecutor.js";
 import { attemptAuditDigest, editorRouteSchema, runImprovementLoop, type EditorAttempt, type ImprovementEditor,
@@ -83,8 +83,8 @@ function writeCasebook(): void {
   }
 }
 
-/** The governed native path; the fixture model reads the note only when its persona says USE-TOOL. Counts executions. */
-function fixtureRunner(): TrialRunner {
+/** The governed native path; by default the fixture model reads the note only when its persona says USE-TOOL. Counts executions. */
+function fixtureRunner(readsNote: (body: string) => boolean = (body) => body.includes("USE-TOOL")): TrialRunner {
   let body = "";
   const adapter: LlmAdapter = {
     id: "trial-fixture", version: 1, encoderId: "anthropic-messages", encoderVersion: 1, capabilities: ANTHROPIC_CAPABILITIES,
@@ -92,7 +92,7 @@ function fixtureRunner(): TrialRunner {
       return { url: `${input.baseUrl}/v1/messages`, method: "POST", headers: { ...input.extraHeaders }, body: input.body }; },
     decode: async function* decode() {
       const script = body.includes("tool_result") ? textStep("done")
-        : body.includes("USE-TOOL") ? toolStep("read_1", "fs.read", JSON.stringify({ path: "workspace/n.txt" })) : textStep("done");
+        : readsNote(body) ? toolStep("read_1", "fs.read", JSON.stringify({ path: "workspace/n.txt" })) : textStep("done");
       for (const chunk of script) yield chunk;
     }
   };
@@ -123,8 +123,9 @@ const writingEditor = (text: string): ImprovementEditor => {
 };
 
 function loop(options: { loopId: string; proposals: ImprovementProposal[]; limits: ImprovementLimits; edit: ImprovementEditor; runner?: TrialRunner;
-  signal?: AbortSignal; policy?: typeof POLICY }) {
+  signal?: AbortSignal; policy?: typeof POLICY; seed?: string; compose?: boolean }) {
   return runImprovementLoop({ workspace: ws, agentId: "default", experimentId, loopId: options.loopId, session, proposals: options.proposals,
+    ...(options.seed === undefined ? {} : { seed: options.seed }), ...(options.compose === undefined ? {} : { compose: options.compose }),
     editor: { route: ROUTE, edit: options.edit }, limits: options.limits, policy: options.policy ?? POLICY, mode: "supervise",
     trials: { runTrial: options.runner ?? stubRunner, executorIdentity: "native:fixture" }, ...(options.signal ? { signal: options.signal } : {}) });
 }
@@ -255,5 +256,121 @@ describe("bounded recursive improvement loop (GAP-WP08)", () => {
   test("an attempt's audit digest changes when only its context path changes (H2X-11)", () => {
     const record = { mission: "m", contextPath: "/tmp/a", parentDigest: "0".repeat(64), route: ROUTE, proposalId: "p1", harvestedDigest: null };
     expect(attemptAuditDigest(record)).not.toBe(attemptAuditDigest({ ...record, contextPath: "/tmp/b" }));
+  });
+
+  test("branches: a seeded, recorded domain order, one branch per domain first, bounded concurrency and shared budget (H2-05, H2-06, H2-08)", async () => {
+    const domains = [["a1", "alpha"], ["a2", "alpha"], ["b1", "beta"], ["c1", "gamma"]] as const;
+    const branched: ImprovementProposal[] = domains.map(([id, domain]) => ({ proposalId: id, mission: `mission ${id}`, evidenceClass: "repeated-failure", evidence: null, domain }));
+    const order = (seed: string) => ["alpha", "beta", "gamma"].sort((a, b) =>
+      sha256Hex(`improvement-domain-order/1\0${seed}\0${a}`).localeCompare(sha256Hex(`improvement-domain-order/1\0${seed}\0${b}`)));
+    let inFlight = 0, peak = 0;
+    const seen: string[] = [];
+    const slow: ImprovementEditor = async (attempt) => {
+      seen.push(attempt.mission);
+      peak = Math.max(peak, ++inFlight);
+      await new Promise((resolve) => setTimeout(resolve, 50));
+      writeFileSync(join(attempt.dir, "candidate.txt"), `Try ${attempt.mission}`);
+      inFlight -= 1;
+    };
+    const parallel = await loop({ loopId: "domains", seed: "s1", proposals: branched, limits: { width: 3, depth: 1, maxExecutions: 100, concurrency: 2 }, edit: slow });
+    expect(parallel.domainOrder).toEqual(order("s1"));
+    expect([...seen].sort()).toEqual(["mission a1", "mission b1", "mission c1"]); // every domain before a second alpha branch
+    expect([parallel.edits, parallel.probes, parallel.executionsUsed, peak]).toEqual([3, 3, 18, 2]);
+    const plan = loadSessionEventHistory({ workspace: ws, sessionId: "improver" }).events
+      .map((row) => JSON.parse(row.meta_json) as Record<string, unknown>).filter((meta) => meta.kind === "improvement/stage" && meta.stage === "plan");
+    expect(plan).toHaveLength(1);
+    // Resumed with another concurrency, the same branches are reused: nothing is edited or executed again.
+    const editorCalls = seen.length, calls = executions;
+    const resumed = await loop({ loopId: "domains", seed: "s1", proposals: branched, limits: { width: 3, depth: 1, maxExecutions: 100, concurrency: 1 }, edit: slow });
+    expect([seen.length, executions, resumed.executionsUsed]).toEqual([editorCalls, calls, 18]);
+    // A different seed records its own order; width 4 then gives alpha its second branch last.
+    seen.length = 0; peak = 0;
+    const serial = await loop({ loopId: "serial", seed: "s2", proposals: branched, limits: { width: 4, depth: 1, maxExecutions: 100 }, edit: slow });
+    expect(serial.domainOrder).toEqual(order("s2"));
+    expect(seen.at(-1)).toBe("mission a2");
+    expect(peak).toBe(1); // the default concurrency is serial
+    // Branches in flight hold their reservations: three at once cannot overrun a budget of two probes.
+    const budget = await loop({ loopId: "budget-parallel", proposals: branched, limits: { width: 3, depth: 1, maxExecutions: 12, concurrency: 3 }, edit: slow });
+    expect([budget.probes, budget.executionsUsed, budget.stopReason]).toEqual([2, 12, "budget"]);
+    await expect(loop({ loopId: "bad", proposals: branched, limits: { width: 3, depth: 1, maxExecutions: 12, concurrency: 0 }, edit: slow })).rejects.toThrow(/concurrency 1\.\.8/);
+    await expect(loop({ loopId: "bad", proposals: [{ ...branched[0]!, domain: "Not A Domain" }], limits: { width: 1, depth: 1, maxExecutions: 12 }, edit: slow })).rejects.toThrow(/domain/);
+  });
+
+  test("an invalid edit gets at most `repairs` re-edits from the same parent, then the parent stays (H2-21)", async () => {
+    const missions: string[] = [];
+    const flaky = (failures: number): ImprovementEditor => async (attempt) => {
+      missions.push(attempt.mission);
+      expect(readFileSync(join(attempt.dir, "candidate.txt"), "utf8")).toBe("Answer briefly from memory."); // the unchanged parent each time
+      if (missions.length <= failures) throw new Error("bad edit");
+      writeFileSync(join(attempt.dir, "candidate.txt"), "Try harder");
+    };
+    const repaired = await loop({ loopId: "repaired", proposals: proposals(1), limits: { width: 1, depth: 1, maxExecutions: 100, repairs: 2 }, edit: flaky(2) });
+    expect([repaired.edits, repaired.repairs, repaired.probes]).toEqual([3, 2, 1]);
+    expect(missions[1]).toMatch(/^mission 1\n\nRepair 1 of 2: the previous edit was invalid \(editor failed: bad edit\)/);
+    // Resumed, the journalled attempts are reused: the editor is not called again.
+    await loop({ loopId: "repaired", proposals: proposals(1), limits: { width: 1, depth: 1, maxExecutions: 100, repairs: 2 }, edit: flaky(2) });
+    expect(missions).toHaveLength(3);
+    missions.length = 0;
+    const exhausted = await loop({ loopId: "exhausted", proposals: proposals(1), limits: { width: 1, depth: 1, maxExecutions: 100, repairs: 1 }, edit: flaky(9) });
+    expect([exhausted.edits, exhausted.repairs, exhausted.probes, exhausted.selection]).toEqual([2, 1, 0, "baseline"]);
+    missions.length = 0;
+    const none = await loop({ loopId: "no-repair", proposals: proposals(1), limits: { width: 1, depth: 1, maxExecutions: 100 }, edit: flaky(9) });
+    expect([none.edits, none.repairs]).toEqual([1, 0]);
+    // An unchanged edit is valid: it is not repaired.
+    const unchanged = await loop({ loopId: "unchanged", proposals: proposals(1), limits: { width: 1, depth: 1, maxExecutions: 100, repairs: 3 }, edit: async () => undefined });
+    expect([unchanged.edits, unchanged.repairs, unchanged.probes]).toEqual([1, 0, 0]);
+    await expect(loop({ loopId: "bad", proposals: proposals(1), limits: { width: 1, depth: 1, maxExecutions: 100, repairs: 4 }, edit: flaky(0) })).rejects.toThrow(/repairs 0\.\.3/);
+  });
+
+  test("composition joins two measured improvements, and the composite is executed and judged as a new candidate (H2-10)", async () => {
+    const policy = { ...POLICY, minUpliftSuccessRate: 0.2, minUpliftValuePoints: 20 };
+    // More model calls in a minute than the default per-minute budget admits.
+    writeFileSync(budgetsPath(ws), readFileSync(budgetsPath(ws), "utf8").replace(/maxLlmRequests: 60\b/, "maxLlmRequests: 1000"));
+    signBudgetsConfig(ws);
+    // The model reads the note for a case only when the persona names it: USE-TOOL:case_a,case_b.
+    const readsNote = (body: string) => {
+      const named = /USE-TOOL:([a-z0-9_,]+)/.exec(body)?.[1]?.split(",") ?? [];
+      const caseId = /\((case_\d+)\)/.exec(body)?.[1];
+      return caseId !== undefined && named.includes(caseId);
+    };
+    const heldOut = (loopId: string) => {
+      const row = listExperiments({ workspace: ws, agentId: "default" }).find((item) => item.name === `improvement-loop:${loopId}`)!;
+      return experimentHoldout(ws, "default", loadExperiment(ws, "default", row.experimentId)).heldOut;
+    };
+    const contrasts: string[][] = [];
+    const editor = (loopId: string, cover: (held: string[]) => Record<string, string[]>): ImprovementEditor => async (attempt) => {
+      const held = heldOut(loopId);
+      if (attempt.mission.startsWith("Compose")) {
+        const a = readFileSync(join(attempt.dir, "contrast-a.txt"), "utf8"), b = readFileSync(join(attempt.dir, "contrast-b.txt"), "utf8");
+        contrasts.push([a, b]);
+        const named = [a, b].flatMap((text) => /USE-TOOL:([a-z0-9_,]+)/.exec(text)![1]!.split(","));
+        writeFileSync(join(attempt.dir, "candidate.txt"), `USE-TOOL:${[...new Set(named)].sort().join(",")}`);
+        return;
+      }
+      writeFileSync(join(attempt.dir, "candidate.txt"), `USE-TOOL:${(cover(held)[attempt.mission] ?? []).join(",")}`);
+    };
+    const halves = (held: string[]) => ({ "mission 1": [held[0]!], "mission 2": [held[1]!] });
+    const options = { proposals: proposals(2), runner: fixtureRunner(readsNote), policy };
+    // Without composition the two equal improvements tie, and the parent stays.
+    const tied = await loop({ ...options, loopId: "tied", limits: { width: 2, depth: 1, maxExecutions: 100 }, edit: editor("tied", halves) });
+    expect([tied.probes, tied.composites, tied.selection]).toEqual([2, 0, "baseline"]);
+    const calls = executions;
+    const composed = await loop({ ...options, loopId: "composed", compose: true, limits: { width: 2, depth: 2, maxExecutions: 100, concurrency: 2 }, edit: editor("composed", halves) });
+    expect(contrasts).toHaveLength(1);
+    expect(composed.composites).toBe(1);
+    expect(executions - calls).toBe(18); // two branches and the composite, each executed once; round 2 reuses all three probes
+    expect(composed.selection).toBe("candidate");
+    const twoCases = heldOut("composed").slice(0, 2).sort().join(",");
+    expect(composed.selected!.candidateDigest).toBe(sha256Hex(Buffer.from(`USE-TOOL:${twoCases}`)));
+    expect(existsSync(`${composed.selected!.candidateFile}.sig`)).toBe(false); // never auditor-signed
+    // Round 2: the branches pass but no longer beat the composite parent, so nothing is composed again.
+    expect([composed.rounds, composed.edits]).toEqual([2, 5]);
+    // A passing candidate and one the gate refuses are no contrast pair, however much the refused one improved.
+    const strict = await loop({ ...options, loopId: "gate-refused", compose: true, policy: { ...policy, minUpliftValuePoints: 50 },
+      limits: { width: 2, depth: 1, maxExecutions: 100 }, edit: editor("gate-refused", (held) => ({ "mission 1": [held[0]!], "mission 2": [held[0]!, held[1]!] })) });
+    expect([strict.composites, contrasts.length]).toEqual([0, 1]);
+    // The composite needs its own execution budget.
+    const short = await loop({ ...options, loopId: "short", compose: true, limits: { width: 2, depth: 1, maxExecutions: 12 }, edit: editor("short", halves) });
+    expect([short.composites, short.stopReason, short.executionsUsed, contrasts.length]).toEqual([0, "budget", 12, 1]);
   });
 });
