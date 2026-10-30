@@ -296,6 +296,27 @@ describe("P07 controlled native lifecycle and transport", () => {
       ["fixture-node", ["fixture-cli.js", "acp", "--provider", "stub"]]
     ]);
   });
+  test("several reviewed MCP configs reach amc acp in order, each with its own pin (WP21c)", async () => {
+    await connect(new ControlledPeer(), { command: ["fixture-node", "fixture-cli.js"],
+      mcpConfig: ["first.json", "second.json"], mcpConfigSha256: ["a".repeat(64), "b".repeat(64)] });
+    await connect(new ControlledPeer(), { command: ["fixture-node", "fixture-cli.js"], mcpConfig: "only.json" });
+    expect(processMock.spawn.mock.calls.map(([, argv]) => argv)).toEqual([
+      ["fixture-cli.js", "acp", "--provider", "stub", "--mcp-config", "first.json", "--mcp-config-sha256", "a".repeat(64),
+        "--mcp-config", "second.json", "--mcp-config-sha256", "b".repeat(64)],
+      ["fixture-cli.js", "acp", "--provider", "stub", "--mcp-config", "only.json"]
+    ]);
+  });
+  test.each([
+    [{ mcpConfig: ["first.json", "second.json"], mcpConfigSha256: ["a".repeat(64)] }],
+    [{ mcpConfigSha256: "a".repeat(64) }],
+    [{ mcpConfig: [] as string[] }],
+    [{ mcpConfig: ["first.json", ""] }],
+    [{ mcpConfig: ["bad\0.json"] }],
+    [{ mcpConfig: [7] as unknown as string[] }]
+  ])("unpaired or malformed MCP configs are refused before spawn: %j", async options => {
+    await expect(AMCNativeClient.start({ workspace: process.cwd(), provider: "stub", ...options })).rejects.toBeInstanceOf(AMCNativeInputError);
+    expect(processMock.spawn).not.toHaveBeenCalled();
+  });
   test("invalid validation IDs are rejected before spawn, not coerced into CLI flags", async () => {
     await expect(AMCNativeClient.start({ workspace: process.cwd(), provider: "stub", validationConfig: "checks.json",
       validate: [7] as unknown as readonly string[] })).rejects.toBeInstanceOf(AMCNativeInputError);

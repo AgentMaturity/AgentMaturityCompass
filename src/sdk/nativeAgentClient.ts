@@ -72,8 +72,10 @@ export {
   readonly validate?: readonly string[];
   readonly approveTools?: string;
   readonly approveRisk?: "low" | "medium" | "high" | "critical";
-  readonly mcpConfig?: string;
-  readonly mcpConfigSha256?: string;
+  /** One reviewed MCP config per server; the runtime reviews every one and mounts each grant with its signed action class. */
+  readonly mcpConfig?: string | readonly string[];
+  /** Exact reviewed bytes, one per mcpConfig in the same order. */
+  readonly mcpConfigSha256?: string | readonly string[];
   readonly credentialsHome?: string;
   readonly credentialsFile?: string;
   /** Exclude project and user dotenv fallback in operator-owned server integrations. */
@@ -279,13 +281,13 @@ export class AMCNativeClient {
       ["--validation-config", options.validationConfig], ["--validation-config-sha256", options.validationConfigSha256],
       ["--validation-repair", options.validationRepair],
       ["--approve-tools", options.approveTools], ["--approve-risk", options.approveRisk],
-      ["--mcp-config", options.mcpConfig], ["--mcp-config-sha256", options.mcpConfigSha256],
       ["--credentials-home", options.credentialsHome], ["--credentials-file", options.credentialsFile],
       ["--credentials-mode", options.credentialsMode],
       ["--thinking", options.thinking], ["--reasoning-effort", options.reasoningEffort],
       ["--max-tokens", options.maxTokens], ["--max-steps", options.maxSteps]] as const) {
       if (value !== undefined) args.push(flag, String(value));
     }
+    args.push(...mcpConfigArgv(options.mcpConfig, options.mcpConfigSha256));
     if (options.allowUnconfinedShell === true) args.push("--unsafe-unconfined-shell");
     if (options.validate !== undefined) {
       if (!Array.isArray(options.validate) || options.validate.length < 1 || options.validate.length > 8
@@ -769,4 +771,15 @@ export class AMCNativeClient {
 
 
 
+}
+
+/** Pair each config with its pin before spawn; the runtime still reviews and refuses every one. */
+function mcpConfigArgv(configs: string | readonly string[] | undefined, pins: string | readonly string[] | undefined): string[] {
+  const list = (value: string | readonly string[] | undefined) => value === undefined ? [] : typeof value === "string" ? [value] : value;
+  const paths = list(configs), digests = list(pins);
+  if (!Array.isArray(paths) || !Array.isArray(digests) || [...paths, ...digests].some(value => typeof value !== "string" || !value || value.includes("\0"))
+    || (configs !== undefined && paths.length === 0) || (pins !== undefined && digests.length !== paths.length)) {
+    throw new AMCNativeInputError("Give one non-empty mcpConfig path per server and, when pinning, one mcpConfigSha256 per config in the same order.");
+  }
+  return paths.flatMap((path, index) => ["--mcp-config", path, ...(digests[index] === undefined ? [] : ["--mcp-config-sha256", digests[index]])]);
 }

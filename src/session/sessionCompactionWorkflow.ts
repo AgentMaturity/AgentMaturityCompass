@@ -7,10 +7,12 @@ import { describeMeasuredLiveEntries, prepareSurfaceCompaction } from "./surface
 import { compactionReceipt } from "./surfaceCompactionValidation.js";
 import { resumeSession } from "./sessionResume.js";
 import type { SessionService } from "./sessionService.js";
+import type { EvidenceEvent } from "../types.js";
 import { redactCompactionReplacement } from "../dataflow/redactingSession.js";
 import type { TrustContext } from "../trust/trustContext.js";
 
-function snapshot(workspace: string, sessionId: string, trust?: TrustContext) {
+/** A verified read of one session's rows inside the reader's change fence; never writer admission. */
+export function snapshotReleasedSession(workspace: string, sessionId: string, trust?: TrustContext, measure = true) {
   // Inspect the recorded backend, never a permissive fallback selected from a
   // malformed marker or environment. Keep verification and measurement inside
   // the same reader's change fence; this is still read-only, not writer admission.
@@ -22,8 +24,8 @@ function snapshot(workspace: string, sessionId: string, trust?: TrustContext) {
     const record = store.readSessionRecord(sessionId);
     if (record === null) throw new Error(`No session ${sessionId} exists in this workspace`);
     const rows = store.readSessionEvents(sessionId), head = rows.at(-1);
-    if (!head) throw new Error("Session has no native history to compact");
-    const entries = describeMeasuredLiveEntries(reader.workspace, rows, { trust });
+    if (!head) throw new Error("Session has no native history");
+    const entries = measure ? describeMeasuredLiveEntries(reader.workspace, rows, { trust }) : [];
     let lastSeal = -1;
     rows.forEach((row, index) => { if (row.event_type === "turn/seal") lastSeal = index; });
     const interrupted = rows.slice(lastSeal + 1).some(row => row.event_type === "turn/start");
@@ -33,7 +35,7 @@ function snapshot(workspace: string, sessionId: string, trust?: TrustContext) {
 }
 
 export function inspectSessionCompaction(workspace: string, sessionId: string, options: { trust?: TrustContext } = {}) {
-  const source = snapshot(workspace, sessionId, options.trust);
+  const source = snapshotReleasedSession(workspace, sessionId, options.trust);
   return { ok: true as const, sessionId, headEventId: source.head.id, headEventHash: source.head.event_hash,
     trustRootAnchored: source.anchored, backend: source.backend,
     closed: source.record.ended_ts !== null || source.record.session_seal_sig !== null,
@@ -56,7 +58,7 @@ export function compactReleasedSession(input: SessionCompactionInput) {
   if (!["summarize", "replace", "drop"].includes(input.mode)) throw new Error("Unsupported compaction mode");
   if (input.mode === "drop" && input.replacement !== undefined) throw new Error("Drop does not accept replacement text");
   if (input.mode !== "summarize" && input.summaryRole !== undefined) throw new Error("A summary role applies only to range summaries");
-  const source = snapshot(input.workspace, input.sessionId, input.trust);
+  const source = snapshotReleasedSession(input.workspace, input.sessionId, input.trust);
   if (source.backend !== "sqlite") throw new Error("JSONL compaction through a resumed writer is unavailable; read-only inspection remains supported");
   if (source.record.ended_ts !== null || source.record.session_seal_sig !== null) throw new Error("Closed sessions are immutable; use compaction during an open native conversation");
   if (source.interrupted) throw new Error("This session has an unsealed turn; explicitly recover it before requesting compaction");
@@ -67,22 +69,7 @@ export function compactReleasedSession(input: SessionCompactionInput) {
   prepareSurfaceCompaction(input.workspace, source.rows, { origins: input.originEventIds, mode: input.mode,
     reason: input.reason, ...(redacted === null ? {} : { replacement: redacted.text }),
     ...(input.summaryRole === undefined ? {} : { summaryRole: input.summaryRole }) }, { trust: input.trust });
-  const opened = source.rows.find(row => row.event_type === "session/open");
-  if (!opened) throw new Error("Session has no supported native identity");
-  const identity = JSON.parse(opened.meta_json) as Record<string, unknown>;
-  const field = (name: string): string => {
-    const value = identity[name];
-    if (typeof value !== "string" || !value) throw new Error(`Native session identity is missing ${name}`);
-    return value;
-  };
-  let service: SessionService | undefined;
-  try {
-    const resumed = resumeSession({ workspace: input.workspace, sessionId: input.sessionId,
-      runtime: opened.runtime, agentId: field("agentId"), harnessVersion: field("harnessVersion"),
-      compositionDigest: field("compositionDigest"), policyDigest: field("policyDigest"),
-      claimant: { pid: process.pid, hostId: hostname(), bootId: randomUUID(), startedAt: Math.round(Date.now() - process.uptime() * 1000) } });
-    service = resumed.service;
-    if (resumed.report.observedHeadEventId !== source.head.id) throw new Error("Session changed during writer acquisition; no compaction applied, list it again");
+  return withReleasedNativeWriter(input.workspace, input.sessionId, source.rows, source.head.id, "no compaction applied, list it again", service => {
     redacted?.writeReceipt(service);
     const replacement = redacted?.text ?? "";
     const ref = input.mode === "drop"
@@ -98,14 +85,40 @@ export function compactReleasedSession(input: SessionCompactionInput) {
       replacedBytes: receipt.replacedBytes, replacementBytes: receipt.replacementBytes, savedBytes: receipt.savedBytes,
       measurement: receipt.measurement, trustRootAnchored: source.anchored,
       evidenceRetained: true, writerReleased: true };
+  });
+}
+
+/**
+ * Acquire a released native session's existing writer only while its head is
+ * still the reviewed one, apply one change, and release without sealing.
+ */
+export function withReleasedNativeWriter<T>(workspace: string, sessionId: string, rows: readonly EvidenceEvent[], expectedHeadEventId: string,
+  refusal: string, apply: (service: SessionService) => T): T {
+  const opened = rows.find(row => row.event_type === "session/open");
+  if (!opened) throw new Error("Session has no supported native identity");
+  const identity = JSON.parse(opened.meta_json) as Record<string, unknown>;
+  const field = (name: string): string => {
+    const value = identity[name];
+    if (typeof value !== "string" || !value) throw new Error(`Native session identity is missing ${name}`);
+    return value;
+  };
+  let service: SessionService | undefined;
+  try {
+    const resumed = resumeSession({ workspace, sessionId,
+      runtime: opened.runtime, agentId: field("agentId"), harnessVersion: field("harnessVersion"),
+      compositionDigest: field("compositionDigest"), policyDigest: field("policyDigest"),
+      claimant: { pid: process.pid, hostId: hostname(), bootId: randomUUID(), startedAt: Math.round(Date.now() - process.uptime() * 1000) } });
+    service = resumed.service;
+    if (resumed.report.observedHeadEventId !== expectedHeadEventId) throw new Error(`Session changed during writer acquisition; ${refusal}`);
+    return apply(service);
   } finally {
     if (service) {
       // A release failure overrides success; disposal never claims a signed release.
       try { service.releaseWithoutClosing(); }
       catch (releaseError) {
         try { service.disposeWithoutClosing(); }
-        // oxlint-disable-next-line no-unsafe-finally -- A failed writer release must override a successful compaction result.
-        catch (disposeError) { throw new AggregateError([releaseError, disposeError], "Compaction writer release and disposal failed"); }
+        // oxlint-disable-next-line no-unsafe-finally -- A failed writer release must override a successful change result.
+        catch (disposeError) { throw new AggregateError([releaseError, disposeError], "Native writer release and disposal failed"); }
         // oxlint-disable-next-line no-unsafe-finally -- Never report writerReleased when signed release failed.
         throw releaseError;
       }

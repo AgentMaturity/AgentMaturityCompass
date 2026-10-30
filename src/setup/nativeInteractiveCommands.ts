@@ -7,6 +7,7 @@ export const NATIVE_INTERACTIVE_COMMANDS = [
   { name: "verify", description: "Check the current session's evidence." },
   { name: "compact", description: "Review and summarize a recorded event range." },
   { name: "fork", description: "Queue a child session; /fork cancel clears the queue." },
+  { name: "withdraw", description: "List queued submissions and withdraw one not yet dispatched." },
   { name: "sessions", description: "Browse recorded sessions without acquiring a writer." },
   { name: "resume", description: "Inspect and select a recorded session to resume." },
   { name: "bookmark", description: "Name a verified sealed turn in the current session." },

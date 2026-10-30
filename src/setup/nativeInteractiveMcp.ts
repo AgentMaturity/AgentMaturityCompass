@@ -37,32 +37,38 @@ export function reportNativeInteractiveMcpMount(mount: Pick<MountedNativeMcpServ
   } catch { /* A lost chat channel cannot change the mounted grant or its recorded outcome. */ }
 }
 
-/** One child's last observed mount receipt. Closing a child cannot be undone by late traffic. */
+/** One child's observed mount receipts, one per server. Closing a child cannot be undone by late traffic. */
 export function createNativeInteractiveMcpView(): { accept(value: unknown): void; settled(): void; render(): string[] } {
-  let current: ReceiptMessage | null = null;
+  const mounts = new Map<string, ReceiptMessage>();
+  const conflicted = new Set<string>();
   let closed = false;
-  let refused = false;
+  let refused = 0;
   return {
     accept(value) {
       if (closed || value === null || typeof value !== "object" || (value as { type?: unknown }).type !== RECEIPT) return;
       const parsed = receiptMessage.safeParse(value);
-      current = parsed.success ? parsed.data : null;
-      refused = !parsed.success;
+      // A second receipt for one server is not a newer truth; neither copy is shown as mounted.
+      if (!parsed.success || mounts.has(parsed.data.receipt.serverId) || conflicted.has(parsed.data.receipt.serverId)) {
+        refused++;
+        if (parsed.success) { conflicted.add(parsed.data.receipt.serverId); mounts.delete(parsed.data.receipt.serverId); }
+        return;
+      }
+      mounts.set(parsed.data.receipt.serverId, parsed.data);
     },
     settled() { closed = true; },
     render() {
-      if (refused) return ["MCP mount receipt refused: malformed or oversized child receipt. Mounted state is unavailable."];
-      if (!current) return ["No MCP mount receipt has been received from this child; mounted state is unavailable."];
-      const { receipt, toolNames } = current;
-      const lines = [
-        `MCP mount receipt · server ${receipt.serverId} · state ${closed ? "closed (child settled)" : "active at mount"}. This view does not probe current connection health.`,
-        `Protocol: ${receipt.protocol.negotiatedVersion} (${receipt.protocol.mode}); catalog digest ${receipt.catalogDigest}.`
-      ];
-      if (receipt.protocol.serverInfo) lines.push(`Server information (self-reported): ${escapeTerminalControls(receipt.protocol.serverInfo.name)} ${escapeTerminalControls(receipt.protocol.serverInfo.version)}.`);
-      if (receipt.auth) {
-        lines.push(`Auth receipt at mount: issuer ${escapeTerminalControls(receipt.auth.issuer)}; scopes ${receipt.auth.scopes.map(escapeTerminalControls).join(", ") || "none"}; token expiry ${escapeTerminalControls(receipt.auth.tokenExpiresAt ?? "not reported")}. This is not a current authentication check.`);
-      } else lines.push("Auth receipt: none reported for this mount; no authentication claim is inferred.");
-      lines.push(`Granted tools: ${toolNames.join(", ")}. Enable or disable tools through an explicit reviewed configuration change.`);
+      const lines = refused ? [`MCP mount receipt refused (${refused}): malformed, oversized or duplicate child receipt. That mount's state is unavailable.`] : [];
+      if (!mounts.size) return refused ? lines : ["No MCP mount receipt has been received from this child; mounted state is unavailable."];
+      for (const { receipt, toolNames } of mounts.values()) {
+        lines.push(
+          `MCP mount receipt · server ${receipt.serverId} · state ${closed ? "closed (child settled)" : "active at mount"}. This view does not probe current connection health.`,
+          `Protocol: ${receipt.protocol.negotiatedVersion} (${receipt.protocol.mode}); catalog digest ${receipt.catalogDigest}.`);
+        if (receipt.protocol.serverInfo) lines.push(`Server information (self-reported): ${escapeTerminalControls(receipt.protocol.serverInfo.name)} ${escapeTerminalControls(receipt.protocol.serverInfo.version)}.`);
+        if (receipt.auth) {
+          lines.push(`Auth receipt at mount: issuer ${escapeTerminalControls(receipt.auth.issuer)}; scopes ${receipt.auth.scopes.map(escapeTerminalControls).join(", ") || "none"}; token expiry ${escapeTerminalControls(receipt.auth.tokenExpiresAt ?? "not reported")}. This is not a current authentication check.`);
+        } else lines.push("Auth receipt: none reported for this mount; no authentication claim is inferred.");
+        lines.push(`Granted tools: ${toolNames.join(", ")}. Enable or disable tools through an explicit reviewed configuration change.`);
+      }
       return lines;
     }
   };
