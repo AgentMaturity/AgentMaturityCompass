@@ -22617,7 +22617,7 @@ score
       const result = scanLevelTransitionInfra(process.cwd());
       if (emitClaimResult(chalk.bold.hex('#4AEF79')("\n📈  Level Transition Quality"), result, controlSurfaceClaim("score:levelTransition", result), opts)) return;
       console.log(chalk.gray("Avg quality:"), result.avgTransitionQuality.toFixed(2));
-      console.log(chalk.gray("Retention rate:"), `${(result.promotionRetentionRate * 100).toFixed(1)}%`);
+      console.log(chalk.gray("Retention rate:"), result.promotionRetentionRate === null ? "not measured" : `${(result.promotionRetentionRate * 100).toFixed(1)}%`);
       console.log(chalk.gray("Demotion rate:"), result.demotionRate.toFixed(4));
       console.log(chalk.gray("Score:"), result.score, chalk.gray(`(L${result.level})`));
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }

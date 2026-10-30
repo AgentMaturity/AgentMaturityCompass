@@ -408,7 +408,9 @@ function collectBenchDataWithInputs(params: BenchCollectionInput, window: Return
       endTs: window.endTs,
       auditTypes: ["BUDGET_EXCEEDED", "LEASE_RATE_LIMITED"]
     }),
-    toolhubDenialRate: Number(latestSeriesValue(signals.points.operating.toolhub_denial_rate).toFixed(6)),
+    // No run in the window measured a denial rate (no ToolHub actions): not measured, not a clean 0.
+    toolhubDenialRate: signals.points.operating.toolhub_denial_rate?.length
+      ? Number(latestSeriesValue(signals.points.operating.toolhub_denial_rate).toFixed(6)) : null,
     freezeEvents: countSelectedAudit({
       workspace: params.workspace,
       startTs: window.startTs,
