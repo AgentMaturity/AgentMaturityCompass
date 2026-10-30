@@ -7,7 +7,8 @@ Commit: `7f38251c49dc20cef336b7e0fe2205fa85edc03e`. Receipts: `qualification/202
 A cell is "qualified" only when a lane receipt for this commit passed `npm run qualify:platform` and `amc doctor --json` reported `native-modules` PASS.
 A receipt from another commit counts as "not run". A Node major other than 22 or 24 is "inconclusive (unsupported Node)".
 Desktop installer cells need `npm run package:desktop` and `npm run package:desktop:verify` on that platform; GUI cells need the manual
-receipt from docs/deploy/reference/GUI_CHECKLIST.md. How lanes run: docs/PLATFORM_QUALIFICATION.md.
+receipt from docs/deploy/reference/GUI_CHECKLIST.md. Native shell cells need a passing OS shell-sandbox suite on that platform.
+"Unavailable on this host" records a lane the recording machine cannot run; it is not a pass. How lanes run: docs/PLATFORM_QUALIFICATION.md.
 
 | Platform | Node 22 | Node 24 | Desktop installer | GUI launcher (manual) | Native shell |
 |---|---|---|---|---|---|

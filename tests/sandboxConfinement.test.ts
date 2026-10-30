@@ -316,3 +316,37 @@ describe("escalation widens strictly", () => {
     expect(widened.timeoutMs).toBe(1234);
   });
 });
+
+describe.runIf(onDarwin)("the write-only Seatbelt backend never under-delivers a requested boundary (WP32)", () => {
+  // The generic backend confines writes only. A caller asking it for a network,
+  // read or process boundary must get a refusal with nothing launched, never a
+  // "confined" run that silently left that boundary open.
+  it.each([
+    ["network deny", { network: "deny" as const }],
+    ["a read deny-list", { readDeny: ["/etc/hosts"] }],
+    ["an egress allowlist", { allowHosts: ["example.com"] }],
+    ["a process cap", { maxProcesses: 8 }]
+  ])("refuses %s instead of running without it", async (_label, extra) => {
+    const workspace = tempDir("amc-sbx-ws-");
+    const marker = join(workspace, "ran.txt");
+    const outcome = await new SandboxRunner().run(["/bin/sh", "-c", `echo ran > ${marker}`], workspace, { ...policyFor([workspace]), ...extra });
+    expect(existsSync(marker), "nothing may run under a boundary the backend cannot enforce").toBe(false);
+    expect(outcome.confined).toBe(false);
+    expect(outcome.failure?.kind).toBe("unavailable");
+    expect(outcome.failure?.reason).toMatch(/cannot enforce/);
+    expect(outcome.exitCode).toBeNull();
+  });
+
+  it("stops the command when the caller cancels", async () => {
+    const workspace = tempDir("amc-sbx-ws-");
+    const marker = join(workspace, "late.txt");
+    const controller = new AbortController();
+    setTimeout(() => controller.abort(), 200);
+    const started = Date.now();
+    const outcome = await new SandboxRunner().run(["/bin/sh", "-c", `sleep 5; echo late > ${marker}`], workspace,
+      { ...policyFor([workspace]), signal: controller.signal });
+    expect(Date.now() - started).toBeLessThan(4_000);
+    expect(existsSync(marker)).toBe(false);
+    expect(outcome.cancelled).toBe(true);
+  });
+});

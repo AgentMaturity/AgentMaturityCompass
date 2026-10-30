@@ -112,6 +112,14 @@ export function seatbeltBackend(): SandboxBackend {
 
     async run(command: readonly string[], cwd: string, policy: SandboxPolicy): Promise<SandboxOutcome> {
       const writableRoots = policy.writableRoots.map(realOrLiteral);
+      // This profile confines writes only. A requested network, read or process
+      // boundary is refused with nothing launched, never silently left open (WP32).
+      const unenforceable = (["network", "readDeny", "allowHosts", "maxProcesses", "onEgress", "egressScope"] as const)
+        .filter((field) => policy[field] !== undefined);
+      if (unenforceable.length > 0) {
+        return { confined: false, backend: "seatbelt", exitCode: null, timedOut: false, stdout: "", stderr: "", writableRoots,
+          failure: { kind: "unavailable", reason: `the write-only Seatbelt backend cannot enforce ${unenforceable.join(", ")}; nothing was run` } };
+      }
       const profileDir = mkdtempSync(join(tmpdir(), "amc-sbpl-"));
       const profilePath = join(profileDir, "policy.sb");
       writeFileSync(profilePath, buildSeatbeltProfile(policy.writableRoots), { mode: 0o600 });
@@ -127,7 +135,8 @@ export function seatbeltBackend(): SandboxBackend {
           maxCaptureBytes: 64_000,
           scrubValues: [],
           graceMs: 2_000,
-          timeoutMs: policy.timeoutMs
+          timeoutMs: policy.timeoutMs,
+          ...(policy.signal ? { signal: policy.signal } : {})
         }).done;
 
         const stderr = outcome.stderr.text;
@@ -144,6 +153,7 @@ export function seatbeltBackend(): SandboxBackend {
           // A run that never started has no exit status of its own.
           exitCode: runnerFailed ? null : outcome.exitCode,
           timedOut: outcome.terminatedBy === "timeout",
+          cancelled: outcome.terminatedBy === "cancel",
           stdout: outcome.stdout.text,
           stderr,
           writableRoots
