@@ -50,7 +50,7 @@ export interface TrustDriftMonitorResult {
   agentId: string;
   threshold: number;
   analyzedRuns: number;
-  /** INSUFFICIENT_EVIDENCE when a tampered, unreadable or newer unsealed run was refused: the series may be stale (WP37). */
+  /** INSUFFICIENT_EVIDENCE when a tampered, unreadable or newer unsealed run was refused, or the run history is not whole (`scanTrustedRuns`): the series may be stale. */
   evidenceStatus: "MEASURED" | "INSUFFICIENT_EVIDENCE";
   unverifiedRuns: string[];
   latestPoint: TrustDriftPoint | null;
@@ -81,14 +81,14 @@ function trustMonitorStatePath(workspace: string, agentId: string): string {
  * and marks the result INSUFFICIENT_EVIDENCE, but alerts on the trusted series still fire.
  */
 function loadTrustSeries(workspace: string, agentId: string): { points: TrustDriftPoint[]; blocking: string[] } {
-  const { runs, blocking, untrusted } = scanTrustedRuns(workspace, agentId);
+  const { runs, blocking, untrusted, foreign } = scanTrustedRuns(workspace, agentId);
   const points = runs
     .map((run) => {
       const integrityIndex = deriveIntegrityIndex(run);
       return { runId: run.runId, ts: run.ts, integrityIndex, score0to100: round2(integrityIndex * 100) };
     })
     .sort((a, b) => a.ts - b.ts || a.runId.localeCompare(b.runId));
-  return { points, blocking: [...blocking.map((row) => row.file), ...untrusted.map((reason) => `UNVERIFIED: ${reason}`)] };
+  return { points, blocking: [...blocking.map((row) => row.file), ...[...untrusted, ...foreign].map((reason) => `UNVERIFIED: ${reason}`)] };
 }
 
 function severityFromDrop(drop: number, threshold: number): TrustDriftSeverity {

@@ -1,11 +1,12 @@
 import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { afterEach, describe, expect, test } from "vitest";
+import { afterEach, describe, expect, test, vi } from "vitest";
 import { runFleetIndices } from "../src/assurance/indices.js";
 import { createBenchArtifact } from "../src/bench/benchArtifact.js";
 import { initBenchPolicy } from "../src/bench/benchPolicyStore.js";
 import { getAgentPaths } from "../src/fleet/paths.js";
+import { Ledger } from "../src/ledger/ledger.js";
 import { collectForecastSignals } from "../src/forecast/forecastSignals.js";
 import { listTrustedRuns, scanTrustedRuns } from "../src/governor/runTrust.js";
 import { startTrustDriftMonitor } from "../src/monitor/trustDriftMonitor.js";
@@ -19,6 +20,7 @@ import { writeAnchoredRun } from "./helpers/sealedRun.js";
  */
 const roots: string[] = [];
 afterEach(() => {
+  vi.restoreAllMocks();
   while (roots.length > 0) rmSync(roots.pop()!, { recursive: true, force: true });
 });
 
@@ -107,6 +109,31 @@ describe("trusted run history", () => {
     expect(() => listTrustedRuns(ws, "default")).toThrow(/ledger records run run_1 for default but its run file is not trusted/);
   });
 
+  test("a run copied under a second file name cannot inflate the history", () => {
+    const ws = workspace();
+    own(ws, "run_1", 1000);
+    const file = own(ws, "run_2", 2000);
+    copyFileSync(file, join(runsDir(ws, "default"), "run_2_again.json"));
+    expect(scanTrustedRuns(ws, "default")).toMatchObject({ runs: [{ runId: "run_1" }], untrusted: ["diagnostic run run_2 appears in 2 run files"] });
+    expect(() => listTrustedRuns(ws, "default")).toThrow(/run_2 appears in 2 run files/);
+  });
+
+  test("a run stored under another run's file name is refused", () => {
+    const ws = workspace();
+    own(ws, "run_1", 1000);
+    const file = own(ws, "run_2", 2000);
+    copyFileSync(file, join(runsDir(ws, "default"), "renamed.json"));
+    rmSync(file);
+    expect(scanTrustedRuns(ws, "default").untrusted).toContain("diagnostic run run_2 is not stored as run_2.json");
+  });
+
+  test("an unreadable ledger is reported, never a clean empty history", () => {
+    const ws = workspace();
+    vi.spyOn(Ledger.prototype, "listRuns").mockImplementation(() => { throw new Error("ledger unreadable"); });
+    expect(scanTrustedRuns(ws, "default")).toMatchObject({ runs: [], untrusted: ["the ledger could not be read to check run history"] });
+    expect(() => listTrustedRuns(ws, "default")).toThrow(/ledger could not be read/);
+  });
+
   test("another agent's runs on disk do not refuse this agent's history", () => {
     const ws = workspace();
     own(ws, "run_1", 1000);
@@ -128,5 +155,19 @@ describe("trusted run history", () => {
       "UNVERIFIED: diagnostic run run_mid_b is sealed for agent agent-b, not default",
       "UNVERIFIED: diagnostic run run_mid_a is sealed for agent agent-b, not default"
     ]);
+  });
+
+  test("trust drift: deleting the newest run or losing the ledger is INSUFFICIENT_EVIDENCE, never MEASURED", () => {
+    const ws = workspace();
+    own(ws, "run_high", 1000, 0.9);
+    const low = own(ws, "run_low", 2000, 0.5);
+    rmSync(low);
+    const thinned = startTrustDriftMonitor({ workspace: ws, agentId: "default", alertThreshold: 30, nowTs: 3000 });
+    expect(thinned.evidenceStatus).toBe("INSUFFICIENT_EVIDENCE");
+    expect(thinned.unverifiedRuns).toEqual(["UNVERIFIED: the ledger records run run_low with no matching run file on disk"]);
+
+    const other = workspace();
+    vi.spyOn(Ledger.prototype, "listRuns").mockImplementation(() => { throw new Error("ledger unreadable"); });
+    expect(startTrustDriftMonitor({ workspace: other, agentId: "default", alertThreshold: 30, nowTs: 3000 }).evidenceStatus).toBe("INSUFFICIENT_EVIDENCE");
   });
 });

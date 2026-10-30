@@ -1,6 +1,7 @@
-import { copyFileSync, readFileSync, writeFileSync } from "node:fs";
+import { copyFileSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { getAgentPaths } from "../src/fleet/paths.js";
+import { Ledger } from "../src/ledger/ledger.js";
 import { expect, test, vi } from "vitest";
 import { loadAlertsConfig, signAlertsConfig } from "../src/drift/alerts.js";
 import { runDriftCheck, runDriftCheckAsync } from "../src/drift/driftDetector.js";
@@ -63,6 +64,32 @@ test("a sealed run copied from another agent cannot become the current run and s
   copyFileSync(copied, join(f.paths.runsDir, "window-copied.json"));
   const result = await runDriftCheck({ workspace: f.workspace });
   expect(result).toMatchObject({ triggered: true, previousRunId: "window-0", currentRunId: "window-1" });
+});
+
+test("deleting the newest ledger run is INSUFFICIENT_EVIDENCE, never a clean compare of the older stale pair", async () => {
+  const { f, files } = inputs([5, 5, 4]);
+  rmSync(files[2]!);
+  const result = await runDriftCheck({ workspace: f.workspace });
+  expect(result.triggered).toBe(false);
+  expect(result.reasons.join("; ")).toMatch(/^INSUFFICIENT_EVIDENCE: the ledger records run window-2 with no matching run file on disk/);
+});
+
+test("a run duplicated under another file name cannot pad the baseline window", async () => {
+  const { f, files } = inputs([5, 5, 4]);
+  copyFileSync(files[0]!, join(f.paths.runsDir, "window-0-copy.json"));
+  const result = await runDriftCheck({ workspace: f.workspace });
+  expect(result.triggered).toBe(false);
+  expect(result.reasons.join("; ")).toContain("INSUFFICIENT_EVIDENCE: diagnostic run window-0 appears in 2 run files");
+});
+
+test("an unreadable ledger is INSUFFICIENT_EVIDENCE, never a clean non-trigger", async () => {
+  const { f } = inputs([5, 4]);
+  vi.spyOn(Ledger.prototype, "listRuns").mockImplementation(() => { throw new Error("ledger unreadable"); });
+  const result = await runDriftCheck({ workspace: f.workspace });
+  expect(result.triggered).toBe(false);
+  expect(result.reasons.join("; ")).toContain("INSUFFICIENT_EVIDENCE");
+  expect(result.reasons.join("; ")).toContain("the ledger could not be read");
+  vi.restoreAllMocks();
 });
 
 test("AXE-09: an unavailable assurance pack freezes honestly, without inventing a zero score", async () => {

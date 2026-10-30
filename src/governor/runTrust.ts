@@ -11,7 +11,7 @@ import { pathExists, readUtf8 } from "../utils/fs.js";
 import { fleetAgentsDir, fleetRoot } from "../fleet/paths.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
-import { latestVerifiedRun, refusedRunsBlocking, scanVerifiedRuns, type RefusedRun } from "../diagnostic/runReportResolution.js";
+import { agentRunFiles, latestVerifiedRun, refusedRunsBlocking, scanVerifiedRuns, type RefusedRun } from "../diagnostic/runReportResolution.js";
 
 /**
  * The run a gate or signer may act on (governor, ToolHub, the native Action Policy guard, transformation planning,
@@ -34,15 +34,19 @@ export function latestTrustedRun(workspace: string, agentId: string): { run: Dia
 
 /** A history read for consumers that sign, gate or alert on more than the latest run. */
 export interface TrustedRunScan {
-  /** This agent's sealed, ledger-anchored runs, newest first. */
+  /** This agent's sealed, ledger-anchored runs, newest first, each read from `<runId>.json` and present once. */
   runs: DiagnosticReport[];
   /** Tampered or unreadable files, and unsealed files newer than `runs[0]`: the history may be stale. */
   blocking: RefusedRun[];
   /**
-   * Why the history is not whole: a sealed file left out of `runs` (another agent's copy, or not anchored in the
-   * ledger), or a ledger run of this agent that is missing or untrusted on disk (history thinned by deleting files).
+   * Why this agent's history is not whole: the ledger cannot be read; a sealed file of this agent not anchored in the
+   * ledger, not named for its runId, or present more than once; or a ledger run that may be this agent's and is missing
+   * or untrusted on disk (history thinned by deleting or hiding files). An alerting reader must not report a clean
+   * result while this is non-empty.
    */
   untrusted: string[];
+  /** Sealed runs of another agent copied into this agent's runs dir: excluded, not this agent's history at all. */
+  foreign: string[];
 }
 
 /**
@@ -53,18 +57,32 @@ export interface TrustedRunScan {
 export function scanTrustedRuns(workspace: string, agentId: string): TrustedRunScan {
   const scan = scanVerifiedRuns(workspace, agentId);
   const rows = readLedgerRuns(workspace);
-  const runs: DiagnosticReport[] = [], untrusted: string[] = [];
+  const names = new Set(agentRunFiles(workspace, agentId).map((file) => basename(file, ".json")));
+  const counts = new Map<string, number>();
+  for (const run of scan.runs) counts.set(run.runId, (counts.get(run.runId) ?? 0) + 1);
+  const runs: DiagnosticReport[] = [], untrusted: string[] = [], foreign: string[] = [];
+  const reported = new Set<string>(), refusedIds = new Set<string>();
   for (const run of scan.runs) {
-    const refusal = runAnchorRefusal(run, agentId, rows);
-    if (refusal) untrusted.push(refusal);
-    else runs.push(run);
+    if (run.agentId !== agentId) {
+      foreign.push(`diagnostic run ${run.runId} is sealed for agent ${String(run.agentId)}, not ${agentId}`);
+      continue;
+    }
+    const copies = counts.get(run.runId)!;
+    const refusal = copies > 1 ? `diagnostic run ${run.runId} appears in ${copies} run files`
+      : !names.has(run.runId) ? `diagnostic run ${run.runId} is not stored as ${run.runId}.json`
+        : runAnchorRefusal(run, agentId, rows);
+    if (refusal === null) runs.push(run);
+    else {
+      refusedIds.add(run.runId);
+      if (!reported.has(refusal)) { reported.add(refusal); untrusted.push(refusal); }
+    }
   }
   const blocking = refusedRunsBlocking(scan.refused, runs[0]?.ts ?? null);
   if (rows === null) {
-    if (scan.runs.length > 0 || scan.refused.length > 0) untrusted.push("the ledger could not be read to check run history");
+    untrusted.push("the ledger could not be read to check run history");
   } else {
-    // Runs already in `runs`, or already reported as blocking files, need no coverage line.
-    const seen = new Set([...runs.map((run) => run.runId), ...blocking.map((row) => basename(row.file, ".json"))]);
+    // Runs already in `runs`, or already reported above or as blocking files, need no coverage line.
+    const seen = new Set([...runs.map((run) => run.runId), ...refusedIds, ...blocking.map((row) => basename(row.file, ".json"))]);
     // ponytail: one targeted file read per ledger run per agent dir; index run files once if ledgers grow large.
     for (const row of rows) {
       if (seen.has(row.run_id) || row.run_seal_sig === "unsigned") continue;
@@ -73,13 +91,13 @@ export function scanTrustedRuns(workspace: string, agentId: string): TrustedRunS
       else if (owner === null) untrusted.push(`the ledger records run ${row.run_id} with no matching run file on disk`);
     }
   }
-  return { runs, blocking, untrusted };
+  return { runs, blocking, untrusted, foreign };
 }
 
 /** The trusted history for a consumer that signs or exports it, newest first; throws with every reason otherwise. */
 export function listTrustedRuns(workspace: string, agentId: string): DiagnosticReport[] {
-  const { runs, blocking, untrusted } = scanTrustedRuns(workspace, agentId);
-  const reasons = [...(blocking.length > 0 ? [sealRefusal(blocking)] : []), ...untrusted];
+  const { runs, blocking, untrusted, foreign } = scanTrustedRuns(workspace, agentId);
+  const reasons = [...(blocking.length > 0 ? [sealRefusal(blocking)] : []), ...foreign, ...untrusted];
   if (reasons.length > 0) throw new Error(`run history for agent ${agentId} is not trusted: ${reasons.join("; ")}`);
   return runs;
 }
