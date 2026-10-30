@@ -37,7 +37,7 @@ import { assertSessionWriteAllowed } from "../../session/sessionOwnership.js";
 import { workspaceSelfTrust } from "../../trust/trustContext.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../../utils/fs.js";
 import { sha256Hex } from "../../utils/hash.js";
-import { buildSessionEventRow, EMPTY_SESSION_SEAL_DIGEST, GLOBAL_GENESIS, storeSessionPayload } from "../sessionEventRows.js";
+import { assertAdmittedSessionRow, buildSessionEventRow, EMPTY_SESSION_SEAL_DIGEST, GLOBAL_GENESIS, storeSessionPayload } from "../sessionEventRows.js";
 import { verifyStoredSessionEventMetadata } from "../sessionStoreVerification.js";
 import {
   SESSION_STORE_READ_ONLY,
@@ -172,6 +172,7 @@ export class PostgresSessionEventStore implements SessionEventStore {
 
   appendSessionEvent(input: SessionStoreAppendInput): SessionStoreAppendResult {
     this.assertWritable();
+    assertAdmittedSessionRow(input);
     const id = input.id ?? randomUUID();
     const ts = input.ts ?? Date.now();
     const metaJson = JSON.stringify(input.meta);

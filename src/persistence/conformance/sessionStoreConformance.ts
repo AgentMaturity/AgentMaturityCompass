@@ -345,11 +345,13 @@ export const SESSION_STORE_CONFORMANCE_CASES: readonly ConformanceCase[] = [
       first.close();
 
       const second = ctx.open();
+      // A native row carries its envelope; the sample session holds seq 0..2 (an envelope-less one is refused at append).
       const resumed = second.appendSessionEvent({
         sessionId,
         runtime: "amc",
         eventType: "session/recovered",
-        meta: { note: "reopened" }
+        meta: embedEnvelope({ note: "reopened" }, { v: 1, sessionId, seq: 3, prevSessionEventHash: lastBefore.event_hash,
+          turn: null, step: null, surface: { op: "none" }, synthetic: false })
       });
       const rows = second.readAllEvents();
       const appended = rows.find((row) => row.id === resumed.id);

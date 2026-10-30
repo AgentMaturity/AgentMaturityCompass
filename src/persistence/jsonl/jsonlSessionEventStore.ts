@@ -49,7 +49,7 @@ import { loadOpsPolicy } from "../../ops/policy.js";
 import { queueEvidenceEventSpan } from "../../observability/otelExporter.js";
 import { ensureDir } from "../../utils/fs.js";
 import { readSessionRecords, type SessionLifecycleLine } from "./sessionRecords.js";
-import { buildSessionEventRow, EMPTY_SESSION_SEAL_DIGEST, GLOBAL_GENESIS, storeSessionPayload } from "../sessionEventRows.js";
+import { assertAdmittedSessionRow, buildSessionEventRow, EMPTY_SESSION_SEAL_DIGEST, GLOBAL_GENESIS, storeSessionPayload } from "../sessionEventRows.js";
 import {
   SESSION_STORE_READ_ONLY,
   SESSION_STORE_SEALED,
@@ -180,6 +180,7 @@ export class JsonlSessionEventStore implements SessionEventStore {
 
   appendSessionEvent(input: SessionStoreAppendInput): SessionStoreAppendResult {
     this.assertWritable();
+    assertAdmittedSessionRow(input);
     const sessionRows = this.readSessionEvents(input.sessionId);
     assertSessionWriteAllowed(input, sessionRows[sessionRows.length - 1] ?? null, this.readSessionRecord(input.sessionId));
     const id = input.id ?? randomUUID();
