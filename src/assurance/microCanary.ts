@@ -862,8 +862,7 @@ export function renderMicroCanaryMarkdown(report: MicroCanaryReport): string {
 // ---------------------------------------------------------------------------
 
 /**
- * Compute a micro-canary health score (0-100) for integration with assurance scoring.
- * No probe executed in the window: the score is null (not measured), never 100.
+ * Micro-canary health score (0-100) for assurance scoring; null (not measured), never 100, when no probe ran.
  */
 export function computeCanaryHealthScore(sinceTs?: number): {
   score: number | null;
