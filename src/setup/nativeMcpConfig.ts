@@ -5,7 +5,7 @@ import { credentialRef } from "../credentials/credentialRef.js";
 import { LocalCredentialsService } from "../credentials/localCredentialsService.js";
 import { isActionClass } from "../governor/actionCatalog.js";
 import { loadVerifiedToolsConfigSnapshot } from "../toolhub/toolhubValidators.js";
-import type { NativeToolCapability } from "../agent/nativeToolCapabilities.js";
+import { selectSupportedNativeTools, type NativeToolCapability } from "../agent/nativeToolCapabilities.js";
 import { NATIVE_MCP_MAX_TOTAL_LIMIT_MS, discoverNativeMcpCatalog, nativeMcpToolName, type NativeMcpCatalog, type NativeMcpGrant, type NativeMcpServer } from "../mcp/nativeMcpClient.js";
 import type { ActionClass } from "../types.js";
 import { NativeMcpHttpRefused, nativeMcpHttpEndpoint, nativeMcpNotificationLifetime, validateNativeMcpHeaderNames } from "../mcp/nativeMcpHttpTransport.js";
@@ -201,6 +201,9 @@ export function requireReviewedNativeMcpGrants(loaded: LoadedNativeMcpConfigurat
       return refuse("The signed MCP context must match the reviewed server identity and transport.");
     }
     capabilities.push({ name, actionClass: grant.actionClass, ...(allowed.context ? { context: allowed.context } : {}) });
+  }
+  if (!selectSupportedNativeTools(snapshot).some(tool => tool.name === "tool_search")) {
+    return refuse("Deferred MCP tools require native tool_search as READ_ONLY in the signed allowlist. Review and sign discovery separately; no policy was changed.");
   }
   return { expectedCatalogDigest, grants, capabilities };
 }

@@ -1600,6 +1600,7 @@ Serve the Agent Client Protocol on stdio (for editors; prints nothing but frames
 | `--expected-tools-digest <sha256>` | - |
 | `--validation-config <path>` | - |
 | `--validation-config-sha256 <digest>` | - |
+| `--validation-repair <json>` | - |
 | `--validate <id>` | - |
 | `--approve-tools <actionClass>` | - |
 | `--approve-risk <tier>` | - |
@@ -1767,6 +1768,7 @@ Interactive native tasks over the existing governed run/resume path for the sele
 | `--agent <id>` | - |
 | `--validation-config <path>` | - |
 | `--validation-config-sha256 <digest>` | - |
+| `--validation-repair <json>` | - |
 | `--validate <id>` | - |
 | `--extension <manifest>` | - |
 | `--extension-pin <sha256>` | - |
@@ -1896,14 +1898,17 @@ Run one agent turn and report what the signed log recorded
 | `--steer <text>` | - |
 | `--steer-after <ms>` | - |
 | `--persona <text>` | - |
+| `--mission-context` | - |
 | `--approve-tools <actionClass>` | - |
 | `--approve-risk <tier>` | - |
 | `--interactive-approvals` | - |
+| `--validation-repair <json>` | - |
 | `--interactive-ask-user` | - |
 | `--web-search-searxng <origin>` | - |
 | `--goal-rounds <n>` | - |
 | `--approval-exception <file>` | - |
 | `--json` | - |
+| `--list-skills [name]` | - |
 
 #### `amc agent-loop verify`
 
@@ -5050,6 +5055,13 @@ Run deterministic experiment against signed casebook (exit 0 all candidate cases
 | `--mode <mode>` | - |
 | `--candidate-window <window>` | - |
 | `--candidate-agent <agentId>` | - |
+| `--execute-trials` | - |
+| `--provider <id>` | - |
+| `--model <model>` | - |
+| `--max-steps <n>` | - |
+| `--max-executions <n>` | - |
+| `--trial-timeout-ms <ms>` | - |
+| `--concurrency <n>` | - |
 | `--agent <agentId>` | - |
 
 #### `amc experiment set-baseline`
@@ -7255,6 +7267,8 @@ Read manifest/content hashes and workspace signature status without loading or w
 | Option | Description |
 |--------|-------------|
 | `--expect-digest <sha256>` | - |
+| `--preview-command <name>` | - |
+| `--arguments <text>` | - |
 | `--json` | - |
 
 #### `amc native-extension install`

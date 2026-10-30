@@ -1985,7 +1985,7 @@ export type {
   NewRelicOptions,
   PlatformName,
 } from "./observability/platformConfigs.js";
-
+export * from "./llm/modelEnumeration.js";
 // ── Multi-provider model routing ─────────────────────────────────
 export { ModelRouter } from "./ops/modelRouter.js";
 export type {

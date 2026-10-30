@@ -29,6 +29,7 @@ const DEFAULTS = { privacyClass: "restricted", expiresAfterDays: 90, reviewAfter
 const MAX_DAYS = 3650;
 
 const compactionSchema = z.strictObject({
+  reserveTokens: z.number().int().nonnegative().safe().nullable().optional(),
   contextWindowTokens: z.number().int().positive().nullable(), threshold: z.number(), keepRecentSteps: z.number().int(), pruneMinBytes: z.number().int(),
   summarize: z.boolean(), maxPerTurn: z.number().int()
 });

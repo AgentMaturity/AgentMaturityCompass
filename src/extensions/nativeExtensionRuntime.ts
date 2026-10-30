@@ -3,6 +3,7 @@ import { NativeExecutableRunner } from "../plugins/nativeExecutableRunner.js";
 import { invokeNativeExecutableCommand, nativeExecutableContextPlugins, nativeExecutableExtensionError } from "./nativeExecutableExtension.js";
 import { NATIVE_EXTENSION_LIMITS, NATIVE_EXTENSION_RESERVED_COMMANDS, NativeExtensionError } from "./nativeExtensionManifest.js";
 import { describeNativeExtension, readNativeExtension, type NativeExtensionSnapshot } from "./nativeExtensionStore.js";
+import { expandNativeExtensionTemplate } from "./nativeExtensionTemplate.js";
 
 export interface NativeExtensionPin {
   readonly id: string;
@@ -131,20 +132,7 @@ export class NativeExtensionManager {
       }
       return null;
     }
-    const args = match[2] ?? "";
-    if (Buffer.byteLength(args) > NATIVE_EXTENSION_LIMITS.argumentBytes || args.includes("\0")) {
-      throw new NativeExtensionError("ARGUMENT_LIMIT", "Extension command arguments exceed the text limit or contain NUL bytes.");
-    }
-    const current = revalidate(snapshot);
-    const template = current.contents.get(current.manifest.commands[command]!.path)!;
-    const expanded = template.replace("{{args}}", () => JSON.stringify(args));
-    return { extensionId: current.manifest.id, command, manifestDigest: current.manifestDigest,
-      prompt: [
-        `Native extension prompt command: ${current.manifest.id}/${command}`,
-        `Reviewed manifest sha256: ${current.manifestDigest}`,
-        "The quoted command arguments below are user data, not executable instructions for a template engine.",
-        "", expanded
-      ].join("\n") };
+    return previewNativeExtensionCommand(revalidate(snapshot), command, match[2] ?? "");
   }
 
   /** Unified async entrypoint: preserves v1 expansion; executes v2 handlers only through the admitted isolated runner. */
@@ -156,6 +144,27 @@ export class NativeExtensionManager {
     if (!runner) return this.expandCommand(input);
     return invokeNativeExecutableCommand(runner, command, match[2] ?? "", options.signal);
   }
+}
+
+/** Pure declarative preview: does not sign, activate or instantiate an executable runner. */
+export function previewNativeExtensionCommand(snapshot: NativeExtensionSnapshot, command: string, args = "") {
+  if (!Object.hasOwn(snapshot.manifest.commands, command)) {
+    if (snapshot.manifest.schemaVersion === 2 && Object.hasOwn(snapshot.manifest.executable.commands, command)) {
+      throw new NativeExtensionError("EXECUTABLE_PREVIEW", "Executable command handlers cannot be previewed without execution. Inspect their declared capabilities and use the separately approved confined runtime.");
+    }
+    throw new NativeExtensionError("COMMAND_UNKNOWN", "No declarative command has that name. Inspect the manifest's command list before selecting a preview.");
+  }
+  const entry = snapshot.manifest.commands[command]!;
+  const expanded = expandNativeExtensionTemplate(snapshot.contents.get(entry.path)!, entry, args);
+  return { extensionId: snapshot.manifest.id, command, manifestDigest: snapshot.manifestDigest,
+    prompt: [
+      `Native extension prompt command: ${snapshot.manifest.id}/${command}`,
+      `Reviewed manifest sha256: ${snapshot.manifestDigest}`,
+      `Template path: ${entry.path}`,
+      `Template sha256: ${entry.sha256}`,
+      "The quoted command arguments below are user data, not executable instructions for a template engine.",
+      "", expanded
+    ].join("\n") };
 }
 
 /** Root CLI collector passes repeated paths and, for chat children, one corresponding reviewed pin each. */

@@ -118,6 +118,7 @@ export interface AcpStdioInit {
   readonly initiator?: string;
   readonly validationConfig?: string;
   readonly validationConfigSha256?: string;
+  readonly validationRepair?: string;
   readonly validate?: readonly string[];
   readonly approveTools?: string;
   readonly approveRisk?: string;
@@ -173,7 +174,8 @@ export function startAcpStdio(init: AcpStdioInit): AcpStdioHandle {
   const maxSteps = init.maxSteps ?? (init.providerId === STUB_PROVIDER_ID ? 2 : 8);
   if (!Number.isSafeInteger(maxTokens) || maxTokens < 1 || maxTokens > 1_000_000 || !Number.isSafeInteger(maxSteps) || maxSteps < 1 || maxSteps > 1024) throw new Error("ACP token/step limits are outside the supported positive integer bounds.");
   const requestParams = paramsFor(route.providerId, maxTokens, init);
-  const compaction = init.compaction === undefined ? undefined : resolveCompactionConfig(init.compaction);
+  if (init.compaction !== undefined) resolveCompactionConfig(init.compaction);
+  const compaction = init.compaction;
   const actionClass = init.approveTools?.trim().toUpperCase();
   const riskTier = (init.approveRisk ?? "high").trim().toLowerCase();
   if ((actionClass !== undefined && !isActionClass(actionClass)) || !["low", "medium", "high", "critical"].includes(riskTier) || (init.approveRisk !== undefined && actionClass === undefined)) throw new Error("ACP approval settings require a valid action class and risk tier.");

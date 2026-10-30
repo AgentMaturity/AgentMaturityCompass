@@ -5,10 +5,16 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
+import { AgentDriver } from "../src/agent/agentDriver.js";
+import { createModelMetadataSnapshot } from "../src/llm/modelCatalog.js";
+import { canonicalize } from "../src/utils/json.js";
 import { AutoCompactor } from "../src/agent/compaction/autoCompact.js";
 import { DEFAULT_RETRY_RUNTIME } from "../src/agent/requestRetry.js";
 import { DEFAULT_AGENT_LOOP_CONFIG } from "../src/agent/loopTypes.js";
 import type { StepRunnerInit } from "../src/agent/stepRunner.js";
+import { AdapterRegistry } from "../src/llm/adapter/adapterRegistry.js";
+import { LlmRuntime } from "../src/llm/adapter/llmRuntime.js";
+import { credentialRef } from "../src/credentials/credentialRef.js";
 import { LlmStreamProtocolError } from "../src/llm/streamProtocol.js";
 import { compactionFromFlags, measurePromptPressure, resolveCompactionConfig } from "../src/agent/compaction/promptPressure.js";
 import { verifyAgentRun, type AgentRunVerification } from "../src/agent/runReport.js";
@@ -29,7 +35,7 @@ import type { EvidenceEvent } from "../src/types.js";
 import { lockVault } from "../src/vault/vault.js";
 import { pinnedTrust } from "./helpers/trustContext.js";
 import { LOOP_MODEL, LOOP_PROVIDER, loopHarness, ok, silentTransport, StubToolSeam, textStep, toolStep, toolStepMulti,
-  type LoopHarness, type LoopHarnessOptions, type ScriptedStream } from "./helpers/agentLoopHarness.js";
+  FixedCredentials, scriptedAdapter, type LoopHarness, type LoopHarnessOptions, type ScriptedStream } from "./helpers/agentLoopHarness.js";
 
 // Synthetic response/usage scripts exercise AMC's mechanism, not a model or
 // external authentication. The real encoder, session writer, signatures,
@@ -260,6 +266,66 @@ function scriptsForThreeTools(prompt: number, missingUsage = false): readonly Sc
 const threeOutputs = { old: "O".repeat(8192), "recent-1": "R".repeat(8192), "recent-2": "S".repeat(8192) };
 
 describe("automatic compaction: synthetic provider usage, real signed loop evidence", () => {
+  it("keeps the selected context limit and request route when a registration is replaced after construction", async () => {
+    await withFixture({ scripts: [textStep("unused")] , tools: syntheticTools(threeOutputs) }, async f => {
+      const registry = new AdapterRegistry(), model = "claude-sonnet-4-20250514";
+      const initial = { providerId: LOOP_PROVIDER, adapter: scriptedAdapter(scriptsForThreeTools(183616)),
+        baseUrl: "https://original.anthropic.invalid", credentialRef: credentialRef("AMC_LOOP_TEST_KEY"), models: [model] };
+      registry.register(initial);
+      const llm = new LlmRuntime({ session: f.h.session, registry, credentials: new FixedCredentials(), transport: async request => {
+        expect(request.url).toBe("https://original.anthropic.invalid/v1/messages");
+        f.sent.push(Buffer.from(request.body)); return silentTransport(request);
+      } });
+      const driver = new AgentDriver({ session: f.h.session, llm, tools: f.h.tools,
+        systemPromptEventId: f.h.systemPromptEventId,
+        route: { providerId: LOOP_PROVIDER, model, params: { max_tokens: 256 } } });
+      registry.replace({ ...initial, adapter: scriptedAdapter([textStep("wrong replacement")]), baseUrl: "https://replacement.anthropic.invalid" });
+      driver.followup("Keep this user input verbatim."); await driver.whenIdle();
+      expect(driver.status).toBe("idle");
+      const rows = f.h.events();
+      expect(compactRows(rows)).toHaveLength(1);
+      const trigger = compactionReceipt(compactRows(rows)[0]!);
+      expect(trigger.v === 2 ? trigger.trigger.contextWindowTokens : null).toBe(200000);
+      await verifyRecorded(f, 4);
+    });
+  });
+
+  it("constructs the common driver with catalog defaults from its selected immutable route", async () => {
+    await withFixture({ scripts: scriptsForThreeTools(183616), tools: syntheticTools(threeOutputs) }, async f => {
+      const reviewed = createModelMetadataSnapshot("anthropic", "anthropic-messages", "claude-sonnet-4-20250514")!;
+      const { digest: _oldDigest, ...facts } = reviewed;
+      // Synthetic route snapshot tests local wiring, not a provider/model qualification.
+      const identity = { ...facts, model: LOOP_MODEL, canonicalModel: LOOP_MODEL };
+      const selected = { ...f.h.llm.pin({ providerId: LOOP_PROVIDER, model: LOOP_MODEL }),
+        modelMetadata: { ...identity, digest: digest(canonicalize(identity)) } };
+      const driver = new AgentDriver({ session: f.h.session, llm: f.h.llm, tools: f.h.tools,
+        systemPromptEventId: f.h.systemPromptEventId,
+        route: { providerId: LOOP_PROVIDER, model: LOOP_MODEL, params: { max_tokens: 256 }, pinned: selected } });
+      driver.followup("Keep this user input verbatim.");
+      await driver.whenIdle();
+      expect(driver.status).toBe("idle");
+      const rows = f.h.events();
+      expect(compactRows(rows)).toHaveLength(1);
+      const receipt = compactionReceipt(compactRows(rows)[0]!);
+      expect(receipt.v === 2 ? receipt.trigger.reserveTokens : null).toBe(16384);
+      await verifyRecorded(f, 4);
+    });
+  });
+
+  it.each([8499, 8500])("uses the exact token reserve boundary at %i", async prompt => {
+    await withFixture({ scripts: scriptsForThreeTools(prompt), tools: syntheticTools(threeOutputs),
+      config: { compaction: compaction({ reserveTokens: 1500 }) } }, async f => {
+      await turn(f, "Keep this user input verbatim.");
+      const rows = f.h.events();
+      expect(compactRows(rows)).toHaveLength(prompt < 8500 ? 0 : 1);
+      if (prompt === 8500) {
+        const receipt = compactionReceipt(compactRows(rows)[0]!);
+        expect(receipt.v === 2 ? receipt.trigger.reserveTokens : null).toBe(1500);
+      }
+      await verifyRecorded(f, 4);
+    });
+  });
+
   it.each([7000, 7999, 8000] as const)("uses the exact threshold at %i measured prompt tokens", async prompt => {
     await withFixture({ scripts: scriptsForThreeTools(prompt), tools: syntheticTools(threeOutputs), config: { compaction: compaction() } }, async f => {
       await turn(f, "Keep this user input verbatim.");
@@ -577,7 +643,7 @@ describe("automatic compaction admission and measurement bounds", () => {
   });
 
   it("fills literal defaults and freezes the declared policy", () => {
-    expect(resolveCompactionConfig({})).toEqual({ contextWindowTokens: null, threshold: 0.8, keepRecentSteps: 2, pruneMinBytes: 4096, summarize: true, maxPerTurn: 3 });
+    expect(resolveCompactionConfig({})).toEqual({ contextWindowTokens: null, threshold: 0.8, reserveTokens: null, keepRecentSteps: 2, pruneMinBytes: 4096, summarize: true, maxPerTurn: 3 });
     expect(Object.isFrozen(resolveCompactionConfig({ contextWindowTokens: 10_000 }))).toBe(true);
     expect(resolveCompactionConfig({ threshold: 0.5, keepRecentSteps: 1, pruneMinBytes: 1, maxPerTurn: 1, contextWindowTokens: 1 }).threshold).toBe(0.5);
     expect(resolveCompactionConfig({ threshold: 0.95, keepRecentSteps: 1024, pruneMinBytes: 1_000_000_000, maxPerTurn: 64, contextWindowTokens: Number.MAX_SAFE_INTEGER }).threshold).toBe(0.95);
@@ -597,7 +663,8 @@ describe("automatic compaction admission and measurement bounds", () => {
   it("threads CLI options without ignoring flags that lack a context window", () => {
     expect(compactionFromFlags({})).toBeUndefined();
     expect(compactionFromFlags({ contextWindow: "10000", compactThreshold: "0.9", autoSummary: false }))
-      .toEqual({ contextWindowTokens: 10000, threshold: 0.9, keepRecentSteps: 2, pruneMinBytes: 4096, summarize: false, maxPerTurn: 3 });
+      // Flags remain partial so absent fields can inherit exact reviewed route defaults.
+      .toEqual({ contextWindowTokens: 10000, threshold: 0.9, reserveTokens: null, summarize: false });
     expect(() => compactionFromFlags({ compactThreshold: "0.8" })).toThrow(/require --context-window/);
     expect(() => compactionFromFlags({ autoSummary: false })).toThrow(/require --context-window/);
     expect(() => compactionFromFlags({ contextWindow: "not-a-number" })).toThrow(/Automatic compaction needs/);

@@ -198,13 +198,25 @@ function directedCall(request: EchoedRequest): { readonly name: string; readonly
   return null;
 }
 
+/**
+ * True when the newest user message is itself a directive with no tool result after it. An inherited
+ * history (a fork, GAP-WP17) already holds earlier tool results; a fresh directive still asks for its call.
+ */
+function pendingDirective(request: EchoedRequest): boolean {
+  const last = request.messages.map((message, at) => ({ message, at }))
+    .filter(({ message }) => message.role === "user" && message.content.some((block) => block?.type === "text"
+      && typeof block.text === "string" && !isContextSnapshot(block.text))).at(-1);
+  if (last === undefined || directedCall({ ...request, messages: [last.message] }) === null) return false;
+  return !request.messages.slice(last.at + 1).some((message) => message.content.some((block) => block?.type === "tool_result"));
+}
+
 /** Zero, and true: no model ran, so nothing was consumed. See the module header. */
 const STUB_USAGE = Object.freeze({ inputTokens: 0, outputTokens: 0 });
 
 function* stubChunks(request: EchoedRequest): Generator<StreamChunk> {
   const asked = lastUserText(request);
   const tool = request.tools[0];
-  if (tool !== undefined && !hasToolResult(request)) {
+  if (tool !== undefined && (!hasToolResult(request) || pendingDirective(request))) {
     const id = toolCallId(`stub-call-${request.messages.length}`);
     const { name, args } = directedCall(request) ?? { name: tool.name, args: JSON.stringify({ text: asked }) };
     yield { type: "block-start", index: 0, blockKind: "tool_use" };

@@ -47,6 +47,8 @@ export function resolveForeignRunner(params: {
   readonly workspace: string;
   readonly agentId: string;
   readonly timeoutMs?: number;
+  /** AXR-10: govern only the child's model route; without it the child's tools must meet AMC's control hook. */
+  readonly observeOnly?: boolean;
 }): ForeignRunnerResolution {
   if (!(FOREIGN_PROVIDER_IDS as readonly string[]).includes(params.providerId)) {
     return {
@@ -79,7 +81,8 @@ export function resolveForeignRunner(params: {
       gatewayBase,
       providerRoute,
       model,
-      ...(params.timeoutMs === undefined ? {} : { timeoutMs: params.timeoutMs })
+      ...(params.timeoutMs === undefined ? {} : { timeoutMs: params.timeoutMs }),
+      ...(params.observeOnly === undefined ? {} : { observeOnly: params.observeOnly })
     })
   };
 }
