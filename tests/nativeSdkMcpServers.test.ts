@@ -107,3 +107,17 @@ test.each([
   for (const secret of ["readline", "wp21c-sdk-mcp", ...f.logs, ...f.pins]) expect((error as Error).message).not.toContain(secret);
   expect(f.received()).toEqual([[], []]);
 }, 60_000);
+
+// A reviewed config whose credential reference is not configured passes startup review and is
+// refused when session/new resolves it: a typed refusal with a stable reason, not a generic fault.
+test("the SDK reports an unresolved MCP credential at session/new as a coded refusal", async () => {
+  const f = await fixture();
+  const config = JSON.parse(readFileSync(f.paths[1]!, "utf8")) as { server: Record<string, unknown> };
+  config.server.envRefs = { AMC_FIXTURE_SECRET: "AMC_ABSENT_MCP_FIXTURE_REFERENCE_9B32" };
+  writeFileSync(f.paths[1]!, JSON.stringify(config)); f.pins[1] = sha256Hex(readFileSync(f.paths[1]!));
+  const client = await f.start();
+  const error = await client.newSession().then(() => undefined, (failure: unknown) => failure);
+  expect(error).toBeInstanceOf(f.sdk.AMCNativeStartupRefusedError);
+  expect(error).toMatchObject({ reason: "mcp-credential-unavailable", code: -32003, data: { reason: "mcp-credential-unavailable" } });
+  for (const secret of ["AMC_ABSENT_MCP_FIXTURE_REFERENCE_9B32", "AMC_FIXTURE_SECRET", ...f.logs]) expect((error as Error).message).not.toContain(secret);
+}, 60_000);

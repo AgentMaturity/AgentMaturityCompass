@@ -40,10 +40,11 @@ export class AMCNativeCancelledError extends AMCNativeProtocolError {
 const ACP_STARTUP_REFUSED = -32003;
 
 /**
- * `amc acp` refused its own launch configuration before serving any session. `reason` is
- * the runtime's stable code (mcp-config-tampered, mcp-config-unreviewed, mcp-config-duplicate,
- * mcp-config-unpaired, mcp-grant-class-mismatch, mcp-config-invalid, or startup-refused for
- * any other failure); the message is the runtime's fixed, secret-free text. @public
+ * `amc acp` refused its own launch configuration: at startup review, or at `newSession` when
+ * a reviewed MCP server cannot be mounted. `reason` is the runtime's stable code
+ * (mcp-config-tampered, mcp-config-unreviewed, mcp-config-duplicate, mcp-config-unpaired,
+ * mcp-grant-class-mismatch, mcp-config-invalid, mcp-credential-unavailable, mcp-oauth-refused,
+ * or startup-refused for any other failure); the message is the runtime's fixed, secret-free text. @public
  */
 export class AMCNativeStartupRefusedError extends AMCNativeRefusedError {
   constructor(readonly reason: string, message: string) {

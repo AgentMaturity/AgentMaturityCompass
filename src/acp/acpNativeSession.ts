@@ -6,9 +6,10 @@ import { ApprovalSeam } from "../approvals/seam/approvalSeam.js";
 import type { SessionService } from "../session/sessionService.js";
 import type { RecoveryClaimant } from "../session/sessionRecovery.js";
 import { mountNativeMcpServer, type MountedNativeMcpServer } from "../mcp/nativeMcpClient.js";
-import { reviewNativeMcpConfigurations, reviewedNativeMcpApprovalOptions, resolveNativeMcpServer, type LoadedNativeMcpConfiguration } from "../setup/nativeMcpConfig.js";
+import { NativeMcpConfigError, reviewNativeMcpConfigurations, reviewedNativeMcpApprovalOptions, resolveNativeMcpServer, type LoadedNativeMcpConfiguration } from "../setup/nativeMcpConfig.js";
 import { bindNativeMcpResourceStatus, projectNativeResourceStatus, type NativeMcpResourceSource } from "../prompt/context/nativeResourceStatus.js";
 import { workspaceSkillRoots } from "../skills/skillTurn.js";
+import { ACP_ERROR, AcpFailure } from "./acpErrors.js";
 
 /** Reuse the native pipeline/approval engine and bind extensions to its actual session writer. */
 export async function prepareAcpNativeSession(options: {
@@ -75,6 +76,9 @@ export async function prepareAcpNativeSession(options: {
     serverLifetime.abort();
     await Promise.allSettled(mounts.map(mount => mount.close()));
     try { if (options.claimant) await session.release?.(); else await session.close(); } catch { /* evidence remains authoritative */ }
+    // A reviewed config refused while mounting (credential, OAuth) keeps its stable code: the client
+    // gets the same coded refusal as at startup review, not a generic internal fault.
+    if (error instanceof NativeMcpConfigError) throw new AcpFailure(ACP_ERROR.startupRefused, error.message, { reason: error.code });
     throw error;
   } finally { options.signal.removeEventListener("abort", abortPreparation); }
 

@@ -354,7 +354,8 @@ export class AMCNativeClient {
   }
 
   async newSession(): Promise<AMCNativeSession> {
-    return this.adopt(await this.request("session/new", { cwd: this.workspace, mcpServers: [] }));
+    // Reviewed MCP servers mount at session/new; a refused mount carries the startup refusal code.
+    return this.adopt(await this.request("session/new", { cwd: this.workspace, mcpServers: [] }).catch((error: unknown) => { throw asStartupRefusal(error); }));
   }
 
   /**

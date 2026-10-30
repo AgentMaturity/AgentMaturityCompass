@@ -154,3 +154,20 @@ def _rewrite(path, old, new):
     with open(path, "w", encoding="utf-8") as handle:
         handle.write(text)
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
+@needs_cli
+def test_unresolved_credential_at_new_session_raises_the_runtime_reason(reviewed):
+    with open(reviewed["paths"][1], encoding="utf-8") as handle:
+        config = json.load(handle)
+    config["server"]["envRefs"] = {"AMC_FIXTURE_SECRET": "AMC_ABSENT_MCP_FIXTURE_REFERENCE_9B32"}
+    text = json.dumps(config)
+    with open(reviewed["paths"][1], "w", encoding="utf-8") as handle:
+        handle.write(text)
+    reviewed["pins"][1] = hashlib.sha256(text.encode("utf-8")).hexdigest()
+    with _start(reviewed["workspace"], reviewed["paths"], reviewed["pins"], credentials_mode="operator-only",
+                credentials_home=reviewed["home"], env=reviewed["env"]) as agent:
+        with pytest.raises(AmcStartupRefusedError) as raised:
+            agent.new_session()
+    assert raised.value.reason == "mcp-credential-unavailable" and raised.value.code == -32003
+    assert "AMC_ABSENT_MCP_FIXTURE_REFERENCE_9B32" not in str(raised.value)

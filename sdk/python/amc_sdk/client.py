@@ -80,11 +80,14 @@ class AmcRefusedError(AmcError):
 
 
 class AmcStartupRefusedError(AmcRefusedError):
-    """``amc acp`` refused its own launch configuration before serving any session.
+    """``amc acp`` refused its own launch configuration.
 
-    ``reason`` is the runtime's stable code (mcp-config-tampered, mcp-config-unreviewed,
-    mcp-config-duplicate, mcp-config-unpaired, mcp-grant-class-mismatch, mcp-config-invalid,
-    or startup-refused for any other failure); the message is its fixed, secret-free text.
+    Raised at startup review, or by ``new_session`` when a reviewed MCP server cannot be
+    mounted. ``reason`` is the runtime's stable code (mcp-config-tampered,
+    mcp-config-unreviewed, mcp-config-duplicate, mcp-config-unpaired,
+    mcp-grant-class-mismatch, mcp-config-invalid, mcp-credential-unavailable,
+    mcp-oauth-refused, or startup-refused for any other failure); the message is its fixed,
+    secret-free text.
     """
     def __init__(self, reason: str, message: str) -> None:
         super().__init__(_STARTUP_REFUSED, message, {"reason": reason})
@@ -1411,7 +1414,10 @@ class AmcAgent:
     def new_session(self, cwd: Optional[str] = None, *, timeout: Optional[float] = None) -> Session:
         if cwd is not None and os.path.realpath(os.path.abspath(cwd)) != self.workspace:
             raise AmcError("the workspace is fixed at process launch")
-        result = self._call("session/new", {"cwd": self.workspace, "mcpServers": []}, timeout=timeout)
+        try:
+            result = self._call("session/new", {"cwd": self.workspace, "mcpServers": []}, timeout=timeout)
+        except AmcRefusedError as error:
+            raise _startup_refusal(error) from None
         return Session(self, result["sessionId"])
 
     def resume_session(self, session_id: str, *, timeout: Optional[float] = None) -> Session:
