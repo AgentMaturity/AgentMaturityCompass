@@ -1,6 +1,6 @@
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import YAML from "yaml";
@@ -11,6 +11,7 @@ import { captureRawConfigPairForAsync } from "../dist/config/configSignaturePair
 import { initWorkspace } from "../dist/workspace.js";
 import { lockVault } from "../dist/vault/vault.js";
 import { sha256Hex } from "../dist/utils/hash.js";
+import { amcDeclarativeConfigSchema } from "../dist/config/amcConfigSchema.js";
 
 const roots: string[] = [];
 function workspace() {
@@ -131,12 +132,47 @@ describe("declarative config overlays", () => {
     expect(output.provenance["/diagnostic/window"]).toEqual({ layer: "explicit", path: explicit, sha256: sha256Hex(readFileSync(explicit)) });
   });
 
-  it("keeps the workspace runtime policy separate from declarative overlays", () => {
-    const root = workspace();
-    initWorkspace({ workspacePath: root, trustBoundaryMode: "isolated" });
-    const explicit = write(root, "evaluation.yaml", { agents: [{ id: "a" }] });
-    expect(loadDeclarativeConfig(explicit, root, { userConfig: false }).config.agents[0]?.id).toBe("a");
-    expect(() => loadDeclarativeConfig(undefined, root, { userConfig: false })).toThrow("No amcconfig.yaml found");
+  it("resolves a pre-WP39b workspace config, including .amc/amc.config.yaml, to identical values", () => {
+    // Pre-WP39b loading at 3dcdf61a9 was exactly: discover one file, YAML.parse it, amcDeclarativeConfigSchema.parse it.
+    const legacy = (file: string) => amcDeclarativeConfigSchema.parse(YAML.parse(readFileSync(file, "utf8")));
+    const fixtures = [
+      { agents: [{ id: "a" }] },
+      { agents: [{ id: "a", runtime: "claude" }, { id: "b" }], thresholds: { minOverallLevel: 4 }, diagnostic: { window: "7d" }, env: { K: "v" } },
+    ];
+    for (const location of ["amcconfig.yaml", ".amc/amc.config.yaml"]) for (const fixture of fixtures) {
+      const root = workspace(); mkdirSync(join(root, ".amc"));
+      const file = write(root, location, fixture);
+      const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+      const result = loadDeclarativeConfig(undefined, root);
+      expect(result.configPath).toBe(file);
+      expect(result.config).toEqual(legacy(file));
+      expect(warn.mock.calls.flat().join(" ")).toMatch(location === "amcconfig.yaml" ? /^$/ : /Deprecated: .*amc\.config\.yaml.*Move it to .*amcconfig\.yaml/);
+      warn.mockRestore();
+    }
+  });
+
+  it("ignores ~/.amc/amcconfig.yaml unless the operator opts in, then applies it with provenance", () => {
+    const home = workspace(), root = workspace(); mkdirSync(join(home, ".amc"));
+    vi.stubEnv("HOME", home);
+    const base = write(root, "amcconfig.yaml", { agents: [{ id: "a" }], diagnostic: { window: "7d" } });
+    const user = write(home, ".amc/amcconfig.yaml", { diagnostic: { window: "1d" } });
+    for (const userConfig of [undefined, false] as const) {
+      const result = loadDeclarativeConfig(undefined, root, userConfig === undefined ? {} : { userConfig });
+      expect(result.config).toEqual(amcDeclarativeConfigSchema.parse(YAML.parse(readFileSync(base, "utf8"))));
+      expect(result.provenance["/diagnostic/window"]).toEqual({ layer: "workspace", path: base, sha256: sha256Hex(readFileSync(base)) });
+    }
+    const opted = loadDeclarativeConfig(undefined, root, { userConfig: true });
+    expect(opted.config.diagnostic?.window).toBe("1d");
+    expect(opted.provenance["/diagnostic/window"]).toEqual({ layer: "user", path: user, sha256: sha256Hex(readFileSync(user)) });
+    const cli = fileURLToPath(new URL("../dist/cli.js", import.meta.url));
+    const run = (...flags: string[]) => spawnSync(process.execPath, [cli, "config", "validate", ...flags, "--json"], {
+      cwd: root, encoding: "utf8", env: { ...process.env, HOME: home, AMC_NO_AUTO_REBUILD: "1", NO_COLOR: "1" } });
+    for (const [flags, window] of [[[], "7d"], [["--no-user-config"], "7d"], [["--user-config"], "1d"]] as const) {
+      const child = run(...flags);
+      expect(child.status, child.stderr).toBe(0);
+      expect(JSON.parse(child.stdout).config.diagnostic.window).toBe(window);
+    }
+    vi.unstubAllEnvs();
   });
 
   it("authenticates signed base and overlays through the current config purpose", async () => {

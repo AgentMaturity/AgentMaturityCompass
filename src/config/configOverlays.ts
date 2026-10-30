@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
 import YAML from "yaml";
-import { amcDeclarativeConfigSchema, defaultDeclarativeConfig, type AMCDeclarativeConfig } from "./amcConfigSchema.js";
+import { amcDeclarativeConfigSchema, type AMCDeclarativeConfig } from "./amcConfigSchema.js";
 import { verifyRawConfigSignature } from "./configSignaturePair.js";
 import { sha256Hex } from "../utils/hash.js";
 
@@ -12,8 +12,8 @@ interface ConfigSource {
 }
 export type ConfigProvenance = Record<string, ConfigSource>;
 export interface ConfigOverlayOptions {
-  /** Default: ~/.amc/amcconfig.yaml. False disables the optional user layer. */
-  userConfig?: string | false;
+  /** Opt-in user layer: true reads ~/.amc/amcconfig.yaml, a string names a file; absent or false reads none. */
+  userConfig?: string | boolean;
   /** Invocation values have no signature, so cannot override a signed file. */
   overrides?: Record<string, unknown>;
 }
@@ -46,7 +46,8 @@ export function resolveConfigOverlays(workspace: string,
     origins.set(at, source);
     return value;
   }
-  let raw = merge(undefined, defaultDeclarativeConfig(), defaults);
+  // Built-in defaults come from the schema exactly as before overlays existed; they are only attributed here.
+  let raw: unknown = undefined;
   let signedBase = false;
   for (const { layer, path } of files) {
     const bytes = readFileSync(path), digest = sha256Hex(bytes);

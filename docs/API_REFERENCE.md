@@ -3588,7 +3588,7 @@ Run the evaluation pipeline declared in amcconfig.yaml
 | Option | Description |
 |--------|-------------|
 | `--config <path>` | - |
-| `--user-config <path>` | - |
+| `--user-config [path]` | - |
 | `--no-user-config` | - |
 | `--window <window>` | - |
 | `--format <format>` | - |
@@ -3605,7 +3605,7 @@ Validate amcconfig.yaml without running anything
 | Option | Description |
 |--------|-------------|
 | `--config <path>` | - |
-| `--user-config <path>` | - |
+| `--user-config [path]` | - |
 | `--no-user-config` | - |
 | `--json` | - |
 | `--schema [name]` | - |

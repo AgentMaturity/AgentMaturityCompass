@@ -4032,9 +4032,9 @@ configCmd
   .command("validate")
   .description("Validate amcconfig.yaml without running anything")
   .option("--config <path>", "explicit config overlay path (highest file precedence)")
-  .option("--user-config <path>", "user config overlay path (default ~/.amc/amcconfig.yaml)").option("--no-user-config", "disable the user config overlay")
+  .option("--user-config [path]", "opt in to a user config overlay (default path ~/.amc/amcconfig.yaml)").option("--no-user-config", "no user config overlay (the default; kept as an alias)")
   .option("--json", "emit resolved declarative config and provenance as JSON", false).option("--schema [name]", "dump boot-free JSON Schema (declarative|agent) without loading config")
-  .action(async (opts: { config?: string; userConfig?: string | false; json: boolean; schema?: string | boolean }) => {
+  .action(async (opts: { config?: string; userConfig?: string | boolean; json: boolean; schema?: string | boolean }) => {
     try {
       const { configValidate } = await import("./config/amcConfigCli.js");
       configValidate({ workspace: process.cwd(), ...opts });
@@ -4045,14 +4045,14 @@ configCmd
   .command("run")
   .description("Run the evaluation pipeline declared in amcconfig.yaml")
   .option("--config <path>", "explicit config overlay path (highest file precedence)")
-  .option("--user-config <path>", "user config overlay path (default ~/.amc/amcconfig.yaml)").option("--no-user-config", "disable the user config overlay")
+  .option("--user-config [path]", "opt in to a user config overlay (default path ~/.amc/amcconfig.yaml)").option("--no-user-config", "no user config overlay (the default; kept as an alias)")
   .option("--window <window>", "evidence window override")
   .option("--format <format>", "json|html|terminal|markdown")
   .option("--output <path>", "report output path")
   .option("--dry-run", "resolve and report without executing", false)
   .option("--verbose", "print the resolved configuration", false)
   .option("--json", "emit the machine-readable result", false)
-  .action(async (opts: { config?: string; userConfig?: string | false; window?: string; format?: string; output?: string; dryRun: boolean; verbose: boolean; json: boolean }) => {
+  .action(async (opts: { config?: string; userConfig?: string | boolean; window?: string; format?: string; output?: string; dryRun: boolean; verbose: boolean; json: boolean }) => {
     try {
       const { runFromConfig } = await import("./config/amcConfigRunner.js");
       const result = await runFromConfig({

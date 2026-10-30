@@ -31,8 +31,8 @@ import type {
 // ---------------------------------------------------------------------------
 
 export interface ConfigRunOptions {
-  /** Optional user config overlay; false disables home discovery. */
-  userConfig?: string | false;
+  /** Opt-in user config overlay: true reads ~/.amc/amcconfig.yaml, a string names a file. */
+  userConfig?: string | boolean;
   /** Explicit config file path */
   configPath?: string;
   /** Workspace root */

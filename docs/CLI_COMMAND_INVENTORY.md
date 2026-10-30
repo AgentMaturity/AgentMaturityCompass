@@ -301,8 +301,8 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc config init` | Write a starter amcconfig.yaml | `--output <path>`<br>`--force` | - |
 | `amc config print` | Print resolved runtime config (secret-safe) | `--json` | - |
 | `amc config profile` | Print or apply workspace config profile (dev\|ci\|prod) | - | - |
-| `amc config run` | Run the evaluation pipeline declared in amcconfig.yaml | `--config <path>`<br>`--user-config <path>`<br>`--no-user-config`<br>`--window <window>`<br>`--format <format>`<br>`--output <path>`<br>`--dry-run`<br>`--verbose`<br>`--json` | - |
-| `amc config validate` | Validate amcconfig.yaml without running anything | `--config <path>`<br>`--user-config <path>`<br>`--no-user-config`<br>`--json`<br>`--schema [name]` | - |
+| `amc config run` | Run the evaluation pipeline declared in amcconfig.yaml | `--config <path>`<br>`--user-config [path]`<br>`--no-user-config`<br>`--window <window>`<br>`--format <format>`<br>`--output <path>`<br>`--dry-run`<br>`--verbose`<br>`--json` | - |
+| `amc config validate` | Validate amcconfig.yaml without running anything | `--config <path>`<br>`--user-config [path]`<br>`--no-user-config`<br>`--json`<br>`--schema [name]` | - |
 | `amc connect` | Connect an agent runtime and track first action, decision, and proof | `--agent <agentId>`<br>`--adapter <adapterId>`<br>`--token-file <path>`<br>`--bridge-url <url>`<br>`--mode <mode>`<br>`--status`<br>`--json`<br>`--print-env`<br>`--print-cmd` | - |
 | `amc connect hooks` | Install, inspect, or remove provider-native AMC observation and control hooks | - | - |
 | `amc connect hooks health` | Verify signed hook setup and show the latest verified provider event | `--provider <provider>`<br>`--recover-latch`<br>`--json` | - |

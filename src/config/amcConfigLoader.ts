@@ -7,7 +7,7 @@
 
 import { existsSync } from "node:fs";
 import { homedir } from "node:os";
-import { resolve, join, dirname } from "node:path";
+import { basename, resolve, join, dirname } from "node:path";
 import YAML from "yaml";
 import { resolveConfigOverlays, type ConfigOverlayOptions, type ConfigProvenance } from "./configOverlays.js";
 import {
@@ -40,8 +40,6 @@ export function discoverConfigFile(searchDir: string): string | null {
 
   for (const dir of dirs) {
     for (const filename of CONFIG_FILENAMES) {
-      // .amc/amc.config.yaml is the separate workspace runtime policy, not an evaluation overlay.
-      if (dir !== searchDir && filename === "amc.config.yaml") continue;
       const candidate = resolve(dir, filename);
       if (existsSync(candidate)) {
         return candidate;
@@ -79,9 +77,14 @@ export function loadDeclarativeConfig(
   const files: Array<{ layer: "workspace" | "user" | "explicit"; path: string }> = [];
   const discovered = discoverConfigFile(ws);
   if (discovered) files.push({ layer: "workspace", path: discovered });
-  const user = options.userConfig === false ? null
-    : typeof options.userConfig === "string" ? resolve(ws, options.userConfig) : join(homedir(), ".amc", "amcconfig.yaml");
-  if (user && (typeof options.userConfig === "string" || existsSync(user))) files.push({ layer: "user", path: user });
+  if (discovered && dirname(discovered) === join(ws, ".amc") && /^amc\.config\.ya?ml$/.test(basename(discovered))) {
+    // Read exactly as before WP39b; this name is also the workspace runtime policy, so evaluation config should move.
+    console.warn(`Deprecated: reading declarative evaluation config from ${discovered}. Move it to ${join(ws, "amcconfig.yaml")}.`);
+  }
+  // The user layer is opt-in: home config is an unreviewed input to a governed run unless the operator asks for it.
+  const user = options.userConfig === true ? join(homedir(), ".amc", "amcconfig.yaml")
+    : typeof options.userConfig === "string" ? resolve(ws, options.userConfig) : null;
+  if (user) files.push({ layer: "user", path: user });
   if (explicitPath !== undefined) files.push({ layer: "explicit", path: resolve(ws, explicitPath) });
   for (const file of files) {
     if (!existsSync(file.path)) throw new Error(`Config file not found: ${file.path}`);

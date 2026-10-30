@@ -179,7 +179,7 @@ export interface ConfigValidateOptions {
   json?: boolean;
   workspace: string;
   config?: string;
-  userConfig?: string | false;
+  userConfig?: string | boolean;
   /** Dump the boot-free JSON Schema (declarative by default) instead of loading any config layer. */
   schema?: string | boolean;
 }
@@ -220,7 +220,7 @@ export function configValidate(options: ConfigValidateOptions): void {
 export interface ConfigShowOptions {
   workspace: string;
   config?: string;
-  userConfig?: string | false;
+  userConfig?: string | boolean;
   format: "yaml" | "json";
 }
 
