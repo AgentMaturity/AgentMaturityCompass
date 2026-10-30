@@ -1,5 +1,5 @@
 import { spawnSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, realpathSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
@@ -54,18 +54,19 @@ describe("the TypeScript SDK quickstart against the built package (P1-40)", () =
     return { ws, env, fingerprint: fingerprint! };
   }
 
-  it("writes hello.txt through one governed call and verifies the session against the pinned monitor key", () => {
+  it("records one governed fs.write call, run as SIMULATE under the signed default Action Policy, and verifies the session against the pinned monitor key", () => {
     const { ws, env, fingerprint } = initCoding();
     const run = spawnSync(process.execPath, [QUICKSTART, ws], { cwd: ws, env: { ...env, AMC_EXPECTED_MONITOR_FINGERPRINT: fingerprint }, encoding: "utf8" });
     expect(run.status, `${run.stdout}\n${run.stderr}`).toBe(0);
     const lines = run.stdout.trim().split("\n");
     expect(lines.every((line) => line.startsWith("[synthetic] ")), "every output line is labelled synthetic").toBe(true);
     expect(run.stdout).toContain("claim kind synthetic_example");
-    expect(run.stdout).toContain("governed tool call fs.write hello.txt: completed; hello.txt written: yes");
+    // WP35b/AXR-02 (1549fabbd): `amc init` signs the default Action Policy, so an agent with no observed run has EXECUTE narrowed to SIMULATE.
+    expect(run.stdout).toContain("governed tool call fs.write hello.txt: completed as SIMULATE; hello.txt written: no");
     expect(run.stdout).toContain("verification: verified, externally-anchored");
     expect(run.stdout).toMatch(/receipt sha256: [0-9a-f]{64}/);
     expect(run.stdout).not.toMatch(/\b(certified|compliant)\b/i);
-    expect(readFileSync(join(ws, "hello.txt"), "utf8")).toContain("synthetic stub run");
+    expect(existsSync(join(ws, "hello.txt"))).toBe(false);
   }, 180_000);
 
   it("refuses to claim verification without the pin, or with a pin for another key", () => {

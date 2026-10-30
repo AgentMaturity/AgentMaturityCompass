@@ -140,7 +140,9 @@ node quickstart.mjs        # a copy of examples/sdk/quickstart.mjs
 ```
 
 The quickstart starts `AMCNativeClient` on the stub provider, makes one governed `fs.write` call (`hello.txt`), then
-`closeAndVerify()` and prints the session id, the verification result and the receipt digest. Every line is labelled
+`closeAndVerify()` and prints the session id, the verification result and the receipt digest. `amc init` signs the
+default Action Policy, which runs an agent's EXECUTE calls as SIMULATE until it has an observed diagnostic run, so on a
+fresh workspace the call is recorded as SIMULATE and `hello.txt` is not written. Every line is labelled
 `[synthetic]`: the stub runs no model, so this is a demonstration of the governed path, never a real-model result.
 For a regulated starting point, `amc init --regulated` adds a `block` firewall, a signed approval preset and a signed,
 not yet active Layer 0 control plan (experimental). See [TypeScript SDK](sdk/TYPESCRIPT_SDK.md) for the API contract,

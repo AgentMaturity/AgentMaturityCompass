@@ -2,9 +2,11 @@
  * TypeScript SDK quickstart (P1-40): from `amc init --coding` to a verified synthetic action.
  *
  * Every line it prints is synthetic. The stub provider runs no model: it makes one scripted fs.write call (hello.txt in
- * this workspace) that the signed tool policy, the firewall and the evidence log govern exactly as they govern a real
- * provider's call. Verification checks the integrity and authorship of the recorded evidence against the monitor key
- * you pinned, never the quality of an answer.
+ * this workspace) that the signed tool policy, the firewall, the signed Action Policy and the evidence log govern exactly
+ * as they govern a real provider's call. `amc init` signs the default Action Policy, which runs an agent's EXECUTE calls
+ * as SIMULATE until it has an observed diagnostic run, so on a fresh workspace the call is recorded as SIMULATE and
+ * hello.txt is not written. Verification checks the integrity and authorship of the recorded evidence against the
+ * monitor key you pinned, never the quality of an answer.
  *
  * Run it in a workspace made by `amc init --coding`, with AMC_VAULT_PASSPHRASE set and AMC_EXPECTED_MONITOR_FINGERPRINT
  * set to the fingerprint `amc init` printed:  node quickstart.mjs [workspace]
@@ -38,10 +40,13 @@ try {
 }
 
 const written = existsSync(join(workspace, "hello.txt"));
+const outcome = call?.content?.find((part) => part.type === "content" && part.content?.type === "text")?.content.text ?? "";
+const mode = outcome.startsWith("SIMULATE ") ? "SIMULATE" : "EXECUTE";
 console.log("[synthetic] provider stub: no model ran; a scripted demonstration, never a real-model result (claim kind synthetic_example)");
 console.log(`[synthetic] session ${session.sessionId}`);
-console.log(`[synthetic] governed tool call fs.write hello.txt: ${call?.status ?? "not made"}; hello.txt written: ${written ? "yes" : "no"}`);
+console.log(`[synthetic] governed tool call fs.write hello.txt: ${call?.status ?? "not made"} as ${mode}; hello.txt written: ${written ? "yes" : "no"}`);
 console.log(`[synthetic] verification: ${receipt.state}, ${receipt.scope} (integrity and authorship of the recorded evidence, not answer quality)`);
 console.log(`[synthetic] receipt sha256: ${createHash("sha256").update(JSON.stringify(receipt.report)).digest("hex")}`);
 console.log(`[synthetic] wall time: ${((Date.now() - started) / 1000).toFixed(1)}s`);
-if (call?.status !== "completed" || !written) process.exitCode = 1;
+// A SIMULATE call must leave no file; an EXECUTE call must leave one.
+if (call?.status !== "completed" || written !== (mode === "EXECUTE")) process.exitCode = 1;

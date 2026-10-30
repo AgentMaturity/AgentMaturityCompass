@@ -45,7 +45,9 @@ console.log(receipt.state, receipt.scope); // verified externally-anchored
 
 It prints the session id, the governed `fs.write` call's status, the verification result and the sha256 of the verifier
 report, each line labelled `[synthetic]`. The `fs.write` call passes through the same signed allowlist, firewall,
-budgets and evidence log a real provider's call does. `npm run check:packed-install` runs this quickstart against the
+budgets, signed Action Policy and evidence log a real provider's call does. `amc init` signs the default Action
+Policy, which runs an agent's EXECUTE calls as SIMULATE until it has an observed diagnostic run, so on a fresh
+workspace the call is recorded as SIMULATE and `hello.txt` is not written. `npm run check:packed-install` runs this quickstart against the
 installed package and bin and records its wall time.
 
 ## The runtime child's environment
