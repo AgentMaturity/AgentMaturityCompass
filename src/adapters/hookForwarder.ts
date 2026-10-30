@@ -301,6 +301,8 @@ export async function forwardProviderHookControl(input: {
         provider,
         rawInput: input.rawInput,
         result: payload,
+        // WP35c: this forwarder may run in a delegated child, which never holds the vault passphrase.
+        blobKeyOptional: true,
       });
       if (!verification.ok) {
         throw new HookIntegrationError(
@@ -438,7 +440,8 @@ function verifiedAdmission(workspace: string, agentId: string, eventId: unknown,
   try {
     ledger = openLedger(workspace);
     const row = ledger.db.prepare("SELECT meta_json FROM evidence_events WHERE id = ? LIMIT 1").get(eventId) as { meta_json: string } | undefined;
-    if (!row || !verifyEvidenceEventIntegrity({ ledger, eventId, requireReceipt: true, requireSealedSession: true }).ok) return false;
+    // blobKeyOptional: the admission is read from the signed metadata; a delegated child has no vault to open the blob (WP35c).
+    if (!row || !verifyEvidenceEventIntegrity({ ledger, eventId, requireReceipt: true, requireSealedSession: true, blobKeyOptional: true }).ok) return false;
     const meta = JSON.parse(row.meta_json) as { admitted?: unknown; agentId?: unknown; sessionSha256?: unknown; reported?: { promptSha256?: unknown } };
     return meta.admitted === true && meta.agentId === agentId && meta.sessionSha256 === claudeSessionSha256(sessionId)
       && meta.reported?.promptSha256 === (body.prompt as { sha256?: unknown } | undefined)?.sha256;
