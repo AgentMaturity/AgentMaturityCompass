@@ -76,12 +76,13 @@ function cold(root: string, sessionId: string) {
 }
 
 describe("Chat images through the actual public ACP path (not executed)", () => {
-  test.each([1, 2, 3, 4, 5])("actual initialize pins image admission to Chat version4, not version%s by analogy", async encoderVersion => {
+  test.each([1, 2, 3, 4, 5, 6])("actual initialize pins image admission to Chat version4/5, not version%s by analogy", async encoderVersion => {
     const h = harness(workspace(), { adapter: { ...openaiAdapter, encoderVersion } });
-    // Unknown version5 is deliberately advertised as image=false: discovering
-    // metadata is not a dispatch or admission of an unregistered encoder.
+    // version5 is the registered cache-retention encoder (PXA-15), byte-equal to
+    // version4 without retention. Unknown version6 is deliberately advertised as
+    // image=false: discovering metadata is not admission of an unregistered encoder.
     const initial = await h.call("initialize", { protocolVersion: 1, clientCapabilities: {} });
-    expect(initial.result).toMatchObject({ agentCapabilities: { promptCapabilities: { image: encoderVersion === 4 } } });
+    expect(initial.result).toMatchObject({ agentCapabilities: { promptCapabilities: { image: encoderVersion === 4 || encoderVersion === 5 } } });
     expect(h.sent).toEqual([]);
   });
   test.each(["sqlite", "jsonl"])("%s: image-only wire input, signed immutable inbox, release/load and text continuation reconstruct after writer closure", async backend => {

@@ -123,8 +123,11 @@ describe("executed architecture comparison (GAP-WP06)", () => {
     // Each arm ran under its pinned artifact digest, and nothing else differed between the arms.
     expect(out.report.baseline!.configDigest).toBe(input.baseline.spec.artifactSha256);
     expect(out.report.candidateConfigDigest).toBe(input.candidate.spec.artifactSha256);
+    // The admitted plan names each arm's trial id (bfca8188f), the one its executions ran under.
+    const trialOf = (side: string) => execution.executions.find((row) => row.side === side)!.trialId;
     expect(plans).toEqual([{ executions: 6, caseIds: execution.caseIds,
-      arms: [{ side: "baseline", configDigest: input.baseline.spec.artifactSha256 }, { side: "candidate", configDigest: input.candidate.spec.artifactSha256 }] }]);
+      arms: [{ side: "baseline", configDigest: input.baseline.spec.artifactSha256, trialId: trialOf("baseline") },
+        { side: "candidate", configDigest: input.candidate.spec.artifactSha256, trialId: trialOf("candidate") }] }]);
     expect(settled).toEqual(Array(6).fill("completed"));
     for (const row of out.report.cases.filter((kase) => execution.caseIds.includes(kase.caseId))) {
       expect([row.baselineStatus, row.candidateStatus]).toEqual(["failed", "passed"]);
