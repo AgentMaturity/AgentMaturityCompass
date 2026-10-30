@@ -132,6 +132,7 @@ export function gateToolCallsOnApproval(
     }
   });
   return {
+    ...(inner.extensionHooks === undefined ? {} : { extensionHooks: inner.extensionHooks }),
     ...(inner.supportsEffectGuard === true ? { supportsEffectGuard: true as const } : {}),
     schemas: (): readonly ToolSchema[] | null => inner.schemas(),
     executionMode: (request: ToolCallRequest): "parallel" | "exclusive" =>

@@ -59,7 +59,7 @@ import { resolvePreset, type AgentPreset } from "./presets/agentPresets.js";
 import { IN_PROCESS_PROVIDER, delegationTurnOptions, resolveForeignRunner } from "./agent/providers/delegationProviders.js";
 import type { SubagentRunner } from "./agent/subagentSpawn.js";
 import { loadVerifiedToolsConfigSnapshot } from "./toolhub/toolhubValidators.js";
-import type { AgentToolSeam } from "./agent/toolSeam.js";
+import { EMPTY_TOOL_SEAM, type AgentToolSeam } from "./agent/toolSeam.js";
 import type { SubagentCapability } from "./agent/delegateTool.js";
 import type { ComposedToolSession } from "./kernel/agentLoopRunner.js";
 import { readAgentRunSummary, renderVerifyReport, verifyAgentRun } from "./agent/runReport.js";
@@ -493,7 +493,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           return boundSession;
         };
         const toolset = workspaceToolset = agentToolset({
-          workspace: process.cwd(),
+          workspace: process.cwd(), extensionHooks: extensionTurn.hooks,
           agentId,
           additionalCapabilities: [...mcpServers.flatMap(entry => entry.review.capabilities), ...(wantsDelegation ? [{ name: "delegate", actionClass: "READ_ONLY" as const }] : [])],
           // Fork chooses a different ID; resume chooses the existing writer.
@@ -713,7 +713,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           ...(providerId === STUB_PROVIDER_ID
             ? { transport: stubProviderTransport({ failFirst, thinkMs, retryAfterSeconds: 1 }) }
             : {}),
-          ...(toolSeam === null ? {} : { tools: toolSeam }),
+          ...(toolSeam === null && !extensionTurn.hooks ? {} : { tools: { ...(toolSeam ?? EMPTY_TOOL_SEAM), extensionHooks: extensionTurn.hooks } }),
           ...(bindToolSession === undefined ? {} : { bindToolSession }),
           ...(grantDelegation === null
             ? {}
