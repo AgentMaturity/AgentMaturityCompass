@@ -288,6 +288,8 @@ export function embedEnvelope(
   return { [SESSION_ENVELOPE_META_KEY]: envelope, ...meta };
 }
 
+const NON_SESSION_SLASH_EVENT_TYPES: ReadonlySet<EvidenceEventType> = new Set<EvidenceEventType>(["work/accepted", "time/checkpoint"]);
+
 export type SessionEnvelopeAdmission =
   | { readonly ok: true; readonly envelope: SessionEnvelope | null }
   | { readonly ok: false; readonly code: "TAMPERED" | "UNSUPPORTED_FORMAT"; readonly message: string };
@@ -313,8 +315,9 @@ export function admitSessionEnvelope(metaJson: string, eventType: EvidenceEventT
     }
     return { ok: true, envelope: raw };
   }
-  // Wire intake is receipt-bound operational evidence, written outside a native session spine.
-  if (eventType === "work/accepted") return { ok: true, envelope: null };
+  // Operational evidence written outside a native session spine: wire intake
+  // (receipt-bound) and signed time checkpoints (src/time/checkpoint.ts).
+  if (NON_SESSION_SLASH_EVENT_TYPES.has(eventType)) return { ok: true, envelope: null };
   if (SESSION_EVENT_TYPES.has(eventType) || eventType.includes("/")) {
     return { ok: false, code: "UNSUPPORTED_FORMAT", message: "Native event has no supported session envelope; history cannot silently skip it." };
   }
