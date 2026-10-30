@@ -268,9 +268,11 @@ export class AdapterRegistry {
     }
     const adapter = registration.config.adapter;
     const protocol = catalogProtocolForEncoder(adapter.encoderId) ?? registration.capabilities?.protocol ?? null;
+    // The physical route names the encoder that actually encodes: a retention route's, not the adapter's base version.
+    const encoderVersion = registration.cacheRetention?.encoderVersion ?? adapter.encoderVersion;
     const physicalRoute = parsePhysicalRouteIdentity({ schemaVersion: 1, providerId: input.providerId, model: input.model,
       protocol, baseUrl: registration.baseUrl, adapterId: adapter.id, adapterVersion: adapter.version,
-      encoderId: adapter.encoderId, encoderVersion: adapter.encoderVersion, routeConfigDigest: registration.routeConfigDigest });
+      encoderId: adapter.encoderId, encoderVersion, routeConfigDigest: registration.routeConfigDigest });
     if (physicalRoute === null) throw new LlmRouteError("AMC_LLM_ROUTE_INVALID", "route identity is invalid");
     return Object.freeze({
       physicalRoute,
@@ -285,7 +287,7 @@ export class AdapterRegistry {
       adapterId: adapter.id,
       adapterVersion: adapter.version,
       encoderId: adapter.encoderId,
-      encoderVersion: registration.cacheRetention?.encoderVersion ?? adapter.encoderVersion,
+      encoderVersion,
       baseUrl: registration.baseUrl,
       credentialRef: registration.config.credentialRef,
       timeouts: registration.timeouts,
