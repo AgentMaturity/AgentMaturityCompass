@@ -2,7 +2,8 @@ import { existsSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import type { AssurancePackResult, DiagnosticReport } from "../types.js";
 import { resolveAgentId } from "../fleet/paths.js";
-import { listVerifiedRuns, loadVerifiedRunReport } from "../diagnostic/runReportResolution.js";
+import { loadVerifiedRunReport } from "../diagnostic/runReportResolution.js";
+import { listTrustedRuns } from "../governor/runTrust.js";
 import { latestAssuranceByPack } from "./assuranceRunner.js";
 import { writeFileAtomic } from "../utils/fs.js";
 
@@ -352,7 +353,7 @@ export function runFleetIndices(params: {
     ? readdirSync(agentsDir, { withFileTypes: true }).filter((entry) => entry.isDirectory()).map((entry) => entry.name)
     : ["default"];
   for (const agentId of agentIds) {
-    const latest = listVerifiedRuns(params.workspace, agentId)
+    const latest = listTrustedRuns(params.workspace, agentId)
       .find((run) => run.ts >= params.windowStartTs && run.ts <= params.windowEndTs) ?? null;
     if (!latest) {
       continue;

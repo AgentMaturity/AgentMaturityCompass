@@ -10,7 +10,7 @@ import { getSigningKey, getSigningPublicKeyPem } from "../../src/keys/signingKey
 import { closeSqlitePool } from "../../src/storage/sqlitePool.js";
 import { lockVault, unlockVault } from "../../src/vault/vault.js";
 import type { ActionClass } from "../../src/types.js";
-import { writeSealedReport } from "./sealedRun.js";
+import { writeAnchoredRun, writeSealedReport } from "./sealedRun.js";
 
 export const FREEZE_PASS = "owned-freeze-publication-passphrase";
 const roots: Array<{ root: string; workspace: string }> = [], closers: Array<() => Promise<void>> = [];
@@ -66,11 +66,11 @@ export function writeFreezeDecisionInputs(f: FreezeFixture) {
     correlationWarnings: ["owned unqualified diagnostic INPUT"], evidenceCoverage: 0, evidenceTrustCoverage: { observed: 0, attested: 0, selfReported: 0 },
     targetDiff: [], prioritizedUpgradeActions: [], evidenceToCollectNext: [] });
   const older = join(f.paths.runsDir, "owned-old.json"), previous = join(f.paths.runsDir, "owned-before.json"), current = join(f.paths.runsDir, "owned-after.json");
-  // Sealed with the workspace key (WP37: drift reads only runs and assurance reports whose seal verifies); the content
+  // Sealed with the workspace key and anchored in the ledger (drift reads only trusted runs and sealed assurance reports); the content
   // stays an unqualified INPUT, so its status remains UNSIGNED.
-  writeSealedReport(f.workspace, f.paths.runsDir, "owned-old", report("owned-old", 10, 2));
-  writeSealedReport(f.workspace, f.paths.runsDir, "owned-before", report("owned-before", 100, 4.8));
-  writeSealedReport(f.workspace, f.paths.runsDir, "owned-after", report("owned-after", 200, 3.8));
+  writeAnchoredRun(f.workspace, f.paths.runsDir, report("owned-old", 10, 2) as Parameters<typeof writeAnchoredRun>[2]);
+  writeAnchoredRun(f.workspace, f.paths.runsDir, report("owned-before", 100, 4.8) as Parameters<typeof writeAnchoredRun>[2]);
+  writeAnchoredRun(f.workspace, f.paths.runsDir, report("owned-after", 200, 3.8) as Parameters<typeof writeAnchoredRun>[2]);
   const assurance = writeSealedReport(f.workspace, join(f.paths.reportsDir, "assurance"), "owned-input",
     { agentId: "default", ts: 150, packResults: [{ packId: "injection", score0to100: 90 }, { packId: "hallucination", score0to100: 90 }] });
   expect(JSON.parse(readFileSync(current, "utf8")).status).toBe("UNSIGNED");

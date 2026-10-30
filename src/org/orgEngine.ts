@@ -2,7 +2,7 @@ import { percentileRank } from "../experiments/stats.js";
 import { readdirSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
 import { listAgents, verifyAgentConfigSignature, verifyFleetConfigSignature } from "../fleet/registry.js";
-import { listVerifiedRuns } from "../diagnostic/runReportResolution.js";
+import { listTrustedRuns } from "../governor/runTrust.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import { parseWindowToMs } from "../utils/time.js";
 import type { DiagnosticReport, EvidenceOutcome, TrustTier } from "../types.js";
@@ -58,9 +58,9 @@ function clamp(n: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, n));
 }
 
-/** Sealed runs only (WP37): an edited run must not move an org scorecard. */
+/** Trusted runs only: an edited, copied or unanchored run, or a thinned history, refuses the signed org scorecard. */
 function latestRunInWindow(workspace: string, agentId: string, windowStartTs: number, windowEndTs: number): DiagnosticReport | null {
-  return listVerifiedRuns(workspace, agentId)
+  return listTrustedRuns(workspace, agentId)
     .find((row) => row.ts >= windowStartTs && row.ts <= windowEndTs && row.status === "VALID") ?? null;
 }
 

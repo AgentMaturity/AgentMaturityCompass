@@ -1,0 +1,5 @@
+---
+"agent-maturity-compass": patch
+---
+
+Read run history the way gates read the latest run. Bench export, forecasts, org scorecards and fleet failure-risk indices now count a diagnostic run only when its seal verifies, it names the agent being read and the ledger `runs` table anchors it with the same hash, seal and status. They refuse with the reason when a sealed run was copied from another agent, has no ledger row, is stored under another file name or more than once, the ledger cannot be read, or the ledger records a sealed run of the agent whose file is missing or no longer trusted, so history can be neither inflated nor thinned. The drift detector reports INSUFFICIENT_EVIDENCE rather than comparing a possibly stale pair when the agent's own history is not whole or the ledger is unreadable, and the trust-drift monitor reports INSUFFICIENT_EVIDENCE in the same cases. A run copied from another agent is left out and reported as UNVERIFIED without blocking, so planting one can neither trigger nor silence an alert.

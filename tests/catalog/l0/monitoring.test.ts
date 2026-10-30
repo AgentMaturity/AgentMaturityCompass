@@ -20,7 +20,7 @@ import { canonicalize } from "../../../src/utils/json.js";
 import type { Domain } from "../../../src/domains/domainRegistry.js";
 import { fixturesFor } from "./harness.js";
 import { newWorkspace } from "./workspaces.js";
-import { writeSealedReport } from "../../helpers/sealedRun.js";
+import { writeAnchoredRun } from "../../helpers/sealedRun.js";
 
 /**
  * L0-MON-01 and L0-MON-02 against the real drift detector, freeze and incident clock store (P1-14). The drift oracle is
@@ -49,8 +49,8 @@ function writeRun(ws: string, runId: string, ts: number, s: Scores): void {
     invalidReceiptsCount: 0, correlationWarnings: [], evidenceCoverage: 1, evidenceTrustCoverage: { observed: 1, attested: 0, selfReported: 0 },
     targetDiff: [], prioritizedUpgradeActions: [], evidenceToCollectNext: [], runSealSig: "sig", reportJsonSha256: "hash"
   } satisfies Partial<DiagnosticReport>;
-  // Sealed: since WP37 the drift detector reads only runs whose seal verifies.
-  writeSealedReport(ws, getAgentPaths(ws, "default").runsDir, runId, report);
+  // Sealed and ledger-anchored: the drift detector reads only trusted runs.
+  writeAnchoredRun(ws, getAgentPaths(ws, "default").runsDir, report);
 }
 
 describe("L0-MON-01 drift alarms with a recorded response", () => {

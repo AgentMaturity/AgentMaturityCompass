@@ -1,6 +1,6 @@
 import { join } from "node:path";
 import { resolveAgentId } from "../fleet/paths.js";
-import { refusedRunsBlocking, scanVerifiedRuns } from "../diagnostic/runReportResolution.js";
+import { scanTrustedRuns } from "../governor/runTrust.js";
 import { clamp01, deriveIntegrityIndex, round2 } from "../cert/trustCertificate.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -50,7 +50,7 @@ export interface TrustDriftMonitorResult {
   agentId: string;
   threshold: number;
   analyzedRuns: number;
-  /** INSUFFICIENT_EVIDENCE when a tampered, unreadable or newer unsealed run was refused: the series may be stale (WP37). */
+  /** INSUFFICIENT_EVIDENCE when a tampered, unreadable or newer unsealed run was refused, or the run history is not whole (`scanTrustedRuns`): the series may be stale. */
   evidenceStatus: "MEASURED" | "INSUFFICIENT_EVIDENCE";
   unverifiedRuns: string[];
   latestPoint: TrustDriftPoint | null;
@@ -75,16 +75,20 @@ function trustMonitorStatePath(workspace: string, agentId: string): string {
   return join(trustMonitorRoot(workspace), `${agentId}.json`);
 }
 
-/** Only sealed runs form the series (WP37): an edited run must neither raise nor fake a drift alert; refused files that block the latest point are returned. */
+/**
+ * Only trusted runs form the series (`scanTrustedRuns`): an edited, copied or unanchored run must neither raise nor
+ * mask a drift alert. What was refused is returned (files blocking the latest point, then untrusted-history reasons)
+ * and marks the result INSUFFICIENT_EVIDENCE, but alerts on the trusted series still fire.
+ */
 function loadTrustSeries(workspace: string, agentId: string): { points: TrustDriftPoint[]; blocking: string[] } {
-  const { runs, refused } = scanVerifiedRuns(workspace, agentId);
+  const { runs, blocking, untrusted, foreign } = scanTrustedRuns(workspace, agentId);
   const points = runs
     .map((run) => {
       const integrityIndex = deriveIntegrityIndex(run);
       return { runId: run.runId, ts: run.ts, integrityIndex, score0to100: round2(integrityIndex * 100) };
     })
     .sort((a, b) => a.ts - b.ts || a.runId.localeCompare(b.runId));
-  return { points, blocking: refusedRunsBlocking(refused, points.at(-1)?.ts ?? null).map((row) => row.file) };
+  return { points, blocking: [...blocking.map((row) => row.file), ...[...untrusted, ...foreign].map((reason) => `UNVERIFIED: ${reason}`)] };
 }
 
 function severityFromDrop(drop: number, threshold: number): TrustDriftSeverity {

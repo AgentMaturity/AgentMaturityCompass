@@ -4,7 +4,7 @@ import YAML from "yaml";
 import type { DiagnosticReport, OutcomeReport } from "../types.js";
 import type { OrgScorecard } from "../org/orgSchema.js";
 import { getAgentPaths } from "../fleet/paths.js";
-import { listVerifiedRuns } from "../diagnostic/runReportResolution.js";
+import { listTrustedRuns } from "../governor/runTrust.js";
 import { listAgents } from "../fleet/registry.js";
 import { pathExists, readUtf8 } from "../utils/fs.js";
 import { computeFailureRiskIndices } from "../assurance/indices.js";
@@ -119,9 +119,9 @@ function listAgentIds(workspace: string): string[] {
   return [...new Set(ids)].sort((a, b) => a.localeCompare(b));
 }
 
-/** Sealed runs only (WP37): a forecast must not project from an edited run. */
+/** Trusted runs only: a signed forecast refuses to project from an edited, copied or unanchored run or a thinned history. */
 function loadAgentRuns(workspace: string, agentId: string, earliestTs: number): DiagnosticReport[] {
-  return listVerifiedRuns(workspace, agentId)
+  return listTrustedRuns(workspace, agentId)
     .filter((row) => Number(row.ts) >= earliestTs)
     .sort((a, b) => a.ts - b.ts);
 }
