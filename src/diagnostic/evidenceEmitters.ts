@@ -118,6 +118,7 @@ export const NON_MATURITY_AUDIT_MODULES: ReadonlyArray<{ module: string; why: st
   { module: "src/sandbox/sandbox.ts", why: "sandbox enablement; untagged, read by the L5 sandbox cap" },
   { module: "src/session/sessionResume.ts", why: "AMC's own session-log boundary record (instrumentation, not maturity)" },
   { module: "src/session/spill/spillLifecycle.ts", why: "AMC's own spill erasure records (instrumentation, not maturity)" },
+  { module: "src/session/compactionRecovery.ts", why: "settles an interrupted context compaction on resume (PI-025); context bookkeeping, not agent behaviour" },
   { module: "src/shield/exploitConfirmation.ts", why: "operator-scoped exploit confirmation workflow" },
   { module: "src/skills/skillLoadTool.ts", why: "which skill file and digest the model loaded (DXC-29); workspace content provenance, never maturity evidence" },
   { module: "src/studio/signatures.ts", why: "operator re-signed AMC configuration" },
