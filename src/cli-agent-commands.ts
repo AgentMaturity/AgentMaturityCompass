@@ -47,7 +47,7 @@ import { runLease } from "./leases/runLease.js";
 import { selectSupportedNativeTools } from "./agent/nativeToolCapabilities.js";
 import type { MountedNativeMcpServer } from "./mcp/nativeMcpClient.js";
 import { resolveNativeValidationSelection } from "./setup/nativeValidationConfig.js";
-import { NativeMcpConfigError, type ReviewedNativeMcpServer } from "./setup/nativeMcpConfig.js";
+import { NativeMcpConfigError, reviewedNativeMcpApprovalOptions, type ReviewedNativeMcpServer } from "./setup/nativeMcpConfig.js";
 import { delegateTool } from "./agent/delegateTool.js";
 import { DEFAULT_MAX_DELEGATION_DEPTH } from "./agent/delegationIdentity.js";
 import { parseDelegationScope } from "./agent/delegationScope.js";
@@ -192,7 +192,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--credential <ref>", "credential REFERENCE (never a value) the route authenticates with")
     .option("--credentials-home <dir>", "home directory the credentials store reads from")
     .option("--credentials-file <path>", "explicit credentials file, overriding the home layout")
-    .option("--mcp-config <path>", "reviewed MCP JSON; repeat to mount more servers under the same signed allowlist and approval class; requires --tools workspace and --approve-tools", collectOption)
+    .option("--mcp-config <path>", "reviewed MCP JSON; repeat to mount more servers under the same signed allowlist; each grant keeps its reviewed action class; requires --tools workspace and --approve-tools", collectOption)
     .option("--mcp-config-sha256 <digest>", "refuse an MCP config changed from these exact reviewed bytes; one per --mcp-config, in the same order", collectOption)
     .option("--max-tokens <n>", "provider max_tokens for each request")
     .option("--thinking <mode>", "DeepSeek only: enabled (default) or disabled")
@@ -414,7 +414,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       let mcpServers: readonly ReviewedNativeMcpServer[] = [];
       if (opts.mcpConfig !== undefined) {
         if (opts.tools !== "workspace" || gate === undefined) {
-          io.error("--mcp-config requires explicit --tools workspace and --approve-tools with matching grant action classes."); io.fail(); return;
+          io.error("--mcp-config requires explicit --tools workspace and --approve-tools; each MCP grant keeps its reviewed action class."); io.fail(); return;
         }
         try {
           const { reviewNativeMcpConfigurations } = await import("./setup/nativeMcpConfig.js");
@@ -679,7 +679,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           ...(gate === undefined
             ? {}
             : {
-                approvalGate: {
+                approvalGate: { ...reviewedNativeMcpApprovalOptions(mcpServers),
                   actionClass: gate.actionClass,
                   riskTier: gate.riskTier,
                   answerers: gate.answerers,

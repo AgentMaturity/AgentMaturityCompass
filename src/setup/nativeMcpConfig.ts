@@ -1,13 +1,16 @@
 import { createHash } from "node:crypto";
-import { readFileSync, statSync } from "node:fs";
+import { closeSync, constants, fstatSync, openSync, readSync } from "node:fs";
 import { resolve } from "node:path";
 import { credentialRef } from "../credentials/credentialRef.js";
 import { LocalCredentialsService } from "../credentials/localCredentialsService.js";
+import { freezeToolArguments } from "../tools/toolArguments.js";
+import { verifyAuditorSignatureBytes } from "../org/orgSignatureBytes.js";
 import { isActionClass } from "../governor/actionCatalog.js";
 import { loadVerifiedToolsConfigSnapshot } from "../toolhub/toolhubValidators.js";
 import { selectSupportedNativeTools, type NativeToolCapability } from "../agent/nativeToolCapabilities.js";
-import { NATIVE_MCP_MAX_TOTAL_LIMIT_MS, discoverNativeMcpCatalog, nativeMcpToolName, type NativeMcpCatalog, type NativeMcpGrant, type NativeMcpServer } from "../mcp/nativeMcpClient.js";
+import { NATIVE_MCP_MAX_TOTAL_LIMIT_MS, validateNativeMcpToolAliases, discoverNativeMcpCatalog, nativeMcpToolName, type NativeMcpCatalog, type NativeMcpGrant, type NativeMcpServer } from "../mcp/nativeMcpClient.js";
 import type { ActionClass } from "../types.js";
+import type { ToolApprovalGateOptions } from "../agent/approvalGate.js";
 import { NativeMcpHttpRefused, nativeMcpHttpEndpoint, nativeMcpNotificationLifetime, validateNativeMcpHeaderNames } from "../mcp/nativeMcpHttpTransport.js";
 import { isNativeMcpProtocolVersion } from "../mcp/protocol/version.js";
 import { isEgressRefusal } from "../residency/checkEgress.js";
@@ -66,15 +69,33 @@ function onlyKeys(value: Record<string, unknown>, allowed: readonly string[]): b
   return Object.keys(value).every(key => allowed.includes(key));
 }
 
+const configurationBytes = new WeakMap<LoadedNativeMcpConfiguration, Buffer>();
+const CONFIGURATION_BYTES = 256 * 1024;
+
+/** A growing file stays bounded; a FIFO cannot block operator-config admission. */
+function readConfigurationBytes(path: string): Buffer {
+  const fd = openSync(path, constants.O_RDONLY | constants.O_NONBLOCK);
+  try {
+    const stat = fstatSync(fd);
+    if (!stat.isFile() || stat.size > CONFIGURATION_BYTES) return refuse("MCP config must be a JSON file no larger than 256 KiB.");
+    const bytes = Buffer.alloc(CONFIGURATION_BYTES + 1);
+    let size = 0;
+    while (size < bytes.length) {
+      const count = readSync(fd, bytes, size, bytes.length - size, null);
+      if (count === 0) break;
+      size += count;
+    }
+    if (size > CONFIGURATION_BYTES) return refuse("MCP config exceeds 256 KiB.");
+    return bytes.subarray(0, size);
+  } finally { closeSync(fd); }
+}
+
 /** The explicit file is operator input; parser diagnostics never echo its bytes. */
 export function loadNativeMcpConfiguration(path: string, expectedSha256?: string): LoadedNativeMcpConfiguration {
   const absolute = resolve(path);
   let bytes: Buffer;
   try {
-    const stat = statSync(absolute);
-    if (!stat.isFile() || stat.size > 256 * 1024) return refuse("MCP config must be a JSON file no larger than 256 KiB.");
-    bytes = readFileSync(absolute);
-    if (bytes.length > 256 * 1024) return refuse("MCP config exceeds 256 KiB.");
+    bytes = readConfigurationBytes(absolute);
   } catch (error) {
     if (error instanceof NativeMcpConfigError) throw error;
     return refuse("Could not read the explicit MCP config file.");
@@ -145,14 +166,19 @@ export function loadNativeMcpConfiguration(path: string, expectedSha256?: string
     if (!Array.isArray(value.grants) || value.grants.length > 256) return refuse("MCP grants must be a bounded array of remote tool names and action classes.");
     const names = new Set<string>();
     for (const grant of value.grants) {
-      if (!object(grant) || !onlyKeys(grant, ["name", "actionClass"]) || typeof grant.name !== "string" || !grant.name ||
+      if (!object(grant) || !onlyKeys(grant, ["name", "actionClass", "alias"]) || typeof grant.name !== "string" || !grant.name ||
           typeof grant.actionClass !== "string" || !isActionClass(grant.actionClass) || names.has(grant.name)) {
         return refuse("MCP grants require unique remote tool names and valid explicit action classes.");
       }
       names.add(grant.name);
     }
+    try { validateNativeMcpToolAliases(value.grants as unknown as NativeMcpGrant[], value.grants.map(grant => nativeMcpToolName(server.id as string, (grant as NativeMcpGrant).name))); }
+    catch { return refuse("MCP tool alias is invalid, reserved or collides with another capability."); }
   }
-  return { path: absolute, sha256, config: value as unknown as NativeMcpConfiguration };
+  const loaded = Object.freeze({ path: absolute, sha256,
+    config: freezeToolArguments(value) as unknown as NativeMcpConfiguration });
+  configurationBytes.set(loaded, bytes);
+  return loaded;
 }
 
 /** basic/authorization: auth is pinned by the config digest; it never coexists with literal header credentials. */
@@ -178,16 +204,24 @@ function validateOAuthConfiguration(auth: unknown, headerRefs: unknown): void {
 }
 
 /** Run preflight; the signed allowlist remains an independent permission boundary. */
-export function requireReviewedNativeMcpGrants(loaded: LoadedNativeMcpConfiguration, workspace: string, approvalClass: ActionClass): {
+export function requireReviewedNativeMcpGrants(loaded: LoadedNativeMcpConfiguration, workspace: string, _approvalClass: ActionClass): {
   readonly expectedCatalogDigest: string;
   readonly grants: readonly NativeMcpGrant[];
   readonly capabilities: readonly NativeToolCapability[];
 } {
   const { expectedCatalogDigest, grants } = loaded.config;
   if (!expectedCatalogDigest || !grants?.length) return refuse("Discover and review the MCP catalog, then add its expectedCatalogDigest and explicit grants before running tools.");
-  if (grants.some(grant => grant.actionClass !== approvalClass)) return refuse("Every MCP grant must match --approve-tools. Use separate runs for different approval action classes.");
+  if (grants.some(grant => grant.alias !== undefined)) {
+    try {
+      const bytes = configurationBytes.get(loaded);
+      const signature = readConfigurationBytes(`${loaded.path}.sig`);
+      if (!bytes || !verifyAuditorSignatureBytes(workspace, "BUNDLE", bytes, signature).valid) throw new Error("Invalid alias configuration signature");
+    } catch { return refuse("MCP aliases require a valid BUNDLE signature over the exact config bytes in <config>.sig; review and sign with the existing AMC signing provider."); }
+  }
   const snapshot = loadVerifiedToolsConfigSnapshot(workspace);
   if (!snapshot.signatureValid || !snapshot.config) return refuse("MCP mounting requires a verifiable signed tool allowlist; no policy was changed.");
+  try { validateNativeMcpToolAliases(grants, snapshot.config.tools.allowedTools.map(tool => tool.name)); }
+  catch { return refuse("MCP tool alias is invalid, reserved or collides with another capability."); }
   const capabilities: NativeToolCapability[] = [];
   for (const grant of grants) {
     const name = nativeMcpToolName(loaded.config.server.id, grant.name);
@@ -213,7 +247,7 @@ export interface ReviewedNativeMcpServer {
   readonly review: ReturnType<typeof requireReviewedNativeMcpGrants>;
 }
 
-/** Several servers in one run, each with its own pinned bytes, digest and grants under the one signed allowlist and approval class. */
+/** Several servers in one run, each with its own pinned bytes, digest and grants under the one signed allowlist. Each grant keeps its reviewed action class. */
 export function reviewNativeMcpConfigurations(paths: readonly string[], pins: readonly string[] | undefined, workspace: string,
   approvalClass: ActionClass): ReviewedNativeMcpServer[] {
   if (pins !== undefined && pins.length !== paths.length) return refuse("Give one --mcp-config-sha256 per --mcp-config, in the same order.");
@@ -223,7 +257,16 @@ export function reviewNativeMcpConfigurations(paths: readonly string[], pins: re
     if (reviewed.some(entry => entry.config.config.server.id === config.config.server.id)) return refuse("Each --mcp-config must name a distinct server id.");
     reviewed.push({ config, review: requireReviewedNativeMcpGrants(config, workspace, approvalClass) });
   }
+  try { validateNativeMcpToolAliases(reviewed.flatMap(entry => entry.review.grants),
+    reviewed.flatMap(entry => entry.review.capabilities.map(capability => capability.name))); }
+  catch { return refuse("MCP tool alias is invalid, reserved or collides across reviewed servers."); }
   return reviewed;
+}
+
+/** Bind only reviewed MCP classes; an empty composition preserves the native approval options. */
+export function reviewedNativeMcpApprovalOptions(servers: readonly ReviewedNativeMcpServer[]): Pick<ToolApprovalGateOptions, "reviewedActionClasses"> {
+  return servers.length ? { reviewedActionClasses: Object.freeze(Object.fromEntries(servers.flatMap(entry =>
+    entry.review.capabilities.map(({ name, actionClass }) => [name, actionClass])))) } : {};
 }
 
 /** Values exist only in the private server launch object, never the config/receipt. */

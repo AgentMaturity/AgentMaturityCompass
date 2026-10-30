@@ -39,8 +39,8 @@ export function registerAcpCommands(program: Command): void {
     .option("--validate <id>", "Run this public check after each completed turn; repeat to select more", (id: string, previous: string[] = []) => [...previous, id])
     .option("--approve-tools <actionClass>", "Require the existing signed approval gate for tool calls")
     .option("--approve-risk <tier>", "Signed approval risk tier; requires --approve-tools")
-    .option("--mcp-config <path>", "Reviewed native MCP config; requires workspace tools and signed approvals")
-    .option("--mcp-config-sha256 <digest>", "Pin exact reviewed MCP configuration bytes")
+    .option("--mcp-config <path>", "Reviewed native MCP config; repeat for more servers; requires workspace tools and signed approvals", (path: string, previous: string[] = []) => [...previous, path])
+    .option("--mcp-config-sha256 <digest>", "Pin exact reviewed MCP configuration bytes; one per --mcp-config in the same order", (digest: string, previous: string[] = []) => [...previous, digest])
     .option("--max-tokens <n>", "Positive output-token bound per model request", "512")
     .option("--thinking <mode>", "DeepSeek only: enabled (default) or disabled")
     .option("--reasoning-effort <effort>", "DeepSeek only: exact low, high (default), or max with enabled thinking")
@@ -69,8 +69,8 @@ export function registerAcpCommands(program: Command): void {
       validate?: string[];
       approveTools?: string;
       approveRisk?: string;
-      mcpConfig?: string;
-      mcpConfigSha256?: string;
+      mcpConfig?: string[];
+      mcpConfigSha256?: string[];
       maxTokens: string;
       thinking?: string;
       reasoningEffort?: string;

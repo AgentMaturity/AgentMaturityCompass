@@ -11,7 +11,7 @@ import { resolveCompactionConfig } from "../agent/compaction/promptPressure.js";
 import type { CompactionConfig } from "../agent/loopTypes.js";
 import { isActionClass } from "../governor/actionCatalog.js";
 import { checkToolsetReadiness } from "../agent/agentToolset.js";
-import { loadNativeMcpConfiguration, requireReviewedNativeMcpGrants } from "../setup/nativeMcpConfig.js";
+import { reviewNativeMcpConfigurations } from "../setup/nativeMcpConfig.js";
 import { loadVerifiedToolsConfigSnapshot } from "../toolhub/toolhubValidators.js";
 import { sha256Hex } from "../utils/hash.js";
 import type { ToolApprovalGateOptions } from "../agent/approvalGate.js";
@@ -122,8 +122,8 @@ export interface AcpStdioInit {
   readonly validate?: readonly string[];
   readonly approveTools?: string;
   readonly approveRisk?: string;
-  readonly mcpConfig?: string;
-  readonly mcpConfigSha256?: string;
+  readonly mcpConfig?: string | readonly string[];
+  readonly mcpConfigSha256?: string | readonly string[];
   readonly credentialsHome?: string;
   readonly credentialsFile?: string;
   readonly credentialsMode?: "layered" | "operator-only";
@@ -183,16 +183,19 @@ export function startAcpStdio(init: AcpStdioInit): AcpStdioHandle {
   const approval: ToolApprovalGateOptions | undefined = actionClass === undefined ? undefined : {
     actionClass: actionClass as ToolApprovalGateOptions["actionClass"], riskTier: riskTier as ToolApprovalGateOptions["riskTier"] };
   if (init.mcpConfigSha256 !== undefined && init.mcpConfig === undefined) throw new Error("ACP MCP digest pin requires an explicit config path.");
-  const mcp = init.mcpConfig === undefined ? undefined : loadNativeMcpConfiguration(init.mcpConfig, init.mcpConfigSha256);
-  if (mcp && (tools !== "workspace" || !approval)) throw new Error("ACP MCP requires --tools workspace and --approve-tools.");
-  const mcpReview = mcp && approval ? requireReviewedNativeMcpGrants(mcp, init.workspace, approval.actionClass) : undefined;
+  if (init.mcpConfig !== undefined && (tools !== "workspace" || !approval)) throw new Error("ACP MCP requires --tools workspace and --approve-tools.");
+  const mcpPaths = init.mcpConfig === undefined ? [] : typeof init.mcpConfig === "string" ? [init.mcpConfig] : init.mcpConfig;
+  const mcpPins = init.mcpConfigSha256 === undefined ? undefined : typeof init.mcpConfigSha256 === "string" ? [init.mcpConfigSha256] : init.mcpConfigSha256;
+  const mcp = approval ? reviewNativeMcpConfigurations(mcpPaths, mcpPins, init.workspace, approval.actionClass) : [];
+  // Preserve existing one-server session identities while binding every server in a composed run.
+  const mcpIdentity = mcp.length === 0 ? null : mcp.length === 1 ? mcp[0]!.config.sha256 : mcp.map(entry => entry.config.sha256);
   const shellOptIn = init.unconfinedShell === true ? { unconfinedShell: "cli-flag" as const } : {};
   if ((init.askUser === true || init.webSearchSearxng !== undefined) && tools !== "workspace") throw new Error("--ask-user and --web-search-searxng configure workspace tools; add --tools workspace.");
   const webSearchProvider = init.webSearchSearxng === undefined ? undefined : searxngSearchProvider(init.webSearchSearxng);
   let shellRefusal: string | null = null;
   if (tools === "workspace") {
     const snapshot = loadVerifiedToolsConfigSnapshot(init.workspace);
-    const additionalCapabilities = mcpReview?.capabilities ?? [];
+    const additionalCapabilities = mcp.flatMap(entry => entry.review.capabilities);
     const readiness = checkToolsetReadiness(init.workspace, { snapshot, additionalCapabilities, ...shellOptIn });
     shellRefusal = readiness.shell.offered ? null : readiness.shell.reason;
     if (!readiness.ready) throw new Error("ACP workspace tools require a supported signed tool subset and the existing firewall policy; run the native guide and configure them explicitly.");
@@ -246,12 +249,12 @@ export function startAcpStdio(init: AcpStdioInit): AcpStdioHandle {
       },
       systemPrompt: init.systemPrompt,
       harnessVersion: amcVersion,
-      compositionDigest: sha256Hex(JSON.stringify({ surface: "acp-native", provider: route.providerId, model: route.models?.[0], tools, maxTokens, maxSteps, approval, mcp: mcp?.sha256 ?? null,
+      compositionDigest: sha256Hex(JSON.stringify({ surface: "acp-native", provider: route.providerId, model: route.models?.[0], tools, maxTokens, maxSteps, approval, mcp: mcpIdentity,
         ...(init.askUser === true ? { askUser: "acp-client" } : {}), ...(webSearchProvider === undefined ? {} : { webSearch: webSearchProvider.origin }),
         ...(route.providerId === "deepseek" ? { params: requestParams } : {}),
         ...(validation === undefined ? {} : { validation }), ...(compaction === undefined ? {} : { compaction }),
         ...(init.expectedToolsDigest === undefined ? {} : { expectedToolsDigest: init.expectedToolsDigest }) })),
-      policyDigest: sha256Hex(JSON.stringify({ tools, signedTools: tools === "workspace" ? loadVerifiedToolsConfigSnapshot(params.workspace).digestSha256 : null, approval, mcp: mcp?.sha256 ?? null,
+      policyDigest: sha256Hex(JSON.stringify({ tools, signedTools: tools === "workspace" ? loadVerifiedToolsConfigSnapshot(params.workspace).digestSha256 : null, approval, mcp: mcpIdentity,
         ...(validation === undefined ? {} : { validation }),
         ...(init.expectedToolsDigest === undefined ? {} : { expectedToolsDigest: init.expectedToolsDigest }) })),
       tools, maxSteps, ...shellOptIn, ...(compaction === undefined ? {} : { compaction }), ...(init.expectedToolsDigest === undefined ? {} : { expectedToolsDigest: init.expectedToolsDigest }),
@@ -264,7 +267,7 @@ export function startAcpStdio(init: AcpStdioInit): AcpStdioHandle {
   const claimant = { pid: process.pid, hostId: hostname(), bootId: randomUUID(), startedAt: Date.now() };
   const nativeSession = (session: AgentSessionInit & { sessionId: string }, signal: AbortSignal, resumed: boolean) => prepareAcpNativeSession({
     session, signal, ...(resumed ? { claimant } : {}),
-    ...(approval ? { approval } : {}), ...(mcp ? { mcp } : {}),
+    ...(approval ? { approval } : {}), ...(mcp.length ? { mcp: mcp.map(entry => entry.config) } : {}),
     ...(init.credentialsHome === undefined ? {} : { credentialsHome: init.credentialsHome }),
     ...(init.credentialsFile === undefined ? {} : { credentialsFile: init.credentialsFile }),
     initiator: init.initiator ?? cliInitiator(),
@@ -288,7 +291,7 @@ export function startAcpStdio(init: AcpStdioInit): AcpStdioHandle {
   const agent = createAcpAgent({
     workspace: init.workspace,
     agentId: init.agentId,
-    nativeExecution: { tools, signedApprovalGate: approval !== undefined, reviewedMcpConfigured: mcp !== undefined, taskValidation: true },
+    nativeExecution: { tools, signedApprovalGate: approval !== undefined, reviewedMcpConfigured: mcp.length > 0, taskValidation: true },
     promptRoute: registry.pin({ providerId: route.providerId, model: route.models?.[0] ?? "" }),
     orderedImageInput: true,
     audioInput: true,

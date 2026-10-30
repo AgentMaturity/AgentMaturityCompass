@@ -27,6 +27,8 @@ import type { RecordedGeminiPart } from "../../session/geminiPartMeta.js";
  */
 export interface ToolSchema {
   readonly name: string;
+  /** Signed provider-facing alias; never an execution or allowlist identity. */
+  readonly modelAlias?: string;
   readonly description: string;
   readonly parameters: Record<string, unknown>;
 }
@@ -57,6 +59,8 @@ export type EncodablePart =
       readonly kind: "tool_use";
       readonly toolCallId: string;
       readonly toolName: string;
+      /** Original alias, resolved against the signed schema that authorized this historical call. */
+      readonly providerWireName?: string;
       /** Raw JSON string exactly as the model produced it. */
       readonly argumentsJson: string;
       readonly gemini?: RecordedGeminiPart;
