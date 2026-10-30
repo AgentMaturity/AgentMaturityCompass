@@ -70,7 +70,7 @@ import type { SubagentRunContext, SubagentRunner } from "../agent/subagentSpawn.
 import { parseSubagentStopConditions } from "../agent/subagentStopConditions.js";
 import type { ActionClass } from "../types.js";
 import { createDriverRunner } from "../agent/subagentRunner.js";
-import { COMPOSITION_FAILED } from "../agent/nativeAgentComposition.js";
+import { sealComposedSession } from "./composedSessionSeal.js";
 import { LeasePrincipalRefused } from "../leases/leasePrincipal.js";
 import { planRequiresAgentLease, planRequiresPrincipal } from "../tools/guards/compiledPolicyGuard.js";
 import { loadActiveCompiledPolicy } from "../catalog/compiler/activate.js";
@@ -772,28 +772,8 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
     let resourcesConfirmed = false;
     try { resourcesConfirmed = await (options.tools?.shutdown?.() ?? Promise.resolve(true)); }
     catch (error) { disposalError ??= error; }
-    try {
-      if (!driverConfirmed || loopOwner?.status === "failed") session.disposeWithoutClosing();
-      else if (options.keepOpen) {
-        // oxlint-disable-next-line no-unsafe-finally -- Unknown cleanup must refuse ownership handover.
-        if (!resourcesConfirmed) throw new Error("Cannot hand over a session whose resource cleanup is unknown.");
-        // Hand-over point: the turn is sealed, the session is not. A later
-        // process resumes it through sessionResume.ts, which re-verifies first.
-        session.releaseWithoutClosing();
-      } else {
-        session.close({ reason: !composed ? COMPOSITION_FAILED : !resourcesConfirmed ? "resource_outcome_unknown" : hostShutdown ? "shutdown" : "completed" });
-      }
-    } catch (error) {
-      // A driver that entered `failed` left an open turn only recovery may
-      // close, and the spine refuses a close over it. Swallowed HERE and only
-      // here: the status returned above already reports it, and throwing from a
-      // finally would replace the real failure with this one.
-      try { session.disposeWithoutClosing(); } catch { /* Preserve unsealed evidence after a refused close. */ }
-      if (options.schedulePass !== undefined) {
-        // oxlint-disable-next-line no-unsafe-finally -- A schedule owner cannot report released/closed on a refused seal.
-        throw error;
-      }
-    }
+    sealComposedSession(session, { stopped: driverConfirmed && loopOwner?.status !== "failed", resourcesConfirmed,
+      keepOpen: options.keepOpen === true, composed, hostShutdown, schedulePass: options.schedulePass !== undefined });
     // oxlint-disable-next-line no-unsafe-finally -- Report failed disposal after attempting every schedule owner.
     if (disposalError !== undefined) throw new Error("TOOL_OUTCOME_UNKNOWN: native service cleanup failed.", { cause: disposalError });
     // oxlint-disable-next-line no-unsafe-finally -- A cleanup timeout cannot be reported as successful shutdown.
