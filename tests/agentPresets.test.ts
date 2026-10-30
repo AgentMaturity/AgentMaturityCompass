@@ -6,6 +6,7 @@ import { initWorkspace } from "../src/workspace.js";
 import {
   initPresets,
   presetsPath,
+  preparePresetsAsync,
   readPresets,
   resolvePreset,
   savePresets
@@ -159,5 +160,30 @@ describe("a preset carries a delegation posture", () => {
     expect(resolved.ok).toBe(true);
     if (!resolved.ok) return;
     expect(resolved.preset.delegate?.enabled ?? false).toBe(false);
+  });
+});
+
+
+describe("signed model compaction policy", () => {
+  it("round-trips compaction overrides through existing async policy signing", async () => {
+    const dir = workspace();
+    const compaction = { keepRecentSteps: 4, modelOverrides: [{ providerId: "anthropic", model: "claude-opus-4-6", reserveTokens: 24000 }] };
+    (await preparePresetsAsync(dir, [reviewer({ compaction })])).publish();
+    const read = resolvePreset(dir, "reviewer");
+    expect(read.ok).toBe(true);
+    if (read.ok) expect(read.preset.compaction).toEqual(compaction);
+    const path = presetsPath(dir);
+    writeFileSync(path, readFileSync(path, "utf8").replace("24000", "1"));
+    expect(readPresets(dir).ok).toBe(false);
+  });
+
+  it.each([
+    { reserveTokens: -1 }, { reserveTokens: 1.5 }, { keepRecentTokens: 20000 },
+    { contextWindowTokens: 10000, reserveTokens: 10000 },
+    { modelOverrides: [{ providerId: "anthropic", model: "claude-opus-4-6", unknownSetting: true }] },
+    { modelOverrides: [{ providerId: "anthropic", model: "claude-opus-4-6" }, { providerId: "anthropic", model: "claude-opus-4-6" }] }
+  ])("refuses malformed signed compaction policy %j", compaction => {
+    const dir = workspace();
+    expect(() => savePresets(dir, [reviewer({ compaction })])).toThrow();
   });
 });
