@@ -65,7 +65,7 @@ function mcp() {
   const remove = define();
   const protocol = { negotiatedVersion: "2025-11-25", mode: "legacy" as const, serverInfo: null };
   const mount: MountedNativeMcpServer = {
-    catalog: { serverId: "fixture", digest: "a".repeat(64), protocol, tools: [] },
+    catalog: { serverId: "fixture", digest: "a".repeat(64), protocol, tools: [], instructions: null, resources: [], resourceTemplates: [] },
     toolNames: [toolName], receipt: { serverId: "fixture", catalogDigest: "a".repeat(64), protocol, auth: null },
     serverInstructions: { kind: "mcp-server-instructions", serverId: "fixture", text: "PRIVATE_MCP_INSTRUCTIONS", truncated: false },
     diagnostics: vi.fn(() => "PRIVATE_MCP_DIAGNOSTICS"), close: vi.fn(async () => { remove(); })
