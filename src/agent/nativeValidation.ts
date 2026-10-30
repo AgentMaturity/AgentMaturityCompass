@@ -9,8 +9,18 @@ export interface NativeValidationCheck {
   readonly command: string;
   readonly timeoutMs: number;
 }
+/** Explicit operator opt-in. Limits admit reported usage; they cannot guarantee future provider pricing. */
+export interface NativeValidationRepairPolicy {
+  readonly maxRounds: number;
+  readonly maxRequests: number;
+  readonly maxTokens: number;
+  readonly timeoutMs: number;
+  readonly allowedEditPaths: readonly string[];
+  readonly maxCostUsd?: number;
+}
 export interface NativeValidationPlan {
   readonly configSha256: string;
+  readonly repair?: NativeValidationRepairPolicy;
   readonly checks: readonly NativeValidationCheck[];
 }
 export type NativeValidationStatus = "not-requested" | "pending" | "passed" | "failed" | "unavailable";
@@ -34,7 +44,7 @@ export interface NativeValidationResult {
 /** Snapshot the reviewed plan before any prompt executes. No file discovery or grants. */
 export function freezeNativeValidationPlan(plan: NativeValidationPlan): NativeValidationPlan {
   if (plan === null || typeof plan !== "object" || Array.isArray(plan)) throw new Error("Invalid native validation plan.");
-  const { configSha256, checks: requestedChecks } = plan;
+  const { configSha256, checks: requestedChecks, repair: requestedRepair } = plan;
   if (typeof configSha256 !== "string" || !/^[a-f0-9]{64}$/.test(configSha256)
     || !Array.isArray(requestedChecks) || requestedChecks.length < 1 || requestedChecks.length > 8) throw new Error("Invalid native validation plan.");
   const ids = new Set<string>();
@@ -52,7 +62,24 @@ export function freezeNativeValidationPlan(plan: NativeValidationPlan): NativeVa
     ids.add(id);
     checks.push(Object.freeze({ id, title, command, timeoutMs }));
   }
-  return Object.freeze({ configSha256, checks: Object.freeze(checks) });
+  const repair = requestedRepair === undefined ? undefined : freezeNativeValidationRepairPolicy(requestedRepair);
+  return Object.freeze({ configSha256, checks: Object.freeze(checks), ...(repair === undefined ? {} : { repair }) });
+}
+
+export function freezeNativeValidationRepairPolicy(policy: NativeValidationRepairPolicy): NativeValidationRepairPolicy {
+  if (policy === null || typeof policy !== "object" || Array.isArray(policy)) throw new Error("Invalid native validation repair policy.");
+  const { maxRounds, maxRequests, maxTokens, timeoutMs, allowedEditPaths, maxCostUsd } = policy;
+  const paths = Array.isArray(allowedEditPaths) ? Array.from(allowedEditPaths) : [];
+  if (Object.keys(policy).some(key => !["maxRounds", "maxRequests", "maxTokens", "timeoutMs", "allowedEditPaths", "maxCostUsd"].includes(key))
+    || !Number.isSafeInteger(maxRounds) || maxRounds < 0 || maxRounds > 8
+    || !Number.isSafeInteger(maxRequests) || maxRequests < 1 || maxRequests > 64
+    || !Number.isSafeInteger(maxTokens) || maxTokens < 1 || maxTokens > 1_000_000
+    || !Number.isSafeInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > 600_000
+    || !Array.isArray(allowedEditPaths) || paths.length < 1 || paths.length > 32
+    || new Set(paths).size !== paths.length
+    || paths.some(path => typeof path !== "string" || !path.trim() || path.length > 1024 || /[\x00-\x1f\x7f]/.test(path))
+    || (maxCostUsd !== undefined && (!Number.isFinite(maxCostUsd) || maxCostUsd <= 0))) throw new Error("Invalid native validation repair policy.");
+  return Object.freeze({ maxRounds, maxRequests, maxTokens, timeoutMs, allowedEditPaths: Object.freeze(paths), ...(maxCostUsd === undefined ? {} : { maxCostUsd }) });
 }
 
 export function validationCheckPending(check: Pick<NativeValidationCheck, "id" | "title">): NativeValidationCheckResult {
@@ -67,11 +94,12 @@ export function validationAggregate(checks: readonly NativeValidationCheckResult
 
 interface ValidationTurnInput {
   readonly session: SessionService;
-  readonly tools: AgentToolSeam;
+  readonly tools: Pick<AgentToolSeam, "execute">;
   readonly plan: NativeValidationPlan;
   readonly turn: number;
   readonly signal: AbortSignal;
   readonly abandonGraceMs: number;
+  readonly round?: number;
 }
 
 /** Evidence-only validation: never adds an invented assistant call to the conversation. */
@@ -85,11 +113,13 @@ export class NativeValidationTurn {
 
   private record(phase: string, meta: Record<string, unknown>, payload = ""): string {
     return this.input.session.recordProjectedEvidence({ eventType: "audit", payload, meta: {
-      kind: "native-validation", version: 1, phase, turn: this.input.turn, configSha256: this.input.plan.configSha256, ...meta
+      kind: "native-validation", version: 1, ...(this.input.round === undefined ? {} : { round: this.input.round }), phase, turn: this.input.turn, configSha256: this.input.plan.configSha256, ...meta
     } }).eventId;
   }
 
-  /** Only a normal completed model turn reaches this method. No automatic repair/retry. */
+  get results(): readonly NativeValidationCheckResult[] { return this.checks; }
+
+  /** Only a normal completed model turn or bounded repair reaches this method. */
   async run(step: number): Promise<void> {
     for (let index = 0; index < this.input.plan.checks.length; index++) {
       this.input.signal.throwIfAborted();

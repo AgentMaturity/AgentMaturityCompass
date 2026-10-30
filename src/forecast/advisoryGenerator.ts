@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import type { AdvisoryRecord, ForecastAnomaly, ForecastDrift, ForecastScope } from "./forecastSchema.js";
-import { loadLatestTransformPlan } from "../transformation/transformTasks.js";
+import { loadForecastTransformPlan } from "./forecastTransformPlan.js";
 
 function defaultNextSteps(category: AdvisoryRecord["category"], scope: ForecastScope): string[] {
   const target =
@@ -39,12 +39,7 @@ function defaultNextSteps(category: AdvisoryRecord["category"], scope: ForecastS
 }
 
 function topTransformTaskSteps(workspace: string, scope: ForecastScope): string[] {
-  const plan =
-    scope.type === "AGENT"
-      ? loadLatestTransformPlan(workspace, { type: "AGENT", agentId: scope.id })
-      : scope.type === "NODE"
-        ? loadLatestTransformPlan(workspace, { type: "NODE", nodeId: scope.id })
-        : null;
+  const { plan } = loadForecastTransformPlan(workspace, scope);
   if (!plan) {
     return [];
   }

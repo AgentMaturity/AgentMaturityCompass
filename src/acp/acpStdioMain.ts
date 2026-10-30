@@ -118,6 +118,7 @@ export interface AcpStdioInit {
   readonly initiator?: string;
   readonly validationConfig?: string;
   readonly validationConfigSha256?: string;
+  readonly validationRepair?: string;
   readonly validate?: readonly string[];
   readonly approveTools?: string;
   readonly approveRisk?: string;

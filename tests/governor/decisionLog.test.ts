@@ -14,6 +14,7 @@ import { toolEvidenceFor, type ToolEvidenceRecord } from "../../src/tools/toolEv
 import type { RecordedToolCall, ToolOutcome } from "../../src/tools/toolTypes.js";
 import { lockVault } from "../../src/vault/vault.js";
 import { initWorkspace } from "../../src/workspace.js";
+import { writeRuntimeFirewallPolicy } from "../../src/runtime/firewall.js";
 
 /**
  * P2-25: every authorization decision, allow or deny, writes exactly one AuthZEN-shaped AUTHZ_DECISION entry; denies
@@ -95,6 +96,7 @@ describe("toolhub decisions in the ledger", () => {
     roots.push(workspace);
     vi.stubEnv("AMC_VAULT_PASSPHRASE", "decision-log-fixture-passphrase");
     initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
+    writeRuntimeFirewallPolicy({ workspace: workspace, mode: "observe" }); // AXR-01: ToolHub and hook control apply the runtime firewall as the native pipeline does; unsigned, it blocks every call.
     initBudgets(workspace, "default");
     initActionPolicy(workspace);
     initToolsConfig(workspace);

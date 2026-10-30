@@ -1,0 +1,953 @@
+import type { DiagnosticConfidenceSummary, DiagnosticReport, LayerName, LayerScore, SharedMetricValidationEvidence, MetricValidationContinualLearningSignal, MetricValidationPentestBenchmarkSignal, MetricValidationReport, MetricValidationArchitectureRealitySignal, MetricValidationEmbodiedAgentSignal, MetricValidationEvaluatorSuiteSignal, MetricValidationLivingEnvironmentSignal, MetricValidationPersonaAgentSignal, MetricValidationMobileAgentSignal, MetricValidationScientificLiteratureSignal, MetricValidationBioinformaticsAgentSignal, MetricValidationMirageDrugRepositioningSignal, MetricValidationTraceEvaluationSignal, MetricValidationMirageRagSignal, MetricValidationLegalCodeRagSignal, MetricValidationNetworkTroubleshootingSignal, MetricValidationInferenceOptimizationSignal, MetricValidationJavaCodingAgentSignal, MetricValidationParallelResearchSkillSignal, MetricValidationResumeRagEvaluatorSignal, MetricValidationChipBenchmarkSignal, MetricValidationHermesBenchSignal, MetricValidationCooperBenchSignal, MetricValidationCoderCupSignal, MetricValidationAgenticGraphRagSignal, MetricValidationWebEvalDatasetSignal, MetricValidationAgentScenarioTestSignal, MetricValidationOpenCodeLabSignal, MetricValidationCcPluginEvalComponentType, MetricValidationCcPluginEvalDetectionMode, MetricValidationCcPluginEvalScenarioType, MetricValidationCcPluginEvalSignal, MetricValidationRealignSimulationSignal, MetricValidationAcademiClawSignal, MetricValidationRagChunkingTechniqueSignal, MetricValidationKubernetesOperationalAgentSignal, MetricValidationSecureVibeBenchSignal, MetricValidationRavigBenchSignal, MetricValidationHumanStudyBenchSignal, MetricValidationLegacyBenchSignal, MetricValidationSubtleMemorySignal, MetricValidationGuardbenchSignal, MetricValidationRagEvaluationPipelineSignal, MetricValidationRagasNotebookSignal, QuestionScoreSignedEvidenceRef, QuestionScore, TrustLabel } from "../types.js";
+export interface MetricValidationQuestionRef {
+    id: string;
+    layerName: LayerName;
+}
+export declare const LUNARY_OBSERVABILITY_METRIC_VALIDITY_SOURCE_REF = "web:https://lunary.ai";
+export declare const LUNARY_OBSERVABILITY_METRIC_VALIDITY_REQUIREMENTS: readonly ["live source relevance receipt", "AMC-owned eval-pack manifest", "validation table artifact", "trace/session export manifest", "prompt template or model-registry snapshot when claimed", "evaluator or score-LLM-response config", "feedback or annotation export when claimed", "production monitoring or alert-policy manifest when Watch is claimed", "Score/Shield/Watch surface mapping", "fail-closed threshold policy", "metric owner", "sample size", "confidence interval", "signed evidence refs", "artifact hashes", "row hashes", "no-copy/source-review boundary proof"];
+export declare function lunaryObservabilityMetricValidityRequirements(): string[];
+export declare const GOOGLE_ADK_EVAL_METRIC_VALIDITY_SOURCE_REF = "github:google/adk-python";
+export declare const GOOGLE_ADK_EVAL_METRIC_VALIDITY_REQUIREMENTS: readonly ["live GitHub metadata relevance review", "AMC-owned eval-pack manifest", "validation table artifact", "evaluator-suite proof using existing primitives", "trace-evaluation proof when traces or Watch are claimed", "fail-closed threshold policy", "Score/Shield/Watch surface mapping", "metric owner", "sample size", "confidence interval", "signed evidence refs", "artifact hashes", "row hashes", "no-copy/source-review boundary proof"];
+export declare function googleAdkEvalMetricValidityRequirements(): string[];
+export declare const LM_EVALUATION_HARNESS_METRIC_VALIDITY_SOURCE_REF = "github:EleutherAI/lm-evaluation-harness";
+export declare const LM_EVALUATION_HARNESS_METRIC_VALIDITY_REQUIREMENTS: readonly ["live GitHub metadata relevance review", "AMC-owned eval-pack manifest", "validation table artifact", "evaluator-suite proof using existing primitives", "trace-evaluation proof when traces or Watch are claimed", "fail-closed threshold policy", "Score/Shield/Watch surface mapping", "metric owner", "sample size", "confidence interval", "signed evidence refs", "artifact hashes", "row hashes", "no-copy/source-review boundary proof"];
+export declare function lmEvaluationHarnessMetricValidityRequirements(): string[];
+export declare const OPENAI_SIMPLE_EVALS_METRIC_VALIDITY_SOURCE_REF = "github:openai/simple-evals";
+export declare const OPENAI_SIMPLE_EVALS_METRIC_VALIDITY_REQUIREMENTS: readonly ["live GitHub metadata relevance review", "AMC-owned eval-pack manifest", "validation table artifact", "evaluator-suite proof using existing primitives", "trace-evaluation proof when traces or Watch are claimed", "fail-closed threshold policy", "Score/Shield/Watch surface mapping", "metric owner", "sample size", "confidence interval", "signed evidence refs", "artifact hashes", "row hashes", "no-copy/source-review boundary proof"];
+export declare function openaiSimpleEvalsMetricValidityRequirements(): string[];
+export declare const DIGITAL_MATERIALS_ECOSYSTEM_METRIC_VALIDITY_SOURCE_REF = "doi:10.1039/d5sc09229a; openalex:W7131071926";
+export declare const DIGITAL_MATERIALS_ECOSYSTEM_METRIC_VALIDITY_REQUIREMENTS: readonly ["verified DOI metadata receipt", "verified OpenAlex metadata receipt", "metadata-only source-review proof", "AMC-owned eval-pack manifest", "validation table artifact", "existing metric-validation primitive mapping", "trace or evaluator proof when claimed", "Score/Shield/Watch surface mapping", "fail-closed threshold policy", "metric owner", "sample size", "confidence interval", "signed evidence refs", "artifact hashes", "row hashes", "no-copy/source-review boundary proof"];
+export declare function digitalMaterialsEcosystemMetricValidityRequirements(): string[];
+export declare const CHEMGRAPH_AGENTIC_CHEMISTRY_WORKFLOW_METRIC_VALIDITY_SOURCE_REF = "doi:10.1038/s42004-025-01776-9; openalex:W7119161162";
+export declare const CHEMGRAPH_AGENTIC_CHEMISTRY_WORKFLOW_METRIC_VALIDITY_REQUIREMENTS: readonly ["verified DOI metadata receipt", "verified OpenAlex metadata receipt", "metadata-only source-review proof", "AMC-owned eval-pack manifest", "validation table artifact", "existing metric-validation primitive mapping", "trace or evaluator proof when claimed", "Score/Shield/Watch surface mapping", "fail-closed threshold policy", "metric owner", "sample size", "confidence interval", "signed evidence refs", "artifact hashes", "row hashes", "no-copy/source-review boundary proof"];
+export declare function chemGraphAgenticChemistryWorkflowMetricValidityRequirements(): string[];
+export interface BuildMetricValidationInput {
+    agentId: string;
+    runId: string;
+    ts: number;
+    trustLabel: TrustLabel;
+    integrityIndex: number;
+    evidenceCoverage: number;
+    correlationRatio: number;
+    unsupportedClaimCount: number;
+    layerScores: LayerScore[];
+    questionScores: QuestionScore[];
+    confidenceSummary?: DiagnosticConfidenceSummary;
+    questions?: MetricValidationQuestionRef[];
+    signedEvidenceRefs?: QuestionScoreSignedEvidenceRef[];
+    counterfactualChecks?: MetricValidationCounterfactualCheck[];
+    validationFacetChecks?: MetricValidationFacetCheck[];
+    confounderControlChecks?: MetricValidationConfounderControlCheck[];
+    outcomeAlignmentChecks?: MetricValidationOutcomeAlignmentCheck[];
+    processEvidenceChecks?: MetricValidationProcessEvidenceCheck[];
+    safetyUtilityChecks?: MetricValidationSafetyUtilityCheck[];
+    modalityTransformationChecks?: MetricValidationModalityTransformationCheck[];
+    lifecycleObservabilityChecks?: MetricValidationLifecycleObservabilityCheck[];
+    rankingStabilityChecks?: MetricValidationRankingStabilityCheck[];
+    toolSandboxChecks?: MetricValidationToolSandboxCheck[];
+    continualLearningChecks?: MetricValidationContinualLearningCheck[];
+    strategicInteractionChecks?: MetricValidationStrategicInteractionCheck[];
+    architectureRealityChecks?: MetricValidationArchitectureRealityCheck[];
+    requireArchitectureRealityProof?: boolean;
+    ragPipelineChecks?: MetricValidationRagPipelineCheck[];
+    requireRagEvaluationPipelineProof?: boolean;
+    requireRagasNotebookProof?: boolean;
+    requireMirageRagMetricProof?: boolean;
+    requireLegalCodeRagProof?: boolean;
+    guardbenchChecks?: MetricValidationGuardbenchCheck[];
+    requireGuardbenchMetricProof?: boolean;
+    businessWorkflowChecks?: MetricValidationBusinessWorkflowCheck[];
+    dataAgentAnalyticalChecks?: MetricValidationDataAgentAnalyticalCheck[];
+    embodiedAgentChecks?: MetricValidationEmbodiedAgentCheck[];
+    evaluatorSuiteChecks?: MetricValidationEvaluatorSuiteCheck[];
+    requireEvaluatorSuiteProof?: boolean;
+    pentestBenchmarkChecks?: MetricValidationPentestBenchmarkCheck[];
+    requirePentestBenchmarkProof?: boolean;
+    traceEvaluationChecks?: MetricValidationTraceEvaluationCheck[];
+    requireTraceEvaluationProof?: boolean;
+    livingEnvironmentChecks?: MetricValidationLivingEnvironmentCheck[];
+    requireLivingEnvironmentProof?: boolean;
+    mobileAgentChecks?: MetricValidationMobileAgentCheck[];
+    requireMobileAgentProof?: boolean;
+    personaAgentChecks?: MetricValidationPersonaAgentCheck[];
+    requirePersonaAgentProof?: boolean;
+    scientificLiteratureChecks?: MetricValidationScientificLiteratureCheck[];
+    requireScientificLiteratureProof?: boolean;
+    bioinformaticsAgentChecks?: MetricValidationBioinformaticsAgentCheck[];
+    requireBioinformaticsAgentProof?: boolean;
+    mirageDrugRepositioningChecks?: MetricValidationMirageDrugRepositioningCheck[];
+    requireMirageDrugRepositioningProof?: boolean;
+    networkTroubleshootingChecks?: MetricValidationNetworkTroubleshootingCheck[];
+    requireNetworkTroubleshootingProof?: boolean;
+    inferenceOptimizationChecks?: MetricValidationInferenceOptimizationCheck[];
+    requireInferenceOptimizationProof?: boolean;
+    javaCodingAgentChecks?: MetricValidationJavaCodingAgentCheck[];
+    requireJavaCodingAgentProof?: boolean;
+    webEvalDatasetChecks?: MetricValidationWebEvalDatasetCheck[];
+    requireWebEvalDatasetProof?: boolean;
+    parallelResearchSkillChecks?: MetricValidationParallelResearchSkillCheck[];
+    requireParallelResearchSkillProof?: boolean;
+    resumeRagEvaluatorChecks?: MetricValidationResumeRagEvaluatorCheck[];
+    requireResumeRagEvaluatorProof?: boolean;
+    chipBenchmarkChecks?: MetricValidationChipBenchmarkCheck[];
+    requireChipBenchmarkProof?: boolean;
+    hermesBenchChecks?: MetricValidationHermesBenchCheck[];
+    requireHermesBenchProof?: boolean;
+    cooperBenchChecks?: MetricValidationCooperBenchCheck[];
+    requireCooperBenchProof?: boolean;
+    coderCupChecks?: MetricValidationCoderCupCheck[];
+    requireCoderCupProof?: boolean;
+    agenticGraphRagChecks?: MetricValidationAgenticGraphRagCheck[];
+    requireAgenticGraphRagProof?: boolean;
+    agentScenarioTestChecks?: MetricValidationAgentScenarioTestCheck[];
+    requireAgentScenarioTestProof?: boolean;
+    openCodeLabChecks?: MetricValidationOpenCodeLabCheck[];
+    requireOpenCodeLabProof?: boolean;
+    ccPluginEvalChecks?: MetricValidationCcPluginEvalCheck[];
+    requireCcPluginEvalProof?: boolean;
+    realignSimulationChecks?: MetricValidationRealignSimulationCheck[];
+    requireRealignSimulationProof?: boolean;
+    academiClawChecks?: MetricValidationAcademiClawCheck[];
+    requireAcademiClawProof?: boolean;
+    ragChunkingTechniqueChecks?: MetricValidationRagChunkingTechniqueCheck[];
+    requireRagChunkingTechniqueProof?: boolean;
+    kubernetesOperationalAgentChecks?: MetricValidationKubernetesOperationalAgentCheck[];
+    requireKubernetesOperationalAgentProof?: boolean;
+    secureVibeBenchChecks?: MetricValidationSecureVibeBenchCheck[];
+    requireSecureVibeBenchProof?: boolean;
+    ravigBenchChecks?: MetricValidationRavigBenchCheck[];
+    requireRavigBenchProof?: boolean;
+    humanStudyBenchChecks?: MetricValidationHumanStudyBenchCheck[];
+    requireHumanStudyBenchProof?: boolean;
+    legacyBenchChecks?: MetricValidationLegacyBenchCheck[];
+    requireLegacyBenchProof?: boolean;
+    subtleMemoryChecks?: MetricValidationSubtleMemoryCheck[];
+    requireSubtleMemoryProof?: boolean;
+    sourceRefs?: string[];
+    datasetHash?: string;
+    gateMode?: "ci" | "lifecycle";
+}
+export interface MetricValidationCounterfactualCheck extends SharedMetricValidationEvidence<"metricId" | "evidenceRefs"> {
+    interventionId: string;
+    passed: boolean;
+}
+export interface MetricValidationFacetCheck extends SharedMetricValidationEvidence<"metricId" | "covered" | "evidenceRefs"> {
+    facetId: string;
+}
+export interface MetricValidationConfounderControlCheck extends SharedMetricValidationEvidence<"metricId" | "evidenceRefs"> {
+    confounderId: string;
+    controlled: boolean;
+}
+export interface MetricValidationOutcomeAlignmentCheck extends SharedMetricValidationEvidence<"metricId" | "evidenceRefs"> {
+    outcomeId: string;
+    aligned: boolean;
+}
+export interface MetricValidationProcessEvidenceCheck extends SharedMetricValidationEvidence<"metricId" | "covered" | "evidenceRefs"> {
+    processEvidenceId: string;
+}
+export interface MetricValidationSafetyUtilityCheck extends SharedMetricValidationEvidence<"metricId" | "covered" | "evidenceRefs"> {
+    safetyUtilityId: string;
+}
+export interface MetricValidationModalityTransformationCheck extends SharedMetricValidationEvidence<"metricId" | "covered" | "evidenceRefs"> {
+    transformationId: string;
+}
+export interface MetricValidationLifecycleObservabilityCheck extends SharedMetricValidationEvidence<"metricId" | "covered" | "evidenceRefs"> {
+    lifecycleSignalId: string;
+}
+export interface MetricValidationRankingStabilityCheck extends SharedMetricValidationEvidence<"metricId" | "covered" | "evidenceRefs"> {
+    rankingSignalId: string;
+}
+export interface MetricValidationToolSandboxCheck extends SharedMetricValidationEvidence<"metricId" | "covered" | "evidenceRefs"> {
+    sandboxSignalId: string;
+}
+export interface MetricValidationContinualLearningCheck extends SharedMetricValidationEvidence<"metricId" | "covered" | "evidenceRefs" | "artifactHash" | "metricNames" | "confidenceInterval"> {
+    continualSignalId: string;
+    continualSignalType?: MetricValidationContinualLearningSignal;
+    memoryArtifactHash?: string;
+    runSummaryArtifactHash?: string;
+    gameplayLogArtifactHash?: string;
+    runCount?: number;
+}
+export interface MetricValidationStrategicInteractionCheck extends SharedMetricValidationEvidence<"metricId" | "covered" | "evidenceRefs"> {
+    strategicSignalId: string;
+}
+export interface MetricValidationArchitectureRealityCheck extends SharedMetricValidationEvidence<"metricId" | "covered" | "evidenceRefs" | "artifactHash" | "sampleSize" | "confidenceInterval" | "metricNames"> {
+    architectureSignalId: string;
+    architectureSignalType?: MetricValidationArchitectureRealitySignal;
+    scenarioCount?: number;
+}
+export interface MetricValidationRagPipelineCheck extends SharedMetricValidationEvidence<"metricId" | "covered" | "evidenceRefs" | "artifactHash" | "owner" | "sampleSize" | "confidenceInterval" | "metricNames" | "repositoryRefs"> {
+    ragSignalId: string;
+    evaluationSignalType?: MetricValidationRagEvaluationPipelineSignal;
+    mirageSignalType?: MetricValidationMirageRagSignal;
+    legalCodeRagSignalType?: MetricValidationLegalCodeRagSignal;
+    ragasNotebookSignalType?: MetricValidationRagasNotebookSignal;
+    datasetIds?: string[];
+    retrieverIds?: string[];
+    modelIds?: string[];
+    licenseBoundaryRefs?: string[];
+    notebookIds?: string[];
+    dependencyIds?: string[];
+    documentCorpusIds?: string[];
+    chunkingConfigIds?: string[];
+    testsetGeneratorIds?: string[];
+    evolutionTypes?: Array<"simple" | "reasoning" | "multi_context" | "custom">;
+    testsetIds?: string[];
+    ragChainIds?: string[];
+    legalCodeIds?: string[];
+    jurisdictionIds?: string[];
+    retrievalTechniqueIds?: string[];
+    vectorStoreIds?: string[];
+    embeddingModelIds?: string[];
+    answerContextTraceIds?: string[];
+    langfuseTraceIds?: string[];
+    visualizationIds?: string[];
+    evaluationDatasetIds?: string[];
+    legalQuestionCount?: number;
+    ragasQuestionCount?: number;
+    evaluationModes?: Array<"base" | "oracle" | "mixed" | "custom">;
+    qaPairCount?: number;
+    contextPoolCount?: number;
+}
+export interface MetricValidationGuardbenchCheck extends SharedMetricValidationEvidence<"metricId" | "covered" | "evidenceRefs" | "artifactHash" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"> {
+    guardbenchSignalId: string;
+    guardbenchSignalType?: MetricValidationGuardbenchSignal;
+    datasetIds?: string[];
+    languageIds?: string[];
+    modelIds?: string[];
+    thresholdIds?: string[];
+    exportFormats?: string[];
+}
+export interface MetricValidationBusinessWorkflowCheck extends SharedMetricValidationEvidence<"metricId" | "covered" | "evidenceRefs"> {
+    workflowSignalId: string;
+}
+export interface MetricValidationDataAgentAnalyticalCheck extends SharedMetricValidationEvidence<"metricId" | "covered" | "evidenceRefs"> {
+    dataAgentSignalId: string;
+}
+export interface MetricValidationEmbodiedAgentCheck extends SharedMetricValidationEvidence<"metricId" | "covered" | "evidenceRefs" | "artifactHash" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"> {
+    embodiedSignalId: string;
+    embodiedSignalType?: MetricValidationEmbodiedAgentSignal;
+    taskTypes?: string[];
+    baselineIds?: string[];
+}
+export interface MetricValidationEvaluatorSuiteCheck extends SharedMetricValidationEvidence<"metricId" | "covered" | "evidenceRefs" | "artifactHash" | "owner" | "sampleSize" | "confidenceInterval"> {
+    evaluatorSignalId: string;
+    evaluatorSignalType?: MetricValidationEvaluatorSuiteSignal;
+    assertionTypes?: string[];
+    reporterFormats?: string[];
+    judgeNames?: string[];
+}
+export interface MetricValidationPentestBenchmarkCheck extends SharedMetricValidationEvidence<"metricId" | "covered" | "evidenceRefs" | "artifactHash" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"> {
+    pentestSignalId: string;
+    pentestSignalType?: MetricValidationPentestBenchmarkSignal;
+    languageStacks?: string[];
+    vulnerabilityClasses?: string[];
+    difficultyLevels?: string[];
+    benchmarkSuiteIds?: string[];
+}
+export interface MetricValidationTraceEvaluationCheck extends SharedMetricValidationEvidence<"metricId" | "covered" | "evidenceRefs" | "artifactHash" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"> {
+    traceEvaluationSignalId: string;
+    traceEvaluationSignalType?: MetricValidationTraceEvaluationSignal;
+    modelIds?: string[];
+    agentParameterKeys?: string[];
+    toolNames?: string[];
+    caseSuiteIds?: string[];
+    backendModes?: string[];
+    runPermutationCount?: number;
+}
+export interface MetricValidationLivingEnvironmentCheck extends SharedMetricValidationEvidence<"metricId" | "covered" | "evidenceRefs" | "artifactHash" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"> {
+    livingEnvironmentSignalId: string;
+    livingEnvironmentSignalType?: MetricValidationLivingEnvironmentSignal;
+    capabilityNames?: string[];
+    sandboxProviders?: string[];
+    agentAdapters?: string[];
+    trialCount?: number;
+}
+export interface MetricValidationMobileAgentCheck extends SharedMetricValidationEvidence<"metricId" | "covered" | "evidenceRefs" | "artifactHash" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"> {
+    mobileAgentSignalId: string;
+    mobileAgentSignalType?: MetricValidationMobileAgentSignal;
+    benchmarkIds?: string[];
+    environmentIds?: string[];
+    appIds?: string[];
+    apiCatalogIds?: string[];
+    uiTraceIds?: string[];
+    taskSetIds?: string[];
+    taskComplexityGroups?: string[];
+    licenseBoundaryRefs?: string[];
+    trialCount?: number;
+}
+export interface MetricValidationPersonaAgentCheck extends SharedMetricValidationEvidence<"metricId" | "covered" | "evidenceRefs" | "artifactHash" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"> {
+    personaSignalId: string;
+    personaSignalType?: MetricValidationPersonaAgentSignal;
+    personaIds?: string[];
+    environmentIds?: string[];
+    questionSetIds?: string[];
+    modelIds?: string[];
+    providerIds?: string[];
+    questionCount?: number;
+}
+export interface MetricValidationScientificLiteratureCheck extends SharedMetricValidationEvidence<"metricId" | "covered" | "evidenceRefs" | "artifactHash" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"> {
+    scientificLiteratureSignalId: string;
+    scientificLiteratureSignalType?: MetricValidationScientificLiteratureSignal;
+    benchmarkIds?: string[];
+    taskTypes?: string[];
+    datasetIds?: string[];
+    searchBackendIds?: string[];
+    toolIds?: string[];
+    taskCount?: number;
+}
+export interface MetricValidationBioinformaticsAgentCheck extends SharedMetricValidationEvidence<"metricId" | "covered" | "evidenceRefs" | "artifactHash" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"> {
+    bioinformaticsAgentSignalId: string;
+    bioinformaticsAgentSignalType?: MetricValidationBioinformaticsAgentSignal;
+    benchmarkIds?: string[];
+    taskTypes?: string[];
+    datasetIds?: string[];
+    workflowIds?: string[];
+    toolNames?: string[];
+    perturbationIds?: string[];
+    privacyBoundaryRefs?: string[];
+    taskCount?: number;
+}
+export interface MetricValidationMirageDrugRepositioningCheck extends SharedMetricValidationEvidence<"metricId" | "covered" | "evidenceRefs" | "artifactHash" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"> {
+    mirageDrugRepositioningSignalId: string;
+    mirageDrugRepositioningSignalType?: MetricValidationMirageDrugRepositioningSignal;
+    benchmarkIds?: string[];
+    datasetIds?: string[];
+    splitIds?: string[];
+    mappingIds?: string[];
+    featureSetIds?: string[];
+    similarityMatrixIds?: string[];
+    negativeSamplingIds?: string[];
+    classifierConfigIds?: string[];
+    featureSelectionReportIds?: string[];
+    scoreCalculationIds?: string[];
+    caseStudyIds?: string[];
+    drugCount?: number;
+    diseaseCount?: number;
+    mappingCount?: number;
+    featureSetCount?: number;
+    similarityMatrixCount?: number;
+}
+export interface MetricValidationNetworkTroubleshootingCheck extends SharedMetricValidationEvidence<"metricId" | "covered" | "evidenceRefs" | "artifactHash" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"> {
+    networkTroubleshootingSignalId: string;
+    networkTroubleshootingSignalType?: MetricValidationNetworkTroubleshootingSignal;
+    benchmarkIds?: string[];
+    scenarioIds?: string[];
+    topologyTiers?: string[];
+    issueTypes?: string[];
+    agentIds?: string[];
+    toolNames?: string[];
+    incidentCount?: number;
+}
+export interface MetricValidationInferenceOptimizationCheck extends SharedMetricValidationEvidence<"metricId" | "covered" | "evidenceRefs" | "artifactHash" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"> {
+    inferenceOptimizationSignalId: string;
+    inferenceOptimizationSignalType?: MetricValidationInferenceOptimizationSignal;
+    benchmarkIds?: string[];
+    scenarioIds?: string[];
+    hardwareProfileIds?: string[];
+    backendIds?: string[];
+    searchSpaceIds?: string[];
+    gateIds?: string[];
+    agentIds?: string[];
+    runCount?: number;
+}
+export interface MetricValidationJavaCodingAgentCheck extends SharedMetricValidationEvidence<"metricId" | "covered" | "evidenceRefs" | "artifactHash" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"> {
+    javaCodingAgentSignalId: string;
+    javaCodingAgentSignalType?: MetricValidationJavaCodingAgentSignal;
+    benchmarkIds?: string[];
+    taskIds?: string[];
+    taskTypes?: string[];
+    javaProjectIds?: string[];
+    sandboxIds?: string[];
+    agentConfigIds?: string[];
+    judgeTierIds?: string[];
+    checkTypes?: string[];
+    trialCount?: number;
+}
+export interface MetricValidationWebEvalDatasetCheck extends SharedMetricValidationEvidence<"metricId" | "covered" | "evidenceRefs" | "artifactHash" | "repositoryRefs" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"> {
+    webEvalDatasetSignalId: string;
+    webEvalDatasetSignalType?: MetricValidationWebEvalDatasetSignal;
+    benchmarkIds?: string[];
+    subjectIds?: string[];
+    querySetIds?: string[];
+    searchProviderIds?: string[];
+    documentSetIds?: string[];
+    filterPolicyIds?: string[];
+    qaGenerationIds?: string[];
+    referenceAnswerSetIds?: string[];
+    datasetExportIds?: string[];
+    outputTargets?: Array<"local" | "langsmith" | "custom">;
+    questionCount?: number;
+    documentCount?: number;
+    providerDiversityCount?: number;
+    datasetFreshnessHours?: number;
+    maxFreshnessHours?: number;
+    sourceCoverage?: number;
+    answerGrounding?: number;
+}
+export interface MetricValidationParallelResearchSkillCheck extends SharedMetricValidationEvidence<"metricId" | "covered" | "evidenceRefs" | "artifactHash" | "repositoryRefs" | "licenseRefs" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"> {
+    parallelResearchSignalId: string;
+    parallelResearchSignalType?: MetricValidationParallelResearchSkillSignal;
+    skillManifestIds?: string[];
+    apiSurfaceIds?: string[];
+    searchModeIds?: string[];
+    processorTiers?: string[];
+    securityBoundaryRefs?: string[];
+    dependencyLockIds?: string[];
+    citationCoverage0to1?: number;
+    sourcePolicyCoverage0to1?: number;
+    batchTaskLimit?: number;
+    monitoringCoverage0to1?: number;
+}
+export interface MetricValidationResumeRagEvaluatorCheck extends SharedMetricValidationEvidence<"metricId" | "covered" | "evidenceRefs" | "artifactHash" | "repositoryRefs" | "licenseRefs" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"> {
+    resumeRagSignalId: string;
+    resumeRagSignalType?: MetricValidationResumeRagEvaluatorSignal;
+    resumeInputFormats?: string[];
+    ragStrategyIds?: string[];
+    queryExpansionIds?: string[];
+    retrievalKMin?: number;
+    retrievalKMax?: number;
+    vectorStoreIds?: string[];
+    ollamaModelIds?: string[];
+    embeddingModelIds?: string[];
+    evaluationEndpointIds?: string[];
+    candidateRatingScale?: string;
+    batchModeIds?: string[];
+    privacyBoundaryRefs?: string[];
+    dependencyLockIds?: string[];
+    parserCoverage0to1?: number;
+    evaluationGrounding0to1?: number;
+}
+export interface MetricValidationChipBenchmarkCheck extends SharedMetricValidationEvidence<"metricId" | "covered" | "evidenceRefs" | "artifactHash" | "repositoryRefs" | "licenseRefs" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"> {
+    chipBenchmarkSignalId: string;
+    chipBenchmarkSignalType?: MetricValidationChipBenchmarkSignal;
+    benchmarkIds?: string[];
+    hardwareProfileIds?: string[];
+    modelFamilyIds?: string[];
+    precisionModeIds?: string[];
+    environmentIds?: string[];
+    runnerScriptIds?: string[];
+    servingBackendIds?: string[];
+    datasetIds?: string[];
+    frontendDatasetIds?: string[];
+    pricingRefs?: string[];
+    regressionThresholdIds?: string[];
+    resultRowCount?: number;
+    throughputCoverage0to1?: number;
+    latencyCoverage0to1?: number;
+    costCoverage0to1?: number;
+}
+export interface MetricValidationHermesBenchCheck extends SharedMetricValidationEvidence<"metricId" | "covered" | "evidenceRefs" | "artifactHash" | "repositoryRefs" | "licenseRefs" | "branchRefs" | "commitRefs" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"> {
+    hermesBenchSignalId: string;
+    hermesBenchSignalType?: MetricValidationHermesBenchSignal;
+    treeRefs?: string[];
+    readmeBlobRefs?: string[];
+    buildSpecRefs?: string[];
+    backendTreeRefs?: string[];
+    frontendTreeRefs?: string[];
+    runnerIds?: string[];
+    judgeIds?: string[];
+    taskRegistryIds?: string[];
+    serverConfigIds?: string[];
+    adapterIds?: string[];
+    resultSchemaIds?: string[];
+    frontendComponentIds?: string[];
+    backendTestIds?: string[];
+    frontendTestIds?: string[];
+    dockerRuntimeIds?: string[];
+    taskCount?: number;
+    adapterCount?: number;
+    backendTestCount?: number;
+    frontendTestCount?: number;
+    judgeAgreement0to1?: number;
+    regressionPassRate0to1?: number;
+}
+export interface MetricValidationCooperBenchCheck extends SharedMetricValidationEvidence<"metricId" | "covered" | "evidenceRefs" | "artifactHash" | "repositoryRefs" | "licenseRefs" | "branchRefs" | "commitRefs" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"> {
+    cooperBenchSignalId: string;
+    cooperBenchSignalType?: MetricValidationCooperBenchSignal;
+    releaseRefs?: string[];
+    treeRefs?: string[];
+    readmeBlobRefs?: string[];
+    changelogRefs?: string[];
+    datasetTreeRefs?: string[];
+    datasetReadmeRefs?: string[];
+    runnerIds?: string[];
+    evalBackendIds?: string[];
+    teamHarnessIds?: string[];
+    agentAdapterIds?: string[];
+    ciWorkflowIds?: string[];
+    packageLockRefs?: string[];
+    reportPublicationRefs?: string[];
+    taskCount?: number;
+    featureCount?: number;
+    agentAdapterCount?: number;
+    testCount?: number;
+    cooperationScore0to1?: number;
+    conflictResolutionRate0to1?: number;
+    regressionPassRate0to1?: number;
+}
+export interface MetricValidationCoderCupCheck extends SharedMetricValidationEvidence<"metricId" | "covered" | "evidenceRefs" | "artifactHash" | "repositoryRefs" | "licenseRefs" | "branchRefs" | "commitRefs" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"> {
+    coderCupSignalId: string;
+    coderCupSignalType?: MetricValidationCoderCupSignal;
+    homepageRefs?: string[];
+    treeRefs?: string[];
+    readmeBlobRefs?: string[];
+    contributingRefs?: string[];
+    ciWorkflowIds?: string[];
+    packageManifestRefs?: string[];
+    packageLockRefs?: string[];
+    taskSpecRefs?: string[];
+    testSuiteRefs?: string[];
+    suiteIndexRefs?: string[];
+    runnerIds?: string[];
+    runnerContractRefs?: string[];
+    scoreLedgerRefs?: string[];
+    liveArtifactRefs?: string[];
+    methodologyRefs?: string[];
+    referenceRefs?: string[];
+    costMethodologyRefs?: string[];
+    publicFixtureRefs?: string[];
+    phaseCount?: number;
+    testPlanCount?: number;
+    runnerCount?: number;
+    scoreLedgerCount?: number;
+    liveSurfaceCount?: number;
+    interRaterAgreement0to1?: number;
+    testRetestReliability0to1?: number;
+    regressionPassRate0to1?: number;
+}
+export interface MetricValidationAgenticGraphRagCheck extends SharedMetricValidationEvidence<"metricId" | "covered" | "evidenceRefs" | "artifactHash" | "repositoryRefs" | "licenseRefs" | "branchRefs" | "commitRefs" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"> {
+    agenticGraphRagSignalId: string;
+    agenticGraphRagSignalType?: MetricValidationAgenticGraphRagSignal;
+    treeRefs?: string[];
+    readmeBlobRefs?: string[];
+    graphWorkflowIds?: string[];
+    orchestratorIds?: string[];
+    ragPipelineIds?: string[];
+    databaseIds?: string[];
+    vectorStoreIds?: string[];
+    evaluationIds?: string[];
+    experimentTrackerIds?: string[];
+    uiComponentIds?: string[];
+    dependencyLockRefs?: string[];
+    graphNodeCount?: number;
+    graphEdgeCount?: number;
+    evaluationMetricCount?: number;
+    experimentCount?: number;
+    retrievalGroundingScore0to1?: number;
+    regressionPassRate0to1?: number;
+}
+export interface MetricValidationAgentScenarioTestCheck extends SharedMetricValidationEvidence<"metricId" | "covered" | "evidenceRefs" | "artifactHash" | "repositoryRefs" | "licenseRefs" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"> {
+    agentScenarioTestSignalId: string;
+    agentScenarioTestSignalType?: MetricValidationAgentScenarioTestSignal;
+    benchmarkIds?: string[];
+    scenarioIds?: string[];
+    personaIds?: string[];
+    goalIds?: string[];
+    knowledgeSetIds?: string[];
+    toolMockIds?: string[];
+    trajectoryAssertionIds?: string[];
+    judgeIds?: string[];
+    reporterFormats?: Array<"json" | "github_actions" | "custom">;
+    agentIds?: string[];
+    comparisonIds?: string[];
+    scenarioCount?: number;
+    turnCount?: number;
+    toolCallCount?: number;
+}
+export interface MetricValidationOpenCodeLabCheck extends SharedMetricValidationEvidence<"metricId" | "covered" | "evidenceRefs" | "artifactHash" | "repositoryRefs" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"> {
+    openCodeLabSignalId: string;
+    openCodeLabSignalType?: MetricValidationOpenCodeLabSignal;
+    benchmarkIds?: string[];
+    agentContextIds?: string[];
+    promptVariantIds?: string[];
+    toolDescriptionIds?: string[];
+    policyIds?: string[];
+    runTraceIds?: string[];
+    forkIds?: string[];
+    modelIds?: string[];
+    groundTruthIds?: string[];
+    reporterFormats?: Array<"json" | "github_actions" | "markdown" | "custom">;
+    resultArtifactIds?: string[];
+    runCount?: number;
+    forkAgreement0to1?: number;
+    minForkAgreement0to1?: number;
+    modelVariance0to1?: number;
+    maxModelVariance0to1?: number;
+}
+export interface MetricValidationCcPluginEvalCheck extends SharedMetricValidationEvidence<"metricId" | "covered" | "evidenceRefs" | "artifactHash" | "repositoryRefs" | "licenseRefs" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"> {
+    ccPluginEvalSignalId: string;
+    ccPluginEvalSignalType?: MetricValidationCcPluginEvalSignal;
+    pluginManifestIds?: string[];
+    componentTypes?: MetricValidationCcPluginEvalComponentType[];
+    triggerManifestIds?: string[];
+    scenarioManifestIds?: string[];
+    scenarioTypes?: MetricValidationCcPluginEvalScenarioType[];
+    transcriptIds?: string[];
+    detectionReportIds?: string[];
+    detectionModes?: MetricValidationCcPluginEvalDetectionMode[];
+    judgeIds?: string[];
+    calibrationIds?: string[];
+    conflictReportIds?: string[];
+    checkpointStateIds?: string[];
+    costEstimateIds?: string[];
+    reporterFormats?: Array<"json" | "yaml" | "junit_xml" | "tap" | "github_actions" | "custom">;
+    resultArtifactIds?: string[];
+    triggerAccuracy0to1?: number;
+    falsePositiveRate0to1?: number;
+    falseNegativeRate0to1?: number;
+    componentCount?: number;
+    scenarioCount?: number;
+}
+export interface MetricValidationRealignSimulationCheck extends SharedMetricValidationEvidence<"metricId" | "covered" | "evidenceRefs" | "artifactHash" | "repositoryRefs" | "licenseRefs" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"> {
+    realignSimulationSignalId: string;
+    realignSimulationSignalType?: MetricValidationRealignSimulationSignal;
+    configIds?: string[];
+    appIds?: string[];
+    datasetIds?: string[];
+    scenarioIds?: string[];
+    personaIds?: string[];
+    evaluatorIds?: string[];
+    targetIds?: string[];
+    runTraceIds?: string[];
+    repeatedRunTraceIds?: string[];
+    judgeIds?: string[];
+    calibrationIds?: string[];
+    statisticsReportIds?: string[];
+    ciReporterIds?: string[];
+    reporterFormats?: Array<"json" | "junit_xml" | "github_actions" | "markdown" | "custom">;
+    experimentIds?: string[];
+    resultArtifactIds?: string[];
+    judgeAgreement0to1?: number;
+    regressionPassRate0to1?: number;
+    scenarioCount?: number;
+    evaluatorCount?: number;
+    repeatCount?: number;
+}
+export interface MetricValidationAcademiClawCheck extends SharedMetricValidationEvidence<"metricId" | "covered" | "evidenceRefs" | "artifactHash" | "repositoryRefs" | "licenseRefs" | "branchRefs" | "commitRefs" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"> {
+    academiClawSignalId: string;
+    academiClawSignalType?: MetricValidationAcademiClawSignal;
+    treeRefs?: string[];
+    readmeBlobRefs?: string[];
+    citationRefs?: string[];
+    taskCorpusRefs?: string[];
+    languageIds?: string[];
+    workspaceQueryIds?: string[];
+    dockerImageIds?: string[];
+    rubricIds?: string[];
+    evalTaskRunnerIds?: string[];
+    resultManifestIds?: string[];
+    conversationTraceIds?: string[];
+    metaEvalIds?: string[];
+    modelIds?: string[];
+    ciReporterIds?: string[];
+    reporterFormats?: Array<"json" | "github_actions" | "markdown" | "custom">;
+    taskCount?: number;
+    languageCount?: number;
+    rubricCount?: number;
+    traceCount?: number;
+    metaEvalCount?: number;
+    modelCount?: number;
+    regressionPassRate0to1?: number;
+}
+export interface MetricValidationRagChunkingTechniqueCheck extends SharedMetricValidationEvidence<"metricId" | "covered" | "evidenceRefs" | "artifactHash" | "repositoryRefs" | "licenseRefs" | "branchRefs" | "commitRefs" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"> {
+    ragChunkingTechniqueSignalId: string;
+    ragChunkingTechniqueSignalType?: MetricValidationRagChunkingTechniqueSignal;
+    treeRefs?: string[];
+    readmeBlobRefs?: string[];
+    policyCorpusRefs?: string[];
+    notebookIds?: string[];
+    chunkingStrategyIds?: string[];
+    retrievalPipelineIds?: string[];
+    embeddingVectorstoreIds?: string[];
+    evaluationDatasetIds?: string[];
+    ciReporterIds?: string[];
+    reporterFormats?: Array<"json" | "github_actions" | "markdown" | "custom">;
+    policyDocumentCount?: number;
+    notebookCount?: number;
+    chunkingStrategyCount?: number;
+    evaluationQuestionCount?: number;
+    metricCount?: number;
+    regressionPassRate0to1?: number;
+}
+export interface MetricValidationKubernetesOperationalAgentCheck extends SharedMetricValidationEvidence<"metricId" | "covered" | "evidenceRefs" | "artifactHash" | "repositoryRefs" | "licenseRefs" | "branchRefs" | "commitRefs" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"> {
+    kubernetesOperationalAgentSignalId: string;
+    kubernetesOperationalAgentSignalType?: MetricValidationKubernetesOperationalAgentSignal;
+    releaseRefs?: string[];
+    treeRefs?: string[];
+    readmeBlobRefs?: string[];
+    buildWorkflowRefs?: string[];
+    agentModuleRefs?: string[];
+    mcpServerModuleRefs?: string[];
+    toolModuleRefs?: string[];
+    toolCategoryIds?: string[];
+    diagnosticCapabilityIds?: string[];
+    resourceMetricIds?: string[];
+    logAnalysisIds?: string[];
+    ciReporterIds?: string[];
+    reporterFormats?: Array<"json" | "github_actions" | "junit_xml" | "markdown" | "custom">;
+    toolCategoryCount?: number;
+    diagnosticCapabilityCount?: number;
+    resourceMetricCount?: number;
+    logAnalysisCount?: number;
+    regressionPassRate0to1?: number;
+}
+export interface MetricValidationSecureVibeBenchCheck extends SharedMetricValidationEvidence<"metricId" | "covered" | "evidenceRefs" | "artifactHash" | "repositoryRefs" | "licenseRefs" | "branchRefs" | "commitRefs" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"> {
+    secureVibeBenchSignalId: string;
+    secureVibeBenchSignalType?: MetricValidationSecureVibeBenchSignal;
+    homepageRefs?: string[];
+    arxivRefs?: string[];
+    treeRefs?: string[];
+    readmeBlobRefs?: string[];
+    resultsBlobRefs?: string[];
+    datasetRefs?: string[];
+    formatExampleRefs?: string[];
+    evaluationRunnerRefs?: string[];
+    agentAdapterIds?: string[];
+    vulnerabilityScenarioIds?: string[];
+    testScriptIds?: string[];
+    parserUtilityRefs?: string[];
+    patchDiffUtilityRefs?: string[];
+    ciReporterIds?: string[];
+    reporterFormats?: Array<"json" | "github_actions" | "markdown" | "custom">;
+    agentAdapterCount?: number;
+    scenarioCount?: number;
+    testScriptCount?: number;
+    regressionPassRate0to1?: number;
+}
+export interface MetricValidationRavigBenchCheck extends SharedMetricValidationEvidence<"metricId" | "covered" | "evidenceRefs" | "artifactHash" | "repositoryRefs" | "licenseRefs" | "branchRefs" | "commitRefs" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"> {
+    ravigBenchSignalId: string;
+    ravigBenchSignalType?: MetricValidationRavigBenchSignal;
+    treeRefs?: string[];
+    readmeBlobRefs?: string[];
+    legalBlobRefs?: string[];
+    environmentRefs?: string[];
+    configurationRefs?: string[];
+    contentEvaluationRefs?: string[];
+    designEvaluationRefs?: string[];
+    executionEvaluationRefs?: string[];
+    functionScoringRefs?: string[];
+    datasetRefs?: string[];
+    testCaseRefs?: string[];
+    modelResultRefs?: string[];
+    taxonomyIds?: string[];
+    retrievalContextIds?: string[];
+    multiModalEvaluatorIds?: string[];
+    screenshotEvaluationRefs?: string[];
+    runScriptRefs?: string[];
+    ciReporterIds?: string[];
+    reporterFormats?: Array<"json" | "github_actions" | "junit_xml" | "markdown" | "custom">;
+    datasetCaseCount?: number;
+    visualDesignCheckCount?: number;
+    evaluatorCount?: number;
+    validationPassRate0to1?: number;
+}
+export interface MetricValidationHumanStudyBenchCheck extends SharedMetricValidationEvidence<"metricId" | "covered" | "evidenceRefs" | "artifactHash" | "repositoryRefs" | "licenseRefs" | "branchRefs" | "commitRefs" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"> {
+    humanStudyBenchSignalId: string;
+    humanStudyBenchSignalType?: MetricValidationHumanStudyBenchSignal;
+    studyConfigIds?: string[];
+    backgroundDatasetIds?: string[];
+    humanResponseDatasetIds?: string[];
+    agentResponseDatasetIds?: string[];
+    evaluatorIds?: string[];
+    validatorIds?: string[];
+    scorerIds?: string[];
+    standardizerIds?: string[];
+    reliabilityReportIds?: string[];
+    validationPipelineIds?: string[];
+    resultArtifactIds?: string[];
+    ciReporterIds?: string[];
+    reporterFormats?: Array<"json" | "pytest" | "github_actions" | "custom">;
+    studyCount?: number;
+    participantCount?: number;
+    responseCount?: number;
+    evaluatorCount?: number;
+    interRaterAgreement0to1?: number;
+    testRetestReliability0to1?: number;
+    validationPassRate0to1?: number;
+}
+export interface MetricValidationLegacyBenchCheck extends SharedMetricValidationEvidence<"metricId" | "covered" | "evidenceRefs" | "artifactHash" | "repositoryRefs" | "licenseRefs" | "branchRefs" | "commitRefs" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"> {
+    legacyBenchSignalId: string;
+    legacyBenchSignalType?: MetricValidationLegacyBenchSignal;
+    treeRefs?: string[];
+    readmeBlobRefs?: string[];
+    taskCorpusRefs?: string[];
+    legacyLanguageIds?: string[];
+    environmentIds?: string[];
+    harnessRunnerIds?: string[];
+    agentTaskIds?: string[];
+    patchSubmissionIds?: string[];
+    testOracleIds?: string[];
+    evaluatorIds?: string[];
+    ciReporterIds?: string[];
+    reporterFormats?: Array<"json" | "junit_xml" | "github_actions" | "markdown" | "custom">;
+    resultArtifactIds?: string[];
+    replayCommandIds?: string[];
+    taskCount?: number;
+    languageCount?: number;
+    environmentCount?: number;
+    testOracleCount?: number;
+    evaluatorCount?: number;
+    regressionPassRate0to1?: number;
+    replayPassRate0to1?: number;
+}
+export interface MetricValidationSubtleMemoryCheck extends SharedMetricValidationEvidence<"metricId" | "covered" | "evidenceRefs" | "artifactHash" | "repositoryRefs" | "licenseRefs" | "branchRefs" | "commitRefs" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"> {
+    subtleMemorySignalId: string;
+    subtleMemorySignalType?: MetricValidationSubtleMemorySignal;
+    treeRefs?: string[];
+    arxivRefs?: string[];
+    datasetRefs?: string[];
+    personaIds?: string[];
+    benchInstanceManifestIds?: string[];
+    historySessionManifestIds?: string[];
+    relationTypes?: string[];
+    constructionPipelineIds?: string[];
+    evaluationStageIds?: string[];
+    adapterIds?: string[];
+    judgeIds?: string[];
+    evaluatorIds?: string[];
+    scoreSummaryIds?: string[];
+    diagnosticProtocolIds?: string[];
+    ciReporterIds?: string[];
+    reporterFormats?: string[];
+    personaCount?: number;
+    benchInstanceCount?: number;
+    historyCount?: number;
+    memoryVariantSetCount?: number;
+    relationTypeCount?: number;
+    evaluationStageCount?: number;
+    adapterCount?: number;
+    judgeAgreement0to1?: number;
+    validationPassRate0to1?: number;
+}
+export interface MetricValidationThresholdPolicy {
+    minSampleSize: number;
+    minConstructValidity: number;
+    minCounterfactualResponsiveness: number;
+    minValidationFacetCoverage: number;
+    minConfounderControlCoverage: number;
+    minOutcomeAlignment: number;
+    minProcessEvidenceCoverage: number;
+    minSafetyUtilityCoverage: number;
+    minModalityTransformationCoverage: number;
+    minLifecycleObservabilityCoverage: number;
+    minRankingStabilityCoverage: number;
+    minToolSandboxCoverage: number;
+    minContinualLearningCoverage: number;
+    minStrategicInteractionCoverage: number;
+    minArchitectureRealityCoverage: number;
+    minRagPipelineCoverage: number;
+    minRagEvaluationPipelineCoverage: number;
+    minRagasNotebookCoverage: number;
+    minMirageRagMetricCoverage: number;
+    minLegalCodeRagCoverage: number;
+    minGuardbenchMetricCoverage: number;
+    minBusinessWorkflowCoverage: number;
+    minDataAgentAnalyticalCoverage: number;
+    minEmbodiedAgentCoverage: number;
+    minEvaluatorSuiteCoverage: number;
+    minPentestBenchmarkCoverage: number;
+    minTraceEvaluationCoverage: number;
+    minLivingEnvironmentCoverage: number;
+    minMobileAgentCoverage: number;
+    minPersonaAgentCoverage: number;
+    minScientificLiteratureCoverage: number;
+    minBioinformaticsAgentCoverage: number;
+    minMirageDrugRepositioningCoverage: number;
+    minNetworkTroubleshootingCoverage: number;
+    minInferenceOptimizationCoverage: number;
+    minJavaCodingAgentCoverage: number;
+    minWebEvalDatasetCoverage: number;
+    minParallelResearchSkillCoverage: number;
+    minResumeRagEvaluatorCoverage: number;
+    minChipBenchmarkCoverage: number;
+    minHermesBenchCoverage: number;
+    minHermesBenchTaskCount: number;
+    minHermesBenchAdapterCount: number;
+    minHermesBenchBackendTestCount: number;
+    minHermesBenchFrontendTestCount: number;
+    minHermesBenchJudgeAgreement0to1: number;
+    minHermesBenchRegressionPassRate0to1: number;
+    minCooperBenchCoverage: number;
+    minCooperBenchTaskCount: number;
+    minCooperBenchFeatureCount: number;
+    minCooperBenchAgentAdapterCount: number;
+    minCooperBenchTestCount: number;
+    minCooperBenchCooperationScore0to1: number;
+    minCooperBenchConflictResolutionRate0to1: number;
+    minCooperBenchRegressionPassRate0to1: number;
+    minCoderCupCoverage: number;
+    minCoderCupPhaseCount: number;
+    minCoderCupTestPlanCount: number;
+    minCoderCupRunnerCount: number;
+    minCoderCupScoreLedgerCount: number;
+    minCoderCupLiveSurfaceCount: number;
+    minCoderCupInterRaterAgreement0to1: number;
+    minCoderCupTestRetestReliability0to1: number;
+    minCoderCupRegressionPassRate0to1: number;
+    minAgenticGraphRagCoverage: number;
+    minAgenticGraphRagGraphNodeCount: number;
+    minAgenticGraphRagEvaluationMetricCount: number;
+    minAgenticGraphRagExperimentCount: number;
+    minAgenticGraphRagRetrievalGroundingScore0to1: number;
+    minAgenticGraphRagRegressionPassRate0to1: number;
+    minAgentScenarioTestCoverage: number;
+    minOpenCodeLabCoverage: number;
+    minCcPluginEvalCoverage: number;
+    minCcPluginEvalTriggerAccuracy0to1: number;
+    maxCcPluginEvalFalsePositiveRate0to1: number;
+    maxCcPluginEvalFalseNegativeRate0to1: number;
+    minRealignSimulationCoverage: number;
+    minRealignSimulationJudgeAgreement0to1: number;
+    minRealignSimulationRegressionPassRate0to1: number;
+    minAcademiClawCoverage: number;
+    minAcademiClawTaskCount: number;
+    minAcademiClawLanguageCount: number;
+    minAcademiClawRubricCount: number;
+    minAcademiClawTraceCount: number;
+    minAcademiClawMetaEvalCount: number;
+    minAcademiClawModelCount: number;
+    minAcademiClawRegressionPassRate0to1: number;
+    minRagChunkingTechniqueCoverage: number;
+    minRagChunkingTechniquePolicyDocumentCount: number;
+    minRagChunkingTechniqueNotebookCount: number;
+    minRagChunkingTechniqueChunkingStrategyCount: number;
+    minRagChunkingTechniqueEvaluationQuestionCount: number;
+    minRagChunkingTechniqueMetricCount: number;
+    minRagChunkingTechniqueRegressionPassRate0to1: number;
+    minKubernetesOperationalAgentCoverage: number;
+    minKubernetesOperationalAgentToolCategoryCount: number;
+    minKubernetesOperationalAgentDiagnosticCapabilityCount: number;
+    minKubernetesOperationalAgentResourceMetricCount: number;
+    minKubernetesOperationalAgentLogAnalysisCount: number;
+    minKubernetesOperationalAgentRegressionPassRate0to1: number;
+    minSecureVibeBenchCoverage: number;
+    minSecureVibeBenchAgentAdapterCount: number;
+    minSecureVibeBenchScenarioCount: number;
+    minSecureVibeBenchTestScriptCount: number;
+    minSecureVibeBenchRegressionPassRate0to1: number;
+    minRavigBenchCoverage: number;
+    minRavigBenchDatasetCaseCount: number;
+    minRavigBenchVisualDesignCheckCount: number;
+    minRavigBenchEvaluatorCount: number;
+    minRavigBenchValidationPassRate0to1: number;
+    minHumanStudyBenchCoverage: number;
+    minHumanStudyBenchInterRaterAgreement0to1: number;
+    minHumanStudyBenchTestRetestReliability0to1: number;
+    minHumanStudyBenchValidationPassRate0to1: number;
+    minLegacyBenchCoverage: number;
+    minLegacyBenchLanguageCount: number;
+    minLegacyBenchRegressionPassRate0to1: number;
+    minLegacyBenchReplayPassRate0to1: number;
+    minSubtleMemoryCoverage: number;
+    minSubtleMemoryPersonaCount: number;
+    minSubtleMemoryBenchInstanceCount: number;
+    minSubtleMemoryMemoryVariantSetCount: number;
+    minSubtleMemoryRelationTypeCount: number;
+    minSubtleMemoryEvaluationStageCount: number;
+    minSubtleMemoryAdapterCount: number;
+    minSubtleMemoryJudgeAgreement0to1: number;
+    minSubtleMemoryValidationPassRate0to1: number;
+    maxConfidenceIntervalWidth: number;
+}
+export declare function buildMetricValidationReport(input: BuildMetricValidationInput, priorReports?: DiagnosticReport[], thresholds?: MetricValidationThresholdPolicy): MetricValidationReport;

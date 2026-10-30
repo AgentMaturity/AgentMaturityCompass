@@ -192,7 +192,7 @@ export class NativeMcpHttpTransport implements Transport {
     });
     this.inner.onmessage = message => {
       if (this.closing) return;
-      if ("method" in message && message.method === "notifications/tools/list_changed") this.catalogChanged = true;
+      if ("method" in message && (message.method === "notifications/tools/list_changed" || message.method === "notifications/resources/list_changed")) this.catalogChanged = true;
       if ("method" in message && ++this.notifications > NATIVE_MCP_HTTP_LIMITS.notifications) {
         this.refuse(new NativeMcpHttpRefused("MCP HTTP server-message limit exceeded; review and mount again.", "BOUND_EXCEEDED")); return;
       }
@@ -665,7 +665,7 @@ export class NativeMcpHttpTransport implements Transport {
             // Servers never send requests in 2026-07-28 (MRTR replaces them); notifications here are request-scoped.
             if ((message as Rpc).id !== undefined) throw new NativeMcpHttpRefused("MCP server sent a request on a response stream; it was refused.", "PROTOCOL_ERROR");
             if (++this.notifications > NATIVE_MCP_HTTP_LIMITS.notifications) throw new NativeMcpHttpRefused("MCP HTTP server-message limit exceeded; review and mount again.", "BOUND_EXCEEDED");
-            if (method === "notifications/tools/list_changed") this.catalogChanged = true;
+            if (method === "notifications/tools/list_changed" || method === "notifications/resources/list_changed") this.catalogChanged = true;
             continue;
           }
           const response = statelessResponse(frame.data, id);

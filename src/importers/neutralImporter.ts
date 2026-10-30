@@ -22,8 +22,10 @@ import { neutralExternalEvidenceProfiles } from "./externalEvidenceExport.js";
 import { buildImportedDiagnosticReport, renderImportedReportMarkdown, normalizedImportBody, type NeutralImportProjection } from "./neutralImportPresentation.js";
 import { parseDetectedDshSession, sanitizeDshSession, dshSessionTraces, dshSessionWarnings, type ParsedDshSession } from "./dshSessionImport.js";
 import { SourceFormatError } from "./sourceFormatError.js";
+import { parseVersionedHarnessImport } from "./versionedHarnessImport.js";
+import { sanitizeDshSessionV4, dshSessionTracesV4, dshSessionWarningsV4, type ParsedDshSessionV4 } from "./dshSessionImportV4.js";
+import { parseDetectedCurrentPiTelemetry, currentPiTelemetryWarnings, currentPiTelemetryTraces, type ParsedCurrentPiTelemetry } from "./piTelemetryCurrent.js";
 import { ORIGINAL_NOT_RETAINED_LOSS, oversizedImportReason, readImportSource, retainImportOriginals, type ImportOriginalRef } from "./importOriginals.js";
-
 export const neutralImportCategorySchema = z.enum([
   "trace-jsonl",
   "event-log",
@@ -49,8 +51,8 @@ export interface NeutralImportCandidate {
   confidence: number;
   summary: string;
   redactionCount: number;
-  /** Set when a versioned source format was recognised (Pi v3 sessions today). */
-  sourceFormat?: PiSessionFormat | ParsedCallbackTelemetry["format"] | ParsedDshSession["format"];
+  /** Set when a recognised source has an explicit versioned mapping contract. */
+  sourceFormat?: PiSessionFormat | ParsedCallbackTelemetry["format"] | ParsedDshSession["format"] | ParsedDshSessionV4["format"] | ParsedCurrentPiTelemetry["format"];
 }
 
 export interface NeutralImportUnsupported {
@@ -503,17 +505,12 @@ function parseCandidates(input: { workspace: string; inputPath: string; agentId?
   const agentId = normalizeAgentId(input.agentId ?? "default");
   const sourcePath = resolve(input.inputPath);
   const parsedCandidates: ParsedCandidate[] = [];
-  const unsupported: NeutralImportUnsupported[] = [];
-  const warnings: string[] = [];
-
+  const unsupported: NeutralImportUnsupported[] = [], warnings: string[] = [];
   const files = scanFiles(sourcePath);
   if (files.length >= MAX_SCAN_FILES) warnings.push(`The scan reached its ${MAX_SCAN_FILES}-file limit. Additional files may be unexamined; split the source into smaller imports for complete coverage.`);
   for (const file of files) {
-    if (/\.jsonl\.(?:zstd|zst)$/i.test(file)) {
-      unsupported.push({ path: file, kind: "unsupported-format", reason: "Compressed session logs require a plaintext current-version export from the source runtime. AMC does not decompress or migrate DSH logs implicitly." });
-      continue;
-    }
-    const format = fileFormat(file);
+    const compressedDsh = /\.jsonl\.(?:zstd|zst)$/i.test(file);
+    const format = compressedDsh ? "jsonl" : fileFormat(file);
     if (!format) {
       unsupported.push({ path: file, kind: "unsupported-format", reason: "Add JSON, JSONL, YAML, or NDJSON files for AMC to import this artifact." });
       continue;
@@ -521,28 +518,31 @@ function parseCandidates(input: { workspace: string; inputPath: string; agentId?
     const read = readImportSource(file, format, MAX_FILE_BYTES);
     if (!("raw" in read)) { unsupported.push({ path: file, ...read }); continue; }
     const raw = read.raw;
-    const text = raw.toString("utf8");
-    let piSession: ParsedPiSession | null = null;
-    let dshSession: ParsedDshSession | null = null;
+    let text: string;
+    let piSession: ParsedPiSession | null = null, dshSession: ParsedDshSession | null = null;
+    let dshV4: ParsedDshSessionV4 | null = null, currentPi: ParsedCurrentPiTelemetry | null = null;
     let callbackTelemetry: ParsedCallbackTelemetry | null = null;
     let parsed: unknown;
     try {
-      dshSession = format === "jsonl" ? parseDetectedDshSession(text) : null;
-      piSession = !dshSession && format === "jsonl" ? parseDetectedPiSession(text) : null;
-      if (!dshSession && !piSession && raw.byteLength > MAX_FILE_BYTES) { unsupported.push({ path: file, kind: "oversized", reason: oversizedImportReason(MAX_FILE_BYTES) }); continue; }
-      callbackTelemetry = format === "json" ? parseDetectedCallbackTelemetry(text) : null;
-      parsed = dshSession ? dshSession.rows : piSession ? piSession.rows : callbackTelemetry ? callbackTelemetry.document : parseFile(text, format);
+      ({ text, dshV4, currentPi } = parseVersionedHarnessImport(raw, format, compressedDsh));
+      dshSession = !dshV4 && format === "jsonl" ? parseDetectedDshSession(text) : null;
+      piSession = !dshV4 && !dshSession && format === "jsonl" ? parseDetectedPiSession(text) : null;
+      if (!dshV4 && !dshSession && !piSession && raw.byteLength > MAX_FILE_BYTES) { unsupported.push({ path: file, kind: "oversized", reason: oversizedImportReason(MAX_FILE_BYTES) }); continue; }
+      callbackTelemetry = !currentPi && format === "json" ? parseDetectedCallbackTelemetry(text) : null;
+      parsed = dshV4 ? dshV4.rows : currentPi ? currentPi.document : dshSession ? dshSession.rows : piSession ? piSession.rows : callbackTelemetry ? callbackTelemetry.document : parseFile(text, format);
     } catch (error) {
       unsupported.push({ path: file, digest: sha256Hex(raw), format, kind: "malformed", reason: error instanceof SourceFormatError ? error.message
         : `Could not parse ${format.toUpperCase()}. Inspect the source locally for malformed records or an unsupported version; parser excerpts are omitted to protect source values.` });
       continue;
     }
-    const category = dshSession || piSession || callbackTelemetry ? "event-log" : detectCategory(file, format, parsed);
+    const category = dshV4 || currentPi || dshSession || piSession || callbackTelemetry ? "event-log" : detectCategory(file, format, parsed);
     if (!category) {
       unsupported.push({ path: file, digest: sha256Hex(raw), format, kind: "unsupported-shape", reason: "Unsupported shape. Add traces, event logs, run artifacts, workflow graphs, configs, memory stores, evaluator outputs, or benchmark results." });
       continue;
     }
     const redacted = redactDeep(parsed);
+    if (dshV4) redacted.value = (dshV4 = sanitizeDshSessionV4(dshV4, redacted.value as unknown[], (value) => redactString(value).value)).rows;
+    if (currentPi) currentPi = parseDetectedCurrentPiTelemetry(JSON.stringify(redacted.value))!;
     if (dshSession) {
       dshSession = sanitizeDshSession(dshSession, redacted.value as unknown[], (value) => redactString(value).value);
       redacted.value = dshSession.rows;
@@ -553,13 +553,15 @@ function parseCandidates(input: { workspace: string; inputPath: string; agentId?
     }
     if (callbackTelemetry) callbackTelemetry = parseCallbackTelemetry(redacted.value);
     const redactedTraceLines = Array.isArray(redacted.value) ? redacted.value.map((row) => JSON.stringify(row)).join("\n") : "";
-    const amcTraces = dshSession || piSession || callbackTelemetry ? [] : amcTracesFromText(file, redactedTraceLines);
-    const traces = dshSession ? dshSessionTraces(dshSession, { agentId, source: sourceRelative(sourcePath, file) }) : callbackTelemetry ? callbackTelemetryTraces(callbackTelemetry, agentId) : piSession
+    const amcTraces = dshV4 || currentPi || dshSession || piSession || callbackTelemetry ? [] : amcTracesFromText(file, redactedTraceLines);
+    const traces = dshV4 ? dshSessionTracesV4(dshV4, { agentId, source: sourceRelative(sourcePath, file) }) : currentPi ? currentPiTelemetryTraces(currentPi, agentId) : dshSession ? dshSessionTraces(dshSession, { agentId, source: sourceRelative(sourcePath, file) }) : callbackTelemetry ? callbackTelemetryTraces(callbackTelemetry, agentId) : piSession
       ? piSessionTraces(redacted.value as unknown[], piSession.format, { agentId, source: sourceRelative(sourcePath, file) })
       : amcTraces.length > 0
         ? amcTraces
         : tracesFromCandidate(category, redacted.value, agentId, sourceRelative(sourcePath, file));
     if (piSession) warnings.push(...piSessionWarnings(piSession, sourceRelative(sourcePath, file)));
+    if (dshV4) warnings.push(...dshSessionWarningsV4(dshV4));
+    if (currentPi) warnings.push(...currentPiTelemetryWarnings(currentPi));
     if (dshSession) warnings.push(...dshSessionWarnings(dshSession));
     if (callbackTelemetry) warnings.push(...callbackTelemetryWarnings(callbackTelemetry));
     const collaborationTelemetry = collaborationTelemetryFromCandidate(redacted.value, agentId, sourceRelative(sourcePath, file));
@@ -573,11 +575,11 @@ function parseCandidates(input: { workspace: string; inputPath: string; agentId?
         bytes: raw.byteLength,
         recordCount: count,
         confidence: 0.9,
-        summary: dshSession ? `DSH v2: ${dshSession.format.eventCount} events, ${dshSession.format.inheritedEventCount} inherited; SELF_REPORTED, not evaluated.` : callbackTelemetry ? `${callbackTelemetry.format.spanCount} callback spans; SELF_REPORTED, not evaluated; ${callbackTelemetry.format.pendingSpans} unresolved outcomes.` : piSession
+        summary: dshV4 ? `DSH v4: ${dshV4.format.eventCount} events, ${dshV4.format.inheritedEventCount} inherited; SELF_REPORTED, not evaluated.` : currentPi ? `${currentPi.format.spanCount} current Pi callback spans; SELF_REPORTED, not evaluated.` : dshSession ? `DSH v2: ${dshSession.format.eventCount} events, ${dshSession.format.inheritedEventCount} inherited; SELF_REPORTED, not evaluated.` : callbackTelemetry ? `${callbackTelemetry.format.spanCount} callback spans; SELF_REPORTED, not evaluated; ${callbackTelemetry.format.pendingSpans} unresolved outcomes.` : piSession
           ? piSessionSummary(piSession.format, traces.filter((trace) => "error" in trace && trace.error === true).length)
           : categorySummary(category, count),
         redactionCount: redacted.count,
-        ...(dshSession ? { sourceFormat: dshSession.format } : piSession ? { sourceFormat: piSession.format } : callbackTelemetry ? { sourceFormat: callbackTelemetry.format } : {})
+        ...(dshV4 ? { sourceFormat: dshV4.format } : currentPi ? { sourceFormat: currentPi.format } : dshSession ? { sourceFormat: dshSession.format } : piSession ? { sourceFormat: piSession.format } : callbackTelemetry ? { sourceFormat: callbackTelemetry.format } : {})
       },
       redacted: redacted.value,
       sourceLineNumbers: format === "jsonl" ? parsedJsonlLineNumbers(text) : undefined,
@@ -587,7 +589,6 @@ function parseCandidates(input: { workspace: string; inputPath: string; agentId?
       evidenceRefs: [`import:${sourceRelative(sourcePath, file)}:${sha256Hex(raw).slice(0, 12)}`], raw
     });
   }
-
   if (unsupported.length > 0 && parsedCandidates.length > 0) {
     warnings.push(`${unsupported.length} file(s) were skipped because they were unsupported or malformed.`);
   }
@@ -597,7 +598,6 @@ function parseCandidates(input: { workspace: string; inputPath: string; agentId?
   if (parsedCandidates.some((candidate) => candidate.collaborationTelemetry.length > 0)) {
     warnings.push("Collaboration records were mapped to telemetry-only runtime events; no hidden coordination runtime was created.");
   }
-
   const importSeed = canonicalize({
     sourcePath,
     agentId,

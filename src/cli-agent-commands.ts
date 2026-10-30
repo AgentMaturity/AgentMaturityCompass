@@ -1,3 +1,4 @@
+import { showSkillCatalogSelection } from "./cli/skillCatalogOptions.js";
 import { randomUUID } from "node:crypto";
 import { hostname } from "node:os";
 /**
@@ -40,7 +41,7 @@ import {
 } from "./agent/stubProvider.js";
 import type { LoopNotification } from "./agent/loopTypes.js";
 import { echoToolSeam } from "./agent/echoTool.js";
-import { WEB_SEARCH_SEARXNG_HELP, resolveBreadthRun, withBreadthRunOptions } from "./cli/agentLoopBreadthOptions.js";
+import { VALIDATION_REPAIR_HELP, WEB_SEARCH_SEARXNG_HELP, resolveBreadthRun, withBreadthRunOptions } from "./cli/agentLoopBreadthOptions.js";
 import { agentToolset, type AgentToolset } from "./agent/agentToolset.js";
 import { runLease } from "./leases/runLease.js";
 import { selectSupportedNativeTools } from "./agent/nativeToolCapabilities.js";
@@ -133,7 +134,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--agent <id>", "agent identity; defaults to AMC_AGENT_ID, the current agent, then default")
     .description("Interactive native tasks over the existing governed run/resume path for the selected agent")
     .option("--validation-config <path>", "operator JSON containing named public checks")
-    .option("--validation-config-sha256 <digest>", "pin exact reviewed validation config bytes")
+    .option("--validation-config-sha256 <digest>", "pin exact reviewed validation config bytes").option("--validation-repair <json>", VALIDATION_REPAIR_HELP)
     .option("--validate <id>", "run this public check after each completed turn; repeat to select more", collectOption)
     .option("--extension <manifest>", "load this signed native extension; repeat for multiple manifests", collectOption)
     .option("--extension-pin <sha256>", "exact reviewed digest for each extension in the same order", collectOption)
@@ -239,6 +240,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--steer <text>", "send a steering message mid-turn")
     .option("--steer-after <ms>", "when to send --steer (default 0)")
     .option("--persona <text>", "deployment persona assembled into the system prompt")
+    .option("--mission-context", "include the agent's validated mission and constraints as attributed runtime context")
     .option(
       "--approve-tools <actionClass>",
       "require a signed human approval before every tool call, decided under this action class"
@@ -250,7 +252,9 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       "ADR-5 exception note (JSON) that auto-allows the classes it names until it expires"
     )
     .option("--json", "Output as JSON")
+    .option("--list-skills [name]", "list skill discovery, sources and digests; pass a name to inspect its literal body")
     .action(async (promptParts: string[], opts: RunOptions, command: Command) => {
+      if (showSkillCatalogSelection(opts, io)) return;
       const agentId = resolveAgentId(process.cwd(), selectedAgentOption(command));
       let validation: ReturnType<typeof resolveNativeValidationSelection>;
       try { validation = resolveNativeValidationSelection(opts); }
@@ -532,7 +536,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           `tool writes are scoped to: ${
             toolset.readiness.writeScope.length > 0 ? toolset.readiness.writeScope.join(", ") : "(nothing)"
           }`
-        ));
+        )); progress(chalk.dim(`action policy: ${toolset.readiness.actionPolicy}`));
         if (!toolset.readiness.confined) {
           // A warning, not a refusal: an unconfined fs.read is still governed
           // by the allowlist and the firewall. Code Mode is the part that
@@ -626,7 +630,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
             const mount = await mountNativeMcpServer({ server, workspace: process.cwd(), agentId,
               toolset: workspaceToolset, ...review, signal: mcpAbort.signal });
             mcpMounts.push(mount);
-            progress(`Mounted reviewed MCP tools for this run: ${mount.toolNames.join(", ")}. Signed allowlist, approval gate and budgets remain in force.`);
+            (await import("./setup/nativeInteractiveMcp.js")).reportNativeInteractiveMcpMount(mount, progress);
           }
         }
         let previewRequest: string | null = null;
@@ -656,6 +660,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           // CLAUDE.md in as runtime context. A hardcoded string here — what this
           // command sent before P3.3 — was an agent with no idea where it was.
           promptProfile: {
+            ...(opts.missionContext === true ? { missionContext: true } : {}),
             ...((opts.persona ?? preset?.persona) === undefined
               ? {}
               : { persona: (opts.persona ?? preset?.persona) as string }),

@@ -3301,7 +3301,7 @@ export interface DiagnosticReport {
   dualityCompliance?: {
     executeWithValidTicket: number;
     executeAttempted: number;
-    ratio: number;
+    ratio: number | null;
   };
   toolHubUsage?: {
     toolActionCount: number;
@@ -3629,8 +3629,10 @@ export interface CasebookRunCaseResult {
   title: string;
   baselineSuccess: boolean;
   candidateSuccess: boolean;
-  baselineValuePoints: number;
-  candidateValuePoints: number;
+  baselineValuePoints: number | null;
+  candidateValuePoints: number | null;
+  baselineSuccessPoints?: number | null;
+  candidateSuccessPoints?: number | null;
   /** Measured tokens (not currency); null when the case's usage is not attributable or incomplete. */
   baselineCost: number | null;
   candidateCost: number | null;
@@ -3653,12 +3655,27 @@ interface ExperimentSideIdentity {
   configDigest: string | null;
 }
 
+export interface ExperimentExecution {
+  method: "native-trials/1";
+  /** Holdout partition of the casebook's cases; only its validation (held-out) split is executed and judged. */
+  partitionDigest: string;
+  evaluatedSplit: "validation";
+  caseIds: string[];
+  /** The executor runs each case's task; the judge (casebook validators) alone holds the rubric and expected evidence. */
+  executor: { identity: string };
+  judge: { identity: string };
+  limits: { maxExecutions: number; trialTimeoutMs: number; concurrency: number };
+  executions: Array<{ side: "baseline" | "candidate"; trialId: string; caseId: string; outcome: "completed" | "unavailable"; reason: string | null; durationMs: number }>;
+}
+
 export interface ExperimentReport {
   /** 2 for evidence-bound reports; absent on legacy reports, which stay readable but never promotion-eligible. */
   schemaVersion?: 2;
   methodVersion?: string;
   /** sha256 over the signed casebook index and case files the report was computed from. */
   casebookSha256?: string;
+  /** Advisory lint of agent-facing case prompts (e.g. measurement language); recorded, never a refusal. */
+  inputWarnings?: string[];
   candidateConfigDigest?: string | null;
   baseline?: ExperimentSideIdentity;
   candidate?: ExperimentSideIdentity;
@@ -3666,6 +3683,12 @@ export interface ExperimentReport {
   pairing?: "paired-cases";
   counts?: { cases: number; pairedCases: number; excludedCases: number; baselineSuccesses: number; candidateSuccesses: number };
   costUnit?: "tokens";
+  /** Absolute case-value points on a 0..100 scale; success rates remain fractions. */
+  valueUnit?: "points";
+  /** Recorded at execution time and covered by the report seal. Absent on legacy reports. */
+  warnings?: string[];
+  /** Present when AMC executed the trials itself (GAP-WP04): the held-out cases run, both role identities and each execution. */
+  execution?: ExperimentExecution;
   experimentId: string;
   agentId: string;
   ts: number;

@@ -30,6 +30,9 @@ import type { ActionClass } from "../types.js";
 
 /** The most nodes a single plan may contain. */
 export const MAX_PLAN_NODES = 64;
+/** Root is depth 1. Bounds apply while reading, before recursion or serialization. */
+export const MAX_PLAN_DEPTH = 16;
+export const MAX_PLAN_BYTES = 256 * 1024;
 
 export type WorkflowNode =
   | {
@@ -46,12 +49,6 @@ export type ParsedPlan =
   | { readonly ok: true; readonly plan: WorkflowNode }
   | { readonly ok: false; readonly reason: string };
 
-function countNodes(node: WorkflowNode): number {
-  if (node.kind === "agent") return 1;
-  const children = node.kind === "parallel" ? node.children : node.stages;
-  return 1 + children.reduce((total, child) => total + countNodes(child), 0);
-}
-
 /** How many delegations this plan would spawn. Knowable before any of them run. */
 export function planAgentCount(node: WorkflowNode): number {
   if (node.kind === "agent") return 1;
@@ -59,24 +56,58 @@ export function planAgentCount(node: WorkflowNode): number {
   return children.reduce((total, child) => total + planAgentCount(child), 0);
 }
 
-function parseNode(raw: unknown, seen: Set<string>): ParsedPlan {
+interface ParseBudget {
+  readonly ids: Set<string>;
+  nodes: number;
+  bytes: number;
+}
+
+const byteRefusal = (): ParsedPlan => ({ ok: false, reason: `workflow plan exceeds its ${MAX_PLAN_BYTES} byte budget` });
+const nodeRefusal = (): ParsedPlan => ({ ok: false, reason: `workflow plan exceeds the ${MAX_PLAN_NODES} nodes a single plan may contain` });
+
+/** Conservative JSON byte budget for consumed fields; unused metadata is ignored, never serialized. */
+function consumeString(budget: ParseBudget, value: string): boolean {
+  if (value.length > MAX_PLAN_BYTES - budget.bytes) return false;
+  budget.bytes += Buffer.byteLength(value, "utf8") + 3;
+  if (budget.bytes > MAX_PLAN_BYTES) return false;
+  for (const char of value) {
+    const code = char.charCodeAt(0);
+    if (code < 32 || char === '"' || char === "\\") budget.bytes += 5;
+    else if (char.length === 1 && code >= 0xd800 && code <= 0xdfff) budget.bytes += 3;
+    if (budget.bytes > MAX_PLAN_BYTES) return false;
+  }
+  return true;
+}
+
+function parseNode(raw: unknown, budget: ParseBudget, depth: number): ParsedPlan {
+  if (depth > MAX_PLAN_DEPTH) return { ok: false, reason: `workflow plan exceeds depth ${MAX_PLAN_DEPTH}` };
+  if (budget.nodes >= MAX_PLAN_NODES) return nodeRefusal();
   if (raw === null || typeof raw !== "object" || Array.isArray(raw)) {
     return { ok: false, reason: "a workflow node must be an object" };
   }
+  budget.nodes += 1;
+  budget.bytes += 64; // Covers consumed property names, array separators and object punctuation.
+  if (budget.bytes > MAX_PLAN_BYTES) return byteRefusal();
   const node = raw as Record<string, unknown>;
-  const id = typeof node["id"] === "string" ? node["id"].trim() : "";
+  const rawId = node["id"];
+  if (typeof rawId === "string" && !consumeString(budget, rawId)) return byteRefusal();
+  const id = typeof rawId === "string" ? rawId.trim() : "";
   if (id.length === 0) return { ok: false, reason: "every workflow node needs a non-empty id" };
-  if (seen.has(id)) {
+  if (budget.ids.has(id)) {
     // Outputs are keyed by node id. A duplicate would silently overwrite one
     // agent's answer with another's, and the plan would still report success.
     return { ok: false, reason: `duplicate workflow node id ${JSON.stringify(id)}` };
   }
-  seen.add(id);
+  budget.ids.add(id);
 
   const kind = node["kind"];
+  if (typeof kind === "string" && !consumeString(budget, kind)) return byteRefusal();
   if (kind === "agent") {
-    const runAs = typeof node["runAs"] === "string" ? node["runAs"].trim() : "";
-    const goal = typeof node["goal"] === "string" ? node["goal"].trim() : "";
+    const rawRunAs = node["runAs"], rawGoal = node["goal"];
+    if ((typeof rawRunAs === "string" && !consumeString(budget, rawRunAs))
+      || (typeof rawGoal === "string" && !consumeString(budget, rawGoal))) return byteRefusal();
+    const runAs = typeof rawRunAs === "string" ? rawRunAs.trim() : "";
+    const goal = typeof rawGoal === "string" ? rawGoal.trim() : "";
     if (runAs.length === 0) return { ok: false, reason: `node ${id}: runAs must be a non-empty string` };
     if (goal.length === 0) {
       return { ok: false, reason: `node ${id}: goal must be a non-empty string; a delegate sees none of this plan` };
@@ -86,8 +117,13 @@ function parseNode(raw: unknown, seen: Set<string>): ParsedPlan {
       // A flat type check, never String(): String() on a nested array recurses through join with no depth cap, so one
       // deeply nested scope would throw RangeError on every read of the plan (A4 readiness, workflowTool).
       const rawScope = node["scope"];
-      if (!Array.isArray(rawScope) || !rawScope.every((entry) => typeof entry === "string")) {
+      if (!Array.isArray(rawScope)) {
         return { ok: false, reason: `node ${id}: scope must be an array of strings` };
+      }
+      if (rawScope.length > MAX_PLAN_BYTES - budget.bytes) return byteRefusal();
+      for (const entry of rawScope) {
+        if (typeof entry !== "string") return { ok: false, reason: `node ${id}: scope must be an array of strings` };
+        if (!consumeString(budget, entry)) return byteRefusal();
       }
       const parsed = parseDelegationScope(rawScope);
       if (!parsed.ok) return { ok: false, reason: `node ${id}: ${parsed.reason}` };
@@ -105,9 +141,10 @@ function parseNode(raw: unknown, seen: Set<string>): ParsedPlan {
       // workflow that did nothing.
       return { ok: false, reason: `node ${id}: a ${kind} with no ${key} would run nothing and report success` };
     }
+    if (raws.length > MAX_PLAN_NODES - budget.nodes) return nodeRefusal();
     const parsedChildren: WorkflowNode[] = [];
     for (const child of raws) {
-      const parsed = parseNode(child, seen);
+      const parsed = parseNode(child, budget, depth + 1);
       if (!parsed.ok) return parsed;
       parsedChildren.push(parsed.plan);
     }
@@ -118,7 +155,7 @@ function parseNode(raw: unknown, seen: Set<string>): ParsedPlan {
 
   return {
     ok: false,
-    reason: `node ${id}: unknown kind ${JSON.stringify(kind)}; expected agent, parallel or pipeline`
+    reason: `node ${id}: unknown kind ${typeof kind === "string" ? JSON.stringify(kind.slice(0, 100)) : typeof kind}; expected agent, parallel or pipeline`
   };
 }
 
@@ -131,14 +168,9 @@ function parseNode(raw: unknown, seen: Set<string>): ParsedPlan {
  * the only point at which nothing has been spent yet.
  */
 export function parseWorkflowPlan(raw: unknown): ParsedPlan {
-  const parsed = parseNode(raw, new Set<string>());
-  if (!parsed.ok) return parsed;
-  const nodes = countNodes(parsed.plan);
-  if (nodes > MAX_PLAN_NODES) {
-    return {
-      ok: false,
-      reason: `workflow plan has ${nodes} nodes, more than the ${MAX_PLAN_NODES} a single plan may contain`
-    };
+  try {
+    return parseNode(raw, { ids: new Set<string>(), nodes: 0, bytes: 0 }, 1);
+  } catch {
+    return { ok: false, reason: "workflow plan could not be read safely" };
   }
-  return parsed;
 }

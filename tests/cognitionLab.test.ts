@@ -334,7 +334,9 @@ describe("experiment comparison", () => {
     }
     const other = createLabExperiment({ kind: "trace_memory", name: "Other", description: "D", modelId: "m1" }, workspace);
     simulateExperiment(other.experimentId, workspace);
-    expect(compareExperiments(exp1.experimentId, other.experimentId, workspace)).toEqual([]);
+    const unmatched = compareExperiments(exp1.experimentId, other.experimentId, workspace);
+    expect(unmatched).toHaveLength(exp1.probes.length + other.probes.length);
+    expect(unmatched.every((pair) => pair.status !== "matched" && Object.keys(pair.deltas).length === 0)).toBe(true);
   });
 
   test("comparison handles no matching probes", () => {
@@ -350,22 +352,20 @@ describe("experiment comparison", () => {
     simulateExperiment(exp2.experimentId);
 
     const pairs = compareExperiments(exp1.experimentId, exp2.experimentId);
-    expect(pairs.length).toBe(0);
+    expect(pairs.map((pair) => [pair.probeId, pair.status])).toEqual([["p1", "missing_candidate"], ["p2", "missing_baseline"]]);
   });
 
-  test("identifies significant dimension changes", () => {
+  test("labels simulated comparisons as descriptive single samples", () => {
     const exp1 = createLabExperiment({ kind: "self_knowledge", name: "A", description: "D", modelId: "model-a" });
     const exp2 = createLabExperiment({ kind: "self_knowledge", name: "B", description: "D", modelId: "model-b" });
     simulateExperiment(exp1.experimentId);
     simulateExperiment(exp2.experimentId);
 
     const pairs = compareExperiments(exp1.experimentId, exp2.experimentId);
-    // With different model IDs, scores will differ, so some dimensions should be significant
-    const anySignificant = pairs.some((p) => p.significantDimensions.length > 0);
-    // This depends on the deterministic hash; just verify structure
     expect(pairs.length).toBe(4);
     for (const p of pairs) {
-      expect(Array.isArray(p.significantDimensions)).toBe(true);
+      expect(p.comparisonMode).toBe("single_sample");
+      expect(p.significantDimensions).toEqual([]);
     }
   });
 });
@@ -576,11 +576,11 @@ describe("reset", () => {
 
 
 test.each([
-  { label: "positive threshold", baseline: 0, candidate: 0.05, delta: 0.05, significant: false },
-  { label: "negative threshold", baseline: 0.05, candidate: 0, delta: -0.05, significant: false },
-  { label: "positive above threshold", baseline: 0, candidate: 0.0501, delta: 0.0501, significant: true },
-  { label: "negative above threshold", baseline: 0.0501, candidate: 0, delta: -0.0501, significant: true },
-])("compares explicit fixture scores at the $label without UUID-derived simulation", ({ baseline, candidate, delta, significant }) => {
+  { label: "positive threshold", baseline: 0, candidate: 0.05, delta: 0.05 },
+  { label: "negative threshold", baseline: 0.05, candidate: 0, delta: -0.05 },
+  { label: "positive above threshold", baseline: 0, candidate: 0.0501, delta: 0.0501 },
+  { label: "negative above threshold", baseline: 0.0501, candidate: 0, delta: -0.0501 },
+])("compares explicit fixture scores at the $label without UUID-derived simulation", ({ baseline, candidate, delta }) => {
   const baselineExperiment = createLabExperiment({ kind: "custom", name: "Boundary baseline", description: "Explicit score fixture", modelId: "fixture", probes: [] });
   const candidateExperiment = createLabExperiment({ kind: "custom", name: "Boundary candidate", description: "Explicit score fixture", modelId: "fixture", probes: [] });
   for (const [experimentId, score] of [
@@ -606,5 +606,6 @@ test.each([
   expect(pair.baselineScores).toEqual({ fixtureDimension: baseline });
   expect(pair.candidateScores).toEqual({ fixtureDimension: candidate });
   expect(pair.deltas).toEqual({ fixtureDimension: delta });
-  expect(pair.significantDimensions).toEqual(significant ? ["fixtureDimension"] : []);
+  expect(pair.comparisonMode).toBe("single_sample");
+  expect(pair.significantDimensions).toEqual([]);
 });

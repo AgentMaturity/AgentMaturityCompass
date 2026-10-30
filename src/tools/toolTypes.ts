@@ -177,6 +177,14 @@ export class DefiniteFailureError extends Error {
 
 export type ToolBody = (execution: ToolExecution) => Promise<ToolBodyResult> | ToolBodyResult;
 
+/** One entered step owns conditional admission until its disposer runs. */
+export interface ToolStepContext {
+  readonly agentId: string;
+  readonly turn: number;
+  readonly step: number;
+  readonly signal: AbortSignal;
+}
+
 export interface ToolDefinition {
   readonly name: string;
   readonly actionClass: ActionClass;
@@ -191,6 +199,16 @@ export interface ToolDefinition {
    * a deliberate way to register a tool that only other code dispatches.
    */
   readonly parameters?: Record<string, unknown>;
+  /**
+   * Presentation and invocation route, always subordinate to scope restrictions and guards.
+   * Direct and deferred tools may run on either route; deferred schemas need explicit activation before offering.
+   * Model-only tools run only at the top level; code-only tools run only as nested program calls.
+   * Hidden tools are neither advertised nor callable through either modeled route.
+   * An omitted exposure preserves ordinary programmatic dispatch, including tools with no published schema.
+   */
+  readonly exposure?: "direct" | "deferred" | "model-only" | "code-only" | "hidden";
+  /** Sampled once per step. Only an explicit true admits this registration for that step. */
+  readonly available?: (step: ToolStepContext) => boolean | Promise<boolean>;
   readonly body: ToolBody;
 }
 
