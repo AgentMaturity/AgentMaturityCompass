@@ -1,0 +1,19 @@
+{
+  "schema": "p125-next-window-private-author-review/1",
+  "blockers": [],
+  "oneLiteralNewBody": true,
+  "oldTwoCheckpointBodiesByteExact": true,
+  "bothGrantBodiesAndFileUnchanged": true,
+  "allPreferredCodeExactlyOneFinalNewline": true,
+  "defaultDigestAndExactlyOneReplyRulePreserved": true,
+  "singleSignerListenerWorkspaceRetained": true,
+  "realOwnedAppendSealAndSignedLoaderConfig": true,
+  "allReaderRowsGatheredBeforeAssertions": true,
+  "firstWindowWitnessLine": 445,
+  "firstDefaultToleranceWitnessLine": 452,
+  "zeroToleranceLoopLine": 458,
+  "sourceAllocatedMaterializedOrWritten": false,
+  "candidateImportedParsedCompiledOrExecuted": false,
+  "runtimePortabilityDeadlineAndControlFeasibilityUnproven": true,
+  "rootAndIndependentFullStaticReviewRequired": true
+}

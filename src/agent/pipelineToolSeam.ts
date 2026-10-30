@@ -1,5 +1,5 @@
 import type { ToolSchema } from "../llm/request/requestSpec.js";
-import type { ToolPipeline } from "../tools/toolPipeline.js";
+import { EXCLUSIVE_CLASSES, type ToolPipeline } from "../tools/toolPipeline.js";
 import type { ToolRegistry } from "../tools/toolRegistry.js";
 import type { ToolOutcome as PipelineOutcome } from "../tools/toolTypes.js";
 import type { AgentToolSeam, ToolCallOutcome, ToolCallRequest } from "./toolSeam.js";
@@ -20,21 +20,20 @@ import type { AgentToolSeam, ToolCallOutcome, ToolCallRequest } from "./toolSeam
  * there is nothing to reshape here, only to connect.
  */
 
-/**
- * Classes whose calls must not overlap.
- *
- * A read can run beside anything. Two writes to the same workspace in the same
- * step cannot: the model does not know they are concurrent, read-before-edit
- * would see one of them land between another's check and its write, and the
- * resulting file is neither of the edits the model asked for.
- */
-const EXCLUSIVE_CLASSES = new Set(["WRITE_LOW", "WRITE_HIGH", "DEPLOY", "SECURITY", "FINANCIAL", "IDENTITY"]);
-
 export interface PipelineToolSeamInit {
   readonly registry: ToolRegistry;
   readonly pipeline: ToolPipeline;
   readonly agentId: string;
 }
+
+/**
+ * What an unknown outcome's content starts with, before the tool's output: said to the model, so it does not retry on its
+ * own an effect that may already have happened. The redacting session sets exactly these aside (P2-02).
+ */
+export const OUTCOME_UNKNOWN_NOTICES = Object.freeze([
+  "[amc] outcome unknown: the action may have taken effect. It is not retried automatically. ",
+  "[amc] outcome unknown: the action may have taken effect. It is not retried automatically; it stays unreconciled. "
+] as const);
 
 /**
  * Map a pipeline outcome onto the loop's four independent facts.
@@ -47,11 +46,11 @@ function toLoopOutcome(outcome: PipelineOutcome, aborted: boolean): ToolCallOutc
   if (state === undefined ? aborted : state === "cancelled") {
     return { outcome: "CANCELLED", content: "", exitCode: null, timedOut: false, denied: false };
   }
-  if (outcome.denied === null && (state === "outcome_unknown" || state === "started")) {
+  if (outcome.denied === null && (state === "outcome_unknown" || state === "started"
+    || (state === undefined && outcome.effect === "unknown"))) {
     return {
       outcome: "TOOL_OUTCOME_UNKNOWN",
-      // Said to the model, so it does not retry on its own an effect that may already have happened.
-      content: `[amc] outcome unknown: the action may have taken effect. It is not retried automatically; it stays unreconciled. ${outcome.output}`,
+      content: `${OUTCOME_UNKNOWN_NOTICES[state === undefined ? 0 : 1]}${outcome.output}`,
       exitCode: outcome.exitCode,
       timedOut: outcome.timedOut,
       denied: false
@@ -88,6 +87,9 @@ function parseArguments(rawArguments: string): Record<string, unknown> {
 
 export function pipelineToolSeam(init: PipelineToolSeamInit): AgentToolSeam {
   return {
+    supportsEffectGuard: true,
+    prepareStep: context => init.registry.prepareStep({ ...context, agentId: init.agentId }),
+
     authorizationIntent(request: ToolCallRequest) {
       let args: Record<string, unknown>;
       try {
@@ -95,7 +97,7 @@ export function pipelineToolSeam(init: PipelineToolSeamInit): AgentToolSeam {
       } catch {
         return null; // `execute` answers unparseable arguments with an ERROR; there is nothing to approve.
       }
-      return init.pipeline.authorizationIntent({ name: request.toolName, agentId: init.agentId, arguments: args, requestedMode: "EXECUTE" });
+      return init.pipeline.authorizationIntent({ name: request.toolName, agentId: init.agentId, arguments: args, requestedMode: "EXECUTE", parentToken: request.parentToken });
     },
 
     bindApprovalGate(gate) {
@@ -103,7 +105,7 @@ export function pipelineToolSeam(init: PipelineToolSeamInit): AgentToolSeam {
     },
 
     schemas(): readonly ToolSchema[] | null {
-      const visible = [...init.registry.visible(init.agentId).values()];
+      const visible = [...init.registry.offered(init.agentId).values()];
       const offered = visible
         // A tool with no published schema cannot be called correctly, so it is
         // omitted rather than advertised uncallably. Registering without one is
@@ -111,6 +113,7 @@ export function pipelineToolSeam(init: PipelineToolSeamInit): AgentToolSeam {
         .filter((tool) => tool.parameters !== undefined)
         .map((tool): ToolSchema => ({
           name: tool.name,
+          ...(tool.modelAlias === undefined ? {} : { modelAlias: tool.modelAlias }),
           description: tool.description,
           parameters: tool.parameters as Record<string, unknown>
         }));
@@ -157,6 +160,7 @@ export function pipelineToolSeam(init: PipelineToolSeamInit): AgentToolSeam {
           callId: request.callId,
           parentToken: request.parentToken,
           signal: request.signal,
+          ...(request.beforeEffect === undefined ? {} : { beforeEffect: request.beforeEffect }),
           ...(request.authority === undefined ? {} : { authority: request.authority })
         });
         return toLoopOutcome(outcome, request.signal.aborted);

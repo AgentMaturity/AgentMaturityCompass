@@ -1,0 +1,14 @@
+{
+  "at": "2026-10-16T22:08:31.315232+00:00",
+  "sourceCommit": "a0cfbc280f2b11207205541ba89112c125c29895",
+  "actualPriorReport": {
+    "path": "/private/tmp/p1-25-client-qualification-20261017/after-metadata-full.json",
+    "bytes": 247902,
+    "sha256": "5279fd99df8c6cf6052cd16f7dac47ed481d2207ea367b6637e881945caa9edb"
+  },
+  "findings": 2720,
+  "duplicates": 1268,
+  "actualGateExitsRemainOne": true,
+  "reuseBoundary": "The previous metadata quality run measured the exact working bytes later committed asa0; only a clean local branch changed since. This references actual prior source/metadata evidence without a new scanner invocation or claiming an immutable-source run. New source delta and later checks must still be measured.",
+  "baselineWaiverOrScannerChange": false
+}

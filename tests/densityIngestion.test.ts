@@ -8,6 +8,19 @@ const ROOT = join(__dirname, "..");
 // ─── Density Map ───
 
 describe("densityMap", () => {
+  it("uses population coverage variance at the dimensional-clustering threshold", () => {
+    const report = buildDensityMap([
+      { questionId: "a1", dimension: "A", count: 0 },
+      { questionId: "a2", dimension: "A", count: 0 },
+      { questionId: "b1", dimension: "B", count: 1 },
+      { questionId: "b2", dimension: "B", count: 0 },
+    ], 4);
+    // Coverage ratios [0, 0.5] have population variance 0.0625, below 0.1.
+    // Sample variance 0.125 would incorrectly declare dimensional clustering.
+    expect(report.clusterPattern).toBe("random");
+    expect(report.overallCoverage).toBe(0.25);
+  });
+
   it("full coverage scores 100", () => {
     const records = [
       { questionId: "AMC-1.1", dimension: "Strategic Ops", count: 5 },

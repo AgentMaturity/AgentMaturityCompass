@@ -1,0 +1,16 @@
+{
+  "schema": "p125pc-original-packet-copy-readonly-order-diagnosis/1",
+  "at": "2026-10-17T02:07:17.434062+00:00",
+  "failedOperation": "Root private snapshot preparation, before Git batch or destination creation.",
+  "pathlibCount": 2378,
+  "gitCount": 2378,
+  "sameUniquePathSet": true,
+  "firstOrderDifference": {
+    "index": 10,
+    "pathlibSorted": "qualification/2026-10-17-P1-25/commands/p125-counts/command.json",
+    "gitOrder": "qualification/2026-10-17-P1-25/commands/p125-counts-d15/command.json"
+  },
+  "destinationAbsent": true,
+  "reason": "Path sorts by path components; Git ls-tree uses repository name order. Exact path-set equality, followed by a single shared lexicographic relative-name order for requests/copies, is the valid invariant. No payload changed.",
+  "noProductRetryOrSourceMutation": true
+}

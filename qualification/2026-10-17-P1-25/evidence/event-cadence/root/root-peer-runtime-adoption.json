@@ -1,0 +1,17 @@
+{
+  "at": "2026-10-17T01:15:22.240527+00:00",
+  "independentRuntimeReview": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-control-runtime-review/review.json",
+    "bytes": 6817,
+    "sha256": "50e62439cf933124580654d910db988859de02a055995cb1b086611fb87a4619"
+  },
+  "independentSeal": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-control-runtime-review/seal.json",
+    "bytes": 1919,
+    "sha256": "91431201e47aa54c261f121849298486b6cc026364d194cdb0a90e68b9aa900e"
+  },
+  "rootReadFullReport": true,
+  "actualSixPhaseEvidenceAndManualMasksAlreadyRootReviewed": true,
+  "noCryptoOrStreamRereadCreditFromPeer": true,
+  "receiptAssemblyPublicationStillPending": true
+}

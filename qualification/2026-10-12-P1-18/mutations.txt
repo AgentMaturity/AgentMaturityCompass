@@ -1,0 +1,19 @@
+Mutation checks for P1-18, run on 2026-10-12 in the P1-18 worktree (local macOS arm64, Node 22, not CI).
+Each guard was disabled in place, the named test file run, and the file restored from a byte copy (diff -q confirmed).
+Mutations 1 and 2 are the spec's: the host rule and the litigation rule; each lets its negative fixture pass, so its test fails.
+Mutation 3 disables the review gate (a control citing an unreviewed entry reporting an approved review).
+
+## Mutation 1: host rule disabled in validateRegister (src/catalog/register.ts)
+     × reviewed-secondary-host.json fails with CAT_REGISTER_HOST 4ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  1 failed | 17 passed (18)
+## Mutation 2: litigation rule disabled in validateRegister (src/catalog/register.ts)
+     × us-ca-without-litigation-flag.json fails with CAT_REGISTER_LITIGATION 4ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  1 failed | 17 passed (18)
+## Mutation 3: review gate disabled in checkRegisterCitations (src/catalog/validate.ts)
+     × never reports an approved review for a control citing an entry that awaits a legal reviewer 4ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  1 failed | 6 passed (7)
+## Restored: both files
+      Tests  25 passed (25)

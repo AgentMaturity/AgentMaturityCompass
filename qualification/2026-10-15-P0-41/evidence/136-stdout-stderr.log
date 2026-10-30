@@ -1,0 +1,17 @@
+| Metric | Current | Source | Next gate target (g0) |
+| --- | --- | --- | --- |
+| Critical gaps open | 7 open (G1, G2, G3, G4, G5, G6, G7) | HEAD:docs/program/gaps.json; AMC Strategic Plan — Gaps, Competitors &amp; Regulated-Industry Packs; What's missing; doc df2f49d2-c861-4a27-b368-e7f35526b7c1; tab 7ac61d95-002a; block mg4sf4j6wvz.66975; document revision 132; extracted 2026-10-09 by Claude to scratchpad/plan/strategy-gaps-and-metrics.md; original artifact https://claude.ai/artifact/UZUAqpS3bmo2b5dxKz1E72. Historical source findings, not refreshed verdicts.; declared closures require qualification path and merged SHA; merge/signatures not verified | 2 |
+| Release cadence | not measured (source pending: P0-39, P1-41) | source pending: P0-39, P1-41 | 1.2.0 published |
+| Surfaces labelling claim kinds | not measured (source pending: P0-22, P0-23) | source pending: P0-22, P0-23 | 5 of 5 |
+| OSes with a contained shell (others refused) | not measured (source pending: P0-06, P1-05, P2-14) | source pending: P0-06, P1-05, P2-14 | 1 |
+| Catalog controls with executed tests | not measured (source pending: P1-09, P2-10, P2-27) | source pending: P1-09, P2-10, P2-27 | 0 |
+| False mandatory passes on normative fixtures | not measured (source pending: P1-06, P1-19) | source pending: P1-06, P1-19 | Not measured |
+| Controls with expert sign-off | not measured (source pending: D-08, D-14) | source pending: D-08, D-14 | 0 |
+| Benchmark tasks run | not measured (source pending: P1-47, P2-20) | source pending: P1-47, P2-20 | 0 |
+| Developers reaching a verified action in 15 minutes | not measured (source pending: P1-49) | source pending: P1-49 | Not measured |
+| Reviewer reconstruction time against baseline | not measured (source pending: P1-29, P2-03, P2-05) | source pending: P1-29, P2-03, P2-05 | No baseline |
+| Design partners | not measured (source pending: P1-29, P1-21, P2-03, P2-05, P3-01) | source pending: P1-29, P1-21, P2-03, P2-05, P3-01 | 0 |
+| Independently built verifiers passing the fixtures | not measured (source pending: P1-06, P3-03) | source pending: P1-06, P3-03 | 0 |
+| Independent assessors qualified | not measured (source pending: P2-21, P3-04) | source pending: P2-21, P3-04 | 0 |
+| Regulator, sandbox or insurer references | not measured (source pending: P3-05, P3-06) | source pending: P3-05, P3-06 | 0 |
+| A4 projects taken Aspire → Activate with bound approvals from two distinct users | not measured (source pending: P1-62, P2-39) | source pending: P1-62, P2-39 | Not measured |

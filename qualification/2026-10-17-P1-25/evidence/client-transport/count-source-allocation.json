@@ -1,0 +1,24 @@
+{
+  "schema": "p125c-root-count-admission/1",
+  "at": "2026-10-16T21:44:47.705356+00:00",
+  "scope": [
+    "README.md",
+    "CONTRIBUTING.md",
+    "website/index.html",
+    "website/lite.html",
+    "website/i18n.js",
+    "docs/content/show-hn-draft.md",
+    "docs/content/reddit-launch-drafts.md",
+    "docs/internal/competitive-landscape.md",
+    "docs/internal/mirofish-simulation-council.md",
+    "whitepaper/AMC_WHITEPAPER_v1.md"
+  ],
+  "numericSpans": 15,
+  "proposalSha256": "3aa53ddffba4f8aeb85ab66db101084e5750b564f950d01b75c5e6cbd35cfa53",
+  "hostedAdmissionSha256": "7f42fc44b91918af7dfeaece6f697501c29793954a117117631d53ad85b21990",
+  "currentFreeze": true,
+  "d15": "none",
+  "allOtherAuthoredBytesMustRemainExact": true,
+  "privateOriginalsRemainPrivate": true,
+  "holdsRetained": true
+}

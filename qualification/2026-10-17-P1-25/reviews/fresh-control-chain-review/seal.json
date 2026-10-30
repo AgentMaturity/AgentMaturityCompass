@@ -1,0 +1,58 @@
+{
+  "schema": "p125-fresh-control-chain-review-seal/1",
+  "at": "2026-10-16T19:05:28.499793+00:00",
+  "blockers": [],
+  "inputCount": 152,
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/fresh-control-chain-review/review.json",
+      "bytes": 15325,
+      "sha256": "a2b5a03d22d82713f66418680bffa4da14d77d3bf3e94c46c457ad2980491678",
+      "physicalPath": "/private/tmp/p1-25-time-qualification-20261016/fresh-control-chain-review/review.json",
+      "dev": 16777231,
+      "inode": 543131723,
+      "nlink": 1,
+      "regular": true
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/fresh-control-chain-review/README.md",
+      "bytes": 2484,
+      "sha256": "37ee03e0e1106dfa953956f4847d053316fd72d001ea348f9092ce9735d4d107",
+      "physicalPath": "/private/tmp/p1-25-time-qualification-20261016/fresh-control-chain-review/README.md",
+      "dev": 16777231,
+      "inode": 543131726,
+      "nlink": 1,
+      "regular": true
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/fresh-control-chain-review/identities.json",
+      "bytes": 17718,
+      "sha256": "8204e6b570cbf02be1930e1574e8a2aa44d57ab4e431e3884f48fb503d741559",
+      "physicalPath": "/private/tmp/p1-25-time-qualification-20261016/fresh-control-chain-review/identities.json",
+      "dev": 16777231,
+      "inode": 543131724,
+      "nlink": 1,
+      "regular": true
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/fresh-control-chain-review/current-binding-observations.json",
+      "bytes": 49636,
+      "sha256": "a84506bb666a335b5f8cbefcff7ad6bc91031c5e12eb7fdf2934cbf27d4ab248",
+      "physicalPath": "/private/tmp/p1-25-time-qualification-20261016/fresh-control-chain-review/current-binding-observations.json",
+      "dev": 16777231,
+      "inode": 543131725,
+      "nlink": 1,
+      "regular": true
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/fresh-control-chain-review/pins.json",
+      "bytes": 67654,
+      "sha256": "c389936f4c157c236a5bdc49033791e4496b7e507a5120d3da4332d664e2378d",
+      "physicalPath": "/private/tmp/p1-25-time-qualification-20261016/fresh-control-chain-review/pins.json",
+      "dev": 16777231,
+      "inode": 543131727,
+      "nlink": 1,
+      "regular": true
+    }
+  ]
+}

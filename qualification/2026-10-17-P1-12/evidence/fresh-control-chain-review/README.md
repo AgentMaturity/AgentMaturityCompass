@@ -1,0 +1,7 @@
+The actual fresh canonical run and all three exact-restored runs passed the same 35 cases across three files. Visibility control produced 34 passes and one failure; lease and principal controls each produced 33 passes and two failures. Every run has three passing hook entries and values, exact raw/observer joins, natural owned-group closure and no observed unhandled or late diagnostic.
+
+Actual first assertion lines are 80, 118/135 and 127/137. Lease assertions 119/137 and principal assertion 128 are masked in their respective RED bodies. Restored GREEN separately verifies full bodies. The live patches match the three once-only recipes, all original backups and restores are byte exact, and manual root classifications bind the actual outcome hashes.
+
+Current hashes match 59 selected S/Q paths, 88 protected inputs, eight compiled preservation pairs, five distinct native identities and the borrowed R runner. Root records clean S/Q/index and preserved held R state. File checks are finite snapshots; no continuous isolation is claimed.
+
+These are helper controls on supplied derived fields. They do not prove genuine authority, signed receipts, amount thresholds, destination effects or the full specification mutation suite. All full-issue gaps, P1-07 closure, held decisions, Claude work and unwaived quality RED remain explicit. No product execution or checkout/index/QA write occurred during this review.

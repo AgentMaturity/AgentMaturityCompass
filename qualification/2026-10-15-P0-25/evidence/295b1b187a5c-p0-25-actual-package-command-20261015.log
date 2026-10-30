@@ -1,0 +1,4413 @@
+
+> agent-maturity-compass@1.2.0 check:citations
+> node scripts/check-citations.mjs --json
+
+{
+  "ok": true,
+  "errors": 0,
+  "ratcheted": 623,
+  "baseline": 623,
+  "rules": {
+    "CIT001": {
+      "name": "superseded-as-live",
+      "zeroTolerance": true,
+      "findings": 0,
+      "zeroToleranceFindings": 0,
+      "baseline": 0
+    },
+    "CIT002": {
+      "name": "framework-id",
+      "zeroTolerance": false,
+      "findings": 3,
+      "zeroToleranceFindings": 0,
+      "baseline": 3
+    },
+    "CIT003": {
+      "name": "pack-reference",
+      "zeroTolerance": true,
+      "findings": 0,
+      "zeroToleranceFindings": 0,
+      "baseline": 0
+    },
+    "CIT004": {
+      "name": "record-incomplete",
+      "zeroTolerance": false,
+      "findings": 620,
+      "zeroToleranceFindings": 0,
+      "baseline": 620
+    },
+    "CIT005": {
+      "name": "status-type",
+      "zeroTolerance": true,
+      "findings": 0,
+      "zeroToleranceFindings": 0,
+      "baseline": 0
+    }
+  },
+  "baselineProblems": [],
+  "overBaseline": [],
+  "belowBaseline": [],
+  "findings": [
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack farm-to-fork question ENV-FF-5",
+      "message": "\"EU Regulation (EU) 1169/2011 Art. 21, Annex II\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack farm-to-fork question ENV-FF-9",
+      "message": "\"FDA FSMA 21 CFR §117\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack farm-to-fork question ENV-FF-9",
+      "message": "\"FDA FSMA §204 Food Traceability Rule\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack weave-to-wear question ENV-WW-2",
+      "message": "\"EU ESPR Art. 8 — Digital Product Passport\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack weave-to-wear question ENV-WW-4",
+      "message": "\"ILO Convention C029 Art. 2\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack weave-to-wear question ENV-WW-4",
+      "message": "\"ILO Convention C182 Art. 3\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack weave-to-wear question ENV-WW-5",
+      "message": "\"EU Green Claims Directive (proposed) Art. 3\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack weave-to-wear question ENV-WW-9",
+      "message": "\"EU CS3D 2024/1760 Art. 10\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack weave-to-wear question ENV-WW-9",
+      "message": "\"EU Forced Labour Reg 2024/3015 Art. 3\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack weave-to-wear question ENV-WW-10",
+      "message": "\"ILO Convention C138 Arts. 2–3\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack weave-to-wear question ENV-WW-11",
+      "message": "\"OECD DDG Garment & Footwear Sector §III\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack weave-to-wear question ENV-WW-13",
+      "message": "\"EU Regulation 2024/1781 Arts. 5 & 8\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack material-to-machines question ENV-MM-5",
+      "message": "\"EU Conflict Minerals Regulation 2017/821 Art. 4\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack material-to-machines question ENV-MM-9",
+      "message": "\"IEC 62443-3-3\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack material-to-machines question ENV-MM-9",
+      "message": "\"EU Machinery Reg 2023/1230 Art. 16\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack material-to-machines question ENV-MM-10",
+      "message": "\"Annex III (EHSR)\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack material-to-machines question ENV-MM-11",
+      "message": "\"IEC 62443-3-3 SR 1.1\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack source-to-sustenance question ENV-SS-3",
+      "message": "\"PEFC ST 2002:2020\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack source-to-sustenance question ENV-SS-4",
+      "message": "\"UNFCCC Decision 1/CP.16 Appendix I — Cancun Safeguards\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack source-to-sustenance question ENV-SS-5",
+      "message": "\"IPBES NCP Framework — Habitat Connectivity Assessment\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack source-to-sustenance question ENV-SS-7",
+      "message": "\"EU EIA Directive 2011/92/EU Art. 5\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack source-to-sustenance question ENV-SS-8",
+      "message": "\"EU IAS Regulation 1143/2014 Art. 5\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack source-to-sustenance question ENV-SS-8",
+      "message": "\"CBD COP Decision VI/23\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack source-to-sustenance question ENV-SS-9",
+      "message": "\"GBF Target 13\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack source-to-sustenance question ENV-SS-10",
+      "message": "\"CBD Art. 8(j)\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack source-to-sustenance question ENV-SS-11",
+      "message": "\"EU IUU Reg 1005/2008 Art. 12\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack source-to-sustenance question ENV-SS-13",
+      "message": "\"FAO Code of Conduct Art. 7.2\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack source-to-sustenance question ENV-SS-14",
+      "message": "\"EU Biodiversity Strategy 2030 — Target 4\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack ubiquity-to-utility question ENV-UU-8",
+      "message": "\"IEC 62933-5-2 — Safety requirements for grid-connected EES systems\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack ubiquity-to-utility question ENV-UU-9",
+      "message": "\"FERC Order No. 901\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack ubiquity-to-utility question ENV-UU-11",
+      "message": "\"IEC 62351-8\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack ubiquity-to-utility question ENV-UU-12",
+      "message": "\"IEC 61850\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack ubiquity-to-utility question ENV-UU-15",
+      "message": "\"FERC Order No. 901\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack sip-to-sanitation question ENV-STS-1",
+      "message": "\"WHO DWQ Guidelines Ch. 8\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack sip-to-sanitation question ENV-STS-5",
+      "message": "\"Annex V Reg. 4-6\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack sip-to-sanitation question ENV-STS-7",
+      "message": "\"ISO 24512:2007\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack sip-to-sanitation question ENV-STS-8",
+      "message": "\"NIST SP 800-82 Rev. 3\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack sip-to-sanitation question ENV-STS-9",
+      "message": "\"WHO WSP Framework Annex 2\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack sip-to-sanitation question ENV-STS-10",
+      "message": "\"US EPA NPDWR April 2024\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack sip-to-sanitation question ENV-STS-10",
+      "message": "\"40 CFR Part 141\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack sip-to-sanitation question ENV-STS-12",
+      "message": "\"HELCOM BSAP\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack sip-to-sanitation question ENV-STS-13",
+      "message": "\"WHO GDWQ (4th ed.) §4.1\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack digital-health-record question HLT-DHR-2",
+      "message": "\"45 CFR Part 171\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack digital-health-record question HLT-DHR-6",
+      "message": "\"Ch. IV\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack digital-health-record question HLT-DHR-7",
+      "message": "\"GINA Title I §101\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack digital-health-record question HLT-DHR-10",
+      "message": "\"USCDI v4\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack digital-health-record question HLT-DHR-13",
+      "message": "\"45 CFR Part 171 (exceptions)\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack wellness-management question HLT-WM-4",
+      "message": "\"EEOC Wellness Program Rules\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack wellness-management question HLT-WM-5",
+      "message": "\"Cochrane Handbook for Systematic Reviews §1.2\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack wellness-management question HLT-WM-5",
+      "message": "\"FTC Health Claims Guidelines\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack wellness-management question HLT-WM-8",
+      "message": "\"GINA Title I §101\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack wellness-management question HLT-WM-8",
+      "message": "\"ACA §1201\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack wellness-management question HLT-WM-9",
+      "message": "\"FDA Digital Health Technologies Guidance (2024)\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack wellness-management question HLT-WM-13",
+      "message": "\"FTC HBNR 16 CFR Part 318\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack wellness-management question HLT-WM-13",
+      "message": "\"§318.6\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack patient-lifecycle question HLT-PL-1",
+      "message": "\"FDA CDS Guidance (2022)\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack patient-lifecycle question HLT-PL-2",
+      "message": "\"JCI PCC.4\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack patient-lifecycle question HLT-PL-3",
+      "message": "\"JCI ACC.1\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack patient-lifecycle question HLT-PL-3",
+      "message": "\"ESI v4 Implementation Handbook\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack patient-lifecycle question HLT-PL-5",
+      "message": "\"CMS QPP MIPS\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack patient-lifecycle question HLT-PL-5",
+      "message": "\"JCI QPS.1\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack patient-lifecycle question HLT-PL-6",
+      "message": "\"ACA §1557\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack patient-lifecycle question HLT-PL-8",
+      "message": "\"JCI MMU.1-MMU.7\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack patient-lifecycle question HLT-PL-9",
+      "message": "\"ONC Patient Access API\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack patient-lifecycle question HLT-PL-10",
+      "message": "\"AHIMA CDI Practice Brief\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack patient-lifecycle question HLT-PL-11",
+      "message": "\"FDA AI/ML SaMD Action Plan\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack patient-lifecycle question HLT-PL-11",
+      "message": "\"21 CFR §807.87(l)\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack patient-lifecycle question HLT-PL-12",
+      "message": "\"21 CFR §807.87\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack patient-lifecycle question HLT-PL-14",
+      "message": "\"Joint Commission NPSG.06.01.01\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack patient-lifecycle question HLT-PL-17",
+      "message": "\"Joint Commission NPSG crosswalk expectations\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack clinical-lifecycle question HLT-CL-2",
+      "message": "\"NICE TA Process Guide\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack clinical-lifecycle question HLT-CL-2",
+      "message": "\"WHO Guideline Development Handbook 2nd ed.\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack clinical-lifecycle question HLT-CL-3",
+      "message": "\"WHO Surgical Safety Checklist 2nd ed.\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack clinical-lifecycle question HLT-CL-3",
+      "message": "\"JCI COP.7\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack clinical-lifecycle question HLT-CL-4",
+      "message": "\"FDA 21 CFR §803\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack clinical-lifecycle question HLT-CL-5",
+      "message": "\"ICH E9(R1) — Estimands and Sensitivity Analysis\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack clinical-lifecycle question HLT-CL-9",
+      "message": "\"NICE Shared Decision Making Guidelines\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack clinical-lifecycle question HLT-CL-9",
+      "message": "\"Ottawa DSF\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack clinical-lifecycle question HLT-CL-10",
+      "message": "\"WHO Traditional Medicine Strategy 2014-2023 §3.2\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack clinical-lifecycle question HLT-CL-13",
+      "message": "\"IEC 62366-1:2015 §5.7\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack professional-practice question HLT-PP-2",
+      "message": "\"AHIMA Standards of Ethical Coding\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack professional-practice question HLT-PP-4",
+      "message": "\"False Claims Act 31 USC §3729\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack professional-practice question HLT-PP-5",
+      "message": "\"AHDI Best Practices for Medical Transcription §3\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack professional-practice question HLT-PP-6",
+      "message": "\"NAM Action Collaborative on Clinician Well-Being (2019)\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack professional-practice question HLT-PP-7",
+      "message": "\"HHS Breach Notification Rule 45 CFR §164.404-408\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack professional-practice question HLT-PP-8",
+      "message": "\"CMS ICD-10-CM Official Guidelines\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack professional-practice question HLT-PP-9",
+      "message": "\"No Surprises Act §103\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack professional-practice question HLT-PP-9",
+      "message": "\"CMS Price Transparency Final Rule\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack professional-practice question HLT-PP-10",
+      "message": "\"JCI SQE.9\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack professional-practice question HLT-PP-10",
+      "message": "\"NCQA Credentialing Standards\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack professional-practice question HLT-PP-11",
+      "message": "\"FCA 31 U.S.C. §3729\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack professional-practice question HLT-PP-11",
+      "message": "\"AKS 42 U.S.C. §1320a-7b\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack professional-practice question HLT-PP-14",
+      "message": "\"AMA Code of Medical Ethics §1.1\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack professional-practice question HLT-PP-15",
+      "message": "\"State medical AI practice acts / medical board standards\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack professional-practice question HLT-PP-16",
+      "message": "\"Arts. 9-15\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack life-technology question HLT-LT-1",
+      "message": "\"IMDRF SaMD N12\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack life-technology question HLT-LT-4",
+      "message": "\"WHO Global Strategy on Digital Health 2020-2025 §4.2\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack life-technology question HLT-LT-7",
+      "message": "\"FDA AI/ML Transparency Principles\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack life-technology question HLT-LT-8",
+      "message": "\"FDA Cybersecurity Guidance (2023)\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack life-technology question HLT-LT-8",
+      "message": "\"IEC 81001-5-1:2021\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack life-technology question HLT-LT-9",
+      "message": "\"FDA PCCP Guidance for AI/ML SaMD (2023)\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack life-technology question HLT-LT-10",
+      "message": "\"EUnetHTA 21 Methodology\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack life-technology question HLT-LT-10",
+      "message": "\"NICE ESF for DHTs\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack life-technology question HLT-LT-11",
+      "message": "\"FDA CDS Guidance (85 FR 75492)\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack life-technology question HLT-LT-11",
+      "message": "\"NHS DTAC v3\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack life-technology question HLT-LT-16",
+      "message": "\"IEEE 11073-10201\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack drug-discovery question HLT-DD-1",
+      "message": "\"FDA 21 CFR §211.68\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack drug-discovery question HLT-DD-2",
+      "message": "\"ICH Q9\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack drug-discovery question HLT-DD-3",
+      "message": "\"FAIR Guiding Principles (Wilkinson et al. 2016)\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack drug-discovery question HLT-DD-4",
+      "message": "\"ICH M7(R2)\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack drug-discovery question HLT-DD-4",
+      "message": "\"FDA QSAR Guidance for Mutagenic Impurities\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack drug-discovery question HLT-DD-5",
+      "message": "\"WIPO PCT\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack drug-discovery question HLT-DD-5",
+      "message": "\"USPTO AI Inventorship Guidance (2024)\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack drug-discovery question HLT-DD-6",
+      "message": "\"FDA 21 CFR §211.100, §211.188\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack drug-discovery question HLT-DD-10",
+      "message": "\"OECD GLP Principles §8\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack drug-discovery question HLT-DD-10",
+      "message": "\"FDA 21 CFR Part 58\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack drug-discovery question HLT-DD-11",
+      "message": "\"ICH Q9(R1) 2023 Annex II\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack drug-discovery question HLT-DD-12",
+      "message": "\"ICH Q10 §3.2\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack drug-discovery question HLT-DD-13",
+      "message": "\"ICH Q12 §3.2\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack drug-discovery question HLT-DD-15",
+      "message": "\"FDA 21 CFR §211.68\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack clinical-trials regulatoryBasis",
+      "message": "\"Annex 1 §1-4)\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack clinical-trials question HLT-CT-5",
+      "message": "\"FDA Diversity Action Plan Guidance (2024)\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack clinical-trials question HLT-CT-7",
+      "message": "\"42 CFR Part 11\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack clinical-trials question HLT-CT-15",
+      "message": "\"Declaration of Helsinki §23\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack clinical-trials question HLT-CT-16",
+      "message": "\"Art. 89(1)\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack specialized-medicine question HLT-SM-3",
+      "message": "\"DEA 21 CFR §1304\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack specialized-medicine question HLT-SM-3",
+      "message": "\"§1301.71-76\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack specialized-medicine question HLT-SM-5",
+      "message": "\"ASHP Standards of Practice\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack specialized-medicine question HLT-SM-5",
+      "message": "\"CMS Part D MTM Requirements\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack specialized-medicine question HLT-SM-6",
+      "message": "\"340B Drug Pricing Program (42 USC §256b)\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack specialized-medicine question HLT-SM-6",
+      "message": "\"ACA §1557\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack specialized-medicine question HLT-SM-7",
+      "message": "\"NABP Model State Pharmacy Act §5\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack specialized-medicine question HLT-SM-8",
+      "message": "\"State PDMP Requirements\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack specialized-medicine question HLT-SM-8",
+      "message": "\"CDC Opioid Prescribing Guidelines (2022)\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack specialized-medicine question HLT-SM-9",
+      "message": "\"CMS Part D EOB Requirements\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack specialized-medicine question HLT-SM-9",
+      "message": "\"State Drug Pricing Transparency Laws\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack specialized-medicine question HLT-SM-10",
+      "message": "\"ASHP Guidelines on Patient Education\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack specialized-medicine question HLT-SM-10",
+      "message": "\"Joint Commission NPSG.03.06.01\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack specialized-medicine question HLT-SM-11",
+      "message": "\"21 U.S.C. §360eee-1\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack specialized-medicine question HLT-SM-12",
+      "message": "\"EU Del. Reg. 2016/161 Art. 20-25\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack specialized-medicine question HLT-SM-13",
+      "message": "\"21 U.S.C. §360bb\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack specialized-medicine question HLT-SM-14",
+      "message": "\"Regulation (EC) No 141/2000 Art. 3\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack specialized-medicine question HLT-SM-15",
+      "message": "\"FDA pharmacogenomics guidance\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack specialized-medicine question HLT-SM-15",
+      "message": "\"FDA Table of Pharmacogenetic Associations\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack specialized-medicine question HLT-SM-15",
+      "message": "\"FDA labeling for PGx\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack specialized-medicine question HLT-SM-16",
+      "message": "\"NIH All of Us data access rules + Data Use Agreement\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack specialized-medicine question HLT-SM-18",
+      "message": "\"ACA §1557 (equity principles) + payer PA operational requirements\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack future-of-work question WLT-FW-2",
+      "message": "\"ILO Employment Relationship Recommendation R198\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack future-of-work question WLT-FW-5",
+      "message": "\"ILO Convention C087 Art. 2\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack future-of-work question WLT-FW-5",
+      "message": "\"C098 Art. 1-4\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack future-of-work question WLT-FW-6",
+      "message": "\"ILO Centenary Declaration (2019)\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack future-of-work question WLT-FW-7",
+      "message": "\"EU Working Time Directive 2003/88/EC Art. 3-6\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack future-of-work question WLT-FW-9",
+      "message": "\"EU PWD 2024/2831 Art. 9(2)\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack future-of-work question WLT-FW-9",
+      "message": "\"ILO C190\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack future-of-work question WLT-FW-10",
+      "message": "\"NYC Local Law 144 (NYC Admin Code §20-871 et seq.)\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack future-of-work question WLT-FW-11",
+      "message": "\"820 ILCS 42/5\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack future-of-work question WLT-FW-11",
+      "message": "\"820 ILCS 42/15\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack future-of-work question WLT-FW-14",
+      "message": "\"Jurisdictional scope gating for employment AI laws\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack digital-payments question WLT-DP-3",
+      "message": "\"ECOA Reg. B §1002.6\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack digital-payments question WLT-DP-4",
+      "message": "\"EBA RTS on SCA\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack digital-payments question WLT-DP-12",
+      "message": "\"EBA RTS on SCA (EU) 2018/389 Art. 4 (dynamic linking)\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack no-poverty question WLT-NP-1",
+      "message": "\"CGAP Client Protection Principles\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack no-poverty question WLT-NP-1",
+      "message": "\"World Bank FCP Good Practices\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack no-poverty question WLT-NP-2",
+      "message": "\"IFC Performance Standard 1\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack no-poverty question WLT-NP-2",
+      "message": "\"UNHCR Financial Inclusion Guidelines\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack no-poverty question WLT-NP-3",
+      "message": "\"FATF Guidance on Financial Inclusion (2017)\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack no-poverty question WLT-NP-4",
+      "message": "\"GSMA Code of Conduct for Mobile Money\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack no-poverty question WLT-NP-5",
+      "message": "\"World Bank FCP Good Practices Principle 3\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack no-poverty question WLT-NP-6",
+      "message": "\"World Bank Poverty Measurement\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack no-poverty question WLT-NP-7",
+      "message": "\"ICRC Handbook on Data Protection in Humanitarian Action\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack no-poverty question WLT-NP-8",
+      "message": "\"CERISE-SPTF Universal Standards for SPM\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack no-poverty question WLT-NP-9",
+      "message": "\"ECOA Reg B 12 CFR §202.9\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack no-poverty question WLT-NP-10",
+      "message": "\"ECOA 15 U.S.C. §1691\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack no-poverty question WLT-NP-10",
+      "message": "\"fair lending disparate impact governance\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack no-poverty question WLT-NP-11",
+      "message": "\"Community Reinvestment Act (CRA) — community reinvestment and LMI outcomes\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack no-poverty question WLT-NP-12",
+      "message": "\"World Bank GPFI (2020) — responsible DFS / consumer protection\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack no-poverty question WLT-NP-13",
+      "message": "\"Basel/BCBS — financial inclusion governance and proportionality\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack circular-economy question WLT-CE-2",
+      "message": "\"SEC ESG Fund Naming Rule\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack circular-economy question WLT-CE-3",
+      "message": "\"ECB Climate Risk Guide (2020)\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack circular-economy question WLT-CE-4",
+      "message": "\"ILO Just Transition Guidelines (2015)\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack circular-economy question WLT-CE-7",
+      "message": "\"ICMA GBP 2021\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack circular-economy question WLT-CE-7",
+      "message": "\"EU GBS Regulation 2023/2631\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack circular-economy question WLT-CE-9",
+      "message": "\"ESRS E1-E5\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack circular-economy question WLT-CE-10",
+      "message": "\"SEC Climate Rules — 17 CFR §229.1502\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack circular-economy question WLT-CE-11",
+      "message": "\"ESRS E1 (Scope 3/value-chain)\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack circular-economy question WLT-CE-13",
+      "message": "\"ISO 14040:2006\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack circular-economy question WLT-CE-15",
+      "message": "\"ESRS scope governance\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack blockchain question WLT-BC-2",
+      "message": "\"OWASP Smart Contract Top 10\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack blockchain question WLT-BC-2",
+      "message": "\"IEEE P3207 Blockchain Security\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack blockchain question WLT-BC-3",
+      "message": "\"FATF VA/VASP Guidance §7\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack blockchain question WLT-BC-4",
+      "message": "\"SEC Howey Test (SEC v. W.J. Howey Co.)\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack blockchain question WLT-BC-6",
+      "message": "\"IOSCO DeFi Policy Recommendations (2023)\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack blockchain question WLT-BC-7",
+      "message": "\"Art. 92 (insider dealing)\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack blockchain question WLT-BC-11",
+      "message": "\"FATF R15 §76 (Travel Rule threshold $/€1000)\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack blockchain question WLT-BC-13",
+      "message": "\"CEA §1a(9) (commodity definition)\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack blockchain question WLT-BC-14",
+      "message": "\"SEC v. Ripple Labs\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack blockchain question WLT-BC-14",
+      "message": "\"Howey test application in token distributions\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack k12-pm3 question EDU-K12-2",
+      "message": "\"34 CFR §99.31\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack k12-pm3 question EDU-K12-5",
+      "message": "\"Section 504 of Rehabilitation Act\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack k12-pm3 question EDU-K12-7",
+      "message": "\"FTC Policy Statement on Ed Tech\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack higher-education question EDU-HE-1",
+      "message": "\"Title VI\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack higher-education question EDU-HE-2",
+      "message": "\"QAA Academic Integrity Guidance\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack higher-education question EDU-HE-3",
+      "message": "\"Regional Accreditation Standards\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack higher-education question EDU-HE-4",
+      "message": "\"Belmont Report\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack higher-education question EDU-HE-4",
+      "message": "\"45 CFR Part 46 (Common Rule)\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack higher-education question EDU-HE-7",
+      "message": "\"W3C Verifiable Credentials\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack higher-education question EDU-HE-7",
+      "message": "\"EU Digital Credentials for Learning\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack higher-education question EDU-HE-9",
+      "message": "\"Annex III §3\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack higher-education question EDU-HE-12",
+      "message": "\"UNESCO Higher Education (2022) §4\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack skills-training question EDU-ST-2",
+      "message": "\"ILO Guidelines on TVET §4.3\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack skills-training question EDU-ST-5",
+      "message": "\"Europass DCI\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack skills-training question EDU-ST-5",
+      "message": "\"EU Digital Credentials for Learning\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack skills-training question EDU-ST-6",
+      "message": "\"OSHA 29 CFR §1910.132\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack skills-training question EDU-ST-6",
+      "message": "\"EU Directive 89/391/EEC Art. 12\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack skills-training question EDU-ST-7",
+      "message": "\"National Qualification Record Retention Requirements\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack skills-training question EDU-ST-8",
+      "message": "\"CEDEFOP RPL Guidelines\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack skills-training question EDU-ST-9",
+      "message": "\"European Skills Agenda 2020\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack skills-training question EDU-ST-14",
+      "message": "\"Annex III §3(a)\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack specialized-education question EDU-SE-3",
+      "message": "\"UNESCO Convention on Cultural Diversity 2005 Art. 7\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack specialized-education question EDU-SE-7",
+      "message": "\"Portfolio Assessment Best Practices\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack specialized-education question EDU-SE-9",
+      "message": "\"Recital 18\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack specialized-education question EDU-SE-15",
+      "message": "\"Accessibility scope gating\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack differently-abled question EDU-DA-2",
+      "message": "\"EU Directive 2016/2102\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack differently-abled question EDU-DA-4",
+      "message": "\"Section 504\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack differently-abled question EDU-DA-5",
+      "message": "\"ISO 9241-171:2008\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack differently-abled question EDU-DA-5",
+      "message": "\"ETSI EN 301 549 v3.2.1\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack differently-abled question EDU-DA-9",
+      "message": "\"EU EAA Directive 2019/882\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack differently-abled question EDU-DA-10",
+      "message": "\"accessibility-by-design procurement and lifecycle governance\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack sustainable-communities question MOB-SC-3",
+      "message": "\"EPA EJ Collaborative Model\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack sustainable-communities question MOB-SC-6",
+      "message": "\"ISO 37123:2019\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack sustainable-communities question MOB-SC-6",
+      "message": "\"UNDRR Sendai Framework\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack sustainable-communities question MOB-SC-7",
+      "message": "\"Open Data Charter Principles\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack sustainable-communities question MOB-SC-8",
+      "message": "\"ISO/IEC 27400:2022\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack sustainable-communities question MOB-SC-10",
+      "message": "\"C40 2030 net-zero (1.5°C-aligned pathways)\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack sustainable-ports question MOB-SP-1",
+      "message": "\"Part B §16\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack sustainable-ports question MOB-SP-3",
+      "message": "\"EU MRV Regulation 2015/757\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack sustainable-ports question MOB-SP-5",
+      "message": "\"WCO SAFE Framework\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack sustainable-ports question MOB-SP-5",
+      "message": "\"UN/CEFACT Single Window Recommendation\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack sustainable-ports question MOB-SP-6",
+      "message": "\"ILO Convention C152\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack sustainable-ports question MOB-SP-6",
+      "message": "\"ISO 3691-4:2020 (Driverless Industrial Trucks)\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack sustainable-ports question MOB-SP-8",
+      "message": "\"UN/CEFACT MMT RDM\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack sustainable-ports question MOB-SP-8",
+      "message": "\"ISO 17712:2013\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack sustainable-ports question MOB-SP-9",
+      "message": "\"IMO MSC-FAL.1/Circ.3\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack sustainable-ports question MOB-SP-9",
+      "message": "\"SOLAS Ch. XI-2 Reg. 4\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack sustainable-real-estate question MOB-RE-5",
+      "message": "\"NFPA 101 Life Safety Code\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack sustainable-real-estate question MOB-RE-5",
+      "message": "\"IEC 62386\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack sustainable-real-estate question MOB-RE-6",
+      "message": "\"ISO 20887:2020\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack sustainable-real-estate question MOB-RE-6",
+      "message": "\"EU Construction Products Regulation (CPR)\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack sustainable-real-estate question MOB-RE-7",
+      "message": "\"EU Climate Benchmark Regulation\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack sustainable-real-estate question MOB-RE-8",
+      "message": "\"ISO 19650:2018\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack sustainable-real-estate question MOB-RE-13",
+      "message": "\"WELL v2 — Air (CO2 and ventilation performance)\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack virtual-infrastructure question MOB-VI-4",
+      "message": "\"CSA CCM v4.0\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack virtual-infrastructure question MOB-VI-6",
+      "message": "\"GHG Protocol Scope 2/3\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack virtual-infrastructure question MOB-VI-8",
+      "message": "\"ISO 27036:2023\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack virtual-infrastructure question MOB-VI-14",
+      "message": "\"Regulatory mapping governance\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack privacy-security-mobility question MOB-PS-4",
+      "message": "\"NIST SP 800-207 Zero Trust Architecture\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack privacy-security-mobility question MOB-PS-8",
+      "message": "\"NIST SP 800-218 SSDF\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack freight-3pl-warehouse question MOB-F3W-5",
+      "message": "\"GDP cold-chain control expectations\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack cognition-to-intelligence question TECH-CI-5",
+      "message": "\"Art. 17\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack cognition-to-intelligence question TECH-CI-8",
+      "message": "\"OWASP ML Top 10\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack networked-ecosystems question TECH-NE-5",
+      "message": "\"W3C Standards\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack networked-ecosystems question TECH-NE-5",
+      "message": "\"OpenAPI 3.1\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack networked-ecosystems question TECH-NE-6",
+      "message": "\"OpenID Connect\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack networked-ecosystems question TECH-NE-6",
+      "message": "\"NIST SP 800-63-3\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack networked-ecosystems question TECH-NE-7",
+      "message": "\"ENISA CCAM\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack networked-ecosystems question TECH-NE-11",
+      "message": "\"EU DGA 2022/868 Art. 12\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack os-sustainable-outcomes question TECH-OS-6",
+      "message": "\"UNESCO AI Principles 10\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack os-sustainable-outcomes question TECH-OS-9",
+      "message": "\"Art. 28\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack os-sustainable-outcomes question TECH-OS-15",
+      "message": "\"Citation mapping governance\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack infotainment question TECH-INF-7",
+      "message": "\"ePrivacy Directive Art. 5(3)\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack partnerships-prosperity question TECH-PP-2",
+      "message": "\"SPDX 2.3 Specification\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack partnerships-prosperity question TECH-PP-2",
+      "message": "\"REUSE v3.0\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack partnerships-prosperity question TECH-PP-4",
+      "message": "\"EU FRAND Guidelines 2023\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack partnerships-prosperity question TECH-PP-4",
+      "message": "\"ETSI IPR Policy §6\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack partnerships-prosperity question TECH-PP-7",
+      "message": "\"GRI 203\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack partnerships-prosperity question TECH-PP-9",
+      "message": "\"WIPO WCT Art. 11\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack partnerships-prosperity question TECH-PP-11",
+      "message": "\"WIPO WPPT Art. 7\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack partnerships-prosperity question TECH-PP-13",
+      "message": "\"WTO SPS Agreement Art. 5.7\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack partnerships-prosperity question TECH-PP-14",
+      "message": "\"WIPO WCT/WPPT (mapping governance)\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack digital-citizens-rights question GOV-DCR-7",
+      "message": "\"NIST SP 800-63B AAL3\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack digital-citizens-rights question GOV-DCR-10",
+      "message": "\"assurance level high\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack dance-of-democracy question GOV-DD-4",
+      "message": "\"CoE Rec CM/Rec(2017)5 §7\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack dance-of-democracy question GOV-DD-4",
+      "message": "\"Venice Commission AI Guidelines\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack dance-of-democracy question GOV-DD-5",
+      "message": "\"OSCE/ODIHR Handbook on Electoral Technology\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack dance-of-democracy question GOV-DD-5",
+      "message": "\"OSCE Commitments §7\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack dance-of-democracy question GOV-DD-6",
+      "message": "\"CISA Election Security Guidance 2024\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack dance-of-democracy question GOV-DD-7",
+      "message": "\"FECA 52 U.S.C. §30104\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack dance-of-democracy question GOV-DD-8",
+      "message": "\"HAVA 52 U.S.C. §21081\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack dance-of-democracy question GOV-DD-9",
+      "message": "\"EU Political Advertising Reg 2024\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack dance-of-democracy question GOV-DD-12",
+      "message": "\"OSCE/ODIHR §3.2\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack dance-of-democracy question GOV-DD-14",
+      "message": "\"CoE CM/Rec(2017)5\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack dance-of-democracy question GOV-DD-15",
+      "message": "\"Citation mapping governance\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack petition-to-law question GOV-PL-2",
+      "message": "\"OECD OG Rec Art. 2\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack petition-to-law question GOV-PL-4",
+      "message": "\"Art. 9\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack petition-to-law question GOV-PL-4",
+      "message": "\"Art. 17\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack petition-to-law question GOV-PL-6",
+      "message": "\"IPU Digital Parliament Guidelines\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack petition-to-law question GOV-PL-7",
+      "message": "\"Council of Europe Access to Information Convention (CETS 205)\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack petition-to-law question GOV-PL-9",
+      "message": "\"EU Interoperability Act 2024\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack petition-to-law question GOV-PL-14",
+      "message": "\"Citation mapping governance\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack citizen-services question GOV-CS-3",
+      "message": "\"ECHR Art. 14\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack citizen-services question GOV-CS-5",
+      "message": "\"Art. 6(1)(e)\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack citizen-services question GOV-CS-8",
+      "message": "\"UN E-Gov Survey 2024\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack citizen-services question GOV-CS-9",
+      "message": "\"AI Liability Directive Proposal\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack public-private-collaboration question GOV-PPC-4",
+      "message": "\"OCDS v1.2\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack public-private-collaboration question GOV-PPC-4",
+      "message": "\"World Bank PPP Disclosure Framework\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack public-private-collaboration question GOV-PPC-7",
+      "message": "\"IMF PFRAM\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack public-private-collaboration question GOV-PPC-7",
+      "message": "\"OECD DAC Blended Finance Principles\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack public-private-collaboration question GOV-PPC-8",
+      "message": "\"TFEU Art. 101-102\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack public-private-collaboration question GOV-PPC-8",
+      "message": "\"EU Directive 2014/24 (Public Procurement)\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/industryPacks.ts",
+      "location": "pack public-private-collaboration question GOV-PPC-15",
+      "message": "\"Citation mapping governance\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/score/domainPacks.ts",
+      "location": "rubric health question HC-3",
+      "message": "\"FDA AI/ML Action Plan — Human-AI Teaming\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/score/domainPacks.ts",
+      "location": "rubric health question HC-4",
+      "message": "\"FDA MDR §803 — Medical Device Reporting\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/score/domainPacks.ts",
+      "location": "rubric health question HC-5",
+      "message": "\"FDA AI Guidance — Predetermined Change Control Plan\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/score/domainPacks.ts",
+      "location": "rubric health question HC-8",
+      "message": "\"FDA AI/ML Action Plan — Transparency\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/score/domainPacks.ts",
+      "location": "rubric environment question ENV-4",
+      "message": "\"IEC 62443\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/score/domainPacks.ts",
+      "location": "rubric mobility question MOB-1",
+      "message": "\"ISO 26262-2 §6\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/score/domainPacks.ts",
+      "location": "rubric mobility question MOB-3",
+      "message": "\"ISO 21448\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/score/domainPacks.ts",
+      "location": "rubric mobility question MOB-4",
+      "message": "\"ISO 26262-4 §6.4.3\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/score/domainPacks.ts",
+      "location": "rubric mobility question MOB-6",
+      "message": "\"NHTSA Level 2/3 requirements, SAE J3016\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/score/domainPacks.ts",
+      "location": "rubric mobility question SC-1",
+      "message": "\"IEC 61508-1 §7.6 — Safety Integrity Requirements\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/score/domainPacks.ts",
+      "location": "rubric mobility question SC-2",
+      "message": "\"IEC 61508-2 §7.4 — Hardware Safety Requirements\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/score/domainPacks.ts",
+      "location": "rubric mobility question SC-3",
+      "message": "\"IEC 61508-3 §7.4.4 — Software Requirements\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/score/domainPacks.ts",
+      "location": "rubric mobility question SC-4",
+      "message": "\"IEC 61508-1 §6 — Overall Safety Lifecycle\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/score/domainPacks.ts",
+      "location": "rubric mobility question SC-5",
+      "message": "\"IEC 61508-1 §8 — Overall Validation\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/score/domainPacks.ts",
+      "location": "rubric mobility question SC-6",
+      "message": "\"ISO 21448 (SOTIF)\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/score/domainPacks.ts",
+      "location": "rubric mobility question SC-7",
+      "message": "\"IEC 61508 / ISO 26262 hazard analysis guidance\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/score/domainPacks.ts",
+      "location": "rubric mobility question SC-8",
+      "message": "\"ISO 26262 Part 2 — Functional Safety Management\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/score/domainPacks.ts",
+      "location": "rubric technology question TECH-3",
+      "message": "\"OWASP AI Security Top 10, ISO 27001 A.15\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/score/domainPacks.ts",
+      "location": "rubric technology question TECH-6",
+      "message": "\"OWASP, NIST SSDF\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/score/domainPacks.ts",
+      "location": "rubric wealth question WLT-1",
+      "message": "\"SEC Regulation Best Interest, MiFID II Art.24\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/score/domainPacks.ts",
+      "location": "rubric wealth question WLT-2",
+      "message": "\"FINRA Rule 2111, MiFID II Art.25\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/score/domainPacks.ts",
+      "location": "rubric wealth question WLT-3",
+      "message": "\"MAR (EU) 596/2014, SEC Rule 10b-5\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/score/domainPacks.ts",
+      "location": "rubric wealth question WLT-4",
+      "message": "\"MiFID II KID, SEC Form ADV\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/score/domainPacks.ts",
+      "location": "rubric wealth question WLT-6",
+      "message": "\"MiFID II Art.17, CFTC Rule 1.73\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/score/domainPacks.ts",
+      "location": "rubric wealth question FIN-5",
+      "message": "\"SEC Rule 17a-4 — Records Retention\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/score/domainPacks.ts",
+      "location": "rubric wealth question FIN-6",
+      "message": "\"ECOA / UDAAP\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/score/domainPacks.ts",
+      "location": "rubric wealth question FIN-7",
+      "message": "\"MiFID II\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/score/domainPacks.ts",
+      "location": "rubric wealth question FIN-7",
+      "message": "\"MAR (EU) 596/2014\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/score/domainPacks.ts",
+      "location": "rubric wealth question FIN-8",
+      "message": "\"MiFID II data governance obligations\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/domainRegistry.ts",
+      "location": "domain health regulatoryBasis",
+      "message": "\"FDA AI/ML Action Plan\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/domainRegistry.ts",
+      "location": "domain environment regulatoryBasis",
+      "message": "\"EPA Regulations\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/domainRegistry.ts",
+      "location": "domain mobility regulatoryBasis",
+      "message": "\"NHTSA AV Guidelines\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/domainRegistry.ts",
+      "location": "domain mobility regulatoryBasis",
+      "message": "\"ISO 26262\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/domainRegistry.ts",
+      "location": "domain mobility regulatoryBasis",
+      "message": "\"ISO 21448\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/domainRegistry.ts",
+      "location": "domain mobility regulatoryBasis",
+      "message": "\"IEC 61508\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/domainRegistry.ts",
+      "location": "domain governance regulatoryBasis",
+      "message": "\"FISMA\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/domainRegistry.ts",
+      "location": "domain technology regulatoryBasis",
+      "message": "\"OWASP AI Security\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/domainRegistry.ts",
+      "location": "domain wealth regulatoryBasis",
+      "message": "\"SEC Rule 17a-4\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/domainRegistry.ts",
+      "location": "domain wealth regulatoryBasis",
+      "message": "\"UDAAP/ECOA\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/domainRegistry.ts",
+      "location": "domain wealth regulatoryBasis",
+      "message": "\"MiFID II\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/domainRegistry.ts",
+      "location": "domain wealth regulatoryBasis",
+      "message": "\"CFTC\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/domainRegistry.ts",
+      "location": "domain wealth regulatoryBasis",
+      "message": "\"FINRA\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/domainRegistry.ts",
+      "location": "domain wealth regulatoryBasis",
+      "message": "\"FCA SYSC\" does not resolve to a catalogue record",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueUs.ts",
+      "location": "record us-hipaa",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueUs.ts",
+      "location": "record us-onc-certification",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueUs.ts",
+      "location": "record us-part11",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueUs.ts",
+      "location": "record us-qmsr",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueUs.ts",
+      "location": "record us-cgmp-drugs",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueUs.ts",
+      "location": "record us-clinical-investigations",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueUs.ts",
+      "location": "record us-cms-cop-hospitals",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueUs.ts",
+      "location": "record us-cms-424",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueUs.ts",
+      "location": "record us-coppa",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueUs.ts",
+      "location": "record us-ferpa",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueUs.ts",
+      "location": "record us-title-ix",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueUs.ts",
+      "location": "record us-idea",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueUs.ts",
+      "location": "record us-ada-title-ii-web",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueUs.ts",
+      "location": "record us-section-508",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueUs.ts",
+      "location": "record us-fmcsa-hos",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueUs.ts",
+      "location": "record us-phmsa-hmr",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueUs.ts",
+      "location": "record us-fincen-bsa",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueUs.ts",
+      "location": "record us-sec-climate",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueUs.ts",
+      "location": "record us-ada",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueUs.ts",
+      "location": "record us-hitech",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueUs.ts",
+      "location": "record us-cures",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueUs.ts",
+      "location": "record us-fda-510k",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueUs.ts",
+      "location": "record us-fda-samd",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueUs.ts",
+      "location": "record us-dscsa",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueUs.ts",
+      "location": "record us-dea",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueUs.ts",
+      "location": "record us-essa",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueUs.ts",
+      "location": "record us-cipa",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueUs.ts",
+      "location": "record us-dodd-frank-x",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueUs.ts",
+      "location": "record us-sec-digital-assets",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueUs.ts",
+      "location": "record us-ccpa",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueUs.ts",
+      "location": "record us-nerc-cip",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueUs.ts",
+      "location": "record us-state-pharmacy",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueUs.ts",
+      "location": "record us-ctpat",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueUs.ts",
+      "location": "record us-fedramp",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueUs.ts",
+      "location": "record us-ama-cpt",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueUs.ts",
+      "location": "record us-nabp",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueUs.ts",
+      "location": "record us-samhsa",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueUs.ts",
+      "location": "record us-usp-797-800",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueUs.ts",
+      "location": "record us-dmca-512",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueUs.ts",
+      "location": "record us-foia",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueUs.ts",
+      "location": "record us-gig-economy",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueUs.ts",
+      "location": "record uk-nice-ta",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-ai-act",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-ai-omnibus",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-gdpr",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-nis2",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-dora",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-dsa",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-dma",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-data-act",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-dga",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-eidas2",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-ehds",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-mdr",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-ivdr",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-ctr",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-mica",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-tfr",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-sepa-instant",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-psd2",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-amlr",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-amld5",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-amld6",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-aml-criminal",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-platform-work",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-eudr",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-batteries",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-espr",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-epbd",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-eed",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-red3",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-taxonomy",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-sfdr",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-csrd",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-csddd",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-uwwtd-1991",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-uwwtd-2024",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-dwd",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-wfd",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-nature-restoration",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-open-data",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-psi-2003",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-wad",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-eaa",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-cdsm",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-emfa",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-political-ads",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-port-services",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-iuu",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-reach",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-rohs",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-weee",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-waste-framework",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-fmd",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-organic",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-general-food-law",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-sdg-regulation",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-interoperable-europe",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-inspire",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-cra",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-pld",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-machinery",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-forced-labour",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-driving-times",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-ucc",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-trade-secrets",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-farm-to-fork",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-textiles-strategy",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-biodiversity-2030",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-ceap",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-urban-agenda",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-disinfo-code",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-frand",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-eif",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-eudi-arf",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-gmp-annex-11",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-ema-guidelines",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-ehealth-network",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-eqf",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-microfinance",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueEu.ts",
+      "location": "record eu-epr",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record iso-9001-2026",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record iso-9001-2015",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record iso-14001-2026",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record iso-14001-2015",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record iso-13485",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record iso-14971",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record iso-14155-2026",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record iso-14155-2020",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record iso-27001",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record iso-27701-2025",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record iso-27701-2019",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record iso-27799-2025",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record iso-27799-2016",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record iso-42001",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record iso-28000",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record iso-22301",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record iso-45001",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record iso-50001",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record iso-21434",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record iso-9241-210",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record iso-20000-1",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record iso-29115",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record iso-14044",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record iso-29990",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record iso-21001",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record iec-62304",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record iso-22000",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record iso-26000",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record iso-37120",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record iso-37122",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record iso-20022",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record iso-24510",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record iso-25000",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record iec-62430",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record iec-61968-61970",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record iso-11135",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record iso-13131",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record iso-17511",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record iso-tc307",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record iso-jtc1-sc41",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record ieee-2030",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record ieee-7001",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record etsi-en-303-645",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record unece-r155-r156",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record nist-ai-rmf",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record nist-csf-2",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record nist-sp-800-161",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record w3c-wcag-21",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record w3c-wcag-22",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record pci-dss-401",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record pci-dss-40",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record soc2",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record owasp-api-2023",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record csa-star",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record emv",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record swift-csp",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record itil-4",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record oidc-oauth21",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record ich-e6-r3",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record ich-e6-r2",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record consort-2025",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record consort-2010",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record ich-q8-q12",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record ich-m4",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record cdisc",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record hl7-fhir-r4",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record ihe",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record jci",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record who-ictrp",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record who-dwq",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record who-icf",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record who-gappa",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record who-clinical-guidelines",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record nqf",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record fatf-recs",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record fatf-va-guidance",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record basel-iii",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record bis-cpmi",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record iosco-crypto",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record cgap",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record gsma-mobile-money",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record world-bank-fi",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record world-bank-ppp",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record unhcr-fi",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record ifc-ps",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record un-pri",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record gri",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record sasb",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record tcfd",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record gresb",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record leed-v4",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record breeam",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record well-v2",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record c40",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record oeko-tex",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record grs",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record zdhc-mrsl",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record higg",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record fashion-pact",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record fsc-pefc",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record emf-ce",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record fssc-22000",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record globalgap",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record codex",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record fao-guidelines",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record fao-ccrf",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record gs1-epcis",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record oecd-ai",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record coe-ai-convention",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record coe-rec-2017-5",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record unesco-ai-ethics",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record g20-ai",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record venice-elections-ai",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record osce-odihr",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record un-egov",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record un-sdgs",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record ungps",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record oecd-mne",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record oecd-ppp",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record uncac",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record ilo-c087-c098",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record ilo-vet",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record crpd",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record un-crc",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record unesco-education",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record aacsb",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record bologna",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record iste",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record udl",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record wipo-internet-treaties",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record trips",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record creative-commons",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record fair",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record wef-future-jobs",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record cbd",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record nagoya",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record cites",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record ramsar",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record paris-agreement",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record redd-plus",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record ipbes",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record helcom-bsap",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record marpol",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record imdg",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record isps",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT004",
+      "file": "src/domains/packs/catalogueIntl.ts",
+      "location": "record un-tir",
+      "message": "incomplete citation record (instrument missing; clause missing; edition missing; statusType missing; url missing)",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT002",
+      "file": "src/domains/industryPackAudit.ts",
+      "location": "anchors[2].iso A.5",
+      "message": "ISO/IEC 42001 A.5 must not be labelled as AI policy (label \"Internal organization & AI policy\")",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT002",
+      "file": "src/domains/industryPackAudit.ts",
+      "location": "anchors[8].iso A.5",
+      "message": "ISO/IEC 42001 A.5 must not be labelled as AI policy (label \"AI policy\")",
+      "zeroTolerance": false
+    },
+    {
+      "rule": "CIT002",
+      "file": "src/score/crossFrameworkMapping.ts",
+      "location": "MITRE_ATLAS AML.T0019",
+      "message": "atlas id \"AML.T0019\" is not in the reference table",
+      "zeroTolerance": false
+    }
+  ]
+}

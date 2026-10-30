@@ -1,0 +1,32 @@
+{
+  "schema": "p125g-openssl4-doc-review-seal/1",
+  "at": "2026-10-16T22:45:59.477831+00:00",
+  "blockers": [],
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/tool-doc-review/review.json",
+      "bytes": 7843,
+      "sha256": "5a94f0dcfc57cdd92abc2bb50fe26201e178cbe85625089a9f30bfd6cde2a522",
+      "physicalPath": "/private/tmp/p1-25-grant-qualification-20261017/tool-doc-review/review.json",
+      "regular": true
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/tool-doc-review/README.md",
+      "bytes": 1859,
+      "sha256": "de09f0def19a7663ed0e905cf8b7c531734edfe60015c41498709ed6371ab33c",
+      "physicalPath": "/private/tmp/p1-25-grant-qualification-20261017/tool-doc-review/README.md",
+      "regular": true
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/tool-doc-review/input-pins.json",
+      "bytes": 9909,
+      "sha256": "96b234c2169087f4e9f21cfe42a0ffbd8efea495ea4b79a83a8cd240c7670ec8",
+      "physicalPath": "/private/tmp/p1-25-grant-qualification-20261017/tool-doc-review/input-pins.json",
+      "regular": true
+    }
+  ],
+  "candidateUnchanged": true,
+  "executed": false,
+  "keysReadOrCreated": false,
+  "runtimeFitProven": false
+}

@@ -1,0 +1,448 @@
+{
+  "schema": "p125pc-public-curator-independent-static-review-pins/1",
+  "at": "2026-10-17T02:12:25.969540+00:00",
+  "files": [
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/prepare-public-output.py",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/prepare-public-output.py",
+      "bytes": 17505,
+      "sha256": "2b454cbdc55233c54cbf4cb9b34ed1f1c2aaeb5dcfdfe7bb094bb9d45705be14",
+      "dev": 16777231,
+      "inode": 543909495,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-output-preparation/prepare-public-output.py.source.txt",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/public-output-preparation/prepare-public-output.py.source.txt",
+      "bytes": 17505,
+      "sha256": "2b454cbdc55233c54cbf4cb9b34ed1f1c2aaeb5dcfdfe7bb094bb9d45705be14",
+      "dev": 16777231,
+      "inode": 543909091,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-output-preparation/seal.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/public-output-preparation/seal.json",
+      "bytes": 1853,
+      "sha256": "df68a041310a2df1f092b6d620e51cb9b4e6f1f302c106c6b62ba1ad2d49d8b9",
+      "dev": 16777231,
+      "inode": 543909095,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-output-preparation/phase-inputs.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/public-output-preparation/phase-inputs.json",
+      "bytes": 4132,
+      "sha256": "d59c4d21c40a79ca1234bfb143b64e8eff30b21d92105b1ae6dd51e80ef1b428",
+      "dev": 16777231,
+      "inode": 543909090,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-output-preparation/author-review-addendum.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/public-output-preparation/author-review-addendum.json",
+      "bytes": 2183,
+      "sha256": "254cd6ed950914abbcc2dbfa42e421b73f8290cf401f78038f93a0ee63e6c54f",
+      "dev": 16777231,
+      "inode": 543909179,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125ec-public-curator/command.json",
+      "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p125ec-public-curator/command.json",
+      "bytes": 1287,
+      "sha256": "bfdf066fdad5159f5fb8a5c4a2cb1f3148c852ab734448f21fb671fdeaaadab4",
+      "dev": 16777231,
+      "inode": 543909541,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/audit-public.py",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/audit-public.py",
+      "bytes": 40958,
+      "sha256": "805a2c8e5c5dc48c0d9f3dae9be5ed02babed5cc5a41fd94ef6bdff619d48a80",
+      "dev": 16777231,
+      "inode": 543926542,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/source-checkpoint.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/source-checkpoint.json",
+      "bytes": 453,
+      "sha256": "6173074e96a07158d14eea016d3c0d55e1b704d564bb76aed9f159c7f92b8b6f",
+      "dev": 16777231,
+      "inode": 543926767,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-source-combined-outcome.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-source-combined-outcome.json",
+      "bytes": 7969,
+      "sha256": "6cc159f39b6256b255d459f323615b20fed9ce366df06b7c1c58f8dc7b09e045",
+      "dev": 16777231,
+      "inode": 543926549,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-source-combined-public-audit.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-source-combined-public-audit.json",
+      "bytes": 235594,
+      "sha256": "850aa30e16efb39c41b1b8d53c18d1903d5cd63d568f4fbf60d81ec6d426512b",
+      "dev": 16777231,
+      "inode": 543926557,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-fresh-canonical-outcome.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-fresh-canonical-outcome.json",
+      "bytes": 8001,
+      "sha256": "37a6fef970bca7282fecf5593f083bd672c1831f2f0f58b7aa8dec556d91ecac",
+      "dev": 16777231,
+      "inode": 543992114,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-fresh-canonical-public-audit.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-fresh-canonical-public-audit.json",
+      "bytes": 235614,
+      "sha256": "c057c09eed76a6730a9f5bfbf0d41c6116c71e7d531bfc7c700ef416a42a909b",
+      "dev": 16777231,
+      "inode": 543992141,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-curator-preparation/seal.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-curator-preparation/seal.json",
+      "bytes": 2237,
+      "sha256": "9ea64e5173aeeeee33cd128af412e50f679b1137623bb2bf362db2c700deb6eb",
+      "dev": 16777231,
+      "inode": 543998879,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-curator-preparation/prepare-public-output.py.source.txt",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-curator-preparation/prepare-public-output.py.source.txt",
+      "bytes": 24238,
+      "sha256": "def0d61dd89744fab2448cb9782b991919297921a21336b3577c6b4dc2f1e0c4",
+      "dev": 16777231,
+      "inode": 543997147,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-curator-preparation/fields.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-curator-preparation/fields.json",
+      "bytes": 2608,
+      "sha256": "9ed1f21011724fcc5f3ead57dfcda20d6e2ef8dfda321fdecc5ca2db94b52a33",
+      "dev": 16777231,
+      "inode": 543998875,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/root-runtime-review.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/root-runtime-review.json",
+      "bytes": 30212,
+      "sha256": "88b6051dab7a11566c43f22b12a1ae5f362bf2b4a39815f799f2936a0d66d214",
+      "dev": 16777231,
+      "inode": 543998886,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/preservation-after-controls.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/preservation-after-controls.json",
+      "bytes": 1794,
+      "sha256": "f731abdeab10d226cfdef73a4dbe25a47684d98e126502678310f112f6f47a41",
+      "dev": 16777231,
+      "inode": 543998885,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-m1-outcome.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-m1-outcome.json",
+      "bytes": 11364,
+      "sha256": "246ee26d463193f1b2a3b10d8fc3c5cef9fa6b0faf93787f2167ee6c64121fd0",
+      "dev": 16777231,
+      "inode": 543993836,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-m1-public-audit.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-m1-public-audit.json",
+      "bytes": 188394,
+      "sha256": "ea20094c661260d2d57eeb1aab66daf2bca964619b54ca6aa70e2b8bdf8aaa9b",
+      "dev": 16777231,
+      "inode": 543993849,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-restore1-outcome.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-restore1-outcome.json",
+      "bytes": 7987,
+      "sha256": "08b8776018332147b54e73aee8f1ee667aa4ed5d4f1673b67c139c8eec3f327d",
+      "dev": 16777231,
+      "inode": 543995494,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-restore1-public-audit.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-restore1-public-audit.json",
+      "bytes": 235595,
+      "sha256": "67bb7af19f978ff00c9a17ce07857a7e2da6f71ffcd3d9b3ebbc5b6e6ac6ced7",
+      "dev": 16777231,
+      "inode": 543995511,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-m2-outcome.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-m2-outcome.json",
+      "bytes": 11364,
+      "sha256": "58c6ad9a9284c73896311c95ce3bc90c583eb5e647c338bbbf989bf66ee50bda",
+      "dev": 16777231,
+      "inode": 543997160,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-m2-public-audit.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-m2-public-audit.json",
+      "bytes": 190169,
+      "sha256": "f4f3060d261bf8d48d19f73700e29aff31594d05d7c132812124e45e4920c890",
+      "dev": 16777231,
+      "inode": 543997170,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-restore2-outcome.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-restore2-outcome.json",
+      "bytes": 7987,
+      "sha256": "5c3192efccab323d6db4e958d86222ab982445be8740ba87f86d3c4b70de4a3c",
+      "dev": 16777231,
+      "inode": 543998813,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-restore2-public-audit.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-restore2-public-audit.json",
+      "bytes": 235600,
+      "sha256": "57f4637cdd9ec37504e18d66be2c906776f693c050c619974cdff0653263aab3",
+      "dev": 16777231,
+      "inode": 543998823,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-curator-preparation/prepare-public-output.delta.patch.txt",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-curator-preparation/prepare-public-output.delta.patch.txt",
+      "bytes": 17053,
+      "sha256": "27cce1e6da3a8001317d475c304298050a5b4097a12b536e6c8309d881d5fd95",
+      "dev": 16777231,
+      "inode": 543997148,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-curator-preparation/phase-inputs.unready.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-curator-preparation/phase-inputs.unready.json",
+      "bytes": 1759,
+      "sha256": "4099de26bfa54ddd7f3ba1143306aff2ab83cd37eb98868789ad1549b55630f8",
+      "dev": 16777231,
+      "inode": 543998874,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-curator-preparation/author-review.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-curator-preparation/author-review.json",
+      "bytes": 2707,
+      "sha256": "5dc69fcfdb260e55462351f1bec9a585eff5cfb58651e51bf9a4c80c0e3007f2",
+      "dev": 16777231,
+      "inode": 543998876,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-curator-preparation/README.md",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-curator-preparation/README.md",
+      "bytes": 3224,
+      "sha256": "c1271631a8911d2d960b72c7d2c639db60131afc5c05f82c97061c4be4536dbc",
+      "dev": 16777231,
+      "inode": 543998877,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-curator-preparation/input-pins.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-curator-preparation/input-pins.json",
+      "bytes": 2820,
+      "sha256": "7f337cdcf65af590a003e6c410cd3dba2470940bc26dcc44ff9787f67ac15426",
+      "dev": 16777231,
+      "inode": 543998878,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-curator-preparation/v2/prepare-public-output.py.source.txt",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-curator-preparation/v2/prepare-public-output.py.source.txt",
+      "bytes": 24233,
+      "sha256": "5bd053f7d38cd345bc3cc357c605d2bed450f882695543b126c177a117e58ec7",
+      "dev": 16777231,
+      "inode": 543999011,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-curator-preparation/v2/phase-inputs.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-curator-preparation/v2/phase-inputs.json",
+      "bytes": 4256,
+      "sha256": "14508ad20b3144681ccd9a0768f981ea68e216fcfe9479ff5b22dcdce5cf1048",
+      "dev": 16777231,
+      "inode": 543999010,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-curator-preparation/v2/v1-to-v2.delta.patch.txt",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-curator-preparation/v2/v1-to-v2.delta.patch.txt",
+      "bytes": 3753,
+      "sha256": "e64ddafc5f59cd5fe469c068583e0612b9f98dea671d04a59cfff1b7680125c9",
+      "dev": 16777231,
+      "inode": 543999012,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-curator-preparation/v2/author-review.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-curator-preparation/v2/author-review.json",
+      "bytes": 2171,
+      "sha256": "70b3af6ffbe126e72e65ab22b9247b2160b8cae91abe1a4f3eeecf1e352af013",
+      "dev": 16777231,
+      "inode": 543999013,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-curator-preparation/v2/README.md",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-curator-preparation/v2/README.md",
+      "bytes": 1954,
+      "sha256": "74bc75810fdd06c5c5be4658ad69f01b568e7a1f28b152d1402654e8867593dc",
+      "dev": 16777231,
+      "inode": 543999014,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-curator-preparation/v2/input-pins.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-curator-preparation/v2/input-pins.json",
+      "bytes": 3894,
+      "sha256": "ef81a616885aeae32d02eaa565c270c21f75646f2c8c41c56b4f2d26b86743d0",
+      "dev": 16777231,
+      "inode": 543999015,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-curator-preparation/v2/seal.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-curator-preparation/v2/seal.json",
+      "bytes": 2492,
+      "sha256": "77342bb5ff36b8a0ad9564daf5ac9da133d4aa42facf1355ce5e7b48323cf9ea",
+      "dev": 16777231,
+      "inode": 543999016,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-Qgqjdx/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-Qgqjdx/public-evidence.json",
+      "bytes": 16750,
+      "sha256": "027f3f6b0b85653898002f31b122cf38329a805b8748543e6b9df9b2f52a6be4",
+      "dev": 16777231,
+      "inode": 543921477,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-QBpPTO/checkpoint-public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-QBpPTO/checkpoint-public-evidence.json",
+      "bytes": 27330,
+      "sha256": "cb0e19b1436f90444929267d1b435d142ae703e10759b35a7a166df7e9a9f6a5",
+      "dev": 16777231,
+      "inode": 543921475,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-f3OTIj/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-f3OTIj/public-evidence.json",
+      "bytes": 16780,
+      "sha256": "ebd58253f3395362fba5a3ec8849103543cc0d32f50996efac280ea8a7d91df2",
+      "dev": 16777231,
+      "inode": 543991974,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-LG12nv/checkpoint-public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-LG12nv/checkpoint-public-evidence.json",
+      "bytes": 27410,
+      "sha256": "eba80e0a46a015bc84d5993701d253788e35e3ffcca55f5615c83aaf20085302",
+      "dev": 16777231,
+      "inode": 543991972,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-fTc3F5/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-fTc3F5/public-evidence.json",
+      "bytes": 12407,
+      "sha256": "673f96caf4b0c009b869206b13cd94dd311f1d0a8c5698e51cf1930fbc832cd0",
+      "dev": 16777231,
+      "inode": 543993807,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-kZXqb3/checkpoint-public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-kZXqb3/checkpoint-public-evidence.json",
+      "bytes": 9306,
+      "sha256": "77ca13ffb6910de0191b576431dbd057c2db4103e9402eab1534c960a457e3c5",
+      "dev": 16777231,
+      "inode": 543993805,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-8bR74y/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-8bR74y/public-evidence.json",
+      "bytes": 16781,
+      "sha256": "a135d95ce7d6d4503bc10d66a55714b4368f51f70e24eae14726b1add80c7386",
+      "dev": 16777231,
+      "inode": 543995475,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-doZSmR/checkpoint-public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-doZSmR/checkpoint-public-evidence.json",
+      "bytes": 27410,
+      "sha256": "5932f57663369e048754d6cb556c8450dc9d1dffb3272b0f65ad8337ecbb9766",
+      "dev": 16777231,
+      "inode": 543995473,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-olQgQI/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-olQgQI/public-evidence.json",
+      "bytes": 12411,
+      "sha256": "f6e6d972dc2227eb1fb1bd0efdd06c22256b68ea6f420085894c805122069ff3",
+      "dev": 16777231,
+      "inode": 543997129,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-w30qOt/checkpoint-public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-w30qOt/checkpoint-public-evidence.json",
+      "bytes": 9989,
+      "sha256": "d9faccec1e5dd9481a61aea22850a7c6ecc21bcbc62fa4d0a3fc278711879546",
+      "dev": 16777231,
+      "inode": 543997127,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-GIdCNL/public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-GIdCNL/public-evidence.json",
+      "bytes": 16781,
+      "sha256": "2f30957fe63c7af55b5dfd3efb3793869d5fd57b277aa99d0549b05969dd3541",
+      "dev": 16777231,
+      "inode": 543998788,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-uGWU1Q/checkpoint-public-evidence.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-uGWU1Q/checkpoint-public-evidence.json",
+      "bytes": 27410,
+      "sha256": "4da1daffe3efddcf2dac9654337f46d4653f761f0d1cc800766e8d44719bcec5",
+      "dev": 16777231,
+      "inode": 543998786,
+      "nlink": 1
+    }
+  ],
+  "noRawPemKeyQueryResponseChildStreamOrNativeBodiesRead": true
+}

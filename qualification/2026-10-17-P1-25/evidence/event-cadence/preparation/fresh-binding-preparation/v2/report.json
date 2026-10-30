@@ -1,0 +1,30 @@
+{
+  "schema": "p125ec-binder-v2-actual-checkpoint-schema-correction/1",
+  "blockers": [],
+  "v1PreservedUnexecuted": true,
+  "preExecutionSchemaMismatch": "V1 inherited source[commit], but the actual newly written checkpoint names sourceCommit. No binder was executed.",
+  "preferredChange": "Consume actual sourceCommit and require actual checkpoint schema/root/branch/parent/exact one path/ordinary commit/clean index/twelve-check facts.",
+  "actualSourceCheckpointPin": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/source-checkpoint.json",
+    "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/source-checkpoint.json",
+    "bytes": 541,
+    "sha256": "987d5d871240290965fb544196d6aba695c38e3ba11737f4b9b29f37d4049103",
+    "dev": 16777231,
+    "inode": 543836072,
+    "nlink": 1
+  },
+  "allOtherV1CodeByteExact": true,
+  "sourceSelectionPathAndHashUnchanged": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-preparation/source-selection.json",
+    "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-preparation/source-selection.json",
+    "bytes": 8137,
+    "sha256": "02552fd970f0aff01496e9d954da4f554275a0aec076a461087c156662ce6083",
+    "dev": 16777231,
+    "inode": 543835908,
+    "nlink": 1
+  },
+  "actualSourceCommit": "80268079f804ed0ecb7659cd02a75e8b88ee3e0d",
+  "actualFreshRoot": null,
+  "actualCleanSourceResult": null,
+  "noHelperImportParseCompileExecutionOrSourceIndexQaPriorWrites": true
+}

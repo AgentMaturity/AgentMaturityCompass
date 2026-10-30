@@ -1,0 +1,14 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L1-FIX-TEC-01",
+  "polarity": "positive",
+  "evidenceClass": "valid",
+  "setup": {
+    "synthetic": true,
+    "purpose": "Compiler planning data only; not an executed evidence record."
+  },
+  "expected": {
+    "result": "pass",
+    "reasonCode": "SYNTHETIC_COMPILER_FIXTURE"
+  }
+}

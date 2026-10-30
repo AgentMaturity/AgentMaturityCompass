@@ -1,0 +1,15 @@
+{
+  "at": "2026-10-16T17:20:56.174298+00:00",
+  "sourceCommit": "88e0dbdef8871f119325d289757ad1de38b88a1a",
+  "priorProductionPinsRechecked": 444,
+  "onlyExpectedSourceChange": "S/src/migration/legacy/classify.ts",
+  "heldRProtectedPinsRechecked": 26,
+  "heldRStatus": " M CONTRIBUTING.md\n M README.md\n M docs/SSO_OIDC.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M src/identity/identityConfig.ts\n M src/identity/oidc/jwtVerify.ts\n M src/identity/oidc/oidcRoutes.ts\n M tests/identity/jwtVerify.test.ts\n M unused-code/plan-edits/manifest.json\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md\n?? .changeset/p2-07-oidc-validation-policy.md\n?? tests/identity/oidcValidationConfig.test.ts\n",
+  "heldRHeadExactAndIndexEmpty": true,
+  "ClaudeFiniteInputsRechecked": 10,
+  "freshSourceAndAll37CompiledInputPinsExact": true,
+  "threeNativeIdentitiesExact": true,
+  "SQClean": true,
+  "reservationsExact": true,
+  "allHeldWorkPreserved": true
+}

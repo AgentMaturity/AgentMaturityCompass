@@ -1,0 +1,44 @@
+[
+ {
+  "mutation": "M14 answerer ignores the control version",
+  "file": "src/governor/scopedExceptions.ts",
+  "test": "tests/approvals/regulatedApprovalException.test.ts",
+  "failingTests": [
+   "P2-24 regulated profiles refuse unsigned approval exception notes a signed exception for v1.0.0 of the approval control is refused when the active plan runs v2.0.0"
+  ]
+ },
+ {
+  "mutation": "M15 break-glass request records no initiator",
+  "file": "src/governor/boundRecords.ts",
+  "test": "tests/governor/breakGlass.test.ts",
+  "failingTests": [
+   "P2-24 break-glass activation refuses the activator's own decision, an unbound decision and a denial"
+  ]
+ },
+ {
+  "mutation": "M16 packet review requester taken from input",
+  "file": "src/approvals/reviewRecords.ts",
+  "test": "tests/governor/breakGlass.test.ts",
+  "failingTests": [
+   "P2-24 break-glass a packet review takes its reviewer from the session and its requester from the record, never from input"
+  ]
+ },
+ {
+  "mutation": "M17 excluded users counted toward the quorum",
+  "file": "src/governor/boundRecords.ts",
+  "test": "tests/governor/breakGlass.test.ts",
+  "failingTests": [
+   "P2-24 break-glass a packet review takes its reviewer from the session and its requester from the record, never from input"
+  ]
+ },
+ {
+  "mutation": "M18 break-glass requester not authenticated",
+  "file": "src/governor/breakGlass.ts",
+  "test": "tests/governor/breakGlass.test.ts",
+  "failingTests": [
+   "P2-24 break-glass activation refuses the activator's own decision, an unbound decision and a denial",
+   "P2-24 break-glass a request without an authenticated session is refused, from the API and from both CLI commands",
+   "P2-24 break-glass a packet review takes its reviewer from the session and its requester from the record, never from input"
+  ]
+ }
+]

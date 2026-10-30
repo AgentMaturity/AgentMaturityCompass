@@ -1,0 +1,7 @@
+     × --trust-root flags never lower the threshold trust-roots.json declares 8ms
+     × a malformed or unreadable trust-roots.json is refused even when --trust-root flags are given 3ms
+     × once m-of-n was accepted for a list, a later single-signature policy is refused 6ms
+     × a list that declares rootThreshold needs that many distinct roots, whatever the local policy says 1ms
+     × refuses a list version older than the one this machine accepted 4ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  5 failed | 12 skipped (17)

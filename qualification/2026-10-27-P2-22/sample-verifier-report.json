@@ -1,0 +1,107 @@
+{
+  "type": "amc.verifier-report",
+  "version": 1,
+  "artifact": {
+    "kind": "dsse-intoto",
+    "path": "attestation/review-packet.dsse.json",
+    "sha256": "c7549cfe15d0608a54299f2aa00e9def54a9ba2fb120b6e024dbb65caf54ef09"
+  },
+  "verifier": {
+    "name": "amc-verify",
+    "version": "0.1.0"
+  },
+  "verifiedAt": "2026-10-27T16:44:24.893Z",
+  "asOf": "2026-10-27T16:44:24.610Z",
+  "integrity": {
+    "status": "not-evaluated",
+    "errors": [
+      "dsseEnvelope.signatures[0]: no supplied trust list holds key 16a6e1999881e3488ed42071644518b1f5929bc21eff4b3a2e68c19c24813ae0"
+    ]
+  },
+  "issuerAdmission": {
+    "status": "fail",
+    "signatures": [
+      {
+        "signature": "dsseEnvelope.signatures[0]",
+        "purpose": "artifact-seal",
+        "keyId": "16a6e1999881e3488ed42071644518b1f5929bc21eff4b3a2e68c19c24813ae0",
+        "status": "not-pinned",
+        "source": null,
+        "listId": null,
+        "timeBasis": null,
+        "detail": "key 16a6e1999881e3488ed42071644518b1f5929bc21eff4b3a2e68c19c24813ae0 is not pinned for artifact-seal by any supplied trust list"
+      }
+    ]
+  },
+  "anchoring": {
+    "status": "not-applicable",
+    "detail": null
+  },
+  "time": {
+    "claimedAt": "2026-10-27T16:44:24.610Z",
+    "attested": null,
+    "basis": "claimed"
+  },
+  "scope": {
+    "status": "not-evaluated",
+    "reasons": [
+      "integrity did not pass"
+    ]
+  },
+  "freshness": {
+    "status": "not-evaluated",
+    "reasons": [
+      "integrity did not pass"
+    ]
+  },
+  "completeness": {
+    "status": "not-evaluated",
+    "reasons": [
+      "integrity did not pass"
+    ]
+  },
+  "satisfaction": {
+    "status": "not-evaluated",
+    "reasons": [
+      "evaluated only when the other five dimensions pass"
+    ]
+  },
+  "reasonCodes": {
+    "integrity": [],
+    "issuerAdmission": [
+      "ISSUER_NOT_PINNED"
+    ],
+    "scope": [],
+    "freshness": [],
+    "completeness": [],
+    "satisfaction": []
+  },
+  "trusted": false,
+  "overrides": [],
+  "warnings": [
+    "control L0-EXP-01 is excluded by the statement: applicability predicate is false",
+    "control L0-EXP-02 is excluded by the statement: applicability predicate is false",
+    "control L0-EXP-03 is excluded by the statement: applicability predicate is false",
+    "control L0-FAI-01 is excluded by the statement: applicability predicate is false",
+    "control L0-FAI-02 is excluded by the statement: applicability predicate is false",
+    "control L0-FAI-03 is excluded by the statement: applicability predicate is false",
+    "control L0-FAI-04 is excluded by the statement: applicability predicate is false",
+    "control L0-INV-04 is excluded by the statement: applicability predicate is false",
+    "control L0-TRN-01 is excluded by the statement: applicability predicate is false",
+    "control L0-TRN-02 is excluded by the statement: applicability predicate is false",
+    "control L0-TRN-03 is excluded by the statement: applicability predicate is false",
+    "control L1-GOV-06 is excluded by the statement: applicability predicate is false",
+    "control L1-TECH-01 is excluded by the statement: applicability predicate is false",
+    "control L1-TECH-02 is excluded by the statement: applicability predicate is false",
+    "control L1-TECH-03 is excluded by the statement: applicability predicate is false",
+    "control L1-TECH-04 is excluded by the statement: applicability predicate is false",
+    "control L1-TECH-05 is excluded by the statement: applicability predicate is false",
+    "control L1-TECH-06 is excluded by the statement: applicability predicate is false",
+    "control L1-TECH-07 is excluded by the statement: applicability predicate is false",
+    "control L1-TECH-08 is excluded by the statement: applicability predicate is false",
+    "control L1-WLT-01 is excluded by the statement: applicability predicate is false",
+    "control L1-WLT-US-13 is excluded by the statement: applicability predicate is false",
+    "control L1-WLT-US-14 is excluded by the statement: applicability predicate is false",
+    "control L1-WLT-US-15 is excluded by the statement: applicability predicate is false"
+  ]
+}

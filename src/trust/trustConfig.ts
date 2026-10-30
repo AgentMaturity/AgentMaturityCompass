@@ -5,12 +5,16 @@ import { z } from "zod";
 import YAML from "yaml";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
-import { verifySignedFileWithAuditor } from "../org/orgSigner.js";
+import { publishTrustConfig, verifyTrustConfigPublication } from "./trustConfigPublication.js";
+import { publishNotaryEnablement } from "./notaryEnablementPublication.js";
+import { assertKeysetComplete, keysetDeclared } from "../keys/keyset.js";
 import { getVaultSecret, setVaultSecret } from "../vault/vault.js";
 import { verifyNotaryAttestResponse } from "../notary/notaryVerify.js";
 import { addPublicKeyToHistory } from "../crypto/keys.js";
 import { buildNotaryAuthSignature } from "../notary/notaryAuth.js";
 import { signDigestWithVault } from "../crypto/signing/signerVault.js";
+import type { NotaryAttestationBasis } from "../notary/notaryApiTypes.js";
+import { inCheckPass } from "../utils/checkPass.js";
 
 function signTrustConfigWithVault(workspace: string, path: string): string {
   const digest = sha256Hex(Buffer.from(readUtf8(path), "utf8"));
@@ -55,7 +59,8 @@ export const signKindValues = [
   "MIGRATION_RECEIPT",
   "CONTROL_PLAN",
   "CONTROL_RESULT",
-  "A4_RECORD"
+  "A4_RECORD",
+  "A4_PACKAGE"
 ] as const;
 
 export type SignKind = (typeof signKindValues)[number];
@@ -83,7 +88,8 @@ export const trustConfigSchema = z.object({
         "CERT",
         "INSTALLED_LOCK",
         "RELEASE_MANIFEST",
-        "BACKUP_MANIFEST"
+        "BACKUP_MANIFEST",
+        "A4_PACKAGE"
       ]),
       denyLocalVaultSigningIfNotaryEnabled: z.boolean().default(true),
       notaryMaxClockSkewSeconds: z.number().int().positive().default(120)
@@ -105,7 +111,7 @@ export function trustConfigSigPath(workspace: string): string {
   return `${trustConfigPath(workspace)}.sig`;
 }
 
-function defaultTrustConfig(): TrustConfig {
+export function defaultTrustConfig(): TrustConfig {
   return trustConfigSchema.parse({
     trust: {
       version: 1,
@@ -129,7 +135,8 @@ function defaultTrustConfig(): TrustConfig {
           "CERT",
           "INSTALLED_LOCK",
           "RELEASE_MANIFEST",
-          "BACKUP_MANIFEST"
+          "BACKUP_MANIFEST",
+          "A4_PACKAGE"
         ],
         denyLocalVaultSigningIfNotaryEnabled: true,
         notaryMaxClockSkewSeconds: 120
@@ -138,13 +145,13 @@ function defaultTrustConfig(): TrustConfig {
   });
 }
 
-export function loadTrustConfig(workspace: string): TrustConfig {
+export const loadTrustConfig = inCheckPass(function loadTrustConfig(workspace: string): TrustConfig {
   const path = trustConfigPath(workspace);
   if (!pathExists(path)) {
     return defaultTrustConfig();
   }
   return trustConfigSchema.parse(YAML.parse(readUtf8(path)) as unknown);
-}
+});
 
 export function initTrustConfig(workspace: string): {
   path: string;
@@ -157,6 +164,17 @@ export function initTrustConfig(workspace: string): {
   writeFileAtomic(path, YAML.stringify(config), 0o644);
   const sigPath = signTrustConfigWithVault(workspace, path);
   return { path, sigPath, config };
+}
+
+/** Direct-purpose initialization; true fresh/no-sign compatibility keeps the original synchronous recipe. */
+export async function initTrustConfigAsync(workspace: string, beforePublish?: () => void): Promise<ReturnType<typeof initTrustConfig>> {
+  if (process.env.AMC_NO_SIGN === "1") return initTrustConfig(workspace);
+  const keyset = assertKeysetComplete(workspace);
+  if (keyset === null && !keysetDeclared(workspace)) return initTrustConfig(workspace);
+  const config = defaultTrustConfig();
+  const completed = await publishTrustConfig(workspace, Buffer.from(YAML.stringify(config), "utf8"), beforePublish);
+  completed.assertCurrent();
+  return { path: completed.path, sigPath: completed.sigPath, config };
 }
 
 function saveTrustConfig(workspace: string, config: TrustConfig): {
@@ -172,15 +190,15 @@ function saveTrustConfig(workspace: string, config: TrustConfig): {
   };
 }
 
-export function verifyTrustConfigSignature(workspace: string): {
+export const verifyTrustConfigSignature = inCheckPass(function verifyTrustConfigSignature(workspace: string): {
   valid: boolean;
   signatureExists: boolean;
   reason: string | null;
   path: string;
   sigPath: string;
 } {
-  return verifySignedFileWithAuditor(workspace, trustConfigPath(workspace));
-}
+  return verifyTrustConfigPublication(workspace);
+});
 
 async function httpJsonGet(params: {
   baseUrl: string;
@@ -230,6 +248,7 @@ export async function checkNotaryTrust(workspace: string): Promise<{
   pinnedFingerprint: string | null;
   currentFingerprint: string | null;
   attestationLevel: "SOFTWARE" | "HARDWARE" | null;
+  attestationBasis: NotaryAttestationBasis | null;
   requiredAttestationLevel: "SOFTWARE" | "HARDWARE" | null;
   lastAttestationTs: number | null;
 }> {
@@ -244,6 +263,7 @@ export async function checkNotaryTrust(workspace: string): Promise<{
     pinnedFingerprint: config.trust.mode === "NOTARY" ? config.trust.notary.pinnedPubkeyFingerprint : null,
     currentFingerprint: null as string | null,
     attestationLevel: null as "SOFTWARE" | "HARDWARE" | null,
+    attestationBasis: null as NotaryAttestationBasis | null,
     requiredAttestationLevel: config.trust.mode === "NOTARY" ? config.trust.notary.requiredAttestationLevel : null,
     lastAttestationTs: null as number | null
   };
@@ -311,6 +331,7 @@ export async function checkNotaryTrust(workspace: string): Promise<{
     return out;
   }
   out.attestationLevel = verified.parsed.attestation.notary.attestationLevel;
+  out.attestationBasis = verified.parsed.attestation.notary.attestationBasis ?? null;
   out.lastAttestationTs = verified.parsed.attestation.ts;
   if (verified.parsed.pubkeyFingerprint !== config.trust.notary.pinnedPubkeyFingerprint) {
     out.ok = false;
@@ -375,12 +396,25 @@ export async function enableNotaryTrust(params: {
   // trust set permanently widened for a notary that was never enabled. There
   // is no revocation path, so that widening would have been silent and final.
   const saved = saveTrustConfig(params.workspace, next);
-  addPublicKeyToHistory(params.workspace, "auditor", pubPem, "notary");
+  // Not logged: with the config saved, the transparency seal is signed by this very notary, which would make enabling it
+  // depend on the notary answering mid-enable. An admission only adds a key, so an older history without it narrows
+  // trust; the revision is still marked on this machine.
+  addPublicKeyToHistory(params.workspace, "auditor", pubPem, "notary", { logRevision: false });
   return {
     path: saved.path,
     sigPath: saved.sigPath,
     fingerprint
   };
+}
+
+/** Direct CLI continuation; genuine no-sign/fresh compatibility retains the legacy recipe. */
+export async function enableNotaryTrustAsync(params: Parameters<typeof enableNotaryTrust>[0], beforePublish?: () => void): ReturnType<typeof enableNotaryTrust> {
+  if (process.env.AMC_NO_SIGN === "1") return enableNotaryTrust(params);
+  const keyset = assertKeysetComplete(params.workspace);
+  if (keyset === null && !keysetDeclared(params.workspace)) return enableNotaryTrust(params);
+  const completed = await publishNotaryEnablement(params, beforePublish);
+  completed.assertCurrent();
+  return { path: completed.path, sigPath: completed.sigPath, fingerprint: completed.fingerprint };
 }
 
 export function shouldRequireNotaryForKind(workspace: string, kind: SignKind): boolean {

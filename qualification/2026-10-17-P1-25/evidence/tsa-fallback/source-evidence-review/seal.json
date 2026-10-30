@@ -1,0 +1,42 @@
+{
+  "schema": "p125f-source-evidence-review-seal/1",
+  "at": "2026-10-16T22:23:20.324396+00:00",
+  "sourceCommit": "d8b5c3250138a10078c21886642595f669c4a73c",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/source-evidence-review/README.md",
+      "bytes": 2503,
+      "sha256": "387632d9b911c8955511945551030baf318d1d27dc3b8e1fda5e1d60750e8f25"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/source-evidence-review/input-pins.json",
+      "bytes": 90258,
+      "sha256": "c93d0d8e83ba1fc530cdd0df513c55c461def52587411090a5ac115590cfede5"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/source-evidence-review/private-review-preparation-stop.json",
+      "bytes": 671,
+      "sha256": "a7765ed5432603e0664107b7788d3453b2e6a2326fc7302f6cd0395e15c34eaa"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/source-evidence-review/review.json",
+      "bytes": 12096,
+      "sha256": "c5e9b176598ccb3721c8970d60808ae97d965fa5e5c454625e340726f8a35f90"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/source-evidence-review/source-physical-observations.json",
+      "bytes": 35570,
+      "sha256": "e40556d9c7d75aa240d653bfb1620d1f73c0859b4f6e79b6e9e4148f19e9c01f"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/source-evidence-review/source-run-join.json",
+      "bytes": 8656,
+      "sha256": "a1a0f851a4254bb6b61a527d85d2d44905822825aa865ed62162ced6d4eee026"
+    }
+  ],
+  "inputPinCount": 302,
+  "blockers": [],
+  "allReadsFinished": true,
+  "productExecuted": false,
+  "checkoutIndexQaWrites": false
+}

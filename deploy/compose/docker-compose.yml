@@ -19,6 +19,8 @@ services:
       - "3211:3211"
     volumes:
       - amc_data:/data/amc
+      # P1-08: anti-rollback marks and key-set recovery copies (<AMC home>/state) must survive a restart.
+      - amc_state:/home/amc/.config/amc/state
     environment:
       - AMC_BOOTSTRAP=${AMC_BOOTSTRAP:-1}
       - AMC_WORKSPACE_DIR=/data/amc
@@ -64,3 +66,4 @@ secrets:
 
 volumes:
   amc_data:
+  amc_state:

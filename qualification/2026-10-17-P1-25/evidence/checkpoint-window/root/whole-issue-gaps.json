@@ -1,0 +1,46 @@
+{
+  "schema": "p125k-whole-issue-gaps/1",
+  "at": "2026-10-16T23:46:18.232696+00:00",
+  "sourceCommit": "e49e21348e454ba8f1556cb6dfd3ed69e0e883c2",
+  "wholeP1_25Complete": false,
+  "planComplete": false,
+  "boundedAcceptance": [
+    "One genuine signed pending checkpoint completed at the same sequence using a query-bound timestamp token, a matching ledger event and offline upper bound.",
+    "Required time rejects after a real HTTP500 while retaining a signed pending checkpoint and unchanged verified ledger.",
+    "Both direct source-only omission controls fail at their semantic witnesses and each exact restoration passes the same21-case cohort."
+  ],
+  "technicalWorkStillOpen": [
+    "Two real linked checkpoint bounds and tolerance reader boundaries; next private two-file proposal is unexecuted.",
+    "Event and minute cadence, real Studio scheduling, concurrent retries and corruption combinations.",
+    "Persisted backdate/postdate producer coverage and nonzero accuracy if actual issuer omits it.",
+    "Session sealing, eligible certificate/attestation issuance and production per-event report/config binding.",
+    "Complete plan, full test suite, cross-platform, public issuer and release qualification."
+  ],
+  "heldDecisionsRemain": [
+    "P1-01 recorded gaps",
+    "P0-29 successor decisions",
+    "P0-22 empty-result contract",
+    "D-03 written live-health skip until P2-06",
+    "P0-09/P0-51 key precedence",
+    "P0-24 expert wording",
+    "P2-02 pause/P2-27 echo",
+    "P1-06 Claude ownership",
+    "P1-02 three held failures and coordination",
+    "Provider D15 ignored archive staging held; no force-add or bypass",
+    "Existing private-provider/package/library/manual-generator/public-entry/CI and other recorded human/external holds"
+  ],
+  "F37": "Skipped, unfixed and unqualified at user request. Ordinary HTTP fixtures supply no F37 proof.",
+  "quality": {
+    "status": "RED",
+    "duplicates": 1268,
+    "deadCode": 2712,
+    "beforeDeadCode": 2719,
+    "addedFindings": 0,
+    "removedFindings": 7,
+    "waiver": false,
+    "baselineChange": false
+  },
+  "noTtlContractInvented": true,
+  "noPushPrMergeRelease": true,
+  "preserveClaudeAndMissingReservationOwnership": true
+}

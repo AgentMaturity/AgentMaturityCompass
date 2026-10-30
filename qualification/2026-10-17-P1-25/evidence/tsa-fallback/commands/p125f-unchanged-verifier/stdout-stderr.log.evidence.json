@@ -1,0 +1,11 @@
+{
+  "schema": "amc-qualification-lossless-original/1",
+  "encoding": "base64",
+  "original": {
+    "relativePath": "evidence/tsa-fallback/commands/p125f-unchanged-verifier/stdout-stderr.log",
+    "bytes": 414,
+    "sha256": "31e1b5e9d241488863ee7f83e39cdd6af74a4c150aecf037f45621ee9333dc1a"
+  },
+  "dataBase64": "CiBSVU4gIHY0LjEuMTEgL1VzZXJzL3NpZC8uY29kZXgvd29ya3RyZWVzL3AyLTA3LXNjaW0tcXVhbGlmaWNhdGlvbi9BZ2VudE1hdHVyaXR5Q29tcGFzcwoKIOKckyB0ZXN0cy90aW1lL3ZlcmlmeVRpbWVzdGFtcC50ZXN0LnRzICgxNyB0ZXN0cykgMjNtcwoKIFRlc3QgRmlsZXMgIDEgcGFzc2VkICgxKQogICAgICBUZXN0cyAgMTcgcGFzc2VkICgxNykKICAgU3RhcnQgYXQgIDAzOjQwOjI1CiAgIER1cmF0aW9uICAyMTltcyAodHJhbnNmb3JtIDMzbXMsIHNldHVwIDIwbXMsIGltcG9ydCA0N21zLCB0ZXN0cyAyM21zLCBlbnZpcm9ubWVudCAwbXMpCgpKU09OIHJlcG9ydCB3cml0dGVuIHRvIC9wcml2YXRlL3RtcC9wMS0zOS1wb3N0LXR5cGVjaGVjay0yMDI2MTAxNi9wMTI1Zi11bmNoYW5nZWQtdmVyaWZpZXIucmF3Lmpzb24K",
+  "boundary": "Exact original bytes retained losslessly; decode and verify bytes/SHA256 before use. No command result changes."
+}

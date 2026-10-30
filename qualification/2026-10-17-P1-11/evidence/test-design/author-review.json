@@ -1,0 +1,34 @@
+{
+  "schema": "p111-decisive-unit-author-review/1",
+  "at": "2026-10-16T19:24:09.188222+00:00",
+  "allCandidateLinesRead": true,
+  "fixedTestCount": 25,
+  "sourceApisRead": [
+    "evaluateControl",
+    "admitEvidence",
+    "useKey",
+    "decideEvidence",
+    "decideResult",
+    "decideEnforcement",
+    "decideReview",
+    "evaluateClaimEligibility",
+    "effectiveTrustTier",
+    "ledgerItem",
+    "complianceContext"
+  ],
+  "typedFixtures": true,
+  "castsOrAnyAdded": false,
+  "rootOwnedExecution": true,
+  "candidateExecuted": false,
+  "compilerOrParserExecuted": false,
+  "runtimeFitClaimed": false,
+  "checkoutWrites": false,
+  "sourceMutationsAuthored": false,
+  "blockers": [],
+  "limits": [
+    "Unit fixtures consume loader-derived provenance; no crypto or raw operator metadata admission proof.",
+    "Compiled plan and verified approval are supplied decisions; no integration or independent-review proof.",
+    "Fixed per-body tables may mask later assertions; actual controls must classify real first failures.",
+    "Full issue, source controls, quality checks and all held decisions remain open."
+  ]
+}

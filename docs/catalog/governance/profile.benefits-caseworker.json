@@ -1,0 +1,91 @@
+{
+  "profileVersion": 1,
+  "profileId": "governance-benefits-caseworker-draft",
+  "deployment": {
+    "tenantId": "governance-fixture-tenant",
+    "workspaceId": "governance-fixture-workspace",
+    "deploymentId": "governance-benefits-caseworker-fixture",
+    "agentIds": [
+      "governance-fixture-agent"
+    ]
+  },
+  "primaryStation": {
+    "value": "governance",
+    "provenance": "asserted",
+    "source": "draft:docs/catalog/governance/profile.benefits-caseworker.json; synthetic scope only",
+    "reviewedBy": null
+  },
+  "stations": {
+    "value": [
+      "governance",
+      "technology"
+    ],
+    "provenance": "asserted",
+    "source": "draft:docs/catalog/governance/profile.benefits-caseworker.json; synthetic scope only",
+    "reviewedBy": null
+  },
+  "domains": {
+    "value": [
+      "governance.public-services"
+    ],
+    "provenance": "asserted",
+    "source": "draft:docs/catalog/governance/profile.benefits-caseworker.json; synthetic scope only",
+    "reviewedBy": null
+  },
+  "jurisdictions": {
+    "value": [
+      "US",
+      "US-CA",
+      "US-NY",
+      "EU"
+    ],
+    "provenance": "asserted",
+    "source": "draft:docs/catalog/governance/profile.benefits-caseworker.json; synthetic scope only",
+    "reviewedBy": null
+  },
+  "roles": {
+    "value": [
+      "deployer"
+    ],
+    "provenance": "asserted",
+    "source": "draft:docs/catalog/governance/profile.benefits-caseworker.json; synthetic scope only",
+    "reviewedBy": null
+  },
+  "entityTypes": {
+    "value": [
+      "federal_agency",
+      "state_agency",
+      "public_service_provider"
+    ],
+    "provenance": "asserted",
+    "source": "draft:docs/catalog/governance/profile.benefits-caseworker.json; synthetic scope only",
+    "reviewedBy": null
+  },
+  "riskClass": {
+    "value": null,
+    "provenance": "asserted",
+    "source": "draft:docs/catalog/governance/profile.benefits-caseworker.json; synthetic scope only",
+    "reviewedBy": null
+  },
+  "useCases": {
+    "value": [
+      "benefits_decision",
+      "public_service_ai",
+      "agency_vendor_inference",
+      "explanation_request"
+    ],
+    "provenance": "asserted",
+    "source": "draft:docs/catalog/governance/profile.benefits-caseworker.json; synthetic scope only",
+    "reviewedBy": null
+  },
+  "dataClasses": {
+    "value": null,
+    "provenance": "asserted",
+    "source": "draft:docs/catalog/governance/profile.benefits-caseworker.json; synthetic scope only",
+    "reviewedBy": null
+  },
+  "euRoleRecord": null,
+  "art63Record": null,
+  "operatingProfile": null,
+  "exceptions": []
+}

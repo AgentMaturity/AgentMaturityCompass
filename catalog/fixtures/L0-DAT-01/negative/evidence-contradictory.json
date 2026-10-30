@@ -1,0 +1,80 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L0-DAT-01",
+  "polarity": "negative",
+  "evidenceClass": "contradictory",
+  "setup": {
+    "harness": "evidence",
+    "window": {
+      "start": "2025-01-01T00:00:00.000Z",
+      "end": "2026-09-30T23:59:59.000Z"
+    },
+    "subject": {
+      "tenantId": "tenant-a",
+      "workspaceId": "ws-a",
+      "deploymentId": "dep-a",
+      "agentId": "agent-1",
+      "subjectId": null
+    },
+    "plan": {
+      "applicability": "applicable",
+      "policyDigest": "sha256:fixture-policy",
+      "mode": "enforce"
+    },
+    "items": [
+      {
+        "ref": {
+          "kind": "external",
+          "id": "L0-DAT-01-dataflow-admission-1"
+        },
+        "producerId": "amc.dataflow.admission",
+        "provenance": {
+          "verified": true,
+          "producerId": "amc.dataflow.admission",
+          "trustTier": "OBSERVED"
+        },
+        "recordedAt": "2026-09-20T10:00:00.000Z",
+        "binding": {
+          "workspaceId": "ws-a",
+          "agentId": "agent-1",
+          "controlId": "L0-DAT-01"
+        },
+        "verdict": "conforms",
+        "attributes": {
+          "receiptId": "L0-DAT-01-dataflow-admission-1-receipt",
+          "observationKey": "L0-DAT-01-observation-1",
+          "observation": "allow"
+        }
+      },
+      {
+        "ref": {
+          "kind": "external",
+          "id": "L0-DAT-01-dataflow-admission-2"
+        },
+        "producerId": "amc.dataflow.admission",
+        "provenance": {
+          "verified": true,
+          "producerId": "amc.dataflow.admission",
+          "trustTier": "OBSERVED"
+        },
+        "recordedAt": "2026-09-20T10:00:00.000Z",
+        "binding": {
+          "workspaceId": "ws-a",
+          "agentId": "agent-1",
+          "controlId": "L0-DAT-01"
+        },
+        "verdict": "conforms",
+        "attributes": {
+          "receiptId": "L0-DAT-01-dataflow-admission-2-receipt",
+          "observationKey": "L0-DAT-01-observation-1",
+          "observation": "deny"
+        }
+      }
+    ],
+    "priorUses": []
+  },
+  "expected": {
+    "result": "not_evaluated",
+    "reasonCode": "contradictory"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "at": "2026-10-16T23:34:17.047426+00:00",
+  "before": 2719,
+  "after": 2712,
+  "added": [],
+  "removed": [
+    "[\"src/time/checkpoint.ts\",\"exports\",{\"name\":\"checkpointLedger\"}]",
+    "[\"src/time/checkpoint.ts\",\"exports\",{\"name\":\"checkpointsDir\"}]",
+    "[\"src/time/checkpoint.ts\",\"exports\",{\"name\":\"completePendingCheckpoints\"}]",
+    "[\"src/time/checkpoint.ts\",\"exports\",{\"name\":\"ledgerTimeline\"}]",
+    "[\"src/time/checkpoint.ts\",\"exports\",{\"name\":\"readCheckpointChain\"}]",
+    "[\"src/time/checkpoint.ts\",\"types\",{\"name\":\"CheckpointResult\"}]",
+    "[\"src/time/checkpoint.ts\",\"types\",{\"name\":\"LedgerTimeline\"}]"
+  ],
+  "remainingOrderedFindingsExact": true,
+  "duplicates": 1268,
+  "fullDuplicateResultExact": true,
+  "reason": "New test consumption removes five checkpoint exports and two types from Knip findings; no production source or baseline edits.",
+  "globalStatus": "RED",
+  "waiverOrBaselineChange": false,
+  "diagnosticZeroIsNotGatePass": true,
+  "initialEqualityHypothesisRejected": "A read-only comparison asserted unchanged full findings, failed, and was diagnosed before admission; no product retry or changed input."
+}

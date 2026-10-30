@@ -1,0 +1,61 @@
+{
+  "at": "2026-10-16T22:58:53.904476+00:00",
+  "mode": "apply",
+  "operator": "DROP-VALID-GRANT",
+  "sourceCommit": "188681b32dc472983404dce19e7833cd76ee7576",
+  "target": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/src/time/tsaClient.ts",
+  "binding": {
+    "path": "/private/tmp/p1-25-grant-qualification-20261017/fresh-source-binding.json",
+    "physicalPath": "/private/tmp/p1-25-grant-qualification-20261017/fresh-source-binding.json",
+    "bytes": 90075,
+    "sha256": "dd478ef6153d0b03af4b9bb032fa8c7630b759cc37e021f6d5a0cdaae9c6fd35",
+    "dev": 16777231,
+    "inode": 543649633,
+    "nlink": 1
+  },
+  "sourceOutcome": {
+    "path": "/private/tmp/p1-25-grant-qualification-20261017/p125g-source-combined-outcome.json",
+    "physicalPath": "/private/tmp/p1-25-grant-qualification-20261017/p125g-source-combined-outcome.json",
+    "bytes": 4330,
+    "sha256": "7badbc66b8e813647ad56627da9c651e3cdf171ac25403c03a94b85fe029f6e0",
+    "dev": 16777231,
+    "inode": 543589497,
+    "nlink": 1
+  },
+  "canonicalOutcome": {
+    "path": "/private/tmp/p1-25-grant-qualification-20261017/p125g-fresh-canonical-outcome.json",
+    "physicalPath": "/private/tmp/p1-25-grant-qualification-20261017/p125g-fresh-canonical-outcome.json",
+    "bytes": 4362,
+    "sha256": "0c7370c8b8e212217abe841e4de7efa32833af56ab4073e2e59de6e2d208f01a",
+    "dev": 16777231,
+    "inode": 543650004,
+    "nlink": 1
+  },
+  "compiledMutation": false,
+  "nativeMutation": false,
+  "automaticRestoreOrRetry": false,
+  "regularSingleLinkCheckedBeforeWrite": true,
+  "sourceOnlyMutant": true,
+  "sourceBefore": "fc24b04be6ac0a2980425c763eaddd01320137e177d7bedfa7e8c99daa228387",
+  "mutant": "b33e306bcc751815d60ea40d7704aaa4a8b92cf363328647e8d5749768b7167a",
+  "patchSha256": "88dc42851df1155f12c35a0b61b15ce688ca12d0b52bf569bd339b7198db58a5",
+  "patchCapturedFromLiveMutant": true,
+  "targetBefore": {
+    "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/src/time/tsaClient.ts",
+    "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/src/time/tsaClient.ts",
+    "bytes": 10927,
+    "sha256": "fc24b04be6ac0a2980425c763eaddd01320137e177d7bedfa7e8c99daa228387",
+    "dev": 16777231,
+    "inode": 543604763,
+    "nlink": 1
+  },
+  "targetAfter": {
+    "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/src/time/tsaClient.ts",
+    "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/src/time/tsaClient.ts",
+    "bytes": 10821,
+    "sha256": "b33e306bcc751815d60ea40d7704aaa4a8b92cf363328647e8d5749768b7167a",
+    "dev": 16777231,
+    "inode": 543604763,
+    "nlink": 1
+  }
+}

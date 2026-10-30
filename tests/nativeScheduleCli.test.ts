@@ -8,12 +8,16 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
 import { registerAgentCommands } from "../src/cli-agent-commands.js";
 import { registerNativeScheduleCommands } from "../src/cli-native-schedule-commands.js";
-import { readSchedules, saveSchedules, schedulesPath, scheduleStatus } from "../src/autonomy/scheduleStore.js";
+import { buildCommandInventory } from "../src/cliUx.js";
+import { claimDueRun, readSchedules, saveSchedules, schedulesPath, scheduleStatus } from "../src/autonomy/scheduleStore.js";
+import { readObjective } from "../src/autonomy/objectiveStore.js";
 import { loadVerifiedToolsConfigSnapshot } from "../src/toolhub/toolhubValidators.js";
 import { stubProviderRoute, STUB_PROVIDER_ID, STUB_PROVIDER_MODEL } from "../src/agent/stubProvider.js";
 import { bodyFromChunks, type HttpTransport } from "../src/llm/adapter/transport.js";
 import { readAgentRunSummary, verifyAgentRun } from "../src/agent/runReport.js";
 import type { ComposedTurnOptions } from "../src/kernel/agentLoopRunner.js";
+import { SessionService } from "../src/session/sessionService.js";
+import { openSessionEventStore } from "../src/persistence/openSessionEventStore.js";
 
 const dirs: string[] = [];
 afterEach(() => {
@@ -52,6 +56,16 @@ describe("the native public management contract", () => {
     expect(timer).not.toHaveBeenCalled(); expect(output.log).not.toHaveBeenCalled();
   });
 
+  it("is hidden from help and the command inventory, labelled experimental and not qualified (D-12)", () => {
+    const program = new Command();
+    registerAgentCommands(program, io());
+    const group = program.commands.find(command => command.name() === "native-schedule");
+    expect(group?.description()).toMatch(/^Experimental, not qualified: /);
+    expect(program.helpInformation()).not.toContain("native-schedule");
+    expect(buildCommandInventory(program).map(entry => entry.path).filter(path => path.startsWith("native-schedule"))).toEqual([]);
+    expect(buildCommandInventory(program, { includeInternal: true }).map(entry => entry.path)).toContain("native-schedule list");
+  });
+
   it("previews, signs a disabled definition, enables, disables and removes through current digest pins", async () => {
     const dir = workspace(); const input = join(dir, "review.json"); const bytes = JSON.stringify(definition()); writeFileSync(input, bytes);
     const command = cli(dir);
@@ -76,6 +90,31 @@ describe("the native public management contract", () => {
     await command.parse("enable", "review", "--expect-digest", "0".repeat(64));
     expect(command.output.fail).toHaveBeenCalledTimes(2);
     expect(readFileSync(schedulesPath(dir), "utf8")).toBe(before); expect(command.loadRuntime).not.toHaveBeenCalled();
+  });
+
+  it("closes an exact interrupted claim through the existing reset-failures path without resetting its failure count or loading a runtime", async () => {
+    const dir = workspace(); saveSchedules(dir, [definition(true)]); const pin = pins(dir);
+    const owned = claimDueRun(dir, "review", 1_000_000, pin.schedules);
+    if (!owned.ok) throw new Error(owned.reason);
+    const session = new SessionService(dir, openSessionEventStore(dir, "sqlite"));
+    try {
+      session.open({ sessionId: "cli-interrupted-owner", agentId: "default", harnessVersion: "schedule-cli-fixture",
+        compositionDigest: "fixture-composition", policyDigest: "fixture-policy" });
+      session.recordProjectedEvidence({ eventType: "audit", payload: "Native schedule occurrence claimed before dispatch",
+        meta: { type: "native_schedule_claimed", scheduleId: "review", claimId: owned.claimId,
+          schedulesDigest: owned.configDigest, parentSessionId: session.sessionId, now: 1_000_000 } });
+    } finally { session.disposeWithoutClosing(); }
+    const command = cli(dir); const before = readFileSync(join(dir, ".amc", "schedule-state.json"), "utf8");
+    await command.parse("reset-failures", "review", "--close-interrupted", owned.claimId, "--expect-digest", "0".repeat(64));
+    await command.parse("reset-failures", "review", "--close-interrupted", owned.claimId, "--expect-digest", pin.schedules);
+    expect(command.output.fail).toHaveBeenCalledTimes(2);
+    expect(readFileSync(join(dir, ".amc", "schedule-state.json"), "utf8")).toBe(before);
+    vi.spyOn(process, "kill").mockImplementation(() => { throw Object.assign(new Error("fixture exited"), { code: "ESRCH" }); });
+    await command.parse("reset-failures", "review", "--close-interrupted", owned.claimId, "--expect-digest", pin.schedules);
+    expect(command.output.fail).toHaveBeenCalledTimes(2); expect(command.loadRuntime).not.toHaveBeenCalled();
+    expect(JSON.parse(command.output.log.mock.calls.at(-1)![0]).schedules[0]).toMatchObject({
+      inFlightSince: null, consecutiveFailures: 1, lastOutcome: { ok: false, reason: "interrupted", claimId: owned.claimId }
+    });
   });
 
   it("does no runtime work for a valid pass with no due schedules and refuses changed signed tools", async () => {
@@ -111,12 +150,12 @@ describe("public due execution reaches the existing native composed lifecycle", 
       observed.push(options); return runComposedTurn({ ...options, transport: textOnlyTransport });
     } }) });
     const pin = pins(dir); await command.parse("run-due", ...executionArgs(pin));
-    expect(command.output.fail).not.toHaveBeenCalled(); expect(observed).toHaveLength(1);
+    expect(command.output.fail).toHaveBeenCalledTimes(1); expect(observed).toHaveLength(1);
     expect(observed[0]).toMatchObject({ agentId: "default", prompt: "", approvalGate: { actionClass: "READ_ONLY" },
       schedulePass: { expectedSchedulesDigest: pin.schedules, expectedToolsDigest: pin.tools }, config: { maxStepsPerTurn: 8 } });
     expect(observed[0]?.delegation).toBeUndefined(); expect(observed[0]?.approvalGate?.answerers).toBeUndefined();
     const result = JSON.parse(command.output.log.mock.calls.at(-1)![0]);
-    expect(result.scheduleResults[0]).toMatchObject({ scheduleId: "review", rounds: 2, ok: true, stoppedBy: "max-rounds" });
+    expect(result.scheduleResults[0]).toMatchObject({ scheduleId: "review", rounds: 2, ok: false, stoppedBy: "max-rounds" });
     expect(result.scheduleResults[0].childSessionIds).toHaveLength(2);
     for (const sessionId of result.scheduleResults[0].childSessionIds as string[]) {
       const child = readAgentRunSummary(dir, sessionId, "idle");
@@ -140,5 +179,27 @@ describe("public due execution reaches the existing native composed lifecycle", 
     await expect(runComposedTurn({ ...base, approvalGate: { actionClass: "READ_ONLY", riskTier: "high" },
       delegation: { grant: () => {}, runner: async () => ({ ok: true, text: "must never execute" }) } })).rejects.toThrow(/signed approval gate/);
     expect(transport).not.toHaveBeenCalled(); expect(scheduleStatus(dir, 1_000_000).interrupted).toEqual([]);
+  });
+});
+
+
+describe("WP19 objective lifecycle flags on existing schedule commands", () => {
+  it("creates, pauses and resumes by signed revision without loading the runtime", async () => {
+    const dir = workspace();
+    const reviewed = { ...definition(true), objective: { version: 1, ownerPrincipal: "default",
+      completionCheck: { kind: "file-sha256", path: "done.txt", sha256: createHash("sha256").update("done").digest("hex") } } };
+    saveSchedules(dir, [reviewed]);
+    const input = join(dir, "objective.json"), bytes = JSON.stringify(reviewed); writeFileSync(input, bytes);
+    const command = cli(dir), inputHash = createHash("sha256").update(bytes).digest("hex");
+    const args = ["put", input, "--expect-input-sha256", inputHash, "--expect-digest", pins(dir).schedules];
+    await command.parse(...args, "--objective-action", "create", "--expect-objective-revision", "absent");
+    expect(readObjective(dir, "review")).toMatchObject({ revision: 1, status: "active" });
+    await command.parse(...args, "--objective-action", "pause", "--expect-objective-revision", "1");
+    expect(readObjective(dir, "review")).toMatchObject({ revision: 2, status: "paused" });
+    await command.parse(...args, "--objective-action", "resume", "--expect-objective-revision", "1");
+    expect(command.output.fail).toHaveBeenCalledTimes(1);
+    await command.parse(...args, "--objective-action", "resume", "--expect-objective-revision", "2");
+    expect(readObjective(dir, "review")).toMatchObject({ revision: 3, status: "active" });
+    expect(command.loadRuntime).not.toHaveBeenCalled();
   });
 });

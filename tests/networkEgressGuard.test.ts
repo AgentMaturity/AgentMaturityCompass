@@ -59,7 +59,7 @@ function pipelineWith(dir: string, toolName: string): ToolPipeline {
     name: toolName,
     actionClass: "NETWORK_EXTERNAL",
     description: "fetches a url",
-    body: () => ({ output: "FETCHED" })
+    body: () => ({ ok: true, output: "FETCHED" })
   }));
   registry.guard("network-egress", networkEgressGuard(dir));
   return new ToolPipeline({ registry, workspace: dir });
@@ -113,7 +113,7 @@ describe("egress is governed by actionClass, not by tool name", () => {
     const registry = new ToolRegistry();
     registry.define(defineTool({
       name: "read_file", actionClass: "READ_ONLY", description: "reads",
-      body: () => ({ output: "contents" })
+      body: () => ({ ok: true, output: "contents" })
     }));
     registry.guard("network-egress", networkEgressGuard(dir));
 

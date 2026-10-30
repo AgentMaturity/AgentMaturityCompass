@@ -17,6 +17,11 @@ In `gatePolicy.json`:
   - `experimentId`
   - `minUpliftSuccessRate`
   - `minUpliftValuePoints`
+  - `denyIfRegression` (optional)
+  - `candidateConfigDigest` (optional; must equal the report's candidate configuration digest)
+  - `minPairedCases` (optional; default 3)
+
+The experiment checks use the same evaluator as `amc experiment gate` (see `docs/EXPERIMENTS.md`): legacy unbound reports, too few paired cases and unknown cost do not pass. With `maxCostIncreaseRatio` set, missing cost evidence fails the gate and a zero baseline cost is not skipped.
 
 ## CI Flow
 

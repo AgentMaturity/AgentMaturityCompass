@@ -1,0 +1,303 @@
+{
+  "source": "7a81b5aa7316471e841f4ae0ea684a64c85ae4a1",
+  "runtime": "v22.23.3",
+  "success": false,
+  "total": 23111,
+  "passed": 23060,
+  "failed": 51,
+  "pending": 0,
+  "todo": 0,
+  "rawReport": "/private/tmp/p0-47-full-correctness-20261014.json",
+  "rawReportSha256": "3d659821bae47f08a2fe5a09c281d04e79eeb45ce8eb36afaba13d028a64c30a",
+  "rawBytes": 54663315,
+  "coverageTotal": {
+    "lines": {
+      "total": 153817,
+      "covered": 103969,
+      "skipped": 0,
+      "pct": 67.59
+    },
+    "statements": {
+      "total": 172564,
+      "covered": 113561,
+      "skipped": 0,
+      "pct": 65.8
+    },
+    "functions": {
+      "total": 31517,
+      "covered": 22682,
+      "skipped": 0,
+      "pct": 71.96
+    },
+    "branches": {
+      "total": 137723,
+      "covered": 83711,
+      "skipped": 0,
+      "pct": 60.78
+    },
+    "branchesTrue": {
+      "total": 0,
+      "covered": 0,
+      "skipped": 0,
+      "pct": 100
+    }
+  },
+  "failures": [
+    {
+      "file": "apiRouters.test.ts",
+      "name": "AMC API routers enforce router covers status and formal verification routes",
+      "message": "AssertionError: expected 500 to be 200 // Object.is equality"
+    },
+    {
+      "file": "compareBadgeDocs.test.ts",
+      "name": "compare badge DevRel docs documents compare badge generation in public onboarding docs",
+      "message": "AssertionError: expected '<p align=\"center\">\\n  <img src=\"websi\u2026' to contain 'model-compare-badge.svg'"
+    },
+    {
+      "file": "enterpriseSsoScim.test.ts",
+      "name": "enterprise identity (OIDC/SAML/SCIM) OIDC auth code + PKCE flow creates session and mapped workspace roles",
+      "message": "AssertionError: expected 400 to be 302 // Object.is equality"
+    },
+    {
+      "file": "enterpriseSsoScim.test.ts",
+      "name": "enterprise identity (OIDC/SAML/SCIM) OIDC rejects identity tokens without an affirmative email_verified claim",
+      "message": "AssertionError: expected 400 to be 302 // Object.is equality"
+    },
+    {
+      "file": "enterpriseSsoScim.test.ts",
+      "name": "enterprise identity (OIDC/SAML/SCIM) OIDC rejects bad state, bad nonce/signature, and missing email",
+      "message": "AssertionError: expected 400 to be 302 // Object.is equality"
+    },
+    {
+      "file": "evidencePathsExist.test.ts",
+      "name": "evidence paths keeps the frozen list honest \u2014 every entry really is absent",
+      "message": "AssertionError: expected [ 'src/adversarial', \u2026(123) ] to deeply equal [ 'src/adversarial', \u2026(124) ]"
+    },
+    {
+      "file": "jsonlWriterResume.test.ts",
+      "name": "authenticated native JSONL writer recovery real killed writer: original prefix, acknowledged effects and pending usage survive genuine resume",
+      "message": "Error: fixture exited before receipt: 1"
+    },
+    {
+      "file": "jsonlWriterResume.test.ts",
+      "name": "authenticated native JSONL writer recovery two real resumers cannot acquire the same abandoned writer",
+      "message": "Error: fixture exited before receipt: 1"
+    },
+    {
+      "file": "jsonlWriterResume.test.ts",
+      "name": "authenticated native JSONL writer recovery an empty replacement operations journal cannot authorize uncertain dispatch recovery",
+      "message": "Error: fixture exited before receipt: 1"
+    },
+    {
+      "file": "jsonlWriterResume.test.ts",
+      "name": "authenticated native JSONL writer recovery a released complete turn resumes only as a new explicit turn",
+      "message": "EgressBlocked: Residency egress blocked: registry_unverifiable (active_policy_unverifiable); destination=unregistered; rules=none"
+    },
+    {
+      "file": "jsonlWriterResume.test.ts",
+      "name": "authenticated native JSONL writer recovery a released cancelled turn resumes only as a new explicit turn",
+      "message": "EgressBlocked: Residency egress blocked: registry_unverifiable (active_policy_unverifiable); destination=unregistered; rules=none"
+    },
+    {
+      "file": "jsonlWriterResume.test.ts",
+      "name": "authenticated native JSONL writer recovery a parent cancellation cannot be promoted to a standalone resumed agent",
+      "message": "EgressBlocked: Residency egress blocked: registry_unverifiable (active_policy_unverifiable); destination=unregistered; rules=none"
+    },
+    {
+      "file": "jsonlWriterResume.test.ts",
+      "name": "authenticated native JSONL writer recovery changed agent refuses before new writer rights or append",
+      "message": "EgressBlocked: Residency egress blocked: registry_unverifiable (active_policy_unverifiable); destination=unregistered; rules=none"
+    },
+    {
+      "file": "jsonlWriterResume.test.ts",
+      "name": "authenticated native JSONL writer recovery changed composition refuses before new writer rights or append",
+      "message": "EgressBlocked: Residency egress blocked: registry_unverifiable (active_policy_unverifiable); destination=unregistered; rules=none"
+    },
+    {
+      "file": "jsonlWriterResume.test.ts",
+      "name": "authenticated native JSONL writer recovery changed policy refuses before new writer rights or append",
+      "message": "EgressBlocked: Residency egress blocked: registry_unverifiable (active_policy_unverifiable); destination=unregistered; rules=none"
+    },
+    {
+      "file": "jsonlWriterResume.test.ts",
+      "name": "authenticated native JSONL writer recovery changed head refuses before new writer rights or append",
+      "message": "EgressBlocked: Residency egress blocked: registry_unverifiable (active_policy_unverifiable); destination=unregistered; rules=none"
+    },
+    {
+      "file": "jsonlWriterResume.test.ts",
+      "name": "authenticated native JSONL writer recovery changed trust refuses before new writer rights or append",
+      "message": "EgressBlocked: Residency egress blocked: registry_unverifiable (active_policy_unverifiable); destination=unregistered; rules=none"
+    },
+    {
+      "file": "jsonlWriterResume.test.ts",
+      "name": "authenticated native JSONL writer recovery torn history refuses without rewriting its bytes",
+      "message": "EgressBlocked: Residency egress blocked: registry_unverifiable (active_policy_unverifiable); destination=unregistered; rules=none"
+    },
+    {
+      "file": "jsonlWriterResume.test.ts",
+      "name": "authenticated native JSONL writer recovery unterminated history refuses without rewriting its bytes",
+      "message": "EgressBlocked: Residency egress blocked: registry_unverifiable (active_policy_unverifiable); destination=unregistered; rules=none"
+    },
+    {
+      "file": "jsonlWriterResume.test.ts",
+      "name": "authenticated native JSONL writer recovery signature history refuses without rewriting its bytes",
+      "message": "EgressBlocked: Residency egress blocked: registry_unverifiable (active_policy_unverifiable); destination=unregistered; rules=none"
+    },
+    {
+      "file": "jsonlWriterResume.test.ts",
+      "name": "authenticated native JSONL writer recovery future history refuses without rewriting its bytes",
+      "message": "EgressBlocked: Residency egress blocked: registry_unverifiable (active_policy_unverifiable); destination=unregistered; rules=none"
+    },
+    {
+      "file": "jsonlWriterResume.test.ts",
+      "name": "authenticated native JSONL writer recovery unreadable workspace owner is not stolen",
+      "message": "EgressBlocked: Residency egress blocked: registry_unverifiable (active_policy_unverifiable); destination=unregistered; rules=none"
+    },
+    {
+      "file": "jsonlWriterResume.test.ts",
+      "name": "authenticated native JSONL writer recovery foreign workspace owner is not stolen",
+      "message": "EgressBlocked: Residency egress blocked: registry_unverifiable (active_policy_unverifiable); destination=unregistered; rules=none"
+    },
+    {
+      "file": "jsonlWriterResume.test.ts",
+      "name": "authenticated native JSONL writer recovery live workspace owner is not stolen",
+      "message": "EgressBlocked: Residency egress blocked: registry_unverifiable (active_policy_unverifiable); destination=unregistered; rules=none"
+    },
+    {
+      "file": "jsonlWriterResume.test.ts",
+      "name": "authenticated native JSONL writer recovery direct recovery cannot steal a handle dropped by a live process",
+      "message": "EgressBlocked: Residency egress blocked: registry_unverifiable (active_policy_unverifiable); destination=unregistered; rules=none"
+    },
+    {
+      "file": "llmResponsesCapabilities.test.ts",
+      "name": "explicit Responses protocol and required capabilities explicit unknown or unsupported requirements refuse before reading session/credentials or transport",
+      "message": "TypeError: The \"paths[0]\" argument must be of type string. Received undefined"
+    },
+    {
+      "file": "nativeManagedRecovery.test.ts",
+      "name": "reattached sqlite native controller retains approval quorum, accounting and validation pins",
+      "message": "AssertionError: expected null to be 'validation-outcome' // Object.is equality"
+    },
+    {
+      "file": "nativeManagedRecovery.test.ts",
+      "name": "reattached jsonl native controller retains approval quorum, accounting and validation pins",
+      "message": "AssertionError: expected null to be 'validation-outcome' // Object.is equality"
+    },
+    {
+      "file": "nativeSandboxPolicyBinding.test.ts",
+      "name": "the requirement follows the actual confined body refuses a signed policy change between admission and dispatch",
+      "message": "AssertionError: expected '' to match /changed after shell admission/"
+    },
+    {
+      "file": "nativeSandboxPolicyBinding.test.ts",
+      "name": "the requirement follows the actual confined body refuses a unsigned policy change between admission and dispatch",
+      "message": "AssertionError: expected '' to match /verifiable signed tools policy/"
+    },
+    {
+      "file": "nativeValidationOutcomeSurfaces.test.ts",
+      "name": "Darwin 'CLI' public validation reports 'success', preserves its actual output reference and survives cold inspection",
+      "message": "AssertionError: expected null to be 'validation-outcome' // Object.is equality"
+    },
+    {
+      "file": "nativeValidationOutcomeSurfaces.test.ts",
+      "name": "Darwin 'CLI' public validation reports 'nonzero', preserves its actual output reference and survives cold inspection",
+      "message": "AssertionError: expected null to be 'validation-outcome' // Object.is equality"
+    },
+    {
+      "file": "nativeValidationOutcomeSurfaces.test.ts",
+      "name": "Darwin 'SDK' public validation reports 'success', preserves its actual output reference and survives cold inspection",
+      "message": "AssertionError: expected null to be 'validation-outcome' // Object.is equality"
+    },
+    {
+      "file": "nativeValidationOutcomeSurfaces.test.ts",
+      "name": "Darwin 'SDK' public validation reports 'nonzero', preserves its actual output reference and survives cold inspection",
+      "message": "AssertionError: expected null to be 'validation-outcome' // Object.is equality"
+    },
+    {
+      "file": "nativeValidationOutcomeSurfaces.test.ts",
+      "name": "Darwin 'Studio' public validation reports 'success', preserves its actual output reference and survives cold inspection",
+      "message": "AssertionError: expected null to be 'validation-outcome' // Object.is equality"
+    },
+    {
+      "file": "nativeValidationOutcomeSurfaces.test.ts",
+      "name": "Darwin 'Studio' public validation reports 'nonzero', preserves its actual output reference and survives cold inspection",
+      "message": "AssertionError: expected null to be 'validation-outcome' // Object.is equality"
+    },
+    {
+      "file": "publicDocsArtifact.test.ts",
+      "name": "public Docs Pages artifact builds a deterministic allowlisted artifact with source, renderer, and font hashes",
+      "message": "AssertionError: expected '{\"schemaVersion\":\"2.0\",\"id\":0,\"name\":\u2026' to contain '/blob/0123456789abcdef0123456789abcde\u2026'"
+    },
+    {
+      "file": "publicDocsGraph.test.ts",
+      "name": "AMC public Docs graph every local guide edge resolves to another promoted guide",
+      "message": "AssertionError: expected [ { \u2026(3) }, \u2026(19) ] to deeply equal []"
+    },
+    {
+      "file": "questionScoreExplainability.test.ts",
+      "name": "question score explainability receipts GAP-0634 binds cognitive-retrieval preprint metadata to existing eval score explainability primitives",
+      "message": "AssertionError: expected { questionId: 'AMC-1.3', \u2026(8) } to match object { questionId: 'AMC-1.3', \u2026(6) }"
+    },
+    {
+      "file": "questionScoreExplainability.test.ts",
+      "name": "question score explainability receipts binds UpTrain repository metadata to existing eval score explainability primitives",
+      "message": "AssertionError: expected { questionId: 'AMC-1.3', \u2026(8) } to match object { questionId: 'AMC-1.3', \u2026(5) }"
+    },
+    {
+      "file": "studioNativeTaskService.test.ts",
+      "name": "real stub turns are committed once, survive release/restart/resume and cold verify",
+      "message": "AssertionError: expected 'Native startup did not finish. No mod\u2026' to be null"
+    },
+    {
+      "file": "studioNativeTaskService.test.ts",
+      "name": "owner/selected-agent/demo and stale submission boundaries refuse without extra native requests",
+      "message": "AssertionError: expected 'Native startup did not finish. No mod\u2026' to be null"
+    },
+    {
+      "file": "studioNativeTaskService.test.ts",
+      "name": "a stale non-owning observer recovers the exact lost follow-up acknowledgement without dispatching it again",
+      "message": "AssertionError: expected 'Native startup did not finish. No mod\u2026' to be null"
+    },
+    {
+      "file": "studioNativeTaskService.test.ts",
+      "name": "JSONL managed task cold inspection, verification and archive retain actual history and create deduplication",
+      "message": "AssertionError: expected 'Native startup did not finish. No mod\u2026' to be null"
+    },
+    {
+      "file": "studioNativeTaskService.test.ts",
+      "name": "archive frees a current-history slot while retaining sealed evidence and all dedup identities after restart",
+      "message": "AssertionError: expected 'Native startup did not finish. No mod\u2026' to be null"
+    },
+    {
+      "file": "studioNativeTaskService.test.ts",
+      "name": "archive refuses active, foreign, stale, unsealed and uncertain tasks without changing retained metadata",
+      "message": "AssertionError: expected 'Native startup did not finish. No mod\u2026' to be null"
+    },
+    {
+      "file": "studioNativeTaskService.test.ts",
+      "name": "archive authenticates evidence again and hidden archived descriptors still fail closed on tampering",
+      "message": "AssertionError: expected 'Native startup did not finish. No mod\u2026' to be null"
+    },
+    {
+      "file": "studioNativeTaskService.test.ts",
+      "name": "a physical workspace alias runs the same native session, while a different ACP root is refused",
+      "message": "AssertionError: expected 'Native startup did not finish. No mod\u2026' to be null"
+    },
+    {
+      "file": "dataResidencyPersistence.test.ts",
+      "name": "data residency survives the process chains and signs stored records so tampering is detectable",
+      "message": "AssertionError: expected false to be true // Object.is equality"
+    },
+    {
+      "file": "evidenceBinding.test.ts",
+      "name": "source-literal enumeration every source literal in src is classified",
+      "message": "AssertionError: expected [ 'carried', \u2026(12) ] to deeply equal []"
+    },
+    {
+      "file": "api-security.test.ts",
+      "name": "API security hardening OIDC JWT verifier rejects expired and nonce-mismatched tokens",
+      "message": "AssertionError: expected 'id_token verification failed' to contain 'expired'"
+    }
+  ],
+  "profile": "Coverage correctness excludes only tests/performance, which run separately serially; no floor or baseline changed."
+}

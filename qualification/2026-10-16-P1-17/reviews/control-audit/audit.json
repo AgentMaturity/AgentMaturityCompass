@@ -1,0 +1,223 @@
+{
+  "schema": "amc-p117-three-source-controls-independent-audit/1",
+  "capturedUtc": "2026-10-16T09:52:57.206115+00:00",
+  "scope": "Independent read-only audit of six closed source-sensitivity runs, actual body errors, retained original snapshots/recipes, restoration and compiled/native/config pins. Reviewer authored event tests; root alone applied and executed mutations. No AMC runtime/import, SQL/DB open, source write, test rerun or producer edit by reviewer.",
+  "sourceCommit": "3ebf7cbae4023a130ce9db5c9fe304010cd2e5db",
+  "conclusion": "All three controls are detected by their intended semantic assertions. All restorations pass. Eleven body AssertionErrors include one additional diagnostic mismatch where the original trigger still refuses; this is not a second unsafe admission.",
+  "corpus": "The same68 registrations across five original files run unfiltered in each phase. Identity/status multisets agree between raw and observer; identity multiset matches the shared fresh baseline. Repeats are not new tests.",
+  "phases": [
+    {
+      "phase": "p117-mutant-nydfs-71",
+      "total": 68,
+      "passed": 62,
+      "failed": 6,
+      "pending": 0,
+      "todo": 0,
+      "exit": 1,
+      "ms": 5438,
+      "pgid": 28531,
+      "same68IdentityMultiset": true,
+      "rawObserverIdentityStatusesMatch": true,
+      "hookStates": {
+        "afterAll:pass": 5,
+        "afterEach:pass": 24,
+        "beforeAll:pass": 1
+      },
+      "outerESRCH": true,
+      "markerCount": 3,
+      "captureChecks": 18
+    },
+    {
+      "phase": "p117-restored-nydfs-72",
+      "total": 68,
+      "passed": 68,
+      "failed": 0,
+      "pending": 0,
+      "todo": 0,
+      "exit": 0,
+      "ms": 5319,
+      "pgid": 28712,
+      "same68IdentityMultiset": true,
+      "rawObserverIdentityStatusesMatch": true,
+      "hookStates": {
+        "afterAll:pass": 5,
+        "afterEach:pass": 24,
+        "beforeAll:pass": 1
+      },
+      "outerESRCH": true,
+      "markerCount": 3,
+      "captureChecks": 18
+    },
+    {
+      "phase": "p117-mutant-no-signature",
+      "total": 68,
+      "passed": 65,
+      "failed": 3,
+      "pending": 0,
+      "todo": 0,
+      "exit": 1,
+      "ms": 5436,
+      "pgid": 28776,
+      "same68IdentityMultiset": true,
+      "rawObserverIdentityStatusesMatch": true,
+      "hookStates": {
+        "afterAll:pass": 5,
+        "afterEach:pass": 24,
+        "beforeAll:pass": 1
+      },
+      "outerESRCH": true,
+      "markerCount": 3,
+      "captureChecks": 18
+    },
+    {
+      "phase": "p117-restored-signature",
+      "total": 68,
+      "passed": 68,
+      "failed": 0,
+      "pending": 0,
+      "todo": 0,
+      "exit": 0,
+      "ms": 5456,
+      "pgid": 29656,
+      "same68IdentityMultiset": true,
+      "rawObserverIdentityStatusesMatch": true,
+      "hookStates": {
+        "afterAll:pass": 5,
+        "afterEach:pass": 24,
+        "beforeAll:pass": 1
+      },
+      "outerESRCH": true,
+      "markerCount": 3,
+      "captureChecks": 18
+    },
+    {
+      "phase": "p117-mutant-no-created-ts",
+      "total": 68,
+      "passed": 66,
+      "failed": 2,
+      "pending": 0,
+      "todo": 0,
+      "exit": 1,
+      "ms": 5505,
+      "pgid": 29758,
+      "same68IdentityMultiset": true,
+      "rawObserverIdentityStatusesMatch": true,
+      "hookStates": {
+        "afterAll:pass": 5,
+        "afterEach:pass": 24,
+        "beforeAll:pass": 1
+      },
+      "outerESRCH": true,
+      "markerCount": 3,
+      "captureChecks": 18
+    },
+    {
+      "phase": "p117-restored-created-ts",
+      "total": 68,
+      "passed": 68,
+      "failed": 0,
+      "pending": 0,
+      "todo": 0,
+      "exit": 0,
+      "ms": 5357,
+      "pgid": 29803,
+      "same68IdentityMultiset": true,
+      "rawObserverIdentityStatusesMatch": true,
+      "hookStates": {
+        "afterAll:pass": 5,
+        "afterEach:pass": 24,
+        "beforeAll:pass": 1
+      },
+      "outerESRCH": true,
+      "markerCount": 3,
+      "captureChecks": 18
+    }
+  ],
+  "attribution": [
+    {
+      "control": "NYDFS72\u219271",
+      "mutant": "62 passed/6 failed",
+      "restored": "68/68",
+      "actual": "NYDFS due at1772701200000 versus expected1772704800000 (one hour early). The earlier-trigger case returns1772704800000 versus expected1772708400000.",
+      "frames": [
+        "153:67 persisted due equality",
+        "166:60 before-due composite: status stillSATISFIED, due wrong",
+        "166:60 at-due composite: actualSATISFIED_LATE vs expectedSATISFIED, due wrong",
+        "166:60 after-due composite: statusSATISFIED_LATE agrees, due wrong",
+        "212:67 earlier-trigger due equality",
+        "273:57 independent literal due equality"
+      ],
+      "masking": "The event-count assertion167 is masked for the three notification cases. Earlier signature checks and cold reopen occurred. No later assertion is credited past a failure.",
+      "meaning": "Finite arithmetic sensitivity only, not legal review of72hours."
+    },
+    {
+      "control": "skip row signature verification",
+      "mutant": "65 passed/3 failed",
+      "restored": "68/68",
+      "actual": "Edited timestamp, edited station and wrong-key loads all returned without the expected error.",
+      "frames": [
+        "227:105 edited timestamp no-throw",
+        "238:105 edited station no-throw",
+        "247:110 wrong public key no-throw"
+      ],
+      "masking": "Independent original/edited signature checks before227/238 reached. Original healthy-database assertion228 is masked. Other-station membership assertions245\u2013246 reached before wrong-key failure.",
+      "meaning": "The timestamp case is the required signature discriminator. The station case also fails here but is not counted as a fourth control; its original product regression was separately measured before repair."
+    },
+    {
+      "control": "drop createdTs guard",
+      "mutant": "66 passed/2 failed",
+      "restored": "68/68",
+      "actual": "NOTIFIED on an unstarted NYDFS clock atT-1 returned normally, failing the required refusal. The ordinary TRIGGER still threw: clock event refused: trigger INCIDENT_DETERMINATION(...) is before incident...createdTs(...).",
+      "frames": [
+        "173:86 decisive missing-refusal semantic failure",
+        "178:43 diagnostic /backdated/ mismatch despite actual refusal"
+      ],
+      "masking": "Empty-store assertion174 is masked after no-throw; assertion179 is also masked after diagnostic mismatch. No measured appended-row count is claimed, and no SQLite was opened to invent one.",
+      "meaning": "The unstarted-clock notice isolates the event admission guard. Defense in attachRegulatoryClocks still protects the ordinary trigger; that secondary diagnostic failure alone would be inconclusive."
+    }
+  ],
+  "infrastructure": {
+    "allErrors": "All11 are actual AssertionError records with exact raw/observer stacks; generic exit1 is not used as a kill.",
+    "fileSuiteUnhandledErrors": 0,
+    "nonterminalPendingTodo": 0,
+    "hooks": "All30 recorded hooks pass in each phase.",
+    "knownLateDiagnostics": 0,
+    "outerGroups": "All six commands exit normal0/1, have retained owned-groupESRCH and no nonzero signals.",
+    "surfaceObservations": "18 markers equal their retained files;54 actual compiled-stage children have natural0/nullsignal/PIDESRCH and108 complete UTF8 capture byte/hash matches. No extra signature recalculation for those repeated compiled controls is claimed."
+  },
+  "preservation": {
+    "recipes": "All three exact single replacements derive the declared mutant bytes/hash from retained original snapshots and match applied metadata. They affect Qonly, sequentially using the prior restored phase.",
+    "RAndQ": "Both Git HEADs3ebf and status empty at read time. Seven unique source/test paths in both match frozen baseline bytes.",
+    "compiled": "All five specifically bound compiled child modules remain exact;18 marker pin sets also match their selected15directbuild/SDK inputs. These are TS source controls; compiled CLI/API/MCP remain healthy unmutated controls. No compiled mutation sensitivity or all4529dist proof.",
+    "native": "Both R/Q native bytes/hash/device/inode/nlink match fresh-source-binding; no binary loading or shared ABI mutation.",
+    "guardsAndFloors": "R/Q Vitest config, three setup guards, freeze baseline and coverage baseline each match committed3ebf. Ordinary30second deadlines and quality/freeze floors were unchanged.",
+    "detailFile": "/private/tmp/p1-17-qualification-20261016/control-audit/preservation-facts.json"
+  },
+  "metadataIssue": {
+    "retainedV1": {
+      "path": "/private/tmp/p1-17-qualification-20261016/inspect-phase-v1.py",
+      "bytes": 3573,
+      "sha256": "f8ca16a507de5727f4583c46153b656a323368de2c6df62a7dd118d834149641"
+    },
+    "correctedV2": {
+      "path": "/private/tmp/p1-17-qualification-20261016/inspect-phase.py",
+      "bytes": 3923,
+      "sha256": "fb6fccf4d941eda0fc9e3350e71da61475ac8e5f8311f62e1d51d64356ad3fad"
+    },
+    "cause": "The static recipe omitted Vitest quotes around the parameterized NYDFS title. V1 classified the already completed run then stopped at its expected-title assertion.",
+    "correction": "V2 maps only that explicit unquoted name to the actual quoted name and records the alias in its outcome. The exact source diff is retained in preservation facts.",
+    "limit": "No source/test assertion, runtime guard or criterion was weakened; the closed actual test command was not rerun for this metadata fix. Inner recipe sourceApplied:false/runtime:null fields are preserved historical preparation data, not actual-run denial."
+  },
+  "limits": [
+    "Three source guard controls, not eleven independent vulnerabilities or a fourth station-order control.",
+    "Source-mode execution leaves the now-unused signature import in one mutant; no mutant typecheck/build qualification claimed.",
+    "No full suite/globalcoverage, legal/expert approval, PR/merge/gate or wholeP117acceptance claim.",
+    "F37 stays skipped; all human/Claude/paused boundaries remain."
+  ],
+  "blockingControlFindings": [],
+  "phaseFactsFile": "/private/tmp/p1-17-qualification-20261016/control-audit/phase-facts.json",
+  "failureAttributionFile": "/private/tmp/p1-17-qualification-20261016/control-audit/failure-attribution.json",
+  "inputPinsFile": "/private/tmp/p1-17-qualification-20261016/control-audit/input-pins.json",
+  "allReadsFinished": true,
+  "formalAcceptanceClosed": false
+}

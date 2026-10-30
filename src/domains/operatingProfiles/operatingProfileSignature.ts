@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { basename, resolve } from "node:path";
-import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigest } from "../../crypto/keys.js";
+import { getSigningKey, getPublicKeyHistory, signHexDigest, verifyHexDigest } from "../../crypto/keys.js";
 import { assertOwnerMode } from "../../mode/mode.js";
 import { checkDigestSignature, ed25519KeyId, loadTrustContext } from "../../trust/index.js";
 import { isKeyRefused } from "../../trust/signatureCheck.js";
@@ -65,7 +65,7 @@ export function signOperatingProfile(workspace: string, profilePath: string): st
   const { sigPath, digestSha256 } = inspectOperatingProfileForSigning(workspace, profilePath);
   const payload: OperatingProfileSignature = {
     digestSha256,
-    signature: signHexDigest(digestSha256, getPrivateKeyPem(workspace, "auditor")),
+    signature: signHexDigest(digestSha256, getSigningKey(workspace, "config-signature")),
     signedTs: Date.now(),
     signer: "auditor"
   };

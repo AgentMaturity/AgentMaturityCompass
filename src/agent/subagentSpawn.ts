@@ -1,8 +1,9 @@
-import { mintDelegationPacket, UnsignablePacketError } from "../fleet/delegationPacket.js";
-import { removeHandoffPacket } from "../fleet/handoffPacket.js";
+import { realpathSync } from "node:fs";
+import { mintDelegationPacketAsync, UnsignablePacketError } from "../fleet/delegationPacket.js";
+import { removeHandoffPacketIfCurrent, type HandoffPacket } from "../fleet/handoffPacket.js";
 import { parseDelegationScope } from "./delegationScope.js";
 import { parseSubagentStopConditions } from "./subagentStopConditions.js";
-import { writeDelegationEvidence } from "./delegationEvidenceWriter.js";
+import { writeDelegationEvidence, mintNativeDelegationReceipt } from "./delegationEvidenceWriter.js";
 import type { ActionClass } from "../types.js";
 import {
   DEFAULT_MAX_DELEGATION_DEPTH,
@@ -37,7 +38,8 @@ import type { LoopEventRecord } from "../session/loopEventMeta.js";
  * which is what makes them testable at all.
  *
  * ORDER IS THE SAFETY PROPERTY. Refuse, then authorise, then announce, then run.
- * A refusal writes nothing; an unsignable packet leaves no file and no row; and
+ * A capacity refusal writes an admission audit, never a packet; an unsignable
+ * packet leaves no file and no row; and
  * `delegation-completed` is only ever written for a child that was announced,
  * so a rolled-back spawn cannot emit a completion for a delegation nobody saw.
  */
@@ -55,9 +57,16 @@ export interface SubagentRunContext {
   readonly identity: DelegationIdentity;
   /** The child's own session. A child is never a second writer on the parent's. */
   readonly childSessionId: string;
+  /** Current goal progress supplied by the owning schedule runner; never read from model arguments. */
+  readonly getGoal?: () => unknown;
   readonly goal: string;
   /** The signed delegation packet that authorized this child; its authorization records name it as their parent. */
   readonly packetId?: string;
+  /**
+   * The lease of the run that spawned this child (P2-25), passed explicitly from the parent's composition, never looked
+   * up by a name the model chose. Absent for a child of the root run, whose parent lease is the runner's own.
+   */
+  readonly parentLeaseToken?: string;
   /**
    * The action classes this child is authorised for, validated.
    *
@@ -150,7 +159,7 @@ export interface SubagentHandle {
   /** More work, through the inbox and nowhere else. */
   continue(text: string): Promise<SubagentRunResult>;
   /** Account for the delegation and release the child. Safe to call twice. */
-  close(settledAs: DelegationSettlement, reason: string): void;
+  close(settledAs: DelegationSettlement, reason: string): void | Promise<void>;
 }
 
 /** How the runtime saw a delegation end. */
@@ -158,6 +167,8 @@ export type DelegationSettlement = "reported" | "refused" | "failed" | "cancelle
 
 /** The minimum this module needs of a session. */
 export interface DelegationRecorder {
+  /** Stable owning session identity; recorder identity isolates injected writers without one. */
+  readonly sessionId?: string;
   recordLoopEvent(record: LoopEventRecord): unknown;
   /**
    * Where the settled delegation's scoreable projection is written.
@@ -187,6 +198,8 @@ export interface SpawnSubagentInit {
   /** Mints the child's session id. Injected so a test can pin it. */
   readonly mintSessionId: () => string;
   readonly maxDepth?: number;
+  /** Root-wide active or reserved children, including descendants; operator configuration only. */
+  readonly maxActiveChildren?: number;
   /** Aborted when the parent gives up. See `SubagentRunContext.signal`. */
   readonly signal?: AbortSignal;
   /**
@@ -198,6 +211,8 @@ export interface SpawnSubagentInit {
    * two actually happened.
    */
   readonly cancelGraceMs?: number;
+  /** The spawning run's own lease (P2-25); see `SubagentRunContext.parentLeaseToken`. Absent at the root. */
+  readonly parentLeaseToken?: string;
 }
 
 export type SubagentOutcome =
@@ -229,8 +244,8 @@ export type SubagentOutcome =
 /**
  * Spawn one child, or refuse.
  *
- * Refusals before the announcement write nothing at all — no packet, no row —
- * because a record of an authorisation that never held is worse than silence.
+ * Capacity refusals write an admission audit, without an authorisation packet
+ * or a started/completed pair for work that was never admitted.
  */
 /** How long a cancelled child gets to return before the delegation settles anyway. */
 export const DEFAULT_CANCEL_GRACE_MS = 5_000;
@@ -270,6 +285,69 @@ function settleWithin(
   });
 }
 
+/** Concurrent children per root session, shared across delegate and workflow calls. */
+export const DEFAULT_MAX_ACTIVE_CHILDREN = 8;
+
+interface ChildAdmissionPool {
+  readonly workspaceKey: string;
+  readonly root: string | DelegationRecorder;
+  readonly rootSessionId: string | null;
+  limit: number;
+  active: number;
+}
+// ponytail: process-local admission; use shared leases if child execution crosses processes.
+const activeChildRoots = new Map<string, Map<string | DelegationRecorder, ChildAdmissionPool>>();
+// Enumerable symbols survive trusted identity snapshots in workflowRunner, but
+// never enter JSON/model arguments or signed evidence as mutable configuration.
+const ROOT_CHILD_ADMISSION = Symbol("root child admission");
+type AdmissionIdentity = DelegationIdentity & { readonly [ROOT_CHILD_ADMISSION]?: ChildAdmissionPool };
+
+function childAdmissionRefused(init: SpawnSubagentInit, reason: string, pool?: ChildAdmissionPool): SubagentOutcome {
+  init.session.recordProjectedEvidence({ eventType: "audit", payload: "", meta: {
+    kind: "delegation/admission-refused", version: 1, settledAs: "refused", reason,
+    governedAs: init.parent.governedAs, parentRunAs: init.parent.runAs, childRunAs: init.request.runAs,
+    rootSessionId: pool?.rootSessionId ?? null, packetId: null,
+    maxActiveChildren: pool?.limit ?? null, reservedChildren: pool?.active ?? null
+  } });
+  return { ok: false, reason, packetId: null };
+}
+
+function reserveChildAdmission(init: SpawnSubagentInit):
+  | { readonly ok: true; readonly pool: ChildAdmissionPool; readonly release: () => void }
+  | { readonly ok: false; readonly outcome: SubagentOutcome } {
+  const configured = init.maxActiveChildren;
+  if (configured !== undefined && (!Number.isSafeInteger(configured) || configured < 0)) {
+    return { ok: false, outcome: childAdmissionRefused(init, "maxActiveChildren must be a non-negative safe integer") };
+  }
+  const workspaceKey = JSON.stringify([realpathSync(init.workspace), init.parent.governedAs]);
+  const inherited = (init.parent as AdmissionIdentity)[ROOT_CHILD_ADMISSION];
+  const ancestor = inherited?.workspaceKey === workspaceKey ? inherited : undefined;
+  const root = ancestor?.root ?? init.session.sessionId ?? init.session;
+  const roots = activeChildRoots.get(workspaceKey) ?? new Map<string | DelegationRecorder, ChildAdmissionPool>();
+  const pool = roots.get(root) ?? ancestor ?? { workspaceKey, root,
+    rootSessionId: init.session.sessionId ?? null, limit: configured ?? DEFAULT_MAX_ACTIVE_CHILDREN, active: 0 };
+  pool.limit = Math.min(pool.limit, ancestor?.limit ?? pool.limit, configured ?? pool.limit);
+  if (pool.active >= pool.limit) {
+    return { ok: false, outcome: childAdmissionRefused(init,
+      `delegation refused: maxActiveChildren=${pool.limit} reached for this root session (${pool.active} children active or reserved)`, pool) };
+  }
+  // Synchronous reservation precedes signing, so parallel awaits cannot over-admit.
+  pool.active++;
+  roots.set(root, pool);
+  activeChildRoots.set(workspaceKey, roots);
+  let released = false;
+  return { ok: true, pool, release: () => {
+    if (released) return;
+    released = true;
+    pool.active--;
+    const current = activeChildRoots.get(workspaceKey);
+    if (pool.active === 0 && current?.get(root) === pool) {
+      current.delete(root);
+      if (current.size === 0) activeChildRoots.delete(workspaceKey);
+    }
+  } };
+}
+
 export async function spawnSubagent(init: SpawnSubagentInit): Promise<SubagentOutcome> {
   // The signed packet and all later admissions use this snapshot, not mutable
   // caller arrays/configuration inspected again after an async runner returns.
@@ -286,7 +364,6 @@ export async function spawnSubagent(init: SpawnSubagentInit): Promise<SubagentOu
   }
   const derived = delegateTo(parent, request.runAs, maxDepth);
   if (!derived.ok) return { ok: false, reason: derived.reason, packetId: null };
-  const identity = Object.freeze(derived.identity);
   if (parentSignal?.aborted === true) {
     return { ok: false, reason: "parent gave up before the delegation was authorised", packetId: null };
   }
@@ -297,17 +374,29 @@ export async function spawnSubagent(init: SpawnSubagentInit): Promise<SubagentOu
     scopeClasses = parsed.classes;
   }
 
-  let packetId: string;
+  const admission = reserveChildAdmission({ ...init, workspace, parent, request, session });
+  if (!admission.ok) return admission.outcome;
+  const identity = Object.freeze({ ...derived.identity, [ROOT_CHILD_ADMISSION]: admission.pool });
+
+  let packet: HandoffPacket;
   try {
-    packetId = mintDelegationPacket(workspace, { parent, child: identity, goal: request.goal,
-      delegationScope: request.delegationScope, stopConditions: stops.conditions }).packetId;
+    packet = await mintDelegationPacketAsync(workspace, { parent, child: identity, goal: request.goal,
+      delegationScope: request.delegationScope, stopConditions: stops.conditions }, { signal: parentSignal });
+    if (parentSignal?.aborted) {
+      removeHandoffPacketIfCurrent(workspace, packet);
+      admission.release();
+      return { ok: false, reason: "parent gave up before the delegation was authorised", packetId: null };
+    }
   } catch (error) {
+    admission.release();
     return { ok: false, reason: error instanceof UnsignablePacketError ? error.message : String(error), packetId: null };
   }
+  const packetId = packet.packetId;
   let childSessionId: string;
+  let startedRef: unknown;
   try {
     childSessionId = mintSessionId();
-    session.recordLoopEvent({ kind: "delegation-started", childRunAs: identity.runAs, childSessionId,
+    startedRef = session.recordLoopEvent({ kind: "delegation-started", childRunAs: identity.runAs, childSessionId,
       governedAs: identity.governedAs, depth: identity.depth, packetId });
     if (runner.hookControl === undefined) {
       // The child's own session records the control it runs under only when the
@@ -321,8 +410,19 @@ export async function spawnSubagent(init: SpawnSubagentInit): Promise<SubagentOu
       } });
     }
   } catch (error) {
-    removeHandoffPacket(workspace, packetId);
+    admission.release();
+    removeHandoffPacketIfCurrent(workspace, packet);
     throw error;
+  }
+
+  try {
+    await mintNativeDelegationReceipt(workspace, startedRef);
+  } catch (error) {
+    const reason = `delegation lineage signing refused; child was not run: ${String(error)}`;
+    try { session.recordLoopEvent({ kind: "delegation-completed", childRunAs: identity.runAs,
+      childSessionId, packetId, settledAs: "failed", reason }); }
+    finally { admission.release(); }
+    return { ok: false, reason, packetId };
   }
 
   const controller = new AbortController();
@@ -335,6 +435,8 @@ export async function spawnSubagent(init: SpawnSubagentInit): Promise<SubagentOu
   let stopReason: string | undefined;
   let closeReason = "child has been released";
   let accountingError: unknown;
+  let lineagePending = Promise.resolve();
+  let activeSettled = Promise.resolve();
   let turns = 0;
   let latestText = "";
   let continuation: SubagentContinuation | undefined;
@@ -358,14 +460,21 @@ export async function spawnSubagent(init: SpawnSubagentInit): Promise<SubagentOu
     if (lifetimeTimer !== undefined) clearTimeout(lifetimeTimer);
     parentSignal?.removeEventListener("abort", onParentAbort);
     const releaseFailure = release ? releaseResources() : undefined;
+    if (release) admission.release();
     closeReason = `${reason}${releaseFailure === undefined ? "" : `; ${releaseFailure}`}`;
     if (releaseFailure !== undefined && settledAs === "reported") settledAs = "failed";
     // Mark terminal before calling external writers or release hooks. An idle
     // timeout can run after the parent writer was closed; retain that error for
     // the handle without throwing from an asynchronous timer or inventing a row.
     try {
-      session.recordLoopEvent({ kind: "delegation-completed", childRunAs: identity.runAs,
+      const completedRef = session.recordLoopEvent({ kind: "delegation-completed", childRunAs: identity.runAs,
         childSessionId, packetId, settledAs, reason: closeReason });
+      // Timers and synchronous callers may ignore this promise; retain the failure
+      // immediately, while awaited outcomes/close still observe publication refusal.
+      lineagePending = mintNativeDelegationReceipt(workspace, completedRef).catch(error => {
+        accountingError = error;
+        closeReason += `; delegation lineage signing failed: ${String(error)}`;
+      });
       writeDelegationEvidence(session, { settledAs, depth: identity.depth, packetId,
         childRunAs: identity.runAs, childSessionId, governedAs: identity.governedAs,
         ...(scopeClasses === undefined ? {} : { scopeDeclared: scopeClasses }), childText: latestText });
@@ -373,6 +482,11 @@ export async function spawnSubagent(init: SpawnSubagentInit): Promise<SubagentOu
       accountingError = error;
       closeReason += `; delegation completion could not be recorded: ${String(error)}`;
     }
+  };
+  const awaitLineage = (after = Promise.resolve()): Promise<void> => {
+    const published = after.then(() => lineagePending).then(() => { if (accountingError !== undefined) throw accountingError; });
+    void published.catch(() => {}); // Ignored legacy close calls must not create an unhandled rejection.
+    return published;
   };
   const requestStop = (reason: string): void => {
     if (closed || stopReason !== undefined) return;
@@ -392,48 +506,59 @@ export async function spawnSubagent(init: SpawnSubagentInit): Promise<SubagentOu
   // Only accepted invocations consume max-turns. The initial invocation is #1.
   const execute = async (dispatch: () => Promise<SubagentRunResult>): Promise<SubagentRunResult> => {
     checkDeadline();
-    if (closed || stopReason !== undefined) return { ok: false, text: "",
-      reason: closed ? `child has been released: ${closeReason}` : stopReason };
+    if (closed || stopReason !== undefined) {
+      await lineagePending;
+      return { ok: false, text: "", reason: closed ? `child has been released: ${closeReason}` : stopReason };
+    }
     if (active) return { ok: false, text: "", reason: "child already has an active turn" };
     active = true;
-    lifetimeTimer?.ref?.();
-    turns += 1;
-    let running: Promise<SubagentRunResult>;
-    try { running = Promise.resolve(dispatch()); }
-    catch (error) { running = Promise.reject(error); }
-    const result = await settleWithin(running, controller.signal, graceMs, late => {
-      // After abandonment the executor may still own an active DB. Release it
-      // only after it returns, including an initial late continuation handle.
-      // The original unconfirmed settlement is never rewritten or duplicated.
-      releaseResources(late);
-    });
-    checkDeadline();
-    active = false;
-    lifetimeTimer?.unref?.();
-    if (result === ABANDONED) {
-      account("cancelled", `${stopReason ?? "delegation cancelled"}; child did not stop within the grace window and was abandoned; execution stop unconfirmed`, false);
-      return { ok: false, text: "", reason: closeReason };
-    }
-    if (result.continuation !== undefined) {
-      retained.add(result.continuation);
-      continuation = result.continuation;
-    }
-    latestText = result.text;
-    if (stopReason !== undefined) {
-      account("cancelled", `${stopReason}; runner returned${result.reason === undefined ? "" : `: ${result.reason}`}`);
-      return { ok: false, text: result.text, reason: closeReason };
-    }
-    if (!result.ok || result.text.trim().length === 0) {
-      account("failed", result.reason ?? (result.ok ? "child produced no output" : "child did not report a reason"));
-      return { ok: false, text: result.text, reason: closeReason };
-    }
-    if (limitReached() || continuation === undefined || request.continuable !== true) {
-      account("reported", limitReached() ? `max-turns:${stops.maxTurns} ceiling reached; child reported and was released` : "child reported");
-      if (accountingError !== undefined || closeReason.includes("child resource release failed:")) {
+    let settled!: () => void;
+    activeSettled = new Promise<void>(resolve => { settled = resolve; });
+    try {
+      lifetimeTimer?.ref?.();
+      turns += 1;
+      let running: Promise<SubagentRunResult>;
+      try { running = Promise.resolve(dispatch()); }
+      catch (error) { running = Promise.reject(error); }
+      const result = await settleWithin(running, controller.signal, graceMs, late => {
+        // After abandonment the executor may still own an active DB. Release it
+        // only after it returns, including an initial late continuation handle.
+        // The original unconfirmed settlement is never rewritten or duplicated.
+        releaseResources(late);
+        admission.release();
+      });
+      checkDeadline();
+      active = false;
+      lifetimeTimer?.unref?.();
+      if (result === ABANDONED) {
+        account("cancelled", `${stopReason ?? "delegation cancelled"}; child did not stop within the grace window and was abandoned; execution stop unconfirmed`, false);
+        await lineagePending;
+        return { ok: false, text: "", reason: closeReason };
+      }
+      if (result.continuation !== undefined) {
+        retained.add(result.continuation);
+        continuation = result.continuation;
+      }
+      latestText = result.text;
+      if (stopReason !== undefined) {
+        account("cancelled", `${stopReason}; runner returned${result.reason === undefined ? "" : `: ${result.reason}`}`);
+        await lineagePending;
         return { ok: false, text: result.text, reason: closeReason };
       }
-    }
-    return publicResult(result);
+      if (!result.ok || result.text.trim().length === 0) {
+        account("failed", result.reason ?? (result.ok ? "child produced no output" : "child did not report a reason"));
+        await lineagePending;
+        return { ok: false, text: result.text, reason: closeReason };
+      }
+      if (limitReached() || continuation === undefined || request.continuable !== true) {
+        account("reported", limitReached() ? `max-turns:${stops.maxTurns} ceiling reached; child reported and was released` : "child reported");
+        await lineagePending;
+        if (accountingError !== undefined || closeReason.includes("child resource release failed:")) {
+          return { ok: false, text: result.text, reason: closeReason };
+        }
+      }
+      return publicResult(result);
+    } finally { settled(); }
   };
 
   parentSignal?.addEventListener("abort", onParentAbort, { once: true });
@@ -445,6 +570,7 @@ export async function spawnSubagent(init: SpawnSubagentInit): Promise<SubagentOu
   }
   const first = await execute(() => runner({ continuable: request.continuable === true,
     toolsetAgentId: identity.governedAs, identity, childSessionId, goal: request.goal, packetId,
+    ...(init.parentLeaseToken === undefined ? {} : { parentLeaseToken: init.parentLeaseToken }),
     ...(scopeClasses === undefined ? {} : { delegationScope: scopeClasses }),
     ...(request.stopConditions === undefined ? {} : { stopConditions: stops.conditions }), signal: controller.signal }));
   if (!first.ok) return { ok: false, reason: first.reason ?? closeReason, packetId,
@@ -455,15 +581,16 @@ export async function spawnSubagent(init: SpawnSubagentInit): Promise<SubagentOu
     continue: text => execute(() => continuation!.continue(text)),
     close: (settledAs, reason) => {
       checkDeadline();
-      if (closed) return;
+      if (closed) return awaitLineage();
       if (active) {
         // The active call owns bounded settlement and eventual disposal. Never
         // close a runner's DB beneath its still-running continuation.
         requestStop(`child release requested during an active turn: ${reason}`);
-        return;
+        return awaitLineage(activeSettled);
       }
       account(settledAs, reason);
       if (accountingError !== undefined) throw accountingError;
+      return awaitLineage();
     }
   };
   return { ok: true, identity, packetId, childSessionId, childText: first.text, handle };

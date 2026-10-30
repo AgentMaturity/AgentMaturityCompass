@@ -1,0 +1,322 @@
+{
+  "schema": "p126-five-phase-independent-joins/1",
+  "phases": [
+    {
+      "phase": "p126-fresh-canonical",
+      "tests": {
+        "total": 54,
+        "passed": 54,
+        "failed": 0,
+        "skipped": 0
+      },
+      "files": 5,
+      "hookTaskEntries": 46,
+      "individualHookValues": 46,
+      "exit": 0,
+      "durationMs": 9280,
+      "ownedPgid": 34345,
+      "naturalGroupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "orderedRawObserverJoinExact": true,
+      "perFileOrderMatchesCanonical54": true,
+      "unhandledOrLateErrors": [],
+      "publicEvidencePaths": [],
+      "firstFailures": []
+    },
+    {
+      "phase": "p126-m1",
+      "tests": {
+        "total": 54,
+        "passed": 43,
+        "failed": 11,
+        "skipped": 0
+      },
+      "files": 5,
+      "hookTaskEntries": 46,
+      "individualHookValues": 46,
+      "exit": 1,
+      "durationMs": 8287,
+      "ownedPgid": 34576,
+      "naturalGroupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "orderedRawObserverJoinExact": true,
+      "perFileOrderMatchesCanonical54": true,
+      "unhandledOrLateErrors": [],
+      "publicEvidencePaths": [],
+      "firstFailures": [
+        {
+          "name": "RFC 9162 offline tree empty, leaf and node hashes preserve byte domains and child order",
+          "firstFrame": {
+            "method": "",
+            "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout/tests/transparency/rfc9162.test.ts",
+            "line": 241,
+            "column": 40
+          },
+          "message": "expected '4bf5122f344554c53bde2ebb8cd2b7e3d1600\u2026' to be '6e340b9cffb37a989ca544e6bb780a2c78901\u2026' // Object.is equality"
+        },
+        {
+          "name": "RFC 9162 offline tree ports eight leaf inputs and all nine known roots from constants.go",
+          "firstFrame": {
+            "method": "",
+            "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout/tests/transparency/rfc9162.test.ts",
+            "line": 261,
+            "column": 73
+          },
+          "message": "vendor root at 1: expected '4bf5122f344554c53bde2ebb8cd2b7e3d1600\u2026' to be '6e340b9cffb37a989ca544e6bb780a2c78901\u2026' // Object.is equality"
+        },
+        {
+          "name": "RFC 9162 offline tree ports the five exact happy-path inclusion JSON vectors",
+          "firstFrame": {
+            "method": "",
+            "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout/tests/transparency/rfc9162.test.ts",
+            "line": 274,
+            "column": 57
+          },
+          "message": "testdata/inclusion/0/happy-path.json: expected '4bf5122f344554c53bde2ebb8cd2b7e3d1600\u2026' to be '6e340b9cffb37a989ca544e6bb780a2c78901\u2026' // Object.is equality"
+        },
+        {
+          "name": "RFC 9162 offline tree ports the five exact happy-path consistency JSON vectors",
+          "firstFrame": {
+            "method": "",
+            "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout/tests/transparency/rfc9162.test.ts",
+            "line": 287,
+            "column": 74
+          },
+          "message": "testdata/consistency/0/happy-path.json: expected '4bf5122f344554c53bde2ebb8cd2b7e3d1600\u2026' to be '6e340b9cffb37a989ca544e6bb780a2c78901\u2026' // Object.is equality"
+        },
+        {
+          "name": "RFC 9162 offline tree matches an independent recursive root at every size from 1 through 64",
+          "firstFrame": {
+            "method": "",
+            "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout/tests/transparency/rfc9162.test.ts",
+            "line": 296,
+            "column": 78
+          },
+          "message": "root at 2: expected '2cb69667dbd01036ebb0ae5afbf05fbe5cb84\u2026' to be 'abc1fc3bc01edb8067ef6e7b0b6f38c4ef41f\u2026' // Object.is equality"
+        },
+        {
+          "name": "RFC 9162 offline tree verifies every inclusion index against independent roots for sizes 1 through 64",
+          "firstFrame": {
+            "method": "",
+            "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout/tests/transparency/rfc9162.test.ts",
+            "line": 305,
+            "column": 120
+          },
+          "message": "index 0, size 2: expected false to be true // Object.is equality"
+        },
+        {
+          "name": "RFC 9162 offline tree verifies every consistency pair through size 64 against independent roots",
+          "firstFrame": {
+            "method": "",
+            "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout/tests/transparency/rfc9162.test.ts",
+            "line": 315,
+            "column": 122
+          },
+          "message": "1 to 2: expected false to be true // Object.is equality"
+        },
+        {
+          "name": "RFC 9162 offline tree incremental and rebuilt frontiers match independent RFC roots through size 64",
+          "firstFrame": {
+            "method": "",
+            "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout/tests/transparency/rfc9162.test.ts",
+            "line": 324,
+            "column": 82
+          },
+          "message": "incremental at 1: expected '33fcc3ca27d301bb0c22992a18060b3b1340d\u2026' to be 'b210cd38c696c3466d11028ff86196cbd52a6\u2026' // Object.is equality"
+        },
+        {
+          "name": "RFC 9162 offline tree refuses the exact size-2 inclusion witness when only declared size changes to 3",
+          "firstFrame": {
+            "method": "",
+            "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout/tests/transparency/rfc9162.test.ts",
+            "line": 336,
+            "column": 36
+          },
+          "message": "expected false to be true // Object.is equality"
+        },
+        {
+          "name": "RFC 9162 offline tree rejects malformed, changed, extra, missing and wrong-index inclusion inputs",
+          "firstFrame": {
+            "method": "",
+            "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout/tests/transparency/rfc9162.test.ts",
+            "line": 344,
+            "column": 36
+          },
+          "message": "expected false to be true // Object.is equality"
+        },
+        {
+          "name": "RFC 9162 offline tree rejects malformed consistency proofs, changed roots, invalid sizes and boundary mismatches",
+          "firstFrame": {
+            "method": "",
+            "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout/tests/transparency/rfc9162.test.ts",
+            "line": 372,
+            "column": 38
+          },
+          "message": "expected false to be true // Object.is equality"
+        }
+      ]
+    },
+    {
+      "phase": "p126-restore1",
+      "tests": {
+        "total": 54,
+        "passed": 54,
+        "failed": 0,
+        "skipped": 0
+      },
+      "files": 5,
+      "hookTaskEntries": 46,
+      "individualHookValues": 46,
+      "exit": 0,
+      "durationMs": 8368,
+      "ownedPgid": 34903,
+      "naturalGroupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "orderedRawObserverJoinExact": true,
+      "perFileOrderMatchesCanonical54": true,
+      "unhandledOrLateErrors": [],
+      "publicEvidencePaths": [],
+      "firstFailures": []
+    },
+    {
+      "phase": "p126-m2",
+      "tests": {
+        "total": 54,
+        "passed": 53,
+        "failed": 1,
+        "skipped": 0
+      },
+      "files": 5,
+      "hookTaskEntries": 46,
+      "individualHookValues": 46,
+      "exit": 1,
+      "durationMs": 8393,
+      "ownedPgid": 34996,
+      "naturalGroupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "orderedRawObserverJoinExact": true,
+      "perFileOrderMatchesCanonical54": true,
+      "unhandledOrLateErrors": [],
+      "publicEvidencePaths": [],
+      "firstFailures": [
+        {
+          "name": "RFC 9162 offline tree refuses the exact size-2 inclusion witness when only declared size changes to 3",
+          "firstFrame": {
+            "method": "",
+            "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout/tests/transparency/rfc9162.test.ts",
+            "line": 337,
+            "column": 56
+          },
+          "message": "expected true to be false // Object.is equality"
+        }
+      ]
+    },
+    {
+      "phase": "p126-restore2",
+      "tests": {
+        "total": 54,
+        "passed": 54,
+        "failed": 0,
+        "skipped": 0
+      },
+      "files": 5,
+      "hookTaskEntries": 46,
+      "individualHookValues": 46,
+      "exit": 0,
+      "durationMs": 8430,
+      "ownedPgid": 35096,
+      "naturalGroupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "orderedRawObserverJoinExact": true,
+      "perFileOrderMatchesCanonical54": true,
+      "unhandledOrLateErrors": [],
+      "publicEvidencePaths": [],
+      "firstFailures": []
+    }
+  ],
+  "samePerFileOrdered54Identities": true,
+  "orderedNames": {
+    "tests/sessionAnchorOfflineProof.test.ts": [
+      "session root anchoring anchors a closed session as a session-root transparency artifact",
+      "session root anchoring re-anchoring an unchanged session reuses the existing entry",
+      "session root anchoring the exporter refuses to issue a proof against an unsigned root",
+      "session anchor proof \u2014 offline verification verifies from a directory with no .amc, after the workspace is deleted",
+      "session anchor proof \u2014 offline verification a truncated seal list breaks the session root it claims",
+      "session anchor proof \u2014 offline verification an edited descriptor no longer matches the digest the log anchored",
+      "session anchor proof \u2014 offline verification an edited transparency entry fails its own hash recomputation",
+      "session anchor proof \u2014 offline verification a tampered proof path no longer resolves to the anchored root",
+      "session anchor proof \u2014 offline verification a root that was never signed is rejected even when the path is consistent",
+      "session anchor proof \u2014 offline verification a leaf index outside the signed tree is rejected",
+      "session anchor proof \u2014 offline verification verification fails against a fingerprint the holder did not expect",
+      "session anchor proof \u2014 offline verification an empty pin is refused rather than treated as no pin",
+      "session anchor proof \u2014 offline verification a bundle re-signed with an attacker's auditor key fails the pin",
+      "session anchor proof \u2014 offline verification a descriptor carrying an unrecognised field is rejected, not silently ignored",
+      "session anchor proof \u2014 offline verification a fingerprint that disagrees with the bundle's own key is reported",
+      "session anchor proof \u2014 offline verification anchoring and offline verification work on the JSONL backend",
+      "session anchor proof \u2014 offline verification refuses a proof when the LEDGER does not verify, not just the log",
+      "session anchor proof \u2014 offline verification auditorKeyFingerprint is the sha256 of the exported PEM",
+      "the cryptographic checks fire in the failing direction a forged root signature is rejected \u2014 the one check that makes this cryptography",
+      "the cryptographic checks fire in the failing direction a truncated seal list is rejected by the sealCount cross-check",
+      "the cryptographic checks fire in the failing direction a descriptor whose sealCount disagrees with its seal list is rejected",
+      "the cryptographic checks fire in the failing direction a descriptor whose turnCount is inflated is rejected"
+    ],
+    "tests/transparencyMerkleFailLoud.test.ts": [
+      "a failed merkle update is surfaced, not swallowed appendTransparencyEntry throws when the root cannot be advanced",
+      "a failed merkle update is surfaced, not swallowed the entry is still in the log, and the log itself still verifies",
+      "a failed merkle update is surfaced, not swallowed the lag outlives the process that hit it and names the entry",
+      "a failed merkle update is surfaced, not swallowed the explicit repair path clears the lag",
+      "a failed merkle update is surfaced, not swallowed a recorded lag fails verification on its own, and a healthy append clears it",
+      "a failed merkle update is surfaced, not swallowed a corrupt pending marker still reports a lag rather than being ignored",
+      "merkle verification reports instead of throwing an unparseable log line is a verification error, not an exception"
+    ],
+    "tests/transparencyMerkleIncremental.test.ts": [
+      "transparency merkle frontier equivalence frontier root equals the full rebuild at every leaf count (amc-legacy-v1)",
+      "transparency merkle frontier equivalence frontier root equals the full rebuild at every leaf count (rfc9162-sha256)",
+      "transparency merkle frontier equivalence a wrong odd-node rule diverges from the rebuild \u2014 the equivalence oracle discriminates",
+      "transparency merkle frontier equivalence frontier shape check rejects a leaf count the nodes cannot have produced",
+      "incremental transparency merkle updates appends produce the root and the leaves file a full rebuild would produce",
+      "incremental transparency merkle updates history is appended, not rewritten",
+      "incremental transparency merkle updates the resume state tracks the log and points at the published root",
+      "incremental resume is used, and untrusted resume state falls back a resumable append takes the incremental path",
+      "incremental resume is used, and untrusted resume state falls back a workspace written before the frontier existed migrates itself on the next append",
+      "incremental resume is used, and untrusted resume state falls back a tampered frontier is rebuilt from the log instead of steering the root",
+      "incremental resume is used, and untrusted resume state falls back a frontier that does not cover this append's parent is not resumed",
+      "incremental resume is used, and untrusted resume state falls back a truncated leaves file is detected and repaired rather than appended to"
+    ],
+    "tests/transparency/legacyAmbiguity.test.ts": [
+      "algorithm-aware legacy ambiguity legacy three/four roots collide while RFC roots differ and both proof APIs remain usable",
+      "algorithm-aware legacy ambiguity RFC entry verification needs index and size and derives sides rather than trusting flags"
+    ],
+    "tests/transparency/rfc9162.test.ts": [
+      "RFC 9162 offline tree empty, leaf and node hashes preserve byte domains and child order",
+      "RFC 9162 offline tree ports eight leaf inputs and all nine known roots from constants.go",
+      "RFC 9162 offline tree ports the five exact happy-path inclusion JSON vectors",
+      "RFC 9162 offline tree ports the five exact happy-path consistency JSON vectors",
+      "RFC 9162 offline tree matches an independent recursive root at every size from 1 through 64",
+      "RFC 9162 offline tree verifies every inclusion index against independent roots for sizes 1 through 64",
+      "RFC 9162 offline tree verifies every consistency pair through size 64 against independent roots",
+      "RFC 9162 offline tree incremental and rebuilt frontiers match independent RFC roots through size 64",
+      "RFC 9162 offline tree refuses the exact size-2 inclusion witness when only declared size changes to 3",
+      "RFC 9162 offline tree rejects malformed, changed, extra, missing and wrong-index inclusion inputs",
+      "RFC 9162 offline tree rejects malformed consistency proofs, changed roots, invalid sizes and boundary mismatches"
+    ]
+  },
+  "allRawObserverJoinsExact": true,
+  "normalizedArgvSameExceptOwnedOutputPath": [
+    "/opt/homebrew/opt/node@22/bin/node",
+    "node_modules/vitest/vitest.mjs",
+    "run",
+    "--root",
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout",
+    "tests/transparency/rfc9162.test.ts",
+    "tests/transparency/legacyAmbiguity.test.ts",
+    "tests/transparencyMerkleIncremental.test.ts",
+    "tests/transparencyMerkleFailLoud.test.ts",
+    "tests/sessionAnchorOfflineProof.test.ts",
+    "--reporter=default",
+    "--reporter=json",
+    "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+    "--outputFile.json=<owned-phase-output>"
+  ],
+  "tableRowCountsNotCaseTotals": true
+}

@@ -1,0 +1,5 @@
+
+> agent-maturity-compass@1.2.0 gen-counts
+> node scripts/gen-counts.mjs --write
+
+Updated 10 file(s).

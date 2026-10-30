@@ -1,0 +1,41 @@
+[
+  {
+    "id": "1545-narrower-turns",
+    "oldIssue": "AMC-1545",
+    "file": "src/agent/subagentRunner.ts",
+    "find": "const turns = narrower(parent.maxTurns, grant.maxTurns);",
+    "replace": "const turns = grant.maxTurns;",
+    "tests": [
+      "tests/subagentHookInheritance.test.ts",
+      "tests/nativeDelegationInheritance.test.ts"
+    ],
+    "expect": "killed",
+    "note": "a child grant widens the inherited max-turns"
+  },
+  {
+    "id": "1545-narrower-timeout",
+    "oldIssue": "AMC-1545",
+    "file": "src/agent/subagentRunner.ts",
+    "find": "const timeout = narrower(parent.timeoutMs, grant.timeoutMs);",
+    "replace": "const timeout = grant.timeoutMs;",
+    "tests": [
+      "tests/subagentHookInheritance.test.ts",
+      "tests/nativeDelegationInheritance.test.ts"
+    ],
+    "expect": "killed",
+    "note": "a child grant widens the inherited timeout"
+  },
+  {
+    "id": "1545-narrower-parent-only",
+    "oldIssue": "AMC-1545",
+    "file": "src/agent/subagentRunner.ts",
+    "find": "a === undefined ? b : b === undefined ? a : Math.min(a, b);",
+    "replace": "a === undefined ? b : b === undefined ? undefined : Math.min(a, b);",
+    "tests": [
+      "tests/subagentHookInheritance.test.ts",
+      "tests/nativeDelegationInheritance.test.ts"
+    ],
+    "expect": "killed",
+    "note": "a parent-only limit is dropped when the grant sets none (branch named as a gap during scoping)"
+  }
+]

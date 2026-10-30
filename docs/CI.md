@@ -62,7 +62,7 @@ Exceptions live in `scripts/no-fabrication-allowlist.json`:
 - `pending` holds wording an open issue removes, each naming its owning issue key (for example `P0-21`).
 - `pathPresence` lists the 25 control-surface scorers left after P0-15, which report AMC's own control inventory, until P1-53 retires them. The script freezes those 25 names, so a file outside that set fails even when it takes a retired scorer's place. `pathPresenceBaseline` may only go down: the check fails when the list grows past it, and asks for the baseline to be lowered when the list shrinks.
 
-An entry that no longer matches anything fails as stale, so the list shrinks as issues land.
+An entry may carry a `phrase`: it then exempts only the literals (or scanned lines) that contain that exact text, and the rest of the file is still checked. The pack data entries use one phrase per quoted third-party term (for example "ISO 27001 certified operations"). An empty phrase is refused. An entry that no longer matches anything fails as stale, so the list shrinks as issues land.
 
 A legitimate random call or hash reduction carries a marker comment on its own line, or alone on the line directly above. A trailing marker on the line above, or marker text inside a string, does not count:
 

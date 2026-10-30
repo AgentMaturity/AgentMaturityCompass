@@ -1,0 +1,92 @@
+{
+  "schema": "p125f-builder-preparation-input-pins/1",
+  "inputs": [
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/build-extension-inputs.py",
+      "bytes": 8897,
+      "sha256": "c706f074832d6196cd12bc397abb8fa3d6c7ede11fd25e6159c0e1cfc23612b5"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/receipt-extension-preparation/assemble-extension.py",
+      "bytes": 14973,
+      "sha256": "42b220c161ba7945537b680fe496ecc90e69e422c2b608ebc2652bfd9c9eb9eb"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/receipt-extension-preparation/seal.json",
+      "bytes": 2497,
+      "sha256": "6d2618f908b7ae8145bbf680c8eb1adba87d696637337149cb2322fd20cfb879"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/receipt-extension-preparation/input-template.json",
+      "bytes": 5884,
+      "sha256": "4d8f893b987de0ed897cfa0be503b600eae3c86e188fe5d84d93f8847ebe5b44"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/source-evidence-review/review.json",
+      "bytes": 12096,
+      "sha256": "c5e9b176598ccb3721c8970d60808ae97d965fa5e5c454625e340726f8a35f90"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/source-evidence-review/seal.json",
+      "bytes": 1691,
+      "sha256": "e985c10ab0ad45916ce1bade573463863a1c6414bd2f6b4837951a8b89bf7e12"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/fresh-control-runtime-review/review.json",
+      "bytes": 41823,
+      "sha256": "8547b43159a2b68e61abd481cc6d7ced4610dd3638d28747a064c4868d4c80a4"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/fresh-control-runtime-review/seal.json",
+      "bytes": 1140,
+      "sha256": "9f7fb01a039e6370223785e55d1949ee1ab63d79d016cc8b90a171fa528e03ff"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/whole-issue-gaps.json",
+      "bytes": 2436,
+      "sha256": "a6fb6cb52d296fd50a9a2ea4c85bbbddb23d01e76fd2f1affb2aef5c9158cc83"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/root-final-runtime-review.json",
+      "bytes": 45689,
+      "sha256": "ee4a98e675675f456b12177b041224df2ed91f12c26e08827d85911fb1285392"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/root-peer-evidence-adoption.json",
+      "bytes": 1335,
+      "sha256": "333b2e66c7cb87fab31affa69665035c06bdc225031721c67a879b27bac13988"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/original-p125-packet-pinset.json",
+      "bytes": 210893,
+      "sha256": "e0746a7eef7c6f8470a7f10d722791e4b40c182eabc88ece47f386abb3858ccc"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/original-p125-packet/README.md",
+      "bytes": 15980,
+      "sha256": "14ff4c7747694485db980c0041a210ccf1335271641d22f3ec1df40215438a7e"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/original-p125-packet/receipt.json",
+      "bytes": 126991,
+      "sha256": "1fcef2ee2271e19e5f39aff0d97052c432bb7f923955d18d41d36749c774d7e9"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/original-p125-packet/assembly-inputs.json",
+      "bytes": 150409,
+      "sha256": "6261cf6f1fd22ab71cbb5f9ec611809f6d96b00ae20013cb673b099247ec3b72"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/README-fallback-extension.md",
+      "bytes": 20240,
+      "sha256": "0e06dd9663a62f3f861ead994abede47c20083ea35c48e30ee08bed85f559072"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/notes-fallback-extension.txt",
+      "bytes": 1606,
+      "sha256": "07af49c40713cdfc4859100aad00cf7d493393fd85d3a816d19056f722031c99"
+    }
+  ],
+  "allRehashed": true,
+  "curatedSelectionAndAllCommandPins": "artifact-selection.json"
+}

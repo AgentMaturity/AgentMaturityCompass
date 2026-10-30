@@ -1,0 +1,7 @@
+{
+  "id": "CR-5",
+  "scenario": "Database failover",
+  "status": "not_run",
+  "reason": "HA mode is not part of this topology (--ha not given)",
+  "durationMs": 0
+}

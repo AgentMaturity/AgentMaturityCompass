@@ -13,6 +13,7 @@ import {
   type IssuerAdmission, type KeyPurpose, type TrustContext, type VerifierReportV1
 } from "./trust/index.js";
 import { isKeyRefused } from "./trust/signatureCheck.js";
+import { envelopeForFailedVerification } from "./claims/eligibility/adapters/results.js";
 import type { ClaimEnvelope } from "./claims/eligibility/types.js";
 import { printClaimResult, withClaimFields } from "./cli/claimOutput.js";
 
@@ -70,19 +71,21 @@ function untrusted(reasons: readonly string[], overrides: readonly string[]): vo
 
 /**
  * Prints a verifier report's verdict and exits with its code. `claim` is the verified artifact's own claim (a valid
- * signature proves integrity, never a stronger kind): printed after the verdict, or added to the JSON result.
+ * signature proves integrity, never a stronger kind): printed after the verdict, or added to the JSON result. An
+ * artifact that did not verify vouches for nothing, so its claim then reads untrusted evidence and no pass.
  */
 export function finishVerify(label: string, report: VerifierReportV1,
   opts: { json?: boolean; result?: object; details?: string[]; claim?: ClaimEnvelope }): void {
   const code = verdictExitCode(report);
   const reasons = untrustedReasons(report);
+  const claim = opts.claim && code !== 0 ? envelopeForFailedVerification(opts.claim, code === 1) : opts.claim;
   if (opts.json) {
     const result = opts.result ?? report;
-    console.log(JSON.stringify(opts.claim ? withClaimFields(result, opts.claim) : result, null, 2));
+    console.log(JSON.stringify(claim ? withClaimFields(result, claim) : result, null, 2));
   } else {
     console.log(code === 0 ? chalk.green(`${label} verification PASSED`)
       : code === 2 ? chalk.yellow(`${label} integrity verified, UNTRUSTED`) : chalk.red(`${label} verification FAILED`));
-    if (opts.claim) printClaimResult(opts.claim, {});
+    if (claim) printClaimResult(claim, {});
     for (const line of code === 0 ? opts.details ?? [] : reasons.map((reason) => `- ${reason}`)) console.log(line);
   }
   if (code === 2) untrusted(reasons, report.overrides);
@@ -109,9 +112,15 @@ export function ledgerExitCode(result: { ok: boolean; trustRoot: { anchored: boo
   return 2;
 }
 
-/** verify all and evidence verify, after a PASS: exit 2 when the ledger was only allowed unanchored. */
-export function verifyAllExit(out: { checks: ReadonlyArray<{ id: string; status: string }> }, trust: TrustContext): void {
+/** verify all and evidence verify, after no FAIL: exit 2 when the ledger was only allowed unanchored, 1 when INCOMPLETE. */
+export function verifyAllExit(out: { status?: string; skippedCritical?: readonly string[]; checks: ReadonlyArray<{ id: string; status: string }> },
+  trust: TrustContext): void {
   const anchored = out.checks.some((check) => check.id === "ledger-trust-root" && check.status === "PASS");
   const code = ledgerExitCode({ ok: true, trustRoot: { anchored } }, trust);
   if (code !== 0) process.exit(code);
+  // A skipped critical check was never performed: withhold PASS rather than exit 0 on it (WP37).
+  if (out.status === "INCOMPLETE") {
+    console.error(`INCOMPLETE: critical checks not performed: ${(out.skippedCritical ?? []).join(", ")}`);
+    process.exit(1);
+  }
 }

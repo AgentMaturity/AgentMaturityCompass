@@ -4,7 +4,7 @@
  * regulatory statement carries its data status as the register, catalog or clock table gives it. Nothing here names a
  * maturity level: a level is computed only by a scoring run, never by an explanation.
  */
-export const A4_EXPLAIN_LEVELS = ["novice", "practitioner", "expert"] as const;
+const A4_EXPLAIN_LEVELS = ["novice", "practitioner", "expert"] as const;
 export type A4ExplainLevel = (typeof A4_EXPLAIN_LEVELS)[number];
 
 export interface A4ExplainFact {

@@ -1,0 +1,129 @@
+# Draft (P1-18): wealth.us.sar-workflow. Experimental, agent-drafted and not independently reviewed; expert sign-off waits for D-08.
+# Extends L0-MON-02 (Layer 0, P1-14) with the US finance parameter and citation.
+# A result under this control is evidence of conformity, never proof of compliance.
+
+id: L1-WLT-US-05
+version: "0.1.0"
+support: experimental
+layer: 1
+family: aml
+stations: [wealth]
+title: "SAR workflow: a human approver and the 30-day clock from detection"
+statement: A SAR draft records its human approver, the 30-day filing clock runs from initial detection, and the triage
+  rationale is kept for five years.
+riskRationale: A late SAR, one filed without a human decision, or a lost triage rationale cannot be defended to an examiner.
+mandatory: true
+applicability:
+  predicate: {always: true}
+  reasons:
+    - "The Wealth overlay applies to every US deployment in the Wealth station (pack scope: station wealth, jurisdiction
+      US)."
+  exclusions: []
+citations:
+  - key: us-bsa-1020-320-b-3
+    registerId: us-bsa-sar
+    instrument: "Bank Secrecy Act regulations: reports by banks of suspicious transactions (31 CFR 1020.320)"
+    clause: "31 CFR 1020.320(b)(3): file the SAR no later than 30 calendar days after initial detection of facts that may be
+      a basis for filing"
+    edition: CFR annual edition 2025, Title 31 Vol. 3 (revised 2025-07-01), GPO govinfo
+    jurisdiction: US
+    statusType: binding-now
+    superseded: null
+    effectiveDate: null
+    complianceDueDate: null
+    dateNote: In force; the eCFR version history P1-17 read lists 2016-12-23 as the section's latest amendment, which is not
+      recorded here as an effective date. The legal reviewer records it.
+    url: https://www.govinfo.gov/content/pkg/CFR-2025-title31-vol3/xml/CFR-2025-title31-vol3-sec1020-320.xml
+    retrieval:
+      state: verified
+      retrievedAt: "2026-10-07"
+      contentSha256: 4d7caea80a6f6d66e6075915a67bf44d59b5bbc67a78539f7a5b87552da1ed43
+    appliesWhen:
+      all:
+        - {fact: jurisdictions, includesAny: [US]}
+        - {fact: entityTypes, includesAny: [bank]}
+    legalReview: null
+    note: Experimental, agent-drafted mapping; the legal reviewer (D-08) confirms the clause and its applicability.
+  - key: us-bsa-1020-320-d
+    registerId: us-bsa-sar
+    instrument: "Bank Secrecy Act regulations: reports by banks of suspicious transactions (31 CFR 1020.320)"
+    clause: "31 CFR 1020.320(d): keep a copy of the SAR and its supporting documentation for five years"
+    edition: CFR annual edition 2025, Title 31 Vol. 3 (revised 2025-07-01), GPO govinfo
+    jurisdiction: US
+    statusType: binding-now
+    superseded: null
+    effectiveDate: null
+    complianceDueDate: null
+    dateNote: In force; the eCFR version history P1-17 read lists 2016-12-23 as the section's latest amendment, which is not
+      recorded here as an effective date. The legal reviewer records it.
+    url: https://www.govinfo.gov/content/pkg/CFR-2025-title31-vol3/xml/CFR-2025-title31-vol3-sec1020-320.xml
+    retrieval:
+      state: verified
+      retrievedAt: "2026-10-07"
+      contentSha256: 4d7caea80a6f6d66e6075915a67bf44d59b5bbc67a78539f7a5b87552da1ed43
+    appliesWhen:
+      all:
+        - {fact: jurisdictions, includesAny: [US]}
+        - {fact: entityTypes, includesAny: [bank]}
+    legalReview: null
+    note: Experimental, agent-drafted mapping; the legal reviewer (D-08) confirms the clause and its applicability.
+binding:
+  kind: manual
+  points: []
+  mechanism: Recording initial detection on an incident starts the bsa-1020-320-sar-filing clock (P1-17); a named person
+    approves each SAR draft before filing; the triage rationale is a retained record.
+  parameters: []
+  manualDuty:
+    duty: Record initial detection, have a named person approve each SAR draft before filing, and keep the triage rationale
+      for five years.
+    ownerRole: senior_manager
+    cadence: per detection
+    evidenceOfPerformance: The signed clock events, the approval record and the retained rationale.
+tests:
+  - id: L1-WLT-US-05-T1
+    type: drill
+    oracle:
+      kind: ledger_state
+      observes: The monitor-signed clock events, the deadline computed from them and the store's refusals.
+    fixtures:
+      positive:
+        - L1-WLT-US-05/positive/evidence-valid.json
+        - L1-WLT-US-05/positive/sar-clock-from-detection.json
+      negative:
+        - L1-WLT-US-05/negative/backdated-detection.json
+        - L1-WLT-US-05/negative/duplicate-sar-notice.json
+        - L1-WLT-US-05/negative/notice-before-detection.json
+        - L1-WLT-US-05/negative/evidence-contradictory.json
+        - L1-WLT-US-05/negative/evidence-cross-tenant.json
+        - L1-WLT-US-05/negative/evidence-empty.json
+        - L1-WLT-US-05/negative/evidence-replayed.json
+        - L1-WLT-US-05/negative/evidence-stale.json
+        - L1-WLT-US-05/negative/evidence-violation.json
+    passCriteria: Recording initial detection starts the SAR clock with its deadline 30 days later; a backdated detection, a
+      notice before detection and a second notice are refused (T-US-AML-2, T-US-AML-3). The human approver and the
+      five-year retention are not driven by this test.
+    attempts: 1
+evidence:
+  - id: L1-WLT-US-05-E1
+    producer: amc.incidents.clocks
+    bindingFields: [workspaceId, controlId]
+    freshness: {maxAgeDays: 30}
+    sampling: {method: all, ratePercent: null, minItems: 1}
+    retention: {mode: regime_max}
+    residency: {mode: inherit_deployment}
+  - id: L1-WLT-US-05-E2
+    producer: amc.approvals.engine
+    bindingFields: [workspaceId, agentId, controlId]
+    freshness: {maxAgeDays: 30}
+    sampling: {method: all, ratePercent: null, minItems: 1}
+    retention: {mode: regime_max}
+    residency: {mode: inherit_deployment}
+invalidatedBy: [deployment_version, policy_version]
+owner: {role: senior_manager}
+clock:
+  clockId: bsa-1020-320-sar-filing
+  deadline: {amount: 30, unit: calendarDays}
+levels: [L2, L3]
+crosswalk: []
+review: {status: pending, expert: null, credential: null, reviewedAt: null, nextReview: null}
+provenance: {draftedBy: ai, draftedAt: "2026-10-12", approvedBy: null}

@@ -37,7 +37,7 @@ describe("comply report framework selection", () => {
   });
 
   test("keeps the UX audit aligned with current comply report behavior", () => {
-    const audit = readProjectFile("docs/UX_AUDIT_REPORT.md");
+    const audit = readProjectFile("docs/archive/UX_AUDIT_REPORT.md");
 
     expect(audit).toContain("R3 — comply report selects or lists frameworks");
     expect(audit).toContain("Interactive terminals show a framework picker");

@@ -1,3 +1,4 @@
+import { mean as statsMean, sampleVariance } from "../experiments/stats.js";
 /**
  * Mirofish Simulation Engine
  *
@@ -188,16 +189,14 @@ function applyLayerOverrides(
 /* ── Statistics helpers ───────────────────────────── */
 
 function mean(values: readonly number[]): number {
-  if (values.length === 0) return 0;
-  return values.reduce((s, v) => s + v, 0) / values.length;
+  return statsMean(values);
 }
 
 function stdDev(values: readonly number[], avg: number): number {
-  if (values.length < 2) return 0;
-  const variance = values.reduce((s, v) => s + (v - avg) ** 2, 0) / (values.length - 1);
-  return Math.sqrt(variance);
+  return Math.sqrt(sampleVariance(values, avg));
 }
 
+// Unlike stats.ts bootstrap, this is a normal 1.96 * SE interval clipped to maturity levels [0, 5].
 function ci95(avg: number, sd: number, n: number): readonly [number, number] {
   const margin = 1.96 * (sd / Math.sqrt(Math.max(n, 1)));
   return [clamp(avg - margin, 0, 5), clamp(avg + margin, 0, 5)];

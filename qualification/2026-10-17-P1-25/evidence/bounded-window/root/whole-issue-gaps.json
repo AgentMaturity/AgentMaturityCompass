@@ -1,0 +1,62 @@
+{
+  "schema": "p125w-whole-issue-gaps/1",
+  "at": "2026-10-17T00:24:53.888310+00:00",
+  "sourceCommit": "f11a15ae06a318e0ce9a4c778269b2020af4eb7c",
+  "wholeP1_25Complete": false,
+  "planComplete": false,
+  "boundedAcceptance": [
+    "Two genuine query-bound grants timestamp two real linked monitor-signed checkpoints and bracket a real middle ledger event without editing its persisted timestamp or the clock.",
+    "The same middle event has the exact attested window; an upper-only seed and claimed final checkpoint remain distinct. Four default and six zero-tolerance reader claims meet independent inclusive and one-millisecond-beyond oracles. Actual issuer accuracy was null; equal-second genuine genTimes were accepted.",
+    "Source and fresh canonical22-case cohorts pass. The sequential lower-bound source control fails once at445; the tolerance source control fails twice at290 and452. Each explicit byte restoration returns the same22 ordered cases to GREEN.",
+    "The first47.099ms overlapping launch is retained diagnostic only and supplies no sensitivity credit. All later accepted action-to-test launches follow actual natural helper closure."
+  ],
+  "technicalWorkStillOpen": [
+    "Event and minute cadence, real Studio scheduling, concurrent retries and corruption combinations.",
+    "Persisted backdate/postdate producer coverage and nonzero issuer accuracy.",
+    "Session sealing, eligible certificate/attestation issuance and production per-event report/config binding.",
+    "Complete plan, full test suite, cross-platform, public issuer and release qualification."
+  ],
+  "heldDecisionsRemain": [
+    "P1-01 recorded gaps",
+    "P0-29 successor decisions",
+    "P0-22 empty-result contract",
+    "D-03 written live-health skip until P2-06",
+    "P0-09/P0-51 key precedence",
+    "P0-24 expert wording",
+    "P2-02 pause/P2-27 echo",
+    "P1-06 Claude ownership",
+    "P1-02 three held failures and coordination",
+    "Provider D15 ignored archive staging held; no force-add or bypass",
+    "Existing private-provider/package/library/manual-generator/public-entry/CI and other recorded human/external holds"
+  ],
+  "F37": "Skipped, unfixed and unqualified at user request. Ordinary HTTP fixtures supply no F37 proof.",
+  "quality": {
+    "status": "RED",
+    "duplicates": 1268,
+    "deadCode": 2712,
+    "beforeDeadCode": 2712,
+    "addedFindings": 0,
+    "removedFindings": 0,
+    "remainingOrderedFindingsAndFullDuplicateResultExact": true,
+    "waiver": false,
+    "baselineChange": false
+  },
+  "noTtlContractInvented": true,
+  "noPushPrMergeRelease": true,
+  "preserveClaudeAndMissingReservationOwnership": true,
+  "priorCheckpointLaneGapRecord": {
+    "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/whole-issue-gaps.json",
+    "bytes": 2214,
+    "sha256": "6557bff1a0baf9550c4e552ed2bd1ab13a4d9fe0438af3b9c0ace0d6d19f9d28"
+  },
+  "priorCheckpointLaneAcceptance": [
+    "One genuine signed pending checkpoint completed at the same sequence using a query-bound timestamp token, a matching ledger event and offline upper bound.",
+    "Required time rejects after a real HTTP500 while retaining a signed pending checkpoint and unchanged verified ledger.",
+    "Both direct source-only omission controls fail at their semantic witnesses and each exact restoration passes the same21-case cohort."
+  ],
+  "boundedEvidenceLimits": [
+    "The first checkpoint head has no separate seed hash operand in public JSON. The source assertion and actual GREEN cohort retain its literal comparison; no independent public recomputation is claimed.",
+    "Only source-side omission sensitivity was exercised in a private fresh clone. Compiled-source sensitivity and universal descendant/native/environment isolation are not claimed.",
+    "Precomputed RED reader observations do not make masked later assertions passes."
+  ]
+}

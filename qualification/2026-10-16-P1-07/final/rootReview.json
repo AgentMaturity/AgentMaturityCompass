@@ -1,0 +1,91 @@
+{
+  "schema": "p107-root-final-bounded-review/1",
+  "at": "2026-10-16T18:25:29.194492+00:00",
+  "sourceCommit": "0e06b251a8ff18d8d087657f8a2b62866da89b5c",
+  "branch": "codex/p1-07-gate-qualification",
+  "boundedSourceAndFreshControlsQualified": true,
+  "canonical": {
+    "phase": "p107-fresh-canonical",
+    "total": 971,
+    "passed": 971,
+    "failed": 0,
+    "skipped": 0,
+    "files": 17
+  },
+  "controls": {
+    "M1": {
+      "passed": 968,
+      "failed": 3,
+      "restored": 971
+    },
+    "M2": {
+      "passed": 969,
+      "failed": 2,
+      "restored": 971
+    },
+    "M3": {
+      "passed": 961,
+      "failed": 10,
+      "restored": 971
+    }
+  },
+  "hookTaskEntriesEach": 46,
+  "individualHookValuesEach": 47,
+  "actualBodyOutcomeReview": "All actual raw/observer body results and per-file ordered occurrences reviewed by machine joins and independent peer; first failures and masking reviewed against relevant bodies. This is not an exhaustive static review or coverage claim for every pre-existing source branch.",
+  "sameDayNativeLevel": 1,
+  "nativeL2MatchedIdsCanonical": 4,
+  "nativeL2MatchedIdsM3": 0,
+  "syntheticPositiveLevelM3": 1,
+  "freshSourceAndControlsRestored": true,
+  "sourceAndFreshClean": true,
+  "finiteReviewAndAssemblerPinsRechecked": 314,
+  "peerChainReview": {
+    "path": "/private/tmp/p1-07-gate-qualification-20261016/fresh-control-chain-review/review.json",
+    "bytes": 28151,
+    "sha256": "fcbc38e58d4a30a2f17e7d33bd95e3b53d54fc4bb8641cd1f2de93037317a11d"
+  },
+  "peerSeal": {
+    "path": "/private/tmp/p1-07-gate-qualification-20261016/fresh-control-chain-review/seal.json",
+    "bytes": 1864,
+    "sha256": "2a5846f74441f3f77a80e839d76438d3707ad6fdb5fa137ccd657ffacf2d5a9b"
+  },
+  "finalPreservation": {
+    "path": "/private/tmp/p1-07-gate-qualification-20261016/final-preservation.json",
+    "bytes": 2158,
+    "sha256": "b5990312dfcb50aaa828a8a731d292932aa2acb352723fdbe0f8c2497f3c5ae7"
+  },
+  "finalQChecks": {
+    "path": "/private/tmp/p1-07-gate-qualification-20261016/q-final-check-outcomes.json",
+    "bytes": 2224,
+    "sha256": "e06d189c6d3e8cb2a4e5874a8e58473ece3512498d214c56e28dc644134bd10a"
+  },
+  "chainSummary": {
+    "path": "/private/tmp/p1-07-gate-qualification-20261016/control-chain-summary.json",
+    "bytes": 5938,
+    "sha256": "ccb9aeca8ab53407cd1587a007005b0cbafde6e713348c8e4ffbe9c2aaa2a0e8"
+  },
+  "sourceQuality": {
+    "path": "/private/tmp/p1-07-gate-qualification-20261016/source-check-outcomes.json",
+    "bytes": 9246,
+    "sha256": "cea164f47556de0ef1ad52b00cd9f178742589d33dddb3116d57061dbe40223d"
+  },
+  "assembler": {
+    "path": "/private/tmp/p1-07-gate-qualification-20261016/receipt-preparation-v2/assemble-receipt.py",
+    "bytes": 22481,
+    "sha256": "90b96f2a79538b189a142e34f1e88f68ca366160466c62a44453f3a3f5c3d6db"
+  },
+  "assemblerFullV1AndExactV2DeltaReviewed": true,
+  "qualityGreen": false,
+  "qualityWaived": false,
+  "duplicateFindings": 1268,
+  "deadCodeFindings": 2724,
+  "formalDone": false,
+  "fullNpmTestRun": false,
+  "node24CiCoverageOrReleaseQualification": false,
+  "completePlanDone": false,
+  "allHumanOwnershipAndArchiveHoldsRemainOpen": true,
+  "F37Skipped": true,
+  "forceNoVerifyBaselineOrGuardChanges": false,
+  "ordinaryMetadataValidationPending": true,
+  "nextBoundedItem": "P1-25 builtin timestamp verifier; package approval remains held"
+}

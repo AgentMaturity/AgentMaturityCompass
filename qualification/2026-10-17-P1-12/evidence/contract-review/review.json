@@ -1,0 +1,64 @@
+{
+  "schema": "p112-independent-static-contract-review/1",
+  "at": "2026-10-16T19:53:16.668687+00:00",
+  "allReadsFinished": true,
+  "sourceAuthority": "Root-reported clean S on codex/p1-12-compiled-guard-qualification after bounded P1-11 metadata85dd9d9bda246a78407bb06c9123e78c1745ea15. Reviewer performed no Git/product execution.",
+  "blockersForPureHelperProposal": [],
+  "noSourceAllocationImplied": true,
+  "unblockedSeam": {
+    "exports": [
+      "compiledPolicyShows",
+      "compiledPolicyDenial",
+      "compiledPolicyFacts",
+      "compiledApprovalClasses",
+      "planRequiresAgentLease"
+    ],
+    "fixtureContract": "Complete typed ActiveCompiledPolicy, EffectiveRuntimePolicy and ToolExecution/AuthorizationRecord inputs. These are supplied unit contracts, never verified activations/leases/approvals. For pure denial tests use no runtimePolicy.approvals rule for the chosen class. Do not call compiledPolicyGuard, activate/load APIs or receipt builders in this first lane.",
+    "mandatoryBoundedFamilies": [
+      "Visible listed tool and invisible tool refusal; run_code exception remains explicit and does not qualify sub-call dispatch.",
+      "identity-binding lease requirement true/false/absent; missing authorization or null leaseId refuses; supplied nonempty leaseId passes this helper only.",
+      "Principal required: missing or cli-os-user refuses; supplied studio-session, lease and approval-engine principal values are helper positives only.",
+      "Unsupported guard ID refuses generically and names every control/version, with unknown fallback where absent. This tests refusal of unsupported behavior, never an amount threshold.",
+      "Guard order and visibility precedence are explicit; admitted earlier guards do not bypass later denial. No guards/no matching approval rule returns undefined.",
+      "Plan lease-requirement projection checks exact identity-binding ID and boolean true; no policy is false.",
+      "Approval classes are a fresh set of pipeline.approvalRequiredFor, not inferred approval-rule keys or authority validation.",
+      "Compiled facts strip only leading sha256:, preserve journal revision, prefer first selected action-class approval control over first guard control, use guard fallback, return null when none and null version for missing catalog control."
+    ]
+  },
+  "actualFlow": {
+    "native": "agentToolset loads verified active policy once; load failure refuses start. It registers compiled-policy first, ensures receipt before guard evaluation, sets all action classes to bound authorization when policy exists, adds compiled approval classes and facts/evidenceRefs to trusted context. Native schemas also filter visible tools.",
+    "guardFactory": "compiledPolicyGuard reads signed journal head for every call, diagnoses read integrity failure, and denies changed/removed/new head against pinned entry. Those journal behaviors require separate real fixture proof.",
+    "authorization": "bindAuthorization reads signed tool/policy state, verifies real approvals and lease via checkLease, then writes controlFor result, compiled digest/revision and evidenceRefs; recheck occurs after guards before the body. Typed unit inputs do not run any of this.",
+    "receipts": "buildEffectivePolicyReceipt reads legacy/proposed rules and signed guardrail snapshots; write signs a real artifact before recording EFFECTIVE_POLICY and returns actual eventId or an explicit fallback ref. Native ensureReceipt is lazy before first governed call and per session/guard-label set; kernel tool service intentionally has no session writer. No universal native-session receipt or genuine ledger/event citation claim is provided by this lane.",
+    "strictBinding": "P1-07 removed the opt-out. runner only warns on the env variable and still selects tagged evidence; effective receipt always enabled/default. Spec step7 explicitly shrinks if P1-07 already deleted the switch. Do not restore an opt-out, impose the old refusal/downgrade flow or reopen P1-07 closure."
+  },
+  "unchangedNeighbors": {
+    "recommendedFirst": [
+      "tests/toolPipeline.test.ts",
+      "tests/toolPolicyGuards.test.ts"
+    ],
+    "why": "Monotonic guard ordering, approval-before-guard behavior, immutable arguments and real signed firewall/budget composition are directly adjacent without the broad TCP/UI guardrail cohort.",
+    "priorEvidence": "Retained actual P139 broad raw records toolPipeline18/18. Its three failures are authorizationRecheck06b/09/12b only. No selected prior qualification receipt proof was found for toolPolicyGuards; root must measure the current two-file baseline. Historical18/18 is not current-run proof.",
+    "heldScope": "Do not add actions/authorizationRecheck combinations or fix the three held cancellation/foreign-approval/freeze diagnostics in this lane. Existing old tests are read-only; any actual failure must be classified, not weakened.",
+    "separateLater": [
+      "tests/domainApply.test.ts",
+      "tests/antiGaming.test.ts",
+      "tests/guardrailControlState.test.ts"
+    ],
+    "laterBoundary": "Domain apply tests currently check existing result/files but do not completely assert the spec proposal/no-boolean contract. AntiGaming is existing P1-07 closure; guardrailControlState includes real HTTP/CLI/child fixtures and should not inflate this first helper lane."
+  },
+  "remainingFullIssueAcceptance": [
+    "Genuine compiled policy forbidding a supported effect must block900.00 versus allowed500.00 at the destination, with a positive control. Current supported compiler parameter table has visibility, identity and approval policy parameters, no payment amount threshold. Generic unsupported-guard denial cannot satisfy that test.",
+    "Real domain-apply-only negative control must leave the same destination effect possible and record proposals/none/unenforced_domain_rules, with no boolean writer and deprecated guardrailsEnabled empty. Static source shape or the unchanged domain tests alone are insufficient.",
+    "Real activated signed plan, lockfile/journal verification and tamper/session-start refusal; live-head change/rollback/removal behavior and verified approval-policy strictness remain outside this pure seam.",
+    "Native session EFFECTIVE_POLICY audit/artifact signature, exact digest/revision and actual evidence event binding in consequential authorization records must be observed. DigestX receipt for sessionY must fail evidence credit; pending catalog review must never become regulated pass.",
+    "All14 truthful guardrail boundaries and runbook table need actual snapshot/regression/mutation proof; audit-trail-enforcer conditional journal binding remains a separate current source/docs question, not repaired here.",
+    "The three full-spec mutation requirements are destination guard bypass, regulated strict refusal if still applicable, and false enforced catalog labels. The proposed pure visibility/identity controls are component controls, not substitutes for that entire set.",
+    "Full suite, current source/test types/lint/docs/architecture/counts, required changeset, sample genuine receipt, merged PR/SHA and downstream finance integration remain full-issue acceptance. No PR/push/merge or additional package/source scope is authorized by this report.",
+    "P1-02 held combinations and all other recorded holds, F37 skip, quality RED and Claude-owned work remain unchanged. No new human hold or whole-issue Done inference is created."
+  ],
+  "schemaPrecision": "Current receipt includes planDigest and leaseId and treats an active compiled plan as regulated; it has no explicit regulated boolean. Record the actual shape rather than inventing flags. P1-07 strict binding is always true/default.",
+  "executionByReviewer": false,
+  "checkoutIndexQaWrites": false,
+  "candidateReview": "Separate sealed candidate review will follow actual author seal; no predicted pass claims."
+}

@@ -1,0 +1,184 @@
+{
+  "schemaVersion": "amc.static-review/v1",
+  "key": "P0-21",
+  "kind": "Final static review of unexecuted private freezer v2",
+  "capturedUtc": "2026-10-15T05:37:22.659523+00:00",
+  "reviewedScript": {
+    "path": "/private/tmp/p0-21-freeze-qualified-evidence-v2-20261015.py",
+    "bytes": 32622,
+    "sha256": "d9e02e0a26624c4ebbdf9f3786068bbe6392d7f4abc8fd7603f66d99e6b3d19f"
+  },
+  "findings": [],
+  "blockingFindings": 0,
+  "allReadsFinished": true,
+  "conclusion": "No remaining blocker was identified in freezer v2. It corrects the discovered v1 packaging defects without changing runtime evidence, classification, counts or preservation checks. This is static readiness for root consideration, not freezer execution, actual-packet approval, canonical enactment or formal acceptance.",
+  "supersession": {
+    "supersededScript": {
+      "path": "/private/tmp/p0-21-freeze-qualified-evidence-20261015.py",
+      "bytes": 32189,
+      "sha256": "211bec712aed49ca900bfed3550f3185e8d8334156d0b99ae5bbc9268d779cf3"
+    },
+    "supersededReview": {
+      "path": "/private/tmp/p0-21-freezer-static-review-20261015.json",
+      "bytes": 26809,
+      "sha256": "08c300c748bc1b63b6fe518638114d2ff478c40a0445424068a5af4a1170da10"
+    },
+    "supersededReviewMarkdown": {
+      "path": "/private/tmp/p0-21-freezer-static-review-20261015.md",
+      "bytes": 2846,
+      "sha256": "8729a85f8c87485363b1c5e83b5980dd5169676ec84f930ae80d1080b755fee3"
+    },
+    "preservedByteExact": true,
+    "meaning": "The earlier unversioned review was written before root identified the actual parent HOME/store indexing defect and copied-script sentinel issue. Its findings[] packaging-readiness conclusion is superseded and must not authorize v1 execution. Preserve that report and script as history. V1 and v2 freezer scripts are both unexecuted at this review; controller-v3 actual execution is a different version lineage."
+  },
+  "resolvedV1Defects": [
+    {
+      "id": "V1-parent-home-store-scope",
+      "severity": "P1 packaging scope",
+      "v1Lines": [
+        340,
+        348
+      ],
+      "v2Lines": [
+        341,
+        346,
+        370,
+        376
+      ],
+      "evidence": "Both PARENT/home and PARENT/store are real directories. Direct children include HOME caches and the pnpm v10 install store. V1 pruned only causal BASE roots and would descend into the parent private directories.",
+      "v2Correction": "PARENT top-level traversal now prunes home and store. The later exclusion assertion rejects selected paths equal to or beneath either parent root as well as causal closure/home/tmp and the live journal. The index exclusion metadata names both parent roots.",
+      "status": "Resolved statically; no traversal of those bodies, freeze or runtime was executed for this review."
+    },
+    {
+      "id": "V1-contiguous-sentinel",
+      "severity": "P2 canonical packaging compatibility",
+      "v1Line": 423,
+      "v2Line": 427,
+      "evidence": "V1 source contains the contiguous private-key sentinel used by the existing canonical checker; copying that harmless scanner source could falsely fail the canonical file scan.",
+      "v2Correction": "The source now splits the sentinel into adjacent expression pieces while preserving the assembled runtime scan value. A pure file-content check confirms the contiguous sentinel is absent from v2 source. No private key body was found or copied.",
+      "status": "Resolved in v2. This report deliberately does not quote the contiguous sentinel."
+    },
+    {
+      "id": "V1-write-order-comment",
+      "severity": "P3 preparation clarity",
+      "v1Line": 336,
+      "v2Line": 336,
+      "v2Correction": "The comment now says runtime/preservation prerequisites precede writes and explicitly acknowledges later write-once metadata checks can stop without overwrite, rollback or retry.",
+      "remainingLimit": "The seven outputs remain nontransactional. A later validation or I/O error may leave a partial write-once set; preserve it and stop. No implicit retry or cleanup is approved.",
+      "status": "Truthful bounded limitation, not a current failure."
+    },
+    {
+      "id": "explicit-formal-acceptance",
+      "v2Lines": [
+        383,
+        384,
+        408,
+        409
+      ],
+      "v2Correction": "Both causal and whole-lane summary objects now carry formalAcceptanceClosed:false, consistent with pending independent review and retained acceptance gaps.",
+      "status": "Explicit metadata correction; no acceptance criterion relaxed."
+    }
+  ],
+  "unchangedValidatedDesign": {
+    "basis": "Full v1 source was read, followed by the complete v1→v2 diff and final v2 context. The diff contains only pruning/exclusion metadata, truthful write-order comment, explicit formal flags and split sentinel. No runtime validation or evidence body was edited.",
+    "outputs": "Same seven new private outputs, all opened exclusively and all absent at this review. No repository, source, original test/config/guard/allowlist/compiled/native/prior artifact write exists in the freezer. It performs only two read-only Git metadata subprocesses; this reviewer did not execute them.",
+    "fieldShapes": "Existing setup23/index24, six result dictionaries and completed phase command/owned/group/classification shapes match the accessed keys. The phase/result equality and all eight release hashes remain checked by the unexecuted freezer.",
+    "sourceAndPhysicalChecks": "Freezer code still requires root f58, original tracked7945, compiled4529, private12474 exact maps, physical identities, current borrowed-native identity and resolver link. The separate native reviewer owns the actual full source/phase audit; this static review did not repeat every live source/closure file or load native code.",
+    "counting": "Original core37, CLI14 and consumers48 remain separate invocations. Six controls repeat core37 across18 phases: actual retained result arithmetic is666 executions,655 passes,11 AssertionErrors across10 file/title pairs. Mutant passes remain35,36,34,36,36,34. No single99 run or extra unique causal cases are claimed.",
+    "meaning": "C4 remains registry-policy SELF_REPORTED inclusion at L3, not actual unsafeL3 attainment. C6 remains a representative per-answer two-anchor mutation with raw6/80 no-throw and domain60-versus50 observations; no directly measured final6% aggregate. First-assertion masking and pending semantic/independent actual review remain explicit.",
+    "versions": "Prepared controller-v1/v2 remain unexecuted; actual six-control execution is bound to controller-v3, exact releases and input hashes. Do not confuse freezer-v2 with controller-v2.",
+    "hashOrder": "No cycle: frozen journal/preservation precede index; index excludes itself and later summaries; causal outputs pin index/preservation; whole-lane outputs pin earlier causal/index/preservation. This review contains no future output hash and can be safely indexed once frozen.",
+    "oversize": "The3,978,574-byte physical-copy manifest remains a private hash reference. Freezer copies no native/helper/store/HOME/source/manifest body. A later canonical builder still enforces1MiB and credential/regular-file restrictions.",
+    "inbox": "Current preservation pins the approved872054-byte inbox boundary. Old transitive index bodies retain historical prefix hashes and are not reinterpreted as current full-file constraints.",
+    "limits": "Borrowed parent dependencies, original inherited environment versus causal seven-key allowlist, pre-global-teardown reporter, owned-group-only signal0/ESRCH and no universal descendant/cache/OS/network isolation claims remain unchanged. Literal20/10outside-R4 and source-quality1269/2751 remain unwaived; OBSERVEDL2/schema3 and all holds remain preserved."
+  },
+  "currentReadOnlyChecks": {
+    "prescribedPinRowsExact": 97,
+    "distinctPrescribedFiles": 74,
+    "pinMismatches": [],
+    "parentDirectoriesConfirmed": [
+      {
+        "path": "/private/tmp/p0-21-qualification-20261015/home",
+        "directory": true
+      },
+      {
+        "path": "/private/tmp/p0-21-qualification-20261015/store",
+        "directory": true
+      }
+    ],
+    "journal": {
+      "path": "/private/tmp/p0-21-commands-20261015.jsonl",
+      "bytes": 6667,
+      "sha256": "215d1ff940be928d96363cb833c679fd198beab796054ca10076db78fc05ed40"
+    },
+    "journalRows": 15,
+    "allRootExit0": true,
+    "lastRootPhase": "final-normal-freeze",
+    "ACTIVEAbsent": true,
+    "HALTEDAbsent": true,
+    "allSevenFreezerOutputsAbsent": true,
+    "v2SourceHasContiguousSentinel": false
+  },
+  "directPins": [
+    {
+      "path": "/private/tmp/p0-21-freeze-qualified-evidence-20261015.py",
+      "bytes": 32189,
+      "sha256": "211bec712aed49ca900bfed3550f3185e8d8334156d0b99ae5bbc9268d779cf3"
+    },
+    {
+      "path": "/private/tmp/p0-21-freeze-qualified-evidence-v2-20261015.py",
+      "bytes": 32622,
+      "sha256": "d9e02e0a26624c4ebbdf9f3786068bbe6392d7f4abc8fd7603f66d99e6b3d19f"
+    },
+    {
+      "path": "/private/tmp/p0-21-freezer-static-review-20261015.json",
+      "bytes": 26809,
+      "sha256": "08c300c748bc1b63b6fe518638114d2ff478c40a0445424068a5af4a1170da10"
+    },
+    {
+      "path": "/private/tmp/p0-21-freezer-static-review-20261015.md",
+      "bytes": 2846,
+      "sha256": "8729a85f8c87485363b1c5e83b5980dd5169676ec84f930ae80d1080b755fee3"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/setup-v3.json",
+      "bytes": 15393,
+      "sha256": "6b7cfa580a5718e414f8b1ebc36d91d286cfba646acaba780e6dfd21dff4942d"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/setup-index-v3.json",
+      "bytes": 5376,
+      "sha256": "6366f1ac7a7507b68c9f0d0469cd91d935ea9016192c3c692fbf70221fd2e4b5"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/inputs/preservation.json",
+      "bytes": 8436,
+      "sha256": "c91b8b4d0663f0a69510e5384559abad6305096510b164a8b260dcae21d993a3"
+    },
+    {
+      "path": "/private/tmp/p0-21-qualification-20261015/initial-preflight.json",
+      "bytes": 15064,
+      "sha256": "b039ec6dd5834b494623d6a1ddc3c4415675d829532c38e4ca3c30835de62802"
+    },
+    {
+      "path": "/private/tmp/p0-21-qualification-20261015/exact-source-validation-context.json",
+      "bytes": 3352,
+      "sha256": "79da41374b6d9d69dbaa7b819d9cc2b52804633577eaf1566c93eca9545298fe"
+    },
+    {
+      "path": "/private/tmp/p0-21-qualification-20261015/certification-wording-acceptance-gap.json",
+      "bytes": 9804,
+      "sha256": "9ba0ccbdd290475da8e8e8e44524da92ef3799e3cc49db2c5aaebecf07df4267"
+    },
+    {
+      "path": "/private/tmp/p0-21-commands-20261015.jsonl",
+      "bytes": 6667,
+      "sha256": "215d1ff940be928d96363cb833c679fd198beab796054ca10076db78fc05ed40"
+    }
+  ],
+  "reviewLimits": [
+    "Static file/diff/JSON/hash/stat inspection only. No freezer execution/import/parser/syntax check, product import/test/build/install/replay, native load, process probe/signal or Git command.",
+    "No new test, runner, canonical builder or source fix was authored. Only this new v2 review pair was written. Earlier v1 script/review bytes remain exact.",
+    "Independent actual review, root bounded outcome and canonical enactment remain separate. Formal acceptance, full suite, coverage, Node24, hosted CI, installed/release, dependency closure, G0 and Done remain open."
+  ]
+}

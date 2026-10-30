@@ -10,7 +10,7 @@ import { randomBytes, randomUUID } from "node:crypto";
 import { join } from "node:path";
 import type { DiagnosticReport, TrustTier } from "../types.js";
 import { runDiagnostic } from "../diagnostic/runner.js";
-import { runDriftCheck, type DriftCheckResult } from "../drift/driftDetector.js";
+import { runDriftCheckAsync as runDriftCheck, type DriftCheckResult } from "../drift/driftDetector.js";
 import { dispatchAlert, loadAlertsConfig, type AlertPayload } from "../drift/alerts.js";
 import { detectEvidenceStreamAnomalies, type ObservabilityAnomaly } from "../observability/anomalyDetector.js";
 import { openLedger } from "../ledger/ledger.js";

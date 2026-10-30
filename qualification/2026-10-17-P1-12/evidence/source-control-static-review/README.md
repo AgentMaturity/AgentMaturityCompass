@@ -1,0 +1,3 @@
+The unexecuted helper has no static blocker for root-owned serial controls. It pins the three exact recipes, checks regular single-link target identity, validates selected S/Q bytes, preserves an exclusive original, requires actual closed RED metadata and an outcome-bound manual classification, then restores exact original bytes.
+
+Its file identity checks are snapshots before a path-based write. Root remains responsible for sole-writer admission, the previous restored GREEN, actual semantic failure review and separate native/held/frozen-runtime preservation. This is not an atomic descriptor or continuous-isolation guarantee. No execution or checkout/index/QA writes occurred during this review.

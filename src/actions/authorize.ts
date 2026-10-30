@@ -8,15 +8,20 @@
  */
 import { randomUUID } from "node:crypto";
 import { readFileSync } from "node:fs";
-import { userInfo } from "node:os";
 import { join } from "node:path";
 import { intersectDelegationScopes } from "../agent/delegationScope.js";
 import { approvalRequestBindingDigest, listApprovalDecisions, loadApprovalRequestRecord } from "../approvals/approvalChainStore.js";
-import { consumeApprovedExecution, verifyApprovalForExecution } from "../approvals/approvalEngine.js";
+import { cliInitiator, consumeApprovedExecution, verifyApprovalForExecution } from "../approvals/approvalEngine.js";
+import { activeUserRecord } from "../auth/authApi.js";
 import { assertContract } from "../contracts/index.js";
+import { purposeResource } from "../dataflow/purposePolicy.js";
 import { activeFreezeStatus } from "../drift/freezeEngine.js";
+import { killSwitchDenial } from "../runtime/killSwitch.js";
 import { ACTION_CLASSES } from "../governor/actionCatalog.js";
+import { matchingBreakGlass } from "../governor/breakGlass.js";
+import { matchingScopedExceptions, type DeviationCall } from "../governor/scopedExceptions.js";
 import type { LeasePayload } from "../leases/leaseSchema.js";
+import { lifecycleAdmission } from "../lifecycle/reassessment.js";
 import type { EffectDeclaration } from "../toolhub/toolsSchema.js";
 import { revokedLeaseIdSet } from "../leases/leaseStore.js";
 import { verifyLeaseToken } from "../leases/leaseVerifier.js";
@@ -34,6 +39,11 @@ import {
 import { mintIdempotencyKey } from "./idempotency.js";
 import { normalizeArguments } from "./normalizeArguments.js";
 
+/**
+ * The deploymentId of a record no active compiled plan binds to a deployment: no plan, or one compiled before P1-78.
+ * Such a record names its workspace and deploymentDigest only and claims no deployment (docs/adr/009-authorization-record.md).
+ */
+export const DEPLOYMENT_NOT_BOUND = "not_bound";
 /** A record with no shorter-lived authority expires this soon after it is bound. */
 const DEFAULT_RECORD_TTL_MS = 5 * 60_000;
 const APPROVAL_REQUEST_ID = /^apprreq_[a-f0-9]{32}$/;
@@ -42,6 +52,8 @@ const APPROVAL_REQUEST_ID = /^apprreq_[a-f0-9]{32}$/;
 export interface CompiledPolicyFacts {
   readonly digest: string;
   readonly revision: number;
+  /** The tenant and deployment its profile names (P1-78); null when the plan names none. */
+  readonly deployment: { readonly tenantId: string; readonly deploymentId: string } | null;
   controlFor(actionClass: ActionClass): { readonly controlId: string; readonly controlVersion: string | null } | null;
 }
 
@@ -74,12 +86,20 @@ export type BindResult =
 export type AuthorizationIntentResult =
   | { readonly ok: true; readonly payload: AuthorizationIntent; readonly question: string } | Failed;
 type Call = Pick<ToolExecution, "workspace" | "name" | "actionClass" | "effectiveMode" | "arguments">;
-type Facts = Pick<AuthorizationRecordV1, "scope" | "policy" | "action" | "bindings"> & {
+type Facts = Pick<AuthorizationRecordV1, "scope" | "policy" | "action" | "bindings" | "resource"> & {
   readonly agentSuppliedMetadata: Record<string, unknown> | null;
   readonly effects: EffectDeclaration | null;
 };
 
-const message = (error: unknown): string => (error instanceof Error ? error.message : String(error));
+/**
+ * A failure reason reaches model-visible denials, approval questions and API responses, and an error's text can carry an
+ * absolute host path (an fs error, a verifier naming its file). Name the failure by its class only: the errno code, else
+ * the error's name.
+ */
+const message = (error: unknown): string => {
+  const code = (error as NodeJS.ErrnoException | null)?.code;
+  return typeof code === "string" ? code : error instanceof Error ? error.name : "unknown error";
+};
 const failed = (failure: RecheckFailure, reason: string): Failed => ({ ok: false, failures: [failure], reason });
 
 /** The digest of a policy file as the approvals engine binds it; absent is a named sentinel, unreadable throws. */
@@ -99,6 +119,9 @@ function actionFacts(call: Call, compiled?: CompiledPolicyFacts): { readonly ok:
     // Binding fields come from the SIGNED entry only; an unverifiable config has none.
     const signed = snapshot.config ? findToolDefinition(snapshot.config, call.name) : null;
     if (signed && signed.actionClass !== call.actionClass) return failed("tool_changed", "the signed tools config gives this tool another action class");
+    // P2-02: the purpose comes from the signed processor registry only, for the intent, the binding and the recheck alike.
+    const purpose = purposeResource(call.workspace, call.name);
+    if (!purpose.ok) return failed(purpose.failure, purpose.reason);
     const args = normalizeArguments(signed, call.actionClass, call.arguments);
     if (!args.ok) return failed(args.failure, args.reason);
     const policy = {
@@ -113,12 +136,14 @@ function actionFacts(call: Call, compiled?: CompiledPolicyFacts): { readonly ok:
       actionPolicyDigest: policy.actionPolicyDigest, approvalPolicyDigest: policy.approvalPolicyDigest,
       budgetsDigest: policy.budgetsDigest, compiledPolicyDigest: policy.compiledPolicyDigest, agentConfigDigest: null }));
     return { ok: true, facts: {
-      // ponytail: tenant and deployment id stay unregistered; the compiled plan does not carry them (P1-10 schema).
-      scope: { workspaceId: workspaceIdFromDirectory(call.workspace), tenantId: null, deploymentId: "unregistered", deploymentDigest },
+      // From the verified plan the session pinned (P1-78); without one the record claims no tenant and no deployment.
+      scope: { workspaceId: workspaceIdFromDirectory(call.workspace), tenantId: compiled?.deployment?.tenantId ?? null,
+        deploymentId: compiled?.deployment?.deploymentId ?? DEPLOYMENT_NOT_BOUND, deploymentDigest },
       policy,
       action: { toolName: call.name, adapterId: signed?.context?.kind === "mcp" ? `mcp:${signed.context.server.id}` : "native",
         actionClass: call.actionClass, mode: call.effectiveMode, argumentsDigest: args.argumentsDigest, normalizer: args.normalizer },
       bindings: args.bindings,
+      resource: { purpose: purpose.resource.purpose, dataClasses: [...purpose.resource.dataClasses] },
       agentSuppliedMetadata: args.agentSuppliedMetadata,
       effects: signed?.effects ?? null
     } };
@@ -165,15 +190,16 @@ const LEASE_ERRORS: Record<string, RecheckFailure> = {
 };
 
 /**
- * The lease, verified with its signature, expiry, agent, execute scope and classes, and the signed revocation list.
- * Without an action class it checks everything but the class (the effective-policy receipt, P1-67).
+ * The lease, verified with its signature, expiry, agent, workspace, execute scope and classes, and the signed revocation
+ * list. A lease naming another workspace is refused even when this workspace's key signed it (P1-78). Without an action
+ * class it checks everything but the class (the effective-policy receipt, P1-67).
  */
 export function checkLease(execution: Pick<ToolExecution, "workspace" | "agentId"> & { readonly actionClass?: ActionClass },
   token: string): { readonly payload: LeasePayload } | Failed {
   const workspace = execution.workspace;
   try {
     const verified = verifyLeaseToken({ workspace, token, expectedAgentId: execution.agentId, requiredScope: "toolhub:execute",
-      actionClass: execution.actionClass, revokedLeaseIds: revokedLeaseIdSet(workspace) });
+      expectedWorkspaceId: workspaceIdFromDirectory(workspace), actionClass: execution.actionClass, revokedLeaseIds: revokedLeaseIdSet(workspace) });
     if (verified.ok && verified.payload) return { payload: verified.payload };
     return failed(LEASE_ERRORS[verified.error ?? ""] ?? "scope_widened", verified.error ?? "lease refused");
   } catch (error) {
@@ -181,16 +207,78 @@ export function checkLease(execution: Pick<ToolExecution, "workspace" | "agentId
   }
 }
 
-function osUser(): string {
+/**
+ * The accountable principal of a lease-bound call (P1-78), from authenticated server state only: the lease names a user
+ * id, and the principal is that user's record in the signed users.yaml, read and verified here. A lease naming nobody
+ * contributes no principal (identity-binding then refuses the call); one naming a user that is not active there, or a
+ * users.yaml that does not verify, refuses. The lease token's own identity is never a principal. A user whose only role
+ * is AGENT is a registered service; any other user is a human. `state` is the user record's digest, which the recheck
+ * compares, so a principal deactivated or demoted between bind and execution is refused.
+ */
+export function leasePrincipal(workspace: string, payload: Pick<LeasePayload, "principal">):
+  { readonly principal: AuthorizationRecordV1["principal"]; readonly state: string } | null | Failed {
+  const named = payload.principal;
+  if (!named) return null;
+  let user: ReturnType<typeof activeUserRecord>;
   try {
-    return userInfo().username || "unknown";
-  } catch {
-    return process.env.USER ?? "unknown";
+    user = activeUserRecord(workspace, named.userId);
+  } catch (error) {
+    return failed("authority_store_unavailable", `the lease names user ${named.userId}, and users.yaml could not be verified: ${message(error)}`);
   }
+  if (!user) return failed("principal_unresolved", `the lease names user ${named.userId}, who is not an active user of the signed users.yaml`);
+  return { principal: { principalId: user.userId, kind: user.roles.every((role) => role === "AGENT") ? "service" : "human", authenticatedVia: "lease" },
+    state: sha256Hex(canonicalize({ userId: user.userId, status: user.status, roles: [...user.roles].sort() })) };
+}
+
+/** The bound principal's users.yaml state per record, for the recheck (in-process: the pipeline rechecks the object it bound). */
+const boundPrincipalState = new WeakMap<AuthorizationRecordV1, string>();
+
+/** A record re-derived from a bound one (the journal admission's fresh IDs) keeps the principal state its recheck needs. */
+export function carryBoundPrincipal(from: AuthorizationRecordV1, to: AuthorizationRecordV1): AuthorizationRecordV1 {
+  const state = boundPrincipalState.get(from);
+  if (state !== undefined) boundPrincipalState.set(to, state);
+  return to;
+}
+
+type Deviations = Pick<AuthorizationRecordV1["authority"], "exceptions" | "breakGlassId">;
+
+function deviationCall(execution: Pick<ToolExecution, "workspace" | "agentId">, facts: Pick<AuthorizationRecordV1, "action" | "bindings">): DeviationCall {
+  return { workspace: execution.workspace, agentId: execution.agentId, toolName: facts.action.toolName, actionClass: facts.action.actionClass,
+    amount: facts.bindings.amount, resourceId: facts.bindings.resourceId };
+}
+
+/**
+ * The verified, live scoped exceptions and break-glass record that cover this call (P2-24), re-read on every call. A
+ * store that cannot be read contributes none: the call then runs with no deviation, which only ever denies more.
+ */
+function deviationsFor(call: DeviationCall): Deviations {
+  try {
+    const breakGlass = matchingBreakGlass(call)[0];
+    return { exceptions: matchingScopedExceptions(call).map((exception) => ({ exceptionId: exception.exceptionId,
+      issuer: exception.approval.approvalRequestId, expiresAt: exception.window.notAfter })),
+    ...(breakGlass === undefined ? {} : { breakGlassId: breakGlass.breakGlassId }) };
+  } catch {
+    return { exceptions: [] };
+  }
+}
+
+/** A deviation the record names that no longer verifies, is revoked, ended or no longer covers the call. */
+function deviationFailures(record: AuthorizationRecordV1, execution: ToolExecution): RecheckFailure[] {
+  if (record.authority.exceptions.length === 0 && record.authority.breakGlassId === undefined) return [];
+  const now = deviationsFor(deviationCall(execution, record));
+  const live = new Set(now.exceptions.map((exception) => exception.exceptionId));
+  return [
+    ...(record.authority.exceptions.every((exception) => live.has(exception.exceptionId)) ? [] : ["exception_not_honoured" as const]),
+    ...(record.authority.breakGlassId === undefined || record.authority.breakGlassId === now.breakGlassId ? [] : ["break_glass_not_honoured" as const])
+  ];
 }
 
 /** Build the record for one call. Issued and expiry times come from AMC's clock, never from a caller. */
 export function bindAuthorization(execution: ToolExecution, ctx: AuthorizationContext = {}): BindResult {
+  // P2-23: a suspended, retired or unapproved agent takes no consequential action (advisory plans: a warning row instead).
+  // Enforcement is read from the workspace's active plan, never from `ctx`, so every entry point decides alike.
+  const lifecycle = lifecycleAdmission(execution.workspace, execution.agentId, { actionClass: execution.actionClass });
+  if (!lifecycle.ok) return failed("agent_not_active", lifecycle.reason);
   const facts = actionFacts(execution, ctx.compiledPolicy);
   if (!facts.ok) return facts;
   const approvals: AuthorizationRecordV1["authority"]["approvals"][number][] = [];
@@ -201,10 +289,13 @@ export function bindAuthorization(execution: ToolExecution, ctx: AuthorizationCo
   }
   const lease = ctx.leaseToken === undefined ? null : checkLease(execution, ctx.leaseToken);
   if (lease !== null && "ok" in lease) return lease;
+  const named = lease === null ? null : leasePrincipal(execution.workspace, lease.payload);
+  if (named !== null && "ok" in named) return named;
   const issuedTs = Date.now();
+  const deviations = deviationsFor(deviationCall(execution, facts.facts));
   // Earliest of every authority's own expiry. ponytail: no parent record is in reach in-process; P2-25 clamps to it.
   const expiresTs = Math.min(issuedTs + DEFAULT_RECORD_TTL_MS, lease?.payload.expiresTs ?? Infinity,
-    ...approvals.map(approval => Date.parse(approval.expiresAt)));
+    ...approvals.map(approval => Date.parse(approval.expiresAt)), ...deviations.exceptions.map(exception => Date.parse(exception.expiresAt)));
   if (expiresTs <= issuedTs) return failed("capability_expired", "authority expired before the call");
   const approverIds = [...new Set(approvals.flatMap(approval => approval.approverIds))].sort();
   const delegation = ctx.delegation ?? { depth: 0, parentExecutionId: null };
@@ -217,26 +308,28 @@ export function bindAuthorization(execution: ToolExecution, ctx: AuthorizationCo
       expiresAt: new Date(expiresTs).toISOString(),
       scope: facts.facts.scope,
       subject: { governedAs: execution.agentId, runAs: ctx.runAs ?? execution.agentId, agentConfigDigest: null },
-      // An approval names who authorized the effect; a lease names a service; otherwise the CLI user, self-reported.
+      // An approval names who authorized the effect; a lease, the principal its issuer named (never the lease itself,
+      // P1-78); otherwise the CLI user, self-reported, which identity-binding refuses.
       principal: approverIds.length > 0 ? { principalId: approverIds.join(","), kind: "human", authenticatedVia: "approval-engine" }
-        : lease ? { principalId: `lease:${lease.payload.leaseId}`, kind: "service", authenticatedVia: "lease" }
-          : { principalId: osUser(), kind: "human", authenticatedVia: "cli-os-user" },
+        : named?.principal ?? { principalId: cliInitiator(), kind: "human", authenticatedVia: "cli-os-user" },
       delegation: { depth: delegation.depth, parentExecutionId: delegation.parentExecutionId,
         allowedActionClasses: intersectDelegationScopes(delegation.allowedActionClasses, lease?.payload.executeActionClasses) ?? [...ACTION_CLASSES],
-        leaseId: lease?.payload.leaseId ?? null },
+        leaseId: lease?.payload.leaseId ?? null,
+        ...(lease?.payload.delegationChainDigest === undefined ? {} : { chainDigest: lease.payload.delegationChainDigest, spiffeId: lease.payload.spiffeId ?? null }) },
       session: { sessionId: ctx.sessionId ?? null, runId: null, callId: execution.callId, rootCallId: execution.rootCallId,
         parentToken: execution.parentToken },
       control: ctx.compiledPolicy?.controlFor(execution.actionClass) ?? { controlId: null, controlVersion: null },
       policy: facts.facts.policy,
       action: facts.facts.action,
-      resource: { purpose: null, dataClasses: [] },
+      resource: facts.facts.resource,
       bindings: facts.facts.bindings,
-      authority: { approvals, exceptions: [] },
+      authority: { approvals, ...deviations },
       // Minted here, before dispatch, never taken from a caller (P1-04).
       idempotencyKey: mintIdempotencyKey(),
       evidenceRefs: [...(ctx.evidenceRefs ?? [])],
       ...(facts.facts.agentSuppliedMetadata === null ? {} : { agentSuppliedMetadata: facts.facts.agentSuppliedMetadata })
     });
+    if (named !== null && record.principal.authenticatedVia === "lease") boundPrincipalState.set(record, named.state);
     return { ok: true, record, digest: authorizationRecordDigest(record), effects: facts.facts.effects };
   } catch (error) {
     return failed("authority_store_unavailable", `the authorization record could not be built: ${message(error)}`);
@@ -300,20 +393,31 @@ export function recheckAuthorization(record: AuthorizationRecordV1, execution: T
   else {
     add(...intentDifferences(intentPayloadFor(record), intentPayloadFor(current.facts)));
     if (canonicalize(record.policy) !== canonicalize(current.facts.policy)) add("policy_revision_changed");
+    if (canonicalize(record.resource) !== canonicalize(current.facts.resource)) add("purpose_violation");
   }
   for (const approval of record.authority.approvals) add(...recheckApproval(record, execution, approval));
+  add(...deviationFailures(record, execution));
   if (ctx.leaseToken !== undefined || record.delegation.leaseId !== null) {
     const lease = ctx.leaseToken === undefined ? failed("scope_widened", "the record names a lease the call does not carry")
       : checkLease(execution, ctx.leaseToken);
     if ("ok" in lease) add(...lease.failures);
     else if (lease.payload.leaseId !== record.delegation.leaseId) add("scope_widened");
+    else if (record.principal.authenticatedVia === "lease") {
+      // The principal again, from the signed users.yaml in this read: deactivated, demoted or changed since bind refuses.
+      const now = leasePrincipal(execution.workspace, lease.payload);
+      if (now !== null && "ok" in now) add(...now.failures);
+      else if (now === null || now.state !== boundPrincipalState.get(record) || now.principal.principalId !== record.principal.principalId) add("principal_unresolved");
+    }
   }
+  // P2-26: a kill switch refuses before any freeze, break-glass or exception is weighed; nothing in the record overrides it.
+  if (killSwitchDenial(execution.workspace, { kind: "tool", agentId: execution.agentId, actionClass: record.action.actionClass }) !== null) add("kill_switch_active");
   try {
     const freeze = activeFreezeStatus(execution.workspace, execution.agentId);
     if (freeze.active && freeze.actionClasses.includes(record.action.actionClass)) add("action_class_frozen");
   } catch {
     add("authority_store_unavailable");
   }
+  if (!lifecycleAdmission(execution.workspace, execution.agentId, { record: false, actionClass: execution.actionClass }).ok) add("agent_not_active");
   if (Date.now() >= Date.parse(record.expiresAt)) add("capability_expired");
   // A child can only narrow: its class must be in scope, and a child must name the delegation that made it.
   if (!record.delegation.allowedActionClasses.includes(record.action.actionClass)

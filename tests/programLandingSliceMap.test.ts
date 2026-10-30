@@ -52,6 +52,14 @@ describe("P0-04 landing slice map", () => {
     for (const c of committed.commits as Commit[]) expect(ISSUE_TABLE, c.sha).toContain(c.issue);
   });
 
+  test("P1-46 decided F2: folded into the compiler, so no F2 commit is ever picked", () => {
+    const hidden = committed.slices.find((s: { id: string }) => s.id === "hidden");
+    expect(hidden.decision).toMatch(/^not landed: folded into the compiler \(docs\/adr\/015-f2-blueprints\.md\)/);
+    const f2 = (committed.commits as Commit[]).filter((c) => c.track === "F2");
+    expect(f2.length).toBeGreaterThan(0);
+    for (const c of f2) expect(["record-only", "skip-receipt"], c.sha).toContain(c.action);
+  });
+
   describe("negative fixtures fail", () => {
     test("a receipt-only commit marked cherry-pick", () => {
       const map = copy();

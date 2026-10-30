@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { SIGNING_ALGORITHMS } from "../keys/algorithmPolicy.js";
 
 export const releaseManifestSchema = z.object({
   v: z.literal(1),
@@ -22,7 +23,7 @@ export const releaseManifestSchema = z.object({
     dockerImageSha256: z.string().regex(/^[a-f0-9]{64}$/)
   }),
   signing: z.object({
-    algorithm: z.literal("ed25519"),
+    algorithm: z.enum(SIGNING_ALGORITHMS),
     pubkeyFingerprint: z.string().regex(/^[a-f0-9]{64}$/)
   })
 });

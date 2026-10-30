@@ -1,0 +1,31 @@
+{
+  "schema": "p125pc-root-public-and-metadata-scope-review-adoption/1",
+  "at": "2026-10-17T02:19:11.458757+00:00",
+  "full10219PublicOutputReviewRead": true,
+  "publicOutputReviewPin": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/public-output-actual-review/review.json",
+    "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/public-output-actual-review/review.json",
+    "bytes": 10219,
+    "sha256": "c39af30f400890c549687eef090104d005e474fbeaf957f17ac010f92bba6faf",
+    "dev": 16777231,
+    "inode": 544002853,
+    "nlink": 1
+  },
+  "full26284ScopeReportRead": true,
+  "scopeReviewPin": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/receipt-scope-preparation/review.json",
+    "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/receipt-scope-preparation/review.json",
+    "bytes": 26284,
+    "sha256": "820ed76a9d349296a5593b58f311a64e0842d1a07e97f0f4e90e2b15869c292f",
+    "dev": 16777231,
+    "inode": 544002515,
+    "nlink": 1
+  },
+  "all218ExplicitPublicFilesIndependentlyReviewed": true,
+  "scoped188PhysicalRoots752PathChecksAnd21HistoriesNoObservedOverlap": true,
+  "currentHostedAll13PrFilesWip0NoOverlap": true,
+  "currentMetadataFreeze0D15None": true,
+  "independentReviewLimitsRetained": true,
+  "noSourceCopyOrThreeMetadataSuccessorsAdmittedYet": true,
+  "allHoldsRemainOpen": true
+}

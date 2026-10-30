@@ -1,0 +1,16 @@
+{
+  "at": "2026-10-16T21:41:41.388642+00:00",
+  "beforeFindings": 2723,
+  "afterFindings": 2720,
+  "removed": [
+    "[\"src/time/tsaClient.ts\",\"exports\",{\"name\":\"TSA_TIMEOUT_MS\"}]",
+    "[\"src/time/tsaClient.ts\",\"exports\",{\"name\":\"buildTimestampRequest\"}]",
+    "[\"src/time/tsaClient.ts\",\"exports\",{\"name\":\"postTimestampQuery\"}]"
+  ],
+  "added": [],
+  "qualityRemainsRed": true,
+  "baselineOrWaiverAdopted": false,
+  "diagnosticExit0IsNotQualityPass": true,
+  "beforeReportSha256": "c89713ad99325f6a4636632dc0cc8983aa9476c830c73e6a1cd7679ef137774c",
+  "afterReportSha256": "ab108ec66920bc638b234cde44d753df2a30c35fe1fee60dec4809ac086c51b1"
+}

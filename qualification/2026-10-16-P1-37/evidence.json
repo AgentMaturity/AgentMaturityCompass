@@ -1,0 +1,28 @@
+{
+  "schema": "p137-bounded-qualification/1",
+  "at": "2026-10-16T11:07:18.882082+00:00",
+  "sourceCommit": "b8850be74eb342bb04dbc7dc3786a9393325f436",
+  "canonicalTests": {
+    "total": 51,
+    "passed": 51,
+    "failed": 0,
+    "skipped": 0
+  },
+  "newAutomaticCases": 31,
+  "existingManualCases": 20,
+  "disabledCompatibilityCases": 41,
+  "compatibilityScope": "Three selected loop files, not every loop test. No repeat-run totals summed.",
+  "mechanismLimits": [
+    "Synthetic provider responses/usage and local trust, not real model quality or authentication.",
+    "Manual null-usage class boundary is separate from integrated usage-missing protocol refusal.",
+    "Independent signatures cover retained digests; canonical row/fullchain/source payloads are not recreated.",
+    "Cold child gets owned passphrase; not public-only or locked-vault proof.",
+    "Source-only controls do not mutate compiled CLI; M2 is not build/typecheck-valid.",
+    "Full suite/coverage, full CLI/ACP/SDK option runtime, summary budget refusal, JSONL, Node24/Linux, hosted merge/release remain unqualified."
+  ],
+  "qualityRemainsFailed": true,
+  "F37": "Skipped by human; no repair resumed.",
+  "heldDecisionsAndClaudeReservationsPreserved": true,
+  "formalDone": false,
+  "wholePlanComplete": false
+}

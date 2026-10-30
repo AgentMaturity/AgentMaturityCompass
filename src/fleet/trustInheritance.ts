@@ -129,7 +129,8 @@ function clamp01(value: number): number {
 }
 
 /**
- * Weighted harmonic mean of trust values.
+ * Weighted harmonic mean of trust values. Unlike experiments/stats.ts arithmetic mean,
+ * evidence weights scale reciprocal trust, so weak links reduce the composite more strongly.
  */
 function weightedHarmonicMean(values: { value: number; weight: number }[]): number {
   const filtered = values.filter((v) => v.value > 0 && v.weight > 0);

@@ -43,7 +43,7 @@ function skillContextName(skill: Skill): string {
 }
 
 /** Frame a skill for the model: whose words these are, and where they came from. */
-function renderSkillContext(skill: Skill): string {
+export function renderSkillContext(skill: Skill): string {
   return [
     `# Skill: ${skill.name}`,
     `${skill.description}`,

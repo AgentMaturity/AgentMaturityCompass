@@ -1,0 +1,13 @@
+# P1-19 oracle v4: guarded read preparation and complete cleanup attempts
+
+This closed private correction preserves v1, v2 and v3 unchanged. It has not been parsed, imported, typechecked or executed, and no repository file or retained fixture was changed.
+
+V3 establishes the actual readonly SQLite transaction before its qualified baseline. V4 also verifies that this preparation did not move the data version: every DB and key/history pin, including membership, identity, length and hash, must match the pre-preparation pins exactly. The identified WAL must either have exactly the same pin or change only from absent to an actual regular zero-byte file whose digest is SHA256(empty). The regular-file property comes from the existing checked snapshot reader. A replaced/truncated existing WAL, new nonempty WAL, altered DB or changed key/history refuses before the cold CLI starts. The refusal records snapshot-stable:false and an explicit input diagnostic; it closes the held reader in finally and cannot pass.
+
+The authenticated interval remains strict. The baseline after read preparation and final pins after the cold verifier and action extraction still compare DB, WAL presence/identity/bytes/hash and keys/history without any exception. V4 does not ignore WAL, copy the database, checkpoint, repair, restore, delete sidecars or weaken a policy or test expectation. Reader-preparation predicates and exact hashes are included in the bounded evidence. The already closed producers and writable pools remain required; no atomic hostile-filesystem or same-UID ABA claim is added.
+
+Cleanup now independently attempts rollback and close. The original preparation error and every rollback/close error remain in an AggregateError when multiple failures occur; a sole error is rethrown unchanged. The main oracle renders aggregate members in its failed-check diagnostic. Both normal returned-reader closure and failed preparation use the same small cleanup function. No forced signal, retry or early child completion is introduced.
+
+The filesystem-only cause evidence remains in v3/diagnosis.json: the retained current DB/key/empty-WAL pins exactly reproduce the failed run's after hash, while replacing only WAL with absent reproduces its before hash. This explains the observed snapshot failure, not a passed v4 result. The genuine first source run remains 10/5/5 with all original raw/observer/fixture evidence intact.
+
+The wire and all 16 required check IDs are unchanged. The same two source files remain below 800 lines; v3-to-v4.patch is the exact delta. Root alone reviews, admits, applies and runs a future candidate. All author reads and writes are finished.

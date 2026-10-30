@@ -1,0 +1,14 @@
+{
+  "producers": [
+    {
+      "id": "amc.ledger",
+      "module": "src/ledger/ledger.ts",
+      "emits": [
+        "evidence_event"
+      ],
+      "maxClaimKind": "observed",
+      "status": "available",
+      "plannedBy": null
+    }
+  ]
+}

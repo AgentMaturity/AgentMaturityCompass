@@ -1,0 +1,12 @@
+{
+  "id": "CR-1",
+  "scenario": "Pod killed mid-action",
+  "status": "not_run",
+  "reason": "needs a consequential fixture action with a system of record (P1-19 finance fixture) and the P1-03/P2-12 resume semantics wired into this harness",
+  "blockedBy": [
+    "P1-19",
+    "P1-03",
+    "P2-12"
+  ],
+  "durationMs": 0
+}

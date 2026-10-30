@@ -1,0 +1,105 @@
+{
+  "sourceInputs": [
+    {
+      "path": "src/assurance/assuranceRunner.ts",
+      "bytes": 34718,
+      "sha256": "50bc232fa9f6eaeee5d52745854cd1d4658481492c7024b102ab515cd2197766",
+      "afterSha256": "50bc232fa9f6eaeee5d52745854cd1d4658481492c7024b102ab515cd2197766"
+    },
+    {
+      "path": "src/assurance/evidenceWriters.ts",
+      "bytes": 9181,
+      "sha256": "49b8dd03393dd801303c176859b3f5a8f1900f1fe3692912d1a8d2c6673f6c7b",
+      "afterSha256": "49b8dd03393dd801303c176859b3f5a8f1900f1fe3692912d1a8d2c6673f6c7b"
+    },
+    {
+      "path": "src/ledger/ledger.ts",
+      "bytes": 43792,
+      "sha256": "67128b560786c6df45e0145f02964d855cc41174521f50c493c487a4bce6fb14",
+      "afterSha256": "67128b560786c6df45e0145f02964d855cc41174521f50c493c487a4bce6fb14"
+    },
+    {
+      "path": "src/ledger/ledgerConnection.ts",
+      "bytes": 3137,
+      "sha256": "49a4aec4b727055760717a4edc2360cb2267491922e7788dabf0cc43e0ec6854",
+      "afterSha256": "49a4aec4b727055760717a4edc2360cb2267491922e7788dabf0cc43e0ec6854"
+    },
+    {
+      "path": "src/ledger/ledgerSessionTransactions.ts",
+      "bytes": 3032,
+      "sha256": "0bba4d284e53916f52981b5ea0bd534ac4c77938dbe72970d26ab09c0bc6ed72",
+      "afterSha256": "0bba4d284e53916f52981b5ea0bd534ac4c77938dbe72970d26ab09c0bc6ed72"
+    },
+    {
+      "path": "src/ledger/ledgerVerification.ts",
+      "bytes": 35501,
+      "sha256": "6bbc4237e126b8cb5d070eb8e9c5c58d267a5a2fd8eab754f4d4a22860ec479e",
+      "afterSha256": "6bbc4237e126b8cb5d070eb8e9c5c58d267a5a2fd8eab754f4d4a22860ec479e"
+    },
+    {
+      "path": "src/assurance/agentResponder.ts",
+      "bytes": 21889,
+      "sha256": "2ecae97e66119ce66902c8d93d0edd8ab2e750b795658046bd5c0e8048f9d807",
+      "afterSha256": "2ecae97e66119ce66902c8d93d0edd8ab2e750b795658046bd5c0e8048f9d807"
+    },
+    {
+      "path": "src/storage/sqlitePool.ts",
+      "bytes": 5804,
+      "sha256": "021dfe8f275c90273d1821d36431f182bbde538a3417f2375e96013c91867bfc",
+      "afterSha256": "021dfe8f275c90273d1821d36431f182bbde538a3417f2375e96013c91867bfc"
+    },
+    {
+      "path": "tests/assuranceSessionQualification.test.ts",
+      "bytes": 16295,
+      "sha256": "b5187c328592a4d71ae78db53116f168a2bff58d3d645f80930241b1daba7608",
+      "afterSha256": "b5187c328592a4d71ae78db53116f168a2bff58d3d645f80930241b1daba7608"
+    },
+    {
+      "path": "dist/assurance/assuranceRunner.js",
+      "bytes": 35362,
+      "sha256": "a0e195ed6eee7c5bea9cedebd89d51a6774dd8ec922f3194ef93617f50f3c0e5",
+      "afterSha256": "a0e195ed6eee7c5bea9cedebd89d51a6774dd8ec922f3194ef93617f50f3c0e5"
+    },
+    {
+      "path": "dist/assurance/evidenceWriters.js",
+      "bytes": 8271,
+      "sha256": "93a83500a155beaff2102ec7f6f2154ec9223126d16322ff0c5d5c62dfd71c42",
+      "afterSha256": "93a83500a155beaff2102ec7f6f2154ec9223126d16322ff0c5d5c62dfd71c42"
+    },
+    {
+      "path": "dist/ledger/ledger.js",
+      "bytes": 40649,
+      "sha256": "b555d1a81c0033f2af9a5004e209eae0f11ceb46f665b9f52b17cf9978796da2",
+      "afterSha256": "b555d1a81c0033f2af9a5004e209eae0f11ceb46f665b9f52b17cf9978796da2"
+    },
+    {
+      "path": "dist/ledger/ledgerConnection.js",
+      "bytes": 3070,
+      "sha256": "0dbf42f44099d70defdf362bd58a8489053ba3257b5af6b908d611a0144ca121",
+      "afterSha256": "0dbf42f44099d70defdf362bd58a8489053ba3257b5af6b908d611a0144ca121"
+    },
+    {
+      "path": "dist/ledger/ledgerSessionTransactions.js",
+      "bytes": 2661,
+      "sha256": "8098ec4fcd137f0334bea17c5bb3a0062dff9184f311b570a35d8ad3d424bb49",
+      "afterSha256": "8098ec4fcd137f0334bea17c5bb3a0062dff9184f311b570a35d8ad3d424bb49"
+    },
+    {
+      "path": "dist/ledger/ledgerVerification.js",
+      "bytes": 31436,
+      "sha256": "3590018e331851153403757b6e2a7e9ff3f4f44814b212939e9dff85f109074b",
+      "afterSha256": "3590018e331851153403757b6e2a7e9ff3f4f44814b212939e9dff85f109074b"
+    },
+    {
+      "path": "dist/assurance/agentResponder.js",
+      "bytes": 19004,
+      "sha256": "da6c51a4e4c647398d4b65d4d3755acd72654e6ebd979fdf7789feaa6d98b9b6",
+      "afterSha256": "da6c51a4e4c647398d4b65d4d3755acd72654e6ebd979fdf7789feaa6d98b9b6"
+    }
+  ],
+  "all16SourceInputsUnchanged": true,
+  "privateDependencies": 18,
+  "privateGuardInputPinsUnchanged": true,
+  "privateActiveRestored": true,
+  "runtimeIdle": true
+}

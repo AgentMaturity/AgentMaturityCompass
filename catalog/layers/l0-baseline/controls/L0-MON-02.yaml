@@ -1,0 +1,154 @@
+# Draft (P1-14): experimental, agent-drafted and not independently reviewed. Expert sign-off waits for D-08;
+# citations are unverified until fetched and hashed. A result under this control is evidence of conformity, never proof of compliance.
+id: L0-MON-02
+version: "0.1.0"
+support: experimental
+layer: 0
+family: monitoring-incidents-and-resilience
+stations: [education, environment, health, wealth, technology, mobility, governance]
+title: Incidents start regulatory clocks
+statement: >-
+  A detected incident starts every applicable regulatory clock with its deadline, and notice drafts
+  exist before each deadline.
+riskRationale: >-
+  A reporting deadline that nobody started counting is missed by default.
+mandatory: true
+applicability:
+  predicate: { always: true }
+  reasons: [Layer 0 applies to every agent deployment in every station.]
+  exclusions: []
+citations:
+  - key: eu-ai-act-art-73
+    registerId: eu-ai-act
+    instrument: Artificial Intelligence Act, Regulation (EU) 2024/1689
+    clause: Art. 73
+    edition: Regulation (EU) 2024/1689 as amended by Regulation (EU) 2026/1744 (CELEX 32024R1689, 32026R1744)
+    jurisdiction: EU
+    statusType: binding-now
+    superseded: null
+    effectiveDate: null
+    complianceDueDate: null
+    dateNote: >-
+      Not recorded: the legal review (D-08) pins the effective and compliance dates.
+    url: https://publications.europa.eu/resource/celex/32024R1689
+    retrieval:
+      state: unverified
+      reason: >-
+        Not fetched in P1-14: the task allows no network access. Register entry eu-ai-act records the source
+        as read in its review; fetch and hash this url before expert review (D-08).
+    appliesWhen:
+      all: [{ fact: jurisdictions, includesAny: [EU] }, { fact: roles, includesAny: [provider] }]
+    legalReview: null
+    note: >-
+      Register: providers report serious incidents of high-risk AI systems. The F4 clock table holds the
+      Art. 73 deadlines.
+  - key: eu-gdpr-art-33
+    registerId: eu-gdpr
+    instrument: General Data Protection Regulation, Regulation (EU) 2016/679
+    clause: Art. 33
+    edition: Regulation (EU) 2016/679 (CELEX 32016R0679)
+    jurisdiction: EU
+    statusType: binding-now
+    superseded: null
+    effectiveDate: "2018-05-25"
+    complianceDueDate: "2018-05-25"
+    dateNote: null
+    url: https://publications.europa.eu/resource/celex/32016R0679
+    retrieval:
+      state: unverified
+      reason: >-
+        Not fetched in P1-14: the task allows no network access. Register entry eu-gdpr records the source
+        as read in its review; fetch and hash this url before expert review (D-08).
+    appliesWhen: { fact: jurisdictions, includesAny: [EU] }
+    legalReview: null
+    note: >-
+      Register: personal data breaches are notified to the supervisory authority without undue delay and,
+      where feasible, within 72 hours.
+  - key: eu-dora-art-19
+    registerId: eu-dora
+    instrument: Digital Operational Resilience Act, Regulation (EU) 2022/2554
+    clause: Art. 19
+    edition: Regulation (EU) 2022/2554 (CELEX 32022R2554)
+    jurisdiction: EU
+    statusType: binding-now
+    superseded: null
+    effectiveDate: "2025-01-17"
+    complianceDueDate: "2025-01-17"
+    dateNote: null
+    url: https://publications.europa.eu/resource/celex/32022R2554
+    retrieval:
+      state: unverified
+      reason: >-
+        Not fetched in P1-14: the task allows no network access. Register entry eu-dora records the source
+        as read in its review; fetch and hash this url before expert review (D-08).
+    appliesWhen:
+      all: [{ fact: jurisdictions, includesAny: [EU] }, { fact: entityTypes, includesAny: [eu_financial_entity] }]
+    legalReview: null
+    note: >-
+      Register: major ICT-related incidents are reported to the competent authority.
+binding:
+  kind: manual
+  points: []
+  mechanism: >-
+    Recording an incident starts its clocks from the F4 table; signed clock events record triggers and
+    notices; a draft notice is prepared before each deadline.
+  parameters: []
+  manualDuty:
+    duty: >-
+      Record incident triggers and notices and prepare each notice before its deadline.
+    ownerRole: ciso
+    cadence: per incident
+    evidenceOfPerformance: The signed clock events and the notice drafts.
+tests:
+  - id: L0-MON-02-T1
+    type: drill
+    oracle: { kind: ledger_state, observes: The clocks attached to a drill incident and the signed clock events. }
+    fixtures:
+      positive: [L0-MON-02/positive/clocks-start.json, L0-MON-02/positive/evidence-valid.json]
+      negative:
+        - L0-MON-02/negative/evidence-contradictory.json
+        - L0-MON-02/negative/evidence-cross-tenant.json
+        - L0-MON-02/negative/evidence-empty.json
+        - L0-MON-02/negative/evidence-replayed.json
+        - L0-MON-02/negative/evidence-stale.json
+        - L0-MON-02/negative/evidence-violation.json
+    passCriteria: >-
+      Every applicable clock starts with its deadline and each notice is recorded before it.
+    attempts: 1
+  - id: L0-MON-02-T2
+    type: runtime_enforced
+    oracle: { kind: ledger_state, observes: The clock events store's refusals. }
+    fixtures:
+      positive: [L0-MON-02/positive/evidence-valid-t2.json, L0-MON-02/positive/notice-recorded.json]
+      negative:
+        - L0-MON-02/negative/backdated-notice.json
+        - L0-MON-02/negative/duplicate-notice.json
+        - L0-MON-02/negative/evidence-violation-t2.json
+        - L0-MON-02/negative/future-dated-notice.json
+        - L0-MON-02/negative/unknown-clock.json
+    passCriteria: >-
+      Backdated, future-dated and unknown clock events are refused. Notice drafts are not built yet
+      (P2-26).
+    attempts: 1
+evidence:
+  - id: L0-MON-02-E1
+    producer: amc.incidents.clocks
+    bindingFields: [workspaceId, controlId]
+    freshness: { maxAgeDays: 30 }
+    sampling: { method: all, ratePercent: null, minItems: 1 }
+    retention: { mode: regime_max }
+    residency: { mode: inherit_deployment }
+  - id: L0-MON-02-E2
+    producer: amc.incidents.notices
+    bindingFields: [workspaceId, controlId]
+    freshness: { maxAgeDays: 30 }
+    sampling: { method: all, ratePercent: null, minItems: 1 }
+    retention: { mode: regime_max }
+    residency: { mode: inherit_deployment }
+invalidatedBy: [deployment_version, policy_version]
+owner: { role: ciso }
+clock: null
+levels: [L2, L3]
+crosswalk: []
+review: { status: pending, expert: null, credential: null, reviewedAt: null, nextReview: null }
+provenance: { draftedBy: ai, draftedAt: "2026-10-11", approvedBy: null }

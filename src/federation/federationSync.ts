@@ -1,8 +1,9 @@
-import { mkdtempSync, readdirSync, readFileSync, renameSync, rmSync, statSync } from "node:fs";
+import { lstatSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, realpathSync, renameSync, rmSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join, relative, resolve } from "node:path";
+import { basename, dirname, join, relative, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
-import { randomBytes, randomUUID } from "node:crypto";
+import { randomUUID } from "node:crypto";
+import { verifyHexDigest } from "../crypto/keys.js";
 import { federationManifestSchema, federationManifestSignatureSchema, type FederationManifest } from "./federationSchema.js";
 import { ensureFederationPublisherKey, signFederationDigest } from "./federationIdentity.js";
 import { federationInboxDir, federationOutboxDir, listFederationPeers, loadFederationConfig } from "./federationStore.js";
@@ -366,16 +367,60 @@ export function federationPeerTrust(workspace: string): TrustContext {
  * manifest claims: the matching peer record's peerId, or key-<first 16 hex of the key id> when only the operator's
  * trust list admitted the key (or the peer record's id is not a safe directory name).
  */
-function admittedInboxName(workspace: string, report: VerifierReportV1): string {
+function admittedInboxIdentity(workspace: string, report: VerifierReportV1): { name: string; keyId: string } {
   const keyId = report.issuerAdmission.signatures.find((row) => row.status === "admitted")?.keyId;
   if (!keyId) {
     throw new Error("federation package has no admitted signing key");
   }
   const peerId = listFederationPeers(workspace).find(({ peer, valid }) => valid && ed25519KeyId(peer.publisherPublicKeyPem) === keyId)?.peer.peerId;
-  return peerId !== undefined && safeIdSchema.safeParse(peerId).success ? peerId : `key-${keyId.slice(0, 16)}`;
+  return { keyId, name: peerId !== undefined && safeIdSchema.safeParse(peerId).success ? peerId : `key-${keyId.slice(0, 16)}` };
 }
 
 const STAGING_PREFIX = ".staging-";
+
+/** `workspace` is the operator-selected physical root; never resolve a linked descendant. */
+function checkedInboxDirectory(workspace: string, publisher?: string, create = false): string {
+  const parts = [".amc", "federation", "inbox", ...(publisher === undefined ? [] : [publisher])];
+  const inbox = federationInboxDir(workspace);
+  const target = publisher === undefined ? inbox : containedPath(inbox, "the federation inbox", publisher);
+  let current = workspace;
+  for (const part of parts) {
+    current = join(current, part);
+    let info = lstatSync(current, { throwIfNoEntry: false });
+    if (!info) {
+      if (!create) return target;
+      try { mkdirSync(current); } catch (error) {
+        if ((error as NodeJS.ErrnoException).code !== "EEXIST") throw error;
+      }
+      info = lstatSync(current);
+    }
+    if (info.isSymbolicLink() || !info.isDirectory()) {
+      throw new Error("federation inbox contains a linked or non-directory destination component");
+    }
+  }
+  return target;
+}
+
+/** Retained keys establish history identity only; incoming issuer admission still uses the operator's trust. */
+function authenticatedHistory(directory: string): { manifest: FederationManifest; keyId: string } {
+  const unreadable = `cannot read the manifest or authenticate imported federation package ${basename(directory)}; refusing to import until it is restored or removed`;
+  try {
+    if (!lstatSync(join(directory, "public-keys")).isDirectory()) throw new Error(unreadable);
+    for (const path of PACKAGE_ENVELOPE) {
+      if (!lstatSync(join(directory, path)).isFile()) throw new Error(unreadable);
+    }
+    const bytes = readFileSync(join(directory, "manifest.json"));
+    const manifest = federationManifestSchema.parse(JSON.parse(bytes.toString("utf8")) as unknown);
+    const signature = federationManifestSignatureSchema.parse(JSON.parse(readUtf8(join(directory, "manifest.sig"))) as unknown);
+    const publicKey = readUtf8(join(directory, "public-keys", "publisher.pub"));
+    const keyId = ed25519KeyId(publicKey);
+    const digest = sha256Hex(bytes);
+    if (!keyId || digest !== signature.digestSha256 || !verifyHexDigest(digest, signature.signature, publicKey)) throw new Error(unreadable);
+    return { manifest, keyId };
+  } catch {
+    throw new Error(unreadable);
+  }
+}
 
 /** A top-level `.amcbench` under artifacts/benchmarks/, the files the import ingests. */
 function isPackageBenchmark(path: string): boolean {
@@ -385,29 +430,25 @@ function isPackageBenchmark(path: string): boolean {
 
 /**
  * A manifestId is imported once (a re-import would overwrite what was imported), and a package older than one already
- * imported from the same admitted publisher is refused as a rollback. An imported package whose manifest cannot be read
- * blocks further imports from that publisher rather than being ignored.
+ * imported from the same admitted publisher is refused as a rollback, even under an older alias. Unreadable or
+ * unauthentic history blocks imports because its publisher cannot safely be excluded from the comparison.
  */
-function refuseReplayOrRollback(publisherInbox: string, manifest: FederationManifest): void {
-  if (!pathExists(publisherInbox)) return;
-  for (const entry of readdirSync(publisherInbox, { withFileTypes: true })) {
-    if (!entry.isDirectory() || entry.name.startsWith(STAGING_PREFIX)) continue;
-    if (entry.name === manifest.manifestId) {
-      throw new Error(`federation package ${manifest.manifestId} was already imported from this publisher; it is not imported again`);
-    }
-    const priorFile = join(publisherInbox, entry.name, "manifest.json");
-    let prior: FederationManifest | null = null;
-    try {
-      prior = federationManifestSchema.parse(JSON.parse(readUtf8(priorFile)) as unknown);
-    } catch {
-      prior = null;
-    }
-    if (!prior) {
-      throw new Error(`cannot read the manifest of imported federation package ${entry.name}; refusing to import until it is restored or removed`);
-    }
-    if (prior.createdTs > manifest.createdTs) {
-      throw new Error(`federation package ${manifest.manifestId} (created ${new Date(manifest.createdTs).toISOString()}) is older than `
-        + `${prior.manifestId} (created ${new Date(prior.createdTs).toISOString()}) already imported from this publisher; refused as a rollback`);
+function refuseReplayOrRollback(inbox: string, keyId: string, manifest: FederationManifest): void {
+  if (!pathExists(inbox)) return;
+  for (const bucket of readdirSync(inbox, { withFileTypes: true })) {
+    if (!bucket.isDirectory()) throw new Error("cannot read the manifest history of imported federation packages; refusing to import");
+    for (const entry of readdirSync(join(inbox, bucket.name), { withFileTypes: true })) {
+      if (entry.name.startsWith(STAGING_PREFIX)) continue;
+      if (!entry.isDirectory()) throw new Error(`cannot read the manifest of imported federation package ${entry.name}; refusing to import`);
+      const prior = authenticatedHistory(join(inbox, bucket.name, entry.name));
+      if (prior.keyId !== keyId) continue;
+      if (prior.manifest.manifestId === manifest.manifestId) {
+        throw new Error(`federation package ${manifest.manifestId} was already imported from this publisher; it is not imported again`);
+      }
+      if (prior.manifest.createdTs > manifest.createdTs) {
+        throw new Error(`federation package ${manifest.manifestId} (created ${new Date(manifest.createdTs).toISOString()}) is older than `
+          + `${prior.manifest.manifestId} (created ${new Date(prior.manifest.createdTs).toISOString()}) already imported from this publisher; refused as a rollback`);
+      }
     }
   }
 }
@@ -432,8 +473,10 @@ export function importFederationPackage(params: {
   bomCount: number;
   pluginCount: number;
 } {
+  const workspace = realpathSync(params.workspace);
+  const inbox = checkedInboxDirectory(workspace);
   // Only a package signed by a peer the operator added (`amc federate peer add`) or a trust list pins is imported.
-  const trust = federationPeerTrust(params.workspace);
+  const trust = federationPeerTrust(workspace);
   const verify = verifyPackage(params.bundleFile, trust);
   if (!verify.ok || !verify.manifest) {
     throw new Error(`federation package verify failed: ${untrustedReasons(verify.report).join("; ")}`);
@@ -442,9 +485,11 @@ export function importFederationPackage(params: {
   try {
     tarExtract(params.bundleFile, temp);
     const root = resolveExtractedRoot(temp, PACKAGE_ENVELOPE);
-    const importedPath = containedPath(federationInboxDir(params.workspace), "the federation inbox",
-      admittedInboxName(params.workspace, verify.report), verify.manifest.manifestId);
-    refuseReplayOrRollback(dirname(importedPath), verify.manifest);
+    const publisher = admittedInboxIdentity(workspace, verify.report);
+    const publisherInbox = checkedInboxDirectory(workspace, publisher.name);
+    const importedPath = containedPath(publisherInbox, "the federation inbox", verify.manifest.manifestId);
+    refuseReplayOrRollback(inbox, publisher.keyId, verify.manifest);
+    if (lstatSync(importedPath, { throwIfNoEntry: false })) throw new Error("federation import destination already exists");
     // Everything copied: the manifest's files and the envelope, each with the sha256 verification admitted.
     const copies = [...verify.manifest.files, ...verify.envelope].map(({ path, sha256 }) => ({
       path,
@@ -458,16 +503,19 @@ export function importFederationPackage(params: {
     }
     // Every benchmark signer is checked before anything is written, so a refused package leaves nothing behind.
     for (const copy of copies.filter(({ path }) => isPackageBenchmark(path))) {
-      admitBenchmark(params.workspace, copy.src, trust);
+      admitBenchmark(workspace, copy.src, trust);
     }
     // Staged next to its final place and renamed in one step: the inbox never holds a partial package.
-    const staging = containedPath(dirname(importedPath), "the federation inbox", `${STAGING_PREFIX}${randomBytes(6).toString("hex")}`);
+    checkedInboxDirectory(workspace, publisher.name, true);
+    const staging = mkdtempSync(join(publisherInbox, STAGING_PREFIX));
     try {
       for (const copy of copies) {
         const dst = containedPath(staging, "the staged package directory", copy.path);
         ensureDir(dirname(dst));
         writeFileAtomic(dst, admittedBytes(copy), 0o644);
       }
+      checkedInboxDirectory(workspace, publisher.name);
+      if (lstatSync(importedPath, { throwIfNoEntry: false })) throw new Error("federation import destination already exists");
       renameSync(staging, importedPath);
     } finally {
       rmSync(staging, { recursive: true, force: true });
@@ -480,7 +528,7 @@ export function importFederationPackage(params: {
         if (!entry.isFile() || !entry.name.endsWith(".amcbench")) continue;
         // A peer pin admits the package seal, not the benchmarks inside it: each benchmark's own signer must be
         // admitted by the operator's trust (or be the peer key itself) before it reaches the workspace's stats.
-        ingestBenchmarks(params.workspace, join(benchDir, entry.name), trust);
+        ingestBenchmarks(workspace, join(benchDir, entry.name), trust);
         benchmarkCount += 1;
       }
     }
@@ -498,7 +546,8 @@ export function importFederationPackage(params: {
       : 0;
     return {
       sourceOrgId: verify.manifest.sourceOrgId,
-      importedPath,
+      // Preserve the caller's path spelling; all import I/O uses the checked physical root above.
+      importedPath: containedPath(federationInboxDir(params.workspace), "the federation inbox", publisher.name, verify.manifest.manifestId),
       benchmarkCount,
       certCount,
       bomCount,

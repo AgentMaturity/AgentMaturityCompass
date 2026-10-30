@@ -1,0 +1,5714 @@
+[
+  {
+    "path": "a4 approve",
+    "mode": "agent",
+    "error": "Command 'a4 approve' is blocked in agent mode. Switch to owner mode with: amc mode owner",
+    "before": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659275,
+        "links": 3,
+        "modifiedMs": 1792006789083.291
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659277,
+        "links": 6,
+        "modifiedMs": 1792006789084.4966
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659285,
+        "links": 1,
+        "modifiedMs": 1792006789084.3926,
+        "bytes": 51,
+        "sha256": "2354f7c09d08384986f0f0ecfa7ec2047b4d1f681aca5ecbb94de10b5539b12e"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659279,
+        "links": 2,
+        "modifiedMs": 1792006789083.5393,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659279,
+        "links": 2,
+        "modifiedMs": 1792006789083.5393,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659284,
+        "links": 1,
+        "modifiedMs": 1792006789084.0461,
+        "target": "owned-sentinel.txt"
+      }
+    ],
+    "after": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659275,
+        "links": 3,
+        "modifiedMs": 1792006789083.291
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659277,
+        "links": 6,
+        "modifiedMs": 1792006789084.4966
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659285,
+        "links": 1,
+        "modifiedMs": 1792006789084.3926,
+        "bytes": 51,
+        "sha256": "2354f7c09d08384986f0f0ecfa7ec2047b4d1f681aca5ecbb94de10b5539b12e"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659279,
+        "links": 2,
+        "modifiedMs": 1792006789083.5393,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659279,
+        "links": 2,
+        "modifiedMs": 1792006789083.5393,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659284,
+        "links": 1,
+        "modifiedMs": 1792006789084.0461,
+        "target": "owned-sentinel.txt"
+      }
+    ]
+  },
+  {
+    "path": "a4 complete",
+    "mode": "agent",
+    "error": "Command 'a4 complete' is blocked in agent mode. Switch to owner mode with: amc mode owner",
+    "before": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659294,
+        "links": 3,
+        "modifiedMs": 1792006789088.6135
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659295,
+        "links": 6,
+        "modifiedMs": 1792006789089.3354
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659300,
+        "links": 1,
+        "modifiedMs": 1792006789089.233,
+        "bytes": 51,
+        "sha256": "78726d0fd38afd6a2ea5c90e1a6a7a7e46db3d218acc5d398cff09bc943a57c5"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659296,
+        "links": 2,
+        "modifiedMs": 1792006789088.7415,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659296,
+        "links": 2,
+        "modifiedMs": 1792006789088.7415,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659299,
+        "links": 1,
+        "modifiedMs": 1792006789089.0857,
+        "target": "owned-sentinel.txt"
+      }
+    ],
+    "after": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659294,
+        "links": 3,
+        "modifiedMs": 1792006789088.6135
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659295,
+        "links": 6,
+        "modifiedMs": 1792006789089.3354
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659300,
+        "links": 1,
+        "modifiedMs": 1792006789089.233,
+        "bytes": 51,
+        "sha256": "78726d0fd38afd6a2ea5c90e1a6a7a7e46db3d218acc5d398cff09bc943a57c5"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659296,
+        "links": 2,
+        "modifiedMs": 1792006789088.7415,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659296,
+        "links": 2,
+        "modifiedMs": 1792006789088.7415,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659299,
+        "links": 1,
+        "modifiedMs": 1792006789089.0857,
+        "target": "owned-sentinel.txt"
+      }
+    ]
+  },
+  {
+    "path": "a4 deny",
+    "mode": "agent",
+    "error": "Command 'a4 deny' is blocked in agent mode. Switch to owner mode with: amc mode owner",
+    "before": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659301,
+        "links": 3,
+        "modifiedMs": 1792006789091.856
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659302,
+        "links": 6,
+        "modifiedMs": 1792006789092.5994
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659307,
+        "links": 1,
+        "modifiedMs": 1792006789092.5015,
+        "bytes": 51,
+        "sha256": "12b28521522630f75f6eb4da9842458cf3245e836d9e2c63e27e41836dff949b"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659303,
+        "links": 2,
+        "modifiedMs": 1792006789091.9832,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659303,
+        "links": 2,
+        "modifiedMs": 1792006789091.9832,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659306,
+        "links": 1,
+        "modifiedMs": 1792006789092.32,
+        "target": "owned-sentinel.txt"
+      }
+    ],
+    "after": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659301,
+        "links": 3,
+        "modifiedMs": 1792006789091.856
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659302,
+        "links": 6,
+        "modifiedMs": 1792006789092.5994
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659307,
+        "links": 1,
+        "modifiedMs": 1792006789092.5015,
+        "bytes": 51,
+        "sha256": "12b28521522630f75f6eb4da9842458cf3245e836d9e2c63e27e41836dff949b"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659303,
+        "links": 2,
+        "modifiedMs": 1792006789091.9832,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659303,
+        "links": 2,
+        "modifiedMs": 1792006789091.9832,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659306,
+        "links": 1,
+        "modifiedMs": 1792006789092.32,
+        "target": "owned-sentinel.txt"
+      }
+    ]
+  },
+  {
+    "path": "a4 deploy record",
+    "mode": "agent",
+    "error": "Command 'a4 deploy record' is blocked in agent mode. Switch to owner mode with: amc mode owner",
+    "before": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659308,
+        "links": 3,
+        "modifiedMs": 1792006789094.025
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659309,
+        "links": 6,
+        "modifiedMs": 1792006789094.7766
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659314,
+        "links": 1,
+        "modifiedMs": 1792006789094.6619,
+        "bytes": 51,
+        "sha256": "105abf1f726e62dffa92826d093dc0e5d397af884c540c6d814f622492549938"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659310,
+        "links": 2,
+        "modifiedMs": 1792006789094.1584,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659310,
+        "links": 2,
+        "modifiedMs": 1792006789094.1584,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659313,
+        "links": 1,
+        "modifiedMs": 1792006789094.5056,
+        "target": "owned-sentinel.txt"
+      }
+    ],
+    "after": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659308,
+        "links": 3,
+        "modifiedMs": 1792006789094.025
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659309,
+        "links": 6,
+        "modifiedMs": 1792006789094.7766
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659314,
+        "links": 1,
+        "modifiedMs": 1792006789094.6619,
+        "bytes": 51,
+        "sha256": "105abf1f726e62dffa92826d093dc0e5d397af884c540c6d814f622492549938"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659310,
+        "links": 2,
+        "modifiedMs": 1792006789094.1584,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659310,
+        "links": 2,
+        "modifiedMs": 1792006789094.1584,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659313,
+        "links": 1,
+        "modifiedMs": 1792006789094.5056,
+        "target": "owned-sentinel.txt"
+      }
+    ]
+  },
+  {
+    "path": "a4 deploy verify",
+    "mode": "agent",
+    "error": "Command 'a4 deploy verify' is blocked in agent mode. Switch to owner mode with: amc mode owner",
+    "before": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659315,
+        "links": 3,
+        "modifiedMs": 1792006789096.424
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659316,
+        "links": 6,
+        "modifiedMs": 1792006789099.2117
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659321,
+        "links": 1,
+        "modifiedMs": 1792006789097.4512,
+        "bytes": 51,
+        "sha256": "c3b55e86ff156996fc9b06aba915163a7701360c0e8da0e90aed872ad9a917f4"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659317,
+        "links": 2,
+        "modifiedMs": 1792006789096.5256,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659317,
+        "links": 2,
+        "modifiedMs": 1792006789096.5256,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659320,
+        "links": 1,
+        "modifiedMs": 1792006789096.8413,
+        "target": "owned-sentinel.txt"
+      }
+    ],
+    "after": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659315,
+        "links": 3,
+        "modifiedMs": 1792006789096.424
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659316,
+        "links": 6,
+        "modifiedMs": 1792006789099.2117
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659321,
+        "links": 1,
+        "modifiedMs": 1792006789097.4512,
+        "bytes": 51,
+        "sha256": "c3b55e86ff156996fc9b06aba915163a7701360c0e8da0e90aed872ad9a917f4"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659317,
+        "links": 2,
+        "modifiedMs": 1792006789096.5256,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659317,
+        "links": 2,
+        "modifiedMs": 1792006789096.5256,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659320,
+        "links": 1,
+        "modifiedMs": 1792006789096.8413,
+        "target": "owned-sentinel.txt"
+      }
+    ]
+  },
+  {
+    "path": "a4 export",
+    "mode": "agent",
+    "error": "Command 'a4 export' is blocked in agent mode. Switch to owner mode with: amc mode owner",
+    "before": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659322,
+        "links": 3,
+        "modifiedMs": 1792006789104.293
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659323,
+        "links": 6,
+        "modifiedMs": 1792006789105.2825
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659328,
+        "links": 1,
+        "modifiedMs": 1792006789105.186,
+        "bytes": 51,
+        "sha256": "3bd3c5aad64676de401dd9172d21e7be36a45e31d7643f36c35672321c1f1c09"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659324,
+        "links": 2,
+        "modifiedMs": 1792006789104.4333,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659324,
+        "links": 2,
+        "modifiedMs": 1792006789104.4333,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659327,
+        "links": 1,
+        "modifiedMs": 1792006789104.9746,
+        "target": "owned-sentinel.txt"
+      }
+    ],
+    "after": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659322,
+        "links": 3,
+        "modifiedMs": 1792006789104.293
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659323,
+        "links": 6,
+        "modifiedMs": 1792006789105.2825
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659328,
+        "links": 1,
+        "modifiedMs": 1792006789105.186,
+        "bytes": 51,
+        "sha256": "3bd3c5aad64676de401dd9172d21e7be36a45e31d7643f36c35672321c1f1c09"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659324,
+        "links": 2,
+        "modifiedMs": 1792006789104.4333,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659324,
+        "links": 2,
+        "modifiedMs": 1792006789104.4333,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659327,
+        "links": 1,
+        "modifiedMs": 1792006789104.9746,
+        "target": "owned-sentinel.txt"
+      }
+    ]
+  },
+  {
+    "path": "a4 gate-policy",
+    "mode": "agent",
+    "error": "Command 'a4 gate-policy' is blocked in agent mode. Switch to owner mode with: amc mode owner",
+    "before": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659329,
+        "links": 3,
+        "modifiedMs": 1792006789106.451
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659330,
+        "links": 6,
+        "modifiedMs": 1792006789107.19
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659335,
+        "links": 1,
+        "modifiedMs": 1792006789107.108,
+        "bytes": 51,
+        "sha256": "5bcead9a5573105eedb60605e483883ec9c7fc99f58a6d24a04e2dc99b6a6741"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659331,
+        "links": 2,
+        "modifiedMs": 1792006789106.5774,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659331,
+        "links": 2,
+        "modifiedMs": 1792006789106.5774,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659334,
+        "links": 1,
+        "modifiedMs": 1792006789106.947,
+        "target": "owned-sentinel.txt"
+      }
+    ],
+    "after": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659329,
+        "links": 3,
+        "modifiedMs": 1792006789106.451
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659330,
+        "links": 6,
+        "modifiedMs": 1792006789107.19
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659335,
+        "links": 1,
+        "modifiedMs": 1792006789107.108,
+        "bytes": 51,
+        "sha256": "5bcead9a5573105eedb60605e483883ec9c7fc99f58a6d24a04e2dc99b6a6741"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659331,
+        "links": 2,
+        "modifiedMs": 1792006789106.5774,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659331,
+        "links": 2,
+        "modifiedMs": 1792006789106.5774,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659334,
+        "links": 1,
+        "modifiedMs": 1792006789106.947,
+        "target": "owned-sentinel.txt"
+      }
+    ]
+  },
+  {
+    "path": "a4 hold",
+    "mode": "agent",
+    "error": "Command 'a4 hold' is blocked in agent mode. Switch to owner mode with: amc mode owner",
+    "before": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659336,
+        "links": 3,
+        "modifiedMs": 1792006789108.4934
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659337,
+        "links": 6,
+        "modifiedMs": 1792006789109.184
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659342,
+        "links": 1,
+        "modifiedMs": 1792006789109.097,
+        "bytes": 51,
+        "sha256": "54e6c7a4b2ee854a7d0e6bb2509883a1377a8e524f8655a68099492c4bb81c33"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659338,
+        "links": 2,
+        "modifiedMs": 1792006789108.6006,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659338,
+        "links": 2,
+        "modifiedMs": 1792006789108.6006,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659341,
+        "links": 1,
+        "modifiedMs": 1792006789108.945,
+        "target": "owned-sentinel.txt"
+      }
+    ],
+    "after": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659336,
+        "links": 3,
+        "modifiedMs": 1792006789108.4934
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659337,
+        "links": 6,
+        "modifiedMs": 1792006789109.184
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659342,
+        "links": 1,
+        "modifiedMs": 1792006789109.097,
+        "bytes": 51,
+        "sha256": "54e6c7a4b2ee854a7d0e6bb2509883a1377a8e524f8655a68099492c4bb81c33"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659338,
+        "links": 2,
+        "modifiedMs": 1792006789108.6006,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659338,
+        "links": 2,
+        "modifiedMs": 1792006789108.6006,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659341,
+        "links": 1,
+        "modifiedMs": 1792006789108.945,
+        "target": "owned-sentinel.txt"
+      }
+    ]
+  },
+  {
+    "path": "a4 members",
+    "mode": "agent",
+    "error": "Command 'a4 members' is blocked in agent mode. Switch to owner mode with: amc mode owner",
+    "before": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659343,
+        "links": 3,
+        "modifiedMs": 1792006789110.9688
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659344,
+        "links": 6,
+        "modifiedMs": 1792006789111.9917
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659349,
+        "links": 1,
+        "modifiedMs": 1792006789111.8557,
+        "bytes": 51,
+        "sha256": "aee5b2cd9b78299a80e64942e6733b9ab1751897c1ddc02d26d12c60e3001858"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659345,
+        "links": 2,
+        "modifiedMs": 1792006789111.1067,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659345,
+        "links": 2,
+        "modifiedMs": 1792006789111.1067,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659348,
+        "links": 1,
+        "modifiedMs": 1792006789111.5244,
+        "target": "owned-sentinel.txt"
+      }
+    ],
+    "after": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659343,
+        "links": 3,
+        "modifiedMs": 1792006789110.9688
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659344,
+        "links": 6,
+        "modifiedMs": 1792006789111.9917
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659349,
+        "links": 1,
+        "modifiedMs": 1792006789111.8557,
+        "bytes": 51,
+        "sha256": "aee5b2cd9b78299a80e64942e6733b9ab1751897c1ddc02d26d12c60e3001858"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659345,
+        "links": 2,
+        "modifiedMs": 1792006789111.1067,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659345,
+        "links": 2,
+        "modifiedMs": 1792006789111.1067,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659348,
+        "links": 1,
+        "modifiedMs": 1792006789111.5244,
+        "target": "owned-sentinel.txt"
+      }
+    ]
+  },
+  {
+    "path": "a4 release",
+    "mode": "agent",
+    "error": "Command 'a4 release' is blocked in agent mode. Switch to owner mode with: amc mode owner",
+    "before": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659350,
+        "links": 3,
+        "modifiedMs": 1792006789113.2297
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659351,
+        "links": 6,
+        "modifiedMs": 1792006789114.0552
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659356,
+        "links": 1,
+        "modifiedMs": 1792006789113.9707,
+        "bytes": 51,
+        "sha256": "cdfc862067c994fa9ded452541038b669c93d498565391e88edd10190ad60d99"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659352,
+        "links": 2,
+        "modifiedMs": 1792006789113.3499,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659352,
+        "links": 2,
+        "modifiedMs": 1792006789113.3499,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659355,
+        "links": 1,
+        "modifiedMs": 1792006789113.825,
+        "target": "owned-sentinel.txt"
+      }
+    ],
+    "after": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659350,
+        "links": 3,
+        "modifiedMs": 1792006789113.2297
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659351,
+        "links": 6,
+        "modifiedMs": 1792006789114.0552
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659356,
+        "links": 1,
+        "modifiedMs": 1792006789113.9707,
+        "bytes": 51,
+        "sha256": "cdfc862067c994fa9ded452541038b669c93d498565391e88edd10190ad60d99"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659352,
+        "links": 2,
+        "modifiedMs": 1792006789113.3499,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659352,
+        "links": 2,
+        "modifiedMs": 1792006789113.3499,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659355,
+        "links": 1,
+        "modifiedMs": 1792006789113.825,
+        "target": "owned-sentinel.txt"
+      }
+    ]
+  },
+  {
+    "path": "a4 reopen",
+    "mode": "agent",
+    "error": "Command 'a4 reopen' is blocked in agent mode. Switch to owner mode with: amc mode owner",
+    "before": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659357,
+        "links": 3,
+        "modifiedMs": 1792006789116.8562
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659358,
+        "links": 6,
+        "modifiedMs": 1792006789119.3782
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659363,
+        "links": 1,
+        "modifiedMs": 1792006789118.784,
+        "bytes": 51,
+        "sha256": "8140997f90090ab519601c7f3e20c97ac7df72e7531e877c6bf64c775deb5e12"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659359,
+        "links": 2,
+        "modifiedMs": 1792006789116.998,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659359,
+        "links": 2,
+        "modifiedMs": 1792006789116.998,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659362,
+        "links": 1,
+        "modifiedMs": 1792006789117.7976,
+        "target": "owned-sentinel.txt"
+      }
+    ],
+    "after": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659357,
+        "links": 3,
+        "modifiedMs": 1792006789116.8562
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659358,
+        "links": 6,
+        "modifiedMs": 1792006789119.3782
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659363,
+        "links": 1,
+        "modifiedMs": 1792006789118.784,
+        "bytes": 51,
+        "sha256": "8140997f90090ab519601c7f3e20c97ac7df72e7531e877c6bf64c775deb5e12"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659359,
+        "links": 2,
+        "modifiedMs": 1792006789116.998,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659359,
+        "links": 2,
+        "modifiedMs": 1792006789116.998,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659362,
+        "links": 1,
+        "modifiedMs": 1792006789117.7976,
+        "target": "owned-sentinel.txt"
+      }
+    ]
+  },
+  {
+    "path": "a4 request-changes",
+    "mode": "agent",
+    "error": "Command 'a4 request-changes' is blocked in agent mode. Switch to owner mode with: amc mode owner",
+    "before": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659364,
+        "links": 3,
+        "modifiedMs": 1792006789120.7466
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659365,
+        "links": 6,
+        "modifiedMs": 1792006789121.4478
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659370,
+        "links": 1,
+        "modifiedMs": 1792006789121.3577,
+        "bytes": 51,
+        "sha256": "af27f2ce23564d81cd2cbe34612ec2d26af789ee25155b2e9300a5790600c971"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659366,
+        "links": 2,
+        "modifiedMs": 1792006789120.869,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659366,
+        "links": 2,
+        "modifiedMs": 1792006789120.869,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659369,
+        "links": 1,
+        "modifiedMs": 1792006789121.1982,
+        "target": "owned-sentinel.txt"
+      }
+    ],
+    "after": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659364,
+        "links": 3,
+        "modifiedMs": 1792006789120.7466
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659365,
+        "links": 6,
+        "modifiedMs": 1792006789121.4478
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659370,
+        "links": 1,
+        "modifiedMs": 1792006789121.3577,
+        "bytes": 51,
+        "sha256": "af27f2ce23564d81cd2cbe34612ec2d26af789ee25155b2e9300a5790600c971"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659366,
+        "links": 2,
+        "modifiedMs": 1792006789120.869,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659366,
+        "links": 2,
+        "modifiedMs": 1792006789120.869,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659369,
+        "links": 1,
+        "modifiedMs": 1792006789121.1982,
+        "target": "owned-sentinel.txt"
+      }
+    ]
+  },
+  {
+    "path": "a4 resume",
+    "mode": "agent",
+    "error": "Command 'a4 resume' is blocked in agent mode. Switch to owner mode with: amc mode owner",
+    "before": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659371,
+        "links": 3,
+        "modifiedMs": 1792006789122.4058
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659372,
+        "links": 6,
+        "modifiedMs": 1792006789124.748
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659377,
+        "links": 1,
+        "modifiedMs": 1792006789124.4998,
+        "bytes": 51,
+        "sha256": "9a684bf580771b619aae97c143221f8610630fab7a7a20e32cb3231f9df40560"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659373,
+        "links": 2,
+        "modifiedMs": 1792006789122.5312,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659373,
+        "links": 2,
+        "modifiedMs": 1792006789122.5312,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659376,
+        "links": 1,
+        "modifiedMs": 1792006789124.1387,
+        "target": "owned-sentinel.txt"
+      }
+    ],
+    "after": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659371,
+        "links": 3,
+        "modifiedMs": 1792006789122.4058
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659372,
+        "links": 6,
+        "modifiedMs": 1792006789124.748
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659377,
+        "links": 1,
+        "modifiedMs": 1792006789124.4998,
+        "bytes": 51,
+        "sha256": "9a684bf580771b619aae97c143221f8610630fab7a7a20e32cb3231f9df40560"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659373,
+        "links": 2,
+        "modifiedMs": 1792006789122.5312,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659373,
+        "links": 2,
+        "modifiedMs": 1792006789122.5312,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659376,
+        "links": 1,
+        "modifiedMs": 1792006789124.1387,
+        "target": "owned-sentinel.txt"
+      }
+    ]
+  },
+  {
+    "path": "a4 retire",
+    "mode": "agent",
+    "error": "Command 'a4 retire' is blocked in agent mode. Switch to owner mode with: amc mode owner",
+    "before": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659378,
+        "links": 3,
+        "modifiedMs": 1792006789127.0164
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659379,
+        "links": 6,
+        "modifiedMs": 1792006789127.6921
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659384,
+        "links": 1,
+        "modifiedMs": 1792006789127.6023,
+        "bytes": 51,
+        "sha256": "c5d8ff7de80d12d8821890b747db9f562d8a702e427c9b26d7492049eaf70318"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659380,
+        "links": 2,
+        "modifiedMs": 1792006789127.1465,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659380,
+        "links": 2,
+        "modifiedMs": 1792006789127.1465,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659383,
+        "links": 1,
+        "modifiedMs": 1792006789127.464,
+        "target": "owned-sentinel.txt"
+      }
+    ],
+    "after": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659378,
+        "links": 3,
+        "modifiedMs": 1792006789127.0164
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659379,
+        "links": 6,
+        "modifiedMs": 1792006789127.6921
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659384,
+        "links": 1,
+        "modifiedMs": 1792006789127.6023,
+        "bytes": 51,
+        "sha256": "c5d8ff7de80d12d8821890b747db9f562d8a702e427c9b26d7492049eaf70318"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659380,
+        "links": 2,
+        "modifiedMs": 1792006789127.1465,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659380,
+        "links": 2,
+        "modifiedMs": 1792006789127.1465,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659383,
+        "links": 1,
+        "modifiedMs": 1792006789127.464,
+        "target": "owned-sentinel.txt"
+      }
+    ]
+  },
+  {
+    "path": "a4 rollback",
+    "mode": "agent",
+    "error": "Command 'a4 rollback' is blocked in agent mode. Switch to owner mode with: amc mode owner",
+    "before": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659385,
+        "links": 3,
+        "modifiedMs": 1792006789128.544
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659386,
+        "links": 6,
+        "modifiedMs": 1792006789130.1252
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659391,
+        "links": 1,
+        "modifiedMs": 1792006789129.8367,
+        "bytes": 51,
+        "sha256": "3792b650493917d0fc1f4abfc0a4d394afc524630305283b4651fea77760cfa6"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659387,
+        "links": 2,
+        "modifiedMs": 1792006789128.6377,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659387,
+        "links": 2,
+        "modifiedMs": 1792006789128.6377,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659390,
+        "links": 1,
+        "modifiedMs": 1792006789129.6174,
+        "target": "owned-sentinel.txt"
+      }
+    ],
+    "after": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659385,
+        "links": 3,
+        "modifiedMs": 1792006789128.544
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659386,
+        "links": 6,
+        "modifiedMs": 1792006789130.1252
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659391,
+        "links": 1,
+        "modifiedMs": 1792006789129.8367,
+        "bytes": 51,
+        "sha256": "3792b650493917d0fc1f4abfc0a4d394afc524630305283b4651fea77760cfa6"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659387,
+        "links": 2,
+        "modifiedMs": 1792006789128.6377,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659387,
+        "links": 2,
+        "modifiedMs": 1792006789128.6377,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659390,
+        "links": 1,
+        "modifiedMs": 1792006789129.6174,
+        "target": "owned-sentinel.txt"
+      }
+    ]
+  },
+  {
+    "path": "a4 tune",
+    "mode": "agent",
+    "error": "Command 'a4 tune' is blocked in agent mode. Switch to owner mode with: amc mode owner",
+    "before": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659392,
+        "links": 3,
+        "modifiedMs": 1792006789131.1472
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659393,
+        "links": 6,
+        "modifiedMs": 1792006789131.7803
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659398,
+        "links": 1,
+        "modifiedMs": 1792006789131.6982,
+        "bytes": 51,
+        "sha256": "0b107d89aad6b78896d11bf1cbcdc571d948ca3cfbd50c4aeced34250a896477"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659394,
+        "links": 2,
+        "modifiedMs": 1792006789131.2502,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659394,
+        "links": 2,
+        "modifiedMs": 1792006789131.2502,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659397,
+        "links": 1,
+        "modifiedMs": 1792006789131.5596,
+        "target": "owned-sentinel.txt"
+      }
+    ],
+    "after": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659392,
+        "links": 3,
+        "modifiedMs": 1792006789131.1472
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659393,
+        "links": 6,
+        "modifiedMs": 1792006789131.7803
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659398,
+        "links": 1,
+        "modifiedMs": 1792006789131.6982,
+        "bytes": 51,
+        "sha256": "0b107d89aad6b78896d11bf1cbcdc571d948ca3cfbd50c4aeced34250a896477"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659394,
+        "links": 2,
+        "modifiedMs": 1792006789131.2502,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659394,
+        "links": 2,
+        "modifiedMs": 1792006789131.2502,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659397,
+        "links": 1,
+        "modifiedMs": 1792006789131.5596,
+        "target": "owned-sentinel.txt"
+      }
+    ]
+  },
+  {
+    "path": "a4 approve",
+    "mode": "owner",
+    "error": null,
+    "before": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659399,
+        "links": 3,
+        "modifiedMs": 1792006789132.6487
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659400,
+        "links": 6,
+        "modifiedMs": 1792006789133.3186
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659405,
+        "links": 1,
+        "modifiedMs": 1792006789133.2156,
+        "bytes": 51,
+        "sha256": "5435a12ee909d9dd916f8a1e9d83c99f6ed59a34e55e3860d43f3558911bfe3b"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659401,
+        "links": 2,
+        "modifiedMs": 1792006789132.7517,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659401,
+        "links": 2,
+        "modifiedMs": 1792006789132.7517,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659404,
+        "links": 1,
+        "modifiedMs": 1792006789133.0708,
+        "target": "owned-sentinel.txt"
+      }
+    ],
+    "after": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659399,
+        "links": 3,
+        "modifiedMs": 1792006789132.6487
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659400,
+        "links": 6,
+        "modifiedMs": 1792006789133.3186
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659405,
+        "links": 1,
+        "modifiedMs": 1792006789133.2156,
+        "bytes": 51,
+        "sha256": "5435a12ee909d9dd916f8a1e9d83c99f6ed59a34e55e3860d43f3558911bfe3b"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659401,
+        "links": 2,
+        "modifiedMs": 1792006789132.7517,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659401,
+        "links": 2,
+        "modifiedMs": 1792006789132.7517,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659404,
+        "links": 1,
+        "modifiedMs": 1792006789133.0708,
+        "target": "owned-sentinel.txt"
+      }
+    ]
+  },
+  {
+    "path": "a4 complete",
+    "mode": "owner",
+    "error": null,
+    "before": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659406,
+        "links": 3,
+        "modifiedMs": 1792006789134.0413
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659407,
+        "links": 6,
+        "modifiedMs": 1792006789134.6763
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659412,
+        "links": 1,
+        "modifiedMs": 1792006789134.579,
+        "bytes": 51,
+        "sha256": "8556a2cb471057123d7720c037320adc315db85ec0cda0bd70f0950dc3bcaed1"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659408,
+        "links": 2,
+        "modifiedMs": 1792006789134.1409,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659408,
+        "links": 2,
+        "modifiedMs": 1792006789134.1409,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659411,
+        "links": 1,
+        "modifiedMs": 1792006789134.4702,
+        "target": "owned-sentinel.txt"
+      }
+    ],
+    "after": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659406,
+        "links": 3,
+        "modifiedMs": 1792006789134.0413
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659407,
+        "links": 6,
+        "modifiedMs": 1792006789134.6763
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659412,
+        "links": 1,
+        "modifiedMs": 1792006789134.579,
+        "bytes": 51,
+        "sha256": "8556a2cb471057123d7720c037320adc315db85ec0cda0bd70f0950dc3bcaed1"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659408,
+        "links": 2,
+        "modifiedMs": 1792006789134.1409,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659408,
+        "links": 2,
+        "modifiedMs": 1792006789134.1409,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659411,
+        "links": 1,
+        "modifiedMs": 1792006789134.4702,
+        "target": "owned-sentinel.txt"
+      }
+    ]
+  },
+  {
+    "path": "a4 deny",
+    "mode": "owner",
+    "error": null,
+    "before": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659413,
+        "links": 3,
+        "modifiedMs": 1792006789135.6042
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659414,
+        "links": 6,
+        "modifiedMs": 1792006789136.3428
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659419,
+        "links": 1,
+        "modifiedMs": 1792006789136.2495,
+        "bytes": 51,
+        "sha256": "4908242e7929df49742b9ad249f748ed2f47f9e94cd09d8dfce76650d5da1df4"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659415,
+        "links": 2,
+        "modifiedMs": 1792006789135.7249,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659415,
+        "links": 2,
+        "modifiedMs": 1792006789135.7249,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659418,
+        "links": 1,
+        "modifiedMs": 1792006789136.0908,
+        "target": "owned-sentinel.txt"
+      }
+    ],
+    "after": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659413,
+        "links": 3,
+        "modifiedMs": 1792006789135.6042
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659414,
+        "links": 6,
+        "modifiedMs": 1792006789136.3428
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659419,
+        "links": 1,
+        "modifiedMs": 1792006789136.2495,
+        "bytes": 51,
+        "sha256": "4908242e7929df49742b9ad249f748ed2f47f9e94cd09d8dfce76650d5da1df4"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659415,
+        "links": 2,
+        "modifiedMs": 1792006789135.7249,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659415,
+        "links": 2,
+        "modifiedMs": 1792006789135.7249,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659418,
+        "links": 1,
+        "modifiedMs": 1792006789136.0908,
+        "target": "owned-sentinel.txt"
+      }
+    ]
+  },
+  {
+    "path": "a4 deploy record",
+    "mode": "owner",
+    "error": null,
+    "before": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659420,
+        "links": 3,
+        "modifiedMs": 1792006789138.4944
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659421,
+        "links": 6,
+        "modifiedMs": 1792006789139.196
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659426,
+        "links": 1,
+        "modifiedMs": 1792006789139.107,
+        "bytes": 51,
+        "sha256": "3287330c5def16dc1910b9283b243a4eda7fae2f0249d6adf157fe593be0e9db"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659422,
+        "links": 2,
+        "modifiedMs": 1792006789138.618,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659422,
+        "links": 2,
+        "modifiedMs": 1792006789138.618,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659425,
+        "links": 1,
+        "modifiedMs": 1792006789138.9487,
+        "target": "owned-sentinel.txt"
+      }
+    ],
+    "after": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659420,
+        "links": 3,
+        "modifiedMs": 1792006789138.4944
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659421,
+        "links": 6,
+        "modifiedMs": 1792006789139.196
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659426,
+        "links": 1,
+        "modifiedMs": 1792006789139.107,
+        "bytes": 51,
+        "sha256": "3287330c5def16dc1910b9283b243a4eda7fae2f0249d6adf157fe593be0e9db"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659422,
+        "links": 2,
+        "modifiedMs": 1792006789138.618,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659422,
+        "links": 2,
+        "modifiedMs": 1792006789138.618,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659425,
+        "links": 1,
+        "modifiedMs": 1792006789138.9487,
+        "target": "owned-sentinel.txt"
+      }
+    ]
+  },
+  {
+    "path": "a4 deploy verify",
+    "mode": "owner",
+    "error": null,
+    "before": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659427,
+        "links": 3,
+        "modifiedMs": 1792006789171.6606
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659428,
+        "links": 6,
+        "modifiedMs": 1792006789172.4482
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659433,
+        "links": 1,
+        "modifiedMs": 1792006789172.3484,
+        "bytes": 51,
+        "sha256": "d97857ea435372a99eb8304b65bff0b4ad644b4c267c6eb857b665fcd3abfad0"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659429,
+        "links": 2,
+        "modifiedMs": 1792006789171.841,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659429,
+        "links": 2,
+        "modifiedMs": 1792006789171.841,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659432,
+        "links": 1,
+        "modifiedMs": 1792006789172.186,
+        "target": "owned-sentinel.txt"
+      }
+    ],
+    "after": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659427,
+        "links": 3,
+        "modifiedMs": 1792006789171.6606
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659428,
+        "links": 6,
+        "modifiedMs": 1792006789172.4482
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659433,
+        "links": 1,
+        "modifiedMs": 1792006789172.3484,
+        "bytes": 51,
+        "sha256": "d97857ea435372a99eb8304b65bff0b4ad644b4c267c6eb857b665fcd3abfad0"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659429,
+        "links": 2,
+        "modifiedMs": 1792006789171.841,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659429,
+        "links": 2,
+        "modifiedMs": 1792006789171.841,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659432,
+        "links": 1,
+        "modifiedMs": 1792006789172.186,
+        "target": "owned-sentinel.txt"
+      }
+    ]
+  },
+  {
+    "path": "a4 export",
+    "mode": "owner",
+    "error": null,
+    "before": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659434,
+        "links": 3,
+        "modifiedMs": 1792006789173.6602
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659435,
+        "links": 6,
+        "modifiedMs": 1792006789174.251
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659440,
+        "links": 1,
+        "modifiedMs": 1792006789174.1748,
+        "bytes": 51,
+        "sha256": "cd7dfb5d5498b263f1f73609f62d1a84f3514b48ecc5ee2ea4ec6450a0a4fc43"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659436,
+        "links": 2,
+        "modifiedMs": 1792006789173.7563,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659436,
+        "links": 2,
+        "modifiedMs": 1792006789173.7563,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659439,
+        "links": 1,
+        "modifiedMs": 1792006789174.056,
+        "target": "owned-sentinel.txt"
+      }
+    ],
+    "after": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659434,
+        "links": 3,
+        "modifiedMs": 1792006789173.6602
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659435,
+        "links": 6,
+        "modifiedMs": 1792006789174.251
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659440,
+        "links": 1,
+        "modifiedMs": 1792006789174.1748,
+        "bytes": 51,
+        "sha256": "cd7dfb5d5498b263f1f73609f62d1a84f3514b48ecc5ee2ea4ec6450a0a4fc43"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659436,
+        "links": 2,
+        "modifiedMs": 1792006789173.7563,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659436,
+        "links": 2,
+        "modifiedMs": 1792006789173.7563,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659439,
+        "links": 1,
+        "modifiedMs": 1792006789174.056,
+        "target": "owned-sentinel.txt"
+      }
+    ]
+  },
+  {
+    "path": "a4 gate-policy",
+    "mode": "owner",
+    "error": null,
+    "before": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659441,
+        "links": 3,
+        "modifiedMs": 1792006789176.185
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659442,
+        "links": 6,
+        "modifiedMs": 1792006789177.957
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659447,
+        "links": 1,
+        "modifiedMs": 1792006789177.8384,
+        "bytes": 51,
+        "sha256": "eb4f010828deba47988b6da5ccf8672c86754efc0b30f0076b528d847818560f"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659443,
+        "links": 2,
+        "modifiedMs": 1792006789176.3242,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659443,
+        "links": 2,
+        "modifiedMs": 1792006789176.3242,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659446,
+        "links": 1,
+        "modifiedMs": 1792006789177.6423,
+        "target": "owned-sentinel.txt"
+      }
+    ],
+    "after": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659441,
+        "links": 3,
+        "modifiedMs": 1792006789176.185
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659442,
+        "links": 6,
+        "modifiedMs": 1792006789177.957
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659447,
+        "links": 1,
+        "modifiedMs": 1792006789177.8384,
+        "bytes": 51,
+        "sha256": "eb4f010828deba47988b6da5ccf8672c86754efc0b30f0076b528d847818560f"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659443,
+        "links": 2,
+        "modifiedMs": 1792006789176.3242,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659443,
+        "links": 2,
+        "modifiedMs": 1792006789176.3242,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659446,
+        "links": 1,
+        "modifiedMs": 1792006789177.6423,
+        "target": "owned-sentinel.txt"
+      }
+    ]
+  },
+  {
+    "path": "a4 hold",
+    "mode": "owner",
+    "error": null,
+    "before": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659448,
+        "links": 3,
+        "modifiedMs": 1792006789179.2578
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659449,
+        "links": 6,
+        "modifiedMs": 1792006789180.442
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659454,
+        "links": 1,
+        "modifiedMs": 1792006789179.88,
+        "bytes": 51,
+        "sha256": "687e5c8e1c2f01e17d65a9be95011efa8007616ad2c0d93d879aa6dcbf30ccd4"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659450,
+        "links": 2,
+        "modifiedMs": 1792006789179.3855,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659450,
+        "links": 2,
+        "modifiedMs": 1792006789179.3855,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659453,
+        "links": 1,
+        "modifiedMs": 1792006789179.728,
+        "target": "owned-sentinel.txt"
+      }
+    ],
+    "after": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659448,
+        "links": 3,
+        "modifiedMs": 1792006789179.2578
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659449,
+        "links": 6,
+        "modifiedMs": 1792006789180.442
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659454,
+        "links": 1,
+        "modifiedMs": 1792006789179.88,
+        "bytes": 51,
+        "sha256": "687e5c8e1c2f01e17d65a9be95011efa8007616ad2c0d93d879aa6dcbf30ccd4"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659450,
+        "links": 2,
+        "modifiedMs": 1792006789179.3855,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659450,
+        "links": 2,
+        "modifiedMs": 1792006789179.3855,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659453,
+        "links": 1,
+        "modifiedMs": 1792006789179.728,
+        "target": "owned-sentinel.txt"
+      }
+    ]
+  },
+  {
+    "path": "a4 members",
+    "mode": "owner",
+    "error": null,
+    "before": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659455,
+        "links": 3,
+        "modifiedMs": 1792006789183.2576
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659456,
+        "links": 6,
+        "modifiedMs": 1792006789183.9731
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659461,
+        "links": 1,
+        "modifiedMs": 1792006789183.8804,
+        "bytes": 51,
+        "sha256": "07911d3915db1b4366d4ce9fd32c0c35b3f56d9bd4bbb66b248a9d3b8cd09b53"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659457,
+        "links": 2,
+        "modifiedMs": 1792006789183.393,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659457,
+        "links": 2,
+        "modifiedMs": 1792006789183.393,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659460,
+        "links": 1,
+        "modifiedMs": 1792006789183.7336,
+        "target": "owned-sentinel.txt"
+      }
+    ],
+    "after": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659455,
+        "links": 3,
+        "modifiedMs": 1792006789183.2576
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659456,
+        "links": 6,
+        "modifiedMs": 1792006789183.9731
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659461,
+        "links": 1,
+        "modifiedMs": 1792006789183.8804,
+        "bytes": 51,
+        "sha256": "07911d3915db1b4366d4ce9fd32c0c35b3f56d9bd4bbb66b248a9d3b8cd09b53"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659457,
+        "links": 2,
+        "modifiedMs": 1792006789183.393,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659457,
+        "links": 2,
+        "modifiedMs": 1792006789183.393,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659460,
+        "links": 1,
+        "modifiedMs": 1792006789183.7336,
+        "target": "owned-sentinel.txt"
+      }
+    ]
+  },
+  {
+    "path": "a4 release",
+    "mode": "owner",
+    "error": null,
+    "before": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659462,
+        "links": 3,
+        "modifiedMs": 1792006789184.895
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659463,
+        "links": 6,
+        "modifiedMs": 1792006789188.6167
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659468,
+        "links": 1,
+        "modifiedMs": 1792006789188.366,
+        "bytes": 51,
+        "sha256": "3a2b77f13650d02b46e2aeaea153327b8cd282a77513e271b5cb25c3cfa35dc7"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659464,
+        "links": 2,
+        "modifiedMs": 1792006789184.9846,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659464,
+        "links": 2,
+        "modifiedMs": 1792006789184.9846,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659467,
+        "links": 1,
+        "modifiedMs": 1792006789187.925,
+        "target": "owned-sentinel.txt"
+      }
+    ],
+    "after": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659462,
+        "links": 3,
+        "modifiedMs": 1792006789184.895
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659463,
+        "links": 6,
+        "modifiedMs": 1792006789188.6167
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659468,
+        "links": 1,
+        "modifiedMs": 1792006789188.366,
+        "bytes": 51,
+        "sha256": "3a2b77f13650d02b46e2aeaea153327b8cd282a77513e271b5cb25c3cfa35dc7"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659464,
+        "links": 2,
+        "modifiedMs": 1792006789184.9846,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659464,
+        "links": 2,
+        "modifiedMs": 1792006789184.9846,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659467,
+        "links": 1,
+        "modifiedMs": 1792006789187.925,
+        "target": "owned-sentinel.txt"
+      }
+    ]
+  },
+  {
+    "path": "a4 reopen",
+    "mode": "owner",
+    "error": null,
+    "before": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659469,
+        "links": 3,
+        "modifiedMs": 1792006789190.4622
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659470,
+        "links": 6,
+        "modifiedMs": 1792006789191.8677
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659475,
+        "links": 1,
+        "modifiedMs": 1792006789191.5793,
+        "bytes": 51,
+        "sha256": "172bf8a477530f437380e99105cc73797b7aa40155bcc39f150be2ed9bac9598"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659471,
+        "links": 2,
+        "modifiedMs": 1792006789190.5872,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659471,
+        "links": 2,
+        "modifiedMs": 1792006789190.5872,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659474,
+        "links": 1,
+        "modifiedMs": 1792006789191.398,
+        "target": "owned-sentinel.txt"
+      }
+    ],
+    "after": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659469,
+        "links": 3,
+        "modifiedMs": 1792006789190.4622
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659470,
+        "links": 6,
+        "modifiedMs": 1792006789191.8677
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659475,
+        "links": 1,
+        "modifiedMs": 1792006789191.5793,
+        "bytes": 51,
+        "sha256": "172bf8a477530f437380e99105cc73797b7aa40155bcc39f150be2ed9bac9598"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659471,
+        "links": 2,
+        "modifiedMs": 1792006789190.5872,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659471,
+        "links": 2,
+        "modifiedMs": 1792006789190.5872,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659474,
+        "links": 1,
+        "modifiedMs": 1792006789191.398,
+        "target": "owned-sentinel.txt"
+      }
+    ]
+  },
+  {
+    "path": "a4 request-changes",
+    "mode": "owner",
+    "error": null,
+    "before": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659476,
+        "links": 3,
+        "modifiedMs": 1792006789193.1836
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659477,
+        "links": 6,
+        "modifiedMs": 1792006789193.8142
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659482,
+        "links": 1,
+        "modifiedMs": 1792006789193.732,
+        "bytes": 51,
+        "sha256": "470408b16a2011a8f7669a0d2df95c93709b14703d30267c1e38857c9f29a3fc"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659478,
+        "links": 2,
+        "modifiedMs": 1792006789193.2915,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659478,
+        "links": 2,
+        "modifiedMs": 1792006789193.2915,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659481,
+        "links": 1,
+        "modifiedMs": 1792006789193.5996,
+        "target": "owned-sentinel.txt"
+      }
+    ],
+    "after": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659476,
+        "links": 3,
+        "modifiedMs": 1792006789193.1836
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659477,
+        "links": 6,
+        "modifiedMs": 1792006789193.8142
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659482,
+        "links": 1,
+        "modifiedMs": 1792006789193.732,
+        "bytes": 51,
+        "sha256": "470408b16a2011a8f7669a0d2df95c93709b14703d30267c1e38857c9f29a3fc"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659478,
+        "links": 2,
+        "modifiedMs": 1792006789193.2915,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659478,
+        "links": 2,
+        "modifiedMs": 1792006789193.2915,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659481,
+        "links": 1,
+        "modifiedMs": 1792006789193.5996,
+        "target": "owned-sentinel.txt"
+      }
+    ]
+  },
+  {
+    "path": "a4 resume",
+    "mode": "owner",
+    "error": null,
+    "before": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659483,
+        "links": 3,
+        "modifiedMs": 1792006789194.8855
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659484,
+        "links": 6,
+        "modifiedMs": 1792006789199.2708
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659489,
+        "links": 1,
+        "modifiedMs": 1792006789199.1565,
+        "bytes": 51,
+        "sha256": "5be2df48ff8fcebd506cbe0acae0ff22dfb5d0e7532d29226cc9c47f1fe476e4"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659485,
+        "links": 2,
+        "modifiedMs": 1792006789194.9749,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659485,
+        "links": 2,
+        "modifiedMs": 1792006789194.9749,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659488,
+        "links": 1,
+        "modifiedMs": 1792006789198.974,
+        "target": "owned-sentinel.txt"
+      }
+    ],
+    "after": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659483,
+        "links": 3,
+        "modifiedMs": 1792006789194.8855
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659484,
+        "links": 6,
+        "modifiedMs": 1792006789199.2708
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659489,
+        "links": 1,
+        "modifiedMs": 1792006789199.1565,
+        "bytes": 51,
+        "sha256": "5be2df48ff8fcebd506cbe0acae0ff22dfb5d0e7532d29226cc9c47f1fe476e4"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659485,
+        "links": 2,
+        "modifiedMs": 1792006789194.9749,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659485,
+        "links": 2,
+        "modifiedMs": 1792006789194.9749,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659488,
+        "links": 1,
+        "modifiedMs": 1792006789198.974,
+        "target": "owned-sentinel.txt"
+      }
+    ]
+  },
+  {
+    "path": "a4 retire",
+    "mode": "owner",
+    "error": null,
+    "before": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659490,
+        "links": 3,
+        "modifiedMs": 1792006789200.221
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659491,
+        "links": 6,
+        "modifiedMs": 1792006789202.2285
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659496,
+        "links": 1,
+        "modifiedMs": 1792006789200.7502,
+        "bytes": 51,
+        "sha256": "5ca48f3fce649cffa7940450bffab310a496c9b3020fe8208c9b22d4e64e0812"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659492,
+        "links": 2,
+        "modifiedMs": 1792006789200.3196,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659492,
+        "links": 2,
+        "modifiedMs": 1792006789200.3196,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659495,
+        "links": 1,
+        "modifiedMs": 1792006789200.6365,
+        "target": "owned-sentinel.txt"
+      }
+    ],
+    "after": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659490,
+        "links": 3,
+        "modifiedMs": 1792006789200.221
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659491,
+        "links": 6,
+        "modifiedMs": 1792006789202.2285
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659496,
+        "links": 1,
+        "modifiedMs": 1792006789200.7502,
+        "bytes": 51,
+        "sha256": "5ca48f3fce649cffa7940450bffab310a496c9b3020fe8208c9b22d4e64e0812"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659492,
+        "links": 2,
+        "modifiedMs": 1792006789200.3196,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659492,
+        "links": 2,
+        "modifiedMs": 1792006789200.3196,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659495,
+        "links": 1,
+        "modifiedMs": 1792006789200.6365,
+        "target": "owned-sentinel.txt"
+      }
+    ]
+  },
+  {
+    "path": "a4 rollback",
+    "mode": "owner",
+    "error": null,
+    "before": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659497,
+        "links": 3,
+        "modifiedMs": 1792006789204.1074
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659498,
+        "links": 6,
+        "modifiedMs": 1792006789204.7473
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659503,
+        "links": 1,
+        "modifiedMs": 1792006789204.6648,
+        "bytes": 51,
+        "sha256": "0735e32de1252fb1495acf6bbc6dc810522063c3ff523fcec8b1a54fa7f8c899"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659499,
+        "links": 2,
+        "modifiedMs": 1792006789204.217,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659499,
+        "links": 2,
+        "modifiedMs": 1792006789204.217,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659502,
+        "links": 1,
+        "modifiedMs": 1792006789204.529,
+        "target": "owned-sentinel.txt"
+      }
+    ],
+    "after": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659497,
+        "links": 3,
+        "modifiedMs": 1792006789204.1074
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659498,
+        "links": 6,
+        "modifiedMs": 1792006789204.7473
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659503,
+        "links": 1,
+        "modifiedMs": 1792006789204.6648,
+        "bytes": 51,
+        "sha256": "0735e32de1252fb1495acf6bbc6dc810522063c3ff523fcec8b1a54fa7f8c899"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659499,
+        "links": 2,
+        "modifiedMs": 1792006789204.217,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659499,
+        "links": 2,
+        "modifiedMs": 1792006789204.217,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659502,
+        "links": 1,
+        "modifiedMs": 1792006789204.529,
+        "target": "owned-sentinel.txt"
+      }
+    ]
+  },
+  {
+    "path": "a4 tune",
+    "mode": "owner",
+    "error": null,
+    "before": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659504,
+        "links": 3,
+        "modifiedMs": 1792006789205.633
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659505,
+        "links": 6,
+        "modifiedMs": 1792006789207.3176
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659510,
+        "links": 1,
+        "modifiedMs": 1792006789206.2158,
+        "bytes": 51,
+        "sha256": "1e29f27573de83dcd4ccf29bb50723249ccd68c5fdbe15883f77e17c67a4bc0b"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659506,
+        "links": 2,
+        "modifiedMs": 1792006789205.7483,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659506,
+        "links": 2,
+        "modifiedMs": 1792006789205.7483,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659509,
+        "links": 1,
+        "modifiedMs": 1792006789206.0845,
+        "target": "owned-sentinel.txt"
+      }
+    ],
+    "after": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659504,
+        "links": 3,
+        "modifiedMs": 1792006789205.633
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659505,
+        "links": 6,
+        "modifiedMs": 1792006789207.3176
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659510,
+        "links": 1,
+        "modifiedMs": 1792006789206.2158,
+        "bytes": 51,
+        "sha256": "1e29f27573de83dcd4ccf29bb50723249ccd68c5fdbe15883f77e17c67a4bc0b"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659506,
+        "links": 2,
+        "modifiedMs": 1792006789205.7483,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659506,
+        "links": 2,
+        "modifiedMs": 1792006789205.7483,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659509,
+        "links": 1,
+        "modifiedMs": 1792006789206.0845,
+        "target": "owned-sentinel.txt"
+      }
+    ]
+  },
+  {
+    "path": "a4 acknowledge",
+    "mode": "agent",
+    "error": "Command 'a4 acknowledge' is blocked in agent mode. Switch to owner mode with: amc mode owner",
+    "before": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659511,
+        "links": 3,
+        "modifiedMs": 1792006789209.5366
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659512,
+        "links": 6,
+        "modifiedMs": 1792006789210.6487
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659517,
+        "links": 1,
+        "modifiedMs": 1792006789210.556,
+        "bytes": 51,
+        "sha256": "0464492bdb4dd55eed6040541f6cc7a88c326df1853211b6ed69036593b3332e"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659513,
+        "links": 2,
+        "modifiedMs": 1792006789209.8088,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659513,
+        "links": 2,
+        "modifiedMs": 1792006789209.8088,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659516,
+        "links": 1,
+        "modifiedMs": 1792006789210.3604,
+        "target": "owned-sentinel.txt"
+      }
+    ],
+    "after": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659511,
+        "links": 3,
+        "modifiedMs": 1792006789209.5366
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659512,
+        "links": 6,
+        "modifiedMs": 1792006789210.6487
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659517,
+        "links": 1,
+        "modifiedMs": 1792006789210.556,
+        "bytes": 51,
+        "sha256": "0464492bdb4dd55eed6040541f6cc7a88c326df1853211b6ed69036593b3332e"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659513,
+        "links": 2,
+        "modifiedMs": 1792006789209.8088,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659513,
+        "links": 2,
+        "modifiedMs": 1792006789209.8088,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659516,
+        "links": 1,
+        "modifiedMs": 1792006789210.3604,
+        "target": "owned-sentinel.txt"
+      }
+    ]
+  },
+  {
+    "path": "a4 acknowledge",
+    "mode": "owner",
+    "error": null,
+    "before": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659518,
+        "links": 3,
+        "modifiedMs": 1792006789212.0952
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659519,
+        "links": 6,
+        "modifiedMs": 1792006789212.7773
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659524,
+        "links": 1,
+        "modifiedMs": 1792006789212.692,
+        "bytes": 51,
+        "sha256": "d80ed482203a79a72d746c27f269911d52234b3e11bc2d737b48c6430e675d18"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659520,
+        "links": 2,
+        "modifiedMs": 1792006789212.195,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659520,
+        "links": 2,
+        "modifiedMs": 1792006789212.195,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659523,
+        "links": 1,
+        "modifiedMs": 1792006789212.5137,
+        "target": "owned-sentinel.txt"
+      }
+    ],
+    "after": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659518,
+        "links": 3,
+        "modifiedMs": 1792006789212.0952
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659519,
+        "links": 6,
+        "modifiedMs": 1792006789212.7773
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659524,
+        "links": 1,
+        "modifiedMs": 1792006789212.692,
+        "bytes": 51,
+        "sha256": "d80ed482203a79a72d746c27f269911d52234b3e11bc2d737b48c6430e675d18"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659520,
+        "links": 2,
+        "modifiedMs": 1792006789212.195,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659520,
+        "links": 2,
+        "modifiedMs": 1792006789212.195,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659523,
+        "links": 1,
+        "modifiedMs": 1792006789212.5137,
+        "target": "owned-sentinel.txt"
+      }
+    ]
+  },
+  {
+    "path": "a4 guide",
+    "mode": "agent",
+    "error": null,
+    "before": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659525,
+        "links": 3,
+        "modifiedMs": 1792006789214.1719
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659526,
+        "links": 6,
+        "modifiedMs": 1792006789215.2473
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659531,
+        "links": 1,
+        "modifiedMs": 1792006789215.0056,
+        "bytes": 51,
+        "sha256": "a4dd7e79cde61dccca8cb2eb9d88e45607a4562749f962b0acc4f8c57341b13e"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659527,
+        "links": 2,
+        "modifiedMs": 1792006789214.2854,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659527,
+        "links": 2,
+        "modifiedMs": 1792006789214.2854,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659530,
+        "links": 1,
+        "modifiedMs": 1792006789214.635,
+        "target": "owned-sentinel.txt"
+      }
+    ],
+    "after": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659525,
+        "links": 3,
+        "modifiedMs": 1792006789214.1719
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659526,
+        "links": 6,
+        "modifiedMs": 1792006789215.2473
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659531,
+        "links": 1,
+        "modifiedMs": 1792006789215.0056,
+        "bytes": 51,
+        "sha256": "a4dd7e79cde61dccca8cb2eb9d88e45607a4562749f962b0acc4f8c57341b13e"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659527,
+        "links": 2,
+        "modifiedMs": 1792006789214.2854,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659527,
+        "links": 2,
+        "modifiedMs": 1792006789214.2854,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659530,
+        "links": 1,
+        "modifiedMs": 1792006789214.635,
+        "target": "owned-sentinel.txt"
+      }
+    ]
+  },
+  {
+    "path": "a4 list",
+    "mode": "agent",
+    "error": null,
+    "before": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659532,
+        "links": 3,
+        "modifiedMs": 1792006789217.246
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659533,
+        "links": 6,
+        "modifiedMs": 1792006789217.9658
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659538,
+        "links": 1,
+        "modifiedMs": 1792006789217.874,
+        "bytes": 51,
+        "sha256": "26406352792e61ada63b6a9c9c0f901851f14d89b7a25e6b88a809df56963f46"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659534,
+        "links": 2,
+        "modifiedMs": 1792006789217.3887,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659534,
+        "links": 2,
+        "modifiedMs": 1792006789217.3887,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659537,
+        "links": 1,
+        "modifiedMs": 1792006789217.723,
+        "target": "owned-sentinel.txt"
+      }
+    ],
+    "after": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659532,
+        "links": 3,
+        "modifiedMs": 1792006789217.246
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659533,
+        "links": 6,
+        "modifiedMs": 1792006789217.9658
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659538,
+        "links": 1,
+        "modifiedMs": 1792006789217.874,
+        "bytes": 51,
+        "sha256": "26406352792e61ada63b6a9c9c0f901851f14d89b7a25e6b88a809df56963f46"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659534,
+        "links": 2,
+        "modifiedMs": 1792006789217.3887,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659534,
+        "links": 2,
+        "modifiedMs": 1792006789217.3887,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659537,
+        "links": 1,
+        "modifiedMs": 1792006789217.723,
+        "target": "owned-sentinel.txt"
+      }
+    ]
+  },
+  {
+    "path": "a4 show",
+    "mode": "agent",
+    "error": null,
+    "before": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659539,
+        "links": 3,
+        "modifiedMs": 1792006789218.978
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659540,
+        "links": 6,
+        "modifiedMs": 1792006789219.5518
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659545,
+        "links": 1,
+        "modifiedMs": 1792006789219.4783,
+        "bytes": 51,
+        "sha256": "ecf363e7b0bae318f99b856b9e41f22888dd132e6f33ca5e0afe9722adc722d5"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659541,
+        "links": 2,
+        "modifiedMs": 1792006789219.069,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659541,
+        "links": 2,
+        "modifiedMs": 1792006789219.069,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659544,
+        "links": 1,
+        "modifiedMs": 1792006789219.365,
+        "target": "owned-sentinel.txt"
+      }
+    ],
+    "after": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659539,
+        "links": 3,
+        "modifiedMs": 1792006789218.978
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659540,
+        "links": 6,
+        "modifiedMs": 1792006789219.5518
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659545,
+        "links": 1,
+        "modifiedMs": 1792006789219.4783,
+        "bytes": 51,
+        "sha256": "ecf363e7b0bae318f99b856b9e41f22888dd132e6f33ca5e0afe9722adc722d5"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659541,
+        "links": 2,
+        "modifiedMs": 1792006789219.069,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659541,
+        "links": 2,
+        "modifiedMs": 1792006789219.069,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659544,
+        "links": 1,
+        "modifiedMs": 1792006789219.365,
+        "target": "owned-sentinel.txt"
+      }
+    ]
+  },
+  {
+    "path": "a4 readiness",
+    "mode": "agent",
+    "error": null,
+    "before": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659546,
+        "links": 3,
+        "modifiedMs": 1792006789220.34
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659547,
+        "links": 6,
+        "modifiedMs": 1792006789220.8855
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659552,
+        "links": 1,
+        "modifiedMs": 1792006789220.8162,
+        "bytes": 51,
+        "sha256": "67467b09404592bd8d953a6ecafda6013e756aca465d48171bbd3d6fb38e48d8"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659548,
+        "links": 2,
+        "modifiedMs": 1792006789220.424,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659548,
+        "links": 2,
+        "modifiedMs": 1792006789220.424,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659551,
+        "links": 1,
+        "modifiedMs": 1792006789220.712,
+        "target": "owned-sentinel.txt"
+      }
+    ],
+    "after": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659546,
+        "links": 3,
+        "modifiedMs": 1792006789220.34
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659547,
+        "links": 6,
+        "modifiedMs": 1792006789220.8855
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659552,
+        "links": 1,
+        "modifiedMs": 1792006789220.8162,
+        "bytes": 51,
+        "sha256": "67467b09404592bd8d953a6ecafda6013e756aca465d48171bbd3d6fb38e48d8"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659548,
+        "links": 2,
+        "modifiedMs": 1792006789220.424,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659548,
+        "links": 2,
+        "modifiedMs": 1792006789220.424,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659551,
+        "links": 1,
+        "modifiedMs": 1792006789220.712,
+        "target": "owned-sentinel.txt"
+      }
+    ]
+  },
+  {
+    "path": "a4 verify",
+    "mode": "agent",
+    "error": null,
+    "before": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659553,
+        "links": 3,
+        "modifiedMs": 1792006789221.9387
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659554,
+        "links": 6,
+        "modifiedMs": 1792006789223.1084
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659559,
+        "links": 1,
+        "modifiedMs": 1792006789222.992,
+        "bytes": 51,
+        "sha256": "769a0ebf3fc0749cf5fc1107ef94abd759494951c4beab4761c4159f01e9a661"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659555,
+        "links": 2,
+        "modifiedMs": 1792006789222.296,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659555,
+        "links": 2,
+        "modifiedMs": 1792006789222.296,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659558,
+        "links": 1,
+        "modifiedMs": 1792006789222.8098,
+        "target": "owned-sentinel.txt"
+      }
+    ],
+    "after": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659553,
+        "links": 3,
+        "modifiedMs": 1792006789221.9387
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659554,
+        "links": 6,
+        "modifiedMs": 1792006789223.1084
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659559,
+        "links": 1,
+        "modifiedMs": 1792006789222.992,
+        "bytes": 51,
+        "sha256": "769a0ebf3fc0749cf5fc1107ef94abd759494951c4beab4761c4159f01e9a661"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659555,
+        "links": 2,
+        "modifiedMs": 1792006789222.296,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659555,
+        "links": 2,
+        "modifiedMs": 1792006789222.296,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659558,
+        "links": 1,
+        "modifiedMs": 1792006789222.8098,
+        "target": "owned-sentinel.txt"
+      }
+    ]
+  },
+  {
+    "path": "run",
+    "mode": "agent",
+    "error": null,
+    "before": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659560,
+        "links": 3,
+        "modifiedMs": 1792006789227.7078
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659561,
+        "links": 6,
+        "modifiedMs": 1792006789230.9653
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659566,
+        "links": 1,
+        "modifiedMs": 1792006789228.3567,
+        "bytes": 51,
+        "sha256": "7d3a65399d78ff850ee6047cbb7201cfa41c49974337dd500382a8a386060797"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659562,
+        "links": 2,
+        "modifiedMs": 1792006789227.835,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659562,
+        "links": 2,
+        "modifiedMs": 1792006789227.835,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659565,
+        "links": 1,
+        "modifiedMs": 1792006789228.1653,
+        "target": "owned-sentinel.txt"
+      }
+    ],
+    "after": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659560,
+        "links": 3,
+        "modifiedMs": 1792006789227.7078
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659561,
+        "links": 6,
+        "modifiedMs": 1792006789230.9653
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659566,
+        "links": 1,
+        "modifiedMs": 1792006789228.3567,
+        "bytes": 51,
+        "sha256": "7d3a65399d78ff850ee6047cbb7201cfa41c49974337dd500382a8a386060797"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659562,
+        "links": 2,
+        "modifiedMs": 1792006789227.835,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659562,
+        "links": 2,
+        "modifiedMs": 1792006789227.835,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659565,
+        "links": 1,
+        "modifiedMs": 1792006789228.1653,
+        "target": "owned-sentinel.txt"
+      }
+    ]
+  },
+  {
+    "path": "score run",
+    "mode": "agent",
+    "error": null,
+    "before": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659567,
+        "links": 3,
+        "modifiedMs": 1792006789232.1042
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659568,
+        "links": 6,
+        "modifiedMs": 1792006789232.8047
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659573,
+        "links": 1,
+        "modifiedMs": 1792006789232.7197,
+        "bytes": 51,
+        "sha256": "208a9f07c484f173c3ea33a7cd4c9a9dfbc8f180bfffe8dad8839436d70a50be"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659569,
+        "links": 2,
+        "modifiedMs": 1792006789232.2231,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659569,
+        "links": 2,
+        "modifiedMs": 1792006789232.2231,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659572,
+        "links": 1,
+        "modifiedMs": 1792006789232.5505,
+        "target": "owned-sentinel.txt"
+      }
+    ],
+    "after": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659567,
+        "links": 3,
+        "modifiedMs": 1792006789232.1042
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659568,
+        "links": 6,
+        "modifiedMs": 1792006789232.8047
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659573,
+        "links": 1,
+        "modifiedMs": 1792006789232.7197,
+        "bytes": 51,
+        "sha256": "208a9f07c484f173c3ea33a7cd4c9a9dfbc8f180bfffe8dad8839436d70a50be"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659569,
+        "links": 2,
+        "modifiedMs": 1792006789232.2231,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659569,
+        "links": 2,
+        "modifiedMs": 1792006789232.2231,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659572,
+        "links": 1,
+        "modifiedMs": 1792006789232.5505,
+        "target": "owned-sentinel.txt"
+      }
+    ]
+  },
+  {
+    "path": "a4 guide",
+    "mode": "owner",
+    "error": null,
+    "before": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659574,
+        "links": 3,
+        "modifiedMs": 1792006789233.6912
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659575,
+        "links": 6,
+        "modifiedMs": 1792006789235.4275
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659580,
+        "links": 1,
+        "modifiedMs": 1792006789235.224,
+        "bytes": 51,
+        "sha256": "f8c1edf003cf3028af726a9a024c4b839a65efa54fb8ccb7744db4d33211285a"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659576,
+        "links": 2,
+        "modifiedMs": 1792006789233.813,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659576,
+        "links": 2,
+        "modifiedMs": 1792006789233.813,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659579,
+        "links": 1,
+        "modifiedMs": 1792006789234.8337,
+        "target": "owned-sentinel.txt"
+      }
+    ],
+    "after": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659574,
+        "links": 3,
+        "modifiedMs": 1792006789233.6912
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659575,
+        "links": 6,
+        "modifiedMs": 1792006789235.4275
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659580,
+        "links": 1,
+        "modifiedMs": 1792006789235.224,
+        "bytes": 51,
+        "sha256": "f8c1edf003cf3028af726a9a024c4b839a65efa54fb8ccb7744db4d33211285a"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659576,
+        "links": 2,
+        "modifiedMs": 1792006789233.813,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659576,
+        "links": 2,
+        "modifiedMs": 1792006789233.813,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659579,
+        "links": 1,
+        "modifiedMs": 1792006789234.8337,
+        "target": "owned-sentinel.txt"
+      }
+    ]
+  },
+  {
+    "path": "a4 list",
+    "mode": "owner",
+    "error": null,
+    "before": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659581,
+        "links": 3,
+        "modifiedMs": 1792006789237.189
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659582,
+        "links": 6,
+        "modifiedMs": 1792006789237.8652
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659587,
+        "links": 1,
+        "modifiedMs": 1792006789237.7742,
+        "bytes": 51,
+        "sha256": "fa9479c5385462ed3cfdb73f29b9e06599720540474760bc3d5fa12eefea740f"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659583,
+        "links": 2,
+        "modifiedMs": 1792006789237.3086,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659583,
+        "links": 2,
+        "modifiedMs": 1792006789237.3086,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659586,
+        "links": 1,
+        "modifiedMs": 1792006789237.6292,
+        "target": "owned-sentinel.txt"
+      }
+    ],
+    "after": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659581,
+        "links": 3,
+        "modifiedMs": 1792006789237.189
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659582,
+        "links": 6,
+        "modifiedMs": 1792006789237.8652
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659587,
+        "links": 1,
+        "modifiedMs": 1792006789237.7742,
+        "bytes": 51,
+        "sha256": "fa9479c5385462ed3cfdb73f29b9e06599720540474760bc3d5fa12eefea740f"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659583,
+        "links": 2,
+        "modifiedMs": 1792006789237.3086,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659583,
+        "links": 2,
+        "modifiedMs": 1792006789237.3086,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659586,
+        "links": 1,
+        "modifiedMs": 1792006789237.6292,
+        "target": "owned-sentinel.txt"
+      }
+    ]
+  },
+  {
+    "path": "a4 show",
+    "mode": "owner",
+    "error": null,
+    "before": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659588,
+        "links": 3,
+        "modifiedMs": 1792006789239.7947
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659589,
+        "links": 6,
+        "modifiedMs": 1792006789240.4517
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659594,
+        "links": 1,
+        "modifiedMs": 1792006789240.3496,
+        "bytes": 51,
+        "sha256": "8a97d7a2dab6ab88c1f4ac24fe737a5feb8cee07e6a74275170750d8f20e02b5"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659590,
+        "links": 2,
+        "modifiedMs": 1792006789239.9036,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659590,
+        "links": 2,
+        "modifiedMs": 1792006789239.9036,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659593,
+        "links": 1,
+        "modifiedMs": 1792006789240.2258,
+        "target": "owned-sentinel.txt"
+      }
+    ],
+    "after": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659588,
+        "links": 3,
+        "modifiedMs": 1792006789239.7947
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659589,
+        "links": 6,
+        "modifiedMs": 1792006789240.4517
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659594,
+        "links": 1,
+        "modifiedMs": 1792006789240.3496,
+        "bytes": 51,
+        "sha256": "8a97d7a2dab6ab88c1f4ac24fe737a5feb8cee07e6a74275170750d8f20e02b5"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659590,
+        "links": 2,
+        "modifiedMs": 1792006789239.9036,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659590,
+        "links": 2,
+        "modifiedMs": 1792006789239.9036,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659593,
+        "links": 1,
+        "modifiedMs": 1792006789240.2258,
+        "target": "owned-sentinel.txt"
+      }
+    ]
+  },
+  {
+    "path": "a4 readiness",
+    "mode": "owner",
+    "error": null,
+    "before": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659595,
+        "links": 3,
+        "modifiedMs": 1792006789241.434
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659596,
+        "links": 6,
+        "modifiedMs": 1792006789242.1006
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659601,
+        "links": 1,
+        "modifiedMs": 1792006789241.9956,
+        "bytes": 51,
+        "sha256": "1f4b2e4088dbed5c30a1ec26f752af0a5a80df519c6a5f9cdc069b60d1b2d160"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659597,
+        "links": 2,
+        "modifiedMs": 1792006789241.5454,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659597,
+        "links": 2,
+        "modifiedMs": 1792006789241.5454,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659600,
+        "links": 1,
+        "modifiedMs": 1792006789241.8594,
+        "target": "owned-sentinel.txt"
+      }
+    ],
+    "after": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659595,
+        "links": 3,
+        "modifiedMs": 1792006789241.434
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659596,
+        "links": 6,
+        "modifiedMs": 1792006789242.1006
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659601,
+        "links": 1,
+        "modifiedMs": 1792006789241.9956,
+        "bytes": 51,
+        "sha256": "1f4b2e4088dbed5c30a1ec26f752af0a5a80df519c6a5f9cdc069b60d1b2d160"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659597,
+        "links": 2,
+        "modifiedMs": 1792006789241.5454,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659597,
+        "links": 2,
+        "modifiedMs": 1792006789241.5454,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659600,
+        "links": 1,
+        "modifiedMs": 1792006789241.8594,
+        "target": "owned-sentinel.txt"
+      }
+    ]
+  },
+  {
+    "path": "a4 verify",
+    "mode": "owner",
+    "error": null,
+    "before": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659602,
+        "links": 3,
+        "modifiedMs": 1792006789242.8337
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659603,
+        "links": 6,
+        "modifiedMs": 1792006789243.4712
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659608,
+        "links": 1,
+        "modifiedMs": 1792006789243.3687,
+        "bytes": 51,
+        "sha256": "7f8eea2bb769fe6becfd39bb35ac3af20cc562980e289cf0ff71f9bfef356eab"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659604,
+        "links": 2,
+        "modifiedMs": 1792006789242.9321,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659604,
+        "links": 2,
+        "modifiedMs": 1792006789242.9321,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659607,
+        "links": 1,
+        "modifiedMs": 1792006789243.2383,
+        "target": "owned-sentinel.txt"
+      }
+    ],
+    "after": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659602,
+        "links": 3,
+        "modifiedMs": 1792006789242.8337
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659603,
+        "links": 6,
+        "modifiedMs": 1792006789243.4712
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659608,
+        "links": 1,
+        "modifiedMs": 1792006789243.3687,
+        "bytes": 51,
+        "sha256": "7f8eea2bb769fe6becfd39bb35ac3af20cc562980e289cf0ff71f9bfef356eab"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659604,
+        "links": 2,
+        "modifiedMs": 1792006789242.9321,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659604,
+        "links": 2,
+        "modifiedMs": 1792006789242.9321,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659607,
+        "links": 1,
+        "modifiedMs": 1792006789243.2383,
+        "target": "owned-sentinel.txt"
+      }
+    ]
+  },
+  {
+    "path": "run",
+    "mode": "owner",
+    "error": null,
+    "before": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659609,
+        "links": 3,
+        "modifiedMs": 1792006789244.3855
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659610,
+        "links": 6,
+        "modifiedMs": 1792006789244.964
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659615,
+        "links": 1,
+        "modifiedMs": 1792006789244.8955,
+        "bytes": 51,
+        "sha256": "668bc10bb590275a7fe0e5f72df8679d1af483dd2678678439268ed9ac9d61da"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659611,
+        "links": 2,
+        "modifiedMs": 1792006789244.4846,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659611,
+        "links": 2,
+        "modifiedMs": 1792006789244.4846,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659614,
+        "links": 1,
+        "modifiedMs": 1792006789244.7974,
+        "target": "owned-sentinel.txt"
+      }
+    ],
+    "after": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659609,
+        "links": 3,
+        "modifiedMs": 1792006789244.3855
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659610,
+        "links": 6,
+        "modifiedMs": 1792006789244.964
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659615,
+        "links": 1,
+        "modifiedMs": 1792006789244.8955,
+        "bytes": 51,
+        "sha256": "668bc10bb590275a7fe0e5f72df8679d1af483dd2678678439268ed9ac9d61da"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659611,
+        "links": 2,
+        "modifiedMs": 1792006789244.4846,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659611,
+        "links": 2,
+        "modifiedMs": 1792006789244.4846,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659614,
+        "links": 1,
+        "modifiedMs": 1792006789244.7974,
+        "target": "owned-sentinel.txt"
+      }
+    ]
+  },
+  {
+    "path": "score run",
+    "mode": "owner",
+    "error": null,
+    "before": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659616,
+        "links": 3,
+        "modifiedMs": 1792006789245.9868
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659617,
+        "links": 6,
+        "modifiedMs": 1792006789246.5486
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659622,
+        "links": 1,
+        "modifiedMs": 1792006789246.4807,
+        "bytes": 51,
+        "sha256": "db31598f60cf58b0b789b56eca7d59eddef850089c8c6abfcefdaf99c2653ce3"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659618,
+        "links": 2,
+        "modifiedMs": 1792006789246.0674,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659618,
+        "links": 2,
+        "modifiedMs": 1792006789246.0674,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659621,
+        "links": 1,
+        "modifiedMs": 1792006789246.364,
+        "target": "owned-sentinel.txt"
+      }
+    ],
+    "after": [
+      {
+        "path": ".",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659616,
+        "links": 3,
+        "modifiedMs": 1792006789245.9868
+      },
+      {
+        "path": ".amc",
+        "kind": "directory",
+        "mode": 16832,
+        "inode": 536659617,
+        "links": 6,
+        "modifiedMs": 1792006789246.5486
+      },
+      {
+        "path": ".amc/mode.json",
+        "kind": "file",
+        "mode": 33188,
+        "inode": 536659622,
+        "links": 1,
+        "modifiedMs": 1792006789246.4807,
+        "bytes": 51,
+        "sha256": "db31598f60cf58b0b789b56eca7d59eddef850089c8c6abfcefdaf99c2653ce3"
+      },
+      {
+        "path": ".amc/owned-hardlink.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659618,
+        "links": 2,
+        "modifiedMs": 1792006789246.0674,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-sentinel.txt",
+        "kind": "file",
+        "mode": 33152,
+        "inode": 536659618,
+        "links": 2,
+        "modifiedMs": 1792006789246.0674,
+        "bytes": 30,
+        "sha256": "f770a364951edf3d579e5b1ecf16536ec6a4641482d6c33c6055ca8e48c0f69d"
+      },
+      {
+        "path": ".amc/owned-symlink.txt",
+        "kind": "symlink",
+        "mode": 41453,
+        "inode": 536659621,
+        "links": 1,
+        "modifiedMs": 1792006789246.364,
+        "target": "owned-sentinel.txt"
+      }
+    ]
+  }
+]

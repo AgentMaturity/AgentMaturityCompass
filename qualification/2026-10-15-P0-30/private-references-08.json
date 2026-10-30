@@ -1,0 +1,2505 @@
+{
+  "source": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "references": [
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-8890234492b64640cb461f856250608c0f068e30",
+      "bytes": 3492,
+      "sha256": "24f23a2df79267a78bd018a65703e7dbff869127b9feeb1744a60ec3606e61c7"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-894af34bb8dc843dcc7b9f8e33015a3df5498c06",
+      "bytes": 10583,
+      "sha256": "2ac713fbba7ed5efa96ae7b7638dd53c2d5b0617da55eaaaa46678bc23e0f7b8"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-8b337751c8549128886826da1ec5792695fdd551",
+      "bytes": 9979,
+      "sha256": "d46b31c28b1554b0a58b22cd4ac066d0a35a43f51d0656bd2ec17b54c63bfaa3"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-8b86262572173cd719a7e2cc9a16b2589ceff368",
+      "bytes": 3729,
+      "sha256": "575931fb941cd9806343f8cd03b2481cd6d077a06d5c4762d1e382b9161e8558"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-8f5c7ccef4b512396d103f936c0edb9f6309e6e5",
+      "bytes": 14878,
+      "sha256": "b369ba8b766a48ea46f79ccff7acd97fff9ff5c3bbbe0e2178940b402b6768dc"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-923d15cf2e2364bc7e3c6b919b198728c11bfbd5",
+      "bytes": 1531,
+      "sha256": "bc39a1b7b43d4750f3a2d6c1314a48531349a4945887cad4a9e49a3b662bb6c1"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-933dceaaac1343c98672c3d1470f90a3dbe09165",
+      "bytes": 3304,
+      "sha256": "235ac20e3af323d64777b6e479797a5889292682413e00ccd7ed73235b923175"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-946e179e152ac38f84e934eb7aef99f3e554c8ff",
+      "bytes": 767,
+      "sha256": "a1174dc3e9b59f90ed24a7c26758b22952a11e1e340613337c4e0744ce6095c9"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-96f86043f33064920618ca7b8eaa956bc40ced65",
+      "bytes": 1844,
+      "sha256": "6821acc624b116d0e4ee9c98f5a50c9a33f1e5d5717eb99e528b266be26c6ba2"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-97d0eadc1abdd7fd2009b1142994260161f04087",
+      "bytes": 8340,
+      "sha256": "eb80b300a776c1def78352b729a27479a988ab2aa3d4eca65b4ba9e9105d0e8d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-98c73f1a92d552f0ccea84b9714b19aa3824f677",
+      "bytes": 1119,
+      "sha256": "08edfeb9eab5afe8e8e1b82879fd6044d01d52efc093964318764c0ea7fde91b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-9cc47f4407fc85e3a2158ed85f46ccd708396fe0",
+      "bytes": 7668,
+      "sha256": "2c08ebe64318605a6a28548026214fd8fd653383d195292e3df806a52251eccc"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-9d3403989ffcbac0829c9d6e3f162bf9bf10c0ca",
+      "bytes": 5013,
+      "sha256": "4cc955c4e27869a8dfca884989376d1e82458c2c00ba4daf35dfac2508346dad"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-9edfb9c1842c22a4fc4ebee88c6b1912b334610f",
+      "bytes": 10314,
+      "sha256": "8984d7df61d43829636b912c9df6888d440b58a9119508d585d307298f356a55"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-9f220ae315f96a403e0de2c49bc469e6281b8698",
+      "bytes": 2597,
+      "sha256": "e403a9050f6bc2f73d1973db3b94996a0c744861f001f72ac69fe732441eeb38"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-a01b196943ecffe60efce6c23826f3640ba98a75",
+      "bytes": 4942,
+      "sha256": "c55b354402835bb8bcb130f68c29b893c4f67e46c4ab24f0f54bf48d7e3aea12"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-a08f93286546999d6e5b91483948f9b99771cb1b",
+      "bytes": 5650,
+      "sha256": "8d37ddafdf0e4ec88a26e133bf7b203c2fa34b46d99f58b243f0c75a8efb1f09"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-a167dc2384f1561c5749a0f4ebab5c22e4b13130",
+      "bytes": 18378,
+      "sha256": "460c05ece764f2e1af02778114725be37b91ad89d33bef083252e6aa12dab730"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-a1e33896d85a0ed22a71cc5c9302351b6def576a",
+      "bytes": 8836,
+      "sha256": "ad87e6166c053671ca925ed5c4c34e27608198b318fcc81f6c41156b6663f370"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-a2dc6b55aac8eb192fee8d675058285d0e94d404",
+      "bytes": 11772,
+      "sha256": "1cbc2e8a3d137129bc8c5cb894bc77310a589c26d749fb034070eceae4abc311"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-a2e84cccfd3c79cbca999eaa4d0b6dbc42cf8e08",
+      "bytes": 5056,
+      "sha256": "e1d5c855c0d7b37238e39f29aee9ae0735c6e607802ddc206278000952c1bd65"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-a308b81170000407e4c509412cb3af4df6d72ec2",
+      "bytes": 5509,
+      "sha256": "315dfa799b6fabd7c80a6da659262fedfbfc1c83f6cc2d9ea1dc062cfe7a32d9"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-a34b2647394986f4e640706af219b284a2ceac0f",
+      "bytes": 2575,
+      "sha256": "d40bb05e9f7911d0aa2c9db923f762da804229e490e4117f5fac806d377380e8"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-a3564ec4c6ef9e56424af86b9846ba0ed051c96c",
+      "bytes": 6485,
+      "sha256": "1b023d2fbaa71d7f3598fed3079dbcbe9127473c4b1c03113d1f51d22a0372b6"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-a361ad0eb13e854ffd8e0fc65fe3fe2fd7153b3a",
+      "bytes": 1430,
+      "sha256": "6ec4dd2f20b0573825dc0b5ee751d2ea2b6796d19271997f5e816a2226b56fb1"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-a3fbbbb853e153ef1f6a7a16c83bb6f392ead635",
+      "bytes": 10003,
+      "sha256": "6d8051a745d9ec18a3a1561bbdd9b1b0978ac1d093a75775fef0ccfbfa5486b7"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-a4ef919fb680899f83b44f7b58ba839dfef61c56",
+      "bytes": 6715,
+      "sha256": "91d07451ba6ad5520a374ffe57ad9680cdcee88035b66d5698efca27274f2285"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-a5e60b9376a6b12d35a0a373d376e1a4198b9ffa",
+      "bytes": 1417,
+      "sha256": "31eff8d2a243fc018262a2429b01355d9238d56794481e8929987c45b05fe41d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-a6b536505aaf7e36dcc310240f61aae53b7a7928",
+      "bytes": 1772,
+      "sha256": "5d3e554956661cc2d604c164d7bc9a661d726b5e24f360020b52975572e34b9e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-a6cd636cd666c196eb840178bfdb678fffc1c57c",
+      "bytes": 5774,
+      "sha256": "3d43fba78e3fd7dbbe16ba829f0749d1fa86bc73b9018176fc693da89a56685d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-a7bc24552ccac77d1bd8c7fcf6085ba1eb1c9ad6",
+      "bytes": 12925,
+      "sha256": "327b1170826dace247477506927db902f5496eec2f28668d6ef167942d038415"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-aa0603e556cb4d3af9630402bc70c3c489b88a11",
+      "bytes": 12444,
+      "sha256": "653c61659c7414b188f848ead23911af39abde7bab71d22399e3aa65e674b0d3"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-aa121003548be879210fae48a23d2fae3a384477",
+      "bytes": 1822,
+      "sha256": "fcac22bb8d09cbfef5f516d48385e627a69e492c7c4a9c2ad67f9f18eceee419"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-abcba2e4eb3c52043942b95a96ac6512b3c5da3c",
+      "bytes": 15424,
+      "sha256": "fa3e54d5a0e3cbad9fae652ccc84ca5c4a014bbac0aa6a6fd24227b9182c1015"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-ac1df8604001c709cf5cdf6ee31cd2eb2bb95261",
+      "bytes": 30762,
+      "sha256": "efeb84c22a57d1dec82816bacd842e97ccd4cb46d37d05244686ee29696a9c79"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-ac5ebcee1339e7cb0edc2c3cb6a0e5663688be60",
+      "bytes": 7976,
+      "sha256": "0ab2ef468d413fe2f86fc59b27b5a4c161358e1254653ad1c8c7dc82232aa761"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-ac90004f653d04ec9da0a8e0fd15dd650ffcad1d",
+      "bytes": 41456,
+      "sha256": "c8c813fc92c542b19dfb48392b92b38a0d2efdfcf6144f544b60404a4793a2f3"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-ad810513f69c20951a4b4baf5c9630ef2ea7f772",
+      "bytes": 2633,
+      "sha256": "3f669432c30cbadcf517166f8bc7e31d530a6deaf39de82d7307d83ef1b8dbe1"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-adb05a0a95e9a2214f513e5b5d71db7dfac627fe",
+      "bytes": 3124,
+      "sha256": "e3b6eec9019c660ec1d33d92f79cbd6d0c11e6e1d868b9251daa846faa06a780"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-ae1299f9514ca7f08a4c80fd32f95157f8cac758",
+      "bytes": 3684,
+      "sha256": "b890aa5385d4ba67ee07befdbebfe13fdaa383603f9fbae083b9c26161111db8"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-af257c4dd447ec1fa2cb7ae897a1c69659d525a9",
+      "bytes": 5749,
+      "sha256": "dd1cdea6400ba843cc41f1af9145c3881054b1d9905207355699a2fbee8d0fe2"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-b01163c95f3f1cc0b1b1731c0e8faf3896ab7588",
+      "bytes": 4307,
+      "sha256": "7656b5ccdd922637d7cd1138e861174df5aad1934ec21ebb97af5b8ff37af835"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-b016779c42110562884eb05eb4ba26e233b030f0",
+      "bytes": 5107,
+      "sha256": "803a11e42828bae1db93723cb485fe5ae845148fe8f19ee45452bf8417f2d1c6"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-b2184e20fc81a990209ec64258d4332f5e4e80c5",
+      "bytes": 45251,
+      "sha256": "f12b82717e7f328e7bfe999b11f3066549fbb83fdbb1354c74c065c2a3167e68"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-b2bdefd70fe0fa9a812f4691f49b29d9380258ea",
+      "bytes": 3441,
+      "sha256": "d2b437fe9c9642356cfb2a16a6af7ab218f941bf48eda3c7e46b29b0a4bb4412"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-b2d1d18618f8e38fbc62b5629c35bda8300a3fef",
+      "bytes": 5060,
+      "sha256": "da1e65332121e232695618f790706924e06a5d71e06fae2df12d9bd5ca244880"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-b481cb2f9ed242d5c8372e9f154bbd4e503f6542",
+      "bytes": 1706,
+      "sha256": "5b4c4195450ab89f8ae58894d7c38243fac95d4cc8bbcd0106f91ecafc19cfc7"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-b51cc7c8c8058342143338247581be42f970c2ec",
+      "bytes": 9350,
+      "sha256": "2a0f2d18dc113ede293050dca9298607be5d0443caba64d052d2d0ffc0263f5d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-b5e24d1ed63fccb35150fa66fbab4d907549c200",
+      "bytes": 71300,
+      "sha256": "81c637a10311f255cb0ceeac1f0de9a9d5b9b9175920d865a4ddffdefc3696df"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-b66f08485d890cb4728690bf7e6e639a592064ef",
+      "bytes": 11864,
+      "sha256": "b22c51ea6f2aa06fa0d78a9d61e3eb0d650dd024f27eccb0a2b392bde6bed230"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-b6a708993dcd568692af1c93ddaeaafd9c0e4cc9",
+      "bytes": 8049,
+      "sha256": "2535312e10fdfe5fa99cd5cee6e5a3daef1958dbe1e5ac3776df0e417c013049"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-b787705717be5e446291c7624d73641dd66b0cc1",
+      "bytes": 4182,
+      "sha256": "9c3538deb1ec685fae3c6a6ee4b701e6ddf75ae57dc82a598163db4b9d172d60"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-b9395c3b2670784e77e9285d6632dd5a8e2b7b85",
+      "bytes": 9222,
+      "sha256": "76d745ba356b4a86bb6574855ef9f7bae7b97cccd4eb29132511fbd1d2ded9b5"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-b97d26d3fe48f0b743889f00b177026b6dc29742",
+      "bytes": 18129,
+      "sha256": "80a1907d73a300c7e2b8acde634f9eecfe06c7ff486eb673c3257a2eae839eed"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-b98ea107be8e09fb8327fbba7c0c9de283612cd3",
+      "bytes": 2838,
+      "sha256": "0adad510e1c764a84006f23ddec33e4ea25d80eb03c63d7607a923e90fef051a"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-baf4eb47bc06404de7a9c775633a35a91c1d9a2c",
+      "bytes": 16342,
+      "sha256": "50dc6692bd5fc22415ad5edfb8ec0a2a6c3c75f0185862bf3ec0e6d620272d49"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-bc007d7605e7f1678107b70963cd674578215fca",
+      "bytes": 7988,
+      "sha256": "1af7b872e9253d27ef78761ff8818c8a2c29e379d10a008d56a547d6085b1726"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-bcaa73ba2ec9e6f2f6b4602df67421e3c224a86e",
+      "bytes": 3303,
+      "sha256": "c782d39f5d36e199834da0702bea65e840a709b0cc51156193200cb9b706234b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-bda7532edcb71ac571ee11ac4d4ff7bc1bc356f8",
+      "bytes": 3457,
+      "sha256": "d05afb211c906525ec828cbe0c963f315cdcec605390372aacdf54c8cd5d26af"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-bef971d7b786291abed53ff1846db309e8279fdd",
+      "bytes": 558,
+      "sha256": "b90e9063afef2a81d8a487f2351a752a9041c3428dc251c4e17732225aacf677"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-bfd609fda624922e50d7bcb9ed674121fd894144",
+      "bytes": 3294,
+      "sha256": "97c18df50a612afadba7803ca17112158d73156786ef4106d44117a51c7947b2"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-c009d92f12e98947b1168b571f1072e9e4983623",
+      "bytes": 5533,
+      "sha256": "0be607e4c60e464cd9d7a1e85a35ff6ce9da376aaa07b41b41a3416ecb031c9e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-c0729654388a53a09f9471839bdc4af0ab66369b",
+      "bytes": 3897,
+      "sha256": "78ab29a5b7db7a0b6838e3f69885cb15e884d8717cd88c61f9c04f21a7b14d4c"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-c07413771ca4560ee5704103fcece473482b577a",
+      "bytes": 7421,
+      "sha256": "08bb3ac22b7ca96f2d23be714a14ac4740dd9669ec1da27060de5ca8b865fe1d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-c1b6fe2addd02597f021db46b9afdb7c9d0c4d96",
+      "bytes": 13546,
+      "sha256": "42e29f8b7554d1d71e362ff53ee0789547c996e1cf37d82b454c469cb44c931e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-c26cb1d9eaacfe26dca1a8294a0f13d69a4ce935",
+      "bytes": 24726,
+      "sha256": "c75e910ebd88554b9deaa7078cf43933c8e4a0248defc61f9e41cb8717fea145"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-c5c8f95c4229652d8227e7be12931e3458de7406",
+      "bytes": 2440,
+      "sha256": "72b4f3fe6beea329487ac675465a4044450087ebe3767fae5272e4388de8268c"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-c5d4cbc92d28694e6488f6c54fd594db264aca46",
+      "bytes": 1637,
+      "sha256": "2b2edf3943b42e92d0932ee43831e7adf8324ecd3f95c781bb46ca4901568ffe"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-c73297aefd03defa3e05aa085aa2cc73fd0eb77b",
+      "bytes": 36011,
+      "sha256": "ed5a805e82f361a810cb3f0e4bd872330b7121a2eec0fe955f1551cb4c8601bf"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-c74464cb777cbab218315a6087f5861ad6a8f810",
+      "bytes": 27344,
+      "sha256": "529f2398874fc8aa7ec0e6d2169cac22fc1bc54818ce901a89176518336d3fd3"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-c75b4fdd07bd54e8a9f0992e27e03a3880f74e2b",
+      "bytes": 13835,
+      "sha256": "4d9ee421ec64203f88b1dde46d617ee8e8b6e2e429ad102d7ae4f67afbe73d64"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-c7ac20b72c15ab97aaf82ab1e9e08cdd8f5fbc6d",
+      "bytes": 2207,
+      "sha256": "e796808656de1548c967a4c69b050ace6cb5c1d6fe4de312023305f4536db9da"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-caef6926585646b6dfa8597f3f06b3352d5b131c",
+      "bytes": 10880,
+      "sha256": "31fbb0200759cb38d6724d7fb35ca588277ff9e60b96340a9f5d44d1d8acb831"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-cba52a198397273f27e7d5eebafc4b1b681d51f2",
+      "bytes": 11637,
+      "sha256": "7765e1cbf64795870dfe9964a6e8b3059fa656de55f6318fac723de15cf89f1d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-cba76afe313af725a70cf509ba1dcb3556d81119",
+      "bytes": 4072,
+      "sha256": "fd48115c572962d767645761341c19f386c4a7a4295eebcc10c1fda88973580d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-cbc0923c1ed7f24cc7965f868858bee8fbb884e2",
+      "bytes": 15829,
+      "sha256": "47a057845ef477ebba8242e44a6b716da85bcd0f685db531e4c8f56841669ffa"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-cc0cfdca97a74985e3f2dccc2a494e2e3fd5e3de",
+      "bytes": 18647,
+      "sha256": "d1c882614ffb8b946f8f59d03f2115422a8f2b1133cf9378f502ab702263837c"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-ce0766aa352a19ec2a22a861bea4fe2eb554012f",
+      "bytes": 3189,
+      "sha256": "74b020d13b81e9d814cea5e7d9bec72095ccbef9704208d40254c53f30fc2896"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-d1b06813dc21eb940a7ec2877908738a8f06519f",
+      "bytes": 636,
+      "sha256": "7a265c7fef7e8d598e40f59de66e4fae1a72e981d52f6393b39161cf0b3839ee"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-d287d62374b31121b3781d7755f889aa73018bbb",
+      "bytes": 38438,
+      "sha256": "4289dd04a5d7e6762df9d1f51653e9ca3f1915514e87c5835f76bd44d856de22"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-d43234f27bffedcbf9c1a1663b04d257c0955838",
+      "bytes": 1751,
+      "sha256": "c85d45e1f1a5e6c9b86877f8b1f3484809d33c28f76314f4b6d1abbe75503eab"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-d449a945b5a96b5f695d6add5c9422cadda8b98b",
+      "bytes": 5678,
+      "sha256": "4ca8ad6370a589efdf880bacec86824b8827d77d16196ed5009fc31aaeeecdeb"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-d52893b4477f40c1352563b21374c6564e86f6cd",
+      "bytes": 1987,
+      "sha256": "9fa6a30e9403a41804bb4185216b2f27d337ac0810d20b5b66c850a506292fe5"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-d67e85cdb297f14154e59576b058e71b6d74de36",
+      "bytes": 3021,
+      "sha256": "49152fcff60c5e890ed6ff86dcb7526a57e322a8f33558fe510b668503a2cb30"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-d6cb136cf5b706c41638bd22d52e81117a218485",
+      "bytes": 1442,
+      "sha256": "9a1602a357168577e26012f9ac32d96aadb0a2e806888d1a280a934d436f90c4"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-d8d8723cc510eb80ddedaba57d5e3460768193be",
+      "bytes": 2069,
+      "sha256": "1bc524a0a8d333f48d323f6d0678904bc4f254896c45df7235bf43a2b737e823"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-d96ec4f178ea082813335bf849b385a09ccb5b10",
+      "bytes": 3684,
+      "sha256": "38658c448bbef9c3a834ef267ba38171b49adb73c1f699ee5f1990ca47681ef4"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-db763b43ec0e324a039361b2a90523dd1a1249ff",
+      "bytes": 657285,
+      "sha256": "29afdcc9e4ab7734f1ca50ad0f853d4e854c8b7a516b65185c853a8ca9a30359"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-db91ca60627cd9d968f861900e7d04110cc1e8b3",
+      "bytes": 2322,
+      "sha256": "7056256ae8bc16fe99334148ca9ec189d631638aa8af774482b735b8adc889c6"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-dbe2e1329ac4351df01bb4924d63aecbc96014e8",
+      "bytes": 5331,
+      "sha256": "818367c5f2252eb690f44b434a0d98960c64bce57e430e189ed68ed88b70aed5"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-dd57d86f3ecc39d3920a00d92420dbac90e0223a",
+      "bytes": 382,
+      "sha256": "6dcff6c84598d077d8340f0ebceba7ed2bd95c73d36914d00751155060c58cc8"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-deeb31c49b67559738290d1b135df3564445fbe8",
+      "bytes": 12893,
+      "sha256": "922df7fa3966f070feac0478483afe27558acf25f63ad2ae5cb0b3a2fb183bbb"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-df77ef2391fb1edda0932b78d757db6c6f91f7f7",
+      "bytes": 12387,
+      "sha256": "f078cc39dc0db657fa3005929e272250c4e3e246accdf4c5e55b2a1c1b126ed2"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-df84a922d0701fa826c608e9af6de763483d5e37",
+      "bytes": 8039,
+      "sha256": "0149a112208b26bb4fa7fc05ebe0d080ff25a821a49ee7663b41c903b82fdfb5"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-dfbaa3d3c98eea2fd3e1cf9c0af6c4c4fb9ba470",
+      "bytes": 3497,
+      "sha256": "435c90170f2390708adeb9a1e20f992d520059f90c0ba151dedceb9f6762744b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-dffa35c6626e8b307b68fd2595a0577511f7a7db",
+      "bytes": 7543,
+      "sha256": "bbee815ca8d1385c8b21aa6d3752ee7df98a2caed8071be5c39f7ad886829004"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-e18272e240239b3fe44713470aa3584d1c3e7a00",
+      "bytes": 21627,
+      "sha256": "f40b98760fd56e562740eaf1c05d5b9ca9a250c165e4e727d1beef1bc48d0f62"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-e197ba18d3afca7f2d8777aca2393e04db0bbd4a",
+      "bytes": 1290,
+      "sha256": "a64616d47ee4bb21b8a48ab3163282cb8ed422beb89867b480b1726d29f4afa6"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-e31418f2aac06bf071dd054f71746b6dd9fce196",
+      "bytes": 2974,
+      "sha256": "162b4ace5a6e09b0f1217e64e0f7096fda8eb60126f37d45a2b0c49cc0da6e2f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-e43abb129edac729af996afe595afe20b446b76b",
+      "bytes": 1786,
+      "sha256": "f0556d8dd8d713f2195f9c9ba1ffef7cd9d509e77998c4ebb26927810bea6be1"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-e64a5fd0e45728a992960ee7d4b159a76f23bbb1",
+      "bytes": 22227,
+      "sha256": "51eebe48dc2646237acc486791f2fb2bc6a11bd6cd09fd222da62ad29a5dd041"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-e88a024f168251c4b871be14f112875e6d870c33",
+      "bytes": 2107,
+      "sha256": "55b23d159b4ef65a19e33da984912cfe3a164f9534f6568197ea90b94df170d9"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-eb6310cf740b44ee038d1e44d416f1da9153d3c7",
+      "bytes": 12652,
+      "sha256": "8f228c06fb284d1c9c8d14c01d31bbfebd9ed8ebd3d536a5f31da52b999ef562"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-ec3c5a958ba552b7a203bf75f80a24d654a916d1",
+      "bytes": 12607,
+      "sha256": "8ad2da364ac3168987f89c64e6d875ade7c45847919c6e18b2c8f20ea393b8ab"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-ecfa2ca53b9bc310c7d25caa561f3ca81322a142",
+      "bytes": 8140,
+      "sha256": "5a70704fe3e81acb627cba27d4f09b74584868cac1ad92a2bf4d13ada9a43081"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-edeff73d27d83885c2dff3cc3ff2ad41a78dda14",
+      "bytes": 2145,
+      "sha256": "08addbbaf6b9d4d06eb6766f8ec5b765efd7b6e5bfd73d2bc62cdc1a5af3832d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-ef8e5a2f469dc108ff59098a9ddab359a8074ebf",
+      "bytes": 2054,
+      "sha256": "e96070f8c937175b7aa9f44a67880ada2b3d63b78687b8e9bc815efbd6909b25"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-f0e535683f7e1eb4cead64c76454e2cb49d2ac1f",
+      "bytes": 4348,
+      "sha256": "48c68b015d69830c17b56ec297cb47f57458013da95097ab08a2b0e3249274ea"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-f146e8eb089b7d7e4be637ff6acab2d5a6062d50",
+      "bytes": 5640,
+      "sha256": "baec3ebe49e0c14b9be2f9816441f2576c4da51e30efb393c34eaf22ad83f3a2"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-f19dad9588340f73fde721093d2f0483ec208cfa",
+      "bytes": 11054,
+      "sha256": "c1987da389ba599a39b4269e1c9cd90b5465184f8b594a10df38620ae1fa87bf"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-f28a5aba35b4286420652fd995c55dbbbdf3d6f9",
+      "bytes": 11549,
+      "sha256": "b82fe4ff530081eed2a6e3156678ae944dedf49af413844b49b730de89646e0c"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-f57b53676639baa834ba8514c6441d66d0a330f0",
+      "bytes": 2396,
+      "sha256": "46d2bd3d3cc6adaf4dc47d05e1246d605469ecae3c4e6f8b3fd7d599d4dd4430"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-f5f5c568a2cfe9ae4a28a8d3ed3c58ee9b0a5428",
+      "bytes": 16179,
+      "sha256": "f5408b587e686f0c277832e2af0a6c4918a2a54aa90d8d526fe2aa7f1d27be4d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-f6a9ab889a563aaad292748726666461b1696615",
+      "bytes": 1462,
+      "sha256": "cc08d042f4547d6d25f671e4bea69d63b4b116d0e14eb64849553a9a6fa257ba"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-f7297ca341112116c10c913cbb86960a8488bc69",
+      "bytes": 3221,
+      "sha256": "eeb13d3dae41209d924640712c63bab20a2786c36e685bc46bf256356476224a"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-f74488f8a03ed2bbc4c833c49703bd3f44bb2096",
+      "bytes": 8521,
+      "sha256": "bbf446ba898e3c59236f3af0e39544fd8a976e48b636fa5b46cfecbb6b61c97a"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-f762c998a8b0d3f9a910fca259e31ee6fc7ff63f",
+      "bytes": 1374,
+      "sha256": "43a3082ddaeddfd3011d91a1d6d9f4c63f4c87bfe59df024a47a5cea39f6c2d4"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-f78cb918d125e409f0dce869f7c7d9c946deea6e",
+      "bytes": 34686,
+      "sha256": "786529b7072c570a76ee434be96b30608ff9d6ee803fdb0d7f8a76af46161fd3"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-f821f33426ad6d2cc936636eddae5fb9dcce3b7a",
+      "bytes": 731,
+      "sha256": "067415e0469623acf86b813ec2f5e7b3e1538842776c81bf7b312692eadfaecb"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-f833546c38d112d5f695b5b7e748f24178a24ed3",
+      "bytes": 6186,
+      "sha256": "0f8897d4dd6071473a53d330e440186837459f8fd7a9639c8d7463b7de2a83ab"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-f8daa7fe9e46d9fdc2b0f99ea02886cbdbb3e039",
+      "bytes": 8900,
+      "sha256": "a982db78add849b9b2797a0d6bddcec062fcc2b127c73cfb222f778b34cc6e68"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-f948d59b155a57168f2dd9a234d9f6178ce82785",
+      "bytes": 3826,
+      "sha256": "3b8c786c1ff77428d331b4ae7a682b2726de73e4eb269d87017068c8ab852596"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-f954434e117a1a559c0a851acca6b4590692bb8b",
+      "bytes": 9023,
+      "sha256": "69a8b58c4efb1374360777fbc73653090c87b33f11856f63a4aefa171b34e483"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-f960373b1deb9fe22664bcbe136a49c32888c5b0",
+      "bytes": 878,
+      "sha256": "7b61d8dc81d9b1a260ac3c30f7f4d2b4dfad728bb8b52a3561a0743fe5b5aa63"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-f96ef9d57d094f11934b21368d8ec162cfe45139",
+      "bytes": 6706,
+      "sha256": "c84ee0316875e9437b55d9a430e79926167b6d174b034c0eec1baf001662e0d1"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-fb78c29352a71975c9fb6f669159e01cb0ecc662",
+      "bytes": 19551,
+      "sha256": "91b45a1ff07f3bbc8d34e063befb9a4dfe63c0fe7d8300c843f744a7aaae91f7"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-fbb6eb66ea3bd9232dabac104420d9e7421484b5",
+      "bytes": 20821,
+      "sha256": "3be5d44f6ede67d0b7b2990e1da2a0c00be95413d20b48bf79dde5008c2db774"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-fd35bf291755dce727143f8b4f937ebb48913033",
+      "bytes": 11179,
+      "sha256": "8726ca846866fde6da846825352e5ea997328e34689e1feb38b6924e274006d2"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-fe25d9a659902531645f4151bb148022077e1e8d",
+      "bytes": 10884,
+      "sha256": "989cf9cdd7bfcd55e13d3351cd5cbb13bfd2fe08181b1784ebedf9f54c92b02f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/tmp/initial-original-notary-baseline/tsx-501/17920-ff96cf2ffd6e51c48111e1edb06636b1c5f51241",
+      "bytes": 11630,
+      "sha256": "04bd16143ce8ec40ee6807d92a5a7d373603d626fb5d61c7dff71173e9e10603"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-root-bounded-outcome-20261015.json",
+      "bytes": 4972,
+      "sha256": "667c8d82405551d9d4a38a56c0806c9b813dbc11f3fa3918cb8147ffe9bc8274"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-setup-independent-review-20261015.json",
+      "bytes": 35566,
+      "sha256": "bf994411c25d8a2ae5cfe61fe3299092584394fa50da54b9298b579b4c675fb7"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-setup-independent-review-20261015.md",
+      "bytes": 3090,
+      "sha256": "0f2c1271ca7cd5815753da89ca44b0a2d0df6e716547f1ba5f650722d21ec7b5"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-setup-root-review-20261015.json",
+      "bytes": 2165,
+      "sha256": "19fbb614cf4c5f251eeb751b28189951bdd15894a4eb368646fe0dd112573546"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-v2-setup-independent-review-20261015.json",
+      "bytes": 36410,
+      "sha256": "cfc8ffe5322fdd80328081563dea335b877c69bc5e97ae7714fd235b4dfdfce4"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1529-v2-setup-independent-review-20261015.md",
+      "bytes": 2373,
+      "sha256": "fa78e0bb03517ef7dd49fb06dd6c4de48fe13824633d971388d8840e15ca0a86"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-1529-execution-brief-20261015.json",
+      "bytes": 57524,
+      "sha256": "e799e7194f442764365f239a67967ee638ed7b0f2ca9d9eefce80183f1721ca5"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-1529-execution-brief-20261015.md",
+      "bytes": 6648,
+      "sha256": "10116239590a61202492d225d9370cf283626dbc71ad69bd5db6ad429e09daf6"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-1529-readiness-20261015.json",
+      "bytes": 56763,
+      "sha256": "3cc6413c0cbf95ace45833b67e01c67b980bf17a946f54f5633466c36a9a5bd4"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-1529-readiness-20261015.md",
+      "bytes": 4360,
+      "sha256": "4603cf42327fd5888be83389e83804786469db2406e828e002c325c9a1c19375"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-independent-review-20261015.json",
+      "bytes": 42050,
+      "sha256": "006a1c53d540a376c6da1dbc255c22646f71d727045b573d83b62048dc832286"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-independent-review-20261015.md",
+      "bytes": 3841,
+      "sha256": "43a07d35d1ba7650cdfcd767e9c1d1276fa681c13b11d58e66c6939bb9838107"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-original-root-bounded-outcome-20261015.json",
+      "bytes": 9932,
+      "sha256": "24ab520bb55d0cf5a3dcb32f96beded84ade91117767a15a9bbc837f482c9aff"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015.json",
+      "bytes": 15816,
+      "sha256": "748c1796cdfd0f3bb843f04e5fb33f55d26786e4d96b8f072db96b601be5580b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015.md",
+      "bytes": 4591,
+      "sha256": "033079965c79589f11ecd435a9b06f8e380f017a4f4ac6208bea8f88e7d2b7c3"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/P30-1534-budget-compare-after-preservation.json",
+      "bytes": 650,
+      "sha256": "45eb2189064ed5f782ab8e341a5389d72a62cd4030f7d3fc7fd052d2edb12341"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/P30-1534-budget-compare-before-preservation.json",
+      "bytes": 650,
+      "sha256": "45eb2189064ed5f782ab8e341a5389d72a62cd4030f7d3fc7fd052d2edb12341"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/P30-1534-budget-compare-matrix.json",
+      "bytes": 49462,
+      "sha256": "89aba78ca6a5197864441ddabea527880aa8557cf33ba8bf93e8f05c6656975e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/P30-1534-budget-compare-mutant-full-closure.json",
+      "bytes": 1399777,
+      "sha256": "80674b338de8f53af2e98ef29266009945996d57bc0ee00ef1862b1b5c39030c"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/P30-1534-budget-compare-mutant-source.ts",
+      "bytes": 5577,
+      "sha256": "552e02347c42665d7662266f2b1ac5e6311ff8e4c1a9ab6b792c833448249f8b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/P30-1534-budget-compare-restored-full-closure.json",
+      "bytes": 1399777,
+      "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/P30-1534-budget-compare-source-change.json",
+      "bytes": 1994,
+      "sha256": "3acc6bc5cf5d653ac4cbb6186c0cfa7c04fd496a06a098f4f19e130a1e7b2069"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/P30-1534-budget-compare.patch",
+      "bytes": 685,
+      "sha256": "78d9889b4ed8971c2059ecfac0b5394e3268e564e9977a771c1a832c3fcb87a6"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/P30-1534-no-transaction-after-preservation.json",
+      "bytes": 650,
+      "sha256": "45eb2189064ed5f782ab8e341a5389d72a62cd4030f7d3fc7fd052d2edb12341"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/P30-1534-no-transaction-before-preservation.json",
+      "bytes": 650,
+      "sha256": "45eb2189064ed5f782ab8e341a5389d72a62cd4030f7d3fc7fd052d2edb12341"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/P30-1534-no-transaction-matrix.json",
+      "bytes": 47233,
+      "sha256": "2b9dcf83881e2cf3c6233a531090670dd19200f5bf8f8ce9ea661bb59bb76dc4"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/P30-1534-no-transaction-mutant-full-closure.json",
+      "bytes": 1399777,
+      "sha256": "9a8baf382b11ae480ed27b5e1917c35d846acecf0b725284c740c1ce0aa1c387"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/P30-1534-no-transaction-mutant-source.ts",
+      "bytes": 5617,
+      "sha256": "2bbfda574cf689e5aacb62de9387a3a34dcfb6a924761cf99d5ff535de23fce1"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/P30-1534-no-transaction-restored-full-closure.json",
+      "bytes": 1399777,
+      "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/P30-1534-no-transaction-source-change.json",
+      "bytes": 1841,
+      "sha256": "f2cf18abeed37bacdc2172519383d6a2b603e309816d46059ea0e9ea55498806"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/P30-1534-no-transaction.patch",
+      "bytes": 576,
+      "sha256": "799d378af1ba70c4bb9c51ea5d9171f057200c36bf9d993c0d716a035770de18"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/after-original-native-baseline-preservation.json",
+      "bytes": 650,
+      "sha256": "45eb2189064ed5f782ab8e341a5389d72a62cd4030f7d3fc7fd052d2edb12341"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/after-separate-cli-context-preservation.json",
+      "bytes": 650,
+      "sha256": "45eb2189064ed5f782ab8e341a5389d72a62cd4030f7d3fc7fd052d2edb12341"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/analyst-notes.json",
+      "bytes": 2134,
+      "sha256": "ddb40b699d29c40c07a36646366c4fe725f43ba0ae9335bba728c3a3725c4cb4"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/artifact-index.json",
+      "bytes": 558115,
+      "sha256": "7c594d01e2cf509681d6c703570a831fc33ae0c8129d7cc9382cfeda2812eda0"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/before-original-native-baseline-preservation.json",
+      "bytes": 650,
+      "sha256": "45eb2189064ed5f782ab8e341a5389d72a62cd4030f7d3fc7fd052d2edb12341"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/before-separate-cli-context-preservation.json",
+      "bytes": 650,
+      "sha256": "45eb2189064ed5f782ab8e341a5389d72a62cd4030f7d3fc7fd052d2edb12341"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/bounded-static-subreview.json",
+      "bytes": 1113,
+      "sha256": "aebba4a3b590be5a1b75abdc482422e6c98096dd95cf945636a88089a9f3c939"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/case-status-inventory.json",
+      "bytes": 45009,
+      "sha256": "7cdda8c26a475cafc4b0f178288ef3e7ad9cc6b77e7ba3fb2fbc08a327ac16e6"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/commands-frozen.jsonl",
+      "bytes": 15928,
+      "sha256": "d7ef95d508d69e6a8ed81700cacea42885d8978dc7cef9096ff49a4e11c53512"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/compiled-original.json",
+      "bytes": 462540,
+      "sha256": "82ff86751e49686db52385c53bac4a2c7ef010a2034745289731d4e6d4ac7598"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/controller.py",
+      "bytes": 10163,
+      "sha256": "ab75a72593fbb3550191811d9b61d98ebbb660c9b3b402ba72e2d046898aa479"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/dependency-links.json",
+      "bytes": 102832,
+      "sha256": "acaa51e552d00686949ef6a3b20be7b8a1d6b6afab5b1893da15a1d4d87d6d17"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/final-preservation.json",
+      "bytes": 650,
+      "sha256": "45eb2189064ed5f782ab8e341a5389d72a62cd4030f7d3fc7fd052d2edb12341"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/finalize.py",
+      "bytes": 17415,
+      "sha256": "5244711f8dd8729bdf128972a9813c54d4d788c98ac1bca224e9625a13dc1e71"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/full-closure-final.json",
+      "bytes": 1399777,
+      "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/full-closure-prepared.json",
+      "bytes": 1399777,
+      "sha256": "ccc5fad556024794dd5e14641a8816837996d34edfa70db4d5139b87b3698520"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/index/setup-artifact-index.json",
+      "bytes": 537965,
+      "sha256": "944282561f3bc53619512c4b5d572f4c32c41fc78f201a59548cead0ba238c3f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/native-before.json",
+      "bytes": 457,
+      "sha256": "2ecb3371892b7c627be792d3aadf31d3e138c657b834d73777be7d527406fb26"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/P30-1534-budget-compare-baseline/command.json",
+      "bytes": 1676,
+      "sha256": "e17df2bf648e46bed1aa324de37773b6b4c6a04e83bc1de903c09a99d2a2f80e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/P30-1534-budget-compare-baseline/raw-tests.json",
+      "bytes": 11395,
+      "sha256": "9b1eab11b113ed22f94d7249b703207f38cad62f3f0a8d0ec7f2d4c1fa136af6"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/P30-1534-budget-compare-baseline/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/P30-1534-budget-compare-baseline/stdout.log",
+      "bytes": 543,
+      "sha256": "4cbe58b3024e767ff4caff128dbee7e72544d4d5e34c0cc68c0cd60f9d81f23d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/P30-1534-budget-compare-baseline/summary.json",
+      "bytes": 14437,
+      "sha256": "e0e0072a4621885ef691db042dbc4e89f64334d50db53466d7a03e273502fce5"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/P30-1534-budget-compare-mutant/command.json",
+      "bytes": 1666,
+      "sha256": "1c469e83734fedbcda81dd2626dbd1198a29bba3f4e6d1d2a1144d9269617bc4"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/P30-1534-budget-compare-mutant/raw-tests.json",
+      "bytes": 12190,
+      "sha256": "f934fc4b6452e3078445b1f152881011576f7be70deeca3a1e2f93a41be44236"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/P30-1534-budget-compare-mutant/stderr.log",
+      "bytes": 1891,
+      "sha256": "321fed940068448af46a867f4f471f3d796c9074ce179bc829e18eecbf72d07e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/P30-1534-budget-compare-mutant/stdout.log",
+      "bytes": 3083,
+      "sha256": "60d848a2b90626705f4a0dbe78c7f4e00b7444cca1b15f87dd394b71d1218c69"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/P30-1534-budget-compare-mutant/summary.json",
+      "bytes": 16491,
+      "sha256": "f2c44ca6fccf6c93fb972cb21d0387adbef2865cbc3da54bde6d36d1a78c0e7e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/P30-1534-budget-compare-restored/command.json",
+      "bytes": 1676,
+      "sha256": "cad3eb18d6b45cf108e263d9524765158fd3a8f0a46e1049425bb483bda8d80d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/P30-1534-budget-compare-restored/raw-tests.json",
+      "bytes": 11403,
+      "sha256": "e0f2e7cc771e39eb47274000527a379420c3b5e6b65135072e161996178a93a8"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/P30-1534-budget-compare-restored/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/P30-1534-budget-compare-restored/stdout.log",
+      "bytes": 543,
+      "sha256": "300810d8e2dbd56925771927755a5038c724c587c8cc1c4adcb4ba07d78eac31"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/P30-1534-budget-compare-restored/summary.json",
+      "bytes": 14446,
+      "sha256": "a2a9a9e81b2a59e8c942c2f11a0c168b133e1e7066e99f505162d5266ea2aeb8"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/P30-1534-no-transaction-baseline/command.json",
+      "bytes": 1676,
+      "sha256": "5b17fe4645ba87dc4810233090f82a3609026a91daabec18e2f0f88736a8c44c"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/P30-1534-no-transaction-baseline/raw-tests.json",
+      "bytes": 11412,
+      "sha256": "7134fda4b1b7208430c46012255ca88479932c96a9170dd24e6a2f400acad6e5"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/P30-1534-no-transaction-baseline/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/P30-1534-no-transaction-baseline/stdout.log",
+      "bytes": 543,
+      "sha256": "4bbaaa7f51b206be318e67ffb4795cf7061bcf783b86177e55bc41394cd2f1a2"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/P30-1534-no-transaction-baseline/summary.json",
+      "bytes": 14454,
+      "sha256": "ab64980eb57ab0536dfa7ee7cd9758f2f1c6ea05c6a0b9a370b9ba49d2f7b3fd"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/P30-1534-no-transaction-mutant/command.json",
+      "bytes": 1662,
+      "sha256": "9cf0c788c32d7afbacb508e5f99d6739b91a1eb71f6f122c442555f4e02355e9"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/P30-1534-no-transaction-mutant/raw-tests.json",
+      "bytes": 11404,
+      "sha256": "3e1a0744b3ece7e99e5cc6cc55583d98145e5ba79b3239d477ed61ed6f20fe11"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/P30-1534-no-transaction-mutant/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/P30-1534-no-transaction-mutant/stdout.log",
+      "bytes": 541,
+      "sha256": "5bf4699e6a6bd361c5b56b43ac3b639542cfaa1731d8c8b776675003785c8093"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/P30-1534-no-transaction-mutant/summary.json",
+      "bytes": 14441,
+      "sha256": "cc791d5a257ff6f77725f5c12115bd4bb3d9f3a0621f49a43c4a618121deba1e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/P30-1534-no-transaction-restored/command.json",
+      "bytes": 1676,
+      "sha256": "209f18cb586fcfdfbd78fa49200dc9db2de8a08ba9544ffdca6ecae2400ce9fd"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/P30-1534-no-transaction-restored/raw-tests.json",
+      "bytes": 11395,
+      "sha256": "95f2220ec3ff9986fe335fe81ea6dffeff42c1693237f00f0f79252f50303516"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/P30-1534-no-transaction-restored/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/P30-1534-no-transaction-restored/stdout.log",
+      "bytes": 543,
+      "sha256": "b028c316ecfe89055e5a0e991955ec06f4ddb0c56fe2a1498083b6b2afef088c"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/P30-1534-no-transaction-restored/summary.json",
+      "bytes": 14437,
+      "sha256": "314d1c10b3e826022f39e03f4d77478776dac9ba530dccaef545d7c8350d3e57"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/actual-runtime-fingerprint/command.json",
+      "bytes": 1386,
+      "sha256": "574aa55946b9778b63bf58715efc316317725f4e965e5ec9f43fe80c13f850a7"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/actual-runtime-fingerprint/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/actual-runtime-fingerprint/stdout.log",
+      "bytes": 114,
+      "sha256": "6356112c023d338d4ce2eb165c4ea56d3e428ef958059d868a720d4b17a6639c"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/root-head-final/command.json",
+      "bytes": 1213,
+      "sha256": "6b758075cbde9ecd3e6b3b8470535fef2d6f346ee920e77ea4e49c7bc591415c"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/root-head-final/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/root-head-final/stdout.log",
+      "bytes": 41,
+      "sha256": "4d6100c6870dbeb5ee06470bb88c465f6304ec0b7d1ef2684adc01718809997b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/root-status-final/command.json",
+      "bytes": 1222,
+      "sha256": "27d58c38e134449080e0b1ece0921b9f8d93bf8860aef6c0d878bc9e4d293a0b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/root-status-final/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/root-status-final/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/separate-original-cli-agent-loop-context/command.json",
+      "bytes": 1740,
+      "sha256": "3b9a6da27451bae70198fe1e746ebcee0dc62ee90e255a953fbe7ec9387c79eb"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/separate-original-cli-agent-loop-context/raw-tests.json",
+      "bytes": 4218,
+      "sha256": "eca812acd63245a789bac6df7db6c07bdb6f5a833804bb5efdc396ac2aa71782"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/separate-original-cli-agent-loop-context/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/separate-original-cli-agent-loop-context/stdout.log",
+      "bytes": 1019,
+      "sha256": "b98d615b56607d78070d3160432f5faf6018eefccef17613df43873f44a6541b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/separate-original-cli-agent-loop-context/summary.json",
+      "bytes": 5952,
+      "sha256": "1d0905933d1ffb97b12bef1ecce78c54337989188355059b4f338e7079d77815"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/unchanged-original-native-budget-baseline/command.json",
+      "bytes": 1739,
+      "sha256": "340a85d3e4bdf4a7618a3a5201124df9decbd7f9d96a8b034210d66e9a12faee"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/unchanged-original-native-budget-baseline/raw-tests.json",
+      "bytes": 11408,
+      "sha256": "1ae69a769b5371cc1e27144eda3fa9e2933a6f2fcfe39c3b782fb614ee75398b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/unchanged-original-native-budget-baseline/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/unchanged-original-native-budget-baseline/stdout.log",
+      "bytes": 552,
+      "sha256": "a80c7cc86236ebd2efbe36f4c9c9f9927d7c02f2b47bc2845e57b35eb0e7bc9c"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/unchanged-original-native-budget-baseline/summary.json",
+      "bytes": 14477,
+      "sha256": "970726545c11185c9e978dcaa82575151afa7f96c4b3cf6a4916308fb4672589"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/preparation-navigation-note.json",
+      "bytes": 464,
+      "sha256": "c4f9aef91843151da2e4bdd216b7bb8b6ad123924c515275339614015406b5c9"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/prepare.py",
+      "bytes": 8752,
+      "sha256": "a73ce9fbcd37ce24cdfecbdb9ba83a840d06b00b10691e02c698c31b9af61648"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/prepared-environment.json",
+      "bytes": 361,
+      "sha256": "7d7b31faf4a853b99d4532bc3d132b681ab51b10b15e0f134cb9e801ca836680"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/prepared-preservation.json",
+      "bytes": 4678,
+      "sha256": "f05207fdecd17029b8ea7bfb8318b5791d1e3bf2711c02a61f3dff8dbef493eb"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/prior-closures-final.json",
+      "bytes": 3640,
+      "sha256": "1e38d494f75612dc2d5fb5ccb6e3f0ded05c437844a9c15c6a4fb8bae6f2096e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/prior-closures-prepared.json",
+      "bytes": 3342,
+      "sha256": "6e8bd7e3e561cb3a17230377fef9169013326d7dd86bb87969e85f652e51d17f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/prior-reference-pins-after.json",
+      "bytes": 502174,
+      "sha256": "838cf97390b29679e8a70abd96dfcac52ee9e75b5c178538e007b059c3be66fe"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/prior-reference-pins-before.json",
+      "bytes": 502174,
+      "sha256": "838cf97390b29679e8a70abd96dfcac52ee9e75b5c178538e007b059c3be66fe"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/protected-pins-after.json",
+      "bytes": 44513,
+      "sha256": "929b63a73e91659a200313892f8639582350b3f96e87c080ea0b4e61252e2157"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/protected-pins-before.json",
+      "bytes": 44513,
+      "sha256": "929b63a73e91659a200313892f8639582350b3f96e87c080ea0b4e61252e2157"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/recipes.json",
+      "bytes": 7508,
+      "sha256": "441b05f44034f3272f7e229d81183a7405686e53711e52c10c5741667994b1bb"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/root-runtime-release.json",
+      "bytes": 1621,
+      "sha256": "cec6200060398ea2e3889e90174fe9c28a05a37f016b11aec9757e43a9016ca1"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/root-tracked-before.json",
+      "bytes": 914595,
+      "sha256": "93b780b8024ed47e494b7b8aad80bdb72664965f45b64c83755bcacebf6f74ef"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/runtime-input-pins-after.json",
+      "bytes": 582,
+      "sha256": "35d6190aff7e98b9342b3b11292effb0b0b01e19255465a07f2ecd63dad421f8"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/runtime-input-pins-before.json",
+      "bytes": 582,
+      "sha256": "35d6190aff7e98b9342b3b11292effb0b0b01e19255465a07f2ecd63dad421f8"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/semantic-classification.json",
+      "bytes": 8670,
+      "sha256": "77d17735024c91ea602e5e8be970da4af5803a6f121aa750dd6a2c11a83f09cb"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/setup-prepared.json",
+      "bytes": 6840,
+      "sha256": "870eb2eb11d73aadebda2e7bb169aa561deb7c26b820523bb842f9e3f76bbc37"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/setup-prepared.md",
+      "bytes": 2386,
+      "sha256": "2bf39d9bbcb0352c5f793f0327dc4398c6cafa4f7396943b1a39d8652e320bc5"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-independent-review-20261015.json",
+      "bytes": 71494,
+      "sha256": "e108c318dfb6ef91a5d2fb2dfc923ab68dc6cf37a7501240176e4cb23b3226ac"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-independent-review-20261015.md",
+      "bytes": 4177,
+      "sha256": "59e1a101b885f1965710789070c625b1764c6c0333cfa1798fcbd7e9a60f149c"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-peer-static-review-20261015.json",
+      "bytes": 20890,
+      "sha256": "fedef2c103b56423d366568d21ea56e30eb7a0eb0b6d3efcd8a01389d9f7099c"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-peer-static-review-20261015.md",
+      "bytes": 4143,
+      "sha256": "24d5796318a72421e83d17922810eed3ccb6c5d62f41e4e19386d696c35a0bae"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-proposal-20261015/README.md",
+      "bytes": 2108,
+      "sha256": "07f28212df05eb0914b9eb227b72d3152fce77dee2ef763f9055e49a2298e286"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-proposal-20261015/first-partial-draft-pins.json",
+      "bytes": 1094,
+      "sha256": "a00bf9efe6cf93e53bf89ee2e809a41b7287228ec6ba79140848cb19f4746d6e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-proposal-20261015/initialize.ts",
+      "bytes": 5037,
+      "sha256": "1722948592782c4951d2ffb8dfb41606f03a0c13e6b8572926cdeb997ee569cc"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-proposal-20261015/proposal.json",
+      "bytes": 9760,
+      "sha256": "1dd8cf10d0a4e7a5bdd0bd2a99c455751626830d67612298df026ceaf0d916be"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-proposal-20261015/race.test.mjs",
+      "bytes": 17485,
+      "sha256": "f98f4b36d0f90bab23de4f51ad2eb1c9d44ca125ebffc3d1ee40233a57b01f4e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-proposal-20261015/reader.ts",
+      "bytes": 3498,
+      "sha256": "eb59715562e4dfe3885cd83fcd49a7deafcf7577fa93f6d227b8f7347445e048"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-proposal-20261015/support.ts",
+      "bytes": 3894,
+      "sha256": "c77718b848d7086326c93ae2643b55253ad30ce4eddbf7645adec516330a1763"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-proposal-20261015/worker.ts",
+      "bytes": 6841,
+      "sha256": "7bd51b2666d7c7a70db89485d6f22ee00e8080bcfc9305cc8ab12f5b0341427c"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-proposal-v2-20261015/README.md",
+      "bytes": 2158,
+      "sha256": "ad0542b217954d02c3f870187518aa90059880b0faa522463504db86a4198d94"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-proposal-v2-20261015/initialize.ts",
+      "bytes": 5037,
+      "sha256": "1722948592782c4951d2ffb8dfb41606f03a0c13e6b8572926cdeb997ee569cc"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-proposal-v2-20261015/proposal.json",
+      "bytes": 14758,
+      "sha256": "851f250a062e78f1efd979d73af9f96966d4b5ad40c446ed6e51ffdf57ee62d5"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-proposal-v2-20261015/race.test.mjs",
+      "bytes": 22462,
+      "sha256": "aa4df09b0a3db096b475b3e8788b2fcd6ce36e06f742a98d71129b095b4af788"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-proposal-v2-20261015/race.test.mjs.revision.patch",
+      "bytes": 35255,
+      "sha256": "a97701e50f8759766e34f125ec5c3f619e788e334f126744daaee472751bef46"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-proposal-v2-20261015/reader.ts",
+      "bytes": 3498,
+      "sha256": "eb59715562e4dfe3885cd83fcd49a7deafcf7577fa93f6d227b8f7347445e048"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-proposal-v2-20261015/support.ts",
+      "bytes": 3894,
+      "sha256": "c77718b848d7086326c93ae2643b55253ad30ce4eddbf7645adec516330a1763"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-proposal-v2-20261015/worker.ts",
+      "bytes": 7537,
+      "sha256": "d1eb246719450f10a2ede72059dafad5bf2251ad060762b5d6d7ac694e9c2b3b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-proposal-v2-20261015/worker.ts.revision.patch",
+      "bytes": 1618,
+      "sha256": "931c98c4fb08ca4503c6e0b514dd543a58620ecf748f03a246b6838d1bbc1609"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-public-crypto-review-20261015.json",
+      "bytes": 111829,
+      "sha256": "54500c03c7a0aaf6d4467ff774519369efa262c85a6e0a370eaf2b7b61751dff"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-public-crypto-review-20261015.md",
+      "bytes": 3425,
+      "sha256": "d1c9444a1c65e55245f49a0c11b652c300f325839b0d01980082665a9f44f85f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015.json",
+      "bytes": 12191,
+      "sha256": "388932daefcc227c4a99c7a8227751a6f356c7b9744fdfeca4aa8074f791760c"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015.md",
+      "bytes": 2103,
+      "sha256": "db95cdd826e7d27967c9d435e1f01ab367e275e07a3407622b12ee21dca0466c"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/P30-1534-no-transaction-after-preservation.json",
+      "bytes": 713,
+      "sha256": "79ef2e1a650d254430e19281ad593136bf4b6e7b476cd989b5d9fbc6da22f25f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/P30-1534-no-transaction-before-preservation.json",
+      "bytes": 713,
+      "sha256": "79ef2e1a650d254430e19281ad593136bf4b6e7b476cd989b5d9fbc6da22f25f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/P30-1534-no-transaction-matrix.json",
+      "bytes": 140319,
+      "sha256": "8509281ac87eef29cefe68045ca2de1b9b93e6f71c660401bc2eadd9157ea693"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/P30-1534-no-transaction-mutant-full-closure.json",
+      "bytes": 1400381,
+      "sha256": "6901d3730a48e65c62f46eeb0c5b391cb8041067434dbe8248ccdf366d68e4e3"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/P30-1534-no-transaction-mutant-source.ts",
+      "bytes": 5617,
+      "sha256": "2bbfda574cf689e5aacb62de9387a3a34dcfb6a924761cf99d5ff535de23fce1"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/P30-1534-no-transaction-restored-full-closure.json",
+      "bytes": 1400381,
+      "sha256": "8198cac2ab5fadefcb20247de3363e1df670a7b1692646853139725ca1fde6fd"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/P30-1534-no-transaction-source-change.json",
+      "bytes": 1866,
+      "sha256": "81c4325a96d2b43d0baf6694f92b139ac3527d3c97eed6ce5ef82d1a108f2b43"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/P30-1534-no-transaction.patch",
+      "bytes": 576,
+      "sha256": "799d378af1ba70c4bb9c51ea5d9171f057200c36bf9d993c0d716a035770de18"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/after-initial-race-baseline-preservation.json",
+      "bytes": 713,
+      "sha256": "79ef2e1a650d254430e19281ad593136bf4b6e7b476cd989b5d9fbc6da22f25f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/artifact-index.json",
+      "bytes": 709120,
+      "sha256": "25d34f5f6d14630ea8851fafbca444d7c65196c1544f84e7f0d297ca305e914e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/before-initial-race-baseline-preservation.json",
+      "bytes": 713,
+      "sha256": "79ef2e1a650d254430e19281ad593136bf4b6e7b476cd989b5d9fbc6da22f25f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/closure/tests/p030NativeBudgetQualification/initialize.ts",
+      "bytes": 5037,
+      "sha256": "1722948592782c4951d2ffb8dfb41606f03a0c13e6b8572926cdeb997ee569cc"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/closure/tests/p030NativeBudgetQualification/race.test.mjs",
+      "bytes": 22462,
+      "sha256": "aa4df09b0a3db096b475b3e8788b2fcd6ce36e06f742a98d71129b095b4af788"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/closure/tests/p030NativeBudgetQualification/reader.ts",
+      "bytes": 3498,
+      "sha256": "eb59715562e4dfe3885cd83fcd49a7deafcf7577fa93f6d227b8f7347445e048"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/closure/tests/p030NativeBudgetQualification/support.ts",
+      "bytes": 3894,
+      "sha256": "c77718b848d7086326c93ae2643b55253ad30ce4eddbf7645adec516330a1763"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/closure/tests/p030NativeBudgetQualification/worker.ts",
+      "bytes": 7537,
+      "sha256": "d1eb246719450f10a2ede72059dafad5bf2251ad060762b5d6d7ac694e9c2b3b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/commands-frozen.jsonl",
+      "bytes": 10617,
+      "sha256": "05ab32bfa8b591bb4c7cfa582c99c0d0e533d3795a1456ab13e10caa4a58b471"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/compiled-original.json",
+      "bytes": 462540,
+      "sha256": "82ff86751e49686db52385c53bac4a2c7ef010a2034745289731d4e6d4ac7598"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/controller.py",
+      "bytes": 20851,
+      "sha256": "a322583ddbc96bbf4efe5a3286031fe34ab326eee3741b0750d6344852a75953"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/dependency-links.json",
+      "bytes": 104367,
+      "sha256": "af2721890cc6ba54444b01dad74639b5bb005c715ee414e5d592aa81216fcc36"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/events/init/cleanup.json",
+      "bytes": 184,
+      "sha256": "29b921a35afce1b3b92e08e712dd86f76e30d5111f899c4e8778f0399412f268"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/events/init/job.json",
+      "bytes": 319,
+      "sha256": "720409a9b55cfdc6571e7eb4a20709104c511b31ba15fbb484cbc37f4690f322"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/events/init/pins-before-artifacts.json",
+      "bytes": 1883,
+      "sha256": "e8763c3c89517bbb2a5c4474b26b80f30c646dd8165ec29b6fcdbb7ee48d0dff"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/events/init/result.json",
+      "bytes": 4490,
+      "sha256": "a8cfa3b34fee91366c4b45834fa20556f0851036319bd126e4b60d019f0af77e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/events/left/attempt.json",
+      "bytes": 118,
+      "sha256": "ee2c31a23c717f1df2a88c3767634140f91ed7654106579a99a7329b24bda167"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/events/left/cleanup.json",
+      "bytes": 115,
+      "sha256": "72b5019f42e8d4a4a766bb162ccc0848a298c86ad9b6305133f1ed3083a5e4cd"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/events/left/go",
+      "bytes": 8,
+      "sha256": "1d566b34bf20c67837166d44cfb00f4b9a2a3fbaf3b31d67caf0dffba52f18a7"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/events/left/job.json",
+      "bytes": 319,
+      "sha256": "7666786b45b2b6539df33dfe188be5ddd0d39008fab8d0a4b7e0adb5b7639e4d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/events/left/ready.json",
+      "bytes": 1738,
+      "sha256": "546e93c09f06e4b0f28f65dff8ada9a49ae9cbfee35d28c39ce13613e5dcbc7e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/events/left/release",
+      "bytes": 8,
+      "sha256": "3933e3274b63dc01fd286d6d939a626867c83a4603fc4347e0f8b8856f1b98fd"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/events/left/result.json",
+      "bytes": 500,
+      "sha256": "5b074cd80ebc9e8f6e085d55200baa8739bed1c0e029b360eca4011f892789cf"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/events/positive/attempt.json",
+      "bytes": 117,
+      "sha256": "2134fce48587a9f87cfd4ee2e9d97a705b55343cd32348847f8ab1128068e1fb"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/events/positive/cleanup.json",
+      "bytes": 1097,
+      "sha256": "a86782f8c1ed12888d9a4a983429cadef7938a554fc12bf81191cb75f35dbce0"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/events/positive/gate-completed.json",
+      "bytes": 887,
+      "sha256": "1304600a4d874a730bc05eaabb547fc5feeecdbbb6eecfc5444a021aacf42e21"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/events/positive/gate.json",
+      "bytes": 798,
+      "sha256": "2b9c26163715f330cad8866a06925e482d157171e24ba20e64b74859e4131597"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/events/positive/go",
+      "bytes": 8,
+      "sha256": "1d566b34bf20c67837166d44cfb00f4b9a2a3fbaf3b31d67caf0dffba52f18a7"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/events/positive/job.json",
+      "bytes": 326,
+      "sha256": "931f01701f3a46e4e98629e65d324514144640818da1f5e10337eac60604ccfb"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/events/positive/ready.json",
+      "bytes": 1746,
+      "sha256": "6bf44dfc211977a8d2eee60e21fdf6d0d8b29d3b1babae7e13f96ef46ea40e48"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/events/positive/release",
+      "bytes": 8,
+      "sha256": "3933e3274b63dc01fd286d6d939a626867c83a4603fc4347e0f8b8856f1b98fd"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/events/positive/result.json",
+      "bytes": 1442,
+      "sha256": "0fa48c4aaeb4f4c3a0c612e1daae21e37cd91c3feffd88a0a288996b801a905f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/events/read-control/cleanup.json",
+      "bytes": 70,
+      "sha256": "06b589d748c46dc90ef7a9cefbc4564c2037989798c2dfbe6284c862c709e113"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/events/read-control/job.json",
+      "bytes": 330,
+      "sha256": "c1d75e27aab6ec388da9993034e1bc8b4e468aab33ed7ac07e77238eff7cad54"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/events/read-control/result.json",
+      "bytes": 15440,
+      "sha256": "97b4fb0f492f59d949322f262a99bb12b78a1ffc254ed25f1f581524c1bc838a"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/events/read-race/cleanup.json",
+      "bytes": 70,
+      "sha256": "0eb2fccbb1351626fdad2115af69a4c003d4d893ba5f22457af059e98719f7e1"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/events/read-race/job.json",
+      "bytes": 324,
+      "sha256": "4b3fefc970b9df3b47e667d5378d1563421f550a9f726b00b68754c2bc61b796"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/events/read-race/result.json",
+      "bytes": 22406,
+      "sha256": "1302e5e129243ffaa452fa22f90e1b266a96c0925c4db10318e9d6030e2ad6c9"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/events/right/attempt.json",
+      "bytes": 117,
+      "sha256": "d6054462d9992d151a619955d5dfe08c404365663b8dda1476242c6d48439925"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/events/right/cleanup.json",
+      "bytes": 1097,
+      "sha256": "f794ecba4f67766b9f787a076542069f38d5256efa6bc82b4ff7566de8c26f43"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/events/right/gate-completed.json",
+      "bytes": 887,
+      "sha256": "cae15dc531da3cb44478029ef858be7c97e2addbd111d00828ad1605ccdef4bd"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/events/right/gate.json",
+      "bytes": 798,
+      "sha256": "0d4f30cee60f971d8f428e3869e5b30c1cf8a983f2161d4578973717dfc7033f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/events/right/go",
+      "bytes": 8,
+      "sha256": "1d566b34bf20c67837166d44cfb00f4b9a2a3fbaf3b31d67caf0dffba52f18a7"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/events/right/job.json",
+      "bytes": 320,
+      "sha256": "7bdf67df7bd665806a5bdf28c249b7fc764e58651fc4fbc9afe282fdf8e2be21"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/events/right/ready.json",
+      "bytes": 1740,
+      "sha256": "dd8821249ea599fc37960c1dc81c42132b52332c3e135bddd647c9605f7eec4d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/events/right/release",
+      "bytes": 8,
+      "sha256": "3933e3274b63dc01fd286d6d939a626867c83a4603fc4347e0f8b8856f1b98fd"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/events/right/result.json",
+      "bytes": 1442,
+      "sha256": "301e7b75763b19e52637cbc2576fd162b8c42b09b121e1e16aeb5ecb09d1e53e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/observations.json",
+      "bytes": 4702384,
+      "sha256": "6d1d430e59e44cb1f07429fd22222a70c6f33466668fa590b58497882a37fcde"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/outer-cleanup.json",
+      "bytes": 138,
+      "sha256": "6199f5a6e1b81e4e95ef0dd2d9c1d45b7cc727f7d07daba05160fb5213fdee34"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/phase-ownership.json",
+      "bytes": 148,
+      "sha256": "ef07d3081bdcd1a37426f3a1e77bb920c2262ec8822481624a6ecd3b8af4202a"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/public/control/auditor.pub.pem",
+      "bytes": 113,
+      "sha256": "2f488a2f09ff4aa6550a6bbd39448f364b4ca045b01913a966e5a192b76ca3c3"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/public/control/before-artifacts.json",
+      "bytes": 870,
+      "sha256": "fd493bca1d47b1d65280d5a08097f1cba9f94af684bc4736f9784dfd39708c2a"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/public/control/budgets.yaml",
+      "bytes": 702,
+      "sha256": "d9ef7cd679b71d35ad3a53bddfcdb3fdaa70de28a5e18344bcdb823675c76644"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/public/control/budgets.yaml.sig",
+      "bytes": 247,
+      "sha256": "de45f6fc31160e1172cef7b68a4207a0e0234a98b12a3e4a4b0175fac5694a22"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/public/control/lease.pub.pem",
+      "bytes": 113,
+      "sha256": "c41b66bbd4da43e8bcec735e7171177b502ced3fed475e4dca25d478a93574f8"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/public/control/monitor.pub.pem",
+      "bytes": 113,
+      "sha256": "fcdb346607fc910feadf7a41953055c8bc5bfa537dcf795c054826f2d082d5a8"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/public/control/session.pub.pem",
+      "bytes": 113,
+      "sha256": "03a4be772d15dbc40692d17c9048d710dfd83824a079d7d7b85c7ce3d58c4861"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/public/race/auditor.pub.pem",
+      "bytes": 113,
+      "sha256": "57120df674a26e7ea62e796bb0849fb01ae18a2178f563f95c0072ae6dba6c74"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/public/race/before-artifacts.json",
+      "bytes": 867,
+      "sha256": "a90c17b06ff3a3588e380613fb6ad840667e433d31f7c0b3cfbfc3e7cd1da48d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/public/race/budgets.yaml",
+      "bytes": 702,
+      "sha256": "d9ef7cd679b71d35ad3a53bddfcdb3fdaa70de28a5e18344bcdb823675c76644"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/public/race/budgets.yaml.sig",
+      "bytes": 247,
+      "sha256": "0be20b16c800cd7be44cd804a867c82f1c30abf191a7e7e3b3511c481891be1e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/public/race/lease.pub.pem",
+      "bytes": 113,
+      "sha256": "d061f1c40e9672567ac0a245136bb2dc07e9519908830b94f2e41caf9d26b284"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/public/race/monitor.pub.pem",
+      "bytes": 113,
+      "sha256": "d818ff89de91312e2656220fbbe7fd5e2cb21aecf46efa2aac6c8a80d52cf226"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/public/race/session.pub.pem",
+      "bytes": 113,
+      "sha256": "a87967c6ac470b68527765afd30056fe667786b3192674f58587b6b7844bc431"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/streams/init.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/streams/init.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/streams/left.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/streams/left.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/streams/positive.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/streams/positive.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/streams/read-control.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/streams/read-control.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/streams/read-race.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/streams/read-race.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/streams/right.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-baseline/streams/right.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/events/init/cleanup.json",
+      "bytes": 184,
+      "sha256": "c36d904a3765edbddb69a83da35944c68cc17a2eec444071493d07bddc7f8ffd"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/events/init/job.json",
+      "bytes": 315,
+      "sha256": "73bf9e4c54cd09dcd360c65db5f385547cd22d29b7dd9a648b8ea45b4c866a1b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/events/init/pins-before-artifacts.json",
+      "bytes": 1883,
+      "sha256": "a67c93919f2587cae9b8a56606148bd95497210b34f581811d6a96862bc391cf"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/events/init/result.json",
+      "bytes": 4478,
+      "sha256": "901e0366e0beb5da4e424dad8fde7ff7fa0f33c7ec5bc5c62041afb5d62d3484"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/events/left/attempt.json",
+      "bytes": 118,
+      "sha256": "91926c7a9a5d36aa6264b313c68a3f1f0cc706170342e5f346b18bd311f706cb"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/events/left/cleanup.json",
+      "bytes": 1099,
+      "sha256": "5d633b49dbb535bed4b0d6f060809a46443352e2c0f323e918eb30c04188a2de"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/events/left/gate-completed.json",
+      "bytes": 889,
+      "sha256": "d5322bf79e778158e08d1a10016a8d9c353083d770457bb2b0b2f53f79720531"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/events/left/gate.json",
+      "bytes": 800,
+      "sha256": "06df61cd4a01bcdc72873cea2319b1395570d949f9153a844372262fe6549c2c"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/events/left/go",
+      "bytes": 8,
+      "sha256": "1d566b34bf20c67837166d44cfb00f4b9a2a3fbaf3b31d67caf0dffba52f18a7"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/events/left/job.json",
+      "bytes": 315,
+      "sha256": "1b1af545a9706a6372ea0ef99e1cd62583a003025443f4c97c7a2a5c1f759df4"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/events/left/ready.json",
+      "bytes": 1734,
+      "sha256": "d0c0ce56fe4f59409943fd81918e0a638f07266806466e06d9460466a0b0134f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/events/left/release",
+      "bytes": 8,
+      "sha256": "3933e3274b63dc01fd286d6d939a626867c83a4603fc4347e0f8b8856f1b98fd"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/events/left/result.json",
+      "bytes": 1444,
+      "sha256": "90c7b5a9e210b852a447d60ff91a92bd23a3dd8eb71df330c022b102a9fd07a1"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/events/positive/attempt.json",
+      "bytes": 117,
+      "sha256": "97ca840a214c4798fa79f559083627e2f00180d879affb1200e69e63f161ce33"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/events/positive/cleanup.json",
+      "bytes": 1098,
+      "sha256": "fc08af371612f5943408f81ddfd426a41d9ccea34d05812784bca9e0501e9dc7"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/events/positive/gate-completed.json",
+      "bytes": 888,
+      "sha256": "c13aedfe5eec8a0f9b66b8844154acb8052f00079fa153dcd366cb17636b0ba5"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/events/positive/gate.json",
+      "bytes": 799,
+      "sha256": "f0655a1af0a860719b2aad5bf7ad595e6c1b8bd052bb9f1cae3c08744d1d8846"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/events/positive/go",
+      "bytes": 8,
+      "sha256": "1d566b34bf20c67837166d44cfb00f4b9a2a3fbaf3b31d67caf0dffba52f18a7"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/events/positive/job.json",
+      "bytes": 322,
+      "sha256": "912c2c06981da9b557d4d03ecc6f0dfc10a05efbdfc05b1f106a4329d3de0b20"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/events/positive/ready.json",
+      "bytes": 1742,
+      "sha256": "e40f3ff8635533d23dc499b1309691e374fe1535998c787db84f02fd80d594fd"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/events/positive/release",
+      "bytes": 8,
+      "sha256": "3933e3274b63dc01fd286d6d939a626867c83a4603fc4347e0f8b8856f1b98fd"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/events/positive/result.json",
+      "bytes": 1443,
+      "sha256": "633030ff0697408291dcc8698b563aa50170c3d639b3490381d1c713f65ed78c"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/events/read-control/cleanup.json",
+      "bytes": 70,
+      "sha256": "7fa5fe2948f946a044e395c91c14cdb5db06900b77e502807b9b4534784b492b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/events/read-control/job.json",
+      "bytes": 326,
+      "sha256": "0e60b723b59787ab55accc79be83dc1e734eb90cef9ad293b111eac66e6b2160"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/events/read-control/result.json",
+      "bytes": 15436,
+      "sha256": "09376ef96f721fcb4843d762cbcad93331633d66618ec1457514f375a05a2f16"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/events/read-race/cleanup.json",
+      "bytes": 70,
+      "sha256": "2a52aee1d99c1f891f2422829d7ce0e05a6dc4c08efcbe1ced1512cd4d363b13"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/events/read-race/job.json",
+      "bytes": 320,
+      "sha256": "1a0c6c40eaa831326122aab03a480145247f0abeaf19b5b030c209402de5d136"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/events/read-race/result.json",
+      "bytes": 27142,
+      "sha256": "d6f1a6597983145cd947dec7f82840a9d1b315afa709d0c519e78bd2bf8ebd6c"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/events/right/attempt.json",
+      "bytes": 117,
+      "sha256": "e2ea2ca815e66cc825f03fc18cea4373d704c63895b01f4d3bc734499bd322d4"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/events/right/cleanup.json",
+      "bytes": 1096,
+      "sha256": "8013d8273cdc8bf957ca68f859909ab094fc763fc5e3ab05c10dae3cd00a14b9"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/events/right/gate-completed.json",
+      "bytes": 886,
+      "sha256": "267d38cb89dd8aa91378bb245f72b9733b8b767f0291aed93cc47f0fa9dab89a"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/events/right/gate.json",
+      "bytes": 797,
+      "sha256": "6e4fcb09d9703980bc2dfff060638640a8af47ab90b4956a71f530046470b9d8"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/events/right/go",
+      "bytes": 8,
+      "sha256": "1d566b34bf20c67837166d44cfb00f4b9a2a3fbaf3b31d67caf0dffba52f18a7"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/events/right/job.json",
+      "bytes": 316,
+      "sha256": "3202b6184edfb979ec90c8964a1bc86091355a6dc9d5b38fc6af2439a46e20b0"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/events/right/ready.json",
+      "bytes": 1736,
+      "sha256": "8e84d911c552674aa4f60dbf4499442153afa88eb26ab9bdc0b12658760c713c"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/events/right/release",
+      "bytes": 8,
+      "sha256": "3933e3274b63dc01fd286d6d939a626867c83a4603fc4347e0f8b8856f1b98fd"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/events/right/result.json",
+      "bytes": 1441,
+      "sha256": "cf6d7045d7ff745b813c96a09d022884958f21002746fc057a87f7ecd82f0494"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/observations.json",
+      "bytes": 4716185,
+      "sha256": "d62580199c6e52db1d7429f6db71a4093d0a72a31599fe4a4aff9af368aa37aa"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/outer-cleanup.json",
+      "bytes": 2487,
+      "sha256": "120b8d6d5581c20bf842929bc952efab59554f456f0fb816983fb2bbe7b45c14"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/phase-ownership.json",
+      "bytes": 148,
+      "sha256": "510d9cb8cb7253980c2af2184190264da9898507dc174c578296a26f2943a931"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/public/control/auditor.pub.pem",
+      "bytes": 113,
+      "sha256": "9e9bc88384ff8aa85fea1ca3c47ac0a64d95210bba06ba12823cc22b6d577707"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/public/control/before-artifacts.json",
+      "bytes": 870,
+      "sha256": "7007a185a4490e6c12ccb94db8134df4e8d6e8203b777176c95ec62de6ef3a0a"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/public/control/budgets.yaml",
+      "bytes": 702,
+      "sha256": "d9ef7cd679b71d35ad3a53bddfcdb3fdaa70de28a5e18344bcdb823675c76644"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/public/control/budgets.yaml.sig",
+      "bytes": 247,
+      "sha256": "bd0478fa03b3641c9ea1049a70758532e98bf6ce8dd810708141bb6b8048f8b4"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/public/control/lease.pub.pem",
+      "bytes": 113,
+      "sha256": "1f670fd5b6192f517b421f0079ded1a7f6a76dd8f4f714c04f2c763711d72cc6"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/public/control/monitor.pub.pem",
+      "bytes": 113,
+      "sha256": "505db193dbd1cd85319e313f84bd82b757e1f3a6e625dae3c6aad8d966c313fe"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/public/control/session.pub.pem",
+      "bytes": 113,
+      "sha256": "44ccf6fcf343fedf41fd52007ecaf2f61da721cdc098df7bdb9f3ee72686a9eb"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/public/race/auditor.pub.pem",
+      "bytes": 113,
+      "sha256": "1a8678626734aa1e63351ec0d41fdaa1a4f51739cbacfe8f7de74172a58eb97b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/public/race/before-artifacts.json",
+      "bytes": 867,
+      "sha256": "9d0fcfe072b3523a836e2b0693b244ab194bed1e17703a91a50cb25ab51bf543"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/public/race/budgets.yaml",
+      "bytes": 702,
+      "sha256": "d9ef7cd679b71d35ad3a53bddfcdb3fdaa70de28a5e18344bcdb823675c76644"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/public/race/budgets.yaml.sig",
+      "bytes": 247,
+      "sha256": "4a1f59be4a3240bdf73162974130000e9cff3901dc0b87111369601844722041"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/public/race/lease.pub.pem",
+      "bytes": 113,
+      "sha256": "2c39545b03a06c2d1858556ab86e9e8366220cd05070456aa386733e294d08b1"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/public/race/monitor.pub.pem",
+      "bytes": 113,
+      "sha256": "77da6ad3ebf19720632ac4b1010ea2468e93eb2f92471464b678bf99c85a9ea1"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/public/race/session.pub.pem",
+      "bytes": 113,
+      "sha256": "fccdf39dfa5c34d5d745381495a734ac69d15afb917edb633e3d6389cd259fe2"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/streams/init.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/streams/init.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/streams/left.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/streams/left.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/streams/positive.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/streams/positive.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/streams/read-control.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/streams/read-control.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/streams/read-race.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/streams/read-race.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/streams/right.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-mutant/streams/right.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/events/init/cleanup.json",
+      "bytes": 184,
+      "sha256": "346d256eca2be75a2f3745e75c9956898c95275ee7eadb5259f6cd0c163e2f2a"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/events/init/job.json",
+      "bytes": 319,
+      "sha256": "490e09d319b7922cfa545dc47d5877807dad702112826e80977205902db864af"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/events/init/pins-before-artifacts.json",
+      "bytes": 1883,
+      "sha256": "6011432418cde37d87e052a22473da97d6e3d2a6183cf95f48d3651440c889e1"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/events/init/result.json",
+      "bytes": 4490,
+      "sha256": "db27cf8bb632056abdea13dac2abbd01f0cb2e31c1899f9ec7499ad8b467125f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/events/left/attempt.json",
+      "bytes": 118,
+      "sha256": "2de4170f7e747a4bc8630247affffabd66f7e16623736d5807ec9808a0c8aa7b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/events/left/cleanup.json",
+      "bytes": 1098,
+      "sha256": "f98098566bf039f39b07d56c788e23bf58296fc0e957c3343500cc402cd630fe"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/events/left/gate-completed.json",
+      "bytes": 888,
+      "sha256": "1044ed001085d5f9ba471cb200a116bf571fc4b068d103f10a4b0fb4958b30c5"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/events/left/gate.json",
+      "bytes": 799,
+      "sha256": "15ee8514323eb87cf6ffbf5e5172c5afef7daa22ee264a6a5a8ce20382bdef69"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/events/left/go",
+      "bytes": 8,
+      "sha256": "1d566b34bf20c67837166d44cfb00f4b9a2a3fbaf3b31d67caf0dffba52f18a7"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/events/left/job.json",
+      "bytes": 319,
+      "sha256": "919efa33619aa6f47cc772ae70639724d2d97ccb2bd6f4b6fbe3f37c1c8f9729"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/events/left/ready.json",
+      "bytes": 1738,
+      "sha256": "8fd5c9c219879d76dba4430da53c3fa5547f936698c2a42525b351224f67611f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/events/left/release",
+      "bytes": 8,
+      "sha256": "3933e3274b63dc01fd286d6d939a626867c83a4603fc4347e0f8b8856f1b98fd"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/events/left/result.json",
+      "bytes": 1443,
+      "sha256": "7697c4429ee8e7cc9c44122c81adfc8fe40790a26ac2ba1ad100951056b3e357"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/events/positive/attempt.json",
+      "bytes": 114,
+      "sha256": "feed9f7c3be1f16eafd83b74f712a69393330d102a47cc462531199a1014a999"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/events/positive/cleanup.json",
+      "bytes": 1097,
+      "sha256": "c70b25e102e66b295b2f512bd57ff519b8287662258c0fd37e83d2f05ee97868"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/events/positive/gate-completed.json",
+      "bytes": 887,
+      "sha256": "ff4be6c2ee375100da3d2826a360737c762ccaaf0c0bf008db30885a89946d1f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/events/positive/gate.json",
+      "bytes": 798,
+      "sha256": "a5e9d8f8e7976942c50733194dc9d39973e413d87a93de99014ffe6aa34008dc"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/events/positive/go",
+      "bytes": 8,
+      "sha256": "1d566b34bf20c67837166d44cfb00f4b9a2a3fbaf3b31d67caf0dffba52f18a7"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/events/positive/job.json",
+      "bytes": 326,
+      "sha256": "348ab9c9f91bb6fbfa8049a77da56c330cdc3fbc05803217dc218e6afc35394e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/events/positive/ready.json",
+      "bytes": 1746,
+      "sha256": "b43fbe0cf6bba80deda9d10222bee26a6f8adb064c8c51e460e52823de38fc3e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/events/positive/release",
+      "bytes": 8,
+      "sha256": "3933e3274b63dc01fd286d6d939a626867c83a4603fc4347e0f8b8856f1b98fd"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/events/positive/result.json",
+      "bytes": 1442,
+      "sha256": "f5a3bc7a709eea582d94305e6fb6eb023bee696673bf79a95866e772d703bae4"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/events/read-control/cleanup.json",
+      "bytes": 70,
+      "sha256": "80dc5ae9106cda0333bc57054e79d77678759f544a8544bdb4e24f9c6c03741f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/events/read-control/job.json",
+      "bytes": 330,
+      "sha256": "1f219990e60bdaf9aba19ed15154383bfdd85529e0d9d189dbd32c401c01d10a"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/events/read-control/result.json",
+      "bytes": 15440,
+      "sha256": "40ced8dea87f6f0a953abc4fe44a108648ea9503b750dd016e259be864ff9f82"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/events/read-race/cleanup.json",
+      "bytes": 70,
+      "sha256": "b10bd1ec0fd73a3e783aea7af54c0867999ee29f5f0bfc516e198d1f66589aae"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/events/read-race/job.json",
+      "bytes": 324,
+      "sha256": "21c7e92aa8ab039846321071a1db150dfcd2e54f453bff98c7bf16770acaea50"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/events/read-race/result.json",
+      "bytes": 22406,
+      "sha256": "628d03192e08cc269651c979a717864d7faa9d330488cb05d08e668337cc2f00"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/events/right/attempt.json",
+      "bytes": 117,
+      "sha256": "0284292244efc89563d474dae20cd27e0641d093b4c16ebd8d2eb1d815a05f1c"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/events/right/cleanup.json",
+      "bytes": 115,
+      "sha256": "126037ea2b91cbb3d84309e41d1eced2354bb56910c221bbb4adae13ea9d45a9"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/events/right/go",
+      "bytes": 8,
+      "sha256": "1d566b34bf20c67837166d44cfb00f4b9a2a3fbaf3b31d67caf0dffba52f18a7"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/events/right/job.json",
+      "bytes": 320,
+      "sha256": "01fe87010ce8d8ee2e0f30ebafda337a36c354f5913df663045808f9044e8ec4"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/events/right/ready.json",
+      "bytes": 1740,
+      "sha256": "f6291e8de404af69bef8b21eb6b4d03b3bef0cc7160f8659425c211e16bce2b5"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/events/right/release",
+      "bytes": 8,
+      "sha256": "3933e3274b63dc01fd286d6d939a626867c83a4603fc4347e0f8b8856f1b98fd"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/events/right/result.json",
+      "bytes": 500,
+      "sha256": "e9222011fcadf893edb053792089ee8e6ca926e2cb5f21eef8956b25e2ffa947"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/observations.json",
+      "bytes": 4702378,
+      "sha256": "18c16fc9b64487eab246b97ef7f3f9e517b361eb9f901a8e8a2137edf89f85b7"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/outer-cleanup.json",
+      "bytes": 138,
+      "sha256": "655c9ea96c3bcaadff14d9fee554d08e56fa1a4df5d9b81d0c0301dcfdc53998"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/phase-ownership.json",
+      "bytes": 148,
+      "sha256": "7b1b9f3ec59d5abc9e510f25ae1cd7621050056e24b4f1db67de8e2d1ca2149e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/public/control/auditor.pub.pem",
+      "bytes": 113,
+      "sha256": "8c68031926c9ea20c10d11667968bf54d1572cbb9b1961b9bd445745761bbdb9"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/public/control/before-artifacts.json",
+      "bytes": 870,
+      "sha256": "cc684d1ac01dbce3b0acf167ad15588c76a2f0b648f9709eeb1f0d60cc67c204"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/public/control/budgets.yaml",
+      "bytes": 702,
+      "sha256": "d9ef7cd679b71d35ad3a53bddfcdb3fdaa70de28a5e18344bcdb823675c76644"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/public/control/budgets.yaml.sig",
+      "bytes": 247,
+      "sha256": "bfdaea015b1f69a98319b5eda3b6ec90b24bc031531f280608df5ae846d5e7e5"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/public/control/lease.pub.pem",
+      "bytes": 113,
+      "sha256": "97588e444efafe94e149718c188d985fd7cdc82e61a498055fccdf0df0f19af1"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/public/control/monitor.pub.pem",
+      "bytes": 113,
+      "sha256": "df9532f20b5e61bf347532396e45d7c9f0754dd3c4de4b2ba7477b314f911099"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/public/control/session.pub.pem",
+      "bytes": 113,
+      "sha256": "38b8bc42cb6284f636d647e74f706a55337750e0ef696d83dfbec06198fc9c4d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/public/race/auditor.pub.pem",
+      "bytes": 113,
+      "sha256": "713ddafce35a1c561f1f475655e05719675bda9662a730cabe231b349423d878"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/public/race/before-artifacts.json",
+      "bytes": 867,
+      "sha256": "5a8395dc52a7f7a96ec8777b134935f6cc17bc9c770d3819bf723d68cabbe75f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/public/race/budgets.yaml",
+      "bytes": 702,
+      "sha256": "d9ef7cd679b71d35ad3a53bddfcdb3fdaa70de28a5e18344bcdb823675c76644"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/public/race/budgets.yaml.sig",
+      "bytes": 247,
+      "sha256": "8a05acac4b5957208afbf68735729fd1b86f5db9acb9e1dad77a4cb55f8bac57"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/public/race/lease.pub.pem",
+      "bytes": 113,
+      "sha256": "aae54df20570ce718fd21fb4d4ae2105cebce58ed3f4f6e95d3d263331a84a68"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/public/race/monitor.pub.pem",
+      "bytes": 113,
+      "sha256": "2928e97e8a99a14c2daecba202e282f7ed057a16d78ec36fdcea58e9fe9d185b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/public/race/session.pub.pem",
+      "bytes": 113,
+      "sha256": "8becf6693f3197f83d531c47bfa80594aebf63ba588f9fd317a1ec6cf3aa6df1"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/streams/init.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/streams/init.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/streams/left.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/streams/left.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/streams/positive.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/streams/positive.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/streams/read-control.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/streams/read-control.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/streams/read-race.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/streams/read-race.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/streams/right.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/P30-1534-no-transaction-restored/streams/right.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/initial-unchanged-v2-race-baseline/events/init/cleanup.json",
+      "bytes": 184,
+      "sha256": "a0c3b617aefec9b8e18a411f507e6699c003516fb6ad6e3bfdbe4fec608ab86f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/initial-unchanged-v2-race-baseline/events/init/job.json",
+      "bytes": 323,
+      "sha256": "fd57320ae76be4b82f7663bee4630b24c652ee36a0eb2b0fc98fed307e2fd5da"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/initial-unchanged-v2-race-baseline/events/init/pins-before-artifacts.json",
+      "bytes": 1883,
+      "sha256": "0125b20a748d097c19f1920896935c7445af376d9da4f4bbb1b877d1975ac74c"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/initial-unchanged-v2-race-baseline/events/init/result.json",
+      "bytes": 4502,
+      "sha256": "3b3c9ee231904f25c4ce0dae896b903209118a627b45c47aae7a3c6ab548b47d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/initial-unchanged-v2-race-baseline/events/left/attempt.json",
+      "bytes": 115,
+      "sha256": "ccc96571bd7e45b6792210a160e0da987541e1c63de0664dc305c2d13455f925"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/initial-unchanged-v2-race-baseline/events/left/cleanup.json",
+      "bytes": 115,
+      "sha256": "df02a3fee5c5494914e1fd1bc998b6d8d5e4bfc387b33c1c9f022b7dee61782f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/initial-unchanged-v2-race-baseline/events/left/go",
+      "bytes": 8,
+      "sha256": "1d566b34bf20c67837166d44cfb00f4b9a2a3fbaf3b31d67caf0dffba52f18a7"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/initial-unchanged-v2-race-baseline/events/left/job.json",
+      "bytes": 323,
+      "sha256": "7cba1b51f4c045b8acce37f61f26216fec996a4b9bdc47391cba2ca0d9f6b091"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/initial-unchanged-v2-race-baseline/events/left/ready.json",
+      "bytes": 1742,
+      "sha256": "751cc52e8a788dbe8b504d7e1ac383df5fa475198e6f2ee6ff80ada5c0ac434f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/initial-unchanged-v2-race-baseline/events/left/release",
+      "bytes": 8,
+      "sha256": "3933e3274b63dc01fd286d6d939a626867c83a4603fc4347e0f8b8856f1b98fd"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/initial-unchanged-v2-race-baseline/events/left/result.json",
+      "bytes": 500,
+      "sha256": "1dc03159b6b6bcf9b890d4496264a095c4b8678470deaec0629815c68ee459b5"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/initial-unchanged-v2-race-baseline/events/positive/attempt.json",
+      "bytes": 117,
+      "sha256": "26fec547df59c3c47d255cbb791b8957400aea6024a01524a1786faaf200300e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/initial-unchanged-v2-race-baseline/events/positive/cleanup.json",
+      "bytes": 1097,
+      "sha256": "04b1b38aa736ace416159224168f41097ce196d200f63ee06d8b65de7cf745df"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/initial-unchanged-v2-race-baseline/events/positive/gate-completed.json",
+      "bytes": 887,
+      "sha256": "eb4e50bc76373ce61afc4270b69a318b3fac6eefbf5d7439408c1f950719d9ba"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/evidence/initial-unchanged-v2-race-baseline/events/positive/gate.json",
+      "bytes": 798,
+      "sha256": "e780832b0c8f3e2d820e9b8d965f84160a41674921835539785f276747377267"
+    }
+  ]
+}

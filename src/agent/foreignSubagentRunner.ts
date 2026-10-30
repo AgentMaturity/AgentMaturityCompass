@@ -18,8 +18,8 @@ import type { SubagentRunContext, SubagentRunResult, SubagentRunner } from "./su
  * Studio to be running; it mints its own `randomUUID()` session id, so the
  * announced `childSessionId` would name a session that does not exist; it
  * returns only an `exitCode` with no child text, so there is nothing to put in
- * `SubagentRunResult.text`; and its SANDBOX branch returns a hardcoded
- * `exitCode: 0`, so a crashed foreign agent reports success. This composes the
+ * `SubagentRunResult.text` (its SANDBOX branch also hardcoded `exitCode: 0`
+ * until WP36). This composes the
  * same primitives one level down instead.
  *
  * WHAT AMC CAN AND CANNOT BIND ON A FOREIGN CHILD. It cannot intercept the

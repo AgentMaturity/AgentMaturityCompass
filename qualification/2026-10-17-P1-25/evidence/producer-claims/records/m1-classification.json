@@ -1,0 +1,48 @@
+{
+  "schema": "p125pc-root-manual-control-classification/1",
+  "at": "2026-10-17T02:02:46.806000+00:00",
+  "phase": "p125pc-m1",
+  "sourceCommit": "5d4e9e8d74bef32e68090369223947691c5fea21",
+  "operator": "DROP-PRODUCER-TS",
+  "outcomeSha256": "246ee26d463193f1b2a3b10d8fc3c5cef9fa6b0faf93787f2167ee6c64121fd0",
+  "rootAllFailuresRead": true,
+  "allFailuresClassified": true,
+  "firstSensitiveAssertionRead": true,
+  "noHookOrEnvironmentFailure": true,
+  "actualCohortAndHooksMatchCanonical": true,
+  "actualOwnedChildrenAndCleanupRead": true,
+  "allFailures": [
+    {
+      "test": "P1-25 real signed ledger checkpoint transitions persists backdated and postdated producer claims in the signed ledger and reports their genuine checkpoint window",
+      "messages": [
+        "expected 1792202534624 to be 1792202233999 // Object.is equality"
+      ],
+      "classification": "Intended producer timestamp preservation failure. Replacing input.ts with Date.now() stored 1792202534624 instead of requested backdate1792202233999. The other23 tests passed; no hook, unhandled or late error.",
+      "firstSensitiveFrame": "at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0F9GlT/checkout/tests/time/checkpointWindow.test.ts:698:36"
+    }
+  ],
+  "firstSensitiveAssertion": "checkpointWindow.test.ts:698:36 expect(storedBackdated.ts).toBe(backdatedTs) rejects the actual stored/requested mismatch.",
+  "masking": [
+    "Postdated append/assertion707 not reached.",
+    "Second covering checkpoint/grant and covered ledger verification not reached.",
+    "Reader BACKDATED/POSTDATED finding assertions782/783 and final nonmutation/ledger checks not reached.",
+    "One first grant is independently query-bound; no second request/grant exists or is credited."
+  ],
+  "actualPublicAuditPin": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-m1-public-audit.json",
+    "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-m1-public-audit.json",
+    "bytes": 188394,
+    "sha256": "ea20094c661260d2d57eeb1aab66daf2bca964619b54ca6aa70e2b8bdf8aaa9b",
+    "dev": 16777231,
+    "inode": 543993849,
+    "nlink": 1
+  },
+  "actualCleanup": {
+    "children": 44,
+    "explicitChildStreamHashCount": 88,
+    "closedSockets": 11,
+    "closedLedgerOwners": 34
+  },
+  "sourceOnlyControl": true,
+  "compiledAndNativeUnchanged": true
+}

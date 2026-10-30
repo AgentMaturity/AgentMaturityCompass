@@ -1,0 +1,8 @@
+$ amc domain assess --agent default --domain health
+# exit 1
+
+# stderr
+Industry Packs are locked.
+The planned commercial tier is $9.99/month for all 41 Industry Domain Packs.
+Public checkout and automatic license issuance are not live yet.
+Do not send payment or expect a license until AMC marks this channel live.

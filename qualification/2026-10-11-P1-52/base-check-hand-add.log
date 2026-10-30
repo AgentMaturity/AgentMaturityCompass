@@ -1,0 +1,5 @@
+# hand-added deadCode entry for an untracked dead file src/p152HandAdded.ts; base = HEAD (baseline committed)
+$ npm run -s check:dead-code -- --base HEAD
+{"scan":"dead-code","baseline":2788,"current":2788,"new":0,"stale":0,"accepted":0}
+baseline entry c6cd8a4e7e7da419e8b51060783db68d1fd9dc49c077e5c8cb4af5b681dc8e86 (src/p152HandAdded.ts files) is not in the baseline at HEAD (merge-base d28ec71476fe); a new finding enters only through --accept <id> --reason
+exit 1

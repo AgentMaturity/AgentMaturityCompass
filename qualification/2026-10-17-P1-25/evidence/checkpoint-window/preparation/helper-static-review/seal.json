@@ -1,0 +1,25 @@
+{
+  "schema": "p125k-independent-static-helper-review-seal/1",
+  "at": "2026-10-16T23:33:37.712909+00:00",
+  "blockers": [],
+  "inputPinCount": 192,
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/helper-static-review/review.json",
+      "bytes": 9888,
+      "sha256": "8df0b3a546e8d62b14f0aa29dc6cf1b358e7359047f00305479456a8537d35d4"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/helper-static-review/README.md",
+      "bytes": 2932,
+      "sha256": "484a4cdc5eeed82ed1f1d8dd54b051afd7e88fba1824d2516bad7be6618fc5fe"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/helper-static-review/input-pins.json",
+      "bytes": 42808,
+      "sha256": "d550e59f582c15d8c8e28be72abf04cedbbf21b71898d2f7a3d5d56030775110"
+    }
+  ],
+  "readOnlyStaticNoExecutionOrCheckoutWrite": true,
+  "noFutureRuntimeCredit": true
+}

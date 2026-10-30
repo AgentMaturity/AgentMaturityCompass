@@ -1,6 +1,7 @@
 /** Origin addressing recovered from sweet-merkle; measurements come from authenticated payloads. */
 import { randomBytes } from "node:crypto";
 import type { EvidenceEvent } from "../types.js";
+import { operationalEvidenceProblems, type OperationalEvidenceOptions } from "../keys/operationalLedgerReader.js";
 import { getPublicKeyHistory, getPublicKeyPem, verifyHexDigestAny } from "../crypto/keys.js";
 import { canonicalMetadataForHash } from "../ledger/eventHash.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -19,8 +20,8 @@ export function describeLiveEntries(events: readonly EvidenceEvent[]): readonly 
   return foldSurfaceEntries(events).map(entry => ({ originEventId: entry.originEventId, sourceEventId: entry.sourceEventId,
     sourceEventHash: entry.sourceEventHash, slot: entry.slot, role: entry.role, kind: entry.part.kind, sha256: entry.part.sha256 }));
 }
-export function describeMeasuredLiveEntries(workspace: string, events: readonly EvidenceEvent[]): readonly (LiveSurfaceEntry & { readonly bytes: number | null })[] {
-  authenticateSession(workspace, events); validateSurfaceCompactions(workspace, events);
+export function describeMeasuredLiveEntries(workspace: string, events: readonly EvidenceEvent[], options: OperationalEvidenceOptions = {}): readonly (LiveSurfaceEntry & { readonly bytes: number | null })[] {
+  authenticateSession(workspace, events, options); validateSurfaceCompactions(workspace, events, options);
   const byId = new Map(events.map(row => [row.id, row]));
   return describeLiveEntries(events).map(entry => {
     const source = byId.get(entry.sourceEventId);
@@ -42,7 +43,9 @@ function authenticatedBytes(workspace: string, row: EvidenceEvent, allowPruned =
   return payload.bytes;
 }
 /** Authenticate this session slice without pretending its global chain starts at GENESIS. */
-function authenticateSession(workspace: string, events: readonly EvidenceEvent[]): void {
+function authenticateSession(workspace: string, events: readonly EvidenceEvent[], options: OperationalEvidenceOptions): void {
+  const delegated = operationalEvidenceProblems(workspace, events, options);
+  if (delegated.length) throw new Error(`compaction delegation invalid: ${delegated.slice(0, 3).join("; ")}`);
   const keys = getPublicKeyHistory(workspace, "monitor");
   const expected = process.env["AMC_EXPECTED_MONITOR_FINGERPRINT"];
   if (expected && sha256Hex(Buffer.from(getPublicKeyPem(workspace, "monitor"))) !== expected) throw new Error("compaction monitor trust root mismatch");
@@ -62,9 +65,11 @@ function authenticateSession(workspace: string, events: readonly EvidenceEvent[]
 }
 
 /** Reused by request reconstruction and both ledger backends. No workspace writes. */
-export function validateSurfaceCompactions(workspace: string, events: readonly EvidenceEvent[]): void {
+export function validateSurfaceCompactions(workspace: string, events: readonly EvidenceEvent[], options: OperationalEvidenceOptions = {}): void {
   const sessions = new Set(events.filter(hasOriginCompaction).map(row => row.session_id));
   if (!sessions.size) return;
+  const delegated = operationalEvidenceProblems(workspace, events, options);
+  if (delegated.length) throw new Error(`compaction delegation invalid: ${delegated.slice(0, 3).join("; ")}`);
   const states = new Map<string, readonly SurfaceEntry[]>(), prior = new Map<string, EvidenceEvent>(), rows = new Map<string, EvidenceEvent>();
   for (const row of events) {
     if (!sessions.has(row.session_id)) continue;
@@ -103,12 +108,12 @@ export function prepareSurfaceCompaction(workspace: string, events: readonly Evi
   readonly replacement?: string; readonly summaryRole?: "user" | "assistant"; readonly reason: string;
   /** Present only for automatic compaction; selects receipt v2. Savings are still measured here, never supplied. */
   readonly automatic?: AutomaticCompaction | undefined;
-}): { readonly surface: SurfaceCompactionOp; readonly payload: Buffer; readonly typeMeta: Record<string, unknown> } {
+}, options: OperationalEvidenceOptions = {}): { readonly surface: SurfaceCompactionOp; readonly payload: Buffer; readonly typeMeta: Record<string, unknown> } {
   if (typeof params.reason !== "string" || !params.reason.trim() || params.reason.length > 2048) throw new Error("compaction requires a bounded reason");
   if (params.summaryRole !== undefined && params.summaryRole !== "user" && params.summaryRole !== "assistant") throw new Error("compaction summary role must be user or assistant");
   const automatic = params.automatic, modelSummary = automatic?.summarizer !== undefined;
   if (modelSummary && (params.mode !== "summarize" || params.summaryRole === "user")) throw new Error("an automatic summary is model-written and is never inserted with the user role");
-  authenticateSession(workspace, events); validateSurfaceCompactions(workspace, events);
+  authenticateSession(workspace, events, options); validateSurfaceCompactions(workspace, events, options);
   const head = events.at(-1), envelope = head ? extractEnvelope(head.meta_json) : null;
   if (!head || !envelope) throw new Error("compaction requires an existing session head");
   const entries = foldSurfaceEntries(events), selected = selectCompactionEntries(entries, params.origins, params.mode);

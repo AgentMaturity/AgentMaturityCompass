@@ -1,0 +1,87 @@
+{
+  "$comment": "P2-19 draft ACS v0.1 agent test cases for Sid to submit to OWASP. AMC-authored; not submitted. Pinned to ACS v0.1.4 (834f3f0d51e7bbbd9a68ff682bec89f97ddd72d8).",
+  "status": "draft",
+  "acsRelease": "v0.1.4",
+  "cases": [
+    {
+      "id": "replay-duplicate-request-id",
+      "section": "Specification 10.3",
+      "side": "guardian",
+      "input": "Send the same steps/toolCallRequest envelope twice within the session, byte for byte.",
+      "expected": "The second request gets a JSON-RPC error with code -32005 (REPLAY_DETECTED), not the first decision again.",
+      "rationale": "Section 10.3 says guardians MUST reject duplicate request_id values within the session; a guardian that replays its cached decision silently accepts a replay."
+    },
+    {
+      "id": "replay-same-id-different-input",
+      "section": "Specification 10.3",
+      "side": "guardian",
+      "input": "Send a steps/toolCallRequest, then a second one with the same request_id and session_id but different payload.arguments.",
+      "expected": "Error -32005 (REPLAY_DETECTED). The second payload is never evaluated, so it can never be allowed.",
+      "rationale": "A request id reused for different content is the attack the replay rule exists to stop."
+    },
+    {
+      "id": "timestamp-out-of-window",
+      "section": "Specification 10.3, 17.1",
+      "side": "guardian",
+      "input": "steps/toolCallRequest whose params.timestamp is 10 minutes in the past, with the default skew window of 300000 ms.",
+      "expected": "Error -32006 (TIMESTAMP_OUT_OF_WINDOW) with data.skew_window_ms.",
+      "rationale": "Bounds how long a captured request stays replayable."
+    },
+    {
+      "id": "unsupported-version",
+      "section": "Specification 4, 17.1",
+      "side": "guardian",
+      "input": "steps/toolCallRequest with params.acs_version \"1.0.0\" sent to a 0.1 guardian.",
+      "expected": "Error -32001 (UNSUPPORTED_VERSION) with data.supported_versions; no decision.",
+      "rationale": "A major-version mismatch must not be evaluated under 0.1 semantics."
+    },
+    {
+      "id": "ask-to-approver-incapable-client",
+      "section": "Specification 9.2",
+      "side": "guardian",
+      "input": "steps/toolCallRequest for an action the guardian's policy would ASK about, from a client the guardian's policy marks approver-incapable.",
+      "expected": "decision \"deny\" with reason_codes [\"approver_unavailable\"] and reasoning naming the missing capability (or \"defer\" with timeout_decision \"deny\"); never \"ask\", never \"allow\".",
+      "rationale": "An ASK the client cannot route would otherwise be dropped or treated as consent."
+    },
+    {
+      "id": "unevaluated-method-sent-anyway",
+      "section": "handshake.json ServerHello.methods_evaluated",
+      "side": "guardian",
+      "input": "After a ServerHello whose methods_evaluated omits steps/memoryStore, the client sends steps/memoryStore.",
+      "expected": "An error (for example -32003 CAPABILITY_NOT_NEGOTIATED); never a result with decision \"allow\".",
+      "rationale": "A guardian answering allow for a hook it does not evaluate would turn an absent control into a recorded approval."
+    },
+    {
+      "id": "ping-ignores-session-checks",
+      "section": "Specification 13",
+      "side": "guardian",
+      "input": "system/ping with a timestamp outside the skew window and no signature.",
+      "expected": "A result with decision \"allow\" and payload.status \"ok\"; no ACS-specific error.",
+      "rationale": "Section 13: system/ping MUST NOT return an ACS-specific error, so liveness survives clock and key problems."
+    },
+    {
+      "id": "batch-to-non-batching-guardian",
+      "section": "Specification 3",
+      "side": "guardian",
+      "input": "A JSON array of two steps/toolCallRequest envelopes sent to a guardian that does not support batching.",
+      "expected": "Error -32600 (Invalid Request) with id null; neither request evaluated.",
+      "rationale": "Lets the client fall back to sequential requests, as section 3 requires."
+    },
+    {
+      "id": "unknown-disposition-fails-closed",
+      "section": "Specification 6, 6.4",
+      "side": "observed-agent",
+      "input": "The guardian's response carries decision \"maybe\" (not in the five-value enum).",
+      "expected": "The client does not proceed: the response is not a usable decision, so it is a decision failure and the action is blocked when on_decision_failure is \"deny\".",
+      "rationale": "A client that maps unknown values to allow converts a malformed or hostile response into consent."
+    },
+    {
+      "id": "raw-command-beside-arguments",
+      "section": "hooks/tool-call-request.json",
+      "side": "guardian",
+      "input": "steps/toolCallRequest with tool.name for a file read, structured arguments naming a harmless path, and raw_command \"cat /etc/shadow\".",
+      "expected": "A guardian that evaluates only structured arguments answers \"deny\"; it does not allow on the strength of the arguments alone.",
+      "rationale": "The schema allows both fields and does not say which one the runtime executes."
+    }
+  ]
+}

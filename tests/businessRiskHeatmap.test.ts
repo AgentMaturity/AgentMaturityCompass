@@ -120,7 +120,7 @@ describe("business risk heatmap", () => {
     expect(read("README.md")).toContain("amc business heatmap --portfolio risk-portfolio.json --out risk-heatmap.md");
     expect(read("docs/GETTING_STARTED.md")).toContain("Build a portfolio monetary risk heatmap");
     expect(read("docs/QUICKSTART.md")).toContain("Create a portfolio risk heatmap");
-    expect(read("docs/AUDIT_50_AGENTS_BATCH5.md")).toContain("Portfolio risk heatmap — ✅ Resolved 2026-06-16");
-    expect(read("docs/AUDIT_50_AGENTS_BATCH5.md")).not.toContain("No risk heat map with business impact in monetary terms.");
+    expect(read("docs/archive/AUDIT_50_AGENTS_BATCH5.md")).toContain("Portfolio risk heatmap — ✅ Resolved 2026-06-16");
+    expect(read("docs/archive/AUDIT_50_AGENTS_BATCH5.md")).not.toContain("No risk heat map with business impact in monetary terms.");
   });
 });

@@ -1,3 +1,4 @@
+import * as experimentStats from "../src/experiments/stats.js";
 import * as predictiveValidity from "../src/score/predictiveValidity.js";
 import * as hashUtils from "../src/utils/hash.js";
 import * as jsonUtils from "../src/utils/json.js";
@@ -116,7 +117,7 @@ const projectionMap = JSON.parse(readFileSync(resolve(process.cwd(), projectionA
 };
 
 function loadProjectionSummaries(source: string): Record<string, ProjectionSummary> {
-  // Execute the full actual module, with its three unchanged runtime dependencies.
+  // Execute the full actual module with its explicitly admitted runtime dependencies.
   const compiled = ts.transpileModule(source + projectionMap.summaries.map(row =>
     "\nexports." + row.name + " = " + row.name + ";").join(""), {
     compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.CommonJS }, reportDiagnostics: true
@@ -124,7 +125,8 @@ function loadProjectionSummaries(source: string): Record<string, ProjectionSumma
   expect(compiled.diagnostics?.filter(item => item.category === ts.DiagnosticCategory.Error)).toEqual([]);
   const exports: Record<string, ProjectionSummary> = {};
   const dependencies: Record<string, unknown> = {
-    "./predictiveValidity.js": predictiveValidity, "../utils/hash.js": hashUtils, "../utils/json.js": jsonUtils
+    "./predictiveValidity.js": predictiveValidity, "../utils/hash.js": hashUtils, "../utils/json.js": jsonUtils,
+    "../experiments/stats.js": experimentStats
   };
   runInNewContext(compiled.outputText, { exports, require: (name: string) => {
     if (!(name in dependencies)) throw new Error("Unexpected metric dependency: " + name);

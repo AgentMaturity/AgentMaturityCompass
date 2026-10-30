@@ -15,7 +15,7 @@ import { runOwnedCommand } from "./lib/ownedProcessCommand.mjs";
 
 const { values } = parseArgs({ options: Object.fromEntries(["artifact", "artifact-sha256", "cli-sha256", "source", "source-tree", "out", "npm"].map(name => [name, { type: "string" }])) });
 for (const key of ["artifact", "artifact-sha256", "cli-sha256", "source", "source-tree", "out"]) assert.ok(values[key], `--${key} is required`);
-assert.match(process.version, /^v22\./, "qualification requires Node 22");
+assert.match(process.version, /^v2[24]\./, "qualification requires Node 22 or 24");
 assert.notEqual(process.platform, "win32", "this acceptance runner requires POSIX process-group cleanup");
 for (const key of ["artifact-sha256", "cli-sha256"]) assert.match(values[key], /^[a-f0-9]{64}$/);
 assert.match(values.source, /^[a-f0-9]{40}$/);

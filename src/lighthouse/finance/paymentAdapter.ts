@@ -1,6 +1,7 @@
 import { z } from "zod";
 import type { BindingFacts } from "../../actions/authorizationRecord.js";
 import type { ReconcileAdapter, ReconcileQuery, SystemOfRecordObservation } from "../../actions/reconcile.js";
+import { DefiniteFailureError } from "../../tools/toolTypes.js";
 import { normalizePaymentArgs, paymentArgsDigest, paymentMinorToDecimal, paymentReferenceSchema, type PaymentArgs } from "./paymentArgs.js";
 import type { Payment, PaymentCommit, PaymentServiceClient } from "./paymentServiceClient.js";
 
@@ -105,7 +106,9 @@ export function createPaymentAdapter(options: PaymentAdapterOptions): ReconcileA
         if (result.kind === "unknown") return result;
         if (result.kind === "rejected") return { kind: "rejected", reason: result.code, statusCode: result.statusCode };
         return { kind: "completed", payment: result.value, replayed: result.replayed };
-      } catch {
+      } catch (error) {
+        // The client's egress preflight refused before any socket: definitely not sent, never `unknown`.
+        if (error instanceof DefiniteFailureError) throw error;
         // A client exception does not prove whether a consequential request reached the provider.
         return { kind: "unknown", reason: "payment_dispatch_failed" };
       }

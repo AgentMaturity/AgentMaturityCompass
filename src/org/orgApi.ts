@@ -1,10 +1,11 @@
 import { dirname, join } from "node:path";
+import { captureOrgComputationInputs, captureOrgCommitmentAuthority, type OrgEffectOptions } from "./orgPublication.js";
 import { ensureDir, writeFileAtomic } from "../utils/fs.js";
 import { loadOrgConfig, verifyOrgConfigSignature } from "./orgStore.js";
-import { computeOrgScorecard, nodeHierarchy, recomputeAndPersistOrgScorecard, scorecardNodeComparison, summarizeNodeForUi } from "./orgEngine.js";
+import { computeOrgScorecard, nodeHierarchy, recomputeAndPersistOrgScorecard, recomputeAndPersistOrgScorecardAsync, scorecardNodeComparison, summarizeNodeForUi } from "./orgEngine.js";
 import { loadLatestOrgScorecard } from "./orgScorecard.js";
 import { renderOrgCompareMarkdown, renderOrgNodeReportMarkdown, renderOrgSystemicMarkdown } from "./orgReports.js";
-import { generateOrgCommitmentPlan, generateOrgEducationBrief, generateOrgOwnershipPlan } from "./orgCommitments.js";
+import { generateOrgCommitmentPlan, generateOrgEducationBrief, generateOrgOwnershipPlan, generateOrgCommitmentPlanAsync, generateOrgEducationBriefAsync, generateOrgOwnershipPlanAsync } from "./orgCommitments.js";
 
 export function orgStatus(workspace: string): {
   config: ReturnType<typeof loadOrgConfig>;
@@ -147,4 +148,21 @@ export function generateOrgEoc(params: {
     scorecard,
     days: params.days ?? 30
   });
+}
+
+export async function recomputeOrgScorecardsApiAsync(params: Parameters<typeof recomputeOrgScorecardsApi>[0],
+  options: OrgEffectOptions = {}): Promise<ReturnType<typeof recomputeOrgScorecardsApi>> {
+  return recomputeAndPersistOrgScorecardAsync({ ...params }, options);
+}
+/** Actual maintained E/O/C handoff; capture original authority and consumed config before computation or any wait. */
+export async function generateOrgEocAsync(params: Parameters<typeof generateOrgEoc>[0] & { outFile?: string },
+  options: OrgEffectOptions = {}): Promise<ReturnType<typeof generateOrgEoc>> {
+  const input = { ...params }, assertOriginal = captureOrgCommitmentAuthority(input.workspace, options.beforePublish);
+  const inputs = captureOrgComputationInputs(input.workspace);
+  const scorecard = computeOrgScorecard({ workspace: input.workspace, window: input.window ?? "14d", config: inputs.config });
+  inputs.assertCurrent();
+  const continuation = { outFile: input.outFile, beforePublish: () => { assertOriginal(); inputs.assertCurrent(); } };
+  if (input.type === "learn") return generateOrgEducationBriefAsync({ workspace: input.workspace, nodeId: input.nodeId, scorecard }, continuation);
+  if (input.type === "own") return generateOrgOwnershipPlanAsync({ workspace: input.workspace, nodeId: input.nodeId, scorecard }, continuation);
+  return generateOrgCommitmentPlanAsync({ workspace: input.workspace, nodeId: input.nodeId, scorecard, days: input.days ?? 30 }, continuation);
 }

@@ -1,0 +1,9 @@
+# Independent review of the oracle test v4 delta
+
+No blocking static API, type, setup, lifecycle or expected-value issue was found in the closed V3-to-V4 delta. The exact two supplied patches match the complete file deltas, and all four original/new code pins match. Ten literal test definitions remain unexecuted by this reviewer.
+
+The current public initApprovalPolicy API permits a supplied policy and rewrites/signs it on every call. The initializer captures the signed default bytes, signature and cloned FINANCIAL rule before it creates the fresh one-decision policy. The launcher checks an independent default rule literal and pins the saved default hash. The weaker producer then requires a real one-decision request, creates one genuine bound OWNER decision, verifies it, and retains the existing actual pipeline, preimage, journal, recorder, consumption and session-seal checks. The negative also requires valid provider and ledger/action prerequisites, preventing generic fixture failure from satisfying it.
+
+The unsupported expected field is added before case hashing and pinning. Its test requires the complete sixteen-check protocol, explicit input refusal and diagnostic. It does not independently count an internal cold-CLI launch; that ordering remains a source/interface contract. New stream error listeners remain fail-closed after natural close. Existing failure retention, aggregated cleanup errors and original deadlines are preserved. Only public signed policy bytes and signature were added to public observations.
+
+This review used no shared verifier as the test expected-value source and made no new oracle-body read. It ran no product imports, parser, tests, SQL or network operations and changed no R files. All earlier versions remain immutable. Root owns execution and admission.

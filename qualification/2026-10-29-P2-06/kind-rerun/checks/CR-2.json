@@ -1,0 +1,49 @@
+{
+  "id": "CR-2",
+  "scenario": "Node drain",
+  "status": "failed",
+  "reason": "failed criteria: drain evicts Studio within 180 s (PodDisruptionBudget allows it); Ready again after uncordon (single-node procedure); governed turn passes after the drain",
+  "criteria": [
+    {
+      "name": "node running Studio found",
+      "ok": true,
+      "detail": {
+        "node": "amc-p206-control-plane",
+        "nodes": 1
+      }
+    },
+    {
+      "name": "drain evicts Studio within 180 s (PodDisruptionBudget allows it)",
+      "ok": false,
+      "detail": {
+        "exit": 1,
+        "message": "error when evicting pods/\"amc-rd-amc-5648bf8c45-mkl4v\" -n \"default\": global timeout reached: 3m0s"
+      }
+    },
+    {
+      "name": "Ready again after uncordon (single-node procedure)",
+      "ok": false,
+      "detail": {
+        "node": "amc-p206-control-plane",
+        "readyMs": 55
+      }
+    },
+    {
+      "name": "chain intact across the drain",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "governed turn passes after the drain",
+      "ok": false,
+      "detail": {
+        "ok": false,
+        "status": "failed",
+        "taskId": null,
+        "exit": 1
+      }
+    }
+  ],
+  "podName": "amc-rd-amc",
+  "durationMs": 246369
+}

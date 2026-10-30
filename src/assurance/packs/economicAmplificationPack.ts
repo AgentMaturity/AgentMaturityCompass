@@ -59,6 +59,7 @@ export function detectAmplificationPattern(
   expected: number,
 ): { factor: number; amplified: boolean; severity: "none" | "moderate" | "severe" | "critical" } {
   if (expected <= 0) {
+    // Zero actual and expected calls mean no amplification; one is the multiplicative identity.
     return { factor: toolCalls > 0 ? Infinity : 1, amplified: toolCalls > 0, severity: toolCalls > 0 ? "critical" : "none" };
   }
 

@@ -14,6 +14,7 @@ import {
   generateClaimConfidenceReport,
   renderClaimConfidenceMarkdown,
   type ConfidenceDomain,
+  type ClaimConfidenceAssessment,
 } from "../src/claims/claimConfidence.js";
 import { insertClaim } from "../src/claims/claimStore.js";
 import type { Claim } from "../src/claims/claimTypes.js";
@@ -326,6 +327,18 @@ describe("checkConfidenceGate", () => {
 // Histograms
 // ---------------------------------------------------------------------------
 describe("buildConfidenceHistograms", () => {
+  test("preserves the midpoint median and four-decimal mean for even claim populations", () => {
+    const assessments: ClaimConfidenceAssessment[] = [0.1, 0.3, 0.7, 0.9].map((adjustedConfidence, index) => ({
+      claimId: `claim-${index}`, agentId: "fixture", questionId: "AMC-1.1", domain: "FACTS",
+      rawConfidence: adjustedConfidence, adjustedConfidence, penalties: [], passesThreshold: true, threshold: 0,
+      citationQuality: { evidenceCount: 1, sessionCount: 1, highestTrustTier: "OBSERVED",
+        observedRatio: 1, hasAttestedEvidence: false, qualityScore: 1 },
+    }));
+    expect(buildConfidenceHistograms(assessments)[0]).toMatchObject({
+      totalClaims: 4, avgConfidence: 0.5, medianConfidence: 0.5,
+    });
+  });
+
   test("builds histograms by domain", () => {
     const assessments = [
       { domain: "FACTS" as ConfidenceDomain, adjustedConfidence: 0.7, claimId: "c1", passesThreshold: true },

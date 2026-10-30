@@ -1,0 +1,10 @@
+{
+  "id": "UPG-2",
+  "scenario": "Failed upgrade",
+  "status": "not_run",
+  "reason": "needs a test image whose migration throws (not built by this harness yet)",
+  "blockedBy": [
+    "P2-06 follow-up"
+  ],
+  "durationMs": 0
+}

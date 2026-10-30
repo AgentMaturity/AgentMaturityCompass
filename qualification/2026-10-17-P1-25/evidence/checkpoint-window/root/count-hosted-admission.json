@@ -1,0 +1,359 @@
+{
+  "at": "2026-10-16T23:32:03.413697+00:00",
+  "query": "query { repository(owner:\"AgentMaturity\", name:\"AgentMaturityCompass\") { pullRequests(states:OPEN, first:100) { totalCount pageInfo { hasNextPage } nodes { number title isDraft updatedAt author { __typename login } files(first:100) { totalCount pageInfo { hasNextPage } nodes { path } } } } } }",
+  "response": {
+    "data": {
+      "repository": {
+        "pullRequests": {
+          "totalCount": 13,
+          "pageInfo": {
+            "hasNextPage": false
+          },
+          "nodes": [
+            {
+              "number": 3,
+              "title": "deps: bump @modelcontextprotocol/sdk from 1.27.1 to 1.29.0",
+              "isDraft": false,
+              "updatedAt": "2026-05-22T07:31:22Z",
+              "author": {
+                "__typename": "Bot",
+                "login": "dependabot"
+              },
+              "files": {
+                "totalCount": 2,
+                "pageInfo": {
+                  "hasNextPage": false
+                },
+                "nodes": [
+                  {
+                    "path": "package-lock.json"
+                  },
+                  {
+                    "path": "package.json"
+                  }
+                ]
+              }
+            },
+            {
+              "number": 4,
+              "title": "ci: bump actions/upload-artifact from 4 to 7",
+              "isDraft": false,
+              "updatedAt": "2026-05-22T07:31:23Z",
+              "author": {
+                "__typename": "Bot",
+                "login": "dependabot"
+              },
+              "files": {
+                "totalCount": 3,
+                "pageInfo": {
+                  "hasNextPage": false
+                },
+                "nodes": [
+                  {
+                    "path": ".github/workflows/ci.yml"
+                  },
+                  {
+                    "path": ".github/workflows/docker-build.yml"
+                  },
+                  {
+                    "path": ".github/workflows/nightly-compatibility-matrix.yml"
+                  }
+                ]
+              }
+            },
+            {
+              "number": 5,
+              "title": "ci: bump actions/deploy-pages from 4 to 5",
+              "isDraft": false,
+              "updatedAt": "2026-05-22T07:31:24Z",
+              "author": {
+                "__typename": "Bot",
+                "login": "dependabot"
+              },
+              "files": {
+                "totalCount": 1,
+                "pageInfo": {
+                  "hasNextPage": false
+                },
+                "nodes": [
+                  {
+                    "path": ".github/workflows/pages.yml"
+                  }
+                ]
+              }
+            },
+            {
+              "number": 6,
+              "title": "ci: bump docker/setup-buildx-action from 3 to 4",
+              "isDraft": false,
+              "updatedAt": "2026-05-22T07:31:25Z",
+              "author": {
+                "__typename": "Bot",
+                "login": "dependabot"
+              },
+              "files": {
+                "totalCount": 2,
+                "pageInfo": {
+                  "hasNextPage": false
+                },
+                "nodes": [
+                  {
+                    "path": ".github/workflows/docker-runner.yml"
+                  },
+                  {
+                    "path": ".github/workflows/release.yml"
+                  }
+                ]
+              }
+            },
+            {
+              "number": 7,
+              "title": "ci: bump azure/setup-helm from 4 to 5",
+              "isDraft": false,
+              "updatedAt": "2026-05-22T07:31:26Z",
+              "author": {
+                "__typename": "Bot",
+                "login": "dependabot"
+              },
+              "files": {
+                "totalCount": 2,
+                "pageInfo": {
+                  "hasNextPage": false
+                },
+                "nodes": [
+                  {
+                    "path": ".github/workflows/ci.yml"
+                  },
+                  {
+                    "path": ".github/workflows/docker-build.yml"
+                  }
+                ]
+              }
+            },
+            {
+              "number": 8,
+              "title": "ci: bump actions/setup-node from 4 to 6",
+              "isDraft": false,
+              "updatedAt": "2026-05-22T07:31:27Z",
+              "author": {
+                "__typename": "Bot",
+                "login": "dependabot"
+              },
+              "files": {
+                "totalCount": 6,
+                "pageInfo": {
+                  "hasNextPage": false
+                },
+                "nodes": [
+                  {
+                    "path": ".github/workflows/amc-score.yml"
+                  },
+                  {
+                    "path": ".github/workflows/ci.yml"
+                  },
+                  {
+                    "path": ".github/workflows/docker-build.yml"
+                  },
+                  {
+                    "path": ".github/workflows/nightly-compatibility-matrix.yml"
+                  },
+                  {
+                    "path": ".github/workflows/npm-publish.yml"
+                  },
+                  {
+                    "path": ".github/workflows/release.yml"
+                  }
+                ]
+              }
+            },
+            {
+              "number": 17,
+              "title": "deps: bump zod from 4.3.6 to 4.4.3",
+              "isDraft": false,
+              "updatedAt": "2026-06-26T16:05:35Z",
+              "author": {
+                "__typename": "Bot",
+                "login": "dependabot"
+              },
+              "files": {
+                "totalCount": 2,
+                "pageInfo": {
+                  "hasNextPage": false
+                },
+                "nodes": [
+                  {
+                    "path": "package-lock.json"
+                  },
+                  {
+                    "path": "package.json"
+                  }
+                ]
+              }
+            },
+            {
+              "number": 19,
+              "title": "deps: bump yaml from 2.8.3 to 2.9.0",
+              "isDraft": false,
+              "updatedAt": "2026-06-26T16:05:36Z",
+              "author": {
+                "__typename": "Bot",
+                "login": "dependabot"
+              },
+              "files": {
+                "totalCount": 2,
+                "pageInfo": {
+                  "hasNextPage": false
+                },
+                "nodes": [
+                  {
+                    "path": "package-lock.json"
+                  },
+                  {
+                    "path": "package.json"
+                  }
+                ]
+              }
+            },
+            {
+              "number": 20,
+              "title": "deps: bump inquirer from 13.3.2 to 14.0.2",
+              "isDraft": false,
+              "updatedAt": "2026-07-09T20:50:36Z",
+              "author": {
+                "__typename": "Bot",
+                "login": "dependabot"
+              },
+              "files": {
+                "totalCount": 2,
+                "pageInfo": {
+                  "hasNextPage": false
+                },
+                "nodes": [
+                  {
+                    "path": "package-lock.json"
+                  },
+                  {
+                    "path": "package.json"
+                  }
+                ]
+              }
+            },
+            {
+              "number": 21,
+              "title": "deps: bump commander from 14.0.3 to 15.0.0",
+              "isDraft": false,
+              "updatedAt": "2026-07-09T20:50:37Z",
+              "author": {
+                "__typename": "Bot",
+                "login": "dependabot"
+              },
+              "files": {
+                "totalCount": 2,
+                "pageInfo": {
+                  "hasNextPage": false
+                },
+                "nodes": [
+                  {
+                    "path": "package-lock.json"
+                  },
+                  {
+                    "path": "package.json"
+                  }
+                ]
+              }
+            },
+            {
+              "number": 27,
+              "title": "deps: bump semver from 7.7.4 to 7.8.5",
+              "isDraft": false,
+              "updatedAt": "2026-06-22T06:25:16Z",
+              "author": {
+                "__typename": "Bot",
+                "login": "dependabot"
+              },
+              "files": {
+                "totalCount": 2,
+                "pageInfo": {
+                  "hasNextPage": false
+                },
+                "nodes": [
+                  {
+                    "path": "package-lock.json"
+                  },
+                  {
+                    "path": "package.json"
+                  }
+                ]
+              }
+            },
+            {
+              "number": 28,
+              "title": "deps: bump better-sqlite3 from 12.8.0 to 12.11.1",
+              "isDraft": false,
+              "updatedAt": "2026-06-22T06:27:11Z",
+              "author": {
+                "__typename": "Bot",
+                "login": "dependabot"
+              },
+              "files": {
+                "totalCount": 2,
+                "pageInfo": {
+                  "hasNextPage": false
+                },
+                "nodes": [
+                  {
+                    "path": "package-lock.json"
+                  },
+                  {
+                    "path": "package.json"
+                  }
+                ]
+              }
+            },
+            {
+              "number": 33,
+              "title": "deps: bump the dev-dependencies group across 1 directory with 3 updates",
+              "isDraft": false,
+              "updatedAt": "2026-07-10T20:35:08Z",
+              "author": {
+                "__typename": "Bot",
+                "login": "dependabot"
+              },
+              "files": {
+                "totalCount": 2,
+                "pageInfo": {
+                  "hasNextPage": false
+                },
+                "nodes": [
+                  {
+                    "path": "package-lock.json"
+                  },
+                  {
+                    "path": "package.json"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }
+  },
+  "paths": [
+    "README.md",
+    "CONTRIBUTING.md",
+    "website/index.html",
+    "website/lite.html",
+    "website/i18n.js",
+    "docs/content/show-hn-draft.md",
+    "docs/content/reddit-launch-drafts.md",
+    "docs/internal/competitive-landscape.md",
+    "docs/internal/mirofish-simulation-council.md",
+    "whitepaper/AMC_WHITEPAPER_v1.md"
+  ],
+  "wip": 0,
+  "nonDependabotPrNumbers": [],
+  "allPrPathsIncludingDependabotChecked": true,
+  "overlap": [],
+  "actualExit": 0
+}

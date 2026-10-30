@@ -1,0 +1,167 @@
+# Draft (P1-14): experimental, agent-drafted and not independently reviewed. Expert sign-off waits for D-08;
+# citations are unverified until fetched and hashed. A result under this control is evidence of conformity, never proof of compliance.
+id: L0-EXP-02
+version: "0.1.0"
+support: experimental
+layer: 0
+family: explanation-notice-and-appeal
+stations: [education, environment, health, wealth, technology, mobility, governance]
+title: Notice of consequential decisions
+statement: >-
+  A consequential decision produces a notice with every element the applicable overlay requires, and a
+  notice missing an element fails.
+riskRationale: >-
+  A person who is not told a consequential decision was made, or why, cannot contest it.
+mandatory: true
+applicability:
+  predicate: { fact: useCases, includesAny: [consequential_decision_about_people] }
+  reasons:
+    - Applies only where the profile's use cases include consequential decisions about people (strategy family 9 and P1-33).
+  exclusions:
+    - when:
+        all:
+          - { fact: useCases, includesAny: [reconciliation] }
+          - { not: { fact: useCases, includesAny: [consequential_decision_about_people] } }
+      reason: >-
+        A reconciliation agent that makes no consequential decision about people is out of scope.
+citations:
+  - key: eu-ai-act-art-86
+    registerId: eu-ai-act
+    instrument: Artificial Intelligence Act, Regulation (EU) 2024/1689
+    clause: Art. 86
+    edition: Regulation (EU) 2024/1689 as amended by Regulation (EU) 2026/1744 (CELEX 32024R1689, 32026R1744)
+    jurisdiction: EU
+    statusType: binding-now
+    superseded: null
+    effectiveDate: null
+    complianceDueDate: null
+    dateNote: >-
+      Not recorded: the legal review (D-08) pins the effective and compliance dates.
+    url: https://publications.europa.eu/resource/celex/32024R1689
+    retrieval:
+      state: unverified
+      reason: >-
+        Not fetched in P1-14: the task allows no network access. Register entry eu-ai-act records the source
+        as read in its review; fetch and hash this url before expert review (D-08).
+    appliesWhen: { fact: jurisdictions, includesAny: [EU] }
+    legalReview: null
+    note: >-
+      Register: affected persons may obtain an explanation of individual decisions taken on the basis of
+      Annex III high-risk system output.
+  - key: eu-ccd2-art-18
+    registerId: eu-ccd2
+    instrument: Consumer Credit Directive, Directive (EU) 2023/2225
+    clause: Art. 18
+    edition: Directive (EU) 2023/2225 (CELEX 32023L2225)
+    jurisdiction: EU
+    statusType: binding-future
+    superseded: null
+    effectiveDate: "2026-11-20"
+    complianceDueDate: "2026-11-20"
+    dateNote: null
+    url: https://publications.europa.eu/resource/celex/32023L2225
+    retrieval:
+      state: unverified
+      reason: >-
+        Not fetched in P1-14: the task allows no network access. Register entry eu-ccd2 records the source
+        as read in its review; fetch and hash this url before expert review (D-08).
+    appliesWhen:
+      all: [{ fact: jurisdictions, includesAny: [EU] }, { fact: useCases, includesAny: [credit_decision] }]
+    legalReview: null
+    note: >-
+      Register: where a creditworthiness assessment involves automated processing, consumers may request
+      human intervention. A directive: national transposition applies.
+  - key: us-co-sb26-189-deployers
+    registerId: us-co-sb26-189
+    instrument: Colorado SB26-189 (Part 17 of Article 1 of Title 6, C.R.S.)
+    clause: Deployer duties (register ref Deployers); section numbers to be pinned by the legal reviewer
+    edition: SB26-189 as signed 2026-05-14
+    jurisdiction: US-CO
+    statusType: binding-future
+    superseded: null
+    effectiveDate: "2027-01-01"
+    complianceDueDate: "2027-01-01"
+    dateNote: null
+    url: https://leg.colorado.gov/bills/sb26-189
+    retrieval:
+      state: unverified
+      reason: >-
+        Not fetched in P1-14: the task allows no network access. Register entry us-co-sb26-189 records the
+        source as read in its review; fetch and hash this url before expert review (D-08).
+    appliesWhen: { fact: jurisdictions, includesAny: [US-CO] }
+    legalReview: null
+    note: >-
+      Register: notice at points of interaction; a plain-language description within 30 days after an
+      adverse consequential decision; meaningful human review on request.
+  - key: us-ca-cppa-admt-7220
+    registerId: us-ca-cppa-admt
+    instrument: CCPA regulations on automated decision-making technology (11 CCR)
+    clause: "11 CCR §7220"
+    edition: Regulation text as of the Office of Administrative Law action of 2025-09-22 (register entry us-ca-cppa-admt)
+    jurisdiction: US-CA
+    statusType: binding-now
+    superseded: null
+    effectiveDate: "2026-01-01"
+    complianceDueDate: "2027-01-01"
+    dateNote: null
+    url: https://cppa.ca.gov/regulations/pdf/ccpa_updates_cyber_risk_admt_appr_text.pdf
+    retrieval:
+      state: unverified
+      reason: >-
+        Not fetched in P1-14: the task allows no network access. Register entry us-ca-cppa-admt records the
+        source as read in its review; fetch and hash this url before expert review (D-08).
+    appliesWhen: { fact: jurisdictions, includesAny: [US-CA] }
+    legalReview: null
+    note: >-
+      Register: a pre-use notice before ADMT is used for a significant decision; existing uses comply by
+      2027-01-01 (§7200(b)).
+binding:
+  kind: manual
+  points: []
+  mechanism: >-
+    Each consequential decision emits a notice built from the overlay's element list; the notice is
+    checked against that list before it is sent.
+  parameters: []
+  manualDuty:
+    duty: Keep the notice template aligned with every applicable overlay.
+    ownerRole: senior_manager
+    cadence: on every overlay change
+    evidenceOfPerformance: The notice template and its element check.
+tests:
+  - id: L0-EXP-02-T1
+    type: document_review
+    oracle: { kind: human_assessor, observes: Sampled notices against the overlay's element list. }
+    fixtures:
+      positive: [L0-EXP-02/positive/evidence-valid.json]
+      negative:
+        - L0-EXP-02/negative/evidence-contradictory.json
+        - L0-EXP-02/negative/evidence-cross-tenant.json
+        - L0-EXP-02/negative/evidence-empty.json
+        - L0-EXP-02/negative/evidence-replayed.json
+        - L0-EXP-02/negative/evidence-stale.json
+        - L0-EXP-02/negative/evidence-violation.json
+    passCriteria: Every sampled notice carries every required element.
+    attempts: 1
+  - id: L0-EXP-02-T2
+    type: configuration_check
+    oracle: { kind: signed_config, observes: The signed notice template and the overlay element list it covers. }
+    fixtures:
+      positive: [L0-EXP-02/positive/evidence-valid-t2.json]
+      negative: [L0-EXP-02/negative/evidence-violation-t2.json]
+    passCriteria: The template covers every element of every applicable overlay.
+    attempts: 1
+evidence:
+  - id: L0-EXP-02-E1
+    producer: amc.explanation.notice
+    bindingFields: [deploymentId, controlId]
+    freshness: { maxAgeDays: 90 }
+    sampling: { method: all, ratePercent: null, minItems: 1 }
+    retention: { mode: regime_max }
+    residency: { mode: inherit_deployment }
+invalidatedBy: [model_version, prompt_version, policy_version]
+owner: { role: senior_manager }
+clock: null
+levels: [L2]
+crosswalk: []
+review: { status: pending, expert: null, credential: null, reviewedAt: null, nextReview: null }
+provenance: { draftedBy: ai, draftedAt: "2026-10-11", approvedBy: null }

@@ -130,4 +130,27 @@ describe("AMC public Docs graph", () => {
     expect(Array.from(memberships).filter(([, groups]) => groups.length !== 1)).toEqual([]);
     expect(categories[0]?.docs.filter(doc => publicDocs.has(doc))).toHaveLength(10);
   });
+  test("P2-08 key-provider navigation adds no unresolved public edge", () => {
+    expect(publicDocs.has("KEY_PROVIDERS")).toBe(true);
+    expect(allDocs.has("KEY_PROVIDERS")).toBe(true);
+    expect(internalDocs.has("KEY_PROVIDERS")).toBe(false);
+    expect(existsSync(resolve(docsRoot, "KEY_PROVIDERS.md"))).toBe(true);
+    for (const source of ["HARDWARE_TRUST", "NOTARY", "VAULT"]) {
+      expect(publicDocs.has(source), source).toBe(true);
+      const links = localMarkdownLinks(readFileSync(resolve(docsRoot, `${source}.md`), "utf8"));
+      expect(links.map(href => resolveGuideLink(source, href)), source).toContain("KEY_PROVIDERS");
+    }
+    const defects: Array<{ source: string; href: string; target: string }> = [];
+    for (const source of publicDocs) {
+      const path = resolve(docsRoot, `${source}.md`);
+      if (!existsSync(path)) continue;
+      for (const href of localMarkdownLinks(readFileSync(path, "utf8"))) {
+        const target = resolveGuideLink(source, href);
+        if (target !== null && !publicDocs.has(target)) defects.push({ source, href, target });
+      }
+    }
+    // An existing MCP edge belongs to another item. Do not ignore any other source, href or target.
+    expect(defects.filter(edge => !(edge.source === "MCP_SERVER"
+      && edge.href === "MCP_INDUSTRY_PACKS.md" && edge.target === "MCP_INDUSTRY_PACKS"))).toEqual([]);
+  });
 });

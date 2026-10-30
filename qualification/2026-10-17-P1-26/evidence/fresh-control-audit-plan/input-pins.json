@@ -1,0 +1,167 @@
+{
+  "schema": "p126-five-phase-plan-inputs/1",
+  "inputs": [
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/p126-source-combined-outcome.json",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/p126-source-combined-outcome.json",
+      "bytes": 11051,
+      "sha256": "b81c1584f4bf9364ce154ce36e45e37dbe8c866a093abd82366c03f075a9c35b",
+      "dev": 16777231,
+      "inode": 543338558,
+      "nlink": 1,
+      "readScope": "finite plan input"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p126-source-combined/command.json",
+      "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p126-source-combined/command.json",
+      "bytes": 3074,
+      "sha256": "d01eb25f5d048b0eb6c7c3bda75c0a2bb2b24c6b019991334c4d96e837c2d068",
+      "dev": 16777231,
+      "inode": 543338552,
+      "nlink": 1,
+      "readScope": "finite plan input"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/protected-inputs-after-metadata-repair.json",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/protected-inputs-after-metadata-repair.json",
+      "bytes": 31630,
+      "sha256": "3daf1deac107320055200ca014d74348068797122547951e1663995466af5e2a",
+      "dev": 16777231,
+      "inode": 543332179,
+      "nlink": 1,
+      "readScope": "finite plan input"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/protected-inputs.json",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/protected-inputs.json",
+      "bytes": 30018,
+      "sha256": "17ae38c0dc5f93017d6162253db1ec5e6f95f462c98b3730a922aa13bd9767a0",
+      "dev": 16777231,
+      "inode": 543324624,
+      "nlink": 1,
+      "readScope": "finite plan input"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/test-static-review/review.json",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/test-static-review/review.json",
+      "bytes": 14252,
+      "sha256": "a3d31bab8163244b35c3f24abdafa93b46c723321f06e73f10887474145ba064",
+      "dev": 16777231,
+      "inode": 543325608,
+      "nlink": 1,
+      "readScope": "finite plan input"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/test-static-review/seal.json",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/test-static-review/seal.json",
+      "bytes": 1183,
+      "sha256": "627db1cc030139e83358a8b2256fa51fcdc80de2d00c7e2ece8aa0b9c17ec99f",
+      "dev": 16777231,
+      "inode": 543325612,
+      "nlink": 1,
+      "readScope": "finite plan input"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/contract-review/controls.json",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/contract-review/controls.json",
+      "bytes": 5628,
+      "sha256": "ab18653c468145664a58bcb7e5ea80d9e9579fad72280e0ef2ece5d96ce2945b",
+      "dev": 16777231,
+      "inode": 543324984,
+      "nlink": 1,
+      "readScope": "finite plan input"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/contract-review/seal.json",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/contract-review/seal.json",
+      "bytes": 1760,
+      "sha256": "f111f542ae2e25532feaa3295c92f198169b04c96e4b60b72d1a8ed54181989a",
+      "dev": 16777231,
+      "inode": 543324988,
+      "nlink": 1,
+      "readScope": "finite plan input"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/count-surface-review/proposed-admission.json",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/count-surface-review/proposed-admission.json",
+      "bytes": 27511,
+      "sha256": "3a205ea23bf45a72ce8770afccba695963c04fe12dabec7a2c0372d810d604ac",
+      "dev": 16777231,
+      "inode": 543332238,
+      "nlink": 1,
+      "readScope": "finite plan input"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/count-surface-review/seal.json",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/count-surface-review/seal.json",
+      "bytes": 3537,
+      "sha256": "b13abbb8373f30dd8c1d478e98400fd10016656509b04d196edfc1286a4a075c",
+      "dev": 16777231,
+      "inode": 543332241,
+      "nlink": 1,
+      "readScope": "finite plan input"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/fresh-control-audit-plan/plan.json",
+      "physicalPath": "/private/tmp/p1-12-compiled-guard-qualification-20261017/fresh-control-audit-plan/plan.json",
+      "bytes": 12449,
+      "sha256": "7ea1886034402950cf9489210a430a71115c85fbc98bb81f331481a11716361d",
+      "dev": 16777231,
+      "inode": 543248436,
+      "nlink": 1,
+      "readScope": "finite plan input"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/source-control.py",
+      "physicalPath": "/private/tmp/p1-12-compiled-guard-qualification-20261017/source-control.py",
+      "bytes": 5206,
+      "sha256": "61844915b8ce3fedcaa2a28f8a602f60f2f2b24ae557df29a3ced6554c834104",
+      "dev": 16777231,
+      "inode": 543248517,
+      "nlink": 1,
+      "readScope": "finite plan input"
+    },
+    {
+      "path": "/private/tmp/p1-39-mcp-qualification-20261016/post-typecheck-run-prepared.py",
+      "physicalPath": "/private/tmp/p1-39-mcp-qualification-20261016/post-typecheck-run-prepared.py",
+      "bytes": 14874,
+      "sha256": "abbda23f645d38e643133ebbb4a9b19dc4f9bad5cab20d098c02449c6d3885e6",
+      "dev": 16777231,
+      "inode": 542688370,
+      "nlink": 1,
+      "readScope": "finite plan input"
+    },
+    {
+      "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+      "physicalPath": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+      "bytes": 2110,
+      "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447",
+      "dev": 16777231,
+      "inode": 538608953,
+      "nlink": 1,
+      "readScope": "finite plan input"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/audit-observed.py",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/audit-observed.py",
+      "bytes": 1598,
+      "sha256": "c17e8e17a1eb66b2bedba1cbef1b05c0665015ac99e25cde0beb9be56f32e376",
+      "dev": 16777231,
+      "inode": 543324705,
+      "nlink": 1,
+      "readScope": "finite plan input"
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/receipt-preparation/assemble-receipt.py",
+      "physicalPath": "/private/tmp/p1-25-time-qualification-20261016/receipt-preparation/assemble-receipt.py",
+      "bytes": 21413,
+      "sha256": "28ddcb18ec76480886dc6856dee2a976adf15d2282c1b72d58c26ba22269a5c7",
+      "dev": 16777231,
+      "inode": 543075322,
+      "nlink": 1,
+      "readScope": "finite plan input"
+    }
+  ],
+  "stableSourcePinsIn": "source-pinset.json",
+  "protectedPinsIn": "verified-protected-inputs.json"
+}

@@ -1,7 +1,9 @@
-# syntax=docker/dockerfile:1
+# syntax=docker/dockerfile:1@sha256:4edf897a3ffa55b89f906fc8cc78afdb3f1834cc9c7083565e611a8a7d5fe99e
 # Build from the repository root: --target studio (default), runner or api.
-# Override NODE_IMAGE with a reviewed digest to pin the operating-system image.
-ARG NODE_IMAGE=node:22-bookworm-slim
+# Base and frontend are pinned by multi-platform index digest (linux/amd64 and linux/arm64), resolved
+# 2026-10-11 (P0-35). Refresh at each release; scripts/check-image-pins.mjs refuses an unpinned base.
+# Operators may override NODE_IMAGE with another reviewed node:22-bookworm-slim@sha256:<digest>.
+ARG NODE_IMAGE=node:22-bookworm-slim@sha256:c3de60bf2f9dd0ac6370e6117950ff62d6e339527e7472301c9c78a017978392
 FROM ${NODE_IMAGE} AS native-tools
 RUN apt-get update && apt-get install -y --no-install-recommends \
       python3 make g++ ca-certificates \
@@ -20,6 +22,14 @@ RUN pnpm install --frozen-lockfile
 COPY src/ src/
 COPY api/ api/
 COPY fixtures/policy/ fixtures/policy/
+# Build inputs read by scripts/copy-build-assets.mjs: the adapter claim manifests and the receipts they name.
+COPY docs/adapters/manifests/ docs/adapters/manifests/
+COPY qualification/2026-10-18-P1-22/pi-conformance.json qualification/2026-10-18-P1-22/receipt.json qualification/2026-10-18-P1-22/
+COPY qualification/2026-10-18-P1-23/claude-code-conformance.json qualification/2026-10-18-P1-23/receipt.json qualification/2026-10-18-P1-23/
+# Non-dist entries of package.json "files": npm pack silently omits any that are not in the context.
+COPY catalog/ catalog/
+COPY deploy/apparmor/ deploy/apparmor/
+COPY docs/NATIVE_SANDBOX_UBUNTU.md docs/
 RUN pnpm run build
 # The separate release/prepack gate is NOT exercised by this source image build.
 # This packs the actual publish file set, including bundled kernel + notices.
@@ -50,8 +60,9 @@ COPY --from=install /opt/amc/ /opt/amc/
 RUN ln -s /opt/amc/node_modules/.bin/amc /usr/local/bin/amc \
     && groupadd --gid 10001 amc \
     && useradd --uid 10001 --gid 10001 --create-home --shell /bin/bash amc \
-    && mkdir -p /workspace /data/amc /data/notary \
-    && chown -R 10001:10001 /workspace /data/amc /data/notary /home/amc
+    && mkdir -p /workspace /data/amc /data/notary /home/amc/.config/amc/state \
+    && chown -R 10001:10001 /workspace /data/amc /data/notary /home/amc \
+    && chmod 0700 /home/amc/.config/amc /home/amc/.config/amc/state
 ENV NODE_ENV=production HOME=/home/amc
 USER 10001:10001
 WORKDIR /workspace

@@ -1,3 +1,4 @@
+import { mean, median as arithmeticMedian, quantile as interpolatedQuantile } from "../experiments/stats.js";
 export interface TheilSenResult {
   slope: number;
   intercept: number;
@@ -10,32 +11,14 @@ export function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value));
 }
 
+/** @deprecated Use median from ../experiments/stats.js. */
 export function median(values: number[]): number {
-  if (values.length === 0) {
-    return 0;
-  }
-  const sorted = [...values].sort((a, b) => a - b);
-  const mid = Math.floor(sorted.length / 2);
-  if (sorted.length % 2 === 0) {
-    return (sorted[mid - 1]! + sorted[mid]!) / 2;
-  }
-  return sorted[mid]!;
+  return arithmeticMedian(values);
 }
 
+/** @deprecated Use quantile from ../experiments/stats.js. */
 export function quantile(values: number[], q: number): number {
-  if (values.length === 0) {
-    return 0;
-  }
-  const clamped = clamp(q, 0, 1);
-  const sorted = [...values].sort((a, b) => a - b);
-  const idx = (sorted.length - 1) * clamped;
-  const lo = Math.floor(idx);
-  const hi = Math.ceil(idx);
-  if (lo === hi) {
-    return sorted[lo]!;
-  }
-  const frac = idx - lo;
-  return sorted[lo]! * (1 - frac) + sorted[hi]! * frac;
+  return interpolatedQuantile(values, q);
 }
 
 export function mad(values: number[]): number {
@@ -47,18 +30,19 @@ export function mad(values: number[]): number {
   return median(abs);
 }
 
+// Unlike experiments/stats.ts mean, discard a symmetric fraction of extreme observations first.
 export function trimmedMean(values: number[], trim = 0.1): number {
   if (values.length === 0) {
     return 0;
   }
   if (values.length <= 2) {
-    return values.reduce((sum, value) => sum + value, 0) / values.length;
+    return mean(values);
   }
   const sorted = [...values].sort((a, b) => a - b);
   const trimCount = Math.floor(sorted.length * clamp(trim, 0, 0.45));
   const kept = sorted.slice(trimCount, sorted.length - trimCount);
   const sample = kept.length > 0 ? kept : sorted;
-  return sample.reduce((sum, value) => sum + value, 0) / sample.length;
+  return mean(sample);
 }
 
 export function robustZ(value: number, center: number, sigma: number): number {
@@ -153,6 +137,8 @@ export function theilSen(times: number[], values: number[]): TheilSenResult {
   };
 }
 
+// Unlike experiments/stats.ts bootstrap/mean intervals, this is a MAD-scaled Theil-Sen prediction
+// band with horizon inflation; it measures future observations rather than uncertainty in a mean.
 export function predictWithBand(params: {
   model: TheilSenResult;
   atX: number;

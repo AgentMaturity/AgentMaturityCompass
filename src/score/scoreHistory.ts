@@ -1,3 +1,4 @@
+import { populationVariance } from "../experiments/stats.js";
 /**
  * scoreHistory.ts — Score History & Regression Detection for AMC
  *
@@ -17,7 +18,7 @@ import { join } from "node:path";
 import { getOrCreateSqlitePool } from "../storage/sqlitePool.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
-import { signHexDigest, getPrivateKeyPem, getPublicKeyHistory, verifyHexDigestAny } from "../crypto/keys.js";
+import { signHexDigest, getSigningKey, getPublicKeyHistory, verifyHexDigestAny } from "../crypto/keys.js";
 import type { ModelVersion } from "./modelDrift.js";
 
 /* ── Types ────────────────────────────────────────────────────────── */
@@ -154,7 +155,7 @@ export class ScoreHistoryStore {
   }
 
   private monitorPrivateKey(): string {
-    return getPrivateKeyPem(this.workspace, "monitor");
+    return getSigningKey(this.workspace, "ledger-row");
   }
 
   /**
@@ -476,8 +477,7 @@ export class ScoreHistoryStore {
       const delta = endScore - startScore;
 
       // Calculate volatility (standard deviation)
-      const mean = dataPoints.reduce((sum, p) => sum + p.score, 0) / dataPoints.length;
-      const variance = dataPoints.reduce((sum, p) => sum + Math.pow(p.score - mean, 2), 0) / dataPoints.length;
+      const variance = populationVariance(dataPoints.map((point) => point.score));
       const volatility = Math.sqrt(variance);
 
       // Determine trend

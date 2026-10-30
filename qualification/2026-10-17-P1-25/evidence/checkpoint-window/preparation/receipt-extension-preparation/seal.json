@@ -1,0 +1,45 @@
+{
+  "schema": "p125-checkpoint-private-receipt-extension-skeleton-seal/1",
+  "at": "2026-10-16T23:38:51.315898+00:00",
+  "preferredHelper": "/private/tmp/p1-25-checkpoint-qualification-20261017/receipt-extension-preparation/assemble-extension.py.source.txt",
+  "preferredDelta": "/private/tmp/p1-25-checkpoint-qualification-20261017/receipt-extension-preparation/b36-v3-adaptation.patch.txt",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/receipt-extension-preparation/assemble-extension.py.source.txt",
+      "bytes": 27726,
+      "sha256": "fd7d7efcbb4cd4b3d7a2165e65444ccf76ec2a3cf5afaab759716cd7ba50b7c6"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/receipt-extension-preparation/b36-v3-adaptation.patch.txt",
+      "bytes": 28402,
+      "sha256": "27c8ba98f743dce4f780448e85ee18da959aea097c917109023aaf4cd1780051"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/receipt-extension-preparation/input-template.json",
+      "bytes": 4355,
+      "sha256": "9e0cda2358e67d4de72a959bed06589e509a06eb05d08ec469365d2e64cca4e9"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/receipt-extension-preparation/README.md",
+      "bytes": 4199,
+      "sha256": "e857f39fce836d083208d92e8802781f386b8548d10225996fe6b9999c6a59c2"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/receipt-extension-preparation/plan.json",
+      "bytes": 1652,
+      "sha256": "c0a372adb30a7127bdcf8c198cc6525dcc907d3640132c0e2918c1f39a6e52ae"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/receipt-extension-preparation/input-pins.json",
+      "bytes": 5022,
+      "sha256": "121c1fa9090bcd75138019e09e8ff522eb649d4aabcae5edaa23e468edbdf1c9"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/receipt-extension-preparation/author-static-review.json",
+      "bytes": 1112,
+      "sha256": "883f8a6283ea1a703986f0bd634661ac12374b115fb034590f16a50a38a551cd"
+    }
+  ],
+  "rootFullReadIndependentStaticReviewAndActualFactsRequired": true,
+  "noHelperExecutionOrSourceMetadataIndexQaWrites": true
+}

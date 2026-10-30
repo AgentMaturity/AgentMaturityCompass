@@ -1,0 +1,321 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-25",
+  "date": "2026-10-15",
+  "commit": "2d552741d727aaf3a26759b9df9343f7804d157a",
+  "branch": "codex/p0-25-current-qualification",
+  "node": "v22.23.3",
+  "pnpm": "10.33.0",
+  "os": "Darwin 25.6.0",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "pnpm install --frozen-lockfile --store-dir /private/tmp/p0-25-qualification-20261015/store --package-import-method copy --side-effects-cache=false",
+      "exit": 0,
+      "durationMs": 4866
+    },
+    {
+      "cmd": "pnpm run build",
+      "exit": 0,
+      "durationMs": 30611
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p0-25-qualification-20261015/runtime-fingerprint.cjs",
+      "exit": 0,
+      "durationMs": 132
+    },
+    {
+      "cmd": "pnpm run check:freeze",
+      "exit": 0,
+      "durationMs": 1356
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/citations tests/compliance/mappingPackRefs.test.ts --maxWorkers=1 --no-file-parallelism --reporter=default --reporter=json --reporter=/private/tmp/p0-25-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p0-25-original-citations-mapping-20261015.json",
+      "exit": 0,
+      "durationMs": 2094
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/check-citations.mjs --json",
+      "exit": 0,
+      "durationMs": 421
+    },
+    {
+      "cmd": "npm run check:citations -- --json",
+      "exit": 0,
+      "durationMs": 397
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/releaseGateExecution.test.ts --maxWorkers=1 --no-file-parallelism --reporter=default --reporter=json --reporter=/private/tmp/p0-25-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p0-25-release-executor-contracts-20261015.json",
+      "exit": 0,
+      "durationMs": 537
+    },
+    {
+      "cmd": "npm run check:citations -- --frobnicate",
+      "exit": 1,
+      "durationMs": 258
+    },
+    {
+      "cmd": "npm run check:citations -- --update-baseline",
+      "exit": 1,
+      "durationMs": 185
+    },
+    {
+      "cmd": "npm run check:citations -- --reason p0-25-stray-reason",
+      "exit": 1,
+      "durationMs": 177
+    },
+    {
+      "cmd": "pnpm run check:freeze",
+      "exit": 0,
+      "durationMs": 1227
+    },
+    {
+      "cmd": "git diff --no-index --check /dev/null qualification/2026-10-15-P0-25/README.md",
+      "exit": 1,
+      "durationMs": 22
+    },
+    {
+      "cmd": "pnpm run check:qualification",
+      "exit": 0,
+      "durationMs": 496
+    },
+    {
+      "cmd": "git diff --cached --check",
+      "exit": 2,
+      "durationMs": 18
+    }
+  ],
+  "tests": {
+    "total": 32,
+    "passed": 32,
+    "failed": 0,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "b1b861bc97bcd5ad080186e8b42741c523c95e3b7e5492a87342f46916905504"
+    },
+    {
+      "path": "acceptance-gaps.json",
+      "sha256": "a49d659baa7c6e00c57743069c44531180c7551698668a9ebc957dbd90bf1256"
+    },
+    {
+      "path": "evidence/09b8981735ea-actual-cli-refusals-summary.json",
+      "sha256": "09b8981735eaa29715ac195cd53e192f63ce7c8f604d6c89cda2ccd2afef6080"
+    },
+    {
+      "path": "evidence/0b31e2d70d53-p0-25-corpus-propagation-readonly-supplement-20261015.json",
+      "sha256": "0b31e2d70d53599b929f06390fd173a64d6402d449ad5c3f995119396ae7d82b"
+    },
+    {
+      "path": "evidence/0be7f62a6b8d-p0-30-exact-source-validation-context-20261015.json",
+      "sha256": "0be7f62a6b8d162283927e929abbbdd168126eb3585a0330161734a1117e9a03"
+    },
+    {
+      "path": "evidence/10872e54a487-artifact-index.json",
+      "sha256": "10872e54a487beb237fb3974932cebbc9dfee4e7caee54c717f89cfcf1f6fc0b"
+    },
+    {
+      "path": "evidence/118600b01abf-p0-25-cli-unknown-flag-20261015.log",
+      "sha256": "118600b01abf1f156a260ff505e2b33c1bfdb75bd9098f236c27c54ce2a64792"
+    },
+    {
+      "path": "evidence/127aa6416783-p0-25-bounded-qualification-20261015.md",
+      "sha256": "127aa641678340f621d9aae4d90bdf9234602f55aa42b0639cd3ce7c79bca796"
+    },
+    {
+      "path": "evidence/1687db8722a0-p0-25-freeze-qualified-evidence-20261015.py",
+      "sha256": "1687db8722a06703e4164b06d4111ec489245a479ccd01f5e3f60543ccd62670"
+    },
+    {
+      "path": "evidence/16c02be51040-p0-25-original-citations-mapping-20261015.log",
+      "sha256": "16c02be51040858b2b5745d5d19cc02211af2eb932f6aeda5e94ab33faa248be"
+    },
+    {
+      "path": "evidence/17b66bccbbf3-runtime-fingerprint.cjs",
+      "sha256": "17b66bccbbf372329ef07a234c56bf51b1aa58370491ac1c2333c4fc455341d5"
+    },
+    {
+      "path": "evidence/19f705b47fb0-p0-25-canonical-builder-static-review-20261015.md",
+      "sha256": "19f705b47fb0853886e7044a583f0e9a3190bbad45c3980529b6d124e7e769cc"
+    },
+    {
+      "path": "evidence/20e49e60ecb2-p0-25-root-bounded-outcome-20261015.json",
+      "sha256": "20e49e60ecb2c9a78efcd49be037dcab0b52f9915ed953542760aaffe463d135"
+    },
+    {
+      "path": "evidence/229086382cfd-p0-25-release-executor-contracts-20261015.log",
+      "sha256": "229086382cfd8366fb30821c3b0e4785ad4ad3f35c7e387f208c782b319f834d"
+    },
+    {
+      "path": "evidence/295b1b187a5c-p0-25-actual-package-command-20261015.log",
+      "sha256": "295b1b187a5c887c085b00af08a970627db1bec09587b908c83e08e97ddbba3e"
+    },
+    {
+      "path": "evidence/3330f956401e-final-source-and-reuse-preservation.json",
+      "sha256": "3330f956401eeb479edc69c4f3ab004cf98e2c82467642b79d8ee99e2f5e0bc1"
+    },
+    {
+      "path": "evidence/3a03b2a14c86-p0-30-canonical-postcommit-handoff-20261015.json",
+      "sha256": "3a03b2a14c8614f625dba931e24f5739dc5fde08ce7c4d4844d39e5fdbae9514"
+    },
+    {
+      "path": "evidence/43834fb56a8f-P0-25.md",
+      "sha256": "43834fb56a8fafd4705b65e66dfa54a49c278a91254afe8a40154d1e00592181"
+    },
+    {
+      "path": "evidence/50a18823ef2a-p0-25-build-20261015.log",
+      "sha256": "50a18823ef2a7c7828525e911dd4fee2a00f6339d79b3a0331af78babeaabb45"
+    },
+    {
+      "path": "evidence/52ee8a6f107c-p0-25-canonical-builder-static-review-20261015.json",
+      "sha256": "52ee8a6f107cdea6abf06d07d9afc1e8eeab616f11a7cdd1267d72370879ce45"
+    },
+    {
+      "path": "evidence/53e1f41c709d-actual-collector-summary.json",
+      "sha256": "53e1f41c709d27d568f2bc7d73ea2b795cf2ecd613b979cf88dc99bb94ea402a"
+    },
+    {
+      "path": "evidence/602146f605b4-initial-preflight.json",
+      "sha256": "602146f605b4b03751d2e9536eeb4234ada5e6eb7bc580d5053398eb82b63d38"
+    },
+    {
+      "path": "evidence/62e8483a2607-p0-25-final-normal-freeze-20261015.log",
+      "sha256": "62e8483a26078e5c5ca829ce0be4c640b67cbbdd87d47fda80a4bd8d5402bcde"
+    },
+    {
+      "path": "evidence/62e8483a2607-p0-25-normal-freeze-20261015.log",
+      "sha256": "62e8483a26078e5c5ca829ce0be4c640b67cbbdd87d47fda80a4bd8d5402bcde"
+    },
+    {
+      "path": "evidence/64f0e53143d8-observer-reporter.mjs",
+      "sha256": "64f0e53143d830ba3fc1551620ad474bbd4275f2c835bd69d112f9c93bd2a23a"
+    },
+    {
+      "path": "evidence/7575816b0d99-p0-25-bounded-qualification-20261015.json",
+      "sha256": "7575816b0d993a8327039bbe9d904271d1e2c5937d91d27f03e83ab2d2c36ae6"
+    },
+    {
+      "path": "evidence/780ce5516998-p0-25-run-final-command-20261015.py",
+      "sha256": "780ce55169981260c1b696bf6f660ced97cb1665ffc5da434f27e79bdee22160"
+    },
+    {
+      "path": "evidence/7882458dd5ef-release22-summary.json",
+      "sha256": "7882458dd5efed969421fb19f0fbd37440ebc45b53d234fef579a9d84b935acf"
+    },
+    {
+      "path": "evidence/7af2b89f6fa5-p0-25-runtime-fingerprint-20261015.log",
+      "sha256": "7af2b89f6fa5e6895130c66049ba9b3d1c2ac968c563638aa1b6dc46678a878a"
+    },
+    {
+      "path": "evidence/7df94903fdbc-p0-25-cli-reason-without-update-20261015.log",
+      "sha256": "7df94903fdbcd419d864eb2d602e0efe2a8557d9bb33d2f20bebef43eaf4e01d"
+    },
+    {
+      "path": "evidence/7ea93dd1ec1f-p0-25-readonly-readiness-20261015.json",
+      "sha256": "7ea93dd1ec1fed290b1b7e701ae7c3e4a44f7a8631c45dc86a3b898d73e83b95"
+    },
+    {
+      "path": "evidence/7fceee2436c1-p0-25-release-executor-contracts-20261015.json",
+      "sha256": "7fceee2436c1b18c27ab8016a00d8bffa5ee5f304c51a7e6acd496bc8a5c0b12"
+    },
+    {
+      "path": "evidence/86928a5b4b6a-commands-frozen.jsonl",
+      "sha256": "86928a5b4b6a07e8bc86abc1d1c495cdc3a696c1886137e255bd834610bbfcdc"
+    },
+    {
+      "path": "evidence/9822de470a6f-p0-25-run-command-20261015.py",
+      "sha256": "9822de470a6fa193ba0e5ef5953a077398e900fbee501c34f2d7b27227b769ff"
+    },
+    {
+      "path": "evidence/99773d05f0bd-p0-25-run-observed-command-20261015.py",
+      "sha256": "99773d05f0bd08da323f2f8091759b8d41905b105624050b2abe995f5f29ab0d"
+    },
+    {
+      "path": "evidence/a05fb74b1c7e-p0-24-citation-causal-qualification-20261015.json",
+      "sha256": "a05fb74b1c7e19e93f862187ed09cf2cb4be49a8179522343d0b3aa06999ef54"
+    },
+    {
+      "path": "evidence/a5452d57d332-release-executor-contracts.json",
+      "sha256": "a5452d57d332269d5472f0f4fe2e89fd9dfea808abf9a96592bdf90307ba49ee"
+    },
+    {
+      "path": "evidence/ad39e1e7ae9d-p0-25-cli-update-without-reason-20261015.log",
+      "sha256": "ad39e1e7ae9da59b2ff8e582ba3423c8a2b1dd2811fd32cb5fa31c7662fbe725"
+    },
+    {
+      "path": "evidence/bbb3b802f9a9-p0-25-install-20261015.log",
+      "sha256": "bbb3b802f9a94dd928b12dcde8ed9efecbfbc15c7aa0a5a214bfb008e5ece06c"
+    },
+    {
+      "path": "evidence/c38a0eea4dbd-p0-25-build-canonical-packet-20261015.py",
+      "sha256": "c38a0eea4dbd0d66f81f728bc0d251d1b143c575a4f3971f2b07914fbc1c8b47"
+    },
+    {
+      "path": "evidence/c652dff29527-artifact-index.json",
+      "sha256": "c652dff2952703b79bde504c8367be90cc67201dd5535d6ea910ba58ff134127"
+    },
+    {
+      "path": "evidence/cb23acf16dd7-graph-navigation.json",
+      "sha256": "cb23acf16dd700b9596ec7048739bd9a4302174fadbcf1ba65876cd891b22810"
+    },
+    {
+      "path": "evidence/d643e78818ab-p0-25-staged-diff-check-first-20261015.log",
+      "sha256": "d643e78818ab6d825a477d0729d842c279c584108839bd422b36295966580b35"
+    },
+    {
+      "path": "evidence/dde3bd869c7d-p0-25-actual-collector-json-20261015.log",
+      "sha256": "dde3bd869c7d2ad044fd5c435e5035713e0d07e987b6b699977d925bedfc5110"
+    },
+    {
+      "path": "evidence/e3b0c44298fc-p0-25-canonical-diff-check-20261015.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/e70186df0250-amc-next-after-p0-25-readonly-routing-20261015.json",
+      "sha256": "e70186df02502326e435b921cf4cef09ec186d9cbe9556dc812fba4e71c0dc95"
+    },
+    {
+      "path": "evidence/e732144c6863-original32-summary.json",
+      "sha256": "e732144c68637db36a70343fa21a1cd33df0b947f2fcd57d6245452fc0b0a6fd"
+    },
+    {
+      "path": "evidence/edcb1b6f2951-p0-25-bounded-independent-review-20261015.json",
+      "sha256": "edcb1b6f29516e66a22f0ceb115ca421ddf3aae4e3734360d06123b645891e11"
+    },
+    {
+      "path": "evidence/f0a8be16d7a5-p0-25-bounded-independent-review-20261015.md",
+      "sha256": "f0a8be16d7a5afbaf7177fb00f7e4752698a15553ea9feca1f35b2888fe8b197"
+    },
+    {
+      "path": "evidence/f71be48e3749-p0-25-canonical-qualification-first-20261015.log",
+      "sha256": "f71be48e374973c5062db961c9f5fe7812189868a5f005a8aeffae99de9cbb38"
+    },
+    {
+      "path": "evidence/f9250d40691d-p0-25-original-citations-mapping-20261015.json",
+      "sha256": "f9250d40691dfeb47f8186d21710526563f456ed088d07235bbe1b19f3fec2ce"
+    },
+    {
+      "path": "evidence/face22b6fd61-original-citations-mapping.json",
+      "sha256": "face22b6fd610d8ed0dd32e94854b5c21ff4121da8d13afe62715146171df5ee"
+    },
+    {
+      "path": "evidence-map.json",
+      "sha256": "23a6961c7807e3a0fa4f218ae700f5a22547fbcffc4cf55d8a51ee5a3274ae35"
+    },
+    {
+      "path": "outcomes.json",
+      "sha256": "fbb84dc1c2c482c686181d24e8197d7ba4661b513608ca819d69513d6a3cc1cb"
+    },
+    {
+      "path": "private-references.json",
+      "sha256": "603521b02a5452f11b9bf2610f38465961f376786a7d2e21329ba79f649c21a4"
+    },
+    {
+      "path": "validation-summary.json",
+      "sha256": "53bafe649f624ad30456b5b3c4e427c25e8f09cbd72558b9e75eda898167ff13"
+    }
+  ],
+  "notes": "Bounded existing-source qualification, not formal acceptance or Done. tests records only the original 32-case citation/mapping run. Separate 22 injected-executor cases, three actual parser-refusal commands and reused historical 30-case causal controls are distinct in outcomes.json. The three exit-1 commands are expected argument refusals and did not update the baseline. Actual collector/package both exit0 with zero errors and 623 ratcheted findings; prior informal errors wording is corrected. Strict ISO/expert/host-list gaps and duplicate1269/dead2751 remain unwaived. Original source/tests/config/guards/data and frozen historical evidence remain unchanged. No full-suite, Node24, hosted CI, complete release, PR/merge, formal dependency or G0 claim. The ordinary staged whitespace check exits2 solely for one blank EOF line in the byte-exact copied successful build log; it is retained without altering original evidence. The earlier no-index README comparison exits1 for differing files with an empty diagnostic stream. See validation-summary.json. Normal freeze remains unmodified."
+}

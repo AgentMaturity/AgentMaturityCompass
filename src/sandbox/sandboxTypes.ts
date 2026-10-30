@@ -47,6 +47,8 @@ export interface SandboxPolicy {
   readonly maxProcesses?: number;
   /** Receives every egress proxy decision before it takes effect; a throw denies that connection. */
   readonly onEgress?: (row: ShellEgressRow) => void;
+  /** Required with `allowHosts`: the workspace and agent each proxied connection is checked for (checkEgress). */
+  readonly egressScope?: { readonly workspace: string; readonly agentId: string };
 }
 
 /** One `NATIVE_SHELL_EGRESS` decision by the shell's egress proxy. */

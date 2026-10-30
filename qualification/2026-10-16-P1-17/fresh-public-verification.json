@@ -1,0 +1,948 @@
+{
+  "method": "Offline Node22 builtin fs/crypto/UTF8 only; no product module, SQL, signer, process probe or runtime rerun. Current Q TS files not read.",
+  "roots": [
+    {
+      "root": "/private/tmp/p117-surface-tTABKp",
+      "workspace": "/private/tmp/p117-surface-tTABKp/workspace",
+      "sourceRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout",
+      "success": true,
+      "observationFileMatchesMarker": true,
+      "driverPinMatches": true,
+      "sourcePins": [
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/dist/cli.js",
+          "match": true,
+          "sha256": "ce387d2f113699e2399ecabfdba288cc45748c15c28efc24f2bf0d68e0e9261f"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/dist/api/incidentRouter.js",
+          "match": true,
+          "sha256": "d6755b4523309abc79ed068ce3fd223d66a2bdcdfe5cf279d2d0e4839ea077c3"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/dist/incidents/incidentClockEvents.js",
+          "match": true,
+          "sha256": "079b235d38b02285c15f726653f42f1da60f707327faffd53d79ef8c8c8b8aa2"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/dist/incidents/incidentStore.js",
+          "match": true,
+          "sha256": "ac147ef96fa20aaf2e18d3e566ba63453a4009c957c14c0b3d2935a4a3c77758"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/dist/mcp/amcMcpServer.js",
+          "match": true,
+          "sha256": "3b233c3045d2a1ddee6225efb2967bc3272e8e08af788bda411491dbf2125fc8"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/dist/workspace.js",
+          "match": true,
+          "sha256": "5b50d81f0ba2619bc7a6b5651f0e6179d542d7febbbfa513a30e218ea2215c06"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/dist/ledger/ledger.js",
+          "match": true,
+          "sha256": "b555d1a81c0033f2af9a5004e209eae0f11ceb46f665b9f52b17cf9978796da2"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/dist/storage/sqlitePool.js",
+          "match": true,
+          "sha256": "b30b74682cc61bd1d03d08cced571cfc7ee2fcd0f43105965346d4fff80be55e"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/dist/vault/vault.js",
+          "match": true,
+          "sha256": "f1152e1ace9f772e01a9c3720c66f39fef60ba30f4e3269bba35dc4b2d0e6545"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/dist/crypto/keys.js",
+          "match": true,
+          "sha256": "33c4b7aef14b5794cd59f7300c6672e499ae308e6f0ef2c9ab32e89acbe8b4ee"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/dist/utils/json.js",
+          "match": true,
+          "sha256": "f2440acd31b7d86a041ec312d766116a389b90efba539d473ebb2116290052ba"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/dist/utils/hash.js",
+          "match": true,
+          "sha256": "89eb0ccd539c4d12045ad29906d121da226aadbe5aa1f3b2519fe30c098309d0"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/node_modules/@modelcontextprotocol/sdk/dist/esm/client/index.js",
+          "match": true,
+          "sha256": "db6cc643f5cc095b2fd0b70bf691d1775f07a317e97555e3928559e815f5e32a"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/node_modules/@modelcontextprotocol/sdk/dist/esm/inMemory.js",
+          "match": true,
+          "sha256": "8eb57dc4b4c0993869273a5e01a35c71e8d84c3d5050e9871a8cf141360f883d"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/node_modules/@modelcontextprotocol/sdk/dist/esm/types.js",
+          "match": true,
+          "sha256": "962836b0f8dad85bcd398ad3ddb5ba81a7c7530c706955aa846dd8dfc02dd6a9"
+        }
+      ],
+      "anchorSha256": "b607e3d195ea2371345382759cb4e2614beca067cdaa7d94c16bcf804e099d18",
+      "anchorType": "ed25519",
+      "anchorsAllMatch": true,
+      "anchorBeforeSeed": true,
+      "incidentSignatureValid": true,
+      "clockSignatures": [
+        {
+          "eventId": "ice_8369bc5bae684e34848aaf6cc3b3a1ab",
+          "signatureValid": true,
+          "signatureBytes": 64,
+          "ts": 1772445600000,
+          "recordedTs": 1772445660000,
+          "kind": "TRIGGER",
+          "recordedBy": "owned-fixture-clock"
+        },
+        {
+          "eventId": "ice_dc5ce0472db44a5bb6701151363a1db2",
+          "signatureValid": true,
+          "signatureBytes": 64,
+          "ts": 1772701200000,
+          "recordedTs": 1772701200000,
+          "kind": "NOTIFIED",
+          "recordedBy": "owned-fixture-clock"
+        }
+      ],
+      "rootMode": 448,
+      "configModes": [
+        {
+          "stage": "init",
+          "mode": 384
+        },
+        {
+          "stage": "seed",
+          "mode": 384
+        }
+      ],
+      "publicSecretLeak": false,
+      "children": [
+        {
+          "label": "init",
+          "pid": 28348,
+          "exit": 0,
+          "signal": null,
+          "spawnError": null,
+          "streamsClosed": true,
+          "absentByESRCH": true,
+          "pidProbes": [
+            "ESRCH"
+          ],
+          "captureErrors": [],
+          "truncated": false,
+          "recordMatches": true,
+          "streams": [
+            {
+              "name": "stdout",
+              "path": "/private/tmp/p117-surface-tTABKp/init.stdout.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "match": true,
+              "lateHits": []
+            },
+            {
+              "name": "stderr",
+              "path": "/private/tmp/p117-surface-tTABKp/init.stderr.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "match": true,
+              "lateHits": []
+            }
+          ]
+        },
+        {
+          "label": "seed",
+          "pid": 28355,
+          "exit": 0,
+          "signal": null,
+          "spawnError": null,
+          "streamsClosed": true,
+          "absentByESRCH": true,
+          "pidProbes": [
+            "ESRCH"
+          ],
+          "captureErrors": [],
+          "truncated": false,
+          "recordMatches": true,
+          "streams": [
+            {
+              "name": "stdout",
+              "path": "/private/tmp/p117-surface-tTABKp/seed.stdout.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "match": true,
+              "lateHits": []
+            },
+            {
+              "name": "stderr",
+              "path": "/private/tmp/p117-surface-tTABKp/seed.stderr.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "match": true,
+              "lateHits": []
+            }
+          ]
+        },
+        {
+          "label": "cli",
+          "pid": 28356,
+          "exit": 0,
+          "signal": null,
+          "spawnError": null,
+          "streamsClosed": true,
+          "absentByESRCH": true,
+          "pidProbes": [
+            "ESRCH"
+          ],
+          "captureErrors": [],
+          "truncated": false,
+          "recordMatches": true,
+          "streams": [
+            {
+              "name": "stdout",
+              "path": "/private/tmp/p117-surface-tTABKp/cli.stdout.log",
+              "bytes": 37333,
+              "sha256": "e50e9c0c9b965ba98dc0a3453bebf54311290dceb97df435b69c2421df4e6678",
+              "match": true,
+              "lateHits": []
+            },
+            {
+              "name": "stderr",
+              "path": "/private/tmp/p117-surface-tTABKp/cli.stderr.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "match": true,
+              "lateHits": []
+            }
+          ]
+        }
+      ],
+      "surface": {
+        "kind": "cli",
+        "listing": {
+          "incidentId": "incident-p117-owned",
+          "station": "wealth",
+          "now": "2026-03-05T12:00:00.000Z",
+          "usClockIds": [
+            "nydfs-500-17-notice",
+            "nydfs-500-17-extortion-notice",
+            "nydfs-500-17-extortion-explanation",
+            "glba-314-4j-ftc-notice",
+            "bsa-1020-320-sar-filing"
+          ],
+          "nydfs": {
+            "clockId": "nydfs-500-17-notice",
+            "triggerTs": 1772445600000,
+            "dueTs": 1772704800000,
+            "status": "SATISFIED",
+            "satisfiedTs": 1772701200000,
+            "review": "experimental: agent-drafted, expert review pending (D-08)"
+          },
+          "events": [
+            {
+              "eventId": "ice_8369bc5bae684e34848aaf6cc3b3a1ab",
+              "kind": "TRIGGER",
+              "triggerOrClockId": "INCIDENT_DETERMINATION",
+              "at": "2026-03-02T10:00:00.000Z",
+              "recordedAt": "2026-03-02T10:01:00.000Z",
+              "recordedBy": "owned-fixture-clock"
+            },
+            {
+              "eventId": "ice_dc5ce0472db44a5bb6701151363a1db2",
+              "kind": "NOTIFIED",
+              "triggerOrClockId": "nydfs-500-17-notice",
+              "at": "2026-03-05T09:00:00.000Z",
+              "recordedAt": "2026-03-05T09:00:00.000Z",
+              "recordedBy": "owned-fixture-clock"
+            }
+          ],
+          "notes": [
+            "Clock durations are experimental: agent-drafted, expert review pending (D-08); this is not legal advice.",
+            "Trigger and notice times are operator claims; each event shows when and through which surface it was recorded.",
+            "A station lists candidate clocks: AMC does not decide applicability or check conditions such as 500 or more consumers affected.",
+            "Events verify against this workspace's own monitor key history: a local audit trail, not independent proof.",
+            "AMC computes and records deadlines; it does not file notices."
+          ]
+        },
+        "stdoutMatchesObservation": true
+      }
+    },
+    {
+      "root": "/private/tmp/p117-surface-FZXwmG",
+      "workspace": "/private/tmp/p117-surface-FZXwmG/workspace",
+      "sourceRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout",
+      "success": true,
+      "observationFileMatchesMarker": true,
+      "driverPinMatches": true,
+      "sourcePins": [
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/dist/cli.js",
+          "match": true,
+          "sha256": "ce387d2f113699e2399ecabfdba288cc45748c15c28efc24f2bf0d68e0e9261f"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/dist/api/incidentRouter.js",
+          "match": true,
+          "sha256": "d6755b4523309abc79ed068ce3fd223d66a2bdcdfe5cf279d2d0e4839ea077c3"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/dist/incidents/incidentClockEvents.js",
+          "match": true,
+          "sha256": "079b235d38b02285c15f726653f42f1da60f707327faffd53d79ef8c8c8b8aa2"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/dist/incidents/incidentStore.js",
+          "match": true,
+          "sha256": "ac147ef96fa20aaf2e18d3e566ba63453a4009c957c14c0b3d2935a4a3c77758"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/dist/mcp/amcMcpServer.js",
+          "match": true,
+          "sha256": "3b233c3045d2a1ddee6225efb2967bc3272e8e08af788bda411491dbf2125fc8"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/dist/workspace.js",
+          "match": true,
+          "sha256": "5b50d81f0ba2619bc7a6b5651f0e6179d542d7febbbfa513a30e218ea2215c06"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/dist/ledger/ledger.js",
+          "match": true,
+          "sha256": "b555d1a81c0033f2af9a5004e209eae0f11ceb46f665b9f52b17cf9978796da2"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/dist/storage/sqlitePool.js",
+          "match": true,
+          "sha256": "b30b74682cc61bd1d03d08cced571cfc7ee2fcd0f43105965346d4fff80be55e"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/dist/vault/vault.js",
+          "match": true,
+          "sha256": "f1152e1ace9f772e01a9c3720c66f39fef60ba30f4e3269bba35dc4b2d0e6545"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/dist/crypto/keys.js",
+          "match": true,
+          "sha256": "33c4b7aef14b5794cd59f7300c6672e499ae308e6f0ef2c9ab32e89acbe8b4ee"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/dist/utils/json.js",
+          "match": true,
+          "sha256": "f2440acd31b7d86a041ec312d766116a389b90efba539d473ebb2116290052ba"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/dist/utils/hash.js",
+          "match": true,
+          "sha256": "89eb0ccd539c4d12045ad29906d121da226aadbe5aa1f3b2519fe30c098309d0"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/node_modules/@modelcontextprotocol/sdk/dist/esm/client/index.js",
+          "match": true,
+          "sha256": "db6cc643f5cc095b2fd0b70bf691d1775f07a317e97555e3928559e815f5e32a"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/node_modules/@modelcontextprotocol/sdk/dist/esm/inMemory.js",
+          "match": true,
+          "sha256": "8eb57dc4b4c0993869273a5e01a35c71e8d84c3d5050e9871a8cf141360f883d"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/node_modules/@modelcontextprotocol/sdk/dist/esm/types.js",
+          "match": true,
+          "sha256": "962836b0f8dad85bcd398ad3ddb5ba81a7c7530c706955aa846dd8dfc02dd6a9"
+        }
+      ],
+      "anchorSha256": "2f6f542f4e1c1990940b6932810550b44cd2864079b3d9540f793bd46542c301",
+      "anchorType": "ed25519",
+      "anchorsAllMatch": true,
+      "anchorBeforeSeed": true,
+      "incidentSignatureValid": true,
+      "clockSignatures": [
+        {
+          "eventId": "ice_7c57d479dc6c43998fcf3bb7247d9156",
+          "signatureValid": true,
+          "signatureBytes": 64,
+          "ts": 1772445600000,
+          "recordedTs": 1772445660000,
+          "kind": "TRIGGER",
+          "recordedBy": "owned-fixture-clock"
+        },
+        {
+          "eventId": "ice_478e0e31bbe24f1aaad45d4d05bca1dd",
+          "signatureValid": true,
+          "signatureBytes": 64,
+          "ts": 1772701200000,
+          "recordedTs": 1772701200000,
+          "kind": "NOTIFIED",
+          "recordedBy": "owned-fixture-clock"
+        }
+      ],
+      "rootMode": 448,
+      "configModes": [
+        {
+          "stage": "init",
+          "mode": 384
+        },
+        {
+          "stage": "seed",
+          "mode": 384
+        },
+        {
+          "stage": "http",
+          "mode": 384
+        }
+      ],
+      "publicSecretLeak": false,
+      "children": [
+        {
+          "label": "init",
+          "pid": 28357,
+          "exit": 0,
+          "signal": null,
+          "spawnError": null,
+          "streamsClosed": true,
+          "absentByESRCH": true,
+          "pidProbes": [
+            "ESRCH"
+          ],
+          "captureErrors": [],
+          "truncated": false,
+          "recordMatches": true,
+          "streams": [
+            {
+              "name": "stdout",
+              "path": "/private/tmp/p117-surface-FZXwmG/init.stdout.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "match": true,
+              "lateHits": []
+            },
+            {
+              "name": "stderr",
+              "path": "/private/tmp/p117-surface-FZXwmG/init.stderr.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "match": true,
+              "lateHits": []
+            }
+          ]
+        },
+        {
+          "label": "seed",
+          "pid": 28358,
+          "exit": 0,
+          "signal": null,
+          "spawnError": null,
+          "streamsClosed": true,
+          "absentByESRCH": true,
+          "pidProbes": [
+            "ESRCH"
+          ],
+          "captureErrors": [],
+          "truncated": false,
+          "recordMatches": true,
+          "streams": [
+            {
+              "name": "stdout",
+              "path": "/private/tmp/p117-surface-FZXwmG/seed.stdout.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "match": true,
+              "lateHits": []
+            },
+            {
+              "name": "stderr",
+              "path": "/private/tmp/p117-surface-FZXwmG/seed.stderr.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "match": true,
+              "lateHits": []
+            }
+          ]
+        },
+        {
+          "label": "http",
+          "pid": 28359,
+          "exit": 0,
+          "signal": null,
+          "spawnError": null,
+          "streamsClosed": true,
+          "absentByESRCH": true,
+          "pidProbes": [
+            "ESRCH"
+          ],
+          "captureErrors": [],
+          "truncated": false,
+          "recordMatches": true,
+          "streams": [
+            {
+              "name": "stdout",
+              "path": "/private/tmp/p117-surface-FZXwmG/http.stdout.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "match": true,
+              "lateHits": []
+            },
+            {
+              "name": "stderr",
+              "path": "/private/tmp/p117-surface-FZXwmG/http.stderr.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "match": true,
+              "lateHits": []
+            }
+          ]
+        }
+      ],
+      "surface": {
+        "kind": "http",
+        "statuses": {
+          "listing": 200,
+          "invalid": 400,
+          "missing": 404,
+          "badEvent": 400,
+          "created": 201,
+          "after": 200
+        },
+        "initial": {
+          "incidentId": "incident-p117-owned",
+          "station": "wealth",
+          "now": "2026-03-05T12:00:00.000Z",
+          "usClockIds": [
+            "nydfs-500-17-notice",
+            "nydfs-500-17-extortion-notice",
+            "nydfs-500-17-extortion-explanation",
+            "glba-314-4j-ftc-notice",
+            "bsa-1020-320-sar-filing"
+          ],
+          "nydfs": {
+            "clockId": "nydfs-500-17-notice",
+            "triggerTs": 1772445600000,
+            "dueTs": 1772704800000,
+            "status": "SATISFIED",
+            "satisfiedTs": 1772701200000,
+            "review": "experimental: agent-drafted, expert review pending (D-08)"
+          },
+          "events": [
+            {
+              "eventId": "ice_7c57d479dc6c43998fcf3bb7247d9156",
+              "kind": "TRIGGER",
+              "triggerOrClockId": "INCIDENT_DETERMINATION",
+              "at": "2026-03-02T10:00:00.000Z",
+              "recordedAt": "2026-03-02T10:01:00.000Z",
+              "recordedBy": "owned-fixture-clock"
+            },
+            {
+              "eventId": "ice_478e0e31bbe24f1aaad45d4d05bca1dd",
+              "kind": "NOTIFIED",
+              "triggerOrClockId": "nydfs-500-17-notice",
+              "at": "2026-03-05T09:00:00.000Z",
+              "recordedAt": "2026-03-05T09:00:00.000Z",
+              "recordedBy": "owned-fixture-clock"
+            }
+          ],
+          "notes": [
+            "Clock durations are experimental: agent-drafted, expert review pending (D-08); this is not legal advice.",
+            "Trigger and notice times are operator claims; each event shows when and through which surface it was recorded.",
+            "A station lists candidate clocks: AMC does not decide applicability or check conditions such as 500 or more consumers affected.",
+            "Events verify against this workspace's own monitor key history: a local audit trail, not independent proof.",
+            "AMC computes and records deadlines; it does not file notices."
+          ]
+        },
+        "after": {
+          "incidentId": "incident-p117-owned",
+          "station": "wealth",
+          "now": "2026-03-05T12:00:00.000Z",
+          "usClockIds": [
+            "nydfs-500-17-notice",
+            "nydfs-500-17-extortion-notice",
+            "nydfs-500-17-extortion-explanation",
+            "glba-314-4j-ftc-notice",
+            "bsa-1020-320-sar-filing"
+          ],
+          "nydfs": {
+            "clockId": "nydfs-500-17-notice",
+            "triggerTs": 1772445600000,
+            "dueTs": 1772704800000,
+            "status": "SATISFIED",
+            "satisfiedTs": 1772701200000,
+            "review": "experimental: agent-drafted, expert review pending (D-08)"
+          },
+          "events": [
+            {
+              "eventId": "ice_7c57d479dc6c43998fcf3bb7247d9156",
+              "kind": "TRIGGER",
+              "triggerOrClockId": "INCIDENT_DETERMINATION",
+              "at": "2026-03-02T10:00:00.000Z",
+              "recordedAt": "2026-03-02T10:01:00.000Z",
+              "recordedBy": "owned-fixture-clock"
+            },
+            {
+              "eventId": "ice_5f574799ba0c4a6fbb3963ceef7ac3e2",
+              "kind": "TRIGGER",
+              "triggerOrClockId": "EXTORTION_PAYMENT",
+              "at": "2026-03-02T10:00:00.000Z",
+              "recordedAt": "2026-10-16T09:43:19.349Z",
+              "recordedBy": "api"
+            },
+            {
+              "eventId": "ice_478e0e31bbe24f1aaad45d4d05bca1dd",
+              "kind": "NOTIFIED",
+              "triggerOrClockId": "nydfs-500-17-notice",
+              "at": "2026-03-05T09:00:00.000Z",
+              "recordedAt": "2026-03-05T09:00:00.000Z",
+              "recordedBy": "owned-fixture-clock"
+            }
+          ],
+          "notes": [
+            "Clock durations are experimental: agent-drafted, expert review pending (D-08); this is not legal advice.",
+            "Trigger and notice times are operator claims; each event shows when and through which surface it was recorded.",
+            "A station lists candidate clocks: AMC does not decide applicability or check conditions such as 500 or more consumers affected.",
+            "Events verify against this workspace's own monitor key history: a local audit trail, not independent proof.",
+            "AMC computes and records deadlines; it does not file notices."
+          ]
+        },
+        "created": {
+          "eventId": "ice_5f574799ba0c4a6fbb3963ceef7ac3e2",
+          "incidentId": "incident-p117-owned",
+          "kind": "TRIGGER",
+          "triggerOrClockId": "EXTORTION_PAYMENT",
+          "station": "wealth",
+          "ts": 1772445600000,
+          "recordedTs": 1792143799349,
+          "recordedBy": "api",
+          "signature": "GlyfQZA6KMMm958RcBS9tbllvVVdFJqLgWVLppk6DwV1FVrlYz/KrByBPvQsovlRQvvaUAw1VyLT2EexJfNeBQ=="
+        },
+        "createdSignatureValid": true,
+        "principalSupplied": false,
+        "lifecycle": {
+          "httpClosed": true,
+          "clientClosed": false,
+          "serverClosed": false,
+          "httpErrors": []
+        },
+        "errors": {
+          "invalid": "unknown station not-a-station; expected one of health, education, environment, mobility, governance, technology, wealth",
+          "missing": "Incident not found",
+          "badEvent": "clock event refused: unknown trigger NOT_A_TRIGGER; expected one of AWARENESS, INCIDENT_NOTIFICATION, CLASSIFICATION_MAJOR, INITIAL_NOTIFICATION, INTERMEDIATE_REPORT, BREACH_DETERMINATION, INCIDENT_DETERMINATION, EXTORTION_PAYMENT, INITIAL_DETECTION"
+        }
+      }
+    },
+    {
+      "root": "/private/tmp/p117-surface-lCe0oO",
+      "workspace": "/private/tmp/p117-surface-lCe0oO/workspace",
+      "sourceRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout",
+      "success": true,
+      "observationFileMatchesMarker": true,
+      "driverPinMatches": true,
+      "sourcePins": [
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/dist/cli.js",
+          "match": true,
+          "sha256": "ce387d2f113699e2399ecabfdba288cc45748c15c28efc24f2bf0d68e0e9261f"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/dist/api/incidentRouter.js",
+          "match": true,
+          "sha256": "d6755b4523309abc79ed068ce3fd223d66a2bdcdfe5cf279d2d0e4839ea077c3"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/dist/incidents/incidentClockEvents.js",
+          "match": true,
+          "sha256": "079b235d38b02285c15f726653f42f1da60f707327faffd53d79ef8c8c8b8aa2"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/dist/incidents/incidentStore.js",
+          "match": true,
+          "sha256": "ac147ef96fa20aaf2e18d3e566ba63453a4009c957c14c0b3d2935a4a3c77758"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/dist/mcp/amcMcpServer.js",
+          "match": true,
+          "sha256": "3b233c3045d2a1ddee6225efb2967bc3272e8e08af788bda411491dbf2125fc8"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/dist/workspace.js",
+          "match": true,
+          "sha256": "5b50d81f0ba2619bc7a6b5651f0e6179d542d7febbbfa513a30e218ea2215c06"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/dist/ledger/ledger.js",
+          "match": true,
+          "sha256": "b555d1a81c0033f2af9a5004e209eae0f11ceb46f665b9f52b17cf9978796da2"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/dist/storage/sqlitePool.js",
+          "match": true,
+          "sha256": "b30b74682cc61bd1d03d08cced571cfc7ee2fcd0f43105965346d4fff80be55e"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/dist/vault/vault.js",
+          "match": true,
+          "sha256": "f1152e1ace9f772e01a9c3720c66f39fef60ba30f4e3269bba35dc4b2d0e6545"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/dist/crypto/keys.js",
+          "match": true,
+          "sha256": "33c4b7aef14b5794cd59f7300c6672e499ae308e6f0ef2c9ab32e89acbe8b4ee"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/dist/utils/json.js",
+          "match": true,
+          "sha256": "f2440acd31b7d86a041ec312d766116a389b90efba539d473ebb2116290052ba"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/dist/utils/hash.js",
+          "match": true,
+          "sha256": "89eb0ccd539c4d12045ad29906d121da226aadbe5aa1f3b2519fe30c098309d0"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/node_modules/@modelcontextprotocol/sdk/dist/esm/client/index.js",
+          "match": true,
+          "sha256": "db6cc643f5cc095b2fd0b70bf691d1775f07a317e97555e3928559e815f5e32a"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/node_modules/@modelcontextprotocol/sdk/dist/esm/inMemory.js",
+          "match": true,
+          "sha256": "8eb57dc4b4c0993869273a5e01a35c71e8d84c3d5050e9871a8cf141360f883d"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/node_modules/@modelcontextprotocol/sdk/dist/esm/types.js",
+          "match": true,
+          "sha256": "962836b0f8dad85bcd398ad3ddb5ba81a7c7530c706955aa846dd8dfc02dd6a9"
+        }
+      ],
+      "anchorSha256": "85bd49ad9ec7d001ac31d08f3bf64eec5f4f69f2a7b2ee45a7e0c8581a577452",
+      "anchorType": "ed25519",
+      "anchorsAllMatch": true,
+      "anchorBeforeSeed": true,
+      "incidentSignatureValid": true,
+      "clockSignatures": [
+        {
+          "eventId": "ice_14acf3b9cfcd4bd6a7eb7e0103cd7db9",
+          "signatureValid": true,
+          "signatureBytes": 64,
+          "ts": 1772445600000,
+          "recordedTs": 1772445660000,
+          "kind": "TRIGGER",
+          "recordedBy": "owned-fixture-clock"
+        },
+        {
+          "eventId": "ice_c95b3b58d9514b14a7a160c64aba43dc",
+          "signatureValid": true,
+          "signatureBytes": 64,
+          "ts": 1772701200000,
+          "recordedTs": 1772701200000,
+          "kind": "NOTIFIED",
+          "recordedBy": "owned-fixture-clock"
+        }
+      ],
+      "rootMode": 448,
+      "configModes": [
+        {
+          "stage": "init",
+          "mode": 384
+        },
+        {
+          "stage": "seed",
+          "mode": 384
+        },
+        {
+          "stage": "mcp",
+          "mode": 384
+        }
+      ],
+      "publicSecretLeak": false,
+      "children": [
+        {
+          "label": "init",
+          "pid": 28360,
+          "exit": 0,
+          "signal": null,
+          "spawnError": null,
+          "streamsClosed": true,
+          "absentByESRCH": true,
+          "pidProbes": [
+            "ESRCH"
+          ],
+          "captureErrors": [],
+          "truncated": false,
+          "recordMatches": true,
+          "streams": [
+            {
+              "name": "stdout",
+              "path": "/private/tmp/p117-surface-lCe0oO/init.stdout.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "match": true,
+              "lateHits": []
+            },
+            {
+              "name": "stderr",
+              "path": "/private/tmp/p117-surface-lCe0oO/init.stderr.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "match": true,
+              "lateHits": []
+            }
+          ]
+        },
+        {
+          "label": "seed",
+          "pid": 28378,
+          "exit": 0,
+          "signal": null,
+          "spawnError": null,
+          "streamsClosed": true,
+          "absentByESRCH": true,
+          "pidProbes": [
+            "ESRCH"
+          ],
+          "captureErrors": [],
+          "truncated": false,
+          "recordMatches": true,
+          "streams": [
+            {
+              "name": "stdout",
+              "path": "/private/tmp/p117-surface-lCe0oO/seed.stdout.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "match": true,
+              "lateHits": []
+            },
+            {
+              "name": "stderr",
+              "path": "/private/tmp/p117-surface-lCe0oO/seed.stderr.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "match": true,
+              "lateHits": []
+            }
+          ]
+        },
+        {
+          "label": "mcp",
+          "pid": 28379,
+          "exit": 0,
+          "signal": null,
+          "spawnError": null,
+          "streamsClosed": true,
+          "absentByESRCH": true,
+          "pidProbes": [
+            "ESRCH"
+          ],
+          "captureErrors": [],
+          "truncated": false,
+          "recordMatches": true,
+          "streams": [
+            {
+              "name": "stdout",
+              "path": "/private/tmp/p117-surface-lCe0oO/mcp.stdout.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "match": true,
+              "lateHits": []
+            },
+            {
+              "name": "stderr",
+              "path": "/private/tmp/p117-surface-lCe0oO/mcp.stderr.log",
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "match": true,
+              "lateHits": []
+            }
+          ]
+        }
+      ],
+      "surface": {
+        "kind": "mcp",
+        "toolNames": [
+          "amc_list_agents",
+          "amc_quickscore",
+          "amc_get_guide",
+          "amc_check_compliance",
+          "amc_transparency_report",
+          "amc_score_sector_pack",
+          "amc_score_agent",
+          "amc_list_evidence",
+          "amc_query_diagnostic",
+          "amc_get_recommendations",
+          "amc_incident_clocks"
+        ],
+        "listing": {
+          "incidentId": "incident-p117-owned",
+          "station": "wealth",
+          "now": "2026-03-05T12:00:00.000Z",
+          "usClockIds": [
+            "nydfs-500-17-notice",
+            "nydfs-500-17-extortion-notice",
+            "nydfs-500-17-extortion-explanation",
+            "glba-314-4j-ftc-notice",
+            "bsa-1020-320-sar-filing"
+          ],
+          "nydfs": {
+            "clockId": "nydfs-500-17-notice",
+            "triggerTs": 1772445600000,
+            "dueTs": 1772704800000,
+            "status": "SATISFIED",
+            "satisfiedTs": 1772701200000,
+            "review": "experimental: agent-drafted, expert review pending (D-08)"
+          },
+          "events": [
+            {
+              "eventId": "ice_14acf3b9cfcd4bd6a7eb7e0103cd7db9",
+              "kind": "TRIGGER",
+              "triggerOrClockId": "INCIDENT_DETERMINATION",
+              "at": "2026-03-02T10:00:00.000Z",
+              "recordedAt": "2026-03-02T10:01:00.000Z",
+              "recordedBy": "owned-fixture-clock"
+            },
+            {
+              "eventId": "ice_c95b3b58d9514b14a7a160c64aba43dc",
+              "kind": "NOTIFIED",
+              "triggerOrClockId": "nydfs-500-17-notice",
+              "at": "2026-03-05T09:00:00.000Z",
+              "recordedAt": "2026-03-05T09:00:00.000Z",
+              "recordedBy": "owned-fixture-clock"
+            }
+          ],
+          "notes": [
+            "Clock durations are experimental: agent-drafted, expert review pending (D-08); this is not legal advice.",
+            "Trigger and notice times are operator claims; each event shows when and through which surface it was recorded.",
+            "A station lists candidate clocks: AMC does not decide applicability or check conditions such as 500 or more consumers affected.",
+            "Events verify against this workspace's own monitor key history: a local audit trail, not independent proof.",
+            "AMC computes and records deadlines; it does not file notices."
+          ],
+          "claimKind": "self_reported",
+          "result": "not_evaluated"
+        },
+        "positiveIsError": false,
+        "invalid": {
+          "isError": true,
+          "texts": [
+            "Incident clocks failed: unknown station not-a-station; expected one of health, education, environment, mobility, governance, technology, wealth"
+          ]
+        },
+        "missing": {
+          "isError": true,
+          "texts": [
+            "Incident not found: incident-missing"
+          ]
+        },
+        "lifecycle": {
+          "httpClosed": false,
+          "clientClosed": true,
+          "serverClosed": true,
+          "httpErrors": []
+        },
+        "transport": "actual-sdk-linked-memory"
+      }
+    }
+  ],
+  "outerLateHits": []
+}

@@ -1,19 +1,20 @@
 import { z } from "zod";
-import { executeFsRead, executeFsWrite } from "../../toolhub/toolhubExecutors/fs.js";
+import { detokenize } from "../../dataflow/detokenizeGate.js";
 import { executeGit } from "../../toolhub/toolhubExecutors/git.js";
 import { executeHttpFetch } from "../../toolhub/toolhubExecutors/http.js";
 import { executeProcessSpawn } from "../../toolhub/toolhubExecutors/process.js";
-import { resolveToolPath } from "../../toolhub/toolhubValidators.js";
 import { defineTool } from "../toolRegistry.js";
+import { fsTools } from "../builtin/fsTools.js";
+import { ReadBeforeEditLedger } from "../builtin/readBeforeEdit.js";
 import { DefiniteFailureError, type ToolDefinition, type ToolExecution } from "../toolTypes.js";
 
 /**
  * Toolhub's executors, as pipeline tools (P4.1).
  *
- * Delegation, not reimplementation. Each body validates its arguments and
- * calls the SAME executor the toolhub server calls, so there is one
- * implementation of "write this file" and it cannot drift into two that
- * disagree about what they did.
+ * Filesystem definitions reuse the native fsTools bodies and one observation
+ * ledger for this composition, so limits, paging and read-before-write policy
+ * cannot drift between same-named pipeline tools. Other bodies delegate to the
+ * same executor the toolhub server calls.
  *
  * The names match the signed `tools.yaml` entries exactly, because
  * `toolhubAllowlistGuard` resolves a definition by name — a rename here would
@@ -26,8 +27,6 @@ import { DefiniteFailureError, type ToolDefinition, type ToolExecution } from ".
  * and reporting it as a denial would credit policy with catching a typo.
  */
 
-const fsReadArgs = z.object({ path: z.string().min(1), maxBytes: z.number().int().positive().max(20_000_000).default(200_000) });
-const fsWriteArgs = z.object({ path: z.string().min(1), content: z.string() });
 const gitArgs = z.object({ args: z.array(z.string()).default([]), cwd: z.string().optional() });
 const httpArgs = z.object({
   url: z.string().url(),
@@ -61,33 +60,9 @@ function processOutcome(result: ReturnType<typeof executeProcessSpawn>): {
 }
 
 export function toolhubPipelineTools(): readonly ToolDefinition[] {
+  const ledger = new ReadBeforeEditLedger();
   return [
-    defineTool({
-      name: "fs.read",
-      actionClass: "READ_ONLY",
-      description: "Read a file from the workspace, capped at maxBytes.",
-      body: (execution) => {
-        const args = fsReadArgs.parse(execution.arguments);
-        return executeFsRead({
-          path: resolveToolPath(execution.workspace, args.path),
-          maxBytes: args.maxBytes,
-          simulate: simulated(execution)
-        });
-      }
-    }),
-    defineTool({
-      name: "fs.write",
-      actionClass: "WRITE_LOW",
-      description: "Write a file into the workspace.",
-      body: (execution) => {
-        const args = fsWriteArgs.parse(execution.arguments);
-        return executeFsWrite({
-          path: resolveToolPath(execution.workspace, args.path),
-          content: args.content,
-          simulate: simulated(execution)
-        });
-      }
-    }),
+    ...fsTools({ ledger }).filter(tool => tool.name === "fs.read" || tool.name === "fs.write"),
     ...(["status", "commit", "push"] as const).map((subcommand) =>
       defineTool({
         name: `git.${subcommand}`,
@@ -111,14 +86,20 @@ export function toolhubPipelineTools(): readonly ToolDefinition[] {
       description: "Fetch a URL on the signed host allowlist.",
       body: async (execution) => {
         const args = httpArgs.parse(execution.arguments);
-        const response = await executeHttpFetch({ ...args, workspace: execution.workspace, simulate: simulated(execution),
+        const simulate = simulated(execution);
+        // P2-02: the last step before sending; headers and body only, the URL is never restored.
+        const sent = simulate ? null : detokenize({ headers: args.headers, body: args.body },
+          { execution, destination: { channel: "network-tool", url: args.url }, strictText: true });
+        const response = await executeHttpFetch({ ...args, ...(sent?.value ?? {}), workspace: execution.workspace, simulate,
           ...(execution.idempotencyKey && execution.idempotencyHeader ? { idempotency: { header: execution.idempotencyHeader, key: execution.idempotencyKey } } : {}) });
+        const output = sent === null ? response.body : sent.retokenize(response.body);
         return {
-          output: response.body,
+          ok: response.status >= 200 && response.status < 300,
+          output,
           // An HTTP status is not an exit code, and mapping it to one would
           // make a 404 read as a process that exited 404.
           exitCode: null,
-          bytes: Buffer.byteLength(response.body, "utf8")
+          bytes: Buffer.byteLength(output, "utf8")
         };
       }
     }),

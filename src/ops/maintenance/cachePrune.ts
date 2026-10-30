@@ -1,6 +1,7 @@
 import { readdirSync, statSync, unlinkSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { pathExists } from "../../utils/fs.js";
+import { withConsoleSnapshotLock } from "../../studio/consoleSnapshot.js";
 import { withDeletionGate, DeletionDenied } from "../../residency/deletionGate.js";
 
 function pruneFilesOlderThan(workspace: string, dir: string, olderThanMs: number, extensions?: string[]): string[] {
@@ -56,9 +57,14 @@ export function pruneOpsCaches(params: {
     const stat = statSync(full);
     if (!stat.isFile() || !(stat.mtimeMs < consoleCutoff)) continue;
     try {
-      withDeletionGate({ workspace, executor: "maintenance.cache-unlink",
-        target: { kind: "caches", before: new Date(consoleCutoff).toISOString() } }, () => unlinkSync(full));
-      removedConsoleSnapshots.push(full);
+      const removed = withDeletionGate({ workspace, executor: "maintenance.cache-unlink",
+        target: { kind: "caches", before: new Date(consoleCutoff).toISOString() } }, () => withConsoleSnapshotLock(workspace, () => {
+          if (!pathExists(full)) return false;
+          const current = statSync(full);
+          if (!current.isFile() || !(current.mtimeMs < consoleCutoff)) return false;
+          unlinkSync(full); return true;
+        }));
+      if (removed) removedConsoleSnapshots.push(full);
     } catch (error) {
       if (!(error instanceof DeletionDenied)) throw error;
     }

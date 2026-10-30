@@ -1,0 +1,34 @@
+{
+  "schema": "p125ec-private-readme-clarification/1",
+  "originalReadme": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-extension-preparation/README.md",
+    "bytes": 3921,
+    "sha256": "5289dbd42cb2cbeb476cb418fae77beb3d21fdf721254b802f5954880b62434d",
+    "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-extension-preparation/README.md",
+    "dev": 16777231,
+    "inode": 543908779,
+    "nlink": 1
+  },
+  "preferredReadme": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-extension-preparation/README-preferred.md",
+    "bytes": 3929,
+    "sha256": "9f914257e80e7d23592621b73d2989c0a8861a3e55a4d762dd32b57985deec89",
+    "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-extension-preparation/README-preferred.md",
+    "dev": 16777231,
+    "inode": 543908802,
+    "nlink": 1
+  },
+  "before": "strict zero-skip GREEN controls and restored runs, actual RED task failures",
+  "after": "strict zero-skip GREEN source/fresh/restored runs, actual RED control task failures",
+  "codeAlwaysRequiredControlExit1AndPositiveFailureCount": true,
+  "noCodeTemplateOrOtherOriginalOutputChanged": true,
+  "originalSealPreserved": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-extension-preparation/seal.json",
+    "bytes": 3776,
+    "sha256": "394da669e8bf4078a0123f374f94f837a942e4e3a62cdbed4ff406b4a06ff4c9",
+    "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-extension-preparation/seal.json",
+    "dev": 16777231,
+    "inode": 543908781,
+    "nlink": 1
+  }
+}

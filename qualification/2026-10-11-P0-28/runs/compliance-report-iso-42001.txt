@@ -1,0 +1,16 @@
+$ amc compliance report --framework iso-42001
+# exit 0
+Compliance report generated: <tmp>/ws/compliance-iso-42001.md
+Claim: Self-reported · Result: not evaluated (no evidence events were recorded) · Evidence: untrusted · Enforcement: none · Review: pending · Applicability: unresolved
+Framework: ISO/IEC 42001:2023 + ISO/IEC 42005:2025 + ISO/IEC 42006:2025
+Coverage: not evaluated (0 of 11 categories passed or failed)
+  💡 Categories need control-bound AMC runtime evidence (meta.controlIds) in the window;
+     a pass also needs a compiled plan recording that the control applies.
+     Absence of violations is not a pass. Capture evidence first:
+     amc wrap <runtime> -- <your-agent-command>
+     amc evidence collect
+  Tip: use --out report.json for machine-readable output
+
+💡 To improve coverage:
+  amc score evidence-coverage default    # See which evidence to add
+  amc evidence collect                   # Start collecting evidence

@@ -1,0 +1,749 @@
+{
+  "issue": "P0-51",
+  "scope": "Actual handler qualification in three families plus compiled native-service issuer trust",
+  "status": "Bounded unresolved; reserved formal API refusal defect retained",
+  "recordedUtc": "2026-10-14T18:25:46.189322+00:00",
+  "sourceHeadDuringBothAttempts": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46",
+  "sourceState": "Owned qualification checkout included root-owned uncommitted repairs; exact inputs below bind the executed source and compiled bytes. Git HEAD alone is not the candidate source identity.",
+  "node": "v22.23.3",
+  "finalCounts": {
+    "numTotalTests": 97,
+    "numPassedTests": 67,
+    "numFailedTests": 30,
+    "numPendingTests": 0,
+    "numTodoTests": 0,
+    "numPendingTestSuites": 0
+  },
+  "exit": 1,
+  "authoredFile": "tests/portableVerifierServerQualification.test.ts",
+  "authoredFileSha256": "22580eb50ff6786803aa529cd7c64e51404091bf8d4fe1322477c8d3b01fcc20",
+  "finalInputs": {
+    "tests/portableVerifierServerQualification.test.ts": "22580eb50ff6786803aa529cd7c64e51404091bf8d4fe1322477c8d3b01fcc20",
+    "src/api/cryptoRouter.ts": "1f2abcca570d95a2b918e807d46ff568a8337b108f456119c1b911c870a297d0",
+    "src/api/enforceRouter.ts": "bd66a7a3054594c3a1506b5472ee6d874993e9d853c9aa7582d607e4b74fac10",
+    "src/api/passportRouter.ts": "650016fbfe7b2eacc58f2d2b59349133374e3b50c4c0c2bf9888e8d5554b7405",
+    "src/trust/requestTrust.ts": "edb39ed6dcc47c27c6e871dbb9e2c1b3225e3e9b0f0c3933183c148608dff7ee",
+    "src/trust/admission.ts": "a06877c8f8c4e478c1f6841316752e7ba98db732eee0b16608699cb1176cd989",
+    "src/trust/trustContext.ts": "5129676e1ad79072b37034a129a4a3a091f0f5be84d80e7047c4b353b9f8c991",
+    "src/studio/nativeTaskService.ts": "8628cd51af4cbd8cb164e5a96f7beb22854190e82a840a6cb4f404a3bb7effa6",
+    "src/lifecycle/signedControlJournal.ts": "d17bd55ff75bfe3918a8d01aae3b2ff09cf3176235afb445fffebe3d7a13a0c7",
+    "tests/helpers/publicTaskHttpFixture.ts": "b5a390f5053bf22eef4dba58354e20cd2f2a1f21ad316de495c513179f35b70c",
+    "dist/studio/nativeTaskService.js": "47176a7025286f803bb5d8c2b0444085d032321b35ad7a0b5381785962599097",
+    "dist/cli.js": "0040e8108d1df88bf377cdab98966ce6130f6d6931cbc6c5b7fd6e27475c3d5f",
+    "dist/trust/verifierReport.js": "ab5306a3b3bde8cbf4776dc72638d8a213ace2c717d7c2194bcbb24ee73b37ae",
+    "src/transparency/merkleIndexStore.ts": "f59f267bd79bfa35ab20601f126e4bf8f7283eef629454ddd171ae2ee3d8c7df",
+    "src/transparency/proofArchiveOutput.ts": "f88a87377cadc226294c6432df25e732cb94817baf5d100ceef32de01b421760"
+  },
+  "testResults": [
+    {
+      "name": "actual portable-verifier API trust admission a genuine signed proof accepts only the server operator's independently recorded issuer",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission merkle refuses request field 'pubkey'=false",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission merkle refuses request field 'pubkey'=null",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission merkle refuses request field 'pubkeyPath'=false",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission merkle refuses request field 'pubkeyPath'=null",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission merkle refuses request field 'pubkeyPemFile'=false",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission merkle refuses request field 'pubkeyPemFile'=null",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission merkle refuses request field 'publicKey'=false",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission merkle refuses request field 'publicKey'=null",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission merkle refuses request field 'publicKeyPath'=false",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission merkle refuses request field 'publicKeyPath'=null",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission merkle refuses request field 'publicKeyPem'=false",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission merkle refuses request field 'publicKeyPem'=null",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission merkle refuses request field 'trust'=false",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission merkle refuses request field 'trust'=null",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission merkle refuses request field 'trustList'=false",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission merkle refuses request field 'trustList'=null",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission merkle refuses request field 'trustLists'=false",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission merkle refuses request field 'trustLists'=null",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission merkle refuses request field 'trustRoot'=false",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission merkle refuses request field 'trustRoot'=null",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission merkle refuses request field 'trustRoots'=false",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission merkle refuses request field 'trustRoots'=null",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission merkle refuses request field 'allowUnpinned'=false",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission merkle refuses request field 'allowUnpinned'=null",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission merkle refuses request field 'allowUnanchored'=false",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission merkle refuses request field 'allowUnanchored'=null",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission merkle refuses request field 'expectMonitor'=false",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission merkle refuses request field 'expectMonitor'=null",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission merkle refuses request field 'expectedMonitorFingerprint'=false",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission merkle refuses request field 'expectedMonitorFingerprint'=null",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission formal refuses request field 'pubkey'=false",
+      "status": "failed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission formal refuses request field 'pubkey'=null",
+      "status": "failed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission formal refuses request field 'pubkeyPath'=false",
+      "status": "failed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission formal refuses request field 'pubkeyPath'=null",
+      "status": "failed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission formal refuses request field 'pubkeyPemFile'=false",
+      "status": "failed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission formal refuses request field 'pubkeyPemFile'=null",
+      "status": "failed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission formal refuses request field 'publicKey'=false",
+      "status": "failed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission formal refuses request field 'publicKey'=null",
+      "status": "failed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission formal refuses request field 'publicKeyPath'=false",
+      "status": "failed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission formal refuses request field 'publicKeyPath'=null",
+      "status": "failed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission formal refuses request field 'publicKeyPem'=false",
+      "status": "failed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission formal refuses request field 'publicKeyPem'=null",
+      "status": "failed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission formal refuses request field 'trust'=false",
+      "status": "failed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission formal refuses request field 'trust'=null",
+      "status": "failed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission formal refuses request field 'trustList'=false",
+      "status": "failed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission formal refuses request field 'trustList'=null",
+      "status": "failed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission formal refuses request field 'trustLists'=false",
+      "status": "failed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission formal refuses request field 'trustLists'=null",
+      "status": "failed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission formal refuses request field 'trustRoot'=false",
+      "status": "failed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission formal refuses request field 'trustRoot'=null",
+      "status": "failed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission formal refuses request field 'trustRoots'=false",
+      "status": "failed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission formal refuses request field 'trustRoots'=null",
+      "status": "failed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission formal refuses request field 'allowUnpinned'=false",
+      "status": "failed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission formal refuses request field 'allowUnpinned'=null",
+      "status": "failed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission formal refuses request field 'allowUnanchored'=false",
+      "status": "failed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission formal refuses request field 'allowUnanchored'=null",
+      "status": "failed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission formal refuses request field 'expectMonitor'=false",
+      "status": "failed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission formal refuses request field 'expectMonitor'=null",
+      "status": "failed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission formal refuses request field 'expectedMonitorFingerprint'=false",
+      "status": "failed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission formal refuses request field 'expectedMonitorFingerprint'=null",
+      "status": "failed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission token refuses request field 'pubkey'=false",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission token refuses request field 'pubkey'=null",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission token refuses request field 'pubkeyPath'=false",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission token refuses request field 'pubkeyPath'=null",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission token refuses request field 'pubkeyPemFile'=false",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission token refuses request field 'pubkeyPemFile'=null",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission token refuses request field 'publicKey'=false",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission token refuses request field 'publicKey'=null",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission token refuses request field 'publicKeyPath'=false",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission token refuses request field 'publicKeyPath'=null",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission token refuses request field 'publicKeyPem'=false",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission token refuses request field 'publicKeyPem'=null",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission token refuses request field 'trust'=false",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission token refuses request field 'trust'=null",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission token refuses request field 'trustList'=false",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission token refuses request field 'trustList'=null",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission token refuses request field 'trustLists'=false",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission token refuses request field 'trustLists'=null",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission token refuses request field 'trustRoot'=false",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission token refuses request field 'trustRoot'=null",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission token refuses request field 'trustRoots'=false",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission token refuses request field 'trustRoots'=null",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission token refuses request field 'allowUnpinned'=false",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission token refuses request field 'allowUnpinned'=null",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission token refuses request field 'allowUnanchored'=false",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission token refuses request field 'allowUnanchored'=null",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission token refuses request field 'expectMonitor'=false",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission token refuses request field 'expectMonitor'=null",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission token refuses request field 'expectedMonitorFingerprint'=false",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission token refuses request field 'expectedMonitorFingerprint'=null",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission a genuinely hash-valid unkeyed formal certificate remains UNTRUSTED",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission a genuinely locally valid HMAC token is not evaluated as portable authorship",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission the token handler refuses caller secret false",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission the token handler refuses caller secret null",
+      "status": "passed"
+    },
+    {
+      "name": "actual portable-verifier API trust admission the token handler refuses caller secret \"owned-server-HMAC-fixture\"",
+      "status": "passed"
+    },
+    {
+      "name": "compiled native service uses a pre-turn operator monitor pin and withdraws trust on list loss and distrust, including cold verification",
+      "status": "passed"
+    }
+  ],
+  "api": {
+    "transport": "Actual current handler functions with a Readable IncomingMessage fixture and captured ServerResponse, without sockets or HTTP authentication middleware.",
+    "families": [
+      "POST /api/v1/crypto/merkle/verify-proof",
+      "POST /api/v1/enforce/formal/certificate",
+      "POST /api/v1/passport/trust-token/verify"
+    ],
+    "trustFields": [
+      "pubkey",
+      "pubkeyPath",
+      "pubkeyPemFile",
+      "publicKey",
+      "publicKeyPath",
+      "publicKeyPem",
+      "trust",
+      "trustList",
+      "trustLists",
+      "trustRoot",
+      "trustRoots",
+      "allowUnpinned",
+      "allowUnanchored",
+      "expectMonitor",
+      "expectedMonitorFingerprint"
+    ],
+    "values": [
+      false,
+      null
+    ],
+    "cases": 90,
+    "merkleAndTokenRefusals": {
+      "cases": 60,
+      "passed": 60,
+      "actualStatus": 400
+    },
+    "formalRefusals": {
+      "cases": 30,
+      "failed": 30,
+      "actualStatus": 200,
+      "expectedStatus": 400,
+      "actualVerdict": "UNTRUSTED, valid:false, integrityValid:true and report.trusted:false",
+      "cause": "enforceRouter.ts:458\u2013460 uses z.object without passthrough/strict and strips these unknown fields; no requestTrustOverride is called before the verdict. Genuine valid unkeyed input succeeds at the body/hash controls, so this is not a parser-failure witness.",
+      "owner": "Reserved core API scope; this agent made no source repair."
+    },
+    "normalControls": {
+      "signedMerkle": "200 with real signed inclusion proof and independently recorded auditor root-signed server trust list; trusted:true.",
+      "formalCertificate": "boundedModelCheck generated a hash-valid unkeyed certificate; local verifyCertificate passed. Actual handler returned200, UNTRUSTED, valid:false, integrityValid:true, issuerAdmission fail/not-pinned with null key and no overrides.",
+      "hmacToken": "issueTrustToken/verifyTrustToken created and checked a genuinely locally valid synthetic HMAC token. Actual handler returned200, not_evaluated, valid:false and tokenSha256; its statements were not evaluated.",
+      "secretRefusal": "False, null and the genuine fixture secret each returned400; no request-supplied secret generated a verdict."
+    },
+    "actualHandlerCallCount": 96
+  },
+  "native": {
+    "implementation": "Actual compiled dist/studio/nativeTaskService.js; it spawned the actual compiled dist/cli.js ACP child with provider:stub, tools:none, maxSteps2/maxTokens64.",
+    "issuerControl": "Fixture operator monitor public key captured before the turn, admitted only by a root-signed operator trust list whose separate root was generated by the fixture; no workspaceSelfTrust verdict.",
+    "checkpointFixture": "Owned operator home and explicit AMC_CONTROL_CHECKPOINT_DIR are siblings outside nativeWorkspace; the same checkpoint path is supplied to parent and native child. Parent env is restored.",
+    "observations": [
+      {
+        "kind": "compiled-native-service",
+        "label": "operator-pin-before-turn",
+        "monitorPin": "8f7bb2cba8e9a2c4170901b6fb16e8629b26cdea874a75de9cef39535d4ba1c7",
+        "taskId": "f37949456278a20f7c22f8f023ba94ef8b77bd9fdf8b6add2224226cfc358c59",
+        "sessionId": "ed073a42-70f9-4dd1-9d5e-d279cf1c539f",
+        "revision": 1,
+        "state": "closed",
+        "verification": "externally-anchored",
+        "error": null,
+        "history": {
+          "status": "authenticated",
+          "backend": "sqlite",
+          "headEventHash": "199f39cb03e9229e898e753e2cf3fa1d35fd33c293b237e9ffbb6f28d7132de6",
+          "eventCount": 14,
+          "message": "Persisted session metadata authenticated. Displayed payloads are checked separately; full run verification remains a separate action."
+        },
+        "operatorListPresent": true
+      },
+      {
+        "kind": "compiled-native-service",
+        "label": "live-list-loss",
+        "monitorPin": "8f7bb2cba8e9a2c4170901b6fb16e8629b26cdea874a75de9cef39535d4ba1c7",
+        "taskId": "f37949456278a20f7c22f8f023ba94ef8b77bd9fdf8b6add2224226cfc358c59",
+        "sessionId": "ed073a42-70f9-4dd1-9d5e-d279cf1c539f",
+        "revision": 1,
+        "state": "closed",
+        "verification": "failed",
+        "error": "UNTRUSTED: the recorded evidence is internally consistent, but the operator's trust list and AMC_EXPECTED_MONITOR_FINGERPRINT do not admit its monitor key (not-pinned 8f7bb2cba8e9a2c4170901b6fb16e8629b26cdea874a75de9cef39535d4ba1c7), so authorship is not verified. No verified result is claimed.",
+        "history": {
+          "status": "authenticated",
+          "backend": "sqlite",
+          "headEventHash": "199f39cb03e9229e898e753e2cf3fa1d35fd33c293b237e9ffbb6f28d7132de6",
+          "eventCount": 14,
+          "message": "Persisted session metadata authenticated. Displayed payloads are checked separately; full run verification remains a separate action."
+        },
+        "operatorListPresent": false
+      },
+      {
+        "kind": "compiled-native-service",
+        "label": "cold-list-loss",
+        "monitorPin": "8f7bb2cba8e9a2c4170901b6fb16e8629b26cdea874a75de9cef39535d4ba1c7",
+        "taskId": "f37949456278a20f7c22f8f023ba94ef8b77bd9fdf8b6add2224226cfc358c59",
+        "sessionId": "ed073a42-70f9-4dd1-9d5e-d279cf1c539f",
+        "revision": 1,
+        "state": "closed",
+        "verification": "failed",
+        "error": "UNTRUSTED: the recorded evidence is internally consistent, but the operator's trust list and AMC_EXPECTED_MONITOR_FINGERPRINT do not admit its monitor key (not-pinned 8f7bb2cba8e9a2c4170901b6fb16e8629b26cdea874a75de9cef39535d4ba1c7), so authorship is not verified. No verified result is claimed.",
+        "history": {
+          "status": "authenticated",
+          "backend": "sqlite",
+          "headEventHash": "199f39cb03e9229e898e753e2cf3fa1d35fd33c293b237e9ffbb6f28d7132de6",
+          "eventCount": 14,
+          "message": "Persisted session metadata authenticated. Displayed payloads are checked separately; full run verification remains a separate action."
+        },
+        "operatorListPresent": false
+      },
+      {
+        "kind": "compiled-native-service",
+        "label": "cold-restored-operator-list",
+        "monitorPin": "8f7bb2cba8e9a2c4170901b6fb16e8629b26cdea874a75de9cef39535d4ba1c7",
+        "taskId": "f37949456278a20f7c22f8f023ba94ef8b77bd9fdf8b6add2224226cfc358c59",
+        "sessionId": "ed073a42-70f9-4dd1-9d5e-d279cf1c539f",
+        "revision": 1,
+        "state": "closed",
+        "verification": "externally-anchored",
+        "error": null,
+        "history": {
+          "status": "authenticated",
+          "backend": "sqlite",
+          "headEventHash": "199f39cb03e9229e898e753e2cf3fa1d35fd33c293b237e9ffbb6f28d7132de6",
+          "eventCount": 14,
+          "message": "Persisted session metadata authenticated. Displayed payloads are checked separately; full run verification remains a separate action."
+        },
+        "operatorListPresent": true
+      },
+      {
+        "kind": "compiled-native-service",
+        "label": "cold-operator-distrust",
+        "monitorPin": "8f7bb2cba8e9a2c4170901b6fb16e8629b26cdea874a75de9cef39535d4ba1c7",
+        "taskId": "f37949456278a20f7c22f8f023ba94ef8b77bd9fdf8b6add2224226cfc358c59",
+        "sessionId": "ed073a42-70f9-4dd1-9d5e-d279cf1c539f",
+        "revision": 1,
+        "state": "closed",
+        "verification": "failed",
+        "error": "UNTRUSTED: the recorded evidence is internally consistent, but the operator's trust list and AMC_EXPECTED_MONITOR_FINGERPRINT do not admit its monitor key (distrusted 8f7bb2cba8e9a2c4170901b6fb16e8629b26cdea874a75de9cef39535d4ba1c7), so authorship is not verified. No verified result is claimed.",
+        "history": {
+          "status": "authenticated",
+          "backend": "sqlite",
+          "headEventHash": "199f39cb03e9229e898e753e2cf3fa1d35fd33c293b237e9ffbb6f28d7132de6",
+          "eventCount": 14,
+          "message": "Persisted session metadata authenticated. Displayed payloads are checked separately; full run verification remains a separate action."
+        },
+        "operatorListPresent": true
+      }
+    ],
+    "expectedSequence": [
+      "externally-anchored",
+      "failed/not-pinned",
+      "failed/not-pinned",
+      "externally-anchored",
+      "failed/distrusted"
+    ],
+    "sameTaskSessionHeadAndEventCount": true,
+    "eventCount": 14,
+    "coldMeaning": "Fresh NativeTaskService instance in the same test process after closing the live service; signed descriptor and evidence are loaded anew. This is not a fresh verifier OS process.",
+    "withdrawalTrigger": "Explicit verify calls after list removal/restoration/distrust; no immediate-poll or background withdrawal claim.",
+    "providerLimit": "The real native stub produces a canned synthetic recording. No real model, provider key, tool execution, human participant, TLS/OAuth or hosted service was involved."
+  },
+  "initialAttempt": {
+    "counts": {
+      "numTotalTests": 97,
+      "numPassedTests": 66,
+      "numFailedTests": 31,
+      "numPendingTests": 0,
+      "numTodoTests": 0,
+      "numPendingTestSuites": 0
+    },
+    "exit": 1,
+    "nativeClaim": "None: startup failed before a usable turn.",
+    "nativeFailure": "Native startup did not finish. No model request was automatically retried; inspect setup and task status.",
+    "setupCause": "Initial child HOME was inside the native workspace with no shared external checkpoint pin. signedControlJournal.ts:114\u2013128 derives its default from homedir and rejects a checkpoint root inside the governed workspace. NativeTaskService.ts:266\u2013274 documents matching parent/child checkpoint history.",
+    "adaptation": "Reused publicTaskHttpFixture.ts:25\u201331: external sibling operator home and explicit owned external checkpoint path shared by parent/child. Only fixture setup and env restoration changed; all expectations remain identical.",
+    "originalTestHashVerified": true,
+    "evidenceDirectory": "/private/tmp/p0-51-server-native-z8cn4pij",
+    "ambientCheckpointLimit": "The first attempt did not explicitly pin parent checkpoints; no no-effects claim is made for that exploratory setup. No ambient/user checkpoint cleanup was attempted."
+  },
+  "fixtureOnlyDiff": {
+    "path": "/private/tmp/p0-51-server-native-aligned-fdtpib_a/fixture-only.diff",
+    "bytes": 4087,
+    "sha256": "cd1597683713700dca99517d5689998fa09a2821fbb75a53a4ffbd03bd9b2777"
+  },
+  "rawEvidence": [
+    {
+      "path": "/private/tmp/p0-51-server-native-z8cn4pij/input.json",
+      "bytes": 1678,
+      "sha256": "7b81c4fe5c291286523ba6bb692fcb0c2e0fd458cd47f10ffddf43f831261ca7"
+    },
+    {
+      "path": "/private/tmp/p0-51-server-native-z8cn4pij/vitest.json",
+      "bytes": 45200,
+      "sha256": "3225f69169d17e8f9073fdd4735c7165f1900e11b667ce509363f2cf7bd49118"
+    },
+    {
+      "path": "/private/tmp/p0-51-server-native-z8cn4pij/handler-native-effects.json",
+      "bytes": 90582,
+      "sha256": "0ba67541ca8f396783bc754de5be1dd75648feacc0d166f089c3996cd4a16bcb"
+    },
+    {
+      "path": "/private/tmp/p0-51-server-native-z8cn4pij/initial-owned-test.ts",
+      "bytes": 14251,
+      "sha256": "0740ebab269aa4f569a12f5905630c2778d5c075ec47575c3078268d7d0900df"
+    },
+    {
+      "path": "/private/tmp/p0-51-server-native-qualified-20261014.log",
+      "bytes": 12726,
+      "sha256": "cfd08709191b017bf8f7b16eab3fa27230e70073f9230571cba4f75cd8a50c1f"
+    },
+    {
+      "path": "/private/tmp/p0-51-server-native-aligned-fdtpib_a/input.json",
+      "bytes": 1921,
+      "sha256": "ad4d033544a435c445fbe776b2a3e1a64b5ff8340b099fcc9fb82958cb9920f9"
+    },
+    {
+      "path": "/private/tmp/p0-51-server-native-aligned-fdtpib_a/vitest.json",
+      "bytes": 44767,
+      "sha256": "e68398137a17426714e2486c3cf1fbb6052cae29b11edd3ee50b8ceab446f2f8"
+    },
+    {
+      "path": "/private/tmp/p0-51-server-native-aligned-fdtpib_a/handler-native-effects.json",
+      "bytes": 95415,
+      "sha256": "b0ee3361e3d4ca1ba0e5ced5c53ac474e2f8162d64cabeda7eb16181dc179e05"
+    },
+    {
+      "path": "/private/tmp/p0-51-server-native-checkpoint-aligned-20261014.log",
+      "bytes": 11887,
+      "sha256": "ae74d7cbaa5ecb872d27bc13057998e00f10391dd58bdfc33ba50d3256c6b1a4"
+    }
+  ],
+  "preservation": {
+    "sourceEditsByThisAgent": false,
+    "oldTestEdits": false,
+    "archivesFloorsBaselinesDependenciesCliGraphEdits": false,
+    "protectedHandlersSameAcrossAttempts": true,
+    "compiledInputsSameAcrossAttempts": true,
+    "privateKeyVaultCredentialFilesCopiedToReceipt": false,
+    "freshFixtureRootsOnlyCleaned": true,
+    "allOwnedServicesClosed": true
+  },
+  "limits": [
+    "No full suite, coverage floor, hosted CI or complete P0-51 acceptance claim.",
+    "The three observed handler families do not establish refusal on every API endpoint or production authentication/transport.",
+    "The reserved formal API refusal defect and explicit-pin precedence contradiction remain unresolved; expectations were neither removed nor softened.",
+    "Root owns final source/compiled review and qualification after coordinated build; this report pins the exact pre-final-build compiled inputs."
+  ],
+  "ownership": {
+    "reservationPath": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+    "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca",
+    "citations": [
+      {
+        "line": 18,
+        "text": "src/{...api/enforceRouter,api/passportRouter...}.ts identifies earlier Claude authorship. Header line5 says that wave merged; line18 alone is not an in-flight claim."
+      },
+      {
+        "line": 285,
+        "text": "src/api/*, src/studio/*, src/workspaces/workspaceRouter.ts, src/index.ts (frozen or Claude-owned). This is within the recorded Codex slice boundary."
+      },
+      {
+        "line": 388,
+        "text": "Do not touch src/a4/*, src/api/*, src/approvals/*, src/studio/*, src/console/*, src/ledger/ledger.ts."
+      }
+    ],
+    "currentTaskAuthority": "Root explicitly preserves shared API/Studio holds for this P0-51 bounded qualification. The formal refusal defect was not repaired.",
+    "rootReportedProtectedHashCount": 28,
+    "rootReportedResult": "Root rechecked all28 protected hashes equal accepted main; this subagent independently compared the listed API/native/admission source pins below."
+  },
+  "finalCommittedSourceCorrespondence": {
+    "commit": "d8e5168556aeea8e8c12cbc67848839824edbb48",
+    "comparisons": [
+      {
+        "path": "src/api/cryptoRouter.ts",
+        "finalCommitSha256": "1f2abcca570d95a2b918e807d46ff568a8337b108f456119c1b911c870a297d0",
+        "matchesExecutedInput": true,
+        "acceptedMainSha256": "1f2abcca570d95a2b918e807d46ff568a8337b108f456119c1b911c870a297d0",
+        "unchangedFromAcceptedMain": true
+      },
+      {
+        "path": "src/api/enforceRouter.ts",
+        "finalCommitSha256": "bd66a7a3054594c3a1506b5472ee6d874993e9d853c9aa7582d607e4b74fac10",
+        "matchesExecutedInput": true,
+        "acceptedMainSha256": "bd66a7a3054594c3a1506b5472ee6d874993e9d853c9aa7582d607e4b74fac10",
+        "unchangedFromAcceptedMain": true
+      },
+      {
+        "path": "src/api/passportRouter.ts",
+        "finalCommitSha256": "650016fbfe7b2eacc58f2d2b59349133374e3b50c4c0c2bf9888e8d5554b7405",
+        "matchesExecutedInput": true,
+        "acceptedMainSha256": "650016fbfe7b2eacc58f2d2b59349133374e3b50c4c0c2bf9888e8d5554b7405",
+        "unchangedFromAcceptedMain": true
+      },
+      {
+        "path": "src/studio/nativeTaskService.ts",
+        "finalCommitSha256": "8628cd51af4cbd8cb164e5a96f7beb22854190e82a840a6cb4f404a3bb7effa6",
+        "matchesExecutedInput": true,
+        "acceptedMainSha256": "8628cd51af4cbd8cb164e5a96f7beb22854190e82a840a6cb4f404a3bb7effa6",
+        "unchangedFromAcceptedMain": true
+      },
+      {
+        "path": "src/trust/admission.ts",
+        "finalCommitSha256": "a06877c8f8c4e478c1f6841316752e7ba98db732eee0b16608699cb1176cd989",
+        "matchesExecutedInput": true,
+        "acceptedMainSha256": "a06877c8f8c4e478c1f6841316752e7ba98db732eee0b16608699cb1176cd989",
+        "unchangedFromAcceptedMain": true
+      },
+      {
+        "path": "tests/portableVerifierServerQualification.test.ts",
+        "finalCommitSha256": "22580eb50ff6786803aa529cd7c64e51404091bf8d4fe1322477c8d3b01fcc20",
+        "matchesExecutedInput": true
+      }
+    ],
+    "runtimeLimit": "Final commit source correspondence only. Raw actual runs pin earlier compiled inputs; root final build was active while this note was written, and no subsequent runtime was executed by this subagent."
+  },
+  "priorCompactReceiptPreserved": {
+    "path": "/private/tmp/p0-51-server-native-qualification-before-ownership-20261014.json",
+    "sha256": "850593535c9387b5b77f6acf6c52c256ec0418a8870c6ce13f48b93b57ddee23"
+  }
+}

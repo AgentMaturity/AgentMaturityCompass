@@ -14,6 +14,8 @@
  */
 
 import { randomUUID } from 'node:crypto';
+import type { EvidenceOutcome } from '../types.js';
+import { ratioOrNull } from '../utils/ratio.js';
 import { MetricRegistry, type MetricInput, type MetricGroupResult } from './metricTemplates.js';
 
 /* ── Types ──────────────────────────────────────────────────────── */
@@ -40,8 +42,8 @@ export interface MonitorSample {
   timestamp: number;
   input: MetricInput;
   result: MetricGroupResult;
-  overallScore: number;
-  passRate: number;
+  overallScore: number | null;
+  passRate: number | null;
   alertTriggered: boolean;
 }
 
@@ -64,19 +66,20 @@ export interface MonitorStatus {
   agentType: string;
   enabled: boolean;
   sampleCount: number;
-  currentScore: number;
-  windowAvg: number;
+  currentScore: number | null;
+  windowAvg: number | null;
   trend: 'improving' | 'stable' | 'declining';
   recentAlerts: number;
   lastSampleAt?: number;
-  health: 'healthy' | 'warning' | 'critical';
+  health: 'healthy' | 'warning' | 'critical' | 'not_evaluated';
+  outcome: EvidenceOutcome;
 }
 
 export interface MonitorDashboard {
   monitors: MonitorStatus[];
   totalSamples: number;
   totalAlerts: number;
-  overallHealth: 'healthy' | 'warning' | 'critical';
+  overallHealth: 'healthy' | 'warning' | 'critical' | 'not_evaluated';
 }
 
 /* ── ProductionMonitor ───────────────────────────────────────────── */
@@ -161,7 +164,7 @@ export class ProductionMonitor {
     this.samples.set(monitorId, samples);
 
     // Check alert threshold
-    if (result.overallScore < monitor.alertThreshold) {
+    if (result.overallScore !== null && result.overallScore < monitor.alertThreshold) {
       sample.alertTriggered = true;
       this.triggerAlert(monitor, sample, samples);
     }
@@ -182,7 +185,8 @@ export class ProductionMonitor {
   /* ── Alert management ────────────────────────────────────────── */
 
   private triggerAlert(monitor: MonitorConfig, sample: MonitorSample, windowSamples: MonitorSample[]): void {
-    const windowScores = windowSamples.map(s => s.overallScore);
+    if (sample.overallScore === null) return;
+    const windowScores = windowSamples.map(s => s.overallScore).filter((score): score is number => score !== null);
     const windowAvg = windowScores.length > 0
       ? windowScores.reduce((a, b) => a + b, 0) / windowScores.length
       : 0;
@@ -237,11 +241,9 @@ export class ProductionMonitor {
     if (!monitor) return undefined;
 
     const samples = this.samples.get(monitorId) ?? [];
-    const scores = samples.map(s => s.overallScore);
-    const currentScore = scores.length > 0 ? scores[scores.length - 1]! : 0;
-    const windowAvg = scores.length > 0
-      ? scores.reduce((a, b) => a + b, 0) / scores.length
-      : 0;
+    const scores = samples.map(s => s.overallScore).filter((score): score is number => score !== null);
+    const currentScore = samples.at(-1)?.overallScore ?? null;
+    const windowAvg = ratioOrNull(scores.reduce((a, b) => a + b, 0), scores.length);
 
     // Compute trend from recent samples
     const recentScores = scores.slice(-Math.min(10, scores.length));
@@ -252,6 +254,7 @@ export class ProductionMonitor {
     ).length;
 
     const health: MonitorStatus['health'] =
+      currentScore === null ? 'not_evaluated' :
       recentAlerts >= 3 || currentScore < monitor.alertThreshold * 0.5 ? 'critical' :
       recentAlerts >= 1 || currentScore < monitor.alertThreshold ? 'warning' : 'healthy';
 
@@ -261,8 +264,9 @@ export class ProductionMonitor {
       agentType: monitor.agentType,
       enabled: monitor.enabled,
       sampleCount: samples.length,
-      currentScore: Math.round(currentScore * 1000) / 1000,
-      windowAvg: Math.round(windowAvg * 1000) / 1000,
+      currentScore: currentScore === null ? null : Math.round(currentScore * 1000) / 1000,
+      windowAvg: windowAvg === null ? null : Math.round(windowAvg * 1000) / 1000,
+      outcome: currentScore === null ? "not_evaluated" : "measured",
       trend,
       recentAlerts,
       lastSampleAt: samples.length > 0 ? samples[samples.length - 1]!.timestamp : undefined,
@@ -283,6 +287,7 @@ export class ProductionMonitor {
     const warningCount = statuses.filter(s => s.health === 'warning').length;
 
     const overallHealth: MonitorDashboard['overallHealth'] =
+      statuses.length === 0 || statuses.every(status => status.outcome === 'not_evaluated') ? 'not_evaluated' :
       criticalCount > 0 ? 'critical' :
       warningCount > 0 ? 'warning' : 'healthy';
 

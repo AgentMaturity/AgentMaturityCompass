@@ -1,4 +1,4 @@
-import { initToolsConfig, verifyToolsConfigSignature } from "./toolhubValidators.js";
+import { initToolsConfig, initToolsConfigAsync, verifyToolsConfigSignature } from "./toolhubValidators.js";
 import { PROTECTED_WORKSPACE_PATHS } from "./protectedPaths.js";
 import {
   inspectToolhubContext,
@@ -9,6 +9,10 @@ import {
 
 export function initToolhubConfig(workspace: string): { configPath: string; sigPath: string } {
   return initToolsConfig(workspace);
+}
+
+export function initToolhubConfigAsync(workspace: string, opts: { onlyIfMissing?: boolean } = {}): Promise<{ configPath: string; sigPath: string }> {
+  return initToolsConfigAsync(workspace, undefined, opts);
 }
 
 export function verifyToolhubConfig(workspace: string): {

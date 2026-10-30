@@ -1,0 +1,7 @@
+The actual fresh canonical run and all four restored runs passed the same88 ordered per-file test identities across four files. Tenant, freshness and derived-tier controls each produced87passes/1failure; replay produced85passes/3failures. All nine phases have29passing hook entries/values, exact raw-observer joins, natural owned-group closure and no observed unhandled or late diagnostics.
+
+The first semantic frames are tenant67→124, freshness67→147, tier266, and replay67→168,177,and67→183. Later assertions and the second replay-prefix iteration are masked in RED; restored GREEN verifies complete bodies separately. The tier control concerns typed derived-provenance consumption only.
+
+Four live patches match the once-only source recipes, and every original backup and restoration matches the same source bytes. Independent current hashes match57selected S/Q paths,88protected inputs and four distinct native physical identities. Only the eight actually bound compiled pairs receive preservation credit. The first physical target snapshot was after M1; no retrospective or continuous-isolation claim is made. Held R state and Git cleanliness are root-recorded facts, with protected bytes independently rechecked.
+
+This is bounded component evidence. Public plan integration, raw metadata derivation, score/status spec gaps, held decisions and global REDquality remain open. No product execution or checkout/index/QA writes were performed by this reviewer.

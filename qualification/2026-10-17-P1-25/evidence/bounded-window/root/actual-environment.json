@@ -1,0 +1,17 @@
+{
+  "at": "2026-10-17T00:26:53.593963+00:00",
+  "environment": {
+    "node": "v22.23.3",
+    "pnpm": "10.33.0",
+    "os": "Darwin 25.6.0",
+    "arch": "arm64"
+  },
+  "nativeAbi": "127",
+  "actualClosedCommand": "/private/tmp/p1-39-post-typecheck-20261016/command-p125w-actual-environment/command.json",
+  "actualLog": {
+    "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125w-actual-environment/stdout-stderr.log",
+    "bytes": 85,
+    "sha256": "c733bd35396cfc24b4c27868edabf2cd8f354ec0f6c19ba5c8a908d8808c12a7"
+  },
+  "noIsolationClaim": true
+}

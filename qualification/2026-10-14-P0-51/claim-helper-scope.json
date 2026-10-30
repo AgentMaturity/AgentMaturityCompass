@@ -1,0 +1,16 @@
+{
+  "paths": [
+    "src/notary/notaryCli.ts",
+    "src/transparency/logCli.ts"
+  ],
+  "registered": [],
+  "originalPathOrFileFreezeEntries": [],
+  "compiledPins": [],
+  "reservationSha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca",
+  "reservationExactPathMatches": [],
+  "notes": "notaryCli appears only as a navigation staticProductModulePath for frozen notaryAttestation, not as a frozen originalPath. No notary/logCli helper reservation or raised budget was found. Archive/manifest/core verification paths stay unchanged.",
+  "sourceBefore": {
+    "src/notary/notaryCli.ts": "e3f22041a93d3c6d492fe3a75c12ed3d464857ad05123695fcba0df76b288fce",
+    "src/transparency/logCli.ts": "c030c373f691e9a4eec9240007d62b9dbb53659ce804eea2c90f81b8843e746e"
+  }
+}

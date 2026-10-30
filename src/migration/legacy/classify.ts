@@ -117,7 +117,8 @@ export function classifyLegacyArtifact(kind: LegacyArtifactKind, parsed: unknown
   if (!value || hasClaimEnvelope(value)) return null;
   switch (kind) {
     case "assurance_report":
-      // R1: AMC 1.x graded a canned reply for every scenario; fba5824e added evidenceStatus when it removed it.
+      // R1: AMC 1.x graded a canned reply for every scenario; fba5824e added evidenceStatus when it removed it, and no
+      // 1.x tag contains fba5824e, so a report with evidenceStatus is a 2.x report and current() decides its claim.
       return typeof value.assuranceRunId === "string" && value.evidenceStatus === undefined
         ? classification("R1-assurance-canned-reply", "synthetic_example", { trustTier: text(value.trustTier), label: text(value.trustLabel) })
         : null;

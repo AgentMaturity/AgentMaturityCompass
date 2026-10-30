@@ -1,0 +1,843 @@
+{
+  "schema": "p112-root-actual-receipt-inputs/3",
+  "at": "2026-10-16T20:29:34.017395+00:00",
+  "sourceCommit": "305aba3d0cbd7a5dc84a2b96425c3cd0236bcf71",
+  "environment": {
+    "node": "v22.23.3",
+    "pnpm": "10.33.0",
+    "os": "darwin 25.6.0",
+    "arch": "arm64"
+  },
+  "phases": [
+    "p112-pre-d15",
+    "p112-pre-freeze",
+    "p112-duplicates-before",
+    "p112-dead-code-before",
+    "p112-unchanged-tool-guards",
+    "p112-source-combined",
+    "p112-test-types",
+    "p112-counts-before",
+    "p112-counts-d15",
+    "p112-gen-counts",
+    "p112-node-version",
+    "p112-pnpm-version",
+    "p112-source-types",
+    "p112-lint",
+    "p112-build",
+    "p112-counts-after",
+    "p112-gates",
+    "p112-threat-model",
+    "p112-architecture",
+    "p112-docs",
+    "p112-freeze",
+    "p112-duplicates-after",
+    "p112-dead-code-after",
+    "p112-quality-delta-diagnostic",
+    "p112-fresh-clean-source",
+    "p112-fresh-canonical",
+    "p112-m1",
+    "p112-restore1",
+    "p112-m2",
+    "p112-restore2",
+    "p112-m3",
+    "p112-restore3",
+    "p112-q-counts",
+    "p112-q-gates",
+    "p112-q-freeze",
+    "p112-metadata-d15",
+    "p112-source-receipt-validation"
+  ],
+  "artifacts": [
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/branch-adoption.json",
+      "bytes": 559,
+      "sha256": "649b101ee360584de6a082cca28794ab67888d5fea1e477b0c6ccfd4f999a3ba",
+      "target": "evidence/branch-adoption.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/root-preparation-review.json",
+      "bytes": 3332,
+      "sha256": "5deaca04dae51f1cfd4394724732261acc07278662e9e309457eacd579ea032b",
+      "target": "evidence/root-preparation-review.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/protected-inputs.json",
+      "bytes": 23429,
+      "sha256": "70037c62238cb088e1034713236be9ccc2d9ae991e44dcf3ce734760772560c2",
+      "target": "evidence/protected-inputs.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/held-archive-current-check.json",
+      "bytes": 630,
+      "sha256": "4374403f97ef925d40cfbf5157bc7316a9490aee70b757f45d46781c11a5aeda",
+      "target": "evidence/held-archive-current-check.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/hosted-path-admission.json",
+      "bytes": 10717,
+      "sha256": "f16ee26cbc3eb8f6f5bd55189af2e160d9fe3f85d747cb37eed0c9b62ed236e7",
+      "target": "evidence/hosted-path-admission.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/hosted-counts-admission.json",
+      "bytes": 10963,
+      "sha256": "a6a03a10c6016b9308fadf45bef068f9a157f9bda9c403e84079579d8b7e69ec",
+      "target": "evidence/hosted-counts-admission.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/hosted-metadata-admission.json",
+      "bytes": 10607,
+      "sha256": "9fb3a1fe285cec5bd4275dae913880396df0bdc6d1bf9572f0d849b8abe2f2fa",
+      "target": "evidence/hosted-metadata-admission.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/source-path-allocation.json",
+      "bytes": 1228,
+      "sha256": "78b110a275f0c4d1b6e081d221e2d68a948bb5a7c9535ede32067a9dc8698fc6",
+      "target": "evidence/source-path-allocation.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/test-materialization.json",
+      "bytes": 361,
+      "sha256": "3b13a6ce7b59ec7de232e41cc65342010ce8c7970e287d683d048c685ce9a0b1",
+      "target": "evidence/test-materialization.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/count-surface-allocation.json",
+      "bytes": 18522,
+      "sha256": "71c630436adcb82bbf3cf66b6139b78e26f3c7082078b02900c748053e24faa1",
+      "target": "evidence/count-surface-allocation.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/count-surface-actual.json",
+      "bytes": 582,
+      "sha256": "35b86ccff9ebd558ce759a6b1d42af47942f2b87897e1c772d51eb6c17718187",
+      "target": "evidence/count-surface-actual.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/source-precommit-review.json",
+      "bytes": 2115,
+      "sha256": "fc7775c9677896a87b6cf5c1d8eabcc7c6697f36c3df9e0ea36d5c59c2e11761",
+      "target": "evidence/source-precommit-review.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/source-stage.json",
+      "bytes": 1315,
+      "sha256": "077d650f64b1c3fd85e488003dfdbec7df42597abe387c2f23f93154f1e91bde",
+      "target": "evidence/source-stage.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/source-commit.json",
+      "bytes": 526,
+      "sha256": "7cb7776c2c674a92cb8e74e24c17e1d8f12d46b6ed39979ed94fdb7c4f034dfe",
+      "target": "evidence/source-commit.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/fresh-source-binding.json",
+      "bytes": 72394,
+      "sha256": "3f33395304145cb7b705b7253ae564b713a6043f24468c7ceb727f6e9e8ba118",
+      "target": "evidence/fresh-source-binding.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/control-chain-summary.json",
+      "bytes": 2903,
+      "sha256": "7696cc32dccc946ac99a2f15c21f6124f059b8a179016747313f02fc8758859f",
+      "target": "evidence/control-chain-summary.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/preservation-after-m2.json",
+      "bytes": 480,
+      "sha256": "f49931231c749f65e277ee259d2e954bdae69babdb9bccbba9ecfb56f93fc0d7",
+      "target": "evidence/preservation-after-m2.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/preservation-final.json",
+      "bytes": 477,
+      "sha256": "e8ee149c6639b37cca5100fe1bae18f80a8cbbecc6234d6489dc8d74af9118dc",
+      "target": "evidence/preservation-final.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/receipt-revision-v2/whole-issue-gaps.json",
+      "bytes": 9823,
+      "sha256": "7c105e4fd7d3f7641d9d0821f02b40e907e067be6f0d4a3b9e4f2b33e348599a",
+      "target": "evidence/whole-issue-gaps.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/final-notes.json",
+      "bytes": 1293,
+      "sha256": "8c7fe63d7c12d8219446226db22c17f3208a238ec159b25b27c9bde600e95b73",
+      "target": "evidence/final-notes.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/closed-command-inventory.json",
+      "bytes": 5690,
+      "sha256": "7c9cd959f23b3d4b12de8cb36de1b449267190f497b56cfa4a529b4f78db15b0",
+      "target": "evidence/closed-command-inventory.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/audit-observed.py",
+      "bytes": 1498,
+      "sha256": "859855a1d8e01249ea58a88d611295fd2ee919ecc91a1f90d50ee93b257ad0fa",
+      "target": "evidence/audit-observed.py",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/source-control.py",
+      "bytes": 5206,
+      "sha256": "61844915b8ce3fedcaa2a28f8a602f60f2f2b24ae557df29a3ced6554c834104",
+      "target": "evidence/source-control.py",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/check-preservation.py",
+      "bytes": 2792,
+      "sha256": "84c8091a5a61cb3e63912b4a4c4fa246fea678949611cb11ea410e993967aaf2",
+      "target": "evidence/check-preservation.py",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/capture-quality-delta.mjs",
+      "bytes": 2286,
+      "sha256": "dfd5c31f5266609b18953e2bb827165a478603ff7d945ed7f031103eaed5f746",
+      "target": "evidence/capture-quality-delta.mjs",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/quality-baseline-full.json",
+      "bytes": 248255,
+      "sha256": "7dbd9bc5036e9d763aaac5291ec63360d305b70465fcadd18dfb961e2d8ab0bc",
+      "target": "evidence/quality-baseline-full.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/quality-current-full.json",
+      "bytes": 248137,
+      "sha256": "6b82381cb434c3f7d787815280a9fc4e7279ae64f5e5b48cf61603ca9495b7a3",
+      "target": "evidence/quality-current-full.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/quality-delta.json",
+      "bytes": 1270,
+      "sha256": "f7fe2633770cf84ae43cf99ebd94ffded66cfc4e067bfb9cb795b4617044472f",
+      "target": "evidence/quality-delta.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/precommit-assumption-stop.json",
+      "bytes": 884,
+      "sha256": "3853a1ee0418c921d6d00fcffe24d1b3d73cbcfd1595fa5fcae0fddc458f7a19",
+      "target": "evidence/precommit-assumption-stop.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/p112-fresh-canonical-outcome.json",
+      "bytes": 6916,
+      "sha256": "2280d85c833fd1f314125cf7ae73a677fbf413d9e7bc178d67eecb5db81e9ade",
+      "target": "evidence/p112-fresh-canonical-outcome.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/p112-m1-outcome.json",
+      "bytes": 9350,
+      "sha256": "b2da655c01d46dca232e362e9fa67c74fda72bd9652c42918fa39e665a6f0462",
+      "target": "evidence/p112-m1-outcome.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/p112-m2-outcome.json",
+      "bytes": 12314,
+      "sha256": "72be478e657ddb8d4ac4df8ba483adbc32456c98668bf5fb973ae68c100894a9",
+      "target": "evidence/p112-m2-outcome.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/p112-m3-outcome.json",
+      "bytes": 12129,
+      "sha256": "2051574b880c704e67c2af082dd3796b8c33f8d2ee6a84d4c7ecb3ace7d716ea",
+      "target": "evidence/p112-m3-outcome.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/p112-restore1-outcome.json",
+      "bytes": 6902,
+      "sha256": "f95d9ac121d5c70002ac7b78d2c00a7ff781a8172291952a288100c18a6d2c3b",
+      "target": "evidence/p112-restore1-outcome.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/p112-restore2-outcome.json",
+      "bytes": 6902,
+      "sha256": "c0cda2954202c90f2666a20db00add0cfa54165e3500c8aeda33c3c8a2027222",
+      "target": "evidence/p112-restore2-outcome.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/p112-restore3-outcome.json",
+      "bytes": 6902,
+      "sha256": "edb2f4878c8de60c8354428fcf94334e781aaeaf1076b0a988569d86b85ef2f0",
+      "target": "evidence/p112-restore3-outcome.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/p112-source-combined-outcome.json",
+      "bytes": 6884,
+      "sha256": "b541e5822b192032e4aabc2b8a0664284b04081114e9e910843e03bc1c504b32",
+      "target": "evidence/p112-source-combined-outcome.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/p112-unchanged-tool-guards-outcome.json",
+      "bytes": 4638,
+      "sha256": "935b4e7fac24c634d411ca8ddd280651c626bae3239be62c03820131ef73b285",
+      "target": "evidence/p112-unchanged-tool-guards-outcome.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/m1-apply.json",
+      "bytes": 943,
+      "sha256": "9f0c582a45c82b433ed035c6c6f5187d9ee542b029b74c19df085679f0406878",
+      "target": "evidence/m1-apply.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/m1-restore.json",
+      "bytes": 783,
+      "sha256": "e2f7b8d4e5312ee35b599d6a0250a3429abf9e81e95e7b06d915069824ec3884",
+      "target": "evidence/m1-restore.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/m1-classification.json",
+      "bytes": 947,
+      "sha256": "6fd0e49adeeb52c8cf8c0274af16bcc5c92f6056ad9a2738566942aa1dfd16d9",
+      "target": "evidence/m1-classification.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/m1-original.ts",
+      "bytes": 7685,
+      "sha256": "19f4a72aebfe5d4eab606164cc25aab18e3dce4f2cdbcde1ea261730cae9b710",
+      "target": "evidence/m1-original.ts",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/m1.patch",
+      "bytes": 1086,
+      "sha256": "096ca77b7b5df7b2990ad6b7af42ea8a5a207445d9515a8e629297bae6d1a2f5",
+      "target": "evidence/m1.patch",
+      "envelope": true
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/m2-apply.json",
+      "bytes": 939,
+      "sha256": "0420f93ffb558a7830376d76316ae80b5af96e6ca60458a6310c95a4dfe2e56f",
+      "target": "evidence/m2-apply.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/m2-restore.json",
+      "bytes": 779,
+      "sha256": "810e68b1df102bae327bdbb62605e96dc798dbe88af04542a1ce8018baa01fdf",
+      "target": "evidence/m2-restore.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/m2-classification.json",
+      "bytes": 1595,
+      "sha256": "a2a32b5624e413394b8525dfa38dea6e1554e2cb873112086a5dab6f1ef02ec4",
+      "target": "evidence/m2-classification.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/m2-original.ts",
+      "bytes": 7685,
+      "sha256": "19f4a72aebfe5d4eab606164cc25aab18e3dce4f2cdbcde1ea261730cae9b710",
+      "target": "evidence/m2-original.ts",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/m2.patch",
+      "bytes": 978,
+      "sha256": "5161f7597ebbd9c29959be464fec86caf79039ef2a47ce646f910d49c2c3ca4f",
+      "target": "evidence/m2.patch",
+      "envelope": true
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/m3-apply.json",
+      "bytes": 942,
+      "sha256": "a92ff496b3ea945170534ff3cf69401a64a28d60a9b245578d5d857f12d610e6",
+      "target": "evidence/m3-apply.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/m3-restore.json",
+      "bytes": 782,
+      "sha256": "ec000aca46c4184bf2fbed93734fd19b3cf7392698204e43303497ffef888dbb",
+      "target": "evidence/m3-restore.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/m3-classification.json",
+      "bytes": 1522,
+      "sha256": "fc95a817c34498e55df566f653315cb6be4f383a85b4796987c9cc62967a8265",
+      "target": "evidence/m3-classification.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/m3-original.ts",
+      "bytes": 7685,
+      "sha256": "19f4a72aebfe5d4eab606164cc25aab18e3dce4f2cdbcde1ea261730cae9b710",
+      "target": "evidence/m3-original.ts",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/m3.patch",
+      "bytes": 887,
+      "sha256": "d80e5b2a542aa03d28b35cb90a1c5ddbcf898a6c3b43b5a9a4c1be5585e2ee0d",
+      "target": "evidence/m3.patch",
+      "envelope": true
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/scope-review/README.md",
+      "bytes": 1774,
+      "sha256": "e01df2c5ccc1e24dd33f046906c59acf38f13ba1a8a2eb9a725091e41b3253da",
+      "target": "evidence/scope-review/README.md",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/scope-review/pending-reservation-entry.md",
+      "bytes": 1645,
+      "sha256": "8024bb26c9af2319e1dbdd99830cade2815fbe24165dd8d58ae98364fdda8d1c",
+      "target": "evidence/scope-review/pending-reservation-entry.md",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/scope-review/pins.json",
+      "bytes": 2086,
+      "sha256": "53264ffcebc6c3ee355985349833be5503eabbc88b60397271c0bff4f4a921a2",
+      "target": "evidence/scope-review/pins.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/scope-review/preserved-metadata.json",
+      "bytes": 1027,
+      "sha256": "1f34fa5e60d942dcbe5545ae697fa167138577840e5796ab797fc45582ae4b49",
+      "target": "evidence/scope-review/preserved-metadata.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/scope-review/review.json",
+      "bytes": 5374,
+      "sha256": "d1ceaea72459512a560e79e4c9e406a94a3c17b3cdad564b0ab1c5d89548fb4a",
+      "target": "evidence/scope-review/review.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/scope-review/seal.json",
+      "bytes": 1495,
+      "sha256": "77b5db4bfafb4fabda459b07b49acc7a2d6478e1498804ba4c5779ae47d4af16",
+      "target": "evidence/scope-review/seal.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/test-design/README.md",
+      "bytes": 3068,
+      "sha256": "4db49ae1b6fac7782c552a81d2761504c666181f1225fa67bee67d23644e2798",
+      "target": "evidence/test-design/README.md",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/test-design/author-review.json",
+      "bytes": 1497,
+      "sha256": "bdc2cd6df14ea3f7dca8fab0197e711e04871e9d5a1f63110c70c6e7b5628735",
+      "target": "evidence/test-design/author-review.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/test-design/compiledPolicyGuard.test.ts",
+      "bytes": 11155,
+      "sha256": "0b045ee76d6136d72543b567f1345212d1284faee5259e1b2dc8ab3ddd988da0",
+      "target": "evidence/test-design/compiledPolicyGuard.test.ts.source.txt",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/test-design/input-pins.json",
+      "bytes": 13665,
+      "sha256": "f2e56c9427d3479e12e8f6f1b6817f4ff4c9c8a9f4e31e8a2ec4ead469e74ca9",
+      "target": "evidence/test-design/input-pins.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/test-design/matrix.json",
+      "bytes": 1831,
+      "sha256": "872e1140f5c883c4bde3e9e3c56557e2e0b14d64ff9a4fcacb6123a291ce4214",
+      "target": "evidence/test-design/matrix.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/test-design/seal.json",
+      "bytes": 3192,
+      "sha256": "75c7ef2627f91fecde4fa45f32cbb9588d4c06076417e08d35a110c135bc17bb",
+      "target": "evidence/test-design/seal.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/contract-review/README.md",
+      "bytes": 1329,
+      "sha256": "2287501ec4a2de17939a127634d891f230b3bd2d2924a0bf65c1ddfb71112d80",
+      "target": "evidence/contract-review/README.md",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/contract-review/controls.json",
+      "bytes": 4715,
+      "sha256": "77004cfb385395daca564a826acd68a62caf5de4b5eec3b0bca6e919dd2a3226",
+      "target": "evidence/contract-review/controls.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/contract-review/input-pins.json",
+      "bytes": 7303,
+      "sha256": "d768e86eeefd9ac237db83954b924ac0b0099b66e8e8bd2fdc780115135cc7ee",
+      "target": "evidence/contract-review/input-pins.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/contract-review/review.json",
+      "bytes": 7917,
+      "sha256": "8b01ba979a46c5f960272854bed53da5d341f1bf3ad421abc61093bbb60538b2",
+      "target": "evidence/contract-review/review.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/contract-review/seal.json",
+      "bytes": 1008,
+      "sha256": "6cb8a5306b2b0d2447e758bc03fa54090c74a995bfb3e944a1c09165f8f3affc",
+      "target": "evidence/contract-review/seal.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/candidate-static-review/README.md",
+      "bytes": 913,
+      "sha256": "39930be2f0f8ed86ec3a27f090f5a5e66b4e474a8ad6edfa8ea3963a07d67c8e",
+      "target": "evidence/candidate-static-review/README.md",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/candidate-static-review/controls-witnesses.json",
+      "bytes": 3013,
+      "sha256": "3d1aa454a727836a5a5c21516eb17db68fbc27b8bd577ca8700e34a0afdf9b80",
+      "target": "evidence/candidate-static-review/controls-witnesses.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/candidate-static-review/input-pins.json",
+      "bytes": 9167,
+      "sha256": "f652f25936ccebc02ce5bfbf4662e518b6e7943c39efad31a39d171b892e0740",
+      "target": "evidence/candidate-static-review/input-pins.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/candidate-static-review/review.json",
+      "bytes": 5903,
+      "sha256": "96550d5f62aa37789c3217c62c0b9cba843260666886e1b02b9d2fa2f821e985",
+      "target": "evidence/candidate-static-review/review.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/candidate-static-review/seal.json",
+      "bytes": 1075,
+      "sha256": "001d403038bc57f7b892c0e592df98a1274b9981dd067c3070f448c4bda03a28",
+      "target": "evidence/candidate-static-review/seal.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/source-run-review/README.md",
+      "bytes": 1517,
+      "sha256": "dde1ee738b65d9cc73c8b7f16266aa31b177c572fcf2563277eb6e8663898630",
+      "target": "evidence/source-run-review/README.md",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/source-run-review/current-pin-observations.json",
+      "bytes": 99453,
+      "sha256": "5b8c927ced1a0356b6c9a84db8511a5309e1a53f8b4ec1a7980145b62e4c261a",
+      "target": "evidence/source-run-review/current-pin-observations.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/source-run-review/pins.json",
+      "bytes": 57717,
+      "sha256": "3e40ad106bc71ce1fc623b06ffa5c2c7a02f4aaffbcc690b5ced658d5dfeebb5",
+      "target": "evidence/source-run-review/pins.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/source-run-review/review.json",
+      "bytes": 4401,
+      "sha256": "356ae69ec93c3c5343d59ac1e019474b81517e4eacf8e4d69c1ec9179bc0d42d",
+      "target": "evidence/source-run-review/review.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/source-run-review/seal.json",
+      "bytes": 2318,
+      "sha256": "d1a5c7c5fbc7c6d0b150c6ccf7999328ef0acf113cc90d6e428205cda09648e1",
+      "target": "evidence/source-run-review/seal.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/source-control-static-review/README.md",
+      "bytes": 703,
+      "sha256": "c9f675b5e3e38d668801c1564995aac81618a0cab409a8cdfb38fbb0936c2559",
+      "target": "evidence/source-control-static-review/README.md",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/source-control-static-review/input-pins.json",
+      "bytes": 943,
+      "sha256": "fe126f1f46b7ae5d769e0a19d0b520a169ea8e0249b203dd601841a936eb0a83",
+      "target": "evidence/source-control-static-review/input-pins.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/source-control-static-review/review.json",
+      "bytes": 3181,
+      "sha256": "50b1e5a556a2f066192788dc3daaa59338a6c3e95fda6f7601c78fde4968b1f6",
+      "target": "evidence/source-control-static-review/review.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/source-control-static-review/seal.json",
+      "bytes": 847,
+      "sha256": "e5b0a4b008cfd5c3ffb66fd88aafd65822a270697672321151a8b0daf97e5129",
+      "target": "evidence/source-control-static-review/seal.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/count-surface-review/README.md",
+      "bytes": 1729,
+      "sha256": "73a5434ea7669caeadf2b6bd9457358af5f4946adc456080ffa3c480deb19106",
+      "target": "evidence/count-surface-review/README.md",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/count-surface-review/pins.json",
+      "bytes": 10579,
+      "sha256": "6cf151333dc52e0683b688d5140285077b58d52fa657f4f01e646459bf12059d",
+      "target": "evidence/count-surface-review/pins.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/count-surface-review/preparation-note.json",
+      "bytes": 504,
+      "sha256": "2765baba6919149b4fd5b10af48da4040ee06fd19a46033d92790de0f0278525",
+      "target": "evidence/count-surface-review/preparation-note.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/count-surface-review/proposed-admission.json",
+      "bytes": 24378,
+      "sha256": "d92be217b2f2904ac6e0810d56d4e8e4d6aa5722ee59d8f85c04f59394f4702d",
+      "target": "evidence/count-surface-review/proposed-admission.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/count-surface-review/seal.json",
+      "bytes": 1323,
+      "sha256": "5da3dc2a806792c98435c7217b02e1e94a4277956b76aa7f006e9b250a6b421d",
+      "target": "evidence/count-surface-review/seal.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/fresh-binding-review/README.md",
+      "bytes": 1035,
+      "sha256": "2aa12dd8a71ddecff96d518ec13c3b185231c025738fab55844a3804cdb761c0",
+      "target": "evidence/fresh-binding-review/README.md",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/fresh-binding-review/input-pins.json",
+      "bytes": 74787,
+      "sha256": "aab982a981c2ba344739d8425c7a8d85091722e2d7144eccf9d321bb26064e65",
+      "target": "evidence/fresh-binding-review/input-pins.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/fresh-binding-review/review.json",
+      "bytes": 7650,
+      "sha256": "413481581e151a163f37c3ca1acc1453fd262f908b2b98367906509fefaae1a1",
+      "target": "evidence/fresh-binding-review/review.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/fresh-binding-review/seal.json",
+      "bytes": 827,
+      "sha256": "3012bf7cb31d07012026fd1f62e24ccdd22f4240b24020f664cb184f84e916ef",
+      "target": "evidence/fresh-binding-review/seal.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/fresh-control-chain-review/README.md",
+      "bytes": 1418,
+      "sha256": "29e830ae897fe65520b7a142418c75ff1409c10ea6bc3a0b4a255c83360e54a5",
+      "target": "evidence/fresh-control-chain-review/README.md",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/fresh-control-chain-review/input-pins.json",
+      "bytes": 91029,
+      "sha256": "13a4d3600c27960bce4d92f0526189d36da03b451062345f5396e0d341daeed9",
+      "target": "evidence/fresh-control-chain-review/input-pins.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/fresh-control-chain-review/review.json",
+      "bytes": 27478,
+      "sha256": "dc8fc737852ffdfab162779708707c71c914a30922e7a924c8827a0d064f9feb",
+      "target": "evidence/fresh-control-chain-review/review.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/fresh-control-chain-review/seal.json",
+      "bytes": 873,
+      "sha256": "6a19d6b627cc16410f83a317a70bddd3e6975a8da495f90e05c21b6f935185c8",
+      "target": "evidence/fresh-control-chain-review/seal.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/quality-delta-review/README.md",
+      "bytes": 1005,
+      "sha256": "7b947a804dcf88a5295826ec5eec96d1783defb6c8d356b26155c6478eeb5ae4",
+      "target": "evidence/quality-delta-review/README.md",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/quality-delta-review/input-pins.json",
+      "bytes": 11345,
+      "sha256": "4ca22d7a44fbe3efb938c708f9fcb079d8b8351523b73b4c7d328f5c78daf26c",
+      "target": "evidence/quality-delta-review/input-pins.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/quality-delta-review/project-equivalence.json",
+      "bytes": 3596,
+      "sha256": "f143fa43d291e8c700ef86145cb0c07a87fea98a649a2ec0d05d104a0dd1bd83",
+      "target": "evidence/quality-delta-review/project-equivalence.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/quality-delta-review/review.json",
+      "bytes": 9348,
+      "sha256": "67fcb7cdb2570494a42ffab0f60d7a4163f39ea5f5203401fcf5eb98e33d7027",
+      "target": "evidence/quality-delta-review/review.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/quality-delta-review/seal.json",
+      "bytes": 1064,
+      "sha256": "34d50aba79bfb58631ea2c3ac3ec8a5c06b6808da947fc6f223ad422fe1e2bac",
+      "target": "evidence/quality-delta-review/seal.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/receipt-prose-preparation/README.md",
+      "bytes": 423,
+      "sha256": "3c4319fd91c316710b2d92fc6873346ca0c861577417d7759f0c5f0c08b81ecc",
+      "target": "evidence/receipt-prose-preparation/README.md",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/receipt-prose-preparation/README.proposal.md",
+      "bytes": 2546,
+      "sha256": "ce34d0ecd3de8bfa742f0583ec8f387d9fa530651c430e167003323a5bd7a6c9",
+      "target": "evidence/receipt-prose-preparation/README.proposal.md",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/receipt-prose-preparation/input-pins.json",
+      "bytes": 7675,
+      "sha256": "7c625c11c704531cf129c7d001fe80d35eb860b4a8d231aaf2fad3584c061a2d",
+      "target": "evidence/receipt-prose-preparation/input-pins.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/receipt-prose-preparation/seal.json",
+      "bytes": 1474,
+      "sha256": "ef3c8d0e1db6a314c5bc5da0cdf230ad71f30edcdfeca67124add7d5f5726aca",
+      "target": "evidence/receipt-prose-preparation/seal.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/receipt-prose-preparation/whole-issue-gaps.json",
+      "bytes": 9665,
+      "sha256": "9f21402f746814d5d56ab7ccca911d4536e00333bd57e8bb08efaa398f87afa3",
+      "target": "evidence/receipt-prose-preparation/whole-issue-gaps.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/receipt-revision-v2/metadata-command-correction.json",
+      "bytes": 815,
+      "sha256": "fa424d07e8695cb36b3e02a5f1e8d44977dfa98721267bd7484f24389366b436",
+      "target": "evidence/metadata-command-correction.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/metadata-discovery/discovery-correction.json",
+      "bytes": 2962,
+      "sha256": "0b0d0e09f6136c72877e9b8108808fa793ffcd0c0c816d53b07d65fc33c0502f",
+      "target": "evidence/discovery-correction.json",
+      "envelope": false
+    }
+  ],
+  "tests": {
+    "total": 35,
+    "passed": 35,
+    "failed": 0,
+    "skipped": 0
+  },
+  "notes": "Bounded helper qualification only. Source, fresh and restored 35-case cohorts are separate observations. Three actual semantic source-control RED runs have 1, 2 and 2 failed bodies and exact manual restores. Whole P1-12, held decisions and global quality remain open. Duplicates remain 1268; dead code changes from 2724 to 2723 solely from test export reachability. No waiver, baseline adoption, PR, push, merge, release or tracker Done. See README and exact evidence.",
+  "readme": "# P1-12 bounded compiled policy helper qualification\n\nThe source checkpoint is `305aba3d0cbd7a5dc84a2b96425c3cd0236bcf71` on `codex/p1-12-compiled-guard-qualification`. It adds one 11-case test and updates 15 generated numeric spans across ten count surfaces. All production source and all other authored bytes remain unchanged. This is a bounded qualification checkpoint; whole P1-12 remains open.\n\nSource and fresh canonical runs each passed **35/35** across three physical files: 11 new typed helper cases and 24 unchanged pipeline/policy-guard cases. These observations are separate and are not summed. The retained fresh checkout was cloned from the committed source, installed with the frozen lockfile, built, and passed the helper's doctor, keyless turn, signed evidence/request reconstruction and cross-process resume checks. The helper itself does not execute Vitest.\n\nIn that owned fresh checkout, three individually applied source controls removed the visibility refusal, required-lease refusal and principal-binding refusal. They caused **1, 2 and 2 actual failed test bodies**, respectively, at assertions 80, 118/135 and 127/137 in the new test. The removed visibility refusal returned undefined for a hidden tool. The removed lease refusal returned undefined or fell through to the principal refusal. The removed principal refusal returned undefined for missing or OS-user identity. Each outcome was read and classified before an explicit byte-exact restore; each restore then passed the same **35/35** cases. Later assertions masked by an earlier failure receive no separate witness credit. The seven fresh runs preserve the same 35 per-file ordered identities, with three passing hook entries/values per run and no unhandled or late errors. Controls changed source only; compiled and native files stayed fixed.\n\nActual S/Q binding covers 59 selected paths and eight compiled preservation pairs. Five native artifacts retain distinct, single-link physical identities; the new Q inode is 543305423. Final snapshots preserve 88 protected inputs, Claude's selected variants, held R's exact 18 status rows, HEAD and empty index, and both clean S/Q trees. These finite snapshots and owned process-group closure do not establish universal or continuous isolation. Commands run from borrowed R with explicit S/Q roots and inherited environment.\n\nBuild, source and test type checks, lint, published counts, gates, threat model, architecture, docs and unchanged freeze checks passed. Fresh counts, gates and freeze also passed. Freeze remains 1236 CLI command paths, 1236 inventory paths, 41 station packs and 632 questions. The initial count check correctly failed before numeric regeneration. The quality gates remain **RED**: duplicates 1268 before and after; dead code 2724 to 2723 solely because this new test reaches the compiledPolicyDenial export. No production reachability, waiver or baseline adoption is claimed. The diagnostic's exit 0 means the comparison completed. A private precommit predicate initially assumed unchanged dead-code counts and stopped before staging; its correction did not change a repository check or source.\n\nThe new tests consume supplied ActiveCompiledPolicy and AuthorizationRecordV1 fields. They do not verify signed plan, lease or approval authority, invoke the active-head wrapper, read a live approval policy, enforce an amount-limited destination, or write an effective-policy receipt. Full specification mutations, real receipt/session/digest/event binding, domain contrast, all 14 labels, full suite and coverage, semantic documentation, changeset and publication remain open in `evidence/whole-issue-gaps.json`. P1-07's removed strict-binding opt-out stays closed. All human decisions, Claude ownership, missing-reservation binding, ignored D15 archive and F37 skip remain intact. Dependabot is excluded only from WIP; all PR paths are checked for overlap. No PR, push, merge, release or tracker Done occurred.\n\nRaw logs and live patches use the existing lossless base64 envelope, preserving exact original bytes and hashes. The oversized ownership observation stays private with its exact pin and sealed compact review; it is not truncated or represented as a complete committed observation. The next selected lane is P1-26 offline tree qualification after this bounded receipt closes.\n\nMetadata validation correction: an initial call used the nonexistent package script `check:qualification-receipts` and exited 1 before running a validator. Its original command and log are retained. The existing package script is `check:qualification`; no package, validator or gate is changed. The first private packet passed the real validator, and this clarified revision requires its own validation.\n\nMetadata discovery correction: P1-26 preparation found five additional unresolved imports because Knip discovered this receipt's copied test candidate as an entry. The unchanged normal Vitest include stays `tests/**/*.test.ts`; no actual Vitest collection failure is claimed. This revision retains the candidate's exact bytes as `evidence/test-design/compiledPolicyGuard.test.ts.source.txt`, with unchanged original source provenance and hashes. Earlier packets and manifests remain retained privately and in Git history. No scanner, include, ignore, gate, baseline or production code changes. Post-materialization quality and validation results are separate subsequent evidence.\n",
+  "privateOwnershipObservations": [
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/scope-review/observations.json",
+      "bytes": 1227405,
+      "sha256": "d7a8621abc6d4ae7c501353f99e89911df5213d43d3e5363a82547344f219e34",
+      "boundary": "Retained privately; the included sealed compact review and pins identify this complete original. No truncation or adoption of observations as a qualification result."
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/count-surface-review/ownership-observations.json",
+      "bytes": 919387,
+      "sha256": "6856805c51f771ab0c5dc4d22ab5d0624b4355868e26b40b176fe5032784c142",
+      "boundary": "Retained privately; the included sealed compact review and pins identify this complete original. No truncation or adoption of observations as a qualification result."
+    }
+  ],
+  "assemblerPin": {
+    "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/assemble-receipt.py",
+    "bytes": 4119,
+    "sha256": "55a5d8ef05e6ae776e0f6e9b69e49e2dc6c948275b3da606122487e3f3217868"
+  },
+  "revisionBoundary": "V1 and V2 remain retained. V3 changes only owned qualification metadata: an inert filename for exact source evidence, its references, and the actual discovery correction record. No production or guard changes."
+}

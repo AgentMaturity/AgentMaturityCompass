@@ -1,0 +1,117 @@
+{
+  "schema": "p107-control-classification/1",
+  "number": 3,
+  "phase": "p107-m3",
+  "actualExit": 1,
+  "actualTests": {
+    "numTotalTests": 971,
+    "numPassedTests": 961,
+    "numFailedTests": 10,
+    "numPendingTests": 0
+  },
+  "same971CaseInventoryAndPerFileOrder": true,
+  "firstFailures": [
+    {
+      "name": "what live scoring can honestly claim L2 is evaluated only where an evidence map names an observed emitter",
+      "message": "AssertionError: expected [ 'AMC-2.15', 'AMC-OPDISC-6', \u2026(1) ] to deeply equal [ 'AMC-2.15', 'AMC-5.29', \u2026(2) ]",
+      "firstSourceFrame": "    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/tests/liveEvidenceProjection.test.ts:292:47"
+    },
+    {
+      "name": "P1-07 emitter registry finite correspondence registered IDs are unique and keep both canonical tool-decision anchors",
+      "message": "AssertionError: expected [ 'tool-call-allowed', \u2026(9) ] to include 'tool-call-denied'",
+      "firstSourceFrame": "    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/tests/diagnostic/evidenceEmitterRegistry.test.ts:28:61"
+    },
+    {
+      "name": "P1-07 cumulative gate graphs (synthetic inputs) a later passing L3 cannot skip failed L2; the contiguous graph still has a positive",
+      "message": "AssertionError: expected [ [ 1, 'pass' ], \u2026(2) ] to deeply equal [ [ 1, 'pass' ], [ 2, 'fail' ], \u2026(1) ]",
+      "firstSourceFrame": "    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/tests/diagnostic/levelCumulative.test.ts:52:27"
+    },
+    {
+      "name": "P1-07 cumulative gate graphs (synthetic inputs) gate levels rather than array positions determine the contiguous result",
+      "message": "AssertionError: expected 1 to be 3 // Object.is equality",
+      "firstSourceFrame": "    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/tests/diagnostic/levelCumulative.test.ts:62:50"
+    },
+    {
+      "name": "P1-07 cumulative gate graphs (synthetic inputs) a missing lower gate stops advancement although later gates were evaluated",
+      "message": "AssertionError: expected [ [ 2, 'not_evaluated' ], \u2026(1) ] to deeply equal [ [ 2, 'pass' ], [ 3, 'pass' ] ]",
+      "firstSourceFrame": "    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/tests/diagnostic/levelCumulative.test.ts:69:28"
+    },
+    {
+      "name": "P1-07 canonical map with synthetic unverified parser-built rows independent allowed and denied literals across two synthetic days and sessions reach only L2",
+      "message": "AssertionError: expected 1 to be 2 // Object.is equality",
+      "firstSourceFrame": "    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/tests/diagnostic/levelCumulative.test.ts:95:26"
+    },
+    {
+      "name": "P1-07 canonical map with synthetic unverified parser-built rows missing denied evidence and independent session or day minima remain failures",
+      "message": "AssertionError: no denied: expected 'not_evaluated' to be 'fail' // Object.is equality",
+      "firstSourceFrame": "    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/tests/diagnostic/levelCumulative.test.ts:109:95"
+    },
+    {
+      "name": "P1-07 canonical map with synthetic unverified parser-built rows map binding ignores writer-selected tags above L1 and preserves a valid taggedRows index",
+      "message": "AssertionError: expected 1 to be 2 // Object.is equality",
+      "firstSourceFrame": "    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/tests/diagnostic/levelCumulative.test.ts:116:56"
+    },
+    {
+      "name": "P1-07 canonical map with synthetic unverified parser-built rows self-reported import and keyword input can earn L1 but cannot create higher map evidence",
+      "message": "AssertionError: expected 'not_evaluated' to be 'fail' // Object.is equality",
+      "firstSourceFrame": "    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/tests/diagnostic/levelCumulative.test.ts:157:68"
+    },
+    {
+      "name": "binds real allowed and denied native reads from two sealed sessions to the shipped AMC-5.29 gates",
+      "message": "AssertionError: expected [] to deeply equal [ \u2026(4) ]",
+      "firstSourceFrame": "    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/tests/diagnostic/runtimeEvidenceEndToEnd.test.ts:364:55"
+    }
+  ],
+  "causalWitness": "Only tool-call-denied registration removed. Native calls still produce two actual allowed and two actual denied signed audits; signatures, ledger, roots and projections pass before exact mapping line364. Canonical map is inadmissible and L2 becomes not_evaluated with zero matched IDs, losing all four selected IDs, not merely the two denied IDs. The synthetic independent two-day unit positive drops fromL2 toL1 at line95. Actual same-day native level staysL1; no real L2-to-L1 drop or two-day native continuity claimed.",
+  "nativeFirstFailure": {
+    "line": 364,
+    "matchedIds": [],
+    "expectedActualAuditIds": [
+      "f7145793-53c4-4dfa-b7ec-e4156c355353",
+      "b943759c-5109-43cd-ad15-a8d80419ce02",
+      "760b2436-8383-4c66-96ce-3b2ca5071e50",
+      "bd6d56b6-2ef1-4ecc-8fa6-8256d587b0e4"
+    ],
+    "actualNativeLevel": 1,
+    "actualDays": 1,
+    "l2Reason": "not evaluated at gate 2: L2 evidence map names unregistered or inadmissible emitters: tool-call-denied",
+    "deniedEmitterAdmission": [
+      false,
+      false
+    ]
+  },
+  "maskedAssertions": {
+    "liveEvidenceProjection292": "acceptedTrustTiers loop after evaluated-question list failure",
+    "graph52": "contiguous status/positive level and gap level assertions at53\u201355",
+    "missingLower69": "noL2 status and both missing-lower final level assertions70\u201371",
+    "canonical95": "per-level status, exact four IDs and row effective-tier assertions96\u201398",
+    "minima109": "first reason and subsequent one-session/one-day assertions after no-denied status failure",
+    "mapBinding116": "retagged/index/tagged/unmapped assertions after first untagged level failure",
+    "selfReport157": "first L3 status, keyword iteration and final import-tier assertion after first import L2 status failure",
+    "native364": "per-emitter, continuity/final-level, higher-level, body input/native equalities and post-body success predicates"
+  },
+  "cleanupEvidence": "Actual final cleanup independently verifies ten physical input/native pins, closes owned stores/pool, locks vault and restores exact environment with no cleanup error. Best-effort guard release invocation remains its disclosed limit.",
+  "hooks": "46 observer entries all pass",
+  "unhandledErrors": [],
+  "compiledSensitivityClaim": false,
+  "fullIssueDone": false,
+  "sourceCommit": "0e06b251a8ff18d8d087657f8a2b62866da89b5c",
+  "originalClassification": {
+    "path": "/private/tmp/p1-07-gate-qualification-20261016/m3-classification.json",
+    "bytes": 7009,
+    "sha256": "4446d304cb3e8ee935396cc75181d15e8aee5683580105ca600c46e8c0b10fa0"
+  },
+  "actualSourceBinding": {
+    "apply": {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/m3-apply.json",
+      "bytes": 848,
+      "sha256": "2639af490377e4123644eab8376b261dbaa5aeb76a73a05c2dc7d194efe75822"
+    },
+    "freshBinding": {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/fresh-source-binding.json",
+      "bytes": 11026,
+      "sha256": "8b2dfb76a10435847b92e768b6eac044a012bf73c7184345d515cb0e3b3c7af7"
+    },
+    "method": "Root verified the actual fresh root/commit and exact original\u2192mutant target before the run; preferred record adds source binding to preserved original classification without changing its outcomes."
+  }
+}

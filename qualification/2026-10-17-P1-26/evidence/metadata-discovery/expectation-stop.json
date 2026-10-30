@@ -1,0 +1,9 @@
+{
+  "at": "2026-10-16T20:28:18.600447+00:00",
+  "kind": "private-read-only-expectation-assertion",
+  "assumedFindingCount": 2723,
+  "actualCliFindingCount": 2728,
+  "sourceOrIndexMutationBeforeStop": false,
+  "unexpectedHarnessOrProcessFailure": false,
+  "next": "Read complete actual findings, preserve the copied candidate bytes in an inert artifact filename, and compare actual unchanged scanner outputs. No gate or baseline change."
+}

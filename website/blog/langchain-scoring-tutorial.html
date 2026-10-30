@@ -148,7 +148,7 @@ amc</code></pre>
 
 <h2>Interpreting Your Results</h2>
 
-<p>AMC scores your agent across 5 dimensions with 244 default diagnostic questions, plus 632 sector-specific questions through 41 Industry Packs for 876 total when domain coverage is enabled, on a scale from L0 (no controls) to L5 (self-governing with cryptographic proof). Here's what the levels mean for a LangChain agent:</p>
+<p>AMC scores your agent across 5 dimensions with 244 default diagnostic questions, plus 723 experimental, self-reported sector-specific questions through 41 Industry Packs for 967 total when domain coverage is enabled, on a scale from L0 (no controls) to L5 (self-governing with cryptographic proof). Here's what the levels mean for a LangChain agent:</p>
 
 <ul>
   <li><strong>L0–L1:</strong> Your agent has no safety controls or only documentation-level intent. Fix the critical gaps immediately.</li>
@@ -184,10 +184,10 @@ amc fix --target-level L3    <span style="color:#6a9955"># Writes guardrails int
 <p>Once you have your baseline score, there are several paths forward:</p>
 
 <ul>
-  <li><strong>Run the full Assurance Lab</strong> — <code>amc assurance run --scope full</code> tests your agent against 142 assurance packs</li>
+  <li><strong>Run the full Assurance Lab</strong> — <code>amc assurance run --scope full</code> tests your agent against <!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> registered assurance packs</li>
   <li><strong>Apply domain-specific packs</strong> — <code>amc domain assess --domain health</code> for healthcare, <code>--domain wealth</code> for finance</li>
   <li><strong>Generate a stakeholder report</strong> — <code>amc report &lt;id&gt; --html report.html</code> creates a styled report you can print to PDF</li>
-  <li><strong>Add a README badge</strong> — <code>amc badge</code> generates a shield showing your maturity level</li>
+  <li><strong>Print the passport badge line</strong> — <code>amc badge</code> shows only what AMC recorded for the agent; no level or score can be typed in</li>
 </ul>
 
 <div class="cta-box">

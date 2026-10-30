@@ -59,3 +59,15 @@ When a user is removed from a SCIM group, AMC revokes only roles sourced from th
 - SCIM writes are audited (`SCIM_USER_*`, `SCIM_GROUP_*`, `SCIM_MEMBERSHIP_CHANGED`).
 - Rate limits apply and can return `429`.
 
+
+## PATCH validation
+
+User PATCH accepts `active` as a JSON boolean or a case-insensitive `"true"` or `"false"` string. Other values return HTTP 400 with detail `invalidValue`. Disabling a user also causes their existing identity session to be refused. Supported user paths are `active` and `displayName`; a pathless object may contain those attributes. These User attributes are accepted and ignored, so a request that also carries them still applies its `active` or `displayName` change: `externalId`, `emails` (including filtered paths such as `emails[type eq "work"].value`), `name` and its sub-attributes, `title`, `preferredLanguage`, `phoneNumbers`, `addresses`, and the enterprise extension (`urn:ietf:params:scim:schemas:extension:enterprise:2.0:User` and its attributes). Any other path or attribute returns HTTP 400 with detail `invalidPath`, and the whole request is refused.
+
+Group PATCH supports `members` and filtered removal with `members[value eq "ID"]`. Filtered removal preserves the exact member ID and revokes only that group's role sources. It requires `op: "remove"` without a value. Unsupported group paths return `invalidPath`; malformed member values or unknown users in add/replace return `invalidValue`.
+
+PATCH operations are validated before resource updates. Malformed operation lists return `invalidValue`, and non-string paths return `invalidPath`. An omitted path or an explicit empty path retains the supported pathless forms. These checks do not guarantee rollback after a storage or audit failure.
+
+User listing supports `userName eq "VALUE"` and `externalId eq "VALUE"`. An unsupported nonempty filter returns HTTP 400 with detail `invalidFilter`; a supported filter with no match returns a normal empty list. Error responses use the SCIM Error schema, string `status` and fixed `detail`.
+
+PATCH validation does not change user POST/PUT boolean handling, HTTPS/proxy trust or bearer digest comparison. No Okta or Entra SCIM interoperability result is recorded.

@@ -1,0 +1,89 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L1-ENV-03",
+  "polarity": "negative",
+  "evidenceClass": "empty",
+  "setup": {
+    "harness": "evidence",
+    "window": {
+      "start": "2026-10-01T00:00:00.000Z",
+      "end": "2026-10-18T12:00:00.000Z"
+    },
+    "subject": {
+      "tenantId": "environment-fixture-tenant",
+      "workspaceId": "environment-fixture-workspace",
+      "deploymentId": "environment-grid-operations-in-fixture",
+      "agentId": "environment-fixture-agent",
+      "subjectId": null
+    },
+    "plan": {
+      "applicability": "applicable",
+      "policyDigest": "sha256:fixture-policy",
+      "mode": "enforce"
+    },
+    "items": [],
+    "priorUses": [],
+    "environmentOracle": {
+      "kind": "cea",
+      "input": {
+        "context": {
+          "tenantId": "environment-fixture-tenant",
+          "workspaceId": "environment-fixture-workspace",
+          "deploymentId": "environment-grid-operations-in-fixture",
+          "agentId": "environment-fixture-agent",
+          "controlId": "L1-ENV-03",
+          "controlVersion": "0.1.0",
+          "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+        },
+        "at": "2026-10-18T12:00:00.000Z",
+        "capacityMw": 120,
+        "incident": {
+          "incidentId": "synthetic-incident-1",
+          "kind": "incident",
+          "startedAt": "2026-10-18T00:00:00.000Z"
+        },
+        "packet": {
+          "binding": {
+            "tenantId": "environment-fixture-tenant",
+            "workspaceId": "environment-fixture-workspace",
+            "deploymentId": "environment-grid-operations-in-fixture",
+            "agentId": "environment-fixture-agent",
+            "controlId": "L1-ENV-03",
+            "controlVersion": "0.1.0",
+            "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+          },
+          "incidentId": "synthetic-incident-1",
+          "createdAt": "2026-10-18T06:00:00.000Z",
+          "fields": {
+            "asset": "synthetic 120 MW generator connected IT",
+            "summary": "Synthetic incident packet; local draft fields only",
+            "contact": "",
+            "scope": "synthetic connected IT"
+          }
+        }
+      },
+      "expected": {
+        "result": "not_evaluated",
+        "reasonCode": "dependency_unavailable"
+      },
+      "componentExpected": {
+        "draftPacket": {
+          "result": "fail",
+          "reasonCode": "draft_packet_incomplete",
+          "deadlineAt": "2026-10-18T06:00:00.000Z"
+        }
+      }
+    },
+    "dependencyMetadata": {
+      "item": "P3-09",
+      "state": "unavailable_on_base_pending_final_integration",
+      "registeredCeaClockExercised": false,
+      "separateOrderApplicability": "unresolved",
+      "timingParameters": "Synthetic illustrative 6h incident and 24h sabotage windows; no verified statutory trigger or field list."
+    }
+  },
+  "expected": {
+    "result": "not_evaluated",
+    "reasonCode": "incomplete"
+  }
+}

@@ -1,0 +1,127 @@
+{
+  "canonicalUniqueTotal": 85,
+  "repeatsNotSummed": true,
+  "phases": [
+    {
+      "phase": "p135-fresh-canonical",
+      "tests": {
+        "numTotalTests": 85,
+        "numPassedTests": 85,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "exit": 0,
+      "durationMs": 5976,
+      "bodyFailed": [],
+      "cleanupFailed": []
+    },
+    {
+      "phase": "p135-m1",
+      "tests": {
+        "numTotalTests": 85,
+        "numPassedTests": 84,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "exit": 1,
+      "durationMs": 4775,
+      "bodyFailed": [
+        "R4-never-promoted"
+      ],
+      "cleanupFailed": []
+    },
+    {
+      "phase": "p135-m1-restored",
+      "tests": {
+        "numTotalTests": 85,
+        "numPassedTests": 85,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "exit": 0,
+      "durationMs": 4796,
+      "bodyFailed": [],
+      "cleanupFailed": []
+    },
+    {
+      "phase": "p135-m2",
+      "tests": {
+        "numTotalTests": 85,
+        "numPassedTests": 81,
+        "numFailedTests": 4,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "exit": 1,
+      "durationMs": 4734,
+      "bodyFailed": [
+        "synthetic-persistent-roundtrip",
+        "synthetic-log-tamper",
+        "synthetic-receipt-signature-tamper",
+        "genuine-persistent-roundtrip"
+      ],
+      "cleanupFailed": [
+        "genuine-persistent-roundtrip"
+      ]
+    },
+    {
+      "phase": "p135-m2-restored",
+      "tests": {
+        "numTotalTests": 85,
+        "numPassedTests": 85,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "exit": 0,
+      "durationMs": 4829,
+      "bodyFailed": [],
+      "cleanupFailed": []
+    },
+    {
+      "phase": "p135-m3",
+      "tests": {
+        "numTotalTests": 85,
+        "numPassedTests": 82,
+        "numFailedTests": 3,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "exit": 1,
+      "durationMs": 4775,
+      "bodyFailed": [
+        "synthetic-persistent-roundtrip",
+        "synthetic-log-tamper",
+        "genuine-classifier-inputs"
+      ],
+      "cleanupFailed": []
+    },
+    {
+      "phase": "p135-m3-restored",
+      "tests": {
+        "numTotalTests": 85,
+        "numPassedTests": 85,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "exit": 0,
+      "durationMs": 4816,
+      "bodyFailed": [],
+      "cleanupFailed": []
+    }
+  ],
+  "allThreeRestoredExact": true,
+  "M1": "ATTESTED promoted to observed; direct254; later exact-kind assertions masked.",
+  "M2": "Original rewrite at308/511; extra374/402 preservation after tamper refusal passed; deliberate genuine cleanup475 retained; later genuine signature/idempotence/ledger assertions masked.",
+  "M3": "R1 missing at341/439; log-tamper358 positive-two-record prerequisite failed; no downstream tamper credit; distinct receipt-signature case passed.",
+  "boundaries": [
+    "Source-only mutants; no compiled-child sensitivity or rebuilt mutant.",
+    "All20 hook entries passed in each of seven actual phases; M2 deliberately has one cleanup error.",
+    "Borrowed runner cwd/hash observations in old assurance fixture are not Q source authority.",
+    "Fresh85canonical, not sum of repeat/control cases."
+  ]
+}

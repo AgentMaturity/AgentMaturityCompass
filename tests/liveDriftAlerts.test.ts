@@ -644,7 +644,7 @@ describe("runLiveScoreBehaviorDrift", () => {
     {
       name: "Awesome Agent Memory",
       metricId: "awesomeAgentMemoryEvidenceCoverage0to1",
-      resultHash: "494214c052ab55c7ba905091f8ebbdd7d0bc301c63b17fde3f5ba89b6527767a",
+      resultHash: "f85ad72e72cfc203adf637d0ae2459fb05e8ee07f31d797b850dde97d69f74e4",
       run: () => runAwesomeAgentMemoryLiveDrift({
         agentId: "awesome-memory-blank-refs",
         baselineWindow: {
@@ -665,7 +665,7 @@ describe("runLiveScoreBehaviorDrift", () => {
     {
       name: "Agent Reading Test",
       metricId: "agentReadingTestEvidenceCoverage0to1",
-      resultHash: "e3a8f38164dcf446ba6657e9df23626854d787af6702101065d28c783c15f711",
+      resultHash: "deab2d91df112e3ffb906c3ab345a7fcc4337720bbafaf240e301dd907d775d0",
       run: () => runAgentReadingTestLiveDrift({
         agentId: "agent-reading-blank-refs",
         baselineWindow: {
@@ -686,7 +686,7 @@ describe("runLiveScoreBehaviorDrift", () => {
     {
       name: "CTF Agent Benchmark",
       metricId: "ctfAgentBenchmarkEvidenceCoverage0to1",
-      resultHash: "f74da51b363636d0d71c0fe13d23dc699345dd9cab18e10086f3e1357009f5e9",
+      resultHash: "3c04698aadae26697cfac226bf20e26100489ff25f41a30f506280723265703c",
       run: () => runCtfAgentBenchmarkLiveDrift({
         agentId: "ctf-agent-blank-refs",
         baselineWindow: {
@@ -707,7 +707,7 @@ describe("runLiveScoreBehaviorDrift", () => {
     {
       name: "LLM Fighter",
       metricId: "llmFighterEvidenceCoverage0to1",
-      resultHash: "a2f06d706e9de4229e007a06f31b814820014cfc50cc289d33d170dcf4b3c260",
+      resultHash: "e9eaae35bf1081e4c73fae73757bc9c7af2d4146c030abd36133c2df71772aff",
       run: () => runLlmFighterLiveDrift({
         agentId: "llm-fighter-blank-refs",
         baselineWindow: {
@@ -749,6 +749,7 @@ describe("runLiveScoreBehaviorDrift", () => {
         signedEvidenceRefs: ["specialty-live-signed"],
       });
       const validCoverage = valid.liveDistribution[testCase.metric];
+      if (validCoverage === null) throw new Error("Nonempty specialty fixture must have measured coverage.");
       const blank = runSpecialtyEvidenceCoverage(
         testCase,
         {

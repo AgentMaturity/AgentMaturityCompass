@@ -1,0 +1,8 @@
+{
+  "at": "2026-10-16T20:39:25.751507+00:00",
+  "error": "TypeError: argument of type int is not a container or iterable",
+  "cause": "Private read-only parser treated candidateDelta.paths, the numeric count10, as a path array. Corrected after inspecting the actual schema to derive ten paths from candidateDelta.surfaces.",
+  "sourceOrIndexMutation": false,
+  "generatorExecuted": false,
+  "gateOrPolicyChanged": false
+}

@@ -1,0 +1,86 @@
+{
+  "at": "2026-10-16T22:58:39.293643+00:00",
+  "mode": "restore",
+  "operator": "ORDER",
+  "sourceCommit": "188681b32dc472983404dce19e7833cd76ee7576",
+  "target": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/src/time/tsaClient.ts",
+  "binding": {
+    "path": "/private/tmp/p1-25-grant-qualification-20261017/fresh-source-binding.json",
+    "physicalPath": "/private/tmp/p1-25-grant-qualification-20261017/fresh-source-binding.json",
+    "bytes": 90075,
+    "sha256": "dd478ef6153d0b03af4b9bb032fa8c7630b759cc37e021f6d5a0cdaae9c6fd35",
+    "dev": 16777231,
+    "inode": 543649633,
+    "nlink": 1
+  },
+  "sourceOutcome": {
+    "path": "/private/tmp/p1-25-grant-qualification-20261017/p125g-source-combined-outcome.json",
+    "physicalPath": "/private/tmp/p1-25-grant-qualification-20261017/p125g-source-combined-outcome.json",
+    "bytes": 4330,
+    "sha256": "7badbc66b8e813647ad56627da9c651e3cdf171ac25403c03a94b85fe029f6e0",
+    "dev": 16777231,
+    "inode": 543589497,
+    "nlink": 1
+  },
+  "canonicalOutcome": {
+    "path": "/private/tmp/p1-25-grant-qualification-20261017/p125g-fresh-canonical-outcome.json",
+    "physicalPath": "/private/tmp/p1-25-grant-qualification-20261017/p125g-fresh-canonical-outcome.json",
+    "bytes": 4362,
+    "sha256": "0c7370c8b8e212217abe841e4de7efa32833af56ab4073e2e59de6e2d208f01a",
+    "dev": 16777231,
+    "inode": 543650004,
+    "nlink": 1
+  },
+  "compiledMutation": false,
+  "nativeMutation": false,
+  "automaticRestoreOrRetry": false,
+  "regularSingleLinkCheckedBeforeWrite": true,
+  "sourceOnlyMutant": true,
+  "restored": "fc24b04be6ac0a2980425c763eaddd01320137e177d7bedfa7e8c99daa228387",
+  "byteExact": true,
+  "checkoutClean": true,
+  "outcome": {
+    "path": "/private/tmp/p1-25-grant-qualification-20261017/p125g-m1-outcome.json",
+    "physicalPath": "/private/tmp/p1-25-grant-qualification-20261017/p125g-m1-outcome.json",
+    "bytes": 8815,
+    "sha256": "a38d161c644cd80152a8869a48967e8a69fd83ed780ccad6bf2038c8da1d0dad",
+    "dev": 16777231,
+    "inode": 543650381,
+    "nlink": 1
+  },
+  "classification": {
+    "path": "/private/tmp/p1-25-grant-qualification-20261017/m1-classification.json",
+    "physicalPath": "/private/tmp/p1-25-grant-qualification-20261017/m1-classification.json",
+    "bytes": 1439,
+    "sha256": "e9a9c81cff4a36fcde7594f03926a4d827e0f1508ef201a7e09cfc9830e0fd88",
+    "dev": 16777231,
+    "inode": 543650423,
+    "nlink": 1
+  },
+  "targetBefore": {
+    "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/src/time/tsaClient.ts",
+    "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/src/time/tsaClient.ts",
+    "bytes": 10942,
+    "sha256": "ff81c88306ad744cdb6efa0011aef214c686733a6ef98e77993fabf0b17d7fc9",
+    "dev": 16777231,
+    "inode": 543604763,
+    "nlink": 1
+  },
+  "targetAfter": {
+    "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/src/time/tsaClient.ts",
+    "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/src/time/tsaClient.ts",
+    "bytes": 10927,
+    "sha256": "fc24b04be6ac0a2980425c763eaddd01320137e177d7bedfa7e8c99daa228387",
+    "dev": 16777231,
+    "inode": 543604763,
+    "nlink": 1
+  },
+  "preservationAfterRestore": {
+    "selectedPathsEachRoot": 73,
+    "compiledPairs": 8,
+    "protectedInputs": 135,
+    "nativePhysicalPins": 9,
+    "allSelectedBytesAndPhysicalPinsExact": true,
+    "heldRHeadStatusIndexExact": true
+  }
+}

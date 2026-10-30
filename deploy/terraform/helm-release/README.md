@@ -11,6 +11,10 @@ terraform plan
 terraform apply
 ```
 
+## Image Pinning
+
+Set `image_digest = "sha256:<64 hex>"` to deploy `image_repository@image_digest`; the tag is then ignored. Record the digest you deployed so a rollback can name it.
+
 ## Secret Handling
 
 Create the `amc-bootstrap` Kubernetes secret outside Terraform before applying this release. Do not put vault passphrases or owner passwords in `terraform.tfvars`; Terraform state is not the right place for those values.
@@ -28,7 +32,7 @@ kubectl -n amc-system create secret generic amc-bootstrap \
 ## Verify
 
 ```bash
-kubectl -n amc-system rollout status deploy/amc
+kubectl -n amc-system rollout status deploy/amc-amc
 kubectl -n amc-system get pods,svc,ingress,pvc
 ```
 

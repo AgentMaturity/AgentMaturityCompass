@@ -110,7 +110,7 @@ amc up
 amc connect hooks install --provider claude-code --mode control --agent my-agent
 ```
 
-Control is loopback-only. It evaluates raw tool input in memory, retains no raw args, and returns a receipt-bound native decision from AMC's existing signed policies. Claude Code supports `allow`, `deny`, and `ask`; Gemini CLI has no native `ask`, so AMC returns `deny` for that outcome. Provider-local ask is not proof of AMC quorum, and multi-user policies remain denied.
+Control is loopback-only. It evaluates raw tool input in memory, retains no raw args, and returns a receipt-bound native decision from AMC's existing signed policies. Claude Code receives `allow` or `deny`; an ask is denied, because a provider-local ask is not AMC approval. Gemini CLI has no native `ask`, so AMC returns `deny` for that outcome. Provider-local ask is not proof of AMC quorum, and multi-user policies remain denied. Claude Code control also registers each session (SessionStart) and admits each prompt (UserPromptSubmit); see [adapters/claude-code-hooks.md](adapters/claude-code-hooks.md) for the claim per hook.
 
 For Claude Code, control is enforced at the `PreToolUse` hook only while Claude Code runs it. Claude Code still runs the tool when the hook cannot start, times out, or is switched off by `disableAllHooks` or managed `allowManagedHooksOnly`, so verify it:
 
@@ -118,7 +118,7 @@ For Claude Code, control is enforced at the `PreToolUse` hook only while Claude 
 amc connect hooks status --provider claude-code
 ```
 
-`status` runs the installed hook with a probe payload and prints `Control: verified (probe denied in <n> ms)` only when the hook exits 2 with a deny; otherwise it prints `Control: NOT VERIFIED (<reason>)` and exits 1. The hook runs your Node binary and AMC's `dist/cli.js` by absolute path, so re-install after upgrading AMC or switching Node. See [ADAPTERS.md](ADAPTERS.md#claude-cli-anthropic) for the deadline, exit codes and limits.
+`status` runs the installed hook with a probe payload and prints `Control: verified (probe denied in <n> ms)` only when the hook exits 2 with a deny; otherwise it prints `Control: NOT VERIFIED (<reason>)` and exits 1. The hook runs your Node binary and AMC's `dist/adapters/hookForwarder.js` by absolute path, so re-install after upgrading AMC or Claude Code, or switching Node. See [ADAPTERS.md](ADAPTERS.md#claude-cli-anthropic) for the deadline, exit codes and limits.
 
 ### Verify first-run activation outcomes
 
@@ -133,12 +133,13 @@ AMC tracks four outcomes: connected agent, first observed action, first control 
 
 The status command is pure inspection. It does not mint a lease, call a provider, run a sample task, generate traffic, append evidence, or create a second onboarding record. Run your own agent action through AMC, then refresh the command or the Studio Activation path.
 
-**Add a badge to your README:**
+**Passport badge line:**
 
 ```bash
-amc badge
-# ![AMC L3](https://img.shields.io/badge/AMC-L3%20Defined-blue)
+amc badge    # one line from the agent's passport; the claim line goes to stderr
 ```
+
+`amc badge` shows only what AMC recorded for the agent: it takes no level or score. It is not a certification mark; badges for a README will only come from a public registry (Gate G3).
 
 **Telemetry: there is none.**
 
@@ -524,7 +525,7 @@ amc ingest ./external-agent-logs/ --type generic_json --agent imported-agent
 | `amc mechanic rca list` / `amc mechanic rca show <run>` | Review signed Fixer RCA reports without exposing local workspace paths |
 | `amc experiment optimize --rca latest` | Create isolated optimizer candidates with held-out validation, leakage checks, Pareto ranking, and receipts |
 | `amc experiment optimizer-list` / `amc experiment optimizer-show latest` | Review accepted/rejected optimizer candidates and reasons |
-| `amc evidence export --agent <id> --format json --out evidence.json` | Export verifier-ready evidence for one agent: rows whose metadata names the agent plus every row of the native sessions it opened. Prints `events=`, `sessions=` and `excluded=`; the JSON (`schemaVersion` 2) records the same in `agentFilter` |
+| `amc evidence export --agent <id> --format json --out evidence.json` | Export verifier-ready evidence for one agent: rows whose metadata names the agent plus every row of the native sessions it opened, never the shared `system` session. Prints `events=`, `sessions=` and `excluded=`; the JSON (`schemaVersion` 2) records the same in `agentFilter`, with `systemSession: "excluded"` and `insufficientFor: ["requires_no_audit"]`: system rows can count against an agent, so recompute those controls from an unfiltered export |
 | `amc evidence finding-proofs list` | Trace each major finding to evidence, resources, receipts, and recommendation ids |
 | `amc evidence finding-proofs export --out proofs.json --redacted` | Export shareable proof chains without local workspace paths |
 | `amc evidence lifecycle-receipts list` | List proposal, validation, commit, rollback, and monitor receipts |

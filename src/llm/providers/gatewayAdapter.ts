@@ -1,4 +1,9 @@
 /**
+ * library-only, not enforced by native model routing: no production composition
+ * registers this wrapper. Canonical routes live in src/llm/adapter/adapterRegistry.ts;
+ * gateway enforcement lives in src/gateway/server.ts. WP28 should reuse this
+ * wrapper when composing explicit native gateway routes.
+ *
  * AMC's own gateway, as an LLM provider.
  *
  * WHY THIS EXISTS. AMC already runs a recording proxy: foreign agents point

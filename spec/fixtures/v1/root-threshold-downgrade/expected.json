@@ -1,0 +1,18 @@
+{
+  "case": "root-threshold-downgrade",
+  "normative": true,
+  "dimensions": {
+    "integrity": "pass",
+    "issuerAdmission": "fail",
+    "scope": "not-evaluated",
+    "freshness": "not-evaluated",
+    "completeness": "not-evaluated",
+    "satisfaction": "not-evaluated"
+  },
+  "reasonCodes": {
+    "issuerAdmission": [
+      "TRUST_LIST_SIGNATURE_INVALID"
+    ]
+  },
+  "exitCode": 1
+}

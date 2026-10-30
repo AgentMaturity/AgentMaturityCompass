@@ -69,7 +69,7 @@ describe("round-2 refuter fixes are applied", () => {
 
   it("retrieval observations are flagged so the calendar can skip them", () => {
     const observed = entries.flatMap((e) => e.keyDates.filter((k) => k.observation).map((k) => e.id));
-    expect(observed.sort()).toEqual(["us-eeoc-ai-ta", "us-fda-ai-dsf-draft", "us-qmsr"]);
+    expect(observed.sort()).toEqual(["us-bsa-sar", "us-eeoc-ai-ta", "us-fda-ai-dsf-draft", "us-glba-safeguards", "us-hipaa-rules", "us-qmsr", "us-reg-e"]);
   });
 
   it("the withdrawn AI Liability Directive proposal is not presented as in force", () => {

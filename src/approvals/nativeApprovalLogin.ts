@@ -1,6 +1,6 @@
 import { constants, closeSync, fchmodSync, fstatSync, fsyncSync, ftruncateSync, lstatSync, openSync, realpathSync, unlinkSync, writeFileSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
-import { authenticateUser, createSession, revokeSessionByToken, verifyTrackedSessionToken } from "../auth/authApi.js";
+import { authenticateUser, createSessionAsync, revokeSessionByToken, verifyTrackedSessionToken } from "../auth/authApi.js";
 import type { UserRole } from "../auth/roles.js";
 
 export const NATIVE_APPROVAL_PASSWORD_BYTES = 4096;
@@ -97,7 +97,7 @@ export async function loginNativeApprovals(
     owned = { dev: created.dev, ino: created.ino };
     if (!created.isFile()) fail("TOKEN_FILE_INVALID", "The new token output is not a regular file.");
     fchmodSync(fd, 0o600);
-    const issued = createSession({ workspace, user: authenticated.user, ttlMs: validated.ttlMinutes * 60_000 });
+    const issued = await createSessionAsync({ workspace, user: authenticated.user, ttlMs: validated.ttlMinutes * 60_000 });
     token = issued.token;
     const tracked = verifyTrackedSessionToken({ workspace, token });
     if (!tracked.ok || tracked.payload === null || tracked.authSource !== "LOCAL_USER"

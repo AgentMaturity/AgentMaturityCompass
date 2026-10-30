@@ -1,0 +1,31 @@
+{
+  "kind": "amc.p206-d4-mutations/1",
+  "base": "331f311d6 (mutations applied to the working tree before the commit, each restored after its run)",
+  "test": "tests/backupRestoreRefusal.test.ts",
+  "mutations": [
+    {
+      "id": "M1",
+      "guard": "assertKeysetRestorable: a target holding a workspace must hold the backup's key set (same keys)",
+      "mutation": "key comparison disabled (if (false))",
+      "result": "killed: 2 tests failed (another workspace with marks; another workspace on a machine with no marks)"
+    },
+    {
+      "id": "M2",
+      "guard": "assertKeysetRestorable: the backup's key set must pass this machine's committed and adopted marks for the target path",
+      "mutation": "mark loop skipped (continue)",
+      "result": "killed: 1 test failed (a path where this machine accepted another key set)"
+    },
+    {
+      "id": "M3",
+      "guard": "restoreBackup calls assertKeysetRestorable before any write",
+      "mutation": "call removed",
+      "result": "killed: 3 tests failed"
+    },
+    {
+      "id": "M4",
+      "guard": "restoreBackup stages next to the target and commits by rename",
+      "mutation": "extract, verify and seal directly in the target; no commit step",
+      "result": "killed: 3 tests failed (replacedTo; no partial workspace after a failed seal; same workspace unchanged after a failed seal)"
+    }
+  ]
+}

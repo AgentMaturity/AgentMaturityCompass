@@ -1,0 +1,59 @@
+{
+  "agentId": "default",
+  "runId": "neutral-import-caa334a696c293d1",
+  "ts": 1791740825031,
+  "windowStartTs": 1791740825031,
+  "windowEndTs": 1791740825031,
+  "status": "UNSIGNED",
+  "verificationPassed": false,
+  "trustBoundaryViolated": false,
+  "trustBoundaryMessage": null,
+  "integrityIndex": 0,
+  "trustLabel": "UNRELIABLE — DO NOT USE FOR CLAIMS",
+  "targetProfileId": null,
+  "layerScores": [],
+  "questionScores": [],
+  "inflationAttempts": [],
+  "unsupportedClaimCount": 0,
+  "contradictionCount": 0,
+  "correlationRatio": 0,
+  "invalidReceiptsCount": 0,
+  "correlationWarnings": [],
+  "evidenceCoverage": 0,
+  "evidenceTrustCoverage": {
+    "observed": 0,
+    "attested": 0,
+    "selfReported": 1
+  },
+  "importProvenance": {
+    "evaluationPerformed": false,
+    "sourceTrustTier": "SELF_REPORTED",
+    "artifactCount": 1,
+    "recordCount": 5,
+    "evidenceRefs": [
+      "import:pi-session.jsonl:f485025150b3"
+    ]
+  },
+  "targetDiff": [],
+  "prioritizedUpgradeActions": [],
+  "evidenceToCollectNext": [
+    "Run a full AMC score after importing to correlate imported evidence with live maturity questions."
+  ],
+  "runSealSig": "unsigned-import",
+  "evidenceReadiness": {
+    "schemaVersion": "2026-07-10",
+    "status": "UNVERIFIED",
+    "claimEligible": false,
+    "label": "External import — not evaluated",
+    "reasonCodes": [
+      "NO_ACCEPTED_EVIDENCE"
+    ],
+    "claimBoundary": "Imported content is SELF_REPORTED. Importing or signing an artifact does not verify source claims or perform a maturity evaluation.",
+    "nextStep": "Capture observed evidence or obtain a named attestation, then run a full AMC assessment.",
+    "thresholds": {
+      "readyIntegrity": 0.6,
+      "insufficientIntegrityBelow": 0.4
+    }
+  },
+  "reportJsonSha256": "6bc2c496ced5887f596e7c7b7c1eda5480b6d96398a2426b2348cd0a4c681fb2"
+}

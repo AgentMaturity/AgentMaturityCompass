@@ -1,0 +1,44 @@
+{
+  "schema": "p125ec-public-output-curator-preparation-seal/1",
+  "at": "2026-10-17T01:17:17.369863+00:00",
+  "base": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/prepare-public-output.py",
+    "bytes": 9470,
+    "sha256": "3447d186bb9fdf6b26ba63eb934a236c8c799168455e7254e2b61e2b3e76a567"
+  },
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-output-preparation/prepare-public-output.py.source.txt",
+      "bytes": 17505,
+      "sha256": "2b454cbdc55233c54cbf4cb9b34ed1f1c2aaeb5dcfdfe7bb094bb9d45705be14"
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-output-preparation/prepare-public-output-from-B38.patch.txt",
+      "bytes": 17952,
+      "sha256": "b1e4fb03cb9b806fa3fc6cfcf0408e7b7e223e5575be1b3c1742adc3841917e9"
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-output-preparation/phase-inputs.json",
+      "bytes": 4132,
+      "sha256": "d59c4d21c40a79ca1234bfb143b64e8eff30b21d92105b1ae6dd51e80ef1b428"
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-output-preparation/input-pins.json",
+      "bytes": 3871,
+      "sha256": "119141daff8867c070c1e469dfff629babbe2c415f34ea3a52dcf7c21fd969ad"
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/public-output-preparation/README.md",
+      "bytes": 3154,
+      "sha256": "158925d21e1d8d6c54801636020d52a9dcf5315ea3ea26575529c6cc84d6d332"
+    }
+  ],
+  "actualCurrentPhaseCount": 6,
+  "helperExecuted": false,
+  "helperParsedImportedOrCompiled": false,
+  "publicOutputsMaterialized": false,
+  "noProductOpenSslNativeNetworkOrKeyOperations": true,
+  "noSourceIndexQaPriorArtifactOrReservationOperations": true,
+  "requiresRootFullReadIndependentReviewAndExplicitAdoption": true,
+  "blockers": []
+}

@@ -1,0 +1,11 @@
+# Inert public-output adapter for B38
+
+The preferred source is prepare-public-output.py.source.txt. Its complete adaptation patch derives from the exact B37 helper. Neither helper was imported, parsed, compiled or executed; this preparation did not import SSL or read generated public/signing roots, keys, child streams or private runs. Root must review the code before any active copy and execution.
+
+The fixed phase-input manifest binds the six actual phases accepted by root-runtime-review plus original p125w-m1 as diagnostic only. Every outcome/public-audit pin, emitted lifecycle/checkpoint path and corresponding audit pin is checked at execution. This preserves the original chronology failure and does not turn its genuine fixtures into sequential sensitivity evidence. The obsolete B37 failed-LibreSSL special branch alone is removed. No future phase, copy count or successful output is claimed.
+
+The old single-reply query/body-length/hash and last replyObservation equality checks remain for old cases. The window case instead pairs each of its two actual requests with its own named natural verify-query-bound-reply child argv, query/reply pins, retained per-grant facts, checkpoint/token digest and leaf-certificate DER fingerprint. The shared last replyObservation is checked only against the last pair. Green semantic proof rows must exactly equal the existing public audit proof rows; RED and diagnostic phases retain per-grant public evidence without claiming masked window semantics passed.
+
+The helper creates only exclusive public DER certificate bundles and an explicit allowlist for later copying. It reads exactly root.pem and tsa.pem beside each emitted lifecycle record, demands one certificate block and no private-key marker, converts public certificates and retains source/DER hashes. It performs no discovery or directory traversal, does not publish raw PEM, and does not open any private key, private run or child stream. Every query/reply is explicitly named by the pinned emitted public record. Existing regular physical-file and unique source/destination guards remain.
+
+All output counts derive from future actual allowlist entries. No full issue, plan, release, global quality or broader isolation credit is supplied. All held decisions, F37skip, guards and quality checks remain unchanged.

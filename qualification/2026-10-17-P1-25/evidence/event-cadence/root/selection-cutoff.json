@@ -1,0 +1,13 @@
+{
+  "schema": "p125ec-root-selection-cutoff/1",
+  "at": "2026-10-17T01:23:06.407911+00:00",
+  "publicAllowlist178ActualExact": true,
+  "certificateBundles36Actual": true,
+  "independentCadenceProofs10CapturedUnverified1": true,
+  "metadataScope187RootReviewRead": true,
+  "currentHosted13Wip0AllPrPathsNoOverlap": true,
+  "ordinaryMetadataPreFreezeAndD15Exit0": true,
+  "actualEnvironmentExit0": true,
+  "noSourceCopyAdmission": true,
+  "allFourRootManifestFlagsRemainFalseUntilExactSelectionReview": true
+}

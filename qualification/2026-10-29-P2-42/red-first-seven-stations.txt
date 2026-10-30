@@ -1,0 +1,6 @@
+     × a project on all seven stations crosses Adapt through Review; the explanation and Review's control lists are bound by sha256 16311ms
+     × …/resolved answers the parts checked against their refs, the stored route answers the refs, and a missing part refuses both 16695ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+Error: /stages/adapt/review: 413 {"ok":false,"error":"INPUT_TOO_LARGE: The produced specification is larger than 256 KiB.","code":"INPUT_TOO_LARGE"}
+AssertionError: expected [ { …(9) }, { …(9) }, { …(9) }, …(60) ] to match object { …(2) }
+      Tests  2 failed | 7 skipped (9)

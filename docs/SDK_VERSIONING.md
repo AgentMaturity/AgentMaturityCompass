@@ -7,6 +7,7 @@ AMC SDKs and Bridge integration surfaces follow SemVer for breaking/non-breaking
 - Package version source: `package.json` (`agent-maturity-compass`).
 - Bridge contract version: `v1` (`/bridge/*`).
 - Internal control-plane routes (`/api/v1/*`) are not part of the public SDK contract.
+- The native TypeScript SDK (`agent-maturity-compass/sdk/native`) has its own `@public` surface, API snapshot and semver table: [TypeScript SDK](sdk/TYPESCRIPT_SDK.md).
 
 ## Compatibility Rules
 

@@ -1,0 +1,12 @@
+{
+  "firstHarnessSha256": "f4a986c71725edffc83399b673a715e2277e1192ea7524659eb9a41382a3697e",
+  "preservedHarness": "/private/tmp/p0-27-compiled-cli-first-observer-20261015.mjs",
+  "firstLog": "/private/tmp/p0-27-compiled-cli-first-20261015.log",
+  "firstEvidence": "/private/tmp/p0-27-compiled-cli-0wrJI8",
+  "corrections": [
+    "Explicit AMC_HOME pointed at a fixture directory created0755; actual credential constructor refuses it before native composition. Create newly owned AMC_HOME0700 as the existing contract requires; no permission check is disabled.",
+    "The public terminal driverStatus is idle after a completed turn, as current cliAgentLoopCommands tests assert; observer completed assumption was not source behavior.",
+    "Initial harness stopped on parsing empty failed stdout before saving aggregate; per-command streams/effects and wrapper failure log are retained, not a full CLI verdict."
+  ],
+  "sourceUnchanged": true
+}

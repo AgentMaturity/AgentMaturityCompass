@@ -1,0 +1,80 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L0-OVS-02",
+  "polarity": "negative",
+  "evidenceClass": "stale",
+  "setup": {
+    "harness": "evidence",
+    "window": {
+      "start": "2025-01-01T00:00:00.000Z",
+      "end": "2026-09-30T23:59:59.000Z"
+    },
+    "subject": {
+      "tenantId": "tenant-a",
+      "workspaceId": "ws-a",
+      "deploymentId": "dep-a",
+      "agentId": "agent-1",
+      "subjectId": null
+    },
+    "plan": {
+      "applicability": "applicable",
+      "policyDigest": "sha256:fixture-policy",
+      "mode": "enforce"
+    },
+    "items": [
+      {
+        "ref": {
+          "kind": "receipt",
+          "id": "L0-OVS-02-authorizationRecord-1"
+        },
+        "producerId": "amc.authorizationRecord",
+        "provenance": {
+          "verified": true,
+          "producerId": "amc.authorizationRecord",
+          "trustTier": "OBSERVED"
+        },
+        "recordedAt": "2026-08-26T23:59:59.000Z",
+        "binding": {
+          "workspaceId": "ws-a",
+          "agentId": "agent-1",
+          "controlId": "L0-OVS-02"
+        },
+        "verdict": "conforms",
+        "attributes": {
+          "receiptId": "L0-OVS-02-authorizationRecord-1-receipt",
+          "observationKey": "L0-OVS-02-observation-1",
+          "observation": "conforms"
+        }
+      },
+      {
+        "ref": {
+          "kind": "receipt",
+          "id": "L0-OVS-02-approvals-engine-2"
+        },
+        "producerId": "amc.approvals.engine",
+        "provenance": {
+          "verified": true,
+          "producerId": "amc.approvals.engine",
+          "trustTier": "OBSERVED"
+        },
+        "recordedAt": "2026-09-20T10:00:00.000Z",
+        "binding": {
+          "workspaceId": "ws-a",
+          "agentId": "agent-1",
+          "controlId": "L0-OVS-02"
+        },
+        "verdict": "conforms",
+        "attributes": {
+          "receiptId": "L0-OVS-02-approvals-engine-2-receipt",
+          "observationKey": "L0-OVS-02-observation-2",
+          "observation": "conforms"
+        }
+      }
+    ],
+    "priorUses": []
+  },
+  "expected": {
+    "result": "not_evaluated",
+    "reasonCode": "stale"
+  }
+}

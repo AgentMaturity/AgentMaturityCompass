@@ -2,8 +2,8 @@
  * `amc verify --relabel-legacy` (P1-35): finds the 1.x results in a workspace and in files named with --path,
  * appends one relabel record per result not yet recorded under the current notice, and writes a signed migration
  * receipt. It reads originals and never writes them: the ledger opens read-only, bundles and certificates are
- * extracted to temporary folders by their own verifiers, and the only writes are the relabel log and the receipt.
- * It never walks beyond the workspace locations below and the named files, and never calls `amc verify --repair`.
+ * extracted to temporary folders by their own verifiers. Publication writes the relabel log and receipt; its fixed
+ * lock uses .amc control files. It scans only the locations below and named files, and never calls `amc verify --repair`.
  *
  * Integrity first: the ledger must verify before its sessions are classified, and each run, bundle and certificate
  * goes through AMC's own verifier. A failed check is reported, never dropped: an artifact that fails is skipped as
@@ -14,7 +14,6 @@ import { extname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { inspectAssuranceCertificate } from "../../assurance/assuranceCertificates.js";
 import { verifyCertificate } from "../../assurance/certificate.js";
 import { verifyEvidenceBundle } from "../../bundles/bundle.js";
-import { signDigestWithPolicy } from "../../crypto/signing/signer.js";
 import { sealedRunReportVerifies } from "../../diagnostic/reportSeal.js";
 import { openLedger, verifyLedgerIntegrity, type VerifyResult } from "../../ledger/ledger.js";
 import { untrustedReasons, type TrustContext, type VerifierReportV1 } from "../../trust/index.js";
@@ -24,8 +23,9 @@ import { sha256Hex } from "../../utils/hash.js";
 import { amcVersion } from "../../version.js";
 import { classifyLegacyArtifact, LEGACY_ARTIFACT_KINDS, type LegacyArtifactKind, type LegacyClassification } from "./classify.js";
 import { CURRENT_LEGACY_NOTICE } from "./notices.js";
-import { originalsDigest, signReceipt, writeReceipt, type MigrationReceipt } from "./receipt.js";
-import { appendRelabelLines, chainRecords, RELABEL_LOG, verifyRelabelLog, type RelabelRecord } from "./relabelLog.js";
+import { originalsDigest, type MigrationReceipt } from "./receipt.js";
+import { captureLegacyPublication, captureLegacySources } from "./legacyPublication.js";
+import { chainRecords, RELABEL_LOG, verifyRelabelLog, type RelabelRecord } from "./relabelLog.js";
 
 type Integrity = RelabelRecord["integrity"];
 interface Scanned {
@@ -222,22 +222,56 @@ async function scanPath(workspace: string, given: string, trust: TrustContext): 
 const zeroCounts = () => Object.fromEntries(LEGACY_ARTIFACT_KINDS.map((kind) => [kind, 0])) as Record<LegacyArtifactKind, number>;
 
 /**
- * Scans, appends the new relabel records and writes the signed receipt; with `dryRun` it writes nothing. Idempotent:
+ * Scans, appends the new relabel records and writes the signed receipt; with `dryRun` it publishes nothing. Idempotent:
  * a result already recorded under this notice version (same sha256) is not recorded again. A relabel log that fails
- * its chain or receipt check, or a receipt that cannot be signed, stops the run before anything is written.
+ * its chain or receipt check, or a receipt that cannot be signed, stops before publication member writes.
  */
 export async function relabelLegacyArtifacts(workspace: string, options: RelabelOptions): Promise<RelabelRun> {
-  const now = options.now ?? (() => new Date());
+  const request = { ...options, trust: structuredClone(options.trust),
+    ledgerCheck: options.ledgerCheck === undefined ? undefined : structuredClone(options.ledgerCheck), paths: [...(options.paths ?? [])] };
+  const now = request.now ?? (() => new Date());
   const startedAt = now().toISOString();
   const log = verifyRelabelLog(workspace);
   if (!log.ok) {
     throw new Error(`${RELABEL_LOG} failed its check${log.line === null ? "" : ` at line ${log.line}`}: ${log.reason}; nothing was written`);
   }
-  const notice = CURRENT_LEGACY_NOTICE;
+  const publication = request.dryRun ? null : captureLegacyPublication(workspace, log);
+  const notice = structuredClone(CURRENT_LEGACY_NOTICE), originalNotice = JSON.stringify(notice);
   const recorded = new Set(log.records.filter((row) => row.noticeId === notice.id && row.noticeVersion === notice.version)
     .map((row) => row.artifact.sha256));
-  const scanned = [...scanLedger(workspace, options.trust, options.ledgerCheck), ...scanWorkspaceFiles(workspace)];
-  for (const path of options.paths ?? []) scanned.push(await scanPath(workspace, path, options.trust));
+  const ledgerPresent = existsSync(join(workspace, ".amc", "evidence.sqlite"));
+  const ledgerCheck = request.ledgerCheck ?? (ledgerPresent ? verifyLedgerIntegrity(workspace, { trust: request.trust }) : undefined);
+  const decision = (check: VerifyResult) => JSON.stringify({ failure: ledgerFailure(check, request.trust), anchored: check.trustRoot.anchored,
+    monitorRefused: !check.trustRoot.anchored && Boolean(check.trustRoot.monitorAdmission && isKeyRefused(check.trustRoot.monitorAdmission)) });
+  const originalDecision = ledgerPresent ? decision(ledgerCheck!) : null;
+  const assertLedgerDecision = () => {
+    if (existsSync(join(workspace, ".amc", "evidence.sqlite")) !== ledgerPresent)
+      throw new Error("legacy relabel original ledger presence changed while scanning; retry verification");
+    if (ledgerPresent && decision(verifyLedgerIntegrity(workspace, { trust: request.trust })) !== originalDecision)
+      throw new Error("legacy relabel ledger decision changed or the supplied ledger check is stale; retry verification");
+  };
+  // Retain the observed verdicts. Fresh readonly verification only refuses a changed decision; it never replaces them.
+  if (publication !== null) assertLedgerDecision();
+  const initial = [...(ledgerPresent ? scanLedger(workspace, request.trust, ledgerCheck) : []), ...scanWorkspaceFiles(workspace)];
+  const initialProjection = JSON.stringify(initial);
+  const sources = publication === null ? null : captureLegacySources(workspace,
+    [...initial.filter(item => item.kind !== "ledger_session").map(item => item.locator), ...request.paths]);
+  for (const item of initial) if (item.kind !== "ledger_session") sources?.assertScanned(item.locator, item.sha256);
+  const assertInputsCurrent = () => {
+    sources?.assertCurrent();
+    if (JSON.stringify(CURRENT_LEGACY_NOTICE) !== originalNotice) throw new Error("legacy relabel notice changed while scanning");
+    assertLedgerDecision();
+    const current = [...(ledgerPresent ? scanLedger(workspace, request.trust, ledgerCheck) : []), ...scanWorkspaceFiles(workspace)];
+    if (JSON.stringify(current) !== initialProjection) throw new Error("original legacy relabel scan source projection changed");
+    sources?.assertCurrent();
+  };
+  const scanned = [...initial];
+  for (const path of request.paths) {
+    if (publication !== null) { assertInputsCurrent(); publication.assertCurrent(); }
+    const item = await scanPath(workspace, path, request.trust);
+    if (publication !== null) { sources!.assertScanned(path, item.sha256); assertInputsCurrent(); publication.assertCurrent(); }
+    scanned.push(item);
+  }
 
   const counts = { scanned: zeroCounts(), relabelled: zeroCounts() };
   const recordedAt = now().toISOString();
@@ -266,12 +300,8 @@ export async function relabelLegacyArtifacts(workspace: string, options: Relabel
     originalsDigest: originalsDigest(scanned.flatMap((item) => item.sha256 ? [item.sha256] : []))
   };
   const records = chain.lines.map((line) => JSON.parse(line) as RelabelRecord);
-  if (options.dryRun) return { receipt, records, receiptPath: null };
+  if (publication === null) return { receipt, records, receiptPath: null };
 
-  const out = signReceipt(workspace, receipt, (digestHex) => signDigestWithPolicy({ workspace, kind: "MIGRATION_RECEIPT", digestHex }));
-  // ponytail: a crash between these two writes leaves lines no receipt attests, and the next run refuses; recovery is
-  // the operator's call. A write-ahead intent record would let the next run finish the receipt instead.
-  appendRelabelLines(workspace, chain.lines);
-  writeReceipt(workspace, out);
-  return { receipt, records, receiptPath: out.path };
+  const receiptPath = await publication.publish(receipt, chain.lines, assertInputsCurrent);
+  return { receipt, records, receiptPath };
 }

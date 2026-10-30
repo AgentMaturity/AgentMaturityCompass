@@ -1,0 +1,125 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L1-ENV-05",
+  "polarity": "positive",
+  "evidenceClass": "empty",
+  "setup": {
+    "harness": "evidence",
+    "window": {
+      "start": "2026-10-01T00:00:00.000Z",
+      "end": "2026-10-18T12:00:00.000Z"
+    },
+    "subject": {
+      "tenantId": "environment-fixture-tenant",
+      "workspaceId": "environment-fixture-workspace",
+      "deploymentId": "environment-food-lot-release-fixture",
+      "agentId": "environment-fixture-agent",
+      "subjectId": null
+    },
+    "plan": {
+      "applicability": "applicable",
+      "policyDigest": "sha256:fixture-policy",
+      "mode": "enforce"
+    },
+    "items": [],
+    "priorUses": [],
+    "environmentOracle": {
+      "kind": "sensor",
+      "input": {
+        "context": {
+          "tenantId": "environment-fixture-tenant",
+          "workspaceId": "environment-fixture-workspace",
+          "deploymentId": "environment-food-lot-release-fixture",
+          "agentId": "environment-fixture-agent",
+          "controlId": "L1-ENV-05",
+          "controlVersion": "0.1.0",
+          "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+        },
+        "at": "2026-10-18T12:00:00.000Z",
+        "lotId": "food-lot-1",
+        "feedAvailable": true,
+        "profile": {
+          "binding": {
+            "tenantId": "environment-fixture-tenant",
+            "workspaceId": "environment-fixture-workspace",
+            "deploymentId": "environment-food-lot-release-fixture",
+            "agentId": "environment-fixture-agent",
+            "controlId": "L1-ENV-05",
+            "controlVersion": "0.1.0",
+            "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+          },
+          "lotId": "food-lot-1",
+          "windowMs": 60000,
+          "maxAgeMs": 60000,
+          "maxGapMs": 30000,
+          "requirements": [
+            {
+              "sensorId": "temperature-1",
+              "unit": "C",
+              "min": 0,
+              "max": 5
+            }
+          ]
+        },
+        "readings": [
+          {
+            "binding": {
+              "tenantId": "environment-fixture-tenant",
+              "workspaceId": "environment-fixture-workspace",
+              "deploymentId": "environment-food-lot-release-fixture",
+              "agentId": "environment-fixture-agent",
+              "controlId": "L1-ENV-05",
+              "controlVersion": "0.1.0",
+              "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+            },
+            "lotId": "food-lot-1",
+            "sensorId": "temperature-1",
+            "unit": "C",
+            "recordedAt": "2026-10-18T11:59:00.000Z",
+            "value": 4
+          },
+          {
+            "binding": {
+              "tenantId": "environment-fixture-tenant",
+              "workspaceId": "environment-fixture-workspace",
+              "deploymentId": "environment-food-lot-release-fixture",
+              "agentId": "environment-fixture-agent",
+              "controlId": "L1-ENV-05",
+              "controlVersion": "0.1.0",
+              "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+            },
+            "lotId": "food-lot-1",
+            "sensorId": "temperature-1",
+            "unit": "C",
+            "recordedAt": "2026-10-18T11:59:30.000Z",
+            "value": 4
+          },
+          {
+            "binding": {
+              "tenantId": "environment-fixture-tenant",
+              "workspaceId": "environment-fixture-workspace",
+              "deploymentId": "environment-food-lot-release-fixture",
+              "agentId": "environment-fixture-agent",
+              "controlId": "L1-ENV-05",
+              "controlVersion": "0.1.0",
+              "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+            },
+            "lotId": "food-lot-1",
+            "sensorId": "temperature-1",
+            "unit": "C",
+            "recordedAt": "2026-10-18T12:00:00.000Z",
+            "value": 4
+          }
+        ]
+      },
+      "expected": {
+        "result": "allow",
+        "reasonCode": "sensor_gate_allowed"
+      }
+    }
+  },
+  "expected": {
+    "result": "not_evaluated",
+    "reasonCode": "incomplete"
+  }
+}

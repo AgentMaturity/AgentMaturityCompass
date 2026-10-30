@@ -1,0 +1,6 @@
+{
+  "schema": "p126-plan-protected-snapshot-selection/1",
+  "initialStop": "The first private preparation read the original protected-inputs.json and stopped on the authorized P112 receipt hash change before source-pinset/plan/seal creation. Only expected-inventory.json had been created. No source/index/product action occurred.",
+  "resolution": "Finite root filename listing located protected-inputs-after-metadata-repair.json, which explicitly retains111 original pins and updates exactly the2 authorized receipt/README pins at commit2aa32d5e436e789037c6a8a161d6cf0424b4f4ac. The original snapshot remains unchanged; preferred113pins are rehashed below.",
+  "noRuntimeClaim": true
+}

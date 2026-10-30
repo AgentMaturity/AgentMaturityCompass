@@ -34,7 +34,18 @@ describe("composition inspection through the bundled runtime seam", () => {
     expect(dump.composition).toEqual({ path, sha256: createHash("sha256").update(source).digest("hex"),
       signed: false, signatureReason: "no signature sidecar" });
     expect(dump.entries).toEqual([{ id: "inspection", name: "./not-installed.mjs", disabled: true, source: path }]);
+    // GAP-WP39: boot() is library-only, so no native surface boots this file and the dump says so.
+    expect(dump.bootedBy).toEqual([]);
     expect(process.exit).not.toHaveBeenCalled();
+  });
+
+  it("does not report a forged sidecar with a matching digest as signed (GAP-WP12)", async () => {
+    const path = join(workspace, "amc.cordis.yml");
+    writeFileSync(path, source);
+    writeFileSync(`${path}.sig`, JSON.stringify({ scheme: "amc-composition-v1", configSha256: createHash("sha256").update(source).digest("hex"), signature: "Zm9yZ2Vk", signer: "auditor" }));
+    await program.parseAsync(["composition", "--json"], { from: "user" });
+    const dump = JSON.parse(vi.mocked(console.log).mock.calls[0]![0] as string);
+    expect(dump.composition).toMatchObject({ signed: false, signatureReason: expect.stringMatching(/admitted signing keys/) });
   });
 
   it("renders the default composition for people", async () => {

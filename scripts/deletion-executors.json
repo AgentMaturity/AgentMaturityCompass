@@ -15,6 +15,20 @@
     "Rows include sync filesystem source occurrences, namespace and literal-require bindings, literal or template SQLite DELETE text, followed indirect erasure calls and the public payload-erasure definition. Several rows trace the same physical effect, so row totals are not counts of distinct deleted resources.",
     "Line numbers and source excerpts are navigation hints that may move. This inventory does not close computed aliases or SQL, asynchronous filesystem calls, rename-based replacement, schema cascades, external subprocess deletions or third-party storage APIs."
   ],
+  "directories": [
+    {
+      "path": "a4-projects/",
+      "policy": "never",
+      "owner": "P2-36",
+      "reason": "A4 project state: per-project private blob stores (personal context, brief free text, comment bodies) and their keys. AMC deletes no file here except the owner erasure action's key destruction, which runs through withDeletionGate (src/a4/a4Erasure.ts); any future A4 cleanup must go through assertDeletionAllowed or withDeletionGate. Outside .amc/, retention and backups unless includePaths lists it."
+    },
+    {
+      "path": "a4-releases/",
+      "policy": "never",
+      "owner": "P2-36",
+      "reason": "A4 release packages a chain names by content address. AMC deletes no package a RELEASE names; a4Package.ts removes only a failed attempt's own staging and the outputs no RELEASE names (rows below). Any other A4 cleanup must go through assertDeletionAllowed or withDeletionGate. Outside .amc/, retention and backups unless includePaths lists it."
+    }
+  ],
   "sites": [
     {
       "siteId": "src/a4/a4Blobs.ts:179:1",
@@ -23,8 +37,8 @@
       "call": "rmSync(",
       "category": "filesystem-sync",
       "source": "rmSync(join(dir, \"key.enc\"), { force: true });",
-      "status": "deferred",
-      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+      "status": "gated",
+      "reason": "destroyProjectKey's only caller is the P2-36 owner erasure action (src/a4/a4Erasure.ts eraseProjectPrivate), which runs it inside a fresh withDeletionGate call (executor a4-private-erase, target blobs) using the A4 store's workspace, before the ERASED transition commits. A hold or an unacknowledged audit refuses it with 409 DELETION_DENIED. The tombstone write and deleteVaultSecret on the wrap record run in the same callback."
     },
     {
       "siteId": "src/a4/a4Blobs.ts:180:1",
@@ -33,13 +47,53 @@
       "call": "rmSync(",
       "category": "filesystem-sync",
       "source": "rmSync(join(dir, \"key.pub\"), { force: true });",
-      "status": "deferred",
-      "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+      "status": "gated",
+      "reason": "destroyProjectKey's only caller is the P2-36 owner erasure action (src/a4/a4Erasure.ts eraseProjectPrivate), which runs it inside a fresh withDeletionGate call (executor a4-private-erase, target blobs) using the A4 store's workspace, before the ERASED transition commits. A hold or an unacknowledged audit refuses it with 409 DELETION_DENIED. The tombstone write and deleteVaultSecret on the wrap record run in the same callback."
     },
     {
-      "siteId": "src/a4/a4Store.ts:529:1",
+      "siteId": "src/a4/a4Package.ts:561:1",
+      "path": "src/a4/a4Package.ts",
+      "line": 561,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "if (pathExists(finalDir)) rmSync(finalDir, { recursive: true, force: true }); // an earlier attempt's directory, which no RELEASE names",
+      "status": "deferred",
+      "reason": "Removes an earlier failed release attempt's directory under a4-releases/ that no RELEASE transition names, before this attempt's rename. Unpublished to the chain but outside a mkdtemp staging directory, so it is not exempt; no hold target is defined for A4 release attempts yet (P2-36 lists a4-releases/ as never-deleted)."
+    },
+    {
+      "siteId": "src/a4/a4Package.ts:572:1",
+      "path": "src/a4/a4Package.ts",
+      "line": 572,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(tarDir, { recursive: true, force: true });",
+      "status": "exempt",
+      "reason": "Removes this attempt's own mkdtemp tar staging directory after its tarball was renamed out; operation-owned unpublished staging."
+    },
+    {
+      "siteId": "src/a4/a4Package.ts:592:1",
+      "path": "src/a4/a4Package.ts",
+      "line": 592,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(staging, { recursive: true, force: true });",
+      "status": "exempt",
+      "reason": "Removes this failed attempt's own mkdtemp staging directory; operation-owned unpublished staging."
+    },
+    {
+      "siteId": "src/a4/a4Package.ts:593:1",
+      "path": "src/a4/a4Package.ts",
+      "line": 593,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "if (!landed) for (const path of [finalDir, tarPath, `${tarPath}.sig`, `${tarPath}.sha256`]) rmSync(path, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "Removes this failed attempt's package directory, tarball, signature and digest only when the chain names no RELEASE for it (an unreadable chain keeps them). Unpublished to the chain but not a staging file; no hold target is defined for A4 release attempts yet."
+    },
+    {
+      "siteId": "src/a4/a4Store.ts:489:1",
       "path": "src/a4/a4Store.ts",
-      "line": 529,
+      "line": 489,
       "call": "DELETE FROM",
       "category": "sqlite-delete-literal",
       "source": "db.prepare(\"DELETE FROM a4_requests WHERE ts < ?\").run(ts - A4_REQUEST_WINDOW_MS);",
@@ -1107,6 +1161,16 @@
       "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
     },
     {
+      "siteId": "src/ops/backup/backupEngine.ts:732:1",
+      "path": "src/ops/backup/backupEngine.ts",
+      "line": 732,
+      "call": "rmSync(",
+      "category": "filesystem-sync",
+      "source": "rmSync(stage, { recursive: true, force: true });",
+      "status": "deferred",
+      "reason": "P2-06-D4 restore staging: removes only the .amc-restore-* directory this restore created next to its target, after a commit moved its entries out or a failure before the commit. It never held workspace data a hold could name, and the target may not be a workspace to audit into, so it is not gated; the replaced workspace entries are kept, never deleted."
+    },
+    {
       "siteId": "src/ops/maintenance/cachePrune.ts:27:1",
       "path": "src/ops/maintenance/cachePrune.ts",
       "line": 27,
@@ -1467,6 +1531,26 @@
       "reason": "removeSpillObject places the private unlink inside a fresh withDeletionGate callback after validating the reference and checked object path. It supplies explicit workspace and broad spill scope, without inferring shared-session coverage from the locator hash."
     },
     {
+      "siteId": "src/storage/consolidation/guardEventConsolidation.ts:99:1",
+      "path": "src/storage/consolidation/guardEventConsolidation.ts",
+      "line": 99,
+      "call": "DELETE FROM",
+      "category": "sqlite-delete-literal",
+      "source": "() => db.prepare(\"DELETE FROM amc_guard_events WHERE created_at < ?\").run(beforeIso));",
+      "status": "gated",
+      "reason": "P2-09c pruneLegacyGuardEvents prunes the frozen legacy guard-events file after CUTOVER inside a fresh withDeletionGate call for guard-events (executor guard-events.prune-legacy), called by retention with the same cutoff as the evidence store so retention reaches every copy."
+    },
+    {
+      "siteId": "src/storage/consolidation/guardEventConsolidation.ts:115:1",
+      "path": "src/storage/consolidation/guardEventConsolidation.ts",
+      "line": 115,
+      "call": "DELETE FROM",
+      "category": "sqlite-delete-literal",
+      "source": "() => ledger.db.prepare(\"DELETE FROM amc_guard_events WHERE created_at < ?\").run(beforeIso));",
+      "status": "gated",
+      "reason": "P2-09c pruneConsolidatedGuardEvents prunes the evidence store's DUAL_WRITE copy of guard events inside a fresh withDeletionGate call for guard-events (executor guard-events.prune-consolidated), called by retention only under DUAL_WRITE so both stores stay in parity."
+    },
+    {
       "siteId": "src/studio/studioState.ts:102:1",
       "path": "src/studio/studioState.ts",
       "line": 102,
@@ -1715,6 +1799,16 @@
       "source": "handle.db.prepare(`DELETE FROM scim_groups WHERE group_id = ?`).run(groupId);",
       "status": "deferred",
       "reason": "This destructive route is outside the gated P2-01 slice. Trusted workspace, hold target and ownership or publication of the removed data remain deferred; no exemption or coverage claim."
+    },
+    {
+      "siteId": "src/adapters/hookProviders/installFiles.ts:389:1",
+      "path": "src/adapters/hookProviders/installFiles.ts",
+      "line": 389,
+      "call": "unlinkSync(",
+      "category": "filesystem-sync",
+      "source": "for (const path of targets) if (existsSync(path)) unlinkSync(path);",
+      "status": "gated",
+      "reason": "removeInstallationFiles, called only by removeDshHook and removeCodexHook (amc connect hooks remove --provider dsh|codex, P2-17), after each has verified its signed manifest (Codex also refuses when .codex/hooks.json differs from it) and revoked the installation's lease. It removes only the AMC-owned files the caller names (DSH: .amc/hooks/dsh.lease, dsh.json, dsh.json.sig; Codex: those for codex plus .codex/hooks.json) inside a fresh withDeletionGate call (executors hook-dsh-remove and hook-codex-remove, target caches: no target kind names hook installation files, so the closest one is used and a hold on caches refuses the removal). A refused gate leaves every file in place."
     }
   ]
 }

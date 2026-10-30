@@ -1,9 +1,10 @@
-import { join, dirname } from "node:path";
+import { join } from "node:path";
 import { z } from "zod";
-import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
-import { signFileWithAuditor, verifySignedFileWithAuditor, type SignedFileVerification } from "../org/orgSigner.js";
+import { pathExists, readUtf8 } from "../utils/fs.js";
+import { verifySignedFileWithAuditor, type SignedFileVerification } from "../org/orgSigner.js";
 import type { FourC } from "./fourCs.js";
 import { FOUR_CS } from "./fourCs.js";
+import { prepareTransformPairs, publishTransformPairs, type TransformPublicationChecks } from "./transformPublication.js";
 
 export const transformTaskStatusSchema = z.enum([
   "NOT_STARTED",
@@ -160,17 +161,11 @@ export function writeSignedTransformPlan(workspace: string, plan: TransformPlan)
   const scope = plan.scope.type === "AGENT"
     ? ({ type: "AGENT", agentId: plan.scope.agentId! } as const)
     : ({ type: "NODE", nodeId: plan.scope.nodeId! } as const);
-  const plansDir = transformPlansDir(workspace, scope);
-  ensureDir(plansDir);
-  const planPath = join(plansDir, `${plan.planId}.json`);
-  const payload = JSON.stringify(transformPlanSchema.parse(plan), null, 2);
-  writeFileAtomic(planPath, payload, 0o644);
-  const sigPath = signFileWithAuditor(workspace, planPath);
-
+  const planPath = join(transformPlansDir(workspace, scope), `${plan.planId}.json`);
+  const payload = Buffer.from(JSON.stringify(transformPlanSchema.parse(plan), null, 2));
   const latestPath = transformLatestPlanPath(workspace, scope);
-  ensureDir(dirname(latestPath));
-  writeFileAtomic(latestPath, payload, 0o644);
-  const latestSigPath = signFileWithAuditor(workspace, latestPath);
+  publishTransformPairs(workspace, "transform plan", [{ path: planPath, bytes: payload }, { path: latestPath, bytes: payload }]);
+  const sigPath = `${planPath}.sig`, latestSigPath = `${latestPath}.sig`;
 
   return {
     planPath,
@@ -185,10 +180,9 @@ export function writeSignedTransformSnapshot(workspace: string, scope: { type: "
   sigPath: string;
 } {
   const dir = transformSnapshotsDir(workspace, scope);
-  ensureDir(dir);
   const path = join(dir, `${Date.now()}.json`);
-  writeFileAtomic(path, JSON.stringify(transformPlanSchema.parse(snapshot), null, 2), 0o644);
-  const sigPath = signFileWithAuditor(workspace, path);
+  publishTransformPairs(workspace, "transform track", [{ path, bytes: Buffer.from(JSON.stringify(transformPlanSchema.parse(snapshot), null, 2)) }]);
+  const sigPath = `${path}.sig`;
   return { path, sigPath };
 }
 
@@ -230,3 +224,35 @@ export function summarizeBy4C(tasks: TransformTask[]): {
       totals.Configuration.total === 0 ? 0 : Number(((totals.Configuration.done / totals.Configuration.total) * 100).toFixed(2))
   };
 }
+
+/** Internal tracker batch prepares both plan purposes and the snapshot before any destination replacement. */
+export async function prepareTransformOutputsAsync(workspace: string, input: TransformPlan, snapshot: boolean,
+  command: "transform plan" | "transform track", checks: TransformPublicationChecks = {}) {
+  const plan = transformPlanSchema.parse(structuredClone(input));
+  const scope = plan.scope.type === "AGENT" ? { type: "AGENT" as const, agentId: plan.scope.agentId! }
+    : { type: "NODE" as const, nodeId: plan.scope.nodeId! };
+  const planPath = join(transformPlansDir(workspace, scope), `${plan.planId}.json`), latestPath = transformLatestPlanPath(workspace, scope);
+  const bytes = Buffer.from(JSON.stringify(plan, null, 2));
+  const snapshotPath = snapshot ? join(transformSnapshotsDir(workspace, scope), `${Date.now()}.json`) : null;
+  const writes = [{ path: planPath, bytes }, { path: latestPath, bytes }, ...(snapshotPath === null ? [] : [{ path: snapshotPath, bytes }])];
+  const prepared = await prepareTransformPairs(workspace, command, writes, checks);
+  return { assertCurrent: prepared.assertCurrent, assertCommittedCurrent: prepared.assertCommittedCurrent, publish() { prepared.publish(); return {
+    written: { planPath, sigPath: `${planPath}.sig`, latestPath, latestSigPath: `${latestPath}.sig` },
+    snapshot: snapshotPath === null ? null : { path: snapshotPath, sigPath: `${snapshotPath}.sig` }
+  }; } };
+}
+
+export async function writeSignedTransformPlanAsync(workspace: string, plan: TransformPlan) {
+  const prepared = await prepareTransformOutputsAsync(workspace, plan, false, "transform plan");
+  return prepared.publish().written;
+}
+export async function writeSignedTransformSnapshotAsync(workspace: string,
+  inputScope: { type: "AGENT"; agentId: string } | { type: "NODE"; nodeId: string }, input: TransformPlan) {
+  const scope = { ...inputScope }, plan = transformPlanSchema.parse(structuredClone(input));
+  const path = join(transformSnapshotsDir(workspace, scope), `${Date.now()}.json`);
+  const prepared = await prepareTransformPairs(workspace, "transform track", [{ path, bytes: Buffer.from(JSON.stringify(plan, null, 2)) }]);
+  prepared.publish(); return { path, sigPath: `${path}.sig` };
+}
+
+/** Internal exact latest destination shared with the tracker input snapshot. */
+export const transformLatestPath = transformLatestPlanPath;

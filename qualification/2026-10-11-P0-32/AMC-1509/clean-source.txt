@@ -1,0 +1,17 @@
+clean-source check of 60d0255c in <tmp>
+ok   git clone (committed tree only) (2.2s)
+ok   git checkout pinned commit (0.1s)
+ok   pnpm install --frozen-lockfile (7.3s)
+ok   pnpm run build (43.0s)
+ok   amc doctor (2.4s)
+ok   amc init (isolated workspace) (1.1s)
+ok   keyless native tool turn (1.1s)
+ok   amc session verify --json (0.8s)
+ok   amc agent-loop verify --json (0.9s)
+ok   signed evidence and request reconstruction (1 expected turns)
+ok   process A: leave a completed turn open for resume (0.9s)
+ok   process B: resume and seal the same session (0.9s)
+ok   amc session verify --json (0.8s)
+ok   amc agent-loop verify --json (1.2s)
+ok   signed evidence and request reconstruction (2 expected turns)
+exit=0 start=1791740570537 end=1791740637579

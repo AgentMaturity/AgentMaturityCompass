@@ -1,0 +1,9 @@
+# The AMC Regulated Control Catalog (P1-09). Experimental content: evidence of conformity, never proof of compliance.
+# Format: docs/catalog/CONTROL_RECORD.md. Licence: MIT until decision D-04 (see LICENSE.md).
+id: amc.catalog
+version: 0.1.0
+compilerCompat: ^0.1.0
+publisher: AgentMaturity (agent-maturity-compass)
+maintainers:
+  - { name: Sid, role: maintainer }
+licence: MIT

@@ -670,7 +670,9 @@ describe("AMC-1475 bounded nested Action Policy evidence logic", () => {
       root: join(root, ".amc"),
       name: ACTION_POLICY_WRITER_LOCK,
       operation: () => {
-        expect(() => initActionPolicy(root)).toThrowError(ControlFileLockError);
+        // The locked-vault failure above retained its recovery journal (APPLY_FAILED contract). P2-08's
+        // Action Policy plan checks that journal before taking the writer lock, so init refuses on it first.
+        expect(() => initActionPolicy(root)).toThrowError("Action Policy writer recovery is pending; retry the original exact-confirm apply first.");
         expect(() => applyPolicyPack({ workspace: root, packId: "code-agent.low" }))
           .toThrowError(ControlFileLockError);
         expect(() => applyActionEvidenceLogic({

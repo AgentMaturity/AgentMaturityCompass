@@ -522,7 +522,7 @@ Verify alerts configuration:
 
 ```bash
 cat .amc/alerts.yaml
-amc drift alerts test
+amc alerts test
 ```
 
 ## See Also

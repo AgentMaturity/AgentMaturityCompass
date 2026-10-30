@@ -1,0 +1,11 @@
+# P2-08 local pre-full metadata
+
+Product H is `f6e80b150c57d53b746fcb34238bc7e6dd95f9da` on `codex/p2-08-publication-final`, based on int `2914b043abc56ff84ea81796fcc4faa4e1ccf4b2`. This receipt records actual clean, unchanged product-H checks. All23 required checks and all3 item extras exit0. The actual packed-install check took66285ms. A separate local software-token run has3passed,0failed,0pending in665ms. These are local macOS arm64 measurements, not CI, live cloud service or hardware-HSM results.
+
+The unfiltered full suite is **PENDING on a metadata-only child Q**. Q is not yet known in this packet. The receipt tests field remains null. Root will run actual Q once and complete full outcomes externally, retaining this truthful pending packet without a receipt-HEAD rewrite/retest loop. The actual report must prove collection and completion of all948 required whole files and eligible assertions in87 changed/added test files; unfiltered argv alone supplies no coverage claim. Both earlier focused captures are incomplete and supply no final totals.
+
+The product scope contains337 added/modified paths, with no tracked deletions. The exact four API forwarding hunks and seven generated schema-index hashes are authorized and applied. Every other reservation remains held. The source manifest records the unreserved industry audit verifier change; no domain questions or operatingProfiles change.
+
+The CLI test contract now matches supported Ed25519/P256 keys while retaining garbage/private/missing refusals. Actual whole-file RED was45passed/1failed; updated and restored three-file development runs each passed77/77. Two guard probes failed at intended assertions and restored exact runtime source. The final product also pins the existing MCP Hono override to4.13.11 after an actual runtime audit refusal; installed SDK/node-server resolution and a new audit pass are recorded separately.
+
+Current AC1/AC2 remain partial. Owner-held integrations, unsupported migrations, policy-limited matrix currency, external resources and the prior home npm incident remain explicit in BLOCKERS.md. The separate software-token run, mutation batches and local packaging do not establish every-purpose support or formal acceptance. Raw reports stay in external evidence; every local receipt artifact is under500KB. No local landing, main merge or push is claimed.

@@ -16,7 +16,7 @@ import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
 import { adaptersDetectCli } from "../adapters/adapterCli.js";
 import { pathAllowedByPatterns } from "../toolhub/toolhubValidators.js";
 import { checkNotaryTrust, loadTrustConfig, verifyTrustConfigSignature } from "../trust/trustConfig.js";
-import { signDigestWithPolicy } from "../crypto/signing/signer.js";
+import { signDigestWithPolicyAsync } from "../crypto/signing/signer.js";
 import { verifyKeyHistoryChain } from "../crypto/keys.js";
 import { inspectRuntimeFirewallPolicy } from "../runtime/firewall.js";
 import { nativeModuleCheck } from "./nativeModuleProbe.js";
@@ -221,7 +221,12 @@ export async function runDoctorRules(workspace: string, options: DoctorOptions =
 
   pushRuntimeFirewallCheck(checks, workspace, strict);
 
-  pushSignatureCheck(checks, "sig-action-policy", "action-policy.yaml", verifyActionPolicySignature(workspace));
+  // AXR-02: absent, native agent calls meet no Action Policy; said as such rather than as a missing signature.
+  const actionPolicySig = verifyActionPolicySignature(workspace);
+  if (actionPolicySig.reason === "action policy missing" && !existsSync(actionPolicySig.sigPath)) {
+    checks.push({ id: "sig-action-policy", status: "WARN", message: "action policy: not configured (native agent calls are not checked against an Action Policy)",
+      fixHint: "Create and sign one with: amc policy action init" });
+  } else pushSignatureCheck(checks, "sig-action-policy", "action-policy.yaml", actionPolicySig);
   pushSignatureCheck(checks, "sig-tools", "tools.yaml", verifyToolhubConfig(workspace));
   pushSignatureCheck(checks, "sig-budgets", "budgets.yaml", verifyBudgetsConfigSignature(workspace));
   pushSignatureCheck(checks, "sig-approval-policy", "approval-policy.yaml", verifyApprovalPolicySignature(workspace));
@@ -239,9 +244,9 @@ export async function runDoctorRules(workspace: string, options: DoctorOptions =
     fixHint: "To deliberately contact the configured notary and sign a diagnostic digest, run: amc doctor --live-probes"
   });
   if (trustSig.valid && trustMode === "NOTARY" && liveProbes) {
-    const trust = await checkNotaryTrust(workspace).catch((error) => ({
+    const trust = await checkNotaryTrust(workspace).catch(() => ({
       ok: false,
-      reasons: [String(error)]
+      reasons: ["NOTARY_HEALTH_CHECK_FAILED"]
     }));
     const notaryOk = Boolean(trust.ok);
     checks.push({
@@ -252,7 +257,7 @@ export async function runDoctorRules(workspace: string, options: DoctorOptions =
     });
     try {
       const digest = randomBytes(32).toString("hex");
-      signDigestWithPolicy({
+      await signDigestWithPolicyAsync({
         workspace,
         kind: "MERKLE_ROOT",
         digestHex: digest
@@ -262,11 +267,11 @@ export async function runDoctorRules(workspace: string, options: DoctorOptions =
         status: "PASS",
         message: "Notary signing smoke test succeeded"
       });
-    } catch (error) {
+    } catch {
       checks.push({
         id: "notary-sign-smoke",
         status: "FAIL",
-        message: `Notary signing smoke test failed: ${String(error)}`,
+        message: "Notary signing smoke test failed",
         fixHint: "Ensure notary is reachable, fingerprint is pinned, and auth secret is valid."
       });
     }

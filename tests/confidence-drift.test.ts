@@ -25,8 +25,10 @@ describe("trackConfidenceDrift", () => {
     expect(result).toHaveProperty("citationlessHighConfidenceRate");
   });
 
-  it("calibrationScore is between 0 and 1", () => {
-    const result = trackConfidenceDrift([]);
+  it("calibrationScore is between 0 and 1 once a prediction is resolved, and null (not 1) on none", () => {
+    // WP37: an empty input used to read as perfect calibration (1).
+    expect(trackConfidenceDrift([]).calibrationScore).toBeNull();
+    const result = trackConfidenceDrift([makePred({ confidenceLevel: 0.7, wasCorrect: true })]);
     expect(result.calibrationScore).toBeGreaterThanOrEqual(0);
     expect(result.calibrationScore).toBeLessThanOrEqual(1);
   });
@@ -65,7 +67,7 @@ describe("trackConfidenceDrift", () => {
     ];
     const goodResult = trackConfidenceDrift(good);
     const badResult = trackConfidenceDrift(bad);
-    expect(goodResult.calibrationScore).toBeGreaterThanOrEqual(badResult.calibrationScore);
+    expect(goodResult.calibrationScore).toBeGreaterThanOrEqual(badResult.calibrationScore!);
   });
 });
 

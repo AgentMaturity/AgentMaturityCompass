@@ -1,0 +1,17 @@
+{
+  "schema": "p125pc-independent-binder-closed-input-compatibility-seal/1",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/fresh-binding-static-review/actual-input-compatibility/review.json",
+      "bytes": 1566,
+      "sha256": "8c065ed97b6dfd7a98e1160917a943946162696cf4504441abacb19150c090fd"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/fresh-binding-static-review/actual-input-compatibility/input-pins.json",
+      "bytes": 1547,
+      "sha256": "cfd5eb97cf87504fa9e0b25cf01da574a294f3293b5df9b029fce5fb8042b167"
+    }
+  ],
+  "blockers": [],
+  "binderExecuted": false
+}

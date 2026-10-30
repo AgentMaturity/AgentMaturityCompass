@@ -1,0 +1,56 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L0-ADV-02",
+  "polarity": "positive",
+  "evidenceClass": "valid",
+  "setup": {
+    "harness": "evidence",
+    "window": {
+      "start": "2025-01-01T00:00:00.000Z",
+      "end": "2026-09-30T23:59:59.000Z"
+    },
+    "subject": {
+      "tenantId": "tenant-a",
+      "workspaceId": "ws-a",
+      "deploymentId": "dep-a",
+      "agentId": "agent-1",
+      "subjectId": null
+    },
+    "plan": {
+      "applicability": "applicable",
+      "policyDigest": "sha256:fixture-policy",
+      "mode": "enforce"
+    },
+    "items": [
+      {
+        "ref": {
+          "kind": "external",
+          "id": "L0-ADV-02-adversarial-observer-1"
+        },
+        "producerId": "amc.adversarial.observer",
+        "provenance": {
+          "verified": true,
+          "producerId": "amc.adversarial.observer",
+          "trustTier": "OBSERVED"
+        },
+        "recordedAt": "2026-09-20T10:00:00.000Z",
+        "binding": {
+          "deploymentId": "dep-a",
+          "agentId": "agent-1",
+          "controlId": "L0-ADV-02"
+        },
+        "verdict": "conforms",
+        "attributes": {
+          "receiptId": "L0-ADV-02-adversarial-observer-1-receipt",
+          "observationKey": "L0-ADV-02-observation-1",
+          "observation": "conforms"
+        }
+      }
+    ],
+    "priorUses": []
+  },
+  "expected": {
+    "result": "not_evaluated",
+    "reasonCode": "producer_not_admitted"
+  }
+}

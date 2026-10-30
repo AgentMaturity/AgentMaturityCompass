@@ -1,0 +1,55 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L0-MON-04",
+  "polarity": "negative",
+  "evidenceClass": "violation",
+  "setup": {
+    "harness": "evidence",
+    "window": {
+      "start": "2025-01-01T00:00:00.000Z",
+      "end": "2026-09-30T23:59:59.000Z"
+    },
+    "subject": {
+      "tenantId": "tenant-a",
+      "workspaceId": "ws-a",
+      "deploymentId": "dep-a",
+      "agentId": "agent-1",
+      "subjectId": null
+    },
+    "plan": {
+      "applicability": "applicable",
+      "policyDigest": "sha256:fixture-policy",
+      "mode": "enforce"
+    },
+    "items": [
+      {
+        "ref": {
+          "kind": "external",
+          "id": "L0-MON-04-providerOutage-safeState-1"
+        },
+        "producerId": "amc.providerOutage.safeState",
+        "provenance": {
+          "verified": true,
+          "producerId": "amc.providerOutage.safeState",
+          "trustTier": "OBSERVED"
+        },
+        "recordedAt": "2026-09-20T10:00:00.000Z",
+        "binding": {
+          "deploymentId": "dep-a",
+          "controlId": "L0-MON-04"
+        },
+        "verdict": "violates",
+        "attributes": {
+          "receiptId": "L0-MON-04-providerOutage-safeState-1-receipt",
+          "observationKey": "L0-MON-04-observation-1",
+          "observation": "violates"
+        }
+      }
+    ],
+    "priorUses": []
+  },
+  "expected": {
+    "result": "not_evaluated",
+    "reasonCode": "producer_not_admitted"
+  }
+}

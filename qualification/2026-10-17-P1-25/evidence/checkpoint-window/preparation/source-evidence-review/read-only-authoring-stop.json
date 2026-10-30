@@ -1,0 +1,10 @@
+{
+  "operation": "Static private source-review assembly",
+  "error": "AssertionError at <stdin>:114",
+  "exactFailedCheck": "parent=3468...; assert git(rev-parse HEAD)==parent",
+  "cause": "Root ordinary source commit advanced HEAD to the explicitly announced e49 checkpoint during the read-only audit.",
+  "beforeAnyReviewFolderWrite": true,
+  "noProductSourceIndexOrQaEffect": true,
+  "resolution": "Bind actual e49 record, exact13 committed blobs and current clean/empty index; retain earlier staging snapshots as historical.",
+  "noOldBytesRestored": true
+}

@@ -12,13 +12,14 @@ import type { CatalogLockfile } from "../../catalog/lockfile.js";
 import { A4_STEPS } from "../../contracts/v1/a4Project.js";
 import { STATIONS } from "../../domains/stations.js";
 import {
-  gateStatus, isRegulated, latestGate, LIFECYCLE_BRIDGE, pendingReviews, PLAN_ACTIVATION_DEFERRED, type A4ReadinessItem, type A4ReadinessQuery, type A4ReadinessState
+  gateStatus, isRegulated, latestGate, LIFECYCLE_BRIDGE, pendingReviews, PLAN_ACTIVATION_DEFERRED, readinessItemBuilders, type A4ReadinessItem, type A4ReadinessQuery,
+  type A4ReadinessState
 } from "../a4Readiness.js";
 import type { A4Producer } from "../a4RouterStages.js";
-import { a4AnswerSchema, flatSlots, gatePolicyOf, type A4Answer, type A4Question, type A4Step } from "../a4Schema.js";
+import { flatSlots, gatePolicyOf, type A4Answer, type A4Question, type A4Step } from "../a4Schema.js";
 import { LIFECYCLE_SEAM_KEY } from "./assemble.js";
 import { memoryPolicyFields } from "../adaptMemoryPolicy.js";
-import { answersDigestOf, answerValues, aspireSpecOf, dependencyDigest, listValue, textValue, understandingCurrent } from "./aspire.js";
+import { answersDigestOf, answerValues, askGapCodes, askGaps, carriedGaps, carriedValuesOf, listValue, type CarryingAnswerGaps, stageSpecOf, textValue, understandingCurrent } from "./aspire.js";
 
 const question = (id: string, prompt: string, kind: A4Question["kind"], required: boolean, dependsOn: string[] = []): A4Question =>
   ({ id, stage: "adapt", prompt, dependsOn, required, kind });
@@ -73,8 +74,13 @@ export const ADAPT_CLAIM_BOUNDARY = "Applicability is compiled from declared fac
 /** catalog/README.md lines 8-10, verbatim (D-08). Adapt never composes an "experimental" sentence of its own. */
 export const CATALOG_EXPERIMENTAL_NOTICE = "Every record here is `experimental`: it was drafted by an agent, its citations are not yet fetched, hashed or legally reviewed, and no named expert has approved it.";
 export const ACTIVATE_PLAN_EFFECT_ID = "a4.adapt.activate_plan";
-/** The native task lease (P1-67): a Studio workspace-tools task started after activation runs under one; nothing else gets one. */
+/** The native task lease (P1-67): a Studio workspace-tools task started after activation runs under one. */
 export const NATIVE_LEASE_KEY = "P1-67";
+/**
+ * The run lease (P1-79): a CLI agent run, an SDK native client session, an ACP session or an in-process openAgentSession
+ * given none, with workspace tools, mints its own; its delegated children inherit it.
+ */
+export const RUN_LEASE_KEY = "P1-79";
 
 const load = () => import("../stages/adapt.js");
 /** Adapt's producers; the router records their outputs instead of the no-producer path (src/a4/a4RouterStages.ts). */
@@ -82,20 +88,13 @@ export const PRODUCERS: readonly A4Producer[] = (["understand", "explain", "prop
   .map((step) => ({ id: `adapt.${step}`, step, run: async (ctx) => (await load()).produceAdapt(step, ctx) }));
 
 /** The newest Adapt revision's spec and answers. */
-export function adaptSpecOf(state: Pick<A4ReadinessState, "revisions">): { spec: Record<string, unknown>; answers: A4Answer[]; revisionNo: number | null } {
-  const revision = state.revisions.filter((row) => row.stage === "adapt").at(-1);
-  const spec = revision ? JSON.parse(revision.spec_json) as Record<string, unknown> : {};
-  const answers = Array.isArray(spec.answers) ? spec.answers.flatMap((answer) => {
-    const parsed = a4AnswerSchema.safeParse(answer);
-    return parsed.success ? [parsed.data] : [];
-  }) : [];
-  return { spec, answers, revisionNo: revision?.revision_no ?? null };
+export function adaptSpecOf(state: Pick<A4ReadinessState, "revisions">): ReturnType<typeof stageSpecOf> {
+  return stageSpecOf(state, "adapt");
 }
 
 /** The Aspire answers Adapt carries, as the newest Aspire revision records them (absent ones are left out). */
 export function carriedValues(state: Pick<A4ReadinessState, "revisions">): Map<string, unknown> {
-  const values = answerValues(aspireSpecOf(state).answers);
-  return new Map(CARRIED.filter((id) => values.has(id)).map((id) => [id, values.get(id)]));
+  return carriedValuesOf(state, CARRIED);
 }
 
 const TERM = /^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$/;
@@ -124,12 +123,9 @@ export function factAnswer(answers: readonly A4Answer[], fact: AdaptFact): A4Ans
  * question's values (a fact is catalog terms; the primary station one of the carried stations), and carried answers that
  * are missing or no longer Aspire's (fail closed: re-carry at Understand).
  */
-export function answerGaps(answers: readonly A4Answer[], carried: ReadonlyMap<string, unknown>): { missing: string[]; stale: string[]; invalid: string[]; carried: string[] } {
+export function answerGaps(answers: readonly A4Answer[], carried: ReadonlyMap<string, unknown>): CarryingAnswerGaps {
   const values = answerValues(answers);
-  const byId = new Map(answers.map((answer) => [answer.questionId, answer]));
-  const missing = QUESTIONS.filter((entry) => entry.required && listValue(values.get(entry.id)).length === 0).map((entry) => entry.id);
-  const stale = QUESTIONS.filter((entry) => byId.has(entry.id) && entry.dependsOn.length > 0
-    && byId.get(entry.id)!.dependencyDigest !== dependencyDigest(entry.dependsOn, values)).map((entry) => entry.id);
+  const { missing, stale } = askGaps(QUESTIONS, answers);
   const invalid: string[] = (Object.keys(FACTS) as AdaptFact[]).filter((fact) => {
     const value = factAnswer(answers, fact)?.value;
     const terms = FACTS[fact] === "list" ? factList(value) ?? [] : [factTerm(value)].filter((term): term is string => term !== null);
@@ -140,9 +136,7 @@ export function answerGaps(answers: readonly A4Answer[], carried: ReadonlyMap<st
   invalid.push(...memoryPolicyFields(values).invalid);
   const accept = textValue(values.get("acceptWidenings"));
   if (accept !== null && !/^[0-9a-f]{64}$/.test(accept)) invalid.push("acceptWidenings");
-  const carriedGaps = CARRIED.flatMap((id) => !carried.has(id) ? [] : !byId.has(id) ? [`CARRIED_MISSING:${id}`]
-    : JSON.stringify(values.get(id) ?? null) !== JSON.stringify(carried.get(id) ?? null) ? [`CARRIED_STALE:${id}`] : []);
-  return { missing, stale, invalid, carried: carriedGaps };
+  return { missing, stale, invalid, carried: carriedGaps(CARRIED, answers, carried) };
 }
 
 /**
@@ -190,11 +184,7 @@ export const buildOf = (spec: Record<string, unknown>): AdaptBuild | null => {
 };
 
 type Fields = Partial<Omit<A4ReadinessItem, "id" | "status">>;
-const item = (id: string, status: A4ReadinessItem["status"], fields: Fields = {}): A4ReadinessItem => ({
-  id, status, kind: null, reasonCodes: [], section: "recommendation", evidence: [], claim: null, report: null, acknowledged: null,
-  nextAction: null, mandatory: true, bound: false, ...fields
-} as A4ReadinessItem);
-const waiting = (id: string, codes: string[], fields: Fields = {}): A4ReadinessItem => item(id, "WAITING", { kind: "evidence_missing", reasonCodes: codes, ...fields });
+const { item, waiting } = readinessItemBuilders("recommendation");
 
 /** Whether the project has reached `step` at Adapt (any later stage counts; an earlier one has not). */
 export function reached(state: A4ReadinessState, step: A4Step): boolean {
@@ -202,22 +192,22 @@ export function reached(state: A4ReadinessState, step: A4Step): boolean {
   return A4_STEPS.indexOf(state.project.step) >= A4_STEPS.indexOf(step);
 }
 
-/** The consumption of an Adapt completion gate on `revisionNo`, or undefined while none is consumed. */
-export function adaptCompletionConsumed(state: A4ReadinessState, revisionNo: number): A4ReadinessState["chain"][number] | undefined {
-  const gateIds = new Set(state.gates.filter((row) => row.stage === "adapt" && row.gate === "completion" && row.revision_no === revisionNo).map((row) => row.gate_id));
+/** The consumption of an Adapt (or `stage`'s) completion gate on `revisionNo`, or undefined while none is consumed. */
+export function adaptCompletionConsumed(state: A4ReadinessState, revisionNo: number, stage: "adapt" | "activate" = "adapt"): A4ReadinessState["chain"][number] | undefined {
+  const gateIds = new Set(state.gates.filter((row) => row.stage === stage && row.gate === "completion" && row.revision_no === revisionNo).map((row) => row.gate_id));
   return state.chain.find((link) => link.kind === "GATE_CONSUMED" && typeof link.body.gateId === "string" && gateIds.has(link.body.gateId));
 }
 
 /**
- * The owner acknowledgement of `itemId` on `revisionNo` (the head by default). Once an Adapt completion gate on that
+ * The owner acknowledgement of `itemId` on `revisionNo` (the head by default). Once an Adapt (or `stage`'s) completion gate on that
  * revision is consumed, the one in force at the consumption (recorded before it, unexpired then) stays the record, after
  * it expires and after the head moves on (the conformance statement P1-62 binds). Before that, the newest one unexpired at
  * `now`, whether or not the evaluator counts it (acknowledgeable): conformanceView reads the evaluated item's
  * `acknowledged` there instead, and lists none on a revision the head moved past without a consumption. Null when none.
  */
-export function acknowledgementOf(state: A4ReadinessState, itemId: string, now: number, revisionNo = state.project.revision_no):
+export function acknowledgementOf(state: A4ReadinessState, itemId: string, now: number, revisionNo = state.project.revision_no, stage: "adapt" | "activate" = "adapt"):
   { by: string; ts: number; reason: string; expiresTs: number } | null {
-  const consumed = adaptCompletionConsumed(state, revisionNo);
+  const consumed = adaptCompletionConsumed(state, revisionNo, stage);
   const asOf = consumed === undefined ? now : typeof consumed.body.ts === "number" ? consumed.body.ts : Number.POSITIVE_INFINITY;
   const link = [...state.chain].reverse().find((candidate) => candidate.kind === "ACKNOWLEDGED" && candidate.body.itemId === itemId
     && candidate.revisionNo === revisionNo && (consumed === undefined || candidate.seq < consumed.seq));
@@ -238,7 +228,7 @@ export function ownerOutOfScope(plan: CompiledPlan | null, ack: { by: string; ts
 }
 
 /** One lifecycle-bridge row (design §7 item 9): the control, whether A4 evidence satisfies it, the ref and why. */
-export interface BridgeRow { readonly target: "staging"; readonly controlId: string; readonly status: "satisfied" | "not_evaluated";
+interface BridgeRow { readonly target: "staging"; readonly controlId: string; readonly status: "satisfied" | "not_evaluated";
   readonly evidenceRef: string | null; readonly claimKind: string | null; readonly reason: string; readonly satisfiedBy: string }
 
 /**
@@ -450,10 +440,19 @@ function signingItems(state: A4ReadinessState, query: A4ReadinessQuery, spec: Re
  * The lockout (design §7 item 10, C-11): an active plan with L0-IDN-01 denies every native tool call without a verified
  * lease. Since P1-67 a Studio workspace-tools task started or resumed after activation runs under a lease Studio mints
  * with the workspace's lease key, so the item is READY through P1-67 and names who is still denied rather than hiding
- * them. Studio refuses to start such a task when no lease can be minted (LEASE_UNAVAILABLE), so a locked vault keeps the
- * item WAITING (LEASE_NOT_ISSUED) and an unread vault state is NOT_EVALUATED, never READY. The head revision's bound
- * journal head decides only while it is current: a head moved since (an activation from the CLI or another project), a
- * journal that no longer verifies (every session refused) or an unread slot is NOT_EVALUATED, never NO_ACTIVE_PLAN.
+ * them. Since P1-78 that lease names the task's signed-in principal, and L0-IDN-01 also requires a principal, so Studio
+ * refuses at start (409 PRINCIPAL_UNRESOLVED) a task whose principal is not an active local users.yaml user, a
+ * workspace-router session or the admin token included (PRINCIPAL_REQUIRED, NON_LOCAL_USER_SESSIONS_DENIED). Since P1-79
+ * a CLI agent run, an SDK native client session, an ACP session and an in-process openAgentSession given no lease, with
+ * workspace tools, mint their own lease while the plan requires a principal (RUN_LEASE), naming the active users.yaml
+ * user whose username is the OS account, and their delegated children inherit it (DELEGATED_CHILDREN_INHERIT_LEASE); a
+ * run whose OS account is not one is refused PRINCIPAL_UNRESOLVED before its session opens or a child starts. Tasks
+ * started before activation carry none. Studio refuses to start any workspace-tools task when no lease can be minted
+ * (LEASE_UNAVAILABLE). The item reads Studio's vault only: a locked one keeps the item WAITING (LEASE_NOT_ISSUED) and an
+ * unread vault state is NOT_EVALUATED, never READY; a run's lease is signed in the run's own process, whose vault this
+ * item does not see. The head revision's bound journal head decides only while it is current: a head moved since (an
+ * activation from the CLI or another project), a journal that no longer verifies (every session refused) or an unread
+ * slot is NOT_EVALUATED, never NO_ACTIVE_PLAN.
  */
 function lockoutItem(state: A4ReadinessState, query: A4ReadinessQuery, regulated: boolean): A4ReadinessItem {
   const drifted = query.live.driftedSlots;
@@ -468,16 +467,23 @@ function lockoutItem(state: A4ReadinessState, query: A4ReadinessQuery, regulated
   const active = head !== null || state.chain.some((link) => link.kind === "EFFECT_FINISHED" && link.body.effect === ACTIVATE_PLAN_EFFECT_ID);
   if (!active && !regulated) return item("adapt.plan.nativeSessionsAllowed", "READY", { section: "governance", mandatory: false, reasonCodes: ["NO_ACTIVE_PLAN"] });
   const codes = [active ? "PLAN_ACTIVE" : "PLAN_ACTIVATED_AT_COMPLETION", "PLAN_DENIES_NATIVE_SESSION", `NATIVE_TASK_LEASE:${NATIVE_LEASE_KEY}`,
-    "PRE_ACTIVATION_SESSIONS_DENIED", "CLI_AGENT_SESSIONS_DENIED", "DELEGATED_CHILDREN_DENIED"];
-  const denied = "tasks started before it, CLI agent sessions and delegated children carry none and are denied every call";
+    `RUN_LEASE:${RUN_LEASE_KEY}`, "PRE_ACTIVATION_SESSIONS_DENIED", "DELEGATED_CHILDREN_INHERIT_LEASE", "PRINCIPAL_REQUIRED", "NON_LOCAL_USER_SESSIONS_DENIED"];
+  const denied = "tasks started before it carry none and are denied every call; a task whose signed-in principal is not an active local users.yaml user "
+    + "(a workspace-router session or the admin token included) is refused at start, 409 PRINCIPAL_UNRESOLVED (P1-78), and so is a run whose OS account "
+    + "is not one, PRINCIPAL_UNRESOLVED before its session opens or a delegated child starts (P1-79)";
   const vault = query.live.vaultUnlocked;
   if (active && vault !== true) {
     return item("adapt.plan.nativeSessionsAllowed", vault === null ? "NOT_EVALUATED" : "WAITING", { section: "governance", mandatory: false,
       kind: vault === null ? "source_unavailable" : "plan_denies_native_session", reasonCodes: [...codes, "LEASE_NOT_ISSUED", "VAULT_LOCKED"],
-      nextAction: { label: `Studio mints a native task's lease with the workspace lease key, which the vault holds: unlock it, or every native start is refused; ${denied}` } });
+      nextAction: { label: "Studio mints a native task's lease with the workspace lease key, which Studio's vault holds: unlock it there, or every Studio "
+        + "native start that needs one is refused. A CLI, SDK, ACP or in-process run signs its own lease with its own process's vault (AMC_VAULT_PASSPHRASE), "
+        + `which this item does not read; ${denied}` } });
   }
   return item("adapt.plan.nativeSessionsAllowed", "READY", { section: "governance", mandatory: false, kind: "plan_denies_native_session", reasonCodes: codes,
-    nextAction: { label: `Under an active plan, Studio native tasks with workspace tools started after activation run under a lease (P1-67); ${denied}` } });
+    nextAction: { label: "Under an active plan, Studio native tasks with workspace tools started after activation run under a lease (P1-67), and CLI agent "
+      + "runs, SDK native client sessions, ACP sessions and in-process sessions with workspace tools mint their own, naming the active users.yaml user whose "
+      + "username is the OS account, which their delegated children inherit (P1-79); a run whose own process cannot unlock the vault fails to mint its "
+      + `lease and is refused; ${denied}` } });
 }
 
 /**
@@ -507,6 +513,26 @@ function memoryItem(state: A4ReadinessState, spec: Record<string, unknown>, answ
       nextAction: { label: "Build wrote the memory policy but no signed Enforce manifest after it, so the agent reads DRIFTED in Enforce: build again" } });
   }
   return item("memory_policy_present", "READY", { section: "implementation", reasonCodes: [...facts, checked === null ? "REVIEW_RECHECK_PENDING" : "MEMORY_POLICY_PARSES"] });
+}
+
+/**
+ * P2-26's regime retention floors as an Adapt blocker (P2-34): the memory policy's retention (`expiresAfterDays`, from the
+ * answers Build writes) below the floor is BLOCKED; a floor that cannot be read is NOT_EVALUATED. The rules are
+ * experimental until the D-08 experts review them, and the item says so.
+ */
+function retentionFloorItem(query: A4ReadinessQuery, answers: readonly A4Answer[]): A4ReadinessItem {
+  const id = "memory_policy_retention_floor";
+  const read = query.live.retentionFloor;
+  if (read === undefined || read === null) {
+    return item(id, "NOT_EVALUATED", { section: "governance", kind: "source_unavailable", reasonCodes: ["REGIME_FLOOR_UNREADABLE"],
+      nextAction: { label: "The active compiled plan could not be read, so the regime retention floors are unknown: repair or re-activate the plan" } });
+  }
+  const days = memoryPolicyFields(answerValues(answers)).fields.expiresAfterDays;
+  if (read.floor === null) return item(id, "READY", { section: "governance", reasonCodes: ["NO_REGIME_FLOOR", `RETENTION_DAYS:${days}`] });
+  const codes = [`RETENTION_DAYS:${days}`, `FLOOR_DAYS:${read.floor.days}`, ...read.floor.regimeIds.map((regimeId) => `REGIME:${regimeId}`), "EXPERIMENTAL", "KEY:D-08"];
+  if (days >= read.floor.days) return item(id, "READY", { section: "governance", reasonCodes: codes });
+  return item(id, "BLOCKED", { section: "governance", kind: "evidence_contradictory", reasonCodes: ["MEMORY_RETENTION_BELOW_FLOOR", ...codes],
+    nextAction: { label: `Answer memoryRetentionDays with at least ${read.floor.days} days: ${read.floor.regimeIds.join(", ")} keep logs that long (experimental, pending D-08 review)` } });
 }
 
 /** Informational items: clocks to classify, the completion rule's required reviews by kind, the sources' status, data handling. */
@@ -546,6 +572,7 @@ function contextItems(state: A4ReadinessState, query: A4ReadinessQuery, answers:
 export function adaptItems(state: A4ReadinessState, query: A4ReadinessQuery): A4ReadinessItem[] {
   const { spec, answers, revisionNo } = adaptSpecOf(state);
   const gaps = answerGaps(answers, carriedValues(state));
+  const askCodes = askGapCodes(gaps);
   const proposed = proposedFor(spec, answers);
   const understanding = understandingOf(spec);
   const regulated = isRegulated(state, query.floor);
@@ -554,10 +581,9 @@ export function adaptItems(state: A4ReadinessState, query: A4ReadinessQuery): A4
     return FACTS[fact] === "list" ? factList(value) === null : factTerm(value) === null;
   });
   return [
-    gaps.missing.length + gaps.stale.length + gaps.invalid.length + gaps.carried.length === 0 ? item("ask_complete", "READY")
-      : waiting("ask_complete", [...gaps.missing.map((id) => `ANSWER_MISSING:${id}`), ...gaps.stale.map((id) => `ANSWER_STALE:${id}`),
-        ...gaps.invalid.map((id) => `ANSWER_INVALID:${id}`), ...gaps.carried], { nextAction: { label: gaps.carried.length > 0
-          ? "Run Understand to carry the Aspire answers again" : "Answer or confirm the listed questions" } }),
+    askCodes.length === 0 ? item("ask_complete", "READY")
+      : waiting("ask_complete", askCodes, { nextAction: { label: gaps.carried.length > 0
+        ? "Run Understand to carry the Aspire answers again" : "Answer or confirm the listed questions" } }),
     !reached(state, "understood") ? waiting("understanding_confirmed", ["UNDERSTANDING_NOT_CONFIRMED"])
       : state.project.stage === "adapt" && !understandingCurrent(spec, answers)
         ? waiting("understanding_confirmed", ["UNDERSTANDING_STALE"], { nextAction: { label: "Answers changed: run Understand again, then confirm it" } })
@@ -571,6 +597,7 @@ export function adaptItems(state: A4ReadinessState, query: A4ReadinessQuery): A4
     ...signingItems(state, query, spec, answers, revisionNo, regulated),
     lockoutItem(state, query, regulated),
     memoryItem(state, spec, answers),
+    retentionFloorItem(query, answers),
     ...contextItems(state, query, answers, understanding)
   ];
 }

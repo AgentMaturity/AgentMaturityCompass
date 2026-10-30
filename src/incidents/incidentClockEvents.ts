@@ -126,21 +126,21 @@ function clockInputs(events: readonly UnsignedClockEvent[]) {
   return { triggers: triggers as Partial<Record<ClockTrigger, number>>, satisfied };
 }
 
-/** Rows for this incident and station, each refused with its event id when its signature or a guard fails. */
+/** Verify every incident row before selecting its signed station, so a corrupt station cannot hide a row. */
 function verifiedClockEvents(
   store: IncidentStoreInstance,
   incident: Incident,
   station: Domain,
   publicKeys: string[]
 ): IncidentClockEvent[] {
-  return store.getIncidentClockEvents(incident.incidentId).filter((event) => event.station === station).map((event) => {
+  return store.getIncidentClockEvents(incident.incidentId).map((event) => {
     if (!verifyHexDigestAny(clockEventDigest(event), event.signature, publicKeys)) {
       throw new Error(`clock event ${event.eventId} refused: signature verification failed`);
     }
     const problem = clockEventProblem(incident, event);
     if (problem) throw new Error(`clock event ${event.eventId} refused: ${problem}`);
     return event;
-  });
+  }).filter((event) => event.station === station);
 }
 
 export interface LoadedIncidentClocks {

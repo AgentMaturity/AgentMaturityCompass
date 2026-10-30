@@ -1,0 +1,13 @@
+Published count check failed:
+  - README.md: testFiles says 1,733, actual is 1,735. Run: node scripts/gen-counts.mjs --write
+  - README.md: published counts are stale. Run: node scripts/gen-counts.mjs --write
+  - CONTRIBUTING.md: testFiles says 1,733, actual is 1,735. Run: node scripts/gen-counts.mjs --write
+  - CONTRIBUTING.md: published counts are stale. Run: node scripts/gen-counts.mjs --write
+  - website/index.html: published counts are stale. Run: node scripts/gen-counts.mjs --write
+  - website/lite.html: published counts are stale. Run: node scripts/gen-counts.mjs --write
+  - website/i18n.js: published counts are stale. Run: node scripts/gen-counts.mjs --write
+  - docs/content/show-hn-draft.md: published counts are stale. Run: node scripts/gen-counts.mjs --write
+  - docs/content/reddit-launch-drafts.md: published counts are stale. Run: node scripts/gen-counts.mjs --write
+  - docs/internal/competitive-landscape.md: published counts are stale. Run: node scripts/gen-counts.mjs --write
+  - docs/internal/mirofish-simulation-council.md: published counts are stale. Run: node scripts/gen-counts.mjs --write
+  - whitepaper/AMC_WHITEPAPER_v1.md: published counts are stale. Run: node scripts/gen-counts.mjs --write

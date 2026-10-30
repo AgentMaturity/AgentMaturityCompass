@@ -1,13 +1,13 @@
 {
   "schemaVersion": 1,
   "freezeActive": true,
-  "measuredAt": "2026-10-08T14:40:10.605Z",
-  "measuredOn": "6f347b05d5c2d365b3d645344bec228660c3c5d8",
+  "measuredAt": "2026-10-28T17:44:34.589Z",
+  "measuredOn": "794a790b340a7a9ffde433c8783a93e8eb5c3867",
   "counts": {
-    "cliCommandPaths": 1236,
-    "cliInventoryPaths": 1236,
+    "cliCommandPaths": 1268,
+    "cliInventoryPaths": 1268,
     "stationPacks": 41,
-    "stationPackQuestions": 632
+    "stationPackQuestions": 723
   },
   "allowedExceptionKeys": [
     "P0-02",
@@ -22,11 +22,19 @@
     "P1-16",
     "P1-17",
     "P1-28",
+    "P1-33",
     "P1-40",
     "P1-42",
     "P1-43",
     "P1-44",
     "P1-45",
-    "P1-46"
+    "P1-46",
+    "P1-65",
+    "P2-09",
+    "P0-37",
+    "P2-23",
+    "P1-32",
+    "P2-09d",
+    "P2-25"
   ]
 }

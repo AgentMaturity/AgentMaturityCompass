@@ -1,4 +1,6 @@
-FROM node:20-slim
+# Pinned by multi-platform index digest (linux/amd64 and linux/arm64), resolved 2026-10-11 (P0-35); same base as ../Dockerfile.
+ARG NODE_IMAGE=node:22-bookworm-slim@sha256:c3de60bf2f9dd0ac6370e6117950ff62d6e339527e7472301c9c78a017978392
+FROM ${NODE_IMAGE}
 
 LABEL org.opencontainers.image.title="Agent Maturity Compass — Quickstart"
 LABEL org.opencontainers.image.description="Zero-dependency AMC quickstart container"
@@ -12,17 +14,30 @@ LABEL org.opencontainers.image.licenses="MIT"
 # image could not build at all. The GitHub release is live and carries an
 # npm-tarball asset, so the quickstart installs from there and stays pinned to a
 # known version rather than tracking a moving tag.
+#
+# AMC_TGZ_SHA256 is the release tarball's SHA-256 (website/install-channel.json
+# packageTarballSha256 and the release SHA256SUMS). The build stops when it is
+# empty or does not match the downloaded tarball.
 ARG AMC_VERSION=1.1.1
-RUN apt-get update \
+ARG AMC_TGZ_SHA256=dfc370a884803159a7d8b8a42830c3f8303747a8f2caaa0c5f00513d74f9fbf6
+RUN test -n "${AMC_TGZ_SHA256}" || { echo "AMC_TGZ_SHA256 is empty; refusing an unverified tarball" >&2; exit 1; } \
+    && apt-get update \
     && apt-get install -y --no-install-recommends curl ca-certificates \
     && rm -rf /var/lib/apt/lists/* \
     && curl -fsSL -o /tmp/amc.tgz \
        "https://github.com/AgentMaturity/AgentMaturityCompass/releases/download/v${AMC_VERSION}/agent-maturity-compass-${AMC_VERSION}.tgz" \
+    && echo "${AMC_TGZ_SHA256}  /tmp/amc.tgz" | sha256sum -c - \
     && npm i -g /tmp/amc.tgz \
     && rm -f /tmp/amc.tgz \
     && npm cache clean --force
 
-# Create a workspace directory
+# Same non-root runtime identity as the canonical image (../Dockerfile).
+RUN groupadd --gid 10001 amc \
+    && useradd --uid 10001 --gid 10001 --create-home --shell /bin/bash amc \
+    && mkdir -p /workspace \
+    && chown 10001:10001 /workspace
+ENV HOME=/home/amc
+USER 10001:10001
 WORKDIR /workspace
 
 # Default: interactive quickscore

@@ -1,3 +1,4 @@
+import { cliInitiator } from "../approvals/approvalEngine.js";
 import { nativeRouteFor, paramsFor } from "../cli-agent-options.js";
 import { hostname } from "node:os";
 import { randomUUID } from "node:crypto";
@@ -10,17 +11,24 @@ import { resolveCompactionConfig } from "../agent/compaction/promptPressure.js";
 import type { CompactionConfig } from "../agent/loopTypes.js";
 import { isActionClass } from "../governor/actionCatalog.js";
 import { checkToolsetReadiness } from "../agent/agentToolset.js";
-import { loadNativeMcpConfiguration, requireReviewedNativeMcpGrants } from "../setup/nativeMcpConfig.js";
+import { reviewNativeMcpConfigurations } from "../setup/nativeMcpConfig.js";
 import { loadVerifiedToolsConfigSnapshot } from "../toolhub/toolhubValidators.js";
 import { sha256Hex } from "../utils/hash.js";
 import type { ToolApprovalGateOptions } from "../agent/approvalGate.js";
 import { prepareAcpNativeSession } from "./acpNativeSession.js";
+import { ACP_ERROR, AcpFailure } from "./acpErrors.js";
+import { LeasePrincipalRefused } from "../leases/leasePrincipal.js";
+import { runLease } from "../leases/runLease.js";
 import { resolveNativeValidationSelection } from "../setup/nativeValidationConfig.js";
 import { amcVersion } from "../version.js";
 import { createAcpAgent, type AcpAgent } from "./acpAgentServer.js";
-import type { AcpForkSessionFactory } from "./acpRuntimeContracts.js";
+import type { AcpForkSessionFactory, AcpForkSessionParams } from "./acpRuntimeContracts.js";
+import { forkSession } from "../session/sessionResume.js";
+import { redactingSessionFor } from "../dataflow/redactingSession.js";
 import { ACP_MAX_TURN_UPDATE_BYTES } from "./acpCommittedUpdates.js";
 import type { AcpSink } from "./acpConnection.js";
+import { acpAskUserAnswerer } from "./acpAskUser.js";
+import { searxngSearchProvider } from "../tools/builtin/webSearchProviders.js";
 
 /**
  * Running the ACP agent on stdio (plan P7.1a).
@@ -99,16 +107,23 @@ export interface AcpStdioInit {
   readonly tools?: "none" | "workspace";
   /** `--unsafe-unconfined-shell`: macOS only, see `AgentToolsetOptions.unconfinedShell`. */
   readonly unconfinedShell?: boolean;
+  /** `--ask-user`: ask_user goes to the client as `_amc/ask_user`, answers signed host-side (WP40). Workspace tools only. */
+  readonly askUser?: boolean;
+  /** `--web-search-searxng`: the opt-in web_search provider origin (WP40). Workspace tools only. */
+  readonly webSearchSearxng?: string;
   readonly expectedToolsDigest?: string;
   /** A lease the spawning composer minted for this process (P1-67, Studio native tasks); see `AgentToolsetOptions.leaseToken`. */
   readonly leaseToken?: string;
+  /** Who started this runtime (P1-78): Studio's task principal; absent, the OS user running it, self-reported. */
+  readonly initiator?: string;
   readonly validationConfig?: string;
   readonly validationConfigSha256?: string;
+  readonly validationRepair?: string;
   readonly validate?: readonly string[];
   readonly approveTools?: string;
   readonly approveRisk?: string;
-  readonly mcpConfig?: string;
-  readonly mcpConfigSha256?: string;
+  readonly mcpConfig?: string | readonly string[];
+  readonly mcpConfigSha256?: string | readonly string[];
   readonly credentialsHome?: string;
   readonly credentialsFile?: string;
   readonly credentialsMode?: "layered" | "operator-only";
@@ -159,7 +174,8 @@ export function startAcpStdio(init: AcpStdioInit): AcpStdioHandle {
   const maxSteps = init.maxSteps ?? (init.providerId === STUB_PROVIDER_ID ? 2 : 8);
   if (!Number.isSafeInteger(maxTokens) || maxTokens < 1 || maxTokens > 1_000_000 || !Number.isSafeInteger(maxSteps) || maxSteps < 1 || maxSteps > 1024) throw new Error("ACP token/step limits are outside the supported positive integer bounds.");
   const requestParams = paramsFor(route.providerId, maxTokens, init);
-  const compaction = init.compaction === undefined ? undefined : resolveCompactionConfig(init.compaction);
+  if (init.compaction !== undefined) resolveCompactionConfig(init.compaction);
+  const compaction = init.compaction;
   const actionClass = init.approveTools?.trim().toUpperCase();
   const riskTier = (init.approveRisk ?? "high").trim().toLowerCase();
   if ((actionClass !== undefined && !isActionClass(actionClass)) || !["low", "medium", "high", "critical"].includes(riskTier) || (init.approveRisk !== undefined && actionClass === undefined)) throw new Error("ACP approval settings require a valid action class and risk tier.");
@@ -167,14 +183,19 @@ export function startAcpStdio(init: AcpStdioInit): AcpStdioHandle {
   const approval: ToolApprovalGateOptions | undefined = actionClass === undefined ? undefined : {
     actionClass: actionClass as ToolApprovalGateOptions["actionClass"], riskTier: riskTier as ToolApprovalGateOptions["riskTier"] };
   if (init.mcpConfigSha256 !== undefined && init.mcpConfig === undefined) throw new Error("ACP MCP digest pin requires an explicit config path.");
-  const mcp = init.mcpConfig === undefined ? undefined : loadNativeMcpConfiguration(init.mcpConfig, init.mcpConfigSha256);
-  if (mcp && (tools !== "workspace" || !approval)) throw new Error("ACP MCP requires --tools workspace and --approve-tools.");
-  const mcpReview = mcp && approval ? requireReviewedNativeMcpGrants(mcp, init.workspace, approval.actionClass) : undefined;
+  if (init.mcpConfig !== undefined && (tools !== "workspace" || !approval)) throw new Error("ACP MCP requires --tools workspace and --approve-tools.");
+  const mcpPaths = init.mcpConfig === undefined ? [] : typeof init.mcpConfig === "string" ? [init.mcpConfig] : init.mcpConfig;
+  const mcpPins = init.mcpConfigSha256 === undefined ? undefined : typeof init.mcpConfigSha256 === "string" ? [init.mcpConfigSha256] : init.mcpConfigSha256;
+  const mcp = approval ? reviewNativeMcpConfigurations(mcpPaths, mcpPins, init.workspace, approval.actionClass) : [];
+  // Preserve existing one-server session identities while binding every server in a composed run.
+  const mcpIdentity = mcp.length === 0 ? null : mcp.length === 1 ? mcp[0]!.config.sha256 : mcp.map(entry => entry.config.sha256);
   const shellOptIn = init.unconfinedShell === true ? { unconfinedShell: "cli-flag" as const } : {};
+  if ((init.askUser === true || init.webSearchSearxng !== undefined) && tools !== "workspace") throw new Error("--ask-user and --web-search-searxng configure workspace tools; add --tools workspace.");
+  const webSearchProvider = init.webSearchSearxng === undefined ? undefined : searxngSearchProvider(init.webSearchSearxng);
   let shellRefusal: string | null = null;
   if (tools === "workspace") {
     const snapshot = loadVerifiedToolsConfigSnapshot(init.workspace);
-    const additionalCapabilities = mcpReview?.capabilities ?? [];
+    const additionalCapabilities = mcp.flatMap(entry => entry.review.capabilities);
     const readiness = checkToolsetReadiness(init.workspace, { snapshot, additionalCapabilities, ...shellOptIn });
     shellRefusal = readiness.shell.offered ? null : readiness.shell.reason;
     if (!readiness.ready) throw new Error("ACP workspace tools require a supported signed tool subset and the existing firewall policy; run the native guide and configure them explicitly.");
@@ -205,7 +226,12 @@ export function startAcpStdio(init: AcpStdioInit): AcpStdioHandle {
   // caught: the conversation completed and the agent produced no text at all.
   const transport = route.providerId === STUB_PROVIDER_ID ? stubProviderTransport({}) : undefined;
 
-  const sessionOptions = (params: { sessionId: string; workspace: string; agentId: string }): AgentSessionInit & { sessionId: string } =>
+  // P1-79: each session's lease, minted at session/new, load or fork before the session opens; PRINCIPAL_UNRESOLVED is coded.
+  const sessionLease = (): ReturnType<typeof runLease> => {
+    try { return runLease({ workspace: init.workspace, agentId: init.agentId, model: route.models?.[0] ?? route.providerId, tools, ...(init.leaseToken === undefined ? {} : { leaseToken: init.leaseToken }) }); }
+    catch (error) { throw error instanceof LeasePrincipalRefused ? new AcpFailure(ACP_ERROR.invalidParams, error.message, { reason: error.code }) : error; }
+  };
+  const sessionOptions = (params: { sessionId: string; workspace: string; agentId: string }, lease = sessionLease()): AgentSessionInit & { sessionId: string } =>
     ({
       workspace: params.workspace,
       sessionId: params.sessionId,
@@ -223,38 +249,58 @@ export function startAcpStdio(init: AcpStdioInit): AcpStdioHandle {
       },
       systemPrompt: init.systemPrompt,
       harnessVersion: amcVersion,
-      compositionDigest: sha256Hex(JSON.stringify({ surface: "acp-native", provider: route.providerId, model: route.models?.[0], tools, maxTokens, maxSteps, approval, mcp: mcp?.sha256 ?? null,
+      compositionDigest: sha256Hex(JSON.stringify({ surface: "acp-native", provider: route.providerId, model: route.models?.[0], tools, maxTokens, maxSteps, approval, mcp: mcpIdentity,
+        ...(init.askUser === true ? { askUser: "acp-client" } : {}), ...(webSearchProvider === undefined ? {} : { webSearch: webSearchProvider.origin }),
         ...(route.providerId === "deepseek" ? { params: requestParams } : {}),
         ...(validation === undefined ? {} : { validation }), ...(compaction === undefined ? {} : { compaction }),
         ...(init.expectedToolsDigest === undefined ? {} : { expectedToolsDigest: init.expectedToolsDigest }) })),
-      policyDigest: sha256Hex(JSON.stringify({ tools, signedTools: tools === "workspace" ? loadVerifiedToolsConfigSnapshot(params.workspace).digestSha256 : null, approval, mcp: mcp?.sha256 ?? null,
+      policyDigest: sha256Hex(JSON.stringify({ tools, signedTools: tools === "workspace" ? loadVerifiedToolsConfigSnapshot(params.workspace).digestSha256 : null, approval, mcp: mcpIdentity,
         ...(validation === undefined ? {} : { validation }),
         ...(init.expectedToolsDigest === undefined ? {} : { expectedToolsDigest: init.expectedToolsDigest }) })),
       tools, maxSteps, ...shellOptIn, ...(compaction === undefined ? {} : { compaction }), ...(init.expectedToolsDigest === undefined ? {} : { expectedToolsDigest: init.expectedToolsDigest }),
-      ...(validation === undefined ? {} : { validation }), ...(init.leaseToken === undefined ? {} : { leaseToken: init.leaseToken })
+      ...(validation === undefined ? {} : { validation }), ...lease,
+      // `agent` exists by the time any session is composed; its connection carries the client request.
+      ...(init.askUser === true ? { askUser: acpAskUserAnswerer({ workspace: params.workspace, request: (method, body, signal) => agent.connection.request(method, body, signal) }) } : {}),
+      ...(webSearchProvider === undefined ? {} : { webSearchProvider })
     });
 
   const claimant = { pid: process.pid, hostId: hostname(), bootId: randomUUID(), startedAt: Date.now() };
+  const nativeSession = (session: AgentSessionInit & { sessionId: string }, signal: AbortSignal, resumed: boolean) => prepareAcpNativeSession({
+    session, signal, ...(resumed ? { claimant } : {}),
+    ...(approval ? { approval } : {}), ...(mcp.length ? { mcp: mcp.map(entry => entry.config) } : {}),
+    ...(init.credentialsHome === undefined ? {} : { credentialsHome: init.credentialsHome }),
+    ...(init.credentialsFile === undefined ? {} : { credentialsFile: init.credentialsFile }),
+    initiator: init.initiator ?? cliInitiator(),
+    onApprovalRaised: event => { stderr.write(`amc acp: signed approval pending: ${event.approvalRequestId}\n`); } });
+  /**
+   * Both fork operations acquire the lease before opening a child. Standard fork
+   * inherits supported verified context; the explicit legacy operation records
+   * lineage only. Release the child, then use the same resume and native
+   * composition gates as session/load.
+   */
+  const forkNative = (params: AcpForkSessionParams, inheritConversation: boolean): ReturnType<typeof nativeSession> => {
+    const lease = sessionLease();
+    const identity = sessionOptions({ ...params, sessionId: params.parentSessionId }, lease);
+    const { service } = forkSession({ workspace: params.workspace, parentSessionId: params.parentSessionId, claimant, agentId: params.agentId, inheritConversation,
+      harnessVersion: identity.harnessVersion, compositionDigest: identity.compositionDigest, policyDigest: identity.policyDigest });
+    const forked = redactingSessionFor(service);
+    try { forked.releaseWithoutClosing(); } catch (error) { forked.disposeWithoutClosing(); throw error; }
+    return nativeSession(sessionOptions({ ...params, sessionId: service.sessionId }, lease), params.signal, true);
+  };
 
   const agent = createAcpAgent({
     workspace: init.workspace,
     agentId: init.agentId,
-    nativeExecution: { tools, signedApprovalGate: approval !== undefined, reviewedMcpConfigured: mcp !== undefined, taskValidation: true },
+    nativeExecution: { tools, signedApprovalGate: approval !== undefined, reviewedMcpConfigured: mcp.length > 0, taskValidation: true },
     promptRoute: registry.pin({ providerId: route.providerId, model: route.models?.[0] ?? "" }),
     orderedImageInput: true,
     audioInput: true,
-    ...(init.forkSessionFactory === undefined ? {} : { forkSessionFactory: init.forkSessionFactory }),
+    forkSessionFactory: params => init.forkSessionFactory === undefined
+      ? forkNative(params, true) : init.forkSessionFactory({ ...params, ...sessionLease() }),
+    lineageForkFactory: params => forkNative(params, false),
     write: createAcpStdioSink(stdout),
-    sessionFactory: params => prepareAcpNativeSession({ session: sessionOptions(params), signal: params.signal,
-      ...(approval ? { approval } : {}), ...(mcp ? { mcp } : {}),
-      ...(init.credentialsHome === undefined ? {} : { credentialsHome: init.credentialsHome }),
-      ...(init.credentialsFile === undefined ? {} : { credentialsFile: init.credentialsFile }),
-      onApprovalRaised: event => { stderr.write(`amc acp: signed approval pending: ${event.approvalRequestId}\n`); } }),
-    resumeSessionFactory: params => prepareAcpNativeSession({ session: sessionOptions(params), claimant, signal: params.signal,
-      ...(approval ? { approval } : {}), ...(mcp ? { mcp } : {}),
-      ...(init.credentialsHome === undefined ? {} : { credentialsHome: init.credentialsHome }),
-      ...(init.credentialsFile === undefined ? {} : { credentialsFile: init.credentialsFile }),
-      onApprovalRaised: event => { stderr.write(`amc acp: signed approval pending: ${event.approvalRequestId}\n`); } }),
+    sessionFactory: params => nativeSession(sessionOptions(params), params.signal, false),
+    resumeSessionFactory: params => nativeSession(sessionOptions(params), params.signal, true),
     onUnusable: () => { void close().catch(reportShutdownFailure); },
     // stderr, never stdout. See the module note.
     log: (message) => { stderr.write(`amc acp: ${message}\n`); }

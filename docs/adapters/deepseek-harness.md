@@ -28,6 +28,8 @@ amc adapters run --agent default --adapter deepseek-harness -- "Summarize the RE
 
 Configuration validates file hashes and stores the launcher inside signed `adapters.yaml`. Each run checks the signature and hashes again, probes only that approved command's package version, and uses structured arguments with no shell. The task must be one quoted, nonempty argument beginning with ordinary text; extra DSH options are refused. The launcher receives its optional entrypoint followed by `--profile headless --patch <private file> <task>` and runs in the AMC workspace. Without interruption, its actual exit code is returned. SIGINT/SIGTERM are forwarded to that child, with a five-second forced-termination fallback. A requested interruption returns wrapper code 130/143 even if DSH handles the signal by exiting zero. Signed exit records preserve `requestedSignal`, `childExitCode`, and `childSignal` separately. This does not certify reaping every descendant created by external DSH plugins.
 
+The last hash runs immediately before `spawn`: a changed approved file stops the run before any child starts, and the refusal is recorded as `agent_process_exited` with `refused: "dsh_launch_changed"` in a sealed session. The child is then started by path, so a write to those paths after that last hash and before the operating system executes them is not detected (the exec-by-path window). Keep the approved files where only the operator can write.
+
 This slice supports `SUPERVISE` only. It does not represent DSH's internal tools as AMC-governed tools, change its sandbox/approval settings, or claim an outer process sandbox.
 
 ## Routing and settings
@@ -76,7 +78,7 @@ A first line with `type: "session"` and any DSH-only header key (`createdAt`, `i
 
 Other DSH refusals (limits, malformed lines, noncontiguous sequences) are also shown by name in the import plan instead of a generic parse error. A Pi durable-storage header (`kind: "header"` with `v` or `storageVersion`) is refused in the same way: "Pi durable session format v4 is not supported; AMC imports Pi CLI session v3."
 
-**DSH format v4 is refused, not qualified.** Qualifying it needs at least three recorded v4 sessions (a tool call, a tool error and an interruption) from a pinned DSH release with a local scripted provider, and every v4 event type documented at that pin. None have been recorded, and the v4 header shape has not been re-checked against DSH source for this release, so AMC ships the refusal. Re-export such sessions as v2 if your DSH version can, or keep them outside AMC.
+**DSH format v4 is refused, not qualified.** On 2026-10-16, the upstream session types and JSONL physical-header code were checked at the [strategy pin `5badb150`](https://github.com/deepseek-ai/deepseek-harness/blob/5badb15009ae1756c3afe0ae0cef1faafc290ccc/packages/session/session-persistence-jsonl/src/format.ts) (format v4) and [AMC pin `c389f96b`](https://github.com/deepseek-ai/deepseek-harness/blob/c389f96bf3a9b6807cb71ed6bdad5849be0df6d8/packages/session/session-persistence-jsonl/src/format.ts) (format v2). Both use a physical `type: "session"` header with `version`, `createdAt`, `isSeeded` and `delegationDepth`, so AMC recognizes the v4 header and refuses its unsupported version before generic import. This source check does not qualify v4 events. Qualification still needs at least three recorded v4 sessions (a tool call, a tool error and an interruption) from a pinned DSH release with a local scripted provider, with every event type documented at that pin. No such sessions have been recorded for AMC. Re-export as v2 if your DSH version supports it, or keep the sessions outside AMC.
 
 ### Original bytes and losses
 
@@ -88,14 +90,36 @@ Recognized session JSONL (DSH or Pi) may be up to 32 MiB, DSH's own limit; with 
 
 A retained original proves the bytes are unchanged since import. It does not prove the harness told the truth or that the recorded actions happened, and it never makes an import observed: imports stay `SELF_REPORTED` and `NOT_EVALUATED`. Originals can hold secrets or personal data; they are not included in external-evidence profiles. The record map (`amc-record-map/2`) lists per source the original SHA-256, format version and pinned revision, and the losses of each conversion stage (`redaction`, `projection`, `external-evidence`).
 
+## Tool-call control plugin (not qualified)
+
+AMC also has a DSH plugin that asks AMC before every DSH tool call (`packages/dsh-amc-plugin`, written against DSH
+0.2.1-rc.2). **No DSH version is qualified, so AMC denies every DSH call the plugin sends, and AMC claims nothing for
+DSH tool calls.** It exists so that qualification can follow; see the
+[support matrix](SUPPORT_MATRIX.md).
+
+```sh
+amc up
+amc connect hooks install --provider dsh --agent my-agent --mode control --dry-run   # with the dsh you run on PATH
+amc connect hooks install --provider dsh --agent my-agent --mode control
+amc connect hooks status --provider dsh
+```
+
+AMC does not edit DSH profiles. The install prints the plugin entry to add to your DSH profile: the plugin module,
+with the workspace, the path of AMC's transport module and the DSH version as its config. DSH runs ungoverned while
+it does not load the plugin. The plugin denies a call when AMC is unreachable or answers anything but a signed allow
+for exactly that call. It also denies a call with no arguments, or from a DSH version AMC has not qualified. Only
+`read`, `write`, `edit` and `web_fetch` with absolute paths are mapped; every other DSH tool is denied.
+
 ## Session-log uploads to DeepSeek
 
-DSH's `session-log-deepseek` plugin uploads session logs to DeepSeek by default. AMC's reading of that plugin's README at DSH commit 5badb150 is below; it has not been re-checked for this release, so confirm it at the DSH version you deploy:
+The plugin's defaults differ between the two pinned revisions. Its README and configuration schema were rechecked on 2026-10-16:
 
-- The plugin adds a `dsh_session_log` field, up to 8 MiB (setting `maxBytes`), to requests sent to the official DeepSeek API.
-- `enabled: false` stops it. The shipped profiles mount the plugin.
-- Re-enabling it resends events recorded while it was off.
-- OpenTelemetry feedback uploads have a separate setting.
+| Pinned revision | Session-log upload default | Request-field size limit |
+|---|---|---|
+| [Strategy pin `5badb150`](https://github.com/deepseek-ai/deepseek-harness/blob/5badb15009ae1756c3afe0ae0cef1faafc290ccc/packages/session/session-log-deepseek/README.md) | `enabled: true` | `maxBytes` defaults to 8 MiB |
+| [AMC capture/import pin `c389f96b`](https://github.com/deepseek-ai/deepseek-harness/blob/c389f96bf3a9b6807cb71ed6bdad5849be0df6d8/packages/session/session-log-deepseek/README.md) | `enabled: false` | No independent request-field size cap at this pin |
+
+These are package defaults, not proof of a deployment's effective configuration. Both pins mount the plugin in shipped profiles; overlays can enable it. When enabled, it contributes `dsh_session_log` to official DeepSeek API requests. Set `enabled: false` explicitly when session logs must stay local. At the strategy pin, re-enabling resumes the unaccepted suffix, including events recorded while disabled, and OpenTelemetry feedback uploads have a separate setting. Check the settings and source of the exact version you deploy.
 
 A regulated deployment that must keep session logs local can follow this procedure:
 

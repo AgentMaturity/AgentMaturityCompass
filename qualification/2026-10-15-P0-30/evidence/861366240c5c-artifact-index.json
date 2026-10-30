@@ -1,0 +1,323 @@
+{
+  "createdUtc": "2026-10-14T23:44:54.550795+00:00",
+  "artifacts": [
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/adaptations.json",
+      "bytes": 891,
+      "sha256": "e5b6cf07164f1e31c7d3fa0e336cc1969c0fbfeb76cf4dade2df312ca981895c"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/commands-frozen.jsonl",
+      "bytes": 13224,
+      "sha256": "79353a21045db532910ba408526d1caceb3495920654dc9588e2cd044ac9820e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/compiled-live-after.json",
+      "bytes": 462540,
+      "sha256": "82ff86751e49686db52385c53bac4a2c7ef010a2034745289731d4e6d4ac7598"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/compiled-original.json",
+      "bytes": 462540,
+      "sha256": "82ff86751e49686db52385c53bac4a2c7ef010a2034745289731d4e6d4ac7598"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/compiled-private-after.json",
+      "bytes": 462540,
+      "sha256": "82ff86751e49686db52385c53bac4a2c7ef010a2034745289731d4e6d4ac7598"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/controller-provenance.json",
+      "bytes": 659,
+      "sha256": "4aff5830769fee0d059024ee2bb7d2b8a1f9dbe4e0482ff4a911ce6f347db5d6"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/deny-transport.mjs",
+      "bytes": 738,
+      "sha256": "b6083a9bcc2a3e57b49770d3429d5595d89b208b143442f3ce27af8f4c3b3547"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/direct-P30-1525-cold-vault-initializes-compiled-mutant.json",
+      "bytes": 462540,
+      "sha256": "30fba24d2fbd10032d25cfaa38df988b0a40b39dc71a70ef0108985f7c25138e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/direct-P30-1525-cold-vault-initializes-compiled-restored.json",
+      "bytes": 462540,
+      "sha256": "82ff86751e49686db52385c53bac4a2c7ef010a2034745289731d4e6d4ac7598"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/direct-P30-1525-cold-vault-initializes-matrix.json",
+      "bytes": 9616,
+      "sha256": "8b486645aab77fbb02266174cb805f6aa0e926900a888ce052e6a77cb95a39e8"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/direct-P30-1525-cold-vault-initializes-source-mutant.json",
+      "bytes": 1165,
+      "sha256": "626183f140c8afa104a526a96c114bc591e7def78d613704afb32468c558568c"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/direct-P30-1525-cold-vault-initializes.patch",
+      "bytes": 514,
+      "sha256": "d815670b9327c7e18e179856245544e1ea0a90cd32d0c71aeaa7945b5c9d2fdd"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/driver.py",
+      "bytes": 13463,
+      "sha256": "0e4b11f12e54ab1506b7e9651fc882c160b3a452399d821013b8b213acd7fb1b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/finalize.py",
+      "bytes": 11033,
+      "sha256": "8a12701796dff5e1898ca5ee677dd17e62d286ce68555d273cf89c644804aaad"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/full-closure-final.json",
+      "bytes": 1399777,
+      "sha256": "ccc5fad556024794dd5e14641a8816837996d34edfa70db4d5139b87b3698520"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/native-after.json",
+      "bytes": 305,
+      "sha256": "817378b2664f3d92a8ae6740d6874c0820d982d243f625e4ee4c55e8af60d881"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/native-before.json",
+      "bytes": 305,
+      "sha256": "817378b2664f3d92a8ae6740d6874c0820d982d243f625e4ee4c55e8af60d881"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/original-packet-after.json",
+      "bytes": 456,
+      "sha256": "f4999e55e0f76fde30e152fb94a2eaffddd9d3a837d86a5e97e5198209acae17"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/original-packet-before.json",
+      "bytes": 80818,
+      "sha256": "68bb1f23e82d8fd63902958b5af5113972c1fcde65af9ef60bc3ec7519275c8f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/original-test-inputs/tests/ledgerVerificationReadOnly.test.ts",
+      "bytes": 9057,
+      "sha256": "4190737d0e35f10c8bd909294017071933156d90d9ebcb79189973ea52521d96"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/original-test-inputs/tests/setup/guardWorkspace.ts",
+      "bytes": 1894,
+      "sha256": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/phases/direct-P30-1525-cold-vault-initializes-baseline/command.json",
+      "bytes": 2001,
+      "sha256": "bf0c03ab9ec479f312900a84d5e2655656743c95629d89583e42daa5a5ff718f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/phases/direct-P30-1525-cold-vault-initializes-baseline/raw-tests.json",
+      "bytes": 3760,
+      "sha256": "8d8bb3400692b7b31d95158d9bf964e7971ad0a3b82b45ef5efd820310ea35b2"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/phases/direct-P30-1525-cold-vault-initializes-baseline/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/phases/direct-P30-1525-cold-vault-initializes-baseline/stdout.log",
+      "bytes": 155,
+      "sha256": "6aaa775069ff3e14bc6229950feaae72bfe059e88bfbade078f4c0ff7f769a31"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/phases/direct-P30-1525-cold-vault-initializes-baseline/summary.json",
+      "bytes": 1673,
+      "sha256": "7ef2c39fd80b4f5f51c2245ec5ba8c6d4c95efe27e65312c5c962076150c4901"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/phases/direct-P30-1525-cold-vault-initializes-compile-mutant/command.json",
+      "bytes": 1762,
+      "sha256": "5550e818cfbdc8080e776111bad18e2cba9f6e9fe74c91f579a9e9ecbe96c39f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/phases/direct-P30-1525-cold-vault-initializes-compile-mutant/emit-isolation.json",
+      "bytes": 487,
+      "sha256": "8a0eea20d65c26308a73e0883a6f42e6b37cffea8ec2a36d3c0a63a34a4fdd66"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/phases/direct-P30-1525-cold-vault-initializes-compile-mutant/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/phases/direct-P30-1525-cold-vault-initializes-compile-mutant/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/phases/direct-P30-1525-cold-vault-initializes-compile-restored/command.json",
+      "bytes": 1774,
+      "sha256": "f69369a36711b81c422c89c0037bcdad12bf16e44b820693a85edd1a8d1d9c93"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/phases/direct-P30-1525-cold-vault-initializes-compile-restored/emit-isolation.json",
+      "bytes": 413,
+      "sha256": "88b9098a990dddcf793714bdef26b76e84a5a1331e7187d02f14eebffaf2ef4f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/phases/direct-P30-1525-cold-vault-initializes-compile-restored/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/phases/direct-P30-1525-cold-vault-initializes-compile-restored/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/phases/direct-P30-1525-cold-vault-initializes-mutant/command.json",
+      "bytes": 1987,
+      "sha256": "ce053737973b70712accdacc34faa788a8dff50d1f7a8b95d5c1c4949c473590"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/phases/direct-P30-1525-cold-vault-initializes-mutant/raw-tests.json",
+      "bytes": 6664,
+      "sha256": "22be5926eb2f8d29ea483c5a83605669f06cab9feb0861452a4011a9e865f4d5"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/phases/direct-P30-1525-cold-vault-initializes-mutant/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/phases/direct-P30-1525-cold-vault-initializes-mutant/stdout.log",
+      "bytes": 153,
+      "sha256": "e71e3858b4a4698dd8a9a5161804f9522f113d3e7de3e59041bcb43983eea0e3"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/phases/direct-P30-1525-cold-vault-initializes-mutant/summary.json",
+      "bytes": 5055,
+      "sha256": "1147ad4a840e6e9706122f78326f169a048590575c31bc30be3043cf2e9b7dd3"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/phases/direct-P30-1525-cold-vault-initializes-restored/command.json",
+      "bytes": 2001,
+      "sha256": "25e8fd9ca4d9f79ecbadd8e100844c0f78e74c86594271b99c37ecbc030abc6b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/phases/direct-P30-1525-cold-vault-initializes-restored/raw-tests.json",
+      "bytes": 3755,
+      "sha256": "b919cf2d50e7c2d5dc8e3ad2da9452d15ccc20ca51942a293d29ae2feec2a323"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/phases/direct-P30-1525-cold-vault-initializes-restored/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/phases/direct-P30-1525-cold-vault-initializes-restored/stdout.log",
+      "bytes": 155,
+      "sha256": "52c5517c385fe98753b7294ff5e569ebb012a1c4183f8618abc926c6aa860e18"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/phases/direct-P30-1525-cold-vault-initializes-restored/summary.json",
+      "bytes": 1673,
+      "sha256": "051e0baf401756cb62a386a479248b80aa8f371c4f878dca8bd79b131ff8cf12"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/phases/supplemental-final-live-status/command.json",
+      "bytes": 1524,
+      "sha256": "e1c03820006d031b852c9f31084f699ca010a5e89c6f230acec0b0ba1d4ab401"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/phases/supplemental-final-live-status/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/phases/supplemental-final-live-status/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/phases/supplemental-final-preservation/command.json",
+      "bytes": 1587,
+      "sha256": "96c0bdbad33a106961f09a132db4e1904b02a62fbc2df6725b6e02fc74acce5d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/phases/supplemental-final-preservation/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/phases/supplemental-final-preservation/stdout.log",
+      "bytes": 133,
+      "sha256": "1364e7545250b834d50ead9079b13a2463c438cf70390d72f30df889de8ceb0f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/phases/supplemental-private-copy-setup/command.json",
+      "bytes": 1584,
+      "sha256": "6b50a821ecd229dcc9e313c4caf45ce20eb0ed6cb204325e90b93f5f01108a08"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/phases/supplemental-private-copy-setup/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/phases/supplemental-private-copy-setup/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/private-final-tracked.json",
+      "bytes": 914595,
+      "sha256": "93b780b8024ed47e494b7b8aad80bdb72664965f45b64c83755bcacebf6f74ef"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/private-original-tracked.json",
+      "bytes": 914595,
+      "sha256": "93b780b8024ed47e494b7b8aad80bdb72664965f45b64c83755bcacebf6f74ef"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/private-working-manifest.json",
+      "bytes": 1399777,
+      "sha256": "3b5e08d1986e02f2e727794a393cb292f23f650d3c79b0c3c8cf3234aa29c80e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/private-working-tracked.json",
+      "bytes": 914595,
+      "sha256": "bf3e598e82f6d144db8577953ab0422a34717654fdaecb6a4762524d57fa92c5"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/root-tracked-after.json",
+      "bytes": 914595,
+      "sha256": "93b780b8024ed47e494b7b8aad80bdb72664965f45b64c83755bcacebf6f74ef"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/root-tracked-before.json",
+      "bytes": 914595,
+      "sha256": "93b780b8024ed47e494b7b8aad80bdb72664965f45b64c83755bcacebf6f74ef"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/setup.json",
+      "bytes": 519,
+      "sha256": "be7945db46c5a60b18cca6e1834e453ae278d800959b1404d32ed08a7888c2c4"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/source-after.json",
+      "bytes": 12730,
+      "sha256": "d343a6dffe4cd6aeb778d88fdd9a0bb2bb3672ca994945e1545a47a537fefdbb"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/source-before.json",
+      "bytes": 12730,
+      "sha256": "d343a6dffe4cd6aeb778d88fdd9a0bb2bb3672ca994945e1545a47a537fefdbb"
+    }
+  ],
+  "artifactCount": 62,
+  "scope": "Immutable private references. Complete source/compiled manifests pin retained private executable bodies; no body copy into a canonical packet is requested.",
+  "frozenJournal": {
+    "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/commands-frozen.jsonl",
+    "bytes": 13224,
+    "sha256": "79353a21045db532910ba408526d1caceb3495920654dc9588e2cd044ac9820e"
+  },
+  "excludedAppendableJournal": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/commands.jsonl"
+}

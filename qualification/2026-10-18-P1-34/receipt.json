@@ -1,0 +1,138 @@
+{
+  "schemaVersion": 1,
+  "key": "P1-34",
+  "date": "2026-10-18",
+  "commit": "8f470df89cb78c251cffcc2b984fbee7f2915139",
+  "branch": "rtd/p1-34-catalog-governance",
+  "node": "v22.23.3",
+  "pnpm": "10.33.0",
+  "os": "darwin 25.6.0 (macOS 26.6.2), local macOS arm64, not CI",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "npm run -s build",
+      "exit": 0,
+      "durationMs": 102204
+    },
+    {
+      "cmd": "npm run -s typecheck",
+      "exit": 0,
+      "durationMs": 54328
+    },
+    {
+      "cmd": "npm run -s typecheck:tests",
+      "exit": 0,
+      "durationMs": 144521
+    },
+    {
+      "cmd": "npm run -s lint",
+      "exit": 0,
+      "durationMs": 5691
+    },
+    {
+      "cmd": "npm run -s check:counts",
+      "exit": 0,
+      "durationMs": 2267
+    },
+    {
+      "cmd": "npm run -s check:docs-drift",
+      "exit": 0,
+      "durationMs": 763
+    },
+    {
+      "cmd": "npm run -s check:freeze -- --base-ref int",
+      "exit": 0,
+      "durationMs": 3379
+    },
+    {
+      "cmd": "npm run -s check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 4201
+    },
+    {
+      "cmd": "npm run -s check:gates",
+      "exit": 0,
+      "durationMs": 1008
+    },
+    {
+      "cmd": "npm run -s check:schemas",
+      "exit": 0,
+      "durationMs": 2491
+    },
+    {
+      "cmd": "npm run -s check:api-ref",
+      "exit": 0,
+      "durationMs": 704
+    },
+    {
+      "cmd": "npm run -s check:threat-model",
+      "exit": 0,
+      "durationMs": 641
+    },
+    {
+      "cmd": "npm run -s check:duplicates",
+      "exit": 0,
+      "durationMs": 2337
+    },
+    {
+      "cmd": "npm run -s check:dead-code",
+      "exit": 0,
+      "durationMs": 9323
+    },
+    {
+      "cmd": "npm run -s check:catalog-currency -- --as-of 2027-01-15",
+      "exit": 0,
+      "durationMs": 1050
+    },
+    {
+      "cmd": "npm run -s check:catalog-changelog -- --base-ref int",
+      "exit": 0,
+      "durationMs": 13272
+    },
+    {
+      "cmd": "npm run -s release:notes -- --check",
+      "exit": 0,
+      "durationMs": 585
+    },
+    {
+      "cmd": "npm run -s check:qualification",
+      "exit": 0,
+      "durationMs": 976
+    },
+    {
+      "cmd": "npx vitest run tests/catalog/ tests/trust/ tests/verifier/ tests/starterProfiles.test.ts tests/usRegister.test.ts tests/wealthOverlay.test.ts tests/runPrincipalLease.test.ts tests/freezeGuard.test.ts tests/claims/d03Gates.test.ts --reporter=json",
+      "exit": 0,
+      "durationMs": 260000
+    },
+    {
+      "cmd": "python3 P1-34-work/mutate.py (85 mutations, one vitest file each)",
+      "exit": 0,
+      "durationMs": 2600000
+    }
+  ],
+  "tests": {
+    "total": 1093,
+    "passed": 1093,
+    "failed": 0,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "dce61095d2b64105e0dc3e22dbfa744a902efcf2ea0e59f2c4b5904bf3198520"
+    },
+    {
+      "path": "focused-tests.json",
+      "sha256": "83df6f11bc88eeb1a6a237194ebbaea8a4529c24428e8cb47dea38f7f679e654"
+    },
+    {
+      "path": "int-comparison.json",
+      "sha256": "d228bdbb3c76371711f3713162b7e7c3086ac60db5faa47de1faa4cd1a9a5ab3"
+    },
+    {
+      "path": "mutations.json",
+      "sha256": "8d1dce7203d3bb8b1d9f06cdd22d99db2f915bd1052e2b30dc6e469713bb281b"
+    }
+  ],
+  "notes": "Focused tests only; the full suite was not run here. Durations of the last two rows are approximate. All 85 mutations killed. No content is promoted: every control stays experimental and GOVERNANCE.md awaits Sid's approval. README.md lists the unsigned-identity limit and two P1-33 follow-ups."
+}

@@ -1,5 +1,6 @@
 import type { AuthorizationRecordV1 } from "../actions/authorizationRecord.js";
 import type { ReceiptState } from "../actions/receiptStates.js";
+import type { OutputDigest } from "../dataflow/tokenizer.js";
 import type { ActionClass } from "../types.js";
 
 /**
@@ -62,6 +63,8 @@ export interface ToolExecution {
    * unreachable from the only surface that fans out.
    */
   readonly signal?: AbortSignal;
+  /** Told when this call starts (true) and stops (false) waiting on an approval; Code Mode pauses its wall clock (DXB-20). */
+  readonly onApprovalWait?: (waiting: boolean) => void;
   /**
    * The authorization record bound for this call (P1-02), present for an authorized class once it binds. Rechecked
    * after the guards; the body and the recorder see the same record, its id and its digest.
@@ -78,6 +81,13 @@ export interface ToolExecution {
   /** The header the signed `effects.idempotency` names when its carrier is `http-header`; the body sets it to the key. */
   readonly idempotencyHeader?: string;
 }
+
+/**
+ * What a pipeline recorder sees (P1-78): an execution, or a call refused at visibility before it became one. Such a call's
+ * class is the registered tool's when there is one (a direct call under code mode) and null when no tool of that name is
+ * registered: a refusal is evidence too, and an unknown tool has no class to report.
+ */
+export type RecordedToolCall = Omit<ToolExecution, "actionClass"> & { readonly actionClass: ActionClass | null };
 
 /**
  * A monotonic execution guard, evaluated after pre-execute policy (including
@@ -122,18 +132,25 @@ export interface ToolOutcome {
   readonly denied: ToolDenial | null;
   readonly output: string;
   readonly bytes: number;
+  /** Adapter-declared effect knowledge; this does not create or replace a journal receipt. */
+  readonly effect?: ToolBodyResult["effect"];
   /**
    * A journaled call's receipt state (P1-03), absent for a call outside the journaled classes. `started` means the
    * outcome could not be recorded: the execution stays in the journal for recovery and blocks this agent's journaled
    * calls. Reported state, not a claim the effect did or did not happen.
    */
   readonly action?: { readonly executionId: string; readonly state: ReceiptState; readonly evidenceComplete: boolean };
+  /**
+   * How evidence binds `output` (P2-02), decided once per call by the pipeline so the action receipt's outcome digest
+   * and the `stdout` row carry the same form. Absent outside the pipeline: evidence then uses the plain SHA-256.
+   */
+  readonly outputDigest?: OutputDigest;
 }
 
 /** What a tool body receives and returns. */
 export interface ToolBodyResult {
-  /** Explicit application result, independent of exitCode/timedOut. Omitted preserves legacy resolved-body success. */
-  readonly ok?: boolean;
+  /** Explicit application result, independent of exitCode/timedOut. */
+  readonly ok: boolean;
   readonly output: string;
   readonly bytes?: number;
   readonly exitCode?: number | null;
@@ -160,8 +177,18 @@ export class DefiniteFailureError extends Error {
 
 export type ToolBody = (execution: ToolExecution) => Promise<ToolBodyResult> | ToolBodyResult;
 
+/** One entered step owns conditional admission until its disposer runs. */
+export interface ToolStepContext {
+  readonly agentId: string;
+  readonly turn: number;
+  readonly step: number;
+  readonly signal: AbortSignal;
+}
+
 export interface ToolDefinition {
   readonly name: string;
+  /** Operator-declared provider name; registry identity and authorization remain canonical. */
+  readonly modelAlias?: string;
   readonly actionClass: ActionClass;
   readonly description: string;
   /**
@@ -174,6 +201,16 @@ export interface ToolDefinition {
    * a deliberate way to register a tool that only other code dispatches.
    */
   readonly parameters?: Record<string, unknown>;
+  /**
+   * Presentation and invocation route, always subordinate to scope restrictions and guards.
+   * Direct and deferred tools may run on either route; deferred schemas need explicit activation before offering.
+   * Model-only tools run only at the top level; code-only tools run only as nested program calls.
+   * Hidden tools are neither advertised nor callable through either modeled route.
+   * An omitted exposure preserves ordinary programmatic dispatch, including tools with no published schema.
+   */
+  readonly exposure?: "direct" | "deferred" | "model-only" | "code-only" | "hidden";
+  /** Sampled once per step. Only an explicit true admits this registration for that step. */
+  readonly available?: (step: ToolStepContext) => boolean | Promise<boolean>;
   readonly body: ToolBody;
 }
 

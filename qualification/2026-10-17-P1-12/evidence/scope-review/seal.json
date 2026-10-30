@@ -1,0 +1,39 @@
+{
+  "schema": "p112-initial-private-scope-seal/1",
+  "inputCount": 6,
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/scope-review/observations.json",
+      "bytes": 1227405,
+      "sha256": "d7a8621abc6d4ae7c501353f99e89911df5213d43d3e5363a82547344f219e34"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/scope-review/preserved-metadata.json",
+      "bytes": 1027,
+      "sha256": "1f34fa5e60d942dcbe5545ae697fa167138577840e5796ab797fc45582ae4b49"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/scope-review/pending-reservation-entry.md",
+      "bytes": 1645,
+      "sha256": "8024bb26c9af2319e1dbdd99830cade2815fbe24165dd8d58ae98364fdda8d1c"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/scope-review/review.json",
+      "bytes": 5374,
+      "sha256": "d1ceaea72459512a560e79e4c9e406a94a3c17b3cdad564b0ab1c5d89548fb4a"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/scope-review/README.md",
+      "bytes": 1774,
+      "sha256": "e01df2c5ccc1e24dd33f046906c59acf38f13ba1a8a2eb9a725091e41b3253da"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/scope-review/pins.json",
+      "bytes": 2086,
+      "sha256": "53264ffcebc6c3ee355985349833be5503eabbc88b60397271c0bff4f4a921a2"
+    }
+  ],
+  "blockers": [],
+  "sourceAllocation": false,
+  "runtimeExecuted": false
+}

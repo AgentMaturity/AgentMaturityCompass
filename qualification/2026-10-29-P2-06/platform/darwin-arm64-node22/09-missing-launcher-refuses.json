@@ -1,0 +1,7 @@
+{
+  "stdout": "",
+  "stderr": "node:internal/modules/cjs/loader:1433\n  throw err;\n  ^\n\nError: Cannot find module '/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-platform-l7KVkZ/consumer/node_modules/agent-maturity-compass/dist/cli.js'\n    at Module._resolveFilename (node:internal/modules/cjs/loader:1430:15)\n    at defaultResolveImpl (node:internal/modules/cjs/loader:1040:19)\n    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1045:22)\n    at Module._load (node:internal/modules/cjs/loader:1216:25)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:254:19)\n    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)\n    at node:internal/main/run_main_module:36:49 {\n  code: 'MODULE_NOT_FOUND',\n  requireStack: []\n}\n\nNode.js v22.23.3\n",
+  "exitCode": 1,
+  "signal": null,
+  "errorCode": null
+}

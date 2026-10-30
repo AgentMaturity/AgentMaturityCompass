@@ -1,0 +1,209 @@
+{
+  "command": "npx vitest run tests/amc1464ProviderControlDocs.test.ts tests/amc1465AdapterCapabilityDocs.test.ts tests/amc1466HookActionLifecycleDocs.test.ts tests/amc1469ControlProjection.test.ts tests/amc1470ControlSimulation.test.ts tests/amc1472OutcomeOnboarding.test.ts tests/amc1479PolicyFixturesCi.test.ts tests/amc1480HookHealthDiagnostics.test.ts tests/businessFairScenario.test.ts tests/businessGrcExport.test.ts tests/businessRiskQuantification.test.ts tests/catalog/l0/catalogLoads.test.ts tests/compilerStationDefaults.test.ts tests/complyRiskClassifyDocs.test.ts tests/crossSurfaceBrandIdentity.test.ts tests/demoProspect.test.ts tests/desktopAppThemePackaging.test.ts tests/docsTruthReset.test.ts tests/genCountsSemantics.test.ts tests/maturityTaxonomyConsistency.test.ts tests/minimalStartupInit.test.ts tests/programLandingSliceMap.test.ts tests/publicCommandCountMetadata.test.ts tests/publicDistributionTruth.test.ts tests/publicDocsGraph.test.ts tests/publicLeaderboardExport.test.ts tests/publicQuestionCountDrift.test.ts tests/publicStatsDrift.test.ts tests/publishedCountsAccuracy.test.ts tests/releaseGateExecution.test.ts tests/releaseNotes.test.ts tests/wealthOverlay.test.ts tests/websiteContentValidation.test.ts",
+  "total": 239,
+  "passed": 238,
+  "failed": 1,
+  "skipped": 0,
+  "files": [
+    {
+      "file": "tests/amc1464ProviderControlDocs.test.ts",
+      "passed": 3,
+      "failed": [],
+      "skipped": 0
+    },
+    {
+      "file": "tests/amc1465AdapterCapabilityDocs.test.ts",
+      "passed": 4,
+      "failed": [],
+      "skipped": 0
+    },
+    {
+      "file": "tests/amc1466HookActionLifecycleDocs.test.ts",
+      "passed": 3,
+      "failed": [],
+      "skipped": 0
+    },
+    {
+      "file": "tests/amc1469ControlProjection.test.ts",
+      "passed": 8,
+      "failed": [],
+      "skipped": 0
+    },
+    {
+      "file": "tests/amc1470ControlSimulation.test.ts",
+      "passed": 9,
+      "failed": [],
+      "skipped": 0
+    },
+    {
+      "file": "tests/amc1472OutcomeOnboarding.test.ts",
+      "passed": 10,
+      "failed": [],
+      "skipped": 0
+    },
+    {
+      "file": "tests/amc1479PolicyFixturesCi.test.ts",
+      "passed": 9,
+      "failed": [],
+      "skipped": 0
+    },
+    {
+      "file": "tests/amc1480HookHealthDiagnostics.test.ts",
+      "passed": 6,
+      "failed": [],
+      "skipped": 0
+    },
+    {
+      "file": "tests/businessFairScenario.test.ts",
+      "passed": 3,
+      "failed": [],
+      "skipped": 0
+    },
+    {
+      "file": "tests/businessGrcExport.test.ts",
+      "passed": 3,
+      "failed": [],
+      "skipped": 0
+    },
+    {
+      "file": "tests/businessRiskQuantification.test.ts",
+      "passed": 6,
+      "failed": [],
+      "skipped": 0
+    },
+    {
+      "file": "tests/catalog/l0/catalogLoads.test.ts",
+      "passed": 11,
+      "failed": [],
+      "skipped": 0
+    },
+    {
+      "file": "tests/compilerStationDefaults.test.ts",
+      "passed": 14,
+      "failed": [],
+      "skipped": 0
+    },
+    {
+      "file": "tests/complyRiskClassifyDocs.test.ts",
+      "passed": 4,
+      "failed": [],
+      "skipped": 0
+    },
+    {
+      "file": "tests/crossSurfaceBrandIdentity.test.ts",
+      "passed": 7,
+      "failed": [],
+      "skipped": 0
+    },
+    {
+      "file": "tests/demoProspect.test.ts",
+      "passed": 4,
+      "failed": [],
+      "skipped": 0
+    },
+    {
+      "file": "tests/desktopAppThemePackaging.test.ts",
+      "passed": 5,
+      "failed": [],
+      "skipped": 0
+    },
+    {
+      "file": "tests/docsTruthReset.test.ts",
+      "passed": 8,
+      "failed": [],
+      "skipped": 0
+    },
+    {
+      "file": "tests/genCountsSemantics.test.ts",
+      "passed": 15,
+      "failed": [],
+      "skipped": 0
+    },
+    {
+      "file": "tests/maturityTaxonomyConsistency.test.ts",
+      "passed": 12,
+      "failed": [],
+      "skipped": 0
+    },
+    {
+      "file": "tests/minimalStartupInit.test.ts",
+      "passed": 3,
+      "failed": [],
+      "skipped": 0
+    },
+    {
+      "file": "tests/programLandingSliceMap.test.ts",
+      "passed": 10,
+      "failed": [],
+      "skipped": 0
+    },
+    {
+      "file": "tests/publicCommandCountMetadata.test.ts",
+      "passed": 4,
+      "failed": [],
+      "skipped": 0
+    },
+    {
+      "file": "tests/publicDistributionTruth.test.ts",
+      "passed": 15,
+      "failed": [],
+      "skipped": 0
+    },
+    {
+      "file": "tests/publicDocsGraph.test.ts",
+      "passed": 5,
+      "failed": [
+        "AMC public Docs graph every local guide edge resolves to another promoted guide"
+      ],
+      "skipped": 0
+    },
+    {
+      "file": "tests/publicLeaderboardExport.test.ts",
+      "passed": 5,
+      "failed": [],
+      "skipped": 0
+    },
+    {
+      "file": "tests/publicQuestionCountDrift.test.ts",
+      "passed": 4,
+      "failed": [],
+      "skipped": 0
+    },
+    {
+      "file": "tests/publicStatsDrift.test.ts",
+      "passed": 3,
+      "failed": [],
+      "skipped": 0
+    },
+    {
+      "file": "tests/publishedCountsAccuracy.test.ts",
+      "passed": 4,
+      "failed": [],
+      "skipped": 0
+    },
+    {
+      "file": "tests/releaseGateExecution.test.ts",
+      "passed": 22,
+      "failed": [],
+      "skipped": 0
+    },
+    {
+      "file": "tests/releaseNotes.test.ts",
+      "passed": 7,
+      "failed": [],
+      "skipped": 0
+    },
+    {
+      "file": "tests/wealthOverlay.test.ts",
+      "passed": 7,
+      "failed": [],
+      "skipped": 0
+    },
+    {
+      "file": "tests/websiteContentValidation.test.ts",
+      "passed": 5,
+      "failed": [],
+      "skipped": 0
+    }
+  ]
+}

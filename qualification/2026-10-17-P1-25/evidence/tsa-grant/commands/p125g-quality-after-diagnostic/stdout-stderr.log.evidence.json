@@ -1,0 +1,11 @@
+{
+  "schema": "amc-qualification-lossless-original/1",
+  "encoding": "base64",
+  "original": {
+    "relativePath": "evidence/tsa-grant/commands/p125g-quality-after-diagnostic/stdout-stderr.log",
+    "bytes": 121,
+    "sha256": "306de4fc2d96e0d9d44a4aa59f3764830f719cbf336f2f37be06eee6f4130f90"
+  },
+  "dataBase64": "eyJyb2xlIjoiYWZ0ZXItc291cmNlIiwidG9vbCI6ImtuaXAiLCJ2ZXJzaW9uIjoiNi4zOS4wIiwiZmluZGluZ3MiOjI3MTksImRpYWdub3N0aWNPbmx5Ijp0cnVlLCJxdWFsaXR5R2F0ZVBhc3NlZCI6ZmFsc2V9Cg==",
+  "boundary": "Exact original bytes retained losslessly; decode and verify bytes/SHA256 before use. No command result changes."
+}

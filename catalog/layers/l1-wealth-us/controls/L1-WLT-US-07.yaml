@@ -1,0 +1,134 @@
+# Draft (P1-18): wealth.us.inventory-mfa. Experimental, agent-drafted and not independently reviewed; expert sign-off waits for D-08.
+# Extends L0-INV-01 (Layer 0, P1-14) with the US finance parameter and citation.
+# A result under this control is evidence of conformity, never proof of compliance.
+
+id: L1-WLT-US-07
+version: "0.1.0"
+support: experimental
+layer: 1
+family: inventory-and-identity
+stations: [wealth]
+title: Agents and credentials inventoried with an owner; MFA for people
+statement: Every agent and its credentials are in a signed asset inventory with a named owner, and every human access to
+  the systems the agent touches uses multi-factor authentication.
+riskRationale: An agent or credential missing from the inventory cannot be checked or revoked; the NYDFS AI letter reads
+  the Part 500 inventory to include them.
+mandatory: true
+applicability:
+  predicate: {always: true}
+  reasons:
+    - "The Wealth overlay applies to every US deployment in the Wealth station (pack scope: station wealth, jurisdiction
+      US)."
+  exclusions: []
+citations:
+  - key: us-glba-314-4-c-5
+    registerId: us-glba-safeguards
+    instrument: GLBA Safeguards Rule (FTC), 16 CFR Part 314
+    clause: "16 CFR 314.4(c)(5): multi-factor authentication for any individual accessing any information system"
+    edition: CFR annual edition 2026, Title 16 Vol. 1 (revised 2026-01-01), GPO govinfo
+    jurisdiction: US
+    statusType: binding-now
+    superseded: null
+    effectiveDate: null
+    complianceDueDate: null
+    dateNote: In force; no source in scope gives the date this paragraph took effect. The legal reviewer records it.
+    url: https://www.govinfo.gov/content/pkg/CFR-2026-title16-vol1/xml/CFR-2026-title16-vol1-sec314-4.xml
+    retrieval:
+      state: unverified
+      reason: "Unverified for paragraph (c)(5): P1-17 fetched this file at 2026-10-07T17:10:30Z
+        (sha256:78db42ccdd11efa9aacd304e6deb2f9b1008e4af9f3c6d23b1f829fb455cc632,
+        qualification/2026-10-07-P1-17/sources.md) but encoded only paragraph (j); no text held in the repository
+        confirms paragraph (c)(5). Not re-fetched in P1-18 (no network access)."
+    appliesWhen:
+      all:
+        - {fact: jurisdictions, includesAny: [US]}
+        - {fact: entityTypes, includesAny: [non_bank_financial_institution]}
+    legalReview: null
+    note: Experimental, agent-drafted mapping; the legal reviewer (D-08) confirms the clause and its applicability.
+  - key: us-nydfs-500-13-inventory
+    registerId: us-nydfs-part-500
+    instrument: 23 NYCRR Part 500 (NYDFS Cybersecurity Regulation)
+    clause: "23 NYCRR 500.13 (asset management): the asset inventory, which the AI letter reads to include agents and their
+      credentials"
+    edition: Second Amendment as adopted (effective 2023-11-01), NYDFS
+    jurisdiction: US-NY
+    statusType: binding-now
+    superseded: null
+    effectiveDate: null
+    complianceDueDate: "2025-11-01"
+    dateNote: Due 2025-11-01 per the plan's US register; the effective date of the amended section is not recorded.
+    url: https://www.dfs.ny.gov/system/files/documents/2023/10/rf_fs_2amend23NYCRR500_text_20231101.pdf
+    retrieval:
+      state: unverified
+      reason: "Unverified: P1-17 fetched the Second Amendment text at 2026-10-07T17:11:34Z
+        (sha256:075846139bd36e25659a110325dd5d4b04ef1e052bbf796c512bde59a8b66b33,
+        qualification/2026-10-07-P1-17/sources.md) but encoded only 500.1, 500.17, 500.19 and 500.22; this section
+        number and its 2025-11-01 date are not confirmed from text held in the repository. Not re-fetched in P1-18 (no
+        network access)."
+    appliesWhen: {fact: jurisdictions, includesAny: [US-NY]}
+    legalReview: null
+    note: Experimental, agent-drafted mapping; the legal reviewer (D-08) confirms the clause and its applicability.
+  - key: us-nydfs-500-12-mfa
+    registerId: us-nydfs-part-500
+    instrument: 23 NYCRR Part 500 (NYDFS Cybersecurity Regulation)
+    clause: "23 NYCRR 500.12: multi-factor authentication for all users"
+    edition: Second Amendment as adopted (effective 2023-11-01), NYDFS
+    jurisdiction: US-NY
+    statusType: binding-now
+    superseded: null
+    effectiveDate: null
+    complianceDueDate: "2025-11-01"
+    dateNote: Due 2025-11-01 per the plan's US register; the effective date of the amended section is not recorded.
+    url: https://www.dfs.ny.gov/system/files/documents/2023/10/rf_fs_2amend23NYCRR500_text_20231101.pdf
+    retrieval:
+      state: unverified
+      reason: "Unverified: P1-17 fetched the Second Amendment text at 2026-10-07T17:11:34Z
+        (sha256:075846139bd36e25659a110325dd5d4b04ef1e052bbf796c512bde59a8b66b33,
+        qualification/2026-10-07-P1-17/sources.md) but encoded only 500.1, 500.17, 500.19 and 500.22; this section
+        number and its 2025-11-01 date are not confirmed from text held in the repository. Not re-fetched in P1-18 (no
+        network access)."
+    appliesWhen: {fact: jurisdictions, includesAny: [US-NY]}
+    legalReview: null
+    note: Experimental, agent-drafted mapping; the legal reviewer (D-08) confirms the clause and its applicability.
+binding:
+  kind: enforcement_point
+  points: [tool_pipeline]
+  mechanism: Each agent has an auditor-signed agent.config.yaml naming its owner and purpose; a missing or edited entry
+    fails verification. MFA for human access is outside AMC's runtime and is a reviewer check.
+  parameters: []
+  manualDuty: null
+tests:
+  - id: L1-WLT-US-07-T1
+    type: configuration_check
+    oracle:
+      kind: signed_config
+      observes: The auditor signature over agents/<id>/agent.config.yaml, verified by verifyAgentConfigSignature.
+    fixtures:
+      positive: [L1-WLT-US-07/positive/evidence-valid.json, L1-WLT-US-07/positive/signed-agent-entry.json]
+      negative:
+        - L1-WLT-US-07/negative/edited-agent-entry.json
+        - L1-WLT-US-07/negative/unregistered-agent.json
+        - L1-WLT-US-07/negative/evidence-contradictory.json
+        - L1-WLT-US-07/negative/evidence-cross-tenant.json
+        - L1-WLT-US-07/negative/evidence-empty.json
+        - L1-WLT-US-07/negative/evidence-replayed.json
+        - L1-WLT-US-07/negative/evidence-stale.json
+        - L1-WLT-US-07/negative/evidence-violation.json
+    passCriteria: An agent with a signed registry entry passes; a missing entry or one edited after signing fails (T-NY-2).
+      The owner field, credential inventory and MFA for people are not checked by an executed test yet.
+    attempts: 1
+evidence:
+  - id: L1-WLT-US-07-E1
+    producer: amc.signedConfig.agent
+    bindingFields: [workspaceId, agentId, controlId]
+    freshness: {maxAgeDays: 90}
+    sampling: {method: all, ratePercent: null, minItems: 1}
+    retention: {mode: regime_max}
+    residency: {mode: inherit_deployment}
+invalidatedBy: [model_version, tool_version, deployment_version]
+owner: {role: ciso}
+clock: null
+levels: [L2, L3]
+crosswalk: []
+review: {status: pending, expert: null, credential: null, reviewedAt: null, nextReview: null}
+provenance: {draftedBy: ai, draftedAt: "2026-10-12", approvedBy: null}

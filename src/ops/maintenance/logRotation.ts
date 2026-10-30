@@ -3,6 +3,7 @@ import { isAbsolute, join, relative, resolve, sep } from "node:path";
 import { ensureDir, pathExists } from "../../utils/fs.js";
 import { getWorkspaceScope } from "../../enforce/evidenceEmitter.js";
 import { withDeletionGate, resolveDeletionWorkspace, DeletionDenied } from "../../residency/deletionGate.js";
+import { RegimeRetentionRefused, regimeFloor } from "../retention/regimeRetention.js";
 
 export function rotateLogs(params: {
   workspace?: string;
@@ -19,7 +20,13 @@ export function rotateLogs(params: {
   ensureDir(logDir);
   const removed: string[] = [];
   const kept: string[] = [];
+  // P2-26: no log younger than an applicable regime's floor is deleted, by age or by size; an unreadable plan refuses.
+  const floor = workspace === undefined ? null : regimeFloor(workspace, "logs");
+  if (floor !== null && params.maxDays < floor.days) {
+    throw new RegimeRetentionRefused([`maintenance.rotateLogsDays ${params.maxDays} days undercuts the ${floor.days}-day logs minimum of ${floor.regimeIds.join(", ")}`]);
+  }
   const cutoff = Date.now() - Math.max(1, params.maxDays) * 24 * 60 * 60 * 1000;
+  const floorCutoff = floor === null ? Infinity : Date.now() - floor.days * 24 * 60 * 60 * 1000;
   const maxBytes = Math.max(1, params.maxFileMb) * 1024 * 1024;
   for (const entry of readdirSync(logDir, { withFileTypes: true })) {
     if (!entry.isFile()) {
@@ -31,7 +38,7 @@ export function rotateLogs(params: {
     }
     const stat = statSync(full);
     const tooOld = stat.mtimeMs < cutoff;
-    const tooLarge = stat.size > maxBytes;
+    const tooLarge = stat.size > maxBytes && stat.mtimeMs < floorCutoff;
     if (tooOld || tooLarge) {
       try {
         const targetWorkspace = resolveDeletionWorkspace(workspace);

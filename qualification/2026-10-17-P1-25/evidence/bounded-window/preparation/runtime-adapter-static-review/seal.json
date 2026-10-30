@@ -1,0 +1,36 @@
+{
+  "schema": "p125w-runtime-adapter-independent-static-seal/1",
+  "at": "2026-10-17T00:12:18.445668+00:00",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/runtime-adapter-static-review/review.json",
+      "bytes": 9739,
+      "sha256": "069359b37c5e1fbde8a0e71405304855633b8722c9a8177fc21f6e7b0546b78c",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/runtime-adapter-static-review/review.json",
+      "dev": 16777231,
+      "inode": 543750131,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/runtime-adapter-static-review/README.md",
+      "bytes": 2796,
+      "sha256": "95682b3d4d75340a63249fe34774d56a3ebe514c2c4f0c99e86985ddcd17debd",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/runtime-adapter-static-review/README.md",
+      "dev": 16777231,
+      "inode": 543750132,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/runtime-adapter-static-review/input-pins.json",
+      "bytes": 10747,
+      "sha256": "215cbd6dd215245238184120b920092985f304de6c24700c18e73c1f97bb6363",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/runtime-adapter-static-review/input-pins.json",
+      "dev": 16777231,
+      "inode": 543750133,
+      "nlink": 1
+    }
+  ],
+  "inputCount": 26,
+  "blockers": [],
+  "noExecutionOrSourceAllocation": true
+}

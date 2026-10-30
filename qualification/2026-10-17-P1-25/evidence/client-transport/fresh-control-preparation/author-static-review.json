@@ -1,0 +1,56 @@
+{
+  "schema": "p125c-control-preparation-author-static-review/1",
+  "at": "2026-10-16T21:43:46.054295+00:00",
+  "allReadsFinished": true,
+  "blockers": [],
+  "independentPeerReviewClaim": false,
+  "helperExecution": false,
+  "productExecution": false,
+  "checkoutMutation": false,
+  "fullTextRead": [
+    "source-control.py",
+    "check-preservation.py",
+    "controls.json",
+    "source-pinset.json",
+    "plan.json",
+    "README.md"
+  ],
+  "sourceChecks": {
+    "actualTsaSourceSha256": "fc24b04be6ac0a2980425c763eaddd01320137e177d7bedfa7e8c99daa228387",
+    "exactBeforeOccurrenceEach": 1,
+    "originalAndProposedByteHashRecipesExact": true,
+    "proposedMutantFilesCreated": false,
+    "current121ProtectedBytePinsExact": true,
+    "current6NativePhysicalPinsExact": true,
+    "futureFreshBindingAbsentNotClaimed": true
+  },
+  "schemaFit": {
+    "outcomeAdapter": "existing B34 audit-observed.py and pinned P125 observed()",
+    "actualFields": [
+      "rawObserverOrderedJoin",
+      "hookTaskEntries",
+      "individualHookValues",
+      "orderedIdentities",
+      "taskErrors",
+      "groupAbsentByESRCH",
+      "signalsOtherThanZeroSent"
+    ],
+    "bindingRows": "B33 shape retained; all actual future source/fresh byte and physical pins required",
+    "manualClassification": "Explicit source/operator/outcome-hash-bound root review with firstSensitiveAssertionRead and masking before restore"
+  },
+  "writeChecks": [
+    "Only src/time/tsaClient.ts under the supplied owned Q can be written.",
+    "Original/proposed sizes and hashes plus exact one occurrence precede apply.",
+    "Exclusive backups/prepared/live-patch/records prevent silent replay or overwrite.",
+    "Descriptor O_NOFOLLOW and regular/single-link/content/inode/path checks precede each truncation.",
+    "Source/protected/compiled/native preservation checked before and after each finite operation.",
+    "No automatic restore, retry, test/build, signal or frozen-harness mutation."
+  ],
+  "limits": [
+    "Static full read and standard-library byte/hash/JSON comparisons only; syntax/runtime feasibility remains unproven until root executes.",
+    "Current pre-change head is historical e2cb; no future source commit/Q/compiled/native hashes supplied.",
+    "The prospective 28-case inventory is a required future actual fact, never a claimed source/fresh pass.",
+    "Root-owned all-failure classification remains necessary and is not cryptographically inferred from trusted prose fields.",
+    "No full issue, live TSA, verifier grant, ordered fallback, full suite, quality-green or plan-completion credit."
+  ]
+}

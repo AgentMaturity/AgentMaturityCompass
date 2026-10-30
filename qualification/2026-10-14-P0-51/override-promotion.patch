@@ -1,0 +1,11 @@
+--- correct/dist/trust/verifierReport.js
++++ fixture-mutant/dist/trust/verifierReport.js
+@@ -48,7 +48,7 @@
+     const notEvaluated = { status: "not-evaluated", reasons: [] };
+     const integrity = input.integrityErrors.length ? "fail" : "pass";
+     const issuer = input.signatures.length === 0 ? "not-evaluated"
+-        : input.signatures.every(signature => signature.status === "admitted") ? "pass" : "fail";
++        : input.signatures.every(signature => signature.status === "admitted" || signature.status === "unpinned-allowed") ? "pass" : "fail";
+     const overrides = [];
+     if (input.signatures.some(signature => signature.status === "unpinned-allowed"))
+         overrides.push("allow-unpinned");

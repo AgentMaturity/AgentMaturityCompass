@@ -1,0 +1,8 @@
+{
+  "operator": "skip-issuer-equality",
+  "restoredExact": true,
+  "allFortyOtherInputAndCompiledPinsExact": true,
+  "nativeIdentityExact": true,
+  "sourceSAndHeldRunnerRUnchanged": true,
+  "restoredRerunPending": true
+}

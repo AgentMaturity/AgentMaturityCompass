@@ -181,8 +181,8 @@ describe("methodology reproducibility packet", () => {
     expect(read("docs/SCORING_METHODOLOGY.md")).toContain("amc methodology --sample-dataset --json");
     expect(read("whitepaper/AMC_WHITEPAPER_v1.md")).toContain("amc methodology --reproducibility --json");
     expect(read("whitepaper/AMC_WHITEPAPER_v1.md")).toContain("amc methodology --sample-dataset --json");
-    expect(read("docs/AUDIT_50_AGENTS_BATCH5.md")).toContain("Methodology reproducibility packet — ✅ Resolved 2026-06-16");
-    expect(read("docs/AUDIT_50_AGENTS_BATCH5.md")).toContain("Methodology sample case-study dataset — ✅ Resolved 2026-06-16");
-    expect(read("docs/AUDIT_50_AGENTS_BATCH5.md")).toContain("not a DOI/arXiv assignment or third-party empirical validation");
+    expect(read("docs/archive/AUDIT_50_AGENTS_BATCH5.md")).toContain("Methodology reproducibility packet — ✅ Resolved 2026-06-16");
+    expect(read("docs/archive/AUDIT_50_AGENTS_BATCH5.md")).toContain("Methodology sample case-study dataset — ✅ Resolved 2026-06-16");
+    expect(read("docs/archive/AUDIT_50_AGENTS_BATCH5.md")).toContain("not a DOI/arXiv assignment or third-party empirical validation");
   });
 });

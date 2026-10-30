@@ -4,6 +4,7 @@
     "src/index.ts",
     "src/sdk/mobileFetch.ts",
     "src/sdk/nativeAgentClient.ts",
+    "src/adapters/pi/amcPiExtension.ts",
     "src/standard/externalEvidenceProfile.ts",
     "src/importers/piTelemetryCallbacks.ts",
     "src/trust/index.ts"

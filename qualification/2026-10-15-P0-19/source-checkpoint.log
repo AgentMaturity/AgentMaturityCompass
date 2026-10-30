@@ -1,0 +1,5 @@
+[codex/p0-19-current-qualification f10d97257] test: qualify current P0-19 grading and preserve strict validity failure
+ 13 files changed, 663 insertions(+), 15 deletions(-)
+ create mode 100644 tests/assuranceGradingQualification.test.ts
+ create mode 100644 tests/assuranceRunnerInconclusiveQualification.test.ts
+ create mode 100644 tests/compliance/assuranceGradingEligibilityQualification.test.ts

@@ -163,3 +163,18 @@ describe("getProfile", () => {
     }
   });
 });
+
+
+it("retains full-history online sample moments and a 1000-value percentile window", () => {
+  const profiler = new BehavioralProfiler({ minEventsForProfile: 1100 });
+  for (let index = 0; index < 1100; index++) {
+    profiler.ingest(makeEvent("online-stats", { latencyMs: index < 100 ? 1000 : 100 }));
+  }
+  const anomalies = profiler.ingest(makeEvent("online-stats", { latencyMs: 900 }));
+  const spike = anomalies.find((anomaly) => anomaly.anomalyType === "latency_spike");
+  expect(spike?.baselineValue).toBeCloseTo(182.47048138056313, 10);
+  expect(spike?.deviationFactor).toBeCloseTo(2.7636027525118005, 10);
+  expect(spike?.evidence).toMatchObject({ p95: 100, p99: 100 });
+  // The periodic profile rebuild at event 1100 includes the first 100 high values in its time window.
+  expect(profiler.getProfile("online-stats")?.p95LatencyMs).toBe(1000);
+});

@@ -1,0 +1,60 @@
+{
+  "schema": "p125pc-inert-public-curator-fields/1",
+  "requiresActualFullReviewNotPartialAlias": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/root-runtime-review.json",
+    "schemaExpectedByInheritedGuard": "p125pc-root-completed-runtime-chain-review/1",
+    "rootRuntimeReviewPin": null,
+    "onlyActualFinalDataMayFillThisRole": true
+  },
+  "exactInputsShaGuard": {
+    "consumedPath": "/private/tmp/p1-25-producer-qualification-20261017/public-curator-preparation/phase-inputs.json",
+    "preferredDraftValue": null,
+    "unreadyCannotExecute": true,
+    "preservedGuardBody": "assert pin(INPUTS)['sha256']==INPUTS_SHA",
+    "futureSuccessorMustPinActualCompletedInputs": true
+  },
+  "newProducerBinding": {
+    "caseId": "CHECKPOINT-PERSISTED-PRODUCER-CLAIMS",
+    "key": "producerRequestBinding",
+    "summaryKey": "producerRequestBindings",
+    "actualSemanticKey": "producerClaimsSemanticAudit",
+    "proofKeys": [
+      "sequence",
+      "query",
+      "response",
+      "verificationChildPid",
+      "verificationChildArgv",
+      "independentGrant",
+      "storedTokenPin"
+    ],
+    "actualFieldsCompared": [
+      "actualStages",
+      "reachedStagePrefix",
+      "actualRequestedClaims",
+      "actualFirst",
+      "actualCovered",
+      "actualFinal",
+      "actualObservations"
+    ],
+    "signerBoundToNamedPublicTsaCertificateDerSha": true,
+    "eachStoredTokenPinMustNameOwnWorkspaceSequenceTsr": true,
+    "sourceFailedPrefixPermittedWithoutLaterCredit": true,
+    "unexpectedUnverifiedCapturedPairsOnlyObservational": true,
+    "sharedReplyOnlyLastIndependentlyVerifiedProof": true
+  },
+  "explicitPublicRoles": [
+    "public-lifecycle",
+    "public-certificates",
+    "public-query",
+    "public-response",
+    "public-checkpoint"
+  ],
+  "privacy": [
+    "Only explicit emitted lifecycle/checkpoint files, named request/reply pairs and exact root.pem/tsa.pem public certificates are candidates.",
+    "No signing-root recursion, key or child-stream reads; no raw PEM or default-home trust JSON publication.",
+    "Public-certificate marker checks occur before DER/base64 encoding. No source/private-marker body is encoded by this curator.",
+    "Later unchanged receipt-assembly one-MiB, marker-before-lossless, inert-code and lossless-log/patch guards remain mandatory; this curator does not replace them."
+  ],
+  "counts": "Derived from actual closed phase metadata; no output/resource inventory is predicted. Labelled cross-run resource sums are inventory only, while canonical acceptance case totals stay separate.",
+  "futureOutputAllowlistObserved": false
+}

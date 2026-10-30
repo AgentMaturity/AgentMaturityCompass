@@ -1,0 +1,49 @@
+{
+  "schema": "amc.adapter-claim-manifest/v1",
+  "adapter": "claude-code",
+  "harness": { "package": "@anthropic-ai/claude-code", "versions": ["2.1.296"] },
+  "hooks": [
+    {
+      "name": "PreToolUse",
+      "role": "enforce",
+      "tools": ["Read", "Write", "Edit", "Glob", "Grep", "WebFetch", "Bash (pure form only)", "every other tool name (denied)"],
+      "onFailure": "blocks",
+      "source": "docs/adapters/claude-code-hooks.md",
+      "cases": [
+        { "id": "recorded-version", "path": "cases.allowedRead.claudeCodeVersion", "expect": "{version}" },
+        { "id": "allowed-read-runs", "path": "cases.allowedRead.ranTool", "expect": true },
+        { "id": "denied-bash-no-effect", "path": "cases.denied.bashEffect", "expect": false },
+        { "id": "denied-write-no-effect", "path": "cases.denied.writeCreated", "expect": false },
+        { "id": "unmapped-mcp-tool-no-effect", "path": "cases.denied.mcpRan", "expect": false },
+        { "id": "hook-settings-protected", "path": "cases.denied.settingsCreated", "expect": false },
+        { "id": "foreign-hook-not-governed", "path": "cases.foreignPreToolUseHook.ranTool", "expect": false },
+        { "id": "bridge-stopped-blocks", "path": "cases.bridgeStopped.ranTool", "expect": false },
+        { "id": "receipts-verified", "path": "cases.receiptsVerified.failures", "expect": 0 }
+      ]
+    },
+    {
+      "name": "UserPromptSubmit",
+      "role": "enforce",
+      "tools": ["prompt admission (no tool)"],
+      "onFailure": "blocks",
+      "source": "docs/adapters/claude-code-hooks.md",
+      "cases": [
+        { "id": "frozen-workspace-blocks-prompt", "path": "cases.admissionFreeze.modelRequests", "expect": 0 },
+        { "id": "bridge-stopped-no-model-request", "path": "cases.bridgeStopped.modelRequests", "expect": 0 }
+      ]
+    },
+    { "name": "SessionStart", "role": "observe", "tools": [], "onFailure": "proceeds", "source": "docs/adapters/claude-code-hooks.md", "cases": [] },
+    { "name": "PostToolUse", "role": "observe", "tools": ["Read", "Write", "Edit", "Glob", "Grep", "WebFetch", "Bash"], "onFailure": "proceeds", "source": "docs/adapters/claude-code-hooks.md", "cases": [] },
+    { "name": "PostToolUseFailure", "role": "observe", "tools": ["Read", "Write", "Edit", "Glob", "Grep", "WebFetch", "Bash"], "onFailure": "proceeds", "source": "docs/adapters/claude-code-hooks.md", "cases": [] },
+    { "name": "Stop", "role": "observe", "tools": [], "onFailure": "proceeds", "source": "docs/adapters/claude-code-hooks.md", "cases": [] }
+  ],
+  "notCovered": [
+    "OS containment and Claude Code's own sandbox",
+    "sessions in which Claude Code ran none of AMC's hooks, and sessions without a registration (not governed)",
+    "every hook AMC does not install",
+    "Linux and Windows binaries (Linux packages pinned, not run against AMC; Windows not verified)",
+    "commands an allowed call starts"
+  ],
+  "qualifiedAt": "2026-10-18",
+  "receipt": "qualification/2026-10-18-P1-23/claude-code-conformance.json"
+}

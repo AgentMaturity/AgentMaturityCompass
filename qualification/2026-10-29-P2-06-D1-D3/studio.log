@@ -1,0 +1,13 @@
+Bootstrap completed
+Workspace: /data/amc
+Report: /data/amc/.amc/bootstrap/bootstrap_1793251105078.json
+Signature: /data/amc/.amc/bootstrap/bootstrap_1793251105078.json.sig
+Transparency entry: b988b456b49e6961b57a512ae0c78816e648436fc3cb14c325017ec9b32923a6
+AMC gateway listening on http://0.0.0.0:3210
+AMC gateway proxy listening on http://0.0.0.0:3211
+Studio started
+Studio API: http://0.0.0.0:3212
+Gateway: http://0.0.0.0:3210
+Proxy: http://0.0.0.0:3211
+Dashboard: http://0.0.0.0:4173
+Metrics: http://127.0.0.1:9464/metrics

@@ -1,0 +1,90 @@
+{
+  "profileVersion": 1,
+  "profileId": "education-grading-assistant-us-fixture",
+  "deployment": {
+    "tenantId": "education-fixture-tenant",
+    "workspaceId": "education-fixture-workspace",
+    "deploymentId": "education-grading-assistant-us-fixture",
+    "agentIds": [
+      "education-fixture-agent"
+    ]
+  },
+  "primaryStation": {
+    "value": "education",
+    "provenance": "asserted",
+    "source": "docs/catalog/education/README.md#synthetic-profile-facts",
+    "reviewedBy": null
+  },
+  "stations": {
+    "value": [
+      "education",
+      "technology"
+    ],
+    "provenance": "asserted",
+    "source": "docs/catalog/education/README.md#synthetic-profile-facts",
+    "reviewedBy": null
+  },
+  "domains": {
+    "value": [
+      "education.schools-skills",
+      "technology.platforms-data"
+    ],
+    "provenance": "asserted",
+    "source": "docs/catalog/education/README.md#synthetic-profile-facts",
+    "reviewedBy": null
+  },
+  "jurisdictions": {
+    "value": [
+      "US"
+    ],
+    "provenance": "asserted",
+    "source": "docs/catalog/education/README.md#synthetic-profile-facts",
+    "reviewedBy": null
+  },
+  "roles": {
+    "value": [
+      "deployer"
+    ],
+    "provenance": "asserted",
+    "source": "docs/catalog/education/README.md#synthetic-profile-facts",
+    "reviewedBy": null
+  },
+  "entityTypes": {
+    "value": [
+      "k12_institution"
+    ],
+    "provenance": "asserted",
+    "source": "docs/catalog/education/README.md#synthetic-profile-facts",
+    "reviewedBy": null
+  },
+  "riskClass": {
+    "value": null,
+    "provenance": "asserted",
+    "source": "docs/catalog/education/README.md#synthetic-profile-facts",
+    "reviewedBy": null
+  },
+  "useCases": {
+    "value": [
+      "education_grading",
+      "education_classroom_media",
+      "education_records_export",
+      "education_generated_lesson"
+    ],
+    "provenance": "asserted",
+    "source": "docs/catalog/education/README.md#synthetic-profile-facts",
+    "reviewedBy": null
+  },
+  "dataClasses": {
+    "value": [
+      "education_records",
+      "children_personal_data"
+    ],
+    "provenance": "asserted",
+    "source": "docs/catalog/education/README.md#synthetic-profile-facts",
+    "reviewedBy": null
+  },
+  "euRoleRecord": null,
+  "art63Record": null,
+  "operatingProfile": null,
+  "exceptions": []
+}

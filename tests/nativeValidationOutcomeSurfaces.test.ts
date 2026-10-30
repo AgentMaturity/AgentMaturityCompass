@@ -92,6 +92,7 @@ test.runIf(process.platform === "darwin").each(cases)("Darwin $surface public va
     exitCode: mode === "success" ? 0 : mode === "nonzero" ? 7 : null, reason: mode === "success" ? null : mode === "nonzero" ? "nonzero-exit" : "execution-denied" }] });
   expect(summary.toolCalls).toBe(1);
   expect(f.effect()).toBe(mode === "success" || mode === "nonzero" ? "validation-outcome" : null);
+  expect(f.escaped()).toBe(false);
   const history = loadSessionEventHistory({ workspace, sessionId: summary.sessionId, agentId: "default", requireSealed: true });
   const outputId = summary.validation.checks[0]!.outputEventId;
   const checkCallId = summary.validation.checks[0]!.callId;

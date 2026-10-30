@@ -1,0 +1,30 @@
+{
+  "schema": "p107-runtime-test-proposal-seal/3",
+  "at": "2026-10-16T18:01:34.614217+00:00",
+  "candidateExecuted": false,
+  "checkoutWrites": false,
+  "inputCount": 82,
+  "blockers": [],
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-test-proposal-v3/runtimeEvidenceEndToEnd.test.ts",
+      "bytes": 28819,
+      "sha256": "5eb353a14bdaebf8cef9d14c1dec266c0deeb239c696eb3e3ca32fc250434714"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-test-proposal-v3/v2-to-v3.patch",
+      "bytes": 2491,
+      "sha256": "6861ba8882cf9c53e90f7eba7b6cf5ddbbd91f1e4ec77e6b74b5f98c7ce6bdee"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-test-proposal-v3/README.md",
+      "bytes": 1108,
+      "sha256": "0c744b8843866b53fdbf8aac54737081d802f3f1cffc50dc07be0b7042d0244e"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-test-proposal-v3/input-pins.json",
+      "bytes": 27283,
+      "sha256": "05499bba5ce829f6fe5f0d9bb06de8292598452fd67d88d64406ac3418284cda"
+    }
+  ]
+}

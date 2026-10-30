@@ -1,0 +1,77 @@
+{
+  "id": "BR-1",
+  "scenario": "Backup under load",
+  "status": "failed",
+  "reason": "failed criteria: amc backup create during a governed turn",
+  "criteria": [
+    {
+      "name": "amc backup create during a governed turn",
+      "ok": false,
+      "detail": {
+        "backup": "bkp_ddfee546-ba97-4796-aae9-6bf49a4703cc",
+        "turn": {
+          "exit": 1,
+          "paired": true
+        }
+      }
+    },
+    {
+      "name": "new namespace and volume ready",
+      "ok": true,
+      "detail": "amc-rd-restore"
+    },
+    {
+      "name": "amc backup verify passes",
+      "ok": true,
+      "detail": {
+        "exit": 0
+      }
+    },
+    {
+      "name": "restore into the new namespace and volume",
+      "ok": true,
+      "detail": {
+        "exit": 0,
+        "warnings": [
+          "ledger: Session 57c32f1d-33a0-42bf-839f-0e0be7e21b79 missing seal"
+        ]
+      }
+    },
+    {
+      "name": "restored ledger verifies (chain links, integrity_check, no restore warning beyond open-session seals)",
+      "ok": true,
+      "detail": {
+        "count": 19,
+        "head": "5aba9b81f2ee7f0ec51d53dfe9ccf39ec464b652b215c3f57416592a96da8007",
+        "linked": true,
+        "migrations": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14
+        ],
+        "integrity": "ok",
+        "unexpected": []
+      }
+    },
+    {
+      "name": "restored head is a prefix of the source chain (beyond the restore's own audit rows)",
+      "ok": true,
+      "detail": {
+        "restored": 19,
+        "source": 19
+      }
+    }
+  ],
+  "durationMs": 74833
+}

@@ -38,6 +38,15 @@ from .client import (
     Turn,
     ToolCall,
 )
+from .execution import (
+    EXECUTION_API_VERSION,
+    EXECUTION_PHASES,
+    EXECUTION_VERBS,
+    PHASE_STATES,
+    ExecutionStatus,
+    PendingApproval,
+    VerificationReceipt,
+)
 from .proof import (
     AmcProofError,
     SessionProof,
@@ -74,4 +83,11 @@ __all__ = [
     "export_proof",
     "verify_proof",
     "AmcProofError",
+    "EXECUTION_API_VERSION",
+    "EXECUTION_PHASES",
+    "EXECUTION_VERBS",
+    "PHASE_STATES",
+    "ExecutionStatus",
+    "PendingApproval",
+    "VerificationReceipt",
 ]

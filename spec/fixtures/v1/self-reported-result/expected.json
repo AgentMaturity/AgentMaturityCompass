@@ -1,0 +1,18 @@
+{
+  "case": "self-reported-result",
+  "normative": true,
+  "dimensions": {
+    "integrity": "pass",
+    "issuerAdmission": "pass",
+    "scope": "pass",
+    "freshness": "pass",
+    "completeness": "pass",
+    "satisfaction": "not-evaluated"
+  },
+  "reasonCodes": {
+    "satisfaction": [
+      "NOT_RECOMPUTABLE"
+    ]
+  },
+  "exitCode": 3
+}

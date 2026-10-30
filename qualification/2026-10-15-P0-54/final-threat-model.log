@@ -1,0 +1,5 @@
+
+> agent-maturity-compass@1.2.0 check:threat-model /home/amc/.codex/worktrees/p0-54-qualification/AgentMaturityCompass
+> node scripts/check-threat-model.mjs
+
+check-threat-model: ok (/home/amc/.codex/worktrees/p0-54-qualification/AgentMaturityCompass/docs/security/channel-map.json)

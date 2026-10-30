@@ -1,0 +1,12 @@
+{
+  "key": "P2-19",
+  "acs": { "repository": "https://github.com/Agent-Control-Standard/ACS", "tag": "v0.1.4", "commit": "834f3f0d51e7bbbd9a68ff682bec89f97ddd72d8",
+    "tree": "37f9688e7a3181cc1cce4be4e3bff293faae8666", "wireVersion": "0.1.0" },
+  "officialVectors": "none published (ACS v0.1.4 docs/spec/conformance.md: no conformance test suite)",
+  "suite": "tests/acsConformance.test.ts",
+  "label": "AMC-authored fixtures; responses validated against the pinned, unmodified JSON Schemas in tests/fixtures/acs-v0.1.4/schema",
+  "cases": 8,
+  "passed": 8,
+  "failed": 0,
+  "schemaSelfChecks": { "specExamplesAccepted": 3, "malformedResponsesRejected": 2 }
+}

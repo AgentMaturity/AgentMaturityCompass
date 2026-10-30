@@ -1,0 +1,29 @@
+{
+  "initialProbeReport": {
+    "path": "/private/tmp/p0-22-actual-mutations-20261014.json",
+    "sha256": "ecf47435fa749e8626d26e9a7ec6f47a08b7307be2faa8189b3da98f748bae06"
+  },
+  "initialRegistryLimit": "Quickscore was removed from the exported array after index creation, so that phase proves index consistency detection only. It does not prove the keyword inventory omission contract.",
+  "refinedFault": "Remove score fail-secure from the actual exported array AND map in an isolated Vitest setup process, reproducing a source omission with a consistent index. Its actual inventory description matches the score keyword. No protected source file is edited.",
+  "refinedResult": {
+    "total": 8,
+    "passed": 7,
+    "failed": 1,
+    "pending": 0,
+    "todo": 0,
+    "rawSha256": "687f981843d010872949f989e5d324dd1e849cfb077f7db9bc83dcb0323c3c22",
+    "failedCases": [
+      "result command registry covers the built CLI has unique canonical paths and exactly one classification for every keyword description"
+    ]
+  },
+  "restoredResult": {
+    "total": 8,
+    "passed": 8,
+    "failed": 0,
+    "pending": 0,
+    "todo": 0,
+    "rawSha256": "a61898e2134891a428753b35de819a81f1010ff9802d30f21c36c8ba3dc1110f"
+  },
+  "protectedSourceUnchanged": true,
+  "hookArtifactRestored": true
+}

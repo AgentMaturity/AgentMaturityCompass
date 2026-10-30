@@ -17,9 +17,13 @@
  *   TAMPERED            the per-session chain (seq / prevSessionEventHash) or
  *                       the ledger's own hash/signature verification fails
  *   AGENT_MISMATCH      the requested agent differs from the signed session/open identity
+ *   ROLLBACK_DETECTED   the session journal is older than this machine's mark, or
+ *   FORK_DETECTED       holds other bytes at the marked sequence (P2-12)
  *   LIVE_WRITER         signed ownership still belongs to a live local process,
  *                       or a remote/unknown process whose death cannot be proved.
- *                       A turn seal and an elapsed timeout never release a writer.
+ *                       A turn seal and an elapsed timeout never release a writer;
+ *                       only an explicit `takeover` with a stated reason claims
+ *                       one whose lease lapsed one lease ago (P2-12).
  *   UNRECOVERED         recovery ran and did not reach RECOVERED
  *
  * What resumes is the SAME session: B's first row is `session/resume`, chained
@@ -34,18 +38,25 @@ import type { EvidenceEvent, RuntimeName } from "../types.js";
 import { recoverSession, type RecoveryClaimant, type RecoveryReport } from "./sessionRecovery.js";
 import { SessionService } from "./sessionService.js";
 import type { SessionLineage } from "./sessionApiTypes.js";
-import { assertSessionOwnerAvailable, SessionWriterRefused } from "./sessionOwnership.js";
+import { assertSessionOwnerAvailable, SessionWriterRefused, type WriterTakeover } from "./sessionOwnership.js";
+import { AntiRollbackError } from "../keys/highWater.js";
+import type { InterruptedCallOutcome } from "./resumeRules.js";
+import { assertSessionJournalCurrent, markSessionJournal } from "./writerFence.js";
 import { extractEnvelope, SESSION_ENVELOPE_META_KEY, SESSION_GENESIS } from "./sessionTypes.js";
-import { openHistoryReader } from "./sessionHistoryReader.js";
+import { openHistoryReader, SessionHistoryRefused } from "./sessionHistoryReader.js";
+import { selectForkPrefix, prepareForkConversation, copyForkConversation } from "./forkConversation.js";
+import { redactingSessionFor } from "../dataflow/redactingSession.js";
 import { authenticateJsonlContinuation, type AuthenticatedJsonlContinuation } from "./jsonlContinuation.js";
 import { realpathSync } from "node:fs";
+import { canonicalize } from "../utils/json.js";
 import { loadSessionEventHistory } from "./sessionEventHistory.js";
 import { assertSessionContinuationConfiguration, assertSessionContinuationControls, SessionContinuationControlRefused, type ContinuationControlRefusal } from "./sessionContinuationControls.js";
 
 export const SESSION_ENVELOPE_VERSION = 1;
 const DEFAULT_STALE_AFTER_MS = 60_000;
 
-export type ResumeRefusal = "MISSING" | "SEALED" | "UNSUPPORTED_FORMAT" | "TAMPERED" | "AGENT_MISMATCH" | "LIVE_WRITER" | "UNRECOVERED" | ContinuationControlRefusal;
+export type ResumeRefusal = "MISSING" | "SEALED" | "UNSUPPORTED_FORMAT" | "TAMPERED" | "ROLLBACK_DETECTED" | "FORK_DETECTED" | "AGENT_MISMATCH"
+  | "LIVE_WRITER" | "UNRECOVERED" | ContinuationControlRefusal;
 
 export class SessionResumeRefused extends Error {
   constructor(readonly code: ResumeRefusal, message: string, readonly details: readonly string[] = []) {
@@ -69,6 +80,8 @@ export interface ResumeSessionParams extends OpenIdentity {
   /** How old an unsealed tail must be before it is taken over. Default 60s. */
   readonly staleAfterMs?: number;
   readonly store?: SessionEventStore;
+  /** Claim a remote or unresponsive writer whose lease lapsed one lease ago; the reason is recorded in the claim row. */
+  readonly takeover?: { readonly reason: string };
 }
 
 export interface ResumeReport {
@@ -78,11 +91,17 @@ export interface ResumeReport {
   readonly resumedAfterSeq: number;
   /** Present when the tail was a crash and recovery closed it first. */
   readonly recovery: RecoveryReport | null;
+  /** How each interrupted call was settled after resume (P2-12), when the caller ran `reconcileInterruptedCalls`. */
+  readonly interruptedCalls?: readonly InterruptedCallOutcome[];
 }
 
 export interface ForkSessionParams extends OpenIdentity {
   readonly workspace: string;
   readonly parentSessionId: string;
+  /** Inclusive sealed parent turn; omit to snapshot its latest complete conversation. */
+  readonly forkTurn?: number;
+  /** Explicit legacy operation: record lineage without inheriting model context. */
+  readonly inheritConversation?: boolean;
   readonly claimant: RecoveryClaimant;
   readonly store?: SessionEventStore;
 }
@@ -166,6 +185,15 @@ function withReadOnlyStore<T>(params: { workspace: string; store?: SessionEventS
   } finally { reader.store.close(); }
 }
 
+/** P1-08's anti-rollback floor for the session journal (P2-12), decided from the rows just verified. */
+function assertJournalCurrent(params: { workspace: string; sessionId: string }, rows: readonly EvidenceEvent[]): void {
+  try { assertSessionJournalCurrent(params.workspace, params.sessionId, rows); }
+  catch (error) {
+    if (error instanceof AntiRollbackError) throw new SessionResumeRefused(error.code, error.message);
+    throw error;
+  }
+}
+
 function assertResumeAgent(rows: readonly EvidenceEvent[], agentId: string): void {
   const opened = rows.find(row => row.event_type === "session/open");
   if (opened === undefined || meta(opened).agentId !== agentId) {
@@ -194,6 +222,7 @@ export function resumeSession(params: ResumeSessionParams): { service: SessionSe
   });
   // Check identity before ownership takeover or crash recovery can append rows.
   assertResumeAgent(rows, params.agentId);
+  assertJournalCurrent(params, rows);
   if (!jsonl) {
     // SQLite's chain verifier alone does not pin the replacement composition or
     // reconstruct a missing parent controller. Authenticate the full original
@@ -215,7 +244,8 @@ export function resumeSession(params: ResumeSessionParams): { service: SessionSe
       throw error;
     }
   }
-  try { assertSessionOwnerAvailable(rows[rows.length - 1]!); }
+  let takeover: WriterTakeover | null;
+  try { takeover = assertSessionOwnerAvailable(rows[rows.length - 1]!, params.takeover); }
   catch (error) {
     if (error instanceof SessionWriterRefused) throw new SessionResumeRefused(error.code === "LIVE_WRITER" ? "LIVE_WRITER" : "UNSUPPORTED_FORMAT", error.message);
     throw error;
@@ -227,13 +257,18 @@ export function resumeSession(params: ResumeSessionParams): { service: SessionSe
     // 2. A crash after a side effect: recovery (its own writer, released when
     //    it returns) closes the turn synthetically and records what is unknown.
     //    Nothing is re-executed.
-    recovery = recoverSession({ workspace: params.workspace, sessionId: params.sessionId, claimant: params.claimant, staleAfterMs, ...(params.store ? { store: params.store } : {}) });
+    recovery = recoverSession({ workspace: params.workspace, sessionId: params.sessionId, claimant: params.claimant, staleAfterMs,
+      ...(params.store ? { store: params.store } : {}), ...(takeover === null ? {} : { takeover: { reason: takeover.reason } }) });
     if (recovery.verdict !== "RECOVERED") {
       throw new SessionResumeRefused("UNRECOVERED", `crash recovery ended ${recovery.verdict}${recovery.reason ? `: ${recovery.reason}` : ""}`);
     }
+    // Recovery released its own claim, so the resume below claims a released owner: no takeover is left to record.
+    takeover = null;
     rows = withReadOnlyStore(params, (store) => verifiedRows({ workspace: params.workspace, sessionId: params.sessionId, store }, false));
   }
   const head = rows[rows.length - 1]!;
+  // This machine accepted this head: an older journal restored later, or a fork of it, is refused from now on.
+  markSessionJournal(params.workspace, params.sessionId, head);
 
   // Re-authenticate under the JSONL mutex, before append descriptors are opened.
   // The SQLite path retains its existing immediate-transaction head fence.
@@ -253,7 +288,8 @@ export function resumeSession(params: ResumeSessionParams): { service: SessionSe
       policyDigest: params.policyDigest,
       claimant: params.claimant,
       observedHeadEventId: head.id,
-      observedHeadEventHash: head.event_hash
+      observedHeadEventHash: head.event_hash,
+      ...(takeover === null ? {} : { takeover })
     });
     if (jsonl) {
       const boundary = { auditType: "NATIVE_JSONL_RESUME_BOUNDARY", agentId: params.agentId,
@@ -281,23 +317,46 @@ export function resumeSession(params: ResumeSessionParams): { service: SessionSe
   }
 }
 
-/**
- * A new session whose `session/open` row names the parent's VERIFIED final row.
- * The parent may be sealed or live; it is read, never written.
- */
+/** A fresh signed conversation snapshot at a verified parent prefix. Parent rows are never written. */
 export function forkSession(params: ForkSessionParams): { service: SessionService; parent: SessionLineage } {
-  const rows = withReadOnlyStore(params, (store) => verifiedRows({ workspace: params.workspace, sessionId: params.parentSessionId, store }, true));
-  const last = rows[rows.length - 1]!;
-  const parent: SessionLineage = { sessionId: params.parentSessionId, finalEventHash: last.event_hash, seq: extractEnvelope(last.meta_json)!.seq };
+  const prepared = (() => {
+    try {
+      return withReadOnlyStore(params, store => {
+        const all = verifiedRows({ workspace: params.workspace, sessionId: params.parentSessionId, store }, true);
+        // Authenticate the actual selected rows too: a supplied store is not authority to change their roles or metadata.
+        const persisted = loadSessionEventHistory({ workspace: params.workspace, sessionId: params.parentSessionId }).events
+          .filter(row => extractEnvelope(row.meta_json) !== null);
+        if (canonicalize(all) !== canonicalize(persisted)) {
+          throw new SessionResumeRefused("TAMPERED", "the supplied parent rows differ from authenticated persisted history");
+        }
+        // A fork inherits the parent's conversation and lineage: only the agent that opened the parent may fork it.
+        assertResumeAgent(all, params.agentId);
+        if (params.inheritConversation !== undefined && typeof params.inheritConversation !== "boolean") {
+          throw new SessionResumeRefused("UNSUPPORTED_FORMAT", "inheritConversation must be a boolean");
+        }
+        const selected = params.inheritConversation === false ? { rows: all, forkTurn: undefined } : selectForkPrefix(all, params.forkTurn);
+        const parts = params.inheritConversation === false ? [] : prepareForkConversation(params.workspace, selected.rows);
+        const last = selected.rows.at(-1)!;
+        const parent: SessionLineage = { sessionId: params.parentSessionId, finalEventHash: last.event_hash,
+          seq: extractEnvelope(last.meta_json)!.seq, ...(selected.forkTurn === undefined ? {} : { forkTurn: selected.forkTurn }) };
+        return { parent, parts };
+      });
+    } catch (error) {
+      if (error instanceof SessionHistoryRefused) throw new SessionResumeRefused(
+        error.code === "UNSUPPORTED_FORMAT" || error.code === "MISSING" ? error.code : error.code === "UNSEALED" ? "UNRECOVERED" : "TAMPERED", error.message);
+      throw error;
+    }
+  })();
   const store = params.store ?? openSessionEventStore(params.workspace);
   const service = new SessionService(params.workspace, store);
-  service.open({
-    runtime: params.runtime,
-    agentId: params.agentId,
-    harnessVersion: params.harnessVersion,
-    compositionDigest: params.compositionDigest,
-    policyDigest: params.policyDigest,
-    parent
-  });
-  return { service, parent };
+  try {
+    service.open({ runtime: params.runtime, agentId: params.agentId, harnessVersion: params.harnessVersion,
+      compositionDigest: params.compositionDigest, policyDigest: params.policyDigest, parent: prepared.parent });
+    copyForkConversation(redactingSessionFor(service), prepared.parts);
+    return { service, parent: prepared.parent };
+  } catch (error) {
+    // Retain failed child evidence without returning a partially copied context.
+    try { service.close({ reason: "fork_failed" }); } catch { service.disposeWithoutClosing(); }
+    throw error;
+  }
 }

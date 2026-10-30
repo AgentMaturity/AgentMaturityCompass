@@ -1,0 +1,342 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-32",
+  "date": "2026-10-11",
+  "commit": "60d0255c43f7a54bae88e665e38d326b3232fcd5",
+  "branch": "rtd/p0-32-done-contract",
+  "node": "v25.5.0 (vitest, checks, gate); v22.23.3 (installed RC import)",
+  "pnpm": "10.33.0",
+  "os": "darwin (macOS 26.6.2)",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "npx vitest run tests/importProvenance.test.ts tests/neutralImporter.test.ts",
+      "exit": 0,
+      "durationMs": 9153
+    },
+    {
+      "cmd": "npx vitest run tests/piSessionImport.test.ts tests/piSessionImportBoundaries.test.ts tests/traceFailureUnknownTime.test.ts tests/traceIngestionTiming.test.ts",
+      "exit": 0,
+      "durationMs": 2591
+    },
+    {
+      "cmd": "npx vitest run tests/cleanSourceDocs.test.ts",
+      "exit": 0,
+      "durationMs": 284
+    },
+    {
+      "cmd": "npx vitest run tests/agentLoopRetry.test.ts tests/providerToolNameBinding.test.ts tests/providerToolNames.test.ts",
+      "exit": 0,
+      "durationMs": 8204
+    },
+    {
+      "cmd": "npx vitest run tests/reconciliationDefectsReleaseGate.test.ts tests/releaseGateExecution.test.ts",
+      "exit": 0,
+      "durationMs": 247
+    },
+    {
+      "cmd": "npx vitest run tests/surfaceHistoryCompaction.test.ts",
+      "exit": 0,
+      "durationMs": 8627
+    },
+    {
+      "cmd": "npx vitest run tests/bundleSpill.test.ts tests/cliSpillCommands.test.ts tests/retentionSpill.test.ts tests/sessionSpillCommitment.test.ts tests/sessionSpillRead.test.ts tests/spillEncryption.test.ts tests/spillLifecycle.test.ts",
+      "exit": 0,
+      "durationMs": 18313
+    },
+    {
+      "cmd": "npx vitest run tests/nativeDelegationInheritance.test.ts tests/subagentHookInheritance.test.ts",
+      "exit": 0,
+      "durationMs": 9239
+    },
+    {
+      "cmd": "npx vitest run tests/architectureBoundaries.test.ts",
+      "exit": 0,
+      "durationMs": 4728
+    },
+    {
+      "cmd": "npx vitest run tests/apiRouters.test.ts tests/guardrailControlState.test.ts",
+      "exit": 0,
+      "durationMs": 9746
+    },
+    {
+      "cmd": "npx vitest run tests/apiRequestErrorRoutes.test.ts tests/apiRouterResponseParity.test.ts",
+      "exit": 0,
+      "durationMs": 3700
+    },
+    {
+      "cmd": "npm run -s check:clean-source",
+      "exit": 0,
+      "durationMs": 67042
+    },
+    {
+      "cmd": "node scripts/release-gate.mjs --quick --out <scratch>/release-gate-quick.json",
+      "exit": 0,
+      "durationMs": 145684
+    },
+    {
+      "cmd": "npm run -s check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 2159
+    },
+    {
+      "cmd": "npm install --offline --no-audit --no-fund <P0-31 RC tarball> (new prefix, Node 22)",
+      "exit": 0,
+      "durationMs": 8000
+    },
+    {
+      "cmd": "gh pr view 22 --repo AgentMaturity/AgentMaturityCompass --json number,title,state,mergedAt,baseRefName,headRefName,mergeCommit,url",
+      "exit": 0,
+      "durationMs": 1223
+    },
+    {
+      "cmd": "gh pr view 22 --repo AgentMaturity/AgentMaturityCompass --json headRefOid,baseRefOid,commits",
+      "exit": 0,
+      "durationMs": 610
+    },
+    {
+      "cmd": "gh pr checks 22 --repo AgentMaturity/AgentMaturityCompass",
+      "exit": 0,
+      "durationMs": 1219
+    },
+    {
+      "cmd": "gh pr list --repo AgentMaturity/AgentMaturityCompass --state all --search \"lifecycle readiness\" --json number,title,state,mergedAt",
+      "exit": 0,
+      "durationMs": 695
+    },
+    {
+      "cmd": "gh run view 38132701944 --repo AgentMaturity/AgentMaturityCompass --json jobs,headSha,headBranch,event,conclusion,url",
+      "exit": 0,
+      "durationMs": 1651
+    },
+    {
+      "cmd": "git merge-base --is-ancestor 2a42d6b3 origin/main",
+      "exit": 0,
+      "durationMs": 64
+    },
+    {
+      "cmd": "git merge-base --is-ancestor a0f3644d origin/main",
+      "exit": 0,
+      "durationMs": 56
+    },
+    {
+      "cmd": "git merge-base --is-ancestor 07660bdd origin/main",
+      "exit": 0,
+      "durationMs": 50
+    },
+    {
+      "cmd": "git merge-base --is-ancestor 2a42d6b3 220887d28 (PR #22 head)",
+      "exit": 0,
+      "durationMs": 41
+    },
+    {
+      "cmd": "git merge-base --is-ancestor a0f3644d 220887d28 (PR #22 head)",
+      "exit": 0,
+      "durationMs": 50
+    },
+    {
+      "cmd": "git merge-base --is-ancestor 07660bdd 220887d28 (PR #22 head)",
+      "exit": 0,
+      "durationMs": 45
+    },
+    {
+      "cmd": "git merge-base --is-ancestor 2b4e35ffc origin/main (PR #22 squash merge)",
+      "exit": 0,
+      "durationMs": 45
+    },
+    {
+      "cmd": "git grep -n -E \"413|Internal error\" -- 'tests/api*.test.ts'",
+      "exit": 0,
+      "durationMs": 65
+    },
+    {
+      "cmd": "git grep -n -i -E \"request[ _-]?id\" -- src/api",
+      "exit": 0,
+      "durationMs": 109
+    },
+    {
+      "cmd": "git grep -n \"413\" -- tests/guardrailControlState.test.ts",
+      "exit": 0,
+      "durationMs": 40
+    },
+    {
+      "cmd": "git grep -n -E \"scoring failed|Could not load question sets\" -- tests",
+      "exit": 1,
+      "durationMs": 177
+    },
+    {
+      "cmd": "git grep -n \"build:workspace\" -- src",
+      "exit": 1,
+      "durationMs": 154
+    },
+    {
+      "cmd": "amc import <fixture-pi> --agent default --no-retain-original --json (installed RC, Node 22)",
+      "exit": 0,
+      "durationMs": 1595
+    },
+    {
+      "cmd": "amc import <fixture-config> --agent default --no-retain-original (installed RC, Node 22)",
+      "exit": 0,
+      "durationMs": 1130
+    },
+    {
+      "cmd": "amc imports show <importId> --json (installed RC, Node 22)",
+      "exit": 0,
+      "durationMs": 926
+    },
+    {
+      "cmd": "git status --porcelain (after all runs)",
+      "exit": 0,
+      "durationMs": 84
+    },
+    {
+      "cmd": "npm run -s build",
+      "exit": 0,
+      "durationMs": 46633
+    },
+    {
+      "cmd": "npm run -s typecheck",
+      "exit": 0,
+      "durationMs": 36129
+    },
+    {
+      "cmd": "npm run -s typecheck:tests",
+      "exit": 0,
+      "durationMs": 70219
+    },
+    {
+      "cmd": "npm run -s lint",
+      "exit": 0,
+      "durationMs": 4145
+    },
+    {
+      "cmd": "npm run -s check:counts",
+      "exit": 0,
+      "durationMs": 1086
+    },
+    {
+      "cmd": "npm run -s check:docs-drift",
+      "exit": 0,
+      "durationMs": 750
+    },
+    {
+      "cmd": "npm run -s check:freeze",
+      "exit": 0,
+      "durationMs": 3661
+    },
+    {
+      "cmd": "npm run -s check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 3362
+    },
+    {
+      "cmd": "npm run -s check:gates",
+      "exit": 0,
+      "durationMs": 637
+    },
+    {
+      "cmd": "npm run -s check:schemas",
+      "exit": 0,
+      "durationMs": 1068
+    },
+    {
+      "cmd": "npm run -s check:api-ref",
+      "exit": 0,
+      "durationMs": 448
+    },
+    {
+      "cmd": "npm run -s check:threat-model",
+      "exit": 0,
+      "durationMs": 588
+    },
+    {
+      "cmd": "npm run -s check:duplicates",
+      "exit": 0,
+      "durationMs": 1423
+    },
+    {
+      "cmd": "npm run -s check:dead-code",
+      "exit": 0,
+      "durationMs": 6001
+    },
+    {
+      "cmd": "npm run -s check:qualification",
+      "exit": 0,
+      "durationMs": 466
+    },
+    {
+      "cmd": "node <SP>/needs-snapshot.mjs int",
+      "exit": 0,
+      "durationMs": 432
+    }
+  ],
+  "tests": {
+    "total": 565,
+    "passed": 565,
+    "failed": 0,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "AMC-1506/installed-import/diagnostic-report-pi.json",
+      "sha256": "aabc7a167c7176516afef9751a105bea28ea66a724446fba6522243a722ce5b6"
+    },
+    {
+      "path": "AMC-1506/installed-import/environment.json",
+      "sha256": "b89e239e07fa22791692cb5dfece4397dc9195c69aa22c423134c201417c76ce"
+    },
+    {
+      "path": "AMC-1506/installed-import/fixture-config/agent.config.json",
+      "sha256": "5c6d3eca75cdc8dddbdeecdb7b3eb9d498e08df0f330eddcf68ba43bf7b0eea8"
+    },
+    {
+      "path": "AMC-1506/installed-import/fixture-pi/pi-session.jsonl",
+      "sha256": "f485025150b311c440d0dc154c0b20a54a932e8090ab6202750a0c2c4d6141cb"
+    },
+    {
+      "path": "AMC-1506/installed-import/import-config.txt",
+      "sha256": "93b92092a9fa2ebe1670161e30d6570a1e75ea2f13f27eb8500bf312ea16bf3b"
+    },
+    {
+      "path": "AMC-1506/installed-import/import-pi.json",
+      "sha256": "9201c92738731a9071f3e7658b8e4a48d5919b8505d6ecbc6b20ce588e12c260"
+    },
+    {
+      "path": "AMC-1506/reconciliation-summary.json",
+      "sha256": "e9290c47bb40aba9655d3bba329c9629db4a1774e05bdcf7d5d7c867442ca5f6"
+    },
+    {
+      "path": "AMC-1507/reconciliation-summary.json",
+      "sha256": "92ab73761fc2406876041d25be7a4528333056197dacd7b339d6ab39871916e7"
+    },
+    {
+      "path": "AMC-1509/clean-source.txt",
+      "sha256": "b1eed03cf1fa8f65b9e4ca5753be235575ad65cd178eadd3810b34a77ae21d14"
+    },
+    {
+      "path": "AMC-1509/hosted-clean-source.json",
+      "sha256": "df1df2de5682e480b93d8ed1216afa444eaed0a0a075d741c75509d2e24e9131"
+    },
+    {
+      "path": "AMC-1509/reconciliation-summary.json",
+      "sha256": "3526851d2349c8a4ed7050e811eceb32626a54c3ff04e996544a5fa83f7600db"
+    },
+    {
+      "path": "done-notes.json",
+      "sha256": "c06a15ef9d16ca5cf2bf91fa1b7d7df45455d617db1f138f52af6c3da861c1e5"
+    },
+    {
+      "path": "focused-tests.json",
+      "sha256": "e96020dc52f3e30e140eb50dc43125eae5e76bbc3a4b15edd2650129283bc857"
+    },
+    {
+      "path": "pr-22.json",
+      "sha256": "98797cb3ccf4f3ce52d53873356cd8ea1fdbe9a2c73120de8da1ec259533e238"
+    },
+    {
+      "path": "release-gate-quick.json",
+      "sha256": "db63f1d1e9c2721451bd5281eabcdb2c9873e1ac2557f70af9c9465ae5dfc36d"
+    }
+  ],
+  "notes": "P0-32 close-out C: Done notes for nine old issues, with focused tests re-run at the base commit (int 60d0255c4, the parent of this branch). Local run on macOS 26.6.2 arm64, not CI. Non-zero exits: the two git grep commands for \"scoring failed|Could not load question sets\" in tests and \"build:workspace\" in src exit 1 because nothing matched, which is the recorded finding (no score-router 500 test; no stale build:workspace message). The quick release gate passed 16/16 executed checks and skipped 5 by design (packed-install, full-test-suite, per-file-coverage, install-persona-qa, live-deploy-health); installed acceptance comes from P0-31, not from this gate. tests are the sum of the eleven focused vitest runs in focused-tests.json, not the full suite. The gh commands are read-only. No original from the untracked research folder was read or copied; the three reconciliation summaries come from candidate commit 37c1466b via git show."
+}

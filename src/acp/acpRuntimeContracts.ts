@@ -6,6 +6,7 @@ import { ACP_MAX_SESSION_ROWS, ACP_MAX_TURN_UPDATE_BYTES } from "./acpCommittedU
 import { ACP_ERROR, AcpFailure } from "./acpErrors.js";
 import { acpSupportsImageInput, type AcpPromptBlock, type AcpPromptRoute } from "./acpPromptInput.js";
 import { ACP_NATIVE_AUDIO_CONTRACT, acpSupportsAudioInput } from "./acpAudioInput.js";
+import { EXECUTION_API_VERSION } from "../execution/executionContract.js";
 
 /** Shared wire contract for SDKs. None of these declarations is a cold-verifier verdict. */
 export const ACP_RUNTIME_META_KEY = "dev.agentmaturity.amc";
@@ -13,6 +14,10 @@ export const ACP_RUNTIME_FORMAT = "amc-acp-runtime@1";
 export const ACP_MAX_UPDATE_PARAMS_BYTES = 900_000;
 /** Where a spawning composer (Studio native tasks, P1-67) hands `amc acp` the lease it minted for that process. */
 export const NATIVE_TASK_LEASE_ENV = "AMC_NATIVE_TASK_LEASE";
+/** The Studio principal a native task belongs to (P1-78), recorded as the initiator of the approvals its runtime raises. */
+export const NATIVE_TASK_INITIATOR_ENV = "AMC_NATIVE_TASK_INITIATOR";
+/** The system prompt Studio composed for a native task's agent (P2-37, src/studio/nativeTaskContext.ts); read and unset at startup. */
+export const NATIVE_TASK_SYSTEM_PROMPT_ENV = "AMC_NATIVE_TASK_SYSTEM_PROMPT";
 export const ACP_RUNTIME_LIMITS = Object.freeze({
   inputFrameBytes: MAX_WIRE_LINE_BYTES,
   updateParamsBytes: ACP_MAX_UPDATE_PARAMS_BYTES,
@@ -29,8 +34,13 @@ export interface AcpForkSessionParams {
   readonly workspace: string;
   readonly agentId: string;
   readonly signal: AbortSignal;
+  /** The child's own lease (P1-79), minted before the factory runs; compose the child with it (`AgentSessionInit.leaseToken`). */
+  readonly leaseToken?: string;
 }
 export type AcpForkSessionFactory = (params: AcpForkSessionParams) => AgentSession | Promise<AgentSession>;
+/** `_amc/session/fork` (P2-13): the CLI's --fork-from. The child's signed open row names the verified parent's final row;
+ * it starts with no inherited model context, so it is never advertised as the standard context-inheriting `session/fork`. */
+const ACP_LINEAGE_FORK = "verified-parent-reference";
 
 export function nativeAcpCapabilities(options: {
   readonly route?: AcpPromptRoute;
@@ -38,6 +48,7 @@ export function nativeAcpCapabilities(options: {
   readonly audioInput?: boolean;
   readonly loadSession: boolean;
   readonly forkSession: boolean;
+  readonly lineageFork?: boolean;
   readonly nativeExecution?: { readonly tools: "none" | "workspace"; readonly signedApprovalGate: boolean;
     readonly reviewedMcpConfigured: boolean; readonly taskValidation?: boolean };
 }) {
@@ -49,6 +60,8 @@ export function nativeAcpCapabilities(options: {
     promptCapabilities: Object.freeze({ image, audio, embeddedContext: false }),
     _meta: Object.freeze({ [ACP_RUNTIME_META_KEY]: Object.freeze({
       ...(options.nativeExecution ?? {}),
+      // The execution contract version each SDK pins (P2-13). Phases ride on prompt results of native compositions only.
+      executionApi: EXECUTION_API_VERSION,
       runtimeFormat: ACP_RUNTIME_FORMAT,
       committedUpdates: "live-completed-blocks" as const,
       verification: "not-verified" as const,
@@ -56,6 +69,7 @@ export function nativeAcpCapabilities(options: {
       limits: ACP_RUNTIME_LIMITS,
       ...(options.loadSession ? { releaseSession: true } : {}),
       ...(options.forkSession ? { forkContext: "authenticated-parent-history" as const } : {}),
+      ...(options.lineageFork ? { lineageFork: ACP_LINEAGE_FORK } : {}),
       ...(image && options.orderedImageInput === true ? { orderedImageInput: NATIVE_ORDERED_INPUT_FORMAT } : {}),
       ...(audio ? { audioInput: ACP_NATIVE_AUDIO_CONTRACT } : {})
     }) })

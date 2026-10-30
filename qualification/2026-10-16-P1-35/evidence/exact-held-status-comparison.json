@@ -1,0 +1,4 @@
+{
+  "exactPrior18StatusRows": true,
+  "comparison": "final heldRStatus.splitlines() == provider closure status list; initial raw string/list comparison was invalid, no preservation failure inferred"
+}

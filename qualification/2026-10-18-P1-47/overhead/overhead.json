@@ -1,0 +1,131 @@
+{
+  "schemaVersion": "p1-47-overhead/1",
+  "label": "scripted; measures added latency only; never a result",
+  "environment": "local macOS arm64, colima Docker VM, not CI; host load not controlled",
+  "startedAt": "2026-10-18T07:49:18.714Z",
+  "finishedAt": "2026-10-18T08:31:44.300Z",
+  "loadAverage1m5m15m": {
+    "before": [
+      19.125,
+      19.958984375,
+      48.85888671875
+    ],
+    "after": [
+      32.66796875,
+      26.00830078125,
+      26.638671875
+    ]
+  },
+  "sessions": 5,
+  "callsPerSession": 200,
+  "variants": {
+    "pi-contained": {
+      "sessions": 5,
+      "exits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "toolResults": 1000,
+      "refusedResults": 0,
+      "roundTripMs": {
+        "n": 1000,
+        "p50": 15.83,
+        "p95": 84.76,
+        "mean": 26.27
+      },
+      "bridgeRoutesMs": {}
+    },
+    "pi-contained-amc-tuned-allow": {
+      "sessions": 5,
+      "exits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "toolResults": 1000,
+      "refusedResults": 0,
+      "roundTripMs": {
+        "n": 1000,
+        "p50": 1251.26,
+        "p95": 2746.16,
+        "mean": 1464.49
+      },
+      "bridgeRoutesMs": {
+        "/bridge/hooks/control/v1": {
+          "n": 2005,
+          "p50": 457.42,
+          "p95": 1023.84,
+          "mean": 528.96
+        },
+        "/bridge/hooks/aep/0.1/events": {
+          "n": 2000,
+          "p50": 106.73,
+          "p95": 351.92,
+          "mean": 149.64
+        }
+      }
+    },
+    "pi-contained-amc-tuned-deny": {
+      "sessions": 5,
+      "exits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "toolResults": 1000,
+      "refusedResults": 1000,
+      "roundTripMs": {
+        "n": 1000,
+        "p50": 676.93,
+        "p95": 1582.77,
+        "mean": 792.53
+      },
+      "bridgeRoutesMs": {
+        "/bridge/hooks/control/v1": {
+          "n": 1005,
+          "p50": 473.58,
+          "p95": 1097.13,
+          "mean": 557.14
+        },
+        "/bridge/hooks/aep/0.1/events": {
+          "n": 1000,
+          "p50": 130.77,
+          "p95": 324.43,
+          "mean": 159.13
+        }
+      }
+    }
+  },
+  "addedRoundTripVsBaseMs": {
+    "pi-contained-amc-tuned-allow": {
+      "p50": 1235.43,
+      "p95": 2661.4,
+      "medianRatio": 78.04
+    },
+    "pi-contained-amc-tuned-deny": {
+      "p50": 661.1,
+      "p95": 1498.01,
+      "medianRatio": 41.76
+    }
+  },
+  "decisionLatencyHostInProcessMs": {
+    "calls": 1000,
+    "allowed": 999,
+    "n": 1000,
+    "p50": 988.22,
+    "p95": 1967.95,
+    "mean": 1054.55
+  },
+  "notes": [
+    "Added round trip = the AMC variant's quantile minus the baseline's quantile, not a quantile of paired differences.",
+    "The allow variant's AMC workspace carries P1-22's synthetic conformance fixture run so reads execute; it is a latency fixture, never a trust claim.",
+    "The deny variant has no run: AMC marks the configuration untrusted and denies every call, as the pilot's AMC setups do on a fresh workspace."
+  ]
+}

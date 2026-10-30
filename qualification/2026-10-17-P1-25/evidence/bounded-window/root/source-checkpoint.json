@@ -1,0 +1,16 @@
+{
+  "schema": "p125w-source-checkpoint/1",
+  "at": "2026-10-17T00:13:00.972461+00:00",
+  "commit": "f11a15ae06a318e0ce9a4c778269b2020af4eb7c",
+  "parent": "ac7759702ecbfda304b57e78eb1bd946340adc0f",
+  "branch": "codex/p1-25-window-qualification",
+  "paths": [
+    "tests/time/checkpointWindow.test.ts",
+    "tests/time/tsaTestFixture.ts"
+  ],
+  "ordinaryCommitExit": 0,
+  "sourceCleanIndexEmpty": true,
+  "source22AndTwelveChecks0": true,
+  "globalQualityStillRedUnwaived": true,
+  "noFreshOrControlOrWholeIssueCreditYet": true
+}

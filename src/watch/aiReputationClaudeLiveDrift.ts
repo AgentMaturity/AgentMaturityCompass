@@ -8,9 +8,11 @@
  * from, authenticates to, or verifies anything with that vendor, so a receipt
  * attests only to the data the caller provided.
  */
+import type { EvidenceOutcome } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import {
+  guardedDrop,
   runLiveScoreBehaviorDrift,
   type LiveDriftAlert,
   type LiveDriftMetricId,
@@ -125,6 +127,7 @@ export interface RunAiReputationClaudeLiveDriftInput {
 
 export interface AiReputationClaudeDistribution {
   rowCount: number;
+  evidenceOutcome: EvidenceOutcome;
   reputationScoreMean0to1: number;
   sentimentScoreMean0to1: number;
   responseQualityMean0to1: number;
@@ -133,7 +136,7 @@ export interface AiReputationClaudeDistribution {
   hallucinatedCitationRate0to1: number;
   piiLeakRate0to1: number;
   policyComplianceMean0to1: number;
-  evidenceCoverage0to1: number;
+  evidenceCoverage0to1: number | null;
   reviewPlatformDistribution: Record<string, number>;
   reputationTaskDistribution: Record<string, number>;
   contextDistribution: Record<string, number>;
@@ -148,7 +151,7 @@ export interface AiReputationClaudeScoreDrift {
   hallucinatedCitationRateIncrease0to1: number;
   piiLeakRate0to1: number;
   policyComplianceDrop0to1: number;
-  evidenceCoverageDrop0to1: number;
+  evidenceCoverageDrop0to1: number | null;
 }
 
 export interface AiReputationClaudeBehaviorDrift {
@@ -318,10 +321,11 @@ function distribution(rows: AiReputationClaudeReceiptRow[]): AiReputationClaudeD
     hallucinatedCitationRate0to1: mean(rows.map((row) => row.hallucinatedCitationRate0to1)),
     piiLeakRate0to1: mean(rows.map((row) => row.piiLeakRate0to1)),
     policyComplianceMean0to1: mean(rows.map((row) => row.responsePolicyCompliance0to1)),
-    evidenceCoverage0to1: mean(rows.map((row) => row.evidenceCoverage0to1), rows.length === 0 ? 1 : 0),
+    evidenceCoverage0to1: mean(rows.map((row) => row.evidenceCoverage0to1), null),
     reviewPlatformDistribution: labelDistribution(rows, (row) => row.reviewPlatform),
     reputationTaskDistribution: labelDistribution(rows, (row) => row.reputationTask),
     contextDistribution: labelDistribution(rows, contextLabel),
+    evidenceOutcome: rows.length > 0 ? "measured" : "not_evaluated",
   };
 }
 
@@ -346,7 +350,7 @@ export function runAiReputationClaudeLiveDrift(input: RunAiReputationClaudeLiveD
     hallucinatedCitationRateIncrease0to1: round(Math.max(0, liveDistribution.hallucinatedCitationRate0to1 - baselineDistribution.hallucinatedCitationRate0to1)),
     piiLeakRate0to1: liveDistribution.piiLeakRate0to1,
     policyComplianceDrop0to1: round(Math.max(0, baselineDistribution.policyComplianceMean0to1 - liveDistribution.policyComplianceMean0to1)),
-    evidenceCoverageDrop0to1: round(Math.max(0, baselineDistribution.evidenceCoverage0to1 - liveDistribution.evidenceCoverage0to1)),
+    evidenceCoverageDrop0to1: guardedDrop(true, baselineDistribution.evidenceCoverage0to1, liveDistribution.evidenceCoverage0to1),
   };
   const behaviorDrift: AiReputationClaudeBehaviorDrift = {
     platformDivergence0to1: totalVariationDistance(baselineDistribution.reviewPlatformDistribution, liveDistribution.reviewPlatformDistribution),
@@ -378,8 +382,8 @@ export function runAiReputationClaudeLiveDrift(input: RunAiReputationClaudeLiveD
   if (scoreDrift.policyComplianceDrop0to1 > thresholds.maxPolicyComplianceDrop0to1) {
     additionalAlerts.push(buildAlert(input, "aiReputationPolicyCompliance0to1", scoreDrift.policyComplianceDrop0to1, thresholds.maxPolicyComplianceDrop0to1, "Live AI Reputation Claude response-policy compliance dropped beyond threshold.", "high"));
   }
-  if (liveDistribution.evidenceCoverage0to1 < thresholds.minEvidenceCoverage0to1) {
-    additionalAlerts.push(buildAlert(input, "aiReputationEvidenceCoverage0to1", liveDistribution.evidenceCoverage0to1, thresholds.minEvidenceCoverage0to1, "Live AI Reputation Claude rows are missing source/no-license, README, agent roster, skill catalog, install, review-source, sentiment, competitor, response-policy, crisis, report, result, drift, alert, evidence, or signed-evidence proof.", "critical"));
+  if (liveDistribution.evidenceCoverage0to1 === null || liveDistribution.evidenceCoverage0to1 < thresholds.minEvidenceCoverage0to1) {
+    additionalAlerts.push(buildAlert(input, "aiReputationEvidenceCoverage0to1", liveDistribution.evidenceCoverage0to1, thresholds.minEvidenceCoverage0to1, liveDistribution.evidenceCoverage0to1 === null ? "Live evidence missing; coverage is not evaluated." : "Live AI Reputation Claude rows are missing source/no-license, README, agent roster, skill catalog, install, review-source, sentiment, competitor, response-policy, crisis, report, result, drift, alert, evidence, or signed-evidence proof.", "critical"));
   }
   if (behaviorDrift.platformDivergence0to1 > thresholds.maxPlatformDivergence0to1) {
     additionalAlerts.push(buildAlert(input, "aiReputationPlatformDistribution", behaviorDrift.platformDivergence0to1, thresholds.maxPlatformDivergence0to1, "Live AI Reputation Claude review-platform distribution diverged beyond threshold.", "medium"));

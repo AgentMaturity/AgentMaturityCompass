@@ -1,0 +1,22 @@
+{
+  "schema": "p125w-runtime-audit-preparation-actual-pin-addendum/1",
+  "at": "2026-10-17T00:08:40.078487+00:00",
+  "sealedAdaptersUnchanged": {
+    "seal": "/private/tmp/p1-25-window-qualification-20261017/runtime-audit-preparation/seal.json",
+    "bytes": 2368,
+    "sha256": "75e8b6bef1d9d8f0029f7214042cc24c65a5396bf1f11286d3a0544644d25981"
+  },
+  "actualRuntimeProtectedInputs": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/runtime-protected-inputs.json",
+    "bytes": 78069,
+    "sha256": "f84cd7442210621575ebb659e8fb783fc5764dea3222b7aa5bdccefc0473b725",
+    "schema": "p125w-runtime-protected-inputs-after-two-own-source-successors/1",
+    "protectedRows": 151,
+    "priorNatives": 10
+  },
+  "actualMetadataReadOnlyNoRowBodiesRecheckedHere": true,
+  "adaptersDoNotConsumeOrAlterThisProtectionPin": true,
+  "all14AuthorInputPinsAndEightOutputPinsRecheckedExact": true,
+  "noHelperImportParseCompileExecuteOrSourceIndexQaWrites": true,
+  "runtimeOutcomeAuditOrPassCountsClaimed": false
+}

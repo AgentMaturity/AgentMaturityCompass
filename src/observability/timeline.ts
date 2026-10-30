@@ -1,3 +1,4 @@
+import { mean } from "../experiments/stats.js";
 import { readdirSync } from "node:fs";
 import { basename, join } from "node:path";
 import { getAgentPaths } from "../fleet/paths.js";
@@ -132,8 +133,7 @@ function normalizeAgent(meta: Record<string, unknown>): string | null {
 }
 
 function average(values: number[]): number {
-  if (values.length === 0) return 0;
-  return values.reduce((sum, value) => sum + value, 0) / values.length;
+  return mean(values);
 }
 
 function dedupeStrings(values: string[]): string[] {

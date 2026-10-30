@@ -15,7 +15,7 @@ import Hmr from "@amc/cordis-plugin-hmr";
 import group from "@amc/cordis-plugin-group";
 import timer from "@amc/cordis-plugin-timer";
 import { watchFibers, describeUnsettled, type UnsettledFiber } from "./bootAudit.ts";
-import { loadComposition, type CompositionSource } from "./composition.ts";
+import { admitCompositionBytes, loadComposition, type CompositionSignatureVerifier, type CompositionSource } from "./composition.ts";
 
 export interface BootOptions {
   /** Workspace root; the composition file is resolved beneath it. */
@@ -29,8 +29,27 @@ export interface BootOptions {
    * that sells tamper-evident evidence the plugin tree — which decides what is
    * enforced and what is recorded — is the last thing that should be editable
    * without attestation.
+   *
+   * Default false: unsigned development compositions keep booting and their
+   * `signature` status says unverified.
+   *
+   * boot() is LIBRARY-ONLY (GAP-WP39 decision). No native surface boots
+   * amc.cordis.yml: agent-loop, ACP, Studio native tasks, the SDK and delegated
+   * children all compose through composeNativeAgent / runComposedTurn, whose
+   * services take per-run inputs (the session, routes, credentials, prompt
+   * profile, approval gate) that a static workspace file cannot carry. Booting
+   * a workspace-writable YAML on that path would also make the file decide
+   * which code loads under a governed run -- broader executable composition
+   * than WP12's admission was built to authorise. `amc composition` reports
+   * `bootedBy: []` so an operator is not told otherwise.
    */
   requireSignature?: boolean;
+  /**
+   * Authenticates the composition signature (the main package builds it from
+   * the workspace's admitted key history). Without it no signature verifies,
+   * so requireSignature refuses every composition.
+   */
+  verifySignature?: CompositionSignatureVerifier;
   /** Fail when any plugin has not reached ACTIVE. Default true. */
   auditSettled?: boolean;
   /**
@@ -46,7 +65,8 @@ export interface BootOptions {
 
 export interface BootResult {
   ctx: Context;
-  composition: CompositionSource;
+  /** The composition as last admitted: at boot, then after each accepted reload. */
+  readonly composition: CompositionSource;
   /** Non-empty only when auditSettled is false. */
   unsettled: UnsettledFiber[];
   /**
@@ -83,11 +103,15 @@ export class BootError extends Error {
  */
 export async function boot(options: BootOptions): Promise<BootResult> {
   const auditSettled = options.auditSettled ?? true;
+  const admission = { requireSignature: options.requireSignature ?? false, verifySignature: options.verifySignature };
   const composition = loadComposition({
     workspace: options.workspace,
     configPath: options.configPath,
-    requireSignature: options.requireSignature ?? false
+    ...admission
   });
+  let admitted: CompositionSource = composition;
+  /** Admitted by the read wrapper; becomes `admitted` only once the tree it parsed has applied. */
+  let pending: CompositionSource = composition;
 
   const ctx = new Context();
   const audit = watchFibers(ctx);
@@ -133,6 +157,7 @@ export async function boot(options: BootOptions): Promise<BootResult> {
       }
       await includeService.refresh();
       await ctx.loader.await();
+      admitted = pending;
     };
 
     /**
@@ -146,7 +171,31 @@ export async function boot(options: BootOptions): Promise<BootResult> {
       constructor(scope: Context, config: ConstructorParameters<typeof Include>[1]) {
         super(scope, config);
         includeService = this;
+        admitEveryRead(this);
       }
+    }
+
+    /**
+     * Admits the exact text Include parses, at the initial mount and on every
+     * refresh. Include reads the file itself, so checking the file beforehand
+     * would leave a window between check and mount; wrapping its read closes
+     * it. A rejected read throws before Include applies anything, so a failed
+     * reload leaves the last admitted tree active.
+     */
+    function admitEveryRead(include: Include): void {
+      const carrier = include as unknown as { read?: (forced?: boolean) => Promise<{ content: string } | undefined> };
+      const read = carrier.read;
+      if (typeof read !== "function") {
+        throw new BootError("composition admission is unavailable: the vendored Include no longer exposes read()");
+      }
+      carrier.read = async (forced?: boolean) => {
+        const candidate = await read.call(include, forced);
+        if (candidate) {
+          const { sha256, signature } = admitCompositionBytes(composition.path, composition.relativePath, Buffer.from(candidate.content, "utf8"), admission);
+          pending = { ...composition, sha256, signature };
+        }
+        return candidate;
+      };
     }
 
     let createEntry: Promise<unknown> | undefined;
@@ -184,6 +233,7 @@ export async function boot(options: BootOptions): Promise<BootResult> {
     // outstanding. It throws the fiber's own failure (or an AggregateError),
     // so a plugin that threw surfaces here rather than as a silent PENDING.
     await ctx.loader.await();
+    admitted = pending;
 
     if (options.watch) {
       const watchOptions = typeof options.watch === "object" ? options.watch : {};
@@ -227,7 +277,9 @@ export async function boot(options: BootOptions): Promise<BootResult> {
 
     return {
       ctx,
-      composition,
+      get composition() {
+        return admitted;
+      },
       unsettled,
       async reload() {
         await reloadComposition();

@@ -1,0 +1,50 @@
+[
+  {
+    "mutation": "M1 remove the compiler's approval floor: requiredApprovals takes the catalog value instead of Math.max with the shipped default rule",
+    "file": "src/catalog/compiler/runtimePolicy.ts",
+    "test": "tests/compilerStationDefaults.test.ts",
+    "exit": 1,
+    "killed": true,
+    "failing": [
+      "station-profile/critical/write-high-requires-approval: a control asking 0 approvals, not distinct, still compiles to 2 distinct"
+    ]
+  },
+  {
+    "mutation": "M2 delete the WRITE_HIGH approval requirement from the shipped default policy (requiredApprovals 2 -> 0), the rule F2's template carried",
+    "file": "src/approvals/approvalPolicyEngine.ts",
+    "test": "tests/compilerStationDefaults.test.ts",
+    "exit": 1,
+    "killed": true,
+    "failing": [
+      "golden: education", "golden: environment", "golden: governance", "golden: health", "golden: mobility", "golden: technology", "golden: wealth",
+      "station-profile/critical/write-high-requires-approval: a control asking 0 approvals, not distinct, still compiles to 2 distinct"
+    ]
+  },
+  {
+    "mutation": "M3 raise the default SECURITY quota from 0 to 1",
+    "file": "src/budgets/budgets.ts",
+    "test": "tests/compilerStationDefaults.test.ts",
+    "exit": 1,
+    "killed": true,
+    "failing": [
+      "golden: education", "golden: environment", "golden: governance", "golden: health", "golden: mobility", "golden: technology", "golden: wealth",
+      "budget-default/zero-quota/SECURITY and /FINANCIAL: zero quota and not executable even where Wealth's overlay gates FINANCIAL"
+    ]
+  },
+  {
+    "mutation": "M4 add src/domains/blueprints/index.ts",
+    "file": "src/domains/blueprints/index.ts (created, then removed)",
+    "test": "tests/compilerStationDefaults.test.ts",
+    "exit": 1,
+    "killed": true,
+    "failing": ["P1-46: F2 stays folded no blueprint module, no import of one and no blueprint command path"]
+  },
+  {
+    "mutation": "M5 import the blueprint module from src/index.ts",
+    "file": "src/index.ts",
+    "test": "tests/compilerStationDefaults.test.ts",
+    "exit": 1,
+    "killed": true,
+    "failing": ["P1-46: F2 stays folded no blueprint module, no import of one and no blueprint command path"]
+  }
+]

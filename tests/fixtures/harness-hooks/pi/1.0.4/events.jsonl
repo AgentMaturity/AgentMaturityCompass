@@ -1,0 +1,4 @@
+{"type":"tool_call","toolName":"codemode","toolCallId":"call_codemode_probe","parentToolCallId":null,"input":{"code":"return await tools.read({ path: \"<workspace>/workspace/public.txt\" });"}}
+{"type":"tool_call","toolName":"read","toolCallId":"call_codemode_probe/1","parentToolCallId":"call_codemode_probe","input":{"path":"<workspace>/workspace/public.txt"}}
+{"type":"tool_result","toolName":"read","toolCallId":"call_codemode_probe/1","parentToolCallId":"call_codemode_probe","isError":false}
+{"type":"tool_result","toolName":"codemode","toolCallId":"call_codemode_probe","parentToolCallId":null,"isError":false}

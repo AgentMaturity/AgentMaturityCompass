@@ -1,0 +1,8 @@
+{
+  "phase": "p126-m1",
+  "failedInvocation": "audit-observed.py p126-m1 Q126 combined",
+  "failure": "ValueError: wrong physical test authority: p126-m1",
+  "effect": "Read-only audit stopped before outcome creation. No test rerun or source/index write.",
+  "correctedRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout",
+  "correctedAuditSucceeded": true
+}

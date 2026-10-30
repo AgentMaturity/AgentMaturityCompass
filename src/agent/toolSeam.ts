@@ -18,6 +18,7 @@
  * exited 137 because it was killed on a deadline is `exitCode: 137` AND
  * `timedOut: true`; collapsing them loses which one an operator is looking at.
  */
+import type { NativeExtensionHooks } from "../extensions/nativeExtensionHooks.js";
 import type { AuthorizationIntentResult } from "../actions/authorize.js";
 import type { ToolSchema } from "../llm/request/requestSpec.js";
 import type { ToolDispatch, ToolOutcome } from "../session/sessionTypes.js";
@@ -41,6 +42,8 @@ export interface ToolCallRequest {
    * the model cannot reach it. The pipeline re-verifies every one against the exact call before the body runs.
    */
   readonly authority?: ToolAuthority;
+  /** Trusted narrowing guard, rechecked after approvals immediately before an effect; null alone permits dispatch. */
+  readonly beforeEffect?: () => string | null;
 }
 
 /** What running one tool produced. */
@@ -53,7 +56,9 @@ export interface ToolCallOutcome {
   readonly denied: boolean;
   /**
    * The tool asserts the turn is finished — a hand-back-to-the-user tool, for
-   * instance. The loop honours it instead of asking the model again.
+   * instance. The loop honours it instead of asking the model again only when
+   * every call in the step concludes: one tool cannot erase its siblings'
+   * continuation (PXA-23).
    */
   readonly concludesTurn?: boolean;
   /**
@@ -66,6 +71,12 @@ export interface ToolCallOutcome {
 
 /** How the loop reaches a tool registry. */
 export interface AgentToolSeam {
+  /** The same selected native extension runtime used by the toolset guard. */
+  readonly extensionHooks?: NativeExtensionHooks;
+  /** The seam enforces ToolCallRequest.beforeEffect after all approval waits, at the actual effect boundary. */
+  readonly supportsEffectGuard?: true;
+  /** The entered step owns this admission through completion, failure and cancellation. */
+  prepareStep?(context: { readonly turn: number; readonly step: number; readonly signal: AbortSignal }): Promise<() => void>;
   /**
    * The tools to offer the model, or null for a request that offers none.
    *

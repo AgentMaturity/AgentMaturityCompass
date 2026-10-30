@@ -1,0 +1,117 @@
+{
+ "schemaVersion": 1,
+ "key": "P1-36",
+ "date": "2026-10-18",
+ "commit": "3cdb97cad2fb84efb1872c06bea531ff861454ee",
+ "branch": "rtd/p1-36-fs-tools-parity",
+ "node": "v22.23.3",
+ "pnpm": "10.33.0",
+ "os": "darwin 25.6.0, local macOS arm64, not CI",
+ "arch": "arm64",
+ "commands": [
+  {
+   "cmd": "npm run -s build",
+   "exit": 0,
+   "durationMs": 161505
+  },
+  {
+   "cmd": "npm run -s typecheck",
+   "exit": 0,
+   "durationMs": 171137
+  },
+  {
+   "cmd": "npm run -s typecheck:tests",
+   "exit": 0,
+   "durationMs": 216119
+  },
+  {
+   "cmd": "npm run -s lint",
+   "exit": 0,
+   "durationMs": 9695
+  },
+  {
+   "cmd": "npm run -s check:counts",
+   "exit": 0,
+   "durationMs": 3192
+  },
+  {
+   "cmd": "npm run -s check:docs-drift",
+   "exit": 0,
+   "durationMs": 1424
+  },
+  {
+   "cmd": "npm run -s check:freeze -- --base-ref int",
+   "exit": 0,
+   "durationMs": 6424
+  },
+  {
+   "cmd": "npm run -s check:architecture-boundaries",
+   "exit": 0,
+   "durationMs": 19828
+  },
+  {
+   "cmd": "npm run -s check:gates",
+   "exit": 0,
+   "durationMs": 1875
+  },
+  {
+   "cmd": "npm run -s check:schemas",
+   "exit": 0,
+   "durationMs": 1586
+  },
+  {
+   "cmd": "npm run -s check:api-ref",
+   "exit": 0,
+   "durationMs": 491
+  },
+  {
+   "cmd": "npm run -s check:threat-model",
+   "exit": 0,
+   "durationMs": 812
+  },
+  {
+   "cmd": "npm run -s check:duplicates",
+   "exit": 0,
+   "durationMs": 2288
+  },
+  {
+   "cmd": "npm run -s check:dead-code",
+   "exit": 0,
+   "durationMs": 9146
+  },
+  {
+   "cmd": "npx vitest run tests/fsToolsParity.test.ts tests/lineDiff.test.ts tests/fsToolsLiteralEdit.test.ts tests/fsToolsReadBeforeEdit.test.ts tests/nativePinnedToolSchemas.test.ts --reporter=json --outputFile=qualification/2026-10-18-P1-36/focused-tests.json",
+   "exit": 0,
+   "durationMs": 22501
+  }
+ ],
+ "tests": {
+  "total": 88,
+  "passed": 88,
+  "failed": 0,
+  "skipped": 0
+ },
+ "artifacts": [
+  {
+   "path": "README.md",
+   "sha256": "549a1716b7182f62288d08d329ad9a982b4f8419a7e686359b9f7ea8ea053224"
+  },
+  {
+   "path": "focused-tests.json",
+   "sha256": "8b45e1f0131ea3b122bab6ca17acf5e0653723792fc782d2a0d7eb84390d7a21"
+  },
+  {
+   "path": "mutations.json",
+   "sha256": "587e9e99f7dd90f546e29399a1c55c1027bddd596335c21d1e0f28b9d6337d41"
+  },
+  {
+   "path": "patch-crosscheck.log",
+   "sha256": "5330a314176657415245c1f04509e3fa4b79868444288086a930424f28f7ba10"
+  },
+  {
+   "path": "sample-fs-edit.txt",
+   "sha256": "c863acaf471d2a9c57e68185dee66d848c268c3f2f2694743ddca7f3b87fef89"
+  }
+ ],
+ "notes": "Focused P1-36 tests only; the full suite was not run here. See README.md."
+}

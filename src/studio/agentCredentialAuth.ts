@@ -1,6 +1,7 @@
 import type { IncomingHttpHeaders } from "node:http";
 import { revokedLeaseIdSet } from "../leases/leaseStore.js";
 import { verifyLeaseToken } from "../leases/leaseVerifier.js";
+import { regulatedLeaseProfile } from "../leases/regulatedProfile.js";
 import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
 import { findAgentByToken } from "./studioState.js";
 
@@ -13,7 +14,8 @@ export interface StudioAgentCredential {
 /**
  * Agent credentials supplied together are constraints on one identity. A static
  * token must not hide a narrower or revoked lease in another carrier. Human
- * sessions and bootstrap administration are resolved separately by Studio.
+ * sessions and bootstrap administration are resolved separately by Studio. Under a regulated profile a static token is
+ * refused (P2-25: static agent tokens are disabled for regulated profiles; use a lease); v1 leases keep working everywhere else.
  */
 export function authenticateStudioAgent(params: {
   workspace: string;
@@ -88,6 +90,8 @@ export function authenticateStudioAgent(params: {
     }
   }
 
+  // P2-25: a regulated profile accepts leases only. A static token anywhere in the request refuses it, even beside a lease.
+  if (hasStaticToken && regulatedLeaseProfile(params.workspace).regulated) return null;
   const first = grants[0];
   if (first === undefined || grants.some(grant => grant.agentId !== first.agentId)) return null;
   let scopes = new Set(first.scopes);

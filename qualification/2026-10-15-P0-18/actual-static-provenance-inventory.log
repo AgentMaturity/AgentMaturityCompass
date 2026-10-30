@@ -1,0 +1,1 @@
+{"inventory": {"path": "/private/tmp/p0-18-root-static-provenance-inventory-20261015.json", "bytes": 19249, "sha256": "2f1db07a92c22d9b4272d2d5634e980335079508c3c9ff9c04c15bc83a0a9e9d"}, "paths": 15, "allSourceLiteralHits": [{"relativePath": "src/ingest/ingest.ts", "line": 162, "text": "  trustTier: \"ATTESTED\" | \"SELF_REPORTED\";"}]}

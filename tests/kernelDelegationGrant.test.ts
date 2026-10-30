@@ -14,6 +14,7 @@ import {
 } from "../src/agent/stubProvider.js";
 import { echoToolSeam } from "../src/agent/echoTool.js";
 import type { SubagentCapability } from "../src/agent/delegateTool.js";
+import { readSessionStoreMarker } from "../src/persistence/openSessionEventStore.js";
 
 /**
  * The kernel builds the delegation capability, because only it can (P6.1a).
@@ -268,5 +269,29 @@ describe("a caller can supply its own executor", () => {
       turnOptions(s, { delegation: { grant: (capability) => { grants.push(capability); } } })
     );
     expect(typeof grants[0]!.runner, "a runner is still provided").toBe("function");
+  });
+});
+
+describe("a JSONL workspace admits one session writer (P0-58)", () => {
+  it("refuses an in-process delegation up front, before the parent opens a session", async () => {
+    const s = setup();
+    const prior = process.env["AMC_SESSION_STORE"];
+    process.env["AMC_SESSION_STORE"] = "jsonl";
+    try {
+      const grants: SubagentCapability[] = [];
+      await expect(runComposedTurn(turnOptions(s, { delegation: { grant: (capability) => { grants.push(capability); } } })))
+        .rejects.toMatchObject({ name: "SessionStoreSingleWriterError", code: "SESSION_STORE_SINGLE_WRITER",
+          message: expect.stringMatching(/delegation.*JSONL.*one session writer/) });
+      expect(grants, "no capability was granted").toEqual([]);
+      expect(readSessionStoreMarker(s.workspace), "no session store was opened or pinned").toBeNull();
+      // A foreign runner spawns its own process and opens no AMC session writer here.
+      const marker = async () => ({ ok: true, text: "from the supplied runner" });
+      const outcome = await runComposedTurn(turnOptions(s, { delegation: { runner: marker, grant: (capability) => { grants.push(capability); } } }));
+      expect(grants).toHaveLength(1);
+      expect(readSessionStoreMarker(s.workspace)).toBe("jsonl");
+      expect(outcome.sessionId.length).toBeGreaterThan(0);
+    } finally {
+      if (prior === undefined) delete process.env["AMC_SESSION_STORE"]; else process.env["AMC_SESSION_STORE"] = prior;
+    }
   });
 });

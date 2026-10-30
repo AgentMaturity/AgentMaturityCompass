@@ -34,9 +34,11 @@ describe("evidenceProducer", () => {
     [{ provenance: "dogfood" }, "synthetic"],
     [{ claimKind: "synthetic_example", source: "bridge" }, "synthetic"],
     [{ source: "dogfood-maturity" }, "synthetic"],
+    [{ source: "assurance.executed" }, "synthetic"],
     ...["eval_import", "import", "watch", "attested_ingest", "chatgpt", "claude_console", "gemini_ui", "generic_json", "generic_text"]
       .map((source): [Record<string, unknown>, string] => [{ source }, "import"]),
-    ...["manual", "operator", "feedback.ingest"].map((source): [Record<string, unknown>, string] => [{ source }, "manual"]),
+    ...["manual", "operator", "feedback.ingest", "user", "inferred", "carried", "numeric_self_answer", "default"]
+      .map((source): [Record<string, unknown>, string] => [{ source }, "manual"]),
     [{ source: "webhook" }, "external-report"],
     [{ source: "stdin_pipe" }, "amc-runtime"],
     [{ source: "constructor" }, "amc-runtime"],
@@ -59,7 +61,7 @@ describe("evidenceProducer", () => {
 const REVIEWED_RUNTIME_OR_NON_EVIDENCE = new Set([
   "", "active", "adapter-observation", "adapters", "agent", "agents", "amc", "amc-registered", "amc.audit", "api",
   "approvals", "assurance", "audit-logs", "backoff", "backup", "both", "bridge", "budgets", "built-in-mcp-agent-provider",
-  "builtin", "catalog-only", "cli", "compliance", "correlation", "decision", "derived", "detector",
+  "builtin", "catalog-only", "cli", "compliance", "correlation", "decision", "defaults", "derived", "detector",
   "diagnostic-eval-replay-corpus-boundary", "env", "eoc", "eval-replay-corpus", "eval.run.layer", "eval.run.question",
   "events", "failed-evaluation", "file", "filesystem", "firewall", "fleet", "forecast", "gateway", "hook", "hook_control",
   "host", "identity", "incident-regression", "inference-strategy-comparison", "judge-calibration", "ledger", "leases",
@@ -68,7 +70,32 @@ const REVIEWED_RUNTIME_OR_NON_EVIDENCE = new Set([
   "redteam", "registry", "release", "replay-benchmark-corpus", "reports", "request-failure", "retention.auto",
   "risk-cost-latency-slo", "roles", "sdk", "settings", "shield.exploit_confirmation", "stdin_pipe", "studio",
   "studio-audit", "support-observation", "toolhub", "tools", "trace", "transform", "transparency", "trust", "trust-list",
-  "trust-list-history", "turn-error", "turn-events", "undeclared-runner", "user-env", "users", "validators"
+  "trust-list-history", "turn-error", "turn-events", "undeclared-runner", "user-env", "users", "validators",
+  // Never an evidence event's meta.source (reviewed 2026-10-11): claim-route labels that pick an HTTP result envelope
+  // (P0-23, P1-11); catalog applicability exclusion kinds (P1-10); legal-hold registry row kinds, which write no ledger
+  // rows (P2-01). The self-report-shaped literals (user, inferred, numeric_self_answer, default) are mapped to manual
+  // in PRODUCER_BY_SOURCE instead, so they can never count as AMC runtime evidence.
+  "compliance_report", "diagnostic_report", "path_presence", "predicate", "reviewer_exception", "record", "legacy",
+  "legacy-unverified",
+  // A trust-context distrust entry's source (P1-08, src/trust/trustContext.ts): the workspace's own key revocation list,
+  // never an evidence event's meta.source.
+  "workspace-key-revocations",
+  // A4 Activate record labels (P1-62, reviewed 2026-10-12 at the 442cd919 merge): a monitor record field no source could
+  // fill (src/a4/a4Monitor.ts) and a value claim's recommended lane (src/a4/a4Value.ts). Neither is a ledger meta.source.
+  "source_unavailable", "value_contract",
+  // A secret pattern's contributing engine (P2-02 hardening, src/shield/redaction/secretPatterns.ts SecretPatternSource),
+  // reviewed 2026-10-18 at the codex-full merge. It labels where a redaction pattern came from, never a ledger meta.source.
+  "dataflow",
+  // P1-10F: compileCatalogPlan reports where visible tools came from (defaults or the signed tools.yaml); not evidence.
+  "signed-tools-yaml",
+  // P2-08 (src/passport/passportCli.ts): whether a compared passport was read from the cache or created for the
+  // comparison. A CLI read record's label, never a ledger meta.source.
+  "cache", "created",
+  // P2-34 (src/a4/a4RuntimeLifecycle.ts): which runtime record a TUNE came from (a P2-23 reassessment or a P2-26
+  // envelope log entry) and how the package's version manifest was resolved. A4 record labels, never a ledger meta.source.
+  "envelope", "lifecycle_bound", "not_governed", "reassessment",
+  // Origin of a catalog questionnaire item (P1-53, src/catalog/types.ts QuestionnaireItem.source), never a ledger meta.source.
+  "domain_rubric",
 ]);
 
 function sourceFiles(dir: string): string[] {

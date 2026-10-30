@@ -1,0 +1,61 @@
+{
+  "schema": "p125pc-root-restoration-review/1",
+  "at": "2026-10-17T02:03:21.465469+00:00",
+  "phase": "p125pc-restore1",
+  "outcome": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-restore1-outcome.json",
+    "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-restore1-outcome.json",
+    "bytes": 7987,
+    "sha256": "08b8776018332147b54e73aee8f1ee667aa4ed5d4f1673b67c139c8eec3f327d",
+    "dev": 16777231,
+    "inode": 543995494,
+    "nlink": 1
+  },
+  "publicAudit": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-restore1-public-audit.json",
+    "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/p125pc-restore1-public-audit.json",
+    "bytes": 235595,
+    "sha256": "67bb7af19f978ff00c9a17ce07857a7e2da6f71ffcd3d9b3ebbc5b6e6ac6ced7",
+    "dev": 16777231,
+    "inode": 543995511,
+    "nlink": 1
+  },
+  "naturalRestoreAction": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/control-action-restore1.json",
+    "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/control-action-restore1.json",
+    "bytes": 5835,
+    "sha256": "acb452e7a46b8b3d38f05e0878242718318d80058df739ce8a3cf10df7162e73",
+    "dev": 16777231,
+    "inode": 543993884,
+    "nlink": 1
+  },
+  "same24AllGreenHooks3And4": true,
+  "producerTwoOwnQueryProofsCompleteFindingsAndFinalChecks": true,
+  "preservation": {
+    "selectedPathsEachRoot": 102,
+    "compiledPairs": 23,
+    "protectedInputs": 175,
+    "nativePhysicalPins": 13,
+    "allSelectedBytesAndPhysicalPinsExact": true,
+    "heldRHeadStatusIndexExact": true,
+    "runtimeProtectedInputsPin": {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/runtime-protected-inputs.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/runtime-protected-inputs.json",
+      "bytes": 90612,
+      "sha256": "42bfd4e5565b5d3757d8c14d39b504188ab8a30ec2b19c1bfe71750a47194c59",
+      "dev": 16777231,
+      "inode": 543919887,
+      "nlink": 1
+    },
+    "prechangeProtectedInputsPin": {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/protected-inputs-v3.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/protected-inputs-v3.json",
+      "bytes": 88277,
+      "sha256": "ba4495dc366f2e2051cc29679815f540f4159c7f205c6b25c22cba2fdc5a5aac",
+      "dev": 16777231,
+      "inode": 543919520,
+      "nlink": 1
+    },
+    "oldOneTestSourcePreservedAndOnlyOneExplicitSuccessor": true
+  }
+}

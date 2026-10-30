@@ -17,7 +17,39 @@ docker run --rm --entrypoint python amc-runner:local --version
 
 The source build uses the package-manager version from `package.json` and `pnpm install --frozen-lockfile`, builds the kernel bundle, then packs the npm artifact. A separate stage installs that exact tarball with production dependencies. Final images contain the installed package and its bundled-runtime notices, without the source checkout, private workspace packages or build tools. The tarball checksum is `/opt/amc/artifact.sha256`; npm's installed lockfile is `/opt/amc/package-lock.json`.
 
-The npm production install resolves external dependency ranges when the image is built. The frozen source lock and tarball checksum do not make the entire runtime dependency tree or operating-system image reproducible. Set `--build-arg NODE_IMAGE=node:22-bookworm-slim@sha256:<reviewed-digest>` to pin a reviewed base image. Native dependencies are installed for the builder's target platform; qualify each published platform separately.
+The npm production install resolves external dependency ranges when the image is built. The frozen source lock and tarball checksum do not make the entire runtime dependency tree or operating-system image reproducible. Native dependencies are installed for the builder's target platform; qualify each published platform separately.
+
+## Base image pins
+
+Both Dockerfiles start from `node:22-bookworm-slim` pinned by its multi-platform index digest, and `Dockerfile` pins its BuildKit `# syntax=` frontend the same way. One index digest serves linux/amd64 and linux/arm64. The pin date is in the Dockerfile comment; refresh the digests at each release (`docker buildx imagetools inspect node:22-bookworm-slim`) until automated updates exist. `node scripts/check-image-pins.mjs` fails on any `FROM`, `ARG *_IMAGE` default or `# syntax=` line without `@sha256:<64 hex>`. To substitute another reviewed base, pass `--build-arg NODE_IMAGE=node:22-bookworm-slim@sha256:<reviewed-digest>`.
+
+A pinned base does not make the images reproducible: `apt-get` packages are not version-pinned and the npm production install resolves ranges at build time. Each build is a new image; record and deploy its exact ID or registry digest.
+
+Build and qualify each architecture natively, with an explicit platform when the builder can emulate the other:
+
+```bash
+docker build --platform linux/arm64 --target studio -t amc-studio:arm64 .
+docker build --platform linux/amd64 --target studio -t amc-studio:amd64 .
+```
+
+A loaded image holds one platform. The release workflow is written to push each qualified per-architecture image and then join their digests into one multi-platform tag, writing every digest to `image-digests.json`; it has not run yet. Released images are `ghcr.io/agentmaturity/amc-studio` and `ghcr.io/agentmaturity/amc-runner`. Registry publication is still unverified (see `website/publication-status.json`); until it is, build locally. Deploy by digest, for example Helm `--set image.digest=sha256:<digest>`.
+
+## Quickstart image
+
+`docker/Dockerfile.quickstart` installs a published release tarball, not the source tree:
+
+```bash
+docker build -t amc-quickstart -f docker/Dockerfile.quickstart .
+docker run -it --rm amc-quickstart            # interactive quickscore
+docker run --rm amc-quickstart --version
+```
+
+It uses the same pinned Node 22 base and runs as UID/GID 10001 with `/workspace` as its working directory. `AMC_VERSION` selects the GitHub release and `AMC_TGZ_SHA256` is that tarball's SHA-256 from the release `SHA256SUMS` (for 1.1.1 also `website/install-channel.json`). The build stops when the hash is empty or does not match. Build another release only with its own hash:
+
+```bash
+docker build -f docker/Dockerfile.quickstart \
+  --build-arg AMC_VERSION=<version> --build-arg AMC_TGZ_SHA256=<sha256 from SHA256SUMS> -t amc-quickstart .
+```
 
 ## Studio with persistent state
 

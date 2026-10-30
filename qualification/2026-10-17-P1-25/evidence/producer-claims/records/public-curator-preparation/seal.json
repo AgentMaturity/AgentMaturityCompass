@@ -1,0 +1,52 @@
+{
+  "schema": "p125pc-inert-unready-public-curator-preparation-seal/1",
+  "at": "2026-10-17T02:05:32.643257+00:00",
+  "preferredHelper": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/public-curator-preparation/prepare-public-output.py.source.txt",
+    "bytes": 24238,
+    "sha256": "def0d61dd89744fab2448cb9782b991919297921a21336b3577c6b4dc2f1e0c4"
+  },
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-curator-preparation/prepare-public-output.py.source.txt",
+      "bytes": 24238,
+      "sha256": "def0d61dd89744fab2448cb9782b991919297921a21336b3577c6b4dc2f1e0c4"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-curator-preparation/prepare-public-output.delta.patch.txt",
+      "bytes": 17053,
+      "sha256": "27cce1e6da3a8001317d475c304298050a5b4097a12b536e6c8309d881d5fd95"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-curator-preparation/phase-inputs.unready.json",
+      "bytes": 1759,
+      "sha256": "4099de26bfa54ddd7f3ba1143306aff2ab83cd37eb98868789ad1549b55630f8"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-curator-preparation/fields.json",
+      "bytes": 2608,
+      "sha256": "9ed1f21011724fcc5f3ead57dfcda20d6e2ef8dfda321fdecc5ca2db94b52a33"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-curator-preparation/author-review.json",
+      "bytes": 2707,
+      "sha256": "5dc69fcfdb260e55462351f1bec9a585eff5cfb58651e51bf9a4c80c0e3007f2"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-curator-preparation/README.md",
+      "bytes": 3224,
+      "sha256": "c1271631a8911d2d960b72c7d2c639db60131afc5c05f82c97061c4be4536dbc"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/public-curator-preparation/input-pins.json",
+      "bytes": 2820,
+      "sha256": "7f337cdcf65af590a003e6c410cd3dba2470940bc26dcc44ff9787f67ac15426"
+    }
+  ],
+  "inputCount": 12,
+  "readyForAdoptionOrExecution": false,
+  "codeParsedImportedCompiledOrExecuted": false,
+  "publicOutputsProduced": false,
+  "blockers": [],
+  "unfilledActualInputBoundary": true
+}

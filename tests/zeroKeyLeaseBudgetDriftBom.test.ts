@@ -25,6 +25,8 @@ import { signBomFile, verifyBomSignature } from "../src/bom/bomVerifier.js";
 import { pinnedTrust, workspaceKeyTrust } from "./helpers/trustContext.js";
 import { openLedger } from "../src/ledger/ledger.js";
 import { questionBank } from "../src/diagnostic/questionBank.js";
+import { writeSealedReport } from "./helpers/sealedRun.js";
+import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
 
 const roots: string[] = [];
 
@@ -33,6 +35,7 @@ function newWorkspace(): string {
   roots.push(dir);
   process.env.AMC_VAULT_PASSPHRASE = "zero-key-test-passphrase";
   initWorkspace({ workspacePath: dir, trustBoundaryMode: "isolated" });
+  writeRuntimeFirewallPolicy({ workspace: dir, mode: "observe" }); // AXR-01: ToolHub and hook control apply the runtime firewall as the native pipeline does; unsigned, it blocks every call.
   initBudgets(dir, "default");
   return dir;
 }
@@ -148,7 +151,8 @@ function writeRunFixture(params: {
     runSealSig: "sig",
     reportJsonSha256: "hash"
   };
-  writeFileSync(join(paths.runsDir, `${params.runId}.json`), JSON.stringify(report, null, 2));
+  // Sealed: since WP37 the drift detector reads only runs whose seal verifies.
+  writeSealedReport(params.workspace, paths.runsDir, params.runId, report);
 }
 
 function writeHighMaturityRunForGovernor(workspace: string, runId: string): void {
@@ -198,7 +202,7 @@ function writeHighMaturityRunForGovernor(workspace: string, runId: string): void
     runSealSig: "sig",
     reportJsonSha256: "hash"
   };
-  writeFileSync(join(paths.runsDir, `${runId}.json`), JSON.stringify(report, null, 2));
+  writeSealedReport(workspace, paths.runsDir, runId, report);
 }
 
 describe("zero-key, leases, budgets, drift, and BOM", () => {
@@ -482,6 +486,7 @@ describe("zero-key, leases, budgets, drift, and BOM", () => {
     writeFileSync(join(workspace, "workspace", "output", "seed.txt"), "seed");
 
     const intentA = service.createIntent({
+      initiator: "test-operator",
       agentId: "default",
       workOrderId: workOrder.workOrderId,
       toolName: "fs.write",
@@ -493,6 +498,7 @@ describe("zero-key, leases, budgets, drift, and BOM", () => {
     expect(first.effectiveMode).toBe("EXECUTE");
 
     const intentB = service.createIntent({
+      initiator: "test-operator",
       agentId: "default",
       workOrderId: workOrder.workOrderId,
       toolName: "fs.write",

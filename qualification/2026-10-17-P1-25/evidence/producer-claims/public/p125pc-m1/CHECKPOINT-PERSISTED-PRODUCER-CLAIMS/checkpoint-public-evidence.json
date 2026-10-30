@@ -1,0 +1,247 @@
+{
+  "schema": "amc-p125-checkpoint-owned-fixture/1",
+  "caseId": "CHECKPOINT-PERSISTED-PRODUCER-CLAIMS",
+  "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0F9GlT/checkout",
+  "workspace": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-kZXqb3",
+  "privateHome": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-fTc3F5/home",
+  "noClockRowGateOrPolicyBypass": true,
+  "trustBoundary": "the signed own trust list and captured monitor pin are controlled fixture authority, not an independent production issuer",
+  "windowBoundary": "supported caller input.ts is stored and signed between two genuine checkpoints; no post-append row, clock, scheduler or policy change",
+  "environment": {
+    "helper": "scripts/clean-source-check.mjs#cleanSourceRuntimeEnvironment",
+    "privateHome": true,
+    "signingEnabled": true,
+    "storageOverrideAbsent": true,
+    "trustOverridesAbsent": true,
+    "loaderOverridesAbsent": true
+  },
+  "nativeBefore": {
+    "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0F9GlT/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+    "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0F9GlT/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+    "bytes": 1931552,
+    "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+    "dev": 16777231,
+    "inode": 543985064,
+    "nlink": 1
+  },
+  "trust": {
+    "mode": "pinned",
+    "signatureVerifiedListCount": 1,
+    "rootKeyId": "31fcb265b2b8e2c153c83df7434c86831fe2c363626547d0768e23e059c7449d",
+    "monitorFingerprint": "2226d8f63da2b8d35c85d008a7e22731e89ff65fb366ede292ab7eab1f3b21b1",
+    "tsaLoaded": true,
+    "signedList": {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-fTc3F5/home/checkpoint-trust-list.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-fTc3F5/home/checkpoint-trust-list.json",
+      "bytes": 1993,
+      "sha256": "4fb903d12a94addc998e49a12cfbf049c1ea8ff66e6f70eb9f90475bfecd54e1",
+      "dev": 16777231,
+      "inode": 543993790,
+      "nlink": 1
+    }
+  },
+  "initialLedger": {
+    "ok": true,
+    "chain": true,
+    "governance": true,
+    "anchored": true,
+    "errors": 0,
+    "seedEventId": "7a0cf860-f411-4e8c-9eb0-b3360076b352",
+    "sessionId": "11b5a468-3029-44a0-a67e-a066acc7999b",
+    "eventCount": 1
+  },
+  "producerClaims": {
+    "supportedProducerInputOnly": true,
+    "noPostAppendRowOrClockEdit": true,
+    "elapsedMinuteOrStudioCredit": false,
+    "stages": [
+      {
+        "id": "first-checkpoint",
+        "result": {
+          "sequence": 1,
+          "status": "timestamped",
+          "failures": []
+        },
+        "chain": [
+          {
+            "checkpoint": {
+              "type": "amc.ledger-checkpoint",
+              "version": 1,
+              "workspaceId": "default",
+              "sequence": 1,
+              "claimedAt": "2026-10-17T02:02:14.605Z",
+              "ledger": {
+                "headEventHash": "c69acd7943e454a695030c2b890d55a2562a3a72f5e78e708cb879925072d48d",
+                "eventCount": 1
+              },
+              "transparency": {
+                "root": "b47912239ef9aba5f884c4b7f6f204e8e361d167b95963111a31e2fdd5a7b471",
+                "leafCount": 1,
+                "algorithm": "rfc9162-sha256"
+              },
+              "previousCheckpointSha256": null
+            },
+            "sha256": "315a63fec2e44f75fe75b2ce1d9987fb8dbceaf90830a1dbc14ec8547021e292"
+          }
+        ],
+        "requestPaths": [
+          "/producer-good"
+        ]
+      },
+      {
+        "id": "backdated-appended",
+        "requestedTs": 1792202233999,
+        "row": {
+          "id": "8a598c6b-60c2-4841-b5b2-988ccaf97547",
+          "ts": 1792202534624,
+          "sessionId": "b6e28bd2-055f-45dd-9ea4-75cd7f5b6b33",
+          "eventType": "audit",
+          "eventHash": "8218887f68c92ba9439367658d2c3632328cb339eedc1729624f1c25d16f3602",
+          "previousHash": "c07ea2303d0dc3f5d4a1378861e81cb9ef1ab5f9ce40d54f98c07d4ac8a774aa",
+          "index": 2
+        }
+      }
+    ],
+    "independentGrants": [
+      {
+        "genTime": "2026-10-17T02:02:14.000Z",
+        "accuracyMs": null,
+        "digest": "315a63fec2e44f75fe75b2ce1d9987fb8dbceaf90830a1dbc14ec8547021e292",
+        "anchorId": "amc-p125-grant-test-root",
+        "signerCertSha256": "a98d155f37fb3cb741ade1e193ac81b505aecbb1d8ddffb861f178deb17488d8",
+        "tokenSha256": "d57e4bbefffd0bb29a1a41ff6f457ea4bb55a904b8c54eed5cde59d813106d98",
+        "revocationChecked": false
+      }
+    ],
+    "first": {
+      "result": {
+        "sequence": 1,
+        "status": "timestamped",
+        "failures": []
+      },
+      "checkpoint": {
+        "checkpoint": {
+          "type": "amc.ledger-checkpoint",
+          "version": 1,
+          "workspaceId": "default",
+          "sequence": 1,
+          "claimedAt": "2026-10-17T02:02:14.605Z",
+          "ledger": {
+            "headEventHash": "c69acd7943e454a695030c2b890d55a2562a3a72f5e78e708cb879925072d48d",
+            "eventCount": 1
+          },
+          "transparency": {
+            "root": "b47912239ef9aba5f884c4b7f6f204e8e361d167b95963111a31e2fdd5a7b471",
+            "leafCount": 1,
+            "algorithm": "rfc9162-sha256"
+          },
+          "previousCheckpointSha256": null
+        },
+        "sha256": "315a63fec2e44f75fe75b2ce1d9987fb8dbceaf90830a1dbc14ec8547021e292"
+      },
+      "checkpointPin": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-kZXqb3/.amc/time/checkpoints/1.json",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-kZXqb3/.amc/time/checkpoints/1.json",
+        "bytes": 704,
+        "sha256": "07d784b494d1c613943b8fa5ca2a29a13fbbc2425fc1f3938caa11bfa53783d0",
+        "dev": 16777231,
+        "inode": 543993795,
+        "nlink": 1
+      },
+      "tokenPin": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-kZXqb3/.amc/time/checkpoints/1.tsr",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-kZXqb3/.amc/time/checkpoints/1.tsr",
+        "bytes": 2298,
+        "sha256": "d57e4bbefffd0bb29a1a41ff6f457ea4bb55a904b8c54eed5cde59d813106d98",
+        "dev": 16777231,
+        "inode": 543993801,
+        "nlink": 1
+      },
+      "signatureValid": true,
+      "tokenMatchesIndependentGrant": true,
+      "checkpointRows": [
+        {
+          "id": "8ece4f53-e46d-4e60-ba58-aca8fda0c29d",
+          "eventHash": "c07ea2303d0dc3f5d4a1378861e81cb9ef1ab5f9ce40d54f98c07d4ac8a774aa",
+          "meta": {
+            "checkpointSequence": 1,
+            "checkpointSha256": "315a63fec2e44f75fe75b2ce1d9987fb8dbceaf90830a1dbc14ec8547021e292",
+            "tokenSha256": "d57e4bbefffd0bb29a1a41ff6f457ea4bb55a904b8c54eed5cde59d813106d98"
+          }
+        }
+      ],
+      "ledger": {
+        "ok": true,
+        "chain": true,
+        "governance": true,
+        "anchored": true,
+        "errors": 0
+      }
+    },
+    "requestedClaims": {
+      "backdatedTs": 1792202233999,
+      "postdatedTs": 1792288934000,
+      "postdateOffsetMs": 86400000
+    }
+  },
+  "ownedGuardCloseInvoked": true,
+  "poolBeforeClose": {
+    "key": "ledger:/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-kZXqb3:/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-kZXqb3/.amc/evidence.sqlite",
+    "dbPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-kZXqb3/.amc/evidence.sqlite",
+    "maxSize": 4,
+    "idle": 1,
+    "active": 0,
+    "pooledConnections": 1,
+    "initialized": true
+  },
+  "poolClosed": true,
+  "vaultLocked": true,
+  "immutableInputCount": 3,
+  "immutableInputsUnchanged": true,
+  "nativeAfter": {
+    "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0F9GlT/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+    "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0F9GlT/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+    "bytes": 1931552,
+    "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+    "dev": 16777231,
+    "inode": 543985064,
+    "nlink": 1
+  },
+  "nativeUnchanged": true,
+  "environmentRestored": true,
+  "ledgerOwners": [
+    {
+      "readonly": false,
+      "closeAttempted": true,
+      "closed": true
+    },
+    {
+      "readonly": true,
+      "closeAttempted": true,
+      "closed": true
+    },
+    {
+      "readonly": true,
+      "closeAttempted": true,
+      "closed": true
+    },
+    {
+      "readonly": true,
+      "closeAttempted": true,
+      "closed": true
+    },
+    {
+      "readonly": false,
+      "closeAttempted": true,
+      "closed": true
+    },
+    {
+      "readonly": true,
+      "closeAttempted": true,
+      "closed": true
+    }
+  ],
+  "bodyFailed": true,
+  "bodyErrorName": "AssertionError",
+  "cleanupErrorNames": []
+}

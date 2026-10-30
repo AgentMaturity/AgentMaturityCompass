@@ -13,11 +13,16 @@
  */
 
 import { randomUUID } from "node:crypto";
+import { resolve } from "node:path";
 import { sha256Hex } from "../utils/hash.js";
+import { canonicalize } from "../utils/json.js";
 import {
   saveWorkspaceRecord,
   loadWorkspaceRecords,
-  updateWorkspaceRecord
+  updateWorkspaceRecord,
+  captureWorkspaceRecordPredecessor,
+  prepareWorkspaceRecordAsync,
+  withWorkspaceRecordPublicationLock
 } from "../storage/workspaceRecordStore.js";
 
 /** Where false-positive reports live under .amc/. */
@@ -146,6 +151,13 @@ export function getFPCostModel(): FPCostModel {
 // FP Report CRUD
 // ---------------------------------------------------------------------------
 
+// Body construction is shared by the retained sync and actual async publishers.
+function buildFPReport(input: Parameters<typeof submitFPReport>[0]): FalsePositiveReport {
+  return { reportId: `fp_${randomUUID().slice(0, 12)}`, scenarioId: input.scenarioId,
+    packId: input.packId, assuranceRunId: input.assuranceRunId, response: input.response,
+    justification: input.justification, reportedBy: input.reportedBy, ts: Date.now(), status: "open" };
+}
+
 export function submitFPReport(input: {
   scenarioId: string;
   packId: string;
@@ -154,17 +166,7 @@ export function submitFPReport(input: {
   justification: string;
   reportedBy: string;
 }, workspace?: string): FalsePositiveReport {
-  const report: FalsePositiveReport = {
-    reportId: `fp_${randomUUID().slice(0, 12)}`,
-    scenarioId: input.scenarioId,
-    packId: input.packId,
-    assuranceRunId: input.assuranceRunId,
-    response: input.response,
-    justification: input.justification,
-    reportedBy: input.reportedBy,
-    ts: Date.now(),
-    status: "open",
-  };
+  const report = buildFPReport(input);
   fpReports.push(report);
   if (workspace) {
     saveWorkspaceRecord(workspace, FP_REPORTS_AT, report.reportId, { ...report }, report.ts);
@@ -190,6 +192,51 @@ export function resolveFPReport(
     updateWorkspaceRecord(workspace, FP_REPORTS_AT, report.reportId, { ...report }, Date.now());
   }
   return { ...report };
+}
+
+/** Maintained awaitable workspace publisher; the omitted-workspace compatibility path remains memory-only. */
+export async function submitFPReportAsync(input: Parameters<typeof submitFPReport>[0], workspace?: string): Promise<FalsePositiveReport> {
+  if (!workspace) return submitFPReport(input);
+  const root = resolve(workspace);
+  const report = buildFPReport(input);
+  const prepared = await prepareWorkspaceRecordAsync(root, FP_REPORTS_AT, report.reportId, { ...report }, report.ts);
+  return withWorkspaceRecordPublicationLock(root, FP_REPORTS_AT, () => {
+    prepared.publish();
+    fpReports.push(report);
+    return { ...report };
+  });
+}
+
+function capturedFPReport(target: Buffer | null, reportId: string): FalsePositiveReport | null {
+  try {
+    const stored = target === null ? null : JSON.parse(target.toString("utf8")) as FalsePositiveReport | null;
+    return stored?.reportId === reportId ? stored : null;
+  } catch { return null; }
+}
+
+/** Prepare outside the lock; selected open state, exact record publication and cache transition commit synchronously. */
+export async function resolveFPReportAsync(reportId: string, resolution: Parameters<typeof resolveFPReport>[1], workspace?: string): Promise<FalsePositiveReport | null> {
+  if (!workspace) return resolveFPReport(reportId, resolution);
+  const root = resolve(workspace), ownId = reportId, ownResolution = { ...resolution };
+  const predecessor = captureWorkspaceRecordPredecessor(root, FP_REPORTS_AT, ownId);
+  const live = fpReports.find(report => report.reportId === ownId);
+  const stored = capturedFPReport(predecessor.target, ownId);
+  const selected = live ?? stored;
+  if (selected === null || selected.status !== "open" || (stored !== null && (stored.status !== "open" || stored.resolution !== selected.resolution))) return null;
+  const expected = structuredClone(selected), next = { ...expected, status: ownResolution.status, resolution: ownResolution.reason };
+  const prepared = await prepareWorkspaceRecordAsync(root, FP_REPORTS_AT, ownId, { ...next }, Date.now(), predecessor);
+  return withWorkspaceRecordPublicationLock(root, FP_REPORTS_AT, () => {
+    const current = getFPReport(ownId, root);
+    const durable = capturedFPReport(captureWorkspaceRecordPredecessor(root, FP_REPORTS_AT, ownId).target, ownId);
+    if (current === null || current.status !== "open" || canonicalize(current) !== canonicalize(expected)
+      || (durable !== null && (durable.status !== "open" || durable.resolution !== expected.resolution))) {
+      throw new Error("false-positive report changed while signing was prepared; retry");
+    }
+    prepared.publish();
+    const currentLive = fpReports.find(report => report.reportId === ownId);
+    if (currentLive !== undefined) { currentLive.status = next.status; currentLive.resolution = next.resolution; }
+    return { ...next };
+  });
 }
 
 /** Live reports plus any persisted by an earlier process, deduped by id. */

@@ -7,9 +7,10 @@
  * a Passport export does). This closes that gap, and is the one check a
  * re-signed forgery cannot slip past — proven by tests/sessionVerifierNegative.
  */
-import { extractEnvelope, SESSION_GENESIS } from "../session/sessionTypes.js";
+import { admitSessionEnvelope, SESSION_GENESIS } from "../session/sessionTypes.js";
 import type { Ledger } from "./ledger.js";
 import { validateSurfaceCompactions } from "../session/surfaceCompaction.js";
+import type { OperationalEvidenceOptions } from "../keys/operationalLedgerReader.js";
 
 /**
  * Verifies the per-session chain carried inside session events.
@@ -23,17 +24,22 @@ import { validateSurfaceCompactions } from "../session/surfaceCompaction.js";
  * makes session enclosure and FIFO cryptographic rather than conventional. A
  * break here is a tamper finding, reported on the chain half.
  *
- * Rows with no envelope (legacy events) are skipped, so a workspace with no
- * session spine is unaffected — strictly additive to today's verifier.
+ * Only legacy non-session rows without an envelope are skipped. Native rows
+ * with missing, malformed or unsupported envelopes are verification errors.
  */
-export function verifySessionChains(ledger: Ledger, errors: string[]): void {
+export function verifySessionChains(ledger: Ledger, errors: string[], options: OperationalEvidenceOptions = {}): void {
   const events = ledger.getAllEvents();
-  try { validateSurfaceCompactions(ledger.workspace, events); }
+  try { validateSurfaceCompactions(ledger.workspace, events, { ...options, ledger }); }
   catch (error) { errors.push(`Session compaction invalid: ${error instanceof Error ? error.message : "unsupported history"}`); }
   const expectedSeqBySession = new Map<string, number>();
   const expectedPrevHashBySession = new Map<string, string>();
   for (const event of events) {
-    const envelope = extractEnvelope(event.meta_json);
+    const admission = admitSessionEnvelope(event.meta_json, event.event_type);
+    if (!admission.ok) {
+      errors.push(`Event ${event.id} ${admission.message}`);
+      continue;
+    }
+    const envelope = admission.envelope;
     if (envelope === null) {
       continue;
     }

@@ -1,3 +1,4 @@
+import { ratioOrNull } from "../../utils/ratio.js";
 import type { Applicability, Enforcement, EvidenceState, ResultState, ReviewState } from "../../claims/eligibility/types.js";
 import type { TrustTier } from "../../types.js";
 import type { EnforcementPoint } from "../types.js";
@@ -54,8 +55,9 @@ export function decideEvidence(record: EvaluableControl, admitted: readonly Admi
   for (const contract of record.evidence) {
     const own = admitted.filter(({ item }) => item.producerId === contract.producer);
     const min = contract.minObservedRatio ?? 0;
-    const ratio = own.length === 0 ? 1 : own.filter((row) => isObservedTier(row.trustTier)).length / own.length;
-    if (ratio < min) {
+    const ratio = ratioOrNull(own.filter((row) => isObservedTier(row.trustTier)).length, own.length);
+    // An absent contract is handled by the minimum-item completeness check below.
+    if (ratio !== null && ratio < min) {
       reasons.push(`Observed trust ratio ${ratio.toFixed(3)} is below required ${min.toFixed(3)} (${contract.id})`);
       return "untrusted";
     }

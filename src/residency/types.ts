@@ -48,9 +48,11 @@ export interface CheckEgressInput {
   readonly dataClasses?: readonly string[] | null;
   readonly purpose?: string | null;
   readonly agentId?: string;
+  /** P2-26: the model provider a "provider" call goes to, so a provider-scoped kill switch can match it. */
+  readonly providerId?: string;
 }
 
-export const DELETION_TARGET_KINDS = ["evidence-payloads", "blobs", "spills", "guard-events", "logs", "caches"] as const;
+export const DELETION_TARGET_KINDS = ["evidence-payloads", "blobs", "spills", "guard-events", "logs", "caches", "token-vault"] as const;
 export type DeletionTargetKind = typeof DELETION_TARGET_KINDS[number];
 export interface LegalHoldScopeV1 {
   readonly tenantId: string;
@@ -76,7 +78,8 @@ export interface LegalHoldV1 {
 export type HoldVerdict =
   | { readonly verdict: "clear"; readonly registryDigest: string; readonly holdsChecked: number; readonly warning?: "head_missing_unregulated" }
   | { readonly verdict: "held"; readonly holdIds: readonly string[] }
-  | { readonly verdict: "unknown"; readonly reason: "registry_unreadable" | "record_corrupt" | "signature_invalid" | "head_missing" | "tenant_unmapped" };
+  | { readonly verdict: "unknown"; readonly reason: "registry_unreadable" | "record_corrupt" | "signature_invalid" | "head_missing" | "tenant_unmapped"
+      | "control_checkpoint_root_in_workspace" };
 export interface DeletionRequest {
   readonly workspace: string;
   readonly executor: string;

@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-30",
+  "oldIssue": "AMC-1518",
+  "source": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "capturedUtc": "2026-10-15T04:24:37.515350+00:00",
+  "state": "BOUNDED_ORIGINAL43_AND_TWO_SOURCE_CONTROLS_INDEPENDENTLY_REVIEWED",
+  "packet": {
+    "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015.json",
+    "bytes": 72597,
+    "sha256": "de1a9ea9b169e10c44cc3e827c48b09a131191a2448b77744f3c8fc7ba04f3cb"
+  },
+  "report": {
+    "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015.md",
+    "bytes": 1802,
+    "sha256": "afcc128b76fdcc594ddb2236fda60e02bf0700027e71ecb2046f4ca5a1c2a536"
+  },
+  "independentReview": {
+    "path": "/private/tmp/p0-30-AMC-1518-detached-independent-review-20261015.json",
+    "bytes": 45705,
+    "sha256": "ceccfc66186d40dbd107ff69b1b38802990c78932de3699065e240dd38f4c9fe"
+  },
+  "independentReviewMarkdown": {
+    "path": "/private/tmp/p0-30-AMC-1518-detached-independent-review-20261015.md",
+    "bytes": 2885,
+    "sha256": "5cc2331191b8b8e94da7d238dc426e57e15d225a824a5c0ed81bd1c99131c8c0"
+  },
+  "actual": {
+    "separateOriginalBaseline": 43,
+    "originalRegistrations": 43,
+    "distinctOriginalFileTitlePairs": 42,
+    "M24SecretManifest": [
+      43,
+      41,
+      43
+    ],
+    "M25FixtureTamper": [
+      43,
+      42,
+      43
+    ],
+    "actualCommands": 7,
+    "caseExecutions": 301,
+    "passedExecutions": 298,
+    "privateMutantAssertionFailures": 3,
+    "authoritativeDetachedLaunches": 242,
+    "positiveForkWorkerPhases": 7,
+    "allOriginal43RegisteredPerPhase": true,
+    "allSourceRestorationsGreen": true
+  },
+  "firstCausesAndMasks": [
+    "M24 two selected synthetic secret-manifest fixtures resolve reports instead of rejecting at original152:86. Structured AssertionError with actual Vitest-rewritten Error stack matches raw exactly. Output-directory assertion153 is masked; no independent mutant output-directory assertion is invented. Actual approved detached launches38 instead of34 under guard removal.",
+    "M25 modified private trial fixture yields executed/pass/pass instead of inconclusive/null/null at original160:30. Later reason assertion161 is masked. Original pin guards before/after remain; no general comparator integrity claim."
+  ],
+  "observation": "All242 authoritative pre-intent/PID/close chains match exact18 fixed script hashes/argv/cwd/env keys; actualclose0/null, retained empty numeric group plus ESRCH receipts. Positive actual outer+forkNode22.23.3ABI127 activation, seven healthy original post-teardown worker stopped+forwarded checkpoints after all detached closes. No controller detached signals/outer actions/timeouts/infra/late/pending/todo.",
+  "preservation": {
+    "rootPrivate12268Exact": true,
+    "rootGitCleanSource58AtFreeze": true,
+    "indexedReferences": 5042,
+    "releaseReferences": 4892,
+    "finishedPredecessorClosuresRehashed": 17,
+    "nativeAnd307DependencyLinksExact": true,
+    "proof": {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/root-final-readonly-preservation-v2.json",
+      "bytes": 1657,
+      "sha256": "bb43c3c3acb0dbce59171b4956bff978acda12d2879152cae8545da71e85fcdc"
+    }
+  },
+  "setupHistory": "Unexecuted v1 retains literal-AssertionError blocker/root/native reviews. Separate reviewed v2 corrects only observation with structured identity/raw multiplicity/original source binding. Root preparatory empty-directory assumption and reviewer optional-cache assumption stopped read-only metadata checks before correction; no product runtime was repeated or input changed.",
+  "limits": [
+    "Original43 source bytes/config/imports/guards/fixtures/assertions/deadlines/cleanup unchanged. Explicit builtin spawn/IPC observers affect function identity/timing/I/O/listeners.",
+    "Forwarded post-teardown checkpoint is not IPC delivery, actual worker exit code or universal hardkill/descendant recovery. Missing/unknown/fault records block restoration; original cleanup may already remove ephemeral fixtures.",
+    "Fixed local Node outputs and synthetic adapter observations establish local runner contracts; no authenticated external comparator/model, genuine inference, OS confinement, credential absence or performance superiority.",
+    "Historical55/output-ownership12 and full held76 batch were not executed here. Installed1537, permanent runner/tests, publication/race/anchor/wire-docs gaps, duplicate1269/dead2751, fullsuite/Node24/coverage/hosted/G0/release/Done and ownership remain unwaived."
+  ],
+  "allBoundedReviewsComplete": true,
+  "formalAcceptanceClosed": false,
+  "next": "Canonical P0-30 bounded receipt, ordinary metadata validation and qualification-only commit, then P0-25 by current plan."
+}

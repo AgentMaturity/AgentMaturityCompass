@@ -16,7 +16,7 @@ import { assuranceReadinessGate } from "../assurance/assuranceControlPlane.js";
 import { verifyAuditMapActiveSignature } from "../audit/auditMapStore.js";
 import { verifyAuditPolicySignature } from "../audit/auditPolicyStore.js";
 import { verifyAuditWorkspace } from "../audit/binderVerifier.js";
-import { loadValuePolicy, verifyValuePolicySignature } from "../value/valueStore.js";
+import { loadValuePolicyReadOnly as loadValuePolicy, verifyValuePolicySignature } from "../value/valueStore.js";
 import { getWorkspaceRecord, listWorkspaceRecords } from "./hostDb.js";
 import type { WorkspaceContext } from "./workspaceContext.js";
 import { DEFAULT_WORKSPACE_ID, normalizeWorkspaceId } from "./workspaceId.js";
@@ -156,7 +156,10 @@ export class WorkspaceManager {
         }
       })();
       const valuePolicySig = verifyValuePolicySignature(dir);
-      if (!valuePolicySig.valid) {
+      // Health reads no longer initialize the value policy (P2-08). A never-initialized pair (body and sidecar both
+      // absent) gets the signed default on first value use, as this read used to create; any other invalid pair still fails.
+      const valuePolicyUninitialized = valuePolicySig.reason === "file missing" && !valuePolicySig.signatureExists;
+      if (!valuePolicySig.valid && !valuePolicyUninitialized) {
         if (!valuePolicy || valuePolicy.valuePolicy.enforceSignedInputs) {
           reasons.push(`value policy invalid: ${valuePolicySig.reason ?? "signature verification failed"}`);
         }

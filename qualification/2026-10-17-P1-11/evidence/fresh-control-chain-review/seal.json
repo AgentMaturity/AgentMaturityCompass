@@ -1,0 +1,24 @@
+{
+  "schema": "private-finite-evidence-review-seal/1",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/fresh-control-chain-review/review.json",
+      "bytes": 19234,
+      "sha256": "a305000aefc3a27a583cc41ba56f6965c93b00df76f5c60ad340616684103582"
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/fresh-control-chain-review/README.md",
+      "bytes": 1470,
+      "sha256": "d0a553f639aba61753493ee6a675e4087e766b433f0c1c11490cfe34712791cd"
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/fresh-control-chain-review/input-pins.json",
+      "bytes": 93225,
+      "sha256": "2669daec83bbd7d6727c8fbfcd3c6fa0a9af0f10d587d8e16423f321b1cb7769"
+    }
+  ],
+  "inputCount": 303,
+  "allReadsFinished": true,
+  "blockers": [],
+  "executionByReviewer": false
+}

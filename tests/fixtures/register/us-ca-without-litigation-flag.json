@@ -1,0 +1,30 @@
+{
+  "id": "fixture-us-ca-without-litigation-flag",
+  "row": "California AB 3030 and SB 1120; Texas TRAIGA",
+  "stations": [
+    "health"
+  ],
+  "meaning": "AB 3030: disclose generative AI in clinical messages, with a route to a human. SB 1120: licensed professionals make medical-necessity denials. TRAIGA: disclose AI in care by the first service",
+  "keyDatesText": "AB 3030 and SB 1120 from 2025-01-01; TRAIGA from 2026-01-01",
+  "statusText": "Binding now",
+  "citation": {
+    "instrument": "California AB 3030 (Ch. 848, Stats. 2024)",
+    "clause": "Health and Safety Code §1339.75(a): disclose generative AI in patient clinical communications, with instructions for reaching a human",
+    "edition": "California Legislature bill text, Ch. 848, Stats. 2024",
+    "jurisdiction": "US-CA",
+    "statusType": "binding-now",
+    "effectiveDate": "2025-01-01",
+    "complianceDueDate": null,
+    "url": "https://leginfo.legislature.ca.gov/faces/billTextClient.xhtml?bill_id=202320240AB3030",
+    "contentHash": null,
+    "retrievedAt": "2026-10-04",
+    "legalReviewer": null
+  },
+  "dateNotes": "From 2025-01-01 per the plan's US register; S5 found no operative date in the bill text it read on 2026-10-04 and did not infer one. No compliance-due date is recorded.",
+  "sourceKind": "official",
+  "sourceNote": "S5 entry us-ca-ab3030 records this source read on 2026-10-04 (its obligations and dates checked there) without a content hash; not fetched or hashed in P1-18, which ran without network access (Sid, 2026-10-11).",
+  "flags": {
+    "reverify": "AB 3030's operative date"
+  },
+  "s5RegisterId": "us-ca-ab3030"
+}

@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "key": "P3-24",
+  "date": "2026-10-28",
+  "commit": "28f1b30ef8bc0e2bdf1e85671595a901b7fa4819",
+  "branch": "rtd/w4-p3-24",
+  "node": "v22.23.3",
+  "pnpm": "10.33.0",
+  "os": "darwin 25.6.0",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "npm run -s build",
+      "exit": 0,
+      "durationMs": 69537
+    },
+    {
+      "cmd": "npm run -s typecheck",
+      "exit": 0,
+      "durationMs": 58214
+    },
+    {
+      "cmd": "npm run -s typecheck:tests",
+      "exit": 0,
+      "durationMs": 75177
+    },
+    {
+      "cmd": "npm run -s lint",
+      "exit": 0,
+      "durationMs": 3959
+    },
+    {
+      "cmd": "npm run -s check:gates",
+      "exit": 0,
+      "durationMs": 411
+    },
+    {
+      "cmd": "npm run -s check:dead-code",
+      "exit": 0,
+      "durationMs": 5345
+    },
+    {
+      "cmd": "npm run -s check:duplicates",
+      "exit": 0,
+      "durationMs": 941
+    },
+    {
+      "cmd": "npm run -s check:counts",
+      "exit": 0,
+      "durationMs": 807
+    },
+    {
+      "cmd": "npm run -s check:api-ref",
+      "exit": 0,
+      "durationMs": 217
+    },
+    {
+      "cmd": "npm run -s check:docs-drift",
+      "exit": 0,
+      "durationMs": 460
+    },
+    {
+      "cmd": "npm run -s check:schemas",
+      "exit": 0,
+      "durationMs": 796
+    },
+    {
+      "cmd": "node packages/amc-conformance/bin/amc-conformance.mjs run --class a4-record --impl \"env AMC_A4_PREVIEW=1 node dist/cli.js a4 verify {record} --trust-list {trustList} --trust-root {trustRoot} --json\" --out tmp/p3-24-a4-record.json",
+      "exit": 0,
+      "durationMs": 25362
+    },
+    {
+      "cmd": "node packages/amc-conformance/bin/amc-conformance.mjs run --class verifier --impl \"node packages/verifier/bin/amc-verify.mjs verify {artifact} {verifierArgs}\" --out tmp/p3-24-verifier.json",
+      "exit": 0,
+      "durationMs": 6284
+    },
+    {
+      "cmd": "npx vitest run tests/conformance tests/verifier/conformance.test.ts tests/acsConformance.test.ts --maxWorkers=2 --reporter=json --outputFile=tmp/p3-24-vitest.json",
+      "exit": 0,
+      "durationMs": 85594
+    }
+  ],
+  "tests": {
+    "total": 103,
+    "passed": 96,
+    "failed": 0,
+    "skipped": 7
+  },
+  "artifacts": [
+    {
+      "path": "checks.txt",
+      "sha256": "34830661fed3ef0b5ff3a23b450882739a2d81cfa46dca73f461d5c494f074ea"
+    }
+  ],
+  "notes": "a4-record: 7/7 normative, conformant true. verifier: 61/61, conformant true, fixtureSetDigest equals the committed amc-verify-0.1.0.json (verifier class unaffected). check:freeze fails identically on base e95619acb (exception keys of other items not yet in allowedExceptionKeys); P3-24 adds no CLI command. Mutations in README.md. Source hashes at the commit: spec/conformance/v1/a4-record.json c0b743557abe4f1c076fbc8195b121149713ef30cc56b33d0b91e7842b4844c6; spec/conformance/results/amc-a4-verify-1.2.0.json baaadb8b373aca6f18206b950ba0b9ce97152058b49f8bc934dd68b2f907b552; packages/amc-conformance/lib/classes.mjs 1c71c0be14702d22b3993b8f0550ddf759d4914dd80b056115e08b1224c34af3."
+}

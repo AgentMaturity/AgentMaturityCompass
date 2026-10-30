@@ -1,0 +1,221 @@
+{
+  "registerVersion": 1,
+  "id": "eu",
+  "title": "EU Technology register: experimental, unreviewed draft",
+  "jurisdiction": "EU",
+  "policy": {
+    "litigationRules": []
+  },
+  "entries": [
+    {
+      "id": "eu-ai-act-art50",
+      "row": "P2-30 Technology: Artificial Intelligence Act",
+      "stations": [
+        "technology"
+      ],
+      "meaning": "Experimental draft mapping: Synthetic-content marking verified against a pinned issuer key in local fixtures; this does not establish legal applicability.",
+      "keyDatesText": "Unverified; dates not restated without a primary-text read for this mapping.",
+      "statusText": "Experimental and unreviewed; source text not re-read for this draft.",
+      "citation": {
+        "instrument": "Artificial Intelligence Act",
+        "clause": "Article 50(2), candidate pin",
+        "edition": "Source locator inherited from S5; text and edition not read for P2-30",
+        "jurisdiction": "EU",
+        "statusType": "binding-now",
+        "effectiveDate": null,
+        "complianceDueDate": null,
+        "url": "https://publications.europa.eu/resource/celex/32024R1689",
+        "contentHash": null,
+        "retrievedAt": null,
+        "legalReviewer": null
+      },
+      "dateNotes": "Dates intentionally null pending primary-text verification and named expert review.",
+      "sourceKind": "official",
+      "sourceNote": "Unverified: candidate official source locator inherited from the existing S5 register. No primary text fetched or hashed in P2-30; this record is not source verification or a legal review.",
+      "flags": {
+        "reverify": "Required before reliance or promotion; confirm clause, applicability, edition, dates and current text."
+      },
+      "s5RegisterId": "eu-ai-act"
+    },
+    {
+      "id": "eu-ai-act-gpai",
+      "row": "P2-30 Technology: Artificial Intelligence Act",
+      "stations": [
+        "technology"
+      ],
+      "meaning": "Experimental draft mapping: Upstream documentation is pinned to the model version and checked by document review.",
+      "keyDatesText": "Unverified; dates not restated without a primary-text read for this mapping.",
+      "statusText": "Experimental and unreviewed; source text not re-read for this draft.",
+      "citation": {
+        "instrument": "Artificial Intelligence Act",
+        "clause": "GPAI documentation duties; exact paragraphs unverified",
+        "edition": "Source locator inherited from S5; text and edition not read for P2-30",
+        "jurisdiction": "EU",
+        "statusType": "binding-now",
+        "effectiveDate": null,
+        "complianceDueDate": null,
+        "url": "https://publications.europa.eu/resource/celex/32024R1689",
+        "contentHash": null,
+        "retrievedAt": null,
+        "legalReviewer": null
+      },
+      "dateNotes": "Dates intentionally null pending primary-text verification and named expert review.",
+      "sourceKind": "official",
+      "sourceNote": "Unverified: candidate official source locator inherited from the existing S5 register. No primary text fetched or hashed in P2-30; this record is not source verification or a legal review.",
+      "flags": {
+        "reverify": "Required before reliance or promotion; confirm clause, applicability, edition, dates and current text."
+      },
+      "s5RegisterId": "eu-ai-act"
+    },
+    {
+      "id": "technology-eu-ai-omnibus",
+      "row": "P2-30 Technology: Digital Omnibus on AI",
+      "stations": [
+        "technology"
+      ],
+      "meaning": "Experimental draft mapping: Keep transition dates unresolved until the current text is read and legal scope is confirmed.",
+      "keyDatesText": "Unverified; dates not restated without a primary-text read for this mapping.",
+      "statusText": "Experimental and unreviewed; source text not re-read for this draft.",
+      "citation": {
+        "instrument": "Digital Omnibus on AI",
+        "clause": "Amendments and transitional provisions; exact paragraphs unverified",
+        "edition": "Source locator inherited from S5; text and edition not read for P2-30",
+        "jurisdiction": "EU",
+        "statusType": "binding-now",
+        "effectiveDate": null,
+        "complianceDueDate": null,
+        "url": "https://publications.europa.eu/resource/celex/32026R1744",
+        "contentHash": null,
+        "retrievedAt": null,
+        "legalReviewer": null
+      },
+      "dateNotes": "Dates intentionally null pending primary-text verification and named expert review.",
+      "sourceKind": "official",
+      "sourceNote": "Unverified: candidate official source locator inherited from the existing S5 register. No primary text fetched or hashed in P2-30; this record is not source verification or a legal review.",
+      "flags": {
+        "reverify": "Required before reliance or promotion; confirm clause, applicability, edition, dates and current text."
+      },
+      "s5RegisterId": "eu-ai-omnibus"
+    },
+    {
+      "id": "technology-eu-dsa",
+      "row": "P2-30 Technology: Digital Services Act",
+      "stations": [
+        "technology"
+      ],
+      "meaning": "Experimental draft mapping: Self-reported questionnaire only; no enacted-clause claim derived from answers.",
+      "keyDatesText": "Unverified; dates not restated without a primary-text read for this mapping.",
+      "statusText": "Experimental and unreviewed; source text not re-read for this draft.",
+      "citation": {
+        "instrument": "Digital Services Act",
+        "clause": "Platform duties; exact paragraphs unverified",
+        "edition": "Source locator inherited from S5; text and edition not read for P2-30",
+        "jurisdiction": "EU",
+        "statusType": "binding-now",
+        "effectiveDate": null,
+        "complianceDueDate": null,
+        "url": "https://publications.europa.eu/resource/celex/32022R2065",
+        "contentHash": null,
+        "retrievedAt": null,
+        "legalReviewer": null
+      },
+      "dateNotes": "Dates intentionally null pending primary-text verification and named expert review.",
+      "sourceKind": "official",
+      "sourceNote": "Unverified: candidate official source locator inherited from the existing S5 register. No primary text fetched or hashed in P2-30; this record is not source verification or a legal review.",
+      "flags": {
+        "reverify": "Required before reliance or promotion; confirm clause, applicability, edition, dates and current text."
+      },
+      "s5RegisterId": "eu-dsa"
+    },
+    {
+      "id": "technology-eu-data-act",
+      "row": "P2-30 Technology: Data Act",
+      "stations": [
+        "technology"
+      ],
+      "meaning": "Experimental draft mapping: Self-reported questionnaire only; distinguish fair-contracting questions from AIBOM evidence.",
+      "keyDatesText": "Unverified; dates not restated without a primary-text read for this mapping.",
+      "statusText": "Experimental and unreviewed; source text not re-read for this draft.",
+      "citation": {
+        "instrument": "Data Act",
+        "clause": "Data access and sharing duties; exact paragraphs unverified",
+        "edition": "Source locator inherited from S5; text and edition not read for P2-30",
+        "jurisdiction": "EU",
+        "statusType": "binding-now",
+        "effectiveDate": null,
+        "complianceDueDate": null,
+        "url": "https://publications.europa.eu/resource/celex/32023R2854",
+        "contentHash": null,
+        "retrievedAt": null,
+        "legalReviewer": null
+      },
+      "dateNotes": "Dates intentionally null pending primary-text verification and named expert review.",
+      "sourceKind": "official",
+      "sourceNote": "Unverified: candidate official source locator inherited from the existing S5 register. No primary text fetched or hashed in P2-30; this record is not source verification or a legal review.",
+      "flags": {
+        "reverify": "Required before reliance or promotion; confirm clause, applicability, edition, dates and current text."
+      },
+      "s5RegisterId": "eu-data-act"
+    },
+    {
+      "id": "eu-cra-art14",
+      "row": "P2-30 Technology: Cyber Resilience Act",
+      "stations": [
+        "technology"
+      ],
+      "meaning": "Experimental draft mapping: Local exploited-component report-packet drill with a 24-hour candidate deadline; not a filing or expert-reviewed rule.",
+      "keyDatesText": "Unverified; dates not restated without a primary-text read for this mapping.",
+      "statusText": "Experimental and unreviewed; source text not re-read for this draft.",
+      "citation": {
+        "instrument": "Cyber Resilience Act",
+        "clause": "Article 14, candidate early-warning pin; content not read",
+        "edition": "Source locator inherited from S5; text and edition not read for P2-30",
+        "jurisdiction": "EU",
+        "statusType": "binding-now",
+        "effectiveDate": null,
+        "complianceDueDate": null,
+        "url": "https://publications.europa.eu/resource/celex/32024R2847",
+        "contentHash": null,
+        "retrievedAt": null,
+        "legalReviewer": null
+      },
+      "dateNotes": "Dates intentionally null pending primary-text verification and named expert review.",
+      "sourceKind": "official",
+      "sourceNote": "Unverified: candidate official source locator inherited from the existing S5 register. No primary text fetched or hashed in P2-30; this record is not source verification or a legal review.",
+      "flags": {
+        "reverify": "Required before reliance or promotion; confirm clause, applicability, edition, dates and current text."
+      },
+      "s5RegisterId": "eu-cra"
+    },
+    {
+      "id": "eu-nis2-art23",
+      "row": "P2-30 Technology: NIS2 Directive",
+      "stations": [
+        "technology"
+      ],
+      "meaning": "Experimental draft mapping: Drill references existing NIS2 clocks; applicability depends on entity scope and national implementation.",
+      "keyDatesText": "Unverified; dates not restated without a primary-text read for this mapping.",
+      "statusText": "Experimental and unreviewed; source text not re-read for this draft.",
+      "citation": {
+        "instrument": "NIS2 Directive",
+        "clause": "Article 23, candidate reporting pin",
+        "edition": "Source locator inherited from S5; text and edition not read for P2-30",
+        "jurisdiction": "EU",
+        "statusType": "binding-now",
+        "effectiveDate": null,
+        "complianceDueDate": null,
+        "url": "https://publications.europa.eu/resource/celex/32022L2555",
+        "contentHash": null,
+        "retrievedAt": null,
+        "legalReviewer": null
+      },
+      "dateNotes": "Dates intentionally null pending primary-text verification and named expert review.",
+      "sourceKind": "official",
+      "sourceNote": "Unverified: candidate official source locator inherited from the existing S5 register. No primary text fetched or hashed in P2-30; this record is not source verification or a legal review.",
+      "flags": {
+        "reverify": "Required before reliance or promotion; confirm clause, applicability, edition, dates and current text."
+      },
+      "s5RegisterId": "eu-nis2"
+    }
+  ]
+}

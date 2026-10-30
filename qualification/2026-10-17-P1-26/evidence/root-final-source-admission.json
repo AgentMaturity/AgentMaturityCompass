@@ -1,0 +1,298 @@
+{
+  "schema": "p126-root-controls-and-final-check-admission/1",
+  "at": "2026-10-16T20:56:26.212811+00:00",
+  "sourceCommit": "32435b41d59e651ad2b259a59703cd137e5c925a",
+  "phases": [
+    {
+      "phase": "p126-architecture",
+      "exit": 0,
+      "durationMs": 1637,
+      "commandSha256": "de8432d62e197b614c81953ef110061a80cff1fcc8415157bc44ee9bb26e59aa"
+    },
+    {
+      "phase": "p126-build",
+      "exit": 0,
+      "durationMs": 28820,
+      "commandSha256": "fb2d881bf90cb720aa5f354d3cc9da694aa4ad2c8f8ffb8643b4262136752a6a"
+    },
+    {
+      "phase": "p126-counts-after",
+      "exit": 0,
+      "durationMs": 527,
+      "commandSha256": "caa8c37254ad64c06605285141e4714582e268eb79c59918e0a3f5a15c9d0ee1"
+    },
+    {
+      "phase": "p126-counts-before",
+      "exit": 1,
+      "durationMs": 521,
+      "commandSha256": "8bb4ffcc01f637d8785509c40b8bcb6601d844da2ec1b48159f5586d043d8bfd"
+    },
+    {
+      "phase": "p126-counts-d15",
+      "exit": 0,
+      "durationMs": 362,
+      "commandSha256": "d1c344d27ba3ab25b9739768075bc7e9b071e31624a130887e0725ab5e85821c"
+    },
+    {
+      "phase": "p126-dead-code-after",
+      "exit": 1,
+      "durationMs": 2865,
+      "commandSha256": "069f133f25ecadd618d87ba156d9fdd16d68bb46dfdab6b8ec646a5f785fe645"
+    },
+    {
+      "phase": "p126-dead-code-before",
+      "exit": 1,
+      "durationMs": 2977,
+      "commandSha256": "d2d396d540189c389f3f6c0cd92b0d1ce54656ef741cf00b7f59bb76e7759c78"
+    },
+    {
+      "phase": "p126-docs",
+      "exit": 0,
+      "durationMs": 341,
+      "commandSha256": "42bdc91064b5d785b7dc8a758eedbad182ffd69f3511dec1e44c11956068a5ec"
+    },
+    {
+      "phase": "p126-duplicates-after",
+      "exit": 1,
+      "durationMs": 661,
+      "commandSha256": "154f681c2d92016642469dbca2d353cad8b20f7a1e8e3420c2c1d1236f7128a4"
+    },
+    {
+      "phase": "p126-duplicates-before",
+      "exit": 1,
+      "durationMs": 619,
+      "commandSha256": "dd87ec75e91900e6493256439980888500fd1ac45d2a9c88120b1120ecc3c33f"
+    },
+    {
+      "phase": "p126-final-counts",
+      "exit": 0,
+      "durationMs": 552,
+      "commandSha256": "70086e790580514a2f5618b2a5f118fb8187c0ed285ea2e16ec2a57a42c10547"
+    },
+    {
+      "phase": "p126-final-d15",
+      "exit": 0,
+      "durationMs": 326,
+      "commandSha256": "b5e638ba0ad77b1b3bb4d3b4191f9823709774ffad5d7ba958b8ed699420a764"
+    },
+    {
+      "phase": "p126-final-freeze",
+      "exit": 0,
+      "durationMs": 1475,
+      "commandSha256": "73890736d512606872c3da1ad06ce9d1610f40823cbb0f428b76312059650ea6"
+    },
+    {
+      "phase": "p126-final-gates",
+      "exit": 0,
+      "durationMs": 457,
+      "commandSha256": "3f5a4e0cf25e37f0afda794917f6b6541c647c2083e59460db4b7bedd287f527"
+    },
+    {
+      "phase": "p126-freeze",
+      "exit": 0,
+      "durationMs": 1273,
+      "commandSha256": "c87cabf28ebac02c71ae8f6ef98cc9a62b74315b0d1a0cd6abe3142af1d7b70f"
+    },
+    {
+      "phase": "p126-fresh-canonical",
+      "exit": 0,
+      "durationMs": 9280,
+      "commandSha256": "3f731273948d0997c9388fc53e302c876f181304aa54048892a1d84809fd3f52"
+    },
+    {
+      "phase": "p126-fresh-clean-source",
+      "exit": 0,
+      "durationMs": 46635,
+      "commandSha256": "45e2c650828854e07805c619028cb0e790d0ab16aeca68efd3dffd52e3844f11"
+    },
+    {
+      "phase": "p126-gates",
+      "exit": 0,
+      "durationMs": 566,
+      "commandSha256": "0b24bca4828473e9c9ce09630b4058116ac8a0e5d9c5504a6d067cbf34a92d11"
+    },
+    {
+      "phase": "p126-gen-counts",
+      "exit": 1,
+      "durationMs": 283,
+      "commandSha256": "c055ce7cc44da717e53c321fc3acbf24e9de539a7975d5f61381e57db15b0bbc"
+    },
+    {
+      "phase": "p126-gen-counts-corrected",
+      "exit": 0,
+      "durationMs": 473,
+      "commandSha256": "5f2fd7b0055b89c0fb94e0deac060975a4c1d6ca1168bbba3440317fe2332695"
+    },
+    {
+      "phase": "p126-lint",
+      "exit": 0,
+      "durationMs": 2944,
+      "commandSha256": "83ad576e5a80e5b0de784937f206aa3ee7ccd0197882bdf3760d006fa0085487"
+    },
+    {
+      "phase": "p126-m1",
+      "exit": 1,
+      "durationMs": 8287,
+      "commandSha256": "04e701a32e0f5eba9050e44a418f2a8417c351507c06fb1d00bc5f3976025e61"
+    },
+    {
+      "phase": "p126-m2",
+      "exit": 1,
+      "durationMs": 8393,
+      "commandSha256": "2de2dae59dc272aa5b85d7623007e847d88977ed0bbf28abda18b3fb636a181e"
+    },
+    {
+      "phase": "p126-metadata-quality-after-diagnostic",
+      "exit": 0,
+      "durationMs": 2536,
+      "commandSha256": "7431dfb74be3930e44ba15bd857cc6681ea1a87174a516fe10c1537e7d1e3065"
+    },
+    {
+      "phase": "p126-metadata-quality-before-diagnostic",
+      "exit": 0,
+      "durationMs": 2543,
+      "commandSha256": "231568919d397fdc119f5c46f251012fb8779dfa46869d0ad40cbdebb5b1afec"
+    },
+    {
+      "phase": "p126-node-version",
+      "exit": 0,
+      "durationMs": 16,
+      "commandSha256": "dd8f40dae0183e383a8a9cd5a7dcfe37874ae1b359addd042333026cfc33da77"
+    },
+    {
+      "phase": "p126-pnpm-version",
+      "exit": 0,
+      "durationMs": 251,
+      "commandSha256": "b031ef04933ad8442cb449b13111c09d9aa2f69afc475ed0af35f020f972a70a"
+    },
+    {
+      "phase": "p126-pre-d15",
+      "exit": 0,
+      "durationMs": 405,
+      "commandSha256": "412f51f6a3fa95b5bb8f9ec13bc9b7c95ca066ccebc973da0fda392ac9d529f5"
+    },
+    {
+      "phase": "p126-pre-freeze",
+      "exit": 0,
+      "durationMs": 1265,
+      "commandSha256": "0070ceb16a931fc4bc9b4853cabbf4105b0da1536607b61eeb8914943c9d9be0"
+    },
+    {
+      "phase": "p126-receipt-fix-d15",
+      "exit": 0,
+      "durationMs": 347,
+      "commandSha256": "697da6ec08c185fab1a4512f9c3f22d7ed9cc5f1bfdecc880c8f61aa6d8cc8a9"
+    },
+    {
+      "phase": "p126-receipt-fix-dead-code",
+      "exit": 1,
+      "durationMs": 2729,
+      "commandSha256": "ba08330732c374e95b1cbe40863984762c63b0ddd3e7e896fc49d35d0e7c0b63"
+    },
+    {
+      "phase": "p126-receipt-fix-freeze",
+      "exit": 0,
+      "durationMs": 1269,
+      "commandSha256": "098e5f0f58cbadb668badccf4eafe3de9e03e1b5c53006f4e342bf65888749cc"
+    },
+    {
+      "phase": "p126-receipt-fix-private-validation",
+      "exit": 0,
+      "durationMs": 154,
+      "commandSha256": "5dad997d4792cabf9ca6b6e8c5ebf0d88d27973510b3639b3390d8ac39dfd6f7"
+    },
+    {
+      "phase": "p126-receipt-fix-source-validation",
+      "exit": 0,
+      "durationMs": 541,
+      "commandSha256": "c3c2c4e2fc6f3e612ca5c39375d49b766a583b5b4f05e59daecdb39a6eba2be1"
+    },
+    {
+      "phase": "p126-restore1",
+      "exit": 0,
+      "durationMs": 8368,
+      "commandSha256": "1e4ac0416a6cf49f6bddbd1966aa94e44fe71272f0da7ab95b2a9ab5ae0ae15b"
+    },
+    {
+      "phase": "p126-restore2",
+      "exit": 0,
+      "durationMs": 8430,
+      "commandSha256": "39f09ba5bc3ae7d0874f2ca6e5d953605fcc5f07fa0ef914858d80aa24e2fbf7"
+    },
+    {
+      "phase": "p126-source-combined",
+      "exit": 0,
+      "durationMs": 8348,
+      "commandSha256": "d01eb25f5d048b0eb6c7c3bda75c0a2bb2b24c6b019991334c4d96e837c2d068"
+    },
+    {
+      "phase": "p126-source-quality-diagnostic",
+      "exit": 0,
+      "durationMs": 2477,
+      "commandSha256": "e8d91f4d10d4bfb31f07e0f2026b622e2f0ed800eae25d69e362a09f54563483"
+    },
+    {
+      "phase": "p126-source-types",
+      "exit": 0,
+      "durationMs": 25002,
+      "commandSha256": "2870faa9cb5e136d3f507139483369649ddb3e75cbc964b3a234ab59aca8184c"
+    },
+    {
+      "phase": "p126-test-types",
+      "exit": 0,
+      "durationMs": 35139,
+      "commandSha256": "8e26f25306e27fa3a755fd7d19b779f41d91daa914d612e57e3a3432654346a3"
+    },
+    {
+      "phase": "p126-third-party-notices",
+      "exit": 0,
+      "durationMs": 228,
+      "commandSha256": "3300dc3e29eea90705e2df5c1eb264e6aea5babfe8f9e5069fc30ebfa5113498"
+    },
+    {
+      "phase": "p126-threat-model",
+      "exit": 0,
+      "durationMs": 305,
+      "commandSha256": "68b201193b7d3d035492677edc8b3fa8607da9c688ebe13d15b84d807fa3cb70"
+    },
+    {
+      "phase": "p126-unchanged-transparency",
+      "exit": 0,
+      "durationMs": 8451,
+      "commandSha256": "7bdfe44503e87a3144e932d641e80d7e139f74fe95394a546d0edae07137ea93"
+    }
+  ],
+  "sourceAndFreshCanonical": 54,
+  "restoredCohortEach": 54,
+  "negativeControlFailedBodies": [
+    11,
+    1
+  ],
+  "allFailuresAndMasksRead": true,
+  "rawObserverAuditComplete": true,
+  "all113PreferredProtectedInputsAnd6NativePinsExact": true,
+  "borrowedRunner18RowsHeadAndEmptyIndexExact": true,
+  "hostedFinal": {
+    "openDependabot": 13,
+    "nonDependabotWip": 0,
+    "allChangedPathsChecked": true,
+    "overlap": []
+  },
+  "freeze": {
+    "cliCommandPaths": 1236,
+    "cliInventoryPaths": 1236,
+    "stationPacks": 41,
+    "stationPackQuestions": 632
+  },
+  "d15": "none",
+  "quality": {
+    "duplicates": 1268,
+    "deadCode": 2723,
+    "fullNormalizedSourceFindingSetUnchangedAfterOwnMetadataRepair": true,
+    "gatesRemainRed": true,
+    "adoptedBaseline": false
+  },
+  "noFullSuiteCoveragePublicAnchorLibraryDecisionOrWholeP126Credit": true,
+  "allHoldsAndF37SkipPreserved": true,
+  "boundary": "Bounded offline qualification only. Final metadata must receive current validator and unchanged quality checks after materialization; no prediction of those results."
+}

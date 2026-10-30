@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-41",
+  "kind": "INERT_CANONICAL_BUILDER_PREPARATION_ONLY",
+  "capturedUtc": "2026-10-15T07:48:37.798656+00:00",
+  "builder": {
+    "path": "/private/tmp/p0-41-build-canonical-packet-prepared-20261015.py",
+    "bytes": 14182,
+    "lines": 167,
+    "sha256": "c30fa985d2dbe3c1e714ab994f518307993a31eb000a9d719eaa845ee33ea7e2"
+  },
+  "source": "33a8e20bf340f2f9c717bb813f95de3b648a4ad4",
+  "productionSource": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "futureQualification": "qualification/2026-10-15-P0-41",
+  "interface": "python3 BUILDER --review-json PATH --review-sha SHA256 --review-md PATH --review-md-sha SHA256 --outcome PATH --outcome-sha SHA256 --outcome-bytes INTEGER",
+  "bindingState": "Final independent actual review and root outcome are not supplied or invented by this author. Required arguments, exact review/outcome hashes and blocker/read-finished/formal-false checks precede any Q creation. Root reviews and executes later.",
+  "inputBinding": {
+    "boundedPacketSha256": "7a61cc8015d362cf12e856f9e2870a63c17058b89d7aeaa42eb27ba82754198d",
+    "frozen13CommandJournalSha256": "a39835c4d8a574a293a43a7355415baf6981d080cb0fdf430ef094270e5d1e33",
+    "otherChecks": "Packet private refs and six command/raw/observer/log/classification sets; exact source HEAD/branch/clean tree; all8574 tracked+4529 compiled parent hashes and dist membership; native bytes/identity/mode; unchanged old ACTIVE/HALTED; no new ACTIVE/HALTED."
+  },
+  "counting": "Receipt tests are only latest27/27. Thirteen original all-zero commands plus six causal command records plus one failed v1 baseline remain20 command rows. Six repeated27-case executions produce162/153/9; not162 unique cases. V1 stays27/26/1 fixture error and masked Q12d product refusal.",
+  "curation": "Byte-exact <=1MiB regular files only: bounded packet/review/outcome, original command metadata/logs, six compact phases, control results/releases, bound setup/plan/controller, fixture sources as .txt, preparation/static/failure reviews, WIP pair and selected restored Q12d/Q12f/Q10b/Q13 command result+intent/fixture/commit metadata. Source-copy/Git/HOME/store/tmp/dependency/native bodies are excluded.",
+  "privateOnly": "All source/compiled/physical manifest bodies, including compiled485185B under cap, and both complete1578/9455-ref runtime indices stay unsplit private hash references. No cap splitting, broad recursive closure copying or transitive physical re-audit framework.",
+  "copyAndSchema": "Selected inputs are bounded/scanned before Q mkdir. Each copied file uses exclusive creation and exact byte comparison. receipt.json follows existing receipt.schema.json keys; all other packet files are hashed without a receipt self-hash cycle. private-references.json maps copied sources to canonical files and binds packet/review/outcome.",
+  "limits": "Prepared source was not imported, parsed, compiled, syntax-checked or executed. No canonical directory or seven-output metadata freeze was created. The future write-once builder is not transactional; a later failure leaves owned partial Q for root to report, without automatic deletion. Formal/type/lint/fullsuite/Node24/hosted/online/posting/measurements/adoption and all inherited gaps remain open. P022 passport [] and skipped P029 routes are unrelated to the empty-assertion control. WIP holds and P057 P165/accepted-base barriers remain.",
+  "performed": {
+    "newBuilderAndThisNoteOnly": true,
+    "builderExecuted": false,
+    "codeParserImportCompileTypecheck": false,
+    "productRuntimeOrRepositoryWrites": false,
+    "canonicalWrites": false,
+    "gitCommands": false
+  },
+  "codeWritesFinished": true,
+  "allReadsFinished": true,
+  "formalAcceptanceClosed": false,
+  "runtimeAuthorizationProvided": false
+}

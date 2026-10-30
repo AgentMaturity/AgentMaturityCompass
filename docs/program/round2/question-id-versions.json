@@ -1,0 +1,132 @@
+{
+  "issue": "P1-42",
+  "source": "Round-2 rewrites that change a question's dimension under the same id (P1-42 review). Each takes a new id version, so answers stored under the old id read not evaluated for the new question instead of attaching to it.",
+  "items": [
+    {
+      "packId": "material-to-machines",
+      "oldId": "ENV-MM-4",
+      "newId": "ENV-MM-4-v2",
+      "dimensionBefore": "Safety",
+      "dimensionAfter": "Transparency"
+    },
+    {
+      "packId": "ubiquity-to-utility",
+      "oldId": "ENV-UU-9",
+      "newId": "ENV-UU-9-v2",
+      "dimensionBefore": "Security",
+      "dimensionAfter": "Safety"
+    },
+    {
+      "packId": "citizen-services",
+      "oldId": "GOV-CS-4",
+      "newId": "GOV-CS-4-v2",
+      "dimensionBefore": "Transparency",
+      "dimensionAfter": "Governance"
+    },
+    {
+      "packId": "patient-lifecycle",
+      "oldId": "HLT-PL-16",
+      "newId": "HLT-PL-16-v2",
+      "dimensionBefore": "Safety",
+      "dimensionAfter": "Compliance"
+    },
+    {
+      "packId": "professional-practice",
+      "oldId": "HLT-PP-12",
+      "newId": "HLT-PP-12-v2",
+      "dimensionBefore": "Compliance",
+      "dimensionAfter": "Traceability"
+    },
+    {
+      "packId": "specialized-medicine",
+      "oldId": "HLT-SM-18",
+      "newId": "HLT-SM-18-v2",
+      "dimensionBefore": "Ethics",
+      "dimensionAfter": "Transparency"
+    },
+    {
+      "packId": "privacy-security-mobility",
+      "oldId": "MOB-PS-15",
+      "newId": "MOB-PS-15-v2",
+      "dimensionBefore": "Incident Reporting",
+      "dimensionAfter": "Compliance"
+    },
+    {
+      "packId": "cognition-to-intelligence",
+      "oldId": "TECH-CI-15",
+      "newId": "TECH-CI-15-v2",
+      "dimensionBefore": "Governance",
+      "dimensionAfter": "Transparency"
+    },
+    {
+      "packId": "infotainment",
+      "oldId": "TECH-INF-9",
+      "newId": "TECH-INF-9-v2",
+      "dimensionBefore": "Compliance",
+      "dimensionAfter": "Transparency"
+    },
+    {
+      "packId": "networked-ecosystems",
+      "oldId": "TECH-NE-14",
+      "newId": "TECH-NE-14-v2",
+      "dimensionBefore": "Data Access by Design",
+      "dimensionAfter": "Resilience"
+    },
+    {
+      "packId": "networked-ecosystems",
+      "oldId": "TECH-NE-15",
+      "newId": "TECH-NE-15-v2",
+      "dimensionBefore": "Supply Chain Security",
+      "dimensionAfter": "Compliance"
+    },
+    {
+      "packId": "os-sustainable-outcomes",
+      "oldId": "TECH-OS-9",
+      "newId": "TECH-OS-9-v2",
+      "dimensionBefore": "Compliance",
+      "dimensionAfter": "Resilience"
+    },
+    {
+      "packId": "partnerships-prosperity",
+      "oldId": "TECH-PP-15",
+      "newId": "TECH-PP-15-v2",
+      "dimensionBefore": "Fair Contracting",
+      "dimensionAfter": "Transparency"
+    },
+    {
+      "packId": "digital-payments",
+      "oldId": "WLT-DP-13",
+      "newId": "WLT-DP-13-v2",
+      "dimensionBefore": "Payee Verification",
+      "dimensionAfter": "Safety"
+    },
+    {
+      "packId": "digital-payments",
+      "oldId": "WLT-DP-15",
+      "newId": "WLT-DP-15-v2",
+      "dimensionBefore": "Resilience",
+      "dimensionAfter": "Safety"
+    },
+    {
+      "packId": "no-poverty",
+      "oldId": "WLT-NP-10",
+      "newId": "WLT-NP-10-v2",
+      "dimensionBefore": "Fair Lending",
+      "dimensionAfter": "Ethics"
+    },
+    {
+      "packId": "no-poverty",
+      "oldId": "WLT-NP-13",
+      "newId": "WLT-NP-13-v2",
+      "dimensionBefore": "Risk Management",
+      "dimensionAfter": "Governance"
+    },
+    {
+      "packId": "no-poverty",
+      "oldId": "WLT-NP-15",
+      "newId": "WLT-NP-15-v2",
+      "dimensionBefore": "Risk Management",
+      "dimensionAfter": "Governance"
+    }
+  ]
+}

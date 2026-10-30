@@ -1,0 +1,62 @@
+# Draft (P1-14): experimental, agent-drafted and not independently reviewed. Expert sign-off waits for D-08;
+# citations are unverified until fetched and hashed. A result under this control is evidence of conformity, never proof of compliance.
+id: L0-TRN-02
+version: "0.1.0"
+support: experimental
+layer: 0
+family: transparency-and-disclosure
+stations: [education, environment, health, wealth, technology, mobility, governance]
+title: Represented party stated
+statement: >-
+  When the agent acts for a principal towards a third party, it states whom it represents.
+riskRationale: >-
+  A third party who does not know whom the agent acts for cannot judge its offers, its authority or
+  where to complain.
+mandatory: true
+applicability:
+  predicate: { fact: useCases, includesAny: [acts_for_principal_towards_third_parties] }
+  reasons: [Applies only where the profile's use cases include acting for a principal towards third parties.]
+  exclusions: []
+citations: []
+binding:
+  kind: manual
+  points: []
+  mechanism: >-
+    An output check requires the represented party in the agent's first message to each third party.
+  parameters: []
+  manualDuty:
+    duty: >-
+      Configure the represented-party statement and review the output check results.
+    ownerRole: senior_manager
+    cadence: monthly
+    evidenceOfPerformance: The output check report.
+tests:
+  - id: L0-TRN-02-T1
+    type: runtime_enforced
+    oracle: { kind: system_of_record, observes: Messages to third parties held outside the agent. }
+    fixtures:
+      positive: [L0-TRN-02/positive/evidence-valid.json]
+      negative:
+        - L0-TRN-02/negative/evidence-contradictory.json
+        - L0-TRN-02/negative/evidence-cross-tenant.json
+        - L0-TRN-02/negative/evidence-empty.json
+        - L0-TRN-02/negative/evidence-replayed.json
+        - L0-TRN-02/negative/evidence-stale.json
+        - L0-TRN-02/negative/evidence-violation.json
+    passCriteria: Each first message to a third party names the represented principal.
+    attempts: 1
+evidence:
+  - id: L0-TRN-02-E1
+    producer: amc.transparency.outputCheck
+    bindingFields: [deploymentId, agentId, controlId]
+    freshness: { maxAgeDays: 30 }
+    sampling: { method: all, ratePercent: null, minItems: 1 }
+    retention: { mode: regime_max }
+    residency: { mode: inherit_deployment }
+invalidatedBy: [model_version, prompt_version, deployment_version]
+owner: { role: senior_manager }
+clock: null
+levels: [L2]
+crosswalk: []
+review: { status: pending, expert: null, credential: null, reviewedAt: null, nextReview: null }
+provenance: { draftedBy: ai, draftedAt: "2026-10-11", approvedBy: null }

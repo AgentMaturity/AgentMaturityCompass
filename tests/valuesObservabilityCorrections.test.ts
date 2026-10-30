@@ -78,13 +78,13 @@ describe("valueCoherence — parseWindowString", () => {
 });
 
 describe("valueCoherence — computeVCI", () => {
-  test("returns 1 for empty preferences", () => {
-    expect(computeVCI([])).toBe(1);
+  test("returns unavailable for empty preferences", () => {
+    expect(computeVCI([])).toBeNull();
   });
 
-  test("returns 1 for single preference", () => {
+  test("returns unavailable for single preference", () => {
     const prefs = [pref({ preferenceId: "p1", ts: 1000, impliedValue: "safety" })];
-    expect(computeVCI(prefs)).toBe(1);
+    expect(computeVCI(prefs)).toBeNull();
   });
 
   test("returns value in [0, 1] for multiple preferences", () => {
@@ -107,7 +107,7 @@ describe("valueCoherence — computeVCI", () => {
     ];
     // Should not throw
     const vci = computeVCI(prefs);
-    expect(typeof vci).toBe("number");
+    expect(vci).toBeNull();
   });
 });
 

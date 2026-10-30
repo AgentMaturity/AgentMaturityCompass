@@ -1,0 +1,190 @@
+{
+  "schema": "amc-private-score-qualification-runtime-observer/1",
+  "pid": 19555,
+  "cwd": "/private/tmp/p0-45-causal-qualification-20261015/closure",
+  "reason": "passed",
+  "files": [
+    "/private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts"
+  ],
+  "testCount": 12,
+  "unhandledErrors": [],
+  "tasks": [
+    {
+      "kind": "file",
+      "id": "948291585",
+      "name": "tests/verifyRepair.test.ts",
+      "fullName": null,
+      "filepath": "/private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "948291585_0",
+      "name": "tests/verifyRepair.test.ts planVerifyRepair",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "948291585_0_0",
+      "name": "tests/verifyRepair.test.ts planVerifyRepair plans nothing for a healthy store and apply moves nothing",
+      "fullName": "planVerifyRepair plans nothing for a healthy store and apply moves nothing",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "948291585_0_1",
+      "name": "tests/verifyRepair.test.ts planVerifyRepair leaves evidence alone when only a signed config failed",
+      "fullName": "planVerifyRepair leaves evidence alone when only a signed config failed",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "948291585_0_2",
+      "name": "tests/verifyRepair.test.ts planVerifyRepair counts a tampered blob and plans to archive the ledger, the blobs, the index and its signature",
+      "fullName": "planVerifyRepair counts a tampered blob and plans to archive the ledger, the blobs, the index and its signature",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "948291585_0_3",
+      "name": "tests/verifyRepair.test.ts planVerifyRepair counts a missing blob and keeps the ledger in plan mode",
+      "fullName": "planVerifyRepair counts a missing blob and keeps the ledger in plan mode",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "948291585_1",
+      "name": "tests/verifyRepair.test.ts applyVerifyRepair",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "948291585_1_0",
+      "name": "tests/verifyRepair.test.ts applyVerifyRepair moves every planned file into quarantine with its original SHA-256 and leaves .amc/reports alone",
+      "fullName": "applyVerifyRepair moves every planned file into quarantine with its original SHA-256 and leaves .amc/reports alone",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "948291585_1_1",
+      "name": "tests/verifyRepair.test.ts applyVerifyRepair refuses when the legal hold state is unknown, and moves nothing",
+      "fullName": "applyVerifyRepair refuses when the legal hold state is unknown, and moves nothing",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "948291585_1_2",
+      "name": "tests/verifyRepair.test.ts applyVerifyRepair refuses when the hold check itself throws",
+      "fullName": "applyVerifyRepair refuses when the hold check itself throws",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "948291585_1_3",
+      "name": "tests/verifyRepair.test.ts applyVerifyRepair refuses under an active hold and names it",
+      "fullName": "applyVerifyRepair refuses under an active hold and names it",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "948291585_1_4",
+      "name": "tests/verifyRepair.test.ts applyVerifyRepair refuses when the monitor key does not match the expected fingerprint",
+      "fullName": "applyVerifyRepair refuses when the monitor key does not match the expected fingerprint",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "948291585_1_5",
+      "name": "tests/verifyRepair.test.ts applyVerifyRepair refuses before any move when signing fails",
+      "fullName": "applyVerifyRepair refuses before any move when signing fails",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "948291585_1_6",
+      "name": "tests/verifyRepair.test.ts applyVerifyRepair refuses when a planned file changed after the plan",
+      "fullName": "applyVerifyRepair refuses when a planned file changed after the plan",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "948291585_1_7",
+      "name": "tests/verifyRepair.test.ts applyVerifyRepair puts moved files back when a rename fails part way",
+      "fullName": "applyVerifyRepair puts moved files back when a rename fails part way",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    }
+  ],
+  "boundary": "Run-end records precede global teardown; post-exit outer streams are separately checked. Serialized test errors retain body/hook stacks for manual classification."
+}

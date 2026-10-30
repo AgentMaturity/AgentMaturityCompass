@@ -1,0 +1,56 @@
+{
+  "schema": "amc-private-p1-01-source-strip-control-v3-static-review/1",
+  "createdAt": "2026-10-15T08:36:11.443755+00:00",
+  "reviewer": "/root/native_race_static_review",
+  "driver": {
+    "path": "/private/tmp/p1-01-source-strip-control-v3-prepared-20261015.py",
+    "bytes": 10086,
+    "sha256": "2bfcf3374a0d3cd26388d334c887c27cae0c2957ff7d09a9b66eeba2c76fa5b5"
+  },
+  "previousDriver": {
+    "path": "/private/tmp/p1-01-source-control-v2-prepared-20261015.py",
+    "bytes": 9978,
+    "sha256": "b5985003cd2d469ceb6800b84938e3389a09664414d35fc46a2425d9b8511205"
+  },
+  "previousReview": {
+    "path": "/private/tmp/p1-01-source-control-v2-static-review-20261015.json",
+    "bytes": 2985,
+    "sha256": "c388fbf595bd56f31f2bc548015aa51f2e4127fe1c83c4891f9953754643d822"
+  },
+  "method": "Read complete exact v2-to-v3 textual diff and verify full-file hashes. Reuse complete reviewed v1 code and v2 ownership correction. No parser/import/compiler/runtime or source writes.",
+  "blockingFindings": [],
+  "delta": [
+    {
+      "field": "BASE",
+      "before": "/private/tmp/p1-01-source-control-20261015",
+      "after": "/private/tmp/p1-01-source-strip-control-20261015",
+      "assessment": "Fresh namespace absent at review; no prior halted tree reused or changed."
+    },
+    {
+      "field": "mutated",
+      "before": "text.replace(ANCHOR, ANCHOR + '.passthrough()').encode()",
+      "after": "text.replace(ANCHOR, ANCHOR.replace('z.strictObject(', 'z.object(', 1)).encode()",
+      "assessment": "Retains exact unique outer anchor, changes only first branch object policy to accept and strip unknown fields. All discriminator literals, fields, other branches and guards remain unchanged. No cast or type weakening is introduced."
+    },
+    {
+      "field": "mutation.scope",
+      "assessment": "Explicitly distinguishes this strip control from the compile-blocked literal passthrough control."
+    }
+  ],
+  "causalMeaning": "The actual authorized fixture falls in the changed first branch. Its unchanged valid positive plus one extra top-level member can test refusal sensitivity through the same compiled public schema/API while committed Ajv stays fixed. An input-accepting strip schema should publish an input schema without the original refusal; actual build and stale-check outcomes remain unmeasured by this review.",
+  "literalControlBoundary": "Parent reports prior literal .passthrough tsc exit2 (TS2339 at actionJournal.ts:202:92), with only two baseline checks and compile launched. Negative checks and restoration were not executed. That halted tree is preserved. This v3 is a distinct guard control, not successful completion or replacement proof for the literal mutation acceptance requirement. No old actual result was independently reread for this delta-only review.",
+  "retainedGates": [
+    "Real tsc child must exit0 and owned group reach ESRCH before any mutant check. No predicted compile pass is counted.",
+    "Baseline and restored receipt/schema children require0; mutant receipt/schema require1 plus named expected diagnostics. Full raw attribution remains necessary.",
+    "All previous ownership, pinned input, allowed compiled delta, retained mutant input and restoration ordering code is unchanged.",
+    "No schema regeneration is invoked. No product source change or A4 semantic scope is authorized by this private control."
+  ],
+  "retainedLimits": [
+    "Unbounded child wait; five-second bound is post-exit ESRCH polling only.",
+    "observedPgid=None is allowed and cannot be represented as a positive observation.",
+    "Borrowed dependency and manifest-listed preservation limits remain."
+  ],
+  "runtimeAuthorizedByThisReview": false,
+  "formalAcceptanceClosed": false,
+  "allReadsFinished": true
+}

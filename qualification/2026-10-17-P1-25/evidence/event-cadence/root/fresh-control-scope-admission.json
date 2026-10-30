@@ -1,0 +1,35 @@
+{
+  "at": "2026-10-17T01:05:25.225709+00:00",
+  "sourceReview": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/source-evidence-review/review-v2.json",
+    "bytes": 3056,
+    "sha256": "00c481e69752ab26cde6ee8fc969eced0638a5377d2dfb9b733e09e605dd4d5d"
+  },
+  "sourceSeal": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/source-evidence-review/seal-v2.json",
+    "bytes": 1430,
+    "sha256": "268330136c67e962048d3a9adf3820b7407fa5579d0db2e981895244d6f8beed"
+  },
+  "binderReview": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-static-review/review.json",
+    "bytes": 5452,
+    "sha256": "250a6e6a9dea9f4da72e7551d673a96d0852ea641dd9b03b75a876ef327c5b91"
+  },
+  "binderSeal": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-static-review/seal.json",
+    "bytes": 1107,
+    "sha256": "7645b20df5abbf95fa73f6404e9193af6b0ed65e1f8ca3583ece2bac4a82be12"
+  },
+  "actualBinding": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-source-binding.json",
+    "bytes": 122294,
+    "sha256": "48baa36cfc416eac9c71d6af072eeac7847cd2516c7e48a5cfc777f4fa3ec935"
+  },
+  "rootReadFullReportsAndV2ActualSchemaFix": true,
+  "binderExecutedAfterReviewerReportedCompletedNoBlockerAndBeforeFinalSealAdoption": true,
+  "freshCanonicalMayRun": true,
+  "onlyFutureFreshControlSourceTarget": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-XxtmV6/checkout/src/time/checkpoint.ts",
+  "noControlMutationOrFreshTestCreditYet": true,
+  "allHoldsRetained": true,
+  "readOnlyAdoptionDiagnosis": "Initial verifier assumed every seal has blockers; fresh binder seal does not. KeyError occurred before any output write. Exact report blockers[] and each sealed output are now verified; no artifact, helper or product rerun/change."
+}

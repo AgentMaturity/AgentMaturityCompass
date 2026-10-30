@@ -1,0 +1,49 @@
+{
+  "key": "P1-53",
+  "title": "Retire overlapping scoring and mapping systems into the catalog",
+  "branch": "rtd/w6-p1-53",
+  "base": "cafe5751f",
+  "commit": "the commit that adds this receipt (see git log for qualification/2026-10-29-P1-53/receipt.json)",
+  "environment": { "node": "v22.23.3", "pnpm": "10.33.0", "os": "macOS 26.6.2 (Darwin 25.6.0)" },
+  "commands": [
+    { "command": "npm run -s build", "exit": 0 },
+    { "command": "npx vitest run tests/catalog/consolidation/ tests/scoreCrossFrameworkMapping.test.ts tests/pbsaiGovernance.test.ts --maxWorkers=2", "exit": 0, "files": 4, "tests": 35 },
+    { "command": "npx vitest run <197 test files that reference the changed modules> tests/catalog --maxWorkers=2", "exit": 0, "files": 208, "tests": 3470 },
+    { "command": "npx vitest run <386 test files that reference docs, counts, deep packs, conformance or example mode> --maxWorkers=2", "exit": 0, "files": 364, "skippedFiles": 3, "tests": 3842, "skippedTests": 7 },
+    { "command": "npm run typecheck", "exit": 0 },
+    { "command": "npm run typecheck:tests", "exit": 0 },
+    { "command": "npm run lint", "exit": 0 },
+    { "command": "npm run check:gates", "exit": 0 },
+    { "command": "npm run check:dead-code", "exit": 0, "note": "one accepted finding: scripts/gen-consolidation-index.mjs is a hand-run maintainer script" },
+    { "command": "npm run check:duplicates", "exit": 0 },
+    { "command": "node scripts/gen-counts.mjs --write && npm run check:counts", "exit": 0 },
+    { "command": "npm run -s gen:api-ref && npm run check:api-ref", "exit": 0 },
+    { "command": "npm run check:docs-drift", "exit": 0 },
+    { "command": "npm run check:architecture-boundaries", "exit": 0 },
+    { "command": "npm run check:citations", "exit": 0 },
+    { "command": "node scripts/gen-consolidation-index.mjs --check", "exit": 0 },
+    { "command": "node scripts/check-catalog-changelog.mjs --base-ref cafe5751f", "exit": 0, "note": "catalog digest unchanged: sha256:0344050d488e78da1cb4cc0b5b8810df4f493e438cb3b14fd5a9db2589149fb7" },
+    { "command": "node scripts/check-freeze.mjs --base-ref cafe5751f", "exit": 0, "note": "no new CLI command paths" },
+    { "command": "npm run check:clean-source", "exit": 1, "note": "environmental: the clean checkout's pnpm install could not download node-gyp headers for better-sqlite3 (no network); not caused by this change" }
+  ],
+  "mutations": [
+    { "guard": "generateFrameworkReport ignores active modules", "mutation": "count a control covered when any listed module is active", "failed": ["singleSource: all ten frameworks report 0 coverage", "scoreCrossFrameworkMapping: NIST_AI_RMF with module watch", "scoreCrossFrameworkMapping: EU_AI_ACT with module ledger", "pbsaiGovernance: no coverage"] },
+    { "guard": "scoreDomainPack is never certification-ready", "mutation": "return certificationReadiness: score >= 80", "failed": ["singleSource: every answer at 5 is self-reported and never certification-ready"] },
+    { "guard": "questionnaire claimKind is self_reported only", "mutation": "allow claimKind observed", "failed": ["singleSource: refuses a questionnaire item that claims more than self-reported"] },
+    { "guard": "questionnaire mapsTo names existing controls", "mutation": "skip the CAT_QUESTIONNAIRE_MAPPING check", "failed": ["singleSource: refuses ... maps to no control"] },
+    { "guard": "binding map parameter accepts each pack value", "mutation": "skip spec.check", "failed": ["attachments: flags ... a value the parameter refuses"] },
+    { "guard": "binding map setting exists in every pack", "mutation": "skip the missing-setting issue", "failed": ["attachments: flags ... a missing setting"] },
+    { "guard": "crosswalk receipt rows borrow evidence only from linked mappings", "mutation": "borrow from the first mapping regardless of catalogControls", "failed": ["attachments: borrowing evidence only from mappings that name the control", "attachments: a receipt over a row with no linked mapping fails closed"] }
+  ],
+  "regression": "Mutation 1 restores main's module-based coverage; the all-modules test fails on it and passes after the change.",
+  "artifacts": {
+    "catalog/questionnaires/domain-rubrics.yaml": "ca6b3c183736eba2d49eb84fc58b0444b120b4ba05ee426e9e02ff3a742609d9",
+    "catalog/bindings/policy-packs.yaml": "68eb267081c18edd13235f27221c9831ac6cfaf5fb337a92903296f1bf84b661",
+    "qualification/2026-10-29-P1-53/copy-domain-rubrics.mjs": "d7fa8658e90d38c461f1a1dec238a0ddf18bf1d6bfdf1056f609046a59a066cf"
+  },
+  "rubricContentSha256": { "before": "a91b85c636cca68d2f23f01ed39627a8a36c55d447da944126d3b05895caa202", "after": "a91b85c636cca68d2f23f01ed39627a8a36c55d447da944126d3b05895caa202" },
+  "pendingHumanReview": [
+    "29 compliance-mapping to Layer 0 control pairings (catalogControls): AI-proposed, pending a named reviewer (P1-34)",
+    "catalog/bindings/policy-packs.yaml setting-to-parameter map: AI-proposed, pending review"
+  ]
+}

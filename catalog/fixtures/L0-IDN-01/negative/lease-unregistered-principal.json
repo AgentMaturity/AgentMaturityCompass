@@ -1,0 +1,103 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L0-IDN-01",
+  "polarity": "negative",
+  "evidenceClass": "unknown_authority",
+  "setup": {
+    "harness": "compiled_identity",
+    "profile": {
+      "profileVersion": 1,
+      "profileId": "layer0-identity-fixture",
+      "deployment": {
+        "tenantId": "tenant-a",
+        "workspaceId": "ws-a",
+        "deploymentId": "dep-a",
+        "agentIds": [
+          "default"
+        ]
+      },
+      "primaryStation": {
+        "value": "wealth",
+        "provenance": "asserted",
+        "source": "layer0 fixture: synthetic example profile",
+        "reviewedBy": null
+      },
+      "stations": {
+        "value": [
+          "wealth",
+          "technology"
+        ],
+        "provenance": "asserted",
+        "source": "layer0 fixture: synthetic example profile",
+        "reviewedBy": null
+      },
+      "domains": {
+        "value": [
+          "wealth.banking-finance-ops"
+        ],
+        "provenance": "asserted",
+        "source": "layer0 fixture: synthetic example profile",
+        "reviewedBy": null
+      },
+      "jurisdictions": {
+        "value": [
+          "US"
+        ],
+        "provenance": "asserted",
+        "source": "layer0 fixture: synthetic example profile",
+        "reviewedBy": null
+      },
+      "roles": {
+        "value": [
+          "deployer"
+        ],
+        "provenance": "asserted",
+        "source": "layer0 fixture: synthetic example profile",
+        "reviewedBy": null
+      },
+      "entityTypes": {
+        "value": [
+          "non_bank_financial_institution"
+        ],
+        "provenance": "asserted",
+        "source": "layer0 fixture: synthetic example profile",
+        "reviewedBy": null
+      },
+      "riskClass": {
+        "value": "high",
+        "provenance": "asserted",
+        "source": "layer0 fixture: synthetic example profile",
+        "reviewedBy": null
+      },
+      "useCases": {
+        "value": [
+          "reconciliation"
+        ],
+        "provenance": "asserted",
+        "source": "layer0 fixture: synthetic example profile",
+        "reviewedBy": null
+      },
+      "dataClasses": {
+        "value": [
+          "customer_financial"
+        ],
+        "provenance": "asserted",
+        "source": "layer0 fixture: synthetic example profile",
+        "reviewedBy": null
+      },
+      "euRoleRecord": null,
+      "art63Record": null,
+      "operatingProfile": null,
+      "exceptions": []
+    },
+    "tool": "fs.read",
+    "args": {
+      "path": "workspace/n.txt"
+    },
+    "lease": "unregistered_principal"
+  },
+  "expected": {
+    "result": "deny",
+    "reasonCode": "IDENTITY_UNRESOLVED"
+  }
+}

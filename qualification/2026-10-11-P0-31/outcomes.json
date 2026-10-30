@@ -1,0 +1,147 @@
+{
+  "key": "P0-31",
+  "rc": {
+    "commit": "756bd6977dce19f4ef781bdb492c38d6777964f7",
+    "tarballSha256": "21190c7da41e9fc5bf87e168416b34085f223df8cf80425e420557011ebc0340",
+    "installedCliSha256": "8b9ec22158bcb23a0f0123e1b12abfce1d9cd1675ba9c9f3aad6b54019ac9165"
+  },
+  "cells": {
+    "macos-arm64-node22": "macOS 26.6.2 arm64 host, Homebrew node@22 22.22.0",
+    "macos-arm64-node24": "macOS 26.6.2 arm64 host, Homebrew node@24 24.21.0",
+    "linux-arm64-node22": "node:22-bookworm@sha256:0e5f906573693feaa1e21057ebdcfdb5bd5021f050b2dc7c9deceb629c7da2a8 (Node 22.23.3) on colima amc-s7f (Ubuntu 24.04 kernel 6.8, arm64)",
+    "linux-arm64-node24": "node:24-bookworm@sha256:3d27e5c11e5786e309ec3e03f93ae536eb36e6e5eb3714d5eb3300a36157add0 (Node 24.21.0) on colima amc-s7f (Ubuntu 24.04 kernel 6.8, arm64)"
+  },
+  "followUpsBlockingP0-39": [
+    "P0-56",
+    "P0-57",
+    "P0-58",
+    "P0-59",
+    "P0-60",
+    "P0-61",
+    "P0-62"
+  ],
+  "summary": {
+    "AMC-1510": "passed in 4/4 cells",
+    "AMC-1511": "passed in 4/4 cells; efb4b638 handed to P2-12 (3 surviving guard mutations)",
+    "AMC-1513": "passed on macOS (2/2); Linux (2/2) exception P0-60",
+    "AMC-1515": "passed in 4/4 cells",
+    "AMC-1535": "passed in 4/4 cells",
+    "AMC-1532": "passed in 4/4 cells with named exceptions P0-58, P0-59",
+    "AMC-1533": "passed in 4/4 cells",
+    "AMC-1536": "passed in 4/4 cells (13/13 each)",
+    "AMC-1540": "passed in 4/4 cells (13/13 each)",
+    "AMC-1541": "passed in 4/4 cells (13/13 each); archive negatives and review done; P0-62 for one failed Linux Node 24 attempt",
+    "AMC-1538": "passed (macOS once, Linux in both containers)",
+    "AMC-1545": "failed: P0-61 (mutation survivors); P0-58, P0-59 related",
+    "AMC-1520": "passed in 4/4 cells; spawn-site re-check already on int (fe2ac21f, 03e73617)",
+    "AMC-1523": "passed in 4/4 cells"
+  },
+  "outcomes": {
+    "AMC-1510": {
+      "macos-arm64-node22": "passed: check:packed-install --tarball exit 0 (@amc/core not resolvable); qualify:platform passed on v22.22.0, tarball sha256 equal to the RC",
+      "macos-arm64-node24": "passed: check:packed-install --tarball exit 0 (@amc/core not resolvable); qualify:platform passed on v24.21.0, tarball sha256 equal to the RC",
+      "linux-arm64-node22": "passed: check:packed-install --tarball exit 0 (@amc/core not resolvable); qualify:platform passed on v22.23.3, repack of the extracted RC: gzip layer differs, uncompressed tar identical (rc-tar-identity.txt)",
+      "linux-arm64-node24": "passed: check:packed-install --tarball exit 0 (@amc/core not resolvable); qualify:platform passed on v24.21.0, repack of the extracted RC: gzip layer differs, uncompressed tar identical (rc-tar-identity.txt)"
+    },
+    "AMC-1511": {
+      "macos-arm64-node22": "passed (crash run): installed crash after a durable side effect, resume and new turn: ok, 3/3 checks, exactly 1 effect, no replay, cold verification ok on v22.22.0; efb4b638 handed to P2-12 (6/9 guard mutations killed; survivors: 1511-turn-end-format, 1511-resume-runtime, 1511-resume-history-moved)",
+      "macos-arm64-node24": "passed (crash run): installed crash after a durable side effect, resume and new turn: ok, 3/3 checks, exactly 1 effect, no replay, cold verification ok on v24.21.0; efb4b638 handed to P2-12 (6/9 guard mutations killed; survivors: 1511-turn-end-format, 1511-resume-runtime, 1511-resume-history-moved)",
+      "linux-arm64-node22": "passed (crash run): installed crash after a durable side effect, resume and new turn: ok, 3/3 checks, exactly 1 effect, no replay, cold verification ok on v22.23.3; efb4b638 handed to P2-12 (6/9 guard mutations killed; survivors: 1511-turn-end-format, 1511-resume-runtime, 1511-resume-history-moved)",
+      "linux-arm64-node24": "passed (crash run): installed crash after a durable side effect, resume and new turn: ok, 3/3 checks, exactly 1 effect, no replay, cold verification ok on v24.21.0; efb4b638 handed to P2-12 (6/9 guard mutations killed; survivors: 1511-turn-end-format, 1511-resume-runtime, 1511-resume-history-moved)"
+    },
+    "AMC-1513": {
+      "macos-arm64-node22": "passed: write outside the workspace denied, control write inside scope ok, cancel mid-command killed the process tree (seatbelt, cancelled, treeExitProven)",
+      "macos-arm64-node24": "passed: write outside the workspace denied, control write inside scope ok, cancel mid-command killed the process tree (seatbelt, cancelled, treeExitProven)",
+      "linux-arm64-node22": "exception (P0-60, owner Sid): write outside the workspace denied and control write ok; confined shell could not start (container on an Ubuntu 24.04 kernel with AppArmor userns restriction), the call failed closed with no command run and no unconfined fallback; confined-tree cancellation not exercised",
+      "linux-arm64-node24": "exception (P0-60, owner Sid): write outside the workspace denied and control write ok; confined shell could not start (container on an Ubuntu 24.04 kernel with AppArmor userns restriction), the call failed closed with no command run and no unconfined fallback; confined-tree cancellation not exercised"
+    },
+    "AMC-1515": {
+      "macos-arm64-node22": "passed: stdio MCP over an installed turn: completed call recorded completed (1 remote call); result received after grant disposal reported executed and not replayed; schema-invalid arguments refused with 0 remote calls; SIMULATE not reachable from installed native surfaces (in-process tests cover it)",
+      "macos-arm64-node24": "passed: stdio MCP over an installed turn: completed call recorded completed (1 remote call); result received after grant disposal reported executed and not replayed; schema-invalid arguments refused with 0 remote calls; SIMULATE not reachable from installed native surfaces (in-process tests cover it)",
+      "linux-arm64-node22": "passed: stdio MCP over an installed turn: completed call recorded completed (1 remote call); result received after grant disposal reported executed and not replayed; schema-invalid arguments refused with 0 remote calls; SIMULATE not reachable from installed native surfaces (in-process tests cover it)",
+      "linux-arm64-node24": "passed: stdio MCP over an installed turn: completed call recorded completed (1 remote call); result received after grant disposal reported executed and not replayed; schema-invalid arguments refused with 0 remote calls; SIMULATE not reachable from installed native surfaces (in-process tests cover it)"
+    },
+    "AMC-1535": {
+      "macos-arm64-node22": "passed: the same three properties over Streamable HTTP (loopback fixture)",
+      "macos-arm64-node24": "passed: the same three properties over Streamable HTTP (loopback fixture)",
+      "linux-arm64-node22": "passed: the same three properties over Streamable HTTP (loopback fixture)",
+      "linux-arm64-node24": "passed: the same three properties over Streamable HTTP (loopback fixture)"
+    },
+    "AMC-1532": {
+      "macos-arm64-node22": "passed with named exceptions P0-58 and P0-59: CLI, TypeScript SDK and ACP each gated fs.read behind 1 signed approval, cancelled a turn held at the approval, refused the 4th request on a 3-request daily budget before dispatch, and verified cold (default SQLite store); a second ACP session fails under AMC_SESSION_STORE=jsonl (P0-58); budget refusals carry provider-quota guidance (P0-59)",
+      "macos-arm64-node24": "passed with named exceptions P0-58 and P0-59: CLI, TypeScript SDK and ACP each gated fs.read behind 1 signed approval, cancelled a turn held at the approval, refused the 4th request on a 3-request daily budget before dispatch, and verified cold (default SQLite store); a second ACP session fails under AMC_SESSION_STORE=jsonl (P0-58); budget refusals carry provider-quota guidance (P0-59)",
+      "linux-arm64-node22": "passed with named exceptions P0-58 and P0-59: CLI, TypeScript SDK and ACP each gated fs.read behind 1 signed approval, cancelled a turn held at the approval, refused the 4th request on a 3-request daily budget before dispatch, and verified cold (default SQLite store); a second ACP session fails under AMC_SESSION_STORE=jsonl (P0-58); budget refusals carry provider-quota guidance (P0-59)",
+      "linux-arm64-node24": "passed with named exceptions P0-58 and P0-59: CLI, TypeScript SDK and ACP each gated fs.read behind 1 signed approval, cancelled a turn held at the approval, refused the 4th request on a 3-request daily budget before dispatch, and verified cold (default SQLite store); a second ACP session fails under AMC_SESSION_STORE=jsonl (P0-58); budget refusals carry provider-quota guidance (P0-59)"
+    },
+    "AMC-1533": {
+      "macos-arm64-node22": "passed: native-extension inspect/sign/install with the reviewed digest, signed command expanded in a run, chat /load, command use and /unload through a pty, an edited signed content file refused by run and inspect (CONTENT_CHANGED)",
+      "macos-arm64-node24": "passed: native-extension inspect/sign/install with the reviewed digest, signed command expanded in a run, chat /load, command use and /unload through a pty, an edited signed content file refused by run and inspect (CONTENT_CHANGED)",
+      "linux-arm64-node22": "passed: native-extension inspect/sign/install with the reviewed digest, signed command expanded in a run, chat /load, command use and /unload through a pty, an edited signed content file refused by run and inspect (CONTENT_CHANGED)",
+      "linux-arm64-node24": "passed: native-extension inspect/sign/install with the reviewed digest, signed command expanded in a run, chat /load, command use and /unload through a pty, an edited signed content file refused by run and inspect (CONTENT_CHANGED)"
+    },
+    "AMC-1536": {
+      "macos-arm64-node22": "passed: installed Studio browser 13/13 scenarios, 8/8 cold verifiers valid, on v22.22.0",
+      "macos-arm64-node24": "passed: installed Studio browser 13/13 scenarios, 8/8 cold verifiers valid, on v24.21.0",
+      "linux-arm64-node22": "passed: installed Studio browser 13/13 scenarios, 8/8 cold verifiers valid, on v22.23.3",
+      "linux-arm64-node24": "passed: installed Studio browser 13/13 scenarios, 8/8 cold verifiers valid, on v24.21.0 (first attempt failed at amc up --demo, P0-62; this is the rerun)"
+    },
+    "AMC-1540": {
+      "macos-arm64-node22": "passed: installed Studio browser 13/13 scenarios, 8/8 cold verifiers valid, on v22.22.0",
+      "macos-arm64-node24": "passed: installed Studio browser 13/13 scenarios, 8/8 cold verifiers valid, on v24.21.0",
+      "linux-arm64-node22": "passed: installed Studio browser 13/13 scenarios, 8/8 cold verifiers valid, on v22.23.3",
+      "linux-arm64-node24": "passed: installed Studio browser 13/13 scenarios, 8/8 cold verifiers valid, on v24.21.0 (first attempt failed at amc up --demo, P0-62; this is the rerun)"
+    },
+    "AMC-1541": {
+      "macos-arm64-node22": "passed: installed Studio browser 13/13 scenarios, 8/8 cold verifiers valid, on v22.22.0; archive negatives (tests/studioNativeTaskArchiveNegatives.test.ts, 3/3, 4/4 dist guard mutations killed) and handler review in README",
+      "macos-arm64-node24": "passed: installed Studio browser 13/13 scenarios, 8/8 cold verifiers valid, on v24.21.0; archive negatives (tests/studioNativeTaskArchiveNegatives.test.ts, 3/3, 4/4 dist guard mutations killed) and handler review in README",
+      "linux-arm64-node22": "passed: installed Studio browser 13/13 scenarios, 8/8 cold verifiers valid, on v22.23.3; archive negatives (tests/studioNativeTaskArchiveNegatives.test.ts, 3/3, 4/4 dist guard mutations killed) and handler review in README",
+      "linux-arm64-node24": "passed: installed Studio browser 13/13 scenarios, 8/8 cold verifiers valid, on v24.21.0 (first attempt failed at amc up --demo, P0-62; this is the rerun); archive negatives (tests/studioNativeTaskArchiveNegatives.test.ts, 3/3, 4/4 dist guard mutations killed) and handler review in README"
+    },
+    "AMC-1538": {
+      "macos-arm64-node22": "passed: wheel built from sdk/python at the RC, installed non-editable into a fresh venv, test_validation_installed.py 21 passed, 1 skipped (native fixture lane, fixtures not supplied); Node-independent lane (one macOS run covers both macOS Node cells)",
+      "macos-arm64-node24": "passed: wheel built from sdk/python at the RC, installed non-editable into a fresh venv, test_validation_installed.py 21 passed, 1 skipped (native fixture lane, fixtures not supplied); Node-independent lane (one macOS run covers both macOS Node cells)",
+      "linux-arm64-node22": "passed: wheel built from sdk/python at the RC, installed non-editable into a fresh venv, test_validation_installed.py 21 passed, 1 skipped (native fixture lane, fixtures not supplied); Node-independent lane",
+      "linux-arm64-node24": "passed: wheel built from sdk/python at the RC, installed non-editable into a fresh venv, test_validation_installed.py 21 passed, 1 skipped (native fixture lane, fixtures not supplied); Node-independent lane"
+    },
+    "AMC-1545": {
+      "macos-arm64-node22": "failed (P0-61): installed delegated runs stop on max-turns:1 and timeout-ms:1500 (default store); mutations 1/3 killed, survivors 1545-narrower-timeout, 1545-narrower-parent-only; under jsonl the child never starts (P0-58); parent after a timed-out child is refused with provider-quota guidance (P0-59)",
+      "macos-arm64-node24": "failed (P0-61): installed delegated runs stop on max-turns:1 and timeout-ms:1500 (default store); mutations 1/3 killed, survivors 1545-narrower-timeout, 1545-narrower-parent-only; under jsonl the child never starts (P0-58); parent after a timed-out child is refused with provider-quota guidance (P0-59)",
+      "linux-arm64-node22": "failed (P0-61): installed delegated runs stop on max-turns:1 and timeout-ms:1500 (default store); mutations 1/3 killed, survivors 1545-narrower-timeout, 1545-narrower-parent-only; under jsonl the child never starts (P0-58); parent after a timed-out child is refused with provider-quota guidance (P0-59)",
+      "linux-arm64-node24": "failed (P0-61): installed delegated runs stop on max-turns:1 and timeout-ms:1500 (default store); mutations 1/3 killed, survivors 1545-narrower-timeout, 1545-narrower-parent-only; under jsonl the child never starts (P0-58); parent after a timed-out child is refused with provider-quota guidance (P0-59)"
+    },
+    "AMC-1520": {
+      "macos-arm64-node22": "passed: installed DSH launch pin: approved files spawn, a changed approved file is refused before spawn, ledger verifies; spawn-site re-hash covered by tests/dshRunnerReverify.test.ts (mutation 1520-spawn-recheck killed); exec-by-path window documented in docs/adapters/deepseek-harness.md",
+      "macos-arm64-node24": "passed: installed DSH launch pin: approved files spawn, a changed approved file is refused before spawn, ledger verifies; spawn-site re-hash covered by tests/dshRunnerReverify.test.ts (mutation 1520-spawn-recheck killed); exec-by-path window documented in docs/adapters/deepseek-harness.md",
+      "linux-arm64-node22": "passed: installed DSH launch pin: approved files spawn, a changed approved file is refused before spawn, ledger verifies; spawn-site re-hash covered by tests/dshRunnerReverify.test.ts (mutation 1520-spawn-recheck killed); exec-by-path window documented in docs/adapters/deepseek-harness.md",
+      "linux-arm64-node24": "passed: installed DSH launch pin: approved files spawn, a changed approved file is refused before spawn, ledger verifies; spawn-site re-hash covered by tests/dshRunnerReverify.test.ts (mutation 1520-spawn-recheck killed); exec-by-path window documented in docs/adapters/deepseek-harness.md"
+    },
+    "AMC-1523": {
+      "macos-arm64-node22": "passed: installed amc import <pi-v3> --dry-run text mode prints 'format pi-session v3 (jsonl)', 'Records: 5 (1 mapped, 2 retained only, 2 malformed, 0 unsupported)' and a Next line with --expected-digest",
+      "macos-arm64-node24": "passed: installed amc import <pi-v3> --dry-run text mode prints 'format pi-session v3 (jsonl)', 'Records: 5 (1 mapped, 2 retained only, 2 malformed, 0 unsupported)' and a Next line with --expected-digest",
+      "linux-arm64-node22": "passed: installed amc import <pi-v3> --dry-run text mode prints 'format pi-session v3 (jsonl)', 'Records: 5 (1 mapped, 2 retained only, 2 malformed, 0 unsupported)' and a Next line with --expected-digest",
+      "linux-arm64-node24": "passed: installed amc import <pi-v3> --dry-run text mode prints 'format pi-session v3 (jsonl)', 'Records: 5 (1 mapped, 2 retained only, 2 malformed, 0 unsupported)' and a Next line with --expected-digest"
+    }
+  },
+  "mutations": {
+    "1511-config-composition": "killed",
+    "1511-config-policy": "killed",
+    "1511-stop-control": "killed",
+    "1511-unresolved-child": "killed",
+    "1511-delegated-session": "killed",
+    "1511-turn-end-format": "survived",
+    "1511-resume-runtime": "survived",
+    "1511-resume-history-moved": "survived",
+    "1545-narrower-turns": "killed",
+    "1545-narrower-timeout": "survived",
+    "1545-narrower-parent-only": "survived",
+    "1520-spawn-recheck": "killed",
+    "p031-crash-node-pattern": "killed",
+    "p031-studio-node-pattern": "killed",
+    "1541-turn-archived-code": "killed",
+    "1541-archive-not-closed": "killed",
+    "1541-archive-busy": "killed",
+    "1541-owner-check": "killed",
+    "1511-reconcile-closed-client": "killed"
+  },
+  "notQualified": "Windows and Linux AMD64 (D-12); real providers and human studies (P1-47, P1-49)"
+}

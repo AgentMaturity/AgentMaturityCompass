@@ -1,11 +1,13 @@
 import { randomUUID } from "node:crypto";
 import { resolve } from "node:path";
 import { withWorkspaceScope } from "../enforce/evidenceEmitter.js";
-import { AgentDriver } from "./agentDriver.js";
+import type { AgentDriver } from "./agentDriver.js";
+import { composeNativeAgent, settleFailedComposition, type NativeAgent } from "./nativeAgentComposition.js";
+import { agentPromptProfile } from "../prompt/agentPromptProfile.js";
 import type { NativeImageInput } from "../attachments/nativeImageInput.js";
-import type { NativeInputPart } from "../attachments/nativeOrderedInput.js";
-import type { NativeAudioPart } from "../attachments/nativeAudioInput.js";
-import { agentToolset, type AgentToolset } from "./agentToolset.js";
+import { materializeNativeInputParts, snapshotNativeInputParts, type NativeInputPart } from "../attachments/nativeOrderedInput.js";
+import { materializeNativeAudioParts, snapshotNativeAudioParts, type NativeAudioPart } from "../attachments/nativeAudioInput.js";
+import { agentToolset, type AgentToolset, type AgentToolsetOptions } from "./agentToolset.js";
 import type { NativeToolCapability } from "./nativeToolCapabilities.js";
 import type { ExplicitShellOptIn } from "../sandbox/nativeShellGate.js";
 import type { NativeValidationPlan, NativeValidationResult } from "./nativeValidation.js";
@@ -14,11 +16,20 @@ import type { AgentStatus, CompactionConfig } from "./loopTypes.js";
 import { resolveCompactionConfig } from "./compaction/promptPressure.js";
 import { readAgentRunSummary } from "./runReport.js";
 import type { LoopLlm, LoopRoute } from "./stepRunner.js";
+import type { SessionOpenParams } from "../session/sessionApiTypes.js";
 import type { TurnCancelCause, TurnEndReason } from "../session/sessionTypes.js";
 import type { EvidenceEvent } from "../types.js";
 import { SessionService } from "../session/sessionService.js";
+import { redactingSessionFor } from "../dataflow/redactingSession.js";
 import { resumeSession } from "../session/sessionResume.js";
+import { runLease } from "../leases/runLease.js";
+import { refuseRetired } from "../lifecycle/reassessment.js";
+import { nativeSessionManifest } from "../lifecycle/versionManifest.js";
 import type { RecoveryClaimant } from "../session/sessionRecovery.js";
+import { admitSessionAtOpen } from "../runtime/changeEnvelope.js";
+import { prepareSkillTurn } from "../skills/skillTurn.js";
+import type { Skill } from "../skills/skillCatalog.js";
+import { renderSkillContext, SKILL_CONTEXT_ORDER } from "../skills/skillPrompt.js";
 
 /**
  * One AMC session, many prompts (plan P7.1a).
@@ -45,20 +56,30 @@ import type { RecoveryClaimant } from "../session/sessionRecovery.js";
  * be handed the other's work. The slot is claimed synchronously, before the
  * first await, so two callers racing cannot both find it free.
  *
- * MODELLED ON `createDriverRunner` (./subagentRunner.ts), which already does all
- * of this for delegated children. The shape here is the same minus the delegation
- * accounting: same composition, same fresh-text cursor, same refusal to hand back
- * unsigned output.
+ * COMPOSED THROUGH `composeNativeAgent` (./nativeAgentComposition.ts), like
+ * `createDriverRunner`'s delegated children, with the same prompt profile and
+ * context pre-step as `amc agent-loop` (GAP-WP39). The shape here is the runner's
+ * minus the delegation accounting: same fresh-text cursor, same refusal to hand
+ * back unsigned output.
  */
 
 export interface AgentSessionInit {
   readonly workspace: string;
   /** Minted when absent, so a caller that has no id of its own need not invent one. */
   readonly sessionId?: string;
+  readonly acceptedWork?: SessionOpenParams["acceptedWork"];
   readonly agentId: string;
   readonly makeLlm: (session: SessionService) => LoopLlm;
   readonly route: LoopRoute;
+  /** The deployment's persona; assembled with the harness identity, governance section and runtime context (GAP-WP39). */
   readonly systemPrompt: string;
+  /**
+   * True ONLY when `bindTools` gates every tool call on a signed approval: it decides whether the model is told a
+   * guardrail exists (see agentPromptProfile).
+   */
+  readonly approvalGated?: boolean;
+  /** Include the agent's validated mission and constraints as attributed runtime context. */
+  readonly missionContext?: boolean;
   readonly harnessVersion: string;
   readonly compositionDigest: string;
   readonly policyDigest: string;
@@ -67,16 +88,25 @@ export interface AgentSessionInit {
   readonly expectedToolsDigest?: string;
   /** Explicit acceptance of an unconfined macOS shell; see `AgentToolsetOptions.unconfinedShell`. */
   readonly unconfinedShell?: ExplicitShellOptIn;
-  /** The composer's lease for this runtime; see `AgentToolsetOptions.leaseToken` (P1-67). Never in a digest. */
+  /**
+   * The composer's lease for this runtime; see `AgentToolsetOptions.leaseToken` (P1-67). Absent, a workspace-tools session
+   * under a plan that requires a principal mints the run's lease for the OS account's active users.yaml user, or is
+   * refused PRINCIPAL_UNRESOLVED before any session row (P1-79, runLease). Never in a digest.
+   */
   readonly leaseToken?: string;
   /** Server-composed, reviewed mounts; not a browser or wire-provided capability grant. */
   readonly additionalCapabilities?: readonly NativeToolCapability[];
+  /** WP40 seam: a surface's signed ask_user answerer and operator-configured web_search provider, passed to the toolset. */
+  readonly askUser?: AgentToolsetOptions["askUser"];
+  readonly webSearchProvider?: AgentToolsetOptions["webSearchProvider"];
   readonly maxSteps?: number;
-  /** Automatic compaction; off unless `contextWindowTokens` is declared. */
+  /** Automatic compaction defaults to reviewed route metadata; an explicit null window disables it. */
   readonly compaction?: Partial<CompactionConfig>;
   readonly validation?: NativeValidationPlan;
   /** Bind approvals/extensions to the real owning session and its existing pipeline. */
   readonly bindTools?: (context: { readonly session: SessionService; readonly toolset: AgentToolset | null }) => AgentToolSeam;
+  /** Merged over every row of a new session (an experiment trial's case execution identity, GAP-WP04); refused on resume. */
+  readonly rowStamp?: Readonly<Record<string, unknown>>;
 }
 
 export type AgentPromptResult =
@@ -89,7 +119,12 @@ export type AgentPromptResult =
       readonly turnEndReason?: TurnEndReason;
       readonly validation: NativeValidationResult;
     }
-  | { readonly ok: false; readonly reason: string };
+  | {
+      readonly ok: false;
+      readonly reason: string;
+      /** Recorded failure codes of the failed turn (e.g. AMC_NATIVE_BUDGET_REFUSED), so a client can tell AMC's refusal from a provider's. */
+      readonly failureCodes?: readonly string[];
+    };
 
 export interface AgentSession {
   readonly sessionId: string;
@@ -133,13 +168,22 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
     if (init.tools !== undefined && init.tools !== "none" && init.tools !== "workspace") throw new Error("Unknown native tool mode.");
     if (init.expectedToolsDigest !== undefined && (init.tools !== "workspace" || !/^[a-f0-9]{64}$/.test(init.expectedToolsDigest))) throw new Error("A native tool policy pin requires explicit workspace tools and a SHA-256 digest.");
     if (init.maxSteps !== undefined && (!Number.isSafeInteger(init.maxSteps) || init.maxSteps < 1 || init.maxSteps > 1024)) throw new Error("Native maxSteps must be an integer from 1 through 1024.");
-    const compaction = init.compaction === undefined ? undefined : resolveCompactionConfig(init.compaction);
+    if (init.compaction !== undefined) resolveCompactionConfig(init.compaction);
+    const compaction = init.compaction;
+    refuseRetired(workspace, init.agentId); // P2-23: a retired agent opens no session
+    // P1-79: the caller's lease, or the run's (LeasePrincipalRefused before any session row or recovery).
+    const lease = runLease({ workspace, agentId: init.agentId, model: init.route.model || init.route.providerId, tools: init.tools ?? "workspace",
+      ...(init.leaseToken === undefined ? {} : { leaseToken: init.leaseToken }) });
     const sessionId = init.sessionId ?? randomUUID();
-    const session = claimant === undefined ? new SessionService(workspace) : resumeSession({
+    // P2-02: in an opted-in workspace, messages and tool results are tokenized before any row is committed.
+    if (init.rowStamp !== undefined && claimant !== undefined) throw new Error("A row stamp covers a whole new session; a resumed session cannot take one.");
+    const raw = claimant === undefined ? new SessionService(workspace) : resumeSession({
       workspace, sessionId, agentId: init.agentId,
       harnessVersion: init.harnessVersion, compositionDigest: init.compositionDigest,
       policyDigest: init.policyDigest, claimant
     }).service;
+    if (init.rowStamp !== undefined) raw.stampEveryRow(init.rowStamp);
+    const session = redactingSessionFor(raw);
     // The toolset writes its tool evidence into THIS session rather than into
     // `agentToolset`'s default `toolset-<agentId>`, which nothing ever starts --
     // so a run that actually called a tool left rows referencing a session with no
@@ -152,7 +196,9 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
       ...(init.additionalCapabilities === undefined ? {} : { additionalCapabilities: init.additionalCapabilities }),
       ...(init.expectedToolsDigest === undefined ? {} : { expectedToolsDigest: init.expectedToolsDigest }),
       ...(init.unconfinedShell === undefined ? {} : { unconfinedShell: init.unconfinedShell }),
-      ...(init.leaseToken === undefined ? {} : { leaseToken: init.leaseToken }),
+      ...(init.askUser === undefined ? {} : { askUser: init.askUser }),
+      ...(init.webSearchProvider === undefined ? {} : { webSearchProvider: init.webSearchProvider }),
+      ...lease,
       // Handing over the writer is what keeps the session ANCHORABLE. Pointing the
       // rows at the right session id was only half of it: written through the raw
       // ledger they carry no envelope, and `sessionRootDescriptor` then refuses to
@@ -162,6 +208,7 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
 
     let closed = false;
     let running = false;
+    let activeSkill: Skill | undefined;
     let toolset: ReturnType<typeof agentToolset> | undefined;
     /**
      * How much assistant text the caller has already been told.
@@ -173,6 +220,9 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
     let reported = 0;
     let reportedEndings = 0;
 
+    let driver!: AgentDriver;
+    let composed: NativeAgent | undefined;
+    let composing = false;
     const finish = (release: boolean): void => withWorkspaceScope(workspace, () => {
       if (closed) return;
       if (running) throw new Error("Cancel and settle the active prompt before closing or releasing its session.");
@@ -187,44 +237,65 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
         throw error;
       } finally {
         closed = true;
+        composed?.dispose();
         toolset?.close();
       }
     });
 
-    let driver!: AgentDriver;
     try {
       if (claimant !== undefined) {
         const history = readAgentRunSummary(workspace, sessionId, "idle");
         reported = history.assistantText.length;
         reportedEndings = history.endings.length;
       }
-      if (claimant === undefined) session.open({
-        sessionId,
-        agentId: init.agentId,
-        harnessVersion: init.harnessVersion,
-        compositionDigest: init.compositionDigest,
-        policyDigest: init.policyDigest
-      });
-      toolset = init.tools === "none" ? undefined : makeToolset();
-      const tools = init.bindTools?.({ session, toolset: toolset ?? null }) ?? toolset?.seam ?? EMPTY_TOOL_SEAM;
-      const systemPromptEventId = session.recordSystemPrompt(init.systemPrompt).eventId;
-      driver = new AgentDriver({
+      // GAP-WP39: the same prompt profile and context pre-step as `amc agent-loop` -- workspace instruction files, time
+      // and governance reach this session too. The caller's system prompt is the deployment's persona.
+      const profile = agentPromptProfile({ workspace, agentId: init.agentId, persona: init.systemPrompt, approvalGated: init.approvalGated === true,
+        ...(init.missionContext === true ? { missionContext: true } : {}),
+        extraContextPlugins: [{ name: "context:operator-skill", order: SKILL_CONTEXT_ORDER,
+          collect: async () => activeSkill === undefined ? "" : renderSkillContext(activeSkill) }] });
+      composing = true;
+      composed = composeNativeAgent({
         session,
-        llm: init.makeLlm(session),
+        ...(claimant === undefined ? { open: { sessionId, agentId: init.agentId, harnessVersion: init.harnessVersion,
+          compositionDigest: init.compositionDigest, policyDigest: init.policyDigest,
+          ...(init.acceptedWork === undefined ? {} : { acceptedWork: init.acceptedWork }) } } : {}),
+        prompt: { profile },
+        makeLlm: init.makeLlm,
         route: init.route,
-        systemPromptEventId,
-        tools,
-        ...(init.validation === undefined ? {} : { validation: init.validation }),
-        config: { ...(init.maxSteps === undefined ? {} : { maxStepsPerTurn: init.maxSteps }), ...(compaction === undefined ? {} : { compaction }) }
+        tools: () => {
+          toolset = init.tools === "none" ? undefined : makeToolset();
+          return init.bindTools?.({ session, toolset: toolset ?? null }) ?? toolset?.seam ?? EMPTY_TOOL_SEAM;
+        },
+        // P2-23 reassessment triggers and P2-26 change envelopes run on the composed tool surface, before the first turn;
+        // an out-of-envelope change throws here and the session is settled as a failed composition.
+        admit: ({ systemPrompt, tools }) => admitSessionAtOpen({ workspace, agentId: init.agentId, manifest: () => nativeSessionManifest({ workspace, agentId: init.agentId,
+          providerId: init.route.providerId, model: init.route.model, systemPrompt, harnessVersion: init.harnessVersion,
+          compositionDigest: init.compositionDigest, tools: init.tools ?? "workspace", surface: tools,
+          ...(init.additionalCapabilities === undefined ? {} : { additionalCapabilities: init.additionalCapabilities }) }) }),
+        driver: {
+          ...(init.validation === undefined ? {} : { validation: init.validation }),
+          config: { ...(init.maxSteps === undefined ? {} : { maxStepsPerTurn: init.maxSteps }), ...(compaction === undefined ? {} : { compaction }) }
+        }
       });
+      driver = composed.driver;
     } catch (error) {
-      // A half-composed session would otherwise be left open and unsealed, which
-      // verification reports as an interrupted run that never actually started.
-      try { finish(claimant !== undefined); } catch { /* retain the original composition error; evidence stays unsealed on failure */ }
+      // composeNativeAgent settled the session (never as `completed`); before it ran, nothing was opened here.
+      closed = true;
+      if (!composing) settleFailedComposition(session, claimant === undefined ? "dispose" : "release");
+      try { toolset?.close(); } catch { /* retain the original composition error */ }
       throw error;
     }
 
-    const runPrompt = (enqueue: () => void): Promise<AgentPromptResult> =>
+    const queueSkill = (text: string, enqueue: (prompt: string) => void): string | undefined => {
+      const prepared = prepareSkillTurn({ workspace, prompt: text });
+      if (!prepared.ok) return prepared.reason;
+      activeSkill = prepared.loaded;
+      enqueue(prepared.prompt);
+      return undefined;
+    };
+
+    const runPrompt = (enqueue: () => string | undefined): Promise<AgentPromptResult> =>
       withWorkspaceScope(workspace, async (): Promise<AgentPromptResult> => {
         if (closed) return { ok: false, reason: "session is closed" };
         // Claimed before any await. Checking after one would let two callers both
@@ -232,7 +303,8 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
         if (running) return { ok: false, reason: "a prompt is already running on this session" };
         running = true;
         try {
-          enqueue();
+          const refusal = enqueue();
+          if (refusal !== undefined) return { ok: false, reason: refusal };
           await driver.whenIdle();
 
           const status = driver.status;
@@ -262,20 +334,37 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
           const knownEndings: readonly TurnEndReason[] = ["complete", "cancelled", "max_tokens", "max_steps", "blocked", "error", "interrupted"];
           const failed = endings.find(ending => ending.reason === "error" || ending.reason === "interrupted"
             || !knownEndings.some(reason => reason === ending.reason));
-          if (failed) return { ok: false, reason: `signed turn ${failed.turn} ended ${failed.reason}; idle is not successful completion` };
+          if (failed) {
+            const failureCodes = (summary.diagnostics ?? []).filter(row => row.turn === failed.turn).map(row => row.guidance.code);
+            return { ok: false, reason: `signed turn ${failed.turn} ended ${failed.reason}; idle is not successful completion`,
+              ...(failureCodes.length === 0 ? {} : { failureCodes }) };
+          }
           const turnEndReason = knownEndings.find(reason => reason === endings.at(-1)?.reason);
           if (turnEndReason === undefined) return { ok: false, reason: "the prompt produced no recorded turn ending" };
           return { ok: true, text: fresh.join("\n"), status, turnEndReason, validation: summary.validation };
         } finally {
+          activeSkill = undefined;
           running = false;
         }
       });
 
     return {
       sessionId,
-      prompt: (text, images) => runPrompt(() => { driver.followup(text, images); }),
-      promptParts: parts => runPrompt(() => { driver.followupParts(parts); }),
-      promptAudioParts: parts => runPrompt(() => { driver.followupAudioParts(parts); }),
+      prompt: (text, images) => runPrompt(() => queueSkill(text, prompt => { driver.followup(prompt, images); })),
+      promptParts: parts => runPrompt(() => {
+        // Validate and snapshot before changing the leading command. Media,
+        // suffix text, empty parts and their relative order remain exact.
+        const stable = materializeNativeInputParts(snapshotNativeInputParts(parts));
+        const first = stable[0];
+        if (first?.type !== "text") { driver.followupParts(stable); return undefined; }
+        return queueSkill(first.text, text => { driver.followupParts([{ type: "text", text }, ...stable.slice(1)]); });
+      }),
+      promptAudioParts: parts => runPrompt(() => {
+        const stable = materializeNativeAudioParts(snapshotNativeAudioParts(parts));
+        const first = stable[0];
+        if (first?.type !== "text") { driver.followupAudioParts(stable); return undefined; }
+        return queueSkill(first.text, text => { driver.followupAudioParts([{ type: "text", text }, ...stable.slice(1)]); });
+      }),
       readEvents: () => withWorkspaceScope(workspace, () => session.readEvents()),
 
       cancel(cause: TurnCancelCause, by: string): void {

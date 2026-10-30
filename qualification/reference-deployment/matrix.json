@@ -1,0 +1,184 @@
+{
+  "schema": "amc.reference-deployment-matrix/1",
+  "item": "P2-06",
+  "topology": "docs/deploy/reference/TOPOLOGY.md",
+  "checks": [
+    {
+      "id": "INS-1",
+      "scenario": "Install by digest",
+      "procedure": "helm install with image.requireDigest=true, secrets created out of band, KeyProvider and ledger encryption on",
+      "passCriteria": "Ready within the 300 s startup budget; helm test passes; deploy-verify.mjs reports all five checks PASS with the pinned key; manifests contain @sha256: and no change-me",
+      "module": "checks/install.mjs",
+      "runbook": "docs/deploy/reference/INSTALL.md"
+    },
+    {
+      "id": "INS-2",
+      "scenario": "Install refusals",
+      "procedure": "Render with a change-me value, with requireDigest but no digest, and with replicaCount=2",
+      "passCriteria": "Each install exits non-zero with the chart's message; nothing is created",
+      "module": "checks/install.mjs",
+      "runbook": "docs/deploy/reference/INSTALL.md"
+    },
+    {
+      "id": "UPG-1",
+      "scenario": "Upgrade with data",
+      "procedure": "Seed on version N-1, then helm upgrade to N",
+      "passCriteria": "Pre-upgrade chain prefix byte-identical; new migrations applied once; ledger verifies; helm test and deploy-verify pass; downtime recorded",
+      "module": "checks/upgrade.mjs",
+      "runbook": "docs/deploy/reference/UPGRADE.md"
+    },
+    {
+      "id": "UPG-2",
+      "scenario": "Failed upgrade",
+      "procedure": "Upgrade to a test image whose migration throws",
+      "passCriteria": "Pod never Ready; ledger file hash unchanged; helm rollback restores service",
+      "module": "checks/upgrade.mjs",
+      "runbook": "docs/deploy/reference/UPGRADE.md"
+    },
+    {
+      "id": "RB-1",
+      "scenario": "Helm rollback",
+      "procedure": "helm rollback from N to N-1 with no schema change",
+      "passCriteria": "Governed turn passes; receipts issued before the rollback still verify",
+      "module": "checks/rollback.mjs",
+      "runbook": "docs/deploy/reference/ROLLBACK.md"
+    },
+    {
+      "id": "RB-2",
+      "scenario": "Rollback across a migration",
+      "procedure": "Roll back after N added a schema version",
+      "passCriteria": "N-1 refuses the newer schema with a clear error, or reads it by design; restoring the pre-upgrade backup works; PRAGMA integrity_check returns ok",
+      "module": "checks/rollback.mjs",
+      "runbook": "docs/deploy/reference/ROLLBACK.md"
+    },
+    {
+      "id": "BR-1",
+      "scenario": "Backup under load",
+      "procedure": "amc backup create during writes, restore into a new namespace and volume",
+      "passCriteria": "amc backup verify passes; restored ledger verifies; restored head is a prefix of the source chain",
+      "module": "checks/backup.mjs",
+      "runbook": "docs/deploy/reference/BACKUP_RESTORE.md"
+    },
+    {
+      "id": "BR-2",
+      "scenario": "RPO and RTO",
+      "procedure": "Delete the volume after the agreed backup cadence, then restore",
+      "passCriteria": "Measured RPO and RTO within targets.json",
+      "module": "checks/backup.mjs",
+      "runbook": "docs/deploy/reference/BACKUP_RESTORE.md"
+    },
+    {
+      "id": "BR-3",
+      "scenario": "Bad restores",
+      "procedure": "Flip one byte; withhold the KeyProvider; restore into another tenant",
+      "passCriteria": "Each refused with a typed error; no partial workspace left",
+      "module": "checks/backup.mjs",
+      "runbook": "docs/deploy/reference/BACKUP_RESTORE.md"
+    },
+    {
+      "id": "CR-1",
+      "scenario": "Pod killed mid-action",
+      "procedure": "Force-delete the pod during a consequential fixture action",
+      "passCriteria": "Action ends completed or outcome_unknown and is never re-dispatched; the fixture's system of record shows no duplicate effect",
+      "module": "checks/crash.mjs",
+      "runbook": "docs/deploy/reference/CRASH_RECOVERY.md"
+    },
+    {
+      "id": "CR-2",
+      "scenario": "Node drain",
+      "procedure": "Cordon and drain the node",
+      "passCriteria": "Pod Ready elsewhere with its volume, or the documented PDB procedure works",
+      "module": "checks/crash.mjs",
+      "runbook": "docs/deploy/reference/CRASH_RECOVERY.md"
+    },
+    {
+      "id": "CR-3",
+      "scenario": "Disk full",
+      "procedure": "Fill the volume",
+      "passCriteria": "Protected effects denied with a reason; no corruption once space is freed",
+      "module": "checks/crash.mjs",
+      "runbook": "docs/deploy/reference/CRASH_RECOVERY.md"
+    },
+    {
+      "id": "CR-4",
+      "scenario": "KeyProvider outage",
+      "procedure": "Block the KeyProvider",
+      "passCriteria": "No new protected effects; recovery without restart once restored",
+      "module": "checks/crash.mjs",
+      "runbook": "docs/deploy/reference/KEY_PROVIDER_OUTAGE.md"
+    },
+    {
+      "id": "CR-5",
+      "scenario": "Database failover",
+      "procedure": "Kill the Postgres primary (HA mode only)",
+      "passCriteria": "Appends fail closed, no chain fork, service resumes; RTO recorded",
+      "module": "checks/crash.mjs",
+      "runbook": "docs/deploy/reference/CRASH_RECOVERY.md",
+      "haOnly": true
+    },
+    {
+      "id": "CR-6",
+      "scenario": "Telemetry outage",
+      "procedure": "Stop the scraper or OTLP endpoint",
+      "passCriteria": "Execution continues; mandatory evidence persists; dropped telemetry reported",
+      "module": "checks/crash.mjs",
+      "runbook": "docs/deploy/reference/CRASH_RECOVERY.md"
+    },
+    {
+      "id": "OV-1",
+      "scenario": "Offline bundle check",
+      "procedure": "Export a bundle and verify it on a machine with no network, using the standalone verifier and the published trust list",
+      "passCriteria": "Genuine bundle \"valid as of T\"; tampered, forged-embedded-key, unpinned-issuer and revoked-key fixtures fail",
+      "module": "checks/offline.mjs",
+      "runbook": "docs/deploy/reference/OFFLINE_VERIFICATION.md"
+    },
+    {
+      "id": "OV-2",
+      "scenario": "Offline WORM check",
+      "procedure": "Download exported retention segments",
+      "passCriteria": "Hashes, pinned signatures and segment chaining verify without cluster access",
+      "module": "checks/offline.mjs",
+      "runbook": "docs/deploy/reference/OFFLINE_VERIFICATION.md"
+    },
+    {
+      "id": "TS-1",
+      "scenario": "API isolation",
+      "procedure": "Tenant A's user calls every tenant-B route listed in src/studio/openapi.ts",
+      "passCriteria": "All 401 or 403; no B data in any response",
+      "module": "checks/tenancy.mjs",
+      "runbook": "docs/deploy/reference/TENANT_ONBOARDING.md"
+    },
+    {
+      "id": "TS-2",
+      "scenario": "Credential isolation",
+      "procedure": "Present A's lease and agent token to B's gateway, toolhub and Studio",
+      "passCriteria": "Refused",
+      "module": "checks/tenancy.mjs",
+      "runbook": "docs/deploy/reference/TENANT_ONBOARDING.md"
+    },
+    {
+      "id": "TS-3",
+      "scenario": "Evidence isolation",
+      "procedure": "Cross-tenant evidence fixture (P1-11)",
+      "passCriteria": "No pass; B's verifier rejects A's events",
+      "module": "checks/tenancy.mjs",
+      "runbook": "docs/deploy/reference/TENANT_ONBOARDING.md"
+    },
+    {
+      "id": "TS-4",
+      "scenario": "Storage and network",
+      "procedure": "B's pod reads A's volume, database role or schema; pod-to-pod traffic across namespaces",
+      "passCriteria": "Permission denied; NetworkPolicy blocks the traffic",
+      "module": "checks/tenancy.mjs",
+      "runbook": "docs/deploy/reference/TENANT_ONBOARDING.md"
+    },
+    {
+      "id": "TS-5",
+      "scenario": "Guard events and streams",
+      "procedure": "Generate guard events and Studio stream messages in A",
+      "passCriteria": "Never visible in B",
+      "module": "checks/tenancy.mjs",
+      "runbook": "docs/deploy/reference/TENANT_ONBOARDING.md"
+    }
+  ]
+}

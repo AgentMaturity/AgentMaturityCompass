@@ -1,0 +1,9 @@
+# P1-07 unchanged baseline review
+
+The two closed cohorts independently pass57/57 and30/30, with22 and8 passing hook entries. Exact actual file plus ordered display-name occurrence joins match raw assertions to unique observer test IDs and states. Both raw/observer/log sets were read completely; all failure/task-error/unhandled arrays are empty. The57-case stream contains the three expected diagnostic/deprecation warnings; neither stream has a late failure diagnostic. Owned PGIDs99240 and473 were recorded absent by ESRCH after natural0 exits2963ms and3163ms, with no signal above0.
+
+Actual imported test paths and --root identify S; the borrowed wrapper runs in heldR atbf3b7766, not source commitbf8836cd. Source files and the root's outcome records are hash-bound here. These are separate unchanged baselines, not a new-test count, fresh clone, source-control or governed-runtime qualification.
+
+Existing antiGaming/evidence-gating fixtures restore their opt-out/console edits. Shared guard setup owns and removes guard temp roots and restores its two guard environment fields; repo guards cover sourceS/.amc under their documented size/stat rules. publicMethodology creates/removes an owned temp workspace and calls the diagnostic with noSign:true. FullDiagnostic/quickscore/trace fixtures use survey/synthetic data; their numerical L3–L5 outputs do not qualify observed gates. Relevant setup/teardown/run source was inspected; the long methodology assertion body is pinned without claiming an exhaustive semantic rereview.
+
+No new public lifecycle records exist. Passed hooks do not prove vault locking, closure of every owned pool, native physical identity, a complete environment snapshot or all descendants/sockets. These limits are preserved, not turned into new gates or invented clean records. No product/test/helper/native/SQL/network/probe execution or checkout/index/QA/source write occurred. All held gaps and decisions remain open.

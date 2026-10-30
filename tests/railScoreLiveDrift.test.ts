@@ -104,7 +104,7 @@ describe("runRailScoreLiveDrift", () => {
     expect(result.receipt.failClosed).toBe(false);
 
     // CHARACTERIZATION PIN (ADR-0025, cluster 4): the whole result.
-    expect(sha256Hex(canonicalize(result))).toBe("44516d36d79f48babe84be0af637901c3d91cf5c275922528d1ed020ceb20874");
+    expect(sha256Hex(canonicalize(result))).toBe("ab67673b0780d5bde05c8b4deb6424aa3be3e8afa35d4411ebc70eea803208a0");
     expect(result.receipt.recommendation).toBe("approve");
     expect(result.receipt.alerts).toEqual([]);
     expect(result.railScoreReceiptHash).toMatch(/^[a-f0-9]{64}$/);

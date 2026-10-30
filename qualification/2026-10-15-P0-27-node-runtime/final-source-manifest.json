@@ -1,0 +1,13 @@
+{
+  "capturedUtc": "2026-10-14T21:39:17.552394+00:00",
+  "source": "75cbdf8a1b83ed6b3851ecce3a069940352a40cd",
+  "base": "f10d97257bc1fc7cb04f5cda98624b38793e456a",
+  "file": "tests/assuranceSessionQualification.test.ts",
+  "originalSha256": "b5187c328592a4d71ae78db53116f168a2bff58d3d645f80930241b1daba7608",
+  "candidateSha256": "0bb79da9302aca099af50fb73de3d48d612cf65919d3f247f5405670da943e3b",
+  "linesOriginal": 200,
+  "linesCandidate": 200,
+  "exactTwoSubstitutionsOnly": true,
+  "protectedProductionOriginalTestsGuardsArchivesDependencyDiffEmpty": true,
+  "scope": "Only our newqualificationtest parent/childallowedruntime checks expand22\u219222/24; all eightbehaviorcasesandhelpersotherwisebyteidentical. P019productionproposalstillheld; no other scopechanges."
+}

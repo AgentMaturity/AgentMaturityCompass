@@ -10,7 +10,7 @@ const trees: string[] = [];
 const frozenScorers: string[] = JSON.parse(readFileSync(join(repoRoot, "scripts/no-fabrication-allowlist.json"), "utf8")).pathPresence;
 
 interface Allowlist {
-  permanent?: Array<{ file: string; rule: string; reason: string }>;
+  permanent?: Array<{ file: string; rule: string; reason: string; phrase?: string }>;
   pending?: Array<{ file: string; rule: string; owner: string; reason: string }>;
   pathPresence?: string[];
   pathPresenceBaseline?: number;
@@ -155,6 +155,33 @@ describe("P0-16 check-no-fabrication guard", () => {
     const result = run(tree({ "src/dashboard/templates/index.html": "<p>ok</p>\n<span>L5 Certified</span>\n" }));
     expect(result.status).toBe(1);
     expect(result.output).toContain("src/dashboard/templates/index.html:2 R4");
+  });
+
+  test("R4: an entry with a phrase exempts only literals that contain that phrase (P1-42 review)", () => {
+    const files = { "src/domains/p.ts": 'export const a = "an ISO 27001 certified operation";\nexport const b = "AMC certified this agent";\n' };
+    const entry = { file: "src/domains/p.ts", rule: "R4", reason: "third-party scheme", phrase: "ISO 27001 certified" };
+    const narrowed = run(tree(files, { permanent: [entry] }));
+    expect(narrowed.status).toBe(1);
+    expect(narrowed.output).toContain("src/domains/p.ts:2 R4");
+    expect(narrowed.output).not.toContain("src/domains/p.ts:1 R4");
+    expect(run(tree({ "src/domains/p.ts": 'export const a = "an ISO 27001 certified operation";\n' }, { permanent: [entry] })).status).toBe(0);
+  });
+
+  test("an empty phrase is refused rather than exempting the whole file", () => {
+    const result = run(tree({ "src/domains/p.ts": 'export const b = "AMC certified this agent";\n' },
+      { permanent: [{ file: "src/domains/p.ts", rule: "R4", reason: "x", phrase: " " }] }));
+    expect(result.status).toBe(1);
+    expect(result.output).toContain("a phrase must be non-empty text");
+  });
+
+  test("an R4 phrase entry that matches no literal is stale", () => {
+    const result = run(tree(
+      { "src/domains/p.ts": 'export const a = "an ISO 27001 certified operation";\n' },
+      { permanent: [{ file: "src/domains/p.ts", rule: "R4", reason: "x", phrase: "ISO 27001 certified" },
+        { file: "src/domains/p.ts", rule: "R4", reason: "y", phrase: "ISO 50001 certified" }] }
+    ));
+    expect(result.status).toBe(1);
+    expect(result.output).toMatch(/stale allowlist entry src\/domains\/p\.ts R4 \(permanent\) "ISO 50001 certified"/);
   });
 
   test("a stale permanent entry fails", () => {

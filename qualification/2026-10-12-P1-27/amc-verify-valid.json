@@ -1,0 +1,77 @@
+{
+  "exitCode": 3,
+  "report": {
+    "type": "amc.verifier-report",
+    "version": 1,
+    "artifact": {
+      "kind": "dsse-intoto",
+      "path": "sample-control-results.sigstore.json",
+      "sha256": "f8471c6bfaddb10bceca3c622f7eba61e9a9bb88d9e55d5d54b478c321e08d70"
+    },
+    "verifier": {
+      "name": "amc-verify",
+      "version": "0.1.0"
+    },
+    "verifiedAt": "<run time>",
+    "asOf": "2026-10-12T01:02:49.959Z",
+    "integrity": {
+      "status": "pass",
+      "errors": []
+    },
+    "issuerAdmission": {
+      "status": "pass",
+      "signatures": [
+        {
+          "signature": "dsseEnvelope.signatures[0]",
+          "purpose": "artifact-seal",
+          "keyId": "62a2797313d9a7593b6cef66e59ef667e9c1c80ff343b81eb1976ac250257eff",
+          "status": "admitted",
+          "source": "trust-list",
+          "listId": "p1-27-qualification",
+          "timeBasis": null,
+          "detail": "admitted"
+        }
+      ]
+    },
+    "anchoring": {
+      "status": "not-applicable",
+      "detail": null
+    },
+    "time": {
+      "claimedAt": "2026-10-12T01:02:48.497Z",
+      "attested": null,
+      "basis": "claimed"
+    },
+    "scope": {
+      "status": "pass",
+      "reasons": []
+    },
+    "freshness": {
+      "status": "pass",
+      "reasons": []
+    },
+    "completeness": {
+      "status": "pass",
+      "reasons": []
+    },
+    "satisfaction": {
+      "status": "not-evaluated",
+      "reasons": [
+        "NOT_RECOMPUTABLE: a control-results statement declares results this verifier cannot recompute from the supplied bytes"
+      ]
+    },
+    "reasonCodes": {
+      "integrity": [],
+      "issuerAdmission": [],
+      "scope": [],
+      "freshness": [],
+      "completeness": [],
+      "satisfaction": [
+        "NOT_RECOMPUTABLE"
+      ]
+    },
+    "trusted": true,
+    "overrides": [],
+    "warnings": []
+  }
+}

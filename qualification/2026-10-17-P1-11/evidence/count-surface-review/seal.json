@@ -1,0 +1,29 @@
+{
+  "schema": "p111-private-count-candidate-seal/1",
+  "inputCount": 45,
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/count-surface-review/ownership-observations.json",
+      "bytes": 917481,
+      "sha256": "765901854d44cfe787917901aafbf0ddaa9acd250b5afdd4b19f8b7c2239c213"
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/count-surface-review/proposed-admission.json",
+      "bytes": 25145,
+      "sha256": "c40cc7d19bcc70b21864fd2bee43a11cb96490a3c2c08007fae92627ef79fa37"
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/count-surface-review/README.md",
+      "bytes": 1930,
+      "sha256": "78a7263d34f7c2908cad0a93ddea1729eb97d4fdb75af688ec42c21d20bdd6e0"
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/count-surface-review/pins.json",
+      "bytes": 10717,
+      "sha256": "7421f9c27861ae45365fe18abd670b0953ee40415862d852a7b43b090e26b949"
+    }
+  ],
+  "generatorExecuted": false,
+  "sourceWrites": false,
+  "blockers": []
+}

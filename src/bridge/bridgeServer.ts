@@ -9,7 +9,7 @@ import { bridgeConfigSchema } from "./bridgeConfigSchema.js";
 import { loadBridgeConfig, verifyBridgeConfigSignature } from "./bridgeConfigStore.js";
 import { verifyBridgeLease } from "./bridgeAuth.js";
 import { resolveBridgeRoute, buildModelIntent } from "./bridgeRoutes.js";
-import { summarizeBridgeBody, bridgeSha256 } from "./bridgeRedaction.js";
+import { summarizeBridgeBody, bridgeSha256, bridgeEvidenceRedactor } from "./bridgeRedaction.js";
 import { appendBridgeAudit, appendBridgeOutputValidated, appendBridgeRequestReceipt, appendBridgeResponseReceipt } from "./bridgeReceipts.js";
 import { appendBridgeTelemetryEvent, bridgeTelemetryEventSchema } from "./bridgeTelemetry.js";
 import { enforceBridgePolicy } from "./bridgePolicyEnforcer.js";
@@ -33,11 +33,12 @@ import {
 import {
   CONTROL_HOOK_PATH,
   CONTROL_HOOK_ROUTE,
-  HookControlError,
   MAX_CONTROL_HOOK_BODY_BYTES,
-  evaluateProviderHookControl,
-  type HookProvider,
 } from "./hookControl.js";
+import { handleHookControlRequest } from "./hookControlRoute.js";
+import { guardHookAudit, hookAuditLatchState, latchedMessage } from "./hookAuditLatch.js";
+import { HookControlError, isHookProvider } from "./hookProviders.js";
+import { handleLeasedHookRoute, isLeasedHookPath } from "./leasedHookRoutes.js";
 interface HandleBridgeRequestOptions {
   workspace: string;
   req: IncomingMessage;
@@ -292,9 +293,8 @@ async function forwardToGateway(params: {
   };
 }
 export async function handleBridgeRequest(options: HandleBridgeRequestOptions): Promise<boolean> {
-  if (!options.pathname.startsWith("/bridge/")) {
-    return false;
-  }
+  if (!options.pathname.startsWith("/bridge/")) return false;
+  if (isLeasedHookPath(options.pathname)) return handleLeasedHookRoute(options);
 
   if (options.pathname === "/bridge/health") {
     if ((options.req.method ?? "GET").toUpperCase() !== "GET") {
@@ -449,11 +449,8 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
         return true;
       }
       const rawBody = await readBody(options.req, Math.min(options.maxRequestBytes, MAX_OBSERVED_HOOK_BODY_BYTES));
-      const observed = ingestObservedAepHookEvent({
-        workspace: options.workspace,
-        authenticatedAgentId: auth.payload.agentId,
-        rawBody
-      });
+      const observed = guardHookAudit(options.workspace, (message) => new HookIngressError("HOOK_LEDGER_UNAVAILABLE", 503, message),
+        () => ingestObservedAepHookEvent({ workspace: options.workspace, authenticatedAgentId: auth.payload!.agentId, rawBody }));
       writeJson(options.res, observed.idempotentReplay ? 200 : 201, {
         ok: true,
         observed: observed.observed,
@@ -496,7 +493,7 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
     }
     const providerHeader = options.req.headers["x-amc-hook-provider"];
     const provider = Array.isArray(providerHeader) ? providerHeader[0] : providerHeader;
-    if (provider !== "claude-code" && provider !== "gemini-cli") {
+    if (!isHookProvider(provider) || provider === "acs") {
       writeControlError(options.res, 400, "supported hook provider header required");
       return true;
     }
@@ -525,10 +522,10 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
         return true;
       }
       const rawBody = await readBody(options.req, Math.min(options.maxRequestBytes, MAX_CONTROL_HOOK_BODY_BYTES));
-      const controlled = evaluateProviderHookControl({
+      const controlled = handleHookControlRequest({
         workspace: options.workspace,
         authenticatedAgentId: auth.payload.agentId,
-        provider: provider as HookProvider,
+        provider, lease: auth.payload,
         rawInput: rawBody.toString("utf8"),
       });
       writeJson(options.res, controlled.idempotentReplay ? 200 : 201, controlled);
@@ -572,6 +569,7 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
         writeControlError(options.res, 400, "event_type, session_id, and payload are required");
         return true;
       }
+      const redact = bridgeEvidenceRedactor(options.workspace);
       const ledger = openLedger(options.workspace);
       try {
         try {
@@ -588,10 +586,8 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
           sessionId,
           runtime: "any",
           eventType: "agent_process_started",
-          payload: JSON.stringify({
-            event_type: eventType,
-            payload
-          }),
+          // Stored like bridge telemetry: secrets in every key and leaf, and the protected-data detectors where opted in.
+          payload: JSON.stringify({ event_type: redact.text(eventType), payload: redact.json(payload) }),
           payloadExt: "json",
           inline: false,
           meta: {
@@ -1367,6 +1363,8 @@ export async function startBridgeServer(params: {
     server.once("error", rejectPromise);
     server.listen(params.port, params.host, () => resolvePromise());
   });
+  const latch = hookAuditLatchState(params.workspace); // Startup reports the hook audit latch; it never trips it.
+  if (latch.latched) process.stderr.write(`[amc] ${latchedMessage(latch.reason)}\n`);
   return {
     server,
     close: async () => {

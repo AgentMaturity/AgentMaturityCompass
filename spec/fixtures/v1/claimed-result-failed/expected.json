@@ -1,0 +1,18 @@
+{
+  "case": "claimed-result-failed",
+  "normative": true,
+  "dimensions": {
+    "integrity": "pass",
+    "issuerAdmission": "pass",
+    "scope": "pass",
+    "freshness": "pass",
+    "completeness": "pass",
+    "satisfaction": "fail"
+  },
+  "reasonCodes": {
+    "satisfaction": [
+      "CLAIMED_RESULT_FAILED"
+    ]
+  },
+  "exitCode": 1
+}

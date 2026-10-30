@@ -1,0 +1,181 @@
+# technology.cra-24h-report-packet. Experimental and unreviewed; synthetic fixtures do not establish production enforcement.
+"id": "L1-TECH-02"
+"version": "0.1.0"
+"support": "experimental"
+"layer": 1
+"family": "software-security-reporting"
+"stations":
+  - "technology"
+"title": "Exercise a draft 24-hour vulnerability report packet"
+"statement": "A vulnerability-reporting drill produces a complete draft packet within 24 hours of recorded
+  awareness only when its AIBOM identifies the actively exploited component and the draft CRA clock exists."
+"riskRationale": "Without a component inventory, awareness time or complete packet, a timestamp alone cannot
+  show that a reporting drill met its target."
+"mandatory": true
+"applicability":
+  "predicate":
+    "all":
+      - "fact": "stations"
+        "includesAny":
+          - "technology"
+      - "fact": "domains"
+        "includesAny":
+          - "technology.platforms-data"
+      - "fact": "jurisdictions"
+        "includesAny":
+          - "EU"
+  "reasons":
+    - "Experimental, unreviewed draft for technology.platforms-data; applicability facts are operator
+      assertions and require a scoped legal determination."
+    - "CRA product scope, sector exclusions and reporting applicability require expert confirmation; the
+      fixture's component match does not decide them."
+  "exclusions":
+    - "when":
+        "not":
+          "fact": "domains"
+          "includesAny":
+            - "technology.platforms-data"
+      "reason": "The deployment is outside the Technology platforms-and-data domain; no legal applicability is
+        inferred from a station name."
+    - "when":
+        "not":
+          "fact": "jurisdictions"
+          "includesAny":
+            - "EU"
+      "reason": "The deployment has no asserted nexus to this control's jurisdiction; unresolved jurisdiction is not
+        treated as an exclusion or a pass."
+"citations":
+  - "key": "eu-cra-art14"
+    "registerId": "eu-cra"
+    "instrument": "Cyber Resilience Act"
+    "clause": "Article 14, candidate early-warning pin; content not read"
+    "edition": "Source locator inherited from S5; text and edition not read for P2-30"
+    "jurisdiction": "EU"
+    "statusType": "binding-now"
+    "superseded": null
+    "effectiveDate": null
+    "complianceDueDate": null
+    "dateNote": "Dates intentionally null pending primary-text verification and named expert review."
+    "url": "https://publications.europa.eu/resource/celex/32024R2847"
+    "retrieval":
+      "state": "unverified"
+      "reason": "Unverified: candidate official source locator inherited from the existing S5 register. No primary
+        text fetched or hashed in P2-30; this record is not source verification or a legal review."
+    "appliesWhen":
+      "fact": "jurisdictions"
+      "includesAny":
+        - "EU"
+    "legalReview": null
+    "note": "Experimental, unreviewed draft. Primary-text verification and D-14 expert scope review remain pending."
+"binding":
+  "kind": "manual"
+  "points": []
+  "mechanism": "Experimental, unreviewed manual-duty draft. Fixture results establish only local exercise
+    behavior; a production result requires admitted evidence and a named human assessor."
+  "parameters": []
+  "manualDuty":
+    "duty": "Determine whether the deployment and component fall within the CRA, then preserve the AIBOM,
+      awareness record and draft packet; obtain expert confirmation of the reporting duty and exclusions."
+    "ownerRole": "head_of_qa"
+    "cadence": "At each vulnerability-reporting drill and any candidate actively exploited vulnerability."
+    "evidenceOfPerformance": "The local fixture AIBOM component match, recorded awareness, draft clock, complete
+      packet fields and elapsed time; packet fields are a draft exercise contract, not a statement of legal
+      sufficiency."
+"tests":
+  - "id": "L1-TECH-02-T1"
+    "type": "drill"
+    "oracle":
+      "kind": "system_of_record"
+      "observes": "The local fixture AIBOM component match, recorded awareness, draft clock, complete packet fields
+        and elapsed time; packet fields are a draft exercise contract, not a statement of legal sufficiency."
+    "fixtures":
+      "positive":
+        - "L1-TECH-02/positive/evidence-valid.json"
+        - "L1-TECH-02/positive/oracle-cra-on-time.json"
+        - "L1-TECH-02/positive/oracle-cra-at-deadline.json"
+      "negative":
+        - "L1-TECH-02/negative/evidence-stale.json"
+        - "L1-TECH-02/negative/evidence-replayed.json"
+        - "L1-TECH-02/negative/evidence-contradictory.json"
+        - "L1-TECH-02/negative/evidence-cross-tenant.json"
+        - "L1-TECH-02/negative/evidence-empty.json"
+        - "L1-TECH-02/negative/evidence-violation.json"
+        - "L1-TECH-02/negative/oracle-cra-late.json"
+        - "L1-TECH-02/negative/oracle-cra-incomplete.json"
+        - "L1-TECH-02/negative/oracle-cra-no-aibom.json"
+        - "L1-TECH-02/negative/oracle-cra-component-absent.json"
+        - "L1-TECH-02/negative/oracle-cra-no-clock.json"
+        - "L1-TECH-02/negative/oracle-cra-no-packet.json"
+    "passCriteria": "Synthetic fixture only: a complete packet at or before awareness plus 24 hours passes the
+      drill. Late or incomplete packets fail; missing AIBOM, component or clock is not evaluated."
+    "attempts": 1
+"evidence":
+  - "id": "L1-TECH-02-E1"
+    "producer": "amc.questionnaire"
+    "bindingFields":
+      - "tenantId"
+      - "workspaceId"
+      - "deploymentId"
+      - "agentId"
+      - "controlId"
+      - "controlVersion"
+    "freshness":
+      "maxAgeDays": 30
+    "sampling":
+      "method": "all"
+      "ratePercent": null
+      "minItems": 1
+    "retention":
+      "mode": "regime_max"
+    "residency":
+      "mode": "inherit_deployment"
+  - "id": "L1-TECH-02-E2"
+    "producer": "amc.aibom.attestation"
+    "bindingFields":
+      - "tenantId"
+      - "workspaceId"
+      - "deploymentId"
+      - "agentId"
+      - "controlId"
+      - "controlVersion"
+    "freshness":
+      "maxAgeDays": 30
+    "sampling":
+      "method": "all"
+      "ratePercent": null
+      "minItems": 1
+    "retention":
+      "mode": "regime_max"
+    "residency":
+      "mode": "inherit_deployment"
+"invalidatedBy":
+  - "model_version"
+  - "prompt_version"
+  - "tool_version"
+  - "policy_version"
+  - "deployment_version"
+"owner":
+  "role": "head_of_qa"
+"clock":
+  "clockId": "eu-cra-early-warning-24h"
+  "deadline":
+    "amount": 24
+    "unit": "hours"
+"levels":
+  - "L1"
+"crosswalk":
+  - "framework": "amc-audit-map-v1"
+    "clause": "INCIDENT_RESPONSE_PREPAREDNESS.ADVISORIES"
+    "relation": "partial"
+    "rationale": "The internal audit-map control is related, but does not cover this station-specific requirement,
+      legal scope or oracle. Mapping is experimental and unreviewed."
+"review":
+  "status": "pending"
+  "expert": null
+  "credential": null
+  "reviewedAt": null
+  "nextReview": null
+"provenance":
+  "draftedBy": "ai"
+  "draftedAt": "2026-10-18"
+  "approvedBy": null

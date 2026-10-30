@@ -1,0 +1,22 @@
+{
+  "at": "2026-10-16T20:30:59.511521+00:00",
+  "oldPacket": "/private/tmp/p1-12-compiled-guard-qualification-20261017/private-receipt-root-v2/2026-10-17-P1-12",
+  "preferredPacket": "/private/tmp/p1-26-tree-qualification-20261017/metadata-discovery/private-receipt-root-v3/2026-10-17-P1-12",
+  "oldOriginalsPreservedPrivatelyAndInGit": true,
+  "sourceHeadBefore": "fc2e64eb6ea0cf092c7a6ea86229f9628083eb35",
+  "gitMvExit": 0,
+  "renameFrom": "qualification/2026-10-17-P1-12/evidence/test-design/compiledPolicyGuard.test.ts",
+  "renameTo": "qualification/2026-10-17-P1-12/evidence/test-design/compiledPolicyGuard.test.ts.source.txt",
+  "renamedBytes": 11155,
+  "renamedSha256": "0b045ee76d6136d72543b567f1345212d1284faee5259e1b2dc8ab3ddd988da0",
+  "otherChangedMetadataFiles": [
+    "README.md",
+    "evidence/assembly-inputs.json",
+    "receipt.json"
+  ],
+  "newMetadataFile": "evidence/discovery-correction.json",
+  "all279CurrentFilesEqualPreferredPacket": true,
+  "productionSourceChanges": false,
+  "configsGatesIgnoresOrBaselinesChanged": false,
+  "rootOwnedMetadataOnly": true
+}

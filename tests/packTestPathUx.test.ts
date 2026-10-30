@@ -62,7 +62,7 @@ describe("pack test path UX", () => {
     expect(help.stdout).toContain("Test a local pack directory");
     expect(help.stdout).toContain("auto-detects one child pack");
 
-    const audit = readFileSync(resolve(process.cwd(), "docs/UX_AUDIT_REPORT.md"), "utf8");
+    const audit = readFileSync(resolve(process.cwd(), "docs/archive/UX_AUDIT_REPORT.md"), "utf8");
     expect(audit).toContain("R8 — pack test accepts a path or auto-detects one child pack");
     expect(audit).toContain("`amc pack test ./mypack`");
     expect(audit).not.toContain("must be run from inside the pack directory");

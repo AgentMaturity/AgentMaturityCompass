@@ -215,3 +215,19 @@ describe("human oversight quality scoring signals", () => {
     expect(cmp.resolvedGaps.length).toBeGreaterThan(0);
   });
 });
+
+
+describe("AXE-30 oversight statistics compatibility", () => {
+  it("retains the Wilson center rather than an unadjusted observed proportion", () => {
+    const result = assessOversightQuality({ scores: BASE_SCORES });
+    const success = Math.round(result.overallScore / 100);
+    expect(result.confidence).toBe((success + 1.96 * 1.96 / 2) / (1 + 1.96 * 1.96));
+    expect(result.confidence).not.toBe(success);
+  });
+
+  it("retains nearest-rank approval p95 rather than interpolating between observations", () => {
+    const result = assessOversightQuality({ scores: BASE_SCORES,
+      approvals: [10, 20, 30, 100].map((latency) => makeApproval({ decidedTs: BASE_TS + latency })) });
+    expect(result.approvalLatencySlo.byRiskTier.high.p95TotalLatencyMs).toBe(100);
+  });
+});

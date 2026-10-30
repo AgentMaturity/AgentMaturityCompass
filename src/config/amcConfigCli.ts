@@ -17,6 +17,7 @@ import {
   summarizeConfig,
 } from "./amcConfigLoader.js";
 import type { AMCDeclarativeConfig } from "./amcConfigSchema.js";
+import { renderConfigSchema } from "./configSchemaDump.js";
 
 // ---------------------------------------------------------------------------
 // amc config init
@@ -175,13 +176,24 @@ export function configInit(options: ConfigInitOptions): void {
 // ---------------------------------------------------------------------------
 
 export interface ConfigValidateOptions {
+  json?: boolean;
   workspace: string;
   config?: string;
+  userConfig?: string | boolean;
+  /** Dump the boot-free JSON Schema (declarative by default) instead of loading any config layer. */
+  schema?: string | boolean;
 }
 
 export function configValidate(options: ConfigValidateOptions): void {
   try {
-    const result = loadDeclarativeConfig(options.config, options.workspace);
+    if (options.schema !== undefined) {
+      if (options.config !== undefined || options.userConfig !== undefined) throw new Error("--schema cannot be combined with config layer options");
+      process.stdout.write(renderConfigSchema(typeof options.schema === "string" ? options.schema : undefined));
+      return;
+    }
+    const result = loadDeclarativeConfig(options.config, options.workspace, { userConfig: options.userConfig });
+
+    if (options.json) { console.log(JSON.stringify(result, null, 2)); return; }
 
     console.log(chalk.green("✓ Config is valid"));
     console.log();
@@ -208,12 +220,13 @@ export function configValidate(options: ConfigValidateOptions): void {
 export interface ConfigShowOptions {
   workspace: string;
   config?: string;
+  userConfig?: string | boolean;
   format: "yaml" | "json";
 }
 
 export function configShow(options: ConfigShowOptions): void {
   try {
-    const result = loadDeclarativeConfig(options.config, options.workspace);
+    const result = loadDeclarativeConfig(options.config, options.workspace, { userConfig: options.userConfig });
     const output =
       options.format === "json"
         ? JSON.stringify(result.config, null, 2)

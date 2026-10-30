@@ -1,3 +1,5 @@
+import type { EvidenceOutcome } from "../types.js";
+
 export interface DAGNode {
   agentId: string;
   role: 'orchestrator' | 'worker' | 'monitor' | 'reviewer';
@@ -87,11 +89,18 @@ function computeMaxDepth(nodes: DAGNode[]): number {
 }
 
 export function scoreDAGGovernance(dag: OrchestrationDAG): {
-  score: number;
-  level: 'L1' | 'L2' | 'L3' | 'L4' | 'L5';
+  outcome: EvidenceOutcome;
+  score: number | null;
+  level: 'L1' | 'L2' | 'L3' | 'L4' | 'L5' | null;
   risks: string[];
   recommendations: string[];
 } {
+  if (dag.nodes.length === 0) {
+    return {
+      outcome: "not_evaluated", score: null, level: null,
+      risks: ["No orchestration nodes to evaluate"], recommendations: [],
+    };
+  }
   let score = 100;
   const risks: string[] = [];
   const recommendations: string[] = [];
@@ -118,5 +127,5 @@ export function scoreDAGGovernance(dag: OrchestrationDAG): {
 
   score = Math.max(0, Math.min(100, score));
   const level = score >= 90 ? 'L5' : score >= 70 ? 'L4' : score >= 50 ? 'L3' : score >= 30 ? 'L2' : 'L1';
-  return { score, level, risks, recommendations };
+  return { outcome: "measured", score, level, risks, recommendations };
 }

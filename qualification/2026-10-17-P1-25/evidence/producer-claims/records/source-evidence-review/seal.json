@@ -1,0 +1,31 @@
+{
+  "schema": "p125pc-independent-source-prose-evidence-review-seal/1",
+  "at": "2026-10-17T02:18:52.323970+00:00",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/source-evidence-review/review.json",
+      "bytes": 5852,
+      "sha256": "43b11bdfd9c2556cd3f0067d31dfb1f0ab02ec2db0175ff0f5b060baff75bd1c"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/source-evidence-review/README.md",
+      "bytes": 1468,
+      "sha256": "509bb7c7c7ecbd04f8c6c103aac99645e51ab8277eb58a32d9a105f1308c1ac6"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/source-evidence-review/input-pins.json",
+      "bytes": 12796,
+      "sha256": "4a1fe4c791bec287b3584e54d4d3e69e76ec7d1f9cb539a3533fec544082e16d"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/source-evidence-review/observations.json",
+      "bytes": 2555,
+      "sha256": "9dbaaf44c79f68a2646be19613f1bbef976be10941d31cc61bdcd4df2af6333a"
+    }
+  ],
+  "inputCount": 58,
+  "blockers": [],
+  "authorFilesMutated": false,
+  "productOrHelperExecuted": false,
+  "futureAssemblyOrPublicationCredit": false
+}

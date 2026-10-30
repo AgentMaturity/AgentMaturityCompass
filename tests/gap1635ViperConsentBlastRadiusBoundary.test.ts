@@ -11,6 +11,7 @@ import { openLedger } from "../src/ledger/ledger.js";
 import { createWorkOrder } from "../src/workorders/workorderEngine.js";
 import { decideApprovalForIntent } from "../src/approvals/approvalEngine.js";
 import { validateToolBlastRadiusConsent } from "../src/toolhub/blastRadiusConsent.js";
+import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
 
 const DOC = "docs/source-reviews/GAP-1635-viper-consent-blast-radius.md";
 const SOURCE_URL = "https://github.com/FunnyWolf/Viper";
@@ -27,6 +28,7 @@ function newWorkspace(): string {
   roots.push(dir);
   process.env.AMC_VAULT_PASSPHRASE = "gap-1635-test-passphrase";
   initWorkspace({ workspacePath: dir, trustBoundaryMode: "isolated" });
+  writeRuntimeFirewallPolicy({ workspace: dir, mode: "observe" }); // AXR-01: ToolHub and hook control apply the runtime firewall as the native pipeline does; unsigned, it blocks every call.
   initActionPolicy(dir);
   initToolsConfig(dir);
   return dir;
@@ -69,6 +71,7 @@ describe("GAP-1635 Viper consent blast-radius boundary", () => {
     }).workOrder;
 
     const intent = service.createIntent({
+      initiator: "test-operator",
       agentId: "default",
       workOrderId: workOrder.workOrderId,
       toolName: "process.spawn",
@@ -106,6 +109,7 @@ describe("GAP-1635 Viper consent blast-radius boundary", () => {
       allowedActionClasses: ["WRITE_HIGH"]
     }).workOrder;
     const intent = service.createIntent({
+      initiator: "test-operator",
       agentId: "default",
       workOrderId: workOrder.workOrderId,
       toolName: "process.spawn",

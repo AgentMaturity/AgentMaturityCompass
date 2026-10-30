@@ -114,7 +114,8 @@ function dataset(count: number): VerifierEvidenceDataset {
   const ts = 1_700_000_000_000;
   return {
     schemaVersion: 2, generatedTs: ts, workspace: "owned metadata fixture",
-    agentFilter: { agentId: "agent (fixture) \\", mode: "row-meta-or-owned-session", sessionsIncluded: ["fixture-session"], rowsExcluded: 0 },
+    agentFilter: { agentId: "agent (fixture) \\", mode: "row-meta-or-owned-session", sessionsIncluded: ["fixture-session"], rowsExcluded: 0,
+      systemSession: "excluded", insufficientFor: ["requires_no_audit"] },
     includeChain: true, includeRationale: true, eventCount: count, chainInvalidCount: count,
     records: Array.from({ length: count }, (_, index) => ({
       eventId: `fixture-${index}`, ts, isoTs: new Date(ts).toISOString(), sessionId: "fixture-session",

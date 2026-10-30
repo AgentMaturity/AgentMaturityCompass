@@ -35,6 +35,9 @@ import { lockVault } from "../src/vault/vault.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import type { EvidenceEvent } from "../src/types.js";
 import { wavBytes } from "./fixtures/nativeSignedAudio.js";
+import { initProcessorRegistry } from "../src/dataflow/processorRegistry.js";
+import { redactingSessionFor } from "../src/dataflow/redactingSession.js";
+import { RedactionRefused } from "../src/dataflow/tokenizer.js";
 
 const PNG = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jZ1sAAAAASUVORK5CYII=", "base64");
 const PASSPHRASE = "disposable-attachment-spill-fixture-passphrase";
@@ -366,5 +369,22 @@ describe("user attachments above the per-event cap are retained through the sign
     expect((refusal as SpilledInputRetentionError).stage).toBe("commit");
     expect(objectFiles(spillRoot(root))).toEqual([]);
     expect(h.writer.readEvents()).toHaveLength(before);
+  });
+
+  test("P2-02: an image above the cap in a PHI-run-purpose workspace with no BAA is refused before any row or spill", () => {
+    const h = opened();
+    initProcessorRegistry(h.root, { schemaVersion: "amc.dataflow-processors/v1", experimental: true,
+      processors: [{ processorId: "proc-care", legalName: "Fixture Care Processor",
+        contracts: [{ kind: "DPA", reference: "DPA-CARE-1", effective: "2026-01-01", expires: null, dataClasses: ["phi", "pii"] }] }],
+      purposes: [{ purposeId: "care", allowedDataClasses: ["phi", "pii"], allowedTools: ["model.request"], allowedProcessors: ["proc-care"] }],
+      bindings: [], runPurpose: "care" });
+    const before = h.writer.readEvents().length;
+    let refusal: unknown;
+    try { redactingSessionFor(h.writer).recordUserAttachment({ filename: "chart.png", content: png(h.cap + 1), mimeType: "image/png", kind: "image" }); }
+    catch (error) { refusal = error; }
+    expect(refusal).toBeInstanceOf(RedactionRefused);
+    expect((refusal as RedactionRefused).reason).toBe("attachment_not_redactable");
+    expect(h.writer.readEvents()).toHaveLength(before);
+    expect(objectFiles(spillRoot(h.root))).toEqual([]);
   });
 });

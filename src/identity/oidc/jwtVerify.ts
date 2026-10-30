@@ -145,40 +145,59 @@ function compatibleKey(jwk: ObjectJson, alg: Alg): KeyObject | null {
   } catch { return null; }
 }
 
+type KeyLoader = (kid: string | undefined) => Promise<ObjectJson[]>;
+
+/** Parse a compact JWS and check its signature against exactly one compatible key; no claim is checked here. */
+async function verifiedJwtClaims(token: string, loadKeys: KeyLoader, signatureError: string): Promise<{ ok: true; claims: ObjectJson } | { ok: false; error: string }> {
+  const fail = (error: string): { ok: false; error: string } => ({ ok: false, error });
+  if (typeof token !== "string" || token.length > MAX_BYTES) return fail("invalid jwt format");
+  const parts = token.split(".");
+  if (parts.length !== 3 || parts.some(part => !part)) return fail("invalid jwt format");
+  const [headerPart, payloadPart, signaturePart] = parts as [string, string, string];
+  const decoder = new TextDecoder("utf-8", { fatal: true });
+  const header: unknown = JSON.parse(decoder.decode(fromBase64Url(headerPart)));
+  const claims: unknown = JSON.parse(decoder.decode(fromBase64Url(payloadPart)));
+  if (!objectJson(header) || !objectJson(claims) || Object.hasOwn(header, "crit")) return fail("invalid jwt format");
+  if (typeof header.alg !== "string" || !(ALGS as readonly string[]).includes(header.alg)) return fail("unsupported jwt alg");
+  if (header.kid !== undefined && (typeof header.kid !== "string" || !header.kid)) return fail("invalid jwt kid");
+  const alg = header.alg as Alg;
+  const signature = fromBase64Url(signaturePart);
+  const keys = await loadKeys(header.kid);
+  const candidates = keys.flatMap(jwk => {
+    if (header.kid !== undefined && jwk.kid !== header.kid) return [];
+    const key = compatibleKey(jwk, alg);
+    return key ? [key] : [];
+  });
+  if (candidates.length !== 1) return fail("no matching jwk");
+  const key = candidates[0]!;
+  const options = alg === "PS256" ? { key, padding: constants.RSA_PKCS1_PSS_PADDING, saltLength: constants.RSA_PSS_SALTLEN_DIGEST }
+    : alg === "ES256" ? { key, dsaEncoding: "ieee-p1363" as const } : key;
+  if (!verify("sha256", Buffer.from(`${headerPart}.${payloadPart}`), options, signature)) return fail(signatureError);
+  return { ok: true, claims };
+}
+
+/** The bounded clock skew in seconds and "now" in seconds, or null when either input is not finite. */
+function jwtClock(clockSkewSeconds: number | undefined, nowMs: number | undefined): { skew: number; now: number } | null {
+  const requestedSkew = clockSkewSeconds ?? 120, at = nowMs ?? Date.now();
+  if (!Number.isFinite(requestedSkew) || !Number.isFinite(at)) return null;
+  return { skew: Math.min(300, Math.max(0, requestedSkew)), now: at / 1000 };
+}
+
 export async function verifyJwtIdToken(params: {
   token: string; issuer: string; audience: string; jwksUri: string; nonce: string; clockSkewSeconds?: number; nowMs?: number;
 }): Promise<{ ok: true; claims: JwtClaims } | { ok: false; error: string }> {
   const fail = (error: string): { ok: false; error: string } => ({ ok: false, error });
   try {
     validateOidcUrl(params.issuer);
-    if (typeof params.token !== "string" || params.token.length > MAX_BYTES) return fail("invalid jwt format");
-    const parts = params.token.split(".");
-    if (parts.length !== 3 || parts.some(part => !part)) return fail("invalid jwt format");
-    const [headerPart, payloadPart, signaturePart] = parts as [string, string, string];
-    const decoder = new TextDecoder("utf-8", { fatal: true });
-    const header: unknown = JSON.parse(decoder.decode(fromBase64Url(headerPart)));
-    const claims: unknown = JSON.parse(decoder.decode(fromBase64Url(payloadPart)));
-    if (!objectJson(header) || !objectJson(claims) || Object.hasOwn(header, "crit")) return fail("invalid jwt format");
-    if (typeof header.alg !== "string" || !(ALGS as readonly string[]).includes(header.alg)) return fail("unsupported jwt alg");
-    if (header.kid !== undefined && (typeof header.kid !== "string" || !header.kid)) return fail("invalid jwt kid");
-    const alg = header.alg as Alg;
-    const signature = fromBase64Url(signaturePart);
-    let keys = await fetchJwks(params.jwksUri);
-    if (typeof header.kid === "string" && !keys.some(key => key.kid === header.kid)) keys = await fetchJwks(params.jwksUri, true);
-    const candidates = keys.flatMap(jwk => {
-      if (header.kid !== undefined && jwk.kid !== header.kid) return [];
-      const key = compatibleKey(jwk, alg);
-      return key ? [key] : [];
-    });
-    if (candidates.length !== 1) return fail("no matching jwk");
-    const key = candidates[0]!;
-    const options = alg === "PS256" ? { key, padding: constants.RSA_PKCS1_PSS_PADDING, saltLength: constants.RSA_PSS_SALTLEN_DIGEST }
-      : alg === "ES256" ? { key, dsaEncoding: "ieee-p1363" as const } : key;
-    if (!verify("sha256", Buffer.from(`${headerPart}.${payloadPart}`), options, signature)) return fail("id_token signature invalid");
-    const requestedSkew = params.clockSkewSeconds ?? 120;
-    const nowMs = params.nowMs ?? Date.now();
-    if (!Number.isFinite(requestedSkew) || !Number.isFinite(nowMs)) return fail("invalid jwt time");
-    const skew = Math.min(300, Math.max(0, requestedSkew)), now = nowMs / 1000;
+    const verified = await verifiedJwtClaims(params.token, async (kid) => {
+      const keys = await fetchJwks(params.jwksUri);
+      return typeof kid === "string" && !keys.some(key => key.kid === kid) ? fetchJwks(params.jwksUri, true) : keys;
+    }, "id_token signature invalid");
+    if (!verified.ok) return verified;
+    const claims = verified.claims;
+    const clock = jwtClock(params.clockSkewSeconds, params.nowMs);
+    if (clock === null) return fail("invalid jwt time");
+    const { skew, now } = clock;
     if (typeof claims.exp !== "number" || !Number.isFinite(claims.exp)) return fail("id_token missing exp");
     if (typeof claims.iat !== "number" || !Number.isFinite(claims.iat)) return fail("id_token missing iat");
     if (now >= claims.exp + skew) return fail("id_token expired");
@@ -193,6 +212,35 @@ export async function verifyJwtIdToken(params: {
     if (typeof params.nonce !== "string" || !params.nonce || claims.nonce !== params.nonce) return fail("nonce mismatch");
     return { ok: true, claims: claims as JwtClaims };
   } catch { return fail("id_token verification failed"); }
+}
+
+/**
+ * A workload token (P2-25: JWT-SVID or a cloud agent token) checked with the same parser, algorithms and key rules as
+ * the ID token: a signature from exactly one key of a PINNED key set (inline in signed config, or the pinned issuer's
+ * JWKS URI), a required `exp`, `nbf` when present, the expected audience and, when given, the issuer. No nonce and no
+ * `iat` window: workload tokens are not login responses.
+ */
+export async function verifyWorkloadJwt(params: {
+  token: string; audience: string; issuer: string | null; keys: { readonly inline: readonly ObjectJson[] } | { readonly jwksUri: string };
+  clockSkewSeconds?: number; nowMs?: number;
+}): Promise<{ ok: true; claims: JwtClaims } | { ok: false; error: string }> {
+  const fail = (error: string): { ok: false; error: string } => ({ ok: false, error });
+  try {
+    const source = params.keys;
+    const verified = await verifiedJwtClaims(params.token, async () => "inline" in source ? [...source.inline] : fetchJwks(source.jwksUri),
+      "jwt signature invalid");
+    if (!verified.ok) return verified;
+    const claims = verified.claims, clock = jwtClock(params.clockSkewSeconds, params.nowMs);
+    if (clock === null) return fail("invalid jwt time");
+    if (typeof claims.exp !== "number" || !Number.isFinite(claims.exp)) return fail("jwt missing exp");
+    if (clock.now >= claims.exp + clock.skew) return fail("jwt expired");
+    if (claims.nbf !== undefined && (typeof claims.nbf !== "number" || !Number.isFinite(claims.nbf) || claims.nbf > clock.now + clock.skew)) return fail("jwt not yet valid");
+    if (params.issuer !== null && claims.iss !== params.issuer) return fail("issuer mismatch");
+    const audiences = typeof claims.aud === "string" ? [claims.aud] : claims.aud;
+    if (!Array.isArray(audiences) || !params.audience || !audiences.includes(params.audience)) return fail("audience mismatch");
+    if (typeof claims.sub !== "string" || !claims.sub) return fail("jwt missing subject");
+    return { ok: true, claims: claims as JwtClaims };
+  } catch { return fail("jwt verification failed"); }
 }
 
 export async function discoverOidcWellKnown(issuer: string): Promise<{

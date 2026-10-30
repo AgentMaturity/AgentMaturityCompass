@@ -9,7 +9,8 @@ import chalk from "chalk";
 import { assertSignedPlan } from "../../catalog/compiler/sign.js";
 import type { CompiledPlan, SignedPlan } from "../../catalog/compiler/types.js";
 import { readSignedControlResults } from "../../catalog/evidence/signedResults.js";
-import { loadCatalog, type LoadedCatalog } from "../../catalog/loader.js";
+import { loadAdmittedCatalog } from "../../catalog/admission/gate.js";
+import type { LoadedCatalog } from "../../catalog/loader.js";
 import { verifyCatalogLock } from "../../catalog/lockfile.js";
 import { assertOutsideSignedConfigTree } from "../../domains/operatingProfiles/operatingProfileEmit.js";
 import { pathExists, writeFileAtomic } from "../../utils/fs.js";
@@ -41,7 +42,7 @@ export function runOscalExportCli(opts: { workspace: string; out: string; plan?:
   } catch {
     throw new Error(`Refusing to write OSCAL under ${join(resolve(opts.workspace), ".amc")}: .amc/** is reserved for signed configs.`);
   }
-  const cat = loadCatalog();
+  const cat = loadAdmittedCatalog(); // P1-33: the gated pack support, never the declared claim
   const catalog = toOscalCatalog(cat);
   const signed = opts.plan ? readVerifiedPlan(opts.workspace, resolve(opts.workspace, opts.plan), cat) : null;
   const profile = signed ? toOscalProfile(signed, "catalog.json") : null;

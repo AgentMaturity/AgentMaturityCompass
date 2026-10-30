@@ -1,0 +1,20 @@
+     × a signed exception for v1.0.0 of the approval control is refused when the active plan runs v2.0.0 1350ms
+     × a valid signed receipt for an agent summary, rejected with material_fact_omitted, is rejected and never passes (decisive L346) 1263ms
+     × a review of digest A does not count after the artifact changed to B (decisive L348: stale) 958ms
+     × approved and rejected reviews of the same digest give rejected (contradictory gives no pass) 1169ms
+     × changes_requested alone stays pending, and a lapsed approval is expired 1021ms
+     × a reviewer equal to the requester is refused at creation 908ms
+     × the reviewer comes from the authenticated session, and no session refuses 1017ms
+     × a tampered review record is never counted 926ms
+     × one bound decision activates it; the call runs, the record names it and a BREAK_GLASS_ACTION row is appended 1095ms
+     × covering FINANCIAL while a signed freeze for FINANCIAL is active: denied action_class_frozen 846ms
+     × without a signing key activation is refused and nothing is recorded 1062ms
+     × a second break-glass before the first one's review is refused previous_break_glass_unreviewed 1054ms
+     × an overdue post-hoc review raises POSTMORTEM_OVERDUE 1186ms
+     × activation refuses the activator's own decision, an unbound decision and a denial 1089ms
+     × break-glass for another control does not waive control C 1036ms
+     × a request without an authenticated session is refused, from the API and from both CLI commands 871ms
+     × a packet review takes its reviewer from the session and its requester from the record, never from input 900ms
+     × answers only questions the signed exception covers, and abstains after revocation 1049ms
+⎯⎯⎯⎯⎯⎯ Failed Tests 18 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  18 failed | 28 passed (46)

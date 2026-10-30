@@ -1,0 +1,10 @@
+{
+  "suite": "1.0.0",
+  "class": "compiler",
+  "cases": [
+    { "id": "CMP-001", "name": "same-inputs-same-plan-digest", "normative": false, "profile": "spec/conformance/v1/compiler/profile.json", "catalogLock": "spec/conformance/v1/compiler/catalog-lock.json",
+      "pending": "informative until P1-10's golden outputs exist" },
+    { "id": "CMP-002", "name": "crosswalk-never-auto-passes", "normative": false, "profile": "spec/conformance/v1/compiler/profile.json", "catalogLock": "spec/conformance/v1/compiler/catalog-lock.json",
+      "pending": "informative until P1-10's golden outputs exist" }
+  ]
+}

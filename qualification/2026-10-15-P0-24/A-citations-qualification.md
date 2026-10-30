@@ -1,0 +1,15 @@
+# P0-24 citation correction qualification
+
+The new `tests/citationCorrections.test.ts` contains 23 actual-source controls. The first Node 22.23.3 run measured 22 passing cases and one strict ISO policy-pair failure, with zero pending or todo cases. No production file or earlier test was edited.
+
+The seven classifier cases cover emotion prohibition, mixed employment/chatbot precedence, simultaneous social and emotion prohibitions, social precedence, false-flag exclusions and the empty capability control. Twelve metadata cases and a complete-cohort control preserve existing recorded source metadata and the experimental expert-signoff hold. The two rubric cases inspect the actual HC-1 and FIN-1 records and their real catalogue resolution.
+
+The strict ISO criterion reads all nine actual audit anchor sets and the actual `collectFindings` result. Governance/risk and default anchors still label A.5 as AI policy. Both independent records and the real collector preserve these two violations. The existing ratchet does not qualify the strict correction criterion.
+
+The private emotion witness copied all 4,529 built files, package metadata and two citation scripts into an owned closure, with one explicit dependency resolver symlink. Identical 23-case runs measured 22/23, then 19/23 after moving the actual emotion descriptor to the limited tier, then 22/23 after restoration. The three added failures assert the wrong LIMITED tier, wrong HIGH tier in mixed capabilities and the lost emotion article alongside social scoring. The original ISO failure remained active in every phase. All 4,532 regular private inputs and the resolver symlink restored exactly; every live compiled input, all 54 protected source pins and the new test bytes match before and after.
+
+This packet qualifies bounded local integrity and mutation sensitivity only. Existing recorded dates and accepted official-host syntax are not a fresh legal review. All 31 correction-log expert columns remain empty. Named expert approval, held corrections, legal applicability and whole P0-24 acceptance remain unresolved. No production repair or reserved-path transfer was inferred.
+
+The JSON receipt indexes exact commands, raw reports, effects, actual collector findings, input pins and restoration manifests. It excludes mutable journals. All live-input reads are complete; root owns the final source and canonical boundary.
+
+A later ordinary test-type check found one implicit-any declaration in this new file. The original 171-line source and first receipt are retained byte-exact. The sole subsequent edit typed the findings array with the existing CitationFinding interface. No assertion, capability descriptor, catalogue selection or runtime input changed. A distinct final run of the corrected body again measured 23 total, 22 passing and one identical strict ISO failure, with zero pending or todo cases. The private causal matrix remains explicitly evidence for the original body; it was not rerun or relabelled as a corrected-body matrix. Root owns the final independent type check.

@@ -261,10 +261,10 @@ describe("mode/mode", () => {
     setMode(dir, "owner");
     expect(getMode(dir)).toBe("owner");
   });
-  test("getMode returns owner if file is corrupt", () => {
+  test("getMode fails closed to agent if file is corrupt (DXA-49)", () => {
     fsMkdirSync(join(dir, ".amc"), { recursive: true });
     fsWriteFileSync(join(dir, ".amc", "mode.json"), "NOT_JSON");
-    expect(getMode(dir)).toBe("owner");
+    expect(getMode(dir)).toBe("agent");
   });
   test("assertOwnerMode does not throw in owner mode", () => {
     expect(() => assertOwnerMode(dir, "vault init")).not.toThrow();

@@ -195,6 +195,36 @@ describe("Fleet Scoring", () => {
     expect(md).toContain("default");
   });
 
+  test("fleet report preserves each legacy member's claim label", async () => {
+    const ws = newWorkspace();
+    initFleet(ws);
+    addAgent(ws, "legacy", "Legacy Agent");
+    addAgent(ws, "current", "Current Agent");
+    seedEvidence(ws, "legacy", 5);
+    seedEvidence(ws, "current", 5);
+    const result = await evaluateFleet({ workspace: ws, window: "7d", agentIds: ["legacy", "current"] });
+    const legacy = result.diagnosticReports.find((report) => report.agentId === "legacy")!;
+    expect(legacy.methodology).toBeDefined();
+    legacy.methodology = { ...legacy.methodology!, amcVersion: "1.1.1" };
+
+    const md = renderFleetScoringMarkdown(result);
+    const legacyRow = md.split("\n").find((line) => line.startsWith("| legacy |"));
+    const currentRow = md.split("\n").find((line) => line.startsWith("| current |"));
+    expect(legacyRow).toContain("Legacy (1.x), self-reported");
+    expect(currentRow).toMatch(/\| Self-reported \|$/);
+    expect(currentRow).not.toContain("Legacy");
+    expect(md).toContain("## How to read claim kinds");
+    expect(md).not.toContain("**Claim:** Observed");
+    expect(md).not.toContain("**Claim:** Independently reviewed");
+    const reportClaim = md.split("\n").find((line) => line.startsWith("**Claim:**"));
+    expect(reportClaim).toContain("**Claim:** Self-reported");
+    expect({
+      memberClaims: { legacy: legacyRow!.split("|").at(-2)!.trim(), current: currentRow!.split("|").at(-2)!.trim() },
+      reportClaim,
+      legend: md.slice(md.indexOf("## How to read claim kinds")).trim()
+    }).toMatchSnapshot();
+  });
+
   test("evaluateFleet writes output file when outputPath set", async () => {
     const ws = newWorkspace();
     initFleet(ws);

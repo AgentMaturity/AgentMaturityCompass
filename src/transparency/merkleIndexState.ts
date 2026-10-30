@@ -1,4 +1,5 @@
-import { statSync, unlinkSync } from "node:fs";
+import { lstatSync, readFileSync, statSync, unlinkSync } from "node:fs";
+import type { TransparencyAppendProgress } from "./workspacePublication.js";
 import { z } from "zod";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import type { MerkleAlgorithm } from "./merkle.js";
@@ -76,17 +77,18 @@ export function writeMerkleFrontierState(params: {
   root: string;
 }): MerkleFrontierState {
   ensureDir(transparencyMerkleDir(params.workspace));
-  const state = merkleFrontierStateSchema.parse({
-    v: 1,
-    ts: Date.now(),
-    leafCount: params.leafCount,
-    lastEntryHash: params.lastEntryHash,
-    root: params.root,
-    leavesBytes: leavesFileBytes(params.workspace),
-    frontier: params.frontier.map((node) => ({ level: node.level, hash: node.hash }))
-  });
+  const state = prepareMerkleFrontierState({ ...params, ts: Date.now(), leavesBytes: leavesFileBytes(params.workspace) });
   writeFileAtomic(merkleFrontierPath(params.workspace), JSON.stringify(state, null, 2), 0o644);
   return state;
+}
+
+/** Pure exact frontier recipe, shared with the actual owned async publisher. */
+export function prepareMerkleFrontierState(params: {
+  ts: number; frontier: MerkleFrontier; leafCount: number; lastEntryHash: string; root: string; leavesBytes: number;
+}): MerkleFrontierState {
+  return merkleFrontierStateSchema.parse({ v: 1, ts: params.ts, leafCount: params.leafCount,
+    lastEntryHash: params.lastEntryHash, root: params.root, leavesBytes: params.leavesBytes,
+    frontier: params.frontier.map(node => ({ level: node.level, hash: node.hash })) });
 }
 
 /** Byte length of leaves.jsonl, 0 when it does not exist. */
@@ -166,26 +168,32 @@ export function writeMerklePendingMarker(params: {
 }): boolean {
   try {
     ensureDir(transparencyMerkleDir(params.workspace));
-    const marker = merklePendingSchema.parse({
-      v: 1,
-      ts: Date.now(),
-      entryHash: params.entryHash,
-      reason: params.reason.slice(0, 2000)
-    });
-    writeFileAtomic(merklePendingPath(params.workspace), JSON.stringify(marker, null, 2), 0o644);
-    return true;
+    const bytes = prepareMerklePendingMarkerBytes({ ...params, ts: Date.now() }), path = merklePendingPath(params.workspace);
+    writeFileAtomic(path, bytes, 0o644);
+    const first = lstatSync(path), observed = readFileSync(path), last = lstatSync(path);
+    return first.isFile() && last.isFile() && first.dev === last.dev && first.ino === last.ino
+      && first.mode === last.mode && first.size === last.size && first.mtimeMs === last.mtimeMs
+      && (last.mode & 0o777) === 0o644 && observed.equals(bytes);
   } catch {
     return false;
   }
 }
 
+/** Exact pending bytes; the owned async path retains native/acknowledgment failure causes itself. */
+export function prepareMerklePendingMarkerBytes(params: { ts: number; entryHash: string; reason: string }): Buffer {
+  const marker = merklePendingSchema.parse({ v: 1, ts: params.ts, entryHash: params.entryHash, reason: params.reason.slice(0, 2000) });
+  return Buffer.from(JSON.stringify(marker, null, 2));
+}
+
 /**
+ * Compatibility base for acknowledged committed-line failures. `rootCovered` distinguishes completed-root cleanup
+ * failure from ordinary Merkle lag; legacy consumers still project the known entryHash/pendingRecorded fields.
  * Thrown when a transparency entry is committed to the log but the Merkle root
  * could not be advanced to cover it.
  *
- * This is a distinct type because the two halves of the append have different
- * outcomes and callers need to be able to tell them apart: the log line is
- * durable and chained, the root is behind. A caller that genuinely cannot fail
+ * Ordinary instances mean the line was acknowledged but the root could not be advanced.
+ * The root-covered subclass instead means cleanup/final continuation is incomplete; inspect `rootCovered`.
+ * The compatibility base retains the known committed entry for old consumers. A caller that genuinely cannot fail
  * (an HTTP handler mid-response) can catch this specific type and record a
  * degraded outcome; catching `Error` broadly and continuing would put us back
  * where the swallowed console.error left us.
@@ -194,8 +202,15 @@ export class TransparencyMerkleLagError extends Error {
   readonly entryHash: string;
   readonly pendingRecorded: boolean;
 
-  constructor(params: { entryHash: string; pendingRecorded: boolean; reason: string; cause?: unknown }) {
+  readonly rootCovered: boolean;
+  readonly progress: TransparencyAppendProgress | undefined;
+  readonly pendingCause: unknown;
+  readonly pendingProgress: TransparencyAppendProgress | undefined;
+
+  constructor(params: { entryHash: string; pendingRecorded: boolean; reason: string; cause?: unknown;
+    rootCovered?: boolean; progress?: TransparencyAppendProgress; pendingCause?: unknown; pendingProgress?: TransparencyAppendProgress }) {
     super(
+      params.rootCovered ? `transparency append cleanup incomplete: entry ${params.entryHash} is committed; this attempt acknowledged a covering signed root before cleanup/final continuation failed (${params.reason}); inspect pending-marker and publication progress.` :
       `transparency merkle root lags the log: entry ${params.entryHash} is committed to log.jsonl but the merkle index could not be updated (${params.reason}). ` +
         (params.pendingRecorded
           ? "A pending marker was written, so `amc transparency merkle root` will report the lag until `amc transparency merkle rebuild` repairs it."
@@ -205,6 +220,16 @@ export class TransparencyMerkleLagError extends Error {
     this.name = "TransparencyMerkleLagError";
     this.entryHash = params.entryHash;
     this.pendingRecorded = params.pendingRecorded;
+    this.rootCovered = params.rootCovered ?? false;
+    this.progress = params.progress;
+    this.pendingCause = params.pendingCause;
+    this.pendingProgress = params.pendingProgress;
+  }
+}
+/** A covered committed line with incomplete cleanup/final continuation. The legacy base preserves wrapper progress. */
+export class TransparencyAppendRootCoveredError extends TransparencyMerkleLagError {
+  constructor(params: ConstructorParameters<typeof TransparencyMerkleLagError>[0]) {
+    super({ ...params, rootCovered: true }); this.name = "TransparencyAppendRootCoveredError";
   }
 }
 

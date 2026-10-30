@@ -1,0 +1,7 @@
+{
+  "id": "UPG-1",
+  "scenario": "Upgrade with data",
+  "status": "not_run",
+  "reason": "not selected (--only)",
+  "durationMs": 0
+}

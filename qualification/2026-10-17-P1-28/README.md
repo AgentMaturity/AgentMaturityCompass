@@ -1,0 +1,19 @@
+# P1-28 bounded OSCAL export qualification
+
+Source checkpoint: `3b25c1d33febc1f7e3ecd5fdb3d7a9aaa02e28b4` on `codex/p1-28-qualification`. This packet records a bounded test and documentation slice. P1-28, its formal dependencies and the complete plan remain open.
+
+The checkpoint adds pinned OSCAL 1.2.3 schemas and provenance, strict schema validation with AJV formats, signed plan/results and real CLI export checks, documentation, and numeric test-file inventory updates. Production OSCAL converter bytes remain unchanged. Vendored files preserve parsed JSON values and licence words; only documented terminal ASCII whitespace was removed. The vendor README records upstream and stored hashes.
+
+Seventy unique cases passed in the ordinary, restored and fresh runs: 41 OSCAL, 25 decisive-evidence and 4 GRC cases. Repetitions are the same population. All 70 fresh raw records joined their observer tasks; all 3 afterAll hooks passed, and no unhandled or non-test errors appeared. The unchanged clean-source checker installed the frozen lockfile, built, and verified signed native evidence and a two-process resume. The retained canonical checkout matched 77 source/configuration/fixture pairs, 7 built JavaScript pairs and 9 installed tool/AJV pairs. Its native binary had a distinct inode; all 17 retained native binaries remained unchanged.
+
+The common fixture uses actual catalog loading, validation, compilation, local signing and verification. Its pass/fail/not_evaluated values are supplied fixture claims, not proof of an available producer. Actual CLI cases cover empty optional results, stale inputs before writes, missing plans and protected targets, normally signed shipped-catalog exports, and independent payload/signature tampering. The normal evaluator retains the planned P1-02 producer and pending review. A local signing trail is not expert or compliance approval.
+
+A single converter branch mutation caused 65 passes and 5 semantic failures. The production source seven-field pin and unchanged test seven-field pin matched after restoration; 70 cases then passed again. The built CLI stayed original during mutation, so no mutant-CLI causal claim is made. The documented AJV recipe accepted the valid sample and rejected actual invalid calendar, type and missing-field data.
+
+The full suite remains failed: 25,207 cases, 25,188 passed and 19 failed, in 10 of 1,697 files. The child exited 1; the unchanged wrapper exited 70 because its owned group was still observable. A later, specifically authorized single signal-0 check returned ESRCH for group 47499. Two original stop markers were then archived by ordinary renames with their bytes and inodes preserved. All failed evidence remains. Recovery creates no normal suite completion or suite pass.
+
+The 19 failures remain unwaived: 8 held identity/CLI/action cases, 3 API claim cases, 1 held citation wording case, 1 held D15 manifest case, 2 hook path cases, 2 parity module-root cases and 2 Studio cases. Prospective test path repairs are outside this checkpoint. Dead-code and duplicate gates remain RED at 2,710 and 1,268 findings. No baseline, threshold, guard, environment, worker or timeout was changed to turn a failure into a pass.
+
+Ordinary exact-path staging exited 1 with ignored-parent advice for tracked documentation. The subsequent complete-index audit proved all 19 whole staged blobs equal disk and admission hashes, with no extra paths or unstaged tracked changes, unchanged size/key/whitespace checks, and exact Git object IDs. The ordinary local commit exited 0. No force or staging retry was used.
+
+The standalone sample attachment remains UNREADY. Merge, release, formal acceptance, external expert review and every held decision remain open, including P1-01 gaps, F37, the ignored D15 archive and P1-25 publication. No push, PR, merge, reservation change, freeze bypass or quality waiver occurred.

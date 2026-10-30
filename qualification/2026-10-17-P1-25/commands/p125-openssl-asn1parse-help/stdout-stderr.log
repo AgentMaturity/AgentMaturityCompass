@@ -1,0 +1,25 @@
+Usage: asn1parse [options]
+
+General options:
+ -help           Display this summary
+ -oid infile     file of extra oid definitions
+
+I/O options:
+ -inform parm    input format - one of DER PEM B64
+ -in infile      input file
+ -out outfile    output file (output format is always DER)
+ -noout          do not produce any output
+ -offset +int    offset into file
+ -length +int    length of section in file
+ -strparse +int  offset; a series of these can be used to 'dig'
+                 into multiple ASN1 blob wrappings
+ -genstr val     string to generate ASN1 structure from
+ -genconf val    file to generate ASN1 structure from
+ -strictpem      equivalent to '-inform pem' (obsolete)
+ -item val       item to parse and print
+                 (-inform  will be ignored)
+
+Formatting options:
+ -i              indents the output
+ -dump           unknown data in hex form
+ -dlimit +int    dump the first arg bytes of unknown data in hex form

@@ -1,0 +1,112 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-45",
+  "capturedUtc": "2026-10-15T06:00:33.597628+00:00",
+  "reviewType": "Independent static text/diff review of unexecuted controller code only",
+  "inputs": {
+    "controller": {
+      "path": "/private/tmp/p0-45-causal-controller-prepared-20261015.py",
+      "bytes": 22514,
+      "sha256": "9479a7a7186ce97e740dad14fda9c0244f3f3173d8d41a30b659de8e5e40e192"
+    },
+    "derivedFrom": {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/driver/controller-v3.py",
+      "bytes": 19822,
+      "sha256": "b43db98145e32451f5552ec56cd9a407bda1118bc1fb10cd07f8ae5ae863ed68"
+    },
+    "preparationNote": {
+      "path": "/private/tmp/p0-45-causal-controller-preparation-20261015.json",
+      "bytes": 6056,
+      "sha256": "2c96ccb29346b7bfdf901f59fba20077db61d733ec9684951c7953200a22e849"
+    },
+    "causalPlan": {
+      "path": "/private/tmp/p0-45-causal-readonly-plan-20261015.json",
+      "bytes": 28546,
+      "sha256": "b67310ddfde9a75c550cb563386caa43967530e6412561888d176ae66ae8bab4"
+    },
+    "reporterReference": {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/driver/observer-reporter.mjs",
+      "bytes": 2110,
+      "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+    }
+  },
+  "findings": [],
+  "disposition": "No actionable static code blocker found within the assigned two-control core12 scope. Runtime release still requires the separate measured sealed setup and current input review.",
+  "diffScope": [
+    "P045 private namespace/managed ROOT and START_P045_CAUSAL token replace P021 roots/token. SOURCE2024f25c and production58 are explicit future setup bindings.",
+    "CASE_COUNT12 replaces37 consistently in raw/observer identity and count checks; normalized corpus must equal only tests/verifyRepair.test.ts.",
+    "proposal_data rehashes exact immutable plan b67310..., compares both ordered recipe IDs/target baseline hashes/anchors/protectedAnchor, and requires future proposed-mutant digest shape.",
+    "setup.json/setup-index.json replace P021v3 filenames. Counts are compared with future hash-bound measured setup fields, not inherited7945 counts or static predictions.",
+    "The forward-copy recipe adds a protected rollback-anchor exact-once check before and after mutation. Existing application code restores the original bytes, not a synthesized inverse patch.",
+    "Outer wait is420seconds instead of90. No original30second test/config/helper deadline is modified. No compiler, dist change, import adapter or altered original assertion is introduced."
+  ],
+  "contractsReviewed": [
+    {
+      "topic": "Future setup and per-control release",
+      "evidence": "Exactly one known control per invocation; actual root START token plus8hashes bind setup/controller/proposal/source/compiled/preservation/reporter/index and exact root/copy/control paths. setup pre-runtime flags must be true/false as historical prepared state.",
+      "limit": "No setup/copy/manifests/release are created or verified by this review. Future measured source/native/identity/reference pins must be inspected before release."
+    },
+    {
+      "topic": "Source/dist/native preservation",
+      "evidence": "Before/after phases check all pinned parent source and dist bytes, exact parent dist membership, complete private filesystem map except borrowed top node_modules, no unexpected private symlinks/.git, frozen own/external references, resolver link and native bytes/device/inode/nlink/mode. Only the expected one source-file delta is admitted during a mutant.",
+      "limit": "Parent source membership and physical-copy completeness are established by the later sealed setup/manifest review. This is not an independent dependency installation or entire dependency/cache-universe proof."
+    },
+    {
+      "topic": "Exact recipes and original12",
+      "evidence": "C1 retains both adjacent unknown/active refusal-removal anchors as one plan control; C2 retains only forward rename-to-copy+unlink and protected rollback. Runtime constructs candidate in memory from actual copied original, verifies exact-once anchors and final digest, then writes only the named private target. Normal source-mode original12 is always selected.",
+      "limit": "Original builtCLI5, verifier-separation4 and readonly10 remain separate unchanged baseline contexts. Dist is not recompiled or made mutant-sensitive."
+    },
+    {
+      "topic": "Normal actual child lifecycle",
+      "evidence": "Direct pinned Node22 and parent Vitest CLI, serial flags, cache=false, default+JSON+unchanged reporter; explicit seven-key causal environment with private HOME/TMPDIR and borrowed dependency path. Popen starts a new session, records PID/PGID/executable pin and waits up to420seconds.",
+      "limit": "The original root wrapper inherits environment; this private causal controller is a separate seven-key allowlist. Neither establishes OS or universal network isolation. Native/ABI measurement must retain original provenance."
+    },
+    {
+      "topic": "Timeout and uncertainty",
+      "evidence": "A420second wait expiration retains timeout metadata and ACTIVE, sends no signal, performs no further wait/restoration and raises Stop. Normal completion records every bounded5s/50ms signal-zero group probe and requires positive ESRCH before classification/restoration.",
+      "limit": "Timeout output may remain mutable. No complete descendant absence, terminating-signal cleanup or generic crash recovery is claimed. External interruption may leave ACTIVE/start artifacts; root must stop and review retained state."
+    },
+    {
+      "topic": "Write-once and no retry",
+      "evidence": "Exclusive start marker prevents a second run of a control; phase directory and metadata/results use fresh creation. ACTIVE/HALTED gate entry. Ordinary exceptions write HALTED with automaticRestorationOnException:false; no except/finally blindly restores a possibly active mutant.",
+      "limit": "The Vitest raw producer retains native write behavior in the fresh phase directory; the frozen reporter writes wx. This review does not call every framework output exclusive or completed."
+    },
+    {
+      "topic": "Actual failure classification",
+      "evidence": "Raw/observer exact12 file/title identities, count/status agreement, hooks pass, no file/suite/unhandled errors, pending/todo rejection, process0/1 and rawsuccess/reason agreement. Every failed body must have matching serialized AssertionError messages; tests/setup stacks are rejected. Known unhandled/hook/global-teardown/close banners remain unchanged and case-insensitive.",
+      "limit": "A body AssertionError is sensitivity awaiting root attribution, not automatically a semantic loss or kill. A genuine survivor is allowed; setup/import/native/late/timeout failures halt incomplete rather than qualifying."
+    },
+    {
+      "topic": "Failure masking and meanings",
+      "evidence": "Result preserves complete failure messages and observer frames. C1 may stop at shared expectRefused99 before reason/snapshot/quarantine checks. C2 may bypass only the rename fault spy while preserving every byte at receipt paths.",
+      "limit": "No count prediction is encoded as a required mutant result. Actual raw outcomes supersede the read-only plan. A C2 assertion failure does not prove byte loss or independently satisfy the spec byte-invariant mutation criterion."
+    }
+  ],
+  "requiredLaterSealedReview": [
+    "Actual assigned source/root/branch and measured complete tracked/compiled/physical-copy manifests; no copied test/config/setup/guard changes.",
+    "Original12 measured case identities from the closed passing parent raw/observer, not names invented from static count.",
+    "Normalized proposal exactly matches both immutable plan recipes and proposed mutant digests derived from actual baseline bytes; rollback stays exact.",
+    "Frozen reporter actual2110B/4eddb... and actual controller copy hash9479...; all sealed own/reference/index rows rehashed.",
+    "Borrowed resolver points only to the assigned parent dependencies; native actual hash/device/inode/nlink matches before/after. Preserve plan/reservation/earlier packet pins and current inbox boundary.",
+    "Root actual normal guards and original12/5/4/10 evidence remain separately audited; exact per-control release only after all prerequisites."
+  ],
+  "notEstablished": [
+    "Controller runtime or successful syntax/import",
+    "Fresh copy/setup/preservation correctness",
+    "Any actual mutation kill/survival/count",
+    "Lost bytes/crash atomicity/live writer or real signed hold behavior",
+    "Full P045 acceptance, historical red, fullsuite, coverage, Node24, hosted CI, release or Done"
+  ],
+  "actions": {
+    "targetExecuted": false,
+    "targetImported": false,
+    "targetParsedOrSyntaxCompiled": false,
+    "productImportedOrRun": false,
+    "testCollectedOrRun": false,
+    "copyOrSetupCreated": false,
+    "mutantWritten": false,
+    "sourceOrPriorArtifactsEdited": false,
+    "writes": "Only this NEW private review JSON/Markdown pair."
+  },
+  "allReadsFinished": true
+}

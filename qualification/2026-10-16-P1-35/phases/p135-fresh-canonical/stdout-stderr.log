@@ -1,0 +1,55 @@
+
+ RUN  v4.1.11 /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout
+
+ ✓ tests/claims/claimAdapters.test.ts (39 tests) 13ms
+ ✓ tests/claims/claimLabels.test.ts (8 tests) 19ms
+stdout | tests/migration/legacyRelabel.test.ts > P1-35 synthetic migration source contracts > R2 reads unmarked dogfood metadata conservatively and preserves current marked rows
+AMC_P135_LEGACY_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-XBY21Z/public-evidence.json
+
+stdout | tests/migration/legacyRelabel.test.ts > P1-35 synthetic migration source contracts > R4 never promotes operator-chosen ATTESTED legacy provenance
+AMC_P135_LEGACY_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-2jMvpf/public-evidence.json
+
+stdout | tests/migration/legacyRelabel.test.ts > P1-35 synthetic migration source contracts > current public claim envelopes bypass the legacy classifier
+AMC_P135_LEGACY_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-rkA0bU/public-evidence.json
+
+stdout | tests/migration/legacyRelabel.test.ts > P1-35 synthetic migration source contracts > post-fix assurance without an envelope classifies as R5 self-reported
+AMC_P135_LEGACY_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-sByUEh/public-evidence.json
+
+stdout | tests/migration/legacyRelabel.test.ts > P1-35 synthetic migration source contracts > post-fix assurance lazy claim stays self-reported instead of using current observed fallback
+AMC_P135_LEGACY_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-pGmtmB/public-evidence.json
+
+stdout | tests/migration/legacyRelabel.test.ts > P1-35 synthetic migration source contracts > dry-run and signed persistent relabel preserve synthetic originals and append no records on repeat
+AMC_P135_LEGACY_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-R1bDkF/public-evidence.json
+
+ ✓ tests/sourceQuality.test.ts (5 tests) 2824ms
+     ✓ detects an orphaned source file and accepts its reachable counterpart  1501ms
+     ✓ keeps the explicitly invoked Playwright config reachable without hiding adjacent orphans  512ms
+     ✓ detects real duplicated code and accepts a single copy  808ms
+stdout | tests/migration/legacyRelabel.test.ts > P1-35 synthetic migration source contracts > an edited signed log line refuses further relabelling without changing originals
+AMC_P135_LEGACY_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-vobu0S/public-evidence.json
+
+stdout | tests/migration/legacyRelabel.test.ts > P1-35 synthetic migration source contracts > a tampered migration receipt signature refuses its log and any further append
+AMC_P135_LEGACY_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-aIKpNq/public-evidence.json
+
+stdout | tests/migration/legacyRelabel.test.ts > P1-35 genuine v1.1.1 generated originals > actual old classifier inputs retain R1 to R5 labels and the genuine L3/certificate gaps
+AMC_P135_LEGACY_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-Gwl2LL/public-evidence.json
+
+ ✓ tests/assuranceReportProvenance.test.ts (8 tests) 983ms
+stderr | tests/migration/legacyRelabel.test.ts > P1-35 genuine v1.1.1 generated originals > real relabelling preserves every decoded file and old SQLite bytes with explicit owned trust enrollment
+[amc] Explicit imported admission expanded the monitor signing role (61ee1b7a33aa0a87cfbd7c838b1be3f0d63f095d4ebed734d4687150b790d392).
+[amc] Explicit imported admission expanded the auditor signing role (5f24420aaadad3cffe4aa83f98e8b2044c3aadf60300485725fe1eb633bd2142).
+
+stdout | tests/migration/legacyRelabel.test.ts > P1-35 genuine v1.1.1 generated originals > real relabelling preserves every decoded file and old SQLite bytes with explicit owned trust enrollment
+AMC_P135_LEGACY_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-o2BT6e/public-evidence.json
+
+ ✓ tests/migration/legacyRelabel.test.ts (10 tests) 1333ms
+     ✓ dry-run and signed persistent relabel preserve synthetic originals and append no records on repeat  308ms
+     ✓ real relabelling preserves every decoded file and old SQLite bytes with explicit owned trust enrollment  601ms
+ ✓ tests/assuranceRunnerInconclusiveQualification.test.ts (15 tests) 1999ms
+
+ Test Files  6 passed (6)
+      Tests  85 passed (85)
+   Start at  22:47:15
+   Duration  4.48s (transform 4.87s, setup 138ms, import 7.30s, tests 7.17s, environment 0ms)
+
+JSON report written to /private/tmp/p1-39-post-typecheck-20261016/p135-fresh-canonical.raw.json

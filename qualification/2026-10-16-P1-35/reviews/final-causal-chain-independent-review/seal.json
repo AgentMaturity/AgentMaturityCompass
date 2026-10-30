@@ -1,0 +1,32 @@
+{
+  "schema": "p135-independent-causal-chain-seal/1",
+  "allReadsFinished": true,
+  "blockers": [],
+  "inputPinCount": 359,
+  "inputPinsVerified": true,
+  "rootOwnsMetadataMaterializationAndValidation": true,
+  "runtimeHelperOrProductExecuted": false,
+  "checkoutIndexOrQaWrites": false,
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/final-causal-chain-independent-review/review.json",
+      "bytes": 10061,
+      "sha256": "87b72a5ff923037c643aaf24ac75a39d120475b8394684536ff3cb0c6d58ab6a"
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/final-causal-chain-independent-review/README.md",
+      "bytes": 4180,
+      "sha256": "26fde6dfee54e919d958324b802131a231e6f5db528b12cd3ba66194ce81dc78"
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/final-causal-chain-independent-review/pins.json",
+      "bytes": 86490,
+      "sha256": "84880e900e0dccb57050cf4d45f6ffa501150d6afa8ac34037f02ceb94fc646a"
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/final-causal-chain-independent-review/verified-observations.json",
+      "bytes": 4912,
+      "sha256": "134f7cdf0ffd0ca3ea7fdeb6ae20c4912ba3f78b7feb8b17a97e28d32c5f5e7d"
+    }
+  ]
+}

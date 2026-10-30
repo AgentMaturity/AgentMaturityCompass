@@ -1,0 +1,170 @@
+{
+  "$id": "https://agentmaturity.co/spec/schemas/v1/review-record.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "approval": {
+      "additionalProperties": false,
+      "properties": {
+        "agentId": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "approvalRequestId": {
+          "pattern": "^apprreq_[a-f0-9]{32}$",
+          "type": "string"
+        },
+        "requestBindingDigest": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "agentId",
+        "approvalRequestId",
+        "requestBindingDigest"
+      ],
+      "type": "object"
+    },
+    "decision": {
+      "enum": [
+        "approved",
+        "rejected",
+        "changes_requested"
+      ],
+      "type": "string"
+    },
+    "expiresAt": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "findings": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          },
+          "severity": {
+            "enum": [
+              "info",
+              "minor",
+              "major",
+              "critical"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "severity",
+          "note"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "requesterId": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "reviewId": {
+      "pattern": "^rev_[a-f0-9]{24}$",
+      "type": "string"
+    },
+    "reviewedAt": {
+      "format": "date-time",
+      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+      "type": "string"
+    },
+    "reviewer": {
+      "additionalProperties": false,
+      "properties": {
+        "roles": {
+          "items": {
+            "enum": [
+              "OWNER",
+              "AUDITOR",
+              "APPROVER",
+              "OPERATOR",
+              "VIEWER",
+              "AGENT"
+            ],
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "userId": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "userId",
+        "roles"
+      ],
+      "type": "object"
+    },
+    "schema": {
+      "const": "amc.review-record/v1",
+      "type": "string"
+    },
+    "subject": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "compiled-plan",
+            "control-result",
+            "scoped-exception",
+            "break-glass-packet",
+            "agent-output",
+            "attestation-draft"
+          ],
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "id",
+        "sha256"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "schema",
+    "reviewId",
+    "subject",
+    "decision",
+    "reviewer",
+    "requesterId",
+    "findings",
+    "reviewedAt",
+    "expiresAt",
+    "approval"
+  ],
+  "title": "AMC Review Record",
+  "type": "object"
+}

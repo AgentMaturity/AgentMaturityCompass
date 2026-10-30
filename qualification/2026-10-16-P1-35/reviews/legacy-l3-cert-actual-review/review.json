@@ -1,0 +1,178 @@
+{
+  "schema": "p135-actual-private-certificate-outcome-and-storage/1",
+  "at": "2026-10-16T16:52:31.121201+00:00",
+  "conclusion": "Genuine historical default-policy certificate issuance succeeded. Exact-L3 fixture remains unmet and original certificate cannot fit the committed corpus. Preserve the whole private original for separately bound current qualification; do not silently substitute certificate metadata for corpus acceptance.",
+  "actual": {
+    "launcherExit": 1,
+    "initExit": 0,
+    "apiExit": 1,
+    "phase": "complete",
+    "failureAbsent": true,
+    "seed": {
+      "agentId": "legacy-l3-attempt",
+      "targetMaturity": 4,
+      "questionCount": 244,
+      "evidenceEventCount": 3272,
+      "sessionCount": 7,
+      "targetLevelCounts": {
+        "4": 244
+      }
+    },
+    "layers": [
+      {
+        "layerName": "Strategic Agent Operations",
+        "avgFinalLevel": 3.789
+      },
+      {
+        "layerName": "Leadership & Autonomy",
+        "avgFinalLevel": 3.913
+      },
+      {
+        "layerName": "Culture & Alignment",
+        "avgFinalLevel": 3.989
+      },
+      {
+        "layerName": "Resilience",
+        "avgFinalLevel": 3.982
+      },
+      {
+        "layerName": "Skills",
+        "avgFinalLevel": 3.942
+      }
+    ],
+    "recordedAndSequentialMean": 3.9229999999999996,
+    "exactL3": false,
+    "validity": {
+      "status": "VALID",
+      "verificationPassed": true,
+      "integrityIndex": 1,
+      "trustLabel": "HIGH TRUST",
+      "runSealSigPresent": true
+    },
+    "signedDefaultPolicy": {
+      "setup": {
+        "workflowPath": "/private/tmp/p1-35-legacy-qualification-20261016/legacy-l3-cert-attempt/retained-S25o8q/workspace/.github/workflows/amc.yml",
+        "policyPath": "/private/tmp/p1-35-legacy-qualification-20261016/legacy-l3-cert-attempt/retained-S25o8q/workspace/.amc/agents/legacy-l3-attempt/gatePolicy.json",
+        "policySigPath": "/private/tmp/p1-35-legacy-qualification-20261016/legacy-l3-cert-attempt/retained-S25o8q/workspace/.amc/agents/legacy-l3-attempt/gatePolicy.json.sig",
+        "suggestedBundlePath": "/private/tmp/p1-35-legacy-qualification-20261016/legacy-l3-cert-attempt/retained-S25o8q/workspace/.amc/agents/legacy-l3-attempt/bundles/latest.amcbundle",
+        "signed": true
+      },
+      "pin": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/legacy-l3-cert-attempt/retained-S25o8q/workspace/.amc/agents/legacy-l3-attempt/gatePolicy.json",
+        "bytes": 270,
+        "sha256": "92914d7de436f1b77bc9f8489fedabcfe246dde7d2cfca8fb4661df74aba6765"
+      },
+      "value": {
+        "minIntegrityIndex": 0.8,
+        "minOverall": 3.5,
+        "minLayer": {
+          "Strategic Agent Operations": 3,
+          "Leadership & Autonomy": 3,
+          "Culture & Alignment": 3,
+          "Resilience": 3,
+          "Skills": 3
+        },
+        "requireObservedForLevel5": true,
+        "denyIfLowTrust": true
+      }
+    },
+    "certificateCreated": true,
+    "certId": "aba955ec-a552-4076-9838-434e7a47e83a",
+    "certificateMaturityOverall": 3.923,
+    "embeddedRunBytesExact": true,
+    "embeddedReferenceAndDigestBindingsMatch": true,
+    "independentCryptographicSignatureVerificationRunHere": false
+  },
+  "actualCertificate": {
+    "path": "/private/tmp/p1-35-legacy-qualification-20261016/legacy-l3-cert-attempt/retained-S25o8q/actual.amccert",
+    "bytes": 1996064,
+    "sha256": "8d1ec6ad5e4048ef0aec7bb0c15df6644f2f0b1b1defb257f7afbed925701384"
+  },
+  "actualReport": {
+    "path": "/private/tmp/p1-35-legacy-qualification-20261016/legacy-l3-cert-attempt/retained-S25o8q/workspace/.amc/agents/legacy-l3-attempt/runs/bcb62237-bb3a-4d6c-98e9-e502a3153437.json",
+    "bytes": 4698880,
+    "sha256": "b39d31262e1ee27fda596750e68e6b145aee7b07a74278c2be00da1b22c56d43"
+  },
+  "exitClassification": "Actual init0, API1 and launcher1 reached phase complete with no failure object. The only designed nonzero condition was exactL3=false; certificate creation returned normally. This is not a failed default certificate gate.",
+  "rootReportedClosure": {
+    "exit": 1,
+    "durationMs": 6305,
+    "ownedPgid": 90023,
+    "groupAbsentByESRCH": true,
+    "attribution": "Parent actual harness observation. Reviewer did not execute/probe processes or independently load an owning-wrapper command record."
+  },
+  "archiveStaticAudit": {
+    "members": 40,
+    "regularFiles": 34,
+    "declaredFileBytes": 11383254,
+    "embeddedRunByteExact": true,
+    "certificateJSONDigestAndReportPolicyReferencesMatch": true,
+    "allMemberHashesRecordedIn": "observations.json",
+    "independentCurrentSignatureVerification": false,
+    "privatePemMarkersFound": [],
+    "limit": "Only a PEM private-key marker scan of regular member bytes; not a complete secret or encrypted-payload audit."
+  },
+  "storage": {
+    "currentFourFileCorpusBytes": 776167,
+    "exclusiveCorpusCap": 1000000,
+    "remainingBytes": 223833,
+    "coreCorpusHashesStillExact": true,
+    "certificateBytes": 1996064,
+    "directCertificateAdditionTotal": 2772231,
+    "losslessOuterWrapMeasurements": [
+      {
+        "format": "gzip-9",
+        "wrappedOriginalBytes": 1996064,
+        "encodedBytes": 1980555,
+        "sha256": "376a599ffd28a65403f137c2f1ee7b3be70568ee205c3084172398c464b0cc2b",
+        "roundTripOriginalExact": true,
+        "fitsCoreRemaining223833": false
+      },
+      {
+        "format": "bz2-9",
+        "wrappedOriginalBytes": 1996064,
+        "encodedBytes": 1996018,
+        "sha256": "54f3b4f9b0bac514a4a0ef3a52759104b68074ad82d4e4cb58511658ca5179dd",
+        "roundTripOriginalExact": true,
+        "fitsCoreRemaining223833": false
+      },
+      {
+        "format": "xz-9",
+        "wrappedOriginalBytes": 1996064,
+        "encodedBytes": 1979244,
+        "sha256": "2ad1ff6d6bb5bf72d4b81983492e71e07980f5a183fe06806001cc7a773105e7",
+        "roundTripOriginalExact": true,
+        "fitsCoreRemaining223833": false
+      }
+    ],
+    "reportGzip9Bytes": 916655,
+    "originalsPreserved": true,
+    "noCompressedFilesSaved": true,
+    "noRepackTruncateOrResign": true
+  },
+  "ordinaryQualificationRule": {
+    "source": "scripts/check-qualification-receipts.mjs:18,58",
+    "perFileMaxBytes": 1048576,
+    "directive": "The unchanged validator rejects oversized files and tells authors to summarise the log and keep its hash. This supports a small actual-outcome/member-hash record while retaining the complete source artifact privately; it does not waive the fixture corpus requirement.",
+    "originalCertificateDirectlyInQualificationPacket": false
+  },
+  "smallestHonestNextPath": [
+    "Keep actual.amccert and its actual source report untouched in retained-S25o8q. Bind their exact whole-file hashes and source/command provenance into finite current qualification inputs.",
+    "Root may separately execute unchanged current certificate verification and migration relabel against that exact private file with the actual trust context and owned workspace. Preserve actual refusals, legacy claim, and before/after whole-file hashes; no fake ledgerCheck, trust upgrade or key import shortcut. This current verification has not run in this audit.",
+    "Retain compact outcome/default-policy/member-hash evidence in the ordinary qualification packet if root selects it; keep the full certificate private rather than split/repack/truncate/re-sign it or smuggle it through the fixture budget.",
+    "Leave exact genuine L3 and committed <1MB genuine-certificate corpus acceptance open. The certificate is an actual successful private generation result, not full P1-35 or plan completion."
+  ],
+  "preparationStops": [
+    {
+      "kind": "cross-language-floating-arithmetic-static-assertion",
+      "exit": 1,
+      "meaning": "Initial summary used Python built-in sum, which rounded to3.9230000000000005 rather than the JavaScript left-accumulation3.9229999999999996. No output was written. Repeated explicit left accumulation matches the actual stored mean exactly; exactL3 remains false."
+    },
+    {
+      "kind": "static-validator-path-lookup",
+      "exit": 2,
+      "meaning": "Guessed validate-qualification-receipts.mjs/schema.json/schemas paths were absent. Correct unchanged scripts/check-qualification-receipts.mjs and qualification/receipt.schema.json were located/read; no runtime or validation credit."
+    }
+  ],
+  "boundary": "Standard-library static decode/hash/compression and private JSON output only. No archive extraction to disk, certificate change/repack/re-sign, product/native/SQL/network/runtime/probes, checkout/index/QA mutation or new qualification pass."
+}

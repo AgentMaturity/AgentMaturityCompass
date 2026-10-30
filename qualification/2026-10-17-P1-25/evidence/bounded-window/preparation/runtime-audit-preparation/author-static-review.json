@@ -1,0 +1,16 @@
+{
+  "schema": "p125w-inert-runtime-audit-preparation-author-review/1",
+  "at": "2026-10-17T00:07:45.286847+00:00",
+  "blockers": [],
+  "observedReuseOnlyDestinationAndPrefixChanged": true,
+  "oldPendingAndRequiredSemanticAssertionTextPreserved": true,
+  "allOldResourceAndErrorGuardTextPreserved": true,
+  "newBranchUsesActualChildArgvAndPerGrantFacts": true,
+  "lastReplyObservationNotReusedForFirstProof": true,
+  "defaultAndZeroOraclesIndependentOfProductionConstant": true,
+  "firstHeadPublicOperandLimitExplicit": true,
+  "noPredictedRuntimeCountsOrOutcomes": true,
+  "parsedImportedCompiledOrExecutedAdapters": false,
+  "sourceIndexQaWrites": false,
+  "independentStaticReviewRequired": true
+}

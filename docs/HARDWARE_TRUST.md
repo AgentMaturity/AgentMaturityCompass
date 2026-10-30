@@ -1,6 +1,6 @@
-# Hardware-Backed Trust
+# Notary signing boundary and hardware labels
 
-AMC supports a hardened signing boundary through **AMC Notary**. In Notary mode, critical signatures are produced by a separate process and verified offline with pinned public keys.
+AMC supports a hardened signing boundary through **AMC Notary**. In Notary mode, critical signatures are produced by a separate process and verified offline with pinned public keys. Whether that process's key sits in hardware is a label with a stated basis, never a verified fact: AMC does not verify hardware attestations.
 
 ## Why this exists
 
@@ -22,14 +22,16 @@ Notary reduces this by moving signing away from Studio and enforcing a fail-clos
 ### Not fully protected against
 - Full host compromise of both Studio and Notary plus vault/passphrase compromise.
 - Hardware vendor trust failures when using external signer integrations.
+- A false `hardware` claim by an external signer: its level is provider-reported.
 
-## Attestation levels
+## Attestation levels and their basis
 
-AMC emits a signed Notary attestation and classifies it as:
-- `SOFTWARE`: file-sealed key backend or software-controlled signer.
-- `HARDWARE`: external signer reports hardware claims (`HSM|TPM|KMS|SMARTCARD|ENCLAVE|OTHER`) and signatures verify.
+AMC emits a signed Notary attestation with a level and the basis of that level (P2-08):
+- `SOFTWARE`, basis `configured`: the file-sealed key backend.
+- `HARDWARE` or `SOFTWARE`, basis `provider-reported`: an external signer's own `hardware` claim (`HSM|TPM|KMS|SMARTCARD|ENCLAVE|OTHER`). AMC checks that its signatures verify, not that the claim is true.
+- `HARDWARE` or `SOFTWARE`, basis `provider-metadata` or `configured`: a key held by a key provider ([KEY_PROVIDERS.md](KEY_PROVIDERS.md)). `HARDWARE` only when the provider's key metadata (AWS KMS origin, Google protection level, Azure `EC-HSM`) or, for PKCS#11, the operator's `AMC_PKCS11_PROTECTION` says `hsm`.
 
-`HARDWARE` is stronger operational evidence, but not an absolute security guarantee by itself.
+No basis is "attested". `HARDWARE` is operational evidence of where the key is said to be, as strong as its basis, and not a security guarantee by itself.
 
 ## Fail-closed behavior
 

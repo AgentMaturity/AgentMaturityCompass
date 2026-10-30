@@ -47,6 +47,8 @@ export function resolveForeignRunner(params: {
   readonly workspace: string;
   readonly agentId: string;
   readonly timeoutMs?: number;
+  /** AXR-10: govern only the child's model route; without it the child's tools must meet AMC's control hook. */
+  readonly observeOnly?: boolean;
 }): ForeignRunnerResolution {
   if (!(FOREIGN_PROVIDER_IDS as readonly string[]).includes(params.providerId)) {
     return {
@@ -79,7 +81,8 @@ export function resolveForeignRunner(params: {
       gatewayBase,
       providerRoute,
       model,
-      ...(params.timeoutMs === undefined ? {} : { timeoutMs: params.timeoutMs })
+      ...(params.timeoutMs === undefined ? {} : { timeoutMs: params.timeoutMs }),
+      ...(params.observeOnly === undefined ? {} : { observeOnly: params.observeOnly })
     })
   };
 }
@@ -101,12 +104,14 @@ export function resolveForeignRunner(params: {
 export function delegationTurnOptions(params: {
   readonly grant: (capability: SubagentCapability) => void;
   readonly maxDepth: number;
+  readonly maxActiveChildren?: number;
   readonly scope?: readonly ActionClass[] | undefined;
   readonly stopConditions?: readonly string[] | undefined;
   readonly runner?: SubagentRunner | null;
 }): {
   readonly grant: (capability: SubagentCapability) => void;
   readonly maxDepth: number;
+  readonly maxActiveChildren?: number;
   readonly scope?: readonly ActionClass[];
   readonly stopConditions?: readonly string[];
   readonly runner?: SubagentRunner;
@@ -114,6 +119,7 @@ export function delegationTurnOptions(params: {
   return {
     grant: params.grant,
     maxDepth: params.maxDepth,
+    ...(params.maxActiveChildren === undefined ? {} : { maxActiveChildren: params.maxActiveChildren }),
     ...(params.scope === undefined ? {} : { scope: params.scope }),
     ...(params.stopConditions === undefined ? {} : { stopConditions: Object.freeze([...params.stopConditions]) }),
     ...(params.runner === null || params.runner === undefined ? {} : { runner: params.runner })

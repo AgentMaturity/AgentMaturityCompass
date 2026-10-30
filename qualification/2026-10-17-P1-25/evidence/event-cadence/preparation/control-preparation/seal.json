@@ -1,0 +1,102 @@
+{
+  "schema": "p125ec-inert-source-control-preparation-seal/1",
+  "at": "2026-10-17T01:05:12.330216+00:00",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/control-preparation/source-control.py.source.txt",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/control-preparation/source-control.py.source.txt",
+      "bytes": 26289,
+      "sha256": "a30fa847e29155f851eca012ce4c315729285cc84b34d575cd84d17c64687853",
+      "dev": 16777231,
+      "inode": 543898504,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/control-preparation/b38-to-cadence-control.patch.txt",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/control-preparation/b38-to-cadence-control.patch.txt",
+      "bytes": 19569,
+      "sha256": "3340ddd27149f2285515ac0e1d36d0483a9d5da05881809844130b20175f9e95",
+      "dev": 16777231,
+      "inode": 543898505,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/control-preparation/controls.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/control-preparation/controls.json",
+      "bytes": 5338,
+      "sha256": "9d2588dda5a2e723421433baac6a586c0c5711cdb55ca94a69a7161718b45840",
+      "dev": 16777231,
+      "inode": 543893270,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/control-preparation/COUNT-CHECKPOINT-ROWS.patch.txt",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/control-preparation/COUNT-CHECKPOINT-ROWS.patch.txt",
+      "bytes": 947,
+      "sha256": "01619042ef9f231af40042d70cca48c6397a97f6b91f99adfd5c1b77d04cab92",
+      "dev": 16777231,
+      "inode": 543893268,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/control-preparation/STRICT-THRESHOLD.patch.txt",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/control-preparation/STRICT-THRESHOLD.patch.txt",
+      "bytes": 688,
+      "sha256": "7e74cb2d9e141df6b3613471964e4b3a3516439f808bfb9eb810e9494a64b227",
+      "dev": 16777231,
+      "inode": 543893269,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/control-preparation/control-root-bindings.template.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/control-preparation/control-root-bindings.template.json",
+      "bytes": 4237,
+      "sha256": "dd12841fe9cd635ce6ccd7b41ce09dfa79a64ab8bdad9fa5f8e71578ef25ff78",
+      "dev": 16777231,
+      "inode": 543898633,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/control-preparation/FIELD-INSTRUCTIONS.md",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/control-preparation/FIELD-INSTRUCTIONS.md",
+      "bytes": 4735,
+      "sha256": "af7f16656ee83f30fa7872f3c7c0038595c085a4097cd9720604320bafb752f9",
+      "dev": 16777231,
+      "inode": 543898634,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/control-preparation/README.md",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/control-preparation/README.md",
+      "bytes": 1872,
+      "sha256": "a82b619e3236af90f9581aa17922774d25ddf67e29cbd8ff748d9d26f1194fef",
+      "dev": 16777231,
+      "inode": 543898635,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/control-preparation/input-pins.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/control-preparation/input-pins.json",
+      "bytes": 4553,
+      "sha256": "9d583d941d886475196930b22f97b960cc8ec24dcf8f8b36cd7197b5209412ba",
+      "dev": 16777231,
+      "inode": 543898636,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/control-preparation/author-review.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/control-preparation/author-review.json",
+      "bytes": 2343,
+      "sha256": "059ebaeac7fd9f758cbcce4041c8bf8b1e79663be2ece5d24d928ce751f6d339",
+      "dev": 16777231,
+      "inode": 543898637,
+      "nlink": 1
+    }
+  ],
+  "inputPinCount": 11,
+  "blockers": [],
+  "readyForExecution": false,
+  "noImportParseCompileHelperProductExecutionOrSourceMutation": true,
+  "futureSourceFreshBindingOutcomesAndActionPinsUnfilled": true,
+  "noBinderDuplication": true
+}

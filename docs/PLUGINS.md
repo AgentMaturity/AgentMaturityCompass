@@ -21,6 +21,8 @@ my-plugin/
 
 ## Plugin Manifest (manifest.json)
 
+The manifest below is illustrative. The signed manifest that `amc plugin pack` writes follows `src/plugins/pluginManifestSchema.ts`, which has a different shape (for example `plugin.compatibility.amcMinVersion` and no `amcApiVersion`).
+
 ```json
 {
   "name": "my-compliance-pack",
@@ -198,24 +200,11 @@ content/                # All asset files
 
 ## API Versioning
 
-AMC uses semantic versioning for the plugin API:
-
-```
-Current: 1.0.0 (stable)
-Minimum supported: 1.0.0
-```
-
-Check compatibility before publishing:
+No install, verify or load step checks plugin API compatibility yet: nothing reads an `amcApiVersion` field, `checkPluginCompatibility` (exported from the package root) is not called by the plugin commands, and there is no compatibility command. Before publishing, verify the package signature and artifact hashes against your publisher key:
 
 ```bash
-amc plugin check-compat --manifest ./manifest.json
+amc plugin verify ./my-plugin.amcplug --pubkey ./publisher.pub
 ```
-
-The `amcApiVersion` field in your manifest declares which API version your plugin targets. AMC will:
-
-- **Accept** plugins targeting the current or any backward-compatible version
-- **Warn** about deprecated API features your plugin uses
-- **Reject** plugins targeting a future/incompatible API version
 
 ## CLI Commands Reference
 
@@ -262,7 +251,7 @@ The Compass Console at `/console/plugins` provides:
 2. **Write clear descriptions** — other teams will use your plugin
 3. **Tag comprehensively** — tags drive discoverability in the registry
 4. **Test before publishing** — run `amc plugin verify` and test in a sandbox workspace
-5. **Pin amcApiVersion** — declare the exact API version you tested against
+5. **Record the AMC version you tested against** in your release notes; AMC does not read `amcApiVersion` yet
 6. **Keep assets small** — each asset should serve one clear purpose
 7. **Document assumptions** — add a README.md in your plugin root
 8. **Use SPDX licenses** — standard license identifiers only

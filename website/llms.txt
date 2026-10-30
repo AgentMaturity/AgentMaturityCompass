@@ -5,7 +5,7 @@
 ## Docs
 - [Getting Started](https://agentmaturity.co/docs/#GETTING_STARTED)
 - [Architecture](https://agentmaturity.co/docs/#ARCHITECTURE_MAP)
-- [CLI Reference](https://agentmaturity.co/docs/#CLI_WRAPPERS)
+- [CLI Reference](https://agentmaturity.co/docs/#CLI_COMMAND_INVENTORY)
 - [API Reference](https://agentmaturity.co/docs/#API_SURFACES)
 - [Adapters](https://agentmaturity.co/docs/#ADAPTERS)
 - [Security](https://agentmaturity.co/docs/#SECURITY)

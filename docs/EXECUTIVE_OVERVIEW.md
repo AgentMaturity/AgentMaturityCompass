@@ -46,7 +46,7 @@ We tested a content moderation agent with two methods:
 ### For Your Engineering Team
 - **Evidence-weighted diagnostic scoring** that reveals exactly where agents are weak
 - **632 sector-specific questions** for regulated industries (healthcare, finance, education, etc.)
-- **142 assurance packs** that test real adversarial scenarios (prompt injection, data exfiltration, etc.)
+- **<!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> registered assurance packs** that test real adversarial scenarios (prompt injection, data exfiltration, etc.)
 - **Auto-generated guardrails** that plug directly into agent config files
 - **CI/CD integration** — fail builds if agents don't meet maturity targets
 
@@ -120,7 +120,7 @@ For the board interpretation of an L3 result, attach [What L3 Means For Business
 
 ## Cost
 
-The core trust stack is MIT licensed: scoring, evidence, reports, Studio, adapters, and CI gates. AMC plans a $9.99/month per user add-on for all 41 Industry Domain Packs, but public checkout and automatic license issuance are not live.
+The core trust stack is MIT licensed: scoring, evidence, reports, Studio, adapters, and CI gates. AMC plans a $9.99/month per user add-on for all 41 Industry Domain Packs, but public checkout and automatic license issuance are not live. The packs are self-reported questionnaires, and a licence unlocks access only: it never changes a result.
 
 ## Contact
 

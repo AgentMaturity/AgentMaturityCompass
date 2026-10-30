@@ -1,0 +1,28 @@
+{
+  "schema": "p125pc-independent-binder-actual-closed-input-compatibility/1",
+  "at": "2026-10-17T01:57:21.782334+00:00",
+  "blockers": [],
+  "priorStaticReviewPreserved": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/fresh-binding-static-review/seal.json",
+    "bytes": 938,
+    "sha256": "ca9056f008e1c129b514a5795abf53aa41166ce9d399a3c91071a81ec2eb4ced"
+  },
+  "actualSourceCommit": "5d4e9e8d74bef32e68090369223947691c5fea21",
+  "actualClosedPhase": "p125pc-clean-source",
+  "exit": 0,
+  "durationMs": 48817,
+  "endedUtc": "2026-10-17T01:55:14.888774+00:00",
+  "ownedPgid": 87063,
+  "recordedGroupAbsentByESRCH": true,
+  "signalsOtherThanZeroSent": false,
+  "actualKeptPath": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0F9GlT",
+  "resolvedCheckoutFromKeptLine": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0F9GlT/checkout",
+  "checks": {
+    "actualCommandSchemaMatchesEveryBinderCommandField": true,
+    "exactOneKeptLineAndLogPinnedSourcePrefix": true,
+    "actualRuntimeAndSourceCheckpointSchemasPreviouslyVerifiedExact": true,
+    "allSelectedClosureAndInputHashesPinned": true,
+    "noVitestCreditFromCleanSource": true
+  },
+  "boundary": "This addendum follows the earlier sealed inert review and records actual closed input compatibility from full command/log and root closure record. No process probe, binder execution, actual Q file/native sweep, N-marker probe or source/index/QA mutation. Root must recheck namespace inactivity and execute/admit actual binding separately."
+}

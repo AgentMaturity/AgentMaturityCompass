@@ -3,6 +3,7 @@ import { resolve } from "node:path";
 import { realpathSync } from "node:fs";
 import type { AgentPromptResult, AgentSession } from "../agent/agentSession.js";
 import { SessionResumeRefused } from "../session/sessionResume.js";
+import { assertSecondSessionWriter, SessionStoreSingleWriterError } from "../persistence/openSessionEventStore.js";
 import { amcVersion } from "../version.js";
 import { createAcpConnection, type AcpConnection, type AcpSink } from "./acpConnection.js";
 import { ACP_ERROR, AcpFailure } from "./acpErrors.js";
@@ -17,13 +18,15 @@ import { NATIVE_AUDIO_INPUT_FORMAT } from "../attachments/nativeAudioInput.js";
 import { acpSupportsAudioInput, audioPrompt } from "./acpAudioInput.js";
 import { ACP_MAX_UPDATE_PARAMS_BYTES, acpPromptInputFormat, assertAcpPromptFields, nativeAcpCapabilities, type AcpForkSessionFactory } from "./acpRuntimeContracts.js";
 import { prepareAcpHistory, assertAcpForkLineage } from "./acpHistoryContinuity.js";
+import { executionStatusFor } from "../execution/executionStatus.js";
+import type { TurnEndReason } from "../session/sessionTypes.js";
 
 /**
  * An ACP agent, over one connection (plan P7.1a).
  *
  * THE SLICE, AND WHY IT ENDS WHERE IT DOES. `initialize`, `authenticate`,
- * `session/new`, verified `session/load`, capability-gated `session/fork`,
- * `_amc/session/release`, `session/prompt`, `session/cancel`, and outbound
+ * `session/new`, verified `session/load`, capability-gated `session/fork` and
+ * `_amc/session/fork` (lineage only, P2-13), `_amc/session/release`, `session/prompt`, `session/cancel`, and outbound
  * `session/update`. Nothing else is implemented, and nothing else is STUBBED:
  * an unimplemented method answers `-32601`, which the protocol treats as a
  * legitimate answer. A stub that returned success would be the lie.
@@ -66,6 +69,8 @@ export interface AcpAgentInit {
   readonly resumeSessionFactory?: AcpAgentInit["sessionFactory"];
   /** Must inherit authenticated context; a lineage-only factory is not a fork. */
   readonly forkSessionFactory?: AcpForkSessionFactory;
+  /** `_amc/session/fork` (P2-13): a child whose signed open row names the verified parent; no inherited model context. */
+  readonly lineageForkFactory?: AcpForkSessionFactory;
   /** The actual fixed native route, never a client-supplied capability claim. */
   readonly promptRoute?: AcpPromptRoute;
   /** Launcher attests that its native session factories implement promptParts. */
@@ -185,6 +190,7 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
       case "session/new": return newSession(params, signal);
       case "session/load": return loadSession(params, signal);
       case "session/fork": return forkSession(params, signal);
+      case "_amc/session/fork": return forkSession(params, signal, true);
       case "_amc/session/release": return releaseSession(params);
       case "session/prompt": return prompt(params, signal);
       default:
@@ -217,7 +223,7 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
       authMethods: [],
       agentCapabilities: nativeAcpCapabilities({ route: init.promptRoute, orderedImageInput, audioInput,
         loadSession: init.resumeSessionFactory !== undefined, forkSession: init.forkSessionFactory !== undefined,
-        nativeExecution: init.nativeExecution })
+        lineageFork: init.lineageForkFactory !== undefined, nativeExecution: init.nativeExecution })
     };
   }
 
@@ -233,6 +239,7 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
     const request = params as { cwd: string; mcpServers: readonly unknown[]; additionalDirectories?: readonly string[] };
     assertSessionScope(request);
     if (closing || signal.aborted) throw new AcpFailure(ACP_ERROR.internal, "session creation was cancelled or the agent is shutting down");
+    admitAnotherWriter("A second ACP session");
     const sessionId = randomUUID();
     const session = await init.sessionFactory({ sessionId, workspace: init.workspace, agentId: init.agentId, signal: AbortSignal.any([signal, shutdown.signal]) });
     if (closing || signal.aborted || session.sessionId !== sessionId || sessionIdentityReserved(sessionId)) {
@@ -243,6 +250,15 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
     }
     sessions.set(sessionId, { session, projected: 0, projectedHash: null, updateBytes: 0, projectionFailed: false, running: false, releasing: false });
     return { sessionId };
+  }
+
+  /** Up front, before any factory runs: JSONL admits one session writer per workspace (P0-58). */
+  function admitAnotherWriter(needs: string): void {
+    if (sessions.size + loading.size + cleanupPending.size === 0) return;
+    try { assertSecondSessionWriter(init.workspace, needs); } catch (error) {
+      if (error instanceof SessionStoreSingleWriterError) throw new AcpFailure(ACP_ERROR.invalidParams, error.message, { reason: error.code });
+      throw error;
+    }
   }
 
   function assertSessionScope(request: { cwd: string; mcpServers?: readonly unknown[]; additionalDirectories?: readonly string[] }): void {
@@ -271,6 +287,7 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
       throw new AcpFailure(ACP_ERROR.invalidParams, "session cleanup remains unresolved; close the connection and inspect its ownership before loading again");
     }
     if (closing || signal.aborted || sessions.has(request.sessionId) || loading.has(request.sessionId)) throw new AcpFailure(ACP_ERROR.invalidParams, "session is already loaded, cancelled or the agent is shutting down");
+    admitAnotherWriter("Loading another ACP session");
     loading.add(request.sessionId);
     let session: AgentSession;
     try {
@@ -324,8 +341,10 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
     return {};
   }
 
-  async function forkSession(params: unknown, signal: AbortSignal): Promise<unknown> {
-    if (!init.forkSessionFactory) throw new AcpFailure(ACP_ERROR.methodNotFound, "authenticated context forking is unavailable; a lineage-only copy is not a fork");
+  async function forkSession(params: unknown, signal: AbortSignal, lineageOnly = false): Promise<unknown> {
+    const factory = lineageOnly ? init.lineageForkFactory : init.forkSessionFactory;
+    if (!factory) throw new AcpFailure(ACP_ERROR.methodNotFound, lineageOnly ? "lineage forking is unavailable in this runtime"
+      : "authenticated context forking is unavailable; a lineage-only copy is not a fork");
     const parent = entryFor(params);
     if (parent && (parent.running || parent.releasing || parent.forking || parent.projectionFailed)) {
       throw new AcpFailure(ACP_ERROR.invalidParams, "only an idle, usable session can be forked on this connection");
@@ -338,7 +357,8 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
       assertSessionScope(request);
       if (closing || signal.aborted || loading.has(request.sessionId)
           || [...cleanupPending].some(session => session.sessionId === request.sessionId)) throw new AcpFailure(ACP_ERROR.invalidParams, "fork was cancelled or its source is still loading or awaiting cleanup");
-      child = await init.forkSessionFactory({ parentSessionId: request.sessionId, workspace: init.workspace,
+      admitAnotherWriter("An ACP session fork");
+      child = await factory({ parentSessionId: request.sessionId, workspace: init.workspace,
         agentId: init.agentId, signal: AbortSignal.any([signal, shutdown.signal]) });
       if (closing || signal.aborted || child.sessionId === request.sessionId || sessionIdentityReserved(child.sessionId)) {
         throw new AcpFailure(ACP_ERROR.internal, "fork returned an incompatible, already owned or cancelled session");
@@ -347,14 +367,15 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
       const lineage = assertAcpForkLineage(init.workspace, request.sessionId, child, rows, init.agentId);
       // Both the inherited source and the child's own rows must be representable
       // by this route. This does not substitute a rendered transcript for context.
-      prepareAcpHistory({ workspace: init.workspace, session: { sessionId: request.sessionId,
+      if (!lineageOnly) prepareAcpHistory({ workspace: init.workspace, session: { sessionId: request.sessionId,
         promptParts: child.promptParts, promptAudioParts: child.promptAudioParts }, rows: lineage.rows,
         route: init.promptRoute, orderedImageInput, audioInput });
       const history = prepareAcpHistory({ workspace: init.workspace, session: child, rows,
         route: init.promptRoute, orderedImageInput, audioInput });
       sessions.set(child.sessionId, { session: child, projected: rows.length, projectedHash: history.head,
         updateBytes: 0, projectionFailed: false, running: false, releasing: false });
-      return { sessionId: child.sessionId, _meta: { "dev.agentmaturity.amc": { parentSession: lineage.parent } } };
+      return { sessionId: child.sessionId, _meta: { "dev.agentmaturity.amc": { parentSession: lineage.parent,
+        ...(lineageOnly ? { forkContext: "lineage-only" } : {}) } } };
     } catch (error) {
       // Never close a parent or another registered writer returned by a bad factory.
       if (child && !sessionIdentityReserved(child.sessionId) && child.sessionId !== (params as { sessionId?: unknown } | null)?.sessionId) {
@@ -438,8 +459,10 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
       // refuse and poison the session rather than laundering an invalid tail.
       if (slot.cancelled || signal.aborted) {
         flush(entry, request.sessionId);
-        return { stopReason: "cancelled", ...(init.nativeExecution?.taskValidation ? {
-          _meta: { "dev.agentmaturity.amc": { validation: projectNativeValidation(init.workspace, entry.session.readEvents()) } }
+        const execution = executionOf(request.sessionId, "cancelled");
+        return { stopReason: "cancelled", ...(init.nativeExecution?.taskValidation || execution ? {
+          _meta: { "dev.agentmaturity.amc": { ...(init.nativeExecution?.taskValidation ? { validation: projectNativeValidation(init.workspace, entry.session.readEvents()) } : {}),
+            ...execution } }
         } : {}) };
       }
 
@@ -453,7 +476,8 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
       // Already delivered updates remain distinct from the failed turn result.
       if (!outcome.ok) {
         flush(entry, request.sessionId, false);
-        throw new AcpFailure(ACP_ERROR.internal, "the turn did not complete", { reason: outcome.reason });
+        throw new AcpFailure(ACP_ERROR.internal, "the turn did not complete", { reason: outcome.reason,
+          ...(outcome.failureCodes?.length ? { failureCodes: [...outcome.failureCodes] } : {}), ...executionOf(request.sessionId, "error") });
       }
 
       // `PromptResponse` has no content field, so anything not sent as a
@@ -467,12 +491,14 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
         throw new AcpFailure(ACP_ERROR.internal, "the native turn returned an unsupported ending");
       }
       flush(entry, request.sessionId);
+      const execution = executionOf(request.sessionId, reason);
       return {
         stopReason,
-        // Turn completion and selected public checks are independent outcomes.
-        ...(stopReasonIsLossy(reason) || init.nativeExecution?.taskValidation ? { _meta: { "dev.agentmaturity.amc": {
+        // Turn completion, selected public checks and the execution phases are independent outcomes.
+        ...(stopReasonIsLossy(reason) || init.nativeExecution?.taskValidation || execution ? { _meta: { "dev.agentmaturity.amc": {
           ...(stopReasonIsLossy(reason) ? { turnEndReason: reason } : {}),
-          ...(init.nativeExecution?.taskValidation ? { validation: outcome.validation } : {})
+          ...(init.nativeExecution?.taskValidation ? { validation: outcome.validation } : {}),
+          ...execution
         } } } : {})
       };
     } finally {
@@ -481,6 +507,11 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
       entry.running = false;
       entry.active = undefined;
     }
+  }
+
+  /** The execution phases (P2-13) after a settled prompt; the native runtime only. Evidence verification stays pending here. */
+  function executionOf(sessionId: string, turn: TurnEndReason): { execution: ReturnType<typeof executionStatusFor> } | undefined {
+    return init.nativeExecution ? { execution: executionStatusFor(init.workspace, { sessionId, admission: "admitted", turn, verified: null }) } : undefined;
   }
 
   function entryFor(params: unknown): Registered | undefined {

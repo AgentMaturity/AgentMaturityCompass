@@ -1,12 +1,17 @@
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { generateKeyPairSync } from "node:crypto";
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, test } from "vitest";
 
 import {
+  createSignedLicenseKey,
   validateLicenseKeyFormat,
   detectTierFromKey
 } from "../src/enterprise/license.js";
+import { enterpriseActivateCli, enterpriseStatusCli } from "../src/enterprise/enterpriseCli.js";
+import { loadTrustContext } from "../src/trust/index.js";
+import { operatorTrustHome } from "./helpers/trustContext.js";
 
 import {
   buildEnterpriseAuditPayload,
@@ -109,6 +114,61 @@ describe("license key format validation", () => {
     expect(detectTierFromKey("AMC-PRO-AB12-CD34-EF56")).toBe("PRO");
     expect(detectTierFromKey("AMC-COM-AB12-CD34-EF56")).toBe("FREE");
     expect(detectTierFromKey("invalid")).toBe("FREE");
+  });
+});
+
+/* ────────────────────────────────────────────────────────────────── */
+/*  Enterprise licence: verified only against a pinned key (P1-51)   */
+/* ────────────────────────────────────────────────────────────────── */
+
+describe("enterprise licence verification", () => {
+  const claims = { licenseId: "lic-1", tier: "ENTERPRISE" as const, org: "Example Org", issuedAt: "2026-01-01T00:00:00.000Z", expiresAt: "2099-01-01T00:00:00.000Z" };
+
+  /** A licence key pair; `pinned` puts its public key in a signed operator trust list (artifact-seal). */
+  function licenceSetup(pinned: boolean) {
+    const { privateKey, publicKey } = generateKeyPairSync("ed25519");
+    const publicKeyPem = publicKey.export({ type: "spki", format: "pem" }).toString();
+    const amcHome = pinned ? operatorTrustHome([{ publicKeyPem, purposes: ["artifact-seal"] }]) : newDir("amc-ent-unpinned-");
+    roots.push(amcHome);
+    return { privateKey, trust: loadTrustContext({ amcHome }), key: createSignedLicenseKey({ privateKey, claims }) };
+  }
+
+  test("status reports not configured, and activate refuses and stores nothing, when no licence key is pinned", () => {
+    const workspace = newDir("amc-ent-");
+    const { key, trust } = licenceSetup(false);
+    expect(enterpriseStatusCli({ workspace, trust })).toMatchObject({
+      verificationConfigured: false, licenseValid: false, licenseStatus: "not_configured",
+      errors: [expect.stringContaining("enterprise licence verification not configured")]
+    });
+    const activated = enterpriseActivateCli({ workspace, key, trust });
+    expect(activated).toMatchObject({ success: false, status: "not_configured" });
+    expect(activated.errors.join(" ")).toContain("enterprise licence verification not configured");
+    expect(existsSync(join(workspace, ".amc", "license.key"))).toBe(false);
+  });
+
+  test("activate verifies a licence signed by a pinned key, and status then reports it", () => {
+    const workspace = newDir("amc-ent-");
+    const { key, trust } = licenceSetup(true);
+    expect(enterpriseStatusCli({ workspace, trust })).toMatchObject({ verificationConfigured: true, licenseValid: false });
+    expect(enterpriseActivateCli({ workspace, key, trust })).toMatchObject({ success: true, tier: "ENTERPRISE", org: "Example Org", status: "valid" });
+    expect(enterpriseStatusCli({ workspace, trust })).toMatchObject({
+      verificationConfigured: true, licenseValid: true, licenseStatus: "valid", tier: "ENTERPRISE", org: "Example Org"
+    });
+  });
+
+  test("a licence from an unpinned key, a tampered licence and malformed claims are refused and not stored", () => {
+    const workspace = newDir("amc-ent-");
+    const { trust } = licenceSetup(true);
+    const other = licenceSetup(false);
+    const [payload, signature] = other.key.split(".");
+    const tampered = `${Buffer.from(JSON.stringify({ ...claims, tier: "PRO" })).toString("base64url")}.${signature}`;
+    for (const key of [other.key, tampered, `${payload}.`, "AMC-ENT-AB12-CD34-EF56"]) {
+      expect(enterpriseActivateCli({ workspace, key, trust })).toMatchObject({ success: false, status: "invalid" });
+    }
+    const pinnedTrust = licenceSetup(true);
+    const badClaims = createSignedLicenseKey({ privateKey: pinnedTrust.privateKey, claims: { ...claims, tier: "GOLD" } as never });
+    expect(enterpriseActivateCli({ workspace, key: badClaims, trust: pinnedTrust.trust })).toMatchObject({ success: false, status: "invalid" });
+    expect(existsSync(join(workspace, ".amc", "license.key"))).toBe(false);
   });
 });
 

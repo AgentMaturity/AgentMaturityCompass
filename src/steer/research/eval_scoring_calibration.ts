@@ -8,6 +8,7 @@
  * - Score distribution analysis with percentile stats
  */
 
+import { mean as statsMean, standardDeviation } from "../../experiments/stats.js";
 import { microScore } from "../microScore.js";
 import type { MicroScoreResult } from "../microScore.js";
 
@@ -222,14 +223,11 @@ export function evaluateMonotonicity(
 }
 
 function mean(arr: number[]): number {
-  return arr.length > 0 ? arr.reduce((s, v) => s + v, 0) / arr.length : 0;
+  return statsMean(arr);
 }
 
 function stddev(arr: number[]): number {
-  if (arr.length < 2) return 0;
-  const m = mean(arr);
-  const variance = arr.reduce((s, v) => s + (v - m) ** 2, 0) / (arr.length - 1);
-  return Math.sqrt(variance);
+  return standardDeviation(arr);
 }
 
 export function evaluateTierDiscrimination(
@@ -276,7 +274,8 @@ export function evaluateTierDiscrimination(
     if (gap < minGap) minGap = gap;
   }
 
-  // Cohen's d between excellent and poor
+  // Unlike stats.ts pooled Cohen's d, calibration weights the two sample variances
+  // equally even when tiers have unequal sample counts.
   const excellentScores = tierScores.excellent;
   const poorScores = tierScores.poor;
   const pooledStd = Math.sqrt(
@@ -302,6 +301,8 @@ export function computePercentiles(
 ): ScoringCalibrationResult["percentiles"] {
   const scores = samples.map((s) => microScore(s.text).composite).sort((a, b) => a - b);
 
+  // Unlike stats.ts interpolated quantile, select floor(p*n), including the upper
+  // middle sample at p50 for even populations; keep the four-decimal report format.
   const pct = (p: number) => {
     const idx = Math.min(Math.floor(p * scores.length), scores.length - 1);
     return Number(scores[idx]!.toFixed(4));

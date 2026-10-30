@@ -1,0 +1,18 @@
+{
+  "case": "foreign-evidence",
+  "normative": true,
+  "dimensions": {
+    "integrity": "pass",
+    "issuerAdmission": "pass",
+    "scope": "fail",
+    "freshness": "pass",
+    "completeness": "pass",
+    "satisfaction": "not-evaluated"
+  },
+  "reasonCodes": {
+    "scope": [
+      "FOREIGN_EVIDENCE"
+    ]
+  },
+  "exitCode": 1
+}

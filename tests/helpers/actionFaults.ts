@@ -13,7 +13,7 @@ import { JournalUnavailable } from "../../src/actions/receiptStates.js";
 import { initApprovalPolicy } from "../../src/approvals/approvalPolicyEngine.js";
 import { initBudgets } from "../../src/budgets/budgets.js";
 import { createFreezeIncident } from "../../src/drift/freezeEngine.js";
-import { initActionPolicy } from "../../src/governor/actionPolicyEngine.js";
+import { permitAgentActions } from "./actionPolicyFixtures.js";
 import { openLedger } from "../../src/ledger/ledger.js";
 import { initToolsConfig } from "../../src/toolhub/toolhubValidators.js";
 import { defaultToolsConfig } from "../../src/toolhub/toolsSchema.js";
@@ -45,10 +45,11 @@ export const FAULT_ARGUMENTS: Readonly<Record<FaultTool, Record<string, unknown>
 };
 
 /** A temp workspace whose signed tools config declares both tools' bindings and effects. */
-export function prepareFaultWorkspace(): string {
-  const workspace = mkdtempSync(join(tmpdir(), "amc-action-faults-"));
+export function prepareFaultWorkspace(workspacePath?: string): string {
+  const workspace = workspacePath ?? mkdtempSync(join(tmpdir(), "amc-action-faults-"));
   initWorkspace({ workspacePath: workspace, agentId: "default", trustBoundaryMode: "isolated" });
-  initActionPolicy(workspace);
+  // AXR-02: native calls meet the signed Action Policy; this one lets the fixture's agent EXECUTE (an observed run included).
+  permitAgentActions(workspace, "default");
   initBudgets(workspace, "default");
   initApprovalPolicy(workspace);
   const config = defaultToolsConfig();
@@ -85,11 +86,11 @@ export function faultTools(sor: FakeSystemOfRecord, faults: BodyFaults = {}): To
       const reply = dispatch(() => sor.pay(execution.idempotencyKey!, { amount: args.amount, currency: args.currency, recipient: args.payee },
         execution.executionId ?? null));
       if (reply.status === 409) throw new DefiniteFailureError("idempotency key reused with another body");
-      return { output: `paid ${reply.ref}`, effect: "applied", externalRef: reply.ref! };
+      return { ok: true, output: `paid ${reply.ref}`, effect: "applied", externalRef: reply.ref! };
     } }),
     defineTool({ name: DELETION_TOOL, actionClass: "DATA_EXPORT", description: "Delete a record.", body: (execution) => {
       const reply = dispatch(() => sor.deleteResource(String(execution.arguments.resourceId), execution.executionId ?? null));
-      return { output: `deleted ${reply.ref}`, effect: "applied", externalRef: reply.ref };
+      return { ok: true, output: `deleted ${reply.ref}`, effect: "applied", externalRef: reply.ref };
     } })
   ];
 }
@@ -122,15 +123,31 @@ export function revoke(workspace: string, actionClass: ActionClass, agentId = "d
     deltas: { overallDrop: 0, integrityDrop: 0, correlationDrop: 0, maxLayerDrop: 0 }, actionClasses: [actionClass], reason: "revoked by the fault matrix" });
 }
 
-/** Run one call in a child process that kills itself at the crash point. Resolves once the child is gone. */
+/** The actual child close, including streams; a missing crash point is not a SIGKILL witness. */
+export interface CrashObservation {
+  readonly pid: number | null;
+  readonly code: number | null;
+  readonly signal: NodeJS.Signals | null;
+  readonly stdout: string;
+  readonly stderr: string;
+  readonly spawnError: string | null;
+}
+
+/** Run one call that kills itself at the crash point. Resolve only after the child and its streams close. */
 export function crashInChild(workspace: string, point: "crash_after_start_before_dispatch" | "crash_after_dispatch_before_ack",
-  oracleFile: string, tool: FaultTool): Promise<{ readonly signal: NodeJS.Signals | null; readonly stderr: string }> {
+  oracleFile: string, tool: FaultTool): Promise<CrashObservation> {
   const child = fork(fileURLToPath(new URL("../fixtures/actions/crashingCall.ts", import.meta.url)), [workspace, point, oracleFile, tool], {
-    execArgv: ["--import", "tsx"], stdio: ["ignore", "ignore", "pipe", "ipc"], env: { ...process.env }
+    execArgv: ["--import", "tsx"], stdio: ["ignore", "pipe", "pipe", "ipc"], env: { ...process.env }
   });
+  let stdout = "";
   let stderr = "";
+  let spawnError: string | null = null;
+  child.stdout?.on("data", (chunk) => { stdout += String(chunk); });
   child.stderr?.on("data", (chunk) => { stderr += String(chunk); });
-  return new Promise((resolve) => child.once("exit", (_code, signal) => resolve({ signal, stderr })));
+  child.once("error", (error) => { spawnError = error.message; });
+  return new Promise((resolve) => child.once("close", (code, signal) => resolve({
+    pid: child.pid ?? null, code, signal, stdout, stderr, spawnError
+  })));
 }
 
 /** Every journaled intent's key and execution id, for `effectsWithoutIntent`. */

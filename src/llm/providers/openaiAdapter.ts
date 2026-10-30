@@ -158,8 +158,8 @@ async function* decodeOpenai(response: HttpResponse): AsyncIterable<StreamChunk>
   for await (const event of sseEvents(response.body)) {
     if (event.data === DONE_SENTINEL) {
       if (finish === null) throw protocolFailure("received [DONE] before any finish_reason");
-      // Usage is emitted only if the provider reported it — see the header.
-      if (usage !== null) yield { type: "usage", usage };
+      // Reported usage was emitted as soon as it arrived, even if the
+      // transport loses this sentinel. Missing usage stays missing.
       yield { type: "finish", reason: { kind: finish } };
       terminated = true;
       return;
@@ -194,7 +194,14 @@ async function* decodeOpenai(response: HttpResponse): AsyncIterable<StreamChunk>
     }
 
     const reportedUsage = record(frame.usage);
-    if (reportedUsage !== null) usage = toUsage(reportedUsage) ?? usage;
+    if (reportedUsage !== null) {
+      const next = toUsage(reportedUsage);
+      if (next !== null) {
+        if (usage !== null) throw protocolFailure("repeated usage");
+        usage = next;
+        yield { type: "usage", usage };
+      }
+    }
 
     const choices = Array.isArray(frame.choices) ? frame.choices : [];
     for (const rawChoice of choices) {

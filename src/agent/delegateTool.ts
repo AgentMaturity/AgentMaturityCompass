@@ -47,6 +47,8 @@ export interface SubagentCapability {
   /** Where the delegation rows are written: the CALLER's session. */
   readonly session: DelegationRecorder;
   readonly maxDepth?: number;
+  /** Operator-selected root-wide child cap; never read from model arguments. */
+  readonly maxActiveChildren?: number;
   /**
    * The action classes a delegate may invoke. Set by whoever composes the
    * toolset, never by the model.
@@ -62,6 +64,11 @@ export interface SubagentCapability {
   readonly stopConditions?: readonly string[];
   /** Injected so a test can pin the child's session id. */
   readonly mintSessionId?: () => string;
+  /**
+   * The lease of the run that holds this capability (P2-25), handed to each child's runner as the parent lease its own
+   * delegated lease extends. Set by whoever composes the toolset, never by the model. Absent at the root.
+   */
+  readonly parentLeaseToken?: string;
 }
 
 const DELEGATE_PARAMETERS = Object.freeze({
@@ -117,6 +124,7 @@ function readArgs(raw: unknown): { ok: true; args: DelegateArgs } | { ok: false;
  */
 export function delegateTool(capability: SubagentCapability): ToolDefinition {
   const maxDepth = capability.maxDepth ?? DEFAULT_MAX_DELEGATION_DEPTH;
+  const maxActiveChildren = capability.maxActiveChildren;
   const mintSessionId = capability.mintSessionId ?? (() => `child-${randomUUID().slice(0, 12)}`);
   const stopConditions = capability.stopConditions === undefined
     ? undefined : Object.freeze([...capability.stopConditions]);
@@ -132,7 +140,7 @@ export function delegateTool(capability: SubagentCapability): ToolDefinition {
     body: async (execution: ToolExecution) => {
       const parsed = readArgs(execution.arguments);
       if (!parsed.ok) {
-        return { output: `[amc] delegation refused: ${parsed.detail}` };
+        return { ok: false, output: `[amc] delegation refused: ${parsed.detail}` };
       }
 
       const outcome = await spawnSubagent({
@@ -150,19 +158,21 @@ export function delegateTool(capability: SubagentCapability): ToolDefinition {
         session: capability.session,
         runner: capability.runner,
         mintSessionId,
+        ...(capability.parentLeaseToken === undefined ? {} : { parentLeaseToken: capability.parentLeaseToken }),
         maxDepth,
+        ...(maxActiveChildren === undefined ? {} : { maxActiveChildren }),
         ...(execution.signal === undefined ? {} : { signal: execution.signal })
       });
 
       if (!outcome.ok) {
         // The runtime's account, alone. Nothing the child said is mixed in,
         // because on this path the child said nothing.
-        return { output: `[amc] delegation refused: ${outcome.reason}` };
+        return { ok: false, output: `[amc] delegation refused: ${outcome.reason}` };
       }
 
       // The child's own words, alone. The runtime's account of this delegation
       // is in the `agent_delegation_completed` row, not in front of the model.
-      return { output: outcome.childText };
+      return { ok: true, output: outcome.childText };
     }
   });
 }

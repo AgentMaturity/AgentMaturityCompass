@@ -1,0 +1,5 @@
+
+> agent-maturity-compass@1.2.0 check:qualification
+> node scripts/check-qualification-receipts.mjs
+
+Qualification receipts valid: 13 receipt(s) under qualification.

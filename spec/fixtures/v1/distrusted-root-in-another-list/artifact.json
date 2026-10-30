@@ -1,0 +1,38 @@
+{
+  "type": "amc.scoped-attestation",
+  "version": 2,
+  "tenantId": "tenant-a",
+  "workspaceId": "ws-a",
+  "subjectId": "agent-payments",
+  "sequence": 7,
+  "snapshotDigest": "af2e9ab99613dd425a554c98603fe5166d3a184c0ccb154167812cc6343548f4",
+  "deployment": {
+    "deploymentId": "payments-prod",
+    "deploymentDigest": "a44029d77c2e0a1305b498798f5bbc9431906a6da0fbb79bf021045ef63145bd"
+  },
+  "profile": {
+    "id": "finance-ops",
+    "version": "1.0.0"
+  },
+  "window": {
+    "start": "2026-08-01T00:00:00.000Z",
+    "end": "2026-09-01T00:00:00.000Z"
+  },
+  "exclusions": [],
+  "controlResultsDigest": "8b7989551dcc595573dba208c1d0b3c15c6f0fc3d9a1f9b4188e66a4ef856ac2",
+  "issuerKeyId": "b4b17d977c526873814e3a852a3fa52c06f9ef59f073f642a569377b2be39559",
+  "issuedAt": "2026-09-02T00:00:00.000Z",
+  "expiresAt": "2026-12-02T00:00:00.000Z",
+  "signature": {
+    "v": 1,
+    "alg": "ed25519",
+    "pubkeyB64": "LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUNvd0JRWURLMlZ3QXlFQWpxaG45aXBqOG5lVXY3emtyeEkrNVN0VGhJeXdZSmlNYWE1R2poZXA3S2s9Ci0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQo=",
+    "fingerprint": "b4b17d977c526873814e3a852a3fa52c06f9ef59f073f642a569377b2be39559",
+    "sigB64": "BJpUuVf48B/mVBChCvJ6T6UUT3XFcGbjaTpeRs7aQczuAFdLrbvJuOA4rZWpsrOOt1xhP1SukdbZfd0vubHFCw==",
+    "signedTs": 1788307200000,
+    "signer": {
+      "type": "VAULT",
+      "attestationLevel": "SOFTWARE"
+    }
+  }
+}

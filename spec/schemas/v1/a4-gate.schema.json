@@ -594,6 +594,10 @@
           "minimum": -9007199254740991,
           "type": "integer"
         },
+        "initiator": {
+          "minLength": 1,
+          "type": "string"
+        },
         "intentId": {
           "minLength": 1,
           "type": "string"

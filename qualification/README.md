@@ -4,7 +4,7 @@ A qualification receipt records what was run to prove a plan issue, gate or deci
 
 ## Folder naming
 
-One folder per receipt: `qualification/<YYYY-MM-DD>-<KEY>/`, for example `2026-10-05-P0-01`. The date is the real calendar day the checks ran. The key is a plan issue (`P0-01`), a decision (`D-09`) or a gate (`GATE-G0`). The folder date and key must equal the `date` and `key` in the receipt.
+One folder per receipt: `qualification/<YYYY-MM-DD>-<KEY>/`, for example `2026-10-05-P0-01`. The date is the real calendar day the checks ran. The key is a plan issue (`P0-01`), a decision (`D-09`) or a gate (`GATE-G0`). The folder date and key must equal the `date` and `key` in the receipt. A second receipt for the same key and day keeps the key and adds a lowercase variant, for example `2026-10-15-P0-27-node-runtime`.
 
 ## Required files
 

@@ -1,0 +1,50 @@
+{
+  "observedAt": "2026-10-14T14:22:06.196642+00:00",
+  "acceptedMain": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+  "sourceCommit": "71ed73e5886bc957130f9712985281d1b1149fca",
+  "productSourceChanges": [
+    "src/claims/evidenceProvenance.ts",
+    "src/llm/adapter/llmRuntime.ts"
+  ],
+  "protectedScopes": {
+    "freezeCoverageConfiguration": {
+      "paths": [
+        "vitest.config.ts",
+        "scripts/check-freeze.mjs",
+        "scripts/freeze-baseline.json",
+        "scripts/per-file-coverage.mjs",
+        "scripts/quality/coverage-baseline.json"
+      ],
+      "diff": []
+    },
+    "heldA4AndCatalog": {
+      "paths": [
+        "src/a4",
+        "src/catalog",
+        "catalog"
+      ],
+      "diff": []
+    },
+    "heldP202": {
+      "paths": [
+        "src/dataflow",
+        "src/vault/dlp.ts",
+        "src/privacy/privacyRedaction.ts",
+        "src/gateway/server.ts",
+        "src/agent/agentLoop.ts"
+      ],
+      "diff": []
+    },
+    "cliAndComposition": {
+      "paths": [
+        "src/cli.ts",
+        "src/cli-composition.ts",
+        "src/api/resultRouteRegistry.ts",
+        "src/repl"
+      ],
+      "diff": []
+    }
+  },
+  "helperSha256": "dd1f64f3e1358132f00252d9667baff83ddf47897c4824f56711239434e4e111",
+  "status": "?? qualification/2026-10-14-P0-47/\n"
+}

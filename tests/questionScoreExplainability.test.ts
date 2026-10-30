@@ -6928,7 +6928,8 @@ describe("question score explainability receipts", () => {
           reason: expect.stringContaining("DOI/OpenAlex/Zenodo metadata confirms source relevance only"),
         }),
       ],
-      repairHint: expect.stringContaining("release gates"),
+      // P1-07: AMC-1.3's L5 is not evaluated, so the hint names it and its reason instead of release-gate advice.
+      repairHint: expect.stringContaining("Target L5: Not evaluated: L5 needs a scoped attestation"),
       status: "ready",
       reproducibleEvalPacks: [
         expect.objectContaining({
@@ -6956,8 +6957,9 @@ describe("question score explainability receipts", () => {
     expect(guideMarkdown).toContain("Accepted evidence IDs: ev-gap-0634-eval-pack, ev-gap-0634-signed-ledgers, ev-gap-0634-ci");
     expect(guideMarkdown).toContain("ev-gap-0634-paper-metadata-only");
     expect(guideMarkdown).toContain("Repair hint:");
-    expect(guide.sections[0]?.evidenceNeeded.join("\n")).toContain("DOI/OpenAlex/Zenodo metadata");
-    expect(guide.sections[0]?.evidenceNeeded.join("\n")).toContain("cognitive-retrieval preprint");
+    // P1-07: AMC-1.3's L4 is not evaluated, so the section gives that reason and lists no evidence to collect for it.
+    expect(guide.sections[0]?.notEvaluated).toContain("Not evaluated: L4 needs continuity");
+    expect(guide.sections[0]?.evidenceNeeded).toEqual([]);
 
     const passport = passportJsonSchema.parse({
       v: 1,
@@ -7020,7 +7022,7 @@ describe("question score explainability receipts", () => {
       questionId: "AMC-1.3",
       acceptedEvidenceIds: ["ev-gap-0634-eval-pack", "ev-gap-0634-signed-ledgers", "ev-gap-0634-ci"],
       rejectedEvidenceReasons: [expect.objectContaining({ evidenceId: "ev-gap-0634-paper-metadata-only" })],
-      repairHint: expect.stringContaining("release gates"),
+      repairHint: expect.stringContaining("Target L5: Not evaluated"),
     });
   });
 
@@ -7145,7 +7147,8 @@ describe("question score explainability receipts", () => {
           reason: expect.stringContaining("repository metadata is source context only"),
         }),
       ],
-      repairHint: expect.stringContaining("release gates"),
+      // P1-07: AMC-1.3's L5 is not evaluated, so the hint names it and its reason instead of release-gate advice.
+      repairHint: expect.stringContaining("Target L5: Not evaluated: L5 needs a scoped attestation"),
       status: "ready",
       reproducibleEvalPacks: [
         expect.objectContaining({
@@ -7171,7 +7174,9 @@ describe("question score explainability receipts", () => {
     expect(guideMarkdown).toContain("Accepted evidence IDs: ev-uptrain-eval-pack, ev-uptrain-signed-ledgers");
     expect(guideMarkdown).toContain("ev-uptrain-repo-metadata-only");
     expect(guideMarkdown).toContain("Repair hint:");
-    expect(guide.sections[0]?.evidenceNeeded.join("\n")).toContain("UpTrain repository metadata");
+    // P1-07: AMC-1.3's L4 is not evaluated, so the section gives that reason and lists no evidence to collect for it.
+    expect(guide.sections[0]?.notEvaluated).toContain("Not evaluated: L4 needs continuity");
+    expect(guide.sections[0]?.evidenceNeeded).toEqual([]);
 
     const passport = passportJsonSchema.parse({
       v: 1,
@@ -7232,7 +7237,7 @@ describe("question score explainability receipts", () => {
       questionId: "AMC-1.3",
       acceptedEvidenceIds: ["ev-uptrain-eval-pack", "ev-uptrain-signed-ledgers"],
       rejectedEvidenceReasons: [expect.objectContaining({ evidenceId: "ev-uptrain-repo-metadata-only" })],
-      repairHint: expect.stringContaining("release gates"),
+      repairHint: expect.stringContaining("Target L5: Not evaluated"),
     });
   });
 

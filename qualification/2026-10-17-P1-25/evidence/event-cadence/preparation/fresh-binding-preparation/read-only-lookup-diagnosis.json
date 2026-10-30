@@ -1,0 +1,14 @@
+{
+  "schema": "p125ec-binder-preparation-read-only-lookup-diagnosis/1",
+  "toolResult": {
+    "chunkId": "95fa85",
+    "exitCode": 1,
+    "sessionId": null
+  },
+  "attemptedOptionalPath": "/private/tmp/p1-25-cadence-qualification-20261017/branch-adoption.json",
+  "actualError": "FileNotFoundError: [Errno 2] No such file or directory",
+  "runtimePinsetReadBeforeFailureSucceeded": true,
+  "missingPathSuppliesNoAuthority": true,
+  "correction": "Use only established runtime-protected-inputs.json and later actual source-checkpoint/clean-source records; existing private top-level metadata names were subsequently listed read-only.",
+  "noMutationOrProductExecution": true
+}

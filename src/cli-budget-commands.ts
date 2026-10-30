@@ -3,9 +3,9 @@ import chalk from "chalk";
 import {
   budgetsPath,
   evaluateBudgetStatus,
-  initBudgets,
+  initBudgetsAsync,
   resetBudgetDay,
-  signBudgetsConfig,
+  signBudgetsConfigAsync,
   verifyBudgetsConfigSignature
 } from "./budgets/budgets.js";
 
@@ -15,8 +15,8 @@ export function registerBudgetCommands(program: Command): void {
 
   budgets.command("init")
     .option("--agent <agentId>", "agent ID", "default")
-    .action((opts: { agent: string }) => {
-      const out = initBudgets(process.cwd(), opts.agent);
+    .action(async (opts: { agent: string }) => {
+      const out = await initBudgetsAsync(process.cwd(), opts.agent);
       console.log(chalk.green(`Budgets initialized: ${out.configPath}`));
       console.log(`Signature: ${out.sigPath}`);
     });
@@ -24,10 +24,10 @@ export function registerBudgetCommands(program: Command): void {
   budgets.command("sign")
     .description("Validate and sign the existing reviewed budget limits without changing the policy")
     .option("--json", "Output signature metadata")
-    .action((opts: { json?: boolean }) => {
+    .action(async (opts: { json?: boolean }) => {
       try {
         const workspace = process.cwd();
-        const sigPath = signBudgetsConfig(workspace);
+        const sigPath = await signBudgetsConfigAsync(workspace);
         if (opts.json) console.log(JSON.stringify({ ok: true, configPath: budgetsPath(workspace), sigPath }, null, 2));
         else console.log(chalk.green(`Reviewed budgets signed: ${sigPath}`));
       } catch {

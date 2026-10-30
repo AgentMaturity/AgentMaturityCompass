@@ -82,6 +82,7 @@ export async function handleStudioApiDelegation(params: StudioApiDelegationParam
 
   let principal: string | undefined;
   let nativeTasks: NativeTaskApiContext | undefined;
+  let revalidateAuthority: (() => boolean) | undefined;
   if (!isPublicApiRoute(params.pathname)) {
     const apiAuth = params.authenticate(params.req, params.workspace, params.token);
     if (!apiAuth) {
@@ -106,6 +107,20 @@ export async function handleStudioApiDelegation(params: StudioApiDelegationParam
       return true;
     }
     principal = principalFromAuth(apiAuth) ?? undefined;
+    const identity = JSON.stringify([apiAuth.isAdmin, apiAuth.userId ?? null, apiAuth.username, apiAuth.agentId, apiAuth.sessionAuthSource ?? null]);
+    revalidateAuthority = () => {
+      const current = params.authenticate(params.req, params.workspace, params.token);
+      if (!current) {
+        params.json(params.res, 401, { error: "missing or invalid token" });
+        return false;
+      }
+      const currentIdentity = JSON.stringify([current.isAdmin, current.userId ?? null, current.username, current.agentId, current.sessionAuthSource ?? null]);
+      if (currentIdentity !== identity || (!current.isAdmin && current.agentId)) {
+        params.json(params.res, 403, { error: "authenticated authority changed while the request was prepared" });
+        return false;
+      }
+      return params.requireRoles({ auth: current, res: params.res, workspace: params.workspace, roles: nativeDemo ? ["VIEWER"] : accessPolicy.roles });
+    };
     if (isNativeStudioPath(params.pathname)) {
       const actor = { isAdmin: apiAuth.isAdmin, userId: apiAuth.userId ?? null, nativeCsrfToken: apiAuth.nativeCsrfToken ?? null };
       try {
@@ -136,6 +151,7 @@ export async function handleStudioApiDelegation(params: StudioApiDelegationParam
     params.workspace,
     params.token,
     principal,
-    nativeTasks
+    nativeTasks,
+    revalidateAuthority
   );
 }

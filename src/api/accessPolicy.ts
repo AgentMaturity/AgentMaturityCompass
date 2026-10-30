@@ -59,11 +59,13 @@ const VERIFIER_PATHS = new Set([
 
 const ATTESTER_PATHS = new Set([
   "/api/v1/evidence/attest",
+  "/api/v1/operator/review-packets",
   "/api/v1/watch/attest",
   "/api/v1/adapters/capability-receipts"
 ]);
 
 const OWNER_MUTATION_PATHS = new Set([
+  "/api/v1/operator/plans/activate",
   "/api/v1/vault/unlock",
   "/api/v1/vault/seal",
   "/api/v1/governor/policy/init",
@@ -79,6 +81,9 @@ const OWNER_MUTATION_PATHS = new Set([
   "/api/v1/adapters/init-project",
   "/api/v1/ci/init",
   "/api/v1/drift/freeze/lift",
+  // P2-26: only an OWNER activates or releases the kill switch.
+  "/api/v1/runtime/kill-switch",
+  "/api/v1/runtime/kill-switch/release",
   "/api/v1/firewall/enable",
   "/api/v1/firewall/migrate-signature",
   "/api/v1/bom/sign",
@@ -115,6 +120,9 @@ function isWorkOrderVerification(pathname: string): boolean {
 function isIncidentOversight(pathname: string): boolean {
   return /^\/api\/v1\/incidents\/[^/]+\/oversight$/.test(pathname);
 }
+
+/** P2-23: a governed agent's lifecycle transition is OWNER only. */
+const LIFECYCLE_TRANSITION = /^\/api\/v1\/lifecycle\/agents\/[^/]+\/transition$/;
 
 function isPassportRevocation(pathname: string): boolean {
   return /^\/api\/v1\/passport\/[^/]+\/revoke$/.test(pathname);
@@ -166,6 +174,13 @@ export function resolveApiRolePolicy(pathname: string, rawMethod: string): ApiRo
     if (pathname === "/api/v1/config/logs") {
       return { access: "verify", roles: [...VERIFIER_ROLES] };
     }
+    // P2-22: reviewer timing is personal data (owner only); a review packet goes to auditors and owners.
+    if (pathname === "/api/v1/operator/review-timing/export") {
+      return { access: "owner", roles: [...OWNER_ROLES] };
+    }
+    if (/^\/api\/v1\/operator\/review-packets\/[^/]+\/download$/.test(pathname)) {
+      return { access: "attest", roles: [...ATTESTER_ROLES] };
+    }
     return { access: "read", roles: [...HUMAN_READ_ROLES] };
   }
 
@@ -173,7 +188,8 @@ export function resolveApiRolePolicy(pathname: string, rawMethod: string): ApiRo
     return { access: "analyze", roles: [...HUMAN_READ_ROLES] };
   }
 
-  if (method === "POST" && isA4MemberPath(pathname)) {
+  // P2-22: every human reviewer records their own (opt-in) review timing.
+  if (method === "POST" && (isA4MemberPath(pathname) || pathname === "/api/v1/operator/review-timing/events")) {
     return { access: "read", roles: [...HUMAN_READ_ROLES] };
   }
 
@@ -197,6 +213,7 @@ export function resolveApiRolePolicy(pathname: string, rawMethod: string): ApiRo
   if (
     OWNER_MUTATION_PATHS.has(pathname) ||
     isPassportRevocation(pathname) ||
+    LIFECYCLE_TRANSITION.test(pathname) ||
     isA4OwnerPath(pathname) ||
     OWNER_MUTATION_PREFIXES.some((prefix) => matchesPrefix(pathname, prefix))
   ) {

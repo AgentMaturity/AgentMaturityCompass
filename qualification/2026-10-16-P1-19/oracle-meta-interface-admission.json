@@ -1,0 +1,33 @@
+{
+  "capturedUtc": "2026-10-15T22:31:30.465310+00:00",
+  "rootDecision": "Interfaces reviewed and accepted with explicit lifecycle and evidence-copy clarifications",
+  "sourceHead": "335a3a9ae977f898391fdf2db186138e82d000ae",
+  "componentSource": "b9ba9a092f491d821c154679473b6f38c75b935d",
+  "interfaces": [
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/interface-proposal.json",
+      "bytes": 7286,
+      "sha256": "009727dbbcd6f2196b96a0122a3c7fc89094da6401adbc3965ffcca5e99520ce"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/tests-proposal/interface-proposal.json",
+      "bytes": 6339,
+      "sha256": "45554f7dd7a58af479e767b6a2659636b869c33060eb048705138d2691071578"
+    }
+  ],
+  "cryptoDecision": "Use actual pinned cold ledger CLI plus identical closed DB/WAL and stable authenticated auxiliary inputs; independently verify action chain/index/intent, authorization, auditor signatures/quorum and generic/provider mapping. Do not duplicate already verified ledger/v2/seal crypto without need.",
+  "lifecycle": "Nested children inherit the immutable outer guarded process group; await actual natural close/streams and probe each child PID for ESRCH. Only the outer harness owns and proves its PGID. No detached escape solely for a group claim, signals, retry or early resolution on uncertainty.",
+  "providerEvidenceCopy": "An owned cold txlog/checkpoint copy is allowed after actual provider closure with byte-exact original/copy pins before controlled mutation. Distinguish original provider directory and oracle input copy. Copy no tokens or credentials; preserve controlled negative bytes and failed fixtures. Do not restore original histories.",
+  "trustScope": "Manifest outside workspace and provider evidence directory; anchors captured before grants. Preimage and approval paths beneath pinned workspace. Driver stdout and workspace key history are not independent anchors.",
+  "allowedFourPaths": [
+    "examples/lighthouse-finance/oracle.mjs",
+    "examples/lighthouse-finance/oracleEvidence.mjs",
+    "tests/lighthouse/financeOracle.test.ts",
+    "tests/helpers/financeOracleQualification.ts"
+  ],
+  "RFilesCurrentlyCreated": [],
+  "applicationCondition": "Root reviews closed test/helper bodies first, applies those two paths, runs actual missing-oracle RED, then reviews and applies independent source. Recheck exact D15 and current pins before each R write.",
+  "privateDraftAuthorsMayProceed": true,
+  "formalP119Complete": false,
+  "completePlanGoal": "active"
+}

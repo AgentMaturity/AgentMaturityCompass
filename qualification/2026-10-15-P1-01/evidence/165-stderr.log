@@ -1,0 +1,2 @@
+spec/schemas/v1/receipt.schema.json is stale: run npm run gen:schemas
+spec/schemas/index.json is stale: run npm run gen:schemas

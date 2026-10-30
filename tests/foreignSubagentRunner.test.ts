@@ -20,8 +20,7 @@ import type { SubagentRunContext } from "../src/agent/subagentSpawn.js";
  *
  * Composed from `spawnGovernedChild` rather than `runAdapterCommand`, which
  * cannot satisfy this seam: it requires AMC Studio to be running, mints its own
- * session id, returns only an exit code with no child text, and its SANDBOX
- * branch hardcodes `exitCode: 0`.
+ * session id, and returns only an exit code with no child text.
  */
 const PASS = "foreign-runner-test-passphrase";
 const dirs: string[] = [];

@@ -1,0 +1,84 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L1-EDU-02",
+  "polarity": "negative",
+  "evidenceClass": "empty",
+  "setup": {
+    "harness": "evidence",
+    "window": {
+      "start": "2026-10-01T00:00:00.000Z",
+      "end": "2026-10-18T12:00:00.000Z"
+    },
+    "subject": {
+      "tenantId": "education-fixture-tenant",
+      "workspaceId": "education-fixture-workspace",
+      "deploymentId": "education-grading-assistant-eu-fixture",
+      "agentId": "education-fixture-agent",
+      "subjectId": null
+    },
+    "plan": {
+      "applicability": "applicable",
+      "policyDigest": "sha256:fixture-policy",
+      "mode": "enforce"
+    },
+    "items": [],
+    "priorUses": [],
+    "educationOracle": {
+      "kind": "capability_log",
+      "input": {
+        "context": {
+          "tenantId": "education-fixture-tenant",
+          "workspaceId": "education-fixture-workspace",
+          "deploymentId": "education-grading-assistant-eu-fixture",
+          "agentId": "education-fixture-agent",
+          "controlId": "L1-EDU-02",
+          "controlVersion": "0.1.0",
+          "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+        },
+        "at": "2026-10-18T12:00:00.000Z",
+        "logAvailable": false,
+        "registryAvailable": true,
+        "tools": [
+          {
+            "binding": {
+              "tenantId": "education-fixture-tenant",
+              "workspaceId": "education-fixture-workspace",
+              "deploymentId": "education-grading-assistant-eu-fixture",
+              "agentId": "education-fixture-agent",
+              "controlId": "L1-EDU-02",
+              "controlVersion": "0.1.0",
+              "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+            },
+            "toolId": "summary-tool",
+            "toolVersion": "1",
+            "capabilityClass": "transcript_summary"
+          }
+        ],
+        "requests": [
+          {
+            "binding": {
+              "tenantId": "education-fixture-tenant",
+              "workspaceId": "education-fixture-workspace",
+              "deploymentId": "education-grading-assistant-eu-fixture",
+              "agentId": "education-fixture-agent",
+              "controlId": "L1-EDU-02",
+              "controlVersion": "0.1.0",
+              "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+            },
+            "toolId": "summary-tool",
+            "toolVersion": "1",
+            "source": "lecture_transcript"
+          }
+        ]
+      },
+      "expected": {
+        "result": "not_evaluated",
+        "reasonCode": "capability_log_unavailable"
+      }
+    }
+  },
+  "expected": {
+    "result": "not_evaluated",
+    "reasonCode": "incomplete"
+  }
+}

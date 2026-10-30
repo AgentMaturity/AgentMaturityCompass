@@ -20,6 +20,9 @@ import time
 from dataclasses import dataclass, field
 from typing import Any, Generator, Literal, Optional
 
+from .execution import (EXECUTION_API_VERSION, ExecutionStatus, PendingApproval, VerificationReceipt, admit_verification,
+                        approval_args, parse_execution_status, parse_pending, run_cli)
+
 __all__ = ["AmcAgent", "Session", "Turn", "SessionUpdate", "RunResult", "ToolCall",
            "NativeValidationStatus", "NativeValidationCheckStatus", "NativeValidationCheckResult",
            "NativeValidationResult", "NativeImageInput", "NativeInputPart", "NATIVE_ORDERED_INPUT_FORMAT",
@@ -336,6 +339,8 @@ class RunResult:
     verification: str = "not-verified"
     # Append after legacy fields to preserve positional construction compatibility.
     validation: NativeValidationResult = field(default_factory=_unavailable_validation)
+    #: The execution phases the runtime reported for this turn (P2-13); evidence verification stays pending until verify_session.
+    execution: Optional[ExecutionStatus] = None
 
     @property
     def cancelled(self) -> bool:
@@ -444,9 +449,19 @@ def _prompt_validation(response: dict[str, Any]) -> NativeValidationResult:
     extension = response.get("_meta", {}).get("dev.agentmaturity.amc")
     # Match the native client's legacy/non-object extension behavior. An explicit
     # validation value (including null) must decode; absence is never a pass.
+    if isinstance(extension, dict) and "execution" in extension and parse_execution_status(extension["execution"]) is None:
+        raise AmcProtocolError("native prompt returned invalid execution metadata")
     if not isinstance(extension, dict) or "validation" not in extension:
         return _unavailable_validation()
     return _parse_native_validation_result(extension["validation"])
+
+
+def _prompt_execution(response: dict[str, Any], session_id: str) -> Optional[ExecutionStatus]:
+    extension = response.get("_meta", {}).get("dev.agentmaturity.amc")
+    execution = parse_execution_status(extension.get("execution")) if isinstance(extension, dict) else None
+    if execution is not None and execution.session_id != session_id:
+        raise AmcProtocolError("native prompt returned execution metadata for another session")
+    return execution
 
 
 class _Updates:
@@ -491,6 +506,7 @@ class Turn:
 
     def _finish(self, response: dict[str, Any]) -> None:
         validation = _prompt_validation(response)
+        execution = _prompt_execution(response, self.session_id)
         with self._condition:
             if self._done:
                 return
@@ -520,7 +536,7 @@ class Turn:
                                           content, copy.deepcopy(update.get("_meta", previous.meta if previous else {})))
             self._result = RunResult(self.session_id, response["stopReason"], "".join(chunks),
                                      list(tools.values()), copy.deepcopy(response.get("_meta", {})),
-                                     copy.deepcopy(self._updates.items), validation=validation)
+                                     copy.deepcopy(self._updates.items), validation=validation, execution=execution)
             self._done, self.state = True, "completed"
             self._condition.notify_all()
 
@@ -719,6 +735,7 @@ class AmcAgent:
         if not isinstance(resolved, (str, list)):
             raise ValueError("amc_bin must name an executable and optional arguments")
         self._bin = list(resolved) if isinstance(resolved, list) else (["node", resolved] if resolved.endswith(".js") else [resolved])
+        self._agent_id = agent_id
         if not self._bin or any(not isinstance(arg, str) or not arg or "\0" in arg for arg in self._bin):
             raise ValueError("amc_bin must name an executable and optional arguments")
         if env is not None and (not isinstance(env, dict) or any(
@@ -761,9 +778,9 @@ class AmcAgent:
         self._stderr = bytearray()
         self._writes: queue.Queue[Optional[bytes]] = queue.Queue(maxsize=MAX_PENDING)
         try:
+            self._env = {**os.environ, **(env or {})}
             self._proc = subprocess.Popen(argv, cwd=self.workspace, stdin=subprocess.PIPE,
-                                          stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                                          env={**os.environ, **(env or {})})
+                                          stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=self._env)
         except OSError as error:
             raise AmcProtocolError("could not launch the selected AMC executable") from error
         self._writer = threading.Thread(target=self._write_loop, daemon=True)
@@ -781,6 +798,11 @@ class AmcAgent:
             self._capabilities = copy.deepcopy(result["agentCapabilities"])
             if "loadSession" in self._capabilities and type(self._capabilities["loadSession"]) is not bool:
                 raise AmcProtocolError("the native agent returned an invalid load capability")
+            # Both sides of the protocol are versioned (P2-13): a runtime of another version is refused before any session.
+            version = self._extension().get("executionApi")
+            if type(version) is not int or version != EXECUTION_API_VERSION:
+                raise AmcProtocolError(f"the selected AMC runtime does not speak execution API v{EXECUTION_API_VERSION}; "
+                                       "install the amc CLI release this wrapper was built for")
             with self._lock:
                 self._require_open_locked()
         except BaseException:
@@ -950,7 +972,7 @@ class AmcAgent:
             if self._replies.get(request_id) is not waiter:
                 return  # The transport was failed concurrently; do not revive it.
             turn = self._turns.get(session_id) if method == "session/prompt" else None
-            if method == "session/new" and "result" in message:
+            if method in ("session/new", "_amc/session/fork") and "result" in message:
                 new_id = message["result"].get("sessionId")
                 if not _identity(new_id) or new_id in self._sessions or new_id in self._resuming:
                     raise AmcProtocolError("native agent returned an invalid or repeated session identity")
@@ -1127,6 +1149,68 @@ class AmcAgent:
             with self._lock:
                 self._loading.pop(session_id, None)
                 self._resuming.discard(session_id)
+
+    def _extension(self) -> dict[str, Any]:
+        meta = self._capabilities.get("_meta")
+        extension = meta.get("dev.agentmaturity.amc") if isinstance(meta, dict) else None
+        return extension if isinstance(extension, dict) else {}
+
+    def fork_session(self, parent_session_id: str, *, timeout: Optional[float] = None) -> Session:
+        """fork (P2-13), the CLI's --fork-from: a new session whose signed open row names the parent's verified final row.
+
+        It starts with no inherited model context and its own lease; the parent, sealed or live, is never written. An
+        unverifiable parent raises AmcRefusedError whose data names the reason (MISSING, TAMPERED, ...).
+        """
+        if self._extension().get("lineageFork") != "verified-parent-reference":
+            raise AmcRefusedError(-32601, "this installed runtime does not support lineage forks")
+        if not _identity(parent_session_id):
+            raise ValueError("choose the session to fork")
+        result = self._call("_amc/session/fork", {"sessionId": parent_session_id, "cwd": self.workspace, "mcpServers": []}, timeout=timeout)
+        return Session(self, result["sessionId"])
+
+    def pending_approvals(self) -> list[PendingApproval]:
+        """Pending signed approval requests for this agent, from the engine `amc approvals list` reads (approve, P2-13)."""
+        return parse_pending(run_cli(self._bin, ["approvals", "list", f"--agent={self._agent_id}", "--status=pending", "--json"],
+                                     cwd=self.workspace, env=self._env, timeout=self.timeout))
+
+    def approve(self, approval_request_id: str, *, reason: str, username: str, roles: list[str], user_id: Optional[str] = None,
+                mode: str = "execute", session_token_file: Optional[str] = None, expect_request_digest: Optional[str] = None) -> None:
+        """approve (P2-13): a reviewer's decision through `amc approvals approve`, the signed approval engine every surface uses.
+
+        The engine refuses the run's initiator where the class needs distinct users, a stale or non-pending request, and
+        a changed request when ``expect_request_digest`` binds it; the refusal names why. Not the A4 gate decision (P2-37).
+        """
+        args = approval_args(approval_request_id, self._agent_id, reason=reason, username=username, roles=roles, user_id=user_id,
+                             mode=mode, session_token_file=session_token_file, expect_request_digest=expect_request_digest)
+        completed = run_cli(self._bin, args, cwd=self.workspace, env=self._env, timeout=self.timeout)
+        if completed.returncode != 0:
+            lines = completed.stderr.strip().splitlines()
+            raise AmcRefusedError(completed.returncode, lines[-1][-512:] if lines else "the approval engine refused this decision")
+
+    def verify_session(self, session_id: str) -> VerificationReceipt:
+        """verify (P2-13): after close, the same installed CLI's cold verifier (`amc agent-loop verify --json`)."""
+        if not self.closed:
+            raise AmcError("close the native client before cold verification")
+        if not isinstance(session_id, str) or re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.:-]{0,199}", session_id) is None:
+            raise ValueError("choose the session to verify")  # never a value the CLI could read as a flag
+        return admit_verification(run_cli(self._bin, ["agent-loop", "verify", session_id, "--json"], cwd=self.workspace,
+                                          env=self._env, timeout=self.timeout), session_id)
+
+    def dispose(self) -> None:
+        """dispose (P2-13): release every idle owned writer (resumable), then close the process; close cancels active turns."""
+        failed = False
+        if self._extension().get("releaseSession") is True:
+            with self._lock:
+                idle = [] if self._close_started or self._fatal is not None else [
+                    session for session in self._sessions if session not in self._turns and session not in self._releasing]
+            for session_id in idle:
+                try:
+                    self._release(session_id)
+                except AmcError:
+                    failed = True
+        self.close()
+        if failed:
+            raise AmcProtocolError("a writer did not release cleanly; inspect its signed session before resuming it")
 
     def _prompt(self, session_id: str, text: str, images: Optional[list[NativeImageInput] | tuple[NativeImageInput, ...]] = None,
                 *, timeout: Optional[float] = None) -> Turn:

@@ -1,0 +1,86 @@
+# Test fixture for the P1-33 admission checker (synthetic; not AMC content). It declares reviewed support so the tests
+# can sign review records over its digest; no real person reviewed it.
+id: L1-FIX-01
+version: "0.1.0"
+support: reviewed
+layer: 1
+family: decision-authority-and-oversight
+stations: [wealth]
+title: Approval before a consequential action (fixture)
+statement: >-
+  An action that needs approval is refused at the pipeline until a signed human approval is named, and the approval
+  is consumed when the call runs.
+riskRationale: >-
+  Without the refusal the approval is a label, not a control.
+mandatory: true
+applicability:
+  predicate: { always: true }
+  reasons: [The fixture pack applies to every Wealth deployment in the US.]
+  exclusions: []
+citations:
+  - key: us-bsa-1020-320-e
+    registerId: us-bsa-sar
+    instrument: "Bank Secrecy Act regulations: reports by banks of suspicious transactions (31 CFR 1020.320)"
+    clause: "31 CFR 1020.320(e)"
+    edition: CFR annual edition 2025, Title 31 Vol. 3 (revised 2025-07-01), GPO govinfo
+    jurisdiction: US
+    statusType: binding-now
+    superseded: null
+    effectiveDate: null
+    complianceDueDate: null
+    dateNote: In force; fixture citation copied from L1-WLT-US-04.
+    url: https://www.govinfo.gov/content/pkg/CFR-2025-title31-vol3/xml/CFR-2025-title31-vol3-sec1020-320.xml
+    retrieval:
+      state: verified
+      retrievedAt: "2026-10-07"
+      contentSha256: 4d7caea80a6f6d66e6075915a67bf44d59b5bbc67a78539f7a5b87552da1ed43
+    appliesWhen: null
+    legalReview: { reviewer: fixture-legal, credential: fixture credential, date: "2026-10-15" }
+    note: Test fixture.
+binding:
+  kind: enforcement_point
+  points: [tool_pipeline, approvals]
+  mechanism: >-
+    Action classes that need approval are refused at the pipeline until signed human approvals are named.
+  parameters: []
+  manualDuty: null
+tests:
+  - id: L1-FIX-01-T1
+    type: runtime_enforced
+    oracle:
+      kind: enforcement_receipt
+      observes: The authorization denial or the consumed approval, and the receipt for the call.
+    fixtures:
+      positive: [L1-FIX-01/positive/evidence-valid.json]
+      negative:
+        - L1-FIX-01/negative/evidence-contradictory.json
+        - L1-FIX-01/negative/evidence-cross-tenant.json
+        - L1-FIX-01/negative/evidence-empty.json
+        - L1-FIX-01/negative/evidence-replayed.json
+        - L1-FIX-01/negative/evidence-stale.json
+        - L1-FIX-01/negative/evidence-violation.json
+        - L1-FIX-01/negative/unknown-authority.json
+    passCriteria: Without a signed human approval the call is refused and no tool body runs.
+    attempts: 1
+evidence:
+  - id: L1-FIX-01-E1
+    producer: amc.approvals.engine
+    bindingFields: [workspaceId, agentId, controlId]
+    freshness: { maxAgeDays: 30 }
+    sampling: { method: all, ratePercent: null, minItems: 1 }
+    retention: { mode: regime_max }
+    residency: { mode: inherit_deployment }
+  - id: L1-FIX-01-E2
+    producer: amc.toolPipeline.receipt
+    bindingFields: [workspaceId, agentId, controlId]
+    freshness: { maxAgeDays: 30 }
+    sampling: { method: all, ratePercent: null, minItems: 1 }
+    retention: { mode: regime_max }
+    residency: { mode: inherit_deployment }
+invalidatedBy: [policy_version, deployment_version]
+owner: { role: senior_manager }
+clock: null
+levels: [L2, L3]
+crosswalk: []
+review: { status: approved, expert: fixture-reviewer-a, credential: fixture credential, reviewedAt: "2026-10-15", nextReview: "2027-01-01" }
+provenance: { draftedBy: ai, draftedAt: "2026-10-12", approvedBy: fixture-reviewer-a }

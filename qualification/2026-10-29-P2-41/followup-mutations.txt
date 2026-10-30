@@ -1,0 +1,8 @@
+ 1 file changed, 15 insertions(+), 29 deletions(-)
+mutation 1: ⎯⎯⎯⎯⎯⎯⎯ Failed Tests 7 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  7 failed | 1 passed (8)
+ 1 file changed, 15 insertions(+), 29 deletions(-)
+mutation 2: ⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  1 failed | 7 passed (8)
+ 1 file changed, 15 insertions(+), 29 deletions(-)
+mutation 3:       Tests  8 passed (8)

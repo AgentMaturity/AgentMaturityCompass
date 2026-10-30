@@ -1,0 +1,86 @@
+# Draft (P1-14): experimental, agent-drafted and not independently reviewed. Expert sign-off waits for D-08;
+# citations are unverified until fetched and hashed. A result under this control is evidence of conformity, never proof of compliance.
+id: L0-IDN-02
+version: "0.1.0"
+support: experimental
+layer: 0
+family: identity-and-delegation
+stations: [education, environment, health, wealth, technology, mobility, governance]
+title: Short-lived scoped credentials
+statement: >-
+  Agents act only with signed leases that expire and carry explicit scopes, and an expired, revoked or
+  out-of-scope lease is refused.
+riskRationale: >-
+  A long-lived or unscoped credential turns one leaked token into standing access to every tool the
+  agent could ever use.
+mandatory: true
+applicability:
+  predicate: { always: true }
+  reasons: [Layer 0 applies to every agent deployment in every station.]
+  exclusions: []
+citations: []
+binding:
+  kind: enforcement_point
+  points: [tool_pipeline]
+  mechanism: >-
+    The authorization stage verifies the call's lease (signature, expiry, revocation list, agent,
+    workspace, execute scope and action classes) before the tool body runs.
+  parameters: []
+  manualDuty: null
+tests:
+  - id: L0-IDN-02-T1
+    type: runtime_enforced
+    oracle:
+      kind: enforcement_receipt
+      observes: >-
+        The authorization denial and the signed action_state receipt it writes; the agent's reply is never
+        read.
+    fixtures:
+      positive: [L0-IDN-02/positive/evidence-valid.json, L0-IDN-02/positive/valid-lease.json]
+      negative:
+        - L0-IDN-02/negative/evidence-contradictory.json
+        - L0-IDN-02/negative/evidence-cross-tenant.json
+        - L0-IDN-02/negative/evidence-empty.json
+        - L0-IDN-02/negative/evidence-replayed.json
+        - L0-IDN-02/negative/evidence-stale.json
+        - L0-IDN-02/negative/evidence-violation.json
+        - L0-IDN-02/negative/expired-lease.json
+        - L0-IDN-02/negative/foreign-signer-lease.json
+        - L0-IDN-02/negative/other-agent-lease.json
+        - L0-IDN-02/negative/other-workspace-id-lease.json
+        - L0-IDN-02/negative/out-of-scope-lease.json
+        - L0-IDN-02/negative/revoked-lease.json
+        - L0-IDN-02/negative/unregistered-principal-lease.json
+    passCriteria: >-
+      A valid lease is allowed; expired, revoked, out-of-scope, foreign-signed and other-workspace
+      leases, and a lease naming a user who is not active in the signed users.yaml, are refused at the
+      authorization stage with a denied receipt and no tool body run.
+    attempts: 1
+evidence:
+  - id: L0-IDN-02-E1
+    producer: amc.toolPipeline.receipt
+    bindingFields: [workspaceId, agentId, controlId]
+    freshness: { maxAgeDays: 30 }
+    sampling: { method: all, ratePercent: null, minItems: 1 }
+    retention: { mode: regime_max }
+    residency: { mode: inherit_deployment }
+  - id: L0-IDN-02-E2
+    producer: amc.leases.issuer
+    bindingFields: [workspaceId, agentId, controlId]
+    freshness: { maxAgeDays: 30 }
+    sampling: { method: all, ratePercent: null, minItems: 1 }
+    retention: { mode: regime_max }
+    residency: { mode: inherit_deployment }
+invalidatedBy: [tool_version, policy_version, deployment_version]
+owner: { role: ciso }
+clock: null
+levels: [L2, L3]
+crosswalk:
+  - framework: amc-audit-map-v1
+    clause: ACCESS_CONTROL.LEASE_SCOPING
+    relation: partial
+    rationale: >-
+      The audit map checks that leases are workspace-scoped and least-privilege; it does not check
+      per-call refusal of expired or revoked leases.
+review: { status: pending, expert: null, credential: null, reviewedAt: null, nextReview: null }
+provenance: { draftedBy: ai, draftedAt: "2026-10-11", approvedBy: null }

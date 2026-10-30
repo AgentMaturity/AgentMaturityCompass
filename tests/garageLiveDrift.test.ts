@@ -86,7 +86,7 @@ describe("runGarageLiveDrift", () => {
     expect(result.receipt.failClosed).toBe(false);
 
     // CHARACTERIZATION PIN (ADR-0025, cluster 4): the whole result.
-    expect(sha256Hex(canonicalize(result))).toBe("6752acc4366cfdf140b35241d9623998b99bb545bf26b4659ddcf0811bc8caca");
+    expect(sha256Hex(canonicalize(result))).toBe("4ce9b2a4c88f472f49152901ccd947136b7a2960ffdbc1fa74f65fdc07446445");
     expect(result.receipt.recommendation).toBe("approve");
     expect(result.receipt.sourceRefs).toContain("https://github.com/amazon-science/GaRAGe");
     expect(result.garageReceiptHash).toMatch(/^[a-f0-9]{64}$/);

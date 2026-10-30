@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { URL } from "node:url";
 import { issueLeaseToken } from "../leases/leaseSigner.js";
 import { extractLeaseCarrier, type LeaseCarrier } from "../leases/leaseCarriers.js";
-import { loadLeaseRevocations, verifyLeaseRevocationsSignature } from "../leases/leaseStore.js";
+import { readRevokedLeaseIds } from "../leases/leaseStore.js";
 import { verifyLeaseToken } from "../leases/leaseVerifier.js";
 import type { LeasePayload, LeaseScope } from "../leases/leaseSchema.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
@@ -201,17 +201,17 @@ export function verifyBridgeLease(params: {
       leaseCarrier: carrier.leaseCarrier
     };
   }
-  const revocation = verifyLeaseRevocationsSignature(params.workspace);
-  if (!revocation.valid) {
+  const revocation = readRevokedLeaseIds(params.workspace);
+  if (!revocation.ok) {
     return {
       ok: false,
       status: 401,
-      error: `lease revocation signature invalid: ${revocation.reason ?? "unknown"}`,
+      error: `lease revocation signature invalid: ${revocation.reason}`,
       auditType: "LEASE_INVALID_OR_MISSING",
       leaseCarrier: carrier.leaseCarrier
     };
   }
-  const revokedLeaseIds = new Set(loadLeaseRevocations(params.workspace).revocations.map((row) => row.leaseId));
+  const revokedLeaseIds = revocation.ids;
   const verification = verifyLeaseToken({
     workspace: params.workspace,
     token: carrier.leaseToken,

@@ -5,6 +5,10 @@ import type { ToolExecution } from "../tools/toolTypes.js";
 import { sha256Hex } from "../utils/hash.js";
 import { budgetForAgent, loadVerifiedBudgetsConfig } from "./budgets.js";
 import { budgetSessionAgent, NATIVE_BUDGET_RESERVATION, projectBudgetUsage, readBudgetEvents } from "./nativeBudgetUsage.js";
+import { workspaceSelfTrust } from "../trust/trustContext.js";
+import { nativeUsdReservation, type NativeBudgetDispatch } from "./nativeUsdReservation.js";
+import { reserveExperimentModelRequest } from "./experimentBudget.js";
+import { nativeUsdUnits } from "./nativeUsdAmount.js";
 
 export class NativeBudgetRefusal extends Error {
   readonly code = "AMC_NATIVE_BUDGET_REFUSED";
@@ -20,22 +24,24 @@ type Spend = { kind: "llm"; nativeSessionId: string; headerEventId: string } |
  * lease. A missing outcome stays pending; only matching recorded facts settle it.
  * This is admission against known usage, not a tokenizer or pricing oracle.
  */
-function reserve(workspace: string, spend: Spend, agentId?: string): void {
+function reserve(workspace: string, spend: Spend, agentId?: string, dispatch?: NativeBudgetDispatch): void {
   const ledger = openLedger(workspace);
   try {
     ledger.db.transaction(() => {
       const config = loadVerifiedBudgetsConfig(workspace);
-      const rows = readBudgetEvents(workspace, ledger);
+      const rows = readBudgetEvents(workspace, ledger, { trust: workspaceSelfTrust(workspace) });
       const owner = spend.kind === "llm" ? budgetSessionAgent(rows, spend.nativeSessionId) : agentId;
       if (!owner) throw new NativeBudgetRefusal("native budget identity is missing");
       // Toolset identity is inherited from the root. When a native session
       // exists, a forged tool agent cannot move its spend to a fresh account.
       if (rows.some(row => row.session_id === spend.nativeSessionId && row.event_type === "session/open") &&
           budgetSessionAgent(rows, spend.nativeSessionId) !== owner) throw new NativeBudgetRefusal("native budget identity differs from the session owner");
+      const header = spend.kind === "llm" ? rows.find(row => row.id === spend.headerEventId && row.session_id === spend.nativeSessionId && row.event_type === "request/header") : undefined;
       const budget = budgetForAgent(config, owner);
       if (!budget) throw new NativeBudgetRefusal("no signed budget applies to this native agent");
       const now = Date.now();
       const usage = projectBudgetUsage(rows, owner, now);
+      let usd: ReturnType<typeof nativeUsdReservation> | undefined;
       if (spend.kind === "tool") {
         const limit = budget.daily.maxToolExecutes[spend.actionClass];
         if (limit !== undefined && usage.daily.toolExecutes[spend.actionClass] + usage.daily.toolPending[spend.actionClass] >= limit) {
@@ -51,23 +57,30 @@ function reserve(workspace: string, spend: Spend, agentId?: string): void {
         if (usage.daily.llmTokens >= budget.daily.maxLlmTokens || usage.minute.llmTokens >= budget.perMinute.maxLlmTokens) {
           throw new NativeBudgetRefusal("native model token budget exhausted");
         }
-        if (usage.daily.llmCostUsd >= budget.daily.maxCostUsd) throw new NativeBudgetRefusal("known model cost subtotal exhausted the signed budget");
-        // Unpriced requests remain explicitly unknown in status. Never invent
-        // prices or describe this lower-bound check as a hard USD ceiling.
+        if (budget.daily.maxCostUsd !== null) {
+          if (usage.daily.llmUnreservedCostRequests > 0) throw new NativeBudgetRefusal("USD exposure is unknown for a prior dispatch without a price reservation");
+          if (!header) throw new NativeBudgetRefusal("USD reservation has no matching request header");
+          try { usd = nativeUsdReservation(budget, header.meta_json, dispatch, now); }
+          catch (error) { throw new NativeBudgetRefusal(error instanceof Error ? error.message : "USD request bound is unavailable"); }
+          if (BigInt(usage.daily.llmBudgetCostUnits) + nativeUsdUnits(usd.reservedCostUsd) > nativeUsdUnits(budget.daily.maxCostUsd, false)) throw new NativeBudgetRefusal("USD budget exhausted by measured spend plus request reservations");
+        }
       }
       const sessionId = `native-budget-${randomUUID()}`;
       const reservationKey = spend.kind === "llm" ? `llm:${spend.nativeSessionId}:${spend.headerEventId}` : `tool:${spend.nativeSessionId}:${spend.toolToken}`;
       if (rows.some(row => row.event_type === "audit" && JSON.parse(row.meta_json).reservationKey === reservationKey)) throw new NativeBudgetRefusal("native dispatch was already reserved");
-      const meta = { auditType: NATIVE_BUDGET_RESERVATION, agentId: owner, trustTier: "OBSERVED", reservationKey, ...spend };
+      const experiment = spend.kind === "llm" ? reserveExperimentModelRequest(workspace, owner, budget, header?.meta_json ?? "",
+        dispatch, now, spend.headerEventId, spend.nativeSessionId) : undefined;
+      const meta = { auditType: NATIVE_BUDGET_RESERVATION, agentId: owner, trustTier: "OBSERVED", reservationKey, ...spend, ...usd, ...experiment };
       ledger.startSession({ sessionId, runtime: "amc", binaryPath: "amc-native-budget-admission", binarySha256: sha256Hex("amc-native-budget-admission-v1") });
-      ledger.appendEvidence({ sessionId, runtime: "amc", eventType: "audit", payload: JSON.stringify(meta), payloadExt: "json", meta });
+      // Inline, like the other audit rows: the small reservation record stays verifiable without the vault's blob key.
+      ledger.appendEvidence({ sessionId, runtime: "amc", eventType: "audit", payload: JSON.stringify(meta), payloadExt: "json", inline: true, meta });
       ledger.sealSession(sessionId);
     }).immediate();
   } finally { ledger.close(); }
 }
 
-export function reserveNativeModelBudget(session: SessionService, headerEventId: string): void {
-  reserve(session.workspace, { kind: "llm", nativeSessionId: session.sessionId, headerEventId });
+export function reserveNativeModelBudget(session: SessionService, headerEventId: string, dispatch?: NativeBudgetDispatch): void {
+  reserve(session.workspace, { kind: "llm", nativeSessionId: session.sessionId, headerEventId }, undefined, dispatch);
 }
 
 export function reserveNativeToolBudget(execution: ToolExecution, sessionId: string): string | undefined {

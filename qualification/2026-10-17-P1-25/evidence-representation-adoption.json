@@ -1,0 +1,249 @@
+{
+  "schema": "p125-raw-evidence-representation-adoption/1",
+  "reason": "Default Git trailing-whitespace and blank-at-EOF checks correctly rejected18 raw log/patch files. Reuse the existing P107 lossless JSON format. No original bytes, command results, guard or whitespace policy changed.",
+  "priorAdoption": {
+    "path": "qualification/2026-10-16-P1-07/evidence-representation-adoption.json",
+    "sha256": "eaf37b97d49abbb5f519c8e717c5925ece4b3b90ba42a563f99d58b506b5eb64"
+  },
+  "changes": [
+    {
+      "original": {
+        "relativePath": "commands/p125-build/stdout-stderr.log",
+        "bytes": 955,
+        "sha256": "e6e36dcd7bda0fc5d63469c9f1781ef19fe59c3a49afbf5d2c7c6c0c8dd1acce"
+      },
+      "envelope": {
+        "relativePath": "commands/p125-build/stdout-stderr.log.evidence.json",
+        "bytes": 1721,
+        "sha256": "ceef118a885f1a8b000c9372cd9e93dc719a7437a5c51fe9402f0596e28a7df1"
+      },
+      "roundTripVerified": true
+    },
+    {
+      "original": {
+        "relativePath": "commands/p125-token-asn1-inspection/stdout-stderr.log",
+        "bytes": 10362,
+        "sha256": "b56c174360c875376df1a5670e4d8fe8ddac585c9c736e94dacc8a492a33b1f7"
+      },
+      "envelope": {
+        "relativePath": "commands/p125-token-asn1-inspection/stdout-stderr.log.evidence.json",
+        "bytes": 14279,
+        "sha256": "c910b1b29c6e206c00b436cec5e0d00efa4ffeaa884287f4caa7956af7774bb6"
+      },
+      "roundTripVerified": true
+    },
+    {
+      "original": {
+        "relativePath": "commands/p125-typecheck-tests/stdout-stderr.log",
+        "bytes": 161,
+        "sha256": "fb4ed4c9025dd5e6271e65a32d037c413d19a08be3c3b2a5cac093c68f75f865"
+      },
+      "envelope": {
+        "relativePath": "commands/p125-typecheck-tests/stdout-stderr.log.evidence.json",
+        "bytes": 671,
+        "sha256": "2e0e4d39fb15e6d03f1313d72f5967f309b1e4356e81ffec786454dfaba1e84c"
+      },
+      "roundTripVerified": true
+    },
+    {
+      "original": {
+        "relativePath": "commands/p125-typecheck/stdout-stderr.log",
+        "bytes": 149,
+        "sha256": "ffc3342aa63f1c01882b849ff8dd0a3cd4e7b509f07c4fb8c69713242b5a98d5"
+      },
+      "envelope": {
+        "relativePath": "commands/p125-typecheck/stdout-stderr.log.evidence.json",
+        "bytes": 649,
+        "sha256": "6aaeac84e0f791ee46bdc2c8596d19a57282da3f57ac008675e6506ebab45751"
+      },
+      "roundTripVerified": true
+    },
+    {
+      "original": {
+        "relativePath": "controls/m2-patch.patch",
+        "bytes": 555,
+        "sha256": "6ce3d407d0ee6a207411a31aacd44b41d831b32708b54a2bc94674fb97561e05"
+      },
+      "envelope": {
+        "relativePath": "controls/m2-patch.patch.evidence.json",
+        "bytes": 1171,
+        "sha256": "c7fb95f20ad65169da01bfea6b816673a2207c6896f0bf1cd9d4e7a1e92082ef"
+      },
+      "roundTripVerified": true
+    },
+    {
+      "original": {
+        "relativePath": "crypto/children/15-tstinfo-inspect-stdout.log",
+        "bytes": 675,
+        "sha256": "1309b1adb45309cc03fedc346463be7017ae5ce2b2b84834f0ac248ba371d993"
+      },
+      "envelope": {
+        "relativePath": "crypto/children/15-tstinfo-inspect-stdout.log.evidence.json",
+        "bytes": 1353,
+        "sha256": "77f39accdbf814afe510342b8ea114cd6caf092b3478c55eedd5f75e5d90b681"
+      },
+      "roundTripVerified": true
+    },
+    {
+      "original": {
+        "relativePath": "crypto/children/17-query-inspect-stdout.log",
+        "bytes": 611,
+        "sha256": "b3017332c0a75681b72e393e1e49acfab84a2b2473f8c91b2cf4a85efdee80ed"
+      },
+      "envelope": {
+        "relativePath": "crypto/children/17-query-inspect-stdout.log.evidence.json",
+        "bytes": 1267,
+        "sha256": "ef37a151ad92f7fb0f84d363c8030cc3432bc79d3cb0219bbcdcd397358e6472"
+      },
+      "roundTripVerified": true
+    },
+    {
+      "original": {
+        "relativePath": "crypto/children/19-valid-cms-inspect-stdout.log",
+        "bytes": 13946,
+        "sha256": "036011d1833a2bb5b0de6578d6b5f3f6ea7b18d08cd3acf56fdd0c89217a33ee"
+      },
+      "envelope": {
+        "relativePath": "crypto/children/19-valid-cms-inspect-stdout.log.evidence.json",
+        "bytes": 19053,
+        "sha256": "33f3b3e82a23430de331194059443f104a1a0946a922f65e7cb45d2983b00f97"
+      },
+      "roundTripVerified": true
+    },
+    {
+      "original": {
+        "relativePath": "crypto/children/22-missing-eku-cms-inspect-stdout.log",
+        "bytes": 13757,
+        "sha256": "875e649e260702968f3f5eb65f26b36f8cc3d44324ef6409643ece608f6b9903"
+      },
+      "envelope": {
+        "relativePath": "crypto/children/22-missing-eku-cms-inspect-stdout.log.evidence.json",
+        "bytes": 18807,
+        "sha256": "733eb01980d5c4bb4835657677e18d90dd24baa021dbfc607072379e0513c595"
+      },
+      "roundTripVerified": true
+    },
+    {
+      "original": {
+        "relativePath": "crypto/children/25-noncritical-eku-cms-inspect-stdout.log",
+        "bytes": 13947,
+        "sha256": "47c44d64dd27ae9037640c6de60a956d1ab1bb3c6d4981a51b6c6d0c7669c70e"
+      },
+      "envelope": {
+        "relativePath": "crypto/children/25-noncritical-eku-cms-inspect-stdout.log.evidence.json",
+        "bytes": 19063,
+        "sha256": "1c5c16f2581ccb247c3dae2d14358e25583892e1d50205cc4e3b9d1fe975dfa3"
+      },
+      "roundTripVerified": true
+    },
+    {
+      "original": {
+        "relativePath": "crypto/children/28-expired-cms-inspect-stdout.log",
+        "bytes": 13946,
+        "sha256": "ca5b6f0278f32a372e1bd15c5aaa673318b6a9ba39b0f36b9ae8a649f1c624a6"
+      },
+      "envelope": {
+        "relativePath": "crypto/children/28-expired-cms-inspect-stdout.log.evidence.json",
+        "bytes": 19055,
+        "sha256": "d1370ee4caab770f97c4e6df5500f364b664013b373b9100a62357de399a7fc3"
+      },
+      "roundTripVerified": true
+    },
+    {
+      "original": {
+        "relativePath": "crypto/children/31-root-certificate-inspect-stdout.log",
+        "bytes": 3075,
+        "sha256": "3bb9a816f2c28475e3bff5e05c7b30c3ea8f411e4fa2f9ee103d6377bac87ca7"
+      },
+      "envelope": {
+        "relativePath": "crypto/children/31-root-certificate-inspect-stdout.log.evidence.json",
+        "bytes": 4563,
+        "sha256": "4abc6932440184bab135ca89b843fd82f3e396cf96e0a92ecec2074bd9046901"
+      },
+      "roundTripVerified": true
+    },
+    {
+      "original": {
+        "relativePath": "crypto/children/32-intermediate-certificate-inspect-stdout.log",
+        "bytes": 3205,
+        "sha256": "bb6178e62b85a5c0fd8727ef5019f185725569ee7310798f1f63a43a4d8479fd"
+      },
+      "envelope": {
+        "relativePath": "crypto/children/32-intermediate-certificate-inspect-stdout.log.evidence.json",
+        "bytes": 4747,
+        "sha256": "4bd147f6f9897331edabab752c4970a4147a1337f97f7c78a4fdd23aafcf9c10"
+      },
+      "roundTripVerified": true
+    },
+    {
+      "original": {
+        "relativePath": "crypto/children/33-valid-certificate-inspect-stdout.log",
+        "bytes": 3263,
+        "sha256": "d72b7bffcbeee4601d06911c5c1828b7ce6c6ae9f363b9b09549f3ac9bee68f4"
+      },
+      "envelope": {
+        "relativePath": "crypto/children/33-valid-certificate-inspect-stdout.log.evidence.json",
+        "bytes": 4816,
+        "sha256": "993e08a0efec8097feb24ea6145c419c1f16d10847a3b1bf4e4073288fe1ea12"
+      },
+      "roundTripVerified": true
+    },
+    {
+      "original": {
+        "relativePath": "crypto/children/34-missingEku-certificate-inspect-stdout.log",
+        "bytes": 3185,
+        "sha256": "8a9cc445bbeccc0f492fccf3432b1b71f339bcfd022ade3035122bfdc786d648"
+      },
+      "envelope": {
+        "relativePath": "crypto/children/34-missingEku-certificate-inspect-stdout.log.evidence.json",
+        "bytes": 4717,
+        "sha256": "cda7756e5376dbe8cb1c139380e0ed66c70b9bea5a88b1b6ab47d95655404e2e"
+      },
+      "roundTripVerified": true
+    },
+    {
+      "original": {
+        "relativePath": "crypto/children/35-noncriticalEku-certificate-inspect-stdout.log",
+        "bytes": 3255,
+        "sha256": "c0391c7aec3abe623aea48cd4339f98dccb73d6f94167ed0097b624b25aa2884"
+      },
+      "envelope": {
+        "relativePath": "crypto/children/35-noncriticalEku-certificate-inspect-stdout.log.evidence.json",
+        "bytes": 4813,
+        "sha256": "b7de6ad1361bd25fce8b1ffa9445ca90c426cc825ab93dd57b8faf31d2c413d4"
+      },
+      "roundTripVerified": true
+    },
+    {
+      "original": {
+        "relativePath": "crypto/children/36-expired-certificate-inspect-stdout.log",
+        "bytes": 3263,
+        "sha256": "f2e8cdfd5a5aaaa5b20afb6638b92247d57af615cb3811a1ba369136927574fb"
+      },
+      "envelope": {
+        "relativePath": "crypto/children/36-expired-certificate-inspect-stdout.log.evidence.json",
+        "bytes": 4818,
+        "sha256": "129bf0bbad15a217d28049612b054cab9046b2b99c3af3751b0757d537d16c8e"
+      },
+      "roundTripVerified": true
+    },
+    {
+      "original": {
+        "relativePath": "crypto/children/37-unrelated-certificate-inspect-stdout.log",
+        "bytes": 3085,
+        "sha256": "bd64e0900144fc2865e3bd6d57a1af60fb3a5457677c604704132e4b0b91614b"
+      },
+      "envelope": {
+        "relativePath": "crypto/children/37-unrelated-certificate-inspect-stdout.log.evidence.json",
+        "bytes": 4584,
+        "sha256": "7d279e2aed48a1f0916013f1a977fefbc9d666a4d2eb711c97ad9354cc0b7f21"
+      },
+      "roundTripVerified": true
+    }
+  ],
+  "losslessRoundTripVerified": true,
+  "originalPrivatePacketPreserved": "/private/tmp/p1-25-time-qualification-20261016/private-receipt-root/2026-10-17-P1-25",
+  "commandOutcomesUnchanged": true,
+  "metadataWhitespaceStop": "metadata-stage-whitespace-stop.json",
+  "forceIgnoreRuleNoVerifyOrWhitespacePolicyChange": false
+}

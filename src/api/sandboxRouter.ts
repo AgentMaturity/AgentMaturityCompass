@@ -42,6 +42,7 @@ export async function handleSandboxRoute(
       });
       apiSuccess(res, {
         sessionId: result.sessionId,
+        exitCode: result.exitCode,
         image: result.image,
         networkName: result.networkName,
         dockerArgs: result.dockerArgs

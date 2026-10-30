@@ -20,18 +20,34 @@ catalog/
   producers.yaml                 admitted evidence producers (ProducerRecord[] under `producers:`)
   publisher-hosts.yaml           standards-body hosts for voluntary-standard citations (`hosts:`)
   profiles/cross-station.json    descriptive station-composition templates (P2-28)
+  registers/<id>.json            law-as-data register: one entry per clause (P1-18, REGISTER.md)
+  jurisdictions/<folder>/profiles.json   jurisdiction profiles over register entries (P1-18)
   layers/<pack>/pack.yaml        pack manifest
   layers/<pack>/controls/<id>.yaml   one control record; the file name is the control id
   fixtures/<id>/positive/*.json  fixture envelopes a test must allow or pass
   fixtures/<id>/negative/*.json  fixture envelopes it must deny, fail or leave not evaluated
+  CHANGELOG.md                   append-only catalog changelog (P1-34, GOVERNANCE.md)
+  governance/                    f5-confirmations.yaml, reverify-before-publishing.yaml, standards-licences.md (P1-34)
+  reviews/<subject>/<version>/<record>.json   review records (P1-34)
+  admission/<pack-id>-<version>.json         pack admission reports (P1-33, ADMISSION.md)
+  questionnaires/<id>.yaml       self-reported questionnaire items, capped at L1 (P1-53, CONSOLIDATION.md)
+  bindings/policy-packs.yaml     built-in policy-pack settings to binding parameters (P1-53, CONSOLIDATION.md)
 ```
+
+The P1-34 governance files are read by `src/catalog/governance/`, never as catalog content, so they change no digest.
+Admission reports are checker output, outside every digest; only the admission gate below and `amc catalog check` read them.
+Questionnaires and the policy-pack binding map are loaded and validated but stay outside every digest, because no
+compiled plan reads them (CONSOLIDATION.md).
 
 `package.json` ships `catalog/**`, and `loadCatalog()` finds it from `src/catalog/` and `dist/catalog/` alike
 (`new URL("../../catalog/", import.meta.url)`). `npm run check:packed-install` loads and validates the installed copy.
 
 ## Loading
 
-`loadCatalog({ root? })` reads the documented tree and nothing else. It never imports or evaluates content. It refuses:
+`loadCatalog({ root? })` reads the documented tree and nothing else. It never imports or evaluates content. The
+compiler, activation, the OSCAL export and A4 read it through `loadAdmittedCatalog()`, which loads a pack declaring
+`reviewed` or `qualified` support as `experimental` (warning `ADM_SUPPORT_DOWNGRADED`) unless its recomputed admission
+admits it ([ADMISSION.md](ADMISSION.md)). It refuses:
 
 | Refusal | Code |
 | --- | --- |
@@ -46,7 +62,9 @@ catalog/
 | A second control or pack with an id already loaded | `CAT_DUPLICATE_ID` |
 
 Each fixture is read once: its SHA-256 and its parsed envelope come from the same bytes. `loadCatalog` returns
-`{ root, manifest, vocabulary, producers, publisherHosts, packs, controls, controlFiles, fixtures, issues }`.
+`{ root, manifest, vocabulary, producers, publisherHosts, packs, controls, controlFiles, fixtures, issues }`, plus
+`crossStationProfiles`, `registers` and `jurisdictionProfiles` when those files exist. A register's format and rules are
+in [REGISTER.md](REGISTER.md); a control citation whose `key` is a register entry id must restate that entry.
 
 `validateCatalog(cat, { asOf })` adds the cross-file rules below and returns `{ ok, errors, warnings }`. `ok` is true
 only with no errors. Each issue is `{ code, severity, file, controlId, path, message }`.
@@ -102,7 +120,7 @@ retrieval facts. It adds `key`, `registerId`, `superseded`, `retrieval`, `applie
 | `retrieval` is `{ state: verified, retrievedAt, contentSha256 }` (64 lowercase hex) or `{ state: unverified, reason }` | `CAT_SCHEMA` |
 | `url` is https on the shared official host list (`isSharedOfficialUrl`, P0-25; a superset of the S5 register's hosts), or on `publisher-hosts.yaml` for a `voluntary-standard` citation | `CAT_CITATION_HOST` |
 | A non-null `registerId` names an S5 register entry (`src/compliance/regulatory/register.json`) | `CAT_CITATION_REGISTER` |
-| `statusType` agrees with that entry: `binding-now` needs `in-force` or `partially-applicable` and `bindingForce: binding`; `binding-future` needs `enacted-not-yet-applicable`; `draft` needs `proposed`; `supervisory-guidance` and `voluntary-standard` need `bindingForce: voluntary`. `contractual` and `conformity-scheme` have no register rule | `CAT_CITATION_STATUS_MISMATCH` |
+| `statusType` agrees with that entry: `binding-now` needs `in-force` or `partially-applicable` and `bindingForce: binding`; `binding-future` needs `enacted-not-yet-applicable`, or an `in-force`/`partially-applicable` binding entry together with a `complianceDueDate` (a future clause of an applicable instrument; a due date that has passed is reported by `check:catalog-currency` as `GOV_CITATION_DUE_PASSED`, never a validation error); `draft` needs `proposed`; `supervisory-guidance` and `voluntary-standard` need `bindingForce: voluntary`. `contractual` and `conformity-scheme` have no register rule | `CAT_CITATION_STATUS_MISMATCH` |
 | A citation of a `superseded` register entry, or text matching P0-25's superseded-instrument denylist, must set `superseded: { by, on }` | `CAT_CITATION_SUPERSEDED` |
 | `registerId: null` is a warning for `experimental` controls and an error otherwise | `CAT_NO_REGISTER_ENTRY` |
 | A verified `retrievedAt` is not after `asOf` | `CAT_CITATION_RETRIEVAL` |
@@ -139,7 +157,7 @@ counts as neither observed nor available.
 ## Pack manifest, producers and fixtures
 
 A pack manifest has `id`, `version`, `layer`, `title`, `stations`, `jurisdictions`, `compilerCompat` (a semver range),
-`publisher`, `maintainers`, `licence` (an SPDX id; `MIT` until D-04), `support` (declared; P1-33 gates it), `controls`
+`publisher`, `maintainers`, `licence` (an SPDX id; `MIT` until D-04), `support` (declared; P1-33 gates it, [ADMISSION.md](ADMISSION.md)), `controls`
 and `stewardship`. A producer record has `id`, `module` (the emitting source path), `emits`, `maxClaimKind`
 (`observed`, `self_reported` or `synthetic_example`), `status` (`available` or `planned`) and `plannedBy`, which is set
 exactly when the producer is planned. A fixture envelope has `fixtureVersion: 1`, `controlId`, `polarity`,
@@ -183,7 +201,7 @@ Dimensions:
 | Dimension | Rule |
 | --- | --- |
 | Applicability | The compiled plan's decision (P1-10). No plan: `unresolved`, so nothing passes. |
-| Evidence | First match: `contradictory` when admitted items disagree on one observation (an allow and a deny for one tool call id); `untrusted` when items exist, none is admitted and one failed for its producer or tenant, or a contract's admitted items fall below its minimum observed ratio; `stale` when a contract lacks `minItems` admitted items and some of its items were stale; `incomplete` when a contract lacks `minItems` admitted items (an empty window included); else `sufficient`. |
+| Evidence | First match: `contradictory` when admitted items disagree on one observation (an allow and a deny for one tool call id); `untrusted` when items exist, none is admitted and one failed for its producer or tenant, or a contract's admitted items fall below its minimum observed ratio; `stale` when a contract lacks `minItems` admitted items and some of its items were stale; `incomplete` when a contract lacks `minItems` admitted items (an empty window included); else `sufficient`. The published dimension keeps `sufficient` only when the claim kind is `observed`, or for a pass whose kind is `self_reported` (D-03: every admitted item's provenance was verified from its bytes; evidence attached, not independently verified); otherwise a self-reported admitted item makes it `incomplete` (P0-28). |
 | Result | `fail` when an admitted item violates, whatever the evidence. A violating item that was not admitted blocks a pass, and so does a contract met only by self-reported items (truth rule 3). `pass` only when applicability is `applicable` and evidence `sufficient`; otherwise `not_evaluated`. A not-applicable control never passes. |
 | Enforcement | `advisory` when the plan runs the control's enforcement point in warn mode; `enforced at <point>` only on admitted allow or deny records from that point's producer under the plan's policy digest; `observed` when items were admitted otherwise; else `none`. |
 | Review | `pending` unless a review from the approval engine names this result's digest: `rejected` wins, then `approved`, which is `expired` after `expiresAt`. |
@@ -194,7 +212,8 @@ Compliance mappings (`.amc/compliance-maps.yaml`) run through the same evaluator
 `amc.ledger` bound to the control and the agent (or the workspace); `requires_no_audit` admits any record of the
 subject as coverage, so an empty window is incomplete, and treats a denied audit type as a violation;
 `requires_assurance_pack` admits sealed reports from `amc.assuranceRunner`. Mapping contracts use a 30-day freshness
-bound and no invalidation triggers until P1-53 re-keys them to catalog controls.
+bound and no invalidation triggers. P1-53 links mappings to catalog controls through `catalogControls`, but those
+pairings are AI-proposed and change no result until a reviewer confirms them (CONSOLIDATION.md).
 
 ## Digests
 
@@ -220,6 +239,8 @@ with `JSON.stringify(lock, null, 2)`. It throws when the catalog did not load cl
 
 `verifyCatalogLock(lock, cat)` parses the stored lock strictly, rebuilds it from `cat` and returns
 `{ ok, mismatches: [{ path, expected, actual }] }`, naming each differing path (`packs[amc.l0.baseline].digest`).
+Duplicate pack, control and citation-source identities are invalid. Mismatch values are JSON-encoded so that
+`null` and the string `"null"` remain distinct. Valid lock serialization and catalog digests are unchanged.
 `generatedBy` is informational and not compared. A lock shows the content is unchanged; it does not show it is true.
 
 ## Published schemas

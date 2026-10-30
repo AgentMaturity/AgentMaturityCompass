@@ -1,0 +1,11 @@
+{{- if .Values.ledgerEncryption.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "amc.fullname" . }}-ledger-encryption
+  labels:
+    {{- include "amc.labels" . | nindent 4 }}
+data:
+  ledger-encryption.sh: |-
+{{ .Files.Get "files/ledger-encryption.sh" | indent 4 }}
+{{- end }}

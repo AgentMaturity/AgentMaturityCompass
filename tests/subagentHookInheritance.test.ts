@@ -127,6 +127,24 @@ describe("spawned children inherit the parent's hook control", () => {
     });
   });
 
+  // P0-61: each side may set a limit the other does not, and a grant may be WIDER than its parent. The
+  // descendant always gets the narrower of each limit; a side that is silent never drops the other's.
+  test.each([
+    ["a grant timeout wider than the parent's", ["max-turns:2", "timeout-ms:30000"], ["max-turns:8", "timeout-ms:60000"], ["max-turns:2", "timeout-ms:30000"]],
+    ["parent-only turns and timeout", ["max-turns:3", "timeout-ms:45000"], undefined, ["max-turns:3", "timeout-ms:45000"]],
+    ["grant-only turns and timeout", undefined, ["max-turns:4", "timeout-ms:20000"], ["max-turns:4", "timeout-ms:20000"]],
+    ["parent-only turns with a grant-only timeout", ["max-turns:2"], ["timeout-ms:20000"], ["max-turns:2", "timeout-ms:20000"]]
+  ] as const)("descendant limits narrow %s", async (_case, parent, grant, expected) => {
+    const workspace = setup();
+    const outcome = await createDriverRunner(init(workspace, { hookControl: passThrough,
+      grantDelegation: { runner: async () => ({ ok: true, text: "unused" }), ...(grant === undefined ? {} : { stopConditions: [...grant] }) }
+    }))(context(parent === undefined ? {} : { stopConditions: [...parent] }));
+    expect(outcome).toMatchObject({ ok: true });
+    const record = hookControlRows(workspace, "hook-child");
+    expect(record).toHaveLength(1);
+    expect(JSON.parse(record[0]!.meta_json)).toMatchObject({ descendantStopConditions: [...expected] });
+  });
+
   test("a child built with no hook control records the absence instead of claiming a control it does not have", async () => {
     const workspace = setup();
     const outcome = await createDriverRunner(init(workspace))(context());

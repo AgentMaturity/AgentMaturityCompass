@@ -1,0 +1,95 @@
+{
+  "schema": "amc-private-p1-01-canonical-builder-preparation-static-review/1",
+  "createdAt": "2026-10-15T08:42:04.215759+00:00",
+  "reviewer": "/root/native_race_static_review",
+  "builder": {
+    "path": "/private/tmp/p1-01-build-canonical-packet-prepared-20261015.py",
+    "bytes": 14982,
+    "sha256": "9f500ed7f3f18dc1df733dc342c1a44e5a6356c6574ebb33cf9362f2143ad7ae"
+  },
+  "scope": "Complete source-only review of unexecuted unbound metadata builder. No actual active control outputs, live journal or future bindings read; no import/parser/compile/execution or qualification writes.",
+  "blockingFindings": [],
+  "preparationStatus": "Static preparation only; FINAL_BINDINGS remains None. A separately frozen bound revision and actual input/selection review are required before canonical execution.",
+  "staticChecks": [
+    {
+      "id": "S1",
+      "finding": "The initial main assertion requires a binding dict before reading inputs, invoking Git, creating Q or copying evidence. There is no default fallback or product runtime invocation. Future subprocess calls are read-only Git metadata queries."
+    },
+    {
+      "id": "S2",
+      "finding": "Fixed inputs require exact path/size/hash pins. Closed/frozen journal identity, unique root phases, source anchors, normal group exits, exact allowed nonzero exits and required independent probe/original commands are checked."
+    },
+    {
+      "id": "S3",
+      "finding": "Requires final review allReadsFinished, empty blocking list and formalAcceptanceClosed=false, plus root outcome bound to the journal/control/review. Final review must establish deeper actual evidence/source attribution; template checks do not replace it."
+    },
+    {
+      "id": "S4",
+      "finding": "Primary test receipt requires 16 original passed identities with no pending/todo. Generator 38/75, nine outside-layout A4 JSONs, probe modes, root records and nested seven strip-control/three failed-control child records remain separate counts."
+    },
+    {
+      "id": "S5",
+      "finding": "Successful strip-control result/restoration/native equality and all seven expected normal 0/1 exits are required. Earlier literal-control ACTIVE/HALTED, missing final result and first three child exits0/0/2 are mandatory. The prose explicitly leaves literal-passthrough acceptance open."
+    },
+    {
+      "id": "S6",
+      "finding": "Selected files must be regular non-symlink files outside product root, git and node_modules. Sensitive key suffixes and .env filenames are refused. Traversal is limited to top-level metadata and explicit closed command/phase sidecars; homes/stores/tmp/pages/copies/mutant-inputs are not traversed."
+    },
+    {
+      "id": "S7",
+      "finding": "Manifest paths, named tracked/compiled/physical/Pages manifests, runtime-artifact indices and files larger than1MiB stay private unsplit references. No source/dist/fixture body copies or chunking are introduced. Parent8751 tracked+4529 compiled hashes/modes are checked before writes."
+    },
+    {
+      "id": "S8",
+      "finding": "Q must be absent and under the expected qualification parent, source/branch/clean Git must match, all writes are exclusive and bounded per file, no deletion or cleanup exists. Receipt artifact hashes are computed before receipt itself, avoiding a self-hash cycle. Final status permits only the new qualification namespace."
+    }
+  ],
+  "nonBlockingPreparationFindings": [
+    {
+      "id": "O1",
+      "lines": [
+        202,
+        203,
+        211,
+        212,
+        213,
+        214,
+        220
+      ],
+      "finding": "Selected evidence bodies are cap-checked before Q.mkdir, but generated references/summary/README/receipt encoding and cap checks happen after first canonical writes. Partial publication is explicitly documented, so no transactional promise is violated.",
+      "futureCondition": "Before bound release, precompute/validate all generated bodies or independently verify their final bound sizes. A cap error must not be described as a complete packet; preserve any partial namespace."
+    },
+    {
+      "id": "O2",
+      "finding": "Synthesized README describes the strip control but omits v4 held-constant accepted kernel-bundle detail. Sidecar/review copying can retain it, yet concise prose should explicitly state direct-contract control with a constant kernel artifact, not a complete fresh mutant build/kernel route.",
+      "futureCondition": "Add that sentence in the future bound revision; preserve this unbound preparation."
+    },
+    {
+      "id": "O3",
+      "finding": "Secret guard detects private-key PEM marker and key/env filenames; it is not a general credential detector. Shallow metadata/log selection minimizes exposure but final selected bytes are not yet available/frozen.",
+      "futureCondition": "Final bound input review must inspect actual selected metadata/log bodies for credential-bearing content without exposing values; do not claim broad secret scanning from this predicate."
+    }
+  ],
+  "inputPins": [
+    {
+      "path": "/private/tmp/p1-01-build-canonical-packet-prepared-20261015.py",
+      "bytes": 14982,
+      "sha256": "9f500ed7f3f18dc1df733dc342c1a44e5a6356c6574ebb33cf9362f2143ad7ae"
+    },
+    {
+      "path": "/private/tmp/p1-01-supplemental-coverage-readonly-review-20261015.json",
+      "bytes": 21265,
+      "sha256": "569d8bbe12d4b660d4e55b39be17705a651ca13d776957c0bfeb50b220e88978"
+    },
+    {
+      "path": "/private/tmp/p1-01-source-strip-control-v4-static-review-20261015.json",
+      "bytes": 5269,
+      "sha256": "034cc187390e1c026f1e8c9d29c7cc2ed337c8a0e78cbd0a75fe72b07f63fdef"
+    }
+  ],
+  "canonicalWritesByReviewer": false,
+  "builderExecutedByReviewer": false,
+  "runtimeAuthorizedByThisReview": false,
+  "formalAcceptanceClosed": false,
+  "allReadsFinished": true
+}

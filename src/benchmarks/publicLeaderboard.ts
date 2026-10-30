@@ -1,5 +1,6 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
+import { agentRunFiles } from "../diagnostic/runReportResolution.js";
 import {
   createHFAutoPublishPlan,
   type HFAutoPublishPlan,
@@ -48,17 +49,12 @@ type LatestRun = {
 };
 
 function readLatestRun(workspace: string, agentId: string): LatestRun | null {
-  const runsDir = join(workspace, ".amc", "agents", agentId, "runs");
-  if (!existsSync(runsDir)) {
-    return null;
-  }
-  const files = readdirSync(runsDir).filter((file) => file.endsWith(".json")).sort();
-  const latestFile = files.at(-1);
+  const latestFile = agentRunFiles(workspace, agentId).at(-1);
   if (!latestFile) {
     return null;
   }
   try {
-    return JSON.parse(readFileSync(join(runsDir, latestFile), "utf8")) as LatestRun;
+    return JSON.parse(readFileSync(latestFile, "utf8")) as LatestRun;
   } catch {
     return null;
   }

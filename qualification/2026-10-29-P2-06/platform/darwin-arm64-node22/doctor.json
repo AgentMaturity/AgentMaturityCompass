@@ -1,0 +1,220 @@
+{
+  "ok": false,
+  "mode": "WORKSPACE",
+  "workspaceInitialized": true,
+  "strict": false,
+  "liveProbes": false,
+  "checks": [
+    {
+      "id": "node-version",
+      "status": "PASS",
+      "message": "Node 22.23.3"
+    },
+    {
+      "id": "native-modules",
+      "status": "PASS",
+      "message": "better-sqlite3 native binding opened, queried and closed an in-memory database"
+    },
+    {
+      "id": "key-history-monitor",
+      "status": "FAIL",
+      "message": "monitor historical keys are not authenticated: legacy history has no admission signature",
+      "fixHint": "Current-key verification remains available. Review history and use amc vault history migrate with its SHA-256 and explicitly approved historical fingerprints."
+    },
+    {
+      "id": "key-history-auditor",
+      "status": "FAIL",
+      "message": "auditor historical keys are not authenticated: legacy history has no admission signature",
+      "fixHint": "Current-key verification remains available. Review history and use amc vault history migrate with its SHA-256 and explicitly approved historical fingerprints."
+    },
+    {
+      "id": "key-history-lease",
+      "status": "FAIL",
+      "message": "lease historical keys are not authenticated: legacy history has no admission signature",
+      "fixHint": "Current-key verification remains available. Review history and use amc vault history migrate with its SHA-256 and explicitly approved historical fingerprints."
+    },
+    {
+      "id": "key-history-session",
+      "status": "FAIL",
+      "message": "session historical keys are not authenticated: legacy history has no admission signature",
+      "fixHint": "Current-key verification remains available. Review history and use amc vault history migrate with its SHA-256 and explicitly approved historical fingerprints."
+    },
+    {
+      "id": "workspace-initialized",
+      "status": "PASS",
+      "message": "AMC workspace initialized"
+    },
+    {
+      "id": "studio-running",
+      "status": "INFO",
+      "message": "Studio is not running (optional — needed for dashboard/API)",
+      "fixHint": "Run: amc up"
+    },
+    {
+      "id": "vault",
+      "status": "WARN",
+      "message": "Vault locked in this shell: signing commands (amc firewall enable, amc agent-loop run) will refuse with \"Vault locked\"",
+      "fixHint": "Run: export AMC_VAULT_PASSPHRASE='<the passphrase chosen or shown at amc init>' (interactive alternative: amc vault unlock)"
+    },
+    {
+      "id": "runtime-firewall-policy",
+      "status": "WARN",
+      "message": "Runtime Firewall policy missing: every tool call is denied (missing-policy) until a signed policy exists",
+      "fixHint": "Run: amc firewall enable"
+    },
+    {
+      "id": "sig-action-policy",
+      "status": "PASS",
+      "message": "action-policy.yaml signature valid"
+    },
+    {
+      "id": "sig-tools",
+      "status": "PASS",
+      "message": "tools.yaml signature valid"
+    },
+    {
+      "id": "sig-budgets",
+      "status": "PASS",
+      "message": "budgets.yaml signature valid"
+    },
+    {
+      "id": "sig-approval-policy",
+      "status": "WARN",
+      "message": "approval-policy.yaml signature missing (approval policy missing)",
+      "fixHint": "Unlock vault and re-sign with: amc fix-signatures"
+    },
+    {
+      "id": "sig-adapters",
+      "status": "PASS",
+      "message": "adapters.yaml signature valid"
+    },
+    {
+      "id": "sig-trust",
+      "status": "PASS",
+      "message": "trust.yaml signature valid"
+    },
+    {
+      "id": "route-/openai",
+      "status": "PASS",
+      "message": "Gateway route mounted: /openai"
+    },
+    {
+      "id": "route-/anthropic",
+      "status": "PASS",
+      "message": "Gateway route mounted: /anthropic"
+    },
+    {
+      "id": "route-/gemini",
+      "status": "PASS",
+      "message": "Gateway route mounted: /gemini"
+    },
+    {
+      "id": "route-/grok",
+      "status": "PASS",
+      "message": "Gateway route mounted: /grok"
+    },
+    {
+      "id": "route-/openrouter",
+      "status": "PASS",
+      "message": "Gateway route mounted: /openrouter"
+    },
+    {
+      "id": "route-/local",
+      "status": "PASS",
+      "message": "Gateway route mounted: /local"
+    },
+    {
+      "id": "toolhub-denylist",
+      "status": "PASS",
+      "message": "ToolHub denylist blocks .amc path access"
+    },
+    {
+      "id": "lease-carriers-live",
+      "status": "INFO",
+      "message": "Live gateway model requests and diagnostic lease issuance not run (local diagnostic mode)",
+      "fixHint": "To deliberately issue a lease and send gateway model requests that may incur provider charges, run: amc doctor --live-probes"
+    },
+    {
+      "id": "adapter-autogen-cli",
+      "status": "PASS",
+      "message": "autogen-cli: python3 3.14.7"
+    },
+    {
+      "id": "adapter-claude-cli",
+      "status": "PASS",
+      "message": "claude-cli: claude 2.1.296"
+    },
+    {
+      "id": "adapter-crewai-cli",
+      "status": "PASS",
+      "message": "crewai-cli: python3 3.14.7"
+    },
+    {
+      "id": "adapter-deepseek-harness",
+      "status": "WARN",
+      "message": "deepseek-harness: missing commands: dsh",
+      "fixHint": "Install/enable deepseek-harness CLI or use generic-cli"
+    },
+    {
+      "id": "adapter-gemini-cli",
+      "status": "PASS",
+      "message": "gemini-cli: gemini"
+    },
+    {
+      "id": "adapter-generic-cli",
+      "status": "PASS",
+      "message": "generic-cli: sh 3.2.57"
+    },
+    {
+      "id": "adapter-hermes-cli",
+      "status": "PASS",
+      "message": "hermes-cli: hermes"
+    },
+    {
+      "id": "adapter-langchain-node",
+      "status": "PASS",
+      "message": "langchain-node: node 22.23.3"
+    },
+    {
+      "id": "adapter-langchain-python",
+      "status": "PASS",
+      "message": "langchain-python: python3 3.14.7"
+    },
+    {
+      "id": "adapter-langgraph-python",
+      "status": "PASS",
+      "message": "langgraph-python: python3 3.14.7"
+    },
+    {
+      "id": "adapter-llamaindex-python",
+      "status": "PASS",
+      "message": "llamaindex-python: python3 3.14.7"
+    },
+    {
+      "id": "adapter-openai-agents-sdk",
+      "status": "PASS",
+      "message": "openai-agents-sdk: node 22.23.3"
+    },
+    {
+      "id": "adapter-openclaw-cli",
+      "status": "PASS",
+      "message": "openclaw-cli: openclaw 2026.4.5"
+    },
+    {
+      "id": "adapter-openhands-cli",
+      "status": "WARN",
+      "message": "openhands-cli: missing commands: openhands, oh",
+      "fixHint": "Install/enable openhands-cli CLI or use generic-cli"
+    },
+    {
+      "id": "adapter-python-amc-sdk",
+      "status": "PASS",
+      "message": "python-amc-sdk: python3"
+    },
+    {
+      "id": "adapter-semantic-kernel",
+      "status": "PASS",
+      "message": "semantic-kernel: node 22.23.3"
+    }
+  ]
+}

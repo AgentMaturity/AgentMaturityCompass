@@ -10,7 +10,6 @@ import {
   claimEnvelopeSchema,
   claimFields,
   claimKindSchema,
-  envelopeForDiagnosticReport,
   envelopeForUnboundResult,
   statusDimensionsSchema,
   type ClaimEnvelope,
@@ -18,8 +17,9 @@ import {
   type ClaimMethod,
   type DiagnosticReportClaimInput
 } from "../claims/eligibility/index.js";
-import { envelopeForComplianceReport } from "../claims/eligibility/adapters/results.js";
+import { envelopeForComplianceReport, envelopeForStoredRun } from "../claims/eligibility/adapters/results.js";
 import type { ComplianceReportJson } from "../compliance/mappingSchema.js";
+import type { DiagnosticReport } from "../types.js";
 import { sealedRunReportVerifies } from "../diagnostic/reportSeal.js";
 import { pathParam } from "./apiHelpers.js";
 
@@ -137,7 +137,8 @@ function isComplianceReport(data: unknown): data is ComplianceReportJson {
 /** A run counts as evidence only when this workspace's auditor key sealed it (as in P0-15's domain evidence). */
 export function resultEnvelope(route: ResultRoute, data: unknown, workspace: string, now = Date.now()): ClaimEnvelope {
   if (route.source === "diagnostic_report" && isDiagnosticReport(data) && sealedRunReportVerifies(workspace, data)) {
-    return envelopeForDiagnosticReport(data, now);
+    // The stored-run policy every surface uses: a sealed 1.x run is still a legacy, self-reported result (P1-35).
+    return envelopeForStoredRun(data as unknown as DiagnosticReport, { sealVerified: true, now });
   }
   // In-process only: the route's handler passes the report generateComplianceReport returned, never a stored file.
   if (route.source === "compliance_report" && isComplianceReport(data)) return envelopeForComplianceReport(data, now);
@@ -200,20 +201,39 @@ export function claimResponseSchema(route: ResultRoute, envelope: boolean, exist
 
 type Operation = { responses?: Record<string, { content?: Record<string, { schema?: unknown }> }> };
 
-/** References ClaimResult from the 200 response of every listed route that `paths` documents. */
+/** A documented-only-by-registry operation: the route, its path parameters and its claim-labelled 200 response. */
+export function claimResultOperation(route: ResultRoute, envelope: boolean): Record<string, unknown> {
+  const parameters = [...route.path.matchAll(/:(\w+)/g)].map(([, name]) => ({ name, in: "path", required: true, schema: { type: "string" } }));
+  return { summary: `${route.method} ${route.path}`, description: "Claim-labelled result route. Its request and full response schemas are not documented yet; the claim fields are.",
+    ...(parameters.length > 0 ? { parameters } : {}),
+    responses: { "200": { description: "The result with its claim fields", content: { "application/json": { schema: claimResponseSchema(route, envelope) } } } } };
+}
+
+/**
+ * References ClaimResult from every successful (2xx) response of each listed route that `paths` documents. With
+ * `addMissing`, a listed route `paths` does not document is added as a claimResultOperation, so no result route is
+ * missing from the specification.
+ */
 export function withClaimResponses(paths: Record<string, Record<string, unknown>>, routes: readonly ResultRoute[],
-  envelope: boolean): Record<string, Record<string, unknown>> {
+  envelope: boolean, addMissing = false): Record<string, Record<string, unknown>> {
   const out = { ...paths };
   for (const route of routes) {
     const shape = route.path.replace(/:\w+/g, "{}");
-    const key = Object.keys(out).find((candidate) => candidate.replace(/\{[^}]+\}/g, "{}") === shape) ?? shape;
+    const key = Object.keys(out).find((candidate) => candidate.replace(/\{[^}]+\}/g, "{}") === shape) ?? route.path.replace(/:(\w+)/g, "{$1}");
     const verb = route.method.toLowerCase();
     const operation = out[key]?.[verb] as Operation | undefined;
-    const ok = operation?.responses?.["200"];
-    if (!operation || !ok) continue;
-    const json = ok.content?.["application/json"];
-    const content = { ...ok.content, "application/json": { ...json, schema: claimResponseSchema(route, envelope, json?.schema) } };
-    out[key] = { ...out[key], [verb]: { ...operation, responses: { ...operation.responses, "200": { ...ok, content } } } };
+    if (!operation) {
+      if (addMissing) out[key] = { ...out[key], [verb]: claimResultOperation(route, envelope) };
+      continue;
+    }
+    const responses = { ...operation.responses };
+    for (const [status, response] of Object.entries(responses)) {
+      if (!/^2\d\d$/.test(status)) continue;
+      const json = response.content?.["application/json"];
+      responses[status] = { ...response, content: { ...response.content, "application/json": { ...json, schema: claimResponseSchema(route, envelope, json?.schema) } } };
+    }
+    if (!Object.keys(responses).some((status) => /^2\d\d$/.test(status))) continue;
+    out[key] = { ...out[key], [verb]: { ...operation, responses } };
   }
   return out;
 }

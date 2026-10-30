@@ -1,6 +1,7 @@
 import { createServer, connect, type Server, type Socket } from "node:net";
 import { chmodSync, lstatSync, mkdirSync, statSync, unlinkSync } from "node:fs";
 import { dirname, join } from "node:path";
+import type { AcceptedWork } from "./workAcceptance.js";
 import type { Ledger } from "../ledger/ledger.js";
 import { assertWireCanServe, createWireDispatcher } from "./wireDispatcher.js";
 
@@ -48,6 +49,7 @@ export interface WireListenerInit {
   readonly maxConnections?: number;
   readonly idleTimeoutMs?: number;
   readonly workspaceId?: string;
+  readonly onAccepted?: (accepted: AcceptedWork, leaseToken: string) => void;
 }
 
 export interface WireListener {
@@ -136,7 +138,8 @@ function attach(
     ledger: init.ledger,
     intakeSessionId: init.intakeSessionId,
     monitorPublicKeys: init.monitorPublicKeys,
-    ...(init.workspaceId === undefined ? {} : { workspaceId: init.workspaceId })
+    ...(init.workspaceId === undefined ? {} : { workspaceId: init.workspaceId }),
+    ...(init.onAccepted === undefined ? {} : { onAccepted: init.onAccepted })
   });
 
   socket.setTimeout(idleTimeoutMs, () => socket.destroy());

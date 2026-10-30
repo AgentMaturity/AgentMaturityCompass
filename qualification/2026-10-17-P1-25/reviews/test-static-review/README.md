@@ -1,0 +1,5 @@
+The sealed 17-case candidate has no blocking static finding. It fits the current builtin verifier and configured-anchor artifactTime seam, uses genuine generated signed bytes, and keeps protocol corruption/boundary inputs explicit.
+
+The candidate and all seven author outputs plus22 input hashes match their seals. The actual11 public fixture files/hash tables and seven PEM/DER identity pairs match. Four observed CMS signature/content checks succeed, the positive TS oracle says Verification: OK, and the tampered signed-attribute oracle refuses with exit4/bad signature. Root's pinned review supplies full ESS/certificate/ASN.1 interpretation; no new parser or crypto verification was executed here.
+
+Runtime and compiler compatibility remain root's next checks. The test owns synchronous public reads/crypto only; it changes no environment, clock, source, guard, deadline or async lifecycle. It does not authenticate the trust-list container or qualify client/checkpoint/issuance/CLI integration, historical existence, whole P1-25 or global quality. All holds remain open.

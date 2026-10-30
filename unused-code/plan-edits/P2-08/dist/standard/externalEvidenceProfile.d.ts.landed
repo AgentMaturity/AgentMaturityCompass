@@ -1,0 +1,86 @@
+export type ExternalTrustTier = "SELF_REPORTED" | "ATTESTED" | "OBSERVED";
+export interface ExternalEvidenceEvent {
+    id: string;
+    parentId: string | null;
+    toolCallId: string | null;
+    kind: "input" | "output" | "tool-call" | "tool-result" | "error" | "cancel" | "metadata";
+    outcome: "success" | "failure" | "cancelled" | "unknown" | null;
+    sourceTime: string | null;
+    durationNs: number | null;
+    cost: {
+        amount: string;
+        currency: string;
+        source: string;
+        asOf: string;
+    } | null;
+    attributes: Record<string, string | number | boolean | null>;
+}
+export interface ExternalEvidenceProfile {
+    profile: "amc.external-evidence";
+    version: 1;
+    source: {
+        producer: string;
+        version: string;
+        originalSha256: string;
+        mediaType: string;
+    };
+    session: {
+        id: string;
+        parentSessionId: string | null;
+    };
+    provenance: {
+        trustTier: ExternalTrustTier;
+        captureMethod: "import" | "producer-callback" | "governed-capture";
+        authorityId: string | null;
+    };
+    normalization: {
+        normalizer: string;
+        normalizedSha256: string;
+        ingestedAt: string;
+        losses: string[];
+    };
+    policyRefs: string[];
+    events: ExternalEvidenceEvent[];
+    signature: {
+        algorithm: "ed25519";
+        authorityId: string;
+        value: string;
+    } | null;
+}
+export declare const externalEvidenceProfileSchema: Record<string, unknown>;
+/** Hashes semantic fields. Receipt time and the signature are excluded, with no inferred event times. */
+export declare function externalEvidenceNormalizedDigest(profile: ExternalEvidenceProfile): string;
+/** Domain-separated UTF-8 bytes signed by an external authority; the key is never taken from the evidence. */
+export declare function externalEvidenceSigningBytes(profile: ExternalEvidenceProfile): Buffer;
+/** Structural, referential and digest checks; no AMC service, workspace or credential access. */
+export declare function validateExternalEvidenceProfile(value: unknown): string[];
+/** Construct an unsigned import. Importing never grants authority, even when the importer has a signing key. */
+export declare function createImportedExternalEvidence(input: {
+    source: ExternalEvidenceProfile["source"];
+    session: ExternalEvidenceProfile["session"];
+    normalizer: string;
+    ingestedAt: string;
+    losses: string[];
+    events: ExternalEvidenceEvent[];
+    policyRefs?: string[];
+}): ExternalEvidenceProfile;
+export interface ExternalEvidenceAuthority {
+    id: string;
+    publicKeyPem: string;
+    maxTrustTier: "ATTESTED" | "OBSERVED";
+    captureMethods: Array<"producer-callback" | "governed-capture">;
+    /** Match the producer identity that this independently configured authority is admitted to attest. */
+    producers: string[];
+}
+export declare function verifyExternalEvidence(value: unknown, options?: {
+    authorities?: readonly ExternalEvidenceAuthority[];
+    originalBytes?: Uint8Array;
+    expectedNormalizedDigest?: string;
+}): {
+    ok: boolean;
+    errors: string[];
+    trustTier: ExternalTrustTier;
+    signatureVerified: boolean;
+    originalDigest: "verified" | "declared-not-checked" | "mismatch";
+    parentSession: "none" | "declared-not-verified";
+};

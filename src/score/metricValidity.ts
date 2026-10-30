@@ -1,3 +1,4 @@
+import { mean as statsMean, standardDeviation } from "../experiments/stats.js";
 import type {
   DiagnosticConfidenceSummary,
   DiagnosticReport,
@@ -1431,17 +1432,14 @@ function clamp(value: number, min: number, max: number): number {
 }
 
 function mean(values: number[]): number {
-  if (values.length === 0) return 0;
-  return values.reduce((sum, value) => sum + value, 0) / values.length;
+  return statsMean(values);
 }
 
 function stdDev(values: number[]): number {
-  if (values.length < 2) return 0;
-  const avg = mean(values);
-  const variance = values.reduce((sum, value) => sum + (value - avg) ** 2, 0) / (values.length - 1);
-  return Math.sqrt(variance);
+  return standardDeviation(values);
 }
 
+// Unlike bootstrap deltas in experiments/stats.ts, this is a normal mean interval, bounded to 0..100 and rounded to six decimals.
 function confidenceInterval(values: number[], level = 0.95): MetricValidationConfidenceInterval {
   if (values.length === 0) {
     return { level, lower: 0, upper: 0, marginOfError: 0 };

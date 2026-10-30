@@ -1,0 +1,192 @@
+{
+  "schemaVersion": 1,
+  "libraryVersion": "0.1.0-draft.1",
+  "specVersion": "1.0.0-draft.1",
+  "clauses": [
+    {
+      "id": "PC-EVIDENCE-DELIVERY",
+      "title": "Evidence delivery",
+      "text": "The Vendor shall deliver AMC evidence bundles for the Covered System to the Buyer every [interval, for example quarterly] and within [number] business days of a written request. Each bundle shall state the AMC specification version it follows, which shall be [spec version] or a later version the Buyer accepts in writing. Each bundle shall be signed with keys listed on a trust list that the Vendor publishes and that the Buyer pins before relying on it. A key named only inside a bundle shall not count as trusted. The Vendor shall not charge for producing or delivering bundles under this clause.",
+      "regimes": ["us-federal", "dora", "general"],
+      "amcArtifact": "AMC evidence bundle (.amcbundle, written by `amc bundle export`) signed by keys admitted through a pinned trust list",
+      "limits": "A signature shows who signed a bundle and that it is unchanged, not that its statements are true.",
+      "sources": [
+        { "citation": "OMB M-25-22 (3 Apr 2025), Sec. 4(d)(iii)(E): contract terms must let the agency regularly monitor and evaluate performance, risks and effectiveness", "url": "https://www.whitehouse.gov/wp-content/uploads/2025/02/M-25-22-Driving-Efficient-Acquisition-of-Artificial-Intelligence-in-Government.pdf", "verifiedAt": "2026-10-29" },
+        { "citation": "Regulation (EU) 2022/2554 (DORA), Art. 30(3)(a) and (e): service level targets that allow effective monitoring, and the right to monitor the provider's performance on an ongoing basis", "url": "https://publications.europa.eu/resource/celex/32022R2554", "verifiedAt": "2026-10-29" },
+        { "citation": "AMC Core Spec 1.0.0-draft.1, chapter 4 (evidence model)", "path": "spec/core/04-evidence-model.md", "verifiedAt": "2026-10-29" },
+        { "citation": "AMC trust lists and pinned issuers", "path": "docs/TRUST_LIST.md", "verifiedAt": "2026-10-29" }
+      ],
+      "status": "experimental",
+      "reviewer": null,
+      "reviewedAt": null
+    },
+    {
+      "id": "PC-INDEPENDENT-VERIFICATION",
+      "title": "Independent verification",
+      "text": "The Buyer may verify any evidence bundle or attestation delivered under this Agreement offline, with a verifier the Vendor does not operate, and without sending data to the Vendor. The Vendor shall not require payment, an account or a network connection for verification. The Buyer's right to verify, and to export the evidence it already holds, continues after this Agreement ends for any reason.",
+      "regimes": ["us-federal", "general"],
+      "amcArtifact": "Standalone verifier `amc-verify` (packages/verifier) and its verifier report",
+      "limits": "The verifier package is marked private and is not yet published to a registry; publication is pending the maintainer.",
+      "sources": [
+        { "citation": "OMB M-25-22 (3 Apr 2025), Sec. 4(d)(iii)(E)(II): where the vendor tests, results must be detailed enough to be independently verified or reproduced, if practicable", "url": "https://www.whitehouse.gov/wp-content/uploads/2025/02/M-25-22-Driving-Efficient-Acquisition-of-Artificial-Intelligence-in-Government.pdf", "verifiedAt": "2026-10-29" },
+        { "citation": "AMC Core Spec 1.0.0-draft.1, chapter 9 (verification)", "path": "spec/core/09-verification.md", "verifiedAt": "2026-10-29" },
+        { "citation": "AMC standalone verifier", "path": "docs/STANDALONE_VERIFIER.md", "verifiedAt": "2026-10-29" }
+      ],
+      "status": "experimental",
+      "reviewer": null,
+      "reviewedAt": null
+    },
+    {
+      "id": "PC-CLAIM-VOCABULARY",
+      "title": "Claim vocabulary",
+      "text": "Every statement the Vendor makes from AMC output shall describe it as \"evidence of conformity\" and shall carry its claim kind (\"synthetic_example\", \"self_reported\", \"observed\" or \"independently_reviewed\") and its status dimensions. Where evidence is missing, the statement shall say \"not evaluated\" and shall not report a pass, a partial result or a default score. The Vendor shall not describe the Covered System as \"certified\", \"compliant\", \"certification ready\" or carrying a \"guarantee\" on the basis of AMC output, except where a registry-issued attestation says so.",
+      "regimes": ["general"],
+      "amcArtifact": "Claim kind and status dimensions carried on every AMC result",
+      "sources": [
+        { "citation": "AMC Core Spec 1.0.0-draft.1, chapter 3 (claim kinds and vocabulary)", "path": "spec/core/03-claim-kinds.md", "verifiedAt": "2026-10-29" },
+        { "citation": "AMC claim kinds", "path": "docs/CLAIM_KINDS.md", "verifiedAt": "2026-10-29" }
+      ],
+      "status": "experimental",
+      "reviewer": null,
+      "reviewedAt": null
+    },
+    {
+      "id": "PC-ATTESTATION-SCOPE",
+      "title": "Scope of each attestation",
+      "text": "Each attestation the Vendor delivers shall name exactly one deployment snapshot, deployment, profile, profile version and time window, and shall list every exclusion. A statement about one scope shall not be read as covering another snapshot, deployment, version or window.",
+      "regimes": ["general"],
+      "amcArtifact": "AMC scoped attestation record (schema v2)",
+      "sources": [
+        { "citation": "AMC Core Spec 1.0.0-draft.1, chapter 8 (scoped attestations)", "path": "spec/core/08-scoped-attestations.md", "verifiedAt": "2026-10-29" }
+      ],
+      "status": "experimental",
+      "reviewer": null,
+      "reviewedAt": null
+    },
+    {
+      "id": "PC-TEST-AND-MONITOR",
+      "title": "Right to test and monitor",
+      "text": "The Buyer, or a third party it appoints, may test and monitor the Covered System at [frequency] and at any time after a material change, including adversarial testing. The Buyer may use its own test data, which the Vendor shall not receive. The Vendor shall give the access and time the tests need. Where the Vendor runs a test itself, it shall describe the procedure and give results detailed enough for the Buyer to reproduce them. The Vendor shall not restrict the Buyer from disclosing internally how testing was done or what it found.",
+      "regimes": ["us-federal", "dora", "rbi"],
+      "amcArtifact": "AMC adversarial unauthorized-effects suite and its run records",
+      "limits": "A clean suite run is a finite test result, not proof of safety.",
+      "sources": [
+        { "citation": "OMB M-25-22 (3 Apr 2025), Sec. 4(d)(iii)(E)(I)-(III): agency-defined evaluation data kept from the vendor, vendor access and time for independent evaluation, and no bar on disclosing test procedures or results internally", "url": "https://www.whitehouse.gov/wp-content/uploads/2025/02/M-25-22-Driving-Efficient-Acquisition-of-Artificial-Intelligence-in-Government.pdf", "verifiedAt": "2026-10-29" },
+        { "citation": "Regulation (EU) 2022/2554 (DORA), Art. 30(3)(d): the provider participates and fully cooperates in the financial entity's TLPT (critical or important functions)", "url": "https://publications.europa.eu/resource/celex/32022R2554", "verifiedAt": "2026-10-29" },
+        { "citation": "RBI (Commercial Banks - Managing Risks in Outsourcing) Directions, 2025 (RBI/DOR/2025-26/171, 28 Nov 2025), para 34(iii): regular and continuous monitoring and assessment of the service provider by the bank", "url": "https://www.rbi.org.in/Scripts/BS_ViewMasDirections.aspx?id=13139", "verifiedAt": "2026-10-29" },
+        { "citation": "AMC adversarial suite", "path": "docs/ADVERSARIAL_SUITE.md", "verifiedAt": "2026-10-29" }
+      ],
+      "status": "experimental",
+      "reviewer": null,
+      "reviewedAt": null
+    },
+    {
+      "id": "PC-CHANGE-NOTICE",
+      "title": "Notice of new AI features and changes",
+      "text": "The Vendor shall notify the Buyer in writing at least [number] days before it deploys to the Covered System a new AI feature, enhancement or component, or a change of model, model provider or policy that governs the system's actions. The notice shall name what changes and the date, and shall include the evidence bundle for the version that will run. The Buyer may require the change to meet the agreed performance standards before deployment, and a rollback to the previous version if it does not.",
+      "regimes": ["us-federal", "dora"],
+      "amcArtifact": "AIBOM in successive evidence bundles; a change shows as a difference between two AIBOMs (`amc bundle diff`)",
+      "limits": "The AIBOM lists what the signed configuration declares, not what the agent ran. AMC does not send notices.",
+      "sources": [
+        { "citation": "OMB M-25-22 (3 Apr 2025), Sec. 4(d)(iii)(G) new feature notification, and Sec. 4(d)(iii)(F) performance standards before a new version and roll-back", "url": "https://www.whitehouse.gov/wp-content/uploads/2025/02/M-25-22-Driving-Efficient-Acquisition-of-Artificial-Intelligence-in-Government.pdf", "verifiedAt": "2026-10-29" },
+        { "citation": "Regulation (EU) 2022/2554 (DORA), Art. 30(3)(b): notice periods and notification of any development that might materially affect the provider's ability to provide the service (critical or important functions)", "url": "https://publications.europa.eu/resource/celex/32022R2554", "verifiedAt": "2026-10-29" },
+        { "citation": "AMC agent bill of materials", "path": "docs/AIBOM.md", "verifiedAt": "2026-10-29" }
+      ],
+      "status": "experimental",
+      "reviewer": null,
+      "reviewedAt": null
+    },
+    {
+      "id": "PC-INCIDENT-NOTICE",
+      "title": "Incident notice with evidence",
+      "text": "The Vendor shall notify the Buyer of any incident affecting the Covered System without undue delay and within [number] hours of detection, so that the Buyer can meet its own reporting deadlines. The notice shall include the incident's evidence records and a signed evidence packet, and the Vendor shall update it as facts change. The Vendor shall assist the Buyer with the incident at no additional cost or at a cost agreed in advance.",
+      "regimes": ["dora", "rbi"],
+      "amcArtifact": "AMC incident clock records and the regulator evidence packet",
+      "limits": "AMC computes and records deadlines; it does not file notices. Its clock durations are experimental until a named expert signs them off.",
+      "sources": [
+        { "citation": "Regulation (EU) 2022/2554 (DORA), Art. 30(2)(f): provider assistance when an ICT incident related to the service occurs, at no additional cost or at a cost determined ex-ante", "url": "https://publications.europa.eu/resource/celex/32022R2554", "verifiedAt": "2026-10-29" },
+        { "citation": "RBI (Commercial Banks - Managing Risks in Outsourcing) Directions, 2025 (RBI/DOR/2025-26/171, 28 Nov 2025), para 56: cyber incidents reported by the service provider without undue delay so the bank can report to RBI within six hours of detection; para 69(iii): incidents to be reported to the bank", "url": "https://www.rbi.org.in/Scripts/BS_ViewMasDirections.aspx?id=13139", "verifiedAt": "2026-10-29" },
+        { "citation": "AMC regulatory incident clocks", "path": "docs/REGULATORY_INCIDENT_CLOCKS.md", "verifiedAt": "2026-10-29" }
+      ],
+      "status": "experimental",
+      "reviewer": null,
+      "reviewedAt": null
+    },
+    {
+      "id": "PC-DATA-USE-AND-EXIT",
+      "title": "Data use, portability and exit",
+      "text": "The Vendor shall not use the Buyer's non-public inputs or the outputs produced for the Buyer to train or improve any model or service offered to others without the Buyer's prior written consent. On request, and when this Agreement ends, the Vendor shall return the Buyer's data, evidence bundles and audit exports in documented, machine-readable formats, and shall support a transition to another provider or to the Buyer for [transition period].",
+      "regimes": ["us-federal", "dora"],
+      "amcArtifact": "Evidence bundle and audit binder exports for portability; AMC does not observe what the Vendor trains on",
+      "sources": [
+        { "citation": "OMB M-25-22 (3 Apr 2025), Sec. 3(e)(iv): contracts permanently prohibit using non-public agency inputs and outputs to further train publicly or commercially available AI absent explicit agency consent; Sec. 4(d)(iii)(C) and 4(f)(i): vendor lock-in protections, data and model portability", "url": "https://www.whitehouse.gov/wp-content/uploads/2025/02/M-25-22-Driving-Efficient-Acquisition-of-Artificial-Intelligence-in-Government.pdf", "verifiedAt": "2026-10-29" },
+        { "citation": "Regulation (EU) 2022/2554 (DORA), Art. 30(2)(d): access, recovery and return of data in an easily accessible format on termination; Art. 30(3)(f): exit strategies with a mandatory adequate transition period", "url": "https://publications.europa.eu/resource/celex/32022R2554", "verifiedAt": "2026-10-29" },
+        { "citation": "AMC evidence bundles", "path": "docs/BUNDLES.md", "verifiedAt": "2026-10-29" },
+        { "citation": "AMC audit binder", "path": "docs/AUDIT_BINDER.md", "verifiedAt": "2026-10-29" }
+      ],
+      "status": "experimental",
+      "reviewer": null,
+      "reviewedAt": null
+    },
+    {
+      "id": "PC-AUDIT-ACCESS",
+      "title": "Audit and access rights",
+      "text": "The Buyer, its internal and external auditors, persons it appoints and its competent authorities may access, inspect and audit the Vendor's books, records, logs and evidence relevant to the Covered System, and may take copies. The Vendor shall cooperate fully with these audits and inspections and shall not limit them through other agreements or policies. The parties shall agree in advance the scope, procedure and frequency of audits.",
+      "regimes": ["rbi", "dora"],
+      "amcArtifact": "AMC audit binder (.amcaudit) and evidence bundles",
+      "sources": [
+        { "citation": "RBI (Commercial Banks - Managing Risks in Outsourcing) Directions, 2025 (RBI/DOR/2025-26/171, 28 Nov 2025), para 34(ii), (vii), (viii) and (ix): bank access to books and records, audit rights, RBI access to records and RBI inspection of the service provider", "url": "https://www.rbi.org.in/Scripts/BS_ViewMasDirections.aspx?id=13139", "verifiedAt": "2026-10-29" },
+        { "citation": "Regulation (EU) 2022/2554 (DORA), Art. 30(3)(e)(i)-(iv): unrestricted rights of access, inspection and audit, cooperation during inspections and audits, and their scope, procedure and frequency (critical or important functions)", "url": "https://publications.europa.eu/resource/celex/32022R2554", "verifiedAt": "2026-10-29" },
+        { "citation": "AMC audit binder", "path": "docs/AUDIT_BINDER.md", "verifiedAt": "2026-10-29" }
+      ],
+      "status": "experimental",
+      "reviewer": null,
+      "reviewedAt": null
+    },
+    {
+      "id": "PC-SUBPROCESSORS",
+      "title": "Sub-processors and model providers",
+      "text": "The Vendor shall list in [schedule] every sub-processor and model provider that takes part in operating the Covered System, with the regions where each processes and stores the Buyer's data. The Vendor shall notify the Buyer at least [number] days before adding or replacing one or changing a location, and shall obtain the Buyer's prior consent where [conditions]. The Vendor remains responsible for the performance of each sub-processor it uses.",
+      "regimes": ["dora", "rbi"],
+      "amcArtifact": "not provided by AMC",
+      "limits": "The AIBOM in an evidence bundle names the model providers the signed configuration declares; it is not a sub-processor list.",
+      "sources": [
+        { "citation": "Regulation (EU) 2022/2554 (DORA), Art. 30(2)(a) and (b): conditions for subcontracting, the locations where services are provided and data is processed and stored, and advance notice of location changes", "url": "https://publications.europa.eu/resource/celex/32022R2554", "verifiedAt": "2026-10-29" },
+        { "citation": "RBI (Commercial Banks - Managing Risks in Outsourcing) Directions, 2025 (RBI/DOR/2025-26/171, 28 Nov 2025), para 34(iv): prior approval or consent of the bank for subcontractors; para 69(xi) and (xiii): information on third parties in the supply chain and the provider's liability for its subcontractors", "url": "https://www.rbi.org.in/Scripts/BS_ViewMasDirections.aspx?id=13139", "verifiedAt": "2026-10-29" }
+      ],
+      "status": "experimental",
+      "reviewer": null,
+      "reviewedAt": null
+    },
+    {
+      "id": "PC-RBI-RETAINED-DECISIONS",
+      "title": "RBI: the regulated entity keeps the final decision",
+      "text": "For any function the Buyer may not outsource, including determining compliance with KYC norms for opening deposit accounts and giving sanction for loans, the Covered System shall only recommend. A named officer of the Buyer shall take and record each decision. The Vendor shall configure the system so that it cannot complete such a decision without that officer's recorded approval.",
+      "regimes": ["rbi"],
+      "amcArtifact": "AMC authorization records and approval receipts binding a human decision to the action",
+      "limits": "AMC records who approved an action; whether a function may be outsourced is the Buyer's determination under its own directions. The functions listed differ by entity type: the payments-bank directions omit loan sanction, and the urban co-operative bank directions word them differently.",
+      "sources": [
+        { "citation": "RBI (Commercial Banks - Managing Risks in Outsourcing) Directions, 2025 (RBI/DOR/2025-26/171, 28 Nov 2025), para 15: core management functions, including determining compliance with KYC norms for opening deposit accounts and giving sanction for loans, shall not be outsourced", "url": "https://www.rbi.org.in/Scripts/BS_ViewMasDirections.aspx?id=13139", "verifiedAt": "2026-10-29" },
+        { "citation": "RBI (Non-Banking Financial Companies - Managing Risks in Outsourcing) Directions, 2025 (RBI/DOR/2025-26/363, 28 Nov 2025), para 15: same functions for NBFCs, with intra-group outsourcing allowed under paras 45-51", "url": "https://www.rbi.org.in/Scripts/BS_ViewMasDirections.aspx?id=12941", "verifiedAt": "2026-10-29" },
+        { "citation": "AMC Core Spec 1.0.0-draft.1, chapter 7 (authorization records and receipts)", "path": "spec/core/07-authorization-and-receipts.md", "verifiedAt": "2026-10-29" }
+      ],
+      "status": "experimental",
+      "reviewer": null,
+      "reviewedAt": null
+    },
+    {
+      "id": "PC-DORA-REGISTER-AND-EXIT",
+      "title": "DORA: register of information and exit plan",
+      "text": "The Vendor shall give the Buyer, within [number] days of signature and of any change, the information the Buyer needs to keep its register of information on this arrangement in the format of the applicable implementing technical standards. The Vendor shall also give the information the Buyer needs to prepare, test and carry out its exit plan, including the functions supported, data locations, sub-processors and the transition steps.",
+      "regimes": ["dora"],
+      "amcArtifact": "not provided by AMC",
+      "sources": [
+        { "citation": "Regulation (EU) 2022/2554 (DORA), Art. 28(3): financial entities maintain a register of information on all contractual arrangements for ICT services; Art. 28(9): implementing technical standards set its templates", "url": "https://publications.europa.eu/resource/celex/32022R2554", "verifiedAt": "2026-10-29" },
+        { "citation": "Regulation (EU) 2022/2554 (DORA), Art. 28(8): exit strategies and tested exit plans for services supporting critical or important functions", "url": "https://publications.europa.eu/resource/celex/32022R2554", "verifiedAt": "2026-10-29" }
+      ],
+      "status": "experimental",
+      "reviewer": null,
+      "reviewedAt": null
+    }
+  ]
+}

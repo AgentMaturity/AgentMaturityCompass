@@ -1,14 +1,18 @@
-import { getPrivateKeyPem, getPublicKeyPem, signHexDigest } from "../keys.js";
+import { getSigningKey, getSigningPublicKeyPem, signHexDigest } from "../keys.js";
 import { sha256Hex } from "../../utils/hash.js";
-import type { SignKind, SignedDigest, SignatureEnvelope } from "./signerTypes.js";
+import { signingPurposeForKind, type SignKind, type SignedDigest, type SignatureEnvelope } from "./signerTypes.js";
+
 
 export function signDigestWithVault(params: {
   workspace: string;
   kind: SignKind;
   digestHex: string;
 }): SignedDigest {
-  const privateKeyPem = getPrivateKeyPem(params.workspace, "auditor");
-  const publicKeyPem = getPublicKeyPem(params.workspace, "auditor");
+  // P1-08: policy and configuration kinds sign with config-signature, every artifact with artifact-seal; the envelope
+  // names the key that actually signed.
+  const purpose = signingPurposeForKind(params.kind);
+  const privateKeyPem = getSigningKey(params.workspace, purpose);
+  const publicKeyPem = getSigningPublicKeyPem(params.workspace, purpose);
   const signature = signHexDigest(params.digestHex, privateKeyPem);
   const envelope: SignatureEnvelope = {
     v: 1,

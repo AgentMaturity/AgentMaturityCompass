@@ -1,0 +1,636 @@
+{
+  "schemaVersion": 1,
+  "audit": "P0-48 next-priority read-only preflight",
+  "timestampUtc": "2026-10-14T13:44:18.999004+00:00",
+  "acceptedMain": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+  "observedP047Head": "7a81b5aa7316471e841f4ae0ea684a64c85ae4a1",
+  "scope": "Queue preparation only. No P0-48 implementation, tests, builds, mutations, manifests, PRs, workflow triggers or publication performed; P0-29/P0-47/Claude work preserved.",
+  "primaryAcceptance": {
+    "source": "Merged PR40 body and check records",
+    "PR": {
+      "body": "Proposed plan issue **P0-48** (Gate G0, Urgent): make `build-test` finish on GitHub runners. It feeds P0-33 (\"CI green on main\"). Part of the [AMC Ready-to-Deploy Implementation Plan](https://claude.ai/code/artifact/153157e0-0d2f-4374-934b-5f6f360a46e1). Base: `main` @ `786d8abb`.\n\n## Problem\n\nEvery `build-test` run from 2026-09-16 to 2026-10-05 was **cancelled at its job timeout, with no log uploaded**. That covers `main` and PRs #34, #36 and #37. The last green run was 2026-07-15. Runs ignored their own step timeouts, so the runner agent itself had stalled; no test reported a failure.\n\n## Root cause\n\n`tests/foreignSubagentRunner.test.ts`, test \"a truncated answer is not an answer\":\n- Its fake agent prints 5 MiB with **no newline** (`head -c 5242880 /dev/zero | tr '\\0' 'x'`).\n- `spawnGovernedChild` tees child output to the parent's stdout.\n- The resulting single 5,242,903-byte line in the Actions log stalls the runner.\n\nBisected on GitHub in probe #39 (now closed):\n\n| Round | Run | Result |\n| --- | --- | --- |\n| 1 | [37363461747](https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/37363461747) | Coverage or plain, default or 2 workers: all 4 died |\n| 2 | [37371774017](https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/37371774017) | In a 12 GB container the runner still died; 87 GB disk and 13 GB RAM free |\n| 3 | [37381278303](https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/37381278303) | 8 shards: only shard 8 hung |\n| 4 | [37385666873](https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/37385666873) | Shard 8 in 8 parts: only part 4 hung |\n| 5 | [37389641298](https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/37389641298) | 24 single-file jobs: only this file hung |\n| 6 | [37392711874](https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/37392711874) | Original test, output to a file: runner survived. Patched test printing normally: passed in 1.5 min |\n\n## Fix\n\n1. In that one test, swallow the tee with `vi.spyOn(process.stdout, \"write\")`. The assertion is about what the runner records, not what it prints. Product behaviour is unchanged.\n2. In `ci.yml` \"Full suite and coverage thresholds\" and `npm-publish.yml` \"Test\", pipe the runner-log copy through `cut -c1-4096`. The full output still goes to the log artifact through `tee`. Both steps use `shell: bash` (`-eo pipefail`), so the test exit status still fails the step. No future giant line can stall a runner.\n\nChangeset: patch, \"contributor tooling only, no runtime change\".\n\n## Proof\n\n- **Regression evidence:** the probe rounds above. Locally, the original file writes one 5,242,903-byte line; with the fix its whole output is 420 bytes, and all 12 tests pass.\n- **Mutation:** removing the spy brings the 5 MiB line back (round 6 shows what that does on GitHub).\n- **Full local run of every CI step at `cde922e0`:**\n  - 1,522 test files, 21,409/21,409 tests passed under coverage; per-file floors pass.\n  - `release:gate` 17/19: only the D-11 source checks fail, as on `main`.\n  - Related and parity tests: 34 files, 7,263 tests pass.\n- **Acceptance:** this PR's own `build-test` jobs on GitHub must finish, for the first time since 2026-09-16.\n\n## Follow-up (not in this PR)\n\nProduct question: the monitor tees a foreign child's output straight to the operator's stdout with no line or size bound. A real delegate that prints a huge single line would do the same thing to a user's CI runner when AMC runs inside GitHub Actions (for example through `amc-action`).\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n",
+      "commits": [
+        {
+          "authoredDate": "2026-10-06T00:17:00Z",
+          "authors": [
+            {
+              "email": "adm1n@giggr.app",
+              "id": "U_kgDOBYua5w",
+              "login": "Giggr-admin",
+              "name": "AgentMaturity"
+            },
+            {
+              "email": "noreply@anthropic.com",
+              "id": "MDQ6VXNlcjgxODQ3",
+              "login": "claude",
+              "name": "Claude Opus 5.5"
+            }
+          ],
+          "committedDate": "2026-10-06T00:17:00Z",
+          "messageBody": "The test's fake agent writes 5 MiB of output with no newline, and the\nmonitor tees child output to this process's stdout. That single 5 MiB\nline reached the GitHub Actions log and stalled the runner until the\njob timed out with no log uploaded: every build-test run from\n2026-09-16 to 2026-10-05 was cancelled this way.\n\nFound by bisecting the suite on GitHub (probe PR #39): 8 shards, then\n8 parts of the hanging shard, then 24 single-file jobs. Only this file\nkilled its runner. With its output redirected to a file the runner\nsurvived (exit 0, longest line 5,242,903 bytes); with this fix it\npasses while printing normally (420 bytes in total locally).\n\nThe assertion is about what the runner records, so the tee is swallowed\nwith a spy on process.stdout.write for this one test.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>",
+          "messageHeadline": "test: stop the foreign-runner truncation test printing a 5 MiB line",
+          "oid": "2ffabf3f96af89912bab96f332ba0db811a762ee"
+        },
+        {
+          "authoredDate": "2026-10-06T00:17:00Z",
+          "authors": [
+            {
+              "email": "adm1n@giggr.app",
+              "id": "U_kgDOBYua5w",
+              "login": "Giggr-admin",
+              "name": "AgentMaturity"
+            },
+            {
+              "email": "noreply@anthropic.com",
+              "id": "MDQ6VXNlcjgxODQ3",
+              "login": "claude",
+              "name": "Claude Opus 5.5"
+            }
+          ],
+          "committedDate": "2026-10-06T00:17:00Z",
+          "messageBody": "The full test output still goes to the log artifact through tee. Only the\ncopy that reaches the Actions runner log is cut, so no future test that\nprints a giant line can stall a runner again. pipefail keeps the test\ncommand's exit status.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>",
+          "messageHeadline": "ci: cut runner-log lines at 4,096 bytes in the test steps",
+          "oid": "cde922e0a19c31aae9693d3d26cfdcaf27befe49"
+        }
+      ],
+      "mergeCommit": {
+        "oid": "63081f958d2372b300038176680fe01af4889efa"
+      },
+      "mergedAt": "2026-10-06T14:56:03Z",
+      "state": "MERGED",
+      "statusCheckRollup": [
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-06T00:38:16Z",
+          "conclusion": "FAILURE",
+          "detailsUrl": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/37395019648/job/112048811138",
+          "name": "amc-score",
+          "startedAt": "2026-10-06T00:38:01Z",
+          "status": "COMPLETED",
+          "workflowName": "AMC PR Gate"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-06T00:38:04Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/37395019475/job/112048810733",
+          "name": "changeset",
+          "startedAt": "2026-10-06T00:38:00Z",
+          "status": "COMPLETED",
+          "workflowName": "CI"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-06T00:40:31Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/37395019493/job/112048810505",
+          "name": "docker-build",
+          "startedAt": "2026-10-06T00:38:01Z",
+          "status": "COMPLETED",
+          "workflowName": "Docker Build"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-06T01:03:31Z",
+          "conclusion": "CANCELLED",
+          "detailsUrl": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/37395019475/job/112048810885",
+          "name": "build-test (22)",
+          "startedAt": "2026-10-06T00:38:01Z",
+          "status": "COMPLETED",
+          "workflowName": "CI"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-06T01:03:15Z",
+          "conclusion": "FAILURE",
+          "detailsUrl": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/37395019475/job/112048810954",
+          "name": "build-test (24)",
+          "startedAt": "2026-10-06T00:38:00Z",
+          "status": "COMPLETED",
+          "workflowName": "CI"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-06T00:39:19Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/37395019475/job/112048810858",
+          "name": "e2e-smoke-local",
+          "startedAt": "2026-10-06T00:38:01Z",
+          "status": "COMPLETED",
+          "workflowName": "CI"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-06T00:39:25Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/37395019475/job/112048811042",
+          "name": "clean-source",
+          "startedAt": "2026-10-06T00:38:01Z",
+          "status": "COMPLETED",
+          "workflowName": "CI"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-06T00:39:32Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/37395019475/job/112048810860",
+          "name": "packed-install",
+          "startedAt": "2026-10-06T00:38:00Z",
+          "status": "COMPLETED",
+          "workflowName": "CI"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-06T00:40:41Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/37395019475/job/112048810814",
+          "name": "docker-smoke",
+          "startedAt": "2026-10-06T00:38:00Z",
+          "status": "COMPLETED",
+          "workflowName": "CI"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-06T00:38:12Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/37395019475/job/112048811025",
+          "name": "helm-lint-template",
+          "startedAt": "2026-10-06T00:38:02Z",
+          "status": "COMPLETED",
+          "workflowName": "CI"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-10-06T00:39:22Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/37395019475/job/112048810962",
+          "name": "security-scan-lite",
+          "startedAt": "2026-10-06T00:38:01Z",
+          "status": "COMPLETED",
+          "workflowName": "CI"
+        }
+      ],
+      "title": "[P0-48] Stop a 5 MiB test log line from killing GitHub runners; cut runner-log lines in CI",
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/40"
+    },
+    "exactAcceptance": "this PR’s own build-test jobs on GitHub must finish, for the first time since2026-09-16",
+    "boundary": "Test-only stdout spy and Actions runner-log clipping with full artifact output and failing producer exit retained; product foreign-child stdout policy is expressly a follow-up, not in PR40."
+  },
+  "existingSource": [
+    {
+      "path": "tests/foreignSubagentRunner.test.ts",
+      "sha256": "446bee5c30d4cacecb7064896df3998eff21096c313b98f924fdc18123d2c7ed",
+      "P047HeadEqualsMain": true
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "sha256": "df7c6dd440e1e696bbea7fb13ce835b57b499c4b7afdfda1e5c95301f05f3092",
+      "P047HeadEqualsMain": true
+    },
+    {
+      "path": ".github/workflows/npm-publish.yml",
+      "sha256": "3c4bb58c740409850865514f3d07fe60efb115f471aa5aa2f307f28344e2f5f1",
+      "P047HeadEqualsMain": true
+    }
+  ],
+  "sourceEvidence": [
+    {
+      "path": "tests/foreignSubagentRunner.test.ts",
+      "main": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+      "gitBlob": "d1188c0e0d0c61bbefc22827910d01f6e16413fd",
+      "sha256": "446bee5c30d4cacecb7064896df3998eff21096c313b98f924fdc18123d2c7ed",
+      "firstLine": 159,
+      "lastLine": 186,
+      "excerpt": "describe(\"a truncated answer is not an answer\", () => {\n  it(\"refuses rather than reporting the part that fit\", async () => {\n    // The monitor caps recorded output at 4 MiB and says so with a\n    // `runtime_output_truncated` metric. Folding the rows anyway would hand the\n    // parent a silently-cut answer that reads as complete -- and the parent\n    // quotes it to its model as the delegate's finding.\n    const dir = workspace();\n    // 5 MiB of output, past the cap.\n    const runner = runnerFor(dir, fakeAgent(dir, \"head -c 5242880 /dev/zero | tr '\\\\0' 'x'\"));\n\n    // The monitor tees the child's output to this process's stdout, here as one\n    // 5 MiB line. A single line that long stalls the GitHub Actions runner's log\n    // pipeline until the job times out with no log at all (every CI build-test\n    // run from 2026-09-16 to 2026-10-05 died this way), so the tee is swallowed\n    // here. The assertion is about what the runner records, not what it prints.\n    const write = vi.spyOn(process.stdout, \"write\").mockImplementation(() => true);\n    let result: Awaited<ReturnType<typeof runner>>;\n    try {\n      result = await runner(ctx());\n    } finally {\n      write.mockRestore();\n    }\n\n    expect(result.ok).toBe(false);\n    expect(result.reason).toContain(\"cannot be reported in full\");\n  }, 60_000);\n});\n"
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "main": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+      "gitBlob": "faf724e45b4ff26e8a931924cd9efce23e01d9e0",
+      "sha256": "df7c6dd440e1e696bbea7fb13ce835b57b499c4b7afdfda1e5c95301f05f3092",
+      "firstLine": 152,
+      "lastLine": 185,
+      "excerpt": "      - name: Full suite and coverage thresholds\n        timeout-minutes: 45\n        shell: bash\n        # The full output goes to the log artifact; the runner log gets lines cut at\n        # 4,096 bytes. A test once teed a 5 MiB single-line answer to stdout, and a\n        # line that long stalls the Actions runner until the job times out with no\n        # log at all (every build-test run from 2026-09-16 to 2026-10-05).\n        run: |\n          mkdir -p tmp/ci-coverage\n          npm run test:coverage -- --exclude 'tests/performance/**' --reporter=default --reporter=json --reporter=hanging-process --outputFile.json=tmp/ci-coverage/tests.json 2>&1 | tee tmp/ci-coverage/tests.log | cut -c1-4096\n\n      # Throughput floors hold for uninstrumented code with the CPU to itself. Under\n      # coverage, with every worker busy, the 500 ev/s control-plane floor measured\n      # 477-496 ev/s on hosted runners, so the performance files run here instead.\n      - name: Performance floors (no coverage, one file at a time)\n        run: npx vitest run tests/performance --no-file-parallelism\n\n      # Tests must use temp workspaces; a write to a tracked or untracked path\n      # (for example .amc/keys/*) fails here. Ignored dist/, tmp/ and coverage/ do not show.\n      - name: Tests left the checkout clean\n        run: git status --porcelain=v1 --untracked-files=all > /tmp/after-tests.txt; if [ -s /tmp/after-tests.txt ]; then cat /tmp/after-tests.txt; exit 1; fi\n\n      - name: Per-file coverage floors\n        run: npm run check:coverage\n\n      - name: Upload coverage diagnostics\n        if: always()\n        uses: actions/upload-artifact@v7\n        with:\n          name: coverage-diagnostics-node-${{ matrix.node-version }}\n          path: |\n            tmp/ci-coverage/\n            coverage/coverage-summary.json\n          if-no-files-found: ignore"
+    },
+    {
+      "path": ".github/workflows/npm-publish.yml",
+      "main": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+      "gitBlob": "b06c697731e4014cd7e839931a3c6387ae84096c",
+      "sha256": "3c4bb58c740409850865514f3d07fe60efb115f471aa5aa2f307f28344e2f5f1",
+      "firstLine": 64,
+      "lastLine": 88,
+      "excerpt": "        # 4,096 bytes. A test once teed a 5 MiB single-line answer to stdout, and a\n        # line that long stalls the Actions runner until the job times out with no\n        # log at all (every build-test run from 2026-09-16 to 2026-10-05).\n        run: |\n          mkdir -p tmp/ci-tests\n          npm test -- --reporter=default --reporter=json --reporter=hanging-process --outputFile.json=tmp/ci-tests/tests.json 2>&1 | tee tmp/ci-tests/tests.log | cut -c1-4096\n\n      - name: Upload test diagnostics\n        if: always()\n        uses: actions/upload-artifact@v7\n        with:\n          name: npm-publish-test-diagnostics\n          path: tmp/ci-tests/\n          if-no-files-found: ignore\n\n      - name: Build\n        run: npm run build\n\n      - name: Prepack release guardrails\n        run: npm run release:prepack-check\n\n  release:\n    needs: test-build\n    runs-on: ubuntu-latest\n    steps:"
+    }
+  ],
+  "regressionCoverage": {
+    "existingTestFile": "tests/foreignSubagentRunner.test.ts",
+    "cases": 12,
+    "truncationCase": "refuses rather than reporting the part that fit;5MiB fake answer exceeds monitor4MiB recording cap; result.ok=false and reason cannot be reported in full",
+    "stdoutSpy": "process.stdout.write swallowed only around runner(ctx), restored in finally; product record/refusal assertions stay active",
+    "dedicatedWorkflowClipOrPipefailTestsFound": [],
+    "gap": "No dedicated committed regression directly tests4096console clipping/fulltee-byte retention/producer failure propagation. Use meaningful one-off pipeline qualification; do not infer from source alone."
+  },
+  "historicalAndCurrentRuns": [
+    {
+      "conclusion": "failure",
+      "createdAt": "2026-10-06T00:11:55Z",
+      "event": "pull_request",
+      "headBranch": "rtd/p0-48-ci-hang-probe",
+      "headSha": "80a51d1468c315373bffecb972e6a1d2074d7866",
+      "jobs": [
+        {
+          "name": "probe (original-redirected)",
+          "conclusion": "failure",
+          "databaseId": 112041325128,
+          "startedAt": "2026-10-06T00:11:58Z",
+          "completedAt": "2026-10-06T00:13:33Z",
+          "url": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/37392711874/job/112041325128",
+          "relevantSteps": [
+            {
+              "completedAt": "2026-10-06T00:13:30Z",
+              "conclusion": "failure",
+              "name": "Run original-redirected",
+              "number": 7,
+              "startedAt": "2026-10-06T00:13:01Z",
+              "status": "completed"
+            }
+          ]
+        },
+        {
+          "name": "probe (patched-printing)",
+          "conclusion": "success",
+          "databaseId": 112041325529,
+          "startedAt": "2026-10-06T00:11:58Z",
+          "completedAt": "2026-10-06T00:13:30Z",
+          "url": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/37392711874/job/112041325529",
+          "relevantSteps": []
+        }
+      ],
+      "status": "completed",
+      "updatedAt": "2026-10-06T00:13:34Z",
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/37392711874"
+    },
+    {
+      "conclusion": "failure",
+      "createdAt": "2026-10-06T00:37:58Z",
+      "event": "pull_request",
+      "headBranch": "rtd/p0-48-ci-runner-log-line",
+      "headSha": "cde922e0a19c31aae9693d3d26cfdcaf27befe49",
+      "jobs": [
+        {
+          "name": "build-test (22)",
+          "conclusion": "cancelled",
+          "databaseId": 112048810885,
+          "startedAt": "2026-10-06T00:38:01Z",
+          "completedAt": "2026-10-06T01:03:31Z",
+          "url": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/37395019475/job/112048810885",
+          "relevantSteps": [
+            {
+              "completedAt": "2026-10-06T01:03:28Z",
+              "conclusion": "cancelled",
+              "name": "Full suite and coverage thresholds",
+              "number": 18,
+              "startedAt": "2026-10-06T00:41:17Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-06T01:03:28Z",
+              "conclusion": "skipped",
+              "name": "Per-file coverage floors",
+              "number": 19,
+              "startedAt": "2026-10-06T01:03:28Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-06T01:03:29Z",
+              "conclusion": "success",
+              "name": "Upload coverage diagnostics",
+              "number": 20,
+              "startedAt": "2026-10-06T01:03:28Z",
+              "status": "completed"
+            }
+          ]
+        },
+        {
+          "name": "build-test (24)",
+          "conclusion": "failure",
+          "databaseId": 112048810954,
+          "startedAt": "2026-10-06T00:38:00Z",
+          "completedAt": "2026-10-06T01:03:15Z",
+          "url": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/37395019475/job/112048810954",
+          "relevantSteps": [
+            {
+              "completedAt": "2026-10-06T01:03:11Z",
+              "conclusion": "failure",
+              "name": "Full suite and coverage thresholds",
+              "number": 18,
+              "startedAt": "2026-10-06T00:39:58Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-06T01:03:11Z",
+              "conclusion": "skipped",
+              "name": "Per-file coverage floors",
+              "number": 19,
+              "startedAt": "2026-10-06T01:03:11Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-06T01:03:13Z",
+              "conclusion": "success",
+              "name": "Upload coverage diagnostics",
+              "number": 20,
+              "startedAt": "2026-10-06T01:03:11Z",
+              "status": "completed"
+            }
+          ]
+        }
+      ],
+      "status": "completed",
+      "updatedAt": "2026-10-06T01:03:32Z",
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/37395019475"
+    },
+    {
+      "conclusion": "failure",
+      "createdAt": "2026-10-06T14:56:03Z",
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "8d78504d5a18933f692adb7752d6dd7fe19df64f",
+      "jobs": [
+        {
+          "name": "build-test (22)",
+          "conclusion": "failure",
+          "databaseId": 112336127324,
+          "startedAt": "2026-10-06T14:56:06Z",
+          "completedAt": "2026-10-06T15:22:29Z",
+          "url": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/37483109284/job/112336127324",
+          "relevantSteps": [
+            {
+              "completedAt": "2026-10-06T15:22:25Z",
+              "conclusion": "success",
+              "name": "Full suite and coverage thresholds",
+              "number": 20,
+              "startedAt": "2026-10-06T14:58:31Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-06T15:22:25Z",
+              "conclusion": "failure",
+              "name": "Per-file coverage floors",
+              "number": 22,
+              "startedAt": "2026-10-06T15:22:25Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-06T15:22:27Z",
+              "conclusion": "success",
+              "name": "Upload coverage diagnostics",
+              "number": 23,
+              "startedAt": "2026-10-06T15:22:25Z",
+              "status": "completed"
+            }
+          ]
+        },
+        {
+          "name": "build-test (24)",
+          "conclusion": "cancelled",
+          "databaseId": 112336127502,
+          "startedAt": "2026-10-06T14:56:06Z",
+          "completedAt": "2026-10-06T15:23:45Z",
+          "url": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/37483109284/job/112336127502",
+          "relevantSteps": [
+            {
+              "completedAt": "2026-10-06T15:23:41Z",
+              "conclusion": "cancelled",
+              "name": "Full suite and coverage thresholds",
+              "number": 20,
+              "startedAt": "2026-10-06T14:59:10Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-06T15:23:41Z",
+              "conclusion": "skipped",
+              "name": "Per-file coverage floors",
+              "number": 22,
+              "startedAt": "2026-10-06T15:23:41Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-06T15:23:42Z",
+              "conclusion": "success",
+              "name": "Upload coverage diagnostics",
+              "number": 23,
+              "startedAt": "2026-10-06T15:23:41Z",
+              "status": "completed"
+            }
+          ]
+        }
+      ],
+      "status": "completed",
+      "updatedAt": "2026-10-06T15:23:46Z",
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/37483109284"
+    },
+    {
+      "conclusion": "failure",
+      "createdAt": "2026-10-11T10:39:02Z",
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+      "jobs": [
+        {
+          "name": "build-test (22)",
+          "conclusion": "failure",
+          "databaseId": 114450140435,
+          "startedAt": "2026-10-11T10:39:05Z",
+          "completedAt": "2026-10-11T11:10:55Z",
+          "url": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/38132701944/job/114450140435",
+          "relevantSteps": [
+            {
+              "completedAt": "2026-10-11T11:10:50Z",
+              "conclusion": "failure",
+              "name": "Full suite and coverage thresholds",
+              "number": 26,
+              "startedAt": "2026-10-11T10:41:43Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-11T11:10:50Z",
+              "conclusion": "skipped",
+              "name": "Per-file coverage floors",
+              "number": 29,
+              "startedAt": "2026-10-11T11:10:50Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-11T11:10:53Z",
+              "conclusion": "success",
+              "name": "Upload coverage diagnostics",
+              "number": 30,
+              "startedAt": "2026-10-11T11:10:50Z",
+              "status": "completed"
+            }
+          ]
+        },
+        {
+          "name": "build-test (24)",
+          "conclusion": "cancelled",
+          "databaseId": 114450140505,
+          "startedAt": "2026-10-11T10:39:04Z",
+          "completedAt": "2026-10-11T11:11:12Z",
+          "url": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/38132701944/job/114450140505",
+          "relevantSteps": [
+            {
+              "completedAt": "2026-10-11T11:11:08Z",
+              "conclusion": "cancelled",
+              "name": "Full suite and coverage thresholds",
+              "number": 26,
+              "startedAt": "2026-10-11T10:42:35Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-11T11:11:08Z",
+              "conclusion": "skipped",
+              "name": "Per-file coverage floors",
+              "number": 29,
+              "startedAt": "2026-10-11T11:11:08Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-11T11:11:09Z",
+              "conclusion": "success",
+              "name": "Upload coverage diagnostics",
+              "number": 30,
+              "startedAt": "2026-10-11T11:11:08Z",
+              "status": "completed"
+            }
+          ]
+        }
+      ],
+      "status": "completed",
+      "updatedAt": "2026-10-11T11:11:12Z",
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/38132701944"
+    }
+  ],
+  "authoritativeLogEvidence": [
+    {
+      "runId": 37392711874,
+      "jobId": 112041325128,
+      "fetchExit": 0,
+      "logSha256": "190b6e7cd627ad9a6c9cd2c3f063f1e0da44db382ec0aecab8e19113769c0387",
+      "lineCount": 368,
+      "longestGitHubLogLineChars": 444,
+      "selectedEvidence": [
+        "probe (original-redirected)\tUNKNOWN STEP\t2026-10-06T00:13:01.5420700Z ^[[36;1m  git show origin/main:tests/foreignSubagentRunner.test.ts > tests/foreignSubagentRunner.test.ts^[[0m",
+        "probe (original-redirected)\tUNKNOWN STEP\t2026-10-06T00:13:01.5421370Z ^[[36;1m  npx vitest run tests/foreignSubagentRunner.test.ts > /tmp/out.txt 2>&1; rc=$?^[[0m",
+        "probe (original-redirected)\tUNKNOWN STEP\t2026-10-06T00:13:01.5423536Z ^[[36;1m  npx vitest run tests/foreignSubagentRunner.test.ts --reporter=verbose^[[0m",
+        "probe (original-redirected)\tUNKNOWN STEP\t2026-10-06T00:13:30.7159591Z exit=0 bytes=5244733 longest=5242903",
+        "probe (original-redirected)\tUNKNOWN STEP\t2026-10-06T00:13:30.7255871Z ##[error]Process completed with exit code 1."
+      ],
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/37392711874/job/112041325128"
+    },
+    {
+      "runId": 37392711874,
+      "jobId": 112041325529,
+      "fetchExit": 0,
+      "logSha256": "1c09eb55a8b50c5740704b2208f49583d041adcfe8b5860f64892e823c0063d0",
+      "lineCount": 394,
+      "longestGitHubLogLineChars": 441,
+      "selectedEvidence": [
+        "probe (patched-printing)\tUNKNOWN STEP\t2026-10-06T00:12:59.2684513Z ^[[36;1m  git show origin/main:tests/foreignSubagentRunner.test.ts > tests/foreignSubagentRunner.test.ts^[[0m",
+        "probe (patched-printing)\tUNKNOWN STEP\t2026-10-06T00:12:59.2685183Z ^[[36;1m  npx vitest run tests/foreignSubagentRunner.test.ts > /tmp/out.txt 2>&1; rc=$?^[[0m",
+        "probe (patched-printing)\tUNKNOWN STEP\t2026-10-06T00:12:59.2687568Z ^[[36;1m  npx vitest run tests/foreignSubagentRunner.test.ts --reporter=verbose^[[0m",
+        "probe (patched-printing)\tUNKNOWN STEP\t2026-10-06T00:13:04.6778976Z  ^[[32m✓^[[39m tests/foreignSubagentRunner.test.ts^[[2m > ^[[22ma foreign child answers through the same seam^[[2m > ^[[22mreturns the child's own words, folded from its recorded output^[[33m 528^[[2mms^[[22m^[[39m",
+        "probe (patched-printing)\tUNKNOWN STEP\t2026-10-06T00:13:05.0566770Z  ^[[32m✓^[[39m tests/foreignSubagentRunner.test.ts^[[2m > ^[[22ma foreign child answers through the same seam^[[2m > ^[[22mpasses the goal to the foreign command^[[33m 390^[[2mms^[[22m^[[39m",
+        "probe (patched-printing)\tUNKNOWN STEP\t2026-10-06T00:13:05.4254142Z  ^[[32m✓^[[39m tests/foreignSubagentRunner.test.ts^[[2m > ^[[22ma foreign child answers through the same seam^[[2m > ^[[22mrefuses when the child exits non-zero, rather than returning partial words^[[33m 379^[[2mms^[[22m^[[39m",
+        "probe (patched-printing)\tUNKNOWN STEP\t2026-10-06T00:13:05.6938856Z  ^[[32m✓^[[39m tests/foreignSubagentRunner.test.ts^[[2m > ^[[22ma foreign child answers through the same seam^[[2m > ^[[22mrefuses a child that said nothing^[[33m 370^[[2mms^[[22m^[[39m",
+        "probe (patched-printing)\tUNKNOWN STEP\t2026-10-06T00:13:06.0405765Z  ^[[32m✓^[[39m tests/foreignSubagentRunner.test.ts^[[2m > ^[[22ma foreign child is governed or it does not run^[[2m > ^[[22mrefuses to spawn without a lease^[[32m 261^[[2mms^[[22m^[[39m",
+        "probe (patched-printing)\tUNKNOWN STEP\t2026-10-06T00:13:15.4102065Z  ^[[32m✓^[[39m tests/foreignSubagentRunner.test.ts^[[2m > ^[[22ma foreign child is governed or it does not run^[[2m > ^[[22mkeeps the child's lease out of the recorded output^[[33m 354^[[2mms^[[22m^[[39m",
+        "probe (patched-printing)\tUNKNOWN STEP\t2026-10-06T00:13:17.4116905Z  ^[[32m✓^[[39m tests/foreignSubagentRunner.test.ts^[[2m > ^[[22ma foreign child does not hang its parent^[[2m > ^[[22mrefuses on the deadline, and says it was the deadline^[[33m 10870^[[2mms^[[22m^[[39m",
+        "probe (patched-printing)\tUNKNOWN STEP\t2026-10-06T00:13:27.1759160Z  ^[[32m✓^[[39m tests/foreignSubagentRunner.test.ts^[[2m > ^[[22ma truncated answer is not an answer^[[2m > ^[[22mrefuses rather than reporting the part that fit^[[33m 854^[[2mms^[[22m^[[39m",
+        "probe (patched-printing)\tUNKNOWN STEP\t2026-10-06T00:13:27.4880771Z  ^[[32m✓^[[39m tests/foreignSubagentRunner.test.ts^[[2m > ^[[22ma foreign child stops when its parent gives up^[[2m > ^[[22mkills the process on the signal rather than running to completion^[[33m 9414^[[2mms^[[22m^[[39m",
+        "probe (patched-printing)\tUNKNOWN STEP\t2026-10-06T00:13:27.8803245Z  ^[[32m✓^[[39m tests/foreignSubagentRunner.test.ts^[[2m > ^[[22ma foreign child cannot be continued^[[2m > ^[[22mrefuses a continuable request instead of pretending^[[33m 302^[[2mms^[[22m^[[39m",
+        "probe (patched-printing)\tUNKNOWN STEP\t2026-10-06T00:13:28.2675900Z  ^[[32m✓^[[39m tests/foreignSubagentRunner.test.ts^[[2m > ^[[22ma foreign child is governed by the same chokepoint as an in-process one^[[2m > ^[[22mruns through spawnSubagent with a signed packet and an announced session^[[33m 408^[[2mms^[[22m^[[39m",
+        "probe (patched-printing)\tUNKNOWN STEP\t2026-10-06T00:13:28.2784030Z  ^[[32m✓^[[39m tests/foreignSubagentRunner.test.ts^[[2m > ^[[22ma foreign child is governed by the same chokepoint as an in-process one^[[2m > ^[[22msettles a crashed foreign child as failed, not as a silent success^[[33m 377^[[2mms^[[22m^[[39m",
+        "probe (patched-printing)\tUNKNOWN STEP\t2026-10-06T00:13:28.2826431Z ^[[2m Test Files ^[[22m ^[[1m^[[32m1 passed^[[39m^[[22m^[[90m (1)^[[39m",
+        "probe (patched-printing)\tUNKNOWN STEP\t2026-10-06T00:13:28.2827696Z ^[[2m      Tests ^[[22m ^[[1m^[[32m12 passed^[[39m^[[22m^[[90m (12)^[[39m"
+      ],
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/37392711874/job/112041325529"
+    },
+    {
+      "runId": 37395019475,
+      "jobId": 112048810954,
+      "fetchExit": 0,
+      "logSha256": "bbbcb4f86dda2ae95f3f2df24353b50326618df6ccbf18da54107a0a491c9b3c",
+      "lineCount": 7117,
+      "longestGitHubLogLineChars": 613,
+      "selectedEvidence": [
+        "build-test (24)\tUNKNOWN STEP\t2026-10-06T00:39:53.3708663Z ##[error]Process completed with exit code 1.",
+        "build-test (24)\tUNKNOWN STEP\t2026-10-06T00:39:58.9170793Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}",
+        "build-test (24)\tUNKNOWN STEP\t2026-10-06T00:52:47.9659347Z  ^[[32m✓^[[39m tests/foreignSubagentRunner.test.ts ^[[2m(^[[22m^[[2m12 tests^[[22m^[[2m)^[[22m^[[33m 27041^[[2mms^[[22m^[[39m",
+        "build-test (24)\tUNKNOWN STEP\t2026-10-06T01:03:11.2749212Z ^[[2m Test Files ^[[22m ^[[1m^[[31m3 failed^[[39m^[[22m^[[2m | ^[[22m^[[1m^[[32m1517 passed^[[39m^[[22m^[[2m | ^[[22m^[[33m2 skipped^[[39m^[[90m (1522)^[[39m",
+        "build-test (24)\tUNKNOWN STEP\t2026-10-06T01:03:11.2750159Z ^[[2m      Tests ^[[22m ^[[1m^[[31m4 failed^[[39m^[[22m^[[2m | ^[[22m^[[1m^[[32m21377 passed^[[39m^[[22m^[[2m | ^[[22m^[[33m25 skipped^[[39m^[[90m (21406)^[[39m",
+        "build-test (24)\tUNKNOWN STEP\t2026-10-06T01:03:11.2755055Z ##[error]Process completed with exit code 1."
+      ],
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/37395019475/job/112048810954"
+    },
+    {
+      "runId": 38132701944,
+      "jobId": 114450140435,
+      "fetchExit": 0,
+      "logSha256": "f93a3cf6835170dd14448f762bd2188b030d0ca9dee8347e52502380f6cff25e",
+      "lineCount": 11334,
+      "longestGitHubLogLineChars": 4157,
+      "selectedEvidence": [
+        "build-test (22)\tUNKNOWN STEP\t2026-10-11T10:41:38.7018333Z ##[error]Process completed with exit code 1.",
+        "build-test (22)\tUNKNOWN STEP\t2026-10-11T10:41:43.2395465Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}",
+        "build-test (22)\tUNKNOWN STEP\t2026-10-11T10:58:11.5958329Z  ^[[32m✓^[[39m tests/foreignSubagentRunner.test.ts ^[[2m(^[[22m^[[2m12 tests^[[22m^[[2m)^[[22m^[[33m 26770^[[2mms^[[22m^[[39m",
+        "build-test (22)\tUNKNOWN STEP\t2026-10-11T11:10:49.7846746Z ^[[2m Test Files ^[[22m ^[[1m^[[31m17 failed^[[39m^[[22m^[[2m | ^[[22m^[[1m^[[32m1587 passed^[[39m^[[22m^[[2m | ^[[22m^[[33m2 skipped^[[39m^[[90m (1606)^[[39m",
+        "build-test (22)\tUNKNOWN STEP\t2026-10-11T11:10:49.7847765Z ^[[2m      Tests ^[[22m ^[[1m^[[31m104 failed^[[39m^[[22m^[[2m | ^[[22m^[[1m^[[32m22972 passed^[[39m^[[22m^[[2m | ^[[22m^[[33m27 skipped^[[39m^[[90m (23103)^[[39m",
+        "build-test (22)\tUNKNOWN STEP\t2026-10-11T11:10:50.6717104Z ##[error]Process completed with exit code 1."
+      ],
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/38132701944/job/114450140435"
+    }
+  ],
+  "conclusions": {
+    "runnerStall": "Recovered historical proof: patched-printing probe passed12tests. Original-redirected printed exit0 bytes5244733 longest5242903 although probe job concludedfailure; it reached terminal output. Latermain37483109284 Node22 full-suite step succeeded and uploaded logs before failing per-file coverage. Thus the old giant-line runner stall has primary evidence of recovery.",
+    "originalPRMatrix": "PR40 Node24 full suite reached real assertion failures and uploaded diagnostics; Node22 full-suite step wascancelled. The original both-job finish criterion was not satisfied by the rollup.",
+    "currentMain": "Latestmain38132701944 at5ea Node22 finished with104failed22972passed27skipped tests, foreignSubagentRunner12passed, successful diagnostics upload; Node24 cancelled. Current green CI or completed two-node matrix is not established.",
+    "failureCauseLimit": "Failed/cancelled jobs must not be relabelled green. Matrix failure-cancellation is source-consistent but its cause is not asserted solely from timestamps.",
+    "alreadyMerged": "P0-48 source is present and identical at current P0-47 head. Do not recreate merged code or blanket-overlay any workflow."
+  },
+  "minimalQualification": [
+    {
+      "check": "Use already-running P0-47 correctness report when available",
+      "command": "Inspect tests/foreignSubagentRunner.test.ts outcomes in the existing pinned full report",
+      "purpose": "Avoid rerunning equivalent whole suites if this exact test blob already passed; preserve actual SHA/runtime and result provenance."
+    },
+    {
+      "check": "Focused foreign runner regression on Node22 and Node24 if not covered by that report",
+      "command": "npx vitest run tests/foreignSubagentRunner.test.ts --reporter=default --reporter=json --outputFile.json=/private/tmp/p0-48-foreign-runner-NODE.json > /private/tmp/p0-48-foreign-runner-NODE.log 2>&1",
+      "purpose": "Require all12 cases including truncated output refusal; capture raw output to a file and measure total/maximum line size without echoing a giant line."
+    },
+    {
+      "check": "One-off pipeline byte and exit-status qualification",
+      "command": "Replay the exact bash -eo pipefail producer | tee FULL_LOG | cut -c1-4096 pipeline with a synthetic5MiB ASCII single line and a producer that exits17; redirect console output to CONSOLE_LOG. Assert full log retains all bytes, console line is4096characters and shell exits17. Repeat with producer exit0.",
+      "purpose": "Qualify clipping and failure propagation directly; no product changes or new dependency is needed."
+    },
+    {
+      "check": "Reversible stdout-spy mutation",
+      "command": "In an owned isolated checkout only, remove the stdout spy for the single truncated-answer case, run only that case with allstdout/stderr redirected to a file, measure the giant line, and restore exact test bytes.",
+      "purpose": "Prove the spy matters while preserving recorded-output refusal assertions and avoiding hostile runner-console output."
+    },
+    {
+      "check": "Hosted runner acceptance",
+      "command": "Read both Node22/24 build-test job results at a fresh explicitly pinned candidate/merged head; confirm full test step reaches its result and diagnostics upload, recording any assertion/coverage failures or matrix cancellations separately.",
+      "purpose": "Local pipeline smoke cannot alone establish the original hosted matrix completion criterion. No workflow trigger, PR, push or publication is authorized by this preflight."
+    }
+  ],
+  "dependenciesAndLimits": [
+    "P0-48 feeds P0-33 CI qualification; assertion/coverage failures and matrix cancellation remain P0-33/inherited issue debt, separate from giant-line clipping.",
+    "Use Node22 and Node24 with pnpm10.33.0 and ABI-compatible installed dependencies in an owned isolated checkout. This preflight installed/rebuilt nothing.",
+    "GitHub job acceptance requires hosted execution evidence; local stdout capture is a scoped regression proof only.",
+    "No log cap is applied to the full diagnostic artifact: tee precedes cut. Explicit shell:bash actually logged bash --noprofile --norc -e -o pipefail in current GitHub run.",
+    "Current npm-publish test step remains protected, but its release/publish behavior is outside P0-48 scope; do not trigger that workflow for a log qualification.",
+    "Raw foreign-child product stdout remains unbounded by this change, per explicit PR40 follow-up; no successor key is invented here."
+  ]
+}

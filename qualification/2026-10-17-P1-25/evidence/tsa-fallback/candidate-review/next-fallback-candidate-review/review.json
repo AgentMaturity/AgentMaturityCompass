@@ -1,0 +1,111 @@
+{
+  "schema": "p125-next-fallback-candidate-independent-review/1",
+  "at": "2026-10-16T22:03:48.787132+00:00",
+  "blockers": [],
+  "fixesRequested": [],
+  "allReadsFinished": true,
+  "candidate": {
+    "path": "/private/tmp/p1-25-client-qualification-20261017/next-fallback-test-design/tsaFallback.test.ts",
+    "bytes": 16974,
+    "sha256": "3f3eb0f312d18eef34d9625fe725b385ad29ff9d2042c533a1a41acdb2c1c5a0",
+    "readScope": "all candidate lines fully read; no parser/import/execution",
+    "lines": 291,
+    "fixedLiteralBodies": 4,
+    "prospectiveTarget": "tests/time/tsaFallback.test.ts",
+    "sourceAllocation": false,
+    "executedParsedImportedOrCompiled": false
+  },
+  "pins": {
+    "all45AuthorInputsExact": true,
+    "all5SealedOutputsExact": true,
+    "authorSealExact": true,
+    "scopeRefreshOrOwnershipReleaseClaim": false
+  },
+  "sourceAuthority": {
+    "candidateCheckoutDerivedFromImportMeta": true,
+    "sourceBaseline": "5beb3eae69b08f2e895520c7f459e1465780beeb",
+    "newMetadataOrHeldRunnerSourceAdopted": false,
+    "scope": "Review current stable implementation and the sealed private future candidate. Root client metadata closure and fresh ownership/admission remain prerequisites to any allocation; no clean-tree assumption is made."
+  },
+  "fourCases": [
+    {
+      "id": "OFFLINE",
+      "literal": {
+        "line": 212,
+        "title": "returns the exact default config and offline result without configured TSAs"
+      },
+      "fit": "loadTimeConfig resolves only the explicit owned workspace; absent .amc/time section uses materialized Zod defaults. timestampDigest returns before trust-context loading and before configured TSA dispatch when tsa is empty. Literal expected defaults and result fit the source.",
+      "resources": "Fixture creates an unlistened server object but never binds; no listening/socket/request handles are acquired. A private0700 root is removed in finally, with errors retained.",
+      "limit": "Returned API contract and observed future zero fixture dispatch; no universal no-I/O or native/environment isolation claim."
+    },
+    {
+      "id": "NO-ANCHOR",
+      "literal": {
+        "line": 223,
+        "title": "skips an unmatched anchor before the wire beside a matching-anchor refusal"
+      },
+      "fit": "A real matching-anchor HTTP500 call is asserted first. Current requestTimestamp filters supplied anchors and pushes the named failure before continue when selection is empty. The unmatched route must remain unrequested while the next matched route reaches the listener.",
+      "firstWitnessLine": 237,
+      "laterWitnessLine": 238,
+      "masking": "An earlier genuine-token positive or matching wire positive/setup failure masks the zero-wire witness. If zero-wire fails, later route and named-result assertions are masked.",
+      "limit": "Caller-supplied configured anchor selection, not signed trust-list authentication or a TSA grant."
+    },
+    {
+      "id": "ORDER",
+      "literal": {
+        "line": 245,
+        "title": "preserves literal attempt and failure order through finite HTTP, malformed and imprint refusals"
+      },
+      "fit": "Single configured HTTP500 positive precedes the multi-TSA body. Actual product source captures and awaits the TSA array serially. Fixed routes represent HTTP500, malformed finite DER and the unchanged genuine signed token; the last uses a deterministic different imprint.",
+      "firstLiteralOrderListLine": 262,
+      "masking": "Literal wire order precedes grant/failure/body-size assertions. Any order or continuation failure masks those later assertions; genuine fixture or single-TSA setup failure masks all later witnesses.",
+      "limit": "Refusal continuation and failure ordering only; no fresh-nonce success/fallback credit."
+    },
+    {
+      "id": "TIMEOUT-CONTINUE",
+      "literal": {
+        "line": 272,
+        "title": "continues after the unchanged 10000 ms default abort to a real next-route refusal"
+      },
+      "fit": "timeoutMs is absent, so undefined reaches postTimestampQuery\u2019s unchanged default10000. The first owned route sends no response; the real client abort closes it, then the next finite500 route must be observed. Actual routes/duration/failure strings are logged before assertions.",
+      "firstDispatchWitnessLine": 287,
+      "strictCaughtMessageAssertionLine": 288,
+      "masking": "Dispatch order is asserted before the exact named failure array; a continuation failure masks the later abort-message assertion, while safe lifecycle facts are emitted in finally.",
+      "strictUnexecutedExpectation": "The operation was aborted is a Node22 caught Error.message literal that still needs the actual run. requestTimestamp exposes strings here, so this case makes no typed ABORT_ERR proof.",
+      "deadlines": "Client10000ms and Vitest30000ms remain unchanged. No shortened timer, fake clock, timeout override, retry, signal or duration threshold."
+    }
+  ],
+  "genuineFixture": {
+    "existingPublicTokenAndRootMetadataPinned": true,
+    "fixtureDirectoryBoundToActualImportMetaCheckout": true,
+    "filesRegularNotSymlink": true,
+    "dataDigestMatchesPublicInput": true,
+    "otherDigestDeterministicallyDifferent": true,
+    "positiveCode": "The candidate actually calls verifyTimestampToken with original token/digest/fixed nonce/genuine root before using the same token as a wrong-imprint response. It requires ok and exact digest/genTime/anchor plus revocationCheckedfalse. This new positive has not been run during static review.",
+    "verificationPrecedence": "Current verifier parses CMS, resolves ESS signer and verifies signature, then compares imprint before nonce. The fixed OTHER_DIGEST therefore avoids a random-nonce inequality premise.",
+    "noNewSignaturesKeysOrGrantObjects": true,
+    "noCryptoExecutionByReview": true
+  },
+  "resourceAndErrorReview": {
+    "lexicalOwner": "One fixture owns server, private workspace, request/response/socket records, terminal promises, unexpected errors, primary error and cleanup errors. Handlers/observers attach before acquisition and the listener binds only literal127.0.0.1 port0.",
+    "setupFailures": "Workspace/setup/listen/address/body failures are captured. A never-listened server has no listening-handle closure requirement; a started server is ordinarily closed. General and temporary listen-error listeners preserve the same primary object without swallowing failure.",
+    "finiteReplies": "Replies have exact content length and Connection:close. Unexpected routes/handler failures retain the handler error and attempt only a finite500 response; the error remains a cleanup failure rather than silently passing.",
+    "naturalTerminals": "Finally stops accepting with server.close, awaits all tracked request/response/socket close promises, asserts request end and response state, accounts every unexpected owned error, and removes only the owned temp root. Only the explicitly stalled route can classify ECONNRESET/EPIPE as expected peer-abort errors.",
+    "primaryIdentity": "A sole primary error is rethrown unchanged; actual additional cleanup errors produce a primary-first AggregateError. Identical owned errors are not duplicated.",
+    "safePublication": "Lifecycle facts contain synthetic routes/method/body byte counts/terminal booleans and error names/codes, never request bodies/nonces, token bytes, headers, forms or private keys. Default-timeout failures are synthetic per-TSA public strings; no successful secret-bearing grant is logged.",
+    "guards": "No environment/DNS/policy/registry/native/vault fixture or guard replacement. Fresh owned workspaces use the normal missing-policy/registry no_rule preflight; the test does not manufacture a residency denial needing ledger cleanup. Existing worker setup remains separate.",
+    "runtimeLimit": "Natural closure/setup/error behavior is a static fit and future strict assertions; it is not proven until root runs the candidate. No hidden client/worker resource or universal isolation claim."
+  },
+  "futureControlFit": {
+    "F1Order": "Single-element HTTP500 control is unchanged by reversal; literal multi-attempt dispatch is the first intended semantic witness. No mutant/recipe/result created here.",
+    "F2NoContinue": "ORDER and TIMEOUT-CONTINUE put actual later dispatch before later failure diagnostics; early stop must be classified from the actual first frames, with masks retained.",
+    "F3UnpinnedDispatch": "NO-ANCHOR zero-wire assertion follows a genuine matching listener refusal, so all-zero fixture/setup behavior cannot falsely establish selection.",
+    "predictedCountsOrResults": false
+  },
+  "limits": [
+    "No import/parser/test/product/helper/compiler/native/SQL/network/process probe or source/index/RES/QA write occurred. Standard-library public-byte/hash/JSON/text checks only.",
+    "No full issue, matching fresh-nonce grant, successful ordered fallback, required-time caller, checkpoint/session/issuance/report integration, public TSA/library approval, full suite/quality-green or plan completion.",
+    "Current client metadata must close and root must refresh exact source/ownership/D15/hosted/freeze admission before any new test allocation. Old181 roots do not establish the next current scope.",
+    "F37 skip, held decisions, P1-01 gaps, missing reservations and Claude/R work remain protected. Any receipt source copy must be inert."
+  ]
+}

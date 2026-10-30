@@ -11,6 +11,8 @@ const STATIONS = ["environment", "health", "wealth", "education", "mobility", "t
 const DEFAULT_QUESTION_COUNT = 244;
 /** Sector-pack question total, measured from the registry rather than restated as a literal. */
 const SECTOR_QUESTION_COUNT = listIndustryPacks().reduce((sum, pack) => sum + pack.questions.length, 0);
+/** P1-42 review: every published sector-question count says what the questions are; scripts/gen-counts.mjs writes it. */
+const SECTOR_LABEL = "experimental, self-reported sector-specific";
 
 const PRODUCT_COUNT_FILES = [
   "README.md",
@@ -68,14 +70,17 @@ describe("public diagnostic question-count claims", () => {
 
     expect(readProjectFile("website/blog/langchain-scoring-tutorial.html")).toContain("244 default diagnostic questions");
     expect(readProjectFile("website/blog/langchain-scoring-tutorial.html")).toContain(`${DEFAULT_QUESTION_COUNT + SECTOR_QUESTION_COUNT} total`);
+    expect(readProjectFile("website/blog/langchain-scoring-tutorial.html")).toContain(`${SECTOR_QUESTION_COUNT} ${SECTOR_LABEL} questions`);
     expect(readProjectFile("website/vs-promptfoo.html")).toContain("264 with lifecycle expansion");
-    expect(readProjectFile("docs/adr/005-free-core-paid-industry-packs.md")).toContain(`${SECTOR_QUESTION_COUNT} sector-specific diagnostic questions`);
+    expect(readProjectFile("docs/adr/005-free-core-paid-industry-packs.md")).toContain(`${SECTOR_QUESTION_COUNT} ${SECTOR_LABEL} diagnostic questions`);
   });
 
   test("industry station pages match compiled sector-pack counts", () => {
     for (const station of STATIONS) {
       const { packCount, totalQuestions } = getStationSummary(station);
-      expect(readProjectFile(`website/station-${station}.html`), station).toContain(`${packCount} diagnostic packs · ${totalQuestions} questions`);
+      const page = readProjectFile(`website/station-${station}.html`);
+      expect(page, station).toContain(`${packCount} diagnostic packs · ${totalQuestions} experimental, self-reported questions`);
+      expect(page, station).toContain(`Station: ${packCount} packs · ${totalQuestions} experimental, self-reported questions`);
     }
   });
 
@@ -83,12 +88,27 @@ describe("public diagnostic question-count claims", () => {
     const whitepaper = readProjectFile("whitepaper/AMC_WHITEPAPER_v1.md");
     const total = DEFAULT_QUESTION_COUNT + SECTOR_QUESTION_COUNT;
     const expected = [
-      `${DEFAULT_QUESTION_COUNT} default diagnostic questions plus ${SECTOR_QUESTION_COUNT} sector-specific questions`,
-      `${total} questions (${DEFAULT_QUESTION_COUNT} default + ${SECTOR_QUESTION_COUNT} sector-specific)`,
+      `${DEFAULT_QUESTION_COUNT} default diagnostic questions plus ${SECTOR_QUESTION_COUNT} ${SECTOR_LABEL} questions`,
+      `${total} questions (${DEFAULT_QUESTION_COUNT} default + ${SECTOR_QUESTION_COUNT} ${SECTOR_LABEL})`,
     ];
     const missing = expected.filter((phrase) => !whitepaper.includes(phrase));
     expect(missing, "whitepaper/AMC_WHITEPAPER_v1.md must state the registry's sector-pack question count").toEqual([]);
     expect(whitepaper).not.toContain("140 core diagnostic questions plus 600 sector-specific questions");
     expect(whitepaper).not.toContain("740 questions (140 core + 600 sector-specific)");
+  });
+});
+
+describe("sector-pack counts are generated with their label (P1-42 review)", () => {
+  test("no current-facing surface states a sector question count without saying experimental and self-reported", () => {
+    for (const path of ["whitepaper/AMC_WHITEPAPER_v1.md", "docs/adr/005-free-core-paid-industry-packs.md", "website/blog/langchain-scoring-tutorial.html"]) {
+      expect(readProjectFile(path), path).not.toMatch(/\b\d[\d,]* sector-specific (?:diagnostic )?questions/);
+    }
+    const table = readProjectFile("docs/DOMAIN_PACKS.md");
+    expect(table).toContain("| Station | Packs | Questions (experimental, self-reported) |");
+    expect(table).toContain(`| **Total** | **41** | **${SECTOR_QUESTION_COUNT}** |`);
+    for (const station of STATIONS) {
+      const { packCount, totalQuestions } = getStationSummary(station);
+      expect(table, station).toContain(`| \`${station}\` | ${packCount} | ${totalQuestions} |`);
+    }
   });
 });

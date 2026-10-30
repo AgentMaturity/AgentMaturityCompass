@@ -1,0 +1,8 @@
+{
+  "source": "f10d97257bc1fc7cb04f5cda98624b38793e456a",
+  "finalThreeTestsMatchCorrectedTypes": true,
+  "all45OriginalSourceAndTestPinsMatch": true,
+  "finalNormalBuildAndRuntimeCompletedSequentially": true,
+  "typesHead": "8c16a9044ddea43923e3ed49bc36a9aada485855",
+  "proof": "The committed candidate differs only by3newtestfiles+10inventoryupdates; all source/config/oldtests and finalthree types inputs are byte-identical to the executed phases. No Node24/whole-suite/full-coverage or productionrepair inference."
+}

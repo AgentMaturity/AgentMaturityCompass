@@ -1,0 +1,27 @@
+{
+  "at": "2026-10-16T10:58:39.461812+00:00",
+  "exit": 0,
+  "sourceCommit": "b8850be74eb342bb04dbc7dc3786a9393325f436",
+  "parent": "bce7bbbb24a94b0a372036c054962cd50a9f7732",
+  "branch": "codex/p1-37-qualification",
+  "clean": true,
+  "paths": [
+    "README.md",
+    "CONTRIBUTING.md",
+    "website/index.html",
+    "website/lite.html",
+    "website/i18n.js",
+    "docs/content/show-hn-draft.md",
+    "docs/content/reddit-launch-drafts.md",
+    "docs/internal/competitive-landscape.md",
+    "docs/internal/mirofish-simulation-council.md",
+    "whitepaper/AMC_WHITEPAPER_v1.md",
+    "tests/autoCompaction.test.ts"
+  ],
+  "productionChanged": false,
+  "sourceInputPinsPreserved": 43,
+  "ordinaryCommit": true,
+  "forceOrNoVerify": false,
+  "hostedRefreshUsesNormalOperatorGhConfig": "Read-only metadata only; previous private-HOME authentication refusal retained. AMC runtimes keep private HOME.",
+  "formalDone": false
+}

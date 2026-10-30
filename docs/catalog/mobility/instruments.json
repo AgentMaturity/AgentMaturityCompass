@@ -1,0 +1,563 @@
+{
+  "schemaVersion": 1,
+  "station": "mobility",
+  "support": "experimental",
+  "review": "pending",
+  "promotion": "none",
+  "scope": "Document-only candidate inventory; no new S5, law-as-data or publisher-host row. Controls are operator-policy drafts with no asserted statutory clause mapping.",
+  "sourceInventory": {
+    "integrationRevision": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+    "path": "src/compliance/regulatory/register.json",
+    "sha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+    "matchedExactS5Rows": 8,
+    "candidatesWithoutExactS5Rows": 12,
+    "limit": "The ADS candidate has only a related combined GSR source; that is not an exact eu-ads-ir identity. Candidate records never inherit source verification status or source read dates."
+  },
+  "instruments": [
+    {
+      "id": "us-fair-housing-act",
+      "market": "US",
+      "title": "Fair Housing Act tenant-screening candidate",
+      "status": "unverified",
+      "reverify": true,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "retrievedAt": null,
+      "contentSha256": null,
+      "legalReview": null,
+      "source": {
+        "url": null,
+        "readThisTask": false,
+        "registerId": null,
+        "provenancePath": null,
+        "provenanceSha256": null,
+        "note": "Inherited repository metadata and discovery locators are not a primary-source fetch or legal review."
+      },
+      "discoveryLocators": [],
+      "note": "Protected-class proxy and adverse-reason legal scope require primary and fair-housing expert review."
+    },
+    {
+      "id": "us-nhtsa-sgo-av-framework",
+      "market": "US",
+      "title": "NHTSA crash reporting / AV Framework candidate",
+      "status": "unverified",
+      "reverify": true,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "retrievedAt": null,
+      "contentSha256": null,
+      "legalReview": null,
+      "source": {
+        "url": null,
+        "readThisTask": false,
+        "registerId": "us-nhtsa-sgo-av-framework",
+        "provenancePath": "src/compliance/regulatory/register.json",
+        "provenanceSha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+        "note": "Inherited repository metadata and discovery locators are not a primary-source fetch or legal review."
+      },
+      "discoveryLocators": [
+        {
+          "url": "https://www.federalregister.gov/documents/2026/07/31/2026-15483/av-framework-updates-and-request-for-comments-on-interim-guidance",
+          "provenancePath": "src/compliance/regulatory/register.json#us-nhtsa-sgo-av-framework.sources[0]",
+          "provenanceSha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+          "purpose": "discovery_only",
+          "readThisTask": false
+        }
+      ],
+      "note": "Existing S5 row combines SGO and AV Framework guidance. Exact current crash thresholds, recipients and deadlines are not verified by this task."
+    },
+    {
+      "id": "us-fmvss",
+      "market": "US",
+      "title": "Federal Motor Vehicle Safety Standards candidate",
+      "status": "unverified",
+      "reverify": true,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "retrievedAt": null,
+      "contentSha256": null,
+      "legalReview": null,
+      "source": {
+        "url": null,
+        "readThisTask": false,
+        "registerId": null,
+        "provenancePath": null,
+        "provenanceSha256": null,
+        "note": "Inherited repository metadata and discovery locators are not a primary-source fetch or legal review."
+      },
+      "discoveryLocators": [],
+      "note": "No clause-specific source or safety/type-approval applicability determination is supplied."
+    },
+    {
+      "id": "us-faa",
+      "market": "US",
+      "title": "FAA aviation rules candidate",
+      "status": "unverified",
+      "reverify": true,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "retrievedAt": null,
+      "contentSha256": null,
+      "legalReview": null,
+      "source": {
+        "url": null,
+        "readThisTask": false,
+        "registerId": null,
+        "provenancePath": null,
+        "provenanceSha256": null,
+        "note": "Inherited repository metadata and discovery locators are not a primary-source fetch or legal review."
+      },
+      "discoveryLocators": [],
+      "note": "No particular rule, aircraft scope or clause is invented; aviation advice stays advisory with human sign-off."
+    },
+    {
+      "id": "eu-nis2",
+      "market": "EU",
+      "title": "NIS2 transport reporting candidate",
+      "status": "unverified",
+      "reverify": true,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "retrievedAt": null,
+      "contentSha256": null,
+      "legalReview": null,
+      "source": {
+        "url": null,
+        "readThisTask": false,
+        "registerId": "eu-nis2",
+        "provenancePath": "src/compliance/regulatory/register.json",
+        "provenanceSha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+        "note": "Inherited repository metadata and discovery locators are not a primary-source fetch or legal review."
+      },
+      "discoveryLocators": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/32022L2555",
+          "provenancePath": "src/compliance/regulatory/register.json#eu-nis2.sources[0]",
+          "provenanceSha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+          "purpose": "discovery_only",
+          "readThisTask": false
+        }
+      ],
+      "note": "Available early-warning clock/control is only 24-hour draft arithmetic; full reporting, entity scope and national authority remain open."
+    },
+    {
+      "id": "eu-eidas2",
+      "market": "EU",
+      "title": "eIDAS trusted-identification candidate",
+      "status": "unverified",
+      "reverify": true,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "retrievedAt": null,
+      "contentSha256": null,
+      "legalReview": null,
+      "source": {
+        "url": null,
+        "readThisTask": false,
+        "registerId": "eu-eidas2",
+        "provenancePath": "src/compliance/regulatory/register.json",
+        "provenanceSha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+        "note": "Inherited repository metadata and discovery locators are not a primary-source fetch or legal review."
+      },
+      "discoveryLocators": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/32024R1183",
+          "provenancePath": "src/compliance/regulatory/register.json#eu-eidas2.sources[0]",
+          "provenanceSha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+          "purpose": "discovery_only",
+          "readThisTask": false
+        }
+      ],
+      "note": "Relying-party, identity and clause facts need a primary read; no wallet/date conclusion is copied from inherited metadata."
+    },
+    {
+      "id": "eu-port-services",
+      "market": "EU",
+      "title": "EU Port Services Regulation candidate",
+      "status": "unverified",
+      "reverify": true,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "retrievedAt": null,
+      "contentSha256": null,
+      "legalReview": null,
+      "source": {
+        "url": null,
+        "readThisTask": false,
+        "registerId": null,
+        "provenancePath": null,
+        "provenanceSha256": null,
+        "note": "Inherited repository metadata and discovery locators are not a primary-source fetch or legal review."
+      },
+      "discoveryLocators": [],
+      "note": "This historical candidate ID is absent from S5; port-service/access fixture behavior does not establish all port-service duties."
+    },
+    {
+      "id": "eu-epbd",
+      "market": "EU",
+      "title": "Energy Performance of Buildings Directive candidate",
+      "status": "unverified",
+      "reverify": true,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "retrievedAt": null,
+      "contentSha256": null,
+      "legalReview": null,
+      "source": {
+        "url": null,
+        "readThisTask": false,
+        "registerId": "eu-epbd",
+        "provenancePath": "src/compliance/regulatory/register.json",
+        "provenanceSha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+        "note": "Inherited repository metadata and discovery locators are not a primary-source fetch or legal review."
+      },
+      "discoveryLocators": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/32024L1275",
+          "provenancePath": "src/compliance/regulatory/register.json#eu-epbd.sources[0]",
+          "provenanceSha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+          "purpose": "discovery_only",
+          "readThisTask": false
+        }
+      ],
+      "note": "Building thresholds, transposition and dates remain unverified for this draft; real-estate questionnaire content is not a decisive fixture."
+    },
+    {
+      "id": "eu-gsr",
+      "market": "EU",
+      "title": "General Safety Regulation and combined ADS record candidate",
+      "status": "unverified",
+      "reverify": true,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "retrievedAt": null,
+      "contentSha256": null,
+      "legalReview": null,
+      "source": {
+        "url": null,
+        "readThisTask": false,
+        "registerId": "eu-gsr",
+        "provenancePath": "src/compliance/regulatory/register.json",
+        "provenanceSha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+        "note": "Inherited repository metadata and discovery locators are not a primary-source fetch or legal review."
+      },
+      "discoveryLocators": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/32019R2144",
+          "provenancePath": "src/compliance/regulatory/register.json#eu-gsr.sources[0]",
+          "provenanceSha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+          "purpose": "discovery_only",
+          "readThisTask": false
+        }
+      ],
+      "note": "S5 combines GSR with IR 2022/1426; type approval and driver-data duties need expert review."
+    },
+    {
+      "id": "eu-ads-ir",
+      "market": "EU",
+      "title": "Implementing Regulation 2022/1426 ADS candidate",
+      "status": "unverified",
+      "reverify": true,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "retrievedAt": null,
+      "contentSha256": null,
+      "legalReview": null,
+      "source": {
+        "url": null,
+        "readThisTask": false,
+        "registerId": null,
+        "provenancePath": null,
+        "provenanceSha256": null,
+        "note": "Inherited repository metadata and discovery locators are not a primary-source fetch or legal review.",
+        "relatedRegisterIds": [
+          "eu-gsr"
+        ]
+      },
+      "discoveryLocators": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/32022R1426",
+          "provenancePath": "src/compliance/regulatory/register.json#eu-gsr.sources[1]",
+          "provenanceSha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+          "purpose": "discovery_only",
+          "readThisTask": false
+        }
+      ],
+      "note": "No exact eu-ads-ir S5 identity exists. The related eu-gsr row mentions this instrument; it is not an invented alias or separate verified register entry."
+    },
+    {
+      "id": "eu-efti",
+      "market": "EU",
+      "title": "Electronic Freight Transport Information candidate",
+      "status": "unverified",
+      "reverify": true,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "retrievedAt": null,
+      "contentSha256": null,
+      "legalReview": null,
+      "source": {
+        "url": null,
+        "readThisTask": false,
+        "registerId": "eu-efti",
+        "provenancePath": "src/compliance/regulatory/register.json",
+        "provenanceSha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+        "note": "Inherited repository metadata and discovery locators are not a primary-source fetch or legal review."
+      },
+      "discoveryLocators": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/32020R1056",
+          "provenancePath": "src/compliance/regulatory/register.json#eu-efti.sources[0]",
+          "provenanceSha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+          "purpose": "discovery_only",
+          "readThisTask": false
+        }
+      ],
+      "note": "No platform status, authority acceptance or operative deadline is established by this task."
+    },
+    {
+      "id": "unece-r155",
+      "market": "EU",
+      "title": "UN Regulation 155 vehicle cybersecurity candidate",
+      "status": "unverified",
+      "reverify": true,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "retrievedAt": null,
+      "contentSha256": null,
+      "legalReview": null,
+      "source": {
+        "url": null,
+        "readThisTask": false,
+        "registerId": null,
+        "provenancePath": null,
+        "provenanceSha256": null,
+        "note": "Inherited repository metadata and discovery locators are not a primary-source fetch or legal review."
+      },
+      "discoveryLocators": [
+        {
+          "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=OJ%3AL_202500005",
+          "provenancePath": "src/domains/deep/mobility.ts#mobility-deep-02",
+          "provenanceSha256": "ab06637debd03748f22eaa4509c605aa2b70ff82f5878e0662d8760fe3db6f1c",
+          "purpose": "discovery_only",
+          "readThisTask": false
+        }
+      ],
+      "note": "Split from the spec combined unece-r155-r156 label; neither primary text nor paragraph sufficiency has been reviewed here."
+    },
+    {
+      "id": "unece-r156",
+      "market": "EU",
+      "title": "UN Regulation 156 software-update management candidate",
+      "status": "unverified",
+      "reverify": true,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "retrievedAt": null,
+      "contentSha256": null,
+      "legalReview": null,
+      "source": {
+        "url": null,
+        "readThisTask": false,
+        "registerId": null,
+        "provenancePath": null,
+        "provenanceSha256": null,
+        "note": "Inherited repository metadata and discovery locators are not a primary-source fetch or legal review."
+      },
+      "discoveryLocators": [
+        {
+          "url": "https://unece.org/sites/default/files/2024-03/R156e%20(2).pdf",
+          "provenancePath": "src/domains/deep/mobility.ts#mobility-deep-03",
+          "provenanceSha256": "ab06637debd03748f22eaa4509c605aa2b70ff82f5878e0662d8760fe3db6f1c",
+          "purpose": "discovery_only",
+          "readThisTask": false
+        }
+      ],
+      "note": "The local update-record fields are a draft fixture contract, not a complete interpretation of R156."
+    },
+    {
+      "id": "eu-ai-act",
+      "market": "EU",
+      "title": "AI Act Annex I/type-approval route candidate",
+      "status": "unverified",
+      "reverify": true,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "retrievedAt": null,
+      "contentSha256": null,
+      "legalReview": null,
+      "source": {
+        "url": null,
+        "readThisTask": false,
+        "registerId": "eu-ai-act",
+        "provenancePath": "src/compliance/regulatory/register.json",
+        "provenanceSha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+        "note": "Inherited repository metadata and discovery locators are not a primary-source fetch or legal review."
+      },
+      "discoveryLocators": [
+        {
+          "url": "https://publications.europa.eu/resource/celex/32024R1689",
+          "provenancePath": "src/compliance/regulatory/register.json#eu-ai-act.sources[0]",
+          "provenanceSha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+          "purpose": "discovery_only",
+          "readThisTask": false
+        }
+      ],
+      "note": "The spec states 2 August 2028 for an Annex I route. That is an unverified spec claim here; dated profiles and actual legal route remain P2-11 work."
+    },
+    {
+      "id": "easa-npa-2025-07",
+      "market": "EU",
+      "title": "EASA NPA 2025-07 candidate",
+      "status": "unverified",
+      "reverify": true,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "retrievedAt": null,
+      "contentSha256": null,
+      "legalReview": null,
+      "source": {
+        "url": null,
+        "readThisTask": false,
+        "registerId": null,
+        "provenancePath": null,
+        "provenanceSha256": null,
+        "note": "Inherited repository metadata and discovery locators are not a primary-source fetch or legal review."
+      },
+      "discoveryLocators": [],
+      "note": "Proposal content and dates are uncertain and unread; this metadata does not turn an NPA into a binding rule."
+    },
+    {
+      "id": "isps",
+      "market": "RoW",
+      "title": "ISPS Code port-facility/interface candidate",
+      "status": "unverified",
+      "reverify": true,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "retrievedAt": null,
+      "contentSha256": null,
+      "legalReview": null,
+      "source": {
+        "url": null,
+        "readThisTask": false,
+        "registerId": null,
+        "provenancePath": null,
+        "provenanceSha256": null,
+        "note": "Inherited repository metadata and discovery locators are not a primary-source fetch or legal review."
+      },
+      "discoveryLocators": [],
+      "note": "Current-level access is only a synthetic subset; full plan, SSP, Declaration-of-Security, monitoring and drill duties remain open."
+    },
+    {
+      "id": "marpol",
+      "market": "RoW",
+      "title": "MARPOL ship-emissions candidate",
+      "status": "unverified",
+      "reverify": true,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "retrievedAt": null,
+      "contentSha256": null,
+      "legalReview": null,
+      "source": {
+        "url": null,
+        "readThisTask": false,
+        "registerId": null,
+        "provenancePath": null,
+        "provenanceSha256": null,
+        "note": "Inherited repository metadata and discovery locators are not a primary-source fetch or legal review."
+      },
+      "discoveryLocators": [],
+      "note": "Ship-sulphur/ECA conversion belongs to P2-27; no emission/date finding is made."
+    },
+    {
+      "id": "imdg",
+      "market": "RoW",
+      "title": "IMDG dangerous-goods candidate",
+      "status": "unverified",
+      "reverify": true,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "retrievedAt": null,
+      "contentSha256": null,
+      "legalReview": null,
+      "source": {
+        "url": null,
+        "readThisTask": false,
+        "registerId": null,
+        "provenancePath": null,
+        "provenanceSha256": null,
+        "note": "Inherited repository metadata and discovery locators are not a primary-source fetch or legal review."
+      },
+      "discoveryLocators": [],
+      "note": "Training, documentation, stowage and segregation are not established by these six signatures."
+    },
+    {
+      "id": "iso-21434",
+      "market": "Standard",
+      "title": "ISO/SAE 21434 vehicle cybersecurity candidate",
+      "status": "unverified",
+      "reverify": true,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "retrievedAt": null,
+      "contentSha256": null,
+      "legalReview": null,
+      "source": {
+        "url": null,
+        "readThisTask": false,
+        "registerId": null,
+        "provenancePath": null,
+        "provenanceSha256": null,
+        "note": "Inherited repository metadata and discovery locators are not a primary-source fetch or legal review."
+      },
+      "discoveryLocators": [],
+      "note": "The historical ID is absent from S5; licensed text, TARA completeness and functional-safety scope remain unread/unreviewed."
+    },
+    {
+      "id": "intl-iso-pas-8800",
+      "market": "Standard",
+      "title": "ISO/PAS 8800:2024 AI safety candidate",
+      "status": "unverified",
+      "reverify": true,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "retrievedAt": null,
+      "contentSha256": null,
+      "legalReview": null,
+      "source": {
+        "url": null,
+        "readThisTask": false,
+        "registerId": "intl-iso-pas-8800",
+        "provenancePath": "src/compliance/regulatory/register.json",
+        "provenanceSha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+        "note": "Inherited repository metadata and discovery locators are not a primary-source fetch or legal review."
+      },
+      "discoveryLocators": [
+        {
+          "url": "https://www.iso.org/standard/83303.html",
+          "provenancePath": "src/compliance/regulatory/register.json#intl-iso-pas-8800.sources[0]",
+          "provenanceSha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+          "purpose": "discovery_only",
+          "readThisTask": false
+        }
+      ],
+      "note": "Spec/inherited metadata mention December 2024 publication; no publication/effective date or licensed clause read is asserted here."
+    }
+  ],
+  "notSubstitutes": [
+    {
+      "id": "us-ca-crd-ads",
+      "reason": "Actual S5 record is employment FEHA ADS, not a housing source; it is not substituted for Fair Housing Act."
+    },
+    {
+      "id": "us-fmcsa-ads",
+      "reason": "Actual S5 record concerns ADS commercial motor-carrier rules; it is not substituted for FMVSS, FAA or NHTSA crash-reporting duties."
+    },
+    {
+      "id": "unece-r155-r156",
+      "reason": "Historical combined ID is absent from S5. Two unread candidate metadata rows retain R155/R156 discovery provenance separately."
+    }
+  ]
+}

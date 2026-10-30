@@ -11,20 +11,50 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { pathExists } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
-import { loadBlobPlaintext } from "../storage/blobs/blobStore.js";
+import { loadBlobMetadata, loadBlobPlaintext } from "../storage/blobs/blobStore.js";
+import { loadCurrentBlobKey, readBlobKeyMaterial, VaultLockedError, verifyBlobCurrentKeySignature } from "../storage/blobs/blobKeys.js";
 import type { RetentionProofIndex } from "../ops/retention/retentionArchive.js";
 import type { EvidenceEvent } from "../types.js";
+import { inlinePlaintextOrNull } from "./encryption/ledgerCipher.js";
 
 export function verifyEvidencePayload(
   event: EvidenceEvent,
   workspace: string,
   errors: string[],
   externallyAuthenticatedPayloads?: ReadonlyMap<string, string>,
-  retentionProofs?: RetentionProofIndex
+  retentionProofs?: RetentionProofIndex,
+  /** Rows whose payload could not be checked here (key out of reach): reported, never counted as verified. */
+  notEvaluated?: string[],
+  /**
+   * WP35c: an encrypted blob whose vaulted key is held by a locked vault here is listed in `notEvaluated` instead of
+   * failing, as an encrypted inline payload always is. Only for a reader of the signed metadata (a delegated child's hook
+   * forwarder, which never holds the vault passphrase); every other key or blob failure still fails (blobKeyOutOfReach).
+   */
+  blobKeyOptional = false
 ): void {
   verifyEventRetentionState(event, workspace, errors, retentionProofs);
   if (event.payload_inline !== null) {
-    const payloadSha = sha256Hex(Buffer.from(event.payload_inline, "utf8"));
+    // P2-09: never trust either inline column alone. Each is opened where encrypted; "not evaluated" is reported only
+    // when the key is out of reach (provider unreachable or vault locked), never counted as verified. Any other failure
+    // (missing or rolled-back key file, unknown key version, a ciphertext that does not open) is an error.
+    let plain: string | null;
+    let canonical: string | null;
+    try {
+      plain = inlinePlaintextOrNull(workspace, event.id, event.payload_inline);
+      canonical = event.canonical_payload_inline === null || event.canonical_payload_inline === undefined || event.canonical_payload_inline === event.payload_inline
+        ? plain : inlinePlaintextOrNull(workspace, event.id, event.canonical_payload_inline);
+    } catch {
+      errors.push(`Event ${event.id} payload authentication failed`);
+      return;
+    }
+    const columnsDiffer = event.canonical_payload_inline != null && event.canonical_payload_inline !== event.payload_inline;
+    if (plain === null || (columnsDiffer && canonical === null)) {
+      if (columnsDiffer) errors.push(`Event ${event.id} payload_inline differs from canonical_payload_inline and cannot be compared without the ledger key`);
+      else notEvaluated?.push(`Event ${event.id} payload not evaluated: the ledger key is unavailable here`);
+      return;
+    }
+    if (columnsDiffer && canonical !== plain) errors.push(`Event ${event.id} payload_inline differs from canonical_payload_inline`);
+    const payloadSha = sha256Hex(Buffer.from(plain, "utf8"));
     if (payloadSha !== event.payload_sha256) errors.push(`Event ${event.id} payload hash mismatch`);
     return;
   }
@@ -55,7 +85,30 @@ export function verifyEvidencePayload(
       const actualStoredDigest = sha256Hex(readFileSync(join(workspace, payloadPath)));
       if (actualStoredDigest === expectedStoredDigest) return;
     }
+    if (blobKeyOptional && blobKeyOutOfReach(workspace, payloadPath, event.payload_sha256)) {
+      notEvaluated?.push(`Event ${event.id} payload not evaluated: the blob key is unavailable here`);
+      return;
+    }
     errors.push(`Event ${event.id} payload authentication failed`);
+  }
+}
+
+/**
+ * Whether `payloadPath` is an encrypted blob naming `payloadSha256`, under a key version this workspace issued (1 up to
+ * the signed current version; rotation adds one), whose key is held by a locked vault here. The envelope header is not
+ * authenticated without the key, so its version must be an issued one; any other key failure (the unvaulted key, the
+ * no-sign key, a missing secret in an unlocked vault, bad key material) is not "out of reach".
+ */
+function blobKeyOutOfReach(workspace: string, payloadPath: string, payloadSha256: string): boolean {
+  try {
+    const meta = loadBlobMetadata(workspace, payloadPath);
+    if (meta.keyVersion === null || meta.payloadSha256 !== payloadSha256 || !verifyBlobCurrentKeySignature(workspace).valid) return false;
+    // Issued vaulted versions only: 0 is the unvaulted key, and none is above the signed current version.
+    if (meta.keyVersion < 1 || meta.keyVersion > loadCurrentBlobKey(workspace).keyVersion) return false;
+    readBlobKeyMaterial(workspace, meta.keyVersion);
+    return false;
+  } catch (error) {
+    return error instanceof VaultLockedError;
   }
 }
 

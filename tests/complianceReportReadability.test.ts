@@ -3,6 +3,7 @@ import { resolve } from "node:path";
 import { describe, expect, test } from "vitest";
 import { complianceReportToMarkdown, diffComplianceReports } from "../src/compliance/complianceReport.js";
 import type { ComplianceReportJson } from "../src/compliance/mappingSchema.js";
+import { renderClaimLegend } from "../src/claims/eligibility/render.js";
 
 const longHash = "abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890";
 
@@ -59,6 +60,23 @@ function fixtureReport(): ComplianceReportJson {
 }
 
 describe("compliance report readability", () => {
+  test("renders each category's service-decided claim, separately from the aggregate", () => {
+    const base = fixtureReport();
+    const category = base.categories[0]!;
+    const mixed: ComplianceReportJson = { ...base, configTrusted: true, configReason: null,
+      coverage: { ...base.coverage, missing: 1, evaluated: 1, score: 0 },
+      categories: [category, { ...category, id: "observed-failure", category: "Observed failure", status: "MISSING",
+        claimKind: "observed", result: "fail", evidence: "sufficient", claimReasons: [],
+        dimensions: { ...category.dimensions, result: "fail", evidence: "sufficient", applicability: { state: "applicable" } } }]
+    };
+    const markdown = complianceReportToMarkdown(mixed);
+    expect(markdown).toContain("### Art. 9 Risk Management (NOT_EVALUATED)\n\n**Claim:** Self-reported · **Result:** not evaluated");
+    expect(markdown).toContain("### Observed failure (MISSING)\n\n**Claim:** Observed · **Result:** fail · **Evidence:** sufficient");
+    expect(markdown.split("\n").filter((line) => line.startsWith("**Claim:**"))).toHaveLength(3);
+    expect(markdown.split("\n").filter((line) => line.startsWith("**Claim:**"))).toMatchSnapshot();
+    expect(markdown).toContain(renderClaimLegend("markdown"));
+  });
+
   test("truncates evidence hashes and prints config remediation guidance", () => {
     const markdown = complianceReportToMarkdown(fixtureReport());
 
@@ -105,8 +123,24 @@ describe("compliance report readability", () => {
     expect(diff.categoryDeltas).toEqual([{ id: "eu-ai-act-art-9", before: "NOT_EVALUATED", after: "UNKNOWN" }]);
   });
 
+  test("labels every family's mappings experimental and prints the family's currency flags (P1-45)", () => {
+    const experimental = "- Mappings: experimental: drafted and refuted by AI agents, not signed off by a named expert (D-08 pending).";
+    const euAiAct = complianceReportToMarkdown(fixtureReport());
+    expect(euAiAct).toContain(experimental);
+    expect(euAiAct).not.toContain("- Flag:");
+    const hti1 = complianceReportToMarkdown({ ...fixtureReport(), framework: "HHS_HTI_1" });
+    expect(hti1).toContain(experimental);
+    expect(hti1).toContain("- Flag: At risk: an HTI-5 final rule may delete model-card requirements; re-verify before publishing.");
+    const colorado = complianceReportToMarkdown({ ...fixtureReport(), framework: "CO_AI_ACT" });
+    expect(colorado).toContain("SB26-189 publisher page and act were captured on 2026-10-19");
+    expect(colorado).toContain("remain unverified under the source-text policy");
+    expect(colorado).toContain("current-law applicability review remain pending");
+    // A report from an older version with a framework this build does not know still says experimental.
+    expect(complianceReportToMarkdown({ ...fixtureReport(), framework: "RETIRED_FRAMEWORK" })).toContain(experimental);
+  });
+
   test("keeps the UX audit aligned with current compliance report readability", () => {
-    const audit = readFileSync(resolve(process.cwd(), "docs/UX_AUDIT_REPORT.md"), "utf8");
+    const audit = readFileSync(resolve(process.cwd(), "docs/archive/UX_AUDIT_REPORT.md"), "utf8");
 
     expect(audit).toContain("R10 — compliance reports shorten evidence refs and show config fixes");
     expect(audit).toContain("Full hashes remain available in JSON reports");

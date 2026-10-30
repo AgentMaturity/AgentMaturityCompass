@@ -1,0 +1,14 @@
+{
+  "at": "2026-10-16T20:51:02.284439+00:00",
+  "label": "before-controls",
+  "boundPathsEachRoot": 65,
+  "protectedInputs": 113,
+  "allSourceFreshBytesExact": true,
+  "nativePhysicalPinsExact": true,
+  "heldRHead18RowsAndEmptyIndexExact": true,
+  "bothTreesClean": true,
+  "bothIndexesEmpty": true,
+  "targetRegularSingleLink": true,
+  "targetInode": 543356676,
+  "boundary": "Current read-only snapshot only. No claim of continuous isolation or an unrecorded earlier physical check."
+}

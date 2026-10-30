@@ -1,0 +1,27 @@
+
+ RUN  v4.1.11 /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout
+
+ ✓ tests/surfaceCompaction.test.ts (6 tests) 1461ms
+ ✓ tests/surfaceHistoryCompaction.test.ts (14 tests) 3328ms
+     ✓ measures current authenticated bytes, preserves the origin and reconstructs both cutoffs  307ms
+stdout | tests/autoCompaction.test.ts > automatic compaction: synthetic provider usage, real signed loop evidence > uses a real no-tools summary request at the next high boundary, preserves user authority and exports public signed evidence
+[amc-p137-public-evidence] {"path":"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p137-public-observation-cX6k5h/public-evidence.json","bytes":48514,"sha256":"017453fd36fb7855a795874a9ab04f687396c874452108a5aba89e1096ebefe2"}
+
+ ✓ tests/autoCompaction.test.ts (31 tests) 6080ms
+     ✓ uses the exact threshold at 7000 measured prompt tokens  442ms
+     ✓ uses the exact threshold at 7999 measured prompt tokens  356ms
+     ✓ uses the exact threshold at 8000 measured prompt tokens  365ms
+     ✓ prunes only old results at 8500, protects the recent two before counts and records the next measured effect  361ms
+     ✓ orders eligible large outputs by measured bytes then original order, leaving small and recent outputs intact  412ms
+     ✓ retains the actual encrypted spill object and measures the signed preview rather than full-output tokens  445ms
+     ✓ does not compact with unset and reports unmeasured usage only when enabled  324ms
+     ✓ does not compact with null and reports unmeasured usage only when enabled  334ms
+     ✓ caps successful compaction boundaries at three in one turn and resets the count on the next turn  771ms
+     ✓ uses a real no-tools summary request at the next high boundary, preserves user authority and exports public signed evidence  1549ms
+
+ Test Files  3 passed (3)
+      Tests  51 passed (51)
+   Start at  16:30:01
+   Duration  8.72s (transform 5.36s, setup 64ms, import 7.43s, tests 10.87s, environment 0ms)
+
+JSON report written to /private/tmp/p1-37-post-typecheck-20261016/p137-fresh-canonical.raw.json

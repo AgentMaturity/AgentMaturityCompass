@@ -1,0 +1,6 @@
+# F5 verdicts adopted into the catalog (P1-34; docs/catalog/GOVERNANCE.md). F5's per-question verdicts (keep, rewrite,
+# merge, drop) were drafted and refuted by AI agents. A verdict changes catalog content only when a human review record
+# confirms it (an aiInputs entry of kind f5_verdict, confirmed, ref "<station>/<packId>/<questionId>") and a row here
+# names that record. None is confirmed: D-08 has named no reviewers yet, and P0-26 handles F5's drops with Sid.
+confirmationsVersion: 1
+confirmations: []

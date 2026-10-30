@@ -1,0 +1,23 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`renderBenchCompareMarkdown > renders comparison markdown 1`] = `
+[
+  "**Claim:** Self-reported · **Result:** not evaluated (no evidence events were recorded) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** applicable",
+  "| latency | 50 | 50 | +0 | tie | self_reported |",
+  "| accuracy | 50 | 50 | +0 | tie | self_reported |",
+  "| safety | 50 | 50 | +0 | tie | self_reported |",
+  "| cost-efficiency | 50 | 50 | +0 | tie | self_reported |",
+  "| reliability | 50 | 50 | +0 | tie | self_reported |",
+]
+`;
+
+exports[`renderBenchRunMarkdown > renders benchmark report markdown 1`] = `
+[
+  "**Claim:** Self-reported · **Result:** not evaluated (no evidence events were recorded) · **Evidence:** incomplete · **Enforcement:** none · **Review:** pending · **Applicability:** applicable",
+  "| latency | 50/100 | 50 (+0) | 50% | Integrity-derived indicator (not a timing measurement) | self_reported |",
+  "| accuracy | 50/100 | 50 (+0) | 50% | Diagnostic accuracy | self_reported |",
+  "| safety | 50/100 | 50 (+0) | 50% | Safety controls | self_reported |",
+  "| cost-efficiency | 50/100 | 50 (+0) | 50% | Maturity/risk blend (not a cost measurement) | self_reported |",
+  "| reliability | 50/100 | 50 (+0) | 50% | Integrity/risk blend (not an uptime measurement) | self_reported |",
+]
+`;

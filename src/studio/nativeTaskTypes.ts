@@ -1,4 +1,6 @@
+import type { DelegationChainView } from "../agent/delegationChain.js";
 import type { NativeValidationResult } from "../agent/nativeValidation.js";
+import type { ExecutionStatus } from "../execution/executionContract.js";
 
 /** Browser-safe contract. Workspace, credentials, process and grant selection stay server-owned. */
 export type NativeTaskProvider = "stub" | "openai" | "openai-responses" | "anthropic" | "deepseek" | "gemini" | "gemini-audio" | "ollama";
@@ -93,7 +95,7 @@ export interface NativeTaskEvent {
 }
 export interface NativeTaskHistory {
   readonly status: "not-started" | "authenticated" | "unavailable";
-  readonly backend: "sqlite" | "jsonl" | null;
+  readonly backend: "sqlite" | "jsonl" | "postgres" | null;
   readonly headEventHash: string | null;
   readonly eventCount: number;
   /** Metadata authentication is not a full run-verification or payload-access grant. */
@@ -111,7 +113,10 @@ export interface NativeTaskView {
   readonly state: NativeTaskState; readonly createdAt: number; readonly updatedAt: number;
   readonly archived: boolean;
   readonly turnEndReason: string | null; readonly error: string | null;
-  readonly verification: "not-verified" | "workspace-key-consistency" | "externally-anchored" | "failed";
+  /** "anchored-prefix" (P0-14): anchored, but over a verified prefix; never the same state as "externally-anchored". */
+  readonly verification: "not-verified" | "workspace-key-consistency" | "externally-anchored" | "anchored-prefix" | "failed";
+  /** What an anchored verdict covers; null unless verification is "externally-anchored" or "anchored-prefix" (P0-14). */
+  readonly verificationScope: { readonly scope: "complete-ledger" | "verified-prefix"; readonly unfinalizedSessions: readonly string[] } | null;
   readonly approvals: readonly NativeTaskApproval[]; readonly approvalError: string | null;
   readonly nextCursor: number; readonly firstCursor: number; readonly droppedEvents: number;
   readonly canResume: boolean;
@@ -119,6 +124,10 @@ export interface NativeTaskView {
   /** Read-only eligibility, not an ownership grant or a completed recovery. */
   readonly recovery?: { readonly eligible: boolean; readonly state: "ready" | "interrupted" | "blocked"; readonly message: string } | null;
   readonly history: NativeTaskHistory;
+  /** The four execution phases (P2-13); null before a session exists and while no start was refused. */
+  readonly execution: ExecutionStatus | null;
+  /** The signed delegation chain this process's runtime lease binds (P2-25); null when its lease is v1 or none was minted. */
+  readonly delegation: DelegationChainView | null;
 }
 export interface NativeTaskPoll { readonly task: NativeTaskView; readonly events: readonly NativeTaskEvent[]; readonly truncated: boolean }
 export interface NativeTaskService {
@@ -133,6 +142,8 @@ export interface NativeTaskService {
   release(actor: NativeTaskActor, taskId: string, expectedRevision: number): Promise<NativeTaskView>;
   resume(actor: NativeTaskActor, taskId: string, expectedRevision: number): Promise<NativeTaskView>;
   verify(actor: NativeTaskActor, taskId: string, expectedRevision: number): Promise<NativeTaskView>;
+  /** fork (P2-13): the child task's own request ID, and the parent's current revision. */
+  fork(actor: NativeTaskActor, taskId: string, input: { readonly clientRequestId: string; readonly expectedRevision: number }): Promise<NativeTaskView>;
   archive(actor: NativeTaskActor, taskId: string, expectedRevision: number): NativeTaskView;
   close(): Promise<void>;
 }

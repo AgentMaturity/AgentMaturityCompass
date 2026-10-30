@@ -1,0 +1,1 @@
+{"exit": 0, "processDurationMs": 198, "observations": [{"capturedUtc": "2026-10-15T08:29:51.299705+00:00", "pgid": 39044, "signal": 0, "absentByESRCH": true, "errno": 3}], "maxPollingSeconds": 5, "pollIntervalSeconds": 0.05, "signalsOtherThanZeroSent": false}

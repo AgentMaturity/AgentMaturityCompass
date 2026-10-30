@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { canonicalize } from "../utils/json.js";
 import YAML from "yaml";
 import { z } from "zod";
-import { getPublicKeyHistory } from "../crypto/keys.js";
+import { getPurposeKeyHistory } from "../keys/signingKeys.js";
 import { openLedger, hashBinaryOrPath, verifyEvidenceEventIntegrity } from "../ledger/ledger.js";
 import { verifyReceipt, type ReceiptKind } from "../receipts/receipt.js";
 import type { EvidenceEvent, EvidenceEventType } from "../types.js";
@@ -587,7 +587,7 @@ function recoverObservedHookReceipt(input: {
     requireReceipt: true,
     requireSealedSession: true
   });
-  const verifiedReceipt = verifyReceipt(result.data.receipt, getPublicKeyHistory(input.ledger.workspace, "monitor"));
+  const verifiedReceipt = verifyReceipt(result.data.receipt, getPurposeKeyHistory(input.ledger.workspace, "receipt"));
   if (
     !integrity.ok
     || !verifiedReceipt.ok

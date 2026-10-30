@@ -3,11 +3,11 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, test } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
-import { getPrivateKeyPem, signHexDigest } from "../src/crypto/keys.js";
+import { getPrivateKeyPem, getPublicKeyPem, signHexDigest } from "../src/crypto/keys.js";
 import { canonicalMetadataForHash } from "../src/ledger/eventHash.js";
 import { openSessionEventStore } from "../src/persistence/openSessionEventStore.js";
 import { SessionService } from "../src/session/sessionService.js";
-import { anchorSessionRoot } from "../src/transparency/sessionAnchor.js";
+import { anchorSessionRoot, findSessionAnchorEntries } from "../src/transparency/sessionAnchor.js";
 import {
   buildSessionRootDescriptor,
   SessionAnchorError
@@ -261,6 +261,41 @@ describe("session root descriptor — what may not be anchored", () => {
         sessionId,
         options: { expectedMonitorFingerprint: "d".repeat(64) }
       })
-    ).toThrow(/monitor key fingerprint mismatch/);
+    ).toThrow(/trust root: monitor key fingerprint [0-9a-f]{16}… does not match the expected d{16}…/);
+  });
+
+  test("an explicitly empty monitor fingerprint is refused before an anchor is published", () => {
+    const workspace = newWorkspace();
+    const fingerprint = sha256Hex(Buffer.from(getPublicKeyPem(workspace, "monitor"), "utf8"));
+    const sessionId = runSession(workspace, true);
+    expect(findSessionAnchorEntries(workspace, sessionId)).toEqual([]);
+
+    expect(() => anchorSessionRoot({
+      workspace, sessionId, options: { expectedMonitorFingerprint: "" }
+    })).toThrow(SessionAnchorError);
+    expect(findSessionAnchorEntries(workspace, sessionId)).toEqual([]);
+
+    // The same session really is publishable under its actual independently supplied pin.
+    const control = anchorSessionRoot({
+      workspace, sessionId, options: { expectedMonitorFingerprint: fingerprint }
+    });
+    expect(control.descriptor.monitorKeyFingerprint).toBe(fingerprint);
+    expect(findSessionAnchorEntries(workspace, sessionId)).toHaveLength(1);
+  });
+
+  test("a canonical uppercase monitor fingerprint publishes the actual pinned session anchor", () => {
+    const workspace = newWorkspace();
+    const fingerprint = sha256Hex(Buffer.from(getPublicKeyPem(workspace, "monitor"), "utf8"));
+    const sessionId = runSession(workspace, true);
+    const uppercase = fingerprint.toUpperCase();
+    expect(uppercase).not.toBe(fingerprint);
+    expect(findSessionAnchorEntries(workspace, sessionId)).toEqual([]);
+
+    const result = anchorSessionRoot({
+      workspace, sessionId, options: { expectedMonitorFingerprint: uppercase }
+    });
+    expect(result.descriptor.monitorKeyFingerprint).toBe(fingerprint);
+    expect(result.entry.artifact.sha256).toBe(result.descriptorSha256);
+    expect(findSessionAnchorEntries(workspace, sessionId)).toHaveLength(1);
   });
 });

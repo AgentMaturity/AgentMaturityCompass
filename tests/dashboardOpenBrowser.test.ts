@@ -30,7 +30,7 @@ describe("dashboard open browser launch", () => {
   });
 
   test("keeps the UX audit aligned with current browser launch behavior", () => {
-    const audit = readFileSync(resolve(process.cwd(), "docs/UX_AUDIT_REPORT.md"), "utf8");
+    const audit = readFileSync(resolve(process.cwd(), "docs/archive/UX_AUDIT_REPORT.md"), "utf8");
 
     expect(audit).toContain("R5 — dashboard open launches the browser by default");
     expect(audit).toContain("`amc dashboard open --no-open` keeps headless/CI runs deterministic");

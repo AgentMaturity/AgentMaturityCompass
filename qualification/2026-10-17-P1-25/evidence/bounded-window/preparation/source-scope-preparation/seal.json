@@ -1,0 +1,92 @@
+{
+  "schema": "p125-window-source-scope-private-seal/1",
+  "at": "2026-10-17T00:05:50.408117+00:00",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/source-scope-preparation/observations.json",
+      "bytes": 1738335,
+      "sha256": "b34c4fb745be14a73bbc4fb7a0b8d469e84b94339998f7362794828bc28a4016",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/source-scope-preparation/observations.json",
+      "dev": 16777231,
+      "inode": 543741414,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/source-scope-preparation/read-tool-results.json",
+      "bytes": 4493,
+      "sha256": "4bfa08691bd7d44f4e8075e9ad88553412dbf04122792c86407e1202b67827dd",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/source-scope-preparation/read-tool-results.json",
+      "dev": 16777231,
+      "inode": 543741426,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/source-scope-preparation/own-source-git-blobs.json",
+      "bytes": 50549,
+      "sha256": "abf45200e5f01b01ef214fd403fff0296b3dc5e19379d28374e148af347e33a3",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/source-scope-preparation/own-source-git-blobs.json",
+      "dev": 16777231,
+      "inode": 543741482,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/source-scope-preparation/held36-coverage.json",
+      "bytes": 7136,
+      "sha256": "9e45917e88b46b4e1ffd84c1025b7bbd1bbbd21b0f52d77946ae3423f3ea6255",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/source-scope-preparation/held36-coverage.json",
+      "dev": 16777231,
+      "inode": 543741594,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/source-scope-preparation/read-only-assembly-diagnosis.json",
+      "bytes": 615,
+      "sha256": "07767030d84f02aa19f77a86e7093316b1c73fa8a92bede1d71bc31661fe7b04",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/source-scope-preparation/read-only-assembly-diagnosis.json",
+      "dev": 16777231,
+      "inode": 543741592,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/source-scope-preparation/review.json",
+      "bytes": 11407,
+      "sha256": "ab3f6e59d404fc613cd42005c6b433d9a41b224ce936e41fe1e73bb9f63f998e",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/source-scope-preparation/review.json",
+      "dev": 16777231,
+      "inode": 543741593,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/source-scope-preparation/README.md",
+      "bytes": 3372,
+      "sha256": "65037c3c46592adcf401f35b9e9dec9b269463eadd1551e139942736b633ce3d",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/source-scope-preparation/README.md",
+      "dev": 16777231,
+      "inode": 543741595,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/source-scope-preparation/pending-reservation-entry.md",
+      "bytes": 854,
+      "sha256": "3491dfada527a8a0321ebe4faed13842cf400f05d2cd916a734edd7777313a70",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/source-scope-preparation/pending-reservation-entry.md",
+      "dev": 16777231,
+      "inode": 543741596,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/source-scope-preparation/pins.json",
+      "bytes": 84170,
+      "sha256": "25afec85a584d49c5d24578138b76dcd65470395ecd4a9d1ed83110a95f4a0dd",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/source-scope-preparation/pins.json",
+      "dev": 16777231,
+      "inode": 543741597,
+      "nlink": 1
+    }
+  ],
+  "inputCount": 172,
+  "blockers": [],
+  "all232GitChildrenNaturalZero": true,
+  "noSourceAllocation": true,
+  "largeObservationsPrivateOnly": true
+}

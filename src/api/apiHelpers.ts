@@ -5,8 +5,13 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { ZodError, type ZodType } from "zod";
 import type { ClaimFields } from "../claims/eligibility/index.js";
+import { ensureRequestContext, logApiError, requestContextOf } from "./requestContext.js";
 
 const MAX_JSON_BODY_BYTES = 1_048_576;
+const BODY_TOO_LARGE = `JSON body exceeds ${MAX_JSON_BODY_BYTES} bytes`;
+const INTERNAL_SERVER_ERROR = "Internal server error";
+const oversizedBodies = new WeakSet<IncomingMessage>();
+const requestOf = new WeakMap<ServerResponse, IncomingMessage>();
 const DANGEROUS_JSON_KEYS = new Set(["__proto__", "constructor", "prototype"]);
 
 export class RequestBodyError extends Error {
@@ -61,7 +66,8 @@ function readBody(req: IncomingMessage): Promise<string> {
       const buf = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk, "utf8");
       totalBytes += buf.length;
       if (totalBytes > MAX_JSON_BODY_BYTES) {
-        rejectOnce(new RequestBodyError(`JSON body exceeds ${MAX_JSON_BODY_BYTES} bytes`, 413));
+        oversizedBodies.add(req);
+        rejectOnce(new RequestBodyError(BODY_TOO_LARGE, 413));
         return;
       }
       chunks.push(buf);
@@ -146,15 +152,48 @@ export function labelResultsOn(res: ServerResponse, labeller: ResultLabeller): v
   resultLabellers.set(res, labeller);
 }
 
+/**
+ * One body limit for every /api/v1 route (P1-55): a declared oversize is refused before any handler parses, and a
+ * streamed one makes apiError answer 413 whatever status the route's own catch chose.
+ */
+export function admitRequestBody(req: IncomingMessage, res: ServerResponse): boolean {
+  requestOf.set(res, req);
+  if (!(Number(req.headers?.["content-length"]) > MAX_JSON_BODY_BYTES)) return true;
+  apiError(res, 413, BODY_TOO_LARGE);
+  return false;
+}
+
 export function apiSuccess(res: ServerResponse, data: unknown, status = 200): void {
   const labelled = resultLabellers.get(res)?.(data) ?? { data };
-  res.writeHead(status, { 'Content-Type': 'application/json' });
+  const requestId = requestContextOf(res)?.requestId;
+  res.writeHead(status, requestId ? { 'Content-Type': 'application/json', 'X-Request-Id': requestId } : { 'Content-Type': 'application/json' });
   res.end(JSON.stringify({ ok: true, data: labelled.data, ...labelled.claim }));
 }
 
+/** A 500 body never carries the message: it goes to the log line as detail, with the request id that links them. */
+function writeError(res: ServerResponse, status: number, message: string, detail: unknown): void {
+  const { requestId } = ensureRequestContext(res);
+  const req = requestOf.get(res);
+  const oversized = req !== undefined && oversizedBodies.has(req);
+  const code = oversized ? 413 : status;
+  const error = oversized ? BODY_TOO_LARGE : code === 500 ? INTERNAL_SERVER_ERROR : message;
+  res.writeHead(code, { 'Content-Type': 'application/json', 'X-Request-Id': requestId });
+  res.end(JSON.stringify({ ok: false, error, requestId }));
+  logApiError(res, code, error, code === 500 ? detail : undefined);
+}
+
 export function apiError(res: ServerResponse, status: number, message: string): void {
-  res.writeHead(status, { 'Content-Type': 'application/json' });
-  res.end(JSON.stringify({ ok: false, error: message }));
+  writeError(res, status, message, message);
+}
+
+/** The dispatcher's last resort: a generic 500, or, once headers are out, a log line and a destroyed socket. */
+export function apiInternalError(res: ServerResponse, error: unknown): void {
+  if (res.headersSent) {
+    logApiError(res, 500, INTERNAL_SERVER_ERROR, error);
+    res.destroy();
+    return;
+  }
+  writeError(res, 500, INTERNAL_SERVER_ERROR, error);
 }
 
 /** Preserve request-body status codes while retaining each route's existing fallback. */

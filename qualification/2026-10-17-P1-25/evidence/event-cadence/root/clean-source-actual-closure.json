@@ -1,0 +1,10 @@
+{
+  "at": "2026-10-17T01:03:44.668592+00:00",
+  "actualClosedCommand": "p125ec-clean-source",
+  "exit": 0,
+  "durationMs": 48976,
+  "keptPrintedRoot": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-XxtmV6",
+  "physicalCheckout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-XxtmV6/checkout",
+  "vitestCredit": false,
+  "freshBindingOrNativeCountClaim": false
+}

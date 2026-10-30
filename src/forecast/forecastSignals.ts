@@ -4,10 +4,14 @@ import YAML from "yaml";
 import type { DiagnosticReport, OutcomeReport } from "../types.js";
 import type { OrgScorecard } from "../org/orgSchema.js";
 import { getAgentPaths } from "../fleet/paths.js";
+import { listVerifiedRuns } from "../diagnostic/runReportResolution.js";
 import { listAgents } from "../fleet/registry.js";
 import { pathExists, readUtf8 } from "../utils/fs.js";
 import { computeFailureRiskIndices } from "../assurance/indices.js";
 import { loadTransformMap } from "../transformation/transformPlanner.js";
+import { canonicalize } from "../utils/json.js";
+import { loadForecastTransformPlan, type ForecastTransformPlanInput } from "./forecastTransformPlan.js";
+import type { TransformPlan } from "../transformation/transformTasks.js";
 import { FOUR_CS } from "../transformation/fourCs.js";
 import { listValueReports } from "../value/valueStore.js";
 import type { ValueReport } from "../value/valueSchema.js";
@@ -37,6 +41,7 @@ export interface ForecastSignalBundle {
     latestCorrelationRatio: number;
   };
   runRefs: string[];
+  transformPlanInput: ForecastTransformPlanInput;
   targetProgress: {
     gapPoints: number;
     remainingEffort: number;
@@ -114,11 +119,10 @@ function listAgentIds(workspace: string): string[] {
   return [...new Set(ids)].sort((a, b) => a.localeCompare(b));
 }
 
+/** Sealed runs only (WP37): a forecast must not project from an edited run. */
 function loadAgentRuns(workspace: string, agentId: string, earliestTs: number): DiagnosticReport[] {
-  const files = listJsonFiles(getAgentPaths(workspace, agentId).runsDir);
-  return files
-    .map((file) => parseJsonFile<DiagnosticReport>(file))
-    .filter((row): row is DiagnosticReport => row !== null && Number(row.ts) >= earliestTs)
+  return listVerifiedRuns(workspace, agentId)
+    .filter((row) => Number(row.ts) >= earliestTs)
     .sort((a, b) => a.ts - b.ts);
 }
 
@@ -276,7 +280,7 @@ function valueFromOutcome(report: OutcomeReport | null): Record<(typeof FORECAST
   };
 }
 
-function computeTargetProgress(workspace: string, agentId: string, runs: DiagnosticReport[]): {
+function computeTargetProgress(workspace: string, agentId: string, runs: DiagnosticReport[], latestPlan: TransformPlan | null): {
   gapPoints: number;
   remainingEffort: number;
   throughputHistoryPerDay: number[];
@@ -285,10 +289,6 @@ function computeTargetProgress(workspace: string, agentId: string, runs: Diagnos
   const gapPoints = latestRun
     ? Number(latestRun.targetDiff.reduce((sum, row) => sum + Math.max(0, row.gap), 0).toFixed(6))
     : 0;
-  const latestPlanPath = join(workspace, ".amc", "agents", agentId, "transform", "latest.json");
-  const latestPlan = parseJsonFile<{
-    tasks?: Array<{ effort: number; status: string }>;
-  }>(latestPlanPath);
   const remainingEffort = latestPlan?.tasks
     ? Number(
         latestPlan.tasks
@@ -341,13 +341,14 @@ function computeTargetProgress(workspace: string, agentId: string, runs: Diagnos
   };
 }
 
-export function collectForecastSignals(params: {
+function collectForecastSignalsAt(params: {
   workspace: string;
   scope: ForecastScope;
   lookbackDays?: number;
-}): ForecastSignalBundle {
+}, selectionTs: number): ForecastSignalBundle {
   const lookbackDays = Math.max(14, params.lookbackDays ?? 90);
-  const earliestTs = Date.now() - lookbackDays * 86_400_000;
+  const earliestTs = selectionTs - lookbackDays * 86_400_000;
+  const { plan: transformPlan, ...transformPlanInput } = loadForecastTransformPlan(params.workspace, params.scope);
   const points = zeroSeriesInput();
   const runRefs: string[] = [];
   let observedAccumulator = 0;
@@ -373,7 +374,7 @@ export function collectForecastSignals(params: {
     })
       .filter((report) => report.generatedTs >= earliestTs)
       .sort((a, b) => a.generatedTs - b.generatedTs);
-    targetProgress = computeTargetProgress(params.workspace, params.scope.id, runs);
+    targetProgress = computeTargetProgress(params.workspace, params.scope.id, runs, transformPlan);
 
     for (const run of runs) {
       const trustTier = runTrustTier(run);
@@ -579,6 +580,20 @@ export function collectForecastSignals(params: {
       latestCorrelationRatio: Number((latestCorrelationRatio ?? 0).toFixed(6))
     },
     runRefs: [...new Set(runRefs)],
+    transformPlanInput,
     targetProgress
   };
+}
+
+/** Existing calculation clock stays private; a final reread uses the original selector boundary. */
+export function collectForecastSignals(params: { workspace: string; scope: ForecastScope; lookbackDays?: number }): ForecastSignalBundle {
+  return collectForecastSignalsAt(params, Date.now());
+}
+export function captureForecastSignals(input: { workspace: string; scope: ForecastScope; lookbackDays?: number }) {
+  const params = { ...input, scope: { ...input.scope } }, selectionTs = Date.now(), signals = collectForecastSignalsAt(params, selectionTs);
+  const project = (value: ForecastSignalBundle) => canonicalize({ ...value, generatedTs: 0 });
+  const original = project(signals);
+  return { signals, readCurrent() { return collectForecastSignalsAt(params, selectionTs); }, assertCurrent() {
+    if (project(collectForecastSignalsAt(params, selectionTs)) !== original) throw new Error("selected forecast signal inputs changed while signing");
+  } };
 }

@@ -1,0 +1,75 @@
+{
+  "schema": "p125g-runtime-control-helper-independent-static-review/1",
+  "at": "2026-10-16T22:51:32.270637+00:00",
+  "blockers": [],
+  "fullHelperAndCompanionRead": true,
+  "preferredSeals": [
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/runtime-audit-preparation/seal.json",
+      "bytes": 1837,
+      "sha256": "07cba3a7281b5b4b8370ca7c9c7c8b5cc82fc7a489a900c8e2a0c34ff129d8d8",
+      "physicalPath": "/private/tmp/p1-25-grant-qualification-20261017/runtime-audit-preparation/seal.json",
+      "dev": 16777231,
+      "inode": 543584571,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/fresh-control-preparation/seal-v2.json",
+      "bytes": 3448,
+      "sha256": "4407f3ef6911bd11afc87f5c9d1ba4b078f17c558a902b5e28a7e50d0cf1561f",
+      "physicalPath": "/private/tmp/p1-25-grant-qualification-20261017/fresh-control-preparation/seal-v2.json",
+      "dev": 16777231,
+      "inode": 543584604,
+      "nlink": 1
+    }
+  ],
+  "verified": {
+    "sealedOutputRows": 19,
+    "authorInputPinsetRows": [
+      161,
+      163
+    ],
+    "uniqueAuthorInputPaths": 163,
+    "nativeExistingPhysicalPins": 8,
+    "selectedNames": 73,
+    "compiledPairs": 8,
+    "protectedByteRows": 135,
+    "futureNativeTotalRequired": 9
+  },
+  "adapter": {
+    "base": "Exact B35 adapter and pinned B30 observed() function retained",
+    "delta": "B36 output destination/grant-vs-fallback cohort plus literal P125_TSA_GRANT_EVIDENCE path extraction and one path-list field",
+    "noDereferenceOfGrantMarkerPaths": true,
+    "actualGreenOrRedNotInferred": true,
+    "zeroSkipsRequired": "Old observed() and control closed() reject skipped qualification; discovered/missing tool acceptance is never fabricated.",
+    "actualHooks": "Underlying all-hook-values-pass check retained; controls compare actual source/fresh/control/restore hook counts, not predicted values.",
+    "quality": "Only private destination changes; role stays explicit/exclusive0600 and qualityGatePassed:false. Diagnostic completion is not a quality pass."
+  },
+  "controls": {
+    "target": "src/time/tsaClient.ts",
+    "sourceSha256": "fc24b04be6ac0a2980425c763eaddd01320137e177d7bedfa7e8c99daa228387",
+    "operators": [
+      "ORDER",
+      "DROP-VALID-GRANT"
+    ],
+    "onlySingleOccurrenceSourceChanges": true,
+    "sourceOnly": "No compiled/native write, build or test command in either helper",
+    "context": "Requires root actual fresh binding source commit/roots/helper closed0/naturalESRCH,73 name set/eight compiled pairs/135 protected/eight+fresh natives. S/Q HEAD match binding, indexes empty, S clean; exact held R HEAD/status/empty index retained.",
+    "physical": "Regular canonical single-link files, stable lstat around reads, globally distinct selected physical identities, nine distinct native identities outside selected files. Guarded target fd uses O_NOFOLLOW, fstat and byte/inode/link rechecks before truncation, exact in-place bytes after fsync; target must differ from source.",
+    "namespace": "All four current N ACTIVE/ACTIVE.json/HALTED/HALTED.json markers reject operations. Existing frozen wrapper/observer are unchanged; no old halt clearing or namespace retry occurs.",
+    "apply": "Explicit operator1/2 only, pristine Q, no preexisting output/prepared/original/patch; exclusive original and prepared record before sole guarded write; capture actual live Git patch; compare preserved selected/compiled/native states before/after.",
+    "restore": "Closed same19 zero-skip RED exit1, test-only task errors, actual identity/hook match and manual root full-failure/first-sensitive/masking classification bound to phase/source/operator/outcome required. Current target must match expected mutant/apply record; exclusive original must match known source; explicit guarded byte-exact restore and clean Q/preservation required.",
+    "sequence": "Operator2 additionally requires operator1 byteExact restore and actual same19 GREEN restore1. Root separately executes/audits restore2 GREEN and final preservation; a preservation snapshot alone is not a runtime gate result.",
+    "sensitivity": "Candidate route403/424 and nonnull406/426 are proposed first witnesses after actual query-bound positives. No outcomes or failed totals predicted."
+  },
+  "privacy": "Only source/helper/docs/pin metadata and named existing native-byte hash/stat checks performed. No generated private key, signing directory, private-run record or child stdout/stderr opened. Protected/input path names were screened before rehashing.",
+  "limitations": [
+    "No actual fresh binding/runtime/control/result was evaluated here; source19GREEN is root-reported context only.",
+    "Manual root classification is semantic authority; the helper verifies its binding/required fields, not future AssertionError meaning.",
+    "Marker extraction is inventory only; root must inspect/adopt actual public JSON and complete failure logs before lifecycle/crypto claims.",
+    "Finite byte/physical checks are boundary observations, not universal continuous isolation.",
+    "All source-generator/package/CI/report/required-time/global-quality/fullissue/plan holds remain open."
+  ],
+  "noHelperImportParserCompilerProductNativeSqlNetworkExecution": true,
+  "noSourceIndexQaChanges": true
+}

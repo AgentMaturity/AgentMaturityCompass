@@ -1,3 +1,4 @@
+import { signatureEnvelopeSchema } from "../crypto/signing/signatureEnvelope.js";
 import { z } from "zod";
 
 export const benchScopeTypeSchema = z.enum(["WORKSPACE", "NODE", "AGENT"]);
@@ -145,21 +146,7 @@ export const benchSignatureSchema = z.object({
   signature: z.string().min(1),
   signedTs: z.number().int(),
   signer: z.literal("auditor"),
-  envelope: z
-    .object({
-      v: z.literal(1),
-      alg: z.literal("ed25519"),
-      pubkeyB64: z.string().min(1),
-      fingerprint: z.string().length(64),
-      sigB64: z.string().min(1),
-      signedTs: z.number().int(),
-      signer: z.object({
-        type: z.enum(["VAULT", "NOTARY"]),
-        attestationLevel: z.enum(["SOFTWARE", "HARDWARE"]),
-        notaryFingerprint: z.string().length(64).optional()
-      })
-    })
-    .optional()
+  envelope: signatureEnvelopeSchema.optional()
 });
 
 export const benchPiiScanSchema = z.object({
@@ -208,7 +195,8 @@ export const benchComparisonSchema = z.object({
       high: z.number().int().min(0)
     })
   }),
-  percentiles: z.record(z.string().min(1), z.number().min(0).max(100)),
+  /** null per metric when there is no imported population to rank against (WP37). */
+  percentiles: z.record(z.string().min(1), z.number().min(0).max(100).nullable()),
   composites: z.object({
     ecosystemAlignmentScore: z.number().min(0).max(100),
     riskAssuranceScore: z.number().min(0).max(100),

@@ -1,0 +1,2562 @@
+{
+  "schema": "amc.mutation-batch.result.v1",
+  "commit": "91678253fb17b62c8ee3e8701b8c927d1cf42b8b",
+  "startedAt": "2026-10-10T23:41:18.117Z",
+  "finishedAt": "2026-10-11T00:02:45.097Z",
+  "node": "v25.5.0",
+  "platform": "darwin arm64",
+  "summary": {
+    "entries": 71,
+    "killed": 70,
+    "survived": 0,
+    "equivalent": 1,
+    "equivalentKilled": 0,
+    "errors": 0,
+    "byIssue": {
+      "AMC-1525": {
+        "entries": 5,
+        "killed": 5,
+        "survived": 0,
+        "equivalent": 0,
+        "other": 0
+      },
+      "AMC-1542": {
+        "entries": 8,
+        "killed": 8,
+        "survived": 0,
+        "equivalent": 0,
+        "other": 0
+      },
+      "AMC-1546": {
+        "entries": 2,
+        "killed": 2,
+        "survived": 0,
+        "equivalent": 0,
+        "other": 0
+      },
+      "AMC-1508": {
+        "entries": 1,
+        "killed": 1,
+        "survived": 0,
+        "equivalent": 0,
+        "other": 0
+      },
+      "AMC-1534": {
+        "entries": 2,
+        "killed": 2,
+        "survived": 0,
+        "equivalent": 0,
+        "other": 0
+      },
+      "AMC-1529": {
+        "entries": 2,
+        "killed": 2,
+        "survived": 0,
+        "equivalent": 0,
+        "other": 0
+      },
+      "AMC-1537": {
+        "entries": 1,
+        "killed": 1,
+        "survived": 0,
+        "equivalent": 0,
+        "other": 0
+      },
+      "AMC-1547": {
+        "entries": 6,
+        "killed": 6,
+        "survived": 0,
+        "equivalent": 0,
+        "other": 0
+      },
+      "AMC-1513": {
+        "entries": 10,
+        "killed": 10,
+        "survived": 0,
+        "equivalent": 0,
+        "other": 0
+      },
+      "AMC-1516": {
+        "entries": 10,
+        "killed": 10,
+        "survived": 0,
+        "equivalent": 0,
+        "other": 0
+      },
+      "AMC-1517": {
+        "entries": 4,
+        "killed": 3,
+        "survived": 0,
+        "equivalent": 1,
+        "other": 0
+      },
+      "AMC-1518": {
+        "entries": 2,
+        "killed": 2,
+        "survived": 0,
+        "equivalent": 0,
+        "other": 0
+      },
+      "AMC-1519": {
+        "entries": 4,
+        "killed": 4,
+        "survived": 0,
+        "equivalent": 0,
+        "other": 0
+      },
+      "AMC-1520": {
+        "entries": 4,
+        "killed": 4,
+        "survived": 0,
+        "equivalent": 0,
+        "other": 0
+      },
+      "AMC-1523": {
+        "entries": 6,
+        "killed": 6,
+        "survived": 0,
+        "equivalent": 0,
+        "other": 0
+      },
+      "AMC-1521": {
+        "entries": 4,
+        "killed": 4,
+        "survived": 0,
+        "equivalent": 0,
+        "other": 0
+      }
+    }
+  },
+  "baselines": [
+    {
+      "tests": [
+        "tests/crypto/keyHistoryMutationGuards.test.ts",
+        "tests/crypto/keyHistoryAdmission.test.ts",
+        "tests/crypto/keyHistoryForgery.test.ts"
+      ],
+      "exitCode": 0,
+      "durationMs": 29879,
+      "totals": {
+        "total": 30,
+        "passed": 30,
+        "failed": 0
+      }
+    },
+    {
+      "tests": [
+        "tests/crypto/keyHistoryMutationGuards.test.ts",
+        "tests/crypto/keyHistoryAdmission.test.ts"
+      ],
+      "exitCode": 0,
+      "durationMs": 23421,
+      "totals": {
+        "total": 26,
+        "passed": 26,
+        "failed": 0
+      }
+    },
+    {
+      "tests": [
+        "tests/crypto/keyHistoryMutationGuards.test.ts",
+        "tests/keyHistoryBundleCertificate.test.ts"
+      ],
+      "exitCode": 0,
+      "durationMs": 30179,
+      "totals": {
+        "total": 19,
+        "passed": 19,
+        "failed": 0
+      }
+    },
+    {
+      "tests": [
+        "tests/crypto/keyHistoryMutationGuards.test.ts",
+        "tests/ledgerVerificationReadOnly.test.ts"
+      ],
+      "exitCode": 0,
+      "durationMs": 26816,
+      "totals": {
+        "total": 14,
+        "passed": 14,
+        "failed": 0
+      }
+    },
+    {
+      "tests": [
+        "tests/leaseRevocationConsumers.test.ts",
+        "tests/leaseRevocationFailClosed.test.ts",
+        "tests/leaseRevocationWriterIntegrity.test.ts"
+      ],
+      "exitCode": 0,
+      "durationMs": 50032,
+      "totals": {
+        "total": 46,
+        "passed": 46,
+        "failed": 0
+      }
+    },
+    {
+      "tests": [
+        "tests/leaseRevocationWriterIntegrity.test.ts"
+      ],
+      "exitCode": 0,
+      "durationMs": 25970,
+      "totals": {
+        "total": 14,
+        "passed": 14,
+        "failed": 0
+      }
+    },
+    {
+      "tests": [
+        "tests/leaseRevocationConsumers.test.ts",
+        "tests/leaseRevocationFailClosed.test.ts"
+      ],
+      "exitCode": 0,
+      "durationMs": 50414,
+      "totals": {
+        "total": 32,
+        "passed": 32,
+        "failed": 0
+      }
+    },
+    {
+      "tests": [
+        "tests/leaseRevocationConsumers.test.ts"
+      ],
+      "exitCode": 0,
+      "durationMs": 27945,
+      "totals": {
+        "total": 7,
+        "passed": 7,
+        "failed": 0
+      }
+    },
+    {
+      "tests": [
+        "tests/leaseRevocationConsumers.test.ts",
+        "tests/wireDispatcher.test.ts"
+      ],
+      "exitCode": 0,
+      "durationMs": 32859,
+      "totals": {
+        "total": 27,
+        "passed": 27,
+        "failed": 0
+      }
+    },
+    {
+      "tests": [
+        "tests/studioCredentialBindingHttp.test.ts",
+        "tests/studioAgentCredentialBinding.test.ts"
+      ],
+      "exitCode": 0,
+      "durationMs": 56206,
+      "totals": {
+        "total": 22,
+        "passed": 22,
+        "failed": 0
+      }
+    },
+    {
+      "tests": [
+        "tests/portalAttribution.test.ts"
+      ],
+      "exitCode": 0,
+      "durationMs": 29736,
+      "totals": {
+        "total": 22,
+        "passed": 22,
+        "failed": 0
+      }
+    },
+    {
+      "tests": [
+        "tests/nativeBudgets.test.ts"
+      ],
+      "exitCode": 0,
+      "durationMs": 42672,
+      "totals": {
+        "total": 26,
+        "passed": 26,
+        "failed": 0
+      }
+    },
+    {
+      "tests": [
+        "tests/notaryAuthReplay.test.ts",
+        "tests/notaryComposeIntegration.test.ts"
+      ],
+      "exitCode": 0,
+      "durationMs": 20919,
+      "totals": {
+        "total": 16,
+        "passed": 16,
+        "failed": 0
+      }
+    },
+    {
+      "tests": [
+        "tests/notaryAuthReplay.test.ts"
+      ],
+      "exitCode": 0,
+      "durationMs": 861,
+      "totals": {
+        "total": 6,
+        "passed": 6,
+        "failed": 0
+      }
+    },
+    {
+      "tests": [
+        "tests/nativePinnedToolSchemas.test.ts"
+      ],
+      "exitCode": 0,
+      "durationMs": 29578,
+      "totals": {
+        "total": 11,
+        "passed": 11,
+        "failed": 0
+      }
+    },
+    {
+      "tests": [
+        "tests/spillEncryption.test.ts",
+        "tests/sessionSpillCommitment.test.ts",
+        "tests/sessionAttachmentSpill.test.ts",
+        "tests/sessionInboxSpill.test.ts"
+      ],
+      "exitCode": 0,
+      "durationMs": 51990,
+      "totals": {
+        "total": 55,
+        "passed": 55,
+        "failed": 0
+      }
+    },
+    {
+      "tests": [
+        "tests/spillEncryption.test.ts",
+        "tests/sessionSpillCommitment.test.ts",
+        "tests/sessionAttachmentSpill.test.ts"
+      ],
+      "exitCode": 0,
+      "durationMs": 41767,
+      "totals": {
+        "total": 50,
+        "passed": 50,
+        "failed": 0
+      }
+    },
+    {
+      "tests": [
+        "tests/sessionSpill.test.ts",
+        "tests/sessionAttachmentSpill.test.ts"
+      ],
+      "exitCode": 0,
+      "durationMs": 34690,
+      "totals": {
+        "total": 25,
+        "passed": 25,
+        "failed": 0
+      }
+    },
+    {
+      "tests": [
+        "tests/sessionSpill.test.ts"
+      ],
+      "exitCode": 0,
+      "durationMs": 29052,
+      "totals": {
+        "total": 15,
+        "passed": 15,
+        "failed": 0
+      }
+    },
+    {
+      "tests": [
+        "tests/spillLifecycle.test.ts"
+      ],
+      "exitCode": 0,
+      "durationMs": 28554,
+      "totals": {
+        "total": 15,
+        "passed": 15,
+        "failed": 0
+      }
+    },
+    {
+      "tests": [
+        "tests/spillLifecycle.test.ts",
+        "tests/retentionSpill.test.ts",
+        "tests/cliSpillCommands.test.ts"
+      ],
+      "exitCode": 0,
+      "durationMs": 64293,
+      "totals": {
+        "total": 85,
+        "passed": 85,
+        "failed": 0
+      }
+    },
+    {
+      "tests": [
+        "tests/sandboxConfinement.test.ts",
+        "tests/bwrapBackendPure.test.ts"
+      ],
+      "exitCode": 0,
+      "durationMs": 1971,
+      "totals": {
+        "total": 41,
+        "passed": 41,
+        "failed": 0
+      }
+    },
+    {
+      "tests": [
+        "tests/externalEvidenceProfile.test.ts",
+        "tests/importProvenance.test.ts"
+      ],
+      "exitCode": 0,
+      "durationMs": 3840,
+      "totals": {
+        "total": 18,
+        "passed": 18,
+        "failed": 0
+      }
+    },
+    {
+      "tests": [
+        "tests/neutralImporter.test.ts",
+        "tests/neutralImportMapping.test.ts",
+        "tests/externalEvidenceExport.test.ts"
+      ],
+      "exitCode": 0,
+      "durationMs": 26027,
+      "totals": {
+        "total": 26,
+        "passed": 26,
+        "failed": 0
+      }
+    },
+    {
+      "tests": [
+        "tests/neutralImportMapping.test.ts",
+        "tests/callbackTelemetryCapture.test.ts"
+      ],
+      "exitCode": 0,
+      "durationMs": 3202,
+      "totals": {
+        "total": 13,
+        "passed": 13,
+        "failed": 0
+      }
+    },
+    {
+      "tests": [
+        "tests/harnessComparison.test.ts",
+        "tests/harnessComparisonOutputOwnership.test.ts"
+      ],
+      "exitCode": 0,
+      "durationMs": 6476,
+      "totals": {
+        "total": 55,
+        "passed": 55,
+        "failed": 0
+      }
+    },
+    {
+      "tests": [
+        "tests/cosProduct07NativeSdk.test.ts",
+        "tests/cosProduct07NativeSdkProcess.test.ts",
+        "tests/nativeAgentClientVerify.test.ts"
+      ],
+      "exitCode": 0,
+      "durationMs": 22941,
+      "totals": {
+        "total": 53,
+        "passed": 53,
+        "failed": 0
+      }
+    },
+    {
+      "tests": [
+        "tests/deepseekPublicSurface.test.ts",
+        "tests/dshCaptureInterruption.test.ts",
+        "tests/deepseekHarnessLaunch.test.ts"
+      ],
+      "exitCode": 0,
+      "durationMs": 47994,
+      "totals": {
+        "total": 36,
+        "passed": 36,
+        "failed": 0
+      }
+    },
+    {
+      "tests": [
+        "tests/deepseekPublicSurface.test.ts",
+        "tests/deepseekHarnessLaunch.test.ts"
+      ],
+      "exitCode": 0,
+      "durationMs": 8238,
+      "totals": {
+        "total": 32,
+        "passed": 32,
+        "failed": 0
+      }
+    },
+    {
+      "tests": [
+        "tests/cliImportCommands.test.ts"
+      ],
+      "exitCode": 0,
+      "durationMs": 1856,
+      "totals": {
+        "total": 4,
+        "passed": 4,
+        "failed": 0
+      }
+    },
+    {
+      "tests": [
+        "tests/reconciliationDefectsReleaseGate.test.ts"
+      ],
+      "exitCode": 0,
+      "durationMs": 449,
+      "totals": {
+        "total": 3,
+        "passed": 3,
+        "failed": 0
+      }
+    }
+  ],
+  "results": [
+    {
+      "id": "P30-1525-envelope-signature",
+      "oldIssue": "AMC-1525",
+      "file": "src/crypto/keyHistoryEnvelope.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/crypto/keyHistoryMutationGuards.test.ts",
+        "tests/crypto/keyHistoryAdmission.test.ts",
+        "tests/crypto/keyHistoryForgery.test.ts"
+      ],
+      "note": "Skip the envelope signature check.",
+      "line": 102,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 6442,
+      "totals": {
+        "total": 30,
+        "passed": 23,
+        "failed": 7
+      },
+      "failingTests": [
+        "tests/crypto/keyHistoryAdmission.test.ts > authenticated history admission rejects source tampering even when chain hashes remain unchanged",
+        "tests/crypto/keyHistoryAdmission.test.ts > authenticated history admission rejects revision tampering even when chain hashes remain unchanged",
+        "tests/crypto/keyHistoryAdmission.test.ts > authenticated history admission ordinary digest signatures cannot authorize a history envelope",
+        "tests/crypto/keyHistoryAdmission.test.ts > authenticated history admission does not launder tampered-envelope history through unlock, initialization or secret changes",
+        "tests/crypto/keyHistoryForgery.test.ts > key history forgery rejects a correctly hash-chained attacker key while the live key stays unchanged",
+        "tests/crypto/keyHistoryMutationGuards.test.ts > AMC-1525 key-history guards fail their mutations refuses an attacker key appended with a valid hash chain but no valid envelope signature",
+        "tests/crypto/keyHistoryMutationGuards.test.ts > AMC-1525 key-history guards fail their mutations bundle and certificate refuse a signer admitted only by a tampered raw history file"
+      ],
+      "failingTestCount": 7,
+      "failedFiles": []
+    },
+    {
+      "id": "P30-1525-unsigned-migration",
+      "oldIssue": "AMC-1525",
+      "file": "src/vault/vault.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/crypto/keyHistoryMutationGuards.test.ts",
+        "tests/crypto/keyHistoryAdmission.test.ts"
+      ],
+      "note": "Accept unsigned migration: restores the pre-fix vault behaviour that sealed a planted bare-array history on any vault create or rewrite.",
+      "line": 201,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 6845,
+      "totals": {
+        "total": 26,
+        "passed": 23,
+        "failed": 3
+      },
+      "failingTests": [
+        "tests/crypto/keyHistoryAdmission.test.ts > authenticated history admission does not launder legacy history through unlock, initialization or secret changes",
+        "tests/crypto/keyHistoryAdmission.test.ts > authenticated history admission does not seed a new vault from an existing planted history list",
+        "tests/crypto/keyHistoryMutationGuards.test.ts > AMC-1525 key-history guards fail their mutations never admits an unsigned legacy history without explicit migration"
+      ],
+      "failingTestCount": 3,
+      "failedFiles": []
+    },
+    {
+      "id": "P30-1525-bundle-raw-history",
+      "oldIssue": "AMC-1525",
+      "file": "src/bundles/bundle.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/crypto/keyHistoryMutationGuards.test.ts",
+        "tests/keyHistoryBundleCertificate.test.ts"
+      ],
+      "note": "Read the raw history file in bundle verification. Issuer admission refuses independently, so the kill is the manifest-signature error, not ok:false.",
+      "line": 578,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 10670,
+      "totals": {
+        "total": 19,
+        "passed": 15,
+        "failed": 4
+      },
+      "failingTests": [
+        "tests/keyHistoryBundleCertificate.test.ts > AMC-1525 portable authenticated key history bundle rejects an attacker signer admitted by unsigned hash chain",
+        "tests/keyHistoryBundleCertificate.test.ts > AMC-1525 portable authenticated key history bundle rejects an attacker signer admitted by rehashed signed envelope",
+        "tests/keyHistoryBundleCertificate.test.ts > AMC-1525 portable authenticated key history bundle rejects an attacker signer admitted by transplanted signed envelope",
+        "tests/crypto/keyHistoryMutationGuards.test.ts > AMC-1525 key-history guards fail their mutations bundle and certificate refuse a signer admitted only by a tampered raw history file"
+      ],
+      "failingTestCount": 4,
+      "failedFiles": []
+    },
+    {
+      "id": "P30-1525-certificate-raw-history",
+      "oldIssue": "AMC-1525",
+      "file": "src/assurance/certificate.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/crypto/keyHistoryMutationGuards.test.ts",
+        "tests/keyHistoryBundleCertificate.test.ts"
+      ],
+      "note": "Read the raw history file in certificate verification (same caveat as the bundle entry).",
+      "line": 638,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 9258,
+      "totals": {
+        "total": 19,
+        "passed": 15,
+        "failed": 4
+      },
+      "failingTests": [
+        "tests/keyHistoryBundleCertificate.test.ts > AMC-1525 portable authenticated key history certificate rejects an attacker signer admitted by unsigned hash chain",
+        "tests/keyHistoryBundleCertificate.test.ts > AMC-1525 portable authenticated key history certificate rejects an attacker signer admitted by rehashed signed envelope",
+        "tests/keyHistoryBundleCertificate.test.ts > AMC-1525 portable authenticated key history certificate rejects an attacker signer admitted by transplanted signed envelope",
+        "tests/crypto/keyHistoryMutationGuards.test.ts > AMC-1525 key-history guards fail their mutations bundle and certificate refuse a signer admitted only by a tampered raw history file"
+      ],
+      "failingTestCount": 4,
+      "failedFiles": []
+    },
+    {
+      "id": "P30-1525-cold-vault-initializes",
+      "oldIssue": "AMC-1525",
+      "file": "src/ledger/ledgerVerification.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/crypto/keyHistoryMutationGuards.test.ts",
+        "tests/ledgerVerificationReadOnly.test.ts"
+      ],
+      "note": "Let a cold vault initialize trust: verification opens the ledger writable, which mints a vault and keys.",
+      "line": 702,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 8649,
+      "totals": {
+        "total": 14,
+        "passed": 9,
+        "failed": 5
+      },
+      "failingTests": [
+        "tests/ledgerVerificationReadOnly.test.ts > cold-process encrypted evidence fails closed for missing-passphrase without modifying disk",
+        "tests/ledgerVerificationReadOnly.test.ts > cold-process encrypted evidence fails closed for missing-vault without modifying disk",
+        "tests/ledgerVerificationReadOnly.test.ts > public-only ledger verification preserves the supplied trust anchors without creating a vault",
+        "tests/crypto/keyHistoryMutationGuards.test.ts > AMC-1525 key-history guards fail their mutations bundle and certificate refuse a signer admitted only by a tampered raw history file",
+        "tests/crypto/keyHistoryMutationGuards.test.ts > AMC-1525 key-history guards fail their mutations cold verification without a vault refuses and leaves the workspace listing unchanged"
+      ],
+      "failingTestCount": 5,
+      "failedFiles": []
+    },
+    {
+      "id": "P30-1542-empty-set",
+      "oldIssue": "AMC-1542",
+      "file": "src/leases/leaseStore.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/leaseRevocationConsumers.test.ts",
+        "tests/leaseRevocationFailClosed.test.ts",
+        "tests/leaseRevocationWriterIntegrity.test.ts"
+      ],
+      "note": "Return an empty set from revokedLeaseIdSet.",
+      "line": 186,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 11182,
+      "totals": {
+        "total": 46,
+        "passed": 24,
+        "failed": 22
+      },
+      "failingTests": [
+        "tests/leaseRevocationConsumers.test.ts > AMC-1542 every revocation consumer refuses an unverifiable list 'managedHookLease'",
+        "tests/leaseRevocationConsumers.test.ts > AMC-1542 every revocation consumer refuses an unverifiable list 'agentCredentialAuth'",
+        "tests/leaseRevocationFailClosed.test.ts > revokedLeaseIdSet fails closed throws on a tampered store instead of answering an empty set",
+        "tests/leaseRevocationFailClosed.test.ts > revokedLeaseIdSet fails closed refuses a deleted list while preserving its surviving signature",
+        "tests/leaseRevocationFailClosed.test.ts > verifyLeaseForCli checks the store it trusts refuses to verify anything against a tampered revocation store",
+        "tests/leaseRevocationFailClosed.test.ts > managed hooks authenticate the revocation store claude-code observe refuses a 'tampered list' before forwarding or reinstalling",
+        "tests/leaseRevocationFailClosed.test.ts > managed hooks authenticate the revocation store claude-code observe refuses a 'deleted list' before forwarding or reinstalling",
+        "tests/leaseRevocationFailClosed.test.ts > managed hooks authenticate the revocation store claude-code control refuses a 'tampered list' before forwarding or reinstalling",
+        "tests/leaseRevocationFailClosed.test.ts > managed hooks authenticate the revocation store claude-code control refuses a 'deleted list' before forwarding or reinstalling",
+        "tests/leaseRevocationFailClosed.test.ts > managed hooks authenticate the revocation store gemini-cli observe refuses a 'tampered list' before forwarding or reinstalling",
+        "tests/leaseRevocationFailClosed.test.ts > managed hooks authenticate the revocation store gemini-cli observe refuses a 'deleted list' before forwarding or reinstalling",
+        "tests/leaseRevocationFailClosed.test.ts > managed hooks authenticate the revocation store gemini-cli control refuses a 'tampered list' before forwarding or reinstalling",
+        "tests/leaseRevocationFailClosed.test.ts > managed hooks authenticate the revocation store gemini-cli control refuses a 'deleted list' before forwarding or reinstalling",
+        "tests/leaseRevocationFailClosed.test.ts > managed hooks authenticate the revocation store reports signed malformed store data as an invalid lease rather than throwing from status",
+        "tests/leaseRevocationFailClosed.test.ts > lease consumers refuse damaged signed revocation stores CLI and Bridge refuse a revoked lease after a 'tampered list'",
+        "tests/leaseRevocationFailClosed.test.ts > lease consumers refuse damaged signed revocation stores CLI and Bridge refuse a revoked lease after a 'deleted list'",
+        "tests/leaseRevocationWriterIntegrity.test.ts > AMC-1542 revocation writer authenticates the prior snapshot refuses removed-entry without rewriting list or signature",
+        "tests/leaseRevocationWriterIntegrity.test.ts > AMC-1542 revocation writer authenticates the prior snapshot refuses missing-list without rewriting list or signature",
+        "tests/leaseRevocationWriterIntegrity.test.ts > AMC-1542 revocation writer authenticates the prior snapshot refuses missing-signature without rewriting list or signature",
+        "tests/leaseRevocationWriterIntegrity.test.ts > AMC-1542 revocation writer authenticates the prior snapshot refuses invalid-signature without rewriting list or signature"
+      ],
+      "failingTestCount": 22,
+      "failedFiles": []
+    },
+    {
+      "id": "P30-1542-revoke-snapshot",
+      "oldIssue": "AMC-1542",
+      "file": "src/leases/leaseStore.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/leaseRevocationWriterIntegrity.test.ts"
+      ],
+      "note": "Skip the snapshot check in revokeLease.",
+      "line": 151,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 7020,
+      "totals": {
+        "total": 14,
+        "passed": 9,
+        "failed": 5
+      },
+      "failingTests": [
+        "tests/leaseRevocationWriterIntegrity.test.ts > AMC-1542 revocation writer authenticates the prior snapshot refuses removed-entry without rewriting list or signature",
+        "tests/leaseRevocationWriterIntegrity.test.ts > AMC-1542 revocation writer authenticates the prior snapshot refuses missing-list without rewriting list or signature",
+        "tests/leaseRevocationWriterIntegrity.test.ts > AMC-1542 revocation writer authenticates the prior snapshot refuses missing-signature without rewriting list or signature",
+        "tests/leaseRevocationWriterIntegrity.test.ts > AMC-1542 revocation writer authenticates the prior snapshot refuses invalid-signature without rewriting list or signature",
+        "tests/leaseRevocationWriterIntegrity.test.ts > AMC-1542 revocation writer authenticates the prior snapshot leaves the deliberate reviewed repair path separate from ordinary revocation"
+      ],
+      "failingTestCount": 5,
+      "failedFiles": []
+    },
+    {
+      "id": "P30-1542-publish-verify",
+      "oldIssue": "AMC-1542",
+      "file": "src/leases/leaseStore.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/leaseRevocationWriterIntegrity.test.ts"
+      ],
+      "note": "Publish a revocation pair without verifying the prepared signature (the P0-30 publish fix).",
+      "line": 56,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 8056,
+      "totals": {
+        "total": 14,
+        "passed": 11,
+        "failed": 3
+      },
+      "failingTests": [
+        "tests/leaseRevocationWriterIntegrity.test.ts > AMC-1542 revocation writer authenticates the prior snapshot revoke refuses to publish a pair that would not verify (P0-30)",
+        "tests/leaseRevocationWriterIntegrity.test.ts > AMC-1542 revocation writer authenticates the prior snapshot resign refuses to publish a pair that would not verify (P0-30)",
+        "tests/leaseRevocationWriterIntegrity.test.ts > AMC-1542 revocation writer authenticates the prior snapshot bootstrap refuses to publish a pair that would not verify (P0-30)"
+      ],
+      "failingTestCount": 3,
+      "failedFiles": []
+    },
+    {
+      "id": "P30-1542-consumer-bridge",
+      "oldIssue": "AMC-1542",
+      "file": "src/bridge/bridgeAuth.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/leaseRevocationConsumers.test.ts",
+        "tests/leaseRevocationFailClosed.test.ts"
+      ],
+      "note": "bridgeAuth admits leases against an unverified list.",
+      "line": 205,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 12104,
+      "totals": {
+        "total": 32,
+        "passed": 29,
+        "failed": 3
+      },
+      "failingTests": [
+        "tests/leaseRevocationConsumers.test.ts > AMC-1542 every revocation consumer refuses an unverifiable list 'bridgeAuth'",
+        "tests/leaseRevocationFailClosed.test.ts > lease consumers refuse damaged signed revocation stores CLI and Bridge refuse a revoked lease after a 'tampered list'",
+        "tests/leaseRevocationFailClosed.test.ts > lease consumers refuse damaged signed revocation stores CLI and Bridge refuse a revoked lease after a 'deleted list'"
+      ],
+      "failingTestCount": 3,
+      "failedFiles": []
+    },
+    {
+      "id": "P30-1542-consumer-gateway",
+      "oldIssue": "AMC-1542",
+      "file": "src/gateway/server.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/leaseRevocationConsumers.test.ts",
+        "tests/leaseRevocationFailClosed.test.ts"
+      ],
+      "note": "gateway admits leases against an unverified list.",
+      "line": 464,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 11717,
+      "totals": {
+        "total": 32,
+        "passed": 29,
+        "failed": 3
+      },
+      "failingTests": [
+        "tests/leaseRevocationConsumers.test.ts > AMC-1542 every revocation consumer refuses an unverifiable list 'gateway'",
+        "tests/leaseRevocationFailClosed.test.ts > lease consumers refuse damaged signed revocation stores gateway refuses a revoked lease after a 'tampered list' without reaching its upstream",
+        "tests/leaseRevocationFailClosed.test.ts > lease consumers refuse damaged signed revocation stores gateway refuses a revoked lease after a 'deleted list' without reaching its upstream"
+      ],
+      "failingTestCount": 3,
+      "failedFiles": []
+    },
+    {
+      "id": "P30-1542-consumer-router",
+      "oldIssue": "AMC-1542",
+      "file": "src/workspaces/workspaceRouter.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/leaseRevocationConsumers.test.ts",
+        "tests/leaseRevocationFailClosed.test.ts"
+      ],
+      "note": "workspaceRouter admits leases against an unverified list (the workspace's own agent auth still refuses: defence in depth).",
+      "line": 663,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 12243,
+      "totals": {
+        "total": 32,
+        "passed": 29,
+        "failed": 3
+      },
+      "failingTests": [
+        "tests/leaseRevocationConsumers.test.ts > AMC-1542 every revocation consumer refuses an unverifiable list 'workspaceRouter'",
+        "tests/leaseRevocationFailClosed.test.ts > lease consumers refuse damaged signed revocation stores workspace router refuses a revoked lease after a 'tampered list'",
+        "tests/leaseRevocationFailClosed.test.ts > lease consumers refuse damaged signed revocation stores workspace router refuses a revoked lease after a 'deleted list'"
+      ],
+      "failingTestCount": 3,
+      "failedFiles": []
+    },
+    {
+      "id": "P30-1542-consumer-studio",
+      "oldIssue": "AMC-1542",
+      "file": "src/studio/studioServer.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/leaseRevocationConsumers.test.ts"
+      ],
+      "note": "studioServer verifyLeaseForScope admits leases against an unverified list.",
+      "line": 1150,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 7047,
+      "totals": {
+        "total": 7,
+        "passed": 6,
+        "failed": 1
+      },
+      "failingTests": [
+        "tests/leaseRevocationConsumers.test.ts > AMC-1542 every revocation consumer refuses an unverifiable list 'studioServer verifyLeaseForScope'"
+      ],
+      "failingTestCount": 1,
+      "failedFiles": []
+    },
+    {
+      "id": "P30-1542-consumer-wire",
+      "oldIssue": "AMC-1542",
+      "file": "src/wire/wireDispatcher.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/leaseRevocationConsumers.test.ts",
+        "tests/wireDispatcher.test.ts"
+      ],
+      "note": "wireDispatcher admits leases against an unverified list.",
+      "line": 202,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 10319,
+      "totals": {
+        "total": 27,
+        "passed": 25,
+        "failed": 2
+      },
+      "failingTests": [
+        "tests/leaseRevocationConsumers.test.ts > AMC-1542 every revocation consumer refuses an unverifiable list 'wireDispatcher'",
+        "tests/wireDispatcher.test.ts > what a lease must say refuses EVERY lease when the revocation list will not verify"
+      ],
+      "failingTestCount": 2,
+      "failedFiles": []
+    },
+    {
+      "id": "P30-1546-mixed-credentials",
+      "oldIssue": "AMC-1546",
+      "file": "src/studio/agentCredentialAuth.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/studioCredentialBindingHttp.test.ts",
+        "tests/studioAgentCredentialBinding.test.ts"
+      ],
+      "note": "Accept mixed credentials (grants from different agents).",
+      "line": 92,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 12736,
+      "totals": {
+        "total": 22,
+        "passed": 18,
+        "failed": 4
+      },
+      "failingTests": [
+        "tests/studioAgentCredentialBinding.test.ts > Studio binds agent identity before ToolHub execution refuses A's static token with B's lease before fs.write, receipt creation or approval consumption",
+        "tests/studioAgentCredentialBinding.test.ts > all supplied credential scopes and validity constraints bind does not let another valid lease hide a revoked or invalid lower-priority carrier",
+        "tests/studioAgentCredentialBinding.test.ts > all supplied credential scopes and validity constraints bind rejects malformed, empty and conflicting credentials without static-token fallback",
+        "tests/studioCredentialBindingHttp.test.ts > Studio credential binding over loopback HTTP (P0-30) refuses A's static token plus B's lease before B's approved fs.write writes anything"
+      ],
+      "failingTestCount": 4,
+      "failedFiles": []
+    },
+    {
+      "id": "P30-1546-lease-narrowing",
+      "oldIssue": "AMC-1546",
+      "file": "src/studio/agentCredentialAuth.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/studioCredentialBindingHttp.test.ts",
+        "tests/studioAgentCredentialBinding.test.ts"
+      ],
+      "note": "Ignore lease narrowing (no scope intersection).",
+      "line": 94,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 13477,
+      "totals": {
+        "total": 22,
+        "passed": 14,
+        "failed": 8
+      },
+      "failingTests": [
+        "tests/studioAgentCredentialBinding.test.ts > all supplied credential scopes and validity constraints bind intersects the static token and narrower lease on every scope-only endpoint",
+        "tests/studioAgentCredentialBinding.test.ts > all supplied credential scopes and validity constraints bind does not ignore a narrower lease in x-amc-lease beside a static identity",
+        "tests/studioAgentCredentialBinding.test.ts > all supplied credential scopes and validity constraints bind does not ignore a narrower lease in x-api-key beside a static identity",
+        "tests/studioAgentCredentialBinding.test.ts > all supplied credential scopes and validity constraints bind does not ignore a narrower lease in x-goog-api-key beside a static identity",
+        "tests/studioAgentCredentialBinding.test.ts > all supplied credential scopes and validity constraints bind does not ignore a narrower lease in api-key beside a static identity",
+        "tests/studioAgentCredentialBinding.test.ts > all supplied credential scopes and validity constraints bind does not ignore a narrower lease in authorization beside a static identity",
+        "tests/studioAgentCredentialBinding.test.ts > all supplied credential scopes and validity constraints bind intersects multiple valid lease carriers rather than accepting the first carrier's wider scope",
+        "tests/studioCredentialBindingHttp.test.ts > Studio credential binding over loopback HTTP (P0-30) narrows A's static token to a receipt:verify-only lease: only the narrower scope works"
+      ],
+      "failingTestCount": 8,
+      "failedFiles": []
+    },
+    {
+      "id": "P30-1508-submittedby-from-body",
+      "oldIssue": "AMC-1508",
+      "file": "src/api/productRouter.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/portalAttribution.test.ts"
+      ],
+      "note": "Take submittedBy from the body. The route refuses a body submittedBy with 400 rather than ignoring it.",
+      "line": 89,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 4351,
+      "totals": {
+        "total": 22,
+        "passed": 17,
+        "failed": 5
+      },
+      "failingTests": [
+        "tests/portalAttribution.test.ts > AMC-1508 — persisted portal attribution after authentication rejects client submittedBy=someone-else without changing persisted rows",
+        "tests/portalAttribution.test.ts > AMC-1508 — persisted portal attribution after authentication rejects client submittedBy=sid without changing persisted rows",
+        "tests/portalAttribution.test.ts > AMC-1508 — persisted portal attribution after authentication rejects client submittedBy= without changing persisted rows",
+        "tests/portalAttribution.test.ts > AMC-1508 — persisted portal attribution after authentication rejects client submittedBy=null without changing persisted rows",
+        "tests/portalAttribution.test.ts > AMC-1508 — persisted portal attribution after authentication at the router seam a body naming someone else never becomes the stored submitter (P0-30)"
+      ],
+      "failingTestCount": 5,
+      "failedFiles": []
+    },
+    {
+      "id": "P30-1534-budget-compare",
+      "oldIssue": "AMC-1534",
+      "file": "src/budgets/nativeBudgetAdmission.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/nativeBudgets.test.ts"
+      ],
+      "note": "Drop the budget compare in reserveNativeToolBudget.",
+      "line": 41,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 13221,
+      "totals": {
+        "total": 26,
+        "passed": 23,
+        "failed": 3
+      },
+      "failingTests": [
+        "tests/nativeBudgets.test.ts > AMC-1534 native budget admissions and signed accounting counts one executed audit per call, separates denials and failures, and blocks at the exact class cap",
+        "tests/nativeBudgets.test.ts > AMC-1534 native budget admissions and signed accounting missing final recording retains a pending reservation instead of freeing the final tool slot",
+        "tests/nativeBudgets.test.ts > AMC-1534 native budget admissions and signed accounting two reservations released together by a barrier at the last budget unit admit exactly one"
+      ],
+      "failingTestCount": 3,
+      "failedFiles": []
+    },
+    {
+      "id": "P30-1529-replay-bytes-binding",
+      "oldIssue": "AMC-1529",
+      "file": "src/notary/notaryAuth.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/notaryAuthReplay.test.ts",
+        "tests/notaryComposeIntegration.test.ts"
+      ],
+      "note": "Drop the replay guard's binding to the canonical signature bytes (key on the raw header).",
+      "line": 98,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 5866,
+      "totals": {
+        "total": 16,
+        "passed": 13,
+        "failed": 3
+      },
+      "failingTests": [
+        "tests/notaryAuthReplay.test.ts > authenticated notary replay admission consumes one admission across accepted signature and timestamp spellings for POST /sign",
+        "tests/notaryAuthReplay.test.ts > authenticated notary replay admission consumes one admission across accepted signature and timestamp spellings for GET /log/tail",
+        "tests/notaryComposeIntegration.test.ts > optional Compose notary listener and policy signing signs the original digest through the actual CLI service and policy producer, retaining auth and payload checks"
+      ],
+      "failingTestCount": 3,
+      "failedFiles": []
+    },
+    {
+      "id": "P30-1529-replay-lifetime",
+      "oldIssue": "AMC-1529",
+      "file": "src/notary/notaryAuth.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/notaryAuthReplay.test.ts"
+      ],
+      "note": "Drop the replay guard's lifetime check.",
+      "line": 49,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 502,
+      "totals": {
+        "total": 6,
+        "passed": 5,
+        "failed": 1
+      },
+      "failingTests": [
+        "tests/notaryAuthReplay.test.ts > authenticated notary replay admission retains a future-dated authentication through its inclusive validity boundary"
+      ],
+      "failingTestCount": 1,
+      "failedFiles": []
+    },
+    {
+      "id": "P30-1537-reviewed-pin",
+      "oldIssue": "AMC-1537",
+      "file": "src/agent/agentToolset.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/nativePinnedToolSchemas.test.ts"
+      ],
+      "note": "Skip the reviewed-pin digest comparison before schema admission (agentToolset.ts schemas()).",
+      "line": 489,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 8211,
+      "totals": {
+        "total": 11,
+        "passed": 5,
+        "failed": 6
+      },
+      "failingTests": [
+        "tests/nativePinnedToolSchemas.test.ts > wider grants refuses pinned schema admission before native model preparation, without a no-tools fallback",
+        "tests/nativePinnedToolSchemas.test.ts > same-name wider path refuses pinned schema admission before native model preparation, without a no-tools fallback",
+        "tests/nativePinnedToolSchemas.test.ts > revoked subset refuses pinned schema admission before native model preparation, without a no-tools fallback",
+        "tests/nativePinnedToolSchemas.test.ts > misclassified identity refuses pinned schema admission before native model preparation, without a no-tools fallback",
+        "tests/nativePinnedToolSchemas.test.ts > the existing execution digest guard still records a signed denial after an operator widens the policy",
+        "tests/nativePinnedToolSchemas.test.ts > pinned Code Mode and explicit extension schemas cannot bypass the same snapshot admission"
+      ],
+      "failingTestCount": 6,
+      "failedFiles": []
+    },
+    {
+      "id": "P30-1547-write-before-commit",
+      "oldIssue": "AMC-1547",
+      "file": "src/session/spill/spillStore.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/spillEncryption.test.ts",
+        "tests/sessionSpillCommitment.test.ts",
+        "tests/sessionAttachmentSpill.test.ts",
+        "tests/sessionInboxSpill.test.ts"
+      ],
+      "note": "Write spill content before its commitment.",
+      "line": 226,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 12883,
+      "totals": {
+        "total": 55,
+        "passed": 42,
+        "failed": 13
+      },
+      "failingTests": [
+        "tests/sessionAttachmentSpill.test.ts > user attachments above the per-event cap are retained through the signed spill store a signed commitment row is durable before any object exists; the attachment row carries a descriptor and the same reference",
+        "tests/sessionAttachmentSpill.test.ts > user attachments above the per-event cap are retained through the signed spill store a commitment refused at admission never publishes an object or an attachment row",
+        "tests/sessionInboxSpill.test.ts > queued inputs above the per-event cap are retained through the signed spill store the loop/inbox commitment is durable before any object exists; the inbox row carries a descriptor and keeps its format; replay, claim, continuity and projection carry the original bytes",
+        "tests/sessionSpillCommitment.test.ts > signed spill commitment precedes encrypted persistence admits the signed non-surface commitment before any spill file, then admits the result after persistence",
+        "tests/sessionSpillCommitment.test.ts > signed spill commitment precedes encrypted persistence a commitment failure at before-admission never persists an object or publishes a result",
+        "tests/sessionSpillCommitment.test.ts > signed spill commitment precedes encrypted persistence a commitment failure at after-commit-return-lost never persists an object or publishes a result",
+        "tests/spillEncryption.test.ts > retained spill encryption and publication prepares only in memory and publishes encrypted bytes from the input snapshot",
+        "tests/spillEncryption.test.ts > retained spill encryption and publication requires a completed commitment callback before any publication",
+        "tests/spillEncryption.test.ts > retained spill encryption and publication refuses asynchronous commitment callbacks without writing",
+        "tests/spillEncryption.test.ts > retained spill encryption and publication finishes short writes instead of publishing a truncated object",
+        "tests/spillEncryption.test.ts > retained spill encryption and publication removes its partial file when a write makes no progress",
+        "tests/spillEncryption.test.ts > retained spill encryption and publication does not overwrite a name planted after preparation",
+        "tests/spillEncryption.test.ts > retained spill encryption and publication refuses a linked parent and an exposed private directory"
+      ],
+      "failingTestCount": 13,
+      "failedFiles": []
+    },
+    {
+      "id": "P30-1547-default-key",
+      "oldIssue": "AMC-1547",
+      "file": "src/session/spill/spillEncryption.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/spillEncryption.test.ts",
+        "tests/sessionSpillCommitment.test.ts",
+        "tests/sessionAttachmentSpill.test.ts"
+      ],
+      "note": "Fall back to a default spill key.",
+      "line": 115,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 13088,
+      "totals": {
+        "total": 50,
+        "passed": 40,
+        "failed": 10
+      },
+      "failingTests": [
+        "tests/sessionAttachmentSpill.test.ts > user attachments above the per-event cap are retained through the signed spill store before any blob has provisioned the workspace key, the spill store cannot prepare and the attachment is refused with nothing recorded",
+        "tests/sessionSpillCommitment.test.ts > signed spill commitment precedes encrypted persistence missing current-key signature produces only an explicit unretrievable preview and creates no key",
+        "tests/sessionSpillCommitment.test.ts > signed spill commitment precedes encrypted persistence unavailable vault cannot produce a signed result or spill plaintext, fallback keys or replacement material",
+        "tests/spillEncryption.test.ts > retained spill encryption and publication refuses no-sign mode without creating an unvaulted spill key",
+        "tests/spillEncryption.test.ts > retained spill encryption and publication does not repair missing current key metadata",
+        "tests/spillEncryption.test.ts > retained spill encryption and publication does not repair missing current key signature",
+        "tests/spillEncryption.test.ts > retained spill encryption and publication rejects tampered current metadata instead of selecting its unverified version",
+        "tests/spillEncryption.test.ts > retained spill encryption and publication refuses signed unsupported key version 0 before encoding",
+        "tests/spillEncryption.test.ts > retained spill encryption and publication refuses signed unsupported key version 4294967296 before encoding",
+        "tests/spillEncryption.test.ts > retained spill encryption and publication uses read-only vault access when supplied, then refuses after credentials disappear"
+      ],
+      "failingTestCount": 10,
+      "failedFiles": []
+    },
+    {
+      "id": "P30-1547-skip-verify",
+      "oldIssue": "AMC-1547",
+      "file": "src/session/spill/spillEvidence.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/sessionSpill.test.ts",
+        "tests/sessionAttachmentSpill.test.ts"
+      ],
+      "note": "Skip verifySpilledContent in the sweep (authenticate rows only).",
+      "line": 276,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 12622,
+      "totals": {
+        "total": 25,
+        "passed": 21,
+        "failed": 4
+      },
+      "failingTests": [
+        "tests/sessionAttachmentSpill.test.ts > user attachments above the per-event cap are retained through the signed spill store retention, erasure and export already cover the spilled attachment through its signed references",
+        "tests/sessionSpill.test.ts > spill — oversized tool output leaves the ledger, its commitment does not detects a tampered spill file whose length is unchanged",
+        "tests/sessionSpill.test.ts > spill — oversized tool output leaves the ledger, its commitment does not reports a deleted spill object as missing, not as tampering",
+        "tests/sessionSpill.test.ts > spill — oversized tool output leaves the ledger, its commitment does not degrades honestly when the spill store cannot write: no locator, but still a commitment"
+      ],
+      "failingTestCount": 4,
+      "failedFiles": []
+    },
+    {
+      "id": "P30-1547-dotdot-path",
+      "oldIssue": "AMC-1547",
+      "file": "src/session/spill/spillTypes.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/sessionSpill.test.ts"
+      ],
+      "note": "Allow .. in a spill locator path.",
+      "line": 198,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 8796,
+      "totals": {
+        "total": 15,
+        "passed": 14,
+        "failed": 1
+      },
+      "failingTests": [
+        "tests/sessionSpill.test.ts > spill — oversized tool output leaves the ledger, its commitment does not rejects a locator that tries to name a path outside the session directory"
+      ],
+      "failingTestCount": 1,
+      "failedFiles": []
+    },
+    {
+      "id": "P30-1547-export-unauthenticated",
+      "oldIssue": "AMC-1547",
+      "file": "src/session/spill/spillLifecycle.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/spillLifecycle.test.ts"
+      ],
+      "note": "Export without the authenticated inventory.",
+      "line": 241,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 6692,
+      "totals": {
+        "total": 15,
+        "passed": 14,
+        "failed": 1
+      },
+      "failingTests": [
+        "tests/spillLifecycle.test.ts > authenticated spill inventory distinguishes missing encrypted objects from modified ciphertext"
+      ],
+      "failingTestCount": 1,
+      "failedFiles": []
+    },
+    {
+      "id": "P30-1547-erase-scope",
+      "oldIssue": "AMC-1547",
+      "file": "src/session/spill/spillLifecycle.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/spillLifecycle.test.ts",
+        "tests/retentionSpill.test.ts",
+        "tests/cliSpillCommands.test.ts"
+      ],
+      "note": "Erase outside the requested scope.",
+      "line": 126,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 20620,
+      "totals": {
+        "total": 85,
+        "passed": 80,
+        "failed": 5
+      },
+      "failingTests": [
+        "tests/cliSpillCommands.test.ts > native spill commands over sqlite history plans read-only, canonicalizes repeated exact IDs, then calls native intent/unlink/outcome for only the reviewed scope",
+        "tests/cliSpillCommands.test.ts > native spill commands over jsonl history plans read-only, canonicalizes repeated exact IDs, then calls native intent/unlink/outcome for only the reviewed scope",
+        "tests/retentionSpill.test.ts > retention reaches committed spill objects without selecting active sessions makes retention progress when a backlog exceeds one signed audit payload while keeping every locator's exact references together",
+        "tests/spillLifecycle.test.ts > explicit local spill erasure rejects empty scope and scope that leaves another signed reference outside it",
+        "tests/spillLifecycle.test.ts > explicit local spill erasure signs intention before real unlink and records exact outcomes while preserving other sessions"
+      ],
+      "failingTestCount": 5,
+      "failedFiles": []
+    },
+    {
+      "id": "P30-1534-no-transaction",
+      "oldIssue": "AMC-1534",
+      "file": "src/budgets/nativeBudgetAdmission.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/nativeBudgets.test.ts"
+      ],
+      "note": "Drop the IMMEDIATE transaction around read/check/reserve (the race): one edit replaces the wrapper with a function whose .immediate() runs the body bare. Killed only by the two-process barrier case.",
+      "line": 26,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 12273,
+      "totals": {
+        "total": 26,
+        "passed": 25,
+        "failed": 1
+      },
+      "failingTests": [
+        "tests/nativeBudgets.test.ts > AMC-1534 native budget admissions and signed accounting two reservations released together by a barrier at the last budget unit admit exactly one"
+      ],
+      "failingTestCount": 1,
+      "failedFiles": []
+    },
+    {
+      "id": "S7-M01-bwrap-child-guard",
+      "oldIssue": "AMC-1513",
+      "file": "src/sandbox/bwrapBackend.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/sandboxConfinement.test.ts",
+        "tests/bwrapBackendPure.test.ts"
+      ],
+      "note": "S7 entry re-pointed at main (P0-13 landed S7's tests). tests/nativeSandboxPolicyBinding.test.ts is left out: two of its cases fail on main without any mutation (stale since P1-02's authorization recheck; see the README), and S7 recorded every kill in bwrapBackendPure.",
+      "line": 95,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 1111,
+      "totals": {
+        "total": 41,
+        "passed": 37,
+        "failed": 4
+      },
+      "failingTests": [
+        "tests/bwrapBackendPure.test.ts > bwrapCommandExit duplicate child or exit rows are refused",
+        "tests/bwrapBackendPure.test.ts > bwrapCommandExit child pid 1.5 is refused",
+        "tests/bwrapBackendPure.test.ts > bwrapCommandExit child pid 12 is refused",
+        "tests/bwrapBackendPure.test.ts > bwrapCommandExit child pid 9007199254740992 is refused"
+      ],
+      "failingTestCount": 4,
+      "failedFiles": []
+    },
+    {
+      "id": "S7-M02-bwrap-exit-before-child",
+      "oldIssue": "AMC-1513",
+      "file": "src/sandbox/bwrapBackend.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/sandboxConfinement.test.ts",
+        "tests/bwrapBackendPure.test.ts"
+      ],
+      "note": "S7 entry re-pointed at main (P0-13 landed S7's tests). tests/nativeSandboxPolicyBinding.test.ts is left out: two of its cases fail on main without any mutation (stale since P1-02's authorization recheck; see the README), and S7 recorded every kill in bwrapBackendPure.",
+      "line": 99,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 1076,
+      "totals": {
+        "total": 41,
+        "passed": 40,
+        "failed": 1
+      },
+      "failingTests": [
+        "tests/bwrapBackendPure.test.ts > bwrapCommandExit an exit code without a preceding child pid is refused"
+      ],
+      "failingTestCount": 1,
+      "failedFiles": []
+    },
+    {
+      "id": "S7-M03-bwrap-exit-dup",
+      "oldIssue": "AMC-1513",
+      "file": "src/sandbox/bwrapBackend.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/sandboxConfinement.test.ts",
+        "tests/bwrapBackendPure.test.ts"
+      ],
+      "note": "S7 entry re-pointed at main (P0-13 landed S7's tests). tests/nativeSandboxPolicyBinding.test.ts is left out: two of its cases fail on main without any mutation (stale since P1-02's authorization recheck; see the README), and S7 recorded every kill in bwrapBackendPure.",
+      "line": 99,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 1077,
+      "totals": {
+        "total": 41,
+        "passed": 40,
+        "failed": 1
+      },
+      "failingTests": [
+        "tests/bwrapBackendPure.test.ts > bwrapCommandExit duplicate child or exit rows are refused"
+      ],
+      "failingTestCount": 1,
+      "failedFiles": []
+    },
+    {
+      "id": "S7-M04-bwrap-exit-range",
+      "oldIssue": "AMC-1513",
+      "file": "src/sandbox/bwrapBackend.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/sandboxConfinement.test.ts",
+        "tests/bwrapBackendPure.test.ts"
+      ],
+      "note": "S7 entry re-pointed at main (P0-13 landed S7's tests). tests/nativeSandboxPolicyBinding.test.ts is left out: two of its cases fail on main without any mutation (stale since P1-02's authorization recheck; see the README), and S7 recorded every kill in bwrapBackendPure.",
+      "line": 99,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 1219,
+      "totals": {
+        "total": 41,
+        "passed": 40,
+        "failed": 1
+      },
+      "failingTests": [
+        "tests/bwrapBackendPure.test.ts > bwrapCommandExit exit code 256 is refused"
+      ],
+      "failingTestCount": 1,
+      "failedFiles": []
+    },
+    {
+      "id": "S7-M05-bwrap-nonobject-row",
+      "oldIssue": "AMC-1513",
+      "file": "src/sandbox/bwrapBackend.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/sandboxConfinement.test.ts",
+        "tests/bwrapBackendPure.test.ts"
+      ],
+      "note": "S7 entry re-pointed at main (P0-13 landed S7's tests). tests/nativeSandboxPolicyBinding.test.ts is left out: two of its cases fail on main without any mutation (stale since P1-02's authorization recheck; see the README), and S7 recorded every kill in bwrapBackendPure.",
+      "line": 92,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 1344,
+      "totals": {
+        "total": 41,
+        "passed": 40,
+        "failed": 1
+      },
+      "failingTests": [
+        "tests/bwrapBackendPure.test.ts > bwrapCommandExit row [1] is refused"
+      ],
+      "failingTestCount": 1,
+      "failedFiles": []
+    },
+    {
+      "id": "S7-M06-bwrap-child-positive",
+      "oldIssue": "AMC-1513",
+      "file": "src/sandbox/bwrapBackend.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/sandboxConfinement.test.ts",
+        "tests/bwrapBackendPure.test.ts"
+      ],
+      "note": "S7 entry re-pointed at main (P0-13 landed S7's tests). tests/nativeSandboxPolicyBinding.test.ts is left out: two of its cases fail on main without any mutation (stale since P1-02's authorization recheck; see the README), and S7 recorded every kill in bwrapBackendPure.",
+      "line": 95,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 1136,
+      "totals": {
+        "total": 41,
+        "passed": 39,
+        "failed": 2
+      },
+      "failingTests": [
+        "tests/bwrapBackendPure.test.ts > bwrapCommandExit child pid 0 is refused",
+        "tests/bwrapBackendPure.test.ts > bwrapCommandExit child pid -1 is refused"
+      ],
+      "failingTestCount": 2,
+      "failedFiles": []
+    },
+    {
+      "id": "S7-M07-bpf-arch-check",
+      "oldIssue": "AMC-1513",
+      "file": "src/sandbox/bwrapBackend.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/sandboxConfinement.test.ts",
+        "tests/bwrapBackendPure.test.ts"
+      ],
+      "note": "S7 entry re-pointed at main (P0-13 landed S7's tests). tests/nativeSandboxPolicyBinding.test.ts is left out: two of its cases fail on main without any mutation (stale since P1-02's authorization recheck; see the README), and S7 recorded every kill in bwrapBackendPure.",
+      "line": 63,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 1146,
+      "totals": {
+        "total": 41,
+        "passed": 39,
+        "failed": 2
+      },
+      "failingTests": [
+        "tests/bwrapBackendPure.test.ts > linuxSocketDenyFilter x64 kills foreign ABIs and refuses socket, socketpair, connect, x32 and io_uring entry points",
+        "tests/bwrapBackendPure.test.ts > linuxSocketDenyFilter arm64 uses its own socket numbers and kills the x64 ABI"
+      ],
+      "failingTestCount": 2,
+      "failedFiles": []
+    },
+    {
+      "id": "S7-M08-bpf-x32-rule",
+      "oldIssue": "AMC-1513",
+      "file": "src/sandbox/bwrapBackend.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/sandboxConfinement.test.ts",
+        "tests/bwrapBackendPure.test.ts"
+      ],
+      "note": "S7 entry re-pointed at main (P0-13 landed S7's tests). tests/nativeSandboxPolicyBinding.test.ts is left out: two of its cases fail on main without any mutation (stale since P1-02's authorization recheck; see the README), and S7 recorded every kill in bwrapBackendPure.",
+      "line": 68,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 1460,
+      "totals": {
+        "total": 41,
+        "passed": 40,
+        "failed": 1
+      },
+      "failingTests": [
+        "tests/bwrapBackendPure.test.ts > linuxSocketDenyFilter x64 kills foreign ABIs and refuses socket, socketpair, connect, x32 and io_uring entry points"
+      ],
+      "failingTestCount": 1,
+      "failedFiles": []
+    },
+    {
+      "id": "S7-M09-bpf-io-uring",
+      "oldIssue": "AMC-1513",
+      "file": "src/sandbox/bwrapBackend.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/sandboxConfinement.test.ts",
+        "tests/bwrapBackendPure.test.ts"
+      ],
+      "note": "S7 entry re-pointed at main (P0-13 landed S7's tests). tests/nativeSandboxPolicyBinding.test.ts is left out: two of its cases fail on main without any mutation (stale since P1-02's authorization recheck; see the README), and S7 recorded every kill in bwrapBackendPure.",
+      "line": 71,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 1727,
+      "totals": {
+        "total": 41,
+        "passed": 39,
+        "failed": 2
+      },
+      "failingTests": [
+        "tests/bwrapBackendPure.test.ts > linuxSocketDenyFilter x64 kills foreign ABIs and refuses socket, socketpair, connect, x32 and io_uring entry points",
+        "tests/bwrapBackendPure.test.ts > linuxSocketDenyFilter arm64 uses its own socket numbers and kills the x64 ABI"
+      ],
+      "failingTestCount": 2,
+      "failedFiles": []
+    },
+    {
+      "id": "S7-M10-bpf-connect",
+      "oldIssue": "AMC-1513",
+      "file": "src/sandbox/bwrapBackend.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/sandboxConfinement.test.ts",
+        "tests/bwrapBackendPure.test.ts"
+      ],
+      "note": "S7 entry re-pointed at main (P0-13 landed S7's tests). tests/nativeSandboxPolicyBinding.test.ts is left out: two of its cases fail on main without any mutation (stale since P1-02's authorization recheck; see the README), and S7 recorded every kill in bwrapBackendPure.",
+      "line": 71,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 1379,
+      "totals": {
+        "total": 41,
+        "passed": 40,
+        "failed": 1
+      },
+      "failingTests": [
+        "tests/bwrapBackendPure.test.ts > linuxSocketDenyFilter x64 kills foreign ABIs and refuses socket, socketpair, connect, x32 and io_uring entry points"
+      ],
+      "failingTestCount": 1,
+      "failedFiles": []
+    },
+    {
+      "id": "S7-M11-profile-import-gate-221",
+      "oldIssue": "AMC-1516",
+      "file": "src/standard/externalEvidenceProfile.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/externalEvidenceProfile.test.ts",
+        "tests/importProvenance.test.ts"
+      ],
+      "note": "S7 entry re-pointed at main (P0-13 landed S7's tests).",
+      "line": 221,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 1477,
+      "totals": {
+        "total": 18,
+        "passed": 17,
+        "failed": 1
+      },
+      "failingTests": [
+        "tests/externalEvidenceProfile.test.ts > external evidence profile an authority that a direct JS caller admits for imports still cannot promote an import"
+      ],
+      "failingTestCount": 1,
+      "failedFiles": []
+    },
+    {
+      "id": "S7-M12-profile-lower-clamp-230",
+      "oldIssue": "AMC-1516",
+      "file": "src/standard/externalEvidenceProfile.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/externalEvidenceProfile.test.ts",
+        "tests/importProvenance.test.ts"
+      ],
+      "note": "S7 entry re-pointed at main (P0-13 landed S7's tests).",
+      "line": 230,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 1399,
+      "totals": {
+        "total": 18,
+        "passed": 17,
+        "failed": 1
+      },
+      "failingTests": [
+        "tests/externalEvidenceProfile.test.ts > external evidence profile the verifier never raises a producer's own lower declaration"
+      ],
+      "failingTestCount": 1,
+      "failedFiles": []
+    },
+    {
+      "id": "S7-M13-export-chunk-bound",
+      "oldIssue": "AMC-1516",
+      "file": "src/importers/externalEvidenceExport.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/neutralImporter.test.ts",
+        "tests/neutralImportMapping.test.ts",
+        "tests/externalEvidenceExport.test.ts"
+      ],
+      "note": "S7 entry re-pointed at main (P0-13 landed S7's tests).",
+      "line": 13,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 6772,
+      "totals": {
+        "total": 26,
+        "passed": 25,
+        "failed": 1
+      },
+      "failingTests": [
+        "tests/externalEvidenceExport.test.ts > neutralExternalEvidenceProfiles large sources split into bounded parts without cross-part ancestry and disclose redaction"
+      ],
+      "failingTestCount": 1,
+      "failedFiles": []
+    },
+    {
+      "id": "S7-M14-export-callback-cancel",
+      "oldIssue": "AMC-1516",
+      "file": "src/importers/externalEvidenceExport.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/neutralImporter.test.ts",
+        "tests/neutralImportMapping.test.ts",
+        "tests/externalEvidenceExport.test.ts"
+      ],
+      "note": "S7 entry re-pointed at main (P0-13 landed S7's tests).",
+      "line": 51,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 4832,
+      "totals": {
+        "total": 26,
+        "passed": 25,
+        "failed": 1
+      },
+      "failingTests": [
+        "tests/externalEvidenceExport.test.ts > neutralExternalEvidenceProfiles cancellation and failure are kept apart and never become success"
+      ],
+      "failingTestCount": 1,
+      "failedFiles": []
+    },
+    {
+      "id": "S7-M15-export-unicode-replace",
+      "oldIssue": "AMC-1516",
+      "file": "src/importers/externalEvidenceExport.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/neutralImporter.test.ts",
+        "tests/neutralImportMapping.test.ts",
+        "tests/externalEvidenceExport.test.ts"
+      ],
+      "note": "S7 entry re-pointed at main (P0-13 landed S7's tests).",
+      "line": 29,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 4903,
+      "totals": {
+        "total": 26,
+        "passed": 25,
+        "failed": 1
+      },
+      "failingTests": [
+        "tests/externalEvidenceExport.test.ts > neutralExternalEvidenceProfiles malformed Unicode is replaced and long strings bounded instead of refusing the import"
+      ],
+      "failingTestCount": 1,
+      "failedFiles": []
+    },
+    {
+      "id": "S7-M16-export-time-range",
+      "oldIssue": "AMC-1516",
+      "file": "src/importers/externalEvidenceExport.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/neutralImporter.test.ts",
+        "tests/neutralImportMapping.test.ts",
+        "tests/externalEvidenceExport.test.ts"
+      ],
+      "note": "S7 entry re-pointed at main (P0-13 landed S7's tests).",
+      "line": 45,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 4433,
+      "totals": {
+        "total": 26,
+        "passed": 25,
+        "failed": 1
+      },
+      "failingTests": [
+        "tests/externalEvidenceExport.test.ts > neutralExternalEvidenceProfiles source time and duration are kept only when exactly representable"
+      ],
+      "failingTestCount": 1,
+      "failedFiles": []
+    },
+    {
+      "id": "S7-M17-export-duration-loss",
+      "oldIssue": "AMC-1516",
+      "file": "src/importers/externalEvidenceExport.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/neutralImporter.test.ts",
+        "tests/neutralImportMapping.test.ts",
+        "tests/externalEvidenceExport.test.ts"
+      ],
+      "note": "S7 ran this before splitting the test (survived); re-run on main, where the split test (M17b) exists.",
+      "line": 50,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 6180,
+      "totals": {
+        "total": 26,
+        "passed": 25,
+        "failed": 1
+      },
+      "failingTests": [
+        "tests/externalEvidenceExport.test.ts > neutralExternalEvidenceProfiles source time and duration are kept only when exactly representable"
+      ],
+      "failingTestCount": 1,
+      "failedFiles": []
+    },
+    {
+      "id": "S7-M18-export-redaction-loss",
+      "oldIssue": "AMC-1516",
+      "file": "src/importers/externalEvidenceExport.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/neutralImporter.test.ts",
+        "tests/neutralImportMapping.test.ts",
+        "tests/externalEvidenceExport.test.ts"
+      ],
+      "note": "S7 entry re-pointed at main (P0-13 landed S7's tests).",
+      "line": 21,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 6253,
+      "totals": {
+        "total": 26,
+        "passed": 25,
+        "failed": 1
+      },
+      "failingTests": [
+        "tests/externalEvidenceExport.test.ts > neutralExternalEvidenceProfiles large sources split into bounded parts without cross-part ancestry and disclose redaction"
+      ],
+      "failingTestCount": 1,
+      "failedFiles": []
+    },
+    {
+      "id": "S7-M17b-export-duration-loss",
+      "oldIssue": "AMC-1516",
+      "file": "src/importers/externalEvidenceExport.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/neutralImporter.test.ts",
+        "tests/neutralImportMapping.test.ts",
+        "tests/externalEvidenceExport.test.ts"
+      ],
+      "note": "S7 entry re-pointed at main (P0-13 landed S7's tests).",
+      "line": 50,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 5557,
+      "totals": {
+        "total": 26,
+        "passed": 25,
+        "failed": 1
+      },
+      "failingTests": [
+        "tests/externalEvidenceExport.test.ts > neutralExternalEvidenceProfiles source time and duration are kept only when exactly representable"
+      ],
+      "failingTestCount": 1,
+      "failedFiles": []
+    },
+    {
+      "id": "S7-M19-export-time-loss",
+      "oldIssue": "AMC-1516",
+      "file": "src/importers/externalEvidenceExport.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/neutralImporter.test.ts",
+        "tests/neutralImportMapping.test.ts",
+        "tests/externalEvidenceExport.test.ts"
+      ],
+      "note": "S7 entry re-pointed at main (P0-13 landed S7's tests).",
+      "line": 46,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 4532,
+      "totals": {
+        "total": 26,
+        "passed": 25,
+        "failed": 1
+      },
+      "failingTests": [
+        "tests/externalEvidenceExport.test.ts > neutralExternalEvidenceProfiles source time and duration are kept only when exactly representable"
+      ],
+      "failingTestCount": 1,
+      "failedFiles": []
+    },
+    {
+      "id": "S7-M20-callback-allowlist-66",
+      "oldIssue": "AMC-1517",
+      "file": "src/importers/callbackTelemetryCapture.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/neutralImportMapping.test.ts",
+        "tests/callbackTelemetryCapture.test.ts"
+      ],
+      "note": "S7 entry re-pointed at main (P0-13 landed S7's tests).",
+      "line": 66,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 849,
+      "totals": {
+        "total": 13,
+        "passed": 12,
+        "failed": 1
+      },
+      "failingTests": [
+        "tests/callbackTelemetryCapture.test.ts > callback capture attribute admission keys outside the operational allowlist are dropped and counted on spans, updates and events"
+      ],
+      "failingTestCount": 1,
+      "failedFiles": []
+    },
+    {
+      "id": "S7-M21-callback-sensitive-extension-66",
+      "oldIssue": "AMC-1517",
+      "file": "src/importers/callbackTelemetryCapture.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/neutralImportMapping.test.ts",
+        "tests/callbackTelemetryCapture.test.ts"
+      ],
+      "note": "S7 entry re-pointed at main (P0-13 landed S7's tests).",
+      "line": 66,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 845,
+      "totals": {
+        "total": 13,
+        "passed": 12,
+        "failed": 1
+      },
+      "failingTests": [
+        "tests/callbackTelemetryCapture.test.ts > callback capture attribute admission an explicit extension admits operational keys but never content-shaped keys"
+      ],
+      "failingTestCount": 1,
+      "failedFiles": []
+    },
+    {
+      "id": "S7-M22-callback-token-counter-exemption-66",
+      "oldIssue": "AMC-1517",
+      "file": "src/importers/callbackTelemetryCapture.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/neutralImportMapping.test.ts",
+        "tests/callbackTelemetryCapture.test.ts"
+      ],
+      "note": "S7 entry re-pointed at main (P0-13 landed S7's tests).",
+      "line": 66,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 802,
+      "totals": {
+        "total": 13,
+        "passed": 12,
+        "failed": 1
+      },
+      "failingTests": [
+        "tests/callbackTelemetryCapture.test.ts > callback capture attribute admission known token counters stay admitted although their names contain input/output"
+      ],
+      "failingTestCount": 1,
+      "failedFiles": []
+    },
+    {
+      "id": "S7-M23-callback-closed-113-equivalent",
+      "oldIssue": "AMC-1517",
+      "file": "src/importers/callbackTelemetryCapture.ts",
+      "expect": "equivalent",
+      "tests": [
+        "tests/neutralImportMapping.test.ts",
+        "tests/callbackTelemetryCapture.test.ts"
+      ],
+      "note": "Equivalent by design: close() sets closed and ends every entry, so `entry.ended` already covers `this.closed` (S7, callbackTelemetryCapture.ts:113).",
+      "line": 113,
+      "outcome": "equivalent",
+      "ok": true,
+      "exitCode": 0,
+      "signal": null,
+      "durationMs": 1094,
+      "totals": {
+        "total": 13,
+        "passed": 13,
+        "failed": 0
+      },
+      "failingTests": [],
+      "failingTestCount": 0,
+      "failedFiles": []
+    },
+    {
+      "id": "S7-M24-harness-secret-manifest-112",
+      "oldIssue": "AMC-1518",
+      "file": "src/benchmarks/harnessComparison.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/harnessComparison.test.ts",
+        "tests/harnessComparisonOutputOwnership.test.ts"
+      ],
+      "note": "S7 entry re-pointed at main (P0-13 landed S7's tests).",
+      "line": 112,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 3021,
+      "totals": {
+        "total": 55,
+        "passed": 53,
+        "failed": 2
+      },
+      "failingTests": [
+        "tests/harnessComparison.test.ts > matched harness execution receipts a manifest carrying an exact runtime value is refused before any output directory exists",
+        "tests/harnessComparison.test.ts > matched harness execution receipts a manifest carrying a private key block is refused before any output directory exists"
+      ],
+      "failingTestCount": 2,
+      "failedFiles": []
+    },
+    {
+      "id": "S7-M25-harness-fixture-tamper-248",
+      "oldIssue": "AMC-1518",
+      "file": "src/benchmarks/harnessComparison.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/harnessComparison.test.ts",
+        "tests/harnessComparisonOutputOwnership.test.ts"
+      ],
+      "note": "S7 entry re-pointed at main (P0-13 landed S7's tests).",
+      "line": 248,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 2983,
+      "totals": {
+        "total": 55,
+        "passed": 54,
+        "failed": 1
+      },
+      "failingTests": [
+        "tests/harnessComparison.test.ts > matched harness execution receipts a target that rewrites its pinned fixture cannot produce a determinate result"
+      ],
+      "failingTestCount": 1,
+      "failedFiles": []
+    },
+    {
+      "id": "S7-M26-sdk-close-before-verify-753",
+      "oldIssue": "AMC-1519",
+      "file": "src/sdk/nativeAgentClient.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/cosProduct07NativeSdk.test.ts",
+        "tests/cosProduct07NativeSdkProcess.test.ts",
+        "tests/nativeAgentClientVerify.test.ts"
+      ],
+      "note": "S7 entry re-pointed at main (P0-13 landed S7's tests).",
+      "line": 756,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 10637,
+      "totals": {
+        "total": 53,
+        "passed": 52,
+        "failed": 1
+      },
+      "failingTests": [
+        "tests/nativeAgentClientVerify.test.ts > native SDK cold verification admission a live client never runs or promotes verification before close"
+      ],
+      "failingTestCount": 1,
+      "failedFiles": []
+    },
+    {
+      "id": "S7-M27-sdk-trust-anchor-789",
+      "oldIssue": "AMC-1519",
+      "file": "src/sdk/nativeAgentClient.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/cosProduct07NativeSdk.test.ts",
+        "tests/cosProduct07NativeSdkProcess.test.ts",
+        "tests/nativeAgentClientVerify.test.ts"
+      ],
+      "note": "S7 entry re-pointed at main (P0-13 landed S7's tests).",
+      "line": 792,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 10532,
+      "totals": {
+        "total": 53,
+        "passed": 51,
+        "failed": 2
+      },
+      "failingTests": [
+        "tests/nativeAgentClientVerify.test.ts > native SDK cold verification admission an anchored receipt with a different expected fingerprint is refused",
+        "tests/nativeAgentClientVerify.test.ts > native SDK cold verification admission an anchored receipt with no expected fingerprint is refused"
+      ],
+      "failingTestCount": 2,
+      "failedFiles": []
+    },
+    {
+      "id": "S7-M28-sdk-trust-anchor-mismatch-only-789",
+      "oldIssue": "AMC-1519",
+      "file": "src/sdk/nativeAgentClient.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/cosProduct07NativeSdk.test.ts",
+        "tests/cosProduct07NativeSdkProcess.test.ts",
+        "tests/nativeAgentClientVerify.test.ts"
+      ],
+      "note": "S7 entry re-pointed at main (P0-13 landed S7's tests).",
+      "line": 792,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 10907,
+      "totals": {
+        "total": 53,
+        "passed": 52,
+        "failed": 1
+      },
+      "failingTests": [
+        "tests/nativeAgentClientVerify.test.ts > native SDK cold verification admission an anchored receipt with a different expected fingerprint is refused"
+      ],
+      "failingTestCount": 1,
+      "failedFiles": []
+    },
+    {
+      "id": "S7-M29-sdk-trust-anchor-missing-only-789",
+      "oldIssue": "AMC-1519",
+      "file": "src/sdk/nativeAgentClient.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/cosProduct07NativeSdk.test.ts",
+        "tests/cosProduct07NativeSdkProcess.test.ts",
+        "tests/nativeAgentClientVerify.test.ts"
+      ],
+      "note": "S7 entry re-pointed at main (P0-13 landed S7's tests).",
+      "line": 792,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 10651,
+      "totals": {
+        "total": 53,
+        "passed": 52,
+        "failed": 1
+      },
+      "failingTests": [
+        "tests/nativeAgentClientVerify.test.ts > native SDK cold verification admission an anchored receipt with no expected fingerprint is refused"
+      ],
+      "failingTestCount": 1,
+      "failedFiles": []
+    },
+    {
+      "id": "S7-M30-dsh-hash-compare-34",
+      "oldIssue": "AMC-1520",
+      "file": "src/adapters/deepseekHarnessLaunch.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/deepseekPublicSurface.test.ts",
+        "tests/dshCaptureInterruption.test.ts",
+        "tests/deepseekHarnessLaunch.test.ts"
+      ],
+      "note": "S7 entry re-pointed at main (P0-13 landed S7's tests).",
+      "line": 34,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 8062,
+      "totals": {
+        "total": 36,
+        "passed": 34,
+        "failed": 2
+      },
+      "failingTests": [
+        "tests/deepseekHarnessLaunch.test.ts > DSH launch pin matching pinned files are admitted and changed executable or entrypoint bytes refuse",
+        "tests/deepseekHarnessLaunch.test.ts > DSH launch pin launch preparation re-checks the pin instead of trusting configuration time"
+      ],
+      "failingTestCount": 2,
+      "failedFiles": []
+    },
+    {
+      "id": "S7-M31-dsh-isfile-34",
+      "oldIssue": "AMC-1520",
+      "file": "src/adapters/deepseekHarnessLaunch.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/deepseekPublicSurface.test.ts",
+        "tests/deepseekHarnessLaunch.test.ts"
+      ],
+      "note": "S7 entry re-pointed at main (P0-13 landed S7's tests).",
+      "line": 34,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 8948,
+      "totals": {
+        "total": 32,
+        "passed": 31,
+        "failed": 1
+      },
+      "failingTests": [
+        "tests/deepseekHarnessLaunch.test.ts > DSH launch pin a directory at a pinned path is refused even when its hash field is reused"
+      ],
+      "failingTestCount": 1,
+      "failedFiles": []
+    },
+    {
+      "id": "S7-M32-dsh-prepare-reverify-59",
+      "oldIssue": "AMC-1520",
+      "file": "src/adapters/deepseekHarnessLaunch.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/deepseekPublicSurface.test.ts",
+        "tests/dshCaptureInterruption.test.ts",
+        "tests/deepseekHarnessLaunch.test.ts"
+      ],
+      "note": "S7 entry re-pointed at main (P0-13 landed S7's tests).",
+      "line": 59,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 8522,
+      "totals": {
+        "total": 36,
+        "passed": 35,
+        "failed": 1
+      },
+      "failingTests": [
+        "tests/deepseekHarnessLaunch.test.ts > DSH launch pin launch preparation re-checks the pin instead of trusting configuration time"
+      ],
+      "failingTestCount": 1,
+      "failedFiles": []
+    },
+    {
+      "id": "S7-M33-dsh-launchpin-boundary",
+      "oldIssue": "AMC-1520",
+      "file": "src/adapters/deepseekHarnessLaunch.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/deepseekPublicSurface.test.ts",
+        "tests/deepseekHarnessLaunch.test.ts"
+      ],
+      "note": "S7 entry re-pointed at main (P0-13 landed S7's tests).",
+      "line": 90,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 7419,
+      "totals": {
+        "total": 32,
+        "passed": 31,
+        "failed": 1
+      },
+      "failingTests": [
+        "tests/deepseekHarnessLaunch.test.ts > DSH launch pin the capture receipt states that exec by path is outside the hash check"
+      ],
+      "failingTestCount": 1,
+      "failedFiles": []
+    },
+    {
+      "id": "S7-M34-cli-format-name-version-15",
+      "oldIssue": "AMC-1523",
+      "file": "src/cli-import-commands.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/cliImportCommands.test.ts"
+      ],
+      "note": "S7 entry re-pointed at main (P0-13 landed S7's tests).",
+      "line": 35,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 2159,
+      "totals": {
+        "total": 4,
+        "passed": 3,
+        "failed": 1
+      },
+      "failingTests": [
+        "tests/cliImportCommands.test.ts > amc import text rendering a preview names the source format and version, record counts and the structured next actions"
+      ],
+      "failingTestCount": 1,
+      "failedFiles": []
+    },
+    {
+      "id": "S7-M35-cli-next-actions-16",
+      "oldIssue": "AMC-1523",
+      "file": "src/cli-import-commands.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/cliImportCommands.test.ts"
+      ],
+      "note": "S7 entry re-pointed at main (P0-13 landed S7's tests).",
+      "line": 39,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 1844,
+      "totals": {
+        "total": 4,
+        "passed": 3,
+        "failed": 1
+      },
+      "failingTests": [
+        "tests/cliImportCommands.test.ts > amc import text rendering a preview names the source format and version, record counts and the structured next actions"
+      ],
+      "failingTestCount": 1,
+      "failedFiles": []
+    },
+    {
+      "id": "S7-M36-cli-record-counts",
+      "oldIssue": "AMC-1523",
+      "file": "src/cli-import-commands.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/cliImportCommands.test.ts"
+      ],
+      "note": "S7 entry re-pointed at main (P0-13 landed S7's tests).",
+      "line": 29,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 1612,
+      "totals": {
+        "total": 4,
+        "passed": 2,
+        "failed": 2
+      },
+      "failingTests": [
+        "tests/cliImportCommands.test.ts > amc import text rendering a preview names the source format and version, record counts and the structured next actions",
+        "tests/cliImportCommands.test.ts > amc import text rendering an applied import and its manifest point to inspection instead of re-applying"
+      ],
+      "failingTestCount": 2,
+      "failedFiles": []
+    },
+    {
+      "id": "S7-M37-cli-applied-no-reapply",
+      "oldIssue": "AMC-1523",
+      "file": "src/cli-import-commands.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/cliImportCommands.test.ts"
+      ],
+      "note": "S7 entry re-pointed at main (P0-13 landed S7's tests).",
+      "line": 73,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 1764,
+      "totals": {
+        "total": 4,
+        "passed": 3,
+        "failed": 1
+      },
+      "failingTests": [
+        "tests/cliImportCommands.test.ts > amc import text rendering an applied import and its manifest point to inspection instead of re-applying"
+      ],
+      "failingTestCount": 1,
+      "failedFiles": []
+    },
+    {
+      "id": "S7-M38-cli-json-byte-identical",
+      "oldIssue": "AMC-1523",
+      "file": "src/cli/claimOutput.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/cliImportCommands.test.ts"
+      ],
+      "note": "Re-pointed: the import JSON output moved into emitClaimResult (src/cli/claimOutput.ts, P0-22) and the test now pins 'receipt plus claim fields', so the mutation drops the claim fields.",
+      "line": 94,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 1873,
+      "totals": {
+        "total": 4,
+        "passed": 3,
+        "failed": 1
+      },
+      "failingTests": [
+        "tests/cliImportCommands.test.ts > amc import text rendering JSON output is the exact receipt serialization plus its claim fields (P0-22)"
+      ],
+      "failingTestCount": 1,
+      "failedFiles": []
+    },
+    {
+      "id": "S7-M39-cli-shell-quoting",
+      "oldIssue": "AMC-1523",
+      "file": "src/cli-import-commands.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/cliImportCommands.test.ts"
+      ],
+      "note": "S7 entry re-pointed at main (P0-13 landed S7's tests).",
+      "line": 39,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 2185,
+      "totals": {
+        "total": 4,
+        "passed": 3,
+        "failed": 1
+      },
+      "failingTests": [
+        "tests/cliImportCommands.test.ts > amc import text rendering a preview names the source format and version, record counts and the structured next actions"
+      ],
+      "failingTestCount": 1,
+      "failedFiles": []
+    },
+    {
+      "id": "S7-M40-gate-drop-typecheck-tests-step",
+      "oldIssue": "AMC-1521",
+      "file": "scripts/release-gate.mjs",
+      "expect": "killed",
+      "tests": [
+        "tests/reconciliationDefectsReleaseGate.test.ts"
+      ],
+      "note": "S7 mutated a copy (AMC_RECONCILE_ROOT); this batch mutates in place and restores the bytes. Re-pointed: the step is now registered through add(...).",
+      "line": 164,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 554,
+      "totals": {
+        "total": 3,
+        "passed": 2,
+        "failed": 1
+      },
+      "failingTests": [
+        "tests/reconciliationDefectsReleaseGate.test.ts > test typecheck stays a named release and CI step the release gate runs typecheck:tests as its own step before build"
+      ],
+      "failingTestCount": 1,
+      "failedFiles": []
+    },
+    {
+      "id": "S7-M41-gate-substitute-step-command",
+      "oldIssue": "AMC-1521",
+      "file": "scripts/release-gate.mjs",
+      "expect": "killed",
+      "tests": [
+        "tests/reconciliationDefectsReleaseGate.test.ts"
+      ],
+      "note": "S7 mutated a copy (AMC_RECONCILE_ROOT); this batch mutates in place and restores the bytes.",
+      "line": 164,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 553,
+      "totals": {
+        "total": 3,
+        "passed": 2,
+        "failed": 1
+      },
+      "failingTests": [
+        "tests/reconciliationDefectsReleaseGate.test.ts > test typecheck stays a named release and CI step the release gate runs typecheck:tests as its own step before build"
+      ],
+      "failingTestCount": 1,
+      "failedFiles": []
+    },
+    {
+      "id": "S7-M42-ci-drop-typecheck-tests",
+      "oldIssue": "AMC-1521",
+      "file": ".github/workflows/ci.yml",
+      "expect": "killed",
+      "tests": [
+        "tests/reconciliationDefectsReleaseGate.test.ts"
+      ],
+      "note": "S7 mutated a copy (AMC_RECONCILE_ROOT); this batch mutates in place and restores the bytes.",
+      "line": 68,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 503,
+      "totals": {
+        "total": 3,
+        "passed": 2,
+        "failed": 1
+      },
+      "failingTests": [
+        "tests/reconciliationDefectsReleaseGate.test.ts > test typecheck stays a named release and CI step ci.yml runs the test typecheck as a named step"
+      ],
+      "failingTestCount": 1,
+      "failedFiles": []
+    },
+    {
+      "id": "S7-M43-publish-drop-typecheck-tests",
+      "oldIssue": "AMC-1521",
+      "file": ".github/workflows/npm-publish.yml",
+      "expect": "killed",
+      "tests": [
+        "tests/reconciliationDefectsReleaseGate.test.ts"
+      ],
+      "note": "S7 mutated a copy (AMC_RECONCILE_ROOT); this batch mutates in place and restores the bytes.",
+      "line": 57,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 462,
+      "totals": {
+        "total": 3,
+        "passed": 2,
+        "failed": 1
+      },
+      "failingTests": [
+        "tests/reconciliationDefectsReleaseGate.test.ts > test typecheck stays a named release and CI step npm-publish.yml runs the test typecheck as a named step"
+      ],
+      "failingTestCount": 1,
+      "failedFiles": []
+    }
+  ]
+}

@@ -1,6 +1,7 @@
 import { UNSIGNED } from "../agent/runReport.js";
 import { compactionSummaryRows } from "../agent/compaction/summaryPrompt.js";
 import { readEventPayload } from "../session/eventPayload.js";
+import { isContextSnapshot } from "../prompt/assembly/interpolate.js";
 import type { EvidenceEvent } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
 import { projectAcpAttachment } from "./acpImageHistory.js";
@@ -111,7 +112,8 @@ export function projectSessionUpdates(
 
 function userUpdate(workspace: string, event: EvidenceEvent): AcpSessionUpdate | null {
   const text = payloadText(workspace, event);
-  return text === null ? null : { sessionUpdate: "user_message_chunk", content: { type: "text", text } };
+  // The runtime-context snapshot the pre-step committed (GAP-WP39) is harness context, not something the client said.
+  return text === null || isContextSnapshot(text) ? null : { sessionUpdate: "user_message_chunk", content: { type: "text", text } };
 }
 
 function updateFor(workspace: string, event: EvidenceEvent): AcpSessionUpdate | null {

@@ -69,7 +69,10 @@ describe("effectiveTrustTier", () => {
   });
 
   test.each([{ provenance: "dogfood", trustTier: "OBSERVED" }, { claimKind: "synthetic_example", trustTier: "SELF_REPORTED" },
-    { source: "dogfood-maturity", trustTier: "OBSERVED" }])("synthetic rows are excluded: %j", (meta) => {
+    { source: "dogfood-maturity", trustTier: "OBSERVED" }, { source: "assurance.executed" },
+    { source: "assurance.executed", claimKind: "observed", trustTier: "OBSERVED" },
+    { source: "assurance.executed", trustTier: "OBSERVED_HARDENED" },
+    { ...attestedMeta(), source: "assurance.executed" }])("synthetic rows are excluded: %j", (meta) => {
     expect(evidenceProducer(row(meta))).toBe("synthetic");
     expect(effectiveTrustTier(row(meta), { trustList: trust })).toBeNull();
   });
@@ -255,6 +258,7 @@ describe("diagnostic readers", () => {
     expect(evaluateGate(gate, [parseEvidenceEvent(raw({ trustTier: "OBSERVED" }))]).pass).toBe(true);
     expect(evaluateGate(gate, [parseEvidenceEvent(raw({ trustTier: "SELF_REPORTED", claimKind: "synthetic_example" }))]).pass).toBe(false);
     expect(evaluateGate(gate, [parseEvidenceEvent(raw({ trustTier: "OBSERVED", provenance: "dogfood" }))]).pass).toBe(false);
+    expect(evaluateGate(gate, [parseEvidenceEvent(raw({ source: "assurance.executed", trustTier: "OBSERVED" }))]).pass).toBe(false);
   });
 
   test("a verified ATTESTED row reads ATTESTED from the operator's trust list, and degrades when stale", () => {

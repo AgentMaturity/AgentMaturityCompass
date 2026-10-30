@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { describe, expect, test } from "vitest";
 
 function readAudit(): string {
-  return readFileSync("docs/AUDIT_50_AGENTS_BATCH5.md", "utf8");
+  return readFileSync("docs/archive/AUDIT_50_AGENTS_BATCH5.md", "utf8");
 }
 
 describe("Batch 5 audit consistency", () => {

@@ -1,0 +1,71 @@
+
+ RUN  v4.1.11 /private/tmp/p0-21-causal-qualification-20261015/closure
+
+ ✓ tests/transparencyReport.test.ts (15 tests) 41ms
+ ❯ tests/noCertificationFromSelfAssessment.test.ts (7 tests | 2 failed) 2472ms
+     × all-5 answers on every registered pack are a complete self-assessment, not a certification 3ms
+     ✓ a partial self-assessment is reported as incomplete 0ms
+     ✓ an answer outside 1-5 is refused, not clamped 0ms
+     × the pack audit reports a self-reported overall with no certified field 9ms
+     ✓ the domain report carries no certification field or wording 3ms
+     ✓ the transparency report shows evidence standing, never certification 9ms
+     ✓ MCP sector-pack and trust-score text say self-assessment and evidence standing  2445ms
+ ✓ tests/selfReportedLevelCap.test.ts (5 tests) 17ms
+ ❯ tests/logisticsIndustryPack.test.ts (2 tests | 1 failed) 8ms
+     ✓ registers the dedicated logistics pack under mobility discovery 1ms
+     × scores concrete logistics controls and surfaces low-level compliance gaps 3ms
+ ✓ tests/scoreUnits.test.ts (4 tests) 5ms
+ ✓ tests/domainAssessmentUnits.test.ts (4 tests) 11ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/logisticsIndustryPack.test.ts > freight, 3PL, and warehouse industry pack > scores concrete logistics controls and surfaces low-level compliance gaps
+AssertionError: expected 5 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 5
+
+ ❯ tests/logisticsIndustryPack.test.ts:54:34
+     52|     expect(mature.selfAssessment.complete).toBe(true);
+     53|     expect(mature.claimKind).toBe("self_reported");
+     54|     expect(mature.eligibleLevel).toBe(1);
+       |                                  ^
+     55|     expect("certified" in mature).toBe(false);
+     56|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  tests/noCertificationFromSelfAssessment.test.ts > no certification from self-assessment (P0-21) > all-5 answers on every registered pack are a complete self-assessment, not a certification
+AssertionError: farm-to-fork: expected 5 to be less than or equal to 1
+ ❯ tests/noCertificationFromSelfAssessment.test.ts:78:46
+     76|       expect(result.claimKind, pack.id).toBe("self_reported");
+     77|       expect(result.eligibleLevel, pack.id).not.toBeNull();
+     78|       expect(result.eligibleLevel!, pack.id).toBeLessThanOrEqual(1);
+       |                                              ^
+     79|       expect(result.percentage, pack.id).toBe(100);
+     80|       expect("certified" in result, pack.id).toBe(false);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  tests/noCertificationFromSelfAssessment.test.ts > no certification from self-assessment (P0-21) > the pack audit reports a self-reported overall with no certified field
+AssertionError: expected 5 to be less than or equal to 1
+ ❯ tests/noCertificationFromSelfAssessment.test.ts:101:44
+     99|       expect("certified" in audit.overall, pack.id).toBe(false);
+    100|       expect(audit.overall.claimKind).toBe("self_reported");
+    101|       expect(audit.overall.eligibleLevel!).toBeLessThanOrEqual(1);
+       |                                            ^
+    102|       expect(audit.overall.selfAssessment.complete).toBe(true);
+    103|       const markdown = renderIndustryPackAuditMarkdown(audit);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  2 failed | 4 passed (6)
+      Tests  3 failed | 34 passed (37)
+   Start at  10:51:47
+   Duration  3.86s (transform 2.27s, setup 73ms, import 670ms, tests 2.55s, environment 0ms)
+
+JSON report written to /private/tmp/p0-21-causal-qualification-20261015/phases/P021-C3-numeric-self-eligible-cap--mutant/raw.json

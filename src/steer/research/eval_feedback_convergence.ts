@@ -6,6 +6,7 @@
  * Evaluates convergence speed, stability, and profile separation.
  */
 
+import { mean, populationVariance } from "../../experiments/stats.js";
 import {
   createFeedbackLoopState,
   applyFeedbackObservation,
@@ -198,11 +199,9 @@ export function simulateConvergence(
   // Check stability: variance of last 10 distances
   const lastN = trace.slice(-10);
   const distances = lastN.map((p) => p.distanceToTarget);
-  const meanDist =
-    distances.reduce((s, v) => s + v, 0) / distances.length;
-  const variance =
-    distances.reduce((s, v) => s + (v - meanDist) ** 2, 0) /
-    distances.length;
+  // Unlike stats.ts descriptive empty variance (0), an absent trace must retain
+  // the historical NaN variance so it cannot be reported as stable.
+  const variance = distances.length > 0 ? populationVariance(distances) : Number.NaN;
   const stable = variance < 0.01;
 
   const finalDistance = trace[trace.length - 1]?.distanceToTarget ?? 1;
@@ -269,8 +268,7 @@ export function evaluateFeedbackConvergence(
 
   const meanStepsToConverge =
     converged.length > 0
-      ? converged.reduce((s, r) => s + r.stepsToConverge!, 0) /
-        converged.length
+      ? mean(converged.map((r) => r.stepsToConverge!))
       : 0;
 
   const separationResults = evaluateProfileSeparation(convergenceResults);

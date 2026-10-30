@@ -1,3 +1,4 @@
+import { populationVariance } from "../experiments/stats.js";
 /**
  * Meta-Confidence / Confidence in Maturity Score
  *
@@ -88,8 +89,7 @@ function computeConsistency(
   if (priorScores.length === 0) return 0.5;
 
   // Low variance = high consistency
-  const mean = priorScores.reduce((a, b) => a + b, 0) / priorScores.length;
-  const variance = priorScores.reduce((a, b) => a + (b - mean) ** 2, 0) / priorScores.length;
+  const variance = populationVariance(priorScores);
   const maxVariance = 6.25; // max possible variance for 0-5 range
   return Math.max(0, 1 - variance / maxVariance);
 }

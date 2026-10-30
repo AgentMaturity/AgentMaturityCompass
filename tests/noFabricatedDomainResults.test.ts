@@ -1,10 +1,11 @@
 import { spawnSync } from "node:child_process";
-import { generateKeyPairSync } from "node:crypto";
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join, resolve } from "node:path";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { runInNewContext } from "node:vm";
 import { afterAll, afterEach, beforeAll, describe, expect, test, vi } from "vitest";
+import { testIndustryPackLicence } from "./helpers/industryPackLicence.js";
 
 /**
  * P0-15: `amc domain assess|gaps|report|roadmap` printed scores computed from a
@@ -28,7 +29,7 @@ const { canonicalize } = await import("../src/utils/json.js");
 const { sha256Hex } = await import("../src/utils/hash.js");
 const { questionBank } = await import("../src/diagnostic/questionBank.js");
 
-const CLI = resolve(process.cwd(), "dist/cli.js");
+const CLI = fileURLToPath(new URL("../dist/cli.js", import.meta.url));
 const roots: string[] = [];
 const licenseEnv: Record<string, string> = {};
 
@@ -83,14 +84,10 @@ function runCli(cwd: string, args: string[]) {
 }
 
 beforeAll(async () => {
-  const { createIndustryPackLicenseKey } = await import("../src/domains/industryPackEntitlement.js");
-  const { privateKey, publicKey } = generateKeyPairSync("ed25519");
-  const env = {
-    AMC_INDUSTRY_PACKS_LICENSE_PRIVATE_KEY: privateKey.export({ type: "pkcs8", format: "pem" }).toString(),
-    AMC_INDUSTRY_PACKS_LICENSE_PUBLIC_KEY: publicKey.export({ type: "spki", format: "pem" }).toString()
-  } as NodeJS.ProcessEnv;
-  licenseEnv.AMC_INDUSTRY_PACKS_LICENSE_PUBLIC_KEY = env.AMC_INDUSTRY_PACKS_LICENSE_PUBLIC_KEY!;
-  licenseEnv.AMC_INDUSTRY_PACKS_LICENSE_KEY = createIndustryPackLicenseKey({ expiresAt: "2099-01-01T00:00:00.000Z", env });
+  // A licence signed by a key pinned in a temp AMC home trust list (P1-51); the CLI child reads both from its env.
+  const licence = testIndustryPackLicence();
+  roots.push(licence.amcHome);
+  Object.assign(licenseEnv, licence.env);
 });
 
 afterEach(() => {
@@ -199,7 +196,7 @@ describe("dashboard Domains view", () => {
   // The Assess button falls back to localAssess whenever /api/v1/domain/assess is
   // unavailable (no server route exists), so the fallback must not invent a score.
   function loadDomainsComponent() {
-    const source = readFileSync(resolve(process.cwd(), "src/dashboard/templates/components/domains.js"), "utf8")
+    const source = readFileSync(fileURLToPath(new URL("../src/dashboard/templates/components/domains.js", import.meta.url)), "utf8")
       .replace("window.buildDomains = buildDomains;", "window.buildDomains = buildDomains; window.__p015 = { localAssess, renderAssessResult };");
     const window: Record<string, unknown> = {};
     runInNewContext(source, { window, document: {} });

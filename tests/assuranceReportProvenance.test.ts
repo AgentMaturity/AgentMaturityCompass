@@ -8,6 +8,9 @@ import { getAgentPaths } from "../src/fleet/paths.js";
 import { canonicalize } from "../src/utils/json.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import { loadAssuranceSummary } from "../src/diagnostic/assuranceSummary.js";
+import { renderAssuranceMarkdown } from "../src/assurance/report.js";
+import { renderClaimLegend } from "../src/claims/eligibility/render.js";
+import type { AssuranceReport } from "../src/types.js";
 
 /**
  * Assurance reports feed maturity scoring, and until this module existed the
@@ -74,6 +77,17 @@ function baseReport(now: number) {
   };
 }
 
+function renderableReport(now: number): AssuranceReport {
+  const base = baseReport(now);
+  const pack = base.packResults[0]!;
+  return { ...base, mode: "supervise", trustTier: "OBSERVED", status: "VALID", trustLabel: "HIGH TRUST",
+    packResults: [{ ...pack, title: "Tool governance", scenarioCount: 1, passCount: 1, failCount: 0, trustTier: "OBSERVED",
+      scenarioResults: [{ scenarioId: "governance-1", title: "Governed tool use", category: "governance", riskTier: "all",
+        prompt: "Use an approved tool", response: "Approved tool used", pass: true, score0to5: 4.4, score0to100: 88,
+        reasons: [], correlatedRequestIds: [], evidenceEventIds: [], auditEventTypes: pack.scenarioResults[0]!.auditEventTypes }]
+    }] };
+}
+
 /** Sign the way the runner does: hash the canonical report with empty seal fields. */
 function writeSignedReport(workspace: string, now: number, mutate?: (r: Record<string, unknown>) => void): void {
   const base = baseReport(now);
@@ -87,6 +101,32 @@ function writeSignedReport(workspace: string, now: number, mutate?: (r: Record<s
 }
 
 describe("assurance report provenance gate", () => {
+  test.each([true, false])("rendered pack claims reflect sealVerified=%s without reviewer promotion", (sealVerified) => {
+    const report = renderableReport(Date.UTC(2026, 9, 14));
+    const markdown = renderAssuranceMarkdown(report, sealVerified);
+    expect(markdown).toContain(`**Claim:** ${sealVerified ? "Observed" : "Self-reported"}`);
+    expect(markdown).toContain(`**Result:** ${sealVerified ? "pass" : "not evaluated"}`);
+    const row = markdown.split("\n").find((line) => line.startsWith("| toolGovernance |"));
+    expect(row).toMatch(new RegExp(`\\| ${sealVerified ? "observed" : "self_reported"} \\|$`));
+    expect(markdown).not.toContain("**Claim:** Independently reviewed");
+    expect(markdown.split("\n").filter((line) => line.startsWith("**Claim:**") || line.startsWith("| toolGovernance |"))).toMatchSnapshot();
+    expect(markdown).toContain(renderClaimLegend("markdown"));
+  });
+
+  test("empty and inconclusive-only assurance reports cannot render a passing claim", () => {
+    const report = renderableReport(Date.UTC(2026, 9, 14));
+    const pack = report.packResults[0]!;
+    const inconclusive = { ...pack, passCount: 0, score0to100: 0,
+      scenarioResults: pack.scenarioResults.map((scenario) => ({ ...scenario, pass: false, score0to5: 0, score0to100: 0, inconclusive: true })) };
+    for (const packResults of [[], [inconclusive]]) {
+      const markdown = renderAssuranceMarkdown({ ...report, packResults, overallScore0to100: 0 }, true);
+      expect(markdown).toContain("**Result:** not evaluated");
+      expect(markdown).not.toContain("**Result:** pass");
+      expect(markdown.split("\n").find((line) => line.startsWith("**Claim:**"))).toMatchSnapshot();
+      expect(markdown).toContain(renderClaimLegend("markdown"));
+    }
+  });
+
   test("a genuine signed report contributes its scores and tier", () => {
     const workspace = newWorkspace();
     const now = Date.now();

@@ -1,0 +1,25 @@
+{
+  "schema": "p125k-independent-helper-phase-correction-seal/1",
+  "at": "2026-10-16T23:42:04.866531+00:00",
+  "blockers": [],
+  "inputPinCount": 9,
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/helper-phase-correction-review/review.json",
+      "bytes": 2495,
+      "sha256": "f4069b68fa9ee8a7c801596a47ac3e8a23d5c2f3d0d9f7b82432a505ac69e878"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/helper-phase-correction-review/README.md",
+      "bytes": 1008,
+      "sha256": "69c0e8f5434c98be4782e36d121f94eb1da612b266528e654be317dad73d8777"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/helper-phase-correction-review/input-pins.json",
+      "bytes": 1977,
+      "sha256": "85094802276f95ca2b9b9cf3899f45eacaaee76151e265c31d5b30ff855b28c7"
+    }
+  ],
+  "exactTwoPhaseReferencesOnly": true,
+  "noExecutionOrCheckoutWrite": true
+}

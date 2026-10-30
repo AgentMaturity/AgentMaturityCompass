@@ -88,7 +88,7 @@ describe("operational independence dependency analytics", () => {
     expect(report.signals.some((signal) => signal.driftType === "sla_latency")).toBe(true);
   });
 
-  test("graceful degradation score is perfect when no failures are observed", () => {
+  test("graceful degradation is not evaluated when no failures are observed", () => {
     const events: GuardEventLike[] = [
       eventAt(0, {}, { providerId: "openai", dependencyId: "openai" }),
       eventAt(1, {}, { providerId: "openai", dependencyId: "openai" })
@@ -96,8 +96,8 @@ describe("operational independence dependency analytics", () => {
 
     const score = scoreGracefulDegradation(events);
     expect(score.failureEvents).toBe(0);
-    expect(score.score).toBe(100);
-    expect(score.recoveryRate).toBe(1);
+    expect(score.score).toBeNull();
+    expect(score.recoveryRate).toBeNull();
   });
 
   test("graceful degradation credits fallback recovery after failure", () => {
@@ -187,7 +187,7 @@ describe("operational independence dependency analytics", () => {
     const fragileScore = scoreOperationalIndependenceFromEvents(fragile, 30);
     const resilientScore = scoreOperationalIndependenceFromEvents(resilient, 30);
 
-    expect(resilientScore.reducedExternalAccessScore).toBeGreaterThan(fragileScore.reducedExternalAccessScore);
+    expect(resilientScore.reducedExternalAccessScore).toBeGreaterThan(fragileScore.reducedExternalAccessScore!);
   });
 
   test("logistics context scores carrier, warehouse, SLA, traceability, and cold-chain evidence", () => {
@@ -298,4 +298,11 @@ describe("operational independence dependency analytics", () => {
     ]));
     expect(logistics!.recommendedActions.join(" ")).toContain("EPCIS");
   });
+});
+
+
+test("AXE-30 dependency p95 retains nearest rank in percent units", () => {
+  const inventory = buildExternalDependencyInventory([10, 20, 30, 100].map((latencyMs, index) =>
+    eventAt(index, {}, { providerId: "openai", latencyMs })));
+  expect(dependencyById(inventory, "openai")?.p95LatencyMs).toBe(100);
 });

@@ -1,0 +1,17 @@
+{
+  "formalAcceptanceClosed": false,
+  "gaps": [
+    "CIT0023 and CIT004620 baseline findings unchanged; strict prior P024 ISO23/22/1 remains unresolved and ISO reference table/expert31 remain empty. No expert/legal truth approval.",
+    "Catalogue and linter share the host array; register checker still reads its separate JSON policy list, with subset asserted. Literal one-list acceptance is not established.",
+    "Source workflow after-build citations step is blocking and release DAG requires build; real collector/package and parser refusal processes are measured.22release contracts use injected execute fixture; no complete release gate or hosted CI run.",
+    "Required duplicate1269/dead2751 prerequisites remain unwaived. Exact-source type/lint/other prior validation is reused atcode58, not newP025 executions; fullsuite/Node24/coverage/hosted/PR+merge/G0/Done and formal dependency acceptance remain open.",
+    "All earlier unresolved/skipped/paused/ownership scopes and pendingP052/P020/P019 transfers remain untouched; D03 skip remains only untilP206."
+  ],
+  "nextLane": "P0-21",
+  "nextLaneAuthority": {
+    "path": "/private/tmp/amc-next-after-p0-25-readonly-routing-20261015.json",
+    "bytes": 23914,
+    "sha256": "e70186df02502326e435b921cf4cef09ec186d9cbe9556dc812fba4e71c0dc95"
+  },
+  "earlierDecisions": "P0-29 remains skipped and unresolved; P0-22 empty-result contract remains unresolved; D-03 live-health skip ends at P2-06. No pending ownership transfer is applied."
+}

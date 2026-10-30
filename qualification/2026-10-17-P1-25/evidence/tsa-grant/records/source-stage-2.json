@@ -1,0 +1,13 @@
+{
+  "argv": [
+    "git",
+    "-C",
+    "/home/amc/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+    "add",
+    "--",
+    "tests/time/tsaGrant.test.ts"
+  ],
+  "exit": 0,
+  "stdout": "",
+  "stderr": ""
+}

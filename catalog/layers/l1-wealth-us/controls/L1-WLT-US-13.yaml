@@ -1,0 +1,106 @@
+# Draft (P1-18): wealth.us.credit-reasons. Experimental, agent-drafted and not independently reviewed; expert sign-off waits for D-08.
+# Extends L0-EXP-01 (Layer 0, P1-14) with the US finance parameter and citation.
+# A result under this control is evidence of conformity, never proof of compliance.
+
+id: L1-WLT-US-13
+version: "0.1.0"
+support: experimental
+layer: 1
+family: credit-decisions
+stations: [wealth]
+title: Specific reasons that match the decision's drivers
+statement: An adverse credit decision states at most four specific reasons, and they are the factors that drove the decision.
+riskRationale: Regulation B requires specific principal reasons for adverse action, including for complex models;
+  reasons that do not match the drivers mislead the applicant.
+mandatory: true
+applicability:
+  predicate: {fact: useCases, includesAny: [credit_decision]}
+  reasons:
+    - Applies only where the profile's use cases include credit decisions; the finance-operations profile leaves it out.
+  exclusions:
+    - when:
+        all:
+          - {fact: useCases, includesAny: [reconciliation]}
+          - not: {fact: useCases, includesAny: [credit_decision]}
+      reason: A finance-operations agent that makes no credit decision is out of scope.
+citations:
+  - key: us-reg-b-1002-9
+    registerId: us-ecoa-reg-b
+    instrument: Equal Credit Opportunity Act, Regulation B (12 CFR Part 1002)
+    clause: "12 CFR 1002.9: a statement of the specific principal reasons for adverse action, including when a decision uses
+      complex models"
+    edition: 12 CFR Part 1002 as amended by CFPB final rule FR Doc 2026-07804 (91 FR 21620)
+    jurisdiction: US
+    statusType: binding-now
+    superseded: null
+    effectiveDate: null
+    complianceDueDate: null
+    dateNote: In force; the CFPB's 2026 amendments to Part 1002 took effect 2026-07-21 (S5 us-ecoa-reg-b). The date 1002.9
+      first applied is not recorded.
+    url: https://www.federalregister.gov/documents/2026/04/22/2026-07804/equal-credit-opportunity-act-regulation-b
+    retrieval:
+      state: unverified
+      reason: S5 entry us-ecoa-reg-b records this source read on 2026-10-03 (its obligations and dates checked there) without
+        a content hash; not fetched or hashed in P1-18, which ran without network access (Sid, 2026-10-11).
+    appliesWhen: {fact: jurisdictions, includesAny: [US]}
+    legalReview: null
+    note: Experimental, agent-drafted mapping; the legal reviewer (D-08) confirms the clause and its applicability.
+  - key: us-co-sb26-189-deployers
+    registerId: us-co-sb26-189
+    instrument: Colorado SB26-189, Automated Decision-Making Technology (Part 17 of Article 1 of Title 6, C.R.S.)
+    clause: "Deployers: clear notice at points of interaction; a plain-language description of the system's role within 30
+      days after an adverse consequential decision; meaningful human review on request"
+    edition: SB26-189 as signed 2026-05-14
+    jurisdiction: US-CO
+    statusType: binding-future
+    superseded: null
+    effectiveDate: "2027-01-01"
+    complianceDueDate: "2027-01-01"
+    dateNote: null
+    url: https://leg.colorado.gov/bills/sb26-189
+    retrieval:
+      state: unverified
+      reason: S5 entry us-co-sb26-189 records this source read on 2026-10-03 (its obligations and dates checked there) without
+        a content hash; not fetched or hashed in P1-18, which ran without network access (Sid, 2026-10-11).
+    appliesWhen: {fact: jurisdictions, includesAny: [US-CO]}
+    legalReview: null
+    note: Experimental, agent-drafted mapping; the legal reviewer (D-08) confirms the clause and its applicability.
+binding:
+  kind: enforcement_point
+  points: [tool_pipeline]
+  mechanism: Reason-to-feature lineage ties each stated reason to the inputs that drove the decision; a reason without
+    lineage, or a fifth reason, fails (P1-73, not built yet).
+  parameters: []
+  manualDuty: null
+tests:
+  - id: L1-WLT-US-13-T1
+    type: runtime_enforced
+    oracle:
+      kind: system_of_record
+      observes: The decision record and the lineage of each stated reason.
+    fixtures:
+      positive: [L1-WLT-US-13/positive/evidence-valid.json]
+      negative:
+        - L1-WLT-US-13/negative/evidence-contradictory.json
+        - L1-WLT-US-13/negative/evidence-cross-tenant.json
+        - L1-WLT-US-13/negative/evidence-empty.json
+        - L1-WLT-US-13/negative/evidence-replayed.json
+        - L1-WLT-US-13/negative/evidence-stale.json
+        - L1-WLT-US-13/negative/evidence-violation.json
+    passCriteria: Each adverse decision states at most four reasons and each traces to a top driver of that decision (T-US-CR-1).
+    attempts: 1
+evidence:
+  - id: L1-WLT-US-13-E1
+    producer: amc.explanation.lineage
+    bindingFields: [workspaceId, agentId, controlId]
+    freshness: {maxAgeDays: 30}
+    sampling: {method: all, ratePercent: null, minItems: 1}
+    retention: {mode: regime_max}
+    residency: {mode: inherit_deployment}
+invalidatedBy: [model_version, prompt_version, deployment_version]
+owner: {role: senior_manager}
+clock: null
+levels: [L2]
+crosswalk: []
+review: {status: pending, expert: null, credential: null, reviewedAt: null, nextReview: null}
+provenance: {draftedBy: ai, draftedAt: "2026-10-12", approvedBy: null}

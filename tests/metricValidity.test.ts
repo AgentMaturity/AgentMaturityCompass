@@ -105,6 +105,13 @@ describe("metric proof refusal boundaries", () => {
     };
   }
 
+  test("AXE-30 metric interval retains normal critical value, percent scale, and six-decimal rounding", () => {
+    const fixture = input();
+    fixture.questionScores = [score("AMC-1.1", 0), score("AMC-1.2", 1), score("AMC-1.3", 2)];
+    const report = buildMetricValidationReport(fixture, []);
+    expect(report.rows[0]?.confidenceInterval).toEqual({ level: 0.95, lower: 0, upper: 42.632131, marginOfError: 22.632131 });
+  });
+
   const architectureBase: MetricValidationArchitectureRealityCheck = {
     architectureSignalId: "invalid-architecture-proof", architectureSignalType: "wrapper_agent_baseline",
     covered: true, evidenceRefs: ["proof-fixture"], artifactHash: "a".repeat(64)

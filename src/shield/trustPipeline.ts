@@ -99,11 +99,13 @@ export async function runTrustPipeline(input: TrustPipelineInput): Promise<Trust
     toolName: input.toolName,
     parameters: input.parameters,
     sessionId: input.sessionId,
-    instructionSource: input.instructionSource ?? 'user',
+    // Missing trust context is never maximal trust (WP37): an unnamed source is tool-level (untrusted), and a missing
+    // lastVerifiedAt / cumulativeConfidence passes through so the gate treats it as expired / below threshold.
+    instructionSource: input.instructionSource ?? 'tool',
     sensitiveDataFields: input.sensitiveDataFields,
     trustContext: {
-      lastVerifiedAt: input.lastVerifiedAt ?? Date.now(),
-      cumulativeConfidence: input.cumulativeConfidence ?? 1.0,
+      lastVerifiedAt: input.lastVerifiedAt,
+      cumulativeConfidence: input.cumulativeConfidence,
       stepNumber: input.stepNumber ?? 1,
       previousActions: input.previousActions ?? [],
     },
@@ -128,12 +130,19 @@ export async function runTrustPipeline(input: TrustPipelineInput): Promise<Trust
     };
   }
 
+  const missingTrustInputs = [
+    ...(input.instructionSource === undefined ? ['instructionSource'] : []),
+    ...(input.lastVerifiedAt === undefined ? ['lastVerifiedAt'] : []),
+    ...(input.cumulativeConfidence === undefined ? ['cumulativeConfidence'] : []),
+  ];
   const shieldGateStage = {
     passed: gateResult.allowed,
     trustScore: gateResult.trustScore,
     reason: gateResult.reason,
     checks: gateResult.checks,
-    recommendations: gateResult.recommendations,
+    recommendations: missingTrustInputs.length > 0
+      ? [`Trust context missing ${missingTrustInputs.join(', ')}: treated as untrusted, not as fresh or confident.`, ...gateResult.recommendations]
+      : gateResult.recommendations,
     evidenceId: gateResult.evidenceId,
   };
 

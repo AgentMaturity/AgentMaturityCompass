@@ -39,6 +39,30 @@ describe("failSecureGovernance", () => {
     expect(r.hasToolCallWhitelist).toBe(true);
   });
 
+  it("credits the whitelist and agency controls only for the modules that enforce them, never src/policy (P1-12)", () => {
+    markAsAmcCheckout(tmp);
+    // src/policy holds effective-policy receipts: a record of what was enforced, not a whitelist or an autonomy cap.
+    mkdirSync(join(tmp, "src/policy"), { recursive: true });
+    let r = scoreFailSecureGovernance(tmp);
+    expect(r.hasToolCallWhitelist).toBe(false);
+    expect(r.hasExcessiveAgencyControls).toBe(false);
+
+    // The signed ToolHub allowlist is the tool-call whitelist.
+    mkdirSync(join(tmp, "src/toolhub"), { recursive: true });
+    writeFileSync(join(tmp, "src/toolhub/toolhubValidators.ts"), "");
+    r = scoreFailSecureGovernance(tmp);
+    expect(r.hasToolCallWhitelist).toBe(true);
+    expect(r.hasExcessiveAgencyControls).toBe(false);
+
+    // Scope-limited signed leases and signed per-agent budget admission cap agency; each alone is a witness.
+    for (const witness of ["src/leases/leaseVerifier.ts", "src/budgets/nativeBudgetAdmission.ts"]) {
+      mkdirSync(join(tmp, witness, ".."), { recursive: true });
+      writeFileSync(join(tmp, witness), "");
+      expect(scoreFailSecureGovernance(tmp).hasExcessiveAgencyControls).toBe(true);
+      rmSync(join(tmp, witness));
+    }
+  });
+
   it("returns full score when all artifacts present", () => {
     markAsAmcCheckout(tmp);
     mkdirSync(join(tmp, "src/enforce"), { recursive: true });

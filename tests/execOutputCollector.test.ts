@@ -1,4 +1,8 @@
 import { describe, expect, it } from "vitest";
+import { existsSync, mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { runProcess } from "../src/exec/runProcess.js";
 import { OutputCollector, SCRUB_PLACEHOLDER } from "../src/exec/outputCollector.js";
 
 /**
@@ -25,7 +29,67 @@ describe("bounding", () => {
 
     expect(snap.text).toHaveLength(10);
     expect(snap.totalBytes, "everything the process wrote").toBe(20);
-    expect(snap.droppedBytes, "and how much of it was not kept").toBe(10);
+    expect(snap.droppedBytes, "and how much of it was not kept").toBe(11);
+  });
+
+  it("retains the first and rolling last bytes across chunks", () => {
+    const { c } = collect(10);
+    c.push(Buffer.from("0123456789"));
+    c.push(Buffer.from("ABCDEFGHIJ"));
+    c.push(Buffer.from("KLM"));
+    c.end();
+    expect(c.snapshot()).toEqual({ text: "0123\nIJKLM", totalBytes: 23, droppedBytes: 14 });
+  });
+
+  it("keeps UTF-8 characters intact at stream and retention boundaries", () => {
+    const { c } = collect(9);
+    const bytes = Buffer.from("猫猫猫猫猫");
+    c.push(bytes.subarray(0, 1));
+    c.push(bytes.subarray(1, 8));
+    c.push(bytes.subarray(8));
+    c.end();
+    expect(c.snapshot()).toEqual({ text: "猫\n猫", totalBytes: 15, droppedBytes: 9 });
+    expect(c.snapshot().text).not.toContain("\uFFFD");
+  });
+
+  it("scrubs secrets in the retained tail after the cap is full", () => {
+    const secret = "lease-abcdef0123456789";
+    const { c, teed } = collect(100, [secret]);
+    c.push(Buffer.from("HEAD" + "x".repeat(200) + secret.slice(0, 8)));
+    c.push(Buffer.from(secret.slice(8) + "FINAL"));
+    c.end();
+    expect(c.snapshot().text).toContain("HEAD");
+    expect(c.snapshot().text).toContain(SCRUB_PLACEHOLDER + "FINAL");
+    expect(c.snapshot().text).not.toContain(secret);
+    expect(teed.join("")).not.toContain(secret);
+  });
+
+  it("does not reconstruct a secret across the omitted middle", () => {
+    const { c } = collect(8, ["abcdefgh"]);
+    c.push(Buffer.from("abcd" + "x".repeat(40) + "efgh"));
+    c.end();
+    expect(c.snapshot().text).not.toContain("abcdefgh");
+    expect(Buffer.byteLength(c.snapshot().text)).toBeLessThanOrEqual(8);
+  });
+
+  it("scrubs secrets formed by the preview separator and keeps its byte cap", () => {
+    const secret = "abcd\n[amc: output middle omitted]\nefgh";
+    const { c } = collect(38, [secret]);
+    c.push(Buffer.from("abcd" + "x".repeat(100) + "efgh"));
+    c.end();
+    expect(c.snapshot().text).not.toContain(secret);
+    expect(c.snapshot().text).toContain(SCRUB_PLACEHOLDER);
+    expect(Buffer.byteLength(c.snapshot().text)).toBeLessThanOrEqual(38);
+  });
+
+  it.each([-1, Number.NaN, Number.POSITIVE_INFINITY, 1.5])("refuses invalid capture cap %s", max => {
+    expect(() => collect(max)).toThrow(/nonnegative safe integer/);
+  });
+
+  it("retains no text for a zero-byte cap", () => {
+    const { c } = collect(0);
+    c.push(Buffer.from("log")); c.end();
+    expect(c.snapshot()).toEqual({ text: "", totalBytes: 3, droppedBytes: 3 });
   });
 
   it("reports nothing dropped when nothing was", () => {
@@ -46,9 +110,9 @@ describe("bounding", () => {
     c.end();
     const snap = c.snapshot();
 
-    expect(snap.text).toBe("12345");
+    expect(snap.text).toBe("12\n89");
     expect(snap.totalBytes).toBe(9);
-    expect(snap.droppedBytes, "the whole second chunk was dropped").toBe(4);
+    expect(snap.droppedBytes, "omitted bytes exclude the separator").toBe(5);
   });
 
   it("keeps teeing after the capture cap is reached", () => {
@@ -69,7 +133,7 @@ describe("bounding", () => {
     c.push(Buffer.from("hello world"));
     c.end();
     expect(teed.join("")).toBe("hello world");
-    expect(c.snapshot().text).toBe("hell");
+    expect(c.snapshot().text).toBe("h\nld");
   });
 });
 
@@ -109,6 +173,14 @@ describe("scrubbing", () => {
     expect(teed.join("")).toContain("before ");
   });
 
+  it("does not split UTF-16 pairs at the scrubbing carry boundary", () => {
+    const { c, teed } = collect(100, ["123456789"]);
+    c.push(Buffer.from("A😀xxxxxxx"));
+    c.end();
+    expect(c.snapshot().text).toBe("A😀xxxxxxx");
+    expect(teed.join("")).toBe("A😀xxxxxxx");
+  });
+
   it("does not scrub values too short to be secrets", () => {
     // Removing "a" would turn every line into confetti, which is a worse
     // outcome than the risk. Recorded as a deliberate floor.
@@ -135,4 +207,17 @@ describe("scrubbing", () => {
     expect(text).not.toContain(SECRET);
     expect(text).not.toContain(other);
   });
+});
+
+
+it("refuses an invalid capture cap before starting the child", async () => {
+  const workspace = mkdtempSync(join(tmpdir(), "amc-capture-admission-"));
+  const marker = join(workspace, "started");
+  try {
+    expect(() => runProcess({ argv: [process.execPath, "-e", `require("node:fs").writeFileSync(${JSON.stringify(marker)}, "started")`],
+      cwd: workspace, env: {}, stdin: "ignore", stdout: "ignore", stderr: "ignore", maxCaptureBytes: -1,
+      scrubValues: [], graceMs: 10 })).toThrow(/nonnegative safe integer/);
+    await new Promise(resolve => setTimeout(resolve, 500));
+    expect(existsSync(marker), "invalid capture configuration must start no process").toBe(false);
+  } finally { rmSync(workspace, { recursive: true, force: true }); }
 });

@@ -1,0 +1,68 @@
+{
+  "schema": "p125pc-preservation-git-readonly-successor-input-pins/1",
+  "files": [
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-preparation/check-preservation.py.source.txt",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-preparation/check-preservation.py.source.txt",
+      "bytes": 7187,
+      "sha256": "c4ae4e33e4182fa2e540fb55f58bcd4af6c648841651468d55096fc978db4aa0",
+      "dev": 16777231,
+      "inode": 544002325,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-preparation/seal.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-preparation/seal.json",
+      "bytes": 3837,
+      "sha256": "7fff960589024f152f77fee2c4c492d82b2eec614dd0115bb701ed28077ec5f8",
+      "dev": 16777231,
+      "inode": 544002399,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-preparation/input-pins.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-preparation/input-pins.json",
+      "bytes": 3544,
+      "sha256": "a52c943794a6923be87a60395c892bae4ccc3b44d1d088d6bf6e612cae9f431d",
+      "dev": 16777231,
+      "inode": 544002329,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-preparation/root-metadata-admission.template.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-preparation/root-metadata-admission.template.json",
+      "bytes": 2332,
+      "sha256": "7db5a43a23eac63a07c6802e241274433aba4bad2a2aa58d97a8310cbc065c47",
+      "dev": 16777231,
+      "inode": 544002328,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-preparation/README.md",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-preparation/README.md",
+      "bytes": 2901,
+      "sha256": "f2bb87aa601afb0c0ad813155c45cc7823d7c90dbb84759bfaeee361a8ba4989",
+      "dev": 16777231,
+      "inode": 544002397,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-preparation/author-review.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-preparation/author-review.json",
+      "bytes": 1511,
+      "sha256": "d035c915fe7b71cd8dd5488f088fdb9e45d3dc0b1cf221db88877fe5d2bc53e3",
+      "dev": 16777231,
+      "inode": 544002398,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-preparation/check-preservation.py.base.source.txt",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-preparation/check-preservation.py.base.source.txt",
+      "bytes": 3294,
+      "sha256": "d0d423129073d749b3b05c1c10cf2cb09cfe2c8239b24278277d9bb1a4572bed",
+      "dev": 16777231,
+      "inode": 544002326,
+      "nlink": 1
+    }
+  ]
+}

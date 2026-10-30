@@ -1,0 +1,24 @@
+{
+  "issues": [
+    {
+      "file": "examples/orphan-example.ts",
+      "binaries": [], "catalog": [], "catalogReferences": [], "dependencies": [], "devDependencies": [], "duplicates": [], "enumMembers": [], "exports": [],
+      "files": [{ "name": "examples/orphan-example.ts" }],
+      "namespaceMembers": [], "optionalPeerDependencies": [], "types": [], "unlisted": [], "unresolved": []
+    },
+    {
+      "file": "src/enforce/emitter.ts",
+      "binaries": [], "catalog": [], "catalogReferences": [], "dependencies": [], "devDependencies": [], "duplicates": [], "enumMembers": [],
+      "exports": [{ "name": "guardEventsDbPath", "line": 263, "col": 17, "pos": 10288 }],
+      "files": [], "namespaceMembers": [], "optionalPeerDependencies": [],
+      "types": [{ "name": "EmitterOptions", "line": 12, "col": 13, "pos": 410 }],
+      "unlisted": [], "unresolved": []
+    },
+    {
+      "file": "src/domains/packAudit.ts",
+      "binaries": [], "catalog": [], "catalogReferences": [], "dependencies": [], "devDependencies": [],
+      "duplicates": [[{ "name": "verifyPackAuditChecksum", "line": 328, "col": 17, "pos": 15248 }, { "name": "verifyPackAudit", "line": 346, "col": 14, "pos": 16257 }]],
+      "enumMembers": [], "exports": [], "files": [], "namespaceMembers": [], "optionalPeerDependencies": [], "types": [], "unlisted": [], "unresolved": []
+    }
+  ]
+}

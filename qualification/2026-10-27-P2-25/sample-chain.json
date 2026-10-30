@@ -1,0 +1,67 @@
+{
+  "note": "Fixture chain signed by a throwaway workspace's lease key; verifies only in that workspace.",
+  "verifiedInIssuingWorkspace": {
+    "ok": true
+  },
+  "chain": {
+    "links": [
+      {
+        "v": 1,
+        "linkId": "dlink_327df2a0e6d54cc29203395e3553d040",
+        "parentLinkId": null,
+        "depth": 0,
+        "principal": {
+          "kind": "human",
+          "providerId": "okta",
+          "subject": "00u-fixture-alice"
+        },
+        "delegate": {
+          "agentId": "payments",
+          "runAs": "payments",
+          "spiffeId": "spiffe://example.org/agent/payments"
+        },
+        "scopes": [
+          "READ_ONLY",
+          "WRITE_LOW"
+        ],
+        "resources": [
+          "ledger:acme"
+        ],
+        "purpose": "month-end close (fixture)",
+        "notBefore": 1793162564300,
+        "notAfter": 1793166164300,
+        "approvalId": null,
+        "signature": "2lyJ0XB8VJPF3uUStYqqyGNv_Ij0sE15HA775hqsImMFkigkjc1F8KB3I4LLyHjXTpVcSvsAhmU5K6GQPuvyCA"
+      },
+      {
+        "v": 1,
+        "linkId": "dlink_84050bc4eb664abaa481e84803865315",
+        "parentLinkId": "dlink_327df2a0e6d54cc29203395e3553d040",
+        "depth": 1,
+        "principal": {
+          "kind": "agent",
+          "agentId": "payments",
+          "runAs": "payments",
+          "spiffeId": "spiffe://example.org/agent/payments"
+        },
+        "delegate": {
+          "agentId": "payments",
+          "runAs": "payments/reconcile",
+          "spiffeId": null
+        },
+        "scopes": [
+          "READ_ONLY"
+        ],
+        "resources": [
+          "ledger:acme"
+        ],
+        "purpose": null,
+        "notBefore": 1793162564300,
+        "notAfter": 1793164364300,
+        "approvalId": null,
+        "signature": "jidC4xrnOIVK7vOzrkg0RmNdmqOdJT9dCP2wC9Uo4YMw6OfU4a84dNtq70kwGvt3Ch807IRihxn40vaG6To9Dg"
+      }
+    ],
+    "digest": "1fd1b1feff855ef7064c5c4120748abb0b55faaf9014ceed06c62376e8677876"
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "id": "INS-1",
+  "scenario": "Install by digest",
+  "status": "failed",
+  "reason": "failed criteria: KeyProvider and ledger encryption on",
+  "criteria": [
+    {
+      "name": "bootstrap secrets created out of band",
+      "ok": true,
+      "detail": "amc-bootstrap exists before install"
+    },
+    {
+      "name": "Ready within the 300 s startup budget",
+      "ok": true,
+      "detail": {
+        "readyMs": 16845,
+        "exit": 0
+      }
+    },
+    {
+      "name": "manifests contain @sha256: and no change-me",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "the chart renders no Secret (created out of band)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "KeyProvider and ledger encryption on",
+      "ok": false,
+      "detail": "the chart exposes no KeyProvider or ledger-encryption setting; filed against P2-08 and P2-09"
+    },
+    {
+      "name": "monitor key pinned (trust on first use, read through the cluster API)",
+      "ok": true,
+      "detail": "eb0803de5a497948f05b1ac30559dd064a438bd341dc8078708481eb31cf4c6c"
+    },
+    {
+      "name": "helm test passes (governed turn verified)",
+      "ok": true,
+      "detail": {
+        "ok": true,
+        "status": "verified-prefix",
+        "taskId": "f21e7b5d1e5e2017fb7e1c9a3fabe054789670ae737b9257b64b87d1ce00c006",
+        "exit": 0
+      }
+    },
+    {
+      "name": "deploy-verify.mjs: all five checks PASS with the pinned key",
+      "ok": true,
+      "detail": [
+        "health:PASS",
+        "readiness:PASS",
+        "governed-turn:PASS",
+        "receipt-signature:PASS",
+        "receipt-binding:PASS"
+      ]
+    }
+  ],
+  "durationMs": 41560
+}

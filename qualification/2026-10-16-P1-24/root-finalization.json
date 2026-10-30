@@ -1,0 +1,18 @@
+{
+  "capturedUtc": "2026-10-16T10:25:34.441435+00:00",
+  "sourceCommit": "7ee3c45d35d70c3e0be00b65c7b73991529717c0",
+  "originalProposal": {
+    "path": "/private/tmp/p1-24-qualification-20261016/qualification-proposal-parent/proposal-closure.json",
+    "bytes": 8327,
+    "sha256": "218ece726909b1c891bdc91643194504b4228a853f7c9fcc2a9907db6c6e5037"
+  },
+  "controlReview": {
+    "path": "/private/tmp/p1-24-qualification-20261016/control-audit/review.json",
+    "bytes": 41947,
+    "sha256": "00023cc06b8ec2ca9b0552d557b76a40757679ebdea294e39a47ec44227c562b"
+  },
+  "rootReadClosedFreshAndControlReviews": true,
+  "productionEdits": false,
+  "validatorAndMaterializationSeparate": true,
+  "formalDone": false
+}

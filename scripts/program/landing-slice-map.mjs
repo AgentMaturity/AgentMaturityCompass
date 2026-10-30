@@ -138,7 +138,7 @@ function buildSliceMap({ candidate, base, rules }) {
     slices: [...slices.values()].sort((a, b) => a.buildOrder - b.buildOrder).map((s) => ({
       id: s.id, issue: s.issue, phase: s.phase,
       tracks: [...new Set(commits.filter((c) => c.slice === s.id && c.track).map((c) => c.track))].sort(),
-      buildOrder: s.buildOrder
+      buildOrder: s.buildOrder, ...(s.decision ? { decision: s.decision } : {})
     })),
     tracks,
     commits,

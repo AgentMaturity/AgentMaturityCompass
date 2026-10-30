@@ -1,0 +1,196 @@
+{
+  "$id": "https://agentmaturity.co/spec/schemas/v1/scoped-exception.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "approval": {
+      "additionalProperties": false,
+      "properties": {
+        "agentId": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "approvalRequestId": {
+          "pattern": "^apprreq_[a-f0-9]{32}$",
+          "type": "string"
+        },
+        "requestBindingDigest": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "agentId",
+        "approvalRequestId",
+        "requestBindingDigest"
+      ],
+      "type": "object"
+    },
+    "compensatingControls": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "control": {
+      "additionalProperties": false,
+      "properties": {
+        "controlId": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "controlVersion": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "controlId",
+        "controlVersion"
+      ],
+      "type": "object"
+    },
+    "exceptionId": {
+      "pattern": "^sex_[a-f0-9]{24}$",
+      "type": "string"
+    },
+    "reason": {
+      "minLength": 10,
+      "type": "string"
+    },
+    "requestedBy": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "schema": {
+      "const": "amc.scoped-exception/v1",
+      "type": "string"
+    },
+    "scope": {
+      "additionalProperties": false,
+      "properties": {
+        "actionClasses": {
+          "items": {
+            "enum": [
+              "READ_ONLY",
+              "WRITE_LOW",
+              "WRITE_HIGH",
+              "DEPLOY",
+              "SECURITY",
+              "FINANCIAL",
+              "NETWORK_EXTERNAL",
+              "DATA_EXPORT",
+              "IDENTITY"
+            ],
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "agentIds": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "maxAmount": {
+          "anyOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "currency": {
+                  "pattern": "^[A-Z]{3}$",
+                  "type": "string"
+                },
+                "value": {
+                  "pattern": "^\\d+(\\.\\d+)?$",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "value",
+                "currency"
+              ],
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "resourceIds": {
+          "anyOf": [
+            {
+              "items": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "minItems": 1,
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "toolNames": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "workspaceId": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "workspaceId",
+        "agentIds",
+        "toolNames",
+        "actionClasses",
+        "resourceIds",
+        "maxAmount"
+      ],
+      "type": "object"
+    },
+    "window": {
+      "additionalProperties": false,
+      "properties": {
+        "notAfter": {
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+          "type": "string"
+        },
+        "notBefore": {
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "notBefore",
+        "notAfter"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "schema",
+    "exceptionId",
+    "control",
+    "scope",
+    "window",
+    "reason",
+    "compensatingControls",
+    "requestedBy",
+    "approval"
+  ],
+  "title": "AMC Scoped Exception",
+  "type": "object"
+}

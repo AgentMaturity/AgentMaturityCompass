@@ -1,3 +1,4 @@
+import { nearestRank, wilsonInterval } from "../experiments/stats.js";
 /**
  * humanOversightQuality.ts — Human oversight quality scoring with telemetry
  * for approval theater detection, coverage, reviewer concentration, override
@@ -215,12 +216,7 @@ function scoreFrom(scores: Record<string, number>, keys: string[], fallback = 0)
 }
 
 function wilsonScore(successes: number, total: number, z = 1.96): { lower: number; upper: number; center: number } {
-  if (total === 0) return { lower: 0, upper: 0, center: 0 };
-  const p = successes / total;
-  const denominator = 1 + z * z / total;
-  const center = (p + z * z / (2 * total)) / denominator;
-  const margin = (z * Math.sqrt((p * (1 - p) + z * z / (4 * total)) / total)) / denominator;
-  return { lower: Math.max(0, center - margin), upper: Math.min(1, center + margin), center };
+  return wilsonInterval(successes, total, z);
 }
 
 function approvalLatencyMs(event: OversightApprovalEvent): number | null {
@@ -283,13 +279,10 @@ function assessEscalationPacketQuality(events: OversightEscalationEvent[]): Esca
   };
 }
 
+// Unlike clamped nearestRank in experiments/stats.ts, the legacy nonpositive quantile sentinel is zero.
 function percentile(values: number[], quantile: number): number {
-  if (values.length === 0) {
-    return 0;
-  }
-  const sorted = [...values].sort((a, b) => a - b);
-  const index = Math.min(sorted.length - 1, Math.ceil(sorted.length * quantile) - 1);
-  return sorted[index] ?? 0;
+  if (quantile <= 0) return 0;
+  return nearestRank(values, quantile);
 }
 
 function approvalLatencySloRecord(event: OversightApprovalEvent, index: number): ApprovalLatencySloRecord | null {

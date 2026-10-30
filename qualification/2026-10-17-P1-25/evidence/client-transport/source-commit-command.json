@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "git",
+    "commit",
+    "-m",
+    "test(time): qualify TSA request encoding and raw HTTP transport"
+  ],
+  "exit": 0,
+  "stdout": "[codex/p1-25-client-qualification 5beb3eae6] test(time): qualify TSA request encoding and raw HTTP transport\n 11 files changed, 330 insertions(+), 15 deletions(-)\n create mode 100644 tests/time/tsaClient.test.ts\n",
+  "stderr": ""
+}

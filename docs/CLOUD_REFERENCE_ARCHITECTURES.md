@@ -129,6 +129,6 @@ AKS alternative:
 
 - A published AMC-operated SaaS endpoint.
 - Provider-specific full-stack Terraform or Pulumi modules for VPC/VNet, clusters, load balancers, DNS, and registries.
-- Provider-certified production hardening for every regulated workload.
+- Production hardening reviewed by a cloud provider for every regulated workload.
 
 Use `docs/KUBERNETES_HELM_DEPLOYMENT.md` for chart commands and `docs/DEPLOYMENT_OPTIONS.md` for choosing between browser, CLI, CI, self-hosted, managed, and enterprise paths.

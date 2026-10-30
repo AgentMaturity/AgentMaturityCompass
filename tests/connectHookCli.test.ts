@@ -1,12 +1,13 @@
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
+import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 import { afterEach, describe, expect, test } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
 
 const roots: string[] = [];
-const cliPath = resolve(process.cwd(), "dist/cli.js");
+const cliPath = fileURLToPath(new URL("../dist/cli.js", import.meta.url));
 
 function workspace(): string {
   const root = mkdtempSync(join(tmpdir(), "amc-connect-hooks-cli-"));
@@ -101,7 +102,7 @@ describe("amc connect hooks CLI", () => {
     expect(result.status).toBe(2);
     expect(JSON.parse(result.stdout)).toEqual({
       ok: false,
-      error: "provider must be claude-code or gemini-cli",
+      error: "provider must be claude-code, gemini-cli, pi or dsh",
     });
   });
 
@@ -126,7 +127,13 @@ describe("amc connect hooks CLI", () => {
       "--mode", "control",
       "--agent", "control-cli-agent",
       "--token-file", ".amc/hooks/claude-code.lease",
+      // As the installer writes it: Claude Code control answers only the hook it is installed for.
+      "--event", "PreToolUse",
     ], JSON.stringify({
+      session_id: "cli-outage-session",
+      transcript_path: "/private/transcript.jsonl",
+      cwd,
+      permission_mode: "default",
       hook_event_name: "PreToolUse",
       tool_name: "Read",
       tool_use_id: "toolu_cli_outage_01",

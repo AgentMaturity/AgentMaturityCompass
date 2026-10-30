@@ -1,0 +1,41 @@
+{
+  "status": "Bounded qualification with a strict ISO failure; not Done",
+  "node22": {
+    "total": 91,
+    "passed": 90,
+    "failed": 1,
+    "pending": 0,
+    "todo": 0
+  },
+  "separateControls": {
+    "python": "17/17; private five-case 5/4/5",
+    "coldCLI": "3/3 after observer correction; original 0/3 observer failures with all processes exit0"
+  },
+  "quality": {
+    "duplicates": 1269,
+    "deadCode": 2751,
+    "ordinaryGateExits": [
+      1,
+      1
+    ]
+  },
+  "expert": "All 31 expert columns remain empty. ISO licensed-clause choice and other held rows are unchanged.",
+  "open": [
+    "Two strict ISO A.5 policy anchors",
+    "Medical/safety exception and context modeling",
+    "Current law, legal applicability and named expert approval",
+    "Whole suite and coverage",
+    "Node24, hosted CI, G0 and release",
+    "Earlier strict failures, skipped P0-29, pending proposals, paused reservations and 47 echo deferral"
+  ],
+  "next": {
+    "key": "P0-18",
+    "title": "Derive trust tiers from provenance; quarantine the dogfood evidence seeder",
+    "priority": "Urgent",
+    "due": "2026-10-20",
+    "historicalStatus": "Done",
+    "wholeIssueCurrentStatus": "Not requalified here; source and old receipts are not current acceptance",
+    "boundedReadiness": "Ready for root to assign a fresh owned existing-source qualification lane after P0-24 canonical closure; production remains reserved",
+    "why": "Urgent due20October precedes P0-30 due25October and High P0-25/P0-21/P0-26/P0-28. It also measures a still-unqualified dependency of P0-55 without choosing human or legal defaults. Earlier exercised keys, user skips and held/paused lanes are preserved, not reopened by this routing."
+  }
+}

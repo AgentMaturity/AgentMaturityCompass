@@ -1,0 +1,25 @@
+{
+  "pins": [
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/source-control.py",
+      "bytes": 5206,
+      "sha256": "61844915b8ce3fedcaa2a28f8a602f60f2f2b24ae557df29a3ced6554c834104"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/contract-review/controls.json",
+      "bytes": 4715,
+      "sha256": "77004cfb385395daca564a826acd68a62caf5de4b5eec3b0bca6e919dd2a3226"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/candidate-static-review/controls-witnesses.json",
+      "bytes": 3013,
+      "sha256": "3d1aa454a727836a5a5c21516eb17db68fbc27b8bd577ca8700e34a0afdf9b80"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/fresh-control-audit-plan/plan.json",
+      "bytes": 12449,
+      "sha256": "7ea1886034402950cf9489210a430a71115c85fbc98bb81f331481a11716361d"
+    }
+  ],
+  "allReadsFinished": true
+}

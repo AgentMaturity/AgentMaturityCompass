@@ -1,0 +1,7 @@
+The preferred inert helper has no concrete static blocker. The complete 36,597-byte source and 30,298-byte B38 delta were read, and the full unified delta was reproduced exactly. All nine preferred outputs, eighteen declared input pins and original seal outputs match. The preferred README changes only the mistaken GREEN-control wording; the code always requires actual RED controls.
+
+The current base independently matches 1,917 files, 1,916 artifact hashes, 1,914 payloads, 214 commands and 2,916 ordered assembly pins. Current source, runtime, binding, completed peer and preservation schemas fit the helper. All old non-diagnostic privacy and provenance guards remain intact or stronger. Removed requirements apply only to the old B38 diagnostic, whose bytes remain in the full base.
+
+The helper requires actual RED controls, manual failure/mask review, naturally ended actions, exact in-place restoration, complete command artifacts and current physical preservation. It preserves marker-before-encoding, inert code and the 1 MiB cap. Guard-bearing assembler/delta sources remain hash-only.
+
+The template is UNREADY: root flags are false, runtime pins are null and selections are empty. No filled manifest, helper execution, private assembly or publication is approved by this review. Source allocation remains separate. No helper import, parser/compiler/product/native/crypto/network execution, source/index/QA change, key/stream read or reservation probe occurred. All holds, F37 skip and RED quality remain intact.

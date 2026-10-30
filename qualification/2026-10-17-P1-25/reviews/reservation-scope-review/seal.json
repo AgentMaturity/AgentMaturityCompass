@@ -1,0 +1,23 @@
+{
+  "schema": "private-static-review-seal/1",
+  "inputs": 16,
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/reservation-scope-review/review.json",
+      "bytes": 11598,
+      "sha256": "4e72d3e9d8604707469c038e61f261b6d6dad48191d9e61f6d0ac57b1a8dddb2"
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/reservation-scope-review/README.md",
+      "bytes": 2110,
+      "sha256": "da9641b0bc9fc74f65a0aa29195e994301c7c5beadce7326c92b4bf2d4eaacf6"
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/reservation-scope-review/pins.json",
+      "bytes": 4202,
+      "sha256": "6c33b9b99bcaae1bae4ffd65a08b429c7c53a3a85340e9cd817905e64e5852a9"
+    }
+  ],
+  "scope": "P1-25 exact three new paths; no allocation or execution",
+  "blockers": []
+}

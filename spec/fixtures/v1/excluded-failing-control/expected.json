@@ -1,0 +1,14 @@
+{
+  "case": "excluded-failing-control",
+  "normative": true,
+  "dimensions": {
+    "integrity": "pass",
+    "issuerAdmission": "pass",
+    "scope": "pass",
+    "freshness": "pass",
+    "completeness": "pass",
+    "satisfaction": "pass"
+  },
+  "reasonCodes": {},
+  "exitCode": 0
+}

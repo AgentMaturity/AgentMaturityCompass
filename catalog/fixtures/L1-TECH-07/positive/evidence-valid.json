@@ -1,0 +1,60 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L1-TECH-07",
+  "polarity": "positive",
+  "evidenceClass": "valid",
+  "setup": {
+    "harness": "evidence",
+    "fixtureClaimKind": "synthetic_example",
+    "window": {
+      "start": "2026-08-01T00:00:00.000Z",
+      "end": "2026-09-30T23:59:59.000Z"
+    },
+    "subject": {
+      "tenantId": "technology-fixture-tenant",
+      "workspaceId": "technology-fixture-workspace",
+      "deploymentId": "technology-fixture-deployment",
+      "agentId": "technology-fixture-agent",
+      "subjectId": null
+    },
+    "plan": {
+      "applicability": "applicable",
+      "policyDigest": "sha256:fixture-policy",
+      "mode": "enforce"
+    },
+    "items": [
+      {
+        "ref": {
+          "kind": "receipt",
+          "id": "L1-TECH-07-questionnaire-1"
+        },
+        "producerId": "amc.questionnaire",
+        "provenance": {
+          "verified": true,
+          "producerId": "amc.questionnaire",
+          "trustTier": "SELF_REPORTED"
+        },
+        "recordedAt": "2026-09-20T10:00:00.000Z",
+        "binding": {
+          "tenantId": "technology-fixture-tenant",
+          "workspaceId": "technology-fixture-workspace",
+          "deploymentId": "technology-fixture-deployment",
+          "agentId": "technology-fixture-agent",
+          "controlId": "L1-TECH-07",
+          "controlVersion": "0.1.0"
+        },
+        "verdict": "conforms",
+        "attributes": {
+          "receiptId": "L1-TECH-07-questionnaire-receipt-1",
+          "observationKey": "L1-TECH-07-draft-answer",
+          "observation": "conforms"
+        }
+      }
+    ],
+    "priorUses": []
+  },
+  "expected": {
+    "result": "not_evaluated",
+    "reasonCode": null
+  }
+}

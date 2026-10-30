@@ -1,0 +1,18 @@
+{
+  "case": "cross-tenant",
+  "normative": true,
+  "dimensions": {
+    "integrity": "pass",
+    "issuerAdmission": "pass",
+    "scope": "fail",
+    "freshness": "pass",
+    "completeness": "pass",
+    "satisfaction": "not-evaluated"
+  },
+  "reasonCodes": {
+    "scope": [
+      "SCOPE_MISMATCH"
+    ]
+  },
+  "exitCode": 1
+}

@@ -59,7 +59,7 @@ describe("GAP-1259 Superagent prompt-injection suite boundary", () => {
     expect(doc).toContain("No Superagent adapter");
   });
 
-  it("reuses generic prompt-injection suite receipts for Superagent context", () => {
+  it("fails closed on unresolved Superagent fixture metadata", () => {
     const receipt = buildPromptInjectionRegressionSuiteReceipt({
       suiteId: "superagent-style-prompt-injection-suite",
       suiteVersion: "2026.06.25",
@@ -129,9 +129,15 @@ describe("GAP-1259 Superagent prompt-injection suite boundary", () => {
       ],
     });
 
-    expect(receipt.status).toBe("pass");
+    expect(receipt.status).toBe("fail_closed");
+    expect(receipt.failClosedReasons).toContain("ledger workspace missing");
     expect(receipt.coverage.presentVectors).toEqual(["direct", "indirect", "multimodal", "retrieved_content"]);
-    expect(verifyPromptInjectionRegressionSuiteReceipt(receipt)).toEqual({ valid: true, failClosedReasons: [] });
+    expect(receipt.rows.every((row) => row.status === "missing_evidence")).toBe(true);
+    expect(verifyPromptInjectionRegressionSuiteReceipt(receipt)).toEqual({
+      valid: false,
+      failClosedReasons: expect.arrayContaining(["ledger workspace missing"]),
+    });
+    expect(renderPromptInjectionRegressionSuiteMarkdown(receipt)).toContain("Status: fail_closed");
     expect(renderPromptInjectionRegressionSuiteMarkdown(receipt)).toContain("superagent-retrieved-content-fixture");
   });
 

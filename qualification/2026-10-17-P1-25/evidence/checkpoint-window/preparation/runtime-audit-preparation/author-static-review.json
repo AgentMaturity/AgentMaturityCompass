@@ -1,0 +1,14 @@
+{
+  "schema": "p125k-runtime-audit-preparation-author-review/1",
+  "blockers": [],
+  "runtimeOrHookOrFailureOutcomePredicted": false,
+  "exactOldAuditorAndScannerRetained": true,
+  "literalPublicPathExtractionWithoutDereference": true,
+  "cohort": [
+    "tests/time/checkpointWindow.test.ts",
+    "tests/time/tsaGrant.test.ts",
+    "tests/time/verifyTimestamp.test.ts"
+  ],
+  "executedImportedParsedCompiled": false,
+  "sourceIndexQaWrites": false
+}

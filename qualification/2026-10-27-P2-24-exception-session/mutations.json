@@ -1,0 +1,19 @@
+[
+ {
+  "mutation": "M19 exception requester not authenticated",
+  "file": "src/governor/scopedExceptions.ts",
+  "test": "tests/governor/scopedExceptions.test.ts",
+  "failingTests": [
+   "P2-24 scoped exceptions at the enforcement point issuing refuses an approval without the quorum, an unbound decision or the requester as approver",
+   "P2-24 scoped exceptions at the enforcement point a request without an authenticated session, or naming its own requester, is refused (principal_unresolved)"
+  ]
+ },
+ {
+  "mutation": "M20 exception request records no initiator",
+  "file": "src/governor/scopedExceptions.ts",
+  "test": "tests/governor/scopedExceptions.test.ts",
+  "failingTests": [
+   "P2-24 scoped exceptions at the enforcement point issuing refuses an approval without the quorum, an unbound decision or the requester as approver"
+  ]
+ }
+]

@@ -1,0 +1,457 @@
+{
+  "schemaVersion": "2026-09-08",
+  "startedAt": "2026-10-11T08:39:26.623Z",
+  "sourceCommit": "756bd6977dce19f4ef781bdb492c38d6777964f7",
+  "artifactSha256": "21190c7da41e9fc5bf87e168416b34085f223df8cf80425e420557011ebc0340",
+  "artifactPath": "/stage/rc.tgz",
+  "installedCli": "/work/out/studio/installation/node_modules/agent-maturity-compass/dist/cli.js",
+  "installedCliSha256": "8b9ec22158bcb23a0f0123e1b12abfce1d9cd1675ba9c9f3aad6b54019ac9165",
+  "node": {
+    "version": "v22.23.3",
+    "platform": "linux",
+    "arch": "arm64"
+  },
+  "browser": {
+    "engine": "chromium",
+    "version": "151.0.7922.34"
+  },
+  "planned": [
+    "owner-login-and-missing-credential",
+    "rendered-layout-keyboard-and-home-handoff",
+    "selected-agent-committed-task-and-follow-up",
+    "release-reload-explicit-resume",
+    "lost-create-acknowledgement-never-replayed",
+    "unreceived-create-explicit-identical-retry",
+    "unreceived-turn-explicit-identical-retry",
+    "real-pending-approval-link-and-denial",
+    "cancel-actual-turn-waiting-for-approval",
+    "browser-verification-control-reports-actual-verdict",
+    "explicit-closed-task-archive-retains-inspection",
+    "native-write-browser-proof-and-agent-binding",
+    "demo-stub-only-and-approval-refusal"
+  ],
+  "checks": [
+    {
+      "name": "owner-login-and-missing-credential",
+      "status": "passed",
+      "elapsedMs": 1026,
+      "details": {
+        "actorMode": "owner cookie",
+        "nondefaultAgent": "browser-agent",
+        "providerInspectedOnly": "openai"
+      }
+    },
+    {
+      "name": "rendered-layout-keyboard-and-home-handoff",
+      "status": "passed",
+      "elapsedMs": 1245,
+      "details": {
+        "widths": [
+          1280,
+          390
+        ],
+        "clipboardAgent": "browser-agent"
+      }
+    },
+    {
+      "name": "selected-agent-committed-task-and-follow-up",
+      "status": "passed",
+      "elapsedMs": 3737,
+      "details": {
+        "taskId": "ed18df13457f446bb0c4f270e77dcf287fe9ce6f97cb82df6d49b41351d115c4",
+        "sessionId": "e7902b84-c947-4f4a-9cdc-17df97590210",
+        "revision": 2,
+        "evidence": "committed; full verification separate"
+      }
+    },
+    {
+      "name": "release-reload-explicit-resume",
+      "status": "passed",
+      "elapsedMs": 2691,
+      "details": {
+        "sessionId": "e7902b84-c947-4f4a-9cdc-17df97590210",
+        "reloadMutationCount": 0
+      }
+    },
+    {
+      "name": "lost-create-acknowledgement-never-replayed",
+      "status": "passed",
+      "elapsedMs": 1681,
+      "details": {
+        "taskId": "087dfb87d5c3926a3d0f1f503a8e52efe074074950cf57362a85b1d64a7ddae5",
+        "requestId": "69e56e9f-b81e-4fc1-965a-3b49bc29aed9",
+        "browserPosts": 1,
+        "acceptedTasks": 1,
+        "editedDraftPreserved": true
+      }
+    },
+    {
+      "name": "unreceived-create-explicit-identical-retry",
+      "status": "passed",
+      "elapsedMs": 3784,
+      "details": {
+        "taskId": "2eeb121d1b05eaaa42d521d231a2bae2c5d18f1cbfda377f29d7744a78c46965",
+        "sessionId": "099c8375-1794-4556-89e3-59afe7dcb941",
+        "requestId": "f9567e9c-cd61-46e8-a133-773fd0dbf3d8",
+        "attempts": 3,
+        "requestBodyIdentical": true,
+        "revisedDraftPreserved": true,
+        "firstAttemptReachedServer": false,
+        "refusedRetry": "real CSRF check",
+        "failedRefreshRecoverable": true
+      }
+    },
+    {
+      "name": "unreceived-turn-explicit-identical-retry",
+      "status": "passed",
+      "elapsedMs": 5393,
+      "details": {
+        "taskId": "6a95d952d1af60e754b4d75825810c015682b1ee1dcbde700cdcda836e4de0d7",
+        "sessionId": "a7aa5346-10ef-42ff-b343-0b422eb34721",
+        "requestId": "d7e3f066-e0fb-405b-8e64-65d04d6a3d45",
+        "attempts": 3,
+        "requestBodyIdentical": true,
+        "revisedDraftPreserved": true,
+        "firstAttemptReachedServer": false,
+        "refusedRetry": "real CSRF check",
+        "failedRefreshRecoverable": true
+      }
+    },
+    {
+      "name": "real-pending-approval-link-and-denial",
+      "status": "passed",
+      "elapsedMs": 6311,
+      "details": {
+        "taskId": "c5b7ffc02e385d255ee295135481d55cb0a765e750ee3989068867000f77653c",
+        "sessionId": "2d1e3d37-45a1-4763-8de5-980db4557a55",
+        "approvalRequestId": "apprreq_e1de924c2d5e4acdbc83ca10445017c3",
+        "quorum": 2,
+        "decision": "DENY",
+        "note": "Stub requests a synthetic argument shape; no successful coding/editing effect is claimed."
+      }
+    },
+    {
+      "name": "cancel-actual-turn-waiting-for-approval",
+      "status": "passed",
+      "elapsedMs": 4875,
+      "details": {
+        "taskId": "1fbd442f14dffa3168d78d1591037574523799426d2860fe44e14ab145c8dd29",
+        "sessionId": "f96b0c99-15a1-4185-9911-25a3529c2aeb",
+        "ending": "cancelled"
+      }
+    },
+    {
+      "name": "browser-verification-control-reports-actual-verdict",
+      "status": "passed",
+      "elapsedMs": 364,
+      "details": {
+        "sessionId": "f96b0c99-15a1-4185-9911-25a3529c2aeb",
+        "verification": "failed",
+        "note": "Checks faithful presentation of the actual verifier result; cold cryptographic acceptance is independently required after shutdown."
+      }
+    },
+    {
+      "name": "explicit-closed-task-archive-retains-inspection",
+      "status": "passed",
+      "elapsedMs": 4940,
+      "details": {
+        "taskId": "a217f320684b2d22bdfff8abd846e501496c5af2bf92efc0e373b79298c04fa0",
+        "sessionId": "d18a8d83-16cc-4886-88e2-3a9ad18b3a46",
+        "revision": 1,
+        "signedHistoryRetained": true,
+        "defaultListExcluded": true,
+        "explicitArchivedInspection": true,
+        "reloadMutationCount": 0,
+        "evidenceVerification": "anchored-prefix"
+      }
+    },
+    {
+      "name": "native-write-browser-proof-and-agent-binding",
+      "status": "passed",
+      "elapsedMs": 2,
+      "details": {
+        "nativeRequests": 25,
+        "cookieCsrfPresent": true,
+        "agentId": "browser-agent"
+      }
+    },
+    {
+      "name": "demo-stub-only-and-approval-refusal",
+      "status": "passed",
+      "elapsedMs": 3735,
+      "details": {
+        "taskId": "44f503cbad416f03a0875ff3d634c665511cb3b1830fbaa5a351e54fba026dcb",
+        "provider": "stub",
+        "tools": "none",
+        "approvalStatus": 403
+      }
+    }
+  ],
+  "notes": [],
+  "requests": [
+    {
+      "path": "/api/v1/native-tasks",
+      "agentId": "browser-agent",
+      "clientRequestId": "674dffd7-44c2-4565-bd5e-947c14090fbf",
+      "expectedRevision": null,
+      "promptSha256": "49abcc02b26a3a18e9ad14d03f94e3716b3a9dcf86f93d8e82c4910064858e23",
+      "intent": "task-workspace-v1",
+      "csrfPresent": true
+    },
+    {
+      "path": "/api/v1/native-tasks/ed18df13457f446bb0c4f270e77dcf287fe9ce6f97cb82df6d49b41351d115c4/turn",
+      "agentId": "browser-agent",
+      "clientRequestId": "45b5e751-89af-4bdd-b109-46c97d1e1ca4",
+      "expectedRevision": 1,
+      "promptSha256": "0c3a3f9c934a372c66dc380880b2c70ca1045f7ce881bd5e4abea1d6bfbd18d2",
+      "intent": "task-workspace-v1",
+      "csrfPresent": true
+    },
+    {
+      "path": "/api/v1/native-tasks/ed18df13457f446bb0c4f270e77dcf287fe9ce6f97cb82df6d49b41351d115c4/release",
+      "agentId": "browser-agent",
+      "clientRequestId": null,
+      "expectedRevision": 2,
+      "promptSha256": null,
+      "intent": "task-workspace-v1",
+      "csrfPresent": true
+    },
+    {
+      "path": "/api/v1/native-tasks/ed18df13457f446bb0c4f270e77dcf287fe9ce6f97cb82df6d49b41351d115c4/resume",
+      "agentId": "browser-agent",
+      "clientRequestId": null,
+      "expectedRevision": 2,
+      "promptSha256": null,
+      "intent": "task-workspace-v1",
+      "csrfPresent": true
+    },
+    {
+      "path": "/api/v1/native-tasks/ed18df13457f446bb0c4f270e77dcf287fe9ce6f97cb82df6d49b41351d115c4/release",
+      "agentId": "browser-agent",
+      "clientRequestId": null,
+      "expectedRevision": 2,
+      "promptSha256": null,
+      "intent": "task-workspace-v1",
+      "csrfPresent": true
+    },
+    {
+      "path": "/api/v1/native-tasks",
+      "agentId": "browser-agent",
+      "clientRequestId": "69e56e9f-b81e-4fc1-965a-3b49bc29aed9",
+      "expectedRevision": null,
+      "promptSha256": "c2c57a767acc1e6030c4bda508fa0f0fefa76e198024c6a30fed74bc987ad164",
+      "intent": "task-workspace-v1",
+      "csrfPresent": true
+    },
+    {
+      "path": "/api/v1/native-tasks/087dfb87d5c3926a3d0f1f503a8e52efe074074950cf57362a85b1d64a7ddae5/release",
+      "agentId": "browser-agent",
+      "clientRequestId": null,
+      "expectedRevision": 1,
+      "promptSha256": null,
+      "intent": "task-workspace-v1",
+      "csrfPresent": true
+    },
+    {
+      "path": "/api/v1/native-tasks",
+      "agentId": "browser-agent",
+      "clientRequestId": "f9567e9c-cd61-46e8-a133-773fd0dbf3d8",
+      "expectedRevision": null,
+      "promptSha256": "8afda77fba5e82fcf9fe632d5cfc56ae95a88b00c8a725e6c525da153ce0fca3",
+      "intent": "task-workspace-v1",
+      "csrfPresent": true
+    },
+    {
+      "path": "/api/v1/native-tasks",
+      "agentId": "browser-agent",
+      "clientRequestId": "f9567e9c-cd61-46e8-a133-773fd0dbf3d8",
+      "expectedRevision": null,
+      "promptSha256": "8afda77fba5e82fcf9fe632d5cfc56ae95a88b00c8a725e6c525da153ce0fca3",
+      "intent": "task-workspace-v1",
+      "csrfPresent": true
+    },
+    {
+      "path": "/api/v1/native-tasks",
+      "agentId": "browser-agent",
+      "clientRequestId": "f9567e9c-cd61-46e8-a133-773fd0dbf3d8",
+      "expectedRevision": null,
+      "promptSha256": "8afda77fba5e82fcf9fe632d5cfc56ae95a88b00c8a725e6c525da153ce0fca3",
+      "intent": "task-workspace-v1",
+      "csrfPresent": true
+    },
+    {
+      "path": "/api/v1/native-tasks/2eeb121d1b05eaaa42d521d231a2bae2c5d18f1cbfda377f29d7744a78c46965/release",
+      "agentId": "browser-agent",
+      "clientRequestId": null,
+      "expectedRevision": 1,
+      "promptSha256": null,
+      "intent": "task-workspace-v1",
+      "csrfPresent": true
+    },
+    {
+      "path": "/api/v1/native-tasks",
+      "agentId": "browser-agent",
+      "clientRequestId": "c3b7becf-8028-4990-a6b0-0de4df04ecb3",
+      "expectedRevision": null,
+      "promptSha256": "6dfc2ca94675c7fb2032cf3b7954069b66c9b0a1c598fc177eee6b01d83f7a30",
+      "intent": "task-workspace-v1",
+      "csrfPresent": true
+    },
+    {
+      "path": "/api/v1/native-tasks/6a95d952d1af60e754b4d75825810c015682b1ee1dcbde700cdcda836e4de0d7/turn",
+      "agentId": "browser-agent",
+      "clientRequestId": "d7e3f066-e0fb-405b-8e64-65d04d6a3d45",
+      "expectedRevision": 1,
+      "promptSha256": "3762304d8137830962f62ff6c658adbe176e8e9885df0c39ba583e9720845354",
+      "intent": "task-workspace-v1",
+      "csrfPresent": true
+    },
+    {
+      "path": "/api/v1/native-tasks/6a95d952d1af60e754b4d75825810c015682b1ee1dcbde700cdcda836e4de0d7/turn",
+      "agentId": "browser-agent",
+      "clientRequestId": "d7e3f066-e0fb-405b-8e64-65d04d6a3d45",
+      "expectedRevision": 1,
+      "promptSha256": "3762304d8137830962f62ff6c658adbe176e8e9885df0c39ba583e9720845354",
+      "intent": "task-workspace-v1",
+      "csrfPresent": true
+    },
+    {
+      "path": "/api/v1/native-tasks/6a95d952d1af60e754b4d75825810c015682b1ee1dcbde700cdcda836e4de0d7/turn",
+      "agentId": "browser-agent",
+      "clientRequestId": "d7e3f066-e0fb-405b-8e64-65d04d6a3d45",
+      "expectedRevision": 1,
+      "promptSha256": "3762304d8137830962f62ff6c658adbe176e8e9885df0c39ba583e9720845354",
+      "intent": "task-workspace-v1",
+      "csrfPresent": true
+    },
+    {
+      "path": "/api/v1/native-tasks/6a95d952d1af60e754b4d75825810c015682b1ee1dcbde700cdcda836e4de0d7/release",
+      "agentId": "browser-agent",
+      "clientRequestId": null,
+      "expectedRevision": 2,
+      "promptSha256": null,
+      "intent": "task-workspace-v1",
+      "csrfPresent": true
+    },
+    {
+      "path": "/api/v1/native-tasks",
+      "agentId": "browser-agent",
+      "clientRequestId": "aa25fd90-91eb-4874-a399-c2f11e61b120",
+      "expectedRevision": null,
+      "promptSha256": "b71d91e630c685e0f43c624068c6af49c19fc71653e07a05723d679f1cdd0f85",
+      "intent": "task-workspace-v1",
+      "csrfPresent": true
+    },
+    {
+      "path": "/api/v1/native-tasks/c5b7ffc02e385d255ee295135481d55cb0a765e750ee3989068867000f77653c/release",
+      "agentId": "browser-agent",
+      "clientRequestId": null,
+      "expectedRevision": 1,
+      "promptSha256": null,
+      "intent": "task-workspace-v1",
+      "csrfPresent": true
+    },
+    {
+      "path": "/api/v1/native-tasks",
+      "agentId": "browser-agent",
+      "clientRequestId": "37a9ce5e-9d9f-4e86-8f63-f974c347a54e",
+      "expectedRevision": null,
+      "promptSha256": "f610e1cbab90ea46c66470a0ed99ee059f86d58eec94becafc9df96b92d5abdb",
+      "intent": "task-workspace-v1",
+      "csrfPresent": true
+    },
+    {
+      "path": "/api/v1/native-tasks/1fbd442f14dffa3168d78d1591037574523799426d2860fe44e14ab145c8dd29/cancel",
+      "agentId": "browser-agent",
+      "clientRequestId": null,
+      "expectedRevision": 1,
+      "promptSha256": null,
+      "intent": "task-workspace-v1",
+      "csrfPresent": true
+    },
+    {
+      "path": "/api/v1/native-tasks/1fbd442f14dffa3168d78d1591037574523799426d2860fe44e14ab145c8dd29/release",
+      "agentId": "browser-agent",
+      "clientRequestId": null,
+      "expectedRevision": 1,
+      "promptSha256": null,
+      "intent": "task-workspace-v1",
+      "csrfPresent": true
+    },
+    {
+      "path": "/api/v1/native-tasks/1fbd442f14dffa3168d78d1591037574523799426d2860fe44e14ab145c8dd29/verify",
+      "agentId": "browser-agent",
+      "clientRequestId": null,
+      "expectedRevision": 1,
+      "promptSha256": null,
+      "intent": "task-workspace-v1",
+      "csrfPresent": true
+    },
+    {
+      "path": "/api/v1/native-tasks",
+      "agentId": "browser-agent",
+      "clientRequestId": "3ee419f6-022a-48d8-8f5b-546f84c363d7",
+      "expectedRevision": null,
+      "promptSha256": "34f0d513cc84bc60df66fa7fe022191133ea4a3d2a0fac94656a8b4115899589",
+      "intent": "task-workspace-v1",
+      "csrfPresent": true
+    },
+    {
+      "path": "/api/v1/native-tasks/a217f320684b2d22bdfff8abd846e501496c5af2bf92efc0e373b79298c04fa0/verify",
+      "agentId": "browser-agent",
+      "clientRequestId": null,
+      "expectedRevision": 1,
+      "promptSha256": null,
+      "intent": "task-workspace-v1",
+      "csrfPresent": true
+    },
+    {
+      "path": "/api/v1/native-tasks/a217f320684b2d22bdfff8abd846e501496c5af2bf92efc0e373b79298c04fa0/archive",
+      "agentId": "browser-agent",
+      "clientRequestId": null,
+      "expectedRevision": 1,
+      "promptSha256": null,
+      "intent": "task-workspace-v1",
+      "csrfPresent": true
+    }
+  ],
+  "sessionIds": [
+    "e7902b84-c947-4f4a-9cdc-17df97590210",
+    "3c83c641-41da-4e02-b3ce-2ecc47591477",
+    "099c8375-1794-4556-89e3-59afe7dcb941",
+    "a7aa5346-10ef-42ff-b343-0b422eb34721",
+    "2d1e3d37-45a1-4763-8de5-980db4557a55",
+    "f96b0c99-15a1-4185-9911-25a3529c2aeb",
+    "d18a8d83-16cc-4886-88e2-3a9ad18b3a46"
+  ],
+  "cleanup": [
+    {
+      "resource": "owned browser",
+      "ok": true
+    }
+  ],
+  "ok": true,
+  "qualification": "browser-slice-passed",
+  "limits": [
+    "Actual browser with installed AMC server; provider is the explicit local deterministic stub.",
+    "No real model coding-quality claim. Workspace stub tool arguments are synthetic; denial/cancellation are the exercised tool behaviors.",
+    "Browser service workers are blocked for deterministic lost-response interception; offline/service-worker behavior is not qualified.",
+    "Cold cryptographic verification must be run separately after orderly Studio shutdown; a live gateway can make whole-workspace verification refuse.",
+    "No HAR/trace or credential values are retained."
+  ],
+  "harness": {
+    "scriptSha256": "ff835c580a58c0d08220abd14aecffebbd1dba2a758fe1aa3890e5b4f09abf0e",
+    "pageModuleSha256": "22ed3520cb14b5bb45b489200e2051e8bc6ecf47b22f8240f20e0550ee720fb3",
+    "playwright": {
+      "path": "/work/pw/node_modules/@playwright/test/package.json",
+      "version": "1.62.1"
+    }
+  },
+  "finishedAt": "2026-10-11T08:40:07.644Z",
+  "counts": {
+    "planned": 13,
+    "passed": 13,
+    "failed": 0,
+    "notExercised": 0
+  }
+}

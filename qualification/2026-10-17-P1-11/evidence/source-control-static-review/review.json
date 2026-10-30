@@ -1,0 +1,23 @@
+{
+  "schema": "p111-private-control-static-review/1",
+  "allReadsFinished": true,
+  "candidate": {
+    "path": "/private/tmp/p1-11-decisive-qualification-20261017/source-control.py",
+    "bytes": 3766,
+    "sha256": "0e236ab0e15df6b0cbde43fab2a5050c531b0d10a9c0e1e315dcc8906adf1eac"
+  },
+  "executionPerformed": false,
+  "checkoutWrites": false,
+  "blockers": [],
+  "findings": [
+    "Exact four reviewed once-only byte recipes and proposed SHA checks match the sealed control design. Backup, patch and action record writes use exclusive creation. Replay mutation preserves replayDetail and its seen-ID side effects. Restore preserves exact source original and requires clean Git status afterward."
+  ],
+  "rootOwnedRequirements": [
+    "target.write_bytes follows the path; this helper does not itself refresh regular-file/no-alias physical identity immediately before mutation. Root must retain the admitted bound target and selected physical preservation checks.",
+    "Restore checks observed RED total88, nonzero failures, test-only errors and no unhandled/late diagnostics, but does not itself check groupAbsentByESRCH, signalsOtherThanZeroSent or root all-failure/first-frame/masking classification. Root must review those actual closed records before invoking restore."
+  ],
+  "bindingScope": "Root actual fresh binding lists eight compiled pairs; proposed finite source-pinset lists nine including compliance/evidenceBinding.js. Both are preservation evidence only. No compiled-mutant sensitivity claim is supported.",
+  "limits": [
+    "Static full text and metadata review only. No helper, product, compiler, test, native, SQL, network or process probe execution. No assertion of completed causal outcomes or full P1-11 acceptance."
+  ]
+}

@@ -12,7 +12,9 @@
  *     because it quietly found them through the checkout's node_modules would
  *     prove nothing about a user's machine;
  *   - the tool turn must complete and both installed verification commands must
- *     authenticate its evidence and reconstruct every recorded request.
+ *     authenticate its evidence and reconstruct every recorded request;
+ *   - `amc init --coding` and the SDK quickstart (examples/sdk/quickstart.mjs, P1-40)
+ *     must reach a verified synthetic action through the installed package.
  *
  * A configured real provider is exercised only when AMC_PACKED_SMOKE_PROVIDER
  * (and its credential env) is set; otherwise that step is reported as skipped,
@@ -20,9 +22,9 @@
  */
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { verifyPackedRun } from "./packed-evidence-verification.mjs";
 
@@ -33,6 +35,16 @@ function run(label, cmd, args, opts) {
   console.log(`${ok ? "ok  " : "FAIL"} ${label} (${((Date.now() - started) / 1000).toFixed(1)}s)`);
   if (!ok) console.error(`${result.stdout ?? ""}\n${result.stderr ?? ""}`.trim().split("\n").slice(-25).join("\n"));
   return { ok, stdout: result.stdout ?? "", out: `${result.stdout ?? ""}${result.stderr ?? ""}` };
+}
+
+export function installPackedConsumer(tarball, consumer, isolated, packageName) {
+  const installed = run("npm install <tarball> (fresh dir, empty HOME)", "npm", ["install", "--prefix", consumer, "--no-audit", "--no-fund", "--omit=dev", tarball], { cwd: consumer, env: isolated }).ok;
+  if (!installed) return false;
+  if (!existsSync(join(consumer, "node_modules", packageName, "package.json"))) {
+    console.error("FAIL installed packed consumer package manifest is missing");
+    return false;
+  }
+  return true;
 }
 
 export function isolatedInstallEnvironment(base, home) {
@@ -64,7 +76,8 @@ export function verifyPackedComposition(result, source) {
   } catch { return false; }
 }
 
-export function packedInstallCheck({ root = process.cwd(), build = true, keep = false } = {}) {
+/** `tarball` (or AMC_PACKED_INSTALL_TARBALL) checks that exact file instead of building and packing (P0-34). */
+export function packedInstallCheck({ root = process.cwd(), build = true, keep = false, tarball: given = process.env.AMC_PACKED_INSTALL_TARBALL } = {}) {
   const pkg = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
   const work = mkdtempSync(join(tmpdir(), "amc-packed-install-"));
   const home = join(work, "home"); const consumer = join(work, "consumer"); const workspace = join(work, "workspace");
@@ -91,8 +104,13 @@ export function packedInstallCheck({ root = process.cwd(), build = true, keep = 
 
   let tarball = null;
   const steps = [
-    () => !build || run("pnpm run build", "pnpm", ["run", "build"], { cwd: root, env }).ok,
+    () => Boolean(given) || !build || run("pnpm run build", "pnpm", ["run", "build"], { cwd: root, env }).ok,
     () => {
+      if (given) {
+        tarball = resolve(given);
+        console.log(`note: checking the given tarball ${tarball}; nothing is built or packed`);
+        return existsSync(tarball) || (console.error(`FAIL tarball not found at ${tarball}`), false);
+      }
       // --ignore-scripts: the package's `prepack` hook is the RELEASE gate (full
       // test suite, dependency audit, smoke) and measures the working tree. This
       // check measures the artifact; the release gate stays its own explicit
@@ -103,13 +121,16 @@ export function packedInstallCheck({ root = process.cwd(), build = true, keep = 
       tarball = join(work, JSON.parse(r.stdout)[0].filename);
       return existsSync(tarball) || (console.error(`FAIL tarball not found at ${tarball}`), false);
     },
-    () => run("npm install <tarball> (fresh dir, empty HOME)", "npm", ["install", "--no-audit", "--no-fund", "--omit=dev", tarball], { cwd: consumer, env: isolated }).ok,
+    () => installPackedConsumer(tarball, consumer, isolated, pkg.name),
     () => {
-      // The private workspace packages must be ABSENT here — the runtime has to work without them.
-      const r = spawnSync("node", ["-e", "require.resolve('@amc/core')"], { cwd: consumer, env: isolated, encoding: "utf8" });
-      const absent = r.status !== 0;
-      console.log(`${absent ? "ok  " : "FAIL"} @amc/core is not resolvable from the consumer directory`);
-      return absent;
+      // Resolve from installed AMC, without loading a cloud SDK or native binding.
+      const forbidden = ["@amc/core", "@aws-sdk/client-kms", "@google-cloud/kms", "@azure/keyvault-keys", "@azure/identity", "agent-maturity-compass-key-provider-pkcs11", "pkcs11js"];
+      const installedManifest = join(consumer, "node_modules", pkg.name, "package.json");
+      const script = `const resolve = require("node:module").createRequire(${JSON.stringify(installedManifest)});`
+        + ` const unexpected = []; for (const name of ${JSON.stringify(forbidden)}) {`
+        + ' try { resolve.resolve(name); unexpected.push(name); } catch (error) { if (error.code !== "MODULE_NOT_FOUND") throw error; } }'
+        + ' if (unexpected.length) { console.error("unexpected default-install packages: " + unexpected.join(", ")); process.exit(1); }';
+      return run("installed AMC has no private workspace dependency, cloud SDK, or PKCS#11 addon", process.execPath, ["-e", script], { cwd: consumer, env: isolated }).ok;
     },
     () => run("installed standalone production API (no dev dependencies)", "node",
       [join(root, "scripts", "standalone-api-smoke.mjs"), join(consumer, "node_modules", pkg.name, "dist", "standalone-api.js")],
@@ -139,9 +160,44 @@ export function packedInstallCheck({ root = process.cwd(), build = true, keep = 
       return valid;
     },
     () => {
+      // D-20: every A4 surface stays off in the installed package unless the process sets AMC_A4_PREVIEW=1.
+      const a4Tools = (env) => {
+        const r = run(`amc mcp list-tools --json (AMC_A4_PREVIEW ${env.AMC_A4_PREVIEW ?? "unset"})`, amc, ["mcp", "list-tools", "--json"], { cwd: workspace, env });
+        try { return r.ok ? JSON.stringify(JSON.parse(r.stdout)).match(/amc_a4_[a-z_]+/g) ?? [] : null; } catch { return null; }
+      };
+      const closed = a4Tools(isolated);
+      const open = a4Tools({ ...isolated, AMC_A4_PREVIEW: "1" });
+      const router = pathToFileURL(join(consumer, "node_modules", pkg.name, "dist", "a4", "a4Router.js")).href;
+      const script = `const { handleA4Route } = await import(${JSON.stringify(router)}); let status = 0; let body = "";`
+        + " const res = { writeHead: (s) => { status = s; }, setHeader() {}, end: (b) => { body = String(b); } };"
+        + ` await handleA4Route("/api/v1/a4/projects", "GET", { headers: {} }, res, { workspace: ${JSON.stringify(workspace)}, nativeTasks: { demo: false } });`
+        + " if (status !== 404 || JSON.parse(body).code !== \"A4_PREVIEW_DISABLED\") { console.error(status, body); process.exit(1); }";
+      const route = run("installed /api/v1/a4 answers 404 A4_PREVIEW_DISABLED without the preview", "node", ["--input-type=module", "-e", script], { cwd: workspace, env: isolated }).ok;
+      const gated = Array.isArray(closed) && closed.length === 0 && Array.isArray(open) && open.length > 0 && route;
+      console.log(`${gated ? "ok  " : "FAIL"} A4 preview gate: ${closed?.length ?? "?"} amc_a4_* tools without it, ${open?.length ?? "?"} with it`);
+      return gated;
+    },
+    () => {
       const r = run("amc agent-loop run (stub provider, keyless)", amc,
         ["agent-loop", "run", "--provider", "stub", "--json", "say hello"], { cwd: workspace, env: isolated });
       return verifyRun(r);
+    },
+    () => {
+      // P1-40: amc init --coding in a fresh workspace, then the SDK quickstart against the installed package and bin.
+      const started = Date.now();
+      const quickstart = join(work, "quickstart"); mkdirSync(quickstart);
+      const starterEnv = { ...isolated, AMC_BOOTSTRAP_OWNER_USERNAME: "packed-owner", AMC_BOOTSTRAP_OWNER_PASSWORD: "packed-install-owner" };
+      const init = run("amc init --coding (installed bin)", amc, ["init", "--coding"], { cwd: quickstart, env: starterEnv });
+      // The monitor fingerprint init printed, recorded before any agent runs (P0-09); the quickstart pins it.
+      const pin = /export AMC_EXPECTED_MONITOR_FINGERPRINT=([0-9a-f]{64})/.exec(init.stdout)?.[1];
+      if (!init.ok || !pin) return false;
+      const script = join(consumer, "quickstart.mjs");
+      copyFileSync(join(root, "examples", "sdk", "quickstart.mjs"), script);
+      const r = run("SDK quickstart (installed package; stub provider, synthetic)", "node", [script, quickstart],
+        { cwd: consumer, env: { ...starterEnv, AMC_EXPECTED_MONITOR_FINGERPRINT: pin } });
+      const ok = r.ok && r.stdout.includes("hello.txt written: yes") && r.stdout.includes("verification: verified, externally-anchored");
+      console.log(`${ok ? "ok  " : "FAIL"} installed quickstart reached a verified synthetic action in ${((Date.now() - started) / 1000).toFixed(1)}s (amc init --coding included)`);
+      return ok;
     },
     () => {
       const provider = process.env.AMC_PACKED_SMOKE_PROVIDER;
@@ -159,5 +215,7 @@ export function packedInstallCheck({ root = process.cwd(), build = true, keep = 
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
-  process.exit(packedInstallCheck({ build: !process.argv.includes("--no-build"), keep: process.argv.includes("--keep") }) ? 0 : 1);
+  const at = process.argv.indexOf("--tarball");
+  process.exit(packedInstallCheck({ build: !process.argv.includes("--no-build"), keep: process.argv.includes("--keep"),
+    ...(at > 0 ? { tarball: process.argv[at + 1] } : {}) }) ? 0 : 1);
 }

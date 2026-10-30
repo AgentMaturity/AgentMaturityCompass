@@ -12,6 +12,7 @@ import {
 } from "../src/observability/otelExporter.js";
 import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
 import { initWorkspace } from "../src/workspace.js";
+import { openLedger } from "../src/ledger/ledger.js";
 
 /**
  * Failure policy row `telemetry-exporter-down` (P0-11, docs/security/THREAT_MODEL.md):
@@ -49,6 +50,10 @@ function readyWorkspace(): string {
   const dir = realpathSync(mkdtempSync(join(tmpdir(), "amc-telemetry-fail-")));
   dirs.push(dir);
   initWorkspace({ workspacePath: dir, trustBoundaryMode: "isolated" });
+  // P1-78: a toolset with no session writer records only into a session the ledger holds open.
+  const ledger = openLedger(dir);
+  ledger.startSession({ sessionId: "telemetry-failure-session", runtime: "amc", binaryPath: "test", binarySha256: "test" });
+  ledger.close();
   initBudgets(dir, "default");
   writeRuntimeFirewallPolicy({ workspace: dir, mode: "observe" });
   mkdirSync(join(dir, "workspace", "output"), { recursive: true });

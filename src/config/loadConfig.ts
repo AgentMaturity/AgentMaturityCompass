@@ -3,7 +3,7 @@ import { resolve } from "node:path";
 import { studioEnvSchema, type StudioEnv } from "./envSchema.js";
 import type { StudioRuntimeConfig } from "./configTypes.js";
 
-function readSecretFromEnvOrFile(env: NodeJS.ProcessEnv, key: string): string | null {
+export function readSecretFromEnvOrFile(env: NodeJS.ProcessEnv, key: string): string | null {
   const fileKey = `${key}_FILE`;
   const filePath = env[fileKey];
   if (typeof filePath === "string" && filePath.trim().length > 0) {

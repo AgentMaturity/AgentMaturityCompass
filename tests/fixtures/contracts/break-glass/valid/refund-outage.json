@@ -1,0 +1,38 @@
+{
+  "schema": "amc.break-glass/v1",
+  "breakGlassId": "bg_dddddddddddddddddddddddd",
+  "activatedBy": {
+    "userId": "oncall-1",
+    "roles": [
+      "OPERATOR"
+    ]
+  },
+  "reason": "payment processor outage needs manual refunds",
+  "scope": {
+    "workspaceId": "default",
+    "agentIds": [
+      "default"
+    ],
+    "toolNames": [
+      "payments.refund"
+    ],
+    "actionClasses": [
+      "FINANCIAL"
+    ],
+    "controlIds": [
+      "L1-PAY-01"
+    ]
+  },
+  "window": {
+    "notBefore": "2026-10-27T00:00:00.000Z",
+    "notAfter": "2026-10-27T02:00:00.000Z"
+  },
+  "incidentId": "incident_eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+  "postHocReviewDueAt": "2026-10-29T02:00:00.000Z",
+  "prevBreakGlassDigest": "GENESIS",
+  "approval": {
+    "agentId": "default",
+    "approvalRequestId": "apprreq_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "requestBindingDigest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+  }
+}

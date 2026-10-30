@@ -97,6 +97,39 @@ describe("native Gemini signed lifecycle (unexecuted)", () => {
     expect(orderedCold(h.root, h.writer.sessionId).map(row => row.bytes)).toEqual(h.sent.map(request => request.body.toString("base64")));
     expect(verifyLedgerIntegrity(h.root).chain).toEqual({ ok: true, errors: [] });
   }, 120_000);
+  test("introducing an alias preserves the original generated name in signed Gemini history", async () => {
+    const canonical = "mcp:reviewed:files/read", originalWire = providerToolWireName(canonical), raw = geminiCallPart(originalWire, "pre-alias-call");
+    const h = harness([geminiResponse([geminiFrame([raw], "before-alias")]), geminiTextResponse("after-alias")]);
+    const first = h.runtime.prepare(h.spec([schema(canonical)])); await drain(first.stream());
+    result(h.writer, "pre-alias-call"); h.finishStep(first); h.writer.startStep();
+    const second = h.runtime.prepare(h.spec([{ ...schema(canonical), modelAlias: "read_reviewed" }]));
+    await drain(second.stream()); h.finishStep(second);
+    expect(h.sent[1]!.body.toString()).toContain(raw);
+    const body = JSON.parse(h.sent[1]!.body.toString());
+    expect(body.tools[0].functionDeclarations[0].name).toBe("read_reviewed");
+    expect(body.contents.flatMap((message: { parts: { functionResponse?: { name: string } }[] }) => message.parts)
+      .find((part: { functionResponse?: { name: string } }) => part.functionResponse)?.functionResponse?.name).toBe(originalWire);
+    h.close();
+    expect(orderedCold(h.root, h.writer.sessionId).map(row => row.bytes)).toEqual(h.sent.map(request => request.body.toString("base64")));
+  });
+  test("operator alias retains exact signed Gemini parts after rename and revocation", async () => {
+    const canonical = "mcp:reviewed:files/read", alias = "read_reviewed", raw = geminiCallPart(alias, "aliased-call");
+    const h = harness([geminiResponse([geminiFrame([raw], "alias-first")]), geminiTextResponse("alias-second"), geminiTextResponse("alias-third")]);
+    const first = h.runtime.prepare(h.spec([{ ...schema(canonical), modelAlias: alias }]));
+    expect(calls(await drain(first.stream()))).toMatchObject([{ name: canonical, providerWireName: alias }]);
+    expect(JSON.parse(h.sent[0]!.body.toString()).tools[0].functionDeclarations[0].name).toBe(alias);
+    result(h.writer, "aliased-call"); h.finishStep(first); h.writer.startStep();
+    const second = h.runtime.prepare(h.spec([{ ...schema(canonical), modelAlias: "read_renamed" }]));
+    await drain(second.stream()); h.finishStep(second); h.later("Continue with the original signed history.");
+    const third = h.runtime.prepare(h.spec(null)); await drain(third.stream()); h.finishStep(third);
+    for (const request of h.sent.slice(1)) {
+      expect(request.body.toString()).toContain(raw);
+      expect(JSON.parse(request.body.toString()).contents.flatMap((message: { parts: { functionResponse?: { name: string } }[] }) => message.parts)
+        .find((part: { functionResponse?: { name: string } }) => part.functionResponse)?.functionResponse?.name).toBe(alias);
+    }
+    h.close();
+    expect(orderedCold(h.root, h.writer.sessionId).map(row => row.bytes)).toEqual(h.sent.map(request => request.body.toString("base64")));
+  });
   test.each(["unoffered", "added-after-prepare", "malformed-sibling", "trailing-frame", "duplicate-id"])("%s cannot create executable or signed tool authority", async attack => {
     const original = providerToolWireName("fs.read"), foreign = providerToolWireName("fs.write");
     const part = geminiCallPart(attack === "unoffered" || attack === "added-after-prepare" ? foreign : original, "one");

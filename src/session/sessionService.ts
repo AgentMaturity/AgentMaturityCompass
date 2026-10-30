@@ -6,18 +6,19 @@ import type { SessionEventStore } from "../persistence/sessionEventStore.js";
 import { sha256Hex } from "../utils/hash.js";
 import type { ConversationHistory } from "./surfaceProjection.js";
 import { describeLiveEntries, prepareSurfaceCompaction, type AutomaticCompaction, type LiveSurfaceEntry } from "./surfaceCompaction.js";
+import { workspaceSelfTrust } from "../trust/trustContext.js";
 import { createSessionProjections, type SessionProjections } from "./projection/sessionProjections.js";
-
 import { SessionEventWriter } from "./sessionSpine.js";
 export { NATIVE_TRUST_TIER } from "./sessionSpine.js";
 
-import type { RequestHeaderMeta } from "./requestHeaderMeta.js";
+import { pinnedHeaderMetadata, type RequestHeaderMeta } from "./requestHeaderMeta.js";
 import { buildRequestOutcomeMeta, requestOutcomeEventType } from "./requestOutcomeMeta.js";
 import type { RequestOutcomeParams } from "./requestOutcomeMeta.js";
 import { assertToolSchemaCommitted } from "./toolSchemaCommitment.js";
 import { buildStepEndMeta, buildTurnEndMeta } from "./turnLifecycleMeta.js";
 import { buildApprovalRow } from "./approvalEventMeta.js";
 import { buildLoopEventRow } from "./loopEventMeta.js";
+import { buildSessionOpenMeta } from "./sessionOpenMeta.js";
 import { assertNativeImageBytes, snapshotNativeImages } from "../attachments/nativeImageInput.js";
 import { assertNativeAudioBytes, snapshotNativeAudio, NATIVE_AUDIO_INPUT_FORMAT } from "../attachments/nativeAudioInput.js";
 import { snapshotRecordedGeminiPart } from "./geminiPartMeta.js";
@@ -167,14 +168,7 @@ export class SessionService extends SessionEventWriter {
 
     return this.appendSessionEvent({
       eventType: "session/open",
-      typeMeta: {
-        runtime: params.runtime ?? "amc",
-        agentId: params.agentId,
-        harnessVersion: params.harnessVersion,
-        compositionDigest: params.compositionDigest,
-        policyDigest: params.policyDigest,
-        ...(params.parent === undefined ? {} : { parentSession: { ...params.parent } })
-      },
+      typeMeta: buildSessionOpenMeta(params),
       surface: { op: "none" },
       turn: null,
       step: null
@@ -324,7 +318,7 @@ export class SessionService extends SessionEventWriter {
       projectionCutoffEventId: params.projectionCutoffEventId,
       projectionDigest: params.projectionDigest,
       sourceEventIds: [...params.sourceEventIds],
-      requestDigest
+      requestDigest, ...pinnedHeaderMetadata(params)
     };
     const ref = this.appendSessionEvent({
       eventType: "request/header",
@@ -616,7 +610,7 @@ export class SessionService extends SessionEventWriter {
   private commitSurfaceCompaction(params: Parameters<typeof prepareSurfaceCompaction>[2]): SessionEventRef {
     this.ensureUsable();
     if (this.currentStep !== null) throw new Error("compaction is allowed only between steps, never during an in-flight model/tool step");
-    const prepared = prepareSurfaceCompaction(this.workspace, this.readEvents(), params);
+    const prepared = prepareSurfaceCompaction(this.workspace, this.readEvents(), params, { trust: workspaceSelfTrust(this.workspace) });
     return this.appendSessionEvent({ eventType: "loop/compact", typeMeta: {
       turn: this.currentTurn, step: this.currentStep, ...prepared.typeMeta
     }, surface: prepared.surface, payload: prepared.payload, turn: this.currentTurn, step: this.currentStep });

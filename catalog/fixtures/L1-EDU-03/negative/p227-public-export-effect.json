@@ -1,0 +1,20 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L1-EDU-03",
+  "polarity": "negative",
+  "evidenceClass": "violation",
+  "setup": {
+    "synthetic": true,
+    "metadataOnly": true,
+    "execution": {
+      "scenarioId": "edu-record-isolation",
+      "environmentId": "ferpa-purpose-v1",
+      "caseId": "p227-public-export-effect"
+    },
+    "note": "Unexecuted source-owned case declaration. A fresh seeded execution and sealed capture are required; expected below is assertion-only, never an observed result or production evidence."
+  },
+  "expected": {
+    "result": "fail",
+    "reasonCode": "unauthorized_effect"
+  }
+}

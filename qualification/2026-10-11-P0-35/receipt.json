@@ -1,0 +1,262 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-35",
+  "date": "2026-10-11",
+  "commit": "886bc5762cfeed73fdf5d1f7f004f78f1c9c8210",
+  "branch": "rtd/p0-35-image-digests-quickstart",
+  "node": "v25.5.0",
+  "pnpm": "10.33.0",
+  "os": "darwin 25.6.0 (macOS 26.6.2); images built and run in a colima VM (Docker 29.5.2 linux/arm64, linux/amd64 through Rosetta). Local colima, not CI.",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "docker buildx imagetools inspect node:22-bookworm-slim (index sha256:c3de60bf..., 2026-10-11T00:03Z)",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "docker buildx imagetools inspect docker/dockerfile:1 (index sha256:4edf897a...)",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "curl v1.1.1 agent-maturity-compass-1.1.1.tgz and SHA256SUMS; shasum -a 256 = dfc370a8... = install-channel.json packageTarballSha256",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "node scripts/check-image-pins.mjs",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npx vitest run tests/checkImagePins.test.ts (before pinning: the repository test fails, 8 of 9 pass)",
+      "exit": 1,
+      "durationMs": 0
+    },
+    {
+      "cmd": "mutation M1: PINNED also accepts :tag -> npx vitest run tests/checkImagePins.test.ts (4 fail, killed)",
+      "exit": 1,
+      "durationMs": 0
+    },
+    {
+      "cmd": "mutation M2: quickstart sha256sum -c check disabled -> npx vitest run tests/checkImagePins.test.ts (1 fails, killed)",
+      "exit": 1,
+      "durationMs": 0
+    },
+    {
+      "cmd": "docker build --platform linux/arm64 --target studio -t amc-p035-studio:arm64 .",
+      "exit": 0,
+      "durationMs": 167000
+    },
+    {
+      "cmd": "docker build --platform linux/arm64 --target runner -t amc-p035-runner:arm64 .",
+      "exit": 0,
+      "durationMs": 21000
+    },
+    {
+      "cmd": "docker build --platform linux/arm64 -f docker/Dockerfile.quickstart -t amc-p035-quickstart:arm64 .",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "docker build --platform linux/amd64 --target studio -t amc-p035-studio:amd64 .",
+      "exit": 0,
+      "durationMs": 611000
+    },
+    {
+      "cmd": "docker build --platform linux/amd64 --target runner -t amc-p035-runner:amd64 .",
+      "exit": 0,
+      "durationMs": 59000
+    },
+    {
+      "cmd": "docker build --platform linux/amd64 -f docker/Dockerfile.quickstart -t amc-p035-quickstart:amd64 .",
+      "exit": 0,
+      "durationMs": 1000
+    },
+    {
+      "cmd": "[smoke-arm64] node scripts/container-smoke.mjs --studio-image amc-p035-studio:arm64 --runner-image amc-p035-runner:arm64 --out container-smoke-arm64.json",
+      "exit": 0,
+      "durationMs": 41000
+    },
+    {
+      "cmd": "[quickstart-version-arm64] docker run --rm --platform linux/arm64 amc-p035-quickstart:arm64 --version",
+      "exit": 0,
+      "durationMs": 2000
+    },
+    {
+      "cmd": "[quickstart-uid-arm64] docker run --rm --platform linux/arm64 --entrypoint id amc-p035-quickstart:arm64",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "[quickstart-sqlite-arm64] docker run --rm --platform linux/arm64 --entrypoint node amc-p035-quickstart:arm64 -e const r=require(\"node:module\").createRequire(\"/usr/local/lib/node_modules/agent-maturity-compass/package.json\"); new (r(\"better-sqlite3\"))(\":memory:\").close(); console.log(JSON.stringify({sqlite:\"ok\",arch:process.arch,node:process.version,uid:process.getuid()}))",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "[smoke-amd64] node scripts/container-smoke.mjs --studio-image amc-p035-studio:amd64 --runner-image amc-p035-runner:amd64 --out container-smoke-amd64-attempt1.json",
+      "exit": 1,
+      "durationMs": 299000
+    },
+    {
+      "cmd": "[quickstart-version-amd64] docker run --rm --platform linux/amd64 amc-p035-quickstart:amd64 --version",
+      "exit": 0,
+      "durationMs": 44000
+    },
+    {
+      "cmd": "[quickstart-uid-amd64] docker run --rm --platform linux/amd64 --entrypoint id amc-p035-quickstart:amd64",
+      "exit": 0,
+      "durationMs": 2000
+    },
+    {
+      "cmd": "[quickstart-sqlite-amd64] docker run --rm --platform linux/amd64 --entrypoint node amc-p035-quickstart:amd64 -e const r=require(\"node:module\").createRequire(\"/usr/local/lib/node_modules/agent-maturity-compass/package.json\"); new (r(\"better-sqlite3\"))(\":memory:\").close(); console.log(JSON.stringify({sqlite:\"ok\",arch:process.arch,node:process.version,uid:process.getuid()}))",
+      "exit": 0,
+      "durationMs": 4000
+    },
+    {
+      "cmd": "[quickstart-wrong-hash-arm64] docker build --progress=plain --platform linux/arm64 -f docker/Dockerfile.quickstart --build-arg AMC_TGZ_SHA256=0000000000000000000000000000000000000000000000000000000000000000 .",
+      "exit": 1,
+      "durationMs": 103000
+    },
+    {
+      "cmd": "[quickstart-empty-hash-arm64] docker build --progress=plain --platform linux/arm64 -f docker/Dockerfile.quickstart --build-arg AMC_TGZ_SHA256= .",
+      "exit": 1,
+      "durationMs": 3000
+    },
+    {
+      "cmd": "[smoke-amd64-attempt2] node scripts/container-smoke.mjs --studio-image amc-p035-studio:amd64 --runner-image amc-p035-runner:amd64 --out container-smoke-amd64-attempt2.json",
+      "exit": 1,
+      "durationMs": 203000
+    },
+    {
+      "cmd": "[smoke-amd64-attempt3] node scripts/container-smoke.mjs --studio-image amc-p035-studio:amd64 --runner-image amc-p035-runner:amd64 --out container-smoke-amd64.json",
+      "exit": 0,
+      "durationMs": 331000
+    },
+    {
+      "cmd": "[timing] docker run -d amc-p035-studio:amd64 (smoke's sandbox and env) then poll amc studio healthcheck: first readiness 178 s, after stop/start 49 s; container and volume removed",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npx vitest run <224 test files that read the touched files> at 886bc5762",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s build",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s typecheck",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s typecheck:tests",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s lint",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:counts",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:docs-drift",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:freeze",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:gates",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:schemas",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:api-ref",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:threat-model",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:deploy-pack",
+      "exit": 0,
+      "durationMs": 0
+    }
+  ],
+  "tests": {
+    "total": 1511,
+    "passed": 1511,
+    "failed": 0,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "images.json",
+      "sha256": "d1d7070824dbedde76c55baab43ba2c882f1527716cdd6817ced65474b3693ff"
+    },
+    {
+      "path": "container-smoke-arm64.json",
+      "sha256": "5f3af5546f7294ac9be33eb885312a1f6fec0151255b234fcf43ac00f1d94273"
+    },
+    {
+      "path": "container-smoke-amd64.json",
+      "sha256": "94c82932d551220533c0ce1dd10f86ab94f6f52268946b9da6501c283321ed5a"
+    },
+    {
+      "path": "container-smoke-amd64-attempt1.json",
+      "sha256": "795f414041bacc32c3af02b72a0d2f77c6e478cef2879cb2070450b0be77758d"
+    },
+    {
+      "path": "container-smoke-amd64-attempt2.json",
+      "sha256": "38f105e80ec51fb3cb89e14bd305907c927a98653c11dc64424495d3f9642ce6"
+    },
+    {
+      "path": "base-node-22-bookworm-slim.inspect.txt",
+      "sha256": "5ccbfb45368d57d2605f55ba9ac1ad6bb09fccc0e67240c4c445d1637660e8f4"
+    },
+    {
+      "path": "base-dockerfile-frontend.inspect.txt",
+      "sha256": "2a95396d76441253fb868a1acf72eef627dff57f7cc7db48fd8650aa7ef8d6cf"
+    },
+    {
+      "path": "quickstart-negative-builds.txt",
+      "sha256": "265265eda7586e9d12439e85390904da68248d6cf7abee1d87f6e81803028066"
+    },
+    {
+      "path": "quickstart-checks.txt",
+      "sha256": "df7ef753ef4020bd9d3211889a99f55579ecc1a6898fcb37fe19bcc1cb79c0d4"
+    },
+    {
+      "path": "mutations.txt",
+      "sha256": "1ba80885b3abce64e0664cebab2ea13dc1270dd02991386fdb444a6e81cbe37e"
+    }
+  ],
+  "notes": "Local colima on macOS arm64, not CI. commit is the head the images were built from and qualified at; the only later commit adds this folder. Base pins resolved 2026-10-11T00:03Z with docker buildx imagetools inspect: node:22-bookworm-slim index sha256:c3de60bf2f9dd0ac6370e6117950ff62d6e339527e7472301c9c78a017978392 (linux/amd64 sha256:efd0ab5780c2d9ab1f0f869571a00d5edb17793bff4cce4a2792e3eb0ffc7562, linux/arm64 sha256:b20fe038d9592822dd534600a1ddf467e985178aa3fed60ec441a056c2cc45bd, image created 2026-10-06); docker/dockerfile:1 index sha256:4edf897a3ffa55b89f906fc8cc78afdb3f1834cc9c7083565e611a8a7d5fe99e (linux/amd64 sha256:7b32114e84ca21aeb2d6f871a0b62b3a0762193f75d9afd048ee4cbe889f3148, linux/arm64 sha256:e291cde6b1429712d3951bca77be92338719212df6654812f1a55874a481742d). Image IDs per architecture are in images.json; with the containerd image store an ID is the OCI index digest of the loaded image. Non-zero exits, all expected: the pin test before pinning (8 of 9, the repository case fails); mutations M1 and M2 (killed); the wrong-hash quickstart build (fails at sha256sum -c: /tmp/amc.tgz: FAILED) and the empty-hash build (fails at the empty-hash guard before any download). All six images built on the first try at the commit. container-smoke passed on linux/arm64 on the first run. On linux/amd64 (Rosetta) it ran three times at the same commit and images: attempts 1 and 2 failed with 'Studio readiness timed out' (attempt 1 after the restart, attempt 2 at the first start) and attempt 3 passed every check; all three receipts are attached. The smoke allows 180 s for Studio readiness, and a separate timing run of the same amd64 image took 178 s to its first readiness (49 s after a restart), so the amd64 result under Rosetta sits at that deadline; native amd64 qualification is the CI leg (pending-ci). An earlier full run at 879e9d254 (before the counts regeneration changed README.md, which enters the packed tarball) also passed on both architectures; in it the amd64 runner build first failed with a Rosetta segfault (exit 139 in the python3-setuptools postinst) and passed on retry, and the first amd64 container-smoke timed out at Studio readiness after restart while the host also ran build, typecheck and lint, then passed alone. pending-ci: the ci.yml docker-smoke matrix (ubuntu-latest and ubuntu-24.04-arm), the release.yml image job and multi-platform tag, and the docker-runner.yml per-architecture and manifest jobs have not run; nothing was pushed to any registry. The ubuntu-24.04-arm label was not re-checked against GitHub's documentation in this session.\n A durationMs of 0 means the command was not timed."
+}

@@ -1,0 +1,14 @@
+# Test fixture: the two producers the fixture control names, as catalog/producers.yaml records them.
+producers:
+  - id: amc.approvals.engine
+    module: src/approvals/approvalEngine.ts
+    emits: [approval, approval_consumed]
+    maxClaimKind: observed
+    status: available
+    plannedBy: null
+  - id: amc.toolPipeline.receipt
+    module: src/actions/actionJournal.ts
+    emits: [action_state]
+    maxClaimKind: observed
+    status: available
+    plannedBy: null

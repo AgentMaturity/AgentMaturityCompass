@@ -1,0 +1,18 @@
+{
+  "schema": "p125k-control-preparation-author-review/1",
+  "blockers": [],
+  "selectedNames": 94,
+  "compiledPairs": 19,
+  "prechangeAndActualRuntimeProtectedRows": 142,
+  "onlyGrantRowChangedInMetadata": true,
+  "priorNativePins": 9,
+  "futureDistinctTenthNativeUnobserved": true,
+  "runtimeProtectedSchemaDirectlyMatched": true,
+  "futureSourceCommitFreshRootBuildHashesAndResultsUnfilled": true,
+  "globalGitNoOptionalLocks": true,
+  "exactBeforeOnceMatchAndProposedHashesDerivedInMemoryOnly": true,
+  "wholeMutantSourceStored": false,
+  "executedImportedParsedCompiled": false,
+  "sourceIndexQaWrites": false,
+  "independentAndRootReviewRequired": true
+}

@@ -1,0 +1,17 @@
+{
+  "operator": "principal-binding",
+  "restored": "19f4a72aebfe5d4eab606164cc25aab18e3dce4f2cdbcde1ea261730cae9b710",
+  "byteExact": true,
+  "checkoutClean": true,
+  "at": "2026-10-16T20:10:51.327186+00:00",
+  "target": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/src/tools/guards/compiledPolicyGuard.ts",
+  "sourceCommit": "305aba3d0cbd7a5dc84a2b96425c3cd0236bcf71",
+  "mode": "restore",
+  "compiledMutation": false,
+  "nativeMutation": false,
+  "automaticRestoreOrRetry": false,
+  "targetPhysicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/src/tools/guards/compiledPolicyGuard.ts",
+  "targetInode": 543265642,
+  "targetNlink": 1,
+  "regularSingleLinkCheckedBeforeWrite": true
+}

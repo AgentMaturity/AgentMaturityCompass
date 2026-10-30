@@ -1,0 +1,54 @@
+{
+  "schema": "p125pc-preservation-adapter-independent-static-successor-review/2",
+  "at": "2026-10-17T02:16:56.151582+00:00",
+  "blockers": [],
+  "fixesRequested": [],
+  "candidate": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-preparation/v2/check-preservation.py.source.txt",
+    "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-preparation/v2/check-preservation.py.source.txt",
+    "bytes": 7209,
+    "sha256": "ed81b906b74b7a8c548bdb786ce39dbae8804398a88b7c10e814ec7e40e2e98a",
+    "dev": 16777231,
+    "inode": 544002640,
+    "nlink": 1
+  },
+  "priorV1Review": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-static-review/review.json",
+    "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-static-review/review.json",
+    "bytes": 3957,
+    "sha256": "d425c9bdf0956bb59976585d55d1c364584a8ea2b976d91fa440525185410f2f",
+    "dev": 16777231,
+    "inode": 544002701,
+    "nlink": 1
+  },
+  "priorV1Seal": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-static-review/seal.json",
+    "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/preservation-adapter-static-review/seal.json",
+    "bytes": 1979,
+    "sha256": "27223ba702cd1801eea0228c326dabd01e0a3f75df7957ea9425fad0c8b98646",
+    "dev": 16777231,
+    "inode": 544002704,
+    "nlink": 1
+  },
+  "resolvedFinding": "READONLY_GIT_OPTIONAL_LOCKS",
+  "exactDelta": "Exactly one global --no-optional-locks argument immediately after git. Reversing it recovers all V1 bytes.",
+  "checks": {
+    "fullTinyDeltaReadAndOneOptionSemanticsReviewed": true,
+    "bothTinyAndCompleteBaseDeltasReproducedExactlyAsText": true,
+    "sixV2OutputPinsAndParentSealExact": true,
+    "allOther175PhysicalThirteenNative102Pair204IdentityAndHeldR18GuardsUnchanged": true,
+    "threeSameInodeFullPinAdmissionAndOther172PreservationUnchanged": true,
+    "fullRootSnapshotAndSavedThreeOriginalMetadataGuardsUnchanged": true,
+    "allFourActiveHaltedMarkerChecksAndNoMissingReservationProbeUnchanged": true,
+    "sourceBeforeCleanAfterTransitionAndFreshCleanModesUnchanged": true,
+    "templateStillFalseNullWithoutFutureMetadataPins": true,
+    "newGitArgvDisablesOptionalIndexRefreshForEveryRead": true
+  },
+  "verdict": "No remaining concrete static blocker in the preferred narrow V2. Root adoption and actual future execution remain separate.",
+  "limits": [
+    "No helper parsing, import, compilation, Git or product/native/SQL/OpenSSL/network execution occurred.",
+    "No actual V1 index/content refresh was observed or assumed. The issue was identified and corrected statically before adoption.",
+    "This successor review reuses the sealed finite V1 guard/input review through exact byte equality; it does not repeat runtime or full packet preservation audits.",
+    "No root metadata admission, source/index/QA change, execution result, release, whole issue or plan completion is supplied. All held decisions and F37 remain intact."
+  ]
+}

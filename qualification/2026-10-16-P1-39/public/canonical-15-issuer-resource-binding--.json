@@ -1,0 +1,40 @@
+{
+  "schema": "amc-p139-oauth-first/1",
+  "label": "issuer-resource-binding-A",
+  "synthetic": true,
+  "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout",
+  "retainedRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-lIKno3",
+  "observations": {
+    "wrongIssuerMissing": true,
+    "wrongResourceMissing": true,
+    "missingBClassified": true,
+    "headerOnly": true,
+    "correctHeader": true,
+    "tokenInUrlOrBody": false,
+    "catalogRead": true,
+    "grantsRemainSeparate": true,
+    "authenticatedMethods": [
+      "server/discover",
+      "tools/list"
+    ],
+    "beforeGrantAuthorizationHeaders": 0,
+    "setupCallerEnvironment": "Inherited process.env and user dotenv remain enabled by the public configuration caller"
+  },
+  "requests": [],
+  "clients": [],
+  "sockets": [],
+  "lifecycle": {
+    "started": true,
+    "closed": true,
+    "listening": false,
+    "openSockets": 0
+  },
+  "errors": [],
+  "bodyFailed": false,
+  "bodyError": null,
+  "cleanupErrors": [],
+  "environmentMutated": false,
+  "productionCallbackServerCloseObserved": false,
+  "childProcessCreated": false,
+  "signalsSent": false
+}

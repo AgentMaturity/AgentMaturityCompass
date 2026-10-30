@@ -1,0 +1,18 @@
+{
+  "case": "external-evidence-digest-mismatch",
+  "normative": true,
+  "dimensions": {
+    "integrity": "fail",
+    "issuerAdmission": "not-evaluated",
+    "scope": "not-evaluated",
+    "freshness": "not-evaluated",
+    "completeness": "not-evaluated",
+    "satisfaction": "not-evaluated"
+  },
+  "reasonCodes": {
+    "integrity": [
+      "DIGEST_MISMATCH"
+    ]
+  },
+  "exitCode": 1
+}

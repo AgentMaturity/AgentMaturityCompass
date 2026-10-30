@@ -8,6 +8,10 @@ import type { TrustContext } from "../trust/trustContext.js";
 import type { EvidenceEvent } from "../types.js";
 import { resolveAgentId } from "../fleet/paths.js";
 import { assertNotExample } from "../claims/eligibility/exampleMode.js";
+import { canonicalize } from "../utils/json.js";
+import { sha256Hex } from "../utils/hash.js";
+import { runImmediateTransaction } from "../ledger/ledgerSessionTransactions.js";
+import { captureRunHashAuthority, type RunHashPublicationOptions } from "../ledger/runHashSignature.js";
 
 export type IngestType = "chatgpt" | "claude_console" | "gemini_ui" | "generic_json" | "generic_text";
 
@@ -144,7 +148,7 @@ export function ingestBundleHash(workspace: string, ingestSessionId: string, age
  * independent evidence. Only a signature over the bundle hash by a third-party key pinned for independent-attestation
  * in a signed trust list makes the rows ATTESTED; the workspace's own monitor and auditor keys never do.
  */
-export function attestIngestSession(params: {
+type IngestAttestationInput = {
   workspace: string;
   ingestSessionId: string;
   agentId?: string;
@@ -156,12 +160,15 @@ export function attestIngestSession(params: {
   attesterSignature?: { keyId: string; sigB64: string };
   /** Trust lists that may pin the attester; without one no signature is admitted. */
   trust?: TrustContext | null;
-}): {
+};
+type IngestAttestationResult = {
   attestedEventCount: number;
   bundleHash: string;
   trustTier: "ATTESTED" | "SELF_REPORTED";
   reason: string;
-} {
+};
+
+function attestationIdentity(params: IngestAttestationInput) {
   const workspace = params.workspace;
   const attestedBy = params.attestedBy?.trim() ?? "";
   const statement = params.statement?.trim() ?? "";
@@ -171,86 +178,134 @@ export function attestIngestSession(params: {
     );
   }
   const agentId = resolveAgentId(workspace, params.agentId);
-  const ledger = openLedger(workspace);
-  try {
-    const { sources: sourceEvents, copies } = ingestSessionEvents(ledger, params.ingestSessionId);
-    const bundle = bundleOf(sourceEvents, agentId, params.ingestSessionId);
-    const bundleHash = bundleDigest(bundle);
-    const thirdParty = params.attesterSignature
-      ? { kind: "third_party", keyId: params.attesterSignature.keyId, sigB64: params.attesterSignature.sigB64, digestSha256: bundleHash }
-      : null;
-    const verdict = thirdParty
-      ? verifyThirdPartyAttestation(thirdParty, params.trust ?? null, workspaceOwnKeyIds(workspace))
-      : { verified: false, reason: "self-attested: no third-party signature was given" };
-    // A key attests an event once: a replay, or a re-signed wider bundle, would only multiply the same ATTESTED rows.
-    const sourceIds = new Set(sourceEvents.map((event) => event.id));
-    const covered = verdict.verified && thirdParty ? copies.find((meta) => meta.trustTier === "ATTESTED"
-      && meta.attestation?.keyId === thirdParty.keyId && sourceIds.has(meta.originalEventId as string)) : undefined;
-    if (covered && thirdParty) {
-      throw new Error(`ingest session ${params.ingestSessionId} is already attested by key ${thirdParty.keyId} (event ${String(covered.originalEventId)}); attest new evidence in a new ingest session`);
-    }
-    // P0-15: a synthetic_example row is never attested, by the operator or a third party.
-    for (const event of sourceEvents) assertNotExample(eventMeta(event), "attested");
-    const trustTier = verdict.verified ? "ATTESTED" : "SELF_REPORTED";
-    const attestation = verdict.verified && thirdParty
-      ? { ...thirdParty, attestedBy, statement, bundle }
-      : { kind: "self_attested", attestedBy, statement };
-    const attestationSig = ledger.signRunHash(bundleHash);
-
-    for (const event of sourceEvents) {
-      const payload = payloadForEvent(workspace, event);
-      ledger.appendEvidence({
-        sessionId: params.ingestSessionId,
-        runtime: "unknown",
-        eventType: "review",
-        payload,
-        payloadExt: event.payload_path?.endsWith(".json") ? "json" : "txt",
-        meta: {
-          trustTier,
-          source: "attested_ingest",
-          agentId,
-          ingestSessionId: params.ingestSessionId,
-          originalEventId: event.id,
-          attestation
-        }
-      });
-    }
-
-    ledger.appendEvidence({
+  return { workspace, agentId, attestedBy, statement };
+}
+function prepareIngestAttestation(ledger: ReturnType<typeof openLedger>, params: IngestAttestationInput, identity: ReturnType<typeof attestationIdentity>, capturePayloads = false) {
+  const { workspace, agentId, attestedBy, statement } = identity;
+  const { sources: sourceEvents, copies } = ingestSessionEvents(ledger, params.ingestSessionId);
+  const bundle = bundleOf(sourceEvents, agentId, params.ingestSessionId);
+  const bundleHash = bundleDigest(bundle);
+  const thirdParty = params.attesterSignature
+    ? { kind: "third_party", keyId: params.attesterSignature.keyId, sigB64: params.attesterSignature.sigB64, digestSha256: bundleHash }
+    : null;
+  const verdict = thirdParty
+    ? verifyThirdPartyAttestation(thirdParty, params.trust ?? null, workspaceOwnKeyIds(workspace))
+    : { verified: false, reason: "self-attested: no third-party signature was given" };
+  // A key attests an event once: a replay, or a re-signed wider bundle, would only multiply the same ATTESTED rows.
+  const sourceIds = new Set(sourceEvents.map((event) => event.id));
+  const covered = verdict.verified && thirdParty ? copies.find((meta) => meta.trustTier === "ATTESTED"
+    && meta.attestation?.keyId === thirdParty.keyId && sourceIds.has(meta.originalEventId as string)) : undefined;
+  if (covered && thirdParty) {
+    throw new Error(`ingest session ${params.ingestSessionId} is already attested by key ${thirdParty.keyId} (event ${String(covered.originalEventId)}); attest new evidence in a new ingest session`);
+  }
+  // P0-15: a synthetic_example row is never attested, by the operator or a third party.
+  for (const event of sourceEvents) assertNotExample(eventMeta(event), "attested");
+  const trustTier = verdict.verified ? "ATTESTED" : "SELF_REPORTED";
+  const attestation = verdict.verified && thirdParty
+    ? { ...thirdParty, attestedBy, statement, bundle }
+    : { kind: "self_attested", attestedBy, statement };
+  return { workspace, agentId, sourceEvents, copies, bundleHash, verdict, trustTier: trustTier as IngestAttestationResult["trustTier"], attestation,
+    payloads: capturePayloads ? sourceEvents.map(event => Buffer.from(payloadForEvent(workspace, event))) : null };
+}
+function publishIngestAttestation(ledger: ReturnType<typeof openLedger>, params: IngestAttestationInput,
+  plan: ReturnType<typeof prepareIngestAttestation>, attestationSig: string, onAppend?: (id: string) => void): IngestAttestationResult {
+  const { workspace, agentId, sourceEvents, bundleHash, verdict, trustTier, attestation } = plan;
+  for (const [index, event] of sourceEvents.entries()) {
+    const payload = plan.payloads?.[index] ?? payloadForEvent(workspace, event);
+    const copyId = ledger.appendEvidence({
       sessionId: params.ingestSessionId,
       runtime: "unknown",
-      eventType: "audit",
-      payload: JSON.stringify({
-        auditType: "INGEST_ATTESTED",
-        severity: "LOW",
-        ingestSessionId: params.ingestSessionId,
-        bundleHash,
-        signature: attestationSig
-      }),
-      payloadExt: "json",
-      inline: true,
+      eventType: "review",
+      payload,
+      payloadExt: event.payload_path?.endsWith(".json") ? "json" : "txt",
       meta: {
-        source: "attested_ingest",
-        auditType: "INGEST_ATTESTED",
-        severity: "LOW",
-        ingestSessionId: params.ingestSessionId,
-        bundleHash,
-        // The monitor key seals the record; it says who wrote it, not that the content is true.
-        signature: attestationSig,
-        attestation,
-        attestationReason: verdict.reason,
         trustTier,
-        agentId
+        source: "attested_ingest",
+        agentId,
+        ingestSessionId: params.ingestSessionId,
+        originalEventId: event.id,
+        attestation
       }
     });
-
-    return {
-      attestedEventCount: sourceEvents.length,
-      bundleHash,
-      trustTier,
-      reason: verdict.reason
-    };
-  } finally {
-    ledger.close();
+    onAppend?.(copyId);
   }
+
+  const auditId = ledger.appendEvidence({
+    sessionId: params.ingestSessionId,
+    runtime: "unknown",
+    eventType: "audit",
+    payload: JSON.stringify({
+      auditType: "INGEST_ATTESTED",
+      severity: "LOW",
+      ingestSessionId: params.ingestSessionId,
+      bundleHash,
+      signature: attestationSig
+    }),
+    payloadExt: "json",
+    inline: true,
+    meta: {
+      source: "attested_ingest",
+      auditType: "INGEST_ATTESTED",
+      severity: "LOW",
+      ingestSessionId: params.ingestSessionId,
+      bundleHash,
+      // The monitor key seals the record; it says who wrote it, not that the content is true.
+      signature: attestationSig,
+      attestation,
+      attestationReason: verdict.reason,
+      trustTier,
+      agentId
+    }
+  });
+
+  onAppend?.(auditId);
+  return {
+    attestedEventCount: sourceEvents.length,
+    bundleHash,
+    trustTier,
+    reason: verdict.reason
+  };
+}
+
+export function attestIngestSession(params: IngestAttestationInput): IngestAttestationResult {
+  const identity = attestationIdentity(params), ledger = openLedger(identity.workspace);
+  try {
+    const plan = prepareIngestAttestation(ledger, params, identity);
+    return publishIngestAttestation(ledger, params, plan, ledger.signRunHash(plan.bundleHash));
+  } finally { ledger.close(); }
+}
+
+function attestationSourceState(plan: ReturnType<typeof prepareIngestAttestation>): string {
+  return canonicalize({ sources: plan.sourceEvents, copies: plan.copies, attestation: plan.attestation, trustTier: plan.trustTier,
+    verdict: plan.verdict, payloads: plan.sourceEvents.map((event, index) => ({ id: event.id, sha256: sha256Hex(plan.payloads?.[index] ?? payloadForEvent(plan.workspace, event)) })) });
+}
+class IngestAttestationPublicationError extends Error {
+  readonly code = "INGEST_ATTESTATION_PARTIAL";
+  readonly sqlCommitAcknowledged = false;
+  constructor(readonly acknowledgedEventIds: readonly string[], cause: unknown) {
+    super("ingest attestation publication failed; SQL commit was not acknowledged and filesystem effects may remain", { cause });
+    this.name = "IngestAttestationPublicationError";
+  }
+}
+/** Await before the synchronous final publication transaction; never promote an operator's own attestation. */
+export async function attestIngestSessionAsync(params: IngestAttestationInput, options: Pick<RunHashPublicationOptions, "beforePublish"> = {}): Promise<IngestAttestationResult> {
+  const input: IngestAttestationInput = { ...params, attesterSignature: params.attesterSignature ? { ...params.attesterSignature } : undefined,
+    trust: params.trust === undefined ? undefined : structuredClone(params.trust) }, beforePublish = options.beforePublish;
+  beforePublish?.();
+  const fixed = captureRunHashAuthority(input.workspace, process.env.AMC_NO_SIGN === "1"), identity = attestationIdentity(input), ledger = openLedger(input.workspace);
+  try {
+    const plan = prepareIngestAttestation(ledger, input, identity, true);
+    const source = attestationSourceState(plan), seal = await ledger.signRunHashAsync(plan.bundleHash, () => { beforePublish?.(); fixed(); });
+    const acknowledged: string[] = []; let writing = false;
+    try { return runImmediateTransaction(ledger.db, () => {
+      beforePublish?.();
+      const current = prepareIngestAttestation(ledger, input, identity, true);
+      if (attestationSourceState(current) !== source) throw new Error("Ingest attestation inputs changed while signing was prepared");
+      fixed(); seal.assertCurrent(); writing = true;
+      return publishIngestAttestation(ledger, input, current, seal.signature, id => acknowledged.push(id));
+    }); } catch (cause) {
+      if (!writing) throw cause;
+      throw new IngestAttestationPublicationError(Object.freeze([...acknowledged]), cause);
+    }
+  } finally { ledger.close(); }
 }

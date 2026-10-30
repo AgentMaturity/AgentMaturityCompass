@@ -36,7 +36,7 @@ describe("AMC public Playground identity", () => {
     expect(html).toContain('class="playground-wordmark"');
     expect(html).toContain('amc<span class="brand-cursor">_</span><span class="surface-name">playground</span>');
     expect(html).toContain('class="playground-tagline">Evidence over claims.</span>');
-    expect(html).toContain("curated browser preview from AMC's full 142-pack CLI catalog");
+    expect(html).toContain("curated browser preview from AMC's full CLI catalog of <!-- amc:count:assurancePacksRegistered -->");
     expect(html).not.toMatch(/explore 143 assurance packs|shows all 143 test suites/i);
     expect(html).toContain('<footer class="playground-footer">');
   });
@@ -83,7 +83,7 @@ describe("AMC public Playground identity", () => {
     expect(listAssurancePacks()).toHaveLength(143);
     expect(browserPackBlock.match(/\{ id:/g)).toHaveLength(85);
     expect(html).toContain("Showing ${filtered.length} of ${PACKS.length} browser previews");
-    expect(html).toContain("full 142-pack CLI catalog");
+    expect(html).toContain("full CLI catalog of <!-- amc:count:assurancePacksRegistered -->");
   });
 
   test("exposes persistent theme state and a keyboard-safe guided tour", () => {

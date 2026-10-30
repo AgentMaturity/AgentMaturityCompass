@@ -1,6 +1,6 @@
 # Sandbox Mode
 
-Sandbox mode executes agent commands in Docker and writes explicit sandbox attestation evidence.
+Sandbox mode executes agent commands in Docker and records sandbox execution evidence (`SANDBOX_EXECUTION_ENABLED` audit events).
 
 ## Native shell by platform
 
@@ -27,8 +27,9 @@ On macOS, AMC confines the shell with Seatbelt (see
 the shell refused, and only then does an opt-in apply. An unconfined shell runs
 `/bin/sh` as you: it can read files outside the workspace, including `~/.ssh`,
 and it can reach the network. AMC's policy guards still evaluate each call and
-provider keys are stripped from its environment, but nothing confines the
-process. To accept that risk, use one of these opt-ins:
+the command gets an allow-listed environment (`PATH`, `HOME`, user, shell,
+terminal, temp, locale and timezone variables; no provider keys, `AMC_*`
+secrets or other tokens), but nothing confines the process. To accept that risk, use one of these opt-ins:
 
 - `--unsafe-unconfined-shell` on `amc agent-loop run`, `amc agent-loop chat` or
   `amc acp`.
@@ -54,9 +55,10 @@ it: a child of a refused parent is refused.
 
 Every opted-in session prints this warning on stderr (never on the ACP protocol
 stream). Studio returns the same text as `shell.reason` in the native-task
-options and shows it as a banner in task setup. `AMCNativeClient` discards the
-spawned `amc acp` process's stderr, so an SDK caller that opts in does not see
-the warning; the receipts below still record it.
+options and shows it as a banner in task setup. `AMCNativeClient` forwards only this exact native-shell warning from
+the spawned `amc acp` process to the operator's stderr. Other child diagnostics
+remain private. An unsafe option alone does not print a warning when Seatbelt
+confines the shell; the warning must actually come from the child.
 
 ```text
 WARNING: the native shell is UNCONFINED on darwin (opt-in: cli-flag). Commands run with your full user rights: files outside the workspace, ~/.ssh and the network are reachable. Receipts record enforcement: none.
@@ -250,6 +252,12 @@ reach the network. The gateway forward proxy uses the same host decision
 connection and connects only to an address it checked. This is available on macOS; on Linux a signed `egress` is
 refused until the relay in ADR-008 is reviewed and built.
 
+### Windows runner prototype (P2-14)
+
+The native Windows shell remains refused, including unsafe opt-ins. The cut-first Windows runner prototype is standalone and unregistered; it does not add a native backend or Windows shell permission. Its fake token/launcher API exercises protocol and refusal logic only. Even a valid fake result reports `confined:false`, has no enforcement object, does not prove tree exit and carries no real command exit.
+
+Live Windows containment is **not measured: no Windows host**. The proposed research note and ADR017 require Sid review, read Microsoft primary sources and real Windows escape evidence before any enablement decision. This is a no-go for enablement on present evidence, not a conclusion that a Windows boundary is impossible. Existing Linux/macOS and platform qualification results do not qualify this prototype as a Windows boundary.
+
 ## Command
 
 ```bash
@@ -272,6 +280,9 @@ amc sandbox run --agent salesbot \
 - agentId
 - image name/hash (best effort)
 - command and args
+- `envKeys`: the names of the variables passed into the container (never their values) and, for `amc adapters run --mode SANDBOX`, the `leaseId` of the lease among them
+
+The container receives only the variables named in `envKeys` plus the gateway route variables; values reach docker through its inherited environment, never its argv. `amc adapters run --mode SANDBOX` exits with the container's exit code.
 
 ## Network Behavior
 
@@ -283,4 +294,4 @@ amc sandbox run --agent salesbot \
 
 ## Why It Matters for Scoring
 
-For high-risk agents/questions, level 5 support requires sandbox attestation evidence in the selected window (otherwise capped).
+Level 5 is not evaluated in this version: it needs a scoped attestation from a registry under pinned trust (P0-09, P3-04), and no registry issues one yet (see [SCORING_METHODOLOGY](SCORING_METHODOLOGY.md)). The runner also keeps a cap for high-risk agents and questions: without `SANDBOX_EXECUTION_ENABLED` evidence in the window, a level-5 result is capped. While level 5 is not evaluated, that cap changes no result.

@@ -1,3 +1,5 @@
+import type { EvidenceOutcome } from "../types.js";
+import { signatureEnvelopeSchema } from "../crypto/signing/signatureEnvelope.js";
 import { z } from "zod";
 
 export const ORG_NODE_TYPES = ["ENTERPRISE", "TEAM", "FUNCTION", "PROCESS", "ECOSYSTEM"] as const;
@@ -55,21 +57,7 @@ export const orgSignatureSchema = z.object({
   signature: z.string().min(1),
   signedTs: z.number().int(),
   signer: z.literal("auditor"),
-  envelope: z
-    .object({
-      v: z.literal(1),
-      alg: z.literal("ed25519"),
-      pubkeyB64: z.string().min(1),
-      fingerprint: z.string().length(64),
-      sigB64: z.string().min(1),
-      signedTs: z.number().int(),
-      signer: z.object({
-        type: z.enum(["VAULT", "NOTARY"]),
-        attestationLevel: z.enum(["SOFTWARE", "HARDWARE"]),
-        notaryFingerprint: z.string().length(64).optional()
-      })
-    })
-    .optional()
+  envelope: signatureEnvelopeSchema.optional()
 });
 
 export const orgWindowScoreInputSchema = z.object({
@@ -155,13 +143,16 @@ export interface OrgNodeScorecard {
 }
 
 export interface EcosystemRollup {
+  outcome: EvidenceOutcome;
+  sampleSize: number;
+  metricOutcomes: Record<"overall" | "integrity" | "value", EvidenceOutcome>;
   peerCount: number;
   localEnterpriseOverall: number;
   localEnterpriseIntegrity: number;
   localEnterpriseValue: number | null;
   percentiles: {
-    overall: number;
-    integrity: number;
+    overall: number | null;
+    integrity: number | null;
     value: number | null;
   };
 }

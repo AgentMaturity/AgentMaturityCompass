@@ -1,0 +1,62 @@
+Agent Maturity Compass
+
+Usage: amc <command> [options]
+
+Start with a task:
+  amc agent-loop guide             Run a native task with explicit provider setup
+  amc agent-loop chat              Continue native tasks interactively
+  amc                              Assess existing evidence (baseline/assessment)
+  amc connect                      Connect an existing agent
+  amc agent-loop verify <sessionId>Verify recorded native task evidence
+
+Primary command groups:
+  evidence  Evidence integrity, transparency, and bundle export
+  score     Maturity scoring and diagnostic execution
+  incidents Incident workflows, alerts, and regression detection
+  audit     Audit binder, evidence requests, and control maps
+  admin     Operational health, identity, vault, and trust controls
+  lifecycle Workspace bootstrapping, bring-up, and routine verification
+  eval      Evaluation shortcuts for runs, comparisons, and what-if
+
+High-signal commands:
+  evidence
+  amc evidence verify              Run the workspace verification suite
+  amc verify all                   Full trust/policy/plugin verification
+  amc bundle export                Export signed evidence bundle
+  amc transparency verify-bundle   Verify transparency export bundle
+  score
+  amc score tier                   Interactive quick/standard/deep scorecard
+  amc score production-ready       Production readiness gate check
+  incidents
+  amc incident list                List incidents by agent
+  amc incident create              Open a manual incident
+  amc incidents alert              Dispatch INCIDENT_CREATED event
+  amc drift check                  Detect drift that can trigger incidents
+  audit
+  amc audit binder create          Build an audit binder artifact
+  amc audit request list           List open evidence requests
+  amc audit map verify             Verify active compliance maps
+  amc audit verify                 Verify audit policy signatures
+  admin
+  amc setup                        Guided first-time environment setup
+  amc doctor                       System health + misconfiguration checks
+  amc admin status                 Control plane status and signatures
+  amc vault status                 Vault lock/unlock state
+  lifecycle
+  amc resource validate            Validate governed resource drift
+  amc resource apply               Dry-run or accept governed resource changes
+  eval
+  amc eval run                     Alias for diagnostic run
+  amc whatif equalizer             Run equalizer what-if simulation
+  amc e2e smoke                    Run deterministic smoke verification
+
+Global options:
+  --agent <agentId>                  Agent ID override
+  --no-color                         Disable ANSI color output (or set NO_COLOR=1)
+  -h, --help                         Show command help
+  -V, --version                      Show CLI version
+
+Discoverability:
+  amc help <command>                 Detailed help for any command path
+  amc shell                          Interactive REPL session
+  amc --help --all                   Complete command list

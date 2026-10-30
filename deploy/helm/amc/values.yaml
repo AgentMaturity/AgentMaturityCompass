@@ -3,6 +3,10 @@ replicaCount: 1
 image:
   repository: amc-studio
   tag: local
+  # sha256:<64 hex>. When set the chart renders repository@digest and ignores tag.
+  digest: ""
+  # true: refuse to render unless digest is set (values.schema.json and deployment.yaml).
+  requireDigest: false
   pullPolicy: IfNotPresent
 
 serviceAccount:
@@ -24,6 +28,18 @@ workspace:
       - ReadWriteOnce
     size: 10Gi
 
+# <AMC home>/state keeps this machine's anti-rollback marks (high-water.json), key-set recovery copies and applied
+# trust-root rotations (P1-08). On an emptyDir every restart forgets them, and an older revocation list, key history or
+# key set is then accepted again. Keep it persistent; it is never mounted into the workspace.
+amcHomeState:
+  mountPath: /home/amc/.config/amc/state
+  persistence:
+    enabled: true
+    storageClassName: ""
+    accessModes:
+      - ReadWriteOnce
+    size: 1Gi
+
 notary:
   enabled: false
   port: 4343
@@ -43,6 +59,17 @@ notary:
 
 bootstrap:
   enabled: true
+  # false (default): the chart renders no Secret; create amc-bootstrap out of band.
+  # true: render it from bootstrap.values; every value is required and a
+  # change-me placeholder is refused. Values passed here end up in the Helm
+  # release record, so prefer an external secret manager.
+  createSecret: false
+  values:
+    vaultPassphrase: ""
+    ownerUsername: ""
+    ownerPassword: ""
+    notaryPassphrase: ""
+    notaryAuthSecret: ""
   ownerUsernameSecret:
     name: amc-bootstrap
     key: ownerUsername
@@ -53,6 +80,35 @@ bootstrap:
     name: amc-bootstrap
     key: vaultPassphrase
 
+# P2-08 KeyProvider (docs/KEY_PROVIDERS.md). The chart supplies the provider's credentials to Studio's environment, the
+# way P2-08 reads them; which key signs a purpose stays in the workspace's signed amc.config.yaml `keys` section and its
+# owner binding (`amc keys rotate --purpose ledger-row`), never in chart values. Default: file, the vault in the workspace
+# volume, as before. The repository image ships no provider SDK (nor the PKCS#11 wrapper and pkcs11js); any other provider
+# needs an image built with it, or it refuses with KEY_PROVIDER_NOT_INSTALLED.
+keyProvider:
+  # file | aws-kms | gcp-kms | azure-kv | pkcs11
+  provider: file
+  # Non-secret settings only; values.schema.json admits these names: AWS_REGION, AWS_PROFILE, AZURE_TENANT_ID,
+  # AZURE_CLIENT_ID, AMC_PKCS11_MODULE, AMC_PKCS11_PROTECTION.
+  env: {}
+  # The provider credential as a file from a Kubernetes Secret created out of band (never a value here), mounted at
+  # /run/secrets/amc_key_provider_credential and named by the provider's own variable: GOOGLE_APPLICATION_CREDENTIALS
+  # (gcp-kms), AWS_SHARED_CREDENTIALS_FILE (aws-kms), AZURE_CLIENT_CERTIFICATE_PATH (azure-kv), AMC_PKCS11_PIN_FILE
+  # (pkcs11, required). Empty for file, or for a cloud provider whose credentials come from the node.
+  credentialSecret:
+    name: ""
+    key: ""
+
+# P2-09 ledger field encryption (docs/EVIDENCE_STORAGE.md). Off by default. When enabled, a step before Studio starts
+# (files/ledger-encryption.sh) sets opsPolicy.encryption.ledgerEncryptionEnabled in the signed ops policy and, while the
+# workspace has no ledger data key, creates one wrapped at keyProvider.provider/keyRef and encrypts existing rows. It
+# stops the pod on any failure. Setting enabled back to false does not switch encryption off: that is an owner change to
+# the ops policy.
+ledgerEncryption:
+  enabled: false
+  # The wrapping key: a vault wrap-key name (file), KMS key ARN or name, Key Vault key URL or PKCS#11 URI.
+  keyRef: ledger-dek
+
 env:
   AMC_BIND: "0.0.0.0"
   AMC_STUDIO_PORT: "3212"
@@ -61,12 +117,20 @@ env:
   AMC_TOOLHUB_PORT: "3213"
   AMC_LAN_MODE: "true"
   AMC_ALLOWED_CIDRS: "10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,127.0.0.1/32,::1/128"
+  # Extra origins (comma-separated, e.g. https://amc.example.internal for an Ingress
+  # host) appended to the chart's own Service origin http://<fullname>:<service.port>,
+  # which is always set so the helm test pod is admitted.
+  AMC_CORS_ALLOWED_ORIGINS: ""
   AMC_QUERY_LEASE_CARRIER_ENABLED: "false"
   AMC_TRUSTED_PROXY_HOPS: "1"
   AMC_DATA_RETENTION_DAYS: "30"
   AMC_ENABLE_NOTARY: "false"
   AMC_NOTARY_BASE_URL: "http://127.0.0.1:4343"
   AMC_NOTARY_REQUIRED_ATTESTATION: "SOFTWARE"
+  # The monitor key's sha256 fingerprint, pinned by the operator after the first
+  # bootstrap (docs/KUBERNETES_HELM_DEPLOYMENT.md "Pin the monitor key"). Empty:
+  # Studio anchors no verdict, so native verification answers "failed" (untrusted).
+  AMC_EXPECTED_MONITOR_FINGERPRINT: ""
 
 resources:
   requests:
@@ -124,6 +188,33 @@ networkPolicy:
     - 443
     - 80
 
+# One replica (Recreate, a single SQLite writer). maxUnavailable: 1 lets `kubectl drain` evict the pod, with an outage
+# until it is Ready again (P2-06 CR-2). To block voluntary eviction instead, set minAvailable: 1 and maxUnavailable: null;
+# a drain then waits until an operator scales to 0 or deletes the pod (docs/deploy/reference/CRASH_RECOVERY.md).
+# Exactly one of the two must be set.
 podDisruptionBudget:
   enabled: true
-  minAvailable: 1
+  maxUnavailable: 1
+  minAvailable: null
+
+# Prometheus metrics (P2-06). Off by default. When enabled, Studio binds its metrics server on metrics.port on all pod
+# interfaces (it refuses that without signed LAN mode), the Service exposes the port inside the cluster only, and the
+# NetworkPolicy admits it from the monitoring namespace alone. Alert thresholds are proposals for Sid to confirm.
+metrics:
+  enabled: false
+  port: 9464
+  namespaceSelector:
+    matchLabels:
+      kubernetes.io/metadata.name: monitoring
+  podSelector: {}
+  serviceMonitor:
+    enabled: false
+    interval: 30s
+    labels: {}
+  prometheusRule:
+    enabled: false
+    labels: {}
+    # 80% of the default 10 Gi workspace volume.
+    dbSizeBytesWarning: 8589934592
+    # Gateway failures per second over 5 minutes.
+    gatewayFailureRateWarning: 0.1

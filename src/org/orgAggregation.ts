@@ -16,6 +16,8 @@ function totalWeight(points: WeightedPoint[]): number {
   return points.reduce((sum, point) => sum + point.weight, 0);
 }
 
+// Unlike stats.ts unweighted descriptive statistics, organizational rollups use
+// sanitized positive finite fractional weights. Retain their weighted population.
 export function weightedMean(points: WeightedPoint[]): number {
   const rows = sanitize(points);
   const total = totalWeight(rows);
@@ -25,6 +27,9 @@ export function weightedMean(points: WeightedPoint[]): number {
   return rows.reduce((sum, point) => sum + point.value * point.weight, 0) / total;
 }
 
+// Select the first value whose cumulative weight reaches q * total weight.
+// This differs from stats.ts interpolated quantiles and midpoint medians; even
+// equal-weight two-point populations select the lower value at q = 0.5.
 export function weightedPercentile(points: WeightedPoint[], percentile: number): number {
   const rows = sanitize(points);
   if (rows.length === 0) {
@@ -50,6 +55,8 @@ export function weightedMedian(points: WeightedPoint[]): number {
   return weightedPercentile(points, 0.5);
 }
 
+// Trim fractional weight mass, including partial boundary rows, rather than
+// discarding floor(n * trimRatio) whole observations as an unweighted trim would.
 function weightedTrimmedMean(points: WeightedPoint[], trimRatio = 0.1): number {
   const rows = sanitize(points);
   if (rows.length === 0) {

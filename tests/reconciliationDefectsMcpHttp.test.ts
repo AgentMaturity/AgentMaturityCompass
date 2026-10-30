@@ -16,6 +16,7 @@ import { agentToolset } from "../src/agent/agentToolset.js";
 import { SessionService } from "../src/session/sessionService.js";
 import { discoverNativeMcpCatalog, mountNativeMcpServer, nativeMcpToolName } from "../src/mcp/nativeMcpClient.js";
 import type { NativeMcpHttpServer } from "../src/mcp/nativeMcpHttpTransport.js";
+import { removeActionPolicy } from "./helpers/actionPolicyFixtures.js";
 
 const cleanup: (() => Promise<void>)[] = [];
 afterEach(async () => { for (const done of cleanup.splice(0).reverse()) await done(); vi.unstubAllEnvs(); });
@@ -23,7 +24,8 @@ afterEach(async () => { for (const done of cleanup.splice(0).reverse()) await do
 async function fixture(notifyOnCall: boolean) {
   vi.stubEnv("AMC_VAULT_PASSPHRASE", "http-mcp-reconcile-fixture");
   const workspace = mkdtempSync(join(tmpdir(), "amc-reconcile-http-mcp-"));
-  initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" }); initBudgets(workspace);
+  initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
+  removeActionPolicy(workspace); // AXR-02: no Action Policy configured, as before; this file is not about it (amc init signs one). initBudgets(workspace);
   writeRuntimeFirewallPolicy({ workspace, mode: "observe" });
   const configured = loadToolsConfig(workspace), name = nativeMcpToolName("fixture", "lookup");
   initToolsConfig(workspace, { ...configured, tools: { ...configured.tools,
@@ -83,7 +85,7 @@ describe("AMC-1535 Streamable HTTP — AMC-1515 outcomes", () => {
     const f = await fixture(true);
     const outcome = await f.call();
     expect(f.remoteCalls()).toBe(1);
-    expect(outcome.outcome).toBe("ERROR");
+    expect(outcome.outcome).toBe("TOOL_OUTCOME_UNKNOWN");
     expect(String(outcome.content)).toContain("the remote tool executed and its received result was discarded");
   });
 });

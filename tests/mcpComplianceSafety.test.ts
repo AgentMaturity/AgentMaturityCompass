@@ -72,6 +72,16 @@ describe("mcp compliance scoring", () => {
     expect(result.failed).toHaveLength(0);
   });
 
+  test("AXE-27 missing attack measurements cannot earn full compliance", () => {
+    const missingPerformance = scoreMcpCompliance(baselineCapabilities({ mcpSecurityBenchPerformanceUnderAttack: undefined }));
+    expect(missingPerformance.safety.securityResilience.netResilientPerformance.performanceUnderAttack).toBeNull();
+    expect(missingPerformance.level).toBe("minimal");
+    const empty = scoreMcpCompliance(baselineCapabilities({ mcpSecurityBenchAttackInstanceCount: 0 }));
+    expect(empty.safety.securityResilience).toMatchObject({ score: null, outcome: "not_evaluated", sampleSize: 0 });
+    expect(empty.safety.securityResilience.netResilientPerformance).toMatchObject({ attackSuccessRate: null, performanceUnderAttack: null, score0to100: null, outcome: "not_evaluated" });
+    expect(empty.level).toBe("minimal");
+  });
+
   test("flags missing tool output validation", () => {
     const result = scoreMcpCompliance(
       baselineCapabilities({

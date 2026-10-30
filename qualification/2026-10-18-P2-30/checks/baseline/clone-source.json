@@ -1,0 +1,17 @@
+{
+  "recordedAt": "2026-10-18T09:24:30.984Z",
+  "source": "/home/amc/AgentMaturityCompass-worktrees/s7fccbbfa/clone",
+  "ref": "int",
+  "revision": "dc416268dd2b0e30433b2d17aaba5e80b101f7f1",
+  "clone": "/home/amc/AgentMaturityCompass-worktrees/codex-7f/p2-30-baseline",
+  "node": "v22.23.3",
+  "command": [
+    "git",
+    "clone",
+    "-q",
+    "-b",
+    "int",
+    "/home/amc/AgentMaturityCompass-worktrees/s7fccbbfa/clone",
+    "/home/amc/AgentMaturityCompass-worktrees/codex-7f/p2-30-baseline"
+  ]
+}

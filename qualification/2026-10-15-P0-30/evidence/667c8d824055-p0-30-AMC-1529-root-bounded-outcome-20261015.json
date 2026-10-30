@@ -1,0 +1,106 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-30",
+  "oldIssue": "AMC-1529",
+  "source": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "capturedUtc": "2026-10-15T03:24:20.117040+00:00",
+  "state": "BOUNDED_ORIGINAL_NOTARY_CONTROLS_INDEPENDENTLY_REVIEWED",
+  "packet": {
+    "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015.json",
+    "bytes": 18352,
+    "sha256": "b163c11f374ac9c9fff4e307f2ee6b0b4889b8b0ce47f4dee7780a162d6858ff"
+  },
+  "report": {
+    "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015.md",
+    "bytes": 2109,
+    "sha256": "2410c9e41c4c2610c47a3f5f01f9feccdc4b3429399c017310033fd7ec0ad73f"
+  },
+  "independentReview": {
+    "path": "/private/tmp/p0-30-AMC-1529-independent-review-20261015.json",
+    "bytes": 45719,
+    "sha256": "17bffa7e4fa36debc8ef8c33274e6b3288f0b24936cc705c7862ff89dfd8b884"
+  },
+  "independentReviewMarkdown": {
+    "path": "/private/tmp/p0-30-AMC-1529-independent-review-20261015.md",
+    "bytes": 3548,
+    "sha256": "5ff84489b3fe964b2f05fa4a993b2f7f2a7f198ebdff70c6abf301c006627bee"
+  },
+  "wordingClarification": {
+    "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/lifetime-http-wording-clarification.json",
+    "bytes": 862,
+    "sha256": "359e5fcc61d858efb9105302bccfc1e792fca882fc6596f06ea91941b306b65d"
+  },
+  "originalUniqueCases": 16,
+  "initialPassed": 16,
+  "bytesBindingBMR": [
+    16,
+    13,
+    16
+  ],
+  "lifetimeBMR": [
+    6,
+    5,
+    6
+  ],
+  "actualCommands": 8,
+  "corpusProcesses": 7,
+  "repeatedCaseExecutions": 82,
+  "actualFirstFailures": [
+    {
+      "site": "notaryAuthReplay.test.ts:47:38",
+      "cases": 2,
+      "meaning": "Valid equivalent uppercase HMAC headers produce different keys under exact private removal; equality failure masks later replay-map and whitespace checks."
+    },
+    {
+      "site": "notaryComposeIntegration.test.ts:191:39",
+      "cases": 1,
+      "meaning": "Real source foreground CLI service returns200 instead of401 for equivalent uppercase replay after healthy signing, wrong-secret401, checksum400, healthy200 and identical-text replay401 pass. Later reason and GET-tail assertions are masked; unobserved body/GET-tail success is not inferred."
+    },
+    {
+      "site": "notaryAuthReplay.test.ts:70:29",
+      "cases": 1,
+      "meaning": "The retained authenticated object is wrongly admitted after expiry by private lifetime removal. Earlier constructedIncomingMessage helper timestamp-skew refusal at69 passes; there is NO HTTP lifetime runtime. HTTP authentication-before-replay ordering is source evidence only."
+    }
+  ],
+  "observation": {
+    "indexedReferencesIndependentlyRehashed": 4211,
+    "fourDirectAssertionErrors": true,
+    "noPendingTodoHookUnhandledFileSuiteOrKnownLateDiagnostics": true,
+    "outerCommandExits": [
+      0,
+      1
+    ],
+    "outerSignals": 0,
+    "outerGroupActions": 0,
+    "eightOuterGroupsInitiallyAndFinallyEmpty": true,
+    "internalChildBoundary": "Original stopChild sends SIGTERM and has5sSIGKILLfallback. Actual internal child code/signal and ignored/drained streams are unretained; zero outer signals does not establish zero internal signals.",
+    "runEndBeforeGlobalTeardown": "Private observer retains task/hook/unhandled records; post-exit outer streams separately gate known late teardown/guard paths. No universal absence of unlogged errors."
+  },
+  "preservation": {
+    "sourceFiles": 7739,
+    "compiledFiles": 4529,
+    "completePrivateFiles": 12268,
+    "allSourceAndCompiledRestoredExact": true,
+    "rootHead": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+    "rootStatus": "clean",
+    "protectedPins": 205,
+    "priorReferences": 2964,
+    "readinessPins": 4,
+    "releaseAndLatePins": 9,
+    "priorActualClosures": 14,
+    "dependencyLinks": 307,
+    "nativePhysicalIdentityExact": true,
+    "newPermanentFiles": 0,
+    "originalTestsGuardsConfigImportsAssertionsDeadlinesUnchanged": true
+  },
+  "limits": [
+    "Original16 cases are distinct from82 repeated executions; lifetime reuses6. Four failed assertions are not four new tests.",
+    "Real local SOFTWARE Ed25519/HMAC and pinned local policy are fixture authority, not hardware/provider or independently accredited external identity.",
+    "Original deliberate0.0.0.0 listener with127requests and sync bridge remain. No blanket network isolation, retained whole internal-child streams or P0-27 cold corruption-cause repair.",
+    "Compose/Caddy is configuration inspection only. No container, pack/install, old batch, full P0-30, full suite/coverage/Node24/hosted/release/G0/Done.",
+    "Exact-source required duplicate1269/dead2751 failures remain unwaived.",
+    "Protected source/dist/native/prior evidence preservation does not mean absence of tool cache writes."
+  ],
+  "formalAcceptanceClosed": false,
+  "next": "Separately reviewed native signing source11/source8 and original mixed-built CLI-ACP2, then source11 reviewed-pin control. Installed observer stays plan-only behind unchanged normal gates."
+}

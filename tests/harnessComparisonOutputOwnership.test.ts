@@ -4,6 +4,9 @@
  * No filesystem setup or test import has been run by authoring this source.
  */
 import * as fs from "node:fs";
+import { Command } from "commander";
+import * as comparison from "../src/benchmarks/harnessComparison.js";
+import { registerHarnessComparisonCommands } from "../src/benchmarks/harnessComparisonCli.js";
 import { createHash } from "node:crypto";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
@@ -166,4 +169,77 @@ describe("comparison new-only output through the actual runner", () => {
     expect(fs.mkdirSync).not.toHaveBeenCalled(); expect(real.existsSync(outputDir)).toBe(false);
     expect(real.readFileSync(manifestPath)).toEqual(before); unstarted();
   });
+});
+
+
+it("records a bounded redacted IO diagnostic without changing unavailable status", async () => {
+  const canary = "h2xr-io-secret-value-22911";
+  vi.mocked(runProcess).mockImplementationOnce(() => { throw new Error(`${canary} ${"x".repeat(2048)}`); });
+  const report = await runHarnessComparison({ manifestPath, outputDir, allowAdapterExecution: true, redactValues: [canary] });
+  expect(report.trials[0]).toMatchObject({ status: "unavailable", verdict: null, failureKind: "io" });
+  expect(report.trials[0]?.failureMessage).toContain("AMC_REDACTED");
+  expect(report.trials[0]?.failureMessage).toHaveLength(1024);
+  expect(JSON.stringify(report)).not.toContain(canary);
+  for (const file of real.readdirSync(outputDir)) expect(real.readFileSync(join(outputDir, file), "utf8")).not.toContain(canary);
+});
+
+
+it.each([
+  { name: "empty", outcomes: [] as string[], code: 3 },
+  { name: "all-pass", outcomes: ["pass"], code: 0 },
+  { name: "pass with unavailable", outcomes: ["pass", "unavailable"], code: 3 },
+  { name: "failure with unavailable", outcomes: ["fail", "unavailable"], code: 1 }
+])("keeps CLI exit precedence for $name report records", async ({ outcomes, code }) => {
+  const report = await run(false);
+  const template = report.trials[0]!;
+  report.trials = outcomes.map(outcome => ({ ...template,
+    status: outcome === "unavailable" ? "unavailable" : "executed",
+    verdict: outcome === "pass" ? "pass" : outcome === "fail" ? "fail" : null }));
+  vi.spyOn(comparison, "runHarnessComparison").mockResolvedValue(report);
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  const previous = process.exitCode;
+  try {
+    const command = new Command("bench"); registerHarnessComparisonCommands(command);
+    await command.parseAsync(["harness-compare", "--manifest", manifestPath, "--out", outputDir], { from: "user" });
+    expect(process.exitCode).toBe(code);
+  } finally { process.exitCode = previous; }
+});
+
+
+it.each(["--check", "--dry-run"])("%s never dispatches adapters or acquires output even with execution opt-in", async flag => {
+  vi.spyOn(console, "log").mockImplementation(() => {});
+  const previous = process.exitCode;
+  try {
+    const command = new Command("bench"); registerHarnessComparisonCommands(command);
+    await command.parseAsync(["harness-compare", "--manifest", manifestPath, "--out", outputDir, flag, "--allow-adapter-execution"], { from: "user" });
+    expect(process.exitCode).toBe(0); unstarted();
+    expect(real.existsSync(outputDir)).toBe(false); expect(fs.writeFileSync).not.toHaveBeenCalled();
+  } finally { process.exitCode = previous; }
+});
+
+it("execution without an output flag reports a fatal setup error before dispatch", async () => {
+  const errors = vi.spyOn(console, "error").mockImplementation(() => {});
+  const previous = process.exitCode;
+  try {
+    const command = new Command("bench"); registerHarnessComparisonCommands(command);
+    await command.parseAsync(["harness-compare", "--manifest", manifestPath, "--allow-adapter-execution"], { from: "user" });
+    expect(process.exitCode).toBe(1);
+    expect(errors).toHaveBeenCalledWith("Harness comparison ERROR: --out is required when executing a comparison.");
+    unstarted(); expect(real.existsSync(outputDir)).toBe(false);
+  } finally { process.exitCode = previous; }
+});
+
+
+it("readiness pin errors exit 1 before any execution or result write", async () => {
+  const manifest = JSON.parse(real.readFileSync(manifestPath, "utf8"));
+  manifest.targets[0].artifact.sha256 = "0".repeat(64); real.writeFileSync(manifestPath, JSON.stringify(manifest));
+  const logs = vi.spyOn(console, "log").mockImplementation(() => {});
+  const previous = process.exitCode;
+  try {
+    const command = new Command("bench"); registerHarnessComparisonCommands(command);
+    await command.parseAsync(["harness-compare", "--manifest", manifestPath, "--check"], { from: "user" });
+    expect(process.exitCode).toBe(1);
+    expect(JSON.parse(String(logs.mock.calls[0]?.[0]))).toMatchObject({ ready: false });
+    unstarted(); expect(real.existsSync(outputDir)).toBe(false);
+  } finally { process.exitCode = previous; }
 });

@@ -1,0 +1,31 @@
+{
+  "schema": "p107-runtime-test-proposal-seal/1",
+  "at": "2026-10-16T17:50:02.384760+00:00",
+  "target": "tests/diagnostic/runtimeEvidenceEndToEnd.test.ts",
+  "candidateExecuted": false,
+  "checkoutWrites": false,
+  "sourceProductionWrites": false,
+  "inputCount": 66,
+  "allReadsFinished": true,
+  "blockers": [],
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-test-proposal/runtimeEvidenceEndToEnd.test.ts",
+      "bytes": 27005,
+      "sha256": "27fd19d0ad963d7221dd2c4c08b105d2b430abb3a49da22f07bdb2610910e9c9",
+      "readScope": "exact private proposal output"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-test-proposal/README.md",
+      "bytes": 5274,
+      "sha256": "7e3ffb7d1616752aeb50186a3b9ef2bdad572929eeb42dfe117e22698c061c74",
+      "readScope": "exact private proposal output"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-test-proposal/input-pins.json",
+      "bytes": 23889,
+      "sha256": "1809f742041a6cb720e911eb043f99ff580f65bda8a46b926a840d2e9b77f56b",
+      "readScope": "exact private proposal output"
+    }
+  ]
+}

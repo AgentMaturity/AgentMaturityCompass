@@ -37,7 +37,7 @@ const AMC_ARCHIVE_LIMITS: TarArchiveLimits = {
 
 
 
-function tarCreateDeterministic(sourceDir: string, outFile: string): void {
+export function tarCreateDeterministic(sourceDir: string, outFile: string): void {
   const files = collectFiles(sourceDir);
   const out = spawnSync("tar", ["-czf", outFile, "-C", sourceDir, ...files], { encoding: "utf8" });
   if (out.status !== 0) {
@@ -179,47 +179,8 @@ export function createPassportArtifact(params: {
     }
     signature = passportSignatureSchema.parse(signPassportJson(params.workspace, passport));
 
-    const passportJsonPath = join(root, "passport.json");
-    const passportSigPath = join(root, "passport.sig");
-    writeFileAtomic(passportJsonPath, `${canonicalize(passport)}\n`, 0o644);
-    writeFileAtomic(passportSigPath, `${canonicalize(signature)}\n`, 0o644);
-    writeFileAtomic(join(root, "signer.pub"), signerPub, 0o644);
-
-    const piiPath = join(root, "checks", "pii-scan.json");
-    writeFileAtomic(piiPath, `${canonicalize(piiScan)}\n`, 0o644);
-    writeFileAtomic(join(root, "checks", "pii-scan.sha256"), `${digestFile(piiPath)}\n`, 0o644);
-
-    writeFileAtomic(join(root, "meta", "policy.sha256"), `${collected.sourceHashes.policySha256}\n`, 0o644);
-    writeFileAtomic(join(root, "meta", "canon.sha256"), `${collected.sourceHashes.canonSha256}\n`, 0o644);
-    writeFileAtomic(join(root, "meta", "bank.sha256"), `${collected.sourceHashes.bankSha256}\n`, 0o644);
-    writeFileAtomic(join(root, "meta", "cgx.pack.sha256"), `${collected.sourceHashes.cgxPackSha256}\n`, 0o644);
-    if (collected.sourceHashes.promptPackSha256) {
-      writeFileAtomic(join(root, "meta", "prompt.pack.sha256"), `${collected.sourceHashes.promptPackSha256}\n`, 0o644);
-    }
-    if (collected.sourceHashes.assuranceCertSha256) {
-      writeFileAtomic(join(root, "meta", "assurance.cert.sha256"), `${collected.sourceHashes.assuranceCertSha256}\n`, 0o644);
-    }
-    if (collected.sourceHashes.benchSha256) {
-      writeFileAtomic(join(root, "meta", "bench.sha256"), `${collected.sourceHashes.benchSha256}\n`, 0o644);
-    }
-    if (collected.sourceHashes.auditBinderSha256) {
-      writeFileAtomic(join(root, "meta", "audit.binder.sha256"), `${collected.sourceHashes.auditBinderSha256}\n`, 0o644);
-    }
-    if (collected.sourceHashes.valueSnapshotSha256) {
-      writeFileAtomic(join(root, "meta", "value.snapshot.sha256"), `${collected.sourceHashes.valueSnapshotSha256}\n`, 0o644);
-    }
-
-    const buildMeta = {
-      v: 1,
-      generatedTs: passport.generatedTs,
-      scope: passport.scope,
-      status: passport.status.label,
-      sourceHashes: collected.sourceHashes
-    };
-    const buildPath = join(root, "meta", "build.json");
-    writeFileAtomic(buildPath, `${canonicalize(buildMeta)}\n`, 0o644);
-    writeFileAtomic(join(root, "meta", "build.sha256"), `${digestFile(buildPath)}\n`, 0o644);
-    writeFileAtomic(join(root, "meta", "calculation-manifest.json"), `${canonicalize(collected.calculationManifest)}\n`, 0o644);
+    for (const member of passportArchiveMemberBytes({ passport, signature, piiScan, signerPub, collected }))
+      writeFileAtomic(join(root, member.path), member.bytes, 0o644);
 
     tarCreateDeterministic(tmp, outFile);
   } finally {
@@ -342,3 +303,34 @@ export function listExportedPassportArtifacts(workspace: string): Array<{
   walk(dir);
   return out.sort((a, b) => b.generatedTs - a.generatedTs || a.file.localeCompare(b.file));
 }
+
+/** Pure existing archive member recipe; proof members retain the shared bench recipe separately. */
+export function passportArchiveMemberBytes(params: {
+  passport: PassportJson; signature: ReturnType<typeof signPassportJson>; piiScan: ReturnType<typeof scanPassportForPii>;
+  signerPub: string; collected: ReturnType<typeof collectPassportData>;
+}) {
+  const { passport, signature, piiScan, signerPub, collected } = params;
+  const piiBytes = Buffer.from(`${canonicalize(piiScan)}\n`);
+  const files = [
+    { path: "passport.json", bytes: Buffer.from(`${canonicalize(passport)}\n`) },
+    { path: "passport.sig", bytes: Buffer.from(`${canonicalize(signature)}\n`) },
+    { path: "signer.pub", bytes: Buffer.from(signerPub) },
+    { path: "checks/pii-scan.json", bytes: piiBytes },
+    { path: "checks/pii-scan.sha256", bytes: Buffer.from(`${sha256Hex(piiBytes)}\n`) },
+    { path: "meta/policy.sha256", bytes: Buffer.from(`${collected.sourceHashes.policySha256}\n`) },
+    { path: "meta/canon.sha256", bytes: Buffer.from(`${collected.sourceHashes.canonSha256}\n`) },
+    { path: "meta/bank.sha256", bytes: Buffer.from(`${collected.sourceHashes.bankSha256}\n`) },
+    { path: "meta/cgx.pack.sha256", bytes: Buffer.from(`${collected.sourceHashes.cgxPackSha256}\n`) }
+  ];
+  for (const [value, path] of [
+    [collected.sourceHashes.promptPackSha256, "prompt.pack.sha256"], [collected.sourceHashes.assuranceCertSha256, "assurance.cert.sha256"],
+    [collected.sourceHashes.benchSha256, "bench.sha256"], [collected.sourceHashes.auditBinderSha256, "audit.binder.sha256"],
+    [collected.sourceHashes.valueSnapshotSha256, "value.snapshot.sha256"]
+  ]) if (value) files.push({ path: `meta/${path}`, bytes: Buffer.from(`${value}\n`) });
+  const buildMeta = { v: 1, generatedTs: passport.generatedTs, scope: passport.scope, status: passport.status.label, sourceHashes: collected.sourceHashes };
+  const buildBytes = Buffer.from(`${canonicalize(buildMeta)}\n`);
+  files.push({ path: "meta/build.json", bytes: buildBytes }, { path: "meta/build.sha256", bytes: Buffer.from(`${sha256Hex(buildBytes)}\n`) },
+    { path: "meta/calculation-manifest.json", bytes: Buffer.from(`${canonicalize(collected.calculationManifest)}\n`) });
+  return files;
+}
+export { createPassportArtifactAsync } from "./passportProducer.js";

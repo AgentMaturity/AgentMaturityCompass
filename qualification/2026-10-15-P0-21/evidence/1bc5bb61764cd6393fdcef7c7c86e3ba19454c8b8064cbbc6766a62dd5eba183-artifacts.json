@@ -1,0 +1,47 @@
+[
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C4-base-L3-self-tier--mutant/classification.json",
+    "bytes": 4023,
+    "sha256": "f2ba77055f18b7e1b118dcb5bb3b31c679a196f8af4e0c502a05df4ccb0dd4e3"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C4-base-L3-self-tier--mutant/command.json",
+    "bytes": 1934,
+    "sha256": "d8f9db6a394fa53997e260083bbca9f94d965ff41f849b06ee1acbd419422323"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C4-base-L3-self-tier--mutant/inputs-after.json",
+    "bytes": 870,
+    "sha256": "4234a73e47e7987c40354d1faeb1c80e66dc93bdb0269bf48b24c3f53b925e9f"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C4-base-L3-self-tier--mutant/inputs-before.json",
+    "bytes": 870,
+    "sha256": "da23f2f7acaee55a08ae8bdb46df878b0e9684ffe95379a038679334cfb8a046"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C4-base-L3-self-tier--mutant/observer.json",
+    "bytes": 22598,
+    "sha256": "4af9659e0a6e2f1f033fa50b308e09155adc1c7bd925ad1addf21e856905549d"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C4-base-L3-self-tier--mutant/owned-group-after-exit.json",
+    "bytes": 520,
+    "sha256": "4f79fcde2a33c6641f38edb106a42b6bdd15ccaafc52e7e0bb40fe6b5d116b26"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C4-base-L3-self-tier--mutant/owned-process.json",
+    "bytes": 1559,
+    "sha256": "cd31e410f116bc3740536a662e470cbeec423b2fcdbe934c48747589c3bb9925"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C4-base-L3-self-tier--mutant/raw.json",
+    "bytes": 14897,
+    "sha256": "825e11b72b6613712a9876bb63ea6a2039d1ae35b31442941978a77ba93c84d5"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C4-base-L3-self-tier--mutant/stdout-stderr.log",
+    "bytes": 2004,
+    "sha256": "c2fa46e23ed8b0380a6268f2f555731e241a48d1cfbe7d31d7b5a57287f32627"
+  }
+]

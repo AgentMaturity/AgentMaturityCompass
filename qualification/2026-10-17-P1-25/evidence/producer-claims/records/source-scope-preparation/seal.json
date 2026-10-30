@@ -1,0 +1,41 @@
+{
+  "schema": "p125p-finite-source-scope-private-seal/1",
+  "at": "2026-10-17T01:48:55.462765+00:00",
+  "blockers": [],
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/source-scope-preparation/review.json",
+      "bytes": 14416,
+      "sha256": "ad6d0e4eac25a93a28d9f0762afa4a9da4a09a3ddb6f58e91f773aada0201564"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/source-scope-preparation/README.md",
+      "bytes": 1546,
+      "sha256": "7fb46bc66645009b967f9cc88374d91c26ac6dd2b32b5491cdb1b7aaf661f4c4"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/source-scope-preparation/input-pins.json",
+      "bytes": 4716,
+      "sha256": "c87ee3409f10b1a0a64aac31d73f3bac1dd245cc6d4c0ccfb54722ac378cf908"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/source-scope-preparation/pending-reservation-entry.md",
+      "bytes": 1020,
+      "sha256": "8c8d2edef8268885b010fe6ea0489cae31a7d581f755bf4f84f292ebc14f32c2"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/source-scope-preparation/observations.json",
+      "bytes": 2890242,
+      "sha256": "ea32383d0fce4642b3eb465fae0bd7a563871a8fcd944364a562312063d882e2"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/source-scope-preparation/read-tool-results.json",
+      "bytes": 185,
+      "sha256": "d1cb68eda2e37ff92a9e6539538fcf3fb5f883cd0a60cd55531e17b32cca7900"
+    }
+  ],
+  "all595ReadOnlyGitChildrenNatural0": true,
+  "sourceAllocationOrRuntimeCredit": false,
+  "noReservationOrSourceIndexQaMutation": true,
+  "largeObservationsPrivateOnly": true
+}

@@ -1,0 +1,66 @@
+{
+  "schema": "p125pc-inert-runtime-auditor-preparation-seal/1",
+  "at": "2026-10-17T01:47:19.979358+00:00",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/runtime-audit-preparation/audit-observed.py.source.txt",
+      "bytes": 2198,
+      "sha256": "468aee0d4ded5290f60e231fa6a94e3617f7a243de96f46f1ac1a77fd73dc439"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/runtime-audit-preparation/audit-public.py.source.txt",
+      "bytes": 40958,
+      "sha256": "805a2c8e5c5dc48c0d9f3dae9be5ed02babed5cc5a41fd94ef6bdff619d48a80"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/runtime-audit-preparation/audit-observed.delta.patch.txt",
+      "bytes": 1028,
+      "sha256": "2da1b371b412d609cbeadedf578e086493dc2d4702ac31d9a5484201f3060e31"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/runtime-audit-preparation/audit-public.delta.patch.txt",
+      "bytes": 20746,
+      "sha256": "e90df8101290e2c5578f458f131e0cc4a1c2c34abc13ed31265f5e486f2af9b6"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/runtime-audit-preparation/fields.json",
+      "bytes": 3550,
+      "sha256": "f13c3859b94bc19c1acf25c9308bd5f0696e494c5768cbc70ba30dfb4aead5c8"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/runtime-audit-preparation/author-review.json",
+      "bytes": 2781,
+      "sha256": "a11647f54ce451972ffafb78484708d2904228ba3c3dc80fc291cf37bfaf2525"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/runtime-audit-preparation/README.md",
+      "bytes": 2763,
+      "sha256": "5ba1482d76c7ae4fb8f4486d955f13d9a5e630c057090440c6933651e2607439"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/runtime-audit-preparation/read-only-diagnoses.json",
+      "bytes": 1200,
+      "sha256": "5e3115049a23db67e4e2b62f1dc8c2209ad151a207f7a5f5b27eae8e0043fbfb"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/runtime-audit-preparation/input-pins.json",
+      "bytes": 5694,
+      "sha256": "29bf4cbb1f4a188b356ac3969877f617b5f3a89a51fe049daac9cd4ed98fe837"
+    }
+  ],
+  "preferredObserved": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/runtime-audit-preparation/audit-observed.py.source.txt",
+    "bytes": 2198,
+    "sha256": "468aee0d4ded5290f60e231fa6a94e3617f7a243de96f46f1ac1a77fd73dc439"
+  },
+  "preferredPublic": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/runtime-audit-preparation/audit-public.py.source.txt",
+    "bytes": 40958,
+    "sha256": "805a2c8e5c5dc48c0d9f3dae9be5ed02babed5cc5a41fd94ef6bdff619d48a80"
+  },
+  "inputCount": 24,
+  "codeImportedParsedCompiledOrExecuted": false,
+  "sourceOrRuntimeAdmission": false,
+  "noPredictedOutcomesOrCounts": true,
+  "blockers": []
+}

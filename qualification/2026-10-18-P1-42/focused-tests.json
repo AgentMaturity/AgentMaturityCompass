@@ -1,0 +1,347 @@
+{
+ "command": "npx vitest run <the 64 files below>",
+ "commit": "5ef35b7160012416f7336d83b11375b8cadad282",
+ "numTotalTests": 670,
+ "numPassedTests": 667,
+ "numFailedTests": 3,
+ "numPendingTests": 0,
+ "files": [
+  {
+   "file": "tests/amc1474ReusableScopeTemplates.test.ts",
+   "passed": 13,
+   "failed": 0
+  },
+  {
+   "file": "tests/amc1475NestedConditionAuthoring.test.ts",
+   "passed": 12,
+   "failed": 0
+  },
+  {
+   "file": "tests/amc1479PolicyFixturesCi.test.ts",
+   "passed": 9,
+   "failed": 0
+  },
+  {
+   "file": "tests/checkNoFabrication.test.ts",
+   "passed": 31,
+   "failed": 0
+  },
+  {
+   "file": "tests/citationMetadata.test.ts",
+   "passed": 4,
+   "failed": 0
+  },
+  {
+   "file": "tests/crossSurfaceBrandIdentity.test.ts",
+   "passed": 7,
+   "failed": 0
+  },
+  {
+   "file": "tests/deepIndustryPacksStations.test.ts",
+   "passed": 9,
+   "failed": 0
+  },
+  {
+   "file": "tests/docsTruthReset.test.ts",
+   "passed": 8,
+   "failed": 0
+  },
+  {
+   "file": "tests/domain-assessment.test.ts",
+   "passed": 3,
+   "failed": 0
+  },
+  {
+   "file": "tests/domainAssessmentUnits.test.ts",
+   "passed": 4,
+   "failed": 0
+  },
+  {
+   "file": "tests/domainReportAnnexIII.test.ts",
+   "passed": 8,
+   "failed": 0
+  },
+  {
+   "file": "tests/f5DropDecisions.test.ts",
+   "passed": 4,
+   "failed": 0
+  },
+  {
+   "file": "tests/f5DropReconciliation.test.ts",
+   "passed": 2,
+   "failed": 0
+  },
+  {
+   "file": "tests/genCountsSemantics.test.ts",
+   "passed": 15,
+   "failed": 0
+  },
+  {
+   "file": "tests/industryGuides.test.ts",
+   "passed": 47,
+   "failed": 0
+  },
+  {
+   "file": "tests/industryGuidesGenerator.test.ts",
+   "passed": 4,
+   "failed": 0
+  },
+  {
+   "file": "tests/industryPackAudit.test.ts",
+   "passed": 16,
+   "failed": 0
+  },
+  {
+   "file": "tests/industryPackAuditV1Compat.test.ts",
+   "passed": 4,
+   "failed": 0
+  },
+  {
+   "file": "tests/industryPackDepthFloor.test.ts",
+   "passed": 4,
+   "failed": 0
+  },
+  {
+   "file": "tests/industryPackEntitlement.test.ts",
+   "passed": 23,
+   "failed": 0
+  },
+  {
+   "file": "tests/industryPackFrameworkNormalization.test.ts",
+   "passed": 3,
+   "failed": 0
+  },
+  {
+   "file": "tests/industryPackMcpClaims.test.ts",
+   "passed": 12,
+   "failed": 0
+  },
+  {
+   "file": "tests/industryPackMcpTools.test.ts",
+   "passed": 18,
+   "failed": 0
+  },
+  {
+   "file": "tests/industryPackMcpToolsWiring.test.ts",
+   "passed": 3,
+   "failed": 0
+  },
+  {
+   "file": "tests/industryPackNotEvaluated.test.ts",
+   "passed": 7,
+   "failed": 0
+  },
+  {
+   "file": "tests/industryPackRegulatoryRefresh.test.ts",
+   "passed": 4,
+   "failed": 0
+  },
+  {
+   "file": "tests/industryPackSchema.test.ts",
+   "passed": 11,
+   "failed": 0
+  },
+  {
+   "file": "tests/industryPackWeightingPaymentInvariance.test.ts",
+   "passed": 12,
+   "failed": 0
+  },
+  {
+   "file": "tests/industryPacks-environment.test.ts",
+   "passed": 5,
+   "failed": 0
+  },
+  {
+   "file": "tests/industryPacks-governance.test.ts",
+   "passed": 7,
+   "failed": 0
+  },
+  {
+   "file": "tests/industryPacks-infotainment.test.ts",
+   "passed": 1,
+   "failed": 0
+  },
+  {
+   "file": "tests/industryPacks-mobility.test.ts",
+   "passed": 6,
+   "failed": 0
+  },
+  {
+   "file": "tests/industryPacksEducation.test.ts",
+   "passed": 85,
+   "failed": 0
+  },
+  {
+   "file": "tests/industryPacksHealthRound2.test.ts",
+   "passed": 6,
+   "failed": 0
+  },
+  {
+   "file": "tests/industryPacksHostedApi.test.ts",
+   "passed": 10,
+   "failed": 0
+  },
+  {
+   "file": "tests/industryPacksPaywallSurfaces.test.ts",
+   "passed": 5,
+   "failed": 0
+  },
+  {
+   "file": "tests/industryPacksSplitEquality.test.ts",
+   "passed": 4,
+   "failed": 0
+  },
+  {
+   "file": "tests/logisticsIndustryPack.test.ts",
+   "passed": 2,
+   "failed": 0
+  },
+  {
+   "file": "tests/majorGaps.test.ts",
+   "passed": 42,
+   "failed": 0
+  },
+  {
+   "file": "tests/mcpServer.test.ts",
+   "passed": 11,
+   "failed": 0
+  },
+  {
+   "file": "tests/mcpTools.test.ts",
+   "passed": 7,
+   "failed": 0
+  },
+  {
+   "file": "tests/noAmcOsReads.test.ts",
+   "passed": 3,
+   "failed": 0
+  },
+  {
+   "file": "tests/noCertificationFromSelfAssessment.test.ts",
+   "passed": 7,
+   "failed": 0
+  },
+  {
+   "file": "tests/noTierGatingOnTrustStack.test.ts",
+   "passed": 4,
+   "failed": 0
+  },
+  {
+   "file": "tests/publicBrandSystem.test.ts",
+   "passed": 6,
+   "failed": 0
+  },
+  {
+   "file": "tests/publicDistributionTruth.test.ts",
+   "passed": 15,
+   "failed": 0
+  },
+  {
+   "file": "tests/publicDocsArtifact.test.ts",
+   "passed": 3,
+   "failed": 1
+  },
+  {
+   "file": "tests/publicDocsGraph.test.ts",
+   "passed": 5,
+   "failed": 1
+  },
+  {
+   "file": "tests/publicQuestionCountDrift.test.ts",
+   "passed": 5,
+   "failed": 0
+  },
+  {
+   "file": "tests/publicStatsDrift.test.ts",
+   "passed": 3,
+   "failed": 0
+  },
+  {
+   "file": "tests/questionIdVersions.test.ts",
+   "passed": 3,
+   "failed": 0
+  },
+  {
+   "file": "tests/questionSets.test.ts",
+   "passed": 6,
+   "failed": 0
+  },
+  {
+   "file": "tests/questionnaireLabelSurfaces.test.ts",
+   "passed": 9,
+   "failed": 0
+  },
+  {
+   "file": "tests/questionnaireLabels.test.ts",
+   "passed": 5,
+   "failed": 0
+  },
+  {
+   "file": "tests/receiptsCorrelationRuntimeDashboard.test.ts",
+   "passed": 7,
+   "failed": 0
+  },
+  {
+   "file": "tests/regulatoryCalendar.test.ts",
+   "passed": 28,
+   "failed": 0
+  },
+  {
+   "file": "tests/regulatoryClaimsHonesty.test.ts",
+   "passed": 5,
+   "failed": 1
+  },
+  {
+   "file": "tests/regulatoryCurrencyRegister.test.ts",
+   "passed": 13,
+   "failed": 0
+  },
+  {
+   "file": "tests/roundTwoMergeDecisions.test.ts",
+   "passed": 3,
+   "failed": 0
+  },
+  {
+   "file": "tests/sectorPacksDocDerived.test.ts",
+   "passed": 2,
+   "failed": 0
+  },
+  {
+   "file": "tests/standaloneApi.test.ts",
+   "passed": 6,
+   "failed": 0
+  },
+  {
+   "file": "tests/studioVaultModeLoop.test.ts",
+   "passed": 9,
+   "failed": 0
+  },
+  {
+   "file": "tests/citations/lintCitations.test.ts",
+   "passed": 21,
+   "failed": 0
+  },
+  {
+   "file": "tests/catalog/l0/catalogLoads.test.ts",
+   "passed": 11,
+   "failed": 0
+  }
+ ],
+ "failures": [
+  {
+   "file": "tests/publicDocsArtifact.test.ts",
+   "test": "builds a deterministic allowlisted artifact with source, renderer, and font hashes",
+   "classification": "also failing on int, outside P1-42 ($SP/P0-36f-base-failed.txt, $SP/P1-08-int-tests.txt)"
+  },
+  {
+   "file": "tests/publicDocsGraph.test.ts",
+   "test": "every local guide edge resolves to another promoted guide",
+   "classification": "also failing on int, outside P1-42 ($SP/P0-36f-base-failed.txt, $SP/P1-08-int-tests.txt)"
+  },
+  {
+   "file": "tests/regulatoryClaimsHonesty.test.ts",
+   "test": "is no longer exported from the package root (D-12: unreviewed regulatory content)",
+   "classification": "also failing on int, outside P1-42 ($SP/P0-36f-base-failed.txt, $SP/P1-08-int-tests.txt)"
+  }
+ ]
+}

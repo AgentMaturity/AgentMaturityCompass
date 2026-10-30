@@ -1,0 +1,5 @@
+qualification/2026-10-15-P0-11/evidence/3d6471987a90a4c050dc6d71311a52628fb1bd7676332747d17782289ce30288-stdout-stderr.log:21: new blank line at EOF.
+qualification/2026-10-15-P0-11/evidence/5c1981f23721d88c490c80f2e6c1f2324898f3f7acee719c8ece8c8c1f90e878-controller.py:40: trailing whitespace.
++C2_MESSAGE = 'the evidence store is unreachable' 
+qualification/2026-10-15-P0-11/evidence/5c1981f23721d88c490c80f2e6c1f2324898f3f7acee719c8ece8c8c1f90e878-p0-11-causal-controller-prepared-20261015.py:40: trailing whitespace.
++C2_MESSAGE = 'the evidence store is unreachable' 

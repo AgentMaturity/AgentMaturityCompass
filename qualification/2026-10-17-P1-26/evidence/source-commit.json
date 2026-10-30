@@ -1,0 +1,15 @@
+{
+  "at": "2026-10-16T20:46:17.481017+00:00",
+  "argv": [
+    "git",
+    "commit",
+    "-m",
+    "test(P1-26): qualify offline Merkle trees and proof boundaries"
+  ],
+  "exit": 0,
+  "stdout": "[codex/p1-26-tree-qualification 32435b41d] test(P1-26): qualify offline Merkle trees and proof boundaries\n 13 files changed, 668 insertions(+), 15 deletions(-)\n create mode 100644 tests/transparency/LICENSE.transparency-dev-merkle\n create mode 100644 tests/transparency/legacyAmbiguity.test.ts\n create mode 100644 tests/transparency/rfc9162.test.ts\n",
+  "stderr": "",
+  "head": "32435b41d59e651ad2b259a59703cd137e5c925a",
+  "status": "",
+  "noForceOrNoVerify": true
+}

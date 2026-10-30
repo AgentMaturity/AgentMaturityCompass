@@ -1,0 +1,40 @@
+{
+  "schema": "p125g-private-receipt-v3-author-static-review/1",
+  "at": "2026-10-16T23:06:57.836751+00:00",
+  "blockers": [],
+  "staticSchemaCorrectionOnly": true,
+  "preservedVersions": [
+    "V1",
+    "V2"
+  ],
+  "actualBaseRowsRehashed": 897,
+  "baseInventoryMatchesPrivatePacket": true,
+  "actualPeerSchema": "p125g-independent-actual-fresh-control-runtime-review/1",
+  "actualSixPhasesRead": [
+    "p125g-source-combined",
+    "p125g-fresh-canonical",
+    "p125g-m1",
+    "p125g-restore1",
+    "p125g-m2",
+    "p125g-restore2"
+  ],
+  "actualOperationNamesRead": [
+    "ORDER",
+    "DROP-VALID-GRANT"
+  ],
+  "directActualFieldConsumption": true,
+  "rootPrefixBytes": 3995,
+  "historicalSuffixBytes": 20240,
+  "historicalSuffixByteExact": true,
+  "lookupDiagnosticsSupplyQualificationCredit": false,
+  "readyForPrivateAssembly": false,
+  "codeImportedParsedCompiledExecuted": false,
+  "sourceMetadataIndexQaChanged": false,
+  "generatedKeysPrivateRunRawChildStreamsOrPublicSigningFilesRead": false,
+  "remainingInputs": [
+    "Actual environment and timezone-aware command cutoff",
+    "Complete actual closed-command and artifact inventory",
+    "Actual extended notes and root semantic review flags"
+  ],
+  "wholeIssueOrPlanComplete": false
+}

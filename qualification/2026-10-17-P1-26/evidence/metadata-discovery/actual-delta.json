@@ -1,0 +1,20 @@
+{
+  "at": "2026-10-16T20:31:20.306605+00:00",
+  "before": 2728,
+  "after": 2723,
+  "removed": [
+    "[\"qualification/2026-10-17-P1-12/evidence/test-design/compiledPolicyGuard.test.ts\",\"unresolved\",{\"name\":\"../../src/actions/authorizationRecord.js\"}]",
+    "[\"qualification/2026-10-17-P1-12/evidence/test-design/compiledPolicyGuard.test.ts\",\"unresolved\",{\"name\":\"../../src/catalog/compiler/activate.js\"}]",
+    "[\"qualification/2026-10-17-P1-12/evidence/test-design/compiledPolicyGuard.test.ts\",\"unresolved\",{\"name\":\"../../src/catalog/compiler/types.js\"}]",
+    "[\"qualification/2026-10-17-P1-12/evidence/test-design/compiledPolicyGuard.test.ts\",\"unresolved\",{\"name\":\"../../src/tools/guards/compiledPolicyGuard.js\"}]",
+    "[\"qualification/2026-10-17-P1-12/evidence/test-design/compiledPolicyGuard.test.ts\",\"unresolved\",{\"name\":\"../../src/tools/toolTypes.js\"}]"
+  ],
+  "added": [],
+  "afterEqualsPriorSourceFindingSet": true,
+  "priorSourceReference": "/private/tmp/p1-12-compiled-guard-qualification-20261017/quality-current-full.json",
+  "diagnosticCompletionOnly": true,
+  "qualityGateStillRed": true,
+  "baselineAdopted": false,
+  "scannerOrConfigurationChanged": false,
+  "candidateBytesPreserved": true
+}

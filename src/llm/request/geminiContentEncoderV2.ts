@@ -21,13 +21,14 @@ export const geminiContentEncoderV2: RequestEncoder = {
     const params = geminiParams(request.params);
     if (request.system !== null) geminiText(request.system, "system text");
     bindProviderToolNames(request.tools ?? []);
+    const aliases = new Map(request.tools?.map(tool => [tool.name, tool.modelAlias]));
     const offered = new Set(request.tools?.map(tool => tool.name) ?? []);
     const declarations = (request.tools ?? []).map(tool => {
       assertGeminiJsonValue(tool);
-      geminiKeys(tool as unknown as Record<string, unknown>, ["name", "description", "parameters"], "tool schema");
+      geminiKeys(tool as unknown as Record<string, unknown>, ["name", "description", "parameters", "modelAlias"], "tool schema");
       geminiText(tool.description, "tool description");
       if (!geminiObject(tool.parameters)) return geminiFail("a function schema must be an object");
-      return { name: providerToolWireName(tool.name), description: tool.description, parametersJsonSchema: tool.parameters };
+      return { name: providerToolWireName(tool.name, tool.modelAlias), description: tool.description, parametersJsonSchema: tool.parameters };
     });
     if (params.toolConfig !== undefined) {
       if (declarations.length === 0) return geminiFail("toolConfig requires offered functions");
@@ -35,7 +36,7 @@ export const geminiContentEncoderV2: RequestEncoder = {
       const allowed = tool.functionCallingConfig.allowedFunctionNames;
       if (Array.isArray(allowed)) tool.functionCallingConfig.allowedFunctionNames = allowed.map(name => {
         if (!offered.has(name)) return geminiFail("allowedFunctionNames must select currently offered canonical names");
-        return providerToolWireName(name as string);
+        return providerToolWireName(name as string, aliases.get(name as string));
       });
     }
     const contents: { role: "user" | "model"; parts: string[] }[] = [];
@@ -52,7 +53,7 @@ export const geminiContentEncoderV2: RequestEncoder = {
         if (metadata !== undefined) {
           if (message.role !== "assistant" || !["text", "thinking", "tool_use"].includes(part.kind)) return geminiFail("Gemini provenance requires its original assistant part");
           geminiKeys(part as unknown as Record<string, unknown>, part.kind === "tool_use"
-            ? ["kind", "toolCallId", "toolName", "argumentsJson", "gemini"] : ["kind", "text", "gemini"], "signed part");
+            ? ["kind", "toolCallId", "toolName", "argumentsJson", "providerWireName", "gemini"] : ["kind", "text", "gemini"], "signed part");
           const scope = `${metadata.headerEventId}\0${metadata.responseId}`;
           if (scope !== activeResponse) {
             if (seenResponses.has(scope)) return geminiFail("a signed Gemini response was reordered or revisited");
@@ -61,7 +62,7 @@ export const geminiContentEncoderV2: RequestEncoder = {
           if (metadata.partIndex !== nextPart++) return geminiFail("signed Gemini part order has a gap or duplicate");
           const raw = readGeminiPart(metadata);
           if (part.kind === "tool_use") {
-            const wireName = providerToolWireName(part.toolName);
+            const wireName = (part.providerWireName ?? providerToolWireName(part.toolName, aliases.get(part.toolName)));
             snapshotRecordedGeminiPart(metadata, part.kind, part.argumentsJson, { id: part.toolCallId, wireName });
             if (allCalls.has(part.toolCallId)) return geminiFail("duplicate historical function-call key");
             allCalls.add(part.toolCallId);

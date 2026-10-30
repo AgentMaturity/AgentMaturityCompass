@@ -3,7 +3,9 @@ import { isIP } from "node:net";
 import { join, resolve } from "node:path";
 import YAML from "yaml";
 import { z } from "zod";
-import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { captureGatewayConfigPair, captureGatewayConfigPairForAsync, verifyRawConfigSignature, withConfigSignaturePairLock, type ConfigSignaturePairOptions } from "../config/configSignaturePair.js";
+import { captureOrgPairs, orgPairBytes } from "../org/preparedOrgPairs.js";
+import { assertOwnerMode } from "../mode/mode.js";
 import { isCredentialValuePresent } from "../credentials/credentialValue.js";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -48,11 +50,11 @@ export const gatewayConfigSchema = z.object({
     port: z.number().int().min(0).max(65535).default(3210)
   }),
   redaction: z.object({
-    headerKeysDenylist: z.array(z.string()).default(["authorization", "x-api-key", "api-key", "x-openai-key"]),
+    headerKeysDenylist: z.array(z.string()).default(["authorization", "x-api-key", "api-key", "x-openai-key", "x-amc-lease", "x-goog-api-key", "x-anthropic-api-key", "cookie", "set-cookie"]),
     jsonPathsDenylist: z.array(z.string()).default(["$.api_key", "$.key"]),
     textRegexDenylist: z
       .array(z.string())
-      .default(["(?i)sk-[A-Za-z0-9]{10,}", "(?i)bearer\\s+[A-Za-z0-9._-]{10,}"])
+      .default(["(?i)sk-[A-Za-z0-9_-]{10,}", "(?i)bearer\\s+[A-Za-z0-9._-]{10,}"])
   }),
   upstreams: z.record(z.string(), upstreamSchema),
   routes: z.array(routeSchema).min(1),
@@ -118,9 +120,9 @@ export function defaultGatewayConfig(): GatewayConfig {
       port: 3210
     },
     redaction: {
-      headerKeysDenylist: ["authorization", "x-api-key", "api-key", "x-openai-key"],
+      headerKeysDenylist: ["authorization", "x-api-key", "api-key", "x-openai-key", "x-amc-lease", "x-goog-api-key", "x-anthropic-api-key", "cookie", "set-cookie"],
       jsonPathsDenylist: ["$.api_key", "$.key"],
-      textRegexDenylist: ["(?i)sk-[A-Za-z0-9]{10,}", "(?i)bearer\\s+[A-Za-z0-9._-]{10,}"]
+      textRegexDenylist: ["(?i)sk-[A-Za-z0-9_-]{10,}", "(?i)bearer\\s+[A-Za-z0-9._-]{10,}"]
     },
     upstreams: {
       openai: {
@@ -353,13 +355,13 @@ export function presetGatewayConfigForProvider(provider: string): GatewayConfig 
 
 export function saveGatewayConfig(workspace: string, config: GatewayConfig, explicitPath?: string): string {
   const targetPath = explicitPath ? resolve(workspace, explicitPath) : gatewayPaths(workspace).configPath;
-  ensureDir(join(workspace, ".amc"));
-  writeFileAtomic(targetPath, YAML.stringify(config), 0o644);
-  const sigPath = explicitPath ? `${resolve(workspace, explicitPath)}.sig` : gatewayPaths(workspace).sigPath;
-  if (pathExists(sigPath)) {
-    unlinkSync(sigPath);
-  }
-  return targetPath;
+  const bytes = Buffer.from(YAML.stringify(config)), sigPath = `${targetPath}.sig`;
+  return withConfigSignaturePairLock(workspace, () => {
+    captureOrgPairs([targetPath]); // Retained unsigned save/invalidate writer joins the same target protocol.
+    ensureDir(join(workspace, ".amc")); writeFileAtomic(targetPath, bytes, 0o644);
+    if (pathExists(sigPath)) unlinkSync(sigPath);
+    return targetPath;
+  });
 }
 
 function loadGatewayConfigFromPath(configPath: string): GatewayConfig {
@@ -376,25 +378,20 @@ export function loadGatewayConfig(workspace: string, explicitPath?: string): Gat
 }
 
 export function signGatewayConfig(workspace: string, explicitPath?: string): string {
-  const { configPath, sigPath } = gatewayPaths(workspace);
-  const targetPath = explicitPath ? resolve(workspace, explicitPath) : configPath;
-  if (!pathExists(targetPath)) {
-    throw new Error(`Cannot sign missing gateway config: ${targetPath}`);
-  }
-
-  const raw = readFileSync(targetPath);
-  const digest = sha256Hex(raw);
-  const signature = signHexDigest(digest, getPrivateKeyPem(workspace, "auditor"));
-  const sigPayload = {
-    configSha256: digest,
-    signature,
-    signedTs: Date.now(),
-    signer: "auditor" as const
-  };
-
-  const writeSigPath = targetPath === configPath ? sigPath : `${targetPath}.sig`;
-  writeFileAtomic(writeSigPath, JSON.stringify(sigPayload, null, 2), 0o644);
-  return writeSigPath;
+  const targetPath = explicitPath ? resolve(workspace, explicitPath) : gatewayPaths(workspace).configPath;
+  if (!pathExists(targetPath)) throw new Error(`Cannot sign missing gateway config: ${targetPath}`);
+  return captureGatewayConfigPair(workspace, targetPath).publishSync().sigPath;
+}
+/** Internal actual raw gateway preparation; no kind, key or provider override. */
+export function prepareGatewayConfigPair(workspace: string, replacement?: Uint8Array,
+  options: ConfigSignaturePairOptions & { explicitPath?: string } = {}) {
+  const targetPath = options.explicitPath ? resolve(workspace, options.explicitPath) : gatewayPaths(workspace).configPath;
+  return captureGatewayConfigPairForAsync(workspace, targetPath, replacement, options).prepare();
+}
+export async function signGatewayConfigAsync(workspace: string, explicitPath?: string): Promise<string> {
+  const targetPath = explicitPath ? resolve(workspace, explicitPath) : gatewayPaths(workspace).configPath;
+  if (!pathExists(targetPath)) throw new Error(`Cannot sign missing gateway config: ${targetPath}`);
+  return (await prepareGatewayConfigPair(workspace, undefined, { explicitPath })).publish().sigPath;
 }
 
 export function verifyGatewayConfigSignature(
@@ -414,16 +411,18 @@ export function verifyGatewayConfigSignature(
   }
 
   try {
-    const sigPayload = gatewaySigSchema.parse(JSON.parse(readFileSync(sigPath, "utf8")) as unknown);
-    const raw = readFileSync(configPath);
+    const pair = captureOrgPairs([configPath]), body = orgPairBytes(pair, configPath), sidecar = orgPairBytes(pair, sigPath);
+    if (body === null || sidecar === null) throw new Error("gateway pair changed while reading");
+    const value: unknown = JSON.parse(sidecar.toString("utf8"));
+    if (value !== null && typeof value === "object" && Object.prototype.hasOwnProperty.call(value, "envelope")) throw new Error("raw gateway signature does not carry an envelope");
+    const sigPayload = gatewaySigSchema.parse(value), raw = body;
     const digest = sha256Hex(raw);
 
     if (digest !== sigPayload.configSha256) {
       return { valid: false, signatureExists: true, reason: "config digest mismatch", configPath, sigPath };
     }
 
-    const auditorKeys = getPublicKeyHistory(workspace, "auditor");
-    const ok = verifyHexDigestAny(digest, sigPayload.signature, auditorKeys);
+    const ok = verifyRawConfigSignature(workspace, digest, sigPayload.signature);
     return {
       valid: ok,
       signatureExists: true,
@@ -443,10 +442,29 @@ export function verifyGatewayConfigSignature(
 }
 
 export function initGatewayConfig(workspace: string, config?: GatewayConfig): { configPath: string; sigPath: string } {
-  const cfg = gatewayConfigSchema.parse(config ?? defaultGatewayConfig());
-  const configPath = saveGatewayConfig(workspace, cfg);
-  const sigPath = signGatewayConfig(workspace, configPath);
-  return { configPath, sigPath };
+  assertOwnerMode(workspace, "gateway init");
+  const bytes = Buffer.from(YAML.stringify(gatewayConfigSchema.parse(config ?? defaultGatewayConfig())));
+  const pair = captureGatewayConfigPair(workspace, gatewayPaths(workspace).configPath, bytes,
+    { beforePublish() { assertOwnerMode(workspace, "gateway init"); } }).publishSync();
+  return { configPath: pair.path, sigPath: pair.sigPath };
+}
+export async function initGatewayConfigAsync(workspace: string, config?: GatewayConfig): Promise<{ configPath: string; sigPath: string }> {
+  assertOwnerMode(workspace, "gateway init");
+  const bytes = Buffer.from(YAML.stringify(gatewayConfigSchema.parse(config ?? defaultGatewayConfig())));
+  const pair = (await prepareGatewayConfigPair(workspace, bytes,
+    { beforePublish() { assertOwnerMode(workspace, "gateway init"); } })).publish();
+  return { configPath: pair.path, sigPath: pair.sigPath };
+}
+/** Maintained bind-agent RMW uses exactly the captured source body through Sign and destination CAS. */
+export async function bindGatewayAgentAsync(workspace: string, routePrefix: string, agentId: string, explicitPath?: string): Promise<{ configPath: string; sigPath: string }> {
+  assertOwnerMode(workspace, "gateway bind-agent");
+  const file = explicitPath ? resolve(workspace, explicitPath) : gatewayPaths(workspace).configPath, previous = captureOrgPairs([file]);
+  const body = orgPairBytes(previous, file);
+  if (body === null) throw new Error(`Gateway config not found: ${file}`);
+  const next = bindAgentRoute(gatewayConfigSchema.parse(YAML.parse(body.toString("utf8")) as unknown), routePrefix, agentId);
+  const result = (await prepareGatewayConfigPair(workspace, Buffer.from(YAML.stringify(next)), { explicitPath, previous,
+    beforePublish() { assertOwnerMode(workspace, "gateway bind-agent"); } })).publish();
+  return { configPath: result.path, sigPath: result.sigPath };
 }
 
 /**
@@ -493,10 +511,6 @@ export function routeBaseUrls(config: GatewayConfig): Array<{
     openaiCompatible: route.openaiCompatible,
     agentId: route.agentId
   }));
-}
-
-export function gatewayConfigHash(config: GatewayConfig): string {
-  return sha256Hex(canonicalize(config));
 }
 
 export function bindAgentRoute(config: GatewayConfig, routePrefix: string, agentId: string): GatewayConfig {

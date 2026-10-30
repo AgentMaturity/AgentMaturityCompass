@@ -1,3 +1,5 @@
+import type { EvidenceOutcome } from "../types.js";
+
 export type AgentClassification =
   | 'workflow'
   | 'smart-workflow'
@@ -6,17 +8,26 @@ export type AgentClassification =
   | 'advanced-agent';
 
 export interface AgentClassificationResult {
-  classification: AgentClassification;
-  amcLevel: 'L0' | 'L1' | 'L2' | 'L3' | 'L4' | 'L5';
+  outcome: EvidenceOutcome;
+  score: number | null;
+  classification: AgentClassification | null;
+  amcLevel: 'L0' | 'L1' | 'L2' | 'L3' | 'L4' | 'L5' | null;
   justification: string[];
   marketingLabel: string;
-  governanceRequired: boolean;
-  governanceUrgency: 'none' | 'recommended' | 'required' | 'critical';
+  governanceRequired: boolean | null;
+  governanceUrgency: 'none' | 'recommended' | 'required' | 'critical' | null;
 }
 
 export function classifyAgentVsWorkflow(scores: Record<string, number>): AgentClassificationResult {
-  const vals = Object.values(scores).filter(v => typeof v === 'number' && !isNaN(v));
-  const avg = vals.length > 0 ? vals.reduce((a, b) => a + b, 0) / vals.length : 0;
+  const vals = Object.values(scores).filter(v => Number.isFinite(v));
+  if (vals.length === 0) {
+    return {
+      outcome: "not_evaluated", score: null, classification: null, amcLevel: null,
+      justification: ["No scores to evaluate"], marketingLabel: "Not evaluated",
+      governanceRequired: null, governanceUrgency: null,
+    };
+  }
+  const avg = vals.reduce((a, b) => a + b, 0) / vals.length;
   const justification: string[] = [];
 
   let classification: AgentClassification;
@@ -69,5 +80,5 @@ export function classifyAgentVsWorkflow(scores: Record<string, number>): AgentCl
     justification.push('Full autonomy with governance framework required');
   }
 
-  return { classification, amcLevel, justification, marketingLabel, governanceRequired, governanceUrgency } satisfies AgentClassificationResult;
+  return { outcome: "measured", score: avg, classification, amcLevel, justification, marketingLabel, governanceRequired, governanceUrgency } satisfies AgentClassificationResult;
 }

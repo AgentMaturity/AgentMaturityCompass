@@ -1,0 +1,82 @@
+{
+  "id": "RB-2",
+  "scenario": "Rollback across a migration",
+  "status": "passed",
+  "criteria": [
+    {
+      "name": "helm rollback to N-1 accepted by Helm",
+      "ok": true,
+      "detail": {
+        "to": 2
+      }
+    },
+    {
+      "name": "N-1 refuses the newer schema with a clear error",
+      "ok": true,
+      "detail": {
+        "ready": false,
+        "refusal": "ledger schema version 16 is newer than this AMC; restore the pre-upgrade backup or upgrade AMC"
+      }
+    },
+    {
+      "name": "pre-upgrade backup restored",
+      "ok": true,
+      "detail": {
+        "exit": 0,
+        "warnings": [
+          "ledger: Session 5ce6af9b-92cc-4dc2-a96b-1c53a436df9e missing seal"
+        ],
+        "message": "[amc] key set generation 1 of /data/amc/.p206-restore adopted unanchored (trust on first use): this machine never committed it, so a workspace writer could have replaced it. Pin keys (a trust list, --pubkey, --expect-monitor) for a verdict that must not depend on it."
+      }
+    },
+    {
+      "name": "N-1 serves the restored workspace",
+      "ok": true,
+      "detail": {
+        "readyMs": 10762
+      }
+    },
+    {
+      "name": "PRAGMA integrity_check returns ok",
+      "ok": true,
+      "detail": {
+        "count": 51,
+        "head": "3eaba6f5e4df55b56bfe731c2874c73441985137b297f38b68623024a79d2488",
+        "linked": true,
+        "migrations": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14
+        ],
+        "integrity": "ok"
+      }
+    },
+    {
+      "name": "restored chain starts with the pre-upgrade chain",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "name": "governed turn passes on the restored N-1",
+      "ok": true,
+      "detail": {
+        "ok": true,
+        "status": "verified-prefix",
+        "taskId": "4ab62bf92b0b3df769ca19cc08ec32c5e115539d3c0d3d78cdee38357e22e4b9",
+        "exit": 0
+      }
+    }
+  ],
+  "durationMs": 170614
+}

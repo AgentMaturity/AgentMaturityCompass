@@ -233,7 +233,8 @@ export class ShieldGuardOrchestrator {
     }
 
     // Check 4: Uncertainty Threshold (UProp)
-    const cumulativeConfidence = request.trustContext.cumulativeConfidence ?? 1.0;
+    // A missing confidence is below threshold, never a perfect 1.0 (WP37); a missing lastVerifiedAt already reads expired.
+    const cumulativeConfidence = request.trustContext.cumulativeConfidence ?? 0;
     const UNCERTAINTY_THRESHOLD = 0.6; // Below 60% cumulative confidence = defer to human
     const uncertaintyAcceptable = cumulativeConfidence >= UNCERTAINTY_THRESHOLD;
     if (!uncertaintyAcceptable) {

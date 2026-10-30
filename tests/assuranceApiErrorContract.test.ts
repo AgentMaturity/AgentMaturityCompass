@@ -16,6 +16,7 @@ const bodyRoutes = [
   ["/api/v1/assurance/fp/resolve", "fp resolve failed"],
   ["/api/v1/assurance", "invalid request"]
 ] as const;
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
 
 async function requestError(pathname: string, input: { body: string } | { error: unknown }) {
   // Exercise the actual body reader before any control-plane or provider operation.
@@ -44,9 +45,12 @@ async function requestError(pathname: string, input: { body: string } | { error:
   const handled = await handleAssuranceRoute(pathname, "POST", req, res);
   expect(handled).toBe(true);
   expect(statuses).toHaveLength(1);
-  expect(headers).toEqual([{ "Content-Type": "application/json" }]);
   expect(bodies).toHaveLength(1);
-  return { status: statuses[0], body: JSON.parse(bodies[0]!) };
+  // P1-55: every error carries one request id, in the body and the header.
+  const { requestId, ...body } = JSON.parse(bodies[0]!) as { requestId?: string };
+  expect(requestId).toMatch(UUID);
+  expect(headers).toEqual([{ "Content-Type": "application/json", "X-Request-Id": requestId }]);
+  return { status: statuses[0], body };
 }
 
 describe.each(bodyRoutes)("assurance body-error contract: %s", (pathname, fallback) => {

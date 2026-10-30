@@ -1,0 +1,79 @@
+{
+  "measured": "the installed Claude Code PreToolUse control handler (node + dist/adapters/hookForwarder.js) spawned against a loopback Bridge, 200 allowed Read calls; dist-only script, same measurement as the conformance latency case",
+  "final": {
+    "commit": "c8a9907b4a8d3faea5c2953cbcbb3444cd07c0a4",
+    "macos": {
+      "platform": "darwin-arm64",
+      "node": "v22.23.3",
+      "cpus": 12,
+      "loadavg": [
+        24.6,
+        19.53,
+        21.44
+      ],
+      "n": 200,
+      "allowed": 200,
+      "p50": 681.5,
+      "p95": 1249.3,
+      "min": 494.4,
+      "max": 1861.6,
+      "failures": []
+    },
+    "linux": {
+      "platform": "linux-arm64",
+      "node": "v22.23.3",
+      "cpus": 4,
+      "loadavg": [
+        1.43,
+        0.88,
+        0.39
+      ],
+      "n": 200,
+      "allowed": 200,
+      "p50": 1322.2,
+      "p95": 2727.4,
+      "min": 789.3,
+      "max": 3989.3,
+      "failures": []
+    },
+    "note": "host load average 17-28 from other work; the Linux arm64 container runs in a colima VM (4 vCPU) on the same host, offline (--network none), reusing a local image's Linux node_modules"
+  },
+  "earlierLowerLoad": {
+    "commit": "16df8e390 (before the single-allow forwarder)",
+    "macos": {
+      "platform": "darwin-arm64",
+      "node": "v22.23.3",
+      "cpus": 12,
+      "loadavg": [
+        15.25,
+        10.58,
+        9.58
+      ],
+      "n": 200,
+      "allowed": 200,
+      "p50": 566,
+      "p95": 680.1,
+      "min": 433.8,
+      "max": 848.4,
+      "failures": []
+    },
+    "linux": {
+      "platform": "linux-arm64",
+      "node": "v22.23.3",
+      "cpus": 4,
+      "loadavg": [
+        1.07,
+        0.53,
+        0.21
+      ],
+      "n": 200,
+      "allowed": 200,
+      "p50": 670.3,
+      "p95": 767.8,
+      "min": 531.8,
+      "max": 1027,
+      "failures": []
+    }
+  },
+  "target": "50 ms p95 authorization overhead: not met"
+}

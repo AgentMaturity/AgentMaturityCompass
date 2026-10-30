@@ -5,7 +5,7 @@ import { exceptionRefSchema, isoTimeSchema, nonEmpty } from "./common.js";
 const { applicability, evidence, enforcement, review } = statusDimensionsSchema.shape;
 
 /** The five status dimensions of P0-08, with "`pass` needs applicable and sufficient evidence" in the shape itself. */
-const dimensionsSchema = z.discriminatedUnion("result", [
+export const controlDimensionsSchema = z.discriminatedUnion("result", [
   z.strictObject({
     result: z.literal("pass"),
     applicability: z.strictObject({ state: z.literal("applicable") }),
@@ -23,7 +23,7 @@ export const controlResultV1Schema = z.strictObject({
   controlId: nonEmpty,
   controlVersion: nonEmpty,
   evaluatedAt: isoTimeSchema,
-  dimensions: dimensionsSchema,
+  dimensions: controlDimensionsSchema,
   claimKind: claimKindSchema,
   evidenceRefs: z.array(nonEmpty),
   exceptions: z.array(exceptionRefSchema),

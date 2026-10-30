@@ -1,0 +1,6 @@
+     × forged first-key statement signed by the new key only is refused 6ms
+     × a statement for artifact-seal is not accepted for receipt 1ms
+     × duplicate JSON keys are refused 1ms
+     × non-canonical base64 signature text is refused 1ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  4 failed (4)

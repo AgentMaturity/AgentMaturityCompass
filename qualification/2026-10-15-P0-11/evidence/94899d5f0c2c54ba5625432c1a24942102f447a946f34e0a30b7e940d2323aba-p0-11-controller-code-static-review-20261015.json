@@ -1,0 +1,103 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-11",
+  "reviewer": "/root/p0_22_report_audit/p024_packet_meaning",
+  "capturedUtc": "2026-10-15T06:36:16.711359+00:00",
+  "scope": "Independent full static code review of prepared controller only; future measured setup and actual runtime are outside this review.",
+  "decision": "NO_BLOCKING_STATIC_CODE_FINDINGS",
+  "findings": [],
+  "blockingFindings": [],
+  "controller": {
+    "path": "/private/tmp/p0-11-causal-controller-prepared-20261015.py",
+    "bytes": 28317,
+    "sha256": "5c1981f23721d88c490c80f2e6c1f2324898f3f7acee719c8ece8c8c1f90e878"
+  },
+  "preparationNote": {
+    "path": "/private/tmp/p0-11-causal-controller-preparation-20261015.json",
+    "bytes": 7822,
+    "sha256": "5b08820a38a84f6edf63ad922a315852e661ae89f544f74e8b78193f1fbe0605"
+  },
+  "reusedController": {
+    "path": "/private/tmp/p0-45-causal-controller-prepared-20261015.py",
+    "bytes": 22514,
+    "sha256": "9479a7a7186ce97e740dad14fda9c0244f3f3173d8d41a30b659de8e5e40e192"
+  },
+  "exactPlan": {
+    "path": "/private/tmp/p0-11-causal-readonly-plan-20261015.json",
+    "bytes": 47054,
+    "sha256": "154463c7ef958626a2fc7c2426343abd5184fddf8b754c9088ff07abbbd2e1b3"
+  },
+  "recipeReview": {
+    "path": "/private/tmp/p0-11-recipes-static-review-20261015.json",
+    "bytes": 21585,
+    "sha256": "b7619c6e45d47c4782a6cd7be7607f4debc8a8180c649aa16e99a8b7a9b7b278"
+  },
+  "checks": {
+    "threeExactRecipes": "proposal_data seals frozen plan hash and exact ordered C1/C2/L1 ID,target,baseline,anchor,mutant hash and selected corpus.",
+    "actualOriginalBindings": "Both map and recording original raw report pins must be exact, green7, correct root-relative file, no file diagnostics, unique actual file/title registrations and identity-manifest equality.",
+    "caseClassification": "Exact selected7 raw/observer membership/state/messages, hook/nonbody/unhandled/pending/todo/late gates and normal0/1.",
+    "C2SpecificError": "OnlyC2mutant, toolEvidenceRecording namedleaf title, exactError/message, originalcallback202/await206/record306 in observer and raw. No newthrow-frame assumption or genericError allowance.",
+    "conservativeFrameBoundary": "If actual original stack serialization lacks any required reviewed frame, phase stops incomplete. No runtime evidence that these frames are present is claimed here.",
+    "survivorsAndMeaning": "All-green mutant is survivor. ExactError/bodyAssertion classes retained separately; later semantic attribution remains. L1diagnostic is not invalid-map admission.",
+    "sourcePreservation": "Future8362tracked+4529compiled=12891 maps and explicit borrowed link/native identity/immutable pins; phase-specific one-source delta only.",
+    "release": "Nine hash bindings includingcase-identities plus exactsetup/index/controller/root/copy/control paths and START_P011_CAUSAL_<id>.",
+    "process": "Owned session,420s wait/no terminating signal,5s50ms signal0positiveESRCH,wx artifacts/once-per-control starts.",
+    "environment": "Seven-key explicit allowlist and legacyAMC_P021_RUNTIME_OBSERVER_PATH; no original deadline/config/helper/assertion change.",
+    "uncertainty": "ACTIVE/HALTED retained, no automatic signal/retry/cleanup/exception restoration; exact mutant hash and normal group-absent completion before restore.",
+    "limits": "Source-only no compiler/dist/import rewrite, nested-savepoint rather than universal outercommit, no fullsuite/isolation/native-load/formal ownership clearance."
+  },
+  "futureSetupPrerequisites": [
+    "Actual original map7 and recording7 closed raw pins and grouped identities.",
+    "Complete measured8362/4529/12891 manifests, independent physical identities, onlyexplicit node_modules borrowed link.",
+    "Actual current native fingerprint and exact native/helper/plan/reservation input pins.",
+    "Sealed setup/index and independently reviewed executing controller copy/proposal/reporter.",
+    "Exact9hash control release; no release is supplied by this code review."
+  ],
+  "futureFields": {
+    "setup": [
+      "parentSource",
+      "productionSource",
+      "parentRoot",
+      "closureRoot",
+      "trackedCopied",
+      "compiledCopied",
+      "totalPhysicalCopied",
+      "originalCasesByCorpus",
+      "frozenOwnInputs",
+      "noMutantWritten",
+      "testExecutionPerformed"
+    ],
+    "proposal": [
+      "causalPlan",
+      "corpora",
+      "staticExpectedCasesByCorpus",
+      "originalReportPins",
+      "recipes"
+    ],
+    "identityKeys": [
+      "map",
+      "recording"
+    ],
+    "expectedSource": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+    "productionCodeSource": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+    "copiedTracked": 8362,
+    "copiedCompiled": 4529,
+    "copiedTotal": 12891
+  },
+  "performed": {
+    "fullCodeAndNoteRead": true,
+    "targetImportedParsedSyntaxCompiledExecuted": false,
+    "productRuntimeTestsFingerprintBuildInstall": false,
+    "copySetupMutantOrReleaseCreated": false,
+    "sourceGitProducerChanges": false,
+    "writes": "Only NEW code-static-review JSON/MD pair."
+  },
+  "formalAcceptanceClosed": false,
+  "runtimeAuthorizationProvided": false,
+  "allReadsFinished": true,
+  "markdown": {
+    "path": "/private/tmp/p0-11-controller-code-static-review-20261015.md",
+    "bytes": 4118,
+    "sha256": "7c337761b5d9dae852ec2f75e42959f350e624778b8878162dfe3e48578b7413"
+  }
+}

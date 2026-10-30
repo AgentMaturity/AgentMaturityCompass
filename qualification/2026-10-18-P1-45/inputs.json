@@ -1,0 +1,40 @@
+{
+ "schema": "amc.p1-45.inputs/1",
+ "purpose": "Identifies the round-2 framework research the clause-level controls were applied from. The controls are hand-maintained since P1-45; the generator that read these files is not carried, because it read a research tree that is in no branch.",
+ "inputs": {
+  "dora": {
+   "mappingJsonSha256": "cd851f95d2bf689109142bc69dd61b06d85353999a94299f260b99d8aea50a57",
+   "reviewJsonSha256": "8be965e61568ed11885c2ff460f7988240ddad7ea9663069b6e733c785199777",
+   "controlsFile": "src/compliance/frameworks/controls/dora.ts"
+  },
+  "nis2": {
+   "mappingJsonSha256": "e5ac7980b1eec94fa5254824f9946b2d238fac306f3adc544df4e1e43e64945c",
+   "reviewJsonSha256": "6d5c2cbac214576b841e4f97f9433add89ba361a37f36e5d5fb6c4aa33e62279",
+   "controlsFile": "src/compliance/frameworks/controls/nis2.ts"
+  },
+  "nist-ai-600-1": {
+   "mappingJsonSha256": "0564cb632f1c989297bfa94fda73f639ecbe3a510c2f927c0125f179008e4aec",
+   "reviewJsonSha256": "87dc69f0a664d21d65e8e238b5edf12eeb27427743f65eeb34c136a23afff30a",
+   "controlsFile": "src/compliance/frameworks/controls/nistAi600_1.ts"
+  },
+  "us-state-ai-laws": {
+   "mappingJsonSha256": "110e3b252944e3833f72ac88076bfe46611531e0a3d804c440b548ec87eb04a9",
+   "reviewJsonSha256": "5528a06f80ceadb5502bf13bb4c386a5c5a1111d95f82ff2ee351a6994591ed1",
+   "controlsFile": "src/compliance/frameworks/controls/usStateAiLaws.ts"
+  },
+  "hhs-onc-fda": {
+   "mappingJsonSha256": "51ac744188bdb63be9f4d3960dc94e6488831832881a263b337fc0c57229b963",
+   "reviewJsonSha256": "7aeeddd00ef4716771409cd675773b49f8cb7eab1380756e62503c5508abe7b3",
+   "controlsFile": "src/compliance/frameworks/controls/hhsHti1Hipaa.ts"
+  }
+ },
+ "source": "sha256 values copied from the round-2 apply receipt counts.json (git blob ebe940b5e5f306b67a6a3d06448b4651005ecddc, sha256 e44cc0b7a75285b86ea4e92c8f0c1065d9f9952226dc057e2dd98534a0ffe823, force-added on candidate 37c1466b). Re-hashed on 2026-10-18 from the research files on this machine: all ten match.",
+ "notApplied": {
+  "iso-42005-42006": {
+   "mappingJsonSha256": "7d723ce382ad6a9b415239491182045eec925aae93445bd7ed091d3f60e87464",
+   "reviewJsonSha256": "472aea2da057165de739a3afd54c7b7e7fd65ea289f410db611572b6d61a7fb8",
+   "why": "descoped by the 2026-10-04 root ruling: iso.org unreachable, no row verified"
+  }
+ },
+ "transform": "P1-45 converted each link's coverage to relation 'partial' with a rationale (172 from the research notes, 167 drafted from the mapping's evidence and the clause's gap notes, 2 written in review), applied the review corrections in review.json, and replaced the generated-file headers."
+}

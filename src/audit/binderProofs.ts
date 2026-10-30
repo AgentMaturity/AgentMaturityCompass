@@ -17,17 +17,6 @@ export function buildBinderProofs(params: {
   });
 }
 
-export function writeBinderProofFiles(params: {
-  outDir: string;
-  bundle: BenchProofBundle;
-}): {
-  proofIds: string[];
-  transparencyRootSha256: string;
-  merkleRootSha256: string;
-} {
-  return writeBenchProofFiles(params);
-}
-
 export function verifyBinderProofs(bundle: BenchProofBundle): {
   ok: boolean;
   errors: string[];

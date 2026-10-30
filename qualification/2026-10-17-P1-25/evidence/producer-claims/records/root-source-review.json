@@ -1,0 +1,31 @@
+{
+  "schema": "p125pc-root-source-actual-review/1",
+  "at": "2026-10-17T01:53:45.578990+00:00",
+  "tests": {
+    "total": 24,
+    "passed": 24,
+    "failed": 0,
+    "skipped": 0
+  },
+  "rawObserverOrderedJoin": true,
+  "threeHookEntriesFourValuesPass": true,
+  "allTwelveNormalChecks0": true,
+  "producerTwoActualQueryBoundProofsAndStoredClaimsAccepted": true,
+  "producerStages": [
+    "first-checkpoint",
+    "backdated-appended",
+    "postdated-appended",
+    "second-checkpoint"
+  ],
+  "actualPublicCounts": {
+    "grantPublicCount": 7,
+    "checkpointPublicCount": 5,
+    "children": 46,
+    "explicitChildStreamHashCount": 92,
+    "closedSockets": 12,
+    "closedLedgerOwners": 38
+  },
+  "all175ActivePhysicalAnd12OldNativePinsExactAfterBuild": true,
+  "qualityRedUnchangedUnwaived": true,
+  "noFreshControlOrSourceCommitCreditYet": true
+}

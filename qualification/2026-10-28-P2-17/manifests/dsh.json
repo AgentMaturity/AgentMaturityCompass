@@ -1,0 +1,36 @@
+{
+  "schema": "amc.adapter-claim-manifest/v1",
+  "adapter": "dsh",
+  "harness": {
+    "package": "@deepseek-ai/dsh",
+    "versions": [],
+    "commit": "c389f96bf3a9b6807cb71ed6bdad5849be0df6d8"
+  },
+  "hooks": [
+    {
+      "name": "launch (process boundary)",
+      "role": "observe",
+      "tools": [],
+      "onFailure": "unknown",
+      "source": "docs/adapters/deepseek-harness.md",
+      "cases": []
+    },
+    {
+      "name": "gateway (model traffic)",
+      "role": "observe",
+      "tools": [],
+      "onFailure": "unknown",
+      "source": "docs/adapters/deepseek-harness.md",
+      "cases": []
+    }
+  ],
+  "notCovered": [
+    "every DSH tool call: AMC's plugin, Bridge provider, session registration and installer exist, but no DSH version is qualified and the pinned DSH 0.2.1-rc.2 (pre-release, pending Sid's acceptance) has no recorded run, so the Bridge denies every DSH call and nothing is claimed; see docs/source-reviews/P2-17-dsh-plugin.md",
+    "DSH sessions that did not load the plugin (an unresolvable plugin entry is skipped, not fatal)",
+    "DSH's own sandbox and approval settings (AMC does not rely on them)",
+    "custom plugins, changed profiles and direct web requests outside the gateway",
+    "the exec-by-path window after the last launcher hash"
+  ],
+  "qualifiedAt": null,
+  "receipt": null
+}

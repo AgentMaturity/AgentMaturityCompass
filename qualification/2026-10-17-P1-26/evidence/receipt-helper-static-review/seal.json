@@ -1,0 +1,57 @@
+{
+  "schema": "p126-receipt-helper-static-review-seal/1",
+  "at": "2026-10-16T20:49:44.462503+00:00",
+  "blockers": [],
+  "inputCount": 12,
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/receipt-helper-static-review/README.md",
+      "bytes": 1728,
+      "sha256": "4db1d80de1416ea5220aee5499e3273f5717d54804dabb10d59868d8d23852e4",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/receipt-helper-static-review/README.md",
+      "dev": 16777231,
+      "inode": 543407842,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/receipt-helper-static-review/review.json",
+      "bytes": 7008,
+      "sha256": "b0ab9a81e6aa90d6a717cbbc6c448cf5be1de0e56251064068b8ec0b7a4e47b3",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/receipt-helper-static-review/review.json",
+      "dev": 16777231,
+      "inode": 543407841,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/receipt-helper-static-review/check-preservation.py.adaptation.patch",
+      "bytes": 2248,
+      "sha256": "ecc7a55a7fb5f38109f63f7f692a3eca688e1710a4588efdecf6f278ae54eb32",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/receipt-helper-static-review/check-preservation.py.adaptation.patch",
+      "dev": 16777231,
+      "inode": 543407839,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/receipt-helper-static-review/assemble-receipt.py.adaptation.patch",
+      "bytes": 1481,
+      "sha256": "2ad21b1f922557d8c6faf5c0e4558690d89bcd93ced56b769d082f854bf4aeb0",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/receipt-helper-static-review/assemble-receipt.py.adaptation.patch",
+      "dev": 16777231,
+      "inode": 543407840,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/receipt-helper-static-review/input-pins.json",
+      "bytes": 4655,
+      "sha256": "5f5708492763276677577129cb34bc983e80d91f4b35f82cd0e0f267b8c272dd",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/receipt-helper-static-review/input-pins.json",
+      "dev": 16777231,
+      "inode": 543407843,
+      "nlink": 1
+    }
+  ],
+  "allPinsRechecked": true,
+  "helpersExecuted": false,
+  "futureBindingOrPacketValidated": false,
+  "privateOnly": true
+}

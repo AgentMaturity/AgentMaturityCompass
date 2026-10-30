@@ -1,0 +1,98 @@
+{
+  "at": "2026-10-16T20:04:09.556966+00:00",
+  "paths": [
+    "README.md",
+    "CONTRIBUTING.md",
+    "website/index.html",
+    "website/lite.html",
+    "website/i18n.js",
+    "docs/content/show-hn-draft.md",
+    "docs/content/reddit-launch-drafts.md",
+    "docs/internal/competitive-landscape.md",
+    "docs/internal/mirofish-simulation-council.md",
+    "whitepaper/AMC_WHITEPAPER_v1.md",
+    "tests/policy/compiledPolicyGuard.test.ts"
+  ],
+  "greenChecks": [
+    {
+      "phase": "p112-test-types",
+      "exit": 0,
+      "durationMs": 35285
+    },
+    {
+      "phase": "p112-source-types",
+      "exit": 0,
+      "durationMs": 25154
+    },
+    {
+      "phase": "p112-lint",
+      "exit": 0,
+      "durationMs": 2785
+    },
+    {
+      "phase": "p112-build",
+      "exit": 0,
+      "durationMs": 28896
+    },
+    {
+      "phase": "p112-counts-after",
+      "exit": 0,
+      "durationMs": 483
+    },
+    {
+      "phase": "p112-gates",
+      "exit": 0,
+      "durationMs": 427
+    },
+    {
+      "phase": "p112-threat-model",
+      "exit": 0,
+      "durationMs": 299
+    },
+    {
+      "phase": "p112-architecture",
+      "exit": 0,
+      "durationMs": 1610
+    },
+    {
+      "phase": "p112-docs",
+      "exit": 0,
+      "durationMs": 328
+    },
+    {
+      "phase": "p112-freeze",
+      "exit": 0,
+      "durationMs": 1186
+    }
+  ],
+  "quality": {
+    "duplicates-before": {
+      "exit": 1,
+      "findings": 1268
+    },
+    "duplicates-after": {
+      "exit": 1,
+      "findings": 1268
+    },
+    "dead-code-before": {
+      "exit": 1,
+      "findings": 2724
+    },
+    "dead-code-after": {
+      "exit": 1,
+      "findings": 2723
+    }
+  },
+  "qualityDiagnostic": "quality-delta.json",
+  "removedUnusedExportNowImportedByNewTest": [
+    "[\"src/tools/guards/compiledPolicyGuard.ts\",\"exports\",{\"name\":\"compiledPolicyDenial\"}]"
+  ],
+  "addedDeadCodeFindings": [],
+  "priorPrivateStop": "precommit-assumption-stop.json",
+  "all88ProtectedPinsExact": true,
+  "allOtherAuthoredBytesExact": true,
+  "wholeIssueDone": false,
+  "qualityWaived": false,
+  "baselineAdopted": false,
+  "allHoldsRetained": true
+}

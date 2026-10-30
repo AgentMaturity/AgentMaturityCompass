@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "python3",
+    "-B",
+    "/private/tmp/p1-25-producer-qualification-20261017/check-preservation.py",
+    "before-metadata",
+    "5d4e9e8d74bef32e68090369223947691c5fea21",
+    "/private/tmp/p1-25-producer-qualification-20261017/preservation-before-assembly.json"
+  ],
+  "startedUtc": "2026-10-17T02:18:49.951636+00:00",
+  "endedUtc": "2026-10-17T02:18:50.347287+00:00",
+  "exit": 0,
+  "stdout": "{\"schema\": \"p125pc-root-current-preservation/1\", \"at\": \"2026-10-17T02:18:50.342531+00:00\", \"mode\": \"before-metadata\", \"sourceHead\": \"5d4e9e8d74bef32e68090369223947691c5fea21\", \"all175ActivePhysicalPinsExact\": true, \"other172OriginalAndThreeAdmittedMetadataSuccessorsExact\": false, \"all102SourceFreshPairs23CompiledPairs204DistinctPhysicalFilesExact\": true, \"all13DistinctNativesExact\": true, \"freshCleanIndexEmpty\": true, \"heldR18RowsHeadIndexExact\": true, \"sourceCleanIndexEmptyRequired\": true, \"noUniversalIsolationClaim\": true}\n",
+  "stderr": "",
+  "naturalDirectReturnObserved": true
+}

@@ -2,7 +2,7 @@ import { closeSync, constants, fstatSync, lstatSync, openSync, readSync } from "
 import { join, resolve } from "node:path";
 import YAML from "yaml";
 import { z } from "zod";
-import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { getSigningKey, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
 import { getMode } from "../mode/mode.js";
 import { writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -22,6 +22,8 @@ export interface ProcessorRecordV1 {
   readonly processorId: string;
   readonly legalName: string;
   readonly contracts: readonly ProcessorContractV1[];
+  /** P2-01 destination IDs (.amc/residency/destinations.yaml) this processor operates; only egress there may restore tokens. */
+  readonly destinationIds?: readonly string[];
 }
 
 export interface ProcessorBindingV1 {
@@ -38,6 +40,8 @@ export interface ProcessorRegistryV1 {
   readonly processors: readonly ProcessorRecordV1[];
   readonly purposes: readonly PurposePolicyV1[];
   readonly bindings: readonly ProcessorBindingV1[];
+  /** The purpose every tool call in this workspace serves (P2-02 step 8). Operator data only. Absent: nothing is restorable. */
+  readonly runPurpose?: string;
 }
 
 export type ProcessorRegistryFailure = "workspace_invalid" | "registry_unreadable" | "signature_missing" | "signature_invalid" | "schema_invalid";
@@ -76,14 +80,16 @@ const contractSchema = z.strictObject({ kind: z.enum(["BAA", "DPA", "other"]), r
   if (contract.expires !== null && contract.expires <= contract.effective)
     context.addIssue({ code: "custom", path: ["expires"], message: "expiry must follow effective date" });
 });
-const processorSchema = z.strictObject({ processorId: term, legalName: declaration, contracts: z.array(contractSchema).min(1).max(64) });
+const processorSchema = z.strictObject({ processorId: term, legalName: declaration, contracts: z.array(contractSchema).min(1).max(64),
+  destinationIds: terms.optional() });
 const purposeSchema = z.strictObject({ purposeId: term, allowedDataClasses: classes, allowedTools: terms, allowedProcessors: terms });
 const bindingSchema = z.strictObject({ providerId: term,
   baseUrl: z.string().refine(value => normalizeProcessorRouteBaseUrl(value) !== null).transform(value => normalizeProcessorRouteBaseUrl(value)!),
   processorId: term, purposeId: term });
 
 export const processorRegistrySchema = z.strictObject({ schemaVersion: z.literal("amc.dataflow-processors/v1"), experimental: z.literal(true),
-  processors: z.array(processorSchema).max(256), purposes: z.array(purposeSchema).max(256), bindings: z.array(bindingSchema).max(1024)
+  processors: z.array(processorSchema).max(256), purposes: z.array(purposeSchema).max(256), bindings: z.array(bindingSchema).max(1024),
+  runPurpose: term.optional()
 }).superRefine((registry, context) => {
   const processorIds = registry.processors.map(row => row.processorId);
   const purposeIds = registry.purposes.map(row => row.purposeId);
@@ -91,6 +97,10 @@ export const processorRegistrySchema = z.strictObject({ schemaVersion: z.literal
   for (const [field, ids] of [["processors", processorIds], ["purposes", purposeIds], ["bindings", bindings]] as const) {
     if (new Set(ids).size !== ids.length) context.addIssue({ code: "custom", path: [field], message: "duplicate identity or route binding" });
   }
+  const owned = registry.processors.flatMap(row => row.destinationIds ?? []);
+  if (new Set(owned).size !== owned.length) context.addIssue({ code: "custom", path: ["processors"], message: "a destination has one processor" });
+  if (registry.runPurpose !== undefined && !purposeIds.includes(registry.runPurpose))
+    context.addIssue({ code: "custom", path: ["runPurpose"], message: "unknown run purpose" });
   for (const purpose of registry.purposes) {
     if (purpose.allowedProcessors.some(id => !processorIds.includes(id)))
       context.addIssue({ code: "custom", path: ["purposes"], message: "unknown processor reference" });
@@ -162,6 +172,24 @@ function parse(bytes: Buffer): ProcessorRegistryV1 {
     { maxAliasCount: 0, uniqueKeys: true })));
 }
 
+const optedInRegistries = new Set<string>();
+/**
+ * The P2-02 opt-in, without reading or verifying anything: the registry file or its `.sig` exists (the snapshot below is
+ * `missing` only when neither does). A path that cannot be checked counts as opted in, so it fails closed. Once seen
+ * opted in, a workspace stays opted in for the life of the process, so a session composed before the operator opted in
+ * starts redacting, and removing the registry never stops it; every surface (sessions, the action journal, stored
+ * evidence) then makes the same choice.
+ */
+export function protectedDataOptedIn(workspace: string): boolean {
+  let path: string;
+  try { path = processorRegistryPath(workspace); } catch { return true; }
+  if (optedInRegistries.has(path)) return true;
+  let optedIn: boolean;
+  try { optedIn = present(path) || present(processorRegistrySigPath(workspace)); } catch { optedIn = true; }
+  if (optedIn) optedInRegistries.add(path);
+  return optedIn;
+}
+
 /** Missing, unsigned, broken, or ambiguous data never supplies protected-request permission. */
 export function loadProcessorRegistrySnapshot(workspace: string): ProcessorRegistrySnapshot {
   let path: string;
@@ -193,7 +221,7 @@ export function signProcessorRegistry(workspace: string): string {
     parse(bytes);
     const digestSha256 = sha256Hex(bytes);
     const sigPath = processorRegistrySigPath(root);
-    writeFileAtomic(sigPath, canonicalize({ digestSha256, signature: signHexDigest(digestSha256, getPrivateKeyPem(root, "auditor")),
+    writeFileAtomic(sigPath, canonicalize({ digestSha256, signature: signHexDigest(digestSha256, getSigningKey(root, "config-signature")),
       signedTs: Date.now(), signer: "auditor" }), 0o600);
     return sigPath;
   } catch { throw new ProcessorRegistryError("signing_failed"); }

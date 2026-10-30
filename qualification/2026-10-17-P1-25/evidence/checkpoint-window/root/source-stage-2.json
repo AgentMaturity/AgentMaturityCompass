@@ -1,0 +1,75 @@
+{
+  "at": "2026-10-16T23:35:56.604744+00:00",
+  "ordinaryTrackedRefreshExit": 0,
+  "exact13Paths": [
+    {
+      "relativePath": "README.md",
+      "bytes": 59828,
+      "sha256": "7b19c2b09835977976c5a6f38abff99cbc9b522fdce72dcda45c2c5fef2870e4"
+    },
+    {
+      "relativePath": "CONTRIBUTING.md",
+      "bytes": 16220,
+      "sha256": "a00544afa8dc3271694fed5a7fa6fbf62ec693d5bf2f2053dd00ee94e3a9812e"
+    },
+    {
+      "relativePath": "website/index.html",
+      "bytes": 43520,
+      "sha256": "b1edca14e7b3c0bae53edff70220be007ef5715f1d46d673749517a9cd85b61d"
+    },
+    {
+      "relativePath": "website/lite.html",
+      "bytes": 11197,
+      "sha256": "04b882a274579841f767133444091f1bd08daf2db03658a5b7ddcb735c156d20"
+    },
+    {
+      "relativePath": "website/i18n.js",
+      "bytes": 44169,
+      "sha256": "fda86f006536cb6d6a7d0d7e3cd66fb674dda79a91e0bac8ebc49ba7866e0506"
+    },
+    {
+      "relativePath": "docs/content/show-hn-draft.md",
+      "bytes": 1951,
+      "sha256": "89a709d6036d058230884aad46870641a8cb0e55f06828e2d0d3b6df454518ad"
+    },
+    {
+      "relativePath": "docs/content/reddit-launch-drafts.md",
+      "bytes": 3075,
+      "sha256": "38d8774b93f149f2e697bccc9ff854e941e16d8dab17e4612bc1b21bf008d444"
+    },
+    {
+      "relativePath": "docs/internal/competitive-landscape.md",
+      "bytes": 3880,
+      "sha256": "73076d52e089b9ae7926e5561fd8742be150f295e026f34af07c174a1f9441a2"
+    },
+    {
+      "relativePath": "docs/internal/mirofish-simulation-council.md",
+      "bytes": 2489,
+      "sha256": "a884b11cb23d6eb12ae12a261fa40c4b8f21df1c3e71b60a6e01dde6cbc05ff7"
+    },
+    {
+      "relativePath": "whitepaper/AMC_WHITEPAPER_v1.md",
+      "bytes": 107509,
+      "sha256": "b6fe791cc31d705fc0d4121f95456d5f8ccdf5f25f6276948d5d7354f610b39d"
+    },
+    {
+      "relativePath": "tests/time/tsaGrant.test.ts",
+      "bytes": 2964,
+      "sha256": "c8c8901449610883c5a7a73d6b8f38de65a833824deb912b67c6255d1973caca"
+    },
+    {
+      "relativePath": "tests/time/checkpointWindow.test.ts",
+      "bytes": 22649,
+      "sha256": "fc91661c759c7f46d1450d17cd237a1b848c7cc10ca9742e2b7e6b5ec272ade7"
+    },
+    {
+      "relativePath": "tests/time/tsaTestFixture.ts",
+      "bytes": 24967,
+      "sha256": "f6140366e2f7c4e28a03e5bc3ef6fe372cee81b985357b0921c3df245b5e250c"
+    }
+  ],
+  "allIndexBlobsExact": true,
+  "defaultCachedFullRangeWhitespace0": true,
+  "onlyHelperFinalNewlineSuccessor": true,
+  "noForceOrIgnoreRuleChanges": true
+}

@@ -1,0 +1,43 @@
+{
+  "schema": "p125pc-root-source-prose-peer-adoption/1",
+  "at": "2026-10-17T02:20:13.665103+00:00",
+  "fullPreferredReadmeNew7272PrefixAndHistorical39139SuffixRead": true,
+  "preferredReadmePin": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/final-README-v2.md",
+    "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/final-README-v2.md",
+    "bytes": 46411,
+    "sha256": "5bb1be6b4a3d6f3083e2bb8b710d0ec8d2b176c407a9a9ee9fd30a5640d869ca",
+    "dev": 16777231,
+    "inode": 544002242,
+    "nlink": 1
+  },
+  "wholeIssueGapsPin": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/whole-issue-gaps.json",
+    "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/whole-issue-gaps.json",
+    "bytes": 4548,
+    "sha256": "acc041aa1514efd452fb05f83b6e57f82bedfbc001c773bef4f9205a67253803",
+    "dev": 16777231,
+    "inode": 543998887,
+    "nlink": 1
+  },
+  "independentReviewPin": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/source-evidence-review/review.json",
+    "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/source-evidence-review/review.json",
+    "bytes": 5852,
+    "sha256": "43b11bdfd9c2556cd3f0067d31dfb1f0ab02ec2db0175ff0f5b060baff75bd1c",
+    "dev": 16777231,
+    "inode": 544002902,
+    "nlink": 1
+  },
+  "independentPreferredSealPin": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/source-evidence-review/seal-v2.json",
+    "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/source-evidence-review/seal-v2.json",
+    "bytes": 1450,
+    "sha256": "8fcc7b0c5b674e211ccfd07fb0c4c975d1fe7536d591561da471c066348ea66d",
+    "dev": 16777231,
+    "inode": 544002916,
+    "nlink": 1
+  },
+  "noMaterialFindings": true,
+  "allHoldsQualityRedAndLaterPublicationBoundariesRetained": true
+}

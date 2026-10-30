@@ -5,6 +5,7 @@ import {
   getHookIntegrationStatus,
   type HookIntegrationStatus,
   type HookMode,
+  type HookIntegrationProvider,
   type HookProvider,
 } from "../adapters/hookIntegration.js";
 import { verifyEvidenceEventIntegrity, type EvidenceLedgerReader } from "../ledger/ledger.js";
@@ -36,7 +37,7 @@ export interface HookHealthLastEvent {
 
 export interface HookHealthDiagnostic {
   schemaVersion: "2026-07-13";
-  provider: HookProvider;
+  provider: HookIntegrationProvider;
   agentId: string | null;
   mode: HookMode | null;
   status: HookHealthStatus;
@@ -48,6 +49,8 @@ export interface HookHealthDiagnostic {
     manifestValid: boolean;
     leaseValid: boolean;
     expiresAt: string | null;
+    /** Pi only: the claim AMC may make, from verified session registrations. */
+    governance?: HookIntegrationStatus["governance"];
   };
   evidence: {
     state: "missing" | "verified" | "invalid" | "unavailable";
@@ -104,7 +107,7 @@ function installationReason(state: HookIntegrationStatus["state"]): HookHealthRe
 }
 
 function repairCommands(
-  provider: HookProvider,
+  provider: HookIntegrationProvider,
   state: HookHealthStatus,
   reasons: ReadonlySet<HookHealthReasonCode> = new Set(),
 ): string[] {
@@ -137,6 +140,7 @@ function baseDiagnostic(status: HookIntegrationStatus): Omit<HookHealthDiagnosti
       manifestValid: status.manifestValid,
       leaseValid: status.leaseValid,
       expiresAt: status.expiresTs === null ? null : new Date(status.expiresTs).toISOString(),
+      ...(status.governance ? { governance: status.governance } : {}),
     },
     derivedDiagnostic: true,
     recorded: false,
