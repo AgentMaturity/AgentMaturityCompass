@@ -35,7 +35,7 @@ import {
   CONTROL_HOOK_ROUTE,
   MAX_CONTROL_HOOK_BODY_BYTES,
 } from "./hookControl.js";
-import { handleHookControlRequest } from "./hookControlRoute.js";
+import { handleHookControlRequestAsync } from "./hookControlRoute.js";
 import { guardHookAudit, hookAuditLatchState, latchedMessage } from "./hookAuditLatch.js";
 import { HookControlError, isHookProvider } from "./hookProviders.js";
 import { handleLeasedHookRoute, isLeasedHookPath } from "./leasedHookRoutes.js";
@@ -522,10 +522,10 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
         return true;
       }
       const rawBody = await readBody(options.req, Math.min(options.maxRequestBytes, MAX_CONTROL_HOOK_BODY_BYTES));
-      const controlled = handleHookControlRequest({
+      const controlled = await handleHookControlRequestAsync({
         workspace: options.workspace,
         authenticatedAgentId: auth.payload.agentId,
-        provider, lease: auth.payload,
+        provider, lease: auth.payload, leaseToken: auth.leaseToken,
         rawInput: rawBody.toString("utf8"),
       });
       writeJson(options.res, controlled.idempotentReplay ? 200 : 201, controlled);

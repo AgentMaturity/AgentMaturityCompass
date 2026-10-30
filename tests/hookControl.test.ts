@@ -1,8 +1,13 @@
-import { mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, symlinkSync, unlinkSync, writeFileSync } from "node:fs";
 import { createServer } from "node:http";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { afterEach, describe, expect, test } from "vitest";
+import { afterEach, describe, expect, test, vi } from "vitest";
+import * as auditLatch from "../src/bridge/hookAuditLatch.js";
+import { loadKeyProvider } from "../src/keys/purposeProviders.js";
+import * as approvalEngine from "../src/approvals/approvalEngine.js";
+import { decideApprovalForIntent, verifyApprovalForExecution } from "../src/approvals/approvalEngine.js";
+import { listApprovalRequests, loadApprovalConsumed } from "../src/approvals/approvalChainStore.js";
 import { defaultApprovalPolicy, initApprovalPolicy } from "../src/approvals/approvalPolicyEngine.js";
 import { getHookIntegrationStatus, installHookIntegration, mapProviderHookEvent } from "../src/adapters/hookIntegration.js";
 import { forwardProviderHookControl, forwardProviderHookEvent } from "../src/adapters/hookForwarder.js";
@@ -12,26 +17,31 @@ import { renderProviderControlResponse, validateProviderControlResponse } from "
 import { questionBank } from "../src/diagnostic/questionBank.js";
 import { getAgentPaths } from "../src/fleet/paths.js";
 import { initActionPolicy, defaultActionPolicy } from "../src/governor/actionPolicyEngine.js";
+import * as ledgerApi from "../src/ledger/ledger.js";
 import { hashBinaryOrPath, openLedger, verifyEvidenceEventIntegrity } from "../src/ledger/ledger.js";
 import { verifyReceipt } from "../src/receipts/receipt.js";
 import { getPublicKeyHistory } from "../src/crypto/keys.js";
 import { initWorkspace } from "../src/workspace.js";
 import type { DiagnosticReport } from "../src/types.js";
+import { issueLeaseToken } from "../src/leases/leaseSigner.js";
+import { workspaceIdFromDirectory } from "../src/workspaces/workspaceId.js";
 import { verifyLeaseToken } from "../src/leases/leaseVerifier.js";
 import { canonicalize } from "../src/utils/json.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import { inspectHookActionLifecycle } from "../src/watch/hookActionLifecycle.js";
+import * as claudeProcess from "../src/adapters/hookProviders/claudeCode.js";
 import { claudeActionId } from "../src/adapters/hookProviders/claudeCode.js";
 import { claudeEnvelope } from "../src/adapters/hookProviders/claudeCodePayloads.js";
-import { handleHookControlRequest } from "../src/bridge/hookControlRoute.js";
+import { handleHookControlRequest, handleHookControlRequestAsync } from "../src/bridge/hookControlRoute.js";
 import { getPurposeKeyHistory } from "../src/keys/signingKeys.js";
 import { boundClaudeCode } from "./helpers/claudeCodeHookFixtures.js";
 import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
 
 const roots: string[] = [];
+const actualClaudeHookSources = claudeProcess.claudeSessionHookSources;
 
 function newWorkspace(): string {
-  const workspace = mkdtempSync(join(tmpdir(), "amc-hook-control-"));
+  const workspace = realpathSync(mkdtempSync(join(tmpdir(), "amc-hook-control-")));
   roots.push(workspace);
   process.env.AMC_VAULT_PASSPHRASE = "hook-control-test-passphrase";
   initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
@@ -114,6 +124,9 @@ async function freePort(): Promise<number> {
  * install one bound to this process's Node (the session process the registration checks) and register `sessionId`.
  */
 function claudeControlled(workspace: string, agentId: string, sessionId = "private-session", bridgeBase?: string): void {
+  // These policy tests register their own Node process. OS process inspection has separate security tests.
+  vi.spyOn(claudeProcess, "processExecutable").mockImplementation(pid => pid === process.pid ? realpathSync(process.execPath) : null);
+  vi.spyOn(claudeProcess, "claudeSessionHookSources").mockImplementation(({ pid: _pid, ...input }) => actualClaudeHookSources(input));
   installHookIntegration({ workspace, provider: "claude-code", agentId, mode: "control", claudeCodeInstall: boundClaudeCode(), ...(bridgeBase ? { bridgeBase } : {}) });
   const configDir = join(workspace, ".fixture-home", ".claude");
   mkdirSync(configDir, { recursive: true });
@@ -129,6 +142,7 @@ function claudeRequest(workspace: string, fields: { tool_name: string; tool_use_
 }
 
 afterEach(() => {
+  vi.restoreAllMocks();
   while (roots.length > 0) {
     const root = roots.pop();
     if (root) rmSync(root, { recursive: true, force: true });
@@ -323,8 +337,7 @@ describe("provider-native signed hook control", () => {
     }));
   });
 
-  // P1-23: a provider-local ask is not AMC approval and AMC has no approval path for hook calls, so a write that needs
-  // approval is denied (capability-lossy) for Claude Code too; earlier versions answered Claude Code with a native ask.
+  // A pending engine request denies the provider until its signed grant is consumed on retry.
   test("denies a write that needs approval for Claude Code and Gemini CLI alike instead of a provider-local ask", () => {
     for (const provider of ["claude-code", "gemini-cli"] as const) {
       const workspace = newWorkspace();
@@ -342,10 +355,11 @@ describe("provider-native signed hook control", () => {
           });
       const result = evaluateProviderHookControl({ workspace, authenticatedAgentId: agentId, provider, rawInput });
 
-      expect(result.requestedDecision).toBe("ask");
-      expect(result).toMatchObject({ decision: "deny", effectiveOutcome: "deny", providerMapping: "fail_closed_deny", capabilityLossy: true });
+      expect(result.requestedDecision).toBe("deny");
+      expect(result).toMatchObject({ decision: "deny", effectiveOutcome: "deny", providerMapping: "native", capabilityLossy: false });
+      expect(listApprovalRequests({ workspace, agentId })).toHaveLength(1);
       if (provider === "claude-code") {
-        expect(result.reason).toContain("A Claude Code ask is not AMC approval");
+        expect(result.reason).toContain("AMC approval pending:");
         expect(result.providerResponse).toMatchObject({ hookSpecificOutput: { permissionDecision: "deny" } });
       }
       expect(JSON.stringify(result)).not.toContain("PRIVATE");
@@ -353,7 +367,7 @@ describe("provider-native signed hook control", () => {
     }
   });
 
-  test("denies instead of weakening multi-user or distinct-user approval quorum to one native ask", () => {
+  test("raises the exact multi-user and distinct-user quorum instead of weakening it to one native ask", () => {
     const workspace = newWorkspace();
     const agentId = "quorum-writer";
     installObservedRun(workspace, agentId);
@@ -378,7 +392,8 @@ describe("provider-native signed hook control", () => {
 
     expect(result.requestedDecision).toBe("deny");
     expect(result.decision).toBe("deny");
-    expect(result.reason).toContain("cannot be reduced to one provider-local ask");
+    expect(result.reason).toContain("AMC approval pending:");
+    expect(listApprovalRequests({ workspace, agentId })[0]).toMatchObject({ requiredApprovals: 2, requireDistinctUsers: true });
   });
 
   test("rejects ambiguous and oversized control input before policy evaluation", () => {
@@ -634,4 +649,285 @@ describe("provider-native signed hook control", () => {
       await bridge.close();
     }
   });
+});
+
+
+describe("AXR-22 signed hook approvals", () => {
+  function fixture(provider: "claude-code" | "gemini-cli") {
+    const workspace = newWorkspace(), agentId = `signed-${provider}`;
+    installObservedRun(workspace, agentId);
+    permitReadAndWrite(workspace);
+    if (provider === "claude-code") claudeControlled(workspace, agentId);
+    const fields = { tool_name: "Write", tool_use_id: "toolu_signed_approval",
+      tool_input: { file_path: join(realpathSync.native(workspace), "workspace", "output", "approved.txt"), content: "PRIVATE_APPROVAL_CONTENT" } };
+    const raw = (nonce = "nonce-fixture-000000000000") => provider === "claude-code" ? claudeRequest(workspace, fields, nonce)
+      : JSON.stringify({ hook_event_name: "BeforeTool", tool_name: "write_file", tool_call_id: fields.tool_use_id,
+        session_id: "signed-gemini-session", tool_input: fields.tool_input });
+    const input = () => ({ workspace, authenticatedAgentId: agentId, provider, rawInput: raw() });
+    const requests = () => listApprovalRequests({ workspace, agentId });
+    const decide = (decision: "APPROVED" | "DENIED" = "APPROVED", userId = "reviewer-one") => {
+      const request = requests()[0]!;
+      return decideApprovalForIntent({ workspace, agentId, approvalId: request.approvalRequestId,
+        decision, mode: "EXECUTE", reason: "Reviewed exact hook call", username: userId, userId, userRoles: ["APPROVER"] });
+    };
+    return { workspace, agentId, fields, raw, input, requests, decide };
+  }
+
+  test.each(["claude-code", "gemini-cli"] as const)("%s creates a signed pending request, consumes one grant and refuses replay", (provider) => {
+    const f = fixture(provider), input = f.input();
+    const pending = evaluateProviderHookControl(input);
+    expect(pending.decision).toBe("deny");
+    expect(f.requests()).toHaveLength(1);
+    const request = f.requests()[0]!;
+    expect(pending.reason).toContain(request.approvalRequestId);
+    expect(verifyApprovalForExecution({ workspace: f.workspace, approvalId: request.approvalRequestId,
+      expectedAgentId: f.agentId, expectedIntentId: request.intentId, expectedIntentHash: request.boundHashes.intentHash,
+      expectedToolName: request.toolName, expectedActionClass: request.actionClass })).toMatchObject({ ok: false, status: "PENDING" });
+    expect(verifyProviderHookControlResult({ ...input, result: pending }).ok).toBe(true);
+    f.decide();
+    const approved = evaluateProviderHookControl({ ...input, rawInput: f.raw("nonce-approved-retry-0000") });
+    expect(approved.decision).toBe("allow");
+    expect(loadApprovalConsumed({ workspace: f.workspace, agentId: f.agentId, approvalRequestId: request.approvalRequestId }))
+      .toMatchObject({ executionId: approved.actionId });
+    expect(verifyProviderHookControlResult({ ...input, rawInput: f.raw("nonce-approved-retry-0000"), result: approved }).ok).toBe(true);
+    const replay = evaluateProviderHookControl({ ...input, rawInput: f.raw("nonce-approved-retry-0000") });
+    expect(replay.decision).toBe("deny");
+    expect(replay.reason).toMatch(/consumed|replay/i);
+    expect(f.requests()).toHaveLength(1);
+    const ledger = openLedger(f.workspace);
+    const rows = ledger.getAllEvents().filter(row => JSON.parse(row.meta_json).controlSchemaVersion === 2);
+    expect(rows.filter(row => JSON.parse(row.meta_json).actionId === approved.actionId)).toHaveLength(1);
+    const approvedMeta = JSON.parse(rows.find(row => row.id === approved.eventId)!.meta_json);
+    expect(approvedMeta.approvalRequestIds).toEqual([request.approvalRequestId]);
+    expect(ledger.getAllEvents().map(row => row.meta_json).join("\n")).not.toContain("PRIVATE_APPROVAL_CONTENT");
+    ledger.close();
+  });
+
+  test.each(["claude-code", "gemini-cli"] as const)("%s denies a signed refusal and an expired grant", provider => {
+    const refused = fixture(provider);
+    evaluateProviderHookControl(refused.input());
+    expect(refused.requests()).toHaveLength(1);
+    refused.decide("DENIED");
+    expect(evaluateProviderHookControl(refused.input())).toMatchObject({ decision: "deny", reason: expect.stringContaining("DENIED") });
+    const expired = fixture(provider);
+    evaluateProviderHookControl(expired.input());
+    expect(expired.requests()).toHaveLength(1);
+    expired.decide();
+    const now = vi.spyOn(Date, "now").mockReturnValue(expired.requests()[0]!.expiresTs);
+    try {
+      expect(evaluateProviderHookControl(expired.input())).toMatchObject({ decision: "deny", reason: expect.stringMatching(/expir/i) });
+      expect(loadApprovalConsumed({ workspace: expired.workspace, agentId: expired.agentId,
+        approvalRequestId: expired.requests()[0]!.approvalRequestId })).toBeNull();
+    } finally { now.mockRestore(); }
+  });
+
+  test("binds approval to exact arguments, call, lease and policy", () => {
+    const f = fixture("gemini-cli"), input = f.input();
+    evaluateProviderHookControl(input);
+    expect(f.requests()).toHaveLength(1);
+    f.decide();
+    const differentCall = JSON.parse(input.rawInput);
+    differentCall.tool_call_id = "another-call";
+    expect(evaluateProviderHookControl({ ...input, rawInput: JSON.stringify(differentCall) }).decision).toBe("deny");
+    const changed = JSON.parse(input.rawInput);
+    changed.tool_input.content = "DIFFERENT";
+    expect(evaluateProviderHookControl({ ...input, rawInput: JSON.stringify(changed) }).decision).toBe("deny");
+    expect(evaluateProviderHookControl({ ...input, lease: { leaseId: "different", expiresTs: Date.now() + 60_000 } }).decision).toBe("deny");
+    const policy = defaultApprovalPolicy();
+    policy.approvalPolicy.actionClasses.WRITE_LOW!.ttlMinutes = 20;
+    initApprovalPolicy(f.workspace, policy);
+    expect(evaluateProviderHookControl(input).decision).toBe("deny");
+    expect(loadApprovalConsumed({ workspace: f.workspace, agentId: f.agentId, approvalRequestId: f.requests()[0]!.approvalRequestId })).toBeNull();
+  });
+
+  test("denies if the approval engine cannot create or consume its signed records", () => {
+    const f = fixture("gemini-cli");
+    mkdirSync(join(f.workspace, ".amc", "agents", f.agentId, "approvals"), { recursive: true });
+    writeFileSync(join(f.workspace, ".amc", "agents", f.agentId, "approvals", "requests"), "unavailable");
+    expect(evaluateProviderHookControl(f.input())).toMatchObject({ decision: "deny", reason: expect.stringMatching(/approval.*unavailable/i) });
+  });
+  test.each(["claude-code", "gemini-cli"] as const)("%s routes Bridge approval creation and consumption through async publishers", async provider => {
+    const f = fixture(provider), input = f.input();
+    const creation = vi.spyOn(approvalEngine, "createApprovalForIntentAsync");
+    const consumption = vi.spyOn(approvalEngine, "captureApprovedExecutionConsumptionEntry");
+    const pending = await handleHookControlRequestAsync(input);
+    expect(pending).toMatchObject({ decision: "deny" });
+    expect(f.requests()).toHaveLength(1);
+    f.decide();
+    const approved = await handleHookControlRequestAsync(input);
+    expect(approved, "reason" in approved ? String(approved.reason) : "missing reason").toMatchObject({ decision: "allow" });
+    expect(await handleHookControlRequestAsync(input)).toMatchObject({ decision: "deny" });
+    expect(creation).toHaveBeenCalledTimes(1);
+    expect(consumption).toHaveBeenCalledTimes(1);
+  });
+
+  test("keeps a two-user grant pending until both distinct approvers decide", () => {
+    const f = fixture("gemini-cli"), policy = defaultApprovalPolicy();
+    policy.approvalPolicy.actionClasses.WRITE_LOW!.requiredApprovals = 2;
+    policy.approvalPolicy.actionClasses.WRITE_LOW!.requireDistinctUsers = true;
+    initApprovalPolicy(f.workspace, policy);
+    expect(evaluateProviderHookControl(f.input()).decision).toBe("deny");
+    f.decide();
+    expect(evaluateProviderHookControl(f.input()).decision).toBe("deny");
+    f.decide("APPROVED", "reviewer-two");
+    expect(evaluateProviderHookControl(f.input()).decision).toBe("allow");
+  });
+
+  test("denies if a granted approval cannot publish its consumption", () => {
+    const f = fixture("gemini-cli");
+    evaluateProviderHookControl(f.input());
+    expect(f.requests()).toHaveLength(1);
+    f.decide();
+    const consumed = join(getAgentPaths(f.workspace, f.agentId).rootDir, "approvals", "consumed");
+    rmSync(consumed, { recursive: true, force: true });
+    writeFileSync(consumed, "unavailable");
+    expect(evaluateProviderHookControl(f.input())).toMatchObject({ decision: "deny", reason: expect.stringMatching(/unavailable/i) });
+  });
+
+  test("denies a grant after the Claude call's symlink target changes", () => {
+    const f = fixture("claude-code"), output = join(f.workspace, "workspace", "output");
+    mkdirSync(output, { recursive: true });
+    writeFileSync(join(output, "one.txt"), "one");
+    writeFileSync(join(output, "two.txt"), "two");
+    const link = join(output, "target.txt");
+    symlinkSync(join(output, "one.txt"), link);
+    f.fields.tool_input.file_path = link;
+    expect(evaluateProviderHookControl(f.input()).decision).toBe("deny");
+    expect(f.requests()).toHaveLength(1);
+    f.decide();
+    unlinkSync(link);
+    symlinkSync(join(output, "two.txt"), link);
+    expect(evaluateProviderHookControl(f.input()).decision).toBe("deny");
+    expect(loadApprovalConsumed({ workspace: f.workspace, agentId: f.agentId, approvalRequestId: f.requests()[0]!.approvalRequestId })).toBeNull();
+  });
+
+  test("denies a granted Claude call if its registered session changes", () => {
+    const f = fixture("claude-code");
+    evaluateProviderHookControl(f.input());
+    expect(f.requests()).toHaveLength(1);
+    f.decide();
+    const skill = join(f.workspace, ".claude", "skills", "changed");
+    mkdirSync(skill, { recursive: true });
+    writeFileSync(join(skill, "SKILL.md"), "Changed session skill");
+    expect(evaluateProviderHookControl(f.input()).decision).toBe("deny");
+    expect(loadApprovalConsumed({ workspace: f.workspace, agentId: f.agentId, approvalRequestId: f.requests()[0]!.approvalRequestId })).toBeNull();
+  });
+
+  test.each(["policy", "grant expiry"] as const)("rechecks context after asynchronous consumption returns: %s", async kind => {
+    const f = fixture("gemini-cli"), input = f.input();
+    await handleHookControlRequestAsync(input);
+    expect(f.requests()).toHaveLength(1);
+    f.decide();
+    const capture = approvalEngine.captureApprovedExecutionConsumptionEntry;
+    vi.spyOn(approvalEngine, "captureApprovedExecutionConsumptionEntry").mockImplementation(workspace => {
+      const entry = capture(workspace);
+      return { ...entry, selectGrant(selection, options) {
+        const grant = entry.selectGrant(selection, options);
+        return { ...grant, async consume() {
+          const consumed = await grant.consume();
+          if (kind === "grant expiry") vi.spyOn(Date, "now").mockReturnValue(f.requests()[0]!.expiresTs);
+          else {
+            const changed = defaultApprovalPolicy();
+            changed.approvalPolicy.actionClasses.WRITE_LOW!.ttlMinutes += 1;
+            initApprovalPolicy(workspace, changed);
+          }
+          return consumed;
+        } };
+      } };
+    });
+    expect(await handleHookControlRequestAsync(input)).toMatchObject({ decision: "deny", reason: expect.stringMatching(/context changed/i) });
+  });
+
+  test("rechecks signed policy across a real asynchronous provider Sign", async () => {
+    const f = fixture("gemini-cli"), input = f.input();
+    await handleHookControlRequestAsync(input);
+    expect(f.requests()).toHaveLength(1);
+    f.decide();
+    const provider = loadKeyProvider(f.workspace, "file"), sign = provider.sign.bind(provider);
+    const signing = vi.spyOn(provider, "sign").mockImplementationOnce(async (...args) => {
+      const result = await sign(...args);
+      expect(args[0]).toMatchObject({ provider: "file", id: "artifact-seal" });
+      expect(Buffer.from(args[1])).toHaveLength(32);
+      const policy = defaultApprovalPolicy();
+      policy.approvalPolicy.actionClasses.WRITE_LOW!.ttlMinutes += 1;
+      initApprovalPolicy(f.workspace, policy);
+      return result;
+    });
+    expect(await handleHookControlRequestAsync(input)).toMatchObject({ decision: "deny" });
+    expect(signing).toHaveBeenCalledTimes(1);
+    expect(loadApprovalConsumed({ workspace: f.workspace, agentId: f.agentId, approvalRequestId: f.requests()[0]!.approvalRequestId })).toBeNull();
+  });
+
+  test.each(["lease expiry", "audit latch", "authorization expiry"] as const)("rechecks %s across provider signing", async kind => {
+    const f = fixture(kind === "authorization expiry" ? "claude-code" : "gemini-cli");
+    const expiresTs = Date.now() + 60_000;
+    const input = { ...f.input(), ...(kind === "lease expiry" ? { lease: { leaseId: "lease-signing-test", expiresTs, executeActionClasses: ["WRITE_LOW" as const] } } : {}) };
+    await handleHookControlRequestAsync(input);
+    expect(f.requests()).toHaveLength(1);
+    f.decide();
+    let latched = false;
+    const state = auditLatch.hookAuditLatchState;
+    vi.spyOn(auditLatch, "hookAuditLatchState").mockImplementation(workspace => latched ? { ...state(workspace), latched: true, reason: "owned test latch", latchedAt: null } : state(workspace));
+    const provider = loadKeyProvider(f.workspace, "file"), sign = provider.sign.bind(provider);
+    vi.spyOn(provider, "sign").mockImplementationOnce(async (...args) => {
+      const signed = await sign(...args);
+      if (kind === "audit latch") latched = true;
+      else vi.spyOn(Date, "now").mockReturnValue(kind === "lease expiry" ? expiresTs : Date.now() + 5 * 60_000 + 1);
+      return signed;
+    });
+    expect(await handleHookControlRequestAsync(input)).toMatchObject({ decision: "deny" });
+    expect(loadApprovalConsumed({ workspace: f.workspace, agentId: f.agentId, approvalRequestId: f.requests()[0]!.approvalRequestId })).toBeNull();
+  });
+
+  test("denies when the approval engine reports a lost consumption race", () => {
+    const f = fixture("gemini-cli");
+    evaluateProviderHookControl(f.input());
+    expect(f.requests()).toHaveLength(1);
+    f.decide();
+    vi.spyOn(approvalEngine, "consumeApprovedExecution").mockReturnValue({ consumed: false, replay: true, reason: "another execution consumed the grant" });
+    expect(evaluateProviderHookControl(f.input())).toMatchObject({ decision: "deny", reason: expect.stringMatching(/replay denied/i) });
+  });
+
+  test("refuses an approval-backed allow recovered after a unique writer conflict", () => {
+    const f = fixture("gemini-cli");
+    evaluateProviderHookControl(f.input());
+    expect(f.requests()).toHaveLength(1);
+    f.decide();
+    const open = ledgerApi.openLedger;
+    vi.spyOn(ledgerApi, "openLedger").mockImplementation(workspace => {
+      const ledger = open(workspace), append = ledger.appendEvidenceWithReceipt.bind(ledger);
+      ledger.appendEvidenceWithReceipt = input => {
+        const result = append(input);
+        if (input.meta?.decision === "allow") throw new Error("UNIQUE constraint failed: evidence_events.id");
+        return result;
+      };
+      return ledger;
+    });
+    expect(() => evaluateProviderHookControl(f.input())).toThrowError(expect.objectContaining({ code: "HOOK_CONTROL_REPLAY_CONFLICT", statusCode: 409 }));
+  });
+
+  test("reverifies the broker token before consuming a grant", async () => {
+    const f = fixture("gemini-cli");
+    const issued = issueLeaseToken({ workspace: f.workspace, workspaceId: workspaceIdFromDirectory(f.workspace), agentId: f.agentId,
+      ttlMs: 600_000, scopes: ["hook:control"], routeAllowlist: ["/hooks/control/v1"], modelAllowlist: ["*"],
+      maxTokensPerMinute: 1000, maxRequestsPerMinute: 1000, maxCostUsdPerDay: null, executeActionClasses: ["WRITE_LOW"] });
+    const input = { ...f.input(), lease: issued.payload, leaseToken: issued.token };
+    const pending = await handleHookControlRequestAsync(input);
+    expect(pending).toMatchObject({ decision: "deny" });
+    expect(JSON.stringify(pending)).not.toContain(issued.token);
+    expect(f.requests()).toHaveLength(1);
+    f.decide();
+    expect(await handleHookControlRequestAsync({ ...input, leaseToken: "invalid-broker-token" })).toMatchObject({ decision: "deny" });
+    expect(loadApprovalConsumed({ workspace: f.workspace, agentId: f.agentId, approvalRequestId: f.requests()[0]!.approvalRequestId })).toBeNull();
+    expect(await handleHookControlRequestAsync(input)).toMatchObject({ decision: "allow" });
+  });
+
+  test("denies a signed policy with a missing action-class approval rule", () => {
+    const f = fixture("gemini-cli"), policy = defaultApprovalPolicy();
+    delete policy.approvalPolicy.actionClasses.WRITE_LOW;
+    initApprovalPolicy(f.workspace, policy);
+    expect(evaluateProviderHookControl(f.input())).toMatchObject({ decision: "deny", reason: expect.stringMatching(/no rule/i) });
+    expect(f.requests()).toHaveLength(0);
+  });
+
 });

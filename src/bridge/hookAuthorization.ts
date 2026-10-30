@@ -54,6 +54,7 @@ function bindHookAuthorization(input: {
   lease?: HookLease;
   actionId: string;
   parentActionId: string | null;
+  approvalRequestIds?: readonly string[];
   idempotencyKey: string;
   toolName: string;
   actionClass: ActionClass;
@@ -63,7 +64,8 @@ function bindHookAuthorization(input: {
     token: input.actionId, callId: input.actionId, rootCallId: input.parentActionId ?? input.actionId,
     parentToken: input.parentActionId, name: input.toolName, agentId: input.agentId, workspace: input.workspace,
     actionClass: input.actionClass, requestedMode: "EXECUTE", effectiveMode: "EXECUTE", arguments: input.toolInput,
-  }, { delegation: { depth: 0, parentExecutionId: null, allowedActionClasses: input.lease?.executeActionClasses } });
+  }, { delegation: { depth: 0, parentExecutionId: null, allowedActionClasses: input.lease?.executeActionClasses },
+    authority: { approvalRequestIds: input.approvalRequestIds ?? [] } });
   if (!bound.ok) return { ok: false, reason: `AMC could not bind an authorization record (${bound.failures.join(", ")}): ${bound.reason}` };
   const lease = input.lease;
   const named = lease?.principal ? leasePrincipal(input.workspace, lease) : null;
@@ -151,6 +153,7 @@ export function authorizeHookDecision<R extends { decision: string; reason: stri
   toolInput: Readonly<Record<string, unknown>>;
   ledger: Parameters<typeof piSessionRegistration>[0];
   requested: R;
+  approvalRequestIds?: readonly string[];
   now: number;
 }): { requested: R; authorization: HookAuthorization | null; enforced: boolean; version: string | null } {
   const { call } = input;

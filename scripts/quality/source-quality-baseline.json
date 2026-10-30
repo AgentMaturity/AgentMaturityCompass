@@ -865,7 +865,6 @@
     {"id":"d8ebc0c432d6d353bb9493d8c19b51e6c42176316bcf27ca1c46a13f4b2f2d87","paths":["terminal/nativePtyTerminal.ts","terminal/pipeTerminal.ts"],"format":"typescript"},
     {"id":"d9166c1e64b1644077bac75b2cba108b2213eb673a75f15d4a7a32b87344b136","paths":["bridge/hookControl.ts","bridge/hookControl.ts"],"format":"typescript"},
     {"id":"d94cc1373fe1d5b2dfadf06e89259d5d52952b34762e217c7eae8e788312d18b","paths":["diagnostic/questionScoreExplainability.ts","diagnostic/questionScoreExplainability.ts"],"format":"typescript"},
-    {"id":"d9cece4905d7822d28eaf2a4e8df5c015303daee60959a24481560850ffaa6de","paths":["bridge/hookControl.ts","bridge/hookControl.ts"],"format":"typescript"},
     {"id":"d9fab1037d40297cbb8d36d149a48e8e77ebd122c64cec81ae02342d29dfbcb1","paths":["dataflow/processorRegistry.ts","residency/destinationRegistry.ts"],"format":"typescript"},
     {"id":"da00a4d6ce541025b2e67db4c3652fbbe2d769ad59c8c1ad181caee458318b7f","paths":["diagnostic/questionScoreExplainability.ts","diagnostic/questionScoreExplainability.ts"],"format":"typescript"},
     {"id":"da199019570c8a0498797255b5b0bb1d043ca369fd878d7b3b10f25394219887","paths":["studio/studioServer.ts","studio/studioServer.ts"],"format":"typescript"},
@@ -1431,7 +1430,6 @@
     {"id":"2b74b7ed859acbe9b763dc1aeb2b695e801e19b465268c1154f601967041da79","file":"src/forecast/forecastEngine.ts","kind":"exports"},
     {"id":"2b77842929563cb3fd212440684e9b3689e12d41e215da67ec03c936c93e6220","file":"src/steer/index.ts","kind":"types"},
     {"id":"2b93c379c0605479feb22ae7e13fe25d66572c9dd8a1836ed8030c38b4c8ba15","file":"src/assurance/indices.ts","kind":"types"},
-    {"id":"2b9b3ce21164925cbf4ebbf484c6cad19dace4340cd85c619cc9cd171b146ecd","file":"src/approvals/approvalEngine.ts","kind":"exports"},
     {"id":"2ba5eeb7dc26afba3d78ed5d2ad2c2042d43af30a73b31df9374b18e0f46d002","file":"src/benchmarks/replayBenchmarkCorpus.ts","kind":"types"},
     {"id":"2bb00985364daaf33c95362dd28af3c2cacb0f9895cf50283b0d60c9356ae08e","file":"src/product/index.ts","kind":"exports"},
     {"id":"2bb856728e0fc4404636279eab440ada5e48efbabce546efd389fec42e5e3a31","file":"src/bench/benchPolicyStore.ts","kind":"exports"},
@@ -3893,7 +3891,11 @@
     {"id":"8d28a2f9bb2b5f0ceb8e679228555c006594c3e905745b1eceb88e1020834fb2","scan":"dead-code","reason":"Codex WP21b: retain public NativeMcpStdioServer API type; the new ACP namespace test changes the Knip namespace fingerprint, not the supported API.","acceptedBy":"AgentMaturity","date":"2026-10-30"},
     {"id":"b2b26b14ffe2a71a4befe47f426c44844d8273bc3b950a1d92b73bc37d5ee71a","scan":"dead-code","reason":"Codex WP21b: retain public NativeMcpMountReceipt API type for native MCP consumers; namespace-test fingerprint drift does not justify deleting the receipt contract.","acceptedBy":"AgentMaturity","date":"2026-10-30"},
     {"id":"da6ca4117872e89c6c91e86a25807f8099dacf8a6d2703f3b419314d5cd27677","scan":"duplicates","reason":"Codex WP21b: retain strict version-local Gemini schema and tool-choice validation in frozen text/image v1 and audio v2; provider wire alias calculation already uses the shared mapper.","acceptedBy":"AgentMaturity","date":"2026-10-30"},
-    {"id":"f7448cbd4848794e55089c832f3ce4b26a25b33a6b9f23992b52cf3bae881808","scan":"duplicates","reason":"Codex WP21b: retain strict provider-local DeepSeek and Ollama historical-part key allowlists; admitting verified wire provenance updates existing clone fingerprints without coupling protocol evolution.","acceptedBy":"AgentMaturity","date":"2026-10-30"}
+    {"id":"f7448cbd4848794e55089c832f3ce4b26a25b33a6b9f23992b52cf3bae881808","scan":"duplicates","reason":"Codex WP21b: retain strict provider-local DeepSeek and Ollama historical-part key allowlists; admitting verified wire provenance updates existing clone fingerprints without coupling protocol evolution.","acceptedBy":"AgentMaturity","date":"2026-10-30"},
+    {"id":"132335017b42368997dbdb007d1d038f0fd657f29d0e48dae1d3e63055f6a305","scan":"duplicates","reason":"The legacy v1 and current v2 signed control metadata schemas intentionally retain separate version contracts with matching receipt fields; renaming the v2 base changes this existing clone fingerprint.","acceptedBy":"AgentMaturity","date":"2026-10-30"},
+    {"id":"6818ad8a1c7b80a13d9044aee7b78217c0871ecedd9f713f42484fc88431ba67","scan":"dead-code","reason":"Preserve the existing approval-engine hygiene export; the test namespace import for real publisher spies changes Knip classification only.","acceptedBy":"AgentMaturity","date":"2026-10-30"},
+    {"id":"b30e343f11002f96c5d1513fa64012247a08afec9a275e7dad4d429fa0a8022c","scan":"dead-code","reason":"Preserve hookControl public type compatibility after extracting the cohesive policy module; the reason-code type remains re-exported from its original path.","acceptedBy":"AgentMaturity","date":"2026-10-30"},
+    {"id":"dbb25539f745c6aa04fb11b4cac71fd5079160229cd3e159ab967f4f5c651d34","scan":"dead-code","reason":"Preserve hookControl public type compatibility after extracting policy evaluation; compound step consumers may still import the type through its original re-export.","acceptedBy":"AgentMaturity","date":"2026-10-30"}
   ],
   "rebaselines": [
     {"scan":"duplicates","toolFrom":"","toolTo":"5.4.0","configFrom":"","configTo":"b0b0290eb79f02e99c8e4c3e0fea8182d56903f2e2512643a783307dac64e209","added":1254,"reason":"initial baseline (D-11)","rebaselinedBy":"AgentMaturity","date":"2026-10-11"},
