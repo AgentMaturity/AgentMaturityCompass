@@ -6,7 +6,7 @@ import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { generateTrustCertificate, verifyTrustCertificateEnvelope } from "../src/cert/trustCertificate.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import { pinnedTrust, workspaceKeyPem } from "./helpers/trustContext.js";
-import { writeSealedReport } from "./helpers/sealedRun.js";
+import { writeAnchoredRun } from "./helpers/sealedRun.js";
 
 /** The workspace operator pins the auditor key that signs its trust certificates (P0-09). */
 const auditorTrust = (workspace: string) => pinnedTrust([{ publicKeyPem: workspaceKeyPem(workspace, "auditor"), purposes: ["artifact-seal"] }]);
@@ -21,19 +21,21 @@ function newWorkspace(): string {
   return root;
 }
 
-/** Sealed like the runner's runs: since WP37 an unsealed run file is never signed into a certificate. */
+/** Sealed and ledger-anchored like the runner's runs: a certificate signs only the agent's trusted run (WP37, run trust). */
 function writeRun(workspace: string, agentId: string, runId: string, ts: number, integrityIndex: number): void {
-  writeSealedReport(workspace, join(workspace, ".amc", "agents", agentId, "runs"), runId, { runId, ts, integrityIndex });
+  writeAnchoredRun(workspace, join(workspace, ".amc", "agents", agentId, "runs"),
+    { runId, agentId, ts, integrityIndex, windowStartTs: ts - 1000, windowEndTs: ts, status: "VALID" });
 }
 
 function writeEvidenceChain(workspace: string, hashes: Array<{ prev: string; hash: string }>): void {
   const dbPath = join(workspace, ".amc", "evidence.sqlite");
   const db = new Database(dbPath);
   try {
-    db.exec("CREATE TABLE evidence_events (prev_event_hash TEXT NOT NULL, event_hash TEXT NOT NULL)");
-    const stmt = db.prepare("INSERT INTO evidence_events (prev_event_hash, event_hash) VALUES (?, ?)");
+    // The ledger exists already (writeRun anchors the run in it); only the hash-chain columns matter here.
+    const stmt = db.prepare(`INSERT INTO evidence_events (id, ts, session_id, runtime, event_type, payload_sha256, meta_json, prev_event_hash, event_hash, writer_sig)
+      VALUES (?, 0, 'chain', 'unknown', 'test', '', '{}', ?, ?, '')`);
     for (const row of hashes) {
-      stmt.run(row.prev, row.hash);
+      stmt.run(`ev_${row.hash}`, row.prev, row.hash);
     }
   } finally {
     db.close();

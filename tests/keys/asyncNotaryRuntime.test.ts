@@ -25,7 +25,7 @@ import { sha256Hex } from "../../src/utils/hash.js";
 import { AWS_ARN, awsFake, fakeKey } from "./providerFakes.js";
 import { awsKmsProvider, type KmsCall } from "../../src/keys/providers/awsKms.js";
 import { spawnOwnedNode } from "../helpers/ownedNodeGroup.js";
-import { writeSealedReport } from "../helpers/sealedRun.js";
+import { writeAnchoredRun } from "../helpers/sealedRun.js";
 import { getAgentPaths } from "../../src/fleet/paths.js";
 
 const boundary = vi.hoisted(() => ({ call: null as KmsCall | null, syncCalls: 0 }));
@@ -71,7 +71,7 @@ async function api(path: string, body: unknown, root: string, exported = false) 
 }
 
 /** Since WP37 a trust certificate is signed only from a sealed run; seed one sealed with the workspace's own key. */
-const seedSealedRun = (root: string) => { writeSealedReport(root, getAgentPaths(root, "default").runsDir, "seed-run", { runId: "seed-run", ts: 1, integrityIndex: 0.5 }); return root; };
+const seedSealedRun = (root: string) => { writeAnchoredRun(root, getAgentPaths(root, "default").runsDir, { runId: "seed-run", agentId: "default", ts: 1, integrityIndex: 0.5, windowStartTs: 0, windowEndTs: 1, status: "VALID" }); return root; };
 
 test("owned sync bridge denial is effective before a real SDK could load; async production signer never invokes it", async () => {
   const f = await prepared(); expect(() => loadNotarySigner({ notaryDir: f.root, backend: f.config.notary.backend })).toThrow("owned runtime test forbids");

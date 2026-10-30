@@ -3,7 +3,11 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { agentToolset } from "../src/agent/agentToolset.js";
+import { loadAuditMapActive } from "../src/audit/auditMapStore.js";
+import { loadAuditPolicy } from "../src/audit/auditPolicyStore.js";
+import { collectAuditBinderData } from "../src/audit/binderCollector.js";
 import { initBudgets } from "../src/budgets/budgets.js";
+import { generateTrustCertificate } from "../src/cert/trustCertificate.js";
 import { runDiagnostic } from "../src/diagnostic/runner.js";
 import { getAgentPaths } from "../src/fleet/paths.js";
 import { latestRunForAgent, latestTrustedRun, summarizeGovernorInput } from "../src/governor/actionPolicyEngine.js";
@@ -104,7 +108,7 @@ describe("governor run trust", () => {
   it("deleting the newest run file does not roll the gate back to an older passing run", async () => {
     const dir = workspace();
     permitAgentActions(dir, "default");
-    const failing = { ...observedRunReport("default"), runId: "run_newer_failing", ts: Date.now() + 1000, integrityIndex: 0.1, trustLabel: "LOW TRUST" };
+    const failing = { ...observedRunReport("default"), runId: "run_newer_failing", ts: Date.now() + 1000, integrityIndex: 0.1, trustLabel: "LOW TRUST" as const };
     writeSealedRun(dir, failing);
     expect(check(dir).effectiveMode).toBe("SIMULATE");
     rmSync(runPath(dir, "default", "run_newer_failing"));
@@ -121,6 +125,31 @@ describe("governor run trust", () => {
     writeSealedRun(dir, { ...observedRunReport("other-agent"), runId: "run_other_agent", ts: Date.now() + 1000 });
     expect(latestTrustedRun(dir, "default")).toMatchObject({ refusal: null, run: { runId: "run_action_policy_fixture" } });
     expect(check(dir).effectiveMode).toBe("EXECUTE");
+  });
+
+  it("the trust certificate and audit binder refuse a sealed run copied from another agent", async () => {
+    const signCert = (dir: string) => generateTrustCertificate({ workspace: dir, agentId: "default", outputPath: "cert.json", nowTs: Date.now() });
+    const binderText = async (dir: string) => JSON.stringify((await collectAuditBinderData({ workspace: dir, scope: { type: "AGENT", id: "default" },
+      policy: loadAuditPolicy(dir), map: loadAuditMapActive(dir), nowTs: Date.now() })).binder);
+    const control = workspace();
+    installObservedRun(control, "default");
+    expect(signCert(control).envelope.payload.scoreSourceRunId).toBe("run_action_policy_fixture");
+    expect(await binderText(control)).not.toContain("Unverifiable agent diagnostic runs");
+
+    const dir = workspace();
+    installObservedRun(dir, "other-agent");
+    mkdirSync(getAgentPaths(dir, "default").runsDir, { recursive: true });
+    copyFileSync(runPath(dir, "other-agent", "run_action_policy_fixture"), runPath(dir, "default", "run_action_policy_fixture"));
+    expect(() => signCert(dir)).toThrow(/sealed for agent other-agent, not default/);
+    expect(await binderText(dir)).toContain("block the latest result: diagnostic run run_action_policy_fixture is sealed for agent other-agent");
+  });
+
+  it("the trust certificate does not roll back past a deleted newest run", () => {
+    const dir = workspace();
+    installObservedRun(dir, "default");
+    writeSealedRun(dir, { ...observedRunReport("default"), runId: "run_newer_failing", ts: Date.now() + 1000, integrityIndex: 0.1 });
+    rmSync(runPath(dir, "default", "run_newer_failing"));
+    expect(() => generateTrustCertificate({ workspace: dir, agentId: "default", outputPath: "cert.json" })).toThrow(/newer run run_newer_failing/);
   });
 
   it("an honest run written by the runner verifies and is the run the governor uses", async () => {
