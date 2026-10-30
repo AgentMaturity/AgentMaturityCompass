@@ -22,7 +22,7 @@ import { evidenceProducer, effectiveTrustTier, eventMeta, readerTrustFor } from 
 import { runDiagnostic } from "../src/diagnostic/runner.js";
 import { withWorkspaceScope } from "../src/enforce/evidenceEmitter.js";
 import { testIndustryPackLicence } from "./helpers/industryPackLicence.js";
-import { writeSealedReport } from "./helpers/sealedRun.js";
+import { writeAnchoredRun } from "./helpers/sealedRun.js";
 
 /**
  * P0-15: illustrative domain values exist only behind `--example`, stamped
@@ -453,8 +453,10 @@ describe("signing paths refuse a synthetic_example result", () => {
 
   test("amc passport create (createPassportArtifact)", async () => {
     const agentRuns = join(workspace, ".amc", "agents", "example-passport", "runs");
-    // Sealed: since WP37 a passport reads only sealed runs, so the refusal must come from the synthetic content itself.
-    writeSealedReport(workspace, agentRuns, "example-passport-run", { runId: "example-passport-run", agentId: "example-agent", ts: Date.now(), ...EXAMPLE });
+    // Sealed and anchored for this agent: a passport reads only the agent's trusted run, so the refusal must come from
+    // the synthetic content itself.
+    writeAnchoredRun(workspace, agentRuns, { runId: "example-passport-run", agentId: "example-passport", ts: Date.now(),
+      windowStartTs: 0, windowEndTs: 1, status: "VALID", ...EXAMPLE });
     const { defaultPassportPolicy } = await import("../src/passport/passportPolicySchema.js");
     const { savePassportPolicy } = await import("../src/passport/passportStore.js");
     savePassportPolicy(workspace, defaultPassportPolicy());
@@ -464,8 +466,8 @@ describe("signing paths refuse a synthetic_example result", () => {
   });
 
   test("amc audit binder create (auditBinderCreateCli)", async () => {
-    writeSealedReport(workspace, join(workspace, ".amc", "agents", "example-binder", "runs"), "example-binder-run",
-      { runId: "example-binder-run", agentId: "example-agent", ts: Date.now(), ...EXAMPLE });
+    writeAnchoredRun(workspace, join(workspace, ".amc", "agents", "example-binder", "runs"),
+      { runId: "example-binder-run", agentId: "example-binder", ts: Date.now(), windowStartTs: 0, windowEndTs: 1, status: "VALID", ...EXAMPLE });
     const { auditBinderCreateCli } = await import("../src/audit/auditCli.js");
     const { AuditBinderPublicationError } = await import("../src/audit/binderPublication.js");
     // P2-08 reports every binder failure as a publication error; the synthetic refusal is its cause and nothing was published.

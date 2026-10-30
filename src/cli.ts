@@ -98,7 +98,7 @@ import { warnSupersededCommand } from "./cli/deprecatedCommand.js";
 import { commandPath, installClaimLabelHooks } from "./cli/claimLabelHooks.js";
 import {
   aggregateClaim, artifactClaim, assuranceClaim, controlSurfaceClaim, emitClaimResult, executedTestClaim, fleetHealthClaim, latestRunsClaim,
-  latestRunForDisplay, printClaimLegendFooter, printClaimResult, printControlSurfaceSkip, printLabelledReport, printTitledResult, runClaimEnvelope, runIdClaim, selfAnswerClaim,
+  latestRunForDisplay, namedRunForDisplay, printClaimLegendFooter, printClaimResult, printControlSurfaceSkip, printLabelledReport, printTitledResult, runClaimEnvelope, runIdClaim, selfAnswerClaim,
   unverifiedClaim, withClaimFields, withClaimFieldsEach
 } from "./cli/claimOutput.js";
 import { renderDiagnosticReportHtml } from "./cli/reportRenderers.js"; import { emitScoreEvidenceResult } from "./cli/scoreEvidenceOutput.js";
@@ -19169,11 +19169,11 @@ program
     const workspace = process.cwd();
     const agentId = activeAgent(program) ?? "default";
     const currentReport = opts.run && opts.run !== "latest"
-      ? loadRunReport(workspace, opts.run, agentId)
+      ? namedRunForDisplay(workspace, opts.run, agentId)
       : latestRunOrHint(workspace, agentId);
     if (!currentReport) return;
     const previousReport = opts.previousRun
-      ? loadRunReport(workspace, opts.previousRun, agentId)
+      ? namedRunForDisplay(workspace, opts.previousRun, agentId)
       : null;
     const dashboard = opux.generateOperatorDashboard(currentReport, opts.role as typeof validRoles[number], previousReport);
     console.log(opux.renderOperatorDashboardMarkdown(dashboard));

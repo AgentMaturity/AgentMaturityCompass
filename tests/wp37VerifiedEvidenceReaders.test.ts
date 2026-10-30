@@ -16,7 +16,7 @@ import { loadAuditMapActive } from "../src/audit/auditMapStore.js";
 import { assuranceLatestCertificatePath } from "../src/assurance/assurancePolicyStore.js";
 import { writeFileAtomic, ensureDir } from "../src/utils/fs.js";
 import { dirname } from "node:path";
-import { tamperReport, writeSealedReport } from "./helpers/sealedRun.js";
+import { tamperReport, writeAnchoredRun, writeSealedReport } from "./helpers/sealedRun.js";
 
 /** A parsed-but-unverified certificate: the verifier is stubbed only for the certificate-summary test. */
 const certStub = vi.hoisted(() => ({ result: null as null | Record<string, unknown> }));
@@ -81,7 +81,8 @@ describe("WP37 verified run readers", () => {
 
   test("generateTrustCertificate signs the newest sealed run; an older unsigned run does not block, a newer one does", () => {
     const ws = workspace();
-    writeSealedReport(ws, runsDir(ws), "run-1", run("run-1", 1000, 0.5));
+    // Anchored in the ledger as the runner publishes it: the certificate signs only the agent's trusted run.
+    writeAnchoredRun(ws, runsDir(ws), run("run-1", 1000, 0.5) as Parameters<typeof writeAnchoredRun>[2]);
     writeFileSync(join(runsDir(ws), "run-0.json"), JSON.stringify({ ...run("run-0", 500, 0.9), runSealSig: "unsigned" }));
     const out = generateTrustCertificate({ workspace: ws, agentId: "agent-x", outputPath: "cert.json", nowTs: 1_700_000_000_000 });
     expect(out.envelope.payload.scoreSourceRunId).toBe("run-1");

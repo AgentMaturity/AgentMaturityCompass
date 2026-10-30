@@ -20,8 +20,8 @@ export function writeSealedReport(workspace: string, dir: string, name: string, 
  * `writeSealedReport` for a diagnostic run a gate reads (governor, ToolHub, transformation): also anchored in the ledger
  * `runs` table, as the runner publishes it. `anchor: false` leaves a sealed but unrecorded run.
  */
-export function writeAnchoredRun(workspace: string, dir: string, report: { runId: string; windowStartTs: number; windowEndTs: number;
-  targetProfileId?: string | null; status: "VALID" | "INVALID" | "UNSIGNED" }, opts: { anchor?: boolean } = {}): string {
+export function writeAnchoredRun<T extends { runId: string; windowStartTs: number; windowEndTs: number;
+  targetProfileId?: string | null; status: "VALID" | "INVALID" | "UNSIGNED" }>(workspace: string, dir: string, report: T, opts: { anchor?: boolean } = {}): string {
   const file = writeSealedReport(workspace, dir, report.runId, report);
   if (opts.anchor === false) return file;
   const sealed = JSON.parse(readFileSync(file, "utf8")) as { reportJsonSha256: string; runSealSig: string };

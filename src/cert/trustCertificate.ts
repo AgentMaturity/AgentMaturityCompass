@@ -5,7 +5,7 @@ import {
   ensureSigningKeys,
 } from "../crypto/keys.js";
 import { resolveAgentId } from "../fleet/paths.js";
-import { latestVerifiedRun } from "../diagnostic/runReportResolution.js";
+import { latestTrustedRun } from "../governor/actionPolicyEngine.js";
 import type { DiagnosticReport } from "../types.js";
 import { pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -124,11 +124,14 @@ export function deriveIntegrityIndex(report: Partial<DiagnosticReport>): number 
   return 0;
 }
 
-/** The newest run whose seal verifies (WP37): an edited run file must not become a signed score. */
+/**
+ * The agent's trusted run (`latestTrustedRun`: sealed, this agent's, ledger-anchored and its newest ledger run): an
+ * edited, copied or rolled-back run file must not become a signed score. `blocking` holds the refusal, if any.
+ */
 function loadLatestRunSnapshot(workspace: string, agentId: string): RunSnapshot & { blocking: string[] } {
-  const { run: best, blocking } = latestVerifiedRun(workspace, agentId);
+  const { run: best, refusal } = latestTrustedRun(workspace, agentId);
   if (!best) {
-    return { runId: null, runTs: null, runSha256: null, integrityIndex: 0, score0to100: 0, blocking: blocking.map((row) => row.file) };
+    return { runId: null, runTs: null, runSha256: null, integrityIndex: 0, score0to100: 0, blocking: refusal ? [refusal] : [] };
   }
   const integrityIndex = deriveIntegrityIndex(best);
   return {
@@ -302,7 +305,7 @@ function prepareTrustCertificate(input: GenerateTrustCertificateInput) {
   const runSnapshot = loadLatestRunSnapshot(workspace, agentId);
   if (!input.preview && runSnapshot.blocking.length > 0) {
     // Signing the last sealed run here would roll the certificate back past a tampered or unverifiable newer run.
-    throw new Error(`Unverifiable diagnostic run(s) for agent ${agentId} (${runSnapshot.blocking.join(", ")}); refusing to sign a trust certificate from older evidence.`);
+    throw new Error(`Unverifiable diagnostic run for agent ${agentId} (${runSnapshot.blocking.join(", ")}); refusing to sign a trust certificate from older evidence.`);
   }
   if (!input.preview && runSnapshot.runId === null) {
     throw new Error(`No sealed diagnostic run verifies for agent ${agentId}; refusing to sign a trust certificate (use --preview for an unsigned preview).`);

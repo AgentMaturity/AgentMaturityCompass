@@ -5,7 +5,7 @@ import { defaultPromptPolicy, promptPolicySchema } from "../prompt/promptPolicyS
 import { promptPolicyPath } from "../prompt/promptPolicyStore.js";
 import type { LayerScore } from "../types.js";
 import { readUtf8, pathExists } from "../utils/fs.js";
-import { latestVerifiedRun } from "../diagnostic/runReportResolution.js";
+import { latestTrustedRun } from "../governor/actionPolicyEngine.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { loadTrustConfig } from "../trust/trustConfig.js";
@@ -173,9 +173,9 @@ function collectPassportLocalData(params: {
   const truncBytes = params.policy.passportPolicy.privacy.hashTruncBytes;
   const scopeIdHash = hashPassportId(`${scope.type}:${scope.id}`, truncBytes);
 
-  // Only a sealed run is signed into a passport (WP37); none verifies, or a newer/tampered run fails verification →
-  // the null-report path (insufficient evidence), never a rollback to an older sealed run.
-  const report = latestVerifiedRun(params.workspace, scope.agentIdForDiagnostic).run;
+  // Only the agent's trusted run is signed into a passport (WP37, run trust): sealed, this agent's, ledger-anchored and its
+  // newest ledger run. Anything refused takes the null-report path (insufficient evidence), never an older sealed run.
+  const report = latestTrustedRun(params.workspace, scope.agentIdForDiagnostic).run;
   assertNotExample(report, "signed into a passport");
   const trustLabel = mapTrustLabel(report?.trustLabel);
   const integrityIndex = Number((report?.integrityIndex ?? 0).toFixed(4));

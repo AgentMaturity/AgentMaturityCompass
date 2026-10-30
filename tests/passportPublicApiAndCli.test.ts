@@ -19,7 +19,7 @@ import { passportCompareCli, passportShareCli } from "../src/passport/passportCl
 import { defaultPassportPolicy } from "../src/passport/passportPolicySchema.js";
 import { savePassportPolicy } from "../src/passport/passportStore.js";
 import { operatorTrustHome, workspaceKeyPem } from "./helpers/trustContext.js";
-import { writeSealedReport } from "./helpers/sealedRun.js";
+import { writeAnchoredRun } from "./helpers/sealedRun.js";
 
 const roots: string[] = [];
 const previousVaultPassphrase = process.env.AMC_VAULT_PASSPHRASE;
@@ -42,7 +42,11 @@ function writeDiagnosticRun(params: {
 }): void {
   const run = {
     runId: params.runId,
+    agentId: params.agentId,
     ts: params.ts,
+    windowStartTs: params.ts - 1000,
+    windowEndTs: params.ts,
+    status: "VALID" as const,
     trustLabel: "HIGH TRUST",
     integrityIndex: 0.92,
     correlationRatio: 0.9,
@@ -65,8 +69,8 @@ function writeDiagnosticRun(params: {
     }))
   };
   const dir = join(params.workspace, ".amc", "agents", params.agentId, "runs");
-  // Sealed: since WP37 a passport embeds only runs whose seal verifies.
-  writeSealedReport(params.workspace, dir, params.runId, run);
+  // Sealed and ledger-anchored: a passport embeds only the agent's trusted run (WP37, run trust).
+  writeAnchoredRun(params.workspace, dir, run);
 }
 
 function createAgentPassport(workspacePath: string, agentId: string, outName = "latest.amcpass") {
