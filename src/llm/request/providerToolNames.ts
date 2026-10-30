@@ -114,9 +114,9 @@ export function encodeProviderToolNames(request: EncodableRequest, encoderId: To
 
 /** No optimistic admission of unknown future or historical encoder behavior. */
 export function usesProviderToolNames(encoderId: string, version: number): boolean {
-  return (encoderId === "openai-chat" && (version === 3 || version === 4))
-    || (encoderId === "anthropic-messages" && (version === 3 || version === 4))
-    || (encoderId === "openai-responses" && (version === 2 || version === 3))
+  return (encoderId === "openai-chat" && version >= 3 && version <= 5)
+    || (encoderId === "anthropic-messages" && version >= 3 && version <= 5)
+    || (encoderId === "openai-responses" && version >= 2 && version <= 4)
     || (encoderId === "deepseek-chat" && version === 1)
     || (encoderId === "ollama-chat" && version === 1)
     || (encoderId === "gemini-generate-content" && (version === 1 || version === 2))

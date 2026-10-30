@@ -72,7 +72,8 @@ import type { ActionClass } from "../types.js";
 import { createDriverRunner } from "../agent/subagentRunner.js";
 import { COMPOSITION_FAILED } from "../agent/nativeAgentComposition.js";
 import { LeasePrincipalRefused } from "../leases/leasePrincipal.js";
-import { planRequiresPrincipal } from "../tools/guards/compiledPolicyGuard.js";
+import { planRequiresAgentLease, planRequiresPrincipal } from "../tools/guards/compiledPolicyGuard.js";
+import { loadActiveCompiledPolicy } from "../catalog/compiler/activate.js";
 import { refuseRetired } from "../lifecycle/reassessment.js";
 import { admitSessionAtOpen } from "../runtime/changeEnvelope.js";
 import { nativeSessionManifest } from "../lifecycle/versionManifest.js";
@@ -465,6 +466,10 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
   if ((options.schedulePass !== undefined || (options.delegation !== undefined && options.delegation.runner === undefined))
     && options.leaseToken === undefined && planRequiresPrincipal(options.workspace)) {
     throw new LeasePrincipalRefused("the active plan requires a principal for every tool call, and this run holds no lease for its in-process children to inherit; no session was opened");
+  }
+  // AXR-20: refuse a lease-less run with root tools once, before any session row, instead of denying every governed call.
+  if (options.tools !== undefined && options.leaseToken === undefined && planRequiresAgentLease(loadActiveCompiledPolicy(options.workspace))) {
+    throw new Error("IDENTITY_UNRESOLVED: the active plan's identity-binding requires a verified agent lease for every tool call, and this run holds none; no session was opened. Start the task from Studio, or issue a lease with `amc lease issue` and pass it with --lease-file <path> (a private 0600 file).");
   }
   if (options.delegation !== undefined) {
     // An in-process child opens a second session writer; a foreign runner's process opens none here.

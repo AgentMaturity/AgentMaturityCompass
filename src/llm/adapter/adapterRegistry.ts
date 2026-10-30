@@ -28,6 +28,7 @@ import { resolveRetryPolicy } from "../retryPolicy.js";
 import { resolveStreamTimeouts, type LlmStreamTimeouts } from "./streamTimeouts.js";
 import type { LlmAdapter } from "./adapterTypes.js";
 import { snapshotCapabilities, type ProviderCapabilities } from "./providerCapabilities.js";
+import { cacheRetentionEncoderVersion, isCacheRetention, type CacheRetention } from "../request/cacheRetentionEncoders.js";
 import { catalogProtocolForEncoder, createModelMetadataSnapshot, parseModelMetadataSnapshot, type ModelMetadataSnapshot } from "../modelCatalog.js";
 import { parsePhysicalRouteIdentity, parseVirtualRoutingDecision, physicalRouteDigest,
   type PhysicalRouteIdentity, type VirtualRoutingDecision } from "../request/routeIdentity.js";
@@ -76,6 +77,8 @@ export interface LlmRouteConfig extends Partial<LlmStreamTimeouts> {
   readonly retry?: RetryPolicyConfig;
   /** Static headers every request on this route carries. */
   readonly headers?: Readonly<Record<string, string>>;
+  /** Prompt-cache retention (PXA-15), committed in each request header and encoded by the adapter's retention encoder version. */
+  readonly cacheRetention?: CacheRetention;
 }
 
 /**
@@ -103,6 +106,8 @@ export interface PinnedRoute {
   readonly timeouts: LlmStreamTimeouts;
   readonly retryPolicy: ResolvedRetryPolicy;
   readonly headers: Readonly<Record<string, string>>;
+  /** Frozen at registration; prepare adds it to the request params, and callers cannot override it. */
+  readonly cacheRetention?: CacheRetention;
   /** Registry generation at pin time. */
   readonly generation: number;
 }
@@ -126,6 +131,7 @@ interface Registration {
   readonly timeouts: LlmStreamTimeouts;
   readonly retryPolicy: ResolvedRetryPolicy;
   readonly headers: Readonly<Record<string, string>>;
+  readonly cacheRetention?: { readonly value: CacheRetention; readonly encoderVersion: number };
 }
 
 function normalizeBaseUrl(baseUrl: string, providerId: string): string {
@@ -154,6 +160,18 @@ function normalizeBaseUrl(baseUrl: string, providerId: string): string {
 export interface VirtualRouteSelection {
   readonly intent: string;
   readonly decision: Pick<RoutingDecision, "strategy" | "reason" | "selectedModel" | "selectedProvider">;
+}
+
+/** The route's retention and the encoder version that carries it; refused when the adapter's encoder has none. */
+function routeCacheRetention(config: LlmRouteConfig): Registration["cacheRetention"] {
+  const value: unknown = config.cacheRetention;
+  if (value === undefined) return undefined;
+  if (!isCacheRetention(value)) throw new LlmRouteError("AMC_LLM_ROUTE_INVALID", `route ${config.providerId}: cacheRetention must be short or long`);
+  const encoderVersion = cacheRetentionEncoderVersion(config.adapter.encoderId, config.adapter.encoderVersion);
+  if (encoderVersion === null) {
+    throw new LlmRouteError("AMC_LLM_ROUTE_INVALID", `route ${config.providerId}: cacheRetention is unsupported by encoder ${config.adapter.encoderId}@${config.adapter.encoderVersion}`);
+  }
+  return Object.freeze({ value, encoderVersion });
 }
 
 /** Lowercased header names, so a route cannot shadow an adapter header by case. */
@@ -267,12 +285,13 @@ export class AdapterRegistry {
       adapterId: adapter.id,
       adapterVersion: adapter.version,
       encoderId: adapter.encoderId,
-      encoderVersion: adapter.encoderVersion,
+      encoderVersion: registration.cacheRetention?.encoderVersion ?? adapter.encoderVersion,
       baseUrl: registration.baseUrl,
       credentialRef: registration.config.credentialRef,
       timeouts: registration.timeouts,
       retryPolicy: registration.retryPolicy,
       headers: registration.headers,
+      ...(registration.cacheRetention === undefined ? {} : { cacheRetention: registration.cacheRetention.value }),
       generation: this.generationCounter
     });
   }
@@ -318,6 +337,7 @@ export class AdapterRegistry {
     try { timeouts = resolveStreamTimeouts(config); } catch (error) {
       throw new LlmRouteError("AMC_LLM_ROUTE_INVALID", `route ${config.providerId}: ${error instanceof Error ? error.message : "invalid stream timeouts"}`);
     }
+    const cacheRetention = routeCacheRetention(config);
     const retryPolicy = resolveRetryPolicy(config.retry, `llm.routes.${config.providerId}.retry`);
     const headers = normalizeHeaders(config.headers);
     const capabilities = snapshotCapabilities(config.adapter.capabilities);
@@ -325,7 +345,8 @@ export class AdapterRegistry {
     const routeConfigDigest = sha256Hex(canonicalize({ providerId: config.providerId, baseUrl,
       adapterId: config.adapter.id, adapterVersion: config.adapter.version, encoderId: config.adapter.encoderId,
       encoderVersion: config.adapter.encoderVersion, credentialRef: config.credentialRef,
-      headers, retryPolicy, timeouts, models: config.models, capabilities }));
+      headers, retryPolicy, timeouts, models: config.models, capabilities,
+      ...(cacheRetention === undefined ? {} : { cacheRetention }) }));
     this.registrationCounter += 1;
     this.generationCounter += 1;
     const registrationId = `${config.providerId}#${this.registrationCounter}`;
@@ -341,7 +362,8 @@ export class AdapterRegistry {
       // a later edit put in the registry.
       timeouts,
       retryPolicy,
-      headers
+      headers,
+      ...(cacheRetention === undefined ? {} : { cacheRetention })
     });
     return registrationId;
   }

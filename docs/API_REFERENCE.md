@@ -1803,6 +1803,7 @@ Interactive native tasks over the existing governed run/resume path for the sele
 | `--no-auto-summary` | - |
 | `--session <id>` | - |
 | `--fork-from <id>` | - |
+| `--lease-file <path>` | - |
 
 #### `amc agent-loop guide`
 
@@ -1906,6 +1907,7 @@ Run one agent turn and report what the signed log recorded
 | `--interactive-ask-user` | - |
 | `--web-search-searxng <origin>` | - |
 | `--goal-rounds <n>` | - |
+| `--lease-file <path>` | - |
 | `--approval-exception <file>` | - |
 | `--json` | - |
 | `--list-skills [name]` | - |
