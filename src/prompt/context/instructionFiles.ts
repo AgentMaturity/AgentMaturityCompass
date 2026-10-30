@@ -38,30 +38,36 @@
  * DEDUPLICATION. `AGENTS.md` and `CLAUDE.md` are very often the same document —
  * a copy, or a symlink — and sending both spends the context window twice for no
  * information. Byte-identical (after trimming) contributions collapse to the
- * STRONGEST occurrence, so the path the model is shown is the one AMC's writer
+ * STRONGEST occurrence for legacy low-level loads, so the path shown is the one AMC's writer
  * would edit. A collapse is reported to the caller as a diagnostic but is NOT
  * put in the model's context: "these two files you cannot see are identical" is
- * a fact about the harness, not guidance for the work.
+ * a fact about the harness, not guidance for the work. Workspace-only/touched
+ * loads retain each path to preserve its source and triggering event identity.
  */
-import { readFileSync, statSync } from "node:fs";
+import { lstatSync, realpathSync } from "node:fs";
+import { dirname, resolve } from "node:path";
+import { readWorkspaceFile } from "../../tools/builtin/workspaceWalk.js";
 import { sha256Hex } from "../../utils/hash.js";
 import {
-  instructionCandidates,
+  discoverInstructionCandidates,
   type InstructionCandidate,
   type InstructionCandidateOptions
 } from "./instructionPrecedence.js";
+import { MAX_INSTRUCTION_DIRECTORIES, MAX_INSTRUCTION_DIRECTORY_DEPTH, MAX_INSTRUCTION_TOUCH_PATHS } from "./touchedInstructions.js";
 
 /** One instruction file whose content is in the contribution. */
 export interface LoadedInstruction {
   readonly candidate: InstructionCandidate;
   readonly content: string;
   readonly bytes: number;
+  /** SHA-256 of the exact, untrimmed UTF-8 content included in context. */
+  readonly sha256: string;
 }
 
-/** Why an instruction file that EXISTS is not in the contribution. */
-export type InstructionOmissionReason = "unreadable" | "oversize" | "over-budget";
+/** Why an instruction file or part of discovery is absent from the contribution. */
+export type InstructionOmissionReason = "unreadable" | "oversize" | "over-budget" | "discovery-limit";
 
-/** A present file that did not make it in, and the reason, for the model. */
+/** A file omission or incomplete discovery, stated safely to the model. */
 export interface InstructionOmission {
   readonly displayPath: string;
   readonly reason: InstructionOmissionReason;
@@ -98,6 +104,49 @@ export const DEFAULT_MAX_INSTRUCTION_FILE_BYTES = 64 * 1024;
 /** Default cap on the whole set. Two full-size files, and no more. */
 export const DEFAULT_MAX_INSTRUCTION_TOTAL_BYTES = 128 * 1024;
 
+/** The workspace identity pinned by a native instruction plugin. Never rendered. */
+export interface InstructionWorkspaceIdentity {
+  readonly requestedPath: string;
+  readonly realPath: string;
+  readonly dev: number;
+  readonly ino: number;
+}
+
+/** Resolve an initial workspace alias once; subsequent reads must keep this identity. */
+export function captureInstructionWorkspace(workspace: string): InstructionWorkspaceIdentity | null {
+  try {
+    const requestedPath = resolve(workspace);
+    const realPath = realpathSync(requestedPath);
+    const status = lstatSync(realPath);
+    if (!status.isDirectory()) return null;
+    return Object.freeze({ requestedPath, realPath, dev: status.dev, ino: status.ino });
+  } catch {
+    return null;
+  }
+}
+
+function workspaceMatches(identity: InstructionWorkspaceIdentity): boolean {
+  try {
+    if (realpathSync(identity.requestedPath) !== identity.realPath) return false;
+    const status = lstatSync(identity.realPath);
+    return status.isDirectory() && status.dev === identity.dev && status.ino === identity.ino;
+  } catch {
+    return false;
+  }
+}
+
+/** Fail closed without exposing either the original or substituted host path. */
+function unverifiedWorkspace(): InstructionLoad {
+  return {
+    included: [], duplicates: [],
+    omitted: [{
+      displayPath: "Workspace instruction discovery",
+      reason: "unreadable",
+      detail: "the workspace directory identity could not be verified"
+    }]
+  };
+}
+
 export interface InstructionLoadOptions extends InstructionCandidateOptions {
   /** Per-file UTF-8 byte cap. A larger file is omitted whole. */
   readonly maxFileBytes?: number;
@@ -105,13 +154,15 @@ export interface InstructionLoadOptions extends InstructionCandidateOptions {
   readonly maxTotalBytes?: number;
   /** Cancellation for the reads. */
   readonly signal?: AbortSignal;
+  /** @internal Pin retained across plugin collections; direct loads capture their own. */
+  readonly workspaceIdentity?: InstructionWorkspaceIdentity | null;
   /**
    * Reads one candidate's UTF-8 text, or throws.
    *
    * Injected so a test can produce a read failure without depending on the
    * host's permission model — `chmod 000` does nothing when the suite runs as
    * root, which is exactly the environment where a swallowed error would go
-   * unnoticed. Production leaves it out and gets `readFileSync`.
+   * unnoticed. Production leaves it out and gets the bounded workspace reader.
    */
   readonly readTextFile?: (absolutePath: string) => string;
 }
@@ -130,9 +181,15 @@ function isMissingPathError(error: unknown): boolean {
 }
 
 /** Stat one candidate, keeping "not there" and "cannot look" apart. */
-function probe(candidate: InstructionCandidate): Probe {
+function probe(candidate: InstructionCandidate, workspace: string): Probe {
   try {
-    const info = statSync(candidate.absolutePath);
+    if (candidate.scope === "project") {
+      const expected = resolve(workspace, dirname(candidate.displayPath));
+      if (realpathSync(dirname(candidate.absolutePath)) !== expected) {
+        return { kind: "unreadable", detail: "the directory contains a symbolic link" };
+      }
+    }
+    const info = lstatSync(candidate.absolutePath);
     if (!info.isFile()) {
       return { kind: "unreadable", detail: "the path exists but is not a regular file" };
     }
@@ -146,11 +203,27 @@ function probe(candidate: InstructionCandidate): Probe {
 /** Read one candidate that a probe called present. */
 function readCandidate(
   candidate: InstructionCandidate,
-  read: (absolutePath: string) => string
+  options: InstructionLoadOptions,
+  maxFileBytes: number
 ): { readonly content: string; readonly bytes: number } | null {
   try {
-    const content = read(candidate.absolutePath);
-    return { content, bytes: Buffer.byteLength(content, "utf8") };
+    if (options.readTextFile !== undefined) {
+      const content = options.readTextFile(candidate.absolutePath);
+      return { content, bytes: Buffer.byteLength(content, "utf8") };
+    }
+    const result = readWorkspaceFile(
+      candidate.scope === "project" ? options.workspace : dirname(candidate.absolutePath),
+      candidate.scope === "project" ? candidate.displayPath : candidate.fileName,
+      maxFileBytes + 1,
+      maxFileBytes
+    );
+    if (result === null) return null;
+    if (result.size > maxFileBytes) return { content: "", bytes: result.size };
+    if (!result.complete) return null;
+    const content = result.bytes.toString("utf8");
+    // Invalid UTF-8 cannot produce an exact source-content digest after decoding.
+    if (!Buffer.from(content, "utf8").equals(result.bytes)) return null;
+    return { content, bytes: result.bytes.length };
   } catch {
     // A file can disappear or lose permissions between the probe and the read.
     // The caller turns this into an `unreadable` omission rather than dropping
@@ -171,16 +244,40 @@ function readCandidate(
  * @returns the retained files in ascending precedence, plus what was left out.
  */
 export function loadInstructionFiles(options: InstructionLoadOptions): InstructionLoad {
-  const read = options.readTextFile ?? ((path: string) => readFileSync(path, "utf8"));
+  options.signal?.throwIfAborted();
+  const identity = options.workspaceIdentity === undefined
+    ? captureInstructionWorkspace(options.workspace)
+    : options.workspaceIdentity;
+  if (identity === null) {
+    // Preserve legacy home-only loads when no workspace exists. Native/touched
+    // discovery must establish its workspace before reading any instructions.
+    if (options.workspaceOnly === true || options.touchedPaths !== undefined) return unverifiedWorkspace();
+  } else if (!workspaceMatches(identity)) return unverifiedWorkspace();
   const maxFileBytes = options.maxFileBytes ?? DEFAULT_MAX_INSTRUCTION_FILE_BYTES;
   const maxTotalBytes = options.maxTotalBytes ?? DEFAULT_MAX_INSTRUCTION_TOTAL_BYTES;
 
   const loaded: LoadedInstruction[] = [];
   const omitted: InstructionOmission[] = [];
+  const discovery = discoverInstructionCandidates(options);
+  if (discovery.limited) {
+    omitted.push({
+      displayPath: "Workspace instruction discovery",
+      reason: "discovery-limit",
+      detail: `the discovery limit is ${MAX_INSTRUCTION_TOUCH_PATHS} touch paths, ${MAX_INSTRUCTION_DIRECTORY_DEPTH} directory levels and ${MAX_INSTRUCTION_DIRECTORIES} directories; some instruction paths were not examined`
+    });
+  }
+  if (discovery.excluded) {
+    omitted.push({
+      displayPath: "Workspace instruction discovery",
+      reason: "unreadable",
+      detail: "some touched paths were outside the workspace or inside excluded metadata directories"
+    });
+  }
 
-  for (const candidate of instructionCandidates(options)) {
+  for (const candidate of discovery.candidates) {
     options.signal?.throwIfAborted();
-    const probed = probe(candidate);
+    if (identity !== null && !workspaceMatches(identity)) return unverifiedWorkspace();
+    const probed = probe(candidate, identity?.realPath ?? resolve(options.workspace));
     if (probed.kind === "absent") continue;
     if (probed.kind === "unreadable") {
       omitted.push({ displayPath: candidate.displayPath, reason: "unreadable", detail: probed.detail });
@@ -194,7 +291,8 @@ export function loadInstructionFiles(options: InstructionLoadOptions): Instructi
       });
       continue;
     }
-    const content = readCandidate(candidate, read);
+    const content = readCandidate(candidate, options, maxFileBytes);
+    if (identity !== null && !workspaceMatches(identity)) return unverifiedWorkspace();
     if (content === null) {
       omitted.push({
         displayPath: candidate.displayPath,
@@ -214,10 +312,13 @@ export function loadInstructionFiles(options: InstructionLoadOptions): Instructi
       });
       continue;
     }
-    loaded.push({ candidate, content: content.content, bytes: content.bytes });
+    loaded.push({ candidate, content: content.content, bytes: content.bytes, sha256: sha256Hex(content.content) });
   }
 
-  return retain(loaded, omitted, maxTotalBytes);
+  if (identity !== null && !workspaceMatches(identity)) return unverifiedWorkspace();
+  // Touched chains retain each source path and touch identity, including equal
+  // content in separate directories. Preserve the original low-level dedupe.
+  return retain(loaded, omitted, maxTotalBytes, options.workspaceOnly !== true && options.touchedPaths === undefined);
 }
 
 /**
@@ -230,7 +331,8 @@ export function loadInstructionFiles(options: InstructionLoadOptions): Instructi
 function retain(
   loaded: readonly LoadedInstruction[],
   omitted: readonly InstructionOmission[],
-  maxTotalBytes: number
+  maxTotalBytes: number,
+  deduplicate: boolean
 ): InstructionLoad {
   const strongestFirst = [...loaded].reverse();
   const keptByDigest = new Map<string, string>();
@@ -241,7 +343,7 @@ function retain(
 
   for (const file of strongestFirst) {
     const digest = sha256Hex(file.content.trim());
-    const kept = keptByDigest.get(digest);
+    const kept = deduplicate ? keptByDigest.get(digest) : undefined;
     if (kept !== undefined) {
       duplicates.push({ displayPath: file.candidate.displayPath, duplicateOf: kept });
       continue;

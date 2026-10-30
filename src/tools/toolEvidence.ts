@@ -7,6 +7,7 @@ import {
   projectQuestionIds
 } from "../diagnostic/liveEvidenceProjection.js";
 import type { RecordedToolCall, ToolOutcome } from "./toolTypes.js";
+import { nativeFilesystemTouch } from "../prompt/context/nativeFilesystemTouch.js";
 
 /**
  * What a governed tool call contributes to the evidence spine (P5.1/P5.2a).
@@ -147,6 +148,7 @@ export function toolEvidenceFor(execution: RecordedToolCall, outcome: ToolOutcom
   const questionIds = projectQuestionIds(execution, outcome);
   const projectionRules = projectMatchingRuleIds(execution, outcome);
   const fileChange = takeFileChange(execution);
+  const filesystemTouch = nativeFilesystemTouch(execution, outcome);
 
   const call = {
     trustTier: "OBSERVED" as const,
@@ -186,15 +188,15 @@ export function toolEvidenceFor(execution: RecordedToolCall, outcome: ToolOutcom
       auditType,
       tool: execution.name,
       denied: outcome.denied,
-      // NOT the arguments. They are frozen and available on the tool_action
-      // row; repeating them here would put the same untrusted content in a
-      // second place with a second retention story.
+      // Retain only the bounded directory needed for instruction context, never filenames or arbitrary argument content.
       outcome: outcome.ok ? "ok" : "not-ok",
+      ...(filesystemTouch === undefined ? {} : { nativeFilesystemTouch: filesystemTouch }),
       ...(fileChange === undefined ? {} : { fileChange })
     }),
     meta: {
       ...common,
       auditType,
+      ...(filesystemTouch === undefined ? {} : { nativeFilesystemTouch: filesystemTouch }),
       ...(outcome.denied
         ? { denialStage: outcome.denied.stage, denialGuard: outcome.denied.guardLabel, denialReason: outcome.denied.reason }
         : {})

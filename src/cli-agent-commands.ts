@@ -53,7 +53,9 @@ import { parseDelegationScope } from "./agent/delegationScope.js";
 import { parseSubagentStopConditions } from "./agent/subagentStopConditions.js";
 import { prepareSkillTurn, workspaceSkillRoots } from "./skills/skillTurn.js";
 import { buildSkillCatalog } from "./skills/skillCatalog.js";
-import { loadNativeExtensions, type NativeExtensionTurn } from "./extensions/nativeExtensionRuntime.js";
+import { loadNativeExtensions, type NativeExtensionManager, type NativeExtensionTurn } from "./extensions/nativeExtensionRuntime.js";
+import { bindNativeMcpResourceStatus, projectNativeResourceStatus, type NativeMcpResourceSource } from "./prompt/context/nativeResourceStatus.js";
+import { explicitPresetCompositionOptions, nativePresetCompositionSources } from "./cli/agentCompositionSources.js";
 import { resolvePreset, type AgentPreset } from "./presets/agentPresets.js";
 import { IN_PROCESS_PROVIDER, delegationTurnOptions, resolveForeignRunner } from "./agent/providers/delegationProviders.js";
 import type { SubagentRunner } from "./agent/subagentSpawn.js";
@@ -261,9 +263,8 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       if (opts.interactiveApprovals && opts.approvalException !== undefined) {
         io.error("Interactive approvals require the signed approval engine; approval exceptions cannot be combined with this mode."); io.fail(); return;
       }
-      // Resolved FIRST, so every flag default below can fall back to it. A
-      // preset is signed policy: an unverifiable one composes nothing, for the
-      // same reason an unverifiable schedule runs nothing.
+      // Verify the signed preset before applying invocation flags.
+      const explicitCompositionOptions = explicitPresetCompositionOptions(command);
       let preset: AgentPreset | undefined;
       if (opts.preset !== undefined) {
         const resolved = resolvePreset(process.cwd(), opts.preset);
@@ -273,12 +274,8 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           return;
         }
         preset = resolved.preset;
-        // Said out loud. A run whose model, tool mode or approval gate came from
-        // a file the operator wrote last month should say so, or the behaviour
-        // has no visible cause.
         (opts.json ? io.error : io.log)(chalk.dim(`composed from preset "${preset.id}": ${preset.description}`));
-        // Apply the remaining policy fields before approval and delegation are
-        // built. A signed preset must not merely advertise these settings.
+        // Apply preset approval before constructing policy controls.
         opts = { ...opts, approveTools: opts.approveTools ?? preset.approveTools };
       }
       try { opts = applyNativeDelegationPreset(opts, preset?.delegate); }
@@ -292,9 +289,10 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
         io.error("--audio-input is exclusive with positional text and --image; put every original part in its manifest order."); io.fail(); return;
       }
       let extensionTurn: NativeExtensionTurn;
+      let extensions: NativeExtensionManager;
       try {
         const catalog = buildSkillCatalog(workspaceSkillRoots(process.cwd(), opts.credentialsHome));
-        const extensions = loadNativeExtensions({ workspace: process.cwd(), manifestPaths: opts.extension,
+        extensions = loadNativeExtensions({ workspace: process.cwd(), manifestPaths: opts.extension,
           expectedDigests: opts.extensionPin, reservedCommands: [...catalog.skills, ...catalog.problems].map(skill => skill.name) });
         extensionTurn = extensions.prepareTurn();
         rawPrompt = extensions.expandCommand(rawPrompt)?.prompt ?? rawPrompt;
@@ -462,6 +460,8 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
         return;
       }
       const dispatchMode = (opts.toolMode ?? preset?.toolMode) === "code" ? "code" as const : "native" as const;
+      const compositionSources = nativePresetCompositionSources(preset, explicitCompositionOptions, opts, { providerId, model, maxTokens, maxSteps, tools: toolMode, toolMode: dispatchMode,
+        approveTools: gate?.actionClass, delegateEnabled: wantsDelegation, delegateScope, maxDelegationDepth, delegateTimeout, delegateStops: delegateStops.conditions });
       const shellOptIn = opts.unsafeUnconfinedShell === true ? { unconfinedShell: "cli-flag" as const } : {};
       // Resume names its existing session; a fresh run supplies a new ID. Fork
       // selects its own ID inside composition, which binds the actual writer
@@ -612,6 +612,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       const timers: NodeJS.Timeout[] = [];
       let onSigint: (() => void) | null = null;
       const mcpMounts: MountedNativeMcpServer[] = [];
+      const mcpStatus: NativeMcpResourceSource[] = [];
       const mcpAbort = new AbortController();
       const cancelMcp = () => mcpAbort.abort();
       if (mcpServers.length) process.on("SIGINT", cancelMcp);
@@ -626,6 +627,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
             const mount = await mountNativeMcpServer({ server, workspace: process.cwd(), agentId,
               toolset: workspaceToolset, ...review, signal: mcpAbort.signal });
             mcpMounts.push(mount);
+            mcpStatus.push(bindNativeMcpResourceStatus(mount, workspaceToolset.registry, agentId));
             progress(`Mounted reviewed MCP tools for this run: ${mount.toolNames.join(", ")}. Signed allowlist, approval gate and budgets remain in force.`);
           }
         }
@@ -638,6 +640,9 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           ...(opts.keepOpen ? { keepOpen: true } : {}),
           workspace: process.cwd(),
           agentId,
+          ...(compositionSources === undefined ? {} : { compositionSources }),
+          resourceStatus: () => projectNativeResourceStatus({ extensions, mcp: mcpStatus,
+            skillRoots: workspaceSkillRoots(extensions.workspace, opts.credentialsHome) }),
           ...(opts.stream ? { onLiveText: (event: import("./llm/adapter/liveTextPreview.js").LiveTextPreviewEvent) => {
             if (event.kind === "text") {
               if (previewRequest !== event.headerEventId) {

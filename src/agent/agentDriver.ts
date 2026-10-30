@@ -1,4 +1,5 @@
 import { randomBytes } from "node:crypto";
+import { recordDeliveredContext } from "../prompt/context/nativeCompositionContext.js";
 /**
  * The turn/step machine — AMC running an agent (plan P3.2).
  *
@@ -435,6 +436,7 @@ export class AgentDriver {
             if (message.text.length > 0 || !message.images?.length) {
               // Context a tool supplied reaches the model as the tool's data, never with the user's authority.
               this.head = this.session.recordUserMessage(message.origin === "tool" ? fenceToolContext(message.text) : message.text);
+              if (message.contextSnapshot === true) recordDeliveredContext(this.session, this.head, { turn: turnRef.turn, step });
             }
             this.head = recordNativeImageMessage(this.session, message) ?? this.head;
           }
@@ -542,7 +544,11 @@ export class AgentDriver {
     const orderedClaims = claimed.filter(message => message.parts !== undefined);
     const audioClaims = claimed.filter(message => message.audioParts !== undefined);
     const decision = await this.hooks.preStep(
-      { turn, step, target, messages: claimed, signal },
+      { turn, step, target, messages: claimed, signal, contextSession: Object.freeze({
+        sessionId: this.session.sessionId, workspace: this.session.workspace,
+        readEvents: () => this.session.readEvents(),
+        recordProjectedEvidence: this.session.recordProjectedEvidence.bind(this.session)
+      }) },
       (): Promise<PreparedStep> => Promise.resolve({ kind: "enter", messages: claimed })
     );
     signal.throwIfAborted();

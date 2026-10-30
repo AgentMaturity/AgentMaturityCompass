@@ -7,6 +7,8 @@ import type { SessionService } from "../session/sessionService.js";
 import type { RecoveryClaimant } from "../session/sessionRecovery.js";
 import { mountNativeMcpServer, type MountedNativeMcpServer } from "../mcp/nativeMcpClient.js";
 import { loadNativeMcpConfiguration, requireReviewedNativeMcpGrants, resolveNativeMcpServer, type LoadedNativeMcpConfiguration } from "../setup/nativeMcpConfig.js";
+import { bindNativeMcpResourceStatus, projectNativeResourceStatus, type NativeMcpResourceSource } from "../prompt/context/nativeResourceStatus.js";
+import { workspaceSkillRoots } from "../skills/skillTurn.js";
 
 /** Reuse the native pipeline/approval engine and bind extensions to its actual session writer. */
 export async function prepareAcpNativeSession(options: {
@@ -28,9 +30,14 @@ export async function prepareAcpNativeSession(options: {
   if (reviewed && (!options.approval || options.session.tools !== "workspace")) throw new Error("Native MCP requires explicit workspace tools and signed approvals.");
   const grants = reviewed && options.approval ? requireReviewedNativeMcpGrants(reviewed, options.session.workspace, options.approval.actionClass) : undefined;
   const binding: { value?: { readonly session: SessionService; readonly toolset: AgentToolset | null } } = {};
+  const mcpStatus: NativeMcpResourceSource[] = [];
   const init: AgentSessionInit & { sessionId: string } = {
     ...options.session,
     ...(grants ? { additionalCapabilities: grants.capabilities } : {}),
+    resourceStatus: () => ({
+      ...projectNativeResourceStatus({ mcp: mcpStatus, skillRoots: workspaceSkillRoots(options.session.workspace) }),
+      extensions: options.session.resourceStatus?.().extensions ?? null
+    }),
     // bindTools below gates every call (EMPTY_TOOL_SEAM included) whenever an approval is configured, so the prompt may say so.
     approvalGated: options.approval !== undefined,
     bindTools: context => {
@@ -57,6 +64,7 @@ export async function prepareAcpNativeSession(options: {
       if (options.signal.aborted) throw new Error("Native MCP preparation was cancelled.");
       mount = await mountNativeMcpServer({ server, workspace: options.session.workspace, agentId: options.session.agentId,
         toolset, ...grants, signal: serverLifetime.signal });
+      mcpStatus.push(bindNativeMcpResourceStatus(mount, toolset.registry, options.session.agentId));
     }
     if (options.signal.aborted) throw new Error("Native session preparation was cancelled.");
   } catch (error) {

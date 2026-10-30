@@ -26,6 +26,9 @@ import { refuseRetired } from "../lifecycle/reassessment.js";
 import { nativeSessionManifest } from "../lifecycle/versionManifest.js";
 import type { RecoveryClaimant } from "../session/sessionRecovery.js";
 import { admitSessionAtOpen } from "../runtime/changeEnvelope.js";
+import { projectNativeResourceStatus, type NativeResourceStatus } from "../prompt/context/nativeResourceStatus.js";
+import { workspaceSkillRoots } from "../skills/skillTurn.js";
+import type { CompositionSource } from "../prompt/context/compositionProvenance.js";
 
 /**
  * One AMC session, many prompts (plan P7.1a).
@@ -96,6 +99,8 @@ export interface AgentSessionInit {
   /** Automatic compaction; off unless `contextWindowTokens` is declared. */
   readonly compaction?: Partial<CompactionConfig>;
   readonly validation?: NativeValidationPlan;
+  readonly resourceStatus?: () => NativeResourceStatus;
+  readonly compositionSources?: readonly CompositionSource[];
   /** Bind approvals/extensions to the real owning session and its existing pipeline. */
   readonly bindTools?: (context: { readonly session: SessionService; readonly toolset: AgentToolset | null }) => AgentToolSeam;
 }
@@ -119,6 +124,8 @@ export type AgentPromptResult =
 
 export interface AgentSession {
   readonly sessionId: string;
+  /** Process-local observations; unbound hosts and unmeasured execution remain explicitly unknown. */
+  resourceStatus?(): NativeResourceStatus;
   /** Run one prompt to completion. Rejects a second while one is in flight. */
   prompt(text: string, images?: readonly NativeImageInput[]): Promise<AgentPromptResult>;
   /** Optional on externally supplied legacy factories; native composition implements it. */
@@ -245,6 +252,8 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
         prompt: { profile },
         makeLlm: init.makeLlm,
         route: init.route,
+        resourceStatus: init.resourceStatus ?? (() => projectNativeResourceStatus({ skillRoots: workspaceSkillRoots(workspace) })),
+        ...(init.compositionSources === undefined ? {} : { compositionSources: init.compositionSources }),
         tools: () => {
           toolset = init.tools === "none" ? undefined : makeToolset();
           return init.bindTools?.({ session, toolset: toolset ?? null }) ?? toolset?.seam ?? EMPTY_TOOL_SEAM;
@@ -322,6 +331,7 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
 
     return {
       sessionId,
+      resourceStatus: () => composed!.resourceStatus(),
       prompt: (text, images) => runPrompt(() => { driver.followup(text, images); }),
       promptParts: parts => runPrompt(() => { driver.followupParts(parts); }),
       promptAudioParts: parts => runPrompt(() => { driver.followupAudioParts(parts); }),

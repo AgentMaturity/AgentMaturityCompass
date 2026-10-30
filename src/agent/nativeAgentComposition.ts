@@ -21,7 +21,7 @@
  *
  * KERNEL-FREE, like everything else under src/agent/: no `@amc/*` import.
  */
-import type { LoopHooks, PreStepDecision, PreStepInput } from "./loopTypes.js";
+import type { LoopHooks, NativeContextSession, PreStepDecision, PreStepInput } from "./loopTypes.js";
 import { NO_HOOKS } from "./loopTypes.js";
 import { AgentDriver, type AgentDriverInit } from "./agentDriver.js";
 import type { LoopLlm, LoopRoute } from "./stepRunner.js";
@@ -30,9 +30,13 @@ import type { SessionService } from "../session/sessionService.js";
 import type { SessionOpenParams } from "../session/sessionApiTypes.js";
 import { buildAgentPromptRegistry, type AgentPromptProfile } from "../prompt/agentPromptProfile.js";
 import type { PromptAssemblyRegistry } from "../prompt/assembly/promptRegistry.js";
+import type { PromptAssembly } from "../prompt/assembly/promptTypes.js";
 import { renderPrompt } from "../prompt/assembly/interpolate.js";
 import { ContextPluginHost } from "../prompt/context/contextHost.js";
 import { createContextPreStep } from "../prompt/context/contextPreStep.js";
+import { compositionSource, type CompositionSource } from "../prompt/context/compositionProvenance.js";
+import { createSessionTouchedPaths, lastRecordedContextSnapshot, recordCompositionSources, recordNativeComposition } from "../prompt/context/nativeCompositionContext.js";
+import { projectNativeResourceStatus, type NativeResourceStatus } from "../prompt/context/nativeResourceStatus.js";
 
 /** The `session/close` reason of a session whose composition threw: it never became ready, so it did not complete. */
 export const COMPOSITION_FAILED = "composition_failed";
@@ -42,18 +46,46 @@ export interface NativePrompt {
   readonly host: ContextPluginHost;
   /** Bind as `LoopHooks.preStep`: refreshes the context plugins and commits their snapshot before each step. */
   readonly preStep: (input: PreStepInput, next: () => Promise<PreStepDecision>) => Promise<PreStepDecision>;
+  resourceStatus(): NativeResourceStatus;
   /** Removes the context registrations. */
   dispose(): void;
 }
 
 /** A profile's registry, plugin host and context pre-step, wired to each other. */
-export function composeNativePrompt(profile: AgentPromptProfile, options: { readonly sessionId?: string; readonly newMessageId?: () => string } = {}): NativePrompt {
+export interface NativePromptOptions {
+  readonly sessionId?: string;
+  readonly newMessageId?: () => string;
+  readonly session?: NativeContextSession;
+  readonly resourceStatus?: () => NativeResourceStatus;
+}
+
+export function composeNativePrompt(profile: AgentPromptProfile, options: NativePromptOptions = {}): NativePrompt {
   const registry = buildAgentPromptRegistry(profile);
   const host = new ContextPluginHost(profile.contextPlugins);
+  const touchedPaths = createSessionTouchedPaths();
+  let disposed = false;
   const seam = createContextPreStep({ registry, host,
     ...(options.sessionId === undefined ? {} : { sessionId: options.sessionId }),
-    ...(options.newMessageId === undefined ? {} : { newMessageId: options.newMessageId }) });
-  return { registry, host, preStep: seam.preStep, dispose: seam.dispose };
+    ...(options.newMessageId === undefined ? {} : { newMessageId: options.newMessageId }),
+    touchedPaths: input => {
+      const session = input.contextSession ?? options.session;
+      return session === undefined ? [] : touchedPaths(session);
+    },
+    previousSnapshot: input => {
+      const session = input.contextSession ?? options.session;
+      return session === undefined ? undefined : lastRecordedContextSnapshot(session);
+    },
+    onSnapshot: (input, contexts, snapshot) => {
+      const session = input.contextSession ?? options.session;
+      if (session !== undefined) recordCompositionSources(session, "context", [
+        ...contexts.map(context => compositionSource("context", context.name, context.text)),
+        compositionSource("prompt", "runtime-context-source", snapshot)
+      ], input);
+    }
+  });
+  return { registry, host, preStep: seam.preStep,
+    resourceStatus: () => !disposed && options.resourceStatus !== undefined ? options.resourceStatus() : projectNativeResourceStatus(),
+    dispose: () => { disposed = true; seam.dispose(); } };
 }
 
 /** Composed from a profile (a root agent), or inherited as already-rendered text and control (a delegated child). */
@@ -74,6 +106,8 @@ export interface NativeAgentInit {
   /** Runs after the prompt row and before the driver: admission checks and control rows. A throw fails composition. */
   readonly admit?: (composed: { readonly systemPrompt: string; readonly tools: AgentToolSeam }) => void;
   readonly driver?: Pick<AgentDriverInit, "validation" | "config">;
+  readonly resourceStatus?: () => NativeResourceStatus;
+  readonly compositionSources?: readonly CompositionSource[];
 }
 
 export interface NativeAgent {
@@ -82,6 +116,7 @@ export interface NativeAgent {
   readonly systemPromptEventId: string;
   /** The section names of the system prompt as assembled (not as registered). */
   readonly promptSections: readonly string[];
+  resourceStatus(): NativeResourceStatus;
   /** Releases the composition's own registrations. Session lifetime stays with the surface. */
   dispose(): void;
 }
@@ -104,15 +139,19 @@ export function composeNativeAgent(init: NativeAgentInit): NativeAgent {
     let systemPrompt: string;
     let hooks: LoopHooks;
     let promptSections: readonly string[];
+    let promptAssembly: PromptAssembly | string;
     if ("profile" in init.prompt) {
-      prompt = composeNativePrompt(init.prompt.profile, { sessionId: session.sessionId });
+      prompt = composeNativePrompt(init.prompt.profile, { sessionId: session.sessionId, session,
+        ...(init.resourceStatus === undefined ? {} : { resourceStatus: init.resourceStatus }) });
       const assembly = prompt.registry.assemble({ sessionId: session.sessionId });
+      promptAssembly = assembly;
       // Rendered before any row: an unknown `{{variable}}` throws with nothing sent.
       systemPrompt = renderPrompt(assembly);
       promptSections = assembly.sections.map(section => section.name);
       hooks = { ...NO_HOOKS, preStep: prompt.preStep };
     } else {
       systemPrompt = init.prompt.text;
+      promptAssembly = systemPrompt;
       hooks = init.prompt.hooks;
       promptSections = [];
     }
@@ -121,11 +160,15 @@ export function composeNativeAgent(init: NativeAgentInit): NativeAgent {
     llm.pin?.({ providerId: init.route.providerId, model: init.route.model });
     const systemPromptEventId = session.recordSystemPrompt(systemPrompt).eventId;
     init.admit?.({ systemPrompt, tools });
+    recordNativeComposition(session, promptAssembly, tools, init.route, init.compositionSources);
     const driver = new AgentDriver({ session, llm, route: init.route, systemPromptEventId, tools, hooks,
       ...(init.driver?.validation === undefined ? {} : { validation: init.driver.validation }),
       ...(init.driver?.config === undefined ? {} : { config: init.driver.config }) });
     const composedPrompt = prompt;
-    return { driver, session, systemPromptEventId, promptSections, dispose: () => composedPrompt?.dispose() };
+    let disposed = false;
+    return { driver, session, systemPromptEventId, promptSections,
+      resourceStatus: () => !disposed && init.resourceStatus !== undefined ? init.resourceStatus() : projectNativeResourceStatus(),
+      dispose: () => { disposed = true; composedPrompt?.dispose(); } };
   } catch (error) {
     prompt?.dispose();
     settleFailedComposition(session, opened ? "close" : init.open === undefined ? "release" : "dispose");

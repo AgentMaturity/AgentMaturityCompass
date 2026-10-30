@@ -94,6 +94,10 @@ import { agentLoopServices, AGENT_LOOP_SEAM } from "./services/agentLoopServices
 import type { AgentLoopSeamService } from "./services/agentLoopServices.js";
 import { assertSecondSessionWriter } from "../persistence/openSessionEventStore.js";
 import { redactingSessionFor } from "../dataflow/redactingSession.js";
+import { recordNativeComposition } from "../prompt/context/nativeCompositionContext.js";
+import type { NativeResourceStatus } from "../prompt/context/nativeResourceStatus.js";
+import type { CompositionSource } from "../prompt/context/compositionProvenance.js";
+import { renderPrompt } from "../prompt/assembly/interpolate.js";
 
 /** The section name a pinned system prompt is registered under. */
 export const PINNED_PROMPT_SECTION = "host:pinned-prompt";
@@ -132,6 +136,7 @@ export interface ComposedApprovalGate extends ToolApprovalGateOptions {
 /** What a caller may do to a turn while it runs. */
 export interface ComposedTurnHandle {
   readonly sessionId: string;
+  resourceStatus(): NativeResourceStatus;
   /** Stop the turn. The cause rides inside the signed `turn/end`. */
   cancel(cause: TurnCancelCause): void;
 }
@@ -146,6 +151,8 @@ export interface ComposedToolSession {
 export interface ComposedTurnOptions {
   readonly workspace: string;
   readonly agentId: string;
+  readonly resourceStatus?: () => NativeResourceStatus;
+  readonly compositionSources?: readonly CompositionSource[];
   /** Explicit owner-driven due pass, not a model turn, timer or resumable task. */
   readonly schedulePass?: {
     readonly now: number;
@@ -394,6 +401,7 @@ function compositionDigestOf(options: ComposedTurnOptions, profile: AgentPromptP
       models: route.models
     })),
     route: { providerId: options.route.providerId, model: options.route.model },
+    sources: options.compositionSources ?? [],
     prompt: {
       sections: profile.sections.map((section) => section.name),
       contexts: profile.contextPlugins.map((plugin) => plugin.name),
@@ -534,7 +542,8 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
     // An unknown route fails composition here, before any prompt row or request (DXA-13).
     serviceOn<LlmSeamService>(ctx, LLM_SEAM.name).pin({ providerId: options.route.providerId, model: options.route.model });
 
-    const promptFiber = ctx.plugin(promptServices, { profile, sessionId });
+    const promptFiber = ctx.plugin(promptServices, { profile, sessionId, session,
+      ...(options.resourceStatus === undefined ? {} : { resourceStatus: options.resourceStatus }) });
     await promptFiber.await();
     fibers.push(promptFiber);
     const prompt = serviceOn<PromptSeamService>(ctx, PROMPT_SEAM.name);
@@ -542,7 +551,8 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
     // Rendered BEFORE the loop is composed, so an unknown `{{variable}}` throws
     // here — with no turn started, no request sent, and a session that closes
     // cleanly in the `finally`. A prompt with a hole in it never reaches a model.
-    const systemPromptText = prompt.render();
+    const promptAssembly = prompt.assemble();
+    const systemPromptText = renderPrompt(promptAssembly);
     const systemPromptRef = session.recordSystemPrompt(systemPromptText);
 
     const gate = options.approvalGate;
@@ -581,6 +591,7 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
       agentId: options.agentId, providerId: options.route.providerId, model: options.route.model, systemPrompt: systemPromptText,
       harnessVersion: identity.harnessVersion, compositionDigest: identity.compositionDigest,
       tools: options.tools === undefined ? "none" : "workspace", surface: options.tools ?? EMPTY_TOOL_SEAM }) });
+    recordNativeComposition(session, promptAssembly, tools ?? EMPTY_TOOL_SEAM, options.route, options.compositionSources);
 
     // Always present, so context reaches the model whether or not anyone asked
     // to watch. `notify` is the live mirror and is optional; `preStep` is how the
@@ -701,6 +712,7 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
     const loop = serviceOn<AgentLoopSeamService>(ctx, AGENT_LOOP_SEAM.name);
     options.onReady?.({
       sessionId,
+      resourceStatus: prompt.resourceStatus,
       cancel: (cause: TurnCancelCause) => {
         loop.cancel(cause);
       }

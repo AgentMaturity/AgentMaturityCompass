@@ -18,6 +18,7 @@ import type { TurnCancelCause } from "../session/sessionTypes.js";
 import type { QueuedNativeImage } from "../attachments/nativeImageInput.js";
 import type { QueuedNativeInputPart } from "../attachments/nativeOrderedInput.js";
 import type { QueuedNativeAudioPart } from "../attachments/nativeAudioInput.js";
+import type { EvidenceEvent } from "../types.js";
 
 export type { InboxOrigin, InboxSpliceOp, InboxTarget } from "../session/loopEventMeta.js";
 
@@ -33,6 +34,8 @@ export interface InboxMessage {
   readonly audioParts?: readonly QueuedNativeAudioPart[];
   /** Exact signed loop/inbox row whose image bundle this message carries. */
   readonly inputEventId?: string;
+  /** Synthesized by the context pre-step; the driver commits delivered-byte provenance after any redaction. */
+  readonly contextSnapshot?: true;
 }
 
 /**
@@ -87,6 +90,14 @@ export function toTurnEndParams(ending: TurnEnding): TurnEndParams {
     : { reason: ending.reason };
 }
 
+/** The current writer's context capability. Inherited pre-steps use the child that is executing, never their parent. */
+export interface NativeContextSession {
+  readonly sessionId: string;
+  readonly workspace: string;
+  readEvents(): readonly EvidenceEvent[];
+  recordProjectedEvidence(row: { readonly eventType: "audit"; readonly payload: string; readonly meta: Record<string, unknown> }): unknown;
+}
+
 export interface PreStepInput {
   readonly turn: number;
   readonly step: number;
@@ -95,6 +106,7 @@ export interface PreStepInput {
   /** The batch this step boundary claimed — already durably spliced out. */
   readonly messages: readonly InboxMessage[];
   readonly signal: AbortSignal;
+  readonly contextSession?: NativeContextSession;
 }
 
 /**
