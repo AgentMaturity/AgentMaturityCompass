@@ -2,8 +2,7 @@ import { existsSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import type { AssurancePackResult, DiagnosticReport } from "../types.js";
 import { resolveAgentId } from "../fleet/paths.js";
-import { loadVerifiedRunReport } from "../diagnostic/runReportResolution.js";
-import { listTrustedRuns } from "../governor/runTrust.js";
+import { listTrustedRuns, scanTrustedRuns } from "../governor/runTrust.js";
 import { latestAssuranceByPack } from "./assuranceRunner.js";
 import { writeFileAtomic } from "../utils/fs.js";
 
@@ -317,10 +316,10 @@ export function runIndicesForAgent(params: {
   outputPath?: string;
 }): FailureRiskReport {
   const agentId = resolveAgentId(params.workspace, params.agentId);
-  // Indices are a scoring output: only a sealed run feeds them (WP37).
-  const run = loadVerifiedRunReport(params.workspace, params.runId, agentId);
+  // Indices are a scoring output: only a trusted run feeds them (WP37) — sealed for this agent and recorded in the ledger.
+  const run = scanTrustedRuns(params.workspace, agentId).runs.find((row) => row.runId === params.runId);
   if (!run) {
-    throw new Error(`Run ${params.runId} is missing or its seal does not verify; failure-risk indices need a sealed run.`);
+    throw new Error(`Run ${params.runId} is not a trusted run for ${agentId}: failure-risk indices need a run sealed for this agent, stored as ${params.runId}.json and recorded in the ledger.`);
   }
   const assuranceByPack = latestAssuranceByPack({
     workspace: params.workspace,

@@ -2,7 +2,7 @@ import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSyn
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, test, vi } from "vitest";
-import { runFleetIndices } from "../src/assurance/indices.js";
+import { runFleetIndices, runIndicesForAgent } from "../src/assurance/indices.js";
 import { createBenchArtifact } from "../src/bench/benchArtifact.js";
 import { initBenchPolicy } from "../src/bench/benchPolicyStore.js";
 import { getAgentPaths } from "../src/fleet/paths.js";
@@ -169,5 +169,18 @@ describe("trusted run history", () => {
     const other = workspace();
     vi.spyOn(Ledger.prototype, "listRuns").mockImplementation(() => { throw new Error("ledger unreadable"); });
     expect(startTrustDriftMonitor({ workspace: other, agentId: "default", alertThreshold: 30, nowTs: 3000 }).evidenceStatus).toBe("INSUFFICIENT_EVIDENCE");
+  });
+});
+
+describe("indices for a named run", () => {
+  test("accept the agent's own anchored run and refuse a copied or unrecorded one by name", () => {
+    const ws = workspace(), now = Date.now();
+    own(ws, "run_own", now - 3 * 86_400_000);
+    plantCopy(ws, "run_copied", now - 2 * 86_400_000);
+    writeAnchoredRun(ws, runsDir(ws, "default"), report("default", "run_unanchored", now - 86_400_000), { anchor: false });
+    expect(runIndicesForAgent({ workspace: ws, runId: "run_own", agentId: "default" }).runId).toBe("run_own");
+    for (const runId of ["run_copied", "run_unanchored"]) {
+      expect(() => runIndicesForAgent({ workspace: ws, runId, agentId: "default" })).toThrow(`Run ${runId} is not a trusted run for default`);
+    }
   });
 });
