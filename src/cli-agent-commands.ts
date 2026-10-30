@@ -41,7 +41,7 @@ import {
 } from "./agent/stubProvider.js";
 import type { LoopNotification } from "./agent/loopTypes.js";
 import { echoToolSeam } from "./agent/echoTool.js";
-import { WEB_SEARCH_SEARXNG_HELP, resolveBreadthRun, withBreadthRunOptions } from "./cli/agentLoopBreadthOptions.js";
+import { VALIDATION_REPAIR_HELP, WEB_SEARCH_SEARXNG_HELP, resolveBreadthRun, withBreadthRunOptions } from "./cli/agentLoopBreadthOptions.js";
 import { agentToolset, type AgentToolset } from "./agent/agentToolset.js";
 import { runLease } from "./leases/runLease.js";
 import { selectSupportedNativeTools } from "./agent/nativeToolCapabilities.js";
@@ -134,7 +134,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--agent <id>", "agent identity; defaults to AMC_AGENT_ID, the current agent, then default")
     .description("Interactive native tasks over the existing governed run/resume path for the selected agent")
     .option("--validation-config <path>", "operator JSON containing named public checks")
-    .option("--validation-config-sha256 <digest>", "pin exact reviewed validation config bytes")
+    .option("--validation-config-sha256 <digest>", "pin exact reviewed validation config bytes").option("--validation-repair <json>", VALIDATION_REPAIR_HELP)
     .option("--validate <id>", "run this public check after each completed turn; repeat to select more", collectOption)
     .option("--extension <manifest>", "load this signed native extension; repeat for multiple manifests", collectOption)
     .option("--extension-pin <sha256>", "exact reviewed digest for each extension in the same order", collectOption)
@@ -163,8 +163,8 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--thinking <mode>", "DeepSeek only: enabled or disabled; tools-free chat requires explicit disabled")
     .option("--reasoning-effort <effort>", "DeepSeek only: exact low, high, or max with enabled thinking")
     .option("--max-steps <n>", "model steps per turn (default 8, or 2 for stub)")
-    .option("--context-window <tokens>", "declared model context window; enables automatic compaction between steps")
-    .option("--compact-threshold <fraction>", "measured prompt share of --context-window that triggers compaction (0.5-0.95, default 0.8)")
+    .option("--context-window <tokens>", "override the reviewed model context window for automatic compaction")
+    .option("--compact-threshold <fraction>", "use ratio trigger instead of the catalog token reserve (0.5-0.95; requires --context-window)")
     .option("--no-auto-summary", "prune old tool output only; never run a model-written summary step")
     .option("--session <id>", "resume this unsealed session; each turn verifies before acquiring its writer")
     .option("--fork-from <id>", "create a child of this verified parent on the first task")
@@ -198,8 +198,8 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--thinking <mode>", "DeepSeek only: enabled (default) or disabled")
     .option("--reasoning-effort <effort>", "DeepSeek only: exact low, high (default), or max with enabled thinking")
     .option("--max-steps <n>", "how many model steps one turn may take")
-    .option("--context-window <tokens>", "declared model context window; enables automatic compaction between steps")
-    .option("--compact-threshold <fraction>", "measured prompt share of --context-window that triggers compaction (0.5-0.95, default 0.8)")
+    .option("--context-window <tokens>", "override the reviewed model context window for automatic compaction")
+    .option("--compact-threshold <fraction>", "use ratio trigger instead of the catalog token reserve (0.5-0.95; requires --context-window)")
     .option("--no-auto-summary", "prune old tool output only; never run a model-written summary step")
     .option("--tools <mode>", 'tool seam: "workspace" (the governed built-ins), "echo", or "none"')
     .option("--tool-mode <mode>", '"native" (one call per step) or "code" (dispatch from a program)')
@@ -378,8 +378,6 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       ) {
         return;
       }
-      const compaction = compactionOption(io, opts);
-      if (compaction === null) return;
       const piRoute = await piAiRouteSelection(io, providerId, opts, opts.model ?? preset?.model);
       if (piRoute === null) return;
       const route = piRoute?.route ?? routeFor(io, providerId, opts, opts.model ?? preset?.model);
@@ -440,6 +438,8 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       // decided which model this route serves (and refused when none was named),
       // so a second derivation here is a second chance to disagree with it.
       const model = route.models?.[0] ?? STUB_PROVIDER_MODEL;
+      const compaction = compactionOption(io, opts, preset?.compaction, { providerId: route.providerId, model });
+      if (compaction === null) return;
       // The echo tool is offered by default only on the stub route: handing a
       // real provider a demonstration tool would spend the operator's money on
       // exercising a stub.
@@ -536,7 +536,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           `tool writes are scoped to: ${
             toolset.readiness.writeScope.length > 0 ? toolset.readiness.writeScope.join(", ") : "(nothing)"
           }`
-        ));
+        )); progress(chalk.dim(`action policy: ${toolset.readiness.actionPolicy}`));
         if (!toolset.readiness.confined) {
           // A warning, not a refusal: an unconfined fs.read is still governed
           // by the allowlist and the firewall. Code Mode is the part that

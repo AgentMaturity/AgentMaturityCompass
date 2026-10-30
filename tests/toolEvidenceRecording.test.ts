@@ -27,6 +27,7 @@ import type { ToolOutcome } from "../src/tools/toolTypes.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import { canonicalize } from "../src/utils/json.js";
 import { lockVault } from "../src/vault/vault.js";
+import { removeActionPolicy } from "./helpers/actionPolicyFixtures.js";
 
 /**
  * Every governed tool call lands in the signed spine (P5.1 remainder).
@@ -67,6 +68,7 @@ function readyWorkspace(): string {
   const dir = realpathSync(mkdtempSync(join(tmpdir(), "amc-toolev-")));
   dirs.push(dir);
   initWorkspace({ workspacePath: dir, trustBoundaryMode: "isolated" });
+  removeActionPolicy(dir); // AXR-02: no Action Policy configured, as before; this file is not about it (amc init signs one).
   // P1-78: a toolset with no session writer records only into a session the ledger holds open.
   const ledger = openLedger(dir);
   ledger.startSession({ sessionId: "toolset-test-session", runtime: "amc", binaryPath: "test", binarySha256: "test" });
@@ -277,6 +279,7 @@ it("keeps a real journaled effect when recording fails, signs the gap and refuse
   try {
     for (const [key, value] of Object.entries(environment)) process.env[key] = value;
     initWorkspace({ workspacePath: workspace, agentId: "default", trustBoundaryMode: "isolated" });
+    removeActionPolicy(workspace); // AXR-02: no Action Policy configured, as before; this file is not about it (amc init signs one).
     // Pin before producing the policies, approvals and action receipts below.
     const monitorPem = getPublicKeyPem(workspace, "monitor");
     const auditorPem = getPublicKeyPem(workspace, "auditor");

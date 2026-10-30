@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { appendHumanActionEventAsync } from "../auth/humanLog.js";
 import { NATIVE_INTERACTIVE_COMMANDS } from "./nativeInteractiveCommands.js";
 
-const MUTATING_COMMANDS = new Set(["compact", "fork", "load", "unload"]);
+const MUTATING_COMMANDS = new Set(["compact", "fork", "load", "unload", "bookmark"]);
 
 /** Operational command history only; never appends to the selected native session. */
 export async function runNativeInteractiveCommand<T>(input: {

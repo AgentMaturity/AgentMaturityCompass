@@ -98,11 +98,13 @@ export interface AgentSessionInit {
   readonly askUser?: AgentToolsetOptions["askUser"];
   readonly webSearchProvider?: AgentToolsetOptions["webSearchProvider"];
   readonly maxSteps?: number;
-  /** Automatic compaction; off unless `contextWindowTokens` is declared. */
+  /** Automatic compaction defaults to reviewed route metadata; an explicit null window disables it. */
   readonly compaction?: Partial<CompactionConfig>;
   readonly validation?: NativeValidationPlan;
   /** Bind approvals/extensions to the real owning session and its existing pipeline. */
   readonly bindTools?: (context: { readonly session: SessionService; readonly toolset: AgentToolset | null }) => AgentToolSeam;
+  /** Merged over every row of a new session (an experiment trial's case execution identity, GAP-WP04); refused on resume. */
+  readonly rowStamp?: Readonly<Record<string, unknown>>;
 }
 
 export type AgentPromptResult =
@@ -164,18 +166,22 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
     if (init.tools !== undefined && init.tools !== "none" && init.tools !== "workspace") throw new Error("Unknown native tool mode.");
     if (init.expectedToolsDigest !== undefined && (init.tools !== "workspace" || !/^[a-f0-9]{64}$/.test(init.expectedToolsDigest))) throw new Error("A native tool policy pin requires explicit workspace tools and a SHA-256 digest.");
     if (init.maxSteps !== undefined && (!Number.isSafeInteger(init.maxSteps) || init.maxSteps < 1 || init.maxSteps > 1024)) throw new Error("Native maxSteps must be an integer from 1 through 1024.");
-    const compaction = init.compaction === undefined ? undefined : resolveCompactionConfig(init.compaction);
+    if (init.compaction !== undefined) resolveCompactionConfig(init.compaction);
+    const compaction = init.compaction;
     refuseRetired(workspace, init.agentId); // P2-23: a retired agent opens no session
     // P1-79: the caller's lease, or the run's (LeasePrincipalRefused before any session row or recovery).
     const lease = runLease({ workspace, agentId: init.agentId, model: init.route.model || init.route.providerId, tools: init.tools ?? "workspace",
       ...(init.leaseToken === undefined ? {} : { leaseToken: init.leaseToken }) });
     const sessionId = init.sessionId ?? randomUUID();
     // P2-02: in an opted-in workspace, messages and tool results are tokenized before any row is committed.
-    const session = redactingSessionFor(claimant === undefined ? new SessionService(workspace) : resumeSession({
+    if (init.rowStamp !== undefined && claimant !== undefined) throw new Error("A row stamp covers a whole new session; a resumed session cannot take one.");
+    const raw = claimant === undefined ? new SessionService(workspace) : resumeSession({
       workspace, sessionId, agentId: init.agentId,
       harnessVersion: init.harnessVersion, compositionDigest: init.compositionDigest,
       policyDigest: init.policyDigest, claimant
-    }).service);
+    }).service;
+    if (init.rowStamp !== undefined) raw.stampEveryRow(init.rowStamp);
+    const session = redactingSessionFor(raw);
     // The toolset writes its tool evidence into THIS session rather than into
     // `agentToolset`'s default `toolset-<agentId>`, which nothing ever starts --
     // so a run that actually called a tool left rows referencing a session with no

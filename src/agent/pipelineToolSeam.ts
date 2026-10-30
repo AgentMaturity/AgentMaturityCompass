@@ -87,6 +87,7 @@ function parseArguments(rawArguments: string): Record<string, unknown> {
 
 export function pipelineToolSeam(init: PipelineToolSeamInit): AgentToolSeam {
   return {
+    supportsEffectGuard: true,
     prepareStep: context => init.registry.prepareStep({ ...context, agentId: init.agentId }),
 
     authorizationIntent(request: ToolCallRequest) {
@@ -159,6 +160,7 @@ export function pipelineToolSeam(init: PipelineToolSeamInit): AgentToolSeam {
           callId: request.callId,
           parentToken: request.parentToken,
           signal: request.signal,
+          ...(request.beforeEffect === undefined ? {} : { beforeEffect: request.beforeEffect }),
           ...(request.authority === undefined ? {} : { authority: request.authority })
         });
         return toLoopOutcome(outcome, request.signal.aborted);

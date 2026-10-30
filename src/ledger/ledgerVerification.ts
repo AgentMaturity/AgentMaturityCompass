@@ -161,6 +161,8 @@ export function verifyEvidenceEventIntegrity(input: {
   requireReceipt?: boolean;
   requireSealedSession?: boolean;
   trust?: TrustContext;
+  /** WP35c: an encrypted blob payload whose key is out of reach is listed as not evaluated (verifyEvidencePayload). */
+  blobKeyOptional?: boolean;
 }): VerifyResult {
   const errors: string[] = [];
   const event = input.ledger.db.prepare(
@@ -178,7 +180,7 @@ export function verifyEvidenceEventIntegrity(input: {
     : undefined;
   if (retentionProofs && !retentionProofs.ok) errors.push(...retentionProofs.errors);
   const notEvaluated: string[] = [];
-  verifyEvidencePayload(event, input.ledger.workspace, errors, undefined, retentionProofs, notEvaluated);
+  verifyEvidencePayload(event, input.ledger.workspace, errors, undefined, retentionProofs, notEvaluated, input.blobKeyOptional);
   const prefix = input.ledger.db.prepare(
     "SELECT * FROM evidence_events WHERE rowid <= ? ORDER BY rowid ASC"
   ).all(event.row_id) as EvidenceEvent[];

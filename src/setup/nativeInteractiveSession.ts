@@ -18,6 +18,7 @@ import { resolveNativeValidationSelection } from "./nativeValidationConfig.js";
 import { deepseekParams } from "../llm/providers/deepseekContract.js";
 import { NATIVE_INTERACTIVE_COMMANDS, nativeInteractiveCompleter } from "./nativeInteractiveCommands.js";
 import { listNativeInteractiveSessions, renderNativeInteractiveSession, assertNativeInteractiveSelection, type NativeInteractiveSessionSummary } from "./nativeInteractiveNavigation.js";
+import { createNativeInteractiveBookmark, listNativeInteractiveBookmarks, navigateNativeInteractiveBookmark } from "./nativeInteractiveBookmarks.js";
 import { runNativeInteractiveCommand } from "./nativeInteractiveCommandAudit.js";
 import { createNativeInteractiveMcpView } from "./nativeInteractiveMcp.js";
 import { renderNativeInteractiveToolResults } from "./nativeInteractiveResults.js";
@@ -26,6 +27,7 @@ import { escapeTerminalControls } from "../tools/builtin/askUserTool.js";
 export interface NativeChatOptions extends NativeChatProfileOptions {
   readonly validationConfig?: string;
   readonly validationConfigSha256?: string;
+  readonly validationRepair?: string;
   readonly validate?: readonly string[];
   readonly extension?: readonly string[];
   readonly extensionPin?: readonly string[];
@@ -282,7 +284,8 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
       ...(options.autoSummary === false ? ["--no-auto-summary"] : []),
       ...(approvalClass === undefined ? [] : ["--approve-tools", approvalClass, "--approve-risk", approvalRisk]), ...mcpArgs,
       ...(validation === undefined ? [] : ["--validation-config", resolve(options.validationConfig!), "--validation-config-sha256", validation.configSha256,
-        ...validation.checks.flatMap(check => ["--validate", check.id])])];
+        ...validation.checks.flatMap(check => ["--validate", check.id]),
+        ...(validation.repair === undefined ? [] : ["--validation-repair", JSON.stringify(validation.repair)])])];
     const routeArgs = [...routeBaseArgs, ...nativeChatProfileArgv(profile)];
     const showScope = () => {
       io.log(`Native chat · agent ${guide.agentId} · provider ${provider} · model ${guide.model}`);
@@ -342,6 +345,32 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
           sessionId = selected.sessionId; forkFrom = null; previousSummary = null;
           io.log(`Session selected: ${sessionId}. The next explicit task verifies history before acquiring its writer.`);
         } catch (error) { io.error(escapeTerminalControls(error instanceof Error ? error.message : "Session navigation unavailable; no writer acquired.")); }
+        return false;
+      }
+      if (text === "/bookmark") {
+        if (sessionId === null || forkFrom !== null) throw new Error("Run a task or select its recorded session before bookmarking a turn.");
+        const name = await question("Bookmark name (blank cancels): ");
+        if (!name?.trim()) return false;
+        const turn = await question("Sealed turn number (blank selects latest sealed turn): ");
+        if (turn === null) return false;
+        if (turn.trim() && !/^[1-9][0-9]*$/.test(turn.trim())) throw new Error("Choose a positive sealed turn number.");
+        const bookmark = await createNativeInteractiveBookmark(cwd, { name, sessionId, ...(turn.trim() ? { turn: Number(turn.trim()) } : {}) });
+        io.log(escapeTerminalControls(`Bookmark saved: ${bookmark.name} · session ${bookmark.sessionId} · turn ${bookmark.turn} · seal ${bookmark.sealEventHash}`));
+        return false;
+      }
+      if (text === "/bookmarks") {
+        const bookmarks = listNativeInteractiveBookmarks(cwd);
+        io.log("Signed bookmarks (target evidence checked on navigation; no writer acquired):");
+        bookmarks.forEach((bookmark, at) => io.log(escapeTerminalControls(`${at + 1}. ${bookmark.name} · session ${bookmark.sessionId} · turn ${bookmark.turn}`)));
+        if (!bookmarks.length) return false;
+        const choice = await question("Bookmark number to inspect (blank cancels): ");
+        if (!choice?.trim()) return false;
+        const selected = /^[1-9][0-9]*$/.test(choice.trim()) ? bookmarks[Number(choice.trim()) - 1] : undefined;
+        if (!selected) throw new Error("Choose a listed bookmark number.");
+        const target = navigateNativeInteractiveBookmark(cwd, selected.name, selected);
+        io.log(escapeTerminalControls(`Verified bookmark: ${target.bookmark.name} · session ${target.bookmark.sessionId} · turn ${target.bookmark.turn} · seal ${target.bookmark.sealEventHash}`));
+        for (const event of target.events) io.log(escapeTerminalControls(`  ${event.event_type} · ${event.id} · ${event.event_hash}`));
+        io.log("Bookmark inspection complete; no writer acquired. Use /resume to select a session for a new task.");
         return false;
       }
       if (text === "/extensions") {

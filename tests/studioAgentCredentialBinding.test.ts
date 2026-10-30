@@ -24,6 +24,7 @@ import { startStudioApiServer } from "../src/studio/studioServer.js";
 import { ensureAgentToken } from "../src/studio/studioState.js";
 import type { ToolExecutionResponse, ToolIntentResponse } from "../src/toolhub/toolhubServer.js";
 import type { DiagnosticReport } from "../src/types.js";
+import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
 
 // Author-only HTTP regressions for AMC-1546. No execution result is claimed here.
 // Authentication, leases, signatures, ToolHub, approvals, receipts and fs.write are
@@ -51,6 +52,7 @@ async function fixture() {
   const workspace = realpathSync(mkdtempSync(join(tmpdir(), "amc-agent-credential-binding-")));
   roots.push(workspace);
   initWorkspace({ workspacePath: workspace, agentId: A, trustBoundaryMode: "isolated" });
+  writeRuntimeFirewallPolicy({ workspace: workspace, mode: "observe" }); // AXR-01: ToolHub and hook control apply the runtime firewall as the native pipeline does; unsigned, it blocks every call.
   // Workspace initialization does not create fleet agent configurations.
   // Both identities use native signed configs; this fixture never invokes a provider.
   initFleet(workspace, { orgName: "Credential binding fixture" });

@@ -6,6 +6,7 @@ import { extractEnvelope, SESSION_ENVELOPE_META_KEY, SESSION_GENESIS } from "../
 import type { ActionClass, EvidenceEvent } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
 import { operationalEvidenceProblems, type OperationalEvidenceOptions } from "../keys/operationalLedgerReader.js";
+import { nativeUsdUnits } from "./nativeUsdAmount.js";
 
 export const NATIVE_BUDGET_RESERVATION = "NATIVE_BUDGET_RESERVATION";
 export const actionClasses: readonly ActionClass[] = ["READ_ONLY", "WRITE_LOW", "WRITE_HIGH", "DEPLOY", "SECURITY", "FINANCIAL", "NETWORK_EXTERNAL", "DATA_EXPORT", "IDENTITY"];
@@ -119,6 +120,13 @@ export function measuredUsage(value: unknown, native: boolean): { tokens: number
   return { tokens, tokensKnown: reported && usage.complete !== false && (total !== null || (input !== null && output !== null)), cost: cost ?? 0, costKnown: cost !== null };
 }
 
+function completeNativeCost(header: EvidenceEvent, settled: EvidenceEvent | undefined): boolean {
+  const meta = settled ? budgetMeta(settled) : {};
+  const values = meta.usage as Record<string, unknown> | undefined;
+  return settled?.event_type === "request/response" && meta.outcome === "completed" && meta.dispatchAttempted === true
+    && values?.reported === true && values.complete === true && measuredUsage(values, true).costKnown && budgetMeta(header).providerId !== "stub";
+}
+
 export interface BudgetPeriodUsage {
   llmRequests: number;
   llmPreparedRequests: number;
@@ -133,7 +141,9 @@ export interface BudgetPeriodUsage {
   llmCostUsageComplete: boolean;
 }
 export interface BudgetUsage {
-  daily: BudgetPeriodUsage & { toolExecutes: Record<ActionClass, number>; toolDenied: Record<ActionClass, number>; toolPending: Record<ActionClass, number>; llmPendingRequests: number };
+  daily: BudgetPeriodUsage & { toolExecutes: Record<ActionClass, number>; toolDenied: Record<ActionClass, number>; toolPending: Record<ActionClass, number>; llmPendingRequests: number;
+    /** Outstanding signed ceilings, including unresolved exposure from earlier days. Never measured spend. */
+    llmReservedCostUsd: number; llmBudgetCostUsd: number; llmBudgetCostUnits: string; llmUnreservedCostRequests: number };
   minute: BudgetPeriodUsage;
 }
 const period = (): BudgetPeriodUsage => ({ llmRequests: 0, llmPreparedRequests: 0, llmTokens: 0, llmCostUsd: 0,
@@ -142,7 +152,9 @@ const period = (): BudgetPeriodUsage => ({ llmRequests: 0, llmPreparedRequests: 
 export function projectBudgetUsage(rows: readonly EvidenceEvent[], agentId: string, now: number): BudgetUsage {
   const date = new Date(now); date.setHours(0, 0, 0, 0);
   const dayStart = date.getTime();
-  const result: BudgetUsage = { daily: { ...period(), toolExecutes: toolCounts(), toolDenied: toolCounts(), toolPending: toolCounts(), llmPendingRequests: 0 }, minute: period() };
+  const result: BudgetUsage = { daily: { ...period(), toolExecutes: toolCounts(), toolDenied: toolCounts(), toolPending: toolCounts(), llmPendingRequests: 0,
+    llmReservedCostUsd: 0, llmBudgetCostUsd: 0, llmBudgetCostUnits: "0", llmUnreservedCostRequests: 0 }, minute: period() };
+  let budgetCostUnits = 0n, reservedCostUnits = 0n;
   const owners = new Map<string, string>();
   for (const row of rows) if (row.event_type === "session/open") owners.set(row.session_id, budgetSessionAgent(rows, row.session_id));
   const owner = (row: EvidenceEvent): unknown => owners.get(row.session_id) ?? budgetMeta(row).agentId ?? "default";
@@ -178,6 +190,7 @@ export function projectBudgetUsage(rows: readonly EvidenceEvent[], agentId: stri
   }
   const recordRequest = (ts: number, usage: unknown, native: boolean, protocolRefused = false) => {
     const measured = measuredUsage(usage, native);
+    if (ts >= dayStart && ts <= now) budgetCostUnits += nativeUsdUnits(measured.cost);
     for (const part of periods(ts)) {
       part.llmRequests++; part.llmTokens += measured.tokens; part.llmCostUsd += measured.cost;
       if (!measured.tokensKnown) { part.unknownLlmTokenRequests++; if (!protocolRefused) part.blockingUnknownLlmTokenRequests++; }
@@ -194,6 +207,15 @@ export function projectBudgetUsage(rows: readonly EvidenceEvent[], agentId: stri
       const settled = settlements.get(headerId);
       const settledMeta = settled ? budgetMeta(settled) : {};
       recordRequest(reservation.ts, settledMeta.usage, true, settled?.event_type === "request/failure" && [401, 403, 429].includes(Number(settledMeta.httpStatus)));
+      const measured = measuredUsage(settledMeta.usage, true);
+      const completeCost = completeNativeCost(header, settled);
+      const reserved = number(meta.reservedCostUsd);
+      if (meta.reservedCostUsd !== undefined && (reserved === null || reserved === 0)) throw new Error("Native USD reservation amount is invalid");
+      if (reserved !== null && !completeCost) {
+        // An incomplete observation cannot release the ceiling. Preserve exposure over day boundaries.
+        reservedCostUnits += nativeUsdUnits(Math.max(reserved, measured.cost));
+        if (reservation.ts >= dayStart) budgetCostUnits -= nativeUsdUnits(measured.cost);
+      } else if (!completeCost) result.daily.llmUnreservedCostRequests++;
       if (!settled) result.daily.llmPendingRequests++;
       handledHeaders.add(headerId);
     } else if (meta.kind === "tool") {
@@ -216,11 +238,12 @@ export function projectBudgetUsage(rows: readonly EvidenceEvent[], agentId: stri
     const header = headers.get(headerId);
     if (!header || header.session_id !== settled.session_id) throw new Error("Native budget settlement has no matching header");
     const meta = budgetMeta(settled);
-    if (meta.requestDigest !== budgetMeta(header).requestDigest) throw new Error("Native budget settlement request digest differs from its header");
+    if (meta.requestDigest !== budgetMeta(header).requestDigest || meta.providerId !== budgetMeta(header).providerId) throw new Error("Native budget settlement request digest or provider differs from its header");
     const failure = meta.failure as Record<string, unknown> | undefined;
     const historicalAttempt = meta.dispatchAttempted === undefined && (meta.httpStatus !== null || ["TRANSPORT", "ABORTED"].includes(String(failure?.code)));
     if (!handledHeaders.has(headerId) && (settled.event_type === "request/response" || meta.dispatchAttempted === true || historicalAttempt)) {
       recordRequest(header.ts, meta.usage, true, settled.event_type === "request/failure" && [401, 403, 429].includes(Number(meta.httpStatus)));
+      if (!completeNativeCost(header, settled)) result.daily.llmUnreservedCostRequests++;
     }
   }
   for (const row of tools.values()) {
@@ -237,6 +260,7 @@ export function projectBudgetUsage(rows: readonly EvidenceEvent[], agentId: stri
   for (const row of rows) {
     if (row.ts > now || owner(row) !== agentId) continue;
     const meta = budgetMeta(row);
+    if (row.event_type === "llm_request" && !legacyResponses.has(`${row.session_id}:${String(meta.request_id ?? meta.requestId ?? row.id)}`)) result.daily.llmUnreservedCostRequests++;
     if (row.event_type === "llm_request") for (const part of periods(row.ts)) {
       part.llmRequests++;
       if (!legacyResponses.has(`${row.session_id}:${String(meta.request_id ?? meta.requestId ?? row.id)}`)) {
@@ -245,10 +269,14 @@ export function projectBudgetUsage(rows: readonly EvidenceEvent[], agentId: stri
     }
     if (row.event_type === "llm_response") {
       const measured = measuredUsage(meta.usage, false);
+      const provenance = meta.usage as Record<string, unknown> | undefined;
+      const costComplete = measured.costKnown && provenance?.reported !== false && provenance?.complete !== false;
+      if (row.ts >= dayStart) budgetCostUnits += nativeUsdUnits(measured.cost);
+      if (!costComplete) result.daily.llmUnreservedCostRequests++;
       for (const part of periods(row.ts)) {
         part.llmTokens += measured.tokens; part.llmCostUsd += measured.cost;
         if (!measured.tokensKnown) { part.unknownLlmTokenRequests++; part.blockingUnknownLlmTokenRequests++; }
-        if (!measured.costKnown) part.unknownLlmCostRequests++;
+        if (!costComplete) part.unknownLlmCostRequests++;
       }
     }
     if (row.event_type === "tool_action" && row.ts >= dayStart && !tools.has(toolKey(row, meta)) &&
@@ -266,5 +294,9 @@ export function projectBudgetUsage(rows: readonly EvidenceEvent[], agentId: stri
     part.llmTokenUsageComplete = part.unknownLlmTokenRequests === 0;
     part.llmCostUsageComplete = part.unknownLlmCostRequests === 0;
   }
+  result.daily.llmBudgetCostUnits = (budgetCostUnits + reservedCostUnits).toString();
+  result.daily.llmBudgetCostUsd = Number(budgetCostUnits + reservedCostUnits) / 1e12;
+  result.daily.llmReservedCostUsd = Number(reservedCostUnits) / 1e12;
+  if (!Number.isFinite(result.daily.llmBudgetCostUsd)) throw new Error("Native USD budget exposure overflow");
   return result;
 }

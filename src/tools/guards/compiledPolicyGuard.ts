@@ -122,9 +122,13 @@ function deviatedControls(policy: ActiveCompiledPolicy, execution: ToolExecution
   }
 }
 
-/** Why the pinned policy denies this call, or undefined. */
+/**
+ * Why the pinned policy denies this call, or undefined. `planeBindsIdentity` is set by a plane that authenticates the
+ * caller itself and has no native authorization record (ToolHub's and hook control's leases, AXR-01); it skips only the
+ * `identity-binding` guard, never an unimplemented one.
+ */
 export function compiledPolicyDenial(policy: ActiveCompiledPolicy, workspace: string, execution: ToolExecution,
-  readTools: ToolsSnapshotRead = () => loadVerifiedToolsConfigSnapshot(workspace)): string | undefined {
+  readTools: ToolsSnapshotRead = () => loadVerifiedToolsConfigSnapshot(workspace), planeBindsIdentity = false): string | undefined {
   const deny = (controlIds: readonly string[], why: string): string => `compiled policy denied this call (control ${named(policy, controlIds)}): ${why}`;
   const pipeline = policy.runtimePolicy.toolPipeline;
   const toolsWhy = pipeline.toolsConfigSha256 === undefined ? null : toolsConfigDenial(pipeline.toolsConfigSha256, readTools());
@@ -137,7 +141,8 @@ export function compiledPolicyDenial(policy: ActiveCompiledPolicy, workspace: st
   const waived = (controlIds: readonly string[]): boolean =>
     controlIds.length > 0 && controlIds.every((id) => (deviated ??= deviatedControls(policy, execution)).has(id));
   for (const guard of pipeline.guards) {
-    const why = guard.id === "identity-binding" ? identityDenial(guard.params, execution) : `guard ${guard.id} is not implemented by this pipeline`;
+    const why = guard.id !== "identity-binding" ? `guard ${guard.id} is not implemented by this pipeline`
+      : planeBindsIdentity ? null : identityDenial(guard.params, execution);
     if (why && !waived(guard.controlIds)) return deny(guard.controlIds, why);
   }
   const rule = policy.runtimePolicy.approvals[execution.actionClass];

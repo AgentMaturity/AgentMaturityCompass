@@ -38,6 +38,8 @@ const metadataSchema = z.strictObject({
   contextWindowTokens: tokens.nullable(), maxOutputTokens: tokens.nullable(),
   modalities: z.strictObject({ input: z.array(modality).readonly(), output: z.array(modality).readonly() }).readonly().nullable(),
   reasoning: z.boolean().nullable(), modelSupport: z.literal("catalog-not-probed"), pricing: pricingSchema.nullable(),
+  reviewKind: z.literal("operator-declared").optional(),
+  discoveryDigest: text.refine(isSha256HexDigest).optional(),
   digest: text.refine(isSha256HexDigest)
 }).readonly();
 
@@ -121,4 +123,21 @@ export function listModelMetadata(providerId: string, protocol: string): readonl
     const snapshot = createModelMetadataSnapshot(providerId, protocol, model);
     return snapshot === null ? [] : [snapshot];
   }));
+}
+
+/** Operator-reviewed facts only. Freshness describes that review, not a provider probe or authenticated remote claim. */
+export function createReviewedModelMetadataSnapshot(facts: Pick<ModelMetadataSnapshot,
+  "providerId" | "protocol" | "model" | "source" | "asOf" | "contextWindowTokens" | "maxOutputTokens" | "modalities" | "reasoning"> & { readonly discoveryDigest?: string }): ModelMetadataSnapshot {
+  const canonicalProviderId = canonicalProvider(facts.providerId, facts.protocol) ?? facts.providerId;
+  const payload = {
+    schemaVersion: 1, providerId: facts.providerId, canonicalProviderId, protocol: facts.protocol,
+    model: facts.model, canonicalModel: canonicalModelFor(canonicalProviderId, facts.protocol, facts.model),
+    source: facts.source.trim(), asOf: facts.asOf, freshness: "verified", reviewKind: "operator-declared",
+    contextWindowTokens: facts.contextWindowTokens, maxOutputTokens: facts.maxOutputTokens,
+    modalities: facts.modalities, reasoning: facts.reasoning, modelSupport: "catalog-not-probed", pricing: null,
+    ...(facts.discoveryDigest === undefined ? {} : { discoveryDigest: facts.discoveryDigest })
+  };
+  const snapshot = parseModelMetadataSnapshot({ ...payload, digest: sha256Hex(canonicalize(payload)) });
+  if (snapshot === null) throw new Error("Invalid operator-reviewed model metadata");
+  return snapshot;
 }

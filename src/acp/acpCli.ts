@@ -35,6 +35,7 @@ export function registerAcpCommands(program: Command): void {
     .option("--expected-tools-digest <sha256>", "Refuse any workspace tool call after its signed policy digest changes")
     .option("--validation-config <path>", "Operator JSON containing named public checks")
     .option("--validation-config-sha256 <digest>", "Pin exact reviewed validation configuration bytes")
+    .option("--validation-repair <json>", "Explicit bounded repair policy for selected public checks, including allowed edit paths")
     .option("--validate <id>", "Run this public check after each completed turn; repeat to select more", (id: string, previous: string[] = []) => [...previous, id])
     .option("--approve-tools <actionClass>", "Require the existing signed approval gate for tool calls")
     .option("--approve-risk <tier>", "Signed approval risk tier; requires --approve-tools")
@@ -44,8 +45,8 @@ export function registerAcpCommands(program: Command): void {
     .option("--thinking <mode>", "DeepSeek only: enabled (default) or disabled")
     .option("--reasoning-effort <effort>", "DeepSeek only: exact low, high (default), or max with enabled thinking")
     .option("--max-steps <n>", "Positive model-step bound per turn (default 8, stub 2)")
-    .option("--context-window <tokens>", "Declared model context window; enables automatic compaction between steps")
-    .option("--compact-threshold <fraction>", "Measured prompt share of --context-window that triggers compaction (0.5-0.95, default 0.8)")
+    .option("--context-window <tokens>", "Override the reviewed model context window for automatic compaction")
+    .option("--compact-threshold <fraction>", "Use ratio trigger instead of the catalog token reserve (0.5-0.95; requires --context-window)")
     .option("--no-auto-summary", "Prune old tool output only; never run a model-written summary step")
     .option("--agent-id <id>", "Agent identity recorded in the ledger", "default")
     .option("--system-prompt <text>", "System prompt for each session", "You are a careful assistant.")
@@ -64,6 +65,7 @@ export function registerAcpCommands(program: Command): void {
       expectedToolsDigest?: string;
       validationConfig?: string;
       validationConfigSha256?: string;
+      validationRepair?: string;
       validate?: string[];
       approveTools?: string;
       approveRisk?: string;
@@ -106,6 +108,7 @@ export function registerAcpCommands(program: Command): void {
           ...(opts.expectedToolsDigest === undefined ? {} : { expectedToolsDigest: opts.expectedToolsDigest }),
           ...(opts.validationConfig === undefined ? {} : { validationConfig: opts.validationConfig }),
           ...(opts.validationConfigSha256 === undefined ? {} : { validationConfigSha256: opts.validationConfigSha256 }),
+          ...(opts.validationRepair === undefined ? {} : { validationRepair: opts.validationRepair }),
           ...(opts.validate === undefined ? {} : { validate: opts.validate }),
           maxTokens: Number(opts.maxTokens),
           ...(opts.thinking === undefined ? {} : { thinking: opts.thinking }),

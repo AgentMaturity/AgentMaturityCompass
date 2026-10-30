@@ -32,8 +32,13 @@ import { canonicalToolSchemaBytes } from "./requestSpec.js";
 import { DEFAULT_REQUEST_ENCODERS } from "./deriveRequest.js";
 import type { RequestEncoderRegistry } from "./requestEncoder.js";
 import { resolveRequestSources } from "./requestSources.js";
+import type { ModelMetadataSnapshot } from "../modelCatalog.js";
+import type { PhysicalRouteIdentity, VirtualRoutingDecision } from "./routeIdentity.js";
 
 export interface PrepareRequestSpec {
+  readonly modelMetadata?: ModelMetadataSnapshot | null;
+  readonly physicalRoute?: PhysicalRouteIdentity;
+  readonly routingDecision?: VirtualRoutingDecision | null;
   readonly model: string;
   readonly providerId: string;
   /** Which encoder turns this request into bytes. Recorded in the header. */
@@ -116,6 +121,9 @@ export function prepareRequest(session: SessionService, spec: PrepareRequestSpec
 
   spec.assertRequest?.(resolution.request);
   return session.recordRequestHeader({
+    ...(spec.modelMetadata === undefined ? {} : { modelMetadata: spec.modelMetadata }),
+    ...(spec.physicalRoute === undefined ? {} : { physicalRoute: spec.physicalRoute }),
+    ...(spec.routingDecision === undefined ? {} : { routingDecision: spec.routingDecision }),
     model: spec.model,
     providerId: spec.providerId,
     params: spec.params,

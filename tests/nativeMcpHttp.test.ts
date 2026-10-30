@@ -15,6 +15,7 @@ import { discoverNativeMcpCatalog, mountNativeMcpServer, nativeMcpToolName, type
 import { NATIVE_MCP_HTTP_LIMITS, NativeMcpHttpTransport, nativeMcpHttpEndpoint, type NativeMcpHttpServer } from "../src/mcp/nativeMcpHttpTransport.js";
 import { loadNativeMcpConfiguration, resolveNativeMcpServer } from "../src/setup/nativeMcpConfig.js";
 import { sha256Hex } from "../src/utils/hash.js";
+import { removeActionPolicy } from "./helpers/actionPolicyFixtures.js";
 
 const SECRET = "synthetic-http-mcp-credential-41a9";
 const cleanup: (() => Promise<void>)[] = [];
@@ -27,7 +28,8 @@ interface Call { method: string; rpc?: string; session?: string; origin?: string
 async function fixture(state: State = {}, options: Partial<NativeMcpHttpServer> = {}) {
   vi.stubEnv("AMC_VAULT_PASSPHRASE", "http-mcp-fixture-vault-only");
   const workspace = mkdtempSync(join(tmpdir(), "amc-http-mcp-"));
-  initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" }); initBudgets(workspace);
+  initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
+  removeActionPolicy(workspace); // AXR-02: no Action Policy configured, as before; this file is not about it (amc init signs one). initBudgets(workspace);
   writeRuntimeFirewallPolicy({ workspace, mode: "observe" });
   const configured = loadToolsConfig(workspace), name = nativeMcpToolName("fixture", "lookup");
   initToolsConfig(workspace, { ...configured, tools: { ...configured.tools,
