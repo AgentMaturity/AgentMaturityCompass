@@ -1029,7 +1029,6 @@
     {"id":"00f83eb9f756288453b050255de2be312bf3f86e726fbc30d3be0469cc5a99fd","file":"src/product/index.ts","kind":"exports"},
     {"id":"010b4eed7d9b650b8b885ece3cb20f728282c51259c1f000858e621a354f03b9","file":"src/approvals/approvalDelivery.ts","kind":"types"},
     {"id":"010be3948e8d0d9c1403b0a95ed15d00d85093cf87874d482165c31a55f493de","file":"src/canon/canonSchema.ts","kind":"exports"},
-    {"id":"010e68b75173cb12e2c71b3d4e4e9ea21b07a1d2e89f974752a719930dbfd5bc","file":"src/config/amcConfigSchema.ts","kind":"exports"},
     {"id":"0148c58864abd784dccc2de7f0bb90bb191b4cd5f59a03cee1e37ecfb05a85d0","file":"src/identity/hostVault.ts","kind":"exports"},
     {"id":"016d98558404da977c734bc83ba52d1d6e599340be2b14cd9cdb72a876b8be78","file":"src/product/toolContract.ts","kind":"types"},
     {"id":"017ffdb865d58e7960744f8b09d0c9b4fbcc3b62621a941c51d499da53d8e9a9","file":"src/enforce/safetyDSL.ts","kind":"types"},
