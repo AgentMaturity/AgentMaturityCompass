@@ -20,6 +20,7 @@ import { SessionService } from "../../src/session/sessionService.js";
 import { initToolsConfig, loadToolsConfig } from "../../src/toolhub/toolhubValidators.js";
 import { canonicalize } from "../../src/utils/json.js";
 import { initWorkspace } from "../../src/workspace.js";
+import { removeActionPolicy } from "../helpers/actionPolicyFixtures.js";
 
 const CHECKOUT = realpathSync(fileURLToPath(new URL("../../", import.meta.url)));
 const MODERN = "2026-07-28";
@@ -234,7 +235,8 @@ async function owned(label: string, loseFirstToolResponse: boolean, body: (f: Fi
   });
   try {
     process.env.AMC_VAULT_PASSPHRASE = "stateless-fixture-vault-only";
-    initWorkspace({ workspacePath: root, trustBoundaryMode: "isolated" }); initBudgets(root);
+    initWorkspace({ workspacePath: root, trustBoundaryMode: "isolated" });
+    removeActionPolicy(root); // AXR-02: no Action Policy configured, as before; this file is not about it (amc init signs one). initBudgets(root);
     writeRuntimeFirewallPolicy({ workspace: root, mode: "observe" });
     const configured = loadToolsConfig(root);
     initToolsConfig(root, { ...configured, tools: { ...configured.tools,
@@ -522,8 +524,9 @@ describe("P1-39 governed stateless MCP public flow", () => {
       expect(outcome).toMatchObject({ outcome: "ERROR", exitCode: 1, timedOut: false, denied: false });
       const recorded = assertRecordedPair(f, 0, outcome);
       expect(recorded.meta.outcome).toBe("ERROR");
-      expect(JSON.parse(String(outcome.content))).toEqual({
+      expect(JSON.parse(String(outcome.content))).toMatchObject({
         content: [{ type: "text", text: "Synthetic remote error: TOOL_OUTCOME_UNKNOWN" }],
+        amcProvenance: { serverId: SERVER_ID, catalogDigest: f.reviewed!.digest, trust: "untrusted-external" }, amcLosses: [],
         isError: true, resultType: "complete"
       });
       expect(f.requests.map(row => row.rpc)).toEqual(["server/discover", "tools/list", "server/discover", "tools/list", "tools/list", "tools/call"]);

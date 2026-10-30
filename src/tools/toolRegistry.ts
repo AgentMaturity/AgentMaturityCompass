@@ -1,3 +1,6 @@
+import { AjvJsonSchemaValidator } from "@modelcontextprotocol/sdk/validation/ajv";
+import { sha256Hex } from "../utils/hash.js";
+import { canonicalize } from "../utils/json.js";
 import { RUN_CODE_TOOL } from "./toolPipeline.js";
 import type {
   LabelledToolGuard,
@@ -32,11 +35,58 @@ export interface GuardDenial {
 interface ToolRegistration {
   readonly definition: ToolDefinition;
   readonly available: ToolDefinition["available"];
+  readonly exposure: ToolDefinition["exposure"];
 }
 
 interface StepAvailability {
   readonly admitted: Set<ToolRegistration>;
   ready: boolean;
+}
+
+export interface ToolActivationRequest {
+  readonly name: string;
+  readonly schemaDigestSha256: string;
+}
+
+export interface ToolActivation extends ToolActivationRequest {
+  readonly revision: number;
+}
+
+const loadoutFailureMessages = {
+  UNAUTHORIZED: "Tool activation is not authorized for this session.",
+  CATALOG_UNAVAILABLE: "Tool catalog is unavailable for this session.",
+  STALE_ACTIVATION: "Tool activation is stale. Search again before activating.",
+  LOADOUT_LIMIT: "Tool loadout limit reached (20).",
+  EVIDENCE_UNAVAILABLE: "Tool activation evidence is unavailable.",
+  INVALID_ARGUMENTS: "Invalid tool search arguments.",
+  CANCELLED: "Tool discovery or activation cancelled."
+} as const;
+
+export type ToolLoadoutErrorCode = keyof typeof loadoutFailureMessages;
+
+/** Finite, fixed public failures; internal policy, schema and writer errors never become model-visible messages. */
+export class ToolLoadoutError extends Error {
+  readonly code: ToolLoadoutErrorCode;
+
+  constructor(code: ToolLoadoutErrorCode) {
+    const safeCode = typeof code === "string" && Object.hasOwn(loadoutFailureMessages, code) ? code : "CATALOG_UNAVAILABLE";
+    super(loadoutFailureMessages[safeCode]);
+    this.code = safeCode;
+    this.name = "ToolLoadoutError";
+    Object.freeze(this);
+  }
+}
+
+interface LoadoutEntry {
+  readonly registration: ToolRegistration;
+  readonly schemaDigestSha256: string;
+}
+
+interface ToolLoadout {
+  readonly identity: string;
+  readonly discovered: Map<string, LoadoutEntry>;
+  readonly active: Map<string, LoadoutEntry>;
+  revision: number;
 }
 
 interface ToolLayer {
@@ -65,6 +115,7 @@ export class ToolRegistry {
   private readonly scopes = new Map<string, ToolLayer>();
   private transportRegistered = false;
   private readonly steps = new Map<string, StepAvailability>();
+  private readonly loadouts = new Map<string, ToolLoadout>();
 
   private layerFor(scope: string | undefined): ToolLayer {
     if (scope === undefined) return this.global;
@@ -99,10 +150,12 @@ export class ToolRegistry {
       );
     }
     // The registration object is a generation: re-registering even the same definition cannot reuse an old admission.
-    const registration = { definition: tool, available: tool.available };
+    const registration = { definition: tool, available: tool.available, exposure: tool.exposure };
     layer.tools.set(tool.name, registration);
+    this.pruneLoadouts();
     return () => {
       if (layer.tools.get(tool.name) === registration) layer.tools.delete(tool.name);
+      this.pruneLoadouts();
     };
   }
 
@@ -139,6 +192,7 @@ export class ToolRegistry {
     }
     const layer = this.layerFor(scope);
     layer.restrictions.push(restriction);
+    this.pruneLoadouts();
     return () => {
       const at = layer.restrictions.indexOf(restriction);
       if (at >= 0) layer.restrictions.splice(at, 1);
@@ -190,23 +244,139 @@ export class ToolRegistry {
       .map(([name, registration]) => [name, registration.definition]));
   }
 
-  /** Directly offered schemas. Deferred and hidden tools cannot inflate the model's initial tool list. */
-  offered(scope?: string): ReadonlyMap<string, ToolDefinition> {
-    return new Map([...this.visible(scope)].filter(([, tool]) => tool.exposure === undefined || tool.exposure === "direct"));
+  /** Exposure narrows through both registration layers; a scoped replacement cannot opt out of global presentation. */
+  private exposures(name: string, scope?: string): readonly ToolDefinition["exposure"][] {
+    return [this.global.tools.get(name)?.exposure, scope === undefined ? undefined : this.scopes.get(scope)?.tools.get(name)?.exposure];
   }
 
-  /** Finite metadata only; this view contains neither dispatch functions nor hidden/code-only schemas. */
+  /** Modeled invocation routes are subordinate to the same global and scoped exposure restrictions. */
+  invocationDenial(name: string, scope: string, nested: boolean): string | undefined {
+    const exposures = this.exposures(name, scope);
+    if (exposures.includes("hidden")) return "hidden tools cannot be invoked by the model";
+    if (!nested && exposures.includes("code-only")) return "code-only tools require a Code Mode sub-call";
+    if (nested && exposures.includes("model-only")) return "model-only tools cannot be invoked by Code Mode";
+    return undefined;
+  }
+
+  private discoverable(name: string, scope?: string): boolean {
+    const exposures = this.exposures(name, scope);
+    return !exposures.includes("hidden") && !exposures.includes("code-only");
+  }
+
+  private deferred(name: string, scope: string): boolean {
+    return this.discoverable(name, scope) && this.exposures(name, scope).includes("deferred");
+  }
+
+  /** Direct schemas plus explicitly activated deferred schemas; presentation never grants execution authority. */
+  offered(scope?: string): ReadonlyMap<string, ToolDefinition> {
+    this.pruneLoadouts();
+    const active = scope === undefined ? undefined : this.loadouts.get(scope)?.active;
+    return new Map([...this.visible(scope)].filter(([name]) => this.discoverable(name, scope)
+      && (!this.exposures(name, scope).includes("deferred") || active?.has(name) === true)));
+  }
+
+  /** Finite metadata only; this view contains neither dispatch functions nor hidden/internal schemas. */
   catalog(scope?: string): readonly { name: string; description: string; parameters: Record<string, unknown> }[] {
     return [...this.visible(scope).values()]
-      .filter(tool => tool.exposure !== "hidden" && tool.parameters !== undefined)
+      .filter(tool => this.discoverable(tool.name, scope) && tool.parameters !== undefined)
       .map(tool => ({ name: tool.name, description: tool.description, parameters: structuredClone(tool.parameters!) }));
   }
 
+  /** Stable registration metadata identity; step availability never changes the catalog's reviewed schema bytes. */
+  catalogDigest(scope?: string): string {
+    const catalog = [...this.permitted(scope)].filter(([name, registration]) => this.discoverable(name, scope)
+      && registration.definition.parameters !== undefined)
+      .map(([name, registration]) => ({ name, description: registration.definition.description,
+        parameters: registration.definition.parameters, actionClass: registration.definition.actionClass,
+        exposure: this.exposures(name, scope).map(exposure => exposure ?? "direct") })).sort((a, b) => a.name.localeCompare(b.name));
+    return sha256Hex(canonicalize(catalog));
+  }
+
+  /** One bounded in-memory loadout per agent. New session, policy or catalog identity starts empty. */
+  synchronizeLoadout(scope: string, identity: string): void {
+    const previous = this.loadouts.get(scope);
+    if (previous?.identity === identity) return;
+    this.loadouts.set(scope, { identity, discovered: new Map(), active: new Map(), revision: previous?.revision ?? 0 });
+  }
+
+  /** Remember only the last bounded discovery result, bound to current registration and exact schema bytes. */
+  rememberDiscovery(scope: string, schemas: readonly { name: string; parameters: Record<string, unknown> }[]): void {
+    const state = this.loadouts.get(scope);
+    if (!state) return;
+    state.discovered.clear();
+    const permitted = this.permitted(scope);
+    const visible = this.visible(scope);
+    for (const schema of schemas.slice(0, 20)) {
+      const registration = permitted.get(schema.name);
+      if (!registration || !this.deferred(schema.name, scope) || !visible.has(schema.name)) continue;
+      const schemaDigestSha256 = sha256Hex(canonicalize(schema.parameters));
+      if (registration.definition.parameters === undefined
+        || sha256Hex(canonicalize(registration.definition.parameters)) !== schemaDigestSha256) continue;
+      state.discovered.set(schema.name, { registration, schemaDigestSha256 });
+    }
+  }
+
+  /** Commit evidence before publishing. A guessed name, stale discovery or failed writer grants no schema. */
+  activate(scope: string, request: ToolActivationRequest, record: (activation: ToolActivation) => string,
+    signal?: AbortSignal): ToolActivation & { readonly evidenceRef: string } {
+    signal?.throwIfAborted();
+    this.pruneLoadouts();
+    const state = this.loadouts.get(scope);
+    const entry = state?.discovered.get(request.name);
+    if (!state || !entry || entry.schemaDigestSha256 !== request.schemaDigestSha256
+      || !this.visible(scope).has(request.name)) {
+      throw new ToolLoadoutError(this.visible(scope).has(request.name) && this.deferred(request.name, scope)
+        ? "STALE_ACTIVATION" : "UNAUTHORIZED");
+    }
+    if (state.active.size >= 20 && !state.active.has(request.name)) throw new ToolLoadoutError("LOADOUT_LIMIT");
+    // A malformed published schema must not be offered to a provider.
+    new AjvJsonSchemaValidator().getValidator(
+      entry.registration.definition.parameters as Parameters<AjvJsonSchemaValidator["getValidator"]>[0]);
+    const revision = state.revision;
+    const activation = { name: request.name, schemaDigestSha256: request.schemaDigestSha256, revision: revision + 1 };
+    let evidenceRef: string;
+    try {
+      evidenceRef = record(Object.freeze(activation));
+    } catch (error) {
+      if (error instanceof ToolLoadoutError) throw error;
+      throw new ToolLoadoutError("EVIDENCE_UNAVAILABLE");
+    }
+    signal?.throwIfAborted();
+    this.pruneLoadouts();
+    if (typeof evidenceRef !== "string" || evidenceRef.trim() === "") throw new ToolLoadoutError("EVIDENCE_UNAVAILABLE");
+    if (this.loadouts.get(scope) !== state || state.revision !== revision
+      || state.discovered.get(request.name) !== entry || !this.visible(scope).has(request.name)) {
+      throw new ToolLoadoutError("STALE_ACTIVATION");
+    }
+    state.active.set(request.name, entry);
+    state.revision = activation.revision;
+    return { ...activation, evidenceRef };
+  }
+
+  /** Revocation never revives after a restriction is lifted, a registration reloads, or a later condition denies. */
+  private pruneLoadouts(): void {
+    for (const [scope, state] of this.loadouts) {
+      const permitted = this.permitted(scope);
+      const step = this.steps.get(scope);
+      for (const entries of [state.discovered, state.active]) for (const [name, entry] of entries) {
+        const registration = permitted.get(name);
+        const parameters = registration?.definition.parameters;
+        if (registration !== entry.registration || !this.deferred(name, scope) || parameters === undefined
+          || sha256Hex(canonicalize(parameters)) !== entry.schemaDigestSha256
+          || (registration.available !== undefined && step?.ready === true && !step.admitted.has(registration))) {
+          entries.delete(name);
+        }
+      }
+    }
+  }
+
   /** Capture both registration and step identity before a call crosses any await. */
-  admissionCheck(name: string, scope: string): () => boolean {
+  admissionCheck(name: string, scope: string, nested = false): () => boolean {
     const registration = this.permitted(scope).get(name);
     const state = this.steps.get(scope);
-    return () => registration !== undefined && this.permitted(scope).get(name) === registration
+    const routeAdmitted = this.invocationDenial(name, scope, nested) === undefined;
+    return () => routeAdmitted && registration !== undefined && this.permitted(scope).get(name) === registration
+      && this.invocationDenial(name, scope, nested) === undefined
       && this.visible(scope).get(name) === registration.definition
       && (registration.available === undefined || this.steps.get(scope) === state);
   }
@@ -239,6 +409,7 @@ export class ToolRegistry {
       if (this.steps.get(context.agentId) !== state) throw new Error("tool step admission is stale");
       for (const result of results) if (result.admitted === true) state.admitted.add(result.registration);
       state.ready = true;
+      this.pruneLoadouts();
       return dispose;
     } catch (error) {
       dispose();

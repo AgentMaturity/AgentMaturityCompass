@@ -20,6 +20,7 @@ import { PATH_ARGUMENTS } from "../src/toolhub/toolArgumentRoles.js";
 import { canonicalize } from "../src/utils/json.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import { initWorkspace } from "../src/workspace.js";
+import { removeActionPolicy } from "./helpers/actionPolicyFixtures.js";
 
 // AUTHORED UNEXECUTED: source regressions, not installed or provider acceptance.
 const cleanups: Array<() => void> = [];
@@ -35,6 +36,7 @@ function fixture(options: { pinned?: boolean; code?: boolean; extension?: boolea
   vi.stubEnv("AMC_VAULT_PASSPHRASE", "synthetic-pinned-schema-fixture-only");
   vi.stubEnv("AMC_CONTROL_CHECKPOINT_DIR", join(root, "control-checkpoints"));
   initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
+  removeActionPolicy(workspace); // AXR-02: no Action Policy configured, as before; this file is not about it (amc init signs one).
   initBudgets(workspace, "default"); writeRuntimeFirewallPolicy({ workspace, mode: "observe" });
   const config = defaultToolsConfig(); config.tools.allowedTools = [read, ...(options.grants ?? [])];
   // A signed legacy permissive default cannot override the explicit native pin.
@@ -225,17 +227,22 @@ test("the bash and search schemas pin the reviewed WP34b arguments", () => {
   expect(sha256Hex(canonicalize(offered))).toBe(BASH_SEARCH_TOOL_SCHEMAS_SHA256);
 });
 
-// WP13 follows the canonical-schema review process above. The bounded metadata-only discovery schema is reviewed here.
-const TOOL_SEARCH_SCHEMA_SHA256 = "320ad65415b600041f6d08d6c0441d9b7b3e52c85d95ea71e5069deb01e63ca7";
-test("the tool_search schema pins bounded read-only discovery without activation arguments", () => {
+// WP13b follows the canonical-schema review process above. Review the new explicit name/digest activation operation;
+// discovery remains separate, READ_ONLY, and bounded. Both operations are pinned with their exact description and schema.
+const TOOL_SEARCH_SCHEMA_SHA256 = "dc3d1d6289cbf3bee2f274c45c9e1bdd2f31b3c3308417779e65ef14268ce789";
+test("the tool_search schema pins separate bounded discovery and digest-bound activation operations", () => {
   const tool = toolSearchTool({ catalog: () => [] });
   expect(tool.actionClass).toBe("READ_ONLY");
   const { name, description, parameters } = tool;
-  expect(parameters).toMatchObject({ type: "object", additionalProperties: false, required: ["query"], properties: {
+  expect(parameters).toMatchObject({ type: "object", additionalProperties: false, properties: {
     query: { type: "string", minLength: 1, maxLength: 1000, pattern: "\\S" },
     limit: { type: "integer", minimum: 1, maximum: 20, default: 5 }
   } });
-  expect(Object.keys(parameters!.properties as object).sort()).toEqual(["limit", "query"]);
+  expect(Object.keys(parameters!.properties as object).sort()).toEqual(["activate", "limit", "query"]);
+  expect(parameters!.properties).toMatchObject({ activate: { type: "object", additionalProperties: false,
+    required: ["name", "schemaDigestSha256"], properties: { name: { type: "string", minLength: 1, maxLength: 256 },
+      schemaDigestSha256: { type: "string", pattern: "^[a-f0-9]{64}$" } } } });
+  expect(parameters!.oneOf).toHaveLength(2);
   expect(sha256Hex(canonicalize({ name, description, parameters }))).toBe(TOOL_SEARCH_SCHEMA_SHA256);
 });
 

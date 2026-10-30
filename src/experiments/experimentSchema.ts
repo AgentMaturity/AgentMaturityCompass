@@ -11,7 +11,9 @@ export const experimentSchema = z.object({
     baselineConfig: z.object({
       id: z.string().min(1),
       kind: z.enum(["current", "file"]),
-      path: z.string().nullable().optional()
+      path: z.string().nullable().optional(),
+      /** Full sha256 of the baseline file at set-baseline time; records without it cannot run executed trials. */
+      digestSha256: z.string().length(64).nullable().optional()
     }),
     candidateConfig: z.object({
       id: z.string().min(1),

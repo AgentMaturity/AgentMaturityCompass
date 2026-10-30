@@ -25,6 +25,7 @@ import { compactionFromFlags } from "./agent/compaction/promptPressure.js";
 import { liveNativeFailureGuidance, renderNativeFailureGuidance } from "./agent/nativeFailureGuidance.js";
 import { isActionClass } from "./governor/actionCatalog.js";
 import type { ActionClass } from "./types.js";
+import type { LiveTextPreviewEvent } from "./llm/adapter/liveTextPreview.js";
 import type { ApprovalAnswerer, ApprovalRiskTier } from "./approvals/seam/approvalSeamTypes.js";
 import {
   createApprovalExceptionAnswerer,
@@ -47,6 +48,7 @@ export interface RunOptions {
   audioInput?: string;
   validationConfig?: string;
   validationConfigSha256?: string;
+  validationRepair?: string;
   validate?: string[];
   extension?: string[];
   extensionPin?: string[];
@@ -87,6 +89,8 @@ export interface RunOptions {
   takeoverExpiredWriter?: string;
   steerAfter?: string;
   persona?: string;
+  missionContext?: boolean;
+  listSkills?: boolean | string;
   approveTools?: string;
   approveRisk?: string;
   approvalException?: string;
@@ -509,4 +513,22 @@ export function renderNotification(notification: LoopNotification): string | nul
       // follows, and echoing them here would bury the two lines that matter.
       return null;
   }
+}
+
+/** `--stream`: the provisional live reply on stderr; the recorded settlement remains the outcome. */
+export function liveTextPreviewPrinter(): (event: LiveTextPreviewEvent) => void {
+  let previewRequest: string | null = null;
+  return event => {
+    if (event.kind === "text") {
+      if (previewRequest !== event.headerEventId) {
+        process.stderr.write(`\nLive reply · session ${event.sessionId} · provisional until recorded settlement\n`);
+        previewRequest = event.headerEventId;
+      }
+      process.stderr.write(event.text);
+    } else if (previewRequest !== null) {
+      process.stderr.write(event.truncated ? "\n[Live preview truncated; read the recorded result for the outcome.]\n"
+        : "\n[Live preview ended; read the recorded result for the outcome.]\n");
+      previewRequest = null;
+    }
+  };
 }

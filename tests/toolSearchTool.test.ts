@@ -1,7 +1,7 @@
 import { describe, expect, test, vi } from "vitest";
 import { toolSearchTool, type ToolSearchSchema } from "../src/tools/builtin/toolSearchTool.js";
 import { ToolPipeline } from "../src/tools/toolPipeline.js";
-import { ToolRegistry } from "../src/tools/toolRegistry.js";
+import { ToolRegistry, ToolLoadoutError } from "../src/tools/toolRegistry.js";
 import { canonicalize } from "../src/utils/json.js";
 import { sha256Hex } from "../src/utils/hash.js";
 
@@ -76,6 +76,23 @@ describe("deferred tool discovery", () => {
     expect(result.ok).toBe(false);
     expect(result.output).not.toContain("secret-policy-error");
     expect(result.output).not.toContain("weather.forecast");
+  });
+
+  test("empty results and an unavailable catalog have distinct safe outcomes", async () => {
+    const empty = await fixture(() => [])({ query: "weather" });
+    expect(empty.ok).toBe(true); expect(JSON.parse(empty.output)).toEqual({ tools: [] });
+    const unavailable = await fixture(() => { throw new Error("secret catalog detail"); })({ query: "weather" });
+    expect(unavailable.ok).toBe(false);
+    expect(JSON.parse(unavailable.output)).toMatchObject({ error: { code: "CATALOG_UNAVAILABLE" } });
+    expect(unavailable.output).not.toContain("secret catalog detail");
+  });
+
+  test.each(["private-error-code", "constructor", "__proto__"])("unexpected error codes are sanitized: %s", async code => {
+    const forged = Object.assign(Object.create(ToolLoadoutError.prototype) as ToolLoadoutError, { code, message: "private error detail" });
+    const result = await fixture(() => { throw forged; })({ query: "weather" });
+    expect(result.ok).toBe(false);
+    expect(JSON.parse(result.output)).toEqual({ error: { code: "CATALOG_UNAVAILABLE", message: "Tool catalog is unavailable for this session." } });
+    expect(result.output).not.toContain("private error detail");
   });
 
   test("cancellation during catalog admission publishes no metadata", async () => {

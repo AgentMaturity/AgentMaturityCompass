@@ -16,6 +16,7 @@ import { getAgentPaths } from "../src/fleet/paths.js";
 import { defaultActionPolicy, initActionPolicy } from "../src/governor/actionPolicyEngine.js";
 import type { DiagnosticReport } from "../src/types.js";
 import { initWorkspace } from "../src/workspace.js";
+import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
 
 const cliPath = fileURLToPath(new URL("../dist/cli.js", import.meta.url));
 const PASSPHRASE = "claude-hook-fail-closed-passphrase";
@@ -36,6 +37,8 @@ function newWorkspace(): string {
   process.env.AMC_VAULT_PASSPHRASE = PASSPHRASE;
   initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
   initApprovalPolicy(workspace);
+  // AXR-01: hook control applies the runtime firewall as the native pipeline does; without a signed policy it blocks every call.
+  writeRuntimeFirewallPolicy({ workspace, mode: "observe" });
   return workspace;
 }
 

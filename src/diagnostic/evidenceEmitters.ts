@@ -62,9 +62,10 @@ export const EVIDENCE_EMITTERS: readonly EmitterEntry[] = [
  */
 export const NON_MATURITY_AUDIT_MODULES: ReadonlyArray<{ module: string; why: string }> = [
   { module: "src/prompt/context/nativeCompositionContext.ts", why: "native composition and context source commitments; configuration bookkeeping, never maturity evidence" },
+  { module: "src/setup/nativeInteractiveCommandAudit.ts", why: "operator chat command bookkeeping; handler settlement is not task success or maturity evidence" },
   { module: "src/a4/a4Store.ts", why: "A4 project transitions and gate decisions; governance bookkeeping, untagged, never maturity evidence" },
   { module: "src/actions/actionJournal.ts", why: "action receipt states and dropped-telemetry counts (P1-03); AMC enforcement bookkeeping, untagged, never maturity evidence" },
-  { module: "src/agent/agentToolset.ts", why: "native shell confinement settings; untagged, so they bind to no question" },
+  { module: "src/agent/agentToolset.ts", why: "native shell confinement and deferred schema activation bookkeeping; untagged, so they bind to no question" },
   { module: "src/agent/compaction/autoCompact.ts", why: "context compaction bookkeeping (P1-37); token counts before and after, not agent behaviour" },
   { module: "src/approvals/approvalStudioService.ts", why: "operator approval decisions about AMC actions, not the scored agent's behaviour" },
   { module: "src/autonomy/scheduleStore.ts", why: "operator authorization to close an interrupted schedule claim; operational bookkeeping, never goal quality or maturity evidence" },
@@ -88,6 +89,7 @@ export const NON_MATURITY_AUDIT_MODULES: ReadonlyArray<{ module: string; why: st
   { module: "src/enforce/scopeTemplates.ts", why: "policy scope template applied; untagged, so it binds to no question" },
   { module: "src/eoc/flows.ts", why: "education, ownership and commitment bookkeeping" },
   { module: "src/eval/evalImporters.ts", why: "import bookkeeping and imported failures; self-reported by provenance" },
+  { module: "src/experiments/trialExecutor.ts", why: "experiment trial start and settle records (GAP-WP04); executor bookkeeping a casebook judge reads, never agent behaviour" },
   { module: "src/governor/decisionLog.ts", why: "AuthZEN authorization decision log (P2-25): one AMC decision per call, allow or deny, untagged and never maturity evidence" },
   { module: "src/gateway/server.ts", why: "gateway refusals and misconfiguration; read only by score caps and penalties" },
   { module: "src/ingest/ingest.ts", why: "ingest bookkeeping; imported rows are self-reported" },
