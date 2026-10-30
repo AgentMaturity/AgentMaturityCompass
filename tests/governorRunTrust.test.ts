@@ -65,6 +65,25 @@ describe("governor run trust", () => {
     expect(await nativeWrite(dir)).toBe(true);
   });
 
+  it("a fresh agent's SIMULATE names the missing trusted run, not a signature failure", () => {
+    const dir = workspace();
+    const decision = runGovernorCheck({ workspace: dir, agentId: "default", actionClass: "READ_ONLY", riskTier: "med", mode: "EXECUTE" });
+    expect(decision.effectiveMode).toBe("SIMULATE");
+    expect(decision.reasons).toContain("UNTRUSTED RUN: agent default has no trusted diagnostic run.");
+    expect(decision.reasons.join("\n")).not.toMatch(/signature verification failed/);
+    expect(decision.requiredEvidence.join("\n")).not.toMatch(/Re-sign/);
+    expect(decision.requiredEvidence.join("\n")).toMatch(/integrity >= 0\.6 \(HIGH TRUST\)/);
+  });
+
+  it("a sealed low-integrity run is named with its integrity", () => {
+    const dir = workspace();
+    signPermissiveActionPolicy(dir);
+    writeSealedRun(dir, { ...observedRunReport("default"), runId: "run_low", integrityIndex: 0.041, trustLabel: "UNRELIABLE — DO NOT USE FOR CLAIMS" });
+    const decision = check(dir);
+    expect(decision.effectiveMode).toBe("SIMULATE");
+    expect(decision.reasons.join("\n")).toMatch(/UNTRUSTED RUN: latest trusted run run_low has integrity 0\.041 \(UNRELIABLE[^)]*\), below 0\.6/);
+  });
+
   it("a planted VALID run JSON does not lift SIMULATE to EXECUTE", async () => {
     const dir = workspace();
     signPermissiveActionPolicy(dir);
