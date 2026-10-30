@@ -16,7 +16,7 @@ function object(fields: Record<string, string>): string {
 }
 const PART_KEYS: Readonly<Record<EncodablePart["kind"], readonly string[]>> = {
   text: ["kind", "text"], thinking: ["kind", "text"],
-  tool_use: ["kind", "toolCallId", "toolName", "argumentsJson"],
+  tool_use: ["kind", "toolCallId", "toolName", "providerWireName", "argumentsJson"],
   tool_result: ["kind", "toolCallId", "isError", "text"],
   image: ["kind", "sha256", "mediaType", "bytes"], audio: ["kind"]
 };
@@ -40,13 +40,14 @@ export const ollamaChatEncoder: RequestEncoder = Object.freeze({
     if (request.tools !== null) {
       ollamaArray(request.tools, "tools", 128);
       for (const tool of request.tools) {
-        ollamaKeys(tool, ["name", "description", "parameters"], "tool schema");
+        ollamaKeys(tool, ["name", "description", "parameters", "modelAlias"], "tool schema");
         try { assertOllamaJsonValue(tool); } catch { ollamaFail("tool schema is not passive lossless JSON"); }
         ollamaText(tool.description, "tool description");
         if (!ollamaObject(tool.parameters)) ollamaFail("tool parameters require a JSON Schema object");
       }
     }
     bindProviderToolNames(request.tools ?? []);
+    const aliases = new Map(request.tools?.map(tool => [tool.name, tool.modelAlias]));
     const messages: string[] = [], allCalls = new Set<string>(), streams = new Set<string>();
     const pending = new Map<string, { name: string; identity: OllamaCallIdentity }>();
     let imageCount = 0, imageBytes = 0, partCount = 0;
@@ -61,7 +62,7 @@ export const ollamaChatEncoder: RequestEncoder = Object.freeze({
       let content = "", thinking = "", hasThinking = false, phase = 0, stream: string | null = null;
       const calls: string[] = [];
       for (const part of message.parts) {
-        ollamaKeys(part, ["kind", "text", "toolCallId", "toolName", "argumentsJson", "isError", "sha256", "mediaType", "bytes"], "part");
+        ollamaKeys(part, ["kind", "text", "toolCallId", "toolName", "providerWireName", "argumentsJson", "isError", "sha256", "mediaType", "bytes"], "part");
         if (typeof part.kind !== "string" || !Object.hasOwn(PART_KEYS, part.kind)) ollamaFail("unsupported input modality");
         if (part.kind === "audio") ollamaFail("audio input is unsupported by ollama-chat@1; it will not become a transcript");
         ollamaKeys(part, PART_KEYS[part.kind], "part");
@@ -96,7 +97,7 @@ export const ollamaChatEncoder: RequestEncoder = Object.freeze({
           phase = 1; content += ollamaText(part.text, "assistant content");
         } else if (part.kind === "tool_use") {
           phase = 2;
-          const identity = readOllamaCallKey(part.toolCallId), name = providerToolWireName(part.toolName);
+          const identity = readOllamaCallKey(part.toolCallId), name = (part.providerWireName ?? providerToolWireName(part.toolName, aliases.get(part.toolName)));
           if (stream === null) {
             if (streams.has(identity.stream)) ollamaFail("an original Ollama response was revisited or split");
             stream = identity.stream; streams.add(stream);
@@ -125,7 +126,7 @@ export const ollamaChatEncoder: RequestEncoder = Object.freeze({
     const fields: Record<string, string> = { model: JSON.stringify(model), messages: `[${messages.join(",")}]` };
     for (const [key, value] of Object.entries(params)) fields[key] = canonicalize(value);
     if (request.tools !== null) fields.tools = canonicalize(request.tools.map(tool => ({ type: "function",
-      function: { name: providerToolWireName(tool.name), description: tool.description, parameters: tool.parameters } })));
+      function: { name: providerToolWireName(tool.name, tool.modelAlias), description: tool.description, parameters: tool.parameters } })));
     const bytes = Buffer.from(object(fields), "utf8");
     if (bytes.length > 32 * 1024 * 1024) ollamaFail("request exceeds the native body bound");
     return bytes;

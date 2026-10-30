@@ -410,6 +410,7 @@ function compositionDigestOf(options: ComposedTurnOptions, profile: AgentPromptP
             actionClass: gate.actionClass,
             riskTier: gate.riskTier,
             toolNames: gate.toolNames ?? null,
+            ...(gate.reviewedActionClasses === undefined ? {} : { reviewedActionClasses: gate.reviewedActionClasses }),
             answerers: (gate.answerers ?? []).map((answerer) => answerer.name)
           },
     version: amcVersion

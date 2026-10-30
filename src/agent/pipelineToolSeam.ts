@@ -112,6 +112,7 @@ export function pipelineToolSeam(init: PipelineToolSeamInit): AgentToolSeam {
         .filter((tool) => tool.parameters !== undefined)
         .map((tool): ToolSchema => ({
           name: tool.name,
+          ...(tool.modelAlias === undefined ? {} : { modelAlias: tool.modelAlias }),
           description: tool.description,
           parameters: tool.parameters as Record<string, unknown>
         }));
