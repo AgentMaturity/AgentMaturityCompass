@@ -23,6 +23,8 @@ interface RunOutcome { readonly sessionId: string; readonly status: AgentStatus;
 
 export const WEB_SEARCH_SEARXNG_HELP = "opt-in web_search provider for workspace tools: a SearXNG JSON origin, also granted under web_search in the signed tools policy";
 
+export const MAX_ACTIVE_CHILDREN_HELP = "root-wide active child cap including descendants (default 8; 0 disables children)";
+export const NO_DELEGATE_STOP_HELP = "explicitly clear extra child stops from a preset; budgets, depth and approvals still apply";
 export const VALIDATION_REPAIR_HELP = "explicit bounded repair policy for selected public checks, including allowed edit paths";
 
 export function withBreadthRunOptions(command: Command): Command {
