@@ -44,7 +44,7 @@
     "api:start:production": "node dist/standalone-api.js",
     "lint": "oxlint --type-aware --deny-warnings -c .oxlintrc.json src && node scripts/lint-contract.mjs && node scripts/check-no-fabrication.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p packages/verifier/tsconfig.json --noEmit",
-    "typecheck:tests": "tsc -p tsconfig.tests.json --noEmit",
+    "typecheck:tests": "node --max-old-space-size=8192 node_modules/typescript/bin/tsc -p tsconfig.tests.json --noEmit",
     "pretest": "npm run build",
     "test": "vitest run",
     "test:e2e": "node scripts/run-e2e.mjs",

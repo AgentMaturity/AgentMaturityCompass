@@ -1,3 +1,5 @@
+import { composeNativeBackground } from "./nativeBackground.js";
+import type { NativeTerminalHostOptions } from "../terminal/nativeTerminal.js";
 import { existsSync } from "node:fs";
 import { runCodeTool } from "../codemode/runCodeTool.js";
 import { runtimeFirewallPolicyPath } from "../runtime/firewall.js";
@@ -61,6 +63,8 @@ import { NATIVE_BUILTIN_CAPABILITIES, NATIVE_DELEGATION_CAPABILITIES, selectSupp
  */
 
 export interface AgentToolsetOptions {
+  /** Explicit interactive authority; an argv-bound bash approval cannot supply this grant. */
+  readonly nativeTerminal?: NativeTerminalHostOptions;
   readonly extensionHooks?: NativeExtensionHooks;
   readonly workspace: string;
   readonly agentId: string;
@@ -282,7 +286,9 @@ export interface AgentToolset {
    * run, and a caller that forgot to close would leak a SQLite handle per
    * agent. Safe to call more than once.
    */
-  close(): void;
+  hasOwnedWork(): boolean;
+  shutdown(): Promise<boolean>;
+  close(): void | Promise<void>;
 }
 
 export function agentToolset(options: AgentToolsetOptions): AgentToolset {
@@ -319,6 +325,10 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
   ], ...(options.unconfinedShell === undefined ? {} : { unconfinedShell: options.unconfinedShell }),
   ...(options.parentShell === undefined ? {} : { parentShell: options.parentShell }) });
   const registry = new ToolRegistry();
+  let pipeline!: ToolPipeline;
+  const background = composeNativeBackground({ workspace, sessionId: () => options.sessionId,
+    pipeline: () => pipeline, confinedShell: () => readiness.shell.decision === "confined",
+    ...(options.nativeTerminal === undefined ? {} : { nativeTerminal: options.nativeTerminal }) });
   const nativeIdentities = new Map([...NATIVE_BUILTIN_CAPABILITIES, ...NATIVE_DELEGATION_CAPABILITIES]
     .map(capability => [capability.name, capability]));
 
@@ -435,7 +445,10 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
     workspace,
     scrubValues,
     // The per-call refusal stays: availability at composition is a prerequisite, not proof.
-    record: (execution, outcome) => recordAudit({
+    onOutput: (execution, _stream, text) => background.outputShell(execution, text),
+    record: (execution, outcome) => {
+      background.captureShell(execution, outcome);
+      return recordAudit({
       schemaVersion: "2026-09-08", auditType: "NATIVE_SHELL_CONFINEMENT", platform: process.platform,
       backend: outcome.backend, confined: outcome.confined, failure: outcome.failure,
       enforcementLevel: outcome.confined ? "enforced" : "none", boundary: shell.boundary,
@@ -443,7 +456,8 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
       exitCode: outcome.exitCode, timedOut: outcome.timedOut, cancelled: outcome.cancelled ?? false,
       treeExitProven: outcome.treeExitProven ?? false, droppedBytes: outcome.droppedBytes ?? 0,
       callId: execution.callId, rootCallId: execution.rootCallId, token: execution.token
-    }),
+      });
+    },
     // Written before the proxy acts on the decision; a failed write denies the connection.
     recordEgress: (execution, row) => recordAudit({
       schemaVersion: "2026-09-08", auditType: "NATIVE_SHELL_EGRESS", platform: process.platform, boundary: shell.boundary, ...row,
@@ -483,6 +497,7 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
   registry.define(planTool({ sessionId: currentSessionId, record: recordNative }));
   registry.define(skillLoadTool({ roots: options.skillRoots ?? workspaceSkillRoots(workspace), record: recordNative }));
   registry.define(goalTool(options.getGoal));
+  for (const tool of background.tools) registry.define(tool);
   if (options.subagents !== undefined) {
     // Both tools, from one capability. `delegate` is one child; `workflow` is a
     // declared plan of them. Each is still gated a second time by the operator's
@@ -542,7 +557,7 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
   });
 
   const facts = compiled ? compiledPolicyFacts(compiled) : null;
-  const pipeline = new ToolPipeline({
+  pipeline = new ToolPipeline({
     prepareGuards: options.extensionHooks?.prepare,
     registry,
     workspace,
@@ -603,8 +618,9 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
   }
 
   const seam = pipelineToolSeam({ registry, pipeline, agentId });
+  const closeHandles = (): void => { ledgerHandle?.close(); ledgerHandle = null; journal?.close(); journal = null; };
   return {
-    seam: { ...seam, extensionHooks: options.extensionHooks, schemas: () => {
+    seam: { ...seam, extensionHooks: options.extensionHooks, shutdown: () => background.shutdown(), hasOwnedWork: () => background.hasOwnedWork(), schemas: () => {
       recordUnconfinedEnabled();
       const snapshot = loadVerifiedToolsConfigSnapshot(workspace);
       admittedCatalog(agentId, snapshot, false);
@@ -626,12 +642,15 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
     registry,
     pipeline,
     readiness,
-    close: (): void => {
+    hasOwnedWork: () => background.hasOwnedWork(),
+    shutdown: () => background.shutdown(),
+    close: (): void | Promise<void> => {
       registry.synchronizeLoadout(agentId, "closed");
-      ledgerHandle?.close();
-      ledgerHandle = null;
-      journal?.close();
-      journal = null;
+      const pending = background.hasOwnedWork();
+      const drain = background.shutdown();
+      if (pending) return drain.then(() => closeHandles(), error => { closeHandles(); throw error; });
+      closeHandles();
+      void drain.catch(() => undefined);
     }
   };
 }

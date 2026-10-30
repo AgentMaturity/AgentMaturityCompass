@@ -40,7 +40,7 @@
 import { Context } from "./amcRuntime.js";
 import { createHash, randomUUID } from "node:crypto";
 import { gateToolCallsOnApproval, type ToolApprovalGateOptions } from "../agent/approvalGate.js";
-import type { AgentLoopConfig, AgentStatus, LoopHooks, LoopNotification } from "../agent/loopTypes.js";
+import type { AgentLoopConfig, AgentStatus, CancelOptions, LoopHooks, LoopNotification } from "../agent/loopTypes.js";
 import type { LoopRoute } from "../agent/stepRunner.js";
 import { EMPTY_TOOL_SEAM, type AgentToolSeam } from "../agent/toolSeam.js";
 import type { NativeShellReadiness } from "../sandbox/nativeShellGate.js";
@@ -70,7 +70,7 @@ import type { SubagentRunContext, SubagentRunner } from "../agent/subagentSpawn.
 import { parseSubagentStopConditions } from "../agent/subagentStopConditions.js";
 import type { ActionClass } from "../types.js";
 import { createDriverRunner } from "../agent/subagentRunner.js";
-import { COMPOSITION_FAILED } from "../agent/nativeAgentComposition.js";
+import { sealComposedSession } from "./composedSessionSeal.js";
 import { LeasePrincipalRefused } from "../leases/leasePrincipal.js";
 import { planRequiresAgentLease, planRequiresPrincipal } from "../tools/guards/compiledPolicyGuard.js";
 import { loadActiveCompiledPolicy } from "../catalog/compiler/activate.js";
@@ -95,6 +95,10 @@ import { agentLoopServices, AGENT_LOOP_SEAM } from "./services/agentLoopServices
 import type { AgentLoopSeamService } from "./services/agentLoopServices.js";
 import { assertSecondSessionWriter } from "../persistence/openSessionEventStore.js";
 import { redactingSessionFor } from "../dataflow/redactingSession.js";
+import { recordNativeComposition } from "../prompt/context/nativeCompositionContext.js";
+import type { NativeResourceStatus } from "../prompt/context/nativeResourceStatus.js";
+import type { CompositionSource } from "../prompt/context/compositionProvenance.js";
+import { renderPrompt } from "../prompt/assembly/interpolate.js";
 
 /** The section name a pinned system prompt is registered under. */
 export const PINNED_PROMPT_SECTION = "host:pinned-prompt";
@@ -133,8 +137,11 @@ export interface ComposedApprovalGate extends ToolApprovalGateOptions {
 /** What a caller may do to a turn while it runs. */
 export interface ComposedTurnHandle {
   readonly sessionId: string;
+  resourceStatus(): NativeResourceStatus;
   /** Stop the turn. The cause rides inside the signed `turn/end`. */
-  cancel(cause: TurnCancelCause): void;
+  cancel(cause: TurnCancelCause, options?: CancelOptions): void;
+  /** Permanently close admission and bound the active driver drain. */
+  shutdown(): Promise<boolean>;
 }
 
 /** Narrow evidence capability for tools, bound to the actual selected session. */
@@ -147,6 +154,8 @@ export interface ComposedToolSession {
 export interface ComposedTurnOptions {
   readonly workspace: string;
   readonly agentId: string;
+  readonly resourceStatus?: () => NativeResourceStatus;
+  readonly compositionSources?: readonly CompositionSource[];
   /** Explicit owner-driven due pass, not a model turn, timer or resumable task. */
   readonly schedulePass?: {
     readonly now: number;
@@ -396,6 +405,7 @@ function compositionDigestOf(options: ComposedTurnOptions, profile: AgentPromptP
       models: route.models
     })),
     route: { providerId: options.route.providerId, model: options.route.model },
+    sources: options.compositionSources ?? [],
     prompt: {
       sections: profile.sections.map((section) => section.name),
       contexts: profile.contextPlugins.map((plugin) => plugin.name),
@@ -515,6 +525,8 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
   let steerTimer: NodeJS.Timeout | null = null;
   /** Set once the loop (or schedule pass) is ready; until then a throw is a failed composition, never a completion. */
   let composed = false;
+  let hostShutdown = false;
+  let loopOwner: AgentLoopSeamService | undefined;
 
   try {
     // P2-12: interrupted calls follow their resume rules before this turn's first request; nothing is dispatched again.
@@ -544,7 +556,8 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
     // An unknown route fails composition here, before any prompt row or request (DXA-13).
     serviceOn<LlmSeamService>(ctx, LLM_SEAM.name).pin({ providerId: options.route.providerId, model: options.route.model });
 
-    const promptFiber = ctx.plugin(promptServices, { profile, sessionId });
+    const promptFiber = ctx.plugin(promptServices, { profile, sessionId, session,
+      ...(options.resourceStatus === undefined ? {} : { resourceStatus: options.resourceStatus }) });
     await promptFiber.await();
     fibers.push(promptFiber);
     const prompt = serviceOn<PromptSeamService>(ctx, PROMPT_SEAM.name);
@@ -552,7 +565,8 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
     // Rendered BEFORE the loop is composed, so an unknown `{{variable}}` throws
     // here — with no turn started, no request sent, and a session that closes
     // cleanly in the `finally`. A prompt with a hole in it never reaches a model.
-    const systemPromptText = prompt.render();
+    const promptAssembly = prompt.assemble();
+    const systemPromptText = renderPrompt(promptAssembly);
     const systemPromptRef = session.recordSystemPrompt(systemPromptText);
 
     const gate = options.approvalGate;
@@ -591,6 +605,7 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
       agentId: options.agentId, providerId: options.route.providerId, model: options.route.model, systemPrompt: systemPromptText,
       harnessVersion: identity.harnessVersion, compositionDigest: identity.compositionDigest,
       tools: options.tools === undefined ? "none" : "workspace", surface: options.tools ?? EMPTY_TOOL_SEAM }) });
+    recordNativeComposition(session, promptAssembly, tools ?? EMPTY_TOOL_SEAM, options.route, options.compositionSources);
 
     // Always present, so context reaches the model whether or not anyone asked
     // to watch. `notify` is the live mirror and is optional; `preStep` is how the
@@ -710,11 +725,21 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
     fibers.push(loopFiber);
     composed = true;
 
-    const loop = serviceOn<AgentLoopSeamService>(ctx, AGENT_LOOP_SEAM.name);
+    const loop = loopOwner = serviceOn<AgentLoopSeamService>(ctx, AGENT_LOOP_SEAM.name);
+    let abandon!: (error: Error) => void;
+    const shutdownFailure = new Promise<never>((_resolve, reject) => { abandon = reject; });
+    void shutdownFailure.catch(() => undefined);
     options.onReady?.({
       sessionId,
-      cancel: (cause: TurnCancelCause) => {
-        loop.cancel(cause);
+      resourceStatus: prompt.resourceStatus,
+      cancel: (cause: TurnCancelCause, options = {}) => {
+        loop.cancel(cause, options);
+      },
+      shutdown: async () => {
+        hostShutdown = true;
+        const confirmed = await loop.agent.dispose();
+        if (!confirmed) abandon(new Error("TOOL_OUTCOME_UNKNOWN: native driver did not drain within its shutdown grace."));
+        return confirmed;
       }
     });
     if (audioParts !== undefined) loop.agent.followupAudioParts(audioParts);
@@ -732,7 +757,7 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
         }
       }, steer.afterMs);
     }
-    await loop.whenIdle();
+    await Promise.race([loop.whenIdle(), shutdownFailure]);
     return {
       sessionId,
       status: loop.status,
@@ -748,35 +773,22 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
     if (steerTimer !== null) clearTimeout(steerTimer);
     // Reverse order: the loop lets go of the model seam before the model seam
     // lets go of the credentials it resolves per request.
-    let scheduleDisposalError: unknown;
+    let disposalError: unknown;
     for (const fiber of [...fibers].reverse()) {
       try { await fiber.dispose(); }
       catch (error) {
-        // oxlint-disable-next-line no-unsafe-finally -- Disposal failure must refuse successful ownership handover.
-        if (options.schedulePass === undefined) throw error;
-        scheduleDisposalError ??= error; // Try every remaining owner, including the parent session.
+        disposalError ??= error; // Try every owner, including the session writer, before reporting failure.
       }
     }
-    try {
-      if (options.keepOpen) {
-        // Hand-over point: the turn is sealed, the session is not. A later
-        // process resumes it through sessionResume.ts, which re-verifies first.
-        session.releaseWithoutClosing();
-      } else {
-        session.close({ reason: composed ? "completed" : COMPOSITION_FAILED });
-      }
-    } catch (error) {
-      // A driver that entered `failed` left an open turn only recovery may
-      // close, and the spine refuses a close over it. Swallowed HERE and only
-      // here: the status returned above already reports it, and throwing from a
-      // finally would replace the real failure with this one.
-      if (options.schedulePass !== undefined) {
-        try { session.disposeWithoutClosing(); } catch { /* preserve original closure failure */ }
-        // oxlint-disable-next-line no-unsafe-finally -- A schedule owner cannot report released/closed on a refused seal.
-        throw error;
-      }
-    }
+    const driverConfirmed = await (loopOwner?.agent.dispose() ?? Promise.resolve(true));
+    let resourcesConfirmed = false;
+    try { resourcesConfirmed = await (options.tools?.shutdown?.() ?? Promise.resolve(true)); }
+    catch (error) { disposalError ??= error; }
+    sealComposedSession(session, { stopped: driverConfirmed && loopOwner?.status !== "failed", resourcesConfirmed,
+      keepOpen: options.keepOpen === true, composed, hostShutdown, schedulePass: options.schedulePass !== undefined });
     // oxlint-disable-next-line no-unsafe-finally -- Report failed disposal after attempting every schedule owner.
-    if (scheduleDisposalError !== undefined) throw scheduleDisposalError;
+    if (disposalError !== undefined) throw new Error("TOOL_OUTCOME_UNKNOWN: native service cleanup failed.", { cause: disposalError });
+    // oxlint-disable-next-line no-unsafe-finally -- A cleanup timeout cannot be reported as successful shutdown.
+    if (!driverConfirmed || !resourcesConfirmed) throw new Error("TOOL_OUTCOME_UNKNOWN: native resources did not confirm cleanup.");
   }
 }

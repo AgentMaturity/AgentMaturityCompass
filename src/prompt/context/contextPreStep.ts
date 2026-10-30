@@ -36,16 +36,16 @@
  * premise of the user's message rather than as the state it is being answered
  * in.
  *
- * KNOWN AND UNCLOSED: the committed row is a plain `user/message`, whose meta
- * carries no source discriminator, so an auditor cannot tell a plugin snapshot
- * from a human's own words by the row's METADATA. What attributes it is the
- * PAYLOAD — the supersession preamble and the per-plugin headings are inside the
- * signed bytes. Closing it properly means giving `user/message` a source field
- * in the spine, which is a change to the session model and not to this seam.
+ * ATTRIBUTION. The content remains a plain `user/message`. Native drivers append
+ * a signed context-delivery audit naming that row and its committed byte digest,
+ * including any redaction. The pre-step's source commitments and this delivery
+ * reference distinguish contributed context without changing the session model.
  */
 import { randomUUID } from "node:crypto";
 import type { InboxMessage, PreStepDecision, PreStepInput } from "../../agent/loopTypes.js";
-import { renderContextSnapshot } from "../assembly/interpolate.js";
+import { joinContextSections, renderContextSections } from "../assembly/interpolate.js";
+import type { AssembledContext } from "../assembly/promptTypes.js";
+import type { TouchedInstructionPath } from "./contextTypes.js";
 import type { PromptAssemblyRegistry } from "../assembly/promptRegistry.js";
 import type { ContextPluginHost } from "./contextHost.js";
 
@@ -57,6 +57,12 @@ export interface ContextPreStepInit {
   readonly sessionId?: string;
   /** Identity for the synthesized message. Injected so a test can pin it. */
   readonly newMessageId?: () => string;
+  /** Read committed tool paths at this boundary, including earlier turns. */
+  readonly touchedPaths?: (input: PreStepInput) => readonly TouchedInstructionPath[];
+  /** Recover the last committed context when composing a resumed session. */
+  readonly previousSnapshot?: (input: PreStepInput) => string | undefined;
+  /** Commit attribution before returning the snapshot for delivery. A refusal stops the step. */
+  readonly onSnapshot?: (input: PreStepInput, contexts: readonly AssembledContext[], snapshot: string) => void;
 }
 
 /** A registered seam: the hook the loop runs, and the registration it owns. */
@@ -84,6 +90,12 @@ export interface ContextPreStepSeam {
 export function createContextPreStep(init: ContextPreStepInit): ContextPreStepSeam {
   const dispose = init.host.register(init.registry);
   const newMessageId = init.newMessageId ?? ((): string => randomUUID());
+  const activeSessions = new Set<string | undefined>();
+  const initializedSessions = new Set<string | undefined>();
+  const clearedSnapshot = joinContextSections([{
+    name: "context:cleared",
+    text: "Previously supplied runtime context has been cleared; no runtime context contributions are currently available."
+  }]);
 
   const preStep = async (
     input: PreStepInput,
@@ -94,25 +106,38 @@ export function createContextPreStep(init: ContextPreStepInit): ContextPreStepSe
     // A no-step turn stays a no-step turn. See the module header.
     if (input.step === 1 && decision.messages.length === 0) return decision;
     input.signal.throwIfAborted();
-
-    await init.host.refresh({
-      ...(init.sessionId === undefined ? {} : { sessionId: init.sessionId }),
+    const sessionId = input.contextSession?.sessionId ?? init.sessionId;
+    if (!initializedSessions.has(sessionId)) {
+      const previous = init.previousSnapshot?.(input);
+      if (previous !== undefined && previous !== clearedSnapshot) activeSessions.add(sessionId);
+      initializedSessions.add(sessionId);
+    }
+    const observed = await init.host.refreshSnapshot({
+      ...(sessionId === undefined ? {} : { sessionId }),
       turn: input.turn,
       step: input.step,
+      signal: input.signal,
+      ...(init.touchedPaths === undefined ? {} : { touchedPaths: init.touchedPaths(input) })
+    });
+    const assembly = init.registry.assemble({
+      ...(sessionId === undefined ? {} : { sessionId }),
       signal: input.signal
     });
-    const snapshot = renderContextSnapshot(
-      init.registry.assemble({
-        ...(init.sessionId === undefined ? {} : { sessionId: init.sessionId }),
-        signal: input.signal
-      })
-    );
+    const contexts = renderContextSections({ ...assembly, contexts: assembly.contexts.map(context =>
+      observed.has(context.name) ? { ...context, text: observed.get(context.name)! } : context) });
+    const hasContext = contexts.length > 0;
+    const snapshot = hasContext ? joinContextSections(contexts) : activeSessions.has(sessionId) ? clearedSnapshot : "";
     input.signal.throwIfAborted();
     if (snapshot.length === 0) return decision;
+    init.onSnapshot?.(input, contexts, snapshot);
+    // A shared parent/child seam must clear only the session that received the old snapshot.
+    if (hasContext) activeSessions.add(sessionId);
+    else activeSessions.delete(sessionId);
 
     const message: InboxMessage = {
       messageId: newMessageId(),
       text: snapshot,
+      contextSnapshot: true,
       // The honest label for text queued at a step boundary that never woke the
       // driver. It is not a steer (nobody is steering) and not a tool's output.
       origin: "inject"
@@ -120,5 +145,5 @@ export function createContextPreStep(init: ContextPreStepInit): ContextPreStepSe
     return { kind: "enter", messages: [...decision.messages, message] };
   };
 
-  return { preStep, dispose };
+  return { preStep, dispose: () => { activeSessions.clear(); initializedSessions.clear(); dispose(); } };
 }

@@ -188,7 +188,8 @@ describe("governed native Streamable HTTP", () => {
   test("cancellation aborts the active stream, terminates the session and removes the grant", async () => {
     const f = await fixture({ hold: true }); await f.mount(); const controller = new AbortController(); const call = f.call(controller.signal);
     await vi.waitFor(() => expect(f.calls.filter(call => call.rpc === "tools/call")).toHaveLength(1)); controller.abort();
-    expect((await call).outcome).toBe("CANCELLED"); expect((await f.call()).outcome).toBe("DENIED");
+    // WP16: the tools/call was dispatched before the abort, so its remote effect is unknown, not cancelled.
+    expect((await call).outcome).toBe("TOOL_OUTCOME_UNKNOWN"); expect((await f.call()).outcome).toBe("DENIED");
     await vi.waitFor(() => expect(f.calls.filter(call => call.method === "DELETE")).toHaveLength(2));
   });
   test("P2-02: a token argument on an unbound grant is refused purpose_violation before tools/call, and the mount stays open", async () => {

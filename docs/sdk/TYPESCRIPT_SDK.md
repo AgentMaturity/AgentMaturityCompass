@@ -50,6 +50,33 @@ Policy, which runs an agent's EXECUTE calls as SIMULATE until it has an observed
 workspace the call is recorded as SIMULATE and `hello.txt` is not written. `npm run check:packed-install` runs this quickstart against the
 installed package and bin and records its wall time.
 
+## Local request preview (experimental)
+
+`previewNativePrompt` snapshots text/image ACP request data without starting a client, creating a session, recording
+evidence or dispatching. It returns `state: "preview"`, `dispatched: false`, `spend: "none"` and
+`admission: "not-evaluated"`. Local shape, UTF-8, image-header and frame-size checks do not establish runtime
+capability, ownership, attachment threat or budget admission. It does not estimate tokens or cost.
+
+```ts
+import { previewNativePrompt } from "agent-maturity-compass/sdk/native";
+const preview = previewNativePrompt({ sessionId: "the-intended-session", text: "Explain this change" });
+console.log(preview.state, preview.request); // preview; request data only
+```
+
+## In-process shutdown (experimental)
+
+Sessions returned by `openAgentSession` and `resumeAgentSession` expose `await session.shutdown({ timeoutMs: 10000 })`.
+Shutdown stops admission, requests cancellation and reports observed `settled`, `cancelled` and `unknown` tool calls,
+including validation tools, plus cancelled/pending message IDs and errors. Tool lists describe the turn being stopped;
+prior outcomes remain in session history. Repeated shutdown returns the same snapshot.
+`TOOL_OUTCOME_UNKNOWN` means effects remain unknown; the tool may still be running. `recorded: false` means no result
+row was observed, so even dispatch is unknown. The result is explicitly `not-verified`.
+
+`state: "settled"` describes driver settlement, not tool success. `sessionClosed` reports sealing separately. A timeout
+returns `state: "incomplete"` and retains the writer/resources while work remains live. Once that work settles, the
+owner can call `close()` or `release()` explicitly. The timeout is an integer from 0 through 60000 ms. Existing ACP,
+subprocess-client and Studio host `close()` contracts retain their existing behavior.
+
 ## The runtime child's environment
 
 `AMCNativeClient` starts its `amc acp` child with `PATH`, `HOME`, user, shell, locale, temp and timezone variables, the

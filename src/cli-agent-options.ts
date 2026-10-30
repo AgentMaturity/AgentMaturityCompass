@@ -25,6 +25,8 @@ import { compactionFromFlags } from "./agent/compaction/promptPressure.js";
 import { liveNativeFailureGuidance, renderNativeFailureGuidance } from "./agent/nativeFailureGuidance.js";
 import { isActionClass } from "./governor/actionCatalog.js";
 import type { ActionClass } from "./types.js";
+import type { LiveTextPreviewEvent } from "./llm/adapter/liveTextPreview.js";
+import type { ComposedTurnHandle } from "./kernel/agentLoopRunner.js";
 import type { ApprovalAnswerer, ApprovalRiskTier } from "./approvals/seam/approvalSeamTypes.js";
 import {
   createApprovalExceptionAnswerer,
@@ -529,4 +531,42 @@ export function renderNotification(notification: LoopNotification): string | nul
       // follows, and echoing them here would bury the two lines that matter.
       return null;
   }
+}
+
+/** `--stream`: the provisional live reply on stderr; the recorded settlement remains the outcome. */
+export function liveTextPreviewPrinter(): (event: LiveTextPreviewEvent) => void {
+  let previewRequest: string | null = null;
+  return event => {
+    if (event.kind === "text") {
+      if (previewRequest !== event.headerEventId) {
+        process.stderr.write(`\nLive reply · session ${event.sessionId} · provisional until recorded settlement\n`);
+        previewRequest = event.headerEventId;
+      }
+      process.stderr.write(event.text);
+    } else if (previewRequest !== null) {
+      process.stderr.write(event.truncated ? "\n[Live preview truncated; read the recorded result for the outcome.]\n"
+        : "\n[Live preview ended; read the recorded result for the outcome.]\n");
+      previewRequest = null;
+    }
+  };
+}
+
+/**
+ * Ctrl-C is the operator's stop button and SIGTERM a parent stop: each produces the same signed cancellation
+ * `--cancel-after` does, not a killed process whose turn a later recovery has to close as `interrupted`.
+ * @returns the disposer that removes both listeners.
+ */
+export function armTurnSignals(handle: ComposedTurnHandle, io: AgentLoopCliIo): () => void {
+  const onSigint = (): void => {
+    io.error(chalk.yellow("\ncancelling the turn (cause: user)…"));
+    handle.cancel({ kind: "user" });
+  };
+  const onSigterm = (): void => {
+    io.error(chalk.yellow("\ncancelling the turn (signal: SIGTERM)…"));
+    handle.cancel({ kind: "parent" }, { by: "signal:SIGTERM" });
+    void handle.shutdown();
+  };
+  process.on("SIGINT", onSigint);
+  process.on("SIGTERM", onSigterm);
+  return () => { process.removeListener("SIGINT", onSigint); process.removeListener("SIGTERM", onSigterm); };
 }

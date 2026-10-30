@@ -97,6 +97,11 @@ export class ContextPluginHost {
    * @throws whatever a plugin throws, and `AbortError` when the signal aborts.
    */
   async refresh(input: ContextCollectInput): Promise<void> {
+    await this.refreshSnapshot(input);
+  }
+
+  /** Return this boundary's own contribution map; concurrent inherited contexts cannot replace its rendered values. */
+  async refreshSnapshot(input: ContextCollectInput): Promise<ReadonlyMap<string, string>> {
     const next = new Map<string, string>();
     for (const plugin of this.plugins) {
       input.signal?.throwIfAborted();
@@ -104,6 +109,7 @@ export class ContextPluginHost {
     }
     input.signal?.throwIfAborted();
     this.cache = next;
+    return next;
   }
 
   /** The text one plugin produced at the last refresh, or `""` if it has none. */

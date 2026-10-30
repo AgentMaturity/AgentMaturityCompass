@@ -157,6 +157,7 @@ function defaultContextPlugins(options: AgentPromptProfileOptions): readonly Con
   return [
     createInstructionsContextPlugin({
       workspace: options.workspace,
+      workspaceOnly: true,
       ...(options.amcHome === undefined ? {} : { amcHome: options.amcHome }),
       ...(options.env === undefined ? {} : { env: options.env }),
       ...(options.maxInstructionFileBytes === undefined

@@ -7,6 +7,8 @@ import type { SessionService } from "../session/sessionService.js";
 import type { RecoveryClaimant } from "../session/sessionRecovery.js";
 import { mountNativeMcpServer, type MountedNativeMcpServer } from "../mcp/nativeMcpClient.js";
 import { reviewNativeMcpConfigurations, reviewedNativeMcpApprovalOptions, resolveNativeMcpServer, type LoadedNativeMcpConfiguration } from "../setup/nativeMcpConfig.js";
+import { bindNativeMcpResourceStatus, projectNativeResourceStatus, type NativeMcpResourceSource } from "../prompt/context/nativeResourceStatus.js";
+import { workspaceSkillRoots } from "../skills/skillTurn.js";
 
 /** Reuse the native pipeline/approval engine and bind extensions to its actual session writer. */
 export async function prepareAcpNativeSession(options: {
@@ -29,9 +31,14 @@ export async function prepareAcpNativeSession(options: {
   const reviewed = options.approval ? reviewNativeMcpConfigurations(configs.map(config => config.path), configs.map(config => config.sha256),
     options.session.workspace, options.approval.actionClass) : [];
   const binding: { value?: { readonly session: SessionService; readonly toolset: AgentToolset | null } } = {};
+  const mcpStatus: NativeMcpResourceSource[] = [];
   const init: AgentSessionInit & { sessionId: string } = {
     ...options.session,
     ...(reviewed.length ? { additionalCapabilities: reviewed.flatMap(entry => entry.review.capabilities) } : {}),
+    resourceStatus: () => ({
+      ...projectNativeResourceStatus({ mcp: mcpStatus, skillRoots: workspaceSkillRoots(options.session.workspace) }),
+      extensions: options.session.resourceStatus?.().extensions ?? null
+    }),
     // bindTools below gates every call (EMPTY_TOOL_SEAM included) whenever an approval is configured, so the prompt may say so.
     approvalGated: options.approval !== undefined,
     bindTools: context => {
@@ -57,8 +64,10 @@ export async function prepareAcpNativeSession(options: {
           ...(options.credentialsHome === undefined ? {} : { credentialsHome: options.credentialsHome }),
           ...(options.credentialsFile === undefined ? {} : { credentialsFile: options.credentialsFile }) });
         if (options.signal.aborted) throw new Error("Native MCP preparation was cancelled.");
-        mounts.push(await mountNativeMcpServer({ server, workspace: options.session.workspace, agentId: options.session.agentId,
-          toolset, ...review, signal: serverLifetime.signal }));
+        const mount = await mountNativeMcpServer({ server, workspace: options.session.workspace, agentId: options.session.agentId,
+          toolset, ...review, signal: serverLifetime.signal });
+        mounts.push(mount);
+        mcpStatus.push(bindNativeMcpResourceStatus(mount, toolset.registry, options.session.agentId));
       }
     }
     if (options.signal.aborted) throw new Error("Native session preparation was cancelled.");

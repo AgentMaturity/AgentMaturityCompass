@@ -42,11 +42,12 @@ import type {
   PromptVariableProvider
 } from "../../prompt/assembly/promptTypes.js";
 import type { ContextPluginHost } from "../../prompt/context/contextHost.js";
-import { composeNativePrompt } from "../../agent/nativeAgentComposition.js";
+import { composeNativePrompt, type NativePromptOptions } from "../../agent/nativeAgentComposition.js";
+import type { NativeResourceStatus } from "../../prompt/context/nativeResourceStatus.js";
 
 export const PROMPT_SEAM = defineSeam("amcPrompt");
 
-export interface PromptServiceConfig {
+export interface PromptServiceConfig extends NativePromptOptions {
   /** What to assemble, as data. Built by `agentPromptProfile`. */
   readonly profile: AgentPromptProfile;
   /** Handed to every section provider and every context plugin. */
@@ -82,18 +83,22 @@ export class PromptSeamService extends AmcSeam {
    * possible place to discover it.
    */
   readonly preStep: (input: PreStepInput, next: () => Promise<PreStepDecision>) => Promise<PreStepDecision>;
+  readonly resourceStatus: () => NativeResourceStatus;
 
   constructor(ctx: Context, config: PromptServiceConfig) {
     super(ctx, PROMPT_SEAM.name);
     // The same registry/host/pre-step wiring every native surface composes through (GAP-WP39).
     const seam = composeNativePrompt(config.profile, {
       ...(config.sessionId === undefined ? {} : { sessionId: config.sessionId }),
+      ...(config.session === undefined ? {} : { session: config.session }),
+      ...(config.resourceStatus === undefined ? {} : { resourceStatus: config.resourceStatus }),
       ...(config.newMessageId === undefined ? {} : { newMessageId: config.newMessageId })
     });
     this.registry = seam.registry;
     this.host = seam.host;
     this.sessionId = config.sessionId;
     this.preStep = seam.preStep;
+    this.resourceStatus = seam.resourceStatus;
     this.ctx.effect(() => () => {
       seam.dispose();
     }, "amcPrompt context registrations");

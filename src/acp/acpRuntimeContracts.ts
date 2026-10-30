@@ -6,6 +6,7 @@ import { ACP_MAX_SESSION_ROWS, ACP_MAX_TURN_UPDATE_BYTES } from "./acpCommittedU
 import { ACP_ERROR, AcpFailure } from "./acpErrors.js";
 import { acpSupportsImageInput, type AcpPromptBlock, type AcpPromptRoute } from "./acpPromptInput.js";
 import { ACP_NATIVE_AUDIO_CONTRACT, acpSupportsAudioInput } from "./acpAudioInput.js";
+import { validClientRequestId } from "../session/loopEventMeta.js";
 import { EXECUTION_API_VERSION } from "../execution/executionContract.js";
 
 /** Shared wire contract for SDKs. None of these declarations is a cold-verifier verdict. */
@@ -64,6 +65,10 @@ export function nativeAcpCapabilities(options: {
       executionApi: EXECUTION_API_VERSION,
       runtimeFormat: ACP_RUNTIME_FORMAT,
       committedUpdates: "live-completed-blocks" as const,
+      committedTurn: "amc-committed-turn-v1" as const,
+      currentPlanUpdates: "amc-current-plan-v1" as const,
+      sessionEventPage: "amc-session-event-page-v1" as const,
+      ...(options.nativeExecution ? { clientRequestIds: true, withdrawSubmission: true } : {}),
       verification: "not-verified" as const,
       cancellation: "prompt-scoped" as const,
       limits: ACP_RUNTIME_LIMITS,
@@ -84,14 +89,24 @@ export function acpPromptInputFormat(meta: unknown): typeof NATIVE_ORDERED_INPUT
   if (!isRecord(meta)) throw new AcpFailure(ACP_ERROR.invalidParams, "ACP prompt metadata must be an object or null.");
   if (!Object.hasOwn(meta, ACP_RUNTIME_META_KEY)) return undefined;
   const extension = meta[ACP_RUNTIME_META_KEY];
-  if (!isRecord(extension) || Object.keys(extension).some(key => key !== "inputFormat")) {
+  if (!isRecord(extension) || Object.keys(extension).some(key => key !== "inputFormat" && key !== "clientRequestId")) {
     throw new AcpFailure(ACP_ERROR.invalidParams, "Malformed or unsupported native prompt extension; no downgrade was used.");
+  }
+  if (Object.hasOwn(extension, "clientRequestId") && !validClientRequestId(extension.clientRequestId)) {
+    throw new AcpFailure(ACP_ERROR.invalidParams, "clientRequestId must be 1 through 128 visible ASCII characters.");
   }
   if (!Object.hasOwn(extension, "inputFormat")) return undefined;
   if (extension.inputFormat !== NATIVE_ORDERED_INPUT_FORMAT && extension.inputFormat !== NATIVE_AUDIO_INPUT_FORMAT) {
     throw new AcpFailure(ACP_ERROR.invalidParams, "Unsupported native ordered input format; no downgrade was used.");
   }
   return extension.inputFormat;
+}
+
+/** Uses the same strict extension admission as ordered input; unknown metadata stays opaque. */
+export function acpPromptClientRequestId(meta: unknown): string | undefined {
+  acpPromptInputFormat(meta);
+  if (!isRecord(meta) || !isRecord(meta[ACP_RUNTIME_META_KEY])) return undefined;
+  return (meta[ACP_RUNTIME_META_KEY] as { clientRequestId?: string }).clientRequestId;
 }
 
 /** The vendored schema permits extra properties. Native codecs cannot silently lose

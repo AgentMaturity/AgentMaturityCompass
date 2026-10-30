@@ -1072,7 +1072,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc session proof` | Export a session's inclusion proof (verifiable offline, without this workspace) | `--out <path>` | - |
 | `amc session recover` | Recover a crashed session by appending synthetic closers under a fenced claim (append-only) | `--force`<br>`--close`<br>`--stale-after <ms>`<br>`--json` | - |
 | `amc session replay-request` | Rebuild each request this session sent from its signed rows and check it against the recorded digest | `--json`<br>`--out <path>` | - |
-| `amc session show` | Show a session's projected conversation and its event spine | `--json` | - |
+| `amc session show` | Show a session's projected conversation and its event spine | `--json`<br>`--limit <rows>`<br>`--cursor <cursor>` | - |
 | `amc session spill-read` | Read a bounded byte range of retained output against its signed origin | `--workspace <path>`<br>`--offset <bytes>`<br>`--limit <bytes>`<br>`--expect-monitor <sha256>`<br>`--json` | - |
 | `amc session verify` | Verify the ledger and report per-session lifecycle verdicts (open / released / interrupted / closed) | `--json`<br>`--expect-monitor <sha256>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unanchored` | - |
 | `amc session verify-proof` | Verify a session inclusion proof offline — needs only the bundle and a pinned fingerprint | `--expect-auditor-key <sha256>`<br>`--json`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned`<br>`--allow-unanchored` | - |

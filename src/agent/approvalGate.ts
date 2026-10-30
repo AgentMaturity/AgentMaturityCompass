@@ -138,6 +138,8 @@ export function gateToolCallsOnApproval(
   return {
     ...(inner.extensionHooks === undefined ? {} : { extensionHooks: inner.extensionHooks }),
     ...(inner.supportsEffectGuard === true ? { supportsEffectGuard: true as const } : {}),
+    ...(inner.shutdown === undefined ? {} : { shutdown: () => inner.shutdown!() }),
+    ...(inner.hasOwnedWork === undefined ? {} : { hasOwnedWork: () => inner.hasOwnedWork!() }),
     schemas: (): readonly ToolSchema[] | null => inner.schemas(),
     executionMode: (request: ToolCallRequest): "parallel" | "exclusive" =>
       inner.executionMode(request),

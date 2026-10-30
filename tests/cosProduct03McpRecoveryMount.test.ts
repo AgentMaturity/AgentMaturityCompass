@@ -229,7 +229,8 @@ describe("P03 governed native MCP recovery", () => {
     const f = await fixture(); await f.mount(); f.state.toolMode = "resume"; f.state.holdToolRecovery = true;
     const controller = new AbortController(), calling = f.call(controller.signal);
     await vi.waitFor(() => expect([...f.held].some(item => item.kind === "tool")).toBe(true));
-    controller.abort(new Error("synthetic cancellation reason")); expect((await calling).outcome).toBe("CANCELLED");
+    // WP16: the tools/call was dispatched before recovery was cancelled, so its remote effect is unknown, not cancelled.
+    controller.abort(new Error("synthetic cancellation reason")); expect((await calling).outcome).toBe("TOOL_OUTCOME_UNKNOWN");
     await vi.waitFor(() => expect([...f.held].some(item => item.kind === "tool")).toBe(false));
     expect((await f.call()).outcome).toBe("DENIED"); await new Promise<void>(resolve => setTimeout(resolve, 400));
     expect(f.posts("tools/call")).toHaveLength(1); expect(f.calls.filter(call => call.cursor?.startsWith("tool:"))).toHaveLength(1);

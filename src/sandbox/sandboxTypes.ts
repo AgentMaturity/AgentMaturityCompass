@@ -22,6 +22,8 @@
 export type SandboxBackendKind = "seatbelt" | "landlock" | "bwrap" | "none";
 
 export interface SandboxPolicy {
+  /** Already-scrubbed process output for an owning bounded job collector. */
+  readonly onOutput?: (stream: "stdout" | "stderr", text: string) => void;
   /**
    * Directories the command may write to. Everything else is read-only.
    *

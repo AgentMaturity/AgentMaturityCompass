@@ -23,13 +23,9 @@ import { hostname } from "node:os";
  * tests. The packaged runtime bundles the kernel and its workspace dependencies
  * through src/kernel/amcRuntime.ts.
  *
- * HOW A TURN IS CANCELLED. With Ctrl-C, or with `--cancel-after`. There is no
- * `agent-loop cancel <session>` because there is no cross-process control
- * channel yet: a command that pretended to stop an agent in another process
- * would be a command that silently did nothing. What both supported paths do is
- * the real thing — `cancel({kind:"user"})`, which writes a signed `loop/cancel`
- * row and closes the turn `cancelled` with its cause inside the hashed
- * `turn/end`.
+ * HOW A TURN IS CANCELLED. Ctrl-C and `--cancel-after` name a user stop;
+ * SIGTERM names a parent stop requested by `signal:SIGTERM`. Each writes a
+ * signed `loop/cancel` and closes the turn `cancelled` with its cause in the hashed `turn/end`.
  */
 import type { Command } from "commander";
 import { resolveAgentId } from "./fleet/paths.js";
@@ -55,7 +51,9 @@ import { parseDelegationScope } from "./agent/delegationScope.js";
 import { parseSubagentStopConditions } from "./agent/subagentStopConditions.js";
 import { prepareSkillTurn, workspaceSkillRoots } from "./skills/skillTurn.js";
 import { buildSkillCatalog } from "./skills/skillCatalog.js";
-import { loadNativeExtensions, type NativeExtensionTurn } from "./extensions/nativeExtensionRuntime.js";
+import { loadNativeExtensions, type NativeExtensionManager, type NativeExtensionTurn } from "./extensions/nativeExtensionRuntime.js";
+import { bindNativeMcpResourceStatus, projectNativeResourceStatus, type NativeMcpResourceSource } from "./prompt/context/nativeResourceStatus.js";
+import { explicitPresetCompositionOptions, nativePresetCompositionSources } from "./cli/agentCompositionSources.js";
 import { resolvePreset, type AgentPreset } from "./presets/agentPresets.js";
 import { IN_PROCESS_PROVIDER, delegationTurnOptions, resolveForeignRunner } from "./agent/providers/delegationProviders.js";
 import type { SubagentRunner } from "./agent/subagentSpawn.js";
@@ -77,7 +75,7 @@ import { loadNativeAudioManifest } from "./attachments/nativeAudioFiles.js";
 import type { NativeAudioPart } from "./attachments/nativeAudioInput.js";
 
 import {
-  activeChildLimitOption, approvalGateFor, collectOption, collectDelegateStop, compactionOption, resetDelegateStops, integerOption, paramsFor, piAiRouteSelection, renderNotification, routeFor,
+  activeChildLimitOption, approvalGateFor, armTurnSignals, collectOption, collectDelegateStop, compactionOption, integerOption, liveTextPreviewPrinter, paramsFor, piAiRouteSelection, renderNotification, resetDelegateStops, routeFor,
   type AgentLoopCliIo, type RunOptions
 } from "./cli-agent-options.js";
 export type { AgentLoopCliIo, RunOptions } from "./cli-agent-options.js";
@@ -263,9 +261,8 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       if (opts.interactiveApprovals && opts.approvalException !== undefined) {
         io.error("Interactive approvals require the signed approval engine; approval exceptions cannot be combined with this mode."); io.fail(); return;
       }
-      // Resolved FIRST, so every flag default below can fall back to it. A
-      // preset is signed policy: an unverifiable one composes nothing, for the
-      // same reason an unverifiable schedule runs nothing.
+      // Verify the signed preset before applying invocation flags.
+      const explicitCompositionOptions = explicitPresetCompositionOptions(command);
       let preset: AgentPreset | undefined;
       if (opts.preset !== undefined) {
         const resolved = resolvePreset(process.cwd(), opts.preset);
@@ -275,12 +272,8 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           return;
         }
         preset = resolved.preset;
-        // Said out loud. A run whose model, tool mode or approval gate came from
-        // a file the operator wrote last month should say so, or the behaviour
-        // has no visible cause.
         (opts.json ? io.error : io.log)(chalk.dim(`composed from preset "${preset.id}": ${preset.description}`));
-        // Apply the remaining policy fields before approval and delegation are
-        // built. A signed preset must not merely advertise these settings.
+        // Apply preset approval before constructing policy controls.
         opts = { ...opts, approveTools: opts.approveTools ?? preset.approveTools };
       }
       try { opts = applyNativeDelegationPreset(opts, preset?.delegate); }
@@ -294,9 +287,10 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
         io.error("--audio-input is exclusive with positional text and --image; put every original part in its manifest order."); io.fail(); return;
       }
       let extensionTurn: NativeExtensionTurn;
+      let extensions: NativeExtensionManager;
       try {
         const catalog = buildSkillCatalog(workspaceSkillRoots(process.cwd(), opts.credentialsHome));
-        const extensions = loadNativeExtensions({ workspace: process.cwd(), manifestPaths: opts.extension,
+        extensions = loadNativeExtensions({ workspace: process.cwd(), manifestPaths: opts.extension,
           expectedDigests: opts.extensionPin, reservedCommands: [...catalog.skills, ...catalog.problems].map(skill => skill.name) });
         extensionTurn = extensions.prepareTurn();
         rawPrompt = extensions.expandCommand(rawPrompt)?.prompt ?? rawPrompt;
@@ -465,6 +459,8 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
         return;
       }
       const dispatchMode = (opts.toolMode ?? preset?.toolMode) === "code" ? "code" as const : "native" as const;
+      const compositionSources = nativePresetCompositionSources(preset, explicitCompositionOptions, opts, { providerId, model, maxTokens, maxSteps, tools: toolMode, toolMode: dispatchMode,
+        approveTools: gate?.actionClass, delegateEnabled: wantsDelegation, delegateScope, maxDelegationDepth, delegateTimeout, delegateStops: delegateStops.conditions });
       const shellOptIn = opts.unsafeUnconfinedShell === true ? { unconfinedShell: "cli-flag" as const } : {};
       // Resume names its existing session; a fresh run supplies a new ID. Fork
       // selects its own ID inside composition, which binds the actual writer
@@ -613,11 +609,12 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
         toolSeam = echoToolSeam();
       }
       const timers: NodeJS.Timeout[] = [];
-      let onSigint: (() => void) | null = null;
+      let disarmSignals = (): void => undefined;
       const mcpMounts: MountedNativeMcpServer[] = [];
+      const mcpStatus: NativeMcpResourceSource[] = [];
       const mcpAbort = new AbortController();
       const cancelMcp = () => mcpAbort.abort();
-      if (mcpServers.length) process.on("SIGINT", cancelMcp);
+      if (mcpServers.length) { process.on("SIGINT", cancelMcp); process.on("SIGTERM", cancelMcp); }
       breadth.armCancel();
 
       try {
@@ -629,10 +626,10 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
             const mount = await mountNativeMcpServer({ server, workspace: process.cwd(), agentId,
               toolset: workspaceToolset, ...review, signal: mcpAbort.signal });
             mcpMounts.push(mount);
+            mcpStatus.push(bindNativeMcpResourceStatus(mount, workspaceToolset.registry, agentId));
             (await import("./setup/nativeInteractiveMcp.js")).reportNativeInteractiveMcpMount(mount, progress);
           }
         }
-        let previewRequest: string | null = null;
         let priorTurnEndings = 0;
         const outcome = await runner.runComposedTurn({
           sessionId: turnSessionId,
@@ -641,19 +638,10 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           ...(opts.keepOpen ? { keepOpen: true } : {}),
           workspace: process.cwd(),
           agentId,
-          ...(opts.stream ? { onLiveText: (event: import("./llm/adapter/liveTextPreview.js").LiveTextPreviewEvent) => {
-            if (event.kind === "text") {
-              if (previewRequest !== event.headerEventId) {
-                process.stderr.write(`\nLive reply · session ${event.sessionId} · provisional until recorded settlement\n`);
-                previewRequest = event.headerEventId;
-              }
-              process.stderr.write(event.text);
-            } else if (previewRequest !== null) {
-              process.stderr.write(event.truncated ? "\n[Live preview truncated; read the recorded result for the outcome.]\n"
-                : "\n[Live preview ended; read the recorded result for the outcome.]\n");
-              previewRequest = null;
-            }
-          } } : {}),
+          ...(compositionSources === undefined ? {} : { compositionSources }),
+          resourceStatus: () => projectNativeResourceStatus({ extensions, mcp: mcpStatus,
+            skillRoots: workspaceSkillRoots(extensions.workspace, opts.credentialsHome) }),
+          ...(opts.stream ? { onLiveText: liveTextPreviewPrinter() } : {}),
           // No pinned `systemPrompt`: the prompt is ASSEMBLED, which is what
           // gives the run its identity and pulls the workspace's own AGENTS.md /
           // CLAUDE.md in as runtime context. A hardcoded string here — what this
@@ -747,14 +735,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
             // invocation reports only its newly recorded ending as its exit
             // outcome; the driver's idle state means it can accept more work.
             priorTurnEndings = readAgentRunSummary(process.cwd(), handle.sessionId, "idle").endings.length;
-            // Ctrl-C is the operator's stop button, and it must produce the same
-            // signed cancellation `--cancel-after` does — not a killed process
-            // whose turn a later recovery has to close as `interrupted`.
-            onSigint = () => {
-              io.error(chalk.yellow("\ncancelling the turn (cause: user)…"));
-              handle.cancel({ kind: "user" });
-            };
-            process.on("SIGINT", onSigint);
+            disarmSignals = armTurnSignals(handle, io);
             if (cancelAfter > 0) {
               timers.push(setTimeout(() => handle.cancel({ kind: "user" }), cancelAfter));
             }
@@ -771,11 +752,12 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
         breadth.reportRun(outcome, priorTurnEndings, validation !== undefined);
       } finally {
         for (const timer of timers) clearTimeout(timer);
-        if (onSigint !== null) process.removeListener("SIGINT", onSigint);
+        disarmSignals();
         const closed = await Promise.allSettled(mcpMounts.map(mount => mount.close()));
         try { if (closed.some(result => result.status === "rejected")) { io.error("MCP cleanup failed; this mount must not be reused."); io.fail(); } }
         finally {
           process.removeListener("SIGINT", cancelMcp);
+          process.removeListener("SIGTERM", cancelMcp);
           breadth.dispose();
           workspaceToolset?.close();
         }

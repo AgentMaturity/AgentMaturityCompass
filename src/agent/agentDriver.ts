@@ -1,5 +1,6 @@
 import type { NativeExtensionHookEvent } from "../extensions/nativeExtensionHookSchema.js";
 import { randomBytes } from "node:crypto";
+import { recordDeliveredContext } from "../prompt/context/nativeCompositionContext.js";
 /**
  * The turn/step machine — AMC running an agent (plan P3.2).
  *
@@ -44,6 +45,7 @@ import { randomBytes } from "node:crypto";
 import type { SessionEventRef, SessionService } from "../session/sessionService.js";
 import type { TokenUsage, TurnCancelCause, TurnTrigger } from "../session/sessionTypes.js";
 import { isTurnCancelCause } from "../session/sessionTypes.js";
+import { canonicalTurnCancelCause } from "../session/turnLifecycleMeta.js";
 import { LoopInbox } from "./inbox.js";
 import type { NativeImageInput } from "../attachments/nativeImageInput.js";
 import { recordNativeImageMessage } from "./nativeImageMessage.js";
@@ -75,6 +77,8 @@ import { freezeNativeValidationPlan, NativeValidationTurn, type NativeValidation
 import { NativeValidationRepair, NativeValidationRepairStop } from "./nativeValidationRepair.js";
 import { AutoCompactor } from "./compaction/autoCompact.js";
 import { resolveRouteCompaction } from "./compaction/promptPressure.js";
+import { shutdownTimeoutMs, shutdownToolResults, type AgentShutdownResult } from "./agentShutdown.js";
+export type { AgentShutdownResult } from "./agentShutdown.js";
 
 export interface AgentDriverInit {
   readonly session: SessionService;
@@ -100,7 +104,7 @@ export interface AgentDriverInit {
 type Phase =
   | { readonly kind: "idle"; readonly lastTurn: number }
   | { kind: "running"; abort: AbortController; turn: number; step: number; wakeRequested: boolean }
-  | { readonly kind: "failed"; readonly cause: unknown };
+  | { readonly kind: "failed"; readonly cause: unknown; readonly turn: number };
 
 /** A pre-step that decided to enter, with the batch it decided to enter with. */
 type PreparedStep = Extract<PreStepDecision, { kind: "enter" }>;
@@ -128,6 +132,11 @@ export class AgentDriver {
   private phase: Phase = { kind: "idle", lastTurn: 0 };
 
   private activityDone: Promise<void> = Promise.resolve();
+  private admissionClosed = false;
+  private disposal: Promise<boolean> | null = null;
+
+  private shutdownPromise: Promise<AgentShutdownResult> | undefined;
+  private shutdownErrors: string[] | undefined;
 
   /** The last row this driver committed. Named by a `loop/cancel` as its observed head. */
   private head: SessionEventRef | null = null;
@@ -194,6 +203,9 @@ export class AgentDriver {
     return this.phase.kind;
   }
 
+  /** Disposal closes admission before any asynchronous cleanup starts. */
+  get disposed(): boolean { return this.admissionClosed; }
+
   get sessionId(): string {
     return this.session.sessionId;
   }
@@ -206,20 +218,20 @@ export class AgentDriver {
    * classification is captured BEFORE the insertion so that a cancel triggered
    * re-entrantly by an observer of the insertion cannot reclassify it.
    */
-  send(text: string, target: InboxTarget, wakeup: boolean, images?: readonly NativeImageInput[]): InboxReceipt {
-    return this.enqueue(text, target, wakeup, images);
+  send(text: string, target: InboxTarget, wakeup: boolean, images?: readonly NativeImageInput[], clientRequestId?: string): InboxReceipt {
+    return this.enqueue(text, target, wakeup, images, undefined, undefined, clientRequestId);
   }
 
   /** Preserve the same lane, wake, abort-demotion and durable admission machinery. */
-  sendParts(parts: readonly NativeInputPart[], target: InboxTarget, wakeup: boolean): InboxReceipt {
-    return this.enqueue("", target, wakeup, undefined, parts);
+  sendParts(parts: readonly NativeInputPart[], target: InboxTarget, wakeup: boolean, clientRequestId?: string): InboxReceipt {
+    return this.enqueue("", target, wakeup, undefined, parts, undefined, clientRequestId);
   }
 
-  sendAudioParts(parts: readonly NativeAudioPart[], target: InboxTarget, wakeup: boolean): InboxReceipt {
-    return this.enqueue("", target, wakeup, undefined, undefined, parts);
+  sendAudioParts(parts: readonly NativeAudioPart[], target: InboxTarget, wakeup: boolean, clientRequestId?: string): InboxReceipt {
+    return this.enqueue("", target, wakeup, undefined, undefined, parts, clientRequestId);
   }
 
-  private enqueue(text: string, target: InboxTarget, wakeup: boolean, images?: readonly NativeImageInput[], parts?: readonly NativeInputPart[], audioParts?: readonly NativeAudioPart[]): InboxReceipt {
+  private enqueue(text: string, target: InboxTarget, wakeup: boolean, images?: readonly NativeImageInput[], parts?: readonly NativeInputPart[], audioParts?: readonly NativeAudioPart[], clientRequestId?: string): InboxReceipt {
     this.assertUsable();
     const wakingAfterAbort =
       wakeup && this.phase.kind === "running" && this.phase.abort.signal.aborted;
@@ -229,23 +241,31 @@ export class AgentDriver {
       demotedFrom: wakingAfterAbort ? target : null,
       ...(images === undefined ? {} : { images }),
       ...(parts === undefined ? {} : { parts }),
-      ...(audioParts === undefined ? {} : { audioParts })
+      ...(audioParts === undefined ? {} : { audioParts }),
+      ...(clientRequestId === undefined ? {} : { clientRequestId })
     });
-    if (wakeup) this.wakeDriver(wakingAfterAbort);
+    // A retry may wake its still-pending original admission, never an already consumed effect.
+    if (wakeup && (clientRequestId === undefined || [...this.inbox.nextTurn, ...this.inbox.nextStep].some(message => message.messageId === receipt.messageId))) this.wakeDriver(wakingAfterAbort);
     return receipt;
   }
 
   /** Queue a prompt that gets its own turn, and wake the driver. */
-  followup(text: string, images?: readonly NativeImageInput[]): InboxReceipt {
-    return this.send(text, "next-turn", true, images);
+  followup(text: string, images?: readonly NativeImageInput[], clientRequestId?: string): InboxReceipt {
+    return this.send(text, "next-turn", true, images, clientRequestId);
   }
 
-  followupParts(parts: readonly NativeInputPart[]): InboxReceipt {
-    return this.sendParts(parts, "next-turn", true);
+  followupParts(parts: readonly NativeInputPart[], clientRequestId?: string): InboxReceipt {
+    return this.sendParts(parts, "next-turn", true, clientRequestId);
   }
 
-  followupAudioParts(parts: readonly NativeAudioPart[]): InboxReceipt {
-    return this.sendAudioParts(parts, "next-turn", true);
+  followupAudioParts(parts: readonly NativeAudioPart[], clientRequestId?: string): InboxReceipt {
+    return this.sendAudioParts(parts, "next-turn", true, clientRequestId);
+  }
+
+  /** Remove one pending submission without cancelling the active turn or sibling inputs. */
+  withdraw(messageId: string): boolean {
+    this.assertUsable();
+    return this.inbox.withdraw(messageId);
   }
 
   /** Steer the nearest step boundary. An idle driver starts a turn for it. */
@@ -275,26 +295,31 @@ export class AgentDriver {
     if (!isTurnCancelCause(cause)) {
       throw new Error("AgentDriver.cancel: a cancellation must name its cause");
     }
+    const boundedCause = canonicalTurnCancelCause(cause);
     const keepInbox = options.keepInbox === true;
     try {
       this.head = this.session.recordLoopEvent({
         kind: "cancel",
-        cause,
+        cause: boundedCause,
         keepInbox,
         requestedBy: options.by ?? "local",
         observedHeadEventId: this.head?.eventId ?? null,
         phase: this.phase.kind
       });
     } catch (error: unknown) {
+      this.shutdownErrors?.push(error instanceof Error ? error.message : String(error));
       this.notifyError(error);
     }
-    if (!keepInbox) {
-      this.inbox.clear();
-      if (this.phase.kind === "running") this.phase.wakeRequested = false;
+    try {
+      if (!keepInbox) this.inbox.clear();
+    } finally {
+      // A failed queue splice must never prevent the active work from seeing its stop signal.
+      if (this.phase.kind === "running") {
+        if (!keepInbox) this.phase.wakeRequested = false;
+        // The bounded cause IS the abort reason, so the turn's catch reads back exactly what was recorded.
+        this.phase.abort.abort(boundedCause);
+      }
     }
-    // The cause IS the abort reason, so the turn's catch reads back exactly what
-    // the canceller named rather than re-deriving it from somewhere else.
-    if (this.phase.kind === "running") this.phase.abort.abort(cause);
   }
 
   /**
@@ -312,7 +337,71 @@ export class AgentDriver {
     } while (activity !== this.activityDone);
   }
 
+  /** Stop admission, cancel owned work and return an immutable, bounded local outcome snapshot. */
+  shutdown(options: { readonly timeoutMs?: number } = {}): Promise<AgentShutdownResult> {
+    if (this.shutdownPromise) return this.shutdownPromise;
+    const timeoutMs = shutdownTimeoutMs(options.timeoutMs);
+    // Publish before cancellation observers can call shutdown or enqueue re-entrantly.
+    let resolve!: (result: AgentShutdownResult) => void;
+    this.shutdownPromise = new Promise(settle => { resolve = settle; });
+    const turn = this.phase.kind === "idle" ? null : this.phase.turn || null;
+    const queued = [...this.inbox.nextStep, ...this.inbox.nextTurn].map(message => message.messageId);
+    const errors: string[] = [];
+    this.shutdownErrors = errors;
+    if (this.phase.kind === "failed") errors.push(String(this.phase.cause instanceof Error ? this.phase.cause.message : this.phase.cause));
+    if (this.phase.kind !== "failed" && (this.phase.kind === "running" || this.inbox.hasPending)) {
+      try { this.cancel({ kind: "disposed" }, { by: "native-shutdown" }); }
+      catch (error) { errors.push(error instanceof Error ? error.message : String(error)); }
+    }
+    void this.finishShutdown(turn, queued, errors, timeoutMs).then(resolve);
+    return this.shutdownPromise;
+  }
+
+  private async finishShutdown(turn: number | null, queued: readonly string[], errors: string[], timeoutMs: number): Promise<AgentShutdownResult> {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    let timedOut = false;
+    try {
+      timedOut = await Promise.race([this.whenIdle().then(() => false), new Promise<boolean>(resolve => {
+        timer = setTimeout(() => resolve(true), timeoutMs);
+      })]);
+    } catch (error) { errors.push(error instanceof Error ? error.message : String(error)); }
+    finally { clearTimeout(timer); this.shutdownErrors = undefined; }
+    if (timedOut) errors.push("Native shutdown timed out; owned work may still be running.");
+    if (this.phase.kind === "failed" && errors.length === 0) errors.push("Native shutdown left an incomplete turn; recovery is required.");
+    const pending = [...this.inbox.nextStep, ...this.inbox.nextTurn].map(message => message.messageId);
+    let tools: ReturnType<typeof shutdownToolResults> = { settled: Object.freeze([]), cancelled: Object.freeze([]), unknown: Object.freeze([]) };
+    try { tools = shutdownToolResults(this.session.readEvents(), turn); }
+    catch (error) { errors.push(error instanceof Error ? error.message : String(error)); }
+    return Object.freeze({ sessionId: this.sessionId, state: !timedOut && this.phase.kind === "idle" && pending.length === 0 && errors.length === 0 ? "settled" : "incomplete",
+      driverStatus: this.status, turn, timedOut, ...tools, cancelledMessageIds: Object.freeze(queued.filter(id => !pending.includes(id))),
+      pendingMessageIds: Object.freeze(pending), errors: Object.freeze(errors), verification: "not-verified" });
+  }
+
+
+  /**
+   * Close admission, request cancellation, and wait a bounded time for logical
+   * work to settle. False is unconfirmed cleanup; the host must not seal it as
+   * clean or reuse this driver. Producer cleanup belongs to its resource owner.
+   */
+  dispose(graceMs = Math.min(30_000, Math.max(1_000, this.config.toolAbandonGraceMs + 1_000))): Promise<boolean> {
+    if (this.disposal) return this.disposal;
+    if (!Number.isSafeInteger(graceMs) || graceMs < 0 || graceMs > 30_000) throw new RangeError("Driver disposal grace must be between 0 and 30000 ms.");
+    this.admissionClosed = true;
+    let settle!: (confirmed: boolean) => void;
+    // Reserve before cancellation emits any row or observer notification.
+    this.disposal = new Promise<boolean>(resolve => { settle = resolve; });
+    const timer = setTimeout(() => settle(false), graceMs);
+    if (this.phase.kind !== "failed" && (this.phase.kind === "running" || this.inbox.hasPending)) {
+      try { this.cancel({ kind: "disposed" }, { by: "host:dispose" }); }
+      catch { if (this.phase.kind === "running") this.phase.abort.abort({ kind: "disposed" }); }
+    }
+    void this.whenIdle().then(() => { clearTimeout(timer); settle(true); }, () => { clearTimeout(timer); settle(false); });
+    return this.disposal;
+  }
+
   private assertUsable(): void {
+    if (this.admissionClosed) throw new Error("AgentDriver is disposed: new work is refused");
+    if (this.shutdownPromise) throw new Error("AgentDriver is shut down; admission is stopped.");
     if (this.phase.kind === "failed") {
       throw new Error(
         "AgentDriver is in a terminal failed state: session evidence or pending context requires operator recovery"
@@ -349,7 +438,7 @@ export class AgentDriver {
    * teardown must never wait on a model turn.
    */
   private wakeDriver(wakeAfterAbort = false): void {
-    if (this.phase.kind === "failed") return;
+    if (this.admissionClosed || this.shutdownPromise || this.phase.kind === "failed") return;
     if (this.phase.kind === "running") {
       const reason: unknown = this.phase.abort.signal.reason;
       const disposed = isTurnCancelCause(reason) && reason.kind === "disposed";
@@ -472,6 +561,7 @@ export class AgentDriver {
             if (message.text.length > 0 || !message.images?.length) {
               // Context a tool supplied reaches the model as the tool's data, never with the user's authority.
               this.head = this.session.recordUserMessage(message.origin === "tool" ? fenceToolContext(message.text) : message.text);
+              if (message.contextSnapshot === true) recordDeliveredContext(this.session, this.head, { turn: turnRef.turn, step });
             }
             this.head = recordNativeImageMessage(this.session, message) ?? this.head;
           }
@@ -547,7 +637,7 @@ export class AgentDriver {
       catch (error) { ending = { reason: "error", error }; this.notifyError(error); }
       await this.closeTurn(turnRef.turn, ending, signal);
       if (cleanupFailure !== undefined) {
-        this.setPhase({ kind: "failed", cause: cleanupFailure.error });
+        this.setPhase({ kind: "failed", cause: cleanupFailure.error, turn: turnRef.turn });
       }
     }
 
@@ -580,7 +670,7 @@ export class AgentDriver {
     try {
       this.head = this.session.endTurn(toTurnEndParams(resolved));
     } catch (error: unknown) {
-      this.setPhase({ kind: "failed", cause: error });
+      this.setPhase({ kind: "failed", cause: error, turn });
       this.notifyError(error);
       return;
     }
@@ -589,7 +679,7 @@ export class AgentDriver {
     try {
       this.head = this.session.sealTurn();
     } catch (error: unknown) {
-      this.setPhase({ kind: "failed", cause: error });
+      this.setPhase({ kind: "failed", cause: error, turn });
       this.notifyError(error);
     }
   }
@@ -608,7 +698,11 @@ export class AgentDriver {
     const orderedClaims = claimed.filter(message => message.parts !== undefined);
     const audioClaims = claimed.filter(message => message.audioParts !== undefined);
     const decision = await this.hooks.preStep(
-      { turn, step, target, messages: claimed, signal },
+      { turn, step, target, messages: claimed, signal, contextSession: Object.freeze({
+        sessionId: this.session.sessionId, workspace: this.session.workspace,
+        readEvents: () => this.session.readEvents(),
+        recordProjectedEvidence: this.session.recordProjectedEvidence.bind(this.session)
+      }) },
       (): Promise<PreparedStep> => Promise.resolve({ kind: "enter", messages: claimed })
     );
     signal.throwIfAborted();

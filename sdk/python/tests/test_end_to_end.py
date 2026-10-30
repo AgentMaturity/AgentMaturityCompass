@@ -195,3 +195,21 @@ def test_explicit_handoff_replays_history_and_continues_same_session(workspace):
         with pytest.raises(AmcRefusedError) as raised:
             third.resume_session(session_id)
         assert raised.value.data == {"reason": "SEALED"}
+
+
+@needs_amc
+def test_committed_pages_reconnect_without_claiming_a_writer(workspace):
+    with _agent(workspace) as writer:
+        session = writer.new_session()
+        result = session.prompt("one committed answer")
+        with _agent(workspace) as reader:
+            pages = list(reader.read_session_pages(session.session_id, limit=8))
+            text = "".join(event.update["content"]["text"] for page in pages for event in page.updates
+                           if event.update["sessionUpdate"] == "agent_message_chunk")
+            assert text == result.text and pages[-1].committed
+            assert pages[-1].state["validation"]["status"] == result.validation.status
+            assert not pages[-1].sealed
+            assert reader._sessions == set(), "read-only paging claimed a session writer"
+            resumed = reader.read_session_page(session.session_id, cursor=pages[-1].resume_cursor, limit=8)
+            assert resumed.updates == () and resumed.next_seq == pages[-1].next_seq
+        session.prompt("the original writer still owns this session")

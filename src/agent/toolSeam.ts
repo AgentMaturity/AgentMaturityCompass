@@ -71,6 +71,9 @@ export interface ToolCallOutcome {
 
 /** How the loop reaches a tool registry. */
 export interface AgentToolSeam {
+  /** Native resource cleanup before the owning writer closes or is handed off. */
+  shutdown?(): Promise<boolean>;
+  hasOwnedWork?(): boolean;
   /** The same selected native extension runtime used by the toolset guard. */
   readonly extensionHooks?: NativeExtensionHooks;
   /** The seam enforces ToolCallRequest.beforeEffect after all approval waits, at the actual effect boundary. */
