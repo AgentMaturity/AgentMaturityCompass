@@ -23,6 +23,7 @@ import { signWithPurposeKey } from "../keys/purposeProviders.js";
 import { capturePurposePublication, assertPurposePublicationCurrent } from "../keys/purposePublication.js";
 import { withControlFileLock } from "../lifecycle/controlFileLock.js";
 import { admissibleConfigFile } from "./configFile.js";
+import { admitLoopCandidate, type CandidateConfig, type LoopCandidateBinding } from "./loopCandidate.js";
 import { experimentGateSchema, experimentSchema, type ExperimentFile, type ExperimentGatePolicy } from "./experimentSchema.js";
 import { deterministicSeed, meanDifference, pairedBootstrapCI, pairedStandardizedEffect } from "./stats.js";
 import { DEFAULT_MIN_PAIRED_CASES, evaluateExperimentGate, type ExperimentGateStatus } from "./experimentGatePolicy.js";
@@ -97,6 +98,10 @@ export function verifySignedCandidateFile(workspace: string, file: string): { va
     };
   }
 }
+
+/** Auditor-signed admission, or a loop candidate (GAP-WP08) bound to its loop's journal. */
+export const admitExperimentCandidate = (workspace: string, candidate: CandidateConfig, loop?: LoopCandidateBinding) =>
+  candidate.kind === "improvement-candidate" ? admitLoopCandidate(candidate, loop) : verifySignedCandidateFile(workspace, candidate.path ?? "");
 
 /** The newest run, admitted against the current configuration; null when there are no runs. */
 function latestRunOrNull(workspace: string, agentId: string, experimentId: string): ExperimentReport | null {
@@ -244,6 +249,15 @@ export function setExperimentCandidate(params: {
   };
 }
 
+/** Only for an experiment the improvement loop created for itself; the candidate is unsigned loop output. */
+export function setExperimentLoopCandidate(params: { workspace: string; agentId: string; experimentId: string; candidateFile: string; loop: LoopCandidateBinding }): void {
+  const path = workspaceConfigFile(params.workspace, params.candidateFile);
+  updateExperiment(params.workspace, params.agentId, params.experimentId, (experiment) => {
+    experiment.experiment.candidateConfig = { id: params.loop.digestSha256.slice(0, 12), kind: "improvement-candidate", path,
+      digestSha256: params.loop.digestSha256, signatureValid: false, loopId: params.loop.loopId };
+  });
+}
+
 /** Invalid experiment request input, refused before any casebook or report work. */
 export class ExperimentInputError extends Error {
   readonly code = "EXPERIMENT_INPUT_INVALID";
@@ -284,6 +298,7 @@ export interface ExperimentRunParams {
   candidateTrialId?: string;
   /** Provenance of trials AMC executed itself; sealed into the report. */
   execution?: ExperimentExecution;
+  loopCandidate?: LoopCandidateBinding;
 }
 
 /**
@@ -311,7 +326,7 @@ function prepareExperimentReport(params: ExperimentRunParams) {
     throw new ExperimentInputError(`invalid experiment mode '${String(params.mode)}'; expected supervise or sandbox`);
   }
   const candidateConfig = experiment.experiment.candidateConfig;
-  if (!candidateConfig || !candidateConfig.signatureValid) {
+  if (!candidateConfig || !(candidateConfig.kind === "improvement-candidate" ? admitExperimentCandidate(params.workspace, candidateConfig, params.loopCandidate).valid : candidateConfig.signatureValid)) {
     throw new ExperimentInputError("candidate config is missing or unsigned");
   }
   if (!params.candidateWindow) {
@@ -459,7 +474,7 @@ function prepareExperimentReport(params: ExperimentRunParams) {
   } satisfies Omit<ExperimentReport, "reportJsonSha256" | "reportSealSig">;
 
   const runsDir = experimentRunsDir(params.workspace, agentId, params.experimentId);
-  return { agentId, experiment, baselineRun, candidateRun, base, runsDir,
+  return { agentId, experiment, baselineRun, candidateRun, base, runsDir, loopCandidate: params.loopCandidate,
     jsonPath: join(runsDir, `${runId}.json`), mdPath: join(runsDir, `${runId}.md`) };
 }
 
@@ -482,7 +497,7 @@ function experimentReportInputs(workspace: string, prepared: ReturnType<typeof p
     const { agentId, experiment, baselineRun, candidateRun } = prepared, config = experiment.experiment;
     const files = [experimentFilePath(workspace, agentId, config.experimentId)];
     if (config.baselineConfig.path) files.push(config.baselineConfig.path);
-    if (config.candidateConfig?.path) files.push(config.candidateConfig.path, `${config.candidateConfig.path}.sig`);
+    if (config.candidateConfig?.path) files.push(config.candidateConfig.path, ...(config.candidateConfig.kind === "improvement-candidate" ? [] : [`${config.candidateConfig.path}.sig`]));
     for (const id of new Set([baselineRun.agentId, candidateRun.agentId])) {
       const root = join(getAgentPaths(workspace, id).rootDir, "casebooks", config.casebookId), file = join(root, "casebook.yaml");
       const book = loadCasebook(workspace, config.casebookId, id);
@@ -502,7 +517,7 @@ function experimentReportInputs(workspace: string, prepared: ReturnType<typeof p
 function assertExperimentSourcesCurrent(workspace: string, prepared: ReturnType<typeof prepareExperimentReport>, actualLedger?: Ledger): void {
   const candidate = prepared.experiment.experiment.candidateConfig;
   if (candidate?.path) {
-    const admission = verifySignedCandidateFile(workspace, candidate.path);
+    const admission = admitExperimentCandidate(workspace, candidate, prepared.loopCandidate);
     if (!admission.valid || admission.digestSha256 !== candidate.digestSha256) throw new Error("experiment candidate admission changed while signing");
   }
   try {
@@ -541,7 +556,7 @@ export function runExperiment(params: ExperimentRunParams): { report: Experiment
 export async function runExperimentAsync(params: Parameters<typeof runExperiment>[0], options: { beforePublish?: () => void } = {}): Promise<ReturnType<typeof runExperiment>> {
   const input = { workspace: params.workspace, agentId: params.agentId, experimentId: params.experimentId, mode: params.mode,
     candidateWindow: params.candidateWindow, candidateAgentId: params.candidateAgentId,
-    baselineTrialId: params.baselineTrialId, candidateTrialId: params.candidateTrialId, execution: params.execution }, beforePublish = options.beforePublish;
+    baselineTrialId: params.baselineTrialId, candidateTrialId: params.candidateTrialId, execution: params.execution, loopCandidate: params.loopCandidate }, beforePublish = options.beforePublish;
   beforePublish?.();
   // All original authorities precede the first await. Log policy does not choose or replace the raw report purpose.
   const captured = capturePurposePublication(input.workspace, "artifact-seal");
